@@ -21,8 +21,8 @@
  */
 
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "BulletBody.hh"
 #include "common/XMLConfig.hh"
 #include "BulletPhysics.hh"
@@ -121,7 +121,7 @@ common::Angle BulletHinge2Joint::GetAngle(int index) const
 // Get rate of rotation about first axis
 double BulletHinge2Joint::GetVelocity(int index) const
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
   return 0;
 }
 
@@ -129,21 +129,21 @@ double BulletHinge2Joint::GetVelocity(int index) const
 /// Set the velocity of an axis(index).
 void BulletHinge2Joint::SetVelocity(int index, double angle)
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
 void BulletHinge2Joint::SetAnchor( int index, const common::Vector3 &anchor )
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
 void BulletHinge2Joint::SetAxis( int index, const common::Vector3 &axis )
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
 }
 
 
@@ -151,28 +151,28 @@ void BulletHinge2Joint::SetAxis( int index, const common::Vector3 &axis )
 // Set the joint damping
 void BulletHinge2Joint::SetDamping( int /*index*/, const double damping )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set torque
 void BulletHinge2Joint::SetForce(int index, double torque)
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
 void BulletHinge2Joint::SetMaxForce(int index, double t)
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
 double BulletHinge2Joint::GetMaxForce(int index)
 {
-  gzerr(0) << "Not implemented";
+  gzerr << "Not implemented";
   return 0;
 }
 

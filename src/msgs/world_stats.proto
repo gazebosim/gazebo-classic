@@ -2,7 +2,7 @@ package gazebo.msgs;
 import "header.proto";
 import "time.proto";
 
-message WorldStats
+message WorldStatistics
 {
   required Header header     = 1;
   required Time  sim_time    = 2;

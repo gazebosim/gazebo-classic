@@ -24,8 +24,8 @@
 
 #include "common/Diagnostics.hh"
 #include "common/Global.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 #include "common/Vector3.hh"
 #include "common/XMLConfig.hh"
 #include "common/Time.hh"
@@ -57,7 +57,6 @@
 using namespace gazebo;
 using namespace physics;
 
-
 GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 
 class ContactUpdate_TBB
@@ -74,10 +73,10 @@ class ContactUpdate_TBB
       ContactFeedback *feedback = &(*this->contacts)[i];
 
       if (feedback->contact.geom1 == NULL)
-        gzerr(0) << "collision update Geom1 is null\n";
+        gzerr << "collision update Geom1 is null\n";
 
       if (feedback->contact.geom2 == NULL)
-        gzerr(0) << "Collision update Geom2 is null\n";
+        gzerr << "Collision update Geom2 is null\n";
 
       feedback->contact.forces.clear();
 
@@ -131,7 +130,7 @@ class Colliders_TBB
  
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEPhysics::ODEPhysics(World *world)
+ODEPhysics::ODEPhysics(WorldPtr world)
     : PhysicsEngine(world)
 {
   // Collision detection init
@@ -330,21 +329,10 @@ void ODEPhysics::Fini()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add an entity to the world
-void ODEPhysics::AddEntity(Entity *entity)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Remove an entity from the physics engine
-void ODEPhysics::RemoveEntity(Entity *entity)
-{
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
-Body *ODEPhysics::CreateBody(Entity *parent)
+BodyPtr ODEPhysics::CreateBody(EntityPtr parent)
 {
   if (parent == NULL)
     gzthrow("Body must have a parent\n");
@@ -355,7 +343,7 @@ Body *ODEPhysics::CreateBody(Entity *parent)
   if (iter == this->spaces.end())
     this->spaces[parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
 
-  ODEBody *body = new ODEBody(parent);
+  ODEBodyPtr body( new ODEBody(parent) );
 
   body->SetSpaceId( this->spaces[parent->GetName()] );
 
@@ -364,29 +352,31 @@ Body *ODEPhysics::CreateBody(Entity *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new geom
-Geom *ODEPhysics::CreateGeom(std::string type, Body *body)
+GeomPtr ODEPhysics::CreateGeom(const std::string &type, BodyPtr body)
 {
-  ODEGeom *geom = new ODEGeom(body);
-  Shape *shape = NULL;
+  ODEGeomPtr geom( new ODEGeom(body) );
+  ShapePtr shape;
 
   if ( type == "sphere")
-    shape = new ODESphereShape(geom);
+    shape.reset( new ODESphereShape(geom) );
   else if ( type == "plane")
-    shape = new ODEPlaneShape(geom);
+    shape.reset( new ODEPlaneShape(geom) );
   else if ( type == "box")
-    shape = new ODEBoxShape(geom);
+    shape.reset( new ODEBoxShape(geom) );
   else if ( type == "cylinder")
-    shape = new ODECylinderShape(geom);
+    shape.reset( new ODECylinderShape(geom) );
   else if ( type == "multiray")
-    shape = new ODEMultiRayShape(geom);
+    shape.reset( new ODEMultiRayShape(geom) );
   else if ( type == "trimesh")
-    shape = new ODETrimeshShape(geom);
+    shape.reset( new ODETrimeshShape(geom) );
   else if ( type == "heightmap")
-    shape = new ODEHeightmapShape(geom);
+    shape.reset( new ODEHeightmapShape(geom) );
   else if ( type == "map")
-    shape = new MapShape(geom);
+    shape.reset( new MapShape(geom) );
   else
-    gzerr(0) << "Unable to create geom of type["<<type<<"]\n";
+    gzerr << "Unable to create geom of type[" << type << "]\n";
+
+  geom->SetShape(shape);
 
   return geom;
 }
@@ -536,20 +526,22 @@ void ODEPhysics::ConvertMass(void *engineMass, const Mass &mass)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new joint
-Joint *ODEPhysics::CreateJoint(std::string type)
+JointPtr ODEPhysics::CreateJoint(const std::string &type)
 {
+  JointPtr joint;
+
   if (type == "slider")
-    return new ODESliderJoint(this->worldId);
+    joint.reset( new ODESliderJoint(this->worldId) );
   if (type == "hinge")
-    return new ODEHingeJoint(this->worldId);
+    joint.reset( new ODEHingeJoint(this->worldId) );
   if (type == "hinge2")
-    return new ODEHinge2Joint(this->worldId);
+    joint.reset( new ODEHinge2Joint(this->worldId) );
   if (type == "ball")
-    return new ODEBallJoint(this->worldId);
+    joint.reset( new ODEBallJoint(this->worldId) );
   if (type == "universal")
-    return new ODEUniversalJoint(this->worldId);
-  else
-    return NULL;
+    joint.reset( new ODEUniversalJoint(this->worldId) );
+
+  return joint;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -625,8 +617,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
-    if (geom1->GetShapeType() == Common::TRIMESH_SHAPE ||
-        geom2->GetShapeType() == Common::TRIMESH_SHAPE )
+    if (geom1->GetShapeType() == Base::TRIMESH_SHAPE ||
+        geom2->GetShapeType() == Base::TRIMESH_SHAPE )
       self->trimeshColliders.push_back( std::make_pair(geom1, geom2) );
     else
       self->colliders.push_back( std::make_pair(geom1, geom2) );
@@ -650,8 +642,8 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
 
   // for now, only use maxContacts if both geometries are trimeshes
   // other types of geometries do not need too many contacts
-  if (geom1->GetShapeType() == Common::TRIMESH_SHAPE && 
-      geom2->GetShapeType() == Common::TRIMESH_SHAPE)
+  if (geom1->GetShapeType() == Base::TRIMESH_SHAPE && 
+      geom2->GetShapeType() == Base::TRIMESH_SHAPE)
   {
     numContacts = **this->maxContactsP;
   }

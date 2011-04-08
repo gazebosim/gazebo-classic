@@ -23,59 +23,18 @@
 #define HEIGHTMAPSHAPE_HH
 
 #include "common/Image.hh"
-#include "physics/Geom.hh"
-
+#include "physics/PhysicsTypes.hh"
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
 	namespace physics
   {
-  // NATY:  class OgreHeightmap;
-  
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_heightmap_geom Height map geom
-        \brief Height map geom
-  
-      \par Attributes
-      The following attributes are supported.
-  
-      - image (string)
-        - Greyscale image to use as the height map
-        - Default: (empty)
-  
-      - worldTexture (string)
-        - Material to use on distant portions of the heightmap, relative to the camera's pose
-        - Default: (empty)
-  
-      - detailTexture (string)
-        - Material to use on nearby portions of the heightmap, relative to the camera's pose
-        - Default: (empty)
-  
-      - size (float tuple)
-        - Size of the height map
-        - Default: 0 0 0
-  
-      \par Example
-      \verbatim
-        <geom:heightmap name="terrain_geom">
-          <image>terrain.png</image>
-          <worldTexture>terrain_texture.jpg</worldTexture>
-          <detailTexture>terrain_detail.jpg</detailTexture>
-          <size>1000 1000 10.0</size>
-        </geom:heightmap>
-      \endverbatim
-      */
-    /// \}
-    /// \addtogroup gazebo_heightmap_geom 
-    /// \{
-  
-  
     /// \brief Height map geom
     class HeightmapShape : public Shape
     {
       /// \brief Constructor
-      public: HeightmapShape(Geom *parent);
+      public: HeightmapShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~HeightmapShape();
@@ -84,7 +43,10 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the heightmap
-      protected: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load(common::XMLConfigNode *node);
+
+      /// \brief Initialize the heightmap
+      public: virtual void Init();
   
       /// \brief Save child parameters
       protected: void Save(std::string &prefix, std::ostream &stream);
@@ -102,8 +64,6 @@ namespace gazebo
   
       // NATY: protected: OgreHeightmap *ogreHeightmap;
     };
-  
-    /// \}
   }
 
 }

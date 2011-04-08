@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include <iostream>
 #include <boost/lexical_cast.hpp>
 
+#include "common/Console.hh"
 #include "common/Messages.hh"
 
 #include "transport/IOManager.hh"
@@ -96,7 +96,7 @@ void Connection::OnAccept(const boost::system::error_code &e,
   if (!e)
     this->acceptCB( conn );
   else
-    std::cerr << e.message() << std::endl;
+    gzerr << e.message() << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ void Connection::Write(const std::string &buffer)
   {
     //Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
-    std::cerr << "Connection::Write error[" << error.message() << "]\n";
+    gzerr << "Connection::Write error[" << error.message() << "]\n";
     return;
   }
 
@@ -221,7 +221,7 @@ unsigned short Connection::GetLocalPort() const
   else if (this->acceptor)
     return this->acceptor->local_endpoint().port();
   else
-    std::cerr << "No socket is open, unable to get port information.\n";
+    gzerr << "No socket is open, unable to get port information.\n";
 
   return 0;
 }

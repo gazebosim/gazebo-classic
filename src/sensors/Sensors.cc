@@ -15,7 +15,7 @@
  *
 */
 
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 
 #include "transport/Transport.hh"
 
@@ -48,7 +48,7 @@ sensors::SensorPtr sensors::create_sensor(const std::string &type)
     sensor->Init();
   }
   else
-    gzerr(0) << "Unable to create sensor\n";
+    gzerr << "Unable to create sensor\n";
 
   return sensor;
 }

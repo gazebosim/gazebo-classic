@@ -20,7 +20,10 @@
 #include "common/Vector3.hh"
 
 #include "physics/ode/ODEPhysics.hh"
-#include "physics/Mass.hh"
+#include "physics/ode/ODETypes.hh"
+#include "physics/ode/ODEGeom.hh"
+
+#include "physics/PhysicsTypes.hh"
 #include "physics/BoxShape.hh"
 
 namespace gazebo
@@ -29,15 +32,14 @@ namespace gazebo
   {
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(Geom *parent) : BoxShape(parent) {}
+      public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) {}
       public: virtual ~ODEBoxShape() {}
       public: virtual void SetSize( const common::Vector3 &size )
       {
         BoxShape::SetSize(size);
 
-        ODEGeom *oParent = dynamic_cast<ODEGeom*>(this->geomParent);
-        if (!oParent)
-          std::cerr << "\n\nNot and ODEGeom!!\n\n";
+        ODEGeomPtr oParent;
+        oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
 
         common::Pose3d rpose;
   

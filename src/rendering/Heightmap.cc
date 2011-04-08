@@ -26,7 +26,7 @@
 #include <math.h>
 
 #include "common/Image.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 #include "rendering/Scene.hh"
 #include "rendering/Heightmap.hh"

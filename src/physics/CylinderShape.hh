@@ -17,7 +17,6 @@
 /* Desc: Cylinder geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: CylinderGeom.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef CYLINDERSHAPE_HH
@@ -30,54 +29,21 @@ namespace gazebo
 {
 	namespace physics
   {
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_cylinder_geom Cylinder geom
-        \brief Cylinder geom
-  
-        \par Attributes
-        The following attributes are supported.
-  
-        \htmlinclude default_geom_attr_include.html
-  
-        - size (float tuple, meters)
-          - Radius and height of the cylinder
-          - Default: 0 0 
-  
-      \par Example
-      \verbatim
-      <geom:cylinder name="geom_name">
-        <xyz>1 2 3</xyz>
-        <rpy>0 0 30</rpy>
-        <size>0.1 0.5</size>
-        <mass>0.5</mass>
-        <laserFiducialId>1</laserFiducialId>
-        <laserRetro>0.5</laserRetro>
-  
-        <visual>
-          <size>0.1 0.1 0.5</size>
-          <mesh>default</mesh>
-          <material>Gazebo/Red</material>
-        </visual>
-      </geom:box>
-      \endverbatim
-      */
-    /// \}
-    /// \addtogroup gazebo_cylinder_geom
-    /// \{
-  
     /// \brief Cylinder geom
     class CylinderShape : public Shape
     {
       /// \brief Constructor
-      public: CylinderShape(Geom *parent);
+      public: CylinderShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~CylinderShape();
   
       /// \brief Load the cylinder
       public: virtual void Load(common::XMLConfigNode *node);
-  
+
+      /// \brief Initialize the cylinder
+      public: void Init();
+
       /// \brief Save child parameters
       public: virtual void Save(std::string &prefix, std::ostream &stream);
   

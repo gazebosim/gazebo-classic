@@ -23,60 +23,13 @@
 #ifndef PLANESHAPE_HH
 #define PLANESHAPE_HH
 
-#include "common/Param.hh"
+#include "common/CommonTypes.hh"
 #include "Shape.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfig;
-  }
-
 	namespace physics
   {
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_plane_geom Plane Geom
-        \brief Geom for an infinite plane.
-  
-         \par Attributes
-        The following attributes are supported.
-    
-        \htmlinclude default_geom_attr_include.html
-   
-        - normal (float tuple, unit vector)
-          - Set the plane's normal vector
-          - Default: 0 0 1
-  
-        - segments (int tuple)
-          - Set the number of segments of the plane. Larger numbers increase the vertex density.
-          - Default: 1 1
-  
-        - uvTile (float tuple)
-          - Set the UV tiling, used for texture mapping
-          - Default: 1 1
-  
-        - size (float tuple, meters)
-          - Size of the plane
-          - Default: 0 0
-    
-        \par Example
-        \verbatim
-        <geom:plane name="plane1_geom">
-          <normal>0 0 1</normal>
-          <size>2000 2000</size>
-          <segments>10 10</segments>
-          <uvTile>100 100</uvTile>
-          <material>Gazebo/GrassFloor</material>
-        </geom:plane>
-        \endverbatim
-    */
-    /// \}
-    /// \addtogroup gazebo_plane_geom 
-    /// \{
-  
-  
     /// \brief Geom for an infinite plane.
     /// 
     /// This geom is used primarily for ground planes.  Note that while
@@ -85,14 +38,17 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param body Body to which we are attached.
-      public: PlaneShape(Geom *parent);
+      public: PlaneShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~PlaneShape();
    
       /// \brief Load the plane
       public: virtual void Load(common::XMLConfigNode *node);
-  
+
+      /// \brief Initialize the plane
+      public: virtual void Init();
+ 
       /// \brief Save child parameters
       public: virtual void Save(std::string &prefix, std::ostream &stream);
   
@@ -107,8 +63,6 @@ namespace gazebo
   
       protected: common::ParamT<common::Vector3> *normalP;
     };
-    
-    /// \}
   }
 }
 #endif

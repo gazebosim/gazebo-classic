@@ -1,70 +1,62 @@
-#include_directories( 
-#  ${XML_INCLUDE_DIRS} 
-#  ${PROJECT_BINARY_DIR}/src/msgs
-#  ${PROJECT_SOURCE_DIR}/src 
-#)
-
 if (INCLUDE_ODE) 
   add_subdirectory(ode)
 endif()
 
-set (sources ${sources}
+set (sources Base.cc
              Body.cc
-             PhysicsFactory.cc
-             PhysicsEngine.cc
-             SurfaceParams.cc
-             Mass.cc
-             Joint.cc
-             Geom.cc
-             Shape.cc
              BoxShape.cc
-             CylinderShape.cc
-             PlaneShape.cc
-             SphereShape.cc
-             RayShape.cc
-             MultiRayShape.cc
-             TrimeshShape.cc
-             MapShape.cc
-             HeightmapShape.cc
              Contact.cc
-             Common.cc
+             CylinderShape.cc
              Entity.cc
-             World.cc
+             Geom.cc
+             HeightmapShape.cc
+             Joint.cc
+             Mass.cc
+             MapShape.cc
              Model.cc
+             MultiRayShape.cc
              Physics.cc
+             PhysicsEngine.cc
+             PhysicsFactory.cc
+             PlaneShape.cc
+             RayShape.cc
+             Shape.cc
+             SphereShape.cc
+             SurfaceParams.cc
+             TrimeshShape.cc
+             World.cc
 ) 
 
-set (headers ${headers}
-             BallJoint.hh
+set (headers BallJoint.hh
+             Base.hh
              Body.hh
-             PhysicsFactory.hh
-             SurfaceParams.hh
+             BoxShape.hh
+             Contact.hh
+             CylinderShape.hh
+             Entity.hh
+             Geom.hh
+             HeightmapShape.hh
              Hinge2Joint.hh
              HingeJoint.hh
              Joint.hh
-             PhysicsEngine.hh
-             SliderJoint.hh
-             UniversalJoint.hh
-             Mass.hh
-             Geom.hh
-             Shape.hh
-             BoxShape.hh
-             CylinderShape.hh
+             JointFeedback.hh
              MapShape.hh
+             Mass.hh
+             Model.hh
+             MultiRayShape.hh
+             Physics.hh
+             PhysicsEngine.hh
+             PhysicsFactory.hh
+             PhysicsTypes.hh
              PlaneShape.hh
              RayShape.hh
-             MultiRayShape.hh
+             Shape.hh
+             SliderJoint.hh
              SphereShape.hh
+             SurfaceParams.hh
              TrimeshShape.hh
-             HeightmapShape.hh
-             Contact.hh
-             JointFeedback.hh
-             Common.hh
-             Entity.hh
+             UniversalJoint.hh
              World.hh
-             Model.hh
-             Physics.hh
-             PhysicsTypes.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})

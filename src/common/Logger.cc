@@ -18,7 +18,7 @@
 #include "common/Time.hh"
 #include "Entity.hh"
 #include "Simulator.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Logger.hh"
 
 using namespace gazebo;
@@ -97,13 +97,13 @@ Logger::LogObj::LogObj(const std::string &entityName, const std::string &filenam
 
   if (!this->logFile.is_open())
   {
-    gzerr(0) << "Unable to open file for logging:" << filename << "\n";
+    gzerr << "Unable to open file for logging:" << filename << "\n";
     return;
   }
 
   if (!this->entity)
   {
-    gzerr(0) << "Unable to find entity with name:" << entityName << "\n";
+    gzerr << "Unable to find entity with name:" << entityName << "\n";
     return;
   }
 

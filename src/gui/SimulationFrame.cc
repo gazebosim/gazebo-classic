@@ -28,8 +28,8 @@
 #include "gui/TimePanel.hh"
 #include "gui/SimulationFrame.hh"
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/XMLConfig.hh"
 #include "common/Events.hh"
 #include "common/Image.hh"
@@ -316,7 +316,7 @@ void SimulationFrame::OnOpen(wxCommandEvent & WXUNUSED(event))
     {
       xmlFile->Load(doc);
     }
-    catch (common::GazeboError e)
+    catch (common::Exception e)
     {
       gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
     }
@@ -327,7 +327,7 @@ void SimulationFrame::OnOpen(wxCommandEvent & WXUNUSED(event))
       // NATY Put back in
       //Simulator::Instance()->Load(doc);
     }
-    catch (common::GazeboError e)
+    catch (common::Exception e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }

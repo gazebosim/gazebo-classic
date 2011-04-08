@@ -18,11 +18,10 @@
  * Desc: Gazebo Error
  * Author: Nathan Koenig
  * Date: 07 May 2007
- * SVN info: $Id$
  */
 
-#ifndef GAZEBOERROR_HH
-#define GAZEBOERROR_HH
+#ifndef GAZEBO_EXCEPTION_HH
+#define GAZEBO_EXCEPTION_HH
 
 #include <iostream>
 #include <sstream>
@@ -32,47 +31,25 @@ namespace gazebo
 {
 	namespace common
   {
-    /// \addtogroup gazebo_server
-    /// \brief Gazebo error class
-    /// \{
-  
     /// Throw an error
-    #define gzthrow(msg) {std::ostringstream throwStream; throwStream << "Exception: " << msg << std::endl << std::flush; throw gazebo::common::GazeboError(__FILE__,__LINE__,throwStream.str()); }
+    #define gzthrow(msg) {std::ostringstream throwStream; throwStream << "Exception: " << msg << std::endl << std::flush; throw gazebo::common::Exception(__FILE__,__LINE__,throwStream.str()); }
   
     
-    /// \brief Class to handle errors
-    ///
-    /**
-     Use <tt>gzthrow(data1 << data2)</tt> to throw errors.
-  
-     Example:
-     
-     \verbatim
-     Recommended new way:
-     gzthrow("This is an error message of type[" << type << "]");
-     Old way:
-     std::ostringstream stream;
-     stream << "This is an error message of type[" << type << "]\n";
-     gzthrow(stream.str());
-     The final "\n" is not needed anymore, the code should be changed to the new type.
-     \endverbatim
-  
-    */
-    class GazeboError
+    class Exception
     {
       /// \brief Constructor
-      public: GazeboError();
+      public: Exception();
     
       /// \brief Default constructor
       /// \param file File name
       /// \param line Line number where the error occurred
       /// \param msg Error message
-      public: GazeboError(const char *file, 
+      public: Exception(const char *file, 
                           int line, 
                           std::string msg);
     
       /// \brief Destructor
-      public: virtual ~GazeboError();
+      public: virtual ~Exception();
     
       /// \brief Return the error function
       /// \return The error function name
@@ -81,7 +58,6 @@ namespace gazebo
       /// \brief Return the error line
       /// \return The error line
       public: int GetErrorLine() const;
-    
     
       /// \brief Return the error string
       /// \return The error string
@@ -97,17 +73,15 @@ namespace gazebo
       private: std::string str;
     
       /// \brief Ostream operator for Gazebo Error
-      public: friend std::ostream &operator<<(std::ostream& out, const gazebo::common::GazeboError &err)
+      public: friend std::ostream &operator<<(std::ostream& out, 
+                  const gazebo::common::Exception &err)
               {
                 return out << err.GetErrorFile()
                            << ":" << err.GetErrorLine() 
                            << " : " << err.GetErrorStr();
               }
     };
-    
-  /** \} */
-  /// \}
   }
-
 }
+
 #endif

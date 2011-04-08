@@ -17,16 +17,14 @@
 /* Desc: Heightmap shape
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id$
  */
 
-#include <iostream>
 #include <string.h>
 #include <math.h>
 
 #include "common/Image.hh"
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 #include "physics/HeightmapShape.hh"
 
@@ -36,10 +34,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-HeightmapShape::HeightmapShape(Geom *parent)
+HeightmapShape::HeightmapShape(GeomPtr parent)
     : Shape(parent)
 {
-  this->AddType(Common::HEIGHTMAP_SHAPE);
+  this->AddType(Base::HEIGHTMAP_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->imageFilenameP = new common::ParamT<std::string>("image","",1);
@@ -76,6 +74,7 @@ void HeightmapShape::Update()
 /// Load the heightmap
 void HeightmapShape::Load(common::XMLConfigNode *node)
 {
+  Shape::Load(node);
   this->imageFilenameP->Load(node);
   this->worldTextureP->Load(node);
   this->detailTextureP->Load(node);
@@ -92,6 +91,12 @@ void HeightmapShape::Load(common::XMLConfigNode *node)
   this->terrainSize = (**this->sizeP);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the heightmap
+void HeightmapShape::Init()
+{
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
 void HeightmapShape::Save(std::string &prefix, std::ostream &stream)

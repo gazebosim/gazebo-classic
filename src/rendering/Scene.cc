@@ -21,8 +21,8 @@
 #include <OGRE/Ogre.h>
 
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/XMLConfig.hh"
 
 #include "rendering/Conversions.hh"
@@ -94,8 +94,6 @@ Scene::Scene(const std::string &name)
 /// Destructor
 Scene::~Scene()
 {
-  std::cout << "DELETE SCENE\n";
-
   Visual_M::iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     delete iter->second;
@@ -195,8 +193,8 @@ void Scene::Init()
     }
     catch (int)
     {
-      gzmsg(0) << "Unable to set sky dome to material[" 
-               << **this->skyMaterialP << "]\n";
+      gzwarn << "Unable to set sky dome to material[" 
+             << **this->skyMaterialP << "]\n";
     }
   }
 
@@ -350,7 +348,6 @@ Grid *Scene::GetGrid(unsigned int index) const
 //Create a camera
 Camera *Scene::CreateCamera(const std::string &name)
 {
-  std::cout << "\n\n SCENE Create A Camera\n\n";
   Camera *camera = new Camera(this->name + "::" + name, this);
   this->cameras.push_back(camera);
 
@@ -872,7 +869,6 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 {
-  std::cout << "RECEIVE SCENE Visuals[" << msg->visual_size() << "] Poses[" << msg->pose_size() << "]\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (int i=0; i < msg->visual_size(); i++)
   {
@@ -889,7 +885,6 @@ void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  std::cout << "Receive Visual\n" << msg->DebugString() << "\n-----------\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(msg);
 }
@@ -946,8 +941,6 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
   Visual_M::iterator iter;
   iter = this->visuals.find(msg->header().str_id());
-
-  //std::cout << "Process Visual\n" << msg->DebugString() << "\n----------\n";
 
   if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
   {

@@ -18,33 +18,35 @@
 #define SHAPE_HH
 
 #include <string>
-#include <iostream>
 
-#include "common/XMLConfig.hh"
-#include "physics/Common.hh"
+#include "common/CommonTypes.hh"
+#include "physics/PhysicsTypes.hh"
+
+#include "physics/Base.hh"
 
 namespace gazebo
 {
 	namespace physics
   {
-    class Geom;
-  
     /// \brief Base class for all shapes
-    class Shape : public Common
+    class Shape : public Base
     {
       /// \brief Constructor
-      public: Shape(Geom *p);
+      public: Shape(GeomPtr p);
   
       /// \brief Destructor
       public: virtual ~Shape();
     
       /// \brief Load the shape
-      public: virtual void Load(common::XMLConfigNode *node) = 0;
-    
+      public: virtual void Load(common::XMLConfigNode *node);
+
+      /// \brief Initialize the shape
+      public: virtual void Init() = 0;
+
       /// \brief Save the shape
       public: virtual void Save(std::string &prefix, std::ostream &stream) = 0;
   
-      protected: Geom *geomParent;
+      protected: GeomPtr geomParent;
     };
   }
 

@@ -26,7 +26,7 @@
 #include "common/XMLConfig.hh"
 #include "MultiRayShape.hh"
 #include "PhysicsEngine.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 #include "MultiRayShape.hh"
 #include "RaySensor.hh"

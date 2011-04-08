@@ -29,45 +29,11 @@ namespace gazebo
 {
 	namespace physics
   {
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
-        \brief Trimesh geom
-  
-      \par Attributes
-      The following attributes are supported.
-  
-      \htmlinclude default_geom_attr_include.html
-  
-      - scale (float tuple, meters)
-        - Scale of the trimesh
-        - Default: 1 1 1
-  
-      \par Example
-      \verbatim
-        <geom:trimesh name="pallet_geom">
-          <mesh>WoodPallet.mesh</mesh>
-          <scale>.2 .2 .2</scale>
-          <mass>0.1</mass>
-  
-          <visual>
-            <scale>.2 .2 .2</scale>
-            <material>Gazebo/WoodPallet</material>
-            <mesh>WoodPallet.mesh</mesh>
-          </visual>
-        </geom:trimesh>
-      \endverbatim
-    */
-    /// \}
-    /// \addtogroup gazebo_trimesh_geom 
-    /// \{
-  
-  
     /// \brief Triangle mesh geom
     class ODETrimeshShape : public TrimeshShape
     {
       /// \brief Constructor
-      public: ODETrimeshShape(Geom *parent);
+      public: ODETrimeshShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~ODETrimeshShape();
@@ -81,8 +47,6 @@ namespace gazebo
       private: dReal matrix_dblbuff[16*2];
       private: int last_matrix_index;
     };
-  
-    /// \}
   }
 }
 #endif

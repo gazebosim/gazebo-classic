@@ -18,20 +18,18 @@
  * Desc: Gazebo Error
  * Author: Nathan Koenig
  * Date: 07 May 2007
- * SVN info: $Id$
  */
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
-
 using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructor
-GazeboError::GazeboError(const char *file, int line, std::string msg)
+Exception::Exception(const char *file, int line, std::string msg)
 {
   this->file = file;
   this->line = line;
@@ -41,27 +39,27 @@ GazeboError::GazeboError(const char *file, int line, std::string msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-GazeboError::~GazeboError()
+Exception::~Exception()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the error file
-std::string GazeboError::GetErrorFile() const
+std::string Exception::GetErrorFile() const
 {
   return this->file;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the error string
-std::string GazeboError::GetErrorStr() const
+std::string Exception::GetErrorStr() const
 {
   return this->str;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the error code
-int GazeboError::GetErrorLine() const
+int Exception::GetErrorLine() const
 {
   return this->line;
 }

@@ -21,8 +21,8 @@
  */
 
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "BulletBody.hh"
 #include "common/XMLConfig.hh"
 #include "BulletSliderJoint.hh"
@@ -104,7 +104,7 @@ common::Angle BulletSliderJoint::GetAngle(int index) const
 // Get the rate of change
 double BulletSliderJoint::GetVelocity(int index) const
 {
-  gzerr(0) << "Not implemented in bullet\n";
+  gzerr << "Not implemented in bullet\n";
   return 0;
 }
 
@@ -112,28 +112,28 @@ double BulletSliderJoint::GetVelocity(int index) const
 /// Set the velocity of an axis(index).
 void BulletSliderJoint::SetVelocity(int index, double angle)
 {
-  gzerr(0) << "Not implemented in bullet\n";
+  gzerr << "Not implemented in bullet\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of motion
 void BulletSliderJoint::SetAxis( int index, const common::Vector3 &axis )
 {
-  gzerr(0) << "Not implemented in bullet\n";
+  gzerr << "Not implemented in bullet\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
 void BulletSliderJoint::SetDamping( int /*index*/, const double damping )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the slider force
 void BulletSliderJoint::SetForce(int index, double force)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -168,14 +168,14 @@ common::Angle BulletSliderJoint::GetLowStop(int index)
 /// Set the max allowed force of an axis(index).
 void BulletSliderJoint::SetMaxForce(int /*index*/, double /*t*/)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
 double BulletSliderJoint::GetMaxForce(int /*index*/)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
   return 0;
 }
 

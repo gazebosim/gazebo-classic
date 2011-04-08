@@ -20,8 +20,8 @@
  */
 
 #include "common/Timer.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 
 #include "sensors/Sensor.hh"
@@ -120,7 +120,7 @@ void Sensor::LoadController(common::XMLConfigNode *node)
   /*
   if (!node)
   {
-    gzmsg(0) << this->GetName() << " sensor has no controller.\n";
+    gzwarn << this->GetName() << " sensor has no controller.\n";
     return;
   }
 

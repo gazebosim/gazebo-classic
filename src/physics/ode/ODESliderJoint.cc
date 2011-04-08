@@ -21,7 +21,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo_config.h"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/XMLConfig.hh"
 
 #include "physics/Body.hh"

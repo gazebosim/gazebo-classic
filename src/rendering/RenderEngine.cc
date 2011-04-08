@@ -38,8 +38,8 @@
 
 #include "common/Color.hh"
 #include "common/Events.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/GazeboConfig.hh"
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
@@ -303,7 +303,7 @@ void RenderEngine::LoadPlugins()
         std::string description("Unable to load Ogre Plugin[");
         description.append(*piter);
         description.append("]...Skipping.");
-        gzerr(0) << description << "\n";
+        gzerr << description << "\n";
       }
     }
   }

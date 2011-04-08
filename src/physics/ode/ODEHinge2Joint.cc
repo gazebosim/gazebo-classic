@@ -21,7 +21,7 @@
  */
 
 #include "gazebo_config.h"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
 
@@ -131,7 +131,7 @@ void ODEHinge2Joint::SetDamping( int /*index*/, const double damping )
   // NATY
   // this->physics->UnlockMutex();
 #else
-  gzerr(0) << "joint damping not implemented in ODE hinge2 joint\n";
+  gzerr << "joint damping not implemented in ODE hinge2 joint\n";
 #endif
 }
 
@@ -162,7 +162,7 @@ common::Angle ODEHinge2Joint::GetAngle(int index) const
   if (index == 0)
     return dJointGetHinge2Angle1( this->jointId );
   else
-    gzerr(0) << "ODE has not function to get the second angle in a hinge2 joint";
+    gzerr << "ODE has not function to get the second angle in a hinge2 joint";
   // NATY 
   // this->physics->UnlockMutex();
 

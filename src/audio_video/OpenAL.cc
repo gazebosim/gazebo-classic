@@ -33,8 +33,8 @@
 #endif
 
 #include "common/XMLConfig.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "AudioDecoder.hh"
 #include "common/GazeboConfig.hh"
 #include "Simulator.hh"
@@ -93,7 +93,7 @@ void OpenAL::Load(XMLConfigNode *node)
   // Make sure that we could open the audio device
   if (this->audioDevice == NULL)
   {
-    gzerr(0) << "Unable to open audio device[" << deviceName << "]\n Audio will be disabled.\n";
+    gzerr << "Unable to open audio device[" << deviceName << "]\n Audio will be disabled.\n";
     return;
   }
 
@@ -102,7 +102,7 @@ void OpenAL::Load(XMLConfigNode *node)
 
   if (this->context == NULL)
   {
-    gzerr(0) << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
+    gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
     return;
   }
 
@@ -151,14 +151,14 @@ OpenALSource *OpenAL::CreateSource( XMLConfigNode *node )
   // Make sure the xml node is valid
   if (!node)
   {
-    gzerr(0) << "Invalid xmlconfig node\n";
+    gzerr << "Invalid xmlconfig node\n";
     return NULL;
   }
 
   // Make sure the audio device has been opened
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio device not open\n";
+    gzerr << "Audio device not open\n";
     return NULL;
   }
 
@@ -186,7 +186,7 @@ void OpenAL::SetListenerPos( const Vector3 pos )
   // Make sure we have an audio device
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio disabled\n";
+    gzerr << "Audio disabled\n";
     return;
   }
 
@@ -197,7 +197,7 @@ void OpenAL::SetListenerPos( const Vector3 pos )
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
   }
 #endif
 }
@@ -212,7 +212,7 @@ void OpenAL::SetListenerVel( const Vector3 vel )
   // Make sure we have an audio device
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio disabled\n";
+    gzerr << "Audio disabled\n";
   }
 
   // Clear error state
@@ -221,7 +221,7 @@ void OpenAL::SetListenerVel( const Vector3 vel )
   alListener3f(AL_VELOCITY, vel.x, vel.y, vel.z);
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" <<  error << "]\n";
+    gzerr << " Error: [" <<  error << "]\n";
   }
 #endif
 }
@@ -238,7 +238,7 @@ void OpenAL::SetListenerOrient( float cx, float cy, float cz,
   // Make sure we have an audio device
   if (!this->audioDevice)
   {
-    gzerr(0) << "Audio disabled\n";
+    gzerr << "Audio disabled\n";
   }
 
   // Clear error state
@@ -248,7 +248,7 @@ void OpenAL::SetListenerOrient( float cx, float cy, float cz,
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
   }
 #endif
 }
@@ -318,7 +318,7 @@ int OpenALSource::SetPos(const Vector3 &pos)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << "Error: [" << error << "]\n";
+    gzerr << "Error: [" << error << "]\n";
     return -1;
   }
 #endif
@@ -341,7 +341,7 @@ int OpenALSource::SetVel(const Vector3 &vel)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << "Error: [" << error << "]\n";
+    gzerr << "Error: [" << error << "]\n";
     return -1;
   }
 #endif
@@ -362,7 +362,7 @@ int OpenALSource::SetPitch(float p)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
     return -1;
   }
 #endif
@@ -384,7 +384,7 @@ int OpenALSource::SetGain(float g)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << "Error: [" << error << "]\n";
+    gzerr << "Error: [" << error << "]\n";
     return -1;
   }
 #endif
@@ -406,7 +406,7 @@ int OpenALSource::SetLoop(bool state)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr(0) << " Error: [" << error << "]\n";
+    gzerr << " Error: [" << error << "]\n";
     return -1;
   }
 #endif

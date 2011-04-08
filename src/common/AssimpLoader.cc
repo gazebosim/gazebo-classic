@@ -16,8 +16,8 @@
 */
 #include <sys/stat.h>
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/Mesh.hh"
 #include "common/Material.hh"
 #include "common/AssimpLoader.hh"
@@ -52,7 +52,7 @@ Mesh *AssimpLoader::Load(const std::string &filename)
 
   if (!scene)
   {
-    gzerr(0) << "Importer Error:" << this->importer.GetErrorString();
+    gzerr << "Importer Error:" << this->importer.GetErrorString();
     gzthrow("Unable to import mesh file[" << filename << "] using assimp");
   }
 

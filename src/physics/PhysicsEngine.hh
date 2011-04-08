@@ -16,72 +16,29 @@
 */
 /* Desc: The base class for all physics engines
  * Author: Nate Koenig
- * Date: 11 June 2007
  */
 
 #ifndef PHYSICSENGINE_HH
 #define PHYSICSENGINE_HH
 
-#include <iostream>
-
 #include "common/Event.hh"
-#include "common/Param.hh"
+#include "common/CommonTypes.hh"
 
-#include "physics/Joint.hh"
-#include "physics/Geom.hh"
+#include "transport/Publisher.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
+#include "physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace physics
   {
-    class Entity;
-    class Body;
-    
-    /// \addtogroup gazebo_physics_engine
-    /** \{
-    
-    \verbatim
-    <physics:<engine_type>>
-      <gravity>0.0 0.0 -9.8 </gravity>
-      <stepTime>0.020</stepTime>
-    </physics:<engine_type>>
-    \endverbatim
-    
-    The parameters are as follows:
-    
-    - speed (float)
-      - Target simulation speed (e.g. speed 2 yields twice real time).
-      - Default 1.0
-    
-    - gravity (float vector)
-      - The gravity vector (m/sec/sec); the default corresponds to Earth gravity.
-      - Default 0 0 -9.8
-    
-    - stepcommon::Time (float)
-      - The minimum step time for the simulator.  Reducing the step time
-        will increase the fidelity of the physical simulation, but consume
-        more CPU time.  If you have particulary complex system that appears to
-        be diverging (i.e., objects "explode" when they come into collision), consider
-        reducing the step time.
-      - Default 0.020
-    
-    */
-    
+   
     /// \brief Base class for a physics engine
     class PhysicsEngine
     {
       /// \brief Default constructor
-      public: PhysicsEngine(World *world);
+      /// \param world Pointer to the world
+      public: PhysicsEngine(WorldPtr world);
     
       /// \brief Destructor
       public: virtual ~PhysicsEngine();
@@ -109,20 +66,15 @@ namespace gazebo
       /// \brief Finilize the physics engine
       public: virtual void Fini() = 0;
   
-      /// \brief Add an entity to the world
-      public: virtual void AddEntity(Entity *entity) = 0;
-  
-      /// \brief Remove an entity from the physics engine
-      public: virtual void RemoveEntity(Entity *entity) = 0;
-    
       /// \brief Create a new body
-      public: virtual Body *CreateBody(Entity *parent) = 0;
+      public: virtual BodyPtr CreateBody(EntityPtr parent) = 0;
   
       /// \brief Create a geom
-      public: virtual Geom *CreateGeom(std::string shapeTypename, Body *body) = 0;
+      public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
+                                         BodyPtr body) = 0;
   
       /// \brief Create a new joint
-      public: virtual Joint *CreateJoint(std::string type) = 0;
+      public: virtual JointPtr CreateJoint(const std::string &type) = 0;
     
       /// \brief Return the gavity vector
       /// \return The gavity vector
@@ -151,14 +103,6 @@ namespace gazebo
       /// \brief Set the step type
       public: virtual void SetStepType(const std::string type) {}
   
-      /// \brief Lock the physics engine mutex
-      public: void LockMutex();
-  
-      public: inline bool Locked() const {return this->locked;}
-  
-      /// \brief Unlock the physics engine mutex
-      public: void UnlockMutex();
- 
       /// \brief Set whether to show contacts
       public: void ShowContacts(const bool &show);
   
@@ -211,7 +155,7 @@ namespace gazebo
       /// \brief Add a contact visual
       protected: void AddContactVisual(common::Vector3 pos, common::Vector3 norm);
   
-      protected: World *world;
+      protected: WorldPtr world;
   
       /// The gravity vector
       protected: common::ParamT<common::Vector3> *gravityP;
@@ -224,10 +168,7 @@ namespace gazebo
       /// it is called 
       protected: common::ParamT<double> *updateRateP;
   
-      protected: std::vector<common::Param*> parameters;
-  
-      private: boost::recursive_mutex *mutex;
-      private: bool locked;
+      protected: common::Param_V parameters;
   
       protected: std::string visual;
       protected: transport::PublisherPtr vis_pub;

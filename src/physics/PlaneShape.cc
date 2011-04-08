@@ -15,6 +15,8 @@
  *
 */
 
+#include "common/XMLConfig.hh"
+
 #include "physics/Geom.hh"
 #include "physics/PlaneShape.hh"
 
@@ -24,7 +26,8 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
+PlaneShape::PlaneShape(GeomPtr parent) 
+  : Shape(parent)
 {
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
@@ -46,10 +49,17 @@ PlaneShape::~PlaneShape()
 /// Load the plane
 void PlaneShape::Load(common::XMLConfigNode *node)
 {
+  Shape::Load(node);
   this->normalP->Load(node->GetChild("plane"));
-  this->CreatePlane();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the plane
+void PlaneShape::Init()
+{
+  this->CreatePlane();
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
 void PlaneShape::Save(std::string &prefix, std::ostream &stream)

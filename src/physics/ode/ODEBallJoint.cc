@@ -21,7 +21,7 @@
  */
 
 #include "gazebo_config.h"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "physics/ode/ODEBallJoint.hh"
 
 using namespace gazebo;
@@ -80,7 +80,7 @@ void ODEBallJoint::SetDamping( int /*index*/, const double damping )
   // this->physics->UnlockMutex();
 #else
   // alternaitvely, apply explicit damping
-  gzerr(0) << "joint damping not implemented in ODE ball joint\n";
+  gzerr << "joint damping not implemented in ODE ball joint\n";
 #endif
 }
 

@@ -19,8 +19,8 @@
 
 #include "common/Events.hh"
 #include "common/Color.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 
 #include "rendering/RenderEngine.hh"
 //#include "rendering/RTShaderSystem.hh"
@@ -79,7 +79,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
     }
     catch (...)
     {
-      gzerr(0) << " Unable to create the rendering window\n";
+      gzerr << " Unable to create the rendering window\n";
       window = NULL;
     }
   }
@@ -102,7 +102,7 @@ void WindowManager::Resize(unsigned int id, int width, int height)
 {
   if (id >= this->windows.size())
   {
-    gzerr(5) << "Invalid window id[" << id << "]\n";
+    gzerr << "Invalid window id[" << id << "]\n";
   }
   else
   {

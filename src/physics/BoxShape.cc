@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include "common/Vector3.hh"
+#include "common/XMLConfig.hh"
 #include "BoxShape.hh"
 
 using namespace gazebo;
@@ -22,12 +25,12 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-BoxShape::BoxShape(Geom *parent) : Shape(parent)
+BoxShape::BoxShape(GeomPtr parent) : Shape(parent)
 {
-  this->AddType(Common::BOX_SHAPE);
+  this->AddType(Base::BOX_SHAPE);
 
   common::Param::Begin(&this->parameters);
-  this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(1,1,1),1);
+  this->sizeP = new common::ParamT<common::Vector3>("size", common::Vector3(1,1,1),1);
   this->sizeP->Callback( &BoxShape::SetSize, this );
   common::Param::End();
 }
@@ -43,7 +46,14 @@ BoxShape::~BoxShape()
 /// Load the box
 void BoxShape::Load(common::XMLConfigNode *node)
 {
-  this->sizeP->Load(node->GetChild("box"));
+  Shape::Load(node);
+  this->sizeP->Load( node->GetChild("box") );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Initialize the box
+void BoxShape::Init()
+{
   this->SetSize( **this->sizeP );
 }
 
@@ -60,5 +70,3 @@ void BoxShape::SetSize( const common::Vector3 &size )
 {
   this->sizeP->SetValue( size );
 }
-
-

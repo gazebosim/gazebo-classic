@@ -17,33 +17,20 @@
 /* Desc: A ray
  * Author: Nate Keonig
  * Date: 14 Oct 2009
- * SVN: $Id:$
- */
+*/
 
 #ifndef RAYSHAPE_HH
 #define RAYSHAPE_HH
 
 #include <float.h>
 
-#include "common/Global.hh"
-#include "physics/Geom.hh"
-#include "transport/Publisher.hh"
+#include "physics/PhysicsTypes.hh"
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
 	namespace physics
   {
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_ray_geom Ray geom
-        \brief Ray geom
-  
-        This geom is used soley by ray sensors. It should not be directly included in a world file.
-    */
-    /// \}
-    /// \addtogroup gazebo_ray_geom 
-    /// \{
-  
     /// \brief Ray geom 
     class RayShape : public Shape
     {
@@ -51,7 +38,7 @@ namespace gazebo
       /// \param body Body the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when 
       ///        rendering images
-      public: RayShape( Geom *parent, bool displayRays );
+      public: RayShape( GeomPtr parent, bool displayRays );
     
       /// \brief Destructor
       public: virtual ~RayShape();
@@ -99,8 +86,11 @@ namespace gazebo
       /// \brief Get the fiducial id detected by this ray
       public: int GetFiducial() const;
   
-      /// \brief Load thte ray
-      protected: virtual void Load(common::XMLConfigNode *node);
+      /// \brief Load the ray
+      public: virtual void Load(common::XMLConfigNode *node);
+
+      /// \brief In the ray
+      public: virtual void Init();
   
       /// \brief Save child parameters
       protected: virtual void Save(std::string &, std::ostream &);
@@ -120,7 +110,6 @@ namespace gazebo
       protected: common::Vector3 globalEndPos;
       protected: transport::PublisherPtr vis_pub;
     };
-    /// \}
   }
 }
 #endif

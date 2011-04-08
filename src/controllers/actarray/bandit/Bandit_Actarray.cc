@@ -27,7 +27,7 @@
 #include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "Bandit_Actarray.hh"
 

@@ -24,8 +24,8 @@ set ( sources Messages.cc
               Event.cc
               Events.cc
               GazeboConfig.cc
-              GazeboError.cc
-              GazeboMessage.cc
+              Exception.cc
+              Console.cc
               Matrix3.cc
               Matrix4.cc
               Mesh.cc
@@ -50,7 +50,8 @@ set ( sources Messages.cc
               Material.cc
 )
 
-set ( headers Messages.hh
+set ( headers CommonTypes.hh
+              Messages.hh
               Angle.hh
               AssimpLoader.hh
               Box.hh
@@ -59,8 +60,8 @@ set ( headers Messages.hh
               Event.hh
               Events.hh
               GazeboConfig.hh
-              GazeboError.hh
-              GazeboMessage.hh
+              Exception.hh
+              Console.hh
               Global.hh
               Matrix3.hh
               Matrix4.hh

@@ -23,8 +23,8 @@
 #include <math.h>
 
 #include "common/XMLConfig.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 
 #include "physics/Geom.hh"
 #include "physics/World.hh"
@@ -37,25 +37,11 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEBody::ODEBody(Entity *parent)
+ODEBody::ODEBody(EntityPtr parent)
     : Body(parent)
 {
-  this->odePhysics = dynamic_cast<ODEPhysics*>(this->GetWorld()->GetPhysicsEngine());
-
-  if (this->odePhysics == NULL)
-    gzthrow("Not using the ode physics engine");
-
-  if ( !this->IsStatic() )
-  {
-    this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
-    dBodySetData(this->bodyId, this);
-    dBodySetAutoDisableDefaults(this->bodyId);
-    dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
-  }
-  else
-    this->bodyId = NULL;
+  this->bodyId = NULL;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -72,8 +58,10 @@ void ODEBody::Load(common::XMLConfigNode *node)
 {
   Body::Load(node);
 
-  // Update the Center of Mass.
-  this->UpdateCoM();
+  this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(this->GetWorld()->GetPhysicsEngine());
+
+  if (this->odePhysics == NULL)
+    gzthrow("Not using the ode physics engine");
 }
 
 
@@ -81,7 +69,35 @@ void ODEBody::Load(common::XMLConfigNode *node)
 // Init the ODE body
 void ODEBody::Init() 
 {
+  if ( !this->IsStatic() )
+  {
+    this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
+    dBodySetData(this->bodyId, this);
+    dBodySetAutoDisableDefaults(this->bodyId);
+    dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
+  }
+
   Body::Init();
+
+  if (this->bodyId)
+  {
+    Base_V::iterator iter;
+    for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    {
+      if ((*iter)->HasType(Base::GEOM))
+      {
+        ODEGeomPtr g = boost::shared_static_cast<ODEGeom>(*iter);
+        if (g->IsPlaceable() && g->GetGeomId())
+        {
+          gzmsg << "dGeomSetBody. Geom[" << g->GetName() << "]\n";
+          dGeomSetBody(g->GetGeomId(), this->bodyId);
+        }
+      }
+    }
+  }
+ 
+  // Update the Center of Mass.
+  this->UpdateCoM();
 
   if (this->bodyId)
   {
@@ -104,7 +120,7 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.pos.Set(p[0], p[1], p[2]);
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
-  pose = self->comEntity->GetRelativePose().GetInverse() + pose;
+  pose = self->GetRelativePose().GetInverse() + pose;
   pose.Correct();
 
   self->SetWorldPose(pose);
@@ -156,24 +172,6 @@ void ODEBody::SetSelfCollide(bool collide)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Attach a geom to this body
-void ODEBody::AttachGeom( Geom *geom )
-{
-  Body::AttachGeom(geom);
-
-  ODEGeom *odeGeom = (ODEGeom*)(geom);
-
-  if ( this->bodyId && odeGeom->IsPlaceable())
-  {
-    if (odeGeom->GetGeomId())
-    {
-      dGeomSetBody(odeGeom->GetGeomId(), this->bodyId);
-    }
-  }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Change the ode pose
 void ODEBody::OnPoseChange()
 {
@@ -182,7 +180,8 @@ void ODEBody::OnPoseChange()
 
   //this->SetEnabled(true);
 
-  common::Pose3d pose = this->comEntity->GetWorldPose();
+  //common::Pose3d pose = this->comEntity->GetWorldPose();
+  common::Pose3d pose = this->GetWorldPose();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 

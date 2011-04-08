@@ -22,37 +22,30 @@
 #include <sstream>
 
 #include "common/Events.hh"
-#include "Model.hh"
-#include "Shape.hh"
-#include "Mass.hh"
-#include "PhysicsEngine.hh"
-#include "common/Global.hh"
-#include "common/GazeboMessage.hh"
-#include "SurfaceParams.hh"
-#include "World.hh"
-#include "Body.hh"
+#include "common/Messages.hh"
+#include "common/Console.hh"
+#include "common/XMLConfig.hh"
+
+#include "physics/Contact.hh"
+#include "physics/Shape.hh"
+#include "physics/SurfaceParams.hh"
+#include "physics/Body.hh"
 #include "physics/Geom.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( Body *body )
-    : Entity(body->GetCoMEntity())
+Geom::Geom( BodyPtr body )
+    : Entity(body)
 {
-  this->AddType(Common::GEOM);
+  this->AddType(Base::GEOM);
 
   this->body = body;
-
-  // Create the contact parameters
-  this->surface = new SurfaceParams();
+  this->surface.reset( new SurfaceParams() );
 
   this->transparency = 0;
-
-  this->shape = NULL;
-
   this->contactsEnabled = false;
 
   common::Param::Begin(&this->parameters);
@@ -96,10 +89,6 @@ Geom::~Geom()
   delete this->laserFiducialIdP;
   delete this->laserRetroP;
   delete this->enableContactsP;
-
-  if (this->shape)
-    delete this->shape;
-  this->shape = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,40 +102,38 @@ void Geom::Fini()
 // First step in the loading process
 void Geom::Load(common::XMLConfigNode *node)
 {
+  common::XMLConfigNode *childNode;
+
   Entity::Load(node);
 
-  this->SetName(this->nameP->GetValue());
   this->massP->Load(node);
+  this->laserFiducialIdP->Load(node);
+  this->laserRetroP->Load(node);
+  this->enableContactsP->Load(node);
+  this->surface->Load(node);
 
-  common::XMLConfigNode *childNode;
   if ( (childNode = node->GetChild("origin")) != NULL)
   {
     this->xyzP->Load(childNode);
     this->rpyP->Load(childNode);
   }
 
-  this->laserFiducialIdP->Load(node);
-  this->laserRetroP->Load(node);
-  this->enableContactsP->Load(node);
+  if (this->shape)
+    this->shape->Load(node->GetChild("geometry"));
+  else
+    gzwarn << "No shape has been specified. Error!!!\n";
 
+  //TODO: this shouldn't exist in the physics sim
+  //this->CreateBoundingBox();
+}
+
+void Geom::Init()
+{
   this->SetContactsEnabled(**this->enableContactsP);
-
   this->SetRelativePose( common::Pose3d( **this->xyzP, **this->rpyP ) );
-
   this->mass.SetMass( **this->massP );
 
-  this->surface->Load(node);
-
-  if (this->shape)
-  {
-    this->shape->Load(node->GetChild("geometry"));
-  }
-  else
-    std::cerr << "No shape has been specified. Error!!!\n";
-
-  this->CreateBoundingBox();
-
-  this->body->AttachGeom(this);
+  this->shape->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,10 +143,9 @@ void Geom::CreateBoundingBox()
   // Create the bounding box
   if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
   {
-    common::Vector3 min;
-    common::Vector3 max;
+    common::Box box;
 
-    this->GetBoundingBox(min,max);
+    box = this->GetBoundingBox();
 
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "::BBVISUAL" ;
@@ -179,7 +165,7 @@ void Geom::CreateBoundingBox()
     else
       msg.set_material( "Gazebo/GreenTransparent" );
 
-    common::Message::Set(msg.mutable_scale(), (max - min) * 1.01);
+    common::Message::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
     common::Message::Set(msg.mutable_pose()->mutable_position(), common::Vector3(0,0,0.0));
     common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0));
     msg.set_transparency( .5 );
@@ -201,7 +187,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
   this->rpyP->SetValue( this->GetRelativePose().rot );
 
   stream << prefix << "<geom name=\"" 
-         << this->nameP->GetValue() << "\">\n";
+         << this->GetName() << "\">\n";
 
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
@@ -220,8 +206,6 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 // Set the encapsulated geometry object
 void Geom::SetGeom(bool placeable)
 {
-  this->GetWorld()->GetPhysicsEngine()->LockMutex();
-
   this->placeable = placeable;
 
   if (this->IsStatic())
@@ -235,8 +219,6 @@ void Geom::SetGeom(bool placeable)
     this->SetCategoryBits(GZ_ALL_COLLIDE);
     this->SetCollideBits(GZ_ALL_COLLIDE);
   }
-
-  this->GetWorld()->GetPhysicsEngine()->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,14 +289,14 @@ void Geom::SetMass(const double &_mass)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the body this geom belongs to
-Body *Geom::GetBody() const
+BodyPtr Geom::GetBody() const
 {
   return this->body;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the model this geom belongs to
-Model *Geom::GetModel() const
+ModelPtr Geom::GetModel() const
 {
   return this->body->GetModel();
 }
@@ -336,21 +318,21 @@ const Mass &Geom::GetMass() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-Common::EntityType Geom::GetShapeType()
+Base::EntityType Geom::GetShapeType()
 {
   return this->shape->GetLeafType();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the shape for this geom
-void Geom::SetShape(Shape *shape)
+void Geom::SetShape(ShapePtr shape)
 {
   this->shape = shape;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the attached shape
-Shape *Geom::GetShape() const
+ShapePtr Geom::GetShape() const
 {
   return this->shape;
 }
@@ -373,7 +355,8 @@ bool Geom::GetContactsEnabled() const
 /// Get the number of contacts
 unsigned int Geom::GetContactCount() const
 {
-  return this->GetParentModel()->GetContactCount(this);
+  // TODO: redo this
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -383,15 +366,18 @@ void Geom::AddContact(const Contact &contact)
   if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
     return;
 
-  this->GetParentModel()->StoreContact(this, contact);
-  this->contactSignal( contact );
+  // TODO: redo this
+  //this->GetParentModel()->StoreContact(shared_from_this(), contact);
+  //this->contactSignal( contact );
 }           
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific contact
 Contact Geom::GetContact(unsigned int i) const
 {
-  return this->GetParentModel()->RetrieveContact(this, i);
+  return Contact();
+  // TODO: redo this
+  //return this->GetParentModel()->RetrieveContact(, i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -32,7 +32,7 @@
 #include <stdint.h>
 
 #include "common/MeshLoader.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Vector3.hh"
 
 #define M_MESH 0x3000

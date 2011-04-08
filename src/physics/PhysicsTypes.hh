@@ -15,14 +15,53 @@
  *
 */
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
   namespace physics
   {
+    class Base;
+    class Entity;
     class World;
+    class Model;
+    class Body;
+    class Geom;
+    class Joint;
+    class Contact;
+    class PhysicsEngine;
+    class Mass;
+    class SurfaceParams;
+    class Shape;
+    class RayShape;
 
+    typedef boost::shared_ptr<Base> BasePtr;
+    typedef boost::shared_ptr<Entity> EntityPtr;
     typedef boost::shared_ptr<World> WorldPtr;
+    typedef boost::shared_ptr<Model> ModelPtr;
+    typedef boost::shared_ptr<Body> BodyPtr;
+    typedef boost::shared_ptr<Geom> GeomPtr;
+    typedef boost::shared_ptr<Joint> JointPtr;
+    typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+    typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
+    typedef boost::shared_ptr<Shape> ShapePtr;
+    typedef boost::shared_ptr<RayShape> RayShapePtr;
+
+    typedef std::vector<BasePtr> Base_V;
+    typedef std::vector<ModelPtr> Model_V;
+    typedef std::vector<JointPtr> Joint_V;
+    typedef std::vector<BodyPtr>  Body_V;
+    typedef std::vector<GeomPtr>  Geom_V;
+
+    #ifndef GZ_COLLIDE_BITS
+    
+    #define GZ_ALL_COLLIDE 0x0FFFFFFF
+    #define GZ_NONE_COLLIDE 0x00000000
+    #define GZ_FIXED_COLLIDE 0x00000001
+    #define GZ_SENSOR_COLLIDE 0x00000002
+    #define GZ_GHOST_COLLIDE 0x10000000
+    
+    #endif
   }
 }

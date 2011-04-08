@@ -94,7 +94,7 @@ namespace gazebo
     /// \brief Constructor
     public: UniversalJoint() : T()
             {
-              this->AddType(Common::UNIVERSAL_JOINT);
+              this->AddType(Base::UNIVERSAL_JOINT);
   
               common::Param::Begin(&this->parameters);
               this->axis1P = new common::ParamT<common::Vector3>("axis1",common::Vector3(0,0,1),0);

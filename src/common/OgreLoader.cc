@@ -22,7 +22,7 @@
 #include <list>
 
 #include "common/Mesh.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/OgreLoader.hh"
 
 using namespace gazebo;
@@ -317,7 +317,7 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
 
   uint8_t v = ReadValue<uint8_t>(file);
   if (v)
-    gzmsg(0) << "Warning: this doesn't fully support animated meshes." << v << "]\n";
+    gzwarn << "This doesn't fully support animated meshes." << v << "]\n";
 
   if (!feof(file))
   {

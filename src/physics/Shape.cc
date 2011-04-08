@@ -14,22 +14,19 @@
  * limitations under the License.
  *
 */
-#include "World.hh"
 #include "physics/Geom.hh"
-#include "Shape.hh"
+#include "physics/Shape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Shape::Shape(Geom *p)
-  : Common(p) 
+Shape::Shape(GeomPtr p)
+  : Base(p) 
 {
-  this->AddType(Common::SHAPE);
+  this->AddType(Base::SHAPE);
   this->geomParent = p;
-  this->geomParent->SetShape(this);
   this->SetName("shape");
 }
 
@@ -38,5 +35,11 @@ Shape::Shape(Geom *p)
 Shape::~Shape()
 {
   if (this->geomParent)
-    this->geomParent->SetShape(NULL);
+    this->geomParent->SetShape(ShapePtr());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load
+void Shape::Load(common::XMLConfigNode *node)
+{
 }

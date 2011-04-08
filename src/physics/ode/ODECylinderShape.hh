@@ -27,12 +27,13 @@ namespace gazebo
   {
     class ODECylinderShape : public CylinderShape
     {
-      public: ODECylinderShape(Geom *parent) : CylinderShape(parent) {}
+      public: ODECylinderShape(GeomPtr parent) : CylinderShape(parent) {}
       public: virtual ~ODECylinderShape() {}
       public: void SetSize(const double &radius, const double &length)
       {
         CylinderShape::SetSize(radius, length);
-        ODEGeom *oParent = (ODEGeom*)(this->geomParent);
+        ODEGeomPtr oParent;
+        oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
   
         dMass odeMass;
         common::Pose3d rpose;

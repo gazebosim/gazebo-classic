@@ -84,7 +84,7 @@ TimePanel::TimePanel( wxWindow *parent )
   this->statsSub = transport::subscribe("/gazebo/default/world_stats", &TimePanel::OnStats, this);
 }
 
-void TimePanel::OnStats( const boost::shared_ptr<msgs::WorldStats const> &msg)
+void TimePanel::OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &msg)
 {
   this->simTime  = common::Message::Convert( msg->sim_time() );
   this->realTime = common::Message::Convert( msg->real_time() );

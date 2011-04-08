@@ -18,7 +18,7 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 #include "common/Messages.hh"
 

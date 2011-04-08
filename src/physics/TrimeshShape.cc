@@ -16,13 +16,13 @@
 */
 /* Desc: Trimesh shape
  * Author: Nate Keonig
- * Date: 16 Ocy 2009
- * SVN: $Id$
+ * Date: 16 Oct 2009
  */
 
+#include "common/XMLConfig.hh"
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -35,9 +35,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
+TrimeshShape::TrimeshShape(GeomPtr parent) 
+  : Shape(parent)
 {
-  this->AddType(Common::TRIMESH_SHAPE);
+  this->AddType(Base::TRIMESH_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->meshNameP = new common::ParamT<std::string>("mesh","",1);
@@ -62,16 +63,20 @@ TrimeshShape::~TrimeshShape()
 /// Load the trimesh
 void TrimeshShape::Load(common::XMLConfigNode *node)
 {
-  common::MeshManager *meshManager = common::MeshManager::Instance();
-
+  Shape::Load(node);
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
   this->centerMeshP->Load(node);
   this->genTexCoordP->Load(node);
- 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Init the trimesh shape
+void TrimeshShape::Init()
+{
+  common::MeshManager *meshManager = common::MeshManager::Instance();
   this->mesh = meshManager->Load( **this->meshNameP );
-  //this->mesh->Print();
-  
+
   if (this->centerMeshP->GetValue() == std::string("aabb_center"))
   {
     common::Vector3 center,min_xyz,max_xyz;
@@ -112,7 +117,7 @@ void TrimeshShape::Load(common::XMLConfigNode *node)
       common::Mesh *newMesh = new common::Mesh();
       newMesh->SetName( newName.str() );
       newMesh->AddSubMesh( subMesh );
-     
+
       meshManager->AddMesh( newMesh ); 
 
       std::ostringstream stream;
@@ -135,7 +140,7 @@ void TrimeshShape::Load(common::XMLConfigNode *node)
       common::XMLConfig *config = new common::XMLConfig();
       config->LoadString( stream.str() );
 
-      Geom *newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( "trimesh", this->geomParent->GetBody() );
+      GeomPtr newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( "trimesh", this->geomParent->GetBody() );
 
       newGeom->SetSaveable(false);
       newGeom->Load( config->GetRootNode()->GetChild() );
@@ -144,6 +149,7 @@ void TrimeshShape::Load(common::XMLConfigNode *node)
     }
   }
 }
+ 
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save child parameters

@@ -27,7 +27,7 @@ namespace gazebo
     class ODEMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
-      public: ODEMultiRayShape(Geom *parent);
+      public: ODEMultiRayShape(GeomPtr parent);
     
       /// \brief Destructor
       public: virtual ~ODEMultiRayShape();

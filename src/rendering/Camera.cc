@@ -26,9 +26,9 @@
 #include <dirent.h>
 
 #include "common/Events.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 #include "common/Pose3d.hh"
 
@@ -671,7 +671,7 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 const unsigned char *Camera::GetImageData(unsigned int i)
 {
   if (i!=0)
-    gzerr(0) << "Camera index must be zero for cam";
+    gzerr << "Camera index must be zero for cam";
 
   int width = this->imageSizeP->GetValue().x;
   int height = this->imageSizeP->GetValue().y;

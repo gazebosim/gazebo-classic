@@ -1,6 +1,6 @@
 #include "common/XMLConfig.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 
 #include "rendering/RenderEngine.hh"
 #include "Rendering.hh"
@@ -15,10 +15,10 @@ bool rendering::load(common::XMLConfigNode *node)
   {
     rendering::RenderEngine::Instance()->Load(node);
   }
-  catch(common::GazeboError e)
+  catch(common::Exception e)
   {
     result = false;
-    gzerr(0) << "Failed to load the Rendering engine subsystem\n" << e ;
+    gzerr << "Failed to load the Rendering engine subsystem\n" << e ;
   }
 
   return result;
@@ -35,10 +35,10 @@ bool rendering::init(bool create_dummy_window)
   {
     rendering::RenderEngine::Instance()->Init();
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     result = false;
-    gzerr(0) <<"Failed to Initialize the Rendering engine subsystem\n" << e ;
+    gzerr <<"Failed to Initialize the Rendering engine subsystem\n" << e ;
   }
 
   return result;
@@ -53,9 +53,9 @@ rendering::ScenePtr rendering::create_scene(const std::string &name)
   {
     scene = rendering::RenderEngine::Instance()->CreateScene(name);
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
-    gzerr(0) <<"Failed to create a scene in the Rendering engine" << e ;
+    gzerr <<"Failed to create a scene in the Rendering engine" << e ;
   }
 
   return scene;

@@ -19,7 +19,7 @@
  * Date: 8 Nov 2010
  */
 
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "Simulator.hh"
 #include "common/Common.hh"
 #include "Entity.hh"
@@ -85,7 +85,7 @@ void SimulationIfaceHandler::Update()
   // Make sure the request count is valid
   if (this->iface->data->requestCount > GAZEBO_SIMULATION_MAX_REQUESTS)
   {
-    gzerr(0) << "Request count[" << this->iface->data->requestCount << "] greater than max allowable[" << GAZEBO_SIMULATION_MAX_REQUESTS << "]\n";
+    gzerr << "Request count[" << this->iface->data->requestCount << "] greater than max allowable[" << GAZEBO_SIMULATION_MAX_REQUESTS << "]\n";
 
     requestCount = GAZEBO_SIMULATION_MAX_REQUESTS;
   }
@@ -125,7 +125,7 @@ void SimulationIfaceHandler::Update()
           if (common)
             common->SetParam( req->strValue, req->strValue1 );
           else
-            gzerr(0) << "Invalid entity name[" << req->name 
+            gzerr << "Invalid entity name[" << req->name 
                      << "] in simulation interface Set Param Request.\n";
           break;
         }
@@ -144,7 +144,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid body name[" << req->name 
+            gzerr << "Invalid body name[" << req->name 
               << "] in simulation interface Set Force Request.\n";
           }
           break;
@@ -165,7 +165,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid body name[" << req->name 
+            gzerr << "Invalid body name[" << req->name 
               << "] in simulation interface Set Torque Request.\n";
           }
           break;
@@ -188,7 +188,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name 
+            gzerr << "Invalid model name[" << req->name 
               << "] in simulation interface Set Linear Vel Request.\n";
           }
           break;
@@ -215,7 +215,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name 
+            gzerr << "Invalid model name[" << req->name 
               << "] in simulation interface Set Angular Vel Request.\n";
           }
           break;
@@ -239,7 +239,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name 
+            gzerr << "Invalid model name[" << req->name 
               << "] in simulation interface Set Linear Accel Request.\n";
           }
           break;
@@ -261,7 +261,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name 
+            gzerr << "Invalid model name[" << req->name 
               << "] in simulation interface Set Linear Accel Request.\n";
           }
           break;
@@ -318,7 +318,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name 
+            gzerr << "Invalid model name[" << req->name 
                      << "] in simulation interface Set State Request.\n";
           }
           break;
@@ -344,7 +344,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Set Pose 3d Request.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Set Pose 3d Request.\n";
           }
 
           break;
@@ -371,7 +371,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface Get Num Children.\n";
+            gzerr << "Invalid entity name[" << req->name << "] in simulation interface Get Num Children.\n";
           break;
         }
 
@@ -393,7 +393,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM.\n";
+            gzerr << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM.\n";
 
           break;
         }
@@ -415,7 +415,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM.\n";
+            gzerr << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM.\n";
 
           break;
         }
@@ -434,7 +434,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM_COUNT.\n";
+            gzerr << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM_COUNT.\n";
 
           break;
         }
@@ -455,7 +455,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Model Name.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Get Model Name.\n";
 
           break;
         }
@@ -483,10 +483,10 @@ void SimulationIfaceHandler::Update()
               this->iface->data->responseCount += 1;
             }
             else
-            gzerr(0) << "Invalid child index in simulation interface Get Child Name.\n";
+            gzerr << "Invalid child index in simulation interface Get Child Name.\n";
           }
           else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Child Name.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Get Child Name.\n";
 
           break;
         }
@@ -524,7 +524,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface Get Model Type.\n";
+            gzerr << "Invalid entity name[" << req->name << "] in simulation interface Get Model Type.\n";
 
           break;
         }
@@ -548,7 +548,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Model Extent.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Get Model Extent.\n";
 
           break;
         }
@@ -603,7 +603,7 @@ void SimulationIfaceHandler::Update()
             this->iface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get State Request.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Get State Request.\n";
           break;
         }
  
@@ -634,7 +634,7 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Pose 3d Request.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Get Pose 3d Request.\n";
           }
 
           break;
@@ -915,13 +915,13 @@ void SimulationIfaceHandler::Update()
           }
           else
           {
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Children Request.\n";
+            gzerr << "Invalid model name[" << req->name << "] in simulation interface Get Children Request.\n";
           }
           break;
         }
 
       default:
-        gzerr(0) << "Unknown simulation iface request[" << req->type << "]\n";
+        gzerr << "Unknown simulation iface request[" << req->type << "]\n";
         break;
     }
 

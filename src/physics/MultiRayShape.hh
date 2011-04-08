@@ -19,8 +19,8 @@
 
 #include <vector>
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/Vector3.hh"
 #include "common/Angle.hh"
 
@@ -35,11 +35,6 @@ namespace gazebo
     class Visual;
   }
 
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace physics
   {
     /// \brief Laser geom contains a set of ray-geoms, structured to simulate
@@ -47,14 +42,17 @@ namespace gazebo
     class MultiRayShape : public Shape
     {
       /// \brief Constructor
-      public: MultiRayShape(Geom *parent);
+      public: MultiRayShape(GeomPtr parent);
     
       /// \brief Destructor
       public: virtual ~MultiRayShape();
   
       /// \brief Load a multi-ray shape from xml file
-      public: void Load(common::XMLConfigNode *node);
-  
+      public: virtual void Load(common::XMLConfigNode *node);
+ 
+      /// \brief Init the shape 
+      public: virtual void Init();
+              
       /// \brief Save child parameters
       public: virtual void Save(std::string &prefix, std::ostream &stream);
   
@@ -123,7 +121,7 @@ namespace gazebo
       protected: msgs::Visual *rayFanOutlineMsg;
     
       /// Ray data
-      protected: std::vector< RayShape* > rays;
+      protected: std::vector< RayShapePtr > rays;
   
       protected: double maxRange;
   

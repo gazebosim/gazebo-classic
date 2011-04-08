@@ -20,6 +20,7 @@
  */
 
 #include "physics/Body.hh"
+#include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODEGeom.hh"
 #include "physics/ode/ODERayShape.hh"
 
@@ -29,12 +30,12 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODERayShape::ODERayShape( Geom *parent, bool displayRays )
+ODERayShape::ODERayShape( GeomPtr parent, bool displayRays )
     : RayShape(parent, displayRays)
 {
   this->SetName("ODE Ray Shape");
 
-  ODEGeom *geom = (ODEGeom*)this->geomParent;
+  ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   // Create default ray with unit length
   geom->SetGeom( dCreateRay( geom->GetSpaceId(), 1.0 ),  false );
@@ -50,7 +51,7 @@ ODERayShape::~ODERayShape()
 // Update the ray geom
 void ODERayShape::Update()
 {
-  ODEGeom *geom = (ODEGeom*)this->geomParent;
+  ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   common::Vector3 dir;
 
@@ -78,7 +79,7 @@ void ODERayShape::Update()
 void ODERayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd)
 {
   common::Vector3 dir;
-  ODEGeom *geom = (ODEGeom*)this->geomParent;
+  ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   RayShape::SetPoints(posStart, posEnd);
 

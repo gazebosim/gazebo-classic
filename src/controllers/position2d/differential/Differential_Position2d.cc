@@ -27,7 +27,7 @@
 #include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "PhysicsEngine.hh"
 #include "ControllerFactory.hh"
 #include "Differential_Position2d.hh"

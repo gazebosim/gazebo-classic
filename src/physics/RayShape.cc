@@ -22,6 +22,8 @@
 #include "transport/Transport.hh"
 
 #include "common/Messages.hh"
+
+#include "physics/Geom.hh"
 #include "physics/RayShape.hh"
 
 using namespace gazebo;
@@ -30,7 +32,8 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
+RayShape::RayShape( GeomPtr parent, bool displayRays ) 
+  : Shape(parent)
 {
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
@@ -184,8 +187,15 @@ int RayShape::GetFiducial() const
 /// Load thte ray
 void RayShape::Load(common::XMLConfigNode *node) 
 {
+  Shape::Load(node);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// In the ray
+void RayShape::Init()
+{
+}
+  
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
 void RayShape::Save(std::string &, std::ostream &) 

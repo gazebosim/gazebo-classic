@@ -159,7 +159,7 @@ void TopicManager::ConnectSubscibers(const std::string &topic)
     }
   }
   else
-    std::cerr << "Shouldn't get here\n";//TODO: Properly handle this error
+    gzerr << "Shouldn't get here\n";//TODO: Properly handle this error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ void TopicManager::ConnectSubToPub( const std::string &topic,
     if (publication)
       publication->AddTransport( publink );
     else
-      std::cerr << "Attempting to connect a remote publisher...but we don't have a publication. This shouldn't happen\n";
+      gzerr << "Attempting to connect a remote publisher...but we don't have a publication. This shouldn't happen\n";
   }
 
   this->ConnectSubscibers(topic);
@@ -197,7 +197,7 @@ bool TopicManager::UpdatePublications( const std::string &topic,
   {
     // TODO: Handle this error properly
     if (msgType != pub->GetMsgType())
-      std::cerr << "Attempting to advertise on an existing topic with a conflicting message type\n";
+      gzerr << "Attempting to advertise on an existing topic with a conflicting message type\n";
   }
   else
   {

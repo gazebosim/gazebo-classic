@@ -35,7 +35,7 @@ namespace gazebo
 
       public: void MyUpdate( );
   
-      private: void OnStats( const boost::shared_ptr<msgs::WorldStats const> &msg);
+      private: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &msg);
   
       private: wxStaticText *percentRealTimeText;
       private: wxTextCtrl *percentRealTimeCtrl;

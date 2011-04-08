@@ -14,7 +14,10 @@
  * limitations under the License.
  *
 */
-#include "CylinderShape.hh"
+
+#include "common/XMLConfig.hh"
+
+#include "physics/CylinderShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -22,9 +25,9 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-CylinderShape::CylinderShape(Geom *parent) : Shape(parent)
+CylinderShape::CylinderShape(GeomPtr parent) : Shape(parent)
 {
-  this->AddType(Common::CYLINDER_SHAPE);
+  this->AddType(Base::CYLINDER_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->radiusP = new common::ParamT<double>("radius",1,1);
@@ -47,11 +50,18 @@ CylinderShape::~CylinderShape()
 /// Load the cylinder
 void CylinderShape::Load(common::XMLConfigNode *node)
 {
+  Shape::Load(node);
   this->radiusP->Load(node->GetChild("cylinder"));
   this->lengthP->Load(node->GetChild("cylinder"));
+}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the cylinder
+void CylinderShape::Init()
+{
   this->SetSize( **this->radiusP, **this->lengthP );
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters

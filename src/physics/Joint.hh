@@ -17,13 +17,10 @@
 /* Desc: The base joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id$
  */
 
 #ifndef JOINT_HH
 #define JOINT_HH
-
-#include <boost/signal.hpp>
 
 #include "common/Event.hh"
 #include "common/Angle.hh"
@@ -31,26 +28,14 @@
 #include "common/Global.hh"
 #include "transport/Publisher.hh"
 
-#include "physics/Common.hh"
+#include "physics/Base.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace physics
   {
-    /// \addtogroup gazebo_physics
     /// \brief Base class for all joints
-    /// \{
-  
-    class Body;
-    class Model;
-  
-    /// \brief Base class for all joints
-    class Joint : public Common
+    class Joint : public Base
     {
       /// \brief Type of joint
       public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM, STOP_ERP,STOP_CFM,ERP,CFM,FMAX,VEL,HI_STOP,LO_STOP};
@@ -66,6 +51,7 @@ namespace gazebo
   
       /// \brief Save a joint to a stream in XML format
       public: void Save(std::string &prefix, std::ostream &stream);
+
       protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream) {}
   
       /// \brief Update the joint
@@ -78,16 +64,16 @@ namespace gazebo
       public: virtual void Reset();
   
       /// \brief Set the model this joint belongs too
-      public: void SetModel(Model *model);
+      public: void SetModel(ModelPtr model);
   
       /// \brief Get the body to which the joint is attached according the _index
-      public: virtual Body *GetJointBody( int index ) const = 0;
+      public: virtual BodyPtr GetJointBody( int index ) const = 0;
   
       /// \brief Determines of the two bodies are connected by a joint
-      public: virtual bool AreConnected( Body *one, Body *two ) const = 0;
+      public: virtual bool AreConnected( BodyPtr one, BodyPtr two ) const = 0;
   
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach( Body *one, Body *two );
+      public: virtual void Attach( BodyPtr one, BodyPtr two );
   
       /// \brief Detach this joint from all bodies
       public: virtual void Detach() = 0;
@@ -160,10 +146,10 @@ namespace gazebo
       public: virtual void SetAttribute( Attribute, int index, double value) = 0;
     
       /// The first body this joint connects to
-      protected: Body *body1;
+      protected: BodyPtr body1;
   
       /// The second body this joint connects to
-      protected: Body *body2;
+      protected: BodyPtr body2;
   
       /// Name of this joint
       protected: common::ParamT<double> *erpP;
@@ -186,10 +172,10 @@ namespace gazebo
       protected: std::string line2;
       protected: bool showJoints;
   
-      protected: Model *model;
+      protected: ModelPtr model;
   
       protected: common::Vector3 anchorPos;
-      protected: Body *anchorBody;
+      protected: BodyPtr anchorBody;
   
       private: event::EventT<void ()> jointUpdateSignal;
       private: event::ConnectionPtr showJointsConnection;
@@ -198,8 +184,6 @@ namespace gazebo
       protected: double damping_coefficient;
       protected: transport::PublisherPtr vis_pub;
     };
-  
-    /// \}
   }
 }
 #endif

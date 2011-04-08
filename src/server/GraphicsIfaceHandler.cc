@@ -26,8 +26,8 @@
 #include "rendering/Scene.hh"
 #include "World.hh"
 #include "Entity.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "IfaceFactory.hh"
 #include "rendering/Visual.hh"
 #include "rendering/OgreDynamicLines.hh"
@@ -77,7 +77,7 @@ void GraphicsIfaceHandler::Load(const std::string &_name, Entity *_parent)
   }
   catch (std::string err)
   {
-    gzerr(0) << "Error: Unable to make graphics3d interface[" << _name << "]\n";
+    gzerr << "Error: Unable to make graphics3d interface[" << _name << "]\n";
     gzthrow(err);
   }
 
@@ -148,7 +148,7 @@ void GraphicsIfaceHandler::Update()
         break;
 
       default:
-        gzerr(0) << "Unknown draw mode[" 
+        gzerr << "Unknown draw mode[" 
           << this->threeDIface->data->commands[i].drawMode << "\n";
         break;
     }
@@ -189,7 +189,7 @@ void GraphicsIfaceHandler::DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData
       opType = RENDERING_TRIANGLE_FAN;
       break;
     default:
-      gzerr(0) << "Unknown draw operation mode[" 
+      gzerr << "Unknown draw operation mode[" 
                << data->drawMode << "]\n";
       return;
   }
@@ -340,7 +340,7 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
       }
     default:
       {
-        gzerr(0) << "Unknown draw mode for shapes[" 
+        gzerr << "Unknown draw mode for shapes[" 
           << data->drawMode << "]\n";
         break;
       }

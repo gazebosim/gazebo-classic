@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "transport/TopicManager.hh"
 #include "transport/Publisher.hh"
 

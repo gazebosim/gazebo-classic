@@ -20,22 +20,18 @@
  * Date: 09 Sept. 2008
  */
 
-#ifndef COMMON_HH
-#define COMMON_HH
+#ifndef GAZEBO_PHYSICS_BASE_HH
+#define GAZEBO_PHYSICS_BASE_HH
 
-#include <vector>
+#include <boost/enable_shared_from_this.hpp>
+
 #include <string>
 
-#include "common/Global.hh"
-#include "common/Param.hh"
+#include "common/CommonTypes.hh"
+#include "physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfig;
-  }
-
 	namespace physics
   {
     static std::string EntityTypename[] = { 
@@ -44,26 +40,34 @@ namespace gazebo
       "plane", "shape", "slider", "sphere", "trimesh", "universal", "light",
       "visual" };
 
-    class World;
-
-    class Common
+    class Base : public boost::enable_shared_from_this<Base>
     {
-      public: enum EntityType{COMMON, ENTITY, MODEL, BODY, GEOM, BALL_JOINT, 
-                              BOX_SHAPE, CYLINDER_SHAPE, HEIGHTMAP_SHAPE, 
-                              HINGE2_JOINT, HINGE_JOINT, JOINT, MAP_SHAPE, 
-                              MULTIRAY_SHAPE, RAY_SHAPE, PLANE_SHAPE, SHAPE, 
-                              SLIDER_JOINT, SPHERE_SHAPE, TRIMESH_SHAPE, 
-                              UNIVERSAL_JOINT, LIGHT, VISUAL};
+      public: enum EntityType{BASE, ENTITY, MODEL, BODY, GEOM, 
+                              BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, 
+                              HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, 
+                              JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, 
+                              PLANE_SHAPE, SHAPE, SLIDER_JOINT, SPHERE_SHAPE, 
+                              TRIMESH_SHAPE, UNIVERSAL_JOINT, LIGHT, VISUAL};
 
       /// \brief Constructor
-      public: Common(Common *parent);
+      /// \param parent Parent of this object
+      public: Base(BasePtr parent);
   
       /// \brief Destructor
-      public: virtual ~Common();
+      public: virtual ~Base();
   
       /// \brief Load 
+      /// \param node Pointer to an XML config node
       public: virtual void Load(common::XMLConfigNode *node);
-  
+
+      /// \brief Save the object
+      /// \param prefix A prefix string
+      /// \param stream The output stream
+      public: virtual void Save(const std::string &prefix, std::ostream &stream);
+
+      /// \brief Finialize the object
+      public: virtual void Fini();
+
       /// \brief Set the name of the entity
       /// \param name Body name
       public: virtual void SetName(const std::string &name);
@@ -73,27 +77,31 @@ namespace gazebo
       public: std::string GetName() const;
   
       /// \brief Get the count of the parameters
+      /// \return The number of parameters associated with this object
       public: unsigned int GetParamCount() const;
   
       /// \brief Get a param by index
+      /// \param index The index of the parameter to retreive
+      /// \return The parameter, or NULL on error
       public: common::Param *GetParam(unsigned int index) const;
   
       /// \brief Get a parameter by name
+      /// \param key The string name of a parameter to retreive
+      /// \return The parameter, or NULL on error
       public: common::Param *GetParam(const std::string &key) const;
   
-       /// \brief Set a parameter by name
-      public: void SetParam(const std::string &key, const std::string &value);
-     
       /// \brief Return the ID of this entity. This id is unique
       /// \return Integer ID
       public: int GetId() const;
   
       /// \brief Set whether the object should be "saved", when the user
       ///        selects to save the world to xml
+      /// \param v Set to True if the object should be saved.
       public: void SetSaveable(bool v);
   
       /// \brief Get whether the object should be "saved", when the user
       ///        selects to save the world to xml
+      /// \return True if the object is saveable
       public: bool GetSaveable() const;
   
       /// \brief Return the ID of the parent
@@ -101,32 +109,35 @@ namespace gazebo
       public: int GetParentId() const;
     
       /// \brief Set the parent
-      /// \param parent Parent entity
-      public: void SetParent(Common *parent);
+      /// \param parent Parent object
+      public: void SetParent(BasePtr parent);
     
       /// \brief Get the parent
       /// \return Pointer to the parent entity
-      public: Common *GetParent() const;
+      public: BasePtr GetParent() const;
   
       /// \brief Add a child to this entity
       /// \param child Child entity
-      public: void AddChild(Common *child);
+      public: void AddChild(BasePtr child);
   
       /// \brief Remove a child from this entity
       /// \param child Child to remove
-      public: virtual void RemoveChild(Common *child);
+      public: virtual void RemoveChild(unsigned int id);
    
       /// \brief Get the number of children
+      /// \return The number of children
       public: unsigned int GetChildCount() const;
   
       /// \brief Get by name 
-      public: Common *GetByName(const std::string &name);
+      /// \param name Get a child (or self) object by name
+      /// \return A pointer to the object, NULL if not found
+      public: BasePtr GetByName(const std::string &name);
   
       /// \brief Get a child by index
-      public: Common *GetChild(unsigned int i) const;
+      public: BasePtr GetChild(unsigned int i) const;
   
       /// \brief Get a child by name
-      public: Common *GetChild(const std::string &name );
+      public: BasePtr GetChild(const std::string &name );
   
       /// \brief Add a type specifier
       public: void AddType( EntityType type );
@@ -167,43 +178,41 @@ namespace gazebo
       public: bool IsSelected() const;
   
       /// \brief Returns true if the entities are the same. Checks only the name
-      public: bool operator==(const Common &ent) const;
+      public: bool operator==(const Base &ent) const;
   
       /// \brief Set the world this object belongs to. This will also 
       ///        set the world for all children
-      public: void SetWorld(World *newWorld);
+      public: void SetWorld(WorldPtr newWorld);
     
       /// \brief Get the world this object is in
-      public: World *GetWorld() const;
+      public: WorldPtr GetWorld() const;
    
+      /// List of all the parameters
+      protected: common::Param_V parameters;
+
       /// \brief Parent of this entity
-      protected: Common *parent;
-  
+      protected: BasePtr parent;
+ 
+      /// \brief Children of this entity
+      protected: Base_V children;
+
+      ///  Name of the entity
+      private: common::ParamT<std::string> *nameP;
+ 
+      /// \brief Set to true if the object should be saved.
+      private: bool saveable;
+ 
       /// \brief This entities ID
       private: unsigned int id;
     
       /// \brief Used to automaticaly chose a unique ID on creation
       private: static unsigned int idCounter;
    
-      ///  Name of the entity
-      protected: common::ParamT<std::string> *nameP;
-  
-      /// List of all the parameters
-      protected: std::vector<common::Param*> parameters;
-  
-      /// \brief Set to true if the object should be saved.
-      protected: bool saveable;
-   
-      /// \brief Children of this entity
-      protected: std::vector< Common* > children;
-   
       private: std::vector< EntityType > type;
   
       private: bool selected;
   
-      private: bool showInGui;
-  
-      private: World *world;
+      private: WorldPtr world;
     };
   }
 

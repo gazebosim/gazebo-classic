@@ -16,7 +16,7 @@
 */
 #include <string.h>
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Matrix3.hh"
 
 using namespace gazebo;

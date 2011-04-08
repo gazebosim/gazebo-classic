@@ -50,7 +50,7 @@ SensorServer::SensorServer()
   {
     common::GazeboConfig::Instance()->Load();
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
@@ -78,7 +78,7 @@ void SensorServer::Load(const std::string &filename)
     else
       xmlFile->LoadString(default_config);
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
   }

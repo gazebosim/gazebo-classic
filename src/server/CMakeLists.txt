@@ -81,7 +81,7 @@ SET (sources Common.cc
              GazeboConfig.cc
              Time.cc
              Entity.cc
-             GazeboError.cc
+             Exception.cc
              GazeboMessage.cc
              Model.cc
              Angle.cc
@@ -111,8 +111,8 @@ SET (sources Common.cc
 
 SET (headers Common.hh
              Entity.hh
-             GazeboError.hh
-             GazeboMessage.hh
+             Exception.hh
+             Console.hh
              Global.hh
              Model.hh
              Pose3d.hh

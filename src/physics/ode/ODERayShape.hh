@@ -30,24 +30,13 @@ namespace gazebo
 {
 	namespace physics
   {
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_ray_geom Ray geom
-        \brief Ray geom
-  
-        This geom is used soley by ray sensors. It should not be directly included in a world file.
-    */
-    /// \}
-    /// \addtogroup gazebo_ray_geom 
-    /// \{
-  
     /// \brief Ray geom 
     class ODERayShape : public RayShape
     {
       /// \brief Constructor
       /// \param body Body the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when rendering images
-      public: ODERayShape( Geom *geom, bool displayRays );
+      public: ODERayShape( GeomPtr geom, bool displayRays );
     
       /// \brief Destructor
       public: virtual ~ODERayShape();
@@ -62,8 +51,6 @@ namespace gazebo
       public: virtual void SetPoints(const common::Vector3 &posStart, 
                                      const common::Vector3 &posEnd);
     };
-    
-    /// \}
   }
 }
 #endif

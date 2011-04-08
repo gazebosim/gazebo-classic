@@ -7,8 +7,9 @@
 #include <boost/shared_ptr.hpp>
 #include <google/protobuf/message.h>
 
+#include "common/Console.hh"
 #include "common/Messages.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 namespace gazebo
 {
@@ -56,7 +57,7 @@ namespace gazebo
 
                 // TODO: Handle this error properly
                 if (packet.type() != "data")
-                  std::cerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
+                  gzerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
                 boost::shared_ptr<M> m( new M );
                 m->ParseFromString( packet.serialized_data() );
                 this->callback( m );
@@ -85,7 +86,7 @@ namespace gazebo
 
                 // TODO: Handle this error properly
                 if (packet.type() != "data")
-                  std::cerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
+                  gzerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
                 boost::shared_ptr<msgs::String> m( new msgs::String );
                 m->ParseFromString( packet.serialized_data() );
                 this->callback( m );

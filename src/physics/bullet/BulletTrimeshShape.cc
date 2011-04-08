@@ -23,7 +23,7 @@
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
 #include "Body.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "BulletTrimeshShape.hh"
 
 using namespace gazebo;

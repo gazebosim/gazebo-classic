@@ -75,8 +75,6 @@ namespace gazebo
   {\
     SensorFactory::RegisterSensor( name, New##classname);\
   }
-  
-  /// \}
   }
 }
 

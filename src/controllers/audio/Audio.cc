@@ -26,7 +26,7 @@
 #include "Model.hh"
 #include "Simulator.hh"
 #include "gz.h"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "OpenAL.hh"
 #include "Audio.hh"

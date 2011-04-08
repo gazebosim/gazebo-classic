@@ -16,13 +16,14 @@
 */
 /* Desc: ODE Body class
  * Author: Nate Koenig
- * Date: 15 May 2009
  */
 
 #ifndef ODEBODY_HH
 #define ODEBODY_HH
 
 #include <ode/ode.h>
+
+#include "physics/ode/ODETypes.hh"
 #include "physics/Body.hh"
 
 namespace gazebo
@@ -36,15 +37,11 @@ namespace gazebo
   {
     class ODEPhysics;
 
-    /// \addtogroup gazebo_physics
-    /// \brief The body class
-    /// \{
-  
     /// Body class
     class ODEBody : public Body
     {
       /// \brief Constructor
-      public: ODEBody(Entity *parent);
+      public: ODEBody(EntityPtr parent);
   
       /// \brief Destructor
       public: virtual ~ODEBody();
@@ -61,10 +58,6 @@ namespace gazebo
   
       /// \brief Update the body
       public: virtual void Update();
-  
-      /// \brief Attach a geom to this body
-      /// \param geom Geometery to attach to this body
-      public: virtual void AttachGeom( Geom *geom );
   
       /// \brief Called when the pose of the entity (or one of its parents) has
       /// changed
@@ -145,7 +138,7 @@ namespace gazebo
       /// ODE body handle
       private: dBodyID bodyId;
   
-      private: ODEPhysics *odePhysics;
+      private: ODEPhysicsPtr odePhysics;
   
       private: dSpaceID spaceId;
     };

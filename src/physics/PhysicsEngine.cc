@@ -16,14 +16,11 @@
 */
 /* Desc: The base class for all physics engines
  * Author: Nate Koenig
- * Date: 11 June 2007
  */
 
-#include <boost/thread/recursive_mutex.hpp>
-
 #include "common/Messages.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/Events.hh"
 
 #include "transport/Transport.hh"
@@ -34,10 +31,9 @@
 using namespace gazebo;
 using namespace physics;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-PhysicsEngine::PhysicsEngine(World *world)
+PhysicsEngine::PhysicsEngine(WorldPtr world)
   : world(world)
 {
   this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
@@ -49,9 +45,6 @@ PhysicsEngine::PhysicsEngine(World *world)
   this->updateRateP = new common::ParamT<double>("update_rate", 0.0, 0);
   this->stepTimeP = new common::ParamT<common::Time>("step_time",0.025,0);
   common::Param::End();
-
-  this->mutex = new boost::recursive_mutex();
-  this->locked = false;
 
   {
     /*this->visualMsg = new VisualMsg();
@@ -104,7 +97,7 @@ PhysicsEngine::PhysicsEngine(World *world)
 
     this->showContactConnection = event::Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
 
-    // NATY: put this back in
+    // TODO: put this back in
     //this->contactLinesIter = this->contactLines.begin();
     //delete mat;
   }
@@ -126,23 +119,20 @@ PhysicsEngine::~PhysicsEngine()
   delete this->gravityP;
   delete this->updateRateP;
   delete this->stepTimeP;
-
-  delete this->mutex;
-  this->mutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
 common::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->gravityP->GetValue();
+  return (**this->gravityP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
 double PhysicsEngine::GetUpdateRate() const
 {
-  return this->updateRateP->GetValue();
+  return (**this->updateRateP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,22 +154,6 @@ common::Time PhysicsEngine::GetStepTime() const
 void PhysicsEngine::SetStepTime(common::Time time)
 {
   this->stepTimeP->SetValue(time);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Lock the physics engine mutex
-void PhysicsEngine::LockMutex()
-{
-  this->mutex->lock();
-  this->locked = true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Lock the physics engine mutex
-void PhysicsEngine::UnlockMutex()
-{
-  this->mutex->unlock();
-  this->locked = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +207,7 @@ void PhysicsEngine::ShowContacts(const bool &show)
   msg.set_visible( show );
   this->vis_pub->Publish(msg);
 
-  /* NATY put back in
+  /* TODO put back in
   if (show)
     this->contactLinesIter = this->contactLines.begin();
     */
@@ -253,7 +227,7 @@ common::Param *PhysicsEngine::GetParam(unsigned int index) const
   if (index < this->parameters.size())
     return this->parameters[index];
   else
-    gzerr(0) << "Invalid index[" << index << "]\n";
+    gzerr << "Invalid index[" << index << "]\n";
   return NULL;
 }
 
@@ -261,7 +235,7 @@ common::Param *PhysicsEngine::GetParam(unsigned int index) const
 /// Get a parameter by name
 common::Param *PhysicsEngine::GetParam(const std::string &key) const
 {
-  std::vector<common::Param*>::const_iterator iter;
+  common::Param_V::const_iterator iter;
   common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
@@ -274,7 +248,7 @@ common::Param *PhysicsEngine::GetParam(const std::string &key) const
   }
 
   if (result == NULL)
-    gzerr(0) << "Unable to find common::Param using key[" << key << "]\n";
+    gzerr << "Unable to find common::Param using key[" << key << "]\n";
 
   return result;
 
@@ -284,7 +258,7 @@ common::Param *PhysicsEngine::GetParam(const std::string &key) const
 /// Set a parameter by name
 void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
 {
-  std::vector<common::Param*>::const_iterator iter;
+  common::Param_V::const_iterator iter;
   common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
@@ -297,7 +271,7 @@ void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
   }
 
   if (result == NULL)
-    gzerr(0) << "Unable to find common::Param using key[" << key << "]\n";
+    gzerr << "Unable to find common::Param using key[" << key << "]\n";
   else
     result->SetFromString( value, true );
 }

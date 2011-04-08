@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Event.hh"
 #include "common/Time.hh"
 #include "common/SingletonT.hh"

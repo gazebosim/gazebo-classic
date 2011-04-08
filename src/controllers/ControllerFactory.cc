@@ -23,7 +23,7 @@
 
 #include "gazebo_config.h"
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "Entity.hh"
 #include "gz.h"
 #include "Controller.hh"
@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include "Simulator.hh"
 #include "common/GazeboConfig.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 
 #ifdef HAVE_DL
 #include <dlfcn.h>

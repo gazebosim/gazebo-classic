@@ -28,7 +28,7 @@
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
 #include "Simulator.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "StereoCameraSensor.hh"
 #include "Stereo_Camera.hh"

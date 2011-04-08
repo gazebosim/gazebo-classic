@@ -26,9 +26,9 @@
 #include "common/Events.hh"
 #include "common/Quatern.hh"
 #include "common/XMLConfig.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 #include "physics/Model.hh"
 #include "physics/World.hh"
@@ -41,20 +41,10 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Body::Body(Entity *parent)
+Body::Body(EntityPtr parent)
     : Entity(parent)
 {
-  this->AddType(Common::BODY);
-
-  // NATY: put back in functionality
-  // this->GetVisualNode()->SetShowInGui(false);
-
-  this->comEntity = new Entity(this);
-  this->comEntity->SetName("COM_Entity");
-  this->comEntity->SetShowInGui(false);
-
-  // NATY: put back in functionality
-  //this->comEntity->GetVisualNode()->SetShowInGui(false);
+  this->AddType(Base::BODY);
 
   common::Param::Begin(&this->parameters);
   this->autoDisableP = new common::ParamT<bool>("auto_disable", true, 0);
@@ -91,10 +81,6 @@ Body::Body(Entity *parent)
   this->kinematicP->Callback( &Body::SetKinematic, this );
 
   common::Param::End();
-
-  this->connections.push_back( event::Events::ConnectShowJointsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
-  this->connections.push_back( event::Events::ConnectShowPhysicsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
-
 }
 
 
@@ -102,7 +88,6 @@ Body::Body(Entity *parent)
 // Destructor
 Body::~Body()
 {
-  std::map< std::string, Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
 
   for (unsigned int i=0; i < this->visuals.size(); i++)
@@ -125,16 +110,6 @@ Body::~Body()
     }
     this->cgVisuals.clear();
   }
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    if (giter->second)
-      delete giter->second;
-  this->geoms.clear();
-
-  if (this->comEntity)
-    delete this->comEntity;
-  this->comEntity = NULL;
-
 
   delete this->xyzP;
   delete this->rpyP;
@@ -160,8 +135,13 @@ Body::~Body()
 // Load the body based on an common::XMLConfig node
 void Body::Load(common::XMLConfigNode *node)
 {
+  common::XMLConfigNode *childNode;
+
   Entity::Load(node);
-  this->comEntity->RegisterVisual();
+
+  //this->comEntity.reset( new Entity(shared_from_this()) );
+  //this->comEntity->SetName("COM_Entity");
+  //this->comEntity->Load(NULL);
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
@@ -181,16 +161,20 @@ void Body::Load(common::XMLConfigNode *node)
   this->ixzP->Load(node);
   this->iyzP->Load(node);
   this->kinematicP->Load(node);
+  this->dampingFactorP->Load(node);
+  this->turnGravityOffP->Load(node);
 
-  this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
-  this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
-                                     **this->ixyP, **this->ixzP, **this->iyzP);
-  this->customMass.SetMass(**this->bodyMassP);
+  if ( (childNode = node->GetChild("origin")) != NULL)
+  {
+    this->xyzP->Load(childNode);
+    this->rpyP->Load(childNode);
+  }
 
-  this->mass = this->customMass;
-     
-  common::XMLConfigNode *childNode;
+  // before loading child geometry, we have to figure out of selfCollide is true
+  // and modify parent class Entity so this body has its own spaceId
+  this->SetSelfCollide( **this->selfCollideP );
 
+  // TODO: this shouldn't be in the physics sim
   childNode = node->GetChild("visual");
   while (childNode)
   {
@@ -208,23 +192,9 @@ void Body::Load(common::XMLConfigNode *node)
    
     childNode = childNode->GetNext("visual");
   }
-
-   this->dampingFactorP->Load(node);
-  this->turnGravityOffP->Load(node);
-  
-  // before loading child geometry, we have to figure out of selfCollide is true
-  // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide( **this->selfCollideP );
-
-  // save transform from this Parent Model Frame to this Body Frame
-  // this is only used in setting Model pose from canonicalBody
-  // the true model pose given a canonical body is
-  //   this body's pose - this body's offsetFromModelFrame
-  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(common::Pose3d());
-
-  childNode = node->GetChild("collision");
-
+ 
   // Load the geometries
+  childNode = node->GetChild("collision");
   while (childNode)
   {
     // Create and Load a geom, which will belong to this body.
@@ -232,150 +202,41 @@ void Body::Load(common::XMLConfigNode *node)
     childNode = childNode->GetNext("collision");
   }
 
-  this->SetKinematic(**this->kinematicP);
-
-  this->showPhysicsConnection = event::Events::ConnectShowPhysicsSignal( boost::bind(&Body::ShowPhysics, this, _1) );
-
-
- if ( (childNode = node->GetChild("origin")) != NULL)
-  {
-    this->xyzP->Load(childNode);
-    this->rpyP->Load(childNode);
-  }
-
-
-  // DO THIS LAST!
-  this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our common::XMLConfig node
-void Body::Save(std::string &prefix, std::ostream &stream)
-{
-  std::map<std::string, Geom* >::iterator giter;
-
-  this->xyzP->SetValue( this->GetRelativePose().pos );
-  this->rpyP->SetValue( this->GetRelativePose().rot );
-
-  stream << prefix << "<body name=\"" << this->nameP->GetValue() << "\">\n";
-  stream << prefix << "  " << *(this->xyzP) << "\n";
-  stream << prefix << "  " << *(this->rpyP) << "\n";
-
-  std::string p = prefix + "  ";
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    stream << "\n";
-    giter->second->Save(p, stream);
-  }
-
-  // NATY: put back in functionality
-  /*std::vector<Visual*>::iterator iter;
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-  {
-    if (*iter)
-      (*iter)->Save(p, stream);
-  }*/
-
-
-  stream << prefix << "</body>\n";
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Finalize the body
-void Body::Fini()
-{
-  std::map< std::string, Geom* >::iterator giter;
-
-  this->connections.clear();
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    giter->second->Fini();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the friction mode of the body
-void Body::SetFrictionMode( const bool &v )
-{
-  std::map< std::string, Geom* >::iterator giter;
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    giter->second->SetFrictionMode( v );
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the collide mode of the body
-void Body::SetCollideMode( const std::string &m )
-{
-  std::map< std::string, Geom* >::iterator giter;
-
-  unsigned int collideBits;
-
-  if (m == "all")
-    collideBits =  GZ_ALL_COLLIDE;
-  else if (m == "none")
-    collideBits =  GZ_NONE_COLLIDE;
-  else if (m == "sensors")
-    collideBits = GZ_SENSOR_COLLIDE;
-  else if (m == "ghost")
-    collideBits = GZ_GHOST_COLLIDE;
-  else
-  {
-    gzerr(0) << "Unknown collide mode[" << m << "]\n";
-    return;
-  }
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    giter->second->SetCategoryBits(collideBits);
-    giter->second->SetCollideBits(collideBits);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return Self-Collision Setting
-bool Body::GetSelfCollide()
-{
-  return this->selfCollideP->GetValue();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the laser fiducial integer id of this body
-void Body::SetLaserFiducialId(int id)
-{
-  std::map< std::string, Geom* >::iterator giter;
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    giter->second->SetLaserFiducialId( id );
-  }
-
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the laser retro reflectiveness of this body
-void Body::SetLaserRetro(float retro)
-{
-  std::map< std::string, Geom* >::iterator giter;
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    giter->second->SetLaserRetro( retro );
-  }
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
 void Body::Init()
 {
+  this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
+  this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
+                                     **this->ixyP, **this->ixzP, **this->iyzP);
+  this->customMass.SetMass(**this->bodyMassP);
+
+  this->mass = this->customMass;
+ 
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->HasType(Base::GEOM))
+    {
+      GeomPtr g = boost::shared_static_cast<Geom>(*iter);
+      g->Init();
+      if (!**this->customMassMatrixP)
+        this->mass += g->GetMass();
+    }
+  }
+
+  // save transform from this Parent Model Frame to this Body Frame
+  // this is only used in setting Model pose from canonicalBody
+  // the true model pose given a canonical body is
+  //   this body's pose - this body's offsetFromModelFrame
+  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(common::Pose3d());
+
+  this->SetKinematic(**this->kinematicP);
+
   // If no geoms are attached, then don't let gravity affect the body.
-  if (this->geoms.size()==0 || **this->turnGravityOffP)
+  if (this->children.size()==0 || **this->turnGravityOffP)
     this->SetGravityMode(false);
 
   // global-inertial damping is implemented in ode svn trunk
@@ -390,7 +251,8 @@ void Body::Init()
 
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
-  if (this->mass.GetAsDouble() > 0.0)
+  /// TODO: this shouldn't be in the physics sim
+  /*if (this->mass.GetAsDouble() > 0.0)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
@@ -408,7 +270,7 @@ void Body::Init()
     this->vis_pub->Publish(msg);
     this->cgVisuals.push_back( msg.header().str_id() );
 
-    if (this->geoms.size() > 1)
+    if (this->children.size() > 1)
     {
       msgs::Visual g_msg;
       common::Message::Init(g_msg, visname.str() + "_connectors");
@@ -420,8 +282,11 @@ void Body::Init()
       g_msg.set_visible( false );
 
       // Create a line to each geom
-      for (std::map< std::string, Geom* >::iterator giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+      for (Base_V::iterator giter = this->children.begin(); 
+           giter != this->children.end(); giter++)
       {
+        EntityPtr e = boost::shared_dynamic_cast<Entity>(*giter);
+
         msgs::Point *pt;
         pt = g_msg.add_points();
         pt->set_x(0);
@@ -429,16 +294,141 @@ void Body::Init()
         pt->set_z(0);
 
         pt = g_msg.add_points();
-        pt->set_x(giter->second->GetRelativePose().pos.x);
-        pt->set_y(giter->second->GetRelativePose().pos.y);
-        pt->set_z(giter->second->GetRelativePose().pos.z);
+        pt->set_x(e->GetRelativePose().pos.x);
+        pt->set_y(e->GetRelativePose().pos.y);
+        pt->set_z(e->GetRelativePose().pos.z);
       }
       this->vis_pub->Publish(msg);
       this->cgVisuals.push_back( g_msg.header().str_id() );
     }
-  }
+  }*/
 
   this->enabled = true;
+
+  // DO THIS LAST!
+  this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Save the body based on our common::XMLConfig node
+void Body::Save(std::string &prefix, std::ostream &stream)
+{
+  Base_V::iterator giter;
+
+  this->xyzP->SetValue( this->GetRelativePose().pos );
+  this->rpyP->SetValue( this->GetRelativePose().rot );
+
+  stream << prefix << "<body name=\"" << this->GetName() << "\">\n";
+  stream << prefix << "  " << *(this->xyzP) << "\n";
+  stream << prefix << "  " << *(this->rpyP) << "\n";
+
+  std::string p = prefix + "  ";
+
+  for (giter = this->children.begin(); giter != this->children.end(); giter++)
+  {
+    stream << "\n";
+    (*giter)->Save(p, stream);
+  }
+
+  // TODO: put back in functionality
+  /*std::vector<Visual*>::iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    if (*iter)
+      (*iter)->Save(p, stream);
+  }*/
+
+
+  stream << prefix << "</body>\n";
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Finalize the body
+void Body::Fini()
+{
+  Base_V::iterator giter;
+
+  this->connections.clear();
+
+  for (giter = this->children.begin(); giter != this->children.end(); giter++)
+    (*giter)->Fini();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the friction mode of the body
+void Body::SetFrictionMode( const bool &v )
+{
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->HasType(Base::GEOM))
+      boost::shared_static_cast<Geom>(*iter)->SetFrictionMode( v );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the collide mode of the body
+void Body::SetCollideMode( const std::string &m )
+{
+  Base_V::iterator giter;
+
+  unsigned int collideBits;
+
+  if (m == "all")
+    collideBits =  GZ_ALL_COLLIDE;
+  else if (m == "none")
+    collideBits =  GZ_NONE_COLLIDE;
+  else if (m == "sensors")
+    collideBits = GZ_SENSOR_COLLIDE;
+  else if (m == "ghost")
+    collideBits = GZ_GHOST_COLLIDE;
+  else
+  {
+    gzerr << "Unknown collide mode[" << m << "]\n";
+    return;
+  }
+
+  // TODO: Put this back in
+  /*for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    (*giter)->SetCategoryBits(collideBits);
+    (*giter)->SetCollideBits(collideBits);
+  }*/
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return Self-Collision Setting
+bool Body::GetSelfCollide()
+{
+  return this->selfCollideP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the laser fiducial integer id of this body
+void Body::SetLaserFiducialId(int id)
+{
+  Base_V::iterator iter;
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->HasType(Base::GEOM))
+      boost::shared_static_cast<Geom>(*iter)->SetLaserFiducialId( id );
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the laser retro reflectiveness of this body
+void Body::SetLaserRetro(float retro)
+{
+  Base_V::iterator iter;
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->HasType(Base::GEOM))
+      boost::shared_static_cast<Geom>(*iter)->SetLaserRetro( retro );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -460,35 +450,12 @@ void Body::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Attach a geom to this body
-void Body::AttachGeom( Geom *geom )
-{
-  std::map<std::string, Geom*>::iterator iter;
-  iter = this->geoms.find(geom->GetName());
-
-  if (iter == this->geoms.end())
-  {
-    this->geoms[geom->GetName()] = geom;
-
-    if (!**this->customMassMatrixP)
-    {
-      Mass tmpMass = geom->GetMass();
-      //tmpMass.Rotate( this->GetRelativePose().rot );
-      this->mass += tmpMass;
-    }
-  }
-  else
-    gzerr(0) << "Attempting to add two geoms with the same name[" << geom->GetName() << "] to body[" << this->GetName() << "].\n";
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Update the center of mass
 void Body::UpdateCoM()
 {
   common::Pose3d bodyPose;
   common::Pose3d origPose, newPose;
-  std::map<std::string, Geom*>::iterator iter;
+  Base_V::iterator iter;
 
   bodyPose = this->GetRelativePose();
 
@@ -498,17 +465,21 @@ void Body::UpdateCoM()
   }
 
   // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
-  for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    common::Vector3 offset;
-    origPose = iter->second->GetRelativePose();
-    newPose = origPose;
+    EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
+    if (e)
+    {
+      common::Vector3 offset;
+      origPose = e->GetRelativePose();
+      newPose = origPose;
 
-    newPose.pos -= this->mass.GetCoG();
-    iter->second->SetRelativePose(newPose, true);
+      newPose.pos -= this->mass.GetCoG();
+      e->SetRelativePose(newPose, true);
+    }
   }
 
-  this->comEntity->SetRelativePose(common::Pose3d(this->mass.GetCoG(),common::Quatern()),true);
+  //this->comEntity->SetRelativePose(common::Pose3d(this->mass.GetCoG(),common::Quatern()),true);
   this->OnPoseChange();
 }
 
@@ -517,7 +488,7 @@ void Body::UpdateCoM()
 // Load a new geom helper function
 void Body::LoadGeom(common::XMLConfigNode *node)
 {
-  Geom *geom = NULL;
+  GeomPtr geom;
   if (!node->GetChild("geometry"))
     gzthrow("Collision needs a geometry");
 
@@ -527,7 +498,8 @@ void Body::LoadGeom(common::XMLConfigNode *node)
     this->SetStatic(true);
     */
 
-  geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(type, this);
+  geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( type, 
+      boost::shared_static_cast<Body>(shared_from_this()) );
 
   if (!geom)
     gzthrow("Unknown Geometry Type["+
@@ -611,65 +583,26 @@ common::Vector3 Body::GetRelativeTorque() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the vector of all geoms
-const std::map<std::string, Geom*> *Body::GetGeoms() const
-{
-  return &(this->geoms);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the model that this body belongs to
-Model *Body::GetModel() const
+ModelPtr Body::GetModel() const
 {
-  return dynamic_cast<Model*>(this->GetParent());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a geom by name
-Geom *Body::GetGeom(const std::string &name) const
-{
-  std::map<std::string, Geom*>::const_iterator iter = this->geoms.find(name);
-
-  if (iter != this->geoms.end())
-    return iter->second;
-  else
-    return NULL;
+  return boost::shared_dynamic_cast<Model>(this->GetParent());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the body
-void Body::GetBoundingBox(common::Vector3 &min, common::Vector3 &max ) const
+common::Box Body::GetBoundingBox() const
 {
-  common::Vector3 bbmin;
-  common::Vector3 bbmax;
-  std::map<std::string, Geom*>::const_iterator iter;
+  common::Box box;
+  Base_V::const_iterator iter;
 
-  min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  max.Set(0,0,0);
+  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.max.Set(0,0,0);
 
-  for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    iter->second->GetBoundingBox(bbmin, bbmax);
-    min.x = std::min(bbmin.x, min.x);
-    min.y = std::min(bbmin.y, min.y);
-    min.z = std::min(bbmin.z, min.z);
-
-    max.x = std::max(bbmax.x, max.x);
-    max.y = std::max(bbmax.y, max.y);
-    max.z = std::max(bbmax.z, max.z);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set to true to show the physics visualizations
-void Body::ShowPhysics(const bool &show)
-{
-  for (unsigned int i=0; i < this->cgVisuals.size(); i++)
-  {
-    msgs::Visual msg;
-    common::Message::Init(msg, this->cgVisuals[i] );
-    msg.set_visible( show );
-    this->vis_pub->Publish(msg);
+    if ((*iter)->HasType(Base::GEOM))
+      box += boost::shared_static_cast<Geom>(*iter)->GetBoundingBox();
   }
 }
 
@@ -704,21 +637,4 @@ bool Body::GetAutoDisable() const
 void Body::SetAutoDisable(const bool &value)
 {
   this->autoDisableP->SetValue(value);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the transparency
-void Body::SetTransparent(const bool &show)
-{
-  for (unsigned int i = 0; i < this->visuals.size(); i++)
-  {
-    msgs::Visual msg;
-    common::Message::Init(msg, this->visuals[i]);
-    msg.set_action( msgs::Visual::UPDATE );
-    if (show)
-      msg.set_transparency( 0.6 );
-    else
-      msg.set_transparency( 0.0 );
-    this->vis_pub->Publish(msg);
-  }
 }

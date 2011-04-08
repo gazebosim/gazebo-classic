@@ -27,7 +27,7 @@
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
 #include "World.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "Generic_Imu.hh"
 #include "ImuSensor.hh"

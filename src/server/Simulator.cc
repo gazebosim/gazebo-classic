@@ -43,8 +43,8 @@
 #include "common/GazeboConfig.hh"
 #include "gz.h"
 #include "PhysicsEngine.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 #include "common/Global.hh"
 
 #include "Simulator.hh"
@@ -200,7 +200,7 @@ void Simulator::Load(const std::string &fileName)
   {
     this->gazeboConfig->Load();
   }
-  catch (GazeboError e)
+  catch (Exception e)
   {
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
@@ -212,7 +212,7 @@ void Simulator::Load(const std::string &fileName)
     else
       xmlFile->LoadString(defaultConfigXML);
   }
-  catch (GazeboError e)
+  catch (Exception e)
   {
     gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
   }
@@ -240,7 +240,7 @@ World *Simulator::CreateWorld(const std::string &fileName)
     else
       xmlFile->LoadString(defaultWorldXML);
   }
-  catch (GazeboError e)
+  catch (Exception e)
   {
     gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
   }
@@ -259,7 +259,7 @@ World *Simulator::CreateWorld(const std::string &fileName)
     {
       world->Load(worldNode);
     }
-    catch (GazeboError e)
+    catch (Exception e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -322,7 +322,7 @@ void Simulator::SetActiveWorld(unsigned int i)
   if (i < this->worlds.size())
     this->activeWorldIndex = i;
   else
-    gzerr(0) << "Invalid world index[" << i << "]\n";
+    gzerr << "Invalid world index[" << i << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -337,7 +337,7 @@ void Simulator::SetActiveWorld(World *world)
   if (i < this->worlds.size())
     this->activeWorldIndex = i;
   else
-    gzerr(0) << "Invalid world [" << world->GetName() << "]\n";
+    gzerr << "Invalid world [" << world->GetName() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ void Simulator::Init()
     for (unsigned int i=0; i < this->worlds.size(); i++)
       this->worlds[i]->Init();
   }
-  catch (GazeboError e)
+  catch (Exception e)
   {
     gzthrow("Failed to Initialize the World\n"  << e);
   }
@@ -377,7 +377,7 @@ void Simulator::Save(const std::string& filename)
 
   if (!output.is_open())
   {
-    gzerr(0) << "Unable to save file to[" << filename << "]\n";
+    gzerr << "Unable to save file to[" << filename << "]\n";
     return;
   }
 

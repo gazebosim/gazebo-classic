@@ -27,7 +27,7 @@
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
 #include "common/Global.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "World.hh"
 #include "BulletBody.hh"
 

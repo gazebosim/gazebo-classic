@@ -27,7 +27,8 @@
 
 #include <google/protobuf/message.h>
 
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 
 #define HEADER_LENGTH 8
 
@@ -130,9 +131,9 @@ namespace gazebo
                   {
                     inbound_data_size = this->ParseHeader(this->inbound_header);
                   }
-                  catch (gazebo::common::GazeboError &e)
+                  catch (gazebo::common::Exception &e)
                   {
-                    std::cerr << "Error[" << e << "]\n";
+                    gzerr << "Error[" << e << "]\n";
                   }
 
                   // Start the asynchronous call to receive data
@@ -154,7 +155,7 @@ namespace gazebo
                {
                  if (e)
                  {
-                   std::cerr << "Error:" << e.message() << std::endl;
+                   gzerr << "Error:" << e.message() << std::endl;
                  }
                  else
                  {

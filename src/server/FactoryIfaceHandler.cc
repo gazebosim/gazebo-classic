@@ -25,7 +25,7 @@
 #include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "gz.h"
 #include "FactoryIfaceHandler.hh"
 

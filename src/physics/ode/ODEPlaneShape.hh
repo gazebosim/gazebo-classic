@@ -27,14 +27,16 @@ namespace gazebo
   {
     class ODEPlaneShape : public PlaneShape
     {
-      public: ODEPlaneShape(Geom *parent) : PlaneShape(parent) {}
+      public: ODEPlaneShape(GeomPtr parent) : PlaneShape(parent) {}
       public: virtual ~ODEPlaneShape() {}
     
       /// \brief Create the plane
       public: void CreatePlane()
       {
+        gzmsg << "Create a plane!\n";
         PlaneShape::CreatePlane();
-        ODEGeom *odeParent = (ODEGeom*)(this->geomParent);
+        ODEGeomPtr odeParent;
+        odeParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
     
         double altitude = 0;
   
@@ -47,7 +49,8 @@ namespace gazebo
       public: void SetAltitude(const common::Vector3 &pos)
       {
         PlaneShape::SetAltitude(pos);
-        ODEGeom *odeParent = (ODEGeom*)(this->geomParent);
+        ODEGeomPtr odeParent;
+        odeParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
   
         dVector4 vec4;
     

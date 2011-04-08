@@ -16,75 +16,22 @@
 */
 /* Desc: Occupancy grid geom
  * Author: Nate Koenig
- * Date: 14 Jly 2008
- * CVS: $Id$
- */
+*/
 
 #ifndef MAPSHAPE_HH
 #define MAPSHAPE_HH
 
 #include <deque>
 
-#include "common/Param.hh"
+#include "common/CommonTypes.hh"
+
 #include "physics/Geom.hh"
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Image;
-  }
-
 	namespace physics
   {
-  
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_map_geom Map geom
-        \brief Map geom
-  
-      \par Attributes
-      The following attributes are supported.
-  
-      - image (string)
-        - Binary image that defines an occupancy grid
-        - Default: (empty)
-  
-      - scale (float)
-        - Scaling factor
-        - Default: 1
-  
-      - granularity (int)
-        - Degree of coarseness when determing if an image area is occupied. Units are pixels
-        - Default: 5
-  
-      - threshold (unsigned char)
-        - Grayscale threshold. A pixel value greater than this amount is considered free space
-        - Default: 200
-  
-      - negative (bool)
-        - True if the image pixel values should be inverted.
-        - Default: false
-  
-      - material (string)
-        - Material to apply to the map
-        - Default: (empty)
-  
-  
-  
-      \par Example
-      \verbatim
-        <geom:map name="map_geom">
-          <image>map.png</image>
-          <scale>0.1</scale>
-        </geom:map>
-      \endverbatim
-      */
-    /// \}
-    /// \addtogroup gazebo_map_geom 
-    /// \{
-  
-  
     class SpaceTree;
     class QuadNode;
   
@@ -92,7 +39,7 @@ namespace gazebo
     class MapShape : public Shape
     {
       /// \brief Constructor
-      public: MapShape(Geom *parent);
+      public: MapShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~MapShape();
@@ -101,7 +48,10 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the map
-      protected: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load(common::XMLConfigNode *node);
+
+      /// \brief Init the map
+      public: virtual void Init();
   
       /// \brief Save parameters
       protected: void Save(std::string &prefix, std::ostream &stream);
@@ -191,8 +141,6 @@ namespace gazebo
       public: bool valid;
   
     };
-  
-    /// \}
   }
 
 }

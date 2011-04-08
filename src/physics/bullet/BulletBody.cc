@@ -23,13 +23,13 @@
 #include <sstream>
 
 #include "common/XMLConfig.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 
 #include "physics/Geom.hh"
 #include "BulletGeom.hh"
 #include "BulletMotionState.hh"
 #include "common/Quatern.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "BulletPhysics.hh"
 #include "PhysicsEngine.hh"
 #include "Mass.hh"
@@ -215,7 +215,7 @@ void BulletBody::SetGravityMode(bool mode)
 bool BulletBody::GetGravityMode()
 {
   bool result;
-  gzerr(0) << "BulletBody::GetGravityMode not implemented, returning spurious result\n";
+  gzerr << "BulletBody::GetGravityMode not implemented, returning spurious result\n";
 
   return result;
 }

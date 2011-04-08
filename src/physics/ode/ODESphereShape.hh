@@ -18,7 +18,9 @@
 #define ODESPHERESHAPE_HH
 
 #include "physics/ode/ODEPhysics.hh"
-#include "physics/Mass.hh"
+#include "physics/ode/ODEGeom.hh"
+
+#include "physics/PhysicsTypes.hh"
 #include "physics/SphereShape.hh"
 
 namespace gazebo
@@ -27,12 +29,13 @@ namespace gazebo
   {
     class ODESphereShape : public SphereShape
     {
-      public: ODESphereShape(Geom *parent) : SphereShape(parent) {}
+      public: ODESphereShape(ODEGeomPtr parent) : SphereShape(parent) {}
       public: virtual ~ODESphereShape() {}
       public: void SetSize(const double &radius)
       {
         SphereShape::SetSize(radius);
-        ODEGeom *oParent = (ODEGeom*)(this->geomParent);
+        ODEGeomPtr oParent;
+        oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
   
         dMass odeMass;
         common::Pose3d rpose;

@@ -25,7 +25,7 @@
 #include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "Steering_Position2d.hh"
 #include "Wheel.hh"

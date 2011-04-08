@@ -24,7 +24,8 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
+MultiRayShape::MultiRayShape(GeomPtr parent) 
+  : Shape(parent)
 {
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
@@ -64,12 +65,6 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 /// Destructor
 MultiRayShape::~MultiRayShape()
 {
-  std::vector< RayShape* >::iterator iter;
-
-  for (iter=this->rays.begin(); iter!=this->rays.end(); iter++)
-  {
-    delete *iter;
-  }
   this->rays.clear();
 
   delete this->rayCountP;
@@ -93,6 +88,7 @@ MultiRayShape::~MultiRayShape()
 // Load a multi-ray shape from xml file
 void MultiRayShape::Load(common::XMLConfigNode *node)
 {
+  Shape::Load(node);
   this->rayCountP->Load(node);
   this->rangeCountP->Load(node);
   this->minAngleP->Load(node);
@@ -106,15 +102,12 @@ void MultiRayShape::Load(common::XMLConfigNode *node)
   this->verticalRangeCountP->Load(node);
   this->verticalMinAngleP->Load(node);
   this->verticalMaxAngleP->Load(node);
-//}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-/*void MultiRayShape::Load(unsigned int vertRayCount, unsigned int rayCount,
-            common::Vector3 origin, double minRange, double maxRange,
-            common::Angle minVertAngle, common::Angle maxVertAngle,
-            common::Angle minAngle, common::Angle maxcommon::Angle )
+/// Init the shape 
+void MultiRayShape::Init()
 {
-*/
   common::Vector3 start, end, axis;
 
   common::Angle yawAngle, pitchAngle; 
@@ -228,7 +221,7 @@ int MultiRayShape::GetFiducial(int index)
 /// Update the geom
 void MultiRayShape::Update()
 {
-  std::vector<RayShape*>::iterator iter;
+  std::vector<RayShapePtr>::iterator iter;
   common::Vector3 a, b;
   int i = 1;
 

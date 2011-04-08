@@ -17,7 +17,6 @@
 /* Desc: ODE Heightmap shape
  * Author: Nate Keonig
  * Date: 12 Nov 2009
- * SVN: $Id$
  */
 
 #ifndef ODEHEIGHTMAPSHAPE_HH
@@ -35,7 +34,7 @@ namespace gazebo
     class ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
-      public: ODEHeightmapShape(Geom *parent);
+      public: ODEHeightmapShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();
@@ -44,7 +43,7 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the heightmap
-      protected: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Init();
   
       /// Create a lookup table of the terrain's height
       private: void FillHeightMap();

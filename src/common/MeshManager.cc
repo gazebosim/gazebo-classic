@@ -21,8 +21,8 @@
 #include "common/Matrix3.hh"
 #include "common/Matrix4.hh"
 #include "common/GazeboConfig.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/Mesh.hh"
 #include "common/OgreLoader.hh"
 #include "common/AssimpLoader.hh"
@@ -78,7 +78,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
 {
   if (!this->IsValidFilename(filename))
   {
-    gzerr(0) << "Invalid mesh filename extension[" << filename << "]\n";
+    gzerr << "Invalid mesh filename extension[" << filename << "]\n";
     return NULL;
   }
 
@@ -158,15 +158,15 @@ const Mesh *MeshManager::Load(const std::string &filename)
         mesh = this->meshes[filename];
       }
     } 
-    catch (gazebo::common::GazeboError e)
+    catch (gazebo::common::Exception e)
     {
-      gzerr(0) << "Error loading mesh[" << fullname << "]\n";
-      gzerr(0) << e << "\n";
+      gzerr << "Error loading mesh[" << fullname << "]\n";
+      gzerr << e << "\n";
       gzthrow(e);
     }
   }
   else
-    gzerr(0) << "Unable to find file[" << filename << "]\n";
+    gzerr << "Unable to find file[" << filename << "]\n";
 
   //mesh->RecalculateNormals();
   return mesh;
@@ -231,7 +231,7 @@ const Mesh *MeshManager::GetMesh(const std::string &name) const
   if (iter != this->meshes.end())
     return iter->second;
 
-  gzerr(0) << "Unable to find mesh with name[" << name << "]\n";
+  gzerr << "Unable to find mesh with name[" << name << "]\n";
   return NULL;
 }
  

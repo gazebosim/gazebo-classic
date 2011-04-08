@@ -18,9 +18,6 @@
  * Author: Andrew Howard and Nate Koenig
  */
 
-#include <assert.h>
-#include <sstream>
-#include <fstream>
 #include <boost/thread.hpp>
 
 #include <tbb/parallel_for.h>
@@ -31,8 +28,8 @@
 #include "common/Diagnostics.hh"
 #include "common/Events.hh"
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/XMLConfig.hh"
 
 #include "physics/Body.hh"
@@ -40,11 +37,6 @@
 #include "physics/PhysicsFactory.hh"
 #include "physics/Model.hh"
 #include "physics/World.hh"
-
-// NATY: put back in
-//#include "common/Logger.hh"
-
-//#include "OpenAL.hh"
 
 #include "physics/Geom.hh"
 
@@ -54,7 +46,7 @@ using namespace physics;
 
 class ModelUpdate_TBB
 {
-  public: ModelUpdate_TBB(std::vector<Model*> *models) : models(models) {}
+  public: ModelUpdate_TBB(Model_V *models) : models(models) {}
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
@@ -64,38 +56,28 @@ class ModelUpdate_TBB
     }
   }
 
-  private: std::vector<Model*> *models;
+  private: Model_V *models;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Private constructor
 World::World()
 {
-  //this->server = NULL;
-  this->physicsEngine = NULL;
-  //this->graphics = NULL;
-  //this->simIfaceHandler = NULL;
-  //this->openAL = NULL;
-  this->selectedEntity = NULL;
   this->stepInc = false;
-
-  this->rootElement = new Common(NULL);
-  this->rootElement->SetName("root");
-  this->rootElement->SetWorld(this);
-
-  //this->factoryIfaceHandler = NULL;
   this->pause = false;
 
   common::Param::Begin(&this->parameters);
   this->nameP = new common::ParamT<std::string>("name","default",1);
-  //this->saveStateTimeoutP = new common::ParamT<Time>("save_state_resolution",0.1,0);
-  //this->saveStateBufferSizeP = new common::ParamT<unsigned int>("save_state_buffer_size",1000,0);
   common::Param::End();
 
-  this->connections.push_back( event::Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
-  this->connections.push_back( event::Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
-  this->connections.push_back( event::Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
-  this->connections.push_back( event::Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
+  this->connections.push_back( 
+     event::Events::ConnectPauseSignal(boost::bind(&World::PauseCB, this, _1)));
+  this->connections.push_back( 
+     event::Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
+  this->connections.push_back( 
+     event::Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
+  this->connections.push_back(
+     event::Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,9 +85,6 @@ World::World()
 World::~World()
 {
   delete this->nameP;
-  //delete this->saveStateTimeoutP;
-  //delete this->saveStateBufferSizeP;
-
   this->connections.clear();
   this->Fini();
 }
@@ -114,6 +93,7 @@ World::~World()
 // Load the world
 void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 {
+  gzmsg << "World::Load\n";
   // DO THIS FIRST
   this->nameP->Load(rootNode);
 
@@ -125,10 +105,11 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 
   common::Message::Init( this->worldStatsMsg, "statistics" );
 
-  this->sceneSub = transport::subscribe("~/publish_scene", &World::PublishScene, this);
+  this->sceneSub = transport::subscribe("~/publish_scene", 
+                                        &World::PublishScene, this);
   this->scenePub = transport::advertise<msgs::Scene>("~/scene");
 
-  this->statPub = transport::advertise<msgs::WorldStats>("~/world_stats");
+  this->statPub = transport::advertise<msgs::WorldStatistics>("~/world_stats");
   this->visPub = transport::advertise<msgs::Visual>("~/visual");
   this->visSub = transport::subscribe("~/visual", &World::VisualLog, this);
 
@@ -138,92 +119,30 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
   this->scenePub->Publish( scene );
 
-  //this->saveStateTimeoutP->Load(rootNode);
-  //this->saveStateBufferSizeP->Load(rootNode);
-
-  // Create the server object (needs to be done before models initialize)
-  /*if (this->server == NULL)
-  {
-    this->server = new libgazebo::Server();
-
-    try
-    {
-      this->server->Init(**this->nameP, true );
-    }
-    catch (std::string err)
-    {
-      gzthrow (err);
-    }
-  }*/
-
-  // Create the simulator interface
-  /*try
-  {
-    if (!this->simIfaceHandler)
-    {
-      this->simIfaceHandler = new SimulationIfaceHandler(this);
-    }
-  }
-  catch (std::string err)
-  {
-    gzthrow(err);
-  }
-  */
-
-  // Create the default factory
-  /*if (!this->factoryIfaceHandler)
-    this->factoryIfaceHandler = new FactoryIfaceHandler(this);
-
-    */
-  // Create the graphics iface handler
-  /*if (!this->graphics)
-  {
-    this->graphics = new GraphicsIfaceHandler(this);
-    this->graphics->Load("default");
-  }
-  */
-
-
-  // Load OpenAL audio 
-  /*if (rootNode && rootNode->GetChild("audio"))
-  {
-    this->openAL = OpenAL::Instance();
-    this->openAL->Load(rootNode->GetChild("audio"));
-  }*/
-
   common::XMLConfigNode *physicsNode = NULL;
   if (rootNode )
     physicsNode = rootNode->GetChild("physics");
 
   if (physicsNode)
   {
-    if (this->physicsEngine)
-    {
-      delete this->physicsEngine;
-      this->physicsEngine = NULL;
-    }
     std::string type = physicsNode->GetString("type","ode",1);
 
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, this);
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, shared_from_this());
     if (this->physicsEngine == NULL)
       gzthrow("Unable to create physics engine\n");
   }
   else
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode", this);
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode", shared_from_this());
 
   // This should come before loading of entities
   this->physicsEngine->Load(physicsNode);
-  
-  // last bool is initModel, init model is not needed as Init()
-  // is called separately from main.cc
-  this->LoadEntities(rootNode, this->rootElement, false, false);
 
-  /*this->worldStates.resize(**this->saveStateBufferSizeP);
-  this->worldStatesInsertIter = this->worldStates.begin();
-  this->worldStatesEndIter = this->worldStates.begin();
-  this->worldStatesCurrentIter = this->worldStatesInsertIter;
-  */
+  this->rootElement.reset(new Base(BasePtr()));
+  this->rootElement->SetName("root");
+  this->rootElement->SetWorld(shared_from_this());
 
+  // First, create all the entities
+  this->LoadEntities(rootNode, this->rootElement);
 
   // Choose threaded or unthreaded model updating depending on the number of
   // models in the scene
@@ -237,13 +156,11 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 // Save the world
 void World::Save(std::string &prefix, std::ostream &stream)
 {
-  std::vector< Model* >::iterator miter;
+  Model_V::iterator miter;
 
   stream << "<world>\n";
 
   stream << prefix << "  " << *(this->nameP);
-  //stream << prefix << "  " << *(this->saveStateTimeoutP);
-  //stream << prefix << "  " << *(this->saveStateBufferSizeP);
 
   this->physicsEngine->Save(prefix, stream);
 
@@ -264,7 +181,9 @@ void World::Save(std::string &prefix, std::ostream &stream)
 // Initialize the world
 void World::Init()
 {
-  std::vector< Model* >::iterator miter;
+  gzmsg << "World::Init\n";
+
+  Model_V::iterator miter;
 
   // Initialize all the entities
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
@@ -275,26 +194,6 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
-
-  // Initialize openal
-  /*if (this->openAL)
-    this->openAL->Init();
-    */
-
-  this->toDeleteEntities.clear();
-  this->toLoadEntities.clear();
-
-  //this->graphics->Init();
-
-  //this->factoryIfaceHandler->Init();
-  //this->saveStateTimer.Start();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Primarily used to update the graphics interfaces
-void World::GraphicsUpdate()
-{
-  //this->graphics->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -403,15 +302,7 @@ void World::Update()
   if (this->physicsEngine)
     this->physicsEngine->UpdatePhysics();
 
-  //this->factoryIfaceHandler->Update();
-
-  // Process all incoming messages from simiface
-  //this->simIfaceHandler->Update();
-
-  /// Process all internal messages
-  this->ProcessMessages();
-
-  // NATY: put back in
+  // TODO: put back in
   //Logger::Instance()->Update();
 
   event::Events::worldUpdateEndSignal();
@@ -422,72 +313,28 @@ void World::Update()
 void World::Fini()
 {
   // Clear out the entity tree
-  std::vector<Model*>::iterator iter;
+  Model_V::iterator iter;
   for (iter = this->models.begin(); iter != this->models.end(); iter++)
   {
     if (*iter)
     {
       (*iter)->Fini();
-      delete *iter;
-      (*iter) = NULL;
     }
   }
   this->models.clear();
 
-  /*if (this->graphics)
-  {
-    delete this->graphics;
-    this->graphics = NULL;
-  }
-
-  if (this->simIfaceHandler)
-  {
-    delete this->simIfaceHandler;
-    this->simIfaceHandler = NULL;
-  }
-
-  if (this->factoryIfaceHandler)
-  {
-    delete this->factoryIfaceHandler;
-    this->factoryIfaceHandler = NULL;
-  }
-  */
-
   if (this->physicsEngine)
   {
     this->physicsEngine->Fini();
-    delete this->physicsEngine;
-    this->physicsEngine = NULL;
+    this->physicsEngine.reset();
   }
-
-  /*try
-  {
-    if (this->server)
-    {
-      delete this->server;
-      this->server = NULL;
-    }
-  }
-  catch (std::string e)
-  {
-    gzthrow(e);
-  }
-  */
-
-  // Close the openal server
-  /*if (this->openAL)
-    this->openAL->Fini();
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Remove all entities from the world
 void World::Clear()
 {
-  std::vector<Model*>::iterator iter;
-  for (iter = this->models.begin(); iter != this->models.end(); iter++)
-    event::Events::deleteEntitySignal((*iter)->GetCompleteScopedName());
-  this->ProcessEntitiesToDelete();
+  // TODO: Implement this
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -511,43 +358,64 @@ common::Param *World::GetParam(unsigned int index) const
   if (index < this->parameters.size())
     return this->parameters[index];
   else
-    gzerr(2) << "World::GetParam - Invalid param index\n";
+    gzerr << "World::GetParam - Invalid param index\n";
 
   return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Retun the libgazebo server
-/*libgazebo::Server *World::GetGzServer() const
-{
-  return this->server;
-}
-*/
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Return the physics engine
-PhysicsEngine *World::GetPhysicsEngine() const
+PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Delete an entity by name
+void World::DeleteEntityCB(const std::string &name)
+{
+  // TODO: Implement this function
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get an element by name
+BasePtr World::GetByName(const std::string &name)
+{
+  return this->rootElement->GetByName(name);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-void World::LoadEntities(common::XMLConfigNode *node, Common *parent, bool removeDuplicate, bool initModel)
+void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
 {
+  std::cout << "Load Entities\n";
   common::XMLConfigNode *cnode;
-  Model *model = NULL;
 
-  if (node)
+  cnode = node->GetChild("model");
+  while (cnode)
+  {
+    std::cout << "New Model\n";
+    ModelPtr model( new Model(parent) );
+    model->SetWorld(shared_from_this());
+    model->Load(cnode);
+
+    // TODO : Put back in the ability to nest models. We should do this
+    // without requiring a joint.
+
+    event::Events::addEntitySignal(model->GetCompleteScopedName());
+    parent = model;
+    this->models.push_back(model);
+
+    cnode = cnode->GetNext("model");
+  }
+
+  /*if (node)
   {
     // Check for model nodes
     if (node->GetName() == "model")
     {
-      model = this->LoadModel(node, parent, removeDuplicate, initModel);
-      event::Events::addEntitySignal(model->GetCompleteScopedName());
-      parent = model;
     }
+    // TODO: this shouldn't exist in the physics sim
     else if (node->GetName() == "light")
     {
       msgs::Light msg = common::Message::LightFromXML(node);
@@ -558,188 +426,9 @@ void World::LoadEntities(common::XMLConfigNode *node, Common *parent, bool remov
 
     // Load children
     for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
-      this->LoadEntities( cnode, parent, removeDuplicate, initModel);
-  }
+      this->LoadEntities( cnode, parent);
+  }*/
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Add a new entity to the world
-void World::InsertEntity( std::string xmlString)
-{
-  this->toLoadEntities.push_back( xmlString );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Load all the entities that have been queued
-void World::ProcessEntitiesToLoad()
-{
-
-  if (!this->toLoadEntities.empty())
-  {
-    std::vector< std::string >::iterator iter;
-
-    for (iter = this->toLoadEntities.begin(); 
-        iter != this->toLoadEntities.end(); iter++)
-    {
-      // Create the world file
-      common::XMLConfig *xmlConfig = new common::XMLConfig();
-
-      // Load the XML tree from the given string
-      try
-      {
-        xmlConfig->LoadString( *iter );
-      }
-      catch (common::GazeboError e)
-      {
-        gzerr(0) << "The world could not load the XML data [" << e << "]\n";
-        continue;
-      }
-
-      // last bool is initModel, yes, init model after loading it
-      this->LoadEntities( xmlConfig->GetRootNode(), this->rootElement, true, true); 
-      delete xmlConfig;
-    }
-    this->toLoadEntities.clear();
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Load all the entities that have been queued
-void World::ProcessEntitiesToDelete()
-{
-  if (!this->toDeleteEntities.empty())
-  {
-    // Remove and delete all models that are marked for deletion
-    std::vector< std::string>::iterator miter;
-    for (miter=this->toDeleteEntities.begin();
-        miter!=this->toDeleteEntities.end(); miter++)
-    {
-      Common *common = this->GetByName(*miter);
-
-      if (common)
-      {
-        if (common->HasType(Common::MODEL))
-        {
-          Model *model = (Model*)common;
-
-          model->Fini();
-
-          std::vector<Model*>::iterator newiter;
-          newiter = std::find(this->models.begin(), this->models.end(), model);
-
-          if (newiter != this->models.end())
-            this->models.erase( newiter );
-        }
-        else if (common->HasType(Common::BODY))
-          ((Body*)common)->Fini();
-
-        delete (common);
-      }
-    }
-
-    this->toDeleteEntities.clear();
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Delete an entity by name
-void World::DeleteEntityCB(const std::string &name)
-{
-  std::vector< Model* >::iterator miter;
-
-  Common *common = this->GetByName(name);
-
-  if (!common)
-    return;
-
-  this->toDeleteEntities.push_back(name);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get an element by name
-Common *World::GetByName(const std::string &name)
-{
-  return this->rootElement->GetByName(name);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Receive a message
-void World::ReceiveMessage( const google::protobuf::Message &message )
-{
-//  this->messages.push_back( msg.Clone() );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Process all messages
-void World::ProcessMessages()
-{
-  /*
-
-  unsigned int count = this->messages.size();
-  for ( unsigned int i=0; i < count; i++)
-  {
-    Message *msg = this->messages[i];
-
-    if (msg->type == INSERT_MODEL_MSG)
-    {
-      // Create the world file
-      common::XMLConfig *xmlConfig = new common::XMLConfig();
-
-      // Load the XML tree from the given string
-      try
-      {
-        xmlConfig->LoadString( ((InsertModelMsg*)msg)->xmlStr );
-      }
-      catch (gazebo::GazeboError e)
-      {
-        gzerr(0) << "The world could not load the XML data [" << e << "]\n";
-        continue;
-      }
-
-      // last bool is initModel, yes, init model after loading it
-      this->LoadEntities( xmlConfig->GetRootNode(), this->rootElement, true, true); 
-      delete xmlConfig;
-    }
-  }
-
-  this->messages.erase(this->messages.begin(), this->messages.begin()+count);
-  */
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Load a model
-Model *World::LoadModel(common::XMLConfigNode *node, Common *parent, 
-                        bool removeDuplicate, bool initModel)
-{
-  common::Pose3d pose;
-  if (parent == NULL)
-    gzthrow("Parent can't be null");
-
-  Model *model = new Model(parent);
-  model->SetWorld(this);
-
-  // Load the model
-  model->Load( node, removeDuplicate );
-
-  // If calling LoadEntity()->LoadModel()from Simulator::Load()->World::Load()
-  // GetWorldInitialized() is false, in this case, model->Init() is
-  // called later directly from main.cc through Simulator::Init()
-  // on the other hand
-  // LoadEntity()->LoadModel() is also called from ProcessEntitesToLoad(),
-  // in this case, GetWorldInitialized should return true, and we want
-  // to call model->Init() here
-  if (initModel) 
-    model->Init();
-
-  if (parent != NULL && parent->HasType(Common::MODEL))
-    model->Attach(node->GetChild("attach"));
-  else
-    // Add the model to our list
-    this->models.push_back(model);
-
-  return model;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Get the number of models
@@ -750,112 +439,32 @@ unsigned int World::GetModelCount() const
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Get a model based on an index
-Model *World::GetModel(unsigned int index)
+ModelPtr World::GetModel(unsigned int index)
 {
-  if (index < this->models.size())
-    return this->models[index];
-  else
-    gzerr(2) << "Invalid model index\n";
+  ModelPtr model;
 
-  return NULL;
+  if (index < this->models.size())
+    model = this->models[index];
+  else
+    gzerr << "Invalid model index\n";
+
+  return model;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Reset the simulation to the initial settings
 void World::Reset()
 {
-  std::vector< Model* >::iterator miter;
+  Model_V::iterator miter;
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
-  {
     (*miter)->Reset();
-  }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Save the state of the world
-void World::SaveState()
-{
-  std::vector<Model*>::iterator mIter;
-  std::vector<Body*>::iterator bIter;
-  std::vector<Geom*>::iterator gIter;
-
-  WorldState *ws = &(*this->worldStatesInsertIter);
-  for (mIter = this->models.begin(); mIter != this->models.end(); mIter++)
-    ws->modelPoses[(*mIter)->GetName()] = (*mIter)->GetRelativePose();
-
-  this->worldStatesInsertIter++;
-  if (this->worldStatesInsertIter == this->worldStates.end())
-    this->worldStatesInsertIter = this->worldStates.begin();
-
-  if (this->worldStatesInsertIter == this->worldStatesEndIter)
-  {
-    this->worldStatesEndIter++;
-    if (this->worldStatesEndIter == this->worldStates.end())
-    {
-      this->worldStatesEndIter = this->worldStates.begin();
-    }
-  }
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the state of the world to the pos pointed to by the iterator
-void World::SetState(std::deque<WorldState>::iterator iter)
-{
-  std::vector<Model*>::iterator mIter;
-  std::vector<Body*>::iterator bIter;
-  std::vector<Geom*>::iterator gIter;
-
-  WorldState *ws = &(*iter);
-  for (mIter = this->models.begin(); mIter != this->models.end(); mIter++)
-    (*mIter)->SetRelativePose( ws->modelPoses[(*mIter)->GetName()] );
-
-/*  for (bIter = this->bodies.begin(); bIter !=this->bodies.end(); bIter++)
-    (*bIter)->SetRelativePose( ws->bodyPoses[(*bIter)->GetName()] );
-
-  for (gIter = this->geometries.begin(); gIter !=this->geometries.end(); 
-       gIter++)
-    (*gIter)->SetRelativePose( ws->geomPoses[(*gIter)->GetName()] );
-    */
-
-  this->worldStatesCurrentIter = iter;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Goto a position in time
-/*void World::GotoTime(double pos)
-{
-  Simulator::Instance()->SetPaused(true);
-
-  this->worldStatesCurrentIter = this->worldStatesInsertIter;
-
-  int diff = this->worldStatesInsertIter - this->worldStatesEndIter;
-
-  int i = (int)(diff * (1.0-pos));
-
-  if (this->worldStatesCurrentIter == this->worldStates.begin())
-    this->worldStatesCurrentIter = this->worldStates.end()--;
-
-  for (;i>=0; i--, this->worldStatesCurrentIter--)
-  {
-    if (this->worldStatesCurrentIter == this->worldStatesEndIter)
-      break;
-
-    if (this->worldStatesCurrentIter == this->worldStates.begin())
-      this->worldStatesCurrentIter = this->worldStates.end()-1;
-  }
-
-  this->SetState(this->worldStatesCurrentIter);
-}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pause callback
 void World::PauseCB(bool p)
 {
-  if (!p)
-    this->worldStatesInsertIter = this->worldStatesCurrentIter;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -870,8 +479,8 @@ void World::StepCB()
 void World::SetSelectedEntityCB( const std::string &name )
 {
   msgs::Selection msg;
-  Common *common = this->GetByName(name);
-  Entity *ent = dynamic_cast<Entity*>(common);
+  BasePtr base = this->GetByName(name);
+  EntityPtr ent = boost::shared_dynamic_cast<Entity>(base);
 
   // unselect selectedEntity
   if (this->selectedEntity)
@@ -880,7 +489,6 @@ void World::SetSelectedEntityCB( const std::string &name )
     msg.set_selected( false );
     this->selectionPub->Publish(msg);
 
-    //this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
     this->selectedEntity->SetSelected(false);
   }
 
@@ -889,7 +497,6 @@ void World::SetSelectedEntityCB( const std::string &name )
   {
     // set selected entity to ent
     this->selectedEntity = ent;
-    //this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
     this->selectedEntity->SetSelected(true);
 
     msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
@@ -897,14 +504,13 @@ void World::SetSelectedEntityCB( const std::string &name )
     this->selectionPub->Publish(msg);
   }
   else
-    this->selectedEntity = NULL;
-
+    this->selectedEntity.reset();
   //event::Events::entitySelectedSignal(this->selectedEntity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the selected entity
-Entity *World::GetSelectedEntity() const
+EntityPtr World::GetSelectedEntity() const
 {
   return this->selectedEntity;
 }
@@ -913,7 +519,7 @@ Entity *World::GetSelectedEntity() const
 /// Print entity tree
 void World::PrintEntityTree()
 {
-  for (std::vector<Model*>::iterator iter = this->models.begin();
+  for (Model_V::iterator iter = this->models.begin();
        iter != this->models.end(); iter++)
   {
     (*iter)->Print("");
@@ -991,12 +597,12 @@ void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Construct a scene message
-void World::BuildSceneMsg(msgs::Scene &scene, Common *entity)
+void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 {
   if (entity->HasType(Entity::ENTITY))
   {
     msgs::Pose *poseMsg = scene.add_pose();
-    common::Pose3d pose = ((Entity*)entity)->GetRelativePose();
+    common::Pose3d pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
     poseMsg->CopyFrom( common::Message::Convert(pose) );
     common::Message::Init(*poseMsg, entity->GetCompleteScopedName() );
   }

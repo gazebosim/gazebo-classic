@@ -25,7 +25,7 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "Joint.hh"
 #include "common/Param.hh"
 #include "common/Vector3.hh"
@@ -68,30 +68,30 @@ namespace gazebo
     /// \brief Set the anchor point
     public: virtual void SetAnchor( int /*index*/, 
                                     const gazebo::common::Vector3 & /*anchor*/ ) 
-            {gzerr(0) << "Not implement in Bullet\n";}
+            {gzerr << "Not implement in Bullet\n";}
 
     /// \brief Set the joint damping
     public: virtual void SetDamping( int /*index*/, 
                                     const double /*damping*/ ) 
-            {gzerr(0) << "Not implement in Bullet\n";}
+            {gzerr << "Not implement in Bullet\n";}
 
     /// \brief Get the anchor point
     public: virtual gazebo::common::Vector3 GetAnchor(int index) const
-            {gzerr(0) << "Not implement in Bullet\n"; return common::Vector3();}
+            {gzerr << "Not implement in Bullet\n"; return common::Vector3();}
 
     /// \brief Get the force the joint applies to the first body
     /// \param index The index of the body( 0 or 1 )
     public: virtual common::Vector3 GetBodyForce(unsigned int index) const
-            {gzerr(0) << "Not implement in Bullet\n"; return common::Vector3();}
+            {gzerr << "Not implement in Bullet\n"; return common::Vector3();}
 
     /// \brief Get the torque the joint applies to the first body
     /// \param index The index of the body( 0 or 1 )
     public: virtual common::Vector3 GetBodyTorque(unsigned int index) const
-            {gzerr(0) << "Not implement in Bullet\n"; return common::Vector3();}
+            {gzerr << "Not implement in Bullet\n"; return common::Vector3();}
 
     /// \brief Set a parameter for the joint
     public: virtual void SetAttribute( Attribute, int index, double value)
-            {gzerr(0) << "Not implement in Bullet\n";}
+            {gzerr << "Not implement in Bullet\n";}
  
     /// \brief Set the ERP of this joint
     public: void SetERP(double newERP);

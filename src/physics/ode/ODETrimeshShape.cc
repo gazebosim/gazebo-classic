@@ -17,12 +17,11 @@
 /* Desc: ODE Trimesh shape
  * Author: Nate Keonig
  * Date: 16 Oct 2009
- * SVN: $Id$
  */
 
 #include "common/Mesh.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 
 #include "physics/ode/ODEGeom.hh"
 #include "physics/ode/ODEPhysics.hh"
@@ -34,7 +33,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODETrimeshShape::ODETrimeshShape(Geom *parent) : TrimeshShape(parent)
+ODETrimeshShape::ODETrimeshShape(GeomPtr parent) : TrimeshShape(parent)
 {
 }
 
@@ -49,7 +48,7 @@ ODETrimeshShape::~ODETrimeshShape()
 /// Update function.
 void ODETrimeshShape::Update()
 {
-  ODEGeom *ogeom = ((ODEGeom*)this->geomParent);
+  ODEGeomPtr ogeom = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
 
   /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
@@ -90,7 +89,7 @@ void ODETrimeshShape::Load(common::XMLConfigNode *node)
 {
   dMass odeMass;
   Mass mass;
-  ODEGeom *pgeom = (ODEGeom*)this->geomParent;
+  ODEGeomPtr pgeom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   TrimeshShape::Load(node);
 
@@ -103,7 +102,7 @@ void ODETrimeshShape::Load(common::XMLConfigNode *node)
   const common::SubMesh *subMesh = mesh->GetSubMesh(i);
   if (subMesh->GetVertexCount() < 3)
   {
-    gzerr(0) << "ODETrimesh invalid mesh\n";
+    gzerr << "ODETrimesh invalid mesh\n";
     return;
   }
 

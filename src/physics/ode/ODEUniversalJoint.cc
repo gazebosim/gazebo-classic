@@ -21,7 +21,7 @@
  */
 
 #include "gazebo_config.h"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 
 #include "physics/Body.hh"
 #include "physics/ode/ODEUniversalJoint.hh"
@@ -101,7 +101,7 @@ void ODEUniversalJoint::SetDamping( int /*index*/, const double damping )
   dJointSetDamping( this->jointId, damping);
 #else
   // alternaitvely, apply explicit damping
-  gzerr(0) << "joint damping not implemented in ODE ball joint\n";
+  gzerr << "joint damping not implemented in ODE ball joint\n";
 #endif
 }
 

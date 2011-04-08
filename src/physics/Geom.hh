@@ -17,46 +17,27 @@
 /* Desc: Geom class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id$
  */
 
 #ifndef GEOM_HH
 #define GEOM_HH
 
-#include <boost/bind.hpp>
-
 #include "common/Event.hh"
-#include "common/Param.hh"
-#include "common/Vector3.hh"
+#include "common/CommonTypes.hh"
 
-#include "physics/Contact.hh"
-#include "physics/Shape.hh"
-#include "physics/Entity.hh"
+#include "physics/PhysicsTypes.hh"
 #include "physics/Mass.hh"
+#include "physics/Entity.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace physics
   {
-    class Model;
-    class Body;
-    class SurfaceParams;
-  
-    /// \addtogroup gazebo_physics
-    /// \brief Base class for all geoms
-    /// \{
-  
     /// \brief Base class for all geoms
     class Geom : public Entity
     {
       /// \brief Constructor
-      //public: Geom(Body *body, const std::string &name);
-      public: Geom(Body *body);
+      public: Geom(BodyPtr body);
     
       /// \brief Destructor
       public: virtual ~Geom();
@@ -66,6 +47,8 @@ namespace gazebo
   
       /// \brief Load the geom
       public: virtual void Load(common::XMLConfigNode *node);
+
+      public: virtual void Init();
   
       /// \brief Load the geom
       public: void Save(std::string &prefix, std::ostream &stream);
@@ -112,28 +95,28 @@ namespace gazebo
       public: void SetMass(const Mass &mass);
   
       /// \brief Get the body this geom belongs to
-      public: Body *GetBody() const;
+      public: BodyPtr GetBody() const;
   
       /// \brief Get the model this geom belongs to
-      public: Model *GetModel() const;
+      public: ModelPtr GetModel() const;
   
       /// \brief Set the friction mode of the geom
       public: void SetFrictionMode( const bool &v );
   
       /// \brief Get the bounding box for this geom
-      public: virtual void GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const = 0;
+      public: virtual common::Box GetBoundingBox() const = 0;
   
       /// \brief Get a pointer to the mass
       public: const Mass &GetMass() const;
   
       /// \brief Get the shape type
-      public: Common::EntityType GetShapeType();
+      public: Base::EntityType GetShapeType();
   
       /// \brief Set the shape for this geom
-      public: void SetShape(Shape *shape);
+      public: void SetShape(ShapePtr shape);
               
       /// \brief Get the attached shape
-      public: Shape *GetShape() const;
+      public: ShapePtr GetShape() const;
   
       /// \brief Turn contact recording on or off
       public: void SetContactsEnabled(const bool &enable);
@@ -190,10 +173,10 @@ namespace gazebo
       private: void CreateBoundingBox();
   
       ///  Contact parameters
-      public: SurfaceParams *surface; 
+      public: SurfaceParamsPtr surface; 
   
       /// The body this geom belongs to
-      protected: Body *body;
+      protected: BodyPtr body;
     
       protected: bool placeable;
   
@@ -213,17 +196,13 @@ namespace gazebo
       /// All the visual apparence 
       private: std::string bbVisual;
   
-      protected: Shape *shape;
+      protected: ShapePtr shape;
   
       private: bool contactsEnabled;
   
       public: event::EventT< void (const Contact &)> contactSignal;
       private: std::vector<event::ConnectionPtr> connections;
-            
     };
-  
-    /// \}
-  
   }
 }
 #endif

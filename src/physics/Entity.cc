@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
  */
 
 #include "common/Messages.hh"
-#include "common/GazeboError.hh"
-#include "common/Global.hh"
+#include "common/Console.hh"
 
 #include "transport/Transport.hh"
 
@@ -38,12 +36,13 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Entity::Entity(Common *parent)
-: Common(parent)
+Entity::Entity(BasePtr parent)
+  : Base(parent)
 {
+  this->AddType(ENTITY);
+
   this->pose_pub = transport::advertise<msgs::Pose>("~/pose");
   this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
-  this->AddType(ENTITY);
 
   common::Param::Begin(&this->parameters);
   this->staticP = new common::ParamT<bool>("static",false,0);
@@ -55,64 +54,22 @@ Entity::Entity(Common *parent)
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
-    Entity *ep = (Entity*)(this->parent);
-    this->SetStatic(ep->IsStatic());
+    this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
   }
-
-  // NATY: put functionality back in
-  //this->visualNode->SetOwner(this);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Load
-void Entity::Load(common::XMLConfigNode *node)
-{
-  Common::Load(node);
-  this->RegisterVisual();
-  common::Message::Init( *this->poseMsg, this->GetCompleteScopedName() );
-}
- 
-
-void Entity::SetName(const std::string &name)
-{
-  // TODO: if an entitie's name is changed, then the old visual is never
-  // removed. Should add in functionality to modify/update the visual
-  Common::SetName(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Entity::~Entity()
 {
-  // remove all connected joints for a Body before delteing it
-   /*gazebo::Model* parent_model = dynamic_cast<gazebo::Model*>(this->parent);
-   if (parent_model)
-     parent_model->DeleteConnectedJoints(this);
-     */
+  Base_V::iterator iter;
 
   delete this->staticP;
 
-  std::vector<Common*>::iterator iter;
+  // TODO: put this back in
+  //this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
-  this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
-
-  /*for (iter = this->children.begin(); iter != this->children.end(); iter++)
-  {
-    if (*iter && (*iter)->HasType(ENTITY))
-    {
-      Entity *child = (Entity*)(*iter);
-      child->SetParent(NULL);
-      this->GetWorld()->GetPhysicsEngine()->RemoveEntity(child);
-
-      if (child->HasType(MODEL))
-      {
-        Model *m = (Model*)child;
-        m->Detach();
-      }
-      //delete *iter;
-    }
-  }*/
-
+  // Tell all renderers that I'm gone
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->vis_pub->Publish(*this->visualMsg);
   delete this->visualMsg;
@@ -122,41 +79,61 @@ Entity::~Entity()
   this->poseMsg = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load
+void Entity::Load(common::XMLConfigNode *node)
+{
+  Base::Load(node);
+
+  this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
+
+  if (this->parent)
+    this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
+
+  this->vis_pub->Publish(*this->visualMsg);
+
+  common::Message::Init( *this->poseMsg, this->GetCompleteScopedName() );
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
+// Set the name of the entity
+void Entity::SetName(const std::string &name)
+{
+  // TODO: if an entitie's name is changed, then the old visual is never
+  // removed. Should add in functionality to modify/update the visual
+  Base::SetName(name);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this entity is static: immovable
 void Entity::SetStatic(const bool &s)
 {
-  std::vector< Common *>::iterator iter;
-  Body *body = NULL;
+  Base_V::iterator iter;
 
   this->staticP->SetValue( s );
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (! (*iter)->HasType(ENTITY))
-      continue;
-
-    Entity *ent = (Entity*)(*iter);
-    if (!ent || ent->IsStatic())
-      continue;
-
-    ent->SetStatic(s);
-    if (ent->HasType(BODY))
-    {
-      body = (Body*)ent;
-      body->SetEnabled(!s);
-    }
+    EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
+    if (e)
+      e->SetStatic(s);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return whether this entity is static
 bool Entity::IsStatic() const
 {
-  return this->staticP->GetValue();
+  return (**this->staticP);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the initial pose
+void Entity::SetInitialPose(const common::Pose3d &p )
+{
+  this->initialPose = p;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the bounding box for the entity 
@@ -169,11 +146,8 @@ common::Box Entity::GetBoundingBox() const
 /// Get the absolute pose of the entity
 common::Pose3d Entity::GetWorldPose() const
 {
-  if (this->parent && this->parent->HasType(ENTITY))
-  {
-    Entity *ent = (Entity*)this->parent;
-    return this->GetRelativePose() + ent->GetWorldPose();
-  }
+  if (this->parent && this->parentEntity)
+    return this->GetRelativePose() + this->parentEntity->GetWorldPose();
   else
     return this->GetRelativePose();
 }
@@ -201,25 +175,23 @@ common::Pose3d Entity::GetModelRelativePose() const
   if (this->HasType(MODEL) || !this->parent)
     return common::Pose3d();
 
-  return this->GetRelativePose() + 
-         ((Entity*)this->parent)->GetModelRelativePose();
+  return this->GetRelativePose() + this->parentEntity->GetModelRelativePose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
 void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
 {
-
   if (this->parent && this->parent->HasType(ENTITY))
   {
-    // NATY: I took out the first if clause because it would cause other
+    // TODO: I took out the first if clause because it would cause other
     // bodies in a model to penetrate the ground since they were not the 
     // canonical body
     // if this is the canonical body of a model, then
     // we want to SetWorldPose of the parent model
     // by doing some backwards transform
     /*if (this->parent->HasType(MODEL) && 
-        ((Model*)this->parent)->GetCanonicalBody() == (Body*)this)
+        ((Model*)this->parent)->GetBody("canonical") == (Body*)this)
     {
       // abs pose of the model + relative pose of cb = abs pose of cb 
       // so to get abs pose of the model, we need
@@ -247,7 +219,7 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose
-      common::Pose3d relative_pose = pose - ((Entity*)this->parent)->GetWorldPose();
+      common::Pose3d relative_pose = pose - this->parentEntity->GetWorldPose();
       // relative pose is the pose relative to the parent
       // if this is called from MoveCallback, notify is false
       // FIXME: if this is called by user, and notify is true
@@ -269,11 +241,11 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
     //  triggers another SetWorldPose() and overwrites this change
     this->SetRelativePose(pose, notify);
     //then, set abs pose of the canonical body
-    //Body* cb = ((Model*)this)->GetCanonicalBody();
+    //Body* cb = ((Model*)this)->GetBody("canonical");
   }
   else
   {
-    std::cerr << "No parent and not a model, strange\n";
+    gzerr << "No parent and not a model, strange\n";
   }
 }
 
@@ -303,35 +275,23 @@ void Entity::PoseChange(bool notify)
   {
     this->OnPoseChange();
 
-    std::vector<Common*>::iterator iter;
+    Base_V::iterator iter;
     for  (iter = this->children.begin(); iter != this->children.end(); iter++)
     {
       if ((*iter)->HasType(ENTITY))
-        ((Entity*)*iter)->OnPoseChange();
+        boost::shared_static_cast<Entity>(*iter)->OnPoseChange();
     }
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Register a visual
-void Entity::RegisterVisual()
-{
-  this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
-
-  if (this->parent)
-    this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
-
-  this->vis_pub->Publish(*this->visualMsg);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the parent model, if one exists
-Model *Entity::GetParentModel() const
+ModelPtr Entity::GetParentModel() const
 {
-  Common *p = this->parent;
+  BasePtr p = this->parent;
 
   while (p && p->HasType(MODEL))
     p = p->GetParent();
 
-  return (Model*)p;
+  return boost::shared_dynamic_cast<Model>(p);
 }

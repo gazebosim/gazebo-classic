@@ -22,7 +22,7 @@
 #include <list>
 
 #include "common/GazeboConfig.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Plugin.hh"
 
 #ifdef HAVE_DL

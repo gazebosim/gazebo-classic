@@ -32,6 +32,7 @@ namespace gazebo
   {
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
+    typedef std::vector<ConnectionPtr> Connection_V;
 
     /// \brief Base class for all events
     class Event

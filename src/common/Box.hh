@@ -53,6 +53,10 @@ namespace gazebo
       /// \brief Equal operator
       public: const Box &operator=( const Box &b );
 
+      public: Box operator+( const Box &b ) const;
+
+      public: const Box &operator+=( const Box &b );
+
       public: friend std::ostream &operator<<( std::ostream &out, const gazebo::common::Box &b )
       {
         out << "Min[" << b.min << "] Max[" << b.max << "]";

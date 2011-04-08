@@ -16,7 +16,6 @@
 */
 /* Desc: Body class
  * Author: Nate Koenig
- * Date: 13 Feb 2006
  */
 
 #ifndef BODY_HH
@@ -26,19 +25,13 @@
 #include <vector>
 
 #include "common/Event.hh"
-#include "common/Pose3d.hh"
-#include "common/Param.hh"
+#include "common/CommonTypes.hh"
 
 #include "physics/Entity.hh"
 #include "physics/Mass.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace physics
   {
     class Model;
@@ -52,7 +45,7 @@ namespace gazebo
     class Body : public Entity
     {
       /// \brief Constructor
-      public: Body(Entity *parent);
+      public: Body(EntityPtr parent);
   
       /// \brief Destructor
       public: virtual ~Body();
@@ -72,10 +65,6 @@ namespace gazebo
   
       /// \brief Update the body
       public: virtual void Update();
-  
-      /// \brief Attach a geom to this body
-      /// \param geom Geometery to attach to this body
-      public: virtual void AttachGeom( Geom *geom );
   
       /// \brief Set whether this body is enabled
       public: virtual void SetEnabled(bool enable) const = 0;
@@ -135,7 +124,6 @@ namespace gazebo
       public: virtual void SetTorque(const common::Vector3 &force) = 0;
   
   
-  
       /// \brief Get the linear velocity of the body
       public: common::Vector3 GetRelativeLinearVel() const;
   
@@ -167,15 +155,8 @@ namespace gazebo
       public: virtual common::Vector3 GetWorldTorque() const = 0;
   
   
-  
-      /// \brief Get the vector of all geoms
-      public: const std::map<std::string, Geom*> *GetGeoms() const;
-  
-      /// \brief Get a geom by name
-      public: Geom *GetGeom(const std::string &name) const;
-  
       /// \brief Get the model that this body belongs to
-      public: Model *GetModel() const;
+      public: ModelPtr GetModel() const;
   
       /// \brief Get the mass of the body
       public: const Mass &GetMass() const { return mass; }
@@ -190,25 +171,14 @@ namespace gazebo
       /// \brief Load a renderable
       private: void LoadVisual(common::XMLConfigNode *node);
   
-      /// \brief Update the pose of the body
-      //protected: void UpdatePose();
-  
-      /// \brief Set transparency for all child geometries
-      public: void SetTransparent(const bool &show);
-  
       /// \brief  Get the size of the body
-      public: void GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const;
+      public: virtual common::Box GetBoundingBox() const;
   
       /// \brief Set the linear damping factor
       public: virtual void SetLinearDamping(double damping) = 0;
   
       /// \brief Set the angular damping factor
       public: virtual void SetAngularDamping(double damping) = 0;
-  
-      /// \brief Set to true to show the physics visualizations
-      public: void ShowPhysics(const bool &show);
-  
-      public: Entity *GetCoMEntity() { return this->comEntity; }
   
       /// \brief Set whether this body is in the kinematic state
       public: virtual void SetKinematic(const bool &) {}
@@ -230,9 +200,6 @@ namespace gazebo
       public: void DisconnectEnabledSignal( event::ConnectionPtr &c )
               { enabledSignal.Disconnect(c); }
   
-      /// List of geometries attached to this body
-      protected: std::map< std::string, Geom* > geoms;
-  
       /// Mass properties of the object
       protected: Mass mass;
   
@@ -243,7 +210,7 @@ namespace gazebo
       public: common::Pose3d initModelOffset;
   
       // Helper entity for separating body pose from center-of-mass pose
-      protected: Entity *comEntity;
+      protected: EntityPtr comEntity;
   
       /// The pose of the body relative to the model. Can also think of this
       /// as the body's pose offset.

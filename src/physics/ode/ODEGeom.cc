@@ -21,8 +21,8 @@
 
 #include <sstream>
 
-#include "common/Global.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
+#include "common/Box.hh"
 
 #include "physics/Mass.hh"
 #include "physics/SurfaceParams.hh"
@@ -35,12 +35,10 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEGeom::ODEGeom( Body *_body )
+ODEGeom::ODEGeom( BodyPtr _body )
     : Geom(_body)
 {
-  this->SetName("ODE Geom");
-  this->SetSpaceId( ((ODEBody*)this->body)->GetSpaceId() );
-
+  this->SetName("ODE_Geom");
   this->geomId = NULL;
 }
 
@@ -57,6 +55,8 @@ ODEGeom::~ODEGeom()
 void ODEGeom::Load(common::XMLConfigNode *node)
 {
   Geom::Load(node);
+
+  this->SetSpaceId( boost::shared_static_cast<ODEBody>(this->body)->GetSpaceId() );
 
   /*if (this->geomId && this->placeable)
   {
@@ -258,8 +258,9 @@ Mass ODEGeom::GetBodyMassMatrix()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void ODEGeom::GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const
+common::Box ODEGeom::GetBoundingBox() const
 {
+  common::Box box;
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -267,8 +268,10 @@ void ODEGeom::GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const
   //if (this->geomId && this->type != Shape::PLANE)
   dGeomGetAABB(this->geomId, aabb);
 
-  min.Set(aabb[0], aabb[2], aabb[4]);
-  max.Set(aabb[1], aabb[3], aabb[5]);
+  box.min.Set(aabb[0], aabb[2], aabb[4]);
+  box.max.Set(aabb[1], aabb[3], aabb[5]);
+
+  return box;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

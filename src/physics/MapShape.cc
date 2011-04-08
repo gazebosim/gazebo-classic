@@ -16,17 +16,15 @@
 */
 /* Desc: Map shape
  * Author: Nate Koenig
- * Date: 14 July 2008
- */
+*/
 
-#include <iostream>
 #include <string.h>
 #include <math.h>
 
 #include "common/GazeboConfig.hh"
 #include "common/Image.hh"
-#include "common/GazeboError.hh"
-#include "common/Global.hh"
+#include "common/Exception.hh"
+#include "common/XMLConfig.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -42,10 +40,10 @@ unsigned int MapShape::geomCounter = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-MapShape::MapShape(Geom *parent)
+MapShape::MapShape(GeomPtr parent)
     : Shape(parent)
 {
-  this->AddType(Common::MAP_SHAPE);
+  this->AddType(Base::MAP_SHAPE);
 
   this->root = new QuadNode(NULL);
 
@@ -90,6 +88,7 @@ void MapShape::Update()
 /// Load the heightmap
 void MapShape::Load(common::XMLConfigNode *node)
 {
+  Shape::Load(node);
   std::string imageFilename = node->GetString("image","",1);
 
   this->negativeP->Load(node);
@@ -110,7 +109,12 @@ void MapShape::Load(common::XMLConfigNode *node)
 
   if (!this->mapImage->Valid())
     gzthrow(std::string("Unable to open image file[") + imageFilename + "]" );
+}
 
+//////////////////////////////////////////////////////////////////////////////
+// Init the map
+void MapShape::Init()
+{
   this->root->x = 0;
   this->root->y = 0;
 
@@ -142,7 +146,7 @@ void MapShape::CreateBoxes(QuadNode *node)
     std::ostringstream stream;
 
     // Create the box geometry
-    Geom *geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetBody());
+    GeomPtr geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetBody());
     geom->SetSaveable(false);
 
     common::XMLConfig *boxConfig = new common::XMLConfig();

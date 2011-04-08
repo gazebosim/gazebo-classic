@@ -21,8 +21,8 @@
  */
 
 #include "BulletBody.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "BulletJoint.hh"
 
 using namespace gazebo;

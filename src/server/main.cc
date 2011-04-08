@@ -106,7 +106,7 @@ home directory, or to the log file specified with the -l command line option.
 #include "gazebo_config.h"
 #include "Simulator.hh"
 #include "World.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Global.hh"
 
 
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 
     gazebo::Simulator::Instance()->CreateWorld(worldFileName);
   }
-  catch (gazebo::GazeboError e)
+  catch (gazebo::Exception e)
   {
     std::cerr << "Error Loading Gazebo" << std::endl;
     std::cerr << e << std::endl;
@@ -272,7 +272,7 @@ int main(int argc, char **argv)
     gazebo::Simulator::Instance()->GetActiveWorld()->SetPaused(optPaused);
     gazebo::Simulator::Instance()->Init();
   }
-  catch (gazebo::GazeboError e)
+  catch (gazebo::Exception e)
   {
     std::cerr << "Initialization failed" << std::endl;
     std::cerr << e << std::endl;
@@ -285,7 +285,7 @@ int main(int argc, char **argv)
   {
     gazebo::Simulator::Instance()->Run();
   }
-  catch (gazebo::GazeboError e)
+  catch (gazebo::Exception e)
   {
     std::cerr << "Main simulation loop failed" << std::endl;
     std::cerr << e << std::endl;
@@ -298,7 +298,7 @@ int main(int argc, char **argv)
   {
     gazebo::Simulator::Instance()->Fini();
   }
-  catch (gazebo::GazeboError e)
+  catch (gazebo::Exception e)
   {
     std::cerr << "Finalization failed" << std::endl;
     std::cerr << e << std::endl;

@@ -20,8 +20,8 @@
  * CVS: $Id: BulletBallJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "BulletBody.hh"
 #include "BulletBallJoint.hh"
 
@@ -58,14 +58,14 @@ common::Vector3 BulletBallJoint::GetAnchor(int index) const
 // Set the joints anchor point
 void BulletBallJoint::SetAnchor(int index, const common::Vector3 &anchor)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
 void BulletBallJoint::SetDamping( int /*index*/, const double damping )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

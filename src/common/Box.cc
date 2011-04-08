@@ -85,3 +85,23 @@ const Box &Box::operator=( const Box &b )
 
   return *this;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+Box Box::operator+( const Box &b ) const
+{
+  Vector3 mn = this->min;
+  Vector3 mx = this->max;
+
+  mn.SetToMin(b.min);
+  mx.SetToMax(b.max);
+
+  return Box(mn, mx);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+const Box &Box::operator+=( const Box &b )
+{
+  this->min.SetToMin(b.min);
+  this->max.SetToMax(b.max);
+  return *this;
+}

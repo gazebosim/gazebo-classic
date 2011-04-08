@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <math.h>
 
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Color.hh"
 
 using namespace gazebo;
@@ -152,7 +152,7 @@ Vector3 Color::GetAsHSV() const
 
   if(v == x) 
   {
-    gzerr(0) << "rgb to hsv undefined\n";
+    gzerr << "rgb to hsv undefined\n";
     return hsv;
   }
 
@@ -238,7 +238,7 @@ float Color::operator[](unsigned int index)
     case 1: return this->G();
     case 2: return this->B();
     case 3: return this->A();
-    default: gzerr(0) << "Invalid color index[" << index << "]\n";
+    default: gzerr << "Invalid color index[" << index << "]\n";
   }
 
   return 0;

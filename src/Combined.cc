@@ -42,6 +42,7 @@ const std::string default_config =
       <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
     <model name='box1'>\
+      <static>true</static>\
       <origin xyz='0 0 1'/>\
       <link name='body'>\
         <collision name='geom'>\
@@ -53,7 +54,6 @@ const std::string default_config =
         <visual>\
           <geometry>\
             <box size='1.0 1.0 1.0'/>\
-            <!--<mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>-->\
           </geometry>\
           <mesh filename='unit_box'/>\
         </visual>\
@@ -90,7 +90,7 @@ Combined::Combined()
   {
     common::GazeboConfig::Instance()->Load();
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
@@ -116,7 +116,7 @@ void Combined::Load()
   {
     xmlFile->LoadString(default_config);
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
   }
@@ -138,7 +138,7 @@ void Combined::Load()
     {
       physics::load_world(world, worldNode);
     }
-    catch (common::GazeboError e)
+    catch (common::Exception e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }

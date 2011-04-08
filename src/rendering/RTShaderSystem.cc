@@ -26,8 +26,8 @@
 
 #include "rendering/Scene.hh"
 #include "rendering/Visual.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "rendering/RTShaderSystem.hh"
 
 #define MINOR_VERSION 700
@@ -84,7 +84,7 @@ void RTShaderSystem::Init()
     this->initialized = true;
   }
   else
-    gzerr(0) << "RT Shader system failed to initialize\n";
+    gzerr << "RT Shader system failed to initialize\n";
 #endif
 }
 
@@ -359,7 +359,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   // Core shader lib not found -> shader generating will fail.
   if (coreLibsPath.empty())
   {
-    gzerr(0) << "Unable to find shader lib. Shader generating will fail.";
+    gzerr << "Unable to find shader lib. Shader generating will fail.";
     return false;
   }
 

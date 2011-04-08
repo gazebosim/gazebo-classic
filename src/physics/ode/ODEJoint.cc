@@ -20,8 +20,8 @@
  * SVN: $Id$
  */
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 
 #include "physics/World.hh"
 #include "physics/Body.hh"
@@ -77,14 +77,14 @@ void ODEJoint::Load(common::XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the body to which the joint is attached according the _index
-Body *ODEJoint::GetJointBody( int index ) const
+BodyPtr ODEJoint::GetJointBody( int index ) const
 {
-  Body *result=0;
+  BodyPtr result;
 
   if ( index==0 || index==1 )
   {
-    ODEBody *odeBody1 = dynamic_cast<ODEBody*>(this->body1);
-    ODEBody *odeBody2 = dynamic_cast<ODEBody*>(this->body2);
+    ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(this->body1);
+    ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(this->body2);
     if (odeBody1 != NULL &&
         dJointGetBody( this->jointId, index ) == odeBody1->GetODEId())
       result = this->body1;
@@ -97,10 +97,10 @@ Body *ODEJoint::GetJointBody( int index ) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Determines of the two bodies are connected by a joint
-bool ODEJoint::AreConnected( Body *one, Body *two ) const
+bool ODEJoint::AreConnected( BodyPtr one, BodyPtr two ) const
 {
-  ODEBody *odeBody1 = dynamic_cast<ODEBody*>(one);
-  ODEBody *odeBody2 = dynamic_cast<ODEBody*>(two);
+  ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(one);
+  ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(two);
 
   if (odeBody1 == NULL || odeBody2 == NULL)
     gzthrow("ODEJoint requires ODE bodies\n");
@@ -118,12 +118,12 @@ double ODEJoint::GetParam( int /*parameter*/ ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach the two bodies with this joint
-void ODEJoint::Attach(Body *one, Body *two)
+void ODEJoint::Attach(BodyPtr one, BodyPtr two)
 {
   Joint::Attach(one, two);
 
-  ODEBody *odeBody1 = dynamic_cast<ODEBody*>(this->body1);
-  ODEBody *odeBody2 = dynamic_cast<ODEBody*>(this->body2);
+  ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(this->body1);
+  ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(this->body2);
 
   if (odeBody1 == NULL && odeBody2 == NULL)
     gzthrow("ODEJoint requires at least one ODE body\n");
@@ -146,10 +146,9 @@ void ODEJoint::Attach(Body *one, Body *two)
 // Detach this joint from all bodies
 void ODEJoint::Detach()
 {
-  this->body1 = NULL;
-  this->body2 = NULL;
+  this->body1.reset();
+  this->body2.reset();
   dJointAttach( this->jointId, 0, 0 );
-  return;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -157,8 +156,10 @@ void ODEJoint::Detach()
 // where appropriate
 void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
 {
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->body1) 
+    this->body1->SetEnabled(true);
+  if (this->body2) 
+    this->body2->SetEnabled(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +331,7 @@ void ODEJoint::SetAttribute( Attribute attr, int index, double value)
       this->SetParam(dParamLoStop, value);
       break;
     default:
-      gzerr(0) << "Unable to handle joint attribute[" << attr << "]\n";
+      gzerr << "Unable to handle joint attribute[" << attr << "]\n";
       break;
   };
 }

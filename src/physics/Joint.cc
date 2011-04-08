@@ -22,15 +22,15 @@
 #include "transport/Transport.hh"
 
 #include "common/Events.hh"
-#include "PhysicsEngine.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
-#include "common/Global.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
+#include "common/XMLConfig.hh"
 
-#include "Body.hh"
-#include "Model.hh"
-#include "World.hh"
-#include "Joint.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/Body.hh"
+#include "physics/Model.hh"
+#include "physics/World.hh"
+#include "physics/Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -39,11 +39,10 @@ using namespace physics;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 Joint::Joint()
-  : Common(NULL)
+  : Base(BasePtr())
 {
   this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
-  this->AddType(JOINT);
-  this->model = NULL;
+  this->AddType(Base::JOINT);
   this->showJoints = false;
 
   common::Param::Begin(&this->parameters);
@@ -57,9 +56,6 @@ Joint::Joint()
   this->provideFeedbackP = new common::ParamT<bool>("provide_feedback", false, 0);
   this->fudgeFactorP = new common::ParamT<double>( "fudge_factor", 1.0, 0 );
   common::Param::End();
-
-  this->body1 = NULL;
-  this->body2 = NULL;
 
   this->showJointsConnection = event::Events::ConnectShowJointsSignal(boost::bind(&Joint::ShowJoints, this, _1) );
 }
@@ -108,8 +104,7 @@ Joint::~Joint()
 // Load a joint
 void Joint::Load(common::XMLConfigNode *node)
 {
-  // Name the joint
-  this->nameP->Load(node);
+  Base::Load(node);
 
   this->body1NameP->Load(node->GetChild("child"));
   this->body2NameP->Load(node->GetChild("parent"));
@@ -127,14 +122,17 @@ void Joint::Load(common::XMLConfigNode *node)
   {
     visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
 
-    this->body1 = this->model->GetBody( **(this->body1NameP));
-    this->body2 = this->model->GetBody(**(this->body2NameP));
+    this->body1 = this->model->GetBody( **(this->body1NameP) );
+    this->body2 = this->model->GetBody( **(this->body2NameP) );
   }
   else
   {
     visname << this->GetName() << "_VISUAL";
-    this->body1 = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->body1NameP) ));
-    this->body2 = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->body2NameP) ));
+    this->body1 = boost::shared_dynamic_cast<Body>(
+        this->GetWorld()->GetByName( **(this->body1NameP) ));
+
+    this->body2 = boost::shared_dynamic_cast<Body>(
+        this->GetWorld()->GetByName( **(this->body2NameP) ));
   }
 
   this->anchorBody = this->body1;
@@ -190,9 +188,9 @@ void Joint::Load(common::XMLConfigNode *node)
 /// Save a joint to a stream in XML format
 void Joint::Save(std::string &prefix, std::ostream &stream)
 {
-  std::string typeName;// =Common::EntityTypename[ (int)this->GetLeafType() ];
+  std::string typeName;// =Base::EntityTypename[ (int)this->GetLeafType() ];
 
-  stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
+  stream << prefix << "<joint:" << typeName << " name=\"" << this->GetName() << "\">\n";
   stream << prefix << "  " << *(this->body1NameP) << "\n";
   stream << prefix << "  " << *(this->body2NameP) << "\n";
   stream << prefix << "  " << *(this->anchorOffsetP) << "\n";
@@ -279,7 +277,7 @@ void Joint::Reset()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void Joint::Attach( Body *one, Body *two )
+void Joint::Attach( BodyPtr one, BodyPtr two )
 {
   this->body1 = one;
   this->body2 = two;
@@ -288,7 +286,7 @@ void Joint::Attach( Body *one, Body *two )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the model this joint belongs too
-void Joint::SetModel(Model *model)
+void Joint::SetModel(ModelPtr model)
 {
   this->model = model;
   this->SetWorld(this->model->GetWorld());

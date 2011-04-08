@@ -15,6 +15,7 @@
  *
 */
 #include "physics/World.hh"
+#include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODEBody.hh"
 #include "physics/ode/ODEGeom.hh"
 #include "physics/ode/ODEPhysics.hh"
@@ -27,7 +28,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-ODEMultiRayShape::ODEMultiRayShape(Geom *parent)
+ODEMultiRayShape::ODEMultiRayShape(GeomPtr parent)
   : MultiRayShape(parent)
 {
   this->SetName("ODE Multiray Shape");
@@ -42,9 +43,9 @@ ODEMultiRayShape::ODEMultiRayShape(Geom *parent)
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  ODEBody *pBody = (ODEBody*)(this->geomParent->GetBody());
+  ODEBodyPtr pBody = boost::shared_static_cast<ODEBody>(this->geomParent->GetBody());
   pBody->SetSpaceId( this->raySpaceId );
-  ((ODEGeom*)parent)->SetSpaceId(this->raySpaceId);
+  boost::shared_static_cast<ODEGeom>(parent)->SetSpaceId(this->raySpaceId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,20 +58,18 @@ ODEMultiRayShape::~ODEMultiRayShape()
 /// Update the rays 
 void ODEMultiRayShape::UpdateRays()
 {
-  ODEPhysics *ode = dynamic_cast<ODEPhysics*>(
+  ODEPhysicsPtr ode = boost::shared_dynamic_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
     gzthrow( "Invalid physics engine. Must use ODE." );
 
-  ode->LockMutex();
-
+  // TODO: Do we need to lock the physics engine here?
+  
   // Do collision detection
   dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
       ( dGeomID ) ( ode->GetSpaceId() ),
       this, &UpdateCallback );
-      
-  ode->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +143,7 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
       if ( n > 0 )
       {
-        RayShape *shape = (RayShape*)(rayGeom->GetShape());
+        RayShapePtr shape = boost::shared_static_cast<RayShape>(rayGeom->GetShape());
         if (contact.depth < shape->GetLength())
         {
           shape->SetLength(contact.depth );
@@ -161,10 +160,10 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 void ODEMultiRayShape::AddRay(const common::Vector3 &start, const common::Vector3 &end )
 {
   MultiRayShape::AddRay(start,end);
-  ODEGeom *odeGeom = new ODEGeom(this->geomParent->GetBody());
+  ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetBody()) );
   odeGeom->SetName("ODE Ray Geom");
 
-  ODERayShape *ray = new ODERayShape(odeGeom, **this->displayTypeP == "lines" );
+  ODERayShapePtr ray( new ODERayShape(odeGeom, **this->displayTypeP == "lines" ));
 
   ray->SetPoints(start,end);
   this->rays.push_back(ray);

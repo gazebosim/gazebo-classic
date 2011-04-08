@@ -26,7 +26,7 @@
 
 #include "common/Global.hh"
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 #include "Simulator.hh"
 #include "SensorFactory.hh"

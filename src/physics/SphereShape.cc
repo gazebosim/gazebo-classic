@@ -17,20 +17,19 @@
 /* Desc: Sphere shape
  * Author: Nate Keonig
  * Date: 14 Oct 2009
- * SVN: $Id:$
  */
-
+#include "common/XMLConfig.hh"
 #include "physics/SphereShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-SphereShape::SphereShape(Geom *parent) : Shape(parent)
+SphereShape::SphereShape(GeomPtr parent) 
+  : Shape(parent)
 {
-  this->AddType(Common::SPHERE_SHAPE);
+  this->AddType(Base::SPHERE_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->radiusP = new common::ParamT<double>("radius",1.0,0);
@@ -49,10 +48,17 @@ SphereShape::~SphereShape()
 /// Load the sphere
 void SphereShape::Load(common::XMLConfigNode *node)
 {
+  Shape::Load(node);
   this->radiusP->Load( node->GetChild("sphere") );
-  this->SetSize( **this->radiusP );
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the sphere
+void SphereShape::Init()
+{
+  this->SetSize( **this->radiusP );
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save shape parameters
 void SphereShape::Save(std::string &prefix, std::ostream &stream)

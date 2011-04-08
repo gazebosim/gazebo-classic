@@ -29,7 +29,7 @@
 #include "Controller.hh"
 #include "common/Global.hh"
 #include "World.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "Body.hh"
 #include "rendering/Visual.hh"
 

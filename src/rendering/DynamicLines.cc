@@ -25,7 +25,7 @@
 #include <math.h>
 #include <sstream>
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "rendering/DynamicLines.hh"
 
 using namespace gazebo;

@@ -23,7 +23,7 @@
 
 #include "common/Events.hh"
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 
 #include "rendering/Camera.hh"
 #include "rendering/Scene.hh"

@@ -31,8 +31,8 @@
 #include "rendering/SelectionObj.hh"
 //#include "rendering/RTShaderSystem.hh"
 #include "common/MeshManager.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 #include "common/Global.hh"
 #include "common/Mesh.hh"
@@ -57,7 +57,7 @@ Visual::Visual(const std::string &name, Visual *parent)
   if (parent)
     pnode = parent->GetSceneNode();
   else
-    gzerr(0) << "Create a visual, invalid parent!!!\n";
+    gzerr << "Create a visual, invalid parent!!!\n";
 
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
@@ -454,14 +454,14 @@ void Visual::SetMaterial(const std::string &materialName)
   }
   catch (Ogre::Exception e)
   {
-    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
+    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
     return;
   }
 
   if (origMaterial.isNull())
   {
-    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
+    gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white\n";
     return;
   }
@@ -508,7 +508,7 @@ void Visual::SetMaterial(const std::string &materialName)
   }
   catch (Ogre::Exception e)
   {
-    gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry["
+    gzwarn << "Unable to set Material[" << myMaterialName << "] to Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
   }
 }
@@ -1111,7 +1111,7 @@ void Visual::InsertMesh( const common::Mesh *mesh)
   }
   catch (Ogre::Exception e)
   {
-    gzerr(0) << "Unable to create a basic Unit cylinder object" << std::endl;
+    gzerr << "Unable to create a basic Unit cylinder object" << std::endl;
   }
 }
 

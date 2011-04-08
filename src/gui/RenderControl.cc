@@ -25,7 +25,7 @@
 #include <GL/glx.h>
 #endif
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Global.hh"
 #include "common/Events.hh"
 

@@ -17,8 +17,8 @@
 #include <algorithm>
 #include <float.h>
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/Mesh.hh"
 
 using namespace gazebo;
@@ -551,7 +551,7 @@ unsigned int SubMesh::GetVertexIndex(const Vector3 &v) const
 void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
 {
   if (this->vertices.size() ==0 || this->indices.size() == 0)
-    gzerr(0) << "No vertices or indices\n";
+    gzerr << "No vertices or indices\n";
 
   std::vector< Vector3 >::const_iterator  viter;
   std::vector< unsigned int >::const_iterator  iiter;

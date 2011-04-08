@@ -20,8 +20,8 @@
  * SVN: $Id:$
  */
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "BulletBody.hh"
 #include "BulletUniversalJoint.hh"
 
@@ -89,7 +89,7 @@ common::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void BulletUniversalJoint::SetAnchor( int index, const common::Vector3 &anchor )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -104,14 +104,14 @@ common::Vector3 BulletUniversalJoint::GetAxis(int index) const
 // Set the joint damping
 void BulletUniversalJoint::SetDamping( int /*index*/, const double damping )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
 void BulletUniversalJoint::SetAxis( int index, const common::Vector3 &axis )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ common::Angle BulletUniversalJoint::GetAngle(int index) const
 // Get the angular rate of an axis
 double BulletUniversalJoint::GetVelocity(int index) const
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
   return 0;
 }
 
@@ -136,28 +136,28 @@ double BulletUniversalJoint::GetVelocity(int index) const
 /// Set the velocity of an axis(index).
 void BulletUniversalJoint::SetVelocity(int index, double angle)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the torque of this joint
 void BulletUniversalJoint::SetForce(int index, double torque)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
 void BulletUniversalJoint::SetMaxForce(int index, double t)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
 double BulletUniversalJoint::GetMaxForce(int index)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
   return 0;
 }
 

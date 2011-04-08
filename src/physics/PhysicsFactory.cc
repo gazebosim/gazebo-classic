@@ -63,12 +63,14 @@ void PhysicsFactory::RegisterPhysicsEngine(std::string classname,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new instance of a physics engine.
-PhysicsEngine *PhysicsFactory::NewPhysicsEngine(const std::string &classname, World *world)
+PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &classname, WorldPtr world)
 {
+  PhysicsEnginePtr result;
+
   if (engines[classname])
   {
-    return (engines[classname]) (world);
+    result = (engines[classname]) (world);
   }
 
-  return NULL;
+  return result;
 }

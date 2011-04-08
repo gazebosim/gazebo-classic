@@ -27,7 +27,7 @@
 #include "Model.hh"
 #include "Joint.hh"
 #include "Simulator.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "Generic_Actarray.hh"
 #include <typeinfo>

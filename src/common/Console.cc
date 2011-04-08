@@ -15,67 +15,62 @@
  *
 */
 /*
- * Desc: Gazebo Message
+ * Desc: Gazebo Console messages
  * Author: Nathan Koenig
  * Date: 09 June 2007
- * SVN info: $Id$
  */
 
 #include <time.h>
 #include <string.h>
 
 #include "common/XMLConfig.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
 
-
-GazeboMessage *GazeboMessage::myself = NULL;
+Console *Console::myself = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructor
-GazeboMessage::GazeboMessage()
+Console::Console()
 {
   this->msgStream = &std::cout;
   this->errStream = &std::cerr;
 
-  this->level = 0;
   Param::Begin(&this->parameters);
-  this->verbosityP = new ParamT<int>("verbosity",0,0);
+  this->quietP = new ParamT<int>("quiet",false,0);
   this->logDataP = new ParamT<bool>("log_data",false,0);
   Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-GazeboMessage::~GazeboMessage()
+Console::~Console()
 {
-  delete this->verbosityP;
+  delete this->quietP;
   delete this->logDataP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return an instance to this class
-GazeboMessage *GazeboMessage::Instance()
+Console *Console::Instance()
 {
   if (myself == NULL)
-    myself = new GazeboMessage();
+    myself = new Console();
 
   return myself;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the Message parameters
-void GazeboMessage::Load(XMLConfigNode *node)
+void Console::Load(XMLConfigNode *node)
 {
   char logFilename[50];
 
-  this->verbosityP->Load(node);
+  this->quietP->Load(node);
   this->logDataP->Load(node);
-
-  this->SetVerbose(**(this->verbosityP));
 
   if (**(this->logDataP))
   {
@@ -101,42 +96,39 @@ void GazeboMessage::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save in xml format
-void GazeboMessage::Save(std::string &prefix, std::ostream &stream)
+void Console::Save(std::string &prefix, std::ostream &stream)
 {
-  stream << prefix << *(this->verbosityP) << "\n";
+  stream << prefix << *(this->quietP) << "\n";
   stream << prefix << *(this->logDataP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the verbosity
-void GazeboMessage::SetVerbose( int level )
+void Console::SetQuiet( bool q )
 {
-  this->level = level;
+  this->quietP->SetValue( q );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the message stream
-std::ostream &GazeboMessage::Msg( int msglevel )
+std::ostream &Console::Msg()
 {
-  if (msglevel <= this->level)
-    return *this->msgStream;
-  else
+  if (**this->quietP)
     return this->nullStream;
+  else
+    return *this->msgStream;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the error stream
-std::ostream &GazeboMessage::Err( int msglevel )
+std::ostream &Console::Error()
 {
-  if (msglevel <= this->level)
-    return *this->errStream;
-  else
-    return this->nullStream;
+  return *this->errStream;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Log a message
-std::ofstream &GazeboMessage::Log()
+std::ofstream &Console::Log()
 {
   return this->logStream;
 }

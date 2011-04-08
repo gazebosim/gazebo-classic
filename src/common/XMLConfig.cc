@@ -34,8 +34,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
 
@@ -413,7 +413,7 @@ void XMLConfigNode::Print()
 {
   XMLConfigNode *node;
 
-  gzmsg(2) << "name = [" << (const char*) this->xmlNode->name << "]\n";
+  gzmsg << "name = [" << (const char*) this->xmlNode->name << "]\n";
 
   // Recurse
   for (node = this->childFirst; node != NULL; node = node->next)

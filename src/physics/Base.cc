@@ -20,110 +20,123 @@
  * Date: 09 Sept. 2008
  */
 
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+
+#include "common/Console.hh"
 #include "physics/World.hh"
-#include "physics/Common.hh"
+#include "physics/Base.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-unsigned int Common::idCounter = 0;
+unsigned int Base::idCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Common::Common(Common *parent)
+Base::Base(BasePtr parent)
  : parent(parent)
 {
-  this->world = NULL;
-  if (this->parent)
-    this->world = this->parent->GetWorld();
-
-  this->AddType(COMMON);
-
+  this->AddType(BASE);
   this->id = ++idCounter;
+  this->saveable = true;
+  this->selected = false;
 
   common::Param::Begin(&this->parameters);
   this->nameP = new common::ParamT<std::string>("name","noname",1);
   common::Param::End();
 
-  this->saveable = true;
-
-  if (this->parent)
-    this->parent->AddChild(this);
-
-  this->showInGui = true;
-  this->selected = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-Common::~Common()
+Base::~Base()
 {
+  gzmsg << "DELETEING BASE[" << this->GetName() << "]\n";
+
   // remove self as a child of the parent
   if (this->parent)
-    this->parent->RemoveChild(this);
+    this->parent->RemoveChild(this->id);
 
-  this->SetParent(NULL);
+  this->SetParent(BasePtr());
 
-  std::vector<Common*>::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (Base_V::iterator iter = this->children.begin(); 
+       iter != this->children.end(); iter++)
   {
     if (*iter)
-    {
-      (*iter)->SetParent(NULL);
-      delete *iter;
-    }
+      (*iter)->SetParent(BasePtr());
   }
+  this->children.clear();
 
   delete this->nameP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load 
-void Common::Load(common::XMLConfigNode *node)
+void Base::Load(common::XMLConfigNode *node)
 {
   this->nameP->Load(node);
+
+  gzmsg << "Load Base[" << this->GetName() << "]";
+
+  if (this->parent)
+  {
+    gzmsg << "   Has parent\n";
+    this->world = this->parent->GetWorld();
+    this->parent->AddChild(shared_from_this());
+  }
+  else
+    gzmsg << "   No parent\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Save function
+void Base::Save(const std::string &prefix, std::ostream &stream)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Finialize the object
+void Base::Fini()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of the entity
-void Common::SetName(const std::string &name)
+void Base::SetName(const std::string &name)
 {
+  this->nameP->SetDefaultValue(name);
   this->nameP->SetValue( name );
 }
   
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of the entity
-std::string Common::GetName() const
+std::string Base::GetName() const
 {
-  return this->nameP->GetValue();
+  return **this->nameP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the count of the parameters
-unsigned int Common::GetParamCount() const
+unsigned int Base::GetParamCount() const
 {
   return this->parameters.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a param by index
-common::Param *Common::GetParam(unsigned int index) const
+common::Param *Base::GetParam(unsigned int index) const
 {
   if (index < this->parameters.size())
     return this->parameters[index];
   else
-    gzerr(0) << "Invalid index[" << index << "]\n";
+    gzerr << "Invalid index[" << index << "]\n";
   return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a parameter by name
-common::Param *Common::GetParam(const std::string &key) const
+common::Param *Base::GetParam(const std::string &key) const
 {
-  std::vector<common::Param*>::const_iterator iter;
+  common::Param_V::const_iterator iter;
   common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
@@ -136,36 +149,14 @@ common::Param *Common::GetParam(const std::string &key) const
   }
 
   if (result == NULL)
-    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+    gzerr << "Unable to find Param using key[" << key << "]\n";
 
   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set a parameter by name
-void Common::SetParam(const std::string &key, const std::string &value)
-{
-  std::vector<common::Param*>::const_iterator iter;
-  common::Param *result = NULL;
-
-  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
-  {
-    if ((*iter)->GetKey() == key)
-    {
-      result = *iter;
-      break;
-    }
-  }
-
-  if (result == NULL)
-    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
-  else
-    result->SetFromString( value, true );
-}
- 
-////////////////////////////////////////////////////////////////////////////////
 /// Return the ID of this entity. This id is unique
-int Common::GetId() const
+int Base::GetId() const
 {
   return this->id;
 }
@@ -173,7 +164,7 @@ int Common::GetId() const
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the object should be "saved", when the user
 ///        selects to save the world to xml
-void Common::SetSaveable(bool v)
+void Base::SetSaveable(bool v)
 {
   this->saveable = v;
 }
@@ -181,35 +172,35 @@ void Common::SetSaveable(bool v)
 ////////////////////////////////////////////////////////////////////////////////
 /// Get whether the object should be "saved", when the user
 /// selects to save the world to xml
-bool Common::GetSaveable() const
+bool Base::GetSaveable() const
 {
   return this->saveable;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the ID of the parent
-int Common::GetParentId() const
+int Base::GetParentId() const
 {
   return this->parent == NULL ? 0 : this->parent->GetId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the parent
-void Common::SetParent(Common *parent)
+void Base::SetParent(BasePtr parent)
 {
   this->parent = parent;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the parent
-Common *Common::GetParent() const
+BasePtr Base::GetParent() const
 {
   return this->parent;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a child to this entity
-void Common::AddChild(Common *child)
+void Base::AddChild(BasePtr child)
 {
   if (child == NULL)
     gzthrow("Cannot add a null child to an entity");
@@ -220,12 +211,12 @@ void Common::AddChild(Common *child)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Remove a child from this entity
-void Common::RemoveChild(Common *child)
+void Base::RemoveChild(unsigned int _id)
 {
-  std::vector<Common*>::iterator iter;
+  Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if ((*iter)->GetName() == child->GetName())
+    if ((*iter)->GetId() == _id)
     {
       this->children.erase(iter);
       break;
@@ -235,31 +226,31 @@ void Common::RemoveChild(Common *child)
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Get the number of children
-unsigned int Common::GetChildCount() const
+unsigned int Base::GetChildCount() const
 {
   return this->children.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a type specifier
-void Common::AddType( Common::EntityType t )
+void Base::AddType( Base::EntityType t )
 {
   this->type.push_back(t);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a child by index
-Common *Common::GetChild(unsigned int i) const
+BasePtr Base::GetChild(unsigned int i) const
 {
   if (i < this->children.size())
     return this->children[i];
   
-  return NULL;
+  return BasePtr();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a child by name
-Common *Common::GetChild(const std::string &name )
+BasePtr Base::GetChild(const std::string &name )
 {
   std::string fullName = this->GetCompleteScopedName() + "::" + name;
   return this->GetByName(fullName);
@@ -267,13 +258,13 @@ Common *Common::GetChild(const std::string &name )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get by name helper
-Common *Common::GetByName(const std::string &name)
+BasePtr Base::GetByName(const std::string &name)
 {
   if (this->GetCompleteScopedName() == name)
-    return this;
+    return shared_from_this();
 
-  Common *result = NULL;
-  std::vector<Common*>::const_iterator iter;
+  BasePtr result;
+  Base_V::const_iterator iter;
 
   for (iter =  this->children.begin(); 
        iter != this->children.end() && result ==NULL; iter++)
@@ -285,9 +276,9 @@ Common *Common::GetByName(const std::string &name)
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of this entity with the model scope
 /// model1::...::modelN::entityName
-std::string Common::GetScopedName() const
+std::string Base::GetScopedName() const
 {
-  Common *p = this->parent;
+  BasePtr p = this->parent;
   std::string scopedName = this->GetName();
 
   while (p)
@@ -302,9 +293,9 @@ std::string Common::GetScopedName() const
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of this entity with the model scope
 /// model1::...::modelN::entityName
-std::string Common::GetCompleteScopedName() const
+std::string Base::GetCompleteScopedName() const
 {
-  Common *p = this->parent;
+  BasePtr p = this->parent;
   std::string scopedName = this->GetName();
 
   while (p)
@@ -318,48 +309,41 @@ std::string Common::GetCompleteScopedName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the type
-bool Common::HasType(const Common::EntityType &t) const
+bool Base::HasType(const Base::EntityType &t) const
 {
   return std::binary_search(this->type.begin(), this->type.end(), t);
-
-  /*for (unsigned int i=0; i < this->type.size(); i++)
-    if (this->type[i] == t)
-      return true;
-
-  return false;
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of types
-unsigned int Common::GetTypeCount() const
+unsigned int Base::GetTypeCount() const
 {
   return this->type.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a type by index
-Common::EntityType Common::GetType(unsigned int index) const
+Base::EntityType Base::GetType(unsigned int index) const
 {
   if (index < this->type.size())
     return this->type[index];
 
   gzthrow("Invalid type index");
-  return COMMON;
+  return BASE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the leaf type (last type set)
-Common::EntityType Common::GetLeafType() const
+Base::EntityType Base::GetLeafType() const
 {
   return this->type.back();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Common::Print(std::string prefix)
+void Base::Print(std::string prefix)
 {
-  std::vector<Common*>::iterator iter;
-  std::cout << prefix << this->GetName() << "\n";
+  Base_V::iterator iter;
+  gzmsg << prefix << this->GetName() << "\n";
 
   prefix += "  ";
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
@@ -367,27 +351,12 @@ void Common::Print(std::string prefix)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// True == show parameters in the gui
-bool Common::GetShowInGui() const
-{
-  return this->showInGui;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// True == show parameters in the gui
-void Common::SetShowInGui(bool v)
-{
-  this->showInGui = v;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set whether this entity has been selected by the user through the gui
-bool Common::SetSelected( bool s )
+bool Base::SetSelected( bool s )
 {
-  std::vector< Common *>::iterator iter;
-
   this->selected = s;
 
+  Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
     (*iter)->SetSelected(s);
 
@@ -396,14 +365,14 @@ bool Common::SetSelected( bool s )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// True if the entity is selected by the user
-bool Common::IsSelected() const
+bool Base::IsSelected() const
 {
   return this->selected;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Returns true if the entities are the same. Checks only the name
-bool Common::operator==(const Common &ent) const 
+bool Base::operator==(const Base &ent) const 
 {
   return ent.GetName() == this->GetName();
 }
@@ -411,21 +380,20 @@ bool Common::operator==(const Common &ent) const
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world this object belongs to. This will also set the world for all 
 /// children
-void Common::SetWorld(World *newWorld)
+void Base::SetWorld(WorldPtr newWorld)
 {
   this->world = newWorld;
 
-  for (unsigned int i=0; i < this->children.size(); i++)
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    Entity *child = dynamic_cast<Entity*>(this->children[i]);
-    if (child)
-      child->SetWorld(this->world);
+    (*iter)->SetWorld(this->world);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world this object is in
-World *Common::GetWorld() const
+WorldPtr Base::GetWorld() const
 {
   return this->world;
 }

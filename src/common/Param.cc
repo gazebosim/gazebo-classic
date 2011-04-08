@@ -17,11 +17,10 @@
 /* Desc: Parameter class
  * Author: Nate Koenig
  * Date: 14 Aug 2008
- * SVN: $Id$
  */
 
 #include "common/XMLConfig.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Param.hh"
 #include "common/Quatern.hh"
 #include "common/Pose3d.hh"

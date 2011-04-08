@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/GazeboConfig.hh"
 
 #include "gui/SimulationApp.hh"
@@ -36,7 +36,7 @@ GuiClient::GuiClient()
   {
     common::GazeboConfig::Instance()->Load();
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
@@ -57,7 +57,7 @@ void GuiClient::Load(const std::string &filename)
   {
     this->gui->Load(filename);
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow( "Error loading the GUI\n" << e);
   }
@@ -69,7 +69,7 @@ void GuiClient::Init()
   {
     this->gui->Init();
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow( "Error initializing the GUI\n" << e);
   }
@@ -81,7 +81,7 @@ void GuiClient::Run()
   {
     this->gui->Run();
   }
-  catch (common::GazeboError e)
+  catch (common::Exception e)
   {
     gzthrow( "Error running the GUI\n" << e);
   }

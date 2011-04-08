@@ -32,72 +32,27 @@
 
 #include "common/Param.hh"
 
+#include "physics/ode/ODETypes.hh"
+
 #include "physics/PhysicsEngine.hh"
+#include "physics/Contact.hh"
 #include "physics/Shape.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace physics
   {
-    class Entity;
-    class ODEGeom;
-  
     class ContactFeedback
     {
       public: Contact contact;
       public: std::vector<dJointFeedback> feedbacks;
     };
-  
-  
-  /// \addtogroup gazebo_physics_engine
-  /// \{
-  
-  /** \defgroup odephysicsengine ODE Physics Engine
-  
-  The \c param:physics tag is used to specify certain parameters for the ODE phyics engine. The following parameters are in addition to those provided by the PhysicsEngine base class.
-  
-  \par Attributes
-  
-  - cfm (float)
-    - Global constraint force mixing
-    - Default: 10e-5
-    - Range:  10e-10 to 1.0
-    - Recommended value: 10e-5
-  - erp (float)
-    - Global error reduction parameter
-    - Default: 0.2
-    - Range: 0 to 1.0
-    - Recommended Range: 0.1 to 0.8
-  - stepcommon::Time (float)
-    - Time, in seconds, that elapse for each iteration of the physics engine
-    - Default: 0.025
-  -gravity (float float float)
-    - Gravity vector.
-    - Default: 0 0 -9.8
-  
-  \verbatim
-  <physics:ode>
-    <stepTime>0.03</stepTime>
-    <gravity>0 0 -9.8</gravity>
-    <cfm>10e-5</cfm>
-    <erp>0.2</erp>
-  </physcis:ode>
-  \endverbatim
-  
-  
-  \{
-  */
-  
+
   /// \brief ODE physics engine
   class ODEPhysics : public PhysicsEngine
   {
     /// \brief Constructor
-    public: ODEPhysics(World *world);
+    public: ODEPhysics(WorldPtr world);
   
     /// \brief Destructor
     public: virtual ~ODEPhysics();
@@ -123,20 +78,15 @@ namespace gazebo
     /// \brief Finilize the ODE engine
     public: virtual void Fini();
   
-    /// \brief Add an entity to the world
-    public: virtual void AddEntity(Entity *entity);
-  
-    /// \brief Remove an entity from the physics engine
-    public: virtual void RemoveEntity(Entity *entity);
-  
     /// \brief Create a new body
-    public: virtual Body *CreateBody(Entity *parent);
+    public: virtual BodyPtr CreateBody(EntityPtr parent);
   
     /// \brief Create a geom
-    public: virtual Geom *CreateGeom(std::string shapeTypename, Body *parent);
+    public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
+                                       BodyPtr parent);
    
     /// \brief Create a new joint
-    public: virtual Joint *CreateJoint(std::string jointTypename);
+    public: virtual JointPtr CreateJoint(const std::string &type);
   
     /// \brief Return the space id 
     public: dSpaceID GetSpaceId() const;

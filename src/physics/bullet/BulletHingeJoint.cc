@@ -21,8 +21,8 @@
  */
 
 #include "Model.hh"
-#include "common/GazeboMessage.hh"
-#include "common/GazeboError.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
 #include "World.hh"
 #include "BulletBody.hh"
 #include "BulletPhysics.hh"
@@ -110,7 +110,7 @@ common::Vector3 BulletHingeJoint::GetAnchor(int index ) const
 // Set the anchor point
 void BulletHingeJoint::SetAnchor( int index, const common::Vector3 &anchor )
 {
-  gzerr(0) << "Not implemented...\n";
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ common::Vector3 BulletHingeJoint::GetAxis(int index) const
 // Set the axis of rotation
 void BulletHingeJoint::SetAxis( int index, const common::Vector3 &axis )
 {
-  gzerr(0) << "Bullet handles setAxis improperly\n";
+  gzerr << "Bullet handles setAxis improperly\n";
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
   /*btcommon::Vector3 vec(axis.x, axis.y, axis.z);
@@ -136,7 +136,7 @@ void BulletHingeJoint::SetAxis( int index, const common::Vector3 &axis )
 // Set the joint damping
 void BulletHingeJoint::SetDamping( int /*index*/, const double damping )
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -153,14 +153,14 @@ common::Angle BulletHingeJoint::GetAngle(int index ) const
 /// Set the velocity of an axis(index).
 void BulletHingeJoint::SetVelocity(int index, double angle)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the rotation rate
 double BulletHingeJoint::GetVelocity(int index) const
 {
-  gzerr(0) << "Not implemented...\n";
+  gzerr << "Not implemented...\n";
   return 0;
 }
 
@@ -168,14 +168,14 @@ double BulletHingeJoint::GetVelocity(int index) const
 /// Set the max allowed force of an axis(index).
 void BulletHingeJoint::SetMaxForce(int index, double t)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
 double BulletHingeJoint::GetMaxForce(int index)
 {
-  gzerr(0) << "Not implemented\n";
+  gzerr << "Not implemented\n";
   return 0;
 }
 
@@ -184,14 +184,14 @@ double BulletHingeJoint::GetMaxForce(int index)
 // Set the torque of this joint
 void BulletHingeJoint::SetForce(int index, double torque)
 {
-  gzerr(0) << "Not implemented...\n";
+  gzerr << "Not implemented...\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the torque of a joint.
 double BulletHingeJoint::GetForce(int index)
 {
-  gzerr(0) << "Not implemented...\n";
+  gzerr << "Not implemented...\n";
   return 0;
 }
 

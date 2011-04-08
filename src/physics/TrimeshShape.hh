@@ -22,7 +22,10 @@
 #ifndef TRIMESHSHAPE_HH
 #define TRIMESHSHAPE_HH
 
-#include "Shape.hh"
+#include "common/CommonTypes.hh"
+#include "physics/PhysicsTypes.hh"
+
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
@@ -33,54 +36,11 @@ namespace gazebo
 
 	namespace physics
   {
-    /// \addtogroup gazebo_physics_geom
-    /// \{
-    /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
-        \brief Trimesh geom
-  
-      \par Attributes
-      The following attributes are supported.
-  
-      \htmlinclude default_geom_attr_include.html
-  
-      - scale (float tuple, meters)
-        - Scale of the trimesh
-        - Default: 1 1 1
-      - centerMesh (re-center trimesh about AABB center or bottom most point)
-        - aabb_center
-        - aabb_bottom
-        - none (default)
-  
-      - genTexCoord (generate spherical projected texture coordinates)
-        - true or false, default to false
-  
-      \par Example
-      \verbatim
-        <geom:trimesh name="pallet_geom">
-          <mesh>WoodPallet.mesh</mesh>
-          <scale>.2 .2 .2</scale>
-          <centerMesh>AABBCenter</centerMesh>
-          <genTexCoord>True</genTexCoord>
-          <mass>0.1</mass>
-  
-          <visual>
-            <scale>.2 .2 .2</scale>
-            <material>Gazebo/WoodPallet</material>
-            <mesh>WoodPallet.mesh</mesh>
-          </visual>
-        </geom:trimesh>
-      \endverbatim
-    */
-    /// \}
-    /// \addtogroup gazebo_trimesh_geom 
-    /// \{
-  
-  
     /// \brief Triangle mesh geom
     class TrimeshShape : public Shape
     {
       /// \brief Constructor
-      public: TrimeshShape(Geom *parent);
+      public: TrimeshShape(GeomPtr parent);
   
       /// \brief Destructor
       public: virtual ~TrimeshShape();
@@ -89,7 +49,10 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the trimesh
-      protected: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load(common::XMLConfigNode *node);
+
+      /// \brief Init the trimesh shape
+      public: virtual void Init();
   
       /// \brief Save child parameters
       protected: virtual void Save(std::string &prefix, std::ostream &stream);
@@ -100,19 +63,9 @@ namespace gazebo
       protected: common::ParamT<common::Vector3> *scaleP;
       protected: common::ParamT<std::string> *centerMeshP;
       protected: common::ParamT<bool> *genTexCoordP;
-  
-  /*
-      protected: unsigned int numVertices;
-      protected: unsigned int numIndices;
-      protected: float *vertices;
-      protected: unsigned int *indices;
-      */
-  
+ 
       protected: const common::Mesh *mesh;
     };
-  
-    /// \}
   }
-
 }
 #endif

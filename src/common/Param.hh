@@ -120,6 +120,9 @@ namespace gazebo
   
       /// \brief Set the value of the parameter
       public: void SetValue(const T &value, bool callback=false);
+
+      /// \brief Set the default value
+      public: void SetDefaultValue(const T &value);
   
       public: inline T operator*() const {return value;}
   
@@ -235,6 +238,14 @@ namespace gazebo
   
       if (callback)
         this->changeSignal(this->value);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// Set the default value of the parameter
+    template<typename T>
+    void ParamT<T>::SetDefaultValue(const T &v)
+    {
+      this->defaultValue = v;
     }
   
   }

@@ -30,7 +30,7 @@
 //#include <GL/gl.h>
 
 #include "common/Vector3.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Image.hh"
 #include "common/GazeboConfig.hh"
 
@@ -118,7 +118,7 @@ int Image::Load(const std::string &filename)
             this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), BMP_DEFAULT);
           else
           {
-            gzerr(5) << "Unknown image format[" << this->fullName << "]\n";
+            gzerr << "Unknown image format[" << this->fullName << "]\n";
             return -1;
           }
 
@@ -129,7 +129,7 @@ int Image::Load(const std::string &filename)
     }
   }
 
-  gzerr(5) << "Unable to open image file[" << filename << "]\n";
+  gzerr << "Unable to open image file[" << filename << "]\n";
   return -1;
 
 }

@@ -17,7 +17,6 @@
 /* Desc: The world; all models are collected here
  * Author: Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
  */
 
 #ifndef VECTOR3_HH

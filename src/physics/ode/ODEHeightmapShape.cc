@@ -21,7 +21,7 @@
  */
 
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "physics/ode/ODEGeom.hh"
 #include "physics/ode/ODEHeightmapShape.hh"
 
@@ -31,7 +31,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEHeightmapShape::ODEHeightmapShape(Geom *parent)
+ODEHeightmapShape::ODEHeightmapShape(GeomPtr parent)
     : HeightmapShape(parent)
 {
 }
@@ -78,10 +78,9 @@ dReal ODEHeightmapShape::GetHeightCallback(void *data, int x, int y)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void ODEHeightmapShape::Load(common::XMLConfigNode *node)
+void ODEHeightmapShape::Init()
 {
-  HeightmapShape::Load(node);
-  ODEGeom *oParent = (ODEGeom*)(this->geomParent);
+  ODEGeomPtr oParent = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   // sampling size along image width and height
   this->odeVertSize = this->img.GetWidth() * 4;

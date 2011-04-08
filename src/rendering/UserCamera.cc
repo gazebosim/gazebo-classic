@@ -23,7 +23,7 @@
 #include <sstream>
 
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Events.hh"
 
 

@@ -28,6 +28,7 @@ SET (headers ODEPhysics.hh
              ODERayShape.hh
              ODEMultiRayShape.hh
              ODEHeightmapShape.hh
+             ODETypes.hh
 )
 
 add_library(gazebo_physics_ode SHARED ${sources})

@@ -43,17 +43,17 @@ namespace gazebo
       public: virtual void Load(common::XMLConfigNode *node);
   
       /// \brief Get the body to which the joint is attached according the _index
-      public: virtual Body *GetJointBody( int index ) const;
+      public: virtual BodyPtr GetJointBody( int index ) const;
   
       /// \brief Determines of the two bodies are connected by a joint
-      public: bool virtual AreConnected( Body *one, Body *two ) const;
+      public: bool virtual AreConnected( BodyPtr one, BodyPtr two ) const;
   
       /// \brief The default function does nothing. This should be overriden in 
       ///        the child classes where appropriate
       public: virtual double GetParam( int /*parameter*/ ) const;
   
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach( Body *one, Body *two );
+      public: virtual void Attach( BodyPtr one, BodyPtr two );
   
       /// \brief Detach this joint from all bodies
       public: virtual void Detach();

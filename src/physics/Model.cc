@@ -17,22 +17,21 @@
 /* Desc: Base class for all models.
  * Author: Nathan Koenig and Andrew Howard
  * Date: 8 May 2003
- * SVN: $Id$
  */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
 #include <sstream>
-#include <iostream>
 #include <float.h>
 
 #include "common/Events.hh"
 #include "common/Global.hh"
-#include "common/GazeboError.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/XMLConfig.hh"
 
+#include "physics/Joint.hh"
 #include "physics/Body.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -41,12 +40,9 @@
 using namespace gazebo;
 using namespace physics;
 
-
-uint Model::lightNumber = 0;
-
 class BodyUpdate_TBB
 {
-  public: BodyUpdate_TBB(std::vector<Body*> *bodies) : bodies(bodies) {}
+  public: BodyUpdate_TBB(Body_V *bodies) : bodies(bodies) {}
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
@@ -56,18 +52,16 @@ class BodyUpdate_TBB
     }
   }
 
-  private: std::vector<Body*> *bodies;
+  private: Body_V *bodies;
 };
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Model::Model(Common *parent)
-    : Entity(parent)
+Model::Model(BasePtr parent)
+  : Entity(parent)
 {
   this->AddType(MODEL);
-
-  this->joint = NULL;
 
   common::Param::Begin(&this->parameters);
   this->canonicalBodyNameP = new common::ParamT<std::string>("canonicalBody",
@@ -94,17 +88,13 @@ Model::Model(Common *parent)
   this->laserRetroP = new common::ParamT<float>("laser_retro", -1, 0);
   this->laserRetroP->Callback( &Model::SetLaserRetro, this );
   common::Param::End();
-
-  //this->graphicsHandler = NULL;
-  this->parentBodyNameP = NULL;
-  this->myBodyNameP = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Model::~Model()
 {
-  /*std::vector<Common*>::iterator eiter;
+  /*Base_V::iterator eiter;
   for (eiter =this->children.begin(); eiter != this->children.end();)
     if (*eiter && (*eiter)->HasType(BODY))
     {
@@ -142,12 +132,6 @@ Model::~Model()
   }
   this->controllers.clear();
 
-  if (this->parentBodyNameP)
-  {
-    delete this->parentBodyNameP;
-    this->parentBodyNameP = NULL;
-  }
-
   if (this->myBodyNameP)
   {
     delete this->myBodyNameP;
@@ -158,37 +142,24 @@ Model::~Model()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the model
-void Model::Load(common::XMLConfigNode *node, bool removeDuplicate)
+void Model::Load(common::XMLConfigNode *node)
 {
+  std::cout << "Model Load[" << this->GetName() << "]\n";
   Entity::Load(node);
 
   common::XMLConfigNode *childNode;
-  std::string scopedName;
-  common::Pose3d pose;
-  Common* dup;
 
   this->staticP->Load(node);
-
-  scopedName = this->GetScopedName();
-
-  dup = Common::GetByName(scopedName);
-
-  // Look for existing models by the same name
-  if(dup != NULL && dup != this)
-  {
-    if(!removeDuplicate)
-    {
-      gzthrow("Duplicate model name[" + scopedName + "]\n");
-    }
-    else
-    {
-      // Delete the existing one (this should only be reached when called
-      // via the factory interface).
-      event::Events::deleteEntitySignal(scopedName.c_str());
-    }
-  }
-
   this->canonicalBodyNameP->Load(node);
+  this->enableGravityP->Load(node);
+  this->enableFrictionP->Load(node);
+  this->collideP->Load(node);
+  this->laserFiducialP->Load(node);
+  this->laserRetroP->Load(node);
+
+
+  // TODO: check for duplicate model, and raise an error
+  //BasePtr dup = Base::GetByName(this->GetScopedName());
 
   if ( (childNode = node->GetChild("origin")) != NULL)
   {
@@ -196,50 +167,26 @@ void Model::Load(common::XMLConfigNode *node, bool removeDuplicate)
     this->rpyP->Load(childNode);
   }
 
+  this->LoadChildrenAndJoints(node);
+}
 
-  this->enableGravityP->Load(node);
-  this->enableFrictionP->Load(node);
-  this->collideP->Load(node);
-  this->laserFiducialP->Load(node);
-  this->laserRetroP->Load(node);
+////////////////////////////////////////////////////////////////////////////////
+// Initialize the model
+void Model::Init()
+{
+  Base_V::iterator iter;
+  common::Pose3d pose;
 
   this->SetStatic( **(this->staticP) );
 
   // Get the position and orientation of the model (relative to parent)
-  pose.Reset();
   pose.pos = **this->xyzP;
   pose.rot = **this->rpyP;
 
   this->SetRelativePose( pose );
 
-  this->LoadPhysical(node);
-
   // Record the model's initial pose (for reseting)
-  this->SetInitPose(pose);
-
-  // NATY: Put this back in
-  // Load controllers
-  /*childNode = node->GetChild("controller");
-  while (childNode)
-  {
-    this->LoadController(childNode);
-    childNode = childNode->GetNext("controller");
-  }*/
-
-  // Create a default body if one does not exist in the XML file
-  if (this->children.size() <= 0)
-  {
-    std::ostringstream bodyName;
-
-    bodyName << this->GetName() << "_body";
-
-    // Create an empty body for the model
-    Body *body = this->CreateBody();
-    body->SetName(bodyName.str());
-
-    this->canonicalBodyNameP->SetValue( bodyName.str() );
-  }
-
+  this->SetInitialPose( pose );
 
   if (this->canonicalBodyNameP->GetValue().empty())
   {
@@ -255,7 +202,7 @@ void Model::Load(common::XMLConfigNode *node, bool removeDuplicate)
     }
   }
 
-  this->canonicalBody = (Body*)this->GetChild(**this->canonicalBodyNameP);
+  this->canonicalBody = boost::shared_dynamic_cast<Body>(this->GetChild(**this->canonicalBodyNameP));
 
   // This must be placed after creation of the bodies
   // Static variable overrides the gravity
@@ -269,9 +216,13 @@ void Model::Load(common::XMLConfigNode *node, bool removeDuplicate)
   if (**this->laserRetroP != -1.0)
     this->SetLaserRetro(**this->laserRetroP);
 
-  // Create the graphics iface handler
-  //this->graphicsHandler = new GraphicsIfaceHandler(this->GetWorld());
-  //this->graphicsHandler->Load(this->GetScopedName(), this);
+  for (iter = this->children.begin(); iter!=this->children.end(); iter++)
+  {
+    if ((*iter)->HasType(BODY))
+      boost::shared_static_cast<Body>(*iter)->Init();
+    else if ((*iter)->HasType(MODEL))
+      boost::shared_static_cast<Model>(*iter)->Init();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,17 +231,15 @@ void Model::Save(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
   std::string typeName;
-  //std::map<std::string, Body* >::iterator bodyIter;
-  std::vector<Common* >::iterator bodyIter;
-  //std::map<std::string, Controller* >::iterator contIter;
-  JointContainer::iterator jointIter;
+  Base_V::iterator bodyIter;
+  Joint_V::iterator jointIter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
 
 
   stream << prefix << "<model";
-  stream << " name=\"" << this->nameP->GetValue() << "\">\n"; 
+  stream << " name=\"" << this->GetName() << "\">\n"; 
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
   stream << prefix << "  " << *(this->enableGravityP) << "\n";
@@ -302,19 +251,19 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   for (bodyIter=this->children.begin(); bodyIter!=this->children.end(); bodyIter++)
   {
     stream << "\n";
-    Entity *entity = (Entity*)*bodyIter;
+    EntityPtr entity = boost::shared_dynamic_cast<Entity>(*bodyIter);
     if (entity && entity->HasType(BODY))
     {
-      Body *body = (Body*)(entity);
-      body->Save(p, stream);
+      boost::shared_static_cast<Body>(entity)->Save(p, stream);
     }
   }
 
   // Save all the joints
-  for (jointIter = this->joints.begin(); jointIter != this->joints.end(); 
-      jointIter++)
+  for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
+  {
     if (*jointIter)
       (*jointIter)->Save(p, stream);
+  }
 
   // Save all the controllers
   /*for (contIter=this->controllers.begin();
@@ -325,21 +274,13 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   }
   */
 
-  if (this->parentBodyNameP && this->myBodyNameP)
-  {
-    stream << prefix << "  <attach>\n";
-    stream << prefix << "    " << *(this->parentBodyNameP) << "\n";
-    stream << prefix << "    " << *(this->myBodyNameP) << "\n";
-    stream << prefix << "  </attach>\n";
-  }
-
   // Save all child models
-  std::vector< Common* >::iterator eiter;
+  Base_V::iterator eiter;
   for (eiter = this->children.begin(); eiter != this->children.end(); eiter++)
   {
     if (*eiter && (*eiter)->HasType(MODEL))
     {
-      Model *cmodel = (Model*)*eiter;
+      ModelPtr cmodel = boost::static_pointer_cast<Model>(*eiter);
       cmodel->Save(p, stream);
     }
   }
@@ -347,43 +288,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "</model:" << typeName << ">\n";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the model
-void Model::Init()
-{
-  std::vector<Common* >::iterator biter;
-  //std::map<std::string, Controller* >::iterator contIter;
 
-  //this->graphicsHandler->Init();
-
-  for (biter = this->children.begin(); biter!=this->children.end(); biter++)
-  {
-    if (*biter)
-    {
-      if ((*biter)->HasType(BODY))
-        ((Body*)*biter)->Init();
-      else if ((*biter)->HasType(MODEL))
-        ((Model*)*biter)->Init();
-    }
-  }
-
-  /*
-  for (contIter=this->controllers.begin();
-       contIter!=this->controllers.end(); contIter++)
-  {
-    contIter->second->Init();
-  }
-  */
-
-  this->InitChild();
-
-  // this updates the relativePose of the Model Entity
-  // set model pointer of the canonical body so when body updates,
-  // one can callback to the model
-  //Body* cb = this->GetCanonicalBody();
-  //if (cb != NULL)
-    //cb->SetCanonicalModel(this);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the model
@@ -423,20 +328,11 @@ void Model::Update()
   }*/
 }
 
-void Model::OnPoseChange()
-{
-  /// set the pose of the model, which is the pose of the canonical body
-  /// this updates the relativePose of the Model Entity
-  //Body* cb = this->GetCanonicalBody();
-  //if (cb != NULL)
-    //this->SetWorldPose(cb->GetWorldPose(),false);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Remove a child
-void Model::RemoveChild(Entity *child)
+void Model::RemoveChild(EntityPtr child)
 {
-  JointContainer::iterator jiter;
+  Joint_V::iterator jiter;
 
   if (child->HasType(BODY))
   {
@@ -451,50 +347,36 @@ void Model::RemoveChild(Entity *child)
         if (!(*jiter))
           continue;
 
-        Body *jbody0 = (*jiter)->GetJointBody(0);
-        Body *jbody1 = (*jiter)->GetJointBody(1);
+        BodyPtr jbody0 = (*jiter)->GetJointBody(0);
+        BodyPtr jbody1 = (*jiter)->GetJointBody(1);
 
         if (!jbody0 || !jbody1 || jbody0->GetName() == child->GetName() ||
             jbody1->GetName() == child->GetName() ||
             jbody0->GetName() == jbody1->GetName())
         {
-          Joint *joint = *jiter;
           this->joints.erase( jiter );
           done = false;
-          delete joint;
           break;
         }
       }
     }
   }
 
-  Entity::RemoveChild(child);
+  Entity::RemoveChild(child->GetId());
 
-  std::vector<Common*>::iterator iter;
+  Base_V::iterator iter;
   for (iter =this->children.begin(); iter != this->children.end(); iter++)
     if (*iter && (*iter)->HasType(BODY))
-      ((Body*)*iter)->SetEnabled(true);
+      boost::static_pointer_cast<Body>(*iter)->SetEnabled(true);
 
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Primarily used to update the graphics interfaces
-void Model::GraphicsUpdate()
-{
-  /*if (this->graphicsHandler)
-  {
-    this->graphicsHandler->Update();
-  }
-  */
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the model
 void Model::Fini()
 {
-  /* NATY: Put back in
-  std::vector<Common* >::iterator biter;
+  /* TODO: Put back in
+  Base_V::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
   for (contIter = this->controllers.begin();
@@ -518,7 +400,7 @@ void Model::Fini()
     this->graphicsHandler = NULL;
   }
 
-  std::vector< Common* >::iterator iter;
+  Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(MODEL))
@@ -529,16 +411,15 @@ void Model::Fini()
   }
 
   */
-  this->FiniChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Reset the model
 void Model::Reset()
 {
-  /* NATY: Put back in
+  /* TODO: Put back in
   JointContainer::iterator jiter;
-  std::vector< Common* >::iterator biter;
+  Base_V::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
   common::Vector3 v(0,0,0);
 
@@ -569,31 +450,16 @@ void Model::Reset()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the initial pose
-void Model::SetInitPose(const common::Pose3d &pose)
-{
-  this->initPose = pose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the initial pose
-const common::Pose3d &Model::GetInitPose() const
-{
-  return this->initPose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the linear velocity of the model
 void Model::SetLinearVel( const common::Vector3 &vel )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
       body->SetEnabled(true);
       body->SetLinearVel( vel );
     }
@@ -604,14 +470,13 @@ void Model::SetLinearVel( const common::Vector3 &vel )
 /// Set the angular velocity of the model
 void Model::SetAngularVel( const common::Vector3 &vel )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
       body->SetEnabled(true);
       body->SetAngularVel( vel );
     }
@@ -622,14 +487,13 @@ void Model::SetAngularVel( const common::Vector3 &vel )
 /// Set the linear acceleration of the model
 void Model::SetLinearAccel( const common::Vector3 &accel )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
       body->SetEnabled(true);
       body->SetLinearAccel( accel );
     }
@@ -640,14 +504,13 @@ void Model::SetLinearAccel( const common::Vector3 &accel )
 /// Set the angular acceleration of the model
 void Model::SetAngularAccel( const common::Vector3 &accel )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
       body->SetEnabled(true);
       body->SetAngularAccel( accel );
     }
@@ -658,10 +521,9 @@ void Model::SetAngularAccel( const common::Vector3 &accel )
 /// Get the linear velocity of the model
 common::Vector3 Model::GetRelativeLinearVel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetRelativeLinearVel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeLinearVel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -669,10 +531,9 @@ common::Vector3 Model::GetRelativeLinearVel() const
 /// Get the linear velocity of the entity in the world frame
 common::Vector3 Model::GetWorldLinearVel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetWorldLinearVel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldLinearVel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -680,10 +541,9 @@ common::Vector3 Model::GetWorldLinearVel() const
 /// Get the angular velocity of the model
 common::Vector3 Model::GetRelativeAngularVel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetRelativeAngularVel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeAngularVel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -691,10 +551,9 @@ common::Vector3 Model::GetRelativeAngularVel() const
 /// Get the angular velocity of the model in the world frame
 common::Vector3 Model::GetWorldAngularVel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetWorldAngularVel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldAngularVel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -703,10 +562,9 @@ common::Vector3 Model::GetWorldAngularVel() const
 /// Get the linear acceleration of the model
 common::Vector3 Model::GetRelativeLinearAccel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetRelativeLinearAccel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeLinearAccel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -714,10 +572,9 @@ common::Vector3 Model::GetRelativeLinearAccel() const
 /// Get the linear acceleration of the model in the world frame
 common::Vector3 Model::GetWorldLinearAccel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetWorldLinearAccel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldLinearAccel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -725,10 +582,9 @@ common::Vector3 Model::GetWorldLinearAccel() const
 /// Get the angular acceleration of the model
 common::Vector3 Model::GetRelativeAngularAccel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetRelativeAngularAccel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetRelativeAngularAccel();
+  else
     return common::Vector3(0,0,0);
 }
 
@@ -736,51 +592,36 @@ common::Vector3 Model::GetRelativeAngularAccel() const
 /// Get the angular acceleration of the model in the world frame
 common::Vector3 Model::GetWorldAngularAccel() const
 {
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetWorldAngularAccel();
-  else // return 0 vector if model has no body
+  if (!this->GetBody("canonical"))
+    return this->GetBody("canonical")->GetWorldAngularAccel();
+  else
     return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
-void Model::GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const
+common::Box Model::GetBoundingBox() const
 {
-  common::Vector3 bbmin, bbmax;
-  std::vector<Common* >::const_iterator iter;
+  common::Box box;
+  Base_V::const_iterator iter;
 
-  min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      Body *body = (Body*)*iter;
-      body->GetBoundingBox(bbmin, bbmax);
-      min.x = std::min(bbmin.x, min.x);
-      min.y = std::min(bbmin.y, min.y);
-      min.z = std::min(bbmin.z, min.z);
-
-      max.x = std::max(bbmax.x, max.x);
-      max.y = std::max(bbmax.y, max.y);
-      max.z = std::max(bbmax.z, max.z);
+      common::Box bodyBox;
+      BodyPtr body = boost::shared_static_cast<Body>(*iter);
+      bodyBox = body->GetBoundingBox();
+      box += bodyBox;
     }
   }
+
+  return box;
 }
  
-////////////////////////////////////////////////////////////////////////////////
-// Create and return a new body
-Body *Model::CreateBody()
-{
-  Body *body = this->GetWorld()->GetPhysicsEngine()->CreateBody(this);
-  this->bodies.push_back(body);
-
-  // Create a new body
-  return body;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of joints
 unsigned int Model::GetJointCount() const
@@ -790,7 +631,7 @@ unsigned int Model::GetJointCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a joing by index
-Joint *Model::GetJoint( unsigned int index ) const
+JointPtr Model::GetJoint( unsigned int index ) const
 {
   if (index >= this->joints.size())
     gzthrow("Invalid joint index[" << index << "]\n");
@@ -800,30 +641,47 @@ Joint *Model::GetJoint( unsigned int index ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get a joint by name
-Joint *Model::GetJoint(std::string name)
+JointPtr Model::GetJoint(const std::string &name)
 {
-  JointContainer::iterator iter;
+  JointPtr result;
+  Joint_V::iterator iter;
 
   for (iter = this->joints.begin(); iter != this->joints.end(); iter++)
+  {
     if ( (*iter)->GetName() == name)
-      return (*iter);
+    {
+      result = (*iter);
+      break;
+    }
+  }
 
-  return NULL;
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load a new body helper function
-void Model::LoadBody(common::XMLConfigNode *node)
+/// Get a body by name
+BodyPtr Model::GetBody(const std::string &name) const
 {
-  if (!node)
-    gzthrow("Trying to load a body with NULL XML information");
+  Base_V::const_iterator biter;
+  BodyPtr result;
 
-  // Create a new body
-  Body *body = this->CreateBody();
-
-  // Load the body using the config node. This also loads all of the
-  // bodies geometries
-  body->Load(node);
+  if (name == "canonical")
+  {
+    result = this->canonicalBody;
+  }
+  else
+  {
+    for (biter=this->children.begin(); biter != this->children.end(); biter++)
+    {
+      if ((*biter)->GetName() == name)
+      {
+        result = boost::shared_dynamic_cast<Body>(*biter);
+        break;
+      }
+    }
+  }
+ 
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -833,16 +691,15 @@ void Model::LoadJoint(common::XMLConfigNode *node)
   if (!node)
     gzthrow("Trying to load a joint with NULL XML information");
 
-  Joint *joint;
+  JointPtr joint;
 
   std::string type = node->GetString("type","hinge",1);
-  std::cout << "Load Joint[" << type << "]\n";
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint( type );
 
-  joint->SetModel(this);
+  joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
 
-  // Load each joint
+  // Load the joint
   joint->Load(node);
 
   if (this->GetJoint( joint->GetName() ) != NULL)
@@ -852,173 +709,16 @@ void Model::LoadJoint(common::XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load a controller helper function
-void Model::LoadController(common::XMLConfigNode *node)
-{
-  /* NATY: PUt back in
-  if (!node)
-    gzthrow( "node parameter is NULL" );
-
-  Controller *controller=0;
-  std::ostringstream stream;
-
-  // Get the controller's type
-  std::string controllerType = node->GetName();
-
-  // Get the unique name of the controller
-  std::string controllerName = node->GetString("name",std::string(),1);
-  
-  // See if the controller is in a plugin
-  std::string pluginName = node->GetString("plugin","",0);
-  if (pluginName != "")
-	  ControllerFactory::LoadPlugin(pluginName, controllerType);
-
-  // Create the controller based on it's type
-  controller = ControllerFactory::NewController(controllerType, this);
-
-  if (controller)
-  {
-    // Load the controller
-    try
-    {
-      controller->Load(node);
-    }
-    catch (GazeboError e)
-    {
-      gzerr(0) << "Error Loading Controller[" <<  controllerName
-      << "]\n" << e << std::endl;
-      delete controller;
-      controller = NULL;
-      return;
-    }
-
-    // Store the controller
-    this->controllers[controllerName] = controller;
-  }
-  else
-  {
-    gzmsg(0) << "Unknown controller[" << controllerType << "]\n";
-  }
-  */
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the default body
-Body *Model::GetBody()
-{
-  return dynamic_cast<Body*>(this->children.front());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a geom by name
-Geom *Model::GetGeom(const std::string &name) const
-{
-  Geom *geom = NULL;
-  std::vector< Common* >::const_iterator biter;
-
-  for (biter=this->children.begin(); biter != this->children.end(); biter++)
-  {
-    if (*biter && (*biter)->HasType(BODY))
-    {
-      Body *body = (Body*)*biter;
-      if ((geom = body->GetGeom(name)) != NULL)
-        break;
-    }
-  }
-
-  return geom;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a body by name
-Body *Model::GetBody(const std::string &name)
-{
-  std::vector< Common* >::const_iterator biter;
-
-  if (name == "canonical")
-    return this->GetCanonicalBody();
-
-  for (biter=this->children.begin(); biter != this->children.end(); biter++)
-  {
-    if ((*biter)->GetName() == name)
-      return (Body*)*biter;
-  }
- 
-  return NULL;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Detach from parent model
-void Model::Detach()
-{
-  if (this->joint)
-    delete this->joint;
-  this->joint = NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Attach this model to its parent
-void Model::Attach(common::XMLConfigNode *node)
-{
-  Model *parentModel = NULL;
-
-  common::Param::Begin(&this->parameters);
-  this->parentBodyNameP = new common::ParamT<std::string>("parentBody","canonical",1);
-  this->myBodyNameP = new common::ParamT<std::string>("myBody",this->canonicalBodyNameP->GetValue(),1);
-  common::Param::End();
-
-  if (node)
-  {
-    this->parentBodyNameP->Load(node);
-    this->myBodyNameP->Load(node);
-  }
-
-  if (this->parent->HasType(MODEL))
-    parentModel = (Model*)this->parent;
-
-  if (parentModel == NULL)
-    gzthrow("Parent cannot be NULL when attaching two models");
-
-  this->joint =this->GetWorld()->GetPhysicsEngine()->CreateJoint("hinge");
-
-  Body *myBody = this->GetBody(**(this->myBodyNameP));
-  Body *pBody = parentModel->GetBody(**(this->parentBodyNameP));
-
-  if (myBody == NULL)
-    gzthrow("No canonical body set.");
-
-  if (pBody == NULL)
-    gzthrow("Parent has no canonical body");
-
-  this->joint->Attach(myBody, pBody);
-  this->joint->SetAnchor(0, myBody->GetWorldPose().pos );
-  this->joint->SetAxis(0, common::Vector3(0,1,0) );
-  this->joint->SetHighStop(0,common::Angle(0));
-  this->joint->SetLowStop(0,common::Angle(0));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the canonical body. Used for connected Model heirarchies
-Body * Model::GetCanonicalBody() const
-{
-  return this->canonicalBody;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the gravity mode of the model
 void Model::SetGravityMode( const bool &v )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
-      body->SetGravityMode( v );
+      boost::shared_static_cast<Body>(*iter)->SetGravityMode( v );
     }
   }
 }
@@ -1027,15 +727,13 @@ void Model::SetGravityMode( const bool &v )
 /// Set the gravity mode of the model
 void Model::SetFrictionMode( const bool &v )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
     if ((*iter) && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
-      body->SetFrictionMode( v );
+      boost::shared_static_cast<Body>(*iter)->SetFrictionMode( v );
     }
   }
 }
@@ -1044,15 +742,13 @@ void Model::SetFrictionMode( const bool &v )
 /// Set the collide mode of the model
 void Model::SetCollideMode( const std::string &m )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
-      body->SetCollideMode( m );
+      boost::shared_static_cast<Body>(*iter)->SetCollideMode( m );
     }
   }
 }
@@ -1061,163 +757,68 @@ void Model::SetCollideMode( const std::string &m )
 /// Set the Fiducial Id of the model
 void Model::SetLaserFiducialId( const int &id )
 {
-  Body *body;
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)(*iter);
-      body->SetLaserFiducialId( id );
+      boost::shared_static_cast<Body>(*iter)->SetLaserFiducialId( id );
     }
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the Fiducial Id of the Model
-int Model::GetLaserFiducialId( )
-{
- //this is not correct if geoms set their own Fiducial. 
- //you can not expect it to be correct in that case anyway ...
-  return **this->laserFiducialP; 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the Laser retro property of the model
 void Model::SetLaserRetro( const float &retro )
 {
-  Body *body;
-
-  std::vector<Common* >::iterator iter;
+  Base_V::iterator iter;
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      body = (Body*)*iter;
-      body->SetLaserRetro( retro );
+       boost::shared_static_cast<Body>(*iter)->SetLaserRetro(retro);
     }
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a physical model
-void Model::LoadPhysical(common::XMLConfigNode *node)
+void Model::LoadChildrenAndJoints(common::XMLConfigNode *node)
 {
   common::XMLConfigNode *childNode = NULL;
 
   // Load the bodies
-  if (node->GetChild("link"))
-    childNode = node->GetChild("link");
-  else
-    childNode = node->GetChild("link");
-
+  childNode = node->GetChild("link");
   while (childNode)
   {
-    this->LoadBody(childNode);
+    // Create a new body
+    BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
+        boost::shared_static_cast<Model>(shared_from_this()));
 
-    if (childNode->GetNext("link"))
-      childNode = childNode->GetNext("link");
-    else
-      childNode = childNode->GetNext("link");
+    // Load the body using the config node. This also loads all of the
+    // bodies geometries
+    body->Load(childNode);
+
+    childNode = childNode->GetNext("link");
   }
 
   // Load the joints
   childNode = node->GetChild("joint");
-
   while (childNode)
   {
     try
     {
       this->LoadJoint(childNode);
     }
-    catch (common::GazeboError e)
+    catch (common::Exception e)
     {
-      gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
-      gzerr(0) <<  e << std::endl;
+      gzerr << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
+      gzerr <<  e << std::endl;
       childNode = childNode->GetNext("joint");
       continue;
     }
     childNode = childNode->GetNext("joint");
   }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the list of model interfaces 
-/// e.g "pioneer2dx_model1::laser::laser_iface0->laser"
-void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
-{
-  /* NATY: Put back in
-  std::vector< Common* >::const_iterator biter;
-  std::map<std::string, Controller* >::const_iterator contIter;
-
-  for (contIter=this->controllers.begin();
-      contIter!=this->controllers.end(); contIter++)
-  {
-    contIter->second->GetInterfaceNames(list);	
-
-  }
-
-  for (biter=this->children.begin(); biter != this->children.end(); biter++)
-  {
-    if (*biter && (*biter)->HasType(BODY))
-    {
-      const Body *body = (Body*)*biter;
-      body->GetInterfaceNames(list);
-    }
-  }
-  */
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return Model Absolute Pose
-/// this is redundant as long as Model's relativePose is maintained
-/// which is done in Model::OnPoseChange and during Model initialization
-common::Pose3d Model::GetWorldPose()
-{
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    return cb->GetWorldPose();
-  else 
-    return common::Pose3d();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Add an occurance of a contact to this geom
-void Model::StoreContact(const Geom *geom, const Contact &contact)
-{
-  this->contacts[geom->GetName()].push_back( contact.Clone() );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the number of contacts for a geom
-unsigned int Model::GetContactCount(const Geom *geom) const
-{
-  std::map<std::string, std::vector<Contact> >::const_iterator iter;
-  iter = this->contacts.find( geom->GetName() );
-
-  if (iter != this->contacts.end())
-    return iter->second.size();
-  else
-    gzerr(0) << "Invalid contact index\n";
-
-  return 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Retreive a contact
-Contact Model::RetrieveContact(const Geom *geom, unsigned int i) const
-{
-  std::map<std::string, std::vector<Contact> >::const_iterator iter;
-  iter = this->contacts.find( geom->GetName() );
-
-  if (iter != this->contacts.end() && i < iter->second.size())
-    return iter->second[i];
-  else
-    gzerr(0) << "Invalid contact index\n";
-
-  return Contact();
 }

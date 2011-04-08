@@ -29,7 +29,7 @@
 #include "common/Image.hh"
 #include "common/Global.hh"
 #include "rendering/OgreHeightmap.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "Body.hh"
 #include "BulletHeightmapGeom.hh"
 

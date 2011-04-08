@@ -26,7 +26,7 @@
 #include "Model.hh"
 #include "World.hh"
 #include "gazebo.h"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "ControllerFactory.hh"
 #include "ControllerStub.hh"
 

@@ -22,7 +22,7 @@
 #ifndef TIMER_HH
 #define TIMER_HH
 
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 #include "common/Time.hh"
 
 namespace gazebo

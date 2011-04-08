@@ -26,9 +26,9 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/XMLConfig.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Global.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 
 #include "rendering/Scene.hh"
 #include "rendering/DynamicLines.hh"

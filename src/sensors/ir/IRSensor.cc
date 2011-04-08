@@ -32,7 +32,7 @@
 #include "RaySensor.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 
 #include "IRSensor.hh"

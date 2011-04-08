@@ -21,7 +21,7 @@
 #include <list>
 #include <boost/bind.hpp>
 
-#include "common/GazeboError.hh"
+#include "common/Exception.hh"
 #include "common/Messages.hh"
 #include "common/SingletonT.hh"
 

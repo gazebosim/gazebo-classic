@@ -26,7 +26,7 @@
 
 #include "common/XMLConfig.hh"
 #include "common/GazeboConfig.hh"
-#include "common/GazeboMessage.hh"
+#include "common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -81,7 +81,7 @@ void GazeboConfig::Load()
       node = rc.GetRootNode()->GetChild("gazeboPath");
       while (node)
       {
-        gzmsg(5) << "Gazebo Path[" << node->GetValue() << "]\n";
+        gzmsg << "Gazebo Path[" << node->GetValue() << "]\n";
         this->gazeboPaths.push_back(node->GetValue());
         this->AddPluginPaths(node->GetValue()+"/plugins");
         node = node->GetNext("gazeboPath");
@@ -94,7 +94,7 @@ void GazeboConfig::Load()
       node = rc.GetRootNode()->GetChild("ogrePath");
       while (node)
       {
-        gzmsg(5) << "Ogre Path[" << node->GetValue() << "]\n";
+        gzmsg << "Ogre Path[" << node->GetValue() << "]\n";
         this->ogrePaths.push_back( node->GetValue() );
         node = node->GetNext("ogrePath");
       }
@@ -103,7 +103,7 @@ void GazeboConfig::Load()
   }
   else
   {
-    gzmsg(0) << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
+    gzwarn << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
 
     if (!gazebo_resource_path )
     {

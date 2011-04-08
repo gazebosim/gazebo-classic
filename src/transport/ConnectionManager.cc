@@ -59,16 +59,16 @@ void ConnectionManager::Init(const std::string &master_host,
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
-      std::cout << "Connected to gazebo master @ " << this->masterConn->GetRemoteURI() << "\n";
+      gzmsg << "Connected to gazebo master @ " << this->masterConn->GetRemoteURI() << "\n";
     }
     else
     {
       // TODO: MAke this a proper error
-      std::cerr << "Conflicting gazebo versions\n";
+      gzerr << "Conflicting gazebo versions\n";
     }
   }
   else
-    std::cerr << "Didn't receive an init from the master\n";
+    gzerr << "Didn't receive an init from the master\n";
 
   this->masterConn->StartRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 
@@ -110,12 +110,12 @@ void ConnectionManager::OnMasterRead( const std::string &data)
     }
     else
     {
-      std::cerr << "We are the publisher, so bug off\n";
+      gzerr << "We are the publisher, so bug off\n";
     }
 
   }
   else
-    std::cerr << "ConnectionManager::OnMasterRead unknown type[" << packet.type() << "]\n";
+    gzerr << "ConnectionManager::OnMasterRead unknown type[" << packet.type() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ void ConnectionManager::OnRead(const ConnectionPtr &connection,
     TopicManager::Instance()->ConnectPubToSub(sub.topic(), subLink);
   }
   else
-    std::cerr << "Error est here\n";
+    gzerr << "Error est here\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
