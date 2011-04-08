@@ -66,6 +66,15 @@ namespace gazebo
     /// \brief bounce vel
     public: double bounceVel;
   
+    /// \brief friction direction for mu1
+    ///        defined in the coordinate system of the body
+    ///        true fdir1 is taken as a vector perpendicular to contact normal
+    ///        in the plane spanned by contact normal and fdir1 provided here
+    ///        in the event, friciton normal is parallel to fdir1 provided here
+    ///        mu1 is found by uisng body frame axis x, y or z as fdir1 in the
+    ///        order of x, y then z
+    public: Vector3 fdir1;
+
     /// \brief soft constraint force mixing
     public: double softCfm;
 

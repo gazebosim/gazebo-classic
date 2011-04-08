@@ -860,6 +860,49 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         Vector3 contactNorm(contact.geom.normal[0], contact.geom.normal[1], 
                             contact.geom.normal[2]);
 
+        // contact friction direction setting for mu1, align with body frame
+        if (geom1->surface->fdir1 != Vector3(0,0,0))
+        {
+          Pose3d geom1_pose = geom1->GetWorldPose();
+          // get fdir1 in the world frame
+          Vector3 fdir1 = geom1_pose.rot.RotateVector(geom1->surface->fdir1);
+          // get fdir1 perpendicular to contact normal
+          fdir1 = contactNorm.GetCrossProd(fdir1).GetCrossProd(contactNorm);
+          // if fdir1 is parallel to contact normal, try fdir1 axis as x, y, or z axis,
+          //   one of these should work
+          if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(1,0,0)).GetCrossProd(contactNorm);
+          if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,1,0)).GetCrossProd(contactNorm);
+          if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,0,1)).GetCrossProd(contactNorm);
+
+          // set fdir1 for ODE
+          contact.fdir1[0] = fdir1.x;
+          contact.fdir1[0] = fdir1.y;
+          contact.fdir1[0] = fdir1.z;
+        }
+
+        // ************************************************************************
+        // FIXME: WARNING, IF BOTH GEOM HAS FDIR1 SPECIFIED, GEOM2 OVERWRITES GEOM1
+        //        but we might be able to do something smarter here
+        // ************************************************************************
+        if (geom2->surface->fdir1 != Vector3(0,0,0))
+        {
+          Pose3d geom2_pose = geom2->GetWorldPose();
+          // get fdir1 in the world frame
+          Vector3 fdir1 = geom2_pose.rot.RotateVector(geom2->surface->fdir1);
+          // get fdir1 perpendicular to contact normal
+          fdir1 = contactNorm.GetCrossProd(fdir1).GetCrossProd(contactNorm);
+          // if fdir1 is parallel to contact normal, try fdir1 axis as x, y, or z axis,
+          //   one of these should work
+          if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(1,0,0)).GetCrossProd(contactNorm);
+          if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,1,0)).GetCrossProd(contactNorm);
+          if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,0,1)).GetCrossProd(contactNorm);
+
+          // set fdir1 for ODE
+          contact.fdir1[0] = fdir1.x;
+          contact.fdir1[0] = fdir1.y;
+          contact.fdir1[0] = fdir1.z;
+        }
+
         if (World::Instance()->GetShowContacts())
           self->AddContactVisual(contactPos, contactNorm);
 

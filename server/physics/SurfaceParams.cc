@@ -66,6 +66,8 @@ void SurfaceParams::Load(XMLConfigNode *node)
   this->kd = node->GetDouble("kd",this->kd);
   this->bounce = node->GetDouble("bounce",this->bounce);
   this->bounceVel = node->GetDouble("bounceVel",this->bounceVel);
+  // initialize fdir1 as a zero vector
+  this->fdir1 = node->GetVector3("fdir1",Vector3(0,0,0));
 
   this->mu1 = node->GetDouble("mu1",this->mu1);
   this->mu2 = node->GetDouble("mu2",this->mu2);
