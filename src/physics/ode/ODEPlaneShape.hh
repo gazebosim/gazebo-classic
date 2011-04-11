@@ -33,7 +33,6 @@ namespace gazebo
       /// \brief Create the plane
       public: void CreatePlane()
       {
-        gzmsg << "Create a plane!\n";
         PlaneShape::CreatePlane();
         ODEGeomPtr odeParent;
         odeParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);

@@ -70,6 +70,8 @@ namespace gazebo
 
       private: std::list<ConnectionPtr> connections;
 
+      private: bool initialized;
+
       //Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
     };

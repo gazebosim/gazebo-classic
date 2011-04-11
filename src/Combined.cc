@@ -1,10 +1,10 @@
 #include "common/Timer.hh"
+#include "common/Exception.hh"
 #include "common/GazeboConfig.hh"
 #include "common/XMLConfig.hh"
 
-#include "transport/Transport.hh"
-
 #include "sensors/Sensors.hh"
+#include "transport/Transport.hh"
 
 #include "physics/Physics.hh"
 #include "rendering/Rendering.hh"
@@ -31,7 +31,7 @@ const std::string default_config =
       <grid>false</grid>\
     </scene>\
     <physics type='ode'>\
-      <step_time>0.001</step_time>\
+      <step_time>0.0001</step_time>\
       <gravity>0 0 -9.8</gravity>\
       <cfm>0.0000000001</cfm>\
       <erp>0.2</erp>\
@@ -41,24 +41,6 @@ const std::string default_config =
       <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
       <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
-    <model name='box1'>\
-      <static>true</static>\
-      <origin xyz='0 0 1'/>\
-      <link name='body'>\
-        <collision name='geom'>\
-          <geometry>\
-            <box size='1.0 1.0 1.0'/>\
-          </geometry>\
-          <mass>1.0</mass>\
-        </collision>\
-        <visual>\
-          <geometry>\
-            <box size='1.0 1.0 1.0'/>\
-          </geometry>\
-          <mesh filename='unit_box'/>\
-        </visual>\
-      </link>\
-    </model>\
     <model name='plane1_model'>\
       <static>true</static>\
       <link name='body'>\
@@ -74,6 +56,24 @@ const std::string default_config =
           </geometry>\
           <material name='Gazebo/GreyGrid' uv_tile='100 100'/>\
           <cast_shadows>false</cast_shadows>\
+        </visual>\
+      </link>\
+    </model>\
+    <model name='box1'>\
+      <static>false</static>\
+      <origin xyz='0 0 1'/>\
+      <link name='body'>\
+        <collision name='geom'>\
+          <geometry>\
+            <box size='1.0 1.0 1.0'/>\
+          </geometry>\
+          <mass>1.0</mass>\
+        </collision>\
+        <visual>\
+          <geometry>\
+            <box size='1.0 1.0 1.0'/>\
+          </geometry>\
+          <mesh filename='unit_box'/>\
         </visual>\
       </link>\
     </model>\

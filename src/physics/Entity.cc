@@ -163,6 +163,7 @@ common::Pose3d Entity::GetRelativePose() const
 /// Set the pose of the entity relative to its parent
 void Entity::SetRelativePose(const common::Pose3d &pose, bool notify)
 {
+  std::cout << "Set Relative Pose[" << pose.pos.z << "]\n";
   this->relativePose = pose;
   this->relativePose.Correct();
   this->PoseChange(notify);

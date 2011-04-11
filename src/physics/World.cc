@@ -93,7 +93,6 @@ World::~World()
 // Load the world
 void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 {
-  gzmsg << "World::Load\n";
   // DO THIS FIRST
   this->nameP->Load(rootNode);
 
@@ -181,15 +180,12 @@ void World::Save(std::string &prefix, std::ostream &stream)
 // Initialize the world
 void World::Init()
 {
-  gzmsg << "World::Init\n";
-
   Model_V::iterator miter;
 
   // Initialize all the entities
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
-    if (*miter)
-      (*miter)->Init();
+    (*miter)->Init();
   }
 
   // Initialize the physics engine
@@ -388,13 +384,11 @@ BasePtr World::GetByName(const std::string &name)
 // Load a model
 void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
 {
-  std::cout << "Load Entities\n";
   common::XMLConfigNode *cnode;
 
   cnode = node->GetChild("model");
   while (cnode)
   {
-    std::cout << "New Model\n";
     ModelPtr model( new Model(parent) );
     model->SetWorld(shared_from_this());
     model->Load(cnode);
@@ -403,7 +397,6 @@ void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
     // without requiring a joint.
 
     event::Events::addEntitySignal(model->GetCompleteScopedName());
-    parent = model;
     this->models.push_back(model);
 
     cnode = cnode->GetNext("model");

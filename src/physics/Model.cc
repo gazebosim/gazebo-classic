@@ -144,7 +144,6 @@ Model::~Model()
 // Load the model
 void Model::Load(common::XMLConfigNode *node)
 {
-  std::cout << "Model Load[" << this->GetName() << "]\n";
   Entity::Load(node);
 
   common::XMLConfigNode *childNode;
@@ -160,12 +159,9 @@ void Model::Load(common::XMLConfigNode *node)
 
   // TODO: check for duplicate model, and raise an error
   //BasePtr dup = Base::GetByName(this->GetScopedName());
-
-  if ( (childNode = node->GetChild("origin")) != NULL)
-  {
-    this->xyzP->Load(childNode);
-    this->rpyP->Load(childNode);
-  }
+  childNode = node->GetChild("origin");
+  this->xyzP->Load(childNode);
+  this->rpyP->Load(childNode);
 
   this->LoadChildrenAndJoints(node);
 }
@@ -221,7 +217,9 @@ void Model::Init()
     if ((*iter)->HasType(BODY))
       boost::shared_static_cast<Body>(*iter)->Init();
     else if ((*iter)->HasType(MODEL))
+    {
       boost::shared_static_cast<Model>(*iter)->Init();
+    }
   }
 }
 

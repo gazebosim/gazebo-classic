@@ -305,6 +305,8 @@ void Body::Init()
 
   this->enabled = true;
 
+
+  std::cout << "Body[" << this->GetName() << "] Set Relative Pose\n";
   // DO THIS LAST!
   this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
 }

@@ -29,6 +29,7 @@ ConnectionManager::ConnectionManager()
   : masterConn( new Connection() ),
     serverConn( new Connection() )
 {
+  this->initialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,7 @@ void ConnectionManager::Init(const std::string &master_host,
 
   this->masterConn->StartRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 
+  this->initialized = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,8 +133,7 @@ void ConnectionManager::OnAccept(const ConnectionPtr &new_connection)
 
 ////////////////////////////////////////////////////////////////////////////////
 // On read header
-void ConnectionManager::OnRead(const ConnectionPtr &connection,
-                                     const std::string &data )
+void ConnectionManager::OnRead(const ConnectionPtr &connection, const std::string &data )
 {
   msgs::Packet packet;
   packet.ParseFromString(data);
@@ -161,6 +162,9 @@ void ConnectionManager::OnRead(const ConnectionPtr &connection,
 void ConnectionManager::Advertise(const std::string &topic, 
                                   const std::string &msgType)
 {
+  if (!this->initialized)
+    return;
+
   msgs::Publish msg;
   msg.set_topic( topic );
   msg.set_msg_type( msgType );
@@ -204,6 +208,9 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 void ConnectionManager::Subscribe(const std::string &topic, 
                                   const std::string &msgType)
 {
+  if (!this->initialized)
+    return;
+
   // TODO:
   // Find a current connection on the topic
   //ConnectionPtr conn = this->FindConnection( topic );
@@ -230,8 +237,13 @@ void ConnectionManager::Subscribe(const std::string &topic,
 ConnectionPtr ConnectionManager::ConnectToRemoteHost( const std::string &host,
                                                        unsigned short port)
 {
+  ConnectionPtr conn;
+
+  if (!this->initialized)
+    return conn;
+
   // Connect to the remote host
-  ConnectionPtr conn(new Connection());
+  conn.reset(new Connection());
   conn->Connect(host, port);
 
   this->connections.push_back( conn );
