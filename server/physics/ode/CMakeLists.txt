@@ -17,6 +17,7 @@ SET (sources ODEPhysics.cc
              ODEBody.cc
              ODEJoint.cc
              ODESliderJoint.cc
+             ODEScrewJoint.cc
              ODEHingeJoint.cc
              ODEHinge2Joint.cc
              ODEUniversalJoint.cc
@@ -32,6 +33,7 @@ SET (headers ODEPhysics.hh
              ODEBody.hh
              ODEJoint.hh
              ODESliderJoint.hh
+             ODEScrewJoint.hh
              ODEHingeJoint.hh
              ODEHinge2Joint.hh
              ODEUniversalJoint.hh

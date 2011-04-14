@@ -51,6 +51,7 @@ set (headers BallJoint.hh
              Joint.hh
              PhysicsEngine.hh
              SliderJoint.hh
+             ScrewJoint.hh
              UniversalJoint.hh
              Mass.hh
              Geom.hh

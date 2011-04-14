@@ -42,6 +42,7 @@
 #include "FixedJoint.hh"
 #include "ODEHingeJoint.hh"
 #include "ODEHinge2Joint.hh"
+#include "ODEScrewJoint.hh"
 #include "ODESliderJoint.hh"
 #include "ODEBallJoint.hh"
 #include "ODEUniversalJoint.hh"
@@ -694,6 +695,8 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
   {
     case Joint::FIXED:
       return new FixedJoint();
+    case Joint::SCREW:
+      return new ODEScrewJoint(this->worldId);
     case Joint::SLIDER:
       return new ODESliderJoint(this->worldId);
     case Joint::HINGE:

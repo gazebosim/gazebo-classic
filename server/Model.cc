@@ -935,6 +935,8 @@ void Model::LoadJoint(XMLConfigNode *node)
     jtype = Joint::HINGE;
   else if (node->GetName() == "ball")
     jtype = Joint::BALL;
+  else if (node->GetName() == "screw")
+    jtype = Joint::SCREW;
   else if (node->GetName() == "slider")
     jtype = Joint::SLIDER;
   else if (node->GetName() == "hinge2")

@@ -49,7 +49,7 @@ namespace gazebo
   class Joint : public Common
   {
     /// \brief Type of joint
-    public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL, FIXED, TYPE_COUNT};
+    public: enum Type {SCREW, SLIDER, HINGE, HINGE2, BALL, UNIVERSAL, FIXED, TYPE_COUNT};
     public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM, STOP_ERP,STOP_CFM,ERP,CFM,FMAX,VEL,HI_STOP,LO_STOP};
 
     /// \brief Type names of joint

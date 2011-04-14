@@ -51,6 +51,7 @@ SET (sources BulletPhysics.cc
              BulletMotionState.cc
              BulletJoint.cc
              BulletSliderJoint.cc
+             BulletScrewJoint.cc
              BulletHingeJoint.cc
              BulletHinge2Joint.cc
              BulletUniversalJoint.cc

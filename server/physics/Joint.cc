@@ -36,7 +36,7 @@
 
 using namespace gazebo;
 
-std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"slider", "hinge", "hinge2", "ball", "universal"};
+std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"screw", "slider", "hinge", "hinge2", "ball", "universal"};
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -205,6 +205,9 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 
   switch (this->type)
   {
+    case SCREW: 
+      typeName="screw"; 
+      break;
     case SLIDER: 
       typeName="slider"; 
       break;
