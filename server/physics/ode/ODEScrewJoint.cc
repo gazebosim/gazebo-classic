@@ -135,7 +135,6 @@ void ODEScrewJoint::SetDamping( int /*index*/, const double damping )
   this->damping_coefficient = damping;
 #ifdef INCLUDE_ODE_JOINT_DAMPING
   this->physics->LockMutex();
-  // ode does not yet support screw joint damping
   dJointSetDamping( this->jointId, this->damping_coefficient);
   this->physics->UnlockMutex();
 #else
