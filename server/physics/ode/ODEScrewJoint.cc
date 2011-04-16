@@ -172,7 +172,8 @@ void ODEScrewJoint::SetForce(int /*index*/, double force)
   if (this->body2) this->body2->SetEnabled(true);
 
 #if ODE_SCREW_JOINT
-  dJointAddScrewForce(this->jointId, force);
+  //dJointAddScrewForce(this->jointId, force);
+  dJointAddScrewTorque(this->jointId, force);
 #endif
   this->physics->UnlockMutex();
 }
