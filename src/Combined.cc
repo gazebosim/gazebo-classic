@@ -31,7 +31,7 @@ const std::string default_config =
       <grid>false</grid>\
     </scene>\
     <physics type='ode'>\
-      <step_time>0.0001</step_time>\
+      <step_time>0.001</step_time>\
       <gravity>0 0 -9.8</gravity>\
       <cfm>0.0000000001</cfm>\
       <erp>0.2</erp>\
@@ -107,14 +107,17 @@ Combined::~Combined()
 {
 }
 
-void Combined::Load()
+void Combined::Load(const std::string &filename)
 {
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
   try
   {
-    xmlFile->LoadString(default_config);
+    if (!filename.empty())
+      xmlFile->Load(filename);
+    else
+      xmlFile->LoadString(default_config);
   }
   catch (common::Exception e)
   {
@@ -189,4 +192,37 @@ void Combined::Run()
 void Combined::Quit()
 {
   this->quit = true;
+}
+
+void Combined::SetParams( const common::StrStr_M &params )
+{
+  common::StrStr_M::const_iterator iter;
+  for (iter = params.begin(); iter != params.end(); iter++)
+  {
+    if (iter->first == "pause")
+    {
+      bool p = false;
+      try
+      {
+        p = boost::lexical_cast<bool>(iter->second);
+      }
+      catch (...)
+      {
+        // Unable to convert via lexical_cast, so try "true/false" string
+        std::string str = iter->second;
+        boost::to_lower(str);
+
+        if (str == "true")
+          p = true;
+        else if (str == "false")
+          p = false;
+        else
+          gzerr << "Invalid param value[" << iter->first << ":" 
+                << iter->second << "]\n";
+      }
+
+      for (int i=0; i < this->worlds.size(); i++)
+        physics::pause_world(this->worlds[i], p);
+    }
+  }
 }

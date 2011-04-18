@@ -167,6 +167,11 @@ else (PKG_CONFIG_FOUND)
   message (FATAL_ERROR "\nError: pkg-config not found")
 endif (PKG_CONFIG_FOUND)
 
+#set (QT_USE_QTOPENGL TRUE)
+find_package (Qt4 REQUIRED)
+if (NOT QT4_FOUND)
+  BUILD_ERROR("Missing: Qt4")
+endif()
 
 ########################################
 # Find wxWidgets

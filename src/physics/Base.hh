@@ -28,6 +28,7 @@
 #include <string>
 
 #include "common/CommonTypes.hh"
+#include "common/Param.hh"
 #include "physics/PhysicsTypes.hh"
 
 namespace gazebo

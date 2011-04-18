@@ -22,15 +22,14 @@
 #ifndef PARAM_HH
 #define PARAM_HH
 
-#include <iostream>
-#include <vector>
 #include <boost/lexical_cast.hpp>
-#include <boost/any.hpp>
 #include <boost/bind.hpp>
-#include <boost/signal.hpp>
 #include <boost/algorithm/string.hpp>
 #include <typeinfo>
 #include <string>
+
+#include "common/Event.hh"
+#include "common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -47,7 +46,7 @@ namespace gazebo
       public: virtual  ~Param();
 
       /// \brief Begin a block of "new Param<*>"
-      public: static void Begin(std::vector<Param*> *_params);
+      public: static void Begin(Param_V *_params);
   
       /// \brief End a block of "new Param<*>"
       public: static void End();
@@ -136,15 +135,16 @@ namespace gazebo
       public: template< typename C>
               void Callback( void (C::*func)(const T &), C *c)
               {
-                changeSignal.connect( boost::bind( func, c, _1) ); 
+                connection = changeSignal.Connect( boost::bind( func, c, _1) ); 
               }
   
    
       private: T value;
     
       private: T defaultValue;
-    
-      private: boost::signal<void (T)> changeSignal;
+   
+      private: event::ConnectionPtr connection; 
+      private: event::EventT<void (T)> changeSignal;
     };
    
   
@@ -167,6 +167,8 @@ namespace gazebo
     template<typename T>
     ParamT<T>::~ParamT()
     {
+      if (this->connection)
+        this->changeSignal.Disconnect(this->connection);
     }
 
     ////////////////////////////////////////////////////////////////////////////

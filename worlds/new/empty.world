@@ -52,27 +52,6 @@
       </link>
     </model>
 
-    <model name="box_model">
-      <static>true</static>
-      <origin xyz="0 0 1.5"/>
-      <link name="body">
-        <collision name="geom">
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-          <mass>1.0</mass>
-        </collision>
-
-        <visual>
-          <geometry>
-            <box size="1 1 1"/>
-          </geometry>
-          <material name="Gazebo/WoodPallet"/>
-          <cast_shadows>true</cast_shadows>
-        </visual>
-      </link>
-    </model>
- 
     <!-- White Point light -->
     <light name="point_white">
       <xyz>0.0 0 10</xyz>

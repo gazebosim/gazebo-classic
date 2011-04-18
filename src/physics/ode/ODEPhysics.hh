@@ -150,8 +150,10 @@ namespace gazebo
   
     /// \brief Collide two geoms
     public: void Collide(ODEGeom *geom1, ODEGeom *geom2, 
-                         dContactGeom contactGeoms[]);
+                         dContactGeom *contactGeoms);
   
+    public: void ProcessContactFeedback(ContactFeedback &feedback);
+
     /// \brief Top-level world for all bodies
     private: dWorldID worldId;
   
@@ -179,11 +181,13 @@ namespace gazebo
     private: tbb::concurrent_vector<ContactFeedback> contactFeedbacks;
   
     private: std::map<std::string, dSpaceID> spaces;
-  
+
     private: std::vector< std::pair<ODEGeom*, ODEGeom*> > colliders;
     private: std::vector< std::pair<ODEGeom*, ODEGeom*> > trimeshColliders;
   
     private: tbb::spin_mutex collideMutex;
+
+    private: dContactGeom *contactGeoms;
 
     private: void (*physicsStepFunc)(dxWorld*, dReal);
   };

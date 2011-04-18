@@ -74,8 +74,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   {
     try
     {
-      window = RenderEngine::Instance()->root->createRenderWindow( stream.str(), 
-                     width, height, false, &params);
+      window = RenderEngine::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
     }
     catch (...)
     {
@@ -98,6 +97,14 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   return this->windows.size()-1;
 }
 
+void WindowManager::GetAttribute(unsigned int id, const std::string &attr, void *data)
+{
+  if (id >= this->windows.size())
+    gzerr << "Invalid window id[" << id << "]\n";
+  else
+    this->windows[id]->getCustomAttribute(attr, data);
+}
+
 void WindowManager::Resize(unsigned int id, int width, int height)
 {
   if (id >= this->windows.size())
@@ -110,6 +117,18 @@ void WindowManager::Resize(unsigned int id, int width, int height)
     this->windows[id]->windowMovedOrResized();
   }
 } 
+
+void WindowManager::Moved(unsigned int id)
+{
+  if (id >= this->windows.size())
+  {
+    gzerr << "Invalid window id[" << id << "]\n";
+  }
+  else
+  {
+    this->windows[id]->windowMovedOrResized();
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the average FPS

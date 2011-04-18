@@ -7,6 +7,9 @@
 std::string config_file = "";
 gazebo::GuiClient *client = NULL;
 
+int g_argc;
+char **g_argv;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Print the version/licence string
 void PrintVersion()
@@ -27,6 +30,9 @@ void PrintUsage()
 // Parse the argument list.  Options are placed in static variables.
 int ParseArgs(int argc, char **argv)
 {
+  g_argc = argc;
+  g_argv = argv;
+
   int ch;
 
   char *flags = (char*)("h");

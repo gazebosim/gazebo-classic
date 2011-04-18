@@ -50,6 +50,8 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &name, Visual *parent)
 {
+  gzdbg << "New Visual[" << name << "]\n";
+
   this->SetName(name);
   this->sceneNode = NULL;
 
@@ -98,6 +100,9 @@ Visual::~Visual()
   delete this->meshTileP;
   delete this->materialNameP;
   delete this->castShadowsP;
+
+  if (this->preRenderConnection)
+    event::Events::DisconnectPreRenderSignal( this->preRenderConnection );
 
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter=this->lines.begin();

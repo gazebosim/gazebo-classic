@@ -111,18 +111,25 @@ void Console::SetQuiet( bool q )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the message stream
-std::ostream &Console::Msg()
+std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 {
   if (**this->quietP)
     return this->nullStream;
   else
+  {
+    *this->msgStream << "\033[1;" << color << "m" << lbl <<  "\033[0m ";
     return *this->msgStream;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the error stream
-std::ostream &Console::Error()
+std::ostream &Console::ColorErr(const std::string &lbl, const std::string &file, unsigned int line, int color)
 {
+  int index = file.find_last_of("/") + 1;
+
+  *this->errStream << "\033[1;" << color << "m" << lbl << " [" << file.substr( index , file.size() - index)<< ":" << line << "]\033[0m ";
+
   return *this->errStream;
 }
 

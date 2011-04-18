@@ -30,8 +30,16 @@ std::string SubscriptionTransport::GetMsgType() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg)
+{
+  std::string data;
+  msg->SerializeToString(&data);
+  this->connection->Write( data );
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Output a message to a connection
-void SubscriptionTransport::HandleMessage(const std::string &newdata)
+void SubscriptionTransport::HandleData(const std::string &newdata)
 {
   this->connection->Write( newdata );
 }

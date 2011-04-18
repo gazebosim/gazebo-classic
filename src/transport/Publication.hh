@@ -30,6 +30,8 @@ namespace gazebo
 
       /// \brief Publish data
       public: void Publish(const std::string &data);
+      public: void PublishData(const std::string &data);
+      public: void Publish(const google::protobuf::Message &msg);
 
       public: void AddTransport( const PublicationTransportPtr &publink );
 
@@ -39,7 +41,7 @@ namespace gazebo
 
       private: std::list<PublicationTransportPtr> transports;
 
-      private: std::string prevMessage;
+      private: google::protobuf::Message *prevMsg;
     };
     typedef boost::shared_ptr<Publication> PublicationPtr;
   }

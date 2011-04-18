@@ -163,7 +163,7 @@ common::Pose3d Entity::GetRelativePose() const
 /// Set the pose of the entity relative to its parent
 void Entity::SetRelativePose(const common::Pose3d &pose, bool notify)
 {
-  std::cout << "Set Relative Pose[" << pose.pos.z << "]\n";
+  gzdbg << "Set Relative Pose[" << pose.pos.z << "]\n";
   this->relativePose = pose;
   this->relativePose.Correct();
   this->PoseChange(notify);
@@ -191,8 +191,8 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
     // if this is the canonical body of a model, then
     // we want to SetWorldPose of the parent model
     // by doing some backwards transform
-    /*if (this->parent->HasType(MODEL) && 
-        ((Model*)this->parent)->GetBody("canonical") == (Body*)this)
+    if (this->parent->HasType(MODEL) && 
+        boost::shared_static_cast<Model>(this->parent)->GetBody("canonical")->GetId() == this->GetId())
     {
       // abs pose of the model + relative pose of cb = abs pose of cb 
       // so to get abs pose of the model, we need
@@ -210,13 +210,11 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
       //model_abs_pose.pos = pose.pos - this->GetRelativePose().pos;
       // set abs pose of parent model without propagating
       // changes to children
-      ((Entity*)this->parent)->SetWorldPose(model_abs_pose,false);
+      boost::shared_static_cast<Entity>(this->parent)->SetWorldPose(model_abs_pose,false);
       // that should be all, as relative pose of a canonical model
       // should not change
     }
     else
-      */
-
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose

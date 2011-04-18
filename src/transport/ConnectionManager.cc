@@ -97,7 +97,6 @@ void ConnectionManager::OnMasterRead( const std::string &data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-      std::cout << "Publisher update[" << pub.topic() << "]\n";
       // Connect to the remote publisher
       ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 

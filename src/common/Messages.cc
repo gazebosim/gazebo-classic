@@ -93,6 +93,20 @@ std::string Message::Package(const std::string type,
   return data;
 }
 
+msgs::Packet Message::Package2(const std::string type, 
+                      const google::protobuf::Message &message)
+{
+  msgs::Packet pkg;
+  Message::Stamp( pkg.mutable_stamp() );
+  pkg.set_type(type);
+
+  std::string *serialized_data = pkg.mutable_serialized_data();
+  if (!message.SerializeToString(serialized_data))
+    gzthrow("Failed to serialized message");
+
+  return pkg;
+}
+
 void Message::Set(msgs::Point *pt, const Vector3 &v)
 {
   pt->set_x(v.x);

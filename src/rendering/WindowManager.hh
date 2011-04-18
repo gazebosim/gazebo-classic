@@ -41,6 +41,8 @@ namespace gazebo
                                 unsigned int width, 
                                 unsigned int height );
   
+      public: void GetAttribute(unsigned int id, 
+                  const std::string &attr, void *data);
   
       /// \brief Attach a camera to a window
       public: void SetCamera( int windowId, Camera *camera);
@@ -48,6 +50,8 @@ namespace gazebo
       /// \brief Resize a window
       public: void Resize(unsigned int id, int width, int height);
   
+      public: void Moved(unsigned int id);
+
       /// \brief Get the average FPS
       public: float GetAvgFPS(unsigned int windowId);
   

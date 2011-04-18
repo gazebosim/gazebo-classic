@@ -1,8 +1,9 @@
 #ifndef GAZEBO_COMMON_TYPES_HH
 #define GAZEBO_COMMON_TYPES_HH
 
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include <vector>
+#include <map>
+#include <string>
 
 namespace gazebo
 {
@@ -18,6 +19,7 @@ namespace gazebo
     class Image;
 
     typedef std::vector<common::Param*> Param_V;
+    typedef std::map<std::string, std::string> StrStr_M;
   }
 }
 

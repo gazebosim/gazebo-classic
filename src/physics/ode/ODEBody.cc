@@ -120,10 +120,13 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.pos.Set(p[0], p[1], p[2]);
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
-  pose = self->GetRelativePose().GetInverse() + pose;
+  self->SetWorldPose(pose);
+
+  /*pose = self->GetRelativePose().GetInverse() + pose;
   pose.Correct();
 
   self->SetWorldPose(pose);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

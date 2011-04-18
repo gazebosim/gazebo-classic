@@ -17,8 +17,7 @@
 #include "common/Exception.hh"
 #include "common/GazeboConfig.hh"
 
-#include "gui/SimulationApp.hh"
-
+#include "gui/Gui.hh"
 #include "transport/Transport.hh"
 
 #include "GuiClient.hh"
@@ -29,7 +28,6 @@ GuiClient::GuiClient()
   : renderEngineEnabled(true), guiEnabled(true)
 {
   this->quit = false;
-  this->gui = NULL;
 
   // load the configuration options 
   try
@@ -47,48 +45,25 @@ GuiClient::GuiClient()
 
 GuiClient::~GuiClient()
 {
-  if (this->gui)
-    delete this->gui;
 }
 
 void GuiClient::Load(const std::string &filename)
 {
-  try
-  {
-    this->gui->Load(filename);
-  }
-  catch (common::Exception e)
-  {
-    gzthrow( "Error loading the GUI\n" << e);
-  }
+  gui::load(filename);
 }
 
 void GuiClient::Init()
 {
-  try
-  {
-    this->gui->Init();
-  }
-  catch (common::Exception e)
-  {
-    gzthrow( "Error initializing the GUI\n" << e);
-  }
+  gui::init();
 }
 
 void GuiClient::Run()
 {
-  try
-  {
-    this->gui->Run();
-  }
-  catch (common::Exception e)
-  {
-    gzthrow( "Error running the GUI\n" << e);
-  }
+  gui::run();
 }
 
 void GuiClient::Quit()
 {
-  this->quit = true;
+  gui::quit();
 }
 

@@ -88,6 +88,14 @@ Scene::Scene(const std::string &name)
   this->fogStartP = new common::ParamT<double>("linear_start",0,0);
   this->fogEndP = new common::ParamT<double>("linear_end",1.0,0);
   common::Param::End();
+
+  // Send a request to get the current world state
+  // TODO: Use RPC or some service call to get this properly
+  transport::PublisherPtr pub = transport::advertise<msgs::Request>("/gazebo/default/publish_scene");
+  msgs::Request req;
+  req.set_request("publish");
+  pub->Publish(req);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -870,6 +878,8 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  gzdbg << "Receive Scene msg. VIsuals[" << msg->visual_size() << "]\n";
   for (int i=0; i < msg->visual_size(); i++)
   {
     boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(msg->visual(i)) );

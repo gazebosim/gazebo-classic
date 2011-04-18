@@ -43,6 +43,9 @@ namespace gazebo
         static std::string Package(const std::string type, 
                                    const google::protobuf::Message &message);
 
+        static msgs::Packet Package2(const std::string type, 
+                                     const google::protobuf::Message &message);
+
         static msgs::Point      Convert(const Vector3 &v);
         static msgs::Quaternion Convert(const Quatern &q);
         static msgs::Pose       Convert(const Pose3d &p);

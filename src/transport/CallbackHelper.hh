@@ -22,7 +22,8 @@ namespace gazebo
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const = 0;
 
-      public: virtual void HandleMessage(const std::string &newdata) = 0;
+      public: virtual void HandleMessage(const google::protobuf::Message *msg) = 0;
+      public: virtual void HandleData(const std::string &newdata) = 0;
     };
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
 
@@ -50,9 +51,20 @@ namespace gazebo
                 return m->GetTypeName();
               }
 
-      public: virtual void HandleMessage(const std::string &newdata)
+      public: virtual void HandleMessage(const google::protobuf::Message *msg)
               {
-                msgs::Packet packet;
+                /*boost::shared_ptr<M> m( new M );
+                m->ParseFromString( ((msgs::Packet*)msg)->serialized_data() );
+                */
+                boost::shared_ptr<M> m( new M );
+                m->CopyFrom(*msg);
+
+                this->callback( m );
+              }
+
+      public: virtual void HandleData(const std::string &newdata)
+              {
+                /*msgs::Packet packet;
                 packet.ParseFromString(newdata);
 
                 // TODO: Handle this error properly
@@ -60,6 +72,10 @@ namespace gazebo
                   gzerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
                 boost::shared_ptr<M> m( new M );
                 m->ParseFromString( packet.serialized_data() );
+                */
+
+                boost::shared_ptr<M> m( new M );
+                m->ParseFromString( newdata );
                 this->callback( m );
               }
 
@@ -79,14 +95,14 @@ namespace gazebo
                 return m.GetTypeName();
               }
 
-      public: virtual void HandleMessage(const std::string &newdata)
+      public: virtual void HandleData(const std::string &newdata)
               {
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);
 
                 // TODO: Handle this error properly
                 if (packet.type() != "data")
-                  gzerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
+                  gzerr << "CallbackHelperT::HandleData Invalid message!!!\n";
                 boost::shared_ptr<msgs::String> m( new msgs::String );
                 m->ParseFromString( packet.serialized_data() );
                 this->callback( m );

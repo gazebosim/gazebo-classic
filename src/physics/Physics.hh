@@ -32,5 +32,6 @@ namespace gazebo
     void load_world(WorldPtr world, common::XMLConfigNode *node);
     void init_world(WorldPtr world);
     void run_world(WorldPtr world);
+    void pause_world(WorldPtr world, bool pause);
   }
 }

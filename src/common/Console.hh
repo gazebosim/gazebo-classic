@@ -34,12 +34,17 @@ namespace gazebo
 {
 	namespace common
   {
-    #define gzmsg (gazebo::common::Console::Instance()->Msg())
+    /// \brief Output a message 
+    #define gzmsg (gazebo::common::Console::Instance()->ColorMsg("Msg", 32))
 
-    /// Output a message
-    #define gzwarn (gazebo::common::Console::Instance()->Msg()<< "\033[1;35m" << "Warning: [" << __FILE__ << ":" << __LINE__ << "]" << "\033[0m" <<"\n")
+    /// \brief Output a debug message
+    #define gzdbg (gazebo::common::Console::Instance()->ColorMsg("Dbg", 36))
+
+    /// \brief Output a warning message
+    #define gzwarn (gazebo::common::Console::Instance()->ColorErr("Warning",__FILE__, __LINE__,33))
   
-    #define gzerr (gazebo::common::Console::Instance()->Error() << "\033[1;31m" << "Error: [" << __FILE__ << ":" << __LINE__ << "]" << "\033[0m" <<"\n")
+    /// \brief Output an error message
+    #define gzerr (gazebo::common::Console::Instance()->ColorErr("Error",__FILE__, __LINE__,31))
    
     /// Log a message
     #define gzlog (gazebo::common::Console::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
@@ -69,11 +74,11 @@ namespace gazebo
     
       /// \brief Use this to output a message to the terminal
       /// \param level Level of the message
-      public: std::ostream &Msg();
+      public: std::ostream &ColorMsg(const std::string &lbl, int color);
   
       /// \brief Use this to output an error to the terminal
       /// \param level Level of the message
-      public: std::ostream &Error();
+      public: std::ostream &ColorErr(const std::string &lbl, const std::string &file, unsigned int line, int color);
     
       /// \brief Use this to output a message to a log file
       public: std::ofstream &Log();

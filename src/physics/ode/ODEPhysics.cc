@@ -66,41 +66,15 @@ class ContactUpdate_TBB
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
-    std::vector<dJointFeedback>::iterator jiter;
 
     for (size_t i=r.begin(); i != r.end(); i++)
     {
-      ContactFeedback *feedback = &(*this->contacts)[i];
-
-      if (feedback->contact.geom1 == NULL)
-        gzerr << "collision update Geom1 is null\n";
-
-      if (feedback->contact.geom2 == NULL)
-        gzerr << "Collision update Geom2 is null\n";
-
-      feedback->contact.forces.clear();
-
-      // Copy all the joint forces to the contact
-      for (jiter = feedback->feedbacks.begin(); 
-          jiter != feedback->feedbacks.end(); jiter++)
-      {
-        JointFeedback joint;
-        joint.body1Force.Set( (*jiter).f1[0], (*jiter).f1[1], (*jiter).f1[2] );
-        joint.body2Force.Set( (*jiter).f2[0], (*jiter).f2[1], (*jiter).f2[2] );
-
-        joint.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
-        joint.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
-
-        feedback->contact.forces.push_back(joint);
-      }
-
-      // Add the contact to each geom
-      feedback->contact.geom1->AddContact( feedback->contact );
-      feedback->contact.geom2->AddContact( feedback->contact );
+      this->engine->ProcessContactFeedback((*this->contacts)[i]);
     }
   }
 
-  tbb::concurrent_vector<ContactFeedback> *contacts;
+  private: tbb::concurrent_vector<ContactFeedback> *contacts;
+  private: ODEPhysics *engine;
 };
 
 class Colliders_TBB
@@ -133,6 +107,8 @@ class Colliders_TBB
 ODEPhysics::ODEPhysics(WorldPtr world)
     : PhysicsEngine(world)
 {
+  this->contactGeoms = NULL;
+
   // Collision detection init
   dInitODE2(0);
 
@@ -158,6 +134,7 @@ ODEPhysics::ODEPhysics(WorldPtr world)
   this->contactFeedbacksP = new common::ParamT<int>("contact_feedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
   this->maxContactsP = new common::ParamT<int>("max_contacts",100,0); // enforced for trimesh-trimesh contacts
   common::Param::End();
+
 }
 
 
@@ -207,6 +184,8 @@ void ODEPhysics::Load(common::XMLConfigNode *node)
   this->maxContactsP->Load(node);
 
   this->stepTimeDouble = (**this->stepTimeP).Double();
+
+  this->contactGeoms = new dContactGeom[this->GetMaxContacts()];
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, **contactMaxCorrectingVelP);
@@ -282,6 +261,7 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
+  int i;
   this->colliders.clear();
   this->trimeshColliders.clear();
 
@@ -290,23 +270,45 @@ void ODEPhysics::UpdateCollision()
 
   this->contactFeedbacks.clear();
 
-  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->colliders.size(), 10),
-      Colliders_TBB(&this->colliders, this) );
+  // Collide all the geoms
+  if (this->colliders.size() < 50)
+  {
+    for (i=0; i<this->colliders.size(); i++)
+    {
+      this->Collide(this->colliders[i].first, 
+                    this->colliders[i].second, this->contactGeoms);
+    }
+  }
+  else
+  {
+    tbb::parallel_for( tbb::blocked_range<size_t>(0, 
+          this->colliders.size(), 10), Colliders_TBB(&this->colliders, this) );
+  }
 
-  dContactGeom contactGeoms[this->GetMaxContacts()];
   // Trimesh collision must happen in this thread sequentially
-  for (int i=0; i<this->trimeshColliders.size(); i++)
+  for (i=0; i<this->trimeshColliders.size(); i++)
   {
     ODEGeom *geom1 = this->trimeshColliders[i].first;
     ODEGeom *geom2 = this->trimeshColliders[i].second;
-    this->Collide(geom1, geom2, contactGeoms);
+    this->Collide(geom1, geom2, this->contactGeoms);
   }
 
-  // Process all the contacts, get the feedback info, and call the geom
-  // callbacks
-  tbb::parallel_for( tbb::blocked_range<size_t>(0, 
-        this->contactFeedbacks.size(), 50), 
+  // Process all the contact feedbacks
+  if (this->contactFeedbacks.size() < 50)
+  {
+    for (i=0; i < this->contactFeedbacks.size(); i++)
+    {
+      this->ProcessContactFeedback( this->contactFeedbacks[i] );
+    }
+  }
+  else
+  {
+    // Process all the contacts, get the feedback info, and call the geom
+    // callbacks
+    tbb::parallel_for( tbb::blocked_range<size_t>(0, 
+          this->contactFeedbacks.size(), 20), 
         ContactUpdate_TBB(&this->contactFeedbacks) );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -454,6 +456,11 @@ void ODEPhysics::SetContactSurfaceLayer(double layer_depth)
 void ODEPhysics::SetMaxContacts(double max_contacts)
 {
   this->maxContactsP->SetValue(max_contacts);
+
+  if (this->contactGeoms)
+    delete this->contactGeoms;
+  
+  this->contactGeoms = new dContactGeom[**this->maxContactsP];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -501,7 +508,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 ////////////////////////////////////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->maxContactsP->GetValue();
+  return (**this->maxContactsP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -585,8 +592,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact))
     return;
 
-  ODEPhysics *self;
-  self = (ODEPhysics*) data;
+  ODEPhysics *self = (ODEPhysics*) data;
 
   // Check if either are spaces
   if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
@@ -622,8 +628,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       self->trimeshColliders.push_back( std::make_pair(geom1, geom2) );
     else
       self->colliders.push_back( std::make_pair(geom1, geom2) );
-
-    return;
   }
 }
 
@@ -631,21 +635,19 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 ////////////////////////////////////////////////////////////////////////////////
 // Collide two geoms
 void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2, 
-                         dContactGeom contactGeoms[])
+                         dContactGeom *contactGeoms)
 {
   int numContacts = 10;
   int j;
   int numc = 0;
   dContact contact;
 
-  //dContactGeom contactGeoms[**this->maxContactsP];
-
   // for now, only use maxContacts if both geometries are trimeshes
   // other types of geometries do not need too many contacts
   if (geom1->GetShapeType() == Base::TRIMESH_SHAPE && 
       geom2->GetShapeType() == Base::TRIMESH_SHAPE)
   {
-    numContacts = **this->maxContactsP;
+    numContacts = this->GetMaxContacts();
   }
 
   {
@@ -760,4 +762,36 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
     }
     */
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::ProcessContactFeedback(ContactFeedback &feedback)
+{
+  std::vector<dJointFeedback>::iterator jiter;
+
+  if (feedback.contact.geom1 == NULL)
+    gzerr << "collision update Geom1 is null\n";
+
+  if (feedback.contact.geom2 == NULL)
+    gzerr << "Collision update Geom2 is null\n";
+
+  feedback.contact.forces.clear();
+
+  // Copy all the joint forces to the contact
+  for (jiter = feedback.feedbacks.begin(); 
+      jiter != feedback.feedbacks.end(); jiter++)
+  {
+    JointFeedback joint;
+    joint.body1Force.Set( (*jiter).f1[0], (*jiter).f1[1], (*jiter).f1[2] );
+    joint.body2Force.Set( (*jiter).f2[0], (*jiter).f2[1], (*jiter).f2[2] );
+
+    joint.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
+    joint.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
+
+    feedback.contact.forces.push_back(joint);
+  }
+
+  // Add the contact to each geom
+  feedback.contact.geom1->AddContact( feedback.contact );
+  feedback.contact.geom2->AddContact( feedback.contact );
 }

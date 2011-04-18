@@ -23,11 +23,6 @@
 
 namespace gazebo
 {
-  namespace gui
-  {
-    class SimulationApp;
-  }
-
   class GuiClient
   {
     public: GuiClient();
@@ -39,7 +34,6 @@ namespace gazebo
     public: void Quit();
 
     private: bool renderEngineEnabled, guiEnabled;
-    private: gui::SimulationApp *gui;
 
     private: bool quit;
   };
