@@ -1,0 +1,37 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include ( ${QT_USE_FILE} )
+
+link_directories(  
+  ${BOOST_LIBRARY_DIRS} 
+)
+
+add_definitions( ${QT_DEFINITIONS} )
+
+set (sources Gui.cc MainWindow.cc RenderWidget.cc GLWidget.cc TimePanel.cc)
+
+set (headers Gui.hh MainWindow.hh RenderWidget.hh GLWidget.hh TimePanel.hh)
+
+set (resources images.qrc)
+
+QT4_WRAP_CPP(headers_MOC ${headers})
+QT4_ADD_RESOURCES(resources_RCC ${resources})
+
+set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}} ${wxWidgets_CXX_FLAGS}")
+
+add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${resources_RCC})
+
+                                         
+target_link_libraries(gazebo_gui Xpm  ${QT_LIBRARIES} ${ogre_libraries} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}} ${boost_libraries})
+
+
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazebo_gui PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+
+set_target_properties(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
+
+install (TARGETS gazebo_gui DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/gui COMPONENT headers)

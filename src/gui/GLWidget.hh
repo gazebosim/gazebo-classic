@@ -1,0 +1,52 @@
+#ifndef GL_WIDGET_HH
+#define GL_WIDGET_HH
+
+#include <QtGui>
+
+#include "rendering/RenderTypes.hh"
+#include "common/MouseEvent.hh"
+
+namespace gazebo
+{
+  namespace rendering
+  {
+    class UserCamera;
+  }
+
+  namespace gui
+  {
+    class GLWidget : public QWidget
+    {
+      Q_OBJECT
+
+      public: GLWidget(QWidget *parent = 0);
+      public: virtual ~GLWidget();
+
+      public: void ViewScene(rendering::ScenePtr scene);
+
+      signals:
+        void clicked();
+
+      protected: virtual void moveEvent(QMoveEvent *e);
+      protected: virtual void paintEvent(QPaintEvent *e);
+      protected: virtual void resizeEvent(QResizeEvent *e);
+      protected: virtual void showEvent(QShowEvent *e);
+
+
+      protected: void wheelEvent(QWheelEvent *event);
+      protected: void mousePressEvent(QMouseEvent *event);
+      protected: void mouseMoveEvent(QMouseEvent *event);
+      protected: void mouseReleaseEvent(QMouseEvent *event);
+
+      private: std::string GetOgreHandle() const;
+
+      private: int windowId;
+
+      private: rendering::UserCamera *userCamera;
+      private: QFrame *renderFrame;
+      private: common::MouseEvent mouseEvent;
+    };
+  }
+}
+
+#endif
