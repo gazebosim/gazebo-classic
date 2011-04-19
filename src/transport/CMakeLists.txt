@@ -28,6 +28,7 @@ set (headers TopicManager.hh
              PublicationTransport.hh
              SubscribeOptions.hh
              Transport.hh
+             TransportTypes.hh
 )
 
 add_library(gazebo_transport SHARED ${sources})

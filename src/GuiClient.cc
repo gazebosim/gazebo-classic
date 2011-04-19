@@ -41,6 +41,9 @@ GuiClient::GuiClient()
 
   // Start the transport system by connecting to the master.
   transport::init();
+
+  // TODO: Move this to someplace proper
+  transport::set_topic_namespace("default");
 }
 
 GuiClient::~GuiClient()

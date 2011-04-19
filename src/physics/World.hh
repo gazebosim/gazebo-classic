@@ -23,12 +23,12 @@
 #define WORLD_HH
 
 #include <vector>
+#include <list>
 #include <string>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/Publisher.hh"
-#include "transport/Subscriber.hh"
+#include "transport/TransportTypes.hh"
 
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
@@ -150,10 +150,12 @@ namespace gazebo
       private: void Update();
  
       /// \brief Pause callback
-      private: void PauseCB(bool p);
+      private: void OnPause(bool p);
     
       /// \brief Step callback
-      private: void StepCB();
+      private: void OnStep();
+
+      private: void OnControl( const boost::shared_ptr<msgs::WorldControl const> &data );
     
       /// \brief Delete an entity by name
       /// \param name The name of the entity to delete
@@ -209,7 +211,7 @@ namespace gazebo
       private: transport::PublisherPtr visPub, selectionPub, lightPub, scenePub;
       private: transport::PublisherPtr statPub;
 
-      private: transport::SubscriberPtr visSub, sceneSub;
+      private: transport::SubscriberPtr visSub, sceneSub, controlSub;
 
       private: msgs::WorldStatistics worldStatsMsg;
 

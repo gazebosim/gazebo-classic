@@ -43,7 +43,7 @@ MeshManager::MeshManager()
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
-  this->CreateSphere("unit_sphere",1.0, 32, 32);
+  this->CreateSphere("unit_sphere",0.5, 32, 32);
   this->CreateSphere("joint_anchor",0.01, 32, 32);
   this->CreateBox("body_cg", Vector3(0.014,0.014,0.014), 
                              Vector2d(0.014,0.014));

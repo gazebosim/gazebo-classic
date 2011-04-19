@@ -24,6 +24,8 @@
 #include <tbb/blocked_range.h>
 
 #include "transport/Transport.hh"
+#include "transport/Publisher.hh"
+#include "transport/Subscriber.hh"
 
 #include "common/Diagnostics.hh"
 #include "common/Events.hh"
@@ -71,9 +73,7 @@ World::World()
   common::Param::End();
 
   this->connections.push_back( 
-     event::Events::ConnectPauseSignal(boost::bind(&World::PauseCB, this, _1)));
-  this->connections.push_back( 
-     event::Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
+     event::Events::ConnectStepSignal( boost::bind(&World::OnStep, this) ) );
   this->connections.push_back( 
      event::Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
   this->connections.push_back(
@@ -103,6 +103,9 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   transport::set_topic_namespace(**this->nameP);
 
   common::Message::Init( this->worldStatsMsg, "statistics" );
+
+  this->controlSub = transport::subscribe("~/world_control", 
+                                        &World::OnControl, this);
 
   this->sceneSub = transport::subscribe("~/publish_scene", 
                                         &World::PublishScene, this);
@@ -241,6 +244,22 @@ void World::RunLoop()
 
   while (!this->stop)
   {
+    /// Send statistics about the world simulation
+    if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
+    {
+      common::Message::Stamp( this->worldStatsMsg.mutable_header() );
+      common::Message::Set( this->worldStatsMsg.mutable_sim_time(), 
+          this->GetSimTime());
+      common::Message::Set( this->worldStatsMsg.mutable_real_time(),
+          this->GetRealTime() );
+      common::Message::Set( this->worldStatsMsg.mutable_pause_time(),
+          this->GetPauseTime());
+
+      this->statPub->Publish( this->worldStatsMsg );
+      this->prevStatTime = common::Time::GetWallTime();
+    }
+
+
     if (this->IsPaused() && !this->stepInc)
       this->pauseTime += step;
     else
@@ -275,21 +294,6 @@ void World::RunLoop()
 void World::Update()
 {
   event::Events::worldUpdateStartSignal();
-
-  /// Send statistics about the world simulation
-  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
-  {
-    common::Message::Stamp( this->worldStatsMsg.mutable_header() );
-    common::Message::Set( this->worldStatsMsg.mutable_sim_time(), 
-        this->GetSimTime());
-    common::Message::Set( this->worldStatsMsg.mutable_real_time(),
-        this->GetRealTime() );
-    common::Message::Set( this->worldStatsMsg.mutable_pause_time(),
-        this->GetPauseTime());
-
-    this->statPub->Publish( this->worldStatsMsg );
-    this->prevStatTime = common::Time::GetWallTime();
-  }
 
   // Update all the models
   (*this.*modelUpdateFunc)();
@@ -456,14 +460,8 @@ void World::Reset()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Pause callback
-void World::PauseCB(bool p)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Step callback
-void World::StepCB()
+void World::OnStep()
 {
   this->stepInc = true;
 }
@@ -566,19 +564,30 @@ bool World::IsPaused() const
 /// Set whether the simulation is paused
 void World::SetPaused(bool p)
 {
+  gzdbg << "A\n";
   if (this->pause == p)
     return;
 
+  gzdbg << "Pause[" << p << "]\n";
   event::Events::pauseSignal(p);
   this->pause = p;
+}
+
+void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
+{
+  gzdbg << "On Control\n";
+
+  if (data->has_pause())
+    this->SetPaused( data->pause() );
+
+  if (data->has_step())
+    this->OnStep();
 }
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
 {
   msgs::Scene scene;
   common::Message::Init(scene,"scene");
-
-  gzdbg << "PublishScene[" << this->visualMsgs.size() << "]\n";
 
   std::list< boost::shared_ptr<msgs::Visual const> >::iterator iter;
   for (iter = this->visualMsgs.begin(); iter != this->visualMsgs.end(); iter++)
@@ -614,7 +623,6 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 // the scene. This in turns allows a gui to query the latest state.
 void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  gzdbg << "New Visual Message\n";
   std::list< boost::shared_ptr<msgs::Visual const> >::iterator iter;
   std::list< boost::shared_ptr<msgs::Visual const> >::iterator prev;
 

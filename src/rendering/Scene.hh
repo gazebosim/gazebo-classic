@@ -23,12 +23,14 @@
 
 #include <OGRE/OgreMesh.h>
 
-#include "transport/Subscriber.hh"
+#include "transport/TransportTypes.hh"
 #include "common/Events.hh"
 #include "common/Messages.hh"
 #include "common/Param.hh"
 #include "common/Color.hh"
 #include "common/Vector2i.hh"
+
+#include "rendering/RenderTypes.hh"
 
 namespace Ogre
 {
@@ -108,22 +110,22 @@ namespace gazebo
       public: Grid *GetGrid(unsigned int index) const;
   
       /// \brief Create a camera
-      public: Camera *CreateCamera(const std::string &name);
+      public: CameraPtr CreateCamera(const std::string &name);
   
       /// \brief Get the number of cameras in this scene
       public: unsigned int GetCameraCount() const;
   
       /// \brief Get a camera
-      public: Camera *GetCamera(unsigned int index) const;
+      public: CameraPtr GetCamera(unsigned int index) const;
   
       /// \brief Create a user camera
-      public: UserCamera *CreateUserCamera(const std::string &name);
+      public: UserCameraPtr CreateUserCamera(const std::string &name);
   
       /// \brief Get the number of user cameras in this scene
       public: unsigned int GetUserCameraCount() const;
   
       /// \brief Get a user camera
-      public: UserCamera *GetUserCamera(unsigned int index) const;
+      public: UserCameraPtr GetUserCamera(unsigned int index) const;
   
   
       /// \brief Get an entity at a pixel location using a camera. Used for
@@ -212,8 +214,8 @@ namespace gazebo
       //bsp attributes saved to write XML file back
       private: SceneType type;
   
-      private: std::vector<Camera*> cameras;
-      private: std::vector<UserCamera*> userCameras;
+      private: std::vector<CameraPtr> cameras;
+      private: std::vector<UserCameraPtr> userCameras;
   
       private: Ogre::SceneManager *manager;
       private: Ogre::RaySceneQuery *raySceneQuery;

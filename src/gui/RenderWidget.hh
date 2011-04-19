@@ -16,6 +16,8 @@ namespace gazebo
       public: RenderWidget( QWidget *parent = 0 );
       public: virtual ~RenderWidget();
 
+      private slots: virtual void update();
+
       private: GLWidget *glWidget;
 
       private: QLineEdit *xPosEdit;
@@ -25,8 +27,8 @@ namespace gazebo
       private: QLineEdit *rollEdit;
       private: QLineEdit *pitchEdit;
       private: QLineEdit *yawEdit;
-      private: QLineEdit *fpsOut;
-      private: QLineEdit *trianglesOut;
+      private: QLineEdit *fpsEdit;
+      private: QLineEdit *trianglesEdit;
 
     };
   }

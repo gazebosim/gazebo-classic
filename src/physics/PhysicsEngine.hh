@@ -23,9 +23,7 @@
 
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
-
-#include "transport/Publisher.hh"
-
+#include "transport/TransportTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
 namespace gazebo

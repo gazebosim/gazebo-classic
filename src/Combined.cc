@@ -9,6 +9,7 @@
 #include "physics/Physics.hh"
 #include "rendering/Rendering.hh"
 
+#include "Master.hh"
 #include "Combined.hh"
 
 using namespace gazebo;
@@ -59,30 +60,21 @@ const std::string default_config =
         </visual>\
       </link>\
     </model>\
-    <model name='box1'>\
-      <static>false</static>\
-      <origin xyz='0 0 1'/>\
-      <link name='body'>\
-        <collision name='geom'>\
-          <geometry>\
-            <box size='1.0 1.0 1.0'/>\
-          </geometry>\
-          <mass>1.0</mass>\
-        </collision>\
-        <visual>\
-          <geometry>\
-            <box size='1.0 1.0 1.0'/>\
-          </geometry>\
-          <mesh filename='unit_box'/>\
-        </visual>\
-      </link>\
-    </model>\
   </world>\
 </gazebo>";
 
 
 Combined::Combined()
 {
+  std::string host = "";
+  unsigned short port = 0;
+
+  gazebo::transport::get_master_uri(host,port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->masterThread = new boost::thread( boost::bind(&Master::Run, this->master) );
+
   this->quit = false;
 
   // load the configuration options 

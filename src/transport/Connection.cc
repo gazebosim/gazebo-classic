@@ -57,8 +57,9 @@ void Connection::Connect(const std::string &host, unsigned short port)
     this->socket.close();
     this->socket.connect(*endpoint_iter++, error);
   }
+
   if (error)
-    throw boost::system::system_error(error);
+    gzthrow ("Unable to connect to " << host << ":" << port);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

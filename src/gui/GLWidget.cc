@@ -3,6 +3,8 @@
 
 #include <math.h>
 
+#include "common/Exception.hh"
+
 #include "rendering/Rendering.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"
@@ -18,7 +20,6 @@ GLWidget::GLWidget(QWidget *parent)
   : QWidget(parent)
 {
   this->windowId = -1;
-  this->userCamera = NULL;
 
   setAttribute(Qt::WA_OpaquePaintEvent,true);
   setAttribute(Qt::WA_PaintOnScreen,true);
@@ -34,10 +35,6 @@ GLWidget::GLWidget(QWidget *parent)
   mainLayout->addWidget(this->renderFrame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
-
-  QTimer *timer = new QTimer(this);
-  connect( timer, SIGNAL(timeout()), this, SLOT(update()) );
-  timer->start(33);
 }
 
 GLWidget::~GLWidget()
@@ -152,6 +149,13 @@ void GLWidget::ViewScene(rendering::ScenePtr scene)
   this->userCamera->SetWorldRotation( common::Quatern::EulerToQuatern(0, DTOR(15), 0) );
 
   rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+rendering::UserCameraPtr GLWidget::GetCamera() const
+{
+  return this->userCamera;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

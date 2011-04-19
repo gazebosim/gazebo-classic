@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "transport/Publisher.hh"
+#include "transport/TransportTypes.hh"
 
 #include "msgs/MessageTypes.hh"
 #include "common/CommonTypes.hh"

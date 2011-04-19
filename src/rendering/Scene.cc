@@ -132,12 +132,7 @@ Scene::~Scene()
     delete this->grids[i];
   this->grids.clear();
 
-  for (unsigned int i=0; i < this->cameras.size(); i++)
-    delete this->cameras[i];
   this->cameras.clear();
-
-  for (unsigned int i=0; i < this->userCameras.size(); i++)
-    delete this->userCameras[i];
   this->userCameras.clear();
 }
 
@@ -354,9 +349,9 @@ Grid *Scene::GetGrid(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 //Create a camera
-Camera *Scene::CreateCamera(const std::string &name)
+CameraPtr Scene::CreateCamera(const std::string &name)
 {
-  Camera *camera = new Camera(this->name + "::" + name, this);
+  CameraPtr camera( new Camera(this->name + "::" + name, this) );
   this->cameras.push_back(camera);
 
   return camera;
@@ -371,20 +366,22 @@ unsigned int Scene::GetCameraCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific camera by index
-Camera *Scene::GetCamera(unsigned int index) const
+CameraPtr Scene::GetCamera(unsigned int index) const
 {
-  if (index < this->cameras.size())
-    return this->cameras[index];
+  CameraPtr cam;
 
-  return NULL;
+  if (index < this->cameras.size())
+    cam = this->cameras[index];
+
+  return cam;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a user camera
-UserCamera *Scene::CreateUserCamera(const std::string &name)
+UserCameraPtr Scene::CreateUserCamera(const std::string &name)
 {
-  UserCamera *camera = new UserCamera(this->name + "::" + name, this);
+  UserCameraPtr camera( new UserCamera(this->name + "::" + name, this) );
   camera->Load(NULL);
   camera->Init();
   this->userCameras.push_back(camera);
@@ -401,12 +398,14 @@ unsigned int Scene::GetUserCameraCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific user camera by index
-UserCamera *Scene::GetUserCamera(unsigned int index) const
+UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 {
-  if (index < this->userCameras.size())
-    return this->userCameras[index];
+  UserCameraPtr cam;
 
-  return NULL;
+  if (index < this->userCameras.size())
+    cam = this->userCameras[index];
+
+  return cam;
 }
 
 
@@ -878,8 +877,6 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-
-  gzdbg << "Receive Scene msg. VIsuals[" << msg->visual_size() << "]\n";
   for (int i=0; i < msg->visual_size(); i++)
   {
     boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(msg->visual(i)) );
@@ -949,6 +946,7 @@ void Scene::PreRender()
 
 void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
+
   Visual_M::iterator iter;
   iter = this->visuals.find(msg->header().str_id());
 
@@ -979,6 +977,7 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
     visual->LoadFromMsg(msg);
     this->visuals[msg->header().str_id()] = visual;
   }
+
 }
 
 void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)

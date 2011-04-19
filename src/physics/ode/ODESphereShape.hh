@@ -41,7 +41,7 @@ namespace gazebo
         common::Pose3d rpose;
     
         Mass mass = this->geomParent->GetMass();
-    
+
         // Initialize box mass matrix
         dMassSetSphereTotal(&odeMass, mass.GetAsDouble(), radius);
         rpose = this->geomParent->GetRelativePose();

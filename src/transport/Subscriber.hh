@@ -53,7 +53,6 @@ namespace gazebo
       private: std::string topic;
       private: CallbackHelperPtr subscription;
     };
-    typedef boost::shared_ptr<Subscriber> SubscriberPtr;
   }
 }
 

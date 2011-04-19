@@ -41,6 +41,7 @@ Exception::Exception(const char *file, int line, std::string msg)
 /// Destructor
 Exception::~Exception()
 {
+  std::cerr << *this << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

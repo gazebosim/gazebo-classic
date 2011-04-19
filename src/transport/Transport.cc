@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
+#include "transport/Publisher.hh"
+#include "transport/Subscriber.hh"
 #include "transport/ConnectionManager.hh"
 #include "Transport.hh"
 

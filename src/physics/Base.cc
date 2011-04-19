@@ -22,6 +22,7 @@
 
 
 #include "common/Console.hh"
+#include "common/Exception.hh"
 #include "physics/World.hh"
 #include "physics/Base.hh"
 

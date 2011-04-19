@@ -51,25 +51,17 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-  
-    /// \addtogroup gazebo_rendering
-    /// \brief Basic camera 
-    /// \{
-    /// \defgroup gazebo_camera Camera
-    /// \brief Basic camera sensor
-    // \{
-    
-    
+   
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
     class Camera 
     {
       /// \brief Constructor
-      protected: Camera(const std::string &namePrefix, Scene *scene);
+      public: Camera(const std::string &namePrefix, Scene *scene);
     
       /// \brief Destructor
-      protected: virtual ~Camera();
+      public: virtual ~Camera();
     
       /// \brief Load the camera using parameter from an XMLConfig node
       /// \param node The XMLConfig node

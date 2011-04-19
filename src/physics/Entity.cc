@@ -22,6 +22,7 @@
 #include "common/Messages.hh"
 #include "common/Console.hh"
 
+#include "transport/Publisher.hh"
 #include "transport/Transport.hh"
 
 #include "physics/Geom.hh"
@@ -163,7 +164,6 @@ common::Pose3d Entity::GetRelativePose() const
 /// Set the pose of the entity relative to its parent
 void Entity::SetRelativePose(const common::Pose3d &pose, bool notify)
 {
-  gzdbg << "Set Relative Pose[" << pose.pos.z << "]\n";
   this->relativePose = pose;
   this->relativePose.Correct();
   this->PoseChange(notify);

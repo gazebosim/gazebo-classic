@@ -19,10 +19,9 @@
 
 #include <boost/bind.hpp>
 
+#include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
 #include "transport/TopicManager.hh"
-#include "transport/Publisher.hh"
-#include "transport/Subscriber.hh"
 
 namespace gazebo
 {

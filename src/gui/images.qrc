@@ -9,5 +9,6 @@
   <file>images/spotlight.png</file>
   <file>images/pointlight.png</file>
   <file>images/directionallight.png</file>
+  <file>images/gazebo.svg</file>
 </qresource>
 </RCC>

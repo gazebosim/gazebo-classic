@@ -47,7 +47,7 @@ WindowManager::~WindowManager()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a camera to a window
-void WindowManager::SetCamera( int windowId, Camera *camera)
+void WindowManager::SetCamera( int windowId, CameraPtr camera)
 {
   this->windows[windowId]->removeAllViewports(); 
   camera->SetRenderTarget( this->windows[windowId] );

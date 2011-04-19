@@ -36,6 +36,7 @@ void gui::load(const std::string &filename)
 
 void gui::init()
 {
+
   g_main_win->show();
   g_main_win->Init();
 }

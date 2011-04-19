@@ -1,4 +1,7 @@
 #include <QtGui>
+#include <iomanip>
+
+#include "rendering/UserCamera.hh"
 
 #include "gui/GLWidget.hh"
 #include "gui/RenderWidget.hh"
@@ -50,13 +53,13 @@ RenderWidget::RenderWidget( QWidget *parent )
   this->yawEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->yawEdit->setFixedWidth(100);
 
-  this->fpsOut = new QLineEdit;
-  this->fpsOut->setReadOnly(true);
-  this->fpsOut->setFixedWidth(40);
+  this->fpsEdit = new QLineEdit;
+  this->fpsEdit->setReadOnly(true);
+  this->fpsEdit->setFixedWidth(50);
 
-  this->trianglesOut = new QLineEdit;
-  this->trianglesOut->setReadOnly(true);
-  this->trianglesOut->setFixedWidth(100);
+  this->trianglesEdit = new QLineEdit;
+  this->trianglesEdit->setReadOnly(true);
+  this->trianglesEdit->setFixedWidth(80);
 
   QLabel *xyzLabel = new QLabel(tr("XYZ:"));
   QLabel *rpyLabel = new QLabel(tr("RPY:"));
@@ -77,9 +80,9 @@ RenderWidget::RenderWidget( QWidget *parent )
 
   bottomBarLayout->addItem(new QSpacerItem(40,20,QSizePolicy::Expanding, QSizePolicy::Minimum));
   bottomBarLayout->addWidget(fpsLabel);
-  bottomBarLayout->addWidget(this->fpsOut);
+  bottomBarLayout->addWidget(this->fpsEdit);
   bottomBarLayout->addWidget(trianglesLabel);
-  bottomBarLayout->addWidget(this->trianglesOut);
+  bottomBarLayout->addWidget(this->trianglesEdit);
   bottomBarLayout->addSpacing(10);
 
   frameLayout->addWidget(this->glWidget);
@@ -92,9 +95,61 @@ RenderWidget::RenderWidget( QWidget *parent )
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
+
+  QTimer *timer = new QTimer(this);
+  connect( timer, SIGNAL(timeout()), this, SLOT(update()) );
+  timer->start(33);
+
 }
 
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
+}
+
+void RenderWidget::update()
+{
+  rendering::UserCameraPtr cam = this->glWidget->GetCamera();
+
+  if (!cam)
+    return;
+
+  float fps = cam->GetAvgFPS();
+  int triangleCount = cam->GetTriangleCount();
+  common::Pose3d pose = cam->GetWorldPose();
+
+  std::ostringstream stream;
+
+  stream << std::fixed << std::setprecision(2) << pose.pos.x;
+  this->xPosEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(2) << pose.pos.y;
+  this->yPosEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(2) << pose.pos.z;
+  this->zPosEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(2) << RTOD(pose.rot.GetAsEuler().x);
+  this->rollEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(2) << RTOD(pose.rot.GetAsEuler().y);
+  this->pitchEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(2) << RTOD(pose.rot.GetAsEuler().z);
+  this->yawEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(1) << fps;
+  this->fpsEdit->setText(tr(stream.str().c_str()));
+  stream.str("");
+
+  stream << std::fixed << std::setprecision(2) << triangleCount;
+  this->trianglesEdit->setText( tr(stream.str().c_str()) );
+
+  this->glWidget->update();
 }

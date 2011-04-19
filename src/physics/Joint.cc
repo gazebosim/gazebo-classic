@@ -20,6 +20,7 @@
  */
 
 #include "transport/Transport.hh"
+#include "transport/Publisher.hh"
 
 #include "common/Events.hh"
 #include "common/Exception.hh"

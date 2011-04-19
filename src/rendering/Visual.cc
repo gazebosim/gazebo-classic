@@ -50,8 +50,6 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &name, Visual *parent)
 {
-  gzdbg << "New Visual[" << name << "]\n";
-
   this->SetName(name);
   this->sceneNode = NULL;
 
@@ -207,7 +205,6 @@ void Visual::Load(common::XMLConfigNode *node)
 {
   std::ostringstream stream;
   common::Pose3d pose;
-  common::Vector3 size(0,0,0);
   Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
 
@@ -430,6 +427,7 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const common::Vector3 &scale )
 {
+  gzdbg << "Set Scale[" << this->GetName() << "] S[" << scale << "]\n";
   this->scaleP->SetValue(scale);
   this->sceneNode->setScale(Conversions::Vector3(scale));
 }

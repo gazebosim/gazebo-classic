@@ -23,6 +23,7 @@ namespace gazebo
       public: virtual ~GLWidget();
 
       public: void ViewScene(rendering::ScenePtr scene);
+      public: rendering::UserCameraPtr GetCamera() const;
 
       signals:
         void clicked();
@@ -42,7 +43,7 @@ namespace gazebo
 
       private: int windowId;
 
-      private: rendering::UserCamera *userCamera;
+      private: rendering::UserCameraPtr userCamera;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
     };

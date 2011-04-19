@@ -193,7 +193,6 @@ void RenderEngine::UpdateScenes()
 // Initialize ogre
 void RenderEngine::Init()
 {
-  std::cout << "RenderEngine Init\n";
   Ogre::ColourValue ambient;
 
   /// Create a dummy rendering context.
@@ -201,7 +200,6 @@ void RenderEngine::Init()
   /// initialize properly
   if (this->headless)
   {
-    std::cout << "Creating a dummy display\n";
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay) 
       gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
@@ -266,7 +264,6 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 // Load plugins
 void RenderEngine::LoadPlugins()
 {
-  std::cout << "RenderEngine::LoadPlugins\n";
   std::list<std::string>::iterator iter;
   std::list<std::string> ogrePaths = common::GazeboConfig::Instance()->GetOgrePaths();
  
@@ -314,7 +311,6 @@ void RenderEngine::LoadPlugins()
 // Setup resources
 void RenderEngine::SetupResources()
 {
-  std::cout << "RenderEngine::SetupResources\n";
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::iterator iter;
@@ -372,7 +368,6 @@ void RenderEngine::SetupResources()
 // Setup render system
 void RenderEngine::SetupRenderSystem()
 {
-  std::cout << "RenderEngine::SetupRenderSystem\n";
   Ogre::RenderSystem *renderSys;
   const Ogre::RenderSystemList *rsList;
 

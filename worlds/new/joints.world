@@ -30,7 +30,6 @@
       <contactSurfaceLayer>0.0</contactSurfaceLayer>
     </physics>
 
-
     <!-- Ground Plane -->
     <model name="plane1_model">
       <static>true</static>
@@ -71,48 +70,33 @@
           <cast_shadows>true</cast_shadows>
         </visual>
       </link>
-    </model>
 
-    <model name="sphere_model">
-      <static>false</static>
-      <origin xyz="0 2 1.5"/>
-      <link name="body">
+      <link name="body2">
+        <origin xyz="0 0 2" rpy="0 0 0"/>
         <collision name="geom">
           <geometry>
-            <sphere radius=".5"/>
+            <box size=".5 0.5 .5"/>
           </geometry>
           <mass>1.0</mass>
         </collision>
 
         <visual>
           <geometry>
-            <sphere radius=".5"/>
+            <box size=".5 .5 .5"/>
           </geometry>
           <material name="Gazebo/Grey"/>
           <cast_shadows>true</cast_shadows>
         </visual>
       </link>
-    </model>
 
-    <model name="cylinder_model">
-      <static>false</static>
-      <origin xyz="0 -2 1.5"/>
-      <link name="body">
-        <collision name="geom">
-          <geometry>
-            <cylinder radius=".5" length="1.0"/>
-          </geometry>
-          <mass>1.0</mass>
-        </collision>
-
-        <visual>
-          <geometry>
-            <cylinder radius=".5" length="1.0"/>
-          </geometry>
-          <material name="Gazebo/Grey"/>
-          <cast_shadows>true</cast_shadows>
-        </visual>
-      </link>
+      <joint type="hinge" name="hinge_joint">
+        <child link="body2"/>
+        <parent link="body"/>
+        <anchorOffset>0 0 0.0</anchorOffset>
+        <axis>0 1 0</axis>
+        <erp>0.8</erp>
+        <cfm>10e-5</cfm>
+      </joint>
     </model>
 
   </world>

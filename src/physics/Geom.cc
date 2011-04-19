@@ -26,6 +26,8 @@
 #include "common/Console.hh"
 #include "common/XMLConfig.hh"
 
+#include "transport/Publisher.hh"
+
 #include "physics/Contact.hh"
 #include "physics/Shape.hh"
 #include "physics/SurfaceParams.hh"

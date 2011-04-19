@@ -36,7 +36,7 @@ add_executable(gzserver physics_server.cc PhysicsServer.cc)
 add_executable(gzclient gui_client.cc GuiClient.cc)
 add_executable(gzmaster master.cc Master.cc)
 add_executable(gzsensor sensor_server.cc SensorServer.cc)
-add_executable(gzcombined combined.cc Combined.cc)
+add_executable(gzcombined combined.cc Combined.cc Master.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport

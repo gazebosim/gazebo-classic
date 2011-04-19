@@ -25,6 +25,7 @@
 #include "common/Messages.hh"
 #include "common/SingletonT.hh"
 
+#include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
 #include "transport/SubscriptionTransport.hh"
 #include "transport/PublicationTransport.hh"

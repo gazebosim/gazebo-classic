@@ -36,6 +36,8 @@
 #include "physics/Geom.hh"
 #include "physics/Body.hh"
 
+#include "transport/Publisher.hh"
+
 using namespace gazebo;
 using namespace physics;
 

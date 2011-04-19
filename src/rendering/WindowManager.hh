@@ -18,6 +18,8 @@
 #define WINDOWMANAGER_HH
 
 #include "common/SingletonT.hh"
+#include "rendering/RenderTypes.hh"
+
 #include <string>
 #include <vector>
 
@@ -30,8 +32,6 @@ namespace gazebo
 {
 	namespace rendering
   {
-    class Camera;
-  
     class WindowManager : public SingletonT<WindowManager>
     {
       public: WindowManager();
@@ -45,7 +45,7 @@ namespace gazebo
                   const std::string &attr, void *data);
   
       /// \brief Attach a camera to a window
-      public: void SetCamera( int windowId, Camera *camera);
+      public: void SetCamera( int windowId, CameraPtr camera);
   
       /// \brief Resize a window
       public: void Resize(unsigned int id, int width, int height);

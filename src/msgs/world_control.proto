@@ -1,0 +1,9 @@
+package gazebo.msgs;
+import "header.proto";
+
+message WorldControl
+{
+  required Header header = 1;
+  optional bool pause = 2;
+  optional bool step = 4;
+}

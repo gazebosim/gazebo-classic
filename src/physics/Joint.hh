@@ -26,7 +26,7 @@
 #include "common/Angle.hh"
 #include "common/Vector3.hh"
 #include "common/Global.hh"
-#include "transport/Publisher.hh"
+#include "transport/TransportTypes.hh"
 
 #include "physics/Base.hh"
 

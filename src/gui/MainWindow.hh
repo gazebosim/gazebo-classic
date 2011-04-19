@@ -2,6 +2,7 @@
 #define MAINWINDOW_HH
 
 #include <qmainwindow.h>
+#include "transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -67,6 +68,8 @@ namespace gazebo
 
       private: TimePanel *timePanel;
       private: RenderWidget *glWidget;
+
+      private: transport::PublisherPtr worldControlPub;
     };
   }
 }

@@ -22,7 +22,6 @@
 #define PUBLISHER_HH
 
 #include <google/protobuf/message.h>
-#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
@@ -54,7 +53,6 @@ namespace gazebo
       private: std::string topic;
       private: std::string msgType;
     };
-    typedef boost::shared_ptr<Publisher> PublisherPtr;
   }
 }
 

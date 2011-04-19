@@ -4,12 +4,13 @@
 #include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 
+#include "transport/Transport.hh"
+
 #include "rendering/Rendering.hh"
 
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
-#include "gui/OgreWidget.h"
 #include "gui/MainWindow.hh"
 
 using namespace gazebo;
@@ -41,6 +42,7 @@ MainWindow::MainWindow()
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
 
+  this->worldControlPub = transport::advertise<msgs::WorldControl>("~/world_control");
 
   this->glWidget = new RenderWidget(mainWidget);
   this->glWidget->hide();
@@ -52,6 +54,9 @@ MainWindow::MainWindow()
   mainWidget->setLayout(mainLayout);
 
   this->setCentralWidget(mainWidget);
+  this->setWindowIcon(QIcon(":/images/gazebo.svg"));
+  this->setWindowIconText(tr("Gazebo"));
+  this->setWindowTitle(tr("Gazebo"));
 }
 
 MainWindow::~MainWindow()
@@ -132,17 +137,29 @@ void MainWindow::About()
 
 void MainWindow::Play()
 {
-  gzdbg << "Play\n";
+  msgs::WorldControl msg;
+  common::Message::Init(msg,"world_control");
+  msg.set_pause(false);
+
+  this->worldControlPub->Publish(msg);
 }
 
 void MainWindow::Pause()
 {
-  gzdbg << "Pause\n";
+  msgs::WorldControl msg;
+  common::Message::Init(msg,"world_control");
+  msg.set_pause(true);
+
+  this->worldControlPub->Publish(msg);
 }
 
 void MainWindow::Step()
 {
-  gzdbg << "Step\n";
+  msgs::WorldControl msg;
+  common::Message::Init(msg,"world_control");
+  msg.set_step(true);
+
+  this->worldControlPub->Publish(msg);
 }
 
 void MainWindow::CreateBox()

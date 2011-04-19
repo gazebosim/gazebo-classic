@@ -18,6 +18,9 @@ namespace gazebo
     class Time;
     class Image;
 
+    template <typename T>
+    class ParamT;
+
     typedef std::vector<common::Param*> Param_V;
     typedef std::map<std::string, std::string> StrStr_M;
   }
