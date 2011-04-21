@@ -1,4 +1,5 @@
-#include "SubscriptionTransport.hh"
+#include "transport/ConnectionManager.hh"
+#include "transport/SubscriptionTransport.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -13,6 +14,7 @@ SubscriptionTransport::SubscriptionTransport()
 // Destructor
 SubscriptionTransport::~SubscriptionTransport()
 {
+  ConnectionManager::Instance()->RemoveConnection( this->connection );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,4 +44,11 @@ void SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg)
 void SubscriptionTransport::HandleData(const std::string &newdata)
 {
   this->connection->Write( newdata );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the connection
+const ConnectionPtr &SubscriptionTransport::GetConnection() const
+{
+  return this->connection;
 }

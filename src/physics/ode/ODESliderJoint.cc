@@ -57,15 +57,7 @@ void ODESliderJoint::Load(common::XMLConfigNode *node)
 common::Vector3 ODESliderJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
-
-  // NATY
-  //this->physics->LockMutex();
-
   dJointGetSliderAxis( this->jointId, result );
-
-  // NATY
-  //this->physics->UnlockMutex();
-
   return common::Vector3(result[0], result[1], result[2]);
 }
 
@@ -73,14 +65,7 @@ common::Vector3 ODESliderJoint::GetAxis(int /*index*/) const
 // Get the position of the joint
 common::Angle ODESliderJoint::GetAngle(int index) const
 {
-  // NATY
-  //this->physics->LockMutex();
-  
   common::Angle result = dJointGetSliderPosition( this->jointId );
-
-  // NATY
-  //this->physics->UnlockMutex();
-  
   return result;
 }
 
@@ -88,12 +73,7 @@ common::Angle ODESliderJoint::GetAngle(int index) const
 // Get the rate of change
 double ODESliderJoint::GetVelocity(int /*index*/) const
 {
-  // NATY
-  //this->physics->LockMutex();
   double result = dJointGetSliderPositionRate( this->jointId );
-  // NATY
-  //this->physics->UnlockMutex();
-
   return result;
 }
 
@@ -108,15 +88,11 @@ void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 // Set the axis of motion
 void ODESliderJoint::SetAxis( int /*index*/, const common::Vector3 &axis )
 {
-  // NATY
-  //this->physics->LockMutex();
-  if (this->body1) 
-    this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) 
+    this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
-  // NATY
-  //this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -125,12 +101,8 @@ void ODESliderJoint::SetDamping( int /*index*/, const double damping )
 {
   this->damping_coefficient = damping;
 #ifdef INCLUDE_ODE_JOINT_DAMPING
-  // NATY
-  //this->physics->LockMutex();
   // ode does not yet support slider joint damping
   dJointSetDamping( this->jointId, this->damping_coefficient);
-  // NATY
-  //this->physics->UnlockMutex();
 #else
   // alternaitvely, apply explicit damping
   this->ConnectJointUpdateSignal(boost::bind(&ODESliderJoint::ApplyDamping,this));
@@ -149,38 +121,25 @@ void ODESliderJoint::ApplyDamping()
 // Set the slider force
 void ODESliderJoint::SetForce(int /*index*/, double force)
 {
-  // NATY
-  //this->physics->LockMutex();
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   dJointAddSliderForce(this->jointId, force);
-  // NATY
-  //this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the _parameter
 void ODESliderJoint::SetParam( int parameter, double value )
 {
-  // NATY
-  //this->physics->LockMutex();
   ODEJoint::SetParam(parameter, value);
   dJointSetSliderParam( this->jointId, parameter, value );
-  // NATY
-  // this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the _parameter
 double ODESliderJoint::GetParam( int parameter ) const
 {
-  // NATY
-  //this->physics->LockMutex();
   double result = dJointGetSliderParam( this->jointId, parameter );
-  // NATY
-  //this->physics->UnlockMutex();
-
   return result;
 }
 

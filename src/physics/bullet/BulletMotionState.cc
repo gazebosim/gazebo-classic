@@ -108,8 +108,6 @@ void BulletMotionState::setWorldTransform(const btTransform &worldTrans)
 
   this->worldPose = BulletPhysics::ConvertPose( worldTrans );
 
-  //std::cout << "New Pose[" << this->pose << "]\n";
-
   this->body->SetWorldPose(this->worldPose, false);
   //this->visual->SetDirty(true, this->worldPose - this->body->GetWorldPose());
 }

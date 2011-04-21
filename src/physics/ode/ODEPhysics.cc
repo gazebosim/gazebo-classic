@@ -584,7 +584,6 @@ void ODEPhysics::SetGravity(const gazebo::common::Vector3 &gravity)
 // Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
-
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 
@@ -611,6 +610,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     {
       return;
     }
+    
 
     // Get pointers to the underlying geoms
     if (dGeomGetClass(o1) == dGeomTransformClass)

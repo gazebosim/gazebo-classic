@@ -134,6 +134,8 @@ Scene::~Scene()
 
   this->cameras.clear();
   this->userCameras.clear();
+
+  this->manager->clearScene();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +342,7 @@ Grid *Scene::GetGrid(unsigned int index) const
 {
   if (index >= this->grids.size())
   {
-    std::cerr << "Scene::GetGrid() Invalid index\n";
+    gzerr << "Scene::GetGrid() Invalid index\n";
     return NULL;
   }
 

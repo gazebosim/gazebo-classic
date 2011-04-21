@@ -82,14 +82,12 @@ void TrimeshShape::Init()
     common::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
     meshManager->SetMeshCenter(this->mesh,center);
-    //std::cout << " aabb center " << std::endl;
   }
   else if (this->centerMeshP->GetValue() == std::string("aabb_bottom"))
   {
     common::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
     meshManager->SetMeshCenter(this->mesh,common::Vector3(center.x,center.y,min_xyz.z));
-    //std::cout << " aabb bottom " << std::endl;
   }
 
   if (this->genTexCoordP->GetValue())

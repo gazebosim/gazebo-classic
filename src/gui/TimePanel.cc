@@ -104,7 +104,7 @@ void TimePanel::Update()
   this->simTimeEdit->setText( tr(sim.str().c_str()));
   this->realTimeEdit->setText( tr(real.str().c_str()) );
 
-  pause << std::setprecision(2) << pauseTime.Double();
+  pause << std::fixed << std::setprecision(2) << pauseTime.Double();
   this->pauseTimeEdit->setText( tr(pause.str().c_str()) );
 }
 

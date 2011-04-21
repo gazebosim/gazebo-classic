@@ -191,7 +191,7 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
     // if this is the canonical body of a model, then
     // we want to SetWorldPose of the parent model
     // by doing some backwards transform
-    if (this->parent->HasType(MODEL) && 
+    /*if (this->parent->HasType(MODEL) && 
         boost::shared_static_cast<Model>(this->parent)->GetBody("canonical")->GetId() == this->GetId())
     {
       // abs pose of the model + relative pose of cb = abs pose of cb 
@@ -215,6 +215,7 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
       // should not change
     }
     else
+    */
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose

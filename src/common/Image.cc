@@ -94,7 +94,6 @@ int Image::Load(const std::string &filename)
       std::string path(*piter);
       DIR *dir=opendir(path.c_str()); 
 
-      //std::cout << "searching path[" << path << "]\n";
       // if directory exist
       if (dir != NULL)
       {
@@ -249,7 +248,7 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
 
     if (FreeImage_GetPixelColor( this->bitmap, x, y, &firgb ) == FALSE)
     {
-      std::cerr << "Image: Coordinates out of range[" 
+      gzerr << "Image: Coordinates out of range[" 
                 << x << " " << y << "] \n";
       return clr;
     }
@@ -273,7 +272,7 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
     BYTE byteValue;
     if (FreeImage_GetPixelIndex(this->bitmap, x, y, &byteValue) == FALSE)
     {
-      std::cerr << "Image: Coordinates out of range   [" 
+      gzerr << "Image: Coordinates out of range   [" 
         << x << " " << y << "] \n";
       return clr;
     }

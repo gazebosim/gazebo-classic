@@ -58,8 +58,8 @@ common::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEUniversalJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 {
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   dJointSetUniversalAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
 }
@@ -83,8 +83,8 @@ common::Vector3 ODEUniversalJoint::GetAxis(int index ) const
 void ODEUniversalJoint::SetAxis( int index, const common::Vector3 &axis )
 {
 
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
 
   if (index == 0)
     dJointSetUniversalAxis1( this->jointId, axis.x, axis.y, axis.z );
@@ -145,8 +145,8 @@ void ODEUniversalJoint::SetVelocity(int index,double angle)
 // Set the torque of this joint
 void ODEUniversalJoint::SetForce(int index, double torque)
 {
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) this->childBody->SetEnabled(true);
+  if (this->parentBody) this->parentBody->SetEnabled(true);
   if (index == 0)
     dJointAddUniversalTorques( this->jointId, torque, 0);
   else

@@ -52,7 +52,7 @@ void Logger::AddLog(const std::string &entity, const std::string &filename)
     this->logObjects.push_back(newLog);
   else
   {
-    std::cerr << "Unable to create log\n";
+    gzerr << "Unable to create log\n";
     delete newLog;
   }
 }

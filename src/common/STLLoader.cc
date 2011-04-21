@@ -18,6 +18,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "common/Console.hh"
 #include "common/Mesh.hh"
 #include "common/STLLoader.hh"
 
@@ -112,7 +113,7 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
       normal.z = r3;
 
       if (fgets ( input, LINE_MAX_LEN, filein ) == NULL)
-        std::cerr << "Error..\n";
+        gzerr << "Error..\n";
 
       ivert = 0;
 
@@ -120,7 +121,7 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
       {
         Vector3 vertex;
         if (fgets ( input, LINE_MAX_LEN, filein ) == NULL)
-          std::cerr << "Error...\n";
+          gzerr << "Error...\n";
 
         count = sscanf ( input, "%*s %e %e %e", &r1, &r2, &r3 );
 

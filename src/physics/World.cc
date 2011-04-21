@@ -550,7 +550,10 @@ gazebo::common::Time World::GetStartTime() const
 /// Get the real time (elapsed time)
 common::Time World::GetRealTime() const
 {
-  return common::Time::GetWallTime() - this->startTime;
+  if (this->pause)
+    return (this->pauseStartTime - this->startTime) - this->realTimeOffset;
+  else
+    return (common::Time::GetWallTime() - this->startTime) - this->realTimeOffset;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -564,19 +567,20 @@ bool World::IsPaused() const
 /// Set whether the simulation is paused
 void World::SetPaused(bool p)
 {
-  gzdbg << "A\n";
   if (this->pause == p)
     return;
 
-  gzdbg << "Pause[" << p << "]\n";
+  if (p)
+    this->pauseStartTime = common::Time::GetWallTime();
+  else
+    this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
+
   event::Events::pauseSignal(p);
   this->pause = p;
 }
 
 void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 {
-  gzdbg << "On Control\n";
-
   if (data->has_pause())
     this->SetPaused( data->pause() );
 

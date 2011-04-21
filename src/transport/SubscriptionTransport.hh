@@ -29,6 +29,9 @@ namespace gazebo
       /// \brief Output a message to a connection
       public: virtual void HandleData(const std::string &newdata);
 
+      /// \brief Get the connection
+      public: const ConnectionPtr &GetConnection() const;
+
       private: ConnectionPtr connection;
     };
     typedef boost::shared_ptr<SubscriptionTransport> SubscriptionTransportPtr;

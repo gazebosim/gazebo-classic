@@ -46,12 +46,7 @@ ODEBallJoint::~ODEBallJoint()
 common::Vector3 ODEBallJoint::GetAnchor(int index) const
 {
   dVector3 result;
-  // NATY
-  // this->physics->LockMutex();
   dJointGetBallAnchor( jointId, result );
-  // NATY
-  // this->physics->UnlockMutex();
-
   return common::Vector3(result[0], result[1], result[2]);
 }
 
@@ -60,11 +55,7 @@ common::Vector3 ODEBallJoint::GetAnchor(int index) const
 // Set the joints anchor point
 void ODEBallJoint::SetAnchor(int index, const common::Vector3 &anchor)
 {
-  // NATY
-  // this->physics->LockMutex();
   dJointSetBallAnchor( jointId, anchor.x, anchor.y, anchor.z );
-  // NATY 
-  // this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -72,12 +63,7 @@ void ODEBallJoint::SetAnchor(int index, const common::Vector3 &anchor)
 void ODEBallJoint::SetDamping( int /*index*/, const double damping )
 {
 #ifdef INCLUDE_ODE_JOINT_DAMPING
-  // NATY
-  // this->physics->LockMutex();
-  // ode does not yet support ball joint damping
   dJointSetDamping( this->jointId, damping);
-  // NATY
-  // this->physics->UnlockMutex();
 #else
   // alternaitvely, apply explicit damping
   gzerr << "joint damping not implemented in ODE ball joint\n";

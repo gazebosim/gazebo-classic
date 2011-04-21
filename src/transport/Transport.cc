@@ -66,3 +66,8 @@ void transport::set_topic_namespace(const std::string &space)
 {
   transport::TopicManager::Instance()->SetTopicNamespace( space );
 }
+
+void transport::fini()
+{
+  transport::TopicManager::Instance()->Fini();
+}

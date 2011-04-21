@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "common/Exception.hh"
+#include "common/Console.hh"
 #include "common/XMLConfig.hh"
 #include "common/Messages.hh"
 
@@ -59,7 +60,7 @@ void Message::Init(google::protobuf::Message &message, const std::string &id)
     Message::Stamp(header->mutable_stamp());
   }
   else
-    std::cout << "Header is non-existant\n";
+    gzerr << "Header is non-existant\n";
 }
 
 void Message::Stamp(msgs::Header *hdr)
@@ -392,7 +393,7 @@ msgs::Fog Message::FogFromXML(XMLConfigNode *node)
   else if (type == "exp2")
     result.set_type(msgs::Fog::EXPONENTIAL2);
   else
-    std::cerr << "Unknown fog type[" << type << "]\n";
+    gzerr << "Unknown fog type[" << type << "]\n";
 
   result.mutable_color()->CopyFrom( 
       Message::Convert(node->GetColor("color",Color(1,1,1,1))) );

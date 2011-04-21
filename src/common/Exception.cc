@@ -20,6 +20,7 @@
  * Date: 07 May 2007
  */
 
+#include "common/Console.hh"
 #include "common/Exception.hh"
 
 using namespace gazebo;
@@ -34,14 +35,14 @@ Exception::Exception(const char *file, int line, std::string msg)
   this->file = file;
   this->line = line;
   this->str = msg;
-  std::cerr << *this << "\n";
+  gzerr << *this << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Exception::~Exception()
 {
-  std::cerr << *this << "\n";
+  gzerr << *this << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

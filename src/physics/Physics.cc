@@ -54,3 +54,8 @@ void physics::pause_world(WorldPtr world, bool pause)
 {
   world->SetPaused(pause);
 }
+
+void physics::stop_world(WorldPtr world)
+{
+  world->Stop();
+}

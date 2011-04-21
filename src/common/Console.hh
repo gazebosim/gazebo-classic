@@ -26,9 +26,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
 
-#include "common/Param.hh"
+#include "common/CommonTypes.hh"
 
 namespace gazebo
 {

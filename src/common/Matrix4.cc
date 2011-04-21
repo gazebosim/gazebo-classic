@@ -161,7 +161,6 @@ Vector3 Matrix4::TransformAffine( const Vector3 &v ) const
 {
   if (!this->IsAffine())
   {
-    std::cout << "****\n" << *this << "***\n";
     gzthrow("Not and affine matrix");
   }
 

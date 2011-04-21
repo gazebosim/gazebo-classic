@@ -25,7 +25,6 @@
 using namespace gazebo;
 
 GuiClient::GuiClient()
-  : renderEngineEnabled(true), guiEnabled(true)
 {
   this->quit = false;
 
@@ -68,5 +67,6 @@ void GuiClient::Run()
 void GuiClient::Quit()
 {
   gui::quit();
+  transport::fini();
 }
 

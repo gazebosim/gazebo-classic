@@ -112,10 +112,11 @@ Visual::~Visual()
 
   if (this->sceneNode != NULL)
   {
-    this->sceneNode->removeAndDestroyAllChildren();
+    this->sceneNode->removeAllChildren();
     this->sceneNode->detachAllObjects();
 
-    this->sceneNode->getParentSceneNode()->removeAndDestroyChild( this->sceneNode->getName() );
+    if (this->sceneNode->getParentSceneNode())
+      this->sceneNode->getParentSceneNode()->removeAndDestroyChild( this->sceneNode->getName() );
     this->sceneNode = NULL;
   }
 }
@@ -262,7 +263,7 @@ void Visual::Load(common::XMLConfigNode *node)
   }
   catch (Ogre::Exception e)
   {
-    std::cerr << "Ogre Error:" << e.getFullDescription() << "\n";
+    gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
     gzthrow("Unable to create a mesh from " + this->meshNameP->GetValue());
   }
 
@@ -384,9 +385,7 @@ Ogre::MovableObject *Visual::GetAttached(unsigned short num)
 // Attach a static object
 void Visual::MakeStatic()
 {
-  /*std::cout << "\n\n MAKE STATIC GEOMETRY \n\n";
-
-  if (!this->staticGeom)
+  /*if (!this->staticGeom)
     this->staticGeom = this->sceneNode->getCreator()->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
   // Add the scene node to the static geometry
@@ -427,7 +426,6 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const common::Vector3 &scale )
 {
-  gzdbg << "Set Scale[" << this->GetName() << "] S[" << scale << "]\n";
   this->scaleP->SetValue(scale);
   this->sceneNode->setScale(Conversions::Vector3(scale));
 }
@@ -696,7 +694,6 @@ void Visual::SetRotation( const common::Quatern &rot)
 // Set the pose of the visual
 void Visual::SetPose( const common::Pose3d &pose)
 {
-  std::cout << "Visual Set Pose[" << pose << "]\n";
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }
@@ -969,7 +966,7 @@ void Visual::InsertMesh( const common::Mesh *mesh)
 
   if (mesh->GetSubMeshCount() == 0)
   {
-    std::cerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
+    gzerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
     return;
   }
 

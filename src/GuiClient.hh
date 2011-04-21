@@ -33,8 +33,6 @@ namespace gazebo
 
     public: void Quit();
 
-    private: bool renderEngineEnabled, guiEnabled;
-
     private: bool quit;
   };
 }

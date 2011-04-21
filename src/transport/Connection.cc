@@ -36,6 +36,8 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
+  this->Cancel();
+  this->Close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +171,13 @@ void Connection::OnWrite(const boost::system::error_code &e)
     throw boost::system::system_error(e);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Close a connection
+void Connection::Close()
+{
+  if (this->socket.is_open())
+    this->socket.close();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Cancel all async operations on an open socket
@@ -182,6 +191,7 @@ void Connection::Cancel()
 // Read data from the socket
 void Connection::Read(std::string &data)
 {
+
   char header[HEADER_LENGTH];
   std::vector<char> incoming;
 

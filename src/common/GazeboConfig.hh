@@ -24,67 +24,69 @@
 
 #include <string>
 #include <list>
+#include <stdio.h>
 
 #include "common/SingletonT.hh"
+
+#define LINUX
+#ifdef WINDOWS
+ #include <direct.h>
+ #define GetCurrentDir _getcwd
+#else
+ #include <unistd.h>
+ #define GetCurrentDir getcwd
+#endif
 
 namespace gazebo
 {
 	namespace common
-{
-
-/// \addtogroup gazebo_server
-/// \brief Local configuration on this computer about how gazebo server should work 
-/// \{
-
-  class GazeboConfig : public SingletonT<GazeboConfig>
   {
-    /// \brief Constructor
-    private: GazeboConfig();
-
-    /// \brief destructor
-    private: ~GazeboConfig();
-
-    /// \brief True if the string is null
-    public: void Load();
-
-    /// \brief Get paths to Gazebo install 
-    public: std::list<std::string>& GetGazeboPaths();
-
-    /// \brief Get paths to ogre install
-    public: std::list<std::string>& GetOgrePaths();
- 
-    /// \brief Get plugin paths
-    public: std::list<std::string>& GetPluginPaths();
- 
-    /// \brief Add colon delimited paths to Gazebo install 
-    public: void AddGazeboPaths(std::string path);
-
-    /// \brief Add colon delimited paths to ogre install
-    public: void AddOgrePaths(std::string path);
- 
-    /// \brief Add colon delimited paths to plugins
-    public: void AddPluginPaths(std::string path);
-
-    public: void ClearGazeboPaths();
-    public: void ClearOgrePaths();
-    public: void ClearPluginPaths();
-
-    /// Paths gazebo install
-    private: std::list<std::string> gazeboPaths;
-    
-    /// Paths to the ogre install
-    private: std::list<std::string> ogrePaths;
-
-    /// Paths to the plugins
-    private: std::list<std::string> pluginPaths;
-
-    //Singleton implementation
-    private: friend class SingletonT<GazeboConfig>;
-  };
-
-
-/// \}
-}
+    class GazeboConfig : public SingletonT<GazeboConfig>
+    {
+      /// \brief Constructor
+      private: GazeboConfig();
+  
+      /// \brief destructor
+      private: ~GazeboConfig();
+  
+      /// \brief True if the string is null
+      public: void Load();
+  
+      /// \brief Get paths to Gazebo install 
+      public: std::list<std::string>& GetGazeboPaths();
+  
+      /// \brief Get paths to ogre install
+      public: std::list<std::string>& GetOgrePaths();
+   
+      /// \brief Get plugin paths
+      public: std::list<std::string>& GetPluginPaths();
+   
+      /// \brief Add colon delimited paths to Gazebo install 
+      public: void AddGazeboPaths(std::string path);
+  
+      /// \brief Add colon delimited paths to ogre install
+      public: void AddOgrePaths(std::string path);
+   
+      /// \brief Add colon delimited paths to plugins
+      public: void AddPluginPaths(std::string path);
+  
+      public: void ClearGazeboPaths();
+      public: void ClearOgrePaths();
+      public: void ClearPluginPaths();
+  
+      /// Paths gazebo install
+      private: std::list<std::string> gazeboPaths;
+      
+      /// Paths to the ogre install
+      private: std::list<std::string> ogrePaths;
+  
+      /// Paths to the plugins
+      private: std::list<std::string> pluginPaths;
+  
+      //Singleton implementation
+      private: friend class SingletonT<GazeboConfig>;
+    };
+  }
 
 }
 #endif

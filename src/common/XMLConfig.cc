@@ -17,7 +17,6 @@
 /* Desc: XML file parser
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
  */
 
 #include <float.h>
@@ -34,6 +33,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "common/GazeboConfig.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Global.hh"
@@ -81,9 +81,72 @@ void XMLConfig::Load( const std::string &filename )
   // Enable line numbering
   xmlLineNumbersDefault( 1 );
 
-  // Load the file
-  this->xmlDoc = xmlParseFile( this->filename.c_str() );
-  this->FillDocumentNodes();
+  std::string output;
+  this->PreParser(this->filename, output);
+
+  this->LoadString(output);
+}
+
+std::string XMLConfig::GetFilename(const std::string &fname)
+{
+  std::ifstream test;
+
+  test.open(fname.c_str());
+  if (test.is_open())
+  {
+    test.close();
+    return fname;
+  }
+
+  char cPath[FILENAME_MAX];
+  if (!GetCurrentDir(cPath, sizeof(cPath)))
+    gzerr << "Unable to get the current path\n";
+
+  test.open((std::string(cPath) + fname).c_str());
+  if (test.is_open())
+  {
+    test.close();
+    return std::string(cPath) + fname;
+  }
+
+  std::list<std::string> paths = GazeboConfig::Instance()->GetGazeboPaths();
+  for (std::list<std::string>::const_iterator iter = paths.begin(); iter != paths.end(); iter++)
+  {
+    test.open((*iter + fname).c_str());
+    if (test.is_open())
+    {
+      test.close();
+      return *iter + fname;
+    }
+  }
+
+  gzerr << "Unable to find a good path for [" << fname << "]\n";
+  return std::string();
+}
+
+void XMLConfig::PreParser(const std::string &fname, std::string &output)
+{
+  std::ifstream ifs(this->GetFilename(fname).c_str(), std::ios::in);
+  std::string line;
+
+  while (ifs.good())
+  {
+    std::getline(ifs, line);
+    boost::trim(line);
+
+    if (boost::find_first(line,"<include"))
+    {
+      int start = line.find("filename=");
+      start += strlen("filename=") + 1;
+      int end = line.find_first_of("'\"", start);
+      std::string fname2 = line.substr(start, end-start);
+      this->PreParser(fname2, output);
+    }
+    else
+      output += line + "\n";
+  }
+
+  ifs.close();
 }
 
 void XMLConfig::LoadString( const std::string &str )
@@ -138,13 +201,6 @@ void XMLConfig::FillDocumentNodes()
     gzthrow("Unable to create new XPath context");
   }
 
-  // Apply the XInclude process.
-  if (xmlXIncludeProcess(this->xmlDoc) < 0)
-  {
-    //this will fail if the included file is not found, too strict?
-    gzthrow("XInclude process failed\n");
-  }
-
   // Create wrappers for all the nodes (recursive)
   this->root = this->CreateNodes( NULL, xmlDocGetRootElement(this->xmlDoc) );
   if (this->root == NULL)
@@ -173,58 +229,7 @@ XMLConfigNode *XMLConfig::CreateNodes( XMLConfigNode *parent,
     for ( xmlNode = xmlNode->xmlChildrenNode; xmlNode != NULL;
           xmlNode = xmlNode->next)
     {
-
-      // If the node is xi:include, then only process the children of
-      // the included XML files' root node
-      if (!xmlNode->ns &&
-          !strcmp((const char*)(xmlNode->name),"include"))
-      {
-        xmlNodePtr xmlNode2 = NULL;
-        xmlChar *value = NULL;
-
-        // Check to see if this model is meant to be embedded.
-        // When embedded == true, then the root node of the included XML
-        // file should be skipped.
-        if (xmlHasProp( xmlNode, (xmlChar*)"embedded" ))
-        {
-          value = xmlGetProp( xmlNode, (xmlChar*)"embedded"  );
-        }
-
-        if (value && !strcmp((const char*)value,"true"))
-        {
-          // Get point to the first node of the included file
-          xmlNode2 = xmlNode->xmlChildrenNode->next;
-
-          // Skip over garbage
-          while (xmlNodeIsText( xmlNode2 ) ||
-                 !strcmp((const char*)xmlNode2->name,"comment") ||
-                 !strcmp((const char*)xmlNode2->name,"include"))
-            xmlNode2 = xmlNode2->next;
-
-          // Get pointer to the first child of the included file
-          xmlNode2 = xmlNode2->xmlChildrenNode;
-          xmlFree(value);
-        }
-        else if (value)
-        {
-          // Get pointer to the first node in the included file.
-          xmlNode2 = xmlNode->xmlChildrenNode->next;
-          xmlFree(value);
-        }
-
-        // Process all children of the included file's root node
-        for (; xmlNode2 != NULL; xmlNode2 = xmlNode2->next)
-        {
-          this->CreateNodes(self, xmlNode2);
-        }
-
-        // Now skip of the root node that was just processed
-        xmlNode = xmlNode->next;
-      }
-      else
-      {
-        this->CreateNodes( self, xmlNode );
-      }
+      this->CreateNodes( self, xmlNode );
     }
   }
 

@@ -19,6 +19,8 @@ namespace gazebo
       public: void Init(const ConnectionPtr &conn);
       public: void AddCallback(const boost::function<void(const std::string &)> &cb);
 
+      public: const ConnectionPtr GetConnection() const;
+
       private: void OnPublish(const std::string &data);
 
       private: std::string topic;

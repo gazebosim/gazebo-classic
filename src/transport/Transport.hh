@@ -45,6 +45,9 @@ namespace gazebo
     /// \brief Set the global topic namespace
     void set_topic_namespace(const std::string &space);
 
+    /// \brief Finialize all the transport stuff
+    void fini();
+
     /// \brief Adverise a topic
     template<typename M>
     transport::PublisherPtr advertise(const std::string &topic)

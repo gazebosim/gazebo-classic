@@ -46,7 +46,6 @@ Sensor::Sensor()
 // Destructor
 Sensor::~Sensor()
 {
-  std::cout << "DELETE SENSOR!!\n";
   delete this->nameP;
   delete this->updateRateP;
   delete this->alwaysActiveP;

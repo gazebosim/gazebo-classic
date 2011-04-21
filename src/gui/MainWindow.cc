@@ -65,8 +65,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::Load( const std::string &filename )
 {
-  gzdbg << "Main Window Load\n";
-
   // Load the world file
   common::XMLConfig *xmlFile = new common::XMLConfig();
 
@@ -111,7 +109,8 @@ void MainWindow::Init()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-  gzdbg << "Close Event\n";
+  delete this->glWidget;
+  delete this->timePanel;
 }
 
 void MainWindow::New()

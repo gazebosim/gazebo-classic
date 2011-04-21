@@ -81,7 +81,6 @@ void GazeboConfig::Load()
       node = rc.GetRootNode()->GetChild("gazeboPath");
       while (node)
       {
-        gzmsg << "Gazebo Path[" << node->GetValue() << "]\n";
         this->gazeboPaths.push_back(node->GetValue());
         this->AddPluginPaths(node->GetValue()+"/plugins");
         node = node->GetNext("gazeboPath");
@@ -94,7 +93,6 @@ void GazeboConfig::Load()
       node = rc.GetRootNode()->GetChild("ogrePath");
       while (node)
       {
-        gzmsg << "Ogre Path[" << node->GetValue() << "]\n";
         this->ogrePaths.push_back( node->GetValue() );
         node = node->GetNext("ogrePath");
       }

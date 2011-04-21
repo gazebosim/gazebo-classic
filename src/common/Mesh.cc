@@ -16,6 +16,7 @@
 */
 #include <algorithm>
 #include <float.h>
+#include <string.h>
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -638,14 +639,12 @@ void Mesh::GetAABB(Vector3 &center,Vector3 &min_xyz,Vector3 &max_xyz)
   center.x = 0.5*(min_xyz.x+max_xyz.x);
   center.y = 0.5*(min_xyz.y+max_xyz.y);
   center.z = 0.5*(min_xyz.z+max_xyz.z);
-  //std::cout << "Mesh get aabb " << center << min_xyz << max_xyz << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set mesh center
 void Mesh::SetMeshCenter(Vector3 center)
 {
-  //std::cout << "Mesh set mesh center " << center << std::endl;
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
     (*siter)->SetSubMeshCenter(center);
@@ -693,7 +692,7 @@ void SubMesh::GenSphericalTexCoord(Vector3 center)
     double t = std::min(1.0,std::max(-1.0,y/r));
     double u = acos(s) / M_PI;
     double v = acos(t) / M_PI;
-    //std::cerr << "uv1 debug: " << u << "," << v << std::endl;
+    //gzerr << "uv1 debug: " << u << "," << v << std::endl;
     this->AddTexCoord(u,v);
   }
 }

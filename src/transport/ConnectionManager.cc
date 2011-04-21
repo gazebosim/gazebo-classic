@@ -36,6 +36,9 @@ ConnectionManager::ConnectionManager()
 // Destructor
 ConnectionManager::~ConnectionManager()
 {
+  this->connections.clear();
+  this->masterConn.reset();
+  this->serverConn.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +80,12 @@ void ConnectionManager::Init(const std::string &master_host,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Finalize
+void ConnectionManager::Fini()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // On read master
 void ConnectionManager::OnMasterRead( const std::string &data)
 {
@@ -103,17 +112,28 @@ void ConnectionManager::OnMasterRead( const std::string &data)
       // Create a transport link that will read from the connection, and 
       // send data to a Publication.
       PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
-            pub.msg_type()));
+                                      pub.msg_type()));
       publink->Init( conn );
 
       // Connect local subscribers to the publication transport link
       TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
     }
-    else
-    {
-      gzerr << "We are the publisher, so bug off\n";
-    }
+  }
+  else if (packet.type() == "unsubscribe")
+  {
+    msgs::Subscribe sub;
+    sub.ParseFromString( packet.serialized_data() );
 
+    // Disconnect a local publisher from a remote subscriber
+    TopicManager::Instance()->DisconnectPubFromSub(sub.topic(), sub.host(), sub.port());
+  }
+  else if (packet.type() == "unadvertise")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString( packet.serialized_data() );
+
+    // Disconnection all local subscribers from a remote publisher
+    TopicManager::Instance()->DisconnectSubFromPub(pub.topic(), pub.host(), pub.port());
   }
   else
     gzerr << "ConnectionManager::OnMasterRead unknown type[" << packet.type() << "]\n";
@@ -140,7 +160,6 @@ void ConnectionManager::OnRead(const ConnectionPtr &connection, const std::strin
   // If we have an incoming (remote) subscription
   if (packet.type() == "sub")
   {
-
     msgs::Subscribe sub;
     sub.ParseFromString( packet.serialized_data() );
 
@@ -174,6 +193,18 @@ void ConnectionManager::Advertise(const std::string &topic,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void ConnectionManager::Unadvertise( const std::string &topic )
+{
+  msgs::Publish msg;
+  msg.set_topic( topic );
+  msg.set_msg_type( "" );
+  msg.set_host( this->serverConn->GetLocalAddress() );
+  msg.set_port( this->serverConn->GetLocalPort() );
+
+  this->masterConn->Write(common::Message::Package("unadvertise", msg));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Get all the publishers the master knows about
 void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 {
@@ -202,6 +233,12 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 
   this->masterConn->StartRead( 
       boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
+}
+
+void ConnectionManager::Unsubscribe( const msgs::Subscribe &msg )
+{
+  // Inform the master that we want to unsubscribe from a topic.
+  this->masterConn->Write(common::Message::Package("unsubscribe", msg));
 }
 
 void ConnectionManager::Subscribe(const std::string &topic, 
@@ -249,6 +286,22 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost( const std::string &host,
 
   return conn;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Remove a connection
+void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
+{
+  std::list<ConnectionPtr>::iterator iter;
+
+  iter = this->connections.begin(); 
+  while (iter != this->connections.end())
+  {
+    if ( (*iter) == conn )
+      this->connections.erase( iter++);
+    else
+      iter++;
+  }
+} 
 
 
 ////////////////////////////////////////////////////////////////////////////////

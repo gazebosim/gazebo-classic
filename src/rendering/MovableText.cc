@@ -680,8 +680,6 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
     // parent node position
     Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() + Ogre::Vector3::UNIT_Y * this->baseline;
 
-//    std::cout << "Parent Pos[" << ppos << "]\n";
-
     // apply scale
     scale3x3[0][0] = mParentNode->_getDerivedScale().x / 2;
     scale3x3[1][1] = mParentNode->_getDerivedScale().y / 2;

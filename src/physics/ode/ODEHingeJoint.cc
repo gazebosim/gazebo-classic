@@ -37,6 +37,7 @@ using namespace physics;
 ODEHingeJoint::ODEHingeJoint( dWorldID worldId )
     : HingeJoint<ODEJoint>()
 {
+  gzdbg << "ODE HInge Joint Constructor\n";
   this->jointId = dJointCreateHinge(worldId, NULL);
 }
 
@@ -71,8 +72,10 @@ common::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEHingeJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 {
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) 
+    this->childBody->SetEnabled(true);
+  if (this->parentBody) 
+    this->parentBody->SetEnabled(true);
 
   dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
 }
@@ -93,8 +96,10 @@ common::Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 // Set the axis of rotation
 void ODEHingeJoint::SetAxis( int /*index*/, const common::Vector3 &axis )
 {
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) 
+    this->childBody->SetEnabled(true);
+  if (this->parentBody) 
+    this->parentBody->SetEnabled(true);
 
   dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
 }
@@ -163,8 +168,10 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 // Set the torque of this joint
 void ODEHingeJoint::SetForce(int /*index*/, double torque)
 {
-  if (this->body1) this->body1->SetEnabled(true);
-  if (this->body2) this->body2->SetEnabled(true);
+  if (this->childBody) 
+    this->childBody->SetEnabled(true);
+  if (this->parentBody) 
+    this->parentBody->SetEnabled(true);
   dJointAddHingeTorque( this->jointId, torque );
 }
 

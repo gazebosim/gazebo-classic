@@ -51,8 +51,8 @@ Joint::Joint()
   this->cfmP = new common::ParamT<double>("cfm",10e-3,0);
   this->stopKpP = new common::ParamT<double>("stop_kp",1000000.0,0);
   this->stopKdP = new common::ParamT<double>("stop_kd",1.0,0);
-  this->body1NameP = new common::ParamT<std::string>("link",std::string(),1);
-  this->body2NameP = new common::ParamT<std::string>("link",std::string(),1);
+  this->parentNameP = new common::ParamT<std::string>("link",std::string(),1);
+  this->childNameP = new common::ParamT<std::string>("link",std::string(),1);
   this->anchorOffsetP = new common::ParamT<common::Vector3>("anchor_offset",common::Vector3(0,0,0), 0);
   this->provideFeedbackP = new common::ParamT<bool>("provide_feedback", false, 0);
   this->fudgeFactorP = new common::ParamT<double>( "fudge_factor", 1.0, 0 );
@@ -94,8 +94,8 @@ Joint::~Joint()
   delete this->cfmP;
   delete this->stopKpP;
   delete this->stopKdP;
-  delete this->body1NameP;
-  delete this->body2NameP;
+  delete this->parentNameP;
+  delete this->childNameP;
   delete this->anchorOffsetP;
   delete this->provideFeedbackP;
   delete this->fudgeFactorP;
@@ -107,8 +107,8 @@ void Joint::Load(common::XMLConfigNode *node)
 {
   Base::Load(node);
 
-  this->body1NameP->Load(node->GetChild("child"));
-  this->body2NameP->Load(node->GetChild("parent"));
+  this->childNameP->Load(node->GetChild("child"));
+  this->parentNameP->Load(node->GetChild("parent"));
   this->anchorOffsetP->Load(node);
   this->erpP->Load(node);
   this->cfmP->Load(node);
@@ -119,38 +119,46 @@ void Joint::Load(common::XMLConfigNode *node)
 
   std::ostringstream visname;
 
+  gzdbg << "Parent[" << **this->parentNameP << "] Child[" << **this->childNameP << "]\n";
+
   if (this->model)
   {
     visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
 
-    this->body1 = this->model->GetBody( **(this->body1NameP) );
-    this->body2 = this->model->GetBody( **(this->body2NameP) );
+    this->childBody = this->model->GetBody( **(this->childNameP) );
+    this->parentBody = this->model->GetBody( **(this->parentNameP) );
   }
   else
   {
     visname << this->GetName() << "_VISUAL";
-    this->body1 = boost::shared_dynamic_cast<Body>(
-        this->GetWorld()->GetByName( **(this->body1NameP) ));
+    this->childBody = boost::shared_dynamic_cast<Body>(
+        this->GetWorld()->GetByName( **(this->childNameP) ));
 
-    this->body2 = boost::shared_dynamic_cast<Body>(
-        this->GetWorld()->GetByName( **(this->body2NameP) ));
+    this->parentBody = boost::shared_dynamic_cast<Body>(
+        this->GetWorld()->GetByName( **(this->parentNameP) ));
   }
 
-  this->anchorBody = this->body1;
+  this->anchorBody = this->parentBody;
 
-  if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
-    gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
+  if (!this->parentBody && **this->parentNameP != std::string("world"))
+    gzthrow("Couldn't Find Parent Body[" + **this->parentNameP );
 
-  if (!this->body2 && this->body2NameP->GetValue() != std::string("world"))
-    gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
+  if (!this->childBody && **this->childNameP != std::string("world"))
+    gzthrow("Couldn't Find Child Body[" + **this->childNameP);
 
   // setting anchor relative to gazebo body frame origin
   this->anchorPos = (common::Pose3d(**(this->anchorOffsetP),common::Quatern()) + this->anchorBody->GetWorldPose()).pos ;
 
-  this->Attach(this->body1, this->body2);
+}
 
+void Joint::Init()
+{
+  this->Attach(this->childBody, this->parentBody);
+
+  //TODO: Instead of Creating a multiple visual message. Send
+  //a JointMessage.
   /// Add a renderable for the joint
-  msgs::Visual msg;
+  /*msgs::Visual msg;
   common::Message::Init(msg, visname.str());
   msg.set_parent_id( this->GetName() );
   msg.set_render_type( msgs::Visual::MESH_RESOURCE );
@@ -176,6 +184,7 @@ void Joint::Load(common::XMLConfigNode *node)
   msg.set_material( "Gazebo/BlueGlow" );
   this->vis_pub->Publish(msg);
   this->line2 = msg.header().str_id();
+  */
 
 
   // Set the anchor vector
@@ -192,8 +201,8 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
   std::string typeName;// =Base::EntityTypename[ (int)this->GetLeafType() ];
 
   stream << prefix << "<joint:" << typeName << " name=\"" << this->GetName() << "\">\n";
-  stream << prefix << "  " << *(this->body1NameP) << "\n";
-  stream << prefix << "  " << *(this->body2NameP) << "\n";
+  stream << prefix << "  " << *(this->childNameP) << "\n";
+  stream << prefix << "  " << *(this->parentNameP) << "\n";
   stream << prefix << "  " << *(this->anchorOffsetP) << "\n";
 
   stream << prefix << "  " << *(this->erpP) << "\n";
@@ -214,7 +223,7 @@ void Joint::Update()
   this->jointUpdateSignal();
 
   //TODO: Evaluate impact of this code on performance
-  if (this->showJoints)
+  /*if (this->showJoints)
   {
     msgs::Visual msg;
     common::Message::Init(msg, this->visual);
@@ -222,7 +231,7 @@ void Joint::Update()
     common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0) );
     this->vis_pub->Publish(msg);
 
-    if (this->body1) 
+    if (this->childBody) 
     {
       common::Message::Init(msg, this->line1);
       msgs::Point *pt;
@@ -233,12 +242,12 @@ void Joint::Update()
       pt->set_z(0);
 
       pt = msg.add_points();
-      common::Message::Set(pt, this->body1->GetWorldPose().pos - this->anchorPos );
+      common::Message::Set(pt, this->childBody->GetWorldPose().pos - this->anchorPos );
 
       this->vis_pub->Publish(msg);
     }
 
-    if (this->body2)
+    if (this->parentBody)
     {
       common::Message::Init(msg, this->line2);
       msgs::Point *pt;
@@ -249,10 +258,10 @@ void Joint::Update()
       pt->set_z(0);
 
       pt = msg.add_points();
-      common::Message::Set(pt, this->body2->GetWorldPose().pos - this->anchorPos);
+      common::Message::Set(pt, this->parentBody->GetWorldPose().pos - this->anchorPos);
       this->vis_pub->Publish(msg);
     }
-  }
+  }*/
 }
 
 
@@ -278,10 +287,10 @@ void Joint::Reset()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void Joint::Attach( BodyPtr one, BodyPtr two )
+void Joint::Attach( BodyPtr parent, BodyPtr child )
 {
-  this->body1 = one;
-  this->body2 = two;
+  this->parentBody = parent;
+  this->childBody = child;
 }
 
 

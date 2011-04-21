@@ -74,7 +74,6 @@ void RTShaderSystem::Init()
     /*for (unsigned int s=0; s < OgreAdaptor::Instance()->GetSceneMgrCount();s++)
     {
       std::string sceneName = OgreAdaptor::Instance()->GetSceneMgr(s)->getName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
-      std::cout << "SceneName[" << sceneName << "]\n";
 
       // Set the scene manager
       this->shaderGenerator->addSceneManager(

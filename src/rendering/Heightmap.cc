@@ -121,12 +121,6 @@ void Heightmap::Load( std::string imageFilename,
 
   tileSize++;
 
-  /*std::cout << "ODE Scale[" << this->odeScale << "]\n";
-  std::cout << "Terrain Image[" << this->imageFilenameP->GetValue() << "] Size[" << this->terrainSize << "]\n";
-  printf("Terrain Size[%f %f %f]\n", this->terrainSize.x, this->terrainSize.y, this->terrainSize.z);
-  printf("VertSize[%d] Tile Size[%d]\n", terrainVertSize, tileSize);
-  */
-
   stream << "WorldTexture=" << worldTexture << "\n";
   //The detail texture
   stream << "DetailTexture=" << detailTexture << "\n";

@@ -64,6 +64,9 @@ namespace gazebo
       /// \brief Stop the read loop 
       public: void StopRead();
 
+      /// \brief Close a connection
+      public: void Close();
+
       /// \brief Cancel all async operations on an open socket
       public: void Cancel();
 
@@ -119,8 +122,8 @@ namespace gazebo
               {
                 if (e)
                 {
-                  std::cerr << "An error occrured reading a header[" 
-                            << e.message() << "]\n";
+                  gzerr << "An error occrured reading a header[" 
+                        << e.message() << "]\n";
                   // Pass the error to the handler
                   //boost::get<0>(handler)(e);
                 }

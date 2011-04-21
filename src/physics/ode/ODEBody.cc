@@ -69,9 +69,13 @@ void ODEBody::Load(common::XMLConfigNode *node)
 // Init the ODE body
 void ODEBody::Init() 
 {
+
   if ( !this->IsStatic() )
   {
     this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
+
+    gzdbg << "ODEBody::Init [" << this->GetCompleteScopedName() << "] Static[" << this->IsStatic() << "] BodyID[" << this->bodyId << "]\n";
+
     dBodySetData(this->bodyId, this);
     dBodySetAutoDisableDefaults(this->bodyId);
     dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
@@ -89,7 +93,6 @@ void ODEBody::Init()
         ODEGeomPtr g = boost::shared_static_cast<ODEGeom>(*iter);
         if (g->IsPlaceable() && g->GetGeomId())
         {
-          gzmsg << "dGeomSetBody. Geom[" << g->GetName() << "]\n";
           dGeomSetBody(g->GetGeomId(), this->bodyId);
         }
       }

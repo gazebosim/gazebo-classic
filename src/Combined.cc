@@ -1,3 +1,6 @@
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "common/Timer.hh"
 #include "common/Exception.hh"
 #include "common/GazeboConfig.hh"
@@ -18,7 +21,6 @@ const std::string default_config =
 "<?xml version='1.0'?>\
 <gazebo>\
   <config>\
-    <verbosity>4</verbosity>\
     <gui>\
       <size>800 600</size>\
       <pos>0 0</pos>\
@@ -66,15 +68,6 @@ const std::string default_config =
 
 Combined::Combined()
 {
-  std::string host = "";
-  unsigned short port = 0;
-
-  gazebo::transport::get_master_uri(host,port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->masterThread = new boost::thread( boost::bind(&Master::Run, this->master) );
-
   this->quit = false;
 
   // load the configuration options 
@@ -86,6 +79,23 @@ Combined::Combined()
   {
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
+}
+
+Combined::~Combined()
+{
+  delete this->master;
+}
+
+void Combined::Load(const std::string &filename)
+{
+  std::string host = "";
+  unsigned short port = 0;
+
+  gazebo::transport::get_master_uri(host,port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->masterThread = new boost::thread( boost::bind(&Master::Run, this->master) );
 
   transport::init();
 
@@ -93,14 +103,7 @@ Combined::Combined()
 
   /// Init the sensors library
   sensors::init("default");
-}
 
-Combined::~Combined()
-{
-}
-
-void Combined::Load(const std::string &filename)
-{
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
@@ -179,10 +182,18 @@ void Combined::Run()
     sensors::run_once(true);
     //std::cout << "Render Time[" << timer.GetElapsed() << "]\n";
   }
+
+  for (int i=0; i < this->worlds.size(); i++)
+    physics::stop_world(this->worlds[i]);
+
+  transport::fini();
+
+  this->masterThread->join();
 }
 
 void Combined::Quit()
 {
+  this->master->Quit();
   this->quit = true;
 }
 

@@ -126,7 +126,13 @@ void TopicManager::HandleIncoming()
 // Unsubscribe from a topic
 void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 {
-  this->subscribed_topics[topic].remove(sub);
+  PublicationPtr publication = this->FindPublication(topic);
+  if (publication)
+  {
+    publication->RemoveSubscription(sub);
+  }
+
+  this->subscribed_topics[topic].remove( sub );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +142,22 @@ void TopicManager::ConnectPubToSub( const std::string &topic,
 {
   PublicationPtr publication = this->FindPublication( topic );
   publication->AddSubscription( sublink );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Disconnect a local publisher from a remote subscriber
+void TopicManager::DisconnectPubFromSub( const std::string &topic, const std::string &host, unsigned int port)
+{
+  PublicationPtr publication = this->FindPublication(topic);
+  publication->RemoveSubscription(host, port);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Disconnection all local subscribers from a remote publisher
+void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::string &host, unsigned int port)
+{
+  PublicationPtr publication = this->FindPublication(topic);
+  publication->RemoveTransport(host, port);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,6 +198,7 @@ void TopicManager::ConnectSubToPub( const std::string &topic,
 
   this->ConnectSubscibers(topic);
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a new publication to the list of advertised publication
@@ -223,4 +246,30 @@ std::string TopicManager::EncodeTopicName(const std::string &topic)
 void TopicManager::SetTopicNamespace(const std::string &space)
 {
   this->topicNamespace = space;
+}
+
+void TopicManager::Fini()
+{
+  ConnectionManager::Instance()->Fini();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Stop advertising on a topic
+void TopicManager::Unadvertise(const std::string &topic)
+{
+  int count = 0;
+  std::vector<PublicationPtr>::iterator iter;
+
+  for (iter = this->advertisedTopics.begin(); 
+       iter != this->advertisedTopics.end(); iter++)
+  {
+    if ((*iter)->GetTopic() == topic)
+      count++;
+  }
+
+  // Tell the master we are 
+  if (count <= 1)
+  {
+    ConnectionManager::Instance()->Unadvertise(topic);
+  }
 }

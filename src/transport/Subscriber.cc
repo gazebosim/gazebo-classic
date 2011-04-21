@@ -56,7 +56,7 @@ std::string Subscriber::GetMsgType() const
 /// Unsubscribe from the topic
 void Subscriber::Unsubscribe() const
 {
-  TopicManager::Instance()->Unsubscribe(this->topic, this->subscription );
+  TopicManager::Instance()->Unsubscribe( this->topic, this->subscription );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

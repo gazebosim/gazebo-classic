@@ -85,7 +85,7 @@ Time DiagnosticManager::GetTime(int index) const
   if (iter != this->timers.end())
     return iter->second;
   else
-    std::cerr << "Error\n";
+    gzerr << "Error getting time\n";
 
   return Time();
 }
@@ -102,7 +102,7 @@ std::string DiagnosticManager::GetLabel(int index) const
   if (iter != this->timers.end())
     return iter->first;
   else
-    std::cerr << "Error\n";
+    gzerr << "Erorr getting label\n";
 
   return "null";
 }
@@ -117,7 +117,7 @@ Time DiagnosticManager::GetTime(const std::string &label) const
   if (iter != this->timers.end())
     return iter->second;
   else
-    std::cerr << "More errors\n";
+    gzerr << "Error getting time\n";
 
   return Time();
 }

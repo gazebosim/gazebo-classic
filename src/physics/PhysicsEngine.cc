@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  */
 
+#include "common/Param.hh"
 #include "common/Messages.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"

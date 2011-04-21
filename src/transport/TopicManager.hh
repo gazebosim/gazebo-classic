@@ -100,10 +100,7 @@ namespace gazebo
               }
 
       /// \brief Stop advertising on a topic
-      public: void Unadvertise(const std::string &topic)
-              {
-                // TODO: Implement this
-              }
+      public: void Unadvertise(const std::string &topic);
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
@@ -119,6 +116,17 @@ namespace gazebo
       /// \brief Connect a local Subscriber to a remote Publisher
       public: void ConnectSubToPub( const std::string &topic,
                                     const PublicationTransportPtr &publink );
+
+
+      /// \brief Disconnect a local publisher from a remote subscriber
+      public: void DisconnectPubFromSub( const std::string &topic, 
+                                         const std::string &host, 
+                                         unsigned int port);
+
+      /// \brief Disconnection all local subscribers from a remote publisher
+      public: void DisconnectSubFromPub( const std::string &topic, 
+                                         const std::string &host, 
+                                         unsigned int port);
 
       /// \brief Connect all subscribers on a topic to known publishers
       public: void ConnectSubscibers(const std::string &topic);
@@ -137,11 +145,14 @@ namespace gazebo
       /// \brief Set the global namespace of all topics
       public: void SetTopicNamespace(const std::string &space);
 
+      /// \brief Close all publications and subscribed topics with the master
+      public: void Fini();
+
       private: void HandleIncoming();
 
       /// \brief A map <subscribed_topic_name, subscription_callbacks> of 
       ///        subscribers to topics
-      typedef std::map<std::string, std::list<CallbackHelperPtr> > SubMap;
+      typedef std::map< std::string, std::list<CallbackHelperPtr> > SubMap;
 
       private: std::vector<PublicationPtr> advertisedTopics;
       private: SubMap subscribed_topics; 

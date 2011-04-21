@@ -494,7 +494,6 @@ void Light::SetCastShadows(const bool &cast)
     if (**this->castShadowsP != cast)
       this->castShadowsP->SetValue( cast );
 
-    std::cout << "\nCAST SHADOWS\n";
     this->light->setCastShadows(cast);
   }
   */
@@ -549,7 +548,6 @@ void Light::SetupShadows()
 {
   if (this->light->getType() == Ogre::Light::LT_DIRECTIONAL)
   {
-    std::cout << "Setup Shadows\n";
     unsigned int numShadowTextures = 3;
 
     // shadow camera setup
@@ -602,7 +600,6 @@ void Light::SetupShadows()
   }
   else if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
-    std::cout << "SPot light setup shadows\n";
     this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup()));
   }
 }

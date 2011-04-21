@@ -28,6 +28,13 @@ namespace gazebo
 
       public: void AddSubscription(const CallbackHelperPtr &callback);
 
+      public: void RemoveSubscription(const CallbackHelperPtr &callback);
+
+      /// \brief Remove a subscription
+      public: void RemoveSubscription(const std::string &host, unsigned int port);
+
+      public: void RemoveTransport(const std::string &host, unsigned int port);
+
       /// \brief Publish data
       public: void Publish(const std::string &data);
       public: void PublishData(const std::string &data);

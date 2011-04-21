@@ -51,8 +51,6 @@ Base::Base(BasePtr parent)
 /// Destructor
 Base::~Base()
 {
-  gzmsg << "DELETEING BASE[" << this->GetName() << "]\n";
-
   // remove self as a child of the parent
   if (this->parent)
     this->parent->RemoveChild(this->id);
@@ -76,16 +74,11 @@ void Base::Load(common::XMLConfigNode *node)
 {
   this->nameP->Load(node);
 
-  gzmsg << "Load Base[" << this->GetName() << "]";
-
   if (this->parent)
   {
-    gzmsg << "   Has parent\n";
     this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
   }
-  else
-    gzmsg << "   No parent\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

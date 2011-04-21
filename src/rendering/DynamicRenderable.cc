@@ -237,6 +237,5 @@ Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
   vMax = mBox.getMaximum();
   vMid = ((vMax - vMin) * 0.5) + vMin;
   vDist = cam->getDerivedPosition() - vMid;
-  //std::cout << "getSquaredview " <<  vDist.squaredLength() << std::endl;
   return vDist.squaredLength();
 }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
@@ -24,6 +25,14 @@ namespace gazebo
     typedef std::vector<common::Param*> Param_V;
     typedef std::map<std::string, std::string> StrStr_M;
   }
+
+  namespace event
+  {
+    class Connection;
+    typedef boost::shared_ptr<Connection> ConnectionPtr;
+    typedef std::vector<ConnectionPtr> Connection_V;
+  }
+
 }
 
 #endif

@@ -41,19 +41,28 @@ namespace gazebo
       public: void Init( const std::string &master_host, 
                          unsigned short master_port);
 
+      public: void Fini();
+
       public: void Subscribe( const std::string &topic, 
                               const std::string &msgType);
+
+      public: void Unsubscribe( const msgs::Subscribe &msg );
 
       public: void Advertise( const std::string &topic, 
                               const std::string &msgType);
 
+      public: void Unadvertise( const std::string &topic );
+
       /// \brief Explicitly update the publisher list
       public: void GetAllPublishers( std::list<msgs::Publish> &publishers );
 
+      /// \brief Remove a connection
+      public: void RemoveConnection(ConnectionPtr &conn);
+ 
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host, 
                                             unsigned short port);
-               
+             
       /// \brief Connect to a remote server
       private: ConnectionPtr ConnectToRemoteHost( const std::string &host,
                                                   unsigned short port);

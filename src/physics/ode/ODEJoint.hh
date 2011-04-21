@@ -53,7 +53,7 @@ namespace gazebo
       public: virtual double GetParam( int /*parameter*/ ) const;
   
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach( BodyPtr one, BodyPtr two );
+      public: virtual void Attach( BodyPtr parent, BodyPtr child );
   
       /// \brief Detach this joint from all bodies
       public: virtual void Detach();

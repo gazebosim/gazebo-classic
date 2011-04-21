@@ -3,7 +3,7 @@ package gazebo.msgs;
 message Subscribe
 {
   required string topic    = 1;
-  required string msg_type = 3;
-  required string host     = 4;
-  required uint32 port     = 5;
+  required string host     = 2;
+  required uint32 port     = 3;
+  required string msg_type = 4;
 }

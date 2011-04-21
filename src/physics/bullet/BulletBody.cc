@@ -144,7 +144,7 @@ void BulletBody::Load(common::XMLConfigNode *node)
       // change the visual accordingly
       iter->second->SetRelativePose(newPose);//, false);
 
-      std::cout << "Orig Pose[" << origPose << "] New Pose[" << newPose << "]\n";
+      gzmsg << "Orig Pose[" << origPose << "] New Pose[" << newPose << "]\n";
     }
     */
 

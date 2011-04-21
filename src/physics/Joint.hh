@@ -48,6 +48,9 @@ namespace gazebo
   
       /// \brief Load a joint
       public: virtual void Load(common::XMLConfigNode *node);
+
+      /// \brief Initialize a joint
+      public: virtual void Init();
   
       /// \brief Save a joint to a stream in XML format
       public: void Save(std::string &prefix, std::ostream &stream);
@@ -73,7 +76,7 @@ namespace gazebo
       public: virtual bool AreConnected( BodyPtr one, BodyPtr two ) const = 0;
   
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach( BodyPtr one, BodyPtr two );
+      public: virtual void Attach( BodyPtr parent, BodyPtr child );
   
       /// \brief Detach this joint from all bodies
       public: virtual void Detach() = 0;
@@ -146,10 +149,10 @@ namespace gazebo
       public: virtual void SetAttribute( Attribute, int index, double value) = 0;
     
       /// The first body this joint connects to
-      protected: BodyPtr body1;
+      protected: BodyPtr childBody;
   
       /// The second body this joint connects to
-      protected: BodyPtr body2;
+      protected: BodyPtr parentBody;
   
       /// Name of this joint
       protected: common::ParamT<double> *erpP;
@@ -161,8 +164,8 @@ namespace gazebo
       // joint limit Kd setting
       protected: common::ParamT<double> *stopKdP;
   
-      protected: common::ParamT<std::string> *body1NameP;
-      protected: common::ParamT<std::string> *body2NameP;
+      protected: common::ParamT<std::string> *parentNameP;
+      protected: common::ParamT<std::string> *childNameP;
       protected: common::ParamT<common::Vector3> *anchorOffsetP;
       protected: common::ParamT<bool> *provideFeedbackP;
       protected: common::ParamT<double> *fudgeFactorP;

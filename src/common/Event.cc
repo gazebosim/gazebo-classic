@@ -15,7 +15,7 @@
  *
 */
 
-#include <iostream>
+#include "common/Console.hh"
 #include "common/Event.hh"
 
 using namespace gazebo;
@@ -34,12 +34,12 @@ Connection::Connection(Event *e, int i)
 Connection::~Connection()
 { 
   if (common::Time::GetWallTime() - this->creationTime < common::Time(0,10000))
-    std::cerr << "Warning: Deleteing a connection right after creation. Make sure to save the ConnectionPtr from a Connect call\n";
+    gzerr << "Warning: Deleteing a connection right after creation. Make sure to save the ConnectionPtr from a Connect call\n";
 
   if (this->event && this->id >= 0)
   {
-    ConnectionPtr self(this);
-    this->event->Disconnect( self ); 
+    this->event->Disconnect( this->id ); 
+    this->id = -1;
     this->event = NULL;
   }
 }
@@ -48,4 +48,9 @@ Connection::~Connection()
 int Connection::Id() const
 { 
   return this->id; 
+}
+
+int Connection::UniqueId() const
+{
+  return this->uniqueId;
 }

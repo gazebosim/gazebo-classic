@@ -97,7 +97,6 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   // Connect to the render signal
   this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&Camera::Render, this) ) );
   this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Camera::PostRender, this) ) );
-
   this->connections.push_back( event::Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) ));
 }
 
@@ -178,7 +177,7 @@ void Camera::Load( common::XMLConfigNode *node )
   }
   else
   {
-    std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
+    gzerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
     this->imageFormat = (int)Ogre::PF_R8G8B8;
   }
 
@@ -188,7 +187,7 @@ void Camera::Load( common::XMLConfigNode *node )
     std::string command;
     command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
     if (system(command.c_str()) < 0)
-      std::cerr << "Error making directory\n";
+      gzerr << "Error making directory\n";
   }
 
   if (this->hfovP->GetValue() < common::Angle(0.01) || 
@@ -503,7 +502,7 @@ int Camera::GetImageDepth() const
     return 1;
   else
   {
-    std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
+    gzerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
 }
@@ -561,7 +560,7 @@ void Camera::SetSaveFramePathname(const std::string &pathname)
     std::string command;
     command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
     if (system(command.c_str()) <0)
-      std::cerr << "Error making directory\n";
+      gzerr << "Error making directory\n";
   }
 }
 
@@ -717,7 +716,7 @@ void Camera::SaveFrame()
     std::string command;
     command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
     if (system(command.c_str()) < 0)
-      std::cerr << "Error making directory\n";
+      gzerr << "Error making directory\n";
   }
 
   // Get access to the buffer and make an image and write it to file

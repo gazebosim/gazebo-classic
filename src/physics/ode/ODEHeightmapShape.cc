@@ -86,12 +86,6 @@ void ODEHeightmapShape::Init()
   this->odeVertSize = this->img.GetWidth() * 4;
   this->odeScale = this->terrainSize / this->odeVertSize;
 
-  /*std::ostringstream stream;
-  std::cout << "ODE Scale[" << this->odeScale << "]\n";
-  std::cout << "Terrain Image[" << this->imageFilenameP->GetValue() << "] Size[" << this->terrainSize << "]\n";
-  printf("Terrain Size[%f %f %f]\n", this->terrainSize.x, this->terrainSize.y, this->terrainSize.z);
-  */
-
   // Step 1: Create the Ogre height map: Performs a ray scene query
   //NATY this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP), (**this->detailTextureP), this->terrainSize );
 

@@ -83,13 +83,13 @@ BodyPtr ODEJoint::GetJointBody( int index ) const
 
   if ( index==0 || index==1 )
   {
-    ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(this->body1);
-    ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(this->body2);
+    ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(this->childBody);
+    ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(this->parentBody);
     if (odeBody1 != NULL &&
         dJointGetBody( this->jointId, index ) == odeBody1->GetODEId())
-      result = this->body1;
+      result = this->childBody;
     else if (odeBody2)
-      result = this->body2;
+      result = this->parentBody;
   }
 
   return result;
@@ -118,27 +118,28 @@ double ODEJoint::GetParam( int /*parameter*/ ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach the two bodies with this joint
-void ODEJoint::Attach(BodyPtr one, BodyPtr two)
+void ODEJoint::Attach(BodyPtr parent, BodyPtr child)
 {
-  Joint::Attach(one, two);
+  Joint::Attach(parent, child);
 
-  ODEBodyPtr odeBody1 = boost::shared_dynamic_cast<ODEBody>(this->body1);
-  ODEBodyPtr odeBody2 = boost::shared_dynamic_cast<ODEBody>(this->body2);
+  ODEBodyPtr odechild = boost::shared_dynamic_cast<ODEBody>(this->childBody);
+  ODEBodyPtr odeparent = boost::shared_dynamic_cast<ODEBody>(this->parentBody);
 
-  if (odeBody1 == NULL && odeBody2 == NULL)
+  if (odechild == NULL && odeparent == NULL)
     gzthrow("ODEJoint requires at least one ODE body\n");
 
-  if (!odeBody1 && odeBody2)
+  if (!odechild && odeparent)
   {
-    dJointAttach( this->jointId, 0, odeBody2->GetODEId() );
+    dJointAttach( this->jointId, 0, odeparent->GetODEId() );
   }
-  else if (odeBody1 && !odeBody2)
+  else if (odechild && !odeparent)
   {
-    dJointAttach( this->jointId, odeBody1->GetODEId(), 0 );
+    dJointAttach( this->jointId, odechild->GetODEId(), 0 );
   }
-  else if (odeBody1 && odeBody2)
+  else if (odechild && odeparent)
   {
-    dJointAttach( this->jointId, odeBody1->GetODEId(), odeBody2->GetODEId() );
+    gzdbg << "Child[" << odechild->GetODEId() <<"] Pare["<< odeparent->GetODEId() << "]\n"; 
+    dJointAttach( this->jointId, odechild->GetODEId(), odeparent->GetODEId() );
   }
 }
 
@@ -146,8 +147,8 @@ void ODEJoint::Attach(BodyPtr one, BodyPtr two)
 // Detach this joint from all bodies
 void ODEJoint::Detach()
 {
-  this->body1.reset();
-  this->body2.reset();
+  this->childBody.reset();
+  this->parentBody.reset();
   dJointAttach( this->jointId, 0, 0 );
 }
 
@@ -156,10 +157,10 @@ void ODEJoint::Detach()
 // where appropriate
 void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
 {
-  if (this->body1) 
-    this->body1->SetEnabled(true);
-  if (this->body2) 
-    this->body2->SetEnabled(true);
+  if (this->childBody) 
+    this->childBody->SetEnabled(true);
+  if (this->parentBody) 
+    this->parentBody->SetEnabled(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

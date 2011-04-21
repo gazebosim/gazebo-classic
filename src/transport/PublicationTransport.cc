@@ -1,4 +1,5 @@
 #include "transport/TopicManager.hh"
+#include "transport/ConnectionManager.hh"
 #include "transport/PublicationTransport.hh"
 
 using namespace gazebo;
@@ -13,21 +14,33 @@ PublicationTransport::PublicationTransport(const std::string &topic,
 
 PublicationTransport::~PublicationTransport()
 {
-  //TODO: Unadvertise 
+  if (this->conn)
+  {
+    msgs::Subscribe sub;
+    sub.set_topic(this->topic);
+    sub.set_msg_type(this->msgType);
+    sub.set_host( this->conn->GetLocalAddress() );
+    sub.set_port( this->conn->GetLocalPort() );
+    ConnectionManager::Instance()->Unsubscribe( sub );
+    this->conn->StopRead();
+
+    ConnectionManager::Instance()->RemoveConnection( this->conn );
+  }
 }
 
 void PublicationTransport::Init(const ConnectionPtr &conn)
 {
+  this->conn = conn;
   msgs::Subscribe sub;
   sub.set_topic(this->topic);
   sub.set_msg_type(this->msgType);
-  sub.set_host( conn->GetLocalAddress() );
-  sub.set_port( conn->GetLocalPort() );
+  sub.set_host( this->conn->GetLocalAddress() );
+  sub.set_port( this->conn->GetLocalPort() );
 
-  conn->Write( common::Message::Package("sub",sub) );
+  this->conn->Write( common::Message::Package("sub",sub) );
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher
-  conn->StartRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
+  this->conn->StartRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
 }
 
 void PublicationTransport::AddCallback(const boost::function<void(const std::string &)> &cb)
@@ -41,4 +54,9 @@ void PublicationTransport::OnPublish(const std::string &data)
   {
     (this->callback)(data);
   }
+}
+
+const ConnectionPtr PublicationTransport::GetConnection() const
+{
+  return this->conn;
 }

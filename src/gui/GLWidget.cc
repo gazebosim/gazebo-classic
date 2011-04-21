@@ -43,10 +43,6 @@ GLWidget::~GLWidget()
 
 void GLWidget::showEvent(QShowEvent *event)
 {
-  // Load the Ogre rendering system
-  if (!rendering::load(NULL))
-    gzthrow("Failed to load the rendering engine");
-
   QApplication::flush();
   this->windowId = rendering::WindowManager::Instance()->CreateWindow(
       this->GetOgreHandle(), this->width(), this->height());

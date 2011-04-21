@@ -28,6 +28,7 @@
 #include <typeinfo>
 #include <string>
 
+#include "common/Console.hh"
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
@@ -211,11 +212,11 @@ namespace gazebo
         if (str == "inf" || str == "-inf")
         {
           // int this case, the parser complains, but seems to assign the right values
-          std::cout << "INFO [gazebo::Param]: boost throws when lexical casting inf's, but the values are usually passed through correctly (key[" << this->key << "], value[" << str << "])\n";
+          gzmsg << "INFO [gazebo::Param]: boost throws when lexical casting inf's, but the values are usually passed through correctly (key[" << this->key << "], value[" << str << "])\n";
         }
         else
         {
-          std::cerr << "Unable to read value with key[" << this->key << "] and value[" << str << "]\n";
+          gzerr << "Unable to read value with key[" << this->key << "] and value[" << str << "]\n";
         }
       }
   

@@ -66,6 +66,10 @@ namespace gazebo
       /// \brief Get the root node
       public: XMLConfigNode *GetRootNode() const;
   
+      private: void PreParser(const std::string &fname, std::string &output);
+
+      private: std::string GetFilename(const std::string &fname);
+
       /// \brief Fill the document with information
       private: void FillDocumentNodes();
    

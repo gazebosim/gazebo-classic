@@ -67,8 +67,8 @@ RenderEngine::RenderEngine()
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
 
-  this->logManager=NULL;
-  this->root=NULL;
+  this->logManager = NULL;
+  this->root = NULL;
 
   this->dummyDisplay = false;
 }
@@ -83,6 +83,7 @@ RenderEngine::~RenderEngine()
                       (GLXContext)this->dummyContext);
     XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
     XCloseDisplay((Display*)this->dummyDisplay);
+
   }
 }
 
@@ -92,7 +93,7 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
 {
   if (this->root)
   {
-    std::cerr << "Attempting to load, but root already exist\n";
+    gzerr << "Attempting to load, but root already exist\n";
     return;
   }
 
@@ -159,7 +160,7 @@ ScenePtr RenderEngine::GetScene(unsigned int index)
     return this->scenes[index];
   else
   {
-    std::cerr << "Invalid Scene Index[" << index << "]\n";
+    gzerr << "Invalid Scene Index[" << index << "]\n";
     return ScenePtr();
   }
 }
@@ -407,25 +408,8 @@ void RenderEngine::SetupRenderSystem()
 
   renderSys->setConfigOption("FSAA", "2");
 
-  /* Print out the list of options
-  Ogre::ConfigOptionMap map = renderSys->getConfigOptions();
-  Ogre::ConfigOptionMap::iterator iter;
-
-  printf("KEYS-------------------------\n");
-  for (iter = map.begin(); iter != map.end(); iter++)
-  {
-    std::cout << "Key[" << iter->first << "] Name[" << iter->second.name << "] Value[" << iter->second.currentValue << "]\n";
-  }
-  */
-
   this->root->setRenderSystem(renderSys);
-
 }
-
-
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns true if the graphics card support GLSL
@@ -439,13 +423,6 @@ bool RenderEngine::HasGLSL()
   profiles = capabilities->getSupportedShaderProfiles();
 
   iter = std::find(profiles.begin(), profiles.end(), "glsl");
-
-  // Print all the shader profiles
-  /*std::cout << "Shader profiles:\n";
-  for (iter = profiles.begin(); iter != profiles.end(); iter++)
-  {
-    std::cout << *iter << "\n";
-  }*/
 
   return iter != profiles.end();
 }

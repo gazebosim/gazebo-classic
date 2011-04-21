@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-
 <!-- Generic Pioneer2dx Model -->
 <model type="physical" name="default_pioneer_model">
   <canonicalBody>chassis_body</canonicalBody>
@@ -81,7 +79,7 @@
       <material name="Gazebo/Black"/>
     </visual>
   </link>
-  
+
   <link name="right_wheel">
     <origin xyz="0.1 .17 0.11" rpy="0 90 90"/>
   
@@ -114,7 +112,7 @@
       <material name="Gazebo/Black"/>
     </visual>
   </link>
-  
+
   <link name="castor_body">
     <origin xyz="-0.200 0 0.04" rpy="0 0 0"/>
   
@@ -132,7 +130,7 @@
       <material name="Gazebo/Black"/>
     </visual>
   </link>
-  
+
   <joint type="hinge" name="left_wheel_hinge">
     <child link="left_wheel"/>
     <parent link="chassis_body"/>

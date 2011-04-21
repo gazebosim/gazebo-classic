@@ -25,19 +25,17 @@
 #include <boost/shared_ptr.hpp>
 
 #include "common/Time.hh"
+#include "common/CommonTypes.hh"
 
 namespace gazebo
 {
   namespace event
   {
-    class Connection;
-    typedef boost::shared_ptr<Connection> ConnectionPtr;
-    typedef std::vector<ConnectionPtr> Connection_V;
-
     /// \brief Base class for all events
     class Event
     { 
-      public: virtual void Disconnect(ConnectionPtr &c) = 0;
+      public: virtual void Disconnect(ConnectionPtr c) = 0;
+      public: virtual void Disconnect(int id) = 0;
     };
 
     /// \brief A class that encapsulates a connection
@@ -47,6 +45,7 @@ namespace gazebo
       public: Connection(Event *e, int i);
       public: ~Connection();
       public: int Id() const;
+      public: int UniqueId() const;
       private: Event *event;
       private: int id;
 
@@ -67,7 +66,8 @@ namespace gazebo
       public: ConnectionPtr Connect(const boost::function<T> &subscriber);
 
       /// \brief Disconnect a callback to this event
-      public: virtual void Disconnect(ConnectionPtr &c);
+      public: virtual void Disconnect(ConnectionPtr c);
+      public: virtual void Disconnect(int id);
 
       public: void operator()()
               { this->Signal(); }
@@ -202,13 +202,19 @@ namespace gazebo
     }
     
     template<typename T>
-    void EventT<T>::Disconnect(ConnectionPtr &c)
+    void EventT<T>::Disconnect(ConnectionPtr c)
     {
-      if (c->Id() >=0 && c->Id() < (int)this->connections.size())
+      this->Disconnect(c->Id());
+      c->event = NULL;
+      c->id = -1;
+    }
+
+    template<typename T>
+    void EventT<T>::Disconnect(int id)
+    {
+      if (id >=0 && id < (int)this->connections.size())
       {
-        this->connections.erase(this->connections.begin()+c->Id());
-        c->event = NULL;
-        c->id = -1;
+        this->connections.erase(this->connections.begin()+id);
       }
     }
   }

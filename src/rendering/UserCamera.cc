@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "common/Global.hh"
+#include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Events.hh"
 
@@ -71,6 +72,7 @@ UserCamera::~UserCamera()
   }
 
   delete this->viewController;
+
   this->connections.clear();
 }
 

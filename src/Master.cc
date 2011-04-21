@@ -31,6 +31,8 @@ Master::Master()
 
 Master::~Master()
 {
+  this->connections.clear();
+  this->connection.reset();
 }
 
 void Master::Init(unsigned short port)
@@ -43,7 +45,6 @@ void Master::Init(unsigned short port)
   {
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
-  std::cout << "master started\n";
   std::cout << "GAZEBO_MASTER_URI=" << this->connection->GetLocalURI() << "\n";
 }
 
@@ -81,6 +82,52 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
       {
         iter->second->Write(common::Message::Package("publisher_update", pub));
       }
+    }
+  }
+  else if (packet.type() == "unadvertise")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString( packet.serialized_data() );
+
+    SubList::iterator iter;
+    // Find all subscribers of the topic
+    for (iter = this->subscribers.begin(); 
+         iter != this->subscribers.end(); iter++)
+    {
+      if (iter->first.topic() == pub.topic())
+      {
+        iter->second->Write(common::Message::Package("unadvertise", pub));
+      }
+    }
+
+  }
+  else if (packet.type() == "unsubscribe")
+  {
+    msgs::Subscribe sub;
+    sub.ParseFromString( packet.serialized_data() );
+    SubList::iterator subiter = this->subscribers.begin();
+
+    // Find all publishers of the topic, and remove the subscriptions
+    for (PubList::iterator iter = this->publishers.begin(); 
+         iter != this->publishers.end(); iter++)
+    {
+      if (iter->first.topic() == sub.topic())
+      {
+        iter->second->Write(common::Message::Package("unsubscribe", sub));
+      }
+    }
+
+    // Remove the subscribers from our list
+    while (subiter != this->subscribers.end())
+    {
+      if (subiter->first.topic() == sub.topic() && 
+          subiter->first.host() == sub.host() &&
+          subiter->first.port() == sub.port())
+      {
+        this->subscribers.erase(subiter++);
+      }
+      else
+        subiter++;
     }
   }
   else if (packet.type() == "subscribe")

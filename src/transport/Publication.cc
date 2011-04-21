@@ -38,6 +38,77 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// A a transport
+void Publication::AddTransport( const PublicationTransportPtr &publink)
+{
+  publink->AddCallback( boost::bind(&Publication::PublishData, this, _1) );
+  this->transports.push_back( publink );
+}
+
+void Publication::RemoveTransport(const std::string &host, unsigned int port)
+{
+  std::list<PublicationTransportPtr>::iterator iter;
+  iter = this->transports.begin(); 
+  while (iter != this->transports.end())
+  {
+    if ((*iter)->GetConnection()->GetRemoteAddress() == host &&
+        (*iter)->GetConnection()->GetRemotePort() == port)
+    {
+      this->transports.erase( iter++ );
+    }
+    else 
+      iter++;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
+{
+  std::list< CallbackHelperPtr >::iterator iter;
+  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
+  {
+    if (*iter == callback)
+    {
+      this->callbacks.erase(iter);
+      break;
+    }
+  }
+
+  // If no more subscribers, then disconnect from all publishers
+  if (this->callbacks.size() == 0)
+  {
+    this->transports.clear();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Remove a subscription
+void Publication::RemoveSubscription(const std::string &host, unsigned int port)
+{
+  SubscriptionTransportPtr subptr;
+  std::list< CallbackHelperPtr >::iterator iter;
+
+  iter = this->callbacks.begin(); 
+  while (iter != this->callbacks.end())
+  {
+    subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
+    if (subptr && subptr->GetConnection()->GetRemoteAddress() == host &&
+        subptr->GetConnection()->GetRemotePort() == port)
+    {
+      this->callbacks.erase(iter++);
+    }
+    else
+      iter++;
+  }
+
+  // If no more subscribers, then disconnect from all publishers
+  if (this->callbacks.size() == 0)
+  {
+    this->transports.clear();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Publish data
 void Publication::Publish(const std::string &data)
 {
@@ -77,9 +148,4 @@ std::string Publication::GetMsgType() const
   return this->msgType;
 }
 
-void Publication::AddTransport( const PublicationTransportPtr &publink)
-{
-  publink->AddCallback( boost::bind(&Publication::PublishData, this, _1) );
-  this->transports.push_back( publink );
-}
 

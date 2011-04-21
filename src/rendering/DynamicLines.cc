@@ -113,8 +113,6 @@ void DynamicLines::FillHardwareBuffers()
   int size = this->points.size();
   this->PrepareHardwareBuffers(size,0);
 
-  //std::cout << "debug size " << size << std::endl;
-
   if (!size)
   {
     this->mBox.setExtents(Ogre::Vector3::ZERO, Ogre::Vector3::ZERO);
@@ -124,7 +122,6 @@ void DynamicLines::FillHardwareBuffers()
   Ogre::HardwareVertexBufferSharedPtr vbuf =
     this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(0);
 
-  //Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
   Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
   {
     for (int i = 0; i < size; i++)
@@ -138,19 +135,8 @@ void DynamicLines::FillHardwareBuffers()
   }
   vbuf->unlock();
 
-  // std::cout << "debug mBox merging "
-  //    << this->getBoundingBox().getMinimum().x << " , "
-  //    << this->getBoundingBox().getMinimum().y << " , "
-  //    << this->getBoundingBox().getMinimum().z << " | "
-  //    << this->getBoundingBox().getMaximum().x << " , "
-  //    << this->getBoundingBox().getMaximum().y << " , "
-  //    << this->getBoundingBox().getMaximum().z << std::endl;
-  //this->mBox.setExtents(Ogre::Vector3(-1e9,-1e9,-1e9),Ogre::Vector3(1e9,1e9,1e9) );
-
   // need to update after mBox change, otherwise the lines goes in and out of scope based on old mBox
   this->getParentSceneNode()->needUpdate();
-
-  //this->getParentSceneNode()->showBoundingBox(true); // debug
 
   this->dirty = false;
 }

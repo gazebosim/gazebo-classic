@@ -170,7 +170,6 @@ void Model::Load(common::XMLConfigNode *node)
 // Initialize the model
 void Model::Init()
 {
-  Base_V::iterator iter;
   common::Pose3d pose;
 
   this->SetStatic( **(this->staticP) );
@@ -212,7 +211,9 @@ void Model::Init()
   if (**this->laserRetroP != -1.0)
     this->SetLaserRetro(**this->laserRetroP);
 
-  for (iter = this->children.begin(); iter!=this->children.end(); iter++)
+  // Initialize the bodies before the joints
+  for (Base_V::iterator iter = this->children.begin(); 
+       iter!=this->children.end(); iter++)
   {
     if ((*iter)->HasType(BODY))
       boost::shared_static_cast<Body>(*iter)->Init();
@@ -220,6 +221,13 @@ void Model::Init()
     {
       boost::shared_static_cast<Model>(*iter)->Init();
     }
+  }
+
+  // Initialize the joints last.
+  for (Joint_V::iterator iter = this->joints.begin(); 
+       iter != this->joints.end(); iter++)
+  {
+    (*iter)->Init();
   }
 }
 

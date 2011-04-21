@@ -20,9 +20,11 @@
  * Date: 09 June 2007
  */
 
-#include <time.h>
-#include <string.h>
+//#include <time.h>
+//#include <string.h>
+#include <sstream>
 
+#include "common/Param.hh"
 #include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"

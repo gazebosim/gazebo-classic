@@ -80,13 +80,14 @@ int main(int argc, char **argv)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   }
+  
 
   combined = new gazebo::Combined();
   combined->Load(config_filename);
   combined->SetParams( params );
   combined->Init();
   combined->Run();
-  
+
   delete combined;
   combined = NULL;
 }

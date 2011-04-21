@@ -32,53 +32,6 @@ namespace gazebo
 {
 	namespace physics
   {
-  
-    /// \addtogroup gazebo_physics_joints
-    /// \{
-    /** \defgroup gazebo_hinge_joint Hinge Joint
-      
-      \brief A two-axis hinge joint.
-    
-      \par Attributes
-      - body1 (string)
-        - Name of the first body to attach to the joint
-      - body2 (string)
-        - Name of the second body to attach to the joint
-      - anchor (string)
-        - Name of the body which will act as the anchor to the joint
-      - axis (float, tuple)
-        - Defines the axis of rotation for the first degree of freedom
-        - Default: 0 0 1
-      - lowStop (float, degrees)
-        - The low stop angle for the first degree of freedom
-        - Default: infinity
-      - highStop (float, degrees)
-        - The high stop angle for the first degree of freedom
-        - Default: infinity
-      - erp (double)
-        - Error reduction parameter. 
-        - Default = 0.4
-      - cfm (double)
-        - Constraint force mixing. 
-        - Default = 0.8
-    
-      \par Example
-      \verbatim
-      <joint:hinge name="hinge_joint>
-        <body1>body1_name</body1>
-        <body2>body2_name</body2>
-        <anchor>anchor_body</anchor>
-        <axis>0 0 1</axis>
-        <lowStop>0</lowStop>
-        <highStop>30</highStop>
-      </joint:hinge>
-      \endverbatim
-    */
-    /// \}
-    
-    /// \addtogroup gazebo_hinge_joint
-    /// \{
-    
     ///\brief A single axis hinge joint
     template<class T>
     class HingeJoint : public T
@@ -140,7 +93,6 @@ namespace gazebo
       protected: common::ParamT<common::Angle> *hiStopP; 
       protected: common::ParamT<double> *dampingP; 
     };
-    /// \}
   }
 }
 #endif

@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <list>
 
+#include "common/Console.hh"
 #include "common/GazeboConfig.hh"
 #include "common/Exception.hh"
 #include "common/Plugin.hh"
@@ -74,14 +75,14 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
   void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (!handle)
   {
-    std::cerr << "Failed to load plugin " << fullname << ": " << dlerror();
+    gzerr << "Failed to load plugin " << fullname << ": " << dlerror();
     return NULL;
   }
 
   Plugin *(*registerFunc)() = (Plugin *(*)())dlsym(handle, registerName.c_str());
   if(!registerFunc)
   {
-    std::cerr << "Failed to resolve " << registerName << ": " << dlerror();
+    gzerr << "Failed to resolve " << registerName << ": " << dlerror();
     return NULL;
   }
 
@@ -97,7 +98,7 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
     int errors = lt_dlinit();
     if (errors)
     {
-      std::cerr << "Error(s) initializing dynamic loader (" 
+      gzerr << "Error(s) initializing dynamic loader (" 
         << errors << ", " << lt_dlerror() << ")";
       return NULL;
     }
@@ -109,14 +110,14 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
 
   if (!handle)
   {
-    std::cerr << "Failed to load " << fullname << ": " << lt_dlerror();
+    gzerr << "Failed to load " << fullname << ": " << lt_dlerror();
     return NULL;
   }
 
   Plugin *(*registerFunc)() = (Plugin *(*)())lt_dlsym(handle, registerName.c_str());
   if(!registerFunc)
   {
-    std::cerr << "Failed to resolve " << registerName << ": " << lt_dlerror();
+    gzerr << "Failed to resolve " << registerName << ": " << lt_dlerror();
     return NULL;
   }
 
