@@ -855,8 +855,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
                                      geom2->surface->bounce);
         contact.surface.bounce_vel = std::min(geom1->surface->bounceVel, 
                                          geom2->surface->bounceVel);
-        dJointID c = dJointCreateContact (self->worldId,
-                                          self->contactGroup, &contact);
 
         Vector3 contactPos(contact.geom.pos[0], contact.geom.pos[1], 
                            contact.geom.pos[2]);
@@ -876,11 +874,16 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(1,0,0)).GetCrossProd(contactNorm);
           if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,1,0)).GetCrossProd(contactNorm);
           if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,0,1)).GetCrossProd(contactNorm);
+          contact.surface.mode = contact.surface.mode | dContactFDir1;
 
           // set fdir1 for ODE
           contact.fdir1[0] = fdir1.x;
-          contact.fdir1[0] = fdir1.y;
-          contact.fdir1[0] = fdir1.z;
+          contact.fdir1[1] = fdir1.y;
+          contact.fdir1[2] = fdir1.z;
+          // std::cout << "gazebo " << geom1->GetName() << " "
+          //                        << fdir1.x << " "
+          //                        << fdir1.y << " "
+          //                        << fdir1.z << "\n";
         }
 
         // ************************************************************************
@@ -899,12 +902,21 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(1,0,0)).GetCrossProd(contactNorm);
           if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,1,0)).GetCrossProd(contactNorm);
           if (fdir1 == Vector3(0,0,0)) fdir1 = contactNorm.GetCrossProd(Vector3(0,0,1)).GetCrossProd(contactNorm);
+          contact.surface.mode = contact.surface.mode | dContactFDir1;
 
           // set fdir1 for ODE
           contact.fdir1[0] = fdir1.x;
-          contact.fdir1[0] = fdir1.y;
-          contact.fdir1[0] = fdir1.z;
+          contact.fdir1[1] = fdir1.y;
+          contact.fdir1[2] = fdir1.z;
+          // std::cout << "gazebo " << geom2->GetName() << " "
+          //                        << fdir1.x << " "
+          //                        << fdir1.y << " "
+          //                        << fdir1.z << "\n";
         }
+
+
+        dJointID c = dJointCreateContact (self->worldId,
+                                          self->contactGroup, &contact);
 
         if (World::Instance()->GetShowContacts())
           self->AddContactVisual(contactPos, contactNorm);
