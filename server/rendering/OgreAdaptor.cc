@@ -723,6 +723,7 @@ bool OgreAdaptor::HasGLSL()
   Ogre::RenderSystemCapabilities::ShaderProfiles::const_iterator iter;
 
   capabilities = this->root->getRenderSystem()->getCapabilities();
+  if (!capabilities) return false;
   profiles = capabilities->getSupportedShaderProfiles();
 
   iter = std::find(profiles.begin(), profiles.end(), "glsl2");
