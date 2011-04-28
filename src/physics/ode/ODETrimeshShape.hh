@@ -44,6 +44,8 @@ namespace gazebo
       /// \brief Load the trimesh
       protected: virtual void Load(common::XMLConfigNode *node);
   
+      protected: virtual void Init();
+
       private: dReal matrix_dblbuff[16*2];
       private: int last_matrix_index;
     };

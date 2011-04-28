@@ -135,7 +135,7 @@
     <child link="left_wheel"/>
     <parent link="chassis_body"/>
     <anchorOffset>0 0 0.04</anchorOffset>
-    <axis>0 1 0</axis>
+    <axis xyz="0 1 0"/>
     <erp>0.8</erp>
     <cfm>10e-5</cfm>
   </joint>
@@ -144,7 +144,7 @@
     <child link="right_wheel"/>
     <parent link="chassis_body"/>
     <anchorOffset>0 0 -0.04</anchorOffset>
-    <axis>0 1 0</axis>
+    <axis xyz="0 1 0"/>
     <erp>0.8</erp>
     <cfm>10e-5</cfm>
   </joint>

@@ -135,6 +135,7 @@ void Light::Load(common::XMLConfigNode *node)
 
   try
   {
+    gzdbg << "Light Name[" << this->GetName() << "]\n";
     this->light = this->scene->GetManager()->createLight(this->GetName());
   }
   catch (Ogre::Exception e)
@@ -164,7 +165,7 @@ void Light::Load(common::XMLConfigNode *node)
 /// Load from a light message
 void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
-  this->nameP->SetValue(msg->header().str_id());
+  this->nameP->SetValue( msg->header().str_id() );
 
   if (msg->has_type() && msg->type() == msgs::Light::POINT)
     this->lightTypeP->SetValue("point");

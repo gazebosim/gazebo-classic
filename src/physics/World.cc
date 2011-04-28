@@ -68,6 +68,7 @@ World::World()
   this->stepInc = false;
   this->pause = false;
 
+  
   common::Param::Begin(&this->parameters);
   this->nameP = new common::ParamT<std::string>("name","default",1);
   common::Param::End();
@@ -104,6 +105,9 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 
   common::Message::Init( this->worldStatsMsg, "statistics" );
 
+  this->sceneMsg.CopyFrom( 
+      common::Message::SceneFromXML(rootNode->GetChild("scene")) );
+
   this->controlSub = transport::subscribe("~/world_control", 
                                         &World::OnControl, this);
 
@@ -112,14 +116,9 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   this->scenePub = transport::advertise<msgs::Scene>("~/scene");
 
   this->statPub = transport::advertise<msgs::WorldStatistics>("~/world_stats");
-  this->visPub = transport::advertise<msgs::Visual>("~/visual");
   this->visSub = transport::subscribe("~/visual", &World::VisualLog, this);
 
   this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
-  this->lightPub = transport::advertise<msgs::Light>("~/light");
-
-  msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
-  this->scenePub->Publish( scene );
 
   common::XMLConfigNode *physicsNode = NULL;
   if (rootNode )
@@ -407,25 +406,13 @@ void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
     cnode = cnode->GetNext("model");
   }
 
-  /*if (node)
+  cnode = node->GetChild("light");
+  while (cnode)
   {
-    // Check for model nodes
-    if (node->GetName() == "model")
-    {
-    }
-    // TODO: this shouldn't exist in the physics sim
-    else if (node->GetName() == "light")
-    {
-      msgs::Light msg = common::Message::LightFromXML(node);
-      msg.mutable_header()->set_str_id( "light" );
-      msg.set_action(msgs::Light::UPDATE);
-      this->lightPub->Publish(msg);
-    }
-
-    // Load children
-    for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
-      this->LoadEntities( cnode, parent);
-  }*/
+    msgs::Light *lm = this->sceneMsg.add_light();
+    lm->CopyFrom( common::Message::LightFromXML(cnode) );
+    cnode = cnode->GetNext("light");
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -590,18 +577,11 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
 {
-  msgs::Scene scene;
-  common::Message::Init(scene,"scene");
+  common::Message::Stamp(this->sceneMsg.mutable_header());
 
-  std::list< boost::shared_ptr<msgs::Visual const> >::iterator iter;
-  for (iter = this->visualMsgs.begin(); iter != this->visualMsgs.end(); iter++)
-  {
-    msgs::Visual *visMsg = scene.add_visual();
-    visMsg->CopyFrom( *(*iter) );
-  }
-
-  this->BuildSceneMsg(scene, this->rootElement);
-  this->scenePub->Publish( scene );
+  this->sceneMsg.clear_pose();
+  this->BuildSceneMsg(this->sceneMsg, this->rootElement);
+  this->scenePub->Publish( this->sceneMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -627,22 +607,21 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 // the scene. This in turns allows a gui to query the latest state.
 void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  std::list< boost::shared_ptr<msgs::Visual const> >::iterator iter;
-  std::list< boost::shared_ptr<msgs::Visual const> >::iterator prev;
-
-  iter = this->visualMsgs.begin();
-  while (iter != this->visualMsgs.end())
+  unsigned int i = 0;
+  for (; i < this->sceneMsg.visual_size(); i++)
   {
-    if ( (*iter)->header().str_id() == msg->header().str_id() )
+    if (this->sceneMsg.visual(i).header().str_id() == msg->header().str_id())
     {
-      prev = iter++;
-      this->visualMsgs.erase(prev);
+      this->sceneMsg.mutable_visual(i)->CopyFrom(*msg);
+      break;
     }
-    else
-      iter++;
   }
 
-  this->visualMsgs.push_back( msg );
+  if (i >= this->sceneMsg.visual_size())
+  {
+    msgs::Visual *newVis = this->sceneMsg.add_visual();
+    newVis->CopyFrom(*msg);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

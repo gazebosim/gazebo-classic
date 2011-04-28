@@ -24,6 +24,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <iostream>
 #include <iomanip>
+#include <deque>
 
 #include <google/protobuf/message.h>
 
@@ -74,7 +75,7 @@ namespace gazebo
       public: void Read(std::string &data);
 
       /// \brief Write data to the socket
-      public: void Write(const std::string &buffer);
+      public: void EnqueueMsg(const std::string &buffer, bool force = false);
 
       /// \brief Get the local URI
       public: std::string GetLocalURI() const;
@@ -170,7 +171,9 @@ namespace gazebo
                }
 
 
-      /// \brief Handle on write callbacks
+     /// \brief Handle on write callbacks
+     public: void ProcessWriteQueue();
+
      private: void OnWrite(const boost::system::error_code &e);
 
      /// \brief Handle new connections, if this is a server
@@ -194,8 +197,9 @@ namespace gazebo
       private: boost::asio::ip::tcp::socket socket;
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
-      private: std::string outbound_header;
-      private: std::string outbound_data;
+      private: std::deque<std::string> writeQueue;
+      private: unsigned int writeCount;
+      private: boost::mutex *writeMutex;
 
       // Called when a new connection is received
       private: AcceptCallback acceptCB;

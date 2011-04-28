@@ -36,14 +36,14 @@ void SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg)
 {
   std::string data;
   msg->SerializeToString(&data);
-  this->connection->Write( data );
+  this->connection->EnqueueMsg( data );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Output a message to a connection
 void SubscriptionTransport::HandleData(const std::string &newdata)
 {
-  this->connection->Write( newdata );
+  this->connection->EnqueueMsg( newdata );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

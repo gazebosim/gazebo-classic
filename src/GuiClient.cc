@@ -61,6 +61,7 @@ void GuiClient::Init()
 
 void GuiClient::Run()
 {
+  this->transportThread = new boost::thread( &transport::run );
   gui::run();
 }
 

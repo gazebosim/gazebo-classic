@@ -88,6 +88,9 @@ Combined::~Combined()
 
 void Combined::Load(const std::string &filename)
 {
+
+  std::cout << "A\n";
+
   std::string host = "";
   unsigned short port = 0;
 
@@ -173,14 +176,14 @@ void Combined::Init()
 
 void Combined::Run()
 {
+  this->transportThread = new boost::thread( &transport::run );
+
   for (int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
   while (!this->quit)
   {
-    //timer.Start();
     sensors::run_once(true);
-    //std::cout << "Render Time[" << timer.GetElapsed() << "]\n";
   }
 
   for (int i=0; i < this->worlds.size(); i++)

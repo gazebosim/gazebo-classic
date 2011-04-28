@@ -71,3 +71,11 @@ void transport::fini()
 {
   transport::TopicManager::Instance()->Fini();
 }
+
+/// \brief Run the transport. This starts message passing
+void transport::run()
+{
+  std::cout << "Run Transport\n";
+  transport::ConnectionManager::Instance()->Run();
+}
+

@@ -87,11 +87,16 @@ void ODETrimeshShape::Update()
 /// Load the trimesh
 void ODETrimeshShape::Load(common::XMLConfigNode *node)
 {
+  TrimeshShape::Load(node);
+}
+
+void ODETrimeshShape::Init()
+{
   dMass odeMass;
   Mass mass;
   ODEGeomPtr pgeom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
-  TrimeshShape::Load(node);
+  TrimeshShape::Init();
 
   mass = this->geomParent->GetMass();
 
@@ -99,7 +104,7 @@ void ODETrimeshShape::Load(common::XMLConfigNode *node)
 
   dTriMeshDataID odeData;
 
-  const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+  const common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
   if (subMesh->GetVertexCount() < 3)
   {
     gzerr << "ODETrimesh invalid mesh\n";

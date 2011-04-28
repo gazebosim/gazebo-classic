@@ -43,6 +43,8 @@ namespace gazebo
 
       public: void Fini();
 
+      public: void Run();
+
       public: void Subscribe( const std::string &topic, 
                               const std::string &msgType);
 

@@ -59,6 +59,8 @@ namespace gazebo
     {
   
       public: enum SceneType {BSP, GENERIC};
+
+      private: Scene() {}
   
       /// \brief Constructor
       public: Scene(const std::string &name);

@@ -41,7 +41,7 @@ TrimeshShape::TrimeshShape(GeomPtr parent)
   this->AddType(Base::TRIMESH_SHAPE);
 
   common::Param::Begin(&this->parameters);
-  this->meshNameP = new common::ParamT<std::string>("mesh","",1);
+  this->meshNameP = new common::ParamT<std::string>("filename","",1);
   this->scaleP = new common::ParamT<common::Vector3>("scale",common::Vector3(1,1,1),0);
   this->centerMeshP = new common::ParamT<std::string>("center_mesh","none",0);
   this->genTexCoordP = new common::ParamT<bool>("gen_tex_coord",false,0);
@@ -64,8 +64,8 @@ TrimeshShape::~TrimeshShape()
 void TrimeshShape::Load(common::XMLConfigNode *node)
 {
   Shape::Load(node);
-  this->meshNameP->Load(node);
-  this->scaleP->Load(node);
+  this->meshNameP->Load(node->GetChild("mesh"));
+  this->scaleP->Load(node->GetChild("mesh"));
   this->centerMeshP->Load(node);
   this->genTexCoordP->Load(node);
 }
@@ -156,4 +156,3 @@ void TrimeshShape::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << *(this->meshNameP) << "\n";
   stream << prefix << *(this->scaleP) << "\n";
 }
- 

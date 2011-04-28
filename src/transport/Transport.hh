@@ -42,11 +42,15 @@ namespace gazebo
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
     void init(const std::string &master_host="", unsigned short master_port=0);
 
-    /// \brief Set the global topic namespace
-    void set_topic_namespace(const std::string &space);
-
     /// \brief Finialize all the transport stuff
     void fini();
+
+    /// \brief Run the transport. This starts message passing
+    void run();
+
+
+    /// \brief Set the global topic namespace
+    void set_topic_namespace(const std::string &space);
 
     /// \brief Adverise a topic
     template<typename M>

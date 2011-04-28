@@ -24,7 +24,8 @@
 
 #include <float.h>
 #include "common/Param.hh"
-#include "Joint.hh"
+#include "common/XMLConfig.hh"
+#include "physics/Joint.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
                 this->AddType(Base::SLIDER_JOINT);
   
                 common::Param::Begin(&this->parameters);
-                this->axisP = new common::ParamT<common::Vector3>("axis",common::Vector3(0,0,1), 0);
+                this->axisP = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,0,1), 0);
                 this->loStopP = new common::ParamT<double>("lowStop",-DBL_MAX,0);
                 this->hiStopP = new common::ParamT<double>("highStop",DBL_MAX,0);
                 this->dampingP = new common::ParamT<double>("damping",0.0, 0);
@@ -60,7 +61,7 @@ namespace gazebo
       /// \brief Load the joint
       protected: virtual void Load(common::XMLConfigNode *node)
                  {
-                   this->axisP->Load(node);
+                   this->axisP->Load(node->GetChild("axis"));
                    this->loStopP->Load(node);
                    this->hiStopP->Load(node);
                    this->dampingP->Load(node);

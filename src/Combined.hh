@@ -30,7 +30,7 @@ namespace gazebo
     private: bool quit;
 
     private: Master *master;
-    private: boost::thread *masterThread;
+    private: boost::thread *masterThread, *transportThread;
   };
 }
 

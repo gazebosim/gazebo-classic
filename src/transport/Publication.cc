@@ -29,12 +29,17 @@ std::string Publication::GetTopic() const
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
-  this->callbacks.push_back(callback);
-
-  if (this->prevMsg && this->prevMsg->IsInitialized())
+  std::list< CallbackHelperPtr >::iterator iter;
+  iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
+  if (iter == this->callbacks.end())
   {
-    callback->HandleMessage(this->prevMsg);
-  }
+    this->callbacks.push_back(callback);
+
+    if (this->prevMsg && this->prevMsg->IsInitialized())
+    {
+      callback->HandleMessage(this->prevMsg);
+    }
+  } 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

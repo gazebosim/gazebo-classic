@@ -250,6 +250,8 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
   std::string type = node->GetString("type","point",1);
   std::transform( type.begin(), type.end(), type.begin(), ::tolower);
 
+  Message::Init(result,node->GetString("name","light",1));
+
   if (type == "point")
     result.set_type(msgs::Light::POINT);
   else if (type == "spot")
@@ -407,23 +409,29 @@ msgs::Fog Message::FogFromXML(XMLConfigNode *node)
 msgs::Scene Message::SceneFromXML(XMLConfigNode *node)
 {
   msgs::Scene result;
+
   Message::Init(result,"scene");
   XMLConfigNode *cnode = NULL;
 
-  result.mutable_ambient()->CopyFrom( 
-      Message::Convert(node->GetColor("ambient",Color(1,1,1,1))) );
+  if (node)
+  {
+    result.mutable_ambient()->CopyFrom( 
+        Message::Convert(node->GetColor("ambient",Color(1,1,1,1))) );
 
-  result.mutable_background()->CopyFrom( 
-      Message::Convert(node->GetColor("background_color",Color(1,1,1,1))) );
+    result.mutable_background()->CopyFrom( 
+        Message::Convert(node->GetColor("background_color",Color(1,1,1,1))) );
 
-  if (!node->GetString("sky_material","",0).empty())
-    result.set_sky_material( node->GetString("sky_material","",1) );
+    if (!node->GetString("sky_material","",0).empty())
+      result.set_sky_material( node->GetString("sky_material","",1) );
 
-  if ( (cnode = node->GetChild("fog")) != NULL)
-    result.mutable_fog()->CopyFrom( Message::FogFromXML(cnode) );
+    if ( (cnode = node->GetChild("fog")) != NULL)
+      result.mutable_fog()->CopyFrom( Message::FogFromXML(cnode) );
 
-  if ( (cnode = node->GetChild("shadows")) != NULL && cnode->GetBool("enabled",true,0))
-    result.mutable_shadows()->CopyFrom( Message::ShadowsFromXML(cnode) );
+    if ( (cnode = node->GetChild("shadows")) != NULL && cnode->GetBool("enabled",true,0))
+      result.mutable_shadows()->CopyFrom( Message::ShadowsFromXML(cnode) );
+  }
+  else
+    gzwarn << "node is null\n";
 
   return result;
 }

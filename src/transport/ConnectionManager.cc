@@ -86,6 +86,24 @@ void ConnectionManager::Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Run all the connections
+void ConnectionManager::Run()
+{
+  std::list<ConnectionPtr>::iterator iter;
+  while (true)
+  {
+    this->masterConn->ProcessWriteQueue();
+
+    for (iter = this->connections.begin(); 
+         iter != this->connections.end(); iter++)
+    {
+      (*iter)->ProcessWriteQueue();
+    }
+    usleep(10000);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // On read master
 void ConnectionManager::OnMasterRead( const std::string &data)
 {
@@ -189,7 +207,7 @@ void ConnectionManager::Advertise(const std::string &topic,
   msg.set_host( this->serverConn->GetLocalAddress() );
   msg.set_port( this->serverConn->GetLocalPort() );
 
-  this->masterConn->Write(common::Message::Package("advertise", msg));
+  this->masterConn->EnqueueMsg(common::Message::Package("advertise", msg));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +219,7 @@ void ConnectionManager::Unadvertise( const std::string &topic )
   msg.set_host( this->serverConn->GetLocalAddress() );
   msg.set_port( this->serverConn->GetLocalPort() );
 
-  this->masterConn->Write(common::Message::Package("unadvertise", msg));
+  this->masterConn->EnqueueMsg(common::Message::Package("unadvertise", msg));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +236,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
   this->masterConn->Cancel();
 
   // Get the list of publishers
-  this->masterConn->Write( common::Message::Package("request", request) );
+  this->masterConn->EnqueueMsg( common::Message::Package("request", request) );
 
   this->masterConn->Read(data);
 
@@ -238,7 +256,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 void ConnectionManager::Unsubscribe( const msgs::Subscribe &msg )
 {
   // Inform the master that we want to unsubscribe from a topic.
-  this->masterConn->Write(common::Message::Package("unsubscribe", msg));
+  this->masterConn->EnqueueMsg(common::Message::Package("unsubscribe", msg));
 }
 
 void ConnectionManager::Subscribe(const std::string &topic, 
@@ -264,7 +282,7 @@ void ConnectionManager::Subscribe(const std::string &topic,
     // Inform the master that we want to subscribe to a topic.
     // This will result in Connection::OnMasterRead getting called with a 
     // packet type of "publisher_update"
-    this->masterConn->Write(common::Message::Package("subscribe", msg));
+    this->masterConn->EnqueueMsg(common::Message::Package("subscribe", msg));
   }
 }
 

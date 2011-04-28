@@ -6,31 +6,23 @@ import "color.proto";
 
 message Light
 {
-  required Header header = 1;
-
-  enum ActionType
-  {
-    UPDATE = 1;
-    DELETE = 2;
-  }
-  required ActionType action = 2;
-
+  required Header header           = 1;
   enum LightType
   {
-    POINT = 1;
-    SPOT = 2;
+    POINT       = 1;
+    SPOT        = 2;
     DIRECTIONAL = 3;
   }
-  optional LightType type = 3;
+  optional LightType type         = 2;
 
-  optional Pose pose = 4;
-  optional Color diffuse = 5;
-  optional Color specular = 6;
-  optional Point attenuation = 7;
-  optional Point direction = 8;
-  optional float range = 9;
-  optional bool cast_shadows = 10;
-  optional float spot_inner_angle = 11;
-  optional float spot_outer_angle = 12;
-  optional float spot_falloff = 13;
+  optional Pose pose              = 3;
+  optional Color diffuse          = 4;
+  optional Color specular         = 5;
+  optional Point attenuation      = 6;
+  optional Point direction        = 7;
+  optional float range            = 8;
+  optional bool cast_shadows      = 9;
+  optional float spot_inner_angle = 10;
+  optional float spot_outer_angle = 11;
+  optional float spot_falloff     = 12;
 }

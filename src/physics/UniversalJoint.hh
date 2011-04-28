@@ -23,6 +23,7 @@
 #define UNIVERSALJOINT_HH
 
 #include "physics/Joint.hh"
+#include "common/XMLConfig.hh"
 
 namespace gazebo
 {
@@ -38,8 +39,8 @@ namespace gazebo
               this->AddType(Base::UNIVERSAL_JOINT);
   
               common::Param::Begin(&this->parameters);
-              this->axis1P = new common::ParamT<common::Vector3>("axis1",common::Vector3(0,0,1),0);
-              this->axis2P = new common::ParamT<common::Vector3>("axis2",common::Vector3(0,0,1),0);
+              this->axis1P = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,0,1),0);
+              this->axis2P = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,0,1),0);
   
               this->loStop1P = new common::ParamT<common::Angle>("lowStop1",-M_PI,0);
               this->hiStop1P = new common::ParamT<common::Angle>("highStop1",M_PI,0);
@@ -62,8 +63,8 @@ namespace gazebo
     /// \brief Load the joint
     protected: virtual void Load(common::XMLConfigNode *node)
                {
-                 this->axis1P->Load(node);
-                 this->axis2P->Load(node);
+                 this->axis1P->Load(node->GetChild("axis1"));
+                 this->axis2P->Load(node->GetChild("axis2"));
   
                  this->loStop1P->Load(node);
                  this->hiStop1P->Load(node);

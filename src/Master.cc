@@ -52,7 +52,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 {
   msgs::String msg;
   msg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
-  new_connection->Write( common::Message::Package("init", msg) );
+  new_connection->EnqueueMsg( common::Message::Package("init", msg), true );
 
   new_connection->StartRead( boost::bind(&Master::OnRead, this, new_connection, _1));
   this->connections.push_back(new_connection);
@@ -63,7 +63,6 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
 {
   msgs::Packet packet;
   packet.ParseFromString(data);
-
 
   if (packet.type() == "advertise")
   {
@@ -80,7 +79,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
     {
       if (iter->first.topic() == pub.topic())
       {
-        iter->second->Write(common::Message::Package("publisher_update", pub));
+        iter->second->EnqueueMsg(common::Message::Package("publisher_update", pub));
       }
     }
   }
@@ -96,7 +95,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
     {
       if (iter->first.topic() == pub.topic())
       {
-        iter->second->Write(common::Message::Package("unadvertise", pub));
+        iter->second->EnqueueMsg(common::Message::Package("unadvertise", pub));
       }
     }
 
@@ -113,7 +112,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
     {
       if (iter->first.topic() == sub.topic())
       {
-        iter->second->Write(common::Message::Package("unsubscribe", sub));
+        iter->second->EnqueueMsg(common::Message::Package("unsubscribe", sub));
       }
     }
 
@@ -145,7 +144,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
     {
       if (iter->first.topic() == sub.topic())
       {
-        conn->Write(common::Message::Package("publisher_update", iter->first));
+        conn->EnqueueMsg(common::Message::Package("publisher_update", iter->first), true);
       }
     }
   }
@@ -164,7 +163,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
         msgs::Publish *pub = msg.add_publisher();
         pub->CopyFrom( iter->first );
       }
-      conn->Write( common::Message::Package("publisher_list", msg) );
+      conn->EnqueueMsg( common::Message::Package("publisher_list", msg), true );
     }
     else if (req.request() == "topic_info")
     {
@@ -197,7 +196,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
         }
       }
 
-      conn->Write( common::Message::Package("topic_info_response", ti) );
+      conn->EnqueueMsg( common::Message::Package("topic_info_response", ti), true );
     }
   }
   else
@@ -206,9 +205,15 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
 
 void Master::Run()
 {
+  std::list<transport::ConnectionPtr>::iterator iter;
   while (!this->quit)
   {
-    usleep(1000000);
+    for (iter = this->connections.begin(); 
+         iter != this->connections.end(); iter++)
+    {
+      (*iter)->ProcessWriteQueue();
+    }
+    usleep(100000);
   }
 }
 

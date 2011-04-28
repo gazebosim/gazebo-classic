@@ -208,14 +208,12 @@ namespace gazebo
     
       private: event::Connection_V connections;
     
-      private: transport::PublisherPtr visPub, selectionPub, lightPub, scenePub;
+      private: transport::PublisherPtr selectionPub, scenePub;
       private: transport::PublisherPtr statPub;
-
       private: transport::SubscriberPtr visSub, sceneSub, controlSub;
 
       private: msgs::WorldStatistics worldStatsMsg;
-
-      private: std::list< boost::shared_ptr<msgs::Visual const> > visualMsgs;
+      private: msgs::Scene sceneMsg;
 
       private: void (World::*modelUpdateFunc)();
 

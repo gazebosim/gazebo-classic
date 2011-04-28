@@ -42,7 +42,7 @@ namespace gazebo
                 this->AddType(Base::HINGE_JOINT);
   
                 common::Param::Begin(&this->parameters);
-                this->axisP = new common::ParamT<common::Vector3>("axis",common::Vector3(0,1,0), 1);
+                this->axisP = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,1,0), 1);
                 this->loStopP = new common::ParamT<common::Angle>("lowStop",-std::numeric_limits<float>::max(),0);
                 this->hiStopP = new common::ParamT<common::Angle>("highStop",std::numeric_limits<float>::max(),0);
                 this->dampingP = new common::ParamT<double>("damping",0.0, 0);
@@ -61,7 +61,7 @@ namespace gazebo
       /// \brief Load joint
       protected: virtual void Load(common::XMLConfigNode *node)
                  {
-                   this->axisP->Load(node);
+                   this->axisP->Load(node->GetChild("axis"));
                    this->loStopP->Load(node);
                    this->hiStopP->Load(node);
                    this->dampingP->Load(node);

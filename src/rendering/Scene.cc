@@ -48,19 +48,6 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
-  // Set the global topic namespace
-  transport::set_topic_namespace(name);
-
-  this->receiveMutex = new boost::mutex();
-
-  this->sceneSub = transport::subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
-  this->visSub = transport::subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
-  this->lightSub = transport::subscribe("~/light", &Scene::ReceiveLightMsg, this);
-  this->poseSub = transport::subscribe("~/pose", &Scene::ReceivePoseMsg, this);
-  this->selectionSub = transport::subscribe("~/selection", &Scene::HandleSelectionMsg, this);
-
-  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
-
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -69,9 +56,16 @@ Scene::Scene(const std::string &name)
   this->raySceneQuery = NULL;
   this->type = GENERIC;
 
+
+  // Set the global topic namespace
+  transport::set_topic_namespace(name);
+
+  this->receiveMutex = new boost::mutex();
+
+  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
+
   Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
   this->grids.push_back(grid);
-
 
   common::Param::Begin(&this->parameters);
   this->ambientP = new common::ParamT<common::Color>("ambient", common::Color(.5,.5,.5,1), 0);
@@ -89,12 +83,13 @@ Scene::Scene(const std::string &name)
   this->fogEndP = new common::ParamT<double>("linear_end",1.0,0);
   common::Param::End();
 
-  // Send a request to get the current world state
-  // TODO: Use RPC or some service call to get this properly
-  transport::PublisherPtr pub = transport::advertise<msgs::Request>("/gazebo/default/publish_scene");
-  msgs::Request req;
-  req.set_request("publish");
-  pub->Publish(req);
+  
+  this->sceneSub = transport::subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
+
+  this->visSub = transport::subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
+  this->lightSub = transport::subscribe("~/light", &Scene::ReceiveLightMsg, this);
+  this->poseSub = transport::subscribe("~/pose", &Scene::ReceivePoseMsg, this);
+  this->selectionSub = transport::subscribe("~/selection", &Scene::HandleSelectionMsg, this);
 
 }
 
@@ -165,6 +160,7 @@ void Scene::Load(common::XMLConfigNode *node)
     this->type = BSP;
   else
     this->type = GENERIC;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,11 +177,9 @@ void Scene::Init()
   else
     this->manager = root->createSceneManager(Ogre::ST_GENERIC);
 
+
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();
-
-  // Ambient lighting
-  this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
 
   // Create the sky
   if ( !(**this->skyMaterialP).empty() )
@@ -235,6 +229,14 @@ void Scene::Init()
 
     this->manager->setShadowColour( Conversions::Color(**this->shadowColorP) );
   }
+
+  // Send a request to get the current world state
+  // TODO: Use RPC or some service call to get this properly
+  transport::PublisherPtr pub = transport::advertise<msgs::Request>("/gazebo/default/publish_scene");
+  msgs::Request req;
+  req.set_request("publish");
+
+  pub->Publish(req);
 
   //this->InitShadows();
 
@@ -286,6 +288,9 @@ std::string Scene::GetName() const
 void Scene::SetAmbientColor(const common::Color &color)
 {
   this->ambientP->SetValue(color);
+
+  // Ambient lighting
+  this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -890,6 +895,15 @@ void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(msg->pose(i)) );
     this->poseMsgs.push_back( pm );
   }
+
+  for (int i=0; i < msg->light_size(); i++)
+  {
+    boost::shared_ptr<msgs::Light> lm( new msgs::Light(msg->light(i)) );
+    this->lightMsgs.push_back( lm );
+  }
+
+  if (msg->has_ambient())
+    this->SetAmbientColor( common::Message::Convert(msg->ambient()) );
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -924,7 +938,6 @@ void Scene::PreRender()
     this->ProcessLightMsg( *lIter );
   }
   this->lightMsgs.clear();
-
 
   // Process all the Pose messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
@@ -1011,15 +1024,7 @@ void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
   Light_M::iterator iter;
   iter = this->lights.find(msg->header().str_id());
 
-  if (msg->action() == msgs::Light::DELETE)
-  {
-    printf("DELETE  A LIGHT!!\n");
-  }
-  else if (iter != this->lights.end())
-  {
-    printf(" UPDATE A LIGHT\n");
-  }
-  else
+  if (iter == this->lights.end())
   {
     Light *light = new Light(this);
     light->LoadFromMsg(msg);

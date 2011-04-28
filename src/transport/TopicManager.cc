@@ -140,6 +140,10 @@ void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 void TopicManager::ConnectPubToSub( const std::string &topic,
                                     const SubscriptionTransportPtr &sublink )
 {
+
+  if (topic == "/gazebo/default/publish_scene")
+    gzdbg << "Connect Pub To Sub\n";
+    
   PublicationPtr publication = this->FindPublication( topic );
   publication->AddSubscription( sublink );
 }
@@ -174,6 +178,8 @@ void TopicManager::ConnectSubscibers(const std::string &topic)
     std::list<CallbackHelperPtr>::iterator cbIter;
     for (cbIter = iter->second.begin(); cbIter != iter->second.end(); cbIter++)
     {
+      if (topic == "/gazebo/default/publish_scene")
+        gzdbg << "Connect Subscribers\n";
       publication->AddSubscription( *cbIter );
     }
   }

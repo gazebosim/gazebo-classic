@@ -369,7 +369,7 @@ GeomPtr ODEPhysics::CreateGeom(const std::string &type, BodyPtr body)
     shape.reset( new ODECylinderShape(geom) );
   else if ( type == "multiray")
     shape.reset( new ODEMultiRayShape(geom) );
-  else if ( type == "trimesh")
+  else if ( type == "mesh")
     shape.reset( new ODETrimeshShape(geom) );
   else if ( type == "heightmap")
     shape.reset( new ODEHeightmapShape(geom) );

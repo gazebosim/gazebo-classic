@@ -124,13 +124,16 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
 // Create a scene
 ScenePtr RenderEngine::CreateScene(const std::string &name)
 {
+  gzdbg << "Create a scene\n";
   ScenePtr scene( new Scene(name) );
+  scene->Load(NULL);
+  scene->Init();
+
   scene->SetType(Scene::GENERIC);
   scene->SetAmbientColor(common::Color(0.5, 0.5, 0.5));
   scene->SetBackgroundColor(common::Color(0.5, 0.5, 0.5, 1.0));
   scene->CreateGrid( 10, 1, 0.03, common::Color(1,1,1,1));
-  scene->Load(NULL);
-  scene->Init();
+
 
   this->scenes.push_back(scene);
   return scene;
