@@ -101,6 +101,11 @@ ODEPhysics::ODEPhysics()
   this->quickStepToleranceP = new ParamT<double>("quickStepTolerance",0,0); // number of thread pool threads for islands
 #endif
 
+#ifdef ODE_PRECON_PGS
+  this->stepPreconItersP = new ParamT<unsigned int>("stepPreconIters", 0, 0);
+  this->quickStepPreconItersP = new ParamT<int>   ("quickStepPreconIters", -1, 0, true, "replace quickStepPreconIters with stepPreconIters");
+#endif
+
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
   this->stepTypeP = new ParamT<std::string>("stepType", "quick", 0);
@@ -147,6 +152,11 @@ ODEPhysics::~ODEPhysics()
   delete this->quickStepToleranceP;
 #endif
 
+#ifdef ODE_PRECON_PGS
+  delete this->stepPreconItersP;
+  delete this->quickStepPreconItersP;
+#endif
+
   delete this->globalCFMP;
   delete this->globalERPP;
   delete this->stepTypeP;
@@ -188,6 +198,14 @@ void ODEPhysics::Load(XMLConfigNode *node)
   dWorldSetQuickStepTolerance(this->worldId, this->quickStepToleranceP->GetValue() );
 #endif
  
+#ifdef ODE_PRECON_PGS
+  this->stepPreconItersP->Load(cnode);
+  this->quickStepPreconItersP->Load(cnode);
+  dWorldSetQuickStepPreconIterations(this->worldId, **this->stepPreconItersP );
+  if (this->quickStepPreconItersP->GetValue() >= 0) // only set them if specified
+    dWorldSetQuickStepPreconIterations(this->worldId, **this->quickStepPreconItersP );
+#endif
+
   this->gravityP->Load(cnode);
   this->stepTimeP->Load(cnode);
   this->updateRateP->Load(cnode);
@@ -225,6 +243,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
   dWorldSetAutoDisableSteps(this->worldId, 50);
 
   this->contactGeoms.resize(**this->defaultMaxContactsP);
+  this->contactGeomsSkipped.resize(**this->defaultMaxContactsP);
   this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
 
   // Reset the contact pointer
@@ -249,6 +268,17 @@ void ODEPhysics::Load(XMLConfigNode *node)
 
 }
 
+#ifdef ODE_PRECON_PGS
+////////////////////////////////////////////////////////////////////////////////
+/// Set the precondition step iterations
+void ODEPhysics::SetSORPGSPreconIters(unsigned int iters)
+{
+  this->stepPreconItersP->SetValue(iters);
+  dWorldSetQuickStepNumIterations(this->worldId, **this->stepPreconItersP );
+}
+#endif
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Save the ODE engine
 void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
@@ -262,6 +292,12 @@ void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->quickStepOverlapP) << "\n";
   stream << prefix << "  " << *(this->quickStepToleranceP) << "\n";
 #endif
+
+#ifdef ODE_PRECON_PGS
+  stream << prefix << "  " << *(this->stepPreconItersP) << "\n";
+  stream << prefix << "  " << *(this->quickStepPreconItersP) << "\n";
+#endif
+
   stream << prefix << "  " << *(this->stepTimeP) << "\n";
   stream << prefix << "  " << *(this->gravityP) << "\n";
   stream << prefix << "  " << *(this->updateRateP) << "\n";
@@ -617,6 +653,7 @@ void ODEPhysics::SetMaxContacts(int max_contacts)
   // @todo: FIXME: resizes contactGeoms, but can we do this on the fly?
   //               this might need to be done on a new time step
   this->contactGeoms.resize(**this->defaultMaxContactsP);
+  this->contactGeomsSkipped.resize(**this->defaultMaxContactsP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -802,9 +839,9 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     // if dCollide is not threaded out in parallel, this is ok, otherwise
     //   create local contactGeoms buffer for each CallBack instance
     self->contactGeoms.resize(max_contacts);
+    self->contactGeomsSkipped.resize(max_contacts);
 
-    int num_contacts = dCollide(o1,o2,max_contacts, &self->contactGeoms[0],
-                                sizeof(self->contactGeoms[0]));
+    int num_contacts = dCollide(o1,o2,max_contacts, &self->contactGeoms[0], sizeof(self->contactGeoms[0]));
 
     if (num_contacts != 0)
     {
@@ -814,12 +851,54 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       (*self->contactFeedbackIter).feedbacks.resize(num_contacts);
 
       double h, kp, kd;
+      bool contact_created = false;
       for (int i = 0; i < num_contacts; i++)
       {
+        // default to non-skip
+        self->contactGeomsSkipped[i] = false;
+
         // skip negative depth contacts
         if(self->contactGeoms[i].depth < 0)
           continue;
 
+        //   
+        // skip adding collision joint if the collisions are
+        //   near each others
+        //   and normals are nearly parallel
+        //   
+        double normal_dot_tol = 0.001;
+        double dist_tol   = 0.003;
+        for (int j = 0; j < i; j++)
+        {
+          // skip comparison with self and negative depth contacts against non-skipped contacts
+          if(self->contactGeoms[j].depth < 0 || self->contactGeomsSkipped[j])
+            continue;
+
+          // if distance(self->contactGeoms[i].pos[:] and self->contactGeoms[j].pos[:]) < tol
+          // && dotproduct(self->contactGeoms[i].normal[:] and self->contactGeoms[j].normal[:]) < tol
+          //   skip this contact
+
+          Vector3 contactPos1(self->contactGeoms[i].pos[0], self->contactGeoms[i].pos[1], self->contactGeoms[i].pos[2]);
+          Vector3 contactNorm1(self->contactGeoms[i].normal[0], self->contactGeoms[i].normal[1], self->contactGeoms[i].normal[2]);
+          Vector3 contactPos2(self->contactGeoms[j].pos[0], self->contactGeoms[j].pos[1], self->contactGeoms[j].pos[2]);
+          Vector3 contactNorm2(self->contactGeoms[j].normal[0], self->contactGeoms[j].normal[1], self->contactGeoms[j].normal[2]);
+
+          double normal_dot = 1.0 - contactNorm1.GetDotProd(contactNorm2);
+          double dist = (contactPos1 - contactPos2).GetLength();
+          if (fabs(normal_dot) < normal_dot_tol && dist < dist_tol)
+          {
+            self->contactGeomsSkipped[i] = true;
+            //printf("skipping norm[%f]<[%f]  dist[%f]<[%f]\n",normal_dot,normal_dot_tol,dist,dist_tol);
+            break;
+          }
+          //else printf("   ...   norm[%f]<[%f]  dist[%f]<[%f]\n",normal_dot,normal_dot_tol,dist,dist_tol);
+
+        }
+        if (self->contactGeomsSkipped[i]) continue;
+
+        //   
+        // proceed to add the contact point and create a contact joint
+        //   
         dContact contact;
         contact.geom = self->contactGeoms[i];
         contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
@@ -834,14 +913,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
         if (geom1->surface->enableFriction && geom2->surface->enableFriction)
         {
-          contact.surface.mu = std::min(geom1->surface->mu1, 
-              geom2->surface->mu1);
-          contact.surface.mu2 = std::min(geom1->surface->mu2, 
-              geom2->surface->mu2);
-          contact.surface.slip1 = std::min(geom1->surface->slip1, 
-              geom2->surface->slip1);
-          contact.surface.slip2 = std::min(geom1->surface->slip2, 
-              geom2->surface->slip2);
+          contact.surface.mu = std::min(geom1->surface->mu1, geom2->surface->mu1);
+          contact.surface.mu2 = std::min(geom1->surface->mu2, geom2->surface->mu2);
+          contact.surface.slip1 = std::min(geom1->surface->slip1, geom2->surface->slip1);
+          contact.surface.slip2 = std::min(geom1->surface->slip2, geom2->surface->slip2);
         }
         else
         {
@@ -924,29 +999,31 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         // Store the contact info 
         if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
         {
-          (*self->contactFeedbackIter).contact.depths.push_back(
-              contact.geom.depth);
+          (*self->contactFeedbackIter).contact.depths.push_back(contact.geom.depth);
           (*self->contactFeedbackIter).contact.positions.push_back(contactPos);
           (*self->contactFeedbackIter).contact.normals.push_back(contactNorm);
-          (*self->contactFeedbackIter).contact.time = 
-            Simulator::Instance()->GetSimTime();
+          (*self->contactFeedbackIter).contact.time = Simulator::Instance()->GetSimTime();
           dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
         }
 
         dJointAttach (c, b1, b2);
+        contact_created = true;
       }
 
-      // increase contact feedback buffer size if needed
-      if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
+      if (contact_created)
       {
-        self->contactFeedbackIter++;
-        if (self->contactFeedbackIter == self->contactFeedbacks.end())
+        // increase contact feedback buffer size if needed
+        if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
         {
-          // extend vector by 100 elements, but
-          //  remember last index, since resize might re-allocate the vector
-          unsigned int index = self->contactFeedbackIter - self->contactFeedbacks.begin();
-          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
-          self->contactFeedbackIter = self->contactFeedbacks.begin() + index;
+          self->contactFeedbackIter++;
+          if (self->contactFeedbackIter == self->contactFeedbacks.end())
+          {
+            // extend vector by 100 elements, but
+            //  remember last index, since resize might re-allocate the vector
+            unsigned int index = self->contactFeedbackIter - self->contactFeedbacks.begin();
+            self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
+            self->contactFeedbackIter = self->contactFeedbacks.begin() + index;
+          }
         }
       }
     }

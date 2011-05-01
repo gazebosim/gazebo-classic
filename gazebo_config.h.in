@@ -18,6 +18,7 @@
 #cmakedefine QUICKSTEP_EXPERIMENTAL 1
 #cmakedefine ODE_CONTACT_BODY_MAXVEL 1
 #cmakedefine ODE_SCREW_JOINT 1
+#cmakedefine ODE_PRECON_PGS 1
 #cmakedefine PARALLEL_QUICKSTEP 1
 #cmakedefine INCLUDE_RTSHADER 1
 #cmakedefine ENABLE_TIMERS 1

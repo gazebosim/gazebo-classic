@@ -166,6 +166,13 @@ class ODEPhysics : public PhysicsEngine
   /// \brief access functions to set ODE parameters
   public: void SetMaxContacts(int max_contacts);
 
+#ifdef ODE_PRECON_PGS
+  /// \brief access functions to set ODE parameters
+  public: void SetSORPGSPreconIters(unsigned int iters);
+  private: ParamT<unsigned int> *stepPreconItersP; 
+  private: ParamT<int>    *quickStepPreconItersP;
+#endif
+
   /// \brief access functions to set ODE parameters
   public: double GetWorldCFM();
   /// \brief access functions to set ODE parameters
@@ -224,6 +231,7 @@ class ODEPhysics : public PhysicsEngine
   private: std::map<std::string, dSpaceID> spaces;
 
   private: std::vector<dContactGeom> contactGeoms;
+  private: std::vector<bool> contactGeomsSkipped;
 
 #ifdef QUICKSTEP_EXPERIMENTAL
   /// experimental ode stuff
