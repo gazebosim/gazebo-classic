@@ -118,6 +118,19 @@ if (PKG_CONFIG_FOUND)
     SET (ODE_SCREW_JOINT TRUE CACHE BOOL "support for ODE quickstep experimental screw stuff")
   ENDIF (NOT ODE_WG_SCREW_PATCHES_FOUND)
 
+  ###################################################
+  #                                                 #
+  #   patched ode version with precon pgs (ppgs)    #
+  #                                                 #
+  ###################################################
+  SET(ODE_WG_PRECON_PATCHES_VERSION 0.11.1.71 CACHE INTERNAL "ODE version with precon pgs" FORCE)
+  pkg_check_modules(ODE_WG_PRECON_PATCHES ode>=${ODE_WG_PRECON_PATCHES_VERSION})
+  IF (NOT ODE_WG_PRECON_PATCHES_FOUND)
+    SET (ODE_PRECON_PGS FALSE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  ELSE (NOT ODE_WG_PRECON_PATCHES_FOUND)
+    SET (ODE_PRECON_PGS TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  ENDIF (NOT ODE_WG_PRECON_PATCHES_FOUND)
+
   #################################################
   # Find OGRE 
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
