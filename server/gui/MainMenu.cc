@@ -123,6 +123,7 @@ void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
 // Show Bounding boxes callback
 void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetShowBoundingBoxes( !World::Instance()->GetShowBoundingBoxes() );
 }
 
@@ -130,6 +131,7 @@ void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
 // Show Bounding boxes callback
 void MainMenu::ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetShowJoints( !World::Instance()->GetShowJoints() );
 }
 
@@ -137,6 +139,7 @@ void MainMenu::ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/)
 // Show Bounding boxes callback
 void MainMenu::ShowPhysicsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetShowPhysics( !World::Instance()->GetShowPhysics() );
 }
 
@@ -153,6 +156,7 @@ void MainMenu::ResetCB(Fl_Widget * /*w*/, void * /*data*/)
 // View the world as wireframe
 void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetWireframe( !World::Instance()->GetWireframe() );
 }
 
@@ -160,6 +164,7 @@ void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
 // View the contacts
 void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetShowContacts( !World::Instance()->GetShowContacts() );
 
   // hardocde contact visualization circular buffer to 5000 elements when viewed
@@ -176,6 +181,7 @@ void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
 // View the light source visuals
 void MainMenu::ShowLightsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetShowLights( !World::Instance()->GetShowLights() );
 }
 
@@ -183,5 +189,6 @@ void MainMenu::ShowLightsCB(Fl_Widget * /*w*/, void * /*data*/)
 // View the light source visuals
 void MainMenu::ShowCamerasCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->SetShowCameras( !World::Instance()->GetShowCameras() );
 }
