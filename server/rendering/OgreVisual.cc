@@ -462,7 +462,7 @@ Vector3 OgreVisual::GetScale()
 
   Ogre::Vector3 vscale;
   vscale=this->sceneNode->getScale();
-  return Vector3(vscale.x, vscale.y, vscale.z);
+  return Vector3(fabs(vscale.x), fabs(vscale.y), fabs(vscale.z));
 }
 
 
