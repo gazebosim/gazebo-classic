@@ -35,7 +35,7 @@
       <geometry>
         <mesh filename="pr2/base_v0/caster.stl"/>
       </geometry>
-      <material name="Caster"/>
+      <material name="Gazebo/Red"/>
     </visual>
     <collision name="fl_caster_rotation_geom">
       <origin rpy="0 0 0" xyz="0 0 0"/>

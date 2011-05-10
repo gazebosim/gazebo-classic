@@ -71,6 +71,8 @@ RenderEngine::RenderEngine()
   this->root = NULL;
 
   this->dummyDisplay = false;
+
+  this->initialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +129,9 @@ ScenePtr RenderEngine::CreateScene(const std::string &name)
   gzdbg << "Create a scene\n";
   ScenePtr scene( new Scene(name) );
   scene->Load(NULL);
-  scene->Init();
+
+  if (this->initialized)
+    scene->Init();
 
   scene->SetType(Scene::GENERIC);
   scene->SetAmbientColor(common::Color(0.5, 0.5, 0.5));
@@ -197,12 +201,14 @@ void RenderEngine::UpdateScenes()
 // Initialize ogre
 void RenderEngine::Init()
 {
+  this->initialized = false;
+
   Ogre::ColourValue ambient;
 
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
   /// initialize properly
-  if (this->headless)
+  //if (this->headless)
   {
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay) 
@@ -246,6 +252,11 @@ void RenderEngine::Init()
   if (this->HasGLSL())
     RTShaderSystem::Instance()->UpdateShaders();
     */
+
+  for (unsigned int i=0; i < this->scenes.size(); i++)
+    this->scenes[i]->Init();
+
+  this->initialized = true;
 }
 
 

@@ -6,8 +6,7 @@
 
 #include "transport/Transport.hh"
 
-#include "rendering/Rendering.hh"
-
+#include "gui/ModelBuilderWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
@@ -15,19 +14,6 @@
 
 using namespace gazebo;
 using namespace gui;
-
-const std::string default_config =
-"<?xml version='1.0'?>\
-<gazebo>\
-  <config>\
-    <verbosity>4</verbosity>\
-    <gui>\
-      <size>800 600</size>\
-      <pos>0 0</pos>\
-    </gui>\
-  </config>\
-</gazebo>\
-";
 
 
 MainWindow::MainWindow()
@@ -63,43 +49,8 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::Load( const std::string &filename )
+void MainWindow::Load( const common::XMLConfigNode *node )
 {
-  // Load the world file
-  common::XMLConfig *xmlFile = new common::XMLConfig();
-
-  try
-  {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
-
-  // Get the root node, and make sure we have a gazebo config
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  if (!rootNode || rootNode->GetName() != "gazebo")
-    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
-
-  // Get the config node
-  common::XMLConfigNode *configNode = rootNode->GetChild("config");
-  if (!configNode)
-    gzthrow("Invalid xml. Needs a <config> tag");
- 
-  // Get the gui node
-  common::XMLConfigNode *guiNode = configNode->GetChild("gui");
-  if (!guiNode)
-    gzthrow("Invalid xml. Needs a <gui> tag");
-
-  // Load the Ogre rendering system
-  if (!rendering::load(configNode))
-    gzthrow("Failed to load the rendering engine");
-
-  delete xmlFile;
 }
 
 void MainWindow::Init()
@@ -161,6 +112,15 @@ void MainWindow::Step()
   this->worldControlPub->Publish(msg);
 }
 
+void MainWindow::NewModel()
+{
+  gzmsg << "new Model\n";
+  ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
+  modelBuilder->Init();
+  modelBuilder->show();
+  modelBuilder->resize(800,600);
+}
+
 void MainWindow::CreateBox()
 {
 }
@@ -210,6 +170,12 @@ void MainWindow::CreateActions()
   this->quitAct->setStatusTip(tr("Quit"));
   connect(this->quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
+  this->newModelAct = new QAction(tr("New &Model"), this);
+  this->newModelAct->setShortcut(tr("Ctrl+M"));
+  this->newModelAct->setStatusTip(tr("Create a new model"));
+  connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
+
+
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   this->playAct->setStatusTip(tr("Run the world"));
   connect(this->playAct, SIGNAL(triggered()), this, SLOT(Play()));
@@ -256,6 +222,9 @@ void MainWindow::CreateMenus()
   this->fileMenu->addAction(this->saveAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(this->quitAct);
+
+  this->editMenu = this->menuBar()->addMenu(tr("&Edit"));
+  this->editMenu->addAction(this->newModelAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
 

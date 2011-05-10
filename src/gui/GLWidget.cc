@@ -16,7 +16,7 @@
 using namespace gazebo;
 using namespace gui;
 
-GLWidget::GLWidget(QWidget *parent)
+GLWidget::GLWidget( QWidget *parent )
   : QWidget(parent)
 {
   this->windowId = -1;
@@ -48,12 +48,10 @@ void GLWidget::showEvent(QShowEvent *event)
       this->GetOgreHandle(), this->width(), this->height());
 
   QWidget::showEvent(event);
-  if (!rendering::init(false))
-    gzthrow("Failed to initialized the rendering engine\n");
 
-  rendering::ScenePtr scene = rendering::create_scene("default");
-
-  this->ViewScene( scene );
+  if (this->userCamera)
+    rendering::WindowManager::Instance()->SetCamera(this->windowId, 
+                                                    this->userCamera);
 }
 
 void GLWidget::moveEvent(QMoveEvent *e)
@@ -144,7 +142,8 @@ void GLWidget::ViewScene(rendering::ScenePtr scene)
   this->userCamera->SetWorldPosition( common::Vector3(-5,0,5) );
   this->userCamera->SetWorldRotation( common::Quatern::EulerToQuatern(0, DTOR(15), 0) );
 
-  rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
+  if (this->windowId >= 0)
+    rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
 }
 
 

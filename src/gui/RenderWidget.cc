@@ -2,6 +2,7 @@
 #include <iomanip>
 
 #include "rendering/UserCamera.hh"
+#include "rendering/Rendering.hh"
 
 #include "gui/GLWidget.hh"
 #include "gui/RenderWidget.hh"
@@ -22,6 +23,11 @@ RenderWidget::RenderWidget( QWidget *parent )
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->glWidget = new GLWidget(mainFrame);
+  gzdbg << "A\n";
+  rendering::ScenePtr scene = rendering::create_scene("default");
+  gzdbg << "B\n";
+  this->glWidget->ViewScene( scene );
+  gzdbg << "C\n";
 
   this->xPosEdit = new QLineEdit;
   this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit) );
@@ -99,7 +105,6 @@ RenderWidget::RenderWidget( QWidget *parent )
   QTimer *timer = new QTimer(this);
   connect( timer, SIGNAL(timeout()), this, SLOT(update()) );
   timer->start(33);
-
 }
 
 RenderWidget::~RenderWidget()

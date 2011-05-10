@@ -7,9 +7,20 @@ link_directories(
 
 add_definitions( ${QT_DEFINITIONS} )
 
-set (sources Gui.cc MainWindow.cc RenderWidget.cc GLWidget.cc TimePanel.cc)
+set (sources Gui.cc 
+             MainWindow.cc 
+             RenderWidget.cc 
+             GLWidget.cc 
+             TimePanel.cc
+             ModelBuilderWidget.cc
+             )
 
-set (headers Gui.hh MainWindow.hh RenderWidget.hh GLWidget.hh TimePanel.hh)
+set (headers Gui.hh 
+             MainWindow.hh 
+             RenderWidget.hh 
+             GLWidget.hh 
+             TimePanel.hh
+             ModelBuilderWidget.hh)
 
 set (resources images.qrc)
 

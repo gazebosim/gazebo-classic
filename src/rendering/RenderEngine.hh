@@ -145,6 +145,8 @@ namespace gazebo
   
       /// True if the GUI is enabled
       private: bool headless;
+
+      private: bool initialized;
    
       private: friend class SingletonT<RenderEngine>;
     };

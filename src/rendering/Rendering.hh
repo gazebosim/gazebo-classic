@@ -12,12 +12,11 @@ namespace gazebo
 
   namespace rendering
   {
-    bool load(common::XMLConfigNode *node);
+    bool load(const std::string &filename);
 
-    bool init(bool create_dummy_window);
+    bool init();
 
     rendering::ScenePtr create_scene(const std::string &name);
-
   }
 }
 #endif

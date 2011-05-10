@@ -86,16 +86,12 @@ void SensorServer::Load(const std::string &filename)
   if (!rootNode || rootNode->GetName() != "gazebo")
     gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
 
-  common::XMLConfigNode *configNode = rootNode->GetChild("config");
-  if (!configNode)
-    gzthrow("Invalid xml. Needs a <config> tag");
-
   // Load the rendering system
-  if (!rendering::load(configNode))
+  if (!rendering::load(filename))
     gzthrow("Unable to load the rendering engine");
 
   // The rendering engine will run headless 
-  if (!rendering::init(true))
+  if (!rendering::init())
     gzthrow("Unable to intialize the rendering engine");
 
   rendering::create_scene("default");

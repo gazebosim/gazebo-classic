@@ -19,7 +19,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: GLWidget(QWidget *parent = 0);
+      public: GLWidget(QWidget *parent=0);
       public: virtual ~GLWidget();
 
       public: void ViewScene(rendering::ScenePtr scene);

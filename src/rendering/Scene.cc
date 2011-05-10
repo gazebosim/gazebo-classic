@@ -90,7 +90,6 @@ Scene::Scene(const std::string &name)
   this->lightSub = transport::subscribe("~/light", &Scene::ReceiveLightMsg, this);
   this->poseSub = transport::subscribe("~/pose", &Scene::ReceivePoseMsg, this);
   this->selectionSub = transport::subscribe("~/selection", &Scene::HandleSelectionMsg, this);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,9 +287,9 @@ std::string Scene::GetName() const
 void Scene::SetAmbientColor(const common::Color &color)
 {
   this->ambientP->SetValue(color);
-
   // Ambient lighting
-  this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
+  if (this->manager)
+    this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -641,13 +640,14 @@ void Scene::SetFog( std::string type, const common::Color &color, double density
   else
     type = "none";
 
-  this->manager->setFog( fogType, Conversions::Color(color), density, start, end );
-
   this->fogTypeP->SetValue(type);
   this->fogColorP->SetValue(color);
   this->fogDensityP->SetValue(density);
   this->fogStartP->SetValue(start);
   this->fogEndP->SetValue(end);
+
+  if (this->manager)
+    this->manager->setFog( fogType, Conversions::Color(color), density, start, end );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

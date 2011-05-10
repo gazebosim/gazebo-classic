@@ -17,26 +17,78 @@
 
 #include <QApplication>
 
-#include "MainWindow.hh"
-#include "Gui.hh"
+#include "common/XMLConfig.hh"
+#include "common/Exception.hh"
+#include "rendering/Rendering.hh"
+#include "gui/MainWindow.hh"
+#include "gui/Gui.hh"
 
 using namespace gazebo;
+
+const std::string default_config =
+"<?xml version='1.0'?>\
+<gazebo>\
+  <config>\
+    <verbosity>4</verbosity>\
+    <gui>\
+      <size>800 600</size>\
+      <pos>0 0</pos>\
+    </gui>\
+  </config>\
+</gazebo>\
+";
+
 
 QApplication *g_app;
 gui::MainWindow *g_main_win;
 
 void gui::load(const std::string &filename)
 {
+  rendering::load(filename);
+  rendering::init();
+
+  // Load the world file
+  common::XMLConfig *xmlFile = new common::XMLConfig();
+
+  try
+  {
+    if (!filename.empty())
+      xmlFile->Load(filename);
+    else
+      xmlFile->LoadString(default_config);
+  }
+  catch (common::Exception e)
+  {
+    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
+  }
+
+  // Get the root node, and make sure we have a gazebo config
+  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
+  if (!rootNode || rootNode->GetName() != "gazebo")
+    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
+
+  // Get the config node
+  common::XMLConfigNode *configNode = rootNode->GetChild("config");
+  if (!configNode)
+    gzthrow("Invalid xml. Needs a <config> tag");
+ 
+  // Get the gui node
+  common::XMLConfigNode *guiNode = configNode->GetChild("gui");
+  if (!guiNode)
+    gzthrow("Invalid xml. Needs a <gui> tag");
+
+
   g_app = new QApplication(0,NULL);
   g_main_win = new MainWindow();
 
-  g_main_win->Load(filename);
+  g_main_win->Load(guiNode);
   g_main_win->resize(1024,768);
+
+
 }
 
 void gui::init()
 {
-
   g_main_win->show();
   g_main_win->Init();
 }

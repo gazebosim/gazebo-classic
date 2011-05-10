@@ -6,6 +6,11 @@
 
 namespace gazebo
 {
+  namespace common
+  {
+    class XMLConfigNode;
+  }
+
   namespace gui
   {
     class RenderWidget;
@@ -19,7 +24,7 @@ namespace gazebo
       public: MainWindow();
       public: virtual ~MainWindow();
 
-      public: void Load( const std::string &config );
+      public: void Load( const common::XMLConfigNode *node );
       public: void Init();
 
       protected: void closeEvent(QCloseEvent *event);
@@ -31,6 +36,8 @@ namespace gazebo
       private slots: void Play();
       private slots: void Pause();
       private slots: void Step();
+
+      private slots: void NewModel();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -44,6 +51,7 @@ namespace gazebo
       private: void CreateToolbars();
 
       private: QMenu *fileMenu;
+      private: QMenu *editMenu;
       private: QMenu *viewMenu;
       private: QMenu *helpMenu;
       private: QToolBar *playToolbar;
@@ -54,6 +62,8 @@ namespace gazebo
       private: QAction *saveAct;
       private: QAction *aboutAct;
       private: QAction *quitAct;
+
+      private: QAction *newModelAct;
 
       private: QAction *playAct;
       private: QAction *pauseAct;

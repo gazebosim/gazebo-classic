@@ -88,9 +88,6 @@ Combined::~Combined()
 
 void Combined::Load(const std::string &filename)
 {
-
-  std::cout << "A\n";
-
   std::string host = "";
   unsigned short port = 0;
 
@@ -147,18 +144,12 @@ void Combined::Load(const std::string &filename)
     worldNode = worldNode->GetNext("world");
   }
 
-
-
-  common::XMLConfigNode *configNode = rootNode->GetChild("config");
-  if (!configNode)
-    gzthrow("Invalid xml. Needs a <config> tag");
-
   // Load the rendering system
-  if (!rendering::load(configNode))
+  if (!rendering::load(filename))
     gzthrow("Unable to load the rendering engine");
 
   // The rendering engine will run headless 
-  if (!rendering::init(true))
+  if (!rendering::init())
     gzthrow("Unable to intialize the rendering engine");
 
   rendering::create_scene("default");
