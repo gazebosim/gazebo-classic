@@ -35,6 +35,8 @@ GLWidget::GLWidget( QWidget *parent )
   mainLayout->addWidget(this->renderFrame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
+
+  this->entityMaker = NULL;
 }
 
 GLWidget::~GLWidget()
@@ -99,6 +101,9 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
   this->mouseEvent.right = event->buttons() & Qt::RightButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
   this->mouseEvent.middle = event->buttons() & Qt::MidButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
   this->mouseEvent.dragging = false;
+
+  if (this->entityMaker)
+    this->entityMaker->OnMousePush(this->mouseEvent);
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
@@ -113,7 +118,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
   this->mouseEvent.pos.Set( event->pos().x(), event->pos().y() );
   this->mouseEvent.dragging = true;
 
-  this->userCamera->HandleMouseEvent(this->mouseEvent);
+  if (this->entityMaker)
+    this->entityMaker->OnMouseDrag(this->mouseEvent);
+  else
+    this->userCamera->HandleMouseEvent(this->mouseEvent);
 
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 }
@@ -128,6 +136,9 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   this->mouseEvent.middle = event->buttons() & Qt::MidButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
 
   emit clicked();
+
+  if (this->entityMaker)
+    this->entityMaker->OnMouseRelease(this->mouseEvent);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,4 +184,18 @@ std::string GLWidget::GetOgreHandle() const
 
 
   return handle;
+}
+
+void GLWidget::CreateEntity(const std::string &name)
+{
+  if (this->entityMaker)
+    this->entityMaker->Stop();
+
+  // TODO: change the cursor to a cross
+
+  if (name == "box")
+    this->entityMaker = &this->boxMaker;
+
+  if (this->entityMaker)
+    this->entityMaker->Start();
 }

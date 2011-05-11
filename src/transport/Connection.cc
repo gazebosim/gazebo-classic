@@ -147,23 +147,30 @@ void Connection::EnqueueMsg(const std::string &buffer, bool force)
 
 void Connection::ProcessWriteQueue()
 {
-  std::list<boost::asio::const_buffer> buffer;
   boost::mutex::scoped_lock( *this->writeMutex );
 
   if (this->writeQueue.size() > 0)
   {
-    for (unsigned int i=0; i < this->writeQueue.size(); i++)
-    {
-      buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
-    }
-    this->writeCount = this->writeQueue.size();
+    unsigned int sum = 0;
+    unsigned int i = 0;
+    for (; i < this->writeCounts.size(); i++)
+      sum += this->writeCounts[i];
 
-    // Write the serialized data to the socket. We use
-    // "gather-write" to send both the head and the data in
-    // a single write operation
-    boost::asio::async_write( this->socket, buffer, 
-        boost::bind(&Connection::OnWrite, this, 
-          boost::asio::placeholders::error));
+    if (sum < this->writeQueue.size())
+    {
+      std::list<boost::asio::const_buffer> buffer;
+
+      for (i=sum; i < this->writeQueue.size(); i++)
+        buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
+      this->writeCounts.push_back( buffer.size() );
+
+      // Write the serialized data to the socket. We use
+      // "gather-write" to send both the head and the data in
+      // a single write operation
+      boost::asio::async_write( this->socket, buffer, 
+          boost::bind(&Connection::OnWrite, this, 
+            boost::asio::placeholders::error));
+    }
   }
 }
 
@@ -191,8 +198,10 @@ void Connection::OnWrite(const boost::system::error_code &e)
   else
   {
     boost::mutex::scoped_lock( *this->writeMutex );
-    for (unsigned int i=0; i < this->writeCount; i++)
+    for (unsigned int i=0; i < this->writeCounts[0]; i++)
       this->writeQueue.pop_front();
+
+    this->writeCounts.pop_front();
   }
 }
 

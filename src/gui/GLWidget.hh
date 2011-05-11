@@ -6,6 +6,8 @@
 #include "rendering/RenderTypes.hh"
 #include "common/MouseEvent.hh"
 
+#include "gui/BoxMaker.hh"
+
 namespace gazebo
 {
   namespace rendering
@@ -24,6 +26,8 @@ namespace gazebo
 
       public: void ViewScene(rendering::ScenePtr scene);
       public: rendering::UserCameraPtr GetCamera() const;
+
+      public: void CreateEntity(const std::string &name);
 
       signals:
         void clicked();
@@ -46,6 +50,10 @@ namespace gazebo
       private: rendering::UserCameraPtr userCamera;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
+
+
+      private: EntityMaker *entityMaker;
+      private: BoxMaker boxMaker;
     };
   }
 }

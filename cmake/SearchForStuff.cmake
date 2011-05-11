@@ -26,7 +26,6 @@ set (GTK2_INCLUDE_DIRS "" CACHE STRING "WX GTK2 include paths. Use this to overr
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
-include (FindwxWidgets)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
 # The Google Protobuf library for message generation + serialization
@@ -172,14 +171,6 @@ find_package (Qt4 REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
-
-########################################
-# Find wxWidgets
-find_package(wxWidgets)
-if (NOT wxWidgets_FOUND)
-    BUILD_ERROR ("Missing: wxWidgets(http://www.wxwidgets.org)")
-endif (NOT wxWidgets_FOUND)
-
 
 ########################################
 # Find Boost, if not specified manually

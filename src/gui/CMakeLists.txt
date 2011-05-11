@@ -13,6 +13,9 @@ set (sources Gui.cc
              GLWidget.cc 
              TimePanel.cc
              ModelBuilderWidget.cc
+             EntityMaker.cc
+             BoxMaker.cc
+             SphereMaker.cc
              )
 
 set (headers Gui.hh 
@@ -20,7 +23,11 @@ set (headers Gui.hh
              RenderWidget.hh 
              GLWidget.hh 
              TimePanel.hh
-             ModelBuilderWidget.hh)
+             ModelBuilderWidget.hh
+             EntityMaker.hh
+             BoxMaker.hh
+             SphereMaker.hh
+             )
 
 set (resources images.qrc)
 

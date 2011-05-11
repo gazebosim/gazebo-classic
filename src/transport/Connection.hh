@@ -198,7 +198,7 @@ namespace gazebo
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
       private: std::deque<std::string> writeQueue;
-      private: unsigned int writeCount;
+      private: std::deque<unsigned int> writeCounts;
       private: boost::mutex *writeMutex;
 
       // Called when a new connection is received

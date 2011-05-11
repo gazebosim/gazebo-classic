@@ -1,11 +1,8 @@
-include ( ${wxWidgets_USE_FILE} )
-
 include_directories( 
   ${PROJECT_SOURCE_DIR}/src 
   ${PROJECT_BINARY_DIR}/src 
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
-  ${wxWidgets_INCLUDE_DIRS}
   ${XML_INCLUDE_DIRS} 
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
