@@ -17,6 +17,8 @@
 #ifndef ENTITYMAKER_HH
 #define ENTITYMAKER_HH
 
+#include "rendering/RenderTypes.hh"
+#include "transport/TransportTypes.hh"
 #include "common/Vector3.hh"
 
 namespace gazebo
@@ -39,7 +41,7 @@ namespace gazebo
       /// \brief Set whether to snap to grid
       public: static void SetSnapToGrid(bool snap);
   
-      public: virtual void Start() = 0;
+      public: virtual void Start(const rendering::UserCameraPtr camera) = 0;
       public: virtual void Stop() = 0;
       public: virtual bool IsActive() const = 0;
   
@@ -52,6 +54,9 @@ namespace gazebo
   
       protected: virtual void CreateTheEntity() = 0;
   
+      protected: rendering::UserCameraPtr camera; 
+      protected: transport::PublisherPtr visPub;
+
       private: static bool snapToGrid;
       private: static double snapDistance;
       private: static double snapGridSize;

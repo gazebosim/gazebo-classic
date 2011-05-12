@@ -5,8 +5,11 @@
 
 #include "rendering/RenderTypes.hh"
 #include "common/MouseEvent.hh"
+#include "common/Event.hh"
 
 #include "gui/BoxMaker.hh"
+#include "gui/SphereMaker.hh"
+#include "gui/CylinderMaker.hh"
 
 namespace gazebo
 {
@@ -45,15 +48,20 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      private: void OnMoveMode(bool mode);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
 
+      private: std::vector<event::ConnectionPtr> connections;
 
       private: EntityMaker *entityMaker;
       private: BoxMaker boxMaker;
+      private: SphereMaker sphereMaker;
+      private: CylinderMaker cylinderMaker;
     };
   }
 }

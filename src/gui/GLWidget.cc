@@ -36,6 +36,10 @@ GLWidget::GLWidget( QWidget *parent )
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
 
+  this->connections.push_back( 
+      event::Events::ConnectMoveModeSignal( 
+        boost::bind(&GLWidget::OnMoveMode, this, _1) ) );
+
   this->entityMaker = NULL;
 }
 
@@ -191,11 +195,32 @@ void GLWidget::CreateEntity(const std::string &name)
   if (this->entityMaker)
     this->entityMaker->Stop();
 
-  // TODO: change the cursor to a cross
 
   if (name == "box")
     this->entityMaker = &this->boxMaker;
+  else if (name == "sphere")
+    this->entityMaker = &this->sphereMaker;
+  else if (name == "cylinder")
+    this->entityMaker = &this->cylinderMaker;
+  else
+    this->entityMaker = NULL;
 
   if (this->entityMaker)
-    this->entityMaker->Start();
+  {
+    // TODO: change the cursor to a cross
+    this->entityMaker->Start(this->userCamera);
+  }
+  else
+  {
+    // TODO: make sure cursor state stays at the default
+  }
+}
+
+void GLWidget::OnMoveMode(bool mode)
+{
+  if (mode)
+  {
+    // TODO: set cursor to default state
+    this->entityMaker = NULL;
+  }
 }

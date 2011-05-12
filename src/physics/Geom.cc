@@ -82,7 +82,7 @@ Geom::~Geom()
     msgs::Visual msg;
     common::Message::Init(msg, this->bbVisual);
     msg.set_action( msgs::Visual::DELETE);
-    this->vis_pub->Publish(msg);
+    this->visPub->Publish(msg);
   }
 
   delete this->massP;
@@ -172,7 +172,7 @@ void Geom::CreateBoundingBox()
     common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0));
     msg.set_transparency( .5 );
 
-    this->vis_pub->Publish(msg);
+    this->visPub->Publish(msg);
   }
 }
 
@@ -269,7 +269,7 @@ void Geom::ShowBoundingBox(const bool &show)
     common::Message::Init(msg, this->bbVisual);
     msg.set_visible( show );
     msg.set_action( msgs::Visual::UPDATE );
-    this->vis_pub->Publish(msg);
+    this->visPub->Publish(msg);
   }
 }
 
@@ -394,7 +394,7 @@ void Geom::EnabledCB(bool enabled)
   else
     msg.set_material( "Gazebo/RedTransparent" );
 
-  this->vis_pub->Publish(msg);
+  this->visPub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

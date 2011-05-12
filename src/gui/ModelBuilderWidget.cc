@@ -68,15 +68,15 @@ void ModelBuilderWidget::Init()
 
 void ModelBuilderWidget::CreateBox()
 {
-  gzmsg << "Creat abox\n";
+  this->glWidget->CreateEntity("box");
 }
 
 void ModelBuilderWidget::CreateSphere()
 {
-  gzmsg << "Creat a spher\n";
+  this->glWidget->CreateEntity("sphere");
 }
 
 void ModelBuilderWidget::CreateCylinder()
 {
-  gzmsg << "Creat a cylinder\n";
+  this->glWidget->CreateEntity("cylinder");
 }

@@ -19,6 +19,11 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
+#include "common/Quatern.hh"
+
+#include "rendering/UserCamera.hh"
+
+#include "transport/Publisher.hh"
 
 #include "gui/CylinderMaker.hh"
 
@@ -35,6 +40,8 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh( "unit_cylinder" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
+
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), common::Quatern());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -42,8 +49,9 @@ CylinderMaker::~CylinderMaker()
   delete this->visualMsg;
 }
 
-void CylinderMaker::Start()
+void CylinderMaker::Start(const rendering::UserCameraPtr camera)
 {
+  this->camera = camera;
   std::ostringstream stream;
   stream <<  "user_cylinder_" << counter++;
   this->visualMsg->mutable_header()->set_str_id( stream.str() );
@@ -53,7 +61,7 @@ void CylinderMaker::Start()
 void CylinderMaker::Stop()
 {
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  //Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visPub->Publish(*this->visualMsg);
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   this->state = 0;
@@ -100,11 +108,11 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   else if (this->state == 2)
     norm.Set(1,0,0);
 
-  /* NATY: Fix camera issue
-  p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = this->camera->GetWorldPointOnPlane(this->mousePushPos.x, 
+                                          this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
-  p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = this->camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
   if (this->state == 1)
@@ -134,8 +142,8 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
 
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
   common::Message::Set(this->visualMsg->mutable_scale(), scale );
-  //Simulator::Instance()->SendMessage(*this->visualMsg);
-*/
+
+  this->visPub->Publish(*this->visualMsg);
 }
 
 void CylinderMaker::CreateTheEntity()
@@ -171,7 +179,7 @@ void CylinderMaker::CreateTheEntity()
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
   common::Message::Stamp(this->visualMsg->mutable_header());
-  //Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visPub->Publish(*this->visualMsg);
   //Simulator::Instance()->SendMessage( msg );
 }
 

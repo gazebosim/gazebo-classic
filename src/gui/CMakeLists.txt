@@ -16,28 +16,32 @@ set (sources Gui.cc
              EntityMaker.cc
              BoxMaker.cc
              SphereMaker.cc
+             CylinderMaker.cc
              )
 
-set (headers Gui.hh 
+set (qt_headers Gui.hh 
              MainWindow.hh 
              RenderWidget.hh 
              GLWidget.hh 
              TimePanel.hh
              ModelBuilderWidget.hh
-             EntityMaker.hh
+             )
+
+set (headers EntityMaker.hh
              BoxMaker.hh
              SphereMaker.hh
+             CylinderMaker.hh
              )
+
 
 set (resources images.qrc)
 
-QT4_WRAP_CPP(headers_MOC ${headers})
+QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}} ${wxWidgets_CXX_FLAGS}")
 
-add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${resources_RCC})
-
+add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
                                          
 target_link_libraries(gazebo_gui Xpm  ${QT_LIBRARIES} ${ogre_libraries} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}} ${boost_libraries})
 
@@ -52,4 +56,4 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 set_target_properties(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
 
 install (TARGETS gazebo_gui DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/gui COMPONENT headers)
+install (FILES ${headers} ${qt_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/gui COMPONENT headers)

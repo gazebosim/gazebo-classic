@@ -19,6 +19,11 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
+#include "common/Quatern.hh"
+
+#include "rendering/UserCamera.hh"
+
+#include "transport/Publisher.hh"
 
 #include "gui/SphereMaker.hh"
 
@@ -35,6 +40,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh( "unit_sphere" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), common::Quatern());
 }
 
 SphereMaker::~SphereMaker()
@@ -42,8 +48,9 @@ SphereMaker::~SphereMaker()
   delete this->visualMsg;
 }
 
-void SphereMaker::Start()
+void SphereMaker::Start(const rendering::UserCameraPtr camera)
 {
+  this->camera = camera;
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
   this->visualMsg->mutable_header()->set_str_id( stream.str() );
@@ -54,7 +61,7 @@ void SphereMaker::Start()
 void SphereMaker::Stop()
 {
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  //Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visPub->Publish(*this->visualMsg);
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   event::Events::moveModeSignal(true);
@@ -98,25 +105,24 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
 
   norm.Set(0,0,1);
 
-  /* NATY: Fix camera issue
-  p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = this->camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
-  p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = this->camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
   common::Vector3 p( this->visualMsg->pose().position().x(),
-             this->visualMsg->pose().position().y(),
-             this->visualMsg->pose().position().z() );
+                     this->visualMsg->pose().position().y(),
+                     this->visualMsg->pose().position().z() );
 
   p.z = scale;
 
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   common::Message::Set(this->visualMsg->mutable_scale(),common::Vector3(scale,scale,scale));
-  */
+  this->visPub->Publish(*this->visualMsg);
 }
 
 void SphereMaker::CreateTheEntity()
@@ -153,4 +159,7 @@ void SphereMaker::CreateTheEntity()
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
   common::Message::Stamp(this->visualMsg->mutable_header());
+  this->visPub->Publish(*this->visualMsg);
+
+  //Simulator::Instance()->SendMessage( msg );
 }

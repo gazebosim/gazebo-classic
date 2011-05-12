@@ -97,7 +97,7 @@ Body::~Body()
     msgs::Visual msg;
     common::Message::Init(msg, this->visuals[i]);
     msg.set_action( msgs::Visual::DELETE );
-    this->vis_pub->Publish(msg);
+    this->visPub->Publish(msg);
   }
   this->visuals.clear();
 
@@ -108,7 +108,7 @@ Body::~Body()
       msgs::Visual msg;
       common::Message::Init(msg, this->cgVisuals[i]);
       msg.set_action( msgs::Visual::DELETE );
-      this->vis_pub->Publish(msg);
+      this->visPub->Publish(msg);
     }
     this->cgVisuals.clear();
   }
@@ -189,7 +189,7 @@ void Body::Load(common::XMLConfigNode *node)
     msg.set_parent_id( this->GetCompleteScopedName() );
     msg.set_is_static( this->IsStatic() );
 
-    this->vis_pub->Publish(msg);
+    this->visPub->Publish(msg);
     this->visuals.push_back(msg.header().str_id());
    
     childNode = childNode->GetNext("visual");

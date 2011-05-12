@@ -42,8 +42,8 @@ Entity::Entity(BasePtr parent)
 {
   this->AddType(ENTITY);
 
-  this->pose_pub = transport::advertise<msgs::Pose>("~/pose");
-  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
+  this->posePub = transport::advertise<msgs::Pose>("~/pose");
+  this->visPub = transport::advertise<msgs::Visual>("~/visual");
 
   common::Param::Begin(&this->parameters);
   this->staticP = new common::ParamT<bool>("static",false,0);
@@ -72,7 +72,7 @@ Entity::~Entity()
 
   // Tell all renderers that I'm gone
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  this->vis_pub->Publish(*this->visualMsg);
+  this->visPub->Publish(*this->visualMsg);
   delete this->visualMsg;
   this->visualMsg = NULL;
 
@@ -91,7 +91,7 @@ void Entity::Load(common::XMLConfigNode *node)
   if (this->parent)
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
 
-  this->vis_pub->Publish(*this->visualMsg);
+  this->visPub->Publish(*this->visualMsg);
 
   common::Message::Init( *this->poseMsg, this->GetCompleteScopedName() );
 }
@@ -269,7 +269,7 @@ void Entity::PoseChange(bool notify)
 {
   msgs::Pose msg;
   common::Message::Set( this->poseMsg, this->GetRelativePose());
-  this->pose_pub->Publish( *this->poseMsg);
+  this->posePub->Publish( *this->poseMsg);
 
   if (notify)
   {

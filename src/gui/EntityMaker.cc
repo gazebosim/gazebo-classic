@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "transport/Transport.hh"
 #include "gui/EntityMaker.hh"
 
 using namespace gazebo;
@@ -27,6 +28,7 @@ double EntityMaker::snapGridSize = 1.0;
 /// Constructor
 EntityMaker::EntityMaker()
 {
+  this->visPub = transport::advertise<msgs::Visual>("/model_builder/visual");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

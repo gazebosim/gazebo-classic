@@ -16,9 +16,15 @@
 */
 #include <sstream>
 
+#include "common/Console.hh"
 #include "common/Messages.hh"
 #include "common/Events.hh"
+#include "common/Quatern.hh"
 #include "common/MouseEvent.hh"
+
+#include "rendering/UserCamera.hh"
+
+#include "transport/Publisher.hh"
 
 #include "gui/BoxMaker.hh"
 
@@ -35,6 +41,7 @@ BoxMaker::BoxMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh( "unit_box_U1V1" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), common::Quatern());
 }
 
 BoxMaker::~BoxMaker()
@@ -42,8 +49,11 @@ BoxMaker::~BoxMaker()
   delete this->visualMsg;
 }
 
-void BoxMaker::Start()
+void BoxMaker::Start(const rendering::UserCameraPtr camera)
 {
+  this->camera = camera;
+
+  gzdbg << "Start BoxMaker\n";
   std::ostringstream stream;
   stream << "user_box_" << counter++;
   this->visualMsg->mutable_header()->set_str_id( stream.str() );
@@ -53,8 +63,9 @@ void BoxMaker::Start()
 
 void BoxMaker::Stop()
 {
+  gzdbg << "Stop BoxMaker\n";
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  //Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visPub->Publish(*this->visualMsg);
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   this->state = 0;
@@ -93,23 +104,24 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
+  gzdbg << "BoxMaker: OnMouseDrag\n";
   common::Vector3 norm(0,0,1);
   common::Vector3 p1, p2;
 
-  /* NATY: Fix camera issue
-  p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = this->camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
-  p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = this->camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
   if (this->state == 1)
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
+    common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
 
   common::Vector3 scale = p1-p2;
   common::Vector3 p( this->visualMsg->pose().position().x(), 
-             this->visualMsg->pose().position().y(), 
-             this->visualMsg->pose().position().z() );
+                     this->visualMsg->pose().position().y(), 
+                     this->visualMsg->pose().position().z() );
+
 
   if (this->state == 1)
   {
@@ -129,12 +141,12 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
   common::Message::Set(this->visualMsg->mutable_scale(), scale );
 
-  //Simulator::Instance()->SendMessage(*this->visualMsg);
-  */
+  this->visPub->Publish(*this->visualMsg);
 }
 
 void BoxMaker::CreateTheEntity()
 {
+  gzdbg << "BoxMaker: Create the entity\n";
   msgs::InsertModel msg;
   common::Message::Init(msg, "new_box");
 
@@ -166,9 +178,9 @@ void BoxMaker::CreateTheEntity()
 
   msg.set_xml( newModelStr.str() );
 
-  this->visualMsg->set_action( msgs::Visual::DELETE );
   common::Message::Stamp(this->visualMsg->mutable_header());
-  //Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visualMsg->set_action( msgs::Visual::DELETE );
+  this->visPub->Publish(*this->visualMsg);
 
   //Simulator::Instance()->SendMessage( msg );
 }

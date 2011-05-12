@@ -160,8 +160,8 @@ namespace gazebo
       private: common::Pose3d initialPose;
       private: common::Pose3d relativePose;
 
-      private: transport::PublisherPtr pose_pub;
-      protected: transport::PublisherPtr vis_pub;
+      private: transport::PublisherPtr posePub;
+      protected: transport::PublisherPtr visPub;
 
       protected: msgs::Visual *visualMsg;
       protected: msgs::Pose *poseMsg;
