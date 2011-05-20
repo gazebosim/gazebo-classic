@@ -901,7 +901,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         //   
         dContact contact;
         contact.geom = self->contactGeoms[i];
-        contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
+        contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1 | dContactMu2;
 
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.
