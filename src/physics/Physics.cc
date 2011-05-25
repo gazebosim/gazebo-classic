@@ -31,8 +31,8 @@ bool physics::init()
 
 physics::WorldPtr physics::create_world(const std::string &name)
 {
-    physics::WorldPtr world( new physics::World() );
-    return world;
+  physics::WorldPtr world( new physics::World(name) );
+  return world;
 }
 
 void physics::load_world(WorldPtr world, common::XMLConfigNode *node)

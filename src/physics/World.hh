@@ -39,6 +39,7 @@
 namespace boost
 {
   class thread;
+  class mutex;
 }
 
 namespace gazebo
@@ -53,7 +54,7 @@ namespace gazebo
     class World : public boost::enable_shared_from_this<World>
     {
       /// Private constructor
-      public: World();
+      public: World(const std::string &name);
     
       /// Private destructor
       public: ~World();
@@ -142,6 +143,9 @@ namespace gazebo
       /// \param node XMLConfg node pointer
       /// \param parent Parent of the model to load
       private: void LoadEntities(common::XMLConfigNode *node, BasePtr parent);
+
+      /// \brief Load a model
+      private: ModelPtr LoadModel(common::XMLConfigNode *node, BasePtr parent);
  
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
@@ -171,6 +175,7 @@ namespace gazebo
 
       private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
 
+      private: void OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &data);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();
@@ -199,7 +204,7 @@ namespace gazebo
     
       private: std::vector<google::protobuf::Message> messages;
     
-      private: common::ParamT<std::string> *nameP;
+      private: std::string name;
                
       /// Current simulation time
       private: common::Time simTime, pauseTime, startTime;
@@ -207,10 +212,11 @@ namespace gazebo
       private: bool stepInc;
     
       private: event::Connection_V connections;
-    
+
+      private: transport::NodePtr node;    
       private: transport::PublisherPtr selectionPub, scenePub;
-      private: transport::PublisherPtr statPub;
-      private: transport::SubscriberPtr visSub, sceneSub, controlSub;
+      private: transport::PublisherPtr statPub, worldPub, newEntityPub;
+      private: transport::SubscriberPtr visSub, sceneSub, controlSub, factorySub;
 
       private: msgs::WorldStatistics worldStatsMsg;
       private: msgs::Scene sceneMsg;
@@ -221,6 +227,8 @@ namespace gazebo
       private: common::Time prevStatTime;
       private: common::Time pauseStartTime;
       private: common::Time realTimeOffset;
+
+      private: boost::mutex *updateMutex;
     };
 
   }

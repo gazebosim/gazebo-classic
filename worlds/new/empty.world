@@ -48,17 +48,37 @@
       </link>
     </model>
 
+    <model name="box_model">
+      <static>false</static>
+      <origin xyz="0 0 0.5"/>
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <mass>1.0</mass>
+        </collision>
+
+        <visual>
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material name="Gazebo/Grey"/>
+          <cast_shadows>true</cast_shadows>
+        </visual>
+      </link>
+    </model>
+
+
     <!-- White Point light -->
-    <light name="point_white">
-      <xyz>0.0 0 10</xyz>
-      <rpy>0 0 0</rpy>
-      <type>directional</type>
-      <diffuse>1.0 1.0 1.0 1.0</diffuse>
-      <specular>.1 .1 .1 1.0</specular>
-      <attenuation>.2 0.01 0.0</attenuation>
+    <light name="point_white" type='point'>
+      <origin xyz='0 0 10' rpy='0 0 0'/>
+      <diffuse color='1.0 1.0 1.0 1.0'/>
+      <specular color='.1 .1 .1 1.0'/>
+      <attenuation constant='.2' linear='0.01' quadratic='0.0'/>
       <range>40</range>
-      <direction>0 0.0 -1.0</direction>
-      <cast_shadows>true</cast_shadows>
+      <direction>0 0 -1.0</direction>
+      <cast_shadows>false</cast_shadows>
     </light>
   </world>
 </gazebo>

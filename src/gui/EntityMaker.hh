@@ -55,7 +55,10 @@ namespace gazebo
       protected: virtual void CreateTheEntity() = 0;
   
       protected: rendering::UserCameraPtr camera; 
+
+      protected: transport::NodePtr node;
       protected: transport::PublisherPtr visPub;
+      protected: transport::PublisherPtr makerPub;
 
       private: static bool snapToGrid;
       private: static double snapDistance;

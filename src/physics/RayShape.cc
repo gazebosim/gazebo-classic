@@ -38,7 +38,7 @@ RayShape::RayShape( GeomPtr parent, bool displayRays )
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
+  /*this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
   if (displayRays)
   {
     msgs::Visual msg;
@@ -51,7 +51,7 @@ RayShape::RayShape( GeomPtr parent, bool displayRays )
 
     // NATY: put back in
     //this->lineMsg->visibility = GZ_LASER_CAMERA;
-  }
+  }*/
 
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;
@@ -107,7 +107,7 @@ void RayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 
   pt = msg.add_points();
   common::Message::Set(pt, this->relativeEndPos );
 
-  this->vis_pub->Publish(msg);
+  //this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ void RayShape::SetLength( double len )
   common::Message::Set(pt, this->relativeStartPos );
   pt = msg.add_points();
   common::Message::Set(pt,  this->relativeEndPos );
-  this->vis_pub->Publish(msg);
+  //this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

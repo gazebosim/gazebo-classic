@@ -74,8 +74,6 @@ void ODEBody::Init()
   {
     this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
 
-    gzdbg << "ODEBody::Init [" << this->GetCompleteScopedName() << "] Static[" << this->IsStatic() << "] BodyID[" << this->bodyId << "]\n";
-
     dBodySetData(this->bodyId, this);
     dBodySetAutoDisableDefaults(this->bodyId);
     dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());

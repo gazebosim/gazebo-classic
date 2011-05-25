@@ -91,29 +91,15 @@ macro (BUILD_WARNING)
 endmacro (BUILD_WARNING)
 
 
-###############################################################################
-# Reset lists
-MACRO (GAZEBOSERVER_RESET_LISTS)
-  #SET (gazeboserver_sources "" CACHE INTERNAL 
-  #     ${gazeboserver_sources_desc} FORCE)
-  #SET (gazeboserver_headers "" CACHE INTERNAL 
-  #     ${gazeboserver_sources_desc} FORCE)
-  #SET (gazeboserver_headers_nopath "" CACHE INTERNAL 
-  #     "gazeboserver_headers_nopath" FORCE)
-  #SET (gazeboserver_include_dirs "" CACHE INTERNAL 
-  #     ${gazeboserver_include_dirs_desc} FORCE)
-  #SET (gazeboserver_link_dirs "" CACHE INTERNAL 
-  #     ${gazeboserver_link_dirs_desc} FORCE)
-  #SET (gazeboserver_link_libs "" CACHE INTERNAL 
-  #     ${gazeboserver_link_libs_desc} FORCE)
-  #SET (gazeboserver_ldflags "" CACHE INTERNAL 
-  #     ${gazeboserver_ldflags_desc} FORCE)
-  #SET (gazeboserver_cflags "" CACHE INTERNAL 
-  #     ${gazeboserver_cflags_desc} FORCE)
-  #SET (gazebosensor_sources "" CACHE INTERNAL 
-  #     ${gazebosensor_sources_desc} FORCE)
-  #SET (gazebocontroller_sources "" CACHE INTERNAL 
-  #     ${gazebocontroller_sources_desc} FORCE)
-  #set (bullet_link_libs "" CACHE INTERNAL 
-  #     ${bullet_link_libs_desc} FORCE)
-ENDMACRO (GAZEBOSERVER_RESET_LISTS)
+macro (INSTALL_INCLUDES _subdir)
+  install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
+endmacro(INSTALL_INCLUDES)
+
+macro (INSTALL_LIBRARY _name)
+  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR})
+endmacro (INSTALL_LIBRARY _name)
+
+macro (INSTALL_EXECUTABLE _name)
+  install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
+endmacro (INSTALL_EXECUTABLE _name)
+

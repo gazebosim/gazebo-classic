@@ -284,62 +284,9 @@ install(FILES ${PROJECT_BINARY_DIR}/gazeboserver.hh DESTINATION ${CMAKE_INSTALL_
 configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeboserver_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
 
-
 install (TARGETS gazebo_server_library DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 #install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_client DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
-
-
-# INCLUDE DIRS
-#${TBB_INCLUDE_DIRS}
-#${ODE_INCLUDE_DIRS}
-#${ogre_include_dirs}
-#${XML_INCLUDE_DIRS}
-#${XPM_INCLUDE_DIRS}
-#${OAL_INCLUDE_DIRS}
-#${AVF_INCLUDE_DIRS}
-#${AVC_INCLUDE_DIRS})
-
-# LINK DIRS
-#${TBB_LIBRARY_DIRS}
-#${ODE_LIBRARY_DIRS}
-#${ogre_library_dirs}
-#${GTK2_LIBRARY_DIRS} 
-#${XML_LIBRARY_DIRS}
-#${XPM_LIBRARY_DIRS}
-#${OAL_LIBRARY_DIRS}
-#${AVF_LIBRARY_DIRS}
-#${AVC_LIBRARY_DIRS})
-
-# LINK LIBS
-#${TBB_LINK_LIBS} ${TBB_LIBRARIES}
-#${ODE_LINK_LIBS} ${ODE_LIBRARIES}
-#${ogre_link_libs} ${ogre_libraries}
-#${GTK2_LINK_LIBS} ${GTK2_LIBRARIES}
-#${XML_LINK_LIBS} ${XML_LIBRARIES}
-#${XPM_LINK_LIBS} ${XPM_LIBRARIES}
-#${OAL_LINK_LIBS} ${OAL_LIBRARIES}
-#${AVF_LINK_LIBS} ${AVF_LIBRARIES}
-#${AVC_LINK_LIBS} ${AVC_LIBRARIES}
-
-# LD FLAGS
-#${TBB_LDFLAGS}
-#${ODE_LDFLAGS}
-#${ogre_ldflags}
-#${GTK2_LDFLAGS}
-#${XML_LDFLAGS}
-
-# C Flags
-#${ogre_cflags})
-#${GTK2_CFLAGS})
-#${XML_CFLAGS})
-
-
-# REMOVED FROM SEARCHFORSTUFF
-  #APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-  #                      ${gazeboserver_ldflags_desc} 
-  #                      ${bullet_lflags})
-
 

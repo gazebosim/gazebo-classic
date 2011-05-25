@@ -169,6 +169,7 @@ namespace gazebo
       protected: common::Param_V parameters;
   
       protected: std::string visual;
+      protected: transport::NodePtr node;
       protected: transport::PublisherPtr vis_pub;
       private: event::ConnectionPtr showContactConnection; 
   

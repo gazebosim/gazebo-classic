@@ -79,6 +79,7 @@ namespace gazebo
       private: TimePanel *timePanel;
       private: RenderWidget *glWidget;
 
+      private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
     };
   }

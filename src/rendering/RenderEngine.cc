@@ -126,7 +126,6 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
 // Create a scene
 ScenePtr RenderEngine::CreateScene(const std::string &name)
 {
-  gzdbg << "Create a scene\n";
   ScenePtr scene( new Scene(name) );
   scene->Load(NULL);
 

@@ -15,7 +15,6 @@
  *
 */
 
-#include <boost/algorithm/string.hpp>
 
 #include "common/Messages.hh"
 #include "transport/Publication.hh"
@@ -28,7 +27,6 @@ using namespace transport;
 // Constructor
 TopicManager::TopicManager()
 {
-  this->topicNamespace = "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +79,6 @@ PublicationPtr TopicManager::FindPublication(const std::string &topic)
 // Subscribe to a topic give some options
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
 {
-  std::string topic = this->DecodeTopicName( ops.GetTopic() );
   CallbackHelperPtr subscription = ops.GetSubscription();
 
   // Create a subscription (essentially a callback that gets 
@@ -90,14 +87,14 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   //CallbackHelperPtr subscription( new CallbackHelperT<M>( callback ) );
   //this->subscribed_topics[topic].push_back(subscription);
   
-  this->subscribed_topics[topic].push_back(subscription);
+  this->subscribed_topics[ops.GetTopic()].push_back(subscription);
 
   // The object that gets returned to the caller of this
   // function
-  SubscriberPtr sub( new Subscriber(topic, subscription) );
+  SubscriberPtr sub( new Subscriber(ops.GetTopic(), subscription) );
 
   // Find a current publication
-  PublicationPtr pub = this->FindPublication(topic);
+  PublicationPtr pub = this->FindPublication(ops.GetTopic());
 
   // If the publication exits, just add the subscription to it 
   if (pub)
@@ -107,7 +104,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   else
   {
     // Otherwise subscribe to the remote topic
-    ConnectionManager::Instance()->Subscribe(topic, ops.GetMsgType());
+    ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());
   }
 
   return sub;
@@ -140,10 +137,6 @@ void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 void TopicManager::ConnectPubToSub( const std::string &topic,
                                     const SubscriptionTransportPtr &sublink )
 {
-
-  if (topic == "/gazebo/default/publish_scene")
-    gzdbg << "Connect Pub To Sub\n";
-    
   PublicationPtr publication = this->FindPublication( topic );
   publication->AddSubscription( sublink );
 }
@@ -178,8 +171,6 @@ void TopicManager::ConnectSubscibers(const std::string &topic)
     std::list<CallbackHelperPtr>::iterator cbIter;
     for (cbIter = iter->second.begin(); cbIter != iter->second.end(); cbIter++)
     {
-      if (topic == "/gazebo/default/publish_scene")
-        gzdbg << "Connect Subscribers\n";
       publication->AddSubscription( *cbIter );
     }
   }
@@ -230,33 +221,6 @@ bool TopicManager::UpdatePublications( const std::string &topic,
   }
 
   return inserted;
-}
-
-std::string TopicManager::DecodeTopicName(const std::string &topic)
-{
-  std::string result = topic;
-  boost::replace_first(result, "~", "/gazebo/" + this->topicNamespace);
-  boost::replace_first(result, "//", "/");
-  return result;
-}
-
-std::string TopicManager::EncodeTopicName(const std::string &topic)
-{
-  std::string result = topic;
-  boost::replace_first(result, "/gazebo/" + this->topicNamespace, "~");
-  boost::replace_first(result, "//", "/");
-
-  return result;
-}
-
-void TopicManager::SetTopicNamespace(const std::string &space)
-{
-  this->topicNamespace = space;
-}
-
-void TopicManager::Fini()
-{
-  ConnectionManager::Instance()->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

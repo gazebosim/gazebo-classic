@@ -53,7 +53,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find ODE
-  pkg_check_modules(ODE ode>=${ODE_VERSION})
+  pkg_check_modules(ODE ode>=${MIN_ODE_VERSION})
   IF (NOT ODE_FOUND)
     BUILD_ERROR ("Missing: ODE(http://www.ode.org)")
     SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
@@ -93,14 +93,6 @@ if (PKG_CONFIG_FOUND)
 
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
   set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
-
-  #################################################
-  # Find GTK
-  pkg_check_modules(GTK2 gtk+-2.0)
-  if (NOT GTK2_FOUND)
-    BUILD_ERROR("Missing: gtk+-2.0")
-  endif (NOT GTK2_FOUND)
-
 
   #################################################
   # Find XML

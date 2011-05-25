@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 #include "gazebo_config.h"
 #include "common/CommonTypes.hh"
@@ -12,6 +13,8 @@ gazebo::Combined *combined = NULL;
 
 std::string config_filename = "";
 gazebo::common::StrStr_M params;
+
+boost::interprocess::interprocess_semaphore sem(0);
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -64,7 +67,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int )
 {
-  combined->Quit();
+  sem.post();
 }
 
 int main(int argc, char **argv)
@@ -86,8 +89,11 @@ int main(int argc, char **argv)
   combined->Load(config_filename);
   combined->SetParams( params );
   combined->Init();
-  combined->Run();
+  combined->Start();
 
+  sem.wait();
+
+  combined->Stop();
   delete combined;
   combined = NULL;
 }

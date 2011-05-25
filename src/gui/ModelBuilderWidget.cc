@@ -3,6 +3,9 @@
 #include "rendering/Rendering.hh"
 #include "rendering/UserCamera.hh"
 
+#include "physics/World.hh"
+#include "physics/Physics.hh"
+
 #include "gui/GLWidget.hh"
 
 #include "gui/ModelBuilderWidget.hh"
@@ -54,6 +57,12 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
+
+  physics::init();
+  this->world = physics::create_world("model_builder");
+  this->world->Load(NULL);
+  this->world->Init();
+  this->world->SetPaused(true);
 }
 
 ModelBuilderWidget::~ModelBuilderWidget()

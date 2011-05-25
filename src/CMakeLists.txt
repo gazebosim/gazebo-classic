@@ -18,12 +18,13 @@ link_directories(
 add_subdirectory(msgs)
 add_subdirectory(transport)
 add_subdirectory(common)
-add_subdirectory(libgazebo)
+#add_subdirectory(libgazebo)
 add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
 add_subdirectory(sensors)
 
+add_dependencies( gazebo_physics gazebo_msgs )
 add_dependencies( gazebo_common gazebo_msgs )
 add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
@@ -76,8 +77,8 @@ target_link_libraries( gzsensor gazebo_common
                                 pthread)
                                 
 
-install (TARGETS gzmaster DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install (TARGETS gzserver DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install (TARGETS gzclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install (TARGETS gzsensor DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install (TARGETS gzcombined DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+INSTALL_EXECUTABLE( gzmaster )
+INSTALL_EXECUTABLE( gzserver )
+INSTALL_EXECUTABLE( gzclient )
+INSTALL_EXECUTABLE( gzsensor )
+INSTALL_EXECUTABLE( gzcombined )

@@ -144,6 +144,11 @@ void Light::Load(common::XMLConfigNode *node)
         "Unable to create a light");
   }
 
+  gzdbg << "Type[" << **this->lightTypeP  << "]\n";
+  gzdbg << "Diffuse[" << **this->diffuseP << "]\n";
+  gzdbg << "Direction[" << **this->directionP << "]\n";
+  gzdbg << "Attenuation[" << **this->attenuationP << "]\n";
+
   this->SetLightType( **this->lightTypeP );
   this->SetDiffuseColor(**this->diffuseP);
   this->SetSpecularColor(**this->specularP);

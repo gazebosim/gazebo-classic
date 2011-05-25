@@ -43,7 +43,7 @@ set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS
 
 add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
                                          
-target_link_libraries(gazebo_gui Xpm  ${QT_LIBRARIES} ${ogre_libraries} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}} ${boost_libraries})
+target_link_libraries(gazebo_gui Xpm  ${QT_LIBRARIES} ${ogre_libraries} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}} ${boost_libraries} gazebo_physics)
 
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
@@ -55,5 +55,5 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 set_target_properties(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
 
-install (TARGETS gazebo_gui DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install (FILES ${headers} ${qt_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/gui COMPONENT headers)
+INSTALL_LIBRARY(gazebo_gui)
+INSTALL_INCLUDES( "gui" ${headers} ${qt_headers})

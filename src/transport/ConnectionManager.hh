@@ -41,9 +41,14 @@ namespace gazebo
       public: void Init( const std::string &master_host, 
                          unsigned short master_port);
 
+      /// \brief Finalize the conneciton manager
       public: void Fini();
 
-      public: void Run();
+      /// \brief Start the conneciton manager
+      public: void Start();
+
+      /// \brief Stop the conneciton manager
+      public: void Stop();
 
       public: void Subscribe( const std::string &topic, 
                               const std::string &msgType);
@@ -61,6 +66,9 @@ namespace gazebo
       /// \brief Remove a connection
       public: void RemoveConnection(ConnectionPtr &conn);
  
+      /// \brief Run the connection manager loop
+      private: void RunLoop();
+
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host, 
                                             unsigned short port);
@@ -82,6 +90,8 @@ namespace gazebo
       private: std::list<ConnectionPtr> connections;
 
       private: bool initialized;
+      private: bool stop;
+      private: boost::thread *thread;
 
       //Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

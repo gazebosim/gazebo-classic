@@ -148,38 +148,43 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
 
 void CylinderMaker::CreateTheEntity()
 {
-  msgs::InsertModel msg;
+  msgs::Factory msg;
   common::Message::Init(msg,"new cylinder");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model type='physical' name='" << this->visualMsg->header().str_id() << "'>\
-    <xyz>" << this->visualMsg->pose().position().x() << " " 
-           << this->visualMsg->pose().position().y() << " " 
-           << this->visualMsg->pose().position().z() << "</xyz>\
-    <body name='body'>\
-    <geom type='cylinder' name='geom'>\
-    <size>" << this->visualMsg->scale().x()*.5 << " " 
-            << this->visualMsg->scale().z() << "</size>\
-    <mass>0.5</mass>\
-    <visual>\
-    <mesh>unit_cylinder</mesh>\
-    <scale>" << this->visualMsg->scale().x() << " "
-             << this->visualMsg->scale().y() << " "
-             << this->visualMsg->scale().z() << "</scale>\
-    <material>Gazebo/Grey</material>\
-    <shader>pixel</shader>\
-    </visual>\
-    </geom>\
-    </body>\
-    </model>";
+  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "'>\
+    <static>false</static>\
+    <origin xyz='" << this->visualMsg->pose().position().x() << " " 
+                   << this->visualMsg->pose().position().y() << " " 
+                   << this->visualMsg->pose().position().z() << "'/>\
+    <link name='body'>\
+      <collision name='geom'>\
+        <geometry>\
+          <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
+                    length='" << this->visualMsg->scale().z() << "'/>\
+        </geometry>\
+        <mass>0.5</mass>\
+      </collision>\
+      <visual>\
+        <geometry>\
+          <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
+                    length='" << this->visualMsg->scale().z() << "'/>\
+        </geometry>\
+        <material name='Gazebo/Grey'/>\
+        <shader>pixel</shader>\
+        <cast_shadows>pixel</cast_shadows>\
+      </visual>\
+    </link>\
+  </model>";
 
   msg.set_xml( newModelStr.str() );
 
-  this->visualMsg->set_action( msgs::Visual::DELETE );
   common::Message::Stamp(this->visualMsg->mutable_header());
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
-  //Simulator::Instance()->SendMessage( msg );
+
+  this->makerPub->Publish(msg);
 }
 

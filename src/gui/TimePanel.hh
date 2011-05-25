@@ -2,7 +2,8 @@
 #define TIME_PANEL_HH
 
 #include <QWidget>
-#include "transport/Transport.hh"
+#include "transport/TransportTypes.hh"
+#include "msgs/MessageTypes.hh"
 #include "common/Time.hh"
 
 class QLineEdit;
@@ -29,6 +30,8 @@ namespace gazebo
       private: common::Time lastUpdateTime,statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;
       private: transport::SubscriberPtr statsSub;
+
+      private: transport::NodePtr node;
     };
   }
 }

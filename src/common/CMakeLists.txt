@@ -105,5 +105,5 @@ target_link_libraries( gazebo_common gazebo_msgs
                                      ${assimp_libraries}
                                      ${freeimage_library})
 
-install ( TARGETS gazebo_common DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
-install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/common COMPONENT headers)
+INSTALL_LIBRARY(gazebo_common)
+INSTALL_INCLUDES("common" ${headers})

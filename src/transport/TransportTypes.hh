@@ -9,9 +9,11 @@ namespace gazebo
   {
     class Publisher;
     class Subscriber;
+    class Node;
 
     typedef boost::shared_ptr<Publisher> PublisherPtr;
     typedef boost::shared_ptr<Subscriber> SubscriberPtr;
+    typedef boost::shared_ptr<Node> NodePtr;
   }
 }
 

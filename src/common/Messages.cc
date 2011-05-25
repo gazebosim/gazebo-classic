@@ -245,6 +245,7 @@ Plane Message::Convert(const msgs::Plane &p)
 
 msgs::Light Message::LightFromXML(XMLConfigNode *node)
 {
+  XMLConfigNode *cnode = NULL;
   msgs::Light result;
 
   std::string type = node->GetString("type","point",1);
@@ -259,14 +260,33 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
   else if (type == "directional")
     result.set_type(msgs::Light::DIRECTIONAL);
 
-  result.mutable_pose()->mutable_position()->CopyFrom( Convert(node->GetVector3("xyz",Vector3(0,0,0))) );  
-  result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(node->GetRotation("rpy", Quatern() )) );
+  if ((cnode = node->GetChild("origin")) != NULL)
+  {
+    result.mutable_pose()->mutable_position()->CopyFrom( Convert(cnode->GetVector3("xyz",Vector3(0,0,0))) );  
+    result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(cnode->GetRotation("rpy", Quatern() )) );
+  }
 
-  result.mutable_diffuse()->CopyFrom( Convert( node->GetColor("diffuse", Color(1,1,1,1)) ) );
-  result.mutable_specular()->CopyFrom( Convert( node->GetColor("specular", Color(0,0,0,1)) ) );
-  result.mutable_attenuation()->CopyFrom( Convert( 
-        node->GetVector3("attenuation",Vector3(.2, 0.1, 0.0)) ) );
-  result.mutable_direction()->CopyFrom( Convert( node->GetVector3("direction",Vector3(0, 0, -1)) ) );
+  if ((cnode = node->GetChild("diffuse")) != NULL)
+  {
+    result.mutable_diffuse()->CopyFrom( 
+        Convert( cnode->GetColor("color", Color(1,1,1,1)) ) );
+  }
+
+  if ((cnode = node->GetChild("specular")) != NULL)
+  {
+    result.mutable_specular()->CopyFrom( 
+        Convert( cnode->GetColor("color", Color(0,0,0,1)) ) );
+  }
+
+  if ((cnode = node->GetChild("attenuation")) != NULL)
+  {
+    result.mutable_attenuation()->set_x(cnode->GetFloat("constant",0.2,1));
+    result.mutable_attenuation()->set_y(cnode->GetFloat("linear",0.1,1));
+    result.mutable_attenuation()->set_z(cnode->GetFloat("quadratic",0.0,1));
+  }
+
+  result.mutable_direction()->CopyFrom( 
+      Convert( node->GetVector3("direction",Vector3(0, 0, -1)) ) );
   result.set_range( node->GetDouble("range",20,1) );
   result.set_cast_shadows( node->GetBool("cast_shadows",false,0) );
 

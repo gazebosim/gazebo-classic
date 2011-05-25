@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "physics/PhysicsTypes.hh"
+
 namespace gazebo
 {
   class GLWidget;
@@ -23,6 +25,8 @@ namespace gazebo
 
       private: GLWidget *glWidget; 
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;
+
+      private: physics::WorldPtr world;
     };
   }
 }

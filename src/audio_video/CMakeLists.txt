@@ -23,4 +23,5 @@ target_link_libraries(gazebo_av ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIE
 
 set_target_properties(gazebo_av PROPERTIES OUTPUT_NAME "gazebo_av" VERSION ${GAZEBO_VERSION})
 
-install (TARGETS gazebo_av DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+INSTALL_LIBRARY(gazebo_av)
+INSTALL_INCLUDES("audio_video" ${headers})

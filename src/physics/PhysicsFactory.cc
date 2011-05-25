@@ -21,9 +21,10 @@
  * SVN info: $Id:$
  */
 
-#include "World.hh"
-#include "PhysicsEngine.hh"
-#include "PhysicsFactory.hh"
+#include "physics/World.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/PhysicsFactory.hh"
+#include "common/Console.hh"
 #include "gazebo_config.h"
 
 #ifdef INCLUDE_ODE
@@ -71,6 +72,8 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &classname, 
   {
     result = (engines[classname]) (world);
   }
+  else
+    gzerr << "Invalid Physics Type[" << classname << "]\n";
 
   return result;
 }

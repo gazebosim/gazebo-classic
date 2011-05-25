@@ -24,6 +24,7 @@
 
 #include "transport/Publisher.hh"
 #include "transport/Transport.hh"
+#include "transport/Node.hh"
 
 #include "physics/Geom.hh"
 #include "physics/Model.hh"
@@ -40,10 +41,8 @@ using namespace physics;
 Entity::Entity(BasePtr parent)
   : Base(parent)
 {
+  this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
-
-  this->posePub = transport::advertise<msgs::Pose>("~/pose");
-  this->visPub = transport::advertise<msgs::Visual>("~/visual");
 
   common::Param::Begin(&this->parameters);
   this->staticP = new common::ParamT<bool>("static",false,0);
@@ -85,6 +84,9 @@ Entity::~Entity()
 void Entity::Load(common::XMLConfigNode *node)
 {
   Base::Load(node);
+  this->node->Init(this->GetWorld()->GetName());
+  this->posePub = this->node->Advertise<msgs::Pose>("~/pose");
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
 
   this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
 

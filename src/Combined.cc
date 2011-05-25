@@ -69,6 +69,7 @@ const std::string default_config =
 Combined::Combined()
 {
   this->quit = false;
+  this->runThread = NULL;
 
   // load the configuration options 
   try
@@ -84,6 +85,7 @@ Combined::Combined()
 Combined::~Combined()
 {
   delete this->master;
+  delete this->masterThread;
 }
 
 void Combined::Load(const std::string &filename)
@@ -153,10 +155,6 @@ void Combined::Load(const std::string &filename)
     gzthrow("Unable to intialize the rendering engine");
 
   rendering::create_scene("default");
-
-  sensors::SensorPtr sensor1 = sensors::create_sensor("camera");
-  sensors::SensorPtr sensor2 = sensors::create_sensor("camera");
-
 }
 
 void Combined::Init()
@@ -165,30 +163,43 @@ void Combined::Init()
     physics::init_world(this->worlds[i]);
 }
 
-void Combined::Run()
+void Combined::Start()
 {
-  this->transportThread = new boost::thread( &transport::run );
+  this->quit = false;
 
   for (int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
+
+  this->runThread = new boost::thread(boost::bind(&Combined::RunLoop, this)); 
+}
+
+void Combined::Stop()
+{
+  for (int i=0; i < this->worlds.size(); i++)
+    physics::stop_world(this->worlds[i]);
+
+  this->quit = true;
+  this->master->Quit();
+  if (this->runThread)
+  {
+    this->runThread->join();
+    delete this->runThread;
+    this->runThread = NULL;
+  }
+
+  transport::fini();
+}
+
+void Combined::RunLoop()
+{
+  transport::run();
 
   while (!this->quit)
   {
     sensors::run_once(true);
   }
 
-  for (int i=0; i < this->worlds.size(); i++)
-    physics::stop_world(this->worlds[i]);
-
-  transport::fini();
-
   this->masterThread->join();
-}
-
-void Combined::Quit()
-{
-  this->master->Quit();
-  this->quit = true;
 }
 
 void Combined::SetParams( const common::StrStr_M &params )

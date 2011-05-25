@@ -65,27 +65,25 @@ namespace gazebo
       public: template<typename M>
               PublisherPtr Advertise(const std::string &topic)
               {
-                std::string decodedTopic = this->DecodeTopicName(topic);
-
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                if (this->UpdatePublications(decodedTopic, msg->GetTypeName()))
+                if (this->UpdatePublications(topic, msg->GetTypeName()))
                 {
-                  ConnectionManager::Instance()->Advertise(decodedTopic,
+                  ConnectionManager::Instance()->Advertise(topic,
                                                            msg->GetTypeName());
                 }
 
                 // Connect all local subscription to the publisher
-                PublicationPtr publication = this->FindPublication( decodedTopic );
+                PublicationPtr publication = this->FindPublication( topic );
                 SubMap::iterator iter;
                 for (iter = this->subscribed_topics.begin(); 
                      iter != this->subscribed_topics.end(); iter++)
                 {
-                  if ( iter->first == decodedTopic )
+                  if ( iter->first == topic )
                   {
                     std::list<CallbackHelperPtr>::iterator liter;
                     for (liter = iter->second.begin(); 
@@ -96,7 +94,7 @@ namespace gazebo
                   }
                 }
 
-                return PublisherPtr( new Publisher(decodedTopic, msg->GetTypeName()) );
+                return PublisherPtr( new Publisher(topic, msg->GetTypeName()) );
               }
 
       /// \brief Stop advertising on a topic
@@ -136,18 +134,6 @@ namespace gazebo
       public: bool UpdatePublications( const std::string &topic, 
                                        const std::string &msgType );
 
-      /// \brief Decode a topic name
-      public: std::string DecodeTopicName(const std::string &topic);
-
-      /// \brief Encode a topic name
-      public: std::string EncodeTopicName(const std::string &topic);
-
-      /// \brief Set the global namespace of all topics
-      public: void SetTopicNamespace(const std::string &space);
-
-      /// \brief Close all publications and subscribed topics with the master
-      public: void Fini();
-
       private: void HandleIncoming();
 
       /// \brief A map <subscribed_topic_name, subscription_callbacks> of 
@@ -156,8 +142,6 @@ namespace gazebo
 
       private: std::vector<PublicationPtr> advertisedTopics;
       private: SubMap subscribed_topics; 
-
-      private: std::string topicNamespace;
 
       //Singleton implementation
       private: friend class SingletonT<TopicManager>;

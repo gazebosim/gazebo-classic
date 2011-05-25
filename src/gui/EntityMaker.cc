@@ -15,6 +15,7 @@
  *
 */
 #include "transport/Transport.hh"
+#include "transport/Node.hh"
 #include "gui/EntityMaker.hh"
 
 using namespace gazebo;
@@ -28,7 +29,10 @@ double EntityMaker::snapGridSize = 1.0;
 /// Constructor
 EntityMaker::EntityMaker()
 {
-  this->visPub = transport::advertise<msgs::Visual>("/model_builder/visual");
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("model_builder");
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
+  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

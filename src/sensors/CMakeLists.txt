@@ -30,5 +30,5 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      ${boost_libraries}
                                      )
 
-install ( TARGETS gazebo_sensors DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
-install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/sensors COMPONENT headers)
+INSTALL_LIBRARY(gazebo_sensors)
+INSTALL_INCLUDES("sensors" ${headers})

@@ -1,7 +1,8 @@
 #include <QtGui>
 #include <sstream>
 
-#include "TimePanel.hh"
+#include "transport/Node.hh"
+#include "gui/TimePanel.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -49,7 +50,9 @@ TimePanel::TimePanel( QWidget *parent )
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
 
-  this->statsSub = transport::subscribe("/gazebo/default/world_stats", &TimePanel::OnStats, this);
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("default");
+  this->statsSub = this->node->Subscribe("~/world_stats", &TimePanel::OnStats, this);
 
   QTimer *timer = new QTimer(this);
   connect( timer, SIGNAL(timeout()), this, SLOT(Update()) );

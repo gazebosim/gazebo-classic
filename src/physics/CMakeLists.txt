@@ -77,5 +77,5 @@ if (INCLUDE_ODE)
   target_link_libraries(gazebo_physics gazebo_physics_ode)
 endif()
 
-install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
-install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/physics COMPONENT headers)
+INSTALL_LIBRARY(gazebo_physics)
+INSTALL_INCLUDES("physics" ${headers})

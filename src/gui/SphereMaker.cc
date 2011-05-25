@@ -127,39 +127,39 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
 
 void SphereMaker::CreateTheEntity()
 {
-  msgs::InsertModel msg;
+  msgs::Factory msg;
   common::Message::Init(msg, "new_sphere");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model type='physical' name='" << this->visualMsg->header().str_id() << "'>\
-    <xyz>" << this->visualMsg->pose().position().x() << " "
-           << this->visualMsg->pose().position().y() << " "
-           << this->visualMsg->pose().position().z() << "</xyz>\
-    <body name='body'>\
-    <geom type='sphere' name='geom'>\
-    <size>" << this->visualMsg->scale().x() << " "
-            << this->visualMsg->scale().y() << " "
-            << this->visualMsg->scale().z() << "</size>\
-    <mass>0.5</mass>\
-    <visual>\
-    <mesh>unit_sphere</mesh>\
-    <scale>" << this->visualMsg->scale().x() << " "
-             << this->visualMsg->scale().y() << " "
-             << this->visualMsg->scale().z() << "</scale>\
-    <material>Gazebo/Grey</material>\
-    <shader>pixel</shader>\
-    </visual>\
-    </geom>\
-    </body>\
-    </model>";
+  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "'>\
+    <origin xyz='" << this->visualMsg->pose().position().x() << " " 
+                    << this->visualMsg->pose().position().y() << " " 
+                    << this->visualMsg->pose().position().z() << "'/>\
+    <link name='body'>\
+      <collision name='geom'>\
+        <geometry>\
+          <sphere radius='" << this->visualMsg->scale().x() << "'/>\
+        </geometry>\
+        <mass>0.5</mass>\
+      </collision>\
+      <visual>\
+        <geometry>\
+          <sphere radius='" << this->visualMsg->scale().x() << "'/>\
+        </geometry>\
+        <material name='Gazebo/Grey'/>\
+        <cast_shadows>true</cast_shadows>\
+        <shader>pixel</shader>\
+      </visual>\
+    </link>\
+  </model>";
 
   msg.set_xml( newModelStr.str() );
 
-  this->visualMsg->set_action( msgs::Visual::DELETE );
   common::Message::Stamp(this->visualMsg->mutable_header());
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  //Simulator::Instance()->SendMessage( msg );
+  this->makerPub->Publish(msg);
 }

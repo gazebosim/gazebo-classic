@@ -53,7 +53,6 @@ void BoxMaker::Start(const rendering::UserCameraPtr camera)
 {
   this->camera = camera;
 
-  gzdbg << "Start BoxMaker\n";
   std::ostringstream stream;
   stream << "user_box_" << counter++;
   this->visualMsg->mutable_header()->set_str_id( stream.str() );
@@ -63,7 +62,6 @@ void BoxMaker::Start(const rendering::UserCameraPtr camera)
 
 void BoxMaker::Stop()
 {
-  gzdbg << "Stop BoxMaker\n";
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
   this->visualMsg->set_action( msgs::Visual::UPDATE );
@@ -104,7 +102,6 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
-  gzdbg << "BoxMaker: OnMouseDrag\n";
   common::Vector3 norm(0,0,1);
   common::Vector3 p1, p2;
 
@@ -146,35 +143,39 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
 
 void BoxMaker::CreateTheEntity()
 {
-  gzdbg << "BoxMaker: Create the entity\n";
-  msgs::InsertModel msg;
+  msgs::Factory msg;
   common::Message::Init(msg, "new_box");
 
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model type='physical' name='" << this->visualMsg->header().str_id() << "'>\
-    <xyz>" << this->visualMsg->pose().position().x() << " " 
-           << this->visualMsg->pose().position().y() << " " 
-           << this->visualMsg->pose().position().z() << "</xyz>\
-    <body name='body'>\
-    <geom type='box' name='geom'>\
-    <size>" << this->visualMsg->scale().x() << " "
-            << this->visualMsg->scale().y() << " "
-            << this->visualMsg->scale().z() << "</size>\
-    <mass>0.5</mass>\
-    <visual>\
-    <mesh>unit_box_U1V1</mesh>\
-    <scale>" << this->visualMsg->scale().x() << " "
-             << this->visualMsg->scale().y() << " "
-             << this->visualMsg->scale().z() << "</scale>\
-    <material>Gazebo/Grey</material>\
-    <shader>pixel</shader>\
-    </visual>\
-    </geom>\
-    </body>\
-    </model>";
+  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "'>\
+    <static>false</static>\
+    <origin xyz='" << this->visualMsg->pose().position().x() << " " 
+                    << this->visualMsg->pose().position().y() << " " 
+                    << this->visualMsg->pose().position().z() << "'/>\
+    <link name='body'>\
+      <collision name='geom'>\
+        <geometry>\
+          <box size='" << this->visualMsg->scale().x() << " "
+                       << this->visualMsg->scale().y() << " "
+                       << this->visualMsg->scale().z() << "'/>\
+        </geometry>\
+        <mass>0.5</mass>\
+      </collision>\
+      <visual>\
+        <geometry>\
+          <box size='" << this->visualMsg->scale().x() << " "
+                       << this->visualMsg->scale().y() << " "
+                       << this->visualMsg->scale().z() << "'/>\
+        </geometry>\
+        <material name='Gazebo/Grey'/>\
+        <cast_shadows>true</cast_shadows>\
+        <shader>pixel</shader>\
+      </visual>\
+    </link>\
+  </model>";
 
   msg.set_xml( newModelStr.str() );
 
@@ -182,5 +183,5 @@ void BoxMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  //Simulator::Instance()->SendMessage( msg );
+  this->makerPub->Publish(msg);
 }

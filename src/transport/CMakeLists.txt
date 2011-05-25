@@ -14,6 +14,7 @@ set (sources TopicManager.cc
              SubscriptionTransport.cc
              PublicationTransport.cc
              Transport.cc
+             Node.cc
 ) 
 
 set (headers TopicManager.hh
@@ -29,6 +30,7 @@ set (headers TopicManager.hh
              SubscribeOptions.hh
              Transport.hh
              TransportTypes.hh
+             Node.hh
 )
 
 add_library(gazebo_transport SHARED ${sources})
@@ -44,5 +46,5 @@ target_link_libraries(gazebo_transport gazebo_common
                                        gazebo_msgs 
                                        ${boost_libraries})
 
-install (TARGETS gazebo_transport DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/transport COMPONENT headers)
+INSTALL_LIBRARY(gazebo_transport)
+INSTALL_INCLUDES("transport" ${headers})

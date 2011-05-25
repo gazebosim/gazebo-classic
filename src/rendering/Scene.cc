@@ -35,6 +35,7 @@
 
 //#include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
+#include "transport/Node.hh"
 
 #include "rendering/Scene.hh"
 
@@ -48,6 +49,8 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(name);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -55,10 +58,6 @@ Scene::Scene(const std::string &name)
   this->manager = NULL;
   this->raySceneQuery = NULL;
   this->type = GENERIC;
-
-
-  // Set the global topic namespace
-  transport::set_topic_namespace(name);
 
   this->receiveMutex = new boost::mutex();
 
@@ -84,12 +83,12 @@ Scene::Scene(const std::string &name)
   common::Param::End();
 
   
-  this->sceneSub = transport::subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
-  this->visSub = transport::subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
-  this->lightSub = transport::subscribe("~/light", &Scene::ReceiveLightMsg, this);
-  this->poseSub = transport::subscribe("~/pose", &Scene::ReceivePoseMsg, this);
-  this->selectionSub = transport::subscribe("~/selection", &Scene::HandleSelectionMsg, this);
+  this->visSub = this->node->Subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
+  this->lightSub = this->node->Subscribe("~/light", &Scene::ReceiveLightMsg, this);
+  this->poseSub = this->node->Subscribe("~/pose", &Scene::ReceivePoseMsg, this);
+  this->selectionSub = this->node->Subscribe("~/selection", &Scene::HandleSelectionMsg, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,7 +230,7 @@ void Scene::Init()
 
   // Send a request to get the current world state
   // TODO: Use RPC or some service call to get this properly
-  transport::PublisherPtr pub = transport::advertise<msgs::Request>("/gazebo/default/publish_scene");
+  transport::PublisherPtr pub = this->node->Advertise<msgs::Request>("~/publish_scene");
   msgs::Request req;
   req.set_request("publish");
 

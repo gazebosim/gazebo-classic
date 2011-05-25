@@ -61,21 +61,14 @@ void transport::init(const std::string &master_host, unsigned short master_port)
   transport::ConnectionManager::Instance()->Init( host, port );
 }
 
-/// Set the global topic namespace
-void transport::set_topic_namespace(const std::string &space)
-{
-  transport::TopicManager::Instance()->SetTopicNamespace( space );
-}
-
 void transport::fini()
 {
-  transport::TopicManager::Instance()->Fini();
+  transport::ConnectionManager::Instance()->Fini();
 }
 
 /// \brief Run the transport. This starts message passing
 void transport::run()
 {
-  std::cout << "Run Transport\n";
-  transport::ConnectionManager::Instance()->Run();
+  transport::ConnectionManager::Instance()->Start();
 }
 

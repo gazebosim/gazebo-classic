@@ -4,6 +4,7 @@
 #include "common/Exception.hh"
 #include "common/XMLConfig.hh"
 
+#include "transport/Node.hh"
 #include "transport/Transport.hh"
 
 #include "gui/ModelBuilderWidget.hh"
@@ -28,7 +29,9 @@ MainWindow::MainWindow()
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
 
-  this->worldControlPub = transport::advertise<msgs::WorldControl>("~/world_control");
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("default");
+  this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->glWidget = new RenderWidget(mainWidget);
   this->glWidget->hide();
@@ -114,7 +117,6 @@ void MainWindow::Step()
 
 void MainWindow::NewModel()
 {
-  gzmsg << "new Model\n";
   ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
   modelBuilder->Init();
   modelBuilder->show();

@@ -66,6 +66,5 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
                                         X11 )
-
-install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
-install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/rendering COMPONENT headers)
+INSTALL_LIBRARY(gazebo_rendering)
+INSTALL_INCLUDES("rendering" ${headers})

@@ -33,8 +33,6 @@ bool sensors::init(const std::string &world_name)
   // Register all the sensor types
   sensors::SensorFactory::RegisterAll();
 
-  transport::set_topic_namespace(world_name);
-
   return true;
 }
 

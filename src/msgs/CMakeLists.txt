@@ -2,7 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (msgs color.proto
           header.proto
-          insert_model.proto
+          factory.proto
           light.proto
           plane.proto
           point.proto
@@ -24,6 +24,7 @@ set (msgs color.proto
           topic_info.proto
           world_stats.proto
           world_control.proto
+          entity.proto
 )
 
 
@@ -41,6 +42,5 @@ endforeach()
 
 configure_file ( ${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh )
 
-install (TARGETS gazebo_msgs DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install (FILES ${PROTO_HDRS} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh  DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/msgs COMPONENT headers)
-
+INSTALL_LIBRARY(gazebo_msgs)
+INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh)

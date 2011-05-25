@@ -25,6 +25,7 @@
 #include "common/Events.hh"
 
 #include "transport/Transport.hh"
+#include "transport/Node.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -37,7 +38,9 @@ using namespace physics;
 PhysicsEngine::PhysicsEngine(WorldPtr world)
   : world(world)
 {
-  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(world->GetName());
+  this->vis_pub = this->node->Advertise<msgs::Visual>("~/visual");
 
   common::Param::Begin(&this->parameters);
   this->gravityP = new common::ParamT<common::Vector3>("gravity",common::Vector3(0.0, -9.80665, 0.0), 0);

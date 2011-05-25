@@ -42,7 +42,6 @@ using namespace physics;
 Joint::Joint()
   : Base(BasePtr())
 {
-  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
   this->AddType(Base::JOINT);
   this->showJoints = false;
 
@@ -66,7 +65,7 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  if (!this->visual.empty())
+  /*if (!this->visual.empty())
   {
     msgs::Visual msg;
     common::Message::Init(msg, this->visual);
@@ -89,6 +88,7 @@ Joint::~Joint()
     msg.set_action( msgs::Visual::DELETE );
     this->vis_pub->Publish(msg);
   }
+  */
 
   delete this->erpP;
   delete this->cfmP;
@@ -106,6 +106,9 @@ Joint::~Joint()
 void Joint::Load(common::XMLConfigNode *node)
 {
   Base::Load(node);
+
+  //this->node->Init(this->GetWorld()->GetName());
+  //this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
 
   this->childNameP->Load(node->GetChild("child"));
   this->parentNameP->Load(node->GetChild("parent"));
@@ -269,11 +272,12 @@ void Joint::Update()
 // Set the joint to show visuals
 void Joint::ShowJoints(const bool &s)
 {
-  msgs::Visual msg;
+  /*msgs::Visual msg;
   common::Message::Init(msg, this->visual);
   msg.set_visible(s);
   this->vis_pub->Publish(msg);
   this->showJoints = s;
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////

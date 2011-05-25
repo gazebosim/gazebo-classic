@@ -47,38 +47,6 @@ namespace gazebo
 
     /// \brief Run the transport. This starts message passing
     void run();
-
-
-    /// \brief Set the global topic namespace
-    void set_topic_namespace(const std::string &space);
-
-    /// \brief Adverise a topic
-    template<typename M>
-    transport::PublisherPtr advertise(const std::string &topic)
-    {
-      return transport::TopicManager::Instance()->Advertise<M>(topic);
-    }
-
-    /// \brief Subscribe to a topic, and return data on the callback
-    template<typename M, typename T>
-    transport::SubscriberPtr subscribe(const std::string &topic,
-        void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)
-    {
-      SubscribeOptions ops;
-      ops.template Init<M>(topic, boost::bind(fp, obj, _1));
-      return transport::TopicManager::Instance()->Subscribe(ops);
-    }
-
-    /// \brief Subscribe to a topic, and return data on the callback
-    template<typename M>
-    transport::SubscriberPtr subscribe(const std::string &topic,
-        void(*fp)(const boost::shared_ptr<M const> &))
-    {
-      SubscribeOptions ops;
-      ops.template Init<M>(topic, fp);
-      return transport::TopicManager::Instance()->Subscribe(ops);
-    }
-
   }
 }
 

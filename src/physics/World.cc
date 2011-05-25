@@ -19,10 +19,12 @@
  */
 
 #include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include "transport/Node.hh"
 #include "transport/Transport.hh"
 #include "transport/Publisher.hh"
 #include "transport/Subscriber.hh"
@@ -62,16 +64,20 @@ class ModelUpdate_TBB
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Private constructor
-World::World()
+// constructor
+World::World(const std::string &name)
 {
   this->stepInc = false;
   this->pause = false;
 
-  
+  this->name = name;
+
+  this->updateMutex = new boost::mutex();
+
   common::Param::Begin(&this->parameters);
-  this->nameP = new common::ParamT<std::string>("name","default",1);
+  // NO Parameters...
   common::Param::End();
+
 
   this->connections.push_back( 
      event::Events::ConnectStepSignal( boost::bind(&World::OnStep, this) ) );
@@ -85,7 +91,6 @@ World::World()
 // Private destructor
 World::~World()
 {
-  delete this->nameP;
   this->connections.clear();
   this->Fini();
 }
@@ -94,46 +99,54 @@ World::~World()
 // Load the world
 void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 {
+  common::XMLConfigNode *physicsNode = NULL;
+
   // DO THIS FIRST
-  this->nameP->Load(rootNode);
+  if (rootNode)
+  {
+    this->sceneMsg.CopyFrom( 
+        common::Message::SceneFromXML(rootNode->GetChild("scene")) );
+    physicsNode = rootNode->GetChild("physics");
+  }
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->GetName());
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0,200000000);
 
-  // Set the global topic namespace
-  transport::set_topic_namespace(**this->nameP);
 
   common::Message::Init( this->worldStatsMsg, "statistics" );
 
-  this->sceneMsg.CopyFrom( 
-      common::Message::SceneFromXML(rootNode->GetChild("scene")) );
+  this->factorySub = this->node->Subscribe("~/factory", 
+                                           &World::OnFactoryMsg, this);
 
-  this->controlSub = transport::subscribe("~/world_control", 
-                                        &World::OnControl, this);
 
-  this->sceneSub = transport::subscribe("~/publish_scene", 
+  this->controlSub = this->node->Subscribe("~/world_control", 
+                                           &World::OnControl, this);
+
+  this->sceneSub = this->node->Subscribe("~/publish_scene", 
                                         &World::PublishScene, this);
-  this->scenePub = transport::advertise<msgs::Scene>("~/scene");
+  this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
 
-  this->statPub = transport::advertise<msgs::WorldStatistics>("~/world_stats");
-  this->visSub = transport::subscribe("~/visual", &World::VisualLog, this);
-
-  this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
-
-  common::XMLConfigNode *physicsNode = NULL;
-  if (rootNode )
-    physicsNode = rootNode->GetChild("physics");
+  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
+  this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
+  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
+  this->newEntityPub = this->node->Advertise<msgs::Entity>("~/new_entity");
 
   if (physicsNode)
   {
     std::string type = physicsNode->GetString("type","ode",1);
 
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, shared_from_this());
-    if (this->physicsEngine == NULL)
-      gzthrow("Unable to create physics engine\n");
   }
   else
+  {
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode", shared_from_this());
+  }
+
+  if (this->physicsEngine == NULL)
+    gzthrow("Unable to create physics engine\n");
 
   // This should come before loading of entities
   this->physicsEngine->Load(physicsNode);
@@ -142,8 +155,9 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   this->rootElement->SetName("root");
   this->rootElement->SetWorld(shared_from_this());
 
-  // First, create all the entities
-  this->LoadEntities(rootNode, this->rootElement);
+  // Create all the entities
+  if (rootNode)
+    this->LoadEntities(rootNode, this->rootElement);
 
   // Choose threaded or unthreaded model updating depending on the number of
   // models in the scene
@@ -161,7 +175,7 @@ void World::Save(std::string &prefix, std::ostream &stream)
 
   stream << "<world>\n";
 
-  stream << prefix << "  " << *(this->nameP);
+  stream << prefix << "  " << this->name;
 
   this->physicsEngine->Save(prefix, stream);
 
@@ -235,8 +249,6 @@ void World::RunLoop()
 
   this->startTime = common::Time::GetWallTime();
 
-  this->stop = false;
-
   // Set a default sleep time
   req.tv_sec  = 0;
   req.tv_nsec = 10000;
@@ -263,6 +275,7 @@ void World::RunLoop()
       this->pauseTime += step;
     else
     {
+      boost::mutex::scoped_lock lock(*this->updateMutex);
       this->simTime += step;
       this->Update();
     }
@@ -341,7 +354,7 @@ void World::Clear()
 /// Get the name of the world
 std::string World::GetName() const
 {
-  return **this->nameP;
+  return this->name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -384,6 +397,26 @@ BasePtr World::GetByName(const std::string &name)
   return this->rootElement->GetByName(name);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Load a model 
+ModelPtr World::LoadModel(common::XMLConfigNode *node, BasePtr parent)
+{
+  ModelPtr model( new Model(parent) );
+  model->SetWorld(shared_from_this());
+  model->Load(node);
+
+  event::Events::addEntitySignal(model->GetCompleteScopedName());
+  this->models.push_back(model);
+
+  msgs::Entity msg;
+  common::Message::Init(msg, model->GetCompleteScopedName() );
+  msg.set_name(model->GetCompleteScopedName());
+
+  this->newEntityPub->Publish(msg);
+
+  return model;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
 void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
@@ -393,15 +426,10 @@ void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
   cnode = node->GetChild("model");
   while (cnode)
   {
-    ModelPtr model( new Model(parent) );
-    model->SetWorld(shared_from_this());
-    model->Load(cnode);
+    this->LoadModel(cnode, parent);
 
     // TODO : Put back in the ability to nest models. We should do this
     // without requiring a joint.
-
-    event::Events::addEntitySignal(model->GetCompleteScopedName());
-    this->models.push_back(model);
 
     cnode = cnode->GetNext("model");
   }
@@ -411,6 +439,7 @@ void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
   {
     msgs::Light *lm = this->sceneMsg.add_light();
     lm->CopyFrom( common::Message::LightFromXML(cnode) );
+
     cnode = cnode->GetNext("light");
   }
 }
@@ -580,25 +609,31 @@ void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
   common::Message::Stamp(this->sceneMsg.mutable_header());
 
   this->sceneMsg.clear_pose();
-  this->BuildSceneMsg(this->sceneMsg, this->rootElement);
-  this->scenePub->Publish( this->sceneMsg );
+  if (this->rootElement)
+  {
+    this->BuildSceneMsg(this->sceneMsg, this->rootElement);
+    this->scenePub->Publish( this->sceneMsg );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Construct a scene message
 void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 {
-  if (entity->HasType(Entity::ENTITY))
+  if (entity)
   {
-    msgs::Pose *poseMsg = scene.add_pose();
-    common::Pose3d pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
-    poseMsg->CopyFrom( common::Message::Convert(pose) );
-    common::Message::Init(*poseMsg, entity->GetCompleteScopedName() );
-  }
+    if (entity->HasType(Entity::ENTITY))
+    {
+      msgs::Pose *poseMsg = scene.add_pose();
+      common::Pose3d pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
+      poseMsg->CopyFrom( common::Message::Convert(pose) );
+      common::Message::Init(*poseMsg, entity->GetCompleteScopedName() );
+    }
 
-  for (unsigned int i=0; i < entity->GetChildCount(); i++)
-  {
-    this->BuildSceneMsg( scene, entity->GetChild(i) );
+    for (unsigned int i=0; i < entity->GetChildCount(); i++)
+    {
+      this->BuildSceneMsg( scene, entity->GetChild(i) );
+    }
   }
 }
 
@@ -640,5 +675,31 @@ void World::ModelUpdateSingleLoop()
        iter != this->models.end(); iter++)
   {
     (*iter)->Update();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Received a factory msg
+void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
+{
+  // Load the world file
+  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
+  
+  try
+  {
+    xmlFile->LoadString(msg->xml());
+  }
+  catch (common::Exception e)
+  {
+    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
+  }
+
+  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
+
+  {
+    boost::mutex::scoped_lock lock(*this->updateMutex);
+    // Add the new models into the World
+    ModelPtr model = this->LoadModel( rootNode, BasePtr() );
+    model->Init();
   }
 }

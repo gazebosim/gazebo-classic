@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.4.6 FATAL_ERROR )
+cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
 if(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
@@ -21,6 +21,10 @@ set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
+set (INCLUDE_INSTALL_DIR "include/gazebo")
+set (LIB_INSTALL_DIR "lib")
+set (BIN_INSTALL_DIR "bin")
+
 
 # with -fPIC
 if(UNIX AND NOT WIN32)
@@ -34,16 +38,16 @@ if(UNIX AND NOT WIN32)
    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
  endif(CMAKE_UNAME)
 endif(UNIX AND NOT WIN32)
-                             
-set (MIN_OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
+
+
+set (MIN_OGRE_VERSION 1.7.3 CACHE INTERNAL "Ogre version requirement" FORCE)
+set (MIN_ODE_VERSION 0.11.1 CACHE INTERNAL "ODE version requirement" FORCE)
+set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
 set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
-set (FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
-set (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
-set (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
+set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 
-#set (ENABLE_BINDINGS OFF CACHE BOOL "Enable libgazebo bindings")
 
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
@@ -74,7 +78,7 @@ set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 MESSAGE (STATUS "\n\n====== Finding 3rd Party Packages ======")
-INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
+include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------\n")
 
 if ( build_warnings )
@@ -96,10 +100,10 @@ else (build_errors)
   ########################################
   # Write the config.h file
   configure_file (${PROJECT_SOURCE_DIR}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
-  install(FILES ${PROJECT_BINARY_DIR}/gazebo_config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
+  INSTALL_INCLUDES(${PROJECT_BINARY_DIR}/gazebo_config.h "")
 
   configure_file (${PROJECT_SOURCE_DIR}/gazebo.h.in ${PROJECT_BINARY_DIR}/gazebo.h)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazebo.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
+  INSTALL_INCLUDES(${CMAKE_CURRENT_BINARY_DIR}/gazebo.h "")
   
   ########################################
   # Make the gazebo rc file
@@ -113,10 +117,11 @@ else (build_errors)
   if (BUILD_GAZEBO)
     add_subdirectory(src)
     add_subdirectory(worlds)
+    add_subdirectory(Media)
+    add_subdirectory(test)
     #add_subdirectory(tools)
     #add_subdirectory(benchmarks)
-    add_subdirectory(Media)
-    
+   
     #if (INCLUDE_PLAYER)
     #  add_subdirectory(player)
     #  add_subdirectory(player_cfgs)
@@ -129,26 +134,24 @@ else (build_errors)
   ########################################
   # Make the package config files
   configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_transport_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
 
-  # Cpack stuff
-  include (InstallRequiredSystemLibraries)
-  set (CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+  ########################################
+  # Package Creation: 
+  include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
+  set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION}")
   set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
   set (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
   set (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_PATCH_VERSION}")
-  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Gazebo robot simulator")
-  set (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_VERSION}")
-  set (CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_VERSION}")
-  set (CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
-  set (CPACK_GENERATOR "TBZ2")
-  set (CPACK_SOURCE_GENERATOR "TBZ2")
-  list (APPEND CPACK_SOURCE_IGNORE_FILES "/.svn/;.swp$;/build/")
-  include (CPack)
+
+  if (CPACK_GENERATOR)
+    message(STATUS "Found CPack generators: ${CPACK_GENERATOR}")
+
+    configure_file("${gazebo_cmake_dir}/cpack_options.cmake.in" ${GAZEBO_CPACK_CFG_FILE} @ONLY)
+    set(CPACK_PROJECT_CONFIG_FILE ${GAZEBO_CPACK_CFG_FILE})
+    include (CPack)
+  endif()
 
   message(STATUS "Configuration successful. Type make to compile gazebo")
-
 endif(build_errors)
 
-
-GAZEBOSERVER_RESET_LISTS()

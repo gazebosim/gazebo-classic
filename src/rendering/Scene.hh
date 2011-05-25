@@ -244,7 +244,8 @@ namespace gazebo
       private: Light_M lights;
 
       private: boost::mutex *receiveMutex;
-  
+
+      private: transport::NodePtr node;  
       private: transport::SubscriberPtr sceneSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;

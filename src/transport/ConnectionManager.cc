@@ -30,12 +30,14 @@ ConnectionManager::ConnectionManager()
     serverConn( new Connection() )
 {
   this->initialized = false;
+  this->thread = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 ConnectionManager::~ConnectionManager()
 {
+  this->Stop();
   this->connections.clear();
   this->masterConn.reset();
   this->serverConn.reset();
@@ -77,20 +79,49 @@ void ConnectionManager::Init(const std::string &master_host,
   this->masterConn->StartRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 
   this->initialized = true;
+  this->stop = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize
 void ConnectionManager::Fini()
 {
+  this->Stop();
+
+  this->connections.clear();
+  this->masterConn->Cancel();
+  this->masterConn->StopRead();
+  this->masterConn->Close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Start the conneciton manager
+void ConnectionManager::Start()
+{
+  this->stop = false;
+  this->thread = new boost::thread( 
+      boost::bind(&ConnectionManager::RunLoop, this));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Stop the conneciton manager
+void ConnectionManager::Stop()
+{
+  this->stop = true;
+  if (this->thread)
+  {
+    this->thread->join();
+    delete this->thread;
+    this->thread = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run all the connections
-void ConnectionManager::Run()
+void ConnectionManager::RunLoop()
 {
   std::list<ConnectionPtr>::iterator iter;
-  while (true)
+  while (!this->stop)
   {
     this->masterConn->ProcessWriteQueue();
 
