@@ -41,7 +41,7 @@ namespace gazebo
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
-    class Connection
+    class Connection : public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
       public: Connection();
@@ -177,8 +177,7 @@ namespace gazebo
      private: void OnWrite(const boost::system::error_code &e);
 
      /// \brief Handle new connections, if this is a server
-     private: void OnAccept(const boost::system::error_code &e,
-                            ConnectionPtr newConnection);
+     private: void OnAccept(const boost::system::error_code &e);
 
      /// \brief Parse a header to get the size of a packet
      private: std::size_t ParseHeader( const std::string &header );
@@ -209,6 +208,10 @@ namespace gazebo
 
       private: boost::thread *readThread;
       private: bool readQuit;
+
+      public: unsigned int id;
+      private: static unsigned int idCounter;
+      private: ConnectionPtr acceptConn;
     };
 
   }

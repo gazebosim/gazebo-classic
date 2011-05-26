@@ -35,8 +35,16 @@ TopicManager::~TopicManager()
 {
 }
 
-void TopicManager::Init(unsigned short port)
+void TopicManager::Init()
 {
+  this->advertisedTopics.clear();
+  this->subscribed_topics.clear();
+}
+
+void TopicManager::Fini()
+{
+  this->advertisedTopics.clear();
+  this->subscribed_topics.clear();
 }
 
 

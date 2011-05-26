@@ -21,7 +21,7 @@ using namespace gazebo;
 using namespace transport;
 
 IOManager::IOManager()
-  : work(this->io_service)
+  : work(this->io_service), count(0)
 {
   this->thread = boost::thread( boost::bind(&boost::asio::io_service::run, 
                                             &this->io_service) );
@@ -29,11 +29,26 @@ IOManager::IOManager()
 
 IOManager::~IOManager()
 {
-  this->thread.interrupt();
+  this->thread.detach();
   this->io_service.stop();
 }
 
 boost::asio::io_service &IOManager::GetIO()
 {
   return this->io_service;
+}
+
+void IOManager::IncCount()
+{
+  this->count++;
+}
+
+void IOManager::DecCount()
+{
+  this->count--;
+}
+
+unsigned int IOManager::GetCount() const
+{
+  return this->count;
 }

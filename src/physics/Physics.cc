@@ -29,6 +29,12 @@ bool physics::init()
   return true;
 }
 
+bool physics::fini()
+{
+  // Empty for now
+  return true;
+}
+
 physics::WorldPtr physics::create_world(const std::string &name)
 {
   physics::WorldPtr world( new physics::World(name) );

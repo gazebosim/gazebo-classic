@@ -69,8 +69,6 @@ bool rendering::init()
 {
   bool result = true;
 
-  //rendering::RenderEngine::Instance()->SetHeadless(create_dummy_window);
-
   //Initialize RenderEngine
   try
   {
@@ -83,6 +81,12 @@ bool rendering::init()
   }
 
   return result;
+}
+
+bool rendering::fini()
+{
+  rendering::RenderEngine::Instance()->Fini();
+  return true;
 }
 
 rendering::ScenePtr rendering::create_scene(const std::string &name)

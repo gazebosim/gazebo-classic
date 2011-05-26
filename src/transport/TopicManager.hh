@@ -45,7 +45,9 @@ namespace gazebo
       private: TopicManager();
       private: virtual ~TopicManager();
 
-      public: void Init(unsigned short port);
+      public: void Init();
+
+      public: void Fini();
 
       public: PublicationPtr FindPublication(const std::string &topic);
 

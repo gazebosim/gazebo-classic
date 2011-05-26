@@ -25,21 +25,31 @@
 using namespace gazebo;
 using namespace transport;
 
+unsigned int Connection::idCounter = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Connection::Connection()
   : socket( IOManager::Instance()->GetIO() )
 {
+  IOManager::Instance()->IncCount();
+  this->id = idCounter++;
+
   this->writeMutex = new boost::mutex();
+  this->acceptor = NULL;
+  this->readThread = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Connection::~Connection()
 {
-  delete this->writeMutex;
-  this->Cancel();
+  this->StopRead();
   this->Close();
+  this->Cancel();
+
+  delete this->writeMutex;
+  IOManager::Instance()->DecCount();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,29 +89,36 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
   this->acceptor->bind(endpoint);
   this->acceptor->listen();
 
-  ConnectionPtr newConnection(new Connection());
+  this->acceptConn = ConnectionPtr(new Connection());
 
-  this->acceptor->async_accept(newConnection->socket,
+  this->acceptor->async_accept(this->acceptConn->socket,
       boost::bind(&Connection::OnAccept, this, 
-                  boost::asio::placeholders::error, newConnection));
+                  boost::asio::placeholders::error));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Accept a new connection to this server, and start a new acceptor
-void Connection::OnAccept(const boost::system::error_code &e, 
-                          ConnectionPtr conn)
+void Connection::OnAccept(const boost::system::error_code &e)
 {
-  // First start a new acceptor
-  ConnectionPtr newConnection(new Connection());
-  this->acceptor->async_accept(newConnection->socket, 
-      boost::bind(&Connection::OnAccept, this, 
-        boost::asio::placeholders::error, newConnection));
-
   // Call the accept callback if there isn't an error
   if (!e)
-    this->acceptCB( conn );
+  {
+    // First start a new acceptor
+    this->acceptCB( this->acceptConn );
+
+    this->acceptConn = ConnectionPtr(new Connection());
+
+    this->acceptor->async_accept(this->acceptConn->socket, 
+        boost::bind(&Connection::OnAccept, this, 
+          boost::asio::placeholders::error));
+  }
   else
-    gzerr << e.message() << std::endl;
+  {
+    // Probably the connection was closed. No need to report an error since
+    // this can happen duing a shutdown.
+    if (e.value() != ECANCELED)
+      gzerr << e.message() << "Value[" << e.value() << "]" << std::endl;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,8 +134,10 @@ void Connection::StartRead(const ReadCallback &cb)
 void Connection::StopRead()
 {
   if (this->readThread)
+  {
     this->readThread->interrupt();
-  delete this->readThread;
+    delete this->readThread;
+  }
   this->readThread = NULL;
 }
 
@@ -211,12 +230,27 @@ void Connection::Close()
 {
   if (this->socket.is_open())
     this->socket.close();
+
+  if (this->acceptor && this->acceptor->is_open())
+    this->acceptor->close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Cancel all async operations on an open socket
 void Connection::Cancel()
 {
+  if (this->acceptor)
+  {
+    try
+    {
+      this->acceptor->cancel();
+    } 
+    catch (boost::system::system_error &e)
+    { }
+    delete this->acceptor;
+    this->acceptor = NULL;
+  }
+
   if (this->socket.is_open())
     this->socket.cancel();
 }
@@ -235,7 +269,10 @@ void Connection::Read(std::string &data)
   // First read the header
   this->socket.read_some( boost::asio::buffer(header), error );
   if (error)
+  {
+    gzerr << "Connection[" << this->id << "] Closed during Read\n";
     throw boost::system::system_error(error);
+  }
 
   // Parse the header to get the size of the incoming data packet
   incoming_size = this->ParseHeader( header );
@@ -317,19 +354,36 @@ std::size_t Connection::ParseHeader( const std::string &header )
 /// the read thread
 void Connection::ReadLoop(const ReadCallback &cb)
 {
+  fd_set fileDescriptorSet;
+  struct timeval timeStruct;
   std::string data;
+
+  int nativeSocket = this->socket.native();
+
+  timeStruct.tv_sec = 1;
+  timeStruct.tv_usec = 0;
+
   while (!this->readQuit)
   {
     try
     {
-      this->Read(data);
+      boost::this_thread::interruption_point();
+      if (this->socket.available() >= HEADER_LENGTH)
+      {
+        this->Read(data);
+        (cb)(data);
+      }
+      else
+      {
+        usleep(33000);
+        continue;
+      }
     }
     catch (std::exception &e)
     {
       // The connection closed
       break;
     }
-    (cb)(data);
   }
 }
 

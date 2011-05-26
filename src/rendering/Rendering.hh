@@ -15,6 +15,7 @@ namespace gazebo
     bool load(const std::string &filename);
 
     bool init();
+    bool fini();
 
     rendering::ScenePtr create_scene(const std::string &name);
   }

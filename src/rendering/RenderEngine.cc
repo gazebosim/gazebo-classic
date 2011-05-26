@@ -63,10 +63,6 @@ RenderEngine::RenderEngine()
 {
   this->headless = false;
 
-  // Create a new log manager and prevent output from going to stdout
-  this->logManager = new Ogre::LogManager();
-  this->logManager->createLog("Ogre.log", true, false, false);
-
   this->logManager = NULL;
   this->root = NULL;
 
@@ -79,20 +75,18 @@ RenderEngine::RenderEngine()
 /// Destructor
 RenderEngine::~RenderEngine()
 {
-  if (this->dummyDisplay)
-  {
-    glXDestroyContext((Display*)this->dummyDisplay, 
-                      (GLXContext)this->dummyContext);
-    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
-    XCloseDisplay((Display*)this->dummyDisplay);
-
-  }
+  this->Fini();
+  delete this->logManager;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
 void RenderEngine::Load(common::XMLConfigNode *rootNode)
 {
+  // Create a new log manager and prevent output from going to stdout
+  this->logManager = new Ogre::LogManager();
+  this->logManager->createLog("Ogre.log", true, false, false);
+
   if (this->root)
   {
     gzerr << "Attempting to load, but root already exist\n";
@@ -136,7 +130,6 @@ ScenePtr RenderEngine::CreateScene(const std::string &name)
   scene->SetAmbientColor(common::Color(0.5, 0.5, 0.5));
   scene->SetBackgroundColor(common::Color(0.5, 0.5, 0.5, 1.0));
   scene->CreateGrid( 10, 1, 0.03, common::Color(1,1,1,1));
-
 
   this->scenes.push_back(scene);
   return scene;
@@ -263,6 +256,26 @@ void RenderEngine::Init()
 /// Finalize
 void RenderEngine::Fini()
 {
+  this->scenes.clear();
+
+  if (this->root)
+    delete this->root;
+  this->root = NULL;
+
+  if (this->logManager)
+    delete this->logManager;
+  this->logManager = NULL;
+
+
+  if (this->dummyDisplay)
+  {
+    glXDestroyContext((Display*)this->dummyDisplay, 
+                      (GLXContext)this->dummyContext);
+    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
+    XCloseDisplay((Display*)this->dummyDisplay);
+  }
+  this->dummyDisplay = false;
+  this->initialized = false;
 }
  
 ////////////////////////////////////////////////////////////////////////////////

@@ -31,6 +31,18 @@ Master::Master()
 
 Master::~Master()
 {
+  this->publishers.clear();
+  this->subscribers.clear();
+
+  for (std::deque<transport::ConnectionPtr>::iterator iter = this->connections.begin(); iter != this->connections.end(); iter++)
+  {
+    (*iter)->StopRead();
+    (*iter)->Close();
+    (*iter)->Cancel();
+
+    (*iter).reset();
+  }
+
   this->connections.clear();
   this->connection.reset();
 }
@@ -52,15 +64,17 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 {
   msgs::String msg;
   msg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
+
   new_connection->EnqueueMsg( common::Message::Package("init", msg), true );
 
-  new_connection->StartRead( boost::bind(&Master::OnRead, this, new_connection, _1));
   this->connections.push_back(new_connection);
+  new_connection->StartRead( boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
 }
 
-void Master::OnRead(const transport::ConnectionPtr &conn, 
+void Master::OnRead(const unsigned int connectionIndex, 
                     const std::string &data)
 {
+  transport::ConnectionPtr conn = this->connections[connectionIndex];
   msgs::Packet packet;
   packet.ParseFromString(data);
 
@@ -205,7 +219,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
 
 void Master::Run()
 {
-  std::list<transport::ConnectionPtr>::iterator iter;
+  std::deque<transport::ConnectionPtr>::iterator iter;
   while (!this->quit)
   {
     for (iter = this->connections.begin(); 
@@ -245,7 +259,7 @@ msgs::Publish Master::GetPublisher( const std::string &topic )
 transport::ConnectionPtr Master::FindConnection(const std::string &host, unsigned short port)
 {
   transport::ConnectionPtr conn;
-  std::list<transport::ConnectionPtr>::iterator iter;
+  std::deque<transport::ConnectionPtr>::iterator iter;
 
 
   for (iter = this->connections.begin(); 

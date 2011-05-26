@@ -29,6 +29,10 @@ namespace gazebo
     {
       public: boost::asio::io_service &GetIO();
 
+      public: void IncCount();
+      public: void DecCount();
+      public: unsigned int GetCount() const;
+
       private: IOManager();
       private: ~IOManager();
 
@@ -36,6 +40,7 @@ namespace gazebo
 
       // Use io_service::work to keep the io_service running in thread
       private: boost::asio::io_service::work work;
+      private: unsigned int count;
 
       private: boost::thread thread;
 

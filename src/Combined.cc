@@ -8,6 +8,7 @@
 
 #include "sensors/Sensors.hh"
 #include "transport/Transport.hh"
+#include "transport/IOManager.hh"
 
 #include "physics/Physics.hh"
 #include "rendering/Rendering.hh"
@@ -86,6 +87,12 @@ Combined::~Combined()
 {
   delete this->master;
   delete this->masterThread;
+
+  while (transport::IOManager::Instance()->GetCount() > 0)
+  {
+    usleep(100000);
+    gzdbg << "Connectionmanager::Destructor IOCount[" << transport::IOManager::Instance()->GetCount() << "]\n";
+  }
 }
 
 void Combined::Load(const std::string &filename)
@@ -175,11 +182,16 @@ void Combined::Start()
 
 void Combined::Stop()
 {
+  physics::fini();
+  rendering::fini();
+
   for (int i=0; i < this->worlds.size(); i++)
     physics::stop_world(this->worlds[i]);
 
   this->quit = true;
   this->master->Quit();
+  this->masterThread->join();
+
   if (this->runThread)
   {
     this->runThread->join();
@@ -199,7 +211,6 @@ void Combined::RunLoop()
     sensors::run_once(true);
   }
 
-  this->masterThread->join();
 }
 
 void Combined::SetParams( const common::StrStr_M &params )

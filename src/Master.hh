@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include <deque>
 #include <boost/shared_ptr.hpp>
 
 #include "common/Messages.hh"
@@ -20,7 +21,7 @@ namespace gazebo
     public: void Run();
     public: void Quit();
 
-    private: void OnRead(const transport::ConnectionPtr &new_connection,
+    private: void OnRead(const unsigned int connectionIndex,
                          const std::string &data);
 
     private: void OnAccept(const transport::ConnectionPtr &new_connection);
@@ -29,7 +30,7 @@ namespace gazebo
 
     private: transport::ConnectionPtr FindConnection(const std::string &host, unsigned short port);
 
-    private: std::list<transport::ConnectionPtr> connections;
+    private: std::deque<transport::ConnectionPtr> connections;
 
     typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> > PubList;
     typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> > SubList;

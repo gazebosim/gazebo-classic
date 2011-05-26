@@ -58,11 +58,13 @@ void transport::init(const std::string &master_host, unsigned short master_port)
   if (host.empty())
     get_master_uri(host, port);
 
+  transport::TopicManager::Instance()->Init();
   transport::ConnectionManager::Instance()->Init( host, port );
 }
 
 void transport::fini()
 {
+  transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
 }
 

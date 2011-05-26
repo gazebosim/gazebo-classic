@@ -15,6 +15,7 @@
  *
 */
 #include "common/Messages.hh"
+#include "transport/IOManager.hh"
 #include "transport/TopicManager.hh"
 #include "transport/ConnectionManager.hh"
 
@@ -26,8 +27,6 @@ using namespace transport;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 ConnectionManager::ConnectionManager()
-  : masterConn( new Connection() ),
-    serverConn( new Connection() )
 {
   this->initialized = false;
   this->thread = NULL;
@@ -37,10 +36,7 @@ ConnectionManager::ConnectionManager()
 // Destructor
 ConnectionManager::~ConnectionManager()
 {
-  this->Stop();
-  this->connections.clear();
-  this->masterConn.reset();
-  this->serverConn.reset();
+  this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +44,9 @@ ConnectionManager::~ConnectionManager()
 void ConnectionManager::Init(const std::string &master_host, 
                              unsigned short master_port)
 {
+  this->masterConn.reset( new Connection() );
+  this->serverConn.reset( new Connection() );
+
   // Create a new TCP server on a free port
   this->serverConn->Listen(0, boost::bind(&ConnectionManager::OnAccept, this, _1) );
 
@@ -86,12 +85,19 @@ void ConnectionManager::Init(const std::string &master_host,
 // Finalize
 void ConnectionManager::Fini()
 {
+  this->initialized = false;
+  if (this->thread)
+  {
+    this->thread->interrupt();
+    delete this->thread;
+  }
+  this->thread = NULL;
+
   this->Stop();
 
+  this->masterConn.reset();
+  this->serverConn.reset();
   this->connections.clear();
-  this->masterConn->Cancel();
-  this->masterConn->StopRead();
-  this->masterConn->Close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,13 +196,13 @@ void ConnectionManager::OnMasterRead( const std::string &data)
 
 ////////////////////////////////////////////////////////////////////////////////
 // On accept
-void ConnectionManager::OnAccept(const ConnectionPtr &new_connection)
+void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
 {
-  new_connection->AsyncRead(
-      boost::bind(&ConnectionManager::OnRead, this, new_connection, _1) );
+  newConnection->AsyncRead(
+      boost::bind(&ConnectionManager::OnRead, this, newConnection, _1) );
 
   // Add the connection to the list of connections
-  this->connections.push_back( new_connection );
+  this->connections.push_back( newConnection );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,10 +253,17 @@ void ConnectionManager::Unadvertise( const std::string &topic )
   msgs::Publish msg;
   msg.set_topic( topic );
   msg.set_msg_type( "" );
-  msg.set_host( this->serverConn->GetLocalAddress() );
-  msg.set_port( this->serverConn->GetLocalPort() );
 
-  this->masterConn->EnqueueMsg(common::Message::Package("unadvertise", msg));
+  if (this->serverConn)
+  {
+    msg.set_host( this->serverConn->GetLocalAddress() );
+    msg.set_port( this->serverConn->GetLocalPort() );
+  }
+
+  if (this->masterConn)
+  {
+    this->masterConn->EnqueueMsg(common::Message::Package("unadvertise", msg));
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
