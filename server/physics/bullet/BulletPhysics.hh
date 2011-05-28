@@ -146,6 +146,11 @@ class BulletPhysics : public PhysicsEngine
   public: btDynamicsWorld *GetDynamicsWorld() const
           {return this->dynamicsWorld;}
 
+  /// \brief stores rms errors from quickstep
+  public: std::vector<double> rms_error;
+  public: std::vector<double>::iterator rms_error_iter;
+  public: double GetRMSError();
+
   //private: btAxisSweep3 *broadPhase;
   private: btBroadphaseInterface *broadPhase;
   private: btDefaultCollisionConfiguration *collisionConfig;

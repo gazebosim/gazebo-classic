@@ -57,6 +57,7 @@ namespace gazebo
 
     private: Fl_Value_Output *iterations;
     private: Fl_Value_Output *percentOutput;
+    private: Fl_Value_Output *rmsErrorOutput;
     private: Fl_Value_Output *realTime;
     private: Fl_Value_Output *pauseTime;
     private: Fl_Value_Output *simTime;

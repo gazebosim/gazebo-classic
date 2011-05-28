@@ -126,6 +126,9 @@ namespace gazebo
     /// \brief Create a new joint
     public: virtual Joint *CreateJoint(Joint::Type type) = 0;
   
+    /// \brief stores rms errors from quickstep
+    public: virtual double GetRMSError() = 0;
+
     /// \brief Return the gavity vector
     /// \return The gavity vector
     public: Vector3 GetGravity() const;

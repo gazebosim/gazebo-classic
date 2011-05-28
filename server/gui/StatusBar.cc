@@ -36,10 +36,12 @@
 #include "Simulator.hh"
 #include "OgreAdaptor.hh"
 #include "StatusBar.hh"
+#include "World.hh"
+#include "PhysicsEngine.hh"
 
 using namespace gazebo;
 
-gazebo::Time StatusBar::statusUpdatePeriod = 0.05;
+gazebo::Time StatusBar::statusUpdatePeriod = 0.3;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -51,6 +53,16 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
 
   this->box(FL_NO_BOX);
   this->color(BG_COLOR);
+
+  this->rmsErrorOutput = new Fl_Value_Output(x,y,40,20,"RMS Error");
+  this->rmsErrorOutput->labelsize(11);
+  this->rmsErrorOutput->align(FL_ALIGN_RIGHT);
+  this->rmsErrorOutput->textsize(11);
+  this->rmsErrorOutput->precision(2);
+  this->rmsErrorOutput->box(FL_BORDER_BOX);
+  this->rmsErrorOutput->color(FL_WHITE);
+
+  x = this->rmsErrorOutput->x() + this->rmsErrorOutput->w() + 85;
 
   this->percentOutput = new Fl_Value_Output(x,y,40,20,"x Real Time");
   this->percentOutput->labelsize(11);
@@ -174,6 +186,8 @@ void StatusBar::Update()
     }
 
     this->percentOutput->value(this->percent.Double());
+
+    this->rmsErrorOutput->value(World::Instance()->GetPhysicsEngine()->GetRMSError());
 
     this->realTime->value(real);
     this->simTime->value(sim);

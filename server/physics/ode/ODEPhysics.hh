@@ -190,6 +190,11 @@ class ODEPhysics : public PhysicsEngine
   /// \brief access functions to set ODE parameters
   public: int GetMaxContacts();
 
+  /// \brief stores rms errors from quickstep
+  public: std::vector<double> rms_error;
+  public: std::vector<double>::iterator rms_error_iter;
+  public: double GetRMSError();
+
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
 

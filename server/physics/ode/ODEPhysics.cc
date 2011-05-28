@@ -125,8 +125,14 @@ ODEPhysics::ODEPhysics()
 
   Param::End();
 
+  this->rms_error.resize(100000);
+  this->rms_error_iter = this->rms_error.begin();
 }
 
+double ODEPhysics::GetRMSError()
+{
+  return *this->rms_error_iter;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -482,17 +488,20 @@ void ODEPhysics::UpdatePhysics()
     DIAGNOSTICTIMER(timer("ODEPhysics: Constraint Solver",6));
 
     if (**this->stepTypeP == "quick" || **this->quickStepP == true)
+    {
       dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
+#ifdef ODE_RMS_ERROR
+      this->rms_error_iter++;
+      if (this->rms_error_iter == this->rms_error.end())
+        this->rms_error_iter = this->rms_error.begin();
+      *this->rms_error_iter = dWorldGetQuickStepRMSError(this->worldId);
+#endif
+    }
     else if (**this->stepTypeP == "world")
       dWorldStep( this->worldId, (**this->stepTimeP).Double() );
 #ifdef PARALLEL_QUICKSTEP
     else if (**this->stepTypeP == "parallel_quick")
-    {
       dWorldParallelQuickStep(this->worldId, (**this->stepTimeP).Double());  
-#ifdef ODE_RMS_ERROR
-      double rms_error = dWorldGetQuickStepRMSError(this->worldId);
-#endif
-    }
 #endif
     else
       gzthrow(std::string("Invalid step type[") + **this->stepTypeP);

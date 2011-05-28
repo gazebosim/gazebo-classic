@@ -190,6 +190,11 @@ Body *BulletPhysics::CreateBody(Entity *parent)
   return body;
 }
 
+double BulletPhysics::GetRMSError()
+{
+  return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a new geom
 Geom *BulletPhysics::CreateGeom(Shape::Type type, Body *parent)
