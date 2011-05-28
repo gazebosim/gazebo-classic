@@ -131,6 +131,19 @@ if (PKG_CONFIG_FOUND)
     SET (ODE_PRECON_PGS TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
   ENDIF (NOT ODE_WG_PRECON_PATCHES_FOUND)
 
+  ###################################################
+  #                                                 #
+  #   patched ode version with rms error            #
+  #                                                 #
+  ###################################################
+  SET(ODE_WG_RMS_ERROR_PATCHES_VERSION 0.11.1.72 CACHE INTERNAL "ODE version with precon pgs" FORCE)
+  pkg_check_modules(ODE_WG_RMS_ERROR_PATCHES ode>=${ODE_WG_RMS_ERROR_PATCHES_VERSION})
+  IF (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
+    SET (ODE_RMS_ERROR FALSE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  ELSE (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
+    SET (ODE_RMS_ERROR TRUE CACHE BOOL "support for ODE quickstep experimental precon stuff")
+  ENDIF (NOT ODE_WG_RMS_ERROR_PATCHES_FOUND)
+
   #################################################
   # Find OGRE 
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})

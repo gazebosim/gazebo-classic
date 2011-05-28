@@ -487,7 +487,12 @@ void ODEPhysics::UpdatePhysics()
       dWorldStep( this->worldId, (**this->stepTimeP).Double() );
 #ifdef PARALLEL_QUICKSTEP
     else if (**this->stepTypeP == "parallel_quick")
+    {
       dWorldParallelQuickStep(this->worldId, (**this->stepTimeP).Double());  
+#ifdef ODE_RMS_ERROR
+      double rms_error = dWorldGetQuickStepRMSError(this->worldId);
+#endif
+    }
 #endif
     else
       gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
