@@ -67,8 +67,14 @@ namespace gazebo
     private: Time lastUpdateTime;
 
     // calculated percent speedup in last percentWindowDuration seconds real time.
-    private: Time percent, percentLastRealTime, percentLastSimTime;
+    private: Time percentLastRealTime, percentLastSimTime;
+    private: double percent_sum;
     private: static gazebo::Time statusUpdatePeriod;
+
+    private: int samples;
+    private: std::vector<double> percents;
+    private: std::vector<double>::iterator percents_iter;
+    private: bool percents_full;
   };
   
 }

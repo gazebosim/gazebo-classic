@@ -41,7 +41,7 @@
 
 using namespace gazebo;
 
-gazebo::Time StatusBar::statusUpdatePeriod = 0.3;
+gazebo::Time StatusBar::statusUpdatePeriod = 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -105,6 +105,12 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->show();
 
   this->lastUpdateTime = 0;
+
+  this->samples = 20; // take average of last 10 samples
+  this->percents.resize(this->samples);
+  this->percents_iter = this->percents.begin();
+  this->percents_full = false;
+  this->percent_sum = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,25 +123,39 @@ StatusBar::~StatusBar()
 /// Update the toolbar data
 void StatusBar::Update()
 {
-  //float percent = 0;
+  //float percent_sum = 0;
   double sim = 0;
   double real = 0;
+
 
   if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
     Time simTime = Simulator::Instance()->GetSimTime();
     Time realTime = Simulator::Instance()->GetRealTime();
     
-    if (realTime < this->statusUpdatePeriod )
+    //if (realTime < this->statusUpdatePeriod )
+    if (!this->percents_full)
     {
-      this->percent = ( simTime / realTime);
       this->percentLastRealTime =0;
       this->percentLastSimTime = 0;
+
+      *this->percents_iter = ( simTime / realTime).Double();
+      this->percent_sum += *this->percents_iter;
+      this->percents_iter++;
+      if (this->percents_iter == this->percents.end()) {
+        this->percents_iter = this->percents.begin();
+        this->percents_full = true;
+      }
     }
     else
     {
-      this->percent = ((simTime - this->percentLastSimTime) / 
-                       (realTime - this->percentLastRealTime)).Double();
+      *this->percents_iter = ((simTime - this->percentLastSimTime) / 
+                             (realTime - this->percentLastRealTime)).Double();
+      this->percent_sum += *this->percents_iter;
+      this->percents_iter++;
+      if (this->percents_iter == this->percents.end())
+        this->percents_iter = this->percents.begin();
+      this->percent_sum -= *this->percents_iter;
 
       this->percentLastRealTime = realTime;
       this->percentLastSimTime = simTime;
@@ -185,7 +205,7 @@ void StatusBar::Update()
       this->realTime->label("(min) Real Time");
     }
 
-    this->percentOutput->value(this->percent.Double());
+    this->percentOutput->value(this->percent_sum / this->samples);
 
     this->rmsErrorOutput->value(World::Instance()->GetPhysicsEngine()->GetRMSError());
 

@@ -125,13 +125,12 @@ ODEPhysics::ODEPhysics()
 
   Param::End();
 
-  this->rms_error.resize(100000);
-  this->rms_error_iter = this->rms_error.begin();
+  this->rms_error = 0;
 }
 
 double ODEPhysics::GetRMSError()
 {
-  return *this->rms_error_iter;
+  return this->rms_error;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -491,10 +490,7 @@ void ODEPhysics::UpdatePhysics()
     {
       dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
 #ifdef ODE_RMS_ERROR
-      this->rms_error_iter++;
-      if (this->rms_error_iter == this->rms_error.end())
-        this->rms_error_iter = this->rms_error.begin();
-      *this->rms_error_iter = dWorldGetQuickStepRMSError(this->worldId);
+      this->rms_error = dWorldGetQuickStepRMSError(this->worldId);
 #endif
     }
     else if (**this->stepTypeP == "world")
