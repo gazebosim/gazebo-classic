@@ -3,7 +3,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 
-#include "src/Combined.hh"
+#include "src/Server.hh"
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
 
@@ -93,16 +93,16 @@ void OnNewEntity(const boost::shared_ptr<msgs::Entity const> &msg)
 
 TEST(Factory, BoxCreate)
 {
-  Combined *combined = NULL;
+  Server *server = NULL;
 
   boost::unique_lock<boost::mutex> lock(mutex);
   boost::posix_time::time_duration td = boost::posix_time::seconds(1);
 
-  ASSERT_NO_THROW(combined = new Combined());
-  ASSERT_NO_THROW(combined->Load(""));
-  ASSERT_NO_THROW(combined->Init());
+  ASSERT_NO_THROW(server = new Server());
+  ASSERT_NO_THROW(server->Load(""));
+  ASSERT_NO_THROW(server->Init());
 
-  combined->Start();
+  server->Start();
 
   transport::NodePtr node = transport::NodePtr( new transport::Node() );
   ASSERT_NO_THROW(node->Init("default"));
@@ -159,9 +159,9 @@ TEST(Factory, BoxCreate)
   // Check the right model was created 
   ASSERT_STREQ(model_name.c_str(), "factory_cylinder_test");
 
-  ASSERT_NO_THROW(combined->Stop());
+  ASSERT_NO_THROW(server->Stop());
 
-  delete combined;
+  delete server;
 }
 
 int main(int argc, char **argv)

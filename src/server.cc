@@ -7,9 +7,9 @@
 
 #include "gazebo_config.h"
 #include "common/CommonTypes.hh"
-#include "Combined.hh"
+#include "Server.hh"
 
-gazebo::Combined *combined = NULL;
+gazebo::Server *server = NULL;
 
 std::string config_filename = "";
 gazebo::common::StrStr_M params;
@@ -20,7 +20,7 @@ boost::interprocess::interprocess_semaphore sem(0);
 // TODO: Implement these options
 void PrintUsage()
 {
-  std::cerr << "Usage: gzcombined\n";
+  std::cerr << "Usage: gzserver\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,15 +85,15 @@ int main(int argc, char **argv)
   }
   
 
-  combined = new gazebo::Combined();
-  combined->Load(config_filename);
-  combined->SetParams( params );
-  combined->Init();
-  combined->Start();
+  server = new gazebo::Server();
+  server->Load(config_filename);
+  server->SetParams( params );
+  server->Init();
+  server->Start();
 
   sem.wait();
 
-  combined->Stop();
-  delete combined;
-  combined = NULL;
+  server->Stop();
+  delete server;
+  server = NULL;
 }

@@ -35,6 +35,8 @@ Connection::Connection()
   IOManager::Instance()->IncCount();
   this->id = idCounter++;
 
+  //std::cout << "Connection.cc Debug: " << this->id << "\n";
+
   this->writeMutex = new boost::mutex();
   this->acceptor = NULL;
   this->readThread = NULL;

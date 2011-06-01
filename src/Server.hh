@@ -1,5 +1,5 @@
-#ifndef COMBINED_HH
-#define COMBINED_HH
+#ifndef SERVER_HH
+#define SERVER_HH
 
 #include <string>
 #include <vector>
@@ -14,10 +14,10 @@ namespace gazebo
 {
   class Master;
 
-  class Combined
+  class Server
   {
-    public: Combined();
-    public: virtual ~Combined();
+    public: Server();
+    public: virtual ~Server();
 
     public: void Load(const std::string &filename);
     public: void Init();

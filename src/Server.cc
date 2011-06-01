@@ -14,7 +14,7 @@
 #include "rendering/Rendering.hh"
 
 #include "Master.hh"
-#include "Combined.hh"
+#include "Server.hh"
 
 using namespace gazebo;
 
@@ -49,7 +49,7 @@ const std::string default_config =
 </gazebo>";
 
 
-Combined::Combined()
+Server::Server()
 {
   this->quit = false;
   this->runThread = NULL;
@@ -65,7 +65,7 @@ Combined::Combined()
   }
 }
 
-Combined::~Combined()
+Server::~Server()
 {
   delete this->master;
   delete this->masterThread;
@@ -77,7 +77,7 @@ Combined::~Combined()
   }
 }
 
-void Combined::Load(const std::string &filename)
+void Server::Load(const std::string &filename)
 {
   std::string host = "";
   unsigned short port = 0;
@@ -146,23 +146,23 @@ void Combined::Load(const std::string &filename)
   rendering::create_scene("default");
 }
 
-void Combined::Init()
+void Server::Init()
 {
   for (int i=0; i < this->worlds.size(); i++)
     physics::init_world(this->worlds[i]);
 }
 
-void Combined::Start()
+void Server::Start()
 {
   this->quit = false;
 
   for (int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
-  this->runThread = new boost::thread(boost::bind(&Combined::RunLoop, this)); 
+  this->runThread = new boost::thread(boost::bind(&Server::RunLoop, this)); 
 }
 
-void Combined::Stop()
+void Server::Stop()
 {
   physics::fini();
   rendering::fini();
@@ -184,7 +184,7 @@ void Combined::Stop()
   transport::fini();
 }
 
-void Combined::RunLoop()
+void Server::RunLoop()
 {
   transport::run();
 
@@ -195,7 +195,7 @@ void Combined::RunLoop()
 
 }
 
-void Combined::SetParams( const common::StrStr_M &params )
+void Server::SetParams( const common::StrStr_M &params )
 {
   common::StrStr_M::const_iterator iter;
   for (iter = params.begin(); iter != params.end(); iter++)

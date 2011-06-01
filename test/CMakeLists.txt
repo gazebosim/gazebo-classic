@@ -20,7 +20,7 @@ enable_testing()
 find_package( GTest REQUIRED )
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
-add_executable(factory factory.cc ${PROJECT_SOURCE_DIR}/src/Combined.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
+add_executable(factory factory.cc ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
 
 target_link_libraries( factory ${GTEST_BOTH_LIBRARIES} 
                                gazebo_common 

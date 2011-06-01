@@ -123,6 +123,7 @@ namespace gazebo
               {
                 if (e)
                 {
+                  //std::cout << "Connection Debug: " << id << "\n";
                   gzerr << "An error occrured reading a header[" 
                         << e.message() << "]\n";
                   // Pass the error to the handler

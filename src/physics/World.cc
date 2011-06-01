@@ -413,7 +413,7 @@ ModelPtr World::LoadModel(common::XMLConfigNode *node, BasePtr parent)
   msg.set_name(model->GetCompleteScopedName());
 
   this->newEntityPub->Publish(msg);
-
+  //std::cout << "entity debug: " << msg.DebugString() << "\n\n\n";
   return model;
 }
 

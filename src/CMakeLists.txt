@@ -30,11 +30,11 @@ add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
 add_dependencies( gazebo_sensors gazebo_rendering )
 
-add_executable(gzserver physics_server.cc PhysicsServer.cc)
+add_executable(gzphysics physics_server.cc PhysicsServer.cc)
 add_executable(gzclient gui_client.cc GuiClient.cc)
 add_executable(gzmaster master.cc Master.cc)
 add_executable(gzsensor sensor_server.cc SensorServer.cc)
-add_executable(gzcombined combined.cc Combined.cc Master.cc)
+add_executable(gzserver server.cc Server.cc Master.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport
@@ -45,22 +45,21 @@ target_link_libraries( gzmaster gazebo_common
                                 ${assimp_libraries}
                                 ${PROTOBUF_LIBRARY})
 
-target_link_libraries( gzcombined gazebo_common
-                                  gazebo_transport
-                                  gazebo_physics
-                                  gazebo_sensors
-                                  gazebo_rendering
-                                  gazebo_msgs
-                                  assimp
-                                  pthread)
-
-
 target_link_libraries( gzserver gazebo_common
                                 gazebo_transport
                                 gazebo_physics
+                                gazebo_sensors
+                                gazebo_rendering
                                 gazebo_msgs
                                 assimp
                                 pthread)
+
+target_link_libraries( gzphysics gazebo_common
+                                 gazebo_transport
+                                 gazebo_physics
+                                 gazebo_msgs
+                                 assimp
+                                 pthread)
 
 target_link_libraries( gzclient gazebo_common
                                 gazebo_transport
@@ -75,10 +74,37 @@ target_link_libraries( gzsensor gazebo_common
                                 gazebo_rendering
                                 gazebo_msgs
                                 pthread)
-                                
 
 INSTALL_EXECUTABLE( gzmaster )
-INSTALL_EXECUTABLE( gzserver )
+INSTALL_EXECUTABLE( gzphysics )
 INSTALL_EXECUTABLE( gzclient )
 INSTALL_EXECUTABLE( gzsensor )
-INSTALL_EXECUTABLE( gzcombined )
+INSTALL_EXECUTABLE( gzserver )
+
+add_library(gazebo_server SHARED Server.cc Master.cc)
+target_link_libraries( gazebo_server gazebo_common
+                                     gazebo_transport
+                                     gazebo_physics
+                                     gazebo_sensors
+                                     gazebo_rendering
+                                     gazebo_msgs
+                                     assimp
+                                     pthread)
+
+add_library(gazebo_client SHARED GuiClient.cc)
+target_link_libraries( gazebo_client gazebo_common
+                                     gazebo_transport
+                                     gazebo_gui
+                                     gazebo_rendering
+                                     gazebo_msgs
+                                     pthread)
+
+add_dependencies( gazebo_server gazebo_msgs )
+add_dependencies( gazebo_client gazebo_msgs gazebo_rendering )
+
+INSTALL_LIBRARY(gazebo_server)
+INSTALL_LIBRARY(gazebo_client)
+
+set( headers Server.hh GuiClient.hh )
+INSTALL_INCLUDES("" ${headers})
+

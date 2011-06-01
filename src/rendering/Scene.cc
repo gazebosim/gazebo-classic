@@ -909,6 +909,7 @@ void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(msg);
+  //std::cout << "visual debug: " << msg->DebugString() << "\n\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

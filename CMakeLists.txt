@@ -40,7 +40,7 @@ if(UNIX AND NOT WIN32)
 endif(UNIX AND NOT WIN32)
 
 
-set (MIN_OGRE_VERSION 1.7.3 CACHE INTERNAL "Ogre version requirement" FORCE)
+set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
 set (MIN_ODE_VERSION 0.11.1 CACHE INTERNAL "ODE version requirement" FORCE)
 set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
@@ -135,6 +135,12 @@ else (build_errors)
   # Make the package config files
   configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_transport_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_server_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_server.pc @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_server.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_client_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_client.pc @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_client.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
 
   ########################################
   # Package Creation: 
