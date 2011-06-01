@@ -45,24 +45,6 @@ const std::string default_config =
       <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
       <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
-    <model name='plane1_model'>\
-      <static>true</static>\
-      <link name='body'>\
-        <collision name='geom'>\
-          <geometry>\
-            <plane normal='0 0 1'/>\
-          </geometry>\
-          <contact_coefficients mu1='109999.0' mu2='1000.0'/>\
-        </collision>\
-        <visual>\
-          <geometry>\
-            <plane normal='0 0 1' size='100 100' offset='0'/>\
-          </geometry>\
-          <material name='Gazebo/GreyGrid' uv_tile='100 100'/>\
-          <cast_shadows>false</cast_shadows>\
-        </visual>\
-      </link>\
-    </model>\
   </world>\
 </gazebo>";
 
