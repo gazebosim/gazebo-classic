@@ -32,6 +32,7 @@
 
 #include "Time.hh"
 #include "SingletonT.hh"
+#include "Timer.hh"
 
 namespace boost
 {

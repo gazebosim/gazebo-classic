@@ -24,6 +24,7 @@
  * CVS: $Id$
  */
 
+#include "gazebo_config.h"
 #include "PhysicsEngine.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
@@ -36,7 +37,11 @@
 
 using namespace gazebo;
 
+#ifdef ODE_SCREW_JOINT
 std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"screw", "slider", "hinge", "hinge2", "ball", "universal"};
+#else
+std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"slider", "hinge", "hinge2", "ball", "universal"};
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -205,9 +210,11 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 
   switch (this->type)
   {
+#ifdef ODE_SCREW_JOINT
     case SCREW: 
       typeName="screw"; 
       break;
+#endif
     case SLIDER: 
       typeName="slider"; 
       break;

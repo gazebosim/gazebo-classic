@@ -42,33 +42,62 @@ set (sources Body.cc
              FixedJoint.cc
 ) 
 
-set (headers BallJoint.hh
-             Body.hh
-             PhysicsFactory.hh
-             SurfaceParams.hh
-             Hinge2Joint.hh
-             HingeJoint.hh
-             Joint.hh
-             PhysicsEngine.hh
-             SliderJoint.hh
-             ScrewJoint.hh
-             UniversalJoint.hh
-             Mass.hh
-             Geom.hh
-             Shape.hh
-             BoxShape.hh
-             CylinderShape.hh
-             MapShape.hh
-             PlaneShape.hh
-             RayShape.hh
-             MultiRayShape.hh
-             SphereShape.hh
-             TrimeshShape.hh
-             HeightmapShape.hh
-             Contact.hh
-             JointFeedback.hh
-             FixedJoint.hh
-)
+if (ODE_SCREW_JOINT )
+  set (headers BallJoint.hh
+               Body.hh
+               PhysicsFactory.hh
+               SurfaceParams.hh
+               Hinge2Joint.hh
+               HingeJoint.hh
+               Joint.hh
+               PhysicsEngine.hh
+               SliderJoint.hh
+               ScrewJoint.hh
+               UniversalJoint.hh
+               Mass.hh
+               Geom.hh
+               Shape.hh
+               BoxShape.hh
+               CylinderShape.hh
+               MapShape.hh
+               PlaneShape.hh
+               RayShape.hh
+               MultiRayShape.hh
+               SphereShape.hh
+               TrimeshShape.hh
+               HeightmapShape.hh
+               Contact.hh
+               JointFeedback.hh
+               FixedJoint.hh
+  )
+else (ODE_SCREW_JOINT)
+  set (headers BallJoint.hh
+               Body.hh
+               PhysicsFactory.hh
+               SurfaceParams.hh
+               Hinge2Joint.hh
+               HingeJoint.hh
+               Joint.hh
+               PhysicsEngine.hh
+               SliderJoint.hh
+               UniversalJoint.hh
+               Mass.hh
+               Geom.hh
+               Shape.hh
+               BoxShape.hh
+               CylinderShape.hh
+               MapShape.hh
+               PlaneShape.hh
+               RayShape.hh
+               MultiRayShape.hh
+               SphereShape.hh
+               TrimeshShape.hh
+               HeightmapShape.hh
+               Contact.hh
+               JointFeedback.hh
+               FixedJoint.hh
+  )
+endif (ODE_SCREW_JOINT)
 
 add_library(gazebo_physics SHARED ${sources})
 target_link_libraries(gazebo_physics ${LINK_LIBS} )

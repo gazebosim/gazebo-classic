@@ -178,6 +178,8 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual void SetAutoDisableFlag(bool auto_disable) {}
     /// \brief access functions to set ODE parameters
+    public: virtual void SetSORPGSPreconIters(unsigned int iters) {}
+    /// \brief access functions to set ODE parameters
     public: virtual void SetSORPGSIters(unsigned int iters) {}
     /// \brief access functions to set ODE parameters
     public: virtual void SetSORPGSW(double w) {}
@@ -187,6 +189,8 @@ namespace gazebo
     public: virtual void SetContactSurfaceLayer(double layer_depth) {}
     /// \brief access functions to set ODE parameters
     public: virtual void SetMaxContacts(int max_contacts) {}
+    /// \brief criteria for stopping inner iterations
+    public: virtual void SetRMSError(double rms_error) {}
 
     /// \brief access functions to set ODE parameters
     public: virtual double GetWorldCFM() {return 0;}
@@ -196,6 +200,8 @@ namespace gazebo
     public: virtual bool GetAutoDisableFlag() {return 0;}
     /// \brief access functions to set ODE parameters
     public: virtual int GetSORPGSIters() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual int GetSORPGSPreconIters() {return 0;}
     /// \brief access functions to set ODE parameters
     public: virtual double GetSORPGSW() {return 0;}
     /// \brief access functions to set ODE parameters

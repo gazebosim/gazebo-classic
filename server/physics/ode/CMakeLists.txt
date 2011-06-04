@@ -12,37 +12,69 @@ link_directories(
 )
 
 
-SET (sources ODEPhysics.cc
-             ODEGeom.cc
-             ODEBody.cc
-             ODEJoint.cc
-             ODESliderJoint.cc
-             ODEScrewJoint.cc
-             ODEHingeJoint.cc
-             ODEHinge2Joint.cc
-             ODEUniversalJoint.cc
-             ODEBallJoint.cc
-             ODETrimeshShape.cc
-             ODERayShape.cc
-             ODEMultiRayShape.cc
-             ODEHeightmapShape.cc
-)
+if (ODE_SCREW_JOINT)
+  SET (sources ODEPhysics.cc
+               ODEGeom.cc
+               ODEBody.cc
+               ODEJoint.cc
+               ODESliderJoint.cc
+               ODEScrewJoint.cc
+               ODEHingeJoint.cc
+               ODEHinge2Joint.cc
+               ODEUniversalJoint.cc
+               ODEBallJoint.cc
+               ODETrimeshShape.cc
+               ODERayShape.cc
+               ODEMultiRayShape.cc
+               ODEHeightmapShape.cc
+  )
 
-SET (headers ODEPhysics.hh
-             ODEGeom.hh
-             ODEBody.hh
-             ODEJoint.hh
-             ODESliderJoint.hh
-             ODEScrewJoint.hh
-             ODEHingeJoint.hh
-             ODEHinge2Joint.hh
-             ODEUniversalJoint.hh
-             ODEBallJoint.hh
-             ODETrimeshShape.hh
-             ODERayShape.hh
-             ODEMultiRayShape.hh
-             ODEHeightmapShape.hh
-)
+  SET (headers ODEPhysics.hh
+               ODEGeom.hh
+               ODEBody.hh
+               ODEJoint.hh
+               ODESliderJoint.hh
+               ODEScrewJoint.hh
+               ODEHingeJoint.hh
+               ODEHinge2Joint.hh
+               ODEUniversalJoint.hh
+               ODEBallJoint.hh
+               ODETrimeshShape.hh
+               ODERayShape.hh
+               ODEMultiRayShape.hh
+               ODEHeightmapShape.hh
+  )
+else (ODE_SCREW_JOINT)
+  SET (sources ODEPhysics.cc
+               ODEGeom.cc
+               ODEBody.cc
+               ODEJoint.cc
+               ODESliderJoint.cc
+               ODEHingeJoint.cc
+               ODEHinge2Joint.cc
+               ODEUniversalJoint.cc
+               ODEBallJoint.cc
+               ODETrimeshShape.cc
+               ODERayShape.cc
+               ODEMultiRayShape.cc
+               ODEHeightmapShape.cc
+  )
+
+  SET (headers ODEPhysics.hh
+               ODEGeom.hh
+               ODEBody.hh
+               ODEJoint.hh
+               ODESliderJoint.hh
+               ODEHingeJoint.hh
+               ODEHinge2Joint.hh
+               ODEUniversalJoint.hh
+               ODEBallJoint.hh
+               ODETrimeshShape.hh
+               ODERayShape.hh
+               ODEMultiRayShape.hh
+               ODEHeightmapShape.hh
+  )
+endif (ODE_SCREW_JOINT)
 
 add_library(gazebo_physics_ode SHARED ${sources})
 

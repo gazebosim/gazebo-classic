@@ -45,20 +45,36 @@ LINK_DIRECTORIES(
  ${gazeboserver_link_dirs} 
 )
 
-SET (sources BulletPhysics.cc
-             BulletGeom.cc
-             BulletBody.cc
-             BulletMotionState.cc
-             BulletJoint.cc
-             BulletSliderJoint.cc
-             BulletScrewJoint.cc
-             BulletHingeJoint.cc
-             BulletHinge2Joint.cc
-             BulletUniversalJoint.cc
-             BulletBallJoint.cc
-             BulletTrimeshShape.cc
-             #BulletRayGeom.cc
-)
+if (ODE_SCREW_JOINT)
+  SET (sources BulletPhysics.cc
+               BulletGeom.cc
+               BulletBody.cc
+               BulletMotionState.cc
+               BulletJoint.cc
+               BulletSliderJoint.cc
+               BulletScrewJoint.cc
+               BulletHingeJoint.cc
+               BulletHinge2Joint.cc
+               BulletUniversalJoint.cc
+               BulletBallJoint.cc
+               BulletTrimeshShape.cc
+               #BulletRayGeom.cc
+  )
+else (ODE_SCREW_JOINT)
+  SET (sources BulletPhysics.cc
+               BulletGeom.cc
+               BulletBody.cc
+               BulletMotionState.cc
+               BulletJoint.cc
+               BulletSliderJoint.cc
+               BulletHingeJoint.cc
+               BulletHinge2Joint.cc
+               BulletUniversalJoint.cc
+               BulletBallJoint.cc
+               BulletTrimeshShape.cc
+               #BulletRayGeom.cc
+  )
+endif (ODE_SCREW_JOINT)
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 

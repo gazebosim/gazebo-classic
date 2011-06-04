@@ -165,10 +165,12 @@ class ODEPhysics : public PhysicsEngine
   public: void SetContactSurfaceLayer(double layer_depth);
   /// \brief access functions to set ODE parameters
   public: void SetMaxContacts(int max_contacts);
+  /// \brief access functions to set ODE parameters
+  public: void SetRMSError(double rms_error);
 
-#ifdef ODE_PRECON_PGS
   /// \brief access functions to set ODE parameters
   public: void SetSORPGSPreconIters(unsigned int iters);
+#ifdef ODE_PRECON_PGS
   private: ParamT<unsigned int> *stepPreconItersP; 
   private: ParamT<int>    *quickStepPreconItersP;
 #endif
@@ -181,6 +183,8 @@ class ODEPhysics : public PhysicsEngine
   public: bool GetAutoDisableFlag();
   /// \brief access functions to set ODE parameters
   public: int GetSORPGSIters();
+  /// \brief access functions to set ODE parameters
+  public: int GetSORPGSPreconIters();
   /// \brief access functions to set ODE parameters
   public: double GetSORPGSW();
   /// \brief access functions to set ODE parameters

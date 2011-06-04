@@ -30,6 +30,8 @@
 #include <iostream>
 #include <float.h>
 
+#include "gazebo_config.h"
+
 #include "OgreVisual.hh"
 #include "Light.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -935,8 +937,10 @@ void Model::LoadJoint(XMLConfigNode *node)
     jtype = Joint::HINGE;
   else if (node->GetName() == "ball")
     jtype = Joint::BALL;
+#ifdef ODE_SCREW_JOINT
   else if (node->GetName() == "screw")
     jtype = Joint::SCREW;
+#endif
   else if (node->GetName() == "slider")
     jtype = Joint::SLIDER;
   else if (node->GetName() == "hinge2")
@@ -1300,7 +1304,7 @@ void Model::LoadPhysical(XMLConfigNode *node)
       gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
       gzerr(0) <<  e << std::endl;
       this->Print("");
-      throw("Error loading model\n");
+      //throw("Error loading model\n");
       childNode = childNode->GetNextByNSPrefix("joint");
       continue;
     }

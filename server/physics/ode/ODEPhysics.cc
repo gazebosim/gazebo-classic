@@ -26,6 +26,8 @@
 
 #include <assert.h>
 
+#include "gazebo_config.h"
+
 #include "Timer.hh"
 #include "PhysicsFactory.hh"
 #include "Global.hh"
@@ -42,7 +44,9 @@
 #include "FixedJoint.hh"
 #include "ODEHingeJoint.hh"
 #include "ODEHinge2Joint.hh"
+#ifdef ODE_SCREW_JOINT
 #include "ODEScrewJoint.hh"
+#endif
 #include "ODESliderJoint.hh"
 #include "ODEBallJoint.hh"
 #include "ODEUniversalJoint.hh"
@@ -55,8 +59,6 @@
 #include "ODEMultiRayShape.hh"
 #include "ODEHeightmapShape.hh"
 #include "MapShape.hh"
-
-#include "gazebo_config.h"
 
 #include "ODEPhysics.hh"
 
@@ -272,17 +274,6 @@ void ODEPhysics::Load(XMLConfigNode *node)
     dWorldSetQuickStepW(this->worldId, **this->quickStepWP );
 
 }
-
-#ifdef ODE_PRECON_PGS
-////////////////////////////////////////////////////////////////////////////////
-/// Set the precondition step iterations
-void ODEPhysics::SetSORPGSPreconIters(unsigned int iters)
-{
-  this->stepPreconItersP->SetValue(iters);
-  dWorldSetQuickStepNumIterations(this->worldId, **this->stepPreconItersP );
-}
-#endif
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the ODE engine
@@ -509,6 +500,17 @@ void ODEPhysics::UpdatePhysics()
   this->UnlockMutex(); 
 }
 
+void ODEPhysics::SetRMSError(double rms_error)
+{
+#ifdef QUICKSTEP_EXPERIMENTAL
+  dWorldSetQuickStepTolerance(this->worldId, rms_error );
+  //TODO: add functions for each of the following
+  //dWorldSetIslandThreads(this->worldId, this->islandThreadsP->GetValue() );
+  //dWorldSetQuickStepThreads(this->worldId, this->quickStepThreadsP->GetValue() );
+  //dWorldSetQuickStepNumChunks(this->worldId, this->quickStepChunksP->GetValue() );
+  //dWorldSetQuickStepNumOverlap(this->worldId, this->quickStepOverlapP->GetValue() );
+#endif
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the ODE engine
 void ODEPhysics::Fini()
@@ -614,6 +616,18 @@ void ODEPhysics::SetAutoDisableFlag(bool auto_disable)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the precondition step iterations
+void ODEPhysics::SetSORPGSPreconIters(unsigned int iters)
+{
+#ifdef ODE_PRECON_PGS
+  this->stepPreconItersP->SetValue(iters);
+  dWorldSetQuickStepNumIterations(this->worldId, **this->stepPreconItersP );
+#endif
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the step iterations
 void ODEPhysics::SetSORPGSIters(unsigned int iters)
 {
@@ -676,6 +690,12 @@ bool ODEPhysics::GetAutoDisableFlag()
 int ODEPhysics::GetSORPGSIters()
 {
   return this->stepItersP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int ODEPhysics::GetSORPGSPreconIters()
+{
+  return this->stepPreconItersP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -742,8 +762,10 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
   {
     case Joint::FIXED:
       return new FixedJoint();
+#ifdef ODE_SCREW_JOINT
     case Joint::SCREW:
       return new ODEScrewJoint(this->worldId);
+#endif
     case Joint::SLIDER:
       return new ODESliderJoint(this->worldId);
     case Joint::HINGE:
