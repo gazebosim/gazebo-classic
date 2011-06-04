@@ -210,7 +210,10 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->quickStepPreconItersP->Load(cnode);
   dWorldSetQuickStepPreconIterations(this->worldId, **this->stepPreconItersP );
   if (this->quickStepPreconItersP->GetValue() >= 0) // only set them if specified
+  {
     dWorldSetQuickStepPreconIterations(this->worldId, **this->quickStepPreconItersP );
+    this->stepPreconItersP->SetValue(**this->quickStepPreconItersP);
+  }
 #endif
 
   this->gravityP->Load(cnode);
@@ -269,9 +272,15 @@ void ODEPhysics::Load(XMLConfigNode *node)
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags
   if (this->quickStepItersP->GetValue() > 0) // only set them if specified
+  {
+    this->stepItersP->SetValue(**this->quickStepItersP);
     dWorldSetQuickStepNumIterations(this->worldId, **this->quickStepItersP );
+  }
   if (this->quickStepWP->GetValue() > 0) // only set them if specified
+  {
     dWorldSetQuickStepW(this->worldId, **this->quickStepWP );
+    this->stepWP->SetValue(**this->quickStepWP);
+  }
 
 }
 
@@ -621,7 +630,7 @@ void ODEPhysics::SetSORPGSPreconIters(unsigned int iters)
 {
 #ifdef ODE_PRECON_PGS
   this->stepPreconItersP->SetValue(iters);
-  dWorldSetQuickStepNumIterations(this->worldId, **this->stepPreconItersP );
+  dWorldSetQuickStepPreconIterations(this->worldId, **this->stepPreconItersP );
 #endif
 }
 
