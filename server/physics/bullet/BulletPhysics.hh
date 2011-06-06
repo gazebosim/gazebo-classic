@@ -149,6 +149,7 @@ class BulletPhysics : public PhysicsEngine
   /// \brief stores rms errors from quickstep
   public: std::vector<double> rms_error;
   public: std::vector<double>::iterator rms_error_iter;
+  public: double GetRMSErrorTolerance();
   public: double GetRMSError();
 
   //private: btAxisSweep3 *broadPhase;

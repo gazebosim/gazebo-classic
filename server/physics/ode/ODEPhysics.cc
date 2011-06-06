@@ -130,6 +130,15 @@ ODEPhysics::ODEPhysics()
   this->rms_error = 0;
 }
 
+double ODEPhysics::GetRMSErrorTolerance()
+{
+#ifdef QUICKSTEP_EXPERIMENTAL
+  return **this->quickStepToleranceP;
+#else
+  return 0;
+#endif
+}
+
 double ODEPhysics::GetRMSError()
 {
   return this->rms_error;
@@ -509,10 +518,10 @@ void ODEPhysics::UpdatePhysics()
   this->UnlockMutex(); 
 }
 
-void ODEPhysics::SetRMSError(double rms_error)
+void ODEPhysics::SetRMSErrorTolerance(double rms_error_tolerance)
 {
 #ifdef QUICKSTEP_EXPERIMENTAL
-  dWorldSetQuickStepTolerance(this->worldId, rms_error );
+  dWorldSetQuickStepTolerance(this->worldId, rms_error_tolerance );
   //TODO: add functions for each of the following
   //dWorldSetIslandThreads(this->worldId, this->islandThreadsP->GetValue() );
   //dWorldSetQuickStepThreads(this->worldId, this->quickStepThreadsP->GetValue() );

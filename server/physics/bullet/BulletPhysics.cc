@@ -190,6 +190,11 @@ Body *BulletPhysics::CreateBody(Entity *parent)
   return body;
 }
 
+double BulletPhysics::GetRMSErrorTolerance()
+{
+  return 0;
+}
+
 double BulletPhysics::GetRMSError()
 {
   return 0;

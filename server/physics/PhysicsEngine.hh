@@ -190,7 +190,10 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual void SetMaxContacts(int max_contacts) {}
     /// \brief criteria for stopping inner iterations
-    public: virtual void SetRMSError(double rms_error) {}
+    public: virtual void SetRMSErrorTolerance(double rms_error_tolerance) {}
+
+    /// \brief Get current criteria for stopping inner iterations
+    public: virtual double GetRMSErrorTolerance() = 0;
 
     /// \brief access functions to set ODE parameters
     public: virtual double GetWorldCFM() {return 0;}

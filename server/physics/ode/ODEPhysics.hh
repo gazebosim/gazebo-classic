@@ -166,7 +166,7 @@ class ODEPhysics : public PhysicsEngine
   /// \brief access functions to set ODE parameters
   public: void SetMaxContacts(int max_contacts);
   /// \brief access functions to set ODE parameters
-  public: void SetRMSError(double rms_error);
+  public: void SetRMSErrorTolerance(double rms_error_tolerance);
 
   /// \brief access functions to set ODE parameters
   public: void SetSORPGSPreconIters(unsigned int iters);
@@ -197,6 +197,7 @@ class ODEPhysics : public PhysicsEngine
   /// \brief stores rms errors from quickstep
   public: double rms_error;
   public: double GetRMSError();
+  public: double GetRMSErrorTolerance();
 
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
