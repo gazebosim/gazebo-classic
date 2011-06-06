@@ -133,7 +133,7 @@ void SphereMaker::CreateTheEntity()
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "'>\
+  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "_model'>\
     <origin xyz='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
                     << this->visualMsg->pose().position().z() << "'/>\

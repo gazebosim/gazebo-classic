@@ -64,7 +64,7 @@ void GuiClient::Run()
 
 void GuiClient::Quit()
 {
-  gui::quit();
+  gui::fini();
   transport::fini();
 }
 

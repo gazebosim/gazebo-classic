@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include <Ogre.h>
+#include <OgrePlugin.h>
 #include <OgreDataStream.h>
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
@@ -86,6 +87,7 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
+  
 
   if (this->root)
   {
@@ -103,6 +105,7 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
   }
 
+  
   // Load all the plugins
   this->LoadPlugins();
 
@@ -256,14 +259,29 @@ void RenderEngine::Init()
 /// Finalize
 void RenderEngine::Fini()
 {
+  // Close all the windows first;
+  WindowManager::Instance()->Fini();
+
   this->scenes.clear();
 
   if (this->root)
+  {
+    const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
+
+    for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); iter != ll.end(); iter++)
+    {
+      this->root->unloadPlugin((*iter)->getName());
+      this->root->uninstallPlugin(*iter);
+    }
     delete this->root;
+  }
   this->root = NULL;
 
   if (this->logManager)
+  {
+    this->logManager->destroyLog("Ogre.log");
     delete this->logManager;
+  }
   this->logManager = NULL;
 
 
@@ -313,7 +331,7 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
-    plugins.push_back(path+"/Plugin_CgProgramManager.so");
+    //plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {

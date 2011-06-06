@@ -23,11 +23,8 @@ RenderWidget::RenderWidget( QWidget *parent )
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->glWidget = new GLWidget(mainFrame);
-  gzdbg << "A\n";
   rendering::ScenePtr scene = rendering::create_scene("default");
-  gzdbg << "B\n";
   this->glWidget->ViewScene( scene );
-  gzdbg << "C\n";
 
   this->xPosEdit = new QLineEdit;
   this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit) );

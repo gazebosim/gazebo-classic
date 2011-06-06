@@ -19,6 +19,7 @@
 
 #include "common/XMLConfig.hh"
 #include "common/Exception.hh"
+#include "common/Console.hh"
 #include "rendering/Rendering.hh"
 #include "gui/MainWindow.hh"
 #include "gui/Gui.hh"
@@ -78,13 +79,12 @@ void gui::load(const std::string &filename)
     gzthrow("Invalid xml. Needs a <gui> tag");
 
 
-  g_app = new QApplication(0,NULL);
+  int argc = 0;
+  g_app = new QApplication(argc, NULL);
   g_main_win = new MainWindow();
 
   g_main_win->Load(guiNode);
   g_main_win->resize(1024,768);
-
-
 }
 
 void gui::init()
@@ -98,7 +98,8 @@ void gui::run()
   g_app->exec();
 }
 
-void gui::quit()
+void gui::fini()
 {
+  rendering::fini();
   g_app->quit();
 }

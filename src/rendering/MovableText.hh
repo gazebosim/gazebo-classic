@@ -17,7 +17,6 @@
 /* Desc: Middleman between OGRE and Gazebo
  * Author: indepedentCreations@gmail.com
  * Date: 13 Feb 2006
- * CVS: $Id$
  */
 
 #ifndef MOVABLETEXT_HH

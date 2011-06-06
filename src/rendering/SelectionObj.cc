@@ -29,9 +29,6 @@ using namespace rendering;
 /// Constructor
 SelectionObj::SelectionObj()
 {
-  // NATY: Fix this so it doesn't need the simulator. Should assume that
-  // SelectionObj has been generated from a REnderEngine
-  //this->scene = Simulator::Instance()->GetActiveWorld()->GetScene();
   this->node = new Visual("selection_obj_visual", this->scene );
 
   Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("selection_tube"));

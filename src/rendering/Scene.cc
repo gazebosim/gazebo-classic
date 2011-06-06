@@ -65,6 +65,7 @@ Scene::Scene(const std::string &name)
 
   Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
   this->grids.push_back(grid);
+  
 
   common::Param::Begin(&this->parameters);
   this->ambientP = new common::ParamT<common::Color>("ambient", common::Color(.5,.5,.5,1), 0);
@@ -89,6 +90,7 @@ Scene::Scene(const std::string &name)
   this->lightSub = this->node->Subscribe("~/light", &Scene::ReceiveLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose", &Scene::ReceivePoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection", &Scene::HandleSelectionMsg, this);
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +130,13 @@ Scene::~Scene()
   this->cameras.clear();
   this->userCameras.clear();
 
-  this->manager->clearScene();
+  gzdbg << "Delete a scene Thread[" << boost::this_thread::get_id() << "]\n";
+  if (this->manager)
+  {
+    this->manager->clearScene();
+    RenderEngine::Instance()->root->destroySceneManager(this->manager);
+    this->manager = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,11 +238,11 @@ void Scene::Init()
 
   // Send a request to get the current world state
   // TODO: Use RPC or some service call to get this properly
-  transport::PublisherPtr pub = this->node->Advertise<msgs::Request>("~/publish_scene");
+  this->scenePub = this->node->Advertise<msgs::Request>("~/publish_scene");
   msgs::Request req;
   req.set_request("publish");
 
-  pub->Publish(req);
+  this->scenePub->Publish(req);
 
   //this->InitShadows();
 
@@ -337,6 +345,7 @@ void Scene::CreateGrid(uint32_t cell_count, float cell_length,
     grid->Init();
 
   this->grids.push_back(grid);
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -909,7 +918,6 @@ void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(msg);
-  //std::cout << "visual debug: " << msg->DebugString() << "\n\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

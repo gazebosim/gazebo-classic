@@ -251,6 +251,7 @@ namespace gazebo
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;
       private: transport::SubscriberPtr selectionSub;
+      private: transport::PublisherPtr scenePub;
 
       private: std::vector<event::ConnectionPtr> connections;
     };

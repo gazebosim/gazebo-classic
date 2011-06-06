@@ -51,7 +51,8 @@ void TopicManager::Fini()
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
 void TopicManager::Publish( const std::string &topic, 
-                            google::protobuf::Message &message )
+                            google::protobuf::Message &message,
+                            const boost::function<void()> &cb)
 {
   if (!message.IsInitialized())
   {
@@ -60,7 +61,7 @@ void TopicManager::Publish( const std::string &topic,
 
   PublicationPtr pub = this->FindPublication(topic);
 
-  pub->Publish( message ); 
+  pub->Publish( message, cb ); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

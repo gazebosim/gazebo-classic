@@ -186,7 +186,6 @@ std::string GLWidget::GetOgreHandle() const
   handle += boost::lexical_cast<std::string>((unsigned long)q_parent->winId());
 #endif
 
-
   return handle;
 }
 

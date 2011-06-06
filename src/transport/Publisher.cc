@@ -30,12 +30,16 @@ using namespace transport;
 Publisher::Publisher(const std::string &topic, const std::string &msg_type)
   : topic(topic), msgType(msg_type)
 {
+  this->pubCount = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Publisher::~Publisher()
 {
+  if (this->pubCount > 0)
+    gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->pubCount << " outstanding publications.\n";
+
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 }
@@ -47,7 +51,9 @@ void Publisher::Publish(google::protobuf::Message &message )
   if (message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  TopicManager::Instance()->Publish(this->topic, message);
+  this->pubCount += 1;
+  TopicManager::Instance()->Publish(this->topic, message, 
+      boost::bind(&Publisher::OnPublishComplete, this));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,3 +70,9 @@ std::string Publisher::GetMsgType() const
   return this->msgType;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Callback when a publish is completed
+void Publisher::OnPublishComplete()
+{
+  this->pubCount -= 1;
+}

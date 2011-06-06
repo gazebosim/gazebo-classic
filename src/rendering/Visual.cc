@@ -50,6 +50,7 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &name, Visual *parent)
 {
+  gzdbg << "New Visual[" << name << "]\n";
   this->SetName(name);
   this->sceneNode = NULL;
 

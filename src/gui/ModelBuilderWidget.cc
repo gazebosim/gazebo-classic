@@ -62,7 +62,7 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   this->world = physics::create_world("model_builder");
   this->world->Load(NULL);
   this->world->Init();
-  this->world->SetPaused(true);
+  //this->world->SetPaused(true);
 }
 
 ModelBuilderWidget::~ModelBuilderWidget()

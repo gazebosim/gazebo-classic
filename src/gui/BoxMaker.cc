@@ -150,8 +150,8 @@ void BoxMaker::CreateTheEntity()
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "'>\
-    <static>false</static>\
+  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "_model'>\
+    <static>true</static>\
     <origin xyz='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
                     << this->visualMsg->pose().position().z() << "'/>\
@@ -183,5 +183,6 @@ void BoxMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
+  gzdbg << "Make Box[" << msg.DebugString() << "]\n";
   this->makerPub->Publish(msg);
 }

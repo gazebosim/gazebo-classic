@@ -36,7 +36,10 @@ namespace gazebo
     {
       public: WindowManager();
       public: virtual ~WindowManager();
-  
+
+      /// \brief Shutdown all the windows
+      public: void Fini();
+ 
       public: int CreateWindow( std::string ogreHandle, 
                                 unsigned int width, 
                                 unsigned int height );

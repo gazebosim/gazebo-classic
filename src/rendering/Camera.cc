@@ -104,6 +104,7 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
 // Destructor
 Camera::~Camera()
 {
+  gzdbg << "Camera Destructor\n";
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
 
@@ -129,8 +130,6 @@ Camera::~Camera()
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
   }
-  // NATY
-  //this->scene->UnregisterCamera(this);
 }
 
 //////////////////////////////////////////////////////////////////////////////

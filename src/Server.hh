@@ -21,8 +21,8 @@ namespace gazebo
 
     public: void Load(const std::string &filename);
     public: void Init();
-    public: void Start();
-    public: void Stop();
+    public: void Run(bool blocking = true);
+    public: void Quit();
 
     public: void SetParams( const common::StrStr_M &params );
 

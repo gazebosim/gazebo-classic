@@ -684,7 +684,8 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
 {
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
-  
+ 
+ gzdbg << "Factor Msg[" << msg << "]\n World[" << this->GetName() << "]\n"; 
   try
   {
     xmlFile->LoadString(msg->xml());

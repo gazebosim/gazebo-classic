@@ -87,6 +87,7 @@ int main(int argc, char **argv)
   client->Init();
   client->Run();
 
+  client->Quit();
   delete client;
   client = NULL;
 

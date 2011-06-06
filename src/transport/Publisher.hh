@@ -50,8 +50,12 @@ namespace gazebo
       /// \brief Get the message type
       public: std::string GetMsgType() const;
 
+      /// \brief Callback when a publish is completed
+      private: void OnPublishComplete();
+               
       private: std::string topic;
       private: std::string msgType;
+      private: unsigned int pubCount;
     };
   }
 }

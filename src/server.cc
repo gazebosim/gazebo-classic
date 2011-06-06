@@ -7,6 +7,8 @@
 
 #include "gazebo_config.h"
 #include "common/CommonTypes.hh"
+#include "rendering/Rendering.hh"
+#include "common/GazeboConfig.hh"
 #include "Server.hh"
 
 gazebo::Server *server = NULL;
@@ -67,7 +69,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int )
 {
-  sem.post();
+  server->Quit();
 }
 
 int main(int argc, char **argv)
@@ -84,16 +86,13 @@ int main(int argc, char **argv)
     return -1;
   }
   
-
   server = new gazebo::Server();
   server->Load(config_filename);
   server->SetParams( params );
   server->Init();
-  server->Start();
+  server->Run();
 
-  sem.wait();
-
-  server->Stop();
   delete server;
   server = NULL;
+  return 0;
 }

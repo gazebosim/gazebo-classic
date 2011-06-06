@@ -106,8 +106,10 @@ namespace gazebo
       ///        function directly.
       /// \param topic Name of the topic
       /// \param message The message to send.
+      /// \param cb Callback, used when the publish is completed.
       public: void Publish( const std::string &topic, 
-                            google::protobuf::Message &message );
+                            google::protobuf::Message &message,
+                            const boost::function<void()> &cb = NULL);
 
       /// \brief Connection a local Publisher to a remote Subscriber
       public: void ConnectPubToSub( const std::string &topic,

@@ -131,7 +131,8 @@ void Publication::PublishData(const std::string &data)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Publication::Publish(const google::protobuf::Message &msg)
+void Publication::Publish(const google::protobuf::Message &msg,
+                          const boost::function<void()> &cb)
 {
   std::list< CallbackHelperPtr >::iterator iter;
 
@@ -139,6 +140,8 @@ void Publication::Publish(const google::protobuf::Message &msg)
   {
     (*iter)->HandleMessage(&msg);
   }
+  if (cb)
+    (cb)();
 
   if (!this->prevMsg)
     this->prevMsg = msg.New();

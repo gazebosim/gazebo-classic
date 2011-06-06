@@ -152,17 +152,20 @@ void Server::Init()
     physics::init_world(this->worlds[i]);
 }
 
-void Server::Start()
+void Server::Run(bool blocking)
 {
   this->quit = false;
 
   for (int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
-  this->runThread = new boost::thread(boost::bind(&Server::RunLoop, this)); 
+  if (blocking)
+    this->RunLoop();
+  else
+    this->runThread = new boost::thread(boost::bind(&Server::RunLoop, this)); 
 }
 
-void Server::Stop()
+void Server::Quit()
 {
   physics::fini();
   rendering::fini();
@@ -191,8 +194,8 @@ void Server::RunLoop()
   while (!this->quit)
   {
     sensors::run_once(true);
+    usleep(10000);
   }
-
 }
 
 void Server::SetParams( const common::StrStr_M &params )

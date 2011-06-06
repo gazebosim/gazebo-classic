@@ -102,7 +102,7 @@ TEST(Factory, BoxCreate)
   ASSERT_NO_THROW(server->Load(""));
   ASSERT_NO_THROW(server->Init());
 
-  server->Start();
+  server->Run(false);
 
   transport::NodePtr node = transport::NodePtr( new transport::Node() );
   ASSERT_NO_THROW(node->Init("default"));
@@ -159,7 +159,7 @@ TEST(Factory, BoxCreate)
   // Check the right model was created 
   ASSERT_STREQ(model_name.c_str(), "factory_cylinder_test");
 
-  ASSERT_NO_THROW(server->Stop());
+  ASSERT_NO_THROW(server->Quit());
 
   delete server;
 }

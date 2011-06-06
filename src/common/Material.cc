@@ -82,7 +82,6 @@ void Material::SetTextureImage(const std::string tex)
 // Set a texture image with resource_path
 void Material::SetTextureImage(const std::string tex,const std::string resource_path)
 {
-  //Ogre::ResourceGroupManager::getSingleton().addResourceLocation( resource_path, "FileSystem", "General");
   this->texImage = tex;
 
   this->Update();

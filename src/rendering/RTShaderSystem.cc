@@ -16,8 +16,6 @@
 */
 /* Desc: Wrapper around the OGRE RTShader system
  * Author: Nate Koenig
- * Date: 27 Jan 2010
- * SVN: $Id:$
  */
 
 #include <boost/bind.hpp>
@@ -39,7 +37,6 @@ using namespace rendering;
 /// Constructor
 RTShaderSystem::RTShaderSystem()
 {
-  this->initialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
