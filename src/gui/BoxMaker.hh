@@ -34,7 +34,8 @@ namespace gazebo
       public: BoxMaker();
       public: virtual ~BoxMaker();
     
-      public: virtual void Start(const rendering::UserCameraPtr camera);
+      public: virtual void Start(const rendering::UserCameraPtr camera, 
+                                 const CreateCallback &cb);
       public: virtual void Stop();
       public: virtual bool IsActive() const;
   

@@ -48,8 +48,10 @@ SphereMaker::~SphereMaker()
   delete this->visualMsg;
 }
 
-void SphereMaker::Start(const rendering::UserCameraPtr camera)
+void SphereMaker::Start(const rendering::UserCameraPtr camera,
+                        const CreateCallback &cb)
 {
+  this->createCB = cb;
   this->camera = camera;
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
@@ -161,5 +163,9 @@ void SphereMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  this->makerPub->Publish(msg);
+  (this->createCB)(
+      common::Message::Convert(this->visualMsg->pose().position()), 
+      common::Message::Convert(this->visualMsg->scale()) );
+
+  //this->makerPub->Publish(msg);
 }

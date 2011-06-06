@@ -32,6 +32,8 @@ namespace gazebo
   {
     class EntityMaker
     {
+      public: typedef boost::function<void(const common::Vector3 &pos, const common::Vector3 &scale)> CreateCallback;
+
       /// \brief Constructor
       public: EntityMaker();
   
@@ -41,7 +43,9 @@ namespace gazebo
       /// \brief Set whether to snap to grid
       public: static void SetSnapToGrid(bool snap);
   
-      public: virtual void Start(const rendering::UserCameraPtr camera) = 0;
+      public: virtual void Start(const rendering::UserCameraPtr camera, 
+                                 const CreateCallback &cb) = 0;
+
       public: virtual void Stop() = 0;
       public: virtual bool IsActive() const = 0;
   
@@ -59,6 +63,8 @@ namespace gazebo
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr visPub;
       protected: transport::PublisherPtr makerPub;
+      protected: CreateCallback createCB;
+               
 
       private: static bool snapToGrid;
       private: static double snapDistance;

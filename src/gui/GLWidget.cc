@@ -189,11 +189,11 @@ std::string GLWidget::GetOgreHandle() const
   return handle;
 }
 
-void GLWidget::CreateEntity(const std::string &name)
+void GLWidget::CreateEntity(const std::string &name, 
+                            const EntityMaker::CreateCallback &cb)
 {
   if (this->entityMaker)
     this->entityMaker->Stop();
-
 
   if (name == "box")
     this->entityMaker = &this->boxMaker;
@@ -207,7 +207,7 @@ void GLWidget::CreateEntity(const std::string &name)
   if (this->entityMaker)
   {
     // TODO: change the cursor to a cross
-    this->entityMaker->Start(this->userCamera);
+    this->entityMaker->Start(this->userCamera, cb);
   }
   else
   {

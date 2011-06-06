@@ -77,15 +77,36 @@ void ModelBuilderWidget::Init()
 
 void ModelBuilderWidget::CreateBox()
 {
-  this->glWidget->CreateEntity("box");
+  this->glWidget->CreateEntity("box", 
+      boost::bind(&ModelBuilderWidget::OnBoxCreate, this, _1, _2) );
 }
 
 void ModelBuilderWidget::CreateSphere()
 {
-  this->glWidget->CreateEntity("sphere");
+  this->glWidget->CreateEntity("sphere",
+      boost::bind(&ModelBuilderWidget::OnSphereCreate, this, _1, _2) );
 }
 
 void ModelBuilderWidget::CreateCylinder()
 {
-  this->glWidget->CreateEntity("cylinder");
+  this->glWidget->CreateEntity("cylinder",
+      boost::bind(&ModelBuilderWidget::OnCylinderCreate, this, _1, _2) );
+}
+
+void ModelBuilderWidget::OnBoxCreate(const common::Vector3 &pos,  
+                                     const common::Vector3 &scale)
+{
+  gzdbg << "Box Create[" << pos << "] [" << scale << "]\n";
+}
+
+void ModelBuilderWidget::OnSphereCreate(const common::Vector3 &pos,  
+                                     const common::Vector3 &scale)
+{
+  gzdbg << "Sphere Create[" << pos << "] [" << scale << "]\n";
+}
+
+void ModelBuilderWidget::OnCylinderCreate(const common::Vector3 &pos,  
+                                     const common::Vector3 &scale)
+{
+  gzdbg << "Cylinder Create[" << pos << "] [" << scale << "]\n";
 }

@@ -49,8 +49,10 @@ BoxMaker::~BoxMaker()
   delete this->visualMsg;
 }
 
-void BoxMaker::Start(const rendering::UserCameraPtr camera)
+void BoxMaker::Start(const rendering::UserCameraPtr camera, 
+                     const CreateCallback &cb)
 {
+  this->createCB = cb;
   this->camera = camera;
 
   std::ostringstream stream;
@@ -183,6 +185,8 @@ void BoxMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  gzdbg << "Make Box[" << msg.DebugString() << "]\n";
-  this->makerPub->Publish(msg);
+  (this->createCB)(
+      common::Message::Convert(this->visualMsg->pose().position()), 
+      common::Message::Convert(this->visualMsg->scale()) );
+  //this->makerPub->Publish(msg);
 }

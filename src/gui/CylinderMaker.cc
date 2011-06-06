@@ -49,8 +49,10 @@ CylinderMaker::~CylinderMaker()
   delete this->visualMsg;
 }
 
-void CylinderMaker::Start(const rendering::UserCameraPtr camera)
+void CylinderMaker::Start(const rendering::UserCameraPtr camera,
+                          const CreateCallback &cb)
 {
+  this->createCB = cb;
   this->camera = camera;
   std::ostringstream stream;
   stream <<  "user_cylinder_" << counter++;
@@ -185,6 +187,10 @@ void CylinderMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  this->makerPub->Publish(msg);
+  (this->createCB)(
+      common::Message::Convert(this->visualMsg->pose().position()), 
+      common::Message::Convert(this->visualMsg->scale()) );
+
+  //this->makerPub->Publish(msg);
 }
 

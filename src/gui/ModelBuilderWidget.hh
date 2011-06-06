@@ -8,6 +8,10 @@
 namespace gazebo
 {
   class GLWidget;
+  namespace common
+  {
+    class Vector3;
+  }
 
   namespace gui
   {
@@ -22,6 +26,15 @@ namespace gazebo
       private slots: void CreateBox();
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
+
+      private: void OnBoxCreate(const common::Vector3 &pos,  
+                                const common::Vector3 &scale);
+ 
+      private: void OnSphereCreate(const common::Vector3 &pos,  
+                                   const common::Vector3 &scale);
+ 
+      private: void OnCylinderCreate(const common::Vector3 &pos,  
+                                     const common::Vector3 &scale);
 
       private: GLWidget *glWidget; 
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;
