@@ -54,11 +54,11 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->box(FL_NO_BOX);
   this->color(BG_COLOR);
 
-  this->rmsErrorOutput = new Fl_Value_Output(x,y,40,20,"RMS Error");
+  this->rmsErrorOutput = new Fl_Value_Output(x,y,50,20,"RMS Error");
   this->rmsErrorOutput->labelsize(11);
   this->rmsErrorOutput->align(FL_ALIGN_RIGHT);
   this->rmsErrorOutput->textsize(11);
-  this->rmsErrorOutput->precision(2);
+  this->rmsErrorOutput->precision(4);
   this->rmsErrorOutput->box(FL_BORDER_BOX);
   this->rmsErrorOutput->color(FL_WHITE);
 
