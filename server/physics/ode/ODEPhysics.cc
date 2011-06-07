@@ -269,7 +269,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->contactFeedbackIter = this->contactFeedbacks.begin();
 
   Vector3 g = this->gravityP->GetValue();
-  dWorldSetGravity(this->worldId, g.x, g.y, g.z);
+  this->SetGravity(g);
 
   dWorldSetCFM(this->worldId, this->globalCFMP->GetValue());
   dWorldSetERP(this->worldId, this->globalERPP->GetValue());
@@ -291,6 +291,14 @@ void ODEPhysics::Load(XMLConfigNode *node)
     this->stepWP->SetValue(**this->quickStepWP);
   }
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set ODE Gravity
+void ODEPhysics::SetGravity(Vector3 gravity) const
+{
+  this->gravityP->SetValue(gravity);
+  dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

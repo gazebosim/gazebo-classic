@@ -199,6 +199,9 @@ class ODEPhysics : public PhysicsEngine
   public: double GetRMSError();
   public: double GetRMSErrorTolerance();
 
+  /// \brief Set ODE Gravity
+  private: void SetGravity(Vector3 gravity) const;
+ 
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
 

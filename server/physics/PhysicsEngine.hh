@@ -134,7 +134,7 @@ namespace gazebo
     public: Vector3 GetGravity() const;
 
     /// \brief Set the gavity vector
-    public: void SetGravity(Vector3 gravity) const;
+    public: virtual void SetGravity(Vector3 gravity) const;
 
     /// \brief Get the time between each update cycle
     /// \return seconds between updates 
