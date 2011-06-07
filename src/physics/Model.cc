@@ -61,6 +61,7 @@ class BodyUpdate_TBB
 Model::Model(BasePtr parent)
   : Entity(parent)
 {
+  std::cout << "New Model\n";
   this->AddType(MODEL);
 
   common::Param::Begin(&this->parameters);

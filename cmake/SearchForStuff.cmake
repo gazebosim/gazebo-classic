@@ -159,7 +159,7 @@ else (PKG_CONFIG_FOUND)
 endif (PKG_CONFIG_FOUND)
 
 #set (QT_USE_QTOPENGL TRUE)
-find_package (Qt4 REQUIRED)
+find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()

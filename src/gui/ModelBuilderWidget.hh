@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "physics/PhysicsTypes.hh"
+#include "transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -40,6 +41,9 @@ namespace gazebo
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;
 
       private: physics::WorldPtr world;
+
+      protected: transport::NodePtr node;
+      protected: transport::PublisherPtr factoryPub;
     };
   }
 }

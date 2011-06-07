@@ -6,6 +6,9 @@
 #include "physics/World.hh"
 #include "physics/Physics.hh"
 
+#include "transport/Node.hh"
+#include "transport/Publisher.hh"
+
 #include "gui/GLWidget.hh"
 
 #include "gui/ModelBuilderWidget.hh"
@@ -29,8 +32,8 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   this->glWidget = new GLWidget(renderFrame);
   rendering::ScenePtr scene = rendering::create_scene("model_builder");
   this->glWidget->ViewScene( scene );
-  //this->glWidget->hide();
 
+  // Add another widget that will hold body information.
   frameLayout->addWidget(this->glWidget);
   renderFrame->setLayout(frameLayout);
   renderFrame->layout()->setContentsMargins(4,4,4,4);
@@ -58,11 +61,47 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
 
+  // TODO: Use messages so that the gui doesn't depend upon physics 
   physics::init();
   this->world = physics::create_world("model_builder");
   this->world->Load(NULL);
   this->world->Init();
-  //this->world->SetPaused(true);
+  this->world->SetPaused(true);
+  
+  msgs::Factory msg;
+  common::Message::Init(msg, "new_box");
+  std::ostringstream newModelStr;
+
+  newModelStr << "<?xml version='1.0'?>";
+
+  newModelStr << "<model name='my_new_model'>\
+    <static>true</static>\
+    <origin xyz='0 0 0'/>\
+    <link name='body'>\
+      <collision name='geom'>\
+        <geometry>\
+          <box size='1 1 1'/>\
+        </geometry>\
+        <mass>0.5</mass>\
+      </collision>\
+      <visual>\
+        <geometry>\
+          <box size='1 1 1'/>\
+        </geometry>\
+        <material name='Gazebo/Grey'/>\
+        <cast_shadows>true</cast_shadows>\
+        <shader>pixel</shader>\
+      </visual>\
+    </link>\
+  </model>";
+
+  msg.set_xml( newModelStr.str() );
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("model_builder");
+
+  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->factoryPub->Publish(msg);
 }
 
 ModelBuilderWidget::~ModelBuilderWidget()
