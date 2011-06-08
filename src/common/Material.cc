@@ -72,7 +72,7 @@ std::string Material::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set a texture image
-void Material::SetTextureImage(const std::string tex)
+void Material::SetTextureImage(const std::string &tex)
 {
   this->texImage = tex;
   this->Update();
@@ -80,7 +80,8 @@ void Material::SetTextureImage(const std::string tex)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set a texture image with resource_path
-void Material::SetTextureImage(const std::string tex,const std::string resource_path)
+void Material::SetTextureImage(const std::string &tex,
+                               const std::string &resource_path)
 {
   this->texImage = tex;
 

@@ -78,25 +78,25 @@ namespace gazebo
       public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
   
       /// \brief Get the axis of rotation
-      public: virtual common::Vector3 GetAxis(int index) const {}
+      public: virtual common::Vector3 GetAxis(int /*index*/) const {return common::Vector3();}
   
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
   
       /// \brief Set the velocity of an axis(index).
-      public: virtual void SetVelocity(int index, double angle) {}
+      public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
   
       /// \brief Get the rotation rate of an axis(index)
-      public: virtual double GetVelocity(int index) const {}
+      public: virtual double GetVelocity(int /*index*/) const {return 0;}
   
       /// \brief Get the max allowed force of an axis(index).
-      public: virtual double GetMaxForce(int index) {}
+      public: virtual double GetMaxForce(int /*index*/) {return 0;}
   
       /// \brief Set the max allowed force of an axis(index).
-      public: virtual void SetMaxForce(int index, double t) {}
+      public: virtual void SetMaxForce(int /*index*/, double /*t*/) {}
   
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual common::Angle GetAngle(int index) const {}
+      public: virtual common::Angle GetAngle(int /*index*/) const {return common::Angle(0);}
    
     };
     

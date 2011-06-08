@@ -57,7 +57,6 @@ void Master::Init(unsigned short port)
   {
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
-  std::cout << "GAZEBO_MASTER_URI=" << this->connection->GetLocalURI() << "\n";
 }
 
 void Master::OnAccept(const transport::ConnectionPtr &new_connection)

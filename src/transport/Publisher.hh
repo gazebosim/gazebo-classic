@@ -31,7 +31,7 @@ namespace gazebo
     class Publisher
     {
       /// \brief Default Constructor
-      public: Publisher() {}
+      public: Publisher() {pubCount = 0;}
 
       /// \brief Use this constructor
       /// \param topic Name of topic

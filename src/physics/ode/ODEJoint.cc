@@ -138,7 +138,6 @@ void ODEJoint::Attach(BodyPtr parent, BodyPtr child)
   }
   else if (odechild && odeparent)
   {
-    gzdbg << "Child[" << odechild->GetODEId() <<"] Pare["<< odeparent->GetODEId() << "]\n"; 
     dJointAttach( this->jointId, odechild->GetODEId(), odeparent->GetODEId() );
   }
 }

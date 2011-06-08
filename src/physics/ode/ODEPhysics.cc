@@ -261,7 +261,7 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-  int i;
+  unsigned int i;
   this->colliders.clear();
   this->trimeshColliders.clear();
 

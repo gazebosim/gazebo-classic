@@ -129,6 +129,8 @@ double ODEUniversalJoint::GetVelocity(int index) const
     result = dJointGetUniversalAngle1Rate( this->jointId );
   else 
     result = dJointGetUniversalAngle2Rate( this->jointId );
+
+  return result;
 }
  
 //////////////////////////////////////////////////////////////////////////////

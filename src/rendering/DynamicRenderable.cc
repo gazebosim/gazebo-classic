@@ -17,6 +17,7 @@
 #include <OgreCamera.h>
 #include <OgreHardwareBufferManager.h>
 
+#include "common/Console.hh"
 #include "rendering/DynamicRenderable.hh"
 
 using namespace gazebo;
@@ -86,6 +87,12 @@ void DynamicRenderable::SetOperationType(RenderOpType opType)
 
     case RENDERING_TRIANGLE_FAN:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
+      break;
+    case RENDERING_MESH_RESOURCE:
+      gzwarn << "RENDERING_MESH_RESOURCE not handled\n";
+      break;
+    default:
+      gzerr << "Unknown render operation type[" << opType << "]\n";
       break;
   }
 }

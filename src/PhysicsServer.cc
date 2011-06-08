@@ -163,13 +163,13 @@ void PhysicsServer::Load( const std::string &filename )
 
 void PhysicsServer::Init()
 {
-  for (int i=0; i < this->worlds.size(); i++)
+  for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::init_world(this->worlds[i]);
 }
 
 void PhysicsServer::Run()
 {
-  for (int i=0; i < this->worlds.size(); i++)
+  for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
   while (!this->quit)

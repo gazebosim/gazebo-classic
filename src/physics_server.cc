@@ -140,7 +140,7 @@ void PrintVersion()
 // Parse the argument list.  Options are placed in static variables.
 int ParseArgs(int argc, char **argv)
 {
-  FILE *tmpFile;
+  //FILE *tmpFile;
   int ch;
 
   char *flags = (char*)("l:hd:gxt:nqperu");

@@ -342,7 +342,6 @@ common::Vector3 ODEBody::GetWorldAngularVel() const
   if (this->bodyId)
   {
     const dReal *dvel;
-    dReal result[3];
 
     dvel = dBodyGetAngularVel(this->bodyId);
 

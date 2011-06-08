@@ -74,7 +74,7 @@ namespace gazebo
     public: void Normalize();
 
     /// \brief Dereference operator
-    public: inline double operator*() { return value; }
+    public: inline double operator*() const { return value; }
 
     /// \brief Substraction
     public: Angle operator-(const Angle &angle) const;

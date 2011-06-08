@@ -56,30 +56,47 @@ include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
 # Build type cflags
-set (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -Wall -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
-set (CMAKE_C_FLAGS_DEBUG " -ggdb  -Wall -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
-set (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_RELEASE " -O0 -DNDEBUG -Wall -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
+set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
+
+set (CMAKE_C_FLAGS_DEBUG " -ggdb -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
+set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+
+set (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
+
+set (CMAKE_C_FLAGS_CHECK " -ggdb -Wall -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow -pedantic -Wno-long-long -Wno-unused-value -fPIC" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
 
 #####################################
 # Build type link flags
 set (CMAKE_LINK_FLAGS_RELEASE " -fPIC" CACHE INTERNAL "Link flags fro release" FORCE)
 set (CMAKE_LINK_FLAGS_DEBUG " -fPIC" CACHE INTERNAL "Link flags for debug" FORCE)
 set (CMAKE_LINK_FLAGS_PROFILE " -fPIC" CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_CHECK " -fPIC" CACHE INTERNAL "Link flags for static code checking" FORCE)
 
 #####################################
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE "release" CACHE STRING 
-    "Choose the type of build, options are: debug release profile" FORCE)
+    "Choose the type of build, options are: debug release profile check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+
+#####################################
+# Set all the global build flags
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
+set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
+set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
-MESSAGE (STATUS "\n\n====== Finding 3rd Party Packages ======")
+message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
-MESSAGE (STATUS "----------------------------------------\n")
+message (STATUS "----------------------------------------\n")
 
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")
@@ -112,8 +129,10 @@ else (build_errors)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
   
-  message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
-  
+  message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
+  message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+  message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
+ 
   if (BUILD_GAZEBO)
     add_subdirectory(src)
     add_subdirectory(worlds)
@@ -126,9 +145,6 @@ else (build_errors)
     #  add_subdirectory(player)
     #  add_subdirectory(player_cfgs)
     #endif (INCLUDE_PLAYER)
-    
-    message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-    message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
   endif (BUILD_GAZEBO)
 
   ########################################

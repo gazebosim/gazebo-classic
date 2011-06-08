@@ -122,8 +122,6 @@ void Joint::Load(common::XMLConfigNode *node)
 
   std::ostringstream visname;
 
-  gzdbg << "Parent[" << **this->parentNameP << "] Child[" << **this->childNameP << "]\n";
-
   if (this->model)
   {
     visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";

@@ -35,13 +35,6 @@ set (headers TopicManager.hh
 
 add_library(gazebo_transport SHARED ${sources})
 
-if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_transport PROPERTIES LINK_FLAGS
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-
 target_link_libraries(gazebo_transport gazebo_common 
                                        gazebo_msgs 
                                        ${boost_libraries})

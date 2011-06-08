@@ -117,7 +117,6 @@ Light::~Light()
 void Light::Load(common::XMLConfigNode *node)
 {
   common::Vector3 vec;
-  double range,constant,linear,quad;
 
   if (node)
   {
@@ -135,7 +134,6 @@ void Light::Load(common::XMLConfigNode *node)
 
   try
   {
-    gzdbg << "Light Name[" << this->GetName() << "]\n";
     this->light = this->scene->GetManager()->createLight(this->GetName());
   }
   catch (Ogre::Exception e)
@@ -143,11 +141,6 @@ void Light::Load(common::XMLConfigNode *node)
     gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
         "Unable to create a light");
   }
-
-  gzdbg << "Type[" << **this->lightTypeP  << "]\n";
-  gzdbg << "Diffuse[" << **this->diffuseP << "]\n";
-  gzdbg << "Direction[" << **this->directionP << "]\n";
-  gzdbg << "Attenuation[" << **this->attenuationP << "]\n";
 
   this->SetLightType( **this->lightTypeP );
   this->SetDiffuseColor(**this->diffuseP);
@@ -579,7 +572,7 @@ void Light::SetupShadows()
     this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
     Ogre::Vector4 splitPoints;
-    for (int i = 0; i < numShadowTextures; ++i)
+    for (unsigned int i = 0; i < numShadowTextures; ++i)
       splitPoints[i] = splitPointList[i];
 
     Ogre::MaterialManager::ResourceMapIterator iter = Ogre::MaterialManager::getSingleton().getResourceIterator();

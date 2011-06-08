@@ -43,7 +43,7 @@ namespace gazebo
     public: Vector3 TransformAffine( const Vector3 &v ) const;
 
     public: const Matrix4 &operator=( const Matrix4 &mat );
-    public: void operator=( const Matrix3 &mat );
+    public: const Matrix4 & operator=( const Matrix3 &mat );
 
     public: Matrix4 operator*(const Matrix4 &mat);
 

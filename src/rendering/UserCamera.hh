@@ -71,7 +71,7 @@ namespace gazebo
       public: void HandleMouseEvent(const common::MouseEvent &evt);
   
       /// \brief Set view controller
-      public: void SetViewController( const std::string type );
+      public: void SetViewController( const std::string &type );
   
       /// \brief Resize the camera
       //public: void Resize(unsigned int w, unsigned int h);

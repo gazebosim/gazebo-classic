@@ -70,6 +70,7 @@ Server::~Server()
   delete this->master;
   delete this->masterThread;
 
+  // TODO: probably should clean this up. Make sure this is needed.
   while (transport::IOManager::Instance()->GetCount() > 0)
   {
     usleep(100000);
@@ -148,7 +149,7 @@ void Server::Load(const std::string &filename)
 
 void Server::Init()
 {
-  for (int i=0; i < this->worlds.size(); i++)
+  for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::init_world(this->worlds[i]);
 }
 
@@ -156,7 +157,7 @@ void Server::Run(bool blocking)
 {
   this->quit = false;
 
-  for (int i=0; i < this->worlds.size(); i++)
+  for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
   if (blocking)
@@ -170,7 +171,7 @@ void Server::Quit()
   physics::fini();
   rendering::fini();
 
-  for (int i=0; i < this->worlds.size(); i++)
+  for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::stop_world(this->worlds[i]);
 
   this->quit = true;
@@ -225,7 +226,7 @@ void Server::SetParams( const common::StrStr_M &params )
                 << iter->second << "]\n";
       }
 
-      for (int i=0; i < this->worlds.size(); i++)
+      for (unsigned int i=0; i < this->worlds.size(); i++)
         physics::pause_world(this->worlds[i], p);
     }
   }

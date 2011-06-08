@@ -43,7 +43,6 @@ WindowManager::WindowManager()
 ////////////////////////////////////////////////////////////////////////////////
 WindowManager::~WindowManager()
 {
-  gzdbg << "Window Manager Destructor\n";
   this->Fini();
 }
 
@@ -51,7 +50,6 @@ WindowManager::~WindowManager()
 // Shutdown all the windows
 void WindowManager::Fini()
 {
-  gzdbg << "WindowManager::Fini!!!\n";
   for (std::vector<Ogre::RenderWindow*>::iterator iter = this->windows.begin();
       iter != this->windows.end(); iter++)
   {

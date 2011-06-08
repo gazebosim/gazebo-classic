@@ -1,3 +1,0 @@
-ADD_SUBDIRECTORY(differential)
-ADD_SUBDIRECTORY(holonome3sw)
-ADD_SUBDIRECTORY(steering)

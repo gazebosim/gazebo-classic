@@ -154,5 +154,5 @@ void ODESliderJoint::SetMaxForce(int index, double t)
 /// Get the max allowed force of an axis(index).
 double ODESliderJoint::GetMaxForce(int index)
 {
-  this->GetParam(dParamFMax);
+  return this->GetParam(dParamFMax);
 }

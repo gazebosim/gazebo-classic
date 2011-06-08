@@ -172,6 +172,7 @@ void Connection::ProcessWriteQueue()
   {
     unsigned int sum = 0;
     unsigned int i = 0;
+
     for (; i < this->writeCounts.size(); i++)
       sum += this->writeCounts[i];
 
@@ -246,7 +247,10 @@ void Connection::Cancel()
       this->acceptor->cancel();
     } 
     catch (boost::system::system_error &e)
-    { }
+    { 
+      gzwarn << "Connection::Cancel Error\n";
+      // Left empty on purpose 
+    }
     delete this->acceptor;
     this->acceptor = NULL;
   }
@@ -354,11 +358,8 @@ std::size_t Connection::ParseHeader( const std::string &header )
 /// the read thread
 void Connection::ReadLoop(const ReadCallback &cb)
 {
-  fd_set fileDescriptorSet;
   struct timeval timeStruct;
   std::string data;
-
-  int nativeSocket = this->socket.native();
 
   timeStruct.tv_sec = 1;
   timeStruct.tv_usec = 0;
@@ -375,7 +376,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
       }
       else
       {
-        usleep(33000);
+        usleep(3300);
         continue;
       }
     }

@@ -225,7 +225,7 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &evt)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set view controller
-void UserCamera::SetViewController( const std::string type )
+void UserCamera::SetViewController( const std::string &type )
 {
   delete this->viewController;
   this->viewController = NULL;

@@ -41,7 +41,7 @@ namespace gazebo
     /// \brief A class that encapsulates a connection
     class Connection
     {
-      public: Connection() :event(NULL), id(-1) {}
+      public: Connection() :event(NULL), id(-1), uniqueId(-1) {}
       public: Connection(Event *e, int i);
       public: ~Connection();
       public: int Id() const;

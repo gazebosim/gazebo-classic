@@ -24,6 +24,12 @@
 #include "gui/MainWindow.hh"
 #include "gui/Gui.hh"
 
+// These are needed by QT. They need to stay valid during the entire
+// lifetime of the application, and argc > 0 and argv must contain one valid
+// character string
+int g_argc = 1;
+char **g_argv;
+
 using namespace gazebo;
 
 const std::string default_config =
@@ -78,9 +84,15 @@ void gui::load(const std::string &filename)
   if (!guiNode)
     gzthrow("Invalid xml. Needs a <gui> tag");
 
+  g_argv = new char*[g_argc];
+  for (int i=0; i < g_argc; i++)
+  {
+    g_argv[i] = new char[strlen("gazebo")];
+    strcpy(g_argv[i], "gazebo");
+  }
 
-  int argc = 0;
-  g_app = new QApplication(argc, NULL);
+  g_app = new QApplication(g_argc, g_argv);
+
   g_main_win = new MainWindow();
 
   g_main_win->Load(guiNode);

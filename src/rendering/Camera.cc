@@ -104,7 +104,6 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
 // Destructor
 Camera::~Camera()
 {
-  gzdbg << "Camera Destructor\n";
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
 
@@ -232,13 +231,6 @@ void Camera::Init()
   this->saveCount = 0;
 
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
-
-  Ogre::Real left, right ,top, bottom;
-
-  //Ogre::Frustum *frustum = this->camera->getFrustum();
-  //this->camera->getFrustumExtents(left, right, top, bottom);
-  //this->camera->setFrustumExtents(-100, 100, 100, -100);
-  //printf("F Extents[%f %f %f %f]\n", left, right ,top ,bottom);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -952,8 +944,6 @@ Scene *Camera::GetScene() const
 // Create the ogre camera
 void Camera::CreateCamera()
 {
-  Ogre::Viewport *cviewport;
-
   this->camera = this->scene->GetManager()->createCamera(this->name);
 
   // Use X/Y as horizon, Z up
@@ -965,7 +955,6 @@ void Camera::CreateCamera()
   this->camera->setDirection(1,0,0);
 
   this->SetClipDist(**this->nearClipP, **this->farClipP);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

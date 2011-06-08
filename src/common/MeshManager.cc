@@ -315,7 +315,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
 void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
-    const Vector2d &segments, const Vector2d uvTile)
+                              const Vector2d &segments, const Vector2d &uvTile)
 {
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
@@ -325,7 +325,7 @@ void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal, 
     double d, const Vector2d &size, const Vector2d &segments,
-    const Vector2d uvTile)
+    const Vector2d &uvTile)
 {
   if (this->HasMesh(name))
   {

@@ -41,8 +41,7 @@ OgreLoader::OgreLoader()
 /// Destructor
 OgreLoader::~OgreLoader()
 {
-  if (this->gSubMesh)
-    delete this->gSubMesh;
+  delete this->gSubMesh;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

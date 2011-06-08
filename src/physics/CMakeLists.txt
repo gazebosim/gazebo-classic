@@ -61,13 +61,6 @@ set (headers BallJoint.hh
 
 add_library(gazebo_physics SHARED ${sources})
 
-if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_physics PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-
 target_link_libraries(gazebo_physics gazebo_common 
                                      ${TBB_LIBRARIES} 
                                      ${libtool_library} 

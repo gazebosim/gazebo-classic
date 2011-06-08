@@ -57,8 +57,7 @@ XMLConfig::XMLConfig()
 // Standard destructor
 XMLConfig::~XMLConfig()
 {
-  if (this->root)
-    delete this->root;
+  delete this->root;
 
   return;
 }
@@ -275,8 +274,7 @@ XMLConfigNode::XMLConfigNode( XMLConfig *cfg, XMLConfigNode *parent,
 XMLConfigNode::~XMLConfigNode()
 {
   // Delete all our children first
-  if (this->childFirst)
-    delete this->childFirst;
+  delete this->childFirst;
 
   // Unlink ourself from our siblings
   if (this->prev)

@@ -93,12 +93,12 @@ namespace gazebo
 
     public: void CreatePlane(const std::string &name, const Plane &plane,
                              const Vector2d &segments, 
-                             const Vector2d uvTile);
+                             const Vector2d &uvTile);
 
     public: void CreatePlane(const std::string &name, const Vector3 &normal, 
                              double d, const Vector2d &size, 
                              const Vector2d &segments,
-                             const Vector2d uvTile);
+                             const Vector2d &uvTile);
 
     private: void Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
                                   bool doubleSided);

@@ -570,7 +570,6 @@ void Visual::SetTransparency( float trans )
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
-    Ogre::SimpleRenderable *simple = NULL;
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);

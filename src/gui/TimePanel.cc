@@ -52,11 +52,14 @@ TimePanel::TimePanel( QWidget *parent )
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("default");
+
   this->statsSub = this->node->Subscribe("~/world_stats", &TimePanel::OnStats, this);
 
   QTimer *timer = new QTimer(this);
   connect( timer, SIGNAL(timeout()), this, SLOT(Update()) );
   timer->start(33);
+
+  this->simTime.Set(0);
 }
 
 TimePanel::~TimePanel()
@@ -86,7 +89,7 @@ void TimePanel::Update()
     sim << std::fixed << std::setprecision(2) << simDbl/3600 << " hrs";
   else if (simDbl > 999)
     sim << std::fixed << std::setprecision(2) << simDbl/60 << " min";
-  else
+  else 
     sim << std::fixed << std::setprecision(2) << simDbl << " sec";
 
   double realDbl = this->realTime.Double();
@@ -101,7 +104,11 @@ void TimePanel::Update()
   else
     real << std::fixed << std::setprecision(2) << realDbl << " sec";
 
-  percent << std::fixed << std::setprecision(2) << ( this->simTime / this->realTime).Double();
+  if (simDbl > 0)
+    percent << std::fixed << std::setprecision(2) << ( this->simTime / this->realTime).Double();
+  else
+    percent << "0";
+
   this->percentRealTimeEdit->setText( tr(percent.str().c_str()) );
 
   this->simTimeEdit->setText( tr(sim.str().c_str()));

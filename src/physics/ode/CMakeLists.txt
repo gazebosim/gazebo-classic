@@ -33,13 +33,6 @@ SET (headers ODEPhysics.hh
 
 add_library(gazebo_physics_ode SHARED ${sources})
 
-if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_physics_ode PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-
 LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")
 
 set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}")

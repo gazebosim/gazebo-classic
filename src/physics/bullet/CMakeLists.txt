@@ -59,14 +59,6 @@ SET (sources BulletPhysics.cc
              #BulletRayGeom.cc
 )
 
-if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_physics_bullet PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-
-
 add_definitions(${bullet_cflags})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 add_library(gazebo_physics_bullet SHARED ${sources})

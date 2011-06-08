@@ -55,13 +55,6 @@ set (headers MovableText.hh
 
 add_library(gazebo_rendering SHARED ${sources})
 
-if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_rendering PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-
 target_link_libraries( gazebo_rendering gazebo_common 
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 

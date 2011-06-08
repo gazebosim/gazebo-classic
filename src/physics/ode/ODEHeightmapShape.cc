@@ -47,7 +47,7 @@ ODEHeightmapShape::~ODEHeightmapShape()
 void ODEHeightmapShape::FillHeightMap()
 {
   unsigned int x,y;
-  float h;
+  float h = 0;
 
   // Resize the vector to match the size of the vertices
   this->heights.resize(this->odeVertSize*this->odeVertSize);

@@ -155,6 +155,8 @@ double ODEHinge2Joint::GetVelocity(int index) const
     result = dJointGetHinge2Angle1Rate( this->jointId );
   else
     result = dJointGetHinge2Angle2Rate( this->jointId );
+
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////

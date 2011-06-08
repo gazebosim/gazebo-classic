@@ -215,8 +215,6 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
           Ogre::MaterialPtr curMaterial = 
             Ogre::MaterialManager::getSingleton().getByName(curMaterialName);
 
-          Ogre::Pass* curPass = curMaterial->getTechnique(0)->getPass(0);
-
           // Grab the first pass render state. 
           // NOTE:For more complicated samples iterate over the passes and build
           // each one of them as desired.
@@ -328,7 +326,6 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
             user = (char*)"nobody";
           stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
           cachePath = stream.str();
-          struct stat astat;
           // Create the directory
           if (mkdir(cachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
           {
@@ -430,7 +427,7 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
 
   // set the receiver params for any materials that need the split point information
   Ogre::Vector4 splitPoints;
-  for (int i = 0; i < srcSplitPoints.size(); ++i)
+  for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
   {
     splitPoints[i] = srcSplitPoints[i];
   }

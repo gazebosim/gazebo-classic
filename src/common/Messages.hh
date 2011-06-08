@@ -40,10 +40,10 @@ namespace gazebo
         static void Stamp(msgs::Header *);
         static void Stamp(msgs::Time *);
 
-        static std::string Package(const std::string type, 
+        static std::string Package(const std::string &type, 
                                    const google::protobuf::Message &message);
 
-        static msgs::Packet Package2(const std::string type, 
+        static msgs::Packet Package2(const std::string &type, 
                                      const google::protobuf::Message &message);
 
         static msgs::Point      Convert(const Vector3 &v);

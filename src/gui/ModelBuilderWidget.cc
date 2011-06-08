@@ -20,6 +20,7 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   : QWidget(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
+  QSplitter *splitter = new QSplitter;
 
   QFrame *renderFrame = new QFrame;
   renderFrame->setLineWidth(1);
@@ -33,10 +34,14 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   rendering::ScenePtr scene = rendering::create_scene("model_builder");
   this->glWidget->ViewScene( scene );
 
-  // Add another widget that will hold body information.
   frameLayout->addWidget(this->glWidget);
   renderFrame->setLayout(frameLayout);
   renderFrame->layout()->setContentsMargins(4,4,4,4);
+
+  QFrame *rightFrame = new QFrame;
+  rightFrame->setLineWidth(1);
+  rightFrame->setFrameShadow(QFrame::Sunken);
+  rightFrame->setFrameShape(QFrame::Box);
 
   QToolBar *toolbar = new QToolBar(this);
 
@@ -55,8 +60,15 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   connect(this->cylinderCreateAct, SIGNAL(triggered()), this, SLOT(CreateCylinder()));
   toolbar->addAction(cylinderCreateAct);
 
+  splitter->addWidget(renderFrame);
+  splitter->addWidget(rightFrame);
+  QList<int> sizes;
+  sizes.push_back(splitter->width());
+  sizes.push_back(0);
+  splitter->setSizes(sizes);
+
   mainLayout->addWidget(toolbar);
-  mainLayout->addWidget(renderFrame);
+  mainLayout->addWidget(splitter);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
@@ -135,17 +147,14 @@ void ModelBuilderWidget::CreateCylinder()
 void ModelBuilderWidget::OnBoxCreate(const common::Vector3 &pos,  
                                      const common::Vector3 &scale)
 {
-  gzdbg << "Box Create[" << pos << "] [" << scale << "]\n";
 }
 
 void ModelBuilderWidget::OnSphereCreate(const common::Vector3 &pos,  
                                      const common::Vector3 &scale)
 {
-  gzdbg << "Sphere Create[" << pos << "] [" << scale << "]\n";
 }
 
 void ModelBuilderWidget::OnCylinderCreate(const common::Vector3 &pos,  
                                      const common::Vector3 &scale)
 {
-  gzdbg << "Cylinder Create[" << pos << "] [" << scale << "]\n";
 }

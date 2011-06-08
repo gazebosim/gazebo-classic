@@ -173,7 +173,7 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 /// Reads a binary STL (stereolithography) file.
 void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 {
-  short int attribute = 0;
+  // Unused: short int attribute = 0;
   char c;
   int i;
   int iface;
@@ -219,7 +219,7 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
       subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
     }
 
-    attribute = ShortIntRead ( filein );
+    // Unused: attribute = ShortIntRead ( filein );
   }
 }
 

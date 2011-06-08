@@ -37,7 +37,6 @@ using namespace physics;
 ODEHingeJoint::ODEHingeJoint( dWorldID worldId )
     : HingeJoint<ODEJoint>()
 {
-  gzdbg << "ODE HInge Joint Constructor\n";
   this->jointId = dJointCreateHinge(worldId, NULL);
 }
 

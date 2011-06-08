@@ -606,6 +606,8 @@ common::Box Body::GetBoundingBox() const
     if ((*iter)->HasType(Base::GEOM))
       box += boost::shared_static_cast<Geom>(*iter)->GetBoundingBox();
   }
+
+  return box;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -616,6 +618,8 @@ bool Body::SetSelected( bool s )
 
   if (s == false)
     this->SetEnabled(true);
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

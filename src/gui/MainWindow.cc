@@ -69,17 +69,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::New()
 {
-  gzdbg << "New world\n";
+  gzdbg << "MainWindow::New world\n";
 }
 
 void MainWindow::Open()
 {
-  gzdbg << "Open file\n";
+  gzdbg << "MainWindow::Open file\n";
 }
 
 void MainWindow::Save()
 {
-  gzdbg << "Save to file\n";
+  gzdbg << "MainWindow::Save to file\n";
 }
 
 void MainWindow::About()

@@ -25,6 +25,7 @@ add_subdirectory(physics)
 add_subdirectory(sensors)
 
 add_dependencies( gazebo_physics gazebo_msgs )
+add_dependencies( gazebo_physics_ode gazebo_msgs )
 add_dependencies( gazebo_common gazebo_msgs )
 add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )

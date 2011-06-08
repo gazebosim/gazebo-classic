@@ -123,8 +123,9 @@ namespace gazebo
               {
                 if (e)
                 {
-                  gzerr << "An error occrured reading a header[" 
-                        << e.message() << "]\n";
+                  if (e.message() != "End of File")
+                    gzerr << "An error occrured reading a header[" 
+                      << e.message() << "]\n";
                 }
                 else
                 {

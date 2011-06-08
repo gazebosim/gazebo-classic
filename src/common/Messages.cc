@@ -76,8 +76,8 @@ void Message::Stamp(msgs::Time *time)
   time->set_nsec(tm.nsec);
 }
 
-std::string Message::Package(const std::string type, 
-                      const google::protobuf::Message &message)
+std::string Message::Package(const std::string &type, 
+                             const google::protobuf::Message &message)
 {
   std::string data;
   msgs::Packet pkg;
@@ -94,8 +94,8 @@ std::string Message::Package(const std::string type,
   return data;
 }
 
-msgs::Packet Message::Package2(const std::string type, 
-                      const google::protobuf::Message &message)
+msgs::Packet Message::Package2(const std::string &type, 
+                               const google::protobuf::Message &message)
 {
   msgs::Packet pkg;
   Message::Stamp( pkg.mutable_stamp() );

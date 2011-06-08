@@ -30,7 +30,7 @@ namespace gazebo
       public: Box();
 
       /// \brief Constructor
-      public: Box (const Vector3 min, const Vector3 max);
+      public: Box (const Vector3 &min, const Vector3 &max);
 
       /// \brief Copy Constructor
       public: Box( const Box &b );

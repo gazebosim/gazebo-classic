@@ -35,7 +35,7 @@
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor);
+GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
  
 //////////////////////////////////////////////////////////////////////////////
 // Constructor

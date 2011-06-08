@@ -103,7 +103,7 @@ const Matrix4 &Matrix4::operator=( const Matrix4 &mat )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equality operator
-void Matrix4::operator=( const Matrix3 &mat )
+const Matrix4 &Matrix4::operator=( const Matrix3 &mat )
 {
   this->m[0][0] = mat.m[0][0];
   this->m[0][1] = mat.m[0][1];
@@ -116,6 +116,8 @@ void Matrix4::operator=( const Matrix3 &mat )
   this->m[2][0] = mat.m[2][0];
   this->m[2][1] = mat.m[2][1];
   this->m[2][2] = mat.m[2][2];
+
+  return *this;
 }
 
 

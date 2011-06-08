@@ -245,7 +245,7 @@ void World::RunLoop()
   common::Time diffTime;
   common::Time currTime;
   common::Time lastTime = this->GetRealTime();
-  struct timespec req, rem;
+  struct timespec req;//, rem;
 
   this->startTime = common::Time::GetWallTime();
 
@@ -413,7 +413,6 @@ ModelPtr World::LoadModel(common::XMLConfigNode *node, BasePtr parent)
   msg.set_name(model->GetCompleteScopedName());
 
   this->newEntityPub->Publish(msg);
-  //std::cout << "entity debug: " << msg.DebugString() << "\n\n\n";
   return model;
 }
 
@@ -642,7 +641,7 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 // the scene. This in turns allows a gui to query the latest state.
 void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  unsigned int i = 0;
+  int i = 0;
   for (; i < this->sceneMsg.visual_size(); i++)
   {
     if (this->sceneMsg.visual(i).header().str_id() == msg->header().str_id())
@@ -685,7 +684,6 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
  
- gzdbg << "Factor Msg[" << msg << "]\n World[" << this->GetName() << "]\n"; 
   try
   {
     xmlFile->LoadString(msg->xml());

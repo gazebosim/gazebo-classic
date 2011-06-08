@@ -47,6 +47,8 @@ bool transport::get_master_uri(std::string &master_host,
   int last_colon = master_uri.find_last_of(":");
   master_host = master_uri.substr(0,last_colon);
   master_port = boost::lexical_cast<unsigned short>( master_uri.substr(last_colon+1, master_uri.size() - (last_colon+1)) );
+
+  return true;
 }
 
 

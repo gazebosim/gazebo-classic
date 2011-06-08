@@ -65,7 +65,7 @@ namespace gazebo
       public: void Load(XMLConfigNode *node);
     
       /// \brief Saves the message parameters
-      public: void Save(std::string &prefix, std::ostream &stream);
+      public: void Save(std::string &prefix, std::ostream &stream) const;
   
       /// \brief Set quiet output
       /// \param q True to prevent warning

@@ -210,7 +210,7 @@ void Base::RemoveChild(unsigned int _id)
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if ((*iter)->GetId() == _id)
+    if ((*iter)->GetId() == (int)_id)
     {
       this->children.erase(iter);
       break;

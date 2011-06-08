@@ -130,7 +130,6 @@ Scene::~Scene()
   this->cameras.clear();
   this->userCameras.clear();
 
-  gzdbg << "Delete a scene Thread[" << boost::this_thread::get_id() << "]\n";
   if (this->manager)
   {
     this->manager->clearScene();
@@ -518,7 +517,7 @@ common::Vector3 Scene::GetFirstContact(Camera *camera,
                                        common::Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetCamera();
-  Ogre::Real closest_distance = -1.0f;
+  //Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
       (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
       (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
@@ -865,7 +864,7 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
     unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
 
 
-    size_t offset = (submesh->useSharedVertices)? shared_offset : current_offset;
+    //size_t offset = (submesh->useSharedVertices)? shared_offset : current_offset;
 
     // Ogre 1.6 patch (commenting the static_cast...) - index offsets start from 0 for each submesh
     if ( use32bitindexes )

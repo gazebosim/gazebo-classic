@@ -98,7 +98,7 @@ void Console::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save in xml format
-void Console::Save(std::string &prefix, std::ostream &stream)
+void Console::Save(std::string &prefix, std::ostream &stream) const
 {
   stream << prefix << *(this->quietP) << "\n";
   stream << prefix << *(this->logDataP) << "\n";
