@@ -19,7 +19,7 @@
  * Date: 19 Jun 2008
  */
 
-#include <Ogre.h>
+#include "rendering/ogre.h"
 #include <sstream>
 
 #include "common/Global.hh"

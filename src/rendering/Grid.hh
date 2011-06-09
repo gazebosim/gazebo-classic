@@ -22,7 +22,8 @@
 #include <stdint.h>
 #include <vector>
 
-#include <OGRE/OgreMaterial.h>
+// TODO: remove this line
+#include "rendering/ogre.h"
 
 #include "common/Param.hh"
 #include "common/Color.hh"

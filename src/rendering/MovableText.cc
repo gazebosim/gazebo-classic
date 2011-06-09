@@ -68,20 +68,20 @@ MovableText::~MovableText()
 
 ////////////////////////////////////////////////////////////////////////////////
 //Loads the text to display and select the font
-void MovableText::Load(const std::string &name,
-                       const Ogre::UTFString &text,
-                       const std::string &fontName,
-                       float charHeight,
-                       const Ogre::ColourValue &color)
+void MovableText::Load( const std::string &name_,
+                        const Ogre::UTFString &text_,
+                        const std::string &fontName_,
+                        float charHeight_,
+                        const Ogre::ColourValue &color_)
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-    this->text=text;
-    this->color=color;
-    this->fontName=fontName;
-    this->charHeight=charHeight;
-    this->mName = name;
+    this->text = text_;
+    this->color = color_;
+    this->fontName = fontName_;
+    this->charHeight = charHeight_;
+    this->mName = name_;
 
     if (this->mName == "")
       throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS,
@@ -98,8 +98,7 @@ void MovableText::Load(const std::string &name,
 
   this->SetFontName(this->fontName);
 
-
-  // NATE
+  // TODO: is this necessary?
   //this->_setupGeometry();
 }
 

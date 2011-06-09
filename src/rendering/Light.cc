@@ -20,8 +20,9 @@
  * Date: 15 July 2003
  */
 
-#include <Ogre.h>
 #include <boost/bind.hpp>
+
+#include "rendering/ogre.h"
 
 #include "common/Messages.hh"
 #include "common/Events.hh"

@@ -15,10 +15,8 @@
  *
 */
 #include <boost/lexical_cast.hpp>
-#include <OGRE/OgreSceneManager.h>
-#include <OGRE/OgreSceneQuery.h>
-#include <OGRE/OgreRoot.h>
-#include <OGRE/Ogre.h>
+
+#include "rendering/ogre.h"
 
 #include "common/Global.hh"
 #include "common/Exception.hh"
@@ -132,8 +130,9 @@ Scene::~Scene()
 
   if (this->manager)
   {
-    this->manager->clearScene();
-    RenderEngine::Instance()->root->destroySceneManager(this->manager);
+    // TODO: this was causing a segfault. Need to debug, and put back in
+    //this->manager->clearScene();
+    //RenderEngine::Instance()->root->destroySceneManager(this->manager);
     this->manager = NULL;
   }
 }

@@ -22,9 +22,9 @@
 #ifndef MOVABLETEXT_HH
 #define MOVABLETEXT_HH
 
-#include <OGRE/Ogre.h>
-#include <OGRE/OgreMovableObject.h>
-#include <OGRE/OgreRenderable.h>
+// TODO: remove this line
+#include "rendering/ogre.h"
+
 #include <string>
 
 namespace boost

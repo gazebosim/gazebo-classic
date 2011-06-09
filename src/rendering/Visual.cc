@@ -19,7 +19,7 @@
  * Date: 14 Dec 2007
  */
 
-#include <Ogre.h>
+#include "rendering/ogre.h"
 
 #include "common/Messages.hh"
 #include "common/Events.hh"

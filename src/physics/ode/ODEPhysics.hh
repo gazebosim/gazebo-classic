@@ -22,7 +22,7 @@
 #ifndef ODEPHYSICS_HH
 #define ODEPHYSICS_HH
 
-#include <ode/ode.h>
+#include "physics/ode/ode_inc.h"
 
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>

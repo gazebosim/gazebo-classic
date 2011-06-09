@@ -17,9 +17,7 @@
 #ifndef CONVERSIONS_HH
 #define CONVERSIONS_HH
 
-#include <OGRE/OgreColourValue.h>
-#include <OGRE/OgreVector3.h>
-#include <OGRE/OgreQuaternion.h>
+#include "rendering/ogre.h"
 
 #include "common/Color.hh"
 #include "common/Vector3.hh"

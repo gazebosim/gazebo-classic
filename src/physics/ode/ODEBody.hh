@@ -21,7 +21,7 @@
 #ifndef ODEBODY_HH
 #define ODEBODY_HH
 
-#include <ode/ode.h>
+#include "physics/ode/ode_inc.h"
 
 #include "physics/ode/ODETypes.hh"
 #include "physics/Body.hh"

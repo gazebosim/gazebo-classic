@@ -92,7 +92,7 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
   this->acceptConn = ConnectionPtr(new Connection());
 
   this->acceptor->async_accept(this->acceptConn->socket,
-      boost::bind(&Connection::OnAccept, this, 
+      boost::bind(&Connection::OnAccept, shared_from_this(), 
                   boost::asio::placeholders::error));
 }
 
@@ -109,7 +109,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(this->acceptConn->socket, 
-        boost::bind(&Connection::OnAccept, this, 
+        boost::bind(&Connection::OnAccept, shared_from_this(), 
           boost::asio::placeholders::error));
   }
   else
@@ -126,7 +126,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
 /// new message to the ReadCallback
 void Connection::StartRead(const ReadCallback &cb)
 {
-  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, this, cb ) ); 
+  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, shared_from_this(), cb ) ); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ void Connection::ProcessWriteQueue()
       // "gather-write" to send both the head and the data in
       // a single write operation
       boost::asio::async_write( this->socket, buffer, 
-          boost::bind(&Connection::OnWrite, this, 
+          boost::bind(&Connection::OnWrite, shared_from_this(), 
             boost::asio::placeholders::error));
     }
   }
@@ -230,10 +230,16 @@ void Connection::OnWrite(const boost::system::error_code &e)
 void Connection::Close()
 {
   if (this->socket.is_open())
+  {
+    this->socket.cancel();
     this->socket.close();
+  }
 
   if (this->acceptor && this->acceptor->is_open())
+  {
+    this->acceptor->cancel();
     this->acceptor->close();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -23,7 +23,8 @@
 #ifndef HEIGHTMAP_HH
 #define HEIGHTMAP_HH
 
-#include <Ogre.h>
+// TODO: remove this line
+#include "rendering/ogre.h"
 
 #include "common/Vector3.hh"
 #include "common/Vector2d.hh"

@@ -17,14 +17,12 @@
 /* Desc: Heightmap geometry
  * Author: Nate Keonig
  * Date: 12 May 2009
- * SVN: $Id$
  */
 
-#include <Ogre.h>
-#include <iostream>
 #include <string.h>
 #include <math.h>
 
+#include "rendering/ogre.h"
 #include "common/Image.hh"
 #include "common/Exception.hh"
 

@@ -22,13 +22,11 @@
 #ifndef RTSHADERSYSTEM_HH
 #define RTSHADERSYSTEM_HH
 
-#include <Ogre.h>
+// TODO: remove this line
+#include "rendering/ogre.h"
+
 #include <list>
 #include "gazebo_config.h"
-
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-#include <RTShaderSystem/OgreRTShaderSystem.h>
-#endif
 
 #include "rendering/Camera.hh"
 #include "common/SingletonT.hh"

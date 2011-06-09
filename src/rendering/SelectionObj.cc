@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#include <Ogre.h>
 #include <boost/lexical_cast.hpp>
+
+#include "rendering/ogre.h"
 #include "rendering/Visual.hh"
 #include "rendering/Scene.hh"
 #include "common/MeshManager.hh"

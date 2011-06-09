@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <Ogre.h>
+#include "rendering/ogre.h"
 #include "rendering/Material.hh"
 
 using namespace gazebo;
@@ -23,7 +23,6 @@ using namespace rendering;
 ////////////////////////////////////////////////////////////////////////////////
 void Material::Update()
 {
-  /*
   Ogre::MaterialPtr matPtr;
 
   if (Ogre::MaterialManager::getSingleton().resourceExists(this->GetName()))
@@ -54,6 +53,4 @@ void Material::Update()
     Ogre::TextureUnitState *texState = pass->createTextureUnitState();
     texState->setTextureName( this->GetTextureImage() );
   }
-  */
 }
-

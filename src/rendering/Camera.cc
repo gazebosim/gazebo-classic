@@ -21,9 +21,9 @@
  */
 
 #include <sstream>
-#include <OgreImageCodec.h>
-#include <Ogre.h>
 #include <dirent.h>
+
+#include "rendering/ogre.h"
 
 #include "common/Events.hh"
 #include "common/Console.hh"

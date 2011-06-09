@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <Ogre.h>
+#include "rendering/ogre.h"
 #include <math.h>
 
 #include "common/Events.hh"

@@ -20,7 +20,6 @@
 
 #include <boost/bind.hpp>
 #include <sys/stat.h>
-#include <iostream>
 
 #include "rendering/Scene.hh"
 #include "rendering/Visual.hh"

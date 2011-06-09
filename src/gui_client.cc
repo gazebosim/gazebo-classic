@@ -63,8 +63,8 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int )
 {
+  std::cout << "Sig Handler\n";
   client->Quit();
-  return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,9 +85,11 @@ int main(int argc, char **argv)
   client = new gazebo::GuiClient();
   client->Load(config_file);
   client->Init();
+
+  // This is a blocking call
   client->Run();
 
-  client->Quit();
+  std::cout << "Her now\n";
   delete client;
   client = NULL;
 

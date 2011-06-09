@@ -21,7 +21,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
-#include <OGRE/OgreMesh.h>
+#include "rendering/ogre.h"
 
 #include "transport/TransportTypes.hh"
 #include "common/Events.hh"

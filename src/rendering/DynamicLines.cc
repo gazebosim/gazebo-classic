@@ -20,7 +20,7 @@
  * CVS: $Id$
  */
 
-#include <Ogre.h>
+#include "rendering/ogre.h"
 #include <cmath>
 #include <math.h>
 #include <sstream>

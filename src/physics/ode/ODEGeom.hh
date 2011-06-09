@@ -17,13 +17,12 @@
 /* Desc: Geom class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id: Geom.hh 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #ifndef ODEGEOM_HH
 #define ODEGEOM_HH
 
-#include <ode/ode.h>
+#include "physics/ode/ode_inc.h"
 
 #include "common/CommonTypes.hh"
 

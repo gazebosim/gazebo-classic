@@ -29,11 +29,7 @@
 #include <iostream>
 #include <string.h>
 
-#include <Ogre.h>
-#include <OgrePlugin.h>
-#include <OgreDataStream.h>
-#include <OgreLogManager.h>
-#include <OgreWindowEventUtilities.h>
+#include "rendering/ogre.h"
 
 #include "gazebo_config.h"
 
@@ -264,7 +260,8 @@ void RenderEngine::Fini()
 
   this->scenes.clear();
 
-  if (this->root)
+  // TODO: this was causing a segfault. Need to debug, and put back in
+ /*if (this->root)
   {
     const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
 
@@ -283,6 +280,7 @@ void RenderEngine::Fini()
     delete this->logManager;
   }
   this->logManager = NULL;
+  */
 
 
   if (this->dummyDisplay)

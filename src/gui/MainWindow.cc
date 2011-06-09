@@ -63,6 +63,7 @@ void MainWindow::Init()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+  gzdbg << "Close Event\n";
   delete this->glWidget;
   delete this->timePanel;
 }
