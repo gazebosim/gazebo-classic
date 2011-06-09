@@ -63,7 +63,7 @@ RenderEngine::RenderEngine()
   this->logManager = NULL;
   this->root = NULL;
 
-  this->dummyDisplay = false;
+  this->dummyDisplay = NULL;
 
   this->initialized = false;
 }
@@ -73,7 +73,6 @@ RenderEngine::RenderEngine()
 RenderEngine::~RenderEngine()
 {
   this->Fini();
-  delete this->logManager;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +112,7 @@ void RenderEngine::Load(common::XMLConfigNode * /*rootNode*/)
 
   // Setup the available resources
   this->SetupResources();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,6 +227,7 @@ void RenderEngine::Init()
 
     WindowManager::Instance()->CreateWindow( stream.str(), 1, 1 );
   }
+  
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
@@ -236,13 +237,10 @@ void RenderEngine::Init()
 
   Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
-  /*
-  if (this->HasGLSL())
-    RTShaderSystem::Instance()->Init();
-
-  if (this->HasGLSL())
-    RTShaderSystem::Instance()->UpdateShaders();
-    */
+  //if (this->HasGLSL())
+  //  RTShaderSystem::Instance()->Init();
+  //if (this->HasGLSL())
+  //  RTShaderSystem::Instance()->UpdateShaders();
 
   for (unsigned int i=0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();
@@ -255,22 +253,35 @@ void RenderEngine::Init()
 /// Finalize
 void RenderEngine::Fini()
 {
+  // TODO: this was causing a segfault on shutdown
   // Close all the windows first;
-  WindowManager::Instance()->Fini();
+  /*WindowManager::Instance()->Fini();
+
+  if (this->dummyDisplay)
+  {
+    glXDestroyContext((Display*)this->dummyDisplay, 
+                      (GLXContext)this->dummyContext);
+    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
+    XCloseDisplay((Display*)this->dummyDisplay);
+    this->dummyDisplay = NULL;
+  }
+  */
 
   this->scenes.clear();
 
   // TODO: this was causing a segfault. Need to debug, and put back in
- /*if (this->root)
+ if (this->root)
   {
-    const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
+    /*const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
 
     for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); iter != ll.end(); iter++)
     {
       this->root->unloadPlugin((*iter)->getName());
       this->root->uninstallPlugin(*iter);
     }
-    delete this->root;
+    */
+    // TODO: this was causing a segfault on shutdown
+    //delete this->root;
   }
   this->root = NULL;
 
@@ -280,17 +291,8 @@ void RenderEngine::Fini()
     delete this->logManager;
   }
   this->logManager = NULL;
-  */
 
-
-  if (this->dummyDisplay)
-  {
-    glXDestroyContext((Display*)this->dummyDisplay, 
-                      (GLXContext)this->dummyContext);
-    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
-    XCloseDisplay((Display*)this->dummyDisplay);
-  }
-  this->dummyDisplay = false;
+  this->dummyDisplay = NULL;
   this->initialized = false;
 }
  
@@ -329,7 +331,7 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
-    //plugins.push_back(path+"/Plugin_CgProgramManager.so");
+    plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {

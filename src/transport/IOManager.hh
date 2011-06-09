@@ -33,6 +33,8 @@ namespace gazebo
       public: void DecCount();
       public: unsigned int GetCount() const;
 
+      public: void Stop();
+
       private: IOManager();
       private: ~IOManager();
 

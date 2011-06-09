@@ -131,10 +131,18 @@ void ConnectionManager::RunLoop()
   {
     this->masterConn->ProcessWriteQueue();
 
-    for (iter = this->connections.begin(); 
-         iter != this->connections.end(); iter++)
+    iter = this->connections.begin();
+    while (iter != this->connections.end())
     {
-      (*iter)->ProcessWriteQueue();
+      if ((*iter)->IsOpen())
+      {
+        (*iter)->ProcessWriteQueue();
+        iter++;
+      }
+      else
+      {
+        this->connections.erase( iter++);
+      }
     }
     usleep(10000);
   }
@@ -276,8 +284,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
   msgs::Publishers pubs;
   request.set_request("get_publishers");
 
-  this->masterConn->StopRead();
-  this->masterConn->Cancel();
+  //this->masterConn->Shutdown();
 
   // Get the list of publishers
   this->masterConn->EnqueueMsg( common::Message::Package("request", request) );

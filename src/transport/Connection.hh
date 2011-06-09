@@ -28,6 +28,7 @@
 
 #include <google/protobuf/message.h>
 
+#include "common/Event.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
@@ -65,11 +66,17 @@ namespace gazebo
       /// \brief Stop the read loop 
       public: void StopRead();
 
+      /// \brief Shutdown the socket
+      public: void Shutdown();
+
+      /// \brief Return true if the connection is open
+      public: bool IsOpen() const;
+
       /// \brief Close a connection
-      public: void Close();
+      private: void Close();
 
       /// \brief Cancel all async operations on an open socket
-      public: void Cancel();
+      private: void Cancel();
 
       /// \brief Read data from the socket
       public: void Read(std::string &data);
@@ -169,6 +176,12 @@ namespace gazebo
                  }
                }
 
+     public: event::ConnectionPtr ConnectToShutdownSignal( boost::function<void()> subscriber_ ) 
+             { return this->shutdownSignal.Connect(subscriber_); }
+
+     public: void DisconnectShutdownSignal( event::ConnectionPtr subscriber_)
+             {this->shutdownSignal.Disconnect(subscriber_);}
+
 
      /// \brief Handle on write callbacks
      public: void ProcessWriteQueue();
@@ -211,6 +224,8 @@ namespace gazebo
       public: unsigned int id;
       private: static unsigned int idCounter;
       private: ConnectionPtr acceptConn;
+
+      private: event::EventT<void()> shutdownSignal;
     };
 
   }

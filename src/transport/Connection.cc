@@ -38,15 +38,14 @@ Connection::Connection()
   this->writeMutex = new boost::mutex();
   this->acceptor = NULL;
   this->readThread = NULL;
+  this->readQuit = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Connection::~Connection()
 {
-  this->StopRead();
-  this->Close();
-  this->Cancel();
+  this->Shutdown();
 
   delete this->writeMutex;
   IOManager::Instance()->DecCount();
@@ -214,7 +213,10 @@ std::string Connection::GetRemoteURI() const
 void Connection::OnWrite(const boost::system::error_code &e)
 {
   if (e)
-    throw boost::system::system_error(e);
+  {
+    // It will reach this point if the remote connection disconnects.
+    this->Shutdown();
+  }
   else
   {
     boost::mutex::scoped_lock( *this->writeMutex );
@@ -226,19 +228,59 @@ void Connection::OnWrite(const boost::system::error_code &e)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Shutdown the socket
+void Connection::Shutdown()
+{
+  this->shutdownSignal();
+  this->StopRead();
+
+  if (this->socket.is_open())
+  {
+    boost::system::error_code ec;
+    this->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+  }
+
+  //this->Cancel();
+  this->Close();
+  //this->acceptor = NULL;
+  //this->readThread = NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the connection is open
+bool Connection::IsOpen() const
+{
+  return this->socket.is_open();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Close a connection
 void Connection::Close()
 {
   if (this->socket.is_open())
   {
-    this->socket.cancel();
-    this->socket.close();
+    try
+    {
+      this->socket.close();
+    }
+    catch (boost::system::system_error &e)
+    {
+      gzwarn <<"Error closing socket[" << this->id << "]\n";// msg[" << e.what() << "]\n";
+    }
   }
 
   if (this->acceptor && this->acceptor->is_open())
   {
-    this->acceptor->cancel();
-    this->acceptor->close();
+    try
+    {
+      this->acceptor->close();
+    }
+    catch (boost::system::system_error &e)
+    {
+      gzwarn <<"Error closing acceptor[" << this->id << "]\n";// msg[" << e.what() << "]\n";
+    }
+
   }
 }
 
@@ -254,7 +296,7 @@ void Connection::Cancel()
     } 
     catch (boost::system::system_error &e)
     { 
-      gzwarn << "Connection::Cancel Error\n";
+      gzwarn << "Connection::Cancel Error[" << e.what() << "]\n";
       // Left empty on purpose 
     }
     delete this->acceptor;
@@ -370,6 +412,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
   timeStruct.tv_sec = 1;
   timeStruct.tv_usec = 0;
 
+  this->readQuit = false;
   while (!this->readQuit)
   {
     try

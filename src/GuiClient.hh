@@ -18,7 +18,6 @@
 #define GUICLIENT_HH
 
 #include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
 
 #include "common/Messages.hh"
 
@@ -35,8 +34,6 @@ namespace gazebo
     public: void Quit();
 
     private: bool quit;
-
-    private: boost::thread *transportThread;
   };
 }
 

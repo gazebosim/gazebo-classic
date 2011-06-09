@@ -99,27 +99,27 @@ namespace gazebo
       public: virtual std::string GetStepType() const {return "unknown";}
   
       /// \brief Set the step type
-      public: virtual void SetStepType(const std::string type) {}
+      public: virtual void SetStepType(const std::string &/*type*/) {}
   
       /// \brief Set whether to show contacts
       public: void ShowContacts(const bool &show);
   
       /// \brief access functions to set ODE parameters
-      public: virtual void SetWorldCFM(double cfm) {}
+      public: virtual void SetWorldCFM(double /*cfm_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetWorldERP(double erp) {}
+      public: virtual void SetWorldERP(double /*erp_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetAutoDisableFlag(bool auto_disable) {}
+      public: virtual void SetAutoDisableFlag(bool /*autoDisable_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetSORPGSIters(unsigned int iters) {}
+      public: virtual void SetSORPGSIters(unsigned int /*iters_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetSORPGSW(double w) {}
+      public: virtual void SetSORPGSW(double /*w_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetContactMaxCorrectingVel(double vel) {}
+      public: virtual void SetContactMaxCorrectingVel(double /*vel_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetContactSurfaceLayer(double layer_depth) {}
+      public: virtual void SetContactSurfaceLayer(double /*layerDepth_*/) {}
       /// \brief access functions to set ODE parameters
-      public: virtual void SetMaxContacts(double max_contacts) {}
+      public: virtual void SetMaxContacts(double /*maxContacts_*/) {}
   
       /// \brief access functions to set ODE parameters
       public: virtual double GetWorldCFM() {return 0;}
@@ -151,7 +151,8 @@ namespace gazebo
       public: void SetParam(const std::string &key, const std::string &value);
    
       /// \brief Add a contact visual
-      protected: void AddContactVisual(common::Vector3 pos, common::Vector3 norm);
+      protected: void AddContactVisual(const common::Vector3 &pos_, 
+                                       const common::Vector3 &norm_);
   
       protected: WorldPtr world;
   

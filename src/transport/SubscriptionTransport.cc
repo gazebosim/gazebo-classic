@@ -32,19 +32,36 @@ std::string SubscriptionTransport::GetMsgType() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg)
+bool SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg_)
 {
+  bool result = false;
   std::string data;
-  msg->SerializeToString(&data);
-  this->connection->EnqueueMsg( data );
+  msg_->SerializeToString(&data);
+
+  if (this->connection->IsOpen())
+  {
+    this->connection->EnqueueMsg( data );
+    result = true;
+  }
+
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Output a message to a connection
-void SubscriptionTransport::HandleData(const std::string &newdata)
+bool SubscriptionTransport::HandleData(const std::string &newdata)
 {
-  this->connection->EnqueueMsg( newdata );
+  bool result = false;
+  std::string data;
+  if (this->connection->IsOpen())
+  {
+    this->connection->EnqueueMsg( newdata );
+    result = true;
+  }
+
+  return result;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the connection

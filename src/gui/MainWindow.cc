@@ -7,6 +7,7 @@
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
 
+#include "gui/Gui.hh"
 #include "gui/ModelBuilderWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"

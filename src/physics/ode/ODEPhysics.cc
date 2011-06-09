@@ -144,6 +144,8 @@ ODEPhysics::~ODEPhysics()
 {
   dCloseODE();
 
+  this->contactFeedbacks.clear();
+
   if (this->spaceId)
     dSpaceDestroy(this->spaceId);
 

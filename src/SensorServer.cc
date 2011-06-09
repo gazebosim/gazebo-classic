@@ -107,7 +107,6 @@ void SensorServer::Run()
   {
     timer.Start();
     sensors::run_once(true);
-    std::cout << "Render Time[" << timer.GetElapsed() << "]\n";
   }
 }
 

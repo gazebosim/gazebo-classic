@@ -194,11 +194,12 @@ void XMLConfig::FillDocumentNodes()
   }
 
   // Create xpath evaluation context
-  xmlXPathContextPtr xpathContex = xmlXPathNewContext(this->xmlDoc);
+  /*xmlXPathContextPtr xpathContex = xmlXPathNewContext(this->xmlDoc);
   if (xpathContex == NULL)
   {
     gzthrow("Unable to create new XPath context");
   }
+  */
 
   // Create wrappers for all the nodes (recursive)
   this->root = this->CreateNodes( NULL, xmlDocGetRootElement(this->xmlDoc) );

@@ -50,14 +50,16 @@ void Publication::AddTransport( const PublicationTransportPtr &publink)
   this->transports.push_back( publink );
 }
 
-void Publication::RemoveTransport(const std::string &host, unsigned int port)
+////////////////////////////////////////////////////////////////////////////////
+// Remove a transport
+void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 {
   std::list<PublicationTransportPtr>::iterator iter;
   iter = this->transports.begin(); 
   while (iter != this->transports.end())
   {
-    if ((*iter)->GetConnection()->GetRemoteAddress() == host &&
-        (*iter)->GetConnection()->GetRemotePort() == port)
+    if ((*iter)->GetConnection()->GetRemoteAddress() == host_ &&
+        (*iter)->GetConnection()->GetRemotePort() == port_)
     {
       this->transports.erase( iter++ );
     }
@@ -118,9 +120,13 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 void Publication::Publish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
-  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
+  iter = this->callbacks.begin();
+  while (iter != this->callbacks.end())
   {
-    (*iter)->HandleData(data);
+    if ((*iter)->HandleData(data))
+      iter++;
+    else
+      this->callbacks.erase( iter++ );
   }
 }
 
@@ -136,9 +142,13 @@ void Publication::Publish(const google::protobuf::Message &msg,
 {
   std::list< CallbackHelperPtr >::iterator iter;
 
-  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
+  iter = this->callbacks.begin();
+  while (iter != this->callbacks.end())
   {
-    (*iter)->HandleMessage(&msg);
+    if ((*iter)->HandleMessage(&msg))
+      iter++;
+    else
+      this->callbacks.erase( iter++ );
   }
   if (cb)
     (cb)();

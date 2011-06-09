@@ -14,38 +14,49 @@ PublicationTransport::PublicationTransport(const std::string &topic,
 
 PublicationTransport::~PublicationTransport()
 {
-  if (this->conn)
+  if (this->connection)
   {
+    this->connection->DisconnectShutdownSignal(this->shutdownConnectionPtr);
+
     msgs::Subscribe sub;
     sub.set_topic(this->topic);
     sub.set_msg_type(this->msgType);
-    sub.set_host( this->conn->GetLocalAddress() );
-    sub.set_port( this->conn->GetLocalPort() );
+    sub.set_host( this->connection->GetLocalAddress() );
+    sub.set_port( this->connection->GetLocalPort() );
     ConnectionManager::Instance()->Unsubscribe( sub );
-    this->conn->StopRead();
+    this->connection->StopRead();
+    this->connection.reset();
 
-    ConnectionManager::Instance()->RemoveConnection( this->conn );
+    ConnectionManager::Instance()->RemoveConnection( this->connection );
   }
 }
 
-void PublicationTransport::Init(const ConnectionPtr &conn)
+void PublicationTransport::Init(const ConnectionPtr &conn_)
 {
-  this->conn = conn;
+  this->connection = conn_;
   msgs::Subscribe sub;
   sub.set_topic(this->topic);
   sub.set_msg_type(this->msgType);
-  sub.set_host( this->conn->GetLocalAddress() );
-  sub.set_port( this->conn->GetLocalPort() );
+  sub.set_host( this->connection->GetLocalAddress() );
+  sub.set_port( this->connection->GetLocalPort() );
 
-  this->conn->EnqueueMsg( common::Message::Package("sub",sub) );
+  this->connection->EnqueueMsg( common::Message::Package("sub",sub) );
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher
-  this->conn->StartRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
+  this->connection->StartRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
+
+  this->shutdownConnectionPtr = this->connection->ConnectToShutdownSignal(
+      boost::bind(&PublicationTransport::OnConnectionShutdown, this));
 }
 
-void PublicationTransport::AddCallback(const boost::function<void(const std::string &)> &cb)
+void PublicationTransport::OnConnectionShutdown()
 {
-  this->callback = cb;
+  gzdbg << "Publication transport connection shutdown\n";
+}
+
+void PublicationTransport::AddCallback(const boost::function<void(const std::string &)> &cb_)
+{
+  this->callback = cb_;
 }
 
 void PublicationTransport::OnPublish(const std::string &data)
@@ -58,5 +69,5 @@ void PublicationTransport::OnPublish(const std::string &data)
 
 const ConnectionPtr PublicationTransport::GetConnection() const
 {
-  return this->conn;
+  return this->connection;
 }

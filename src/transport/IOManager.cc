@@ -29,8 +29,13 @@ IOManager::IOManager()
 
 IOManager::~IOManager()
 {
-  this->thread.detach();
+  this->Stop();
+}
+
+void IOManager::Stop()
+{
   this->io_service.stop();
+  this->thread.join();
 }
 
 boost::asio::io_service &IOManager::GetIO()

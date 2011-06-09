@@ -22,8 +22,8 @@ namespace gazebo
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const = 0;
 
-      public: virtual void HandleMessage(const google::protobuf::Message *msg) = 0;
-      public: virtual void HandleData(const std::string &newdata) = 0;
+      public: virtual bool HandleMessage(const google::protobuf::Message *msg) = 0;
+      public: virtual bool HandleData(const std::string &newdata) = 0;
     };
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
 
@@ -51,7 +51,7 @@ namespace gazebo
                 return m->GetTypeName();
               }
 
-      public: virtual void HandleMessage(const google::protobuf::Message *msg)
+      public: virtual bool HandleMessage(const google::protobuf::Message *msg)
               {
                 /*boost::shared_ptr<M> m( new M );
                 m->ParseFromString( ((msgs::Packet*)msg)->serialized_data() );
@@ -60,9 +60,10 @@ namespace gazebo
                 m->CopyFrom(*msg);
 
                 this->callback( m );
+                return true;
               }
 
-      public: virtual void HandleData(const std::string &newdata)
+      public: virtual bool HandleData(const std::string &newdata)
               {
                 /*msgs::Packet packet;
                 packet.ParseFromString(newdata);
@@ -77,6 +78,7 @@ namespace gazebo
                 boost::shared_ptr<M> m( new M );
                 m->ParseFromString( newdata );
                 this->callback( m );
+                return true;
               }
 
       private: boost::function<void (const boost::shared_ptr<M const> &)> callback;
@@ -95,7 +97,7 @@ namespace gazebo
                 return m.GetTypeName();
               }
 
-      public: virtual void HandleData(const std::string &newdata)
+      public: virtual bool HandleData(const std::string &newdata)
               {
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);
@@ -106,6 +108,7 @@ namespace gazebo
                 boost::shared_ptr<msgs::String> m( new msgs::String );
                 m->ParseFromString( packet.serialized_data() );
                 this->callback( m );
+                return true;
               }
 
       private: boost::function<void (const boost::shared_ptr<msgs::String const> &)> callback;

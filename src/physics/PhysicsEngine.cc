@@ -162,7 +162,8 @@ void PhysicsEngine::SetStepTime(common::Time time)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a contact visual
-void PhysicsEngine::AddContactVisual(common::Vector3 pos, common::Vector3 norm)
+void PhysicsEngine::AddContactVisual(const common::Vector3 &/*pos_*/, 
+                                     const common::Vector3 &/*norm_*/)
 {
   // NATY: put back in
  /* if (!RenderState::GetShowContacts())

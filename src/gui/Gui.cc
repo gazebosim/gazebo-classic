@@ -107,9 +107,7 @@ void gui::init()
 
 void gui::run()
 {
-  gzdbg << "Gui::run\n";
   g_app->exec();
-  gzdbg << "Gui::run is done\n";
 }
 
 void gui::fini()

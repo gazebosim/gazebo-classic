@@ -24,10 +24,10 @@ namespace gazebo
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const;
 
-      public: virtual void HandleMessage(const google::protobuf::Message *msg);
+      public: virtual bool HandleMessage(const google::protobuf::Message *msg);
 
       /// \brief Output a message to a connection
-      public: virtual void HandleData(const std::string &newdata);
+      public: virtual bool HandleData(const std::string &newdata);
 
       /// \brief Get the connection
       public: const ConnectionPtr &GetConnection() const;

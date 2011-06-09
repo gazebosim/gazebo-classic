@@ -3,7 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include "transport/Connection.hh"
-//#include "transport/Publication.hh"
+#include "common/Event.hh"
 
 namespace gazebo
 {
@@ -21,12 +21,15 @@ namespace gazebo
 
       public: const ConnectionPtr GetConnection() const;
 
+      private: void OnConnectionShutdown();
+
       private: void OnPublish(const std::string &data);
 
       private: std::string topic;
       private: std::string msgType;
-      private: ConnectionPtr conn;
+      private: ConnectionPtr connection;
       private: boost::function<void (const std::string &)> callback;
+      private: event::ConnectionPtr shutdownConnectionPtr;
       //private: PublicationPtr pub;
     };
     typedef boost::shared_ptr<PublicationTransport> PublicationTransportPtr;

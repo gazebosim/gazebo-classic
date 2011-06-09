@@ -36,14 +36,12 @@ Master::~Master()
 
   for (std::deque<transport::ConnectionPtr>::iterator iter = this->connections.begin(); iter != this->connections.end(); iter++)
   {
-    (*iter)->StopRead();
-    (*iter)->Close();
-    (*iter)->Cancel();
-
+    (*iter)->Shutdown();
     (*iter).reset();
   }
 
   this->connections.clear();
+  this->connection->Shutdown();
   this->connection.reset();
 }
 
@@ -224,7 +222,10 @@ void Master::Run()
     for (iter = this->connections.begin(); 
          iter != this->connections.end(); iter++)
     {
-      (*iter)->ProcessWriteQueue();
+      if ((*iter)->IsOpen())
+        (*iter)->ProcessWriteQueue();
+      else
+        std::cout << "Master connection has closed\n";
     }
     usleep(100000);
   }

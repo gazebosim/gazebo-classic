@@ -19,6 +19,7 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
+#include "transport/IOManager.hh"
 #include "transport/Publisher.hh"
 #include "transport/Subscriber.hh"
 #include "transport/ConnectionManager.hh"
@@ -66,6 +67,7 @@ void transport::init(const std::string &master_host, unsigned short master_port)
 
 void transport::fini()
 {
+  IOManager::Instance()->Stop();
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
 }

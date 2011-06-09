@@ -35,6 +35,8 @@ TopicManager::~TopicManager()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Init the topic Manager
 void TopicManager::Init()
 {
   this->advertisedTopics.clear();

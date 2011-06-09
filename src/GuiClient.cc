@@ -58,13 +58,12 @@ void GuiClient::Init()
 
 void GuiClient::Run()
 {
-  this->transportThread = new boost::thread( &transport::run );
+  transport::run();
   gui::run();
 }
 
 void GuiClient::Quit()
 {
-  gui::fini();
   transport::fini();
+  gui::fini();
 }
-

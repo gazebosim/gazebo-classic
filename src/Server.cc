@@ -71,11 +71,12 @@ Server::~Server()
   delete this->masterThread;
 
   // TODO: probably should clean this up. Make sure this is needed.
-  while (transport::IOManager::Instance()->GetCount() > 0)
+  /*while (transport::IOManager::Instance()->GetCount() > 0)
   {
     usleep(100000);
     gzdbg << "Connectionmanager::Destructor IOCount[" << transport::IOManager::Instance()->GetCount() << "]\n";
   }
+  */
 }
 
 void Server::Load(const std::string &filename)
@@ -168,15 +169,7 @@ void Server::Run(bool blocking)
 
 void Server::Quit()
 {
-  physics::fini();
-  rendering::fini();
-
-  for (unsigned int i=0; i < this->worlds.size(); i++)
-    physics::stop_world(this->worlds[i]);
-
   this->quit = true;
-  this->master->Quit();
-  this->masterThread->join();
 
   if (this->runThread)
   {
@@ -184,8 +177,6 @@ void Server::Quit()
     delete this->runThread;
     this->runThread = NULL;
   }
-
-  transport::fini();
 }
 
 void Server::RunLoop()
@@ -197,6 +188,21 @@ void Server::RunLoop()
     sensors::run_once(true);
     usleep(10000);
   }
+
+  for (unsigned int i=0; i < this->worlds.size(); i++)
+    physics::stop_world(this->worlds[i]);
+
+  transport::fini();
+
+  this->master->Quit();
+  this->masterThread->join();
+  delete this->master;
+  this->master = NULL;
+
+  physics::fini();
+
+  rendering::fini();
+
 }
 
 void Server::SetParams( const common::StrStr_M &params )

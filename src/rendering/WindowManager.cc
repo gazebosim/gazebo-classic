@@ -50,12 +50,13 @@ WindowManager::~WindowManager()
 // Shutdown all the windows
 void WindowManager::Fini()
 {
-  for (std::vector<Ogre::RenderWindow*>::iterator iter = this->windows.begin();
+  // TODO: this was causing a segfault on shutdown
+  /*for (std::vector<Ogre::RenderWindow*>::iterator iter = this->windows.begin();
       iter != this->windows.end(); iter++)
   {
     (*iter)->removeAllViewports();
     (*iter)->destroy();
-  }
+  }*/
   this->windows.clear();
 }
 
@@ -79,6 +80,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   Ogre::RenderWindow *window = NULL;
 
   params["parentWindowHandle"] = ogreHandle;
+  params["externalGLControl"] = true;
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
@@ -88,7 +90,8 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   {
     try
     {
-      window = RenderEngine::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+      window = RenderEngine::Instance()->root->createRenderWindow( 
+          stream.str(), width, height, false, &params);
     }
     catch (...)
     {
@@ -102,11 +105,14 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
     gzthrow("Unable to create the rendering window\n");
   }
 
-  window->setActive(true);
-  //window->setVisible(true);
-  window->setAutoUpdated(true);
+  if (window)
+  {
+    window->setActive(true);
+    //window->setVisible(true);
+    window->setAutoUpdated(false);
 
-  this->windows.push_back(window);
+    this->windows.push_back(window);
+  }
 
   return this->windows.size()-1;
 }

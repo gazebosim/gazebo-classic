@@ -69,6 +69,7 @@ World::World(const std::string &name)
 {
   this->stepInc = false;
   this->pause = false;
+  this->thread = NULL;
 
   this->name = name;
 

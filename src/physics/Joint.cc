@@ -268,7 +268,7 @@ void Joint::Update()
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint to show visuals
-void Joint::ShowJoints(const bool &s)
+void Joint::ShowJoints(const bool & /*s_*/)
 {
   /*msgs::Visual msg;
   common::Message::Init(msg, this->visual);

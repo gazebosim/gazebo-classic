@@ -63,7 +63,6 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int )
 {
-  std::cout << "Sig Handler\n";
   client->Quit();
 }
 
@@ -89,7 +88,8 @@ int main(int argc, char **argv)
   // This is a blocking call
   client->Run();
 
-  std::cout << "Her now\n";
+  client->Quit();
+
   delete client;
   client = NULL;
 

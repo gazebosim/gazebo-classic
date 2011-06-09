@@ -1,3 +1,4 @@
+#include <boost/thread.hpp>
 #include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -102,6 +103,7 @@ rendering::ScenePtr rendering::create_scene(const std::string &name)
   {
     gzerr <<"Failed to create a scene in the Rendering engine" << e ;
   }
+  
 
   return scene;
 }
