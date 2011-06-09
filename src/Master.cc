@@ -193,8 +193,8 @@ void Master::OnRead(const unsigned int connectionIndex,
       {
         if ( piter->first.topic() == req.str_data())
         {
-          msgs::Publish *pub = ti.add_publisher();
-          pub->CopyFrom( piter->first );
+          msgs::Publish *pubPtr = ti.add_publisher();
+          pubPtr->CopyFrom( piter->first );
         }
       }
 

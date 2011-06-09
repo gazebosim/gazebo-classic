@@ -34,9 +34,9 @@ using namespace rendering;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-Heightmap::Heightmap(Scene *scene)
+Heightmap::Heightmap(Scene *scene_)
 {
-  this->scene = scene;
+  this->scene = scene_;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -62,25 +62,26 @@ float Heightmap::GetHeightAt(const common::Vector2d &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Overloaded Ogre function for Ray Scene Queries
-bool Heightmap::queryResult(Ogre::MovableObject *obj, Ogre::Real dist)
+bool Heightmap::queryResult(Ogre::MovableObject * /*obj_*/, Ogre::Real /*dist_*/)
 {
   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Overloaded Ogre function for Ray Scene Queries
-bool Heightmap::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist)
+bool Heightmap::queryResult(Ogre::SceneQuery::WorldFragment * /*frag_*/, 
+                            Ogre::Real dist_)
 {
-  this->distToTerrain = dist;
+  this->distToTerrain = dist_;
   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the heightmap
 void Heightmap::Load( std::string imageFilename, 
-                          std::string worldTexture, 
-                          std::string detailTexture,
-                          common::Vector3 _terrainSize)
+                      std::string worldTexture, 
+                      std::string detailTexture,
+                      common::Vector3 _terrainSize)
 {
   std::ostringstream stream;
   unsigned int terrainVertSize;

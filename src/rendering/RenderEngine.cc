@@ -78,7 +78,7 @@ RenderEngine::~RenderEngine()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
-void RenderEngine::Load(common::XMLConfigNode *rootNode)
+void RenderEngine::Load(common::XMLConfigNode * /*rootNode*/)
 {
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();

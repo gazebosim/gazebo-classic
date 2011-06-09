@@ -31,10 +31,8 @@
 namespace Ogre
 {
   class SceneManager;
-  
   class ManualObject;
   class SceneNode;
-  
   class Any;
 }
 
@@ -60,8 +58,8 @@ namespace gazebo
       /// \param r Red color component, in the range [0, 1]
       /// \param g Green color component, in the range [0, 1]
       /// \param b Blue color component, in the range [0, 1]
-      public: Grid( Scene *scene, uint32_t cell_count, float cell_length, 
-                    float line_width, const common::Color &color );
+      public: Grid( Scene *scene_, uint32_t cellCount_, float cellLength_, 
+                    float lineWidth_, const common::Color &color_ );
   
       /// \brief Destructor
       public: ~Grid();
@@ -74,21 +72,21 @@ namespace gazebo
       public: Ogre::SceneNode* GetSceneNode() { return this->sceneNode; }
       
       /// \brief Sets user data on all ogre objects we own
-      public: void SetUserData( const Ogre::Any& data );
+      public: void SetUserData( const Ogre::Any& data_ );
       
-      public: void SetColor(const common::Color& color);
+      public: void SetColor(const common::Color& color_);
       public: common::Color GetColor() { return **this->colorP; }
   
-      public: void SetCellCount(uint32_t count);
+      public: void SetCellCount(uint32_t count_);
       public: float GetCellCount() { return **this->cellCountP; }
   
-      public: void SetCellLength(float len);
+      public: void SetCellLength(float len_);
       public: float GetCellLength() { return **this->cellLengthP; }
   
-      public: void SetLineWidth(float width);
+      public: void SetLineWidth(float width_);
       public: float GetLineWidth() { return **this->lineWidthP; }
   
-      public: void SetHeight(uint32_t count);
+      public: void SetHeight(uint32_t count_);
       public: uint32_t GetHeight() { return this->height; }
       
       private: void Create();

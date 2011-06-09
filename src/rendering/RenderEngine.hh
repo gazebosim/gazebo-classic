@@ -129,9 +129,6 @@ namespace gazebo
       /// All of the scenes
       private: std::vector< ScenePtr > scenes;
     
-      /// Pointer to the rendering system
-      public: Ogre::RenderSystem *renderSys;
-   
       private: Ogre::LogManager *logManager;
    
       /// ID for a dummy window. Used for gui-less operation

@@ -47,8 +47,8 @@ int UserCamera::count = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-UserCamera::UserCamera(const std::string &name, Scene *scene)
-  : Camera(name, scene)
+UserCamera::UserCamera(const std::string &name_, Scene *scene_)
+  : Camera(name_, scene_)
 {
   std::stringstream stream;
 
@@ -250,7 +250,7 @@ void UserCamera::Resize(unsigned int w, unsigned int h)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the dimensions of the viewport
-void UserCamera::SetViewportDimensions(float x, float y, float w, float h)
+void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/, float /*w_*/, float /*h_*/)
 {
   //this->viewport->setDimensions(x, y, w, h);
 }
@@ -285,9 +285,9 @@ void UserCamera::ShowVisual(bool s)
 
 //////////////////////////////////////////////////////////////////////////////
 // Move the camera to focus on an scene node
-void UserCamera::MoveToVisual( Visual *visual)
+void UserCamera::MoveToVisual( Visual *visual_)
 {
-  if (!visual)
+  if (!visual_)
     return;
 
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
@@ -304,7 +304,7 @@ void UserCamera::MoveToVisual( Visual *visual)
 
   common::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  common::Vector3 end = visual->GetWorldPose().pos;
+  common::Vector3 end = visual_->GetWorldPose().pos;
   end.Correct();
   common::Vector3 dir = end - start;
   dir.Correct();
@@ -323,7 +323,7 @@ void UserCamera::MoveToVisual( Visual *visual)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  common::Vector3 size = visual->GetBoundingBoxSize();
+  common::Vector3 size = visual_->GetBoundingBoxSize();
 
   double scale = std::max(std::max(size.x, size.y), size.z);
   scale += 0.5;
@@ -354,7 +354,7 @@ void UserCamera::MoveToVisual( Visual *visual)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the camera to track a scene node
-void UserCamera::TrackVisual( Visual *visual )
+void UserCamera::TrackVisual( Visual * /*visual_*/ )
 {
   /* NATY: Put back in
   this->sceneNode->getParent()->removeChild(this->sceneNode);

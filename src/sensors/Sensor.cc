@@ -81,7 +81,7 @@ void Sensor::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the sensor
-void Sensor::Update(bool force)
+void Sensor::Update(bool /*force_*/)
 {
   //DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
@@ -114,7 +114,7 @@ std::string Sensor::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a controller helper function
-void Sensor::LoadController(common::XMLConfigNode *node)
+void Sensor::LoadController(common::XMLConfigNode * /*node_*/)
 {
   /*
   if (!node)

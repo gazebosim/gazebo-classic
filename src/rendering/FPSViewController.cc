@@ -26,8 +26,8 @@ using namespace rendering;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-FPSViewController::FPSViewController(UserCamera *camera)
-  : ViewController(camera)
+FPSViewController::FPSViewController(UserCamera *camera_)
+  : ViewController(camera_)
 {
 }
 

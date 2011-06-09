@@ -48,15 +48,14 @@ unsigned int Visual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Visual::Visual(const std::string &name, Visual *parent)
+Visual::Visual(const std::string &name_, Visual *parent_)
 {
-  gzdbg << "New Visual[" << name << "]\n";
-  this->SetName(name);
+  this->SetName(name_);
   this->sceneNode = NULL;
 
   Ogre::SceneNode *pnode = NULL;
-  if (parent)
-    pnode = parent->GetSceneNode();
+  if (parent_)
+    pnode = parent_->GetSceneNode();
   else
     gzerr << "Create a visual, invalid parent!!!\n";
 
@@ -67,24 +66,24 @@ Visual::Visual(const std::string &name, Visual *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Visual::Visual (const std::string &name, Ogre::SceneNode *parent)
+Visual::Visual (const std::string &name_, Ogre::SceneNode *parent_)
 {
-  this->SetName(name);
+  this->SetName(name_);
   this->sceneNode = NULL;
 
-  this->sceneNode = parent->createChildSceneNode( this->GetName() );
+  this->sceneNode = parent_->createChildSceneNode( this->GetName() );
 
   this->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Visual::Visual (const std::string &name, Scene *scene)
+Visual::Visual (const std::string &name_, Scene *scene_)
 {
-  this->SetName(name);
+  this->SetName(name_);
   this->sceneNode = NULL;
 
-  this->sceneNode = scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
+  this->sceneNode = scene_->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
 
   this->Init();
 }
@@ -241,7 +240,7 @@ void Visual::Load(common::XMLConfigNode *node)
           boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
           boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
 
-        if (!common::MeshManager::Instance()->HasMesh(meshName));
+        if (!common::MeshManager::Instance()->HasMesh(meshName))
         {
           common::MeshManager::Instance()->CreateBox(meshName, common::Vector3(1,1,1), **this->meshTileP);
         }
@@ -310,9 +309,9 @@ void Visual::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of the visual
-void Visual::SetName( const std::string &name )
+void Visual::SetName( const std::string &name_ )
 {
-  this->name = name;
+  this->name = name_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -626,7 +625,7 @@ float Visual::GetTransparency()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Visual::SetHighlight(bool highlight)
+void Visual::SetHighlight(bool /*highlight*/)
 {
 }
 
@@ -647,10 +646,10 @@ void Visual::SetCastShadows(const bool &shadows)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual is visible
-void Visual::SetVisible(bool visible, bool cascade)
+void Visual::SetVisible(bool visible_, bool cascade_)
 {
-  this->sceneNode->setVisible( visible, cascade );
-  this->visible = visible;
+  this->sceneNode->setVisible( visible_, cascade_ );
+  this->visible = visible_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

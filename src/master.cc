@@ -20,7 +20,7 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
-int main(int argc, char **argv)
+int main(int /*argc*/, char ** /*argv*/)
 {
   PrintVersion();
 

@@ -159,9 +159,9 @@ namespace gazebo
                             const common::Vector3 &end, 
                             const std::string &name);
   
-      public: void SetFog( std::string type, const common::Color &color, 
-                           double density, 
-                           double start, double end );
+      public: void SetFog( const std::string &type_, 
+                           const common::Color &color_, 
+                           double density_, double start_, double end_ );
   
       // Get the scene ID
       public: unsigned int GetId() const;
@@ -170,7 +170,7 @@ namespace gazebo
       public: std::string GetIdString() const;
   
       /// \brief Print scene graph
-      private: void PrintSceneGraphHelper(std::string prefix, 
+      private: void PrintSceneGraphHelper(const std::string &prefix, 
                                           Ogre::Node *node);
   
       public: void InitShadows();

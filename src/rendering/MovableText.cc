@@ -187,26 +187,26 @@ void MovableText::SetColor(const Ogre::ColourValue &newColor)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the character height
-void MovableText::SetCharHeight(float height)
+void MovableText::SetCharHeight(float height_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (this->charHeight != height)
+  if (this->charHeight != height_)
   {
-    this->charHeight = height;
+    this->charHeight = height_;
     this->needUpdate = true;
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the width of the space between characters
-void MovableText::SetSpaceWidth(float width)
+void MovableText::SetSpaceWidth(float width_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (this->spaceWidth != width)
+  if (this->spaceWidth != width_)
   {
-    this->spaceWidth = width;
+    this->spaceWidth = width_;
     this->needUpdate = true;
   }
 }
@@ -231,12 +231,12 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set additional height
-void MovableText::SetBaseline( float base )
+void MovableText::SetBaseline( float base_ )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if ( this->baseline != base )
+  if ( this->baseline != base_ )
   {
-    this->baseline = base;
+    this->baseline = base_;
     this->needUpdate = true;
   }
 }
@@ -608,7 +608,7 @@ void MovableText::_updateColors(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  Ogre::RGBA color;
+  Ogre::RGBA clr;
   Ogre::HardwareVertexBufferSharedPtr vbuf;
   Ogre::RGBA *pDest=NULL;
   unsigned int i;
@@ -617,7 +617,7 @@ void MovableText::_updateColors(void)
   assert(!this->material.isNull());
 
   // Convert to system-specific
-  Ogre::Root::getSingleton().convertColourValue(this->color, & color);
+  Ogre::Root::getSingleton().convertColourValue(this->color, & clr);
 
   vbuf = this->renderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);
 
@@ -625,7 +625,7 @@ void MovableText::_updateColors(void)
 
   for (i = 0; i < this->renderOp.vertexData->vertexCount; ++i)
   {
-    *pDest++ = color;
+    *pDest++ = clr;
   }
 
   vbuf->unlock();
@@ -698,7 +698,7 @@ float MovableText::getBoundingRadius() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-float MovableText::getSquaredViewDepth(const Ogre::Camera *cam) const
+float MovableText::getSquaredViewDepth(const Ogre::Camera * /*cam_*/) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return 0;

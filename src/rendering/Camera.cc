@@ -45,10 +45,10 @@ unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-Camera::Camera(const std::string &namePrefix, Scene *scene)
+Camera::Camera(const std::string &namePrefix_, Scene *scene_)
 {
   this->windowId = 0;
-  this->scene = scene;
+  this->scene = scene_;
 
   this->textureWidth = this->textureHeight = 0;
 
@@ -59,7 +59,7 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   this->myCount = cameraCounter++;
 
   std::ostringstream stream;
-  stream << namePrefix << "(" << this->myCount << ")";
+  stream << namePrefix_ << "(" << this->myCount << ")";
   this->name = stream.str();
 
   this->renderTarget = NULL;
@@ -241,9 +241,9 @@ void Camera::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the ID of the window this camera is rendering into.
-void Camera::SetWindowId( unsigned int windowId )
+void Camera::SetWindowId( unsigned int windowId_ )
 {
-  this->windowId = windowId;
+  this->windowId = windowId_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,9 +255,9 @@ unsigned int Camera::GetWindowId() const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the scene this camera is viewing
-void Camera::SetScene( Scene *scene )
+void Camera::SetScene( Scene *scene_ )
 {
-  this->scene = scene;
+  this->scene = scene_;
 }
 
 
@@ -372,9 +372,9 @@ common::Vector3 Camera::GetWorldPosition() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the global pose of the camera
-void Camera::SetWorldPose(const common::Pose3d &pose)
+void Camera::SetWorldPose(const common::Pose3d &pose_)
 {
-  this->pose = pose;
+  this->pose = pose_;
   this->pose.Correct();
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
   this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);

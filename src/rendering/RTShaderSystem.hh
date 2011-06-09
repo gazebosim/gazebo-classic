@@ -45,7 +45,7 @@ namespace gazebo
               SSLM_PerVertexLighting,
               SSLM_PerPixelLighting,
               SSLM_NormalMapLightingTangentSpace,
-              SSLM_NormalMapLightingObjectSpace,
+              SSLM_NormalMapLightingObjectSpace
             };
 
     /// \brief Constructor

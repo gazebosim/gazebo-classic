@@ -43,9 +43,9 @@ unsigned int Light::lightCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Light::Light(Scene *scene)
+Light::Light(Scene *scene_)
 {
-  this->scene = scene;
+  this->scene = scene_;
 
   std::ostringstream stream;
   stream << "LIGHT" << this->lightCounter << "_VISUAL";
@@ -319,7 +319,7 @@ void Light::CreateVisual()
     this->line->AddPoint(common::Vector3(0,0,0));
     this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
  
-    for (unsigned int i=0; i < 2; i++)
+    for (i=0; i < 2; i++)
     {
       this->line->AddPoint(common::Vector3(0,0,0));
       this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
@@ -484,7 +484,7 @@ void Light::SetRange(const double &range)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set cast shadows
-void Light::SetCastShadows(const bool &cast)
+void Light::SetCastShadows(const bool & /*cast_*/)
 {
   this->light->setCastShadows(true);
   /*if (this->light->getType() == Ogre::Light::LT_POINT)
@@ -515,10 +515,10 @@ void Light::SetSpotInnerAngle(const double &angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the spot light outter angle
-void Light::SetSpotOuterAngle(const double &angle)
+void Light::SetSpotOuterAngle(const double &angle_)
 {
-  if (**this->spotOuterAngleP != angle)
-    this->spotOuterAngleP->SetValue( angle );
+  if (**this->spotOuterAngleP != angle_)
+    this->spotOuterAngleP->SetValue( angle_ );
 
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
     this->light->setSpotlightRange(
@@ -529,17 +529,16 @@ void Light::SetSpotOuterAngle(const double &angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the spot light falloff
-void Light::SetSpotFalloff(const double &angle)
+void Light::SetSpotFalloff(const double &angle_)
 {
-  if (**this->spotFalloffP != angle)
-    this->spotFalloffP->SetValue( angle );
+  if (**this->spotFalloffP != angle_)
+    this->spotFalloffP->SetValue( angle_ );
 
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
     this->light->setSpotlightRange(
         Ogre::Degree(**this->spotInnerAngleP), 
         Ogre::Degree(**this->spotOuterAngleP), 
         **this->spotFalloffP);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

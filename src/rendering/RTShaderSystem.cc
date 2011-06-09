@@ -103,7 +103,7 @@ void RTShaderSystem::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a scene manager
-void RTShaderSystem::AddScene(Scene *scene)
+void RTShaderSystem::AddScene(Scene * /*scene_*/)
 {
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   // Set the scene manager

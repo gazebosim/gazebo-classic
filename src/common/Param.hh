@@ -68,7 +68,7 @@ namespace gazebo
               {return std::string();}
 
       /// \brief Set the parameter value from a string
-      public: virtual void SetFromString(const std::string &, bool callback=false) {}
+      public: virtual void SetFromString(const std::string &, bool /*callback_*/=false) {}
   
       /// \brief Set the help string
       public: void SetHelp(const std::string &h) {this->help = h;}
@@ -152,12 +152,12 @@ namespace gazebo
     //////////////////////////////////////////////////////////////////////////////
     // Constructor
     template< typename T>
-    ParamT<T>::ParamT(std::string key, T defValue, int required)
+    ParamT<T>::ParamT(std::string key_, T defValue_, int required_)
       : Param(this)
     {
-      this->key = key;
-      this->defaultValue = defValue;
-      this->required = required;
+      this->key = key_;
+      this->defaultValue = defValue_;
+      this->required = required_;
       this->value = this->defaultValue;
   
       this->typeName = typeid(T).name();

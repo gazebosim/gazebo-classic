@@ -29,9 +29,9 @@ using namespace rendering;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Grid::Grid( Scene *scene,  unsigned int cell_count, float cell_length, 
-            float line_width, const common::Color& color )
-: scene( scene )
+Grid::Grid( Scene *scene_,  unsigned int cellCount_, float cellLength_, 
+            float lineWidth_, const common::Color& color_ )
+: scene( scene_ )
 {
   this->height = 0;
 
@@ -43,10 +43,10 @@ Grid::Grid( Scene *scene,  unsigned int cell_count, float cell_length,
   this->h_offsetP = new common::ParamT<float>("height_offset",0,0);
   common::Param::End();
 
-  this->cellCountP->SetValue(cell_count);
-  this->cellLengthP->SetValue(cell_length);
-  this->lineWidthP->SetValue(line_width);
-  this->colorP->SetValue(color);
+  this->cellCountP->SetValue(cellCount_);
+  this->cellLengthP->SetValue(cellLength_);
+  this->lineWidthP->SetValue(lineWidth_);
+  this->colorP->SetValue(color_);
   this->h_offsetP->SetValue(0.005);
 
   static uint32_t gridCount = 0;
@@ -67,36 +67,36 @@ Grid::~Grid()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetCellCount(uint32_t count)
+void Grid::SetCellCount(uint32_t count_)
 {
-  this->cellCountP->SetValue(count);
+  this->cellCountP->SetValue(count_);
 
   this->Create();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetCellLength(float len)
+void Grid::SetCellLength(float len_)
 {
-  this->cellLengthP->SetValue(len);
+  this->cellLengthP->SetValue(len_);
 
   this->Create();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetLineWidth(float width)
+void Grid::SetLineWidth(float width_)
 {
-  this->lineWidthP->SetValue( width );
+  this->lineWidthP->SetValue( width_ );
 
   this->Create();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetColor(const common::Color& color)
+void Grid::SetColor(const common::Color& color_)
 {
-  this->colorP->SetValue( color );
+  this->colorP->SetValue( color_ );
 
-  this->material->setDiffuse( color.R(), color.G(), color.B(), color.A() );
-  this->material->setAmbient( color.R(), color.G(), color.B() );
+  this->material->setDiffuse( color_.R(), color_.G(), color_.B(), color_.A() );
+  this->material->setAmbient( color_.R(), color_.G(), color_.B() );
 
   if ( (**this->colorP).A() < 0.9998 )
   {
@@ -114,9 +114,9 @@ void Grid::SetColor(const common::Color& color)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetHeight(uint32_t height)
+void Grid::SetHeight(uint32_t height_)
 {
-  this->height = height;
+  this->height = height_;
 
   this->Create();
 }
@@ -202,7 +202,7 @@ void Grid::Create()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetUserData( const Ogre::Any& data )
+void Grid::SetUserData( const Ogre::Any& data_ )
 {
-  this->manualObject->setUserAny( data );
+  this->manualObject->setUserAny( data_ );
 }

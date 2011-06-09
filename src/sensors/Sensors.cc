@@ -28,7 +28,7 @@ using namespace gazebo;
 
 bool g_sensors_done = false;
 
-bool sensors::init(const std::string &world_name)
+bool sensors::init(const std::string & /*worldName_*/)
 {
   // Register all the sensor types
   sensors::SensorFactory::RegisterAll();
@@ -60,7 +60,7 @@ void sensors::run()
   }
 }
 
-void sensors::run_once(bool force)
+void sensors::run_once(bool /*force_*/)
 {
   sensors::SensorManager::Instance()->Update(true);
 }

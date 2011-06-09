@@ -45,14 +45,14 @@ unsigned int Scene::idCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Scene::Scene(const std::string &name)
+Scene::Scene(const std::string &name_)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(name);
+  this->node->Init(name_);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
-  this->name = name;
+  this->name = name_;
   this->manager = NULL;
   this->raySceneQuery = NULL;
   this->type = GENERIC;
@@ -139,28 +139,28 @@ Scene::~Scene()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Scene::Load(common::XMLConfigNode *node)
+void Scene::Load(common::XMLConfigNode *node_)
 {
   common::XMLConfigNode *cnode = NULL;
 
-  if (node)
-    cnode = node->GetChild("shadows");
+  if (node_)
+    cnode = node_->GetChild("shadows");
   this->shadowEnabledP->Load(cnode);
   this->shadowTypeP->Load(cnode);
   this->shadowColorP->Load(cnode);
 
-  this->ambientP->Load(node);
-  this->backgroundColorP->Load(node);
-  this->skyMaterialP->Load(node ? node->GetChild("sky") : NULL);
-  this->fogColorP->Load(node ? node->GetChild("fog") : NULL);
-  this->fogDensityP->Load(node ? node->GetChild("fog") : NULL);
-  this->fogTypeP->Load(node ? node->GetChild("fog") : NULL);
-  this->fogDensityP->Load(node ? node->GetChild("fog") : NULL);
-  this->fogStartP->Load(node ? node->GetChild("fog") : NULL);
-  this->fogEndP->Load(node ? node->GetChild("fog") : NULL);
+  this->ambientP->Load(node_);
+  this->backgroundColorP->Load(node_);
+  this->skyMaterialP->Load(node_ ? node_->GetChild("sky") : NULL);
+  this->fogColorP->Load(node_ ? node_->GetChild("fog") : NULL);
+  this->fogDensityP->Load(node_ ? node_->GetChild("fog") : NULL);
+  this->fogTypeP->Load(node_ ? node_->GetChild("fog") : NULL);
+  this->fogDensityP->Load(node_ ? node_->GetChild("fog") : NULL);
+  this->fogStartP->Load(node_ ? node_->GetChild("fog") : NULL);
+  this->fogEndP->Load(node_ ? node_->GetChild("fog") : NULL);
 
   // Get the SceneManager, in this case a generic one
-  if (node && node->GetChild("bsp"))
+  if (node_ && node_->GetChild("bsp"))
     this->type = BSP;
   else
     this->type = GENERIC;
@@ -320,9 +320,9 @@ common::Color Scene::GetBackgroundColor() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the scene type
-void Scene::SetType(Scene::SceneType type)
+void Scene::SetType(Scene::SceneType type_)
 {
-  this->type = type;
+  this->type = type_;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,9 +361,9 @@ Grid *Scene::GetGrid(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 //Create a camera
-CameraPtr Scene::CreateCamera(const std::string &name)
+CameraPtr Scene::CreateCamera(const std::string &name_)
 {
-  CameraPtr camera( new Camera(this->name + "::" + name, this) );
+  CameraPtr camera( new Camera(this->name + "::" + name_, this) );
   this->cameras.push_back(camera);
 
   return camera;
@@ -391,9 +391,9 @@ CameraPtr Scene::GetCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a user camera
-UserCameraPtr Scene::CreateUserCamera(const std::string &name)
+UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
-  UserCameraPtr camera( new UserCamera(this->name + "::" + name, this) );
+  UserCameraPtr camera( new UserCamera(this->name + "::" + name_, this) );
   camera->Load(NULL);
   camera->Init();
   this->userCameras.push_back(camera);
@@ -566,11 +566,11 @@ void Scene::PrintSceneGraph()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Print scene graph
-void Scene::PrintSceneGraphHelper(std::string prefix, Ogre::Node *node)
+void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 {
-  Ogre::SceneNode *snode = dynamic_cast<Ogre::SceneNode*>(node);
+  Ogre::SceneNode *snode = dynamic_cast<Ogre::SceneNode*>(node_);
 
-  std::string nodeName = node->getName();
+  std::string nodeName = node_->getName();
   int numAttachedObjs = 0;
   bool isInSceneGraph = false;
   if (snode)
@@ -578,93 +578,91 @@ void Scene::PrintSceneGraphHelper(std::string prefix, Ogre::Node *node)
     numAttachedObjs = snode->numAttachedObjects();
     isInSceneGraph = snode->isInSceneGraph();
   }
-  int numChildren = node->numChildren();
-  Ogre::Vector3 pos = node->getPosition();
-  Ogre::Vector3 scale = node->getScale();
+  int numChildren = node_->numChildren();
+  Ogre::Vector3 pos = node_->getPosition();
+  Ogre::Vector3 scale = node_->getScale();
 
-  std::cout << prefix << nodeName << "\n";
-  std::cout << prefix << "  Num Objs[" << numAttachedObjs << "]\n";
-  std::cout << prefix << "  Num Children[" << numChildren << "]\n";
-  std::cout << prefix << "  IsInGraph[" << isInSceneGraph << "]\n";
-  std::cout << prefix << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
-  std::cout << prefix << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
+  std::cout << prefix_ << nodeName << "\n";
+  std::cout << prefix_ << "  Num Objs[" << numAttachedObjs << "]\n";
+  std::cout << prefix_ << "  Num Children[" << numChildren << "]\n";
+  std::cout << prefix_ << "  IsInGraph[" << isInSceneGraph << "]\n";
+  std::cout << prefix_ << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
+  std::cout << prefix_ << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
   
-  prefix += "  ";
-  for (unsigned int i=0; i < node->numChildren(); i++)
+  for (unsigned int i=0; i < node_->numChildren(); i++)
   {
-    this->PrintSceneGraphHelper( prefix, node->getChild(i) );
+    this->PrintSceneGraphHelper( prefix_ + "  ", node_->getChild(i) );
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Draw a named line
-void Scene::DrawLine(const common::Vector3 &start, const common::Vector3 &end, 
-                     const std::string &name)
+void Scene::DrawLine(const common::Vector3 &start_, 
+                     const common::Vector3 &end_, 
+                     const std::string &name_)
 {
-  Ogre::SceneNode *node = NULL;
+  Ogre::SceneNode *sceneNode = NULL;
   Ogre::ManualObject *obj = NULL;
   bool attached = false;
 
-  if ( this->manager->hasManualObject(name))
+  if ( this->manager->hasManualObject(name_))
   {
-    node = this->manager->getSceneNode(name);
-    obj = this->manager->getManualObject(name);
+    sceneNode = this->manager->getSceneNode(name_);
+    obj = this->manager->getManualObject(name_);
     attached = true;
   }
   else
   {
-    node = this->manager->getRootSceneNode()->createChildSceneNode(name);
-    obj = this->manager->createManualObject(name); 
+    sceneNode = this->manager->getRootSceneNode()->createChildSceneNode(name_);
+    obj = this->manager->createManualObject(name_); 
   }
 
-  node->setVisible(true);
+  sceneNode->setVisible(true);
   obj->setVisible(true);
 
   obj->clear();
   obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST); 
-  obj->position(start.x, start.y, start.z); 
-  obj->position(end.x, end.y, end.z); 
+  obj->position(start_.x, start_.y, start_.z); 
+  obj->position(end_.x, end_.y, end_.z); 
   obj->end(); 
 
   if (!attached)
-    node->attachObject(obj);
+    sceneNode->attachObject(obj);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set fog for this scene
-void Scene::SetFog( std::string type, const common::Color &color, double density, 
-                    double start, double end )
+void Scene::SetFog( const std::string &type_, const common::Color &color_, 
+                    double density_, double start_, double end_ )
 {
   Ogre::FogMode fogType = Ogre::FOG_NONE;
 
-  if (type == "linear")
+  if (type_ == "linear")
     fogType = Ogre::FOG_LINEAR;
-  else if (type == "exp")
+  else if (type_ == "exp")
     fogType = Ogre::FOG_EXP;
-  else if (type == "exp2")
+  else if (type_ == "exp2")
     fogType = Ogre::FOG_EXP2;
-  else
-    type = "none";
 
-  this->fogTypeP->SetValue(type);
-  this->fogColorP->SetValue(color);
-  this->fogDensityP->SetValue(density);
-  this->fogStartP->SetValue(start);
-  this->fogEndP->SetValue(end);
+  this->fogTypeP->SetValue(type_);
+  this->fogColorP->SetValue(color_);
+  this->fogDensityP->SetValue(density_);
+  this->fogStartP->SetValue(start_);
+  this->fogEndP->SetValue(end_);
 
   if (this->manager)
-    this->manager->setFog( fogType, Conversions::Color(color), density, start, end );
+    this->manager->setFog( fogType, Conversions::Color(color_), density_, start_, end_ );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Hide a visual
-void Scene::SetVisible(const std::string &name, bool visible)
+void Scene::SetVisible(const std::string &name_, bool visible_)
 {
-  if (this->manager->hasSceneNode(name))
-    this->manager->getSceneNode(name)->setVisible(visible);
+  if (this->manager->hasSceneNode(name_))
+    this->manager->getSceneNode(name_)->setVisible(visible_);
 
-  if ( this->manager->hasManualObject(name))
-    this->manager->getManualObject(name)->setVisible(visible);
+  if ( this->manager->hasManualObject(name_))
+    this->manager->getManualObject(name_)->setVisible(visible_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -965,13 +963,13 @@ void Scene::PreRender()
 }
 
 
-void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
+void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg_)
 {
 
   Visual_M::iterator iter;
-  iter = this->visuals.find(msg->header().str_id());
+  iter = this->visuals.find(msg_->header().str_id());
 
-  if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
+  if (msg_->has_action() && msg_->action() == msgs::Visual::DELETE)
   {
     if (iter != this->visuals.end() )
     {
@@ -982,26 +980,25 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   }
   else if (iter != this->visuals.end())
   {
-    iter->second->UpdateFromMsg(msg);
+    iter->second->UpdateFromMsg(msg_);
   }
   else
   {
     Visual *visual = NULL;
-    Visual_M::iterator iter;
-    iter = this->visuals.find(msg->parent_id());
+    iter = this->visuals.find(msg_->parent_id());
 
     if (iter != this->visuals.end())
-      visual = new Visual(msg->header().str_id(), iter->second);
+      visual = new Visual(msg_->header().str_id(), iter->second);
     else 
-      visual = new Visual(msg->header().str_id(), this);
+      visual = new Visual(msg_->header().str_id(), this);
 
-    visual->LoadFromMsg(msg);
-    this->visuals[msg->header().str_id()] = visual;
+    visual->LoadFromMsg(msg_);
+    this->visuals[msg_->header().str_id()] = visual;
   }
 
 }
 
-void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)
+void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg_)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
@@ -1009,39 +1006,39 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)
   // Find an old pose message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
   {
-    if ( (*iter)->header().str_id() == msg->header().str_id() )
+    if ( (*iter)->header().str_id() == msg_->header().str_id() )
     {
       this->poseMsgs.erase(iter);
       break;
     }
   }
 
-  this->poseMsgs.push_back( msg );
+  this->poseMsgs.push_back( msg_ );
 }
 
-void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
+void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg_)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->lightMsgs.push_back(msg);
+  this->lightMsgs.push_back(msg_);
 }
 
-void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
+void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg_)
 {
   Light_M::iterator iter;
-  iter = this->lights.find(msg->header().str_id());
+  iter = this->lights.find(msg_->header().str_id());
 
   if (iter == this->lights.end())
   {
     Light *light = new Light(this);
-    light->LoadFromMsg(msg);
-    this->lights[msg->header().str_id()] = light;
+    light->LoadFromMsg(msg_);
+    this->lights[msg_->header().str_id()] = light;
   }
 }
 
-void Scene::HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg)
+void Scene::HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg_)
 {
   Visual_M::iterator viter;
-  viter = this->visuals.find(msg->header().str_id());
+  viter = this->visuals.find(msg_->header().str_id());
   if (viter != this->visuals.end())
-    viter->second->ShowSelectionBox(msg->selected());
+    viter->second->ShowSelectionBox(msg_->selected());
 }

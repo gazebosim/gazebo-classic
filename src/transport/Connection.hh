@@ -118,14 +118,14 @@ namespace gazebo
       // using a tuple since boost::bind seems to have trouble binding
       // a function object created using boost::bind as a parameter
       private: template<typename Handler>
-               void OnReadHeader(const boost::system::error_code &e,
-                                 boost::tuple<Handler> handler)
+               void OnReadHeader(const boost::system::error_code &e_,
+                                 boost::tuple<Handler> handler_)
               {
-                if (e)
+                if (e_)
                 {
-                  if (e.message() != "End of File")
+                  if (e_.message() != "End of File")
                     gzerr << "An error occrured reading a header[" 
-                      << e.message() << "]\n";
+                      << e_.message() << "]\n";
                 }
                 else
                 {
@@ -148,7 +148,7 @@ namespace gazebo
                   boost::asio::async_read( this->socket, 
                       boost::asio::buffer(this->inbound_data), 
                       boost::bind(f, this, boost::asio::placeholders::error, 
-                                  handler) );
+                                  handler_) );
                 }
               }
 

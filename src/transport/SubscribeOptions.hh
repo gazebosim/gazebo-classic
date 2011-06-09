@@ -15,7 +15,8 @@ namespace gazebo
               {}
 
       public: template<class M>
-              void Init(const std::string &topic, const boost::function<void (const boost::shared_ptr<M const> &)> &callback)
+              void Init(const std::string &topic_, 
+                        const boost::function<void (const boost::shared_ptr<M const> &)> &callback_)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -23,9 +24,9 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Subscribe requires a google protobuf type");
  
-                this->topic = topic;
+                this->topic = topic_;
                 this->msgType = msg->GetTypeName();
-                this->subscription = CallbackHelperPtr( new CallbackHelperT<M>(callback) );
+                this->subscription = CallbackHelperPtr( new CallbackHelperT<M>(callback_) );
               }
 
       public: std::string GetTopic() const
