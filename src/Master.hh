@@ -19,8 +19,10 @@ namespace gazebo
 
     public: void Init(unsigned short port);
     public: void Run();
-    public: void Quit();
+    public: void Stop();
+    public: void Fini();
 
+    public: void RunLoop();
     private: void OnRead(const unsigned int connectionIndex,
                          const std::string &data);
 
@@ -38,7 +40,8 @@ namespace gazebo
     private: SubList subscribers;
 
     private: transport::ConnectionPtr connection;
-    private: bool quit;
+    private: boost::thread *runThread;
+    private: bool stop;
   };
 }
 

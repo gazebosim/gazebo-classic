@@ -69,7 +69,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int )
 {
-  server->Quit();
+  server->Stop();
 }
 
 int main(int argc, char **argv)
@@ -91,6 +91,7 @@ int main(int argc, char **argv)
   server->SetParams( params );
   server->Init();
   server->Run();
+  server->Fini();
 
   delete server;
   server = NULL;

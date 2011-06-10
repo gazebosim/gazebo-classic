@@ -27,6 +27,8 @@
 
 using namespace gazebo;
 
+boost::thread *runThread = NULL;
+
 /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
 /// environment variable
 bool transport::get_master_uri(std::string &master_host, 
@@ -65,16 +67,23 @@ void transport::init(const std::string &master_host, unsigned short master_port)
   transport::ConnectionManager::Instance()->Init( host, port );
 }
 
-void transport::fini()
+void transport::run()
+{
+  runThread = new boost::thread(&transport::ConnectionManager::Run,
+                                transport::ConnectionManager::Instance());
+}
+
+void transport::stop()
 {
   IOManager::Instance()->Stop();
+  transport::ConnectionManager::Instance()->Stop();
+  runThread->join();
+  delete runThread;
+  runThread = NULL;
+}
+
+void transport::fini()
+{
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
 }
-
-/// \brief Run the transport. This starts message passing
-void transport::run()
-{
-  transport::ConnectionManager::Instance()->Start();
-}
-

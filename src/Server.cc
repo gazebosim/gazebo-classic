@@ -51,8 +51,7 @@ const std::string default_config =
 
 Server::Server()
 {
-  this->quit = false;
-  this->runThread = NULL;
+  this->stop = false;
 
   // load the configuration options 
   try
@@ -68,7 +67,6 @@ Server::Server()
 Server::~Server()
 {
   delete this->master;
-  delete this->masterThread;
 
   // TODO: probably should clean this up. Make sure this is needed.
   /*while (transport::IOManager::Instance()->GetCount() > 0)
@@ -88,10 +86,9 @@ void Server::Load(const std::string &filename)
 
   this->master = new gazebo::Master();
   this->master->Init(port);
-  this->masterThread = new boost::thread( boost::bind(&Master::Run, this->master) );
+  this->master->Run();
 
   transport::init();
-
   physics::init();
 
   /// Init the sensors library
@@ -154,55 +151,48 @@ void Server::Init()
     physics::init_world(this->worlds[i]);
 }
 
-void Server::Run(bool blocking)
+void Server::Stop()
 {
-  this->quit = false;
+  this->stop = true;
+}
 
+void Server::Fini()
+{
+  transport::fini();
+  physics::fini();
+  rendering::fini();
+
+  this->master->Fini();
+  delete this->master;
+  this->master = NULL;
+}
+
+void Server::Run()
+{
+  // Run the transport loop: starts a new thread
+  transport::run();
+
+  // Run each world. Each world starts a new thread
   for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
-  if (blocking)
-    this->RunLoop();
-  else
-    this->runThread = new boost::thread(boost::bind(&Server::RunLoop, this)); 
-}
-
-void Server::Quit()
-{
-  this->quit = true;
-
-  if (this->runThread)
-  {
-    this->runThread->join();
-    delete this->runThread;
-    this->runThread = NULL;
-  }
-}
-
-void Server::RunLoop()
-{
-  transport::run();
-
-  while (!this->quit)
+  // Update the sensors.
+  this->stop = false;
+  while (!this->stop)
   {
     sensors::run_once(true);
     usleep(10000);
   }
 
+  // Stop all the worlds
   for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::stop_world(this->worlds[i]);
 
-  transport::fini();
+  // Stop the transport loop
+  transport::stop();
 
-  this->master->Quit();
-  this->masterThread->join();
-  delete this->master;
-  this->master = NULL;
-
-  physics::fini();
-
-  rendering::fini();
-
+  // Stop the master 
+  this->master->Stop();
 }
 
 void Server::SetParams( const common::StrStr_M &params )

@@ -41,11 +41,11 @@ namespace gazebo
       public: void Init( const std::string &master_host, 
                          unsigned short master_port);
 
+      /// \brief Run the connection manager loop
+      public: void Run();
+
       /// \brief Finalize the conneciton manager
       public: void Fini();
-
-      /// \brief Start the conneciton manager
-      public: void Start();
 
       /// \brief Stop the conneciton manager
       public: void Stop();
@@ -66,9 +66,6 @@ namespace gazebo
       /// \brief Remove a connection
       public: void RemoveConnection(ConnectionPtr &conn);
  
-      /// \brief Run the connection manager loop
-      private: void RunLoop();
-
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host, 
                                             unsigned short port);

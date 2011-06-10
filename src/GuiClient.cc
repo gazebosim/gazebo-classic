@@ -26,7 +26,7 @@ using namespace gazebo;
 
 GuiClient::GuiClient()
 {
-  this->quit = false;
+  this->stop = false;
 
   // load the configuration options 
   try
@@ -58,11 +58,19 @@ void GuiClient::Init()
 
 void GuiClient::Run()
 {
+  // Run transport loop. Starts a thread
   transport::run();
+  // Run Gui.
   gui::run();
 }
 
-void GuiClient::Quit()
+void GuiClient::Stop()
+{
+  transport::stop();
+  gui::stop();
+}
+
+void GuiClient::Fini()
 {
   transport::fini();
   gui::fini();

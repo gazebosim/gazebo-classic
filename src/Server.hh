@@ -21,19 +21,19 @@ namespace gazebo
 
     public: void Load(const std::string &filename);
     public: void Init();
-    public: void Run(bool blocking = true);
-    public: void Quit();
+    public: void Run();
+    public: void Stop();
+    public: void Fini();
 
     public: void SetParams( const common::StrStr_M &params );
 
     private: void RunLoop();
 
     private: std::vector< physics::WorldPtr > worlds;
-    private: bool quit;
+    private: bool stop;
 
     private: Master *master;
     private: boost::thread *masterThread;
-    private: boost::thread *runThread;
   };
 }
 

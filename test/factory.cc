@@ -102,7 +102,8 @@ TEST(Factory, BoxCreate)
   ASSERT_NO_THROW(server->Load(""));
   ASSERT_NO_THROW(server->Init());
 
-  server->Run(false);
+  //TODO: this is broken. Run has change to a blocking call.
+  server->Run();
 
   transport::NodePtr node = transport::NodePtr( new transport::Node() );
   ASSERT_NO_THROW(node->Init("default"));
@@ -159,7 +160,8 @@ TEST(Factory, BoxCreate)
   // Check the right model was created 
   ASSERT_STREQ(model_name.c_str(), "factory_cylinder_test");
 
-  ASSERT_NO_THROW(server->Quit());
+  ASSERT_NO_THROW(server->Stop());
+  ASSERT_NO_THROW(server->Fini());
 
   delete server;
 }

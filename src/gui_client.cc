@@ -63,7 +63,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int )
 {
-  client->Quit();
+  client->Stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
   // This is a blocking call
   client->Run();
 
-  client->Quit();
+  client->Fini();
 
   delete client;
   client = NULL;

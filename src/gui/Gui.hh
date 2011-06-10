@@ -24,6 +24,7 @@ namespace gazebo
     void load(const std::string &load);
     void init();
     void run();
+    void stop();
     void fini();
   }
 }

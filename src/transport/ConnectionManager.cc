@@ -100,14 +100,6 @@ void ConnectionManager::Fini()
   this->connections.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Start the conneciton manager
-void ConnectionManager::Start()
-{
-  this->stop = false;
-  this->thread = new boost::thread( 
-      boost::bind(&ConnectionManager::RunLoop, this));
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stop the conneciton manager
@@ -124,9 +116,10 @@ void ConnectionManager::Stop()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run all the connections
-void ConnectionManager::RunLoop()
+void ConnectionManager::Run()
 {
   std::list<ConnectionPtr>::iterator iter;
+  this->stop = false;
   while (!this->stop)
   {
     this->masterConn->ProcessWriteQueue();

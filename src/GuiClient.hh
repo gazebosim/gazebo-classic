@@ -30,10 +30,10 @@ namespace gazebo
     public: void Load(const std::string &filename);
     public: void Init();
     public: void Run();
+    public: void Stop();
+    public: void Fini();
 
-    public: void Quit();
-
-    private: bool quit;
+    private: bool stop;
   };
 }
 

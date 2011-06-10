@@ -110,8 +110,12 @@ void gui::run()
   g_app->exec();
 }
 
+void gui::stop()
+{
+  g_app->quit();
+}
+
 void gui::fini()
 {
   rendering::fini();
-  g_app->quit();
 }

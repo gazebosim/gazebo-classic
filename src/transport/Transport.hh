@@ -42,11 +42,15 @@ namespace gazebo
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
     void init(const std::string &master_host="", unsigned short master_port=0);
 
-    /// \brief Finialize all the transport stuff
-    void fini();
-
-    /// \brief Run the transport. This starts message passing
+    /// \brief Run the transport component. This starts message passing. This is
+    ///        a blocking call
     void run();
+
+    /// \brief Stop the transport component from running.
+    void stop();
+
+    /// \brief Cleanup the transport component
+    void fini();
   }
 }
 

@@ -26,11 +26,14 @@ using namespace gazebo;
 Master::Master()
   : connection( new transport::Connection() )
 {
-  this->quit = false;
+  this->stop = false;
+  this->runThread = NULL;
 }
 
 Master::~Master()
 {
+  delete this->runThread;
+
   this->publishers.clear();
   this->subscribers.clear();
 
@@ -216,8 +219,13 @@ void Master::OnRead(const unsigned int connectionIndex,
 
 void Master::Run()
 {
+  this->runThread = new boost::thread(boost::bind(&Master::RunLoop, this));
+}
+
+void Master::RunLoop()
+{
   std::deque<transport::ConnectionPtr>::iterator iter;
-  while (!this->quit)
+  while (!this->stop)
   {
     for (iter = this->connections.begin(); 
          iter != this->connections.end(); iter++)
@@ -231,9 +239,13 @@ void Master::Run()
   }
 }
 
-void Master::Quit()
+void Master::Stop()
 {
-  this->quit = true;
+  this->stop = true;
+}
+
+void Master::Fini()
+{
 }
 
 msgs::Publish Master::GetPublisher( const std::string &topic )

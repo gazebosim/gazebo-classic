@@ -16,7 +16,7 @@ void PrintVersion()
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ )
 {
-  master->Quit();
+  master->Stop();
   return;
 }
 
@@ -38,6 +38,10 @@ int main(int /*argc*/, char ** /*argv*/)
   master = new gazebo::Master();
   master->Init(port);
   master->Run();
+  master->Fini();
+
+  delete master;
+  master = NULL;
 
   return 1;
 }
