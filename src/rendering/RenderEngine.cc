@@ -37,7 +37,7 @@
 #include "common/Events.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
 
@@ -310,7 +310,7 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
-  std::list<std::string> ogrePaths = common::GazeboConfig::Instance()->GetOgrePaths();
+  std::list<std::string> ogrePaths = common::SystemPaths::Instance()->GetOgrePaths();
  
   for (iter=ogrePaths.begin(); 
        iter!=ogrePaths.end(); ++iter)
@@ -358,10 +358,10 @@ void RenderEngine::SetupResources()
 {
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
-  std::list<std::string>::iterator iter;
+  std::list<std::string>::const_iterator iter;
 
-  for (iter= common::GazeboConfig::Instance()->GetGazeboPaths().begin();
-       iter!=common::GazeboConfig::Instance()->GetGazeboPaths().end(); iter++)
+  for (iter= common::SystemPaths::Instance()->GetGazeboPaths().begin();
+       iter!=common::SystemPaths::Instance()->GetGazeboPaths().end(); iter++)
   {
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)

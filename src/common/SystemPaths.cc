@@ -17,7 +17,6 @@
 /* Desc: Local Gazebo configuration 
  * Author: Jordi Polo
  * Date: 3 May 2008
- * SVN: $Id$
  */
 #include <assert.h>
 #include <iostream>
@@ -25,7 +24,7 @@
 #include <sstream>
 
 #include "common/XMLConfig.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/Console.hh"
 
 using namespace gazebo;
@@ -34,19 +33,19 @@ using namespace common;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-GazeboConfig::GazeboConfig()
+SystemPaths::SystemPaths()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-GazeboConfig::~GazeboConfig()
+SystemPaths::~SystemPaths()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Loads the configuration file 
-void GazeboConfig::Load()
+void SystemPaths::Load()
 {
   std::ifstream cfgFile;
 
@@ -118,35 +117,55 @@ void GazeboConfig::Load()
   }
 }
 
-std::list<std::string> &GazeboConfig::GetGazeboPaths() 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the gazebo install paths
+const std::list<std::string> &SystemPaths::GetGazeboPaths() const
 {
   return this->gazeboPaths;
 }
 
-std::list<std::string> &GazeboConfig::GetOgrePaths()
+////////////////////////////////////////////////////////////////////////////////
+/// Get the ogre install paths  
+const std::list<std::string> &SystemPaths::GetOgrePaths() const
 {
   return this->ogrePaths;
 }
 
-std::list<std::string> &GazeboConfig::GetPluginPaths()
+////////////////////////////////////////////////////////////////////////////////
+/// Get the plugin paths  
+const std::list<std::string> &SystemPaths::GetPluginPaths() const
 {
   return this->pluginPaths;
 }
 
-void GazeboConfig::ClearGazeboPaths()
+////////////////////////////////////////////////////////////////////////////////
+/// Get the model path extension
+std::string SystemPaths::GetModelPathExtension() const
+{
+  return "share/gazebo/models";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the world path extension
+std::string SystemPaths::GetWorldPathExtension() const
+{
+  return "share/gazebo/worlds";
+}
+
+void SystemPaths::ClearGazeboPaths()
 {
   this->gazeboPaths.clear();
 }
-void GazeboConfig::ClearOgrePaths()
+void SystemPaths::ClearOgrePaths()
 {
   this->ogrePaths.clear();
 }
-void GazeboConfig::ClearPluginPaths()
+void SystemPaths::ClearPluginPaths()
 {
   this->pluginPaths.clear();
 }
 
-void GazeboConfig::AddGazeboPaths(std::string gazebo_resource_path)
+void SystemPaths::AddGazeboPaths(std::string gazebo_resource_path)
 {
   std::string delim(":");
   if(!gazebo_resource_path.empty()) 
@@ -163,7 +182,7 @@ void GazeboConfig::AddGazeboPaths(std::string gazebo_resource_path)
   }
 }
 
-void GazeboConfig::AddOgrePaths(std::string ogre_resource_path)
+void SystemPaths::AddOgrePaths(std::string ogre_resource_path)
 {
   std::string delim(":");
   if(!ogre_resource_path.empty()) 
@@ -180,7 +199,7 @@ void GazeboConfig::AddOgrePaths(std::string ogre_resource_path)
   }
 }
 
-void GazeboConfig::AddPluginPaths(std::string gazebo_plugin_path)
+void SystemPaths::AddPluginPaths(std::string gazebo_plugin_path)
 {
   std::string delim(":");
   if(!gazebo_plugin_path.empty()) 

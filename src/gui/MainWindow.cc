@@ -8,6 +8,7 @@
 #include "transport/Transport.hh"
 
 #include "gui/Gui.hh"
+#include "gui/InsertModelWidget.hh"
 #include "gui/ModelBuilderWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
@@ -25,7 +26,8 @@ MainWindow::MainWindow()
   this->CreateActions();
   this->CreateMenus();
   this->CreateToolbars();
-  
+
+  QSplitter *splitter = new QSplitter;  
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
@@ -39,7 +41,17 @@ MainWindow::MainWindow()
 
   this->timePanel = new TimePanel(mainWidget);
 
-  mainLayout->addWidget( this->glWidget );
+  InsertModelWidget *insertModel = new InsertModelWidget();
+
+  //QFrame *leftFrame = new QFrame;
+  //leftFrame->setLineWidth(1);
+  //leftFrame->setFrameShadow(QFrame::Sunken);
+  //leftFrame->setFrameShape(QFrame::Box);
+
+  splitter->addWidget(insertModel);
+  splitter->addWidget(this->glWidget);
+  //mainLayout->addWidget( this->glWidget );
+  mainLayout->addWidget(splitter);
   mainLayout->addWidget( this->timePanel );
   mainWidget->setLayout(mainLayout);
 
@@ -149,6 +161,10 @@ void MainWindow::CreateDirectionalLight()
 {
 }
 
+void MainWindow::InsertModel()
+{
+}
+
 void MainWindow::CreateActions()
 {
   this->newAct = new QAction(tr("&New"), this);
@@ -216,6 +232,10 @@ void MainWindow::CreateActions()
   this->dirLghtCreateAct->setStatusTip(tr("Create a directional light"));
   connect(this->dirLghtCreateAct, SIGNAL(triggered()), this, SLOT(CreateDirectionalLight()));
 
+  this->insertModelAct = new QAction(QIcon(":/images/insertModel.png"), tr("Insert Model"), this);
+  this->insertModelAct->setStatusTip(tr("Insert a model"));
+  connect(this->insertModelAct, SIGNAL(triggered()), this, SLOT(InsertModel()));
+
 }
 
 void MainWindow::CreateMenus()
@@ -253,4 +273,6 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);
   this->editToolbar->addAction(this->dirLghtCreateAct);
+  this->editToolbar->addSeparator();
+  this->editToolbar->addAction(this->insertModelAct);
 }

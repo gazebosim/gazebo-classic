@@ -45,6 +45,7 @@ namespace gazebo
       private slots: void CreatePointLight();
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
+      private slots: void InsertModel();
 
       private: void CreateActions();
       private: void CreateMenus();
@@ -75,6 +76,8 @@ namespace gazebo
       private: QAction *pointLghtCreateAct;
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
+
+      private: QAction *insertModelAct;
 
       private: TimePanel *timePanel;
       private: RenderWidget *glWidget;

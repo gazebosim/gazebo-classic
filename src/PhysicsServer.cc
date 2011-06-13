@@ -15,7 +15,7 @@
  *
 */
 
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 
@@ -94,7 +94,7 @@ PhysicsServer::PhysicsServer()
   // load the configuration options 
   try
   {
-    common::GazeboConfig::Instance()->Load();
+    common::SystemPaths::Instance()->Load();
   }
   catch (common::Exception e)
   {

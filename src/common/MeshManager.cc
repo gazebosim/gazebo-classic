@@ -20,7 +20,7 @@
 #include "common/Plane.hh"
 #include "common/Matrix3.hh"
 #include "common/Matrix4.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
@@ -119,7 +119,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   else
   {
     std::list<std::string> gazeboPaths;
-    gazeboPaths = GazeboConfig::Instance()->GetGazeboPaths();
+    gazeboPaths = SystemPaths::Instance()->GetGazeboPaths();
     for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
         iter!=gazeboPaths.end(); ++iter)
     {

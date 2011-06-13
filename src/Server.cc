@@ -3,7 +3,7 @@
 
 #include "common/Timer.hh"
 #include "common/Exception.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/XMLConfig.hh"
 
 #include "sensors/Sensors.hh"
@@ -56,7 +56,7 @@ Server::Server()
   // load the configuration options 
   try
   {
-    common::GazeboConfig::Instance()->Load();
+    common::SystemPaths::Instance()->Load();
   }
   catch (common::Exception e)
   {

@@ -10,5 +10,6 @@
   <file>images/pointlight.png</file>
   <file>images/directionallight.png</file>
   <file>images/gazebo.svg</file>
+  <file>images/insertModel.png</file>
 </qresource>
 </RCC>

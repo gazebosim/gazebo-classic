@@ -13,21 +13,24 @@ set (sources Gui.cc
              GLWidget.cc 
              TimePanel.cc
              ModelBuilderWidget.cc
+             InsertModelWidget.cc
              EntityMaker.cc
              BoxMaker.cc
              SphereMaker.cc
              CylinderMaker.cc
              )
 
-set (qt_headers Gui.hh 
+set (qt_headers 
              MainWindow.hh 
              RenderWidget.hh 
              GLWidget.hh 
              TimePanel.hh
              ModelBuilderWidget.hh
+             InsertModelWidget.hh
              )
 
-set (headers EntityMaker.hh
+set (headers Gui.hh
+             EntityMaker.hh
              BoxMaker.hh
              SphereMaker.hh
              CylinderMaker.hh

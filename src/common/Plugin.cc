@@ -22,7 +22,7 @@
 #include <list>
 
 #include "common/Console.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/Exception.hh"
 #include "common/Plugin.hh"
 
@@ -61,7 +61,7 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
   bool found = false;
   std::string fullname;
   std::list<std::string>::iterator iter;
-  std::list<std::string> pluginPaths= GazeboConfig::Instance()->GetPluginPaths();
+  std::list<std::string> pluginPaths= SystemPaths::Instance()->GetPluginPaths();
 
   for (iter=pluginPaths.begin(); iter!=pluginPaths.end(); ++iter)
   {

@@ -15,7 +15,7 @@
  *
 */
 #include "common/Timer.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/XMLConfig.hh"
 #include "transport/Transport.hh"
 
@@ -48,7 +48,7 @@ SensorServer::SensorServer()
   // load the configuration options 
   try
   {
-    common::GazeboConfig::Instance()->Load();
+    common::SystemPaths::Instance()->Load();
   }
   catch (common::Exception e)
   {

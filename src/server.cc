@@ -8,7 +8,7 @@
 #include "gazebo_config.h"
 #include "common/CommonTypes.hh"
 #include "rendering/Rendering.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "Server.hh"
 
 gazebo::Server *server = NULL;

@@ -41,26 +41,32 @@ namespace gazebo
 {
 	namespace common
   {
-    class GazeboConfig : public SingletonT<GazeboConfig>
+    class SystemPaths : public SingletonT<SystemPaths>
     {
       /// \brief Constructor
-      private: GazeboConfig();
+      private: SystemPaths();
   
       /// \brief destructor
-      private: ~GazeboConfig();
+      private: ~SystemPaths();
   
       /// \brief True if the string is null
       public: void Load();
-  
-      /// \brief Get paths to Gazebo install 
-      public: std::list<std::string>& GetGazeboPaths();
-  
-      /// \brief Get paths to ogre install
-      public: std::list<std::string>& GetOgrePaths();
-   
-      /// \brief Get plugin paths
-      public: std::list<std::string>& GetPluginPaths();
-   
+ 
+      /// \brief Get the gazebo install paths
+      public: const std::list<std::string> &GetGazeboPaths() const; 
+
+      /// \brief Get the model path extension
+      public: std::string GetModelPathExtension() const;
+
+     /// \brief Get the world path extension
+      public: std::string GetWorldPathExtension() const;
+
+      /// \brief Get the ogre install paths  
+      public: const std::list<std::string> &GetOgrePaths() const; 
+
+      /// \brief Get the plugin paths  
+      public: const std::list<std::string> &GetPluginPaths() const; 
+
       /// \brief Add colon delimited paths to Gazebo install 
       public: void AddGazeboPaths(std::string path);
   
@@ -84,7 +90,7 @@ namespace gazebo
       private: std::list<std::string> pluginPaths;
   
       //Singleton implementation
-      private: friend class SingletonT<GazeboConfig>;
+      private: friend class SingletonT<SystemPaths>;
     };
   }
 

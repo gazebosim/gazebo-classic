@@ -32,7 +32,7 @@
 #include "common/Vector3.hh"
 #include "common/Console.hh"
 #include "common/Image.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -74,7 +74,7 @@ int Image::Load(const std::string &filename)
   struct stat st;
 
   // @todo: fix path search. for now repeat similar path search in simulator 
-  std::list<std::string> gazeboPaths=GazeboConfig::Instance()->GetGazeboPaths();
+  std::list<std::string> gazeboPaths=SystemPaths::Instance()->GetGazeboPaths();
  
   for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
        iter!=gazeboPaths.end(); ++iter)

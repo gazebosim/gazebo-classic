@@ -23,7 +23,7 @@ set ( sources Messages.cc
               Diagnostics.cc
               Event.cc
               Events.cc
-              GazeboConfig.cc
+              SystemPaths.cc
               Exception.cc
               Console.cc
               Matrix3.cc
@@ -59,7 +59,7 @@ set ( headers CommonTypes.hh
               Diagnostics.hh
               Event.hh
               Events.hh
-              GazeboConfig.hh
+              SystemPaths.hh
               Exception.hh
               Console.hh
               Global.hh

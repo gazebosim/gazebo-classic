@@ -33,7 +33,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Global.hh"
@@ -108,7 +108,7 @@ std::string XMLConfig::GetFilename(const std::string &fname)
     return std::string(cPath) + fname;
   }
 
-  std::list<std::string> paths = GazeboConfig::Instance()->GetGazeboPaths();
+  std::list<std::string> paths = SystemPaths::Instance()->GetGazeboPaths();
   for (std::list<std::string>::const_iterator iter = paths.begin(); iter != paths.end(); iter++)
   {
     test.open((*iter + fname).c_str());

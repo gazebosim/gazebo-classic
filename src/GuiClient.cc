@@ -15,7 +15,7 @@
  *
 */
 #include "common/Exception.hh"
-#include "common/GazeboConfig.hh"
+#include "common/SystemPaths.hh"
 
 #include "gui/Gui.hh"
 #include "transport/Transport.hh"
@@ -31,7 +31,7 @@ GuiClient::GuiClient()
   // load the configuration options 
   try
   {
-    common::GazeboConfig::Instance()->Load();
+    common::SystemPaths::Instance()->Load();
   }
   catch (common::Exception e)
   {

@@ -14,4 +14,4 @@ SET (files athene.model
            wizbot.model
 )
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/worlds/models)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/models)
