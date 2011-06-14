@@ -395,7 +395,7 @@ void World::DeleteEntityCB(const std::string &name)
 // Get an element by name
 BasePtr World::GetByName(const std::string &name)
 {
-  return this->rootElement->GetByName(name);
+  return this->rootElement->GetByName(this->rootElement->GetName() + "::" + name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -687,7 +687,15 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
  
   try
   {
-    xmlFile->LoadString(msg->xml());
+    if (msg->has_xml())
+      xmlFile->LoadString(msg->xml());
+    else if (msg->has_filename())
+      xmlFile->Load(msg->filename());
+    else
+    {
+      gzerr << "An XML string or filename must be set\n";
+      return;
+    }
   }
   catch (common::Exception e)
   {
