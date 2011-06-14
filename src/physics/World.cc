@@ -707,7 +707,7 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
   {
     boost::mutex::scoped_lock lock(*this->updateMutex);
     // Add the new models into the World
-    ModelPtr model = this->LoadModel( rootNode, BasePtr() );
+    ModelPtr model = this->LoadModel( rootNode, this->rootElement );
     model->Init();
   }
 }
