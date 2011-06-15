@@ -95,7 +95,7 @@ namespace gazebo
     public: void Report(const std::string msg)
             {
               //switching to printf so messages do not get broken up into interlaced pieces on multiple threads
-              //(gazebo::GazeboMessage::Instance()->Msg(this->msgLevel)) << this->name << "[" << msg << *this << "]\n";
+              (gazebo::GazeboMessage::Instance()->Msg(this->msgLevel)) << this->name << "[" << msg << *this << "]\n";
               if (gazebo::GazeboMessage::Instance()->GetVerbose() >= this->msgLevel)
               {
                 std::ostringstream stream;

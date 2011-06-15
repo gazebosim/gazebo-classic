@@ -497,12 +497,15 @@ void OgreAdaptor::UpdateCameras()
 
   int idx = 0;
 
-  // Copy camera data to memory (blit)
-  // Only blit for cameras that needed to render in the last render loop
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
-    if (dynamic_cast<UserCamera*>((*iter)) == NULL && capture_cameras_data_[idx++])
-      (*iter)->CaptureData();
+    DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera blit",6));
+    // Copy camera data to memory (blit)
+    // Only blit for cameras that needed to render in the last render loop
+    for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+    {
+      if (dynamic_cast<UserCamera*>((*iter)) == NULL && capture_cameras_data_[idx++])
+        (*iter)->CaptureData();
+    }
   }
 
   // Reset all cameras update status to false
@@ -511,7 +514,7 @@ void OgreAdaptor::UpdateCameras()
   idx = 0;
   // Draw all the non-user cameras within the same sim time step
   {
-    //DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
+    DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
 
     // these locks are needed to avoid race conditions on load, do not remove
     // unless an alternative dead-lock prevention strategy has been implemented
@@ -530,6 +533,7 @@ void OgreAdaptor::UpdateCameras()
   {
     // this lock is needed if visuals are manipulated in physics loop during updates, do not remove unless
     // alternate check is in place
+    DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));
     boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
 
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)

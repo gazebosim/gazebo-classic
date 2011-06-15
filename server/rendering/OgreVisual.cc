@@ -38,6 +38,7 @@
 #include "OgreCreator.hh"
 #include "Global.hh"
 #include "OgreVisual.hh"
+#include "STLLoader.hh"
 
 using namespace gazebo;
 
@@ -324,6 +325,28 @@ void OgreVisual::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->castShadowsP) << "\n";
   stream << prefix << "  " << *(this->scaleP) << "\n";
   stream << prefix << "</visual>\n";
+
+
+  // dump out all meshes in simulation in the /tmp directory
+  std::string meshName = (**this->meshNameP);
+  //std::string meshFilename = meshName.substr(meshName.rfind("/")+1, meshName.rfind(".")-1);
+  std::string meshFilename = this->GetName();
+  // std::cout << "orig stl mesh: [" << meshName << "] "
+  //           << "save stl mesh: [" << meshFilename << "] "
+  //           << "pose: ["
+  //           << this->GetWorldPose() << "] "
+  //           << "\n";
+  // Get the mesh and write it
+  if (MeshManager::Instance()->HasMesh(meshName))
+  {
+    const Mesh* mesh = MeshManager::Instance()->GetMesh(meshName);
+    STLLoader stlLoader;
+    std::string filename = "/tmp/"+meshFilename+".stl";
+    FILE *file = fopen(filename.c_str(), "w");
+    stlLoader.WriteBinary(file, mesh, this->GetWorldPose());
+    fclose(file);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

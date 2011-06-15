@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "MeshLoader.hh"
+#include "Pose3d.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000
@@ -45,6 +46,16 @@ namespace gazebo
 
     /// Read 1 float from a binary file.
     private: float FloatRead ( FILE *filein );
+
+    /// Write STL Binary file
+    public: void WriteBinary (FILE *fileout, const Mesh* mesh, Pose3d pose);
+
+    /// helper function to write STL mesh
+    private: uint16_t CharWrite ( FILE *fileout, char c );
+    private: uint16_t LongIntWrite ( FILE *fileout, long int int_val );
+    private: uint16_t FloatWrite ( FILE *fileout, float float_val );
+    private: uint16_t ShortIntWrite ( FILE *fileout, short int short_int_val );
+
 
   };
 }

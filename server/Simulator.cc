@@ -433,7 +433,7 @@ void Simulator::MainLoop()
 {
   this->state = RUN;
 
-  //DIAGNOSTICTIMER(timer("--------------------------- START Simulator::MainLoop() --------------------------",6));
+  DIAGNOSTICTIMER(timer("--------------------------- START Simulator::MainLoop() --------------------------",6));
   Time currTime = 0;
   Time lastTime = 0;
   Time lastGuiTime = 0;

@@ -113,11 +113,11 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
         vertex.y = r2;
         vertex.z = r3;
 
-        if (!subMesh->HasVertex(vertex))
-        {
+        //if (!subMesh->HasVertex(vertex))  // skipping vertices breaks trimesh
+        //{
           subMesh->AddVertex(vertex);
           subMesh->AddNormal(normal);
-        }
+        //}
         subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
         ivert = ivert + 1;
@@ -154,11 +154,10 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 /// Reads a binary STL (stereolithography) file.
 void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 {
-  short int attribute = 0;
+  int attribute = 0;
   char c;
   int i;
   int iface;
-  int face_num;
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -168,7 +167,7 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
     c = (char)fgetc(filein);
 
   //Number of faces.
-  face_num = this->LongIntRead(filein);
+  int face_num = this->LongIntRead(filein);
 
   //For each (triangular) face,
   //  components of normal vector,
@@ -192,16 +191,87 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
       vertex.y = this->FloatRead(filein);
       vertex.z = this->FloatRead(filein);
 
-      if (!subMesh->HasVertex(vertex))
-      {
+      //if (!subMesh->HasVertex(vertex))  // skipping vertices breaks trimesh
+      //{
         subMesh->AddVertex(vertex);
         subMesh->AddNormal(normal);
-      }
+      //}
       subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
     }
 
     attribute = ShortIntRead ( filein );
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Write the STL binary file out
+/// this subroutine assumes STL mesh corresponds to the one and only SubMesh
+/// in Mesh*,
+void STLLoader::WriteBinary (FILE *fileout, const Mesh* mesh, Pose3d pose)
+{
+  int submesh_count = mesh->GetSubMeshCount();
+  if (submesh_count > 1) std::cout << "WARNING: we can only handle one submesh at this time\n";
+  if (submesh_count == 0)
+  {
+    std::cout << "WARNING: no submeshes, return without writing STLB\n";
+    return;
+  }
+
+  const SubMesh* subMesh = mesh->GetSubMesh(0);
+
+  int bytes = 0;
+
+  // 80 byte header, use empty string
+  for (int i = 0; i < 80; i++ )
+    bytes = bytes + CharWrite ( fileout, ' ' );
+
+  // number of faces is number of vertices / 3
+  int vertex_num = subMesh->GetVertexCount();
+
+  // write number of faces
+  bytes = bytes + LongIntWrite ( fileout, vertex_num/3 );
+
+  // write per face (1 normal repeated 3 times, 3 corners)
+  for (int ivertex = 0; ivertex < vertex_num; ivertex += 3 )
+  {
+    // write face normal
+    Vector3 normal = subMesh->GetNormal(ivertex);
+    normal = pose.rot * normal; // rotate surface normals
+    bytes = bytes + FloatWrite ( fileout, normal.x );
+    bytes = bytes + FloatWrite ( fileout, normal.y );
+    bytes = bytes + FloatWrite ( fileout, normal.z );
+
+    // get vertices
+    Vector3 vertex1 = subMesh->GetVertex(ivertex);
+    Vector3 vertex2 = subMesh->GetVertex(ivertex+1);
+    Vector3 vertex3 = subMesh->GetVertex(ivertex+2);
+
+    // rotate and translate points
+    vertex1 = pose.pos + pose.rot * vertex1;
+    vertex2 = pose.pos + pose.rot * vertex2;
+    vertex3 = pose.pos + pose.rot * vertex3;
+
+    // write coord 1
+    bytes = bytes + FloatWrite ( fileout, vertex1.x );
+    bytes = bytes + FloatWrite ( fileout, vertex1.y );
+    bytes = bytes + FloatWrite ( fileout, vertex1.z );
+
+    // write coord 2
+    bytes = bytes + FloatWrite ( fileout, vertex2.x );
+    bytes = bytes + FloatWrite ( fileout, vertex2.y );
+    bytes = bytes + FloatWrite ( fileout, vertex2.z );
+
+    // write coord 3
+    bytes = bytes + FloatWrite ( fileout, vertex3.x );
+    bytes = bytes + FloatWrite ( fileout, vertex3.y );
+    bytes = bytes + FloatWrite ( fileout, vertex3.z );
+
+    int attribute = 0; // defined by binary stl format
+    bytes = bytes + ShortIntWrite ( fileout, attribute );
+  }
+  std::cout << "binary STL file has [" << bytes << "] bytes.\n";
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -310,4 +380,50 @@ uint16_t STLLoader::ShortIntRead ( FILE *filein )
   ival = c1 | ( c2 << 8 );
 
   return ival;
+}
+
+uint16_t STLLoader::CharWrite ( FILE *fileout, char c )
+{
+  fputc ( c, fileout );
+  return 1;
+}
+
+uint16_t STLLoader::LongIntWrite ( FILE *fileout, long int int_val )
+{
+  union
+  {
+    long int yint;
+    char ychar[4];
+  } y;
+
+  y.yint = int_val;
+
+  fputc ( y.ychar[0], fileout );
+  fputc ( y.ychar[1], fileout );
+  fputc ( y.ychar[2], fileout );
+  fputc ( y.ychar[3], fileout );
+
+  return 4;
+}
+uint16_t STLLoader::FloatWrite ( FILE *fileout, float float_val )
+{
+  int nbytes = sizeof ( float );
+  fwrite ( &float_val, nbytes, 1, fileout );
+  return nbytes;
+}
+
+uint16_t STLLoader::ShortIntWrite ( FILE *fileout, short int short_int_val )
+{
+  union
+  {
+    short int yint;
+    char ychar[2];
+  } y;
+
+  y.yint = short_int_val;
+
+  fputc ( y.ychar[0], fileout );
+  fputc ( y.ychar[1], fileout );
+
+  return 2;
 }
