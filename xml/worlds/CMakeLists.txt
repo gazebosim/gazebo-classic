@@ -1,25 +1,7 @@
-ADD_SUBDIRECTORY(models)
-
-SET (files bandit.world
-           bsp.world
-           bumper.world
-           epuck_single.world
-           epuck.world
-           federation.world
-           laser.world
-           lights.world
-           map.world
-           openal.world
-           pioneer2at.world
-           pioneer2dx_camera.world
-           pioneer2dx_gripper.world
+SET (files empty.world
            pioneer2dx.world
-           simplecar.world
-           simpleshapes.world
-           stereocamera.world
-           terrain.world
-           trimesh.world
-           wizbot.world
+           pr2.world
+           shapes.world
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/worlds/)
