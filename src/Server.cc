@@ -227,3 +227,17 @@ void Server::SetParams( const common::StrStr_M &params )
     }
   }
 }
+
+
+physics::BasePtr Server::GetByName(const std::string &name)
+{
+  physics::BasePtr result;
+  result.reset();
+  for (unsigned int i=0; i < this->worlds.size(); i++)
+  {
+    std::cout << "world " << i << " : " << "\n";
+    result = this->worlds[i]->GetByName(name);
+    if (result) break;
+  }
+  return result;
+}

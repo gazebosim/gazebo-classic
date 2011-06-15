@@ -8,6 +8,7 @@
 
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
+#include "physics/World.hh"
 
 
 namespace gazebo
@@ -34,6 +35,10 @@ namespace gazebo
 
     private: Master *master;
     private: boost::thread *masterThread;
+
+    /// accessor for getting a child by name
+    public: physics::BasePtr GetByName(const std::string &name);
+
   };
 }
 
