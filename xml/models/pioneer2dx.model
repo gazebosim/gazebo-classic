@@ -156,15 +156,4 @@
     <cfm>10e-5</cfm>
   </joint>
 
-<!--
-<controller type="differential_position2d" name="controller1">
-  <leftJoint>left_wheel_hinge</leftJoint>
-  <rightJoint>right_wheel_hinge</rightJoint>
-  <wheelSeparation>0.34</wheelSeparation>
-  <wheelDiameter>0.15</wheelDiameter>
-  <torque>5</torque>
-  <interface type="position" name="position_iface_0"/>
-</controller>
--->
-
 </model>

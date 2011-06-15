@@ -374,10 +374,10 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
   if (node->GetChild("origin"))
   {
     result.mutable_pose()->mutable_position()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetVector3("xyz",Vector3(0,0,0))));
+        Convert(node->GetChild("origin")->GetVector3("xyz",Vector3())));
 
     result.mutable_pose()->mutable_orientation()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetRotation("rpy",Quatern(1,0,0,0))));
+        Convert(node->GetChild("origin")->GetRotation("rpy",Quatern())));
   }
 
   return result;

@@ -32,6 +32,10 @@ namespace gazebo
       /// \brief Get the connection
       public: const ConnectionPtr &GetConnection() const;
 
+      /// \brief Return true if the callback is local, false if the callback 
+      /// is tied to a  remote connection
+      public: virtual bool IsLocal() const;
+
       private: ConnectionPtr connection;
     };
     typedef boost::shared_ptr<SubscriptionTransport> SubscriptionTransportPtr;

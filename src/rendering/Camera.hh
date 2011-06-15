@@ -185,7 +185,7 @@ namespace gazebo
       public: void ToggleSaveFrame();
     
       /// \brief Get a pointer to the ogre camera
-      public: Ogre::Camera *GetCamera() const;
+      public: Ogre::Camera *GetOgreCamera() const;
   
       /// \brief Get the viewport width in pixels
       public: unsigned int GetViewportWidth() const;

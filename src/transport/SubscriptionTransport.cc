@@ -69,3 +69,13 @@ const ConnectionPtr &SubscriptionTransport::GetConnection() const
 {
   return this->connection;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the callback is local, false if the callback is tied to a 
+/// remote connection
+bool SubscriptionTransport::IsLocal() const
+{
+  return false;
+}
+
+

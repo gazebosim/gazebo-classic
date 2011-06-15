@@ -252,9 +252,9 @@ BasePtr Base::GetChild(const std::string &name )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get by name helper
-BasePtr Base::GetByName(const std::string &name)
+BasePtr Base::GetByName(const std::string &name_)
 {
-  if (this->GetCompleteScopedName() == name)
+  if (this->GetCompleteScopedName() == name_)
     return shared_from_this();
 
   BasePtr result;
@@ -262,7 +262,10 @@ BasePtr Base::GetByName(const std::string &name)
 
   for (iter =  this->children.begin(); 
        iter != this->children.end() && result ==NULL; iter++)
-    result = (*iter)->GetByName(name);
+  {
+    
+    result = (*iter)->GetByName(name_);
+  }
 
   return result;
 }

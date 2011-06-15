@@ -339,8 +339,16 @@ void Visual::Save(std::string &prefix, std::ostream &stream)
 /// Attach a visual
 void Visual::AttachVisual(Visual *vis)
 {
-  vis->GetSceneNode()->getParentSceneNode()->removeChild(vis->GetSceneNode());
-  this->sceneNode->addChild( vis->GetSceneNode() );
+  if (!vis)
+    gzerr << "Visual is null\n";
+  else
+  {
+    if (vis->GetSceneNode()->getParentSceneNode())
+    {
+      vis->GetSceneNode()->getParentSceneNode()->removeChild(vis->GetSceneNode());
+    }
+    this->sceneNode->addChild( vis->GetSceneNode() );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -751,23 +759,6 @@ common::Pose3d Visual::GetWorldPose() const
 Ogre::SceneNode * Visual::GetSceneNode() const
 {
   return this->sceneNode;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set to true to show a white bounding box, used to indicate user selection
-void Visual::ShowSelectionBox( bool value )
-{
-  if (!selectionObj)
-  {
-    selectionObj = new SelectionObj();
-    selectionObj->Load();
-  }
-
-  if (value)
-    selectionObj->Attach(this);
-  else
-    selectionObj->Attach(NULL);
-    
 }
 
 

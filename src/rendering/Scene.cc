@@ -30,6 +30,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/Camera.hh"
 #include "rendering/Grid.hh"
+#include "rendering/SelectionObj.hh"
 
 //#include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
@@ -87,8 +88,9 @@ Scene::Scene(const std::string &name_)
   this->visSub = this->node->Subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::ReceiveLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose", &Scene::ReceivePoseMsg, this);
-  this->selectionSub = this->node->Subscribe("~/selection", &Scene::HandleSelectionMsg, this);
-  
+  this->selectionSub = this->node->Subscribe("~/selection", &Scene::OnSelectionMsg, this);
+
+  this->selectionObj = new SelectionObj(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +173,7 @@ void Scene::Load(common::XMLConfigNode *node_)
 // Initialize the scene
 void Scene::Init()
 {
+
   Ogre::Root *root = RenderEngine::Instance()->root;
 
   if (this->manager)
@@ -246,6 +249,8 @@ void Scene::Init()
 
   // Register this scene the the real time shaders system
   //RTShaderSystem::Instance()->AddScene(this);
+  
+  this->selectionObj->Init();
 }
 
 
@@ -292,9 +297,12 @@ std::string Scene::GetName() const
 void Scene::SetAmbientColor(const common::Color &color)
 {
   this->ambientP->SetValue(color);
+
   // Ambient lighting
   if (this->manager)
+  {
     this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -423,11 +431,11 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-//common::Common *Scene::GetEntityAt(Camera *camera, Vector2i mousePos, std::string &mod) 
-//{
-  /* NATY: put back in
-  Common *entity = NULL;
-  Ogre::Camera *ogreCam = camera->GetCamera();
+/*Visual *Scene::GetVisualAt(CameraPtr camera, 
+                                   Vector2i mousePos, std::string &mod) 
+{
+  Visual *visual = NULL;
+  Ogre::Camera *ogreCam = camera->GetOgreCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
 
   Ogre::Real closest_distance = -1.0f;
@@ -506,13 +514,12 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
     }
   }
 
-*/
- // return NULL;
-//}
+  return NULL;
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world pos of a the first contact at a pixel location
-common::Vector3 Scene::GetFirstContact(Camera *camera, 
+/*common::Vector3 Scene::GetFirstContact(Camera *camera, 
                                        common::Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetCamera();
@@ -530,32 +537,7 @@ common::Vector3 Scene::GetFirstContact(Camera *camera,
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
   return common::Vector3(pt.x, pt.y, pt.z);
-}
-
-// NATY
-/*
-////////////////////////////////////////////////////////////////////////////////
-// Register a camera
-void Scene::RegisterCamera( Camera *cam )
-{
-  this->cameras.push_back(cam);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Unregister a user camera
-void Scene::UnregisterCamera( Camera *cam )
-{
-  std::vector<Camera*>::iterator iter;
-  for(iter=this->cameras.begin();iter != this->cameras.end();iter++)
-  {
-    if ((*iter) == cam)
-    {
-      this->cameras.erase(iter);
-      break;
-    }
-  }
-}
-*/
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Print scene graph
@@ -934,7 +916,6 @@ void Scene::PreRender()
   }
   this->visualMsgs.clear();
 
-
   // Process the light messages
   for (lIter =  this->lightMsgs.begin(); 
        lIter != this->lightMsgs.end(); lIter++)
@@ -960,12 +941,22 @@ void Scene::PreRender()
       ++pIter;
   }
 
+  if (this->selectionMsg)
+  {
+    Visual_M::iterator viter;
+    viter = this->visuals.find(this->selectionMsg->header().str_id());
+    if (viter != this->visuals.end())
+      this->selectionObj->Attach( viter->second );
+    else
+      this->selectionObj->Attach( NULL );
+
+    this->selectionMsg.reset();
+  }
 }
 
 
 void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg_)
 {
-
   Visual_M::iterator iter;
   iter = this->visuals.find(msg_->header().str_id());
 
@@ -985,7 +976,11 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg_)
   else
   {
     Visual *visual = NULL;
-    iter = this->visuals.find(msg_->parent_id());
+
+    if (msg_->has_parent_id())
+      iter = this->visuals.find(msg_->parent_id());
+    else
+      iter = this->visuals.end();
 
     if (iter != this->visuals.end())
       visual = new Visual(msg_->header().str_id(), iter->second);
@@ -993,9 +988,9 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg_)
       visual = new Visual(msg_->header().str_id(), this);
 
     visual->LoadFromMsg(msg_);
+    gzdbg << "New Visual[" << msg_->header().str_id() << "]\n";
     this->visuals[msg_->header().str_id()] = visual;
   }
-
 }
 
 void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg_)
@@ -1035,10 +1030,7 @@ void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg_)
   }
 }
 
-void Scene::HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg_)
+void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg_)
 {
-  Visual_M::iterator viter;
-  viter = this->visuals.find(msg_->header().str_id());
-  if (viter != this->visuals.end())
-    viter->second->ShowSelectionBox(msg_->selected());
+  this->selectionMsg = msg_;
 }

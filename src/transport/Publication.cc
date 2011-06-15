@@ -46,7 +46,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
 // A a transport
 void Publication::AddTransport( const PublicationTransportPtr &publink)
 {
-  publink->AddCallback( boost::bind(&Publication::PublishData, this, _1) );
+  publink->AddCallback( boost::bind(&Publication::LocalPublish, this, _1) );
   this->transports.push_back( publink );
 }
 
@@ -121,6 +121,7 @@ void Publication::Publish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
+  
   while (iter != this->callbacks.end())
   {
     if ((*iter)->HandleData(data))
@@ -131,9 +132,25 @@ void Publication::Publish(const std::string &data)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Publication::PublishData(const std::string &data)
+// Publish data only on local subscriptions
+void Publication::LocalPublish(const std::string &data)
 {
-  this->Publish(data);
+  std::list< CallbackHelperPtr >::iterator iter;
+  iter = this->callbacks.begin();
+  
+  while (iter != this->callbacks.end())
+  {
+    if ((*iter)->IsLocal())
+    {
+      if ((*iter)->HandleData(data))
+        iter++;
+      else
+        this->callbacks.erase( iter++ );
+    }
+    else
+      iter++;
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

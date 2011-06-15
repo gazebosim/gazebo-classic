@@ -19,31 +19,29 @@
 
 #include "common/Vector3.hh"
 
-
 namespace gazebo
 {
 	namespace rendering
-{
-  class Visual;
-  class Scene;
-
-  class SelectionObj
   {
-    /// \brief Constructor
-    public: SelectionObj();
-
-    /// \brief Destructor
-    public: virtual ~SelectionObj();
-
-    public: void Load();
-
-    /// \brief Set the position of the node
-    public: void Attach( Visual *visual );
-
-    private: Visual *node;
-    private: Scene *scene;
-  };
-}
-
+    class Visual;
+    class Scene;
+  
+    class SelectionObj
+    {
+      /// \brief Constructor
+      public: SelectionObj(Scene *scene_);
+  
+      /// \brief Destructor
+      public: virtual ~SelectionObj();
+  
+      public: void Init();
+  
+      /// \brief Set the position of the node
+      public: void Attach( Visual *visual );
+  
+      private: Visual *node;
+      private: Scene *scene;
+    };
+  }
 }
 #endif

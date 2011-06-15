@@ -37,7 +37,8 @@ namespace gazebo
 
       /// \brief Publish data
       public: void Publish(const std::string &data);
-      public: void PublishData(const std::string &data);
+      public: void LocalPublish(const std::string &data);
+
       public: void Publish(const google::protobuf::Message &msg,
                            const boost::function<void()> &cb = NULL);
 

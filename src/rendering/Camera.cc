@@ -564,7 +564,7 @@ void Camera::ToggleSaveFrame()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a pointer to the ogre camera
-Ogre::Camera *Camera::GetCamera() const
+Ogre::Camera *Camera::GetOgreCamera() const
 {
   return this->camera;
 }

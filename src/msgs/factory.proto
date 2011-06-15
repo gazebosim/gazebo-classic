@@ -3,6 +3,7 @@ import "header.proto";
 
 message Factory
 {
-  required Header header = 1;
-  required string xml = 2;
+  required Header header   = 1;
+  optional string xml      = 2;
+  optional string filename = 3;
 }

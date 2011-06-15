@@ -48,7 +48,7 @@
       </link>
     </model>
 
-    <include filename="worlds/new/models/pioneer2dx.model"/>
+    <include filename="pioneer2dx.model"/>
 
     <!-- White Point light -->
     <light name="point_white">

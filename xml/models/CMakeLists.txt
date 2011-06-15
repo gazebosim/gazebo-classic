@@ -1,5 +1,5 @@
-SET (files pioneer2dx.model
+set (files pioneer2dx.model
            pr2.model
 )
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/worlds/models)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/models/)

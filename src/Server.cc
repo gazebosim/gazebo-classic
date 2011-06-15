@@ -11,6 +11,8 @@
 #include "transport/IOManager.hh"
 
 #include "physics/Physics.hh"
+#include "physics/World.hh"
+#include "physics/Base.hh"
 #include "rendering/Rendering.hh"
 
 #include "Master.hh"
@@ -29,7 +31,7 @@ const std::string default_config =
   </config>\
   <world name='default'>\
     <scene>\
-      <ambient>0.1 0.1 0.1 1</ambient>\
+      <ambient>0.2 0.2 0.2 1</ambient>\
       <background_color>.1 .1 .1 1.0</background_color>\
       <shadows enabled='false' color='0.2 0.2 0.2 1.0' type='texture_modulative'/>\
       <grid>false</grid>\
@@ -45,6 +47,34 @@ const std::string default_config =
       <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
       <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
+    <light name='point_white' type='point'>\
+      <origin xyz='0 0 10' rpy='0 0 0'/>\
+      <diffuse color='1.0 1.0 1.0 1.0'/>\
+      <specular color='.1 .1 .1 1.0'/>\
+      <attenuation constant='.2' linear='0.01' quadratic='0.0'/>\
+      <range>40</range>\
+      <direction>0 0 -1.0</direction>\
+      <cast_shadows>false</cast_shadows>\
+    </light>\
+    <model name='box_model'>\
+      <static>false</static>\
+      <origin xyz='0 0 0.5'/>\
+      <link name='body'>\
+        <collision name='geom'>\
+          <geometry>\
+            <box size='1 1 1'/>\
+          </geometry>\
+          <mass>1.0</mass>\
+        </collision>\
+        <visual>\
+          <geometry>\
+            <box size='1 1 1'/>\
+          </geometry>\
+          <material name='Gazebo/Grey'/>\
+          <cast_shadows>true</cast_shadows>\
+        </visual>\
+      </link>\
+    </model>\
   </world>\
 </gazebo>";
 

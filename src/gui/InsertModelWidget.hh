@@ -3,7 +3,10 @@
 
 #include <QWidget>
 
+#include "transport/TransportTypes.hh"
+
 class QTreeWidget;
+class QTreeWidgetItem;
 
 namespace gazebo
 {
@@ -15,7 +18,12 @@ namespace gazebo
       public: InsertModelWidget( QWidget *parent = 0 );
       public: virtual ~InsertModelWidget();
 
+      private slots: void OnModelSelection();
+
       private: QTreeWidget *fileTreeWidget;
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr factoryPub, visualPub, selectionPub;
     };
   }
 }

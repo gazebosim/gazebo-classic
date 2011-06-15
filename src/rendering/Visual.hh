@@ -181,10 +181,6 @@ namespace gazebo
       /// \brief Make the visual objects static renderables
       public: void MakeStatic();
   
-      /// \brief Set to true to show a white bounding box, used to indicate 
-      //         user selection
-      public: void ShowSelectionBox( bool value );
-  
       /// \brief Return true if the  visual is a static geometry
       public: bool IsStatic() const;
   

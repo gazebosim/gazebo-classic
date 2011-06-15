@@ -28,12 +28,9 @@ using namespace rendering;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-SelectionObj::SelectionObj()
+SelectionObj::SelectionObj(Scene *scene_)
+  : scene(scene_)
 {
-  this->node = new Visual("selection_obj_visual", this->scene );
-
-  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("selection_tube"));
-  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box_U1V1"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,8 +42,14 @@ SelectionObj::~SelectionObj()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void SelectionObj::Load()
+void SelectionObj::Init()
 {
+  this->node = new Visual("selection_obj_visual", this->scene );
+
+  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("selection_tube"));
+  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box_U1V1"));
+
+
   Ogre::SceneNode *rotNode = this->node->GetSceneNode()->createChildSceneNode("rot_node");
   Ogre::SceneNode *transNode = this->node->GetSceneNode()->createChildSceneNode("trans_node");
   transNode->setInheritOrientation(false);
@@ -157,6 +160,7 @@ void SelectionObj::Load()
   zBox[1]->setScale(0.2, 0.2, 0.2);
   zBox[1]->setPosition(0, 0, -1.5);
 
+  this->node->SetVisible(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

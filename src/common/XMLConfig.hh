@@ -17,7 +17,6 @@
 /* Desc: XML config file
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
  */
 
 #ifndef XMLCONFIG_HH

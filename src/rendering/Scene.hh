@@ -54,6 +54,7 @@ namespace gazebo
     class Grid;
     class Camera;
     class UserCamera;
+    class SelectionObj;
   
     class Scene
     {
@@ -135,19 +136,15 @@ namespace gazebo
       /// \param camera The ogre camera, used to do mouse picking
       /// \param mousePos The position of the mouse in screen coordinates
       /// \return The selected entity, or NULL
-      /*public: common::Common *GetEntityAt(Camera *camera, 
-                                          common::Vector2i mousePos, 
-                                          std::string &mod);
-                                          */
+      /*public: Visual *GetVisualAt(Camera *camera, 
+                                  common::Vector2i mousePos, 
+                                  std::string &mod);
+                                  */
   
       /// \brief Get the world pos of a the first contact at a pixel location
-      public: common::Vector3 GetFirstContact(Camera *camera, 
+      /*public: common::Vector3 GetFirstContact(CameraPtr camera, 
                                               common::Vector2i mousePos);
-  
-              // NATY
-      /// \brief Register a user camera
-      //public: void RegisterCamera( Camera *cam );
-      //public: void UnregisterCamera( Camera *cam );
+                                              */
   
       public: void PrintSceneGraph();
   
@@ -194,7 +191,7 @@ namespace gazebo
       private: void ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
       private: void ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
 
-      private: void HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
+      private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
                
       private: void ReceivePoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
   
@@ -243,6 +240,8 @@ namespace gazebo
       typedef std::map<std::string, Light*> Light_M;
       private: Light_M lights;
 
+      private: boost::shared_ptr<msgs::Selection const> selectionMsg;
+
       private: boost::mutex *receiveMutex;
 
       private: transport::NodePtr node;  
@@ -254,6 +253,8 @@ namespace gazebo
       private: transport::PublisherPtr scenePub;
 
       private: std::vector<event::ConnectionPtr> connections;
+
+      private: SelectionObj *selectionObj;
     };
   }
 }
