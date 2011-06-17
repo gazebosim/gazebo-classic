@@ -677,5 +677,290 @@ bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
   return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
+{
+  _scene.Clear();
+
+  TiXmlElement *ambient = _config->FirstChildElement("ambient");
+  if (ambient)
+  {
+    if (ambient->Attribute("rgba"))
+    {
+      if (!_scene.ambientColor.Init(ambient->Attribute("rgba")))
+      {
+        printf("Error: Ambient rgba is malformed\n");
+        return false;
+      }
+    }
+    else
+    {
+      printf("Error: Ambient requires a rgba attribute\n");
+      return false;
+    }
+  }
+
+  TiXmlElement *background = _config->FirstChildElement("background");
+  if (background)
+  {
+    if (background->Attribute("rgba"))
+    {
+      if (!_scene.backgroundColor.Init(background->Attribute("rgba")))
+      {
+        printf("Error: Background rgba is malformed\n");
+        return false;
+      }
+    }
+    else
+    {
+      printf("Error: Background requires a rgba attribute\n");
+      return false;
+    }
+
+
+    TiXmlElement *sky = background->FirstChildElement("sky");
+    if (sky)
+    {
+      const char *materialChar = sky->Attribute("material");
+      if (!materialChar)
+      {
+        printf("Error: No material for the sky.\n");
+        return false;
+      }
+      _scene.skyMaterial = std::string(materialChar);
+    }
+  }
+
+  TiXmlElement *shadow = _config->FirstChildElement("shadows");
+  if (shadow)
+  {
+    std::string enabled = shadow->Attribute("enabled");
+    if (!enabled.empty() && !getBoolFromStr(enabled, _scene.shadowEnabled))
+    {
+      printf("Error: Shadown element requires an enabled attribute");
+    }
+
+    if (shadow->Attribute("rgba"))
+    {
+      if (!_scene.shadowColor.Init(shadow->Attribute("rgba")))
+      {
+        printf("Error: Shadow rgba is malformed\n");
+        return false;
+      }
+    }
+    else
+    {
+      printf("Error: Shadow requires a rgba attribute\n");
+      return false;
+    }
+
+    _scene.shadowType = shadow->Attribute("type");
+    if (_scene.shadowType.empty())
+    {
+      printf("Error: Shadow requires a type attribute\n");
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine)
+{
+  TiXmlElement *odeConfig = _config->FirstChildElement("ode");
+
+  if ( !odeConfig )
+  {
+    printf("Error: Physics element missing <ode>\n");
+    return false;
+  }
+
+  TiXmlElement *solverConfig = odeConfig->FirstChildElement("solver");
+  if (!solverConfig)
+  {
+    printf("Error: ODE Physics missing solver element\n");
+    return false;
+  }
+
+  _open_dynamics_engine.solverType = solverConfig->Attribute("type");
+  if (_open_dynamics_engine.solverType.empty())
+  {
+    printf("Error: ODE Physics missing solver type\n");
+    return false;
+  }
+
+  std::string dtStr = solverConfig->Attribute("dt");
+  if (dtStr.empty())
+  {
+    printf("Error: ODE Physics solver missing dt attribute\n");
+    return false;
+  }
+  if (!getDoubleFromStr(dtStr, _open_dynamics_engine.dt))
+  {
+    printf("Error: ODE Physics solver malformed dt attribute\n");
+    return false;
+  }
+
+  std::string itersStr = solverConfig->Attribute("iters");
+  if (itersStr.empty())
+  {
+    printf("Error: ODE Physics solver missing iters attribute\n");
+    return false;
+  }
+  if (!getIntFromStr(itersStr, _open_dynamics_engine.iters))
+  {
+    printf("Error: ODE Physics solver malformed iters attribute\n");
+    return false;
+  }
+
+  std::string sorStr = solverConfig->Attribute("sor");
+  if (sorStr.empty())
+  {
+    printf("Error: ODE Physics solver missing sor attribute\n");
+    return false;
+  }
+  if (!getDoubleFromStr(sorStr, _open_dynamics_engine.sor))
+  {
+    printf("Error: ODE Physics solver malformed sor attribute\n");
+    return false;
+  }
+
+
+  // Contraints
+  TiXmlElement *constraintsConfig = odeConfig->FirstChildElement("constraints");
+  if (constraintsConfig)
+  {
+    std::string cfmStr = constraintsConfig->Attribute("cfm");
+    if (cfmStr.empty())
+    {
+      printf("Error: ODE Physics contraints missing cfm attribute\n");
+      return false;
+    }
+    if (!getDoubleFromStr(cfmStr, _open_dynamics_engine.cfm))
+    {
+      printf("Error: ODE Physics contraints malformed cfm attribute\n");
+      return false;
+    }
+
+    std::string erpStr = constraintsConfig->Attribute("erp");
+    if (erpStr.empty())
+    {
+      printf("Error: ODE Physics contraints missing erp attribute\n");
+      return false;
+    }
+    if (!getDoubleFromStr(erpStr, _open_dynamics_engine.erp))
+    {
+      printf("Error: ODE Physics contraints malformed erp attribute\n");
+      return false;
+    }
+
+    std::string contactMaxCorrectingVelStr = constraintsConfig->Attribute("contact_max_correcting_vel");
+    if (contactMaxCorrectingVelStr.empty())
+    {
+      printf("Error: ODE Physics contraints missing contact_max_correcting_vel attribute\n");
+      return false;
+    }
+    if (!getDoubleFromStr(contactMaxCorrectingVelStr, _open_dynamics_engine.contactMaxCorrectingVel))
+    {
+      printf("Error: ODE Physics contraints malformed contact_max_correcting_vel attribute\n");
+      return false;
+    } 
+ 
+    std::string contactSurfaceLayerStr = constraintsConfig->Attribute("contact_surface_layer");
+    if (contactSurfaceLayerStr.empty())
+    {
+      printf("Error: ODE Physics contraints missing contact_surface_layer attribute\n");
+      return false;
+    }
+    if (!getDoubleFromStr(contactSurfaceLayerStr, _open_dynamics_engine.contactSurfaceLayer))
+    {
+      printf("Error: ODE Physics contraints malformed contact_surface_layer attribute\n");
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool InitXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
+{
+  _physics.Clear();
+  
+  if (!_config)
+  {
+    printf("Error: xml config is NULL\n");
+    return false;
+  }
+
+  _physics.type = _config->Attribute("type");
+  if (_physics.type.empty())
+  {
+    printf("Error: Missing physics type attribute\n");
+    return false;
+  }
+
+  TiXmlElement *gravityElement = _config->FirstChildElement("gravity");
+  if (gravityElement)
+  {
+    if (!Init(gravityElement->Attribute("xyz"),_physics.gravity))
+    {
+      printf("Gravity has malformed xyz\n");
+      _physics.gravity.Clear();
+      return false;
+    }
+  }
+
+  if (_physics.type == "ode")
+  {
+    _physics.engine.reset(new OpenDynamicsEngine );
+  }
+  else
+  {
+    printf("Error: Unknown physics engine type[%s]\n",_physics.type.c_str());
+    return false;
+  }
+  InitXml(_config,_physics.engine);
+  
+  return true;
+}
+
+bool Init(const std::string &_vectorStr, boost::shared_ptr<Color> &_color)
+{
+  _color.Clear();
+
+  std::vector<std::string> pieces;
+  std::vector<float> rgba;
+  boost::split( pieces, _vectorStr, boost::is_any_of(" "));
+
+  for (unsigned int i = 0; i < pieces.size(); ++i)
+  {
+    if (!pieces[i].empty())
+    {
+      try
+      {
+        rgba.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+      }
+      catch (boost::bad_lexical_cast &e)
+      {
+        printf("color rgba element (%s) is not a valid float",pieces[i].c_str());
+        return false;
+      }
+    }
+  }
+
+  if (rgba.size() != 4)
+  {
+    printf("Color contains %i elements instead of 4 elements", (int)rgba.size());
+    return false;
+  }
+
+  _color.r = rgba[0];
+  _color.g = rgba[1];
+  _color.b = rgba[2];
+  _color.a = rgba[3];
+
+  return true;
+}
+
 }
 

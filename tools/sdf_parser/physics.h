@@ -50,7 +50,6 @@ namespace sdf
   class PhysicsEngine
   {
     public: virtual void Clear() = 0;
-    public: virtual bool InitXml(TiXmlElement *) = 0;
 
     public: virtual void Print() = 0;
   };
@@ -79,8 +78,6 @@ namespace sdf
               this->contactSurfaceLayer = 0;
             };
 
-    public: bool InitXml(TiXmlElement *_config);
-
     public: virtual void Print() 
             {
               std::cout << "ODE:\n";
@@ -104,8 +101,6 @@ namespace sdf
 
     public: boost::shared_ptr<PhysicsEngine> engine;
 
-    public: bool InitXml(TiXmlElement *_config);
-  
     public: void Clear()
     {
       this->type.clear();

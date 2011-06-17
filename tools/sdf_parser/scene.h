@@ -58,8 +58,6 @@ namespace sdf
     public: Color shadowColor;
     public: std::string shadowType;
   
-    public: bool InitXml(TiXmlElement *_config);
-  
     public: void Clear()
     {
       this->ambientColor.Clear();

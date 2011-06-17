@@ -60,44 +60,6 @@ namespace sdf
       a = 1.0f;
     }
 
-  public: bool Init(const std::string &_vectorStr)
-          {
-            this->Clear();
-
-            std::vector<std::string> pieces;
-            std::vector<float> rgba;
-            boost::split( pieces, _vectorStr, boost::is_any_of(" "));
-
-            for (unsigned int i = 0; i < pieces.size(); ++i)
-            {
-              if (!pieces[i].empty())
-              {
-                try
-                {
-                  rgba.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
-                }
-                catch (boost::bad_lexical_cast &e)
-                {
-                  printf("color rgba element (%s) is not a valid float",pieces[i].c_str());
-                  return false;
-                }
-              }
-            }
-
-            if (rgba.size() != 4)
-            {
-              printf("Color contains %i elements instead of 4 elements", (int)rgba.size());
-              return false;
-            }
-
-            this->r = rgba[0];
-            this->g = rgba[1];
-            this->b = rgba[2];
-            this->a = rgba[3];
-
-            return true;
-          };
-  
     friend std::ostream &operator<<(std::ostream &out, const Color &clr)
     {
       out << clr.r << " " << clr.g << " " << clr.b << " " << clr.a;

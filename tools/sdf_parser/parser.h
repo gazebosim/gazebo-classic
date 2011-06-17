@@ -77,6 +77,21 @@ namespace sdf
   /// \brief Load World from a XML-string
   bool InitString(const std::string &_xmlstring, boost::shared_ptr<World> &_world);
   
+  /// scene
+  bool InitXml(TiXmlElement *_config, boost::shared_ptr<Scene> &_scene);
+  
+  /// PhysicsEngine
+  virtual bool InitXml(TiXmlElement *, boost::shared_ptr<PhysicsEngine> &_physics_engine) = 0;
+
+  /// OpenDynamicsEngine
+  bool InitXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_open_dynamics_engine);
+
+  /// Physics
+  bool InitXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_physics);
+  
+  /// color
+  bool Init(const std::string &_vectorStr, boost::shared_ptr<Color> &_color);
+  
 
   bool getBoolFromStr(std::string _str, bool &_value);
  
