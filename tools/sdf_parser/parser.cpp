@@ -76,7 +76,7 @@ bool getDoubleFromStr(const std::string &_str, double &_value)
   return true;
 }
 
-bool geIntFromStr(const std::string &_str, int &_value)
+bool getIntFromStr(const std::string &_str, int &_value)
 {
   try
   {

@@ -38,27 +38,27 @@
 #include <vector>
 
 #include "parser.h"
-#include "model.h"
+#include "world.h"
 
 using namespace sdf;
 
 ////////////////////////////////////////////////////////////////////////////////
-Model::Model()
+World::World()
 {
   this->Clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Model::Clear()
+void World::Clear()
 {
   this->name.clear();
-  this->links.clear();
   this->joints.clear();
+  this->models.clear();
   this->plugins.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Model::InitFile(const std::string &_filename)
+bool World::InitFile(const std::string &_filename)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.LoadFile(_filename);
@@ -67,7 +67,7 @@ bool Model::InitFile(const std::string &_filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Model::InitString(const std::string &_xmlString)
+bool World::InitString(const std::string &_xmlString)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -76,7 +76,7 @@ bool Model::InitString(const std::string &_xmlString)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Model::InitXml(TiXmlDocument *_xmlDoc)
+bool World::InitXml(TiXmlDocument *_xmlDoc)
 {
   if (!_xmlDoc)
   {
@@ -88,17 +88,17 @@ bool Model::InitXml(TiXmlDocument *_xmlDoc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Model::InitXml(TiXmlElement *_modelXml)
+bool World::InitXml(TiXmlElement *_worldXml)
 {
-  printf("Parsing model xml\n");
-  if (!_modelXml) 
+  printf("World::InitXml Parsing world xml\n");
+  if (!_worldXml) 
     return false;
 
-  return this->Init(_modelXml);
+  return this->Init(_worldXml);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Model::Init(TiXmlDocument *_xmlDoc)
+bool World::Init(TiXmlDocument *_xmlDoc)
 {
   if (!_xmlDoc)
   {
@@ -106,70 +106,74 @@ bool Model::Init(TiXmlDocument *_xmlDoc)
     return false;
   }
 
-  TiXmlElement *modelXml = _xmlDoc->FirstChildElement("model");
-  if (!modelXml)
+  TiXmlElement *worldXml = _xmlDoc->FirstChildElement("world");
+  if (!worldXml)
   {
-    printf("Could not find the 'model' element in the xml file\n");
+    printf("Could not find the 'world' element in the xml file\n");
     return false;
   }
-  return this->Init(modelXml);
+  return this->Init(worldXml);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Model::Init(TiXmlElement *_modelXml)
+bool World::Init(TiXmlElement *_worldXml)
 {
   this->Clear();
 
-  printf("Parsing model xml\n");
-  if (!_modelXml) 
-    return false;
+  printf("Parsing the best world xml\n");
 
-  // Get model name
-  const char *nameStr = _modelXml->Attribute("name");
+  if (!_worldXml) 
+  {
+    printf("Error: World XML is NULL\n");
+    return false;
+  }
+
+  // Get world name
+  const char *nameStr = _worldXml->Attribute("name");
   if (!nameStr)
   {
-    printf("No name given for the model.\n");
+    printf("No name given for the world.\n");
     return false;
   }
   this->name = std::string(nameStr);
 
-  // Get all Link elements
-  for (TiXmlElement* linkXml = _modelXml->FirstChildElement("link"); 
-       linkXml; linkXml = linkXml->NextSiblingElement("link"))
-  {
-    boost::shared_ptr<Link> link;
-    link.reset(new Link);
+  this->scene.reset(new Scene);
+  this->scene->InitXml(_worldXml->FirstChildElement("scene"));
 
-    if (link->InitXml(linkXml))
+  this->physics.reset(new Physics);
+  this->physics->InitXml(_worldXml->FirstChildElement("physics"));
+
+  // Get all model elements
+  for (TiXmlElement* modelXml = _worldXml->FirstChildElement("model"); 
+       modelXml; modelXml = modelXml->NextSiblingElement("model"))
+  {
+    boost::shared_ptr<Model> model;
+    model.reset(new Model);
+
+    if (model->InitXml(modelXml))
     {
-      if (this->GetLink(link->name))
+      if (this->GetModel(model->name))
       {
-        printf("link '%s' is not unique.\n", link->name.c_str());
-        link.reset();
+        printf("model '%s' is not unique.\n", model->name.c_str());
+        model.reset();
         return false;
       }
       else
       {
-        this->links.insert(make_pair(link->name,link));
-        printf("successfully added a new link '%s'\n", link->name.c_str());
+        this->models.insert(make_pair(model->name,model));
+        printf("successfully added a new model '%s'\n", model->name.c_str());
       }
     }
     else
     {
-      printf("link xml is not initialized correctly\n");
-      link.reset();
+      printf("model xml is not initialized correctly\n");
+      model.reset();
       return false;
     }
   }
 
-  if (this->links.empty())
-  {
-    printf("No link elements found in xml file\n");
-    return false;
-  }
-
   // Get all Joint elements
-  for (TiXmlElement* jointXml = _modelXml->FirstChildElement("joint"); 
+  for (TiXmlElement* jointXml = _worldXml->FirstChildElement("joint"); 
        jointXml; jointXml = jointXml->NextSiblingElement("joint"))
   {
     boost::shared_ptr<Joint> joint;
@@ -198,48 +202,26 @@ bool Model::Init(TiXmlElement *_modelXml)
   }
 
   /// Get all the plugins
-  getPlugins(_modelXml, this->plugins);
+  getPlugins(_worldXml, this->plugins);
 
   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<const Link> Model::GetLink(const std::string &_name) const
+boost::shared_ptr<const Model> World::GetModel(const std::string &_name) const
 {
-  boost::shared_ptr<const Link> ptr;
+  boost::shared_ptr<const Model> ptr;
 
-  if (this->links.find(_name) == this->links.end())
+  if (this->models.find(_name) == this->models.end())
     ptr.reset();
   else
-    ptr = this->links.find(_name)->second;
+    ptr = this->models.find(_name)->second;
 
   return ptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Model::GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const
-{
-  for (std::map<std::string, boost::shared_ptr<Link> >::const_iterator link = this->links.begin(); link != this->links.end(); link++)
-  {
-    _links.push_back(link->second);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Model::GetLink(const std::string& _name, 
-                    boost::shared_ptr<Link> &_link) const
-{
-  boost::shared_ptr<Link> ptr;
-
-  if (this->links.find(_name) == this->links.end())
-    ptr.reset();
-  else
-    ptr = this->links.find(_name)->second;
-  _link = ptr;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<const Joint> Model::GetJoint(const std::string &_name) const
+boost::shared_ptr<const Joint> World::GetJoint(const std::string &_name) const
 {
   boost::shared_ptr<const Joint> ptr;
   if (this->joints.find(_name) == this->joints.end())
@@ -248,4 +230,3 @@ boost::shared_ptr<const Joint> Model::GetJoint(const std::string &_name) const
     ptr = this->joints.find(_name)->second;
   return ptr;
 }
-

@@ -34,44 +34,54 @@
 
 /* Author: Wim Meeussen */
 
+#ifndef URDF_SCENE_H
+#define URDF_SCENE_H
+
+#include <string>
+#include <tinyxml.h>
+#include <boost/shared_ptr.hpp>
 #include <iostream>
-#include "world.h"
 
-using namespace sdf;
+#include "color.h"
 
-int main(int argc, char** argv)
+namespace sdf
 {
-  if (argc < 2)
+  class Scene
   {
-    std::cerr << "Expect xml file to parse" << std::endl;
-    return -1;
-  }
+    public: Scene() { this->Clear(); };
+  
+    public: Color ambientColor;
+    public: Color backgroundColor;
+    public: std::string skyMaterial;
 
-  TiXmlDocument worldDoc;
-  worldDoc.LoadFile(argv[1]);
+    public: bool shadowEnabled;
+    public: Color shadowColor;
+    public: std::string shadowType;
+  
+    public: bool InitXml(TiXmlElement *_config);
+  
+    public: void Clear()
+    {
+      this->ambientColor.Clear();
+      this->backgroundColor.Clear();
+      this->skyMaterial.clear();
+      this->shadowEnabled = true;
+      this->shadowColor.Clear();
+      this->shadowType.clear();
+    }
 
-  TiXmlElement *worldXml = worldDoc.FirstChildElement("world");
-
-  if (!worldXml)
-  {
-    std::cerr << "ERROR: Could not load the xml into TiXmlElement" << std::endl;
-    return -1;
-  }
-
-  World world;
-  if (!world.Init(worldXml))
-  {
-    std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
-    return -1;
-  }
-
-  std::cout << "world name is: " << world.name << std::endl;
-
-  // get info from parser
-  std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
-
-  std::cout << world << "\n";
-
-  return 0;
+    public: friend std::ostream &operator<<(std::ostream &out, const Scene &scene)
+    {
+      out << "Scene:\n";
+      out << "  Ambient[" << scene.ambientColor << "]\n";
+      out << "  Background Color[" << scene.backgroundColor << "]\n";
+      out << "  SkyMaterial[" << scene.skyMaterial << "]\n";
+      out << "  ShadowEnabled[" << scene.shadowEnabled << "]\n";
+      out << "  ShadowColor[" << scene.shadowColor << "]\n";
+      out << "  ShadowType[" << scene.shadowType << "]\n";
+      return out;
+    }
+  };
 }
 
+#endif

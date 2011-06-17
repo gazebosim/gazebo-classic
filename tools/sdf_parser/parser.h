@@ -49,7 +49,7 @@ namespace sdf
  
   bool getDoubleFromStr(const std::string &_str, double &_value);
  
-  bool geIntFromStr(const std::string &_str, int &_value);
+  bool getIntFromStr(const std::string &_str, int &_value);
     
   bool getUIntFromStr(const std::string &_str, unsigned int &_value);
 

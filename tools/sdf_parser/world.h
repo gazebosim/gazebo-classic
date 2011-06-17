@@ -34,91 +34,96 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef ROBOT_MODEL_URDF_H
-#define ROBOT_MODEL_URDF_H
+#ifndef ROBOT_WORLD_URDF_H
+#define ROBOT_WORLD_URDF_H
 
 #include <string>
 #include <map>
 #include <tinyxml.h>
-#include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
 #include "plugin.h"
-#include "link.h"
+#include "scene.h"
+#include "physics.h"
+#include "model.h"
+#include "joint.h"
 
 namespace sdf
 {
-  class Model
+  class World
   {
-    public: Model();
+    public: World();
   
-    /// \brief Load Model from TiXMLElement
+    /// \brief Load World from TiXMLElement
     public: bool Init(TiXmlElement *_xml);
 
-    /// \brief Load Model from TiXMLDocument
+    /// \brief Load World from TiXMLDocument
     public: bool Init(TiXmlDocument *_xml);
   
-    /// \brief Load Model from TiXMLElement
+    /// \brief Load World from TiXMLElement
     public: bool InitXml(TiXmlElement *_xml);
 
-    /// \brief Load Model from TiXMLDocument
+    /// \brief Load World from TiXMLDocument
     public: bool InitXml(TiXmlDocument *_xml);
 
-    /// \brief Load Model given a filename
+    /// \brief Load World given a filename
     public: bool InitFile(const std::string &_filename);
 
-    /// \brief Load Model from a XML-string
+    /// \brief Load World from a XML-string
     public: bool InitString(const std::string &_xmlstring);
   
-    public: boost::shared_ptr<const Link> GetLink(const std::string &_name) const;
-    public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
+    public: boost::shared_ptr<const Model> GetModel(const std::string &_name) const;
     public: const std::string& GetName() const {return this->name;};
   
-    public: void GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const;
+    public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
+    public: void GetModels(std::vector<boost::shared_ptr<Model> > &_models) const;
   
-    /// \brief complete list of Links
-    public: std::map<std::string, boost::shared_ptr<Link> > links;
+    public: std::string name;
+    public: boost::shared_ptr<Scene> scene;
+    public: boost::shared_ptr<Physics> physics;
 
-    /// \brief complete list of Joints
-    public: std::map<std::string, boost::shared_ptr<Joint> > joints;
+    /// \brief complete list of models
+    public: std::map<std::string, boost::shared_ptr<Model> > models;
 
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
 
+    /// \brief complete list of joints
+    public: std::map<std::string, boost::shared_ptr<Joint> > joints;
+
     private: void Clear();
   
-    public: std::string name;
-  
     /// non-const getLink()
-    private: void GetLink(const std::string &_name, 
-                          boost::shared_ptr<Link> &_link) const;
+    private: void GetModel(const std::string &_name, 
+                          boost::shared_ptr<Model> &_model) const;
   
-    /// non-const getMaterial()
-    private: boost::shared_ptr<Material> GetMaterial(const std::string &_name) const;
-
-    public: friend std::ostream &operator<<(std::ostream &out, const Model &model)
+    public: friend std::ostream &operator<<(std::ostream &out, const World &world)
   {
-    out << "Model: Name[" << model.name << "]\n";
+    out << "World: Name[" << world.name << "]\n";
 
-    // Print plugins
-    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
-    for (iter = model.plugins.begin(); iter != model.plugins.end(); iter++)
-    {
-      out << "  " << *(iter->second.get()) << "\n";
-    }
+    out << *(world.scene.get()) << "\n";
+    out << *(world.physics.get()) << "\n";
 
-    // Print links
-    std::map<std::string, boost::shared_ptr<Link> >::const_iterator liter;
-    for (liter = model.links.begin(); liter != model.links.end(); liter++)
+    // Print models
+    std::map<std::string, boost::shared_ptr<Model> >::const_iterator miter;
+    for (miter = world.models.begin(); miter != world.models.end(); miter++)
     {
-      out << "  " << *(liter->second.get()) << "\n";
+      out << "  " << *(miter->second.get()) << "\n";
     }
 
     // Print joints
     std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
-    for (jiter = model.joints.begin(); jiter != model.joints.end(); jiter++)
+    for (jiter = world.joints.begin(); jiter != world.joints.end(); jiter++)
     {
       out << "  " << *(jiter->second.get()) << "\n";
+    }
+
+    // Print plugins
+    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
+    for (iter = world.plugins.begin(); iter != world.plugins.end(); iter++)
+    {
+      out << "  " << *(iter->second.get()) << "\n";
     }
 
     return out;
