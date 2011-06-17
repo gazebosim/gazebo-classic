@@ -56,7 +56,7 @@ const std::string default_config =
       <direction>0 0 -1.0</direction>\
       <cast_shadows>false</cast_shadows>\
     </light>\
-    <model name='box_model'>\
+    <!--<model name='box_model'>\
       <static>false</static>\
       <origin xyz='0 0 0.5'/>\
       <link name='body'>\
@@ -74,7 +74,7 @@ const std::string default_config =
           <cast_shadows>true</cast_shadows>\
         </visual>\
       </link>\
-    </model>\
+    </model>-->\
   </world>\
 </gazebo>";
 
