@@ -47,186 +47,173 @@
 #include "joint.h"
 #include "color.h"
 
-namespace gdf{
-
-class Geometry
+namespace sdf
 {
-public:
-  enum {SPHERE, BOX, CYLINDER, MESH} type;
-
-  virtual bool initXml(TiXmlElement *) = 0;
-};
-
-class Sphere : public Geometry
-{
-public:
-  Sphere() { this->clear(); };
-  double radius;
-
-  void clear()
+  class Geometry
   {
-    radius = 0;
+    public: enum {SPHERE, BOX, CYLINDER, MESH} type;
+
+    public: virtual bool InitXml(TiXmlElement *) = 0;
   };
-  bool initXml(TiXmlElement *);
-};
-
-class Box : public Geometry
-{
-public:
-  Box() { this->clear(); };
-  Vector3 size;
-
-  void clear()
+  
+  class Sphere : public Geometry
   {
-    size.clear();
+    public: Sphere() { this->Clear(); };
+    public: double radius;
+
+    public: void Clear()
+            {
+              radius = 0;
+            };
+
+    public: bool InitXml(TiXmlElement *);
   };
-  bool initXml(TiXmlElement *);
-};
-
-class Cylinder : public Geometry
-{
-public:
-  Cylinder() { this->clear(); };
-  double length;
-  double radius;
-
-  void clear()
+  
+  class Box : public Geometry
   {
-    length = 0;
-    radius = 0;
+    public: Box() { this->Clear(); };
+    public: Vector3 size;
+
+    public: void Clear()
+            {
+              size.Clear();
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
-  bool initXml(TiXmlElement *);
-};
-
-class Mesh : public Geometry
-{
-public:
-  Mesh() { this->clear(); };
-  std::string filename;
-  Vector3 scale;
-
-  void clear()
+  
+  class Cylinder : public Geometry
   {
-    filename.clear();
-    // default scale
-    scale.x = 1;
-    scale.y = 1;
-    scale.z = 1;
+    public: Cylinder() { this->Clear(); };
+    public: double length;
+    public: double radius;
+
+    public: void Clear()
+            {
+              length = 0;
+              radius = 0;
+            };
+    public: bool InitXml(TiXmlElement *);
   };
-  bool initXml(TiXmlElement *);
-  bool fileExists(std::string filename);
-};
-
-class Material
-{
-public:
-  Material() { this->clear(); };
-  std::string script;
-  Color color;
-
-  void clear()
+  
+  class Mesh : public Geometry
   {
-    color.clear();
-    script.clear();
+    public: Mesh() { this->Clear(); };
+    public: std::string filename;
+    public: Vector3 scale;
+
+    public: void Clear()
+            {
+              filename.clear();
+              // default scale
+              scale.x = 1;
+              scale.y = 1;
+              scale.z = 1;
+            };
+    public: bool InitXml(TiXmlElement *);
+    public: bool FileExists(std::string filename);
   };
-  bool initXml(TiXmlElement* config);
-};
-
-class Inertial
-{
-public:
-  Inertial() { this->clear(); };
-  Pose origin;
-  double mass;
-  double ixx,ixy,ixz,iyy,iyz,izz;
-
-  void clear()
+  
+  class Material
   {
-    origin.clear();
-    mass = 0;
-    ixx = ixy = ixz = iyy = iyz = izz = 0;
+    public: Material() { this->Clear(); };
+    public: std::string script;
+    public: Color color;
+
+    public: void Clear()
+            {
+              color.Clear();
+              script.clear();
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
-  bool initXml(TiXmlElement* config);
-};
-
-class Visual
-{
-public:
-  Visual() { this->clear(); };
-  Pose origin;
-  std::string name;
-  boost::shared_ptr<Geometry> geometry;
-
-  boost::shared_ptr<Material> material;
-
-  void clear()
+  
+  class Inertial
   {
-    origin.clear();
-    name.clear();
-    material.reset();
-    geometry.reset();
+    public: Inertial() { this->Clear(); };
+    public: Pose origin;
+    public: double mass;
+    public: double ixx,ixy,ixz,iyy,iyz,izz;
+
+    public: void Clear()
+            {
+              origin.Clear();
+              mass = 0;
+              ixx = ixy = ixz = iyy = iyz = izz = 0;
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
-  bool initXml(TiXmlElement* config);
-};
-
-class Collision
-{
-public:
-  Collision() { this->clear(); };
-  Pose origin;
-  std::string name;
-  boost::shared_ptr<Geometry> geometry;
-
-  void clear()
+  
+  class Visual
   {
-    origin.clear();
-    name.clear();
-    geometry.reset();
+    public: Visual() { this->Clear(); };
+    public: Pose origin;
+    public: std::string name;
+    public: boost::shared_ptr<Geometry> geometry;
+
+    public: boost::shared_ptr<Material> material;
+
+    public: void Clear()
+            {
+              origin.Clear();
+              name.clear();
+              material.reset();
+              geometry.reset();
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
-  bool initXml(TiXmlElement* config);
-};
-
-
-class Link
-{
-public:
-  Link() { this->clear(); };
-
-  std::string name;
-
-  /// inertial element
-  boost::shared_ptr<Inertial> inertial;
-
-  /// a collection of visual elements
-  std::vector<boost::shared_ptr<Visual> > visuals;
-
-  /// a collection of collision elements
-  std::vector<boost::shared_ptr<Collision> > collisions;
-
-  // a collection of the sensors
-  std::map<std::string, boost::shared_ptr<Sensor> > sensors;
-
-  bool initXml(TiXmlElement* config);
-
-  void clear()
+  
+  class Collision
   {
-    this->name.clear();
-    this->inertial.reset();
-    this->visuals.clear();
-    this->collisions.clear();
+    public: Collision() { this->Clear(); };
+    public: Pose origin;
+    public: std::string name;
+    public: boost::shared_ptr<Geometry> geometry;
+
+    public: void Clear()
+            {
+              origin.Clear();
+              name.clear();
+              geometry.reset();
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
+  
+  class Link
+  {
+    public: Link() { this->Clear(); };
 
-  void addVisual(boost::shared_ptr<Visual> visual);
-  void getVisuals(std::vector<boost::shared_ptr<Visual > > &vis) const;
+    public: std::string name;
 
-  void addCollision(boost::shared_ptr<Collision> collision);
-  void getCollisions(std::vector<boost::shared_ptr<Collision > > &col) const;
+              /// inertial element
+    public: boost::shared_ptr<Inertial> inertial;
 
-  boost::shared_ptr<const Sensor> getSensor(const std::string& name) const;
-};
+            /// a collection of visual elements
+    public: std::vector<boost::shared_ptr<Visual> > visuals;
 
+            /// a collection of collision elements
+    public: std::vector<boost::shared_ptr<Collision> > collisions;
 
+            // a collection of the sensors
+    public: std::map<std::string, boost::shared_ptr<Sensor> > sensors;
 
+    public: bool InitXml(TiXmlElement *_config);
+
+    public: void Clear()
+            {
+              this->name.clear();
+              this->inertial.reset();
+              this->visuals.clear();
+              this->collisions.clear();
+            };
+
+    public: void AddVisual(boost::shared_ptr<Visual> _visual);
+    public: void GetVisuals(std::vector<boost::shared_ptr<Visual > > &_vis) const;
+
+    public: void AddCollision(boost::shared_ptr<Collision> _collision);
+    public: void GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const;
+
+    public: boost::shared_ptr<const Sensor> GetSensor(const std::string &_name) const;
+  };
 
 }
 

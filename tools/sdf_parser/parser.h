@@ -38,47 +38,16 @@
 #define URDF_PARSER_H
 
 #include <string>
-#include <map>
-#include <tinyxml.h>
-#include <boost/function.hpp>
-#include "link.h"
 
-
-namespace gdf{
-
-class Parser
+namespace sdf
 {
-public:
-  Parser();
-
-  /// \brief Load Model from TiXMLElement
-  bool init(TiXmlElement *xml);
-  /// \brief Load Model from TiXMLDocument
-  bool init(TiXmlDocument *xml);
-
-  boost::shared_ptr<const Link> getLink(const std::string& name) const;
-  boost::shared_ptr<const Joint> getJoint(const std::string& name) const;
-  const std::string& getName() const {return name_;};
-
-  void getLinks(std::vector<boost::shared_ptr<Link> >& links) const;
-
-  /// \brief complete list of Links
-  std::map<std::string, boost::shared_ptr<Link> > links_;
-  /// \brief complete list of Joints
-  std::map<std::string, boost::shared_ptr<Joint> > joints_;
-
-protected:
-  void clear();
-
-  std::string name_;
-
-  /// non-const getLink()
-  void getLink(const std::string& name, boost::shared_ptr<Link> &link) const;
-
-  /// non-const getMaterial()
-  boost::shared_ptr<Material> getMaterial(const std::string& name) const;
-};
-
+  bool getBoolFromStr(std::string _str, bool &_value);
+ 
+  bool getDoubleFromStr(const std::string &_str, double &_value);
+ 
+  bool geIntFromStr(const std::string &_str, int &_value);
+    
+  bool getUIntFromStr(const std::string &_str, unsigned int &_value);
 }
 
 #endif

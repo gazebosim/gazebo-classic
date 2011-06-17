@@ -40,37 +40,38 @@
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 
-namespace gdf{
+using namespace sdf;
 
-boost::shared_ptr<Geometry> parseGeometry(TiXmlElement *g)
+boost::shared_ptr<Geometry> parseGeometry(TiXmlElement *_g)
 {
   boost::shared_ptr<Geometry> geom;
-  if (!g) return geom;
+  if (!_g) 
+    return geom;
 
-  TiXmlElement *shape = g->FirstChildElement();
+  TiXmlElement *shape = _g->FirstChildElement();
   if (!shape)
   {
     printf("Geometry tag contains no child element.\n");
     return geom;
   }
 
-  std::string type_name = shape->ValueStr();
-  if (type_name == "sphere")
+  std::string typeName = shape->ValueStr();
+  if (typeName == "sphere")
     geom.reset(new Sphere);
-  else if (type_name == "box")
+  else if (typeName == "box")
     geom.reset(new Box);
-  else if (type_name == "cylinder")
+  else if (typeName == "cylinder")
     geom.reset(new Cylinder);
-  else if (type_name == "mesh")
+  else if (typeName == "mesh")
     geom.reset(new Mesh);
   else
   {
-    printf("Unknown geometry type '%s'\n", type_name.c_str());
+    printf("Unknown geometry type '%s'\n", typeName.c_str());
     return geom;
   }
 
   // clear geom object when fails to initialize
-  if (!geom->initXml(shape)){
+  if (!geom->InitXml(shape)){
     printf("Geometry failed to parse\n");
     geom.reset();
   }
@@ -78,28 +79,28 @@ boost::shared_ptr<Geometry> parseGeometry(TiXmlElement *g)
   return geom;
 }
 
-bool Material::initXml(TiXmlElement *config)
+bool Material::InitXml(TiXmlElement *_config)
 {
-  bool has_rgb = false;
+  bool hasRGB = false;
 
-  this->clear();
+  this->Clear();
 
-  this->script = config->Attribute("script");
+  this->script = _config->Attribute("script");
 
   // color
-  TiXmlElement *c = config->FirstChildElement("color");
+  TiXmlElement *c = _config->FirstChildElement("color");
   if (c)
   {
     if (c->Attribute("rgba"))
     {
-      if (!this->color.init(c->Attribute("rgba")))
+      if (!this->color.Init(c->Attribute("rgba")))
       {
         printf("Material has malformed color rgba values.\n");
-        this->color.clear();
+        this->color.Clear();
         return false;
       }
       else
-        has_rgb = true;
+        hasRGB = true;
     }
     else
     {
@@ -107,31 +108,31 @@ bool Material::initXml(TiXmlElement *config)
     }
   }
 
-  return !this->script.empty() || has_rgb;
+  return !this->script.empty() || hasRGB;
 }
 
-bool Inertial::initXml(TiXmlElement *config)
+bool Inertial::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   // Origin
-  TiXmlElement *o = config->FirstChildElement("origin");
+  TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("INFO: Origin tag not present for inertial element, using default (Identity)\n\n");
-    this->origin.clear();
+    this->origin.Clear();
   }
   else
   {
-    if (!this->origin.initXml(o))
+    if (!this->origin.InitXml(o))
     {
       printf("Inertial has a malformed origin tag\n");
-      this->origin.clear();
+      this->origin.Clear();
       return false;
     }
   }
 
-  if (!config->Attribute("mass"))
+  if (!_config->Attribute("mass"))
   {
     printf("Inertial element must have mass attribute.");
     return false;
@@ -139,73 +140,75 @@ bool Inertial::initXml(TiXmlElement *config)
 
   try
   {
-    mass = boost::lexical_cast<double>(config->Attribute("mass"));
+    mass = boost::lexical_cast<double>(_config->Attribute("mass"));
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("mass (%s) is not a float",config->Attribute("mass"));
+    printf("mass (%s) is not a float",_config->Attribute("mass"));
     return false;
   }
 
-  TiXmlElement *inertia_xml = config->FirstChildElement("inertia");
-  if (!inertia_xml)
+  TiXmlElement *inertiaXml = _config->FirstChildElement("inertia");
+  if (!inertiaXml)
   {
     printf("Inertial element must have inertia element");
     return false;
   }
-  if (!(inertia_xml->Attribute("ixx") && inertia_xml->Attribute("ixy") && inertia_xml->Attribute("ixz") &&
-        inertia_xml->Attribute("iyy") && inertia_xml->Attribute("iyz") &&
-        inertia_xml->Attribute("izz")))
+
+  if (!(inertiaXml->Attribute("ixx") && inertiaXml->Attribute("ixy") && 
+        inertiaXml->Attribute("ixz") && inertiaXml->Attribute("iyy") && 
+        inertiaXml->Attribute("iyz") && inertiaXml->Attribute("izz")))
   {
     printf("Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes");
     return false;
   }
+
   try
   {
-    ixx  = boost::lexical_cast<double>(inertia_xml->Attribute("ixx"));
-    ixy  = boost::lexical_cast<double>(inertia_xml->Attribute("ixy"));
-    ixz  = boost::lexical_cast<double>(inertia_xml->Attribute("ixz"));
-    iyy  = boost::lexical_cast<double>(inertia_xml->Attribute("iyy"));
-    iyz  = boost::lexical_cast<double>(inertia_xml->Attribute("iyz"));
-    izz  = boost::lexical_cast<double>(inertia_xml->Attribute("izz"));
+    ixx  = boost::lexical_cast<double>(inertiaXml->Attribute("ixx"));
+    ixy  = boost::lexical_cast<double>(inertiaXml->Attribute("ixy"));
+    ixz  = boost::lexical_cast<double>(inertiaXml->Attribute("ixz"));
+    iyy  = boost::lexical_cast<double>(inertiaXml->Attribute("iyy"));
+    iyz  = boost::lexical_cast<double>(inertiaXml->Attribute("iyz"));
+    izz  = boost::lexical_cast<double>(inertiaXml->Attribute("izz"));
   }
   catch (boost::bad_lexical_cast &e)
   {
     printf("one of the inertia elements: ixx (%s) ixy (%s) ixz (%s) iyy (%s) iyz (%s) izz (%s) is not a valid double",
-              inertia_xml->Attribute("ixx"),
-              inertia_xml->Attribute("ixy"),
-              inertia_xml->Attribute("ixz"),
-              inertia_xml->Attribute("iyy"),
-              inertia_xml->Attribute("iyz"),
-              inertia_xml->Attribute("izz"));
+              inertiaXml->Attribute("ixx"),
+              inertiaXml->Attribute("ixy"),
+              inertiaXml->Attribute("ixz"),
+              inertiaXml->Attribute("iyy"),
+              inertiaXml->Attribute("iyz"),
+              inertiaXml->Attribute("izz"));
     return false;
   }
 
   return true;
 }
 
-bool Visual::initXml(TiXmlElement *config)
+bool Visual::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
-  this->name = config->Attribute("name");
+  this->name = _config->Attribute("name");
 
   // Origin
-  TiXmlElement *o = config->FirstChildElement("origin");
+  TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("Origin tag not present for visual element, using default (Identity)");
-    this->origin.clear();
+    this->origin.Clear();
   }
-  else if (!this->origin.initXml(o))
+  else if (!this->origin.InitXml(o))
   {
     printf("Visual has a malformed origin tag");
-    this->origin.clear();
+    this->origin.Clear();
     return false;
   }
 
   // Geometry
-  TiXmlElement *geom = config->FirstChildElement("geometry");
+  TiXmlElement *geom = _config->FirstChildElement("geometry");
   geometry = parseGeometry(geom);
   if (!geometry)
   {
@@ -214,7 +217,7 @@ bool Visual::initXml(TiXmlElement *config)
   }
 
   // Material
-  TiXmlElement *mat = config->FirstChildElement("material");
+  TiXmlElement *mat = _config->FirstChildElement("material");
   if (!mat)
   {
     printf("visual element has no material tag.");
@@ -223,7 +226,7 @@ bool Visual::initXml(TiXmlElement *config)
   {
     // try to parse material element in place
     this->material.reset(new Material);
-    if (!this->material->initXml(mat))
+    if (!this->material->InitXml(mat))
     {
       printf("Could not parse material element in Visual block, maybe defined outside.");
       this->material.reset();
@@ -237,28 +240,28 @@ bool Visual::initXml(TiXmlElement *config)
   return true;
 }
 
-bool Collision::initXml(TiXmlElement* config)
+bool Collision::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
-  this->name = config->Attribute("name");
+  this->name = _config->Attribute("name");
 
   // Origin
-  TiXmlElement *o = config->FirstChildElement("origin");
+  TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("Origin tag not present for collision element, using default (Identity)");
-    this->origin.clear();
+    this->origin.Clear();
   }
-  else if (!this->origin.initXml(o))
+  else if (!this->origin.InitXml(o))
   {
     printf("Collision has a malformed origin tag");
-    this->origin.clear();
+    this->origin.Clear();
     return false;
   }
 
   // Geometry
-  TiXmlElement *geom = config->FirstChildElement("geometry");
+  TiXmlElement *geom = _config->FirstChildElement("geometry");
   geometry = parseGeometry(geom);
   if (!geometry)
   {
@@ -269,9 +272,9 @@ bool Collision::initXml(TiXmlElement* config)
   return true;
 }
 
-bool Sphere::initXml(TiXmlElement *c)
+bool Sphere::InitXml(TiXmlElement *c)
 {
-  this->clear();
+  this->Clear();
 
   this->type = SPHERE;
   if (!c->Attribute("radius"))
@@ -293,32 +296,35 @@ bool Sphere::initXml(TiXmlElement *c)
   return true;
 }
 
-bool Box::initXml(TiXmlElement *c)
+bool Box::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   this->type = BOX;
-  if (!c->Attribute("size"))
+  if (!_config->Attribute("size"))
   {
     printf("Box shape has no size attribute");
     return false;
   }
-  if (!size.init(c->Attribute("size")))
+
+  if (!size.Init(_config->Attribute("size")))
   {
     printf("Box shape has malformed size attribute");
-    size.clear();
+    size.Clear();
     return false;
   }
+
   return true;
 }
 
-bool Cylinder::initXml(TiXmlElement *c)
+bool Cylinder::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   this->type = CYLINDER;
-  if (!c->Attribute("length") ||
-      !c->Attribute("radius"))
+
+  if (!_config->Attribute("length") ||
+      !_config->Attribute("radius"))
   {
     printf("Cylinder shape must have both length and radius attributes");
     return false;
@@ -326,66 +332,66 @@ bool Cylinder::initXml(TiXmlElement *c)
 
   try
   {
-    length = boost::lexical_cast<double>(c->Attribute("length"));
+    length = boost::lexical_cast<double>(_config->Attribute("length"));
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("length (%s) is not a valid float",c->Attribute("length"));
+    printf("length (%s) is not a valid float",_config->Attribute("length"));
     return false;
   }
 
   try
   {
-    radius = boost::lexical_cast<double>(c->Attribute("radius"));
+    radius = boost::lexical_cast<double>(_config->Attribute("radius"));
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("radius (%s) is not a valid float",c->Attribute("radius"));
+    printf("radius (%s) is not a valid float",_config->Attribute("radius"));
     return false;
   }
 
   return true;
 }
 
-bool Mesh::fileExists(std::string filename)
+bool Mesh::FileExists(std::string _filename)
 {
   printf("Warning: Need to implement a gazebo_config hook\n");
-  std::string fullname = filename;
+  std::string fullname = _filename;
 
   std::ifstream fin; 
   fin.open(fullname.c_str(), std::ios::in); fin.close();
 
   if (fin.fail()) {
-    printf("Mesh [%s] does not exist\n",filename.c_str());
+    printf("Mesh [%s] does not exist\n",_filename.c_str());
     return false;
   }
   
   return true;
 }
 
-bool Mesh::initXml(TiXmlElement *c)
+bool Mesh::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   this->type = MESH;
-  if (!c->Attribute("filename"))
+  if (!_config->Attribute("filename"))
   {
     printf("Mesh must contain a filename attribute\n");
     return false;
   }
 
-  filename = c->Attribute("filename");
+  filename = _config->Attribute("filename");
 
   // check if filename exists, is this really necessary?
-  if (!fileExists(filename))
-    printf("filename referred by mesh [%s] does not appear to exist.\n",filename.c_str());
+  if (!this->FileExists(filename))
+    printf("filename referred by mesh [%s] does not appear to exist.\n", filename.c_str());
 
-  if (c->Attribute("scale"))
+  if (_config->Attribute("scale"))
   {
-    if (!this->scale.init(c->Attribute("scale")))
+    if (!this->scale.Init(_config->Attribute("scale")))
     {
       printf("Mesh scale was specified, but could not be parsed\n");
-      this->scale.clear();
+      this->scale.Clear();
       return false;
     }
   }
@@ -396,24 +402,24 @@ bool Mesh::initXml(TiXmlElement *c)
 }
 
 
-bool Link::initXml(TiXmlElement* config)
+bool Link::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
-  const char *name_char = config->Attribute("name");
-  if (!name_char)
+  const char *nameChar = _config->Attribute("name");
+  if (!nameChar)
   {
     printf("No name given for the link.\n");
     return false;
   }
-  this->name = std::string(name_char);
+  this->name = std::string(nameChar);
 
   // Inertial (optional)
-  TiXmlElement *i = config->FirstChildElement("inertial");
+  TiXmlElement *i = _config->FirstChildElement("inertial");
   if (i)
   {
     inertial.reset(new Inertial);
-    if (!inertial->initXml(i))
+    if (!inertial->InitXml(i))
     {
       printf("Could not parse inertial element for Link '%s'\n", this->name.c_str());
       return false;
@@ -421,12 +427,13 @@ bool Link::initXml(TiXmlElement* config)
   }
 
   // Multiple Visuals (optional)
-  for (TiXmlElement* vis_xml = config->FirstChildElement("visual"); vis_xml; vis_xml = vis_xml->NextSiblingElement("visual"))
+  for (TiXmlElement* visXml = _config->FirstChildElement("visual"); 
+       visXml; visXml = visXml->NextSiblingElement("visual"))
   {
     boost::shared_ptr<Visual> vis;
     vis.reset(new Visual);
 
-    if (vis->initXml(vis_xml))
+    if (vis->InitXml(visXml))
     {
       //  add Visual to the vector
       this->visuals.push_back(vis);
@@ -441,12 +448,13 @@ bool Link::initXml(TiXmlElement* config)
   }
 
   // Multiple Collisions (optional)
-  for (TiXmlElement* col_xml = config->FirstChildElement("collision"); col_xml; col_xml = col_xml->NextSiblingElement("collision"))
+  for (TiXmlElement* colXml = _config->FirstChildElement("collision"); 
+       colXml; colXml = colXml->NextSiblingElement("collision"))
   {
     boost::shared_ptr<Collision> col;
     col.reset(new Collision);
 
-    if (col->initXml(col_xml))
+    if (col->InitXml(colXml))
     {
       // group exists, add Collision to the vector in the map
       this->collisions.push_back(col);
@@ -461,14 +469,15 @@ bool Link::initXml(TiXmlElement* config)
   }
 
   // Get all sensor elements
-  for (TiXmlElement* sensor_xml = config->FirstChildElement("sensor"); sensor_xml; sensor_xml = config->NextSiblingElement("sensor"))
+  for (TiXmlElement* sensorXml = _config->FirstChildElement("sensor"); 
+       sensorXml; sensorXml = _config->NextSiblingElement("sensor"))
   {
     boost::shared_ptr<Sensor> sensor;
     sensor.reset(new Sensor);
 
-    if (sensor->initXml(sensor_xml))
+    if (sensor->InitXml(sensorXml))
     {
-      if (this->getSensor(sensor->name))
+      if (this->GetSensor(sensor->name))
       {
         printf("sensor '%s' is not unique.\n", sensor->name.c_str());
         sensor.reset();
@@ -491,47 +500,49 @@ bool Link::initXml(TiXmlElement* config)
   return true;
 }
 
-void Link::addVisual(boost::shared_ptr<Visual> visual)
+void Link::AddVisual(boost::shared_ptr<Visual> _visual)
 {
   // group exists, add Visual to the vector in the map
-  std::vector<boost::shared_ptr<Visual > >::iterator vis_it = find(this->visuals.begin(),this->visuals.end(),visual);
+  std::vector<boost::shared_ptr<Visual > >::iterator vis_it = find(this->visuals.begin(),this->visuals.end(), _visual);
 
   if (vis_it != this->visuals.end())
     printf("attempted to add a visual that already exists, skipping.\n");
   else
-    this->visuals.push_back(visual);
+    this->visuals.push_back(_visual);
   printf("successfully added a new visual\n");
 }
 
-void Link::getVisuals(std::vector<boost::shared_ptr<Visual > > &vis) const
+void Link::GetVisuals(std::vector<boost::shared_ptr<Visual > > &_vis) const
 {
-  vis = this->visuals;
+  _vis = this->visuals;
 }
 
-void Link::addCollision(boost::shared_ptr<Collision> collision)
+void Link::AddCollision(boost::shared_ptr<Collision> _collision)
 {
   // group exists, add Collision to the vector in the map
-  std::vector<boost::shared_ptr<Collision > >::iterator vis_it = find(this->collisions.begin(),this->collisions.end(),collision);
+  std::vector<boost::shared_ptr<Collision > >::iterator vis_it = find(this->collisions.begin(),this->collisions.end(),_collision);
+
   if (vis_it != this->collisions.end())
     printf("attempted to add a collision that already exists, skipping.\n");
   else
-    this->collisions.push_back(collision);
+    this->collisions.push_back(_collision);
+
   printf("successfully added a new collision\n");
 }
 
-void Link::getCollisions(std::vector<boost::shared_ptr<Collision > > &col) const
+void Link::GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const
 {
-  col = this->collisions;
+  _col = this->collisions;
 }
 
-boost::shared_ptr<const Sensor> Link::getSensor(const std::string& name) const
+boost::shared_ptr<const Sensor> Link::GetSensor(const std::string& _name) const
 {
   boost::shared_ptr<const Sensor> ptr;
-  if (this->sensors.find(name) == this->sensors.end())
+
+  if (this->sensors.find(_name) == this->sensors.end())
     ptr.reset();
   else
-    ptr = this->sensors.find(name)->second;
-  return ptr;
-}
+    ptr = this->sensors.find(_name)->second;
 
+  return ptr;
 }

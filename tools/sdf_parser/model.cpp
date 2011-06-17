@@ -38,42 +38,207 @@
 #include <vector>
 #include "model.h"
 
-namespace gdf{
+using namespace sdf;
 
-bool Model::initFile(const std::string& filename)
+////////////////////////////////////////////////////////////////////////////////
+Model::Model()
 {
-  TiXmlDocument xml_doc;
-  xml_doc.LoadFile(filename);
-
-  return init(&xml_doc);
+  this->Clear();
 }
 
-bool Model::initString(const std::string& xml_string)
+////////////////////////////////////////////////////////////////////////////////
+void Model::Clear()
 {
-  TiXmlDocument xml_doc;
-  xml_doc.Parse(xml_string.c_str());
-
-  return init(&xml_doc);
+  this->name.clear();
+  this->links.clear();
+  this->joints.clear();
 }
 
-bool Model::initXml(TiXmlDocument *xml_doc)
+////////////////////////////////////////////////////////////////////////////////
+bool Model::InitFile(const std::string &_filename)
 {
-  if (!xml_doc)
+  TiXmlDocument xmlDoc;
+  xmlDoc.LoadFile(_filename);
+
+  return this->Init(&xmlDoc);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Model::InitString(const std::string &_xmlString)
+{
+  TiXmlDocument xmlDoc;
+  xmlDoc.Parse(_xmlString.c_str());
+
+  return this->Init(&xmlDoc);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Model::InitXml(TiXmlDocument *_xmlDoc)
+{
+  if (!_xmlDoc)
   {
     printf("Could not parse the xml\n");
     return false;
   }
 
-  return init(xml_doc);
+  return this->Init(_xmlDoc);
 }
 
-bool Model::initXml(TiXmlElement *robot_xml)
+////////////////////////////////////////////////////////////////////////////////
+bool Model::InitXml(TiXmlElement *_modelXml)
 {
-  printf("Parsing robot xml\n");
-  if (!robot_xml) 
+  printf("Parsing model xml\n");
+  if (!_modelXml) 
     return false;
 
-  return init(robot_xml);
+  return this->Init(_modelXml);
 }
 
-}// namespace
+////////////////////////////////////////////////////////////////////////////////
+bool Model::Init(TiXmlDocument *_xmlDoc)
+{
+  if (!_xmlDoc)
+  {
+    printf("Could not parse the xml\n");
+    return false;
+  }
+
+  TiXmlElement *modelXml = _xmlDoc->FirstChildElement("model");
+  if (!modelXml)
+  {
+    printf("Could not find the 'model' element in the xml file\n");
+    return false;
+  }
+  return this->Init(modelXml);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Model::Init(TiXmlElement *_modelXml)
+{
+  this->Clear();
+
+  printf("Parsing model xml\n");
+  if (!_modelXml) 
+    return false;
+
+  // Get model name
+  const char *nameStr = _modelXml->Attribute("name");
+  if (!nameStr)
+  {
+    printf("No name given for the model.\n");
+    return false;
+  }
+  this->name = std::string(nameStr);
+
+  // Get all Link elements
+  for (TiXmlElement* linkXml = _modelXml->FirstChildElement("link"); 
+       linkXml; linkXml = linkXml->NextSiblingElement("link"))
+  {
+    boost::shared_ptr<Link> link;
+    link.reset(new Link);
+
+    if (link->InitXml(linkXml))
+    {
+      if (this->GetLink(link->name))
+      {
+        printf("link '%s' is not unique.\n", link->name.c_str());
+        link.reset();
+        return false;
+      }
+      else
+      {
+        this->links.insert(make_pair(link->name,link));
+        printf("successfully added a new link '%s'\n", link->name.c_str());
+      }
+    }
+    else
+    {
+      printf("link xml is not initialized correctly\n");
+      link.reset();
+      return false;
+    }
+  }
+
+  if (this->links.empty())
+  {
+    printf("No link elements found in xml file\n");
+    return false;
+  }
+
+  // Get all Joint elements
+  for (TiXmlElement* jointXml = _modelXml->FirstChildElement("joint"); 
+       jointXml; jointXml = jointXml->NextSiblingElement("joint"))
+  {
+    boost::shared_ptr<Joint> joint;
+    joint.reset(new Joint);
+
+    if (joint->InitXml(jointXml))
+    {
+      if (this->GetJoint(joint->name))
+      {
+        printf("joint '%s' is not unique.\n", joint->name.c_str());
+        joint.reset();
+        return false;
+      }
+      else
+      {
+        this->joints.insert(make_pair(joint->name,joint));
+        printf("successfully added a new joint '%s'\n", joint->name.c_str());
+      }
+    }
+    else
+    {
+      printf("joint xml is not initialized correctly\n");
+      joint.reset();
+      return false;
+    }
+  }
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+boost::shared_ptr<const Link> Model::GetLink(const std::string &_name) const
+{
+  boost::shared_ptr<const Link> ptr;
+
+  if (this->links.find(name) == this->links.end())
+    ptr.reset();
+  else
+    ptr = this->links.find(_name)->second;
+
+  return ptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Model::GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const
+{
+  for (std::map<std::string, boost::shared_ptr<Link> >::const_iterator link = this->links.begin(); link != this->links.end(); link++)
+  {
+    _links.push_back(link->second);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Model::GetLink(const std::string& _name, 
+                    boost::shared_ptr<Link> &_link) const
+{
+  boost::shared_ptr<Link> ptr;
+
+  if (this->links.find(_name) == this->links.end())
+    ptr.reset();
+  else
+    ptr = this->links.find(_name)->second;
+  _link = ptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+boost::shared_ptr<const Joint> Model::GetJoint(const std::string &_name) const
+{
+  boost::shared_ptr<const Joint> ptr;
+  if (this->joints.find(_name) == this->joints.end())
+    ptr.reset();
+  else
+    ptr = this->joints.find(_name)->second;
+  return ptr;
+}

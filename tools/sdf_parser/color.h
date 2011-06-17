@@ -43,59 +43,67 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace gdf
+namespace sdf
 {
 
-class Color
-{
-public:
-  Color() {this->clear();};
-  float r;
-  float g;
-  float b;
-  float a;
-
-  void clear()
+  class Color
   {
-    r = g = b = 0.0f;
-    a = 1.0f;
-  }
-  bool init(const std::string &vector_str)
-  {
-    this->clear();
-    std::vector<std::string> pieces;
-    std::vector<float> rgba;
-    boost::split( pieces, vector_str, boost::is_any_of(" "));
-    for (unsigned int i = 0; i < pieces.size(); ++i)
+  public: Color() {this->Clear();}
+  public: float r;
+  public: float g;
+  public: float b;
+  public: float a;
+  
+  public: void Clear()
     {
-      if (!pieces[i].empty())
-      {
-        try
-        {
-          rgba.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
-        }
-        catch (boost::bad_lexical_cast &e)
-        {
-          printf("color rgba element (%s) is not a valid float",pieces[i].c_str());
-          return false;
-        }
-      }
+      r = g = b = 0.0f;
+      a = 1.0f;
     }
 
-    if (rgba.size() != 4)
+  public: bool Init(const std::string &_vectorStr)
+          {
+            this->Clear();
+
+            std::vector<std::string> pieces;
+            std::vector<float> rgba;
+            boost::split( pieces, _vectorStr, boost::is_any_of(" "));
+
+            for (unsigned int i = 0; i < pieces.size(); ++i)
+            {
+              if (!pieces[i].empty())
+              {
+                try
+                {
+                  rgba.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+                }
+                catch (boost::bad_lexical_cast &e)
+                {
+                  printf("color rgba element (%s) is not a valid float",pieces[i].c_str());
+                  return false;
+                }
+              }
+            }
+
+            if (rgba.size() != 4)
+            {
+              printf("Color contains %i elements instead of 4 elements", (int)rgba.size());
+              return false;
+            }
+
+            this->r = rgba[0];
+            this->g = rgba[1];
+            this->b = rgba[2];
+            this->a = rgba[3];
+
+            return true;
+          };
+  
+    friend std::ostream &operator<<(std::ostream &out, const Color &clr)
     {
-      printf("Color contains %i elements instead of 4 elements", (int)rgba.size());
-      return false;
+      out << clr.r << " " << clr.g << " " << clr.b << " " << clr.a;
+      return out;
     }
-
-    this->r = rgba[0];
-    this->g = rgba[1];
-    this->b = rgba[2];
-    this->a = rgba[3];
-
-    return true;
   };
-};
 
 }
 

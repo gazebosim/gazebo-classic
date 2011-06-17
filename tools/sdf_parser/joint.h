@@ -44,99 +44,97 @@
 
 #include "pose.h"
 
-namespace gdf{
-
-class Link;
-
-class JointDynamics
+namespace sdf
 {
-public:
-  JointDynamics() { this->clear(); };
-  double damping;
-  double friction;
-
-  void clear()
+  class Link;
+  
+  class JointDynamics
   {
-    damping = 0;
-    friction = 0;
+    public: JointDynamics() { this->Clear(); };
+    public: double damping;
+    public: double friction;
+
+    public: void Clear()
+            {
+              damping = 0;
+              friction = 0;
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
-  bool initXml(TiXmlElement* config);
-};
-
-class JointLimits
-{
-public:
-  JointLimits() { this->clear(); };
-  double lower;
-  double upper;
-  double effort;
-  double velocity;
-
-  void clear()
+  
+  class JointLimits
   {
-    lower = 0;
-    upper = 0;
-    effort = 0;
-    velocity = 0;
+    public: JointLimits() { this->Clear(); };
+    public: double lower;
+    public: double upper;
+    public: double effort;
+    public: double velocity;
+
+    public: void Clear()
+            {
+              lower = 0;
+              upper = 0;
+              effort = 0;
+              velocity = 0;
+            };
+    public: bool InitXml(TiXmlElement *_config);
   };
-  bool initXml(TiXmlElement* config);
-};
-
-
-class Joint
-{
-public:
-
-  Joint() { this->clear(); };
-
-  std::string name;
-  enum
+  
+  
+  class Joint
   {
-    UNKNOWN, REVOLUTE, REVOLUTE2, PRISMATIC, PISTON, BALL, UNIVERSAL
-  } type;
+    public: enum
+            {
+              UNKNOWN, REVOLUTE, REVOLUTE2, PRISMATIC, PISTON, BALL, UNIVERSAL
+            } type;
 
-  /// \brief     type_       meaning of axis_
-  /// ------------------------------------------------------
-  ///            UNKNOWN    unknown type
-  ///            REVOLUTE   rotation axis
-  ///            REVOLUTE2  rotation axis
-  ///            PRISMATIC  translation axis
-  ///            PISTON     N/A
-  ///            BALL       N/A
-  ///            UNIVERSAL  N/A
-  Vector3 axis;
-  Vector3 axis2;
+    public: Joint() { this->Clear(); };
 
-  /// child Link element
-  ///   child link frame is the same as the Joint frame
-  std::string child_link_name;
+    public: std::string name;
 
-  /// parent Link element
-  ///   origin specifies the transform from Parent Link to Joint Frame
-  std::string parent_link_name;
+    /// \brief     type_       meaning of axis_
+    /// ------------------------------------------------------
+    ///            UNKNOWN    unknown type
+    ///            REVOLUTE   rotation axis
+    ///            REVOLUTE2  rotation axis
+    ///            PRISMATIC  translation axis
+    ///            PISTON     N/A
+    ///            BALL       N/A
+    ///            UNIVERSAL  N/A
+    public: Vector3 axis;
+    public: Vector3 axis2;
 
-  /// transform from Child Link frame to Joint frame
-  Pose origin;
+    /// child Link element
+    ///   child link frame is the same as the Joint frame
+    public: std::string childLinkName;
 
-  /// Joint Dynamics
-  boost::shared_ptr<JointDynamics> dynamics;
+    /// parent Link element
+    ///   origin specifies the transform from Parent Link to Joint Frame
+    public: std::string parentLinkName;
 
-  /// Joint Limits
-  boost::shared_ptr<JointLimits> limits;
+    /// transform from Child Link frame to Joint frame
+    public: Pose origin;
 
-  bool initXml(TiXmlElement* xml);
-  void clear()
-  {
-    this->axis.clear();
-    this->axis2.clear();
-    this->child_link_name.clear();
-    this->parent_link_name.clear();
-    this->origin.clear();
-    this->dynamics.reset();
-    this->limits.reset();
-    this->type = UNKNOWN;
+    /// Joint Dynamics
+    public: boost::shared_ptr<JointDynamics> dynamics;
+
+    /// Joint Limits
+    public: boost::shared_ptr<JointLimits> limits;
+
+    public: bool InitXml(TiXmlElement* xml);
+
+    public: void Clear()
+            {
+              this->axis.Clear();
+              this->axis2.Clear();
+              this->childLinkName.clear();
+              this->parentLinkName.clear();
+              this->origin.Clear();
+              this->dynamics.reset();
+              this->limits.reset();
+              this->type = UNKNOWN;
+            };
   };
-};
 
 }
 

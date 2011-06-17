@@ -34,18 +34,19 @@
 
 /* Author: John Hsu */
 
-#include "joint.h"
 #include <boost/lexical_cast.hpp>
+#include "joint.h"
 
-namespace gdf{
+using namespace sdf;
 
-bool JointDynamics::initXml(TiXmlElement* config)
+bool JointDynamics::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   // Get joint damping
-  const char* damping_str = config->Attribute("damping");
-  if (damping_str == NULL){
+  const char* dampingStr = _config->Attribute("damping");
+  if (dampingStr == NULL)
+  {
     printf("joint dynamics: no damping, defaults to 0\n");
     this->damping = 0;
   }
@@ -53,18 +54,18 @@ bool JointDynamics::initXml(TiXmlElement* config)
   {
     try
     {
-      this->damping = boost::lexical_cast<double>(damping_str);
+      this->damping = boost::lexical_cast<double>(dampingStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("damping value (%s) is not a float\n",damping_str);
+      printf("damping value (%s) is not a float\n",dampingStr);
       return false;
     }
   }
 
   // Get joint friction
-  const char* friction_str = config->Attribute("friction");
-  if (friction_str == NULL){
+  const char* frictionStr = _config->Attribute("friction");
+  if (frictionStr == NULL){
     printf("joint dynamics: no friction, defaults to 0\n");
     this->friction = 0;
   }
@@ -72,33 +73,34 @@ bool JointDynamics::initXml(TiXmlElement* config)
   {
     try
     {
-      this->friction = boost::lexical_cast<double>(friction_str);
+      this->friction = boost::lexical_cast<double>(frictionStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("friction value (%s) is not a float\n",friction_str);
+      printf("friction value (%s) is not a float\n",frictionStr);
       return false;
     }
   }
 
-  if (damping_str == NULL && friction_str == NULL)
+  if (dampingStr == NULL && frictionStr == NULL)
   {
     printf("joint dynamics element specified with no damping and no friction\n");
     return false;
   }
   else{
-    printf("joint dynamics: damping %f and friction %f\n", damping, friction);
+    printf("joint dynamics: damping %f and friction %f\n", this->damping, this->friction);
     return true;
   }
 }
 
-bool JointLimits::initXml(TiXmlElement* config)
+bool JointLimits::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   // Get lower joint limit
-  const char* lower_str = config->Attribute("lower");
-  if (lower_str == NULL){
+  const char* lowerStr = _config->Attribute("lower");
+  if (lowerStr == NULL)
+  {
     printf("joint limit: no lower, defaults to 0\n");
     this->lower = 0;
   }
@@ -106,18 +108,19 @@ bool JointLimits::initXml(TiXmlElement* config)
   {
     try
     {
-      this->lower = boost::lexical_cast<double>(lower_str);
+      this->lower = boost::lexical_cast<double>(lowerStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("lower value (%s) is not a float\n",lower_str);
+      printf("lower value (%s) is not a float\n",lowerStr);
       return false;
     }
   }
 
   // Get upper joint limit
-  const char* upper_str = config->Attribute("upper");
-  if (upper_str == NULL){
+  const char* upperStr = _config->Attribute("upper");
+  if (upperStr == NULL)
+  {
     printf("joint limit: no upper, , defaults to 0\n");
     this->upper = 0;
   }
@@ -125,18 +128,18 @@ bool JointLimits::initXml(TiXmlElement* config)
   {
     try
     {
-      this->upper = boost::lexical_cast<double>(upper_str);
+      this->upper = boost::lexical_cast<double>(upperStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("upper value (%s) is not a float\n",upper_str);
+      printf("upper value (%s) is not a float\n",upperStr);
       return false;
     }
   }
 
   // Get joint effort limit
-  const char* effort_str = config->Attribute("effort");
-  if (effort_str == NULL){
+  const char* effortStr = _config->Attribute("effort");
+  if (effortStr == NULL){
     printf("joint limit: no effort\n");
     return false;
   }
@@ -144,18 +147,19 @@ bool JointLimits::initXml(TiXmlElement* config)
   {
     try
     {
-      this->effort = boost::lexical_cast<double>(effort_str);
+      this->effort = boost::lexical_cast<double>(effortStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("effort value (%s) is not a float\n",effort_str);
+      printf("effort value (%s) is not a float\n",effortStr);
       return false;
     }
   }
 
   // Get joint velocity limit
-  const char* velocity_str = config->Attribute("velocity");
-  if (velocity_str == NULL){
+  const char* velocityStr = _config->Attribute("velocity");
+  if (velocityStr == NULL)
+  {
     printf("joint limit: no velocity\n");
     return false;
   }
@@ -163,11 +167,11 @@ bool JointLimits::initXml(TiXmlElement* config)
   {
     try
     {
-      this->velocity = boost::lexical_cast<double>(velocity_str);
+      this->velocity = boost::lexical_cast<double>(velocityStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("velocity value (%s) is not a float\n",velocity_str);
+      printf("velocity value (%s) is not a float\n",velocityStr);
       return false;
     }
   }
@@ -177,86 +181,84 @@ bool JointLimits::initXml(TiXmlElement* config)
 
 
 
-bool Joint::initXml(TiXmlElement* config)
+bool Joint::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   // Get Joint Name
-  const char *name = config->Attribute("name");
-  if (!name)
+  const char *nameStr = _config->Attribute("name");
+  if (!nameStr)
   {
     printf("unnamed joint found\n");
     return false;
   }
-  this->name = name;
+  this->name = nameStr;
 
   // Get transform from Parent Link to Joint Frame
-  TiXmlElement *origin_xml = config->FirstChildElement("origin");
-  if (!origin_xml)
+  TiXmlElement *originXml = _config->FirstChildElement("origin");
+  if (!originXml)
   {
-    this->origin.clear();
+    this->origin.Clear();
   }
   else
   {
-    if (!this->origin.initXml(origin_xml))
+    if (!this->origin.InitXml(originXml))
     {
       printf("Malformed parent origin element for joint '%s'\n", this->name.c_str());
-      this->origin.clear();
+      this->origin.Clear();
       return false;
     }
   }
 
   // Get Parent Link
-  TiXmlElement *parent_xml = config->FirstChildElement("parent");
-  if (parent_xml)
+  TiXmlElement *parentXml = _config->FirstChildElement("parent");
+  if (parentXml)
   {
-    const char *pname = parent_xml->Attribute("link");
+    const char *pname = parentXml->Attribute("link");
     if (!pname)
       printf("no parent link name specified for Joint link '%s'. this might be the root?\n", this->name.c_str());
     else
     {
-      this->parent_link_name = std::string(pname);
-
+      this->parentLinkName = std::string(pname);
     }
   }
 
   // Get Child Link
-  TiXmlElement *child_xml = config->FirstChildElement("child");
-  if (child_xml)
+  TiXmlElement *childXml = _config->FirstChildElement("child");
+  if (childXml)
   {
-    const char *pname = child_xml->Attribute("link");
+    const char *pname = childXml->Attribute("link");
     if (!pname)
       printf("no child link name specified for Joint link '%s'.\n", this->name.c_str());
     else
     {
-      this->child_link_name = std::string(pname);
-
+      this->childLinkName = std::string(pname);
     }
   }
 
   // Get Joint type
-  const char* type_char = config->Attribute("type");
-  if (!type_char)
+  const char* typeChar = _config->Attribute("type");
+  if (!typeChar)
   {
     printf("joint '%s' has no type, check to see if it's a reference.\n", this->name.c_str());
     return false;
   }
-  std::string type_str = type_char;
-  if (type_str == "piston")
+  std::string typeStr = typeChar;
+  if (typeStr == "piston")
     type = PISTON;
-  else if (type_str == "revolute2")
+  else if (typeStr == "revolute2")
     type = REVOLUTE2;
-  else if (type_str == "revolute")
+  else if (typeStr == "revolute")
     type = REVOLUTE;
-  else if (type_str == "universal")
+  else if (typeStr == "universal")
     type = UNIVERSAL;
-  else if (type_str == "prismatic")
+  else if (typeStr == "prismatic")
     type = PRISMATIC;
-  else if (type_str == "ball")
+  else if (typeStr == "ball")
     type = BALL;
   else
   {
-    printf("Joint '%s' has no known type '%s'\n", this->name.c_str(), type_str.c_str());
+    printf("Joint '%s' has no known type '%s'\n", this->name.c_str(), typeStr.c_str());
     return false;
   }
 
@@ -264,20 +266,23 @@ bool Joint::initXml(TiXmlElement* config)
   if (this->type != BALL)
   {
     // axis
-    TiXmlElement *axis_xml = config->FirstChildElement("axis");
-    if (!axis_xml){
+    TiXmlElement *axisXml = _config->FirstChildElement("axis");
+    if (!axisXml)
+    {
       printf("no axis elemement for Joint link '%s', defaulting to (1,0,0) axis\n", this->name.c_str());
       this->axis = Vector3(1.0, 0.0, 0.0);
     }
     else{
-      if (!axis_xml->Attribute("xyz")){
+      if (!axisXml->Attribute("xyz"))
+      {
         printf("no xyz attribute for axis element for Joint link '%s'\n", this->name.c_str());
       }
-      else {
-        if (!this->axis.init(axis_xml->Attribute("xyz")))
+      else 
+      {
+        if (!this->axis.Init(axisXml->Attribute("xyz")))
         {
           printf("Malformed axis element for joint '%s'\n", this->name.c_str());
-          this->axis.clear();
+          this->axis.Clear();
           return false;
         }
       }
@@ -285,11 +290,11 @@ bool Joint::initXml(TiXmlElement* config)
   }
 
   // Get limit
-  TiXmlElement *limit_xml = config->FirstChildElement("limit");
-  if (limit_xml)
+  TiXmlElement *limitXml = _config->FirstChildElement("limit");
+  if (limitXml)
   {
     limits.reset(new JointLimits);
-    if (!limits->initXml(limit_xml))
+    if (!limits->InitXml(limitXml))
     {
       printf("Could not parse limit element for joint '%s'\n", this->name.c_str());
       limits.reset();
@@ -298,11 +303,11 @@ bool Joint::initXml(TiXmlElement* config)
   }
 
   // Get Dynamics
-  TiXmlElement *prop_xml = config->FirstChildElement("dynamics");
-  if (prop_xml)
+  TiXmlElement *propXml = _config->FirstChildElement("dynamics");
+  if (propXml)
   {
     dynamics.reset(new JointDynamics);
-    if (!dynamics->initXml(prop_xml))
+    if (!dynamics->InitXml(propXml))
     {
       printf("Could not parse joint_dynamics element for joint '%s'\n", this->name.c_str());
       dynamics.reset();
@@ -311,6 +316,4 @@ bool Joint::initXml(TiXmlElement* config)
   }
 
   return true;
-}
-
 }

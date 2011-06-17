@@ -44,119 +44,113 @@
 
 #include "pose.h"
 
-namespace gdf{
-
-class SensorType
+namespace sdf
 {
-  enum {CAMERA, RAY, CONTACT} type;
 
-  virtual bool initXml(TiXmlElement *) = 0;
-};
-
-class Sensor
-{
-public:
-  Sensor() { this->clear(); };
-
-  std::string name;
-  std::string type;
-  bool always_on;
-  double update_rate;
-
-  Pose origin;
-
-  boost::shared_ptr<SensorType> sensor_type;
-
-  bool initXml(TiXmlElement* config);
-
-  void clear()
+  class SensorType
   {
-    this->name.clear();
-    this->type.clear();
-    this->always_on = false;
-    this->update_rate = -1;
-    this->sensor_type.reset();
-    this->origin.clear();
-  }
-
-};
-
-
-
-class Contact : public SensorType
-{
-  Contact() { }
-  bool initXml(TiXmlElement *) {return true;}
-};
-
-class Camera : public SensorType
-{
-public:
-  Camera() { this->clear(); };
-  double horizontal_fov;
-  unsigned int image_width;
-  unsigned int image_height;
-  std::string image_format;
-  double clip_near;
-  double clip_far;
-  bool save_enabled;
-  std::string save_path;
-
-  void clear()
-  {
-    this->horizontal_fov = 0;
-    this->image_width = 0;
-    this->image_height = 0;
-    this->image_format.clear();
-    this->clip_near = 0;
-    this->clip_far = 0;
-    this->save_enabled = false;
-    this->save_path.clear();
-  }
-
-  bool initXml(TiXmlElement *);
-};
-
-class Ray : public SensorType
-{
-public:
-  Ray() { this->clear(); };
-  bool display;
-  unsigned int horizontal_samples;
-  double       horizontal_resolution;
-  double       horizontal_min_angle;
-  double       horizontal_max_angle;
-
-  unsigned int vertical_samples;
-  double       vertical_resolution;
-  double       vertical_min_angle;
-  double       vertical_max_angle;
-
-  double range_min;
-  double range_max;
-  double range_resolution;
-
-  void clear()
-  {
-    this->display = false;
-    this->horizontal_samples = 1;
-    this->horizontal_resolution = 1;
-    this->horizontal_min_angle = 0;
-    this->horizontal_max_angle = 0;
-
-    this->vertical_samples = 1;
-    this->vertical_resolution = 1;
-    this->vertical_min_angle = 0;
-    this->vertical_max_angle = 0;
-
-    this->range_min = 0;
-    this->range_max = 1000;
-    this->range_resolution = 0;
+    enum {CAMERA, RAY, CONTACT} type;
+  
+    virtual bool InitXml(TiXmlElement *) = 0;
   };
-
-  bool initXml(TiXmlElement *);
-};
-
+  
+  class Sensor
+  {
+    public: Sensor() { this->Clear(); };
+  
+    public: std::string name;
+    public: std::string type;
+    public: bool alwaysOn;
+    public: double updateRate;
+  
+    public: Pose origin;
+  
+    public: boost::shared_ptr<SensorType> sensorType;
+  
+    public: bool InitXml(TiXmlElement *_config);
+  
+    public: void Clear()
+    {
+      this->name.clear();
+      this->type.clear();
+      this->alwaysOn = false;
+      this->updateRate = -1;
+      this->sensorType.reset();
+      this->origin.Clear();
+    }
+  };
+  
+  class Contact : public SensorType
+  {
+    public: Contact() { }
+    public: bool InitXml(TiXmlElement *) {return true;}
+  };
+  
+  class Camera : public SensorType
+  {
+    public: Camera() { this->Clear(); };
+    public: double horizontalFov;
+    public: unsigned int imageWidth;
+    public: unsigned int imageHeight;
+    public: std::string imageFormat;
+    public: double clipNear;
+    public: double clipFar;
+    public: bool saveEnabled;
+    public: std::string savePath;
+  
+    public: void Clear()
+    {
+      this->horizontalFov = 0;
+      this->imageWidth = 0;
+      this->imageHeight = 0;
+      this->imageFormat.clear();
+      this->clipNear = 0;
+      this->clipFar = 0;
+      this->saveEnabled = false;
+      this->savePath.clear();
+    }
+  
+    public: bool InitXml(TiXmlElement *);
+  };
+  
+  class Ray : public SensorType
+  {
+    public: Ray() { this->Clear(); };
+    public: bool display;
+    public: unsigned int horizontalSamples;
+    public: double       horizontalResolution;
+    public: double       horizontalMinAngle;
+    public: double       horizontalMaxAngle;
+  
+    public: unsigned int verticalSamples;
+    public: double       verticalResolution;
+    public: double       verticalMinAngle;
+    public: double       verticalMaxAngle;
+  
+    public: double rangeMin;
+    public: double rangeMax;
+    public: double rangeResolution;
+  
+    public: void Clear()
+    {
+      this->display = false;
+      this->horizontalSamples = 1;
+      this->horizontalResolution = 1;
+      this->horizontalMinAngle = 0;
+      this->horizontalMaxAngle = 0;
+  
+      this->verticalSamples = 1;
+      this->verticalResolution = 1;
+      this->verticalMinAngle = 0;
+      this->verticalMaxAngle = 0;
+  
+      this->rangeMin = 0;
+      this->rangeMax = 1000;
+      this->rangeResolution = 0;
+    };
+  
+    bool InitXml(TiXmlElement *);
+  };
 
 }
 

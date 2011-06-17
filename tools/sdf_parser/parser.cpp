@@ -35,158 +35,75 @@
 /* Author: Wim Meeussen */
 
 #include <boost/algorithm/string.hpp>
-#include <vector>
+#include <boost/lexical_cast.hpp>
+
+#include <tinyxml.h>
+#include <stdio.h>
+
 #include "parser.h"
 
-namespace gdf{
-
-Parser::Parser()
+namespace sdf
 {
-  this->clear();
-}
 
-void Parser::clear()
+bool getBoolFromStr(std::string _str, bool &_value)
 {
-  name_.clear();
-  this->links_.clear();
-  this->joints_.clear();
-}
-
-bool Parser::init(TiXmlDocument *xml_doc)
-{
-  if (!xml_doc)
+  boost::to_lower(_str);
+  if (_str == "true" || _str == "t" || _str == "1")
+    _value = true;
+  else if (_str == "false" || _str == "f" || _str == "0")
+    _value = false;
+  else
   {
-    printf("Could not parse the xml\n");
+    _value = false;
     return false;
-  }
-
-  TiXmlElement *model_xml = xml_doc->FirstChildElement("model");
-  if (!model_xml)
-  {
-    printf("Could not find the 'model' element in the xml file\n");
-    return false;
-  }
-  return init(model_xml);
-}
-
-
-bool Parser::init(TiXmlElement *model_xml)
-{
-  this->clear();
-
-  printf("Parsing model xml\n");
-  if (!model_xml) 
-    return false;
-
-  // Get model name
-  const char *name = model_xml->Attribute("name");
-  if (!name)
-  {
-    printf("No name given for the model.\n");
-    return false;
-  }
-  this->name_ = std::string(name);
-
-  // Get all Link elements
-  for (TiXmlElement* link_xml = model_xml->FirstChildElement("link"); link_xml; link_xml = link_xml->NextSiblingElement("link"))
-  {
-    boost::shared_ptr<Link> link;
-    link.reset(new Link);
-
-    if (link->initXml(link_xml))
-    {
-      if (this->getLink(link->name))
-      {
-        printf("link '%s' is not unique.\n", link->name.c_str());
-        link.reset();
-        return false;
-      }
-      else
-      {
-        this->links_.insert(make_pair(link->name,link));
-        printf("successfully added a new link '%s'\n", link->name.c_str());
-      }
-    }
-    else
-    {
-      printf("link xml is not initialized correctly\n");
-      link.reset();
-      return false;
-    }
-  }
-  if (this->links_.empty()){
-    printf("No link elements found in xml file\n");
-    return false;
-  }
-
-  // Get all Joint elements
-  for (TiXmlElement* joint_xml = model_xml->FirstChildElement("joint"); joint_xml; joint_xml = joint_xml->NextSiblingElement("joint"))
-  {
-    boost::shared_ptr<Joint> joint;
-    joint.reset(new Joint);
-
-    if (joint->initXml(joint_xml))
-    {
-      if (this->getJoint(joint->name))
-      {
-        printf("joint '%s' is not unique.\n", joint->name.c_str());
-        joint.reset();
-        return false;
-      }
-      else
-      {
-        this->joints_.insert(make_pair(joint->name,joint));
-        printf("successfully added a new joint '%s'\n", joint->name.c_str());
-      }
-    }
-    else
-    {
-      printf("joint xml is not initialized correctly\n");
-      joint.reset();
-      return false;
-    }
   }
 
   return true;
 }
 
-boost::shared_ptr<const Link> Parser::getLink(const std::string& name) const
+bool getDoubleFromStr(const std::string &_str, double &_value)
 {
-  boost::shared_ptr<const Link> ptr;
-  if (this->links_.find(name) == this->links_.end())
-    ptr.reset();
-  else
-    ptr = this->links_.find(name)->second;
-  return ptr;
-}
-
-void Parser::getLinks(std::vector<boost::shared_ptr<Link> >& links) const
-{
-  for (std::map<std::string,boost::shared_ptr<Link> >::const_iterator link = this->links_.begin();link != this->links_.end(); link++)
+  try
   {
-    links.push_back(link->second);
+    _value = boost::lexical_cast<double>(_str);
   }
+  catch (boost::bad_lexical_cast &e)
+  {
+    printf("ERR: string is not a double format\n");
+    return false;
+  }
+
+  return true;
 }
 
-void Parser::getLink(const std::string& name,boost::shared_ptr<Link> &link) const
+bool geIntFromStr(const std::string &_str, int &_value)
 {
-  boost::shared_ptr<Link> ptr;
-  if (this->links_.find(name) == this->links_.end())
-    ptr.reset();
-  else
-    ptr = this->links_.find(name)->second;
-  link = ptr;
+  try
+  {
+    _value = boost::lexical_cast<int>(_str);
+  }
+  catch (boost::bad_lexical_cast &e)
+  {
+    printf("ERR: string is not an int format\n");
+    return false;
+  }
+
+  return true;
 }
 
-boost::shared_ptr<const Joint> Parser::getJoint(const std::string& name) const
+bool getUIntFromStr(const std::string &_str, unsigned int &_value)
 {
-  boost::shared_ptr<const Joint> ptr;
-  if (this->joints_.find(name) == this->joints_.end())
-    ptr.reset();
-  else
-    ptr = this->joints_.find(name)->second;
-  return ptr;
+  try
+  {
+    _value = boost::lexical_cast<unsigned int>(_str);
+  }
+  catch (boost::bad_lexical_cast &e)
+  {
+    printf("ERR: string is not an unsigned int format\n");
+    return false;
+  }
+
+  return true;
 }
 
 }
-

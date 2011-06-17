@@ -39,24 +39,57 @@
 
 #include <string>
 #include <map>
-#include "parser.h"
+#include <tinyxml.h>
 
+#include "link.h"
 
-namespace gdf{
-
-class Model: public gdf::Parser
+namespace sdf
 {
-public:
-  /// \brief Load Model from TiXMLElement
-  bool initXml(TiXmlElement *xml);
-  /// \brief Load Model from TiXMLDocument
-  bool initXml(TiXmlDocument *xml);
-  /// \brief Load Model given a filename
-  bool initFile(const std::string& filename);
-  /// \brief Load Model from a XML-string
-  bool initString(const std::string& xmlstring);
-};
+  class Model
+  {
+    public: Model();
+  
+    /// \brief Load Model from TiXMLElement
+    public: bool Init(TiXmlElement *_xml);
 
+    /// \brief Load Model from TiXMLDocument
+    public: bool Init(TiXmlDocument *_xml);
+  
+    /// \brief Load Model from TiXMLElement
+    public: bool InitXml(TiXmlElement *_xml);
+
+    /// \brief Load Model from TiXMLDocument
+    public: bool InitXml(TiXmlDocument *_xml);
+
+    /// \brief Load Model given a filename
+    public: bool InitFile(const std::string &_filename);
+
+    /// \brief Load Model from a XML-string
+    public: bool InitString(const std::string &_xmlstring);
+  
+    public: boost::shared_ptr<const Link> GetLink(const std::string &_name) const;
+    public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
+    public: const std::string& GetName() const {return this->name;};
+  
+    public: void GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const;
+  
+    /// \brief complete list of Links
+    public: std::map<std::string, boost::shared_ptr<Link> > links;
+
+    /// \brief complete list of Joints
+    public: std::map<std::string, boost::shared_ptr<Joint> > joints;
+
+    private: void Clear();
+  
+    private: std::string name;
+  
+    /// non-const getLink()
+    private: void GetLink(const std::string &_name, 
+                          boost::shared_ptr<Link> &_link) const;
+  
+    /// non-const getMaterial()
+    private: boost::shared_ptr<Material> GetMaterial(const std::string &_name) const;
+  };
 }
 
 #endif

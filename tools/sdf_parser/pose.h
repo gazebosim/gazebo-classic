@@ -43,68 +43,83 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace gdf{
+namespace sdf{
 
 class Vector3
 {
-public:
-  Vector3(double _x,double _y, double _z) {this->x=_x;this->y=_y;this->z=_z;};
-  Vector3() {this->clear();};
-  double x;
-  double y;
-  double z;
+  public: Vector3(double _x,double _y, double _z) 
+          {this->x=_x;this->y=_y;this->z=_z;};
+  
+  public: Vector3() {this->Clear();};
+  public: double x;
+  public: double y;
+  public: double z;
 
-  void clear() {this->x=this->y=this->z=0.0;};
-  bool init(const std::string &vector_str)
+  public: void Clear() {this->x=this->y=this->z=0.0;};
+  public: bool Init(const std::string &_vectorStr)
+          {
+            this->Clear();
+            std::vector<std::string> pieces;
+            std::vector<double> xyz;
+            boost::split( pieces, _vectorStr, boost::is_any_of(" "));
+            for (unsigned int i = 0; i < pieces.size(); ++i)
+            {
+              if (pieces[i] != "")
+              {
+                try
+                {
+                  xyz.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+                }
+                catch (boost::bad_lexical_cast &e)
+                {
+                  printf("Vector3 xyz element (%s) is not a valid float",pieces[i].c_str());
+                  return false;
+                }
+              }
+            }
+
+            if (xyz.size() != 3) 
+            {
+              printf("Vector contains %i elements instead of 3 elements", (int)xyz.size()); 
+              return false;
+            }
+
+            this->x = xyz[0];
+            this->y = xyz[1];
+            this->z = xyz[2];
+
+            return true;
+          };
+
+  public: Vector3 operator+(Vector3 _vec)
   {
-    this->clear();
-    std::vector<std::string> pieces;
-    std::vector<double> xyz;
-    boost::split( pieces, vector_str, boost::is_any_of(" "));
-    for (unsigned int i = 0; i < pieces.size(); ++i){
-      if (pieces[i] != ""){
-        try
-        {
-          xyz.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
-        }
-        catch (boost::bad_lexical_cast &e)
-        {
-          printf("Vector3 xyz element (%s) is not a valid float",pieces[i].c_str());
-          return false;
-        }
-      }
-    }
-
-    if (xyz.size() != 3) {
-	printf("Vector contains %i elements instead of 3 elements", (int)xyz.size()); 
-      return false;
-    }
-
-    this->x = xyz[0];
-    this->y = xyz[1];
-    this->z = xyz[2];
-
-    return true;
+    return Vector3(this->x+_vec.x,this->y+_vec.y,this->z+_vec.z);
   };
-  Vector3 operator+(Vector3 vec)
+
+  friend std::ostream &operator<<(std::ostream &out, const Vector3 &vec)
   {
-    return Vector3(this->x+vec.x,this->y+vec.y,this->z+vec.z);
-  };
+    out << vec.x << " " << vec.y << " " << vec.z;
+    return out;
+  }
 };
 
 class Rotation
 {
-public:
-  Rotation(double _x,double _y, double _z, double _w) {this->x=_x;this->y=_y;this->z=_z;this->w=_w;};
-  Rotation() {this->clear();};
-  void getQuaternion(double &quat_x,double &quat_y,double &quat_z, double &quat_w) const
+  public: Rotation(double _x,double _y, double _z, double _w) 
+        {this->x=_x; this->y=_y; this->z=_z; this->w=_w;};
+
+  public: Rotation() {this->Clear();};
+
+  public: void GetQuaternion(double &_quatX,double &_quatY,
+                             double &_quatZ, double &_quatW) const
   {
-    quat_x = this->x;
-    quat_y = this->y;
-    quat_z = this->z;
-    quat_w = this->w;
+    _quatX = this->x;
+    _quatY = this->y;
+    _quatZ = this->z;
+    _quatW = this->w;
   };
-  void getRPY(double &roll,double &pitch,double &yaw) const
+
+  void GetRPY(double &_roll,double &_pitch,double &_yaw) const
   {
     double sqw;
     double sqx;
@@ -116,57 +131,57 @@ public:
     sqz = this->z * this->z;
     sqw = this->w * this->w;
 
-    roll  = atan2(2 * (this->y*this->z + this->w*this->x), sqw - sqx - sqy + sqz);
+    _roll  = atan2(2 * (this->y*this->z + this->w*this->x), sqw - sqx - sqy + sqz);
     double sarg = -2 * (this->x*this->z - this->w*this->y);
-    pitch = sarg <= -1.0 ? -0.5*M_PI : (sarg >= 1.0 ? 0.5*M_PI : asin(sarg));
-    yaw   = atan2(2 * (this->x*this->y + this->w*this->z), sqw + sqx - sqy - sqz);
+    _pitch = sarg <= -1.0 ? -0.5*M_PI : (sarg >= 1.0 ? 0.5*M_PI : asin(sarg));
+    _yaw   = atan2(2 * (this->x*this->y + this->w*this->z), sqw + sqx - sqy - sqz);
+  };
 
-  };
-  void setFromQuaternion(double quat_x,double quat_y,double quat_z,double quat_w)
+  void SetFromQuaternion(double _quatX,double _quatY,double _quatZ,double _quatW)
   {
-    this->x = quat_x;
-    this->y = quat_y;
-    this->z = quat_z;
-    this->w = quat_w;
-    this->normalize();
+    this->x = _quatX;
+    this->y = _quatY;
+    this->z = _quatZ;
+    this->w = _quatW;
+    this->Normalize();
   };
-  void setFromRPY(double roll, double pitch, double yaw)
+
+  void SetFromRPY(double _roll, double _pitch, double _yaw)
   {
     double phi, the, psi;
 
-    phi = roll / 2.0;
-    the = pitch / 2.0;
-    psi = yaw / 2.0;
+    phi = _roll / 2.0;
+    the = _pitch / 2.0;
+    psi = _yaw / 2.0;
 
     this->x = sin(phi) * cos(the) * cos(psi) - cos(phi) * sin(the) * sin(psi);
     this->y = cos(phi) * sin(the) * cos(psi) + sin(phi) * cos(the) * sin(psi);
     this->z = cos(phi) * cos(the) * sin(psi) - sin(phi) * sin(the) * cos(psi);
     this->w = cos(phi) * cos(the) * cos(psi) + sin(phi) * sin(the) * sin(psi);
 
-    this->normalize();
+    this->Normalize();
   };
 
-  double x,y,z,w;
 
-  bool init(const std::string &rotation_str)
+  bool Init(const std::string &_rotationStr)
   {
-    this->clear();
+    this->Clear();
 
     Vector3 rpy;
     
-    if (!rpy.init(rotation_str))
+    if (!rpy.Init(_rotationStr))
       return false;
     else
     {
-      this->setFromRPY(rpy.x,rpy.y,rpy.z);
+      this->SetFromRPY(rpy.x,rpy.y,rpy.z);
       return true;
     }
       
   };
 
-  void clear() { this->x=this->y=this->z=0.0;this->w=1.0; }
+  void Clear() { this->x=this->y=this->z=0.0;this->w=1.0; }
 
-  void normalize()
+  void Normalize()
   {
     double s = sqrt(this->x * this->x +
                     this->y * this->y +
@@ -189,27 +204,28 @@ public:
   };
 
   // Multiplication operator (copied from gazebo)
-  Rotation operator*( const Rotation &qt ) const
+  Rotation operator*( const Rotation &_qt ) const
   {
     Rotation c;
 
-    c.x = this->w * qt.x + this->x * qt.w + this->y * qt.z - this->z * qt.y;
-    c.y = this->w * qt.y - this->x * qt.z + this->y * qt.w + this->z * qt.x;
-    c.z = this->w * qt.z + this->x * qt.y - this->y * qt.x + this->z * qt.w;
-    c.w = this->w * qt.w - this->x * qt.x - this->y * qt.y - this->z * qt.z;
+    c.x = this->w * _qt.x + this->x * _qt.w + this->y * _qt.z - this->z * _qt.y;
+    c.y = this->w * _qt.y - this->x * _qt.z + this->y * _qt.w + this->z * _qt.x;
+    c.z = this->w * _qt.z + this->x * _qt.y - this->y * _qt.x + this->z * _qt.w;
+    c.w = this->w * _qt.w - this->x * _qt.x - this->y * _qt.y - this->z * _qt.z;
 
     return c;
   };
+
   /// Rotate a vector using the quaternion
-  Vector3 operator*(Vector3 vec) const
+  Vector3 operator*(Vector3 _vec) const
   {
     Rotation tmp;
     Vector3 result;
 
     tmp.w = 0.0;
-    tmp.x = vec.x;
-    tmp.y = vec.y;
-    tmp.z = vec.z;
+    tmp.x = _vec.x;
+    tmp.y = _vec.y;
+    tmp.z = _vec.z;
 
     tmp = (*this) * (tmp * this->GetInverse());
 
@@ -219,6 +235,7 @@ public:
 
     return result;
   };
+
   // Get the inverse of this quaternion
   Rotation GetInverse() const 
   {
@@ -237,67 +254,81 @@ public:
     return q;
   };
 
+  friend std::ostream &operator<<(std::ostream &out, const Rotation &rot)
+  {
+    double r,p,y;
+    rot.GetRPY(r,p,y);
+    out << r << " " << p << " " << y;
+    return out;
+  }
 
+  double x,y,z,w;
 };
 
 class Pose
 {
-public:
-  Pose() { this->clear(); };
+  public: Pose() { this->Clear(); };
 
-  Vector3  position;
-  Rotation rotation;
+  public: Vector3  position;
+  public: Rotation rotation;
 
-  void clear()
+  void Clear()
   {
-    this->position.clear();
-    this->rotation.clear();
+    this->position.Clear();
+    this->rotation.Clear();
   };
-  bool initXml(TiXmlElement* xml)
+
+  bool InitXml(TiXmlElement *_xml)
   {
-    this->clear();
-    if (!xml)
+    this->Clear();
+    if (!_xml)
     {
-      printf("parsing pose: xml empty");
+      printf("parsing pose: _xml empty");
       return false;
     }
     else
     {
-      const char* xyz_str = xml->Attribute("xyz");
-      if (xyz_str == NULL)
+      const char* _xyzStr = _xml->Attribute("xyz");
+      if (_xyzStr == NULL)
       {
         printf("parsing pose: no xyz, using default values.");
         return true;
       }
       else
       {
-        if (!this->position.init(xyz_str))
+        if (!this->position.Init(_xyzStr))
         {
           printf("malformed xyz");
-          this->position.clear();
+          this->position.Clear();
           return false;
         }
       }
 
-      const char* rpy_str = xml->Attribute("rpy");
-      if (rpy_str == NULL)
+      const char* rpyStr = _xml->Attribute("rpy");
+      if (rpyStr == NULL)
       {
         printf("parsing pose: no rpy, using default values.");
         return true;
       }
       else
       {
-        if (!this->rotation.init(rpy_str))
+        if (!this->rotation.Init(rpyStr))
         {
           printf("malformed rpy");
           return false;
-          this->rotation.clear();
+          this->rotation.Clear();
         }
       }
 
       return true;
     }
   };
+
+  friend std::ostream &operator<<(std::ostream &out, const Pose &pose)
+  {
+    out << "pos[" << pose.position << "] rot[" << pose.rotation << "]";
+    return out;
+  }
 };
 
 }

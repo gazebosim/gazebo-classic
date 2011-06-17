@@ -34,45 +34,49 @@
 
 /* Author: Wim Meeussen */
 
-#include "parser.h"
 #include <iostream>
+#include "model.h"
 
-using namespace gdf;
+using namespace sdf;
 
 int main(int argc, char** argv)
 {
-  if (argc < 2){
+  if (argc < 2)
+  {
     std::cerr << "Expect xml file to parse" << std::endl;
     return -1;
   }
 
-  TiXmlDocument model_doc;
-  model_doc.LoadFile(argv[1]);
+  TiXmlDocument modelDoc;
+  modelDoc.LoadFile(argv[1]);
 
-  TiXmlElement *model_xml = model_doc.FirstChildElement("model");
+  TiXmlElement *modelXml = modelDoc.FirstChildElement("model");
 
-  if (!model_xml){
+  if (!modelXml)
+  {
     std::cerr << "ERROR: Could not load the xml into TiXmlElement" << std::endl;
     return -1;
   }
 
-  Parser model;
-  if (!model.init(model_xml)){
+  Model model;
+  if (!model.Init(modelXml))
+  {
     std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
     return -1;
   }
 
-  std::cout << "robot name is: " << model.getName() << std::endl;
+  std::cout << "robot name is: " << model.GetName() << std::endl;
 
   // get info from parser
   std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
   // get root link
   std::vector<boost::shared_ptr<Link> > links;
-  model.getLinks(links);
+  model.GetLinks(links);
 
   std::map<std::string, boost::shared_ptr<Joint> >::iterator jIter;
   
-  for (std::vector<boost::shared_ptr<Link> >::iterator iter = links.begin(); iter != links.end(); iter++)
+  for (std::vector<boost::shared_ptr<Link> >::iterator iter = links.begin(); 
+       iter != links.end(); iter++)
   {
     std::cout << "link: " << (*iter)->name << "\n";
     std::vector<boost::shared_ptr<Visual> >::iterator vIter;
@@ -92,15 +96,15 @@ int main(int argc, char** argv)
       std::cout << "  Collision: " << (*cIter)->name << "\n";
     }
 
-    for (sIter = (*iter)->sensors.begin(); sIter != (*iter)->sensors.end(); sIter++)
+    for (sIter = (*iter)->sensors.begin(); sIter != (*iter)->sensors.end(); 
+         sIter++)
     {
       std::cout << "sensor: " << sIter->second->name << "\n";
     }
-
-
   }
 
-  for (jIter = model.joints_.begin(); jIter != model.joints_.end(); jIter++)
+
+  for (jIter = model.joints.begin(); jIter != model.joints.end(); jIter++)
   {
     std::cout << "joint: " << jIter->second->name << "\n";
   }

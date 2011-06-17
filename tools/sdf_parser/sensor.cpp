@@ -35,148 +35,90 @@
 /* Author: Wim Meeussen */
 
 
-#include "sensor.h"
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 
-namespace gdf{
+#include "parser.h"
+#include "sensor.h"
 
-bool getBoolFromStr(std::string str, bool &value)
+using namespace sdf;
+
+////////////////////////////////////////////////////////////////////////////////
+bool Camera::InitXml(TiXmlElement *_config)
 {
-  boost::to_lower(str);
-  if (str == "true" || str == "t" || str == "1")
-    value = true;
-  else if (str == "false" || str == "f" || str == "0")
-    value = false;
-  else
-  {
-    value = false;
-    return false;
-  }
-
-  return true;
-}
-
-bool getDoubleFromStr(const std::string &str, double &value)
-{
-  try
-  {
-    value = boost::lexical_cast<double>(str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("ERR: string is not a double format\n");
-    return false;
-  }
-
-  return true;
-}
-
-bool geIntFromStr(const std::string &str, int &value)
-{
-  try
-  {
-    value = boost::lexical_cast<int>(str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("ERR: string is not an int format\n");
-    return false;
-  }
-
-  return true;
-}
-
-bool getUIntFromStr(const std::string &str, unsigned int &value)
-{
-  try
-  {
-    value = boost::lexical_cast<unsigned int>(str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("ERR: string is not an unsigned int format\n");
-    return false;
-  }
-
-  return true;
-}
-
-bool Camera::initXml(TiXmlElement *config)
-{
-  this->clear();
+  this->Clear();
 
   // Horizontal field of view
-  TiXmlElement *hfov = config->FirstChildElement("horizontal_fov");
+  TiXmlElement *hfov = _config->FirstChildElement("horizontal_fov");
   if (!hfov)
   {
     printf("Error: Camera sensor requires a horizontal field of view via <horizontal_fov angle='radians'/>\n");
     return false;
   }
 
-  if (!getDoubleFromStr( hfov->Attribute("angle"), this->horizontal_fov))
+  if (!getDoubleFromStr( hfov->Attribute("angle"), this->horizontalFov))
   {
     printf("Err: Invalid horizontal_fov");
     return false;
   }
 
   // Image 
-  TiXmlElement *image = config->FirstChildElement("image");
+  TiXmlElement *image = _config->FirstChildElement("image");
   if (!image)
   {
     printf("Error: Camera sensor requires an image element \n");
     return false;
   }
 
-  if (!getUIntFromStr( image->Attribute("width"), this->image_width))
+  if (!getUIntFromStr( image->Attribute("width"), this->imageWidth))
   {
     printf("Err: Invalid image_width");
     return false;
   }
 
-  if (!getUIntFromStr( image->Attribute("height"), this->image_height))
+  if (!getUIntFromStr( image->Attribute("height"), this->imageHeight))
   {
     printf("Err: Invalid image_height");
     return false;
   }
 
-  this->image_format = image->Attribute("format");
+  this->imageFormat = image->Attribute("format");
 
   // clip 
-  TiXmlElement *clip = config->FirstChildElement("clip");
+  TiXmlElement *clip = _config->FirstChildElement("clip");
   if (!clip)
   {
     printf("Error: Camera sensor requires an clip element \n");
     return false;
   }
 
-  if (!getDoubleFromStr( clip->Attribute("near"), this->clip_near))
+  if (!getDoubleFromStr( clip->Attribute("near"), this->clipNear))
   {
     printf("Err: Invalid near clip");
     return false;
   }
 
-  if (!getDoubleFromStr( clip->Attribute("far"), this->clip_far))
+  if (!getDoubleFromStr( clip->Attribute("far"), this->clipFar))
   {
     printf("Err: Invalid far clip");
     return false;
   }
 
   // save 
-  TiXmlElement *save = config->FirstChildElement("save");
+  TiXmlElement *save = _config->FirstChildElement("save");
   if (save)
   {
     std::string enabled = save->Attribute("enabled");
-    if (enabled.empty() || !getBoolFromStr(enabled, this->save_enabled))
+    if (enabled.empty() || !getBoolFromStr(enabled, this->saveEnabled))
     {
       printf("Err: invalid save enabled flag\n");
       return false;
     }
 
-    this->save_path = save->Attribute("path");
-    if (this->save_path.empty())
+    this->savePath = save->Attribute("path");
+    if (this->savePath.empty())
     {
       printf("Err: invalid save path\n");
       return false;
@@ -186,86 +128,87 @@ bool Camera::initXml(TiXmlElement *config)
   return true;
 }
 
-bool Ray::initXml(TiXmlElement *config)
+////////////////////////////////////////////////////////////////////////////////
+bool Ray::InitXml(TiXmlElement *_config)
 {
-  this->clear();
+  this->Clear();
 
   // scan 
-  TiXmlElement *scan = config->FirstChildElement("scan");
+  TiXmlElement *scan = _config->FirstChildElement("scan");
   if (scan)
   {
-    std::string display_str = config->Attribute("display");
-    if (!display_str.empty() && !getBoolFromStr(display_str, this->display))
+    std::string displayStr = _config->Attribute("display");
+    if (!displayStr.empty() && !getBoolFromStr(displayStr, this->display))
     {
       printf("Err: invalid display flag\n");
       return false;
     }
 
     // Horizontal scans
-    TiXmlElement *horizontal = config->FirstChildElement("horizontal");
+    TiXmlElement *horizontal = _config->FirstChildElement("horizontal");
     if (!horizontal)
     {
       printf("Err: missing horizontal element\n");
       return false;
     }
 
-    if (!getUIntFromStr( horizontal->Attribute("samples"), this->horizontal_samples))
+    if (!getUIntFromStr( horizontal->Attribute("samples"), this->horizontalSamples))
     {
       printf("Err: Invalid horizontal samples");
       return false;
     }
 
-    std::string h_res_str = horizontal->Attribute("resolution"); 
-    if (!h_res_str.empty() && !getDoubleFromStr( h_res_str, this->horizontal_resolution))
+    std::string hResStr = horizontal->Attribute("resolution"); 
+    if (!hResStr.empty() && !getDoubleFromStr( hResStr, this->horizontalResolution))
     {
       printf("Err: Invalid horizontal resolution");
       return false;
     }
 
-    std::string min_angle_str = horizontal->Attribute("min_angle"); 
-    if (!min_angle_str.empty() && !getDoubleFromStr( min_angle_str, this->horizontal_min_angle))
+    std::string minAngleStr = horizontal->Attribute("min_angle"); 
+    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, this->horizontalMinAngle))
     {
       printf("Err: Invalid horizontal min angle");
       return false;
     }
 
-    std::string max_angle_str = horizontal->Attribute("max_angle"); 
-    if (!max_angle_str.empty() && !getDoubleFromStr( max_angle_str, this->horizontal_max_angle))
+    std::string maxAngleStr = horizontal->Attribute("max_angle"); 
+    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, this->horizontalMaxAngle))
     {
       printf("Err: Invalid horizontal max angle");
       return false;
     }
 
     // Vertical scans
-    TiXmlElement *vertical = config->FirstChildElement("vertical");
+    TiXmlElement *vertical = _config->FirstChildElement("vertical");
     if (!vertical)
     {
       printf("Err: missing vertical element\n");
       return false;
     }
 
-    if (!getUIntFromStr( vertical->Attribute("samples"), this->vertical_samples))
+    if (!getUIntFromStr( vertical->Attribute("samples"), this->verticalSamples))
     {
       printf("Err: Invalid vertical samples");
       return false;
     }
 
-    std::string v_res_str = vertical->Attribute("resolution"); 
-    if (!v_res_str.empty() && !getDoubleFromStr( v_res_str, this->vertical_resolution))
+    std::string vResStr = vertical->Attribute("resolution"); 
+    if (!vResStr.empty() && !getDoubleFromStr( vResStr, this->verticalResolution))
     {
       printf("Err: Invalid vertical resolution");
       return false;
     }
 
-    min_angle_str = vertical->Attribute("min_angle"); 
-    if (!min_angle_str.empty() && !getDoubleFromStr( min_angle_str, this->vertical_min_angle))
+    minAngleStr = vertical->Attribute("min_angle"); 
+    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, this->verticalMinAngle))
     {
       printf("Err: Invalid vertical min angle");
       return false;
     }
 
-    max_angle_str = vertical->Attribute("max_angle"); 
-    if (!max_angle_str.empty() && !getDoubleFromStr( max_angle_str, this->vertical_max_angle))
+    maxAngleStr = vertical->Attribute("max_angle"); 
+    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, this->verticalMaxAngle))
     {
       printf("Err: Invalid vertical max angle");
       return false;
@@ -273,23 +216,23 @@ bool Ray::initXml(TiXmlElement *config)
   }
 
   // range 
-  TiXmlElement *range = config->FirstChildElement("range");
+  TiXmlElement *range = _config->FirstChildElement("range");
   if (range)
   {
-    if (!getDoubleFromStr( range->Attribute("min"), this->range_min))
+    if (!getDoubleFromStr( range->Attribute("min"), this->rangeMin))
     {
       printf("Err: Invalid min range\n");
       return false;
     }
 
-    if (!getDoubleFromStr( range->Attribute("max"), this->range_max))
+    if (!getDoubleFromStr( range->Attribute("max"), this->rangeMax))
     {
       printf("Err: Invalid max range\n");
       return false;
     }
 
     std::string res = range->Attribute("resolution");
-    if (!res.empty() && !getDoubleFromStr( res, this->range_resolution))
+    if (!res.empty() && !getDoubleFromStr( res, this->rangeResolution))
     {
       printf("Err: Invalid range resolution\n");
       return false;
@@ -299,63 +242,58 @@ bool Ray::initXml(TiXmlElement *config)
   return true;
 }
 
-
-
-
-bool Sensor::initXml(TiXmlElement* config)
+////////////////////////////////////////////////////////////////////////////////
+bool Sensor::InitXml(TiXmlElement* _config)
 {
-  this->clear();
+  this->Clear();
 
-  const char *name_char = config->Attribute("name");
-  if (!name_char)
+  const char *nameChar = _config->Attribute("name");
+  if (!nameChar)
   {
     printf("No name given for the sensor.\n");
     return false;
   }
-  this->name = std::string(name_char);
+  this->name = std::string(nameChar);
 
-  const char *type_char = config->Attribute("type");
-  if (!type_char)
+  const char *typeChar = _config->Attribute("type");
+  if (!typeChar)
   {
     printf("No type given for the sensor.\n");
     return false;
   }
-  this->type = std::string(type_char);
+  this->type = std::string(typeChar);
 
-  std::string always_on_str = config->Attribute("always_on");
-  if (always_on_str.empty() && 
-      !getBoolFromStr(always_on_str, this->always_on))
+  std::string alwaysOnStr = _config->Attribute("always_on");
+  if (alwaysOnStr.empty() && 
+      !getBoolFromStr(alwaysOnStr, this->alwaysOn))
   {
     printf("ERR: invalid always_on_str\n");
     return false;
   }
 
-  std::string hz = config->Attribute("update_rate");
-  if (!hz.empty() && !getDoubleFromStr(hz, this->update_rate))
+  std::string hz = _config->Attribute("update_rate");
+  if (!hz.empty() && !getDoubleFromStr(hz, this->updateRate))
   {
     printf("ERR: invalid update_rate\n");
     return false;
   }
 
   // Origin
-  TiXmlElement *o = config->FirstChildElement("origin");
+  TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("INFO: Origin tag not present for sensor element, using default (Identity)\n\n");
-    this->origin.clear();
+    this->origin.Clear();
   }
   else
   {
-    if (!this->origin.initXml(o))
+    if (!this->origin.InitXml(o))
     {
       printf("Error: Sensor has a malformed origin tag\n");
-      this->origin.clear();
+      this->origin.Clear();
       return false;
     }
   }
 
   return true;
-}
-
-
 }
