@@ -40,7 +40,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
@@ -49,12 +48,9 @@
 
 namespace sdf
 {
-
   class SensorType
   {
     enum {CAMERA, RAY, CONTACT} type;
-  
-    virtual bool InitXml(TiXmlElement *) = 0;
   };
   
   class Sensor
@@ -72,8 +68,6 @@ namespace sdf
 
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
-
-    public: bool InitXml(TiXmlElement *_config);
   
     public: void Clear()
     {
@@ -86,23 +80,22 @@ namespace sdf
       this->plugins.clear();
     }
 
-  friend std::ostream &operator<<(std::ostream &out, const Sensor &sensor)
-  {
-    out << "Sensor: Name[" << sensor.name << "] Type[" << sensor.type << "]\n";
-
-    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
-    for (iter = sensor.plugins.begin(); iter != sensor.plugins.end(); iter++)
+    friend std::ostream &operator<<(std::ostream &out, const Sensor &sensor)
     {
-      out << "  " << *(iter->second.get()) << "\n";
+      out << "Sensor: Name[" << sensor.name << "] Type[" << sensor.type << "]\n";
+
+      std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
+      for (iter = sensor.plugins.begin(); iter != sensor.plugins.end(); iter++)
+      {
+        out << "  " << *(iter->second.get()) << "\n";
+      }
+      return out;
     }
-    return out;
-  }
   };
   
   class Contact : public SensorType
   {
-    public: Contact() { }
-    public: bool InitXml(TiXmlElement *) {return true;}
+    public: Contact() {}
   };
   
   class Camera : public SensorType
@@ -128,8 +121,6 @@ namespace sdf
       this->saveEnabled = false;
       this->savePath.clear();
     }
-  
-    public: bool InitXml(TiXmlElement *);
   };
   
   class Ray : public SensorType
@@ -167,8 +158,6 @@ namespace sdf
       this->rangeMax = 1000;
       this->rangeResolution = 0;
     };
-  
-    bool InitXml(TiXmlElement *);
   };
 
 }

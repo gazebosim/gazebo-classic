@@ -41,10 +41,21 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+#include "sensor.h"
 #include "plugin.h"
 
 namespace sdf
 {
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor);
+
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_sensor) {return true;}
+
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
+
+
+  /* JOHN below here */
+
+
   bool getBoolFromStr(std::string _str, bool &_value);
  
   bool getDoubleFromStr(const std::string &_str, double &_value);

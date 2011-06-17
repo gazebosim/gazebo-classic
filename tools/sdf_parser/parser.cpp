@@ -141,5 +141,280 @@ bool getPlugins(TiXmlElement *_parentXml,
   return true;
 }
 
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
+{
+  _sensor.Clear();
+
+  /// Get all the plugins
+  getPlugins(_config, _sensor.plugins);
+
+  const char *nameChar = _config->Attribute("name");
+  if (!nameChar)
+  {
+    printf("No name given for the sensor.\n");
+    return false;
+  }
+  _sensor.name = std::string(nameChar);
+
+  const char *typeChar = _config->Attribute("type");
+  if (!typeChar)
+  {
+    printf("No type given for the sensor.\n");
+    return false;
+  }
+  _sensor.type = std::string(typeChar);
+
+  if (_sensor.type == "camera")
+  {
+    _sensor.sensorType.reset(new Camera);
+    initXml(_config, _sensor.sensorType);
+  }
+  else if (_sensor.type == "ray")
+  {
+    _sensor.sensorType.reset(new Ray);
+    initXml(_config, _sensor.sensorType);
+  }
+  else if (_sensor.type == "contact")
+  {
+    _sensor.sensorType.reset(new Contact);
+    initXml(_config, _sensor.sensorType);
+  }
+  else
+  {
+    printf("Error: Unknown sensor type[%s]\n",_sensor.type.c_str());
+    return false;
+  }
+
+
+
+  std::string alwaysOnStr = _config->Attribute("always_on");
+  if (alwaysOnStr.empty() && 
+      !getBoolFromStr(alwaysOnStr, _sensor.alwaysOn))
+  {
+    printf("ERR: invalid always_on_str\n");
+    return false;
+  }
+
+  std::string hz = _config->Attribute("update_rate");
+  if (!hz.empty() && !getDoubleFromStr(hz, _sensor.updateRate))
+  {
+    printf("ERR: invalid update_rate\n");
+    return false;
+  }
+
+  // Origin
+  TiXmlElement *o = _config->FirstChildElement("origin");
+  if (!o)
+  {
+    printf("INFO: Origin tag not present for sensor element, using default (Identity)\n\n");
+    _sensor.origin.Clear();
+  }
+  else
+  {
+    if (!_sensor.origin.InitXml(o))
+    {
+      printf("Error: Sensor has a malformed origin tag\n");
+      _sensor.origin.Clear();
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
+{
+  _sensor.Clear();
+
+  // Horizontal field of view
+  TiXmlElement *hfov = _config->FirstChildElement("horizontal_fov");
+  if (!hfov)
+  {
+    printf("Error: Camera sensor requires a horizontal field of view via <horizontal_fov angle='radians'/>\n");
+    return false;
+  }
+
+  if (!getDoubleFromStr( hfov->Attribute("angle"), _sensor.horizontalFov))
+  {
+    printf("Err: Invalid horizontal_fov");
+    return false;
+  }
+
+  // Image 
+  TiXmlElement *image = _config->FirstChildElement("image");
+  if (!image)
+  {
+    printf("Error: Camera sensor requires an image element \n");
+    return false;
+  }
+
+  if (!getUIntFromStr( image->Attribute("width"), _sensor.imageWidth))
+  {
+    printf("Err: Invalid image_width");
+    return false;
+  }
+
+  if (!getUIntFromStr( image->Attribute("height"), _sensor.imageHeight))
+  {
+    printf("Err: Invalid image_height");
+    return false;
+  }
+
+  _sensor.imageFormat = image->Attribute("format");
+
+  // clip 
+  TiXmlElement *clip = _config->FirstChildElement("clip");
+  if (!clip)
+  {
+    printf("Error: Camera sensor requires an clip element \n");
+    return false;
+  }
+
+  if (!getDoubleFromStr( clip->Attribute("near"), _sensor.clipNear))
+  {
+    printf("Err: Invalid near clip");
+    return false;
+  }
+
+  if (!getDoubleFromStr( clip->Attribute("far"), _sensor.clipFar))
+  {
+    printf("Err: Invalid far clip");
+    return false;
+  }
+
+  // save 
+  TiXmlElement *save = _config->FirstChildElement("save");
+  if (save)
+  {
+    std::string enabled = save->Attribute("enabled");
+    if (enabled.empty() || !getBoolFromStr(enabled, _sensor.saveEnabled))
+    {
+      printf("Err: invalid save enabled flag\n");
+      return false;
+    }
+
+    _sensor.savePath = save->Attribute("path");
+    if (_sensor.savePath.empty())
+    {
+      printf("Err: invalid save path\n");
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
+{
+  _sensor.Clear();
+
+  // scan 
+  TiXmlElement *scan = _config->FirstChildElement("scan");
+  if (scan)
+  {
+    std::string displayStr = _config->Attribute("display");
+    if (!displayStr.empty() && !getBoolFromStr(displayStr, _sensor.display))
+    {
+      printf("Err: invalid display flag\n");
+      return false;
+    }
+
+    // Horizontal scans
+    TiXmlElement *horizontal = _config->FirstChildElement("horizontal");
+    if (!horizontal)
+    {
+      printf("Err: missing horizontal element\n");
+      return false;
+    }
+
+    if (!getUIntFromStr( horizontal->Attribute("samples"), _sensor.horizontalSamples))
+    {
+      printf("Err: Invalid horizontal samples");
+      return false;
+    }
+
+    std::string hResStr = horizontal->Attribute("resolution"); 
+    if (!hResStr.empty() && !getDoubleFromStr( hResStr, _sensor.horizontalResolution))
+    {
+      printf("Err: Invalid horizontal resolution");
+      return false;
+    }
+
+    std::string minAngleStr = horizontal->Attribute("min_angle"); 
+    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor.horizontalMinAngle))
+    {
+      printf("Err: Invalid horizontal min angle");
+      return false;
+    }
+
+    std::string maxAngleStr = horizontal->Attribute("max_angle"); 
+    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor.horizontalMaxAngle))
+    {
+      printf("Err: Invalid horizontal max angle");
+      return false;
+    }
+
+    // Vertical scans
+    TiXmlElement *vertical = _config->FirstChildElement("vertical");
+    if (!vertical)
+    {
+      printf("Err: missing vertical element\n");
+      return false;
+    }
+
+    if (!getUIntFromStr( vertical->Attribute("samples"), _sensor.verticalSamples))
+    {
+      printf("Err: Invalid vertical samples");
+      return false;
+    }
+
+    std::string vResStr = vertical->Attribute("resolution"); 
+    if (!vResStr.empty() && !getDoubleFromStr( vResStr, _sensor.verticalResolution))
+    {
+      printf("Err: Invalid vertical resolution");
+      return false;
+    }
+
+    minAngleStr = vertical->Attribute("min_angle"); 
+    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor.verticalMinAngle))
+    {
+      printf("Err: Invalid vertical min angle");
+      return false;
+    }
+
+    maxAngleStr = vertical->Attribute("max_angle"); 
+    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor.verticalMaxAngle))
+    {
+      printf("Err: Invalid vertical max angle");
+      return false;
+    }
+  }
+
+  // range 
+  TiXmlElement *range = _config->FirstChildElement("range");
+  if (range)
+  {
+    if (!getDoubleFromStr( range->Attribute("min"), _sensor.rangeMin))
+    {
+      printf("Err: Invalid min range\n");
+      return false;
+    }
+
+    if (!getDoubleFromStr( range->Attribute("max"), _sensor.rangeMax))
+    {
+      printf("Err: Invalid max range\n");
+      return false;
+    }
+
+    std::string res = range->Attribute("resolution");
+    if (!res.empty() && !getDoubleFromStr( res, _sensor.rangeResolution))
+    {
+      printf("Err: Invalid range resolution\n");
+      return false;
+    }
+  }
+
+  return true;
+}
 
 }
