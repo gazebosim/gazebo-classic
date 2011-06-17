@@ -39,9 +39,12 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
+#include "plugin.h"
 #include "pose.h"
 
 namespace sdf
@@ -66,7 +69,10 @@ namespace sdf
     public: Pose origin;
   
     public: boost::shared_ptr<SensorType> sensorType;
-  
+
+    /// \brief complete list of plugins
+    public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
+
     public: bool InitXml(TiXmlElement *_config);
   
     public: void Clear()
@@ -77,7 +83,20 @@ namespace sdf
       this->updateRate = -1;
       this->sensorType.reset();
       this->origin.Clear();
+      this->plugins.clear();
     }
+
+  friend std::ostream &operator<<(std::ostream &out, const Sensor &sensor)
+  {
+    out << "Sensor: Name[" << sensor.name << "] Type[" << sensor.type << "]\n";
+
+    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
+    for (iter = sensor.plugins.begin(); iter != sensor.plugins.end(); iter++)
+    {
+      out << "  " << *(iter->second.get()) << "\n";
+    }
+    return out;
+  }
   };
   
   class Contact : public SensorType

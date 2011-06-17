@@ -106,4 +106,40 @@ bool getUIntFromStr(const std::string &_str, unsigned int &_value)
   return true;
 }
 
+bool getPlugins(TiXmlElement *_parentXml, 
+                std::map<std::string, boost::shared_ptr<Plugin> > &_plugins)
+{
+  // Get all plugins 
+  for (TiXmlElement* pluginXml = _parentXml->FirstChildElement("plugin"); 
+      pluginXml; pluginXml = _parentXml->NextSiblingElement("plugin"))
+  {
+    boost::shared_ptr<Plugin> plugin;
+    plugin.reset(new Plugin);
+
+    if (plugin->InitXml(pluginXml))
+    {
+      if (_plugins.find(plugin->name) != _plugins.end())
+      {
+        printf("plugin '%s' is not unique.\n", plugin->name.c_str());
+        plugin.reset();
+        return false;
+      }
+      else
+      {
+        _plugins.insert(make_pair(plugin->name,plugin));
+        printf("successfully added a new plugin '%s'\n", plugin->name.c_str());
+      }
+    }
+    else
+    {
+      printf("plugin xml is not initialized correctly\n");
+      plugin.reset();
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 }

@@ -35,10 +35,11 @@
 /* Author: Wim Meeussen */
 
 
-#include "link.h"
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
+
+#include "link.h"
 
 using namespace sdf;
 

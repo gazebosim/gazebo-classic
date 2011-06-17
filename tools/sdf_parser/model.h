@@ -40,7 +40,9 @@
 #include <string>
 #include <map>
 #include <tinyxml.h>
+#include <iostream>
 
+#include "plugin.h"
 #include "link.h"
 
 namespace sdf
@@ -79,6 +81,9 @@ namespace sdf
     /// \brief complete list of Joints
     public: std::map<std::string, boost::shared_ptr<Joint> > joints;
 
+    /// \brief complete list of plugins
+    public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
+
     private: void Clear();
   
     private: std::string name;
@@ -89,6 +94,35 @@ namespace sdf
   
     /// non-const getMaterial()
     private: boost::shared_ptr<Material> GetMaterial(const std::string &_name) const;
+
+    public: friend std::ostream &operator<<(std::ostream &out, const Model &model)
+  {
+    out << "Model: Name[" << model.name << "]\n";
+
+    // Print plugins
+    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
+    for (iter = model.plugins.begin(); iter != model.plugins.end(); iter++)
+    {
+      out << "  " << *(iter->second.get()) << "\n";
+    }
+
+    // Print links
+    std::map<std::string, boost::shared_ptr<Link> >::const_iterator liter;
+    for (liter = model.links.begin(); liter != model.links.end(); liter++)
+    {
+      out << "  " << *(liter->second.get()) << "\n";
+    }
+
+    // Print joints
+    std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
+    for (jiter = model.joints.begin(); jiter != model.joints.end(); jiter++)
+    {
+      out << "  " << *(jiter->second.get()) << "\n";
+    }
+
+    return out;
+  }
+
   };
 }
 

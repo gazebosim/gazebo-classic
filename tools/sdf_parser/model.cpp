@@ -36,6 +36,8 @@
 
 #include <boost/algorithm/string.hpp>
 #include <vector>
+
+#include "parser.h"
 #include "model.h"
 
 using namespace sdf;
@@ -52,6 +54,7 @@ void Model::Clear()
   this->name.clear();
   this->links.clear();
   this->joints.clear();
+  this->plugins.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +197,9 @@ bool Model::Init(TiXmlElement *_modelXml)
     }
   }
 
+  /// Get all the plugins
+  getPlugins(_modelXml, this->plugins);
+
   return true;
 }
 
@@ -242,3 +248,4 @@ boost::shared_ptr<const Joint> Model::GetJoint(const std::string &_name) const
     ptr = this->joints.find(_name)->second;
   return ptr;
 }
+

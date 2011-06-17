@@ -34,44 +34,35 @@
 
 /* Author: Wim Meeussen */
 
-#include <iostream>
-#include "model.h"
+#ifndef URDF_PLUGIN_H
+#define URDF_PLUGIN_H
 
-using namespace sdf;
+#include <string>
+#include <tinyxml.h>
 
-int main(int argc, char** argv)
+namespace sdf
 {
-  if (argc < 2)
+  class Plugin
   {
-    std::cerr << "Expect xml file to parse" << std::endl;
-    return -1;
-  }
+    public: Plugin() { this->Clear(); };
+  
+    public: std::string name;
+    public: std::string filename;
+ 
+    public: bool InitXml(TiXmlElement *_config);
+  
+    public: void Clear()
+    {
+      this->name.clear();
+      this->filename.clear();
+    }
 
-  TiXmlDocument modelDoc;
-  modelDoc.LoadFile(argv[1]);
-
-  TiXmlElement *modelXml = modelDoc.FirstChildElement("model");
-
-  if (!modelXml)
+  friend std::ostream &operator<<(std::ostream &out, const Plugin &plugin)
   {
-    std::cerr << "ERROR: Could not load the xml into TiXmlElement" << std::endl;
-    return -1;
+    out << "Plugin: Name[" << plugin.name << "] File[" << plugin.filename << "]";
+    return out;
   }
-
-  Model model;
-  if (!model.Init(modelXml))
-  {
-    std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
-    return -1;
-  }
-
-  std::cout << "robot name is: " << model.GetName() << std::endl;
-
-  // get info from parser
-  std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
-
-  std::cout << model << "\n";
-
-  return 0;
+  };
 }
 
+#endif

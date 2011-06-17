@@ -38,6 +38,10 @@
 #define URDF_PARSER_H
 
 #include <string>
+#include <map>
+#include <boost/shared_ptr.hpp>
+
+#include "plugin.h"
 
 namespace sdf
 {
@@ -48,6 +52,9 @@ namespace sdf
   bool geIntFromStr(const std::string &_str, int &_value);
     
   bool getUIntFromStr(const std::string &_str, unsigned int &_value);
+
+  bool getPlugins(TiXmlElement *pluginXml, std::map<std::string, 
+                  boost::shared_ptr<Plugin> > &plugins);
 }
 
 #endif

@@ -247,6 +247,9 @@ bool Sensor::InitXml(TiXmlElement* _config)
 {
   this->Clear();
 
+  /// Get all the plugins
+  getPlugins(_config, this->plugins);
+
   const char *nameChar = _config->Attribute("name");
   if (!nameChar)
   {

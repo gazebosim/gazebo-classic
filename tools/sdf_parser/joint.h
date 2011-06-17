@@ -41,6 +41,7 @@
 #include <vector>
 #include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
 #include "pose.h"
 
@@ -134,6 +135,13 @@ namespace sdf
               this->limits.reset();
               this->type = UNKNOWN;
             };
+
+    public: friend std::ostream &operator<<(std::ostream &out, const Joint &joint)
+            {
+              out << "Joint Name[" << joint.name << "] Type[" << joint.type << "] Parent[" << joint.parentLinkName << "] Child[" << joint.childLinkName << "]";
+              return out;
+            }
+
   };
 
 }

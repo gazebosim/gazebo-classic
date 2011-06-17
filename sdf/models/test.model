@@ -73,6 +73,11 @@
     </visual>
 
     <sensor name="my_sensor" type="camera" always_on="true" update_rate="3">
+      <plugin name="sensor_plugin" filename="/tmp/sensor_plugin.so">  
+        <sensor_funky_xml>so sensor funky</sensor_funky_xml>
+        <sensor_more value="hello"/>
+      </plugin>
+
       <origin xyz="1 2 3"/>
       <horizontal_fov angle="1.57"/>
       <image width="640" height="480" format="L8"/>
@@ -92,5 +97,10 @@
     <child link="body_2"/>
     <axis xyz="0 1 0"/>
   </joint>
-  
+
+  <plugin name="best_plugin" filename="/tmp/good_plugin.so">  
+    <funky_xml>so funky</funky_xml>
+    <more value="hello"/>
+  </plugin>
+
 </model>

@@ -42,6 +42,7 @@
 #include <map>
 #include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
+#include <iostream>
 
 #include "sensor.h"
 #include "joint.h"
@@ -141,6 +142,12 @@ namespace sdf
               ixx = ixy = ixz = iyy = iyz = izz = 0;
             };
     public: bool InitXml(TiXmlElement *_config);
+
+    public: friend std::ostream &operator<<(std::ostream &out, const Inertial &inertial)
+            {
+              out << "Inertial: Mass[" << inertial.mass << "]\n";
+              return out;
+            }
   };
   
   class Visual
@@ -160,6 +167,12 @@ namespace sdf
               geometry.reset();
             };
     public: bool InitXml(TiXmlElement *_config);
+
+    public: friend std::ostream &operator<<(std::ostream &out, const Visual &vis)
+            {
+              out << "Visual Name[" << vis.name << "]";
+              return out;
+            }
   };
   
   class Collision
@@ -175,7 +188,15 @@ namespace sdf
               name.clear();
               geometry.reset();
             };
+
     public: bool InitXml(TiXmlElement *_config);
+
+    public: friend std::ostream &operator<<(std::ostream &out, const Collision &col)
+            {
+              out << "Collision Name[" << col.name << "]";
+              return out;
+            }
+
   };
   
   class Link
@@ -213,6 +234,35 @@ namespace sdf
     public: void GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const;
 
     public: boost::shared_ptr<const Sensor> GetSensor(const std::string &_name) const;
+
+    public: friend std::ostream &operator<<(std::ostream &out, const Link &link)
+  {
+    out << "Link: Name[" << link.name << "]\n";
+
+    std::vector<boost::shared_ptr<Visual> >::const_iterator viter;
+    for (viter = link.visuals.begin(); viter != link.visuals.end(); viter++)
+    {
+      out << "  " << *((*viter).get()) << "\n";
+    }
+
+    std::vector<boost::shared_ptr<Collision> >::const_iterator citer;
+    for (citer = link.collisions.begin(); citer != link.collisions.end(); citer++)
+    {
+      out << "  " << *((*citer).get()) << "\n";
+    }
+
+
+    // Print sensors
+    std::map<std::string, boost::shared_ptr<Sensor> >::const_iterator iter;
+    for (iter = link.sensors.begin(); iter != link.sensors.end(); iter++)
+    {
+      out << "  " << *(iter->second.get()) << "\n";
+    }
+
+    return out;
+  }
+
+
   };
 
 }

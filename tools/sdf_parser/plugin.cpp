@@ -34,44 +34,36 @@
 
 /* Author: Wim Meeussen */
 
-#include <iostream>
-#include "model.h"
+
+#include <fstream>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <algorithm>
+
+#include "plugin.h"
 
 using namespace sdf;
 
-int main(int argc, char** argv)
+////////////////////////////////////////////////////////////////////////////////
+bool Plugin::InitXml(TiXmlElement *_config)
 {
-  if (argc < 2)
+  this->Clear();
+
+  const char *nameChar = _config->Attribute("name");
+  if (!nameChar)
   {
-    std::cerr << "Expect xml file to parse" << std::endl;
-    return -1;
+    printf("No name given for the plugin.\n");
+    return false;
   }
+  this->name = std::string(nameChar);
 
-  TiXmlDocument modelDoc;
-  modelDoc.LoadFile(argv[1]);
-
-  TiXmlElement *modelXml = modelDoc.FirstChildElement("model");
-
-  if (!modelXml)
+  const char *filenameChar = _config->Attribute("filename");
+  if (!filenameChar)
   {
-    std::cerr << "ERROR: Could not load the xml into TiXmlElement" << std::endl;
-    return -1;
+    printf("No filename given for the plugin.\n");
+    return false;
   }
+  this->filename = std::string(filenameChar);
 
-  Model model;
-  if (!model.Init(modelXml))
-  {
-    std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
-    return -1;
-  }
-
-  std::cout << "robot name is: " << model.GetName() << std::endl;
-
-  // get info from parser
-  std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
-
-  std::cout << model << "\n";
-
-  return 0;
+  return true;
 }
-
