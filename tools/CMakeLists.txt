@@ -1,1 +1,1 @@
-add_subdirectory(xml)
+add_subdirectory(sdf_parser)

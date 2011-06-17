@@ -49,9 +49,7 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(TINY_XML tinyxml)
   if (NOT TINY_XML_FOUND)
     BUILD_ERROR ("Missing: TinyXML - Tiny XML parser")
-  else ()
-   message (STATUS "TINY FOUND: ${TINY_XML_INCLUDE_DIRS}")
-  endif (NOT TINY_XML_FOUND)
+  endif ()
 
   #################################################
   # Find TBB

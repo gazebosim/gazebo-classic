@@ -135,7 +135,7 @@ else (build_errors)
  
   if (BUILD_GAZEBO)
     add_subdirectory(src)
-    add_subdirectory(xml)
+    add_subdirectory(sdf)
     add_subdirectory(Media)
     add_subdirectory(test)
     add_subdirectory(tools)
