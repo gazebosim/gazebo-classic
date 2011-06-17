@@ -55,24 +55,6 @@ namespace sdf
   {
     public: World();
   
-    /// \brief Load World from TiXMLElement
-    public: bool Init(TiXmlElement *_xml);
-
-    /// \brief Load World from TiXMLDocument
-    public: bool Init(TiXmlDocument *_xml);
-  
-    /// \brief Load World from TiXMLElement
-    public: bool InitXml(TiXmlElement *_xml);
-
-    /// \brief Load World from TiXMLDocument
-    public: bool InitXml(TiXmlDocument *_xml);
-
-    /// \brief Load World given a filename
-    public: bool InitFile(const std::string &_filename);
-
-    /// \brief Load World from a XML-string
-    public: bool InitString(const std::string &_xmlstring);
-  
     public: boost::shared_ptr<const Model> GetModel(const std::string &_name) const;
     public: const std::string& GetName() const {return this->name;};
   

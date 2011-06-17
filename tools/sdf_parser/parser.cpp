@@ -526,5 +526,156 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
 }
 
 /* John below this line */
+
+////////////////////////////////////////////////////////////////////////////////
+bool InitFile(const std::string &_filename, boost::shared_ptr<World> &_world)
+{
+  TiXmlDocument xmlDoc;
+  xmlDoc.LoadFile(_filename);
+
+  return Init(&xmlDoc,_world);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool InitString(const std::string &_xmlString, boost::shared_ptr<World> &_world)
+{
+  TiXmlDocument xmlDoc;
+  xmlDoc.Parse(_xmlString.c_str());
+
+  return Init(&xmlDoc,_world);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool InitXml(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
+{
+  if (!_xmlDoc)
+  {
+    printf("Could not parse the xml\n");
+    return false;
+  }
+
+  return Init(_xmlDoc,_world);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool InitXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
+{
+  printf("World::InitXml Parsing world xml\n");
+  if (!_worldXml) 
+    return false;
+
+  return Init(_worldXml,_world);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Init(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
+{
+  if (!_xmlDoc)
+  {
+    printf("Could not parse the xml\n");
+    return false;
+  }
+
+  TiXmlElement *worldXml = _xmlDoc->FirstChildElement("world");
+  if (!worldXml)
+  {
+    printf("Could not find the 'world' element in the xml file\n");
+    return false;
+  }
+  return Init(worldXml,_world);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
+{
+  _world.Clear();
+
+  printf("Parsing the best world xml\n");
+
+  if (!_worldXml) 
+  {
+    printf("Error: World XML is NULL\n");
+    return false;
+  }
+
+  // Get world name
+  const char *nameStr = _worldXml->Attribute("name");
+  if (!nameStr)
+  {
+    printf("No name given for the world.\n");
+    return false;
+  }
+  _world.name = std::string(nameStr);
+
+  _world.scene.reset(new Scene);
+  InitXml(_worldXml->FirstChildElement("scene"),_world.scene);
+
+  _world.physics.reset(new Physics);
+  InitXml(_worldXml->FirstChildElement("physics"),_world.physics);
+
+  // Get all model elements
+  for (TiXmlElement* modelXml = _worldXml->FirstChildElement("model"); 
+       modelXml; modelXml = modelXml->NextSiblingElement("model"))
+  {
+    boost::shared_ptr<Model> model;
+    model.reset(new Model);
+
+    if (InitXml(modelXml,model))
+    {
+      if (_world.GetModel(model->name))
+      {
+        printf("model '%s' is not unique.\n", model->name.c_str());
+        model.reset();
+        return false;
+      }
+      else
+      {
+        _world.models.insert(make_pair(model->name,model));
+        printf("successfully added a new model '%s'\n", model->name.c_str());
+      }
+    }
+    else
+    {
+      printf("model xml is not initialized correctly\n");
+      model.reset();
+      return false;
+    }
+  }
+
+  // Get all Joint elements
+  for (TiXmlElement* jointXml = _worldXml->FirstChildElement("joint"); 
+       jointXml; jointXml = jointXml->NextSiblingElement("joint"))
+  {
+    boost::shared_ptr<Joint> joint;
+    joint.reset(new Joint);
+
+    if (InitXml(jointXml,joint))
+    {
+      if (_world.GetJoint(joint->name))
+      {
+        printf("joint '%s' is not unique.\n", joint->name.c_str());
+        joint.reset();
+        return false;
+      }
+      else
+      {
+        _world.joints.insert(make_pair(joint->name,joint));
+        printf("successfully added a new joint '%s'\n", joint->name.c_str());
+      }
+    }
+    else
+    {
+      printf("joint xml is not initialized correctly\n");
+      joint.reset();
+      return false;
+    }
+  }
+
+  /// Get all the plugins
+  getPlugins(_worldXml, _world.plugins);
+
+  return true;
+}
+
 }
 

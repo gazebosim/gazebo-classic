@@ -58,6 +58,25 @@ namespace sdf
 
   /* JOHN below here */
 
+  /// world
+  /// \brief Load World from TiXMLElement
+  bool Init(TiXmlElement *_xml, boost::shared_ptr<World> &_world);
+
+  /// \brief Load World from TiXMLDocument
+  bool Init(TiXmlDocument *_xml, boost::shared_ptr<World> &_world);
+
+  /// \brief Load World from TiXMLElement
+  bool InitXml(TiXmlElement *_xml, boost::shared_ptr<World> &_world);
+
+  /// \brief Load World from TiXMLDocument
+  bool InitXml(TiXmlDocument *_xml, boost::shared_ptr<World> &_world);
+
+  /// \brief Load World given a filename
+  bool InitFile(const std::string &_filename, boost::shared_ptr<World> &_world);
+
+  /// \brief Load World from a XML-string
+  bool InitString(const std::string &_xmlstring, boost::shared_ptr<World> &_world);
+  
 
   bool getBoolFromStr(std::string _str, bool &_value);
  
