@@ -189,7 +189,7 @@ namespace gazebo
 
     private: dContactGeom *contactGeoms;
 
-    private: int (*physicsStepFunc)(dxWorld*, dReal);
+    private: void (*physicsStepFunc)(dxWorld*, dReal);
   };
   
   

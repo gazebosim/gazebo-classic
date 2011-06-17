@@ -252,20 +252,17 @@ BasePtr Base::GetChild(const std::string &name )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get by name helper
-BasePtr Base::GetByName(const std::string &name)
+BasePtr Base::GetByName(const std::string &_name)
 {
-  std::cout << " n1: " << this->GetCompleteScopedName() << " == " << name << "\n";
-  if (this->GetCompleteScopedName() == name)
+  if (this->GetCompleteScopedName() == _name)
     return shared_from_this();
-
-  std::cout << " not equal " << this->children.size() << " \n";
 
   BasePtr result;
   Base_V::const_iterator iter;
 
   for (iter =  this->children.begin(); 
        iter != this->children.end() && result ==NULL; iter++)
-    result = (*iter)->GetByName(name);
+    result = (*iter)->GetByName(_name);
 
   return result;
 }
