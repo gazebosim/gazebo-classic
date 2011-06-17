@@ -60,7 +60,6 @@ namespace sdf
               damping = 0;
               friction = 0;
             };
-    public: bool InitXml(TiXmlElement *_config);
   };
   
   class JointLimits
@@ -78,7 +77,6 @@ namespace sdf
               effort = 0;
               velocity = 0;
             };
-    public: bool InitXml(TiXmlElement *_config);
   };
   
   
@@ -122,7 +120,6 @@ namespace sdf
     /// Joint Limits
     public: boost::shared_ptr<JointLimits> limits;
 
-    public: bool InitXml(TiXmlElement* xml);
 
     public: void Clear()
             {

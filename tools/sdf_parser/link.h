@@ -40,7 +40,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 

@@ -42,18 +42,46 @@
 #include <boost/shared_ptr.hpp>
 
 #include "sensor.h"
+#include "link.h"
+#include "model.h"
+#include "world.h"
+#include "joint.h"
 #include "plugin.h"
 
 namespace sdf
 {
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor);
 
-  bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_sensor) {return true;}
+  bool initXml(TiXmlElement *, boost::shared_ptr<Contact> &) {return true;}
 
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Box> &_box);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Mesh> &_mesh);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDynamics);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint);
 
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Geometry> &_geom);
+
+  /// \brief Load Model given a filename
+  bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
+
+ /// \brief Load Model from a XML-string
+  bool initString(const std::string &_xmlstring, boost::shared_ptr<Model> &_model);
+ 
+  /// \brief Load Model from TiXMLElement
+  bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model);
+
+  /// \brief Load Model from TiXMLDocument
+  bool initDoc(TiXmlDocument *_xml, boost::shared_ptr<Model> &_model);
 
 
   /* JOHN below here */

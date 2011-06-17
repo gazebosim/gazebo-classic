@@ -39,7 +39,6 @@
 
 #include <string>
 #include <map>
-#include <tinyxml.h>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
@@ -52,18 +51,6 @@ namespace sdf
   {
     public: Model();
   
-    /// \brief Load Model from TiXMLElement
-    public: bool Init(TiXmlElement *_xml);
-
-    /// \brief Load Model from TiXMLDocument
-    public: bool Init(TiXmlDocument *_xml);
-  
-    /// \brief Load Model from TiXMLElement
-    public: bool InitXml(TiXmlElement *_xml);
-
-    /// \brief Load Model from TiXMLDocument
-    public: bool InitXml(TiXmlDocument *_xml);
-
     /// \brief Load Model given a filename
     public: bool InitFile(const std::string &_filename);
 
