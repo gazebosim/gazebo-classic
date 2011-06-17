@@ -51,10 +51,10 @@
 namespace sdf
 {
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor);
-
-  bool initXml(TiXmlElement *, boost::shared_ptr<Contact> &) {return true;}
-
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<SensorType> &_sensor_type);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_contact);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision);
@@ -70,6 +70,7 @@ namespace sdf
 
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Geometry> &_geom);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin);
 
   /// \brief Load Model given a filename
   bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
@@ -88,37 +89,34 @@ namespace sdf
 
   /// world
   /// \brief Load World from TiXMLElement
-  bool Init(TiXmlElement *_xml, boost::shared_ptr<World> &_world);
+  bool Init(TiXmlElement *_xml, World &_world);
 
   /// \brief Load World from TiXMLDocument
-  bool Init(TiXmlDocument *_xml, boost::shared_ptr<World> &_world);
+  bool Init(TiXmlDocument *_xml, World &_world);
 
   /// \brief Load World from TiXMLElement
-  bool InitXml(TiXmlElement *_xml, boost::shared_ptr<World> &_world);
+  bool initXml(TiXmlElement *_xml, World &_world);
 
   /// \brief Load World from TiXMLDocument
-  bool InitXml(TiXmlDocument *_xml, boost::shared_ptr<World> &_world);
+  bool initXml(TiXmlDocument *_xml, World &_world);
 
   /// \brief Load World given a filename
-  bool InitFile(const std::string &_filename, boost::shared_ptr<World> &_world);
+  bool InitFile(const std::string &_filename, World &_world);
 
   /// \brief Load World from a XML-string
-  bool InitString(const std::string &_xmlstring, boost::shared_ptr<World> &_world);
+  bool InitString(const std::string &_xmlstring, World &_world);
   
   /// scene
-  bool InitXml(TiXmlElement *_config, boost::shared_ptr<Scene> &_scene);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Scene> &_scene);
   
-  /// PhysicsEngine
-  virtual bool InitXml(TiXmlElement *, boost::shared_ptr<PhysicsEngine> &_physics_engine) = 0;
+  /// physics
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Physics> &_physics);
 
   /// OpenDynamicsEngine
-  bool InitXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_open_dynamics_engine);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
 
   /// Physics
-  bool InitXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_physics);
-  
-  /// color
-  bool Init(const std::string &_vectorStr, boost::shared_ptr<Color> &_color);
+  //bool initXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_physics_engine);
   
 
   bool getBoolFromStr(std::string _str, bool &_value);

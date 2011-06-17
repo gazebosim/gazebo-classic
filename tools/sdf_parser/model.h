@@ -72,7 +72,7 @@ namespace sdf
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
 
-    private: void Clear();
+    public: void Clear();
   
     public: std::string name;
   

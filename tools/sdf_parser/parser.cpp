@@ -116,7 +116,7 @@ bool getPlugins(TiXmlElement *_parentXml,
     boost::shared_ptr<Plugin> plugin;
     plugin.reset(new Plugin);
 
-    if (plugin->InitXml(pluginXml))
+    if (initXml(pluginXml, plugin))
     {
       if (_plugins.find(plugin->name) != _plugins.end())
       {
@@ -141,12 +141,38 @@ bool getPlugins(TiXmlElement *_parentXml,
   return true;
 }
 
+bool initXml(TiXmlElement *_config, boost::shared_ptr<SensorType> &_sensor_type)
+{
+  if (_sensor_type->type == SensorType::CAMERA)
+  {
+    boost::shared_ptr<Camera> camera_sensor = boost::shared_static_cast<Camera>( _sensor_type);
+    //boost::shared_ptr<Camera> camera_sensor(boost::shared_dynamic_cast<Camera>( _sensor_type));
+    return initXml(_config, camera_sensor);
+  }
+  else if (_sensor_type->type == SensorType::RAY)
+  {
+    boost::shared_ptr<Ray> ray_sensor(boost::shared_static_cast<Ray>( _sensor_type));
+    return initXml(_config, ray_sensor);
+  }
+  else if (_sensor_type->type == SensorType::CONTACT)
+  {
+    boost::shared_ptr<Contact> contact_sensor(boost::shared_static_cast<Contact>( _sensor_type));
+    return initXml(_config, contact_sensor);
+  }
+  else
+  {
+    printf("Err: SensorType init unknown type\n");
+    return false;
+  }
+
+}
+
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
 {
-  _sensor.Clear();
+  _sensor->Clear();
 
   /// Get all the plugins
-  getPlugins(_config, _sensor.plugins);
+  getPlugins(_config, _sensor->plugins);
 
   const char *nameChar = _config->Attribute("name");
   if (!nameChar)
@@ -154,7 +180,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
     printf("No name given for the sensor.\n");
     return false;
   }
-  _sensor.name = std::string(nameChar);
+  _sensor->name = std::string(nameChar);
 
   const char *typeChar = _config->Attribute("type");
   if (!typeChar)
@@ -162,26 +188,26 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
     printf("No type given for the sensor.\n");
     return false;
   }
-  _sensor.type = std::string(typeChar);
+  _sensor->type = std::string(typeChar);
 
-  if (_sensor.type == "camera")
+  if (_sensor->type == "camera")
   {
-    _sensor.sensorType.reset(new Camera);
-    initXml(_config, _sensor.sensorType);
+    _sensor->sensorType.reset(new Camera);
+    initXml(_config, _sensor->sensorType);
   }
-  else if (_sensor.type == "ray")
+  else if (_sensor->type == "ray")
   {
-    _sensor.sensorType.reset(new Ray);
-    initXml(_config, _sensor.sensorType);
+    _sensor->sensorType.reset(new Ray);
+    initXml(_config, _sensor->sensorType);
   }
-  else if (_sensor.type == "contact")
+  else if (_sensor->type == "contact")
   {
-    _sensor.sensorType.reset(new Contact);
-    initXml(_config, _sensor.sensorType);
+    _sensor->sensorType.reset(new Contact);
+    initXml(_config, _sensor->sensorType);
   }
   else
   {
-    printf("Error: Unknown sensor type[%s]\n",_sensor.type.c_str());
+    printf("Error: Unknown sensor type[%s]\n",_sensor->type.c_str());
     return false;
   }
 
@@ -189,14 +215,14 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
 
   std::string alwaysOnStr = _config->Attribute("always_on");
   if (alwaysOnStr.empty() && 
-      !getBoolFromStr(alwaysOnStr, _sensor.alwaysOn))
+      !getBoolFromStr(alwaysOnStr, _sensor->alwaysOn))
   {
     printf("ERR: invalid always_on_str\n");
     return false;
   }
 
   std::string hz = _config->Attribute("update_rate");
-  if (!hz.empty() && !getDoubleFromStr(hz, _sensor.updateRate))
+  if (!hz.empty() && !getDoubleFromStr(hz, _sensor->updateRate))
   {
     printf("ERR: invalid update_rate\n");
     return false;
@@ -207,14 +233,14 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
   if (!o)
   {
     printf("INFO: Origin tag not present for sensor element, using default (Identity)\n\n");
-    _sensor.origin.Clear();
+    _sensor->origin.Clear();
   }
   else
   {
-    if (!_sensor.origin.InitXml(o))
+    if (!_sensor->origin.InitXml(o))
     {
       printf("Error: Sensor has a malformed origin tag\n");
-      _sensor.origin.Clear();
+      _sensor->origin.Clear();
       return false;
     }
   }
@@ -224,7 +250,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
 {
-  _sensor.Clear();
+  _sensor->Clear();
 
   // Horizontal field of view
   TiXmlElement *hfov = _config->FirstChildElement("horizontal_fov");
@@ -234,7 +260,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
     return false;
   }
 
-  if (!getDoubleFromStr( hfov->Attribute("angle"), _sensor.horizontalFov))
+  if (!getDoubleFromStr( hfov->Attribute("angle"), _sensor->horizontalFov))
   {
     printf("Err: Invalid horizontal_fov");
     return false;
@@ -248,19 +274,19 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
     return false;
   }
 
-  if (!getUIntFromStr( image->Attribute("width"), _sensor.imageWidth))
+  if (!getUIntFromStr( image->Attribute("width"), _sensor->imageWidth))
   {
     printf("Err: Invalid image_width");
     return false;
   }
 
-  if (!getUIntFromStr( image->Attribute("height"), _sensor.imageHeight))
+  if (!getUIntFromStr( image->Attribute("height"), _sensor->imageHeight))
   {
     printf("Err: Invalid image_height");
     return false;
   }
 
-  _sensor.imageFormat = image->Attribute("format");
+  _sensor->imageFormat = image->Attribute("format");
 
   // clip 
   TiXmlElement *clip = _config->FirstChildElement("clip");
@@ -270,13 +296,13 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
     return false;
   }
 
-  if (!getDoubleFromStr( clip->Attribute("near"), _sensor.clipNear))
+  if (!getDoubleFromStr( clip->Attribute("near"), _sensor->clipNear))
   {
     printf("Err: Invalid near clip");
     return false;
   }
 
-  if (!getDoubleFromStr( clip->Attribute("far"), _sensor.clipFar))
+  if (!getDoubleFromStr( clip->Attribute("far"), _sensor->clipFar))
   {
     printf("Err: Invalid far clip");
     return false;
@@ -287,14 +313,14 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
   if (save)
   {
     std::string enabled = save->Attribute("enabled");
-    if (enabled.empty() || !getBoolFromStr(enabled, _sensor.saveEnabled))
+    if (enabled.empty() || !getBoolFromStr(enabled, _sensor->saveEnabled))
     {
       printf("Err: invalid save enabled flag\n");
       return false;
     }
 
-    _sensor.savePath = save->Attribute("path");
-    if (_sensor.savePath.empty())
+    _sensor->savePath = save->Attribute("path");
+    if (_sensor->savePath.empty())
     {
       printf("Err: invalid save path\n");
       return false;
@@ -306,14 +332,14 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
 {
-  _sensor.Clear();
+  _sensor->Clear();
 
   // scan 
   TiXmlElement *scan = _config->FirstChildElement("scan");
   if (scan)
   {
     std::string displayStr = _config->Attribute("display");
-    if (!displayStr.empty() && !getBoolFromStr(displayStr, _sensor.display))
+    if (!displayStr.empty() && !getBoolFromStr(displayStr, _sensor->display))
     {
       printf("Err: invalid display flag\n");
       return false;
@@ -327,28 +353,28 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
       return false;
     }
 
-    if (!getUIntFromStr( horizontal->Attribute("samples"), _sensor.horizontalSamples))
+    if (!getUIntFromStr( horizontal->Attribute("samples"), _sensor->horizontalSamples))
     {
       printf("Err: Invalid horizontal samples");
       return false;
     }
 
     std::string hResStr = horizontal->Attribute("resolution"); 
-    if (!hResStr.empty() && !getDoubleFromStr( hResStr, _sensor.horizontalResolution))
+    if (!hResStr.empty() && !getDoubleFromStr( hResStr, _sensor->horizontalResolution))
     {
       printf("Err: Invalid horizontal resolution");
       return false;
     }
 
     std::string minAngleStr = horizontal->Attribute("min_angle"); 
-    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor.horizontalMinAngle))
+    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor->horizontalMinAngle))
     {
       printf("Err: Invalid horizontal min angle");
       return false;
     }
 
     std::string maxAngleStr = horizontal->Attribute("max_angle"); 
-    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor.horizontalMaxAngle))
+    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor->horizontalMaxAngle))
     {
       printf("Err: Invalid horizontal max angle");
       return false;
@@ -362,28 +388,28 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
       return false;
     }
 
-    if (!getUIntFromStr( vertical->Attribute("samples"), _sensor.verticalSamples))
+    if (!getUIntFromStr( vertical->Attribute("samples"), _sensor->verticalSamples))
     {
       printf("Err: Invalid vertical samples");
       return false;
     }
 
     std::string vResStr = vertical->Attribute("resolution"); 
-    if (!vResStr.empty() && !getDoubleFromStr( vResStr, _sensor.verticalResolution))
+    if (!vResStr.empty() && !getDoubleFromStr( vResStr, _sensor->verticalResolution))
     {
       printf("Err: Invalid vertical resolution");
       return false;
     }
 
     minAngleStr = vertical->Attribute("min_angle"); 
-    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor.verticalMinAngle))
+    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor->verticalMinAngle))
     {
       printf("Err: Invalid vertical min angle");
       return false;
     }
 
     maxAngleStr = vertical->Attribute("max_angle"); 
-    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor.verticalMaxAngle))
+    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor->verticalMaxAngle))
     {
       printf("Err: Invalid vertical max angle");
       return false;
@@ -394,20 +420,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
   TiXmlElement *range = _config->FirstChildElement("range");
   if (range)
   {
-    if (!getDoubleFromStr( range->Attribute("min"), _sensor.rangeMin))
+    if (!getDoubleFromStr( range->Attribute("min"), _sensor->rangeMin))
     {
       printf("Err: Invalid min range\n");
       return false;
     }
 
-    if (!getDoubleFromStr( range->Attribute("max"), _sensor.rangeMax))
+    if (!getDoubleFromStr( range->Attribute("max"), _sensor->rangeMax))
     {
       printf("Err: Invalid max range\n");
       return false;
     }
 
     std::string res = range->Attribute("resolution");
-    if (!res.empty() && !getDoubleFromStr( res, _sensor.rangeResolution))
+    if (!res.empty() && !getDoubleFromStr( res, _sensor->rangeResolution))
     {
       printf("Err: Invalid range resolution\n");
       return false;
@@ -421,9 +447,9 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
 {
   bool hasRGB = false;
 
-  _material.Clear();
+  _material->Clear();
 
-  _material.script = _config->Attribute("script");
+  _material->script = _config->Attribute("script");
 
   // color
   TiXmlElement *c = _config->FirstChildElement("color");
@@ -431,10 +457,10 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
   {
     if (c->Attribute("rgba"))
     {
-      if (!_material.color.Init(c->Attribute("rgba")))
+      if (!_material->color.Init(c->Attribute("rgba")))
       {
         printf("Material has malformed color rgba values.\n");
-        _material.color.Clear();
+        _material->color.Clear();
         return false;
       }
       else
@@ -446,26 +472,26 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
     }
   }
 
-  return !_material.script.empty() || hasRGB;
+  return !_material->script.empty() || hasRGB;
 }
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
 {
-  _inertial.Clear();
+  _inertial->Clear();
 
   // Origin
   TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("INFO: Origin tag not present for inertial element, using default (Identity)\n\n");
-    _inertial.origin.Clear();
+    _inertial->origin.Clear();
   }
   else
   {
-    if (!_inertial.origin.InitXml(o))
+    if (!_inertial->origin.InitXml(o))
     {
       printf("Inertial has a malformed origin tag\n");
-      _inertial.origin.Clear();
+      _inertial->origin.Clear();
       return false;
     }
   }
@@ -478,7 +504,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
 
   try
   {
-    mass = boost::lexical_cast<double>(_config->Attribute("mass"));
+    _inertial->mass = boost::lexical_cast<double>(_config->Attribute("mass"));
   }
   catch (boost::bad_lexical_cast &e)
   {
@@ -503,12 +529,12 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
 
   try
   {
-    ixx  = boost::lexical_cast<double>(inertiaXml->Attribute("ixx"));
-    ixy  = boost::lexical_cast<double>(inertiaXml->Attribute("ixy"));
-    ixz  = boost::lexical_cast<double>(inertiaXml->Attribute("ixz"));
-    iyy  = boost::lexical_cast<double>(inertiaXml->Attribute("iyy"));
-    iyz  = boost::lexical_cast<double>(inertiaXml->Attribute("iyz"));
-    izz  = boost::lexical_cast<double>(inertiaXml->Attribute("izz"));
+    _inertial->ixx  = boost::lexical_cast<double>(inertiaXml->Attribute("ixx"));
+    _inertial->ixy  = boost::lexical_cast<double>(inertiaXml->Attribute("ixy"));
+    _inertial->ixz  = boost::lexical_cast<double>(inertiaXml->Attribute("ixz"));
+    _inertial->iyy  = boost::lexical_cast<double>(inertiaXml->Attribute("iyy"));
+    _inertial->iyz  = boost::lexical_cast<double>(inertiaXml->Attribute("iyz"));
+    _inertial->izz  = boost::lexical_cast<double>(inertiaXml->Attribute("izz"));
   }
   catch (boost::bad_lexical_cast &e)
   {
@@ -527,27 +553,29 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision)
 {
-  _collision.Clear();
+  _collision->Clear();
 
-  _collision.name = _config->Attribute("name");
+  _collision->name = _config->Attribute("name");
 
   // Origin
   TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("Origin tag not present for collision element, using default (Identity)");
-    _collision.origin.Clear();
+    _collision->origin.Clear();
   }
-  else if (!_collision.origin.InitXml(o))
+  else if (!_collision->origin.InitXml(o))
   {
     printf("Collision has a malformed origin tag");
-    _collision.origin.Clear();
+    _collision->origin.Clear();
     return false;
   }
 
   // Geometry
   TiXmlElement *geom = _config->FirstChildElement("geometry");
-  geometry = parseGeometry(geom);
+  boost::shared_ptr<Geometry> geometry( new Geometry);
+  initXml(geom, geometry);
+
   if (!geometry)
   {
     printf("Malformed geometry for Collision element");
@@ -559,10 +587,10 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere)
 {
-  _sphere.Clear();
+  _sphere->Clear();
 
-  _sphere.type = SPHERE;
-  if (!c->Attribute("radius"))
+  _sphere->type = Geometry::SPHERE;
+  if (!_config->Attribute("radius"))
   {
     printf("Sphere shape must have a radius attribute");
     return false;
@@ -570,11 +598,11 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere)
 
   try
   {
-    radius = boost::lexical_cast<double>(c->Attribute("radius"));
+    _sphere->radius = boost::lexical_cast<double>(_config->Attribute("radius"));
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("radius (%s) is not a valid float",c->Attribute("radius"));
+    printf("radius (%s) is not a valid float",_config->Attribute("radius"));
     return false;
   }
 
@@ -583,19 +611,19 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Box> &_box)
 {
-  _box.Clear();
+  _box->Clear();
 
-  _box.type = BOX;
+  _box->type = Geometry::BOX;
   if (!_config->Attribute("size"))
   {
     printf("Box shape has no size attribute");
     return false;
   }
 
-  if (!size.Init(_config->Attribute("size")))
+  if (!_box->size.Init(_config->Attribute("size")))
   {
     printf("Box shape has malformed size attribute");
-    size.Clear();
+    _box->size.Clear();
     return false;
   }
 
@@ -604,9 +632,9 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Box> &_box)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder)
 {
-  _cylinder.Clear();
+  _cylinder->Clear();
 
-  _cylinder.type = CYLINDER;
+  _cylinder->type = Geometry::CYLINDER;
 
   if (!_config->Attribute("length") ||
       !_config->Attribute("radius"))
@@ -617,7 +645,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder)
 
   try
   {
-    length = boost::lexical_cast<double>(_config->Attribute("length"));
+    _cylinder->length = boost::lexical_cast<double>(_config->Attribute("length"));
   }
   catch (boost::bad_lexical_cast &e)
   {
@@ -627,7 +655,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder)
 
   try
   {
-    radius = boost::lexical_cast<double>(_config->Attribute("radius"));
+    _cylinder->radius = boost::lexical_cast<double>(_config->Attribute("radius"));
   }
   catch (boost::bad_lexical_cast &e)
   {
@@ -640,27 +668,27 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Mesh> &_mesh)
 {
-  _mesh.Clear();
+  _mesh->Clear();
 
-  _mesh.type = MESH;
+  _mesh->type = Geometry::MESH;
   if (!_config->Attribute("filename"))
   {
     printf("Mesh must contain a filename attribute\n");
     return false;
   }
 
-  filename = _config->Attribute("filename");
+  _mesh->filename = _config->Attribute("filename");
 
   // check if filename exists, is this really necessary?
-  if (!_mesh.FileExists(filename))
-    printf("filename referred by mesh [%s] does not appear to exist.\n", filename.c_str());
+  if (!_mesh->FileExists(_mesh->filename))
+    printf("filename referred by mesh [%s] does not appear to exist.\n", _mesh->filename.c_str());
 
   if (_config->Attribute("scale"))
   {
-    if (!_mesh.scale.Init(_config->Attribute("scale")))
+    if (!_mesh->scale.Init(_config->Attribute("scale")))
     {
       printf("Mesh scale was specified, but could not be parsed\n");
-      _mesh.scale.Clear();
+      _mesh->scale.Clear();
       return false;
     }
   }
@@ -672,7 +700,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Mesh> &_mesh)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
 {
-  _link.Clear();
+  _link->Clear();
 
   const char *nameChar = _config->Attribute("name");
   if (!nameChar)
@@ -680,16 +708,16 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     printf("No name given for the link.\n");
     return false;
   }
-  _link.name = std::string(nameChar);
+  _link->name = std::string(nameChar);
 
   // Inertial (optional)
   TiXmlElement *i = _config->FirstChildElement("inertial");
   if (i)
   {
-    inertial.reset(new Inertial);
-    if (!inertial->InitXml(i))
+    _link->inertial.reset(new Inertial);
+    if (!initXml(i,_link->inertial))
     {
-      printf("Could not parse inertial element for Link '%s'\n", _link.name.c_str());
+      printf("Could not parse inertial element for Link '%s'\n", _link->name.c_str());
       return false;
     }
   }
@@ -701,15 +729,15 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     boost::shared_ptr<Visual> vis;
     vis.reset(new Visual);
 
-    if (vis->InitXml(visXml))
+    if (initXml(visXml,vis))
     {
       //  add Visual to the vector
-      _link.visuals.push_back(vis);
+      _link->visuals.push_back(vis);
       printf("successfully added a new visual\n");
     }
     else
     {
-      printf("Could not parse visual element for Link '%s'\n", _link.name.c_str());
+      printf("Could not parse visual element for Link '%s'\n", _link->name.c_str());
       vis.reset();
       return false;
     }
@@ -722,15 +750,15 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     boost::shared_ptr<Collision> col;
     col.reset(new Collision);
 
-    if (col->InitXml(colXml))
+    if (initXml(colXml,col))
     {
       // group exists, add Collision to the vector in the map
-      _link.collisions.push_back(col);
+      _link->collisions.push_back(col);
       printf("successfully added a new collision\n");
     }
     else
     {
-      printf("Could not parse collision element for Link '%s'\n", _link.name.c_str());
+      printf("Could not parse collision element for Link '%s'\n", _link->name.c_str());
       col.reset();
       return false;
     }
@@ -743,9 +771,9 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     boost::shared_ptr<Sensor> sensor;
     sensor.reset(new Sensor);
 
-    if (sensor->InitXml(sensorXml))
+    if (initXml(sensorXml,sensor))
     {
-      if (_link.GetSensor(sensor->name))
+      if (_link->GetSensor(sensor->name))
       {
         printf("sensor '%s' is not unique.\n", sensor->name.c_str());
         sensor.reset();
@@ -753,7 +781,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
       }
       else
       {
-        _link.sensors.insert(make_pair(sensor->name,sensor));
+        _link->sensors.insert(make_pair(sensor->name,sensor));
         printf("successfully added a new sensor '%s'\n", sensor->name.c_str());
       }
     }
@@ -770,27 +798,28 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
 {
-  this->Clear();
+  _visual->Clear();
 
-  this->name = _config->Attribute("name");
+  _visual->name = _config->Attribute("name");
 
   // Origin
   TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
   {
     printf("Origin tag not present for visual element, using default (Identity)");
-    this->origin.Clear();
+    _visual->origin.Clear();
   }
-  else if (!this->origin.InitXml(o))
+  else if (!_visual->origin.InitXml(o))
   {
     printf("Visual has a malformed origin tag");
-    this->origin.Clear();
+    _visual->origin.Clear();
     return false;
   }
 
   // Geometry
-  TiXmlElement *geom = _config->FirstChildElement("geometry");
-  geometry = parseGeometry(geom);
+  TiXmlElement *geometryXml = _config->FirstChildElement("geometry");
+  boost::shared_ptr<Geometry> geometry(new Geometry);
+  initXml(geometryXml,geometry);
   if (!geometry)
   {
     printf("Malformed geometry for Visual element");
@@ -806,11 +835,11 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
   else
   {
     // try to parse material element in place
-    this->material.reset(new Material);
-    if (!this->material->InitXml(mat))
+    _visual->material.reset(new Material);
+    if (!initXml(mat,_visual->material))
     {
       printf("Could not parse material element in Visual block, maybe defined outside.");
-      this->material.reset();
+      _visual->material.reset();
     }
     else
     {
@@ -823,20 +852,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDynamics)
 {
-  _jointDynamics.Clear();
+  _jointDynamics->Clear();
 
   // Get joint damping
   const char* dampingStr = _config->Attribute("damping");
   if (dampingStr == NULL)
   {
     printf("joint dynamics: no damping, defaults to 0\n");
-    _jointDynamics.damping = 0;
+    _jointDynamics->damping = 0;
   }
   else
   {
     try
     {
-      _jointDynamics.damping = boost::lexical_cast<double>(dampingStr);
+      _jointDynamics->damping = boost::lexical_cast<double>(dampingStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
@@ -849,13 +878,13 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDyna
   const char* frictionStr = _config->Attribute("friction");
   if (frictionStr == NULL){
     printf("joint dynamics: no friction, defaults to 0\n");
-    _jointDynamics.friction = 0;
+    _jointDynamics->friction = 0;
   }
   else
   {
     try
     {
-      _jointDynamics.friction = boost::lexical_cast<double>(frictionStr);
+      _jointDynamics->friction = boost::lexical_cast<double>(frictionStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
@@ -870,7 +899,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDyna
     return false;
   }
   else{
-    printf("joint dynamics: damping %f and friction %f\n", _jointDynamics.damping, _jointDynamics.friction);
+    printf("joint dynamics: damping %f and friction %f\n", _jointDynamics->damping, _jointDynamics->friction);
     return true;
   }
 }
@@ -878,20 +907,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDyna
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits)
 {
-  _jointLimits.Clear();
+  _jointLimits->Clear();
 
   // Get lower joint limit
   const char* lowerStr = _config->Attribute("lower");
   if (lowerStr == NULL)
   {
     printf("joint limit: no lower, defaults to 0\n");
-    _jointLimits.lower = 0;
+    _jointLimits->lower = 0;
   }
   else
   {
     try
     {
-      _jointLimits.lower = boost::lexical_cast<double>(lowerStr);
+      _jointLimits->lower = boost::lexical_cast<double>(lowerStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
@@ -905,13 +934,13 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits
   if (upperStr == NULL)
   {
     printf("joint limit: no upper, , defaults to 0\n");
-    _jointLimits.upper = 0;
+    _jointLimits->upper = 0;
   }
   else
   {
     try
     {
-      _jointLimits.upper = boost::lexical_cast<double>(upperStr);
+      _jointLimits->upper = boost::lexical_cast<double>(upperStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
@@ -930,7 +959,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits
   {
     try
     {
-      _jointLimits.effort = boost::lexical_cast<double>(effortStr);
+      _jointLimits->effort = boost::lexical_cast<double>(effortStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
@@ -950,7 +979,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits
   {
     try
     {
-      _jointLimits.velocity = boost::lexical_cast<double>(velocityStr);
+      _jointLimits->velocity = boost::lexical_cast<double>(velocityStr);
     }
     catch (boost::bad_lexical_cast &e)
     {
@@ -964,7 +993,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
 {
-  _jointClear();
+  _joint->Clear();
 
   // Get Joint Name
   const char *nameStr = _config->Attribute("name");
@@ -973,20 +1002,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
     printf("unnamed joint found\n");
     return false;
   }
-  _jointname = nameStr;
+  _joint->name = nameStr;
 
   // Get transform from Parent Link to Joint Frame
   TiXmlElement *originXml = _config->FirstChildElement("origin");
   if (!originXml)
   {
-    _jointorigin.Clear();
+    _joint->origin.Clear();
   }
   else
   {
-    if (!_jointorigin.InitXml(originXml))
+    if (!_joint->origin.InitXml(originXml))
     {
-      printf("Malformed parent origin element for joint '%s'\n", _jointname.c_str());
-      _jointorigin.Clear();
+      printf("Malformed parent origin element for joint '%s'\n", _joint->name.c_str());
+      _joint->origin.Clear();
       return false;
     }
   }
@@ -997,10 +1026,10 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   {
     const char *pname = parentXml->Attribute("link");
     if (!pname)
-      printf("no parent link name specified for Joint link '%s'. this might be the root?\n", _jointname.c_str());
+      printf("no parent link name specified for Joint link '%s'. this might be the root?\n", _joint->name.c_str());
     else
     {
-      _jointparentLinkName = std::string(pname);
+      _joint->parentLinkName = std::string(pname);
     }
   }
 
@@ -1010,10 +1039,10 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   {
     const char *pname = childXml->Attribute("link");
     if (!pname)
-      printf("no child link name specified for Joint link '%s'.\n", _jointname.c_str());
+      printf("no child link name specified for Joint link '%s'.\n", _joint->name.c_str());
     else
     {
-      _jointchildLinkName = std::string(pname);
+      _joint->childLinkName = std::string(pname);
     }
   }
 
@@ -1021,49 +1050,49 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   const char* typeChar = _config->Attribute("type");
   if (!typeChar)
   {
-    printf("joint '%s' has no type, check to see if it's a reference.\n", _jointname.c_str());
+    printf("joint '%s' has no type, check to see if it's a reference.\n", _joint->name.c_str());
     return false;
   }
   std::string typeStr = typeChar;
   if (typeStr == "piston")
-    type = PISTON;
+    _joint->type = Joint::PISTON;
   else if (typeStr == "revolute2")
-    type = REVOLUTE2;
+    _joint->type = Joint::REVOLUTE2;
   else if (typeStr == "revolute")
-    type = REVOLUTE;
+    _joint->type = Joint::REVOLUTE;
   else if (typeStr == "universal")
-    type = UNIVERSAL;
+    _joint->type = Joint::UNIVERSAL;
   else if (typeStr == "prismatic")
-    type = PRISMATIC;
+    _joint->type = Joint::PRISMATIC;
   else if (typeStr == "ball")
-    type = BALL;
+    _joint->type = Joint::BALL;
   else
   {
-    printf("Joint '%s' has no known type '%s'\n", _jointname.c_str(), typeStr.c_str());
+    printf("Joint '%s' has no known type '%s'\n", _joint->name.c_str(), typeStr.c_str());
     return false;
   }
 
   // Get Joint Axis
-  if (_jointtype != BALL)
+  if (_joint->type != Joint::BALL)
   {
     // axis
     TiXmlElement *axisXml = _config->FirstChildElement("axis");
     if (!axisXml)
     {
-      printf("no axis elemement for Joint link '%s', defaulting to (1,0,0) axis\n", _jointname.c_str());
-      _jointaxis = Vector3(1.0, 0.0, 0.0);
+      printf("no axis elemement for Joint link '%s', defaulting to (1,0,0) axis\n", _joint->name.c_str());
+      _joint->axis = Vector3(1.0, 0.0, 0.0);
     }
     else{
       if (!axisXml->Attribute("xyz"))
       {
-        printf("no xyz attribute for axis element for Joint link '%s'\n", _jointname.c_str());
+        printf("no xyz attribute for axis element for Joint link '%s'\n", _joint->name.c_str());
       }
       else 
       {
-        if (!_jointaxis.Init(axisXml->Attribute("xyz")))
+        if (!_joint->axis.Init(axisXml->Attribute("xyz")))
         {
-          printf("Malformed axis element for joint '%s'\n", _jointname.c_str());
-          _jointaxis.Clear();
+          printf("Malformed axis element for joint '%s'\n", _joint->name.c_str());
+          _joint->axis.Clear();
           return false;
         }
       }
@@ -1074,11 +1103,11 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   TiXmlElement *limitXml = _config->FirstChildElement("limit");
   if (limitXml)
   {
-    limits.reset(new JointLimits);
-    if (!limits->InitXml(limitXml))
+    _joint->limits.reset(new JointLimits);
+    if (!initXml(limitXml,_joint->limits))
     {
-      printf("Could not parse limit element for joint '%s'\n", _jointname.c_str());
-      limits.reset();
+      printf("Could not parse limit element for joint '%s'\n", _joint->name.c_str());
+      _joint->limits.reset();
       return false;
     }
   }
@@ -1087,11 +1116,11 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   TiXmlElement *propXml = _config->FirstChildElement("dynamics");
   if (propXml)
   {
-    dynamics.reset(new JointDynamics);
-    if (!dynamics->InitXml(propXml))
+    _joint->dynamics.reset(new JointDynamics);
+    if (!initXml(propXml,_joint->dynamics))
     {
-      printf("Could not parse joint_dynamics element for joint '%s'\n", _jointname.c_str());
-      dynamics.reset();
+      printf("Could not parse joint_dynamics element for joint '%s'\n", _joint->name.c_str());
+      _joint->dynamics.reset();
       return false;
     }
   }
@@ -1102,7 +1131,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
 /// \brief Load Model from TiXMLElement
 bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
 {
-  _model.Clear();
+  _model->Clear();
 
   printf("Parsing model xml\n");
   if (!_xml) 
@@ -1115,7 +1144,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
     printf("No name given for the model.\n");
     return false;
   }
-  _model.name = std::string(nameStr);
+  _model->name = std::string(nameStr);
 
   // Get all Link elements
   for (TiXmlElement* linkXml = _xml->FirstChildElement("link"); 
@@ -1124,9 +1153,9 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
     boost::shared_ptr<Link> link;
     link.reset(new Link);
 
-    if (link->InitXml(linkXml))
+    if (initXml(linkXml,link))
     {
-      if (_model.GetLink(link->name))
+      if (_model->GetLink(link->name))
       {
         printf("link '%s' is not unique.\n", link->name.c_str());
         link.reset();
@@ -1134,7 +1163,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
       }
       else
       {
-        _model.links.insert(make_pair(link->name,link));
+        _model->links.insert(make_pair(link->name,link));
         printf("successfully added a new link '%s'\n", link->name.c_str());
       }
     }
@@ -1146,7 +1175,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
     }
   }
 
-  if (_model.links.empty())
+  if (_model->links.empty())
   {
     printf("No link elements found in xml file\n");
     return false;
@@ -1159,9 +1188,9 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
     boost::shared_ptr<Joint> joint;
     joint.reset(new Joint);
 
-    if (joint->InitXml(jointXml))
+    if (initXml(jointXml,joint))
     {
-      if (_model.GetJoint(joint->name))
+      if (_model->GetJoint(joint->name))
       {
         printf("joint '%s' is not unique.\n", joint->name.c_str());
         joint.reset();
@@ -1169,7 +1198,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
       }
       else
       {
-        _model.joints.insert(make_pair(joint->name,joint));
+        _model->joints.insert(make_pair(joint->name,joint));
         printf("successfully added a new joint '%s'\n", joint->name.c_str());
       }
     }
@@ -1182,7 +1211,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
   }
 
   /// Get all the plugins
-  getPlugins(_xml, _model.plugins);
+  getPlugins(_xml, _model->plugins);
 
   return true;
 }
@@ -1206,7 +1235,7 @@ bool initString(const std::string &_xmlString, boost::shared_ptr<Model> &_model)
 }
 
 /// \brief Load Model from TiXMLDocument
-bool initDoc(TiXmlDocument *_xml, boost::shared_ptr<Model> &_model);
+bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<Model> &_model)
 {
   if (!_xmlDoc)
   {
@@ -1224,49 +1253,67 @@ bool initDoc(TiXmlDocument *_xml, boost::shared_ptr<Model> &_model);
   return initXml(modelXml, _model);
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Geometry> &_geom)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Geometry> &_geometry)
 {
-  boost::shared_ptr<Geometry> geom;
-  if (!_g) 
-    return geom;
-
-  TiXmlElement *shape = _g->FirstChildElement();
+  TiXmlElement *shape = _config->FirstChildElement();
   if (!shape)
   {
     printf("Geometry tag contains no child element.\n");
-    return geom;
+    return _geometry;
   }
 
   std::string typeName = shape->ValueStr();
   if (typeName == "sphere")
-    geom.reset(new Sphere);
+    _geometry.reset(new Sphere);
   else if (typeName == "box")
-    geom.reset(new Box);
+    _geometry.reset(new Box);
   else if (typeName == "cylinder")
-    geom.reset(new Cylinder);
+    _geometry.reset(new Cylinder);
   else if (typeName == "mesh")
-    geom.reset(new Mesh);
+    _geometry.reset(new Mesh);
   else
   {
     printf("Unknown geometry type '%s'\n", typeName.c_str());
-    return geom;
+    return _geometry;
   }
 
   // clear geom object when fails to initialize
-  if (!initXml(shape, geom))
+  if (!initXml(shape, _geometry))
   {
     printf("Geometry failed to parse\n");
-    geom.reset();
+    _geometry.reset();
   }
 
-  return geom;
+  return _geometry;
 }
 
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin)
+{
+  _plugin->Clear();
+
+  const char *nameChar = _config->Attribute("name");
+  if (!nameChar)
+  {
+    printf("No name given for the plugin.\n");
+    return false;
+  }
+  _plugin->name = std::string(nameChar);
+
+  const char *filenameChar = _config->Attribute("filename");
+  if (!filenameChar)
+  {
+    printf("No filename given for the plugin.\n");
+    return false;
+  }
+  _plugin->filename = std::string(filenameChar);
+
+  return true;
+}
 
 /* John below this line */
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InitFile(const std::string &_filename, boost::shared_ptr<World> &_world)
+bool InitFile(const std::string &_filename, World &_world)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.LoadFile(_filename);
@@ -1275,7 +1322,7 @@ bool InitFile(const std::string &_filename, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InitString(const std::string &_xmlString, boost::shared_ptr<World> &_world)
+bool InitString(const std::string &_xmlString, World &_world)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -1284,7 +1331,7 @@ bool InitString(const std::string &_xmlString, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InitXml(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
+bool initXml(TiXmlDocument *_xmlDoc, World &_world)
 {
   if (!_xmlDoc)
   {
@@ -1296,9 +1343,9 @@ bool InitXml(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InitXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
+bool initXml(TiXmlElement *_worldXml, World &_world)
 {
-  printf("World::InitXml Parsing world xml\n");
+  printf("World::initXml Parsing world xml\n");
   if (!_worldXml) 
     return false;
 
@@ -1306,7 +1353,7 @@ bool InitXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Init(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
+bool Init(TiXmlDocument *_xmlDoc, World &_world)
 {
   if (!_xmlDoc)
   {
@@ -1324,7 +1371,7 @@ bool Init(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
+bool Init(TiXmlElement *_worldXml, World &_world)
 {
   _world.Clear();
 
@@ -1346,10 +1393,10 @@ bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
   _world.name = std::string(nameStr);
 
   _world.scene.reset(new Scene);
-  InitXml(_worldXml->FirstChildElement("scene"),_world.scene);
+  initXml(_worldXml->FirstChildElement("scene"),_world.scene);
 
   _world.physics.reset(new Physics);
-  InitXml(_worldXml->FirstChildElement("physics"),_world.physics);
+  initXml(_worldXml->FirstChildElement("physics"),_world.physics);
 
   // Get all model elements
   for (TiXmlElement* modelXml = _worldXml->FirstChildElement("model"); 
@@ -1358,7 +1405,7 @@ bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
     boost::shared_ptr<Model> model;
     model.reset(new Model);
 
-    if (InitXml(modelXml,model))
+    if (initXml(modelXml,model))
     {
       if (_world.GetModel(model->name))
       {
@@ -1387,7 +1434,7 @@ bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
     boost::shared_ptr<Joint> joint;
     joint.reset(new Joint);
 
-    if (InitXml(jointXml,joint))
+    if (initXml(jointXml,joint))
     {
       if (_world.GetJoint(joint->name))
       {
@@ -1416,16 +1463,16 @@ bool Init(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
+bool initXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
 {
-  _scene.Clear();
+  _scene->Clear();
 
   TiXmlElement *ambient = _config->FirstChildElement("ambient");
   if (ambient)
   {
     if (ambient->Attribute("rgba"))
     {
-      if (!_scene.ambientColor.Init(ambient->Attribute("rgba")))
+      if (!_scene->ambientColor.Init(ambient->Attribute("rgba")))
       {
         printf("Error: Ambient rgba is malformed\n");
         return false;
@@ -1443,7 +1490,7 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
   {
     if (background->Attribute("rgba"))
     {
-      if (!_scene.backgroundColor.Init(background->Attribute("rgba")))
+      if (!_scene->backgroundColor.Init(background->Attribute("rgba")))
       {
         printf("Error: Background rgba is malformed\n");
         return false;
@@ -1465,7 +1512,7 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
         printf("Error: No material for the sky.\n");
         return false;
       }
-      _scene.skyMaterial = std::string(materialChar);
+      _scene->skyMaterial = std::string(materialChar);
     }
   }
 
@@ -1473,14 +1520,14 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
   if (shadow)
   {
     std::string enabled = shadow->Attribute("enabled");
-    if (!enabled.empty() && !getBoolFromStr(enabled, _scene.shadowEnabled))
+    if (!enabled.empty() && !getBoolFromStr(enabled, _scene->shadowEnabled))
     {
       printf("Error: Shadown element requires an enabled attribute");
     }
 
     if (shadow->Attribute("rgba"))
     {
-      if (!_scene.shadowColor.Init(shadow->Attribute("rgba")))
+      if (!_scene->shadowColor.Init(shadow->Attribute("rgba")))
       {
         printf("Error: Shadow rgba is malformed\n");
         return false;
@@ -1492,8 +1539,8 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
       return false;
     }
 
-    _scene.shadowType = shadow->Attribute("type");
-    if (_scene.shadowType.empty())
+    _scene->shadowType = shadow->Attribute("type");
+    if (_scene->shadowType.empty())
     {
       printf("Error: Shadow requires a type attribute\n");
       return false;
@@ -1503,7 +1550,11 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
   return true;
 }
 
-bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine)
+//bool initXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_physics_engine)
+//{
+//}
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine)
 {
   TiXmlElement *odeConfig = _config->FirstChildElement("ode");
 
@@ -1520,8 +1571,8 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
     return false;
   }
 
-  _open_dynamics_engine.solverType = solverConfig->Attribute("type");
-  if (_open_dynamics_engine.solverType.empty())
+  _open_dynamics_engine->solverType = solverConfig->Attribute("type");
+  if (_open_dynamics_engine->solverType.empty())
   {
     printf("Error: ODE Physics missing solver type\n");
     return false;
@@ -1533,7 +1584,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
     printf("Error: ODE Physics solver missing dt attribute\n");
     return false;
   }
-  if (!getDoubleFromStr(dtStr, _open_dynamics_engine.dt))
+  if (!getDoubleFromStr(dtStr, _open_dynamics_engine->dt))
   {
     printf("Error: ODE Physics solver malformed dt attribute\n");
     return false;
@@ -1545,7 +1596,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
     printf("Error: ODE Physics solver missing iters attribute\n");
     return false;
   }
-  if (!getIntFromStr(itersStr, _open_dynamics_engine.iters))
+  if (!getIntFromStr(itersStr, _open_dynamics_engine->iters))
   {
     printf("Error: ODE Physics solver malformed iters attribute\n");
     return false;
@@ -1557,7 +1608,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
     printf("Error: ODE Physics solver missing sor attribute\n");
     return false;
   }
-  if (!getDoubleFromStr(sorStr, _open_dynamics_engine.sor))
+  if (!getDoubleFromStr(sorStr, _open_dynamics_engine->sor))
   {
     printf("Error: ODE Physics solver malformed sor attribute\n");
     return false;
@@ -1574,7 +1625,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
       printf("Error: ODE Physics contraints missing cfm attribute\n");
       return false;
     }
-    if (!getDoubleFromStr(cfmStr, _open_dynamics_engine.cfm))
+    if (!getDoubleFromStr(cfmStr, _open_dynamics_engine->cfm))
     {
       printf("Error: ODE Physics contraints malformed cfm attribute\n");
       return false;
@@ -1586,7 +1637,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
       printf("Error: ODE Physics contraints missing erp attribute\n");
       return false;
     }
-    if (!getDoubleFromStr(erpStr, _open_dynamics_engine.erp))
+    if (!getDoubleFromStr(erpStr, _open_dynamics_engine->erp))
     {
       printf("Error: ODE Physics contraints malformed erp attribute\n");
       return false;
@@ -1598,7 +1649,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
       printf("Error: ODE Physics contraints missing contact_max_correcting_vel attribute\n");
       return false;
     }
-    if (!getDoubleFromStr(contactMaxCorrectingVelStr, _open_dynamics_engine.contactMaxCorrectingVel))
+    if (!getDoubleFromStr(contactMaxCorrectingVelStr, _open_dynamics_engine->contactMaxCorrectingVel))
     {
       printf("Error: ODE Physics contraints malformed contact_max_correcting_vel attribute\n");
       return false;
@@ -1610,7 +1661,7 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
       printf("Error: ODE Physics contraints missing contact_surface_layer attribute\n");
       return false;
     }
-    if (!getDoubleFromStr(contactSurfaceLayerStr, _open_dynamics_engine.contactSurfaceLayer))
+    if (!getDoubleFromStr(contactSurfaceLayerStr, _open_dynamics_engine->contactSurfaceLayer))
     {
       printf("Error: ODE Physics contraints malformed contact_surface_layer attribute\n");
       return false;
@@ -1620,9 +1671,9 @@ bool InitXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
   return true;
 }
 
-bool InitXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
+bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
 {
-  _physics.Clear();
+  _physics->Clear();
   
   if (!_config)
   {
@@ -1630,8 +1681,8 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
     return false;
   }
 
-  _physics.type = _config->Attribute("type");
-  if (_physics.type.empty())
+  _physics->type = _config->Attribute("type");
+  if (_physics->type.empty())
   {
     printf("Error: Missing physics type attribute\n");
     return false;
@@ -1640,63 +1691,33 @@ bool InitXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
   TiXmlElement *gravityElement = _config->FirstChildElement("gravity");
   if (gravityElement)
   {
-    if (!Init(gravityElement->Attribute("xyz"),_physics.gravity))
+    if (!_physics->gravity.Init(gravityElement->Attribute("xyz")))
     {
       printf("Gravity has malformed xyz\n");
-      _physics.gravity.Clear();
+      _physics->gravity.Clear();
       return false;
     }
   }
 
-  if (_physics.type == "ode")
+  if (_physics->type == "ode")
   {
-    _physics.engine.reset(new OpenDynamicsEngine );
+    _physics->engine.reset(new OpenDynamicsEngine );
+
+    boost::shared_ptr<OpenDynamicsEngine> open_dynamics_engine = boost::shared_static_cast<OpenDynamicsEngine>(_physics->engine);
+    
+    initXml(_config,open_dynamics_engine);
   }
   else
   {
-    printf("Error: Unknown physics engine type[%s]\n",_physics.type.c_str());
+    printf("Error: Unknown physics engine type[%s]\n",_physics->type.c_str());
     return false;
   }
-  InitXml(_config,_physics.engine);
   
   return true;
 }
 
-bool Init(const std::string &_vectorStr, boost::shared_ptr<Color> &_color)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_contact)
 {
-  _color.Clear();
-
-  std::vector<std::string> pieces;
-  std::vector<float> rgba;
-  boost::split( pieces, _vectorStr, boost::is_any_of(" "));
-
-  for (unsigned int i = 0; i < pieces.size(); ++i)
-  {
-    if (!pieces[i].empty())
-    {
-      try
-      {
-        rgba.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
-      }
-      catch (boost::bad_lexical_cast &e)
-      {
-        printf("color rgba element (%s) is not a valid float",pieces[i].c_str());
-        return false;
-      }
-    }
-  }
-
-  if (rgba.size() != 4)
-  {
-    printf("Color contains %i elements instead of 4 elements", (int)rgba.size());
-    return false;
-  }
-
-  _color.r = rgba[0];
-  _color.g = rgba[1];
-  _color.b = rgba[2];
-  _color.a = rgba[3];
-
   return true;
 }
 

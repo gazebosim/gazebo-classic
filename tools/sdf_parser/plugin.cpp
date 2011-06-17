@@ -42,28 +42,3 @@
 
 #include "plugin.h"
 
-using namespace sdf;
-
-////////////////////////////////////////////////////////////////////////////////
-bool Plugin::InitXml(TiXmlElement *_config)
-{
-  this->Clear();
-
-  const char *nameChar = _config->Attribute("name");
-  if (!nameChar)
-  {
-    printf("No name given for the plugin.\n");
-    return false;
-  }
-  this->name = std::string(nameChar);
-
-  const char *filenameChar = _config->Attribute("filename");
-  if (!filenameChar)
-  {
-    printf("No filename given for the plugin.\n");
-    return false;
-  }
-  this->filename = std::string(filenameChar);
-
-  return true;
-}

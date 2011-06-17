@@ -35,7 +35,8 @@
 /* Author: Wim Meeussen */
 
 #include <iostream>
-#include "world.h"
+
+#include "parser.h"
 
 using namespace sdf;
 
@@ -59,7 +60,7 @@ int main(int argc, char** argv)
   }
 
   World world;
-  if (!world.Init(worldXml))
+  if (!Init(worldXml,world))
   {
     std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
     return -1;

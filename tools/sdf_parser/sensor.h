@@ -50,7 +50,7 @@ namespace sdf
 {
   class SensorType
   {
-    enum {CAMERA, RAY, CONTACT} type;
+    public: enum {CAMERA, RAY, CONTACT} type;
   };
   
   class Sensor

@@ -49,8 +49,6 @@ namespace sdf
     public: std::string name;
     public: std::string filename;
  
-    public: bool InitXml(TiXmlElement *_config);
-  
     public: void Clear()
     {
       this->name.clear();

@@ -74,7 +74,7 @@ namespace sdf
     /// \brief complete list of joints
     public: std::map<std::string, boost::shared_ptr<Joint> > joints;
 
-    private: void Clear();
+    public: void Clear();
   
     /// non-const getLink()
     private: void GetModel(const std::string &_name, 
