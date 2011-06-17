@@ -16,7 +16,7 @@ include (FindPkgConfig)
 message (STATUS "TINY: ${TINY_XML_INCLUDE_DIRS}")
 include_directories(${TINY_XML_INCLUDE_DIRS})
 
-add_library( convert  joint.cpp link.cpp model.cpp parser.cpp)
+add_library( convert  joint.cpp link.cpp model.cpp parser.cpp sensor.cpp)
 target_link_libraries(convert ${TINY_XML_LIBRARIES})
 
 add_executable( check  check_gdf.cpp )

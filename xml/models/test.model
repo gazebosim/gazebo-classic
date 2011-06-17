@@ -71,6 +71,14 @@
       </geometry>
       <material script="Gazebo/Pioneer2Body"/>
     </visual>
+
+    <sensor name="my_sensor" type="camera" always_on="true" update_rate="3">
+      <origin xyz="1 2 3"/>
+      <horizontal_fov angle="1.57"/>
+      <image width="640" height="480" format="L8"/>
+      <clip near="0.1" far="1000"/>
+      <save enabled="false" path="/tmp"/>
+    </sensor>
  
   </link>
 

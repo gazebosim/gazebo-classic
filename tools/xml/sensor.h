@@ -34,191 +34,128 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef URDF_LINK_H
-#define URDF_LINK_H
+#ifndef URDF_SENSOR_H
+#define URDF_SENSOR_H
 
 #include <string>
 #include <vector>
 #include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
 
-#include "joint.h"
-#include "color.h"
+#include "pose.h"
 
 namespace gdf{
 
-class Geometry
+class SensorType
 {
-public:
-  enum {SPHERE, BOX, CYLINDER, MESH} type;
+  enum {CAMERA, RAY, CONTACT} type;
 
   virtual bool initXml(TiXmlElement *) = 0;
 };
 
-class Sphere : public Geometry
+class Sensor
 {
 public:
-  Sphere() { this->clear(); };
-  double radius;
-
-  void clear()
-  {
-    radius = 0;
-  };
-  bool initXml(TiXmlElement *);
-};
-
-class Box : public Geometry
-{
-public:
-  Box() { this->clear(); };
-  Vector3 size;
-
-  void clear()
-  {
-    size.clear();
-  };
-  bool initXml(TiXmlElement *);
-};
-
-class Cylinder : public Geometry
-{
-public:
-  Cylinder() { this->clear(); };
-  double length;
-  double radius;
-
-  void clear()
-  {
-    length = 0;
-    radius = 0;
-  };
-  bool initXml(TiXmlElement *);
-};
-
-class Mesh : public Geometry
-{
-public:
-  Mesh() { this->clear(); };
-  std::string filename;
-  Vector3 scale;
-
-  void clear()
-  {
-    filename.clear();
-    // default scale
-    scale.x = 1;
-    scale.y = 1;
-    scale.z = 1;
-  };
-  bool initXml(TiXmlElement *);
-  bool fileExists(std::string filename);
-};
-
-class Material
-{
-public:
-  Material() { this->clear(); };
-  std::string script;
-  Color color;
-
-  void clear()
-  {
-    color.clear();
-    script.clear();
-  };
-  bool initXml(TiXmlElement* config);
-};
-
-class Inertial
-{
-public:
-  Inertial() { this->clear(); };
-  Pose origin;
-  double mass;
-  double ixx,ixy,ixz,iyy,iyz,izz;
-
-  void clear()
-  {
-    origin.clear();
-    mass = 0;
-    ixx = ixy = ixz = iyy = iyz = izz = 0;
-  };
-  bool initXml(TiXmlElement* config);
-};
-
-class Visual
-{
-public:
-  Visual() { this->clear(); };
-  Pose origin;
-  std::string name;
-  boost::shared_ptr<Geometry> geometry;
-
-  boost::shared_ptr<Material> material;
-
-  void clear()
-  {
-    origin.clear();
-    name.clear();
-    material.reset();
-    geometry.reset();
-  };
-  bool initXml(TiXmlElement* config);
-};
-
-class Collision
-{
-public:
-  Collision() { this->clear(); };
-  Pose origin;
-  std::string name;
-  boost::shared_ptr<Geometry> geometry;
-
-  void clear()
-  {
-    origin.clear();
-    name.clear();
-    geometry.reset();
-  };
-  bool initXml(TiXmlElement* config);
-};
-
-
-class Link
-{
-public:
-  Link() { this->clear(); };
+  Sensor() { this->clear(); };
 
   std::string name;
+  std::string type;
+  bool always_on;
+  double update_rate;
 
-  /// inertial element
-  boost::shared_ptr<Inertial> inertial;
+  Pose origin;
 
-  /// a collection of visual elements
-  std::vector<boost::shared_ptr<Visual> > visuals;
-
-  /// a collection of collision elements
-  std::vector<boost::shared_ptr<Collision> > collisions;
+  boost::shared_ptr<SensorType> sensor_type;
 
   bool initXml(TiXmlElement* config);
 
   void clear()
   {
     this->name.clear();
-    this->inertial.reset();
-    this->visuals.clear();
-    this->collisions.clear();
-  };
+    this->type.clear();
+    this->always_on = false;
+    this->update_rate = -1;
+    this->sensor_type.reset();
+    this->origin.clear();
+  }
 
-  void addVisual(boost::shared_ptr<Visual> visual);
-  void getVisuals(std::vector<boost::shared_ptr<Visual > > &vis) const;
-
-  void addCollision(boost::shared_ptr<Collision> collision);
-  void getCollisions(std::vector<boost::shared_ptr<Collision > > &col) const;
 };
 
 
+
+class Contact : public SensorType
+{
+  Contact() { }
+  bool initXml(TiXmlElement *) {return true;}
+};
+
+class Camera : public SensorType
+{
+public:
+  Camera() { this->clear(); };
+  double horizontal_fov;
+  unsigned int image_width;
+  unsigned int image_height;
+  std::string image_format;
+  double clip_near;
+  double clip_far;
+  bool save_enabled;
+  std::string save_path;
+
+  void clear()
+  {
+    this->horizontal_fov = 0;
+    this->image_width = 0;
+    this->image_height = 0;
+    this->image_format.clear();
+    this->clip_near = 0;
+    this->clip_far = 0;
+    this->save_enabled = false;
+    this->save_path.clear();
+  }
+
+  bool initXml(TiXmlElement *);
+};
+
+class Ray : public SensorType
+{
+public:
+  Ray() { this->clear(); };
+  bool display;
+  unsigned int horizontal_samples;
+  double       horizontal_resolution;
+  double       horizontal_min_angle;
+  double       horizontal_max_angle;
+
+  unsigned int vertical_samples;
+  double       vertical_resolution;
+  double       vertical_min_angle;
+  double       vertical_max_angle;
+
+  double range_min;
+  double range_max;
+  double range_resolution;
+
+  void clear()
+  {
+    this->display = false;
+    this->horizontal_samples = 1;
+    this->horizontal_resolution = 1;
+    this->horizontal_min_angle = 0;
+    this->horizontal_max_angle = 0;
+
+    this->vertical_samples = 1;
+    this->vertical_resolution = 1;
+    this->vertical_min_angle = 0;
+    this->vertical_max_angle = 0;
+
+    this->range_min = 0;
+    this->range_max = 1000;
+    this->range_resolution = 0;
+  };
+
+  bool initXml(TiXmlElement *);
+};
 
 
 }

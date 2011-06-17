@@ -78,6 +78,8 @@ int main(int argc, char** argv)
     std::vector<boost::shared_ptr<Visual> >::iterator vIter;
     std::vector<boost::shared_ptr<Collision> >::iterator cIter;
 
+    std::map<std::string, boost::shared_ptr<Sensor> >::iterator sIter;
+
     for (vIter = (*iter)->visuals.begin();
          vIter != (*iter)->visuals.end(); vIter++)
     {
@@ -89,6 +91,13 @@ int main(int argc, char** argv)
     {
       std::cout << "  Collision: " << (*cIter)->name << "\n";
     }
+
+    for (sIter = (*iter)->sensors.begin(); sIter != (*iter)->sensors.end(); sIter++)
+    {
+      std::cout << "sensor: " << sIter->second->name << "\n";
+    }
+
+
   }
 
   for (jIter = model.joints_.begin(); jIter != model.joints_.end(); jIter++)

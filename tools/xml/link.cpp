@@ -460,6 +460,34 @@ bool Link::initXml(TiXmlElement* config)
     }
   }
 
+  // Get all sensor elements
+  for (TiXmlElement* sensor_xml = config->FirstChildElement("sensor"); sensor_xml; sensor_xml = config->NextSiblingElement("sensor"))
+  {
+    boost::shared_ptr<Sensor> sensor;
+    sensor.reset(new Sensor);
+
+    if (sensor->initXml(sensor_xml))
+    {
+      if (this->getSensor(sensor->name))
+      {
+        printf("sensor '%s' is not unique.\n", sensor->name.c_str());
+        sensor.reset();
+        return false;
+      }
+      else
+      {
+        this->sensors.insert(make_pair(sensor->name,sensor));
+        printf("successfully added a new sensor '%s'\n", sensor->name.c_str());
+      }
+    }
+    else
+    {
+      printf("sensor xml is not initialized correctly\n");
+      sensor.reset();
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -494,6 +522,16 @@ void Link::addCollision(boost::shared_ptr<Collision> collision)
 void Link::getCollisions(std::vector<boost::shared_ptr<Collision > > &col) const
 {
   col = this->collisions;
+}
+
+boost::shared_ptr<const Sensor> Link::getSensor(const std::string& name) const
+{
+  boost::shared_ptr<const Sensor> ptr;
+  if (this->sensors.find(name) == this->sensors.end())
+    ptr.reset();
+  else
+    ptr = this->sensors.find(name)->second;
+  return ptr;
 }
 
 }

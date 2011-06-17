@@ -39,9 +39,11 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
 
+#include "sensor.h"
 #include "joint.h"
 #include "color.h"
 
@@ -201,6 +203,9 @@ public:
   /// a collection of collision elements
   std::vector<boost::shared_ptr<Collision> > collisions;
 
+  // a collection of the sensors
+  std::map<std::string, boost::shared_ptr<Sensor> > sensors;
+
   bool initXml(TiXmlElement* config);
 
   void clear()
@@ -216,6 +221,8 @@ public:
 
   void addCollision(boost::shared_ptr<Collision> collision);
   void getCollisions(std::vector<boost::shared_ptr<Collision > > &col) const;
+
+  boost::shared_ptr<const Sensor> getSensor(const std::string& name) const;
 };
 
 
