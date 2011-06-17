@@ -116,10 +116,10 @@ else (build_errors)
 
   ########################################
   # Write the config.h file
-  configure_file (${PROJECT_SOURCE_DIR}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
+  configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
   INSTALL_INCLUDES(${PROJECT_BINARY_DIR}/gazebo_config.h "")
 
-  configure_file (${PROJECT_SOURCE_DIR}/gazebo.h.in ${PROJECT_BINARY_DIR}/gazebo.h)
+  configure_file (${gazebo_cmake_dir}/gazebo.h.in ${PROJECT_BINARY_DIR}/gazebo.h)
   INSTALL_INCLUDES(${CMAKE_CURRENT_BINARY_DIR}/gazebo.h "")
   
   ########################################
@@ -139,7 +139,6 @@ else (build_errors)
     add_subdirectory(Media)
     add_subdirectory(test)
     add_subdirectory(tools)
-    #add_subdirectory(benchmarks)
    
     #if (INCLUDE_PLAYER)
     #  add_subdirectory(player)

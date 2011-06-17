@@ -57,7 +57,7 @@
 using namespace gazebo;
 using namespace physics;
 
-GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
+GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics)
 
 class ContactUpdate_TBB
 {
@@ -89,17 +89,20 @@ class Colliders_TBB
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
-    dContactGeom contactGeoms[engine->GetMaxContacts()];
+    dContactGeom *contactGeoms = new dContactGeom[this->engine->GetMaxContacts()];
+
     for (size_t i=r.begin(); i != r.end(); i++)
     {
       ODEGeom *geom1 = (*this->colliders)[i].first;
       ODEGeom *geom2 = (*this->colliders)[i].second;
       this->engine->Collide(geom1, geom2, contactGeoms);
     }
+
+    delete contactGeoms;
   }
 
   private: std::vector< std::pair<ODEGeom*, ODEGeom*> > *colliders;
-  private: ODEPhysics*engine;
+  private: ODEPhysics *engine;
 };
  
 ////////////////////////////////////////////////////////////////////////////////
