@@ -18,7 +18,7 @@
       <geometry>
         <mesh filename="Pioneer2dx/chassis.mesh"/>
       </geometry>
-      <material name="Gazebo/Pioneer2Body"/>
+      <material script="Gazebo/Pioneer2Body"/>
     </visual>
   
     <visual>
@@ -26,7 +26,7 @@
       <geometry>
         <mesh filename="Pioneer2dx/chassis_top.mesh"/>
       </geometry>
-      <material name="Gazebo/Black"/>
+      <material script="Gazebo/Black"/>
     </visual>
   
     <visual>
@@ -34,7 +34,7 @@
       <geometry>
         <mesh filename="Pioneer2dx/sonarbank.mesh"/>
       </geometry>
-      <material name="Gazebo/Gold"/>
+      <material script="Gazebo/Gold"/>
     </visual>
   
     <visual>
@@ -42,7 +42,7 @@
       <geometry>
         <mesh filename="Pioneer2dx/sonarbank.mesh"/>
       </geometry>
-      <material name="Gazebo/Gold"/>
+      <material script="Gazebo/Gold"/>
     </visual>
   
   </link>
@@ -61,14 +61,14 @@
       <geometry>
         <mesh filename="Pioneer2dx/tire.mesh"/>
       </geometry>
-      <material name="Gazebo/Black"/>
+      <material script="Gazebo/Black"/>
     </visual>
   
     <visual>
       <geometry>
         <mesh filename="Pioneer2dx/wheel.mesh"/>
       </geometry>
-      <material name="Gazebo/Gold"/>
+      <material script="Gazebo/Gold"/>
     </visual>
   
     <visual>
@@ -76,7 +76,7 @@
       <geometry>
         <cylinder radius="0.04" length="0.08"/>
       </geometry>
-      <material name="Gazebo/Black"/>
+      <material script="Gazebo/Black"/>
     </visual>
   </link>
 
@@ -94,14 +94,14 @@
       <geometry>
         <mesh filename="Pioneer2dx/tire.mesh"/>
       </geometry>
-      <material name="Gazebo/Black"/>
+      <material script="Gazebo/Black"/>
     </visual>
   
     <visual>
       <geometry>
         <mesh filename="Pioneer2dx/wheel.mesh"/>
       </geometry>
-      <material name="Gazebo/Gold"/>
+      <material script="Gazebo/Gold"/>
     </visual>
   
     <visual>
@@ -109,7 +109,7 @@
       <geometry>
         <cylinder radius="0.04" length="0.08"/>
       </geometry>
-      <material name="Gazebo/Black"/>
+      <material script="Gazebo/Black"/>
     </visual>
   </link>
 
@@ -127,7 +127,7 @@
       <geometry>
         <sphere radius="0.02"/>
       </geometry>
-      <material name="Gazebo/Black"/>
+      <material script="Gazebo/Black"/>
     </visual>
   </link>
 

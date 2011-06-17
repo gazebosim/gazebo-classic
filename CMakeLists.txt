@@ -138,7 +138,7 @@ else (build_errors)
     add_subdirectory(xml)
     add_subdirectory(Media)
     add_subdirectory(test)
-    #add_subdirectory(tools)
+    add_subdirectory(tools)
     #add_subdirectory(benchmarks)
    
     #if (INCLUDE_PLAYER)

@@ -9,12 +9,14 @@ endif(COMMAND cmake_policy)
 
 include (FindPkgConfig)
 
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(PKG_CFGS REQUIRED gazebo_transport)
-endif()
+add_subdirectory(xml)
 
-include_directories(${PKG_CFGS_INCLUDE_DIRS})
+#if (PKG_CONFIG_FOUND)
+#  pkg_check_modules(PKG_CFGS REQUIRED gazebo_transport)
+#endif()
 
-add_executable( gztopic gztopic.cc)
+#include_directories(${PKG_CFGS_INCLUDE_DIRS})
 
-target_link_libraries(gztopic ${PKG_CFGS_LIBRARIES})
+#add_executable( convert convert.cc Converter.cc)
+
+#target_link_libraries(convert ${PKG_CFGS_LIBRARIES})
