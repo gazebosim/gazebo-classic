@@ -51,6 +51,9 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_sensor) {return true;}
 
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
+
 
 
   /* JOHN below here */

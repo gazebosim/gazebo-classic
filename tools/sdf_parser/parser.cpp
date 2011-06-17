@@ -417,4 +417,114 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
   return true;
 }
 
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
+{
+  bool hasRGB = false;
+
+  _material.Clear();
+
+  _material.script = _config->Attribute("script");
+
+  // color
+  TiXmlElement *c = _config->FirstChildElement("color");
+  if (c)
+  {
+    if (c->Attribute("rgba"))
+    {
+      if (!_material.color.Init(c->Attribute("rgba")))
+      {
+        printf("Material has malformed color rgba values.\n");
+        _material.color.Clear();
+        return false;
+      }
+      else
+        hasRGB = true;
+    }
+    else
+    {
+      printf("Material color has no rgba\n");
+    }
+  }
+
+  return !_material.script.empty() || hasRGB;
 }
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
+{
+  _inertial.Clear();
+
+  // Origin
+  TiXmlElement *o = _config->FirstChildElement("origin");
+  if (!o)
+  {
+    printf("INFO: Origin tag not present for inertial element, using default (Identity)\n\n");
+    _inertial.origin.Clear();
+  }
+  else
+  {
+    if (!_inertial.origin.InitXml(o))
+    {
+      printf("Inertial has a malformed origin tag\n");
+      _inertial.origin.Clear();
+      return false;
+    }
+  }
+
+  if (!_config->Attribute("mass"))
+  {
+    printf("Inertial element must have mass attribute.");
+    return false;
+  }
+
+  try
+  {
+    mass = boost::lexical_cast<double>(_config->Attribute("mass"));
+  }
+  catch (boost::bad_lexical_cast &e)
+  {
+    printf("mass (%s) is not a float",_config->Attribute("mass"));
+    return false;
+  }
+
+  TiXmlElement *inertiaXml = _config->FirstChildElement("inertia");
+  if (!inertiaXml)
+  {
+    printf("Inertial element must have inertia element");
+    return false;
+  }
+
+  if (!(inertiaXml->Attribute("ixx") && inertiaXml->Attribute("ixy") && 
+        inertiaXml->Attribute("ixz") && inertiaXml->Attribute("iyy") && 
+        inertiaXml->Attribute("iyz") && inertiaXml->Attribute("izz")))
+  {
+    printf("Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes");
+    return false;
+  }
+
+  try
+  {
+    ixx  = boost::lexical_cast<double>(inertiaXml->Attribute("ixx"));
+    ixy  = boost::lexical_cast<double>(inertiaXml->Attribute("ixy"));
+    ixz  = boost::lexical_cast<double>(inertiaXml->Attribute("ixz"));
+    iyy  = boost::lexical_cast<double>(inertiaXml->Attribute("iyy"));
+    iyz  = boost::lexical_cast<double>(inertiaXml->Attribute("iyz"));
+    izz  = boost::lexical_cast<double>(inertiaXml->Attribute("izz"));
+  }
+  catch (boost::bad_lexical_cast &e)
+  {
+    printf("one of the inertia elements: ixx (%s) ixy (%s) ixz (%s) iyy (%s) iyz (%s) izz (%s) is not a valid double",
+              inertiaXml->Attribute("ixx"),
+              inertiaXml->Attribute("ixy"),
+              inertiaXml->Attribute("ixz"),
+              inertiaXml->Attribute("iyy"),
+              inertiaXml->Attribute("iyz"),
+              inertiaXml->Attribute("izz"));
+    return false;
+  }
+
+  return true;
+}
+
+/* John below this line */
+}
+

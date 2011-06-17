@@ -53,8 +53,6 @@ namespace sdf
   class Geometry
   {
     public: enum {SPHERE, BOX, CYLINDER, MESH} type;
-
-    public: virtual bool InitXml(TiXmlElement *) = 0;
   };
   
   class Sphere : public Geometry
@@ -66,8 +64,6 @@ namespace sdf
             {
               radius = 0;
             };
-
-    public: bool InitXml(TiXmlElement *);
   };
   
   class Box : public Geometry
@@ -79,7 +75,6 @@ namespace sdf
             {
               size.Clear();
             };
-    public: bool InitXml(TiXmlElement *_config);
   };
   
   class Cylinder : public Geometry
@@ -93,7 +88,6 @@ namespace sdf
               length = 0;
               radius = 0;
             };
-    public: bool InitXml(TiXmlElement *);
   };
   
   class Mesh : public Geometry
@@ -110,7 +104,6 @@ namespace sdf
               scale.y = 1;
               scale.z = 1;
             };
-    public: bool InitXml(TiXmlElement *);
     public: bool FileExists(std::string filename);
   };
   
@@ -125,7 +118,6 @@ namespace sdf
               color.Clear();
               script.clear();
             };
-    public: bool InitXml(TiXmlElement *_config);
   };
   
   class Inertial
@@ -141,7 +133,6 @@ namespace sdf
               mass = 0;
               ixx = ixy = ixz = iyy = iyz = izz = 0;
             };
-    public: bool InitXml(TiXmlElement *_config);
 
     public: friend std::ostream &operator<<(std::ostream &out, const Inertial &inertial)
             {
@@ -166,7 +157,6 @@ namespace sdf
               material.reset();
               geometry.reset();
             };
-    public: bool InitXml(TiXmlElement *_config);
 
     public: friend std::ostream &operator<<(std::ostream &out, const Visual &vis)
             {
@@ -189,7 +179,6 @@ namespace sdf
               geometry.reset();
             };
 
-    public: bool InitXml(TiXmlElement *_config);
 
     public: friend std::ostream &operator<<(std::ostream &out, const Collision &col)
             {
@@ -216,8 +205,6 @@ namespace sdf
 
             // a collection of the sensors
     public: std::map<std::string, boost::shared_ptr<Sensor> > sensors;
-
-    public: bool InitXml(TiXmlElement *_config);
 
     public: void Clear()
             {
