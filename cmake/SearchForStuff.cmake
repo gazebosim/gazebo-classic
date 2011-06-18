@@ -10,6 +10,10 @@ set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to over
 set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
 set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
 
+set (tinyxml_include_dirs "" CACHE STRING "Tinyxml include paths. Use this to override automatic detection.")
+set (tinyxml_library_dirs "" CACHE STRING "Tinyxml library paths. Use this to override automatic detection.")
+set (tinyxml_libraries "" CACHE STRING "Tinyxml libraries Use this to override automatic detection.")
+
 set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
 set (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
@@ -48,8 +52,38 @@ if (PKG_CONFIG_FOUND)
   # Find tinyxml
   pkg_check_modules(TINY_XML tinyxml)
   if (NOT TINY_XML_FOUND)
-    BUILD_ERROR ("Missing: TinyXML - Tiny XML parser")
+    ########################################
+    # Find tinyxml
+    if (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
+
+      find_path(tinyxml_include_dir tinyxml/tinyxml.hpp ${tinyxml_include_dirs} ENV CPATH)
+      
+      if (NOT tinyxml_include_dir)
+        message (STATUS "Looking for tinyxml/tinyxml.hpp - not found.")
+        set (tinyxml_include_dirs /usr/include CACHE STRING
+          "tinyxml include paths. Use this to override automatic detection.")
+      else (NOT tinyxml_include_dir)
+        message (STATUS "Looking for tinyxml/tinyxml.hpp - found")
+        set (assim_include_dirs ${tinyxml_include_dir} CACHE STRING
+          "tinyxml include paths. Use this to override automatic detection.")
+      endif (NOT tinyxml_include_dir)
+      
+      find_library(tinyxml_library tinyxml ENV LD_LIBRARY_PATH)
+      
+      if (tinyxml_library)
+        message (STATUS "Looking for libtinyxml - found")
+        APPEND_TO_CACHED_LIST(tinyxml_libraries
+                              "tinyxml libraries Use this to override automatic detection."
+                              ${tinyxml_library})
+      endif (tinyxml_library)
+     
+      if (NOT tinyxml_include_dir OR NOT tinyxml_library)
+        BUILD_ERROR("Missing: tinyxml")
+      endif (NOT tinyxml_include_dir OR NOT tinyxml_library)
+
+    endif (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
   endif ()
+
 
   #################################################
   # Find TBB
