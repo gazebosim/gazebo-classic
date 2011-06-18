@@ -38,7 +38,6 @@
 #define URDF_PLUGIN_H
 
 #include <string>
-#include <tinyxml.h>
 
 namespace sdf
 {

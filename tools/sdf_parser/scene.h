@@ -38,7 +38,6 @@
 #define URDF_SCENE_H
 
 #include <string>
-#include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
