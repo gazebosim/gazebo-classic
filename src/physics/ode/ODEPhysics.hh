@@ -37,6 +37,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Contact.hh"
 #include "physics/Shape.hh"
+#include "gazebo_config.h"
 
 namespace gazebo
 {
@@ -188,8 +189,11 @@ namespace gazebo
     private: tbb::spin_mutex collideMutex;
 
     private: dContactGeom *contactGeoms;
-
+#if ODE_WG_TRUNK
+    private: int (*physicsStepFunc)(dxWorld*, dReal);
+#else
     private: void (*physicsStepFunc)(dxWorld*, dReal);
+#endif
   };
   
   
