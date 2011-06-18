@@ -37,6 +37,7 @@
 #ifndef URDF_POSE_H
 #define URDF_POSE_H
 
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include <math.h>
@@ -278,51 +279,6 @@ class Pose
     this->rotation.Clear();
   };
 
-  bool InitXml(TiXmlElement *_xml)
-  {
-    this->Clear();
-    if (!_xml)
-    {
-      printf("parsing pose: _xml empty");
-      return false;
-    }
-    else
-    {
-      const char* _xyzStr = _xml->Attribute("xyz");
-      if (_xyzStr == NULL)
-      {
-        printf("parsing pose: no xyz, using default values.");
-        return true;
-      }
-      else
-      {
-        if (!this->position.Init(_xyzStr))
-        {
-          printf("malformed xyz");
-          this->position.Clear();
-          return false;
-        }
-      }
-
-      const char* rpyStr = _xml->Attribute("rpy");
-      if (rpyStr == NULL)
-      {
-        printf("parsing pose: no rpy, using default values.");
-        return true;
-      }
-      else
-      {
-        if (!this->rotation.Init(rpyStr))
-        {
-          printf("malformed rpy");
-          return false;
-          this->rotation.Clear();
-        }
-      }
-
-      return true;
-    }
-  };
 
   friend std::ostream &operator<<(std::ostream &out, const Pose &pose)
   {

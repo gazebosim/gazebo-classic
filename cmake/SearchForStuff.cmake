@@ -13,6 +13,7 @@ set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override aut
 set (tinyxml_include_dirs "" CACHE STRING "Tinyxml include paths. Use this to override automatic detection.")
 set (tinyxml_library_dirs "" CACHE STRING "Tinyxml library paths. Use this to override automatic detection.")
 set (tinyxml_libraries "" CACHE STRING "Tinyxml libraries Use this to override automatic detection.")
+set (tinyxml_cflags "" CACHE STRING "Tinyxml Use this cflag to enable string support.")
 
 set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
@@ -50,11 +51,14 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find tinyxml
-  pkg_check_modules(TINY_XML tinyxml)
-  if (NOT TINY_XML_FOUND)
+  pkg_check_modules(tinyxml tinyxml)
+  if (NOT tinyxml_FOUND)
+    message(STATUS "tinyxml system package not found, using passed in paths")
     ########################################
     # Find tinyxml
     if (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
+
+      message(STATUS "tinyxml has no passed in paths, try to auto detect manually.")
 
       find_path(tinyxml_include_dir tinyxml/tinyxml.hpp ${tinyxml_include_dirs} ENV CPATH)
       
@@ -82,6 +86,11 @@ if (PKG_CONFIG_FOUND)
       endif (NOT tinyxml_include_dir OR NOT tinyxml_library)
 
     endif (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
+  else ()
+    set(tinyxml_include_dirs ${tinyxml_INCLUDE_DIRs} CACHE STRING "tynyxml include paths.")
+    set(tinyxml_library_dirs ${tinyxml_LIBRARY_DIRS} CACHE STRING "tynyxml include paths.")
+    set(tinyxml_libraries ${tinyxml_LIBRARIES} CACHE STRING "tynyxml include paths.")
+    set(tinyxml_cflags ${tinyxml_CFLAGS} CACHE STRING "tynyxml include paths.")
   endif ()
 
 

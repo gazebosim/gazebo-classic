@@ -35,6 +35,7 @@
 /* Author: Wim Meeussen */
 
 #include <iostream>
+#include <tinyxml.h>
 
 #include "parser.h"
 

@@ -40,6 +40,7 @@
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include <tinyxml.h>
 
 #include "sensor.h"
 #include "link.h"
@@ -47,6 +48,7 @@
 #include "world.h"
 #include "joint.h"
 #include "plugin.h"
+#include "pose.h"
 
 namespace sdf
 {
@@ -73,7 +75,7 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin);
 
   /// \brief Load Model given a filename
-  bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
+  //bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
 
  /// \brief Load Model from a XML-string
   bool initString(const std::string &_xmlstring, boost::shared_ptr<Model> &_model);
@@ -83,9 +85,6 @@ namespace sdf
 
   /// \brief Load Model from TiXMLDocument
   bool initDoc(TiXmlDocument *_xml, boost::shared_ptr<Model> &_model);
-
-
-  /* JOHN below here */
 
   /// world
   /// \brief Load World from TiXMLElement
@@ -101,7 +100,7 @@ namespace sdf
   bool initXml(TiXmlDocument *_xml, World &_world);
 
   /// \brief Load World given a filename
-  bool InitFile(const std::string &_filename, World &_world);
+  //bool InitFile(const std::string &_filename, World &_world);
 
   /// \brief Load World from a XML-string
   bool InitString(const std::string &_xmlstring, World &_world);
@@ -118,6 +117,8 @@ namespace sdf
   /// Physics
   //bool initXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_physics_engine);
   
+  /// Pose
+  bool InitXml(TiXmlElement *_xml, Pose &_pose);
 
   bool getBoolFromStr(std::string _str, bool &_value);
  

@@ -237,7 +237,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
   }
   else
   {
-    if (!_sensor->origin.InitXml(o))
+    if (!InitXml(o,_sensor->origin))
     {
       printf("Error: Sensor has a malformed origin tag\n");
       _sensor->origin.Clear();
@@ -488,7 +488,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
   }
   else
   {
-    if (!_inertial->origin.InitXml(o))
+    if (!InitXml(o,_inertial->origin))
     {
       printf("Inertial has a malformed origin tag\n");
       _inertial->origin.Clear();
@@ -564,7 +564,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision)
     printf("Origin tag not present for collision element, using default (Identity)");
     _collision->origin.Clear();
   }
-  else if (!_collision->origin.InitXml(o))
+  else if (!InitXml(o,_collision->origin))
   {
     printf("Collision has a malformed origin tag");
     _collision->origin.Clear();
@@ -809,7 +809,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
     printf("Origin tag not present for visual element, using default (Identity)");
     _visual->origin.Clear();
   }
-  else if (!_visual->origin.InitXml(o))
+  else if (!InitXml(o,_visual->origin))
   {
     printf("Visual has a malformed origin tag");
     _visual->origin.Clear();
@@ -1012,7 +1012,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   }
   else
   {
-    if (!_joint->origin.InitXml(originXml))
+    if (!InitXml(originXml,_joint->origin))
     {
       printf("Malformed parent origin element for joint '%s'\n", _joint->name.c_str());
       _joint->origin.Clear();
@@ -1216,6 +1216,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
   return true;
 }
 
+/*
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
 {
@@ -1224,6 +1225,7 @@ bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
 
   return initDoc(&xmlDoc,_model);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 bool initString(const std::string &_xmlString, boost::shared_ptr<Model> &_model)
@@ -1310,8 +1312,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin)
   return true;
 }
 
-/* John below this line */
-
+/*
 ////////////////////////////////////////////////////////////////////////////////
 bool InitFile(const std::string &_filename, World &_world)
 {
@@ -1320,6 +1321,7 @@ bool InitFile(const std::string &_filename, World &_world)
 
   return Init(&xmlDoc,_world);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 bool InitString(const std::string &_xmlString, World &_world)
@@ -1720,6 +1722,53 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_contact)
 {
   return true;
 }
+
+bool InitXml(TiXmlElement *_xml, Pose &_pose)
+{
+  _pose.Clear();
+  if (!_xml)
+  {
+    printf("parsing pose: _xml empty");
+    return false;
+  }
+  else
+  {
+    const char* _xyzStr = _xml->Attribute("xyz");
+    if (_xyzStr == NULL)
+    {
+      printf("parsing pose: no xyz, using default values.");
+      return true;
+    }
+    else
+    {
+      if (!_pose.position.Init(_xyzStr))
+      {
+        printf("malformed xyz");
+        _pose.position.Clear();
+        return false;
+      }
+    }
+
+    const char* rpyStr = _xml->Attribute("rpy");
+    if (rpyStr == NULL)
+    {
+      printf("parsing pose: no rpy, using default values.");
+      return true;
+    }
+    else
+    {
+      if (!_pose.rotation.Init(rpyStr))
+      {
+        printf("malformed rpy");
+        return false;
+        _pose.rotation.Clear();
+      }
+    }
+
+    return true;
+  }
+}
+
 
 }
 
