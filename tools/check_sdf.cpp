@@ -60,19 +60,19 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  World world;
-  if (!Init(worldXml,world))
+  boost::shared_ptr<World> world(new World);
+  if (!initXml(worldXml, world))
   {
     std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
     return -1;
   }
 
-  std::cout << "world name is: " << world.name << std::endl;
-
   // get info from parser
   std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
 
-  world.Print("");
+  world->Print("");
+
+  std::cout << "\n";
 
   return 0;
 }

@@ -20,19 +20,22 @@
   <model name="default_pioneer_model">
   
     <link name="chassis_body">
-      <origin xyz="0.0 0.0 0.16" />
+      <origin xyz="0.0 0.0 0.16" rpy="0 0 0"/>
   
       <inertial mass="1.0">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
       </inertial>
   
       <collision name="collision_1">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
   
       <collision name="collision_2">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
@@ -57,19 +60,22 @@
     </link>
   
      <link name="body_2">
-      <origin xyz="0.0 0.0 0.16" />
+      <origin xyz="0.0 0.0 0.16" rpy="0 0 0"/>
   
       <inertial mass="1.0">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
       </inertial>
   
       <collision name="chassis_geom">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
   
       <collision name="chassis_geom_2">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
@@ -97,7 +103,7 @@
           <sensor_more value="hello"/>
         </plugin>
   
-        <origin xyz="1 2 3"/>
+        <origin xyz="1 2 3" rpy="0 0 0"/>
         <horizontal_fov angle="1.57"/>
         <image width="640" height="480" format="L8"/>
         <clip near="0.1" far="1000"/>
@@ -117,8 +123,8 @@
       <axis xyz="0 1 0"/>
     </joint>
   
-    <plugin name="best_plugin" filename="/tmp/good_plugin.so">  
-      <funky_xml>so funky</funky_xml>
+    <plugin name="best_plugin2" filename="/tmp/good_plugin.so">  
+      <funky_xml txt="so funky"/>
       <more value="hello"/>
     </plugin>
   </model>
@@ -126,19 +132,22 @@
   
   <model name="other_model">
     <link name="body_2">
-      <origin xyz="0.0 0.0 0.16" />
+      <origin xyz="0.0 0.0 0.16"  rpy="0 0 0"/>
     
       <inertial mass="1.0">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
       </inertial>
     
       <collision name="chassis_geom">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
     
       <collision name="chassis_geom_2">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
@@ -166,7 +175,7 @@
           <sensor_more value="hello"/>
         </plugin>
     
-        <origin xyz="1 2 3"/>
+        <origin xyz="1 2 3" rpy="0 0 0"/>
         <horizontal_fov angle="1.57"/>
         <image width="640" height="480" format="L8"/>
         <clip near="0.1" far="1000"/>
@@ -179,9 +188,10 @@
   <joint name="world_joint" type="revolute">
     <parent link="default_pioneer_model::chassis_body"/>
     <child link="other_model::body_2"/>
+    <axis xyz="0 0 1"/>
   </joint>
 
-  <plugin name="best_plugin" filename="/tmp/good_plugin.so">  
+  <plugin name="best_plugin_yeah!!" filename="/tmp/good_plugin.so">  
     <funky_xml>so funky</funky_xml>
     <more value="hello"/>
   </plugin>

@@ -32,10 +32,10 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Author: Wim Meeussen */
+/* Author: Nate Koenig, John Hsu */
 
-#ifndef URDF_PARSER_H
-#define URDF_PARSER_H
+#ifndef URDF_PARSER_HH
+#define URDF_PARSER_HH
 
 #include <string>
 #include <map>
@@ -75,36 +75,32 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin);
 
   /// \brief Load Model given a filename
-  //bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
+  bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
 
  /// \brief Load Model from a XML-string
   bool initString(const std::string &_xmlstring, boost::shared_ptr<Model> &_model);
- 
-  /// \brief Load Model from TiXMLElement
-  bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model);
 
   /// \brief Load Model from TiXMLDocument
   bool initDoc(TiXmlDocument *_xml, boost::shared_ptr<Model> &_model);
 
-  /// world
-  /// \brief Load World from TiXMLElement
-  bool Init(TiXmlElement *_xml, World &_world);
+  /// \brief Load Model from TiXMLElement
+  bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model);
 
-  /// \brief Load World from TiXMLDocument
-  bool Init(TiXmlDocument *_xml, World &_world);
 
-  /// \brief Load World from TiXMLElement
-  bool initXml(TiXmlElement *_xml, World &_world);
+  /// \brief Load world given a filename
+  bool initFile(const std::string &_filename, 
+                boost::shared_ptr<World> &_world);
 
-  /// \brief Load World from TiXMLDocument
-  bool initXml(TiXmlDocument *_xml, World &_world);
+  /// \brief Load world from a XML-string
+  bool initString(const std::string &_xmlstring, 
+                  boost::shared_ptr<World> &_world);
 
-  /// \brief Load World given a filename
-  //bool InitFile(const std::string &_filename, World &_world);
+   /// \brief Load World from TiXMLDocument
+  bool initDoc(TiXmlDocument *_xml, boost::shared_ptr<World> &_world);
 
-  /// \brief Load World from a XML-string
-  bool InitString(const std::string &_xmlstring, World &_world);
-  
+   /// \brief Load Model from TiXMLElement
+  bool initXml(TiXmlElement *_xml, boost::shared_ptr<World> &_world);
+
   /// scene
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Scene> &_scene);
   
@@ -114,9 +110,6 @@ namespace sdf
   /// OpenDynamicsEngine
   bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
 
-  /// Physics
-  //bool initXml(TiXmlElement *_config, boost::shared_ptr<PhysicsEngine> &_physics_engine);
-  
   /// Pose
   bool InitXml(TiXmlElement *_xml, Pose &_pose);
 
