@@ -65,7 +65,7 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::Load( const common::XMLConfigNode *node )
+void MainWindow::Load( const common::XMLConfigNode * /*_node*/ )
 {
 }
 
@@ -74,7 +74,7 @@ void MainWindow::Init()
   this->glWidget->show();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
+void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
   gzdbg << "Close Event\n";
   delete this->glWidget;

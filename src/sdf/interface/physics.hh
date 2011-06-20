@@ -34,15 +34,15 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef URDF_PHYSICS_H
-#define URDF_PHYSICS_H
+#ifndef SDF_PHYSICS_HH
+#define SDF_PHYSICS_HH
 
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "color.h"
-#include "pose.h"
+#include "sdf/interface/color.hh"
+#include "sdf/interface/pose.hh"
 
 namespace sdf
 {
@@ -50,7 +50,7 @@ namespace sdf
   {
     public: virtual void Clear() = 0;
 
-    public: virtual void Print() = 0;
+    public: virtual void Print(const std::string &prefix) = 0;
   };
   
   class OpenDynamicsEngine : public PhysicsEngine
@@ -77,17 +77,17 @@ namespace sdf
               this->contactSurfaceLayer = 0;
             };
 
-    public: virtual void Print() 
+    public: virtual void Print(const std::string &prefix) 
             {
-              std::cout << "ODE:\n";
-              std::cout << "  Solver[" << this->solverType << "]\n";
-              std::cout << "  DT[" << this->dt << "]\n";
-              std::cout << "  Iters[" << this->iters << "]\n";
-              std::cout << "  SOR[" << this->sor << "]\n";
-              std::cout << "  CFM[" << this->cfm << "]\n";
-              std::cout << "  ERP[" << this->erp << "]\n";
-              std::cout << "  Contact Max Correcting Vel[" << this->contactMaxCorrectingVel << "]\n";
-              std::cout << "  Contact Surface Layer[" << this->contactSurfaceLayer << "]\n";
+              std::cout << prefix << "ODE:\n";
+              std::cout << prefix << "  Solver[" << this->solverType << "]\n";
+              std::cout << prefix << "  DT[" << this->dt << "]\n";
+              std::cout << prefix << "  Iters[" << this->iters << "]\n";
+              std::cout << prefix << "  SOR[" << this->sor << "]\n";
+              std::cout << prefix << "  CFM[" << this->cfm << "]\n";
+              std::cout << prefix << "  ERP[" << this->erp << "]\n";
+              std::cout << prefix << "  Contact Max Correcting Vel[" << this->contactMaxCorrectingVel << "]\n";
+              std::cout << prefix << "  Contact Surface Layer[" << this->contactSurfaceLayer << "]\n";
             }
   };
  
@@ -107,13 +107,12 @@ namespace sdf
       this->engine.reset();
     }
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Physics &physics)
+    public: virtual void Print(const std::string &_prefix)
     {
-      out << "Physics:\n";
-      out << "  Type[" << physics.type << "]\n";
-      out << "  Gravity[" << physics.gravity << "]\n";
-      physics.engine->Print();
-      return out;
+      std::cout << _prefix << "Physics: Type[" << this->type << "] Gravity[";
+      this->gravity.Print(""); 
+      std::cout << "]\n";
+      this->engine->Print(_prefix + "  ");
     }
   };
 }

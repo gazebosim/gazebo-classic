@@ -87,10 +87,13 @@ if (PKG_CONFIG_FOUND)
 
     endif (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
   else ()
-    set(tinyxml_include_dirs ${tinyxml_INCLUDE_DIRs} CACHE STRING "tynyxml include paths.")
-    set(tinyxml_library_dirs ${tinyxml_LIBRARY_DIRS} CACHE STRING "tynyxml include paths.")
-    set(tinyxml_libraries ${tinyxml_LIBRARIES} CACHE STRING "tynyxml include paths.")
-    set(tinyxml_cflags ${tinyxml_CFLAGS} CACHE STRING "tynyxml include paths.")
+    set(tinyxml_include_dirs ${tinyxml_INCLUDE_DIRS} CACHE STRING "Tinyxml include paths. Use this to override automatic detection." FORCE)
+
+    set(tinyxml_library_dirs ${tinyxml_LIBRARY_DIRS} CACHE STRING "Tinyxml library paths. Use this to override automatic detection." FORCE)
+
+    set(tinyxml_libraries ${tinyxml_LIBRARIES} CACHE STRING "Tinyxml libraries Use this to override automatic detection." FORCE)
+
+    set(tinyxml_cflags ${tinyxml_CFLAGS} CACHE STRING "Tinyxml Use this cflag to enable string support." FORCE)
   endif ()
 
 

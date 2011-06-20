@@ -40,7 +40,7 @@
 #include <tinyxml.h>
 #include <stdio.h>
 
-#include "parser.h"
+#include "sdf/parser/parser.hh"
 
 namespace sdf
 {
@@ -1718,7 +1718,7 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_contact)
+bool initXml(TiXmlElement * /*_config*/, boost::shared_ptr<Contact> &/*_contact*/)
 {
   return true;
 }

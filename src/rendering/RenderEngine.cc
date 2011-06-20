@@ -112,7 +112,6 @@ void RenderEngine::Load(common::XMLConfigNode * /*rootNode*/)
 
   // Setup the available resources
   this->SetupResources();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

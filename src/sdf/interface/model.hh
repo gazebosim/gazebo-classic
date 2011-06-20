@@ -34,16 +34,16 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef ROBOT_MODEL_URDF_H
-#define ROBOT_MODEL_URDF_H
+#ifndef SDF_MODEL_HH
+#define SDF_MODEL_HH
 
 #include <string>
 #include <map>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
-#include "plugin.h"
-#include "link.h"
+#include "sdf/interface/plugin.hh"
+#include "sdf/interface/link.hh"
 
 namespace sdf
 {
@@ -83,33 +83,31 @@ namespace sdf
     /// non-const getMaterial()
     private: boost::shared_ptr<Material> GetMaterial(const std::string &_name) const;
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Model &model)
-  {
-    out << "Model: Name[" << model.name << "]\n";
+    public: void Print(const std::string &prefix)
+            {
+              std::cout << prefix << "Model: Name[" << this->name << "]\n";
 
-    // Print plugins
-    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
-    for (iter = model.plugins.begin(); iter != model.plugins.end(); iter++)
-    {
-      out << "  " << *(iter->second.get()) << "\n";
-    }
+              // Print plugins
+              std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
+              for (iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
+              {
+                iter->second->Print(prefix + "  ");
+              }
 
-    // Print links
-    std::map<std::string, boost::shared_ptr<Link> >::const_iterator liter;
-    for (liter = model.links.begin(); liter != model.links.end(); liter++)
-    {
-      out << "  " << *(liter->second.get()) << "\n";
-    }
+              // Print links
+              std::map<std::string, boost::shared_ptr<Link> >::const_iterator liter;
+              for (liter = this->links.begin(); liter != this->links.end(); liter++)
+              {
+                liter->second->Print(prefix + "  ");
+              }
 
-    // Print joints
-    std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
-    for (jiter = model.joints.begin(); jiter != model.joints.end(); jiter++)
-    {
-      out << "  " << *(jiter->second.get()) << "\n";
-    }
-
-    return out;
-  }
+              // Print joints
+              std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
+              for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
+              {
+                jiter->second->Print(prefix + "  ");
+              }
+            }
 
   };
 }

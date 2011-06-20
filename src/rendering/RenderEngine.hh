@@ -62,7 +62,6 @@ namespace gazebo
     /// \addtogroup gazebo_rendering
     /// \{
     
-    
     class OgreFrameListener;
     class Entity;
     class UserCamera;

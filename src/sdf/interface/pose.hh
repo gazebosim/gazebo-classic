@@ -34,17 +34,21 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef URDF_POSE_H
-#define URDF_POSE_H
+#ifndef SDF_POSE_H
+#define SDF_POSE_H
 
 #include <stdio.h>
 #include <string>
 #include <vector>
 #include <math.h>
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-namespace sdf{
+#include "common/Console.hh"
+
+namespace sdf
+{
 
 class Vector3
 {
@@ -73,7 +77,8 @@ class Vector3
                 }
                 catch (boost::bad_lexical_cast &e)
                 {
-                  printf("Vector3 xyz element (%s) is not a valid float",pieces[i].c_str());
+                  gzerr << "Vector3 xyz element (" << pieces[i] 
+                        << ") is not a valid float\n";
                   return false;
                 }
               }
@@ -81,7 +86,8 @@ class Vector3
 
             if (xyz.size() != 3) 
             {
-              printf("Vector contains %i elements instead of 3 elements", (int)xyz.size()); 
+              gzerr << "Vector contains " << xyz.size() 
+                    << " elements instead of 3 elements\n"; 
               return false;
             }
 
@@ -97,10 +103,9 @@ class Vector3
     return Vector3(this->x+_vec.x,this->y+_vec.y,this->z+_vec.z);
   };
 
-  friend std::ostream &operator<<(std::ostream &out, const Vector3 &vec)
+  public: void Print( const std::string &_prefix )
   {
-    out << vec.x << " " << vec.y << " " << vec.z;
-    return out;
+    std::cout << _prefix << this->x << " " << this->y << " " << this->z;
   }
 };
 
@@ -255,12 +260,11 @@ class Rotation
     return q;
   };
 
-  friend std::ostream &operator<<(std::ostream &out, const Rotation &rot)
+  public: void Print( const std::string &_prefix )
   {
     double r,p,y;
-    rot.GetRPY(r,p,y);
-    out << r << " " << p << " " << y;
-    return out;
+    this->GetRPY(r,p,y);
+    std::cout << _prefix << r << " " << p << " " << y;
   }
 
   double x,y,z,w;
@@ -280,10 +284,12 @@ class Pose
   };
 
 
-  friend std::ostream &operator<<(std::ostream &out, const Pose &pose)
+  public: void Print( const std::string &_prefix )
   {
-    out << "pos[" << pose.position << "] rot[" << pose.rotation << "]";
-    return out;
+    std::cout << _prefix << "Pos[";
+    this->position.Print( "" );
+    std::cout << "] Rot[";
+    this->rotation.Print( "" );
   }
 };
 

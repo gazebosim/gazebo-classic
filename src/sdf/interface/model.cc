@@ -34,74 +34,71 @@
 
 /* Author: Wim Meeussen */
 
+#include <boost/algorithm/string.hpp>
+#include <vector>
 
-#include <fstream>
-#include <boost/lexical_cast.hpp>
-#include <algorithm>
-
-#include "link.h"
+#include "sdf/interface/model.hh"
 
 using namespace sdf;
 
-bool Mesh::FileExists(std::string _filename)
+////////////////////////////////////////////////////////////////////////////////
+Model::Model()
 {
-  printf("Warning: Need to implement a gazebo_config hook\n");
-  std::string fullname = _filename;
-
-  std::ifstream fin; 
-  fin.open(fullname.c_str(), std::ios::in); fin.close();
-
-  if (fin.fail()) {
-    printf("Mesh [%s] does not exist\n",_filename.c_str());
-    return false;
-  }
-  
-  return true;
+  this->Clear();
 }
 
-void Link::AddVisual(boost::shared_ptr<Visual> _visual)
+////////////////////////////////////////////////////////////////////////////////
+void Model::Clear()
 {
-  // group exists, add Visual to the vector in the map
-  std::vector<boost::shared_ptr<Visual > >::iterator vis_it = find(this->visuals.begin(),this->visuals.end(), _visual);
-
-  if (vis_it != this->visuals.end())
-    printf("attempted to add a visual that already exists, skipping.\n");
-  else
-    this->visuals.push_back(_visual);
-  printf("successfully added a new visual\n");
+  this->name.clear();
+  this->links.clear();
+  this->joints.clear();
+  this->plugins.clear();
 }
 
-void Link::GetVisuals(std::vector<boost::shared_ptr<Visual > > &_vis) const
+////////////////////////////////////////////////////////////////////////////////
+boost::shared_ptr<const Link> Model::GetLink(const std::string &_name) const
 {
-  _vis = this->visuals;
-}
+  boost::shared_ptr<const Link> ptr;
 
-void Link::AddCollision(boost::shared_ptr<Collision> _collision)
-{
-  // group exists, add Collision to the vector in the map
-  std::vector<boost::shared_ptr<Collision > >::iterator vis_it = find(this->collisions.begin(),this->collisions.end(),_collision);
-
-  if (vis_it != this->collisions.end())
-    printf("attempted to add a collision that already exists, skipping.\n");
-  else
-    this->collisions.push_back(_collision);
-
-  printf("successfully added a new collision\n");
-}
-
-void Link::GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const
-{
-  _col = this->collisions;
-}
-
-boost::shared_ptr<const Sensor> Link::GetSensor(const std::string& _name) const
-{
-  boost::shared_ptr<const Sensor> ptr;
-
-  if (this->sensors.find(_name) == this->sensors.end())
+  if (this->links.find(_name) == this->links.end())
     ptr.reset();
   else
-    ptr = this->sensors.find(_name)->second;
+    ptr = this->links.find(_name)->second;
 
   return ptr;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void Model::GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const
+{
+  for (std::map<std::string, boost::shared_ptr<Link> >::const_iterator link = this->links.begin(); link != this->links.end(); link++)
+  {
+    _links.push_back(link->second);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Model::GetLink(const std::string& _name, 
+                    boost::shared_ptr<Link> &_link) const
+{
+  boost::shared_ptr<Link> ptr;
+
+  if (this->links.find(_name) == this->links.end())
+    ptr.reset();
+  else
+    ptr = this->links.find(_name)->second;
+  _link = ptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+boost::shared_ptr<const Joint> Model::GetJoint(const std::string &_name) const
+{
+  boost::shared_ptr<const Joint> ptr;
+  if (this->joints.find(_name) == this->joints.end())
+    ptr.reset();
+  else
+    ptr = this->joints.find(_name)->second;
+  return ptr;
+}
+

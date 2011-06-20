@@ -34,72 +34,46 @@
 
 /* Author: Wim Meeussen */
 
-#include <boost/algorithm/string.hpp>
-#include <vector>
+#include <iostream>
+#include <tinyxml.h>
 
-#include "parser.h"
-#include "model.h"
+#include "sdf/parser/parser.hh"
 
 using namespace sdf;
 
-////////////////////////////////////////////////////////////////////////////////
-Model::Model()
+int main(int argc, char** argv)
 {
-  this->Clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Model::Clear()
-{
-  this->name.clear();
-  this->links.clear();
-  this->joints.clear();
-  this->plugins.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<const Link> Model::GetLink(const std::string &_name) const
-{
-  boost::shared_ptr<const Link> ptr;
-
-  if (this->links.find(_name) == this->links.end())
-    ptr.reset();
-  else
-    ptr = this->links.find(_name)->second;
-
-  return ptr;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Model::GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const
-{
-  for (std::map<std::string, boost::shared_ptr<Link> >::const_iterator link = this->links.begin(); link != this->links.end(); link++)
+  if (argc < 2)
   {
-    _links.push_back(link->second);
+    std::cerr << "Expect xml file to parse" << std::endl;
+    return -1;
   }
-}
 
-////////////////////////////////////////////////////////////////////////////////
-void Model::GetLink(const std::string& _name, 
-                    boost::shared_ptr<Link> &_link) const
-{
-  boost::shared_ptr<Link> ptr;
+  TiXmlDocument worldDoc;
+  worldDoc.LoadFile(argv[1]);
 
-  if (this->links.find(_name) == this->links.end())
-    ptr.reset();
-  else
-    ptr = this->links.find(_name)->second;
-  _link = ptr;
-}
+  TiXmlElement *worldXml = worldDoc.FirstChildElement("world");
 
-////////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<const Joint> Model::GetJoint(const std::string &_name) const
-{
-  boost::shared_ptr<const Joint> ptr;
-  if (this->joints.find(_name) == this->joints.end())
-    ptr.reset();
-  else
-    ptr = this->joints.find(_name)->second;
-  return ptr;
+  if (!worldXml)
+  {
+    std::cerr << "ERROR: Could not load the xml into TiXmlElement" << std::endl;
+    return -1;
+  }
+
+  World world;
+  if (!Init(worldXml,world))
+  {
+    std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
+    return -1;
+  }
+
+  std::cout << "world name is: " << world.name << std::endl;
+
+  // get info from parser
+  std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
+
+  world.Print("");
+
+  return 0;
 }
 

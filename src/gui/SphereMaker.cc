@@ -83,7 +83,7 @@ void SphereMaker::OnMousePush(const common::MouseEvent &event)
   this->mousePushPos = event.pressPos;
 }
 
-void SphereMaker::OnMouseRelease(const common::MouseEvent &event)
+void SphereMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 {
   if (this->state == 0)
     return;

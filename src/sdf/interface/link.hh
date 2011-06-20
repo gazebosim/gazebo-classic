@@ -34,8 +34,8 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef URDF_LINK_H
-#define URDF_LINK_H
+#ifndef SDF_LINK_HH
+#define SDF_LINK_HH
 
 #include <string>
 #include <vector>
@@ -43,9 +43,9 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "sensor.h"
-#include "joint.h"
-#include "color.h"
+#include "sdf/interface/sensor.hh"
+#include "sdf/interface/joint.hh"
+#include "sdf/interface/color.hh"
 
 namespace sdf
 {
@@ -133,10 +133,9 @@ namespace sdf
               ixx = ixy = ixz = iyy = iyz = izz = 0;
             };
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Inertial &inertial)
+    public: void Print(const std::string &prefix)
             {
-              out << "Inertial: Mass[" << inertial.mass << "]\n";
-              return out;
+              std::cout << prefix << "Inertial: Mass[" << this->mass << "]\n";
             }
   };
   
@@ -157,10 +156,9 @@ namespace sdf
               geometry.reset();
             };
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Visual &vis)
+    public: void Print(const std::string &_prefix)
             {
-              out << "Visual Name[" << vis.name << "]";
-              return out;
+              std::cout << _prefix << "Visual Name[" << this->name << "]\n";
             }
   };
   
@@ -179,10 +177,9 @@ namespace sdf
             };
 
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Collision &col)
+    public: void Print(const std::string &_prefix)
             {
-              out << "Collision Name[" << col.name << "]";
-              return out;
+              std::cout << _prefix << "Collision Name[" << this->name << "]\n";
             }
 
   };
@@ -221,32 +218,30 @@ namespace sdf
 
     public: boost::shared_ptr<const Sensor> GetSensor(const std::string &_name) const;
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Link &link)
-  {
-    out << "Link: Name[" << link.name << "]\n";
+    public: void Print(const std::string &_prefix)
+            {
+              std::cout << _prefix << "Link: Name[" << this->name << "]\n";
 
-    std::vector<boost::shared_ptr<Visual> >::const_iterator viter;
-    for (viter = link.visuals.begin(); viter != link.visuals.end(); viter++)
-    {
-      out << "  " << *((*viter).get()) << "\n";
-    }
+              std::vector<boost::shared_ptr<Visual> >::const_iterator viter;
+              for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
+              {
+                (*viter)->Print(_prefix + "  ");
+              }
 
-    std::vector<boost::shared_ptr<Collision> >::const_iterator citer;
-    for (citer = link.collisions.begin(); citer != link.collisions.end(); citer++)
-    {
-      out << "  " << *((*citer).get()) << "\n";
-    }
+              std::vector<boost::shared_ptr<Collision> >::const_iterator citer;
+              for (citer = this->collisions.begin(); citer != this->collisions.end(); citer++)
+              {
+                (*citer)->Print(_prefix + "  ");
+              }
 
 
-    // Print sensors
-    std::map<std::string, boost::shared_ptr<Sensor> >::const_iterator iter;
-    for (iter = link.sensors.begin(); iter != link.sensors.end(); iter++)
-    {
-      out << "  " << *(iter->second.get()) << "\n";
-    }
-
-    return out;
-  }
+              // Print sensors
+              std::map<std::string, boost::shared_ptr<Sensor> >::const_iterator iter;
+              for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+              {
+                iter->second->Print( _prefix + "  " );
+              }
+            }
 
 
   };

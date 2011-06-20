@@ -34,49 +34,75 @@
 
 /* Author: Wim Meeussen */
 
-#include <boost/algorithm/string.hpp>
-#include <vector>
 
-#include "parser.h"
-#include "world.h"
+#include <fstream>
+#include <boost/lexical_cast.hpp>
+#include <algorithm>
+
+#include "common/Console.hh"
+#include "sdf/interface/link.hh"
 
 using namespace sdf;
 
-////////////////////////////////////////////////////////////////////////////////
-World::World()
+bool Mesh::FileExists(std::string _filename)
 {
-  this->Clear();
+  gzwarn << "Need to implement a gazebo_config hook\n";
+  std::string fullname = _filename;
+
+  std::ifstream fin; 
+  fin.open(fullname.c_str(), std::ios::in); fin.close();
+
+  if (fin.fail()) {
+    gzerr << "Mesh [" << _filename << "] does not exist\n";
+    return false;
+  }
+  
+  return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void World::Clear()
+void Link::AddVisual(boost::shared_ptr<Visual> _visual)
 {
-  this->name.clear();
-  this->joints.clear();
-  this->models.clear();
-  this->plugins.clear();
+  // group exists, add Visual to the vector in the map
+  std::vector<boost::shared_ptr<Visual > >::iterator vis_it = find(this->visuals.begin(),this->visuals.end(), _visual);
+
+  if (vis_it != this->visuals.end())
+    gzwarn << "attempted to add a visual that already exists, skipping.\n";
+  else
+    this->visuals.push_back(_visual);
+  gzdbg << "successfully added a new visual\n";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<const Model> World::GetModel(const std::string &_name) const
+void Link::GetVisuals(std::vector<boost::shared_ptr<Visual > > &_vis) const
 {
-  boost::shared_ptr<const Model> ptr;
+  _vis = this->visuals;
+}
 
-  if (this->models.find(_name) == this->models.end())
+void Link::AddCollision(boost::shared_ptr<Collision> _collision)
+{
+  // group exists, add Collision to the vector in the map
+  std::vector<boost::shared_ptr<Collision > >::iterator vis_it = find(this->collisions.begin(),this->collisions.end(),_collision);
+
+  if (vis_it != this->collisions.end())
+    gzwarn << "attempted to add a collision that already exists, skipping.\n";
+  else
+    this->collisions.push_back(_collision);
+
+  gzdbg << "successfully added a new collision\n";
+}
+
+void Link::GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const
+{
+  _col = this->collisions;
+}
+
+boost::shared_ptr<const Sensor> Link::GetSensor(const std::string& _name) const
+{
+  boost::shared_ptr<const Sensor> ptr;
+
+  if (this->sensors.find(_name) == this->sensors.end())
     ptr.reset();
   else
-    ptr = this->models.find(_name)->second;
+    ptr = this->sensors.find(_name)->second;
 
-  return ptr;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-boost::shared_ptr<const Joint> World::GetJoint(const std::string &_name) const
-{
-  boost::shared_ptr<const Joint> ptr;
-  if (this->joints.find(_name) == this->joints.end())
-    ptr.reset();
-  else
-    ptr = this->joints.find(_name)->second;
   return ptr;
 }

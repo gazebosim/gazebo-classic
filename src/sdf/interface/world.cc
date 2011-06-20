@@ -34,46 +34,48 @@
 
 /* Author: Wim Meeussen */
 
-#include <iostream>
-#include <tinyxml.h>
+#include <boost/algorithm/string.hpp>
+#include <vector>
 
-#include "parser.h"
+#include "sdf/interface/world.hh"
 
 using namespace sdf;
 
-int main(int argc, char** argv)
+////////////////////////////////////////////////////////////////////////////////
+World::World()
 {
-  if (argc < 2)
-  {
-    std::cerr << "Expect xml file to parse" << std::endl;
-    return -1;
-  }
-
-  TiXmlDocument worldDoc;
-  worldDoc.LoadFile(argv[1]);
-
-  TiXmlElement *worldXml = worldDoc.FirstChildElement("world");
-
-  if (!worldXml)
-  {
-    std::cerr << "ERROR: Could not load the xml into TiXmlElement" << std::endl;
-    return -1;
-  }
-
-  World world;
-  if (!Init(worldXml,world))
-  {
-    std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
-    return -1;
-  }
-
-  std::cout << "world name is: " << world.name << std::endl;
-
-  // get info from parser
-  std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
-
-  std::cout << world << "\n";
-
-  return 0;
+  this->Clear();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+void World::Clear()
+{
+  this->name.clear();
+  this->joints.clear();
+  this->models.clear();
+  this->plugins.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+boost::shared_ptr<const Model> World::GetModel(const std::string &_name) const
+{
+  boost::shared_ptr<const Model> ptr;
+
+  if (this->models.find(_name) == this->models.end())
+    ptr.reset();
+  else
+    ptr = this->models.find(_name)->second;
+
+  return ptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+boost::shared_ptr<const Joint> World::GetJoint(const std::string &_name) const
+{
+  boost::shared_ptr<const Joint> ptr;
+  if (this->joints.find(_name) == this->joints.end())
+    ptr.reset();
+  else
+    ptr = this->joints.find(_name)->second;
+  return ptr;
+}

@@ -83,7 +83,7 @@ void CylinderMaker::OnMousePush(const common::MouseEvent &event)
   this->mousePushPos = event.pressPos;
 }
 
-void CylinderMaker::OnMouseRelease(const common::MouseEvent &event)
+void CylinderMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 {
   if (this->state == 0)
     return;

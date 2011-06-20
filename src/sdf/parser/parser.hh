@@ -42,13 +42,13 @@
 #include <boost/shared_ptr.hpp>
 #include <tinyxml.h>
 
-#include "sensor.h"
-#include "link.h"
-#include "model.h"
-#include "world.h"
-#include "joint.h"
-#include "plugin.h"
-#include "pose.h"
+#include "sdf/interface/sensor.hh"
+#include "sdf/interface/link.hh"
+#include "sdf/interface/model.hh"
+#include "sdf/interface/world.hh"
+#include "sdf/interface/joint.hh"
+#include "sdf/interface/plugin.hh"
+#include "sdf/interface/pose.hh"
 
 namespace sdf
 {

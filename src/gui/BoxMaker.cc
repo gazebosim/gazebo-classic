@@ -85,7 +85,7 @@ void BoxMaker::OnMousePush(const common::MouseEvent &event)
   this->mousePushPos = event.pressPos;
 }
 
-void BoxMaker::OnMouseRelease(const common::MouseEvent &event)
+void BoxMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
 {
   if (this->state == 0)
     return;

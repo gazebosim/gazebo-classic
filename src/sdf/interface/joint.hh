@@ -34,15 +34,15 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef URDF_JOINT_H
-#define URDF_JOINT_H
+#ifndef SDF_JOINT_HH
+#define SDF_JOINT_HH
 
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "pose.h"
+#include "sdf/interface/pose.hh"
 
 namespace sdf
 {
@@ -132,10 +132,12 @@ namespace sdf
               this->type = UNKNOWN;
             };
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Joint &joint)
+    public: void Print(const std::string &_prefix)
             {
-              out << "Joint Name[" << joint.name << "] Type[" << joint.type << "] Parent[" << joint.parentLinkName << "] Child[" << joint.childLinkName << "]";
-              return out;
+              std::cout << _prefix << "Joint: Name[" << this->name << "] Type[" 
+                  << this->type << "]\n";
+              std::cout <<  _prefix << "  Parent[" << this->parentLinkName << "]\n";
+              std::cout << _prefix << "  Child[" << this->childLinkName << "]\n";
             }
 
   };

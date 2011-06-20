@@ -32,52 +32,33 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Author: Wim Meeussen */
+/* Author: Nate Koenig, John Hsu */
 
-#ifndef URDF_SCENE_H
-#define URDF_SCENE_H
+#ifndef SDF_PLUGIN_HH
+#define SDF_PLUGIN_HH
 
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <iostream>
-
-#include "color.h"
 
 namespace sdf
 {
-  class Scene
+  class Plugin
   {
-    public: Scene() { this->Clear(); };
+    public: Plugin() { this->Clear(); };
   
-    public: Color ambientColor;
-    public: Color backgroundColor;
-    public: std::string skyMaterial;
-
-    public: bool shadowEnabled;
-    public: Color shadowColor;
-    public: std::string shadowType;
-  
+    public: std::string name;
+    public: std::string filename;
+ 
     public: void Clear()
     {
-      this->ambientColor.Clear();
-      this->backgroundColor.Clear();
-      this->skyMaterial.clear();
-      this->shadowEnabled = true;
-      this->shadowColor.Clear();
-      this->shadowType.clear();
+      this->name.clear();
+      this->filename.clear();
     }
 
-    public: friend std::ostream &operator<<(std::ostream &out, const Scene &scene)
-    {
-      out << "Scene:\n";
-      out << "  Ambient[" << scene.ambientColor << "]\n";
-      out << "  Background Color[" << scene.backgroundColor << "]\n";
-      out << "  SkyMaterial[" << scene.skyMaterial << "]\n";
-      out << "  ShadowEnabled[" << scene.shadowEnabled << "]\n";
-      out << "  ShadowColor[" << scene.shadowColor << "]\n";
-      out << "  ShadowType[" << scene.shadowType << "]\n";
-      return out;
-    }
+    public: void Print(const std::string &prefix)
+            {
+              std::cout << prefix  << "Plugin: Name[" << this->name 
+                        << "] File[" << this->filename << "]\n";
+            }
   };
 }
 

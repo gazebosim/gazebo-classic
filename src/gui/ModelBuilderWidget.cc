@@ -144,17 +144,17 @@ void ModelBuilderWidget::CreateCylinder()
       boost::bind(&ModelBuilderWidget::OnCylinderCreate, this, _1, _2) );
 }
 
-void ModelBuilderWidget::OnBoxCreate(const common::Vector3 &pos,  
-                                     const common::Vector3 &scale)
+void ModelBuilderWidget::OnBoxCreate(const common::Vector3 &/*pos*/,  
+                                     const common::Vector3 &/*scale*/)
 {
 }
 
-void ModelBuilderWidget::OnSphereCreate(const common::Vector3 &pos,  
-                                     const common::Vector3 &scale)
+void ModelBuilderWidget::OnSphereCreate(const common::Vector3 &/*pos*/,  
+                                     const common::Vector3 &/*scale*/)
 {
 }
 
-void ModelBuilderWidget::OnCylinderCreate(const common::Vector3 &pos,  
-                                     const common::Vector3 &scale)
+void ModelBuilderWidget::OnCylinderCreate(const common::Vector3 &/*pos*/,  
+                                     const common::Vector3 &/*scale*/)
 {
 }

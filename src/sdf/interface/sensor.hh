@@ -32,10 +32,10 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Author: Wim Meeussen */
+/* Author: Nate Koenig, John Hsu */
 
-#ifndef URDF_SENSOR_H
-#define URDF_SENSOR_H
+#ifndef SDF_SENSOR_HH
+#define SDF_SENSOR_HH
 
 #include <string>
 #include <vector>
@@ -43,8 +43,8 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "plugin.h"
-#include "pose.h"
+#include "sdf/interface/plugin.hh"
+#include "sdf/interface/pose.hh"
 
 namespace sdf
 {
@@ -80,16 +80,16 @@ namespace sdf
       this->plugins.clear();
     }
 
-    friend std::ostream &operator<<(std::ostream &out, const Sensor &sensor)
+    public: void Print( const std::string &_prefix )
     {
-      out << "Sensor: Name[" << sensor.name << "] Type[" << sensor.type << "]\n";
+      std::cout << _prefix << "Sensor: Name[" << this->name 
+                << "] Type[" << this->type << "]\n";
 
       std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
-      for (iter = sensor.plugins.begin(); iter != sensor.plugins.end(); iter++)
+      for (iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
       {
-        out << "  " << *(iter->second.get()) << "\n";
+        iter->second->Print( _prefix + "  " );
       }
-      return out;
     }
   };
   

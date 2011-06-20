@@ -34,19 +34,19 @@
 
 /* Author: Wim Meeussen */
 
-#ifndef ROBOT_WORLD_URDF_H
-#define ROBOT_WORLD_URDF_H
+#ifndef SDF_WORLD_HH
+#define SDF_WORLD_HH
 
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "plugin.h"
-#include "scene.h"
-#include "physics.h"
-#include "model.h"
-#include "joint.h"
+#include "sdf/interface/plugin.hh"
+#include "sdf/interface/scene.hh"
+#include "sdf/interface/physics.hh"
+#include "sdf/interface/model.hh"
+#include "sdf/interface/joint.hh"
 
 namespace sdf
 {
@@ -78,37 +78,36 @@ namespace sdf
     /// non-const getLink()
     private: void GetModel(const std::string &_name, 
                           boost::shared_ptr<Model> &_model) const;
-  
-    public: friend std::ostream &operator<<(std::ostream &out, const World &world)
-  {
-    out << "World: Name[" << world.name << "]\n";
+ 
+    public: void Print( const std::string &_prefix) 
+            {
+              std::cout << _prefix << "World: Name[" << this->name << "]\n";
 
-    out << *(world.scene.get()) << "\n";
-    out << *(world.physics.get()) << "\n";
+              this->scene->Print( _prefix + "  " );
 
-    // Print models
-    std::map<std::string, boost::shared_ptr<Model> >::const_iterator miter;
-    for (miter = world.models.begin(); miter != world.models.end(); miter++)
-    {
-      out << "  " << *(miter->second.get()) << "\n";
-    }
+              this->physics->Print( _prefix + "  " );
 
-    // Print joints
-    std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
-    for (jiter = world.joints.begin(); jiter != world.joints.end(); jiter++)
-    {
-      out << "  " << *(jiter->second.get()) << "\n";
-    }
+              // Print models
+              std::map<std::string, boost::shared_ptr<Model> >::const_iterator miter;
+              for (miter = this->models.begin(); miter != this->models.end(); miter++)
+              {
+                miter->second->Print( _prefix + "  " );
+              }
 
-    // Print plugins
-    std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
-    for (iter = world.plugins.begin(); iter != world.plugins.end(); iter++)
-    {
-      out << "  " << *(iter->second.get()) << "\n";
-    }
+              // Print joints
+              std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
+              for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
+              {
+                jiter->second->Print( _prefix + "  " );
+              }
 
-    return out;
-  }
+              // Print plugins
+              std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator iter;
+              for (iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
+              {
+                iter->second->Print( _prefix + "  " );
+              }
+            }
 
   };
 }

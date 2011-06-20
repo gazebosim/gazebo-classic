@@ -32,33 +32,59 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Author: Wim Meeussen */
+/* Author: Nate Koenig, John Hsu */
 
-#ifndef URDF_PLUGIN_H
-#define URDF_PLUGIN_H
+#ifndef SDF_SCENE_HH
+#define SDF_SCENE_HH
 
 #include <string>
+#include <boost/shared_ptr.hpp>
+#include <iostream>
+
+#include "sdf/interface/color.hh"
 
 namespace sdf
 {
-  class Plugin
+  class Scene
   {
-    public: Plugin() { this->Clear(); };
+    public: Scene() { this->Clear(); };
   
-    public: std::string name;
-    public: std::string filename;
- 
+    public: Color ambientColor;
+    public: Color backgroundColor;
+    public: std::string skyMaterial;
+
+    public: bool shadowEnabled;
+    public: Color shadowColor;
+    public: std::string shadowType;
+  
     public: void Clear()
     {
-      this->name.clear();
-      this->filename.clear();
+      this->ambientColor.Clear();
+      this->backgroundColor.Clear();
+      this->skyMaterial.clear();
+      this->shadowEnabled = true;
+      this->shadowColor.Clear();
+      this->shadowType.clear();
     }
 
-  friend std::ostream &operator<<(std::ostream &out, const Plugin &plugin)
-  {
-    out << "Plugin: Name[" << plugin.name << "] File[" << plugin.filename << "]";
-    return out;
-  }
+    public: void Print( const std::string _prefix)
+    {
+      std::cout << _prefix << "Scene:\n";
+      std::cout << _prefix << "  SkyMaterial[" << this->skyMaterial << "]\n";
+      std::cout << _prefix << "  ShadowType[" << this->shadowType << "]\n";
+
+      std::cout << _prefix << "  Ambient Color[";
+      this->ambientColor.Print( "" );
+      std::cout << "]\n";
+
+      std::cout << _prefix << "  Background Color[";
+      this->backgroundColor.Print("");
+      std::cout << "]\n";
+
+      std::cout << _prefix << "  Shadow Color[";
+      this->shadowColor.Print(_prefix + "  ");
+      std::cout << "]\n";
+    }
   };
 }
 
