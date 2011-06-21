@@ -37,16 +37,24 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <libxml/parser.h>
-#include <stdio.h>
-
-#include "parser_deprecated.h"
+#include "common/Console.hh"
+#include "sdf/parser_deprecated/parser_deprecated.hh"
+#include "sdf/parser_deprecated/controller.hh"
 
 namespace sdf
 {
 
-bool getBoolFromStr(std::string _str, bool &_value)
+bool getBoolFromStr(std::string _str, bool &_value, bool _default, 
+                    bool _required)
 {
+  _value = _default;
+
+  if (_str.empty() && _required)
+  {
+    gzerr << "Required key is empty\n";
+    return false;
+  }
+  
   boost::to_lower(_str);
   if (_str == "true" || _str == "t" || _str == "1")
     _value = true;
@@ -54,22 +62,32 @@ bool getBoolFromStr(std::string _str, bool &_value)
     _value = false;
   else
   {
-    _value = false;
+    gzerr << "Malformed boolean string[" << _str << "]\n";
     return false;
   }
 
   return true;
 }
 
-bool getDoubleFromStr(const std::string &_str, double &_value)
+bool getDoubleFromStr(const std::string &_str, double &_value, double _default,
+                      bool _required)
 {
+  _value = _default;
+
+  if (_str.empty() && _required)
+  {
+    gzerr << "Required key is empty\n";
+    return false;
+  }
+ 
   try
   {
     _value = boost::lexical_cast<double>(_str);
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("ERR: string is not a double format\n");
+    _value = _default;
+    gzerr << "Malformed double string[" << _str << "]\n";
     return false;
   }
 
@@ -84,7 +102,7 @@ bool getIntFromStr(const std::string &_str, int &_value)
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("ERR: string is not an int format\n");
+    gzerr << "string is not an int format\n";
     return false;
   }
 
@@ -99,69 +117,72 @@ bool getUIntFromStr(const std::string &_str, unsigned int &_value)
   }
   catch (boost::bad_lexical_cast &e)
   {
-    printf("ERR: string is not an unsigned int format\n");
+    gzerr << "string is not an unsigned int format\n";
     return false;
   }
 
   return true;
 }
 
+// john: map plugins to controllers
 bool getPlugins(xmlNodePtr _parentXml, 
                 std::map<std::string, boost::shared_ptr<Plugin> > &_plugins)
 {
   // Get all plugins 
-  for (xmlNodePtr  pluginXml = _parentXml->FirstChildElement("plugin"); 
-      pluginXml; pluginXml = _parentXml->NextSiblingElement("plugin"))
+  for (xmlNodePtr pluginXml = _parentXml->childFirst;
+      pluginXml; pluginXml = pluginXml->next)
   {
-    boost::shared_ptr<Plugin> plugin;
-    plugin.reset(new Plugin);
-
-    if (initXml(pluginXml, plugin))
+    if (pluginXml->ns && (const char*)plugXml->ns->prefix == "controller")
     {
-      if (_plugins.find(plugin->name) != _plugins.end())
+
+      boost::shared_ptr<Controller> controller;
+      controller.reset(new Controller);
+
+      if (initXml(pluginXml, controller))
       {
-        printf("plugin '%s' is not unique.\n", plugin->name.c_str());
-        plugin.reset();
-        return false;
+        if (_plugins.find(controller->name) != _plugins.end())
+        {
+          gzerr << "plugin '" << plugin->name << "' is not unique.\n";
+          plugin.reset();
+          return false;
+        }
+        else
+        {
+          _plugins.insert(make_pair(plugin->name,plugin));
+        }
       }
       else
       {
-        _plugins.insert(make_pair(plugin->name,plugin));
-        printf("successfully added a new plugin '%s'\n", plugin->name.c_str());
+        gzerr << "plugin xml is not initialized correctly\n";
+        plugin.reset();
+        return false;
       }
-    }
-    else
-    {
-      printf("plugin xml is not initialized correctly\n");
-      plugin.reset();
-      return false;
     }
   }
 
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<SensorType> &_sensor_type)
+bool initXml(xmlNodePtr _config, boost::shared_ptr<SensorType> &_sensorType)
 {
-  if (_sensor_type->type == SensorType::CAMERA)
+  if (_sensorType->type == SensorType::CAMERA)
   {
-    boost::shared_ptr<Camera> camera_sensor = boost::shared_static_cast<Camera>( _sensor_type);
-    //boost::shared_ptr<Camera> camera_sensor(boost::shared_dynamic_cast<Camera>( _sensor_type));
-    return initXml(_config, camera_sensor);
+    boost::shared_ptr<Camera> cameraSensor = boost::shared_static_cast<Camera>( _sensorType);
+    return initXml(_config, cameraSensor);
   }
-  else if (_sensor_type->type == SensorType::RAY)
+  else if (_sensorType->type == SensorType::RAY)
   {
-    boost::shared_ptr<Ray> ray_sensor(boost::shared_static_cast<Ray>( _sensor_type));
-    return initXml(_config, ray_sensor);
+    boost::shared_ptr<Ray> raySensor(boost::shared_static_cast<Ray>( _sensorType));
+    return initXml(_config, raySensor);
   }
-  else if (_sensor_type->type == SensorType::CONTACT)
+  else if (_sensorType->type == SensorType::CONTACT)
   {
-    boost::shared_ptr<Contact> contact_sensor(boost::shared_static_cast<Contact>( _sensor_type));
-    return initXml(_config, contact_sensor);
+    boost::shared_ptr<Contact> contactSensor(boost::shared_static_cast<Contact>( _sensorType));
+    return initXml(_config, contactSensor);
   }
   else
   {
-    printf("Err: SensorType init unknown type\n");
+    gzerr << "SensorType init unknown type\n";
     return false;
   }
 
@@ -174,57 +195,48 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
   /// Get all the plugins
   getPlugins(_config, _sensor->plugins);
 
-  const char *nameChar = _config->Attribute("name");
-  if (!nameChar)
+  if (!_sensor->name.Set(_config->Attribute("name")))
   {
-    printf("No name given for the sensor.\n");
+     gzerr << "Unable to parse sensor name.\n";
     return false;
   }
-  _sensor->name = std::string(nameChar);
-
-  const char *typeChar = _config->Attribute("type");
-  if (!typeChar)
+     
+  if (!_sensor->type.Set(_config->Attribute("type")))
   {
-    printf("No type given for the sensor.\n");
+    gzerr << "Unable to parse sensor type\n";
     return false;
   }
-  _sensor->type = std::string(typeChar);
 
-  if (_sensor->type == "camera")
+  if (_sensor->type.GetValue() == "camera")
   {
     _sensor->sensorType.reset(new Camera);
     initXml(_config, _sensor->sensorType);
   }
-  else if (_sensor->type == "ray")
+  else if (_sensor->type.GetValue() == "ray")
   {
     _sensor->sensorType.reset(new Ray);
     initXml(_config, _sensor->sensorType);
   }
-  else if (_sensor->type == "contact")
+  else if (_sensor->type.GetValue() == "contact")
   {
     _sensor->sensorType.reset(new Contact);
     initXml(_config, _sensor->sensorType);
   }
   else
   {
-    printf("Error: Unknown sensor type[%s]\n",_sensor->type.c_str());
+    gzerr << "Unknown sensor type[" << _sensor->type << "]\n";
     return false;
   }
 
-
-
-  std::string alwaysOnStr = _config->Attribute("always_on");
-  if (alwaysOnStr.empty() && 
-      !getBoolFromStr(alwaysOnStr, _sensor->alwaysOn))
+  if (!_sensor->alwaysOn.Set(_config->Attribute("always_on")))
   {
-    printf("ERR: invalid always_on_str\n");
+    gzerr << "Unable to parse sensor always_on\n";
     return false;
   }
 
-  std::string hz = _config->Attribute("update_rate");
-  if (!hz.empty() && !getDoubleFromStr(hz, _sensor->updateRate))
+  if (!_sensor->updateRate.Set( _config->Attribute("update_rate") ))
   {
-    printf("ERR: invalid update_rate\n");
+    gzerr << "Unable to parse sensor update_rate\n";
     return false;
   }
 
@@ -232,15 +244,14 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
   xmlNodePtr o = _config->FirstChildElement("origin");
   if (!o)
   {
-    printf("INFO: Origin tag not present for sensor element, using default (Identity)\n\n");
-    _sensor->origin.Clear();
+    gzwarn << "Origin tag not present for sensor element, using default (Identity)\n";
+    _sensor->origin.Reset();
   }
   else
   {
-    if (!InitXml(o,_sensor->origin))
+    if (!_sensor->origin.Set( o->Attribute("xyz"), o->Attribute("rpy") ))
     {
-      printf("Error: Sensor has a malformed origin tag\n");
-      _sensor->origin.Clear();
+      gzerr << "Sensor has malformed orgin\n";
       return false;
     }
   }
@@ -254,15 +265,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
 
   // Horizontal field of view
   xmlNodePtr hfov = _config->FirstChildElement("horizontal_fov");
-  if (!hfov)
+  if(!hfov)
   {
-    printf("Error: Camera sensor requires a horizontal field of view via <horizontal_fov angle='radians'/>\n");
+    gzerr << "Camera missing horizontal_fov element\n";
     return false;
   }
 
-  if (!getDoubleFromStr( hfov->Attribute("angle"), _sensor->horizontalFov))
+  if (!_sensor->horizontalFov.Set(hfov->Attribute("angle")))
   {
-    printf("Err: Invalid horizontal_fov");
+    gzerr << "Unable to parse camera horizontal_fov angle attribute\n";
     return false;
   }
 
@@ -270,41 +281,45 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
   xmlNodePtr image = _config->FirstChildElement("image");
   if (!image)
   {
-    printf("Error: Camera sensor requires an image element \n");
+    gzerr << "Camera sensor requires an image element \n";
     return false;
   }
 
-  if (!getUIntFromStr( image->Attribute("width"), _sensor->imageWidth))
+  if (!_sensor->imageWidth.Set( image->Attribute("width")))
   {
-    printf("Err: Invalid image_width");
+    gzerr << "Unable to parse sensor image width\n";
     return false;
   }
 
-  if (!getUIntFromStr( image->Attribute("height"), _sensor->imageHeight))
+  if (!_sensor->imageWidth.Set( image->Attribute("height")))
   {
-    printf("Err: Invalid image_height");
+    gzerr << "Unable to parse sensor image height\n";
     return false;
   }
 
-  _sensor->imageFormat = image->Attribute("format");
+  if (!_sensor->imageFormat.Set( image->Attribute("format")))
+  {
+    gzerr << "Unable to parse sensor image format\n";
+    return false;
+  }
 
   // clip 
   xmlNodePtr clip = _config->FirstChildElement("clip");
   if (!clip)
   {
-    printf("Error: Camera sensor requires an clip element \n");
+    gzerr << "Camera sensor requires an clip element \n";
     return false;
   }
 
-  if (!getDoubleFromStr( clip->Attribute("near"), _sensor->clipNear))
+  if (!_sensor->clipNear.Set( clip->Attribute("near") ))
   {
-    printf("Err: Invalid near clip");
+    gzerr << "Unable to parse camera near clip";
     return false;
   }
 
-  if (!getDoubleFromStr( clip->Attribute("far"), _sensor->clipFar))
+  if (!_sensor->clipFar.Set( clip->Attribute("far") ))
   {
-    printf("Err: Invalid far clip");
+    gzerr << "Unable to parse camera far clip";
     return false;
   }
 
@@ -312,17 +327,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
   xmlNodePtr save = _config->FirstChildElement("save");
   if (save)
   {
-    std::string enabled = save->Attribute("enabled");
-    if (enabled.empty() || !getBoolFromStr(enabled, _sensor->saveEnabled))
+    if (!_sensor->saveEnabled.Set(save->Attribute("enabled")))
     {
-      printf("Err: invalid save enabled flag\n");
+      gzerr << "Unable to parse camera save enabled flag\n";
       return false;
     }
 
-    _sensor->savePath = save->Attribute("path");
-    if (_sensor->savePath.empty())
+    if (!_sensor->savePath.Set(save->Attribute("path")))
     {
-      printf("Err: invalid save path\n");
+      gzerr << "Unable to parse camera save path\n";
       return false;
     }
   }
@@ -338,45 +351,41 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Ray> &_sensor)
   xmlNodePtr scan = _config->FirstChildElement("scan");
   if (scan)
   {
-    std::string displayStr = _config->Attribute("display");
-    if (!displayStr.empty() && !getBoolFromStr(displayStr, _sensor->display))
+    if (!_sensor->display.Set(scan->Attribute("display")))
     {
-      printf("Err: invalid display flag\n");
+      gzerr << "Unable to parse ray display flag\n";
       return false;
     }
 
     // Horizontal scans
-    xmlNodePtr horizontal = _config->FirstChildElement("horizontal");
+    xmlNodePtr horizontal = scan->FirstChildElement("horizontal");
     if (!horizontal)
     {
-      printf("Err: missing horizontal element\n");
+      gzerr << "missing horizontal element";
       return false;
     }
 
-    if (!getUIntFromStr( horizontal->Attribute("samples"), _sensor->horizontalSamples))
+    if (!_sensor->horizontalSamples.Set( horizontal->Attribute("samples")))
     {
-      printf("Err: Invalid horizontal samples");
+      gzerr << "Unable to parse ray sensor horizontal samples";
       return false;
     }
 
-    std::string hResStr = horizontal->Attribute("resolution"); 
-    if (!hResStr.empty() && !getDoubleFromStr( hResStr, _sensor->horizontalResolution))
+    if (!_sensor->horizontalResolution.Set(horizontal->Attribute("resolution")))
     {
-      printf("Err: Invalid horizontal resolution");
+      gzerr << "Unable to parse ray sensor horizontal resolution";
       return false;
     }
 
-    std::string minAngleStr = horizontal->Attribute("min_angle"); 
-    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor->horizontalMinAngle))
+    if (!_sensor->horizontalMinAngle.Set(horizontal->Attribute("min_angle")))
     {
-      printf("Err: Invalid horizontal min angle");
+      gzerr << "Unable to parse ray sensor horizontal min_angle";
       return false;
     }
 
-    std::string maxAngleStr = horizontal->Attribute("max_angle"); 
-    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor->horizontalMaxAngle))
+    if (!_sensor->horizontalMaxAngle.Set(horizontal->Attribute("max_angle")))
     {
-      printf("Err: Invalid horizontal max angle");
+      gzerr << "Unable to parse ray sensor horizontal max_angle";
       return false;
     }
 
@@ -384,58 +393,58 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Ray> &_sensor)
     xmlNodePtr vertical = _config->FirstChildElement("vertical");
     if (!vertical)
     {
-      printf("Err: missing vertical element\n");
+      gzerr << "missing vertical element\n";
       return false;
     }
 
-    if (!getUIntFromStr( vertical->Attribute("samples"), _sensor->verticalSamples))
+    if (!_sensor->verticalSamples.Set( vertical->Attribute("samples")))
     {
-      printf("Err: Invalid vertical samples");
+      gzerr << "Unable to parse ray sensor vertical samples";
       return false;
     }
 
-    std::string vResStr = vertical->Attribute("resolution"); 
-    if (!vResStr.empty() && !getDoubleFromStr( vResStr, _sensor->verticalResolution))
+    if (!_sensor->verticalResolution.Set(vertical->Attribute("resolution")))
     {
-      printf("Err: Invalid vertical resolution");
+      gzerr << "Unable to parse ray sensor vertical resolution";
       return false;
     }
 
-    minAngleStr = vertical->Attribute("min_angle"); 
-    if (!minAngleStr.empty() && !getDoubleFromStr( minAngleStr, _sensor->verticalMinAngle))
+    if (!_sensor->verticalMinAngle.Set(vertical->Attribute("min_angle")))
     {
-      printf("Err: Invalid vertical min angle");
+      gzerr << "Unable to parse ray sensor vertical min_angle";
       return false;
     }
 
-    maxAngleStr = vertical->Attribute("max_angle"); 
-    if (!maxAngleStr.empty() && !getDoubleFromStr( maxAngleStr, _sensor->verticalMaxAngle))
+    if (!_sensor->verticalMaxAngle.Set(vertical->Attribute("max_angle")))
     {
-      printf("Err: Invalid vertical max angle");
-      return false;
-    }
-  }
-
-  // range 
-  xmlNodePtr range = _config->FirstChildElement("range");
-  if (range)
-  {
-    if (!getDoubleFromStr( range->Attribute("min"), _sensor->rangeMin))
-    {
-      printf("Err: Invalid min range\n");
+      gzerr << "Unable to parse ray sensor vertical max_angle";
       return false;
     }
 
-    if (!getDoubleFromStr( range->Attribute("max"), _sensor->rangeMax))
+
+    // range 
+    xmlNodePtr range = _config->FirstChildElement("range");
+    if (!range)
     {
-      printf("Err: Invalid max range\n");
+      gzerr << "ray sensor missing range element\n";
       return false;
     }
 
-    std::string res = range->Attribute("resolution");
-    if (!res.empty() && !getDoubleFromStr( res, _sensor->rangeResolution))
+    if (!_sensor->rangeMin.Set( range->Attribute("min")))
     {
-      printf("Err: Invalid range resolution\n");
+      gzerr << "Invalid min range\n";
+      return false;
+    }
+
+    if (!_sensor->rangeMax.Set( range->Attribute("max")))
+    {
+      gzerr << "Invalid max range\n";
+      return false;
+    }
+
+    if (!_sensor->rangeResolution.Set( range->Attribute("resolution")))
+    {
+      gzerr << "Invalid range resolution\n";
       return false;
     }
   }
@@ -449,7 +458,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material)
 
   _material->Clear();
 
-  _material->script = _config->Attribute("script");
+  if (!_material->script.Set( _config->Attribute("script") ))
+  {
+    gzerr << "Unable to parse material script attribute\n";
+    return false;
+  }
 
   // color
   xmlNodePtr c = _config->FirstChildElement("color");
@@ -457,10 +470,10 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material)
   {
     if (c->Attribute("rgba"))
     {
-      if (!_material->color.Init(c->Attribute("rgba")))
+      if (!_material->color.Set(c->Attribute("rgba")))
       {
-        printf("Material has malformed color rgba values.\n");
-        _material->color.Clear();
+        gzerr << "Unable to parse material color rgba attribute.\n";
+        _material->color.Reset();
         return false;
       }
       else
@@ -468,11 +481,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material)
     }
     else
     {
-      printf("Material color has no rgba\n");
+      gzwarn << "Material color has no rgba\n";
     }
   }
 
-  return !_material->script.empty() || hasRGB;
+  return !_material->script.GetValue().empty() || hasRGB;
 }
 
 bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
@@ -483,39 +496,35 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
   xmlNodePtr o = _config->FirstChildElement("origin");
   if (!o)
   {
-    printf("INFO: Origin tag not present for inertial element, using default (Identity)\n\n");
-    _inertial->origin.Clear();
+    gzwarn << "INFO: Origin tag not present for inertial element, using default (Identity)\n";
+    _inertial->origin.Reset();
   }
   else
   {
-    if (!InitXml(o,_inertial->origin))
+    if (!_inertial->origin.Set(o->Attribute("xyz"), o->Attribute("rpy")))
     {
-      printf("Inertial has a malformed origin tag\n");
-      _inertial->origin.Clear();
+      gzerr << "Unable to parse origin tag\n";
+      _inertial->origin.Reset();
       return false;
     }
   }
 
   if (!_config->Attribute("mass"))
   {
-    printf("Inertial element must have mass attribute.");
+    gzerr << "Inertial element must have mass attribute.";
     return false;
   }
 
-  try
+  if (!_inertial->mass.Set(_config->Attribute("mass")))
   {
-    _inertial->mass = boost::lexical_cast<double>(_config->Attribute("mass"));
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("mass (%s) is not a float",_config->Attribute("mass"));
+    gzerr << "Unable to parse inerital mass attribute\n";
     return false;
   }
 
   xmlNodePtr inertiaXml = _config->FirstChildElement("inertia");
   if (!inertiaXml)
   {
-    printf("Inertial element must have inertia element");
+    gzerr << "Inertial element must have inertia element\n";
     return false;
   }
 
@@ -523,28 +532,25 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
         inertiaXml->Attribute("ixz") && inertiaXml->Attribute("iyy") && 
         inertiaXml->Attribute("iyz") && inertiaXml->Attribute("izz")))
   {
-    printf("Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes");
+    gzerr << "Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes\n";
     return false;
   }
 
-  try
+  if (!_inertial->ixx.Set(inertiaXml->Attribute("ixx")) || 
+      !_inertial->ixy.Set(inertiaXml->Attribute("ixy")) || 
+      !_inertial->ixz.Set(inertiaXml->Attribute("ixz")) || 
+      !_inertial->iyy.Set(inertiaXml->Attribute("iyy")) || 
+      !_inertial->iyz.Set(inertiaXml->Attribute("iyz")) || 
+      !_inertial->izz.Set(inertiaXml->Attribute("izz")) )
   {
-    _inertial->ixx  = boost::lexical_cast<double>(inertiaXml->Attribute("ixx"));
-    _inertial->ixy  = boost::lexical_cast<double>(inertiaXml->Attribute("ixy"));
-    _inertial->ixz  = boost::lexical_cast<double>(inertiaXml->Attribute("ixz"));
-    _inertial->iyy  = boost::lexical_cast<double>(inertiaXml->Attribute("iyy"));
-    _inertial->iyz  = boost::lexical_cast<double>(inertiaXml->Attribute("iyz"));
-    _inertial->izz  = boost::lexical_cast<double>(inertiaXml->Attribute("izz"));
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("one of the inertia elements: ixx (%s) ixy (%s) ixz (%s) iyy (%s) iyz (%s) izz (%s) is not a valid double",
-              inertiaXml->Attribute("ixx"),
-              inertiaXml->Attribute("ixy"),
-              inertiaXml->Attribute("ixz"),
-              inertiaXml->Attribute("iyy"),
-              inertiaXml->Attribute("iyz"),
-              inertiaXml->Attribute("izz"));
+    gzerr << "one of the inertia elements: "
+      << "ixx (" << inertiaXml->Attribute("ixx") << ") "
+      << "ixy (" << inertiaXml->Attribute("ixy") << ") "
+      << "ixz (" << inertiaXml->Attribute("ixz")  << ") "
+      << "iyy (" << inertiaXml->Attribute("iyy")  << ") "
+      << "iyz (" << inertiaXml->Attribute("iyz")  << ") "
+      << "izz (" << inertiaXml->Attribute("izz")  << ") "
+      << "is not a valid double.\n";
     return false;
   }
 
@@ -555,30 +561,40 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
 {
   _collision->Clear();
 
-  _collision->name = _config->Attribute("name");
+  if (!_collision->name.Set(_config->Attribute("name")))
+  {
+    gzerr << "Unable to parse collision name\n";
+    return false;
+  }
 
   // Origin
   xmlNodePtr o = _config->FirstChildElement("origin");
   if (!o)
   {
-    printf("Origin tag not present for collision element, using default (Identity)");
-    _collision->origin.Clear();
+    gzwarn << "Origin tag not present for collision element, using default (Identity\n";
+    _collision->origin.Reset();
   }
-  else if (!InitXml(o,_collision->origin))
+  else if (!_collision->origin.Set(o->Attribute("xyz"), o->Attribute("rpy")))
   {
-    printf("Collision has a malformed origin tag");
-    _collision->origin.Clear();
+    gzerr << "Unable to parse collision origin element\n";
+    _collision->origin.Reset();
     return false;
   }
 
   // Geometry
   xmlNodePtr geom = _config->FirstChildElement("geometry");
-  boost::shared_ptr<Geometry> geometry( new Geometry);
-  initXml(geom, geometry);
-
-  if (!geometry)
+  if (geom)
   {
-    printf("Malformed geometry for Collision element");
+    _collision->geometry.reset( new Geometry);
+    if (!initXml(geom, _collision->geometry))
+    {
+      gzerr << "Unable to parse collision geometry element\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "Collision is missing a geometry element.\n";
     return false;
   }
 
@@ -589,20 +605,9 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sphere> &_sphere)
 {
   _sphere->Clear();
 
-  _sphere->type = Geometry::SPHERE;
-  if (!_config->Attribute("radius"))
+  if (!_sphere->radius.Set(_config->Attribute("radius")))
   {
-    printf("Sphere shape must have a radius attribute");
-    return false;
-  }
-
-  try
-  {
-    _sphere->radius = boost::lexical_cast<double>(_config->Attribute("radius"));
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("radius (%s) is not a valid float",_config->Attribute("radius"));
+    gzerr << "Unable to parse sphere's radius attribute\n";
     return false;
   }
 
@@ -613,17 +618,9 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Box> &_box)
 {
   _box->Clear();
 
-  _box->type = Geometry::BOX;
-  if (!_config->Attribute("size"))
+  if (!_box->size.Set(_config->Attribute("size")))
   {
-    printf("Box shape has no size attribute");
-    return false;
-  }
-
-  if (!_box->size.Init(_config->Attribute("size")))
-  {
-    printf("Box shape has malformed size attribute");
-    _box->size.Clear();
+    gzerr << "Unable to parse sphere's size attribute\n";
     return false;
   }
 
@@ -634,32 +631,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Cylinder> &_cylinder)
 {
   _cylinder->Clear();
 
-  _cylinder->type = Geometry::CYLINDER;
-
-  if (!_config->Attribute("length") ||
-      !_config->Attribute("radius"))
+  if (!_cylinder->length.Set(_config->Attribute("length")))
   {
-    printf("Cylinder shape must have both length and radius attributes");
+    gzerr << "Unable to parse cylinder's length attribute\n";
     return false;
   }
 
-  try
+  if (!_cylinder->radius.Set(_config->Attribute("radius")))
   {
-    _cylinder->length = boost::lexical_cast<double>(_config->Attribute("length"));
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("length (%s) is not a valid float",_config->Attribute("length"));
-    return false;
-  }
-
-  try
-  {
-    _cylinder->radius = boost::lexical_cast<double>(_config->Attribute("radius"));
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    printf("radius (%s) is not a valid float",_config->Attribute("radius"));
+    gzerr << "Unable to parse cylinder's radius attribute\n";
     return false;
   }
 
@@ -670,30 +650,17 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Mesh> &_mesh)
 {
   _mesh->Clear();
 
-  _mesh->type = Geometry::MESH;
-  if (!_config->Attribute("filename"))
+  if (!_mesh->filename.Set(_config->Attribute("filename")))
   {
-    printf("Mesh must contain a filename attribute\n");
+    gzerr << "Unable to parse mesh's filename attribute\n";
     return false;
   }
 
-  _mesh->filename = _config->Attribute("filename");
-
-  // check if filename exists, is this really necessary?
-  if (!_mesh->FileExists(_mesh->filename))
-    printf("filename referred by mesh [%s] does not appear to exist.\n", _mesh->filename.c_str());
-
-  if (_config->Attribute("scale"))
+  if (!_mesh->scale.Set(_config->Attribute("scale")))
   {
-    if (!_mesh->scale.Init(_config->Attribute("scale")))
-    {
-      printf("Mesh scale was specified, but could not be parsed\n");
-      _mesh->scale.Clear();
-      return false;
-    }
+    gzerr << "Unable to parse mesh's scale attribute\n";
+    return false;
   }
-  else
-    printf("Mesh scale was not specified, default to (1,1,1)\n");
 
   return true;
 }
@@ -702,13 +669,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
 {
   _link->Clear();
 
-  const char *nameChar = _config->Attribute("name");
-  if (!nameChar)
+  if (!_link->name.Set(_config->Attribute("name")))
   {
-    printf("No name given for the link.\n");
+    gzerr << "Unable to parse value for link name.\n";
     return false;
   }
-  _link->name = std::string(nameChar);
 
   // Inertial (optional)
   xmlNodePtr i = _config->FirstChildElement("inertial");
@@ -717,14 +682,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     _link->inertial.reset(new Inertial);
     if (!initXml(i,_link->inertial))
     {
-      printf("Could not parse inertial element for Link '%s'\n", _link->name.c_str());
+      gzerr << "Could not parse inertial element for Link '" 
+        << _link->name << "'\n";
       return false;
     }
   }
 
   // Multiple Visuals (optional)
   for (xmlNodePtr  visXml = _config->FirstChildElement("visual"); 
-       visXml; visXml = visXml->NextSiblingElement("visual"))
+      visXml; visXml = visXml->NextSiblingElement("visual"))
   {
     boost::shared_ptr<Visual> vis;
     vis.reset(new Visual);
@@ -733,11 +699,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     {
       //  add Visual to the vector
       _link->visuals.push_back(vis);
-      printf("successfully added a new visual\n");
     }
     else
     {
-      printf("Could not parse visual element for Link '%s'\n", _link->name.c_str());
+      gzerr << "Could not parse visual element for Link '" 
+        << _link->name << "'\n";
       vis.reset();
       return false;
     }
@@ -745,7 +711,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
 
   // Multiple Collisions (optional)
   for (xmlNodePtr  colXml = _config->FirstChildElement("collision"); 
-       colXml; colXml = colXml->NextSiblingElement("collision"))
+      colXml; colXml = colXml->NextSiblingElement("collision"))
   {
     boost::shared_ptr<Collision> col;
     col.reset(new Collision);
@@ -754,11 +720,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     {
       // group exists, add Collision to the vector in the map
       _link->collisions.push_back(col);
-      printf("successfully added a new collision\n");
     }
     else
     {
-      printf("Could not parse collision element for Link '%s'\n", _link->name.c_str());
+      gzerr << "Could not parse collision element for Link '" 
+        <<  _link->name << "'\n";
       col.reset();
       return false;
     }
@@ -766,28 +732,27 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
 
   // Get all sensor elements
   for (xmlNodePtr  sensorXml = _config->FirstChildElement("sensor"); 
-       sensorXml; sensorXml = _config->NextSiblingElement("sensor"))
+      sensorXml; sensorXml = sensorXml->NextSiblingElement("sensor"))
   {
     boost::shared_ptr<Sensor> sensor;
     sensor.reset(new Sensor);
 
     if (initXml(sensorXml,sensor))
     {
-      if (_link->GetSensor(sensor->name))
+      if (_link->GetSensor(sensor->name.GetValue()))
       {
-        printf("sensor '%s' is not unique.\n", sensor->name.c_str());
+        gzerr << "sensor '" << sensor->name << "' is not unique.\n";
         sensor.reset();
         return false;
       }
       else
       {
-        _link->sensors.insert(make_pair(sensor->name,sensor));
-        printf("successfully added a new sensor '%s'\n", sensor->name.c_str());
+        _link->sensors.insert(make_pair(sensor->name.GetValue(),sensor));
       }
     }
     else
     {
-      printf("sensor xml is not initialized correctly\n");
+      gzerr << "sensor xml is not initialized correctly\n";
       sensor.reset();
       return false;
     }
@@ -800,50 +765,54 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
 {
   _visual->Clear();
 
-  _visual->name = _config->Attribute("name");
+  if (!_visual->name.Set( _config->Attribute("name")))
+  {
+    gzerr << "Unable to parse visual name attribute\n";
+    return false;
+  }
 
   // Origin
   xmlNodePtr o = _config->FirstChildElement("origin");
   if (!o)
   {
-    printf("Origin tag not present for visual element, using default (Identity)");
-    _visual->origin.Clear();
+    gzwarn << "Origin tag not present for visual element, using default (Identity)\n";
+    _visual->origin.Reset();
   }
-  else if (!InitXml(o,_visual->origin))
+  else if (!_visual->origin.Set(o->Attribute("xyz"),o->Attribute("rpy")))
   {
-    printf("Visual has a malformed origin tag");
-    _visual->origin.Clear();
+    gzerr << "Unable to parase visual origin element\n";
+    _visual->origin.Reset();
     return false;
   }
 
   // Geometry
   xmlNodePtr geometryXml = _config->FirstChildElement("geometry");
-  boost::shared_ptr<Geometry> geometry(new Geometry);
-  initXml(geometryXml,geometry);
-  if (!geometry)
+  if (geometryXml)
   {
-    printf("Malformed geometry for Visual element");
-    return false;
-  }
-
-  // Material
-  xmlNodePtr mat = _config->FirstChildElement("material");
-  if (!mat)
-  {
-    printf("visual element has no material tag.");
+    _visual->geometry.reset(new Geometry);
+    if (!initXml(geometryXml, _visual->geometry))
+    {
+      gzerr << "Unable to parse geometry for Visual element\n";
+      return false;
+    }
   }
   else
   {
+    gzerr << "Visual is missing geometry element\n";
+    return false;
+  }
+
+
+  // Material
+  xmlNodePtr mat = _config->FirstChildElement("material");
+  if (mat)
+  {
     // try to parse material element in place
     _visual->material.reset(new Material);
-    if (!initXml(mat,_visual->material))
+    if (!initXml(mat, _visual->material))
     {
-      printf("Could not parse material element in Visual block, maybe defined outside.");
+      gzerr << "Could not parse material element in Visual block, maybe defined outside.\n";
       _visual->material.reset();
-    }
-    else
-    {
-      printf("Parsed material element in Visual block.");
     }
   }
 
@@ -858,7 +827,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointDynamics> &_jointDynamic
   const char* dampingStr = _config->Attribute("damping");
   if (dampingStr == NULL)
   {
-    printf("joint dynamics: no damping, defaults to 0\n");
+    gzwarn << "joint dynamics: no damping, defaults to 0.\n";
     _jointDynamics->damping = 0;
   }
   else
@@ -869,7 +838,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointDynamics> &_jointDynamic
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("damping value (%s) is not a float\n",dampingStr);
+      gzerr << "damping value (" << dampingStr << ") is not a float.\n";
       return false;
     }
   }
@@ -877,7 +846,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointDynamics> &_jointDynamic
   // Get joint friction
   const char* frictionStr = _config->Attribute("friction");
   if (frictionStr == NULL){
-    printf("joint dynamics: no friction, defaults to 0\n");
+    gzwarn << "joint dynamics: no friction, defaults to 0.\n";
     _jointDynamics->friction = 0;
   }
   else
@@ -888,20 +857,18 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointDynamics> &_jointDynamic
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("friction value (%s) is not a float\n",frictionStr);
+      gzerr << "friction value (" << frictionStr << ") is not a float\n";
       return false;
     }
   }
 
   if (dampingStr == NULL && frictionStr == NULL)
   {
-    printf("joint dynamics element specified with no damping and no friction\n");
+    gzerr << "joint dynamics element specified with no damping and no friction\n";
     return false;
   }
-  else{
-    printf("joint dynamics: damping %f and friction %f\n", _jointDynamics->damping, _jointDynamics->friction);
-    return true;
-  }
+
+  return true;
 }
 
 
@@ -913,7 +880,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
   const char* lowerStr = _config->Attribute("lower");
   if (lowerStr == NULL)
   {
-    printf("joint limit: no lower, defaults to 0\n");
+    gzwarn << "joint limit: no lower, defaults to 0.\n";
     _jointLimits->lower = 0;
   }
   else
@@ -924,7 +891,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("lower value (%s) is not a float\n",lowerStr);
+      gzerr << "lower value (" << lowerStr << ") is not a float\n";
       return false;
     }
   }
@@ -933,7 +900,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
   const char* upperStr = _config->Attribute("upper");
   if (upperStr == NULL)
   {
-    printf("joint limit: no upper, , defaults to 0\n");
+    gzwarn << "joint limit: no upper, , defaults to 0.\n";
     _jointLimits->upper = 0;
   }
   else
@@ -944,7 +911,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("upper value (%s) is not a float\n",upperStr);
+      gzerr << "upper value (" << upperStr << ") is not a float\n";
       return false;
     }
   }
@@ -952,7 +919,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
   // Get joint effort limit
   const char* effortStr = _config->Attribute("effort");
   if (effortStr == NULL){
-    printf("joint limit: no effort\n");
+    gzerr << "joint limit: no effort\n";
     return false;
   }
   else
@@ -963,7 +930,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("effort value (%s) is not a float\n",effortStr);
+      gzerr << "effort value (" << effortStr << ") is not a float.\n";
       return false;
     }
   }
@@ -972,7 +939,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
   const char* velocityStr = _config->Attribute("velocity");
   if (velocityStr == NULL)
   {
-    printf("joint limit: no velocity\n");
+    gzerr << "joint limit: no velocity\n";
     return false;
   }
   else
@@ -983,7 +950,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits)
     }
     catch (boost::bad_lexical_cast &e)
     {
-      printf("velocity value (%s) is not a float\n",velocityStr);
+      gzerr << "velocity value (" << velocityStr << ") is not a float.\n";
       return false;
     }
   }
@@ -999,7 +966,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   const char *nameStr = _config->Attribute("name");
   if (!nameStr)
   {
-    printf("unnamed joint found\n");
+    gzerr << "unnamed joint found\n";
     return false;
   }
   _joint->name = nameStr;
@@ -1008,14 +975,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   xmlNodePtr originXml = _config->FirstChildElement("origin");
   if (!originXml)
   {
-    _joint->origin.Clear();
+    _joint->origin.Reset();
   }
   else
   {
-    if (!InitXml(originXml,_joint->origin))
+    if (!_joint->origin.Set(originXml->Attribute("xyz"),
+                            originXml->Attribute("rpy")))
     {
-      printf("Malformed parent origin element for joint '%s'\n", _joint->name.c_str());
-      _joint->origin.Clear();
+      gzerr << "Unable to parse joint origin element\n";
+      _joint->origin.Reset();
       return false;
     }
   }
@@ -1026,7 +994,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   {
     const char *pname = parentXml->Attribute("link");
     if (!pname)
-      printf("no parent link name specified for Joint link '%s'. this might be the root?\n", _joint->name.c_str());
+      gzwarn << "no parent link name specified for Joint link '" 
+        <<  _joint->name << "'. this might be the root?\n";
     else
     {
       _joint->parentLinkName = std::string(pname);
@@ -1039,7 +1008,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   {
     const char *pname = childXml->Attribute("link");
     if (!pname)
-      printf("no child link name specified for Joint link '%s'.\n", _joint->name.c_str());
+      gzwarn << "no child link name specified for Joint link '" 
+        << _joint->name << "'.\n";
     else
     {
       _joint->childLinkName = std::string(pname);
@@ -1050,7 +1020,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   const char* typeChar = _config->Attribute("type");
   if (!typeChar)
   {
-    printf("joint '%s' has no type, check to see if it's a reference.\n", _joint->name.c_str());
+    gzerr << "joint '" << _joint->name 
+      << "' has no type, check to see if it's a reference.\n";
     return false;
   }
   std::string typeStr = typeChar;
@@ -1068,7 +1039,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     _joint->type = Joint::BALL;
   else
   {
-    printf("Joint '%s' has no known type '%s'\n", _joint->name.c_str(), typeStr.c_str());
+    gzerr << "Joint '" << _joint->name  << "' has no known type '" 
+      << typeStr << "'.\n";
     return false;
   }
 
@@ -1079,19 +1051,22 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     xmlNodePtr axisXml = _config->FirstChildElement("axis");
     if (!axisXml)
     {
-      printf("no axis elemement for Joint link '%s', defaulting to (1,0,0) axis\n", _joint->name.c_str());
+      gzwarn << "no axis elemement for Joint link '" 
+        << _joint->name << "', defaulting to (1,0,0) axis\n";
       _joint->axis = Vector3(1.0, 0.0, 0.0);
     }
     else{
       if (!axisXml->Attribute("xyz"))
       {
-        printf("no xyz attribute for axis element for Joint link '%s'\n", _joint->name.c_str());
+        gzwarn << "no xyz attribute for axis element for Joint link '" 
+          << _joint->name << "'.\n";
       }
       else 
       {
         if (!_joint->axis.Init(axisXml->Attribute("xyz")))
         {
-          printf("Malformed axis element for joint '%s'\n", _joint->name.c_str());
+          gzerr << "Malformed axis element for joint '" 
+            << _joint->name << "'.\n";
           _joint->axis.Clear();
           return false;
         }
@@ -1106,7 +1081,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     _joint->limits.reset(new JointLimits);
     if (!initXml(limitXml,_joint->limits))
     {
-      printf("Could not parse limit element for joint '%s'\n", _joint->name.c_str());
+      gzerr << "Could not parse limit element for joint '" 
+        << _joint->name << "'.\n";
       _joint->limits.reset();
       return false;
     }
@@ -1119,7 +1095,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     _joint->dynamics.reset(new JointDynamics);
     if (!initXml(propXml,_joint->dynamics))
     {
-      printf("Could not parse joint_dynamics element for joint '%s'\n", _joint->name.c_str());
+      gzerr << "Could not parse joint_dynamics element for joint '" 
+        << _joint->name << "'.\n";
       _joint->dynamics.reset();
       return false;
     }
@@ -1128,12 +1105,54 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   return true;
 }
 
-/// \brief Load Model from xmlNode
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
+{
+  xmlDoc xmlDoc;
+  xmlDoc.LoadFile(_filename);
+
+  return initDoc(&xmlDoc,_model);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+bool initString(const std::string &_xmlString, boost::shared_ptr<Model> &_model)
+{
+  xmlDoc xmlDoc;
+  xmlDoc.Parse(_xmlString.c_str());
+
+  return initDoc(&xmlDoc, _model);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Load Model from TiXMLDocument
+bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<Model> &_model)
+{
+  if (!_xmlDoc)
+  {
+    gzerr << "Could not parse the xml\n";
+    return false;
+  }
+
+  xmlNodePtr modelXml = _xmlDoc->FirstChildElement("model");
+  if (!modelXml)
+  {
+    gzerr << "Could not find the 'model' element in the xml file\n";
+    return false;
+  }
+
+  return initXml(modelXml, _model);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Load Model from TiXMLElement
 bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
 {
   _model->Clear();
 
-  printf("Parsing model xml\n");
   if (!_xml) 
     return false;
 
@@ -1141,35 +1160,34 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
   const char *nameStr = _xml->Attribute("name");
   if (!nameStr)
   {
-    printf("No name given for the model.\n");
+    gzerr << "No name given for the model.\n";
     return false;
   }
   _model->name = std::string(nameStr);
 
   // Get all Link elements
   for (xmlNodePtr  linkXml = _xml->FirstChildElement("link"); 
-       linkXml; linkXml = linkXml->NextSiblingElement("link"))
+      linkXml; linkXml = linkXml->NextSiblingElement("link"))
   {
     boost::shared_ptr<Link> link;
     link.reset(new Link);
 
     if (initXml(linkXml,link))
     {
-      if (_model->GetLink(link->name))
+      if (_model->GetLink(link->name.GetValue()))
       {
-        printf("link '%s' is not unique.\n", link->name.c_str());
+        gzerr << "link '" << link->name << "' is not unique.\n";
         link.reset();
         return false;
       }
       else
       {
-        _model->links.insert(make_pair(link->name,link));
-        printf("successfully added a new link '%s'\n", link->name.c_str());
+        _model->links.insert(make_pair(link->name.GetValue(),link));
       }
     }
     else
     {
-      printf("link xml is not initialized correctly\n");
+      gzerr << "link xml is not initialized correctly\n";
       link.reset();
       return false;
     }
@@ -1177,13 +1195,13 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
 
   if (_model->links.empty())
   {
-    printf("No link elements found in xml file\n");
+    gzerr << "No link elements found in xml file\n";
     return false;
   }
 
   // Get all Joint elements
   for (xmlNodePtr  jointXml = _xml->FirstChildElement("joint"); 
-       jointXml; jointXml = jointXml->NextSiblingElement("joint"))
+      jointXml; jointXml = jointXml->NextSiblingElement("joint"))
   {
     boost::shared_ptr<Joint> joint;
     joint.reset(new Joint);
@@ -1192,19 +1210,18 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
     {
       if (_model->GetJoint(joint->name))
       {
-        printf("joint '%s' is not unique.\n", joint->name.c_str());
+        gzerr << "joint '" << joint->name << "' is not unique.\n";
         joint.reset();
         return false;
       }
       else
       {
         _model->joints.insert(make_pair(joint->name,joint));
-        printf("successfully added a new joint '%s'\n", joint->name.c_str());
       }
     }
     else
     {
-      printf("joint xml is not initialized correctly\n");
+      gzerr << "joint xml is not initialized correctly\n";
       joint.reset();
       return false;
     }
@@ -1216,77 +1233,64 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
   return true;
 }
 
-/*
 ////////////////////////////////////////////////////////////////////////////////
-bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
-{
-  xmlDoc xmlDoc;
-  xmlDoc.LoadFile(_filename);
-
-  return initDoc(&xmlDoc,_model);
-}
-*/
-
-////////////////////////////////////////////////////////////////////////////////
-bool initString(const std::string &_xmlString, boost::shared_ptr<Model> &_model)
-{
-  xmlDoc xmlDoc;
-  xmlDoc.Parse(_xmlString.c_str());
-
-  return initDoc(&xmlDoc, _model);
-}
-
-/// \brief Load Model from xmlDoc
-bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<Model> &_model)
-{
-  if (!_xmlDoc)
-  {
-    printf("Could not parse the xml\n");
-    return false;
-  }
-
-  xmlNodePtr modelXml = _xmlDoc->FirstChildElement("model");
-  if (!modelXml)
-  {
-    printf("Could not find the 'model' element in the xml file\n");
-    return false;
-  }
-
-  return initXml(modelXml, _model);
-}
-
 bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
 {
-  xmlNodePtr shape = _config->FirstChildElement();
+  bool result = false;
+  xmlNodePtr shape = NULL;
+
+  if (!_config)
+  {
+    gzerr << "Null xml\n";
+    return false;
+  }
+
+  shape = _config->FirstChildElement();
   if (!shape)
   {
-    printf("Geometry tag contains no child element.\n");
-    return _geometry;
+    gzerr << "Geometry tag contains no child element.\n";
+    return false;
   }
 
   std::string typeName = shape->ValueStr();
   if (typeName == "sphere")
-    _geometry.reset(new Sphere);
+  {
+    boost::shared_ptr<Sphere> sphere(new Sphere);
+    result = initXml(shape, sphere);
+    _geometry = sphere;
+  }
   else if (typeName == "box")
-    _geometry.reset(new Box);
+  {
+    boost::shared_ptr<Box> box(new Box);
+    result = initXml(shape, box);
+    _geometry =  box;
+  }
   else if (typeName == "cylinder")
-    _geometry.reset(new Cylinder);
+  {
+    boost::shared_ptr<Cylinder> cylinder(new Cylinder);
+    result = initXml(shape, cylinder);
+    _geometry = cylinder;
+  }
   else if (typeName == "mesh")
-    _geometry.reset(new Mesh);
+  {
+    boost::shared_ptr<Mesh> mesh(new Mesh);
+    result = initXml(shape, mesh);
+    _geometry = mesh;
+  }
   else
   {
-    printf("Unknown geometry type '%s'\n", typeName.c_str());
-    return _geometry;
+    gzerr << "Unknown geometry type '" << typeName << "'.\n";
+    return false;
   }
 
   // clear geom object when fails to initialize
-  if (!initXml(shape, _geometry))
+  if (!result)
   {
-    printf("Geometry failed to parse\n");
+    gzerr << "Geometry failed to parse\n";
     _geometry.reset();
   }
 
-  return _geometry;
+  return true;
 }
 
 bool initXml(xmlNodePtr _config, boost::shared_ptr<Plugin> &_plugin)
@@ -1296,7 +1300,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Plugin> &_plugin)
   const char *nameChar = _config->Attribute("name");
   if (!nameChar)
   {
-    printf("No name given for the plugin.\n");
+    gzerr << "No name given for the plugin.\n";
     return false;
   }
   _plugin->name = std::string(nameChar);
@@ -1304,7 +1308,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Plugin> &_plugin)
   const char *filenameChar = _config->Attribute("filename");
   if (!filenameChar)
   {
-    printf("No filename given for the plugin.\n");
+    gzerr << "No filename given for the plugin.\n";
     return false;
   }
   _plugin->filename = std::string(filenameChar);
@@ -1312,76 +1316,52 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Plugin> &_plugin)
   return true;
 }
 
-/*
+
 ////////////////////////////////////////////////////////////////////////////////
-bool InitFile(const std::string &_filename, World &_world)
+bool initFile(const std::string &_filename, boost::shared_ptr<World> &_world)
 {
   xmlDoc xmlDoc;
   xmlDoc.LoadFile(_filename);
 
-  return Init(&xmlDoc,_world);
+  return initDoc(&xmlDoc, _world);
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InitString(const std::string &_xmlString, World &_world)
+bool initString(const std::string &_xmlString, boost::shared_ptr<World> &_world)
 {
   xmlDoc xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
 
-  return Init(&xmlDoc,_world);
+  return initDoc(&xmlDoc,_world);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initXml(xmlDocPtr _xmlDoc, World &_world)
+bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<World> &_world)
 {
   if (!_xmlDoc)
   {
-    printf("Could not parse the xml\n");
-    return false;
-  }
-
-  return Init(_xmlDoc,_world);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool initXml(xmlNodePtr _worldXml, World &_world)
-{
-  printf("World::initXml Parsing world xml\n");
-  if (!_worldXml) 
-    return false;
-
-  return Init(_worldXml,_world);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Init(xmlDocPtr _xmlDoc, World &_world)
-{
-  if (!_xmlDoc)
-  {
-    printf("Could not parse the xml\n");
+    gzerr << "Could not parse the xml\n";
     return false;
   }
 
   xmlNodePtr worldXml = _xmlDoc->FirstChildElement("world");
   if (!worldXml)
   {
-    printf("Could not find the 'world' element in the xml file\n");
+    gzerr << "Could not find the 'world' element in the xml file\n";
     return false;
   }
-  return Init(worldXml,_world);
+
+  return initXml(worldXml, _world);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Init(xmlNodePtr _worldXml, World &_world)
+bool initXml(xmlNodePtr _worldXml, boost::shared_ptr<World> &_world)
 {
-  _world.Clear();
-
-  printf("Parsing the best world xml\n");
+  _world->Clear();
 
   if (!_worldXml) 
   {
-    printf("Error: World XML is NULL\n");
+    gzerr << "Error: World XML is NULL\n";
     return false;
   }
 
@@ -1389,83 +1369,81 @@ bool Init(xmlNodePtr _worldXml, World &_world)
   const char *nameStr = _worldXml->Attribute("name");
   if (!nameStr)
   {
-    printf("No name given for the world.\n");
+    gzerr << "No name given for the world->\n";
     return false;
   }
-  _world.name = std::string(nameStr);
+  _world->name = std::string(nameStr);
 
-  _world.scene.reset(new Scene);
-  initXml(_worldXml->FirstChildElement("scene"),_world.scene);
+  _world->scene.reset(new Scene);
+  initXml(_worldXml->FirstChildElement("scene"),_world->scene);
 
-  _world.physics.reset(new Physics);
-  initXml(_worldXml->FirstChildElement("physics"),_world.physics);
+  _world->physics.reset(new Physics);
+  initXml(_worldXml->FirstChildElement("physics"),_world->physics);
 
   // Get all model elements
-  for (xmlNodePtr  modelXml = _worldXml->FirstChildElement("model"); 
-       modelXml; modelXml = modelXml->NextSiblingElement("model"))
+  for (xmlNodePtr modelXml = _worldXml->FirstChildElement("model"); 
+      modelXml; modelXml = modelXml->NextSiblingElement("model"))
   {
     boost::shared_ptr<Model> model;
     model.reset(new Model);
 
     if (initXml(modelXml,model))
     {
-      if (_world.GetModel(model->name))
+      if (_world->GetModel(model->name))
       {
-        printf("model '%s' is not unique.\n", model->name.c_str());
+        gzerr << "model '" << model->name << "' is not unique.\n";
         model.reset();
         return false;
       }
       else
       {
-        _world.models.insert(make_pair(model->name,model));
-        printf("successfully added a new model '%s'\n", model->name.c_str());
+        _world->models.insert(make_pair(model->name,model));
       }
     }
     else
     {
-      printf("model xml is not initialized correctly\n");
+      gzerr << "model xml is not initialized correctly\n";
       model.reset();
       return false;
     }
   }
 
   // Get all Joint elements
-  for (xmlNodePtr  jointXml = _worldXml->FirstChildElement("joint"); 
-       jointXml; jointXml = jointXml->NextSiblingElement("joint"))
+  for (xmlNodePtr jointXml = _worldXml->FirstChildElement("joint"); 
+      jointXml; jointXml = jointXml->NextSiblingElement("joint"))
   {
     boost::shared_ptr<Joint> joint;
     joint.reset(new Joint);
 
     if (initXml(jointXml,joint))
     {
-      if (_world.GetJoint(joint->name))
+      if (_world->GetJoint(joint->name))
       {
-        printf("joint '%s' is not unique.\n", joint->name.c_str());
+        gzerr << "joint '" << joint->name << "s' is not unique.\n";
         joint.reset();
         return false;
       }
       else
       {
-        _world.joints.insert(make_pair(joint->name,joint));
-        printf("successfully added a new joint '%s'\n", joint->name.c_str());
+        _world->joints.insert(make_pair(joint->name,joint));
       }
     }
     else
     {
-      printf("joint xml is not initialized correctly\n");
+      gzerr << "joint xml is not initialized correctly\n";
       joint.reset();
       return false;
     }
   }
 
   /// Get all the plugins
-  getPlugins(_worldXml, _world.plugins);
+  getPlugins(_worldXml, _world->plugins);
 
   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
+bool initXml(xmlNodePtr _config, boost::shared_ptr<Scene> &_scene)
 {
   _scene->Clear();
 
@@ -1476,13 +1454,13 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
     {
       if (!_scene->ambientColor.Init(ambient->Attribute("rgba")))
       {
-        printf("Error: Ambient rgba is malformed\n");
+        gzerr << "Error: Ambient rgba is malformed\n";
         return false;
       }
     }
     else
     {
-      printf("Error: Ambient requires a rgba attribute\n");
+      gzerr << "Ambient requires a rgba attribute\n";
       return false;
     }
   }
@@ -1494,7 +1472,7 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
     {
       if (!_scene->backgroundColor.Init(background->Attribute("rgba")))
       {
-        printf("Error: Background rgba is malformed\n");
+        gzerr << "Background rgba is malformed\n";
         return false;
       }
     }
@@ -1511,7 +1489,7 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
       const char *materialChar = sky->Attribute("material");
       if (!materialChar)
       {
-        printf("Error: No material for the sky.\n");
+        gzerr << "No material for the sky.\n";
         return false;
       }
       _scene->skyMaterial = std::string(materialChar);
@@ -1521,30 +1499,31 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
   xmlNodePtr shadow = _config->FirstChildElement("shadows");
   if (shadow)
   {
-    std::string enabled = shadow->Attribute("enabled");
-    if (!enabled.empty() && !getBoolFromStr(enabled, _scene->shadowEnabled))
+    if (!getBoolFromStr(shadow->Attribute("enabled"), _scene->shadowEnabled,
+          true, true))
     {
-      printf("Error: Shadown element requires an enabled attribute");
+      gzerr << "Shadow element requires an enabled attribute";
+      return false;
     }
 
     if (shadow->Attribute("rgba"))
     {
       if (!_scene->shadowColor.Init(shadow->Attribute("rgba")))
       {
-        printf("Error: Shadow rgba is malformed\n");
+        gzerr << "Shadow rgba is malformed\n";
         return false;
       }
     }
     else
     {
-      printf("Error: Shadow requires a rgba attribute\n");
+      gzerr << "Shadow requires a rgba attribute\n";
       return false;
     }
 
     _scene->shadowType = shadow->Attribute("type");
     if (_scene->shadowType.empty())
     {
-      printf("Error: Shadow requires a type attribute\n");
+      gzerr << "Shadow requires a type attribute\n";
       return false;
     }
   }
@@ -1552,67 +1531,53 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
   return true;
 }
 
-//bool initXml(xmlNodePtr _config, boost::shared_ptr<PhysicsEngine> &_physics_engine)
-//{
-//}
-
 bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine)
 {
   xmlNodePtr odeConfig = _config->FirstChildElement("ode");
 
   if ( !odeConfig )
   {
-    printf("Error: Physics element missing <ode>\n");
+    gzerr << "Physics element missing <ode>\n";
     return false;
   }
 
   xmlNodePtr solverConfig = odeConfig->FirstChildElement("solver");
   if (!solverConfig)
   {
-    printf("Error: ODE Physics missing solver element\n");
+    gzerr << "ODE Physics missing solver element\n";
     return false;
   }
 
   _open_dynamics_engine->solverType = solverConfig->Attribute("type");
   if (_open_dynamics_engine->solverType.empty())
   {
-    printf("Error: ODE Physics missing solver type\n");
+    gzerr << "ODE Physics missing solver type\n";
     return false;
   }
 
-  std::string dtStr = solverConfig->Attribute("dt");
-  if (dtStr.empty())
+  if (!getDoubleFromStr(solverConfig->Attribute("dt"), 
+        _open_dynamics_engine->dt, 0.01, true))
   {
-    printf("Error: ODE Physics solver missing dt attribute\n");
-    return false;
-  }
-  if (!getDoubleFromStr(dtStr, _open_dynamics_engine->dt))
-  {
-    printf("Error: ODE Physics solver malformed dt attribute\n");
+    gzerr << "ODE Physics solver unable to parse dt attribute\n";
     return false;
   }
 
   std::string itersStr = solverConfig->Attribute("iters");
   if (itersStr.empty())
   {
-    printf("Error: ODE Physics solver missing iters attribute\n");
+    gzerr << "ODE Physics solver missing iters attribute\n";
     return false;
   }
   if (!getIntFromStr(itersStr, _open_dynamics_engine->iters))
   {
-    printf("Error: ODE Physics solver malformed iters attribute\n");
+    gzerr << "ODE Physics solver malformed iters attribute\n";
     return false;
   }
 
-  std::string sorStr = solverConfig->Attribute("sor");
-  if (sorStr.empty())
+  if (!getDoubleFromStr(solverConfig->Attribute("sor"), 
+        _open_dynamics_engine->sor, 0.0, true))
   {
-    printf("Error: ODE Physics solver missing sor attribute\n");
-    return false;
-  }
-  if (!getDoubleFromStr(sorStr, _open_dynamics_engine->sor))
-  {
-    printf("Error: ODE Physics solver malformed sor attribute\n");
+    gzerr << "ODE Physics solver unable to parse sor attribute\n)";
     return false;
   }
 
@@ -1621,51 +1586,31 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dy
   xmlNodePtr constraintsConfig = odeConfig->FirstChildElement("constraints");
   if (constraintsConfig)
   {
-    std::string cfmStr = constraintsConfig->Attribute("cfm");
-    if (cfmStr.empty())
+
+    if (!getDoubleFromStr(constraintsConfig->Attribute("cfm"), 
+          _open_dynamics_engine->cfm, 0.0, true))
     {
-      printf("Error: ODE Physics contraints missing cfm attribute\n");
-      return false;
-    }
-    if (!getDoubleFromStr(cfmStr, _open_dynamics_engine->cfm))
-    {
-      printf("Error: ODE Physics contraints malformed cfm attribute\n");
+      gzerr << "ODE Physics contraints unable to parse cfm attribute\n";
       return false;
     }
 
-    std::string erpStr = constraintsConfig->Attribute("erp");
-    if (erpStr.empty())
+    if (!getDoubleFromStr(constraintsConfig->Attribute("erp"), 
+          _open_dynamics_engine->erp, 0.01, true))
     {
-      printf("Error: ODE Physics contraints missing erp attribute\n");
-      return false;
-    }
-    if (!getDoubleFromStr(erpStr, _open_dynamics_engine->erp))
-    {
-      printf("Error: ODE Physics contraints malformed erp attribute\n");
+      gzerr << "ODE Physics contraints unable to parse erp attribute\n";
       return false;
     }
 
-    std::string contactMaxCorrectingVelStr = constraintsConfig->Attribute("contact_max_correcting_vel");
-    if (contactMaxCorrectingVelStr.empty())
+
+    if (!getDoubleFromStr(constraintsConfig->Attribute("contact_max_correcting_vel"), _open_dynamics_engine->contactMaxCorrectingVel, 0.0, true))
     {
-      printf("Error: ODE Physics contraints missing contact_max_correcting_vel attribute\n");
-      return false;
-    }
-    if (!getDoubleFromStr(contactMaxCorrectingVelStr, _open_dynamics_engine->contactMaxCorrectingVel))
-    {
-      printf("Error: ODE Physics contraints malformed contact_max_correcting_vel attribute\n");
+      gzerr << "ODE Physics contraints unable to parse contact_max_correcting_vel attribute\n";
       return false;
     } 
- 
-    std::string contactSurfaceLayerStr = constraintsConfig->Attribute("contact_surface_layer");
-    if (contactSurfaceLayerStr.empty())
+
+    if (!getDoubleFromStr(constraintsConfig->Attribute("contact_surface_layer"), _open_dynamics_engine->contactSurfaceLayer, 0.0, true))
     {
-      printf("Error: ODE Physics contraints missing contact_surface_layer attribute\n");
-      return false;
-    }
-    if (!getDoubleFromStr(contactSurfaceLayerStr, _open_dynamics_engine->contactSurfaceLayer))
-    {
-      printf("Error: ODE Physics contraints malformed contact_surface_layer attribute\n");
+      gzerr << "ODE Physics contraints unable to parse contact_surface_layer attribute\n";
       return false;
     }
   }
@@ -1673,20 +1618,20 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dy
   return true;
 }
 
-bool initXml(xmlNodePtr  _config, boost::shared_ptr<Physics> &_physics)
+bool initXml(xmlNodePtr _config, boost::shared_ptr<Physics> &_physics)
 {
   _physics->Clear();
-  
+
   if (!_config)
   {
-    printf("Error: xml config is NULL\n");
+    gzerr << "xml config is NULL\n";
     return false;
   }
 
   _physics->type = _config->Attribute("type");
   if (_physics->type.empty())
   {
-    printf("Error: Missing physics type attribute\n");
+    gzerr << "Missing physics type attribute\n";
     return false;
   }
 
@@ -1695,7 +1640,7 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Physics> &_physics)
   {
     if (!_physics->gravity.Init(gravityElement->Attribute("xyz")))
     {
-      printf("Gravity has malformed xyz\n");
+      gzerr << "Gravity has malformed xyz\n";
       _physics->gravity.Clear();
       return false;
     }
@@ -1706,19 +1651,19 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Physics> &_physics)
     _physics->engine.reset(new OpenDynamicsEngine );
 
     boost::shared_ptr<OpenDynamicsEngine> open_dynamics_engine = boost::shared_static_cast<OpenDynamicsEngine>(_physics->engine);
-    
+
     initXml(_config,open_dynamics_engine);
   }
   else
   {
-    printf("Error: Unknown physics engine type[%s]\n",_physics->type.c_str());
+    gzerr << "Unknown physics engine type[" << _physics->type << "].\n";
     return false;
   }
-  
+
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Contact> &_contact)
+bool initXml(xmlNodePtr  /*_config*/, boost::shared_ptr<Contact> &/*_contact*/)
 {
   return true;
 }
@@ -1728,7 +1673,7 @@ bool InitXml(xmlNodePtr _xml, Pose &_pose)
   _pose.Clear();
   if (!_xml)
   {
-    printf("parsing pose: _xml empty");
+    gzerr << "parsing pose: _xml empty\n";
     return false;
   }
   else
@@ -1736,14 +1681,14 @@ bool InitXml(xmlNodePtr _xml, Pose &_pose)
     const char* _xyzStr = _xml->Attribute("xyz");
     if (_xyzStr == NULL)
     {
-      printf("parsing pose: no xyz, using default values.");
+      gzwarn << "parsing pose: no xyz, using default values.\n";
       return true;
     }
     else
     {
       if (!_pose.position.Init(_xyzStr))
       {
-        printf("malformed xyz");
+        gzerr << "malformed xyz\n";
         _pose.position.Clear();
         return false;
       }
@@ -1752,14 +1697,14 @@ bool InitXml(xmlNodePtr _xml, Pose &_pose)
     const char* rpyStr = _xml->Attribute("rpy");
     if (rpyStr == NULL)
     {
-      printf("parsing pose: no rpy, using default values.");
+      gzwarn << "parsing pose: no rpy, using default values.\n";
       return true;
     }
     else
     {
       if (!_pose.rotation.Init(rpyStr))
       {
-        printf("malformed rpy");
+        gzerr << "malformed rpy\n";
         return false;
         _pose.rotation.Clear();
       }

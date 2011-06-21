@@ -32,23 +32,23 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/* Author: Wim Meeussen */
+/* Author: Nate Koenig, John Hsu */
 
-#ifndef URDF_PARSER_H
-#define URDF_PARSER_H
+#ifndef URDF_PARSER_HH
+#define URDF_PARSER_HH
 
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <libxml/parser.h>
 
-#include "sensor.h"
-#include "link.h"
-#include "model.h"
-#include "world.h"
-#include "joint.h"
-#include "plugin.h"
-#include "pose.h"
+#include "sdf/interface/sensor.hh"
+#include "sdf/interface/link.hh"
+#include "sdf/interface/model.hh"
+#include "sdf/interface/world.hh"
+#include "sdf/interface/joint.hh"
+#include "sdf/interface/plugin.hh"
+#include "sdf/interface/pose.hh"
 
 namespace sdf
 {
@@ -75,36 +75,32 @@ namespace sdf
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Plugin> &_plugin);
 
   /// \brief Load Model given a filename
-  //bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
+  bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
 
-  /// \brief Load Model from a XML-string
+ /// \brief Load Model from a XML-string
   bool initString(const std::string &_xmlstring, boost::shared_ptr<Model> &_model);
- 
-  /// \brief Load Model from xmlNode
-  bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model);
 
-  /// \brief Load Model from xmlDoc
+  /// \brief Load Model from TiXMLDocument
   bool initDoc(xmlDocPtr _xml, boost::shared_ptr<Model> &_model);
 
-  /// world
-  /// \brief Load World from xmlNode
-  bool Init(xmlNodePtr _xml, World &_world);
+  /// \brief Load Model from TiXMLElement
+  bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model);
 
-  /// \brief Load World from xmlDoc
-  bool Init(xmlDocPtr _xml, World &_world);
 
-  /// \brief Load World from xmlNode
-  bool initXml(xmlNodePtr _xml, World &_world);
+  /// \brief Load world given a filename
+  bool initFile(const std::string &_filename, 
+                boost::shared_ptr<World> &_world);
 
-  /// \brief Load World from xmlDoc
-  bool initXml(xmlDocPtr _xml, World &_world);
+  /// \brief Load world from a XML-string
+  bool initString(const std::string &_xmlstring, 
+                  boost::shared_ptr<World> &_world);
 
-  /// \brief Load World given a filename
-  //bool InitFile(const std::string &_filename, World &_world);
+   /// \brief Load World from TiXMLDocument
+  bool initDoc(xmlDocPtr _xml, boost::shared_ptr<World> &_world);
 
-  /// \brief Load World from a XML-string
-  bool InitString(const std::string &_xmlstring, World &_world);
-  
+   /// \brief Load Model from TiXMLElement
+  bool initXml(xmlNodePtr _xml, boost::shared_ptr<World> &_world);
+
   /// scene
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Scene> &_scene);
   
@@ -114,17 +110,17 @@ namespace sdf
   /// OpenDynamicsEngine
   bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
 
-  /// Physics
-  //bool initXml(xmlNodePtr _config, boost::shared_ptr<PhysicsEngine> &_physics_engine);
-  
   /// Pose
   bool InitXml(xmlNodePtr _xml, Pose &_pose);
 
-  bool getBoolFromStr(std::string _str, bool &_value);
+
+  bool getBoolFromStr(std::string _key, bool &_value, 
+                      bool _default, bool _required);
  
-  bool getDoubleFromStr(const std::string &_str, double &_value);
+  bool getDoubleFromStr(const std::string &_key, double &_value,
+                        double _default, bool _required);
  
-  bool getIntFromStr(const std::string &_str, int &_value);
+  bool getIntFromStr(const std::string &_key, int &_value);
     
   bool getUIntFromStr(const std::string &_str, unsigned int &_value);
 
