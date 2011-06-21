@@ -39,19 +39,22 @@
 
 #include <string>
 
+#include "sdf/interface/Param.hh"
+
 namespace sdf
 {
   class Plugin
   {
-    public: Plugin() { this->Clear(); };
+    public: Plugin() : name("name", ""), filename("filename","")
+            { this->Clear(); };
   
-    public: std::string name;
-    public: std::string filename;
+    public: ParamT<std::string, true> name;
+    public: ParamT<std::string, true> filename;
  
     public: void Clear()
     {
-      this->name.clear();
-      this->filename.clear();
+      this->name.Reset();
+      this->filename.Reset();
     }
 
     public: void Print(const std::string &prefix)

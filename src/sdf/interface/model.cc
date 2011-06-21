@@ -43,6 +43,7 @@ using namespace sdf;
 
 ////////////////////////////////////////////////////////////////////////////////
 Model::Model()
+  : name("name", "")
 {
   this->Clear();
 }
@@ -50,7 +51,7 @@ Model::Model()
 ////////////////////////////////////////////////////////////////////////////////
 void Model::Clear()
 {
-  this->name.clear();
+  this->name.Reset();
   this->links.clear();
   this->joints.clear();
   this->plugins.clear();

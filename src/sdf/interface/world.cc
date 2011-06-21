@@ -43,6 +43,7 @@ using namespace sdf;
 
 ////////////////////////////////////////////////////////////////////////////////
 World::World()
+  : name("name", "")
 {
   this->Clear();
 }
@@ -50,7 +51,7 @@ World::World()
 ////////////////////////////////////////////////////////////////////////////////
 void World::Clear()
 {
-  this->name.clear();
+  this->name.Reset();
   this->joints.clear();
   this->models.clear();
   this->plugins.clear();
