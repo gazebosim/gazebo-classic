@@ -49,19 +49,8 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  xmlDoc worldDoc;
-  worldDoc.LoadFile(argv[1]);
-
-  xmlNodePtr worldXml = worldDoc.FirstChildElement("world");
-
-  if (!worldXml)
-  {
-    std::cerr << "ERROR: Could not load the xml into xmlNode" << std::endl;
-    return -1;
-  }
-
   boost::shared_ptr<World> world(new World);
-  if (!initXml(worldXml, world))
+  if (!initFile(argv[1], world))
   {
     std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
     return -1;
@@ -74,7 +63,7 @@ int main(int argc, char** argv)
 
   std::cout << "\n";
 
-  saveXml("/tmp/test.xml", world);
+  //saveXml("/tmp/test.xml", world);
 
   return 0;
 }

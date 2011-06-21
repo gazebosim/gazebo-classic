@@ -51,9 +51,9 @@ namespace sdf
  
     public: void Clear()
     {
-      this->name.clear();
+      this->name.Reset();
       this->type.clear();
-      this->filename.clear();
+      this->filename.Reset();
     }
 
     public: void Print(const std::string &prefix)

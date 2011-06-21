@@ -49,6 +49,7 @@
 #include "sdf/interface/joint.hh"
 #include "sdf/interface/plugin.hh"
 #include "sdf/interface/pose.hh"
+#include "sdf/parser_deprecated/controller.hh"
 
 namespace sdf
 {
@@ -72,7 +73,7 @@ namespace sdf
 
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geom);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Plugin> &_plugin);
+  bool initXml(xmlNodePtr _config, boost::shared_ptr<Controller> &_controller);
 
   /// \brief Load Model given a filename
   bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
@@ -88,8 +89,7 @@ namespace sdf
 
 
   /// \brief Load world given a filename
-  bool initFile(const std::string &_filename, 
-                boost::shared_ptr<World> &_world);
+  bool initFile(const std::string &_filename, boost::shared_ptr<World> &_world);
 
   /// \brief Load world from a XML-string
   bool initString(const std::string &_xmlstring, 
@@ -113,19 +113,78 @@ namespace sdf
   /// Pose
   bool InitXml(xmlNodePtr _xml, Pose &_pose);
 
+/*
+  bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Scene> &_scene);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Physics> &_physics);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<OpenDynamicsEngine> &_engine);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Model> &_model);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Link> &_link);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Joint> &_joint);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Plugin> &_plugin);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Visual> &_visual);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Collision> &_collision);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Inertial> &_inertial);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Sensor> &_sensor);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Material> &_mat);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Geometry> &_geom);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Camera> &_camera);
+  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Ray> &_ray);
 
-  bool getBoolFromStr(std::string _key, bool &_value, 
-                      bool _default, bool _required);
- 
-  bool getDoubleFromStr(const std::string &_key, double &_value,
-                        double _default, bool _required);
- 
-  bool getIntFromStr(const std::string &_key, int &_value);
-    
-  bool getUIntFromStr(const std::string &_str, unsigned int &_value);
+  bool saveXml(xmlNodePtr _parent, const Vector3 &_vec);
+  bool saveXml(xmlNodePtr _parent, const Rotation &_rot);
+  bool saveXml(xmlNodePtr _parent, const ParamT<Pose,true> &_pose);
+  bool saveXml(xmlNodePtr _parent, const ParamT<Pose,false> &_pose);
+*/
 
   bool getPlugins(xmlNodePtr pluginXml, std::map<std::string, 
                   boost::shared_ptr<Plugin> > &plugins);
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Get a child based on a name. Returns null if not found
+  xmlNodePtr FirstChildElement( xmlNodePtr node, const std::string &name)
+  {
+    xmlNodePtr tmp;
+    for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = tmp->next )
+      if (tmp->name && name == (const char*)tmp->name) break;
+
+    return tmp;
+  }
+  xmlNodePtr NextSiblingElement( xmlNodePtr node, const std::string &name)
+  {
+    xmlNodePtr tmp;
+    for (tmp = node->next; tmp != NULL; tmp = tmp->next )
+      if (tmp->name && name == (const char*)tmp->name) break;
+
+    return tmp;
+  }
+
+  void PreParser(const std::string &fname, std::string &output)
+  {
+    std::ifstream ifs(fname.c_str(), std::ios::in);
+    std::string line;
+
+    while (ifs.good())
+    {
+      std::getline(ifs, line);
+      boost::trim(line);
+
+      if (boost::find_first(line,"<include"))
+      {
+        int start = line.find("filename=");
+        start += strlen("filename=") + 1;
+        int end = line.find_first_of("'\"", start);
+        std::string fname2 = line.substr(start, end-start);
+        PreParser(fname2, output);
+      }
+      else
+        output += line + "\n";
+    }
+
+    ifs.close();
+  }
+
+
 }
 
 #endif
