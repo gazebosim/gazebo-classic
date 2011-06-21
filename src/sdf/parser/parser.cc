@@ -255,7 +255,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
     return false;
   }
 
-  if (!_sensor->imageWidth.Set( image->Attribute("height")))
+  if (!_sensor->imageHeight.Set( image->Attribute("height")))
   {
     gzerr << "Unable to parse sensor image height\n";
     return false;
@@ -735,6 +735,12 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
     return false;
   }
 
+  if (!_visual->castShadows.Set( _config->Attribute("cast_shadows")))
+  {
+    gzerr << "Unable to parse visual cast_shadows attribute\n";
+    return false;
+  }
+
   // Origin
   TiXmlElement *o = _config->FirstChildElement("origin");
   if (!o)
@@ -898,26 +904,26 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
 
 
   // Get Joint type
-  const char* typeChar = _config->Attribute("type");
-  if (!typeChar)
+  if (!_joint->type.Set(_config->Attribute("type")))
   {
     gzerr << "joint '" << _joint->name 
       << "' has no type, check to see if it's a reference.\n";
     return false;
   }
-  std::string typeStr = typeChar;
+
+  std::string typeStr = _joint->type.GetValue();
   if (typeStr == "piston")
-    _joint->type = Joint::PISTON;
+    _joint->typeEnum = Joint::PISTON;
   else if (typeStr == "revolute2")
-    _joint->type = Joint::REVOLUTE2;
+    _joint->typeEnum = Joint::REVOLUTE2;
   else if (typeStr == "revolute")
-    _joint->type = Joint::REVOLUTE;
+    _joint->typeEnum = Joint::REVOLUTE;
   else if (typeStr == "universal")
-    _joint->type = Joint::UNIVERSAL;
+    _joint->typeEnum = Joint::UNIVERSAL;
   else if (typeStr == "prismatic")
-    _joint->type = Joint::PRISMATIC;
+    _joint->typeEnum = Joint::PRISMATIC;
   else if (typeStr == "ball")
-    _joint->type = Joint::BALL;
+    _joint->typeEnum = Joint::BALL;
   else
   {
     gzerr << "Joint '" << _joint->name  << "' has no known type '" 
@@ -926,7 +932,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get Joint Axis
-  if (_joint->type != Joint::BALL)
+  if (_joint->typeEnum != Joint::BALL)
   {
     // axis
     TiXmlElement *axisXml = _config->FirstChildElement("axis");
@@ -1230,14 +1236,7 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
   }
 
   // Get world name
-  const char *nameStr = _worldXml->Attribute("name");
-  if (!nameStr)
-  {
-    gzerr << "No name given for the world->\n";
-    return false;
-  }
-
-  if (!_world->name.Set(std::string(nameStr)))
+  if (!_world->name.Set(_worldXml->Attribute("name")))
   {
     gzerr << "Unable to parse world name\n";
     return false;
@@ -1493,8 +1492,560 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
   return true;
 }
 
-bool initXml(TiXmlElement * /*_config*/, boost::shared_ptr<Contact> &/*_contact*/)
+bool initXml(TiXmlElement * /*_config*/, 
+             boost::shared_ptr<Contact> &/*_contact*/)
 {
+  return true;
+}
+
+bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world)
+{
+  TiXmlDocument doc;
+
+  TiXmlDeclaration *decl = new TiXmlDeclaration( "1.0", "", "" );
+  doc.LinkEndChild(decl);
+
+  TiXmlElement *root = new TiXmlElement("gazebo");
+  doc.LinkEndChild(root);
+  root->SetAttribute("version","1.0");
+
+  TiXmlElement *worldElement = new TiXmlElement("world");
+  root->LinkEndChild(worldElement);
+
+  worldElement->SetAttribute(_world->name.GetKey(), 
+                             _world->name.GetAsString());
+
+  saveXml(worldElement, _world->scene); 
+  saveXml(worldElement, _world->physics); 
+
+  // Save the models
+  std::map<std::string, boost::shared_ptr<Model> >::const_iterator miter;
+  for (miter = _world->models.begin(); miter != _world->models.end(); miter++)
+  {
+    saveXml(worldElement, miter->second); 
+  }
+
+  // Save the joints
+  std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
+  for (jiter = _world->joints.begin(); jiter != _world->joints.end(); jiter++)
+  {
+    saveXml(worldElement, jiter->second); 
+  }
+
+  // Save the plugins
+  std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator piter;
+  for (piter = _world->plugins.begin(); piter != _world->plugins.end(); piter++)
+  {
+    saveXml(worldElement, piter->second); 
+  }
+
+  TiXmlPrinter printer;
+  printer.SetIndent("  ");
+
+  doc.Accept(&printer);
+
+  std::fstream out(filename.c_str(), std::ios::out);
+  out << printer.CStr();
+  out.close();
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Scene> &_scene)
+{
+  TiXmlElement *sceneNode = new TiXmlElement("scene");
+  _parent->LinkEndChild( sceneNode );
+
+  TiXmlElement *ambientNode = new TiXmlElement("ambient");
+  sceneNode->LinkEndChild( ambientNode );
+  ambientNode->SetAttribute( _scene->ambientColor.GetKey(),
+                             _scene->ambientColor.GetAsString() );
+
+  TiXmlElement *backgroundNode = new TiXmlElement("background");
+  sceneNode->LinkEndChild( backgroundNode );
+  backgroundNode->SetAttribute( _scene->backgroundColor.GetKey(),
+                                _scene->backgroundColor.GetAsString() );
+
+
+  TiXmlElement *skyNode = new TiXmlElement("sky");
+  backgroundNode->LinkEndChild( skyNode );
+  skyNode->SetAttribute( _scene->skyMaterial.GetKey(),
+                         _scene->skyMaterial.GetAsString());
+
+  // Save shadows
+  TiXmlElement *shadowNode = new TiXmlElement("shadows");
+  sceneNode->LinkEndChild( shadowNode );
+  shadowNode->SetAttribute( _scene->shadowEnabled.GetKey(),
+                            _scene->shadowEnabled.GetAsString());
+  shadowNode->SetAttribute( _scene->shadowColor.GetKey(),
+                            _scene->shadowColor.GetAsString());
+  shadowNode->SetAttribute( _scene->shadowType.GetKey(),
+                            _scene->shadowType.GetAsString());
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Physics> &_physics)
+{
+  TiXmlElement *physicsNode = new TiXmlElement("physics");
+  _parent->LinkEndChild( physicsNode );
+
+  physicsNode->SetAttribute( _physics->type.GetKey(), 
+                             _physics->type.GetAsString() );
+
+  TiXmlElement *gravityNode = new TiXmlElement("gravity");
+  physicsNode->LinkEndChild( gravityNode );
+  gravityNode->SetAttribute( _physics->gravity.GetKey(),
+                             _physics->gravity.GetAsString() );
+
+  if (_physics->type.GetAsString() == "ode")
+  {
+    boost::shared_ptr<OpenDynamicsEngine> openDynamicsEngine = boost::shared_static_cast<OpenDynamicsEngine>(_physics->engine);
+    saveXml( physicsNode, openDynamicsEngine );
+  }
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<OpenDynamicsEngine> &_engine)
+{
+  TiXmlElement *odeNode = new TiXmlElement("ode");
+  _parent->LinkEndChild( odeNode );
+
+  TiXmlElement *solverNode = new TiXmlElement("solver");
+  odeNode->LinkEndChild( solverNode );
+
+  solverNode->SetAttribute( _engine->solverType.GetKey(),
+                            _engine->solverType.GetAsString() );
+  solverNode->SetAttribute( _engine->dt.GetKey(),
+                            _engine->dt.GetAsString() );
+  solverNode->SetAttribute( _engine->iters.GetKey(),
+                            _engine->iters.GetAsString() );
+  solverNode->SetAttribute( _engine->sor.GetKey(),
+                            _engine->sor.GetAsString() );
+
+
+  TiXmlElement *constraintsNode = new TiXmlElement("constraints");
+  odeNode->LinkEndChild( constraintsNode );
+  constraintsNode->SetAttribute( _engine->cfm.GetKey(),
+                                 _engine->cfm.GetAsString() );
+  constraintsNode->SetAttribute( _engine->erp.GetKey(),
+                                 _engine->erp.GetAsString() );
+  constraintsNode->SetAttribute( _engine->contactMaxCorrectingVel.GetKey(),
+                                 _engine->contactMaxCorrectingVel.GetAsString() );
+  constraintsNode->SetAttribute( _engine->contactSurfaceLayer.GetKey(),
+                                 _engine->contactSurfaceLayer.GetAsString() );
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Joint> &_joint)
+{
+  TiXmlElement *jointNode = new TiXmlElement("joint");
+  _parent->LinkEndChild( jointNode );
+
+  jointNode->SetAttribute(_joint->name.GetKey(),
+                          _joint->name.GetAsString());
+  jointNode->SetAttribute(_joint->type.GetKey(),
+                          _joint->type.GetAsString());
+
+  TiXmlElement *parentNode = new TiXmlElement("parent");
+  jointNode->LinkEndChild(parentNode);
+  parentNode->SetAttribute( _joint->parentLinkName.GetKey(),
+                            _joint->parentLinkName.GetAsString() );
+
+  TiXmlElement *childNode = new TiXmlElement("child");
+  jointNode->LinkEndChild(childNode);
+  childNode->SetAttribute( _joint->childLinkName.GetKey(),
+                           _joint->childLinkName.GetAsString() );
+
+  saveXml(jointNode, _joint->origin);
+
+  // Axis 1
+  TiXmlElement *axisNode = new TiXmlElement("axis");
+  jointNode->LinkEndChild(axisNode);
+  axisNode->SetAttribute( _joint->axis.GetKey(), _joint->axis.GetAsString() );
+
+  // Axis 2
+  TiXmlElement *axis2Node = new TiXmlElement("axis2");
+  jointNode->LinkEndChild(axis2Node);
+  axis2Node->SetAttribute( _joint->axis2.GetKey(), _joint->axis2.GetAsString());
+
+  // Dynamics
+  if (_joint->dynamics)
+  {
+    TiXmlElement *dynamicsNode = new TiXmlElement("dynamics");
+    jointNode->LinkEndChild(dynamicsNode);
+    dynamicsNode->SetAttribute( _joint->dynamics->damping.GetKey(),
+        _joint->dynamics->damping.GetAsString() );
+    dynamicsNode->SetAttribute( _joint->dynamics->friction.GetKey(),
+        _joint->dynamics->friction.GetAsString() );
+  }
+
+  // Limit
+  if (_joint->limits)
+  {
+    TiXmlElement *limitNode = new TiXmlElement("limit");
+    jointNode->LinkEndChild(limitNode);
+    limitNode->SetAttribute( _joint->limits->lower.GetKey(),
+        _joint->limits->lower.GetAsString() );
+    limitNode->SetAttribute( _joint->limits->upper.GetKey(),
+        _joint->limits->upper.GetAsString() );
+    limitNode->SetAttribute( _joint->limits->effort.GetKey(),
+        _joint->limits->effort.GetAsString() );
+    limitNode->SetAttribute( _joint->limits->velocity.GetKey(),
+        _joint->limits->velocity.GetAsString() );
+  }
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const Vector3 &_vec)
+{
+  std::ostringstream stream;
+  stream << _vec;
+  _parent->SetAttribute("xyz", stream.str());
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const Rotation &_rot)
+{
+  std::ostringstream stream;
+  stream << _rot;
+  _parent->SetAttribute("rot", stream.str());
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const ParamT<Pose,true> &_pose)
+{
+  TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
+  _parent->LinkEndChild( originNode );
+
+  saveXml(originNode, _pose.GetValue().position);
+  saveXml(originNode, _pose.GetValue().rotation);
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const ParamT<Pose,false> &_pose)
+{
+  TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
+  _parent->LinkEndChild( originNode );
+
+  std::ostringstream posStream, rotStream;
+
+  posStream << _pose.GetValue().position;
+  rotStream << _pose.GetValue().rotation;
+
+  originNode->SetAttribute("xyz", posStream.str());
+  originNode->SetAttribute("rpy", rotStream.str());
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Model> &_model)
+{
+  TiXmlElement *modelNode = new TiXmlElement("model");
+  _parent->LinkEndChild( modelNode );
+
+
+  modelNode->SetAttribute( _model->name.GetKey(),
+                           _model->name.GetAsString() );
+
+  // Save the links
+  std::map<std::string, boost::shared_ptr<Link> >::const_iterator liter;
+  for (liter = _model->links.begin(); liter != _model->links.end(); liter++)
+  {
+    saveXml(modelNode, liter->second);
+  }
+
+  // Save the joints
+  std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
+  for (jiter = _model->joints.begin(); jiter != _model->joints.end(); jiter++)
+  {
+    saveXml(modelNode, jiter->second);
+  }
+
+  // Save the plugins
+  std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator piter;
+  for (piter = _model->plugins.begin(); piter != _model->plugins.end(); piter++)
+  {
+    saveXml(modelNode, piter->second);
+  }
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Link> &_link)
+{
+  TiXmlElement *linkNode = new TiXmlElement("link");
+  _parent->LinkEndChild( linkNode );
+
+  linkNode->SetAttribute(_link->name.GetKey(),
+                         _link->name.GetAsString());
+  linkNode->SetAttribute(_link->selfCollide.GetKey(),
+                         _link->selfCollide.GetAsString());
+  linkNode->SetAttribute(_link->gravity.GetKey(),
+                         _link->gravity.GetAsString());
+
+  // Save interial
+  saveXml(linkNode, _link->inertial);
+
+  // Save visuals
+  std::vector<boost::shared_ptr<Visual> >::const_iterator viter;
+  for (viter = _link->visuals.begin(); viter != _link->visuals.end(); viter++)
+  {
+    saveXml(linkNode, *viter);
+  }
+
+  // Save collisions
+  std::vector<boost::shared_ptr<Collision> >::const_iterator citer;
+  for (citer = _link->collisions.begin(); citer != _link->collisions.end(); citer++)
+  {
+    saveXml(linkNode, *citer);
+  }
+
+  // Save sensors
+  std::map<std::string, boost::shared_ptr<Sensor> >::const_iterator siter;
+  for (siter = _link->sensors.begin(); siter != _link->sensors.end(); siter++)
+  {
+    saveXml(linkNode, siter->second);
+  }
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Plugin> &_plugin)
+{
+  TiXmlElement *pluginNode = new TiXmlElement("plugin");
+  _parent->LinkEndChild( pluginNode );
+  pluginNode->SetAttribute(_plugin->name.GetKey(),
+                           _plugin->name.GetAsString());
+  pluginNode->SetAttribute(_plugin->filename.GetKey(),
+                           _plugin->filename.GetAsString());
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Visual> &_visual)
+{
+  TiXmlElement *visualNode = new TiXmlElement("visual");
+  _parent->LinkEndChild( visualNode );
+  visualNode->SetAttribute( _visual->castShadows.GetKey(),
+                            _visual->castShadows.GetAsString());
+  visualNode->SetAttribute( _visual->name.GetKey(),
+                            _visual->name.GetAsString());
+
+  saveXml(visualNode, _visual->origin);
+  saveXml(visualNode, _visual->geometry);
+  saveXml(visualNode, _visual->material);
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Geometry> &_geom)
+{
+  TiXmlElement *shapeNode = NULL;
+  TiXmlElement *geomNode = new TiXmlElement("geometry");
+  _parent->LinkEndChild( geomNode );
+
+  if (_geom->type == Geometry::SPHERE)
+  {
+    boost::shared_ptr<Sphere> shape = boost::shared_static_cast<Sphere>(_geom);
+    shapeNode = new TiXmlElement("sphere");
+    shapeNode->SetAttribute(shape->radius.GetKey(),shape->radius.GetAsString());
+  }
+  else if (_geom->type == Geometry::BOX)
+  {
+    boost::shared_ptr<Box> shape = boost::shared_static_cast<Box>(_geom);
+    shapeNode = new TiXmlElement("box");
+    std::ostringstream stream;
+    stream << shape->size;
+    shapeNode->SetAttribute("size", stream.str());
+  }
+  else if (_geom->type == Geometry::CYLINDER)
+  {
+    boost::shared_ptr<Cylinder> shape = boost::shared_static_cast<Cylinder>(_geom);
+    shapeNode = new TiXmlElement("cylinder");
+    shapeNode->SetAttribute(shape->radius.GetKey(),shape->radius.GetAsString());
+    shapeNode->SetAttribute(shape->length.GetKey(),shape->length.GetAsString());
+  }
+  else if (_geom->type == Geometry::MESH)
+  {
+    boost::shared_ptr<Mesh> shape = boost::shared_static_cast<Mesh>(_geom);
+    shapeNode = new TiXmlElement("mesh");
+    shapeNode->SetAttribute(shape->filename.GetKey(),
+                            shape->filename.GetAsString());
+    shapeNode->SetAttribute(shape->scale.GetKey(),
+                            shape->scale.GetAsString());
+  }
+  else
+  {
+    gzerr << "Unknown geometry type[" << _geom->type << "]\n";
+    return false;
+  }
+
+  geomNode->LinkEndChild( shapeNode );
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Material> &_mat)
+{
+  TiXmlElement *matNode = new TiXmlElement("material");
+  _parent->LinkEndChild( matNode );
+  matNode->SetAttribute( _mat->script.GetKey(), _mat->script.GetAsString());
+
+  TiXmlElement *colorNode = new TiXmlElement("color");
+  colorNode->SetAttribute( _mat->color.GetKey(), _mat->color.GetAsString());
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Collision> &_collision)
+{
+  TiXmlElement *collisionNode = new TiXmlElement("collision");
+  _parent->LinkEndChild( collisionNode );
+  collisionNode->SetAttribute( _collision->name.GetKey(),
+                               _collision->name.GetAsString());
+
+  saveXml(collisionNode, _collision->origin);
+  saveXml(collisionNode, _collision->geometry);
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor)
+{
+  TiXmlElement *sensorNode = new TiXmlElement("sensor");
+  _parent->LinkEndChild( sensorNode );
+
+  sensorNode->SetAttribute( _sensor->name.GetKey(),
+                            _sensor->name.GetAsString() );
+  sensorNode->SetAttribute( _sensor->type.GetKey(),
+                            _sensor->type.GetAsString() );
+  sensorNode->SetAttribute( _sensor->alwaysOn.GetKey(),
+                            _sensor->alwaysOn.GetAsString() );
+  sensorNode->SetAttribute( _sensor->updateRate.GetKey(),
+                            _sensor->updateRate.GetAsString() );
+
+  saveXml(sensorNode, _sensor->origin);
+
+  if (_sensor->sensorType->type == SensorType::CAMERA)
+  {
+    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor->sensorType);
+    saveXml( sensorNode, camera);
+  }
+  else if (_sensor->sensorType->type == SensorType::RAY)
+  {
+    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor->sensorType);
+    saveXml( sensorNode, ray);
+  }
+  else if (_sensor->sensorType->type != SensorType::CONTACT)
+  {
+    gzerr << "Unknown sensor type[" << _sensor->type << "]\n";
+    return false;
+  }
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Camera> &_camera)
+{
+  TiXmlElement *hfovNode = new TiXmlElement("horizontal_fov");
+  _parent->LinkEndChild( hfovNode );
+  hfovNode->SetAttribute( _camera->horizontalFov.GetKey(),
+                          _camera->horizontalFov.GetAsString() );
+
+  TiXmlElement *imageNode = new TiXmlElement("image");
+  _parent->LinkEndChild( imageNode );
+  imageNode->SetAttribute( _camera->imageWidth.GetKey(),
+                           _camera->imageWidth.GetAsString() );
+  imageNode->SetAttribute( _camera->imageHeight.GetKey(),
+                           _camera->imageHeight.GetAsString() );
+
+  TiXmlElement *clipNode = new TiXmlElement("clip");
+  _parent->LinkEndChild( clipNode );
+  clipNode->SetAttribute( _camera->clipNear.GetKey(),
+                          _camera->clipNear.GetAsString() );
+  clipNode->SetAttribute( _camera->clipFar.GetKey(),
+                          _camera->clipFar.GetAsString() );
+
+  TiXmlElement *saveNode = new TiXmlElement("save");
+  _parent->LinkEndChild( saveNode );
+  saveNode->SetAttribute( _camera->saveEnabled.GetKey(),
+                          _camera->saveEnabled.GetAsString() );
+  saveNode->SetAttribute( _camera->savePath.GetKey(),
+                          _camera->savePath.GetAsString() );
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Ray> &_ray)
+{
+  TiXmlElement *scanNode = new TiXmlElement("scan");
+  _parent->LinkEndChild( scanNode );
+  scanNode->SetAttribute( _ray->display.GetKey(),
+                          _ray->display.GetAsString() );
+
+  TiXmlElement *horizontalNode = new TiXmlElement("horizontal");
+  _parent->LinkEndChild( horizontalNode );
+  horizontalNode->SetAttribute( _ray->horizontalSamples.GetKey(),
+                                _ray->horizontalSamples.GetAsString() );
+  horizontalNode->SetAttribute( _ray->horizontalResolution.GetKey(),
+                                _ray->horizontalResolution.GetAsString() );
+  horizontalNode->SetAttribute( _ray->horizontalMinAngle.GetKey(),
+                                _ray->horizontalMinAngle.GetAsString() );
+  horizontalNode->SetAttribute( _ray->horizontalMaxAngle.GetKey(),
+                                _ray->horizontalMaxAngle.GetAsString() );
+
+  TiXmlElement *verticalNode = new TiXmlElement("vertical");
+  _parent->LinkEndChild( verticalNode );
+  verticalNode->SetAttribute( _ray->verticalSamples.GetKey(),
+                              _ray->verticalSamples.GetAsString() );
+  verticalNode->SetAttribute( _ray->verticalResolution.GetKey(),
+                              _ray->verticalResolution.GetAsString() );
+  verticalNode->SetAttribute( _ray->verticalMinAngle.GetKey(),
+                              _ray->verticalMinAngle.GetAsString() );
+  verticalNode->SetAttribute( _ray->verticalMaxAngle.GetKey(),
+                              _ray->verticalMaxAngle.GetAsString() );
+
+  TiXmlElement *rangeNode = new TiXmlElement("range");
+  _parent->LinkEndChild( rangeNode );
+  rangeNode->SetAttribute( _ray->rangeMin.GetKey(),
+                           _ray->rangeMin.GetAsString() );
+  rangeNode->SetAttribute( _ray->rangeMax.GetKey(),
+                           _ray->rangeMax.GetAsString() );
+  rangeNode->SetAttribute( _ray->rangeResolution.GetKey(),
+                           _ray->rangeResolution.GetAsString() );
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Inertial> &_inertial)
+{
+  TiXmlElement *inertialNode = new TiXmlElement("inertial");
+  _parent->LinkEndChild( inertialNode );
+  inertialNode->SetAttribute(_inertial->mass.GetKey(),
+                             _inertial->mass.GetAsString());
+
+
+  saveXml(inertialNode, _inertial->origin);
+
+  TiXmlElement *inertiaNode = new TiXmlElement("inertia");
+  inertialNode->LinkEndChild(inertiaNode);
+  inertiaNode->SetAttribute( _inertial->ixx.GetKey(),
+                             _inertial->ixx.GetAsString() );
+  inertiaNode->SetAttribute( _inertial->ixy.GetKey(),
+                             _inertial->ixy.GetAsString() );
+  inertiaNode->SetAttribute( _inertial->ixz.GetKey(),
+                             _inertial->ixz.GetAsString() );
+  inertiaNode->SetAttribute( _inertial->iyy.GetKey(),
+                             _inertial->iyy.GetAsString() );
+  inertiaNode->SetAttribute( _inertial->iyz.GetKey(),
+                             _inertial->iyz.GetAsString() );
+  inertiaNode->SetAttribute( _inertial->izz.GetKey(),
+                             _inertial->izz.GetAsString() );
+
   return true;
 }
 

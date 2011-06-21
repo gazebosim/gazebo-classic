@@ -50,7 +50,7 @@ namespace sdf
   {
     public: Scene() : ambientColor("rgba", Color()),
             backgroundColor("rgba",Color()),
-            skyMaterial("script",""),
+            skyMaterial("material",""),
             shadowEnabled("enabled",true),
             shadowColor("rgba",Color()),
             shadowType("type","")

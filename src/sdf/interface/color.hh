@@ -110,8 +110,8 @@ namespace sdf
   public: friend std::ostream &operator<<( std::ostream &_out, 
                                            const Color &_color)
           {
-            _out << "rgba='" << _color.r << " " << _color.g << " " 
-                 << _color.b << " " << _color.a << "'";
+            _out <<  _color.r << " " << _color.g << " " 
+                 << _color.b << " " << _color.a;
             return _out;
           }
  

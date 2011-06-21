@@ -90,14 +90,15 @@ namespace sdf
     public: enum
             {
               UNKNOWN, REVOLUTE, REVOLUTE2, PRISMATIC, PISTON, BALL, UNIVERSAL
-            } type;
+            } typeEnum;
 
-    public: Joint() : name("name",""), axis("axis",Vector3()), 
+    public: Joint() : name("name",""), type("type",""), axis("axis",Vector3()), 
             axis2("axis2", Vector3()), childLinkName("link", ""), 
             parentLinkName("link", ""), origin("origin", Pose())
     { this->Clear(); };
 
     public: ParamT<std::string,true> name;
+    public: ParamT<std::string,true> type;
 
     /// \brief     type_       meaning of axis_
     /// ------------------------------------------------------
@@ -137,7 +138,7 @@ namespace sdf
               this->origin.Reset();
               this->dynamics.reset();
               this->limits.reset();
-              this->type = UNKNOWN;
+              this->typeEnum = UNKNOWN;
             };
 
     public: void Print(const std::string &_prefix)

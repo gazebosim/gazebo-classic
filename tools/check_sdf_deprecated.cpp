@@ -74,6 +74,8 @@ int main(int argc, char** argv)
 
   std::cout << "\n";
 
+  saveXml("/tmp/test.xml", world);
+
   return 0;
 }
 

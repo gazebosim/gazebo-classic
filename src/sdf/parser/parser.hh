@@ -34,8 +34,8 @@
 
 /* Author: Nate Koenig, John Hsu */
 
-#ifndef URDF_PARSER_HH
-#define URDF_PARSER_HH
+#ifndef SDF_PARSER_HH
+#define SDF_PARSER_HH
 
 #include <string>
 #include <map>
@@ -87,6 +87,7 @@ namespace sdf
   bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model);
 
 
+
   /// \brief Load world given a filename
   bool initFile(const std::string &_filename, 
                 boost::shared_ptr<World> &_world);
@@ -113,17 +114,30 @@ namespace sdf
   /// Pose
   bool InitXml(TiXmlElement *_xml, Pose &_pose);
 
+  bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Scene> &_scene);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Physics> &_physics);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<OpenDynamicsEngine> &_engine);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Model> &_model);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Link> &_link);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Joint> &_joint);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Plugin> &_plugin);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Visual> &_visual);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Collision> &_collision);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Inertial> &_inertial);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Material> &_mat);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Geometry> &_geom);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Camera> &_camera);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Ray> &_ray);
 
-  bool getBoolFromStr(std::string _key, bool &_value, 
-                      bool _default, bool _required);
- 
-  bool getDoubleFromStr(const std::string &_key, double &_value,
-                        double _default, bool _required);
- 
-  bool getIntFromStr(const std::string &_key, int &_value);
-    
-  bool getUIntFromStr(const std::string &_str, unsigned int &_value);
+  bool saveXml(TiXmlElement *_parent, const Vector3 &_vec);
+  bool saveXml(TiXmlElement *_parent, const Rotation &_rot);
+  bool saveXml(TiXmlElement *_parent, const ParamT<Pose,true> &_pose);
+  bool saveXml(TiXmlElement *_parent, const ParamT<Pose,false> &_pose);
 
+  /// \brief Helper function to get plugins that are children of the passed
+  ///        xml node
   bool getPlugins(TiXmlElement *pluginXml, std::map<std::string, 
                   boost::shared_ptr<Plugin> > &plugins);
 }

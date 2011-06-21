@@ -111,7 +111,7 @@ namespace sdf
   
   class Material
   {
-    public: Material(): script("script", ""), color("color",Color())
+    public: Material(): script("script", ""), color("rgba",Color())
             { this->Clear(); }
     public: ParamT<std::string, false> script;
     public: ParamT<Color, false> color;
@@ -154,10 +154,13 @@ namespace sdf
   
   class Visual
   {
-    public: Visual() :origin("origin", Pose()), 
-                      name("name","") { this->Clear(); };
+    public: Visual() :origin("origin", Pose()), name("name",""),
+            castShadows("cast_shadows", true)
+            { this->Clear(); };
+
     public: ParamT<Pose, false> origin;
     public: ParamT<std::string, true> name;
+    public: ParamT<bool, false> castShadows;
 
     public: boost::shared_ptr<Geometry> geometry;
     public: boost::shared_ptr<Material> material;
@@ -202,9 +205,13 @@ namespace sdf
   
   class Link
   {
-    public: Link() : name("name", "") { this->Clear(); };
+    public: Link() : name("name", ""), selfCollide("self_collide", false), 
+                     gravity("gravity",true) 
+    { this->Clear(); };
 
     public: ParamT<std::string, true> name;
+    public: ParamT<bool, false> selfCollide;
+    public: ParamT<bool, false> gravity;
 
     /// inertial element
     public: boost::shared_ptr<Inertial> inertial;

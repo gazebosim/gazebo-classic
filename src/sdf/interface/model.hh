@@ -74,9 +74,9 @@ namespace sdf
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
 
-    public: void Clear();
-  
     public: ParamT<std::string,true> name;
+
+    public: void Clear();
   
     /// non-const getLink()
     private: void GetLink(const std::string &_name, 

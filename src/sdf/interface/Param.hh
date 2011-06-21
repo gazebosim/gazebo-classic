@@ -58,7 +58,9 @@ namespace sdf
               {return std::string();}
 
       /// \brief Set the parameter value from a string
-      public: virtual bool Set(const std::string &) {return true;}
+      public: virtual bool Set(const char * /*_string*/) {return true;}
+
+      public: const std::string &GetKey() const {return this->key;} 
 
       public: std::string GetTypeName() const;
 
@@ -75,7 +77,7 @@ namespace sdf
       /// List of created parameters
       private: static std::vector<Param*> *params;
   
-      protected: std::string name; 
+      protected: std::string key; 
       protected: bool required;
       protected: std::string typeName;
     };
@@ -85,10 +87,10 @@ namespace sdf
     class ParamT : public Param
     {
       /// \brief Constructor
-      public: ParamT(const std::string &_name, const T &_default)
+      public: ParamT(const std::string &_key, const T &_default)
               : Param(this), value(_default), defaultValue(_default)
       {
-        this->name = _name;
+        this->key = _key;
         this->required = _required;
         this->typeName = typeid(T).name();
       }
@@ -109,13 +111,20 @@ namespace sdf
  
 
       /// \brief Set the parameter value from a string
-      public: virtual bool Set( const std::string &_str )
+      public: virtual bool Set( const char *_cstr )
       {
-        if (_str.empty() && this->required)
+        if (_cstr == NULL && this->required)
         {
           gzerr << "Empty string used when setting a required parameter\n";
           return false;
         }
+        else if (_cstr == NULL)
+        {
+          this->value = this->defaultValue;
+          return true;
+        }
+
+        std::string _str = _cstr;
 
         std::string tmp = _str;
         std::string lowerTmp = _str;
@@ -184,10 +193,10 @@ namespace sdf
     class ParamT<Vector3, _required> : public Param
     {
       /// \brief Constructor
-      public: ParamT(const std::string &_name, const Vector3 &_default)
+      public: ParamT(const std::string &_key, const Vector3 &_default)
               : Param(this), value(_default), defaultValue(_default)
       {
-        this->name = _name;
+        this->key = _key;
         this->required = _required;
         this->typeName = typeid(Vector3).name();
       }
@@ -211,13 +220,19 @@ namespace sdf
       }
 
       /// \brief Set the parameter value from a string
-      public: virtual bool Set( const std::string &_str )
+      public: virtual bool Set( const char *_str )
       {
-        if (_str.empty() && this->required)
+        if (_str == NULL && this->required)
         {
           gzerr << "Empty string used when setting a required parameter\n";
           return false;
         }
+        else if (_str == NULL)
+        {
+          this->value = this->defaultValue;
+          return true;
+        }
+
         return this->value.Init(_str);
       } 
 
@@ -256,10 +271,10 @@ namespace sdf
     class ParamT<Color, _required> : public Param
     {
       /// \brief Constructor
-      public: ParamT(const std::string &_name, const Color &_default)
+      public: ParamT(const std::string &_key, const Color &_default)
               : Param(this), value(_default), defaultValue(_default)
       {
-        this->name = _name;
+        this->key = _key;
         this->required = _required;
         this->typeName = typeid(Color).name();
       }
@@ -283,13 +298,19 @@ namespace sdf
       }
 
       /// \brief Set the parameter value from a string
-      public: virtual bool Set( const std::string &_str )
+      public: virtual bool Set( const char *_str )
       {
-        if (_str.empty() && this->required)
+        if (_str == NULL && this->required)
         {
           gzerr << "Empty string used when setting a required parameter\n";
           return false;
         }
+        else if (_str == NULL)
+        {
+          this->value = this->defaultValue;
+          return true;
+        }
+
         return this->value.Init(_str);
       } 
 
@@ -328,10 +349,10 @@ namespace sdf
     class ParamT<Pose, _required> : public Param
     {
       /// \brief Constructor
-      public: ParamT(const std::string &_name, const Pose &_default)
+      public: ParamT(const std::string &_key, const Pose &_default)
               : Param(this), value(_default), defaultValue(_default)
       {
-        this->name = _name;
+        this->key = _key;
         this->required = _required;
         this->typeName = typeid(Pose).name();
       }
@@ -357,25 +378,31 @@ namespace sdf
       }
 
       /// \brief Set the parameter value from a string
-      public: virtual bool Set( const std::string &_xyz, 
-                                const std::string &_rpy )
+      public: virtual bool Set( const char *_xyz, 
+                                const char *_rpy )
       {
-        if ( (_xyz.empty() && _rpy.empty()) && this->required)
+        if ( (!_xyz && !_rpy) && this->required)
         {
           gzerr << "Empty string used when setting a required parameter\n";
           return false;
         }
 
-        if (!this->value.position.Init(_xyz))
+        if (_xyz && !this->value.position.Init(_xyz))
         {
           gzerr << "Unable to set position value\n";
           return false;
         }
-        if (!this->value.rotation.Init(_rpy))
+        else
+          this->value.position = this->defaultValue.position;
+
+        if (_rpy && !this->value.rotation.Init(_rpy))
         {
           gzerr << "Unable to set rotation value\n";
           return false;
         }
+        else
+          this->value.rotation = this->defaultValue.rotation;
+
 
         return true;
       } 
