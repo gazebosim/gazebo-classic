@@ -39,6 +39,15 @@
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
+        <surface>
+          <friction>
+            <ode mu="1.0" mu2="0" fdir1="1.1" slip1="0.1" slip2="0.2"/>
+          </friction>
+          <bounce restitution_coefficient="0.5" threshold="0.2"/>
+          <contact>
+            <ode soft_cfm="0.0" kp="100" kd="10" max_vel="0.4" min_depth="0.3"/>
+          </contact>
+        </surface>
       </collision>
     
       <visual name="visual_1">

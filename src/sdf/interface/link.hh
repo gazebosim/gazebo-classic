@@ -178,21 +178,103 @@ namespace sdf
               std::cout << _prefix << "Visual Name[" << this->name << "]\n";
             }
   };
+
+  class Friction
+  {
+    public: enum Type {UNKNOWN, ODE};
+    public: Friction(Type _t) : type(_t) {}
+    public: Type type;
+  };
+
+  class ODEFriction : public Friction
+  {
+    public: ODEFriction() : Friction(ODE), mu("mu",0.0), mu2("mu2",0), fdir1("fdir1",0), 
+            slip1("slip1",0), slip2("slip2",0)
+            { this->Clear(); }
+
+    public: ParamT<double, true> mu;
+    public: ParamT<double, false> mu2;
+    public: ParamT<double, false> fdir1;
+    public: ParamT<double, false> slip1;
+    public: ParamT<double, false> slip2;
+
+    public: void Clear()
+            {
+              this->mu.Reset();
+              this->mu2.Reset();
+              this->fdir1.Reset();
+              this->slip1.Reset();
+              this->slip2.Reset();
+            }
+  };
+
+  class Contact
+  {
+    public: enum Type {UNKNOWN, ODE};
+    public: Contact(Type _t) : type(_t) {}
+    public: Type type;
+  };
+
+  class ODEContact : public Contact
+  {
+    public: ODEContact() : Contact(ODE), softCFM("soft_cfm",0), kp("kp",0), kd("kd",0), 
+            maxVel("max_vel",0), minDepth("min_depth",0)
+    { this->Clear(); }
+
+    public: ParamT<double, false> softCFM;
+    public: ParamT<double, false> kp;
+    public: ParamT<double, false> kd;
+    public: ParamT<double, false> maxVel;
+    public: ParamT<double, false> minDepth;
+
+    public: void Clear()
+            {
+              this->softCFM.Reset();
+              this->kp.Reset();
+              this->kd.Reset();
+              this->maxVel.Reset();
+              this->minDepth.Reset();
+            }
+  };
+
+  class Surface
+  {
+    public: Surface() : bounceRestCoeff("restitution_coefficient",0), 
+            bounceThreshold("threshold",0) 
+    { this->Clear(); }
+
+    public: ParamT<double, true> bounceRestCoeff;
+    public: ParamT<double, true> bounceThreshold;
+    public: std::vector< boost::shared_ptr<Contact> > contacts;
+    public: std::vector< boost::shared_ptr<Friction> > frictions;
+
+    public: void Clear()
+            {
+              this->bounceRestCoeff.Reset();
+              this->bounceThreshold.Reset();
+              this->contacts.clear();
+              this->frictions.clear();
+            }
+
+  };
   
   class Collision
   {
-    public: Collision(): origin("origin", Pose()), name("name","") 
-    { this->Clear(); };
+    public: Collision(): origin("origin", Pose()), name("name","")
+    { this->Clear(); }
 
     public: ParamT<Pose, false> origin;
     public: ParamT<std::string, true> name;
+
     public: boost::shared_ptr<Geometry> geometry;
+    public: boost::shared_ptr<Surface> surface;
 
     public: void Clear()
             {
               this->origin.Reset();
               this->name.Reset();
-              geometry.reset();
+              this->geometry.reset();
+              this->surface.reset();
             };
 
 

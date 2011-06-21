@@ -100,14 +100,14 @@ namespace sdf
     }
   };
   
-  class Contact : public SensorType
+  class ContactSensor : public SensorType
   {
-    public: Contact() : SensorType(CONTACT) {}
+    public: ContactSensor() : SensorType(CONTACT) {}
   };
   
-  class Camera : public SensorType
+  class CameraSensor : public SensorType
   {
-    public: Camera() : SensorType(CAMERA), horizontalFov("horizontal_fov", 0.0),
+    public: CameraSensor() : SensorType(CAMERA), horizontalFov("horizontal_fov", 0.0),
             imageWidth("width",0), imageHeight("height",0),
             imageFormat("format","R8G8B8"), clipNear("near",0.0), 
             clipFar("far",1.0), saveEnabled("enabled", false), 
@@ -136,9 +136,9 @@ namespace sdf
     }
   };
   
-  class Ray : public SensorType
+  class RaySensor : public SensorType
   {
-    public: Ray() : SensorType(RAY), 
+    public: RaySensor() : SensorType(RAY), 
             display("display", false),
             horizontalSamples("samples",1), 
             horizontalResolution("resolution", 1), 

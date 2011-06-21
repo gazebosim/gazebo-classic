@@ -131,17 +131,17 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<SensorType> &_sensorType)
 {
   if (_sensorType->type == SensorType::CAMERA)
   {
-    boost::shared_ptr<Camera> cameraSensor = boost::shared_static_cast<Camera>( _sensorType);
+    boost::shared_ptr<CameraSensor> cameraSensor = boost::shared_static_cast<CameraSensor>( _sensorType);
     return initXml(_config, cameraSensor);
   }
   else if (_sensorType->type == SensorType::RAY)
   {
-    boost::shared_ptr<Ray> raySensor(boost::shared_static_cast<Ray>( _sensorType));
+    boost::shared_ptr<RaySensor> raySensor(boost::shared_static_cast<RaySensor>( _sensorType));
     return initXml(_config, raySensor);
   }
   else if (_sensorType->type == SensorType::CONTACT)
   {
-    boost::shared_ptr<Contact> contactSensor(boost::shared_static_cast<Contact>( _sensorType));
+    boost::shared_ptr<ContactSensor> contactSensor(boost::shared_static_cast<ContactSensor>( _sensorType));
     return initXml(_config, contactSensor);
   }
   else
@@ -173,17 +173,17 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
 
   if (_sensor->type.GetValue() == "camera")
   {
-    _sensor->sensorType.reset(new Camera);
+    _sensor->sensorType.reset(new CameraSensor);
     initXml(_config, _sensor->sensorType);
   }
   else if (_sensor->type.GetValue() == "ray")
   {
-    _sensor->sensorType.reset(new Ray);
+    _sensor->sensorType.reset(new RaySensor);
     initXml(_config, _sensor->sensorType);
   }
   else if (_sensor->type.GetValue() == "contact")
   {
-    _sensor->sensorType.reset(new Contact);
+    _sensor->sensorType.reset(new ContactSensor);
     initXml(_config, _sensor->sensorType);
   }
   else
@@ -223,7 +223,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<CameraSensor> &_sensor)
 {
   _sensor->Clear();
 
@@ -307,7 +307,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<RaySensor> &_sensor)
 {
   _sensor->Clear();
 
@@ -562,8 +562,156 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision)
     return false;
   }
 
+  // Surface
+  TiXmlElement *surface = _config->FirstChildElement("surface");
+  if (surface)
+  {
+    _collision->surface.reset(new Surface);
+    if (!initXml(surface, _collision->surface))
+    {
+      gzerr << "Unable to parse collision surface element\n";
+      return false;
+    }
+  }
+
   return true;
 }
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
+{
+  _surface->Clear();
+  TiXmlElement *friction = _config->FirstChildElement("friction");
+  if (friction)
+  {
+    _surface->frictions.clear();
+
+    for (TiXmlElement* frictionXml = friction->FirstChildElement(); 
+        frictionXml; frictionXml = frictionXml->NextSiblingElement())
+    {
+      if (std::string(frictionXml->Value()) == "ode")
+      {
+        boost::shared_ptr<ODEFriction> odeFriction( new ODEFriction );
+        if (!initXml(frictionXml, odeFriction))
+        {
+          gzerr << "Unable to parse ODE Friction element\n";
+          return false;
+        }
+        _surface->frictions.push_back( odeFriction );
+      }
+
+    }
+  }
+
+  TiXmlElement *bounce = _config->FirstChildElement("bounce");
+  if (bounce)
+  {
+    if (!_surface->bounceRestCoeff.Set( bounce->Attribute("restitution_coefficient") ))
+    {
+      gzerr << "Unable to set surface bouce restitution_coefficient\n";
+      return false;
+    }
+
+    if (!_surface->bounceThreshold.Set( bounce->Attribute("threshold") ))
+    {
+      gzerr << "Unable to set surface bouce threshold\n";
+      return false;
+    }
+  }
+
+  TiXmlElement *contact = _config->FirstChildElement("contact");
+  if (contact)
+  {
+    _surface->contacts.clear();
+
+    for (TiXmlElement* contactXml = contact->FirstChildElement(); 
+        contactXml; contactXml = contactXml->NextSiblingElement())
+    {
+      if (std::string(contactXml->Value()) == "ode")
+      {
+        boost::shared_ptr<ODEContact> odeContact( new ODEContact );
+        if (!initXml(contactXml, odeContact))
+        {
+          gzerr << "Unable to parse ODE Contact element\n";
+          return false;
+        }
+        _surface->contacts.push_back( odeContact );
+      }
+    }
+  }
+
+  return true;
+}
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEFriction> &_friction)
+{
+  if (!_friction->mu.Set( _config->Attribute("mu") ))
+  {
+    gzerr << "Unable to parse ODE friction mu element\n";
+    return false;
+  }
+
+  if (!_friction->mu2.Set( _config->Attribute("mu2") ))
+  {
+    gzerr << "Unable to parse ODE friction mu2 element\n";
+    return false;
+  }
+
+  if (!_friction->fdir1.Set( _config->Attribute("fdir1") ))
+  {
+    gzerr << "Unable to parse ODE friction fdir1 element\n";
+    return false;
+  }
+
+  if (!_friction->slip1.Set( _config->Attribute("slip1") ))
+  {
+    gzerr << "Unable to parse ODE friction slip1 element\n";
+    return false;
+  }
+
+  if (!_friction->slip2.Set( _config->Attribute("slip2") ))
+  {
+    gzerr << "Unable to parse ODE friction slip2 element\n";
+    return false;
+  }
+
+  return true;
+}
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEContact> &_contact)
+{
+  if (!_contact->softCFM.Set( _config->Attribute("soft_cfm") ))
+  {
+    gzerr << "Unable to parse ODE contact soft_cfm element\n";
+    return false;
+  }
+
+  if (!_contact->kp.Set( _config->Attribute("kp") ))
+  {
+    gzerr << "Unable to parse ODE contact kp element\n";
+    return false;
+  }
+
+  if (!_contact->kd.Set( _config->Attribute("kd") ))
+  {
+    gzerr << "Unable to parse ODE contact kd element\n";
+    return false;
+  }
+
+  if (!_contact->maxVel.Set( _config->Attribute("max_vel") ))
+  {
+    gzerr << "Unable to parse ODE contact max_vel element\n";
+    return false;
+  }
+
+  if (!_contact->minDepth.Set( _config->Attribute("min_depth") ))
+  {
+    gzerr << "Unable to parse ODE contact min_depth element\n";
+    return false;
+  }
+
+  return true;
+}
+
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere)
 {
@@ -1493,7 +1641,7 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
 }
 
 bool initXml(TiXmlElement * /*_config*/, 
-             boost::shared_ptr<Contact> &/*_contact*/)
+             boost::shared_ptr<ContactSensor> &/*_contact*/)
 {
   return true;
 }
@@ -1912,6 +2060,9 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Collision> &_collisi
   saveXml(collisionNode, _collision->origin);
   saveXml(collisionNode, _collision->geometry);
 
+  if (_collision->surface)
+    saveXml(collisionNode, _collision->surface);
+
   return true;
 }
 
@@ -1933,12 +2084,12 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor)
 
   if (_sensor->sensorType->type == SensorType::CAMERA)
   {
-    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor->sensorType);
+    boost::shared_ptr<CameraSensor> camera = boost::shared_static_cast<CameraSensor>(_sensor->sensorType);
     saveXml( sensorNode, camera);
   }
   else if (_sensor->sensorType->type == SensorType::RAY)
   {
-    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor->sensorType);
+    boost::shared_ptr<RaySensor> ray = boost::shared_static_cast<RaySensor>(_sensor->sensorType);
     saveXml( sensorNode, ray);
   }
   else if (_sensor->sensorType->type != SensorType::CONTACT)
@@ -1950,7 +2101,7 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Camera> &_camera)
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<CameraSensor> &_camera)
 {
   TiXmlElement *hfovNode = new TiXmlElement("horizontal_fov");
   _parent->LinkEndChild( hfovNode );
@@ -1981,7 +2132,7 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Camera> &_camera)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Ray> &_ray)
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<RaySensor> &_ray)
 {
   TiXmlElement *scanNode = new TiXmlElement("scan");
   _parent->LinkEndChild( scanNode );
@@ -2045,6 +2196,90 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Inertial> &_inertial
                              _inertial->iyz.GetAsString() );
   inertiaNode->SetAttribute( _inertial->izz.GetKey(),
                              _inertial->izz.GetAsString() );
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, boost::shared_ptr<Surface> &_surface)
+{
+  TiXmlElement *surfaceNode = new TiXmlElement("surface");
+  _parent->LinkEndChild( surfaceNode );
+
+  TiXmlElement *bounceNode = new TiXmlElement("bounce");
+  surfaceNode->LinkEndChild( bounceNode );
+  bounceNode->SetAttribute( _surface->bounceRestCoeff.GetKey(),
+                            _surface->bounceRestCoeff.GetAsString() );
+  bounceNode->SetAttribute( _surface->bounceThreshold.GetKey(),
+                            _surface->bounceThreshold.GetAsString() );
+
+  if (_surface->frictions.size() > 0)
+  {
+    TiXmlElement *frictionNode = new TiXmlElement("friction");
+    surfaceNode->LinkEndChild( frictionNode );
+
+    std::vector< boost::shared_ptr<Friction> >::const_iterator fiter;
+    for (fiter = _surface->frictions.begin(); fiter != _surface->frictions.end(); fiter++)
+    {
+      if ((*fiter)->type == Friction::ODE)
+      {
+        boost::shared_ptr<ODEFriction> odeFriction = boost::shared_static_cast<ODEFriction>(*fiter);
+        saveXml(frictionNode, odeFriction);
+      }
+    }
+  }
+
+  if (_surface->contacts.size() > 0)
+  {
+    TiXmlElement *contactNode = new TiXmlElement("contact");
+    surfaceNode->LinkEndChild( contactNode );
+
+    std::vector< boost::shared_ptr<Contact> >::const_iterator citer;
+    for (citer = _surface->contacts.begin(); citer != _surface->contacts.end(); citer++)
+    {
+      if ((*citer)->type == Contact::ODE)
+      {
+        boost::shared_ptr<ODEContact> odeContact = boost::shared_static_cast<ODEContact>(*citer);
+        saveXml(contactNode, odeContact);
+      }
+    }
+  }
+
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEFriction> &_friction)
+{
+  TiXmlElement *odeNode = new TiXmlElement("ode");
+  _parent->LinkEndChild( odeNode );
+
+  odeNode->SetAttribute( _friction->mu.GetKey(),
+                         _friction->mu.GetAsString() );
+  odeNode->SetAttribute( _friction->mu2.GetKey(),
+                         _friction->mu2.GetAsString() );
+  odeNode->SetAttribute( _friction->fdir1.GetKey(),
+                         _friction->fdir1.GetAsString() );
+  odeNode->SetAttribute( _friction->slip1.GetKey(),
+                         _friction->slip1.GetAsString() );
+  odeNode->SetAttribute( _friction->slip2.GetKey(),
+                         _friction->slip2.GetAsString() );
+  return true;
+}
+
+bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEContact> &_contact)
+{
+  TiXmlElement *odeNode = new TiXmlElement("ode");
+  _parent->LinkEndChild( odeNode );
+
+  odeNode->SetAttribute( _contact->softCFM.GetKey(),
+                         _contact->softCFM.GetAsString() );
+  odeNode->SetAttribute( _contact->kp.GetKey(),
+                         _contact->kp.GetAsString() );
+  odeNode->SetAttribute( _contact->kd.GetKey(),
+                         _contact->kd.GetAsString() );
+  odeNode->SetAttribute( _contact->maxVel.GetKey(),
+                         _contact->maxVel.GetAsString() );
+  odeNode->SetAttribute( _contact->minDepth.GetKey(),
+                         _contact->minDepth.GetAsString() );
 
   return true;
 }

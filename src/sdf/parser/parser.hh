@@ -54,9 +54,9 @@ namespace sdf
 {
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<SensorType> &_sensor_type);
-  bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_contact);
-  bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
-  bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<ContactSensor> &_contact);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<CameraSensor> &_sensor);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<RaySensor> &_sensor);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision);
@@ -111,6 +111,10 @@ namespace sdf
   /// OpenDynamicsEngine
   bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
 
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEFriction> &_friction);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEContact> &_contact);
+
   /// Pose
   bool InitXml(TiXmlElement *_xml, Pose &_pose);
 
@@ -128,13 +132,18 @@ namespace sdf
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor);
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Material> &_mat);
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Geometry> &_geom);
-  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Camera> &_camera);
-  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Ray> &_ray);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<CameraSensor> &_camera);
+  bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<RaySensor> &_ray);
 
   bool saveXml(TiXmlElement *_parent, const Vector3 &_vec);
   bool saveXml(TiXmlElement *_parent, const Rotation &_rot);
   bool saveXml(TiXmlElement *_parent, const ParamT<Pose,true> &_pose);
   bool saveXml(TiXmlElement *_parent, const ParamT<Pose,false> &_pose);
+
+  bool saveXml(TiXmlElement *_parent, boost::shared_ptr<Surface> &_surface);
+  bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEFriction> &_friction);
+  bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEContact> &_contact);
+
 
   /// \brief Helper function to get plugins that are children of the passed
   ///        xml node

@@ -135,17 +135,17 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<SensorType> &_sensorType)
 {
   if (_sensorType->type == SensorType::CAMERA)
   {
-    boost::shared_ptr<Camera> cameraSensor = boost::shared_static_cast<Camera>( _sensorType);
+    boost::shared_ptr<CameraSensor> cameraSensor = boost::shared_static_cast<CameraSensor>( _sensorType);
     return initXml(_config, cameraSensor);
   }
   else if (_sensorType->type == SensorType::RAY)
   {
-    boost::shared_ptr<Ray> raySensor(boost::shared_static_cast<Ray>( _sensorType));
+    boost::shared_ptr<RaySensor> raySensor(boost::shared_static_cast<RaySensor>( _sensorType));
     return initXml(_config, raySensor);
   }
   else if (_sensorType->type == SensorType::CONTACT)
   {
-    boost::shared_ptr<Contact> contactSensor(boost::shared_static_cast<Contact>( _sensorType));
+    boost::shared_ptr<ContactSensor> contactSensor(boost::shared_static_cast<ContactSensor>( _sensorType));
     return initXml(_config, contactSensor);
   }
   else
@@ -177,17 +177,17 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
 
   if (_sensor->type.GetValue() == "camera")
   {
-    _sensor->sensorType.reset(new Camera);
+    _sensor->sensorType.reset(new CameraSensor);
     initXml(_config, _sensor->sensorType);
   }
   else if (_sensor->type.GetValue() == "ray")
   {
-    _sensor->sensorType.reset(new Ray);
+    _sensor->sensorType.reset(new RaySensor);
     initXml(_config, _sensor->sensorType);
   }
   else if (_sensor->type.GetValue() == "contact")
   {
-    _sensor->sensorType.reset(new Contact);
+    _sensor->sensorType.reset(new ContactSensor);
     initXml(_config, _sensor->sensorType);
   }
   else
@@ -227,7 +227,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
+bool initXml(xmlNodePtr _config, boost::shared_ptr<CameraSensor> &_sensor)
 {
   _sensor->Clear();
 
@@ -235,7 +235,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
   xmlNodePtr hfov = FirstChildElement(_config, "horizontal_fov");
   if(!hfov)
   {
-    gzerr << "Camera missing horizontal_fov element\n";
+    gzerr << "CameraSensor missing horizontal_fov element\n";
     return false;
   }
 
@@ -249,7 +249,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
   xmlNodePtr image = FirstChildElement(_config, "image");
   if (!image)
   {
-    gzerr << "Camera sensor requires an image element \n";
+    gzerr << "CameraSensor sensor requires an image element \n";
     return false;
   }
 
@@ -275,7 +275,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
   xmlNodePtr clip = FirstChildElement(_config, "clip");
   if (!clip)
   {
-    gzerr << "Camera sensor requires an clip element \n";
+    gzerr << "CameraSensor sensor requires an clip element \n";
     return false;
   }
 
@@ -311,7 +311,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Ray> &_sensor)
+bool initXml(xmlNodePtr _config, boost::shared_ptr<RaySensor> &_sensor)
 {
   _sensor->Clear();
 
@@ -1521,7 +1521,7 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Physics> &_physics)
 }
 
 bool initXml(xmlNodePtr  /*_config*/, 
-             boost::shared_ptr<Contact> &/*_contact*/)
+             boost::shared_ptr<ContactSensor> &/*_contact*/)
 {
   return true;
 }
@@ -1962,12 +1962,12 @@ bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Sensor> &_sensor)
 
   if (_sensor->sensorType->type == SensorType::CAMERA)
   {
-    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor->sensorType);
+    boost::shared_ptr<CameraSensor> camera = boost::shared_static_cast<CameraSensor>(_sensor->sensorType);
     saveXml( sensorNode, camera);
   }
   else if (_sensor->sensorType->type == SensorType::RAY)
   {
-    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor->sensorType);
+    boost::shared_ptr<RaySensor> ray = boost::shared_static_cast<RaySensor>(_sensor->sensorType);
     saveXml( sensorNode, ray);
   }
   else if (_sensor->sensorType->type != SensorType::CONTACT)
@@ -1979,7 +1979,7 @@ bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Sensor> &_sensor)
   return true;
 }
 
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Camera> &_camera)
+bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<CameraSensor> &_camera)
 {
   xmlNodePtr hfovNode = new xmlNode("horizontal_fov");
   _parent->LinkEndChild( hfovNode );
@@ -2010,7 +2010,7 @@ bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Camera> &_camera)
   return true;
 }
 
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Ray> &_ray)
+bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<RaySensor> &_ray)
 {
   xmlNodePtr scanNode = new xmlNode("scan");
   _parent->LinkEndChild( scanNode );
