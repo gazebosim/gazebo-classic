@@ -93,36 +93,6 @@ bool getDoubleFromStr(const std::string &_str, double &_value, double _default,
   return true;
 }
 
-bool getIntFromStr(const std::string &_str, int &_value)
-{
-  try
-  {
-    _value = boost::lexical_cast<int>(_str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    gzerr << "string is not an int format\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool getUIntFromStr(const std::string &_str, unsigned int &_value)
-{
-  try
-  {
-    _value = boost::lexical_cast<unsigned int>(_str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    gzerr << "string is not an unsigned int format\n";
-    return false;
-  }
-
-  return true;
-}
-
 bool getPlugins(TiXmlElement *_parentXml, 
                 std::map<std::string, boost::shared_ptr<Plugin> > &_plugins)
 {
@@ -135,15 +105,15 @@ bool getPlugins(TiXmlElement *_parentXml,
 
     if (initXml(pluginXml, plugin))
     {
-      if (_plugins.find(plugin->name) != _plugins.end())
+      if (_plugins.find(plugin->name.GetValue()) != _plugins.end())
       {
-        gzerr << "plugin '" << plugin->name << "' is not unique.\n";
+        gzerr << "plugin '" << plugin->name.GetValue() << "' is not unique.\n";
         plugin.reset();
         return false;
       }
       else
       {
-        _plugins.insert(make_pair(plugin->name,plugin));
+        _plugins.insert(make_pair(plugin->name.GetValue(),plugin));
       }
     }
     else
@@ -817,48 +787,15 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDyna
 {
   _jointDynamics->Clear();
 
-  // Get joint damping
-  const char* dampingStr = _config->Attribute("damping");
-  if (dampingStr == NULL)
+  if (!_jointDynamics->damping.Set(_config->Attribute("damping")))
   {
-    gzwarn << "joint dynamics: no damping, defaults to 0.\n";
-    _jointDynamics->damping = 0;
-  }
-  else
-  {
-    try
-    {
-      _jointDynamics->damping = boost::lexical_cast<double>(dampingStr);
-    }
-    catch (boost::bad_lexical_cast &e)
-    {
-      gzerr << "damping value (" << dampingStr << ") is not a float.\n";
-      return false;
-    }
+    gzerr << "Unable to parse joint dynamics damping attribute\n";
+    return false;
   }
 
-  // Get joint friction
-  const char* frictionStr = _config->Attribute("friction");
-  if (frictionStr == NULL){
-    gzwarn << "joint dynamics: no friction, defaults to 0.\n";
-    _jointDynamics->friction = 0;
-  }
-  else
+  if (!_jointDynamics->friction.Set(_config->Attribute("friction")))
   {
-    try
-    {
-      _jointDynamics->friction = boost::lexical_cast<double>(frictionStr);
-    }
-    catch (boost::bad_lexical_cast &e)
-    {
-      gzerr << "friction value (" << frictionStr << ") is not a float\n";
-      return false;
-    }
-  }
-
-  if (dampingStr == NULL && frictionStr == NULL)
-  {
-    gzerr << "joint dynamics element specified with no damping and no friction\n";
+    gzerr << "Unable to parse joint dynamics friction attribute\n";
     return false;
   }
 
@@ -866,87 +803,33 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDyna
 }
 
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<JointLimits> &_jointLimits)
+bool initXml(TiXmlElement *_config, 
+             boost::shared_ptr<JointLimits> &_jointLimits)
 {
   _jointLimits->Clear();
 
-  // Get lower joint limit
-  const char* lowerStr = _config->Attribute("lower");
-  if (lowerStr == NULL)
+  if (!_jointLimits->lower.Set(_config->Attribute("lower")))
   {
-    gzwarn << "joint limit: no lower, defaults to 0.\n";
-    _jointLimits->lower = 0;
-  }
-  else
-  {
-    try
-    {
-      _jointLimits->lower = boost::lexical_cast<double>(lowerStr);
-    }
-    catch (boost::bad_lexical_cast &e)
-    {
-      gzerr << "lower value (" << lowerStr << ") is not a float\n";
-      return false;
-    }
-  }
-
-  // Get upper joint limit
-  const char* upperStr = _config->Attribute("upper");
-  if (upperStr == NULL)
-  {
-    gzwarn << "joint limit: no upper, , defaults to 0.\n";
-    _jointLimits->upper = 0;
-  }
-  else
-  {
-    try
-    {
-      _jointLimits->upper = boost::lexical_cast<double>(upperStr);
-    }
-    catch (boost::bad_lexical_cast &e)
-    {
-      gzerr << "upper value (" << upperStr << ") is not a float\n";
-      return false;
-    }
-  }
-
-  // Get joint effort limit
-  const char* effortStr = _config->Attribute("effort");
-  if (effortStr == NULL){
-    gzerr << "joint limit: no effort\n";
+    gzerr << "Unable to parse joint limit lower\n";
     return false;
   }
-  else
-  {
-    try
-    {
-      _jointLimits->effort = boost::lexical_cast<double>(effortStr);
-    }
-    catch (boost::bad_lexical_cast &e)
-    {
-      gzerr << "effort value (" << effortStr << ") is not a float.\n";
-      return false;
-    }
-  }
 
-  // Get joint velocity limit
-  const char* velocityStr = _config->Attribute("velocity");
-  if (velocityStr == NULL)
+  if (!_jointLimits->upper.Set(_config->Attribute("upper")))
   {
-    gzerr << "joint limit: no velocity\n";
+    gzerr << "Unable to parse joint limit upper\n";
     return false;
   }
-  else
+
+  if (!_jointLimits->effort.Set(_config->Attribute("effort")))
   {
-    try
-    {
-      _jointLimits->velocity = boost::lexical_cast<double>(velocityStr);
-    }
-    catch (boost::bad_lexical_cast &e)
-    {
-      gzerr << "velocity value (" << velocityStr << ") is not a float.\n";
-      return false;
-    }
+    gzerr << "Unable to parse joint limit effort\n";
+    return false;
+  }
+
+  if (!_jointLimits->effort.Set(_config->Attribute("velocity")))
+  {
+    gzerr << "Unable to parse joint limit velocity\n";
+    return false;
   }
 
   return true;
@@ -957,13 +840,11 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   _joint->Clear();
 
   // Get Joint Name
-  const char *nameStr = _config->Attribute("name");
-  if (!nameStr)
+  if (!_joint->name.Set(_config->Attribute("name")))
   {
-    gzerr << "unnamed joint found\n";
+    gzerr << "Unable to parse joint name attribute\n";
     return false;
   }
-  _joint->name = nameStr;
 
   // Get transform from Parent Link to Joint Frame
   TiXmlElement *originXml = _config->FirstChildElement("origin");
@@ -986,29 +867,35 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   TiXmlElement *parentXml = _config->FirstChildElement("parent");
   if (parentXml)
   {
-    const char *pname = parentXml->Attribute("link");
-    if (!pname)
-      gzwarn << "no parent link name specified for Joint link '" 
-        <<  _joint->name << "'. this might be the root?\n";
-    else
+    if (!_joint->parentLinkName.Set(parentXml->Attribute("link")))
     {
-      _joint->parentLinkName = std::string(pname);
+      gzerr << "Unable to parse joint parent link name\n";
+      return false;
     }
+  }
+  else
+  {
+    gzerr << "No parent link specified for joint[" << _joint->name << "]\n";
+    return false;
   }
 
   // Get Child Link
   TiXmlElement *childXml = _config->FirstChildElement("child");
   if (childXml)
   {
-    const char *pname = childXml->Attribute("link");
-    if (!pname)
-      gzwarn << "no child link name specified for Joint link '" 
-        << _joint->name << "'.\n";
-    else
+    if (!_joint->childLinkName.Set(childXml->Attribute("link")))
     {
-      _joint->childLinkName = std::string(pname);
+      gzerr << "Unable to parse joint child link name\n";
+      return false;
     }
   }
+  else
+  {
+    gzerr << "No child link specified for joint[" << _joint->name << "]\n";
+    return false;
+  }
+
+
 
   // Get Joint type
   const char* typeChar = _config->Attribute("type");
@@ -1047,23 +934,13 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
     {
       gzwarn << "no axis elemement for Joint link '" 
         << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis = Vector3(1.0, 0.0, 0.0);
+      _joint->axis.SetValue( Vector3(1.0, 0.0, 0.0));
     }
     else{
-      if (!axisXml->Attribute("xyz"))
+      if (!_joint->axis.Set( axisXml->Attribute("xyz")) )
       {
-        gzwarn << "no xyz attribute for axis element for Joint link '" 
-          << _joint->name << "'.\n";
-      }
-      else 
-      {
-        if (!_joint->axis.Init(axisXml->Attribute("xyz")))
-        {
-          gzerr << "Malformed axis element for joint '" 
-            << _joint->name << "'.\n";
-          _joint->axis.Clear();
-          return false;
-        }
+        gzerr << "Unable to parse axis for joint[" << _joint->name << "]\n";
+        return false;
       }
     }
   }
@@ -1150,14 +1027,11 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
   if (!_xml) 
     return false;
 
-  // Get model name
-  const char *nameStr = _xml->Attribute("name");
-  if (!nameStr)
+  if (!_model->name.Set(_xml->Attribute("name")))
   {
     gzerr << "No name given for the model.\n";
     return false;
   }
-  _model->name = std::string(nameStr);
 
   // Get all Link elements
   for (TiXmlElement* linkXml = _xml->FirstChildElement("link"); 
@@ -1202,7 +1076,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
 
     if (initXml(jointXml,joint))
     {
-      if (_model->GetJoint(joint->name))
+      if (_model->GetJoint(joint->name.GetValue()))
       {
         gzerr << "joint '" << joint->name << "' is not unique.\n";
         joint.reset();
@@ -1210,7 +1084,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
       }
       else
       {
-        _model->joints.insert(make_pair(joint->name,joint));
+        _model->joints.insert(make_pair(joint->name.GetValue(),joint));
       }
     }
     else
@@ -1291,21 +1165,17 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin)
 {
   _plugin->Clear();
 
-  const char *nameChar = _config->Attribute("name");
-  if (!nameChar)
+  if (!_plugin->name.Set(_config->Attribute("name")))
   {
-    gzerr << "No name given for the plugin.\n";
+    gzerr << "Unable to parse the plugin name.\n";
     return false;
   }
-  _plugin->name = std::string(nameChar);
 
-  const char *filenameChar = _config->Attribute("filename");
-  if (!filenameChar)
+  if (!_plugin->filename.Set(_config->Attribute("filename")))
   {
-    gzerr << "No filename given for the plugin.\n";
+    gzerr << "Unable to parse plugin filename.\n";
     return false;
   }
-  _plugin->filename = std::string(filenameChar);
 
   return true;
 }
@@ -1366,7 +1236,12 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
     gzerr << "No name given for the world->\n";
     return false;
   }
-  _world->name = std::string(nameStr);
+
+  if (!_world->name.Set(std::string(nameStr)))
+  {
+    gzerr << "Unable to parse world name\n";
+    return false;
+  }
 
   _world->scene.reset(new Scene);
   initXml(_worldXml->FirstChildElement("scene"),_world->scene);
@@ -1383,7 +1258,7 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
 
     if (initXml(modelXml,model))
     {
-      if (_world->GetModel(model->name))
+      if (_world->GetModel(model->name.GetValue()))
       {
         gzerr << "model '" << model->name << "' is not unique.\n";
         model.reset();
@@ -1391,7 +1266,7 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
       }
       else
       {
-        _world->models.insert(make_pair(model->name,model));
+        _world->models.insert(make_pair(model->name.GetValue(),model));
       }
     }
     else
@@ -1411,7 +1286,7 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
 
     if (initXml(jointXml,joint))
     {
-      if (_world->GetJoint(joint->name))
+      if (_world->GetJoint(joint->name.GetValue()))
       {
         gzerr << "joint '" << joint->name << "s' is not unique.\n";
         joint.reset();
@@ -1419,7 +1294,7 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
       }
       else
       {
-        _world->joints.insert(make_pair(joint->name,joint));
+        _world->joints.insert(make_pair(joint->name.GetValue(),joint));
       }
     }
     else
@@ -1444,17 +1319,9 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
   TiXmlElement *ambient = _config->FirstChildElement("ambient");
   if (ambient)
   {
-    if (ambient->Attribute("rgba"))
+    if (!_scene->ambientColor.Set(ambient->Attribute("rgba")))
     {
-      if (!_scene->ambientColor.Init(ambient->Attribute("rgba")))
-      {
-        gzerr << "Error: Ambient rgba is malformed\n";
-        return false;
-      }
-    }
-    else
-    {
-      gzerr << "Ambient requires a rgba attribute\n";
+      gzerr << "Unable to parse ambient color\n";
       return false;
     }
   }
@@ -1462,17 +1329,9 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
   TiXmlElement *background = _config->FirstChildElement("background");
   if (background)
   {
-    if (background->Attribute("rgba"))
+    if (!_scene->backgroundColor.Set(background->Attribute("rgba")))
     {
-      if (!_scene->backgroundColor.Init(background->Attribute("rgba")))
-      {
-        gzerr << "Background rgba is malformed\n";
-        return false;
-      }
-    }
-    else
-    {
-      printf("Error: Background requires a rgba attribute\n");
+      gzerr << "Unable to parse background rgba\n";
       return false;
     }
 
@@ -1480,44 +1339,33 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
     TiXmlElement *sky = background->FirstChildElement("sky");
     if (sky)
     {
-      const char *materialChar = sky->Attribute("material");
-      if (!materialChar)
+      if (!_scene->skyMaterial.Set(sky->Attribute("material")))
       {
-        gzerr << "No material for the sky.\n";
+        gzerr << "Unable to parse material for the sky.\n";
         return false;
       }
-      _scene->skyMaterial = std::string(materialChar);
     }
   }
 
   TiXmlElement *shadow = _config->FirstChildElement("shadows");
   if (shadow)
   {
-    if (!getBoolFromStr(shadow->Attribute("enabled"), _scene->shadowEnabled,
-          true, true))
+    if (!_scene->shadowEnabled.Set(shadow->Attribute("enabled")))
     {
       gzerr << "Shadow element requires an enabled attribute";
       return false;
     }
 
-    if (shadow->Attribute("rgba"))
+    if (!_scene->shadowColor.Set(shadow->Attribute("rgba")))
     {
-      if (!_scene->shadowColor.Init(shadow->Attribute("rgba")))
-      {
-        gzerr << "Shadow rgba is malformed\n";
-        return false;
-      }
-    }
-    else
-    {
-      gzerr << "Shadow requires a rgba attribute\n";
+      gzerr << "Unable to parse shadow rgba\n";
       return false;
     }
 
-    _scene->shadowType = shadow->Attribute("type");
-    if (_scene->shadowType.empty())
+
+    if (!_scene->shadowType.Set(shadow->Attribute("type")))
     {
-      gzerr << "Shadow requires a type attribute\n";
+      gzerr << "Unable to parse shadow type attribute\n";
       return false;
     }
   }
@@ -1525,7 +1373,7 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_openDynamicsEngine)
 {
   TiXmlElement *odeConfig = _config->FirstChildElement("ode");
 
@@ -1542,34 +1390,25 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
     return false;
   }
 
-  _open_dynamics_engine->solverType = solverConfig->Attribute("type");
-  if (_open_dynamics_engine->solverType.empty())
+  if (!_openDynamicsEngine->solverType.Set( solverConfig->Attribute("type")))
   {
     gzerr << "ODE Physics missing solver type\n";
     return false;
   }
 
-  if (!getDoubleFromStr(solverConfig->Attribute("dt"), 
-        _open_dynamics_engine->dt, 0.01, true))
+  if (!_openDynamicsEngine->dt.Set(solverConfig->Attribute("dt")))
   {
     gzerr << "ODE Physics solver unable to parse dt attribute\n";
     return false;
   }
 
-  std::string itersStr = solverConfig->Attribute("iters");
-  if (itersStr.empty())
-  {
-    gzerr << "ODE Physics solver missing iters attribute\n";
-    return false;
-  }
-  if (!getIntFromStr(itersStr, _open_dynamics_engine->iters))
+  if (!_openDynamicsEngine->iters.Set(solverConfig->Attribute("iters")))
   {
     gzerr << "ODE Physics solver malformed iters attribute\n";
     return false;
   }
 
-  if (!getDoubleFromStr(solverConfig->Attribute("sor"), 
-        _open_dynamics_engine->sor, 0.0, true))
+  if (!_openDynamicsEngine->sor.Set(solverConfig->Attribute("sor"))) 
   {
     gzerr << "ODE Physics solver unable to parse sor attribute\n)";
     return false;
@@ -1581,28 +1420,26 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_open
   if (constraintsConfig)
   {
 
-    if (!getDoubleFromStr(constraintsConfig->Attribute("cfm"), 
-          _open_dynamics_engine->cfm, 0.0, true))
+    if (!_openDynamicsEngine->cfm.Set(constraintsConfig->Attribute("cfm"))) 
     {
       gzerr << "ODE Physics contraints unable to parse cfm attribute\n";
       return false;
     }
 
-    if (!getDoubleFromStr(constraintsConfig->Attribute("erp"), 
-          _open_dynamics_engine->erp, 0.01, true))
+    if (!_openDynamicsEngine->erp.Set(constraintsConfig->Attribute("erp"))) 
     {
       gzerr << "ODE Physics contraints unable to parse erp attribute\n";
       return false;
     }
 
 
-    if (!getDoubleFromStr(constraintsConfig->Attribute("contact_max_correcting_vel"), _open_dynamics_engine->contactMaxCorrectingVel, 0.0, true))
+    if (!_openDynamicsEngine->contactMaxCorrectingVel.Set(constraintsConfig->Attribute("contact_max_correcting_vel")))
     {
       gzerr << "ODE Physics contraints unable to parse contact_max_correcting_vel attribute\n";
       return false;
     } 
 
-    if (!getDoubleFromStr(constraintsConfig->Attribute("contact_surface_layer"), _open_dynamics_engine->contactSurfaceLayer, 0.0, true))
+    if (!_openDynamicsEngine->contactSurfaceLayer.Set(constraintsConfig->Attribute("contact_surface_layer")))
     {
       gzerr << "ODE Physics contraints unable to parse contact_surface_layer attribute\n";
       return false;
@@ -1622,25 +1459,24 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
     return false;
   }
 
-  _physics->type = _config->Attribute("type");
-  if (_physics->type.empty())
+  if (!_physics->type.Set(_config->Attribute("type")))
   {
-    gzerr << "Missing physics type attribute\n";
+    gzerr << "Unable to parse physics type attribute\n";
     return false;
   }
 
   TiXmlElement *gravityElement = _config->FirstChildElement("gravity");
   if (gravityElement)
   {
-    if (!_physics->gravity.Init(gravityElement->Attribute("xyz")))
+    if (!_physics->gravity.Set(gravityElement->Attribute("xyz")))
     {
-      gzerr << "Gravity has malformed xyz\n";
-      _physics->gravity.Clear();
+      gzerr << "Unable to parse physics gravity element \n";
+      _physics->gravity.Reset();
       return false;
     }
   }
 
-  if (_physics->type == "ode")
+  if (_physics->type.GetValue() == "ode")
   {
     _physics->engine.reset(new OpenDynamicsEngine );
 
@@ -1662,52 +1498,4 @@ bool initXml(TiXmlElement * /*_config*/, boost::shared_ptr<Contact> &/*_contact*
   return true;
 }
 
-bool InitXml(TiXmlElement *_xml, Pose &_pose)
-{
-  _pose.Clear();
-  if (!_xml)
-  {
-    gzerr << "parsing pose: _xml empty\n";
-    return false;
-  }
-  else
-  {
-    const char* _xyzStr = _xml->Attribute("xyz");
-    if (_xyzStr == NULL)
-    {
-      gzwarn << "parsing pose: no xyz, using default values.\n";
-      return true;
-    }
-    else
-    {
-      if (!_pose.position.Init(_xyzStr))
-      {
-        gzerr << "malformed xyz\n";
-        _pose.position.Clear();
-        return false;
-      }
-    }
-
-    const char* rpyStr = _xml->Attribute("rpy");
-    if (rpyStr == NULL)
-    {
-      gzwarn << "parsing pose: no rpy, using default values.\n";
-      return true;
-    }
-    else
-    {
-      if (!_pose.rotation.Init(rpyStr))
-      {
-        gzerr << "malformed rpy\n";
-        return false;
-        _pose.rotation.Clear();
-      }
-    }
-
-    return true;
-  }
 }
-
-
-}
-

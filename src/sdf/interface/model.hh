@@ -42,6 +42,8 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+
+#include "sdf/interface/Param.hh"
 #include "sdf/interface/plugin.hh"
 #include "sdf/interface/link.hh"
 
@@ -59,7 +61,7 @@ namespace sdf
   
     public: boost::shared_ptr<const Link> GetLink(const std::string &_name) const;
     public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
-    public: const std::string& GetName() const {return this->name;};
+    public: std::string GetName() const {return this->name.GetValue();}
   
     public: void GetLinks(std::vector<boost::shared_ptr<Link> > &_links) const;
   
@@ -74,7 +76,7 @@ namespace sdf
 
     public: void Clear();
   
-    public: std::string name;
+    public: ParamT<std::string,true> name;
   
     /// non-const getLink()
     private: void GetLink(const std::string &_name, 

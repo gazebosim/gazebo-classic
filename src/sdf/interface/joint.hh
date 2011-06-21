@@ -51,31 +51,36 @@ namespace sdf
   
   class JointDynamics
   {
-    public: JointDynamics() { this->Clear(); };
-    public: double damping;
-    public: double friction;
+    public: JointDynamics() : damping("damping",0), friction("friction",0) 
+            { this->Clear(); }
+
+    public: ParamT<double, true> damping;
+    public: ParamT<double, true> friction;
 
     public: void Clear()
             {
-              damping = 0;
-              friction = 0;
+              damping.Reset();
+              friction.Reset();
             };
   };
   
   class JointLimits
   {
-    public: JointLimits() { this->Clear(); };
-    public: double lower;
-    public: double upper;
-    public: double effort;
-    public: double velocity;
+    public: JointLimits() : lower("lower",0), upper("upper",0),
+            effort("effort",0), velocity("velocity",0) 
+    { this->Clear(); }
+
+    public: ParamT<double,true> lower;
+    public: ParamT<double,true> upper;
+    public: ParamT<double,true> effort;
+    public: ParamT<double,true> velocity;
 
     public: void Clear()
             {
-              lower = 0;
-              upper = 0;
-              effort = 0;
-              velocity = 0;
+              this->lower.Reset();
+              this->upper.Reset();
+              this->effort.Reset();
+              this->velocity.Reset();
             };
   };
   
@@ -87,9 +92,12 @@ namespace sdf
               UNKNOWN, REVOLUTE, REVOLUTE2, PRISMATIC, PISTON, BALL, UNIVERSAL
             } type;
 
-    public: Joint() : origin("origin", Pose()) { this->Clear(); };
+    public: Joint() : name("name",""), axis("axis",Vector3()), 
+            axis2("axis2", Vector3()), childLinkName("link", ""), 
+            parentLinkName("link", ""), origin("origin", Pose())
+    { this->Clear(); };
 
-    public: std::string name;
+    public: ParamT<std::string,true> name;
 
     /// \brief     type_       meaning of axis_
     /// ------------------------------------------------------
@@ -100,16 +108,16 @@ namespace sdf
     ///            PISTON     N/A
     ///            BALL       N/A
     ///            UNIVERSAL  N/A
-    public: Vector3 axis;
-    public: Vector3 axis2;
+    public: ParamT<Vector3, false> axis;
+    public: ParamT<Vector3, false> axis2;
 
     /// child Link element
     ///   child link frame is the same as the Joint frame
-    public: std::string childLinkName;
+    public: ParamT<std::string, true> childLinkName;
 
     /// parent Link element
     ///   origin specifies the transform from Parent Link to Joint Frame
-    public: std::string parentLinkName;
+    public: ParamT<std::string, true> parentLinkName;
 
     /// transform from Child Link frame to Joint frame
     public: ParamT<Pose, true> origin;
@@ -120,13 +128,12 @@ namespace sdf
     /// Joint Limits
     public: boost::shared_ptr<JointLimits> limits;
 
-
     public: void Clear()
             {
-              this->axis.Clear();
-              this->axis2.Clear();
-              this->childLinkName.clear();
-              this->parentLinkName.clear();
+              this->axis.Reset();
+              this->axis2.Reset();
+              this->childLinkName.Reset();
+              this->parentLinkName.Reset();
               this->origin.Reset();
               this->dynamics.reset();
               this->limits.reset();
@@ -140,6 +147,8 @@ namespace sdf
               std::cout <<  _prefix << "  Parent[" << this->parentLinkName << "]\n";
               std::cout << _prefix << "  Child[" << this->childLinkName << "]\n";
             }
+
+
 
   };
 

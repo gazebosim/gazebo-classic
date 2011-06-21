@@ -41,30 +41,37 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
+#include "sdf/interface/Param.hh"
 #include "sdf/interface/color.hh"
 
 namespace sdf
 {
   class Scene
   {
-    public: Scene() { this->Clear(); };
+    public: Scene() : ambientColor("rgba", Color()),
+            backgroundColor("rgba",Color()),
+            skyMaterial("script",""),
+            shadowEnabled("enabled",true),
+            shadowColor("rgba",Color()),
+            shadowType("type","")
+    { this->Clear(); }
   
-    public: Color ambientColor;
-    public: Color backgroundColor;
-    public: std::string skyMaterial;
+    public: ParamT<Color, true> ambientColor;
+    public: ParamT<Color, true> backgroundColor;
+    public: ParamT<std::string, false> skyMaterial;
 
-    public: bool shadowEnabled;
-    public: Color shadowColor;
-    public: std::string shadowType;
+    public: ParamT<bool, false> shadowEnabled;
+    public: ParamT<Color, false> shadowColor;
+    public: ParamT<std::string, false> shadowType;
   
     public: void Clear()
     {
-      this->ambientColor.Clear();
-      this->backgroundColor.Clear();
-      this->skyMaterial.clear();
-      this->shadowEnabled = true;
-      this->shadowColor.Clear();
-      this->shadowType.clear();
+      this->ambientColor.Reset();
+      this->backgroundColor.Reset();
+      this->skyMaterial.Reset();
+      this->shadowEnabled.Reset();
+      this->shadowColor.Reset();
+      this->shadowType.Reset();
     }
 
     public: void Print( const std::string _prefix)
@@ -73,17 +80,11 @@ namespace sdf
       std::cout << _prefix << "  SkyMaterial[" << this->skyMaterial << "]\n";
       std::cout << _prefix << "  ShadowType[" << this->shadowType << "]\n";
 
-      std::cout << _prefix << "  Ambient Color[";
-      this->ambientColor.Print( "" );
-      std::cout << "]\n";
+      std::cout << _prefix << "  Ambient Color[" << this->ambientColor << "]\n";
 
-      std::cout << _prefix << "  Background Color[";
-      this->backgroundColor.Print("");
-      std::cout << "]\n";
+      std::cout << _prefix << "  Background Color[" << this->backgroundColor << "]\n";
 
-      std::cout << _prefix << "  Shadow Color[";
-      this->shadowColor.Print("");
-      std::cout << "]\n";
+      std::cout << _prefix << "  Shadow Color[" << this->shadowColor << "]\n";
     }
   };
 }

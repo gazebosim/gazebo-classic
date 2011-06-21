@@ -42,6 +42,7 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
+#include "sdf/interface/Param.hh"
 #include "sdf/interface/plugin.hh"
 #include "sdf/interface/scene.hh"
 #include "sdf/interface/physics.hh"
@@ -55,12 +56,12 @@ namespace sdf
     public: World();
   
     public: boost::shared_ptr<const Model> GetModel(const std::string &_name) const;
-    public: const std::string& GetName() const {return this->name;};
+    public: std::string GetName() const {return this->name.GetValue();}
   
     public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
     public: void GetModels(std::vector<boost::shared_ptr<Model> > &_models) const;
   
-    public: std::string name;
+    public: ParamT<std::string, true> name;
     public: boost::shared_ptr<Scene> scene;
     public: boost::shared_ptr<Physics> physics;
 
