@@ -43,6 +43,7 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
+#include "sdf/interface/Param.hh"
 #include "sdf/interface/sensor.hh"
 #include "sdf/interface/joint.hh"
 #include "sdf/interface/color.hh"
@@ -51,86 +52,98 @@ namespace sdf
 {
   class Geometry
   {
-    public: enum {SPHERE, BOX, CYLINDER, MESH} type;
+    public: enum Type{UNKNOWN, SPHERE, BOX, CYLINDER, MESH};
+    public: Geometry(Type _type = UNKNOWN) : type(_type) {}
+    public: Type type;
   };
   
   class Sphere : public Geometry
   {
-    public: Sphere() { this->Clear(); };
-    public: double radius;
+    public: Sphere() : Geometry(SPHERE), radius("radius", 1.0) { this->Clear(); }
+    public: ParamT<double, true> radius;
 
     public: void Clear()
             {
-              radius = 0;
+              this->radius.Reset();
             };
   };
   
   class Box : public Geometry
   {
-    public: Box() { this->Clear(); };
-    public: Vector3 size;
+    public: Box() : Geometry(BOX), size("size", Vector3(0,0,0)) { this->Clear(); };
+    public: ParamT<Vector3, true> size;
 
     public: void Clear()
             {
-              size.Clear();
+              size.Reset();
             };
   };
   
   class Cylinder : public Geometry
   {
-    public: Cylinder() { this->Clear(); };
-    public: double length;
-    public: double radius;
+    public: Cylinder() : Geometry(CYLINDER), 
+            length("length", 1.0), radius("radius", 1.0) 
+            { this->Clear(); };
+    public: ParamT<double, true> length;
+    public: ParamT<double, true> radius;
 
     public: void Clear()
             {
-              length = 0;
-              radius = 0;
+              this->length.Reset();
+              this->radius.Reset();
             };
   };
   
   class Mesh : public Geometry
   {
-    public: Mesh() { this->Clear(); };
-    public: std::string filename;
-    public: Vector3 scale;
+    public: Mesh() : Geometry(MESH), filename("filename", ""), scale("scale", Vector3(1,1,1)) 
+            { this->Clear(); }
+    public: ParamT<std::string, true> filename;
+    public: ParamT<Vector3, false> scale;
 
     public: void Clear()
             {
-              filename.clear();
-              // default scale
-              scale.x = 1;
-              scale.y = 1;
-              scale.z = 1;
+              this->filename.Reset();
+              this->scale.Reset();
             };
     public: bool FileExists(std::string filename);
   };
   
   class Material
   {
-    public: Material() { this->Clear(); };
-    public: std::string script;
-    public: Color color;
+    public: Material(): script("script", ""), color("color",Color())
+            { this->Clear(); }
+    public: ParamT<std::string, false> script;
+    public: ParamT<Color, false> color;
 
     public: void Clear()
             {
-              color.Clear();
-              script.clear();
+              this->color.Reset();
+              this->script.Reset();
             };
   };
   
   class Inertial
   {
-    public: Inertial() { this->Clear(); };
-    public: Pose origin;
-    public: double mass;
-    public: double ixx,ixy,ixz,iyy,iyz,izz;
+    public: Inertial() : origin("origin", Pose()), 
+            mass("mass",1.0), ixx("ixx",0.0), ixy("ixy",0.0), ixz("ixz",0.0), 
+            iyy("iyy",0.0), iyz("iyz",0.0), izz("izz",0.0) 
+    { this->Clear(); }
+
+    public: ParamT<Pose, false> origin;
+    public: ParamT<double, true> mass;
+    public: ParamT<double, true> ixx,ixy,ixz,iyy,iyz,izz;
 
     public: void Clear()
             {
-              origin.Clear();
-              mass = 0;
-              ixx = ixy = ixz = iyy = iyz = izz = 0;
+              this->origin.Reset();
+              this->mass.Reset();
+              this->ixx.Reset();
+              this->ixy.Reset();
+              this->ixz.Reset();
+              this->iyy.Reset();
+              this->iyz.Reset();
+              this->izz.Reset();
             };
 
     public: void Print(const std::string &prefix)
@@ -141,19 +154,20 @@ namespace sdf
   
   class Visual
   {
-    public: Visual() { this->Clear(); };
-    public: Pose origin;
-    public: std::string name;
-    public: boost::shared_ptr<Geometry> geometry;
+    public: Visual() :origin("origin", Pose()), 
+                      name("name","") { this->Clear(); };
+    public: ParamT<Pose, false> origin;
+    public: ParamT<std::string, true> name;
 
+    public: boost::shared_ptr<Geometry> geometry;
     public: boost::shared_ptr<Material> material;
 
     public: void Clear()
             {
-              origin.Clear();
-              name.clear();
-              material.reset();
-              geometry.reset();
+              this->origin.Reset();
+              this->name.Reset();
+              this->material.reset();
+              this->geometry.reset();
             };
 
     public: void Print(const std::string &_prefix)
@@ -164,15 +178,17 @@ namespace sdf
   
   class Collision
   {
-    public: Collision() { this->Clear(); };
-    public: Pose origin;
-    public: std::string name;
+    public: Collision(): origin("origin", Pose()), name("name","") 
+    { this->Clear(); };
+
+    public: ParamT<Pose, false> origin;
+    public: ParamT<std::string, true> name;
     public: boost::shared_ptr<Geometry> geometry;
 
     public: void Clear()
             {
-              origin.Clear();
-              name.clear();
+              this->origin.Reset();
+              this->name.Reset();
               geometry.reset();
             };
 
@@ -186,25 +202,25 @@ namespace sdf
   
   class Link
   {
-    public: Link() { this->Clear(); };
+    public: Link() : name("name", "") { this->Clear(); };
 
-    public: std::string name;
+    public: ParamT<std::string, true> name;
 
-              /// inertial element
+    /// inertial element
     public: boost::shared_ptr<Inertial> inertial;
 
-            /// a collection of visual elements
+    /// a collection of visual elements
     public: std::vector<boost::shared_ptr<Visual> > visuals;
 
-            /// a collection of collision elements
+    /// a collection of collision elements
     public: std::vector<boost::shared_ptr<Collision> > collisions;
 
-            // a collection of the sensors
+   // a collection of the sensors
     public: std::map<std::string, boost::shared_ptr<Sensor> > sensors;
 
     public: void Clear()
             {
-              this->name.clear();
+              this->name.Reset();
               this->inertial.reset();
               this->visuals.clear();
               this->collisions.clear();

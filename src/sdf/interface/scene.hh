@@ -82,7 +82,7 @@ namespace sdf
       std::cout << "]\n";
 
       std::cout << _prefix << "  Shadow Color[";
-      this->shadowColor.Print(_prefix + "  ");
+      this->shadowColor.Print("");
       std::cout << "]\n";
     }
   };

@@ -42,6 +42,7 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
+#include "sdf/interface/Param.hh"
 #include "sdf/interface/pose.hh"
 
 namespace sdf
@@ -86,7 +87,7 @@ namespace sdf
               UNKNOWN, REVOLUTE, REVOLUTE2, PRISMATIC, PISTON, BALL, UNIVERSAL
             } type;
 
-    public: Joint() { this->Clear(); };
+    public: Joint() : origin("origin", Pose()) { this->Clear(); };
 
     public: std::string name;
 
@@ -111,7 +112,7 @@ namespace sdf
     public: std::string parentLinkName;
 
     /// transform from Child Link frame to Joint frame
-    public: Pose origin;
+    public: ParamT<Pose, true> origin;
 
     /// Joint Dynamics
     public: boost::shared_ptr<JointDynamics> dynamics;
@@ -126,7 +127,7 @@ namespace sdf
               this->axis2.Clear();
               this->childLinkName.clear();
               this->parentLinkName.clear();
-              this->origin.Clear();
+              this->origin.Reset();
               this->dynamics.reset();
               this->limits.reset();
               this->type = UNKNOWN;

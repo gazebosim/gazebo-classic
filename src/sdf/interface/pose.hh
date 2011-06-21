@@ -105,8 +105,15 @@ class Vector3
 
   public: void Print( const std::string &_prefix )
   {
-    std::cout << _prefix << this->x << " " << this->y << " " << this->z;
+    std::cout << _prefix << *this;
   }
+
+  public: friend std::ostream &operator<<( std::ostream &_out, 
+                                           const Vector3 &_vec)
+          {
+            _out << _vec.x << " " << _vec.y << " " << _vec.z;
+           return _out; 
+          }
 };
 
 class Rotation
@@ -262,17 +269,24 @@ class Rotation
 
   public: void Print( const std::string &_prefix )
   {
-    double r,p,y;
-    this->GetRPY(r,p,y);
-    std::cout << _prefix << r << " " << p << " " << y;
+    std::cout << _prefix << *this;
   }
 
+  public: friend std::ostream &operator<<( std::ostream &_out, 
+                                           const Rotation &_rot)
+          {
+            double r,p,y;
+            _rot.GetRPY(r,p,y);
+            _out << r << " " << p << " " << y;
+            return _out;
+          }
+ 
   double x,y,z,w;
 };
 
 class Pose
 {
-  public: Pose() { this->Clear(); };
+  public: Pose() { this->Clear(); }
 
   public: Vector3  position;
   public: Rotation rotation;
@@ -286,11 +300,16 @@ class Pose
 
   public: void Print( const std::string &_prefix )
   {
-    std::cout << _prefix << "Pos[";
-    this->position.Print( "" );
-    std::cout << "] Rot[";
-    this->rotation.Print( "" );
+    std::cout << _prefix << *this;
   }
+
+  public: friend std::ostream &operator<<( std::ostream &_out, 
+                                           const Pose &_pose)
+          {
+            _out << "xyz='" << _pose.position << "' "
+                 << "rpy='" << _pose.rotation << "'";
+            return _out;
+          }
 };
 
 }

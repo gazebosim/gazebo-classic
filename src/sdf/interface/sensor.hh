@@ -43,6 +43,7 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
+#include "sdf/interface/Param.hh"
 #include "sdf/interface/plugin.hh"
 #include "sdf/interface/pose.hh"
 
@@ -50,19 +51,24 @@ namespace sdf
 {
   class SensorType
   {
-    public: enum {CAMERA, RAY, CONTACT} type;
+    public: enum Type{CAMERA, RAY, CONTACT};
+    public: SensorType(Type _type) : type(_type) {}
+    public: Type type;
   };
   
   class Sensor
   {
-    public: Sensor() { this->Clear(); };
+    public: Sensor() : name("name",""), type("type",""), 
+            alwaysOn("always_on", false), updateRate("update_rate",10.0),
+            origin("origin", Pose())
+    { this->Clear(); };
   
-    public: std::string name;
-    public: std::string type;
-    public: bool alwaysOn;
-    public: double updateRate;
+    public: ParamT<std::string, true> name;
+    public: ParamT<std::string, true> type;
+    public: ParamT<bool, false> alwaysOn;
+    public: ParamT<double, true> updateRate;
   
-    public: Pose origin;
+    public: ParamT<Pose, true> origin;
   
     public: boost::shared_ptr<SensorType> sensorType;
 
@@ -71,12 +77,13 @@ namespace sdf
   
     public: void Clear()
     {
-      this->name.clear();
-      this->type.clear();
-      this->alwaysOn = false;
-      this->updateRate = -1;
+      this->name.Reset();
+      this->type.Reset();
+      this->alwaysOn.Reset();
+      this->updateRate.Reset();
+      this->origin.Reset();
+
       this->sensorType.reset();
-      this->origin.Clear();
       this->plugins.clear();
     }
 
@@ -95,68 +102,87 @@ namespace sdf
   
   class Contact : public SensorType
   {
-    public: Contact() {}
+    public: Contact() : SensorType(CONTACT) {}
   };
   
   class Camera : public SensorType
   {
-    public: Camera() { this->Clear(); };
-    public: double horizontalFov;
-    public: unsigned int imageWidth;
-    public: unsigned int imageHeight;
-    public: std::string imageFormat;
-    public: double clipNear;
-    public: double clipFar;
-    public: bool saveEnabled;
-    public: std::string savePath;
+    public: Camera() : SensorType(CAMERA), horizontalFov("horizontal_fov", 0.0),
+            imageWidth("width",0), imageHeight("height",0),
+            imageFormat("format","R8G8B8"), clipNear("near",0.0), 
+            clipFar("far",1.0), saveEnabled("enabled", false), 
+            savePath("path","")
+    { this->Clear(); };
+
+    public: ParamT<double, true> horizontalFov;
+    public: ParamT<unsigned int, true> imageWidth;
+    public: ParamT<unsigned int, true> imageHeight;
+    public: ParamT<std::string, false> imageFormat;
+    public: ParamT<double, true> clipNear;
+    public: ParamT<double, true> clipFar;
+    public: ParamT<bool, false> saveEnabled;
+    public: ParamT<std::string, false> savePath;
   
     public: void Clear()
     {
-      this->horizontalFov = 0;
-      this->imageWidth = 0;
-      this->imageHeight = 0;
-      this->imageFormat.clear();
-      this->clipNear = 0;
-      this->clipFar = 0;
-      this->saveEnabled = false;
-      this->savePath.clear();
+      this->horizontalFov.Reset();
+      this->imageWidth.Reset();
+      this->imageHeight.Reset();
+      this->imageFormat.Reset();
+      this->clipNear.Reset();
+      this->clipFar.Reset();
+      this->saveEnabled.Reset();
+      this->savePath.Reset();
     }
   };
   
   class Ray : public SensorType
   {
-    public: Ray() { this->Clear(); };
-    public: bool display;
-    public: unsigned int horizontalSamples;
-    public: double       horizontalResolution;
-    public: double       horizontalMinAngle;
-    public: double       horizontalMaxAngle;
+    public: Ray() : SensorType(RAY), 
+            display("display", false),
+            horizontalSamples("samples",1), 
+            horizontalResolution("resolution", 1), 
+            horizontalMinAngle("min_angle",0), 
+            horizontalMaxAngle("max_angle",1),
+            verticalSamples("samples",1), 
+            verticalResolution("resolution", 1), 
+            verticalMinAngle("min_angle",0), 
+            verticalMaxAngle("max_angle",1),
+            rangeMin("min",0), rangeMax("max",1.0), 
+            rangeResolution("resolution",0.0001)
+    { this->Clear(); }
+
+    public: ParamT<bool, false> display;
+    public: ParamT<unsigned int, true> horizontalSamples;
+    public: ParamT<double, true>       horizontalResolution;
+    public: ParamT<double, true>       horizontalMinAngle;
+    public: ParamT<double, true>       horizontalMaxAngle;
   
-    public: unsigned int verticalSamples;
-    public: double       verticalResolution;
-    public: double       verticalMinAngle;
-    public: double       verticalMaxAngle;
+    public: ParamT<unsigned int, true> verticalSamples;
+    public: ParamT<double, true>       verticalResolution;
+    public: ParamT<double, true>       verticalMinAngle;
+    public: ParamT<double, true>       verticalMaxAngle;
   
-    public: double rangeMin;
-    public: double rangeMax;
-    public: double rangeResolution;
+    public: ParamT<double, true> rangeMin;
+    public: ParamT<double, true> rangeMax;
+    public: ParamT<double, false> rangeResolution;
   
     public: void Clear()
     {
-      this->display = false;
-      this->horizontalSamples = 1;
-      this->horizontalResolution = 1;
-      this->horizontalMinAngle = 0;
-      this->horizontalMaxAngle = 0;
+      this->display.Reset();
+      this->horizontalSamples.Reset();
+      this->horizontalResolution.Reset();
+      this->horizontalMinAngle.Reset();
+      this->horizontalMaxAngle.Reset();
   
-      this->verticalSamples = 1;
-      this->verticalResolution = 1;
-      this->verticalMinAngle = 0;
-      this->verticalMaxAngle = 0;
+      this->verticalSamples.Reset();
+      this->verticalResolution.Reset();
+      this->verticalMinAngle.Reset();
+      this->verticalMaxAngle.Reset();
   
-      this->rangeMin = 0;
-      this->rangeMax = 1000;
-      this->rangeResolution = 0;
+      this->rangeMin.Reset();
+      this->rangeMax.Reset();
+      this->rangeResolution.Reset();
     };
   };
 

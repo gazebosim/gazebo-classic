@@ -113,11 +113,14 @@ namespace sdf
   /// Pose
   bool InitXml(TiXmlElement *_xml, Pose &_pose);
 
-  bool getBoolFromStr(std::string _str, bool &_value);
+
+  bool getBoolFromStr(std::string _key, bool &_value, 
+                      bool _default, bool _required);
  
-  bool getDoubleFromStr(const std::string &_str, double &_value);
+  bool getDoubleFromStr(const std::string &_key, double &_value,
+                        double _default, bool _required);
  
-  bool getIntFromStr(const std::string &_str, int &_value);
+  bool getIntFromStr(const std::string &_key, int &_value);
     
   bool getUIntFromStr(const std::string &_str, unsigned int &_value);
 

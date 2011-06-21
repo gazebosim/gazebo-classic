@@ -105,9 +105,16 @@ namespace sdf
 
     public: void Print(const std::string &prefix)
             {
-              std::cout << prefix << this->r << " " << this->g << " " 
-                        << this->b << " " << this->a;
+              std::cout << prefix << *this;
             }
+  public: friend std::ostream &operator<<( std::ostream &_out, 
+                                           const Color &_color)
+          {
+            _out << "rgba='" << _color.r << " " << _color.g << " " 
+                 << _color.b << " " << _color.a << "'";
+            return _out;
+          }
+ 
   };
 }
 

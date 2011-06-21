@@ -5,6 +5,7 @@ add_definitions(${tinyxml_cflags})
 set (sources link.cc 
              model.cc 
              world.cc
+             Param.cc
 )
 
 set (headers color.hh
@@ -17,6 +18,7 @@ set (headers color.hh
              scene.hh
              sensor.hh
              world.hh 
+             Param.hh
 )
 
 add_library( gazebo_sdf_interface SHARED ${sources})
