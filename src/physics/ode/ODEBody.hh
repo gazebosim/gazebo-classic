@@ -133,7 +133,7 @@ namespace gazebo
       public: virtual void SetAutoDisable(const bool &value);
   
   
-      protected: math::Pose3d pose;
+      protected: math::Pose pose;
   
       /// ODE body handle
       private: dBodyID bodyId;

@@ -23,7 +23,7 @@
 #include "common/Exception.hh"
 #include "common/Param.hh"
 #include "math/Quatern.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Vector4.hh"
 
@@ -128,9 +128,9 @@ bool Param::IsQuatern() const
 {
   return this->GetTypename() == typeid(math::Quatern).name();
 }
-bool Param::IsPose3d() const
+bool Param::IsPose() const
 {
-  return this->GetTypename() == typeid(math::Pose3d).name();
+  return this->GetTypename() == typeid(math::Pose).name();
 }
 
 //////////////////////////////////////////////////////////////////////////////

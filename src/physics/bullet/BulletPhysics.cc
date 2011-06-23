@@ -264,9 +264,9 @@ void BulletPhysics::ConvertMass(void *engineMass, const Mass &mass)
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
-math::Pose3d BulletPhysics::ConvertPose(btTransform bt)
+math::Pose BulletPhysics::ConvertPose(btTransform bt)
 {
-  math::Pose3d pose;
+  math::Pose pose;
   pose.pos.x = bt.getOrigin().getX();
   pose.pos.y = bt.getOrigin().getY();
   pose.pos.z = bt.getOrigin().getZ();
@@ -281,7 +281,7 @@ math::Pose3d BulletPhysics::ConvertPose(btTransform bt)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert a gazebo pose to a bullet transform
-btTransform BulletPhysics::ConvertPose(const math::Pose3d pose)
+btTransform BulletPhysics::ConvertPose(const math::Pose pose)
 {
   btTransform trans;
 

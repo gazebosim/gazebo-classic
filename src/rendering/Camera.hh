@@ -27,7 +27,7 @@
 #include "common/Time.hh"
 
 #include "math/Angle.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Vector2i.hh"
 
 // Forward Declarations
@@ -104,13 +104,13 @@ namespace gazebo
   
   
       /// \brief Get the global pose of the camera
-      public: math::Pose3d GetWorldPose();
+      public: math::Pose GetWorldPose();
   
       /// \brief Get the camera position in the world
       public: math::Vector3 GetWorldPosition() const;
   
       /// \brief Set the global pose of the camera
-      public: void SetWorldPose(const math::Pose3d &pose);
+      public: void SetWorldPose(const math::Pose &pose);
   
       /// \brief Set the world position
       public: void SetWorldPosition(const math::Vector3 &pos);
@@ -280,7 +280,7 @@ namespace gazebo
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
     
-      private: math::Pose3d pose;
+      private: math::Pose pose;
     
       // Info for saving images
       protected: unsigned char *saveFrameBuffer;

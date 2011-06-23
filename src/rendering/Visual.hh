@@ -26,7 +26,7 @@
 
 #include "common/Event.hh"
 #include "math/Box.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Quatern.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -161,7 +161,7 @@ namespace gazebo
       public: void SetRotation( const math::Quatern &rot);
   
       /// \brief Set the pose of the visual
-      public: void SetPose( const math::Pose3d &pose);
+      public: void SetPose( const math::Pose &pose);
   
       /// \brief Get the position of the visual
       public: math::Vector3 GetPosition() const;
@@ -170,10 +170,10 @@ namespace gazebo
       public: math::Quatern GetRotation() const;
   
       /// \brief Get the pose of the visual
-      public: math::Pose3d GetPose() const;
+      public: math::Pose GetPose() const;
   
       /// \brief Get the global pose of the node
-      public: math::Pose3d GetWorldPose() const;
+      public: math::Pose GetWorldPose() const;
   
       /// \brief Return the scene Node of this visual entity
       public: Ogre::SceneNode *GetSceneNode() const;

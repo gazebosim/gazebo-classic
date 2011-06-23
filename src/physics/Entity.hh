@@ -30,7 +30,7 @@
 #include "math/MathTypes.hh"
 #include "math/Box.hh"
 
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "physics/PhysicsTypes.hh"
 
 #include "physics/Base.hh"
@@ -68,29 +68,29 @@ namespace gazebo
 
       /// \brief Set the initial pose
       /// \param p The initial pose
-      public: void SetInitialPose( const math::Pose3d &p );
+      public: void SetInitialPose( const math::Pose &p );
 
       /// \brief Return the bounding box for the entity 
       public: virtual math::Box GetBoundingBox() const;
   
       /// \brief Get the absolute pose of the entity
-      public: virtual math::Pose3d GetWorldPose() const;
+      public: virtual math::Pose GetWorldPose() const;
   
       /// \brief Get the pose of the entity relative to its parent
-      public: math::Pose3d GetRelativePose() const;
+      public: math::Pose GetRelativePose() const;
   
       /// \brief Get the pose relative to the model this entity belongs to
-      public: math::Pose3d GetModelRelativePose() const;
+      public: math::Pose GetModelRelativePose() const;
   
       /// \brief Set the pose of the entity relative to its parent
       /// \param pose The new pose
       /// \param notify True = tell children of the pose change
-      public: void SetRelativePose(const math::Pose3d &pose, bool notify = true);
+      public: void SetRelativePose(const math::Pose &pose, bool notify = true);
   
       /// \brief Set the world pose of the entity
       /// \param pose The new world pose
       /// \param notify True = tell children of the pose change
-      public: void SetWorldPose(const math::Pose3d &pose, bool notify=true);
+      public: void SetWorldPose(const math::Pose &pose, bool notify=true);
   
       /// \brief Set the position of the entity relative to its parent
       /// \param pos The new X,Y,Z position
@@ -159,8 +159,8 @@ namespace gazebo
       private: EntityPtr parentEntity;
 
       /// The initial pose of the entity
-      private: math::Pose3d initialPose;
-      private: math::Pose3d relativePose;
+      private: math::Pose initialPose;
+      private: math::Pose relativePose;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr posePub;

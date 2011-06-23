@@ -185,7 +185,7 @@ bool Sensor::IsActive()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the current pose
-math::Pose3d Sensor::GetPose() const
+math::Pose Sensor::GetPose() const
 {
   return this->pose;
 }

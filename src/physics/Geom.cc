@@ -132,7 +132,7 @@ void Geom::Load(common::XMLConfigNode *node)
 void Geom::Init()
 {
   this->SetContactsEnabled(**this->enableContactsP);
-  this->SetRelativePose( math::Pose3d( **this->xyzP, **this->rpyP ) );
+  this->SetRelativePose( math::Pose( **this->xyzP, **this->rpyP ) );
   this->mass.SetMass( **this->massP );
 
   this->shape->Init();

@@ -1865,7 +1865,7 @@ bool saveXml(TiXmlElement *_parent, const gazebo::math::Quatern &_rot)
 }
 
 /*
-bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,true> &_pose)
+bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,true> &_pose)
 {
   TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
   _parent->LinkEndChild( originNode );
@@ -1875,7 +1875,7 @@ bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,true> &_po
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,false> &_pose)
+bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,false> &_pose)
 {
   TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
   _parent->LinkEndChild( originNode );
@@ -1885,7 +1885,7 @@ bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,false> &_p
   return true;
 }*/
 
-/*bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose3d &_pose)
+/*bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose &_pose)
 {
   std::ostringstream poseStream;
   poseStream << _pose;

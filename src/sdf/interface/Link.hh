@@ -44,7 +44,7 @@
 #include <iostream>
 
 #include "common/Color.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Vector3.hh"
 
 #include "sdf/interface/Param.hh"
@@ -129,12 +129,12 @@ namespace sdf
   
   class Inertial
   {
-    public: Inertial() : origin("origin", gazebo::math::Pose3d()), 
+    public: Inertial() : origin("origin", gazebo::math::Pose()), 
             mass("mass",1.0), ixx("ixx",0.0), ixy("ixy",0.0), ixz("ixz",0.0), 
             iyy("iyy",0.0), iyz("iyz",0.0), izz("izz",0.0) 
     { this->Clear(); }
 
-    public: ParamT<gazebo::math::Pose3d, false> origin;
+    public: ParamT<gazebo::math::Pose, false> origin;
     public: ParamT<double, true> mass;
     public: ParamT<double, true> ixx,ixy,ixz,iyy,iyz,izz;
 
@@ -158,11 +158,11 @@ namespace sdf
   
   class Visual
   {
-    public: Visual() :origin("origin", gazebo::math::Pose3d()), name("name",""),
+    public: Visual() :origin("origin", gazebo::math::Pose()), name("name",""),
             castShadows("cast_shadows", true)
             { this->Clear(); };
 
-    public: ParamT<gazebo::math::Pose3d, false> origin;
+    public: ParamT<gazebo::math::Pose, false> origin;
     public: ParamT<std::string, true> name;
     public: ParamT<bool, false> castShadows;
 
@@ -264,10 +264,10 @@ namespace sdf
   
   class Collision
   {
-    public: Collision(): origin("origin", gazebo::math::Pose3d()), name("name","")
+    public: Collision(): origin("origin", gazebo::math::Pose()), name("name","")
     { this->Clear(); }
 
-    public: ParamT<gazebo::math::Pose3d, false> origin;
+    public: ParamT<gazebo::math::Pose, false> origin;
     public: ParamT<std::string, true> name;
 
     public: boost::shared_ptr<Geometry> geometry;

@@ -86,7 +86,7 @@ void BulletGeom::Update()
 // On pose change
 void BulletGeom::OnPoseChange()
 {
-  math::Pose3d pose = this->GetRelativePose();
+  math::Pose pose = this->GetRelativePose();
   BulletBody *bbody = (BulletBody*)(this->body);
 
   bbody->SetGeomRelativePose(this, pose);

@@ -27,7 +27,7 @@
 #include "common/Events.hh"
 #include "common/Time.hh"
 #include "common/Param.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 
 namespace gazebo
 {
@@ -74,7 +74,7 @@ namespace gazebo
       public: std::string GetSensorType(){return typeName;}
   
       /// \brief Get the current pose
-      public: virtual math::Pose3d GetPose() const;
+      public: virtual math::Pose GetPose() const;
   
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
@@ -92,7 +92,7 @@ namespace gazebo
       /// \brief True if active
       protected: bool active;
 
-      protected: math::Pose3d pose;
+      protected: math::Pose pose;
   
       protected: common::ParamT<std::string> *nameP;
       protected: common::ParamT<double> *updateRateP;

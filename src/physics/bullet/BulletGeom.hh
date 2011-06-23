@@ -25,7 +25,7 @@
 
 #include "common/Param.hh"
 #include "Entity.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "physics/Geom.hh"
 

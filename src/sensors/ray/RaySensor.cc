@@ -81,7 +81,7 @@ void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
 // Init the ray
 void RaySensor::InitChild()
 {
-  Pose3d bodyPose;
+  Pose bodyPose;
 
   bodyPose = this->body->GetWorldPose();
 }

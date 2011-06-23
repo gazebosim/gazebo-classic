@@ -118,7 +118,7 @@ void RenderWidget::update()
 
   float fps = cam->GetAvgFPS();
   int triangleCount = cam->GetTriangleCount();
-  math::Pose3d pose = cam->GetWorldPose();
+  math::Pose pose = cam->GetWorldPose();
 
   std::ostringstream stream;
 

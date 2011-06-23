@@ -30,7 +30,7 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/XMLConfig.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 
 #include "rendering/Visual.hh"
 #include "rendering/Conversions.hh"
@@ -355,7 +355,7 @@ void Camera::PostRender()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the global pose of the camera
-math::Pose3d Camera::GetWorldPose()
+math::Pose Camera::GetWorldPose()
 {
   this->pose.pos = Conversions::Vector3(this->camera->getRealPosition());
   this->pose.rot = Conversions::Quaternion(this->camera->getRealOrientation());
@@ -372,7 +372,7 @@ math::Vector3 Camera::GetWorldPosition() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the global pose of the camera
-void Camera::SetWorldPose(const math::Pose3d &pose_)
+void Camera::SetWorldPose(const math::Pose &pose_)
 {
   this->pose = pose_;
   this->pose.Correct();

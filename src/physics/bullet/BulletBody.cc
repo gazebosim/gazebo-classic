@@ -105,21 +105,21 @@ void BulletBody::Load(common::XMLConfigNode *node)
                                                          principalInertia);
 
     // Convert to gazebo poses
-    math::Pose3d princ = BulletPhysics::ConvertPose(principal);
-    math::Pose3d inverse = BulletPhysics::ConvertPose(principal.inverse());
+    math::Pose princ = BulletPhysics::ConvertPose(principal);
+    math::Pose inverse = BulletPhysics::ConvertPose(principal.inverse());
 
     // Store the Center of Mass offset in the motion state
     this->motionState->SetCoMOffset(princ);
 
     // Move the body visual to match the center of mass offset
-    math::Pose3d tmp = this->GetRelativePose();
+    math::Pose tmp = this->GetRelativePose();
     tmp.pos += princ.pos;
     this->SetRelativePose(tmp, false);
 
     // Move all the geoms relative to the center of mass
     for (iter = this->geoms.begin(),i = 0; i < this->geoms.size(); i++, iter++)
     {
-      math::Pose3d origPose, newPose;
+      math::Pose origPose, newPose;
 
       // The original pose of the geometry
       origPose = BulletPhysics::ConvertPose(
@@ -238,7 +238,7 @@ void BulletBody::AttachGeom( Geom *geom )
     gzthrow("requires BulletGeom");
 
   btTransform trans;
-  math::Pose3d relativePose = geom->GetRelativePose();
+  math::Pose relativePose = geom->GetRelativePose();
   trans = BulletPhysics::ConvertPose(relativePose);
 
   bgeom->SetCompoundShapeIndex( this->compoundShape->getNumChildShapes() );
@@ -250,7 +250,7 @@ void BulletBody::AttachGeom( Geom *geom )
 /// changed
 void BulletBody::OnPoseChange()
 {
-  math::Pose3d pose = this->GetWorldPose();
+  math::Pose pose = this->GetWorldPose();
 
   this->motionState->SetWorldPose(pose);
   if (this->rigidBody)
@@ -409,7 +409,7 @@ void BulletBody::SetAngularDamping(double damping)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the relative pose of a child geom.
-void BulletBody::SetGeomRelativePose(BulletGeom *geom, const math::Pose3d &newPose)
+void BulletBody::SetGeomRelativePose(BulletGeom *geom, const math::Pose &newPose)
 {
   std::map<std::string, Geom*>::iterator iter;
   unsigned int i;

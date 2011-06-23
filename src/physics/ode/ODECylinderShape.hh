@@ -36,7 +36,7 @@ namespace gazebo
         oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
   
         dMass odeMass;
-        math::Pose3d rpose;
+        math::Pose rpose;
       
         Mass mass = this->geomParent->GetMass();
     

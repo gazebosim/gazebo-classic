@@ -48,7 +48,7 @@
 #include "sdf/interface/World.hh"
 #include "sdf/interface/Joint.hh"
 #include "sdf/interface/Plugin.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Quatern.hh"
 
@@ -118,7 +118,7 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEContact> &_contact);
 
   /// Pose
-  bool InitXml(TiXmlElement *_xml, gazebo::math::Pose3d &_pose);
+  bool InitXml(TiXmlElement *_xml, gazebo::math::Pose &_pose);
 
   bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Scene> &_scene);
@@ -139,10 +139,10 @@ namespace sdf
 
   bool saveXml(TiXmlElement *_parent, const gazebo::math::Vector3 &_vec);
   bool saveXml(TiXmlElement *_parent, const gazebo::math::Quatern &_rot);
-  //bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose3d &_pose);
+  //bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose &_pose);
 
-  //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,true> &_pose);
-  //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,false> &_pose);
+  //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,true> &_pose);
+  //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,false> &_pose);
 
   bool saveXml(TiXmlElement *_parent, boost::shared_ptr<Surface> &_surface);
   bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEFriction> &_friction);

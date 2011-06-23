@@ -78,7 +78,7 @@ class IRSensor: public Sensor
   /// \returns Returns DBL_MAX for no detection.
   public: double GetRange(unsigned int index) const;
 
-  public: Pose3d GetPose(unsigned int index) const;
+  public: Pose GetPose(unsigned int index) const;
 
   private: std::vector<RaySensor*> irBeams;
 

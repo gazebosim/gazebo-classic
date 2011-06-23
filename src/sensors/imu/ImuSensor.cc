@@ -78,7 +78,7 @@ void ImuSensor::SaveChild(std::string &prefix, std::ostream &stream)
 // Init the IMU
 void ImuSensor::InitChild()
 {
-  Pose3d bodyPose;
+  Pose bodyPose;
   bodyPose = this->body->GetWorldPose();
   this->prevPose = bodyPose;
 }
@@ -87,7 +87,7 @@ void ImuSensor::FiniChild()
 {
 }
 
-Pose3d ImuSensor::GetVelocity()
+Pose ImuSensor::GetVelocity()
 {
   return this->imuVel;
 }
@@ -99,7 +99,7 @@ void ImuSensor::UpdateChild()
 //  if (this->active)
   {
     Vector3 velocity;
-    Pose3d poseDelta;
+    Pose poseDelta;
     double heading;
     double v1;
 

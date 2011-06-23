@@ -51,10 +51,10 @@ namespace gazebo
     /// Finalize the ray
     protected: virtual void FiniChild();
   
-    public: Pose3d GetVelocity();
+    public: Pose GetVelocity();
   
-    private: Pose3d prevPose;
-    private: Pose3d imuVel;
+    private: Pose prevPose;
+    private: Pose imuVel;
   
   };
 }

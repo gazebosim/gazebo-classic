@@ -147,7 +147,7 @@ void IRSensor::LoadChild(XMLConfigNode *node)
 // Init the ray
 void IRSensor::InitChild()
 {
-  /*Pose3d bodyPose;
+  /*Pose bodyPose;
   double angle;
   Vector3 start, end, axis;
   RayGeom *ray;
@@ -222,7 +222,7 @@ double IRSensor::GetRange(unsigned int index) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the pose of an ir beam
-Pose3d IRSensor::GetPose(unsigned int index) const
+Pose IRSensor::GetPose(unsigned int index) const
 {
   if (index >= this->irBeams.size())
   {

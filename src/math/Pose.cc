@@ -20,7 +20,7 @@
  * SVN: $Id$
  */
 
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -28,13 +28,13 @@ using namespace math;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructors
-Pose3d::Pose3d()
+Pose::Pose()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Pose3d::Pose3d( const Vector3 &pos, const Quatern &rot)
+Pose::Pose( const Vector3 &pos, const Quatern &rot)
 {
   this->pos = pos;
   this->rot = rot;
@@ -42,7 +42,7 @@ Pose3d::Pose3d( const Vector3 &pos, const Quatern &rot)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Copy constructor
-Pose3d::Pose3d( const Pose3d &pose )
+Pose::Pose( const Pose &pose )
 {
   this->pos = pose.pos;
   this->rot = pose.rot;
@@ -50,20 +50,20 @@ Pose3d::Pose3d( const Pose3d &pose )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Pose3d::~Pose3d()
+Pose::~Pose()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // See if a pose is finite (e.g., not nan)
-bool Pose3d::IsFinite() const
+bool Pose::IsFinite() const
 {
   return this->pos.IsFinite() && this->rot.IsFinite();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Fix any nan values
-void Pose3d::Correct()
+void Pose::Correct()
 {
   this->pos.Correct();
   this->rot.Correct();
@@ -71,17 +71,17 @@ void Pose3d::Correct()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the inverse of this pose
-Pose3d Pose3d::GetInverse() const
+Pose Pose::GetInverse() const
 {
   Quatern inv = this->rot.GetInverse();
-  return Pose3d( inv * (this->pos*-1), inv );
+  return Pose( inv * (this->pos*-1), inv );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this + obj
-Pose3d Pose3d::operator+(const Pose3d &obj) const
+Pose Pose::operator+(const Pose &obj) const
 {
-  Pose3d result;
+  Pose result;
 
   result.pos = this->CoordPositionAdd(obj);
   result.rot = this->CoordRotationAdd(obj.rot);
@@ -91,7 +91,7 @@ Pose3d Pose3d::operator+(const Pose3d &obj) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add-Equals operator
-const Pose3d &Pose3d::operator+=(const Pose3d &obj)
+const Pose &Pose::operator+=(const Pose &obj)
 {
   this->pos = this->CoordPositionAdd(obj);
   this->rot = this->CoordRotationAdd(obj.rot);
@@ -101,9 +101,9 @@ const Pose3d &Pose3d::operator+=(const Pose3d &obj)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj
-Pose3d Pose3d::operator-(const Pose3d &obj) const
+Pose Pose::operator-(const Pose &obj) const
 {
-  Pose3d result;
+  Pose result;
 
   result.pos = this->CoordPositionSub(obj);
   result.rot = this->CoordRotationSub(obj.rot);
@@ -113,7 +113,7 @@ Pose3d Pose3d::operator-(const Pose3d &obj) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj
-const Pose3d &Pose3d::operator-=(const Pose3d &obj)
+const Pose &Pose::operator-=(const Pose &obj)
 {
   this->pos = this->CoordPositionSub(obj);
   this->rot = this->CoordRotationSub(obj.rot);
@@ -123,14 +123,14 @@ const Pose3d &Pose3d::operator-=(const Pose3d &obj)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Multiplication operator
-Pose3d Pose3d::operator*(const Pose3d &pose)
+Pose Pose::operator*(const Pose &pose)
 {
-  return Pose3d(this->CoordPositionAdd(pose), this->rot * pose.rot);
+  return Pose(this->CoordPositionAdd(pose), this->rot * pose.rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add one point to a vector: result = this + pos
-Vector3 Pose3d::CoordPositionAdd(const Vector3 &pos) const
+Vector3 Pose::CoordPositionAdd(const Vector3 &pos) const
 {
   Quatern tmp;
   Vector3 result;
@@ -151,7 +151,7 @@ Vector3 Pose3d::CoordPositionAdd(const Vector3 &pos) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add one point to another: result = this + pose
-Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose) const
+Vector3 Pose::CoordPositionAdd(const Pose &pose) const
 {
   Quatern tmp;
   Vector3 result;
@@ -174,7 +174,7 @@ Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Subtract one position from another: result = this - pose
-Vector3 Pose3d::CoordPositionSub(const Pose3d &pose) const
+Vector3 Pose::CoordPositionSub(const Pose &pose) const
 {
   Quatern tmp;
   Vector3 result;
@@ -196,14 +196,14 @@ Vector3 Pose3d::CoordPositionSub(const Pose3d &pose) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add one rotation to another: result =  this->rot + rot
-Quatern Pose3d::CoordRotationAdd(const Quatern &rot) const
+Quatern Pose::CoordRotationAdd(const Quatern &rot) const
 {
   return Quatern(rot * this->rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Subtract one rotation from another: result = this->rot - rot
-Quatern Pose3d::CoordRotationSub(const Quatern &rot) const
+Quatern Pose::CoordRotationSub(const Quatern &rot) const
 {
   Quatern result(rot.GetInverse() * this->rot);
   result.Normalize();
@@ -212,7 +212,7 @@ Quatern Pose3d::CoordRotationSub(const Quatern &rot) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Reset the pose
-void Pose3d::Reset()
+void Pose::Reset()
 {
   // set the position to zero
   this->pos.Set();
@@ -223,10 +223,10 @@ void Pose3d::Reset()
 //////////////////////////////////////////////////////////////////////////////
 // Find the inverse of a pose; i.e., if b = this + a, given b and this,
 // find a
-Pose3d Pose3d::CoordPoseSolve(const Pose3d &b) const
+Pose Pose::CoordPoseSolve(const Pose &b) const
 {
   Quatern q;
-  Pose3d a;
+  Pose a;
 
   a.rot = this->rot.GetInverse() * b.rot;
   q = a.rot * Quatern(0, this->pos.x, this->pos.y, this->pos.z);
@@ -238,9 +238,9 @@ Pose3d Pose3d::CoordPoseSolve(const Pose3d &b) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Rotate a vector by a quaternion, added for computing CG location for the Body
-Pose3d Pose3d::RotatePositionAboutOrigin(const Quatern &rot) const
+Pose Pose::RotatePositionAboutOrigin(const Quatern &rot) const
 {
-  Pose3d a = *this;
+  Pose a = *this;
   a.pos.x =  (1.0 - 2.0*rot.y*rot.y - 2.0*rot.z*rot.z) * this->pos.x
             +(2.0*(rot.x*rot.y+rot.w*rot.z)          ) * this->pos.y
             +(2.0*(rot.x*rot.z-rot.w*rot.y)          ) * this->pos.z;

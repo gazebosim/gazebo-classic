@@ -205,7 +205,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 void Visual::Load(common::XMLConfigNode *node)
 {
   std::ostringstream stream;
-  math::Pose3d pose;
+  math::Pose pose;
   Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
 
@@ -699,7 +699,7 @@ void Visual::SetRotation( const math::Quatern &rot)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
-void Visual::SetPose( const math::Pose3d &pose)
+void Visual::SetPose( const math::Pose &pose)
 {
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
@@ -721,9 +721,9 @@ math::Quatern Visual::GetRotation( ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the visual
-math::Pose3d Visual::GetPose() const
+math::Pose Visual::GetPose() const
 {
-  math::Pose3d pos;
+  math::Pose pos;
   pos.pos=this->GetPosition();
   pos.rot=this->GetRotation();
   return pos;
@@ -731,9 +731,9 @@ math::Pose3d Visual::GetPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global pose of the node
-math::Pose3d Visual::GetWorldPose() const
+math::Pose Visual::GetWorldPose() const
 {
-  math::Pose3d pose;
+  math::Pose pose;
 
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;

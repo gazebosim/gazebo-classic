@@ -135,10 +135,10 @@ class BulletPhysics : public PhysicsEngine
   public: virtual void ConvertMass(void *engineMass, const Mass &mass);
 
   /// \brief Convert a bullet transform to a gazebo pose
-  public: static math::Pose3d ConvertPose(btTransform bt);
+  public: static math::Pose ConvertPose(btTransform bt);
 
   /// \brief Convert a gazebo pose to a bullet transform
-  public: static btTransform ConvertPose(const math::Pose3d pose);
+  public: static btTransform ConvertPose(const math::Pose pose);
 
   /// \brief Register a joint with the dynamics world
   public: btDynamicsWorld *GetDynamicsWorld() const

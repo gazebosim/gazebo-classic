@@ -48,7 +48,7 @@
 #include "sdf/interface/World.hh"
 #include "sdf/interface/Joint.hh"
 #include "sdf/interface/Plugin.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "sdf/parser_deprecated/controller.hh"
 
 namespace sdf
@@ -111,7 +111,7 @@ namespace sdf
   bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
 
   /// Pose
-  bool InitXml(xmlNodePtr _xml, gazebo::math::Pose3d &_pose);
+  bool InitXml(xmlNodePtr _xml, gazebo::math::Pose &_pose);
 
 /*
   bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);

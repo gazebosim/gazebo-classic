@@ -24,7 +24,7 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 
 namespace gazebo
 {
@@ -39,7 +39,7 @@ namespace gazebo
     public: BulletMotionState(Body *body);
 
     /// \brief Constructor
-    //public: BulletMotionState(const math::Pose3d &initPose);
+    //public: BulletMotionState(const math::Pose &initPose);
 
     /// \brief Destructor
     public: virtual ~BulletMotionState();
@@ -48,7 +48,7 @@ namespace gazebo
     public: void SetVisual(Visual *vis);
 
     /// \brief Get the pose
-    public: math::Pose3d GetWorldPose() const;
+    public: math::Pose GetWorldPose() const;
 
     /// \brief Set the position of the body
     /// \param pos math::Vector position
@@ -59,10 +59,10 @@ namespace gazebo
     public: virtual void SetWorldRotation(const common::Quatern &rot);
 
     /// \brief Set the pose
-    public: void SetWorldPose(const math::Pose3d &pose);
+    public: void SetWorldPose(const math::Pose &pose);
 
     /// \brief Set the center of mass offset
-    public: void SetCoMOffset( const math::Pose3d &com );
+    public: void SetCoMOffset( const math::Pose &com );
 
     /// \brief Get the world transform
     public: virtual void getWorldTransform(btTransform &worldTrans) const;
@@ -71,8 +71,8 @@ namespace gazebo
     public: virtual void setWorldTransform(const btTransform &worldTrans);
 
     private: Visual *visual;
-    private: math::Pose3d worldPose;
-    private: math::Pose3d comOffset;
+    private: math::Pose worldPose;
+    private: math::Pose comOffset;
     private: Body *body;
   };
 }

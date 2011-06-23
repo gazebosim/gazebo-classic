@@ -625,7 +625,7 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
     if (entity->HasType(Entity::ENTITY))
     {
       msgs::Pose *poseMsg = scene.add_pose();
-      math::Pose3d pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
+      math::Pose pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
       poseMsg->CopyFrom( common::Message::Convert(pose) );
       common::Message::Init(*poseMsg, entity->GetCompleteScopedName() );
     }

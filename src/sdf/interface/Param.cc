@@ -22,7 +22,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "math/Vector3.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 
 #include "sdf/interface/Param.hh"
 

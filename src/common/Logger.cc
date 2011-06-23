@@ -125,7 +125,7 @@ void Logger::LogObj::Update()
 {
   if (this->entity)
   {
-    math::Pose3d pose3d = entity->GetWorldPose();
+    math::Pose pose3d = entity->GetWorldPose();
     Time simTime = Simulator::Instance()->GetSimTime();
     Time realTime = Simulator::Instance()->GetRealTime();
 

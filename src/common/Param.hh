@@ -86,7 +86,7 @@ namespace gazebo
       public: bool IsVector3() const;
       public: bool IsVector4() const;
       public: bool IsQuatern() const;
-      public: bool IsPose3d() const;
+      public: bool IsPose() const;
   
       /// List of created parameters
       private: static std::vector<Param*> *params;

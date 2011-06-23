@@ -120,14 +120,14 @@ namespace gazebo
     public: virtual void SetAngularDamping(double damping);
 
     /// \brief Set the relative pose of a child geom.
-    public: void SetGeomRelativePose(BulletGeom *geom, const math::Pose3d &newPose);
+    public: void SetGeomRelativePose(BulletGeom *geom, const math::Pose &newPose);
 
     private: btCompoundShape *compoundShape;
     private: BulletMotionState *motionState;
     private: btRigidBody *rigidBody;
     private: BulletPhysics *bulletPhysics;
 
-    protected: math::Pose3d pose;
+    protected: math::Pose pose;
   };
 
   /// \}

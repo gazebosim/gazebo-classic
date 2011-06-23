@@ -19,7 +19,7 @@
 #include <algorithm>
 
 #include "math/Vector3.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 #include "math/Quatern.hh"
 #include "math/Plane.hh"
 
@@ -128,7 +128,7 @@ void Message::Set(msgs::Quaternion *q, const math::Quatern &v)
   q->set_w(v.w);
 }
 
-void Message::Set(msgs::Pose *p, const math::Pose3d &v)
+void Message::Set(msgs::Pose *p, const math::Pose &v)
 {
   Message::Set( p->mutable_position(), v.pos );
   Message::Set( p->mutable_orientation(), v.rot );
@@ -175,7 +175,7 @@ msgs::Quaternion Message::Convert(const math::Quatern &q)
   return result;
 }
 
-msgs::Pose Message::Convert(const math::Pose3d &p)
+msgs::Pose Message::Convert(const math::Pose &p)
 {
   msgs::Pose result;
   result.mutable_position()->CopyFrom( Convert(p.pos) );
@@ -221,9 +221,9 @@ math::Quatern Message::Convert(const msgs::Quaternion &q)
   return math::Quatern(q.w(), q.x(), q.y(), q.z());
 }
 
-math::Pose3d Message::Convert(const msgs::Pose &p)
+math::Pose Message::Convert(const msgs::Pose &p)
 {
-  return math::Pose3d( Message::Convert(p.position()), 
+  return math::Pose( Message::Convert(p.position()), 
                  Message::Convert(p.orientation()) );
 }
 

@@ -170,7 +170,7 @@ void Model::Load(common::XMLConfigNode *node)
 // Initialize the model
 void Model::Init()
 {
-  math::Pose3d pose;
+  math::Pose pose;
 
   this->SetStatic( **(this->staticP) );
 

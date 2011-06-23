@@ -43,7 +43,7 @@
 #include <iostream>
 
 #include "sdf/interface/Param.hh"
-#include "math/Pose3d.hh"
+#include "math/Pose.hh"
 
 namespace sdf
 {
@@ -96,7 +96,7 @@ namespace sdf
             axis("axis",gazebo::math::Vector3()), 
             axis2("axis2", gazebo::math::Vector3()), 
             childLinkName("link", ""), 
-            parentLinkName("link", ""), origin("origin", gazebo::math::Pose3d())
+            parentLinkName("link", ""), origin("origin", gazebo::math::Pose())
     { this->Clear(); };
 
     public: ParamT<std::string,true> name;
@@ -123,7 +123,7 @@ namespace sdf
     public: ParamT<std::string, true> parentLinkName;
 
     /// transform from Child Link frame to Joint frame
-    public: ParamT<gazebo::math::Pose3d, true> origin;
+    public: ParamT<gazebo::math::Pose, true> origin;
 
     /// Joint Dynamics
     public: boost::shared_ptr<JointDynamics> dynamics;

@@ -207,14 +207,14 @@ namespace gazebo
   
       /// Used by Model if this body is the canonical body
       ///   model pose = body pose + initModelOffset
-      public: math::Pose3d initModelOffset;
+      public: math::Pose initModelOffset;
   
       // Helper entity for separating body pose from center-of-mass pose
       protected: EntityPtr comEntity;
   
       /// The pose of the body relative to the model. Can also think of this
       /// as the body's pose offset.
-      protected: math::Pose3d relativePose;
+      protected: math::Pose relativePose;
   
       protected: common::ParamT<math::Vector3> *xyzP;
       protected: common::ParamT<math::Quatern> *rpyP;
@@ -253,7 +253,7 @@ namespace gazebo
       /// This flag is used to trigger the enabledSignal
       private: bool enabled;
   
-      protected: math::Pose3d newPose;
+      protected: math::Pose newPose;
   
       private: std::vector<event::ConnectionPtr> connections;
     };

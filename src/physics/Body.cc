@@ -233,7 +233,7 @@ void Body::Init()
   // this is only used in setting Model pose from canonicalBody
   // the true model pose given a canonical body is
   //   this body's pose - this body's offsetFromModelFrame
-  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(math::Pose3d());
+  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(math::Pose());
 
   this->SetKinematic(**this->kinematicP);
 
@@ -308,7 +308,7 @@ void Body::Init()
   this->enabled = true;
 
   // DO THIS LAST!
-  this->SetRelativePose(math::Pose3d(**this->xyzP, **this->rpyP));
+  this->SetRelativePose(math::Pose(**this->xyzP, **this->rpyP));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -455,8 +455,8 @@ void Body::Update()
 /// Update the center of mass
 void Body::UpdateCoM()
 {
-  math::Pose3d bodyPose;
-  math::Pose3d origPose, newPose;
+  math::Pose bodyPose;
+  math::Pose origPose, newPose;
   Base_V::iterator iter;
 
   bodyPose = this->GetRelativePose();
@@ -481,7 +481,7 @@ void Body::UpdateCoM()
     }
   }
 
-  //this->comEntity->SetRelativePose(math::Pose3d(this->mass.GetCoG(),common::Quatern()),true);
+  //this->comEntity->SetRelativePose(math::Pose(this->mass.GetCoG(),common::Quatern()),true);
   this->OnPoseChange();
 }
 

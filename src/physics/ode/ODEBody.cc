@@ -110,7 +110,7 @@ void ODEBody::Init()
 // Move callback. Use this to move the visuals
 void ODEBody::MoveCallback(dBodyID id)
 {
-  math::Pose3d pose;
+  math::Pose pose;
   const dReal *p;
   const dReal *r;
   ODEBody *self = (ODEBody*)(dBodyGetData(id));
@@ -184,8 +184,8 @@ void ODEBody::OnPoseChange()
 
   //this->SetEnabled(true);
 
-  //math::Pose3d pose = this->comEntity->GetWorldPose();
-  math::Pose3d pose = this->GetWorldPose();
+  //math::Pose pose = this->comEntity->GetWorldPose();
+  math::Pose pose = this->GetWorldPose();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 

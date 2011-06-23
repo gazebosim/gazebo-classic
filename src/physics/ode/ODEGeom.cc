@@ -60,7 +60,7 @@ void ODEGeom::Load(common::XMLConfigNode *node)
 
   /*if (this->geomId && this->placeable)
   {
-    math::Pose3d localPose;
+    math::Pose localPose;
     dQuaternion q;
 
     // Transform into CoM relative Pose
@@ -90,7 +90,7 @@ void ODEGeom::Load(common::XMLConfigNode *node)
 // Pose change callback
 void ODEGeom::OnPoseChange()
 {
-  math::Pose3d localPose;
+  math::Pose localPose;
   dQuaternion q;
 
   if (this->IsStatic() && this->geomId && this->placeable)
@@ -217,7 +217,7 @@ void ODEGeom::SetCollideBits(unsigned int bits)
 Mass ODEGeom::GetBodyMassMatrix()
 {
   Mass result;
-  math::Pose3d pose;
+  math::Pose pose;
   math::Vector3 cog, principals, products;
   dMass bodyMass;
   dQuaternion q;

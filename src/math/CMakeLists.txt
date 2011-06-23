@@ -5,7 +5,7 @@ set ( sources Angle.cc
               Matrix3.cc
               Matrix4.cc
               Plane.cc
-              Pose3d.cc
+              Pose.cc
               Quatern.cc
               Rand.cc
               Vector2d.cc
@@ -19,7 +19,7 @@ set ( headers Angle.hh
               Matrix3.hh
               Matrix4.hh
               Plane.hh
-              Pose3d.hh
+              Pose.hh
               Quatern.hh
               Rand.hh
               Vector2d.hh
