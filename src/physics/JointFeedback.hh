@@ -22,7 +22,7 @@
 #ifndef JOINTFEEDBACK_HH
 #define JOINTFEEDBACK_HH
 
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 namespace gazebo
 {
@@ -41,11 +41,11 @@ namespace gazebo
                 return *this;
               }
   
-      public: common::Vector3 body1Force;
-      public: common::Vector3 body2Force;
+      public: math::Vector3 body1Force;
+      public: math::Vector3 body2Force;
     
-      public: common::Vector3 body1Torque;
-      public: common::Vector3 body2Torque;
+      public: math::Vector3 body1Torque;
+      public: math::Vector3 body2Torque;
     };
   }
 

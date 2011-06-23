@@ -19,20 +19,20 @@
  * Date: 14 Aug 2008
  */
 
-#include "src/common/Console.hh"
-#include "src/common/Exception.hh"
+#include "common/Console.hh"
+#include "common/Exception.hh"
+#include "math/Vector3.hh"
+#include "math/Pose3d.hh"
 
-#include "sdf/interface/color.hh"
-#include "sdf/interface/pose.hh"
 #include "sdf/interface/Param.hh"
 
 using namespace sdf;
 
-std::vector<Param*> *Param::params = NULL;
+//std::vector<Param*> *Param::params = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Param::Param(Param *_newParam) 
+Param::Param(Param * /*_newParam*/) 
 {
 /*  if (params == NULL)
     gzthrow("Param vector is NULL\n");
@@ -48,7 +48,7 @@ Param::~Param()
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Begin a block of "new ParamT<>"
-void Param::Begin(std::vector<Param*> *_params)
+void Param::Begin(std::vector<Param*> * /*_params*/)
 {
 /*  if (params != NULL)
     gzthrow("Calling Begin before an End\n");
@@ -118,11 +118,11 @@ bool Param::IsStr() const
 ////////////////////////////////////////////////////////////////////////////////
 bool Param::IsVector3() const
 {
-  return this->GetTypeName() == typeid(Vector3).name();
+  return this->GetTypeName() == typeid(gazebo::math::Vector3).name();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Param::IsRotation() const
 {
-  return this->GetTypeName() == typeid(Rotation).name();
+  return this->GetTypeName() == typeid(gazebo::math::Quatern).name();
 }

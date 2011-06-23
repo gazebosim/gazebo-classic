@@ -103,22 +103,22 @@ namespace gazebo
     public: void Attach( Body *one, Body *two );
 
     /// \brief Get the anchor point
-    public: virtual common::Vector3 GetAnchor(int index) const;
+    public: virtual math::Vector3 GetAnchor(int index) const;
 
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
+    public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
 
     /// \brief Set the first axis of rotation
-    public: void SetAxis(int index, const common::Vector3 &axis );
+    public: void SetAxis(int index, const math::Vector3 &axis );
   
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
 
     /// \brief Get the first axis of rotation
-    public: virtual common::Vector3 GetAxis(int index) const;
+    public: virtual math::Vector3 GetAxis(int index) const;
   
     /// \brief Get the angle of axis 1
-    public: virtual common::Angle GetAngle(int index) const;
+    public: virtual math::Angle GetAngle(int index) const;
 
     /// \brief Set the velocity of an axis(index).
     public: virtual void SetVelocity(int index, double angle);
@@ -136,16 +136,16 @@ namespace gazebo
     public: virtual double GetMaxForce(int index);
 
     /// \brief Set the high stop of an axis(index).
-    public: virtual void SetHighStop(int index, common::Angle angle);
+    public: virtual void SetHighStop(int index, math::Angle angle);
 
     /// \brief Set the low stop of an axis(index).
-    public: virtual void SetLowStop(int index, common::Angle angle);
+    public: virtual void SetLowStop(int index, math::Angle angle);
  
     /// \brief Get the high stop of an axis(index).
-    public: virtual common::Angle GetHighStop(int index);
+    public: virtual math::Angle GetHighStop(int index);
 
     /// \brief Get the low stop of an axis(index).
-    public: virtual common::Angle GetLowStop(int index);
+    public: virtual math::Angle GetLowStop(int index);
   };
   
   /// \}

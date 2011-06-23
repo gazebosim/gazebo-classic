@@ -51,7 +51,7 @@ namespace gazebo
       /// \brief Save child parameters
       protected: void Save(std::string &prefix, std::ostream &stream);
   
-      protected: common::Vector3 terrainSize;
+      protected: math::Vector3 terrainSize;
   
       protected: std::vector<double> heights;
   
@@ -59,8 +59,8 @@ namespace gazebo
       protected: common::ParamT<std::string> *imageFilenameP;
       protected: common::ParamT<std::string> *worldTextureP;
       protected: common::ParamT<std::string> *detailTextureP;
-      protected: common::ParamT<common::Vector3> *sizeP;
-      protected: common::ParamT<common::Vector3> *offsetP;
+      protected: common::ParamT<math::Vector3> *sizeP;
+      protected: common::ParamT<math::Vector3> *offsetP;
   
       // NATY: protected: OgreHeightmap *ogreHeightmap;
     };

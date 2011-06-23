@@ -103,7 +103,7 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
     //FACET
     if (this->Leqi(token, (char*)"facet"))
     { 
-      Vector3 normal;
+      math::Vector3 normal;
 
       //Get the XYZ coordinates of the normal vector to the face. 
       sscanf ( next, "%*s %e %e %e", &r1, &r2, &r3 );  
@@ -119,7 +119,7 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 
       for ( ;; ) 
       {
-        Vector3 vertex;
+        math::Vector3 vertex;
         if (fgets ( input, LINE_MAX_LEN, filein ) == NULL)
           gzerr << "Error...\n";
 
@@ -195,7 +195,7 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
   //  2 byte "attribute".
   for (iface = 0; iface < face_num; iface++)
   {
-    Vector3 normal;
+    math::Vector3 normal;
 
     // Get the normal for the face
     normal.x =  this->FloatRead(filein);
@@ -205,7 +205,7 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
     // Get three vertices
     for (i = 0; i < 3; i++) 
     {
-      Vector3 vertex;
+      math::Vector3 vertex;
 
       vertex.x = this->FloatRead(filein);
       vertex.y = this->FloatRead(filein);

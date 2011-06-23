@@ -39,7 +39,6 @@
 #include "common/Console.hh"
 #include "common/SystemPaths.hh"
 #include "common/Global.hh"
-#include "common/XMLConfig.hh"
 
 //#include "rendering/RTShaderSystem.hh"
 #include "rendering/WindowManager.hh"
@@ -77,7 +76,7 @@ RenderEngine::~RenderEngine()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
-void RenderEngine::Load(common::XMLConfigNode * /*rootNode*/)
+void RenderEngine::Load()
 {
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
@@ -100,7 +99,6 @@ void RenderEngine::Load(common::XMLConfigNode * /*rootNode*/)
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
   }
 
-  
   // Load all the plugins
   this->LoadPlugins();
 
@@ -119,12 +117,10 @@ void RenderEngine::Load(common::XMLConfigNode * /*rootNode*/)
 ScenePtr RenderEngine::CreateScene(const std::string &name)
 {
   ScenePtr scene( new Scene(name) );
-  scene->Load(NULL);
 
   if (this->initialized)
     scene->Init();
 
-  scene->SetType(Scene::GENERIC);
   scene->SetAmbientColor(common::Color(0.5, 0.5, 0.5));
   scene->SetBackgroundColor(common::Color(0.5, 0.5, 0.5, 1.0));
   scene->CreateGrid( 10, 1, 0.03, common::Color(1,1,1,1));

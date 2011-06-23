@@ -26,8 +26,8 @@
 // TODO: remove this line
 #include "rendering/ogre.h"
 
-#include "common/Vector3.hh"
-#include "common/Vector2d.hh"
+#include "math/Vector3.hh"
+#include "math/Vector2d.hh"
 
 namespace gazebo
 {
@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual ~Heightmap();
   
       /// \brief Get the height of the heightmap as a specific coordinate
-      public: float GetHeightAt(const common::Vector2d &pos);
+      public: float GetHeightAt(const math::Vector2d &pos);
   
       /// \brief Overloaded Ogre function for Ray Scene Queries
       public: virtual bool queryResult(Ogre::MovableObject *obj, Ogre::Real dist);
@@ -57,9 +57,9 @@ namespace gazebo
       public: virtual void Load( std::string imageFilename, 
                                     std::string worldTexture, 
                                     std::string detialTexture,
-                                    common::Vector3 terrainSize);
+                                    math::Vector3 terrainSize);
   
-      private: common::Vector3 terrainSize;
+      private: math::Vector3 terrainSize;
   
       private: Ogre::Ray ray;
       private: Ogre::RaySceneQuery *rayQuery;

@@ -33,7 +33,7 @@
 
 #include "common/MeshLoader.hh"
 #include "common/Exception.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 #define M_MESH 0x3000
 #define M_SUBMESH 0x4000

@@ -33,7 +33,7 @@ PlaneShape::PlaneShape(GeomPtr parent)
   this->SetName("plane_shape");
 
   common::Param::Begin(&this->parameters);
-  this->normalP = new common::ParamT<common::Vector3>("normal",common::Vector3(0,0,1),0);
+  this->normalP = new common::ParamT<math::Vector3>("normal",math::Vector3(0,0,1),0);
   this->normalP->Callback( &PlaneShape::SetNormal, this );
   common::Param::End();
 }
@@ -75,13 +75,13 @@ void PlaneShape::CreatePlane()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the altitude of the plane
-void PlaneShape::SetAltitude(const common::Vector3 &pos) 
+void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/) 
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the normal
-void PlaneShape::SetNormal( const common::Vector3 &norm )
+void PlaneShape::SetNormal( const math::Vector3 &norm )
 {
   this->normalP->SetValue(norm);
   this->CreatePlane();

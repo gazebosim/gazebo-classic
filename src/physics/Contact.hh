@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "common/Time.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "JointFeedback.hh"
 
 namespace gazebo
@@ -62,8 +62,8 @@ namespace gazebo
  
     public: std::vector<JointFeedback> forces;
 
-    public: std::vector<common::Vector3> positions;
-    public: std::vector<common::Vector3> normals;
+    public: std::vector<math::Vector3> positions;
+    public: std::vector<math::Vector3> normals;
   
     public: std::vector<double> depths;
 

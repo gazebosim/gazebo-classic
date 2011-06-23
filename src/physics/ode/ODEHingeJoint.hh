@@ -22,8 +22,8 @@
 #ifndef ODEHINGEJOINT_HH
 #define ODEHINGEJOINT_HH
 
-#include "common/Angle.hh"
-#include "common/Vector3.hh"
+#include "math/Angle.hh"
+#include "math/Vector3.hh"
 
 #include "physics/HingeJoint.hh"
 #include "physics/ode/ODEJoint.hh"
@@ -45,16 +45,16 @@ namespace gazebo
       protected: virtual void Load(common::XMLConfigNode *node);
   
       /// Get the anchor point
-      public: virtual common::Vector3 GetAnchor(int index) const;
+      public: virtual math::Vector3 GetAnchor(int index) const;
   
       /// Set the anchor point
-      public: virtual void SetAnchor(int index, const common::Vector3 &anchor);
+      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
   
       /// Get the axis of rotation
-      public: virtual common::Vector3 GetAxis(int index) const;
+      public: virtual math::Vector3 GetAxis(int index) const;
   
       /// Set the axis of rotation
-      public: virtual void SetAxis(int index, const common::Vector3 &axis);
+      public: virtual void SetAxis(int index, const math::Vector3 &axis);
    
       /// \brief Set the joint damping
       public: virtual void SetDamping( int index, const double damping );
@@ -63,7 +63,7 @@ namespace gazebo
       public: void ApplyDamping();
   
       /// Get the angle of rotation
-      public: virtual common::Angle GetAngle(int index) const;
+      public: virtual math::Angle GetAngle(int index) const;
    
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double angle);

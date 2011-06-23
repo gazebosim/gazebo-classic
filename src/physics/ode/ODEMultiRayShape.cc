@@ -157,7 +157,7 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
-void ODEMultiRayShape::AddRay(const common::Vector3 &start, const common::Vector3 &end )
+void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
 {
   MultiRayShape::AddRay(start,end);
   ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetBody()) );

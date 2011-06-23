@@ -55,10 +55,10 @@ Geom::Geom( BodyPtr body )
   this->massP = new common::ParamT<double>("mass",0.001,0);
   this->massP->Callback( &Geom::SetMass, this);
 
-  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(), 0);
+  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this);
 
-  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(), 0);
+  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
   this->laserFiducialIdP = new common::ParamT<int>("laser_fiducial_id",-1,0);
@@ -132,7 +132,7 @@ void Geom::Load(common::XMLConfigNode *node)
 void Geom::Init()
 {
   this->SetContactsEnabled(**this->enableContactsP);
-  this->SetRelativePose( common::Pose3d( **this->xyzP, **this->rpyP ) );
+  this->SetRelativePose( math::Pose3d( **this->xyzP, **this->rpyP ) );
   this->mass.SetMass( **this->massP );
 
   this->shape->Init();
@@ -145,7 +145,7 @@ void Geom::CreateBoundingBox()
   // Create the bounding box
   if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
   {
-    common::Box box;
+    math::Box box;
 
     box = this->GetBoundingBox();
 
@@ -168,8 +168,8 @@ void Geom::CreateBoundingBox()
       msg.set_material( "Gazebo/GreenTransparent" );
 
     common::Message::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
-    common::Message::Set(msg.mutable_pose()->mutable_position(), common::Vector3(0,0,0.0));
-    common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0));
+    common::Message::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
+    common::Message::Set(msg.mutable_pose()->mutable_orientation(), math::Quatern(1,0,0,0));
     msg.set_transparency( .5 );
 
     this->visPub->Publish(msg);
@@ -363,7 +363,7 @@ unsigned int Geom::GetContactCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add an occurance of a contact to this geom
-void Geom::AddContact(const Contact &contact)
+void Geom::AddContact(const Contact &/*_contact*/)
 {
   if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
     return;
@@ -375,11 +375,11 @@ void Geom::AddContact(const Contact &contact)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific contact
-Contact Geom::GetContact(unsigned int i) const
+Contact Geom::GetContact(unsigned int /*_i*/) const
 {
   return Contact();
   // TODO: redo this
-  //return this->GetParentModel()->RetrieveContact(, i);
+  //return this->GetParentModel()->RetrieveContact(, _i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -399,80 +399,80 @@ void Geom::EnabledCB(bool enabled)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the geom
-common::Vector3 Geom::GetRelativeLinearVel() const
+math::Vector3 Geom::GetRelativeLinearVel() const
 {
   if (this->body)
     return this->body->GetRelativeLinearVel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the geom in the world frame
-common::Vector3 Geom::GetWorldLinearVel() const
+math::Vector3 Geom::GetWorldLinearVel() const
 {
   if (this->body)
     return this->body->GetWorldLinearVel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the geom
-common::Vector3 Geom::GetRelativeAngularVel() const
+math::Vector3 Geom::GetRelativeAngularVel() const
 {
   if (this->body)
     return this->body->GetRelativeAngularVel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the geom in the world frame
-common::Vector3 Geom::GetWorldAngularVel() const
+math::Vector3 Geom::GetWorldAngularVel() const
 {
   if (this->body)
     return this->body->GetWorldAngularVel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the geom
-common::Vector3 Geom::GetRelativeLinearAccel() const
+math::Vector3 Geom::GetRelativeLinearAccel() const
 {
   if (this->body)
     return this->body->GetRelativeLinearAccel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the geom in the world frame
-common::Vector3 Geom::GetWorldLinearAccel() const
+math::Vector3 Geom::GetWorldLinearAccel() const
 {
   if (this->body)
     return this->body->GetWorldLinearAccel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the geom
-common::Vector3 Geom::GetRelativeAngularAccel() const
+math::Vector3 Geom::GetRelativeAngularAccel() const
 {
   if (this->body)
     return this->body->GetRelativeAngularAccel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the geom in the world frame
-common::Vector3 Geom::GetWorldAngularAccel() const
+math::Vector3 Geom::GetWorldAngularAccel() const
 {
   if (this->body)
     return this->body->GetWorldAngularAccel();
   else
-    return common::Vector3();
+    return math::Vector3();
 }

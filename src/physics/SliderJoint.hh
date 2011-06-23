@@ -42,7 +42,7 @@ namespace gazebo
                 this->AddType(Base::SLIDER_JOINT);
   
                 common::Param::Begin(&this->parameters);
-                this->axisP = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,0,1), 0);
+                this->axisP = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,0,1), 0);
                 this->loStopP = new common::ParamT<double>("lowStop",-DBL_MAX,0);
                 this->hiStopP = new common::ParamT<double>("highStop",DBL_MAX,0);
                 this->dampingP = new common::ParamT<double>("damping",0.0, 0);
@@ -87,16 +87,19 @@ namespace gazebo
                    stream << prefix << *(this->hiStopP) << "\n";
                  }
       /// \brief Set the anchor
-      public: virtual void SetAnchor( int index, const common::Vector3 &anchor) {fakeAnchor = anchor;}
+      public: virtual void SetAnchor( int /*_index*/, 
+                                      const math::Vector3 &_anchor) 
+              {this->fakeAnchor = _anchor;}
   
       /// \brief Get the anchor
-      public: virtual common::Vector3 GetAnchor(int index) const {return fakeAnchor;}
+      public: virtual math::Vector3 GetAnchor(int /*_index*/) const 
+              {return this->fakeAnchor;}
    
-      protected: common::ParamT<common::Vector3> *axisP;
+      protected: common::ParamT<math::Vector3> *axisP;
       protected: common::ParamT<double> *loStopP;
       protected: common::ParamT<double> *hiStopP; 
       protected: common::ParamT<double> *dampingP; 
-      protected: common::Vector3 fakeAnchor;
+      protected: math::Vector3 fakeAnchor;
     };
     
   }

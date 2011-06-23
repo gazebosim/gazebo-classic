@@ -86,7 +86,7 @@ void BulletGeom::Update()
 // On pose change
 void BulletGeom::OnPoseChange()
 {
-  common::Pose3d pose = this->GetRelativePose();
+  math::Pose3d pose = this->GetRelativePose();
   BulletBody *bbody = (BulletBody*)(this->body);
 
   bbody->SetGeomRelativePose(this, pose);
@@ -114,11 +114,11 @@ Mass BulletGeom::GetBodyMassMatrix()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void BulletGeom::GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const
+void BulletGeom::GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const
 {
   if (this->collisionShape)
   {
-    btcommon::Vector3 btMin, btMax;
+    btmath::Vector3 btMin, btMax;
     this->collisionShape->getAabb( btTransform::getIdentity(), btMin, btMax );
 
     min.Set(btMin.x(), btMin.y(), btMin.z());
@@ -132,7 +132,7 @@ void BulletGeom::SetCollisionShape( btCollisionShape *shape )
 {
   this->collisionShape = shape;
 
-  /*btcommon::Vector3 vec;
+  /*btmath::Vector3 vec;
   this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
   */
 

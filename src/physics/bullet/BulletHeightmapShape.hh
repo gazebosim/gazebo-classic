@@ -25,7 +25,7 @@
 
 //#include <btBulletDynamicsCommon.h>
 //#include <btBulletCollisionCommon.h>
-#include "Vector2.hh"
+#include "math::Vector2.hh"
 #include "BulletGeom.hh"
 
 class btHeightfieldTerrainShape;
@@ -96,13 +96,13 @@ namespace gazebo
     /// Create a lookup table of the terrain's height
     private: void FillHeightMap();
 
-    private: common::Vector3 terrainSize;
+    private: math::Vector3 terrainSize;
 
     private: common::ParamT<std::string> *imageFilenameP;
     private: common::ParamT<std::string> *worldTextureP;
     private: common::ParamT<std::string> *detailTextureP;
-    private: common::ParamT<common::Vector3> *sizeP;
-    private: common::ParamT<common::Vector3> *offsetP;
+    private: common::ParamT<math::Vector3> *sizeP;
+    private: common::ParamT<math::Vector3> *offsetP;
 
     private: OgreHeightmap *ogreHeightmap;
 

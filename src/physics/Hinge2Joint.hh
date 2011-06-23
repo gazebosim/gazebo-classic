@@ -23,8 +23,8 @@
 #define HINGE2JOINT_HH
 
 #include "common/Param.hh"
-#include "common/Angle.hh"
-#include "common/Vector3.hh"
+#include "math/Angle.hh"
+#include "math/Vector3.hh"
 #include "common/XMLConfig.hh"
 #include "physics/Joint.hh"
 
@@ -42,12 +42,12 @@ namespace gazebo
               this->AddType(Base::HINGE2_JOINT);
   
               common::Param::Begin(&this->parameters);
-              this->axis1P = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,0,1), 0);
-              this->axis2P = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,0,1), 0);
-              this->loStop1P = new common::ParamT< common::Angle>("lowStop1",-M_PI,0);
-              this->hiStop1P = new common::ParamT< common::Angle>("highStop1",M_PI,0);
-              this->loStop2P = new common::ParamT< common::Angle>("lowStop2",-M_PI,0);
-              this->hiStop2P = new common::ParamT< common::Angle>("highStop2",M_PI,0);
+              this->axis1P = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,0,1), 0);
+              this->axis2P = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,0,1), 0);
+              this->loStop1P = new common::ParamT< math::Angle>("lowStop1",-M_PI,0);
+              this->hiStop1P = new common::ParamT< math::Angle>("highStop1",M_PI,0);
+              this->loStop2P = new common::ParamT< math::Angle>("lowStop2",-M_PI,0);
+              this->hiStop2P = new common::ParamT< math::Angle>("highStop2",M_PI,0);
               common::Param::End();
             }
   
@@ -104,13 +104,13 @@ namespace gazebo
   
                }
   
-    protected: common::ParamT<common::Vector3> *axis1P;
-    protected: common::ParamT<common::Angle> *loStop1P;
-    protected: common::ParamT<common::Angle> *hiStop1P; 
+    protected: common::ParamT<math::Vector3> *axis1P;
+    protected: common::ParamT<math::Angle> *loStop1P;
+    protected: common::ParamT<math::Angle> *hiStop1P; 
   
-    protected: common::ParamT<common::Vector3> *axis2P;
-    protected: common::ParamT<common::Angle> *loStop2P;
-    protected: common::ParamT<common::Angle> *hiStop2P; 
+    protected: common::ParamT<math::Vector3> *axis2P;
+    protected: common::ParamT<math::Angle> *loStop2P;
+    protected: common::ParamT<math::Angle> *hiStop2P; 
   };
   }
 }

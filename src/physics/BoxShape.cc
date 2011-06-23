@@ -15,7 +15,7 @@
  *
 */
 
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "common/XMLConfig.hh"
 #include "BoxShape.hh"
 
@@ -30,7 +30,7 @@ BoxShape::BoxShape(GeomPtr parent) : Shape(parent)
   this->AddType(Base::BOX_SHAPE);
 
   common::Param::Begin(&this->parameters);
-  this->sizeP = new common::ParamT<common::Vector3>("size", common::Vector3(1,1,1),1);
+  this->sizeP = new common::ParamT<math::Vector3>("size", math::Vector3(1,1,1),1);
   this->sizeP->Callback( &BoxShape::SetSize, this );
   common::Param::End();
 }
@@ -66,7 +66,7 @@ void BoxShape::Save(std::string &prefix, std::ostream &stream)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size of the box
-void BoxShape::SetSize( const common::Vector3 &size )
+void BoxShape::SetSize( const math::Vector3 &size )
 {
   this->sizeP->SetValue( size );
 }

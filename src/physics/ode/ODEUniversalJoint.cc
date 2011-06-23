@@ -46,17 +46,17 @@ ODEUniversalJoint::~ODEUniversalJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the anchor point
-common::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
   dJointGetUniversalAnchor( this->jointId, result );
 
-  return common::Vector3( result[0], result[1], result[2] );
+  return math::Vector3( result[0], result[1], result[2] );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void ODEUniversalJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
+void ODEUniversalJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 {
   if (this->childBody) this->childBody->SetEnabled(true);
   if (this->parentBody) this->parentBody->SetEnabled(true);
@@ -66,7 +66,7 @@ void ODEUniversalJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor 
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the first axis of rotation
-common::Vector3 ODEUniversalJoint::GetAxis(int index ) const
+math::Vector3 ODEUniversalJoint::GetAxis(int index ) const
 {
   dVector3 result;
 
@@ -75,12 +75,12 @@ common::Vector3 ODEUniversalJoint::GetAxis(int index ) const
   else
     dJointGetUniversalAxis2( this->jointId, result );
 
-  return common::Vector3( result[0], result[1], result[2] );
+  return math::Vector3( result[0], result[1], result[2] );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
-void ODEUniversalJoint::SetAxis( int index, const common::Vector3 &axis )
+void ODEUniversalJoint::SetAxis( int index, const math::Vector3 &axis )
 {
 
   if (this->childBody) this->childBody->SetEnabled(true);
@@ -94,7 +94,7 @@ void ODEUniversalJoint::SetAxis( int index, const common::Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
-void ODEUniversalJoint::SetDamping( int /*index*/, const double damping )
+void ODEUniversalJoint::SetDamping( int /*_index*/, const double /*_damping*/ )
 {
 #ifdef INCLUDE_ODE_JOINT_DAMPING
   // ode does not yet support Universal joint damping
@@ -107,9 +107,9 @@ void ODEUniversalJoint::SetDamping( int /*index*/, const double damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of an axis
-common::Angle ODEUniversalJoint::GetAngle(int index) const
+math::Angle ODEUniversalJoint::GetAngle(int index) const
 {
-  common::Angle result;
+  math::Angle result;
 
   if (index == 0)
     result = dJointGetUniversalAngle1( this->jointId );

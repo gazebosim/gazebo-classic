@@ -56,19 +56,24 @@ namespace gazebo
                  }
   
       /// \brief Set the axis of rotation
-      public: virtual void SetAxis(int index, const common::Vector3 &axis) {}
+      public: virtual void SetAxis(int /*_index*/, 
+                                   const math::Vector3 &/*_axis*/) 
+              {}
    
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, common::Angle angle) {}
+      public: virtual void SetHighStop(int /*_index*/, 
+                                       math::Angle /*_angle*/) {}
   
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, common::Angle angle) {}
+      public: virtual void SetLowStop(int /*_index*/, math::Angle /*_angle*/) {}
    
       /// \brief Get the high stop of an axis(index).
-      public: virtual common::Angle GetHighStop(int index) {return common::Angle();}
+      public: virtual math::Angle GetHighStop(int /*_index*/) 
+              {return math::Angle();}
   
       /// \brief Get the low stop of an axis(index).
-      public: virtual common::Angle GetLowStop(int index) { return common::Angle();}
+      public: virtual math::Angle GetLowStop(int /*_index*/) 
+              { return math::Angle();}
   
     };
   }

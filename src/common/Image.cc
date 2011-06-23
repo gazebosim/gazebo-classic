@@ -29,7 +29,7 @@
 
 //#include <GL/gl.h>
 
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "common/Console.hh"
 #include "common/Image.hh"
 #include "common/SystemPaths.hh"
@@ -347,7 +347,7 @@ void Image::Rescale(int width, int height)
   FIBITMAP *resizedBitmap = FreeImage_Rescale(this->bitmap, destW, destH, 
                                               FILTER_LANCZOS3);
 
-  Vector3d pt;
+  math::Vector3d pt;
   Color clr;
 
   unsigned int x,y;

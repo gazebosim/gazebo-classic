@@ -23,8 +23,8 @@
 #define JOINT_HH
 
 #include "common/Event.hh"
-#include "common/Angle.hh"
-#include "common/Vector3.hh"
+#include "math/Angle.hh"
+#include "math/Vector3.hh"
 #include "common/Global.hh"
 #include "transport/TransportTypes.hh"
 
@@ -82,7 +82,7 @@ namespace gazebo
       public: virtual void Detach() = 0;
   
       /// \brief Set the axis of rotation
-      public: virtual void SetAxis(int index, const common::Vector3 &axis) = 0;
+      public: virtual void SetAxis(int index, const math::Vector3 &axis) = 0;
   
       /// \brief Set the joint damping
       public: virtual void SetDamping(int index, const double damping) = 0;
@@ -96,25 +96,25 @@ namespace gazebo
               { jointUpdateSignal.Disconnect(c); }
   
       /// \brief Get the axis of rotation
-      public: virtual common::Vector3 GetAxis(int index) const = 0;
+      public: virtual math::Vector3 GetAxis(int index) const = 0;
   
       /// \brief Set the anchor point
-      public: virtual void SetAnchor( int index, const common::Vector3 &anchor ) = 0;
+      public: virtual void SetAnchor( int index, const math::Vector3 &anchor ) = 0;
   
       /// \brief Get the anchor point
-      public: virtual common::Vector3 GetAnchor(int index) const = 0;
+      public: virtual math::Vector3 GetAnchor(int index) const = 0;
   
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, common::Angle angle) = 0;
+      public: virtual void SetHighStop(int index, math::Angle angle) = 0;
   
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, common::Angle angle) = 0;
+      public: virtual void SetLowStop(int index, math::Angle angle) = 0;
    
       /// \brief Get the high stop of an axis(index).
-      public: virtual common::Angle GetHighStop(int index) = 0;
+      public: virtual math::Angle GetHighStop(int index) = 0;
   
       /// \brief Get the low stop of an axis(index).
-      public: virtual common::Angle GetLowStop(int index) = 0;
+      public: virtual math::Angle GetLowStop(int index) = 0;
   
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double v) = 0;
@@ -135,15 +135,15 @@ namespace gazebo
       public: virtual double GetMaxForce(int index) = 0;
   
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual common::Angle GetAngle(int index) const = 0;
+      public: virtual math::Angle GetAngle(int index) const = 0;
   
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body( 0 or 1 )
-      public: virtual common::Vector3 GetBodyForce(unsigned int index) const = 0;
+      public: virtual math::Vector3 GetBodyForce(unsigned int index) const = 0;
   
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body( 0 or 1 )
-      public: virtual common::Vector3 GetBodyTorque(unsigned int index) const = 0;
+      public: virtual math::Vector3 GetBodyTorque(unsigned int index) const = 0;
   
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute( Attribute, int index, double value) = 0;
@@ -166,7 +166,7 @@ namespace gazebo
   
       protected: common::ParamT<std::string> *parentNameP;
       protected: common::ParamT<std::string> *childNameP;
-      protected: common::ParamT<common::Vector3> *anchorOffsetP;
+      protected: common::ParamT<math::Vector3> *anchorOffsetP;
       protected: common::ParamT<bool> *provideFeedbackP;
       protected: common::ParamT<double> *fudgeFactorP;
   
@@ -177,7 +177,7 @@ namespace gazebo
   
       protected: ModelPtr model;
   
-      protected: common::Vector3 anchorPos;
+      protected: math::Vector3 anchorPos;
       protected: BodyPtr anchorBody;
   
       private: event::EventT<void ()> jointUpdateSignal;

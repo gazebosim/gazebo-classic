@@ -22,10 +22,10 @@
 #include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Param.hh"
-#include "common/Quatern.hh"
-#include "common/Pose3d.hh"
-#include "common/Vector3.hh"
-#include "common/Vector4.hh"
+#include "math/Quatern.hh"
+#include "math/Pose3d.hh"
+#include "math/Vector3.hh"
+#include "math/Vector4.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -118,19 +118,19 @@ bool Param::IsStr() const
 
 bool Param::IsVector3() const
 {
-  return this->GetTypename() == typeid(Vector3).name();
+  return this->GetTypename() == typeid(math::Vector3).name();
 }
 bool Param::IsVector4() const
 {
-  return this->GetTypename() == typeid(Vector4).name();
+  return this->GetTypename() == typeid(math::Vector4).name();
 }
 bool Param::IsQuatern() const
 {
-  return this->GetTypename() == typeid(Quatern).name();
+  return this->GetTypename() == typeid(math::Quatern).name();
 }
 bool Param::IsPose3d() const
 {
-  return this->GetTypename() == typeid(Pose3d).name();
+  return this->GetTypename() == typeid(math::Pose3d).name();
 }
 
 //////////////////////////////////////////////////////////////////////////////

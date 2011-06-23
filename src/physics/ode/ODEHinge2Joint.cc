@@ -73,7 +73,7 @@ void ODEHinge2Joint::SaveJoint(std::string &prefix, std::ostream &stream)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get anchor point
-common::Vector3 ODEHinge2Joint::GetAnchor(int index) const
+math::Vector3 ODEHinge2Joint::GetAnchor(int index) const
 {
   dVector3 result;
 
@@ -82,12 +82,12 @@ common::Vector3 ODEHinge2Joint::GetAnchor(int index) const
   else
     dJointGetHinge2Anchor2( this->jointId, result );
 
-  return common::Vector3(result[0], result[1], result[2]);
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void ODEHinge2Joint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
+void ODEHinge2Joint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 {
   if (this->childBody) this->childBody->SetEnabled(true);
   if (this->parentBody) this->parentBody->SetEnabled(true);
@@ -96,7 +96,7 @@ void ODEHinge2Joint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
-void ODEHinge2Joint::SetAxis( int index, const common::Vector3 &axis )
+void ODEHinge2Joint::SetAxis( int index, const math::Vector3 &axis )
 {
   if (this->childBody) this->childBody->SetEnabled(true);
   if (this->parentBody) this->parentBody->SetEnabled(true);
@@ -109,7 +109,7 @@ void ODEHinge2Joint::SetAxis( int index, const common::Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
-void ODEHinge2Joint::SetDamping( int /*index*/, const double damping )
+void ODEHinge2Joint::SetDamping( int /*_index*/, const double /*_damping*/ )
 {
 #ifdef INCLUDE_ODE_JOINT_DAMPING
   // ode does not yet support Hinge2 joint damping
@@ -121,7 +121,7 @@ void ODEHinge2Joint::SetDamping( int /*index*/, const double damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get first axis of rotation
-common::Vector3 ODEHinge2Joint::GetAxis(int index) const
+math::Vector3 ODEHinge2Joint::GetAxis(int index) const
 {
   dVector3 result;
 
@@ -130,19 +130,19 @@ common::Vector3 ODEHinge2Joint::GetAxis(int index) const
   else
     dJointGetHinge2Axis2( this->jointId, result );
 
-  return common::Vector3(result[0], result[1], result[2]);
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get angle of rotation about first axis
-common::Angle ODEHinge2Joint::GetAngle(int index) const
+math::Angle ODEHinge2Joint::GetAngle(int index) const
 {
   if (index == 0)
     return dJointGetHinge2Angle1( this->jointId );
   else
     gzerr << "ODE has not function to get the second angle in a hinge2 joint";
 
-  return common::Angle(0);
+  return math::Angle(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -133,15 +133,15 @@ void Visual::Init()
   this->staticGeom = NULL;
 
   common::Param::Begin(&this->parameters);
-  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(0,0,0), 0);
+  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(0,0,0), 0);
   this->xyzP->Callback( &Visual::SetPosition, this );
 
-  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(1,0,0,0), 0);
+  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(1,0,0,0), 0);
   this->rpyP->Callback( &Visual::SetRotation, this );
 
   this->meshNameP = new common::ParamT<std::string>("mesh","",1);
-  this->meshTileP = new common::ParamT< common::Vector2d >("uvTile", 
-                                common::Vector2d(1.0, 1.0), 0 );
+  this->meshTileP = new common::ParamT< math::Vector2d >("uvTile", 
+                                math::Vector2d(1.0, 1.0), 0 );
  
   //default to Gazebo/White
   this->materialNameP = new common::ParamT<std::string>("material",
@@ -151,7 +151,7 @@ void Visual::Init()
   this->castShadowsP = new common::ParamT<bool>("cast_shadows",true,0);
   this->castShadowsP->Callback( &Visual::SetCastShadows, this );
 
-  this->scaleP = new common::ParamT<common::Vector3>("scale", common::Vector3(1,1,1), 0);
+  this->scaleP = new common::ParamT<math::Vector3>("scale", math::Vector3(1,1,1), 0);
 
   this->normalMapNameP = new common::ParamT<std::string>("normal_map",
                                                 std::string("none"),0);
@@ -171,10 +171,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 
   if (msg->has_plane())
   {
-    common::Plane plane = common::Message::Convert(msg->plane());
+    math::Plane plane = common::Message::Convert(msg->plane());
     common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
-        common::Vector2d(2,2), 
-        common::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
+        math::Vector2d(2,2), 
+        math::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
     mesh = msg->header().str_id();
   }
 
@@ -205,7 +205,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 void Visual::Load(common::XMLConfigNode *node)
 {
   std::ostringstream stream;
-  common::Pose3d pose;
+  math::Pose3d pose;
   Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
 
@@ -242,7 +242,7 @@ void Visual::Load(common::XMLConfigNode *node)
 
         if (!common::MeshManager::Instance()->HasMesh(meshName))
         {
-          common::MeshManager::Instance()->CreateBox(meshName, common::Vector3(1,1,1), **this->meshTileP);
+          common::MeshManager::Instance()->CreateBox(meshName, math::Vector3(1,1,1), **this->meshTileP);
         }
       }
 
@@ -432,7 +432,7 @@ void Visual::AttachMesh( const std::string &meshName )
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Set the scale
-void Visual::SetScale(const common::Vector3 &scale )
+void Visual::SetScale(const math::Vector3 &scale )
 {
   this->scaleP->SetValue(scale);
   this->sceneNode->setScale(Conversions::Vector3(scale));
@@ -440,7 +440,7 @@ void Visual::SetScale(const common::Vector3 &scale )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the scale
-common::Vector3 Visual::GetScale()
+math::Vector3 Visual::GetScale()
 {
   return Conversions::Vector3(this->sceneNode->getScale());
 }
@@ -676,7 +676,7 @@ bool Visual::GetVisible() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-void Visual::SetPosition( const common::Vector3 &pos)
+void Visual::SetPosition( const math::Vector3 &pos)
 {
   /*if (this->IsStatic() && this->staticGeom)
   {
@@ -692,14 +692,14 @@ void Visual::SetPosition( const common::Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void Visual::SetRotation( const common::Quatern &rot)
+void Visual::SetRotation( const math::Quatern &rot)
 {
   this->sceneNode->setOrientation(rot.w, rot.x, rot.y, rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
-void Visual::SetPose( const common::Pose3d &pose)
+void Visual::SetPose( const math::Pose3d &pose)
 {
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
@@ -707,23 +707,23 @@ void Visual::SetPose( const common::Pose3d &pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-common::Vector3 Visual::GetPosition() const
+math::Vector3 Visual::GetPosition() const
 {
   return Conversions::Vector3(this->sceneNode->getPosition());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
-common::Quatern Visual::GetRotation( ) const
+math::Quatern Visual::GetRotation( ) const
 {
   return Conversions::Quaternion(this->sceneNode->getOrientation());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the visual
-common::Pose3d Visual::GetPose() const
+math::Pose3d Visual::GetPose() const
 {
-  common::Pose3d pos;
+  math::Pose3d pos;
   pos.pos=this->GetPosition();
   pos.rot=this->GetRotation();
   return pos;
@@ -731,9 +731,9 @@ common::Pose3d Visual::GetPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global pose of the node
-common::Pose3d Visual::GetWorldPose() const
+math::Pose3d Visual::GetWorldPose() const
 {
-  common::Pose3d pose;
+  math::Pose3d pose;
 
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
@@ -848,12 +848,12 @@ void Visual::SetRibbonTrail(bool value)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
-common::Vector3 Visual::GetBoundingBoxSize() const
+math::Vector3 Visual::GetBoundingBoxSize() const
 {
   this->sceneNode->_updateBounds();
   Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
   Ogre::Vector3 size = box.getSize();
-  return common::Vector3(size.x, size.y, size.z);
+  return math::Vector3(size.x, size.y, size.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -906,16 +906,16 @@ std::string Visual::GetMaterialName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bounds
-common::Box Visual::GetBounds() const
+math::Box Visual::GetBounds() const
 {
-  common::Box box;
+  math::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
   return box;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bounding box for a scene node
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, common::Box &box) const
+void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 {
   node->_updateBounds();
 
@@ -937,7 +937,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, common::Box &box) const
       Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
       Ogre::Vector3 min = bb.getMinimum();
       Ogre::Vector3 max = bb.getMaximum();
-      box.Merge(common::Box(common::Vector3(min.x, min.y, min.z), common::Vector3(max.x, max.y, max.z)));
+      box.Merge(math::Box(math::Vector3(min.x, min.y, min.z), math::Vector3(max.x, max.y, max.z)));
     }
   }
 
@@ -1081,8 +1081,8 @@ void Visual::InsertMesh( const common::Mesh *mesh)
       iBuf->unlock();
     }
 
-    common::Vector3 max = mesh->GetMax();
-    common::Vector3 min = mesh->GetMin();
+    math::Vector3 max = mesh->GetMax();
+    math::Vector3 min = mesh->GetMin();
 
     if (!max.IsFinite())
       gzthrow("Max bounding box is not finite[" << max << "]\n");

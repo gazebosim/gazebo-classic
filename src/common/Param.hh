@@ -141,7 +141,6 @@ namespace gazebo
   
    
       private: T value;
-    
       private: T defaultValue;
    
       private: event::ConnectionPtr connection; 

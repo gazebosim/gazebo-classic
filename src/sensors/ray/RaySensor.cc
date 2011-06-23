@@ -21,7 +21,7 @@
 */
 
 #include "World.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "SensorFactory.hh"
 #include "common/XMLConfig.hh"
 #include "MultiRayShape.hh"

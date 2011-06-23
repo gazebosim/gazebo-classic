@@ -20,8 +20,8 @@
 #include "rendering/ogre.h"
 
 #include "common/Color.hh"
-#include "common/Vector3.hh"
-#include "common/Quatern.hh"
+#include "math/Vector3.hh"
+#include "math/Quatern.hh"
 
 namespace gazebo
 {
@@ -33,16 +33,16 @@ namespace gazebo
       public: static Ogre::ColourValue Color(const common::Color &clr);
 
       /// \brief return Ogre Vector from gazebo Vector3
-      public: static Ogre::Vector3 Vector3(const common::Vector3 &v);
+      public: static Ogre::Vector3 Vector3(const math::Vector3 &v);
 
       /// \brief return gazebo Vector from ogre Vector3
-      public: static common::Vector3 Vector3(const Ogre::Vector3 &v);
+      public: static math::Vector3 Vector3(const Ogre::Vector3 &v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
-      public: static Ogre::Quaternion Quaternion(const common::Quatern &v);
+      public: static Ogre::Quaternion Quaternion(const math::Quatern &v);
 
       /// \brief Ogre quaternion to Gazebo quaternion
-      public: static common::Quatern Quaternion(const Ogre::Quaternion &v);
+      public: static math::Quatern Quaternion(const Ogre::Quaternion &v);
 
     };
   }

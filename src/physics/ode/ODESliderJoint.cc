@@ -54,18 +54,18 @@ void ODESliderJoint::Load(common::XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-common::Vector3 ODESliderJoint::GetAxis(int /*index*/) const
+math::Vector3 ODESliderJoint::GetAxis(int /*_index*/) const
 {
   dVector3 result;
   dJointGetSliderAxis( this->jointId, result );
-  return common::Vector3(result[0], result[1], result[2]);
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the position of the joint
-common::Angle ODESliderJoint::GetAngle(int index) const
+math::Angle ODESliderJoint::GetAngle(int /*_index*/) const
 {
-  common::Angle result = dJointGetSliderPosition( this->jointId );
+  math::Angle result = dJointGetSliderPosition( this->jointId );
   return result;
 }
 
@@ -86,7 +86,7 @@ void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of motion
-void ODESliderJoint::SetAxis( int /*index*/, const common::Vector3 &axis )
+void ODESliderJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
 {
   if (this->childBody) 
     this->childBody->SetEnabled(true);
@@ -145,14 +145,14 @@ double ODESliderJoint::GetParam( int parameter ) const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
-void ODESliderJoint::SetMaxForce(int index, double t) 
+void ODESliderJoint::SetMaxForce(int /*_index*/, double _t) 
 {
-  this->SetParam(dParamFMax, t);
+  this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
-double ODESliderJoint::GetMaxForce(int index)
+double ODESliderJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }

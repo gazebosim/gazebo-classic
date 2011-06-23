@@ -58,18 +58,18 @@ void ODEHingeJoint::Load(common::XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the anchor point
-common::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
+math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
 
   dJointGetHingeAnchor( this->jointId, result );
 
-  return common::Vector3(result[0], result[1], result[2]);
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void ODEHingeJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
+void ODEHingeJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 {
   if (this->childBody) 
     this->childBody->SetEnabled(true);
@@ -82,18 +82,18 @@ void ODEHingeJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-common::Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
+math::Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
 
   dJointGetHingeAxis( this->jointId, result );
 
-  return common::Vector3(result[0], result[1], result[2]);
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of rotation
-void ODEHingeJoint::SetAxis( int /*index*/, const common::Vector3 &axis )
+void ODEHingeJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
 {
   if (this->childBody) 
     this->childBody->SetEnabled(true);
@@ -126,9 +126,9 @@ void ODEHingeJoint::ApplyDamping()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of rotation
-common::Angle ODEHingeJoint::GetAngle(int /*index*/) const
+math::Angle ODEHingeJoint::GetAngle(int /*index*/) const
 {
-  common::Angle result = dJointGetHingeAngle( this->jointId );
+  math::Angle result = dJointGetHingeAngle( this->jointId );
 
   return result;
 }

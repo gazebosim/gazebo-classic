@@ -171,7 +171,7 @@ void OgreLoader::ReadSubMesh(FILE *file, Mesh *mesh)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read the geometry (vertices, normals, and optionally texture coords)
-void OgreLoader::ReadGeometry(FILE *file, Mesh *mesh, SubMesh *subMesh)
+void OgreLoader::ReadGeometry(FILE *file, Mesh * /*mesh*/, SubMesh *subMesh)
 { 
   uint16_t index;
   MeshChunk chunk;
@@ -249,7 +249,7 @@ void OgreLoader::ReadGeometry(FILE *file, Mesh *mesh, SubMesh *subMesh)
         if (fread(vbuf, vertexSize, vertexCount, file) < vertexCount)
           printf("Error reading the vertex buffer\n");
 
-        Vector3 vec;
+        math::Vector3 vec;
         uint16_t semantic, type, offset;
 
         // Extract the information from the buffer

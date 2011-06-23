@@ -43,24 +43,24 @@ ODEBallJoint::~ODEBallJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the joints anchor point
-common::Vector3 ODEBallJoint::GetAnchor(int index) const
+math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 {
   dVector3 result;
   dJointGetBallAnchor( jointId, result );
-  return common::Vector3(result[0], result[1], result[2]);
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joints anchor point
-void ODEBallJoint::SetAnchor(int index, const common::Vector3 &anchor)
+void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &anchor)
 {
   dJointSetBallAnchor( jointId, anchor.x, anchor.y, anchor.z );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
-void ODEBallJoint::SetDamping( int /*index*/, const double damping )
+void ODEBallJoint::SetDamping( int /*_index*/, const double /*_damping*/ )
 {
 #ifdef INCLUDE_ODE_JOINT_DAMPING
   dJointSetDamping( this->jointId, damping);

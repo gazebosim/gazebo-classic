@@ -104,7 +104,7 @@ namespace gazebo
       public: void SetFrictionMode( const bool &v );
   
       /// \brief Get the bounding box for this geom
-      public: virtual common::Box GetBoundingBox() const = 0;
+      public: virtual math::Box GetBoundingBox() const = 0;
   
       /// \brief Get a pointer to the mass
       public: const Mass &GetMass() const;
@@ -137,28 +137,28 @@ namespace gazebo
       public: Contact GetContact(unsigned int i) const;
   
       /// \brief Get the linear velocity of the geom
-      public: virtual common::Vector3 GetRelativeLinearVel() const;
+      public: virtual math::Vector3 GetRelativeLinearVel() const;
   
       /// \brief Get the linear velocity of the geom in the world frame
-      public: virtual common::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel() const;
   
       /// \brief Get the angular velocity of the geom
-      public: virtual common::Vector3 GetRelativeAngularVel() const;
+      public: virtual math::Vector3 GetRelativeAngularVel() const;
   
       /// \brief Get the angular velocity of the geom in the world frame
-      public: virtual common::Vector3 GetWorldAngularVel() const;
+      public: virtual math::Vector3 GetWorldAngularVel() const;
   
       /// \brief Get the linear acceleration of the geom
-      public: virtual common::Vector3 GetRelativeLinearAccel() const;
+      public: virtual math::Vector3 GetRelativeLinearAccel() const;
               
       /// \brief Get the linear acceleration of the geom in the world frame
-      public: virtual common::Vector3 GetWorldLinearAccel() const;
+      public: virtual math::Vector3 GetWorldLinearAccel() const;
   
       /// \brief Get the angular acceleration of the geom
-      public: virtual common::Vector3 GetRelativeAngularAccel() const;
+      public: virtual math::Vector3 GetRelativeAngularAccel() const;
   
       /// \brief Get the angular acceleration of the geom in the world frame
-      public: virtual common::Vector3 GetWorldAngularAccel() const;
+      public: virtual math::Vector3 GetWorldAngularAccel() const;
   
       public: template< typename T>
               event::ConnectionPtr ConnectContactCallback( T subscriber )
@@ -187,8 +187,8 @@ namespace gazebo
   
       ///  Mass as a double
       private: common::ParamT<double> *massP;
-      protected: common::ParamT<common::Vector3> *xyzP;
-      protected: common::ParamT<common::Quatern> *rpyP;
+      protected: common::ParamT<math::Vector3> *xyzP;
+      protected: common::ParamT<math::Quatern> *rpyP;
       protected: common::ParamT<bool> *enableContactsP;
   
       private: float transparency;

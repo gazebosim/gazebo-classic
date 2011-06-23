@@ -52,7 +52,7 @@ Joint::Joint()
   this->stopKdP = new common::ParamT<double>("stop_kd",1.0,0);
   this->parentNameP = new common::ParamT<std::string>("link",std::string(),1);
   this->childNameP = new common::ParamT<std::string>("link",std::string(),1);
-  this->anchorOffsetP = new common::ParamT<common::Vector3>("anchor_offset",common::Vector3(0,0,0), 0);
+  this->anchorOffsetP = new common::ParamT<math::Vector3>("anchor_offset",math::Vector3(0,0,0), 0);
   this->provideFeedbackP = new common::ParamT<bool>("provide_feedback", false, 0);
   this->fudgeFactorP = new common::ParamT<double>( "fudge_factor", 1.0, 0 );
   common::Param::End();
@@ -148,7 +148,7 @@ void Joint::Load(common::XMLConfigNode *node)
     gzthrow("Couldn't Find Child Body[" + **this->childNameP);
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = (common::Pose3d(**(this->anchorOffsetP),common::Quatern()) + this->anchorBody->GetWorldPose()).pos ;
+  this->anchorPos = (math::Pose3d(**(this->anchorOffsetP), math::Quatern()) + this->anchorBody->GetWorldPose()).pos ;
 
 }
 

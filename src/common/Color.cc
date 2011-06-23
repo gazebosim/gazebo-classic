@@ -142,9 +142,9 @@ void Color::SetFromHSV(float h, float s, float v)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the color in HSV colorspace
-Vector3 Color::GetAsHSV() const
+math::Vector3 Color::GetAsHSV() const
 {
-  Vector3 hsv;
+  math::Vector3 hsv;
   float x,v, f, i;
 
   x = std::min(this->r, std::min(this->g, this->b));
@@ -180,9 +180,9 @@ Vector3 Color::GetAsHSV() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the color in YUV colorspace
-Vector3 Color::GetAsYUV() const
+math::Vector3 Color::GetAsYUV() const
 {
-  Vector3 yuv;
+  math::Vector3 yuv;
 
   yuv.x =  0.299*this->r + 0.587*this->g + 0.114*this->b;
   yuv.y = -0.1679*this->r - 0.332*this->g + 0.5*this->b + 0.5;

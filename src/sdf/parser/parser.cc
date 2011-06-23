@@ -213,7 +213,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
   }
   else
   {
-    if (!_sensor->origin.Set( o->Attribute("xyz"), o->Attribute("rpy") ))
+    if (!_sensor->origin.Set( o->Attribute("pose") ))
     {
       gzerr << "Sensor has malformed orgin\n";
       return false;
@@ -465,7 +465,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
   }
   else
   {
-    if (!_inertial->origin.Set(o->Attribute("xyz"), o->Attribute("rpy")))
+    if (!_inertial->origin.Set(o->Attribute("pose")))
     {
       gzerr << "Unable to parse origin tag\n";
       _inertial->origin.Reset();
@@ -538,7 +538,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision)
     gzwarn << "Origin tag not present for collision element, using default (Identity\n";
     _collision->origin.Reset();
   }
-  else if (!_collision->origin.Set(o->Attribute("xyz"), o->Attribute("rpy")))
+  else if (!_collision->origin.Set(o->Attribute("pose")))
   {
     gzerr << "Unable to parse collision origin element\n";
     _collision->origin.Reset();
@@ -896,7 +896,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
     gzwarn << "Origin tag not present for visual element, using default (Identity)\n";
     _visual->origin.Reset();
   }
-  else if (!_visual->origin.Set(o->Attribute("xyz"),o->Attribute("rpy")))
+  else if (!_visual->origin.Set(o->Attribute("pose")))
   {
     gzerr << "Unable to parase visual origin element\n";
     _visual->origin.Reset();
@@ -1008,8 +1008,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
   }
   else
   {
-    if (!_joint->origin.Set(originXml->Attribute("xyz"),
-                            originXml->Attribute("rpy")))
+    if (!_joint->origin.Set(originXml->Attribute("pose")))
     {
       gzerr << "Unable to parse joint origin element\n";
       _joint->origin.Reset();
@@ -1088,7 +1087,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
     {
       gzwarn << "no axis elemement for Joint link '" 
         << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis.SetValue( Vector3(1.0, 0.0, 0.0));
+      _joint->axis.SetValue( gazebo::math::Vector3(1.0, 0.0, 0.0));
     }
     else{
       if (!_joint->axis.Set( axisXml->Attribute("xyz")) )
@@ -1807,7 +1806,8 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Joint> &_joint)
   childNode->SetAttribute( _joint->childLinkName.GetKey(),
                            _joint->childLinkName.GetAsString() );
 
-  saveXml(jointNode, _joint->origin);
+  jointNode->SetAttribute(_joint->origin.GetKey(),
+                          _joint->origin.GetAsString());
 
   // Axis 1
   TiXmlElement *axisNode = new TiXmlElement("axis");
@@ -1848,7 +1848,7 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Joint> &_joint)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const Vector3 &_vec)
+bool saveXml(TiXmlElement *_parent, const gazebo::math::Vector3 &_vec)
 {
   std::ostringstream stream;
   stream << _vec;
@@ -1856,7 +1856,7 @@ bool saveXml(TiXmlElement *_parent, const Vector3 &_vec)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const Rotation &_rot)
+bool saveXml(TiXmlElement *_parent, const gazebo::math::Quatern &_rot)
 {
   std::ostringstream stream;
   stream << _rot;
@@ -1864,32 +1864,35 @@ bool saveXml(TiXmlElement *_parent, const Rotation &_rot)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const ParamT<Pose,true> &_pose)
+/*
+bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,true> &_pose)
 {
   TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
   _parent->LinkEndChild( originNode );
 
-  saveXml(originNode, _pose.GetValue().position);
-  saveXml(originNode, _pose.GetValue().rotation);
+  saveXml(originNode, _pose.GetValue());
 
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const ParamT<Pose,false> &_pose)
+bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,false> &_pose)
 {
   TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
   _parent->LinkEndChild( originNode );
 
-  std::ostringstream posStream, rotStream;
-
-  posStream << _pose.GetValue().position;
-  rotStream << _pose.GetValue().rotation;
-
-  originNode->SetAttribute("xyz", posStream.str());
-  originNode->SetAttribute("rpy", rotStream.str());
+  saveXml(originNode, _pose.GetValue());
 
   return true;
+}*/
+
+/*bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose3d &_pose)
+{
+  std::ostringstream poseStream;
+  poseStream << _pose;
+  _parent->SetAttribute("pose", poseStream.str());
+  return true;
 }
+*/
 
 bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Model> &_model)
 {
@@ -1984,7 +1987,9 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Visual> &_visual)
   visualNode->SetAttribute( _visual->name.GetKey(),
                             _visual->name.GetAsString());
 
-  saveXml(visualNode, _visual->origin);
+  visualNode->SetAttribute( _visual->origin.GetKey(),
+                            _visual->origin.GetAsString() );
+
   saveXml(visualNode, _visual->geometry);
   saveXml(visualNode, _visual->material);
 
@@ -2057,7 +2062,9 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Collision> &_collisi
   collisionNode->SetAttribute( _collision->name.GetKey(),
                                _collision->name.GetAsString());
 
-  saveXml(collisionNode, _collision->origin);
+  collisionNode->SetAttribute( _collision->origin.GetKey(),
+                               _collision->origin.GetAsString());
+
   saveXml(collisionNode, _collision->geometry);
 
   if (_collision->surface)
@@ -2079,8 +2086,8 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor)
                             _sensor->alwaysOn.GetAsString() );
   sensorNode->SetAttribute( _sensor->updateRate.GetKey(),
                             _sensor->updateRate.GetAsString() );
-
-  saveXml(sensorNode, _sensor->origin);
+  sensorNode->SetAttribute( _sensor->origin.GetKey(),
+                            _sensor->origin.GetAsString() );
 
   if (_sensor->sensorType->type == SensorType::CAMERA)
   {
@@ -2178,9 +2185,8 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Inertial> &_inertial
   _parent->LinkEndChild( inertialNode );
   inertialNode->SetAttribute(_inertial->mass.GetKey(),
                              _inertial->mass.GetAsString());
-
-
-  saveXml(inertialNode, _inertial->origin);
+  inertialNode->SetAttribute(_inertial->origin.GetKey(),
+                             _inertial->origin.GetAsString());
 
   TiXmlElement *inertiaNode = new TiXmlElement("inertia");
   inertialNode->LinkEndChild(inertiaNode);

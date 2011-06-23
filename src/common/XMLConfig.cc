@@ -678,9 +678,9 @@ Time XMLConfigNode::GetTime( const std::string &key, double def, int require ) c
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a position
-Vector3 XMLConfigNode::GetVector3( const std::string &key, Vector3 def ) const
+math::Vector3 XMLConfigNode::GetVector3( const std::string &key, math::Vector3 def ) const
 {
-  Vector3 v;
+  math::Vector3 v;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;
@@ -712,9 +712,9 @@ Color XMLConfigNode::GetColor( const std::string &key, Color def ) const
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional double vector
-Vector2d XMLConfigNode::GetVector2d( const std::string &key, Vector2d def ) const
+math::Vector2d XMLConfigNode::GetVector2d( const std::string &key, math::Vector2d def ) const
 {
-  Vector2d v;
+  math::Vector2d v;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;
@@ -727,9 +727,9 @@ Vector2d XMLConfigNode::GetVector2d( const std::string &key, Vector2d def ) cons
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional int vector
-Vector2i XMLConfigNode::GetVector2i( const std::string &key, Vector2i def ) const
+math::Vector2i XMLConfigNode::GetVector2i( const std::string &key, math::Vector2i def ) const
 {
-  Vector2i v;
+  math::Vector2i v;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;
@@ -743,10 +743,11 @@ Vector2i XMLConfigNode::GetVector2i( const std::string &key, Vector2i def ) cons
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a rotation
-Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def ) const
+math::Quatern XMLConfigNode::GetRotation( const std::string &key, 
+                                          math::Quatern def ) const
 {
-  Quatern q;
-  Vector3 p;
+  math::Quatern q;
+  math::Vector3 p;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;

@@ -36,7 +36,7 @@ PointLightMaker::PointLightMaker()
   this->msg.set_type( msgs::Light::POINT );
   common::Message::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
   common::Message::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
-  common::Message::Set(this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.001));
+  common::Message::Set(this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.001));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( false );
 }
@@ -69,7 +69,7 @@ void PointLightMaker::MousePushCB(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
-  common::Vector3 norm;
+  math::Vector3 norm;
   norm.Set(0,0,1);
 
   /* NATY: Fix the camera issue

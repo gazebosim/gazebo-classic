@@ -28,7 +28,7 @@
 #include "physics/Geom.hh"
 #include "BulletGeom.hh"
 #include "BulletMotionState.hh"
-#include "common/Quatern.hh"
+#include "math/Quatern.hh"
 #include "common/Exception.hh"
 #include "BulletPhysics.hh"
 #include "PhysicsEngine.hh"
@@ -75,14 +75,14 @@ void BulletBody::Load(common::XMLConfigNode *node)
 {
   Body::Load(node);
   btScalar btMass = 0.0;
-  btcommon::Vector3 fallInertia(0,0,0);
+  btmath::Vector3 fallInertia(0,0,0);
 
   // Set the initial pose of the body
   this->motionState->SetVisual( this->visualNode );
   this->motionState->SetWorldPose(this->GetWorldPose());
 
   btTransform principal;
-  btcommon::Vector3 principalInertia;
+  btmath::Vector3 principalInertia;
 
   principal.setIdentity();
 
@@ -105,21 +105,21 @@ void BulletBody::Load(common::XMLConfigNode *node)
                                                          principalInertia);
 
     // Convert to gazebo poses
-    common::Pose3d princ = BulletPhysics::ConvertPose(principal);
-    common::Pose3d inverse = BulletPhysics::ConvertPose(principal.inverse());
+    math::Pose3d princ = BulletPhysics::ConvertPose(principal);
+    math::Pose3d inverse = BulletPhysics::ConvertPose(principal.inverse());
 
     // Store the Center of Mass offset in the motion state
     this->motionState->SetCoMOffset(princ);
 
     // Move the body visual to match the center of mass offset
-    common::Pose3d tmp = this->GetRelativePose();
+    math::Pose3d tmp = this->GetRelativePose();
     tmp.pos += princ.pos;
     this->SetRelativePose(tmp, false);
 
     // Move all the geoms relative to the center of mass
     for (iter = this->geoms.begin(),i = 0; i < this->geoms.size(); i++, iter++)
     {
-      common::Pose3d origPose, newPose;
+      math::Pose3d origPose, newPose;
 
       // The original pose of the geometry
       origPose = BulletPhysics::ConvertPose(
@@ -199,11 +199,11 @@ void BulletBody::SetGravityMode(bool mode)
     return;
 
   if (mode == false)
-    this->rigidBody->setMassProps(btScalar(0), btcommon::Vector3(0,0,0));
+    this->rigidBody->setMassProps(btScalar(0), btmath::Vector3(0,0,0));
   else
   {
     btScalar btMass = this->mass.GetAsDouble();
-    btcommon::Vector3 fallInertia(0,0,0);
+    btmath::Vector3 fallInertia(0,0,0);
 
     this->compoundShape->calculateLocalInertia(btMass,fallInertia);
     this->rigidBody->setMassProps(btMass, fallInertia);
@@ -238,7 +238,7 @@ void BulletBody::AttachGeom( Geom *geom )
     gzthrow("requires BulletGeom");
 
   btTransform trans;
-  common::Pose3d relativePose = geom->GetRelativePose();
+  math::Pose3d relativePose = geom->GetRelativePose();
   trans = BulletPhysics::ConvertPose(relativePose);
 
   bgeom->SetCompoundShapeIndex( this->compoundShape->getNumChildShapes() );
@@ -250,7 +250,7 @@ void BulletBody::AttachGeom( Geom *geom )
 /// changed
 void BulletBody::OnPoseChange()
 {
-  common::Pose3d pose = this->GetWorldPose();
+  math::Pose3d pose = this->GetWorldPose();
 
   this->motionState->SetWorldPose(pose);
   if (this->rigidBody)
@@ -293,95 +293,95 @@ void BulletBody::UpdateCoM()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void BulletBody::SetLinearVel(const common::Vector3 &vel)
+void BulletBody::SetLinearVel(const math::Vector3 &vel)
 {
   if (!this->rigidBody)
     return;
 
-  this->rigidBody->setLinearVelocity( btcommon::Vector3(vel.x, vel.y, vel.z) );
+  this->rigidBody->setLinearVelocity( btmath::Vector3(vel.x, vel.y, vel.z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body
-common::Vector3 BulletBody::GetWorldLinearVel() const
+math::Vector3 BulletBody::GetWorldLinearVel() const
 {
   if (!this->rigidBody)
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 
-  btcommon::Vector3 btVec = this->rigidBody->getLinearVelocity();
+  btmath::Vector3 btVec = this->rigidBody->getLinearVelocity();
 
-  return common::Vector3(btVec.x(), btVec.y(), btVec.z());
+  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void BulletBody::SetAngularVel(const common::Vector3 &vel)
+void BulletBody::SetAngularVel(const math::Vector3 &vel)
 {
   if (!this->rigidBody)
     return;
 
-  this->rigidBody->setAngularVelocity( btcommon::Vector3(vel.x, vel.y, vel.z) );
+  this->rigidBody->setAngularVelocity( btmath::Vector3(vel.x, vel.y, vel.z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body
-common::Vector3 BulletBody::GetWorldAngularVel() const
+math::Vector3 BulletBody::GetWorldAngularVel() const
 {
   if (!this->rigidBody)
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 
-  btcommon::Vector3 btVec = this->rigidBody->getAngularVelocity();
+  btmath::Vector3 btVec = this->rigidBody->getAngularVelocity();
 
-  return common::Vector3(btVec.x(), btVec.y(), btVec.z());
+  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the force applied to the body
-void BulletBody::SetForce(const common::Vector3 &force)
+void BulletBody::SetForce(const math::Vector3 &force)
 {
   if (!this->rigidBody)
     return;
 
-  this->rigidBody->applyCentralForce(btcommon::Vector3(force.x, force.y, force.z) );
+  this->rigidBody->applyCentralForce(btmath::Vector3(force.x, force.y, force.z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force applied to the body
-common::Vector3 BulletBody::GetWorldForce() const
+math::Vector3 BulletBody::GetWorldForce() const
 {
   if (!this->rigidBody)
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 
-  btcommon::Vector3 btVec;
+  btmath::Vector3 btVec;
 
   btVec = this->rigidBody->getTotalForce();
 
-  return common::Vector3(btVec.x(), btVec.y(), btVec.z());
+  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the torque applied to the body
-void BulletBody::SetTorque(const common::Vector3 &torque)
+void BulletBody::SetTorque(const math::Vector3 &torque)
 {
   if (!this->rigidBody)
     return;
 
-  this->rigidBody->applyTorque(btcommon::Vector3(torque.x, torque.y, torque.z));
+  this->rigidBody->applyTorque(btmath::Vector3(torque.x, torque.y, torque.z));
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the torque applied to the body
-common::Vector3 BulletBody::GetWorldTorque() const
+math::Vector3 BulletBody::GetWorldTorque() const
 {
   if (!this->rigidBody)
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 
-  btcommon::Vector3 btVec;
+  btmath::Vector3 btVec;
 
   btVec = this->rigidBody->getTotalTorque();
 
-  return common::Vector3(btVec.x(), btVec.y(), btVec.z());
+  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -409,7 +409,7 @@ void BulletBody::SetAngularDamping(double damping)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the relative pose of a child geom.
-void BulletBody::SetGeomRelativePose(BulletGeom *geom, const common::Pose3d &newPose)
+void BulletBody::SetGeomRelativePose(BulletGeom *geom, const math::Pose3d &newPose)
 {
   std::map<std::string, Geom*>::iterator iter;
   unsigned int i;

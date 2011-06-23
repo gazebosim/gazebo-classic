@@ -72,7 +72,7 @@ namespace gazebo
       public: Mass GetBodyMassMatrix();
     
       /// \brief Get the bounding box, defined by the physics engine
-      public: virtual common::Box GetBoundingBox() const;
+      public: virtual math::Box GetBoundingBox() const;
   
       /// \brief Get the geom's space ID
       public: dSpaceID GetSpaceId() const;

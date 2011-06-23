@@ -17,9 +17,10 @@
 #include <sys/stat.h>
 #include <string>
 
-#include "common/Plane.hh"
-#include "common/Matrix3.hh"
-#include "common/Matrix4.hh"
+#include "math/Plane.hh"
+#include "math/Matrix3.hh"
+#include "math/Matrix4.hh"
+
 #include "common/SystemPaths.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -45,10 +46,10 @@ MeshManager::MeshManager()
   // Create some basic shapes
   this->CreateSphere("unit_sphere",0.5, 32, 32);
   this->CreateSphere("joint_anchor",0.01, 32, 32);
-  this->CreateBox("body_cg", Vector3(0.014,0.014,0.014), 
-                             Vector2d(0.014,0.014));
-  this->CreateBox("unit_box_U1V1", Vector3(1,1,1), 
-                             Vector2d(1,1));
+  this->CreateBox("body_cg", math::Vector3(0.014,0.014,0.014), 
+                             math::Vector2d(0.014,0.014));
+  this->CreateBox("unit_box_U1V1", math::Vector3(1,1,1), 
+                             math::Vector2d(1,1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
@@ -190,7 +191,7 @@ bool MeshManager::IsValidFilename(const std::string &filename)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// modify mesh setting its center to aabb center
-void MeshManager::SetMeshCenter(const Mesh *mesh,Vector3 center)
+void MeshManager::SetMeshCenter(const Mesh *mesh,math::Vector3 center)
 {
   if (this->HasMesh(mesh->GetName()))
     this->meshes[mesh->GetName()]->SetMeshCenter(center);
@@ -198,7 +199,7 @@ void MeshManager::SetMeshCenter(const Mesh *mesh,Vector3 center)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// get mesh aabb
-void MeshManager::GetMeshAABB(const Mesh *mesh,Vector3 &center, Vector3 &min_xyz, Vector3 &max_xyz)
+void MeshManager::GetMeshAABB(const Mesh *mesh,math::Vector3 &center, math::Vector3 &min_xyz, math::Vector3 &max_xyz)
 {
   if (this->HasMesh(mesh->GetName()))
     this->meshes[mesh->GetName()]->GetAABB(center,min_xyz,max_xyz);
@@ -206,7 +207,7 @@ void MeshManager::GetMeshAABB(const Mesh *mesh,Vector3 &center, Vector3 &min_xyz
 
 ////////////////////////////////////////////////////////////////////////////////
 /// generate spherical texture coordinates
-void MeshManager::GenSphericalTexCoord(const Mesh *mesh,Vector3 center)
+void MeshManager::GenSphericalTexCoord(const Mesh *mesh,math::Vector3 center)
 {
   if (this->HasMesh(mesh->GetName()))
     this->meshes[mesh->GetName()]->GenSphericalTexCoord(center);
@@ -262,7 +263,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   float r0;
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
-  Vector3 vert, norm;
+  math::Vector3 vert, norm;
   unsigned short verticeIndex = 0;
 
   Mesh *mesh = new Mesh();
@@ -314,8 +315,9 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
-void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
-                              const Vector2d &segments, const Vector2d &uvTile)
+void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
+                              const math::Vector2d &segments, 
+                              const math::Vector2d &uvTile)
 {
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
@@ -323,9 +325,9 @@ void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
 ////////////////////////////////////////////////////////////////////////////////
 // This function was taken from OGRE:
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
-void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal, 
-    double d, const Vector2d &size, const Vector2d &segments,
-    const Vector2d &uvTile)
+void MeshManager::CreatePlane(const std::string &name, const math::Vector3 &normal, 
+    double d, const math::Vector2d &size, const math::Vector2d &segments,
+    const math::Vector2d &uvTile)
 {
   if (this->HasMesh(name))
   {
@@ -339,16 +341,16 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  Vector3 zAxis, yAxis, xAxis;
+  math::Vector3 zAxis, yAxis, xAxis;
   zAxis = normal;
   zAxis.Normalize();
   yAxis = zAxis.GetPerpendicular();
   xAxis = yAxis.GetCrossProd(zAxis);
 
-  Matrix4 xlate, xform, rot;
-  xlate = rot = Matrix4::IDENTITY;
+  math::Matrix4 xlate, xform, rot;
+  xlate = rot = math::Matrix4::IDENTITY;
 
-  Matrix3 rot3;
+  math::Matrix3 rot3;
   rot3.SetFromAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
@@ -356,8 +358,8 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
   xlate.SetTrans( normal * -d );
   xform = xlate * rot;
 
-  Vector3 vec;
-  Vector3 norm(0,0,1);
+  math::Vector3 vec;
+  math::Vector3 norm(0,0,1);
   double xSpace = size.x / segments.x;
   double ySpace = size.y / segments.y;
   double halfWidth = size.x / 2.0;
@@ -390,8 +392,8 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a Box mesh
-void MeshManager::CreateBox(const std::string &name, const Vector3 &sides,
-                            const Vector2d &uvCoords)
+void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
+                            const math::Vector2d &uvCoords)
 {
   int i,k;
 
@@ -590,7 +592,7 @@ void MeshManager::CreateCamera(const std::string &name, float scale)
 void MeshManager::CreateCylinder(const std::string &name, float radius, 
                                  float height, int rings, int segments)
 {
-  Vector3 vert, norm;
+  math::Vector3 vert, norm;
   unsigned short verticeIndex = 0;
   unsigned int i,j;
   int ring, seg;
@@ -695,7 +697,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 void MeshManager::CreateCone(const std::string &name, float radius, 
                              float height, int rings, int segments)
 {
-  Vector3 vert, norm;
+  math::Vector3 vert, norm;
   unsigned short verticeIndex = 0;
   unsigned int i,j;
   int ring, seg;
@@ -808,7 +810,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
                              float outterRadius, float height, int rings, 
                              int segments)
 {
-  Vector3 vert, norm;
+  math::Vector3 vert, norm;
   unsigned short verticeIndex = 0;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);

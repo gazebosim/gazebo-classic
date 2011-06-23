@@ -52,13 +52,13 @@ const Ogre::String &DynamicLines::getMovableType() const
   return moveType;
 }
 
-void DynamicLines::AddPoint(const common::Vector3 &pt)
+void DynamicLines::AddPoint(const math::Vector3 &pt)
 {
   this->points.push_back(pt);
   this->dirty = true;
 }
 
-void DynamicLines::SetPoint(unsigned int index, const common::Vector3 &value)
+void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 {
   if (index >= this->points.size())
   {
@@ -72,7 +72,7 @@ void DynamicLines::SetPoint(unsigned int index, const common::Vector3 &value)
   this->dirty = true;
 }
 
-const common::Vector3& DynamicLines::GetPoint(unsigned int index) const
+const math::Vector3& DynamicLines::GetPoint(unsigned int index) const
 {
   if (index >= this->points.size())
   {

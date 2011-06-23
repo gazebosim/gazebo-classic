@@ -25,8 +25,8 @@
 
 #include "common/Param.hh"
 #include "Entity.hh"
-#include "common/Pose3d.hh"
-#include "common/Vector3.hh"
+#include "math/Pose3d.hh"
+#include "math/Vector3.hh"
 #include "physics/Geom.hh"
 
 class btCollisionShape;
@@ -78,7 +78,7 @@ namespace gazebo
     public: Mass GetBodyMassMatrix();
   
     /// \brief Get the bounding box, defined by the physics engine
-    public: virtual void GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const;
+    public: virtual void GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const;
 
     /// \brief Set the collision shape
     public: void SetCollisionShape( btCollisionShape *shape );

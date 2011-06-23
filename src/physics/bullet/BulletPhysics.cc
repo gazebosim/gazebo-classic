@@ -40,7 +40,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "Entity.hh"
 
 #include "common/XMLConfig.hh"
@@ -124,8 +124,8 @@ void BulletPhysics::Save(std::string &prefix, std::ostream &stream)
 // Initialize the Bullet engine
 void BulletPhysics::Init()
 {
-  common::Vector3 g = this->gravityP->GetValue();
-  this->dynamicsWorld->setGravity(btcommon::Vector3(g.x, g.y, g.z));
+  math::Vector3 g = this->gravityP->GetValue();
+  this->dynamicsWorld->setGravity(btmath::Vector3(g.x, g.y, g.z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,9 +264,9 @@ void BulletPhysics::ConvertMass(void *engineMass, const Mass &mass)
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
-common::Pose3d BulletPhysics::ConvertPose(btTransform bt)
+math::Pose3d BulletPhysics::ConvertPose(btTransform bt)
 {
-  common::Pose3d pose;
+  math::Pose3d pose;
   pose.pos.x = bt.getOrigin().getX();
   pose.pos.y = bt.getOrigin().getY();
   pose.pos.z = bt.getOrigin().getZ();
@@ -281,11 +281,11 @@ common::Pose3d BulletPhysics::ConvertPose(btTransform bt)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert a gazebo pose to a bullet transform
-btTransform BulletPhysics::ConvertPose(const common::Pose3d pose)
+btTransform BulletPhysics::ConvertPose(const math::Pose3d pose)
 {
   btTransform trans;
 
-  trans.setOrigin( btcommon::Vector3( pose.pos.x, pose.pos.y, pose.pos.z) );
+  trans.setOrigin( btmath::Vector3( pose.pos.x, pose.pos.y, pose.pos.z) );
   trans.setRotation( btQuaternion( pose.rot.x, pose.rot.y, 
                                    pose.rot.z, pose.rot.u) );
   return trans;
@@ -293,8 +293,8 @@ btTransform BulletPhysics::ConvertPose(const common::Pose3d pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the gavity vector
-void BulletPhysics::SetGravity(const gazebo::common::Vector3 &gravity)
+void BulletPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
 {
   this->gravityP->SetValue(gravity);
-  this->dynamicsWorld->setGravity(btcommon::Vector3(gravity.x, gravity.y, gravity.z));
+  this->dynamicsWorld->setGravity(btmath::Vector3(gravity.x, gravity.y, gravity.z));
 }

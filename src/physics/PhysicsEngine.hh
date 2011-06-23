@@ -76,10 +76,10 @@ namespace gazebo
     
       /// \brief Return the gavity vector
       /// \return The gavity vector
-      public: common::Vector3 GetGravity() const;
+      public: math::Vector3 GetGravity() const;
   
       /// \brief Set the gavity vector
-      public: virtual void SetGravity(const gazebo::common::Vector3 &gravity) = 0;
+      public: virtual void SetGravity(const gazebo::math::Vector3 &gravity) = 0;
   
       /// \brief Get the time between each update cycle
       /// \return seconds between updates 
@@ -151,13 +151,13 @@ namespace gazebo
       public: void SetParam(const std::string &key, const std::string &value);
    
       /// \brief Add a contact visual
-      protected: void AddContactVisual(const common::Vector3 &pos_, 
-                                       const common::Vector3 &norm_);
+      protected: void AddContactVisual(const math::Vector3 &pos_, 
+                                       const math::Vector3 &norm_);
   
       protected: WorldPtr world;
   
       /// The gravity vector
-      protected: common::ParamT<common::Vector3> *gravityP;
+      protected: common::ParamT<math::Vector3> *gravityP;
     
       /// time steps the physical engine will take 
       /// how much time will pass on each update

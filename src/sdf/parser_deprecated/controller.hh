@@ -37,7 +37,7 @@
 #ifndef SDF_CONTROLLER_HH
 #define SDF_CONTROLLER_HH
 
-#include <sdf/interface/plugin.hh>
+#include <sdf/interface/Plugin.hh>
 #include <string>
 
 /// extends plugin with type

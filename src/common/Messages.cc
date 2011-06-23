@@ -18,6 +18,11 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
+#include "math/Vector3.hh"
+#include "math/Pose3d.hh"
+#include "math/Quatern.hh"
+#include "math/Plane.hh"
+
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/XMLConfig.hh"
@@ -108,14 +113,14 @@ msgs::Packet Message::Package2(const std::string &type,
   return pkg;
 }
 
-void Message::Set(msgs::Point *pt, const Vector3 &v)
+void Message::Set(msgs::Point *pt, const math::Vector3 &v)
 {
   pt->set_x(v.x);
   pt->set_y(v.y);
   pt->set_z(v.z);
 }
 
-void Message::Set(msgs::Quaternion *q, const Quatern &v)
+void Message::Set(msgs::Quaternion *q, const math::Quatern &v)
 {
   q->set_x(v.x);
   q->set_y(v.y);
@@ -123,7 +128,7 @@ void Message::Set(msgs::Quaternion *q, const Quatern &v)
   q->set_w(v.w);
 }
 
-void Message::Set(msgs::Pose *p, const Pose3d &v)
+void Message::Set(msgs::Pose *p, const math::Pose3d &v)
 {
   Message::Set( p->mutable_position(), v.pos );
   Message::Set( p->mutable_orientation(), v.rot );
@@ -143,7 +148,7 @@ void Message::Set(msgs::Time *t, const Time &v)
   t->set_nsec(v.nsec);
 }
 
-void Message::Set(msgs::Plane *p, const Plane &v)
+void Message::Set(msgs::Plane *p, const math::Plane &v)
 {
   Message::Set( p->mutable_normal(), v.normal );
   p->set_size_x( v.size.x );
@@ -151,7 +156,7 @@ void Message::Set(msgs::Plane *p, const Plane &v)
   p->set_d( v.d );
 }
 
-msgs::Point Message::Convert(const Vector3 &v)
+msgs::Point Message::Convert(const math::Vector3 &v)
 {
   msgs::Point result;
   result.set_x(v.x);
@@ -160,7 +165,7 @@ msgs::Point Message::Convert(const Vector3 &v)
   return result;
 }
 
-msgs::Quaternion Message::Convert(const Quatern &q)
+msgs::Quaternion Message::Convert(const math::Quatern &q)
 {
   msgs::Quaternion result;
   result.set_x(q.x);
@@ -170,7 +175,7 @@ msgs::Quaternion Message::Convert(const Quatern &q)
   return result;
 }
 
-msgs::Pose Message::Convert(const Pose3d &p)
+msgs::Pose Message::Convert(const math::Pose3d &p)
 {
   msgs::Pose result;
   result.mutable_position()->CopyFrom( Convert(p.pos) );
@@ -196,7 +201,7 @@ msgs::Time Message::Convert(const Time &t)
   return result;
 }
 
-msgs::Plane Message::Convert(const Plane &p)
+msgs::Plane Message::Convert(const math::Plane &p)
 {
   msgs::Plane result;
   result.mutable_normal()->CopyFrom( Convert(p.normal) );
@@ -206,19 +211,19 @@ msgs::Plane Message::Convert(const Plane &p)
   return result;
 }
 
-Vector3 Message::Convert(const msgs::Point &v)
+math::Vector3 Message::Convert(const msgs::Point &v)
 {
-  return Vector3(v.x(), v.y(), v.z());
+  return math::Vector3(v.x(), v.y(), v.z());
 }
 
-Quatern Message::Convert(const msgs::Quaternion &q)
+math::Quatern Message::Convert(const msgs::Quaternion &q)
 {
-  return Quatern(q.w(), q.x(), q.y(), q.z());
+  return math::Quatern(q.w(), q.x(), q.y(), q.z());
 }
 
-Pose3d Message::Convert(const msgs::Pose &p)
+math::Pose3d Message::Convert(const msgs::Pose &p)
 {
-  return Pose3d( Message::Convert(p.position()), 
+  return math::Pose3d( Message::Convert(p.position()), 
                  Message::Convert(p.orientation()) );
 }
 
@@ -232,10 +237,10 @@ Time Message::Convert(const msgs::Time &t)
   return Time(t.sec(), t.nsec());
 }
 
-Plane Message::Convert(const msgs::Plane &p)
+math::Plane Message::Convert(const msgs::Plane &p)
 {
-  return Plane(Message::Convert(p.normal()), 
-               Vector2d(p.size_x(), p.size_y()),
+  return math::Plane(Message::Convert(p.normal()), 
+               math::Vector2d(p.size_x(), p.size_y()),
                p.d() );
 }
 
@@ -262,8 +267,9 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
 
   if ((cnode = node->GetChild("origin")) != NULL)
   {
-    result.mutable_pose()->mutable_position()->CopyFrom( Convert(cnode->GetVector3("xyz",Vector3(0,0,0))) );  
-    result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(cnode->GetRotation("rpy", Quatern() )) );
+    result.mutable_pose()->mutable_position()->CopyFrom( 
+        Convert(cnode->GetVector3("xyz",math::Vector3(0,0,0))) );  
+    result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(cnode->GetRotation("rpy", math::Quatern() )) );
   }
 
   if ((cnode = node->GetChild("diffuse")) != NULL)
@@ -286,7 +292,7 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
   }
 
   result.mutable_direction()->CopyFrom( 
-      Convert( node->GetVector3("direction",Vector3(0, 0, -1)) ) );
+      Convert( node->GetVector3("direction",math::Vector3(0, 0, -1)) ) );
   result.set_range( node->GetDouble("range",20,1) );
   result.set_cast_shadows( node->GetBool("cast_shadows",false,0) );
 
@@ -319,7 +325,7 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
     {
       result.set_mesh( ccnode->GetString("filename","",0) );
       result.mutable_scale()->CopyFrom( 
-          Convert( ccnode->GetVector3("scale", Vector3(1,1,1)) ) );
+          Convert( ccnode->GetVector3("scale", math::Vector3(1,1,1)) ) );
     }
 
     ccnode = cnode->GetChild("cylinder");
@@ -348,14 +354,14 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
     {
       result.set_mesh("unit_box");
       result.mutable_scale()->CopyFrom( 
-          Convert( ccnode->GetVector3("size", Vector3(1,1,1)) ) );
+          Convert( ccnode->GetVector3("size", math::Vector3(1,1,1)) ) );
     }
 
     ccnode = cnode->GetChild("plane");
     if ( ccnode )
     {
       result.mutable_plane()->mutable_normal()->CopyFrom( 
-          Message::Convert( ccnode->GetVector3("normal",Vector3(0,0,1))) );
+          Message::Convert( ccnode->GetVector3("normal",math::Vector3(0,0,1))) );
       result.mutable_plane()->set_d( ccnode->GetDouble("offset", 0, 0) );
       result.mutable_plane()->set_size_x(ccnode->GetTupleDouble("size", 0, 1));
       result.mutable_plane()->set_size_y(ccnode->GetTupleDouble("size", 1, 1));
@@ -374,10 +380,10 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
   if (node->GetChild("origin"))
   {
     result.mutable_pose()->mutable_position()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetVector3("xyz",Vector3())));
+        Convert(node->GetChild("origin")->GetVector3("xyz",math::Vector3())));
 
     result.mutable_pose()->mutable_orientation()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetRotation("rpy",Quatern())));
+        Convert(node->GetChild("origin")->GetRotation("rpy",math::Quatern())));
   }
 
   return result;

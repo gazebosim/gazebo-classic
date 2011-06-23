@@ -174,13 +174,13 @@ void SelectionObj::Attach( Visual *visual )
 
   if (visual)
   {
-    common::Box box = visual->GetBounds();
-    common::Vector3 scale = box.max - box.min;
+    math::Box box = visual->GetBounds();
+    math::Vector3 scale = box.max - box.min;
 
     double max = std::max(scale.x, scale.y);
     max = std::max(max, scale.z);
     visual->AttachVisual(this->node);
-    this->node->SetScale( common::Vector3(max, max, max) );
+    this->node->SetScale( math::Vector3(max, max, max) );
     this->node->SetVisible(true);
   }
 }

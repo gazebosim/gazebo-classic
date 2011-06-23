@@ -19,7 +19,7 @@
 #include "common/Console.hh"
 #include "common/Messages.hh"
 #include "common/Events.hh"
-#include "common/Quatern.hh"
+#include "math/Quatern.hh"
 #include "common/MouseEvent.hh"
 
 #include "rendering/UserCamera.hh"
@@ -41,7 +41,7 @@ BoxMaker::BoxMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh( "unit_box_U1V1" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), common::Quatern());
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quatern());
 }
 
 BoxMaker::~BoxMaker()
@@ -104,8 +104,8 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
-  common::Vector3 norm(0,0,1);
-  common::Vector3 p1, p2;
+  math::Vector3 norm(0,0,1);
+  math::Vector3 p1, p2;
 
   p1 = this->camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
@@ -116,8 +116,8 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 1)
     common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
 
-  common::Vector3 scale = p1-p2;
-  common::Vector3 p( this->visualMsg->pose().position().x(), 
+  math::Vector3 scale = p1-p2;
+  math::Vector3 p( this->visualMsg->pose().position().x(), 
                      this->visualMsg->pose().position().y(), 
                      this->visualMsg->pose().position().z() );
 

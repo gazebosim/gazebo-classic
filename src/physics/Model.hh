@@ -70,55 +70,55 @@ namespace gazebo
     
       /// \brief Set the linear velocity of the model
       /// \param vel The new linear velocity
-      public: void SetLinearVel( const common::Vector3 &vel );
+      public: void SetLinearVel( const math::Vector3 &vel );
   
       /// \brief Set the angular velocity of the model
       /// \param vel The new angular velocity
-      public: void SetAngularVel( const common::Vector3 &vel );
+      public: void SetAngularVel( const math::Vector3 &vel );
   
       /// \brief Set the linear acceleration of the model
       /// \param vel The new linear acceleration
-      public: void SetLinearAccel( const common::Vector3 &vel );
+      public: void SetLinearAccel( const math::Vector3 &vel );
   
       /// \brief Set the angular acceleration of the model
       /// \param vel The new angular acceleration
-      public: void SetAngularAccel( const common::Vector3 &vel );
+      public: void SetAngularAccel( const math::Vector3 &vel );
   
       /// \brief Get the linear velocity of the entity
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetRelativeLinearVel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetRelativeLinearVel() const;
   
       /// \brief Get the linear velocity of the entity in the world frame
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetWorldLinearVel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetWorldLinearVel() const;
   
       /// \brief Get the angular velocity of the entity
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetRelativeAngularVel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetRelativeAngularVel() const;
   
       /// \brief Get the angular velocity of the entity in the world frame
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetWorldAngularVel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetWorldAngularVel() const;
   
       /// \brief Get the linear acceleration of the entity
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetRelativeLinearAccel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetRelativeLinearAccel() const;
   
       /// \brief Get the linear acceleration of the entity in the world frame
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetWorldLinearAccel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetWorldLinearAccel() const;
   
       /// \brief Get the angular acceleration of the entity 
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetRelativeAngularAccel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetRelativeAngularAccel() const;
   
       /// \brief Get the angular acceleration of the entity in the world frame
-      /// \return Vector3, set to 0,0,0 if the model has no body
-      public: virtual common::Vector3 GetWorldAngularAccel() const;
+      /// \return math::Vector3, set to 0,0,0 if the model has no body
+      public: virtual math::Vector3 GetWorldAngularAccel() const;
   
       /// \brief Get the size of the bounding box
       /// \return The bounding box
-      public: virtual common::Box GetBoundingBox() const;
+      public: virtual math::Box GetBoundingBox() const;
     
       /// \brief Get the number of joints
       /// \return Get the number of joints
@@ -165,8 +165,8 @@ namespace gazebo
       private: void LoadChildrenAndJoints(common::XMLConfigNode *node);
    
       private: common::ParamT<std::string> *canonicalBodyNameP;
-      private: common::ParamT<common::Vector3> *xyzP;
-      private: common::ParamT<common::Quatern> *rpyP;
+      private: common::ParamT<math::Vector3> *xyzP;
+      private: common::ParamT<math::Quatern> *rpyP;
       private: common::ParamT<bool> *enableGravityP;
       private: common::ParamT<bool> *enableFrictionP;
       private: common::ParamT<int> *laserFiducialP;

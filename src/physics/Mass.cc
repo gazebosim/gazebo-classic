@@ -91,14 +91,14 @@ void Mass::SetCoG(double cx, double cy, double cz)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the center of gravity
-void Mass::SetCoG(const common::Vector3 &c)
+void Mass::SetCoG(const math::Vector3 &c)
 {
   this->cog = c;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the center of gravity
-common::Vector3 Mass::GetCoG() const
+math::Vector3 Mass::GetCoG() const
 {
   return this->cog;
 }
@@ -115,21 +115,21 @@ void Mass::SetInertiaMatrix(double ixx, double iyy, double izz,
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
-common::Vector3 Mass::GetPrincipalMoments() const
+math::Vector3 Mass::GetPrincipalMoments() const
 {
   return this->principals;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the products of inertia (Ixy, Ixy, Iyz)
-common::Vector3 Mass::GetProductsofInertia() const
+math::Vector3 Mass::GetProductsofInertia() const
 {
   return this->products;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Rotate this mass
-void Mass::Rotate(const common::Quatern &rot)
+void Mass::Rotate(const math::Quatern &rot)
 {
   this->cog = rot.RotateVector(this->cog);
 }

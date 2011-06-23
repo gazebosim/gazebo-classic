@@ -21,7 +21,6 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
@@ -56,7 +55,6 @@ Scene::Scene(const std::string &name_)
   this->name = name_;
   this->manager = NULL;
   this->raySceneQuery = NULL;
-  this->type = GENERIC;
 
   this->receiveMutex = new boost::mutex();
 
@@ -64,24 +62,6 @@ Scene::Scene(const std::string &name_)
 
   Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
   this->grids.push_back(grid);
-  
-
-  common::Param::Begin(&this->parameters);
-  this->ambientP = new common::ParamT<common::Color>("ambient", common::Color(.5,.5,.5,1), 0);
-  this->shadowEnabledP = new common::ParamT<bool>("enabled", false, 0);
-  this->shadowColorP = new common::ParamT<common::Color>("color", common::Color(0.2, 0.2, 0.2, 1), 0);
-  this->shadowTypeP = new common::ParamT<std::string>("type", "stencil_additive", 0);
-
-  this->skyMaterialP = new common::ParamT<std::string>("material","",1);
-  this->backgroundColorP = new common::ParamT<common::Color>("background_color",common::Color(0.5,0.5,0.5), 0);
-
-  this->fogTypeP = new common::ParamT<std::string>("type","",0);
-  this->fogColorP = new common::ParamT<common::Color>("color",common::Color(1,1,1,1),0);
-  this->fogDensityP = new common::ParamT<double>("density",0,0);
-  this->fogStartP = new common::ParamT<double>("linear_start",0,0);
-  this->fogEndP = new common::ParamT<double>("linear_end",1.0,0);
-  common::Param::End();
-
   
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
@@ -91,6 +71,8 @@ Scene::Scene(const std::string &name_)
   this->selectionSub = this->node->Subscribe("~/selection", &Scene::OnSelectionMsg, this);
 
   this->selectionObj = new SelectionObj(this);
+
+  this->sdf.reset(new sdf::Scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,19 +92,6 @@ Scene::~Scene()
   // Remove a scene
   //RTShaderSystem::Instance()->RemoveScene( this );
 
-  delete this->ambientP;
-  delete this->shadowEnabledP;
-  delete this->shadowColorP;
-  delete this->shadowTypeP;
-  delete this->backgroundColorP;
-  delete this->skyMaterialP;
-
-  delete this->fogTypeP;
-  delete this->fogColorP;
-  delete this->fogDensityP;
-  delete this->fogStartP;
-  delete this->fogEndP;
-
   for (unsigned int i=0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
@@ -141,32 +110,9 @@ Scene::~Scene()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Scene::Load(common::XMLConfigNode *node_)
+void Scene::SetParams(const boost::shared_ptr<sdf::Scene> &_scene)
 {
-  common::XMLConfigNode *cnode = NULL;
-
-  if (node_)
-    cnode = node_->GetChild("shadows");
-  this->shadowEnabledP->Load(cnode);
-  this->shadowTypeP->Load(cnode);
-  this->shadowColorP->Load(cnode);
-
-  this->ambientP->Load(node_);
-  this->backgroundColorP->Load(node_);
-  this->skyMaterialP->Load(node_ ? node_->GetChild("sky") : NULL);
-  this->fogColorP->Load(node_ ? node_->GetChild("fog") : NULL);
-  this->fogDensityP->Load(node_ ? node_->GetChild("fog") : NULL);
-  this->fogTypeP->Load(node_ ? node_->GetChild("fog") : NULL);
-  this->fogDensityP->Load(node_ ? node_->GetChild("fog") : NULL);
-  this->fogStartP->Load(node_ ? node_->GetChild("fog") : NULL);
-  this->fogEndP->Load(node_ ? node_->GetChild("fog") : NULL);
-
-  // Get the SceneManager, in this case a generic one
-  if (node_ && node_->GetChild("bsp"))
-    this->type = BSP;
-  else
-    this->type = GENERIC;
-
+  this->sdf = _scene;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,62 +125,60 @@ void Scene::Init()
   if (this->manager)
     root->destroySceneManager(this->manager);
 
-  if (this->type == BSP)
-    this->manager = root->createSceneManager("BspSceneManager");
-  else
-    this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-
+  this->manager = root->createSceneManager(Ogre::ST_GENERIC);
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
   // Create the sky
-  if ( !(**this->skyMaterialP).empty() )
+  if ( !this->sdf->skyMaterial.GetValue().empty() )
   {
     try
     {
       Ogre::Quaternion orientation;
       orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-      this->manager->setSkyDome(true, **(this->skyMaterialP),10,8, 4, true, orientation);
+      this->manager->setSkyDome(true, *this->sdf->skyMaterial,
+                                10,8, 4, true, orientation);
     }
     catch (int)
     {
       gzwarn << "Unable to set sky dome to material[" 
-             << **this->skyMaterialP << "]\n";
+             << *this->sdf->skyMaterial << "]\n";
     }
   }
 
   // Create Fog
-  this->SetFog(**this->fogTypeP, **this->fogColorP, **this->fogDensityP, 
-               **this->fogStartP, **this->fogEndP);
+  this->SetFog(*this->sdf->fogType, *this->sdf->fogColor, 
+               *this->sdf->fogDensity, *this->sdf->fogStart, 
+               *this->sdf->fogEnd);
 
   // Create ray scene query
   this->raySceneQuery = this->manager->createRayQuery( Ogre::Ray() );
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
-  if (**this->shadowEnabledP)
+  if (*this->sdf->shadowEnabled)
   {
     this->manager->setShadowTextureSize( 512);
     this->manager->setShadowTextureCount( 4 );
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 
     /*
-    if (**this->shadowTypeP == "stencil_additive")
+    if (**this->sdf->shadowType == "stencil_additive")
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-    else if (**this->shadowTypeP == "stencil_modulative")
+    else if (**this->sdf->shadowType == "stencil_modulative")
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-    else if (**this->shadowTypeP == "texture_additive")
+    else if (**this->sdf->shadowType == "texture_additive")
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
-    else if (**this->shadowTypeP == "texture_modulative")
+    else if (**this->sdf->shadowType == "texture_modulative")
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    else if (**this->shadowTypeP == "texture_additive_integrated")
+    else if (**this->sdf->shadowType == "texture_additive_integrated")
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-    else if (**this->shadowTypeP == "texture_modulative_integrated")
+    else if (**this->sdf->shadowType == "texture_modulative_integrated")
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
       */
 
-    this->manager->setShadowColour( Conversions::Color(**this->shadowColorP) );
+    this->manager->setShadowColour( Conversions::Color(*this->sdf->shadowColor) );
   }
 
   // Send a request to get the current world state
@@ -255,30 +199,6 @@ void Scene::Init()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the scene
-void Scene::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << "  " << *(this->ambientP) << "\n";
-
-  if ((**this->skyMaterialP).size())
-  {
-    stream << prefix << "  <sky>\n";
-    stream << prefix << "    " << *(this->skyMaterialP) << "\n";
-    stream << prefix << "  </sky>\n";
-  }
-
-  stream << prefix << "  <fog>\n";
-  stream << prefix << "    " << *this->fogTypeP << "\n";
-  stream << prefix << "    " << *this->fogColorP << "\n";
-  stream << prefix << "    " << *this->fogStartP << "\n";
-  stream << prefix << "    " << *this->fogEndP << "\n";
-  stream << prefix << "    " << *this->fogDensityP << "\n";
-  stream << prefix << "  </fog>\n";
-
-  // NATY: Save shadow info
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the OGRE scene manager
 Ogre::SceneManager *Scene::GetManager() const
 {
@@ -296,12 +216,13 @@ std::string Scene::GetName() const
 /// Set the ambient color
 void Scene::SetAmbientColor(const common::Color &color)
 {
-  this->ambientP->SetValue(color);
+  this->sdf->ambientColor.SetValue(color);
 
   // Ambient lighting
   if (this->manager)
   {
-    this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
+    this->manager->setAmbientLight(
+        Conversions::Color(*this->sdf->ambientColor));
   }
 }
 
@@ -309,35 +230,21 @@ void Scene::SetAmbientColor(const common::Color &color)
 /// Get the ambient color
 common::Color Scene::GetAmbientColor() const
 {
-  return **this->ambientP;
+  return *this->sdf->ambientColor;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the background color
 void Scene::SetBackgroundColor(const common::Color &color)
 {
-  this->backgroundColorP->SetValue(color);
+  this->sdf->backgroundColor.SetValue(color);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the background color
 common::Color Scene::GetBackgroundColor() const
 {
-  return **this->backgroundColorP;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the scene type
-void Scene::SetType(Scene::SceneType type_)
-{
-  this->type = type_;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the scene type
-Scene::SceneType Scene::GetType() const
-{
-  return this->type;
+  return *this->sdf->backgroundColor;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -519,8 +426,8 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world pos of a the first contact at a pixel location
-/*common::Vector3 Scene::GetFirstContact(Camera *camera, 
-                                       common::Vector2i mousePos)
+/*math::Vector3 Scene::GetFirstContact(Camera *camera, 
+                                       math::Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetCamera();
   //Ogre::Real closest_distance = -1.0f;
@@ -536,7 +443,7 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
-  return common::Vector3(pt.x, pt.y, pt.z);
+  return math::Vector3(pt.x, pt.y, pt.z);
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -579,8 +486,8 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Draw a named line
-void Scene::DrawLine(const common::Vector3 &start_, 
-                     const common::Vector3 &end_, 
+void Scene::DrawLine(const math::Vector3 &start_, 
+                     const math::Vector3 &end_, 
                      const std::string &name_)
 {
   Ogre::SceneNode *sceneNode = NULL;
@@ -614,26 +521,27 @@ void Scene::DrawLine(const common::Vector3 &start_,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set fog for this scene
-void Scene::SetFog( const std::string &type_, const common::Color &color_, 
-                    double density_, double start_, double end_ )
+void Scene::SetFog( const std::string &_type, const common::Color &_color, 
+                    double _density, double _start, double _end )
 {
   Ogre::FogMode fogType = Ogre::FOG_NONE;
 
-  if (type_ == "linear")
+  if (_type == "linear")
     fogType = Ogre::FOG_LINEAR;
-  else if (type_ == "exp")
+  else if (_type == "exp")
     fogType = Ogre::FOG_EXP;
-  else if (type_ == "exp2")
+  else if (_type == "exp2")
     fogType = Ogre::FOG_EXP2;
 
-  this->fogTypeP->SetValue(type_);
-  this->fogColorP->SetValue(color_);
-  this->fogDensityP->SetValue(density_);
-  this->fogStartP->SetValue(start_);
-  this->fogEndP->SetValue(end_);
+  this->sdf->fogType.SetValue(_type);
+  this->sdf->fogColor.SetValue(_color);
+  this->sdf->fogDensity.SetValue(_density);
+  this->sdf->fogStart.SetValue(_start);
+  this->sdf->fogEnd.SetValue(_end);
 
   if (this->manager)
-    this->manager->setFog( fogType, Conversions::Color(color_), density_, start_, end_ );
+    this->manager->setFog( fogType, Conversions::Color(_color), 
+                           _density, _start, _end );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

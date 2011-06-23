@@ -52,11 +52,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace rendering
   {
     /// \addtogroup gazebo_rendering
@@ -80,7 +75,7 @@ namespace gazebo
       private: virtual ~RenderEngine();
     
       /// \brief Load the parameters for Ogre
-      public: void Load(common::XMLConfigNode *rootNode);
+      public: void Load();
   
       /// \brief Initialize ogre
       public: void Init();

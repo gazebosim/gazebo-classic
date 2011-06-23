@@ -43,8 +43,8 @@ HeightmapShape::HeightmapShape(GeomPtr parent)
   this->imageFilenameP = new common::ParamT<std::string>("image","",1);
   this->worldTextureP = new common::ParamT<std::string>("world_texture","",0);
   this->detailTextureP = new common::ParamT<std::string>("detail_texture","",0);
-  this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(10,10,10), 0);
-  this->offsetP = new common::ParamT<common::Vector3>("offset",common::Vector3(0,0,0), 0);
+  this->sizeP = new common::ParamT<math::Vector3>("size",math::Vector3(10,10,10), 0);
+  this->offsetP = new common::ParamT<math::Vector3>("offset",math::Vector3(0,0,0), 0);
   common::Param::End();
 
   // NATY: this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());

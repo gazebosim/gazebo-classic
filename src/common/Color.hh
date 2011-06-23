@@ -23,7 +23,7 @@
 #define COLOR_HH
 
 #include <iostream>
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 namespace gazebo
 {
@@ -50,13 +50,13 @@ namespace gazebo
       public: void Set(float r = 1, float g =1 , float b = 1, float a = 1);
 
       /// \brief Get the color in HSV colorspace
-      public: Vector3 GetAsHSV() const;
+      public: math::Vector3 GetAsHSV() const;
  
       /// \brief Set a color based on HSV values
       public: void SetFromHSV(float h, float s, float v);
 
       /// \brief Get the color in YUV colorspace
-      public: Vector3 GetAsYUV() const;
+      public: math::Vector3 GetAsYUV() const;
 
       /// \brief Set from yuv
       public: void SetFromYUV(float y, float u, float v);

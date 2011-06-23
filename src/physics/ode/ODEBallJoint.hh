@@ -72,13 +72,13 @@ namespace gazebo
       public: virtual ~ODEBallJoint();
     
       /// \brief Get joint's anchor point
-      public: virtual common::Vector3 GetAnchor(int index) const;
+      public: virtual math::Vector3 GetAnchor(int index) const;
     
       /// \brief Set joint's anchor point
-      public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
+      public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
   
       /// \brief Get the axis of rotation
-      public: virtual common::Vector3 GetAxis(int /*index*/) const {return common::Vector3();}
+      public: virtual math::Vector3 GetAxis(int /*index*/) const {return math::Vector3();}
   
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
@@ -96,7 +96,7 @@ namespace gazebo
       public: virtual void SetMaxForce(int /*index*/, double /*t*/) {}
   
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual common::Angle GetAngle(int /*index*/) const {return common::Angle(0);}
+      public: virtual math::Angle GetAngle(int /*index*/) const {return math::Angle(0);}
    
     };
     

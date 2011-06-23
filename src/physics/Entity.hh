@@ -25,10 +25,12 @@
 #include <string>
 
 #include "transport/TransportTypes.hh"
-
 #include "msgs/MessageTypes.hh"
 #include "common/CommonTypes.hh"
-#include "common/Pose3d.hh"
+#include "math/MathTypes.hh"
+#include "math/Box.hh"
+
+#include "math/Pose3d.hh"
 #include "physics/PhysicsTypes.hh"
 
 #include "physics/Base.hh"
@@ -66,78 +68,78 @@ namespace gazebo
 
       /// \brief Set the initial pose
       /// \param p The initial pose
-      public: void SetInitialPose( const common::Pose3d &p );
+      public: void SetInitialPose( const math::Pose3d &p );
 
       /// \brief Return the bounding box for the entity 
-      public: virtual common::Box GetBoundingBox() const;
+      public: virtual math::Box GetBoundingBox() const;
   
       /// \brief Get the absolute pose of the entity
-      public: virtual common::Pose3d GetWorldPose() const;
+      public: virtual math::Pose3d GetWorldPose() const;
   
       /// \brief Get the pose of the entity relative to its parent
-      public: common::Pose3d GetRelativePose() const;
+      public: math::Pose3d GetRelativePose() const;
   
       /// \brief Get the pose relative to the model this entity belongs to
-      public: common::Pose3d GetModelRelativePose() const;
+      public: math::Pose3d GetModelRelativePose() const;
   
       /// \brief Set the pose of the entity relative to its parent
       /// \param pose The new pose
       /// \param notify True = tell children of the pose change
-      public: void SetRelativePose(const common::Pose3d &pose, bool notify = true);
+      public: void SetRelativePose(const math::Pose3d &pose, bool notify = true);
   
       /// \brief Set the world pose of the entity
       /// \param pose The new world pose
       /// \param notify True = tell children of the pose change
-      public: void SetWorldPose(const common::Pose3d &pose, bool notify=true);
+      public: void SetWorldPose(const math::Pose3d &pose, bool notify=true);
   
       /// \brief Set the position of the entity relative to its parent
       /// \param pos The new X,Y,Z position
-      public: void SetRelativePosition(const common::Vector3 &pos);
+      public: void SetRelativePosition(const math::Vector3 &pos);
   
       /// \brief Set the rotation of the entity relative to its parent
       /// \param rot The new Quaternion rotation
-      public: void SetRelativeRotation(const common::Quatern &rot);
+      public: void SetRelativeRotation(const math::Quatern &rot);
   
       /// \brief Get the linear velocity of the entity
-      /// \return A Vector3 for the linear velocity
-      public: virtual common::Vector3 GetRelativeLinearVel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the linear velocity
+      public: virtual math::Vector3 GetRelativeLinearVel() const
+              {return math::Vector3();}
   
       /// \brief Get the linear velocity of the entity in the world frame
-      /// \return A Vector3 for the linear velocity
-      public: virtual common::Vector3 GetWorldLinearVel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the linear velocity
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              {return math::Vector3();}
   
       /// \brief Get the angular velocity of the entity
-      /// \return A Vector3 for the velocity
-      public: virtual common::Vector3 GetRelativeAngularVel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the velocity
+      public: virtual math::Vector3 GetRelativeAngularVel() const
+              {return math::Vector3();}
   
       /// \brief Get the angular velocity of the entity in the world frame
-      /// \return A Vector3 for the velocity
-      public: virtual common::Vector3 GetWorldAngularVel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the velocity
+      public: virtual math::Vector3 GetWorldAngularVel() const
+              {return math::Vector3();}
   
       /// \brief Get the linear acceleration of the entity
-      /// \return A Vector3 for the acceleration
-      public: virtual common::Vector3 GetRelativeLinearAccel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the acceleration
+      public: virtual math::Vector3 GetRelativeLinearAccel() const
+              {return math::Vector3();}
   
       /// \brief Get the linear acceleration of the entity in the world frame
-      /// \return A Vector3 for the acceleration
-      public: virtual common::Vector3 GetWorldLinearAccel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the acceleration
+      public: virtual math::Vector3 GetWorldLinearAccel() const
+              {return math::Vector3();}
   
   
       /// \brief Get the angular acceleration of the entity 
-      /// \return A Vector3 for the acceleration
-      public: virtual common::Vector3 GetRelativeAngularAccel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the acceleration
+      public: virtual math::Vector3 GetRelativeAngularAccel() const
+              {return math::Vector3();}
   
       /// \brief Get the angular acceleration of the entity in the world frame
-      /// \return A Vector3 for the acceleration
-      public: virtual common::Vector3 GetWorldAngularAccel() const
-              {return common::Vector3();}
+      /// \return A math::Vector3 for the acceleration
+      public: virtual math::Vector3 GetWorldAngularAccel() const
+              {return math::Vector3();}
   
       /// \brief Get the parent model, if one exists
       /// \return Pointer to a model, or NULL if no parent model exists
@@ -157,8 +159,8 @@ namespace gazebo
       private: EntityPtr parentEntity;
 
       /// The initial pose of the entity
-      private: common::Pose3d initialPose;
-      private: common::Pose3d relativePose;
+      private: math::Pose3d initialPose;
+      private: math::Pose3d relativePose;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr posePub;

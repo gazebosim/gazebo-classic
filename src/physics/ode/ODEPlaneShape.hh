@@ -45,7 +45,7 @@ namespace gazebo
       }
     
       /// Set the altitude of the plane
-      public: void SetAltitude(const common::Vector3 &pos)
+      public: void SetAltitude(const math::Vector3 &pos)
       {
         PlaneShape::SetAltitude(pos);
         ODEGeomPtr odeParent;

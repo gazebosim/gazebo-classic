@@ -42,13 +42,15 @@
 #include <boost/shared_ptr.hpp>
 #include <tinyxml.h>
 
-#include "sdf/interface/sensor.hh"
-#include "sdf/interface/link.hh"
-#include "sdf/interface/model.hh"
-#include "sdf/interface/world.hh"
-#include "sdf/interface/joint.hh"
-#include "sdf/interface/plugin.hh"
-#include "sdf/interface/pose.hh"
+#include "sdf/interface/Sensor.hh"
+#include "sdf/interface/Link.hh"
+#include "sdf/interface/Model.hh"
+#include "sdf/interface/World.hh"
+#include "sdf/interface/Joint.hh"
+#include "sdf/interface/Plugin.hh"
+#include "math/Pose3d.hh"
+#include "math/Vector3.hh"
+#include "math/Quatern.hh"
 
 namespace sdf
 {
@@ -116,7 +118,7 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEContact> &_contact);
 
   /// Pose
-  bool InitXml(TiXmlElement *_xml, Pose &_pose);
+  bool InitXml(TiXmlElement *_xml, gazebo::math::Pose3d &_pose);
 
   bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Scene> &_scene);
@@ -135,10 +137,12 @@ namespace sdf
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<CameraSensor> &_camera);
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<RaySensor> &_ray);
 
-  bool saveXml(TiXmlElement *_parent, const Vector3 &_vec);
-  bool saveXml(TiXmlElement *_parent, const Rotation &_rot);
-  bool saveXml(TiXmlElement *_parent, const ParamT<Pose,true> &_pose);
-  bool saveXml(TiXmlElement *_parent, const ParamT<Pose,false> &_pose);
+  bool saveXml(TiXmlElement *_parent, const gazebo::math::Vector3 &_vec);
+  bool saveXml(TiXmlElement *_parent, const gazebo::math::Quatern &_rot);
+  //bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose3d &_pose);
+
+  //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,true> &_pose);
+  //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose3d,false> &_pose);
 
   bool saveXml(TiXmlElement *_parent, boost::shared_ptr<Surface> &_surface);
   bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEFriction> &_friction);

@@ -42,13 +42,13 @@
 #include <boost/shared_ptr.hpp>
 #include <libxml/parser.h>
 
-#include "sdf/interface/sensor.hh"
-#include "sdf/interface/link.hh"
-#include "sdf/interface/model.hh"
-#include "sdf/interface/world.hh"
-#include "sdf/interface/joint.hh"
-#include "sdf/interface/plugin.hh"
-#include "sdf/interface/pose.hh"
+#include "sdf/interface/Sensor.hh"
+#include "sdf/interface/Link.hh"
+#include "sdf/interface/Model.hh"
+#include "sdf/interface/World.hh"
+#include "sdf/interface/Joint.hh"
+#include "sdf/interface/Plugin.hh"
+#include "math/Pose3d.hh"
 #include "sdf/parser_deprecated/controller.hh"
 
 namespace sdf
@@ -111,7 +111,7 @@ namespace sdf
   bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
 
   /// Pose
-  bool InitXml(xmlNodePtr _xml, Pose &_pose);
+  bool InitXml(xmlNodePtr _xml, gazebo::math::Pose3d &_pose);
 
 /*
   bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);

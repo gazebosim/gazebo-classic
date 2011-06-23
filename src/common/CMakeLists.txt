@@ -16,9 +16,7 @@ link_directories(
 )
 
 set ( sources Messages.cc
-              Angle.cc
               AssimpLoader.cc
-              Box.cc
               Color.cc
               Diagnostics.cc
               Event.cc
@@ -26,25 +24,15 @@ set ( sources Messages.cc
               SystemPaths.cc
               Exception.cc
               Console.cc
-              Matrix3.cc
-              Matrix4.cc
               Mesh.cc
               MeshLoader.cc
               MeshManager.cc
               OgreLoader.cc
               Param.cc
-              Plane.cc
               Plugin.cc
-              Pose3d.cc
-              Quatern.cc
-              Rand.cc
               STLLoader.cc
               Time.cc
               Timer.cc
-              Vector2d.cc
-              Vector2i.cc
-              Vector3.cc
-              Vector4.cc
               XMLConfig.cc
               Image.cc
               Material.cc
@@ -52,9 +40,7 @@ set ( sources Messages.cc
 
 set ( headers CommonTypes.hh
               Messages.hh
-              Angle.hh
               AssimpLoader.hh
-              Box.hh
               Color.hh
               Diagnostics.hh
               Event.hh
@@ -63,26 +49,16 @@ set ( headers CommonTypes.hh
               Exception.hh
               Console.hh
               Global.hh
-              Matrix3.hh
-              Matrix4.hh
               Mesh.hh
               MeshLoader.hh
               MeshManager.hh
               OgreLoader.hh
               Param.hh
-              Plane.hh
               Plugin.hh
-              Pose3d.hh
-              Quatern.hh
-              Rand.hh
               SingletonT.hh
               STLLoader.hh
               Time.hh
               Timer.hh
-              Vector2d.hh
-              Vector2i.hh
-              Vector3.hh
-              Vector4.hh
               XMLConfig.hh
               Image.hh 
               Material.hh
@@ -92,6 +68,7 @@ set ( headers CommonTypes.hh
 add_library(gazebo_common SHARED ${sources})
 
 target_link_libraries( gazebo_common gazebo_msgs
+                                     gazebo_math
                                      ${boost_libraries}
                                      ${XML_LIBRARIES}
                                      ${assimp_libraries}

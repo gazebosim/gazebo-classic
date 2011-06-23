@@ -19,7 +19,7 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
-#include "common/Quatern.hh"
+#include "math/Quatern.hh"
 
 #include "rendering/UserCamera.hh"
 
@@ -40,7 +40,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh( "unit_sphere" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), common::Quatern());
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quatern());
 }
 
 SphereMaker::~SphereMaker()
@@ -102,8 +102,8 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
-  common::Vector3 norm;
-  common::Vector3 p1, p2;
+  math::Vector3 norm;
+  math::Vector3 p1, p2;
 
   norm.Set(0,0,1);
 
@@ -116,14 +116,14 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
-  common::Vector3 p( this->visualMsg->pose().position().x(),
+  math::Vector3 p( this->visualMsg->pose().position().x(),
                      this->visualMsg->pose().position().y(),
                      this->visualMsg->pose().position().z() );
 
   p.z = scale;
 
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
-  common::Message::Set(this->visualMsg->mutable_scale(),common::Vector3(scale,scale,scale));
+  common::Message::Set(this->visualMsg->mutable_scale(),math::Vector3(scale,scale,scale));
   this->visPub->Publish(*this->visualMsg);
 }
 

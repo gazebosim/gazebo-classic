@@ -42,7 +42,7 @@ TrimeshShape::TrimeshShape(GeomPtr parent)
 
   common::Param::Begin(&this->parameters);
   this->meshNameP = new common::ParamT<std::string>("filename","",1);
-  this->scaleP = new common::ParamT<common::Vector3>("scale",common::Vector3(1,1,1),0);
+  this->scaleP = new common::ParamT<math::Vector3>("scale",math::Vector3(1,1,1),0);
   this->centerMeshP = new common::ParamT<std::string>("center_mesh","none",0);
   this->genTexCoordP = new common::ParamT<bool>("gen_tex_coord",false,0);
   common::Param::End();
@@ -79,20 +79,20 @@ void TrimeshShape::Init()
 
   if (this->centerMeshP->GetValue() == std::string("aabb_center"))
   {
-    common::Vector3 center,min_xyz,max_xyz;
+    math::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
     meshManager->SetMeshCenter(this->mesh,center);
   }
   else if (this->centerMeshP->GetValue() == std::string("aabb_bottom"))
   {
-    common::Vector3 center,min_xyz,max_xyz;
+    math::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
-    meshManager->SetMeshCenter(this->mesh,common::Vector3(center.x,center.y,min_xyz.z));
+    meshManager->SetMeshCenter(this->mesh,math::Vector3(center.x,center.y,min_xyz.z));
   }
 
   if (this->genTexCoordP->GetValue())
   {
-    common::Vector3 center,min_xyz,max_xyz;
+    math::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
     meshManager->GenSphericalTexCoord(this->mesh,center);
   }

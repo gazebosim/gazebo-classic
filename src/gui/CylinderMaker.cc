@@ -19,7 +19,7 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
-#include "common/Quatern.hh"
+#include "math/Quatern.hh"
 
 #include "rendering/UserCamera.hh"
 
@@ -41,7 +41,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->set_mesh( "unit_cylinder" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
 
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), common::Quatern());
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quatern());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -102,8 +102,8 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
-  common::Vector3 norm;
-  common::Vector3 p1, p2;
+  math::Vector3 norm;
+  math::Vector3 p1, p2;
 
   if (this->state == 1)
     norm.Set(0,0,1);
@@ -120,11 +120,11 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 1)
     common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
 
-  common::Vector3 p( this->visualMsg->pose().position().x(),
+  math::Vector3 p( this->visualMsg->pose().position().x(),
              this->visualMsg->pose().position().y(),
              this->visualMsg->pose().position().z() );
 
-  common::Vector3 scale;
+  math::Vector3 scale;
 
   if (this->state == 1)
   {

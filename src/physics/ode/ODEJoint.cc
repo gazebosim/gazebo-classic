@@ -199,7 +199,7 @@ dJointFeedback *ODEJoint::GetFeedback()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the high stop of an axis(index)
-void ODEJoint::SetHighStop(int index, common::Angle angle)
+void ODEJoint::SetHighStop(int index, math::Angle angle)
 {
   switch (index)
   {
@@ -214,7 +214,7 @@ void ODEJoint::SetHighStop(int index, common::Angle angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the low stop of an axis(index)
-void ODEJoint::SetLowStop(int index, common::Angle angle)
+void ODEJoint::SetLowStop(int index, math::Angle angle)
 {
   switch (index)
   {
@@ -229,7 +229,7 @@ void ODEJoint::SetLowStop(int index, common::Angle angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the high stop of an axis(index).
-common::Angle ODEJoint::GetHighStop(int index)
+math::Angle ODEJoint::GetHighStop(int index)
 {
   switch (index)
   {
@@ -246,7 +246,7 @@ common::Angle ODEJoint::GetHighStop(int index)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the low stop of an axis(index).
-common::Angle ODEJoint::GetLowStop(int index)
+math::Angle ODEJoint::GetLowStop(int index)
 {
   switch (index)
   {
@@ -263,9 +263,9 @@ common::Angle ODEJoint::GetLowStop(int index)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force the joint applies to the first body
-common::Vector3 ODEJoint::GetBodyForce(unsigned int index) const
+math::Vector3 ODEJoint::GetBodyForce(unsigned int index) const
 {
-  common::Vector3 result;
+  math::Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
   if (index == 0)
@@ -278,9 +278,9 @@ common::Vector3 ODEJoint::GetBodyForce(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque the joint applies to the first body
-common::Vector3 ODEJoint::GetBodyTorque(unsigned int index) const
+math::Vector3 ODEJoint::GetBodyTorque(unsigned int index) const
 {
-  common::Vector3 result;
+  math::Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
   if (index == 0)
@@ -293,45 +293,45 @@ common::Vector3 ODEJoint::GetBodyTorque(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a parameter for the joint
-void ODEJoint::SetAttribute( Attribute attr, int index, double value)
+void ODEJoint::SetAttribute( Attribute _attr, int /*_index*/, double _value)
 {
-  switch (attr)
+  switch (_attr)
   {
     case FUDGE_FACTOR:
-      this->SetParam(dParamFudgeFactor, value);
+      this->SetParam(dParamFudgeFactor, _value);
       break;
     case SUSPENSION_ERP:
-      this->SetParam(dParamSuspensionERP, value);
+      this->SetParam(dParamSuspensionERP, _value);
       break;
     case SUSPENSION_CFM:
-      this->SetParam(dParamSuspensionCFM, value);
+      this->SetParam(dParamSuspensionCFM, _value);
       break;
     case STOP_ERP:
-      this->SetParam(dParamStopERP, value);
+      this->SetParam(dParamStopERP, _value);
       break;
     case STOP_CFM:
-      this->SetParam(dParamStopCFM, value);
+      this->SetParam(dParamStopCFM, _value);
       break;
     case ERP:
-      this->SetParam(dParamERP, value);
+      this->SetParam(dParamERP, _value);
       break;
     case CFM:
-      this->SetParam(dParamCFM, value);
+      this->SetParam(dParamCFM, _value);
       break;
     case FMAX:
-      this->SetParam(dParamFMax, value);
+      this->SetParam(dParamFMax, _value);
       break;
     case VEL:
-      this->SetParam(dParamVel, value);
+      this->SetParam(dParamVel, _value);
       break;
     case HI_STOP:
-      this->SetParam(dParamHiStop, value);
+      this->SetParam(dParamHiStop, _value);
       break;
     case LO_STOP:
-      this->SetParam(dParamLoStop, value);
+      this->SetParam(dParamLoStop, _value);
       break;
     default:
-      gzerr << "Unable to handle joint attribute[" << attr << "]\n";
+      gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
       break;
   };
 }

@@ -83,7 +83,7 @@ void Base::Load(common::XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save function
-void Base::Save(const std::string &prefix, std::ostream &stream)
+void Base::Save(const std::string &/*_prefix*/, std::ostream &/*stream*/)
 {
 }
 

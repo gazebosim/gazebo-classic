@@ -71,7 +71,7 @@ void BulletSliderJoint::Attach( Body *one, Body *two )
   btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
   btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
 
-  btcommon::Vector3 anchor, axis1, axis2;
+  btmath::Vector3 anchor, axis1, axis2;
   btTransform frame1, frame2;
   frame1 = btTransform::getIdentity();
   frame2 = btTransform::getIdentity();
@@ -88,14 +88,14 @@ void BulletSliderJoint::Attach( Body *one, Body *two )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-common::Vector3 BulletSliderJoint::GetAxis(int index) const
+math::Vector3 BulletSliderJoint::GetAxis(int index) const
 {
   return **this->axisP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the position of the joint
-common::Angle BulletSliderJoint::GetAngle(int index) const
+math::Angle BulletSliderJoint::GetAngle(int index) const
 {
   return ((btSliderConstraint*)this->constraint)->getLinearPos();
 }
@@ -117,7 +117,7 @@ void BulletSliderJoint::SetVelocity(int index, double angle)
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of motion
-void BulletSliderJoint::SetAxis( int index, const common::Vector3 &axis )
+void BulletSliderJoint::SetAxis( int index, const math::Vector3 &axis )
 {
   gzerr << "Not implemented in bullet\n";
 }
@@ -138,28 +138,28 @@ void BulletSliderJoint::SetForce(int index, double force)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the high stop of an axis(index).
-void BulletSliderJoint::SetHighStop(int index, common::Angle angle)
+void BulletSliderJoint::SetHighStop(int index, math::Angle angle)
 {
   ((btSliderConstraint*)this->constraint)->setUpperLinLimit(angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the low stop of an axis(index).
-void BulletSliderJoint::SetLowStop(int index, common::Angle angle)
+void BulletSliderJoint::SetLowStop(int index, math::Angle angle)
 {
   ((btSliderConstraint*)this->constraint)->setLowerLinLimit(angle.GetAsRadian());
 }
  
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the high stop of an axis(index).
-common::Angle BulletSliderJoint::GetHighStop(int index)
+math::Angle BulletSliderJoint::GetHighStop(int index)
 {
   return ((btSliderConstraint*)this->constraint)->getUpperLinLimit();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the low stop of an axis(index).
-common::Angle BulletSliderJoint::GetLowStop(int index)
+math::Angle BulletSliderJoint::GetLowStop(int index)
 {
   return ((btSliderConstraint*)this->constraint)->getLowerLinLimit();
 }

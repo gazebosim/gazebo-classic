@@ -25,11 +25,11 @@
 #include <string>
 
 #include "common/Event.hh"
-#include "common/Box.hh"
-#include "common/Pose3d.hh"
-#include "common/Quatern.hh"
-#include "common/Vector3.hh"
-#include "common/Vector2d.hh"
+#include "math/Box.hh"
+#include "math/Pose3d.hh"
+#include "math/Quatern.hh"
+#include "math/Vector3.hh"
+#include "math/Vector2d.hh"
 #include "common/Param.hh"
 #include "common/Messages.hh"
 
@@ -121,10 +121,10 @@ namespace gazebo
       public: void Save(std::string &prefix, std::ostream &stream);
       
       /// \brief Set the scale
-      public: void SetScale( const common::Vector3 &scale );
+      public: void SetScale( const math::Vector3 &scale );
   
       /// \brief Get the scale
-      public: common::Vector3 GetScale();
+      public: math::Vector3 GetScale();
   
       /// \brief Set the material
       public: void SetMaterial(const std::string &materialName);
@@ -155,25 +155,25 @@ namespace gazebo
       public: bool GetVisible() const;
   
       /// \brief Set the position of the visual
-      public: void SetPosition( const common::Vector3 &pos);
+      public: void SetPosition( const math::Vector3 &pos);
   
       /// \brief Set the rotation of the visual
-      public: void SetRotation( const common::Quatern &rot);
+      public: void SetRotation( const math::Quatern &rot);
   
       /// \brief Set the pose of the visual
-      public: void SetPose( const common::Pose3d &pose);
+      public: void SetPose( const math::Pose3d &pose);
   
       /// \brief Get the position of the visual
-      public: common::Vector3 GetPosition() const;
+      public: math::Vector3 GetPosition() const;
   
       /// \brief Get the rotation of the visual
-      public: common::Quatern GetRotation() const;
+      public: math::Quatern GetRotation() const;
   
       /// \brief Get the pose of the visual
-      public: common::Pose3d GetPose() const;
+      public: math::Pose3d GetPose() const;
   
       /// \brief Get the global pose of the node
-      public: common::Pose3d GetWorldPose() const;
+      public: math::Pose3d GetWorldPose() const;
   
       /// \brief Return the scene Node of this visual entity
       public: Ogre::SceneNode *GetSceneNode() const;
@@ -206,7 +206,7 @@ namespace gazebo
       public: void SetRibbonTrail(bool value);
   
       /// \brief Get the size of the bounding box
-      public: common::Vector3 GetBoundingBoxSize() const;
+      public: math::Vector3 GetBoundingBoxSize() const;
   
       /// \brief Set whether to use the RT Shader system
       public: void SetUseRTShader(bool value);
@@ -224,7 +224,7 @@ namespace gazebo
       public: std::string GetMaterialName() const;
   
       /// \brief Get the bounding box for the visual
-      public: common::Box GetBounds() const;
+      public: math::Box GetBounds() const;
   
       /// \brief Insert a mesh into Ogre 
       public: static void InsertMesh( const common::Mesh *mesh);
@@ -232,7 +232,7 @@ namespace gazebo
       /// \brief Update a visual based on a message
       public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
   
-      private: void GetBoundsHelper(Ogre::SceneNode *node, common::Box &box) const;
+      private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
   
       private: std::string myMaterialName;
       private: std::string origMaterialName;
@@ -243,15 +243,15 @@ namespace gazebo
   
       private: static unsigned int visualCounter;
   
-      private: common::ParamT<common::Vector3> *xyzP;
-      private: common::ParamT<common::Quatern> *rpyP;
+      private: common::ParamT<math::Vector3> *xyzP;
+      private: common::ParamT<math::Quatern> *rpyP;
       private: common::ParamT<std::string> *meshNameP;
       private: common::ParamT<std::string> *materialNameP;
       private: common::ParamT<std::string> *normalMapNameP;
       private: common::ParamT<std::string> *shaderP;
       private: common::ParamT<bool> *castShadowsP;
-      private: common::ParamT<common::Vector3> *scaleP;
-      private: common::ParamT<common::Vector2d > *meshTileP;
+      private: common::ParamT<math::Vector3> *scaleP;
+      private: common::ParamT<math::Vector2d > *meshTileP;
   
       // NATY
       //private: boost::recursive_mutex *mutex;

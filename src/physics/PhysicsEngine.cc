@@ -43,7 +43,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr world)
   this->vis_pub = this->node->Advertise<msgs::Visual>("~/visual");
 
   common::Param::Begin(&this->parameters);
-  this->gravityP = new common::ParamT<common::Vector3>("gravity",common::Vector3(0.0, -9.80665, 0.0), 0);
+  this->gravityP = new common::ParamT<math::Vector3>("gravity",math::Vector3(0.0, -9.80665, 0.0), 0);
   this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
 
   this->updateRateP = new common::ParamT<double>("update_rate", 0.0, 0);
@@ -79,22 +79,22 @@ PhysicsEngine::PhysicsEngine(WorldPtr world)
          this->contactLinesIter++, i++)
     {
       (*this->contactLinesIter) = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
       (*this->contactLinesIter)->setMaterial(matName);
     }
     */
@@ -127,7 +127,7 @@ PhysicsEngine::~PhysicsEngine()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
-common::Vector3 PhysicsEngine::GetGravity() const
+math::Vector3 PhysicsEngine::GetGravity() const
 {
   return (**this->gravityP);
 }
@@ -162,15 +162,15 @@ void PhysicsEngine::SetStepTime(common::Time time)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a contact visual
-void PhysicsEngine::AddContactVisual(const common::Vector3 &/*pos_*/, 
-                                     const common::Vector3 &/*norm_*/)
+void PhysicsEngine::AddContactVisual(const math::Vector3 &/*pos_*/, 
+                                     const math::Vector3 &/*norm_*/)
 {
   // NATY: put back in
  /* if (!RenderState::GetShowContacts())
     return;
 
-  common::Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
-  common::Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
+  math::Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
+  math::Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
 
   (*this->contactLinesIter)->SetPoint( 0, pos);
   (*this->contactLinesIter)->SetPoint( 1, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));

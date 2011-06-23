@@ -66,13 +66,13 @@ void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get a point snapped to a grid
-common::Vector3 EntityMaker::GetSnappedPoint(common::Vector3 p)
+math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 p)
 {
-  common::Vector3 result = p;
+  math::Vector3 result = p;
 
   if (this->snapToGrid)
   {
-    common::Vector3 rounded = (p / this->snapGridSize).GetRounded() * this->snapGridSize;
+    math::Vector3 rounded = (p / this->snapGridSize).GetRounded() * this->snapGridSize;
     if (p.Distance( rounded ) < this->snapDistance)
       result = rounded;
   }

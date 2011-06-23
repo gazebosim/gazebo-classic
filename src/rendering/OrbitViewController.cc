@@ -16,7 +16,7 @@
 */
 #include "common/Global.hh"
 #include "common/MouseEvent.hh"
-#include "common/Vector2i.hh"
+#include "math/Vector2i.hh"
 
 #include "rendering/Visual.hh"
 #include "rendering/UserCamera.hh"
@@ -34,7 +34,7 @@ static const float PITCH_LIMIT_HIGH = M_PI - 0.001;
 OrbitViewController::OrbitViewController(UserCamera *camera)
   : ViewController(camera), distance(5.0f)
 {
-  common::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
+  math::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
 
   this->yaw = rpy.z;
   this->pitch = rpy.y;
@@ -44,7 +44,7 @@ OrbitViewController::OrbitViewController(UserCamera *camera)
   this->refVisual = new Visual("OrbitViewController", this->camera->GetSceneNode());
   this->refVisual->Init();
   this->refVisual->AttachMesh("unit_sphere");
-  this->refVisual->SetScale(common::Vector3(0.2,0.2,0.1));
+  this->refVisual->SetScale(math::Vector3(0.2,0.2,0.1));
   this->refVisual->SetCastShadows(false);
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
@@ -62,7 +62,7 @@ OrbitViewController::~OrbitViewController()
 // Update
 void OrbitViewController::Update()
 {
-  common::Vector3 pos;
+  math::Vector3 pos;
   pos.x = this->distance * cos( this->yaw ) * sin( this->pitch );
   pos.z = this->distance * cos( this->pitch );
   pos.y = this->distance * sin( this->yaw ) * sin( this->pitch );
@@ -71,8 +71,8 @@ void OrbitViewController::Update()
 
   this->camera->SetWorldPosition(pos);
 
-  common::Quatern rot;
-  rot.SetFromEuler( common::Vector3(0, M_PI*0.5 - this->pitch, this->yaw - M_PI) );
+  math::Quatern rot;
+  rot.SetFromEuler( math::Vector3(0, M_PI*0.5 - this->pitch, this->yaw - M_PI) );
   this->camera->SetWorldRotation(rot);
 }
 
@@ -83,9 +83,9 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &event)
   if (!this->camera->GetUserMovable())
     return;
 
-  common::Vector2i drag = event.pos - event.prevPos;
+  math::Vector2i drag = event.pos - event.prevPos;
 
-  common::Vector3 directionVec(0,0,0);
+  math::Vector3 directionVec(0,0,0);
 
   if (event.left == common::MouseEvent::DOWN)
   {
@@ -104,12 +104,12 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &event)
   else if (event.right == common::MouseEvent::DOWN)
   {
     this->refVisual->SetVisible(true);
-    this->Translate(common::Vector3(0, drag.x * event.moveScale, drag.y * event.moveScale));
+    this->Translate(math::Vector3(0, drag.x * event.moveScale, drag.y * event.moveScale));
   }
   else if (event.middle == common::MouseEvent::DOWN)
   {
     this->refVisual->SetVisible(true);
-    this->Translate(common::Vector3(drag.y * event.moveScale,0,0));
+    this->Translate(math::Vector3(drag.y * event.moveScale,0,0));
   }
   else
     this->refVisual->SetVisible(false);
@@ -117,7 +117,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &event)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Translate the focal point
-void OrbitViewController::Translate(common::Vector3 vec)
+void OrbitViewController::Translate(math::Vector3 vec)
 {
   this->focalPoint += this->camera->GetWorldPose().rot * vec;
   this->refVisual->SetPosition(this->focalPoint);

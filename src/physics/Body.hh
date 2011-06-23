@@ -106,53 +106,53 @@ namespace gazebo
       public: void SetLaserRetro(float retro);
   
       /// \brief Set the linear velocity of the body
-      public: virtual void SetLinearVel(const common::Vector3 &vel) = 0;
+      public: virtual void SetLinearVel(const math::Vector3 &vel) = 0;
   
       /// \brief Set the angular velocity of the body
-      public: virtual void SetAngularVel(const common::Vector3 &vel) = 0;
+      public: virtual void SetAngularVel(const math::Vector3 &vel) = 0;
   
       /// \brief Set the linear acceleration of the body
-      public: void SetLinearAccel(const common::Vector3 &accel);
+      public: void SetLinearAccel(const math::Vector3 &accel);
   
       /// \brief Set the angular acceleration of the body
-      public: void SetAngularAccel(const common::Vector3 &accel);
+      public: void SetAngularAccel(const math::Vector3 &accel);
   
       /// \brief Set the force applied to the body
-      public: virtual void SetForce(const common::Vector3 &force) = 0;
+      public: virtual void SetForce(const math::Vector3 &force) = 0;
   
       /// \brief Set the torque applied to the body
-      public: virtual void SetTorque(const common::Vector3 &force) = 0;
+      public: virtual void SetTorque(const math::Vector3 &force) = 0;
   
   
       /// \brief Get the linear velocity of the body
-      public: common::Vector3 GetRelativeLinearVel() const;
+      public: math::Vector3 GetRelativeLinearVel() const;
   
       /// \brief Get the angular velocity of the body
-      public: common::Vector3 GetRelativeAngularVel() const;
+      public: math::Vector3 GetRelativeAngularVel() const;
   
       /// \brief Get the linear acceleration of the body
-      public: common::Vector3 GetRelativeLinearAccel() const;
+      public: math::Vector3 GetRelativeLinearAccel() const;
   
       /// \brief Get the linear acceleration of the body in the world frame
-      public: common::Vector3 GetWorldLinearAccel() const;
+      public: math::Vector3 GetWorldLinearAccel() const;
   
       /// \brief Get the angular acceleration of the body
-      public: common::Vector3 GetRelativeAngularAccel() const;
+      public: math::Vector3 GetRelativeAngularAccel() const;
   
       /// \brief Get the angular acceleration of the body in the world frame
-      public: common::Vector3 GetWorldAngularAccel() const;
+      public: math::Vector3 GetWorldAngularAccel() const;
   
       /// \brief Get the force applied to the body
-      public: common::Vector3 GetRelativeForce() const;
+      public: math::Vector3 GetRelativeForce() const;
   
       /// \brief Get the force applied to the body in the world frame
-      public: virtual common::Vector3 GetWorldForce() const = 0;
+      public: virtual math::Vector3 GetWorldForce() const = 0;
   
       /// \brief Get the torque applied to the body
-      public: common::Vector3 GetRelativeTorque() const;
+      public: math::Vector3 GetRelativeTorque() const;
   
       /// \brief Get the torque applied to the body in the world frame
-      public: virtual common::Vector3 GetWorldTorque() const = 0;
+      public: virtual math::Vector3 GetWorldTorque() const = 0;
   
   
       /// \brief Get the model that this body belongs to
@@ -172,7 +172,7 @@ namespace gazebo
       private: void LoadVisual(common::XMLConfigNode *node);
   
       /// \brief  Get the size of the body
-      public: virtual common::Box GetBoundingBox() const;
+      public: virtual math::Box GetBoundingBox() const;
   
       /// \brief Set the linear damping factor
       public: virtual void SetLinearDamping(double damping) = 0;
@@ -207,17 +207,17 @@ namespace gazebo
   
       /// Used by Model if this body is the canonical body
       ///   model pose = body pose + initModelOffset
-      public: common::Pose3d initModelOffset;
+      public: math::Pose3d initModelOffset;
   
       // Helper entity for separating body pose from center-of-mass pose
       protected: EntityPtr comEntity;
   
       /// The pose of the body relative to the model. Can also think of this
       /// as the body's pose offset.
-      protected: common::Pose3d relativePose;
+      protected: math::Pose3d relativePose;
   
-      protected: common::ParamT<common::Vector3> *xyzP;
-      protected: common::ParamT<common::Quatern> *rpyP;
+      protected: common::ParamT<math::Vector3> *xyzP;
+      protected: common::ParamT<math::Quatern> *rpyP;
   
       protected: common::ParamT<double> *dampingFactorP;
   
@@ -226,8 +226,8 @@ namespace gazebo
   
       protected: std::vector< std::string > cgVisuals;
   
-      protected: common::Vector3 linearAccel;
-      protected: common::Vector3 angularAccel;
+      protected: math::Vector3 linearAccel;
+      protected: math::Vector3 angularAccel;
   
       ///  User specified Mass Matrix
       protected: common::ParamT<bool> *autoDisableP;
@@ -253,7 +253,7 @@ namespace gazebo
       /// This flag is used to trigger the enabledSignal
       private: bool enabled;
   
-      protected: common::Pose3d newPose;
+      protected: math::Pose3d newPose;
   
       private: std::vector<event::ConnectionPtr> connections;
     };

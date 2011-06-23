@@ -62,11 +62,11 @@ void BulletUniversalJoint::Attach( Body *one, Body *two )
   btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
   btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
 
-  btcommon::Vector3 anchor, axis1, axis2;
+  btmath::Vector3 anchor, axis1, axis2;
 
-  anchor = btcommon::Vector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  axis1 = btcommon::Vector3((**this->axis1P).x,(**this->axis1P).y,(**this->axis1P).z);
-  axis2 = btcommon::Vector3((**this->axis2P).x,(**this->axis2P).y,(**this->axis2P).z);
+  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
+  axis1 = btmath::Vector3((**this->axis1P).x,(**this->axis1P).y,(**this->axis1P).z);
+  axis2 = btmath::Vector3((**this->axis2P).x,(**this->axis2P).y,(**this->axis2P).z);
 
   this->constraint = new btUniversalConstraint( *rigidBody1, *rigidBody2,
       anchor, axis1, axis2);
@@ -80,24 +80,24 @@ void BulletUniversalJoint::Attach( Body *one, Body *two )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the anchor point
-common::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
+math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void BulletUniversalJoint::SetAnchor( int index, const common::Vector3 &anchor )
+void BulletUniversalJoint::SetAnchor( int index, const math::Vector3 &anchor )
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the first axis of rotation
-common::Vector3 BulletUniversalJoint::GetAxis(int index) const
+math::Vector3 BulletUniversalJoint::GetAxis(int index) const
 {
-  btcommon::Vector3 axis = ((btUniversalConstraint*)this->constraint)->getAxis(index);
-  return common::Vector3(axis.getX(), axis.getY(), axis.getZ());
+  btmath::Vector3 axis = ((btUniversalConstraint*)this->constraint)->getAxis(index);
+  return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -109,19 +109,19 @@ void BulletUniversalJoint::SetDamping( int /*index*/, const double damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
-void BulletUniversalJoint::SetAxis( int index, const common::Vector3 &axis )
+void BulletUniversalJoint::SetAxis( int index, const math::Vector3 &axis )
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of an axis 
-common::Angle BulletUniversalJoint::GetAngle(int index) const
+math::Angle BulletUniversalJoint::GetAngle(int index) const
 {
   if (index == 0)
-    return ((btUniversalConstraint*)this->constraint)->getAngle1();
+    return ((btUniversalConstraint*)this->constraint)->getmath::Angle1();
   else
-    return ((btUniversalConstraint*)this->constraint)->getAngle2();
+    return ((btUniversalConstraint*)this->constraint)->getmath::Angle2();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ double BulletUniversalJoint::GetMaxForce(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the high stop of an axis(index).
-void BulletUniversalJoint::SetHighStop(int index, common::Angle angle)
+void BulletUniversalJoint::SetHighStop(int index, math::Angle angle)
 {
   if (this->constraint)
     if (index == 0)
@@ -179,7 +179,7 @@ void BulletUniversalJoint::SetHighStop(int index, common::Angle angle)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the low stop of an axis(index).
-void BulletUniversalJoint::SetLowStop(int index, common::Angle angle)
+void BulletUniversalJoint::SetLowStop(int index, math::Angle angle)
 {
   if (this->constraint)
     if (index == 0)
@@ -194,9 +194,9 @@ void BulletUniversalJoint::SetLowStop(int index, common::Angle angle)
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the high stop of an axis(index).
-common::Angle BulletUniversalJoint::GetHighStop(int index)
+math::Angle BulletUniversalJoint::GetHighStop(int index)
 {
-  common::Angle result;
+  math::Angle result;
 
   if (this->constraint)
   {
@@ -213,9 +213,9 @@ common::Angle BulletUniversalJoint::GetHighStop(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the low stop of an axis(index).
-common::Angle BulletUniversalJoint::GetLowStop(int index)
+math::Angle BulletUniversalJoint::GetLowStop(int index)
 {
-  common::Angle result;
+  math::Angle result;
 
   if (this->constraint)
   {

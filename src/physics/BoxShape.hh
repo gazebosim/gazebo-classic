@@ -48,9 +48,9 @@ namespace gazebo
       public: virtual void Save(std::string &prefix, std::ostream &stream);
   
       /// \brief Set the size of the box
-      public: virtual void SetSize( const common::Vector3 &size );
+      public: virtual void SetSize( const math::Vector3 &size );
   
-      private: common::ParamT<common::Vector3> *sizeP;
+      private: common::ParamT<math::Vector3> *sizeP;
     };
   }
 }

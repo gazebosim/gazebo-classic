@@ -110,7 +110,7 @@ void ODEBody::Init()
 // Move callback. Use this to move the visuals
 void ODEBody::MoveCallback(dBodyID id)
 {
-  common::Pose3d pose;
+  math::Pose3d pose;
   const dReal *p;
   const dReal *r;
   ODEBody *self = (ODEBody*)(dBodyGetData(id));
@@ -184,8 +184,8 @@ void ODEBody::OnPoseChange()
 
   //this->SetEnabled(true);
 
-  //common::Pose3d pose = this->comEntity->GetWorldPose();
-  common::Pose3d pose = this->GetWorldPose();
+  //math::Pose3d pose = this->comEntity->GetWorldPose();
+  math::Pose3d pose = this->GetWorldPose();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
@@ -209,7 +209,7 @@ dBodyID ODEBody::GetODEId() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this body is enabled
-void ODEBody::SetEnabled(bool enable) const
+void ODEBody::SetEnabled(bool /*_enable*/) const
 {
   if (!this->bodyId)
     return;
@@ -264,10 +264,10 @@ void ODEBody::UpdateCoM()
     dMassSetZero(&odeMass);
 
     // The CoG must always be (0,0,0)
-    common::Vector3 cog;
+    math::Vector3 cog;
 
-    common::Vector3 principals = this->customMass.GetPrincipalMoments();
-    common::Vector3 products = this->customMass.GetProductsofInertia();
+    math::Vector3 principals = this->customMass.GetPrincipalMoments();
+    math::Vector3 products = this->customMass.GetProductsofInertia();
 
     dMassSetParameters(&odeMass, this->customMass.GetAsDouble(),
                        cog.x, cog.y, cog.z,
@@ -297,7 +297,7 @@ void ODEBody::UpdateCoM()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void ODEBody::SetLinearVel(const common::Vector3 &vel)
+void ODEBody::SetLinearVel(const math::Vector3 &vel)
 {
   if (this->bodyId)
   {
@@ -307,9 +307,9 @@ void ODEBody::SetLinearVel(const common::Vector3 &vel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body in the world frame
-common::Vector3 ODEBody::GetWorldLinearVel() const
+math::Vector3 ODEBody::GetWorldLinearVel() const
 {
-  common::Vector3 vel;
+  math::Vector3 vel;
 
   if (this->bodyId)
   {
@@ -323,7 +323,7 @@ common::Vector3 ODEBody::GetWorldLinearVel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void ODEBody::SetAngularVel(const common::Vector3 &vel)
+void ODEBody::SetAngularVel(const math::Vector3 &vel)
 {
   if (this->bodyId)
   {
@@ -335,9 +335,9 @@ void ODEBody::SetAngularVel(const common::Vector3 &vel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the body in the world frame
-common::Vector3 ODEBody::GetWorldAngularVel() const
+math::Vector3 ODEBody::GetWorldAngularVel() const
 {
-  common::Vector3 vel;
+  math::Vector3 vel;
 
   if (this->bodyId)
   {
@@ -353,7 +353,7 @@ common::Vector3 ODEBody::GetWorldAngularVel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the force applied to the body
-void ODEBody::SetForce(const common::Vector3 &force)
+void ODEBody::SetForce(const math::Vector3 &force)
 {
   if (this->bodyId)
   {
@@ -364,9 +364,9 @@ void ODEBody::SetForce(const common::Vector3 &force)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the force applied to the body in the world frame
-common::Vector3 ODEBody::GetWorldForce() const
+math::Vector3 ODEBody::GetWorldForce() const
 {
-  common::Vector3 force;
+  math::Vector3 force;
 
   if (this->bodyId)
   {
@@ -384,7 +384,7 @@ common::Vector3 ODEBody::GetWorldForce() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the torque applied to the body
-void ODEBody::SetTorque(const common::Vector3 &torque)
+void ODEBody::SetTorque(const math::Vector3 &torque)
 {
   if (this->bodyId)
   {
@@ -395,9 +395,9 @@ void ODEBody::SetTorque(const common::Vector3 &torque)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque applied to the body in the world frame
-common::Vector3 ODEBody::GetWorldTorque() const
+math::Vector3 ODEBody::GetWorldTorque() const
 {
-  common::Vector3 torque;
+  math::Vector3 torque;
 
   if (this->bodyId)
   {

@@ -58,7 +58,7 @@ void ODEHeightmapShape::FillHeightMap()
     for (x=0; x<this->odeVertSize; x++)
     {
       // Find the height at a vertex
-      //NATY: h = this->ogreHeightmap->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
+      //NATY: h = this->ogreHeightmap->GetHeightAt(math::Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
 
       // Store the height for future use
       this->heights[y*this->odeVertSize + x] = h;
@@ -118,10 +118,10 @@ void ODEHeightmapShape::Init()
   oParent->SetStatic(true);
 
   //Rotate so Z is up, not Y (which is the default orientation)
-  common::Quatern quat;
-  common::Pose3d pose = oParent->GetWorldPose();
+  math::Quatern quat;
+  math::Pose3d pose = oParent->GetWorldPose();
 
-  quat.SetFromEuler(common::Vector3(DTOR(90),0,0));
+  quat.SetFromEuler(math::Vector3(DTOR(90),0,0));
 
   pose.rot = pose.rot * quat;
   //this->body->SetPose(pose);

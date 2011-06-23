@@ -17,7 +17,7 @@
 #ifndef SPHEREMAKER_HH
 #define SPHEREMAKER_HH
 
-#include "common/Vector2i.hh"
+#include "math/Vector2i.hh"
 #include "gui/EntityMaker.hh"
 
 namespace gazebo
@@ -48,7 +48,7 @@ namespace gazebo
  
      private: int state;
      private: bool leftMousePressed;
-     private: common::Vector2i mousePushPos;
+     private: math::Vector2i mousePushPos;
      private: msgs::Visual *visualMsg;
  
      private: static unsigned int counter;

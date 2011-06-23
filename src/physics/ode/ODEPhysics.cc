@@ -26,7 +26,7 @@
 #include "common/Global.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "common/XMLConfig.hh"
 #include "common/Time.hh"
 
@@ -213,7 +213,7 @@ void ODEPhysics::Load(common::XMLConfigNode *node)
   // Reset the contact pointer
   //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
-  common::Vector3 g = **this->gravityP;
+  math::Vector3 g = **this->gravityP;
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
 
   dWorldSetCFM(this->worldId, **this->globalCFMP);
@@ -579,7 +579,7 @@ void ODEPhysics::SetStepType(const std::string type)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the gavity vector
-void ODEPhysics::SetGravity(const gazebo::common::Vector3 &gravity)
+void ODEPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
 {
   this->gravityP->SetValue(gravity);
   dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
@@ -720,8 +720,8 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
       dJointID c;
 
       // NATY: Put this functionality back in, but needs to be faster.
-      /*common::Vector3 contactPos;
-      common::Vector3 contactNorm;
+      /*math::Vector3 contactPos;
+      math::Vector3 contactNorm;
       */
 
       {

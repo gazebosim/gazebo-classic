@@ -54,7 +54,7 @@ namespace gazebo
       private: dHeightfieldDataID odeData;
   
       private: unsigned int odeVertSize;
-      private: common::Vector3 odeScale;
+      private: math::Vector3 odeScale;
   
       private: std::vector<double> heights;
     };

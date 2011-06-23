@@ -17,7 +17,7 @@
 #ifndef ODEBOXSHAPE_HH
 #define ODEBOXSHAPE_HH
 
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODETypes.hh"
@@ -34,14 +34,14 @@ namespace gazebo
     {
       public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) {}
       public: virtual ~ODEBoxShape() {}
-      public: virtual void SetSize( const common::Vector3 &size )
+      public: virtual void SetSize( const math::Vector3 &size )
       {
         BoxShape::SetSize(size);
 
         ODEGeomPtr oParent;
         oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
 
-        common::Pose3d rpose;
+        math::Pose3d rpose;
   
         dMass odeMass;
   

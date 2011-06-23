@@ -22,7 +22,7 @@
 #include <sstream>
 
 #include "common/Console.hh"
-#include "common/Box.hh"
+#include "math/Box.hh"
 
 #include "physics/Mass.hh"
 #include "physics/SurfaceParams.hh"
@@ -60,7 +60,7 @@ void ODEGeom::Load(common::XMLConfigNode *node)
 
   /*if (this->geomId && this->placeable)
   {
-    common::Pose3d localPose;
+    math::Pose3d localPose;
     dQuaternion q;
 
     // Transform into CoM relative Pose
@@ -90,7 +90,7 @@ void ODEGeom::Load(common::XMLConfigNode *node)
 // Pose change callback
 void ODEGeom::OnPoseChange()
 {
-  common::Pose3d localPose;
+  math::Pose3d localPose;
   dQuaternion q;
 
   if (this->IsStatic() && this->geomId && this->placeable)
@@ -217,8 +217,8 @@ void ODEGeom::SetCollideBits(unsigned int bits)
 Mass ODEGeom::GetBodyMassMatrix()
 {
   Mass result;
-  common::Pose3d pose;
-  common::Vector3 cog, principals, products;
+  math::Pose3d pose;
+  math::Vector3 cog, principals, products;
   dMass bodyMass;
   dQuaternion q;
   dMatrix3 r;
@@ -258,9 +258,9 @@ Mass ODEGeom::GetBodyMassMatrix()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-common::Box ODEGeom::GetBoundingBox() const
+math::Box ODEGeom::GetBoundingBox() const
 {
-  common::Box box;
+  math::Box box;
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));

@@ -24,8 +24,8 @@
 #define ODEHINGE2JOINT_HH
 
 #include "common/Param.hh"
-#include "common/Angle.hh"
-#include "common/Vector3.hh"
+#include "math/Angle.hh"
+#include "math/Vector3.hh"
 
 #include "physics/Hinge2Joint.hh"
 #include "physics/ode/ODEJoint.hh"
@@ -109,22 +109,22 @@ namespace gazebo
     protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream);
    
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
+    public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
   
     /// \brief Set the first axis of rotation
-    public: virtual void SetAxis( int index, const common::Vector3 &axis );
+    public: virtual void SetAxis( int index, const math::Vector3 &axis );
   
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
   
     /// \brief Get anchor point
-    public: virtual common::Vector3 GetAnchor(int index) const;
+    public: virtual math::Vector3 GetAnchor(int index) const;
   
     /// \brief Get first axis of rotation
-    public: virtual common::Vector3 GetAxis(int index) const;
+    public: virtual math::Vector3 GetAxis(int index) const;
   
     /// \brief Get angle of rotation about first axis
-    public: virtual common::Angle GetAngle(int index) const;
+    public: virtual math::Angle GetAngle(int index) const;
   
     /// \brief Get rate of rotation about first axis
     public: virtual double GetVelocity(int index) const;

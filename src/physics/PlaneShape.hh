@@ -56,12 +56,12 @@ namespace gazebo
       public: virtual void CreatePlane();
   
       /// \brief Set the altitude of the plane
-      public: virtual void SetAltitude(const common::Vector3 &pos);
+      public: virtual void SetAltitude(const math::Vector3 &pos);
   
       /// \brief Set the normal
-      public: void SetNormal( const common::Vector3 &norm );
+      public: void SetNormal( const math::Vector3 &norm );
   
-      protected: common::ParamT<common::Vector3> *normalP;
+      protected: common::ParamT<math::Vector3> *normalP;
     };
   }
 }

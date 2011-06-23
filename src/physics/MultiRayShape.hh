@@ -21,8 +21,8 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/Vector3.hh"
-#include "common/Angle.hh"
+#include "math/Vector3.hh"
+#include "math/Angle.hh"
 
 #include "physics/Geom.hh"
 #include "physics/Shape.hh"
@@ -57,9 +57,9 @@ namespace gazebo
       public: virtual void Save(std::string &prefix, std::ostream &stream);
   
       /*public: void Load(unsigned int vertRayCount, unsigned int rayCount,
-                        common::Vector3 origin, double minRange, double maxRange,
-                        common::Angle minVertAngle, common::Angle maxVertAngle,
-                        common::Angle minAngle, common::Angle maxcommon::Angle );
+                        math::Vector3 origin, double minRange, double maxRange,
+                        math::Angle minVertmath::Angle, math::Angle maxVertmath::Angle,
+                        math::Angle minmath::Angle, math::Angle maxmath::Angle );
                         */
               
   
@@ -76,10 +76,10 @@ namespace gazebo
       public: int GetFiducial(int index);
   
       /// \brief Get the minimum angle
-      public: common::Angle GetMinAngle() const;
+      public: math::Angle GetMinAngle() const;
               
       /// \brief Get the maximum angle
-      public: common::Angle GetMaxAngle() const;
+      public: math::Angle GetMaxAngle() const;
   
       /// \brief Get the minimum range
       public: double GetMinRange() const;
@@ -103,10 +103,10 @@ namespace gazebo
       public: int GetVerticalRangeCount() const;
   
       /// \brief Get the vertical min angle
-      public: common::Angle GetVerticalMinAngle() const;
+      public: math::Angle GetVerticalMinAngle() const;
   
       /// \brief Get the vertical max angle
-      public: common::Angle GetVerticalMaxAngle() const;
+      public: math::Angle GetVerticalMaxAngle() const;
   
       /// \brief Update the geom
       public: void Update();
@@ -115,7 +115,7 @@ namespace gazebo
       protected: virtual void UpdateRays() = 0;
     
       /// \brief Add a ray to the geom
-      protected: virtual void AddRay(const common::Vector3 &start, const common::Vector3 &end );
+      protected: virtual void AddRay(const math::Vector3 &start, const math::Vector3 &end );
     
       protected: msgs::Visual *rayFanMsg;
       protected: msgs::Visual *rayFanOutlineMsg;
@@ -125,9 +125,9 @@ namespace gazebo
   
       protected: double maxRange;
   
-      protected: common::ParamT<common::Angle> *minAngleP, *maxAngleP;
+      protected: common::ParamT<math::Angle> *minAngleP, *maxAngleP;
       protected: common::ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
-      protected: common::ParamT<common::Vector3> *originP;
+      protected: common::ParamT<math::Vector3> *originP;
       protected: common::ParamT<int> *rayCountP;
       protected: common::ParamT<int> *rangeCountP;
   
@@ -137,8 +137,8 @@ namespace gazebo
       // For ray blocks such as Velodyne
       protected: common::ParamT<int> *verticalRayCountP;
       protected: common::ParamT<int> *verticalRangeCountP;
-      protected: common::ParamT<common::Angle> *verticalMinAngleP;
-      protected: common::ParamT<common::Angle> *verticalMaxAngleP;
+      protected: common::ParamT<math::Angle> *verticalMinAngleP;
+      protected: common::ParamT<math::Angle> *verticalMaxAngleP;
     };
   
   }

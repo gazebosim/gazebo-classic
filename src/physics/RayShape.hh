@@ -50,19 +50,19 @@ namespace gazebo
       ///        the body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
-      public: virtual void SetPoints(const common::Vector3 &posStart, 
-                                     const common::Vector3 &posEnd);
+      public: virtual void SetPoints(const math::Vector3 &posStart, 
+                                     const math::Vector3 &posEnd);
               
     
       /// \brief Get the relative starting and ending points
       /// \param posA Returns the starting point
       /// \param posB Returns the ending point
-      public: virtual void GetRelativePoints(common::Vector3 &posA, common::Vector3 &posB);
+      public: virtual void GetRelativePoints(math::Vector3 &posA, math::Vector3 &posB);
   
       /// \brief Get the global starting and ending points
       /// \param posA Returns the starting point
       /// \param posB Returns the ending point
-      public: virtual void GetGlobalPoints(common::Vector3 &posA, common::Vector3 &posB);
+      public: virtual void GetGlobalPoints(math::Vector3 &posA, math::Vector3 &posB);
   
       /// \brief Set the length of the ray
       /// \param len Length of the array
@@ -102,12 +102,12 @@ namespace gazebo
       protected: int contactFiducial;
     
       /// Start and end positions of the ray, relative to the body
-      protected: common::Vector3 relativeStartPos;
-      protected: common::Vector3 relativeEndPos;
+      protected: math::Vector3 relativeStartPos;
+      protected: math::Vector3 relativeEndPos;
     
       /// Start and end positions of the ray in global cs
-      protected: common::Vector3 globalStartPos;
-      protected: common::Vector3 globalEndPos;
+      protected: math::Vector3 globalStartPos;
+      protected: math::Vector3 globalEndPos;
       protected: transport::PublisherPtr vis_pub;
     };
   }

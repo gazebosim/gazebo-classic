@@ -62,7 +62,7 @@ BulletRaySensor::~BulletRaySensor()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the sensor
-void BulletRaySensor::AddRay(common::Vector3 start, common::Vector3 end, double minRange, 
+void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end, double minRange, 
                           double maxRange, bool display)
 {
   BulletRayGeom *rayGeom;
@@ -85,7 +85,7 @@ int BulletRaySensor::GetCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the relative starting and ending points of a ray
-void BulletRaySensor::GetRelativePoints(int index, common::Vector3 &a, common::Vector3 &b)
+void BulletRaySensor::GetRelativePoints(int index, math::Vector3 &a, math::Vector3 &b)
 {
   if (index <0 || index >= (int)(this->rays.size()))
   {

@@ -48,8 +48,8 @@ namespace gazebo
       ///        body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
-      public: virtual void SetPoints(const common::Vector3 &posStart, 
-                                     const common::Vector3 &posEnd);
+      public: virtual void SetPoints(const math::Vector3 &posStart, 
+                                     const math::Vector3 &posEnd);
     };
   }
 }

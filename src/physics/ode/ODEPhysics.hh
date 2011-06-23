@@ -108,7 +108,7 @@ namespace gazebo
     public: virtual void SetStepType(const std::string type);
   
     /// \brief Set the gavity vector
-    public: virtual void SetGravity(const gazebo::common::Vector3 &gravity);
+    public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
   
     /// \brief access functions to set ODE parameters
     public: void SetWorldCFM(double cfm);

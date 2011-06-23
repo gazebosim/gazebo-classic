@@ -65,10 +65,10 @@ Light::Light(Scene *scene_)
   this->specularP = new common::ParamT<common::Color>("specular_color", common::Color(.1, .1, .1), 0);
   this->specularP->Callback(&Light::SetSpecularColor, this);
 
-  this->directionP  = new common::ParamT<common::Vector3>("direction", common::Vector3(0, 0, -1), 0);
+  this->directionP  = new common::ParamT<math::Vector3>("direction", math::Vector3(0, 0, -1), 0);
   this->directionP->Callback(&Light::SetDirection, this);
 
-  this->attenuationP  = new common::ParamT<common::Vector3>("attenuation", common::Vector3(.1, 0.01, .001), 1);
+  this->attenuationP  = new common::ParamT<math::Vector3>("attenuation", math::Vector3(.1, 0.01, .001), 1);
   this->attenuationP->Callback(&Light::SetAttenuation, this);
 
   this->spotInnerAngleP = new common::ParamT<double>("spot_inner_angle", 10, 0);
@@ -117,7 +117,7 @@ Light::~Light()
 /// Load the light
 void Light::Load(common::XMLConfigNode *node)
 {
-  common::Vector3 vec;
+  math::Vector3 vec;
 
   if (node)
   {
@@ -248,62 +248,62 @@ void Light::CreateVisual()
   if ( **this->lightTypeP == "directional")
   {
     float s=.5;
-    this->line->AddPoint( common::Vector3(-s, -s, 0) );
-    this->line->AddPoint( common::Vector3(-s, s, 0) );
+    this->line->AddPoint( math::Vector3(-s, -s, 0) );
+    this->line->AddPoint( math::Vector3(-s, s, 0) );
 
-    this->line->AddPoint( common::Vector3(-s, s, 0) );
-    this->line->AddPoint( common::Vector3(s, s, 0) );
+    this->line->AddPoint( math::Vector3(-s, s, 0) );
+    this->line->AddPoint( math::Vector3(s, s, 0) );
 
-    this->line->AddPoint( common::Vector3(s, s, 0) );
-    this->line->AddPoint( common::Vector3(s, -s, 0) );
+    this->line->AddPoint( math::Vector3(s, s, 0) );
+    this->line->AddPoint( math::Vector3(s, -s, 0) );
 
-    this->line->AddPoint( common::Vector3(s, -s, 0) );
-    this->line->AddPoint( common::Vector3(-s, -s, 0) );
+    this->line->AddPoint( math::Vector3(s, -s, 0) );
+    this->line->AddPoint( math::Vector3(-s, -s, 0) );
 
-    this->line->AddPoint( common::Vector3(0, 0, 0) );
-    this->line->AddPoint( common::Vector3(0, 0, -s) );
+    this->line->AddPoint( math::Vector3(0, 0, 0) );
+    this->line->AddPoint( math::Vector3(0, 0, -s) );
   }
   if ( **this->lightTypeP == "point" )
   {
     float s=0.1;
-    this->line->AddPoint(common::Vector3(-s,-s,0));
-    this->line->AddPoint(common::Vector3(-s,s,0));
+    this->line->AddPoint(math::Vector3(-s,-s,0));
+    this->line->AddPoint(math::Vector3(-s,s,0));
 
-    this->line->AddPoint(common::Vector3(-s,s,0));
-    this->line->AddPoint(common::Vector3(s,s,0));
+    this->line->AddPoint(math::Vector3(-s,s,0));
+    this->line->AddPoint(math::Vector3(s,s,0));
 
-    this->line->AddPoint(common::Vector3(s,s,0));
-    this->line->AddPoint(common::Vector3(s,-s,0));
+    this->line->AddPoint(math::Vector3(s,s,0));
+    this->line->AddPoint(math::Vector3(s,-s,0));
 
-    this->line->AddPoint(common::Vector3(s,-s,0));
-    this->line->AddPoint(common::Vector3(-s,-s,0));
-
-
-    this->line->AddPoint(common::Vector3(-s,-s,0));
-    this->line->AddPoint(common::Vector3(0,0,s));
-
-    this->line->AddPoint(common::Vector3(-s,s,0));
-    this->line->AddPoint(common::Vector3(0,0,s));
-
-    this->line->AddPoint(common::Vector3(s,s,0));
-    this->line->AddPoint(common::Vector3(0,0,s));
-
-    this->line->AddPoint(common::Vector3(s,-s,0));
-    this->line->AddPoint(common::Vector3(0,0,s));
+    this->line->AddPoint(math::Vector3(s,-s,0));
+    this->line->AddPoint(math::Vector3(-s,-s,0));
 
 
+    this->line->AddPoint(math::Vector3(-s,-s,0));
+    this->line->AddPoint(math::Vector3(0,0,s));
 
-    this->line->AddPoint(common::Vector3(-s,-s,0));
-    this->line->AddPoint(common::Vector3(0,0,-s));
+    this->line->AddPoint(math::Vector3(-s,s,0));
+    this->line->AddPoint(math::Vector3(0,0,s));
 
-    this->line->AddPoint(common::Vector3(-s,s,0));
-    this->line->AddPoint(common::Vector3(0,0,-s));
+    this->line->AddPoint(math::Vector3(s,s,0));
+    this->line->AddPoint(math::Vector3(0,0,s));
 
-    this->line->AddPoint(common::Vector3(s,s,0));
-    this->line->AddPoint(common::Vector3(0,0,-s));
+    this->line->AddPoint(math::Vector3(s,-s,0));
+    this->line->AddPoint(math::Vector3(0,0,s));
 
-    this->line->AddPoint(common::Vector3(s,-s,0));
-    this->line->AddPoint(common::Vector3(0,0,-s));
+
+
+    this->line->AddPoint(math::Vector3(-s,-s,0));
+    this->line->AddPoint(math::Vector3(0,0,-s));
+
+    this->line->AddPoint(math::Vector3(-s,s,0));
+    this->line->AddPoint(math::Vector3(0,0,-s));
+
+    this->line->AddPoint(math::Vector3(s,s,0));
+    this->line->AddPoint(math::Vector3(0,0,-s));
+
+    this->line->AddPoint(math::Vector3(s,-s,0));
+    this->line->AddPoint(math::Vector3(0,0,-s));
   }
   else if ( this->light->getType() == Ogre::Light::LT_SPOTLIGHT )
   {
@@ -316,34 +316,34 @@ void Light::CreateVisual()
     angles[1] = range * tan(innerAngle);
 
     unsigned int i = 0;
-    this->line->AddPoint(common::Vector3(0,0,0));
-    this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
+    this->line->AddPoint(math::Vector3(0,0,0));
+    this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
  
     for (i=0; i < 2; i++)
     {
-      this->line->AddPoint(common::Vector3(0,0,0));
-      this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(0,0,0));
+      this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(0,0,0));
-      this->line->AddPoint(common::Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(0,0,0));
+      this->line->AddPoint(math::Vector3(-angles[i],-angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(0,0,0));
-      this->line->AddPoint(common::Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(0,0,0));
+      this->line->AddPoint(math::Vector3(angles[i],-angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(0,0,0));
-      this->line->AddPoint(common::Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(0,0,0));
+      this->line->AddPoint(math::Vector3(-angles[i],angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
-      this->line->AddPoint(common::Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i],angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(-angles[i],angles[i], -range));
-      this->line->AddPoint(common::Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i],-angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(-angles[i],-angles[i], -range));
-      this->line->AddPoint(common::Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i],-angles[i], -range));
 
-      this->line->AddPoint(common::Vector3(angles[i],-angles[i], -range));
-      this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
     }
   }
 
@@ -356,7 +356,7 @@ void Light::CreateVisual()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the light
-void Light::SetPosition(const common::Vector3 &p)
+void Light::SetPosition(const math::Vector3 &p)
 {
   this->visual->SetPosition(p);
 }
@@ -433,10 +433,10 @@ void Light::SetSpecularColor(const common::Color &color)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the direction
-void Light::SetDirection(const common::Vector3 &dir)
+void Light::SetDirection(const math::Vector3 &dir)
 {
   // Set the direction which the light points
-  common::Vector3 vec = dir;
+  math::Vector3 vec = dir;
   vec.Normalize();
 
   if (**this->directionP != vec)
@@ -447,9 +447,9 @@ void Light::SetDirection(const common::Vector3 &dir)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the attenuation
-void Light::SetAttenuation(const common::Vector3 &att)
+void Light::SetAttenuation(const math::Vector3 &att)
 {
-  common::Vector3 vec = att;
+  math::Vector3 vec = att;
 
   // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
   if (vec.x < 0)

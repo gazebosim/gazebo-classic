@@ -60,7 +60,7 @@ namespace gazebo
       ///  name of the mesh
       protected: common::ParamT<std::string> *meshNameP;
   
-      protected: common::ParamT<common::Vector3> *scaleP;
+      protected: common::ParamT<math::Vector3> *scaleP;
       protected: common::ParamT<std::string> *centerMeshP;
       protected: common::ParamT<bool> *genTexCoordP;
  

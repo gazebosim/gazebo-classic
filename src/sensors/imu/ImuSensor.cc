@@ -34,7 +34,7 @@
 #include "Controller.hh"
 #include "ImuSensor.hh"
 
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 using namespace gazebo;
 

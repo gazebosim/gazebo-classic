@@ -24,7 +24,7 @@
 
 #include "common/Messages.hh"
 #include "common/Events.hh"
-#include "common/Quatern.hh"
+#include "math/Quatern.hh"
 #include "common/XMLConfig.hh"
 #include "common/Console.hh"
 #include "common/Global.hh"
@@ -52,10 +52,10 @@ Body::Body(EntityPtr parent)
   this->autoDisableP = new common::ParamT<bool>("auto_disable", true, 0);
   this->autoDisableP->Callback( &Body::SetAutoDisable, this );
 
-  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(), 0);
+  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this );
 
-  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(), 0);
+  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this );
   this->dampingFactorP = new common::ParamT<double>("damping_factor", 0.0, 0);
 
@@ -233,7 +233,7 @@ void Body::Init()
   // this is only used in setting Model pose from canonicalBody
   // the true model pose given a canonical body is
   //   this body's pose - this body's offsetFromModelFrame
-  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(common::Pose3d());
+  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(math::Pose3d());
 
   this->SetKinematic(**this->kinematicP);
 
@@ -268,7 +268,7 @@ void Body::Init()
     msg.set_cast_shadows( false );
     msg.set_attach_axes( true );
     msg.set_visible( false );
-    common::Message::Set(msg.mutable_scale(), common::Vector3(0.1, 0.1, 0.1));
+    common::Message::Set(msg.mutable_scale(), math::Vector3(0.1, 0.1, 0.1));
     this->vis_pub->Publish(msg);
     this->cgVisuals.push_back( msg.header().str_id() );
 
@@ -308,7 +308,7 @@ void Body::Init()
   this->enabled = true;
 
   // DO THIS LAST!
-  this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
+  this->SetRelativePose(math::Pose3d(**this->xyzP, **this->rpyP));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -455,8 +455,8 @@ void Body::Update()
 /// Update the center of mass
 void Body::UpdateCoM()
 {
-  common::Pose3d bodyPose;
-  common::Pose3d origPose, newPose;
+  math::Pose3d bodyPose;
+  math::Pose3d origPose, newPose;
   Base_V::iterator iter;
 
   bodyPose = this->GetRelativePose();
@@ -472,7 +472,7 @@ void Body::UpdateCoM()
     EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
     if (e)
     {
-      common::Vector3 offset;
+      math::Vector3 offset;
       origPose = e->GetRelativePose();
       newPose = origPose;
 
@@ -481,7 +481,7 @@ void Body::UpdateCoM()
     }
   }
 
-  //this->comEntity->SetRelativePose(common::Pose3d(this->mass.GetCoG(),common::Quatern()),true);
+  //this->comEntity->SetRelativePose(math::Pose3d(this->mass.GetCoG(),common::Quatern()),true);
   this->OnPoseChange();
 }
 
@@ -512,7 +512,7 @@ void Body::LoadGeom(common::XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear acceleration of the body
-void Body::SetLinearAccel(const common::Vector3 &accel)
+void Body::SetLinearAccel(const math::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->linearAccel = accel;// * this->GetMass();
@@ -522,7 +522,7 @@ void Body::SetLinearAccel(const common::Vector3 &accel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular acceleration of the body
-void Body::SetAngularAccel(const common::Vector3 &accel)
+void Body::SetAngularAccel(const math::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->angularAccel = accel * this->mass.GetAsDouble();
@@ -530,56 +530,56 @@ void Body::SetAngularAccel(const common::Vector3 &accel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the body
-common::Vector3 Body::GetRelativeLinearVel() const
+math::Vector3 Body::GetRelativeLinearVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldLinearVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the body
-common::Vector3 Body::GetRelativeAngularVel() const
+math::Vector3 Body::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldAngularVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the body
-common::Vector3 Body::GetRelativeLinearAccel() const
+math::Vector3 Body::GetRelativeLinearAccel() const
 {
   return this->GetRelativeForce() / this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-common::Vector3 Body::GetWorldLinearAccel() const
+math::Vector3 Body::GetWorldLinearAccel() const
 {
   return this->GetWorldForce() / this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-common::Vector3 Body::GetRelativeAngularAccel() const
+math::Vector3 Body::GetRelativeAngularAccel() const
 {
   return this->GetRelativeTorque() /  this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-common::Vector3 Body::GetWorldAngularAccel() const
+math::Vector3 Body::GetWorldAngularAccel() const
 {
   return this->GetWorldTorque() /  this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force applied to the body
-common::Vector3 Body::GetRelativeForce() const
+math::Vector3 Body::GetRelativeForce() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque applied to the body
-common::Vector3 Body::GetRelativeTorque() const
+math::Vector3 Body::GetRelativeTorque() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldTorque());
 }
@@ -593,9 +593,9 @@ ModelPtr Body::GetModel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the body
-common::Box Body::GetBoundingBox() const
+math::Box Body::GetBoundingBox() const
 {
-  common::Box box;
+  math::Box box;
   Base_V::const_iterator iter;
 
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);

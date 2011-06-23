@@ -125,13 +125,13 @@ void Logger::LogObj::Update()
 {
   if (this->entity)
   {
-    Pose3d pose3d = entity->GetWorldPose();
+    math::Pose3d pose3d = entity->GetWorldPose();
     Time simTime = Simulator::Instance()->GetSimTime();
     Time realTime = Simulator::Instance()->GetRealTime();
 
     double roll, pitch, yaw;
-    Vector3 linearVel = this->entity->GetWorldLinearVel();
-    Vector3 angularVel = this->entity->GetWorldAngularVel();
+    math::Vector3 linearVel = this->entity->GetWorldLinearVel();
+    math::Vector3 angularVel = this->entity->GetWorldAngularVel();
 
     roll = pose3d.rot.GetRoll();
     pitch = pose3d.rot.GetPitch();

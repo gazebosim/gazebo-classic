@@ -132,7 +132,7 @@ bool Entity::IsStatic() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the initial pose
-void Entity::SetInitialPose(const common::Pose3d &p )
+void Entity::SetInitialPose(const math::Pose3d &p )
 {
   this->initialPose = p;
 }
@@ -140,14 +140,14 @@ void Entity::SetInitialPose(const common::Pose3d &p )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the bounding box for the entity 
-common::Box Entity::GetBoundingBox() const
+math::Box Entity::GetBoundingBox() const
 {
-  return common::Box(common::Vector3(0,0,0), common::Vector3(1,1,1));
+  return math::Box(math::Vector3(0,0,0), math::Vector3(1,1,1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the absolute pose of the entity
-common::Pose3d Entity::GetWorldPose() const
+math::Pose3d Entity::GetWorldPose() const
 {
   if (this->parent && this->parentEntity)
     return this->GetRelativePose() + this->parentEntity->GetWorldPose();
@@ -157,14 +157,14 @@ common::Pose3d Entity::GetWorldPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the entity relative to its parent
-common::Pose3d Entity::GetRelativePose() const
+math::Pose3d Entity::GetRelativePose() const
 {
   return this->relativePose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the pose of the entity relative to its parent
-void Entity::SetRelativePose(const common::Pose3d &pose, bool notify)
+void Entity::SetRelativePose(const math::Pose3d &pose, bool notify)
 {
   this->relativePose = pose;
   this->relativePose.Correct();
@@ -173,17 +173,17 @@ void Entity::SetRelativePose(const common::Pose3d &pose, bool notify)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the pose relative to the model this entity belongs to
-common::Pose3d Entity::GetModelRelativePose() const
+math::Pose3d Entity::GetModelRelativePose() const
 {
   if (this->HasType(MODEL) || !this->parent)
-    return common::Pose3d();
+    return math::Pose3d();
 
   return this->GetRelativePose() + this->parentEntity->GetModelRelativePose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
-void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
+void Entity::SetWorldPose(const math::Pose3d &pose, bool notify)
 {
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -200,12 +200,12 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
       // so to get abs pose of the model, we need
       // start with abs pose of cb, inverse rotate by relative pose of cb
       //  then, inverse translate by relative pose of cb
-      common::Pose3d model_abs_pose;
-      common::Pose3d cb_rel_pose = this->GetRelativePose();
+      math::Pose3d model_abs_pose;
+      math::Pose3d cb_rel_pose = this->GetRelativePose();
       // anti-rotate cb-abs by cb-rel = model-abs
       model_abs_pose.rot = pose.rot * this->GetRelativePose().rot.GetInverse();
       // rotate cb-rel pos by cb-rel rot to get pos offset
-      //common::Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
+      //math::Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
       // finally, model-abs pos is cb-abs pos - pos_offset
       //model_abs_pose.pos = cb->GetWorldPose().pos - pos_offset;
       model_abs_pose.pos = pose.pos - model_abs_pose.rot * this->GetRelativePose().pos;
@@ -221,7 +221,7 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose
-      common::Pose3d relative_pose = pose - this->parentEntity->GetWorldPose();
+      math::Pose3d relative_pose = pose - this->parentEntity->GetWorldPose();
       // relative pose is the pose relative to the parent
       // if this is called from MoveCallback, notify is false
       // FIXME: if this is called by user, and notify is true
@@ -253,16 +253,16 @@ void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the position of the entity relative to its parent
-void Entity::SetRelativePosition(const common::Vector3 &pos)
+void Entity::SetRelativePosition(const math::Vector3 &pos)
 {
-  this->SetRelativePose( common::Pose3d( pos, this->GetRelativePose().rot), true );
+  this->SetRelativePose( math::Pose3d( pos, this->GetRelativePose().rot), true );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the rotation of the entity relative to its parent
-void Entity::SetRelativeRotation(const common::Quatern &rot)
+void Entity::SetRelativeRotation(const math::Quatern &rot)
 {
-  this->SetRelativePose( common::Pose3d( this->GetRelativePose().pos, rot), true );
+  this->SetRelativePose( math::Pose3d( this->GetRelativePose().pos, rot), true );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,8 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+#include "sdf/interface/sdf.h"
+
 #include "rendering/ogre.h"
 
 #include "transport/TransportTypes.hh"
@@ -28,7 +30,7 @@
 #include "common/Messages.hh"
 #include "common/Param.hh"
 #include "common/Color.hh"
-#include "common/Vector2i.hh"
+#include "math/Vector2i.hh"
 
 #include "rendering/RenderTypes.hh"
 
@@ -43,7 +45,6 @@ namespace gazebo
 {
   namespace common
   {
-    class XMLConfigNode;
     class Message;
   }
 
@@ -70,14 +71,11 @@ namespace gazebo
       public: virtual ~Scene();
   
       /// \brief Load the scene
-      public: void Load(common::XMLConfigNode *node);
+      public: void SetParams(const boost::shared_ptr<sdf::Scene> &scene);
   
       /// \brief Init
       public: void Init();
 
-      /// \brief Save the scene
-      public: void Save(std::string &prefix, std::ostream &stream);
- 
       /// \brief Process all received messages 
       public: void PreRender();
 
@@ -98,12 +96,6 @@ namespace gazebo
 
       /// \brief Get the background color
       public: common::Color GetBackgroundColor() const;
-  
-      /// \brief Set the scene type
-      public: void SetType(SceneType type);
-  
-      /// \brief Get the scene type
-      public: SceneType GetType() const;
   
       /// \brief Create a grid
       public: void CreateGrid(uint32_t cell_count, float cell_length, 
@@ -137,13 +129,13 @@ namespace gazebo
       /// \param mousePos The position of the mouse in screen coordinates
       /// \return The selected entity, or NULL
       /*public: Visual *GetVisualAt(Camera *camera, 
-                                  common::Vector2i mousePos, 
+                                  math::Vector2i mousePos, 
                                   std::string &mod);
                                   */
   
       /// \brief Get the world pos of a the first contact at a pixel location
-      /*public: common::Vector3 GetFirstContact(CameraPtr camera, 
-                                              common::Vector2i mousePos);
+      /*public: math::Vector3 GetFirstContact(CameraPtr camera, 
+                                              math::Vector2i mousePos);
                                               */
   
       public: void PrintSceneGraph();
@@ -152,13 +144,13 @@ namespace gazebo
       public: void SetVisible(const std::string &name, bool visible);
   
       /// \brief Draw a named line
-      public: void DrawLine(const common::Vector3 &start, 
-                            const common::Vector3 &end, 
+      public: void DrawLine(const math::Vector3 &start, 
+                            const math::Vector3 &end, 
                             const std::string &name);
   
-      public: void SetFog( const std::string &type_, 
-                           const common::Color &color_, 
-                           double density_, double start_, double end_ );
+      public: void SetFog( const std::string &_type, 
+                           const common::Color &_color, 
+                           double _density, double _start, double _end );
   
       // Get the scene ID
       public: unsigned int GetId() const;
@@ -194,24 +186,10 @@ namespace gazebo
       private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
                
       private: void ReceivePoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
-  
+
       private: std::string name;
-      private: common::ParamT<common::Color> *ambientP;
-      private: common::ParamT<common::Color> *backgroundColorP;
-      private: common::ParamT<common::Color> *fogColorP;
-      private: common::ParamT<std::string> *fogTypeP;
-      private: common::ParamT<double> *fogDensityP;
-      private: common::ParamT<double> *fogStartP;
-      private: common::ParamT<double> *fogEndP;
-      private: common::ParamT<std::string> *skyMaterialP;
-      private: common::ParamT<bool> *shadowEnabledP;
-      private: common::ParamT<common::Color> *shadowColorP;
-      private: common::ParamT<std::string> *shadowTypeP;
-  
-      private: std::vector<common::Param*> parameters;
-  
-      //bsp attributes saved to write XML file back
-      private: SceneType type;
+
+      private: boost::shared_ptr<sdf::Scene> sdf;
   
       private: std::vector<CameraPtr> cameras;
       private: std::vector<UserCameraPtr> userCameras;

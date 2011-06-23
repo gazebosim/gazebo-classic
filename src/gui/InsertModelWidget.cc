@@ -116,13 +116,13 @@ void InsertModelWidget::OnModelSelection()
         std::string linkName = linkNode->GetString("name","",1);
         common::XMLConfigNode *originNode = linkNode->GetChild("origin");
 
-        common::Vector3 pos;
-        common::Quatern rot;
+        math::Vector3 pos;
+        math::Quatern rot;
 
         if (originNode)
         {
-          pos = originNode->GetVector3("xyz", common::Vector3());
-          rot = originNode->GetRotation("rpy",common::Quatern());
+          pos = originNode->GetVector3("xyz", math::Vector3());
+          rot = originNode->GetRotation("rpy",math::Quatern());
         }
 
         common::Message::Init(visMsg, modelName+"::"+linkName);

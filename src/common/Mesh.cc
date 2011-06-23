@@ -59,9 +59,9 @@ std::string Mesh::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the maximun X,Y,Z values
-Vector3 Mesh::GetMax() const
+math::Vector3 Mesh::GetMax() const
 {
-  Vector3 max;
+  math::Vector3 max;
   std::vector<SubMesh*>::const_iterator iter;
 
   max.x = -FLT_MAX;
@@ -73,7 +73,7 @@ Vector3 Mesh::GetMax() const
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
-    Vector3 smax = (*iter)->GetMax();
+    math::Vector3 smax = (*iter)->GetMax();
     max.x = std::max(max.x, smax.x);
     max.y = std::max(max.y, smax.y);
     max.z = std::max(max.z, smax.z);
@@ -84,9 +84,9 @@ Vector3 Mesh::GetMax() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the minimum X,Y,Z values
-Vector3 Mesh::GetMin() const
+math::Vector3 Mesh::GetMin() const
 {
-  Vector3 min;
+  math::Vector3 min;
   std::vector<SubMesh *>::const_iterator iter;
 
   min.x = FLT_MAX;
@@ -98,7 +98,7 @@ Vector3 Mesh::GetMin() const
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
-    Vector3 smin = (*iter)->GetMin();
+    math::Vector3 smin = (*iter)->GetMin();
     min.x = std::min(min.x, smin.x);
     min.y = std::min(min.y, smin.y);
     min.z = std::min(min.z, smin.z);
@@ -321,7 +321,7 @@ void SubMesh::AddIndex( unsigned int i)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a vertex to the mesh
-void SubMesh::AddVertex( Vector3 v )
+void SubMesh::AddVertex( math::Vector3 v )
 {
   this->vertices.push_back( v );
 }
@@ -330,12 +330,12 @@ void SubMesh::AddVertex( Vector3 v )
 /// Add a vertex to the mesh
 void SubMesh::AddVertex(double x, double y, double z )
 {
-  this->AddVertex( Vector3(x,y,z) );
+  this->AddVertex( math::Vector3(x,y,z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a normal to the mesh
-void SubMesh::AddNormal( Vector3 n )
+void SubMesh::AddNormal( math::Vector3 n )
 {
   this->normals.push_back( n );
 }
@@ -344,19 +344,19 @@ void SubMesh::AddNormal( Vector3 n )
 /// Add a normal to the mesh
 void SubMesh::AddNormal(double x, double y, double z )
 {
-  this->AddNormal( Vector3(x,y,z) );
+  this->AddNormal( math::Vector3(x,y,z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a texture coord to the mesh
 void SubMesh::AddTexCoord(double u, double v )
 {
-  this->texCoords.push_back( Vector2d(u,v) );
+  this->texCoords.push_back( math::Vector2d(u,v) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a vertex
-Vector3 SubMesh::GetVertex(unsigned int i) const
+math::Vector3 SubMesh::GetVertex(unsigned int i) const
 {
   if (i >= this->vertices.size())
     gzthrow("Index too large");
@@ -366,7 +366,7 @@ Vector3 SubMesh::GetVertex(unsigned int i) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a vertex
-void SubMesh::SetVertex(unsigned int i, const Vector3 &v)
+void SubMesh::SetVertex(unsigned int i, const math::Vector3 &v)
 {
   if (i >= this->vertices.size())
     gzthrow("Index too large");
@@ -376,7 +376,7 @@ void SubMesh::SetVertex(unsigned int i, const Vector3 &v)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a normal
-Vector3 SubMesh::GetNormal(unsigned int i) const
+math::Vector3 SubMesh::GetNormal(unsigned int i) const
 {
   if (i >= this->normals.size())
     gzthrow("Index too large");
@@ -386,7 +386,7 @@ Vector3 SubMesh::GetNormal(unsigned int i) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a normal
-void SubMesh::SetNormal(unsigned int i, const Vector3 &n)
+void SubMesh::SetNormal(unsigned int i, const math::Vector3 &n)
 {
   if (i >= this->normals.size())
     gzthrow("Index too large");
@@ -396,7 +396,7 @@ void SubMesh::SetNormal(unsigned int i, const Vector3 &n)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a tex coord
-Vector2d SubMesh::GetTexCoord(unsigned int i) const
+math::Vector2d SubMesh::GetTexCoord(unsigned int i) const
 {
   if (i >= this->texCoords.size())
     gzthrow("Index too large");
@@ -406,7 +406,7 @@ Vector2d SubMesh::GetTexCoord(unsigned int i) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a tex coord
-void SubMesh::SetTexCoord(unsigned int i, const Vector2d &t)
+void SubMesh::SetTexCoord(unsigned int i, const math::Vector2d &t)
 {
   if (i >= this->texCoords.size())
     gzthrow("Index too large");
@@ -426,10 +426,10 @@ unsigned int SubMesh::GetIndex(unsigned int i) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the maximun X,Y,Z values
-Vector3 SubMesh::GetMax() const
+math::Vector3 SubMesh::GetMax() const
 {
-  Vector3 max;
-  std::vector<Vector3>::const_iterator iter;
+  math::Vector3 max;
+  std::vector<math::Vector3>::const_iterator iter;
 
   max.x = -FLT_MAX;
   max.y = -FLT_MAX;
@@ -447,10 +447,10 @@ Vector3 SubMesh::GetMax() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the minimum X,Y,Z values
-Vector3 SubMesh::GetMin() const
+math::Vector3 SubMesh::GetMin() const
 {
-  Vector3 min;
-  std::vector<Vector3>::const_iterator iter;
+  math::Vector3 min;
+  std::vector<math::Vector3>::const_iterator iter;
 
   min.x = FLT_MAX;
   min.y = FLT_MAX;
@@ -523,9 +523,9 @@ unsigned int SubMesh::GetMaterialIndex() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if this submesh has the vertex
-bool SubMesh::HasVertex( const Vector3 &v ) const
+bool SubMesh::HasVertex( const math::Vector3 &v ) const
 {
-  std::vector< Vector3 >::const_iterator iter;
+  std::vector< math::Vector3 >::const_iterator iter;
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
     if (v == (*iter))
@@ -536,9 +536,9 @@ bool SubMesh::HasVertex( const Vector3 &v ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the index of the vertex
-unsigned int SubMesh::GetVertexIndex(const Vector3 &v) const
+unsigned int SubMesh::GetVertexIndex(const math::Vector3 &v) const
 {
-  std::vector< Vector3 >::const_iterator iter;
+  std::vector< math::Vector3 >::const_iterator iter;
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
     if (v == (*iter))
@@ -554,7 +554,7 @@ void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
   if (this->vertices.size() ==0 || this->indices.size() == 0)
     gzerr << "No vertices or indices\n";
 
-  std::vector< Vector3 >::const_iterator  viter;
+  std::vector< math::Vector3 >::const_iterator  viter;
   std::vector< unsigned int >::const_iterator  iiter;
   unsigned int i;
 
@@ -593,10 +593,10 @@ void SubMesh::RecalculateNormals()
   // For each face, which is defined by three indices, calculate the normals
   for (i=0; i < this->indices.size(); i+=3)
   {
-    Vector3 v1 = this->vertices[this->indices[i]];
-    Vector3 v2 = this->vertices[this->indices[i+1]];
-    Vector3 v3 = this->vertices[this->indices[i+2]];
-    Vector3 n = Vector3::GetNormal(v1, v2, v3);
+    math::Vector3 v1 = this->vertices[this->indices[i]];
+    math::Vector3 v2 = this->vertices[this->indices[i+1]];
+    math::Vector3 v3 = this->vertices[this->indices[i+2]];
+    math::Vector3 n = math::Vector3::GetNormal(v1, v2, v3);
     this->normals[this->indices[i]] += n;
     this->normals[this->indices[i+1]] += n;
     this->normals[this->indices[i+2]] += n;
@@ -611,7 +611,7 @@ void SubMesh::RecalculateNormals()
 
 ////////////////////////////////////////////////////////////////////////////////
 // find aabb and aabb center of mesh
-void Mesh::GetAABB(Vector3 &center,Vector3 &min_xyz,Vector3 &max_xyz)
+void Mesh::GetAABB(math::Vector3 &center,math::Vector3 &min_xyz,math::Vector3 &max_xyz)
 {
   // find aabb center
   min_xyz.x =  1e15;
@@ -627,8 +627,8 @@ void Mesh::GetAABB(Vector3 &center,Vector3 &min_xyz,Vector3 &max_xyz)
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
   {
-    Vector3 max = (*siter)->GetMax();
-    Vector3 min = (*siter)->GetMin();
+    math::Vector3 max = (*siter)->GetMax();
+    math::Vector3 min = (*siter)->GetMin();
     min_xyz.x = std::min(min_xyz.x,min.x);
     max_xyz.x = std::max(max_xyz.x,max.x);
     min_xyz.y = std::min(min_xyz.y,min.y);
@@ -643,7 +643,7 @@ void Mesh::GetAABB(Vector3 &center,Vector3 &min_xyz,Vector3 &max_xyz)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set mesh center
-void Mesh::SetMeshCenter(Vector3 center)
+void Mesh::SetMeshCenter(math::Vector3 center)
 {
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
@@ -652,7 +652,7 @@ void Mesh::SetMeshCenter(Vector3 center)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Assign uv coordinates using spherical projection
-void Mesh::GenSphericalTexCoord(Vector3 center)
+void Mesh::GenSphericalTexCoord(math::Vector3 center)
 {
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
@@ -661,9 +661,9 @@ void Mesh::GenSphericalTexCoord(Vector3 center)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set submesh center
-void SubMesh::SetSubMeshCenter(Vector3 center)
+void SubMesh::SetSubMeshCenter(math::Vector3 center)
 {
-  std::vector<Vector3>::iterator viter;
+  std::vector<math::Vector3>::iterator viter;
   for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
   {
     // generate projected texture coordinates, projected from center of aabb
@@ -676,9 +676,9 @@ void SubMesh::SetSubMeshCenter(Vector3 center)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Assign uv coordinates using spherical projection
-void SubMesh::GenSphericalTexCoord(Vector3 center)
+void SubMesh::GenSphericalTexCoord(math::Vector3 center)
 {
-  std::vector<Vector3>::const_iterator viter;
+  std::vector<math::Vector3>::const_iterator viter;
   for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
   {
     // generate projected texture coordinates, projected from center

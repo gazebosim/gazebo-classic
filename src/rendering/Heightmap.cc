@@ -48,7 +48,7 @@ Heightmap::~Heightmap()
 
 //////////////////////////////////////////////////////////////////////////////
 /// get height at a point
-float Heightmap::GetHeightAt(const common::Vector2d &pos)
+float Heightmap::GetHeightAt(const math::Vector2d &pos)
 {
   Ogre::Vector3 pos3(pos.x, this->terrainSize.z,pos.y);
 
@@ -81,7 +81,7 @@ bool Heightmap::queryResult(Ogre::SceneQuery::WorldFragment * /*frag_*/,
 void Heightmap::Load( std::string imageFilename, 
                       std::string worldTexture, 
                       std::string detailTexture,
-                      common::Vector3 _terrainSize)
+                      math::Vector3 _terrainSize)
 {
   std::ostringstream stream;
   unsigned int terrainVertSize;

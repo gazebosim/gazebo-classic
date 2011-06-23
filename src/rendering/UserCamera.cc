@@ -100,47 +100,47 @@ void UserCamera::Init()
   float f = 0.2;
 
   // Create the front face
-  line->AddPoint(common::Vector3(0, -f, -f)); 
-  line->AddPoint(common::Vector3(0, -f, +f)); 
+  line->AddPoint(math::Vector3(0, -f, -f)); 
+  line->AddPoint(math::Vector3(0, -f, +f)); 
 
-  line->AddPoint(common::Vector3(0, -f, +f)); 
-  line->AddPoint(common::Vector3(0, +f, +f)); 
+  line->AddPoint(math::Vector3(0, -f, +f)); 
+  line->AddPoint(math::Vector3(0, +f, +f)); 
 
-  line->AddPoint(common::Vector3(0, +f, +f)); 
-  line->AddPoint(common::Vector3(0, +f, -f)); 
+  line->AddPoint(math::Vector3(0, +f, +f)); 
+  line->AddPoint(math::Vector3(0, +f, -f)); 
 
-  line->AddPoint(common::Vector3(0, +f, -f)); 
-  line->AddPoint(common::Vector3(0, -f, -f)); 
+  line->AddPoint(math::Vector3(0, +f, -f)); 
+  line->AddPoint(math::Vector3(0, -f, -f)); 
 
 
   // Create the connecting lines
-  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(common::Vector3(+0.0, -f, -f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(math::Vector3(+0.0, -f, -f)); 
 
-  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(common::Vector3(+0.0, -f, +f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(math::Vector3(+0.0, -f, +f)); 
 
-  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(common::Vector3(+0.0, +f, +f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(math::Vector3(+0.0, +f, +f)); 
 
-  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(common::Vector3(+0.0, +f, -f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(math::Vector3(+0.0, +f, -f)); 
 
-  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(common::Vector3(+0.0, -f, -f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(math::Vector3(+0.0, -f, -f)); 
 
   // Draw up arrow
-  line->AddPoint(common::Vector3(0, 0, +f)); 
-  line->AddPoint(common::Vector3(0, 0, +f+0.1)); 
+  line->AddPoint(math::Vector3(0, 0, +f)); 
+  line->AddPoint(math::Vector3(0, 0, +f+0.1)); 
 
-  line->AddPoint(common::Vector3(0.0, -0.02, +f+0.1)); 
-  line->AddPoint(common::Vector3(0.0, +0.02, +f+0.1)); 
+  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1)); 
+  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1)); 
 
-  line->AddPoint(common::Vector3(0.0, +0.02, +f+0.1)); 
-  line->AddPoint(common::Vector3(0.0, +0.00, +f+0.15)); 
+  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1)); 
+  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15)); 
 
-  line->AddPoint(common::Vector3(0.0, +0.00, +f+0.15)); 
-  line->AddPoint(common::Vector3(0.0, -0.02, +f+0.1)); 
+  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15)); 
+  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1)); 
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_LASER_CAMERA);
@@ -302,11 +302,11 @@ void UserCamera::MoveToVisual( Visual *visual_)
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
   Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
 
-  common::Vector3 start = this->GetWorldPose().pos;
+  math::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  common::Vector3 end = visual_->GetWorldPose().pos;
+  math::Vector3 end = visual_->GetWorldPose().pos;
   end.Correct();
-  common::Vector3 dir = end - start;
+  math::Vector3 dir = end - start;
   dir.Correct();
 
   double yawAngle = atan2(dir.y,dir.x);
@@ -323,7 +323,7 @@ void UserCamera::MoveToVisual( Visual *visual_)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  common::Vector3 size = visual_->GetBoundingBoxSize();
+  math::Vector3 size = visual_->GetBoundingBoxSize();
 
   double scale = std::max(std::max(size.x, size.y), size.z);
   scale += 0.5;
@@ -331,7 +331,7 @@ void UserCamera::MoveToVisual( Visual *visual_)
   dir.Normalize();
   double dist = start.Distance(end);
 
-  common::Vector3 mid = start + dir*(dist*.5 - scale);
+  math::Vector3 mid = start + dir*(dist*.5 - scale);
   key = strack->createNodeKeyFrame(.2);
   key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
   key->setRotation(yawFinal);

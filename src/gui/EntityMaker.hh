@@ -19,7 +19,7 @@
 
 #include "rendering/RenderTypes.hh"
 #include "transport/TransportTypes.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 namespace gazebo
 {
@@ -32,7 +32,7 @@ namespace gazebo
   {
     class EntityMaker
     {
-      public: typedef boost::function<void(const common::Vector3 &pos, const common::Vector3 &scale)> CreateCallback;
+      public: typedef boost::function<void(const math::Vector3 &pos, const math::Vector3 &scale)> CreateCallback;
 
       /// \brief Constructor
       public: EntityMaker();
@@ -54,7 +54,7 @@ namespace gazebo
       public: virtual void OnMouseDrag(const common::MouseEvent &event);
   
       // \brief Get a point snapped to a grid
-      protected: common::Vector3 GetSnappedPoint(common::Vector3 p);
+      protected: math::Vector3 GetSnappedPoint(math::Vector3 p);
   
       protected: virtual void CreateTheEntity() = 0;
   

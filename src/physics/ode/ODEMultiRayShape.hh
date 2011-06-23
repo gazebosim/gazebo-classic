@@ -39,7 +39,7 @@ namespace gazebo
       private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
   
       /// \brief Add a ray to the geom
-      protected: void AddRay(const common::Vector3 &start, const common::Vector3 &end );
+      protected: void AddRay(const math::Vector3 &start, const math::Vector3 &end );
   
       /// Ray space for collision detector
       private: dSpaceID superSpaceId;

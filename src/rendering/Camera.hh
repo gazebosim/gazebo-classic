@@ -24,10 +24,11 @@
 
 #include "common/Event.hh"
 #include "common/Param.hh"
-#include "common/Angle.hh"
-#include "common/Pose3d.hh"
 #include "common/Time.hh"
-#include "common/Vector2i.hh"
+
+#include "math/Angle.hh"
+#include "math/Pose3d.hh"
+#include "math/Vector2i.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -103,23 +104,23 @@ namespace gazebo
   
   
       /// \brief Get the global pose of the camera
-      public: common::Pose3d GetWorldPose();
+      public: math::Pose3d GetWorldPose();
   
       /// \brief Get the camera position in the world
-      public: common::Vector3 GetWorldPosition() const;
+      public: math::Vector3 GetWorldPosition() const;
   
       /// \brief Set the global pose of the camera
-      public: void SetWorldPose(const common::Pose3d &pose);
+      public: void SetWorldPose(const math::Pose3d &pose);
   
       /// \brief Set the world position
-      public: void SetWorldPosition(const common::Vector3 &pos);
+      public: void SetWorldPosition(const math::Vector3 &pos);
   
       /// \brief Set the world orientation
-      public: void SetWorldRotation(const common::Quatern &quant);
+      public: void SetWorldRotation(const math::Quatern &quant);
   
     
       /// \brief Translate the camera
-      public: void Translate( const common::Vector3 &direction );
+      public: void Translate( const math::Vector3 &direction );
     
       /// \brief Rotate the camera around the yaw axis
       public: void RotateYaw( float angle );
@@ -136,10 +137,10 @@ namespace gazebo
       public: void SetFOV( float radians );
   
       /// \brief Get the camera FOV (horizontal)  
-      public: common::Angle GetHFOV() const;
+      public: math::Angle GetHFOV() const;
   
       /// \brief Get the camera FOV (vertical)  
-      public: common::Angle GetVFOV() const;
+      public: math::Angle GetVFOV() const;
     
       /// \brief Get the width of the image
       public: unsigned int GetImageWidth() const;
@@ -194,10 +195,10 @@ namespace gazebo
       public: unsigned int GetViewportHeight() const;
   
       /// \brief Get the viewport up vector
-      public: common::Vector3 GetUp();
+      public: math::Vector3 GetUp();
   
       /// \brief Get the viewport right vector
-      public: common::Vector3 GetRight();
+      public: math::Vector3 GetRight();
   
       /// \brief Get the average FPS
       public: virtual float GetAvgFPS() { return 0;}
@@ -237,7 +238,7 @@ namespace gazebo
   
       /// \brief Get a world space ray as cast from the camer through the viewport
       public: void GetCameraToViewportRay(int screenx, int screeny,
-                                          common::Vector3 &origin, common::Vector3 &dir);
+                                          math::Vector3 &origin, math::Vector3 &dir);
   
           /// \brief Set whether to capture data
       public: void SetCaptureData( bool value );
@@ -249,7 +250,7 @@ namespace gazebo
       public: Scene *GetScene() const;
   
       /// \brief Get point on a plane
-      public: common::Vector3 GetWorldPointOnPlane(int x, int y, common::Vector3 planeNorm, double d);
+      public: math::Vector3 GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm, double d);
   
       /// \brief Get the visibility mask
       public: unsigned int GetVisibilityMask() const;
@@ -268,9 +269,9 @@ namespace gazebo
       private: std::string name;
       protected: unsigned int windowId;
   
-      protected: common::ParamT<common::Angle> *hfovP;
+      protected: common::ParamT<math::Angle> *hfovP;
       protected: common::ParamT<double> *nearClipP, *farClipP, *updateRateP;
-      protected: common::ParamT< common::Vector2i > *imageSizeP;
+      protected: common::ParamT< math::Vector2i > *imageSizeP;
       protected: unsigned int textureWidth, textureHeight;
     
       protected: Ogre::Camera *camera;
@@ -279,7 +280,7 @@ namespace gazebo
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
     
-      private: common::Pose3d pose;
+      private: math::Pose3d pose;
     
       // Info for saving images
       protected: unsigned char *saveFrameBuffer;

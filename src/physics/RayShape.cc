@@ -32,8 +32,8 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-RayShape::RayShape( GeomPtr parent, bool displayRays ) 
-  : Shape(parent)
+RayShape::RayShape( GeomPtr _parent, bool /*_displayRays*/ ) 
+  : Shape(_parent)
 {
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
@@ -83,9 +83,9 @@ void RayShape::SetDisplayType( bool displayRays )
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the ray based on starting and ending points relative to the body
-void RayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd)
+void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
 {
-  common::Vector3 dir;
+  math::Vector3 dir;
 
   this->relativeStartPos = posStart;
   this->relativeEndPos = posEnd;
@@ -112,7 +112,7 @@ void RayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the relative starting and ending points
-void RayShape::GetRelativePoints(common::Vector3 &posA, common::Vector3 &posB)
+void RayShape::GetRelativePoints(math::Vector3 &posA, math::Vector3 &posB)
 {
   posA = this->relativeStartPos;
   posB = this->relativeEndPos;
@@ -120,7 +120,7 @@ void RayShape::GetRelativePoints(common::Vector3 &posA, common::Vector3 &posB)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global starting and ending points
-void RayShape::GetGlobalPoints(common::Vector3 &posA, common::Vector3 &posB)
+void RayShape::GetGlobalPoints(math::Vector3 &posA, math::Vector3 &posB)
 {
   posA = this->globalStartPos;
   posB = this->globalEndPos;
@@ -132,7 +132,7 @@ void RayShape::SetLength( double len )
 {
   this->contactLen=len;
 
-  common::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
   this->relativeEndPos = dir * len + this->relativeStartPos;

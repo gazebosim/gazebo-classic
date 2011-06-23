@@ -77,28 +77,28 @@ namespace gazebo
       public: virtual void UpdateCoM();
   
       /// \brief Set the linear velocity of the body
-      public: virtual void SetLinearVel(const common::Vector3 &vel);
+      public: virtual void SetLinearVel(const math::Vector3 &vel);
   
       /// \brief Set the angular velocity of the body
-      public: virtual void SetAngularVel(const common::Vector3 &vel);
+      public: virtual void SetAngularVel(const math::Vector3 &vel);
   
       /// \brief Set the force applied to the body
-      public: virtual void SetForce(const common::Vector3 &force);
+      public: virtual void SetForce(const math::Vector3 &force);
   
       /// \brief Set the torque applied to the body
-      public: virtual void SetTorque(const common::Vector3 &force);
+      public: virtual void SetTorque(const math::Vector3 &force);
   
       /// \brief Get the linear velocity of the body in the world frame
-      public: virtual common::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel() const;
   
       /// \brief Get the angular velocity of the body in the world frame
-      public: virtual common::Vector3 GetWorldAngularVel() const;
+      public: virtual math::Vector3 GetWorldAngularVel() const;
   
       /// \brief Get the force applied to the body in the world frame
-      public: virtual common::Vector3 GetWorldForce() const;
+      public: virtual math::Vector3 GetWorldForce() const;
   
       /// \brief Get the torque applied to the body in the world frame
-      public: virtual common::Vector3 GetWorldTorque() const;
+      public: virtual math::Vector3 GetWorldTorque() const;
   
       /// \brief Set whether gravity affects this body
       public: virtual void SetGravityMode(bool mode);
@@ -133,7 +133,7 @@ namespace gazebo
       public: virtual void SetAutoDisable(const bool &value);
   
   
-      protected: common::Pose3d pose;
+      protected: math::Pose3d pose;
   
       /// ODE body handle
       private: dBodyID bodyId;

@@ -23,7 +23,7 @@
 #ifndef OGREDYNAMICLINES_HH
 #define OGREDYNAMICLINES_HH
 
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 #include "rendering/DynamicRenderable.hh"
 
 #include <vector>
@@ -49,18 +49,18 @@ namespace gazebo
       public: virtual const Ogre::String &getMovableType() const;
     
       /// Add a point to the point list
-      /// \param pt common::Vector3 point
-      public: void AddPoint(const common::Vector3 &pt);
+      /// \param pt math::Vector3 point
+      public: void AddPoint(const math::Vector3 &pt);
     
       /// Change the location of an existing point in the point list
       /// \param index Index of the point to set
-      /// \param value common::Vector3 value to set the point to
-      public: void SetPoint(unsigned int index, const common::Vector3 &value);
+      /// \param value math::Vector3 value to set the point to
+      public: void SetPoint(unsigned int index, const math::Vector3 &value);
     
       /// Return the location of an existing point in the point list
       /// \param index Number of the point to return
-      /// \return common::Vector3 value of the point
-      public: const common::Vector3& GetPoint(unsigned int index) const;
+      /// \return math::Vector3 value of the point
+      public: const math::Vector3& GetPoint(unsigned int index) const;
     
       /// Return the total number of points in the point list
       /// \return Number of points
@@ -78,7 +78,7 @@ namespace gazebo
       /// \brief Implementation DynamicRenderable, pushes point list out to hardware memory
       protected: virtual void FillHardwareBuffers();
     
-      private: std::vector<common::Vector3> points;
+      private: std::vector<math::Vector3> points;
       private: bool dirty;
     };
     

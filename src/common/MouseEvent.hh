@@ -17,7 +17,7 @@
 #ifndef MOUSEEVENT_HH
 #define MOUSEEVENT_HH
 
-#include "common/Vector2i.hh"
+#include "math/Vector2i.hh"
 
 namespace gazebo
 {
@@ -32,10 +32,10 @@ namespace gazebo
                 moveScale(0.01),dragging(false), left(UP), right(UP), middle(UP)
               {}
 
-      public: Vector2i pos; 
-      public: Vector2i prevPos;
-      public: Vector2i pressPos; 
-      public: Vector2i scroll; 
+      public: math::Vector2i pos; 
+      public: math::Vector2i prevPos;
+      public: math::Vector2i pressPos; 
+      public: math::Vector2i scroll; 
 
       public: float moveScale;
 

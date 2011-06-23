@@ -67,10 +67,10 @@ Model::Model(BasePtr parent)
   this->canonicalBodyNameP = new common::ParamT<std::string>("canonicalBody",
                                                    std::string(),0);
 
-  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(0,0,0), 0);
+  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(0,0,0), 0);
   this->xyzP->Callback(&Entity::SetRelativePosition, (Entity*)this);
 
-  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(1,0,0,0), 0);
+  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(1,0,0,0), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
   this->enableGravityP = new common::ParamT<bool>("enable_gravity", true, 0);
@@ -170,7 +170,7 @@ void Model::Load(common::XMLConfigNode *node)
 // Initialize the model
 void Model::Init()
 {
-  common::Pose3d pose;
+  math::Pose3d pose;
 
   this->SetStatic( **(this->staticP) );
 
@@ -427,7 +427,7 @@ void Model::Reset()
   JointContainer::iterator jiter;
   Base_V::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
-  common::Vector3 v(0,0,0);
+  math::Vector3 v(0,0,0);
 
   this->SetRelativePose(this->initPose);  // this has to be relative for nested models to work
 
@@ -457,7 +457,7 @@ void Model::Reset()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear velocity of the model
-void Model::SetLinearVel( const common::Vector3 &vel )
+void Model::SetLinearVel( const math::Vector3 &vel )
 {
   Base_V::iterator iter;
 
@@ -474,7 +474,7 @@ void Model::SetLinearVel( const common::Vector3 &vel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular velocity of the model
-void Model::SetAngularVel( const common::Vector3 &vel )
+void Model::SetAngularVel( const math::Vector3 &vel )
 {
   Base_V::iterator iter;
 
@@ -491,7 +491,7 @@ void Model::SetAngularVel( const common::Vector3 &vel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear acceleration of the model
-void Model::SetLinearAccel( const common::Vector3 &accel )
+void Model::SetLinearAccel( const math::Vector3 &accel )
 {
   Base_V::iterator iter;
 
@@ -508,7 +508,7 @@ void Model::SetLinearAccel( const common::Vector3 &accel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular acceleration of the model
-void Model::SetAngularAccel( const common::Vector3 &accel )
+void Model::SetAngularAccel( const math::Vector3 &accel )
 {
   Base_V::iterator iter;
 
@@ -525,90 +525,90 @@ void Model::SetAngularAccel( const common::Vector3 &accel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the model
-common::Vector3 Model::GetRelativeLinearVel() const
+math::Vector3 Model::GetRelativeLinearVel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetRelativeLinearVel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the entity in the world frame
-common::Vector3 Model::GetWorldLinearVel() const
+math::Vector3 Model::GetWorldLinearVel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetWorldLinearVel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the model
-common::Vector3 Model::GetRelativeAngularVel() const
+math::Vector3 Model::GetRelativeAngularVel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetRelativeAngularVel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the model in the world frame
-common::Vector3 Model::GetWorldAngularVel() const
+math::Vector3 Model::GetWorldAngularVel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetWorldAngularVel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the model
-common::Vector3 Model::GetRelativeLinearAccel() const
+math::Vector3 Model::GetRelativeLinearAccel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetRelativeLinearAccel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the model in the world frame
-common::Vector3 Model::GetWorldLinearAccel() const
+math::Vector3 Model::GetWorldLinearAccel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetWorldLinearAccel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the model
-common::Vector3 Model::GetRelativeAngularAccel() const
+math::Vector3 Model::GetRelativeAngularAccel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetRelativeAngularAccel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the model in the world frame
-common::Vector3 Model::GetWorldAngularAccel() const
+math::Vector3 Model::GetWorldAngularAccel() const
 {
   if (!this->GetBody("canonical"))
     return this->GetBody("canonical")->GetWorldAngularAccel();
   else
-    return common::Vector3(0,0,0);
+    return math::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
-common::Box Model::GetBoundingBox() const
+math::Box Model::GetBoundingBox() const
 {
-  common::Box box;
+  math::Box box;
   Base_V::const_iterator iter;
 
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -618,7 +618,7 @@ common::Box Model::GetBoundingBox() const
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      common::Box bodyBox;
+      math::Box bodyBox;
       BodyPtr body = boost::shared_static_cast<Body>(*iter);
       bodyBox = body->GetBoundingBox();
       box += bodyBox;

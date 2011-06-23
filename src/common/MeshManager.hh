@@ -21,8 +21,9 @@
 #include <string>
 #include <vector>
 
-#include "common/Vector3.hh"
-#include "common/Vector2d.hh"
+#include "math/Vector3.hh"
+#include "math/Vector2d.hh"
+#include "math/Plane.hh"
 #include "common/SingletonT.hh"
 
 namespace gazebo
@@ -51,14 +52,14 @@ namespace gazebo
     public: bool IsValidFilename(const std::string &filename);
 
     /// \bridf set mesh center to be aabb center
-    public: void SetMeshCenter(const Mesh *mesh,Vector3 center);
+    public: void SetMeshCenter(const Mesh *mesh,math::Vector3 center);
 
     /// \bridf get mesh aabb and center
-    public: void GetMeshAABB(const Mesh *mesh,Vector3 &center, 
-                             Vector3 &min_xyz, Vector3 &max_xyz);
+    public: void GetMeshAABB(const Mesh *mesh,math::Vector3 &center, 
+                             math::Vector3 &min_xyz, math::Vector3 &max_xyz);
 
     /// \brief generate spherical texture coordinates
-    public: void GenSphericalTexCoord(const Mesh *mesh,Vector3 center);
+    public: void GenSphericalTexCoord(const Mesh *mesh,math::Vector3 center);
 
 
     /// \brief Add a mesh to the manager
@@ -75,8 +76,8 @@ namespace gazebo
                               int rings, int segments);
   
     /// \brief Create a Box mesh
-    public: void CreateBox(const std::string &name, const Vector3 &sides,
-                           const Vector2d &uvCoords);
+    public: void CreateBox(const std::string &name, const math::Vector3 &sides,
+                           const math::Vector2d &uvCoords);
   
     /// \brief Create a cylinder mesh
     public: void CreateCylinder(const std::string &name, float radius, 
@@ -91,14 +92,16 @@ namespace gazebo
                             float outterRadius, float height, int rings, 
                             int segments);
 
-    public: void CreatePlane(const std::string &name, const Plane &plane,
-                             const Vector2d &segments, 
-                             const Vector2d &uvTile);
+    public: void CreatePlane(const std::string &name, 
+                             const math::Plane &plane,
+                             const math::Vector2d &segments, 
+                             const math::Vector2d &uvTile);
 
-    public: void CreatePlane(const std::string &name, const Vector3 &normal, 
-                             double d, const Vector2d &size, 
-                             const Vector2d &segments,
-                             const Vector2d &uvTile);
+    public: void CreatePlane(const std::string &name, 
+                             const math::Vector3 &normal, 
+                             double d, const math::Vector2d &size, 
+                             const math::Vector2d &segments,
+                             const math::Vector2d &uvTile);
 
     private: void Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
                                   bool doubleSided);

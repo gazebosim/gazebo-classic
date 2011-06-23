@@ -217,7 +217,9 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
   }
   else
   {
-    if (!_sensor->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy") ))
+    std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
+    std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
+    if (!_sensor->origin.Set( (xyz+rpy).c_str() ))
     {
       gzerr << "Sensor has malformed orgin\n";
       return false;
@@ -469,7 +471,10 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
   }
   else
   {
-    if (!_inertial->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
+    std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
+    std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
+
+    if (!_inertial->origin.Set( (xyz+rpy).c_str() ))
     {
       gzerr << "Unable to parse origin tag\n";
       _inertial->origin.Reset();
@@ -537,12 +542,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
 
   // Origin
   xmlNodePtr o = FirstChildElement(_config, "origin");
+  std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
+  std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
+
   if (!o)
   {
     gzwarn << "Origin tag not present for collision element, using default (Identity\n";
     _collision->origin.Reset();
   }
-  else if (!_collision->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
+  else if (!_collision->origin.Set( (xyz+rpy).c_str()))
   {
     gzerr << "Unable to parse collision origin element\n";
     _collision->origin.Reset();
@@ -747,12 +755,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
 
   // Origin
   xmlNodePtr o = FirstChildElement(_config, "origin");
+  std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
+  std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
+
   if (!o)
   {
     gzwarn << "Origin tag not present for visual element, using default (Identity)\n";
     _visual->origin.Reset();
   }
-  else if (!_visual->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
+  else if (!_visual->origin.Set( (xyz+rpy).c_str() ))
   {
     gzerr << "Unable to parase visual origin element\n";
     _visual->origin.Reset();
@@ -864,8 +875,10 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
   else
   {
-    if (!_joint->origin.Set( (const char*)xmlGetProp(originXml,(xmlChar*)"xyz"),
-                             (const char*)xmlGetProp(originXml,(xmlChar*)"rpy")))
+    std::string xyz =  (const char*)xmlGetProp(originXml,(xmlChar*)"xyz");
+    std::string rpy = (const char*)xmlGetProp(originXml,(xmlChar*)"rpy");
+
+    if (!_joint->origin.Set( (xyz+rpy).c_str()))
     {
       gzerr << "Unable to parse joint origin element\n";
       _joint->origin.Reset();
@@ -944,7 +957,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     {
       gzwarn << "no axis elemement for Joint link '" 
         << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis.SetValue( Vector3(1.0, 0.0, 0.0));
+      _joint->axis.SetValue( gazebo::math::Vector3(1.0, 0.0, 0.0));
     }
     else{
       if (!_joint->axis.Set( (const char*)xmlGetProp(axisXml,(xmlChar*)"xyz")) )

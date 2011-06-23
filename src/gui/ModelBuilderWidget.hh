@@ -5,14 +5,11 @@
 
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
+#include "math/Vector3.hh"
 
 namespace gazebo
 {
   class GLWidget;
-  namespace common
-  {
-    class Vector3;
-  }
 
   namespace gui
   {
@@ -28,14 +25,14 @@ namespace gazebo
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
 
-      private: void OnBoxCreate(const common::Vector3 &pos,  
-                                const common::Vector3 &scale);
+      private: void OnBoxCreate(const math::Vector3 &pos,  
+                                const math::Vector3 &scale);
  
-      private: void OnSphereCreate(const common::Vector3 &pos,  
-                                   const common::Vector3 &scale);
+      private: void OnSphereCreate(const math::Vector3 &pos,  
+                                   const math::Vector3 &scale);
  
-      private: void OnCylinderCreate(const common::Vector3 &pos,  
-                                     const common::Vector3 &scale);
+      private: void OnCylinderCreate(const math::Vector3 &pos,  
+                                     const math::Vector3 &scale);
 
       private: GLWidget *glWidget; 
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;

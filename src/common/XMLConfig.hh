@@ -26,10 +26,10 @@
 #include <string>
 
 #include "common/Color.hh"
-#include "common/Vector3.hh"
-#include "common/Vector2d.hh"
-#include "common/Vector2i.hh"
-#include "common/Quatern.hh"
+#include "math/Vector3.hh"
+#include "math/Vector2d.hh"
+#include "math/Vector2i.hh"
+#include "math/Quatern.hh"
 #include "common/Time.hh"
 
 namespace gazebo
@@ -162,19 +162,19 @@ namespace gazebo
       public: Time GetTime( const std::string &key, double def, int require = 0 ) const;
     
       /// \brief Get a position
-      public: Vector3 GetVector3( const std::string &key, Vector3 def ) const;
+      public: math::Vector3 GetVector3( const std::string &key, math::Vector3 def ) const;
   
       /// \brief Get a color
       public: Color GetColor( const std::string &ket, Color def ) const;
     
       /// \brief Get a two dimensional double vector
-      public: Vector2d GetVector2d( const std::string &key, Vector2d def ) const;
+      public: math::Vector2d GetVector2d( const std::string &key, math::Vector2d def ) const;
   
       /// \brief Get a two dimensional int vector
-      public: Vector2i GetVector2i( const std::string &key, Vector2i def ) const;
+      public: math::Vector2i GetVector2i( const std::string &key, math::Vector2i def ) const;
     
       /// \brief Get a rotation
-      public: Quatern GetRotation( const std::string &key, Quatern def ) const;
+      public: math::Quatern GetRotation( const std::string &key, math::Quatern def ) const;
     
       /// \brief Get an attribute tuple value
       public: std::string GetTupleString( const std::string &key, int index, 

@@ -42,13 +42,13 @@ namespace gazebo
     public: virtual ~BulletCylinderShape() {}
 
     /// \brief Set the size of the cylinder
-    public: void SetSize( const Vector2d &size )
+    public: void SetSize( const math::Vector2d &size )
             {
               CylinderShape::SetSize(size);
               BulletGeom *bParent = (BulletGeom*)(this->parent);
   
               bParent->SetCollisionShape( new btCylinderShapeZ(
-                  btcommon::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)) );
+                  btmath::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)) );
             }
   };
 

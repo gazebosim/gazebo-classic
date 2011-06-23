@@ -29,28 +29,28 @@ Ogre::ColourValue Conversions::Color(const common::Color &color)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ogre Vector from gazebo Vector3
-Ogre::Vector3 Conversions::Vector3(const common::Vector3 &v)
+Ogre::Vector3 Conversions::Vector3(const math::Vector3 &v)
 {
   return Ogre::Vector3(v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief return gazebo Vector from ogre Vector3
-common::Vector3 Conversions::Vector3(const Ogre::Vector3 &v)
+math::Vector3 Conversions::Vector3(const Ogre::Vector3 &v)
 {
-  return common::Vector3(v.x, v.y, v.z);
+  return math::Vector3(v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Gazebo quaternion to Ogre quaternion
-Ogre::Quaternion Conversions::Quaternion(const common::Quatern &v)
+Ogre::Quaternion Conversions::Quaternion(const math::Quatern &v)
 {
   return Ogre::Quaternion(v.w, v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Ogre quaternion to Gazebo quaternion
-common::Quatern Conversions::Quaternion(const Ogre::Quaternion &v)
+math::Quatern Conversions::Quaternion(const Ogre::Quaternion &v)
 {
-  return common::Quatern(v.w, v.x, v.y, v.z);
+  return math::Quatern(v.w, v.x, v.y, v.z);
 }

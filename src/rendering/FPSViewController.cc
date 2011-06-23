@@ -15,7 +15,7 @@
  *
 */
 #include "common/Global.hh"
-#include "common/Vector2i.hh"
+#include "math/Vector2i.hh"
 #include "common/MouseEvent.hh"
 
 #include "rendering/UserCamera.hh"
@@ -50,9 +50,9 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &event)
   if (!this->camera->GetUserMovable())
     return;
 
-  common::Vector2i drag = event.pos - event.prevPos;
+  math::Vector2i drag = event.pos - event.prevPos;
 
-  common::Vector3 directionVec(0,0,0);
+  math::Vector3 directionVec(0,0,0);
 
   if (event.left == common::MouseEvent::DOWN)
   {

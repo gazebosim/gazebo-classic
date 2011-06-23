@@ -53,7 +53,7 @@ void ODERayShape::Update()
 {
   ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
-  common::Vector3 dir;
+  math::Vector3 dir;
 
   this->globalStartPos = this->geomParent->GetBody()->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
@@ -76,9 +76,9 @@ void ODERayShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the starting point and direction
-void ODERayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd)
+void ODERayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
 {
-  common::Vector3 dir;
+  math::Vector3 dir;
   ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   RayShape::SetPoints(posStart, posEnd);

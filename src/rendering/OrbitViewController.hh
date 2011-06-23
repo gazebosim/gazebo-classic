@@ -18,7 +18,7 @@
 #define ORBITVIEWCONTROLLER_HH
 
 #include "rendering/ViewController.hh"
-#include "common/Vector3.hh"
+#include "math/Vector3.hh"
 
 namespace gazebo
 {
@@ -44,7 +44,7 @@ namespace gazebo
       public: static std::string GetTypeString() {return "OrbitViewController";}
   
       /// \brief Translate the focal point
-      private: void Translate(common::Vector3 vec);
+      private: void Translate(math::Vector3 vec);
   
       /// \brief Normalize yaw value
       private: void NormalizeYaw(float &v);
@@ -54,7 +54,7 @@ namespace gazebo
   
       private: float yaw, pitch;
       private: float distance;
-      private: common::Vector3 focalPoint;
+      private: math::Vector3 focalPoint;
   
       private: Visual *refVisual;
     };

@@ -36,8 +36,8 @@ DirectionalLightMaker::DirectionalLightMaker()
   this->msg.set_type( msgs::Light::DIRECTIONAL );
   common::Message::Set( this->msg.mutable_diffuse(),common::Color(0.2, 0.2, 0.2, 1));
   common::Message::Set( this->msg.mutable_specular(), common::Color(0.01, 0.01, 0.01, 1));
-  common::Message::Set( this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.001));
-  common::Message::Set( this->msg.mutable_direction(), common::Vector3(.1, .1, -0.9));
+  common::Message::Set( this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.001));
+  common::Message::Set( this->msg.mutable_direction(), math::Vector3(.1, .1, -0.9));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( true );
 }
@@ -70,7 +70,7 @@ void DirectionalLightMaker::MousePushCB(const common::MouseEvent &event)
   if (this->state == 0)
     return;
 
-  common::Vector3 norm;
+  math::Vector3 norm;
   norm.Set(0,0,1);
 
   /* NATY: Fixe camera issue

@@ -16,6 +16,7 @@ link_directories(
 )
 
 add_subdirectory(msgs)
+add_subdirectory(math)
 add_subdirectory(sdf)
 add_subdirectory(transport)
 add_subdirectory(common)

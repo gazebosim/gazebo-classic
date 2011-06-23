@@ -22,8 +22,8 @@
 #ifndef HINGEJOINT_HH
 #define HINGEJOINT_HH
 
-#include "common/Angle.hh"
-#include "common/Vector3.hh"
+#include "math/Angle.hh"
+#include "math/Vector3.hh"
 #include "common/Param.hh"
 #include "common/XMLConfig.hh"
 #include "common/Global.hh"
@@ -42,9 +42,9 @@ namespace gazebo
                 this->AddType(Base::HINGE_JOINT);
   
                 common::Param::Begin(&this->parameters);
-                this->axisP = new common::ParamT<common::Vector3>("xyz",common::Vector3(0,1,0), 1);
-                this->loStopP = new common::ParamT<common::Angle>("lowStop",-std::numeric_limits<float>::max(),0);
-                this->hiStopP = new common::ParamT<common::Angle>("highStop",std::numeric_limits<float>::max(),0);
+                this->axisP = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,1,0), 1);
+                this->loStopP = new common::ParamT<math::Angle>("lowStop",-std::numeric_limits<float>::max(),0);
+                this->hiStopP = new common::ParamT<math::Angle>("highStop",std::numeric_limits<float>::max(),0);
                 this->dampingP = new common::ParamT<double>("damping",0.0, 0);
                 common::Param::End();
               }
@@ -75,7 +75,7 @@ namespace gazebo
                    this->SetHighStop(0, this->hiStopP->GetValue());
                    //this->SetDamping(0, this->dampingP->GetValue()); // uncomment when opende damping is tested and ready
   
-                   common::Vector3 a = **this->axisP;
+                   math::Vector3 a = **this->axisP;
                    this->SetAxis(0, a);
                  }
    
@@ -88,9 +88,9 @@ namespace gazebo
                    stream << prefix << *(this->hiStopP) << "\n";
                  }
   
-      protected: common::ParamT<common::Vector3> *axisP;
-      protected: common::ParamT<common::Angle> *loStopP;
-      protected: common::ParamT<common::Angle> *hiStopP; 
+      protected: common::ParamT<math::Vector3> *axisP;
+      protected: common::ParamT<math::Angle> *loStopP;
+      protected: common::ParamT<math::Angle> *hiStopP; 
       protected: common::ParamT<double> *dampingP; 
     };
   }

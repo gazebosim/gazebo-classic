@@ -1,5 +1,4 @@
 #include <boost/thread.hpp>
-#include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
@@ -22,46 +21,19 @@ const std::string default_config =
 ";
 
 
-bool rendering::load(const std::string &filename)
+bool rendering::load(const std::string & /*filename*/)
 {
   bool result = true;
 
-  // Load the world file
-  common::XMLConfig *xmlFile = new common::XMLConfig();
-
   try
   {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
-
-  // Get the root node, and make sure we have a gazebo config
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  if (!rootNode || rootNode->GetName() != "gazebo")
-    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
-
-  // Get the config node
-  common::XMLConfigNode *configNode = rootNode->GetChild("config");
-  if (!configNode)
-    gzthrow("Invalid xml. Needs a <config> tag");
-
-  try
-  {
-    rendering::RenderEngine::Instance()->Load(configNode);
+    rendering::RenderEngine::Instance()->Load();
   }
   catch(common::Exception e)
   {
     result = false;
     gzerr << "Failed to load the Rendering engine subsystem\n" << e ;
   }
-
-  delete xmlFile;
 
   return result;
 }

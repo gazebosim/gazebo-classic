@@ -27,7 +27,6 @@
 #include <iostream>
 
 #include "common/Event.hh"
-#include "common/Pose3d.hh"
 #include "common/Color.hh"
 #include "common/Param.hh"
 #include "common/Messages.hh"
@@ -76,7 +75,7 @@ namespace gazebo
       public: std::string GetName() const;
  
       /// \brief Set the position of the light
-      public: void SetPosition(const common::Vector3 &p);
+      public: void SetPosition(const math::Vector3 &p);
   
       /// \brief Set whether this entity has been selected by the user through  
       ///        the gui
@@ -98,10 +97,10 @@ namespace gazebo
       public: void SetSpecularColor(const common::Color &color);
   
       /// \brief Set the direction
-      public: void SetDirection(const common::Vector3 &dir);
+      public: void SetDirection(const math::Vector3 &dir);
   
       /// \brief Set the attenuation
-      public: void SetAttenuation(const common::Vector3 &att);
+      public: void SetAttenuation(const math::Vector3 &att);
   
       /// \brief Set the spot light inner angle
       public: void SetSpotInnerAngle(const double &angle);
@@ -135,8 +134,8 @@ namespace gazebo
       private: common::ParamT<std::string> *lightTypeP;
       private: common::ParamT<common::Color> *diffuseP;
       private: common::ParamT<common::Color> *specularP;
-      private: common::ParamT<common::Vector3> *directionP;
-      private: common::ParamT<common::Vector3> *attenuationP;
+      private: common::ParamT<math::Vector3> *directionP;
+      private: common::ParamT<math::Vector3> *attenuationP;
       private: common::ParamT<double> *rangeP;
       private: common::ParamT<bool> *castShadowsP;
       private: common::ParamT<double> *spotInnerAngleP;

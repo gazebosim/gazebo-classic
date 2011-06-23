@@ -135,17 +135,17 @@ class BulletPhysics : public PhysicsEngine
   public: virtual void ConvertMass(void *engineMass, const Mass &mass);
 
   /// \brief Convert a bullet transform to a gazebo pose
-  public: static common::Pose3d ConvertPose(btTransform bt);
+  public: static math::Pose3d ConvertPose(btTransform bt);
 
   /// \brief Convert a gazebo pose to a bullet transform
-  public: static btTransform ConvertPose(const common::Pose3d pose);
+  public: static btTransform ConvertPose(const math::Pose3d pose);
 
   /// \brief Register a joint with the dynamics world
   public: btDynamicsWorld *GetDynamicsWorld() const
           {return this->dynamicsWorld;}
 
   /// \brief Set the gavity vector
-  public: virtual void SetGravity(const gazebo::common::Vector3 &gravity);
+  public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
   //private: btAxisSweep3 *broadPhase;
   private: btBroadphaseInterface *broadPhase;

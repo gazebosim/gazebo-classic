@@ -78,24 +78,24 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
   
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, common::Angle angle);
+      public: virtual void SetHighStop(int index, math::Angle angle);
   
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, common::Angle angle);
+      public: virtual void SetLowStop(int index, math::Angle angle);
    
       /// \brief Get the high stop of an axis(index).
-      public: virtual common::Angle GetHighStop(int index);
+      public: virtual math::Angle GetHighStop(int index);
   
       /// \brief Get the low stop of an axis(index).
-      public: virtual common::Angle GetLowStop(int index);
+      public: virtual math::Angle GetLowStop(int index);
   
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body( 0 or 1 )
-      public: virtual common::Vector3 GetBodyForce(unsigned int index) const;
+      public: virtual math::Vector3 GetBodyForce(unsigned int index) const;
   
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body( 0 or 1 )
-      public: virtual common::Vector3 GetBodyTorque(unsigned int index) const;
+      public: virtual math::Vector3 GetBodyTorque(unsigned int index) const;
   
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute( Attribute, int index, double value);

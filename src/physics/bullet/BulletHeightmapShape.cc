@@ -50,8 +50,8 @@ BulletHeightmapGeom::BulletHeightmapGeom(Body *body)
   this->imageFilenameP = new common::ParamT<std::string>("image","",1);
   this->worldTextureP = new common::ParamT<std::string>("worldTexture","",0);
   this->detailTextureP = new common::ParamT<std::string>("detailTexture","",0);
-  this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(10,10,10), 0);
-  this->offsetP = new common::ParamT<common::Vector3>("offset",common::Vector3(0,0,0), 0);
+  this->sizeP = new common::ParamT<math::Vector3>("size",math::Vector3(10,10,10), 0);
+  this->offsetP = new common::ParamT<math::Vector3>("offset",math::Vector3(0,0,0), 0);
   common::Param::End();
 
   this->ogreHeightmap = new OgreHeightmap();
@@ -86,7 +86,7 @@ void BulletHeightmapGeom::FillHeightMap()
   float *heights = new float[this->width * this->height];
   float maxHeight = -FLT_MAX;
 
-  common::Vector3 scale = this->terrainSize / this->width;
+  math::Vector3 scale = this->terrainSize / this->width;
 
   // Iterate over all the verices
   for (y=0; y<this->height; y++)
@@ -95,7 +95,7 @@ void BulletHeightmapGeom::FillHeightMap()
     {
       // Find the height at a vertex
       heights[y*this->width + x] = this->ogreHeightmap->GetHeightAt(
-          Vector2<float>(x*scale.x, y*scale.y));
+          math::Vector2<float>(x*scale.x, y*scale.y));
 
       if (heights[y*this->width + x] > maxHeight)
         maxHeight = heights[y*this->width + x];
@@ -110,7 +110,7 @@ void BulletHeightmapGeom::FillHeightMap()
   int forwardIndex = 1;
   int rightIndex = 0;
 
-  btcommon::Vector3 localScaling(this->terrainSize.x, this->terrainSize.y, 
+  btmath::Vector3 localScaling(this->terrainSize.x, this->terrainSize.y, 
                          this->terrainSize.z );
 
   this->heightFieldShape  = new btHeightfieldTerrainShape( this->width, 

@@ -1,20 +1,19 @@
-set (sources link.cc 
-             model.cc 
-             world.cc
+set (sources Link.cc 
+             Model.cc 
+             World.cc
              Param.cc
 )
 
-set (headers color.hh
-             joint.hh
-             link.hh
-             model.hh
-             physics.hh
-             plugin.hh
-             pose.hh
-             scene.hh
-             sensor.hh
-             world.hh 
+set (headers Joint.hh
+             Link.hh
+             Model.hh
+             Physics.hh
+             Plugin.hh
+             Scene.hh
+             Sensor.hh
+             World.hh 
              Param.hh
+             sdf.h
 )
 
 add_library( gazebo_sdf_interface SHARED ${sources})

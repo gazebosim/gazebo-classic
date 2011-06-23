@@ -42,14 +42,14 @@ namespace gazebo
     public: virtual ~BulletBoxShape() {}
 
     /// \brief Set the size of the box
-    public: void SetSize( const common::Vector3 &size )
+    public: void SetSize( const math::Vector3 &size )
             {
               BoxShape::SetSize(size);
               BulletGeom *bParent = (BulletGeom*)(this->parent);
 
               /// Bullet requires the half-extents of the box 
               bParent->SetCollisionShape( new btBoxShape(
-                  btcommon::Vector3(size.x*0.5, size.y*0.5, size.z*0.5)) );
+                  btmath::Vector3(size.x*0.5, size.y*0.5, size.z*0.5)) );
             }
   };
 

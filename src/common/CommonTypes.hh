@@ -12,10 +12,6 @@ namespace gazebo
   {
     class Param;
     class XMLConfigNode;
-    class Pose3d;
-    class Vector3;
-    class Quaternion;
-    class Box;
     class Time;
     class Image;
 
@@ -32,7 +28,6 @@ namespace gazebo
     typedef boost::shared_ptr<Connection> ConnectionPtr;
     typedef std::vector<ConnectionPtr> Connection_V;
   }
-
 }
 
 #endif

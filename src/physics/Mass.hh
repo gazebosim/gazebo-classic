@@ -22,8 +22,8 @@
 #ifndef MASS_HH
 #define MASS_HH
 
-#include "common/Quatern.hh"
-#include "common/Vector3.hh"
+#include "math/Quatern.hh"
+#include "math/Vector3.hh"
 
 namespace gazebo
 {
@@ -62,19 +62,19 @@ namespace gazebo
       public: void SetCoG(double cx, double cy, double cz);
   
       /// \brief Set the center of gravity
-      public: void SetCoG(const common::Vector3 &c);
+      public: void SetCoG(const math::Vector3 &c);
   
       /// \brief Get the center of gravity
-      public: common::Vector3 GetCoG() const;
+      public: math::Vector3 GetCoG() const;
   
       /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
-      public: common::Vector3 GetPrincipalMoments() const;
+      public: math::Vector3 GetPrincipalMoments() const;
   
       /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
-      public: common::Vector3 GetProductsofInertia() const;
+      public: math::Vector3 GetProductsofInertia() const;
   
       /// \brief Rotate this mass
-      public: void Rotate(const common::Quatern &rot);
+      public: void Rotate(const math::Quatern &rot);
   
       /// \brief Equal operator
       public: void operator=(const Mass &mass);
@@ -90,9 +90,9 @@ namespace gazebo
               }
   
       private: double mass;
-      private: common::Vector3 cog;
-      private: common::Vector3 principals;
-      private: common::Vector3 products;
+      private: math::Vector3 cog;
+      private: math::Vector3 principals;
+      private: math::Vector3 products;
     };
   }
 }
