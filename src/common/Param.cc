@@ -22,7 +22,7 @@
 #include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Param.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Vector4.hh"
@@ -126,7 +126,7 @@ bool Param::IsVector4() const
 }
 bool Param::IsQuatern() const
 {
-  return this->GetTypename() == typeid(math::Quatern).name();
+  return this->GetTypename() == typeid(math::Quaternion).name();
 }
 bool Param::IsPose() const
 {

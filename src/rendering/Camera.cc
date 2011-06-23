@@ -392,7 +392,7 @@ void Camera::SetWorldPosition(const math::Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world orientation
-void Camera::SetWorldRotation(const math::Quatern &quant)
+void Camera::SetWorldRotation(const math::Quaternion &quant)
 {
   this->pose.rot = quant;
   this->pose.Correct();

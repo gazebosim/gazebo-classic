@@ -260,7 +260,7 @@ void Entity::SetRelativePosition(const math::Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the rotation of the entity relative to its parent
-void Entity::SetRelativeRotation(const math::Quatern &rot)
+void Entity::SetRelativeRotation(const math::Quaternion &rot)
 {
   this->SetRelativePose( math::Pose( this->GetRelativePose().pos, rot), true );
 }

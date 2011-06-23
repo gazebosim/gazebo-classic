@@ -124,5 +124,5 @@ bool Param::IsVector3() const
 ////////////////////////////////////////////////////////////////////////////////
 bool Param::IsRotation() const
 {
-  return this->GetTypeName() == typeid(gazebo::math::Quatern).name();
+  return this->GetTypeName() == typeid(gazebo::math::Quaternion).name();
 }

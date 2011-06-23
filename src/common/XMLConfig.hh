@@ -29,7 +29,7 @@
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 #include "math/Vector2i.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 #include "common/Time.hh"
 
 namespace gazebo
@@ -174,7 +174,7 @@ namespace gazebo
       public: math::Vector2i GetVector2i( const std::string &key, math::Vector2i def ) const;
     
       /// \brief Get a rotation
-      public: math::Quatern GetRotation( const std::string &key, math::Quatern def ) const;
+      public: math::Quaternion GetRotation( const std::string &key, math::Quaternion def ) const;
     
       /// \brief Get an attribute tuple value
       public: std::string GetTupleString( const std::string &key, int index, 

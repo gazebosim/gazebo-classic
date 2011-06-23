@@ -188,7 +188,7 @@ namespace gazebo
       ///  Mass as a double
       private: common::ParamT<double> *massP;
       protected: common::ParamT<math::Vector3> *xyzP;
-      protected: common::ParamT<math::Quatern> *rpyP;
+      protected: common::ParamT<math::Quaternion> *rpyP;
       protected: common::ParamT<bool> *enableContactsP;
   
       private: float transparency;

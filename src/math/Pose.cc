@@ -34,7 +34,7 @@ Pose::Pose()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Pose::Pose( const Vector3 &pos, const Quatern &rot)
+Pose::Pose( const Vector3 &pos, const Quaternion &rot)
 {
   this->pos = pos;
   this->rot = rot;
@@ -73,7 +73,7 @@ void Pose::Correct()
 /// Get the inverse of this pose
 Pose Pose::GetInverse() const
 {
-  Quatern inv = this->rot.GetInverse();
+  Quaternion inv = this->rot.GetInverse();
   return Pose( inv * (this->pos*-1), inv );
 }
 
@@ -132,7 +132,7 @@ Pose Pose::operator*(const Pose &pose)
 // Add one point to a vector: result = this + pos
 Vector3 Pose::CoordPositionAdd(const Vector3 &pos) const
 {
-  Quatern tmp;
+  Quaternion tmp;
   Vector3 result;
 
   // result = pose.rot + pose.rot * this->pos * pose.rot!
@@ -153,7 +153,7 @@ Vector3 Pose::CoordPositionAdd(const Vector3 &pos) const
 // Add one point to another: result = this + pose
 Vector3 Pose::CoordPositionAdd(const Pose &pose) const
 {
-  Quatern tmp;
+  Quaternion tmp;
   Vector3 result;
 
   // result = pose.rot + pose.rot * this->pos * pose.rot!
@@ -176,7 +176,7 @@ Vector3 Pose::CoordPositionAdd(const Pose &pose) const
 // Subtract one position from another: result = this - pose
 Vector3 Pose::CoordPositionSub(const Pose &pose) const
 {
-  Quatern tmp;
+  Quaternion tmp;
   Vector3 result;
 
   // result = pose.rot! * (this->pos - pose.pos) * pose.rot
@@ -196,16 +196,16 @@ Vector3 Pose::CoordPositionSub(const Pose &pose) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add one rotation to another: result =  this->rot + rot
-Quatern Pose::CoordRotationAdd(const Quatern &rot) const
+Quaternion Pose::CoordRotationAdd(const Quaternion &rot) const
 {
-  return Quatern(rot * this->rot);
+  return Quaternion(rot * this->rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Subtract one rotation from another: result = this->rot - rot
-Quatern Pose::CoordRotationSub(const Quatern &rot) const
+Quaternion Pose::CoordRotationSub(const Quaternion &rot) const
 {
-  Quatern result(rot.GetInverse() * this->rot);
+  Quaternion result(rot.GetInverse() * this->rot);
   result.Normalize();
   return result;
 }
@@ -225,11 +225,11 @@ void Pose::Reset()
 // find a
 Pose Pose::CoordPoseSolve(const Pose &b) const
 {
-  Quatern q;
+  Quaternion q;
   Pose a;
 
   a.rot = this->rot.GetInverse() * b.rot;
-  q = a.rot * Quatern(0, this->pos.x, this->pos.y, this->pos.z);
+  q = a.rot * Quaternion(0, this->pos.x, this->pos.y, this->pos.z);
   q = q * a.rot.GetInverse();
   a.pos = b.pos - Vector3(q.x, q.y, q.z);
 
@@ -238,7 +238,7 @@ Pose Pose::CoordPoseSolve(const Pose &b) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Rotate a vector by a quaternion, added for computing CG location for the Body
-Pose Pose::RotatePositionAboutOrigin(const Quatern &rot) const
+Pose Pose::RotatePositionAboutOrigin(const Quaternion &rot) const
 {
   Pose a = *this;
   a.pos.x =  (1.0 - 2.0*rot.y*rot.y - 2.0*rot.z*rot.z) * this->pos.x

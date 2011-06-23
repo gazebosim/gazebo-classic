@@ -27,7 +27,7 @@
 #include "common/Event.hh"
 #include "math/Box.hh"
 #include "math/Pose.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
 #include "common/Param.hh"
@@ -158,7 +158,7 @@ namespace gazebo
       public: void SetPosition( const math::Vector3 &pos);
   
       /// \brief Set the rotation of the visual
-      public: void SetRotation( const math::Quatern &rot);
+      public: void SetRotation( const math::Quaternion &rot);
   
       /// \brief Set the pose of the visual
       public: void SetPose( const math::Pose &pose);
@@ -167,7 +167,7 @@ namespace gazebo
       public: math::Vector3 GetPosition() const;
   
       /// \brief Get the rotation of the visual
-      public: math::Quatern GetRotation() const;
+      public: math::Quaternion GetRotation() const;
   
       /// \brief Get the pose of the visual
       public: math::Pose GetPose() const;
@@ -244,7 +244,7 @@ namespace gazebo
       private: static unsigned int visualCounter;
   
       private: common::ParamT<math::Vector3> *xyzP;
-      private: common::ParamT<math::Quatern> *rpyP;
+      private: common::ParamT<math::Quaternion> *rpyP;
       private: common::ParamT<std::string> *meshNameP;
       private: common::ParamT<std::string> *materialNameP;
       private: common::ParamT<std::string> *normalMapNameP;

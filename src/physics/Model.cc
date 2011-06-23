@@ -70,7 +70,7 @@ Model::Model(BasePtr parent)
   this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(0,0,0), 0);
   this->xyzP->Callback(&Entity::SetRelativePosition, (Entity*)this);
 
-  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(1,0,0,0), 0);
+  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(1,0,0,0), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
   this->enableGravityP = new common::ParamT<bool>("enable_gravity", true, 0);

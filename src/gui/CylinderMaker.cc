@@ -19,7 +19,7 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 
 #include "rendering/UserCamera.hh"
 
@@ -41,7 +41,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->set_mesh( "unit_cylinder" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
 
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quatern());
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 
 CylinderMaker::~CylinderMaker()

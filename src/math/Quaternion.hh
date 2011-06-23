@@ -40,35 +40,35 @@ namespace gazebo
   /// \{
   
   /// \brief A quaternion class
-  class Quatern
+  class Quaternion
   {
     /// \brief Default Constructor
-    public: Quatern();
+    public: Quaternion();
   
     /// \brief Constructor
     /// \param u U param
     /// \param x X param
     /// \param y Y param
     /// \param z Z param
-    public: Quatern( const double &u, const double &x, const double &y, const double &z);
+    public: Quaternion( const double &u, const double &x, const double &y, const double &z);
   
     /// \brief Copy constructor
-    /// \param qt Quatern to copy
-    public: Quatern( const Quatern &qt );
+    /// \param qt Quaternion to copy
+    public: Quaternion( const Quaternion &qt );
   
     /// \brief Destructor
-    public: ~Quatern();
+    public: ~Quaternion();
   
     /// \brief Equal operator
-    /// \param qt Quatern to copy
-    public: const Quatern &operator=(const Quatern &qt);
+    /// \param qt Quaternion to copy
+    public: const Quaternion &operator=(const Quaternion &qt);
   
     /// \brief Invert the quaternion
     public: void Invert();
   
     /// \brief Get the inverse of this quaternion
     /// \return Inverse quarenion
-    public: Quatern GetInverse() const;
+    public: Quaternion GetInverse() const;
   
     /// \brief Set the quatern to the identity
     public: void SetToIdentity();
@@ -95,10 +95,10 @@ namespace gazebo
     public: Vector3 GetAsEuler();
   
     /// \brief Convert euler angles to quatern.
-    public: static Quatern EulerToQuatern( const Vector3 &vec );
+    public: static Quaternion EulerToQuaternion( const Vector3 &vec );
   
     /// \brief Convert euler angles to quatern.
-    public: static Quatern EulerToQuatern( double x, double y, double z);
+    public: static Quaternion EulerToQuaternion( double x, double y, double z);
   
     /// \brief Get the Euler roll angle in radians
     public: double GetRoll();
@@ -112,39 +112,39 @@ namespace gazebo
     /// \brief Return rotation as axis and angle
     public: void GetAsAxis(Vector3 &axis, double &angle) const;
   
-    /// \brief Scale a Quaternion
+    /// \brief Scale a Quaternionion
     /// \param scale Amount to scale this rotation
     public: void Scale(double scale);
   
     /// \brief Addition operator
-    /// \param qt Quatern for addition
+    /// \param qt Quaternion for addition
     /// \return This quatern + qt
-    public: Quatern operator+( const Quatern &qt ) const;
+    public: Quaternion operator+( const Quaternion &qt ) const;
   
     /// \brief Addition operator
-    /// \param qt Quatern for addition
+    /// \param qt Quaternion for addition
     /// \return This quatern + qt
-    public: Quatern operator+=( const Quatern &qt );
+    public: Quaternion operator+=( const Quaternion &qt );
   
     /// \brief Substraction operator
-    /// \param qt Quatern for substraction
+    /// \param qt Quaternion for substraction
     /// \return This quatern - qt
-    public: Quatern operator-( const Quatern &qt ) const;
+    public: Quaternion operator-( const Quaternion &qt ) const;
   
     /// \brief Substraction operator
-    /// \param qt Quatern for substraction
+    /// \param qt Quaternion for substraction
     /// \return This quatern - qt
-    public: Quatern operator-=( const Quatern &qt );
+    public: Quaternion operator-=( const Quaternion &qt );
   
     /// \brief Multiplication operator
-    /// \param qt Quatern for multiplication
+    /// \param qt Quaternion for multiplication
     /// \return This quatern multiplied by the parameter
-    public: Quatern operator*( const Quatern &qt ) const;
+    public: Quaternion operator*( const Quaternion &qt ) const;
   
     /// \brief Multiplication operator
-    /// \param qt Quatern for multiplication
+    /// \param qt Quaternion for multiplication
     /// \return This quatern multiplied by the parameter
-    public: Quatern operator*=( const Quatern &qt );
+    public: Quaternion operator*=( const Quaternion &qt );
   
     /// \brief Vector3 multiplication operator
     public: Vector3 operator*( const Vector3 &v ) const;
@@ -181,11 +181,12 @@ namespace gazebo
   
     /// \brief Ostream operator
     /// \param out Ostream
-    /// \param q Quatern to output
+    /// \param q Quaternion to output
     /// \return The ostream
-    public: friend  std::ostream &operator<<( std::ostream &out, const gazebo::math::Quatern &q )
+    public: friend  std::ostream &operator<<( std::ostream &out, 
+                const gazebo::math::Quaternion &q )
     {
-      Vector3 v = const_cast<Quatern*>(&q)->GetAsEuler();
+      Vector3 v = const_cast<Quaternion*>(&q)->GetAsEuler();
       v.x = v.x * 180.0 / M_PI;
       v.y = v.y * 180.0 / M_PI;
       v.z = v.z * 180.0 / M_PI;
@@ -204,9 +205,10 @@ namespace gazebo
   
     /// \brief Istream operator
     /// \param in Ostream
-    /// \param q Quatern to read values into
+    /// \param q Quaternion to read values into
     /// \return The istream
-    public: friend std::istream &operator>>( std::istream &in, gazebo::math::Quatern &q )
+    public: friend std::istream &operator>>( std::istream &in, 
+                                             gazebo::math::Quaternion &q )
     {
       Angle r, p, y;
   

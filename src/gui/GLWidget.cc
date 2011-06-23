@@ -155,7 +155,7 @@ void GLWidget::ViewScene(rendering::ScenePtr scene)
     this->userCamera = scene->GetUserCamera(0);
 
   this->userCamera->SetWorldPosition( math::Vector3(-5,0,5) );
-  this->userCamera->SetWorldRotation( math::Quatern::EulerToQuatern(0, DTOR(15), 0) );
+  this->userCamera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
 
   if (this->windowId >= 0)
     rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);

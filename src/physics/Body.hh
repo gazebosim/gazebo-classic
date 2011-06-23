@@ -217,7 +217,7 @@ namespace gazebo
       protected: math::Pose relativePose;
   
       protected: common::ParamT<math::Vector3> *xyzP;
-      protected: common::ParamT<math::Quatern> *rpyP;
+      protected: common::ParamT<math::Quaternion> *rpyP;
   
       protected: common::ParamT<double> *dampingFactorP;
   

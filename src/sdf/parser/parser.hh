@@ -50,7 +50,7 @@
 #include "sdf/interface/Plugin.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 
 namespace sdf
 {
@@ -138,7 +138,7 @@ namespace sdf
   bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<RaySensor> &_ray);
 
   bool saveXml(TiXmlElement *_parent, const gazebo::math::Vector3 &_vec);
-  bool saveXml(TiXmlElement *_parent, const gazebo::math::Quatern &_rot);
+  bool saveXml(TiXmlElement *_parent, const gazebo::math::Quaternion &_rot);
   //bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose &_pose);
 
   //bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,true> &_pose);

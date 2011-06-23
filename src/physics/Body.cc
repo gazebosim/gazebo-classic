@@ -24,7 +24,7 @@
 
 #include "common/Messages.hh"
 #include "common/Events.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 #include "common/XMLConfig.hh"
 #include "common/Console.hh"
 #include "common/Global.hh"
@@ -55,7 +55,7 @@ Body::Body(EntityPtr parent)
   this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this );
 
-  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(), 0);
+  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this );
   this->dampingFactorP = new common::ParamT<double>("damping_factor", 0.0, 0);
 

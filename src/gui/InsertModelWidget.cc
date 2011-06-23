@@ -117,12 +117,12 @@ void InsertModelWidget::OnModelSelection()
         common::XMLConfigNode *originNode = linkNode->GetChild("origin");
 
         math::Vector3 pos;
-        math::Quatern rot;
+        math::Quaternion rot;
 
         if (originNode)
         {
           pos = originNode->GetVector3("xyz", math::Vector3());
-          rot = originNode->GetRotation("rpy",math::Quatern());
+          rot = originNode->GetRotation("rpy",math::Quaternion());
         }
 
         common::Message::Init(visMsg, modelName+"::"+linkName);

@@ -136,7 +136,7 @@ void Visual::Init()
   this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(0,0,0), 0);
   this->xyzP->Callback( &Visual::SetPosition, this );
 
-  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(1,0,0,0), 0);
+  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(1,0,0,0), 0);
   this->rpyP->Callback( &Visual::SetRotation, this );
 
   this->meshNameP = new common::ParamT<std::string>("mesh","",1);
@@ -692,7 +692,7 @@ void Visual::SetPosition( const math::Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void Visual::SetRotation( const math::Quatern &rot)
+void Visual::SetRotation( const math::Quaternion &rot)
 {
   this->sceneNode->setOrientation(rot.w, rot.x, rot.y, rot.z);
 }
@@ -714,7 +714,7 @@ math::Vector3 Visual::GetPosition() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
-math::Quatern Visual::GetRotation( ) const
+math::Quaternion Visual::GetRotation( ) const
 {
   return Conversions::Quaternion(this->sceneNode->getOrientation());
 }

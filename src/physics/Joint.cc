@@ -148,7 +148,7 @@ void Joint::Load(common::XMLConfigNode *node)
     gzthrow("Couldn't Find Child Body[" + **this->childNameP);
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = (math::Pose(**(this->anchorOffsetP), math::Quatern()) + this->anchorBody->GetWorldPose()).pos ;
+  this->anchorPos = (math::Pose(**(this->anchorOffsetP), math::Quaternion()) + this->anchorBody->GetWorldPose()).pos ;
 
 }
 

@@ -28,7 +28,7 @@
 #include "physics/Geom.hh"
 #include "BulletGeom.hh"
 #include "BulletMotionState.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 #include "common/Exception.hh"
 #include "BulletPhysics.hh"
 #include "PhysicsEngine.hh"

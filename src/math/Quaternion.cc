@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -27,21 +27,21 @@ using namespace math;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Default Constructor
-Quatern::Quatern()
+Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Quatern::Quatern( const double &w, const double &x, const double &y, const double &z)
+Quaternion::Quaternion( const double &w, const double &x, const double &y, const double &z)
     : w(w), x(x), y(y), z(z)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Copy Constructor
-Quatern::Quatern( const Quatern &qt )
+Quaternion::Quaternion( const Quaternion &qt )
 {
   this->w = qt.w;
   this->x = qt.x;
@@ -51,13 +51,13 @@ Quatern::Quatern( const Quatern &qt )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Quatern::~Quatern()
+Quaternion::~Quaternion()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equal operator
-const Quatern &Quatern::operator=(const Quatern &qt)
+const Quaternion &Quaternion::operator=(const Quaternion &qt)
 {
   this->w = qt.w;
   this->x = qt.x;
@@ -69,7 +69,7 @@ const Quatern &Quatern::operator=(const Quatern &qt)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set quatern to identity
-void Quatern::SetToIdentity()
+void Quaternion::SetToIdentity()
 {
   this->w = 1.0;
   this->x = 0.0;
@@ -80,7 +80,7 @@ void Quatern::SetToIdentity()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Invert the quaternion
-void Quatern::Invert()
+void Quaternion::Invert()
 {
   double norm = this->w*this->w+this->x*this->x+this->y*this->y+this->z*this->z;
   this->w = this->w/norm;
@@ -91,9 +91,9 @@ void Quatern::Invert()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the inverse of this quaternion
-Quatern Quatern::GetInverse() const 
+Quaternion Quaternion::GetInverse() const 
 {
-  Quatern q;
+  Quaternion q;
 
   double norm = this->w*this->w+this->x*this->x+this->y*this->y+this->z*this->z;
 
@@ -111,7 +111,7 @@ Quatern Quatern::GetInverse() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Normalize the quaternion
-void Quatern::Normalize()
+void Quaternion::Normalize()
 {
   double s;
 
@@ -135,7 +135,7 @@ void Quatern::Normalize()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the quaternion from an axis and angle
-void Quatern::SetFromAxis(double ax, double ay, double az, double aa)
+void Quaternion::SetFromAxis(double ax, double ay, double az, double aa)
 {
   double l;
 
@@ -163,7 +163,7 @@ void Quatern::SetFromAxis(double ax, double ay, double az, double aa)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set this quaternion from another
-void Quatern::Set(double u, double x, double y, double z)
+void Quaternion::Set(double u, double x, double y, double z)
 {
   this->w = u;
   this->x = x;
@@ -173,7 +173,7 @@ void Quatern::Set(double u, double x, double y, double z)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the quaternion from Euler angles
-void Quatern::SetFromEuler(const Vector3 &vec)
+void Quaternion::SetFromEuler(const Vector3 &vec)
 {
   double phi, the, psi;
 
@@ -191,7 +191,7 @@ void Quatern::SetFromEuler(const Vector3 &vec)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the rotation in Euler angles
-Vector3 Quatern::GetAsEuler()
+Vector3 Quaternion::GetAsEuler()
 {
   Vector3 vec;
 
@@ -224,44 +224,44 @@ Vector3 Quatern::GetAsEuler()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert euler angles to quatern.
-Quatern Quatern::EulerToQuatern( const Vector3 &vec )
+Quaternion Quaternion::EulerToQuaternion( const Vector3 &vec )
 {
-  Quatern result;
+  Quaternion result;
   result.SetFromEuler(vec);
   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert euler angles to quatern.
-Quatern Quatern::EulerToQuatern( double x, double y, double z)
+Quaternion Quaternion::EulerToQuaternion( double x, double y, double z)
 {
-  return EulerToQuatern( Vector3(x,y,z) );
+  return EulerToQuaternion( Vector3(x,y,z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the Euler roll angle in radians
-double Quatern::GetRoll()
+double Quaternion::GetRoll()
 {
   return this->GetAsEuler().x;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the Euler pitch angle in radians
-double Quatern::GetPitch()
+double Quaternion::GetPitch()
 {
   return this->GetAsEuler().y;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the Euler yaw angle in radians
-double Quatern::GetYaw()
+double Quaternion::GetYaw()
 {
   return this->GetAsEuler().z;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return rotation as axis and angle
-void Quatern::GetAsAxis(Vector3 &axis, double &angle) const
+void Quaternion::GetAsAxis(Vector3 &axis, double &angle) const
 {
   double len = this->x*this->x + this->y*this->y + this->z*this->z;
   if (len > 0.0)
@@ -278,10 +278,10 @@ void Quatern::GetAsAxis(Vector3 &axis, double &angle) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Scale a Quaternion
-void Quatern::Scale(double scale)
+// Scale a Quaternionion
+void Quaternion::Scale(double scale)
 {
-  Quatern b;
+  Quaternion b;
   Vector3 axis;
   double angle;
 
@@ -294,16 +294,16 @@ void Quatern::Scale(double scale)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Addition operator
-Quatern Quatern::operator+( const Quatern &qt ) const
+Quaternion Quaternion::operator+( const Quaternion &qt ) const
 {
-  Quatern result(this->w + qt.w, this->x + qt.x, 
+  Quaternion result(this->w + qt.w, this->x + qt.x, 
                  this->y + qt.y, this->z + qt.z);
   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Addition operator
-Quatern Quatern::operator+=( const Quatern &qt ) 
+Quaternion Quaternion::operator+=( const Quaternion &qt ) 
 {
   *this = *this + qt;
 
@@ -312,7 +312,7 @@ Quatern Quatern::operator+=( const Quatern &qt )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Subtraction operator
-Quatern Quatern::operator-=( const Quatern &qt )
+Quaternion Quaternion::operator-=( const Quaternion &qt )
 {
   *this = *this - qt;
   return *this;
@@ -320,18 +320,18 @@ Quatern Quatern::operator-=( const Quatern &qt )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Substraction operator
-Quatern Quatern::operator-( const Quatern &qt ) const
+Quaternion Quaternion::operator-( const Quaternion &qt ) const
 {
-  Quatern result(this->w - qt.w, this->x - qt.x, 
+  Quaternion result(this->w - qt.w, this->x - qt.x, 
                  this->y - qt.y, this->z - qt.z);
   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Multiplication operator
-Quatern Quatern::operator*( const Quatern &qt ) const
+Quaternion Quaternion::operator*( const Quaternion &qt ) const
 {
-  Quatern c;
+  Quaternion c;
 
   c.x = this->w * qt.x + this->x * qt.w + this->y * qt.z - this->z * qt.y;
   c.y = this->w * qt.y - this->x * qt.z + this->y * qt.w + this->z * qt.x;
@@ -343,7 +343,7 @@ Quatern Quatern::operator*( const Quatern &qt ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Multiplication operator
-Quatern Quatern::operator*=( const Quatern &qt )
+Quaternion Quaternion::operator*=( const Quaternion &qt )
 {
   *this = *this * qt;
   return *this;
@@ -351,9 +351,9 @@ Quatern Quatern::operator*=( const Quatern &qt )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Rotate a vector 
-Vector3 Quatern::operator*( const Vector3 &v ) const
+Vector3 Quaternion::operator*( const Vector3 &v ) const
 {
-/*  Quatern tmp(0.0, v.x, v.y, v.z);
+/*  Quaternion tmp(0.0, v.x, v.y, v.z);
   
   tmp = (*this) * (tmp * this->GetInverse());
 
@@ -372,9 +372,9 @@ Vector3 Quatern::operator*( const Vector3 &v ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Rotate a vector using the quaternion
-Vector3 Quatern::RotateVector(Vector3 vec) const
+Vector3 Quaternion::RotateVector(Vector3 vec) const
 {
-  Quatern tmp;
+  Quaternion tmp;
   Vector3 result;
 
   tmp.w = 0.0;
@@ -393,9 +393,9 @@ Vector3 Quatern::RotateVector(Vector3 vec) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Do the reverse rotation of a vector by this quaternion
-Vector3 Quatern::RotateVectorReverse(Vector3 vec) const
+Vector3 Quaternion::RotateVectorReverse(Vector3 vec) const
 {
-  Quatern tmp;
+  Quaternion tmp;
   Vector3 result;
 
   tmp.w = 0.0;
@@ -415,14 +415,14 @@ Vector3 Quatern::RotateVectorReverse(Vector3 vec) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // See if a quatern is finite (e.g., not nan)
-bool Quatern::IsFinite() const
+bool Quaternion::IsFinite() const
 {
   return finite(this->w) && finite(this->x) && finite(this->y) && finite(this->z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Correct any nan
-void Quatern::Correct()
+void Quaternion::Correct()
 {
   if (!finite(this->x))
     this->x = 0;
@@ -438,7 +438,7 @@ void Quatern::Correct()
 }
 
 
-Vector3 Quatern::GetXAxis() const
+Vector3 Quaternion::GetXAxis() const
 {
   double fTy  = 2.0f*this->y;
   double fTz  = 2.0f*this->z;
@@ -454,7 +454,7 @@ Vector3 Quatern::GetXAxis() const
 
 }
 
-Vector3 Quatern::GetYAxis() const
+Vector3 Quaternion::GetYAxis() const
 {
   double fTx  = 2.0f*this->x;
   double fTy  = 2.0f*this->y;
@@ -469,7 +469,7 @@ Vector3 Quatern::GetYAxis() const
   return Vector3(fTxy-fTwz, 1.0f-(fTxx+fTzz), fTyz+fTwx);
 }
 
-Vector3 Quatern::GetZAxis() const
+Vector3 Quaternion::GetZAxis() const
 {
   double fTx  = 2.0f*this->x;
   double fTy  = 2.0f*this->y;

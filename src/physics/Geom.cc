@@ -58,7 +58,7 @@ Geom::Geom( BodyPtr body )
   this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this);
 
-  this->rpyP = new common::ParamT<math::Quatern>("rpy", math::Quatern(), 0);
+  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
   this->laserFiducialIdP = new common::ParamT<int>("laser_fiducial_id",-1,0);
@@ -169,7 +169,7 @@ void Geom::CreateBoundingBox()
 
     common::Message::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
     common::Message::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
-    common::Message::Set(msg.mutable_pose()->mutable_orientation(), math::Quatern(1,0,0,0));
+    common::Message::Set(msg.mutable_pose()->mutable_orientation(), math::Quaternion(1,0,0,0));
     msg.set_transparency( .5 );
 
     this->visPub->Publish(msg);

@@ -98,7 +98,7 @@ namespace gazebo
   
       /// \brief Set the rotation of the entity relative to its parent
       /// \param rot The new Quaternion rotation
-      public: void SetRelativeRotation(const math::Quatern &rot);
+      public: void SetRelativeRotation(const math::Quaternion &rot);
   
       /// \brief Get the linear velocity of the entity
       /// \return A math::Vector3 for the linear velocity

@@ -19,7 +19,7 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 
 #include "rendering/UserCamera.hh"
 
@@ -40,7 +40,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh( "unit_sphere" );
   this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quatern());
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 
 SphereMaker::~SphereMaker()

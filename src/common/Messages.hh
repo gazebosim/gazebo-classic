@@ -49,21 +49,21 @@ namespace gazebo
                                      const google::protobuf::Message &message);
 
         static msgs::Point      Convert(const math::Vector3 &v);
-        static msgs::Quaternion Convert(const math::Quatern &q);
+        static msgs::Quaternion Convert(const math::Quaternion &q);
         static msgs::Pose       Convert(const math::Pose &p);
         static msgs::Color      Convert(const Color &c);
         static msgs::Time       Convert(const Time &t);
         static msgs::Plane      Convert(const math::Plane &p);
   
         static math::Vector3          Convert(const msgs::Point &v);
-        static math::Quatern          Convert(const msgs::Quaternion &q);
+        static math::Quaternion          Convert(const msgs::Quaternion &q);
         static math::Pose           Convert(const msgs::Pose &p);
         static Color            Convert(const msgs::Color &c);
         static Time             Convert(const msgs::Time &t);
         static math::Plane            Convert(const msgs::Plane &p);
   
         static void Set(msgs::Point *pt, const math::Vector3 &v);
-        static void Set(msgs::Quaternion *q, const math::Quatern &v);
+        static void Set(msgs::Quaternion *q, const math::Quaternion &v);
         static void Set(msgs::Pose *p, const math::Pose &v);
         static void Set(msgs::Color *c, const Color &v);
         static void Set(msgs::Time *t, const Time &v);

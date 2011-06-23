@@ -129,7 +129,7 @@ math::Vector3 Mass::GetProductsofInertia() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Rotate this mass
-void Mass::Rotate(const math::Quatern &rot)
+void Mass::Rotate(const math::Quaternion &rot)
 {
   this->cog = rot.RotateVector(this->cog);
 }

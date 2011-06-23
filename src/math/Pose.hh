@@ -25,7 +25,7 @@
 #include <iostream>
 
 #include "math/Vector3.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 
 namespace gazebo
 {
@@ -45,7 +45,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param pos A position
       /// \param rot A rotation
-      public: Pose( const Vector3 &pos, const Quatern &rot);
+      public: Pose( const Vector3 &pos, const Quaternion &rot);
     
       /// \brief Copy constructor
       /// \param pose Pose to copy
@@ -104,12 +104,12 @@ namespace gazebo
       /// \brief Add one rotation to another: result =  this->rot + rot
       /// \param rot Rotation to add
       /// \return The resulting rotation
-      public: Quatern CoordRotationAdd(const Quatern &rot) const;
+      public: Quaternion CoordRotationAdd(const Quaternion &rot) const;
     
       /// \brief Subtract one rotation from another: result = this->rot - rot
       /// \param rot The rotation to subtract
       /// \return The resulting rotation
-      public: Quatern CoordRotationSub(const Quatern &rot) const;
+      public: Quaternion CoordRotationSub(const Quaternion &rot) const;
     
       /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and 
       ///        this, find a
@@ -119,13 +119,13 @@ namespace gazebo
       public: void Reset();
     
       /// \brief Rotate vector part of a pose about the origin
-      public: Pose RotatePositionAboutOrigin(const Quatern &rot) const;
+      public: Pose RotatePositionAboutOrigin(const Quaternion &rot) const;
     
       /// \brief The position
       public: Vector3 pos;
     
       /// \brief The rotation
-      public: Quatern rot;
+      public: Quaternion rot;
     
       /// \brief Ostream operator
       /// \param out Ostream

@@ -743,10 +743,10 @@ math::Vector2i XMLConfigNode::GetVector2i( const std::string &key, math::Vector2
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a rotation
-math::Quatern XMLConfigNode::GetRotation( const std::string &key, 
-                                          math::Quatern def ) const
+math::Quaternion XMLConfigNode::GetRotation( const std::string &key, 
+                                          math::Quaternion def ) const
 {
-  math::Quatern q;
+  math::Quaternion q;
   math::Vector3 p;
 
   if (this->GetTupleString(key, 0, "") == "")

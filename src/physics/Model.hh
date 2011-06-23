@@ -166,7 +166,7 @@ namespace gazebo
    
       private: common::ParamT<std::string> *canonicalBodyNameP;
       private: common::ParamT<math::Vector3> *xyzP;
-      private: common::ParamT<math::Quatern> *rpyP;
+      private: common::ParamT<math::Quaternion> *rpyP;
       private: common::ParamT<bool> *enableGravityP;
       private: common::ParamT<bool> *enableFrictionP;
       private: common::ParamT<int> *laserFiducialP;

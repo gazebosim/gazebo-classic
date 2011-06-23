@@ -43,14 +43,14 @@ math::Vector3 Conversions::Vector3(const Ogre::Vector3 &v)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Gazebo quaternion to Ogre quaternion
-Ogre::Quaternion Conversions::Quaternion(const math::Quatern &v)
+Ogre::Quaternion Conversions::Quaternion(const math::Quaternion &v)
 {
   return Ogre::Quaternion(v.w, v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Ogre quaternion to Gazebo quaternion
-math::Quatern Conversions::Quaternion(const Ogre::Quaternion &v)
+math::Quaternion Conversions::Quaternion(const Ogre::Quaternion &v)
 {
-  return math::Quatern(v.w, v.x, v.y, v.z);
+  return math::Quaternion(v.w, v.x, v.y, v.z);
 }

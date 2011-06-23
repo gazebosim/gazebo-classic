@@ -21,7 +21,7 @@
 
 #include "common/Color.hh"
 #include "math/Vector3.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 
 namespace gazebo
 {
@@ -39,10 +39,10 @@ namespace gazebo
       public: static math::Vector3 Vector3(const Ogre::Vector3 &v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
-      public: static Ogre::Quaternion Quaternion(const math::Quatern &v);
+      public: static Ogre::Quaternion Quaternion(const math::Quaternion &v);
 
       /// \brief Ogre quaternion to Gazebo quaternion
-      public: static math::Quatern Quaternion(const Ogre::Quaternion &v);
+      public: static math::Quaternion Quaternion(const Ogre::Quaternion &v);
 
     };
   }

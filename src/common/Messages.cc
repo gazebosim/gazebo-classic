@@ -20,7 +20,7 @@
 
 #include "math/Vector3.hh"
 #include "math/Pose.hh"
-#include "math/Quatern.hh"
+#include "math/Quaternion.hh"
 #include "math/Plane.hh"
 
 #include "common/Exception.hh"
@@ -120,7 +120,7 @@ void Message::Set(msgs::Point *pt, const math::Vector3 &v)
   pt->set_z(v.z);
 }
 
-void Message::Set(msgs::Quaternion *q, const math::Quatern &v)
+void Message::Set(msgs::Quaternion *q, const math::Quaternion &v)
 {
   q->set_x(v.x);
   q->set_y(v.y);
@@ -165,7 +165,7 @@ msgs::Point Message::Convert(const math::Vector3 &v)
   return result;
 }
 
-msgs::Quaternion Message::Convert(const math::Quatern &q)
+msgs::Quaternion Message::Convert(const math::Quaternion &q)
 {
   msgs::Quaternion result;
   result.set_x(q.x);
@@ -216,9 +216,9 @@ math::Vector3 Message::Convert(const msgs::Point &v)
   return math::Vector3(v.x(), v.y(), v.z());
 }
 
-math::Quatern Message::Convert(const msgs::Quaternion &q)
+math::Quaternion Message::Convert(const msgs::Quaternion &q)
 {
-  return math::Quatern(q.w(), q.x(), q.y(), q.z());
+  return math::Quaternion(q.w(), q.x(), q.y(), q.z());
 }
 
 math::Pose Message::Convert(const msgs::Pose &p)
@@ -269,7 +269,7 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
   {
     result.mutable_pose()->mutable_position()->CopyFrom( 
         Convert(cnode->GetVector3("xyz",math::Vector3(0,0,0))) );  
-    result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(cnode->GetRotation("rpy", math::Quatern() )) );
+    result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(cnode->GetRotation("rpy", math::Quaternion() )) );
   }
 
   if ((cnode = node->GetChild("diffuse")) != NULL)
@@ -383,7 +383,7 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
         Convert(node->GetChild("origin")->GetVector3("xyz",math::Vector3())));
 
     result.mutable_pose()->mutable_orientation()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetRotation("rpy",math::Quatern())));
+        Convert(node->GetChild("origin")->GetRotation("rpy",math::Quaternion())));
   }
 
   return result;

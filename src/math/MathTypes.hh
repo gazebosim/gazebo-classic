@@ -5,7 +5,7 @@ namespace gazebo
 {
   namespace common
   {
-    class Quatern;
+    class Quaternion;
     class Vector2i;
     class Vector2d;
     class Vector3;

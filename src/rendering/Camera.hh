@@ -116,7 +116,7 @@ namespace gazebo
       public: void SetWorldPosition(const math::Vector3 &pos);
   
       /// \brief Set the world orientation
-      public: void SetWorldRotation(const math::Quatern &quant);
+      public: void SetWorldRotation(const math::Quaternion &quant);
   
     
       /// \brief Translate the camera

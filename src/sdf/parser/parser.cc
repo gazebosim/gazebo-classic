@@ -1856,7 +1856,7 @@ bool saveXml(TiXmlElement *_parent, const gazebo::math::Vector3 &_vec)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const gazebo::math::Quatern &_rot)
+bool saveXml(TiXmlElement *_parent, const gazebo::math::Quaternion &_rot)
 {
   std::ostringstream stream;
   stream << _rot;

@@ -71,7 +71,7 @@ void OrbitViewController::Update()
 
   this->camera->SetWorldPosition(pos);
 
-  math::Quatern rot;
+  math::Quaternion rot;
   rot.SetFromEuler( math::Vector3(0, M_PI*0.5 - this->pitch, this->yaw - M_PI) );
   this->camera->SetWorldRotation(rot);
 }
