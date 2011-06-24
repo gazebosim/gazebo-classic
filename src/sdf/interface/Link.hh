@@ -291,12 +291,12 @@ namespace sdf
   
   class Link
   {
-    public: Link() : origin("origin", Pose()), name("name", ""),
+    public: Link() : origin("origin", gazebo::math::Pose()), name("name", ""),
                      selfCollide("self_collide", false), 
                      gravity("gravity",true) 
     { this->Clear(); };
 
-    public: ParamT<Pose, false> origin;
+    public: ParamT<gazebo::math::Pose, false> origin;
     public: ParamT<std::string, true> name;
     public: ParamT<bool, false> selfCollide;
     public: ParamT<bool, false> gravity;

@@ -794,7 +794,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     gzwarn << "Origin tag not present for link element, using default (Identity)\n";
     _link->origin.Reset();
   }
-  else if (!_link->origin.Set(o->Attribute("xyz"),o->Attribute("rpy")))
+  else if (!_link->origin.Set(o->Attribute("pose")))
   {
     gzerr << "Unable to parase link origin element\n";
     _link->origin.Reset();

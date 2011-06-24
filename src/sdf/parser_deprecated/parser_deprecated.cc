@@ -40,7 +40,10 @@
 #include "common/Console.hh"
 #include "sdf/parser_deprecated/parser_deprecated.hh"
 #include "sdf/interface/Param.hh"
-#include "sdf/interface/pose.hh"
+#include "math/Pose.hh"
+#include "math/Vector3.hh"
+#include "common/Color.hh"
+#include "math/Quaternion.hh"
 
 namespace sdf
 {
@@ -216,19 +219,23 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
   }
 
   // Origin
-  xmlNodePtr o = firstChildElement(_config, "origin");
-  if (!o)
+  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
+  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
+  if (!xyz_xml && !rpy_xml)
   {
-    gzwarn << "Origin tag not present for sensor element, using default (Identity)\n";
+    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
     _sensor->origin.Reset();
   }
   else
   {
-    if (!_sensor->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy") ))
-    {
-      gzerr << "Sensor has malformed orgin\n";
-      return false;
-    }
+    // Origin
+    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
+    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
+    xyzP.Set( getValue(xyz_xml).c_str());
+    rpyP.Set( getValue(rpy_xml).c_str());
+    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
+    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
+    _sensor->origin.SetValue( pose );
   }
 
   return true;
@@ -478,7 +485,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
   if (cx_xml) cx.Set( getValue(cx_xml).c_str() );
   if (cy_xml) cy.Set( getValue(cy_xml).c_str() );
   if (cz_xml) cz.Set( getValue(cz_xml).c_str() );
-  Pose cg; cg.position = Vector3(cx.GetValue(),cy.GetValue(),cz.GetValue());
+  gazebo::math::Pose cg; cg.pos = gazebo::math::Vector3(cx.GetValue(),cy.GetValue(),cz.GetValue());
   _inertial->origin.SetValue(cg);
 
   xmlNodePtr mass_xml = firstChildElement(_config, "mass");
@@ -538,17 +545,23 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
   }
 
   // Origin
-  xmlNodePtr o = firstChildElement(_config, "origin");
-  if (!o)
+  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
+  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
+  if (!xyz_xml && !rpy_xml)
   {
-    gzwarn << "Origin tag not present for collision element, using default (Identity\n";
+    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
     _collision->origin.Reset();
   }
-  else if (!_collision->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
+  else
   {
-    gzerr << "Unable to parse collision origin element\n";
-    _collision->origin.Reset();
-    return false;
+    // Origin
+    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
+    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
+    xyzP.Set( getValue(xyz_xml).c_str());
+    rpyP.Set( getValue(rpy_xml).c_str());
+    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
+    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
+    _collision->origin.SetValue( pose );
   }
 
   // Geometry
@@ -655,13 +668,14 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
   }
   else
   {
-    printf("debug link origin [%s, %s]\n", getValue(xyz_xml).c_str(), getValue(rpy_xml).c_str() );
-    if (!_link->origin.Set( getValue(xyz_xml).c_str(), getValue(rpy_xml).c_str() ))
-    {
-      gzerr << "Unable to parse origin tag\n";
-      _link->origin.Reset();
-      return false;
-    }
+    // Origin
+    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
+    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
+    xyzP.Set( getValue(xyz_xml).c_str());
+    rpyP.Set( getValue(rpy_xml).c_str());
+    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
+    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
+    _link->origin.SetValue( pose );
   }
 
 
@@ -778,17 +792,23 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
   }
 
   // Origin
-  xmlNodePtr o = firstChildElement(_config, "origin");
-  if (!o)
+  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
+  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
+  if (!xyz_xml && !rpy_xml)
   {
-    gzwarn << "Origin tag not present for visual element, using default (Identity)\n";
+    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
     _visual->origin.Reset();
   }
-  else if (!_visual->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
+  else
   {
-    gzerr << "Unable to parase visual origin element\n";
-    _visual->origin.Reset();
-    return false;
+    // Origin
+    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
+    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
+    xyzP.Set( getValue(xyz_xml).c_str());
+    rpyP.Set( getValue(rpy_xml).c_str());
+    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
+    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
+    _visual->origin.SetValue( pose );
   }
 
   // Geometry
@@ -889,20 +909,23 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get transform from Parent Link to Joint Frame
-  xmlNodePtr originXml = firstChildElement(_config, "origin");
-  if (!originXml)
+  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
+  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
+  if (!xyz_xml && !rpy_xml)
   {
+    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
     _joint->origin.Reset();
   }
   else
   {
-    if (!_joint->origin.Set( (const char*)xmlGetProp(originXml,(xmlChar*)"xyz"),
-                             (const char*)xmlGetProp(originXml,(xmlChar*)"rpy")))
-    {
-      gzerr << "Unable to parse joint origin element\n";
-      _joint->origin.Reset();
-      return false;
-    }
+    // Origin
+    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
+    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
+    xyzP.Set( getValue(xyz_xml).c_str());
+    rpyP.Set( getValue(rpy_xml).c_str());
+    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
+    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
+    _joint->origin.SetValue( pose );
   }
 
   // Get Parent Link
@@ -976,7 +999,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     {
       gzwarn << "no axis elemement for Joint link '" 
         << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis.SetValue( Vector3(1.0, 0.0, 0.0));
+      _joint->axis.SetValue( gazebo::math::Vector3(1.0, 0.0, 0.0));
     }
     else{
       if (!_joint->axis.Set( (const char*)xmlGetProp(axisXml,(xmlChar*)"xyz")) )
@@ -1388,14 +1411,14 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
   xmlNodePtr background = firstChildElement(_config, "background");
   if (background)
   {
-    ParamT<Vector3, false> bg("vector3",Vector3());
+    ParamT<gazebo::math::Vector3, false> bg("vector3",gazebo::math::Vector3());
     if (!bg.Set( (getValue(background)).c_str() ) )
     {
       gzerr << "Unable to parse background rgba\n";
       return false;
     }
     // TODO: make color constructor for this?
-    Color color; color.r = bg.GetValue().x; color.g = bg.GetValue().y; color.b = bg.GetValue().z; color.a = 1.0;
+    gazebo::common::Color color(bg.GetValue().x,bg.GetValue().y,bg.GetValue().z);
     _scene->backgroundColor.SetValue( color );
 
 
