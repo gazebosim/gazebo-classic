@@ -212,16 +212,17 @@ namespace sdf
             }
   };
 
-  class Contact
+  class SurfaceContact
   {
     public: enum Type {UNKNOWN, ODE};
-    public: Contact(Type _t) : type(_t) {}
+    public: SurfaceContact(Type _t) : type(_t) {}
     public: Type type;
   };
 
-  class ODEContact : public Contact
+  class ODESurfaceContact : public SurfaceContact
   {
-    public: ODEContact() : Contact(ODE), softCFM("soft_cfm",0), kp("kp",0), kd("kd",0), 
+    public: ODESurfaceContact() : SurfaceContact(ODE), 
+            softCFM("soft_cfm",0), kp("kp",0), kd("kd",0), 
             maxVel("max_vel",0), minDepth("min_depth",0)
     { this->Clear(); }
 
@@ -249,7 +250,7 @@ namespace sdf
 
     public: ParamT<double, true> bounceRestCoeff;
     public: ParamT<double, true> bounceThreshold;
-    public: std::vector< boost::shared_ptr<Contact> > contacts;
+    public: std::vector< boost::shared_ptr<SurfaceContact> > contacts;
     public: std::vector< boost::shared_ptr<Friction> > frictions;
 
     public: void Clear()

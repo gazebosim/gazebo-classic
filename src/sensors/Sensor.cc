@@ -34,44 +34,21 @@ using namespace sensors;
 Sensor::Sensor()
 {
   this->active = true;
-
-  common::Param::Begin(&this->parameters);
-  this->nameP = new common::ParamT<std::string>("name", "sensor_default_name",0);
-  this->updateRateP = new common::ParamT<double>("update_rate", 0, 0);
-  this->alwaysActiveP = new common::ParamT<bool>("always_active", false, 0);
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Sensor::~Sensor()
 {
-  delete this->nameP;
-  delete this->updateRateP;
-  delete this->alwaysActiveP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the sensor
-void Sensor::Load(common::XMLConfigNode *node)
+void Sensor::Load( boost::shared_ptr<sdf::Sensor> _sdf )
 {
-  this->nameP->Load(node);
-  this->updateRateP->Load(node);
-  this->alwaysActiveP->Load(node);
+  this->sdf = _sdf;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Save the sensor info in XML format
-void Sensor::Save(std::string &prefix, std::ostream &stream)
-{
-  std::string p = prefix + "  ";
-
-  stream << prefix << "<sensor:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
-
-  stream << prefix << *(this->updateRateP) << "\n";
-
-  stream << prefix << "</sensor:" << this->typeName << ">\n";
-}
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the sensor
@@ -109,7 +86,7 @@ void Sensor::Fini()
 /// Get name 
 std::string Sensor::GetName() const
 {
-  return **this->nameP;
+  return *this->sdf->name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

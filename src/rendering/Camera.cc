@@ -65,27 +65,15 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->renderTarget = NULL;
   this->userMovable = true;
 
-  common::Param::Begin(&this->camParameters);
-  this->nearClipP = new common::ParamT<double>("near_clip",1,0);
-  this->farClipP = new common::ParamT<double>("far_clip",100,0);
-  this->saveFramesP = new common::ParamT<bool>("save_frames",false,0);
-  this->savePathnameP = new common::ParamT<std::string>("save_frame_path","/tmp/frames",0);
-  this->imageSizeP = new common::ParamT< math::Vector2i >("image_size", math::Vector2i(640, 480),0);
-  this->visMaskP = new common::ParamT<std::string>("mask","none",0);
-  this->hfovP = new common::ParamT<math::Angle>("hfov", math::Angle(DTOR(60)),0);
-  this->imageFormatP = new common::ParamT<std::string>("image_format", "R8G8B8", 0);
-  this->updateRateP = new common::ParamT<double>("update_rate",32,0);
-  common::Param::End();
-
   this->captureData = false;
 
   this->camera = NULL;
   this->viewport = NULL;
 
-  if (**this->updateRateP == 0)
+  if (*this->sdf->updateRate == 0)
     this->renderPeriod = common::Time(0.0);
   else
-    this->renderPeriod = common::Time(1.0/(**this->updateRateP));
+    this->renderPeriod = common::Time(1.0/(*this->sdf->updateRate));
 
   this->renderingEnabled = true;
 
@@ -110,20 +98,12 @@ Camera::~Camera()
   if (this->bayerFrameBuffer)
     delete [] this->bayerFrameBuffer;
 
-  delete this->nearClipP;
-  delete this->farClipP;
-  delete this->saveFramesP;
-  delete this->savePathnameP;
-  delete this->imageSizeP;
-  delete this->imageFormatP;
-  delete this->visMaskP;
-  delete this->hfovP;
-
   if (this->pitchNode)
   {
     this->sceneNode->removeAndDestroyChild( this->name + "PitchNode");
     this->pitchNode = NULL;
   }
+
   if (this->camera)
   {
     this->scene->GetManager()->destroyCamera(this->name);
@@ -133,41 +113,24 @@ Camera::~Camera()
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void Camera::Load( common::XMLConfigNode *node )
+void Camera::Load( boost::shared_ptr<sdf::Camera> _sdf )
 {
-  this->visibilityMask = GZ_ALL_CAMERA; 
+  this->sdf = _sdf;
 
-  if (node)
-  {
-    this->nearClipP->Load(node);
-    this->farClipP->Load(node);
-    this->saveFramesP->Load(node);
-    this->savePathnameP->Load(node);
-    this->imageSizeP->Load(node);
-    this->imageFormatP->Load(node);
-    this->visMaskP->Load(node);
-    this->hfovP->Load(node);
-  }
-
-  if (this->visMaskP->GetValue() == "laser")
-  {
-    this->visibilityMask ^= GZ_LASER_CAMERA;
-  }
-
-  if (this->imageFormatP->GetValue() == "L8")
+  if (this->sdf->imageFormat.GetValue() == "L8")
     this->imageFormat = (int)Ogre::PF_L8;
-  else if (this->imageFormatP->GetValue() == "R8G8B8")
+  else if (this->sdf->imageFormat.GetValue() == "R8G8B8")
     this->imageFormat = (int)Ogre::PF_BYTE_RGB;
-  else if (this->imageFormatP->GetValue() == "B8G8R8")
+  else if (this->sdf->imageFormat.GetValue() == "B8G8R8")
     this->imageFormat = (int)Ogre::PF_BYTE_BGR;
-  else if (this->imageFormatP->GetValue() == "FLOAT32")
+  else if (this->sdf->imageFormat.GetValue() == "FLOAT32")
     this->imageFormat = (int)Ogre::PF_FLOAT32_R;
-  else if (this->imageFormatP->GetValue() == "FLOAT16")
+  else if (this->sdf->imageFormat.GetValue() == "FLOAT16")
     this->imageFormat = (int)Ogre::PF_FLOAT16_R;
-  else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
-      (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
-      (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
-      (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+  else if ( (this->sdf->imageFormat.GetValue() == "BAYER_RGGB8") ||
+      (this->sdf->imageFormat.GetValue() == "BAYER_BGGR8") ||
+      (this->sdf->imageFormat.GetValue() == "BAYER_GBRG8") ||
+      (this->sdf->imageFormat.GetValue() == "BAYER_GRBG8") )
   {
     // let ogre generate rgb8 images for all bayer format requests
     // then post process to produce actual bayer images
@@ -175,42 +138,24 @@ void Camera::Load( common::XMLConfigNode *node )
   }
   else
   {
-    gzerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
+    gzerr << "Error parsing image format (" << this->sdf->imageFormat.GetValue() << "), using default Ogre::PF_R8G8B8\n";
     this->imageFormat = (int)Ogre::PF_R8G8B8;
   }
 
   // Create the directory to store frames
-  if (this->saveFramesP->GetValue())
+  if (*this->sdf->saveEnabled)
   {
     std::string command;
-    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
+    command = "mkdir " + *this->sdf->savePath + " 2>>/dev/null";
     if (system(command.c_str()) < 0)
       gzerr << "Error making directory\n";
   }
 
-  if (this->hfovP->GetValue() < math::Angle(0.01) || 
-      this->hfovP->GetValue() > math::Angle(M_PI))
+  if (*(this->sdf->horizontalFov) < 0.01 || 
+      *(this->sdf->horizontalFov) > M_PI)
   {
     gzthrow("Camera horizontal field of veiw invalid.");
   }
-  if (this->nearClipP->GetValue() <= 0)
-  {
-    gzthrow("near clipping plane (min depth) <= zero");
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save camera info in xml format
-void Camera::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << (*this->nearClipP) << "\n";
-  stream << prefix << (*this->farClipP) << "\n";
-  stream << prefix << (*this->saveFramesP) << "\n";
-  stream << prefix << (*this->savePathnameP) << "\n";
-  stream << prefix << (*this->imageSizeP) << "\n";
-  stream << prefix << (*this->imageFormatP) << "\n";
-  stream << prefix << (*this->visMaskP) << "\n";
-  stream << prefix << (*this->hfovP) << "\n";
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -327,8 +272,9 @@ void Camera::PostRender()
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
 
-    size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
-        (**this->imageSizeP).y, 
+    size = Ogre::PixelUtil::getMemorySize(
+        *this->sdf->imageWidth,
+        *this->sdf->imageHeight, 
         1, 
         format);
 
@@ -338,12 +284,12 @@ void Camera::PostRender()
 
     memset(this->saveFrameBuffer,128,size);
 
-    Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
+    Ogre::PixelBox box(*this->sdf->imageWidth, *this->sdf->imageHeight,
         1, (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
 
     pixelBuffer->blitToMemory( box );
 
-    if (this->saveFramesP->GetValue())
+    if (*this->sdf->saveEnabled)
     {
       this->SaveFrame();
     }
@@ -427,16 +373,16 @@ void Camera::RotatePitch( float angle )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the clip distances
-void Camera::SetClipDist(float near, float far)
+void Camera::SetClipDist(float _near, float _far)
 {
-  this->nearClipP->SetValue(near);
-  this->farClipP->SetValue(far);
+  this->sdf->clipNear.SetValue(_near);
+  this->sdf->clipFar.SetValue(_far);
 
   if (camera)
   {
-    this->camera->setNearClipDistance(**this->nearClipP);
-    this->camera->setFarClipDistance(**this->farClipP);
-    this->camera->setRenderingDistance(**this->farClipP);
+    this->camera->setNearClipDistance(_near);
+    this->camera->setFarClipDistance(_far);
+    this->camera->setRenderingDistance(_far);
   }
 }
 
@@ -444,7 +390,7 @@ void Camera::SetClipDist(float near, float far)
 /// Set the camera FOV (horizontal)  
 void Camera::SetFOV( float radians )
 {
-  this->hfovP->SetValue(radians);
+  this->sdf->horizontalFov.SetValue(radians);
 }
 
 
@@ -452,7 +398,7 @@ void Camera::SetFOV( float radians )
 /// Get the horizontal field of view of the camera
 math::Angle Camera::GetHFOV() const
 {
-  return this->hfovP->GetValue();
+  return this->sdf->horizontalFov.GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -466,34 +412,34 @@ math::Angle Camera::GetVFOV() const
 /// Get the width of the image
 unsigned int Camera::GetImageWidth() const
 {
-  return this->imageSizeP->GetValue().x;
+  return *this->sdf->imageWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int Camera::GetImageHeight() const
 {
-  return this->imageSizeP->GetValue().y;
+  return *this->sdf->imageHeight;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 int Camera::GetImageDepth() const
 {
-  if (this->imageFormatP->GetValue() == "L8")
+  if (this->sdf->imageFormat.GetValue() == "L8")
     return 1;
-  else if (this->imageFormatP->GetValue() == "R8G8B8")
+  else if (this->sdf->imageFormat.GetValue() == "R8G8B8")
     return 3;
-  else if (this->imageFormatP->GetValue() == "B8G8R8")
+  else if (this->sdf->imageFormat.GetValue() == "B8G8R8")
     return 3;
-  else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
-            (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
-            (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
-            (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+  else if ( (this->sdf->imageFormat.GetValue() == "BAYER_RGGB8") ||
+            (this->sdf->imageFormat.GetValue() == "BAYER_BGGR8") ||
+            (this->sdf->imageFormat.GetValue() == "BAYER_GBRG8") ||
+            (this->sdf->imageFormat.GetValue() == "BAYER_GRBG8") )
     return 1;
   else
   {
-    gzerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
+    gzerr << "Error parsing image format (" << this->sdf->imageFormat.GetValue() << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
 }
@@ -502,7 +448,7 @@ int Camera::GetImageDepth() const
 /// \brief Get the height of the image
 std::string Camera::GetImageFormat() const
 {
-  return this->imageFormatP->GetValue();
+  return this->sdf->imageFormat.GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -525,8 +471,8 @@ unsigned int Camera::GetTextureHeight() const
 size_t Camera::GetImageByteSize() const
 {
 
-  return Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
-                                        (**this->imageSizeP).y, 
+  return Ogre::PixelUtil::getMemorySize(*this->sdf->imageWidth,
+                                        *this->sdf->imageHeight, 
                                         1, 
                                         (Ogre::PixelFormat)this->imageFormat);
 }
@@ -536,20 +482,20 @@ size_t Camera::GetImageByteSize() const
 // Enable or disable saving
 void Camera::EnableSaveFrame(bool enable)
 {
-  this->saveFramesP->SetValue( enable );
+  this->sdf->saveEnabled.SetValue( enable );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the save frame pathname
 void Camera::SetSaveFramePathname(const std::string &pathname)
 {
-  this->savePathnameP->SetValue( pathname );
+  this->sdf->savePath.SetValue( pathname );
 
   // Create the directory to store frames
-  if (this->saveFramesP->GetValue())
+  if (*this->sdf->saveEnabled)
   {
     std::string command;
-    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
+    command = "mkdir " + *this->sdf->savePath + " 2>>/dev/null";
     if (system(command.c_str()) <0)
       gzerr << "Error making directory\n";
   }
@@ -559,7 +505,7 @@ void Camera::SetSaveFramePathname(const std::string &pathname)
 /// Toggle saving of frames
 void Camera::ToggleSaveFrame()
 {
-  this->saveFramesP->SetValue(!this->saveFramesP->GetValue());
+  this->sdf->saveEnabled.SetValue(!(*this->sdf->saveEnabled));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -573,14 +519,20 @@ Ogre::Camera *Camera::GetOgreCamera() const
 /// Get the near clip distance
 double Camera::GetNearClip()
 {
-  return this->nearClipP->GetValue();
+  if (this->camera)
+    return this->camera->getNearClipDistance();
+  else
+    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the far clip distance
 double Camera::GetFarClip()
 {
-  return this->farClipP->GetValue();
+  if (this->camera)
+    return this->camera->getFarClipDistance();
+  else
+    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -663,18 +615,21 @@ const unsigned char *Camera::GetImageData(unsigned int i)
   if (i!=0)
     gzerr << "Camera index must be zero for cam";
 
-  int width = this->imageSizeP->GetValue().x;
-  int height = this->imageSizeP->GetValue().y;
+  int width = *this->sdf->imageWidth;
+  int height = *this->sdf->imageHeight;
 
   // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-  if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
-       (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
-       (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
-       (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+  if ( (this->sdf->imageFormat.GetValue() == "BAYER_RGGB8") ||
+       (this->sdf->imageFormat.GetValue() == "BAYER_BGGR8") ||
+       (this->sdf->imageFormat.GetValue() == "BAYER_GBRG8") ||
+       (this->sdf->imageFormat.GetValue() == "BAYER_GRBG8") )
   {
     if (!this->bayerFrameBuffer)
       this->bayerFrameBuffer = new unsigned char[width*height];
-    this->ConvertRGBToBAYER(this->bayerFrameBuffer,this->saveFrameBuffer,this->imageFormatP->GetValue(),width,height);
+
+    this->ConvertRGBToBAYER(this->bayerFrameBuffer,
+        this->saveFrameBuffer, *this->sdf->imageFormat, width, height);
+
     return this->bayerFrameBuffer;
   }
   else
@@ -701,11 +656,11 @@ void Camera::SaveFrame()
   this->GetImageData();
 
   // Create a directory if not present
-  DIR *dir = opendir( this->savePathnameP->GetValue().c_str() );
+  DIR *dir = opendir( (*this->sdf->savePath).c_str() );
   if (!dir)
   {
     std::string command;
-    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
+    command = "mkdir " + (*this->sdf->savePath) + " 2>>/dev/null";
     if (system(command.c_str()) < 0)
       gzerr << "Error making directory\n";
   }
@@ -716,8 +671,8 @@ void Camera::SaveFrame()
   // Create image data structure
   imgData  = new Ogre::ImageCodec::ImageData();
 
-  imgData->width = this->imageSizeP->GetValue().x;
-  imgData->height = this->imageSizeP->GetValue().y;
+  imgData->width = *this->sdf->imageWidth;
+  imgData->height = *this->sdf->imageHeight;
   imgData->depth = this->GetImageDepth();
   imgData->format = (Ogre::PixelFormat)this->imageFormat;
   size = this->GetImageByteSize();
@@ -726,14 +681,16 @@ void Camera::SaveFrame()
   Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
 
   char tmp[1024];
-  if (!this->savePathnameP->GetValue().empty())
+  if (!(*this->sdf->savePath).empty())
   {
     double wallTime = common::Time::GetWallTime().Double();
     int min = (int)(wallTime / 60.0);
     int sec = (int)(wallTime - min*60);
     int msec = (int)(wallTime*1000 - min*60000 - sec*1000);
 
-    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg", this->savePathnameP->GetValue().c_str(), this->GetName().c_str(), this->saveCount, min, sec, msec);
+    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg", 
+        (*this->sdf->savePath).c_str(), this->GetName().c_str(), 
+        this->saveCount, min, sec, msec);
   }
   else
   {
@@ -953,8 +910,6 @@ void Camera::CreateCamera()
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
 
   this->camera->setDirection(1,0,0);
-
-  this->SetClipDist(**this->nearClipP, **this->farClipP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -975,13 +930,6 @@ math::Vector3 Camera::GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the visibility mask
-unsigned int Camera::GetVisibilityMask() const
-{
-  return this->visibilityMask;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set the render target for the camera
 void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 {
@@ -996,7 +944,7 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 
     double ratio = (double)this->viewport->getActualWidth() / 
                    (double)this->viewport->getActualHeight();
-    double vfov = 2.0 * atan(tan( (**this->hfovP).GetAsRadian() / 2.0) / ratio);
+    double vfov = 2.0 * atan(tan( (*this->sdf->horizontalFov) / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }

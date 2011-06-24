@@ -24,6 +24,8 @@
 
 #include <vector>
 
+#include "sdf/interface/sdf.h"
+
 #include "common/Events.hh"
 #include "common/Time.hh"
 #include "common/Param.hh"
@@ -53,7 +55,7 @@ namespace gazebo
     
       ///  \brief Load the sensor
       /// \param node XMLConfigNode pointer
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( boost::shared_ptr<sdf::Sensor> _sdf );
   
       /// \brief Save the sensor info in XML format
       public: void Save(std::string &prefix, std::ostream &stream);
@@ -91,14 +93,10 @@ namespace gazebo
   
       /// \brief True if active
       protected: bool active;
+      protected: boost::shared_ptr<sdf::Sensor> sdf; 
 
       protected: math::Pose pose;
   
-      protected: common::ParamT<std::string> *nameP;
-      protected: common::ParamT<double> *updateRateP;
-      protected: common::ParamT<bool> *alwaysActiveP;
-      protected: std::vector<common::Param*> parameters;
-
       protected: std::string typeName;
 
       protected: std::vector<event::ConnectionPtr> connections;

@@ -127,30 +127,6 @@ bool getPlugins(TiXmlElement *_parentXml,
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<SensorType> &_sensorType)
-{
-  if (_sensorType->type == SensorType::CAMERA)
-  {
-    boost::shared_ptr<CameraSensor> cameraSensor = boost::shared_static_cast<CameraSensor>( _sensorType);
-    return initXml(_config, cameraSensor);
-  }
-  else if (_sensorType->type == SensorType::RAY)
-  {
-    boost::shared_ptr<RaySensor> raySensor(boost::shared_static_cast<RaySensor>( _sensorType));
-    return initXml(_config, raySensor);
-  }
-  else if (_sensorType->type == SensorType::CONTACT)
-  {
-    boost::shared_ptr<ContactSensor> contactSensor(boost::shared_static_cast<ContactSensor>( _sensorType));
-    return initXml(_config, contactSensor);
-  }
-  else
-  {
-    gzerr << "SensorType init unknown type\n";
-    return false;
-  }
-
-}
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
 {
@@ -168,27 +144,6 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
   if (!_sensor->type.Set(_config->Attribute("type")))
   {
     gzerr << "Unable to parse sensor type\n";
-    return false;
-  }
-
-  if (_sensor->type.GetValue() == "camera")
-  {
-    _sensor->sensorType.reset(new CameraSensor);
-    initXml(_config, _sensor->sensorType);
-  }
-  else if (_sensor->type.GetValue() == "ray")
-  {
-    _sensor->sensorType.reset(new RaySensor);
-    initXml(_config, _sensor->sensorType);
-  }
-  else if (_sensor->type.GetValue() == "contact")
-  {
-    _sensor->sensorType.reset(new ContactSensor);
-    initXml(_config, _sensor->sensorType);
-  }
-  else
-  {
-    gzerr << "Unknown sensor type[" << _sensor->type << "]\n";
     return false;
   }
 
@@ -220,13 +175,28 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
     }
   }
 
+  if (_sensor->type.GetValue() == "contact")
+  {
+    boost::shared_ptr<Contact> contact = boost::shared_static_cast<Contact>(_sensor);
+    initXml(_config, contact );
+  }
+  else if (*_sensor->type == "camera")
+  {
+    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor);
+    initXml(_config, camera);
+  }
+  else if (*_sensor->type == "ray")
+  {
+
+    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor);
+    initXml(_config, ray);
+  }
+
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<CameraSensor> &_sensor)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
 {
-  _sensor->Clear();
-
   // Horizontal field of view
   TiXmlElement *hfov = _config->FirstChildElement("horizontal_fov");
   if(!hfov)
@@ -307,10 +277,8 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<CameraSensor> &_sensor)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<RaySensor> &_sensor)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
 {
-  _sensor->Clear();
-
   // scan 
   TiXmlElement *scan = _config->FirstChildElement("scan");
   if (scan)
@@ -628,7 +596,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
     {
       if (std::string(contactXml->Value()) == "ode")
       {
-        boost::shared_ptr<ODEContact> odeContact( new ODEContact );
+        boost::shared_ptr<ODESurfaceContact> odeContact( new ODESurfaceContact );
         if (!initXml(contactXml, odeContact))
         {
           gzerr << "Unable to parse ODE Contact element\n";
@@ -677,7 +645,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEFriction> &_friction)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEContact> &_contact)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<ODESurfaceContact> &_contact)
 {
   if (!_contact->softCFM.Set( _config->Attribute("soft_cfm") ))
   {
@@ -860,8 +828,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
   for (TiXmlElement* sensorXml = _config->FirstChildElement("sensor"); 
       sensorXml; sensorXml = sensorXml->NextSiblingElement("sensor"))
   {
+    std::string sensorType = sensorXml->Attribute("type");
+
     boost::shared_ptr<Sensor> sensor;
-    sensor.reset(new Sensor);
+    if ( sensorType == "camera")
+      sensor.reset(new Camera);
+    else if (sensorType == "ray")
+      sensor.reset(new Ray);
+    else if (sensorType == "contact")
+      sensor.reset(new Contact);
+    else
+    {
+      gzerr << "Unknown sensor type[" << sensorType << "]\n";
+      return false;
+    }
 
     if (initXml(sensorXml,sensor))
     {
@@ -1653,8 +1633,7 @@ bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
   return true;
 }
 
-bool initXml(TiXmlElement * /*_config*/, 
-             boost::shared_ptr<ContactSensor> &/*_contact*/)
+bool initXml(TiXmlElement * /*_config*/, boost::shared_ptr<Contact> & /*_sensor*/)
 {
   return true;
 }
@@ -2103,17 +2082,17 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor)
   sensorNode->SetAttribute( _sensor->origin.GetKey(),
                             _sensor->origin.GetAsString() );
 
-  if (_sensor->sensorType->type == SensorType::CAMERA)
+  if ((*_sensor->type) == "camera")
   {
-    boost::shared_ptr<CameraSensor> camera = boost::shared_static_cast<CameraSensor>(_sensor->sensorType);
+    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor);
     saveXml( sensorNode, camera);
   }
-  else if (_sensor->sensorType->type == SensorType::RAY)
+  else if ( (*_sensor->type) == "ray")
   {
-    boost::shared_ptr<RaySensor> ray = boost::shared_static_cast<RaySensor>(_sensor->sensorType);
+    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor);
     saveXml( sensorNode, ray);
   }
-  else if (_sensor->sensorType->type != SensorType::CONTACT)
+  else if ( (*_sensor->type) != "contact")
   {
     gzerr << "Unknown sensor type[" << _sensor->type << "]\n";
     return false;
@@ -2122,7 +2101,7 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Sensor> &_sensor)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<CameraSensor> &_camera)
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Camera> &_camera)
 {
   TiXmlElement *hfovNode = new TiXmlElement("horizontal_fov");
   _parent->LinkEndChild( hfovNode );
@@ -2153,7 +2132,7 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<CameraSensor> &_came
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<RaySensor> &_ray)
+bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Ray> &_ray)
 {
   TiXmlElement *scanNode = new TiXmlElement("scan");
   _parent->LinkEndChild( scanNode );
@@ -2253,12 +2232,12 @@ bool saveXml(TiXmlElement *_parent, boost::shared_ptr<Surface> &_surface)
     TiXmlElement *contactNode = new TiXmlElement("contact");
     surfaceNode->LinkEndChild( contactNode );
 
-    std::vector< boost::shared_ptr<Contact> >::const_iterator citer;
+    std::vector< boost::shared_ptr<SurfaceContact> >::const_iterator citer;
     for (citer = _surface->contacts.begin(); citer != _surface->contacts.end(); citer++)
     {
-      if ((*citer)->type == Contact::ODE)
+      if ((*citer)->type == SurfaceContact::ODE)
       {
-        boost::shared_ptr<ODEContact> odeContact = boost::shared_static_cast<ODEContact>(*citer);
+        boost::shared_ptr<ODESurfaceContact> odeContact = boost::shared_static_cast<ODESurfaceContact>(*citer);
         saveXml(contactNode, odeContact);
       }
     }
@@ -2285,7 +2264,7 @@ bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEFriction> &_friction)
   return true;
 }
 
-bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODEContact> &_contact)
+bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODESurfaceContact> &_contact)
 {
   TiXmlElement *odeNode = new TiXmlElement("ode");
   _parent->LinkEndChild( odeNode );

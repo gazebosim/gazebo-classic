@@ -110,7 +110,7 @@ Scene::~Scene()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Scene::SetParams(const boost::shared_ptr<sdf::Scene> &_scene)
+void Scene::SetParams(boost::shared_ptr<sdf::Scene> &_scene)
 {
   this->sdf = _scene;
 }
@@ -309,7 +309,7 @@ CameraPtr Scene::GetCamera(unsigned int index) const
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
   UserCameraPtr camera( new UserCamera(this->name + "::" + name_, this) );
-  camera->Load(NULL);
+  camera->Load( boost::shared_ptr<sdf::Camera>() );
   camera->Init();
   this->userCameras.push_back(camera);
 

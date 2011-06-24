@@ -49,12 +49,13 @@
 
 namespace sdf
 {
-  class SensorType
+  /*class SensorType
   {
     public: enum Type{CAMERA, RAY, CONTACT};
     public: SensorType(Type _type) : type(_type) {}
     public: Type type;
   };
+  */
   
   class Sensor
   {
@@ -70,7 +71,7 @@ namespace sdf
   
     public: ParamT<gazebo::math::Pose, true> origin;
   
-    public: boost::shared_ptr<SensorType> sensorType;
+    //public: boost::shared_ptr<SensorType> sensorType;
 
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
@@ -82,8 +83,6 @@ namespace sdf
       this->alwaysOn.Reset();
       this->updateRate.Reset();
       this->origin.Reset();
-
-      this->sensorType.reset();
       this->plugins.clear();
     }
 
@@ -100,14 +99,14 @@ namespace sdf
     }
   };
   
-  class ContactSensor : public SensorType
+  class Contact : public Sensor
   {
-    public: ContactSensor() : SensorType(CONTACT) {}
+    public: Contact() : Sensor() {}
   };
   
-  class CameraSensor : public SensorType
+  class Camera : public Sensor
   {
-    public: CameraSensor() : SensorType(CAMERA), horizontalFov("horizontal_fov", 0.0),
+    public: Camera() : Sensor(), horizontalFov("horizontal_fov", 0.0),
             imageWidth("width",0), imageHeight("height",0),
             imageFormat("format","R8G8B8"), clipNear("near",0.0), 
             clipFar("far",1.0), saveEnabled("enabled", false), 
@@ -136,9 +135,9 @@ namespace sdf
     }
   };
   
-  class RaySensor : public SensorType
+  class Ray : public Sensor
   {
-    public: RaySensor() : SensorType(RAY), 
+    public: Ray() : Sensor(), 
             display("display", false),
             horizontalSamples("samples",1), 
             horizontalResolution("resolution", 1), 

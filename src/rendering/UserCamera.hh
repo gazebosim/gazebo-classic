@@ -17,13 +17,11 @@
 /* Desc: Camera for viewing the world
  * Author: Nate Koenig
  * Date: 19 Jun 2008
- * SVN: $Id$
  */
 
 #ifndef USERCAMERA_HH
 #define USERCAMERA_HH
 
-#include "common/XMLConfig.hh"
 #include "rendering/Camera.hh"
 
 namespace Ogre
@@ -36,7 +34,6 @@ namespace gazebo
 {
   namespace common
   {
-    class XMLConfigNode;
     class MouseEvent;
   }
 
@@ -52,8 +49,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~UserCamera();
   
-      /// \brief Load child
-      public: void Load( common::XMLConfigNode *node );
+      /// \brief Load the user camera
+      public: void Load( boost::shared_ptr<sdf::Camera> _sdf );
   
       /// \brief Initialize
       public: void Init();

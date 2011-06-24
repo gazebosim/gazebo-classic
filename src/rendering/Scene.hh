@@ -71,7 +71,7 @@ namespace gazebo
       public: virtual ~Scene();
   
       /// \brief Load the scene
-      public: void SetParams(const boost::shared_ptr<sdf::Scene> &scene);
+      public: void SetParams(boost::shared_ptr<sdf::Scene> &_scene);
   
       /// \brief Init
       public: void Init();

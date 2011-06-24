@@ -78,9 +78,9 @@ UserCamera::~UserCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load child
-void UserCamera::Load(common::XMLConfigNode *node)
+void UserCamera::Load( boost::shared_ptr<sdf::Camera> _sdf )
 {
-  Camera::Load(node);
+  Camera::Load(_sdf);
 
   this->SetFOV( DTOR(60) );
   this->SetClipDist(0.001, 100);
@@ -188,12 +188,12 @@ void UserCamera::PostRender()
 {
   Camera::PostRender();
 
-  if (**this->saveFramesP)
+  if (*this->sdf->saveEnabled)
   {
     char tmp[1024];
-    if (!this->savePathnameP->GetValue().empty())
+    if (!(*this->sdf->savePath).empty())
     {
-      sprintf(tmp, "%s/%s-%04d.jpg", this->savePathnameP->GetValue().c_str(),
+      sprintf(tmp, "%s/%s-%04d.jpg", (*this->sdf->savePath).c_str(),
           this->name.c_str(), this->saveCount);
     }
     else

@@ -42,7 +42,7 @@ sensors::SensorPtr sensors::create_sensor(const std::string &type)
 
   if (sensor)
   {
-    sensor->Load(NULL);
+    sensor->Load( boost::shared_ptr<sdf::Sensor>() );
     sensor->Init();
   }
   else

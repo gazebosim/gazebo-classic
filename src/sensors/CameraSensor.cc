@@ -60,11 +60,11 @@ CameraSensor::~CameraSensor()
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void CameraSensor::Load( common::XMLConfigNode *node )
+void CameraSensor::Load( boost::shared_ptr<sdf::Camera> _sdf )
 {
-  Sensor::Load(node);
+  Sensor::Load(_sdf);
 
-  this->camera->Load( NULL );
+  this->camera->Load( _sdf );
 
   // Do some sanity checks
   if (this->camera->GetImageWidth() == 0 || 
@@ -72,15 +72,6 @@ void CameraSensor::Load( common::XMLConfigNode *node )
   {
     gzthrow("image has zero size");
   }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save the sensor info in XML format
-void CameraSensor::Save(std::string &prefix, std::ostream &stream)
-{
-  Sensor::Save(prefix, stream);
-  std::string p = prefix + "  ";
-  this->camera->Save(p, stream);
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -30,6 +30,8 @@
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
 
+#include "sdf/interface/sdf.h"
+
 // Forward Declarations
 namespace Ogre
 {
@@ -64,14 +66,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Camera();
     
-      /// \brief Load the camera using parameter from an XMLConfig node
-      /// \param node The XMLConfig node
-      public: void Load( common::XMLConfigNode *node );
+      /// \brief Load the camera
+      /// \param node The SDF camera info
+      public: void Load( boost::shared_ptr<sdf::Camera> _sdf );
   
-      /// \brief Save camera info in xml format
-      /// \param stream Output stream
-      public: void Save(std::string &prefix, std::ostream &stream);
-    
       /// \brief Initialize the camera
       public: void Init();
   
@@ -252,9 +250,6 @@ namespace gazebo
       /// \brief Get point on a plane
       public: math::Vector3 GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm, double d);
   
-      /// \brief Get the visibility mask
-      public: unsigned int GetVisibilityMask() const;
-  
       public: void SetRenderTarget( Ogre::RenderTarget *target );
 
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
@@ -267,11 +262,11 @@ namespace gazebo
       private: void CreateCamera();
   
       private: std::string name;
+      private: math::Pose pose;
+      protected: boost::shared_ptr<sdf::Camera> sdf;
+
       protected: unsigned int windowId;
   
-      protected: common::ParamT<math::Angle> *hfovP;
-      protected: common::ParamT<double> *nearClipP, *farClipP, *updateRateP;
-      protected: common::ParamT< math::Vector2i > *imageSizeP;
       protected: unsigned int textureWidth, textureHeight;
     
       protected: Ogre::Camera *camera;
@@ -280,19 +275,13 @@ namespace gazebo
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
     
-      private: math::Pose pose;
     
       // Info for saving images
       protected: unsigned char *saveFrameBuffer;
       protected: unsigned char *bayerFrameBuffer;
       protected: unsigned int saveCount;
-      protected: common::ParamT<bool> *saveFramesP;
-      protected: common::ParamT<std::string> *savePathnameP;
-      protected: common::ParamT<std::string> *imageFormatP;
    
-      protected: common::ParamT<std::string> *visMaskP;
       protected: int imageFormat;
-      protected: unsigned int visibilityMask;
   
       protected: Ogre::RenderTarget *renderTarget;
   

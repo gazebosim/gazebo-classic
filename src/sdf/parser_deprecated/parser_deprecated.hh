@@ -54,10 +54,9 @@
 namespace sdf
 {
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<SensorType> &_sensor_type);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<ContactSensor> &_contact);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<CameraSensor> &_sensor);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<RaySensor> &_sensor);
+  bool initXml(xmlNodePtr _config, boost::shared_ptr<Contact> &_contact);
+  bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor);
+  bool initXml(xmlNodePtr _config, boost::shared_ptr<Ray> &_sensor);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision);
