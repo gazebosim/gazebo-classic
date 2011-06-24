@@ -291,10 +291,12 @@ namespace sdf
   
   class Link
   {
-    public: Link() : name("name", ""), selfCollide("self_collide", false), 
+    public: Link() : origin("origin", Pose()), name("name", ""),
+                     selfCollide("self_collide", false), 
                      gravity("gravity",true) 
     { this->Clear(); };
 
+    public: ParamT<Pose, false> origin;
     public: ParamT<std::string, true> name;
     public: ParamT<bool, false> selfCollide;
     public: ParamT<bool, false> gravity;
@@ -313,6 +315,7 @@ namespace sdf
 
     public: void Clear()
             {
+              this->origin.Reset();
               this->name.Reset();
               this->inertial.reset();
               this->visuals.clear();

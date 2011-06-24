@@ -787,6 +787,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     return false;
   }
 
+  // Origin
+  TiXmlElement *o = _config->FirstChildElement("origin");
+  if (!o)
+  {
+    gzwarn << "Origin tag not present for link element, using default (Identity)\n";
+    _link->origin.Reset();
+  }
+  else if (!_link->origin.Set(o->Attribute("xyz"),o->Attribute("rpy")))
+  {
+    gzerr << "Unable to parase link origin element\n";
+    _link->origin.Reset();
+    return false;
+  }
+
   // Inertial (optional)
   TiXmlElement *i = _config->FirstChildElement("inertial");
   if (i)

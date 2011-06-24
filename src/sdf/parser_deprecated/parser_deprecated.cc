@@ -39,6 +39,8 @@
 
 #include "common/Console.hh"
 #include "sdf/parser_deprecated/parser_deprecated.hh"
+#include "sdf/interface/Param.hh"
+#include "sdf/interface/pose.hh"
 
 namespace sdf
 {
@@ -133,6 +135,9 @@ bool getPlugins(xmlNodePtr _parentXml,
 
 bool initXml(xmlNodePtr _config, boost::shared_ptr<SensorType> &_sensorType)
 {
+
+  // rather than gating on type, we need to gate on xml element name (sensor:...)
+  // so start with initXml for Sensor
   if (_sensorType->type == SensorType::CAMERA)
   {
     boost::shared_ptr<CameraSensor> cameraSensor = boost::shared_static_cast<CameraSensor>( _sensorType);
@@ -169,9 +174,9 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
     return false;
   }
      
-  if (!_sensor->type.Set( (const char*)xmlGetProp(_config, (xmlChar*)"type")))
+  if (!_sensor->type.Set( (const char*)_config->name ))
   {
-    gzerr << "Unable to parse sensor type\n";
+    gzerr << "Unable to parse sensor type from the namespaced sensor block name\n";
     return false;
   }
 
@@ -196,20 +201,22 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
     return false;
   }
 
-  if (!_sensor->alwaysOn.Set( (const char*)xmlGetProp(_config, (xmlChar*)"always_on")))
+  std::string tmp;
+  
+  if (!_sensor->alwaysOn.Set( (const char*)((getValue(firstChildElement(_config,"alwaysOn")).c_str()))))
   {
-    gzerr << "Unable to parse sensor always_on\n";
+    gzerr << "Unable to parse sensor alwaysOn\n";
     return false;
   }
 
-  if (!_sensor->updateRate.Set( (const char*)xmlGetProp(_config, (xmlChar*)"update_rate")))
+  if (!_sensor->updateRate.Set( (const char*)((getValue(firstChildElement(_config,"updateRate")).c_str()))))
   {
-    gzerr << "Unable to parse sensor update_rate\n";
+    gzerr << "Unable to parse sensor updateRate\n";
     return false;
   }
 
   // Origin
-  xmlNodePtr o = FirstChildElement(_config, "origin");
+  xmlNodePtr o = firstChildElement(_config, "origin");
   if (!o)
   {
     gzwarn << "Origin tag not present for sensor element, using default (Identity)\n";
@@ -217,9 +224,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
   }
   else
   {
-    std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
-    std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
-    if (!_sensor->origin.Set( (xyz+rpy).c_str() ))
+    if (!_sensor->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy") ))
     {
       gzerr << "Sensor has malformed orgin\n";
       return false;
@@ -234,7 +239,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<CameraSensor> &_sensor)
   _sensor->Clear();
 
   // Horizontal field of view
-  xmlNodePtr hfov = FirstChildElement(_config, "horizontal_fov");
+  xmlNodePtr hfov = firstChildElement(_config, "horizontal_fov");
   if(!hfov)
   {
     gzerr << "CameraSensor missing horizontal_fov element\n";
@@ -248,7 +253,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<CameraSensor> &_sensor)
   }
 
   // Image 
-  xmlNodePtr image = FirstChildElement(_config, "image");
+  xmlNodePtr image = firstChildElement(_config, "image");
   if (!image)
   {
     gzerr << "CameraSensor sensor requires an image element \n";
@@ -274,7 +279,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<CameraSensor> &_sensor)
   }
 
   // clip 
-  xmlNodePtr clip = FirstChildElement(_config, "clip");
+  xmlNodePtr clip = firstChildElement(_config, "clip");
   if (!clip)
   {
     gzerr << "CameraSensor sensor requires an clip element \n";
@@ -294,7 +299,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<CameraSensor> &_sensor)
   }
 
   // save 
-  xmlNodePtr save = FirstChildElement(_config, "save");
+  xmlNodePtr save = firstChildElement(_config, "save");
   if (save)
   {
     if (!_sensor->saveEnabled.Set( (const char*)xmlGetProp(save,(xmlChar*)"enabled")))
@@ -318,7 +323,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<RaySensor> &_sensor)
   _sensor->Clear();
 
   // scan 
-  xmlNodePtr scan = FirstChildElement(_config, "scan");
+  xmlNodePtr scan = firstChildElement(_config, "scan");
   if (scan)
   {
     if (!_sensor->display.Set( (const char*)xmlGetProp(scan,(xmlChar*)"display")))
@@ -328,7 +333,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<RaySensor> &_sensor)
     }
 
     // Horizontal scans
-    xmlNodePtr horizontal = FirstChildElement(scan, "horizontal");
+    xmlNodePtr horizontal = firstChildElement(scan, "horizontal");
     if (!horizontal)
     {
       gzerr << "missing horizontal element";
@@ -360,7 +365,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<RaySensor> &_sensor)
     }
 
     // Vertical scans
-    xmlNodePtr vertical = FirstChildElement(_config, "vertical");
+    xmlNodePtr vertical = firstChildElement(_config, "vertical");
     if (!vertical)
     {
       gzerr << "missing vertical element\n";
@@ -393,7 +398,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<RaySensor> &_sensor)
 
 
     // range 
-    xmlNodePtr range = FirstChildElement(_config, "range");
+    xmlNodePtr range = firstChildElement(_config, "range");
     if (!range)
     {
       gzerr << "ray sensor missing range element\n";
@@ -435,7 +440,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material)
   }
 
   // color
-  xmlNodePtr c = FirstChildElement(_config, "color");
+  xmlNodePtr c = firstChildElement(_config, "color");
   if (c)
   {
     if ( (const char*)xmlGetProp(c,(xmlChar*)"rgba"))
@@ -462,67 +467,59 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
 {
   _inertial->Clear();
 
-  // Origin
-  xmlNodePtr o = FirstChildElement(_config, "origin");
-  if (!o)
-  {
-    gzwarn << "INFO: Origin tag not present for inertial element, using default (Identity)\n";
-    _inertial->origin.Reset();
-  }
-  else
-  {
-    std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
-    std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
+  // Origin (old gazebo xml supports only cx,cy,cz translations, no rotation
+  // xyz and rpy under body:... is for the link frame
+  ParamT<double, false> cx("cgx", 0);
+  ParamT<double, false> cy("cgy", 0);
+  ParamT<double, false> cz("cgz", 0);
+  xmlNodePtr cx_xml = firstChildElement(_config, "cx");
+  xmlNodePtr cy_xml = firstChildElement(_config, "cy");
+  xmlNodePtr cz_xml = firstChildElement(_config, "cz");
+  if (cx_xml) cx.Set( getValue(cx_xml).c_str() );
+  if (cy_xml) cy.Set( getValue(cy_xml).c_str() );
+  if (cz_xml) cz.Set( getValue(cz_xml).c_str() );
+  Pose cg; cg.position = Vector3(cx.GetValue(),cy.GetValue(),cz.GetValue());
+  _inertial->origin.SetValue(cg);
 
-    if (!_inertial->origin.Set( (xyz+rpy).c_str() ))
-    {
-      gzerr << "Unable to parse origin tag\n";
-      _inertial->origin.Reset();
-      return false;
-    }
-  }
-
-  if (! (const char*)xmlGetProp(_config,(xmlChar*)"mass"))
+  xmlNodePtr mass_xml = firstChildElement(_config, "mass");
+  if (! mass_xml )
   {
     gzerr << "Inertial element must have mass attribute.";
     return false;
   }
 
-  if (!_inertial->mass.Set( (const char*)xmlGetProp(_config,(xmlChar*)"mass")))
+  if (!_inertial->mass.Set( getValue(mass_xml).c_str()))
   {
     gzerr << "Unable to parse inerital mass attribute\n";
     return false;
   }
 
-  xmlNodePtr inertiaXml = FirstChildElement(_config, "inertia");
-  if (!inertiaXml)
-  {
-    gzerr << "Inertial element must have inertia element\n";
-    return false;
-  }
 
-  if (!( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixx") && (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixy") && 
-         (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixz") && (const char*)xmlGetProp(inertiaXml,(xmlChar*)"iyy") && 
-         (const char*)xmlGetProp(inertiaXml,(xmlChar*)"iyz") && (const char*)xmlGetProp(inertiaXml,(xmlChar*)"izz")))
+  xmlNodePtr ixx_xml = firstChildElement(_config, "ixx");
+  xmlNodePtr ixy_xml = firstChildElement(_config, "ixy");
+  xmlNodePtr ixz_xml = firstChildElement(_config, "ixz");
+  xmlNodePtr iyy_xml = firstChildElement(_config, "iyy");
+  xmlNodePtr iyz_xml = firstChildElement(_config, "iyz");
+  xmlNodePtr izz_xml = firstChildElement(_config, "izz");
+  if (!ixx_xml || !ixy_xml || !ixz_xml || !iyy_xml || !iyz_xml || !izz_xml) 
   {
     gzerr << "Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes\n";
     return false;
   }
-
-  if (!_inertial->ixx.Set( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixx")) || 
-      !_inertial->ixy.Set( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixy")) || 
-      !_inertial->ixz.Set( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixz")) || 
-      !_inertial->iyy.Set( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"iyy")) || 
-      !_inertial->iyz.Set( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"iyz")) || 
-      !_inertial->izz.Set( (const char*)xmlGetProp(inertiaXml,(xmlChar*)"izz")) )
+  if (!_inertial->ixx.Set( getValue(ixx_xml).c_str() ) ||
+      !_inertial->ixy.Set( getValue(ixy_xml).c_str() ) ||
+      !_inertial->ixz.Set( getValue(ixz_xml).c_str() ) ||
+      !_inertial->iyy.Set( getValue(iyy_xml).c_str() ) ||
+      !_inertial->iyz.Set( getValue(iyz_xml).c_str() ) ||
+      !_inertial->izz.Set( getValue(izz_xml).c_str() ) )
   {
     gzerr << "one of the inertia elements: "
-      << "ixx (" << (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixx") << ") "
-      << "ixy (" << (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixy") << ") "
-      << "ixz (" << (const char*)xmlGetProp(inertiaXml,(xmlChar*)"ixz")  << ") "
-      << "iyy (" << (const char*)xmlGetProp(inertiaXml,(xmlChar*)"iyy")  << ") "
-      << "iyz (" << (const char*)xmlGetProp(inertiaXml,(xmlChar*)"iyz")  << ") "
-      << "izz (" << (const char*)xmlGetProp(inertiaXml,(xmlChar*)"izz")  << ") "
+      << "ixx (" << getValue(ixx_xml) << ") "
+      << "ixy (" << getValue(ixy_xml) << ") "
+      << "ixz (" << getValue(ixz_xml) << ") "
+      << "iyy (" << getValue(iyy_xml) << ") "
+      << "iyz (" << getValue(iyz_xml) << ") "
+      << "izz (" << getValue(izz_xml) << ") "
       << "is not a valid double.\n";
     return false;
   }
@@ -541,16 +538,13 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
   }
 
   // Origin
-  xmlNodePtr o = FirstChildElement(_config, "origin");
-  std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
-  std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
-
+  xmlNodePtr o = firstChildElement(_config, "origin");
   if (!o)
   {
     gzwarn << "Origin tag not present for collision element, using default (Identity\n";
     _collision->origin.Reset();
   }
-  else if (!_collision->origin.Set( (xyz+rpy).c_str()))
+  else if (!_collision->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
   {
     gzerr << "Unable to parse collision origin element\n";
     _collision->origin.Reset();
@@ -558,7 +552,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
   }
 
   // Geometry
-  xmlNodePtr geom = FirstChildElement(_config, "geometry");
+  xmlNodePtr geom = firstChildElement(_config, "geometry");
   if (geom)
   {
     _collision->geometry.reset( new Geometry);
@@ -651,43 +645,48 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     return false;
   }
 
-  // Inertial (optional)
-  xmlNodePtr i = FirstChildElement(_config, "inertial");
-  if (i)
+  // location of the link relative to the model
+  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
+  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
+  if (!xyz_xml && !rpy_xml)
   {
-    _link->inertial.reset(new Inertial);
-    if (!initXml(i,_link->inertial))
+    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
+    _link->origin.Reset();
+  }
+  else
+  {
+    printf("debug link origin [%s, %s]\n", getValue(xyz_xml).c_str(), getValue(rpy_xml).c_str() );
+    if (!_link->origin.Set( getValue(xyz_xml).c_str(), getValue(rpy_xml).c_str() ))
     {
-      gzerr << "Could not parse inertial element for Link '" 
-        << _link->name << "'\n";
+      gzerr << "Unable to parse origin tag\n";
+      _link->origin.Reset();
       return false;
     }
   }
 
-  // Multiple Visuals (optional)
-  for (xmlNodePtr  visXml = FirstChildElement(_config, "visual"); 
-      visXml; visXml = NextSiblingElement(visXml, "visual"))
-  {
-    boost::shared_ptr<Visual> vis;
-    vis.reset(new Visual);
 
-    if (initXml(visXml,vis))
+  // Inertial (optional)
+  xmlNodePtr mm = firstChildElement(_config, "massMatrix");
+  ParamT<bool, false> custom_mass_matrix("mass",false);
+  if (mm)
+  {
+    custom_mass_matrix.Set( getValue(mm).c_str() );
+    printf("inertial [%s] custom matrix\n",getValue(mm).c_str());
+    if (custom_mass_matrix.GetValue())
     {
-      //  add Visual to the vector
-      _link->visuals.push_back(vis);
-    }
-    else
-    {
-      gzerr << "Could not parse visual element for Link '" 
-        << _link->name << "'\n";
-      vis.reset();
-      return false;
+      _link->inertial.reset(new Inertial);
+      if (!initXml(_config,_link->inertial))
+      {
+        gzerr << "Could not parse inertial element for Link '" 
+          << _link->name << "'\n";
+        return false;
+      }
     }
   }
 
   // Multiple Collisions (optional)
-  for (xmlNodePtr  colXml = FirstChildElement(_config, "collision"); 
-      colXml; colXml = NextSiblingElement(colXml, "collision"))
+  for (xmlNodePtr  colXml = getChildByNSPrefix(_config, "geom"); 
+      colXml; colXml = getNextByNSPrefix(colXml, "geom"))
   {
     boost::shared_ptr<Collision> col;
     col.reset(new Collision);
@@ -696,6 +695,29 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     {
       // group exists, add Collision to the vector in the map
       _link->collisions.push_back(col);
+
+      // FIXME: there should be only 1 visual under a geom?
+      // Multiple Visuals (optional)
+      for (xmlNodePtr  visXml = getChildByNSPrefix(_config, "visual"); 
+          visXml; visXml = getNextByNSPrefix(visXml, "visual"))
+      {
+        boost::shared_ptr<Visual> vis;
+        vis.reset(new Visual);
+
+        if (initXml(visXml,vis))
+        {
+          //  add Visual to the vector
+          _link->visuals.push_back(vis);
+        }
+        else
+        {
+          gzerr << "Could not parse visual element for Link '" 
+            << _link->name << "'\n";
+          vis.reset();
+          return false;
+        }
+      }
+
     }
     else
     {
@@ -706,9 +728,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     }
   }
 
+
   // Get all sensor elements
-  for (xmlNodePtr  sensorXml = FirstChildElement(_config, "sensor"); 
-      sensorXml; sensorXml = NextSiblingElement(sensorXml, "sensor"))
+  // FIXME: instead of child elements, get namespace == sensor blocks
+  for (xmlNodePtr  sensorXml = firstChildElement(_config, "sensor"); 
+      sensorXml; sensorXml = nextSiblingElement(sensorXml, "sensor"))
   {
     boost::shared_ptr<Sensor> sensor;
     sensor.reset(new Sensor);
@@ -754,16 +778,13 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
   }
 
   // Origin
-  xmlNodePtr o = FirstChildElement(_config, "origin");
-  std::string xyz =  (const char*)xmlGetProp(o,(xmlChar*)"xyz");
-  std::string rpy = (const char*)xmlGetProp(o,(xmlChar*)"rpy");
-
+  xmlNodePtr o = firstChildElement(_config, "origin");
   if (!o)
   {
     gzwarn << "Origin tag not present for visual element, using default (Identity)\n";
     _visual->origin.Reset();
   }
-  else if (!_visual->origin.Set( (xyz+rpy).c_str() ))
+  else if (!_visual->origin.Set( (const char*)xmlGetProp(o,(xmlChar*)"xyz"), (const char*)xmlGetProp(o,(xmlChar*)"rpy")))
   {
     gzerr << "Unable to parase visual origin element\n";
     _visual->origin.Reset();
@@ -771,7 +792,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
   }
 
   // Geometry
-  xmlNodePtr geometryXml = FirstChildElement(_config, "geometry");
+  xmlNodePtr geometryXml = firstChildElement(_config, "geometry");
   if (geometryXml)
   {
     _visual->geometry.reset(new Geometry);
@@ -789,7 +810,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
 
 
   // Material
-  xmlNodePtr mat = FirstChildElement(_config, "material");
+  xmlNodePtr mat = firstChildElement(_config, "material");
   if (mat)
   {
     // try to parse material element in place
@@ -868,17 +889,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get transform from Parent Link to Joint Frame
-  xmlNodePtr originXml = FirstChildElement(_config, "origin");
+  xmlNodePtr originXml = firstChildElement(_config, "origin");
   if (!originXml)
   {
     _joint->origin.Reset();
   }
   else
   {
-    std::string xyz =  (const char*)xmlGetProp(originXml,(xmlChar*)"xyz");
-    std::string rpy = (const char*)xmlGetProp(originXml,(xmlChar*)"rpy");
-
-    if (!_joint->origin.Set( (xyz+rpy).c_str()))
+    if (!_joint->origin.Set( (const char*)xmlGetProp(originXml,(xmlChar*)"xyz"),
+                             (const char*)xmlGetProp(originXml,(xmlChar*)"rpy")))
     {
       gzerr << "Unable to parse joint origin element\n";
       _joint->origin.Reset();
@@ -887,7 +906,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get Parent Link
-  xmlNodePtr parentXml = FirstChildElement(_config, "parent");
+  xmlNodePtr parentXml = firstChildElement(_config, "parent");
   if (parentXml)
   {
     if (!_joint->parentLinkName.Set( (const char*)xmlGetProp(parentXml,(xmlChar*)"link")))
@@ -903,7 +922,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get Child Link
-  xmlNodePtr childXml = FirstChildElement(_config, "child");
+  xmlNodePtr childXml = firstChildElement(_config, "child");
   if (childXml)
   {
     if (!_joint->childLinkName.Set( (const char*)xmlGetProp(childXml,(xmlChar*)"link")))
@@ -952,12 +971,12 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   if (_joint->typeEnum != Joint::BALL)
   {
     // axis
-    xmlNodePtr axisXml = FirstChildElement(_config, "axis");
+    xmlNodePtr axisXml = firstChildElement(_config, "axis");
     if (!axisXml)
     {
       gzwarn << "no axis elemement for Joint link '" 
         << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis.SetValue( gazebo::math::Vector3(1.0, 0.0, 0.0));
+      _joint->axis.SetValue( Vector3(1.0, 0.0, 0.0));
     }
     else{
       if (!_joint->axis.Set( (const char*)xmlGetProp(axisXml,(xmlChar*)"xyz")) )
@@ -969,7 +988,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get limit
-  xmlNodePtr limitXml = FirstChildElement(_config, "limit");
+  xmlNodePtr limitXml = firstChildElement(_config, "limit");
   if (limitXml)
   {
     _joint->limits.reset(new JointLimits);
@@ -983,7 +1002,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get Dynamics
-  xmlNodePtr propXml = FirstChildElement(_config, "dynamics");
+  xmlNodePtr propXml = firstChildElement(_config, "dynamics");
   if (propXml)
   {
     _joint->dynamics.reset(new JointDynamics);
@@ -1042,7 +1061,7 @@ bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<Model> &_model)
     return false;
   }
 
-  xmlNodePtr modelXml = FirstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
+  xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
   if (!modelXml)
   {
     gzerr << "Could not find the 'model' element in the xml file\n";
@@ -1068,8 +1087,8 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
   }
 
   // Get all Link elements
-  for (xmlNodePtr  linkXml = FirstChildElement(_xml, "link"); 
-      linkXml; linkXml = NextSiblingElement(linkXml, "link"))
+  for (xmlNodePtr  linkXml = getChildByNSPrefix(_xml, "body"); 
+      linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
   {
     boost::shared_ptr<Link> link;
     link.reset(new Link);
@@ -1102,8 +1121,8 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
   }
 
   // Get all Joint elements
-  for (xmlNodePtr  jointXml = FirstChildElement(_xml, "joint"); 
-      jointXml; jointXml = NextSiblingElement(jointXml, "joint"))
+  for (xmlNodePtr  jointXml = getChildByNSPrefix(_xml, "joint"); 
+      jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
   {
     boost::shared_ptr<Joint> joint;
     joint.reset(new Joint);
@@ -1255,7 +1274,7 @@ bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<World> &_world)
     return false;
   }
 
-  xmlNodePtr worldXml = FirstChildElement(xmlDocGetRootElement(_xmlDoc), "world");
+  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world");
   if (!worldXml)
   {
     gzerr << "Could not find the 'world' element in the xml file\n";
@@ -1277,21 +1296,21 @@ bool initXml(xmlNodePtr _worldXml, boost::shared_ptr<World> &_world)
   }
 
   // Get world name
-  if (!_world->name.Set( (const char*)xmlGetProp(_worldXml,(xmlChar*)"name")))
+  if (!_world->name.Set( "old_gazebo_xml_deprecated" ))
   {
     gzerr << "Unable to parse world name\n";
     return false;
   }
 
   _world->scene.reset(new Scene);
-  initXml(FirstChildElement(_worldXml, "scene"),_world->scene);
+  initXml(firstChildElement(_worldXml, "ogre"),_world->scene);
 
   _world->physics.reset(new Physics);
-  initXml(FirstChildElement(_worldXml, "physics"),_world->physics);
+  initXml(firstChildElement(_worldXml, "ode"),_world->physics);
 
   // Get all model elements
-  for (xmlNodePtr  modelXml = FirstChildElement(_worldXml, "model"); 
-      modelXml; modelXml = NextSiblingElement(modelXml, "model"))
+  for (xmlNodePtr  modelXml = getChildByNSPrefix(_worldXml, "model"); 
+      modelXml; modelXml = getNextByNSPrefix(modelXml, "model"))
   {
     boost::shared_ptr<Model> model;
     model.reset(new Model);
@@ -1318,8 +1337,8 @@ bool initXml(xmlNodePtr _worldXml, boost::shared_ptr<World> &_world)
   }
 
   // Get all Joint elements
-  for (xmlNodePtr  jointXml = FirstChildElement(_worldXml, "joint"); 
-      jointXml; jointXml = NextSiblingElement(jointXml, "joint"))
+  for (xmlNodePtr  jointXml = getChildByNSPrefix(_worldXml, "joint"); 
+      jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
   {
     boost::shared_ptr<Joint> joint;
     joint.reset(new Joint);
@@ -1356,30 +1375,34 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
 {
   _scene->Clear();
 
-  xmlNodePtr ambient = FirstChildElement(_config, "ambient");
+  xmlNodePtr ambient = firstChildElement(_config, "ambient");
   if (ambient)
   {
-    if (!_scene->ambientColor.Set( (const char*)xmlGetProp(ambient,(xmlChar*)"rgba")))
+    if (!_scene->ambientColor.Set( (getValue(ambient)).c_str() ) )
     {
       gzerr << "Unable to parse ambient color\n";
       return false;
     }
   }
 
-  xmlNodePtr background = FirstChildElement(_config, "background");
+  xmlNodePtr background = firstChildElement(_config, "background");
   if (background)
   {
-    if (!_scene->backgroundColor.Set( (const char*)xmlGetProp(background,(xmlChar*)"rgba")))
+    ParamT<Vector3, false> bg("vector3",Vector3());
+    if (!bg.Set( (getValue(background)).c_str() ) )
     {
       gzerr << "Unable to parse background rgba\n";
       return false;
     }
+    // TODO: make color constructor for this?
+    Color color; color.r = bg.GetValue().x; color.g = bg.GetValue().y; color.b = bg.GetValue().z; color.a = 1.0;
+    _scene->backgroundColor.SetValue( color );
 
 
-    xmlNodePtr sky = FirstChildElement(background, "sky");
+    xmlNodePtr sky = firstChildElement(_config, "sky");
     if (sky)
     {
-      if (!_scene->skyMaterial.Set( (const char*)xmlGetProp(sky,(xmlChar*)"material")))
+      if (!_scene->skyMaterial.Set( getValue(firstChildElement(sky,"material")).c_str() ))
       {
         gzerr << "Unable to parse material for the sky.\n";
         return false;
@@ -1387,68 +1410,52 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
     }
   }
 
-  xmlNodePtr shadow = FirstChildElement(_config, "shadows");
-  if (shadow)
-  {
-    if (!_scene->shadowEnabled.Set( (const char*)xmlGetProp(shadow,(xmlChar*)"enabled")))
+  xmlNodePtr shadow = firstChildElement(_config, "shadows");
+  if (shadow && !_scene->shadowEnabled.Set( (getValue( shadow)).c_str()))
     {
-      gzerr << "Shadow element requires an enabled attribute";
+      gzerr << "shadows element requires a bool value";
       return false;
     }
 
-    if (!_scene->shadowColor.Set( (const char*)xmlGetProp(shadow,(xmlChar*)"rgba")))
+  xmlNodePtr shadow_type = firstChildElement(_config, "shadowTechnique");
+  if (shadow_type && !_scene->shadowType.Set( (getValue( shadow_type)).c_str()))
     {
-      gzerr << "Unable to parse shadow rgba\n";
+      gzerr << "shadowType requires a string attribute";
       return false;
     }
-
-
-    if (!_scene->shadowType.Set( (const char*)xmlGetProp(shadow,(xmlChar*)"type")))
-    {
-      gzerr << "Unable to parse shadow type attribute\n";
-      return false;
-    }
-  }
 
   return true;
 }
 
 bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_openDynamicsEngine)
 {
-  xmlNodePtr odeConfig = FirstChildElement(_config, "ode");
 
-  if ( !odeConfig )
-  {
-    gzerr << "Physics element missing <ode>\n";
-    return false;
-  }
-
-  xmlNodePtr solverConfig = FirstChildElement(odeConfig, "solver");
+  xmlNodePtr solverConfig = firstChildElement(_config, "stepType");
   if (!solverConfig)
   {
-    gzerr << "ODE Physics missing solver element\n";
+    gzerr << "ODE Physics missing solver stepType\n";
     return false;
   }
 
-  if (!_openDynamicsEngine->solverType.Set( (const char*)xmlGetProp(solverConfig,(xmlChar*)"type")))
+  if (!_openDynamicsEngine->solverType.Set( getValue(solverConfig).c_str()))
   {
-    gzerr << "ODE Physics missing solver type\n";
+    gzerr << "ODE Physics missing solver step type\n";
     return false;
   }
 
-  if (!_openDynamicsEngine->dt.Set( (const char*)xmlGetProp(solverConfig,(xmlChar*)"dt")))
+  if (!_openDynamicsEngine->dt.Set( getValue(firstChildElement(_config, "stepTime")).c_str() ))
   {
     gzerr << "ODE Physics solver unable to parse dt attribute\n";
     return false;
   }
 
-  if (!_openDynamicsEngine->iters.Set( (const char*)xmlGetProp(solverConfig,(xmlChar*)"iters")))
+  if (!_openDynamicsEngine->iters.Set( getValue(firstChildElement(_config, "stepIters")).c_str()))
   {
     gzerr << "ODE Physics solver malformed iters attribute\n";
     return false;
   }
 
-  if (!_openDynamicsEngine->sor.Set( (const char*)xmlGetProp(solverConfig,(xmlChar*)"sor"))) 
+  if (!_openDynamicsEngine->sor.Set( getValue(firstChildElement(_config, "stepW")).c_str()))
   {
     gzerr << "ODE Physics solver unable to parse sor attribute\n)";
     return false;
@@ -1456,34 +1463,30 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_openDyn
 
 
   // Contraints
-  xmlNodePtr constraintsConfig = FirstChildElement(odeConfig, "constraints");
-  if (constraintsConfig)
+
+  if (!_openDynamicsEngine->cfm.Set(getValue(firstChildElement(_config, "cfm")).c_str())) 
   {
+    gzerr << "ODE Physics contraints unable to parse cfm attribute\n";
+    return false;
+  }
 
-    if (!_openDynamicsEngine->cfm.Set( (const char*)xmlGetProp(constraintsConfig,(xmlChar*)"cfm"))) 
-    {
-      gzerr << "ODE Physics contraints unable to parse cfm attribute\n";
-      return false;
-    }
-
-    if (!_openDynamicsEngine->erp.Set( (const char*)xmlGetProp(constraintsConfig,(xmlChar*)"erp"))) 
-    {
-      gzerr << "ODE Physics contraints unable to parse erp attribute\n";
-      return false;
-    }
+  if (!_openDynamicsEngine->erp.Set(getValue(firstChildElement(_config, "erp")).c_str())) 
+  {
+    gzerr << "ODE Physics contraints unable to parse erp attribute\n";
+    return false;
+  }
 
 
-    if (!_openDynamicsEngine->contactMaxCorrectingVel.Set( (const char*)xmlGetProp(constraintsConfig,(xmlChar*)"contact_max_correcting_vel")))
-    {
-      gzerr << "ODE Physics contraints unable to parse contact_max_correcting_vel attribute\n";
-      return false;
-    } 
+  if (!_openDynamicsEngine->contactMaxCorrectingVel.Set(getValue(firstChildElement(_config, "contactMaxCorrectingVel")).c_str())) 
+  {
+    gzerr << "ODE Physics contraints unable to parse contact_max_correcting_vel attribute\n";
+    return false;
+  } 
 
-    if (!_openDynamicsEngine->contactSurfaceLayer.Set( (const char*)xmlGetProp(constraintsConfig,(xmlChar*)"contact_surface_layer")))
-    {
-      gzerr << "ODE Physics contraints unable to parse contact_surface_layer attribute\n";
-      return false;
-    }
+  if (!_openDynamicsEngine->contactSurfaceLayer.Set(getValue(firstChildElement(_config, "contactSurfaceLayer")).c_str())) 
+  {
+    gzerr << "ODE Physics contraints unable to parse contact_surface_layer attribute\n";
+    return false;
   }
 
   return true;
@@ -1499,21 +1502,17 @@ bool initXml(xmlNodePtr  _config, boost::shared_ptr<Physics> &_physics)
     return false;
   }
 
-  if (!_physics->type.Set( (const char*)xmlGetProp(_config,(xmlChar*)"type")))
+  if (!_physics->type.Set( (const char*)_config->name ))
   {
     gzerr << "Unable to parse physics type attribute\n";
     return false;
   }
 
-  xmlNodePtr gravityElement = FirstChildElement(_config, "gravity");
-  if (gravityElement)
+  if (!_physics->gravity.Set( getValue(firstChildElement(_config, "gravity")).c_str() )) 
   {
-    if (!_physics->gravity.Set( (const char*)xmlGetProp(gravityElement,(xmlChar*)"xyz")))
-    {
-      gzerr << "Unable to parse physics gravity element \n";
-      _physics->gravity.Reset();
-      return false;
-    }
+    gzerr << "Unable to parse physics gravity element \n";
+    _physics->gravity.Reset();
+    return false;
   }
 
   if (_physics->type.GetValue() == "ode")

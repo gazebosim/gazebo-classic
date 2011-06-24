@@ -141,8 +141,11 @@ namespace sdf
                   boost::shared_ptr<Plugin> > &plugins);
 
   ////////////////////////////////////////////////////////////////////////////
+  //
+  // Some helper functions copied from old XMLConfigNode class
+  //
   // Get a child based on a name. Returns null if not found
-  xmlNodePtr FirstChildElement( xmlNodePtr node, const std::string &name)
+  xmlNodePtr firstChildElement( xmlDocPtr node, const std::string &name)
   {
     xmlNodePtr tmp;
     for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = tmp->next )
@@ -150,14 +153,101 @@ namespace sdf
 
     return tmp;
   }
-  xmlNodePtr NextSiblingElement( xmlNodePtr node, const std::string &name)
+  xmlNodePtr firstChildElement( xmlNodePtr node, const std::string &name)
   {
     xmlNodePtr tmp;
-    for (tmp = node->next; tmp != NULL; tmp = tmp->next )
-      if (tmp->name && name == (const char*)tmp->name) break;
+    for (tmp = xmlFirstElementChild(node); tmp != NULL; tmp = xmlNextElementSibling(tmp) )
+      if (tmp->name && (name == (const char*)tmp->name)) break;
 
     return tmp;
   }
+  xmlNodePtr nextSiblingElement( xmlNodePtr node, const std::string &name)
+  {
+    xmlNodePtr tmp;
+    for (tmp = xmlNextElementSibling(node); tmp != NULL; tmp = xmlNextElementSibling(tmp) )
+      if (tmp->name && (name == (const char*)tmp->name)) break;
+
+    return tmp;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Get the next sibling of node according the namespace prefix
+  xmlNodePtr getNextByNSPrefix(xmlNodePtr node, const std::string &prefix)
+  {
+    xmlNodePtr tmp;
+    for (tmp = node->next; tmp != NULL; tmp = tmp->next )
+      if (tmp->ns && prefix == (const char*)tmp->ns->prefix)
+        break;
+    return tmp;
+  }
+  ////////////////////////////////////////////////////////////////////////////
+  // Get the first child with the appropriate NS prefix
+  xmlNodePtr getChildByNSPrefix(xmlNodePtr node, const std::string &prefix )
+  {
+    xmlNodePtr tmp;
+    for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = tmp->next )
+      if (tmp->ns && prefix == (const char*)tmp->ns->prefix)
+        break;
+    return tmp;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Get a value associated with a node.
+  std::string getNodeValue( xmlNodePtr node, const std::string &key )
+  {
+    std::string result;
+    xmlChar *value=NULL;
+
+    // First check if the key is an attribute
+    if (xmlHasProp( node, (xmlChar*) key.c_str() ))
+    {
+      value = xmlGetProp( node, (xmlChar*) key.c_str() );
+
+      // If not an attribute, then it should be a child node
+    }
+    else if (key == (const char*)node->name)
+    {
+      value = xmlNodeListGetString( node->doc, node->xmlChildrenNode, 1);
+    }
+    else
+    {
+      xmlNodePtr currNode;
+
+      currNode = node->xmlChildrenNode;
+
+      // Loop through children
+      while (currNode)
+      {
+        // If the name matches, then return its value
+        if (key == (const char*)currNode->name)
+        {
+          value = xmlNodeListGetString( node->doc, currNode->xmlChildrenNode, 1 );
+          break;
+        }
+
+        currNode = currNode->next;
+      }
+    }
+
+    if (value)
+    {
+      result = (char*)value;
+      boost::trim(result);
+
+      xmlFree(value);
+    }
+
+    return result;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Get the value of this node
+  std::string getValue(xmlNodePtr node)
+  {
+    return (const char*)xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1);
+  }
+
 
   void PreParser(const std::string &fname, std::string &output)
   {

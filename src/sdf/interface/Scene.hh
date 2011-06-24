@@ -101,6 +101,7 @@ namespace sdf
       std::cout << _prefix << "  Background Color[" << this->backgroundColor << "]\n";
 
       std::cout << _prefix << "  Shadow Color[" << this->shadowColor << "]\n";
+      std::cout << _prefix << "  Shadow Enabled[" << this->shadowEnabled << "]\n";
     }
   };
 }

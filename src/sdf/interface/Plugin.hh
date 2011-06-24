@@ -50,11 +50,16 @@ namespace sdf
   
     public: ParamT<std::string, true> name;
     public: ParamT<std::string, true> filename;
+    public: std::vector<ParamT<std::string, false> > data;
  
     public: void Clear()
     {
       this->name.Reset();
       this->filename.Reset();
+      std::vector<ParamT<std::string, false> >::iterator iter;
+      for (iter = this->data.begin(); iter != this->data.end(); iter++)
+        iter->Reset();
+      this->data.clear();
     }
 
     public: void Print(const std::string &prefix)
