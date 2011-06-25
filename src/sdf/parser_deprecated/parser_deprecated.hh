@@ -60,6 +60,7 @@ namespace sdf
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision);
+  bool initXml(xmlNodePtr _config, boost::shared_ptr<Plane> &_plane);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Sphere> &_sphere);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Box> &_box);
   bool initXml(xmlNodePtr _config, boost::shared_ptr<Cylinder> &_cylinder);

@@ -681,6 +681,19 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<ODESurfaceContact> &_conta
 }
 
 
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Plane> &_plane)
+{
+  _plane->Clear();
+
+  if (!_plane->normal.Set(_config->Attribute("normal")))
+  {
+    gzerr << "Unable to parse plane's normal attribute\n";
+    return false;
+  }
+
+  return true;
+}
+
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere)
 {
   _sphere->Clear();
@@ -700,7 +713,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Box> &_box)
 
   if (!_box->size.Set(_config->Attribute("size")))
   {
-    gzerr << "Unable to parse sphere's size attribute\n";
+    gzerr << "Unable to parse box's size attribute\n";
     return false;
   }
 
@@ -1268,7 +1281,13 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Geometry> &_geometry)
   }
 
   std::string typeName = shape->ValueStr();
-  if (typeName == "sphere")
+  if (typeName == "plane")
+  {
+    boost::shared_ptr<Plane> plane(new Plane);
+    result = initXml(shape, plane);
+    _geometry = plane;
+  }
+  else if (typeName == "sphere")
   {
     boost::shared_ptr<Sphere> sphere(new Sphere);
     result = initXml(shape, sphere);
@@ -1995,7 +2014,13 @@ bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Geometry> &_geom)
   TiXmlElement *geomNode = new TiXmlElement("geometry");
   _parent->LinkEndChild( geomNode );
 
-  if (_geom->type == Geometry::SPHERE)
+  if (_geom->type == Geometry::PLANE)
+  {
+    boost::shared_ptr<Plane> shape = boost::shared_static_cast<Plane>(_geom);
+    shapeNode = new TiXmlElement("plane");
+    shapeNode->SetAttribute(shape->normal.GetKey(),shape->normal.GetAsString());
+  }
+  else if (_geom->type == Geometry::SPHERE)
   {
     boost::shared_ptr<Sphere> shape = boost::shared_static_cast<Sphere>(_geom);
     shapeNode = new TiXmlElement("sphere");

@@ -55,9 +55,20 @@ namespace sdf
 {
   class Geometry
   {
-    public: enum Type{UNKNOWN, SPHERE, BOX, CYLINDER, MESH};
+    public: enum Type{UNKNOWN, PLANE, SPHERE, BOX, CYLINDER, MESH};
     public: Geometry(Type _type = UNKNOWN) : type(_type) {}
     public: Type type;
+  };
+  
+  class Plane : public Geometry
+  {
+    public: Plane() : Geometry(PLANE), normal("normal", gazebo::math::Vector3(0,0,1)) { this->Clear(); }
+    public: ParamT<gazebo::math::Vector3, true> normal;
+
+    public: void Clear()
+            {
+              this->normal.Reset();
+            };
   };
   
   class Sphere : public Geometry

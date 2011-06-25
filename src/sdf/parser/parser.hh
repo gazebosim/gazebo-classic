@@ -63,6 +63,7 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision);
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Plane> &_plane);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Box> &_box);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder);

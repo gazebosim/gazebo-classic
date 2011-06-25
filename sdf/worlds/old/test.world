@@ -96,7 +96,8 @@
       <cz>0</cz>
       <xyz>1.2 0 0</xyz> <!-- this is for body -->
       <rpy>0 -0 0</rpy>
-      <geom:plane name="plane">
+      <geom:plane name="myplane">
+        <xyz>2.2 0 0</xyz> <!-- this is for collision -->
         <laserRetro>2000.0</laserRetro>
         <mu1>50.0</mu1>
         <mu2>50.0</mu2>
@@ -107,6 +108,12 @@
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
         <material>Gazebo/GrayGrid</material>
+        <visual>
+            <xyz>0 0 -0.071</xyz>
+            <rpy>0 -0 0</rpy>
+            <scale>0.01 0.01 0.01</scale>
+            <mesh>unit_box</mesh>
+        </visual>
       </geom:plane>
     </body:plane>
   </model:physical>

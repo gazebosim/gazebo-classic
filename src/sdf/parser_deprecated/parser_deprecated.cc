@@ -183,8 +183,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
     // Origin
     ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
     ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    xyzP.Set( getValue(xyz_xml).c_str());
-    rpyP.Set( getValue(rpy_xml).c_str());
+    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
+    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
     gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
     gazebo::math::Pose pose(xyzP.GetValue(),rpy);
     _sensor->origin.SetValue( pose );
@@ -505,18 +505,19 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
 {
   _collision->Clear();
 
-  if (!_collision->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
+  if (!_collision->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name0")))
   {
     gzerr << "Unable to parse collision name\n";
     return false;
   }
+  printf("debug0: %s\n",_collision->name.GetValue().c_str());
 
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
   xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
   if (!xyz_xml && !rpy_xml)
   {
-    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
+    gzwarn << "INFO: xyz & rpy tag not present for collision element, using default (Identity)\n";
     _collision->origin.Reset();
   }
   else
@@ -524,27 +525,31 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
     // Origin
     ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
     ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    xyzP.Set( getValue(xyz_xml).c_str());
-    rpyP.Set( getValue(rpy_xml).c_str());
+    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
+    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
     gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
     gazebo::math::Pose pose(xyzP.GetValue(),rpy);
     _collision->origin.SetValue( pose );
   }
 
-  // Geometry
-  xmlNodePtr geom = firstChildElement(_config, "geometry");
-  if (geom)
+  // Geometry (<geom:...> where ... is the geometry primitive type)
+  _collision->geometry.reset( new Geometry);
+  if (!initXml(_config, _collision->geometry))
   {
-    _collision->geometry.reset( new Geometry);
-    if (!initXml(geom, _collision->geometry))
-    {
-      gzerr << "Unable to parse collision geometry element\n";
-      return false;
-    }
+    gzerr << "Unable to parse collision geometry element\n";
+    return false;
   }
-  else
+
+  return true;
+}
+
+bool initXml(xmlNodePtr _config, boost::shared_ptr<Plane> &_plane)
+{
+  _plane->Clear();
+
+  if (!_plane->normal.Set( (const char*)xmlGetProp(_config,(xmlChar*)"normal")))
   {
-    gzerr << "Collision is missing a geometry element.\n";
+    gzerr << "Unable to parse plane's normal attribute\n";
     return false;
   }
 
@@ -638,8 +643,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     // Origin
     ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
     ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    xyzP.Set( getValue(xyz_xml).c_str());
-    rpyP.Set( getValue(rpy_xml).c_str());
+    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
+    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
     gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
     gazebo::math::Pose pose(xyzP.GetValue(),rpy);
     _link->origin.SetValue( pose );
@@ -771,8 +776,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
     // Origin
     ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
     ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    xyzP.Set( getValue(xyz_xml).c_str());
-    rpyP.Set( getValue(rpy_xml).c_str());
+    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
+    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
     gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
     gazebo::math::Pose pose(xyzP.GetValue(),rpy);
     _visual->origin.SetValue( pose );
@@ -888,8 +893,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
     // Origin
     ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
     ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    xyzP.Set( getValue(xyz_xml).c_str());
-    rpyP.Set( getValue(rpy_xml).c_str());
+    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
+    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
     gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
     gazebo::math::Pose pose(xyzP.GetValue(),rpy);
     _joint->origin.SetValue( pose );
@@ -1163,8 +1168,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
     return false;
   }
 
-  std::string typeName = (const char*)shape->name;
-  if (typeName == "sphere")
+  std::string typeName = (const char*)_config->name;
+  printf("debug3: %s\n", typeName.c_str());
+  if (typeName == "plane")
+  {
+    boost::shared_ptr<Plane> plane(new Plane);
+    result = initXml(shape, plane);
+    _geometry = plane;
+  }
+  else if (typeName == "sphere")
   {
     boost::shared_ptr<Sphere> sphere(new Sphere);
     result = initXml(shape, sphere);
