@@ -657,7 +657,6 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
   if (mm)
   {
     custom_mass_matrix.Set( getValue(mm).c_str() );
-    printf("inertial [%s] custom matrix\n",getValue(mm).c_str());
     if (custom_mass_matrix.GetValue())
     {
       _link->inertial.reset(new Inertial);
@@ -684,8 +683,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
 
       // FIXME: there should be only 1 visual under a geom?
       // Multiple Visuals (optional)
-      for (xmlNodePtr  visXml = getChildByNSPrefix(_config, "visual"); 
-          visXml; visXml = getNextByNSPrefix(visXml, "visual"))
+      for (xmlNodePtr  visXml = firstChildElement(colXml, "visual"); 
+          visXml; visXml = nextSiblingElement(visXml, "visual"))
       {
         boost::shared_ptr<Visual> vis;
         vis.reset(new Visual);
@@ -713,7 +712,6 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
       return false;
     }
   }
-
 
   // Get all sensor elements
   // FIXME: instead of child elements, get namespace == sensor blocks
@@ -751,17 +749,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
 {
   _visual->Clear();
 
-  if (!_visual->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
-  {
-    gzerr << "Unable to parse visual name attribute\n";
-    return false;
-  }
-
-  if (!_visual->castShadows.Set( (const char*)xmlGetProp(_config,(xmlChar*)"cast_shadows")))
-  {
-    gzerr << "Unable to parse visual cast_shadows attribute\n";
-    return false;
-  }
+  //if (!_visual->name.Set( "old_gazebo_xml_visual" );
+  //if (!_visual->castShadows.Set( "true" );
 
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
@@ -784,30 +773,26 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
   }
 
   // Geometry
-  xmlNodePtr geometryXml = firstChildElement(_config, "geometry");
-  if (geometryXml)
+  // make a copy of <visual> and change it to <visual:[geom type of the collision]> to trick the new Geometry initXml into parsing it
+  xmlNode vis_xml = *_config;
+  vis_xml.name = _config->parent->name;
+
+  _visual->geometry.reset(new Geometry);
+  if (!initXml(&vis_xml, _visual->geometry))
   {
-    _visual->geometry.reset(new Geometry);
-    if (!initXml(geometryXml, _visual->geometry))
-    {
-      gzerr << "Unable to parse geometry for Visual element\n";
-      return false;
-    }
-  }
-  else
-  {
-    gzerr << "Visual is missing geometry element\n";
+    gzerr << "Unable to parse geometry for Visual element\n";
     return false;
   }
 
-
   // Material
-  xmlNodePtr mat = firstChildElement(_config, "material");
-  if (mat)
+  xmlNodePtr mat_xml = firstChildElement(_config, "material");
+  if (mat_xml)
   {
+    // change value to attribute "script" for the new parser
+    xmlSetProp(mat_xml,(xmlChar*)"script",(xmlChar*)(getValue(mat_xml).c_str()));
     // try to parse material element in place
     _visual->material.reset(new Material);
-    if (!initXml(mat, _visual->material))
+    if (!initXml(mat_xml, _visual->material))
     {
       gzerr << "Could not parse material element in Visual block, maybe defined outside.\n";
       _visual->material.reset();
@@ -1111,7 +1096,7 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
 
   if (_model->links.empty())
   {
-    gzerr << "No link elements found in xml file\n";
+    gzerr << "No link elements found in model [" << _model->name.GetValue() << "]\n";
     return false;
   }
 
@@ -1161,7 +1146,6 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
   }
 
   std::string typeName = (const char*)_config->name;
-  printf("debug3: %s\n", typeName.c_str());
   if (typeName == "plane")
   {
     boost::shared_ptr<Plane> plane(new Plane);

@@ -113,6 +113,8 @@
             <rpy>0 -0 0</rpy>
             <scale>0.01 0.01 0.01</scale>
             <mesh>unit_box</mesh>
+            <normal>1 0 0</normal>
+            <material>Gazebo/Red</material>
         </visual>
       </geom:plane>
     </body:plane>
