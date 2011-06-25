@@ -505,12 +505,11 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
 {
   _collision->Clear();
 
-  if (!_collision->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name0")))
+  if (!_collision->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
   {
     gzerr << "Unable to parse collision name\n";
     return false;
   }
-  printf("debug0: %s\n",_collision->name.GetValue().c_str());
 
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
@@ -547,7 +546,8 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Plane> &_plane)
 {
   _plane->Clear();
 
-  if (!_plane->normal.Set( (const char*)xmlGetProp(_config,(xmlChar*)"normal")))
+  xmlNodePtr normal = firstChildElement(_config,"normal");
+  if (!normal || (!_plane->normal.Set( getValue(normal).c_str() )))
   {
     gzerr << "Unable to parse plane's normal attribute\n";
     return false;
@@ -1153,18 +1153,10 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
 bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
 {
   bool result = false;
-  xmlNodePtr shape = NULL;
 
   if (!_config)
   {
     gzerr << "Null xml\n";
-    return false;
-  }
-
-  shape = _config->xmlChildrenNode;
-  if (!shape)
-  {
-    gzerr << "Geometry tag contains no child element.\n";
     return false;
   }
 
@@ -1173,31 +1165,31 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
   if (typeName == "plane")
   {
     boost::shared_ptr<Plane> plane(new Plane);
-    result = initXml(shape, plane);
+    result = initXml(_config, plane);
     _geometry = plane;
   }
   else if (typeName == "sphere")
   {
     boost::shared_ptr<Sphere> sphere(new Sphere);
-    result = initXml(shape, sphere);
+    result = initXml(_config, sphere);
     _geometry = sphere;
   }
   else if (typeName == "box")
   {
     boost::shared_ptr<Box> box(new Box);
-    result = initXml(shape, box);
+    result = initXml(_config, box);
     _geometry =  box;
   }
   else if (typeName == "cylinder")
   {
     boost::shared_ptr<Cylinder> cylinder(new Cylinder);
-    result = initXml(shape, cylinder);
+    result = initXml(_config, cylinder);
     _geometry = cylinder;
   }
   else if (typeName == "mesh")
   {
     boost::shared_ptr<Mesh> mesh(new Mesh);
-    result = initXml(shape, mesh);
+    result = initXml(_config, mesh);
     _geometry = mesh;
   }
   else
