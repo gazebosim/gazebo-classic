@@ -44,10 +44,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
 
 	namespace rendering
   {

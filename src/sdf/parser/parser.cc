@@ -34,6 +34,8 @@
 
 /* Author: Wim Meeussen */
 
+#include <boost/tokenizer.hpp>
+#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -383,6 +385,184 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
 
   return true;
 }
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
+{
+  boost::char_separator<char> openSep("{");
+  boost::char_separator<char> commaSep(",");
+
+  std::list<TiXmlElement*> elements;
+
+  // Remove all white space
+  boost::erase_all(_light->tree, " ");
+
+  TiXmlElement *element = _config;
+  elements.push_back(_config);
+
+  boost::tokenizer<boost::char_separator<char> > openTok(_light->tree, openSep);
+  BOOST_FOREACH(std::string str1, openTok)
+  {
+    int index = str1.find(":");
+    std::string name = str1.substr(0, index);
+    str1.replace(0,index+1,"");
+
+    if (elements.back()->Value() != name)
+    {
+      element = elements.back()->FirstChildElement(name);
+      if (element)
+        elements.push_back(element);
+    }
+
+    if (elements.size() > 0 && elements.back()->Value() == name)
+    {
+      boost::tokenizer<boost::char_separator<char> > tok2(str1, commaSep);
+      BOOST_FOREACH(std::string str2, tok2)
+      {
+        TiXmlElement *currentElement = elements.back();
+        while (str2.rfind("}") != std::string::npos)
+        {
+          str2.erase(str2.size()-1,1);
+          elements.pop_back();
+        }
+        Param *param = Param::Find(_light->parameters, str2);
+        if (param)
+        {
+          if (!param->Set(currentElement->Attribute( str2.c_str() )))
+          {
+            gzerr << "Unable to parse key[" << param->GetKey() << "] from string[" << str2 << "].\n";
+            return false;
+          }
+        }
+        else
+        {
+          gzerr << "Interface is missing key[" << str2 << "]\n";
+          return false;
+        }
+        
+        /*const char *attr = currentElement->Attribute( str2.c_str() );
+        if (attr)
+          std::cout << "Attribute[" << str2 << "=" << attr << "]\n";
+          */
+      }
+    }
+  }
+
+  return true;
+}
+
+/*bool initXml(TiXmlElement *_config, boost::shared_ptr<Light> &_light)
+{
+  _light->Clear();
+
+  if (!_light->type.Set(_config->Attribute("type")))
+  {
+    gzerr << "Unable to parse light type attribute\n";
+    return false;
+  }
+
+  if (!_light->name.Set(_config->Attribute("name")))
+  {
+    gzerr << "Unable to parse light name attribute\n";
+    return false;
+  }
+
+  if (!_light->cast_shadows.Set(_config->Attribute("cast_shadows")))
+  {
+    gzerr << "Unable to parse light cast_shadows\n";
+    return false;
+  }
+
+
+  // Origin
+  TiXmlElement *o = _config->FirstChildElement("origin");
+  if (!o)
+  {
+    gzerr << "Origin tag not present for light element\n";
+    return false;
+  }
+  else
+  {
+    if (!_light->origin.Set( o->Attribute("pose") ))
+    {
+      gzerr << "Light has malformed orgin\n";
+      return false;
+    }
+  }
+
+  // Diffuse color
+  TiXmlElement *diffuse = _config->FirstChildElement("diffuse");
+  if (diffuse && !_light->diffuseColor.Set(diffuse->Attribute("rgba")))
+  {
+    gzerr << "Unable to parse diffuse rgba attribute\n";
+    return false;
+  }
+
+  // Specular color
+  TiXmlElement *specular = _config->FirstChildElement("diffuse");
+  if (specular && !_light->specularColor.Set(specular->Attribute("rgba")))
+  {
+    gzerr << "Unable to parse specular rgba attribute\n";
+    return false;
+  }
+
+  // attenuation 
+  TiXmlElement *attenuation = _config->FirstChildElement("attenuation");
+  if (attenuation)
+  {
+    if (!_light->range.Set(attenuation->Attribute("range")))
+    {
+      gzerr << "Unable to parse attenuation range attribute\n";
+      return false;
+    }
+
+    if (!_light->constantAttenuation.Set(attenuation->Attribute("constant")))
+    {
+      gzerr << "Unable to parse attenuation constant attribute\n";
+      return false;
+    }
+
+    if (!_light->linearAttenuation.Set(attenuation->Attribute("linear")))
+    {
+      gzerr << "Unable to parse attenuation linear attribute\n";
+      return false;
+    }
+
+    if (!_light->quadraticAttenuation.Set(attenuation->Attribute("quadratic")))
+    {
+      gzerr << "Unable to parse attenuation quadratic attribute\n";
+      return false;
+    }
+  }
+
+  // sport 
+  TiXmlElement *spot = _config->FirstChildElement("spot");
+  if (attenuation)
+  {
+    if (!_light->spotInnerAngle.Set( 
+          spot->Attribute( _light->spotInnerAngle.GetKey() )))
+    {
+      gzerr << "Unable to parse " << _light->spotOuterAngle.GetKey() << "\n";
+
+      return false;
+    }
+
+    if (!_light->spotOuterAngle.Set( 
+          spot->Attribute( _light->spotOuterAngle.GetKey() )))
+    {
+      gzerr << "Unable to parse " << _light->spotOuterAngle.GetKey() << "\n";
+      return false;
+    }
+
+    if (!_light->spotFalloff.Set( 
+          spot->Attribute( _light->spotFalloff.GetKey() )))
+    {
+      gzerr << "Unable to parse " << _light->spotFalloff.GetKey() << "\n";
+      return false;
+    }
+  }
+ 
+  return true;
+}*/
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
 {
@@ -1407,6 +1587,26 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
 
   _world->physics.reset(new Physics);
   initXml(_worldXml->FirstChildElement("physics"),_world->physics);
+
+  // Get all light elements
+  for (TiXmlElement* lightXml = _worldXml->FirstChildElement("light"); 
+      lightXml; lightXml = lightXml->NextSiblingElement("light"))
+  {
+    boost::shared_ptr<Light> light;
+    light.reset(new Light);
+
+    if (initXml(lightXml,light))
+    {
+      _world->lights.push_back(light);
+    }
+    else
+    {
+      gzerr << "light xml is not initialized correctly\n";
+      light.reset();
+      return false;
+    }
+  }
+
 
   // Get all model elements
   for (TiXmlElement* modelXml = _worldXml->FirstChildElement("model"); 

@@ -13,6 +13,7 @@ set (headers Joint.hh
              Sensor.hh
              World.hh 
              Param.hh
+             Light.hh
              sdf.h
 )
 

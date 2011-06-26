@@ -60,7 +60,7 @@ namespace gazebo
       public: virtual ~Light();
   
       /// \brief Load the light
-      public: void Load( common::XMLConfigNode *node);
+      public: void Load( /*boost::shared_ptr<sdf::Light> &_sdf*/ );
   
       /// \brief Load from a light message
       public: void LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg);
@@ -137,13 +137,11 @@ namespace gazebo
       private: common::ParamT<math::Vector3> *directionP;
       private: common::ParamT<math::Vector3> *attenuationP;
       private: common::ParamT<double> *rangeP;
+
       private: common::ParamT<bool> *castShadowsP;
       private: common::ParamT<double> *spotInnerAngleP;
       private: common::ParamT<double> *spotOuterAngleP;
       private: common::ParamT<double> *spotFalloffP;
-
-      /// List of all the parameters
-      protected: std::vector<common::Param*> parameters;
 
       private: event::ConnectionPtr showLightsConnection;
       private: static unsigned int lightCounter;

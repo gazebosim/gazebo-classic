@@ -26,7 +26,6 @@
 
 #include "common/Messages.hh"
 #include "common/Events.hh"
-#include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Global.hh"
 #include "common/Console.hh"
@@ -53,7 +52,7 @@ Light::Light(Scene *scene_)
 
   this->lightCounter++;
 
-  common::Param::Begin(&this->parameters);
+  /*common::Param::Begin(&this->parameters);
   this->nameP = new common::ParamT<std::string>("name","light",1);
 
   this->lightTypeP = new common::ParamT<std::string>("type", std::string("point"), 1);
@@ -86,6 +85,7 @@ Light::Light(Scene *scene_)
   this->castShadowsP = new common::ParamT<bool>("cast_shadows",true,0);
   this->castShadowsP->Callback(&Light::SetCastShadows, this);
   common::Param::End();
+  */
 
   this->showLightsConnection = event::Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
 }
@@ -115,23 +115,10 @@ Light::~Light()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the light
-void Light::Load(common::XMLConfigNode *node)
+void Light::Load(/* boost::shared_ptr<sdf::Light> &_sdf*/ )
 {
   math::Vector3 vec;
-
-  if (node)
-  {
-    this->lightTypeP->Load(node);
-    this->diffuseP->Load(node);
-    this->specularP->Load(node);
-    this->directionP->Load(node);
-    this->attenuationP->Load(node);
-    this->rangeP->Load(node);
-    this->castShadowsP->Load(node);
-    this->spotInnerAngleP->Load(node);
-    this->spotOuterAngleP->Load(node);
-    this->spotFalloffP->Load(node);
-  }
+  //this->sdf = _sdf;
 
   try
   {
@@ -200,7 +187,7 @@ void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
   if (msg->has_spot_falloff())
     this->spotFalloffP->SetValue(msg->spot_falloff());
 
-  this->Load(NULL);
+  this->Load();
 
   if (msg->has_pose())
     this->SetPosition(common::Message::Convert(msg->pose().position()));

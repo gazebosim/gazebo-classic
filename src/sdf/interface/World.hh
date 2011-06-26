@@ -48,6 +48,7 @@
 #include "sdf/interface/Physics.hh"
 #include "sdf/interface/Model.hh"
 #include "sdf/interface/Joint.hh"
+#include "sdf/interface/Light.hh"
 
 namespace sdf
 {
@@ -73,6 +74,7 @@ namespace sdf
 
     /// \brief complete list of joints
     public: std::map<std::string, boost::shared_ptr<Joint> > joints;
+    public: std::vector<boost::shared_ptr<Light> > lights;
 
     public: void Clear();
   
@@ -107,6 +109,13 @@ namespace sdf
               for (iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
               {
                 iter->second->Print( _prefix + "  " );
+              }
+
+              // Print light
+              std::vector<boost::shared_ptr<Light> >::const_iterator liter;
+              for (liter = this->lights.begin(); liter != this->lights.end(); liter++)
+              {
+                (*liter)->Print( _prefix + "  " );
               }
             }
 

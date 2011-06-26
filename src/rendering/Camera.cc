@@ -29,7 +29,6 @@
 #include "common/Console.hh"
 #include "common/Global.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 #include "math/Pose.hh"
 
 #include "rendering/Visual.hh"

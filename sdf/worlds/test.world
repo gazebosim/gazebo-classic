@@ -16,7 +16,14 @@
     </ode>
   </physics>
 
+  <light type="directional" name="my_light">
+   <origin pose="0 0 10 0 0 0"/>
+   <diffuse rgba="1 1 1 1"/>
+   <specular rgba="0.1 0.1 0.1 1.0"/>
+   <attenuation range="20" constant="1.0" linear="1.0" quadratic="0.001"/>
+  </light>
 
+  <!--
   <model name="default_pioneer_model">
   
     <link name="chassis_body">
@@ -204,6 +211,7 @@
     <funky_xml>so funky</funky_xml>
     <more value="hello"/>
   </plugin>
+  -->
 
 </world>
 

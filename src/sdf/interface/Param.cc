@@ -28,16 +28,17 @@
 
 using namespace sdf;
 
-//std::vector<Param*> *Param::params = NULL;
+std::vector<Param*> *Param::params = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Param::Param(Param * /*_newParam*/) 
+Param::Param(Param *_newParam) 
 {
-/*  if (params == NULL)
+  /*if (params == NULL)
     gzthrow("Param vector is NULL\n");
-  params->push_back(_newParam);
-  */
+    */
+  if (params)
+    params->push_back(_newParam);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,12 +49,11 @@ Param::~Param()
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Begin a block of "new ParamT<>"
-void Param::Begin(std::vector<Param*> * /*_params*/)
+void Param::Begin(std::vector<Param*> *_params)
 {
-/*  if (params != NULL)
+  if (params != NULL)
     gzthrow("Calling Begin before an End\n");
   params = _params;
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,21 @@ void Param::End()
   /*if (params == NULL)
     gzthrow("Calling End before a Begin\n");
 
+    */
   params = NULL;
-  */
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Find a parameter by name
+Param *Param::Find(std::vector<Param*> &_params, const std::string &key)
+{
+  for (std::vector<Param*>::iterator iter = _params.begin(); 
+       iter != _params.end(); iter++)
+  {
+    if ( (*iter)->GetKey() == key )
+      return (*iter);
+  }
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

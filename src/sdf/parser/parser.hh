@@ -48,6 +48,8 @@
 #include "sdf/interface/World.hh"
 #include "sdf/interface/Joint.hh"
 #include "sdf/interface/Plugin.hh"
+#include "sdf/interface/Light.hh"
+
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "math/Quaternion.hh"
@@ -60,6 +62,7 @@ namespace sdf
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor);
 
+  bool initXml(TiXmlElement *_config, boost::shared_ptr<Light> &_light);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision);
