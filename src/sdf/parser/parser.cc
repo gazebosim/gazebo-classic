@@ -388,6 +388,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
 {
+/*
   boost::char_separator<char> openSep("{");
   boost::char_separator<char> commaSep(",");
 
@@ -439,19 +440,20 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
           return false;
         }
         
-        /*const char *attr = currentElement->Attribute( str2.c_str() );
-        if (attr)
-          std::cout << "Attribute[" << str2 << "=" << attr << "]\n";
-          */
+        // const char *attr = currentElement->Attribute( str2.c_str() );
+        // if (attr)
+        //   std::cout << "Attribute[" << str2 << "=" << attr << "]\n";
       }
     }
   }
 
+*/
   return true;
 }
 
-/*bool initXml(TiXmlElement *_config, boost::shared_ptr<Light> &_light)
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Light> &_light)
 {
+/*
   _light->Clear();
 
   if (!_light->type.Set(_config->Attribute("type")))
@@ -560,9 +562,10 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
       return false;
     }
   }
- 
+
+*/
   return true;
-}*/
+}
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
 {
