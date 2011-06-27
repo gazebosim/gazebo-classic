@@ -931,7 +931,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
   if (!xyz_xml && !rpy_xml)
   {
-    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
+    //gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
     _joint->origin.Reset();
   }
   else
@@ -1009,7 +1009,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
       << "' has no type, check to see if it's a reference.\n";
     return false;
   }
-  gzerr << "joint '" << _joint->name << "' type '" << _joint->type.GetValue() << "'\n";
+  //gzwarn << "joint '" << _joint->name << "' type '" << _joint->type.GetValue() << "'\n";
 
   std::string typeStr = _joint->type.GetValue();
   if (typeStr == "piston")
