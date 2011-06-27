@@ -549,7 +549,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Plane> &_plane)
   xmlNodePtr normal = firstChildElement(_config,"normal");
   if (!normal || (!_plane->normal.Set( getValue(normal).c_str() )))
   {
-    gzerr << "Unable to parse plane's normal attribute\n";
+    gzerr << "Unable to parse plane's normal child element\n";
     return false;
   }
 
@@ -560,9 +560,10 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Sphere> &_sphere)
 {
   _sphere->Clear();
 
-  if (!_sphere->radius.Set( (const char*)xmlGetProp(_config,(xmlChar*)"radius")))
+  if (!_sphere->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
+  if (!_sphere->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
   {
-    gzerr << "Unable to parse sphere's radius attribute\n";
+    gzerr << "Unable to parse sphere's radius child element\n";
     return false;
   }
 
@@ -573,10 +574,32 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Box> &_box)
 {
   _box->Clear();
 
-  if (!_box->size.Set( (const char*)xmlGetProp(_config,(xmlChar*)"size")))
+  xmlNodePtr size_xml = firstChildElement(_config,"size");
+  xmlNodePtr scale_xml = firstChildElement(_config,"scale");
+  if (!size_xml && !scale_xml)
   {
-    gzerr << "Unable to parse sphere's size attribute\n";
+    gzerr << "box has no size or scale child element\n";
     return false;
+  }
+  else if (size_xml)
+  {
+    if (!_box->size.Set( getValue(firstChildElement(_config,"size")).c_str()))
+    {
+      gzerr << "Unable to parse box's size child element\n";
+      return false;
+    }
+  }
+  else if (scale_xml)
+  {
+    if (!_box->size.Set( getValue(firstChildElement(_config,"scale")).c_str()))
+    {
+      gzerr << "Unable to parse box's scale child element\n";
+      return false;
+    }
+    else
+    {
+      gzwarn << "box's scale element is used as size instead\n";
+    }
   }
 
   return true;
@@ -586,15 +609,15 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Cylinder> &_cylinder)
 {
   _cylinder->Clear();
 
-  if (!_cylinder->length.Set( (const char*)xmlGetProp(_config,(xmlChar*)"length")))
+  if (!_cylinder->length.Set( getValue(firstChildElement(_config,"length")).c_str()))
   {
-    gzerr << "Unable to parse cylinder's length attribute\n";
+    gzerr << "Unable to parse cylinder's length child element\n";
     return false;
   }
 
-  if (!_cylinder->radius.Set( (const char*)xmlGetProp(_config,(xmlChar*)"radius")))
+  if (!_cylinder->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
   {
-    gzerr << "Unable to parse cylinder's radius attribute\n";
+    gzerr << "Unable to parse cylinder's radius child element\n";
     return false;
   }
 
@@ -605,16 +628,34 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Mesh> &_mesh)
 {
   _mesh->Clear();
 
-  if (!_mesh->filename.Set( (const char*)xmlGetProp(_config,(xmlChar*)"filename")))
+  xmlNodePtr filename_xml = firstChildElement(_config,"filename");
+  if (!filename_xml)
   {
-    gzerr << "Unable to parse mesh's filename attribute\n";
+    gzerr << "trimesh has no filename child element\n";
     return false;
   }
-
-  if (!_mesh->scale.Set( (const char*)xmlGetProp(_config,(xmlChar*)"scale")))
+  else
   {
-    gzerr << "Unable to parse mesh's scale attribute\n";
+    if (!_mesh->filename.Set( getValue(filename_xml).c_str()))
+    {
+      gzerr << "Unable to parse mesh's filename child element\n";
+      return false;
+    }
+  }
+
+  xmlNodePtr scale_xml = firstChildElement(_config,"scale");
+  if (!scale_xml)
+  {
+    gzerr << "trimesh has no scale child element\n";
     return false;
+  }
+  else
+  {
+    if (!_mesh->scale.Set( getValue(scale_xml).c_str()))
+    {
+      gzerr << "Unable to parse mesh's scale child element\n";
+      return false;
+    }
   }
 
   return true;
@@ -669,36 +710,42 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     }
   }
 
+  printf("debug2: %s\n",_link->name.GetValue().c_str());
+
   // Multiple Collisions (optional)
-  for (xmlNodePtr  colXml = getChildByNSPrefix(_config, "geom"); 
-      colXml; colXml = getNextByNSPrefix(colXml, "geom"))
+  for (xmlNodePtr  collision_xml = getChildByNSPrefix(_config, "geom"); 
+      collision_xml; collision_xml = getNextByNSPrefix(collision_xml, "geom"))
   {
     boost::shared_ptr<Collision> col;
     col.reset(new Collision);
 
-    if (initXml(colXml,col))
+    printf("looping geom:... %s\n",collision_xml->name);
+    if (initXml(collision_xml,col))
     {
       // group exists, add Collision to the vector in the map
       _link->collisions.push_back(col);
 
       // FIXME: there should be only 1 visual under a geom?
       // Multiple Visuals (optional)
-      for (xmlNodePtr  visXml = firstChildElement(colXml, "visual"); 
-          visXml; visXml = nextSiblingElement(visXml, "visual"))
+      // FIXME: insert name for visual xml (using collision name + _visual?)
+      for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual"); 
+          visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
       {
-        boost::shared_ptr<Visual> vis;
-        vis.reset(new Visual);
+        // copy name from collision (parent) into visual
+        xmlSetProp(visual_xml,(xmlChar*)"name",(xmlChar*)(col->name.GetValue().c_str()));
+        boost::shared_ptr<Visual> visual;
+        visual.reset(new Visual);
 
-        if (initXml(visXml,vis))
+        if (initXml(visual_xml,visual))
         {
           //  add Visual to the vector
-          _link->visuals.push_back(vis);
+          _link->visuals.push_back(visual);
         }
         else
         {
           gzerr << "Could not parse visual element for Link '" 
             << _link->name << "'\n";
-          vis.reset();
+          visual.reset();
           return false;
         }
       }
@@ -1060,76 +1107,92 @@ bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
   if (!_xml) 
     return false;
 
-  if (!_model->name.Set( (const char*)xmlGetProp(_xml,(xmlChar*)"name")))
+  if (strcmp((const char*)_xml->name, "renderable")==0)
   {
-    gzerr << "No name given for the model.\n";
-    return false;
+    // should load lights here
+    // initXml(_xml, light);
+    gzwarn << "parsing model:renderable not implemented yet, skipping.\n";
+    return true;
+
   }
-
-  // Get all Link elements
-  for (xmlNodePtr  linkXml = getChildByNSPrefix(_xml, "body"); 
-      linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
+  else if (strcmp((const char*)_xml->name, "physical")==0)
   {
-    boost::shared_ptr<Link> link;
-    link.reset(new Link);
-
-    if (initXml(linkXml,link))
+    if (!_model->name.Set( (const char*)xmlGetProp(_xml,(xmlChar*)"name")))
     {
-      if (_model->GetLink(link->name.GetValue()))
+      gzerr << "No name given for the model.\n";
+      return false;
+    }
+
+    // Get all Link elements
+    for (xmlNodePtr  linkXml = getChildByNSPrefix(_xml, "body"); 
+        linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
+    {
+      boost::shared_ptr<Link> link;
+      link.reset(new Link);
+
+      if (initXml(linkXml,link))
       {
-        gzerr << "link '" << link->name << "' is not unique.\n";
+        if (_model->GetLink(link->name.GetValue()))
+        {
+          gzerr << "link '" << link->name << "' is not unique.\n";
+          link.reset();
+          return false;
+        }
+        else
+        {
+          _model->links.insert(make_pair(link->name.GetValue(),link));
+        }
+      }
+      else
+      {
+        gzerr << "link xml is not initialized correctly\n";
         link.reset();
         return false;
       }
-      else
-      {
-        _model->links.insert(make_pair(link->name.GetValue(),link));
-      }
     }
-    else
+
+    if (_model->links.empty())
     {
-      gzerr << "link xml is not initialized correctly\n";
-      link.reset();
+      gzerr << "No link elements found in model [" << _model->name.GetValue() << "]\n";
       return false;
     }
-  }
 
-  if (_model->links.empty())
-  {
-    gzerr << "No link elements found in model [" << _model->name.GetValue() << "]\n";
-    return false;
-  }
-
-  // Get all Joint elements
-  for (xmlNodePtr  jointXml = getChildByNSPrefix(_xml, "joint"); 
-      jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
-  {
-    boost::shared_ptr<Joint> joint;
-    joint.reset(new Joint);
-
-    if (initXml(jointXml,joint))
+    // Get all Joint elements
+    for (xmlNodePtr  jointXml = getChildByNSPrefix(_xml, "joint"); 
+        jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
     {
-      if (_model->GetJoint(joint->name.GetValue()))
+      boost::shared_ptr<Joint> joint;
+      joint.reset(new Joint);
+
+      if (initXml(jointXml,joint))
       {
-        gzerr << "joint '" << joint->name << "' is not unique.\n";
+        if (_model->GetJoint(joint->name.GetValue()))
+        {
+          gzerr << "joint '" << joint->name << "' is not unique.\n";
+          joint.reset();
+          return false;
+        }
+        else
+        {
+          _model->joints.insert(make_pair(joint->name.GetValue(),joint));
+        }
+      }
+      else
+      {
+        gzerr << "joint xml is not initialized correctly\n";
         joint.reset();
         return false;
       }
-      else
-      {
-        _model->joints.insert(make_pair(joint->name.GetValue(),joint));
-      }
     }
-    else
-    {
-      gzerr << "joint xml is not initialized correctly\n";
-      joint.reset();
-      return false;
-    }
-  }
 
-  /// Get all the plugins
-  getPlugins(_xml, _model->plugins);
+    /// Get all the plugins
+    getPlugins(_xml, _model->plugins);
+  }
+  else
+  {
+    gzerr << "model:" << _xml->name << " is not renderable nor physical\n";
+    return false;
+  }
 
   return true;
 }
@@ -1146,6 +1209,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
   }
 
   std::string typeName = (const char*)_config->name;
+  printf("debug3: %s %s\n",typeName.c_str(), (const char*)xmlGetProp(_config,(xmlChar*)"name"));
   if (typeName == "plane")
   {
     boost::shared_ptr<Plane> plane(new Plane);
@@ -1170,7 +1234,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
     result = initXml(_config, cylinder);
     _geometry = cylinder;
   }
-  else if (typeName == "mesh")
+  else if (typeName == "trimesh")
   {
     boost::shared_ptr<Mesh> mesh(new Mesh);
     result = initXml(_config, mesh);

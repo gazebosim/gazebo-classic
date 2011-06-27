@@ -175,7 +175,7 @@ namespace sdf
   xmlNodePtr getNextByNSPrefix(xmlNodePtr node, const std::string &prefix)
   {
     xmlNodePtr tmp;
-    for (tmp = node->next; tmp != NULL; tmp = tmp->next )
+    for (tmp = xmlNextElementSibling(node); tmp != NULL; tmp = xmlNextElementSibling(tmp) )
       if (tmp->ns && prefix == (const char*)tmp->ns->prefix)
         break;
     return tmp;
@@ -185,7 +185,7 @@ namespace sdf
   xmlNodePtr getChildByNSPrefix(xmlNodePtr node, const std::string &prefix )
   {
     xmlNodePtr tmp;
-    for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = tmp->next )
+    for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = xmlNextElementSibling(tmp) )
       if (tmp->ns && prefix == (const char*)tmp->ns->prefix)
         break;
     return tmp;
