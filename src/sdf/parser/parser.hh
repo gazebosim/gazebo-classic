@@ -56,13 +56,14 @@
 
 namespace sdf
 {
+  bool initXml(TiXmlElement *_config, std::vector<Param*> &_params);
+
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor);
 
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Contact> &_contact);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor);
 
-  bool initXml(TiXmlElement *_config, boost::shared_ptr<Light> &_light);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial);
   bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision);

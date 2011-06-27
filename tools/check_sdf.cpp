@@ -49,6 +49,7 @@ int main(int argc, char** argv)
     return -1;
   }
 
+
   TiXmlDocument worldDoc;
   worldDoc.LoadFile(argv[1]);
 

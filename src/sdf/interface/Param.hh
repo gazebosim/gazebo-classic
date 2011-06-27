@@ -61,9 +61,15 @@ namespace sdf
     /// \brief Set the parameter value from a string
     public: virtual bool Set(const char * /*_string*/) {return true;}
 
+    /// \brief Reset the parameter
+    public: virtual void Reset() = 0;
+
     public: const std::string &GetKey() const {return this->key;} 
 
     public: std::string GetTypeName() const;
+    public: bool GetRequired() const { return this->required; }
+
+    public: virtual boost::shared_ptr<Param> Clone() const = 0;
 
     public: bool IsBool() const;
     public: bool IsInt() const;
@@ -84,18 +90,31 @@ namespace sdf
   };
   
   
-  template< typename T, bool _required>
+  template< typename T>
   class ParamT : public Param
   {
     /// \brief Constructor
-    public: ParamT(const std::string &_key, const T &_default)
+    /*public: ParamT(const std::string &_key, const T &_default, bool _required)
             : Param(this), value(_default), defaultValue(_default)
     {
       this->key = _key;
       this->required = _required;
       this->typeName = typeid(T).name();
+    }*/
+
+    /// \brief Constructor
+    public: ParamT(const std::string &_key, const std::string &_default, 
+                   bool _required)
+            : Param(this)
+    {
+      this->key = _key;
+      this->required = _required;
+      this->typeName = typeid(T).name();
+
+      this->Set(_default.c_str());
+      this->defaultValue = this->value;
     }
- 
+   
     /// \brief Destructor
     public: virtual ~ParamT() {}
  
@@ -109,7 +128,6 @@ namespace sdf
     {
       return boost::lexical_cast<std::string>(this->defaultValue);
     }
- 
 
     /// \brief Set the parameter value from a string
     public: virtual bool Set( const char *_cstr )
@@ -172,15 +190,21 @@ namespace sdf
     }
 
     /// \brief Reset to default value
-    public: void Reset()
+    public: virtual void Reset()
     {
       this->value = this->defaultValue;
     }
 
+    public: virtual boost::shared_ptr<Param> Clone() const
+            {
+              boost::shared_ptr<ParamT<T> > clone(new ParamT<T>(this->GetKey(),this->GetDefaultAsString(), this->required ) );
+              return clone;
+            }
+
     public: inline T operator*() const {return value;}
   
     public: friend std::ostream &operator<<( std::ostream &_out, 
-                                             const ParamT<T, _required> &_p)
+                                             const ParamT<T> &_p)
             {
               _out << _p.value;
               return _out;

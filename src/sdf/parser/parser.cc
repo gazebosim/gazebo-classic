@@ -1,39 +1,3 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-* 
-*  Copyright (c) 2008, Willow Garage, Inc.
-*  All rights reserved.
-* 
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-* 
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-* 
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
-
-/* Author: Wim Meeussen */
-
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -44,56 +8,6 @@
 
 namespace sdf
 {
-
-bool getBoolFromStr(std::string _str, bool &_value, bool _default, 
-                    bool _required)
-{
-  _value = _default;
-
-  if (_str.empty() && _required)
-  {
-    gzerr << "Required key is empty\n";
-    return false;
-  }
-  
-  boost::to_lower(_str);
-  if (_str == "true" || _str == "t" || _str == "1")
-    _value = true;
-  else if (_str == "false" || _str == "f" || _str == "0")
-    _value = false;
-  else
-  {
-    gzerr << "Malformed boolean string[" << _str << "]\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool getDoubleFromStr(const std::string &_str, double &_value, double _default,
-                      bool _required)
-{
-  _value = _default;
-
-  if (_str.empty() && _required)
-  {
-    gzerr << "Required key is empty\n";
-    return false;
-  }
- 
-  try
-  {
-    _value = boost::lexical_cast<double>(_str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    _value = _default;
-    gzerr << "Malformed double string[" << _str << "]\n";
-    return false;
-  }
-
-  return true;
-}
 
 bool getPlugins(TiXmlElement *_parentXml, 
                 std::map<std::string, boost::shared_ptr<Plugin> > &_plugins)
@@ -129,263 +43,6 @@ bool getPlugins(TiXmlElement *_parentXml,
   return true;
 }
 
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
-{
-  _sensor->Clear();
-
-  /// Get all the plugins
-  getPlugins(_config, _sensor->plugins);
-
-  if (!_sensor->name.Set(_config->Attribute("name")))
-  {
-     gzerr << "Unable to parse sensor name.\n";
-    return false;
-  }
-     
-  if (!_sensor->type.Set(_config->Attribute("type")))
-  {
-    gzerr << "Unable to parse sensor type\n";
-    return false;
-  }
-
-  if (!_sensor->alwaysOn.Set(_config->Attribute("always_on")))
-  {
-    gzerr << "Unable to parse sensor always_on\n";
-    return false;
-  }
-
-  if (!_sensor->updateRate.Set( _config->Attribute("update_rate") ))
-  {
-    gzerr << "Unable to parse sensor update_rate\n";
-    return false;
-  }
-
-  // Origin
-  TiXmlElement *o = _config->FirstChildElement("origin");
-  if (!o)
-  {
-    gzwarn << "Origin tag not present for sensor element, using default (Identity)\n";
-    _sensor->origin.Reset();
-  }
-  else
-  {
-    if (!_sensor->origin.Set( o->Attribute("pose") ))
-    {
-      gzerr << "Sensor has malformed orgin\n";
-      return false;
-    }
-  }
-
-  if (_sensor->type.GetValue() == "contact")
-  {
-    boost::shared_ptr<Contact> contact = boost::shared_static_cast<Contact>(_sensor);
-    initXml(_config, contact );
-  }
-  else if (*_sensor->type == "camera")
-  {
-    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor);
-    initXml(_config, camera);
-  }
-  else if (*_sensor->type == "ray")
-  {
-
-    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor);
-    initXml(_config, ray);
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Camera> &_sensor)
-{
-  // Horizontal field of view
-  TiXmlElement *hfov = _config->FirstChildElement("horizontal_fov");
-  if(!hfov)
-  {
-    gzerr << "Camera missing horizontal_fov element\n";
-    return false;
-  }
-
-  if (!_sensor->horizontalFov.Set(hfov->Attribute("angle")))
-  {
-    gzerr << "Unable to parse camera horizontal_fov angle attribute\n";
-    return false;
-  }
-
-  // Image 
-  TiXmlElement *image = _config->FirstChildElement("image");
-  if (!image)
-  {
-    gzerr << "Camera sensor requires an image element \n";
-    return false;
-  }
-
-  if (!_sensor->imageWidth.Set( image->Attribute("width")))
-  {
-    gzerr << "Unable to parse sensor image width\n";
-    return false;
-  }
-
-  if (!_sensor->imageHeight.Set( image->Attribute("height")))
-  {
-    gzerr << "Unable to parse sensor image height\n";
-    return false;
-  }
-
-  if (!_sensor->imageFormat.Set( image->Attribute("format")))
-  {
-    gzerr << "Unable to parse sensor image format\n";
-    return false;
-  }
-
-  // clip 
-  TiXmlElement *clip = _config->FirstChildElement("clip");
-  if (!clip)
-  {
-    gzerr << "Camera sensor requires an clip element \n";
-    return false;
-  }
-
-  if (!_sensor->clipNear.Set( clip->Attribute("near") ))
-  {
-    gzerr << "Unable to parse camera near clip";
-    return false;
-  }
-
-  if (!_sensor->clipFar.Set( clip->Attribute("far") ))
-  {
-    gzerr << "Unable to parse camera far clip";
-    return false;
-  }
-
-  // save 
-  TiXmlElement *save = _config->FirstChildElement("save");
-  if (save)
-  {
-    if (!_sensor->saveEnabled.Set(save->Attribute("enabled")))
-    {
-      gzerr << "Unable to parse camera save enabled flag\n";
-      return false;
-    }
-
-    if (!_sensor->savePath.Set(save->Attribute("path")))
-    {
-      gzerr << "Unable to parse camera save path\n";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Ray> &_sensor)
-{
-  // scan 
-  TiXmlElement *scan = _config->FirstChildElement("scan");
-  if (scan)
-  {
-    if (!_sensor->display.Set(scan->Attribute("display")))
-    {
-      gzerr << "Unable to parse ray display flag\n";
-      return false;
-    }
-
-    // Horizontal scans
-    TiXmlElement *horizontal = scan->FirstChildElement("horizontal");
-    if (!horizontal)
-    {
-      gzerr << "missing horizontal element";
-      return false;
-    }
-
-    if (!_sensor->horizontalSamples.Set( horizontal->Attribute("samples")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal samples";
-      return false;
-    }
-
-    if (!_sensor->horizontalResolution.Set(horizontal->Attribute("resolution")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal resolution";
-      return false;
-    }
-
-    if (!_sensor->horizontalMinAngle.Set(horizontal->Attribute("min_angle")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal min_angle";
-      return false;
-    }
-
-    if (!_sensor->horizontalMaxAngle.Set(horizontal->Attribute("max_angle")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal max_angle";
-      return false;
-    }
-
-    // Vertical scans
-    TiXmlElement *vertical = _config->FirstChildElement("vertical");
-    if (!vertical)
-    {
-      gzerr << "missing vertical element\n";
-      return false;
-    }
-
-    if (!_sensor->verticalSamples.Set( vertical->Attribute("samples")))
-    {
-      gzerr << "Unable to parse ray sensor vertical samples";
-      return false;
-    }
-
-    if (!_sensor->verticalResolution.Set(vertical->Attribute("resolution")))
-    {
-      gzerr << "Unable to parse ray sensor vertical resolution";
-      return false;
-    }
-
-    if (!_sensor->verticalMinAngle.Set(vertical->Attribute("min_angle")))
-    {
-      gzerr << "Unable to parse ray sensor vertical min_angle";
-      return false;
-    }
-
-    if (!_sensor->verticalMaxAngle.Set(vertical->Attribute("max_angle")))
-    {
-      gzerr << "Unable to parse ray sensor vertical max_angle";
-      return false;
-    }
-
-
-    // range 
-    TiXmlElement *range = _config->FirstChildElement("range");
-    if (!range)
-    {
-      gzerr << "ray sensor missing range element\n";
-      return false;
-    }
-
-    if (!_sensor->rangeMin.Set( range->Attribute("min")))
-    {
-      gzerr << "Invalid min range\n";
-      return false;
-    }
-
-    if (!_sensor->rangeMax.Set( range->Attribute("max")))
-    {
-      gzerr << "Invalid max range\n";
-      return false;
-    }
-
-    if (!_sensor->rangeResolution.Set( range->Attribute("resolution")))
-    {
-      gzerr << "Invalid range resolution\n";
-      return false;
-    }
-  }
-
-  return true;
-}
-
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
 {
   boost::char_separator<char> openSep("{");
@@ -394,12 +51,12 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
   std::list<TiXmlElement*> elements;
 
   // Remove all white space
-  boost::erase_all(_light->tree, " ");
+  boost::erase_all(_base->xmlTree, " ");
 
   TiXmlElement *element = _config;
   elements.push_back(_config);
 
-  boost::tokenizer<boost::char_separator<char> > openTok(_light->tree, openSep);
+  boost::tokenizer<boost::char_separator<char> > openTok(_base->xmlTree, openSep);
   BOOST_FOREACH(std::string str1, openTok)
   {
     int index = str1.find(":");
@@ -424,7 +81,7 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
           str2.erase(str2.size()-1,1);
           elements.pop_back();
         }
-        Param *param = Param::Find(_light->parameters, str2);
+        Param *param = Param::Find(_base->parameters, str2);
         if (param)
         {
           if (!param->Set(currentElement->Attribute( str2.c_str() )))
@@ -438,11 +95,6 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
           gzerr << "Interface is missing key[" << str2 << "]\n";
           return false;
         }
-        
-        /*const char *attr = currentElement->Attribute( str2.c_str() );
-        if (attr)
-          std::cout << "Attribute[" << str2 << "=" << attr << "]\n";
-          */
       }
     }
   }
@@ -450,279 +102,39 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Base> &_base)
   return true;
 }
 
-/*bool initXml(TiXmlElement *_config, boost::shared_ptr<Light> &_light)
+
+
+bool initXml(TiXmlElement *_config, boost::shared_ptr<Sensor> &_sensor)
 {
-  _light->Clear();
+  _sensor->Clear();
 
-  if (!_light->type.Set(_config->Attribute("type")))
-  {
-    gzerr << "Unable to parse light type attribute\n";
-    return false;
-  }
+  /// Get all the plugins
+  getPlugins(_config, _sensor->plugins);
+  boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(_sensor);
+  return initXml(_config, base);
+}
 
-  if (!_light->name.Set(_config->Attribute("name")))
-  {
-    gzerr << "Unable to parse light name attribute\n";
-    return false;
-  }
-
-  if (!_light->cast_shadows.Set(_config->Attribute("cast_shadows")))
-  {
-    gzerr << "Unable to parse light cast_shadows\n";
-    return false;
-  }
-
-
-  // Origin
-  TiXmlElement *o = _config->FirstChildElement("origin");
-  if (!o)
-  {
-    gzerr << "Origin tag not present for light element\n";
-    return false;
-  }
-  else
-  {
-    if (!_light->origin.Set( o->Attribute("pose") ))
-    {
-      gzerr << "Light has malformed orgin\n";
-      return false;
-    }
-  }
-
-  // Diffuse color
-  TiXmlElement *diffuse = _config->FirstChildElement("diffuse");
-  if (diffuse && !_light->diffuseColor.Set(diffuse->Attribute("rgba")))
-  {
-    gzerr << "Unable to parse diffuse rgba attribute\n";
-    return false;
-  }
-
-  // Specular color
-  TiXmlElement *specular = _config->FirstChildElement("diffuse");
-  if (specular && !_light->specularColor.Set(specular->Attribute("rgba")))
-  {
-    gzerr << "Unable to parse specular rgba attribute\n";
-    return false;
-  }
-
-  // attenuation 
-  TiXmlElement *attenuation = _config->FirstChildElement("attenuation");
-  if (attenuation)
-  {
-    if (!_light->range.Set(attenuation->Attribute("range")))
-    {
-      gzerr << "Unable to parse attenuation range attribute\n";
-      return false;
-    }
-
-    if (!_light->constantAttenuation.Set(attenuation->Attribute("constant")))
-    {
-      gzerr << "Unable to parse attenuation constant attribute\n";
-      return false;
-    }
-
-    if (!_light->linearAttenuation.Set(attenuation->Attribute("linear")))
-    {
-      gzerr << "Unable to parse attenuation linear attribute\n";
-      return false;
-    }
-
-    if (!_light->quadraticAttenuation.Set(attenuation->Attribute("quadratic")))
-    {
-      gzerr << "Unable to parse attenuation quadratic attribute\n";
-      return false;
-    }
-  }
-
-  // sport 
-  TiXmlElement *spot = _config->FirstChildElement("spot");
-  if (attenuation)
-  {
-    if (!_light->spotInnerAngle.Set( 
-          spot->Attribute( _light->spotInnerAngle.GetKey() )))
-    {
-      gzerr << "Unable to parse " << _light->spotOuterAngle.GetKey() << "\n";
-
-      return false;
-    }
-
-    if (!_light->spotOuterAngle.Set( 
-          spot->Attribute( _light->spotOuterAngle.GetKey() )))
-    {
-      gzerr << "Unable to parse " << _light->spotOuterAngle.GetKey() << "\n";
-      return false;
-    }
-
-    if (!_light->spotFalloff.Set( 
-          spot->Attribute( _light->spotFalloff.GetKey() )))
-    {
-      gzerr << "Unable to parse " << _light->spotFalloff.GetKey() << "\n";
-      return false;
-    }
-  }
- 
-  return true;
-}*/
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Material> &_material)
 {
-  bool hasRGB = false;
-
   _material->Clear();
 
-  if (!_material->script.Set( _config->Attribute("script") ))
-  {
-    gzerr << "Unable to parse material script attribute\n";
-    return false;
-  }
-
-  // color
-  TiXmlElement *c = _config->FirstChildElement("color");
-  if (c)
-  {
-    if (c->Attribute("rgba"))
-    {
-      if (!_material->color.Set(c->Attribute("rgba")))
-      {
-        gzerr << "Unable to parse material color rgba attribute.\n";
-        _material->color.Reset();
-        return false;
-      }
-      else
-        hasRGB = true;
-    }
-    else
-    {
-      gzwarn << "Material color has no rgba\n";
-    }
-  }
-
-  return !_material->script.GetValue().empty() || hasRGB;
+  boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(_material);
+  return initXml(_config, base);
 }
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Inertial> &_inertial)
 {
   _inertial->Clear();
-
-  // Origin
-  TiXmlElement *o = _config->FirstChildElement("origin");
-  if (!o)
-  {
-    gzwarn << "INFO: Origin tag not present for inertial element, using default (Identity)\n";
-    _inertial->origin.Reset();
-  }
-  else
-  {
-    if (!_inertial->origin.Set(o->Attribute("pose")))
-    {
-      gzerr << "Unable to parse origin tag\n";
-      _inertial->origin.Reset();
-      return false;
-    }
-  }
-
-  if (!_config->Attribute("mass"))
-  {
-    gzerr << "Inertial element must have mass attribute.";
-    return false;
-  }
-
-  if (!_inertial->mass.Set(_config->Attribute("mass")))
-  {
-    gzerr << "Unable to parse inerital mass attribute\n";
-    return false;
-  }
-
-  TiXmlElement *inertiaXml = _config->FirstChildElement("inertia");
-  if (!inertiaXml)
-  {
-    gzerr << "Inertial element must have inertia element\n";
-    return false;
-  }
-
-  if (!(inertiaXml->Attribute("ixx") && inertiaXml->Attribute("ixy") && 
-        inertiaXml->Attribute("ixz") && inertiaXml->Attribute("iyy") && 
-        inertiaXml->Attribute("iyz") && inertiaXml->Attribute("izz")))
-  {
-    gzerr << "Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes\n";
-    return false;
-  }
-
-  if (!_inertial->ixx.Set(inertiaXml->Attribute("ixx")) || 
-      !_inertial->ixy.Set(inertiaXml->Attribute("ixy")) || 
-      !_inertial->ixz.Set(inertiaXml->Attribute("ixz")) || 
-      !_inertial->iyy.Set(inertiaXml->Attribute("iyy")) || 
-      !_inertial->iyz.Set(inertiaXml->Attribute("iyz")) || 
-      !_inertial->izz.Set(inertiaXml->Attribute("izz")) )
-  {
-    gzerr << "one of the inertia elements: "
-      << "ixx (" << inertiaXml->Attribute("ixx") << ") "
-      << "ixy (" << inertiaXml->Attribute("ixy") << ") "
-      << "ixz (" << inertiaXml->Attribute("ixz")  << ") "
-      << "iyy (" << inertiaXml->Attribute("iyy")  << ") "
-      << "iyz (" << inertiaXml->Attribute("iyz")  << ") "
-      << "izz (" << inertiaXml->Attribute("izz")  << ") "
-      << "is not a valid double.\n";
-    return false;
-  }
-
-  return true;
+  boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(_inertial);
+  return initXml(_config, base);
 }
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Collision> &_collision)
 {
   _collision->Clear();
-
-  if (!_collision->name.Set(_config->Attribute("name")))
-  {
-    gzerr << "Unable to parse collision name\n";
-    return false;
-  }
-
-  // Origin
-  TiXmlElement *o = _config->FirstChildElement("origin");
-  if (!o)
-  {
-    gzwarn << "Origin tag not present for collision element, using default (Identity\n";
-    _collision->origin.Reset();
-  }
-  else if (!_collision->origin.Set(o->Attribute("pose")))
-  {
-    gzerr << "Unable to parse collision origin element\n";
-    _collision->origin.Reset();
-    return false;
-  }
-
-  // Geometry
-  TiXmlElement *geom = _config->FirstChildElement("geometry");
-  if (geom)
-  {
-    _collision->geometry.reset( new Geometry);
-    if (!initXml(geom, _collision->geometry))
-    {
-      gzerr << "Unable to parse collision geometry element\n";
-      return false;
-    }
-  }
-  else
-  {
-    gzerr << "Collision is missing a geometry element.\n";
-    return false;
-  }
-
-  // Surface
-  TiXmlElement *surface = _config->FirstChildElement("surface");
-  if (surface)
-  {
-    _collision->surface.reset(new Surface);
-    if (!initXml(surface, _collision->surface))
-    {
-      gzerr << "Unable to parse collision surface element\n";
-      return false;
-    }
-  }
-
-  return true;
+  boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(_collision);
+  return initXml(_config, base);
 }
 
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
@@ -739,7 +151,8 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
       if (std::string(frictionXml->Value()) == "ode")
       {
         boost::shared_ptr<ODEFriction> odeFriction( new ODEFriction );
-        if (!initXml(frictionXml, odeFriction))
+        boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(odeFriction);
+        if (!initXml(frictionXml, base))
         {
           gzerr << "Unable to parse ODE Friction element\n";
           return false;
@@ -747,22 +160,6 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
         _surface->frictions.push_back( odeFriction );
       }
 
-    }
-  }
-
-  TiXmlElement *bounce = _config->FirstChildElement("bounce");
-  if (bounce)
-  {
-    if (!_surface->bounceRestCoeff.Set( bounce->Attribute("restitution_coefficient") ))
-    {
-      gzerr << "Unable to set surface bouce restitution_coefficient\n";
-      return false;
-    }
-
-    if (!_surface->bounceThreshold.Set( bounce->Attribute("threshold") ))
-    {
-      gzerr << "Unable to set surface bouce threshold\n";
-      return false;
     }
   }
 
@@ -777,7 +174,8 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
       if (std::string(contactXml->Value()) == "ode")
       {
         boost::shared_ptr<ODESurfaceContact> odeContact( new ODESurfaceContact );
-        if (!initXml(contactXml, odeContact))
+        boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(odeFriction);
+        if (!initXml(contactXml, base))
         {
           gzerr << "Unable to parse ODE Contact element\n";
           return false;
@@ -790,190 +188,9 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Surface> &_surface)
   return true;
 }
 
-bool initXml(TiXmlElement *_config, boost::shared_ptr<ODEFriction> &_friction)
-{
-  if (!_friction->mu.Set( _config->Attribute("mu") ))
-  {
-    gzerr << "Unable to parse ODE friction mu element\n";
-    return false;
-  }
-
-  if (!_friction->mu2.Set( _config->Attribute("mu2") ))
-  {
-    gzerr << "Unable to parse ODE friction mu2 element\n";
-    return false;
-  }
-
-  if (!_friction->fdir1.Set( _config->Attribute("fdir1") ))
-  {
-    gzerr << "Unable to parse ODE friction fdir1 element\n";
-    return false;
-  }
-
-  if (!_friction->slip1.Set( _config->Attribute("slip1") ))
-  {
-    gzerr << "Unable to parse ODE friction slip1 element\n";
-    return false;
-  }
-
-  if (!_friction->slip2.Set( _config->Attribute("slip2") ))
-  {
-    gzerr << "Unable to parse ODE friction slip2 element\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<ODESurfaceContact> &_contact)
-{
-  if (!_contact->softCFM.Set( _config->Attribute("soft_cfm") ))
-  {
-    gzerr << "Unable to parse ODE contact soft_cfm element\n";
-    return false;
-  }
-
-  if (!_contact->kp.Set( _config->Attribute("kp") ))
-  {
-    gzerr << "Unable to parse ODE contact kp element\n";
-    return false;
-  }
-
-  if (!_contact->kd.Set( _config->Attribute("kd") ))
-  {
-    gzerr << "Unable to parse ODE contact kd element\n";
-    return false;
-  }
-
-  if (!_contact->maxVel.Set( _config->Attribute("max_vel") ))
-  {
-    gzerr << "Unable to parse ODE contact max_vel element\n";
-    return false;
-  }
-
-  if (!_contact->minDepth.Set( _config->Attribute("min_depth") ))
-  {
-    gzerr << "Unable to parse ODE contact min_depth element\n";
-    return false;
-  }
-
-  return true;
-}
-
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Plane> &_plane)
-{
-  _plane->Clear();
-
-  if (!_plane->normal.Set(_config->Attribute("normal")))
-  {
-    gzerr << "Unable to parse plane's normal attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Sphere> &_sphere)
-{
-  _sphere->Clear();
-
-  if (!_sphere->radius.Set(_config->Attribute("radius")))
-  {
-    gzerr << "Unable to parse sphere's radius attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Box> &_box)
-{
-  _box->Clear();
-
-  if (!_box->size.Set(_config->Attribute("size")))
-  {
-    gzerr << "Unable to parse box's size attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Cylinder> &_cylinder)
-{
-  _cylinder->Clear();
-
-  if (!_cylinder->length.Set(_config->Attribute("length")))
-  {
-    gzerr << "Unable to parse cylinder's length attribute\n";
-    return false;
-  }
-
-  if (!_cylinder->radius.Set(_config->Attribute("radius")))
-  {
-    gzerr << "Unable to parse cylinder's radius attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Mesh> &_mesh)
-{
-  _mesh->Clear();
-
-  if (!_mesh->filename.Set(_config->Attribute("filename")))
-  {
-    gzerr << "Unable to parse mesh's filename attribute\n";
-    return false;
-  }
-
-  if (!_mesh->scale.Set(_config->Attribute("scale")))
-  {
-    gzerr << "Unable to parse mesh's scale attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
 bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
 {
   _link->Clear();
-
-  if (!_link->name.Set(_config->Attribute("name")))
-  {
-    gzerr << "Unable to parse value for link name.\n";
-    return false;
-  }
-
-  // Origin
-  TiXmlElement *o = _config->FirstChildElement("origin");
-  if (!o)
-  {
-    gzwarn << "Origin tag not present for link element, using default (Identity)\n";
-    _link->origin.Reset();
-  }
-  else if (!_link->origin.Set(o->Attribute("pose")))
-  {
-    gzerr << "Unable to parase link origin element\n";
-    _link->origin.Reset();
-    return false;
-  }
-
-  // Inertial (optional)
-  TiXmlElement *i = _config->FirstChildElement("inertial");
-  if (i)
-  {
-    _link->inertial.reset(new Inertial);
-    if (!initXml(i,_link->inertial))
-    {
-      gzerr << "Could not parse inertial element for Link '" 
-        << _link->name << "'\n";
-      return false;
-    }
-  }
 
   // Multiple Visuals (optional)
   for (TiXmlElement* visXml = _config->FirstChildElement("visual"); 
@@ -1057,267 +274,9 @@ bool initXml(TiXmlElement *_config, boost::shared_ptr<Link> &_link)
     }
   }
 
-  return true;
+  boost::shared_ptr<Base> base = boost::shared_static_cast<Base>(_link);
+  return initXml(_config, base);
 }
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Visual> &_visual)
-{
-  _visual->Clear();
-
-  if (!_visual->name.Set( _config->Attribute("name")))
-  {
-    gzerr << "Unable to parse visual name attribute\n";
-    return false;
-  }
-
-  if (!_visual->castShadows.Set( _config->Attribute("cast_shadows")))
-  {
-    gzerr << "Unable to parse visual cast_shadows attribute\n";
-    return false;
-  }
-
-  // Origin
-  TiXmlElement *o = _config->FirstChildElement("origin");
-  if (!o)
-  {
-    gzwarn << "Origin tag not present for visual element, using default (Identity)\n";
-    _visual->origin.Reset();
-  }
-  else if (!_visual->origin.Set(o->Attribute("pose")))
-  {
-    gzerr << "Unable to parase visual origin element\n";
-    _visual->origin.Reset();
-    return false;
-  }
-
-  // Geometry
-  TiXmlElement *geometryXml = _config->FirstChildElement("geometry");
-  if (geometryXml)
-  {
-    _visual->geometry.reset(new Geometry);
-    if (!initXml(geometryXml, _visual->geometry))
-    {
-      gzerr << "Unable to parse geometry for Visual element\n";
-      return false;
-    }
-  }
-  else
-  {
-    gzerr << "Visual is missing geometry element\n";
-    return false;
-  }
-
-
-  // Material
-  TiXmlElement *mat = _config->FirstChildElement("material");
-  if (mat)
-  {
-    // try to parse material element in place
-    _visual->material.reset(new Material);
-    if (!initXml(mat, _visual->material))
-    {
-      gzerr << "Could not parse material element in Visual block, maybe defined outside.\n";
-      _visual->material.reset();
-    }
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<JointDynamics> &_jointDynamics)
-{
-  _jointDynamics->Clear();
-
-  if (!_jointDynamics->damping.Set(_config->Attribute("damping")))
-  {
-    gzerr << "Unable to parse joint dynamics damping attribute\n";
-    return false;
-  }
-
-  if (!_jointDynamics->friction.Set(_config->Attribute("friction")))
-  {
-    gzerr << "Unable to parse joint dynamics friction attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
-
-bool initXml(TiXmlElement *_config, 
-             boost::shared_ptr<JointLimits> &_jointLimits)
-{
-  _jointLimits->Clear();
-
-  if (!_jointLimits->lower.Set(_config->Attribute("lower")))
-  {
-    gzerr << "Unable to parse joint limit lower\n";
-    return false;
-  }
-
-  if (!_jointLimits->upper.Set(_config->Attribute("upper")))
-  {
-    gzerr << "Unable to parse joint limit upper\n";
-    return false;
-  }
-
-  if (!_jointLimits->effort.Set(_config->Attribute("effort")))
-  {
-    gzerr << "Unable to parse joint limit effort\n";
-    return false;
-  }
-
-  if (!_jointLimits->effort.Set(_config->Attribute("velocity")))
-  {
-    gzerr << "Unable to parse joint limit velocity\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Joint> &_joint)
-{
-  _joint->Clear();
-
-  // Get Joint Name
-  if (!_joint->name.Set(_config->Attribute("name")))
-  {
-    gzerr << "Unable to parse joint name attribute\n";
-    return false;
-  }
-
-  // Get transform from Parent Link to Joint Frame
-  TiXmlElement *originXml = _config->FirstChildElement("origin");
-  if (!originXml)
-  {
-    _joint->origin.Reset();
-  }
-  else
-  {
-    if (!_joint->origin.Set(originXml->Attribute("pose")))
-    {
-      gzerr << "Unable to parse joint origin element\n";
-      _joint->origin.Reset();
-      return false;
-    }
-  }
-
-  // Get Parent Link
-  TiXmlElement *parentXml = _config->FirstChildElement("parent");
-  if (parentXml)
-  {
-    if (!_joint->parentLinkName.Set(parentXml->Attribute("link")))
-    {
-      gzerr << "Unable to parse joint parent link name\n";
-      return false;
-    }
-  }
-  else
-  {
-    gzerr << "No parent link specified for joint[" << _joint->name << "]\n";
-    return false;
-  }
-
-  // Get Child Link
-  TiXmlElement *childXml = _config->FirstChildElement("child");
-  if (childXml)
-  {
-    if (!_joint->childLinkName.Set(childXml->Attribute("link")))
-    {
-      gzerr << "Unable to parse joint child link name\n";
-      return false;
-    }
-  }
-  else
-  {
-    gzerr << "No child link specified for joint[" << _joint->name << "]\n";
-    return false;
-  }
-
-
-
-  // Get Joint type
-  if (!_joint->type.Set(_config->Attribute("type")))
-  {
-    gzerr << "joint '" << _joint->name 
-      << "' has no type, check to see if it's a reference.\n";
-    return false;
-  }
-
-  std::string typeStr = _joint->type.GetValue();
-  if (typeStr == "piston")
-    _joint->typeEnum = Joint::PISTON;
-  else if (typeStr == "revolute2")
-    _joint->typeEnum = Joint::REVOLUTE2;
-  else if (typeStr == "revolute")
-    _joint->typeEnum = Joint::REVOLUTE;
-  else if (typeStr == "universal")
-    _joint->typeEnum = Joint::UNIVERSAL;
-  else if (typeStr == "prismatic")
-    _joint->typeEnum = Joint::PRISMATIC;
-  else if (typeStr == "ball")
-    _joint->typeEnum = Joint::BALL;
-  else
-  {
-    gzerr << "Joint '" << _joint->name  << "' has no known type '" 
-      << typeStr << "'.\n";
-    return false;
-  }
-
-  // Get Joint Axis
-  if (_joint->typeEnum != Joint::BALL)
-  {
-    // axis
-    TiXmlElement *axisXml = _config->FirstChildElement("axis");
-    if (!axisXml)
-    {
-      gzwarn << "no axis elemement for Joint link '" 
-        << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis.SetValue( gazebo::math::Vector3(1.0, 0.0, 0.0));
-    }
-    else{
-      if (!_joint->axis.Set( axisXml->Attribute("xyz")) )
-      {
-        gzerr << "Unable to parse axis for joint[" << _joint->name << "]\n";
-        return false;
-      }
-    }
-  }
-
-  // Get limit
-  TiXmlElement *limitXml = _config->FirstChildElement("limit");
-  if (limitXml)
-  {
-    _joint->limits.reset(new JointLimits);
-    if (!initXml(limitXml,_joint->limits))
-    {
-      gzerr << "Could not parse limit element for joint '" 
-        << _joint->name << "'.\n";
-      _joint->limits.reset();
-      return false;
-    }
-  }
-
-  // Get Dynamics
-  TiXmlElement *propXml = _config->FirstChildElement("dynamics");
-  if (propXml)
-  {
-    _joint->dynamics.reset(new JointDynamics);
-    if (!initXml(propXml,_joint->dynamics))
-    {
-      gzerr << "Could not parse joint_dynamics element for joint '" 
-        << _joint->name << "'.\n";
-      _joint->dynamics.reset();
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
@@ -1327,7 +286,6 @@ bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
 
   return initDoc(&xmlDoc,_model);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool initString(const std::string &_xmlString, boost::shared_ptr<Model> &_model)
@@ -1362,16 +320,11 @@ bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<Model> &_model)
 /// \brief Load Model from TiXMLElement
 bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
 {
-  _model->Clear();
 
   if (!_xml) 
     return false;
 
-  if (!_model->name.Set(_xml->Attribute("name")))
-  {
-    gzerr << "No name given for the model.\n";
-    return false;
-  }
+  _model->Clear();
 
   // Get all Link elements
   for (TiXmlElement* linkXml = _xml->FirstChildElement("link"); 
@@ -1441,91 +394,6 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<Model> &_model)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Geometry> &_geometry)
-{
-  bool result = false;
-  TiXmlElement *shape = NULL;
-
-  if (!_config)
-  {
-    gzerr << "Null xml\n";
-    return false;
-  }
-
-  shape = _config->FirstChildElement();
-  if (!shape)
-  {
-    gzerr << "Geometry tag contains no child element.\n";
-    return false;
-  }
-
-  std::string typeName = shape->ValueStr();
-  if (typeName == "plane")
-  {
-    boost::shared_ptr<Plane> plane(new Plane);
-    result = initXml(shape, plane);
-    _geometry = plane;
-  }
-  else if (typeName == "sphere")
-  {
-    boost::shared_ptr<Sphere> sphere(new Sphere);
-    result = initXml(shape, sphere);
-    _geometry = sphere;
-  }
-  else if (typeName == "box")
-  {
-    boost::shared_ptr<Box> box(new Box);
-    result = initXml(shape, box);
-    _geometry =  box;
-  }
-  else if (typeName == "cylinder")
-  {
-    boost::shared_ptr<Cylinder> cylinder(new Cylinder);
-    result = initXml(shape, cylinder);
-    _geometry = cylinder;
-  }
-  else if (typeName == "mesh")
-  {
-    boost::shared_ptr<Mesh> mesh(new Mesh);
-    result = initXml(shape, mesh);
-    _geometry = mesh;
-  }
-  else
-  {
-    gzerr << "Unknown geometry type '" << typeName << "'.\n";
-    return false;
-  }
-
-  // clear geom object when fails to initialize
-  if (!result)
-  {
-    gzerr << "Geometry failed to parse\n";
-    _geometry.reset();
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<Plugin> &_plugin)
-{
-  _plugin->Clear();
-
-  if (!_plugin->name.Set(_config->Attribute("name")))
-  {
-    gzerr << "Unable to parse the plugin name.\n";
-    return false;
-  }
-
-  if (!_plugin->filename.Set(_config->Attribute("filename")))
-  {
-    gzerr << "Unable to parse plugin filename.\n";
-    return false;
-  }
-
-  return true;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, boost::shared_ptr<World> &_world)
@@ -1567,26 +435,13 @@ bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<World> &_world)
 ////////////////////////////////////////////////////////////////////////////////
 bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
 {
-  _world->Clear();
-
   if (!_worldXml) 
   {
     gzerr << "Error: World XML is NULL\n";
     return false;
   }
 
-  // Get world name
-  if (!_world->name.Set(_worldXml->Attribute("name")))
-  {
-    gzerr << "Unable to parse world name\n";
-    return false;
-  }
-
-  _world->scene.reset(new Scene);
-  initXml(_worldXml->FirstChildElement("scene"),_world->scene);
-
-  _world->physics.reset(new Physics);
-  initXml(_worldXml->FirstChildElement("physics"),_world->physics);
+  _world->Clear();
 
   // Get all light elements
   for (TiXmlElement* lightXml = _worldXml->FirstChildElement("light"); 
@@ -1670,192 +525,7 @@ bool initXml(TiXmlElement *_worldXml, boost::shared_ptr<World> &_world)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-bool initXml(TiXmlElement* _config, boost::shared_ptr<Scene> &_scene)
-{
-  _scene->Clear();
-
-  TiXmlElement *ambient = _config->FirstChildElement("ambient");
-  if (ambient)
-  {
-    if (!_scene->ambientColor.Set(ambient->Attribute("rgba")))
-    {
-      gzerr << "Unable to parse ambient color\n";
-      return false;
-    }
-  }
-
-  TiXmlElement *background = _config->FirstChildElement("background");
-  if (background)
-  {
-    if (!_scene->backgroundColor.Set(background->Attribute("rgba")))
-    {
-      gzerr << "Unable to parse background rgba\n";
-      return false;
-    }
-
-
-    TiXmlElement *sky = background->FirstChildElement("sky");
-    if (sky)
-    {
-      if (!_scene->skyMaterial.Set(sky->Attribute("material")))
-      {
-        gzerr << "Unable to parse material for the sky.\n";
-        return false;
-      }
-    }
-  }
-
-  TiXmlElement *shadow = _config->FirstChildElement("shadows");
-  if (shadow)
-  {
-    if (!_scene->shadowEnabled.Set(shadow->Attribute("enabled")))
-    {
-      gzerr << "Shadow element requires an enabled attribute";
-      return false;
-    }
-
-    if (!_scene->shadowColor.Set(shadow->Attribute("rgba")))
-    {
-      gzerr << "Unable to parse shadow rgba\n";
-      return false;
-    }
-
-
-    if (!_scene->shadowType.Set(shadow->Attribute("type")))
-    {
-      gzerr << "Unable to parse shadow type attribute\n";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement *_config, boost::shared_ptr<OpenDynamicsEngine> &_openDynamicsEngine)
-{
-  TiXmlElement *odeConfig = _config->FirstChildElement("ode");
-
-  if ( !odeConfig )
-  {
-    gzerr << "Physics element missing <ode>\n";
-    return false;
-  }
-
-  TiXmlElement *solverConfig = odeConfig->FirstChildElement("solver");
-  if (!solverConfig)
-  {
-    gzerr << "ODE Physics missing solver element\n";
-    return false;
-  }
-
-  if (!_openDynamicsEngine->solverType.Set( solverConfig->Attribute("type")))
-  {
-    gzerr << "ODE Physics missing solver type\n";
-    return false;
-  }
-
-  if (!_openDynamicsEngine->dt.Set(solverConfig->Attribute("dt")))
-  {
-    gzerr << "ODE Physics solver unable to parse dt attribute\n";
-    return false;
-  }
-
-  if (!_openDynamicsEngine->iters.Set(solverConfig->Attribute("iters")))
-  {
-    gzerr << "ODE Physics solver malformed iters attribute\n";
-    return false;
-  }
-
-  if (!_openDynamicsEngine->sor.Set(solverConfig->Attribute("sor"))) 
-  {
-    gzerr << "ODE Physics solver unable to parse sor attribute\n)";
-    return false;
-  }
-
-
-  // Contraints
-  TiXmlElement *constraintsConfig = odeConfig->FirstChildElement("constraints");
-  if (constraintsConfig)
-  {
-
-    if (!_openDynamicsEngine->cfm.Set(constraintsConfig->Attribute("cfm"))) 
-    {
-      gzerr << "ODE Physics contraints unable to parse cfm attribute\n";
-      return false;
-    }
-
-    if (!_openDynamicsEngine->erp.Set(constraintsConfig->Attribute("erp"))) 
-    {
-      gzerr << "ODE Physics contraints unable to parse erp attribute\n";
-      return false;
-    }
-
-
-    if (!_openDynamicsEngine->contactMaxCorrectingVel.Set(constraintsConfig->Attribute("contact_max_correcting_vel")))
-    {
-      gzerr << "ODE Physics contraints unable to parse contact_max_correcting_vel attribute\n";
-      return false;
-    } 
-
-    if (!_openDynamicsEngine->contactSurfaceLayer.Set(constraintsConfig->Attribute("contact_surface_layer")))
-    {
-      gzerr << "ODE Physics contraints unable to parse contact_surface_layer attribute\n";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement* _config, boost::shared_ptr<Physics> &_physics)
-{
-  _physics->Clear();
-
-  if (!_config)
-  {
-    gzerr << "xml config is NULL\n";
-    return false;
-  }
-
-  if (!_physics->type.Set(_config->Attribute("type")))
-  {
-    gzerr << "Unable to parse physics type attribute\n";
-    return false;
-  }
-
-  TiXmlElement *gravityElement = _config->FirstChildElement("gravity");
-  if (gravityElement)
-  {
-    if (!_physics->gravity.Set(gravityElement->Attribute("xyz")))
-    {
-      gzerr << "Unable to parse physics gravity element \n";
-      _physics->gravity.Reset();
-      return false;
-    }
-  }
-
-  if (_physics->type.GetValue() == "ode")
-  {
-    _physics->engine.reset(new OpenDynamicsEngine );
-
-    boost::shared_ptr<OpenDynamicsEngine> open_dynamics_engine = boost::shared_static_cast<OpenDynamicsEngine>(_physics->engine);
-
-    initXml(_config,open_dynamics_engine);
-  }
-  else
-  {
-    gzerr << "Unknown physics engine type[" << _physics->type << "].\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(TiXmlElement * /*_config*/, boost::shared_ptr<Contact> & /*_sensor*/)
-{
-  return true;
-}
+/*
 
 bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world)
 {
@@ -2076,35 +746,34 @@ bool saveXml(TiXmlElement *_parent, const gazebo::math::Quaternion &_rot)
   return true;
 }
 
-/*
-bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,true> &_pose)
-{
-  TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
-  _parent->LinkEndChild( originNode );
 
-  saveXml(originNode, _pose.GetValue());
+//bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,true> &_pose)
+//{
+//  TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
+//  _parent->LinkEndChild( originNode );
+//
+//  saveXml(originNode, _pose.GetValue());
+//
+//  return true;
+//}
+//
+//bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,false> &_pose)
+//{
+//  TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
+//  _parent->LinkEndChild( originNode );
+//
+//  saveXml(originNode, _pose.GetValue());
+//
+//  return true;
+//}
 
-  return true;
-}
-
-bool saveXml(TiXmlElement *_parent, const ParamT<gazebo::math::Pose,false> &_pose)
-{
-  TiXmlElement *originNode = new TiXmlElement(_pose.GetKey());
-  _parent->LinkEndChild( originNode );
-
-  saveXml(originNode, _pose.GetValue());
-
-  return true;
-}*/
-
-/*bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose &_pose)
-{
-  std::ostringstream poseStream;
-  poseStream << _pose;
-  _parent->SetAttribute("pose", poseStream.str());
-  return true;
-}
-*/
+//bool saveXml(TiXmlElement *_parent, const gazebo::math::Pose &_pose)
+//{
+//  std::ostringstream poseStream;
+//  poseStream << _pose;
+//  _parent->SetAttribute("pose", poseStream.str());
+//  return true;
+//}
 
 bool saveXml(TiXmlElement *_parent, const boost::shared_ptr<Model> &_model)
 {
@@ -2507,5 +1176,6 @@ bool saveXml(TiXmlElement *_parent, boost::shared_ptr<ODESurfaceContact> &_conta
 
   return true;
 }
+*/
 
 }

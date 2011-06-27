@@ -50,11 +50,19 @@
 #include "sdf/interface/Joint.hh"
 #include "sdf/interface/Light.hh"
 
+#include "sdf/interface/SDFBase.hh"
+
 namespace sdf
 {
-  class World
+  class World : public SDFBase
   {
-    public: World();
+    public: World() : name("name", "", true)
+            {
+              Param::End();
+              this->xmlTree = "{world : name}";
+            }
+
+
   
     public: boost::shared_ptr<const Model> GetModel(const std::string &_name) const;
     public: std::string GetName() const {return this->name.GetValue();}
@@ -62,7 +70,7 @@ namespace sdf
     public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
     public: void GetModels(std::vector<boost::shared_ptr<Model> > &_models) const;
   
-    public: ParamT<std::string, true> name;
+    public: ParamT<std::string> name;
     public: boost::shared_ptr<Scene> scene;
     public: boost::shared_ptr<Physics> physics;
 
@@ -76,9 +84,8 @@ namespace sdf
     public: std::map<std::string, boost::shared_ptr<Joint> > joints;
     public: std::vector<boost::shared_ptr<Light> > lights;
 
-    public: void Clear();
+    public: virtual void Clear();
   
-    /// non-const getLink()
     private: void GetModel(const std::string &_name, 
                           boost::shared_ptr<Model> &_model) const;
  

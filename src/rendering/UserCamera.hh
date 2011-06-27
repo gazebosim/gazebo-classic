@@ -50,7 +50,7 @@ namespace gazebo
       public: virtual ~UserCamera();
   
       /// \brief Load the user camera
-      public: void Load( boost::shared_ptr<sdf::Camera> _sdf );
+      public: void Load( boost::shared_ptr<sdf::SDFElement> _sdf );
   
       /// \brief Initialize
       public: void Init();

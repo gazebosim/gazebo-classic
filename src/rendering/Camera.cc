@@ -69,10 +69,11 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->camera = NULL;
   this->viewport = NULL;
 
-  if (*this->sdf->updateRate == 0)
+  /*NATT if (*this->sdf->updateRate == 0)
     this->renderPeriod = common::Time(0.0);
   else
     this->renderPeriod = common::Time(1.0/(*this->sdf->updateRate));
+    */
 
   this->renderingEnabled = true;
 
@@ -112,9 +113,9 @@ Camera::~Camera()
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void Camera::Load( boost::shared_ptr<sdf::Camera> _sdf )
+void Camera::Load( boost::shared_ptr<sdf::SDFElement> _sdf )
 {
-  this->sdf = _sdf;
+  /*NATTthis->sdf = _sdf;
 
   if (this->sdf->imageFormat.GetValue() == "L8")
     this->imageFormat = (int)Ogre::PF_L8;
@@ -155,6 +156,7 @@ void Camera::Load( boost::shared_ptr<sdf::Camera> _sdf )
   {
     gzthrow("Camera horizontal field of veiw invalid.");
   }
+  */
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -271,11 +273,13 @@ void Camera::PostRender()
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
 
+    /*NATT
     size = Ogre::PixelUtil::getMemorySize(
         *this->sdf->imageWidth,
         *this->sdf->imageHeight, 
         1, 
         format);
+        */
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -283,7 +287,7 @@ void Camera::PostRender()
 
     memset(this->saveFrameBuffer,128,size);
 
-    Ogre::PixelBox box(*this->sdf->imageWidth, *this->sdf->imageHeight,
+    /*NATT Ogre::PixelBox box(*this->sdf->imageWidth, *this->sdf->imageHeight,
         1, (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
 
     pixelBuffer->blitToMemory( box );
@@ -292,6 +296,7 @@ void Camera::PostRender()
     {
       this->SaveFrame();
     }
+    */
   }
 
   this->newData = false;
@@ -374,9 +379,9 @@ void Camera::RotatePitch( float angle )
 /// Set the clip distances
 void Camera::SetClipDist(float _near, float _far)
 {
-  this->sdf->clipNear.SetValue(_near);
+  /* NATT this->sdf->clipNear.SetValue(_near);
   this->sdf->clipFar.SetValue(_far);
-
+  */
   if (camera)
   {
     this->camera->setNearClipDistance(_near);
@@ -389,7 +394,7 @@ void Camera::SetClipDist(float _near, float _far)
 /// Set the camera FOV (horizontal)  
 void Camera::SetFOV( float radians )
 {
-  this->sdf->horizontalFov.SetValue(radians);
+  //NATT this->sdf->horizontalFov.SetValue(radians);
 }
 
 
@@ -397,7 +402,8 @@ void Camera::SetFOV( float radians )
 /// Get the horizontal field of view of the camera
 math::Angle Camera::GetHFOV() const
 {
-  return this->sdf->horizontalFov.GetValue();
+  //NATT return this->sdf->horizontalFov.GetValue();
+  return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -411,20 +417,21 @@ math::Angle Camera::GetVFOV() const
 /// Get the width of the image
 unsigned int Camera::GetImageWidth() const
 {
-  return *this->sdf->imageWidth;
+  return 0;//NATT *this->sdf->imageWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int Camera::GetImageHeight() const
 {
-  return *this->sdf->imageHeight;
+  return 0;//NATT *this->sdf->imageHeight;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 int Camera::GetImageDepth() const
 {
+  /* NATT
   if (this->sdf->imageFormat.GetValue() == "L8")
     return 1;
   else if (this->sdf->imageFormat.GetValue() == "R8G8B8")
@@ -441,13 +448,14 @@ int Camera::GetImageDepth() const
     gzerr << "Error parsing image format (" << this->sdf->imageFormat.GetValue() << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 std::string Camera::GetImageFormat() const
 {
-  return this->sdf->imageFormat.GetValue();
+  return "";//NATT this->sdf->imageFormat.GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -469,11 +477,12 @@ unsigned int Camera::GetTextureHeight() const
 // Get the image size in bytes
 size_t Camera::GetImageByteSize() const
 {
-
+/* NATT
   return Ogre::PixelUtil::getMemorySize(*this->sdf->imageWidth,
                                         *this->sdf->imageHeight, 
                                         1, 
                                         (Ogre::PixelFormat)this->imageFormat);
+                                        */
 }
 
 
@@ -481,30 +490,31 @@ size_t Camera::GetImageByteSize() const
 // Enable or disable saving
 void Camera::EnableSaveFrame(bool enable)
 {
-  this->sdf->saveEnabled.SetValue( enable );
+  // NATT this->sdf->saveEnabled.SetValue( enable );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the save frame pathname
 void Camera::SetSaveFramePathname(const std::string &pathname)
 {
-  this->sdf->savePath.SetValue( pathname );
+  //NATT this->sdf->savePath.SetValue( pathname );
 
   // Create the directory to store frames
-  if (*this->sdf->saveEnabled)
+  /*NATT if (*this->sdf->saveEnabled)
   {
     std::string command;
     command = "mkdir " + *this->sdf->savePath + " 2>>/dev/null";
     if (system(command.c_str()) <0)
       gzerr << "Error making directory\n";
   }
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Toggle saving of frames
 void Camera::ToggleSaveFrame()
 {
-  this->sdf->saveEnabled.SetValue(!(*this->sdf->saveEnabled));
+  //NATT this->sdf->saveEnabled.SetValue(!(*this->sdf->saveEnabled));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -613,7 +623,7 @@ const unsigned char *Camera::GetImageData(unsigned int i)
 {
   if (i!=0)
     gzerr << "Camera index must be zero for cam";
-
+/* NATT
   int width = *this->sdf->imageWidth;
   int height = *this->sdf->imageHeight;
 
@@ -633,6 +643,7 @@ const unsigned char *Camera::GetImageData(unsigned int i)
   }
   else
     return this->saveFrameBuffer;
+    */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -654,6 +665,7 @@ void Camera::SaveFrame()
 
   this->GetImageData();
 
+  /*NATT
   // Create a directory if not present
   DIR *dir = opendir( (*this->sdf->savePath).c_str() );
   if (!dir)
@@ -712,6 +724,7 @@ void Camera::SaveFrame()
   pCodec->codeToFile(stream, filename, codecDataPtr);
 
   this->saveCount++;
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -932,6 +945,7 @@ math::Vector3 Camera::GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm
 // Set the render target for the camera
 void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 {
+  /*NATT
   this->renderTarget = target;
 
   if (this->renderTarget)
@@ -947,4 +961,5 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
+  */
 }

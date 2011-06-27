@@ -20,79 +20,55 @@
 
 #include <string>
 
+#include "sdf/interface/SDFBase.hh"
 #include "common/Color.hh"
 #include "math/Pose.hh"
-#include "sdf/interface/Param.hh"
 #include "math/Pose.hh"
 
 namespace sdf
 {
-  class Base
-  {
-    public: Base()
-            {
-              Param::Begin(&this->parameters);
-            }
-
-    public: std::vector<Param*> parameters;
-  };
-
-  class Light : public Base
+  class Light : public SDFBase
   {
     public: Light() :
-              origin("pose", gazebo::math::Pose()),
-              type("type",""),
-              name("name",""), cast_shadows("cast_shadows", false),
-              diffuseColor("rgba", gazebo::common::Color(1,1,1,1)),
-              specularColor("rgba", gazebo::common::Color(.1,.1,.1,1)),
-              range("range", 10),
-              constantAttenuation("constant", 1.0),
-              linearAttenuation("linear", 1.0),
-              quadraticAttenuation("quadratic", 0.0),
-              spotInnerAngle("inner_angle", 0.0),
-              spotOuterAngle("outer_angle", 0.0),
-              spotFalloff("falloff", 0.0)
+              origin("pose", gazebo::math::Pose(), true),
+              type("type","", false),
+              name("name","", false), 
+              cast_shadows("cast_shadows", false, false),
+              diffuseColor("rgba", gazebo::common::Color(1,1,1,1), false),
+              specularColor("rgba", gazebo::common::Color(.1,.1,.1,1), false),
+              range("range", 10, false),
+              constantAttenuation("constant", 1.0, false),
+              linearAttenuation("linear", 1.0, false),
+              quadraticAttenuation("quadratic", 0.0, false),
+              spotInnerAngle("inner_angle", 0.0, false),
+              spotOuterAngle("outer_angle", 0.0, false),
+              spotFalloff("falloff", 0.0, false)
             {
               Param::End();
-              this->tree = "{ light : type,name,cast_shadows,\
-                                   {origin: pose}, {diffuse : rgba},\
-                                   {attenuation : range, constant, linear,\
-                                                  quadratic},\
-                                   {spot: inner_angle, outer_angle, falloff}}"; 
               this->Clear();
+              this->xmlTree = "{ light : type,name,cast_shadows,\
+                                 {origin: pose}, {diffuse : rgba},\
+                                 {attenuation : range, constant, linear,\
+                                                quadratic},\
+                                 {spot: inner_angle, outer_angle, falloff}}"; 
             }
 
 
-    public: std::string tree;
-    public: ParamT<gazebo::math::Pose, true> origin;
-    public: ParamT<std::string, false> type;
-    public: ParamT<std::string, false> name;
-    public: ParamT<bool, false> cast_shadows;
-    public: ParamT<gazebo::common::Color, false> diffuseColor;
-    public: ParamT<gazebo::common::Color, false> specularColor;
-    public: ParamT<double, false> range;
-    public: ParamT<double, false> constantAttenuation;
-    public: ParamT<double, false> linearAttenuation;
-    public: ParamT<double, false> quadraticAttenuation;
+    public: ParamT<gazebo::math::Pose> origin;
+    public: ParamT<std::string> type;
+    public: ParamT<std::string> name;
+    public: ParamT<bool> cast_shadows;
+    public: ParamT<gazebo::common::Color> diffuseColor;
+    public: ParamT<gazebo::common::Color> specularColor;
 
-    public: ParamT<double, false> spotInnerAngle;
-    public: ParamT<double, false> spotOuterAngle;
-    public: ParamT<double, false> spotFalloff;
+    public: ParamT<double> range;
+    public: ParamT<double> constantAttenuation;
+    public: ParamT<double> linearAttenuation;
+    public: ParamT<double> quadraticAttenuation;
 
-    public: void Clear()
-            {
-              this->origin.Reset();
-              this->name.Reset();
-              this->diffuseColor.Reset();
-              this->specularColor.Reset();
-              this->range.Reset();
-              this->constantAttenuation.Reset();
-              this->linearAttenuation.Reset();
-              this->quadraticAttenuation.Reset();
-              this->spotInnerAngle.Reset();
-              this->spotOuterAngle.Reset();
-              this->spotFalloff.Reset();
-            }
+    public: ParamT<double> spotInnerAngle;
+    public: ParamT<double> spotOuterAngle;
+    public: ParamT<double> spotFalloff;
 
     public: void Print(const std::string &_prefix)
             {

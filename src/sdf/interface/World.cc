@@ -42,16 +42,9 @@
 using namespace sdf;
 
 ////////////////////////////////////////////////////////////////////////////////
-World::World()
-  : name("name", "")
-{
-  this->Clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void World::Clear()
 {
-  this->name.Reset();
+  SDFBase::Clear();
   this->joints.clear();
   this->models.clear();
   this->plugins.clear();

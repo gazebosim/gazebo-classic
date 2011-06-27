@@ -46,50 +46,39 @@
 
 namespace sdf
 {
-  class Scene
+  class Scene : public SDFBase
   {
-    public: Scene() : ambientColor("rgba", gazebo::common::Color()),
-            backgroundColor("rgba", gazebo::common::Color()),
-            skyMaterial("material",""),
-            shadowEnabled("enabled",true),
-            shadowColor("rgba", gazebo::common::Color()),
-            shadowType("type",""),
-            fogColor("rgba", gazebo::common::Color()),
-            fogType("type","linear"),
-            fogStart("start",1.0),
-            fogEnd("end",100.0),
-            fogDensity("density",1.0)
-    { this->Clear(); }
-  
-    public: ParamT<gazebo::common::Color, true> ambientColor;
-    public: ParamT<gazebo::common::Color, true> backgroundColor;
-    public: ParamT<std::string, false> skyMaterial;
-
-    public: ParamT<bool, false> shadowEnabled;
-    public: ParamT<gazebo::common::Color, false> shadowColor;
-    public: ParamT<std::string, false> shadowType;
-
-    public: ParamT<gazebo::common::Color, false> fogColor;
-    public: ParamT<std::string, false> fogType;
-    public: ParamT<double, false> fogStart;
-    public: ParamT<double, false> fogEnd;
-    public: ParamT<double, false> fogDensity;
-  
-    public: void Clear()
-    {
-      this->ambientColor.Reset();
-      this->backgroundColor.Reset();
-      this->skyMaterial.Reset();
-      this->shadowEnabled.Reset();
-      this->shadowColor.Reset();
-      this->shadowType.Reset();
-      this->fogColor;
-      this->fogType;
-      this->fogStart;
-      this->fogEnd;
-      this->fogDensity;
+    public: Scene() : 
+            ambientColor("rgba", gazebo::common::Color(), true),
+            backgroundColor("rgba", gazebo::common::Color(), true),
+            skyMaterial("material","", false),
+            shadowEnabled("enabled",true, false),
+            shadowColor("rgba", gazebo::common::Color(), false),
+            shadowType("type","", false),
+            fogColor("rgba", gazebo::common::Color(), false),
+            fogType("type","linear", false),
+            fogStart("start",1.0, false),
+            fogEnd("end",100.0, false),
+            fogDensity("density",1.0, false)
+    { 
+      Param::End();
+      this->xmlTree = "{scene:{ambient:rgba},{background:rgba,{sky:material}},{shadows:enabled, rgba,type},{fog:rgba,type,start,end,density}}";
     }
+  
+    public: ParamT<gazebo::common::Color> ambientColor;
+    public: ParamT<gazebo::common::Color> backgroundColor;
+    public: ParamT<std::string> skyMaterial;
 
+    public: ParamT<bool> shadowEnabled;
+    public: ParamT<gazebo::common::Color> shadowColor;
+    public: ParamT<std::string> shadowType;
+
+    public: ParamT<gazebo::common::Color> fogColor;
+    public: ParamT<std::string> fogType;
+    public: ParamT<double> fogStart;
+    public: ParamT<double> fogEnd;
+    public: ParamT<double> fogDensity;
+  
     public: void Print( const std::string _prefix)
     {
       std::cout << _prefix << "Scene:\n";

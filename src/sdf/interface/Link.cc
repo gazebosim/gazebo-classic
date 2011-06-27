@@ -60,41 +60,6 @@ bool Mesh::FileExists(std::string _filename)
   return true;
 }
 
-void Link::AddVisual(boost::shared_ptr<Visual> _visual)
-{
-  // group exists, add Visual to the vector in the map
-  std::vector<boost::shared_ptr<Visual > >::iterator vis_it = find(this->visuals.begin(),this->visuals.end(), _visual);
-
-  if (vis_it != this->visuals.end())
-    gzwarn << "attempted to add a visual that already exists, skipping.\n";
-  else
-    this->visuals.push_back(_visual);
-  gzdbg << "successfully added a new visual\n";
-}
-
-void Link::GetVisuals(std::vector<boost::shared_ptr<Visual > > &_vis) const
-{
-  _vis = this->visuals;
-}
-
-void Link::AddCollision(boost::shared_ptr<Collision> _collision)
-{
-  // group exists, add Collision to the vector in the map
-  std::vector<boost::shared_ptr<Collision > >::iterator vis_it = find(this->collisions.begin(),this->collisions.end(),_collision);
-
-  if (vis_it != this->collisions.end())
-    gzwarn << "attempted to add a collision that already exists, skipping.\n";
-  else
-    this->collisions.push_back(_collision);
-
-  gzdbg << "successfully added a new collision\n";
-}
-
-void Link::GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const
-{
-  _col = this->collisions;
-}
-
 boost::shared_ptr<const Sensor> Link::GetSensor(const std::string& _name) const
 {
   boost::shared_ptr<const Sensor> ptr;

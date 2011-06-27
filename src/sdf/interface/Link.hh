@@ -47,13 +47,13 @@
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 
-#include "sdf/interface/Param.hh"
+#include "sdf/interface/SDFBase.hh"
 #include "sdf/interface/Sensor.hh"
 #include "sdf/interface/Joint.hh"
 
 namespace sdf
 {
-  class Geometry
+  class Geometry : public SDFBase
   {
     public: enum Type{UNKNOWN, PLANE, SPHERE, BOX, CYLINDER, MESH};
     public: Geometry(Type _type = UNKNOWN) : type(_type) {}
@@ -62,104 +62,102 @@ namespace sdf
   
   class Plane : public Geometry
   {
-    public: Plane() : Geometry(PLANE), normal("normal", gazebo::math::Vector3(0,0,1)) { this->Clear(); }
-    public: ParamT<gazebo::math::Vector3, true> normal;
-
-    public: void Clear()
-            {
-              this->normal.Reset();
-            };
-  };
+    public: Plane() : Geometry(PLANE), 
+            normal("normal", gazebo::math::Vector3(0,0,1), true) 
+    { 
+      Param::End();
+      this->xmlTree = "{geometry:{plane:normal}}";
+      this->Clear(); 
+    }
+    public: ParamT<gazebo::math::Vector3> normal;
+   };
   
   class Sphere : public Geometry
   {
-    public: Sphere() : Geometry(SPHERE), radius("radius", 1.0) { this->Clear(); }
-    public: ParamT<double, true> radius;
-
-    public: void Clear()
-            {
-              this->radius.Reset();
-            };
-  };
+    public: Sphere() : Geometry(SPHERE), 
+            radius("radius", 1.0, true) 
+    { 
+      Param::End();
+      this->xmlTree = "{geometry:{sphere:radius}}";
+      this->Clear(); 
+    }
+    public: ParamT<double> radius;
+ };
   
   class Box : public Geometry
   {
-    public: Box() : Geometry(BOX), size("size", gazebo::math::Vector3(0,0,0)) { this->Clear(); };
-    public: ParamT<gazebo::math::Vector3, true> size;
-
-    public: void Clear()
-            {
-              size.Reset();
-            };
+    public: Box() : Geometry(BOX), 
+            size("size", gazebo::math::Vector3(0,0,0), true) 
+    { 
+      Param::End();
+      this->xmlTree = "{geometry:{box:size}}";
+      this->Clear(); 
+    }
+    public: ParamT<gazebo::math::Vector3> size;
   };
   
   class Cylinder : public Geometry
   {
     public: Cylinder() : Geometry(CYLINDER), 
-            length("length", 1.0), radius("radius", 1.0) 
-            { this->Clear(); };
-    public: ParamT<double, true> length;
-    public: ParamT<double, true> radius;
-
-    public: void Clear()
-            {
-              this->length.Reset();
-              this->radius.Reset();
-            };
+            length("length", 1.0, true), 
+            radius("radius", 1.0, true) 
+            { 
+              Param::End();
+              this->xmlTree = "{geometry:{cylinder:length,radius}}";
+            }
+    public: ParamT<double> length;
+    public: ParamT<double> radius;
   };
   
   class Mesh : public Geometry
   {
-    public: Mesh() : Geometry(MESH), filename("filename", ""), scale("scale", gazebo::math::Vector3(1,1,1)) 
-            { this->Clear(); }
-    public: ParamT<std::string, true> filename;
-    public: ParamT<gazebo::math::Vector3, false> scale;
+    public: Mesh() : Geometry(MESH), 
+            filename("filename", "", true), 
+            scale("scale", gazebo::math::Vector3(1,1,1), false) 
+            { 
+              Param::End();
+              this->xmlTree = "{geometry:{mesh:filename,scale}}";
+            }
 
-    public: void Clear()
-            {
-              this->filename.Reset();
-              this->scale.Reset();
-            };
+    public: ParamT<std::string> filename;
+    public: ParamT<gazebo::math::Vector3> scale;
+
     public: bool FileExists(std::string filename);
   };
   
-  class Material
+  class Material : public SDFBase
   {
-    public: Material(): script("script", ""), 
-            color("rgba",gazebo::common::Color())
-            { this->Clear(); }
-    public: ParamT<std::string, false> script;
-    public: ParamT<gazebo::common::Color, false> color;
+    public: Material(): 
+            script("script", "", false), 
+            color("rgba",gazebo::common::Color(), false)
+            { 
+              Param::End();
+              this->xmlTree = "{material: script,{color:rgba}}";
+            }
 
-    public: void Clear()
-            {
-              this->color.Reset();
-              this->script.Reset();
-            };
+    public: ParamT<std::string> script;
+    public: ParamT<gazebo::common::Color> color;
   };
   
-  class Inertial
+  class Inertial : public SDFBase
   {
-    public: Inertial() : origin("origin", gazebo::math::Pose()), 
-            mass("mass",1.0), ixx("ixx",0.0), ixy("ixy",0.0), ixz("ixz",0.0), 
-            iyy("iyy",0.0), iyz("iyz",0.0), izz("izz",0.0) 
-    { this->Clear(); }
+    public: Inertial() : 
+            origin("origin", gazebo::math::Pose(), false), 
+            mass("mass",1.0, true), 
+            ixx("ixx",0.0, true), 
+            ixy("ixy",0.0, true), 
+            ixz("ixz",0.0, true), 
+            iyy("iyy",0.0, true), 
+            iyz("iyz",0.0, true), 
+            izz("izz",0.0, true) 
+    { 
+      Param::End();
+      this->xmlTree = "{inertial:mass,{origin:pose},{inertia:ixx,ixy,ixz,iyy,iyz,izz}}";
+    }
 
-    public: ParamT<gazebo::math::Pose, false> origin;
-    public: ParamT<double, true> mass;
-    public: ParamT<double, true> ixx,ixy,ixz,iyy,iyz,izz;
-
-    public: void Clear()
-            {
-              this->origin.Reset();
-              this->mass.Reset();
-              this->ixx.Reset();
-              this->ixy.Reset();
-              this->ixz.Reset();
-              this->iyy.Reset();
-              this->iyz.Reset();
-              this->izz.Reset();
-            };
+    public: ParamT<gazebo::math::Pose> origin;
+    public: ParamT<double> mass;
+    public: ParamT<double> ixx,ixy,ixz,iyy,iyz,izz;
 
     public: void Print(const std::string &prefix)
             {
@@ -167,23 +165,27 @@ namespace sdf
             }
   };
   
-  class Visual
+  class Visual : public SDFBase
   {
-    public: Visual() :origin("origin", gazebo::math::Pose()), name("name",""),
-            castShadows("cast_shadows", true)
-            { this->Clear(); };
+    public: Visual() :
+            origin("origin", gazebo::math::Pose(), false), 
+            name("name","", true),
+            castShadows("cast_shadows", true, false)
+            { 
+              Param::End();
+              this->xmlTree = "{visual:name,cast_shadows,{origin:pose}}";
+            }
 
-    public: ParamT<gazebo::math::Pose, false> origin;
-    public: ParamT<std::string, true> name;
-    public: ParamT<bool, false> castShadows;
+    public: ParamT<gazebo::math::Pose> origin;
+    public: ParamT<std::string> name;
+    public: ParamT<bool> castShadows;
 
     public: boost::shared_ptr<Geometry> geometry;
     public: boost::shared_ptr<Material> material;
 
     public: void Clear()
             {
-              this->origin.Reset();
-              this->name.Reset();
+              SDFBase::Clear();
               this->material.reset();
               this->geometry.reset();
             };
@@ -194,7 +196,7 @@ namespace sdf
             }
   };
 
-  class Friction
+  class Friction : public SDFBase
   {
     public: enum Type {UNKNOWN, ODE};
     public: Friction(Type _t) : type(_t) {}
@@ -203,27 +205,25 @@ namespace sdf
 
   class ODEFriction : public Friction
   {
-    public: ODEFriction() : Friction(ODE), mu("mu",0.0), mu2("mu2",0), fdir1("fdir1",0), 
-            slip1("slip1",0), slip2("slip2",0)
-            { this->Clear(); }
-
-    public: ParamT<double, true> mu;
-    public: ParamT<double, false> mu2;
-    public: ParamT<double, false> fdir1;
-    public: ParamT<double, false> slip1;
-    public: ParamT<double, false> slip2;
-
-    public: void Clear()
-            {
-              this->mu.Reset();
-              this->mu2.Reset();
-              this->fdir1.Reset();
-              this->slip1.Reset();
-              this->slip2.Reset();
+    public: ODEFriction() : Friction(ODE), 
+            mu("mu",0.0, true), 
+            mu2("mu2",0.0, false), 
+            fdir1("fdir1",0.0,false), 
+            slip1("slip1",0.0, false), 
+            slip2("slip2",0.0, false)
+            { 
+              Param::End();
+              this->xmlTree = "{friction:{ode:mu,mu1,fdir1,slip1,slip2}}";
             }
+
+    public: ParamT<double> mu;
+    public: ParamT<double> mu2;
+    public: ParamT<double> fdir1;
+    public: ParamT<double> slip1;
+    public: ParamT<double> slip2;
   };
 
-  class SurfaceContact
+  class SurfaceContact : public SDFBase
   {
     public: enum Type {UNKNOWN, ODE};
     public: SurfaceContact(Type _t) : type(_t) {}
@@ -233,66 +233,70 @@ namespace sdf
   class ODESurfaceContact : public SurfaceContact
   {
     public: ODESurfaceContact() : SurfaceContact(ODE), 
-            softCFM("soft_cfm",0), kp("kp",0), kd("kd",0), 
-            maxVel("max_vel",0), minDepth("min_depth",0)
-    { this->Clear(); }
+            softCFM("soft_cfm",0, false), 
+            kp("kp",0, false), 
+            kd("kd",0, false), 
+            maxVel("max_vel",0, false), 
+            minDepth("min_depth",0,false)
+    { 
+      Param::End();
+      this->xmlTree = "{contact:{ode:soft_cfm,kp,kd,max_vel,min_depth}}";
+      this->Clear(); 
+    }
 
-    public: ParamT<double, false> softCFM;
-    public: ParamT<double, false> kp;
-    public: ParamT<double, false> kd;
-    public: ParamT<double, false> maxVel;
-    public: ParamT<double, false> minDepth;
+    public: ParamT<double> softCFM;
+    public: ParamT<double> kp;
+    public: ParamT<double> kd;
+    public: ParamT<double> maxVel;
+    public: ParamT<double> minDepth;
 
-    public: void Clear()
-            {
-              this->softCFM.Reset();
-              this->kp.Reset();
-              this->kd.Reset();
-              this->maxVel.Reset();
-              this->minDepth.Reset();
-            }
   };
 
-  class Surface
+  class Surface : public SDFBase
   {
-    public: Surface() : bounceRestCoeff("restitution_coefficient",0), 
-            bounceThreshold("threshold",0) 
-    { this->Clear(); }
+    public: Surface() : 
+            bounceRestCoeff("restitution_coefficient",0, false), 
+            bounceThreshold("threshold",0,false) 
+    { 
+      Param::End();
+      this->xmlTree = "{surface:{bounce:restitution_coefficient,threshold}}";
+    }
 
-    public: ParamT<double, true> bounceRestCoeff;
-    public: ParamT<double, true> bounceThreshold;
+    public: ParamT<double> bounceRestCoeff;
+    public: ParamT<double> bounceThreshold;
     public: std::vector< boost::shared_ptr<SurfaceContact> > contacts;
     public: std::vector< boost::shared_ptr<Friction> > frictions;
 
     public: void Clear()
             {
-              this->bounceRestCoeff.Reset();
-              this->bounceThreshold.Reset();
+              SDFBase::Clear();
               this->contacts.clear();
               this->frictions.clear();
             }
-
   };
   
-  class Collision
+  class Collision : public SDFBase
   {
-    public: Collision(): origin("origin", gazebo::math::Pose()), name("name","")
-    { this->Clear(); }
+    public: Collision() : 
+            origin("origin", gazebo::math::Pose(), false), 
+            name("name","", true)
+    { 
+      Param::End(); 
+      this->xmlTree = "{collision:name,{origin:pose}}";
+    }
 
-    public: ParamT<gazebo::math::Pose, false> origin;
-    public: ParamT<std::string, true> name;
+    public: ParamT<gazebo::math::Pose> origin;
+    public: ParamT<std::string> name;
 
     public: boost::shared_ptr<Geometry> geometry;
     public: boost::shared_ptr<Surface> surface;
 
     public: void Clear()
             {
-              this->origin.Reset();
-              this->name.Reset();
+              SDFBase::Clear();
               this->geometry.reset();
               this->surface.reset();
             };
-
 
     public: void Print(const std::string &_prefix)
             {
@@ -301,17 +305,19 @@ namespace sdf
 
   };
   
-  class Link
+  class Link : public SDFBase
   {
-    public: Link() : origin("origin", gazebo::math::Pose()), name("name", ""),
-                     selfCollide("self_collide", false), 
-                     gravity("gravity",true) 
+    public: Link() : 
+            origin("origin", gazebo::math::Pose(), false), 
+            name("name", "", true),
+            selfCollide("self_collide", false, false), 
+            gravity("gravity",true, false) 
     { this->Clear(); };
 
-    public: ParamT<gazebo::math::Pose, false> origin;
-    public: ParamT<std::string, true> name;
-    public: ParamT<bool, false> selfCollide;
-    public: ParamT<bool, false> gravity;
+    public: ParamT<gazebo::math::Pose> origin;
+    public: ParamT<std::string> name;
+    public: ParamT<bool> selfCollide;
+    public: ParamT<bool> gravity;
 
     /// inertial element
     public: boost::shared_ptr<Inertial> inertial;
@@ -327,18 +333,11 @@ namespace sdf
 
     public: void Clear()
             {
-              this->origin.Reset();
-              this->name.Reset();
+              SDFBase::Clear();
               this->inertial.reset();
               this->visuals.clear();
               this->collisions.clear();
             };
-
-    public: void AddVisual(boost::shared_ptr<Visual> _visual);
-    public: void GetVisuals(std::vector<boost::shared_ptr<Visual > > &_vis) const;
-
-    public: void AddCollision(boost::shared_ptr<Collision> _collision);
-    public: void GetCollisions(std::vector<boost::shared_ptr<Collision > > &_col) const;
 
     public: boost::shared_ptr<const Sensor> GetSensor(const std::string &_name) const;
 
@@ -366,10 +365,7 @@ namespace sdf
                 iter->second->Print( _prefix + "  " );
               }
             }
-
-
   };
-
 }
 
 #endif

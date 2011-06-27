@@ -78,7 +78,7 @@ UserCamera::~UserCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load child
-void UserCamera::Load( boost::shared_ptr<sdf::Camera> _sdf )
+void UserCamera::Load( boost::shared_ptr<sdf::SDFElement> _sdf )
 {
   Camera::Load(_sdf);
 
@@ -188,6 +188,7 @@ void UserCamera::PostRender()
 {
   Camera::PostRender();
 
+  /*NATT
   if (*this->sdf->saveEnabled)
   {
     char tmp[1024];
@@ -206,6 +207,7 @@ void UserCamera::PostRender()
 
     this->saveCount++;
   }
+  */
 }
 
 

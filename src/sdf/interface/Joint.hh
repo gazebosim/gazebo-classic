@@ -42,65 +42,37 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "sdf/interface/Param.hh"
+#include "sdf/interface/SDFBase.hh"
 #include "math/Pose.hh"
 
 namespace sdf
 {
-  class Link;
-  
-  class JointDynamics
+  class Joint : public SDFBase
   {
-    public: JointDynamics() : damping("damping",0), friction("friction",0) 
-            { this->Clear(); }
+    public: Joint() : 
+            name("name","", true), 
+            type("type","", true), 
+            axis("xyz",gazebo::math::Vector3(), false), 
+            axis2("xyz", gazebo::math::Vector3(), false), 
+            childLinkName("link", "", true), 
+            parentLinkName("link", "", true), 
+            origin("origin", gazebo::math::Pose(), true),
+            damping("damping",0, false), 
+            friction("friction",0, false),
+            limitLower("lower",0, false), 
+            limitUpper("upper",0, false),
+            limitEffort("effort",0, false), 
+            limitVelocity("velocity",0, false)
+    { 
+      Param::End();
+      this->xmlTree = "{joint:type,name, {axis:xyz}, {axis2:xyz},\
+                              {child:link}, {parent:link}, {origin:pose},\
+                              {dynamics:damping,friction},\
+                              {limit:lower,upper,effort,velocity}}";
+      this->Clear(); 
+    }
 
-    public: ParamT<double, true> damping;
-    public: ParamT<double, true> friction;
-
-    public: void Clear()
-            {
-              damping.Reset();
-              friction.Reset();
-            };
-  };
-  
-  class JointLimits
-  {
-    public: JointLimits() : lower("lower",0), upper("upper",0),
-            effort("effort",0), velocity("velocity",0) 
-    { this->Clear(); }
-
-    public: ParamT<double,true> lower;
-    public: ParamT<double,true> upper;
-    public: ParamT<double,true> effort;
-    public: ParamT<double,true> velocity;
-
-    public: void Clear()
-            {
-              this->lower.Reset();
-              this->upper.Reset();
-              this->effort.Reset();
-              this->velocity.Reset();
-            };
-  };
-  
-  
-  class Joint
-  {
-    public: enum
-            {
-              UNKNOWN, REVOLUTE, REVOLUTE2, PRISMATIC, PISTON, BALL, UNIVERSAL
-            } typeEnum;
-
-    public: Joint() : name("name",""), type("type",""), 
-            axis("axis",gazebo::math::Vector3()), 
-            axis2("axis2", gazebo::math::Vector3()), 
-            childLinkName("link", ""), 
-            parentLinkName("link", ""), origin("origin", gazebo::math::Pose())
-    { this->Clear(); };
-
-    public: ParamT<std::string,true> name;
-    public: ParamT<std::string,true> type;
+    public: ParamT<std::string> name;
 
     /// \brief     type_       meaning of axis_
     /// ------------------------------------------------------
@@ -111,37 +83,29 @@ namespace sdf
     ///            PISTON     N/A
     ///            BALL       N/A
     ///            UNIVERSAL  N/A
-    public: ParamT<gazebo::math::Vector3, false> axis;
-    public: ParamT<gazebo::math::Vector3, false> axis2;
+    public: ParamT<std::string> type;
+
+    public: ParamT<gazebo::math::Vector3> axis;
+    public: ParamT<gazebo::math::Vector3> axis2;
 
     /// child Link element
     ///   child link frame is the same as the Joint frame
-    public: ParamT<std::string, true> childLinkName;
+    public: ParamT<std::string> childLinkName;
 
     /// parent Link element
     ///   origin specifies the transform from Parent Link to Joint Frame
-    public: ParamT<std::string, true> parentLinkName;
+    public: ParamT<std::string> parentLinkName;
 
     /// transform from Child Link frame to Joint frame
-    public: ParamT<gazebo::math::Pose, true> origin;
+    public: ParamT<gazebo::math::Pose> origin;
 
-    /// Joint Dynamics
-    public: boost::shared_ptr<JointDynamics> dynamics;
+    public: ParamT<double> damping;
+    public: ParamT<double> friction;
 
-    /// Joint Limits
-    public: boost::shared_ptr<JointLimits> limits;
-
-    public: void Clear()
-            {
-              this->axis.Reset();
-              this->axis2.Reset();
-              this->childLinkName.Reset();
-              this->parentLinkName.Reset();
-              this->origin.Reset();
-              this->dynamics.reset();
-              this->limits.reset();
-              this->typeEnum = UNKNOWN;
-            };
+    public: ParamT<double> limitLower;
+    public: ParamT<double> limitUpper;
+    public: ParamT<double> limitEffort;
+    public: ParamT<double> limitVelocity;
 
     public: void Print(const std::string &_prefix)
             {
@@ -150,9 +114,6 @@ namespace sdf
               std::cout <<  _prefix << "  Parent[" << this->parentLinkName << "]\n";
               std::cout << _prefix << "  Child[" << this->childLinkName << "]\n";
             }
-
-
-
   };
 }
 

@@ -39,24 +39,28 @@
 
 #include <string>
 
-#include "sdf/interface/Param.hh"
+#include "sdf/interface/SDFBase.hh"
 
 namespace sdf
 {
-  class Plugin
+  class Plugin : public SDFBase
   {
-    public: Plugin() : name("name", ""), filename("filename","")
-            { this->Clear(); };
+    public: Plugin() : 
+            name("name", "", true), 
+            filename("filename", "", true)
+            { 
+              Param::End();
+              this->xmlTree = "{plugin:name,filename}";
+            }
   
-    public: ParamT<std::string, true> name;
-    public: ParamT<std::string, true> filename;
-    public: std::vector<ParamT<std::string, false> > data;
+    public: ParamT<std::string> name;
+    public: ParamT<std::string> filename;
+    public: std::vector<ParamT<std::string> > data;
  
     public: void Clear()
     {
-      this->name.Reset();
-      this->filename.Reset();
-      std::vector<ParamT<std::string, false> >::iterator iter;
+      SDFBase::Clear();
+      std::vector<ParamT<std::string> >::iterator iter;
       for (iter = this->data.begin(); iter != this->data.end(); iter++)
         iter->Reset();
       this->data.clear();

@@ -41,46 +41,39 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "sdf/interface/Param.hh"
+#include "sdf/interface/SDFBase.hh"
 #include "math/Vector3.hh"
 
 namespace sdf
 {
-  class PhysicsEngine
+  class PhysicsEngine : public SDFBase
   {
-    public: virtual void Clear() = 0;
-
-    public: virtual void Print(const std::string &prefix) = 0;
   };
   
   class OpenDynamicsEngine : public PhysicsEngine
   {
-    public: OpenDynamicsEngine() : solverType("solver", ""), dt("dt", 0.01),
-            iters("iters",10), sor("sor",0.0), cfm("cfm", 0.0), erp("erp",0.0),
-            contactMaxCorrectingVel("contact_max_correcting_vel",0.0),
-            contactSurfaceLayer("contact_surface_layer",0.0)
-            { this->Clear(); };
+    public: OpenDynamicsEngine() : 
+            solverType("solver", "", true), 
+            dt("dt", 0.01, true),
+            iters("iters",10, true), 
+            sor("sor",0.0, false), 
+            cfm("cfm", 0.0, false), 
+            erp("erp",0.0, false),
+            contactMaxCorrectingVel("contact_max_correcting_vel",0.0,false),
+            contactSurfaceLayer("contact_surface_layer",0.0,false)
+            { 
+              Param::End();
+              this->xmlTree = "{ode:{solver:type,dt,iters,sor},{constraints:cfm,erp,contact_max_correcting_vel,contact_surface_layer}}";
+            }
 
-    public: ParamT<std::string, true> solverType;
-    public: ParamT<double, true> dt;
-    public: ParamT<int, true>iters;
-    public: ParamT<double, false> sor;
-    public: ParamT<double, false> cfm;
-    public: ParamT<double, false> erp;
-    public: ParamT<double, false> contactMaxCorrectingVel;
-    public: ParamT<double, false> contactSurfaceLayer;
-
-    public: void Clear()
-            {
-              this->solverType.Reset();
-              this->dt.Reset();
-              this->iters.Reset();
-              this->sor.Reset();
-              this->cfm.Reset();
-              this->erp.Reset();
-              this->contactMaxCorrectingVel.Reset();
-              this->contactSurfaceLayer.Reset();
-            };
+    public: ParamT<std::string> solverType;
+    public: ParamT<double> dt;
+    public: ParamT<int> iters;
+    public: ParamT<double> sor;
+    public: ParamT<double> cfm;
+    public: ParamT<double> erp;
+    public: ParamT<double> contactMaxCorrectingVel;
+    public: ParamT<double> contactSurfaceLayer;
 
     public: virtual void Print(const std::string &prefix) 
             {
@@ -96,20 +89,23 @@ namespace sdf
             }
   };
  
-  class Physics
+  class Physics : public SDFBase
   {
-    public: Physics() : type("type", "ode"), gravity("xyz",gazebo::math::Vector3()) 
-            { this->Clear(); };
+    public: Physics() : 
+            type("type", "ode", true), 
+            gravity("xyz",gazebo::math::Vector3(),false) 
+            {  
+              this->xmlTree = "{physics:type,{gravity:xyz}}";
+            }
   
-    public: ParamT<std::string, true> type;
-    public: ParamT<gazebo::math::Vector3, false> gravity;
+    public: ParamT<std::string> type;
+    public: ParamT<gazebo::math::Vector3> gravity;
 
     public: boost::shared_ptr<PhysicsEngine> engine;
 
     public: void Clear()
     {
-      this->type.Reset();
-      this->gravity.Reset();
+      SDFBase::Clear();
       this->engine.reset();
     }
 
@@ -118,7 +114,7 @@ namespace sdf
       std::cout << _prefix << "Physics: Type[" << this->type << "] Gravity[";
       std::cout << this->gravity; 
       std::cout << "]\n";
-      this->engine->Print(_prefix + "  ");
+      //this->engine->Print(_prefix + "  ");
     }
   };
 }

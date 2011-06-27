@@ -64,7 +64,7 @@ namespace gazebo
     
       /// \brief Load the camera
       /// \param node The SDF camera info
-      public: void Load( boost::shared_ptr<sdf::Camera> _sdf );
+      public: void Load( boost::shared_ptr<sdf::SDFElement> _sdf );
   
       /// \brief Initialize the camera
       public: void Init();
@@ -259,7 +259,7 @@ namespace gazebo
   
       private: std::string name;
       private: math::Pose pose;
-      protected: boost::shared_ptr<sdf::Camera> sdf;
+      protected: boost::shared_ptr<sdf::SDFElement> sdf;
 
       protected: unsigned int windowId;
   

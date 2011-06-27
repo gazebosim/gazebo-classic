@@ -1,21 +1,24 @@
-set (sources Link.cc 
-             Model.cc 
-             World.cc
-             Param.cc
-)
+set (sources Param.cc)
+  #Link.cc 
+  #             Model.cc 
+  #             World.cc
+  #             Param.cc
+  #)
 
-set (headers Joint.hh
-             Link.hh
-             Model.hh
-             Physics.hh
-             Plugin.hh
-             Scene.hh
-             Sensor.hh
-             World.hh 
-             Param.hh
-             Light.hh
-             sdf.h
-)
+set (headers SDF.hh)
+  #set (headers SDFBase.hh
+  #             Joint.hh
+  #             Link.hh
+  #             Model.hh
+  #             Physics.hh
+  #             Plugin.hh
+  #             Scene.hh
+  #             Sensor.hh
+  #             World.hh 
+  #             Param.hh
+  #             Light.hh
+  #             sdf.h
+  #)
 
 add_library( gazebo_sdf_interface SHARED ${sources})
 target_link_libraries(gazebo_sdf_interface gazebo_common)

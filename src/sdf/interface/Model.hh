@@ -47,17 +47,17 @@
 #include "sdf/interface/Plugin.hh"
 #include "sdf/interface/Link.hh"
 
+#include "sdf/interface/SDFBase.hh"
+
 namespace sdf
 {
-  class Model
+  class Model : public SDFBase
   {
-    public: Model();
-  
-    /// \brief Load Model given a filename
-    public: bool InitFile(const std::string &_filename);
-
-    /// \brief Load Model from a XML-string
-    public: bool InitString(const std::string &_xmlstring);
+    public: Model() : name("name", "", true)
+            {
+              Param::End();
+              this->xmlTree = "{model : name}";
+            }
   
     public: boost::shared_ptr<const Link> GetLink(const std::string &_name) const;
     public: boost::shared_ptr<const Joint> GetJoint(const std::string &_name) const;
@@ -74,9 +74,9 @@ namespace sdf
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
 
-    public: ParamT<std::string,true> name;
+    public: ParamT<std::string> name;
 
-    public: void Clear();
+    public: virtual void Clear();
   
     /// non-const getLink()
     private: void GetLink(const std::string &_name, 

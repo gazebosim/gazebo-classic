@@ -60,7 +60,7 @@ CameraSensor::~CameraSensor()
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void CameraSensor::Load( boost::shared_ptr<sdf::Camera> _sdf )
+void CameraSensor::Load( boost::shared_ptr<sdf::SDFElement> _sdf )
 {
   Sensor::Load(_sdf);
 

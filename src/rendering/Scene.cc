@@ -72,7 +72,7 @@ Scene::Scene(const std::string &name_)
 
   this->selectionObj = new SelectionObj(this);
 
-  this->sdf.reset(new sdf::Scene);
+  //NATT this->sdf.reset(new sdf::Scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,9 +110,9 @@ Scene::~Scene()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Scene::SetParams(boost::shared_ptr<sdf::Scene> &_scene)
+void Scene::SetParams(boost::shared_ptr<sdf::SDFElement> &_sdf)
 {
-  this->sdf = _scene;
+  this->sdf = _sdf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ void Scene::Init()
     this->grids[i]->Init();
 
   // Create the sky
-  if ( !this->sdf->skyMaterial.GetValue().empty() )
+  /*NATT if ( !this->sdf->skyMaterial.GetValue().empty() )
   {
     try
     {
@@ -163,20 +163,18 @@ void Scene::Init()
     this->manager->setShadowTextureCount( 4 );
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 
-    /*
-    if (**this->sdf->shadowType == "stencil_additive")
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-    else if (**this->sdf->shadowType == "stencil_modulative")
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-    else if (**this->sdf->shadowType == "texture_additive")
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
-    else if (**this->sdf->shadowType == "texture_modulative")
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    else if (**this->sdf->shadowType == "texture_additive_integrated")
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-    else if (**this->sdf->shadowType == "texture_modulative_integrated")
-      this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-      */
+    //if (**this->sdf->shadowType == "stencil_additive")
+    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+    //else if (**this->sdf->shadowType == "stencil_modulative")
+    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+    //else if (**this->sdf->shadowType == "texture_additive")
+    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+    //else if (**this->sdf->shadowType == "texture_modulative")
+    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+    //else if (**this->sdf->shadowType == "texture_additive_integrated")
+    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+    //else if (**this->sdf->shadowType == "texture_modulative_integrated")
+    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
     this->manager->setShadowColour( Conversions::Color(*this->sdf->shadowColor) );
   }
@@ -195,6 +193,7 @@ void Scene::Init()
   //RTShaderSystem::Instance()->AddScene(this);
   
   this->selectionObj->Init();
+  */
 }
 
 
@@ -216,7 +215,7 @@ std::string Scene::GetName() const
 /// Set the ambient color
 void Scene::SetAmbientColor(const common::Color &color)
 {
-  this->sdf->ambientColor.SetValue(color);
+  /*NATT this->sdf->ambientColor.SetValue(color);
 
   // Ambient lighting
   if (this->manager)
@@ -224,27 +223,28 @@ void Scene::SetAmbientColor(const common::Color &color)
     this->manager->setAmbientLight(
         Conversions::Color(*this->sdf->ambientColor));
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the ambient color
 common::Color Scene::GetAmbientColor() const
 {
-  return *this->sdf->ambientColor;
+  return common::Color();//NATT *this->sdf->ambientColor;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the background color
 void Scene::SetBackgroundColor(const common::Color &color)
 {
-  this->sdf->backgroundColor.SetValue(color);
+  //NATT this->sdf->backgroundColor.SetValue(color);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the background color
 common::Color Scene::GetBackgroundColor() const
 {
-  return *this->sdf->backgroundColor;
+  return common::Color();//NATT *this->sdf->backgroundColor;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,9 +309,11 @@ CameraPtr Scene::GetCamera(unsigned int index) const
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
   UserCameraPtr camera( new UserCamera(this->name + "::" + name_, this) );
+  /*NATT
   camera->Load( boost::shared_ptr<sdf::Camera>() );
   camera->Init();
   this->userCameras.push_back(camera);
+  */
 
   return camera;
 }
@@ -533,11 +535,13 @@ void Scene::SetFog( const std::string &_type, const common::Color &_color,
   else if (_type == "exp2")
     fogType = Ogre::FOG_EXP2;
 
+  /*NATT
   this->sdf->fogType.SetValue(_type);
   this->sdf->fogColor.SetValue(_color);
   this->sdf->fogDensity.SetValue(_density);
   this->sdf->fogStart.SetValue(_start);
   this->sdf->fogEnd.SetValue(_end);
+  */
 
   if (this->manager)
     this->manager->setFog( fogType, Conversions::Color(_color), 

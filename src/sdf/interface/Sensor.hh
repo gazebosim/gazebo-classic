@@ -43,46 +43,38 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
-#include "sdf/interface/Param.hh"
+#include "sdf/interface/SDFBase.hh"
 #include "sdf/interface/Plugin.hh"
 #include "math/Pose.hh"
 
 namespace sdf
 {
-  /*class SensorType
+ 
+  class Sensor : public SDFBase
   {
-    public: enum Type{CAMERA, RAY, CONTACT};
-    public: SensorType(Type _type) : type(_type) {}
-    public: Type type;
-  };
-  */
+    public: Sensor() : 
+            name("name","", true), 
+            type("type","", true), 
+            alwaysOn("always_on", false,false), 
+            updateRate("update_rate",10.0,true),
+            origin("origin", gazebo::math::Pose(),true)
+    { 
+      this->xmlTree = "{sensor:name,type,always_on,update_rate,{origin:pose}}";
+    }
   
-  class Sensor
-  {
-    public: Sensor() : name("name",""), type("type",""), 
-            alwaysOn("always_on", false), updateRate("update_rate",10.0),
-            origin("origin", gazebo::math::Pose())
-    { this->Clear(); };
+    public: ParamT<std::string> name;
+    public: ParamT<std::string> type;
+    public: ParamT<bool> alwaysOn;
+    public: ParamT<double> updateRate;
   
-    public: ParamT<std::string, true> name;
-    public: ParamT<std::string, true> type;
-    public: ParamT<bool, false> alwaysOn;
-    public: ParamT<double, true> updateRate;
+    public: ParamT<gazebo::math::Pose> origin;
   
-    public: ParamT<gazebo::math::Pose, true> origin;
-  
-    //public: boost::shared_ptr<SensorType> sensorType;
-
     /// \brief complete list of plugins
     public: std::map<std::string, boost::shared_ptr<Plugin> > plugins;
   
     public: void Clear()
     {
-      this->name.Reset();
-      this->type.Reset();
-      this->alwaysOn.Reset();
-      this->updateRate.Reset();
-      this->origin.Reset();
+      SDFBase::Clear();
       this->plugins.clear();
     }
 
@@ -101,88 +93,69 @@ namespace sdf
   
   class Contact : public Sensor
   {
-    public: Contact() : Sensor() {}
+    public: Contact() : Sensor() {Param::End();}
   };
   
   class Camera : public Sensor
   {
-    public: Camera() : Sensor(), horizontalFov("horizontal_fov", 0.0),
-            imageWidth("width",0), imageHeight("height",0),
-            imageFormat("format","R8G8B8"), clipNear("near",0.0), 
-            clipFar("far",1.0), saveEnabled("enabled", false), 
-            savePath("path","")
-    { this->Clear(); };
-
-    public: ParamT<double, true> horizontalFov;
-    public: ParamT<unsigned int, true> imageWidth;
-    public: ParamT<unsigned int, true> imageHeight;
-    public: ParamT<std::string, false> imageFormat;
-    public: ParamT<double, true> clipNear;
-    public: ParamT<double, true> clipFar;
-    public: ParamT<bool, false> saveEnabled;
-    public: ParamT<std::string, false> savePath;
-  
-    public: void Clear()
-    {
-      this->horizontalFov.Reset();
-      this->imageWidth.Reset();
-      this->imageHeight.Reset();
-      this->imageFormat.Reset();
-      this->clipNear.Reset();
-      this->clipFar.Reset();
-      this->saveEnabled.Reset();
-      this->savePath.Reset();
+    public: Camera() : Sensor(), 
+            horizontalFov("angle", 0.0, true),
+            imageWidth("width",0,true), 
+            imageHeight("height",0,true),
+            imageFormat("format","R8G8B8", false), 
+            clipNear("near",0.0, true), 
+            clipFar("far",1.0, false), 
+            saveEnabled("enabled", false, false), 
+            savePath("path","",false)
+    { 
+      Param::End();
+      this->xmlTree="{camera:{horizontal_fov:angle},{image:width,height,format},{clip:near,far},{save:enabled,path}}";
     }
+
+    public: ParamT<double> horizontalFov;
+    public: ParamT<unsigned int> imageWidth;
+    public: ParamT<unsigned int> imageHeight;
+    public: ParamT<std::string> imageFormat;
+    public: ParamT<double> clipNear;
+    public: ParamT<double> clipFar;
+    public: ParamT<bool> saveEnabled;
+    public: ParamT<std::string> savePath;
   };
   
   class Ray : public Sensor
   {
     public: Ray() : Sensor(), 
-            display("display", false),
-            horizontalSamples("samples",1), 
-            horizontalResolution("resolution", 1), 
-            horizontalMinAngle("min_angle",0), 
-            horizontalMaxAngle("max_angle",1),
-            verticalSamples("samples",1), 
-            verticalResolution("resolution", 1), 
-            verticalMinAngle("min_angle",0), 
-            verticalMaxAngle("max_angle",1),
-            rangeMin("min",0), rangeMax("max",1.0), 
-            rangeResolution("resolution",0.0001)
-    { this->Clear(); }
+            display("display", false, false),
+            horizontalSamples("samples",1,true), 
+            horizontalResolution("resolution", 1,true), 
+            horizontalMinAngle("min_angle",0,true), 
+            horizontalMaxAngle("max_angle",1,true),
+            verticalSamples("samples",1,true), 
+            verticalResolution("resolution", 1,true), 
+            verticalMinAngle("min_angle",0,true), 
+            verticalMaxAngle("max_angle",1,true),
+            rangeMin("min",0,true), 
+            rangeMax("max",1.0,true), 
+            rangeResolution("resolution",0.0001,true)
+    { 
+      Param::End();
+      this->xmlTree = "{ray:{scan:display,{horizontal:samples,resolution,min_angle,max_angle},{vertical:samples,resolution,min_angle,max_angle}},{range:min,max,resolution}}";
+    }
 
-    public: ParamT<bool, false> display;
-    public: ParamT<unsigned int, true> horizontalSamples;
-    public: ParamT<double, true>       horizontalResolution;
-    public: ParamT<double, true>       horizontalMinAngle;
-    public: ParamT<double, true>       horizontalMaxAngle;
+    public: ParamT<bool> display;
+    public: ParamT<unsigned int> horizontalSamples;
+    public: ParamT<double>       horizontalResolution;
+    public: ParamT<double>       horizontalMinAngle;
+    public: ParamT<double>       horizontalMaxAngle;
   
-    public: ParamT<unsigned int, true> verticalSamples;
-    public: ParamT<double, true>       verticalResolution;
-    public: ParamT<double, true>       verticalMinAngle;
-    public: ParamT<double, true>       verticalMaxAngle;
+    public: ParamT<unsigned int> verticalSamples;
+    public: ParamT<double>       verticalResolution;
+    public: ParamT<double>       verticalMinAngle;
+    public: ParamT<double>       verticalMaxAngle;
   
-    public: ParamT<double, true> rangeMin;
-    public: ParamT<double, true> rangeMax;
-    public: ParamT<double, false> rangeResolution;
-  
-    public: void Clear()
-    {
-      this->display.Reset();
-      this->horizontalSamples.Reset();
-      this->horizontalResolution.Reset();
-      this->horizontalMinAngle.Reset();
-      this->horizontalMaxAngle.Reset();
-  
-      this->verticalSamples.Reset();
-      this->verticalResolution.Reset();
-      this->verticalMinAngle.Reset();
-      this->verticalMaxAngle.Reset();
-  
-      this->rangeMin.Reset();
-      this->rangeMax.Reset();
-      this->rangeResolution.Reset();
-    };
+    public: ParamT<double> rangeMin;
+    public: ParamT<double> rangeMax;
+    public: ParamT<double> rangeResolution;
   };
 
 }

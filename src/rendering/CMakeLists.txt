@@ -58,7 +58,6 @@ add_library(gazebo_rendering SHARED ${sources})
 target_link_libraries( gazebo_rendering gazebo_common 
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
-                                        gazebo_sdf_interface
                                         X11 )
 INSTALL_LIBRARY(gazebo_rendering)
 INSTALL_INCLUDES("rendering" ${headers})

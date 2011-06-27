@@ -71,7 +71,7 @@ namespace gazebo
       public: virtual ~Scene();
   
       /// \brief Load the scene
-      public: void SetParams(boost::shared_ptr<sdf::Scene> &_scene);
+      public: void SetParams(boost::shared_ptr<sdf::SDFElement> &_scene);
   
       /// \brief Init
       public: void Init();
@@ -189,7 +189,7 @@ namespace gazebo
 
       private: std::string name;
 
-      private: boost::shared_ptr<sdf::Scene> sdf;
+      private: boost::shared_ptr<sdf::SDFElement> sdf;
   
       private: std::vector<CameraPtr> cameras;
       private: std::vector<UserCameraPtr> userCameras;
