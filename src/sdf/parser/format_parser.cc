@@ -10,6 +10,8 @@
 namespace sdf
 {
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load the sdf format from a file
 bool initFile(const std::string &_filename, boost::shared_ptr<SDF> _sdf)
 {
   TiXmlDocument xmlDoc;
@@ -18,6 +20,7 @@ bool initFile(const std::string &_filename, boost::shared_ptr<SDF> _sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Load the sdf format from a string
 bool initString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf)
 {
   TiXmlDocument xmlDoc;
@@ -27,7 +30,7 @@ bool initString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Load Model from TiXMLDocument
+/// Load the sdf format from TiXMLDocument
 bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
 {
   if (!_xmlDoc)
@@ -48,9 +51,10 @@ bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
   return initXml(xml, element);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Load an SDF element from XML
 bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
 {
-
   const char *nameString = _xml->Attribute("name");
   if (!nameString)
   {
@@ -87,7 +91,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
     }
     if (!defaultValue)
     {
-      gzerr << "Attribute is missing a default\n";
+      gzerr << "Attribute[" << name << "] is missing a default\n";
       return false;
     }
     if (!requiredString)
@@ -170,6 +174,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
   return true;
 }
 
+
 bool readFile(const std::string &_filename, boost::shared_ptr<SDF> &_sdf)
 {
   TiXmlDocument xmlDoc;
@@ -193,32 +198,25 @@ bool readDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
     return false;
   }
 
-  TiXmlElement *xml = _xmlDoc->FirstChildElement("gazebo");
-  if (!xml)
-  {
-    gzerr << "Could not find the 'gazebo' element in the xml file\n";
-    return false;
-  }
-
-  return readXml(xml, _sdf);
-}
-
-bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDF> &_sdf)
-{
   std::vector< boost::shared_ptr<SDFElement> >::iterator iter;
   for (iter = _sdf->elementDescriptions.begin(); 
        iter != _sdf->elementDescriptions.end(); iter++)
   {
-    for (TiXmlElement* elemXml = _xml->FirstChildElement((*iter)->name);
+    for (TiXmlElement* elemXml = _xmlDoc->FirstChildElement((*iter)->name);
          elemXml; elemXml = elemXml->NextSiblingElement((*iter)->name))
     {
       boost::shared_ptr<SDFElement> element = (*iter)->Clone();
-      readXml( elemXml, element );
+      if (!readXml( elemXml, element ))
+      {
+        gzerr << "Unable to parse sdf element[" << element->name << "]\n";
+        return false;
+      }
       _sdf->elements.push_back(element);
       if ((*iter)->required == "0" || (*iter)->required == "1")
         break;
     }
   }
+
   return true;
 }
 

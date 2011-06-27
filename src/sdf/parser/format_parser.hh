@@ -17,7 +17,6 @@ namespace sdf
   bool readFile(const std::string &_filename, boost::shared_ptr<SDF> &_sdf);
   bool readString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf);
   bool readDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf);
-  bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDF> &_sdf);
   bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf);
 }
 

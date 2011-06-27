@@ -37,25 +37,37 @@
 #ifndef SDF_CONTROLLER_HH
 #define SDF_CONTROLLER_HH
 
-#include <sdf/interface/Plugin.hh>
 #include <string>
 
 /// extends plugin with type
 namespace sdf
 {
-  class Controller : public Plugin
+  class Controller
   {
-    public: Controller() { this->Clear(); };
+    public: Controller() 
+            { 
+              this->Clear();
+            }
   
-    public: std::string type;
  
     public: void Clear()
     {
       this->name.Reset();
       this->type.clear();
       this->filename.Reset();
+
+      std::vector<ParamT<std::string> >::iterator iter;
+      for (iter = this->data.begin(); iter != this->data.end(); iter++)
+        iter->Reset();
+      this->data.clear();
     }
 
+    public: std::string type;
+
+    public: ParamT<std::string> name;
+    public: ParamT<std::string> filename;
+    public: std::vector<ParamT<std::string> > data;
+ 
     public: void Print(const std::string &prefix)
             {
               std::cout << prefix  << "Controller: Name[" << this->name 

@@ -99,8 +99,7 @@ bool getDoubleFromStr(const std::string &_str, double &_value, double _default,
   return true;
 }
 
-bool getPlugins(xmlNodePtr _parentXml, 
-                std::map<std::string, boost::shared_ptr<Plugin> > &_plugins)
+bool getPlugins(xmlNodePtr _parentXml, boost::shared_ptr<SDFElement> &_sdf)
 {
   // Get all plugins 
   for (xmlNodePtr pluginXml = _parentXml->xmlChildrenNode;
@@ -121,8 +120,9 @@ bool getPlugins(xmlNodePtr _parentXml,
         }
         else
         {
-          boost::shared_ptr<Plugin> plugin = boost::shared_static_cast<Plugin>(controller);
-          _plugins.insert(make_pair(controller->name.GetValue(),plugin));
+          boost::shared_ptr<SDFElement> plugin = _sdf->AddElement("plugin");
+          plugin->GetAttribute("name")->Set(controller->name.GetValue());
+          plugin->GetAttribute("filename")->Set(controller->filename.GetValue());
         }
       }
       else
@@ -137,338 +137,185 @@ bool getPlugins(xmlNodePtr _parentXml,
   return true;
 }
 
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor)
+// Sensor parsing
+bool initSensor(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _sensor->Clear();
+  initAttr(_config, "name", _sdf->GetAttribute("name"));
+  initAttr(_config, "alwaysOn", _sdf->GetAttribute("always_on"));
+  initAttr(_config, "updateRate", _sdf->GetAttribute("update_rate"));
+
+  initOrigin(_config, _sdf);
+ 
+  if ( std::string(_config->name) == "contact" )
+  {
+    boost::shared_ptr<SDFElement> contact = _sdf->AddElement("contact");
+    initContact(_config, contact);
+  }
+  else if ( std::string(_config->name) == "camera" )
+  {
+    boost::shared_ptr<SDFElement> camera = _sdf->AddElement("camera");
+    initCamera(_config, camera);
+  }
+  else if ( std::string(_config->name) == "camera" )
+  {
+    boost::shared_ptr<SDFElement> ray = _sdf->AddElement("ray");
+    initRay(_config, ray);
+  }
 
   /// Get all the plugins
-  getPlugins(_config, _sensor->plugins);
-
-  if (!_sensor->name.Set( (const char*)xmlGetProp(_config, (xmlChar*)"name")))
-  {
-     gzerr << "Unable to parse sensor name.\n";
-    return false;
-  }
-     
-  if (!_sensor->type.Set( (const char*)_config->name ))
-  {
-    gzerr << "Unable to parse sensor type from the namespaced sensor block name\n";
-    return false;
-  }
-
-  std::string tmp;
-  
-  if (!_sensor->alwaysOn.Set( (const char*)((getValue(firstChildElement(_config,"alwaysOn")).c_str()))))
-  {
-    gzerr << "Unable to parse sensor alwaysOn\n";
-    return false;
-  }
-
-  if (!_sensor->updateRate.Set( (const char*)((getValue(firstChildElement(_config,"updateRate")).c_str()))))
-  {
-    gzerr << "Unable to parse sensor updateRate\n";
-    return false;
-  }
-
-  // Origin
-  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
-  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
-  if (!xyz_xml && !rpy_xml)
-  {
-    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
-    _sensor->origin.Reset();
-  }
-  else
-  {
-    // Origin
-    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
-    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
-    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
-    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
-    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
-    _sensor->origin.SetValue( pose );
-  }
-
-  if (_sensor->type.GetValue() == "contact")
-  {
-    boost::shared_ptr<Contact> contact = boost::shared_static_cast<Contact>(_sensor);
-    initXml(_config, contact );
-  }
-  else if (*_sensor->type == "camera")
-  {
-    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor);
-    initXml(_config, camera);
-  }
-  else if (*_sensor->type == "ray")
-  {
-
-    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor);
-    initXml(_config, ray);
-  }
-
-
+  getPlugins(_config, _sdf);
 
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor)
+bool initCamera(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  // Horizontal field of view
-  xmlNodePtr hfov = firstChildElement(_config, "horizontal_fov");
-  if(!hfov)
-  {
-    gzerr << "Camera missing horizontal_fov element\n";
-    return false;
-  }
 
-  if (!_sensor->horizontalFov.Set( (const char*)xmlGetProp(hfov,(xmlChar*)"angle")))
-  {
-    gzerr << "Unable to parse camera horizontal_fov angle attribute\n";
-    return false;
-  }
+  boost::shared_ptr<SDFElement> sdfHFOV = _sdf->AddElement("horizontal_fov");
+  initAttr(_config, "hfov", sdfHFOV->GetAttribute("angle"));
 
-  // Image 
-  xmlNodePtr image = firstChildElement(_config, "image");
-  if (!image)
-  {
-    gzerr << "Camera sensor requires an image element \n";
-    return false;
-  }
+  boost::shared_ptr<SDFElement> sdfImage = _sdf->AddElement("image");
+  initAttr(_config, "imageWidth", sdfImage->GetAttribute("width"));
+  initAttr(_config, "imageHeight", sdfImage->GetAttribute("height"));
+  initAttr(_config, "imageFormat", sdfImage->GetAttribute("format"));
 
-  if (!_sensor->imageWidth.Set( (const char*)xmlGetProp(image,(xmlChar*)"width")))
-  {
-    gzerr << "Unable to parse sensor image width\n";
-    return false;
-  }
-
-  if (!_sensor->imageHeight.Set( (const char*)xmlGetProp(image,(xmlChar*)"height")))
-  {
-    gzerr << "Unable to parse sensor image height\n";
-    return false;
-  }
-
-  if (!_sensor->imageFormat.Set( (const char*)xmlGetProp(image,(xmlChar*)"format")))
-  {
-    gzerr << "Unable to parse sensor image format\n";
-    return false;
-  }
-
-  // clip 
-  xmlNodePtr clip = firstChildElement(_config, "clip");
-  if (!clip)
-  {
-    gzerr << "Camera sensor requires an clip element \n";
-    return false;
-  }
-
-  if (!_sensor->clipNear.Set( (const char*)xmlGetProp(clip,(xmlChar*)"near") ))
-  {
-    gzerr << "Unable to parse camera near clip";
-    return false;
-  }
-
-  if (!_sensor->clipFar.Set( (const char*)xmlGetProp(clip,(xmlChar*)"far") ))
-  {
-    gzerr << "Unable to parse camera far clip";
-    return false;
-  }
+  boost::shared_ptr<SDFElement> sdfClip = _sdf->AddElement("clip");
+  initAttr(_config, "nearClip", sdfClip->GetAttribute("near"));
+  initAttr(_config, "farClip", sdfClip->GetAttribute("far"));
 
   // save 
   xmlNodePtr save = firstChildElement(_config, "save");
-  if (save)
+  if (firstChildElement("saveFrames"))
   {
-    if (!_sensor->saveEnabled.Set( (const char*)xmlGetProp(save,(xmlChar*)"enabled")))
-    {
-      gzerr << "Unable to parse camera save enabled flag\n";
-      return false;
-    }
-
-    if (!_sensor->savePath.Set( (const char*)xmlGetProp(save,(xmlChar*)"path")))
-    {
-      gzerr << "Unable to parse camera save path\n";
-      return false;
-    }
+    boost::shared_ptr<SDFElement> sdfSave = _sdf->AddElement("save");
+    initAttr(_config, "saveFrames", sdfSave->GetAttribute("enabled"));
+    initAttr(_config, "saveFramePath", sdfSave->GetAttribute("path"));
   }
 
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Ray> &_sensor)
+bool initRay(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  // scan 
-  xmlNodePtr scan = firstChildElement(_config, "scan");
-  if (scan)
+  boost::shared_ptr<SDFElement> sdfScan = _sdf->AddElement("scan");
+
+  if (firstChildElement("displayRays"))
   {
-    if (!_sensor->display.Set( (const char*)xmlGetProp(scan,(xmlChar*)"display")))
-    {
-      gzerr << "Unable to parse ray display flag\n";
-      return false;
-    }
-
-    // Horizontal scans
-    xmlNodePtr horizontal = firstChildElement(scan, "horizontal");
-    if (!horizontal)
-    {
-      gzerr << "missing horizontal element";
-      return false;
-    }
-
-    if (!_sensor->horizontalSamples.Set( (const char*)xmlGetProp(horizontal,(xmlChar*)"samples")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal samples";
-      return false;
-    }
-
-    if (!_sensor->horizontalResolution.Set( (const char*)xmlGetProp(horizontal,(xmlChar*)"resolution")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal resolution";
-      return false;
-    }
-
-    if (!_sensor->horizontalMinAngle.Set( (const char*)xmlGetProp(horizontal,(xmlChar*)"min_angle")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal min_angle";
-      return false;
-    }
-
-    if (!_sensor->horizontalMaxAngle.Set( (const char*)xmlGetProp(horizontal,(xmlChar*)"max_angle")))
-    {
-      gzerr << "Unable to parse ray sensor horizontal max_angle";
-      return false;
-    }
-
-    // Vertical scans
-    xmlNodePtr vertical = firstChildElement(_config, "vertical");
-    if (!vertical)
-    {
-      gzerr << "missing vertical element\n";
-      return false;
-    }
-
-    if (!_sensor->verticalSamples.Set( (const char*)xmlGetProp(vertical,(xmlChar*)"samples")))
-    {
-      gzerr << "Unable to parse ray sensor vertical samples";
-      return false;
-    }
-
-    if (!_sensor->verticalResolution.Set( (const char*)xmlGetProp(vertical,(xmlChar*)"resolution")))
-    {
-      gzerr << "Unable to parse ray sensor vertical resolution";
-      return false;
-    }
-
-    if (!_sensor->verticalMinAngle.Set( (const char*)xmlGetProp(vertical,(xmlChar*)"min_angle")))
-    {
-      gzerr << "Unable to parse ray sensor vertical min_angle";
-      return false;
-    }
-
-    if (!_sensor->verticalMaxAngle.Set( (const char*)xmlGetProp(vertical,(xmlChar*)"max_angle")))
-    {
-      gzerr << "Unable to parse ray sensor vertical max_angle";
-      return false;
-    }
-
-
-    // range 
-    xmlNodePtr range = firstChildElement(_config, "range");
-    if (!range)
-    {
-      gzerr << "ray sensor missing range element\n";
-      return false;
-    }
-
-    if (!_sensor->rangeMin.Set( (const char*)xmlGetProp(range,(xmlChar*)"min")))
-    {
-      gzerr << "Invalid min range\n";
-      return false;
-    }
-
-    if (!_sensor->rangeMax.Set( (const char*)xmlGetProp(range,(xmlChar*)"max")))
-    {
-      gzerr << "Invalid max range\n";
-      return false;
-    }
-
-    if (!_sensor->rangeResolution.Set( (const char*)xmlGetProp(range,(xmlChar*)"resolution")))
-    {
-      gzerr << "Invalid range resolution\n";
-      return false;
-    }
+    std::string display = getValue(firstChildElement(_config,"displayRays"));
+    if (display != "false")
+      sdfScan->GetAttribute("display")->Set("false");
+    else
+      sdfScan->GetAttribute("display")->Set("true");
   }
 
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material)
-{
-  bool hasRGB = false;
-
-  _material->Clear();
-
-  if (!_material->script.Set( (const char*)xmlGetProp(_config,(xmlChar*)"script") ))
+  boost::shared_ptr<SDFEelement> sdfHoriz = sdfScan->AddElement("horizontal");
+  if (!sdfHoriz->GetAttribute("samples")->Set(
+        firstChildElement(_config, "rangeCount").c_str()))
   {
-    gzerr << "Unable to parse material script attribute\n";
+    gzerr << "Unable to parse ray sensor rangeCount\n";
     return false;
   }
 
-  // color
-  xmlNodePtr c = firstChildElement(_config, "color");
-  if (c)
+  int rangeCount = boost::lexical_cast<int>(getValue(firstChildElement(_config, "rangeCount")));
+  int rayCount = boost::lexical_cast<int>(getValue(firstChildElement(_config, "rayCount")));
+  if (!sdfHoriz->GetAttribute("resolution")->Set( 
+        boost::lexical_cast<std::string>(rangeCount / rayCount).c_str() ))
   {
-    if ( (const char*)xmlGetProp(c,(xmlChar*)"rgba"))
-    {
-      if (!_material->color.Set( (const char*)xmlGetProp(c,(xmlChar*)"rgba")))
-      {
-        gzerr << "Unable to parse material color rgba attribute.\n";
-        _material->color.Reset();
-        return false;
-      }
-      else
-        hasRGB = true;
-    }
-    else
-    {
-      gzwarn << "Material color has no rgba\n";
-    }
+    gzerr << "Unable to parse ray sensor rayCount\n";
+    return false;
   }
 
-  return !_material->script.GetValue().empty() || hasRGB;
+  double minAngle = boost::lexical_cast<double>(getValue(firstChildElement(_config,"minAngle")));
+  double maxAngle = boost::lexical_cast<double>(getValue(firstChildElement(_config,"maxAngle")));
+
+  if (!sdfHoriz->GetAttribute("min_angle")->Set( 
+        boost::lexical_cast<std::string>(RTOD(minAngle)) ))
+  {
+    gzerr << "Unable to parse min_angle\n";
+    return false;
+  } 
+
+  if (!sdfHoriz->GetAttribute("max_angle")->Set( 
+        boost::lexical_cast<std::string>(RTOD(maxAngle)) ))
+  {
+    gzerr << "Unable to parse max_angle\n";
+    return false;
+  } 
+
+
+  boost::shared_ptr<SDFEelement> sdfRange = _sdf->AddElement("range");
+  if (!sdfRange->GetAttribute("min")->Set( 
+        getValue(firstChildElement(_config,"minRange")) ))
+  {
+    gzerr << "Unable to parse minRange\n";
+  }
+  if (!sdfRange->GetAttribute("max")->Set( 
+        getValue(firstChildElement(_config,"maxRange")) ))
+  {
+    gzerr << "Unable to parse maxRange\n";
+  }
+  if (!sdfRange->GetAttribute("resolution")->Set( 
+        getValue(firstChildElement(_config,"resRange")) ))
+  {
+    gzerr << "Unable to parse resRange\n";
+  }
+
+  return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
+bool initContact(xmlNodePtr *_config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _inertial->Clear();
+  boost::shared_ptr<SDFElement> sdfCollision = _sdf->AddElement("collision");
 
+  initAttr(_config, "geom", sdfCollision->GetAttribute("name"));
+
+  return true;
+}
+
+// _config = <body>
+// _sdf = <inertial>
+bool initInertial(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
+{
   // Origin (old gazebo xml supports only cx,cy,cz translations, no rotation
   // xyz and rpy under body:... is for the link frame
-  ParamT<double, false> cx("cgx", 0);
-  ParamT<double, false> cy("cgy", 0);
-  ParamT<double, false> cz("cgz", 0);
   xmlNodePtr cx_xml = firstChildElement(_config, "cx");
   xmlNodePtr cy_xml = firstChildElement(_config, "cy");
   xmlNodePtr cz_xml = firstChildElement(_config, "cz");
-  if (cx_xml) cx.Set( getValue(cx_xml).c_str() );
-  if (cy_xml) cy.Set( getValue(cy_xml).c_str() );
-  if (cz_xml) cz.Set( getValue(cz_xml).c_str() );
-  gazebo::math::Pose cg; cg.pos = gazebo::math::Vector3(cx.GetValue(),cy.GetValue(),cz.GetValue());
-  _inertial->origin.SetValue(cg);
 
-  xmlNodePtr mass_xml = firstChildElement(_config, "mass");
-  if (! mass_xml )
+  std::string poseString;
+  if (cx_xml) 
+    poseString += getValue(cx_xml) + " ";
+  else
   {
-    gzerr << "Inertial element must have mass attribute.";
+    gzerr << "Missing cx\n";
     return false;
   }
 
-  if (!_inertial->mass.Set( getValue(mass_xml).c_str()))
+  if (cy_xml) 
+    poseString += getValue(cy_xml) + " ";
+  else
   {
-    gzerr << "Unable to parse inerital mass attribute\n";
+    gzerr << "Missing cy\n";
     return false;
   }
 
+  if (cz_xml) 
+    poseString += getValue(cz_xml) + " ";
+  else
+  {
+    gzerr << "Missing cz\n";
+     return false;
+  } 
+
+  // Put in the rpy values
+  poseString += "0 0 0";
+
+  sdfOrigin = _sdf->AddElement("origin");
+  sdfOrigin->GetAttribute("pose")->Set(poseString);
+
+  initAttr(_config, "mass", _sdf->GetAttribute("mass"));
+
+  boost::shared_ptr<SDElement> sdfInertia = _sdf->AddElement("inertia");
 
   xmlNodePtr ixx_xml = firstChildElement(_config, "ixx");
   xmlNodePtr ixy_xml = firstChildElement(_config, "ixy");
@@ -481,12 +328,12 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
     gzerr << "Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes\n";
     return false;
   }
-  if (!_inertial->ixx.Set( getValue(ixx_xml).c_str() ) ||
-      !_inertial->ixy.Set( getValue(ixy_xml).c_str() ) ||
-      !_inertial->ixz.Set( getValue(ixz_xml).c_str() ) ||
-      !_inertial->iyy.Set( getValue(iyy_xml).c_str() ) ||
-      !_inertial->iyz.Set( getValue(iyz_xml).c_str() ) ||
-      !_inertial->izz.Set( getValue(izz_xml).c_str() ) )
+  if (!sdfInertia->GetAttribute("ixx")->Set( getValue(ixx_xml) ) ||
+      !sdfInertia->GetAttribute("ixy")->Set( getValue(ixy_xml) ) ||
+      !sdfInertia->GetAttribute("ixz")->Set( getValue(ixz_xml) ) ||
+      !sdfInertia->GetAttribute("iyy")->Set( getValue(iyy_xml) ) ||
+      !sdfInertia->GetAttribute("iyz")->Set( getValue(iyz_xml) ) ||
+      !sdfInertia->GetAttribute("izz")->Set( getValue(izz_xml) ) )
   {
     gzerr << "one of the inertia elements: "
       << "ixx (" << getValue(ixx_xml) << ") "
@@ -502,216 +349,95 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial)
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision)
+// _conifg = "geom"
+// _sdf = "collision"
+bool initCollision(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _collision->Clear();
+  initAttr(_config, "name", _sdf->GetAttribute("name"));
 
-  if (!_collision->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
+  // Origin
+  initOrigin(_config, _sdf);
+
+  boost::shared_ptr<SDFElement> sdfGeom = _sdf->AddElement("geometry");
+  if (_config->name == "plane")
   {
-    gzerr << "Unable to parse collision name\n";
-    return false;
+    boost::shared_ptr<SDFElement> sdfPlane = sdfGeom->AddElement("plane");
+    sdfPlane->GetAttribute("normal")->Set( getNodeValue(_config, "normal") );
+  }
+  else if (_config->name == "box")
+  {
+    boost::shared_ptr<SDFElement> sdfBox = sdfGeom->AddElement("box");
+    sdfBox->GetAttribute("size")->Set( getNodeValue(_config, "size") );
+  }
+  else if (_config->name == "sphere")
+  {
+    boost::shared_ptr<SDFElement> sdfSphere = sdfGeom->AddElement("sphere");
+    sdfSphere->GetAttribute("radius")->Set( getNodeValue(_config, "radius") );
+  }
+  else if (_config->name == "cylinder")
+  {
+    boost::shared_ptr<SDFElement> sdfCylinder = sdfGeom->AddElement("cylinder");
+    sdfCylinder->GetAttribute("radius")->Set( getNodeTuple(_config, "size",0) );
+    sdfCylinder->GetAttribute("length")->Set( getNodeTuple(_config, "size",1) );
+  }
+  else if (_config->name == "trimesh")
+  {
+    boost::shared_ptr<SDFElement> sdfMesh = sdfGeom->AddElement("mesh");
+    sdfMesh->GetAttribute("filename")->Set( getNodeValue(_config,"mesh") );
+
+    if (firstChildElement(_config, "scale"))
+      sdfMesh->GetAttribute("scale")->Set( getNodeValue(_config,"scale") );
   }
 
+  return true;
+}
+
+// _config = a node with an xyz and/or rpy children
+// _sdf = an sdf element that has an origin child element
+bool initOrigin(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
+{
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
   xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
   if (!xyz_xml && !rpy_xml)
   {
-    gzwarn << "INFO: xyz & rpy tag not present for collision element, using default (Identity)\n";
-    _collision->origin.Reset();
-  }
-  else
-  {
-    // Origin
-    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
-    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
-    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
-    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
-    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
-    _collision->origin.SetValue( pose );
-  }
-
-  // Geometry (<geom:...> where ... is the geometry primitive type)
-  _collision->geometry.reset( new Geometry);
-  if (!initXml(_config, _collision->geometry))
-  {
-    gzerr << "Unable to parse collision geometry element\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Plane> &_plane)
-{
-  _plane->Clear();
-
-  xmlNodePtr normal = firstChildElement(_config,"normal");
-  if (!normal || (!_plane->normal.Set( getValue(normal).c_str() )))
-  {
-    gzerr << "Unable to parse plane's normal child element\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Sphere> &_sphere)
-{
-  _sphere->Clear();
-
-  if (!_sphere->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
-  if (!_sphere->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
-  {
-    gzerr << "Unable to parse sphere's radius child element\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Box> &_box)
-{
-  _box->Clear();
-
-  xmlNodePtr size_xml = firstChildElement(_config,"size");
-  xmlNodePtr scale_xml = firstChildElement(_config,"scale");
-  if (!size_xml && !scale_xml)
-  {
-    gzerr << "box has no size or scale child element\n";
-    return false;
-  }
-  else if (size_xml)
-  {
-    if (!_box->size.Set( getValue(firstChildElement(_config,"size")).c_str()))
-    {
-      gzerr << "Unable to parse box's size child element\n";
-      return false;
-    }
-  }
-  else if (scale_xml)
-  {
-    if (!_box->size.Set( getValue(firstChildElement(_config,"scale")).c_str()))
-    {
-      gzerr << "Unable to parse box's scale child element\n";
-      return false;
-    }
-    else
-    {
-      gzwarn << "box's scale element is used as size instead\n";
-    }
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Cylinder> &_cylinder)
-{
-  _cylinder->Clear();
-
-  ParamT<gazebo::math::Vector2d, false> cyl_size("size",gazebo::math::Vector2d());
-  if(!cyl_size.Set( getValue(firstChildElement(_config,"size")).c_str()))
-  {
-    if (!_cylinder->length.Set( getValue(firstChildElement(_config,"length")).c_str()))
-    {
-      gzerr << "Unable to parse cylinder's length child element\n";
-      return false;
-    }
-
-    if (!_cylinder->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
-    {
-      gzerr << "Unable to parse cylinder's radius child element\n";
-      return false;
-    }
-  }
-  else
-  {
-    _cylinder->radius.SetValue(cyl_size.GetValue().x);
-    _cylinder->length.SetValue(cyl_size.GetValue().y);
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Mesh> &_mesh)
-{
-  _mesh->Clear();
-
-  xmlNodePtr filename_xml = firstChildElement(_config,"mesh");
-  if (!filename_xml)
-  {
-    gzerr << "trimesh has no filename child element\n";
-    return false;
-  }
-  else
-  {
-    if (!_mesh->filename.Set( getValue(filename_xml).c_str()))
-    {
-      gzerr << "Unable to parse mesh's filename(mesh) child element\n";
-      return false;
-    }
-  }
-
-  xmlNodePtr scale_xml = firstChildElement(_config,"scale");
-  if (!scale_xml)
-  {
-    gzerr << "trimesh has no scale child element\n";
-    return false;
-  }
-  else
-  {
-    if (!_mesh->scale.Set( getValue(scale_xml).c_str()))
-    {
-      gzerr << "Unable to parse mesh's scale child element\n";
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
-{
-  _link->Clear();
-
-  if (!_link->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
-  {
-    gzerr << "Unable to parse value for link name.\n";
-    return false;
-  }
-
-  // location of the link relative to the model
-  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
-  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
-  if (!xyz_xml && !rpy_xml)
-  {
     gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
-    _link->origin.Reset();
   }
   else
   {
-    // Origin
-    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
-    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
-    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
-    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
-    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
-    _link->origin.SetValue( pose );
-  }
+    boost::shared_ptr<SDFElement> origin = _sdf->AddElement("origin");
+    std::string poseStr;
 
+    if (xyz_xml) 
+      poseStr += getValue(xyz_xml) + " ";
+    else
+      poseStr += "0 0 0 ";
+
+    if (rpy_xml) 
+      poseStr += getValue(rpy_xml);
+    else
+      poseStr += "0 0 0";
+
+    origin->GetAttribute("pose")->Set( poseStr );
+  }
+}
+
+// _config = <body>
+// _sdf = <link>
+bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
+{
+  initAttr(_config, "name", _sdf->GetAttribute("name"));
+  initOrigin(_conifg, _sdf);
 
   // Inertial (optional)
   xmlNodePtr mm = firstChildElement(_config, "massMatrix");
-  ParamT<bool, false> custom_mass_matrix("mass",false);
   if (mm)
   {
+    ParamT<bool> custom_mass_matrix("mass",false,false);
     custom_mass_matrix.Set( getValue(mm).c_str() );
     if (custom_mass_matrix.GetValue())
     {
-      _link->inertial.reset(new Inertial);
-      if (!initXml(_config,_link->inertial))
+      if (!initInertial(_config, _sdf->AddElement("inertial")))
       {
         gzerr << "Could not parse inertial element for Link '" 
           << _link->name << "'\n";
@@ -720,55 +446,26 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
     }
   }
 
-  printf("debug2: %s\n",_link->name.GetValue().c_str());
-
   // Multiple Collisions (optional)
   for (xmlNodePtr  collision_xml = getChildByNSPrefix(_config, "geom"); 
       collision_xml; collision_xml = getNextByNSPrefix(collision_xml, "geom"))
   {
-    boost::shared_ptr<Collision> col;
-    col.reset(new Collision);
-
-    printf("looping geom:... %s\n",collision_xml->name);
-    if (initXml(collision_xml,col))
+    if (!initCollision(collision_xml,_sdf->AddElement("collision")))
     {
-      // group exists, add Collision to the vector in the map
-      _link->collisions.push_back(col);
-
-      // FIXME: there should be only 1 visual under a geom?
-      // Multiple Visuals (optional)
-      // FIXME: insert name for visual xml (using collision name + _visual?)
-      for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual"); 
-          visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
-      {
-        // copy name from collision (parent) into visual
-        xmlSetProp(visual_xml,(xmlChar*)"name",(xmlChar*)(col->name.GetValue().c_str()));
-
-        boost::shared_ptr<Visual> visual;
-        visual.reset(new Visual);
-
-        if (initXml(visual_xml,visual))
-        {
-          //  add Visual to the vector
-          _link->visuals.push_back(visual);
-        }
-        else
-        {
-          gzerr << "Could not parse visual element for Link '" 
-            << _link->name << "'\n";
-          visual.reset();
-          return false;
-        }
-      }
-
-    }
-    else
-    {
-      gzerr << "Could not parse collision element for Link '" 
-        <<  _link->name << "'\n";
-      col.reset();
+      gzerr << "Unable to parser geom\n";
       return false;
     }
+
+    for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual"); 
+        visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
+    {
+      if (!initVisual(visual_xml,_sdf->AddElement("visual")))
+      {
+        gzerr << "Unable to parse visual\n";
+        return false;
+      }
+    }
+    // TODO: check for duplicate geoms
   }
 
   // Get all sensor elements
@@ -776,313 +473,170 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
   for (xmlNodePtr  sensorXml = firstChildElement(_config, "sensor"); 
       sensorXml; sensorXml = nextSiblingElement(sensorXml, "sensor"))
   {
-    boost::shared_ptr<Sensor> sensor;
-    sensor.reset(new Sensor);
-
-    if (initXml(sensorXml,sensor))
+    if (!initSensor(sensorXml,_sdf->AddElement("sensor")))
     {
-      if (_link->GetSensor(sensor->name.GetValue()))
-      {
-        gzerr << "sensor '" << sensor->name << "' is not unique.\n";
-        sensor.reset();
-        return false;
-      }
-      else
-      {
-        _link->sensors.insert(make_pair(sensor->name.GetValue(),sensor));
-      }
-    }
-    else
-    {
-      gzerr << "sensor xml is not initialized correctly\n";
-      sensor.reset();
+      gzerr << "Unable to parse sensor\n";
       return false;
     }
+    // TODO: check for duplicate sensors
   }
 
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
+/// _config = <visual>
+/// _sdf = visual
+bool initVisual(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _visual->Clear();
+  _sdf->GetAttribute("name")->Set("old_gazebo_xml_visual");
+  _sdf->GetAttribute("cast_shadows")->Set("true");
 
-  //if (!_visual->name.Set( "old_gazebo_xml_visual" );
-  //if (!_visual->castShadows.Set( "true" );
+  initOrigin(_config, _sdf);
 
-  // Origin
-  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
-  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
-  if (!xyz_xml && !rpy_xml)
+  boost::shared_ptr<SDFElement> sdfGeom = _sdf->AddElement("geometry");
+
+  if (getNodeValue(_config, "mesh") == "unit_box")
   {
-    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
-    _visual->origin.Reset();
+    boost::shared_ptr<SDFElement> sdfBox = sdfGeom->AddElement("box");
+    if (getNode(_config,"scale"))
+      sdfBox->GetAttribute("size")->Set( getNodeValue(_config, "scale") );
+    else
+      sdfBox->GetAttribute("size")->Set("1 1 1");
+  }
+  else if (getNodeValue(_config, "mesh") == "unit_sphere")
+  {
+    boost::shared_ptr<SDFElement> sdfSphere = sdfGeom->AddElement("sphere");
+    if (getNode(_config,"scale"))
+      sdfSphere->GetAttribute("radius")->Set( getNodeTuple(_config, "scale", 0) );
+    else
+      sdfSphere->GetAttribute("radius")->Set( "1.0" );
+  }
+  else if (getNodeValue(_config, "mesh") == "unit_cylinder")
+  {
+    boost::shared_ptr<SDFElement> sdfCylinder = sdfGeom->AddElement("cylinder");
+
+    if (getNode(_config,"scale"))
+    {
+      sdfCylinder->GetAttribute("radius")->Set( getNodeTuple(_config, "scale", 0) );
+      sdfCylinder->GetAttribute("length")->Set( getNodeTuple(_config, "scale", 1) );
+    }
+    else
+    {
+      sdfCylinder->GetAttribute("radius")->Set( "1" );
+      sdfCylinder->GetAttribute("length")->Set( "1" );
+    }
   }
   else
   {
-    // Origin
-    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
-    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
-    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
-    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
-    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
-    _visual->origin.SetValue( pose );
-  }
+    boost::shared_ptr<SDFElement> sdfMesh = sdfGeom->AddElement("mesh");
+    sdfMesh->GetAttribute("filename")->Set( getNodeValue(_config,"mesh") );
 
-  // Geometry
-  // all visual element geometries are trimeshes, box-->unit_box
-  // but everyone has <mesh> specified
-  // make a copy of <visual> and change its element name
-  // to <visual:trimesh> to trick the new Geometry initXml into parsing it
-  xmlNode vis_xml = *_config;
-  vis_xml.name = (xmlChar*)"trimesh";
-
-  _visual->geometry.reset(new Geometry);
-  if (!initXml(&vis_xml, _visual->geometry))
-  {
-    gzerr << "Unable to parse geometry for Visual element\n";
-    return false;
+    if (firstChildElement(_config, "scale"))
+      sdfMesh->GetAttribute("scale")->Set( getNodeValue(_config,"scale") );
   }
 
   // Material
   xmlNodePtr mat_xml = firstChildElement(_config, "material");
   if (mat_xml)
   {
-    // change value to attribute "script" for the new parser
-    xmlSetProp(mat_xml,(xmlChar*)"script",(xmlChar*)(getValue(mat_xml).c_str()));
-    // try to parse material element in place
-    _visual->material.reset(new Material);
-    if (!initXml(mat_xml, _visual->material))
-    {
-      gzerr << "Could not parse material element in Visual block, maybe defined outside.\n";
-      _visual->material.reset();
-    }
+    boost::shared_ptr<SDFElement> sdfMat = _sdf->AddElement("material");
+    initAttr(_config, "material", sdfMat->GetAttribute("script"));
   }
 
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<JointDynamics> &_jointDynamics)
+// _config = <joint>
+// _sdf = joint
+bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _jointDynamics->Clear();
+  initAttr(_config, "name", _sdf->GetAttribute("name"));
+  initOrigin(_config, _sdf);
 
-  if (!_jointDynamics->damping.Set( (const char*)xmlGetProp(_config,(xmlChar*)"damping")))
-  {
-    gzerr << "Unable to parse joint dynamics damping attribute\n";
-    return false;
-  }
-
-  if (!_jointDynamics->friction.Set( (const char*)xmlGetProp(_config,(xmlChar*)"friction")))
-  {
-    gzerr << "Unable to parse joint dynamics friction attribute\n";
-    return false;
-  }
-
-  return true;
-}
-
-
-bool initXml(xmlNodePtr _config, 
-             boost::shared_ptr<JointLimits> &_jointLimits)
-{
-  _jointLimits->Clear();
-
-  if (!_jointLimits->lower.Set( (const char*)xmlGetProp(_config,(xmlChar*)"lower")))
-  {
-    gzerr << "Unable to parse joint limit lower\n";
-    return false;
-  }
-
-  if (!_jointLimits->upper.Set( (const char*)xmlGetProp(_config,(xmlChar*)"upper")))
-  {
-    gzerr << "Unable to parse joint limit upper\n";
-    return false;
-  }
-
-  if (!_jointLimits->effort.Set( (const char*)xmlGetProp(_config,(xmlChar*)"effort")))
-  {
-    gzerr << "Unable to parse joint limit effort\n";
-    return false;
-  }
-
-  if (!_jointLimits->effort.Set( (const char*)xmlGetProp(_config,(xmlChar*)"velocity")))
-  {
-    gzerr << "Unable to parse joint limit velocity\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
-{
-  _joint->Clear();
-
-  // Get Joint Name
-  if (!_joint->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
-  {
-    gzerr << "Unable to parse joint name attribute\n";
-    return false;
-  }
-
-  // Get transform from Parent Link to Joint Frame
-  xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
-  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
-  if (!xyz_xml && !rpy_xml)
-  {
-    //gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
-    _joint->origin.Reset();
-  }
-  else
-  {
-    // Origin
-    ParamT<gazebo::math::Vector3, false> xyzP("xyz",gazebo::math::Vector3());
-    ParamT<gazebo::math::Vector3, false> rpyP("rpy",gazebo::math::Vector3());
-    if (xyz_xml) xyzP.Set( getValue(xyz_xml).c_str());
-    if (rpy_xml) rpyP.Set( getValue(rpy_xml).c_str());
-    gazebo::math::Quaternion rpy; rpy.SetFromEuler(rpyP.GetValue());
-    gazebo::math::Pose pose(xyzP.GetValue(),rpy);
-    _joint->origin.SetValue( pose );
-  }
+  boost::shared_ptr<SDFElement> sdfParent = _sdf->AddElement("parent");
+  boost::shared_ptr<SDFElement> sdfChild = _sdf->AddElement("child");
 
   // Get Parent Link
   // parent is specified by <anchor> element in old xml
   // once anchor is found, <body1> or <body2> are parsed
   // as child and parent
-  xmlNodePtr parentXml = firstChildElement(_config, "anchor");
-  if (parentXml)
+  if (!firstChildElement(_config, "anchor"))
   {
-    if (!_joint->parentLinkName.Set( getValue(parentXml).c_str() ))
-    {
-      gzerr << "Unable to parse joint parent link name\n";
-      return false;
-    }
-  }
-  else
-  {
-    gzerr << "No parent link specified for joint[" << _joint->name << "]\n";
+    gzerr << "No parent link specified for joint[" 
+          << _sdf->GetAttribute("name")->GetValue() << "]\n";
     return false;
   }
+  initAttr(_config, "anchor", sdfParent->GetAttribute("link"));
 
   // Get Child Link
   xmlNodePtr body1Xml = firstChildElement(_config, "body1");
   xmlNodePtr body2Xml = firstChildElement(_config, "body2");
   if (body1Xml && body2Xml)
   {
-
-    if (getValue(parentXml) == getValue(body1Xml))
+    if (sdfParent->GetAttribute("link")->GetValue() == getValue(body1Xml))
     {
-      if (!_joint->childLinkName.Set( getValue(body1Xml).c_str() ))
-      {
-        gzerr << "Unable to parse joint child link name body1\n";
-        return false;
-      }
+      initAttr(_config, "body1", sdfChild->GetAttribute("link"));
     }
-    else if (getValue(parentXml) == getValue(body2Xml))
+    else if (sdfParent->GetAttribute("link")->GetValue() == getValue(body2Xml))
     {
-      if (!_joint->childLinkName.Set( getValue(body2Xml).c_str() ))
-      {
-        gzerr << "Unable to parse joint child link name body2\n";
-        return false;
-      }
+      initAttr(_config, "body2", sdfChild->GetAttribute("link"));
     }
     else
     {
       gzerr << "body1 and body2 does not match anchor, not sure which one is parent.\n";
       return false;
     }
-
   }
   else
   {
-    gzerr << "No child link specified for joint[" << _joint->name << "]\n";
+    gzerr << "No child link specified for joint["
+          << _sdf->GetAttribute("name")->GetValue() << "]\n";
     return false;
   }
 
+  if (_config->name == "hinge")
+    _sdf->GetAttribute("type")->Set("revolute");
+  else if (_config->name == "hinge2")
+    _sdf->GetAttribute("type")->Set("revolute2");
+  else if (_config->name == "slider")
+    _sdf->GetAttribute("type")->Set("prismatic");
+  else if (_config->name == "ball")
+    _sdf->GetAttribute("type")->Set("ball");
+  else if (_config->name == "universal")
+    _sdf->GetAttribute("type")->Set("universal");
 
-
-  // Get Joint type
-  if (!_joint->type.Set( (const char*)(_config->name) ))
+  if ( firstChildElement(_config,"axis"))
   {
-    gzerr << "joint '" << _joint->name 
-      << "' has no type, check to see if it's a reference.\n";
-    return false;
-  }
-  //gzwarn << "joint '" << _joint->name << "' type '" << _joint->type.GetValue() << "'\n";
-
-  std::string typeStr = _joint->type.GetValue();
-  if (typeStr == "piston")
-    _joint->typeEnum = Joint::PISTON;
-  else if (typeStr == "revolute2")
-    _joint->typeEnum = Joint::REVOLUTE2;
-  else if (typeStr == "hinge") // revolute in sdf
-    _joint->typeEnum = Joint::REVOLUTE;
-  else if (typeStr == "universal")
-    _joint->typeEnum = Joint::UNIVERSAL;
-  else if (typeStr == "slider") // prismatic in sdf
-    _joint->typeEnum = Joint::PRISMATIC;
-  else if (typeStr == "ball")
-    _joint->typeEnum = Joint::BALL;
-  else
-  {
-    gzerr << "Joint '" << _joint->name  << "' has no known type '" 
-      << typeStr << "'.\n";
-    return false;
+    boost::shared_ptr<SDFElement> sdfAxis = _sdf->AddElement("axis");
+    initAttr(_config, "axis", sdfAxis->GetAttribute("xyz"));
   }
 
-  // Get Joint Axis
-  if (_joint->typeEnum != Joint::BALL)
+  if ( firstChildElement(_config,"axis2"))
   {
-    // axis
-    xmlNodePtr axisXml = firstChildElement(_config, "axis");
-    if (!axisXml)
-    {
-      gzwarn << "no axis elemement for Joint link '" 
-        << _joint->name << "', defaulting to (1,0,0) axis\n";
-      _joint->axis.SetValue( gazebo::math::Vector3(1.0, 0.0, 0.0));
-    }
-    else{
-      if (!_joint->axis.Set( (const char*)xmlGetProp(axisXml,(xmlChar*)"xyz")) )
-      {
-        gzerr << "Unable to parse axis for joint[" << _joint->name << "]\n";
-        return false;
-      }
-    }
+    boost::shared_ptr<SDFElement> sdfAxis = _sdf->AddElement("axis2");
+    initAttr(_config, "axis", sdfAxis->GetAttribute("xyz"));
   }
+
+  boost::shared_ptr<SDFElement> sdfLimit = _sdf->AddElement("limit");
 
   // Get limit
-  xmlNodePtr limitXml = firstChildElement(_config, "limit");
-  if (limitXml)
+  if (firstChildElement(_config, "lowStop"))
   {
-    _joint->limits.reset(new JointLimits);
-    if (!initXml(limitXml,_joint->limits))
-    {
-      gzerr << "Could not parse limit element for joint '" 
-        << _joint->name << "'.\n";
-      _joint->limits.reset();
-      return false;
-    }
+    initAttr(_config, "lowStop", sdfLimit->GetAttribute("lower"));
+  }
+  if (firstChildElement(_config, "hiStop"))
+  {
+    initAttr(_config, "hiStop", sdfLimit->GetAttribute("upper"));
   }
 
-  // Get Dynamics
-  xmlNodePtr propXml = firstChildElement(_config, "dynamics");
-  if (propXml)
+  boost::shared_ptr<SDFElement> sdfDynamics = _sdf->AddElement("dynamics");
+  if (firstChildElement(_config, "damping"))
   {
-    _joint->dynamics.reset(new JointDynamics);
-    if (!initXml(propXml,_joint->dynamics))
-    {
-      gzerr << "Could not parse joint_dynamics element for joint '" 
-        << _joint->name << "'.\n";
-      _joint->dynamics.reset();
-      return false;
-    }
+    initAttr(_config, "damping", sdfDynamics->GetAttribute("damping"));
   }
 
   return true;
 }
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1137,163 +691,42 @@ bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<Model> &_model)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Load Model from xmlNode
-bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model)
+bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _model->Clear();
+  initAttr(_config, "name", _sdf->GetAttribute("name"));
+  initAttr(_config, "static", _sdf->GetAttribute("static"));
+  initOrigin(_config, _sdf);
 
-  if (!_xml) 
-    return false;
-
-  if (strcmp((const char*)_xml->name, "renderable")==0)
+  // Get all Link elements
+  for (xmlNodePtr  linkXml = getChildByNSPrefix(_config, "body"); 
+      linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
   {
-    // should load lights here
-    // initXml(_xml, light);
-    gzwarn << "parsing model:renderable not implemented yet, skipping.\n";
-    return true;
-
-  }
-  else if (strcmp((const char*)_xml->name, "physical")==0)
-  {
-    if (!_model->name.Set( (const char*)xmlGetProp(_xml,(xmlChar*)"name")))
+    if (!initLink(linkXml, _sdf->AddElement("link")))
     {
-      gzerr << "No name given for the model.\n";
+      gzerr << "link xml is not initialized correctly\n";
       return false;
     }
+  }
 
-    // Get all Link elements
-    for (xmlNodePtr  linkXml = getChildByNSPrefix(_xml, "body"); 
-        linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
+  // Get all Joint elements
+  for (xmlNodePtr  jointXml = getChildByNSPrefix(_config, "joint"); 
+       jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
+  {
+    if (!initXml(jointXml,_sdf->AddElement("joint")))
     {
-      boost::shared_ptr<Link> link;
-      link.reset(new Link);
-
-      if (initXml(linkXml,link))
-      {
-        if (_model->GetLink(link->name.GetValue()))
-        {
-          gzerr << "link '" << link->name << "' is not unique.\n";
-          link.reset();
-          return false;
-        }
-        else
-        {
-          _model->links.insert(make_pair(link->name.GetValue(),link));
-        }
-      }
-      else
-      {
-        gzerr << "link xml is not initialized correctly\n";
-        link.reset();
-        return false;
-      }
-    }
-
-    if (_model->links.empty())
-    {
-      gzerr << "No link elements found in model [" << _model->name.GetValue() << "]\n";
+      gzerr << "joint xml is not initialized correctly\n";
       return false;
     }
-
-    // Get all Joint elements
-    for (xmlNodePtr  jointXml = getChildByNSPrefix(_xml, "joint"); 
-        jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
-    {
-      boost::shared_ptr<Joint> joint;
-      joint.reset(new Joint);
-
-      if (initXml(jointXml,joint))
-      {
-        if (_model->GetJoint(joint->name.GetValue()))
-        {
-          gzerr << "joint '" << joint->name << "' is not unique.\n";
-          joint.reset();
-          return false;
-        }
-        else
-        {
-          _model->joints.insert(make_pair(joint->name.GetValue(),joint));
-        }
-      }
-      else
-      {
-        gzerr << "joint xml is not initialized correctly\n";
-        joint.reset();
-        return false;
-      }
-    }
-
-    /// Get all the plugins
-    getPlugins(_xml, _model->plugins);
   }
-  else
-  {
-    gzerr << "model:" << _xml->name << " is not renderable nor physical\n";
-    return false;
-  }
+
+  /// Get all the plugins
+  getPlugins(_config, _sdf);
 
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geometry)
-{
-  bool result = false;
 
-  if (!_config)
-  {
-    gzerr << "Null xml\n";
-    return false;
-  }
-
-  std::string typeName = (const char*)_config->name;
-  printf("debug3: %s %s\n",typeName.c_str(), (const char*)xmlGetProp(_config,(xmlChar*)"name"));
-  if (typeName == "plane")
-  {
-    boost::shared_ptr<Plane> plane(new Plane);
-    result = initXml(_config, plane);
-    _geometry = plane;
-  }
-  else if (typeName == "sphere")
-  {
-    boost::shared_ptr<Sphere> sphere(new Sphere);
-    result = initXml(_config, sphere);
-    _geometry = sphere;
-  }
-  else if (typeName == "box")
-  {
-    boost::shared_ptr<Box> box(new Box);
-    result = initXml(_config, box);
-    _geometry =  box;
-  }
-  else if (typeName == "cylinder")
-  {
-    boost::shared_ptr<Cylinder> cylinder(new Cylinder);
-    result = initXml(_config, cylinder);
-    _geometry = cylinder;
-  }
-  else if (typeName == "trimesh")
-  {
-    boost::shared_ptr<Mesh> mesh(new Mesh);
-    result = initXml(_config, mesh);
-    _geometry = mesh;
-  }
-  else
-  {
-    gzerr << "Unknown geometry type '" << typeName << "'.\n";
-    return false;
-  }
-
-  // clear geom object when fails to initialize
-  if (!result)
-  {
-    gzerr << "Geometry failed to parse\n";
-    _geometry.reset();
-  }
-
-  return true;
-}
-
-bool initXml(xmlNodePtr _config, boost::shared_ptr<Controller> &_controller)
+bool initController(xmlNodePtr _config, boost::shared_ptr<Controller> &_controller)
 {
   _controller->Clear();
 
@@ -1364,810 +797,129 @@ bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<World> &_world)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initXml(xmlNodePtr _worldXml, boost::shared_ptr<World> &_world)
+bool initWorld(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _world->Clear();
-
-  if (!_worldXml) 
+  // Set world name
+  if (!_sdf->GetAttribute("world").Set( "old_gazebo_xml_deprecated" ))
   {
-    gzerr << "Error: World XML is NULL\n";
+    gzerr << "Unable to set world name\n";
     return false;
   }
 
-  // Get world name
-  if (!_world->name.Set( "old_gazebo_xml_deprecated" ))
-  {
-    gzerr << "Unable to parse world name\n";
-    return false;
-  }
+  initScene(firstChildElement(_config, "ogre"), _sdf->AddElement("scene"));
 
-  _world->scene.reset(new Scene);
-  initXml(firstChildElement(_worldXml, "ogre"),_world->scene);
-
-  _world->physics.reset(new Physics);
-  initXml(firstChildElement(_worldXml, "ode"),_world->physics);
+  initPhyscis(firstChildElement(_config, "ode"),_sdf->AddElement("physics"));
 
   // Get all model elements
-  for (xmlNodePtr  modelXml = getChildByNSPrefix(_worldXml, "model"); 
-      modelXml; modelXml = getNextByNSPrefix(modelXml, "model"))
+  for (xmlNodePtr  modelXml = getChildByNSPrefix(_config, "model"); 
+       modelXml; modelXml = getNextByNSPrefix(modelXml, "model"))
   {
-    boost::shared_ptr<Model> model;
-    model.reset(new Model);
 
-    if (initXml(modelXml,model))
+    if (strcmp((const char*)modelXml->name, "renderable")==0)
     {
-      if (_world->GetModel(model->name.GetValue()))
+      if (!initLight(modelXml->name, _sdf->AddElement("light")))
       {
-        gzerr << "model '" << model->name << "' is not unique.\n";
-        model.reset();
+        gzerr << "light xml is not initialized correctly\n";
         return false;
       }
-      else
-      {
-        _world->models.insert(make_pair(model->name.GetValue(),model));
-      }
     }
-    else
+    else 
     {
-      gzerr << "model xml is not initialized correctly\n";
-      model.reset();
-      return false;
-    }
-  }
-
-  // Get all Joint elements
-  for (xmlNodePtr  jointXml = getChildByNSPrefix(_worldXml, "joint"); 
-      jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
-  {
-    boost::shared_ptr<Joint> joint;
-    joint.reset(new Joint);
-
-    if (initXml(jointXml,joint))
-    {
-      if (_world->GetJoint(joint->name.GetValue()))
+      if (!initModel(modelXml,_sdf->AddElement("model")))
       {
-        gzerr << "joint '" << joint->name << "s' is not unique.\n";
-        joint.reset();
+        gzerr << "model xml is not initialized correctly\n";
         return false;
       }
-      else
-      {
-        _world->joints.insert(make_pair(joint->name.GetValue(),joint));
-      }
-    }
-    else
-    {
-      gzerr << "joint xml is not initialized correctly\n";
-      joint.reset();
-      return false;
     }
   }
 
   /// Get all the plugins
-  getPlugins(_worldXml, _world->plugins);
+  getPlugins(_config, _sdf);
 
   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initXml(xmlNodePtr  _config, boost::shared_ptr<Scene> &_scene)
+bool initScene(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
-  _scene->Clear();
 
-  xmlNodePtr ambient = firstChildElement(_config, "ambient");
-  if (ambient)
+  boost::shared_ptr<SDFElement> sdfAmbient = _sdf->AddElement("ambient");
+  initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
+
+  boost::shared_ptr<SDFElement> sdfBackground = _sdf->AddElement("background");
+  initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
+
+  xmlNodPtr sky = firstChildElement(_config, "sky");
+  if (sky)
   {
-    if (!_scene->ambientColor.Set( (getValue(ambient)).c_str() ) )
-    {
-      gzerr << "Unable to parse ambient color\n";
-      return false;
-    }
+    boost::shared_ptr<SDFElement> sdfSky = sdfBackground->AddElement("sky");
+    initAttr(sky, "material", sdfSky->GetAttribute("material"));
   }
 
-  xmlNodePtr background = firstChildElement(_config, "background");
-  if (background)
-  {
-    ParamT<gazebo::math::Vector3, false> bg("vector3",gazebo::math::Vector3());
-    if (!bg.Set( (getValue(background)).c_str() ) )
-    {
-      gzerr << "Unable to parse background rgba\n";
-      return false;
-    }
-    // TODO: make color constructor for this?
-    gazebo::common::Color color(bg.GetValue().x,bg.GetValue().y,bg.GetValue().z);
-    _scene->backgroundColor.SetValue( color );
+  boost::shared_ptr<SDFElement> sdfShadow = _sdf->AddElement("shadows");
+  sdfShadow->GetAttribute("rgba")->Set("0 0 0 0");
 
-
-    xmlNodePtr sky = firstChildElement(_config, "sky");
-    if (sky)
-    {
-      if (!_scene->skyMaterial.Set( getValue(firstChildElement(sky,"material")).c_str() ))
-      {
-        gzerr << "Unable to parse material for the sky.\n";
-        return false;
-      }
-    }
-  }
-
-  xmlNodePtr shadow = firstChildElement(_config, "shadows");
-  if (shadow && !_scene->shadowEnabled.Set( (getValue( shadow)).c_str()))
-    {
-      gzerr << "shadows element requires a bool value";
-      return false;
-    }
-
-  xmlNodePtr shadow_type = firstChildElement(_config, "shadowTechnique");
-  if (shadow_type && !_scene->shadowType.Set( (getValue( shadow_type)).c_str()))
-    {
-      gzerr << "shadowType requires a string attribute";
-      return false;
-    }
+  initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
+  initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
 
   return true;
 }
 
-bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_openDynamicsEngine)
+//_config = physics:ode
+//_sdf = physics
+bool initPhysics(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
+  _sdf->GetAttribute("type")->Set("ode");
 
-  xmlNodePtr solverConfig = firstChildElement(_config, "stepType");
-  if (!solverConfig)
-  {
-    gzerr << "ODE Physics missing solver stepType\n";
-    return false;
-  }
+  boost::shared_ptr<SDFElement> sdfGravity = _sdf->AddElement("gravity");
+  boost::shared_ptr<SDFElement> sdfODE = _sdf->AddElement("ode");
+  boost::shared_ptr<SDFElement> sdfODESolver = sdfODE->AddElement("solver");
+  boost::shared_ptr<SDFElement> sdfODEConstraints = sdfODE->AddElement("constraints");
 
-  if (!_openDynamicsEngine->solverType.Set( getValue(solverConfig).c_str()))
-  {
-    gzerr << "ODE Physics missing solver step type\n";
-    return false;
-  }
+  initAttr(_config, "gravity", sdfGravity->GetAttribute("xyz"));
 
-  if (!_openDynamicsEngine->dt.Set( getValue(firstChildElement(_config, "stepTime")).c_str() ))
-  {
-    gzerr << "ODE Physics solver unable to parse dt attribute\n";
-    return false;
-  }
+  initAttr(_config, "stepType", sdfODESolver->GetAttribute("type"));
+  initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
+  
 
-  if (!_openDynamicsEngine->iters.Set( getValue(firstChildElement(_config, "stepIters")).c_str()))
+  if (sdfODESolver->GetAttribute("type")->GetValue() == "quick")
   {
-    gzerr << "ODE Physics solver malformed iters attribute\n";
-    return false;
-  }
-
-  if (!_openDynamicsEngine->sor.Set( getValue(firstChildElement(_config, "stepW")).c_str()))
-  {
-    gzerr << "ODE Physics solver unable to parse sor attribute\n)";
-    return false;
+    initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
+    initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
   }
 
 
   // Contraints
-
-  if (!_openDynamicsEngine->cfm.Set(getValue(firstChildElement(_config, "cfm")).c_str())) 
-  {
-    gzerr << "ODE Physics contraints unable to parse cfm attribute\n";
-    return false;
-  }
-
-  if (!_openDynamicsEngine->erp.Set(getValue(firstChildElement(_config, "erp")).c_str())) 
-  {
-    gzerr << "ODE Physics contraints unable to parse erp attribute\n";
-    return false;
-  }
-
-
-  if (!_openDynamicsEngine->contactMaxCorrectingVel.Set(getValue(firstChildElement(_config, "contactMaxCorrectingVel")).c_str())) 
-  {
-    gzerr << "ODE Physics contraints unable to parse contact_max_correcting_vel attribute\n";
-    return false;
-  } 
-
-  if (!_openDynamicsEngine->contactSurfaceLayer.Set(getValue(firstChildElement(_config, "contactSurfaceLayer")).c_str())) 
-  {
-    gzerr << "ODE Physics contraints unable to parse contact_surface_layer attribute\n";
-    return false;
-  }
+  initAttr(_config, "cfm", sdfODEContraints->GetAttribute("cfm"));
+  initAttr(_config, "erp", sdfODEContraints->GetAttribute("erp"));
+  initAttr(_config, "contactMaxCorrectingVel", 
+      sdfODEContraints->GetAttribute("contact_max_correcting_vel"));
+  initAttr(_config, "contactSurfaceLayer", 
+      sdfODEContraints->GetAttribute("contact_surface_layer"));
 
   return true;
 }
 
-bool initXml(xmlNodePtr  _config, boost::shared_ptr<Physics> &_physics)
+
+bool initAttr(xmlNodePtr _node, const std::string _key, 
+              boost::shared_ptr<Param> _attr)
 {
-  _physics->Clear();
-
-  if (!_config)
+  if (_node && getNodeValue(_node, key))
   {
-    gzerr << "xml config is NULL\n";
-    return false;
-  }
-
-  if (!_physics->type.Set( (const char*)_config->name ))
-  {
-    gzerr << "Unable to parse physics type attribute\n";
-    return false;
-  }
-
-  if (!_physics->gravity.Set( getValue(firstChildElement(_config, "gravity")).c_str() )) 
-  {
-    gzerr << "Unable to parse physics gravity element \n";
-    _physics->gravity.Reset();
-    return false;
-  }
-
-  if (_physics->type.GetValue() == "ode")
-  {
-    _physics->engine.reset(new OpenDynamicsEngine );
-
-    boost::shared_ptr<OpenDynamicsEngine> open_dynamics_engine = boost::shared_static_cast<OpenDynamicsEngine>(_physics->engine);
-
-    initXml(_config,open_dynamics_engine);
+    if (!param->Set( getNodeValue(_node, key) )) 
+    {
+      gzerr << "Unable to set attribute from  node[" 
+            << _node->name << "] and key[" << _key << "]\n";
+      return false;
+    }
   }
   else
   {
-    gzerr << "Unknown physics engine type[" << _physics->type << "].\n";
+    gzerr << "Unable to get attribute. Node is null or key[" << _key << "] is missing\n";
     return false;
   }
 
   return true;
 }
-
-bool initXml(xmlNodePtr  /*_config*/, 
-             boost::shared_ptr<Contact> &/*_contact*/)
-{
-  return true;
-}
-
-/*
-bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world)
-{
-  xmlDoc doc;
-
-  xmlDocPtr decl = new xmlDoc( "1.0", "", "" );
-  doc.LinkEndChild(decl);
-
-  xmlNodePtr root = new xmlNode("gazebo");
-  doc.LinkEndChild(root);
-  root->SetAttribute("version","1.0");
-
-  xmlNodePtr worldElement = new xmlNode("world");
-  root->LinkEndChild(worldElement);
-
-  worldElement->SetAttribute(_world->name.GetKey(), 
-                             _world->name.GetAsString());
-
-  saveXml(worldElement, _world->scene); 
-  saveXml(worldElement, _world->physics); 
-
-  // Save the models
-  std::map<std::string, boost::shared_ptr<Model> >::const_iterator miter;
-  for (miter = _world->models.begin(); miter != _world->models.end(); miter++)
-  {
-    saveXml(worldElement, miter->second); 
-  }
-
-  // Save the joints
-  std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
-  for (jiter = _world->joints.begin(); jiter != _world->joints.end(); jiter++)
-  {
-    saveXml(worldElement, jiter->second); 
-  }
-
-  // Save the plugins
-  std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator piter;
-  for (piter = _world->plugins.begin(); piter != _world->plugins.end(); piter++)
-  {
-    saveXml(worldElement, piter->second); 
-  }
-
-  TiXmlPrinter printer;
-  printer.SetIndent("  ");
-
-  doc.Accept(&printer);
-
-  std::fstream out(filename.c_str(), std::ios::out);
-  out << printer.CStr();
-  out.close();
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Scene> &_scene)
-{
-  xmlNodePtr sceneNode = new xmlNode("scene");
-  _parent->LinkEndChild( sceneNode );
-
-  xmlNodePtr ambientNode = new xmlNode("ambient");
-  sceneNode->LinkEndChild( ambientNode );
-  ambientNode->SetAttribute( _scene->ambientColor.GetKey(),
-                             _scene->ambientColor.GetAsString() );
-
-  xmlNodePtr backgroundNode = new xmlNode("background");
-  sceneNode->LinkEndChild( backgroundNode );
-  backgroundNode->SetAttribute( _scene->backgroundColor.GetKey(),
-                                _scene->backgroundColor.GetAsString() );
-
-
-  xmlNodePtr skyNode = new xmlNode("sky");
-  backgroundNode->LinkEndChild( skyNode );
-  skyNode->SetAttribute( _scene->skyMaterial.GetKey(),
-                         _scene->skyMaterial.GetAsString());
-
-  // Save shadows
-  xmlNodePtr shadowNode = new xmlNode("shadows");
-  sceneNode->LinkEndChild( shadowNode );
-  shadowNode->SetAttribute( _scene->shadowEnabled.GetKey(),
-                            _scene->shadowEnabled.GetAsString());
-  shadowNode->SetAttribute( _scene->shadowColor.GetKey(),
-                            _scene->shadowColor.GetAsString());
-  shadowNode->SetAttribute( _scene->shadowType.GetKey(),
-                            _scene->shadowType.GetAsString());
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Physics> &_physics)
-{
-  xmlNodePtr physicsNode = new xmlNode("physics");
-  _parent->LinkEndChild( physicsNode );
-
-  physicsNode->SetAttribute( _physics->type.GetKey(), 
-                             _physics->type.GetAsString() );
-
-  xmlNodePtr gravityNode = new xmlNode("gravity");
-  physicsNode->LinkEndChild( gravityNode );
-  gravityNode->SetAttribute( _physics->gravity.GetKey(),
-                             _physics->gravity.GetAsString() );
-
-  if (_physics->type.GetAsString() == "ode")
-  {
-    boost::shared_ptr<OpenDynamicsEngine> openDynamicsEngine = boost::shared_static_cast<OpenDynamicsEngine>(_physics->engine);
-    saveXml( physicsNode, openDynamicsEngine );
-  }
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<OpenDynamicsEngine> &_engine)
-{
-  xmlNodePtr odeNode = new xmlNode("ode");
-  _parent->LinkEndChild( odeNode );
-
-  xmlNodePtr solverNode = new xmlNode("solver");
-  odeNode->LinkEndChild( solverNode );
-
-  solverNode->SetAttribute( _engine->solverType.GetKey(),
-                            _engine->solverType.GetAsString() );
-  solverNode->SetAttribute( _engine->dt.GetKey(),
-                            _engine->dt.GetAsString() );
-  solverNode->SetAttribute( _engine->iters.GetKey(),
-                            _engine->iters.GetAsString() );
-  solverNode->SetAttribute( _engine->sor.GetKey(),
-                            _engine->sor.GetAsString() );
-
-
-  xmlNodePtr constraintsNode = new xmlNode("constraints");
-  odeNode->LinkEndChild( constraintsNode );
-  constraintsNode->SetAttribute( _engine->cfm.GetKey(),
-                                 _engine->cfm.GetAsString() );
-  constraintsNode->SetAttribute( _engine->erp.GetKey(),
-                                 _engine->erp.GetAsString() );
-  constraintsNode->SetAttribute( _engine->contactMaxCorrectingVel.GetKey(),
-                                 _engine->contactMaxCorrectingVel.GetAsString() );
-  constraintsNode->SetAttribute( _engine->contactSurfaceLayer.GetKey(),
-                                 _engine->contactSurfaceLayer.GetAsString() );
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Joint> &_joint)
-{
-  xmlNodePtr jointNode = new xmlNode("joint");
-  _parent->LinkEndChild( jointNode );
-
-  jointNode->SetAttribute(_joint->name.GetKey(),
-                          _joint->name.GetAsString());
-  jointNode->SetAttribute(_joint->type.GetKey(),
-                          _joint->type.GetAsString());
-
-  xmlNodePtr parentNode = new xmlNode("parent");
-  jointNode->LinkEndChild(parentNode);
-  parentNode->SetAttribute( _joint->parentLinkName.GetKey(),
-                            _joint->parentLinkName.GetAsString() );
-
-  xmlNodePtr childNode = new xmlNode("child");
-  jointNode->LinkEndChild(childNode);
-  childNode->SetAttribute( _joint->childLinkName.GetKey(),
-                           _joint->childLinkName.GetAsString() );
-
-  saveXml(jointNode, _joint->origin);
-
-  // Axis 1
-  xmlNodePtr axisNode = new xmlNode("axis");
-  jointNode->LinkEndChild(axisNode);
-  axisNode->SetAttribute( _joint->axis.GetKey(), _joint->axis.GetAsString() );
-
-  // Axis 2
-  xmlNodePtr axis2Node = new xmlNode("axis2");
-  jointNode->LinkEndChild(axis2Node);
-  axis2Node->SetAttribute( _joint->axis2.GetKey(), _joint->axis2.GetAsString());
-
-  // Dynamics
-  if (_joint->dynamics)
-  {
-    xmlNodePtr dynamicsNode = new xmlNode("dynamics");
-    jointNode->LinkEndChild(dynamicsNode);
-    dynamicsNode->SetAttribute( _joint->dynamics->damping.GetKey(),
-        _joint->dynamics->damping.GetAsString() );
-    dynamicsNode->SetAttribute( _joint->dynamics->friction.GetKey(),
-        _joint->dynamics->friction.GetAsString() );
-  }
-
-  // Limit
-  if (_joint->limits)
-  {
-    xmlNodePtr limitNode = new xmlNode("limit");
-    jointNode->LinkEndChild(limitNode);
-    limitNode->SetAttribute( _joint->limits->lower.GetKey(),
-        _joint->limits->lower.GetAsString() );
-    limitNode->SetAttribute( _joint->limits->upper.GetKey(),
-        _joint->limits->upper.GetAsString() );
-    limitNode->SetAttribute( _joint->limits->effort.GetKey(),
-        _joint->limits->effort.GetAsString() );
-    limitNode->SetAttribute( _joint->limits->velocity.GetKey(),
-        _joint->limits->velocity.GetAsString() );
-  }
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const Vector3 &_vec)
-{
-  std::ostringstream stream;
-  stream << _vec;
-  _parent->SetAttribute("xyz", stream.str());
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const Rotation &_rot)
-{
-  std::ostringstream stream;
-  stream << _rot;
-  _parent->SetAttribute("rot", stream.str());
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const ParamT<Pose,true> &_pose)
-{
-  xmlNodePtr originNode = new xmlNode(_pose.GetKey());
-  _parent->LinkEndChild( originNode );
-
-  saveXml(originNode, _pose.GetValue().position);
-  saveXml(originNode, _pose.GetValue().rotation);
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const ParamT<Pose,false> &_pose)
-{
-  xmlNodePtr originNode = new xmlNode(_pose.GetKey());
-  _parent->LinkEndChild( originNode );
-
-  std::ostringstream posStream, rotStream;
-
-  posStream << _pose.GetValue().position;
-  rotStream << _pose.GetValue().rotation;
-
-  originNode->SetAttribute("xyz", posStream.str());
-  originNode->SetAttribute("rpy", rotStream.str());
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Model> &_model)
-{
-  xmlNodePtr modelNode = new xmlNode("model");
-  _parent->LinkEndChild( modelNode );
-
-
-  modelNode->SetAttribute( _model->name.GetKey(),
-                           _model->name.GetAsString() );
-
-  // Save the links
-  std::map<std::string, boost::shared_ptr<Link> >::const_iterator liter;
-  for (liter = _model->links.begin(); liter != _model->links.end(); liter++)
-  {
-    saveXml(modelNode, liter->second);
-  }
-
-  // Save the joints
-  std::map<std::string, boost::shared_ptr<Joint> >::const_iterator jiter;
-  for (jiter = _model->joints.begin(); jiter != _model->joints.end(); jiter++)
-  {
-    saveXml(modelNode, jiter->second);
-  }
-
-  // Save the plugins
-  std::map<std::string, boost::shared_ptr<Plugin> >::const_iterator piter;
-  for (piter = _model->plugins.begin(); piter != _model->plugins.end(); piter++)
-  {
-    saveXml(modelNode, piter->second);
-  }
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Link> &_link)
-{
-  xmlNodePtr linkNode = new xmlNode("link");
-  _parent->LinkEndChild( linkNode );
-
-  linkNode->SetAttribute(_link->name.GetKey(),
-                         _link->name.GetAsString());
-  linkNode->SetAttribute(_link->selfCollide.GetKey(),
-                         _link->selfCollide.GetAsString());
-  linkNode->SetAttribute(_link->gravity.GetKey(),
-                         _link->gravity.GetAsString());
-
-  // Save interial
-  saveXml(linkNode, _link->inertial);
-
-  // Save visuals
-  std::vector<boost::shared_ptr<Visual> >::const_iterator viter;
-  for (viter = _link->visuals.begin(); viter != _link->visuals.end(); viter++)
-  {
-    saveXml(linkNode, *viter);
-  }
-
-  // Save collisions
-  std::vector<boost::shared_ptr<Collision> >::const_iterator citer;
-  for (citer = _link->collisions.begin(); citer != _link->collisions.end(); citer++)
-  {
-    saveXml(linkNode, *citer);
-  }
-
-  // Save sensors
-  std::map<std::string, boost::shared_ptr<Sensor> >::const_iterator siter;
-  for (siter = _link->sensors.begin(); siter != _link->sensors.end(); siter++)
-  {
-    saveXml(linkNode, siter->second);
-  }
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Plugin> &_plugin)
-{
-  xmlNodePtr pluginNode = new xmlNode("plugin");
-  _parent->LinkEndChild( pluginNode );
-  pluginNode->SetAttribute(_plugin->name.GetKey(),
-                           _plugin->name.GetAsString());
-  pluginNode->SetAttribute(_plugin->filename.GetKey(),
-                           _plugin->filename.GetAsString());
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Visual> &_visual)
-{
-  xmlNodePtr visualNode = new xmlNode("visual");
-  _parent->LinkEndChild( visualNode );
-  visualNode->SetAttribute( _visual->castShadows.GetKey(),
-                            _visual->castShadows.GetAsString());
-  visualNode->SetAttribute( _visual->name.GetKey(),
-                            _visual->name.GetAsString());
-
-  saveXml(visualNode, _visual->origin);
-  saveXml(visualNode, _visual->geometry);
-  saveXml(visualNode, _visual->material);
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Geometry> &_geom)
-{
-  xmlNodePtr shapeNode = NULL;
-  xmlNodePtr geomNode = new xmlNode("geometry");
-  _parent->LinkEndChild( geomNode );
-
-  if (_geom->type == Geometry::SPHERE)
-  {
-    boost::shared_ptr<Sphere> shape = boost::shared_static_cast<Sphere>(_geom);
-    shapeNode = new xmlNode("sphere");
-    shapeNode->SetAttribute(shape->radius.GetKey(),shape->radius.GetAsString());
-  }
-  else if (_geom->type == Geometry::BOX)
-  {
-    boost::shared_ptr<Box> shape = boost::shared_static_cast<Box>(_geom);
-    shapeNode = new xmlNode("box");
-    std::ostringstream stream;
-    stream << shape->size;
-    shapeNode->SetAttribute("size", stream.str());
-  }
-  else if (_geom->type == Geometry::CYLINDER)
-  {
-    boost::shared_ptr<Cylinder> shape = boost::shared_static_cast<Cylinder>(_geom);
-    shapeNode = new xmlNode("cylinder");
-    shapeNode->SetAttribute(shape->radius.GetKey(),shape->radius.GetAsString());
-    shapeNode->SetAttribute(shape->length.GetKey(),shape->length.GetAsString());
-  }
-  else if (_geom->type == Geometry::MESH)
-  {
-    boost::shared_ptr<Mesh> shape = boost::shared_static_cast<Mesh>(_geom);
-    shapeNode = new xmlNode("mesh");
-    shapeNode->SetAttribute(shape->filename.GetKey(),
-                            shape->filename.GetAsString());
-    shapeNode->SetAttribute(shape->scale.GetKey(),
-                            shape->scale.GetAsString());
-  }
-  else
-  {
-    gzerr << "Unknown geometry type[" << _geom->type << "]\n";
-    return false;
-  }
-
-  geomNode->LinkEndChild( shapeNode );
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Material> &_mat)
-{
-  xmlNodePtr matNode = new xmlNode("material");
-  _parent->LinkEndChild( matNode );
-  matNode->SetAttribute( _mat->script.GetKey(), _mat->script.GetAsString());
-
-  xmlNodePtr colorNode = new xmlNode("color");
-  colorNode->SetAttribute( _mat->color.GetKey(), _mat->color.GetAsString());
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Collision> &_collision)
-{
-  xmlNodePtr collisionNode = new xmlNode("collision");
-  _parent->LinkEndChild( collisionNode );
-  collisionNode->SetAttribute( _collision->name.GetKey(),
-                               _collision->name.GetAsString());
-
-  saveXml(collisionNode, _collision->origin);
-  saveXml(collisionNode, _collision->geometry);
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Sensor> &_sensor)
-{
-  xmlNodePtr sensorNode = new xmlNode("sensor");
-  _parent->LinkEndChild( sensorNode );
-
-  sensorNode->SetAttribute( _sensor->name.GetKey(),
-                            _sensor->name.GetAsString() );
-  sensorNode->SetAttribute( _sensor->type.GetKey(),
-                            _sensor->type.GetAsString() );
-  sensorNode->SetAttribute( _sensor->alwaysOn.GetKey(),
-                            _sensor->alwaysOn.GetAsString() );
-  sensorNode->SetAttribute( _sensor->updateRate.GetKey(),
-                            _sensor->updateRate.GetAsString() );
-
-  saveXml(sensorNode, _sensor->origin);
-
-  if (_sensor->sensorType->type == SensorType::CAMERA)
-  {
-    boost::shared_ptr<Camera> camera = boost::shared_static_cast<Camera>(_sensor->sensorType);
-    saveXml( sensorNode, camera);
-  }
-  else if (_sensor->sensorType->type == SensorType::RAY)
-  {
-    boost::shared_ptr<Ray> ray = boost::shared_static_cast<Ray>(_sensor->sensorType);
-    saveXml( sensorNode, ray);
-  }
-  else if (_sensor->sensorType->type != SensorType::CONTACT)
-  {
-    gzerr << "Unknown sensor type[" << _sensor->type << "]\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Camera> &_camera)
-{
-  xmlNodePtr hfovNode = new xmlNode("horizontal_fov");
-  _parent->LinkEndChild( hfovNode );
-  hfovNode->SetAttribute( _camera->horizontalFov.GetKey(),
-                          _camera->horizontalFov.GetAsString() );
-
-  xmlNodePtr imageNode = new xmlNode("image");
-  _parent->LinkEndChild( imageNode );
-  imageNode->SetAttribute( _camera->imageWidth.GetKey(),
-                           _camera->imageWidth.GetAsString() );
-  imageNode->SetAttribute( _camera->imageHeight.GetKey(),
-                           _camera->imageHeight.GetAsString() );
-
-  xmlNodePtr clipNode = new xmlNode("clip");
-  _parent->LinkEndChild( clipNode );
-  clipNode->SetAttribute( _camera->clipNear.GetKey(),
-                          _camera->clipNear.GetAsString() );
-  clipNode->SetAttribute( _camera->clipFar.GetKey(),
-                          _camera->clipFar.GetAsString() );
-
-  xmlNodePtr saveNode = new xmlNode("save");
-  _parent->LinkEndChild( saveNode );
-  saveNode->SetAttribute( _camera->saveEnabled.GetKey(),
-                          _camera->saveEnabled.GetAsString() );
-  saveNode->SetAttribute( _camera->savePath.GetKey(),
-                          _camera->savePath.GetAsString() );
-
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Ray> &_ray)
-{
-  xmlNodePtr scanNode = new xmlNode("scan");
-  _parent->LinkEndChild( scanNode );
-  scanNode->SetAttribute( _ray->display.GetKey(),
-                          _ray->display.GetAsString() );
-
-  xmlNodePtr horizontalNode = new xmlNode("horizontal");
-  _parent->LinkEndChild( horizontalNode );
-  horizontalNode->SetAttribute( _ray->horizontalSamples.GetKey(),
-                                _ray->horizontalSamples.GetAsString() );
-  horizontalNode->SetAttribute( _ray->horizontalResolution.GetKey(),
-                                _ray->horizontalResolution.GetAsString() );
-  horizontalNode->SetAttribute( _ray->horizontalMinAngle.GetKey(),
-                                _ray->horizontalMinAngle.GetAsString() );
-  horizontalNode->SetAttribute( _ray->horizontalMaxAngle.GetKey(),
-                                _ray->horizontalMaxAngle.GetAsString() );
-
-  xmlNodePtr verticalNode = new xmlNode("vertical");
-  _parent->LinkEndChild( verticalNode );
-  verticalNode->SetAttribute( _ray->verticalSamples.GetKey(),
-                              _ray->verticalSamples.GetAsString() );
-  verticalNode->SetAttribute( _ray->verticalResolution.GetKey(),
-                              _ray->verticalResolution.GetAsString() );
-  verticalNode->SetAttribute( _ray->verticalMinAngle.GetKey(),
-                              _ray->verticalMinAngle.GetAsString() );
-  verticalNode->SetAttribute( _ray->verticalMaxAngle.GetKey(),
-                              _ray->verticalMaxAngle.GetAsString() );
-
-  xmlNodePtr rangeNode = new xmlNode("range");
-  _parent->LinkEndChild( rangeNode );
-  rangeNode->SetAttribute( _ray->rangeMin.GetKey(),
-                           _ray->rangeMin.GetAsString() );
-  rangeNode->SetAttribute( _ray->rangeMax.GetKey(),
-                           _ray->rangeMax.GetAsString() );
-  rangeNode->SetAttribute( _ray->rangeResolution.GetKey(),
-                           _ray->rangeResolution.GetAsString() );
-  return true;
-}
-
-bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Inertial> &_inertial)
-{
-  xmlNodePtr inertialNode = new xmlNode("inertial");
-  _parent->LinkEndChild( inertialNode );
-  inertialNode->SetAttribute(_inertial->mass.GetKey(),
-                             _inertial->mass.GetAsString());
-
-
-  saveXml(inertialNode, _inertial->origin);
-
-  xmlNodePtr inertiaNode = new xmlNode("inertia");
-  inertialNode->LinkEndChild(inertiaNode);
-  inertiaNode->SetAttribute( _inertial->ixx.GetKey(),
-                             _inertial->ixx.GetAsString() );
-  inertiaNode->SetAttribute( _inertial->ixy.GetKey(),
-                             _inertial->ixy.GetAsString() );
-  inertiaNode->SetAttribute( _inertial->ixz.GetKey(),
-                             _inertial->ixz.GetAsString() );
-  inertiaNode->SetAttribute( _inertial->iyy.GetKey(),
-                             _inertial->iyy.GetAsString() );
-  inertiaNode->SetAttribute( _inertial->iyz.GetKey(),
-                             _inertial->iyz.GetAsString() );
-  inertiaNode->SetAttribute( _inertial->izz.GetKey(),
-                             _inertial->izz.GetAsString() );
-
-  return true;
-}
-*/
 
 }

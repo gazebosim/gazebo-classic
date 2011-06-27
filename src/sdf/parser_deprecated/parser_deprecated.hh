@@ -42,12 +42,7 @@
 #include <boost/shared_ptr.hpp>
 #include <libxml/parser.h>
 
-#include "sdf/interface/Sensor.hh"
-#include "sdf/interface/Link.hh"
-#include "sdf/interface/Model.hh"
-#include "sdf/interface/World.hh"
-#include "sdf/interface/Joint.hh"
-#include "sdf/interface/Plugin.hh"
+#include "sdf/interface/SDF.hh"
 #include "math/Pose.hh"
 #include "sdf/parser_deprecated/controller.hh"
 
