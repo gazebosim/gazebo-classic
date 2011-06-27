@@ -42,6 +42,7 @@
 #include "sdf/interface/Param.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
+#include "math/Vector2d.hh"
 #include "common/Color.hh"
 #include "math/Quaternion.hh"
 
@@ -609,16 +610,25 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Cylinder> &_cylinder)
 {
   _cylinder->Clear();
 
-  if (!_cylinder->length.Set( getValue(firstChildElement(_config,"length")).c_str()))
+  ParamT<gazebo::math::Vector2d, false> cyl_size("size",gazebo::math::Vector2d());
+  if(!cyl_size.Set( getValue(firstChildElement(_config,"size")).c_str()))
   {
-    gzerr << "Unable to parse cylinder's length child element\n";
-    return false;
-  }
+    if (!_cylinder->length.Set( getValue(firstChildElement(_config,"length")).c_str()))
+    {
+      gzerr << "Unable to parse cylinder's length child element\n";
+      return false;
+    }
 
-  if (!_cylinder->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
+    if (!_cylinder->radius.Set( getValue(firstChildElement(_config,"radius")).c_str()))
+    {
+      gzerr << "Unable to parse cylinder's radius child element\n";
+      return false;
+    }
+  }
+  else
   {
-    gzerr << "Unable to parse cylinder's radius child element\n";
-    return false;
+    _cylinder->radius.SetValue(cyl_size.GetValue().x);
+    _cylinder->length.SetValue(cyl_size.GetValue().y);
   }
 
   return true;
@@ -628,7 +638,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Mesh> &_mesh)
 {
   _mesh->Clear();
 
-  xmlNodePtr filename_xml = firstChildElement(_config,"filename");
+  xmlNodePtr filename_xml = firstChildElement(_config,"mesh");
   if (!filename_xml)
   {
     gzerr << "trimesh has no filename child element\n";
@@ -638,7 +648,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Mesh> &_mesh)
   {
     if (!_mesh->filename.Set( getValue(filename_xml).c_str()))
     {
-      gzerr << "Unable to parse mesh's filename child element\n";
+      gzerr << "Unable to parse mesh's filename(mesh) child element\n";
       return false;
     }
   }
@@ -733,6 +743,7 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link)
       {
         // copy name from collision (parent) into visual
         xmlSetProp(visual_xml,(xmlChar*)"name",(xmlChar*)(col->name.GetValue().c_str()));
+
         boost::shared_ptr<Visual> visual;
         visual.reset(new Visual);
 
@@ -820,9 +831,12 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual)
   }
 
   // Geometry
-  // make a copy of <visual> and change it to <visual:[geom type of the collision]> to trick the new Geometry initXml into parsing it
+  // all visual element geometries are trimeshes, box-->unit_box
+  // but everyone has <mesh> specified
+  // make a copy of <visual> and change its element name
+  // to <visual:trimesh> to trick the new Geometry initXml into parsing it
   xmlNode vis_xml = *_config;
-  vis_xml.name = _config->parent->name;
+  vis_xml.name = (xmlChar*)"trimesh";
 
   _visual->geometry.reset(new Geometry);
   if (!initXml(&vis_xml, _visual->geometry))
@@ -933,10 +947,13 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get Parent Link
-  xmlNodePtr parentXml = firstChildElement(_config, "parent");
+  // parent is specified by <anchor> element in old xml
+  // once anchor is found, <body1> or <body2> are parsed
+  // as child and parent
+  xmlNodePtr parentXml = firstChildElement(_config, "anchor");
   if (parentXml)
   {
-    if (!_joint->parentLinkName.Set( (const char*)xmlGetProp(parentXml,(xmlChar*)"link")))
+    if (!_joint->parentLinkName.Set( getValue(parentXml).c_str() ))
     {
       gzerr << "Unable to parse joint parent link name\n";
       return false;
@@ -949,14 +966,33 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
   }
 
   // Get Child Link
-  xmlNodePtr childXml = firstChildElement(_config, "child");
-  if (childXml)
+  xmlNodePtr body1Xml = firstChildElement(_config, "body1");
+  xmlNodePtr body2Xml = firstChildElement(_config, "body2");
+  if (body1Xml && body2Xml)
   {
-    if (!_joint->childLinkName.Set( (const char*)xmlGetProp(childXml,(xmlChar*)"link")))
+
+    if (getValue(parentXml) == getValue(body1Xml))
     {
-      gzerr << "Unable to parse joint child link name\n";
+      if (!_joint->childLinkName.Set( getValue(body1Xml).c_str() ))
+      {
+        gzerr << "Unable to parse joint child link name body1\n";
+        return false;
+      }
+    }
+    else if (getValue(parentXml) == getValue(body2Xml))
+    {
+      if (!_joint->childLinkName.Set( getValue(body2Xml).c_str() ))
+      {
+        gzerr << "Unable to parse joint child link name body2\n";
+        return false;
+      }
+    }
+    else
+    {
+      gzerr << "body1 and body2 does not match anchor, not sure which one is parent.\n";
       return false;
     }
+
   }
   else
   {
@@ -967,23 +1003,24 @@ bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint)
 
 
   // Get Joint type
-  if (!_joint->type.Set( (const char*)xmlGetProp(_config,(xmlChar*)"type")))
+  if (!_joint->type.Set( (const char*)(_config->name) ))
   {
     gzerr << "joint '" << _joint->name 
       << "' has no type, check to see if it's a reference.\n";
     return false;
   }
+  gzerr << "joint '" << _joint->name << "' type '" << _joint->type.GetValue() << "'\n";
 
   std::string typeStr = _joint->type.GetValue();
   if (typeStr == "piston")
     _joint->typeEnum = Joint::PISTON;
   else if (typeStr == "revolute2")
     _joint->typeEnum = Joint::REVOLUTE2;
-  else if (typeStr == "revolute")
+  else if (typeStr == "hinge") // revolute in sdf
     _joint->typeEnum = Joint::REVOLUTE;
   else if (typeStr == "universal")
     _joint->typeEnum = Joint::UNIVERSAL;
-  else if (typeStr == "prismatic")
+  else if (typeStr == "slider") // prismatic in sdf
     _joint->typeEnum = Joint::PRISMATIC;
   else if (typeStr == "ball")
     _joint->typeEnum = Joint::BALL;
