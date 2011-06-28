@@ -66,7 +66,7 @@
 
   <rendering:ogre>
     <ambient>0.5 0.5 0.5 0.5</ambient>
-    <background>0.5 0.5 0.5</background>
+    <background>0.5 0.5 0.5 1.0</background>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -152,8 +152,8 @@
     <enableGravity>false</enableGravity>
     <light>
       <type>point</type>
-      <diffuseColor>0.5 0.5 0.5</diffuseColor>
-      <specularColor>.1 .1 .1</specularColor>
+      <diffuseColor>0.5 0.5 0.5 1.0</diffuseColor>
+      <specularColor>.1 .1 .1 1.0</specularColor>
       <attenuation>0.2 0.1 0</attenuation>
       <range>10</range>
     </light>

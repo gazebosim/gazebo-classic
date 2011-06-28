@@ -45,58 +45,58 @@
 #include "sdf/interface/SDF.hh"
 #include "math/Pose.hh"
 
-namespace sdf
+namespace deprecated_sdf
 {
-  bool initLight(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initSensor(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initCamera(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initRay(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initContact(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initInertial(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initCollision(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initOrigin(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initVisual(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
-  bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initLight(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initSensor(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initCamera(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initRay(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initContact(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initInertial(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initCollision(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initOrigin(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initLink(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initVisual(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initJoint(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initModel(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
 
   /// \brief Load Model given a filename
-  bool initModelFile(const std::string &_filename, boost::shared_ptr<SDFElement> &_sdf);
+  bool initModelFile(const std::string &_filename, boost::shared_ptr<sdf::SDFElement> &_sdf);
 
  /// \brief Load Model from a XML-string
-  bool initModelString(const std::string &_xmlstring, boost::shared_ptr<SDFElement> &_sdf);
+  bool initModelString(const std::string &_xmlstring, boost::shared_ptr<sdf::SDFElement> &_sdf);
 
   /// \brief Load Model from TiXMLDocument
-  bool initModelDoc(xmlDocPtr _xml, boost::shared_ptr<SDFElement> &_sdf);
+  bool initModelDoc(xmlDocPtr _xml, boost::shared_ptr<sdf::SDFElement> &_sdf);
 
   /// \brief Load Model from TiXMLElement
-  bool initModelXml(xmlNodePtr _xml, boost::shared_ptr<SDFElement> &_sdf);
+  bool initModelXml(xmlNodePtr _xml, boost::shared_ptr<sdf::SDFElement> &_sdf);
 
 
   /// \brief Load world given a filename
-  bool initWorldFile(const std::string &_filename, boost::shared_ptr<SDFElement> &_sdf);
+  bool initWorldFile(const std::string &_filename, boost::shared_ptr<sdf::SDF> &_sdf);
 
   /// \brief Load world from a XML-string
   bool initWorldString(const std::string &_xmlstring, 
-                       boost::shared_ptr<SDFElement> &_sdf);
+                       boost::shared_ptr<sdf::SDF> &_sdf);
 
    /// \brief Load World from TiXMLDocument
-  bool initWorldDoc(xmlDocPtr _xml, boost::shared_ptr<SDFElement> &_sdf);
+  bool initWorldDoc(xmlDocPtr _xml, boost::shared_ptr<sdf::SDF> &_sdf);
 
    /// \brief Load Model from TiXMLElement
-  bool initWorld(xmlNodePtr _xml, boost::shared_ptr<SDFElement> &_sdf);
+  bool initWorld(xmlNodePtr _xml, boost::shared_ptr<sdf::SDF> &_sdf);
 
   /// scene
-  bool initScene(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initScene(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
   
   /// physics
-  bool initPhysics(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initPhysics(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
 
   bool getPlugins(xmlNodePtr pluginXml, std::map<std::string, 
-                  boost::shared_ptr<SDFElement> > &_sdf);
+                  boost::shared_ptr<sdf::SDFElement> > &_sdf);
 
   bool initAttr(xmlNodePtr _node, const std::string _key, 
-                boost::shared_ptr<Param> _attr);
+                boost::shared_ptr<sdf::Param> _attr);
 
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -275,7 +275,11 @@ namespace sdf
   // Get the value of this node
   std::string getValue(xmlNodePtr node)
   {
-    return (const char*)xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1);
+    const char *v =(const char*)xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1); 
+    if (v)
+      return std::string(v);
+    else
+      return std::string();
   }
 
 

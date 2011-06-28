@@ -17,7 +17,6 @@
 /* Desc: Color class
  * Author: Nate Koenig
  * Date: 08 May 2009
- * CVS: $Id$
  */
 
 #include <algorithm>

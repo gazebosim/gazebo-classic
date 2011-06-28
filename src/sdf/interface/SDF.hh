@@ -142,6 +142,22 @@ namespace sdf
               }
             }
 
+    public: boost::shared_ptr<SDFElement> AddElement(const std::string &_name)
+            {
+              std::vector< boost::shared_ptr<SDFElement> >::const_iterator iter;
+              for (iter = this->elementDescriptions.begin(); 
+                   iter != this->elementDescriptions.end(); iter++)
+              {
+                if ((*iter)->name == _name)
+                {
+                  this->elements.push_back( (*iter)->Clone() );
+                  return this->elements.back();
+                }
+              }
+              gzerr << "Missing element description for [" << _name << "]\n";
+              return boost::shared_ptr<SDFElement>();
+            }
+
     public: std::vector< boost::shared_ptr<SDFElement> > elementDescriptions;
     public: std::vector< boost::shared_ptr<SDFElement> > elements;
   };

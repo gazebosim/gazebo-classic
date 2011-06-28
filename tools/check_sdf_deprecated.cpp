@@ -37,6 +37,7 @@
 #include <iostream>
 #include <libxml/parser.h>
 
+#include "sdf/parser/parser.hh"
 #include "sdf/parser_deprecated/parser_deprecated.hh"
 
 using namespace sdf;
@@ -49,21 +50,28 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  boost::shared_ptr<World> world(new World);
-  if (!initFile(argv[1], world))
+  boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF);
+  if (!initFile(argv[1], sdf))
   {
-    std::cerr << "ERROR: World Parsing the xml failed" << std::endl;
+    std::cerr << "ERROR: SDF Parsing the xml failed" << std::endl;
+    return -1;
+  }
+
+  if (!deprecated_sdf::initWorldFile(argv[2], sdf))
+  {
+    std::cerr << "ERROR: parsing old xml file\n";
     return -1;
   }
 
   // get info from parser
   std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
 
-  world->Print("");
+  sdf->PrintValues();
 
   std::cout << "\n";
 
   //saveXml("/tmp/test.xml", world);
+  
 
   return 0;
 }

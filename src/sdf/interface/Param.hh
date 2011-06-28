@@ -134,7 +134,7 @@ namespace sdf
     {
       if (_str.empty() && this->required)
       {
-        gzerr << "Empty string used when setting a required parameter\n";
+        gzerr << "Empty string used when setting a required parameter. Key[" << this->GetKey() << "]\n";
         return false;
       }
       else if (_str.empty())

@@ -1,12 +1,96 @@
 <element name="gazebo" required="1">
-  <attribute name="version" type="string" default="" required="1"/>
+  <attribute name="version" type="string" default="1.0" required="1"/>
 
   <element name="world" required="+">
-    <attribute name="name" type="string" default="" required="1"/>
+    <attribute name="name" type="string" default="world" required="1"/>
+
+    <!-- Physics -->
+    <element name="physics" required="1">
+      <attribute name="type" type="string" default="ode" required="1"/>
+      <element name="gravity" required="0">
+          <attribute name="xyz" type="vector3" default="0 0 0" required="1"/>
+      </element> <!-- End Gravity -->
+
+      <element name="ode" required="0">
+        <element name="solver" required="1">
+          <attribute name="type" type="string" default="quick" required="1"/>
+          <attribute name="dt" type="double" default="0.001" required="1"/>
+          <attribute name="iters" type="int" default="10" required="1"/>
+          <attribute name="sor" type="double" default="0" required="1"/>
+        </element> <!-- End Solver -->
+
+        <element name="constraints" required="1">
+          <attribute name="cfm" type="double" default="0" required="1"/>
+          <attribute name="erp" type="double" default="0" required="1"/>
+          <attribute name="contact_max_correcting_vel" type="double" default="0" required="1"/>
+          <attribute name="contact_surface_layer" type="double" default="0" required="1"/>
+        </element> <!-- End Constraints -->
+      </element> <!-- ODE -->
+
+    </element> <!-- Physics -->
+
+    <!-- Scene -->
+    <element name="scene" required="1">
+      <element name="ambient" required="0">
+        <attribute name="rgba" type="color" default="0.5 0.5 0.5 1.0" required="1"/>
+      </element>
+      <element name="background" required="0">
+        <attribute name="rgba" type="color" default="0 0 0 1.0" required="1"/>
+        <element name="sky" required="0">
+          <attribute name="material" type="string" default="__default__" required="1"/>
+        </element>
+      </element>
+
+      <element name="shadows" required="0">
+        <attribute name="enabled" type="bool" default="true" required="1"/>
+        <attribute name="rgba" type="color" default="0 0 0 1.0" required="1"/>
+        <attribute name="type" type="string" default="texture_gpu" required="0"/>
+      </element>
+
+      <element name="fog" required="0">
+        <attribute name="rgba" type="color" default="1 1 1 1" required="0"/>
+        <attribute name="type" type="string" default="linear" required="0"/>
+        <attribute name="start" type="double" default="1.0" required="0"/>
+        <attribute name="end" type="double" default="100.0" required="0"/>
+        <attribute name="density" type="double" default="1.0" required="0"/>
+      </element>
+    </element> <!-- End Scene -->
+
+    <!-- Light -->
+    <element name="light" required="*">
+      <attribute name="name" type="string" default="__default__" required="0"/>
+      <attribute name="type" type="string" default="point" required="1"/>
+      <attribute name="cast_shadows" type="bool" default="false" required="0"/>
+      <element name="origin" required="0">
+        <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+      </element> <!-- End Origin -->
+
+      <element name="diffuse" required="0">
+        <attribute name="rgba" type="color" default="1 1 1 1" required="1"/>
+      </element> <!-- End Diffuse -->
+
+      <element name="specular" required="0">
+        <attribute name="rgba" type="color" default=".1 .1 .1 1" required="1"/>
+      </element> <!-- End Specular -->
+
+      <element name="attenuation" required="0">
+        <attribute name="range" type="double" default="10" required="1"/>
+        <attribute name="constant" type="double" default="1" required="0"/>
+        <attribute name="linear" type="double" default="1" required="0"/>
+        <attribute name="quadratic" type="double" default="0" required="0"/>
+      </element> <!-- End Attenuation -->
+
+      <element name="spot" required="0">
+        <attribute name="inner_angle" type="double" default="0" required="1"/>
+        <attribute name="outer_angle" type="double" default="0" required="1"/>
+        <attribute name="falloff" type="double" default="0" required="1"/>
+      </element> <!-- End Spot -->
+
+    </element> <!-- End Light -->
 
     <!-- Model -->
     <element name="model" required="*">
-      <attribute name="name" type="string" default="" required="1"/>
+      <attribute name="name" type="string" default="model" required="1"/>
       <attribute name="static" type="bool" default="false" required="0"/>
 
       <element name="origin" required="0">
@@ -15,10 +99,12 @@
  
       <!-- Link -->
       <element name="link" required="+">
-        <attribute name="name" type="string" default="" required="1"/>
+        <attribute name="name" type="string" default="link" required="1"/>
         <attribute name="gravity" type="bool" default="true" required="0"/>
         <attribute name="self_collide" type="bool" default="false" required="0"/>
- 
+        <element name="origin" required="0">
+          <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        </element> <!-- End Origin -->
 
         <!-- Inertial -->
         <element name="inertial" required="1">
@@ -39,7 +125,7 @@
 
         <!-- Collision -->
         <element name="collision" required="*">
-          <attribute name="name" type="string" default="" required="0"/>
+          <attribute name="name" type="string" default="collision" required="0"/>
           <attribute name="laser_retro" type="double" default="0" required="0"/>
           <element name="origin" required="0">
             <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
@@ -56,7 +142,7 @@
               <attribute name="length" type="double" default="0" required="1"/>
             </element> <!-- End Cylinder -->
             <element name="mesh" required="0">
-              <attribute name="filename" type="string" default="" required="1"/>
+              <attribute name="filename" type="string" default="file" required="1"/>
               <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
             </element> <!-- End Mesh -->
             <element name="plane" required="0">
@@ -95,14 +181,14 @@
   
         <!-- Visual -->
         <element name="visual" required="*">
-          <attribute name="name" type="string" default="" required="0"/>
+          <attribute name="name" type="string" default="visual" required="0"/>
           <attribute name="cast_shadows" type="bool" default="true" required="0"/>
           <attribute name="laser_retro" type="double" default="0.0" required="0"/>
           <element name="origin" required="0">
             <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
           </element> <!-- End Origin -->
           <element name="material" required="0">
-            <attribute name="script" type="string" default="" required="0"/>
+            <attribute name="script" type="string" default="script" required="0"/>
             <element name="color" required="0">
               <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
             </element> <!-- End Color -->
@@ -119,7 +205,7 @@
               <attribute name="length" type="double" default="0" required="1"/>
             </element> <!-- End Cylinder -->
             <element name="mesh" required="0">
-              <attribute name="filename" type="string" default="" required="1"/>
+              <attribute name="filename" type="string" default="file" required="1"/>
               <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
             </element> <!-- End Mesh -->
             <element name="plane" required="0">
@@ -131,18 +217,18 @@
   
         <!-- Sensor -->
         <element name="sensor" required="0">
-          <attribute name="name" type="string" default="" required="1"/>
+          <attribute name="name" type="string" default="sensor" required="1"/>
           <attribute name="always_on" type="bool" default="false" required="0"/>
           <attribute name="update_rate" type="double" default="10" required="0"/>
           <element name="origin" required="0">
             <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
           </element> <!-- End Origin -->
           <element name="plugin" required="*">
-            <attribute name="name" type="string" default="" required="1"/>
-            <attribute name="filename" type="string" default="" required="1"/>
+            <attribute name="name" type="string" default="name" required="1"/>
+            <attribute name="filename" type="string" default="filenam" required="1"/>
             <element name="data" required="*">
-              <attribute name="value" type="string" default=""
-                required="1"/>
+              <attribute name="name" type="string" default="name" required="1"/>
+              <attribute name="value" type="string" default="value" required="1"/>
             </element>
           </element> <!-- End Plugin -->
 
@@ -161,7 +247,7 @@
             </element> <!-- End Clip -->
             <element name="save" required="0">
               <attribute name="enabled" type="bool" default="false" required="1"/>
-              <attribute name="path" type="string" default="" required="1"/>
+              <attribute name="path" type="string" default="path" required="1"/>
             </element> <!-- End Save -->
           </element> <!-- End Camera -->
   
@@ -190,63 +276,70 @@
 
           <element name="contact" required="0">
             <element name="collision" required="1">
-              <attribute name="name" type="string" default="" required="1"/>
+              <attribute name="name" type="string" default="__default__" required="1"/>
             </element> <!-- End Collision -->
           </element> <!-- End Contact -->
         </element> <!-- End Sensor -->
-  
-        <element name="joint" required="*">
-          <attribute name="name" type="string" default="" required="1"/>
-          <attribute name="type" type="string" default="" required="1"/>
-          <element name="parent" required="1">
-            <attribute name="link" type="string" default="" required="1"/>
-          </element> <!-- End Parent -->
-          <element name="child" required="1">
-            <attribute name="link" type="string" default="" required="1"/>
-          </element> <!-- End Child -->
-          <element name="origin" required="0">
-            <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
-          </element> <!-- End Origin -->
-          <element name="axis" required="1">
-            <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
-          </element> <!-- End Axis -->
-          <element name="axis2" required="0">
-            <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
-          </element> <!-- End Axis2 -->
-          <element name="dynamics" required="0">
-            <attribute name="damping" type="double" default="0" required="0"/>
-            <attribute name="friction" type="double" default="0" required="0"/>
-          </element> <!-- End Dynamics -->
-          <element name="limit" required="0">
-            <attribute name="lower" type="double" default="0" required="0"/>
-            <attribute name="upper" type="double" default="0" required="0"/>
-            <attribute name="effort" type="double" default="0" required="0"/>
-            <attribute name="velocity" type="double" default="0" required="0"/>
-          </element> <!-- End Limit -->
-        </element> <!-- End Joint -->
-  
       </element> <!-- End Link -->
-  
+
+      <element name="joint" required="*">
+        <attribute name="name" type="string" default="__default__" required="1"/>
+        <attribute name="type" type="string" default="__default__" required="1"/>
+        <element name="parent" required="1">
+          <attribute name="link" type="string" default="__default__" required="1"/>
+        </element> <!-- End Parent -->
+        <element name="child" required="1">
+          <attribute name="link" type="string" default="__default__" required="1"/>
+        </element> <!-- End Child -->
+        <element name="origin" required="0">
+          <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        </element> <!-- End Origin -->
+        <element name="axis" required="1">
+          <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+        </element> <!-- End Axis -->
+        <element name="axis2" required="0">
+          <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+        </element> <!-- End Axis2 -->
+        <element name="dynamics" required="0">
+          <attribute name="damping" type="double" default="0" required="0"/>
+          <attribute name="friction" type="double" default="0" required="0"/>
+        </element> <!-- End Dynamics -->
+        <element name="limit" required="0">
+          <attribute name="lower" type="double" default="0" required="0"/>
+          <attribute name="upper" type="double" default="0" required="0"/>
+          <attribute name="effort" type="double" default="0" required="0"/>
+          <attribute name="velocity" type="double" default="0" required="0"/>
+        </element> <!-- End Limit -->
+      </element> <!-- End Joint -->
+
       <element name="plugin" required="*">
-        <attribute name="name" type="string" default="" required="1"/>
-        <attribute name="filename" type="string" default="" required="1"/>
+        <attribute name="name" type="string" default="__default__" required="1"/>
+        <attribute name="filename" type="string" default="__default__" required="1"/>
+        <element name="data" required="*">
+          <attribute name="name" type="string" default="name" required="1"/>
+          <attribute name="value" type="string" default="value" required="1"/>
+        </element>
       </element> <!-- End Plugin -->
     </element> <!-- End Model -->
  
 
     <element name="plugin" required="*">
-      <attribute name="name" type="string" default="" required="1"/>
-      <attribute name="filename" type="string" default="" required="1"/>
+      <attribute name="name" type="string" default="__default__" required="1"/>
+      <attribute name="filename" type="string" default="__default__" required="1"/>
+      <element name="data" required="*">
+        <attribute name="name" type="string" default="name" required="1"/>
+        <attribute name="value" type="string" default="value" required="1"/>
+      </element>
     </element> <!-- End Plugin -->
   
     <element name="joint" required="*">
-      <attribute name="name" type="string" default="" required="1"/>
-      <attribute name="type" type="string" default="" required="1"/>
+      <attribute name="name" type="string" default="__default__" required="1"/>
+      <attribute name="type" type="string" default="__default__" required="1"/>
       <element name="parent" required="1">
-        <attribute name="link" type="string" default="" required="1"/>
+        <attribute name="link" type="string" default="__default__" required="1"/>
       </element>
       <element name="child" required="1">
-        <attribute name="link" type="string" default="" required="1"/>
+        <attribute name="link" type="string" default="__default__" required="1"/>
       </element>
       <element name="origin" required="0">
         <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
