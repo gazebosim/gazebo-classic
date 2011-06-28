@@ -45,10 +45,8 @@ bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
     gzerr << "Could not find the 'element' element in the xml file\n";
     return false;
   }
-  boost::shared_ptr<SDFElement> element(new SDFElement);
-  _sdf->elementDescriptions.push_back(element);
 
-  return initXml(xml, element);
+  return initXml(xml, _sdf->root);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +59,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
     gzerr << "Element is missing the name attribute\n";
     return false;
   }
-  _sdf->name = std::string(nameString);
+  _sdf->SetName( std::string(nameString) );
 
   const char *requiredString = _xml->Attribute("required");
   if (!requiredString)
@@ -69,7 +67,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
     gzerr << "Element is missing the required attributed\n";
     return false;
   }
-  _sdf->required = requiredString;
+  _sdf->SetRequired( requiredString );
   
   // Get all attributes
   for (TiXmlElement *child = _xml->FirstChildElement("attribute"); 
@@ -101,65 +99,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
     }
     bool required = std::string(requiredString) == "1" ? true : false;
 
-    if (std::string(type) == "double")
-    {
-      boost::shared_ptr<ParamT<double> > param( 
-          new ParamT<double>(name,defaultValue,required) );
-      _sdf->attributes.push_back(boost::shared_static_cast<Param>(param));
-    }
-    else if (std::string(type) == "int")
-    {
-      boost::shared_ptr<ParamT<int> > param( 
-          new ParamT<int>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "unsigned int")
-    {
-      boost::shared_ptr<ParamT<unsigned int> > param( 
-          new ParamT<unsigned int>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "float")
-    {
-      boost::shared_ptr<ParamT<float> > param( 
-          new ParamT<float>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "bool")
-    {
-      boost::shared_ptr<ParamT<bool> > param( 
-          new ParamT<bool>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "string")
-    {
-      boost::shared_ptr<ParamT<std::string> > param( 
-          new ParamT<std::string>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "color")
-    {
-      boost::shared_ptr<ParamT<gazebo::common::Color> > param( 
-          new ParamT<gazebo::common::Color>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "vector3")
-    {
-      boost::shared_ptr<ParamT<gazebo::math::Vector3> > param( 
-          new ParamT<gazebo::math::Vector3>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else if (std::string(type) == "pose")
-    {
-      boost::shared_ptr<ParamT<gazebo::math::Pose> > param( 
-          new ParamT<gazebo::math::Pose>(name,defaultValue,required) );
-      _sdf->attributes.push_back(param);
-    }
-    else
-    {
-      gzerr << "Unknown attribute type[" << type << "]\n";
-      return false;
-    }
+    _sdf->AddAttribute(name, type, defaultValue, required);
   }
   
   // Get all child elements
@@ -186,7 +126,6 @@ bool readString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
-
   return readDoc(&xmlDoc, _sdf);
 }
 
@@ -198,23 +137,12 @@ bool readDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
     return false;
   }
 
-  std::vector< boost::shared_ptr<SDFElement> >::iterator iter;
-  for (iter = _sdf->elementDescriptions.begin(); 
-       iter != _sdf->elementDescriptions.end(); iter++)
+  TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
+   
+  if (!readXml( elemXml, _sdf->root))
   {
-    for (TiXmlElement* elemXml = _xmlDoc->FirstChildElement((*iter)->name);
-         elemXml; elemXml = elemXml->NextSiblingElement((*iter)->name))
-    {
-      boost::shared_ptr<SDFElement> element = (*iter)->Clone();
-      if (!readXml( elemXml, element ))
-      {
-        gzerr << "Unable to parse sdf element[" << element->name << "]\n";
-        return false;
-      }
-      _sdf->elements.push_back(element);
-      if ((*iter)->required == "0" || (*iter)->required == "1")
-        break;
-    }
+    gzerr << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";
+    return false;
   }
 
   return true;
@@ -224,9 +152,9 @@ bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
 {
   if (!_xml)
   {
-    if (_sdf->required == "1" || _sdf->required=="+")
+    if (_sdf->GetRequired() == "1" || _sdf->GetRequired() =="+")
     {
-      gzerr << "SDF Element[" << _sdf->name << "] is missing\n";
+      gzerr << "SDF Element[" << _sdf->GetName() << "] is missing\n";
       return false;
     }
     else
@@ -239,7 +167,7 @@ bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
        iter != _sdf->attributes.end(); iter++)
   {
     const char *str = _xml->Attribute( (*iter)->GetKey().c_str() );
-    if ( !(*iter)->Set( str ))
+    if ( str && !(*iter)->Set( str ))
     {
       gzerr << "Unable to read attribute[" << (*iter)->GetKey() << "]\n";
       return false;
@@ -251,16 +179,17 @@ bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
   for (eiter = _sdf->elementDescriptions.begin(); 
        eiter != _sdf->elementDescriptions.end(); eiter++)
   {
-    for (TiXmlElement* elemXml = _xml->FirstChildElement((*eiter)->name);
-         elemXml; elemXml = elemXml->NextSiblingElement((*eiter)->name))
+    for (TiXmlElement* elemXml = _xml->FirstChildElement((*eiter)->GetName());
+         elemXml; elemXml = elemXml->NextSiblingElement((*eiter)->GetName()))
     {
       boost::shared_ptr<sdf::SDFElement> element = (*eiter)->Clone();
       readXml( elemXml, element );
       _sdf->elements.push_back(element);
-      if ((*eiter)->required == "0" || (*eiter)->required == "1")
+      if ((*eiter)->GetRequired() == "0" || (*eiter)->GetRequired() == "1")
         break;
     }
   }
+
   return true;
 }
 

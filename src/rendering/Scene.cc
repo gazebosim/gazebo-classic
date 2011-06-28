@@ -72,7 +72,7 @@ Scene::Scene(const std::string &name_)
 
   this->selectionObj = new SelectionObj(this);
 
-  //NATT this->sdf.reset(new sdf::Scene);
+  this->sdf.reset(new sdf::SDFElement);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

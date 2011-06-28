@@ -1,3 +1,5 @@
+<gazebo version="1.0">
+
 <world name="my_world">
 
   <scene>
@@ -23,7 +25,6 @@
    <attenuation range="20" constant="1.0" linear="1.0" quadratic="0.001"/>
   </light>
 
-  <!--
   <model name="default_pioneer_model">
   
     <link name="chassis_body">
@@ -211,7 +212,6 @@
     <funky_xml>so funky</funky_xml>
     <more value="hello"/>
   </plugin>
-  -->
 
 </world>
-
+</gazebo>

@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  boost::shared_ptr<SDF> sdf(new SDF);
+  boost::shared_ptr<SDF> sdf(new SDF());
 
   if (!initFile(argv[1], sdf))
   {
@@ -23,6 +23,7 @@ int main(int argc, char** argv)
     std::cerr << "Error: SDF parsing the xml failed\n";
     return -1;
   }
+  
 
   sdf->PrintDescription();
   sdf->PrintValues();

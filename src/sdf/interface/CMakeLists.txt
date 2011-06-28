@@ -1,4 +1,4 @@
-set (sources Param.cc)
+set (sources Param.cc SDF.cc)
 set (headers SDF.hh)
 
 add_library( gazebo_sdf_interface SHARED ${sources})
