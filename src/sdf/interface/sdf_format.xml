@@ -140,6 +140,10 @@
           <element name="plugin" required="*">
             <attribute name="name" type="string" default="" required="1"/>
             <attribute name="filename" type="string" default="" required="1"/>
+            <element name="data" required="*">
+              <attribute name="value" type="string" default=""
+                required="1"/>
+            </element>
           </element> <!-- End Plugin -->
 
           <element name="camera" required="0">

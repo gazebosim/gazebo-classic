@@ -59,7 +59,7 @@ namespace sdf
             {return std::string();}
 
     /// \brief Set the parameter value from a string
-    public: virtual bool Set(const char * /*_string*/) {return true;}
+    public: virtual bool Set(const std::string &/*_string*/) {return true;}
 
     /// \brief Reset the parameter
     public: virtual void Reset() = 0;
@@ -111,7 +111,7 @@ namespace sdf
       this->required = _required;
       this->typeName = typeid(T).name();
 
-      this->Set(_default.c_str());
+      this->Set(_default);
       this->defaultValue = this->value;
     }
    
@@ -130,20 +130,18 @@ namespace sdf
     }
 
     /// \brief Set the parameter value from a string
-    public: virtual bool Set( const char *_cstr )
+    public: virtual bool Set( const std::string &_str )
     {
-      if (_cstr == NULL && this->required)
+      if (_str.empty() && this->required)
       {
         gzerr << "Empty string used when setting a required parameter\n";
         return false;
       }
-      else if (_cstr == NULL)
+      else if (_str.empty())
       {
         this->value = this->defaultValue;
         return true;
       }
-
-      std::string _str = _cstr;
 
       std::string tmp = _str;
       std::string lowerTmp = _str;

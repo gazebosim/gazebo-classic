@@ -49,90 +49,82 @@
 namespace sdf
 {
 
-bool getBoolFromStr(std::string _str, bool &_value, bool _default, 
-                    bool _required)
-{
-  _value = _default;
-
-  if (_str.empty() && _required)
-  {
-    gzerr << "Required key is empty\n";
-    return false;
-  }
-  
-  boost::to_lower(_str);
-  if (_str == "true" || _str == "t" || _str == "1")
-    _value = true;
-  else if (_str == "false" || _str == "f" || _str == "0")
-    _value = false;
-  else
-  {
-    gzerr << "Malformed boolean string[" << _str << "]\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool getDoubleFromStr(const std::string &_str, double &_value, double _default,
-                      bool _required)
-{
-  _value = _default;
-
-  if (_str.empty() && _required)
-  {
-    gzerr << "Required key is empty\n";
-    return false;
-  }
- 
-  try
-  {
-    _value = boost::lexical_cast<double>(_str);
-  }
-  catch (boost::bad_lexical_cast &e)
-  {
-    _value = _default;
-    gzerr << "Malformed double string[" << _str << "]\n";
-    return false;
-  }
-
-  return true;
-}
-
-bool getPlugins(xmlNodePtr _parentXml, boost::shared_ptr<SDFElement> &_sdf)
+bool getPlugins(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
   // Get all plugins 
-  for (xmlNodePtr pluginXml = _parentXml->xmlChildrenNode;
-      pluginXml != NULL; pluginXml = pluginXml->next)
+  for (xmlNodePtr pluginXml = _config->xmlChildrenNode;
+       pluginXml != NULL; pluginXml = pluginXml->next)
   {
-    if (pluginXml->ns && std::string("controller") == (const char*)pluginXml->ns->prefix)
+    if (pluginXml->ns && 
+        std::string("controller") == (const char*)pluginXml->ns->prefix)
     {
-      boost::shared_ptr<Controller> controller;
-      controller.reset(new Controller);
+      boost::shared_ptr<SDFElement> sdfPlugin = _sdf->AddElement("plugin");
+      initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
 
-      if (initXml(pluginXml, controller))
-      {
-        if (_plugins.find(controller->name.GetValue()) != _plugins.end())
-        {
-          gzerr << "controller '" << controller->name.GetValue() << "' is not unique.\n";
-          controller.reset();
-          return false;
-        }
-        else
-        {
-          boost::shared_ptr<SDFElement> plugin = _sdf->AddElement("plugin");
-          plugin->GetAttribute("name")->Set(controller->name.GetValue());
-          plugin->GetAttribute("filename")->Set(controller->filename.GetValue());
-        }
-      }
+      if (xmlGetProp(pluginXml, (xmlChar*)"plugin"))
+        initAttr(pluginXml, "plugin", sdfPlugin->GetAttribute("filename"));
       else
+        sdfPlugin->GetAttribute("filename")->Set((const char*)pluginXml->name);
+
+      for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
+           dataXml != NULL; dataXml = dataXml->next)
       {
-        gzerr << "controller xml is not initialized correctly\n";
-        controller.reset();
-        return false;
+        boost::shared_ptr<SDFElement> sdfData = sdfPlugin->AddElement("data");
+        sdfData->GetAttribute("value")->Set( getValue(dataXml) );
+      }
+    }
+    else if (std::string((const char*)pluginXml->name) == "plugin")
+    {
+      boost::shared_ptr<SDFElement> sdfPlugin = _sdf->AddElement("plugin");
+      initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
+      initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
+
+      for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
+          dataXml != NULL; dataXml = dataXml->next)
+      {
+        boost::shared_ptr<SDFElement> sdfData = sdfPlugin->AddElement("data");
+        sdfData->GetAttribute("value")->Set( getValue(dataXml) );
       }
     }
   }
+
+  return true;
+}
+
+// light parsing
+bool initLight(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
+{
+  initOrigin(_config, _sdf);
+  xmlNodePtr lightNode = firstChildElement(_config, "light");
+  if (!lightNode)
+  {
+    gzerr << "Light is missing the <light> child node\n";
+    return false;
+  }
+
+  initAttr(_config, "name", _sdf->GetAttribute("name"));
+  initAttr(lightNode, "castShadows", _sdf->GetAttribute("cast_shadows"));
+  initAttr(lightNode, "type", _sdf->GetAttribute("type"));
+
+  boost::shared_ptr<SDFElement> sdfDiffuse = _sdf->AddElement("diffuse");
+  initAttr(lightNode, "diffuseColor", sdfDiffuse->GetAttribute("rgba"));
+
+  boost::shared_ptr<SDFElement> sdfSpecular = _sdf->AddElement("specular");
+  initAttr(lightNode, "specularColor", sdfDiffuse->GetAttribute("rgba"));
+
+  boost::shared_ptr<SDFElement> sdfAttenuation = _sdf->AddElement("attenuation");
+  initAttr(lightNode, "range", sdfAttenuation->GetAttribute("range"));
+  sdfAttenuation->GetAttribute("constant")->Set( getNodeTuple(lightNode, "attenuation",1));
+  sdfAttenuation->GetAttribute("linear")->Set( getNodeTuple(lightNode, "attenuation",2));
+  sdfAttenuation->GetAttribute("quadratic")->Set( getNodeTuple(lightNode, "attenuation",3));
+  
+  boost::shared_ptr<SDFElement> sdfSpot = _sdf->AddElement("spot");
+  double innerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",1));
+  double outerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",2));
+
+  sdfSpot->GetAttribute("inner_angle")->Set( boost::lexical_cast<std::string>(DTOR(innerAngle)) );
+  sdfSpot->GetAttribute("outer_angle")->Set( boost::lexical_cast<std::string>(DTOR(outerAngle)) );
+  sdfSpot->GetAttribute("falloff")->Set( getNodeTuple(lightNode, "spotCone",3));
 
   return true;
 }
@@ -146,17 +138,17 @@ bool initSensor(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 
   initOrigin(_config, _sdf);
  
-  if ( std::string(_config->name) == "contact" )
+  if ( std::string((const char*)_config->name) == "contact" )
   {
     boost::shared_ptr<SDFElement> contact = _sdf->AddElement("contact");
     initContact(_config, contact);
   }
-  else if ( std::string(_config->name) == "camera" )
+  else if ( std::string((const char*)_config->name) == "camera" )
   {
     boost::shared_ptr<SDFElement> camera = _sdf->AddElement("camera");
     initCamera(_config, camera);
   }
-  else if ( std::string(_config->name) == "camera" )
+  else if ( std::string((const char*)_config->name) == "camera" )
   {
     boost::shared_ptr<SDFElement> ray = _sdf->AddElement("ray");
     initRay(_config, ray);
@@ -184,8 +176,7 @@ bool initCamera(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   initAttr(_config, "farClip", sdfClip->GetAttribute("far"));
 
   // save 
-  xmlNodePtr save = firstChildElement(_config, "save");
-  if (firstChildElement("saveFrames"))
+  if (firstChildElement(_config, "saveFrames"))
   {
     boost::shared_ptr<SDFElement> sdfSave = _sdf->AddElement("save");
     initAttr(_config, "saveFrames", sdfSave->GetAttribute("enabled"));
@@ -199,71 +190,55 @@ bool initRay(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
   boost::shared_ptr<SDFElement> sdfScan = _sdf->AddElement("scan");
 
-  if (firstChildElement("displayRays"))
+  if (firstChildElement(_config, "displayRays"))
   {
-    std::string display = getValue(firstChildElement(_config,"displayRays"));
+    std::string display = getNodeValue(_config, "displayRays");
     if (display != "false")
       sdfScan->GetAttribute("display")->Set("false");
     else
       sdfScan->GetAttribute("display")->Set("true");
   }
 
-  boost::shared_ptr<SDFEelement> sdfHoriz = sdfScan->AddElement("horizontal");
-  if (!sdfHoriz->GetAttribute("samples")->Set(
-        firstChildElement(_config, "rangeCount").c_str()))
-  {
-    gzerr << "Unable to parse ray sensor rangeCount\n";
-    return false;
-  }
+  boost::shared_ptr<SDFElement> sdfHoriz = sdfScan->AddElement("horizontal");
 
-  int rangeCount = boost::lexical_cast<int>(getValue(firstChildElement(_config, "rangeCount")));
-  int rayCount = boost::lexical_cast<int>(getValue(firstChildElement(_config, "rayCount")));
+  initAttr(_config, "rangeCount", sdfHoriz->GetAttribute("samples"));
+
+  int rangeCount = boost::lexical_cast<int>(getNodeValue(_config,"rangeCount"));
+  int rayCount = boost::lexical_cast<int>(getNodeValue(_config, "rayCount"));
+
   if (!sdfHoriz->GetAttribute("resolution")->Set( 
-        boost::lexical_cast<std::string>(rangeCount / rayCount).c_str() ))
+        boost::lexical_cast<std::string>(rangeCount / rayCount) ))
   {
     gzerr << "Unable to parse ray sensor rayCount\n";
     return false;
   }
 
-  double minAngle = boost::lexical_cast<double>(getValue(firstChildElement(_config,"minAngle")));
-  double maxAngle = boost::lexical_cast<double>(getValue(firstChildElement(_config,"maxAngle")));
+  double minAngle = boost::lexical_cast<double>(getNodeValue(_config,"minAngle"));
+  double maxAngle = boost::lexical_cast<double>(getNodeValue(_config,"maxAngle"));
 
   if (!sdfHoriz->GetAttribute("min_angle")->Set( 
-        boost::lexical_cast<std::string>(RTOD(minAngle)) ))
+        boost::lexical_cast<std::string>(DTOR(minAngle)) ))
   {
     gzerr << "Unable to parse min_angle\n";
     return false;
   } 
 
   if (!sdfHoriz->GetAttribute("max_angle")->Set( 
-        boost::lexical_cast<std::string>(RTOD(maxAngle)) ))
+        boost::lexical_cast<std::string>(DTOR(maxAngle)) ))
   {
     gzerr << "Unable to parse max_angle\n";
     return false;
   } 
 
-
-  boost::shared_ptr<SDFEelement> sdfRange = _sdf->AddElement("range");
-  if (!sdfRange->GetAttribute("min")->Set( 
-        getValue(firstChildElement(_config,"minRange")) ))
-  {
-    gzerr << "Unable to parse minRange\n";
-  }
-  if (!sdfRange->GetAttribute("max")->Set( 
-        getValue(firstChildElement(_config,"maxRange")) ))
-  {
-    gzerr << "Unable to parse maxRange\n";
-  }
-  if (!sdfRange->GetAttribute("resolution")->Set( 
-        getValue(firstChildElement(_config,"resRange")) ))
-  {
-    gzerr << "Unable to parse resRange\n";
-  }
+  boost::shared_ptr<SDFElement> sdfRange = _sdf->AddElement("range");
+  initAttr(_config, "minRange", sdfRange->GetAttribute("min"));
+  initAttr(_config, "maxRange", sdfRange->GetAttribute("max"));
+  initAttr(_config, "resRange", sdfRange->GetAttribute("resolution"));
 
   return true;
 }
 
-bool initContact(xmlNodePtr *_config, boost::shared_ptr<SDFElement> &_sdf)
+bool initContact(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
   boost::shared_ptr<SDFElement> sdfCollision = _sdf->AddElement("collision");
 
@@ -310,12 +285,12 @@ bool initInertial(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   // Put in the rpy values
   poseString += "0 0 0";
 
-  sdfOrigin = _sdf->AddElement("origin");
+  boost::shared_ptr<SDFElement> sdfOrigin = _sdf->AddElement("origin");
   sdfOrigin->GetAttribute("pose")->Set(poseString);
 
   initAttr(_config, "mass", _sdf->GetAttribute("mass"));
 
-  boost::shared_ptr<SDElement> sdfInertia = _sdf->AddElement("inertia");
+  boost::shared_ptr<SDFElement> sdfInertia = _sdf->AddElement("inertia");
 
   xmlNodePtr ixx_xml = firstChildElement(_config, "ixx");
   xmlNodePtr ixy_xml = firstChildElement(_config, "ixy");
@@ -359,34 +334,33 @@ bool initCollision(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   initOrigin(_config, _sdf);
 
   boost::shared_ptr<SDFElement> sdfGeom = _sdf->AddElement("geometry");
-  if (_config->name == "plane")
+  if (std::string((const char *)_config->name) == "plane")
   {
     boost::shared_ptr<SDFElement> sdfPlane = sdfGeom->AddElement("plane");
     sdfPlane->GetAttribute("normal")->Set( getNodeValue(_config, "normal") );
   }
-  else if (_config->name == "box")
+  else if (std::string((const char *)_config->name) == "box")
   {
     boost::shared_ptr<SDFElement> sdfBox = sdfGeom->AddElement("box");
     sdfBox->GetAttribute("size")->Set( getNodeValue(_config, "size") );
   }
-  else if (_config->name == "sphere")
+  else if (std::string((const char *)_config->name) == "sphere")
   {
     boost::shared_ptr<SDFElement> sdfSphere = sdfGeom->AddElement("sphere");
     sdfSphere->GetAttribute("radius")->Set( getNodeValue(_config, "radius") );
   }
-  else if (_config->name == "cylinder")
+  else if (std::string((const char *)_config->name) == "cylinder")
   {
     boost::shared_ptr<SDFElement> sdfCylinder = sdfGeom->AddElement("cylinder");
-    sdfCylinder->GetAttribute("radius")->Set( getNodeTuple(_config, "size",0) );
-    sdfCylinder->GetAttribute("length")->Set( getNodeTuple(_config, "size",1) );
+    sdfCylinder->GetAttribute("radius")->Set( getNodeTuple(_config, "size",1) );
+    sdfCylinder->GetAttribute("length")->Set( getNodeTuple(_config, "size",2) );
   }
-  else if (_config->name == "trimesh")
+  else if (std::string((const char *)_config->name) == "trimesh")
   {
     boost::shared_ptr<SDFElement> sdfMesh = sdfGeom->AddElement("mesh");
     sdfMesh->GetAttribute("filename")->Set( getNodeValue(_config,"mesh") );
 
-    if (firstChildElement(_config, "scale"))
-      sdfMesh->GetAttribute("scale")->Set( getNodeValue(_config,"scale") );
+    initAttr(_config, "scale", sdfMesh->GetAttribute("scale"));
   }
 
   return true;
@@ -420,6 +394,8 @@ bool initOrigin(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 
     origin->GetAttribute("pose")->Set( poseStr );
   }
+
+  return true;
 }
 
 // _config = <body>
@@ -427,20 +403,21 @@ bool initOrigin(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
-  initOrigin(_conifg, _sdf);
+  initOrigin(_config, _sdf);
 
   // Inertial (optional)
   xmlNodePtr mm = firstChildElement(_config, "massMatrix");
   if (mm)
   {
-    ParamT<bool> custom_mass_matrix("mass",false,false);
+    ParamT<bool> custom_mass_matrix("mass","false",false);
     custom_mass_matrix.Set( getValue(mm).c_str() );
     if (custom_mass_matrix.GetValue())
     {
-      if (!initInertial(_config, _sdf->AddElement("inertial")))
+      boost::shared_ptr<SDFElement> sdfInertial = _sdf->AddElement("inertial");
+      if (!initInertial(_config, sdfInertial))
       {
         gzerr << "Could not parse inertial element for Link '" 
-          << _link->name << "'\n";
+          << _sdf->GetAttribute("name")->GetAsString() << "'\n";
         return false;
       }
     }
@@ -450,7 +427,8 @@ bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   for (xmlNodePtr  collision_xml = getChildByNSPrefix(_config, "geom"); 
       collision_xml; collision_xml = getNextByNSPrefix(collision_xml, "geom"))
   {
-    if (!initCollision(collision_xml,_sdf->AddElement("collision")))
+    boost::shared_ptr<SDFElement> sdfCollision = _sdf->AddElement("collision");
+    if (!initCollision(collision_xml,sdfCollision))
     {
       gzerr << "Unable to parser geom\n";
       return false;
@@ -459,7 +437,8 @@ bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
     for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual"); 
         visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
     {
-      if (!initVisual(visual_xml,_sdf->AddElement("visual")))
+      boost::shared_ptr<SDFElement> sdfVisual = _sdf->AddElement("visual");
+      if (!initVisual(visual_xml, sdfVisual))
       {
         gzerr << "Unable to parse visual\n";
         return false;
@@ -473,7 +452,8 @@ bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   for (xmlNodePtr  sensorXml = firstChildElement(_config, "sensor"); 
       sensorXml; sensorXml = nextSiblingElement(sensorXml, "sensor"))
   {
-    if (!initSensor(sensorXml,_sdf->AddElement("sensor")))
+    boost::shared_ptr<SDFElement> sdfSensor = _sdf->AddElement("sensor");
+    if (!initSensor(sensorXml,sdfSensor))
     {
       gzerr << "Unable to parse sensor\n";
       return false;
@@ -498,7 +478,7 @@ bool initVisual(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   if (getNodeValue(_config, "mesh") == "unit_box")
   {
     boost::shared_ptr<SDFElement> sdfBox = sdfGeom->AddElement("box");
-    if (getNode(_config,"scale"))
+    if (firstChildElement(_config,"scale"))
       sdfBox->GetAttribute("size")->Set( getNodeValue(_config, "scale") );
     else
       sdfBox->GetAttribute("size")->Set("1 1 1");
@@ -506,8 +486,8 @@ bool initVisual(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   else if (getNodeValue(_config, "mesh") == "unit_sphere")
   {
     boost::shared_ptr<SDFElement> sdfSphere = sdfGeom->AddElement("sphere");
-    if (getNode(_config,"scale"))
-      sdfSphere->GetAttribute("radius")->Set( getNodeTuple(_config, "scale", 0) );
+    if (firstChildElement(_config,"scale"))
+      sdfSphere->GetAttribute("radius")->Set( getNodeTuple(_config, "scale", 1) );
     else
       sdfSphere->GetAttribute("radius")->Set( "1.0" );
   }
@@ -515,10 +495,10 @@ bool initVisual(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   {
     boost::shared_ptr<SDFElement> sdfCylinder = sdfGeom->AddElement("cylinder");
 
-    if (getNode(_config,"scale"))
+    if (firstChildElement(_config,"scale"))
     {
-      sdfCylinder->GetAttribute("radius")->Set( getNodeTuple(_config, "scale", 0) );
-      sdfCylinder->GetAttribute("length")->Set( getNodeTuple(_config, "scale", 1) );
+      sdfCylinder->GetAttribute("radius")->Set( getNodeTuple(_config, "scale", 1) );
+      sdfCylinder->GetAttribute("length")->Set( getNodeTuple(_config, "scale", 2) );
     }
     else
     {
@@ -563,7 +543,7 @@ bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   if (!firstChildElement(_config, "anchor"))
   {
     gzerr << "No parent link specified for joint[" 
-          << _sdf->GetAttribute("name")->GetValue() << "]\n";
+          << _sdf->GetAttribute("name")->GetAsString() << "]\n";
     return false;
   }
   initAttr(_config, "anchor", sdfParent->GetAttribute("link"));
@@ -573,11 +553,11 @@ bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   xmlNodePtr body2Xml = firstChildElement(_config, "body2");
   if (body1Xml && body2Xml)
   {
-    if (sdfParent->GetAttribute("link")->GetValue() == getValue(body1Xml))
+    if (sdfParent->GetAttribute("link")->GetAsString() == getValue(body1Xml))
     {
       initAttr(_config, "body1", sdfChild->GetAttribute("link"));
     }
-    else if (sdfParent->GetAttribute("link")->GetValue() == getValue(body2Xml))
+    else if (sdfParent->GetAttribute("link")->GetAsString() == getValue(body2Xml))
     {
       initAttr(_config, "body2", sdfChild->GetAttribute("link"));
     }
@@ -590,20 +570,22 @@ bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   else
   {
     gzerr << "No child link specified for joint["
-          << _sdf->GetAttribute("name")->GetValue() << "]\n";
+          << _sdf->GetAttribute("name")->GetAsString() << "]\n";
     return false;
   }
 
-  if (_config->name == "hinge")
+  if (std::string((const char*)_config->name) == "hinge")
     _sdf->GetAttribute("type")->Set("revolute");
-  else if (_config->name == "hinge2")
+  else if (std::string((const char*)_config->name) == "hinge2")
     _sdf->GetAttribute("type")->Set("revolute2");
-  else if (_config->name == "slider")
+  else if (std::string((const char*)_config->name) == "slider")
     _sdf->GetAttribute("type")->Set("prismatic");
-  else if (_config->name == "ball")
+  else if (std::string((const char*)_config->name) == "ball")
     _sdf->GetAttribute("type")->Set("ball");
-  else if (_config->name == "universal")
+  else if (std::string((const char*)_config->name) == "universal")
     _sdf->GetAttribute("type")->Set("universal");
+  else
+    gzerr << "Unknown joint type[" << (const char*)_config->name << "]\n";
 
   if ( firstChildElement(_config,"axis"))
   {
@@ -638,57 +620,6 @@ bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   return true;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model)
-{
-  std::ifstream fin;
-  fin.open(_filename.c_str(), std::ios::in);
-  if( !fin.is_open() )
-  {
-    gzerr << "The model file can not be opened, check path and permissions\n";
-  }
-  fin.close();
-
-  // Enable line numbering
-  xmlLineNumbersDefault( 1 );
-
-  std::string output;
-  PreParser(_filename, output);
-
-  initString(output, _model);
-  return true;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-bool initString(const std::string &_xmlString, boost::shared_ptr<Model> &_model)
-{
-  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
-
-  return initDoc(xmlDoc, _model);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Load Model from xmlDoc
-bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<Model> &_model)
-{
-  if (!_xmlDoc)
-  {
-    gzerr << "Could not parse the xml\n";
-    return false;
-  }
-
-  xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
-  if (!modelXml)
-  {
-    gzerr << "Could not find the 'model' element in the xml file\n";
-    return false;
-  }
-
-  return initXml(modelXml, _model);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Load Model from xmlNode
 bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
@@ -701,7 +632,8 @@ bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   for (xmlNodePtr  linkXml = getChildByNSPrefix(_config, "body"); 
       linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
   {
-    if (!initLink(linkXml, _sdf->AddElement("link")))
+    boost::shared_ptr<SDFElement> sdfLink =_sdf->AddElement("link"); 
+    if (!initLink(linkXml, sdfLink))
     {
       gzerr << "link xml is not initialized correctly\n";
       return false;
@@ -712,7 +644,8 @@ bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   for (xmlNodePtr  jointXml = getChildByNSPrefix(_config, "joint"); 
        jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
   {
-    if (!initXml(jointXml,_sdf->AddElement("joint")))
+    boost::shared_ptr<SDFElement> sdfJoint =_sdf->AddElement("joint"); 
+    if (!initJoint(jointXml, sdfJoint))
     {
       gzerr << "joint xml is not initialized correctly\n";
       return false;
@@ -725,90 +658,21 @@ bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   return true;
 }
 
-
-bool initController(xmlNodePtr _config, boost::shared_ptr<Controller> &_controller)
-{
-  _controller->Clear();
-
-  _controller->type = (const char*)_config->name;
-
-  if (!_controller->name.Set( (const char*)xmlGetProp(_config,(xmlChar*)"name")))
-  {
-    gzerr << "Unable to parse the plugin name.\n";
-    return false;
-  }
-
-  if (!_controller->filename.Set( (const char*)xmlGetProp(_config,(xmlChar*)"filename")))
-  {
-    gzerr << "Unable to parse plugin filename.\n";
-    return false;
-  }
-
-  return true;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-bool initFile(const std::string &_filename, boost::shared_ptr<World> &_world)
-{
-  std::ifstream fin;
-  fin.open(_filename.c_str(), std::ios::in);
-  if( !fin.is_open() )
-  {
-    gzerr << "The world file can not be opened, check path and permissions\n";
-  }
-  fin.close();
-
-  // Enable line numbering
-  xmlLineNumbersDefault( 1 );
-
-  std::string output;
-  PreParser(_filename, output);
-
-  initString(output, _world);
-  return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool initString(const std::string &_xmlString, boost::shared_ptr<World> &_world)
-{
-  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
-
-  return initDoc(xmlDoc,_world);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool initDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<World> &_world)
-{
-  if (!_xmlDoc)
-  {
-    gzerr << "Could not parse the xml\n";
-    return false;
-  }
-
-  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world");
-  if (!worldXml)
-  {
-    gzerr << "Could not find the 'world' element in the xml file\n";
-    return false;
-  }
-
-  return initXml(worldXml, _world);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 bool initWorld(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 {
   // Set world name
-  if (!_sdf->GetAttribute("world").Set( "old_gazebo_xml_deprecated" ))
+  if (!_sdf->GetAttribute("world")->Set( "old_gazebo_xml_deprecated" ))
   {
     gzerr << "Unable to set world name\n";
     return false;
   }
 
-  initScene(firstChildElement(_config, "ogre"), _sdf->AddElement("scene"));
+  boost::shared_ptr<SDFElement> sdfScene = _sdf->AddElement("scene");
+  initScene(firstChildElement(_config, "ogre"), sdfScene);
 
-  initPhyscis(firstChildElement(_config, "ode"),_sdf->AddElement("physics"));
+  boost::shared_ptr<SDFElement> sdfPhysics = _sdf->AddElement("physics");
+  initPhysics(firstChildElement(_config, "ode"),sdfPhysics);
 
   // Get all model elements
   for (xmlNodePtr  modelXml = getChildByNSPrefix(_config, "model"); 
@@ -817,7 +681,8 @@ bool initWorld(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 
     if (strcmp((const char*)modelXml->name, "renderable")==0)
     {
-      if (!initLight(modelXml->name, _sdf->AddElement("light")))
+      boost::shared_ptr<SDFElement> sdfLight = _sdf->AddElement("light");
+      if (!initLight(modelXml, sdfLight))
       {
         gzerr << "light xml is not initialized correctly\n";
         return false;
@@ -825,7 +690,8 @@ bool initWorld(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
     }
     else 
     {
-      if (!initModel(modelXml,_sdf->AddElement("model")))
+      boost::shared_ptr<SDFElement> sdfModel = _sdf->AddElement("model");
+      if (!initModel(modelXml,sdfModel))
       {
         gzerr << "model xml is not initialized correctly\n";
         return false;
@@ -849,7 +715,7 @@ bool initScene(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   boost::shared_ptr<SDFElement> sdfBackground = _sdf->AddElement("background");
   initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
 
-  xmlNodPtr sky = firstChildElement(_config, "sky");
+  xmlNodePtr sky = firstChildElement(_config, "sky");
   if (sky)
   {
     boost::shared_ptr<SDFElement> sdfSky = sdfBackground->AddElement("sky");
@@ -882,7 +748,7 @@ bool initPhysics(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
   initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
   
 
-  if (sdfODESolver->GetAttribute("type")->GetValue() == "quick")
+  if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
   {
     initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
     initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
@@ -890,12 +756,12 @@ bool initPhysics(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 
 
   // Contraints
-  initAttr(_config, "cfm", sdfODEContraints->GetAttribute("cfm"));
-  initAttr(_config, "erp", sdfODEContraints->GetAttribute("erp"));
+  initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
+  initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
   initAttr(_config, "contactMaxCorrectingVel", 
-      sdfODEContraints->GetAttribute("contact_max_correcting_vel"));
+      sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
   initAttr(_config, "contactSurfaceLayer", 
-      sdfODEContraints->GetAttribute("contact_surface_layer"));
+      sdfODEConstraints->GetAttribute("contact_surface_layer"));
 
   return true;
 }
@@ -904,9 +770,13 @@ bool initPhysics(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf)
 bool initAttr(xmlNodePtr _node, const std::string _key, 
               boost::shared_ptr<Param> _attr)
 {
-  if (_node && getNodeValue(_node, key))
+  if (_node)
   {
-    if (!param->Set( getNodeValue(_node, key) )) 
+    std::string value = getNodeValue(_node, _key);
+    if (value.empty())
+      gzerr << "Node[" << _node->name << "] Has empty key value[" 
+            << _key << "]\n";
+    if (!_attr->Set( value )) 
     {
       gzerr << "Unable to set attribute from  node[" 
             << _node->name << "] and key[" << _key << "]\n";
@@ -915,11 +785,110 @@ bool initAttr(xmlNodePtr _node, const std::string _key,
   }
   else
   {
-    gzerr << "Unable to get attribute. Node is null or key[" << _key << "] is missing\n";
+    gzerr << "Unable to get attribute. Node is null\n";
     return false;
   }
 
   return true;
+}
+////////////////////////////////////////////////////////////////////////////////
+bool initModelFile(const std::string &_filename, boost::shared_ptr<SDFElement> &_sdf)
+{
+  std::ifstream fin;
+  fin.open(_filename.c_str(), std::ios::in);
+  if( !fin.is_open() )
+  {
+    gzerr << "The model file can not be opened, check path and permissions\n";
+  }
+  fin.close();
+
+  // Enable line numbering
+  xmlLineNumbersDefault( 1 );
+
+  std::string output;
+  PreParser(_filename, output);
+
+  initModelString(output, _sdf);
+  return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+bool initModelString(const std::string &_xmlString, boost::shared_ptr<SDFElement> &_sdf)
+{
+  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
+
+  return initModelDoc(xmlDoc, _sdf);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Load Model from xmlDoc
+bool initModelDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<SDFElement> &_sdf)
+{
+  if (!_xmlDoc)
+  {
+    gzerr << "Could not parse the xml\n";
+    return false;
+  }
+
+  xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
+  if (!modelXml)
+  {
+    gzerr << "Could not find the 'model' element in the xml file\n";
+    return false;
+  }
+
+  return initModel(modelXml, _sdf);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+bool initWorldFile(const std::string &_filename, boost::shared_ptr<SDFElement> &_sdf)
+{
+  std::ifstream fin;
+  fin.open(_filename.c_str(), std::ios::in);
+  if( !fin.is_open() )
+  {
+    gzerr << "The world file can not be opened, check path and permissions\n";
+  }
+  fin.close();
+
+  // Enable line numbering
+  xmlLineNumbersDefault( 1 );
+
+  std::string output;
+  PreParser(_filename, output);
+
+  initWorldString(output, _sdf);
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool initWorldString(const std::string &_xmlString, 
+                     boost::shared_ptr<SDFElement> &_sdf)
+{
+  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
+
+  return initWorldDoc(xmlDoc,_sdf);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool initWorldDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<SDFElement> &_sdf)
+{
+  if (!_xmlDoc)
+  {
+    gzerr << "Could not parse the xml\n";
+    return false;
+  }
+
+  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world");
+  if (!worldXml)
+  {
+    gzerr << "Could not find the 'world' element in the xml file\n";
+    return false;
+  }
+
+  return initWorld(worldXml, _sdf);
 }
 
 }

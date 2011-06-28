@@ -44,96 +44,59 @@
 
 #include "sdf/interface/SDF.hh"
 #include "math/Pose.hh"
-#include "sdf/parser_deprecated/controller.hh"
 
 namespace sdf
 {
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Sensor> &_sensor);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Contact> &_contact);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Camera> &_sensor);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Ray> &_sensor);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Material> &_material);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Inertial> &_inertial);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Collision> &_collision);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Plane> &_plane);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Sphere> &_sphere);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Box> &_box);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Cylinder> &_cylinder);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Mesh> &_mesh);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Link> &_link);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Visual> &_visual);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<JointDynamics> &_jointDynamics);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<JointLimits> &_jointLimits);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint);
-
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Joint> &_joint);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Geometry> &_geom);
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Controller> &_controller);
+  bool initLight(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initSensor(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initCamera(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initRay(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initContact(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initInertial(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initCollision(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initOrigin(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initLink(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initVisual(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initJoint(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
+  bool initModel(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
 
   /// \brief Load Model given a filename
-  bool initFile(const std::string &_filename, boost::shared_ptr<Model> &_model);
+  bool initModelFile(const std::string &_filename, boost::shared_ptr<SDFElement> &_sdf);
 
  /// \brief Load Model from a XML-string
-  bool initString(const std::string &_xmlstring, boost::shared_ptr<Model> &_model);
+  bool initModelString(const std::string &_xmlstring, boost::shared_ptr<SDFElement> &_sdf);
 
   /// \brief Load Model from TiXMLDocument
-  bool initDoc(xmlDocPtr _xml, boost::shared_ptr<Model> &_model);
+  bool initModelDoc(xmlDocPtr _xml, boost::shared_ptr<SDFElement> &_sdf);
 
   /// \brief Load Model from TiXMLElement
-  bool initXml(xmlNodePtr _xml, boost::shared_ptr<Model> &_model);
+  bool initModelXml(xmlNodePtr _xml, boost::shared_ptr<SDFElement> &_sdf);
 
 
   /// \brief Load world given a filename
-  bool initFile(const std::string &_filename, boost::shared_ptr<World> &_world);
+  bool initWorldFile(const std::string &_filename, boost::shared_ptr<SDFElement> &_sdf);
 
   /// \brief Load world from a XML-string
-  bool initString(const std::string &_xmlstring, 
-                  boost::shared_ptr<World> &_world);
+  bool initWorldString(const std::string &_xmlstring, 
+                       boost::shared_ptr<SDFElement> &_sdf);
 
    /// \brief Load World from TiXMLDocument
-  bool initDoc(xmlDocPtr _xml, boost::shared_ptr<World> &_world);
+  bool initWorldDoc(xmlDocPtr _xml, boost::shared_ptr<SDFElement> &_sdf);
 
    /// \brief Load Model from TiXMLElement
-  bool initXml(xmlNodePtr _xml, boost::shared_ptr<World> &_world);
+  bool initWorld(xmlNodePtr _xml, boost::shared_ptr<SDFElement> &_sdf);
 
   /// scene
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Scene> &_scene);
+  bool initScene(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
   
   /// physics
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<Physics> &_physics);
-
-  /// OpenDynamicsEngine
-  bool initXml(xmlNodePtr _config, boost::shared_ptr<OpenDynamicsEngine> &_open_dynamics_engine);
-
-  /// Pose
-  bool InitXml(xmlNodePtr _xml, gazebo::math::Pose &_pose);
-
-/*
-  bool saveXml(const std::string &filename, const boost::shared_ptr<World> &_world);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Scene> &_scene);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Physics> &_physics);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<OpenDynamicsEngine> &_engine);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Model> &_model);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Link> &_link);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Joint> &_joint);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Plugin> &_plugin);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Visual> &_visual);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Collision> &_collision);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Inertial> &_inertial);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Sensor> &_sensor);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Material> &_mat);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<Geometry> &_geom);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<CameraSensor> &_camera);
-  bool saveXml(xmlNodePtr _parent, const boost::shared_ptr<RaySensor> &_ray);
-
-  bool saveXml(xmlNodePtr _parent, const Vector3 &_vec);
-  bool saveXml(xmlNodePtr _parent, const Rotation &_rot);
-  bool saveXml(xmlNodePtr _parent, const ParamT<Pose,true> &_pose);
-  bool saveXml(xmlNodePtr _parent, const ParamT<Pose,false> &_pose);
-*/
+  bool initPhysics(xmlNodePtr _config, boost::shared_ptr<SDFElement> &_sdf);
 
   bool getPlugins(xmlNodePtr pluginXml, std::map<std::string, 
-                  boost::shared_ptr<Plugin> > &plugins);
+                  boost::shared_ptr<SDFElement> > &_sdf);
+
+  bool initAttr(xmlNodePtr _node, const std::string _key, 
+                boost::shared_ptr<Param> _attr);
 
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -156,6 +119,7 @@ namespace sdf
 
     return tmp;
   }
+
   xmlNodePtr nextSiblingElement( xmlNodePtr node, const std::string &name)
   {
     xmlNodePtr tmp;
@@ -234,6 +198,77 @@ namespace sdf
 
     return result;
   }
+
+  std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
+  {
+    std::string value;
+    std::string nvalue;
+    int i, a, b, state, count;
+
+    value = getNodeValue(node, key);
+
+    if (value.empty())
+      return std::string();
+
+    state = 0;
+    count = 0;
+    a = b = 0;
+
+    for (i = 0; i < (int)value.size(); i++)
+    {
+      // Look for start of element
+      if (state == 0)
+      {
+        if (!isspace( value[i] ))
+        {
+          a = i;
+          state = 1;
+        }
+      }
+
+      // Look for end of element
+      else if (state == 1)
+      {
+        if (isspace( value[i] ))
+        {
+          state = 0;
+          b = i - 1;
+          count++;
+          if (count > index)
+            break;
+        }
+      }
+    }
+    if (state == 1)
+    {
+      b = i - 1;
+      count++;
+    }
+
+    if (count == index + 1)
+    {
+      const char *s = value.c_str() + a;
+      size_t size = b-a+2;
+      char *end = (char *)memchr(s,0,size);
+
+      if (end)
+        size = end -s + 1;
+
+      char *r = (char *)malloc(size);
+
+      if (size)
+      {
+        memcpy(r, s, size-1);
+        r[size-1] = '\0';
+      }
+
+      nvalue = r;
+    }
+
+    return nvalue;
+  }
+
+
 
 
   ////////////////////////////////////////////////////////////////////////////
