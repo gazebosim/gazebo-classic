@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     return -1;
   }
   
-  /*if (!readFile(argv[2],sdf))
+  if (!readFile(argv[2],sdf))
   {
     std::cerr << "Error: SDF parsing the xml failed\n";
     return -1;
@@ -26,7 +26,6 @@ int main(int argc, char** argv)
 
   sdf->PrintDescription();
   sdf->PrintValues();
-  */
 
   return 0;
 }
