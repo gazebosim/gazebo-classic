@@ -905,19 +905,19 @@ bool initWorldDoc(xmlDocPtr _xmlDoc, boost::shared_ptr<sdf::SDF> &_sdf)
     return false;
   }
 
-  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world");
-  if (!worldXml)
+  // Old world files do not have a the <gazebo> ... </gazebo> structure
+  _sdf->root->GetAttribute("version")->Set("1.0");
+
+  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world" );
+  while (worldXml)
   {
-    gzerr << "Could not find the 'world' element in the xml file\n";
-    return false;
+    boost::shared_ptr<sdf::SDFElement> world = _sdf->root->AddElement("world");
+    initWorld(worldXml, world);
+
+    worldXml = nextSiblingElement(worldXml,"world");
   }
 
-  boost::shared_ptr<sdf::SDFElement> gazebo = _sdf->AddElement("gazebo");
-  gazebo->GetAttribute("version")->Set("1.0");
-
-  boost::shared_ptr<sdf::SDFElement> world = gazebo->AddElement("world");
-
-  return initWorld(worldXml, world);
+  return true;
 }
 
 }
