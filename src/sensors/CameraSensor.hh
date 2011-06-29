@@ -46,7 +46,7 @@ namespace gazebo
     
       /// \brief Load the camera using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      protected: virtual void Load( boost::shared_ptr<sdf::SDFElement> _sdf );
+      protected: virtual void Load( sdf::ElementPtr _sdf );
     
       /// \brief Initialize the camera
       protected: virtual void Init();

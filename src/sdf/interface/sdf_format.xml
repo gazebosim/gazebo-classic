@@ -80,6 +80,10 @@
         <attribute name="quadratic" type="double" default="0" required="0"/>
       </element> <!-- End Attenuation -->
 
+      <element name="directional" required="0">
+        <attribute name="direction" type="vector3" default="0 0 -1" required="1"/>
+      </element><!-- End Directional -->
+
       <element name="spot" required="0">
         <attribute name="inner_angle" type="double" default="0" required="1"/>
         <attribute name="outer_angle" type="double" default="0" required="1"/>
@@ -189,6 +193,7 @@
           </element> <!-- End Origin -->
           <element name="material" required="0">
             <attribute name="script" type="string" default="script" required="0"/>
+            <attribute name="normal_map" type="string" default="__default__" required="0"/>
             <element name="color" required="0">
               <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
             </element> <!-- End Color -->
@@ -219,7 +224,7 @@
         <element name="sensor" required="0">
           <attribute name="name" type="string" default="sensor" required="1"/>
           <attribute name="always_on" type="bool" default="false" required="0"/>
-          <attribute name="update_rate" type="double" default="10" required="0"/>
+          <attribute name="update_rate" type="double" default="0" required="0"/>
           <element name="origin" required="0">
             <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
           </element> <!-- End Origin -->
@@ -237,8 +242,8 @@
              <attribute name="angle" type="double" default="1.047" required="1"/>
             </element> <!-- End Horizontal_FOV -->
             <element name="image" required="1">
-              <attribute name="width" type="double" default="320" required="1"/>
-              <attribute name="height" type="double" default="240" required="1"/>
+              <attribute name="width" type="int" default="320" required="1"/>
+              <attribute name="height" type="int" default="240" required="1"/>
               <attribute name="format" type="string" default="R8G8B8" required="0"/>
             </element> <!-- End Image -->
             <element name="clip" required="1">

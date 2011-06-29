@@ -47,56 +47,55 @@
 
 namespace deprecated_sdf
 {
-  bool initLight(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initSensor(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initCamera(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initRay(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initContact(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initInertial(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initCollision(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initOrigin(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initLink(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initVisual(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initJoint(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
-  bool initModel(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initContact(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf);
+  bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf);
 
   /// \brief Load Model given a filename
-  bool initModelFile(const std::string &_filename, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initModelFile(const std::string &_filename, sdf::ElementPtr &_sdf);
 
  /// \brief Load Model from a XML-string
-  bool initModelString(const std::string &_xmlstring, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initModelString(const std::string &_xmlstring, sdf::ElementPtr &_sdf);
 
   /// \brief Load Model from TiXMLDocument
-  bool initModelDoc(xmlDocPtr _xml, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initModelDoc(xmlDocPtr _xml, sdf::ElementPtr &_sdf);
 
   /// \brief Load Model from TiXMLElement
-  bool initModelXml(xmlNodePtr _xml, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initModelXml(xmlNodePtr _xml, sdf::ElementPtr &_sdf);
 
 
   /// \brief Load world given a filename
-  bool initWorldFile(const std::string &_filename, boost::shared_ptr<sdf::SDF> &_sdf);
+  bool initWorldFile(const std::string &_filename, sdf::SDFPtr &_sdf);
 
   /// \brief Load world from a XML-string
   bool initWorldString(const std::string &_xmlstring, 
-                       boost::shared_ptr<sdf::SDF> &_sdf);
+                       sdf::SDFPtr &_sdf);
 
    /// \brief Load World from TiXMLDocument
-  bool initWorldDoc(xmlDocPtr _xml, boost::shared_ptr<sdf::SDF> &_sdf);
+  bool initWorldDoc(xmlDocPtr _xml, sdf::SDFPtr &_sdf);
 
    /// \brief Load Model from TiXMLElement
-  bool initWorld(xmlNodePtr _xml, boost::shared_ptr<sdf::SDF> &_sdf);
+  bool initWorld(xmlNodePtr _xml, sdf::SDFPtr &_sdf);
 
   /// scene
-  bool initScene(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf);
   
   /// physics
-  bool initPhysics(xmlNodePtr _config, boost::shared_ptr<sdf::SDFElement> &_sdf);
+  bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf);
 
   bool getPlugins(xmlNodePtr pluginXml, std::map<std::string, 
-                  boost::shared_ptr<sdf::SDFElement> > &_sdf);
+                  sdf::ElementPtr > &_sdf);
 
-  bool initAttr(xmlNodePtr _node, const std::string _key, 
-                boost::shared_ptr<sdf::Param> _attr);
+  bool initAttr(xmlNodePtr _node, const std::string _key, sdf::ParamPtr _attr);
 
   ////////////////////////////////////////////////////////////////////////////
   //

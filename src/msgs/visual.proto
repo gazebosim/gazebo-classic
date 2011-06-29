@@ -27,18 +27,27 @@ message Visual
   }
   optional RenderType render_type = 3;
 
-  optional string parent_id   = 4;
-  optional string mesh        = 5;
-  optional string material    = 6;
-  optional bool cast_shadows  = 7;
-  optional bool attach_axes   = 8;
-  optional bool visible       = 9;
-  optional float transparency = 10;
-  optional Pose pose          = 11;
-  optional Point scale        = 12;
-  optional float uv_tile_x    = 13;
-  optional float uv_tile_y    = 14;
-  repeated Point points       = 15;
-  optional Plane plane        = 16;
-  optional bool is_static     = 17;
+  enum MeshType
+  {
+    BOX      = 1;
+    CYLINDER = 2;
+    SPHERE   = 3;
+    PLANE    = 4;
+    MESH     = 5;
+  }
+  required MeshType mesh_type   = 4;
+  optional string mesh_filename = 5;
+
+  optional string parent_id   = 6;
+  optional string material_script    = 7;
+  optional Color material_color    = 7;
+  optional bool cast_shadows  = 8;
+  optional bool attach_axes   = 9;
+  optional bool visible       = 10;
+  optional float transparency = 11;
+  optional Pose pose          = 12;
+  optional Point scale        = 13;
+  repeated Point points       = 16;
+  optional Plane plane        = 17;
+  optional bool is_static     = 18;
 }

@@ -31,6 +31,8 @@
 #include "common/Param.hh"
 #include "common/Messages.hh"
 
+#include "sdf/interface/sdf.h"
+
 namespace Ogre
 {
   class Light;
@@ -39,11 +41,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
 	namespace rendering
   {
     class Visual;
@@ -59,15 +56,15 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Light();
   
-      /// \brief Load the light
-      public: void Load( /*boost::shared_ptr<sdf::Light> &_sdf*/ );
+      /// \brief Load the light using a set of SDF parameters
+      public: void Load( sdf::ElementPtr &_sdf );
+
+      /// \brief Load the light using default parameters
+      public: void Load( );
   
       /// \brief Load from a light message
       public: void LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg);
   
-      /// \brief Save a light
-      public: void Save(const std::string &prefix, std::ostream &stream);
-
         /// \brief Set the name of the visual
       public: void SetName( const std::string &name );
 
@@ -100,7 +97,8 @@ namespace gazebo
       public: void SetDirection(const math::Vector3 &dir);
   
       /// \brief Set the attenuation
-      public: void SetAttenuation(const math::Vector3 &att);
+      public: void SetAttenuation(double constant, double linear,  
+                                  double quadratic);
   
       /// \brief Set the spot light inner angle
       public: void SetSpotInnerAngle(const double &angle);
@@ -129,19 +127,8 @@ namespace gazebo
   
       private: Visual *visual;
       private: DynamicLines *line;
-  
-      private: common::ParamT<std::string> *nameP;
-      private: common::ParamT<std::string> *lightTypeP;
-      private: common::ParamT<common::Color> *diffuseP;
-      private: common::ParamT<common::Color> *specularP;
-      private: common::ParamT<math::Vector3> *directionP;
-      private: common::ParamT<math::Vector3> *attenuationP;
-      private: common::ParamT<double> *rangeP;
 
-      private: common::ParamT<bool> *castShadowsP;
-      private: common::ParamT<double> *spotInnerAngleP;
-      private: common::ParamT<double> *spotOuterAngleP;
-      private: common::ParamT<double> *spotFalloffP;
+      private: sdf::ElementPtr sdf;
 
       private: event::ConnectionPtr showLightsConnection;
       private: static unsigned int lightCounter;

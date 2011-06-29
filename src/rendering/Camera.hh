@@ -62,9 +62,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Camera();
     
-      /// \brief Load the camera
-      /// \param node The SDF camera info
-      public: void Load( boost::shared_ptr<sdf::SDFElement> _sdf );
+      /// \brief Load the camera with a set of parmeters
+      /// \param _sdf The SDF camera info
+      public: void Load( sdf::ElementPtr &_sdf );
+
+       /// \brief Load the camera with default parmeters
+      public: void Load( );
   
       /// \brief Initialize the camera
       public: void Init();
@@ -176,9 +179,6 @@ namespace gazebo
       /// \brief Set the save frame pathname
       public: void SetSaveFramePathname(const std::string &pathname);
   
-      /// \brief Toggle saving of frames
-      public: void ToggleSaveFrame();
-    
       /// \brief Get a pointer to the ogre camera
       public: Ogre::Camera *GetOgreCamera() const;
   
@@ -259,7 +259,7 @@ namespace gazebo
   
       private: std::string name;
       private: math::Pose pose;
-      protected: boost::shared_ptr<sdf::SDFElement> sdf;
+      protected: sdf::ElementPtr sdf;
 
       protected: unsigned int windowId;
   
@@ -291,8 +291,6 @@ namespace gazebo
       protected: bool captureData;
   
       private: bool userMovable;
-      protected: std::vector<common::Param*> camParameters;
-  
       protected: bool renderingEnabled;
   
       private: bool newData;

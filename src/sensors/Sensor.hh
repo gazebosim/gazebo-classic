@@ -55,7 +55,7 @@ namespace gazebo
     
       ///  \brief Load the sensor
       /// \param node XMLConfigNode pointer
-      public: virtual void Load( boost::shared_ptr<sdf::SDFElement> _sdf );
+      public: virtual void Load( sdf::ElementPtr _sdf );
   
       /// \brief Save the sensor info in XML format
       public: void Save(std::string &prefix, std::ostream &stream);
@@ -93,7 +93,7 @@ namespace gazebo
   
       /// \brief True if active
       protected: bool active;
-      protected: boost::shared_ptr<sdf::SDFElement> sdf; 
+      protected: sdf::ElementPtr sdf; 
 
       protected: math::Pose pose;
   

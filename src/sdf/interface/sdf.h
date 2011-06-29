@@ -1,2 +1,3 @@
-#include "SDF.hh"
-#include "Param.hh"
+#include "sdf/interface/SDF.hh"
+#include "sdf/interface/Param.hh"
+#include "sdf/parser/parser.hh"

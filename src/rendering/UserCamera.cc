@@ -78,7 +78,7 @@ UserCamera::~UserCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load child
-void UserCamera::Load( boost::shared_ptr<sdf::SDFElement> _sdf )
+void UserCamera::Load( sdf::ElementPtr _sdf )
 {
   Camera::Load(_sdf);
 
@@ -187,14 +187,16 @@ void UserCamera::Update()
 void UserCamera::PostRender()
 {
   Camera::PostRender();
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
 
-  /*NATT
-  if (*this->sdf->saveEnabled)
+  if (elem->GetValueBool("enabled"))
   {
+    std::string path = elem->GetValueString("path");
+
     char tmp[1024];
-    if (!(*this->sdf->savePath).empty())
+    if (!path.empty())
     {
-      sprintf(tmp, "%s/%s-%04d.jpg", (*this->sdf->savePath).c_str(),
+      sprintf(tmp, "%s/%s-%04d.jpg", path.c_str(),
           this->name.c_str(), this->saveCount);
     }
     else
@@ -202,12 +204,11 @@ void UserCamera::PostRender()
       sprintf(tmp, "%s-%04d.jpg", this->name.c_str(), this->saveCount);
     }
 
-    // NATY: Use the window manager instead.
+    // TODO: Use the window manager instead.
     //this->window->writeContentsToFile(tmp);
 
     this->saveCount++;
   }
-  */
 }
 
 

@@ -29,11 +29,16 @@
 #include <string>
 
 #include "common/Console.hh"
+#include "common/Color.hh"
+#include "math/Vector3.hh"
+#include "math/Pose.hh"
+#include "math/Quaternion.hh"
 
 namespace sdf
 {
   class Param;
-  typedef std::vector<sdf::Param*> Param_V;
+  typedef boost::shared_ptr< Param > ParamPtr;
+  typedef std::vector< ParamPtr > Param_V;
 
   class Param
   {
@@ -44,22 +49,24 @@ namespace sdf
     public: virtual  ~Param();
 
     /// \brief Begin a block of "new Param<*>"
-    public: static void Begin(Param_V *_params);
+    public: static void Begin(std::vector<Param*> *_params);
   
     /// \brief End a block of "new Param<*>"
     public: static void End();
 
     /// \brief Find a parameter by name
-    public: static Param *Find(std::vector<Param*> &_params, const std::string &key);
+    public: static ParamPtr Find(Param_V &_params, const std::string &key);
 
     /// \brief Get the type
-    public: virtual std::string GetAsString() const {return std::string();}
+    public: virtual std::string GetAsString() const 
+            {return std::string();}
   
     public: virtual std::string GetDefaultAsString() const 
             {return std::string();}
 
     /// \brief Set the parameter value from a string
-    public: virtual bool Set(const std::string &/*_string*/) {return true;}
+    public: virtual bool SetFromString(const std::string &) 
+            {return true;}
 
     /// \brief Reset the parameter
     public: virtual void Reset() = 0;
@@ -79,8 +86,34 @@ namespace sdf
     public: bool IsChar() const;
     public: bool IsStr() const;
     public: bool IsVector3() const;
-    public: bool IsRotation() const;
-  
+    public: bool IsQuaternion() const;
+    public: bool IsPose() const;
+    public: bool IsColor() const;
+
+    public: bool Set(const bool &_value);
+    public: bool Set(const int &_value);
+    public: bool Set(const unsigned int &_value);
+    public: bool Set(const float &_value);
+    public: bool Set(const double &_value);
+    public: bool Set(const char &_value);
+    public: bool Set(const std::string &_value);
+    public: bool Set(const gazebo::math::Vector3 &_value);
+    public: bool Set(const gazebo::math::Quaternion &_value);
+    public: bool Set(const gazebo::math::Pose &_value);
+    public: bool Set(const gazebo::common::Color &_value);
+ 
+    public: bool Get(bool &_value);
+    public: bool Get(int &_value);
+    public: bool Get(unsigned int &_value);
+    public: bool Get(float &_value);
+    public: bool Get(double &_value);
+    public: bool Get(char &_value);
+    public: bool Get(std::string &_value);
+    public: bool Get(gazebo::math::Vector3 &_value);
+    public: bool Get(gazebo::math::Quaternion &_value);
+    public: bool Get(gazebo::math::Pose &_value);
+    public: bool Get(gazebo::common::Color &_value);
+ 
     /// List of created parameters
     private: static std::vector<Param*> *params;
   
@@ -93,15 +126,6 @@ namespace sdf
   template< typename T>
   class ParamT : public Param
   {
-    /// \brief Constructor
-    /*public: ParamT(const std::string &_key, const T &_default, bool _required)
-            : Param(this), value(_default), defaultValue(_default)
-    {
-      this->key = _key;
-      this->required = _required;
-      this->typeName = typeid(T).name();
-    }*/
-
     /// \brief Constructor
     public: ParamT(const std::string &_key, const std::string &_default, 
                    bool _required)

@@ -72,7 +72,7 @@ Scene::Scene(const std::string &name_)
 
   this->selectionObj = new SelectionObj(this);
 
-  this->sdf.reset(new sdf::SDFElement);
+  this->sdf.reset(new sdf::Element);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,16 +110,23 @@ Scene::~Scene()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Scene::SetParams(boost::shared_ptr<sdf::SDFElement> &_sdf)
+void Scene::Load(sdf::ElementPtr &_sdf)
 {
   this->sdf = _sdf;
+  this->Load();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Load
+void Scene::Load()
+{
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the scene
 void Scene::Init()
 {
-
   Ogre::Root *root = RenderEngine::Instance()->root;
 
   if (this->manager)
@@ -131,52 +138,63 @@ void Scene::Init()
     this->grids[i]->Init();
 
   // Create the sky
-  /*NATT if ( !this->sdf->skyMaterial.GetValue().empty() )
+  if ( this->sdf->HasElement("sky") )
   {
     try
     {
       Ogre::Quaternion orientation;
       orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-      this->manager->setSkyDome(true, *this->sdf->skyMaterial,
-                                10,8, 4, true, orientation);
+      this->manager->setSkyDome(true, 
+          this->sdf->GetElement("sky")->GetValueString("material"),
+          10,8, 4, true, orientation);
     }
     catch (int)
     {
       gzwarn << "Unable to set sky dome to material[" 
-             << *this->sdf->skyMaterial << "]\n";
+             << this->sdf->GetElement("sky")->GetValueString("material")
+             << "]\n";
     }
   }
 
   // Create Fog
-  this->SetFog(*this->sdf->fogType, *this->sdf->fogColor, 
-               *this->sdf->fogDensity, *this->sdf->fogStart, 
-               *this->sdf->fogEnd);
+  if (this->sdf->HasElement("fog"))
+  {
+    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog"); 
+    this->SetFog( fogElem->GetValueString("type"), 
+                  fogElem->GetValueColor("rgba"), 
+                  fogElem->GetValueDouble("density"), 
+                  fogElem->GetValueDouble("start"), 
+                  fogElem->GetValueDouble("end"));
+  }
 
   // Create ray scene query
   this->raySceneQuery = this->manager->createRayQuery( Ogre::Ray() );
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
-  if (*this->sdf->shadowEnabled)
+  if (this->sdf->HasElement("shadows") && 
+      this->sdf->GetElement("shadows")->GetValueBool("enabled"))
   {
+    sdf::ElementPtr shadowElem = this->sdf->GetElement("shadows");
     this->manager->setShadowTextureSize( 512);
     this->manager->setShadowTextureCount( 4 );
     this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
 
-    //if (**this->sdf->shadowType == "stencil_additive")
+    //if (*shadowElem-GetAttribute("type") == "stencil_additive")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-    //else if (**this->sdf->shadowType == "stencil_modulative")
+    //else if (*shadowElem-GetAttribute("type") == "stencil_modulative")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-    //else if (**this->sdf->shadowType == "texture_additive")
+    //else if (*shadowElem-GetAttribute("type") == "texture_additive")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
-    //else if (**this->sdf->shadowType == "texture_modulative")
+    //else if (*shadowElem-GetAttribute("type") == "texture_modulative")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    //else if (**this->sdf->shadowType == "texture_additive_integrated")
+    //else if (*shadowElem-GetAttribute("type") == "texture_additive_integrated")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-    //else if (**this->sdf->shadowType == "texture_modulative_integrated")
+    //else if (*shadowElem-GetAttribute("type") == "texture_modulative_integrated")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
-    this->manager->setShadowColour( Conversions::Color(*this->sdf->shadowColor) );
+    this->manager->setShadowColour( 
+        Conversions::Color(shadowElem->GetValueColor("rgba")) );
   }
 
   // Send a request to get the current world state
@@ -193,7 +211,6 @@ void Scene::Init()
   //RTShaderSystem::Instance()->AddScene(this);
   
   this->selectionObj->Init();
-  */
 }
 
 
@@ -215,36 +232,39 @@ std::string Scene::GetName() const
 /// Set the ambient color
 void Scene::SetAmbientColor(const common::Color &color)
 {
-  /*NATT this->sdf->ambientColor.SetValue(color);
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("ambient");
+  elem->GetAttribute("rgba")->Set( color );
 
   // Ambient lighting
   if (this->manager)
   {
     this->manager->setAmbientLight(
-        Conversions::Color(*this->sdf->ambientColor));
+        Conversions::Color(elem->GetValueColor("rgba")));
   }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the ambient color
 common::Color Scene::GetAmbientColor() const
 {
-  return common::Color();//NATT *this->sdf->ambientColor;
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("ambient");
+  return elem->GetValueColor("rgba");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the background color
 void Scene::SetBackgroundColor(const common::Color &color)
 {
-  //NATT this->sdf->backgroundColor.SetValue(color);
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
+  elem->GetAttribute("rgba")->Set(color);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the background color
 common::Color Scene::GetBackgroundColor() const
 {
-  return common::Color();//NATT *this->sdf->backgroundColor;
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
+  return elem->GetValueColor("rgba");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,11 +329,9 @@ CameraPtr Scene::GetCamera(unsigned int index) const
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
   UserCameraPtr camera( new UserCamera(this->name + "::" + name_, this) );
-  /*NATT
-  camera->Load( boost::shared_ptr<sdf::Camera>() );
+  camera->Load( sdf::ElementPtr() );
   camera->Init();
   this->userCameras.push_back(camera);
-  */
 
   return camera;
 }
@@ -535,13 +553,13 @@ void Scene::SetFog( const std::string &_type, const common::Color &_color,
   else if (_type == "exp2")
     fogType = Ogre::FOG_EXP2;
 
-  /*NATT
-  this->sdf->fogType.SetValue(_type);
-  this->sdf->fogColor.SetValue(_color);
-  this->sdf->fogDensity.SetValue(_density);
-  this->sdf->fogStart.SetValue(_start);
-  this->sdf->fogEnd.SetValue(_end);
-  */
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
+
+  elem->GetAttribute("type")->Set(_type);
+  elem->GetAttribute("rgba")->Set(_color);
+  elem->GetAttribute("density")->Set(_density);
+  elem->GetAttribute("start")->Set(_start);
+  elem->GetAttribute("end")->Set(_end);
 
   if (this->manager)
     this->manager->setFog( fogType, Conversions::Color(_color), 

@@ -43,12 +43,21 @@ MeshManager::MeshManager()
   this->ogreLoader = new OgreLoader();
   this->stlLoader = new STLLoader();
 
+CreatePlane(const std::string &name, const math::Plane &plane,
+                              const math::Vector2d &segments, 
+                              const math::Vector2d &uvTile)
+
   // Create some basic shapes
+  this->CreatePlane("unit_plane", math::Plane(math::Vector3(0,0,1),
+                                              math::Vector2d(1,1), 0), 
+                                  math::Vector2d(1,1), 
+                                  math::Vector2d(1,1) );
+
   this->CreateSphere("unit_sphere",0.5, 32, 32);
   this->CreateSphere("joint_anchor",0.01, 32, 32);
   this->CreateBox("body_cg", math::Vector3(0.014,0.014,0.014), 
                              math::Vector2d(0.014,0.014));
-  this->CreateBox("unit_box_U1V1", math::Vector3(1,1,1), 
+  this->CreateBox("unit_box", math::Vector3(1,1,1), 
                              math::Vector2d(1,1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);

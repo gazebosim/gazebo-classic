@@ -1,4 +1,19 @@
-
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include "sdf/interface/sdf.h"
 #include "sdf/parser/parser.hh"
 
@@ -11,8 +26,7 @@ namespace sdf
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the sdf format from a file
-bool initFile(const std::string &_filename, boost::shared_ptr<SDF> _sdf)
+bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.LoadFile(_filename);
@@ -20,8 +34,7 @@ bool initFile(const std::string &_filename, boost::shared_ptr<SDF> _sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the sdf format from a string
-bool initString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf)
+bool initString(const std::string &_xmlString, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -30,8 +43,7 @@ bool initString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the sdf format from TiXMLDocument
-bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
+bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 {
   if (!_xmlDoc)
   {
@@ -50,8 +62,7 @@ bool initDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load an SDF element from XML
-bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
+bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 {
   const char *nameString = _xml->Attribute("name");
   if (!nameString)
@@ -106,7 +117,7 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
   for (TiXmlElement *child = _xml->FirstChildElement("element"); 
        child; child = child->NextSiblingElement("element"))
   {
-    boost::shared_ptr<SDFElement> element(new SDFElement);
+    ElementPtr element(new Element);
     initXml(child, element);
     _sdf->elementDescriptions.push_back(element);
   }
@@ -115,21 +126,24 @@ bool initXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
 }
 
 
-bool readFile(const std::string &_filename, boost::shared_ptr<SDF> &_sdf)
+////////////////////////////////////////////////////////////////////////////////
+bool readFile(const std::string &_filename, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.LoadFile(_filename);
   return readDoc(&xmlDoc, _sdf);
 }
 
-bool readString(const std::string &_xmlString, boost::shared_ptr<SDF> &_sdf)
+////////////////////////////////////////////////////////////////////////////////
+bool readString(const std::string &_xmlString, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
   return readDoc(&xmlDoc, _sdf);
 }
 
-bool readDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
+////////////////////////////////////////////////////////////////////////////////
+bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 {
   if (!_xmlDoc)
   {
@@ -148,7 +162,8 @@ bool readDoc(TiXmlDocument *_xmlDoc, boost::shared_ptr<SDF> &_sdf)
   return true;
 }
 
-bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
+////////////////////////////////////////////////////////////////////////////////
+bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
 {
   if (!_xml)
   {
@@ -162,12 +177,12 @@ bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
   }
 
   // Read all the attributes
-  std::vector< boost::shared_ptr<Param> >::iterator iter;
+  Param_V::iterator iter;
   for (iter = _sdf->attributes.begin(); 
        iter != _sdf->attributes.end(); iter++)
   {
     const char *str = _xml->Attribute( (*iter)->GetKey().c_str() );
-    if ( str && !(*iter)->Set( str ))
+    if ( str && !(*iter)->SetFromString( str ))
     {
       gzerr << "Unable to read attribute[" << (*iter)->GetKey() << "]\n";
       return false;
@@ -175,14 +190,14 @@ bool readXml(TiXmlElement *_xml, boost::shared_ptr<SDFElement> &_sdf)
   }
 
   // Read all the elements
-  std::vector< boost::shared_ptr<sdf::SDFElement> >::iterator eiter;
+  ElementPtr_V::iterator eiter;
   for (eiter = _sdf->elementDescriptions.begin(); 
        eiter != _sdf->elementDescriptions.end(); eiter++)
   {
     for (TiXmlElement* elemXml = _xml->FirstChildElement((*eiter)->GetName());
          elemXml; elemXml = elemXml->NextSiblingElement((*eiter)->GetName()))
     {
-      boost::shared_ptr<sdf::SDFElement> element = (*eiter)->Clone();
+      ElementPtr element = (*eiter)->Clone();
       readXml( elemXml, element );
       _sdf->elements.push_back(element);
       if ((*eiter)->GetRequired() == "0" || (*eiter)->GetRequired() == "1")

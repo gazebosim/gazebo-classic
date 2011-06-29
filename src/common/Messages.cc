@@ -286,9 +286,9 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
 
   if ((cnode = node->GetChild("attenuation")) != NULL)
   {
-    result.mutable_attenuation()->set_x(cnode->GetFloat("constant",0.2,1));
-    result.mutable_attenuation()->set_y(cnode->GetFloat("linear",0.1,1));
-    result.mutable_attenuation()->set_z(cnode->GetFloat("quadratic",0.0,1));
+    result.set_attenuation_constant(cnode->GetFloat("constant",0.2,1));
+    result.set_attenuation_linear(cnode->GetFloat("linear",0.1,1));
+    result.set_attenuation_linear(cnode->GetFloat("quadratic",0.0,1));
   }
 
   result.mutable_direction()->CopyFrom( 

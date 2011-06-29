@@ -92,13 +92,6 @@ Visual::Visual (const std::string &name_, Scene *scene_)
 /// Destructor
 Visual::~Visual()
 {
-  delete this->xyzP;
-  delete this->rpyP;
-  delete this->meshNameP;
-  delete this->meshTileP;
-  delete this->materialNameP;
-  delete this->castShadowsP;
-
   if (this->preRenderConnection)
     event::Events::DisconnectPreRenderSignal( this->preRenderConnection );
 
@@ -132,35 +125,6 @@ void Visual::Init()
   this->ribbonTrail = NULL;
   this->staticGeom = NULL;
 
-  common::Param::Begin(&this->parameters);
-  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(0,0,0), 0);
-  this->xyzP->Callback( &Visual::SetPosition, this );
-
-  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(1,0,0,0), 0);
-  this->rpyP->Callback( &Visual::SetRotation, this );
-
-  this->meshNameP = new common::ParamT<std::string>("mesh","",1);
-  this->meshTileP = new common::ParamT< math::Vector2d >("uvTile", 
-                                math::Vector2d(1.0, 1.0), 0 );
- 
-  //default to Gazebo/White
-  this->materialNameP = new common::ParamT<std::string>("material",
-                                                std::string("none"),0);
-  this->materialNameP->Callback( &Visual::SetMaterial, this );
-
-  this->castShadowsP = new common::ParamT<bool>("cast_shadows",true,0);
-  this->castShadowsP->Callback( &Visual::SetCastShadows, this );
-
-  this->scaleP = new common::ParamT<math::Vector3>("scale", math::Vector3(1,1,1), 0);
-
-  this->normalMapNameP = new common::ParamT<std::string>("normal_map",
-                                                std::string("none"),0);
-  this->normalMapNameP->Callback( &Visual::SetNormalMap, this );
-
-  this->shaderP = new common::ParamT<std::string>("shader", std::string("pixel"),0);
-  this->shaderP->Callback( &Visual::SetShader, this );
-  common::Param::End();
-
   //RTShaderSystem::Instance()->AttachEntity(this);
 }
 
@@ -169,32 +133,71 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 {
   std::string mesh = msg->mesh();
 
-  if (msg->has_plane())
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+  geomElem->ClearElements();
+
+  if (msg->mesh_type() == BOX)
+  {
+    sdf::ElementPtr elem = geomElem->AddElement("box");
+    elem->GetAttribute("size")->Set(commoN::Message::Convert(msg->scale()));
+  }
+  else if (msg->mesh_type() == SPHERE)
+  {
+    sdf::ElementPtr elem = geomElem->AddElement("sphere");
+    elem->GetAttribute("radius")->Set(msg->scale().x());
+  }
+  else if (msg->mesh_type() == CYLINDER)
+  {
+    sdf::ElementPtr elem = geomElem->AddElement("cylinder");
+    elem->GetAttribute("radius")->Set(msg->scale().x());
+    elem->GetAttribute("length")->Set(msg->scale().y());
+  }
+  else if (msg->mesh_type() == PLANE)
+  {
+    math::Plane plane = common::Message::Convert(msg->plane());
+    sdf::ElementPtr elem = geomElem->AddElement("plane");
+    elem->GetAttribute("normal")->Set(plane.GetNormal());
+  }
+  else if (msg->mesh_type() == MESH)
+  {
+    sdf::ElementPtr elem = geomElem->AddElement("mesh");
+    elem->GetAttribute("filename")->Set( msg->mesh_filename );
+  }
+
+  /*if (msg->has_plane())
   {
     math::Plane plane = common::Message::Convert(msg->plane());
     common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
         math::Vector2d(2,2), 
         math::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
     mesh = msg->header().str_id();
-  }
-
-  this->meshNameP->SetValue(mesh);
-  this->meshTileP->Load(NULL);
+  }*/
 
   if (msg->has_pose())
   {
-    this->xyzP->SetValue(common::Message::Convert(msg->pose().position()));
-    this->rpyP->SetValue(common::Message::Convert(msg->pose().orientation()));
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("origin");
+    math::Pose p( common::Message::Convert(msg->pose().position()) 
+                  common::Message::Convert(msg->pose().orientation()) );
+
+    elem->GetAttribute("pose")->Set( p );
   }
 
-  if (msg->has_material())
-    this->materialNameP->SetValue(msg->material());
+  if (msg->has_material_script())
+  {
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+    elem->GetAttribute("script")->Set(msg->material());
+  }
+
+  if (msg->has_material_color())
+  {
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+    elem->GetOrCreateElement("color")->GetAttribute("rgba")->Set(msg->material());
+  }
 
   if (msg->has_cast_shadows())
-    this->castShadowsP->SetValue(msg->cast_shadows());
-
-  if (msg->has_scale())
-    this->scaleP->SetValue(common::Message::Convert(msg->scale()));
+  {
+    this->sdf->GetAttribute("cast_shadows")->Set(msg->cast_shadows());
+  }
 
   this->Load(NULL);
   this->UpdateFromMsg(msg);
@@ -202,50 +205,33 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
-void Visual::Load(common::XMLConfigNode *node)
+void Visual::Load( sdf::ElementPtr &_sdf)
+{
+  this->sdf = _sdf;
+  this->Load();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load the visual
+void Visual::Load()
 {
   std::ostringstream stream;
   math::Pose pose;
   Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
 
-  if (node)
-  {
-    this->xyzP->Load(node);
-    this->rpyP->Load(node);
-    this->meshNameP->Load(node);
-    this->meshTileP->Load(node);
-    this->materialNameP->Load(node);
-    this->castShadowsP->Load(node);
-    this->shaderP->Load(node);
-    this->normalMapNameP->Load(node);
-    this->scaleP->Load(node);
-  }
-
   // Read the desired position and rotation of the mesh
-  pose.pos = this->xyzP->GetValue();
-  pose.rot = this->rpyP->GetValue();
+  pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
+
+  std::string meshName = this->GetMeshName();
 
   try
   {
     // Create the visual
     stream << "VISUAL_" << this->sceneNode->getName();
-    std::string meshName = (**this->meshNameP);
 
     if (!meshName.empty())
     {
-      if ( meshName == "unit_box")
-      {
-        meshName += "_U" + 
-          boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
-          boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
-
-        if (!common::MeshManager::Instance()->HasMesh(meshName))
-        {
-          common::MeshManager::Instance()->CreateBox(meshName, math::Vector3(1,1,1), **this->meshTileP);
-        }
-      }
-
       if (!common::MeshManager::Instance()->HasMesh(meshName))
       {
         common::MeshManager::Instance()->Load(meshName);
@@ -260,11 +246,15 @@ void Visual::Load(common::XMLConfigNode *node)
       else
         obj = (Ogre::MovableObject*)mgr->createEntity( stream.str(), meshName);
     }
+    else
+    {
+      gzerr << "Mesh name is empty\n";
+    }
   }
   catch (Ogre::Exception e)
   {
     gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-    gzthrow("Unable to create a mesh from " + this->meshNameP->GetValue());
+    gzthrow("Unable to create a mesh from " + meshName);
   }
 
   // Attach the entity to the node
@@ -282,15 +272,25 @@ void Visual::Load(common::XMLConfigNode *node)
   {
     meshSize = obj->getBoundingBox().getSize();
   }
-
-  this->sceneNode->setScale((**this->scaleP).x,(**this->scaleP).y, (**this->scaleP).z );
+ 
+  math::Vector3 scale = this->GetScale(); 
+  this->sceneNode->setScale( scale.x, scale.y, scale.z );
 
   // Set the material of the mesh
-  if (**this->materialNameP != "none")
-    this->SetMaterial(this->materialNameP->GetValue());
+  if (this->sdf->HasElement("material"))
+  {
+    sdf::ElementPtr matElem = this->sdf->GetElement("material");
+    std::string script = matElem->GetValueString("script");
+    if (!script.empty())
+      this->SetMaterial(script);
+    else if (matElem->HasElement("color"))
+    {
+      this->SetColor( matElem->GetElement("color")->GetValueColor("rgba") );
+    }
+  }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows((**this->castShadowsP));
+  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,20 +319,6 @@ void Visual::SetName( const std::string &name_ )
 std::string Visual::GetName() const
 {
   return this->name;
-}
- 
-////////////////////////////////////////////////////////////////////////////////
-// Save the visual in XML format
-void Visual::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << "<visual>\n";
-  stream << prefix << "  " << *(this->xyzP) << "\n";
-  stream << prefix << "  " << *(this->rpyP) << "\n";
-  stream << prefix << "  " << *(this->meshNameP) << "\n";
-  stream << prefix << "  " << *(this->materialNameP) << "\n";
-  stream << prefix << "  " << *(this->castShadowsP) << "\n";
-  stream << prefix << "  " << *(this->scaleP) << "\n";
-  stream << prefix << "</visual>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -434,7 +420,22 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const math::Vector3 &scale )
 {
-  this->scaleP->SetValue(scale);
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+
+  if (geomElem->HasElement("box"))
+    geomElem->GetElement("box")->GetAttribute("size").Set(scale);
+  else if (geomElem->HasElement("sphere"))
+    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(scale.x);
+  else if (geomElem->HasElement("cylinder"))
+  {
+    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(scale.x);
+    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(scale.y);
+  }
+  else if (geomElem->HasElement("mesh"))
+    geomElem->GetElement("mesh")->GetAttribute("scale")->Set(scale);
+  else
+    gzerr << "Unknown geometry type\n";
+
   this->sceneNode->setScale(Conversions::Vector3(scale));
 }
 
@@ -442,7 +443,30 @@ void Visual::SetScale(const math::Vector3 &scale )
 /// Get the scale
 math::Vector3 Visual::GetScale()
 {
-  return Conversions::Vector3(this->sceneNode->getScale());
+  math::Vector3 result;
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+
+  if (geomElem->HasElement("box"))
+    result = geomElem->GetElement("box")->GetValueVector3("size");
+  else if (geomElem->HasElement("sphere"))
+  {
+    double r = geomElem->GetElement("sphere")->GetValueVector3("radius");
+    result.set(r,r,r);
+  }
+  else if (geomElem->HasElement("cylinder"))
+  {
+    double r = geomElem->GetElement("cylinder")->GetValueVector3("radius");
+    double l = geomElem->GetElement("cylinder")->GetValueVector3("length");
+    result.set(r,r,l);
+  }
+  else if (geomElem->HasElement("plane"))
+    result.set(1,1,1);
+  else if (geomElem->HasElement("mesh"))
+    result = geomElem->GetElement("mesh")->GetValueVector3("scale");
+  else
+    gzerr << "Unknown geometry type\n";
+
+  return result;
 }
 
 
@@ -788,29 +812,16 @@ void Visual::DisableTrackVisual()
 /// Get the normal map
 std::string Visual::GetNormalMap() const
 {
-  return (**this->normalMapNameP);
+  if (this->sdf->HasElement("material"))
+    return this->sdf->GetElement("material")->GetValueString("normal_map");
+  return std::string();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the normal map
 void Visual::SetNormalMap(const std::string &nmap)
 {
-  this->normalMapNameP->SetValue(nmap);
-  //RTShaderSystem::Instance()->UpdateShaders();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the shader
-std::string Visual::GetShader() const
-{
-  return (**this->shaderP);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the shader
-void Visual::SetShader(const std::string &shader)
-{
-  this->shaderP->SetValue(shader);
+  this->sdf->GetOrCreateElement("material")->GetAttribute("normal_map")->Set(nmap);
   //RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1135,3 +1146,23 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
   }
   */
 }
+
+std::string Visual::GetMeshName() const
+{
+  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+  if (geomElem->HasElement("box"))
+    return "unit_box";
+  else if (geomElem->HasElement("sphere"))
+    return "unit_sphere";
+  else if (geomElem->HasElement("cylinder"))
+    return "unit_cylinder";
+  else if (geomElem->HasElement("plane"))
+    return "unit_plane";
+  else if (geomElem->HasElement("mesh"))
+    return geomElem->GetAttribute("filename");
+  else
+    gzerr << "Unknown geometry type\n";
+
+  return std::string();
+}
+

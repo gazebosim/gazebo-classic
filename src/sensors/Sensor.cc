@@ -44,7 +44,7 @@ Sensor::~Sensor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the sensor
-void Sensor::Load( boost::shared_ptr<sdf::SDFElement> _sdf )
+void Sensor::Load(sdf::ElementPtr _sdf )
 {
   this->sdf = _sdf;
 }
@@ -86,7 +86,7 @@ void Sensor::Fini()
 /// Get name 
 std::string Sensor::GetName() const
 {
-  return ""; //NATT *this->sdf->name;
+  return this->sdf->GetValueString("name");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

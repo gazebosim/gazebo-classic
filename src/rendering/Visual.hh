@@ -44,16 +44,10 @@ namespace Ogre
   class AxisAlignedBox;
 }
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace common
   {
-    class XMLConfigNode;
     class Mesh;
   }
 
@@ -84,8 +78,11 @@ namespace gazebo
       /// \brief Load from a message
       public: void LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
   
-      /// \brief Load the visual
-      public: void Load(common::XMLConfigNode *node);
+      /// \brief Load the visual with a set of parameters
+      public: void Load( sdf::ElementPtr &sdf );
+
+      /// \brief Load the visual with default parameters
+      public: void Load();
   
       /// \brief Update the visual.
       public: void Update();
@@ -117,9 +114,6 @@ namespace gazebo
       /// \brief Attach a mesh to this visual by name
       public: void AttachMesh( const std::string &meshName );
   
-      /// \brief Save the visual
-      public: void Save(std::string &prefix, std::ostream &stream);
-      
       /// \brief Set the scale
       public: void SetScale( const math::Vector3 &scale );
   
@@ -233,6 +227,7 @@ namespace gazebo
       public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
   
       private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
+      private: std::string GetMeshName();
   
       private: std::string myMaterialName;
       private: std::string origMaterialName;
@@ -242,19 +237,6 @@ namespace gazebo
       private: float transparency;
   
       private: static unsigned int visualCounter;
-  
-      private: common::ParamT<math::Vector3> *xyzP;
-      private: common::ParamT<math::Quaternion> *rpyP;
-      private: common::ParamT<std::string> *meshNameP;
-      private: common::ParamT<std::string> *materialNameP;
-      private: common::ParamT<std::string> *normalMapNameP;
-      private: common::ParamT<std::string> *shaderP;
-      private: common::ParamT<bool> *castShadowsP;
-      private: common::ParamT<math::Vector3> *scaleP;
-      private: common::ParamT<math::Vector2d > *meshTileP;
-  
-      // NATY
-      //private: boost::recursive_mutex *mutex;
   
       private: bool isStatic;
       private: Ogre::StaticGeometry *staticGeom;

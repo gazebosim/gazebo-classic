@@ -13,16 +13,18 @@ message Light
     SPOT        = 2;
     DIRECTIONAL = 3;
   }
-  optional LightType type         = 2;
+  optional LightType type                = 2;
 
-  optional Pose pose              = 3;
-  optional Color diffuse          = 4;
-  optional Color specular         = 5;
-  optional Point attenuation      = 6;
-  optional Point direction        = 7;
-  optional float range            = 8;
-  optional bool cast_shadows      = 9;
-  optional float spot_inner_angle = 10;
-  optional float spot_outer_angle = 11;
-  optional float spot_falloff     = 12;
+  optional Pose pose                     = 3;
+  optional Color diffuse                 = 4;
+  optional Color specular                = 5;
+  optional float attenuation_constant    = 6;
+  optional float attenuation_linear      = 7;
+  optional float attenuation_quadratic   = 8;
+  optional Point direction               = 9;
+  optional float range                   = 10;
+  optional bool cast_shadows             = 11;
+  optional float spot_inner_angle        = 12;
+  optional float spot_outer_angle        = 13;
+  optional float spot_falloff            = 14;
 }
