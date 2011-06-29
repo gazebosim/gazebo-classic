@@ -225,7 +225,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
           // Remove all sub render states.
           renderState->reset();
-
+/*
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
           if (vis->GetShader() == "vertex")
           {
@@ -263,6 +263,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
 #endif
+          */
         }
 
 
