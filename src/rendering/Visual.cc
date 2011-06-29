@@ -61,6 +61,7 @@ Visual::Visual(const std::string &name_, Visual *parent_)
 
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
+  this->sdf.reset(new sdf::Element);
   this->Init();
 }
 
@@ -131,37 +132,35 @@ void Visual::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 {
-  std::string mesh = msg->mesh();
-
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
   geomElem->ClearElements();
 
-  if (msg->mesh_type() == BOX)
+  if (msg->mesh_type() == msgs::Visual::BOX)
   {
     sdf::ElementPtr elem = geomElem->AddElement("box");
-    elem->GetAttribute("size")->Set(commoN::Message::Convert(msg->scale()));
+    elem->GetAttribute("size")->Set(common::Message::Convert(msg->scale()));
   }
-  else if (msg->mesh_type() == SPHERE)
+  else if (msg->mesh_type() == msgs::Visual::SPHERE)
   {
     sdf::ElementPtr elem = geomElem->AddElement("sphere");
     elem->GetAttribute("radius")->Set(msg->scale().x());
   }
-  else if (msg->mesh_type() == CYLINDER)
+  else if (msg->mesh_type() == msgs::Visual::CYLINDER)
   {
     sdf::ElementPtr elem = geomElem->AddElement("cylinder");
     elem->GetAttribute("radius")->Set(msg->scale().x());
     elem->GetAttribute("length")->Set(msg->scale().y());
   }
-  else if (msg->mesh_type() == PLANE)
+  else if (msg->mesh_type() == msgs::Visual::PLANE)
   {
     math::Plane plane = common::Message::Convert(msg->plane());
     sdf::ElementPtr elem = geomElem->AddElement("plane");
-    elem->GetAttribute("normal")->Set(plane.GetNormal());
+    elem->GetAttribute("normal")->Set(plane.normal);
   }
-  else if (msg->mesh_type() == MESH)
+  else if (msg->mesh_type() == msgs::Visual::MESH)
   {
     sdf::ElementPtr elem = geomElem->AddElement("mesh");
-    elem->GetAttribute("filename")->Set( msg->mesh_filename );
+    elem->GetAttribute("filename")->Set( msg->mesh_filename() );
   }
 
   /*if (msg->has_plane())
@@ -176,7 +175,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->has_pose())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("origin");
-    math::Pose p( common::Message::Convert(msg->pose().position()) 
+    math::Pose p( common::Message::Convert(msg->pose().position()),
                   common::Message::Convert(msg->pose().orientation()) );
 
     elem->GetAttribute("pose")->Set( p );
@@ -185,13 +184,14 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->has_material_script())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetAttribute("script")->Set(msg->material());
+    elem->GetAttribute("script")->Set(msg->material_script());
   }
 
   if (msg->has_material_color())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("color")->GetAttribute("rgba")->Set(msg->material());
+    elem->GetOrCreateElement("color")->GetAttribute("rgba")->Set(
+        common::Message::Convert(msg->material_color()));
   }
 
   if (msg->has_cast_shadows())
@@ -199,7 +199,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
     this->sdf->GetAttribute("cast_shadows")->Set(msg->cast_shadows());
   }
 
-  this->Load(NULL);
+  this->Load();
   this->UpdateFromMsg(msg);
 }
 
@@ -423,7 +423,7 @@ void Visual::SetScale(const math::Vector3 &scale )
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
-    geomElem->GetElement("box")->GetAttribute("size").Set(scale);
+    geomElem->GetElement("box")->GetAttribute("size")->Set(scale);
   else if (geomElem->HasElement("sphere"))
     geomElem->GetElement("sphere")->GetAttribute("radius")->Set(scale.x);
   else if (geomElem->HasElement("cylinder"))
@@ -450,17 +450,17 @@ math::Vector3 Visual::GetScale()
     result = geomElem->GetElement("box")->GetValueVector3("size");
   else if (geomElem->HasElement("sphere"))
   {
-    double r = geomElem->GetElement("sphere")->GetValueVector3("radius");
-    result.set(r,r,r);
+    double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+    result.Set(r,r,r);
   }
   else if (geomElem->HasElement("cylinder"))
   {
-    double r = geomElem->GetElement("cylinder")->GetValueVector3("radius");
-    double l = geomElem->GetElement("cylinder")->GetValueVector3("length");
-    result.set(r,r,l);
+    double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
+    double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+    result.Set(r,r,l);
   }
   else if (geomElem->HasElement("plane"))
-    result.set(1,1,1);
+    result.Set(1,1,1);
   else if (geomElem->HasElement("mesh"))
     result = geomElem->GetElement("mesh")->GetValueVector3("scale");
   else
@@ -546,6 +546,11 @@ void Visual::SetMaterial(const std::string &materialName)
   }
 }
 
+/// Set the color of the visual
+void Visual::SetColor(const common::Color &/*_color*/)
+{
+  // TODO: implement this 
+}
 
 void Visual::AttachAxes()
 {
@@ -1135,8 +1140,8 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
   if (msg->has_transparency())
     this->SetTransparency(msg->transparency());
 
-  if (msg->has_material())
-    this->SetMaterial(msg->material());
+  if (msg->has_material_script())
+    this->SetMaterial(msg->material_script());
 
   /*if (msg->points.size() > 0)
   {
@@ -1159,7 +1164,7 @@ std::string Visual::GetMeshName() const
   else if (geomElem->HasElement("plane"))
     return "unit_plane";
   else if (geomElem->HasElement("mesh"))
-    return geomElem->GetAttribute("filename");
+    return geomElem->GetValueString("filename");
   else
     gzerr << "Unknown geometry type\n";
 

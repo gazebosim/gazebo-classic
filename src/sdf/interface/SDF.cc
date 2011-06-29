@@ -354,6 +354,10 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
     gzerr << "Unable to find value for key[" << _key << "]\n";
   return result;
 }
+void Element::ClearElements()
+{
+  this->elements.clear();
+}
 
 SDF::SDF()
   : root(new Element)

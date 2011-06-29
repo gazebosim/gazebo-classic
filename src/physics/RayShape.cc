@@ -68,7 +68,7 @@ RayShape::~RayShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set to true in order to view individual rays
-void RayShape::SetDisplayType( bool displayRays )
+void RayShape::SetDisplayType( bool /*_displayRays*/ )
 {
   /* NATY: do we need this?
   if (Simulator::Instance()->GetRenderEngineEnabled() )

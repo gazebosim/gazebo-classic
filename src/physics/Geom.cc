@@ -161,11 +161,11 @@ void Geom::CreateBoundingBox()
     // set. The flag should exist only on the rendering side. May need to
     // put something in the message to indicate that this is a bounding box
     //msg.set_visible( RenderState::GetShowBoundingBoxes() );
-    msg.set_mesh( "unit_box" );
+    msg.set_mesh_type( msgs::Visual::BOX );
     if (this->IsStatic() )
-      msg.set_material( "Gazebo/YellowTransparent" );
+      msg.set_material_script( "Gazebo/YellowTransparent" );
     else
-      msg.set_material( "Gazebo/GreenTransparent" );
+      msg.set_material_script( "Gazebo/GreenTransparent" );
 
     common::Message::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
     common::Message::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
@@ -390,9 +390,9 @@ void Geom::EnabledCB(bool enabled)
   common::Message::Init(msg, this->bbVisual);
 
   if (enabled)
-    msg.set_material( "Gazebo/GreenTransparent" );
+    msg.set_material_script( "Gazebo/GreenTransparent" );
   else
-    msg.set_material( "Gazebo/RedTransparent" );
+    msg.set_material_script( "Gazebo/RedTransparent" );
 
   this->visPub->Publish(msg);
 }

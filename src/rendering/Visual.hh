@@ -33,6 +33,7 @@
 #include "common/Param.hh"
 #include "common/Messages.hh"
 
+#include "sdf/interface/sdf.h"
 #include "rendering/RenderTypes.hh"
 
 namespace Ogre
@@ -122,6 +123,9 @@ namespace gazebo
   
       /// \brief Set the material
       public: void SetMaterial(const std::string &materialName);
+
+      /// \brief Set the color of the visual
+      public: void SetColor(const common::Color &_color);
   
       public: void AttachAxes();
   
@@ -190,12 +194,6 @@ namespace gazebo
       /// \brief Set the normal map
       public: void SetNormalMap(const std::string &nmap);
   
-      /// \brief Get the shader
-      public: std::string GetShader() const;
-  
-      /// \brief Set the shader
-      public: void SetShader(const std::string &shader);
-  
       /// \brief True on or off a ribbon trail
       public: void SetRibbonTrail(bool value);
   
@@ -227,8 +225,10 @@ namespace gazebo
       public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
   
       private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
-      private: std::string GetMeshName();
+      private: std::string GetMeshName() const;
   
+      private: sdf::ElementPtr sdf;
+
       private: std::string myMaterialName;
       private: std::string origMaterialName;
   

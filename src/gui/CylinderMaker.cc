@@ -38,8 +38,8 @@ CylinderMaker::CylinderMaker()
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
-  this->visualMsg->set_mesh( "unit_cylinder" );
-  this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
+  this->visualMsg->set_mesh_type( msgs::Visual::CYLINDER );
+  this->visualMsg->set_material_script( "Gazebo/TurquoiseGlowOutline" );
 
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }

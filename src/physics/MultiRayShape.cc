@@ -34,13 +34,13 @@ MultiRayShape::MultiRayShape(GeomPtr parent)
   this->rayFanMsg->mutable_header()->set_str_id( this->GetName()+"_fan" );
   this->rayFanMsg->set_parent_id( this->geomParent->GetName() );
   this->rayFanMsg->set_render_type( msgs::Visual::TRIANGLE_FAN );
-  this->rayFanMsg->set_material( "Gazebo/BlueLaser" );
+  this->rayFanMsg->set_material_script( "Gazebo/BlueLaser" );
 
   this->rayFanOutlineMsg = new msgs::Visual();
   this->rayFanOutlineMsg->mutable_header()->set_str_id( this->GetName()+"_fanoutline" );
   this->rayFanOutlineMsg->set_parent_id( this->geomParent->GetName() );
   this->rayFanOutlineMsg->set_render_type( msgs::Visual::LINE_STRIP );
-  this->rayFanOutlineMsg->set_material( "Gazebo/BlueGlow" );
+  this->rayFanOutlineMsg->set_material_script( "Gazebo/BlueGlow" );
 
   common::Param::Begin(&this->parameters);
   this->rayCountP = new common::ParamT<int>("ray_count",0,1);

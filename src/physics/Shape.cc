@@ -40,6 +40,6 @@ Shape::~Shape()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Shape::Load(common::XMLConfigNode *node)
+void Shape::Load(common::XMLConfigNode * /*_node*/)
 {
 }

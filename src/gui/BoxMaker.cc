@@ -39,8 +39,8 @@ BoxMaker::BoxMaker()
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
-  this->visualMsg->set_mesh( "unit_box_U1V1" );
-  this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
+  this->visualMsg->set_mesh_type( msgs::Visual::BOX );
+  this->visualMsg->set_material_script( "Gazebo/TurquoiseGlowOutline" );
   common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 

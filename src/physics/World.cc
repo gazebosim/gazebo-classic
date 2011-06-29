@@ -386,7 +386,7 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Delete an entity by name
-void World::DeleteEntityCB(const std::string &name)
+void World::DeleteEntityCB(const std::string &/*_name*/)
 {
   // TODO: Implement this function
 }
@@ -604,7 +604,7 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
     this->OnStep();
 }
 
-void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
+void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
 {
   common::Message::Stamp(this->sceneMsg.mutable_header());
 

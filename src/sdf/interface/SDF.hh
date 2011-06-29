@@ -70,6 +70,7 @@ namespace sdf
     public: boost::shared_ptr<Element> GetElement(const std::string &_name) const;
     public: boost::shared_ptr<Element> GetOrCreateElement(const std::string &_name);
     public: boost::shared_ptr<Element> AddElement(const std::string &_name);
+    public: void ClearElements();
 
     private: std::string name;
     private: std::string required;

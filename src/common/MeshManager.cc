@@ -43,10 +43,6 @@ MeshManager::MeshManager()
   this->ogreLoader = new OgreLoader();
   this->stlLoader = new STLLoader();
 
-CreatePlane(const std::string &name, const math::Plane &plane,
-                              const math::Vector2d &segments, 
-                              const math::Vector2d &uvTile)
-
   // Create some basic shapes
   this->CreatePlane("unit_plane", math::Plane(math::Vector3(0,0,1),
                                               math::Vector2d(1,1), 0), 

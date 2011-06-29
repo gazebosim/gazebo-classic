@@ -308,8 +308,8 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
 
 msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
 {
-  XMLConfigNode *cnode = NULL;
   msgs::Visual result;
+/*  XMLConfigNode *cnode = NULL;
 
   result.set_cast_shadows( node->GetBool("cast_shadows",true,0) );
   result.set_visible( node->GetBool("visible",true,0) );
@@ -386,6 +386,7 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
         Convert(node->GetChild("origin")->GetRotation("rpy",math::Quaternion())));
   }
 
+*/
   return result;
 }
 

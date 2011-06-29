@@ -224,7 +224,10 @@ Mass ODEGeom::GetBodyMassMatrix()
   dMatrix3 r;
 
   if (!this->placeable)
-    return NULL;
+  {
+    gzerr << "ODEGeom is not placeable\n";
+    return Mass();
+  }
 
   cog = this->mass.GetCoG();
   principals = this->mass.GetPrincipalMoments();

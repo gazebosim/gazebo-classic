@@ -3,6 +3,7 @@ import "header.proto";
 import "pose.proto";
 import "point.proto";
 import "plane.proto";
+import "color.proto";
 
 message Visual
 {
@@ -38,16 +39,16 @@ message Visual
   required MeshType mesh_type   = 4;
   optional string mesh_filename = 5;
 
-  optional string parent_id   = 6;
-  optional string material_script    = 7;
-  optional Color material_color    = 7;
-  optional bool cast_shadows  = 8;
-  optional bool attach_axes   = 9;
-  optional bool visible       = 10;
-  optional float transparency = 11;
-  optional Pose pose          = 12;
-  optional Point scale        = 13;
-  repeated Point points       = 16;
-  optional Plane plane        = 17;
-  optional bool is_static     = 18;
+  optional string parent_id        = 6;
+  optional string material_script  = 7;
+  optional Color material_color    = 8;
+  optional bool cast_shadows      = 9;
+  optional bool attach_axes       = 10;
+  optional bool visible           = 11;
+  optional float transparency     = 12;
+  optional Pose pose              = 13;
+  optional Point scale            = 14;
+  repeated Point points           = 15;
+  optional Plane plane            = 16;
+  optional bool is_static         = 17;
 }
