@@ -118,10 +118,12 @@ else (build_errors)
   # Write the config.h file
   configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
   INSTALL_INCLUDES(${PROJECT_BINARY_DIR}/gazebo_config.h "")
+  install(FILES ${PROJECT_BINARY_DIR}/gazebo_config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
 
   configure_file (${gazebo_cmake_dir}/gazebo.h.in ${PROJECT_BINARY_DIR}/gazebo.h)
   INSTALL_INCLUDES(${CMAKE_CURRENT_BINARY_DIR}/gazebo.h "")
-  
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazebo.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
+
   ########################################
   # Make the gazebo rc file
   configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)

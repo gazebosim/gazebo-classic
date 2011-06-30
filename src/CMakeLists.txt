@@ -1,3 +1,5 @@
+add_definitions(${tinyxml_cflags})
+
 include_directories( 
   ${PROJECT_SOURCE_DIR}/src 
   ${PROJECT_BINARY_DIR}/src 
@@ -5,6 +7,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
+  ${tinyxml_include_dirs}
 )
 
 link_directories(  
@@ -12,6 +15,7 @@ link_directories(
   ${BOOST_LIBRARY_DIRS} 
   ${assimp_library_dirs} 
   ${ODE_LIBRARY_DIRS}
+  ${tinyxml_library_dirs}
 )
 
 add_subdirectory(msgs)
@@ -55,7 +59,8 @@ target_link_libraries( gzserver gazebo_common
                                 gazebo_rendering
                                 gazebo_msgs
                                 assimp
-                                pthread)
+                                pthread
+                                ${tinyxml_libraries})
 
 target_link_libraries( gzphysics gazebo_common
                                  gazebo_transport
@@ -88,7 +93,7 @@ INSTALL_EXECUTABLE( gzclient )
 INSTALL_EXECUTABLE( gzsensor )
 INSTALL_EXECUTABLE( gzserver )
 
-add_library(gazebo_server SHARED Server.cc Master.cc)
+add_library(gazebo_server SHARED Server.cc Master.cc ${sources})
 target_link_libraries( gazebo_server gazebo_common
                                      gazebo_transport
                                      gazebo_physics
@@ -96,7 +101,8 @@ target_link_libraries( gazebo_server gazebo_common
                                      gazebo_rendering
                                      gazebo_msgs
                                      assimp
-                                     pthread)
+                                     pthread
+                                     gazebo_sdf_parser)
 
 add_library(gazebo_client SHARED GuiClient.cc)
 target_link_libraries( gazebo_client gazebo_common

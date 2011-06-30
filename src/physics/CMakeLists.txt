@@ -2,6 +2,10 @@ if (INCLUDE_ODE)
   add_subdirectory(ode)
 endif()
 
+include_directories(${tinyxml_include_dirs})
+link_directories( ${tinyxml_library_dirs})
+add_definitions(${tinyxml_cflags})
+
 set (sources Base.cc
              Body.cc
              BoxShape.cc
@@ -61,12 +65,14 @@ set (headers BallJoint.hh
              Inertial.hh
 )
 
-add_library(gazebo_physics SHARED ${sources})
+add_library(gazebo_physics SHARED ${sources} ${sources})
 
 target_link_libraries(gazebo_physics gazebo_common 
+                                     gazebo_sdf_parser
                                      ${TBB_LIBRARIES} 
                                      ${libtool_library} 
-                                     ${boost_libraries})
+                                     ${boost_libraries}
+                                     ${tinyxml_libraries})
 
 if (INCLUDE_ODE) 
   target_link_libraries(gazebo_physics gazebo_physics_ode)
