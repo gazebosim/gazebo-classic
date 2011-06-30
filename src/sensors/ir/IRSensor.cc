@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-#include "common/XMLConfig.hh"
 #include "common/Global.hh"
 #include "RayShape.hh"
 #include "MultiRayShape.hh"
@@ -33,7 +32,6 @@
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 
 #include "IRSensor.hh"
 
@@ -59,8 +57,8 @@ IRSensor::~IRSensor()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Load the ray using parameter from an XMLConfig node
-void IRSensor::LoadChild(XMLConfigNode *node)
+/// Load the ray using parameter from an SDF
+void IRSensor::LoadChild( sdf::ElementPtr &_sdf )
 {
   if (this->body == NULL)
   {

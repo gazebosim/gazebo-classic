@@ -24,7 +24,6 @@
 #include "common/SystemPaths.hh"
 #include "common/Image.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -46,16 +45,6 @@ MapShape::MapShape(GeomPtr parent)
   this->AddType(Base::MAP_SHAPE);
 
   this->root = new QuadNode(NULL);
-
-  common::Param::Begin(&this->parameters);
-  this->negativeP = new common::ParamT<int>("negative", 0, 0);
-  this->thresholdP = new common::ParamT<double>( "threshold", 200.0, 0);
-  this->wallHeightP = new common::ParamT<double>( "height", 1.0, 0 );
-  this->scaleP = new common::ParamT<double>("scale",1.0,0);
-  this->materialP = new common::ParamT<std::string>("material", "", 0);
-  this->granularityP = new common::ParamT<int>("granularity", 5, 0);
-  common::Param::End();
-
 }
 
 
@@ -69,13 +58,6 @@ MapShape::~MapShape()
   if (this->mapImage)
     delete this->mapImage;
   this->mapImage = NULL;
-
-  delete this->negativeP;
-  delete this->thresholdP;
-  delete this->wallHeightP;
-  delete this->scaleP;
-  delete this->materialP;
-  delete this->granularityP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,22 +68,18 @@ void MapShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void MapShape::Load(common::XMLConfigNode *node)
+void MapShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  std::string imageFilename = node->GetString("image","",1);
-
-  this->negativeP->Load(node);
-  this->thresholdP->Load(node);
-  this->wallHeightP->Load(node);
-  this->scaleP->Load(node);
-  this->materialP->Load(node);
-  this->granularityP->Load(node);
+  Shape::Load(_sdf);
+  std::string imageFilename = _sdf->GetValueString("filename");
 
   // Make sure they are ok
-  if (this->scaleP->GetValue() <= 0) this->scaleP->SetValue( 0.1 );
-  if (this->thresholdP->GetValue() <=0) this->thresholdP->SetValue(200);
-  if (this->wallHeightP->GetValue() <= 0) this->wallHeightP->SetValue( 1.0 );
+  if (_sdf->GetValueDouble("scale") <= 0) 
+    _sdf->GetAttribute("scale")->Set( 0.1 );
+  if (this->sdf->GetValueDouble("threshold") <=0) 
+    _sdf->GetAttribute("threshold")->Set(200);
+  if (this->sdf->GetValueDouble("height") <= 0) 
+    _sdf->GetAttribute("height")->Set( 1.0 );
 
   // Load the image 
   this->mapImage = new common::Image();
@@ -138,6 +116,7 @@ void MapShape::Init()
 // Create the ODE boxes
 void MapShape::CreateBoxes(QuadNode *node)
 {
+  /*TODO: fix this to use SDF 
   if (node->leaf)
   {
     if (!node->valid || !node->occupied)
@@ -149,16 +128,14 @@ void MapShape::CreateBoxes(QuadNode *node)
     GeomPtr geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetBody());
     geom->SetSaveable(false);
 
-    common::XMLConfig *boxConfig = new common::XMLConfig();
-
     stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
 
-    float x = (node->x + node->width / 2.0) * this->scaleP->GetValue();
-    float y = (node->y + node->height / 2.0) * this->scaleP->GetValue();
-    float z = this->wallHeightP->GetValue() / 2.0;
-    float xSize = (node->width) * this->scaleP->GetValue();
-    float ySize = (node->height) * this->scaleP->GetValue();
-    float zSize = this->wallHeightP->GetValue();
+    float x = (node->x + node->width / 2.0) * this->sdf->GetValueDouble("scale");
+    float y = (node->y + node->height / 2.0) * this->sdf->GetValueDouble("scale");
+    float z = this->sdf->GetValueDouble("height") / 2.0;
+    float xSize = (node->width) * this->sdf->GetValueDouble("scale");
+    float ySize = (node->height) * this->sdf->GetValueDouble("scale");
+    float zSize = this->sdf->GetValueDouble("height");
 
     char geomName[256];
     sprintf(geomName,"map_geom_%d",geomCounter++);
@@ -191,6 +168,7 @@ void MapShape::CreateBoxes(QuadNode *node)
       this->CreateBoxes(*iter);
     }
   }
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -314,7 +292,7 @@ void MapShape::BuildTree(QuadNode *node)
 
   //int diff = labs(freePixels - occPixels);
 
-  if ((int)(node->width*node->height) > (**this->granularityP))
+  if ((int)(node->width*node->height) > this->sdf->GetValueInt("granularity"))
   {
     float newX, newY;
     float newW, newH;
@@ -397,25 +375,13 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
       pixColor = this->mapImage->GetPixel(x, y);
 
       v = (unsigned char)(255 * ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
-      if (this->negativeP->GetValue())
+      if (this->sdf->GetValueBool("negative"))
         v = 255 - v;
 
-      if (v > this->thresholdP->GetValue())
+      if (v > this->sdf->GetValueDouble("threshold"))
         freePixels++;
       else
         occPixels++;
     }
   }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void MapShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->negativeP) << "\n";
-  stream << prefix << *(this->thresholdP) << "\n";
-  stream << prefix << *(this->wallHeightP) << "\n";
-  stream << prefix << *(this->scaleP) << "\n";
-  stream << prefix << *(this->materialP) << "\n";
-  stream << prefix << *(this->granularityP) << "\n";
 }

@@ -6,11 +6,6 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
   namespace gui
   {
     class RenderWidget;
@@ -24,7 +19,7 @@ namespace gazebo
       public: MainWindow();
       public: virtual ~MainWindow();
 
-      public: void Load( const common::XMLConfigNode *node );
+      public: void Load();
       public: void Init();
 
       protected: void closeEvent(QCloseEvent *event);

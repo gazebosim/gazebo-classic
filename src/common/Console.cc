@@ -21,11 +21,9 @@
  */
 
 //#include <time.h>
-//#include <string.h>
+#include <string.h>
 #include <sstream>
 
-#include "common/Param.hh"
-#include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
@@ -40,19 +38,12 @@ Console::Console()
 {
   this->msgStream = &std::cout;
   this->errStream = &std::cerr;
-
-  Param::Begin(&this->parameters);
-  this->quietP = new ParamT<int>("quiet",false,0);
-  this->logDataP = new ParamT<bool>("log_data",false,0);
-  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Console::~Console()
 {
-  delete this->quietP;
-  delete this->logDataP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,14 +58,12 @@ Console *Console::Instance()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the Message parameters
-void Console::Load(XMLConfigNode *node)
+void Console::Load()
 {
   char logFilename[50];
 
-  this->quietP->Load(node);
-  this->logDataP->Load(node);
-
-  if (**(this->logDataP))
+  // TODO: Reimplement logging
+  /*if (**(this->logDataP))
   {
     time_t t;
     struct tm *localTime;
@@ -90,38 +79,30 @@ void Console::Load(XMLConfigNode *node)
   }
   else
   {
+  */
     strcpy(logFilename,"/dev/null");
-  }
+  //}
 
   this->logStream.open(logFilename, std::ios::out);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Save in xml format
-void Console::Save(std::string &prefix, std::ostream &stream) const
-{
-  stream << prefix << *(this->quietP) << "\n";
-  stream << prefix << *(this->logDataP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the verbosity
 void Console::SetQuiet( bool q )
 {
-  this->quietP->SetValue( q );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the message stream
 std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 {
-  if (**this->quietP)
+  //if (**this->quietP)
     return this->nullStream;
-  else
-  {
+  //else
+  //{
     *this->msgStream << "\033[1;" << color << "m" << lbl <<  "\033[0m ";
     return *this->msgStream;
-  }
+  //}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

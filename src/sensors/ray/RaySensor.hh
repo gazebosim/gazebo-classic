@@ -32,7 +32,6 @@
 namespace gazebo
 {
   class OgreDynamicLines;
-  class XMLConfigNode;
   class Geom;
   class MultiRayShape;
 
@@ -58,12 +57,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RaySensor();
   
-    /// Load the ray using parameter from an XMLConfig node
+    /// Load the ray using parameter from an SDF
     /// \param node The XMLConfig node
-    protected: virtual void LoadChild(XMLConfigNode *node);
-  
-    /// \brief Save the sensor info in XML format
-    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
+    protected: virtual void LoadChild( sdf::ElementPtr &_sdf );
   
     /// Initialize the ray
     protected: virtual void InitChild();

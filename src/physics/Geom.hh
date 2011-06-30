@@ -26,7 +26,6 @@
 #include "common/CommonTypes.hh"
 
 #include "physics/PhysicsTypes.hh"
-#include "physics/Mass.hh"
 #include "physics/Entity.hh"
 
 namespace gazebo
@@ -46,7 +45,7 @@ namespace gazebo
       public: void Fini();
   
       /// \brief Load the geom
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       public: virtual void Init();
   
@@ -56,9 +55,6 @@ namespace gazebo
       /// \brief Set the encapsulated geometry object
       public: void SetGeom(bool placeable);
     
-      /// \brief Update function for geoms
-      public: void Update();
-   
       /// \brief Return whether this geom is placeable
       public: bool IsPlaceable() const;
       
@@ -70,15 +66,6 @@ namespace gazebo
       /// \param bits The bits
       public: virtual void SetCollideBits(unsigned int bits) = 0;
     
-      /// \brief Get the mass of the geom
-      public: virtual Mass GetBodyMassMatrix() = 0;
-    
-      /// \brief Set the laser fiducial integer id
-      public: void SetLaserFiducialId(int id);
-    
-      /// \brief Get the laser fiducial integer id
-      public: int GetLaserFiducialId() const;
-    
       /// \brief Set the laser retro reflectiveness 
       public: void SetLaserRetro(float retro);
     
@@ -88,26 +75,14 @@ namespace gazebo
       /// \brief Set the visibility of the bounding box
       public: void ShowBoundingBox(const bool &show);
   
-      /// \brief Set the mass
-      public: void SetMass(const double &mass);
-  
-      /// \brief Set the mass
-      public: void SetMass(const Mass &mass);
-  
       /// \brief Get the body this geom belongs to
       public: BodyPtr GetBody() const;
   
       /// \brief Get the model this geom belongs to
       public: ModelPtr GetModel() const;
   
-      /// \brief Set the friction mode of the geom
-      public: void SetFrictionMode( const bool &v );
-  
       /// \brief Get the bounding box for this geom
       public: virtual math::Box GetBoundingBox() const = 0;
-  
-      /// \brief Get a pointer to the mass
-      public: const Mass &GetMass() const;
   
       /// \brief Get the shape type
       public: Base::EntityType GetShapeType();
@@ -179,17 +154,6 @@ namespace gazebo
       protected: BodyPtr body;
     
       protected: bool placeable;
-  
-      protected: Mass mass;
-  
-      private: common::ParamT<int> *laserFiducialIdP;
-      private: common::ParamT<float> *laserRetroP;
-  
-      ///  Mass as a double
-      private: common::ParamT<double> *massP;
-      protected: common::ParamT<math::Vector3> *xyzP;
-      protected: common::ParamT<math::Quaternion> *rpyP;
-      protected: common::ParamT<bool> *enableContactsP;
   
       private: float transparency;
   

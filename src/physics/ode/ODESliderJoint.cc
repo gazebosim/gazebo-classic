@@ -22,7 +22,6 @@
 
 #include "gazebo_config.h"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "physics/Body.hh"
 #include "physics/ode/ODESliderJoint.hh"
@@ -47,9 +46,9 @@ ODESliderJoint::~ODESliderJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the joint
-void ODESliderJoint::Load(common::XMLConfigNode *node)
+void ODESliderJoint::Load( sdf::ElementPtr &_sdf )
 {
-  SliderJoint<ODEJoint>::Load(node);
+  SliderJoint<ODEJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////////////////////////////////

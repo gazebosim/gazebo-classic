@@ -18,7 +18,6 @@
  * Author: Nate Koenig
  */
 
-#include "common/Param.hh"
 #include "common/Messages.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -41,14 +40,6 @@ PhysicsEngine::PhysicsEngine(WorldPtr world)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(world->GetName());
   this->vis_pub = this->node->Advertise<msgs::Visual>("~/visual");
-
-  common::Param::Begin(&this->parameters);
-  this->gravityP = new common::ParamT<math::Vector3>("gravity",math::Vector3(0.0, -9.80665, 0.0), 0);
-  this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
-
-  this->updateRateP = new common::ParamT<double>("update_rate", 0.0, 0);
-  this->stepTimeP = new common::ParamT<common::Time>("step_time",0.025,0);
-  common::Param::End();
 
   {
     /*this->visualMsg = new VisualMsg();
@@ -119,45 +110,13 @@ PhysicsEngine::~PhysicsEngine()
     msg.set_action( msgs::Visual::DELETE );
     this->vis_pub->Publish(msg);
   }
-
-  delete this->gravityP;
-  delete this->updateRateP;
-  delete this->stepTimeP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return (**this->gravityP);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the time between each update cycle
-double PhysicsEngine::GetUpdateRate() const
-{
-  return (**this->updateRateP);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the time between each update cycle
-void PhysicsEngine::SetUpdateRate(double rate) const
-{
-  this->updateRateP->SetValue(rate);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the time between each update cycle
-common::Time PhysicsEngine::GetStepTime() const
-{
-  return **this->stepTimeP;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the time between each update cycle
-void PhysicsEngine::SetStepTime(common::Time time)
-{
-  this->stepTimeP->SetValue(time);
+  return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,67 +175,4 @@ void PhysicsEngine::ShowContacts(const bool &show)
   if (show)
     this->contactLinesIter = this->contactLines.begin();
     */
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the count of the parameters
-unsigned int PhysicsEngine::GetParamCount() const
-{
-  return this->parameters.size();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a param by index
-common::Param *PhysicsEngine::GetParam(unsigned int index) const
-{
-  if (index < this->parameters.size())
-    return this->parameters[index];
-  else
-    gzerr << "Invalid index[" << index << "]\n";
-  return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a parameter by name
-common::Param *PhysicsEngine::GetParam(const std::string &key) const
-{
-  common::Param_V::const_iterator iter;
-  common::Param *result = NULL;
-
-  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
-  {
-    if ((*iter)->GetKey() == key)
-    {
-      result = *iter;
-      break;
-    }
-  }
-
-  if (result == NULL)
-    gzerr << "Unable to find common::Param using key[" << key << "]\n";
-
-  return result;
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set a parameter by name
-void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
-{
-  common::Param_V::const_iterator iter;
-  common::Param *result = NULL;
-
-  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
-  {
-    if ((*iter)->GetKey() == key)
-    {
-      result = *iter;
-      break;
-    }
-  }
-
-  if (result == NULL)
-    gzerr << "Unable to find common::Param using key[" << key << "]\n";
-  else
-    result->SetFromString( value, true );
 }

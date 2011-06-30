@@ -15,8 +15,6 @@
  *
 */
 
-#include "common/XMLConfig.hh"
-
 #include "physics/Geom.hh"
 #include "physics/PlaneShape.hh"
 
@@ -31,26 +29,19 @@ PlaneShape::PlaneShape(GeomPtr parent)
 {
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
-
-  common::Param::Begin(&this->parameters);
-  this->normalP = new common::ParamT<math::Vector3>("normal",math::Vector3(0,0,1),0);
-  this->normalP->Callback( &PlaneShape::SetNormal, this );
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 PlaneShape::~PlaneShape()
 {
-  delete this->normalP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the plane
-void PlaneShape::Load(common::XMLConfigNode *node)
+void PlaneShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  this->normalP->Load(node->GetChild("plane"));
+  Shape::Load(_sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,13 +49,6 @@ void PlaneShape::Load(common::XMLConfigNode *node)
 void PlaneShape::Init()
 {
   this->CreatePlane();
-}
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void PlaneShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->normalP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +67,6 @@ void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
 /// Set the normal
 void PlaneShape::SetNormal( const math::Vector3 &norm )
 {
-  this->normalP->SetValue(norm);
+  this->sdf->GetAttribute("normal")->Set(norm);
   this->CreatePlane();
 }

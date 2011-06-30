@@ -51,32 +51,56 @@ namespace sdf
                               const std::string &_defaultvalue,
                               bool _required);
 
+    public: void AddValue(const std::string &_type, 
+                       const std::string &_defaultValue, bool _required);
+
+    /// \brief Get the param of an attribute.
+    /// \param _key the name of the attribute
     public: ParamPtr GetAttribute(const std::string &_key);
 
-    public: bool GetValueBool(const std::string &_key);
-    public: int GetValueInt(const std::string &_key);
-    public: float GetValueFloat(const std::string &_key);
-    public: double GetValueDouble(const std::string &_key);
-    public: unsigned int GetValueUInt(const std::string &_key);
-    public: char GetValueChar(const std::string &_key);
-    public: std::string GetValueString(const std::string &_key);
-    public: gazebo::math::Vector3 GetValueVector3(const std::string &_key);
-    public: gazebo::math::Quaternion GetValueQuaternion(const std::string &_key);
-    public: gazebo::math::Pose GetValuePose(const std::string &_key);
-    public: gazebo::common::Color GetValueColor(const std::string &_key);
+    /// \brief Get the param of the elements value
+    public: ParamPtr GetValue();
+
+    public: bool GetValueBool(const std::string &_key = "");
+    public: int GetValueInt(const std::string &_key = "");
+    public: float GetValueFloat(const std::string &_key = "");
+    public: double GetValueDouble(const std::string &_key = "");
+    public: unsigned int GetValueUInt(const std::string &_key = "");
+    public: char GetValueChar(const std::string &_key = "" );
+    public: std::string GetValueString(const std::string &_key = "");
+    public: gazebo::math::Vector3 GetValueVector3(const std::string &_key = "");
+    public: gazebo::math::Quaternion GetValueQuaternion(const std::string &_key = "");
+    public: gazebo::math::Pose GetValuePose(const std::string &_key = "");
+    public: gazebo::common::Color GetValueColor(const std::string &_key = "");
  
     public: bool HasElement(const std::string &_name) const;
 
-    public: boost::shared_ptr<Element> GetElement(const std::string &_name) const;
-    public: boost::shared_ptr<Element> GetOrCreateElement(const std::string &_name);
-    public: boost::shared_ptr<Element> AddElement(const std::string &_name);
+    public: ElementPtr GetElement(const std::string &_name) const;
+    public: ElementPtr GetFirstElement() const;
+    public: ElementPtr GetNextElement(const std::string &_name, 
+                                       const ElementPtr &_elem) const;
+
+    public: ElementPtr GetOrCreateElement(const std::string &_name);
+    public: ElementPtr AddElement(const std::string &_name);
     public: void ClearElements();
+
+    private: boost::shared_ptr<Param> CreateParam(const std::string &_key, 
+                 const std::string &_type, const std::string &_defaultValue, 
+                 bool _required);
 
     private: std::string name;
     private: std::string required;
 
+    // Attributes of this element
     public: Param_V attributes;
+
+    // Value of this element
+    public: ParamPtr value;
+
+    // The existing child elements
     public: ElementPtr_V elements;
+
+    // The possible child elements
     public: ElementPtr_V elementDescriptions;
   };
 

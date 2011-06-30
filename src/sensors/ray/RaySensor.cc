@@ -23,11 +23,9 @@
 #include "World.hh"
 #include "math/Vector3.hh"
 #include "SensorFactory.hh"
-#include "common/XMLConfig.hh"
 #include "MultiRayShape.hh"
 #include "PhysicsEngine.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 #include "MultiRayShape.hh"
 #include "RaySensor.hh"
 
@@ -55,8 +53,8 @@ RaySensor::~RaySensor()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Load the ray using parameter from an XMLConfig node
-void RaySensor::LoadChild(XMLConfigNode *node)
+/// Load the ray using parameter from an SDF 
+void RaySensor::LoadChild( sdf::ElementPtr &_sdf )
 {
   if (this->body == NULL)
     gzthrow("Null body in the ray sensor");
@@ -67,14 +65,7 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 
   this->laserShape = (MultiRayShape*)(this->laserGeom->GetShape());
 
-  this->laserShape->Load( node );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save the sensor info in XML format
-void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
-{
-  this->laserShape->Save(prefix, stream);
+  this->laserShape->Load( _sdf );
 }
 
 //////////////////////////////////////////////////////////////////////////////

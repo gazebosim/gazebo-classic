@@ -23,7 +23,6 @@
 #define RENDERING_CAMERA_HH
 
 #include "common/Event.hh"
-#include "common/Param.hh"
 #include "common/Time.hh"
 
 #include "math/Angle.hh"

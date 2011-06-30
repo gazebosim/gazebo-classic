@@ -17,7 +17,6 @@
 #ifndef ODECYLINDERSHAPE_HH
 #define ODECYLINDERSHAPE_HH
 
-#include "physics/Mass.hh"
 #include "physics/CylinderShape.hh"
 #include "physics/ode/ODEPhysics.hh"
 
@@ -34,21 +33,6 @@ namespace gazebo
         CylinderShape::SetSize(radius, length);
         ODEGeomPtr oParent;
         oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
-  
-        dMass odeMass;
-        math::Pose rpose;
-      
-        Mass mass = this->geomParent->GetMass();
-    
-        // Initialize mass matrix
-        dMassSetCylinderTotal(&odeMass, mass.GetAsDouble(), 3, 
-                              radius, length);
-        rpose = this->geomParent->GetRelativePose();
-        dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
-   
-        ODEPhysics::ConvertMass(&mass, &odeMass);
-    
-        this->geomParent->SetMass(mass);
   
         oParent->SetGeom( dCreateCylinder( 0, radius, length ), true );
       }

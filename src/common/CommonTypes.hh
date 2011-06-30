@@ -11,7 +11,6 @@ namespace gazebo
   namespace common
   {
     class Param;
-    class XMLConfigNode;
     class Time;
     class Image;
 

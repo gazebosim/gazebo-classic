@@ -30,7 +30,6 @@
 #include "math/Quaternion.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
-#include "common/Param.hh"
 #include "common/Messages.hh"
 
 #include "sdf/interface/sdf.h"

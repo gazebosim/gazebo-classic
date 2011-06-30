@@ -25,6 +25,7 @@ set (sources Base.cc
              SurfaceParams.cc
              TrimeshShape.cc
              World.cc
+             Inertial.cc
 ) 
 
 set (headers BallJoint.hh
@@ -57,6 +58,7 @@ set (headers BallJoint.hh
              TrimeshShape.hh
              UniversalJoint.hh
              World.hh
+             Inertial.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})

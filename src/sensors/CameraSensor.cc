@@ -59,12 +59,18 @@ CameraSensor::~CameraSensor()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Load the camera
-void CameraSensor::Load( sdf::ElementPtr _sdf )
+// Load the camera with SDF parameters
+void CameraSensor::Load( sdf::ElementPtr &_sdf )
 {
-  Sensor::Load(_sdf);
+  this->sdf = _sdf;
+}
 
-  this->camera->Load( _sdf );
+//////////////////////////////////////////////////////////////////////////////
+/// Load the camera using default parameters
+void CameraSensor::Load()
+{
+  Sensor::Load();
+  this->camera->Load( this->sdf );
 
   // Do some sanity checks
   if (this->camera->GetImageWidth() == 0 || 
@@ -73,7 +79,7 @@ void CameraSensor::Load( sdf::ElementPtr _sdf )
     gzthrow("image has zero size");
   }
 }
-
+ 
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
 void CameraSensor::Init()

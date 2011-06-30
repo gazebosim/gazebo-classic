@@ -23,69 +23,40 @@
 #define SLIDERJOINT_HH
 
 #include <float.h>
-#include "common/Param.hh"
-#include "common/XMLConfig.hh"
 #include "physics/Joint.hh"
 
 namespace gazebo
 {
 	namespace physics
   {
- 
     /// \brief A slider joint
     template<class T>
     class SliderJoint : public T
     {
       /// \brief Constructor
       public: SliderJoint( ) : T()
-              {
-                this->AddType(Base::SLIDER_JOINT);
-  
-                common::Param::Begin(&this->parameters);
-                this->axisP = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,0,1), 0);
-                this->loStopP = new common::ParamT<double>("lowStop",-DBL_MAX,0);
-                this->hiStopP = new common::ParamT<double>("highStop",DBL_MAX,0);
-                this->dampingP = new common::ParamT<double>("damping",0.0, 0);
-                common::Param::End();
-              } 
+              { this->AddType(Base::SLIDER_JOINT); } 
   
       /// \brief Destructor
       public: virtual ~SliderJoint()
-              {
-                delete this->axisP;
-                delete this->loStopP;
-                delete this->hiStopP;
-                delete this->dampingP;
-              }
+              { }
   
       /// \brief Load the joint
-      protected: virtual void Load(common::XMLConfigNode *node)
+      protected: virtual void Load( sdf::ElementPtr &_sdf )
                  {
-                   this->axisP->Load(node->GetChild("axis"));
-                   this->loStopP->Load(node);
-                   this->hiStopP->Load(node);
-                   this->dampingP->Load(node);
+                   T::Load(_sdf);
   
-                   T::Load(node);
+                   this->SetAxis(0, 
+                       _sdf->GetElement("axis")->GetValueVector3("xyz"));
   
-                   this->SetAxis(0, **(this->axisP));
-  
+                   sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
                    // Perform this three step ordering to ensure the parameters 
                    // are set properly. This is taken from the ODE wiki.
-                   this->SetHighStop(0,**(this->hiStopP));
-                   this->SetLowStop(0,**(this->loStopP));
-                   this->SetHighStop(0,**(this->hiStopP));
-                   //this->SetDamping(0, this->dampingP->GetValue()); // uncomment when opende damping is tested and ready
+                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                   this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
+                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
                  }
     
-      /// \brief Save a joint to a stream in XML format
-      protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream)
-                 {
-                   T::SaveJoint(prefix, stream);
-                   stream << prefix << *(this->axisP) << "\n";
-                   stream << prefix << *(this->loStopP) << "\n";
-                   stream << prefix << *(this->hiStopP) << "\n";
-                 }
       /// \brief Set the anchor
       public: virtual void SetAnchor( int /*_index*/, 
                                       const math::Vector3 &_anchor) 
@@ -95,10 +66,6 @@ namespace gazebo
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const 
               {return this->fakeAnchor;}
    
-      protected: common::ParamT<math::Vector3> *axisP;
-      protected: common::ParamT<double> *loStopP;
-      protected: common::ParamT<double> *hiStopP; 
-      protected: common::ParamT<double> *dampingP; 
       protected: math::Vector3 fakeAnchor;
     };
     

@@ -148,7 +148,6 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
         {
           shape->SetLength(contact.depth );
           shape->SetRetro( hitGeom->GetLaserRetro() );
-          shape->SetFiducial( hitGeom->GetLaserFiducialId() );
         }
       }
     }
@@ -163,7 +162,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &e
   ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetBody()) );
   odeGeom->SetName("ODE Ray Geom");
 
-  ODERayShapePtr ray( new ODERayShape(odeGeom, **this->displayTypeP == "lines" ));
+  ODERayShapePtr ray( new ODERayShape(odeGeom, true ));
 
   ray->SetPoints(start,end);
   this->rays.push_back(ray);

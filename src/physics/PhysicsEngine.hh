@@ -42,12 +42,8 @@ namespace gazebo
       public: virtual ~PhysicsEngine();
     
       /// \brief Load the physics engine
-      /// \param node Pointer to the XML parameters
-      public: virtual void Load(common::XMLConfigNode *node) = 0;
-    
-      /// \brief Saves to XMLFile
-      /// \param stread Output stream
-      public: virtual void Save(std::string &prefix, std::ostream &stream) =0;
+      /// \param _sdf Pointer to the SDF parameters
+      public: virtual void Load( sdf::ElementPtr _sdf ) = 0;
     
       /// \brief Initialize the physics engine
       public: virtual void Init() = 0;
@@ -57,6 +53,9 @@ namespace gazebo
   
       /// \brief Update the physics engine collision
       public: virtual void UpdateCollision() = 0;
+
+      /// \brief Get the simulation step time
+      public: virtual double GetStepTime() = 0;
   
       /// \brief Update the physics engine
       public: virtual void UpdatePhysics() {}
@@ -80,26 +79,6 @@ namespace gazebo
   
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3 &gravity) = 0;
-  
-      /// \brief Get the time between each update cycle
-      /// \return seconds between updates 
-      public: double GetUpdateRate() const;
-  
-      /// \brief Set the time between each update cycle
-      public: void SetUpdateRate(double rate) const;
-  
-      /// \brief Get the physics time steps in the virtual world
-      /// \return step time 
-      public: common::Time GetStepTime() const;
-  
-      /// \brief Set the step time
-      public: void SetStepTime(common::Time time);
-  
-      /// \brief Get the step type
-      public: virtual std::string GetStepType() const {return "unknown";}
-  
-      /// \brief Set the step type
-      public: virtual void SetStepType(const std::string &/*type*/) {}
   
       /// \brief Set whether to show contacts
       public: void ShowContacts(const bool &show);
@@ -138,36 +117,12 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: virtual int GetMaxContacts() {return 0;}
   
-      /// \brief Get the count of the parameters
-      public: unsigned int GetParamCount() const;
-  
-      /// \brief Get a param by index
-      public: common::Param *GetParam(unsigned int index) const;
-  
-      /// \brief Get a parameter by name
-      public: common::Param *GetParam(const std::string &key) const;
-  
-       /// \brief Set a parameter by name
-      public: void SetParam(const std::string &key, const std::string &value);
-   
       /// \brief Add a contact visual
       protected: void AddContactVisual(const math::Vector3 &pos_, 
                                        const math::Vector3 &norm_);
   
       protected: WorldPtr world;
-  
-      /// The gravity vector
-      protected: common::ParamT<math::Vector3> *gravityP;
-    
-      /// time steps the physical engine will take 
-      /// how much time will pass on each update
-      protected: common::ParamT<common::Time> *stepTimeP;
-      
-      /// update rate of the physical engine, how many times
-      /// it is called 
-      protected: common::ParamT<double> *updateRateP;
-  
-      protected: common::Param_V parameters;
+      protected: sdf::ElementPtr sdf;
   
       protected: std::string visual;
       protected: transport::NodePtr node;

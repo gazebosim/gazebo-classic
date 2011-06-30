@@ -48,14 +48,11 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the map
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Init the map
       public: virtual void Init();
   
-      /// \brief Save parameters
-      protected: void Save(std::string &prefix, std::ostream &stream);
-   
       /// \brief Build the quadtree
       private: void BuildTree(QuadNode *node);
   
@@ -75,23 +72,6 @@ namespace gazebo
   
       /// \brief Create the boxes for the map
       private: void CreateBoxes(QuadNode *node);
-  
-      // The scale factor to apply to the geoms
-      private: common::ParamT<double> *scaleP;
-  
-      // Negative image?
-      private: common::ParamT<int> *negativeP;
-  
-      // Image color threshold used for extrusion
-      private: common::ParamT<double> *thresholdP;
-  
-      // The color of the walls
-      private: common::ParamT<std::string> *materialP;
-  
-      // The amount of acceptable error in the model
-      private: common::ParamT<int> *granularityP;
-  
-      private: common::ParamT<double> *wallHeightP;
   
       private: common::Image *mapImage;
   

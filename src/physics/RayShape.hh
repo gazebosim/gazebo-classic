@@ -87,14 +87,11 @@ namespace gazebo
       public: int GetFiducial() const;
   
       /// \brief Load the ray
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief In the ray
       public: virtual void Init();
   
-      /// \brief Save child parameters
-      protected: virtual void Save(std::string &, std::ostream &);
-   
       /// Contact information; this is filled out during collision
       /// detection.  
       protected: double contactLen;

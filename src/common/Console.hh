@@ -48,8 +48,6 @@ namespace gazebo
     /// Log a message
     #define gzlog (gazebo::common::Console::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
     
-    class XMLConfigNode;
-   
     class Console
     {
       /// \brief Default constructor
@@ -62,11 +60,8 @@ namespace gazebo
       public: static Console *Instance();
     
       /// \brief Load the message parameters
-      public: void Load(XMLConfigNode *node);
+      public: void Load();
     
-      /// \brief Saves the message parameters
-      public: void Save(std::string &prefix, std::ostream &stream) const;
-  
       /// \brief Set quiet output
       /// \param q True to prevent warning
       public: void SetQuiet( bool q );
@@ -94,10 +89,6 @@ namespace gazebo
       private: std::ostream *msgStream;
       private: std::ostream *errStream;
       private: std::ofstream logStream;
-  
-      private: ParamT<int> *quietP;
-      private: ParamT<bool> *logDataP;
-      private: std::vector<Param*> parameters;
   
       /// Pointer to myself
       private: static Console *myself;

@@ -25,7 +25,6 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 #include "common/Messages.hh"
 
 using namespace gazebo;
@@ -245,13 +244,10 @@ math::Plane Message::Convert(const msgs::Plane &p)
 }
 
 
-
-
-
-msgs::Light Message::LightFromXML(XMLConfigNode *node)
+msgs::Light Message::LightFromSDF( sdf::ElementPtr _sdf )
 {
-  XMLConfigNode *cnode = NULL;
   msgs::Light result;
+  /*XMLConfigNode *cnode = NULL;
 
   std::string type = node->GetString("type","point",1);
   std::transform( type.begin(), type.end(), type.begin(), ::tolower);
@@ -303,10 +299,11 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
   if (node->GetChild("spot_falloff"))
     result.set_spot_falloff( node->GetFloat("spot_falloff",0,0) );
 
+    */
   return result;
 }
 
-msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
+msgs::Visual Message::VisualFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Visual result;
 /*  XMLConfigNode *cnode = NULL;
@@ -390,11 +387,11 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
   return result;
 }
 
-msgs::Shadows Message::ShadowsFromXML(XMLConfigNode *node)
+msgs::Shadows Message::ShadowsFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Shadows result;
 
-  std::string type = node->GetString("type","stencil_modulative",0);
+  /*std::string type = node->GetString("type","stencil_modulative",0);
   if (type == "stencil_modulative")
     result.set_type( msgs::Shadows::STENCIL_MODULATIVE);
   else if (type == "stencil_additive")
@@ -406,15 +403,16 @@ msgs::Shadows Message::ShadowsFromXML(XMLConfigNode *node)
 
   result.mutable_color()->CopyFrom( 
       Message::Convert(node->GetColor("color",Color(1,1,1,1))) );
+      */
 
   return result;
 }
 
-msgs::Fog Message::FogFromXML(XMLConfigNode *node)
+msgs::Fog Message::FogFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Fog result;
 
-  std::string type = node->GetString("type","linear",1);
+  /*std::string type = node->GetString("type","linear",1);
   if (type == "linear")
     result.set_type(msgs::Fog::LINEAR);
   else if (type == "exp")
@@ -429,14 +427,15 @@ msgs::Fog Message::FogFromXML(XMLConfigNode *node)
   result.set_density(node->GetFloat("density",1,1));
   result.set_start(node->GetFloat("start",0,1));
   result.set_end(node->GetFloat("end",1,1));
+  */
 
   return result;
 }
 
-msgs::Scene Message::SceneFromXML(XMLConfigNode *node)
+msgs::Scene Message::SceneFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Scene result;
-
+/*
   Message::Init(result,"scene");
   XMLConfigNode *cnode = NULL;
 
@@ -459,6 +458,7 @@ msgs::Scene Message::SceneFromXML(XMLConfigNode *node)
   }
   else
     gzwarn << "node is null\n";
+    */
 
   return result;
 }

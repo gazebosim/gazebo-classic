@@ -22,10 +22,8 @@
 #ifndef HINGE2JOINT_HH
 #define HINGE2JOINT_HH
 
-#include "common/Param.hh"
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "common/XMLConfig.hh"
 #include "physics/Joint.hh"
 
 namespace gazebo
@@ -38,79 +36,39 @@ namespace gazebo
   {
     /// \brief Constructor
     public: Hinge2Joint() : T()
-            {
-              this->AddType(Base::HINGE2_JOINT);
-  
-              common::Param::Begin(&this->parameters);
-              this->axis1P = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,0,1), 0);
-              this->axis2P = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,0,1), 0);
-              this->loStop1P = new common::ParamT< math::Angle>("lowStop1",-M_PI,0);
-              this->hiStop1P = new common::ParamT< math::Angle>("highStop1",M_PI,0);
-              this->loStop2P = new common::ParamT< math::Angle>("lowStop2",-M_PI,0);
-              this->hiStop2P = new common::ParamT< math::Angle>("highStop2",M_PI,0);
-              common::Param::End();
-            }
+            { this->AddType(Base::HINGE2_JOINT); }
   
     /// \brief Destructor
     public: virtual ~Hinge2Joint()
-            {
-              delete this->axis1P;
-              delete this->axis2P;
-              delete this->loStop1P;
-              delete this->hiStop1P;
-              delete this->loStop2P;
-              delete this->hiStop2P;
-            }
+            { }
   
     /// \brief Load the joint
-    protected: virtual void Load(common::XMLConfigNode *node)
+    protected: virtual void Load( sdf::ElementPtr &_sdf )
                {
-                 this->axis1P->Load(node->GetChild("axis1"));
-                 this->axis2P->Load(node->GetChild("axis2"));
-                 this->loStop1P->Load(node);
-                 this->hiStop1P->Load(node);
-                 this->loStop2P->Load(node);
-                 this->hiStop2P->Load(node);
-  
-                 T::Load(node);
-  
-                 this->SetAxis(0,**(this->axis1P));
-                 this->SetAxis(1,**(this->axis2P));
-  
+                 T::Load(_sdf);
+
+                 this->SetAxis(0, 
+                     _sdf->GetElement("axis")->GetValueVector3("xyz"));
+
+                 this->SetAxis(1, 
+                     _sdf->GetElement("axis2")->GetValueVector3("xyz"));
+
+
+                 sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
                  // Perform this three step ordering to ensure the parameters 
                  // are set properly. This is taken from the ODE wiki.
-                 this->SetHighStop(0,**this->hiStop1P);
-                 this->SetLowStop(0,**this->loStop1P);
-                 this->SetHighStop(0,**this->hiStop1P);
-  
+                 this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                 this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
+                 this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+ 
+                 limitElem = _sdf->GetElement("axis2")->GetElement("limit");
                  // Perform this three step ordering to ensure the parameters 
                  // are set properly. This is taken from the ODE wiki.
-                 this->SetHighStop(1,**this->hiStop2P);
-                 this->SetLowStop(1,**this->loStop2P);
-                 this->SetHighStop(1,**this->hiStop2P);
+                 this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                 this->SetLowStop( 1,limitElem->GetValueDouble("lower"));
+                 this->SetHighStop(1,limitElem->GetValueDouble("upper"));
                }
   
-    /// \brief Save a joint to a stream in XML format
-    protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream)
-               {
-                 T::SaveJoint(prefix, stream);
-                 stream << prefix << *(this->axis1P) << "\n";
-                 stream << prefix << *(this->loStop1P) << "\n";
-                 stream << prefix << *(this->hiStop1P) << "\n";
-  
-                 stream << prefix << *(this->axis2P) << "\n";
-                 stream << prefix << *(this->loStop2P) << "\n";
-                 stream << prefix << *(this->hiStop2P) << "\n";
-  
-               }
-  
-    protected: common::ParamT<math::Vector3> *axis1P;
-    protected: common::ParamT<math::Angle> *loStop1P;
-    protected: common::ParamT<math::Angle> *hiStop1P; 
-  
-    protected: common::ParamT<math::Vector3> *axis2P;
-    protected: common::ParamT<math::Angle> *loStop2P;
-    protected: common::ParamT<math::Angle> *hiStop2P; 
   };
   }
 }

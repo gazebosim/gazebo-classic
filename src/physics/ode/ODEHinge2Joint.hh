@@ -23,7 +23,6 @@
 #ifndef ODEHINGE2JOINT_HH
 #define ODEHINGE2JOINT_HH
 
-#include "common/Param.hh"
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
 
@@ -103,10 +102,7 @@ namespace gazebo
     public: virtual ~ODEHinge2Joint(); 
   
     /// \brief Load the joint
-    protected: virtual void Load(common::XMLConfigNode *node);
-  
-    /// \brief Save a joint to a stream in XML format
-    protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream);
+    protected: virtual void Load( sdf::ElementPtr &_sdf );
    
     /// \brief Set the anchor point
     public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
@@ -146,8 +142,6 @@ namespace gazebo
   
     /// \brief Set _parameter with _value
     public: virtual void SetParam( int parameter, double value );
-  
-    private: common::ParamT<double> *suspensionCfmP;
   };
   
   /// \}

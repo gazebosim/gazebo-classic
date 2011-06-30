@@ -38,15 +38,6 @@ HeightmapShape::HeightmapShape(GeomPtr parent)
     : Shape(parent)
 {
   this->AddType(Base::HEIGHTMAP_SHAPE);
-
-  common::Param::Begin(&this->parameters);
-  this->imageFilenameP = new common::ParamT<std::string>("image","",1);
-  this->worldTextureP = new common::ParamT<std::string>("world_texture","",0);
-  this->detailTextureP = new common::ParamT<std::string>("detail_texture","",0);
-  this->sizeP = new common::ParamT<math::Vector3>("size",math::Vector3(10,10,10), 0);
-  this->offsetP = new common::ParamT<math::Vector3>("offset",math::Vector3(0,0,0), 0);
-  common::Param::End();
-
   // NATY: this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
 
@@ -55,12 +46,6 @@ HeightmapShape::HeightmapShape(GeomPtr parent)
 // Destructor
 HeightmapShape::~HeightmapShape()
 {
-  delete this->imageFilenameP;
-  delete this->worldTextureP;
-  delete this->detailTextureP;
-  delete this->sizeP;
-  delete this->offsetP;
-
   // NATY: delete this->ogreHeightmap;
 }
 
@@ -72,38 +57,20 @@ void HeightmapShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void HeightmapShape::Load(common::XMLConfigNode *node)
+void HeightmapShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  this->imageFilenameP->Load(node);
-  this->worldTextureP->Load(node);
-  this->detailTextureP->Load(node);
-  this->sizeP->Load(node);
-  this->offsetP->Load(node);
+  Shape::Load(_sdf);
 
   // Use the image to get the size of the heightmap
-  this->img.Load( (**this->imageFilenameP) );
+  this->img.Load( this->sdf->GetValueString("filename") );
 
   // Width and height must be the same
   if (this->img.GetWidth() != this->img.GetHeight())
     gzthrow("Heightmap image must be square\n");
-
-  this->terrainSize = (**this->sizeP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the heightmap
 void HeightmapShape::Init()
 {
-}
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void HeightmapShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->imageFilenameP) << "\n";
-  stream << prefix << *(this->worldTextureP) << "\n";
-  stream << prefix << *(this->detailTextureP) << "\n";
-  stream << prefix << *(this->sizeP) << "\n";
-  stream << prefix << *(this->offsetP) << "\n";
 }

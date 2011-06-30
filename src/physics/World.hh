@@ -35,6 +35,7 @@
 #include "common/Messages.hh"
 
 #include "physics/PhysicsTypes.hh"
+#include "sdf/interface/sdf.h"
 
 namespace boost
 {
@@ -59,13 +60,9 @@ namespace gazebo
       /// Private destructor
       public: ~World();
     
-      /// Load the world
-      /// \param node common::XMLConfig node point
-      public: void Load(common::XMLConfigNode *rootNode);
-    
-      /// Save the world
-      /// \param stream Output stream
-      public: void Save(std::string &prefix, std::ostream &stream);
+      /// Load the world using SDF parameters
+      /// \param _sdf SDF parameters
+      public: void Load( sdf::ElementPtr _sdf );
     
       /// \brief Initialize the world
       public: void Init();
@@ -140,12 +137,12 @@ namespace gazebo
       public: BasePtr GetByName(const std::string &name);
 
       /// \brief Create all entities
-      /// \param node XMLConfg node pointer
+      /// \param _sdf SDF element
       /// \param parent Parent of the model to load
-      private: void LoadEntities(common::XMLConfigNode *node, BasePtr parent);
+      private: void LoadEntities( sdf::ElementPtr &_sdf , BasePtr parent);
 
       /// \brief Load a model
-      private: ModelPtr LoadModel(common::XMLConfigNode *node, BasePtr parent);
+      private: ModelPtr LoadModel( sdf::ElementPtr &_sdf, BasePtr parent);
  
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
@@ -188,9 +185,6 @@ namespace gazebo
     
       private: BasePtr rootElement;
  
-      /// An abstract entity that is the root of the Entity Tree
-      private: Model_V  models;
-
       /// thread in which the world is updated
       private: boost::thread *thread;
     
@@ -229,6 +223,7 @@ namespace gazebo
       private: common::Time realTimeOffset;
 
       private: boost::mutex *updateMutex;
+      private: sdf::ElementPtr sdf;
     };
 
   }

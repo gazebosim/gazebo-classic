@@ -76,7 +76,7 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   // TODO: Use messages so that the gui doesn't depend upon physics 
   physics::init();
   this->world = physics::create_world("model_builder");
-  this->world->Load(NULL);
+  this->world->Load( sdf::ElementPtr());
   this->world->Init();
   this->world->SetPaused(true);
   

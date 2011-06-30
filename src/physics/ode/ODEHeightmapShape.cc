@@ -82,12 +82,14 @@ void ODEHeightmapShape::Init()
 {
   ODEGeomPtr oParent = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
+  math::Vector3 terrainSize = this->sdf->GetValueVector3("size");
+
   // sampling size along image width and height
   this->odeVertSize = this->img.GetWidth() * 4;
-  this->odeScale = this->terrainSize / this->odeVertSize;
+  this->odeScale = terrainSize / this->odeVertSize;
 
   // Step 1: Create the Ogre height map: Performs a ray scene query
-  //NATY this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP), (**this->detailTextureP), this->terrainSize );
+  //NATY this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP), (**this->detailTextureP), terrainSize );
 
   // Step 2: Construct the heightmap lookup table, using the ogre ray scene
   // query functionality
@@ -101,8 +103,8 @@ void ODEHeightmapShape::Init()
     this->odeData,
     this,
     ODEHeightmapShape::GetHeightCallback,
-    this->terrainSize.x, // in meters
-    this->terrainSize.y, // in meters
+    terrainSize.x, // in meters
+    terrainSize.y, // in meters
     this->odeVertSize, // width sampling size
     this->odeVertSize, // depth sampling size (along height of image)
     1.0, // vertical (z-axis) scaling
@@ -112,7 +114,7 @@ void ODEHeightmapShape::Init()
   );
 
   // Step 5: Restrict the bounds of the AABB to improve efficiency
-  dGeomHeightfieldDataSetBounds( this->odeData, 0, this->terrainSize.z);
+  dGeomHeightfieldDataSetBounds( this->odeData, 0, terrainSize.z);
 
   oParent->SetGeom(dCreateHeightfield( 0, this->odeData, 1), false);
   oParent->SetStatic(true);

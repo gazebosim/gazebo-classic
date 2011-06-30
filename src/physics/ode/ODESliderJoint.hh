@@ -22,7 +22,6 @@
 #ifndef ODESLIDERJOINT_HH
 #define ODESLIDERJOINT_HH
 
-#include "common/Param.hh"
 #include "physics/SliderJoint.hh"
 #include "physics/ode/ODEJoint.hh"
 
@@ -89,7 +88,7 @@ namespace gazebo
       public: virtual ~ODESliderJoint();
     
       /// \brief Load the joint
-      protected: virtual void Load(common::XMLConfigNode *node);
+      protected: virtual void Load( sdf::ElementPtr &_sdf );
   
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetAxis(int index) const;

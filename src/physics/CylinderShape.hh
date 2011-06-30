@@ -23,7 +23,6 @@
 #define CYLINDERSHAPE_HH
 
 #include "physics/Shape.hh"
-#include "common/Param.hh"
 
 namespace gazebo
 {
@@ -39,14 +38,11 @@ namespace gazebo
       public: virtual ~CylinderShape();
   
       /// \brief Load the cylinder
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Initialize the cylinder
       public: void Init();
 
-      /// \brief Save child parameters
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-  
       /// \brief Set radius
       public: void SetRadius(const double &radius);
   
@@ -57,8 +53,6 @@ namespace gazebo
       /// \brief Set the size of the cylinder
       public: virtual void SetSize( const double &radius, const double &length  );
   
-      private: common::ParamT<double> *radiusP;
-      private: common::ParamT<double> *lengthP;
     };
   
     /// \}

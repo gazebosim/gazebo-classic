@@ -17,7 +17,6 @@
 /* Desc: The ODE base joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 12 Oct 2009
- * SVN: $Id$
  */
 
 #ifndef ODEJOINT_HH
@@ -40,7 +39,7 @@ namespace gazebo
       public: virtual ~ODEJoint();
   
       /// \brief Load a joint
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
   
       /// \brief Get the body to which the joint is attached according the _index
       public: virtual BodyPtr GetJointBody( int index ) const;

@@ -16,28 +16,14 @@
 */
 #include "common/Timer.hh"
 #include "common/SystemPaths.hh"
-#include "common/XMLConfig.hh"
 #include "transport/Transport.hh"
 
 #include "sensors/Sensors.hh"
 
+#include "sdf/interface/sdf.h"
 #include "rendering/Rendering.hh"
 
 #include "SensorServer.hh"
-
-const std::string default_config =
-"<?xml version='1.0'?>\
-<gazebo>\
-  <config>\
-    <verbosity>4</verbosity>\
-    <gui>\
-      <size>800 600</size>\
-      <pos>0 0</pos>\
-    </gui>\
-  </config>\
-</gazebo>\
-";
-
 
 using namespace gazebo;
 
@@ -66,28 +52,10 @@ SensorServer::~SensorServer()
 {
 }
 
-void SensorServer::Load(const std::string &filename)
+void SensorServer::Load(const std::string &/*filename*/)
 {
-  // Load the world file
-  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
-
-  try
-  {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  if (!rootNode || rootNode->GetName() != "gazebo")
-    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
-
   // Load the rendering system
-  if (!rendering::load(filename))
+  if (!rendering::load())
     gzthrow("Unable to load the rendering engine");
 
   // The rendering engine will run headless 

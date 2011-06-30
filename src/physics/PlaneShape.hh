@@ -17,7 +17,6 @@
 /* Desc: Plane shape
  * Author: Nate Keonig
  * Date: 14 Oct 2009
- * SVN: $Id:$
  */
 
 #ifndef PLANESHAPE_HH
@@ -44,14 +43,11 @@ namespace gazebo
       public: virtual ~PlaneShape();
    
       /// \brief Load the plane
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Initialize the plane
       public: virtual void Init();
  
-      /// \brief Save child parameters
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-  
       /// \brief Create the plane
       public: virtual void CreatePlane();
   
@@ -60,8 +56,6 @@ namespace gazebo
   
       /// \brief Set the normal
       public: void SetNormal( const math::Vector3 &norm );
-  
-      protected: common::ParamT<math::Vector3> *normalP;
     };
   }
 }

@@ -25,7 +25,6 @@
 // TODO: remove this line
 #include "rendering/ogre.h"
 
-#include "common/Param.hh"
 #include "common/Color.hh"
 
 namespace Ogre
@@ -75,16 +74,16 @@ namespace gazebo
       public: void SetUserData( const Ogre::Any& data_ );
       
       public: void SetColor(const common::Color& color_);
-      public: common::Color GetColor() { return **this->colorP; }
+      public: common::Color GetColor() { return this->colorP; }
   
       public: void SetCellCount(uint32_t count_);
-      public: float GetCellCount() { return **this->cellCountP; }
+      public: float GetCellCount() { return this->cellCountP; }
   
       public: void SetCellLength(float len_);
-      public: float GetCellLength() { return **this->cellLengthP; }
+      public: float GetCellLength() { return this->cellLengthP; }
   
       public: void SetLineWidth(float width_);
-      public: float GetLineWidth() { return **this->lineWidthP; }
+      public: float GetLineWidth() { return this->lineWidthP; }
   
       public: void SetHeight(uint32_t count_);
       public: uint32_t GetHeight() { return this->height; }
@@ -96,12 +95,11 @@ namespace gazebo
       
       private: Ogre::MaterialPtr material;
   
-      private: common::ParamT<unsigned int> *cellCountP;
-      private: common::ParamT<float> *cellLengthP;
-      private: common::ParamT<float> *lineWidthP;
-      private: common::ParamT<common::Color> *colorP;
-      private: common::ParamT<float> *h_offsetP;
-      private: std::vector<common::Param*> parameters;
+      private: unsigned int cellCountP;
+      private: float cellLengthP;
+      private: float lineWidthP;
+      private: common::Color colorP;
+      private: float h_offsetP;
   
       private: std::string name;
       private: unsigned int height;

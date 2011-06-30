@@ -30,8 +30,6 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "common/Param.hh"
-
 #include "physics/ode/ODETypes.hh"
 
 #include "physics/PhysicsEngine.hh"
@@ -59,10 +57,7 @@ namespace gazebo
     public: virtual ~ODEPhysics();
   
     /// \brief Load the ODE engine
-    public: virtual void Load(common::XMLConfigNode *node);
-  
-    /// \brief Saves to XMLFile
-    public: void Save(std::string &prefix, std::ostream &stream);
+    public: virtual void Load( sdf::ElementPtr _sdf );
   
     /// \brief Initialize the ODE engine
     public: virtual void Init();
@@ -78,7 +73,10 @@ namespace gazebo
   
     /// \brief Finilize the ODE engine
     public: virtual void Fini();
-  
+
+    /// \brief Get the simulation step time
+    public: virtual double GetStepTime();
+ 
     /// \brief Create a new body
     public: virtual BodyPtr CreateBody(EntityPtr parent);
   
@@ -115,8 +113,6 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: void SetWorldERP(double erp);
     /// \brief access functions to set ODE parameters
-    public: void SetAutoDisableFlag(bool auto_disable);
-    /// \brief access functions to set ODE parameters
     public: void SetSORPGSIters(unsigned int iters);
     /// \brief access functions to set ODE parameters
     public: void SetSORPGSW(double w);
@@ -125,14 +121,12 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: void SetContactSurfaceLayer(double layer_depth);
     /// \brief access functions to set ODE parameters
-    public: void SetMaxContacts(double max_contacts);
+    public: void SetMaxContacts(unsigned int max_contacts);
   
     /// \brief access functions to set ODE parameters
     public: double GetWorldCFM();
     /// \brief access functions to set ODE parameters
     public: double GetWorldERP();
-    /// \brief access functions to set ODE parameters
-    public: bool GetAutoDisableFlag();
     /// \brief access functions to set ODE parameters
     public: int GetSORPGSIters();
     /// \brief access functions to set ODE parameters
@@ -164,20 +158,10 @@ namespace gazebo
     /// \brief Collision attributes
     private: dJointGroupID contactGroup;
   
-    private: common::ParamT<double> *globalCFMP; 
-    private: common::ParamT<double> *globalERPP; 
-    private: common::ParamT<std::string> *stepTypeP; 
-    private: common::ParamT<unsigned int> *stepItersP; 
-    private: common::ParamT<double> *stepWP; 
-    private: common::ParamT<double> *contactMaxCorrectingVelP;
-    private: common::ParamT<double> *contactSurfaceLayerP;
-    private: common::ParamT<bool> *autoDisableBodyP;
-    private: common::ParamT<int> *contactFeedbacksP;
-    private: common::ParamT<int> *maxContactsP;
- 
     /// Store the value of the stepTime parameter in doubl form. To improve
     /// efficiency
     private: double stepTimeDouble; 
+    private: std::string stepType;
 
     private: tbb::concurrent_vector<ContactFeedback> contactFeedbacks;
   

@@ -44,11 +44,6 @@ Entity::Entity(BasePtr parent)
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
-  common::Param::Begin(&this->parameters);
-  this->staticP = new common::ParamT<bool>("static",false,0);
-  this->staticP->Callback( &Entity::SetStatic, this );
-  common::Param::End();
- 
   this->visualMsg = new msgs::Visual();
   this->poseMsg = new msgs::Pose();
 
@@ -63,8 +58,6 @@ Entity::Entity(BasePtr parent)
 Entity::~Entity()
 {
   Base_V::iterator iter;
-
-  delete this->staticP;
 
   // TODO: put this back in
   //this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
@@ -81,9 +74,9 @@ Entity::~Entity()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load
-void Entity::Load(common::XMLConfigNode *node)
+void Entity::Load(sdf::ElementPtr &_sdf)
 {
-  Base::Load(node);
+  Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
   this->posePub = this->node->Advertise<msgs::Pose>("~/pose");
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
@@ -113,7 +106,7 @@ void Entity::SetStatic(const bool &s)
 {
   Base_V::iterator iter;
 
-  this->staticP->SetValue( s );
+  this->isStatic = s ;
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
@@ -127,7 +120,7 @@ void Entity::SetStatic(const bool &s)
 // Return whether this entity is static
 bool Entity::IsStatic() const
 {
-  return (**this->staticP);
+  return this->isStatic;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

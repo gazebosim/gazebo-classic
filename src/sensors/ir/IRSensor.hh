@@ -17,7 +17,6 @@
 /* Desc: IRSensor proximity sensor
  * Author: Carle Cote
  * Date: 23 february 2004
- * SVN: $Id: IRSensor.hh 4402 2008-03-09 14:39:27Z robotos $
 */
 
 #ifndef IRSENSOR_HH
@@ -30,8 +29,6 @@
 
 namespace gazebo
 {
-
-  class XMLConfigNode;
   class RayGeom;
   class RaySensor;
 
@@ -57,9 +54,9 @@ class IRSensor: public Sensor
   /// \brief Destructor
   public: virtual ~IRSensor();
 
-  /// Load the ray using parameter from an XMLConfig node
-  /// \param node The XMLConfig node
-  protected: virtual void LoadChild(XMLConfigNode *node);
+  /// Load the ray using parameter from an SDF
+  /// \param _sdf The SDF parameter
+  protected: virtual void LoadChild( sdf::ElementPtr &_sdf );
 
   /// Initialize the ray
   protected: virtual void InitChild();

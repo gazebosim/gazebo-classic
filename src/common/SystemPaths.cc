@@ -22,8 +22,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <tinyxml.h>
 
-#include "common/XMLConfig.hh"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
 
@@ -70,30 +70,32 @@ void SystemPaths::Load()
 
   if (cfgFile.is_open())
   {
-    XMLConfig rc;
-    XMLConfigNode *node;
-    rc.Load(rcFilename);
+    TiXmlDocument xmlDoc;
+    xmlDoc.LoadFile(rcFilename);
 
+    TiXmlElement *rootnode = xmlDoc.FirstChildElement("gazeborc");
+    
     // if gazebo path is set, skip reading from .gazeborc
     if(!ogre_resource_path)
     {
-      node = rc.GetRootNode()->GetChild("gazeboPath");
+      TiXmlElement *node = rootnode->FirstChildElement("gazeboPath");
       while (node)
       {
-        this->gazeboPaths.push_back(node->GetValue());
-        this->AddPluginPaths(node->GetValue()+"/plugins");
-        node = node->GetNext("gazeboPath");
+        std::string path = node->GetText();
+        this->gazeboPaths.push_back(path);
+        this->AddPluginPaths(path+"/plugins");
+        node = node->NextSiblingElement("gazeboPath");
       }
     }
 
     // if ogre path is set, skip reading from .gazeborc
     if(!ogre_resource_path)
     {
-      node = rc.GetRootNode()->GetChild("ogrePath");
+      TiXmlElement *node = rootnode->FirstChildElement("ogrePath");
       while (node)
       {
-        this->ogrePaths.push_back( node->GetValue() );
-        node = node->GetNext("ogrePath");
+        this->ogrePaths.push_back( node->GetText() );
+        node = node->NextSiblingElement("ogrePath");
       }
     }
 

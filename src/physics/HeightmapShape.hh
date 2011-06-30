@@ -43,25 +43,14 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the heightmap
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Initialize the heightmap
       public: virtual void Init();
   
-      /// \brief Save child parameters
-      protected: void Save(std::string &prefix, std::ostream &stream);
-  
-      protected: math::Vector3 terrainSize;
-  
       protected: std::vector<double> heights;
   
       protected: common::Image img;
-      protected: common::ParamT<std::string> *imageFilenameP;
-      protected: common::ParamT<std::string> *worldTextureP;
-      protected: common::ParamT<std::string> *detailTextureP;
-      protected: common::ParamT<math::Vector3> *sizeP;
-      protected: common::ParamT<math::Vector3> *offsetP;
-  
       // NATY: protected: OgreHeightmap *ogreHeightmap;
     };
   }

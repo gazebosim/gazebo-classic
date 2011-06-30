@@ -42,69 +42,82 @@ const std::string &Element::GetRequired() const
   return this->required;
 }
 
-void Element::AddAttribute(const std::string &_key, const std::string &_type,
-                              const std::string &_defaultValue, bool _required)
+void Element::AddValue(const std::string &_type, 
+                       const std::string &_defaultValue, bool _required)
+{
+  this->value = this->CreateParam(this->name, _type, _defaultValue, _required);
+}
+
+boost::shared_ptr<Param> Element::CreateParam(const std::string &_key, 
+    const std::string &_type, const std::string &_defaultValue, bool _required)
 {
   if (_type == "double")
   {
     boost::shared_ptr<ParamT<double> > param( 
         new ParamT<double>(_key, _defaultValue,_required) );
-    this->attributes.push_back(boost::shared_static_cast<Param>(param));
+    return param;
   }
   else if (_type == "int")
   {
     boost::shared_ptr<ParamT<int> > param( 
         new ParamT<int>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "unsigned int")
   {
     boost::shared_ptr<ParamT<unsigned int> > param( 
         new ParamT<unsigned int>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "float")
   {
     boost::shared_ptr<ParamT<float> > param( 
         new ParamT<float>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "bool")
   {
     boost::shared_ptr<ParamT<bool> > param( 
         new ParamT<bool>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "string")
   {
     boost::shared_ptr<ParamT<std::string> > param( 
         new ParamT<std::string>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "color")
   {
     boost::shared_ptr<ParamT<gazebo::common::Color> > param( 
         new ParamT<gazebo::common::Color>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "vector3")
   {
     boost::shared_ptr<ParamT<gazebo::math::Vector3> > param( 
         new ParamT<gazebo::math::Vector3>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else if (_type == "pose")
   {
     boost::shared_ptr<ParamT<gazebo::math::Pose> > param( 
         new ParamT<gazebo::math::Pose>(_key,_defaultValue,_required) );
-    this->attributes.push_back(param);
+    return param;
   }
   else
   {
     gzerr << "Unknown attribute _type[" << _type << "]\n";
+    return boost::shared_ptr<Param>();
   }
 }
 
+void Element::AddAttribute(const std::string &_key, const std::string &_type,
+                              const std::string &_defaultValue, bool _required)
+{
+  this->attributes.push_back(
+      this->CreateParam(_key, _type, _defaultValue, _required));
+}
 
 ElementPtr Element::Clone() const
 {
@@ -192,6 +205,12 @@ ParamPtr Element::GetAttribute(const std::string &_key)
   return ParamPtr();
 }
 
+/// Get the param of the elements value
+ParamPtr Element::GetValue()
+{
+  return this->value;
+}
+
 bool Element::HasElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
@@ -214,6 +233,26 @@ ElementPtr Element::GetElement(const std::string &_name) const
   }
 
   gzerr << "Unable to find element with name[" << _name << "]\n";
+  return ElementPtr();
+}
+
+ElementPtr Element::GetFirstElement() const
+{
+  return this->elements.front();
+}
+
+ElementPtr Element::GetNextElement(const std::string &_name, 
+                          const ElementPtr &_elem) const
+{
+  ElementPtr_V::const_iterator iter;
+  iter = std::find(this->elements.begin(), this->elements.end(), _elem);
+
+  for (iter++; iter != this->elements.end(); iter++)
+  {
+    if ( (*iter)->GetName() == _name )
+      return (*iter);
+  }
+
   return ElementPtr();
 }
 
@@ -244,114 +283,171 @@ ElementPtr Element::AddElement(const std::string &_name)
 bool Element::GetValueBool(const std::string &_key)
 {
   bool result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 
 int Element::GetValueInt(const std::string &_key)
 {
   int result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 float Element::GetValueFloat(const std::string &_key)
 {
   float result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 double Element::GetValueDouble(const std::string &_key)
 {
   double result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 unsigned int Element::GetValueUInt(const std::string &_key)
 {
   unsigned int result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 char Element::GetValueChar(const std::string &_key)
 {
   char result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 std::string Element::GetValueString(const std::string &_key)
 {
   std::string result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 {
   gazebo::math::Vector3 result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 {
   gazebo::math::Quaternion result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 
 gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 {
   gazebo::math::Pose result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 
 gazebo::common::Color Element::GetValueColor(const std::string &_key)
 {
   gazebo::common::Color result;
-  ParamPtr param = this->GetAttribute(_key);
-  if (param)
-    param->Get(result);
+  if (_key.empty())
+    this->value->Get(result);
   else
-    gzerr << "Unable to find value for key[" << _key << "]\n";
+  {
+    ParamPtr param = this->GetAttribute(_key);
+    if (param)
+      param->Get(result);
+    else
+      gzerr << "Unable to find value for key[" << _key << "]\n";
+  }
   return result;
 }
 void Element::ClearElements()

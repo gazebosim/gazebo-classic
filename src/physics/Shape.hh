@@ -38,15 +38,13 @@ namespace gazebo
       public: virtual ~Shape();
     
       /// \brief Load the shape
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr _sdf );
 
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
 
-      /// \brief Save the shape
-      public: virtual void Save(std::string &prefix, std::ostream &stream) = 0;
-  
       protected: GeomPtr geomParent;
+      protected: sdf::ElementPtr sdf;
     };
   }
 

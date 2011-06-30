@@ -46,9 +46,9 @@ GuiClient::~GuiClient()
 {
 }
 
-void GuiClient::Load(const std::string &filename)
+void GuiClient::Load()
 {
-  gui::load(filename);
+  gui::load();
 }
 
 void GuiClient::Init()

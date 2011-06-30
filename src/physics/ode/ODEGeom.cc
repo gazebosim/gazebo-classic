@@ -52,9 +52,9 @@ ODEGeom::~ODEGeom()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the geom
-void ODEGeom::Load(common::XMLConfigNode *node)
+void ODEGeom::Load( sdf::ElementPtr &_sdf )
 {
-  Geom::Load(node);
+  Geom::Load(_sdf);
 
   this->SetSpaceId( boost::shared_static_cast<ODEBody>(this->body)->GetSpaceId() );
 
@@ -126,16 +126,6 @@ void ODEGeom::OnPoseChange()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our common::XMLConfig node
-void ODEGeom::Save(std::string &prefix, std::ostream &stream)
-{
-  if (this->GetShapeType() == RAY_SHAPE)
-    return;
-
-  Geom::Save(prefix, stream);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
 void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
 {
@@ -168,12 +158,7 @@ int ODEGeom::GetGeomClass() const
 
   if (this->geomId)
   {
-    // NATY
-    //this->physicsEngine->LockMutex();
     result = dGeomGetClass( this->geomId );
-
-    // NATY
-    //this->physicsEngine->UnlockMutex();
   }
 
   return result;
@@ -184,79 +169,20 @@ int ODEGeom::GetGeomClass() const
 /// Set the category bits, used during collision detection
 void ODEGeom::SetCategoryBits(unsigned int bits)
 {
-  // NATY
-  //this->physicsEngine->LockMutex();
-
   if (this->geomId)
     dGeomSetCategoryBits(this->geomId, bits);
   if (this->spaceId)
     dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
-
-  // NATY
-  //this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
 void ODEGeom::SetCollideBits(unsigned int bits)
 {
-  // NATY
-  //this->physicsEngine->LockMutex();
-
   if (this->geomId)
     dGeomSetCollideBits(this->geomId, bits);
   if (this->spaceId)
     dGeomSetCollideBits((dGeomID)this->spaceId, bits);
-
-  // NATY
-  //this->physicsEngine->UnlockMutex();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the mass of the geom
-Mass ODEGeom::GetBodyMassMatrix()
-{
-  Mass result;
-  math::Pose pose;
-  math::Vector3 cog, principals, products;
-  dMass bodyMass;
-  dQuaternion q;
-  dMatrix3 r;
-
-  if (!this->placeable)
-  {
-    gzerr << "ODEGeom is not placeable\n";
-    return Mass();
-  }
-
-  cog = this->mass.GetCoG();
-  principals = this->mass.GetPrincipalMoments();
-  products = this->mass.GetProductsofInertia();
-
-  pose = this->GetWorldPose(); // get pose of the geometry
-
-  q[0] = pose.rot.w;
-  q[1] = pose.rot.x;
-  q[2] = pose.rot.y;
-  q[3] = pose.rot.z;
-
-  dQtoR(q,r); // turn quaternion into rotation matrix
-
-  dMassSetZero(&bodyMass);
-  dMassSetParameters(&bodyMass, this->mass.GetAsDouble(),
-                     cog.x, cog.y, cog.z,
-                     principals.x, principals.y, principals.z,
-                     products.x, products.y, products.z );
-
-  if (dMassCheck(&bodyMass))
-  {
-    dMassRotate(&bodyMass, r);
-    dMassTranslate( &bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
-  }
-
-  ODEPhysics::ConvertMass(&result, &bodyMass);
-
-  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

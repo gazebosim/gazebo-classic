@@ -17,7 +17,6 @@
 
 #include <QApplication>
 
-#include "common/XMLConfig.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "rendering/Rendering.hh"
@@ -49,40 +48,10 @@ const std::string default_config =
 QApplication *g_app;
 gui::MainWindow *g_main_win;
 
-void gui::load(const std::string &filename)
+void gui::load()
 {
-  rendering::load(filename);
+  rendering::load();
   rendering::init();
-
-  // Load the world file
-  common::XMLConfig *xmlFile = new common::XMLConfig();
-
-  try
-  {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
-
-  // Get the root node, and make sure we have a gazebo config
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  if (!rootNode || rootNode->GetName() != "gazebo")
-    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
-
-  // Get the config node
-  common::XMLConfigNode *configNode = rootNode->GetChild("config");
-  if (!configNode)
-    gzthrow("Invalid xml. Needs a <config> tag");
- 
-  // Get the gui node
-  common::XMLConfigNode *guiNode = configNode->GetChild("gui");
-  if (!guiNode)
-    gzthrow("Invalid xml. Needs a <gui> tag");
 
   g_argv = new char*[g_argc];
   for (int i=0; i < g_argc; i++)
@@ -95,7 +64,7 @@ void gui::load(const std::string &filename)
 
   g_main_win = new MainWindow();
 
-  g_main_win->Load(guiNode);
+  g_main_win->Load();
   g_main_win->resize(1024,768);
 }
 

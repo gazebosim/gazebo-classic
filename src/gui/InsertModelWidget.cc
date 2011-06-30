@@ -4,7 +4,6 @@
 
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
@@ -80,7 +79,7 @@ InsertModelWidget::~InsertModelWidget()
 
 void InsertModelWidget::OnModelSelection()
 {
-  QTreeWidgetItem* selected = this->fileTreeWidget->selectedItems().at(0);
+  /*QTreeWidgetItem* selected = this->fileTreeWidget->selectedItems().at(0);
   if (selected)
   {
     std::string path = selected->parent()->text(0).toStdString() + "/";
@@ -154,11 +153,11 @@ void InsertModelWidget::OnModelSelection()
     selectMsg.set_selected(true);
     this->selectionPub->Publish(selectMsg);
 
-    /*msgs::Factory msg;
-    common::Message::Init(msg, "new");
-    msg.set_filename(path+filename);
+    //msgs::Factory msg;
+    //common::Message::Init(msg, "new");
+    //msg.set_filename(path+filename);
 
-    this->factoryPub->Publish(msg);
-    */
+    //this->factoryPub->Publish(msg);
   }
+*/
 }

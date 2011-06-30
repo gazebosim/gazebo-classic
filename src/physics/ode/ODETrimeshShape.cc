@@ -85,20 +85,16 @@ void ODETrimeshShape::Update()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
-void ODETrimeshShape::Load(common::XMLConfigNode *node)
+void ODETrimeshShape::Load( sdf::ElementPtr &_sdf )
 {
-  TrimeshShape::Load(node);
+  TrimeshShape::Load(_sdf);
 }
 
 void ODETrimeshShape::Init()
 {
-  dMass odeMass;
-  Mass mass;
   ODEGeomPtr pgeom = boost::shared_static_cast<ODEGeom>(this->geomParent);
 
   TrimeshShape::Init();
-
-  mass = this->geomParent->GetMass();
 
   unsigned int i =0;
 
@@ -126,9 +122,9 @@ void ODETrimeshShape::Init()
 
   for (unsigned int j=0;  j < numVertices; j++)
   {
-    vertices[j*3+0] = vertices[j*3+0] * (**this->scaleP).x;
-    vertices[j*3+1] = vertices[j*3+1] * (**this->scaleP).y;
-    vertices[j*3+2] = vertices[j*3+2] * (**this->scaleP).z;
+    vertices[j*3+0] = vertices[j*3+0] * this->sdf->GetValueVector3("scale").x;
+    vertices[j*3+1] = vertices[j*3+1] * this->sdf->GetValueVector3("scale").y;
+    vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
   }
 
   // Build the ODE triangle mesh
@@ -138,12 +134,6 @@ void ODETrimeshShape::Init()
 
   pgeom->SetSpaceId( dSimpleSpaceCreate(pgeom->GetSpaceId()) );
   pgeom->SetGeom( dCreateTriMesh(pgeom->GetSpaceId(), odeData,0,0,0 ), true);
-
-  if (!pgeom->IsStatic())
-    dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
-
-  ODEPhysics::ConvertMass(&mass, &odeMass);
-  this->geomParent->SetMass(mass);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;

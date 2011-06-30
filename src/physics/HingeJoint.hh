@@ -24,8 +24,6 @@
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "common/Param.hh"
-#include "common/XMLConfig.hh"
 #include "common/Global.hh"
 
 namespace gazebo
@@ -38,61 +36,29 @@ namespace gazebo
     {
       /// \brief Constructor
       public: HingeJoint() : T()
-              {
-                this->AddType(Base::HINGE_JOINT);
-  
-                common::Param::Begin(&this->parameters);
-                this->axisP = new common::ParamT<math::Vector3>("xyz",math::Vector3(0,1,0), 1);
-                this->loStopP = new common::ParamT<math::Angle>("lowStop",-std::numeric_limits<float>::max(),0);
-                this->hiStopP = new common::ParamT<math::Angle>("highStop",std::numeric_limits<float>::max(),0);
-                this->dampingP = new common::ParamT<double>("damping",0.0, 0);
-                common::Param::End();
-              }
+              { this->AddType(Base::HINGE_JOINT); }
    
       ///  \brief Destructor
       public: virtual ~HingeJoint()
-              {
-                delete this->axisP;
-                delete this->loStopP;
-                delete this->hiStopP;
-                delete this->dampingP;
-              }
+              { }
   
       /// \brief Load joint
-      protected: virtual void Load(common::XMLConfigNode *node)
+      protected: virtual void Load( sdf::ElementPtr &_sdf)
                  {
-                   this->axisP->Load(node->GetChild("axis"));
-                   this->loStopP->Load(node);
-                   this->hiStopP->Load(node);
-                   this->dampingP->Load(node);
-  
-                   T::Load(node);
-  
+                   T::Load(_sdf);
+
+                   this->SetAxis(0, 
+                     _sdf->GetElement("axis")->GetValueVector3("xyz"));
+ 
+                    sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
                    // Perform this three step ordering to ensure the parameters 
                    // are set properly. This is taken from the ODE wiki.
-                   this->SetHighStop(0, this->hiStopP->GetValue());
-                   this->SetLowStop(0,this->loStopP->GetValue());
-                   this->SetHighStop(0, this->hiStopP->GetValue());
-                   //this->SetDamping(0, this->dampingP->GetValue()); // uncomment when opende damping is tested and ready
-  
-                   math::Vector3 a = **this->axisP;
-                   this->SetAxis(0, a);
+                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                   this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
+                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+
                  }
-   
-      /// \brief Save a joint to a stream in XML format
-      protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream)
-                 {
-                   T::SaveJoint(prefix, stream);
-                   stream << prefix << *(this->axisP) << "\n";
-                   stream << prefix << *(this->loStopP) << "\n";
-                   stream << prefix << *(this->hiStopP) << "\n";
-                 }
-  
-      protected: common::ParamT<math::Vector3> *axisP;
-      protected: common::ParamT<math::Angle> *loStopP;
-      protected: common::ParamT<math::Angle> *hiStopP; 
-      protected: common::ParamT<double> *dampingP; 
-    };
+      };
   }
 }
 #endif

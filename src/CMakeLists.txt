@@ -3,7 +3,6 @@ include_directories(
   ${PROJECT_BINARY_DIR}/src 
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
-  ${XML_INCLUDE_DIRS} 
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
 )
@@ -42,13 +41,14 @@ add_executable(gzserver server.cc Server.cc Master.cc)
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport
                                 gazebo_msgs
-                                ${XML_LIBRARIES}
                                 ${boost_libraries}
                                 ${freeimage_library}
                                 ${assimp_libraries}
                                 ${PROTOBUF_LIBRARY})
 
 target_link_libraries( gzserver gazebo_common
+                                gazebo_sdf_interface
+                                gazebo_sdf_parser
                                 gazebo_transport
                                 gazebo_physics
                                 gazebo_sensors
@@ -60,12 +60,16 @@ target_link_libraries( gzserver gazebo_common
 target_link_libraries( gzphysics gazebo_common
                                  gazebo_transport
                                  gazebo_physics
+                                 gazebo_sdf_interface
+                                 gazebo_sdf_parser
                                  gazebo_msgs
                                  assimp
                                  pthread)
 
 target_link_libraries( gzclient gazebo_common
                                 gazebo_transport
+                                gazebo_sdf_interface
+                                gazebo_sdf_parser
                                 gazebo_gui
                                 gazebo_rendering
                                 gazebo_msgs

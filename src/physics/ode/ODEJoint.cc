@@ -50,29 +50,59 @@ ODEJoint::~ODEJoint()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a joint
-void ODEJoint::Load(common::XMLConfigNode *node)
+void ODEJoint::Load( sdf::ElementPtr &_sdf )
 {
-  Joint::Load(node);
+  Joint::Load(_sdf);
 
-  double h = this->GetWorld()->GetPhysicsEngine()->GetStepTime().Double();
-  double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
-  double stopCfm = 1.0 / (h * (**this->stopKpP) + (**this->stopKdP));
+  if (this->sdf->HasElement("physics") && 
+      this->sdf->GetElement("physics")->HasElement("ode"))
+  {
+    sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
 
-  // Set joint parameters
-  this->SetParam(dParamSuspensionERP, **(this->erpP));
-  this->SetParam(dParamCFM, **(this->cfmP));
-  this->SetParam(dParamFudgeFactor, **(this->fudgeFactorP));
-  this->SetParam(dParamVel,0);
-  this->SetParam(dParamFMax,0);
-  this->SetParam(dParamBounce, 0);
-  this->SetParam(dParamStopERP, stopErp);
-  this->SetParam(dParamStopCFM, stopCfm);
+    if (elem->HasElement("limit"))
+    {
+      this->SetParam(dParamStopERP, 
+          elem->GetElement("limit")->GetValueDouble("cfm"));
+      this->SetParam(dParamStopCFM, 
+          elem->GetElement("limit")->GetValueDouble("erp"));
+    }
 
-  if (**this->provideFeedbackP)
+    if (elem->HasElement("suspension"))
+    {
+      this->SetParam(dParamSuspensionERP, 
+          elem->GetElement("suspension")->GetValueDouble("cfm"));
+      this->SetParam(dParamSuspensionCFM, 
+          elem->GetElement("suspension")->GetValueDouble("erp"));
+    }
+
+    if (elem->HasElement("fudge_factor"))
+      this->SetParam(dParamFudgeFactor, 
+          elem->GetElement("fudge_factor")->GetValueDouble());
+
+    if (elem->HasElement("cfm"))
+        this->SetParam(dParamCFM, 
+          elem->GetElement("cfm")->GetValueDouble());
+
+    if (elem->HasElement("bounce"))
+        this->SetParam(dParamBounce, 
+          elem->GetElement("bounce")->GetValueDouble());
+
+    if (elem->HasElement("max_force"))
+      this->SetParam(dParamFMax, 
+          elem->GetElement("max_force")->GetValueDouble());
+
+    if (elem->HasElement("velocity"))
+      this->SetParam(dParamVel, 
+          elem->GetElement("velocity")->GetValueDouble());
+  }
+
+  //TODO: reimplement
+  /*if (**this->provideFeedbackP)
   {
     this->feedback = new dJointFeedback;
     dJointSetFeedback(this->jointId, this->feedback);
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

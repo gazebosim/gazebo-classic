@@ -22,7 +22,6 @@
 #ifndef BOXSHAPE_HH
 #define BOXSHAPE_HH
 
-#include "common/Param.hh"
 #include "physics/Shape.hh"
 
 namespace gazebo
@@ -39,18 +38,13 @@ namespace gazebo
       public: virtual ~BoxShape();
   
       /// \brief Load the box
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Initialize the box
       public: virtual void Init();
  
-      /// \brief Save child parameters
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-  
       /// \brief Set the size of the box
       public: virtual void SetSize( const math::Vector3 &size );
-  
-      private: common::ParamT<math::Vector3> *sizeP;
     };
   }
 }

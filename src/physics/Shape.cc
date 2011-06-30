@@ -40,6 +40,7 @@ Shape::~Shape()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Shape::Load(common::XMLConfigNode * /*_node*/)
+void Shape::Load( sdf::ElementPtr _sdf )
 {
+  this->sdf = _sdf;
 }

@@ -23,7 +23,6 @@
 
 #include "common/Messages.hh"
 #include "common/Events.hh"
-#include "common/XMLConfig.hh"
 
 #include "rendering/Conversions.hh"
 #include "rendering/DynamicLines.hh"
@@ -33,7 +32,6 @@
 #include "common/MeshManager.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 #include "common/Global.hh"
 #include "common/Mesh.hh"
 #include "rendering/Material.hh"

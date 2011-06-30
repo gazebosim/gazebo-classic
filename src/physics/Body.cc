@@ -25,7 +25,6 @@
 #include "common/Messages.hh"
 #include "common/Events.hh"
 #include "math/Quaternion.hh"
-#include "common/XMLConfig.hh"
 #include "common/Console.hh"
 #include "common/Global.hh"
 #include "common/Exception.hh"
@@ -47,42 +46,6 @@ Body::Body(EntityPtr parent)
     : Entity(parent)
 {
   this->AddType(Base::BODY);
-
-  common::Param::Begin(&this->parameters);
-  this->autoDisableP = new common::ParamT<bool>("auto_disable", true, 0);
-  this->autoDisableP->Callback( &Body::SetAutoDisable, this );
-
-  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(), 0);
-  this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this );
-
-  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(), 0);
-  this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this );
-  this->dampingFactorP = new common::ParamT<double>("damping_factor", 0.0, 0);
-
-  // option to turn gravity off for individual body
-  this->turnGravityOffP = new common::ParamT<bool>("turn_gravity_off", false, 0);
-
-  // option to make body collide with bodies of the same parent
-  this->selfCollideP = new common::ParamT<bool>("self_collide", false, 0);
-
-  // User can specify mass/inertia property for the body
-  this->customMassMatrixP = new common::ParamT<bool>("mass_matrix",false,0);
-  this->cxP = new common::ParamT<double>("cx",0.0,0);
-  this->cyP = new common::ParamT<double>("cy",0.0,0);
-  this->czP = new common::ParamT<double>("cz",0.0,0);
-  this->bodyMassP = new common::ParamT<double>("mass",0.001,0);
-  this->ixxP = new common::ParamT<double>("ixx",1e-6,0);
-  this->iyyP = new common::ParamT<double>("iyy",1e-6,0);
-  this->izzP = new common::ParamT<double>("izz",1e-6,0);
-  this->ixyP = new common::ParamT<double>("ixy",0.0,0);
-  this->ixzP = new common::ParamT<double>("ixz",0.0,0);
-  this->iyzP = new common::ParamT<double>("iyz",0.0,0);
-
-  this->kinematicP = new common::ParamT<bool>("kinematic",true,0);
-  this->kinematicP->SetHelp("true = kinematic state only, false = dynamic body");
-  this->kinematicP->Callback( &Body::SetKinematic, this );
-
-  common::Param::End();
 }
 
 
@@ -112,111 +75,54 @@ Body::~Body()
     }
     this->cgVisuals.clear();
   }
-
-  delete this->xyzP;
-  delete this->rpyP;
-  delete this->dampingFactorP;
-  delete this->turnGravityOffP;
-  delete this->selfCollideP;
-
-  delete this->customMassMatrixP;
-  delete this->cxP ;
-  delete this->cyP ;
-  delete this->czP ;
-  delete this->bodyMassP;
-  delete this->ixxP;
-  delete this->iyyP;
-  delete this->izzP;
-  delete this->ixyP;
-  delete this->ixzP;
-  delete this->iyzP;
-  delete this->kinematicP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load the body based on an common::XMLConfig node
-void Body::Load(common::XMLConfigNode *node)
+// Load the body
+void Body::Load( sdf::ElementPtr &_sdf )
 {
-  common::XMLConfigNode *childNode;
+  Entity::Load(_sdf);
 
-  Entity::Load(node);
-
-  //this->comEntity.reset( new Entity(shared_from_this()) );
-  //this->comEntity->SetName("COM_Entity");
-  //this->comEntity->Load(NULL);
+  if (this->sdf->GetElement("inertial"))
+    this->inertial.Load(this->sdf->GetElement("inertial"));
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->selfCollideP->Load(node);
-
-  // option to enter full mass matrix
-  // load custom inertia matrix for the body
-  this->customMassMatrixP->Load(node);
-  this->cxP ->Load(node);
-  this->cyP ->Load(node);
-  this->czP ->Load(node);
-  this->bodyMassP->Load(node);
-  this->ixxP->Load(node);
-  this->iyyP->Load(node);
-  this->izzP->Load(node);
-  this->ixyP->Load(node);
-  this->ixzP->Load(node);
-  this->iyzP->Load(node);
-  this->kinematicP->Load(node);
-  this->dampingFactorP->Load(node);
-  this->turnGravityOffP->Load(node);
-
-  if ( (childNode = node->GetChild("origin")) != NULL)
-  {
-    this->xyzP->Load(childNode);
-    this->rpyP->Load(childNode);
-  }
-
-  // before loading child geometry, we have to figure out of selfCollide is true
-  // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide( **this->selfCollideP );
+  this->SetSelfCollide( this->sdf->GetValueDouble("self_collide") );
 
   // TODO: this shouldn't be in the physics sim
-  childNode = node->GetChild("visual");
-  while (childNode)
+  sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+  while (visualElem)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "::VISUAL_" << 
                this->visuals.size();
 
-    msgs::Visual msg = common::Message::VisualFromXML(childNode);
+    msgs::Visual msg = common::Message::VisualFromSDF(visualElem);
     common::Message::Init(msg, visname.str());
     msg.set_parent_id( this->GetCompleteScopedName() );
     msg.set_is_static( this->IsStatic() );
 
     this->visPub->Publish(msg);
     this->visuals.push_back(msg.header().str_id());
-   
-    childNode = childNode->GetNext("visual");
+  
+    visualElem = this->sdf->GetNextElement("visual", visualElem); 
   }
  
   // Load the geometries
-  childNode = node->GetChild("collision");
-  while (childNode)
+  sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
+  while (collisionElem)
   {
     // Create and Load a geom, which will belong to this body.
-    this->LoadGeom(childNode);
-    childNode = childNode->GetNext("collision");
+    this->LoadGeom(collisionElem);
+    collisionElem = this->sdf->GetNextElement("collision", collisionElem); 
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
 void Body::Init()
 {
-  this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
-  this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
-                                     **this->ixyP, **this->ixzP, **this->iyzP);
-  this->customMass.SetMass(**this->bodyMassP);
-
-  this->mass = this->customMass;
- 
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
@@ -224,8 +130,6 @@ void Body::Init()
     {
       GeomPtr g = boost::shared_static_cast<Geom>(*iter);
       g->Init();
-      if (!**this->customMassMatrixP)
-        this->mass += g->GetMass();
     }
   }
 
@@ -235,17 +139,17 @@ void Body::Init()
   //   this body's pose - this body's offsetFromModelFrame
   this->initModelOffset = this->GetRelativePose().CoordPoseSolve(math::Pose());
 
-  this->SetKinematic(**this->kinematicP);
+  this->SetKinematic( this->sdf->GetValueBool("kinematic") );
 
   // If no geoms are attached, then don't let gravity affect the body.
-  if (this->children.size()==0 || **this->turnGravityOffP)
+  if (this->children.size()==0 || !this->sdf->GetValueDouble("gravity"))
     this->SetGravityMode(false);
 
   // global-inertial damping is implemented in ode svn trunk
-  if(this->GetId() && this->dampingFactorP->GetValue() > 0)
+  if(this->GetId())
   {
-    this->SetLinearDamping(**this->dampingFactorP);
-    this->SetAngularDamping(**this->dampingFactorP);
+    this->SetLinearDamping( this->inertial.GetLinearDamping() );
+    this->SetAngularDamping( this->inertial.GetAngularDamping() );
   }
 
   this->linearAccel.Set(0,0,0);
@@ -308,42 +212,9 @@ void Body::Init()
   this->enabled = true;
 
   // DO THIS LAST!
-  this->SetRelativePose(math::Pose(**this->xyzP, **this->rpyP));
+  sdf::ElementPtr originElem = this->sdf->GetOrCreateElement("origin");
+  this->SetRelativePose( originElem->GetValuePose("pose") );
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our common::XMLConfig node
-void Body::Save(std::string &prefix, std::ostream &stream)
-{
-  Base_V::iterator giter;
-
-  this->xyzP->SetValue( this->GetRelativePose().pos );
-  this->rpyP->SetValue( this->GetRelativePose().rot );
-
-  stream << prefix << "<body name=\"" << this->GetName() << "\">\n";
-  stream << prefix << "  " << *(this->xyzP) << "\n";
-  stream << prefix << "  " << *(this->rpyP) << "\n";
-
-  std::string p = prefix + "  ";
-
-  for (giter = this->children.begin(); giter != this->children.end(); giter++)
-  {
-    stream << "\n";
-    (*giter)->Save(p, stream);
-  }
-
-  // TODO: put back in functionality
-  /*std::vector<Visual*>::iterator iter;
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-  {
-    if (*iter)
-      (*iter)->Save(p, stream);
-  }*/
-
-
-  stream << prefix << "</body>\n";
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the body
@@ -355,18 +226,6 @@ void Body::Fini()
 
   for (giter = this->children.begin(); giter != this->children.end(); giter++)
     (*giter)->Fini();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the friction mode of the body
-void Body::SetFrictionMode( const bool &v )
-{
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
-  {
-    if ((*iter)->HasType(Base::GEOM))
-      boost::shared_static_cast<Geom>(*iter)->SetFrictionMode( v );
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -403,22 +262,8 @@ void Body::SetCollideMode( const std::string &m )
 // Return Self-Collision Setting
 bool Body::GetSelfCollide()
 {
-  return this->selfCollideP->GetValue();
+  return this->sdf->GetValueBool("self_collide");
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the laser fiducial integer id of this body
-void Body::SetLaserFiducialId(int id)
-{
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
-  {
-    if ((*iter)->HasType(Base::GEOM))
-      boost::shared_static_cast<Geom>(*iter)->SetLaserFiducialId( id );
-  }
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser retro reflectiveness of this body
@@ -452,49 +297,11 @@ void Body::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Update the center of mass
-void Body::UpdateCoM()
-{
-  math::Pose bodyPose;
-  math::Pose origPose, newPose;
-  Base_V::iterator iter;
-
-  bodyPose = this->GetRelativePose();
-
-  if (**this->customMassMatrixP)
-  {
-    this->mass = this->customMass;
-  }
-
-  // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
-  {
-    EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
-    if (e)
-    {
-      math::Vector3 offset;
-      origPose = e->GetRelativePose();
-      newPose = origPose;
-
-      newPose.pos -= this->mass.GetCoG();
-      e->SetRelativePose(newPose, true);
-    }
-  }
-
-  //this->comEntity->SetRelativePose(math::Pose(this->mass.GetCoG(),common::Quatern()),true);
-  this->OnPoseChange();
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Load a new geom helper function
-void Body::LoadGeom(common::XMLConfigNode *node)
+void Body::LoadGeom( sdf::ElementPtr &_sdf )
 {
   GeomPtr geom;
-  if (!node->GetChild("geometry"))
-    gzthrow("Collision needs a geometry");
-
-  std::string type = node->GetChild("geometry")->GetChild()->GetName();
+  std::string type = _sdf->GetElement("geometry")->GetFirstElement()->GetName();
 
   /*if (type == "heightmap" || type == "map")
     this->SetStatic(true);
@@ -504,10 +311,9 @@ void Body::LoadGeom(common::XMLConfigNode *node)
       boost::shared_static_cast<Body>(shared_from_this()) );
 
   if (!geom)
-    gzthrow("Unknown Geometry Type["+
-        node->GetString("name",std::string(),0)+"]");
+    gzthrow("Unknown Geometry Type["+type +"]");
 
-  geom->Load(node);
+  geom->Load(_sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -525,7 +331,7 @@ void Body::SetLinearAccel(const math::Vector3 &accel)
 void Body::SetAngularAccel(const math::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
-  this->angularAccel = accel * this->mass.GetAsDouble();
+  this->angularAccel = accel * this->inertial.GetMass().GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -546,28 +352,28 @@ math::Vector3 Body::GetRelativeAngularVel() const
 /// Get the linear acceleration of the body
 math::Vector3 Body::GetRelativeLinearAccel() const
 {
-  return this->GetRelativeForce() / this->mass.GetAsDouble();
+  return this->GetRelativeForce() / this->inertial.GetMass().GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
 math::Vector3 Body::GetWorldLinearAccel() const
 {
-  return this->GetWorldForce() / this->mass.GetAsDouble();
+  return this->GetWorldForce() / this->inertial.GetMass().GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
 math::Vector3 Body::GetRelativeAngularAccel() const
 {
-  return this->GetRelativeTorque() /  this->mass.GetAsDouble();
+  return this->GetRelativeTorque() / this->inertial.GetMass().GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
 math::Vector3 Body::GetWorldAngularAccel() const
 {
-  return this->GetWorldTorque() /  this->mass.GetAsDouble();
+  return this->GetWorldTorque() / this->inertial.GetMass().GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -624,23 +430,7 @@ bool Body::SetSelected( bool s )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Mass
-void Body::SetMass(Mass mass)
+void Body::SetMass(Mass /*_mass*/)
 {
-  /// @todo: needs verification
-  this->mass = mass;
-  this->customMass = mass;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if auto disable is enabled
-bool Body::GetAutoDisable() const
-{
-  return **this->autoDisableP;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the auto disable flag.
-void Body::SetAutoDisable(const bool &value)
-{
-  this->autoDisableP->SetValue(value);
+  gzwarn << "Body::SetMass is empty\n";
 }

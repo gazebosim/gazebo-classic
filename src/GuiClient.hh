@@ -27,7 +27,7 @@ namespace gazebo
   {
     public: GuiClient();
     public: virtual ~GuiClient();
-    public: void Load(const std::string &filename);
+    public: void Load();
     public: void Init();
     public: void Run();
     public: void Stop();

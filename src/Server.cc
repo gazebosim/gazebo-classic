@@ -4,7 +4,9 @@
 #include "common/Timer.hh"
 #include "common/Exception.hh"
 #include "common/SystemPaths.hh"
-#include "common/XMLConfig.hh"
+
+#include "sdf/interface/sdf.h"
+#include "sdf/parser/parser.hh"
 
 #include "sensors/Sensors.hh"
 #include "transport/Transport.hh"
@@ -125,27 +127,13 @@ void Server::Load(const std::string &filename)
   sensors::init("default");
 
   // Load the world file
-  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
+  sdf::SDFPtr sdf(new sdf::SDF);
 
-  try
-  {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
+  sdf::initFile(filename, sdf);
+  sdf::readFile(filename, sdf);
 
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  if (!rootNode || rootNode->GetName() != "gazebo")
-    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
-
-  common::XMLConfigNode *worldNode = rootNode->GetChild("world");
-
-  while(worldNode)
+  sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+  while(worldElem)
   {
     physics::WorldPtr world = physics::create_world("default");
 
@@ -154,18 +142,18 @@ void Server::Load(const std::string &filename)
     //Create the world
     try
     {
-      physics::load_world(world, worldNode);
+      physics::load_world(world, worldElem);
     }
     catch (common::Exception e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    worldNode = worldNode->GetNext("world");
+    worldElem = sdf->root->GetNextElement("world", worldElem);
   }
 
   // Load the rendering system
-  if (!rendering::load(filename))
+  if (!rendering::load())
     gzthrow("Unable to load the rendering engine");
 
   // The rendering engine will run headless 

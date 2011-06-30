@@ -2,7 +2,6 @@
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
@@ -65,7 +64,7 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::Load( const common::XMLConfigNode * /*_node*/ )
+void MainWindow::Load()
 {
 }
 

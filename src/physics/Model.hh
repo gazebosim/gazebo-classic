@@ -44,14 +44,9 @@ namespace gazebo
       public: virtual ~Model();
     
       /// \brief Load the model
-      /// \param node Pointer to an XML configuration node
-      public: void Load(common::XMLConfigNode *node);
+      /// \param _sdf SDF parameters
+      public: void Load( sdf::ElementPtr &_sdf );
     
-      /// \brief Save the model
-      /// \param prefix Formatting prefix string
-      /// \param stream Ouptut stream
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-  
       /// \brief Initialize the model
       public: virtual void Init();
     
@@ -141,38 +136,18 @@ namespace gazebo
       /// \brief Set the gravity mode of the model
       public: void SetGravityMode( const bool &v );
   
-      /// \brief Set the friction mode of the model
-      public: void SetFrictionMode( const bool &v );
-  
       /// \brief Set the collide mode of the model
       /// \param m The collision mode
       public: void SetCollideMode( const std::string &m );
-  
-      /// \brief Set the laser fiducial integer Id of the model
-      /// \param id ID of the laser fiducial
-      public: void SetLaserFiducialId( const int &id );
   
       /// \brief Set the laser retro reflectiveness of the model
       /// \param retro Retro reflectance value
       public: void SetLaserRetro( const float &retro );
   
       /// \brief Load a joint helper function
-      /// \param node XML Configuration node
-      private: void LoadJoint(common::XMLConfigNode *node);
+      /// \param _sdf SDF parameter
+      private: void LoadJoint( sdf::ElementPtr &_sdf );
     
-      /// \brief Load the children and joints 
-      /// \param node Pointer to the configure node
-      private: void LoadChildrenAndJoints(common::XMLConfigNode *node);
-   
-      private: common::ParamT<std::string> *canonicalBodyNameP;
-      private: common::ParamT<math::Vector3> *xyzP;
-      private: common::ParamT<math::Quaternion> *rpyP;
-      private: common::ParamT<bool> *enableGravityP;
-      private: common::ParamT<bool> *enableFrictionP;
-      private: common::ParamT<int> *laserFiducialP;
-      private: common::ParamT<float> *laserRetroP;
-      private: common::ParamT<std::string> *collideP;
-  
       private: BodyPtr canonicalBody;
 
       private: Joint_V joints;

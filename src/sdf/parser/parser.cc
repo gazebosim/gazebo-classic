@@ -79,6 +79,14 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     return false;
   }
   _sdf->SetRequired( requiredString );
+ 
+  const char *elemTypeString = _xml->Attribute("type");
+  if (elemTypeString)
+  {
+    bool required = std::string(requiredString) == "1" ? true : false;
+    const char *elemDefaultValue = _xml->Attribute("default");
+    _sdf->AddValue(elemTypeString, elemDefaultValue, required);
+  }
   
   // Get all attributes
   for (TiXmlElement *child = _xml->FirstChildElement("attribute"); 
@@ -174,6 +182,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     }
     else
       return true;
+  }
+
+  if (_xml->GetText() != NULL && _sdf->value)
+  {
+    _sdf->value->SetFromString( _xml->GetText() );
   }
 
   // Read all the attributes

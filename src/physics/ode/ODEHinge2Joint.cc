@@ -23,7 +23,6 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 #include "common/Global.hh"
-#include "common/XMLConfig.hh"
 
 #include "physics/Body.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
@@ -38,37 +37,19 @@ ODEHinge2Joint::ODEHinge2Joint( dWorldID worldId )
     : Hinge2Joint<ODEJoint>()
 {
   this->jointId = dJointCreateHinge2( worldId, NULL );
-
-  common::Param::Begin(&this->parameters);
-  this->suspensionCfmP = new common::ParamT<double>("suspensionCfm",0.0,0);
-  common::Param::End();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
 ODEHinge2Joint::~ODEHinge2Joint()
 {
-  delete this->suspensionCfmP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Load the joint
-void ODEHinge2Joint::Load(common::XMLConfigNode *node)
+void ODEHinge2Joint::Load( sdf::ElementPtr &_sdf )
 {
-  Hinge2Joint<ODEJoint>::Load(node);
-
-  this->suspensionCfmP->Load(node);
-
-  // Suspension CFM is only valid for Hinge2 joints
-  this->SetParam(dParamSuspensionCFM, **(this->suspensionCfmP));
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save a joint to a stream in XML format
-void ODEHinge2Joint::SaveJoint(std::string &prefix, std::ostream &stream)
-{
-  Hinge2Joint<ODEJoint>::SaveJoint(prefix, stream);
-  stream << prefix << "  " << *(this->suspensionCfmP) << "\n";
+  Hinge2Joint<ODEJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////////////////////////////////

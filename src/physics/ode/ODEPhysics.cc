@@ -27,7 +27,6 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "math/Vector3.hh"
-#include "common/XMLConfig.hh"
 #include "common/Time.hh"
 
 #include "physics/PhysicsFactory.hh"
@@ -124,20 +123,6 @@ ODEPhysics::ODEPhysics(WorldPtr world)
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
-
-  common::Param::Begin(&this->parameters);
-  this->globalCFMP = new common::ParamT<double>("cfm", 10e-5, 0);
-  this->globalERPP = new common::ParamT<double>("erp", 0.2, 0);
-  this->stepTypeP = new common::ParamT<std::string>("step_type", "quick", 0);
-  this->stepItersP = new common::ParamT<unsigned int>("step_iters", 100, 0);
-  this->stepWP = new common::ParamT<double>("stepW", 1.3, 0);  /// over_relaxation value for SOR
-  this->contactMaxCorrectingVelP = new common::ParamT<double>("contact_max_correcting_vel", 10.0, 0);
-  this->contactSurfaceLayerP = new common::ParamT<double>("contact_surface_layer", 0.01, 0);
-  this->autoDisableBodyP = new common::ParamT<bool>("auto_disable_body", true, 0);
-  this->contactFeedbacksP = new common::ParamT<int>("contact_feedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
-  this->maxContactsP = new common::ParamT<int>("max_contacts",100,0); // enforced for trimesh-trimesh contacts
-  common::Param::End();
-
 }
 
 
@@ -157,96 +142,64 @@ ODEPhysics::~ODEPhysics()
 
   this->spaceId = NULL;
   this->worldId = NULL;
-
-  delete this->globalCFMP;
-  delete this->globalERPP;
-  delete this->stepTypeP;
-  delete this->stepItersP;
-  delete this->stepWP;
-  delete this->contactMaxCorrectingVelP;
-  delete this->contactSurfaceLayerP;
-  delete this->autoDisableBodyP;
-  delete this->contactFeedbacksP;
-  delete this->maxContactsP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the ODE engine
-void ODEPhysics::Load(common::XMLConfigNode *node)
+void ODEPhysics::Load( sdf::ElementPtr _sdf)
 {
-  this->gravityP->Load(node);
-  this->stepTimeP->Load(node);
-  this->updateRateP->Load(node);
-  this->globalCFMP->Load(node);
-  this->globalERPP->Load(node);
-  this->stepTypeP->Load(node);
-  this->stepItersP->Load(node);
-  this->stepWP->Load(node);
-  this->contactMaxCorrectingVelP->Load(node);
-  this->contactSurfaceLayerP->Load(node);
-  this->autoDisableBodyP->Load(node);
-  this->contactFeedbacksP->Load(node);
-  this->maxContactsP->Load(node);
+  sdf::ElementPtr odeElem = _sdf->GetElement("ode");
 
-  this->stepTimeDouble = (**this->stepTimeP).Double();
+  this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
+  this->stepType = odeElem->GetElement("solver")->GetValueString("type");
 
   this->contactGeoms = new dContactGeom[this->GetMaxContacts()];
 
   // Help prevent "popping of deeply embedded object
-  dWorldSetContactMaxCorrectingVel(this->worldId, **contactMaxCorrectingVelP);
+  dWorldSetContactMaxCorrectingVel(this->worldId, 
+      odeElem->GetOrCreateElement("constraints")->GetValueDouble("contact_max_correcting_vel"));
 
   // This helps prevent jittering problems.
-  dWorldSetContactSurfaceLayer(this->worldId, **contactSurfaceLayerP);
+  dWorldSetContactSurfaceLayer(this->worldId,
+      odeElem->GetOrCreateElement("constraints")->GetValueDouble("contact_surface_layer"));
 
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId,1);// **this->autoDisableBodyP);
+  dWorldSetAutoDisableFlag(this->worldId,1);
+
   /*dWorldSetAutoDisableTime(this->worldId, 1);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
   dWorldSetAutoDisableSteps(this->worldId, 10);
   */
-  this->contactFeedbacks.resize(**this->contactFeedbacksP);
+  this->contactFeedbacks.resize(10);
 
   // NATY: not sure if I can remove this...check
   // Reset the contact pointer
   //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
-  math::Vector3 g = **this->gravityP;
+  math::Vector3 g = this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
 
-  dWorldSetCFM(this->worldId, **this->globalCFMP);
-  dWorldSetERP(this->worldId, **this->globalERPP);
+  if (odeElem->HasElement("constraints"))
+  {
+    dWorldSetCFM(this->worldId, 
+        odeElem->GetElement("constraints")->GetValueDouble("cfm"));
+    dWorldSetERP(this->worldId, 
+        odeElem->GetElement("constraints")->GetValueDouble("erp"));
+  }
 
-  dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
-  dWorldSetQuickStepW(this->worldId, **this->stepWP );
+  dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters() );
+  dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
 
   // Set the physics update function
-  if (**this->stepTypeP == "quick")
+  if (this->stepType == "quick")
     this->physicsStepFunc = &dWorldQuickStep;
-  else if (**this->stepTypeP == "world")
+  else if (this->stepType == "world")
     this->physicsStepFunc = &dWorldStep;
   else
-    gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Save the ODE engine
-void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << "<physics type=\"ode\">\n";
-  stream << prefix << "  " << *(this->stepTimeP) << "\n";
-  stream << prefix << "  " << *(this->gravityP) << "\n";
-  stream << prefix << "  " << *(this->updateRateP) << "\n";
-  stream << prefix << "  " << *(this->globalCFMP) << "\n";
-  stream << prefix << "  " << *(this->globalERPP) << "\n";
-  stream << prefix << "  " << *(this->stepTypeP) << "\n";
-  stream << prefix << "  " << *(this->stepItersP) << "\n";
-  stream << prefix << "  " << *(this->stepWP) << "\n";
-  stream << prefix << "  " << *(this->contactMaxCorrectingVelP) << "\n";
-  stream << prefix << "  " << *(this->contactSurfaceLayerP) << "\n";
-  stream << prefix << "</physics>\n";
+    gzthrow(std::string("Invalid step type[") + this->stepType);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,6 +289,13 @@ void ODEPhysics::Fini()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the simulation step time
+double ODEPhysics::GetStepTime()
+{
+  return this->stepTimeDouble;
+}
+ 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
@@ -408,112 +368,109 @@ void ODEPhysics::ConvertMass(Mass *mass, void *engineMass)
       odeMass->I[0*4+2], odeMass->I[1*4+2] );
 }
 
-void ODEPhysics::SetAutoDisableFlag(bool auto_disable)
-{
-  this->autoDisableBodyP->SetValue(auto_disable);
-  dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the step iterations
 void ODEPhysics::SetSORPGSIters(unsigned int iters)
 {
-  this->stepItersP->SetValue(iters);
-  dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
+  this->sdf->GetElement("ode")->GetElement("solver")->GetAttribute("iters")->Set(iters);
+  dWorldSetQuickStepNumIterations(this->worldId, iters );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ODEPhysics::SetSORPGSW(double w)
 {
-  this->stepWP->SetValue(w);
-  dWorldSetQuickStepW(this->worldId, this->stepWP->GetValue() );
+  this->sdf->GetElement("ode")->GetElement("solver")->GetAttribute("sor")->Set(w);
+  dWorldSetQuickStepW(this->worldId, w );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ODEPhysics::SetWorldCFM(double cfm)
 {
-  this->globalCFMP->SetValue(cfm);
-  dWorldSetCFM(this->worldId, this->globalCFMP->GetValue() );
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
+  elem->GetOrCreateElement("constraints");
+  elem->GetAttribute("cfm")->Set(cfm);
+
+  dWorldSetCFM(this->worldId, cfm );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ODEPhysics::SetWorldERP(double erp)
 {
-  this->globalERPP->SetValue(erp);
-  dWorldSetERP(this->worldId, this->globalERPP->GetValue());
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
+  elem->GetOrCreateElement("constraints");
+  elem->GetAttribute("erp")->Set(erp);
+  dWorldSetERP(this->worldId, erp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ODEPhysics::SetContactMaxCorrectingVel(double vel)
+void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
 {
-  this->contactMaxCorrectingVelP->SetValue(vel);
-  dWorldSetContactMaxCorrectingVel(this->worldId, this->contactMaxCorrectingVelP->GetValue());
+  this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetAttribute("contact_max_Correcting_vel")->Set(_vel);
+  dWorldSetContactMaxCorrectingVel(this->worldId, _vel);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ODEPhysics::SetContactSurfaceLayer(double layer_depth)
+void ODEPhysics::SetContactSurfaceLayer(double _depth)
 {
-  this->contactSurfaceLayerP->SetValue(layer_depth);
-  dWorldSetContactSurfaceLayer(this->worldId, this->contactSurfaceLayerP->GetValue());
+  this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetAttribute("contact_surface_layer")->Set(_depth);
+  dWorldSetContactSurfaceLayer(this->worldId, _depth);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ODEPhysics::SetMaxContacts(double max_contacts)
+void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->maxContactsP->SetValue(max_contacts);
+  this->sdf->GetElement("ode")->GetOrCreateElement("max_contacts")->GetValue()->Set(_maxContacts);
 
   if (this->contactGeoms)
     delete this->contactGeoms;
   
-  this->contactGeoms = new dContactGeom[**this->maxContactsP];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool ODEPhysics::GetAutoDisableFlag()
-{
-  return this->autoDisableBodyP->GetValue();
+  this->contactGeoms = new dContactGeom[_maxContacts];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int ODEPhysics::GetSORPGSIters()
 {
-  return this->stepItersP->GetValue();
+  return this->sdf->GetElement("ode")->GetElement("solver")->GetValueInt("iters");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetSORPGSW()
 {
-  return this->stepWP->GetValue();
+  return this->sdf->GetElement("ode")->GetElement("solver")->GetValueInt("sor");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetWorldCFM()
 {
-  return this->globalCFMP->GetValue();
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
+  elem->GetOrCreateElement("constraints");
+  return elem->GetValueDouble("cfm");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetWorldERP()
 {
-  return this->globalERPP->GetValue();
+  sdf::ElementPtr elem = this->sdf->GetElement("ode");
+  elem->GetOrCreateElement("constraints");
+  return elem->GetValueDouble("erp");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetContactMaxCorrectingVel()
 {
-  return this->contactMaxCorrectingVelP->GetValue();
+  return this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetValueDouble("contact_max_Correcting_vel");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetContactSurfaceLayer()
 {
-  return this->contactSurfaceLayerP->GetValue();
+  return this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetValueDouble("contact_surface_layer");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return (**this->maxContactsP);
+  return this->sdf->GetElement("ode")->GetOrCreateElement("max_contacts")->GetValueInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -567,21 +524,24 @@ dSpaceID ODEPhysics::GetSpaceId() const
 /// Get the step type
 std::string ODEPhysics::GetStepType() const
 {
-  return **this->stepTypeP;
+  sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
+  return elem->GetValueString("type");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the step type
 void ODEPhysics::SetStepType(const std::string type)
 {
-  this->stepTypeP->SetValue(type);
+  sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
+  elem->GetAttribute("type")->Set(type);
+  this->stepType = type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the gavity vector
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
 {
-  this->gravityP->SetValue(gravity);
+  this->sdf->GetOrCreateElement("gravity")->GetAttribute("xyz")->Set(gravity);
   dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
 }
 
@@ -672,7 +632,7 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
     contactFeedback.feedbacks.resize(numc);
     */
 
-    double h, kp, kd;
+    //double h, kp, kd;
     for (j=0; j<numc; j++)
     {
       // skip negative depth contacts
@@ -685,9 +645,10 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
                              dContactSoftERP | dContactSoftCFM |  
                              dContactBounce | dContactMu2 | dContactApprox1;
 
+      // TODO: put this back in.
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
-      h = this->stepTimeDouble;
+      /*h = this->stepTimeDouble;
       kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
       kd = geom1->surface->kd + geom2->surface->kd;
       contact.surface.soft_erp = h * kp / (h * kp + kd);
@@ -711,11 +672,12 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
         contact.surface.slip1 = 0.1;
         contact.surface.slip2 = 0.1;
       }
+      */
 
       contact.surface.bounce = std::min(geom1->surface->bounce, 
                                         geom2->surface->bounce);
-      contact.surface.bounce_vel = std::min(geom1->surface->bounceVel, 
-                                            geom2->surface->bounceVel);
+      contact.surface.bounce_vel = std::min(geom1->surface->bounceThreshold, 
+                                            geom2->surface->bounceThreshold);
 
       dJointID c;
 

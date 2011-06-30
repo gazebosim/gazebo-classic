@@ -25,7 +25,6 @@
 #include "common/Events.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "physics/PhysicsEngine.hh"
 #include "physics/Body.hh"
@@ -45,18 +44,6 @@ Joint::Joint()
   this->AddType(Base::JOINT);
   this->showJoints = false;
 
-  common::Param::Begin(&this->parameters);
-  this->erpP = new common::ParamT<double>("erp",0.4,0);
-  this->cfmP = new common::ParamT<double>("cfm",10e-3,0);
-  this->stopKpP = new common::ParamT<double>("stop_kp",1000000.0,0);
-  this->stopKdP = new common::ParamT<double>("stop_kd",1.0,0);
-  this->parentNameP = new common::ParamT<std::string>("link",std::string(),1);
-  this->childNameP = new common::ParamT<std::string>("link",std::string(),1);
-  this->anchorOffsetP = new common::ParamT<math::Vector3>("anchor_offset",math::Vector3(0,0,0), 0);
-  this->provideFeedbackP = new common::ParamT<bool>("provide_feedback", false, 0);
-  this->fudgeFactorP = new common::ParamT<double>( "fudge_factor", 1.0, 0 );
-  common::Param::End();
-
   this->showJointsConnection = event::Events::ConnectShowJointsSignal(boost::bind(&Joint::ShowJoints, this, _1) );
 }
 
@@ -65,91 +52,52 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  /*if (!this->visual.empty())
-  {
-    msgs::Visual msg;
-    common::Message::Init(msg, this->visual);
-    msg.set_action( msgs::Visual::DELETE );
-    this->vis_pub->Publish(msg);
-  }
-
-  if (!this->line1.empty())
-  {
-    msgs::Visual msg;
-    common::Message::Init(msg, this->line1);
-    msg.set_action( msgs::Visual::DELETE );
-    this->vis_pub->Publish(msg);
-  }
-
-  if (!this->line2.empty())
-  {
-    msgs::Visual msg;
-    common::Message::Init(msg, this->line2);
-    msg.set_action( msgs::Visual::DELETE );
-    this->vis_pub->Publish(msg);
-  }
-  */
-
-  delete this->erpP;
-  delete this->cfmP;
-  delete this->stopKpP;
-  delete this->stopKdP;
-  delete this->parentNameP;
-  delete this->childNameP;
-  delete this->anchorOffsetP;
-  delete this->provideFeedbackP;
-  delete this->fudgeFactorP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Load a joint
-void Joint::Load(common::XMLConfigNode *node)
+void Joint::Load(sdf::ElementPtr &_sdf)
 {
-  Base::Load(node);
+  Base::Load(_sdf);
 
   //this->node->Init(this->GetWorld()->GetName());
   //this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
 
-  this->childNameP->Load(node->GetChild("child"));
-  this->parentNameP->Load(node->GetChild("parent"));
-  this->anchorOffsetP->Load(node);
-  this->erpP->Load(node);
-  this->cfmP->Load(node);
-  this->stopKpP->Load(node);
-  this->stopKdP->Load(node);
-  this->provideFeedbackP->Load(node);
-  this->fudgeFactorP->Load(node);
-
   std::ostringstream visname;
+
+  std::string parentName = _sdf->GetElement("parent")->GetValueString("link");
+  std::string childName = _sdf->GetElement("child")->GetValueString("link");
 
   if (this->model)
   {
-    visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
+    visname << this->model->GetScopedName() 
+            << "::" << this->GetName() << "_VISUAL";
 
-    this->childBody = this->model->GetBody( **(this->childNameP) );
-    this->parentBody = this->model->GetBody( **(this->parentNameP) );
+    this->childBody = this->model->GetBody( childName );
+    this->parentBody = this->model->GetBody( parentName );
   }
   else
   {
     visname << this->GetName() << "_VISUAL";
     this->childBody = boost::shared_dynamic_cast<Body>(
-        this->GetWorld()->GetByName( **(this->childNameP) ));
+        this->GetWorld()->GetByName( childName) );
 
     this->parentBody = boost::shared_dynamic_cast<Body>(
-        this->GetWorld()->GetByName( **(this->parentNameP) ));
+        this->GetWorld()->GetByName( parentName ));
   }
 
   this->anchorBody = this->parentBody;
 
-  if (!this->parentBody && **this->parentNameP != std::string("world"))
-    gzthrow("Couldn't Find Parent Body[" + **this->parentNameP );
+  if (!this->parentBody && parentName != std::string("world"))
+    gzthrow("Couldn't Find Parent Body[" + parentName );
 
-  if (!this->childBody && **this->childNameP != std::string("world"))
-    gzthrow("Couldn't Find Child Body[" + **this->childNameP);
+  if (!this->childBody && childName != std::string("world"))
+    gzthrow("Couldn't Find Child Body[" + childName);
+
+  math::Pose offset = _sdf->GetElement("origin")->GetValuePose("pose");
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = (math::Pose(**(this->anchorOffsetP), math::Quaternion()) + this->anchorBody->GetWorldPose()).pos ;
-
+  this->anchorPos = (offset + this->anchorBody->GetWorldPose()).pos ;
 }
 
 void Joint::Init()
@@ -193,28 +141,6 @@ void Joint::Init()
   {
     this->SetAnchor(0, this->anchorPos);
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Save a joint to a stream in XML format
-void Joint::Save(std::string &prefix, std::ostream &stream)
-{
-  std::string typeName;// =Base::EntityTypename[ (int)this->GetLeafType() ];
-
-  stream << prefix << "<joint:" << typeName << " name=\"" << this->GetName() << "\">\n";
-  stream << prefix << "  " << *(this->childNameP) << "\n";
-  stream << prefix << "  " << *(this->parentNameP) << "\n";
-  stream << prefix << "  " << *(this->anchorOffsetP) << "\n";
-
-  stream << prefix << "  " << *(this->erpP) << "\n";
-  stream << prefix << "  " << *(this->cfmP) << "\n";
-  stream << prefix << "  " << *(this->fudgeFactorP) << "\n";
-
-  this->SaveJoint(prefix, stream);
-
-  std::string p = prefix + "  ";
-
-  stream << prefix << "</joint:" << typeName << ">\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

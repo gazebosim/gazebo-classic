@@ -1,12 +1,14 @@
 <element name="gazebo" required="1">
   <attribute name="version" type="string" default="1.0" required="1"/>
 
-  <element name="world" required="+">
+  <element name="world" required="*">
     <attribute name="name" type="string" default="world" required="1"/>
 
     <!-- Physics -->
     <element name="physics" required="1">
       <attribute name="type" type="string" default="ode" required="1"/>
+      <element name="max_contacts" type="int" default="50" required="0"/>
+
       <element name="gravity" required="0">
           <attribute name="xyz" type="vector3" default="0 0 0" required="1"/>
       </element> <!-- End Gravity -->
@@ -106,6 +108,8 @@
         <attribute name="name" type="string" default="link" required="1"/>
         <attribute name="gravity" type="bool" default="true" required="0"/>
         <attribute name="self_collide" type="bool" default="false" required="0"/>
+        <attribute name="kinematic" type="bool" default="false" required="0"/>
+
         <element name="origin" required="0">
           <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
         </element> <!-- End Origin -->
@@ -198,6 +202,8 @@
               <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
             </element> <!-- End Color -->
           </element> <!-- End Material -->
+
+          <!-- Geometry -->
           <element name="geometry" required="1">
             <element name="box" required="0">
               <attribute name="size" type="vector3" default="0 0 0" required="1"/>
@@ -216,6 +222,19 @@
             <element name="plane" required="0">
               <attribute name="normal" type="vector3" default="0 0 1" required="1"/>
             </element> <!-- End Plane -->
+            <element name="image" required="0">
+              <attribute name="filename" type="string" default="__default__" required="1"/>
+              <attribute name="scale" type="double" default="1" required="1"/>
+              <attribute name="threshold" type="int" default="200" required="1"/>
+              <attribute name="height" type="double" default="1" required="1"/>
+              <attribute name="granularity" type="int" default="1" required="1"/>
+            </element> <!-- End Image -->
+
+            <element name="heightmap" required="0">
+              <attribute name="filename" type="string" default="__default__" required="1"/>
+              <attribute name="size" type="vector3" default="1 1 1" required="1"/>
+              <attribute name="offset" type="vector3" default="0 0 0" required="1"/>
+            </element> <!-- End Heightmap -->
           </element><!-- End Geometry -->
         </element> <!-- End Visual -->
 
@@ -287,6 +306,7 @@
         </element> <!-- End Sensor -->
       </element> <!-- End Link -->
 
+      <!-- Joint -->
       <element name="joint" required="*">
         <attribute name="name" type="string" default="__default__" required="1"/>
         <attribute name="type" type="string" default="__default__" required="1"/>
@@ -299,22 +319,53 @@
         <element name="origin" required="0">
           <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
         </element> <!-- End Origin -->
+
         <element name="axis" required="1">
           <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+          <element name="dynamics" required="0">
+            <attribute name="damping" type="double" default="0" required="0"/>
+            <attribute name="friction" type="double" default="0" required="0"/>
+          </element> <!-- End Dynamics -->
+          <element name="limit" required="0">
+            <attribute name="lower" type="double" default="0" required="0"/>
+            <attribute name="upper" type="double" default="0" required="0"/>
+            <attribute name="effort" type="double" default="0" required="0"/>
+            <attribute name="velocity" type="double" default="0" required="0"/>
+          </element> <!-- End Limit -->
         </element> <!-- End Axis -->
-        <element name="axis2" required="0">
+
+        <element name="axis2" required="1">
           <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+          <element name="dynamics" required="0">
+            <attribute name="damping" type="double" default="0" required="0"/>
+            <attribute name="friction" type="double" default="0" required="0"/>
+          </element> <!-- End Dynamics -->
+          <element name="limit" required="0">
+            <attribute name="lower" type="double" default="0" required="0"/>
+            <attribute name="upper" type="double" default="0" required="0"/>
+            <attribute name="effort" type="double" default="0" required="0"/>
+            <attribute name="velocity" type="double" default="0" required="0"/>
+          </element> <!-- End Limit -->
         </element> <!-- End Axis2 -->
-        <element name="dynamics" required="0">
-          <attribute name="damping" type="double" default="0" required="0"/>
-          <attribute name="friction" type="double" default="0" required="0"/>
-        </element> <!-- End Dynamics -->
-        <element name="limit" required="0">
-          <attribute name="lower" type="double" default="0" required="0"/>
-          <attribute name="upper" type="double" default="0" required="0"/>
-          <attribute name="effort" type="double" default="0" required="0"/>
-          <attribute name="velocity" type="double" default="0" required="0"/>
-        </element> <!-- End Limit -->
+
+        <element name="physics" required="0">
+          <element name="ode" required="0">
+            <element name="fudge_factor" type="double" default="0" required="0"/>
+            <element name="cfm" type="double" default="0" required="0"/>
+            <element name="bounce" type="double" default="0" required="0"/>
+            <element name="max_force" type="double" default="0" required="0"/>
+            <element name="velocity" type="double" default="0" required="0"/>
+
+            <element name="limit" required="0">
+              <attribute name="cfm" type="double" default="0" required="1"/>
+              <attribute name="erp" type="double" default="0" required="1"/>
+            </element>
+            <element name="suspension" required="0">
+              <attribute name="cfm" type="double" default="0" required="1"/>
+              <attribute name="erp" type="double" default="0" required="1"/>
+            </element>
+          </element>
+        </element> <!-- End Physics -->
       </element> <!-- End Joint -->
 
       <element name="plugin" required="*">
@@ -336,7 +387,8 @@
         <attribute name="value" type="string" default="value" required="1"/>
       </element>
     </element> <!-- End Plugin -->
-  
+
+    <!-- Joint --> 
     <element name="joint" required="*">
       <attribute name="name" type="string" default="__default__" required="1"/>
       <attribute name="type" type="string" default="__default__" required="1"/>
@@ -351,20 +403,320 @@
       </element>
       <element name="axis" required="1">
         <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
-      </element>
-      <element name="axis2" required="0">
+        <element name="dynamics" required="0">
+          <attribute name="damping" type="double" default="0" required="0"/>
+          <attribute name="friction" type="double" default="0" required="0"/>
+        </element> <!-- End Dynamics -->
+        <element name="limit" required="0">
+          <attribute name="lower" type="double" default="0" required="0"/>
+          <attribute name="upper" type="double" default="0" required="0"/>
+          <attribute name="effort" type="double" default="0" required="0"/>
+          <attribute name="velocity" type="double" default="0" required="0"/>
+        </element> <!-- End Limit -->
+      </element> <!-- End Axis -->
+
+      <element name="axis2" required="1">
         <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
-      </element>
-      <element name="dynamics" required="0">
-        <attribute name="damping" type="double" default="0" required="0"/>
-        <attribute name="friction" type="double" default="0" required="0"/>
-      </element>
-      <element name="limit" required="0">
-        <attribute name="lower" type="double" default="0" required="0"/>
-        <attribute name="upper" type="double" default="0" required="0"/>
-        <attribute name="effort" type="double" default="0" required="0"/>
-        <attribute name="velocity" type="double" default="0" required="0"/>
-      </element>
+        <element name="dynamics" required="0">
+          <attribute name="damping" type="double" default="0" required="0"/>
+          <attribute name="friction" type="double" default="0" required="0"/>
+        </element> <!-- End Dynamics -->
+        <element name="limit" required="0">
+          <attribute name="lower" type="double" default="0" required="0"/>
+          <attribute name="upper" type="double" default="0" required="0"/>
+          <attribute name="effort" type="double" default="0" required="0"/>
+          <attribute name="velocity" type="double" default="0" required="0"/>
+        </element> <!-- End Limit -->
+      </element> <!-- End Axis2 -->
+      <element name="physics" required="0">
+        <element name="ode" required="0">
+          <element name="fudge_factor" type="double" default="0" required="0"/>
+          <element name="cfm" type="double" default="0" required="0"/>
+          <element name="bounce" type="double" default="0" required="0"/>
+          <element name="max_force" type="double" default="0" required="0"/>
+          <element name="velocity" type="double" default="0" required="0"/>
+          <element name="limit" required="0">
+            <attribute name="cfm" type="double" default="0" required="1"/>
+            <attribute name="erp" type="double" default="0" required="1"/>
+          </element>
+
+          <element name="suspension" required="0">
+            <attribute name="cfm" type="double" default="0" required="1"/>
+            <attribute name="erp" type="double" default="0" required="1"/>
+          </element>
+        </element>
+      </element> <!-- End Physics -->
+
     </element> <!-- End Joint -->
   </element> <!-- End World -->
+
+  <!-- Model -->
+  <element name="model" required="*">
+    <attribute name="name" type="string" default="model" required="1"/>
+    <attribute name="static" type="bool" default="false" required="0"/>
+
+    <element name="origin" required="0">
+      <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+    </element> <!-- End Origin -->
+ 
+    <!-- Link -->
+    <element name="link" required="+">
+      <attribute name="name" type="string" default="link" required="1"/>
+      <attribute name="gravity" type="bool" default="true" required="0"/>
+      <attribute name="self_collide" type="bool" default="false" required="0"/>
+      <attribute name="kinematic" type="bool" default="false" required="0"/>
+
+      <element name="origin" required="0">
+        <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+      </element> <!-- End Origin -->
+
+      <!-- Inertial -->
+      <element name="inertial" required="1">
+        <attribute name="mass" type="double" default="1.0" required="1"/>
+        <element name="origin" required="0">
+          <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        </element> <!-- End Origin -->
+        <element name="inertia" required="1">
+          <attribute name="ixx" type="double" default="1.0" required="1"/>
+          <attribute name="ixy" type="double" default="1.0" required="1"/>
+          <attribute name="ixz" type="double" default="1.0" required="1"/>
+          <attribute name="iyy" type="double" default="1.0" required="1"/>
+          <attribute name="iyz" type="double" default="1.0" required="1"/>
+          <attribute name="izz" type="double" default="1.0" required="1"/>
+        </element> <!-- End Inertia -->
+      </element> <!-- End Inertial -->
+ 
+
+      <!-- Collision -->
+      <element name="collision" required="*">
+        <attribute name="name" type="string" default="collision" required="0"/>
+        <attribute name="laser_retro" type="double" default="0" required="0"/>
+        <element name="origin" required="0">
+          <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        </element> <!-- End Origin -->
+        <element name="geometry" required="1">
+          <element name="box" required="0">
+            <attribute name="size" type="vector3" default="0 0 0" required="1"/>
+          </element> <!-- End Box -->
+          <element name="sphere" required="0">
+            <attribute name="radius" type="double" default="0" required="1"/>
+          </element> <!-- End Sphere -->
+          <element name="cylinder" required="0">
+            <attribute name="radius" type="double" default="0" required="1"/>
+            <attribute name="length" type="double" default="0" required="1"/>
+          </element> <!-- End Cylinder -->
+          <element name="mesh" required="0">
+            <attribute name="filename" type="string" default="file" required="1"/>
+            <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
+          </element> <!-- End Mesh -->
+          <element name="plane" required="0">
+            <attribute name="normal" type="vector3" default="0 0 1" required="1"/>
+          </element> <!-- End Plane -->
+        </element><!-- End Geometry -->
+  
+        <element name="surface" required="0">
+          <element name="bounce" required="0">
+            <attribute name="restitution_coefficient" type="double" default="0" required="0"/>
+            <attribute name="threshold" type="double" default="0" required="0"/>
+          </element> <!-- End Bounce -->
+  
+          <element name="friction" required="0">
+            <element name="ode" required="0">
+              <attribute name="mu" type="double" default="0" required="0"/>
+              <attribute name="mu2" type="double" default="0" required="0"/>
+              <attribute name="fdir1" type="double" default="0" required="0"/>
+              <attribute name="slip1" type="double" default="0" required="0"/>
+              <attribute name="slip2" type="double" default="0" required="0"/>
+            </element> <!-- End ODE -->
+          </element> <!-- End Friction -->
+  
+          <element name="contact" required="0">
+            <element name="ode" required="0">
+              <attribute name="soft_cfm" type="double" default="0" required="0"/>
+              <attribute name="kp" type="double" default="0" required="0"/>
+              <attribute name="kd" type="double" default="0" required="0"/>
+              <attribute name="max_vel" type="double" default="0" required="0"/>
+              <attribute name="min_depth" type="double" default="0" required="0"/>
+            </element> <!-- End ODE -->
+          </element> <!-- End Contact -->
+        </element> <!-- End Surface -->
+      </element> <!-- End Collision -->
+
+  
+      <!-- Visual -->
+      <element name="visual" required="*">
+        <attribute name="name" type="string" default="visual" required="0"/>
+        <attribute name="cast_shadows" type="bool" default="true" required="0"/>
+        <attribute name="laser_retro" type="double" default="0.0" required="0"/>
+        <element name="origin" required="0">
+          <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        </element> <!-- End Origin -->
+        <element name="material" required="0">
+          <attribute name="script" type="string" default="script" required="0"/>
+          <attribute name="normal_map" type="string" default="__default__" required="0"/>
+          <element name="color" required="0">
+            <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
+          </element> <!-- End Color -->
+        </element> <!-- End Material -->
+        <element name="geometry" required="1">
+          <element name="box" required="0">
+            <attribute name="size" type="vector3" default="0 0 0" required="1"/>
+          </element> <!-- End Box -->
+          <element name="sphere" required="0">
+            <attribute name="radius" type="double" default="0" required="1"/>
+          </element> <!-- End Sphere -->
+          <element name="cylinder" required="0">
+            <attribute name="radius" type="double" default="0" required="1"/>
+            <attribute name="length" type="double" default="0" required="1"/>
+          </element> <!-- End Cylinder -->
+          <element name="mesh" required="0">
+            <attribute name="filename" type="string" default="file" required="1"/>
+            <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
+          </element> <!-- End Mesh -->
+          <element name="plane" required="0">
+            <attribute name="normal" type="vector3" default="0 0 1" required="1"/>
+          </element> <!-- End Plane -->
+        </element><!-- End Geometry -->
+      </element> <!-- End Visual -->
+
+  
+      <!-- Sensor -->
+      <element name="sensor" required="0">
+        <attribute name="name" type="string" default="sensor" required="1"/>
+        <attribute name="always_on" type="bool" default="false" required="0"/>
+        <attribute name="update_rate" type="double" default="0" required="0"/>
+        <element name="origin" required="0">
+          <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+        </element> <!-- End Origin -->
+        <element name="plugin" required="*">
+          <attribute name="name" type="string" default="name" required="1"/>
+          <attribute name="filename" type="string" default="filenam" required="1"/>
+          <element name="data" required="*">
+            <attribute name="name" type="string" default="name" required="1"/>
+            <attribute name="value" type="string" default="value" required="1"/>
+          </element>
+        </element> <!-- End Plugin -->
+
+        <element name="camera" required="0">
+          <element name="horizontal_fov" required="1">
+           <attribute name="angle" type="double" default="1.047" required="1"/>
+          </element> <!-- End Horizontal_FOV -->
+          <element name="image" required="1">
+            <attribute name="width" type="int" default="320" required="1"/>
+            <attribute name="height" type="int" default="240" required="1"/>
+            <attribute name="format" type="string" default="R8G8B8" required="0"/>
+          </element> <!-- End Image -->
+          <element name="clip" required="1">
+            <attribute name="near" type="double" default="0" required="1"/>
+            <attribute name="far" type="double" default="0" required="1"/>
+          </element> <!-- End Clip -->
+          <element name="save" required="0">
+            <attribute name="enabled" type="bool" default="false" required="1"/>
+            <attribute name="path" type="string" default="path" required="1"/>
+          </element> <!-- End Save -->
+        </element> <!-- End Camera -->
+  
+        <element name="ray" required="0">
+          <element name="scan" required="1">
+            <attribute name="display" type="bool" default="false" required="0"/>
+            <element name="horizontal" required="1">
+              <attribute name="samples" type="unsigned int" default="1" required="1"/>
+              <attribute name="resolution" type="double" default="1" required="0"/>
+              <attribute name="min_angle" type="double" default="0" required="1"/>
+              <attribute name="max_angle" type="double" default="0" required="1"/>
+            </element> <!-- End Horizontal -->
+            <element name="vertical" required="0">
+              <attribute name="samples" type="unsigned int" default="1" required="1"/>
+              <attribute name="resolution" type="double" default="1" required="0"/>
+              <attribute name="min_angle" type="double" default="0" required="1"/>
+              <attribute name="max_angle" type="double" default="0" required="1"/>
+            </element> <!-- End Vertical -->
+          </element> <!-- End Scan -->
+          <element name="range" required="1">
+            <attribute name="min" type="double" default="0" required="1"/>
+            <attribute name="max" type="double" default="0" required="1"/>
+            <attribute name="resolution" type="double" default="0" required="0"/>
+          </element> <!-- End Range -->
+        </element> <!-- End Ray -->
+
+        <element name="contact" required="0">
+          <element name="collision" required="1">
+            <attribute name="name" type="string" default="__default__" required="1"/>
+          </element> <!-- End Collision -->
+        </element> <!-- End Contact -->
+      </element> <!-- End Sensor -->
+    </element> <!-- End Link -->
+
+    <!-- Joint -->
+    <element name="joint" required="*">
+      <attribute name="name" type="string" default="__default__" required="1"/>
+      <attribute name="type" type="string" default="__default__" required="1"/>
+      <element name="parent" required="1">
+        <attribute name="link" type="string" default="__default__" required="1"/>
+      </element> <!-- End Parent -->
+      <element name="child" required="1">
+        <attribute name="link" type="string" default="__default__" required="1"/>
+      </element> <!-- End Child -->
+      <element name="origin" required="0">
+        <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
+      </element> <!-- End Origin -->
+      <element name="axis" required="1">
+        <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+        <element name="dynamics" required="0">
+          <attribute name="damping" type="double" default="0" required="0"/>
+          <attribute name="friction" type="double" default="0" required="0"/>
+        </element> <!-- End Dynamics -->
+        <element name="limit" required="0">
+          <attribute name="lower" type="double" default="0" required="0"/>
+          <attribute name="upper" type="double" default="0" required="0"/>
+          <attribute name="effort" type="double" default="0" required="0"/>
+          <attribute name="velocity" type="double" default="0" required="0"/>
+        </element> <!-- End Limit -->
+      </element> <!-- End Axis -->
+
+      <element name="axis2" required="1">
+        <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
+        <element name="dynamics" required="0">
+          <attribute name="damping" type="double" default="0" required="0"/>
+          <attribute name="friction" type="double" default="0" required="0"/>
+        </element> <!-- End Dynamics -->
+        <element name="limit" required="0">
+          <attribute name="lower" type="double" default="0" required="0"/>
+          <attribute name="upper" type="double" default="0" required="0"/>
+          <attribute name="effort" type="double" default="0" required="0"/>
+          <attribute name="velocity" type="double" default="0" required="0"/>
+        </element> <!-- End Limit -->
+      </element> <!-- End Axis2 -->
+
+      <element name="physics" required="0">
+        <element name="ode" required="0">
+          <element name="fudge_factor" type="double" default="0" required="0"/>
+          <element name="cfm" type="double" default="0" required="0"/>
+          <element name="bounce" type="double" default="0" required="0"/>
+          <element name="max_force" type="double" default="0" required="0"/>
+          <element name="velocity" type="double" default="0" required="0"/>
+          <element name="limit" required="0">
+            <attribute name="cfm" type="double" default="0" required="1"/>
+            <attribute name="erp" type="double" default="0" required="1"/>
+          </element>
+
+          <element name="suspension" required="0">
+            <attribute name="cfm" type="double" default="0" required="1"/>
+            <attribute name="erp" type="double" default="0" required="1"/>
+          </element>
+        </element>
+      </element> <!-- End Physics -->
+
+    </element> <!-- End Joint -->
+
+    <element name="plugin" required="*">
+      <attribute name="name" type="string" default="__default__" required="1"/>
+      <attribute name="filename" type="string" default="__default__" required="1"/>
+      <element name="data" required="*">
+        <attribute name="name" type="string" default="name" required="1"/>
+        <attribute name="value" type="string" default="value" required="1"/>
+      </element>
+    </element> <!-- End Plugin -->
+  </element> <!-- End Model -->
+ 
 </element> <!-- End Gazebo -->

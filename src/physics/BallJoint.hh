@@ -44,17 +44,9 @@ namespace gazebo
               }
     
       /// \brief Load the joint
-      protected: void Load(common::XMLConfigNode *node)
-                 {
-                   T::Load(node);
-                 }
-    
-      /// \brief Save a joint to a stream in XML format
-      protected: void SaveJoint(std::string &prefix, std::ostream &stream)
-                 {
-                   T::SaveJoint(prefix,stream);
-                 }
-  
+      protected: void Load( sdf::ElementPtr &_sdf )
+                 { T::Load(_sdf); }
+ 
       /// \brief Set the axis of rotation
       public: virtual void SetAxis(int /*_index*/, 
                                    const math::Vector3 &/*_axis*/) 

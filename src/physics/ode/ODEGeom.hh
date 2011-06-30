@@ -43,10 +43,7 @@ namespace gazebo
       public: virtual ~ODEGeom();
   
       /// \brief Load the geom
-      public: virtual void Load(common::XMLConfigNode *node);
-  
-      /// \brief Load the geom
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
   
       /// \brief Set the encapsulated geometry object
       public: void SetGeom(dGeomID geomId, bool placeable);
@@ -67,9 +64,6 @@ namespace gazebo
       /// \brief Set the collide bits, used during collision detection
       /// \param bits The bits
       public: virtual void SetCollideBits(unsigned int bits);
-    
-      /// \brief Get the mass of the geom
-      public: Mass GetBodyMassMatrix();
     
       /// \brief Get the bounding box, defined by the physics engine
       public: virtual math::Box GetBoundingBox() const;

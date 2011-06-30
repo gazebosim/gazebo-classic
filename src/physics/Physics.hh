@@ -19,18 +19,13 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
   namespace physics
   {
     bool init();
     bool fini();
 
     WorldPtr create_world(const std::string &name);
-    void load_world(WorldPtr world, common::XMLConfigNode *node);
+    void load_world(WorldPtr world, sdf::ElementPtr &_sdf);
     void init_world(WorldPtr world);
     void run_world(WorldPtr world);
     void stop_world(WorldPtr world);

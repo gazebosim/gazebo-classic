@@ -29,11 +29,23 @@ using namespace physics;
 // Default constructor
 SurfaceParams::SurfaceParams()
 {
+  this->kp = 100000000.0;
+
+  // Damping constraint
+  this->kd = 1.0;
+
   // Bounce param
   this->bounce = 0.0;
 
   // Minumum velocity before bounce is applied
   this->bounceThreshold = 10.0;
+
+  this->softCfm = 0.01;
+
+  this->mu1 = FLT_MAX;
+  this->mu2 = FLT_MAX;
+  this->slip1 = 0.01;
+  this->slip2 = 0.01;
 }
 
 //////////////////////////////////////////////////////////////////////////////

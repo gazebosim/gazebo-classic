@@ -17,7 +17,6 @@
 #ifndef ODEPLANESHAPE_HH
 #define ODEPLANESHAPE_HH
 
-#include "physics/Mass.hh"
 #include "physics/PlaneShape.hh"
 #include "physics/ode/ODEPhysics.hh"
 
@@ -39,9 +38,9 @@ namespace gazebo
     
         double altitude = 0;
   
+        math::Vector3 n = this->sdf->GetValueVector3("normal");
         odeParent->SetGeom(dCreatePlane(odeParent->GetSpaceId(), 
-                           (**normalP).x, (**normalP).y, (**normalP).z, 
-                           altitude), false);
+                           n.x, n.y, n.z, altitude), false);
       }
     
       /// Set the altitude of the plane

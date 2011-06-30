@@ -35,8 +35,6 @@
 namespace gazebo
 {
 
-  class XMLConfigNode;
-
   /// \addtogroup gazebo_sensor
   /// \brief Contact sensor.
   /// \{

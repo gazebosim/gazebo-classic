@@ -22,7 +22,6 @@
 #include <sstream>
 #include <math.h>
 
-#include "common/XMLConfig.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
@@ -53,12 +52,13 @@ ODEBody::~ODEBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load the body based on an common::XMLConfig node
-void ODEBody::Load(common::XMLConfigNode *node)
+// Load the body
+void ODEBody::Load( sdf::ElementPtr &_sdf)
 {
-  Body::Load(node);
+  Body::Load(_sdf);
 
-  this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(this->GetWorld()->GetPhysicsEngine());
+  this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(
+      this->GetWorld()->GetPhysicsEngine());
 
   if (this->odePhysics == NULL)
     gzthrow("Not using the ode physics engine");
@@ -76,7 +76,7 @@ void ODEBody::Init()
 
     dBodySetData(this->bodyId, this);
     dBodySetAutoDisableDefaults(this->bodyId);
-    dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
+    dBodySetAutoDisableFlag(this->bodyId, 1);
   }
 
   Body::Init();
@@ -98,7 +98,7 @@ void ODEBody::Init()
   }
  
   // Update the Center of Mass.
-  this->UpdateCoM();
+  this->UpdateMass();
 
   if (this->bodyId)
   {
@@ -234,65 +234,29 @@ bool ODEBody::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
-// Update the CoM and mass matrix
-/*
-  What's going on here?  In ODE the CoM of a body corresponds to the
-  origin of the body-fixed coordinate system.  In Gazebo, however, we
-  want to have arbitrary body coordinate systems (i.e., CoM may be
-  displaced from the body-fixed cs).  To get around this limitation in
-  ODE, we have an extra fudge-factor (comPose), describing the pose of
-  the CoM relative to Gazebo's body-fixed cs.  When using low-level
-  ODE functions, one must use apply this factor appropriately.
-
-  The UpdateCoM() function is used to compute this offset, based on
-  the mass distribution of attached geoms.  This function also shifts
-  the ODE-pose of the geoms, to keep everything in the same place in the
-  Gazebo cs.  Simple, neh?
-
-  TODO: messes up if you call it twice; should fix.
-*/
-void ODEBody::UpdateCoM()
+// Update the mass matrix
+void ODEBody::UpdateMass()
 {
-  Body::UpdateCoM();
-
   if (!this->bodyId)
     return;
 
-  if (**this->customMassMatrixP)
-  {
-    dMass odeMass;
-    dMassSetZero(&odeMass);
+  dMass odeMass;
+  dMassSetZero(&odeMass);
 
-    // The CoG must always be (0,0,0)
-    math::Vector3 cog;
+  // The CoG must always be (0,0,0)
+  math::Vector3 cog;
 
-    math::Vector3 principals = this->customMass.GetPrincipalMoments();
-    math::Vector3 products = this->customMass.GetProductsofInertia();
+  math::Vector3 principals = this->inertial.GetMass().GetPrincipalMoments();
+  math::Vector3 products = this->inertial.GetMass().GetProductsofInertia();
 
-    dMassSetParameters(&odeMass, this->customMass.GetAsDouble(),
-                       cog.x, cog.y, cog.z,
-                       principals.x, principals.y, principals.z,
-                       products.x, products.y, products.z);
-    if (this->customMass.GetAsDouble() > 0)
-      dBodySetMass(this->bodyId, &odeMass);
-    else
-      gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
-
-    ODEPhysics::ConvertMass(&this->customMass, &odeMass);
-  }
+  dMassSetParameters(&odeMass, this->inertial.GetMass().GetAsDouble(),
+      cog.x, cog.y, cog.z,
+      principals.x, principals.y, principals.z,
+      products.x, products.y, products.z);
+  if (this->inertial.GetMass().GetAsDouble() > 0)
+    dBodySetMass(this->bodyId, &odeMass);
   else
-  { 
-    dMass odeMass;
-    ODEPhysics::ConvertMass(&odeMass, this->mass);
-
-    // Center of Gravity must be at (0,0,0) in the body frame
-    odeMass.c[0] = 0.0;
-    odeMass.c[1] = 0.0;
-    odeMass.c[2] = 0.0;
-
-    // Set the mass of the ODE body
-    dBodySetMass( this->bodyId, &odeMass );
-  }
+    gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -466,12 +430,4 @@ bool ODEBody::GetKinematic() const
     result = dBodyIsKinematic(this->bodyId);
 
   return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the auto disable flag.
-void ODEBody::SetAutoDisable(const bool &value)
-{
-  Body::SetAutoDisable(value);
-  dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
 }

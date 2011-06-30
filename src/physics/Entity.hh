@@ -52,7 +52,7 @@ namespace gazebo
   
       /// \brief Load
       /// \param node Pointer to an configuration node
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
   
       /// \brief Set the name of the entity 
       /// \param name The new name
@@ -152,11 +152,10 @@ namespace gazebo
       /// \brief Handle a change of pose
       private: void PoseChange(bool notify = true);
   
-      // is this an static entity
-      protected: common::ParamT<bool> *staticP;
-    
       /// A helper that prevents numerous dynamic_casts
       private: EntityPtr parentEntity;
+
+      private: bool isStatic;
 
       /// The initial pose of the entity
       private: math::Pose initialPose;

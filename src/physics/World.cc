@@ -24,6 +24,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include "sdf/parser/parser.hh"
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
 #include "transport/Publisher.hh"
@@ -34,7 +35,6 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "physics/Body.hh"
 #include "physics/PhysicsEngine.hh"
@@ -75,11 +75,6 @@ World::World(const std::string &name)
 
   this->updateMutex = new boost::mutex();
 
-  common::Param::Begin(&this->parameters);
-  // NO Parameters...
-  common::Param::End();
-
-
   this->connections.push_back( 
      event::Events::ConnectStepSignal( boost::bind(&World::OnStep, this) ) );
   this->connections.push_back( 
@@ -98,24 +93,17 @@ World::~World()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
+void World::Load( sdf::ElementPtr _sdf )
 {
-  common::XMLConfigNode *physicsNode = NULL;
-
-  // DO THIS FIRST
-  if (rootNode)
-  {
-    this->sceneMsg.CopyFrom( 
-        common::Message::SceneFromXML(rootNode->GetChild("scene")) );
-    physicsNode = rootNode->GetChild("physics");
-  }
+  this->sdf = _sdf;
+  this->sceneMsg.CopyFrom( 
+        common::Message::SceneFromSDF(_sdf->GetElement("scene")) );
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0,200000000);
-
 
   common::Message::Init( this->worldStatsMsg, "statistics" );
 
@@ -135,61 +123,30 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
   this->newEntityPub = this->node->Advertise<msgs::Entity>("~/new_entity");
 
-  if (physicsNode)
-  {
-    std::string type = physicsNode->GetString("type","ode",1);
-
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, shared_from_this());
-  }
-  else
-  {
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode", shared_from_this());
-  }
+  std::string type = _sdf->GetElement("physics")->GetValueString("type");
+  this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 
+                                                          shared_from_this());
 
   if (this->physicsEngine == NULL)
     gzthrow("Unable to create physics engine\n");
 
   // This should come before loading of entities
-  this->physicsEngine->Load(physicsNode);
+  this->physicsEngine->Load( _sdf->GetElement("physics") );
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName("root");
   this->rootElement->SetWorld(shared_from_this());
 
   // Create all the entities
-  if (rootNode)
-    this->LoadEntities(rootNode, this->rootElement);
+  this->LoadEntities(_sdf, this->rootElement);
 
+  // TODO: Performance test to see if TBB model updating is necessary
   // Choose threaded or unthreaded model updating depending on the number of
   // models in the scene
-  if (this->models.size() < 20)
+  //if (this->GetModelCount() < 20)
     this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-  else
-    this->modelUpdateFunc = &World::ModelUpdateTBB;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Save the world
-void World::Save(std::string &prefix, std::ostream &stream)
-{
-  Model_V::iterator miter;
-
-  stream << "<world>\n";
-
-  stream << prefix << "  " << this->name;
-
-  this->physicsEngine->Save(prefix, stream);
-
-  for (miter = this->models.begin(); miter != this->models.end(); miter++)
-  {
-    if (*miter)
-    {
-      (*miter)->Save(prefix, stream);
-      stream << "\n";
-    }
-  }
-
-  stream << "</world>\n";
+  //else
+    //this->modelUpdateFunc = &World::ModelUpdateTBB;
 }
 
 
@@ -197,13 +154,9 @@ void World::Save(std::string &prefix, std::ostream &stream)
 // Initialize the world
 void World::Init()
 {
-  Model_V::iterator miter;
-
   // Initialize all the entities
-  for (miter = this->models.begin(); miter != this->models.end(); miter++)
-  {
-    (*miter)->Init();
-  }
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    this->rootElement->GetChild(i)->Init();
 
   // Initialize the physics engine
   this->physicsEngine->Init();
@@ -239,8 +192,6 @@ void World::RunLoop()
   this->physicsEngine->InitForThread();
 
   common::Time step = this->physicsEngine->GetStepTime();
-  double physicsUpdateRate = this->physicsEngine->GetUpdateRate();
-  common::Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
 
   //bool userStepped;
   common::Time diffTime;
@@ -314,7 +265,6 @@ void World::Update()
   // Update the physics engine
   if (this->physicsEngine)
     this->physicsEngine->UpdatePhysics();
-    
 
   // TODO: put back in
   //Logger::Instance()->Update();
@@ -326,16 +276,8 @@ void World::Update()
 // Finilize the world
 void World::Fini()
 {
-  // Clear out the entity tree
-  Model_V::iterator iter;
-  for (iter = this->models.begin(); iter != this->models.end(); iter++)
-  {
-    if (*iter)
-    {
-      (*iter)->Fini();
-    }
-  }
-  this->models.clear();
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    this->rootElement->GetChild(i)->Fini();
 
   if (this->physicsEngine)
   {
@@ -400,14 +342,13 @@ BasePtr World::GetByName(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a model 
-ModelPtr World::LoadModel(common::XMLConfigNode *node, BasePtr parent)
+ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 {
-  ModelPtr model( new Model(parent) );
+  ModelPtr model( new Model(_parent) );
   model->SetWorld(shared_from_this());
-  model->Load(node);
+  model->Load(_sdf);
 
   event::Events::addEntitySignal(model->GetCompleteScopedName());
-  this->models.push_back(model);
 
   msgs::Entity msg;
   common::Message::Init(msg, model->GetCompleteScopedName() );
@@ -419,28 +360,27 @@ ModelPtr World::LoadModel(common::XMLConfigNode *node, BasePtr parent)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
+void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
 {
-  common::XMLConfigNode *cnode;
+  sdf::ElementPtr childElem = _sdf->GetElement("model");
 
-  cnode = node->GetChild("model");
-  while (cnode)
+  while (childElem)
   {
-    this->LoadModel(cnode, parent);
+    this->LoadModel(childElem, _parent);
 
     // TODO : Put back in the ability to nest models. We should do this
     // without requiring a joint.
 
-    cnode = cnode->GetNext("model");
+    childElem = _sdf->GetNextElement("model", childElem);
   }
 
-  cnode = node->GetChild("light");
-  while (cnode)
+  childElem = _sdf->GetElement("light");
+  while (childElem)
   {
     msgs::Light *lm = this->sceneMsg.add_light();
-    lm->CopyFrom( common::Message::LightFromXML(cnode) );
+    lm->CopyFrom( common::Message::LightFromSDF(childElem) );
 
-    cnode = cnode->GetNext("light");
+    childElem = _sdf->GetNextElement("light", childElem);
   }
 }
 
@@ -448,17 +388,18 @@ void World::LoadEntities( common::XMLConfigNode *node, BasePtr parent )
 /// Get the number of models
 unsigned int World::GetModelCount() const
 {
-  return this->models.size();
+  return this->rootElement->GetChildCount();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Get a model based on an index
-ModelPtr World::GetModel(unsigned int index)
+ModelPtr World::GetModel(unsigned int _index)
 {
   ModelPtr model;
 
-  if (index < this->models.size())
-    model = this->models[index];
+  if (_index < this->rootElement->GetChildCount() &&
+      this->rootElement->GetChild(_index)->HasType(Base::MODEL))
+    model = boost::shared_static_cast<Model>(this->rootElement->GetChild(_index));
   else
     gzerr << "Invalid model index\n";
 
@@ -469,10 +410,9 @@ ModelPtr World::GetModel(unsigned int index)
 // Reset the simulation to the initial settings
 void World::Reset()
 {
-  Model_V::iterator miter;
-
-  for (miter = this->models.begin(); miter != this->models.end(); miter++)
-    (*miter)->Reset();
+  // Reset all the entities
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    this->rootElement->GetChild(i)->Reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -527,11 +467,9 @@ EntityPtr World::GetSelectedEntity() const
 /// Print entity tree
 void World::PrintEntityTree()
 {
-  for (Model_V::iterator iter = this->models.begin();
-       iter != this->models.end(); iter++)
-  {
-    (*iter)->Print("");
-  }
+  // Initialize all the entities
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    this->rootElement->GetChild(i)->Print("");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -661,53 +599,40 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 // TBB version of model updating
-void World::ModelUpdateTBB()
+/*void World::ModelUpdateTBB()
 {
   tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
       ModelUpdate_TBB(&this->models) );
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Single loop verison of model updating
 void World::ModelUpdateSingleLoop()
 {
-  for (Model_V::iterator iter = this->models.begin(); 
-       iter != this->models.end(); iter++)
-  {
-    (*iter)->Update();
-  }
+  // Update all the models
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    this->rootElement->GetChild(i)->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Received a factory msg
 void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
 {
-  // Load the world file
-  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
- 
-  try
-  {
-    if (msg->has_xml())
-      xmlFile->LoadString(msg->xml());
-    else if (msg->has_filename())
-      xmlFile->Load(msg->filename());
-    else
-    {
-      gzerr << "An XML string or filename must be set\n";
-      return;
-    }
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
+  sdf::SDFPtr factorySDF(new sdf::SDF);
 
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
+  //TODO: Fill in the sdfFOrmatString
+  std::string sdfFormatString;
+  sdf::initString(sdfFormatString, factorySDF);
+
+  if (msg->has_xml())
+    sdf::readString( msg->xml(), factorySDF);
+  else
+    sdf::readFile( msg->filename(), factorySDF);
 
   {
     boost::mutex::scoped_lock lock(*this->updateMutex);
     // Add the new models into the World
-    ModelPtr model = this->LoadModel( rootNode, this->rootElement );
+    ModelPtr model = this->LoadModel( factorySDF->root, this->rootElement );
     model->Init();
   }
 }

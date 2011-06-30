@@ -5,7 +5,6 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src/msgs
   ${OGRE_INCLUDE_DIRS}
-  ${XML_INCLUDE_DIRS}
 )
 
 set (sources MovableText.cc

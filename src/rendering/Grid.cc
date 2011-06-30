@@ -35,19 +35,11 @@ Grid::Grid( Scene *scene_,  unsigned int cellCount_, float cellLength_,
 {
   this->height = 0;
 
-  common::Param::Begin(&this->parameters);
-  this->cellCountP = new common::ParamT<unsigned int>("cell_count",0,0);
-  this->cellLengthP = new common::ParamT<float>("cell_length",1,0);
-  this->lineWidthP = new common::ParamT<float>("line_width",0.03,0);
-  this->colorP = new common::ParamT<common::Color>("color",common::Color(1,1,1,1),0);
-  this->h_offsetP = new common::ParamT<float>("height_offset",0,0);
-  common::Param::End();
-
-  this->cellCountP->SetValue(cellCount_);
-  this->cellLengthP->SetValue(cellLength_);
-  this->lineWidthP->SetValue(lineWidth_);
-  this->colorP->SetValue(color_);
-  this->h_offsetP->SetValue(0.005);
+  this->cellCountP = cellCount_;
+  this->cellLengthP = cellLength_;
+  this->lineWidthP = lineWidth_;
+  this->colorP = color_;
+  this->h_offsetP = 0.005;
 
   static uint32_t gridCount = 0;
   std::stringstream ss;
@@ -69,7 +61,7 @@ Grid::~Grid()
 ////////////////////////////////////////////////////////////////////////////////
 void Grid::SetCellCount(uint32_t count_)
 {
-  this->cellCountP->SetValue(count_);
+  this->cellCountP = count_;
 
   this->Create();
 }
@@ -77,7 +69,7 @@ void Grid::SetCellCount(uint32_t count_)
 ////////////////////////////////////////////////////////////////////////////////
 void Grid::SetCellLength(float len_)
 {
-  this->cellLengthP->SetValue(len_);
+  this->cellLengthP = len_;
 
   this->Create();
 }
@@ -85,7 +77,7 @@ void Grid::SetCellLength(float len_)
 ////////////////////////////////////////////////////////////////////////////////
 void Grid::SetLineWidth(float width_)
 {
-  this->lineWidthP->SetValue( width_ );
+  this->lineWidthP = width_;
 
   this->Create();
 }
@@ -93,12 +85,12 @@ void Grid::SetLineWidth(float width_)
 ////////////////////////////////////////////////////////////////////////////////
 void Grid::SetColor(const common::Color& color_)
 {
-  this->colorP->SetValue( color_ );
+  this->colorP = color_;
 
   this->material->setDiffuse( color_.R(), color_.G(), color_.B(), color_.A() );
   this->material->setAmbient( color_.R(), color_.G(), color_.B() );
 
-  if ( (**this->colorP).A() < 0.9998 )
+  if ( (this->colorP).A() < 0.9998 )
   {
     this->material->setSceneBlending( Ogre::SBT_TRANSPARENT_ALPHA );
     this->material->setDepthWriteEnabled( false );
@@ -138,7 +130,7 @@ void Grid::Init()
   this->material->setReceiveShadows(false);
   this->material->getTechnique(0)->setLightingEnabled(false);
 
-  this->SetColor(**this->colorP);
+  this->SetColor(this->colorP);
 
   this->Create();
 }
@@ -148,18 +140,18 @@ void Grid::Create()
 {
   this->manualObject->clear();
 
-  float extent = (**this->cellLengthP*((double)**this->cellCountP))/2;
+  float extent = (this->cellLengthP*((double)this->cellCountP))/2;
 
   this->manualObject->setCastShadows(false);
-  this->manualObject->estimateVertexCount( **this->cellCountP * 4 * this->height + ((**this->cellCountP + 1) * (**this->cellCountP + 1)));
+  this->manualObject->estimateVertexCount( this->cellCountP * 4 * this->height + ((this->cellCountP + 1) * (this->cellCountP + 1)));
   this->manualObject->begin( this->material->getName(), Ogre::RenderOperation::OT_LINE_LIST );
 
   for (uint32_t h = 0; h <= this->height; ++h)
   {
-    float h_real = **this->h_offsetP + (this->height / 2.0f - (float)h) * **this->cellLengthP;
-    for( uint32_t i = 0; i <= **this->cellCountP; i++ )
+    float h_real = this->h_offsetP + (this->height / 2.0f - (float)h) * this->cellLengthP;
+    for( uint32_t i = 0; i <= this->cellCountP; i++ )
     {
-      float inc = extent - ( i * **this->cellLengthP );
+      float inc = extent - ( i * this->cellLengthP );
 
       Ogre::Vector3 p1(inc, -extent,h_real );
       Ogre::Vector3 p2(inc, extent ,h_real );
@@ -167,33 +159,33 @@ void Grid::Create()
       Ogre::Vector3 p4(extent, inc, h_real );
 
       this->manualObject->position(p1);
-      this->manualObject->colour( Conversions::Color(**this->colorP) );
+      this->manualObject->colour( Conversions::Color(this->colorP) );
       this->manualObject->position(p2);
-      this->manualObject->colour( Conversions::Color(**this->colorP) );
+      this->manualObject->colour( Conversions::Color(this->colorP) );
 
       this->manualObject->position(p3);
-      this->manualObject->colour( Conversions::Color(**this->colorP) );
+      this->manualObject->colour( Conversions::Color(this->colorP) );
       this->manualObject->position(p4);
-      this->manualObject->colour( Conversions::Color(**this->colorP) );
+      this->manualObject->colour( Conversions::Color(this->colorP) );
     }
   }
 
   if (this->height > 0)
   {
-    for (uint32_t x = 0; x <= **this->cellCountP; ++x)
+    for (uint32_t x = 0; x <= this->cellCountP; ++x)
     {
-      for (uint32_t y = 0; y <= **this->cellCountP; ++y)
+      for (uint32_t y = 0; y <= this->cellCountP; ++y)
       {
-        float x_real = extent - x * **this->cellLengthP;
-        float y_real = extent - y * **this->cellLengthP;
+        float x_real = extent - x * this->cellLengthP;
+        float y_real = extent - y * this->cellLengthP;
 
-        float z_top = (this->height / 2.0f) * **this->cellLengthP;
+        float z_top = (this->height / 2.0f) * this->cellLengthP;
         float z_bottom = -z_top;
 
         this->manualObject->position( x_real, y_real, z_bottom );
-        this->manualObject->colour( Conversions::Color(**this->colorP) );
+        this->manualObject->colour( Conversions::Color(this->colorP) );
         this->manualObject->position(x_real, y_real, z_bottom);
-        this->manualObject->colour( Conversions::Color(**this->colorP) );
+        this->manualObject->colour( Conversions::Color(this->colorP) );
       }
     }
   }

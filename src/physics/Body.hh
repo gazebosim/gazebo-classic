@@ -29,6 +29,7 @@
 
 #include "physics/Entity.hh"
 #include "physics/Mass.hh"
+#include "physics/Inertial.hh"
 
 namespace gazebo
 {
@@ -50,12 +51,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Body();
   
-      /// \brief Load the body based on an common::XMLConfig node
-      /// \param node common::XMLConfigNode pointer
-      public: virtual void Load(common::XMLConfigNode *node);
-  
-      /// \brief Save the body based on our common::XMLConfig node
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
+      /// \brief Load the body based on an SDF element
+      /// \param _sdf SDF parameters
+      public: virtual void Load( sdf::ElementPtr &_sdf );
   
       /// \brief Initialize the body
       public: virtual void Init();
@@ -76,9 +74,6 @@ namespace gazebo
       ///        through the gui
       public: virtual bool SetSelected( bool s );
   
-      /// \brief Update the center of mass
-      public: virtual void UpdateCoM();
-  
       /// \brief Set whether gravity affects this body
       public: virtual void SetGravityMode(bool mode) = 0;
   
@@ -89,18 +84,12 @@ namespace gazebo
       /// \brief Set whether this body will collide with others in the model
       public: virtual void SetSelfCollide(bool collide) = 0;
   
-      /// \brief Set the friction mode of the body
-      public: void SetFrictionMode( const bool &v );
-  
       /// \brief Set the collide mode of the body
       public: void SetCollideMode( const std::string &m );
   
       /// \brief Get Self-Collision Flag, if this is true, this body will collide
       //         with other bodies even if they share the same parent.
       public: bool GetSelfCollide();
-  
-      /// \brief Set the laser fiducial integer id
-      public: void SetLaserFiducialId(int id);
   
      /// \brief Set the laser retro reflectiveness
       public: void SetLaserRetro(float retro);
@@ -159,17 +148,17 @@ namespace gazebo
       public: ModelPtr GetModel() const;
   
       /// \brief Get the mass of the body
-      public: const Mass &GetMass() const { return mass; }
+      public: const Inertial &GetInertial() const { return this->inertial; }
   
       /// \brief Set the mass of the body
-      public: void SetMass(Mass mass);
+      public: void SetMass(Mass _mass);
   
       /// Load a new geom helper function
-      /// \param node common::XMLConfigNode used to load the geom
-      private: void LoadGeom(common::XMLConfigNode *node);
+      /// \param _sdf SDF element used to load the geom
+      private: void LoadGeom( sdf::ElementPtr &_sdf );
   
       /// \brief Load a renderable
-      private: void LoadVisual(common::XMLConfigNode *node);
+      private: void LoadVisual( sdf::ElementPtr &_sdf );
   
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
@@ -186,12 +175,6 @@ namespace gazebo
       /// \brief Get whether this body is in the kinematic state
       public: virtual bool GetKinematic() const {return false;}
   
-      /// \brief Return true if auto disable is enabled
-      public: bool GetAutoDisable() const;
-  
-      /// \brief Set the auto disable flag.
-      public: virtual void SetAutoDisable(const bool &value);
-  
       /// \brief Connect a to the add entity signal
       public: template<typename T>
               event::ConnectionPtr ConnectEnabledSignal( T subscriber )
@@ -199,9 +182,6 @@ namespace gazebo
   
       public: void DisconnectEnabledSignal( event::ConnectionPtr &c )
               { enabledSignal.Disconnect(c); }
-  
-      /// Mass properties of the object
-      protected: Mass mass;
   
       protected: bool isStatic;
   
@@ -215,35 +195,13 @@ namespace gazebo
       /// The pose of the body relative to the model. Can also think of this
       /// as the body's pose offset.
       protected: math::Pose relativePose;
-  
-      protected: common::ParamT<math::Vector3> *xyzP;
-      protected: common::ParamT<math::Quaternion> *rpyP;
-  
-      protected: common::ParamT<double> *dampingFactorP;
-  
-      protected: common::ParamT<bool> *turnGravityOffP;
-      protected: common::ParamT<bool> *selfCollideP;
-  
+ 
+      protected: Inertial inertial;
+
       protected: std::vector< std::string > cgVisuals;
   
       protected: math::Vector3 linearAccel;
       protected: math::Vector3 angularAccel;
-  
-      ///  User specified Mass Matrix
-      protected: common::ParamT<bool> *autoDisableP;
-      protected: common::ParamT<bool> *customMassMatrixP;
-      protected: common::ParamT<double> *cxP ;
-      protected: common::ParamT<double> *cyP ;
-      protected: common::ParamT<double> *czP ;
-      protected: common::ParamT<double> *bodyMassP;
-      protected: common::ParamT<double> *ixxP;
-      protected: common::ParamT<double> *iyyP;
-      protected: common::ParamT<double> *izzP;
-      protected: common::ParamT<double> *ixyP;
-      protected: common::ParamT<double> *ixzP;
-      protected: common::ParamT<double> *iyzP;
-      protected: common::ParamT<bool> *kinematicP;
-      protected: Mass customMass;
   
       protected: std::vector<std::string> visuals;
   

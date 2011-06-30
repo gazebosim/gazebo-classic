@@ -27,8 +27,8 @@
 
 #include <string>
 
+#include "sdf/interface/sdf.h"
 #include "common/CommonTypes.hh"
-#include "common/Param.hh"
 #include "physics/PhysicsTypes.hh"
 
 namespace gazebo
@@ -58,16 +58,15 @@ namespace gazebo
       public: virtual ~Base();
   
       /// \brief Load 
-      /// \param node Pointer to an XML config node
-      public: virtual void Load(common::XMLConfigNode *node);
-
-      /// \brief Save the object
-      /// \param prefix A prefix string
-      /// \param stream The output stream
-      public: virtual void Save(const std::string &prefix, std::ostream &stream);
+      /// \param node Pointer to an SDF parameters
+      public: virtual void Load( sdf::ElementPtr _sdf );
 
       /// \brief Finialize the object
       public: virtual void Fini();
+
+      public: virtual void Init() {}
+      public: virtual void Reset() {}
+      public: virtual void Update() {}
 
       /// \brief Set the name of the entity
       /// \param name Body name
@@ -76,20 +75,6 @@ namespace gazebo
       /// \brief Return the name of the entity
       /// \return Name of the entity
       public: std::string GetName() const;
-  
-      /// \brief Get the count of the parameters
-      /// \return The number of parameters associated with this object
-      public: unsigned int GetParamCount() const;
-  
-      /// \brief Get a param by index
-      /// \param index The index of the parameter to retreive
-      /// \return The parameter, or NULL on error
-      public: common::Param *GetParam(unsigned int index) const;
-  
-      /// \brief Get a parameter by name
-      /// \param key The string name of a parameter to retreive
-      /// \return The parameter, or NULL on error
-      public: common::Param *GetParam(const std::string &key) const;
   
       /// \brief Return the ID of this entity. This id is unique
       /// \return Integer ID
@@ -187,9 +172,8 @@ namespace gazebo
     
       /// \brief Get the world this object is in
       public: WorldPtr GetWorld() const;
-   
-      /// List of all the parameters
-      protected: common::Param_V parameters;
+  
+      protected: sdf::ElementPtr sdf;
 
       /// \brief Parent of this entity
       protected: BasePtr parent;
@@ -197,9 +181,6 @@ namespace gazebo
       /// \brief Children of this entity
       protected: Base_V children;
 
-      ///  Name of the entity
-      private: common::ParamT<std::string> *nameP;
- 
       /// \brief Set to true if the object should be saved.
       private: bool saveable;
  

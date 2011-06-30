@@ -19,14 +19,12 @@
  * Date: 16 Oct 2009
  */
 
-#include "common/XMLConfig.hh"
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
 #include "common/Exception.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
-#include "physics/Mass.hh"
 #include "physics/Geom.hh"
 #include "physics/TrimeshShape.hh"
 
@@ -39,13 +37,6 @@ TrimeshShape::TrimeshShape(GeomPtr parent)
   : Shape(parent)
 {
   this->AddType(Base::TRIMESH_SHAPE);
-
-  common::Param::Begin(&this->parameters);
-  this->meshNameP = new common::ParamT<std::string>("filename","",1);
-  this->scaleP = new common::ParamT<math::Vector3>("scale",math::Vector3(1,1,1),0);
-  this->centerMeshP = new common::ParamT<std::string>("center_mesh","none",0);
-  this->genTexCoordP = new common::ParamT<bool>("gen_tex_coord",false,0);
-  common::Param::End();
 }
 
 
@@ -53,21 +44,13 @@ TrimeshShape::TrimeshShape(GeomPtr parent)
 // Destructor
 TrimeshShape::~TrimeshShape()
 {
-  delete this->meshNameP;
-  delete this->scaleP;
-  delete this->centerMeshP;
-  delete this->genTexCoordP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
-void TrimeshShape::Load(common::XMLConfigNode *node)
+void TrimeshShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  this->meshNameP->Load(node->GetChild("mesh"));
-  this->scaleP->Load(node->GetChild("mesh"));
-  this->centerMeshP->Load(node);
-  this->genTexCoordP->Load(node);
+  Shape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -75,29 +58,7 @@ void TrimeshShape::Load(common::XMLConfigNode *node)
 void TrimeshShape::Init()
 {
   common::MeshManager *meshManager = common::MeshManager::Instance();
-  this->mesh = meshManager->Load( **this->meshNameP );
-
-  if (this->centerMeshP->GetValue() == std::string("aabb_center"))
-  {
-    math::Vector3 center,min_xyz,max_xyz;
-    meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
-    meshManager->SetMeshCenter(this->mesh,center);
-  }
-  else if (this->centerMeshP->GetValue() == std::string("aabb_bottom"))
-  {
-    math::Vector3 center,min_xyz,max_xyz;
-    meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
-    meshManager->SetMeshCenter(this->mesh,math::Vector3(center.x,center.y,min_xyz.z));
-  }
-
-  if (this->genTexCoordP->GetValue())
-  {
-    math::Vector3 center,min_xyz,max_xyz;
-    meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
-    meshManager->GenSphericalTexCoord(this->mesh,center);
-  }
-
-  Mass mass = this->geomParent->GetMass();
+  this->mesh = meshManager->Load( this->sdf->GetValueString("filename") );
 
   if (this->mesh->GetSubMeshCount() > 1)
   {
@@ -120,39 +81,25 @@ void TrimeshShape::Init()
 
       std::ostringstream stream;
 
-      stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
+      stream << "<collision name='" << newName.str() << "_collision'>";
+      stream << "  <geometry>";
+      stream << "    <mesh filename='" << newName.str() << "' scale='" 
+             << this->sdf->GetValueVector3("scale") << "'/>";
+      stream << "  </geometry>";
+      stream << "</collision>";
+      stream << "<visual name='" << newName.str() << "_visual'>";
+      stream << "  <geometry>";
+      stream << "    <mesh filename='" << newName.str() << "' scale='" 
+             << this->sdf->GetValueVector3("scale") << "'/>";
+      stream << "  </geometry>";
+      stream << "</visual>";
 
-      stream << "<geom:trimesh name='" << newName.str() << "_geom'>";
-      stream << "  <mass>" << 
-        mass.GetAsDouble() / this->mesh->GetSubMeshCount() << "</mass>";
-      stream << "  <xyz>0 0 0</xyz>";
-      stream << "  <scale>" << **this->scaleP << "</scale>";
-      stream << "  <mesh>" << newName.str() << "</mesh>";
-      stream << "  <visual>";
-      stream << "    <mesh>" << newName.str() << "</mesh>";
-      stream << "    <scale>" << **this->scaleP << "</scale>";
-      stream << "  </visual>";
-      stream << "</geom:trimesh>";
-      stream << "</gazebo:world>";
+      GeomPtr newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( 
+          "trimesh", this->geomParent->GetBody() );
 
-      common::XMLConfig *config = new common::XMLConfig();
-      config->LoadString( stream.str() );
-
-      GeomPtr newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( "trimesh", this->geomParent->GetBody() );
-
+      // TODO: need to implement this function properly.
       newGeom->SetSaveable(false);
-      newGeom->Load( config->GetRootNode()->GetChild() );
-
-      delete config;
+      //newGeom->Load( config->GetRootNode()->GetChild() );
     }
   }
-}
- 
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void TrimeshShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->meshNameP) << "\n";
-  stream << prefix << *(this->scaleP) << "\n";
 }

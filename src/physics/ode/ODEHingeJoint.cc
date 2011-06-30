@@ -23,7 +23,6 @@
 
 #include "gazebo_config.h"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 #include "common/Global.hh"
 
 #include "physics/Body.hh"
@@ -48,9 +47,9 @@ ODEHingeJoint::~ODEHingeJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load a hinge joint
-void ODEHingeJoint::Load(common::XMLConfigNode *node)
+void ODEHingeJoint::Load( sdf::ElementPtr &_sdf )
 {
-  HingeJoint<ODEJoint>::Load(node);
+  HingeJoint<ODEJoint>::Load(_sdf);
 
   this->SetParam(dParamFMax, 0);
   this->SetForce(0, 0);

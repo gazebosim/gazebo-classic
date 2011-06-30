@@ -47,22 +47,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~MultiRayShape();
   
-      /// \brief Load a multi-ray shape from xml file
-      public: virtual void Load(common::XMLConfigNode *node);
+      /// \brief Load a multi-ray shape from SDF
+      public: virtual void Load( sdf::ElementPtr &_sdf );
  
       /// \brief Init the shape 
       public: virtual void Init();
               
-      /// \brief Save child parameters
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-  
-      /*public: void Load(unsigned int vertRayCount, unsigned int rayCount,
-                        math::Vector3 origin, double minRange, double maxRange,
-                        math::Angle minVertmath::Angle, math::Angle maxVertmath::Angle,
-                        math::Angle minmath::Angle, math::Angle maxmath::Angle );
-                        */
-              
-  
       public: void SetDisplayType(const std::string &type);
     
       /// \brief Get detected range for a ray.
@@ -90,17 +80,11 @@ namespace gazebo
       /// \brief Get the range resolution
       public: double GetResRange() const;
   
-      /// \brief Get the ray count
-      public: int GetRayCount() const;
+      /// \brief Get the horizontal sample count
+      public: int GetSampleCount() const;
   
-      /// \brief Get the range count
-      public: int GetRangeCount() const;
-  
-      /// \brief Get the vertical scan line count
-      public: int GetVerticalRayCount() const;
-  
-      /// \brief Get the vertical scan line count
-      public: int GetVerticalRangeCount() const;
+      /// \brief Get the vertical sample count
+      public: int GetVerticalSampleCount() const;
   
       /// \brief Get the vertical min angle
       public: math::Angle GetVerticalMinAngle() const;
@@ -123,22 +107,7 @@ namespace gazebo
       /// Ray data
       protected: std::vector< RayShapePtr > rays;
   
-      protected: double maxRange;
-  
-      protected: common::ParamT<math::Angle> *minAngleP, *maxAngleP;
-      protected: common::ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
-      protected: common::ParamT<math::Vector3> *originP;
-      protected: common::ParamT<int> *rayCountP;
-      protected: common::ParamT<int> *rangeCountP;
-  
-       /// Display rays when rendering images
-      protected: common::ParamT<std::string> *displayTypeP;
-    
-      // For ray blocks such as Velodyne
-      protected: common::ParamT<int> *verticalRayCountP;
-      protected: common::ParamT<int> *verticalRangeCountP;
-      protected: common::ParamT<math::Angle> *verticalMinAngleP;
-      protected: common::ParamT<math::Angle> *verticalMaxAngleP;
+      protected: math::Vector3 offset;
     };
   
   }

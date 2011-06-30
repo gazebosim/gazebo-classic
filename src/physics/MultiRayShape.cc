@@ -15,7 +15,6 @@
  *
 */
 #include "common/Messages.hh"
-#include "common/XMLConfig.hh"
 #include "physics/MultiRayShape.hh"
 
 using namespace gazebo;
@@ -41,24 +40,6 @@ MultiRayShape::MultiRayShape(GeomPtr parent)
   this->rayFanOutlineMsg->set_parent_id( this->geomParent->GetName() );
   this->rayFanOutlineMsg->set_render_type( msgs::Visual::LINE_STRIP );
   this->rayFanOutlineMsg->set_material_script( "Gazebo/BlueGlow" );
-
-  common::Param::Begin(&this->parameters);
-  this->rayCountP = new common::ParamT<int>("ray_count",0,1);
-  this->rangeCountP = new common::ParamT<int>("range_count",0,1);
-  this->minAngleP = new common::ParamT<math::Angle>("min_angle",DTOR(-90),1);
-  this->maxAngleP = new common::ParamT<math::Angle>("max_angle",DTOR(-90),1);
-  this->minRangeP = new common::ParamT<double>("min_range",0,1);
-  this->maxRangeP = new common::ParamT<double>("max_range",0,1);
-  this->resRangeP = new common::ParamT<double>("res_range",0.1,1);
-  this->originP = new common::ParamT<math::Vector3>("origin", math::Vector3(0,0,0), 0);
-  this->displayTypeP = new common::ParamT<std::string>("display_rays", "off", 0);
-
-  // for block rays, vertical setting
-  this->verticalRayCountP = new common::ParamT<int>("vertical_ray_count", 1, 0);
-  this->verticalRangeCountP = new common::ParamT<int>("vertical_range_count", 1, 0);
-  this->verticalMinAngleP = new common::ParamT<math::Angle>("vertical_min_angle", DTOR(0), 0);
-  this->verticalMaxAngleP = new common::ParamT<math::Angle>("vertical_max_angle", DTOR(0), 0);
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,42 +47,13 @@ MultiRayShape::MultiRayShape(GeomPtr parent)
 MultiRayShape::~MultiRayShape()
 {
   this->rays.clear();
-
-  delete this->rayCountP;
-  delete this->rangeCountP;
-  delete this->minAngleP;
-  delete this->maxAngleP;
-  delete this->minRangeP;
-  delete this->maxRangeP;
-  delete this->resRangeP;
-  delete this->originP;
-  delete this->displayTypeP;
-
-  delete this->verticalRayCountP;
-  delete this->verticalRangeCountP;
-  delete this->verticalMinAngleP;
-  delete this->verticalMaxAngleP;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a multi-ray shape from xml file
-void MultiRayShape::Load(common::XMLConfigNode *node)
+void MultiRayShape::Load( sdf::ElementPtr &_sdf)
 {
-  Shape::Load(node);
-  this->rayCountP->Load(node);
-  this->rangeCountP->Load(node);
-  this->minAngleP->Load(node);
-  this->maxAngleP->Load(node);
-  this->minRangeP->Load(node);
-  this->maxRangeP->Load(node);
-  this->resRangeP->Load(node);
-  this->originP->Load(node);
-  this->displayTypeP->Load(node);
-  this->verticalRayCountP->Load(node);
-  this->verticalRangeCountP->Load(node);
-  this->verticalMinAngleP->Load(node);
-  this->verticalMaxAngleP->Load(node);
+  Shape::Load(_sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,66 +61,71 @@ void MultiRayShape::Load(common::XMLConfigNode *node)
 void MultiRayShape::Init()
 {
   math::Vector3 start, end, axis;
+  double yawAngle, pitchAngle; 
+  double pDiff, yDiff;
+  double horzMinAngle, horzMaxAngle;
+  double vertMinAngle, vertMaxAngle;
 
-  math::Angle yawAngle, pitchAngle; 
-  math::Angle pDiff = **this->verticalMaxAngleP - **this->verticalMinAngleP;
-  math::Angle yDiff = **this->maxAngleP - **this->minAngleP;
+  int horzSamples = 1;
+  double horzResolution = 1.0;
+  int vertSamples = 1;
+  double vertResolution = 1.0;
 
-  //this->maxRange = maxRange;
+  double minRange, maxRange;
+
+  sdf::ElementPtr scanElem = this->sdf->GetElement("scan");
+  sdf::ElementPtr horzElem = scanElem->GetElement("horiz");
+  sdf::ElementPtr vertElem = scanElem->GetElement("vertical");
+  sdf::ElementPtr rangeElem = scanElem->GetElement("range");
+
+  if (vertElem)
+  {
+    vertMinAngle = vertElem->GetValueDouble("min_angle");
+    vertMaxAngle = vertElem->GetValueDouble("max_angle");
+    vertSamples = vertElem->GetValueInt("samples");
+    vertResolution = vertElem->GetValueInt("resolution");
+    pDiff = vertMaxAngle - vertMinAngle;
+  }
+
+  horzMinAngle = horzElem->GetValueDouble("min_angle");
+  horzMaxAngle = horzElem->GetValueDouble("max_angle");
+  horzSamples = horzElem->GetValueInt("samples");
+  horzResolution = horzElem->GetValueInt("resolution");
+  yDiff = horzMaxAngle - horzMinAngle;
+
+  minRange = rangeElem->GetValueDouble("min");
+  maxRange = rangeElem->GetValueDouble("max");
 
   // Create and array of ray geoms
-  for (int j = 0; j < **this->verticalRayCountP; j++)
+  for (int j = 0; j < vertSamples; j++)
   {
-    for (int i = 0; i < **this->rayCountP; i++)
+    for (int i = 0; i < horzSamples; i++)
     {
-      yawAngle = (**this->rayCountP == 1)? 0 : 
-        i * yDiff.GetAsRadian() / (**this->rayCountP - 1) + 
-        (**this->minAngleP).GetAsRadian();
+      yawAngle = (horzSamples == 1) ? 0 : 
+        i * yDiff / (horzSamples - 1) + horzMinAngle;
 
-      pitchAngle = (**this->verticalRayCountP == 1)? 0 :  
-        j * pDiff.GetAsRadian() / (**this->verticalRayCountP - 1) + 
-        (**this->verticalMinAngleP).GetAsRadian();
+      pitchAngle = (vertSamples == 1)? 0 :  
+        j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      axis.Set(cos(pitchAngle.GetAsRadian()) * 
-          cos(yawAngle.GetAsRadian()), 
-          sin(yawAngle.GetAsRadian()), 
-          sin(pitchAngle.GetAsRadian())*
-          cos(yawAngle.GetAsRadian()));
+      axis.Set(cos(pitchAngle) * cos(yawAngle), 
+               sin(yawAngle), sin(pitchAngle)* cos(yawAngle));
 
-      start = (axis * **this->minRangeP) + **this->originP;
-      end = (axis * **this->maxRangeP) + **this->originP;
+      start = (axis * minRange) + this->offset;
+      end = (axis * maxRange) + this->offset;
 
       this->AddRay(start,end);
     }
   }
 
-  if (**this->displayTypeP == "fan")
+  //TODO: this doesn't belong here
+  /*if (**this->displayTypeP == "fan")
   {
     msgs::Point *pt = this->rayFanMsg->add_points();
     (*pt) = this->rayFanMsg->points(0);
 
     pt = this->rayFanOutlineMsg->add_points();
     (*pt) = this->rayFanOutlineMsg->points(0);
-  }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save the sensor info in XML format
-void MultiRayShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << "  " << *(this->minAngleP) << "\n";
-  stream << prefix << "  " << *(this->maxAngleP) << "\n";
-  stream << prefix << "  " << *(this->minRangeP) << "\n";
-  stream << prefix << "  " << *(this->maxRangeP) << "\n";
-  stream << prefix << "  " << *(this->resRangeP) << "\n";
-  stream << prefix << "  " << *(this->originP) << "\n";
-  stream << prefix << "  " << *(this->rayCountP) << "\n";
-  stream << prefix << "  " << *(this->rangeCountP) << "\n";
-  stream << prefix << "  " << *(this->displayTypeP) << "\n";
-  stream << prefix << "  " << *(this->verticalRayCountP) << "\n";
-  stream << prefix << "  " << *(this->verticalRangeCountP) << "\n";
-  stream << prefix << "  " << *(this->verticalMinAngleP) << "\n";
-  stream << prefix << "  " << *(this->verticalMaxAngleP) << "\n";
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -225,14 +182,15 @@ void MultiRayShape::Update()
   math::Vector3 a, b;
   int i = 1;
 
+  double maxRange = this->sdf->GetElement("range")->GetValueDouble("max");
+
   // Reset the ray lengths and mark the geoms as dirty (so they get
   // redrawn)
   for (iter = this->rays.begin(); 
       iter != this->rays.end(); iter++, i++)
   {
-    (*iter)->SetLength( **this->maxRangeP );
+    (*iter)->SetLength( maxRange );
     (*iter)->SetRetro( 0.0 );
-    (*iter)->SetFiducial( -1 );
 
     // Get the global points of the line
     (*iter)->Update();
@@ -240,7 +198,8 @@ void MultiRayShape::Update()
 
   this->UpdateRays();
 
-  if (**this->displayTypeP == "fan")
+  //TODO: move to rendering engine
+  /*if (**this->displayTypeP == "fan")
   { 
     i = 1;
     for (iter = this->rays.begin(); 
@@ -253,17 +212,18 @@ void MultiRayShape::Update()
       common::Message::Set(this->rayFanMsg->mutable_points(i), b );
       common::Message::Set(this->rayFanOutlineMsg->mutable_points(i), b );
     }
-  }
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
-void MultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
+void MultiRayShape::AddRay(const math::Vector3 &/*start*/, const math::Vector3 &/*end*/ )
 {
-  msgs::Point *pt = NULL;
+  //msgs::Point *pt = NULL;
 
+  //TODO: move to rendering engine
   // Add to the renderable
-  if (**this->displayTypeP == "fan")
+  /*if (**this->displayTypeP == "fan")
   {
     if (this->rayFanMsg->points_size() == 0)
     {
@@ -279,83 +239,68 @@ void MultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end 
 
     pt = this->rayFanOutlineMsg->add_points();
     common::Message::Set(pt, end);
-  }
+  }*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum angle
 math::Angle MultiRayShape::GetMinAngle() const
 {
-  return **this->minAngleP;
+  return this->sdf->GetElement("scan")->GetElement("horizontal")->GetValueDouble("min_angle");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the maximum angle
 math::Angle MultiRayShape::GetMaxAngle() const
 {
-  return **this->maxAngleP;
+  return this->sdf->GetElement("scan")->GetElement("horizontal")->GetValueDouble("max_angle");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum range
 double MultiRayShape::GetMinRange() const
 {
-  return **this->minRangeP;
+  return this->sdf->GetElement("range")->GetValueDouble("min");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the maximum range
 double MultiRayShape::GetMaxRange() const
 {
-  return **this->maxRangeP;
+  return this->sdf->GetElement("range")->GetValueDouble("max");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the range resolution
 double MultiRayShape::GetResRange() const
 {
-  return **this->resRangeP;
+  return this->sdf->GetElement("range")->GetValueDouble("resolution");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get the ray count
-int MultiRayShape::GetRayCount() const
+/// Get the sample count
+int MultiRayShape::GetSampleCount() const
 {
-  return **this->rayCountP;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Get the range count
-int MultiRayShape::GetRangeCount() const
-{
-  return **this->rangeCountP;
+  return this->sdf->GetElement("scan")->GetElement("horizontal")->GetValueDouble("samples");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical scan line count
-int MultiRayShape::GetVerticalRayCount() const
+int MultiRayShape::GetVerticalSampleCount() const
 {
-  return **this->verticalRayCountP;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Get the vertical scan line count
-int MultiRayShape::GetVerticalRangeCount() const
-{
-  return **this->verticalRangeCountP;
+  return this->sdf->GetElement("scan")->GetElement("vertical")->GetValueDouble("samples");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical min angle
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
-  return **this->verticalMinAngleP;
+  return this->sdf->GetElement("scan")->GetElement("vertical")->GetValueDouble("min_angle");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical max angle
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
-  return **this->verticalMaxAngleP;
+  return this->sdf->GetElement("scan")->GetElement("vertical")->GetValueDouble("max_angle");
 }
-

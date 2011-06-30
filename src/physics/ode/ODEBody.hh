@@ -28,10 +28,6 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
 
 	namespace physics
   {
@@ -46,9 +42,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODEBody();
   
-      /// \brief Load the body based on an common::XMLConfig node
-      /// \param node common::XMLConfigNode pointer
-      public: virtual void Load(common::XMLConfigNode *node);
+      /// \brief Load the body based on SDF parameters
+      /// \param _sdf the sdf parameters 
+      public: virtual void Load( sdf::ElementPtr &_sdf );
   
       /// \brief Initialize the body
       public: virtual void Init();
@@ -73,8 +69,8 @@ namespace gazebo
       /// \brief Get whether this body is enabled in the physics engine
       public: virtual bool GetEnabled() const;
   
-      /// \brief Update the center of mass
-      public: virtual void UpdateCoM();
+      /// \brief Update the mass matrix
+      public: virtual void UpdateMass();
   
       /// \brief Set the linear velocity of the body
       public: virtual void SetLinearVel(const math::Vector3 &vel);
@@ -128,10 +124,6 @@ namespace gazebo
   
       /// \brief Get whether this body is in the kinematic state
       public: virtual bool GetKinematic() const;
-  
-      /// \brief Set the auto disable flag.
-      public: virtual void SetAutoDisable(const bool &value);
-  
   
       protected: math::Pose pose;
   

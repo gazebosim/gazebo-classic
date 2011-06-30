@@ -15,8 +15,6 @@
  *
 */
 
-#include "common/XMLConfig.hh"
-
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Physics.hh"
@@ -41,9 +39,9 @@ physics::WorldPtr physics::create_world(const std::string &name)
   return world;
 }
 
-void physics::load_world(WorldPtr world, common::XMLConfigNode *node)
+void physics::load_world(WorldPtr world, sdf::ElementPtr &_sdf)
 {
-  world->Load(node);
+  world->Load(_sdf);
 }
 
 void physics::init_world(WorldPtr world)

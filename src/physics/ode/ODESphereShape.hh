@@ -37,20 +37,6 @@ namespace gazebo
         ODEGeomPtr oParent;
         oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
   
-        dMass odeMass;
-        math::Pose rpose;
-    
-        Mass mass = this->geomParent->GetMass();
-
-        // Initialize box mass matrix
-        dMassSetSphereTotal(&odeMass, mass.GetAsDouble(), radius);
-        rpose = this->geomParent->GetRelativePose();
-        dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
-    
-        ODEPhysics::ConvertMass(&mass, &odeMass);
-        
-        this->geomParent->SetMass(mass);
-    
         // Create the sphere geometry
         oParent->SetGeom( dCreateSphere(0, radius), true);
       }

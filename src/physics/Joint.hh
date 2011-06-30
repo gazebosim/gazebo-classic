@@ -47,15 +47,10 @@ namespace gazebo
       public: virtual ~Joint();
   
       /// \brief Load a joint
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Initialize a joint
       public: virtual void Init();
-  
-      /// \brief Save a joint to a stream in XML format
-      public: void Save(std::string &prefix, std::ostream &stream);
-
-      protected: virtual void SaveJoint(std::string &/*prefix*/, std::ostream &/*stream*/) {}
   
       /// \brief Update the joint
       public: void Update();
@@ -153,22 +148,6 @@ namespace gazebo
   
       /// The second body this joint connects to
       protected: BodyPtr parentBody;
-  
-      /// Name of this joint
-      protected: common::ParamT<double> *erpP;
-      protected: common::ParamT<double> *cfmP;
-  
-      // joint limit Kp setting
-      protected: common::ParamT<double> *stopKpP;
-  
-      // joint limit Kd setting
-      protected: common::ParamT<double> *stopKdP;
-  
-      protected: common::ParamT<std::string> *parentNameP;
-      protected: common::ParamT<std::string> *childNameP;
-      protected: common::ParamT<math::Vector3> *anchorOffsetP;
-      protected: common::ParamT<bool> *provideFeedbackP;
-      protected: common::ParamT<double> *fudgeFactorP;
   
       protected: std::string visual;
       protected: std::string line1;

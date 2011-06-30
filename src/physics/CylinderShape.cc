@@ -15,8 +15,6 @@
  *
 */
 
-#include "common/XMLConfig.hh"
-
 #include "physics/CylinderShape.hh"
 
 using namespace gazebo;
@@ -28,67 +26,54 @@ using namespace physics;
 CylinderShape::CylinderShape(GeomPtr parent) : Shape(parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
-
-  common::Param::Begin(&this->parameters);
-  this->radiusP = new common::ParamT<double>("radius",1,1);
-  this->radiusP->Callback( &CylinderShape::SetRadius, this);
-
-  this->lengthP = new common::ParamT<double>("length",1,1);
-  this->lengthP->Callback( &CylinderShape::SetLength, this);
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 CylinderShape::~CylinderShape()
 {
-  delete this->radiusP;
-  delete this->lengthP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the cylinder
-void CylinderShape::Load(common::XMLConfigNode *node)
+void CylinderShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  this->radiusP->Load(node->GetChild("cylinder"));
-  this->lengthP->Load(node->GetChild("cylinder"));
+  Shape::Load(_sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the cylinder
 void CylinderShape::Init()
 {
-  this->SetSize( **this->radiusP, **this->lengthP );
+  this->SetSize( this->sdf->GetValueDouble("radius"), 
+                 this->sdf->GetValueDouble("length") );
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void CylinderShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->radiusP) << " " << *(this->lengthP) << "\n";
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set radius
 void CylinderShape::SetRadius(const double &radius)
 {
-  this->SetSize(radius, **this->lengthP);
+  this->sdf->GetAttribute("radius")->Set(radius);
+  this->SetSize( this->sdf->GetValueDouble("radius"), 
+                 this->sdf->GetValueDouble("length") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set length
 void CylinderShape::SetLength(const double &length)
 {
-  this->SetSize(**this->radiusP, length);
+  this->sdf->GetAttribute("length")->Set(length);
+  this->SetSize( this->sdf->GetValueDouble("radius"), 
+                 this->sdf->GetValueDouble("length") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size of the cylinder
 void CylinderShape::SetSize( const double &radius, const double &length )
 {
-  this->radiusP->SetValue(radius);
-  this->lengthP->SetValue(length);
+  this->sdf->GetAttribute("radius")->Set(radius);
+  this->sdf->GetAttribute("length")->Set(length);
+  this->SetSize( this->sdf->GetValueDouble("radius"), 
+                 this->sdf->GetValueDouble("length") );
 }
-

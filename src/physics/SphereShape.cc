@@ -18,7 +18,6 @@
  * Author: Nate Keonig
  * Date: 14 Oct 2009
  */
-#include "common/XMLConfig.hh"
 #include "physics/SphereShape.hh"
 
 using namespace gazebo;
@@ -30,47 +29,33 @@ SphereShape::SphereShape(GeomPtr parent)
   : Shape(parent)
 {
   this->AddType(Base::SPHERE_SHAPE);
-
-  common::Param::Begin(&this->parameters);
-  this->radiusP = new common::ParamT<double>("radius",1.0,0);
-  this->radiusP->Callback( &SphereShape::SetSize, this );
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 SphereShape::~SphereShape()
 {
-  delete this->radiusP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the sphere
-void SphereShape::Load(common::XMLConfigNode *node)
+void SphereShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  this->radiusP->Load( node->GetChild("sphere") );
+  Shape::Load(_sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the sphere
 void SphereShape::Init()
 {
-  this->SetSize( **this->radiusP );
-}
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Save shape parameters
-void SphereShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->radiusP) << "\n";
+  this->SetSize( this->sdf->GetValueDouble("radius") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size
 void SphereShape::SetSize(const double &radius)
 {
-  this->radiusP->SetValue( radius );
+  this->sdf->GetAttribute("radius")->Set(radius);
+
+  this->SetSize( this->sdf->GetValueDouble("radius") );
 }
-
-

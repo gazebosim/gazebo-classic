@@ -44,9 +44,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CameraSensor();
     
-      /// \brief Load the camera using parameter from an XMLConfig node
-      /// \param node The XMLConfig node
-      protected: virtual void Load( sdf::ElementPtr _sdf );
+      /// \brief Load the camera using parameter from an SDF element
+      /// \param _sdf The SDF parameters
+      protected: virtual void Load( sdf::ElementPtr &_sdf );
+
+      /// \brief Load the camera using default parameters
+      protected: virtual void Load();
     
       /// \brief Initialize the camera
       protected: virtual void Init();

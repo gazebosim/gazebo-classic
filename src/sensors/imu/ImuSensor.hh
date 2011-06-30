@@ -26,7 +26,6 @@
 namespace gazebo
 {
 
-  class XMLConfigNode;
   class ImuSensor: public Sensor
   {
     /// \brief Constructor

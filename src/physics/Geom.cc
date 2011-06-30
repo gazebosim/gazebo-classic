@@ -24,7 +24,6 @@
 #include "common/Events.hh"
 #include "common/Messages.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "transport/Publisher.hh"
 
@@ -50,25 +49,6 @@ Geom::Geom( BodyPtr body )
   this->transparency = 0;
   this->contactsEnabled = false;
 
-  common::Param::Begin(&this->parameters);
-
-  this->massP = new common::ParamT<double>("mass",0.001,0);
-  this->massP->Callback( &Geom::SetMass, this);
-
-  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(), 0);
-  this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this);
-
-  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(), 0);
-  this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
-
-  this->laserFiducialIdP = new common::ParamT<int>("laser_fiducial_id",-1,0);
-  this->laserRetroP = new common::ParamT<float>("laser_retro",-1,0);
-
-  this->enableContactsP = new common::ParamT<bool>("enable_contacts", false, 0);
-  //this->enableContactsP->Callback( &Geom::SetContactsEnabled, this );
-  
-  common::Param::End();
-
   this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
   this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
 }
@@ -84,13 +64,6 @@ Geom::~Geom()
     msg.set_action( msgs::Visual::DELETE);
     this->visPub->Publish(msg);
   }
-
-  delete this->massP;
-  delete this->xyzP;
-  delete this->rpyP;
-  delete this->laserFiducialIdP;
-  delete this->laserRetroP;
-  delete this->enableContactsP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,26 +75,12 @@ void Geom::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 // First step in the loading process
-void Geom::Load(common::XMLConfigNode *node)
+void Geom::Load( sdf::ElementPtr &_sdf )
 {
-  common::XMLConfigNode *childNode;
-
-  Entity::Load(node);
-
-  this->massP->Load(node);
-  this->laserFiducialIdP->Load(node);
-  this->laserRetroP->Load(node);
-  this->enableContactsP->Load(node);
-  this->surface->Load(node);
-
-  if ( (childNode = node->GetChild("origin")) != NULL)
-  {
-    this->xyzP->Load(childNode);
-    this->rpyP->Load(childNode);
-  }
+  Entity::Load(_sdf);
 
   if (this->shape)
-    this->shape->Load(node->GetChild("geometry"));
+    this->shape->Load(this->sdf->GetElement("geometry"));
   else
     gzwarn << "No shape has been specified. Error!!!\n";
 
@@ -131,10 +90,9 @@ void Geom::Load(common::XMLConfigNode *node)
 
 void Geom::Init()
 {
-  this->SetContactsEnabled(**this->enableContactsP);
-  this->SetRelativePose( math::Pose( **this->xyzP, **this->rpyP ) );
-  this->mass.SetMass( **this->massP );
-
+  this->SetContactsEnabled(false);
+  this->SetRelativePose( 
+      this->sdf->GetOrCreateElement("origin")->GetValuePose("pose") );
   this->shape->Init();
 }
 
@@ -177,34 +135,6 @@ void Geom::CreateBoundingBox()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our common::XMLConfig node
-void Geom::Save(std::string &prefix, std::ostream &stream)
-{
-  if (!this->GetSaveable())
-    return;
-
-  std::string p = prefix + "  ";
-
-  this->xyzP->SetValue( this->GetRelativePose().pos );
-  this->rpyP->SetValue( this->GetRelativePose().rot );
-
-  stream << prefix << "<geom name=\"" 
-         << this->GetName() << "\">\n";
-
-  stream << prefix << "  " << *(this->xyzP) << "\n";
-  stream << prefix << "  " << *(this->rpyP) << "\n";
-
-  this->shape->Save(p,stream);
-
-  stream << prefix << "  " << *(this->massP) << "\n";
-
-  stream << prefix << "  " << *(this->laserFiducialIdP) << "\n";
-  stream << prefix << "  " << *(this->laserRetroP) << "\n";
-
-  stream << prefix << "</geom>\n";
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
 void Geom::SetGeom(bool placeable)
 {
@@ -230,32 +160,19 @@ bool Geom::IsPlaceable() const
   return this->placeable;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the laser fiducial integer id
-void Geom::SetLaserFiducialId(int id)
-{
-  this->laserFiducialIdP->SetValue( id );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the laser fiducial integer id
-int Geom::GetLaserFiducialId() const
-{
-  return this->laserFiducialIdP->GetValue();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser retro reflectiveness
 void Geom::SetLaserRetro(float retro)
 {
-  this->laserRetroP->SetValue(retro);
+  this->sdf->GetAttribute("laser_retro")->Set(retro);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the laser retro reflectiveness
 float Geom::GetLaserRetro() const
 {
-  return this->laserRetroP->GetValue();
+  return this->sdf->GetValueDouble("laser_retro");
 }
 
 
@@ -274,22 +191,6 @@ void Geom::ShowBoundingBox(const bool &show)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the mass
-void Geom::SetMass(const Mass &_mass)
-{
-  this->mass = _mass;
-  //this->body->UpdateCoM();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the mass
-void Geom::SetMass(const double &_mass)
-{
-  this->mass.SetMass( _mass );
-  //this->body->UpdateCoM();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the body this geom belongs to
 BodyPtr Geom::GetBody() const
 {
@@ -301,21 +202,6 @@ BodyPtr Geom::GetBody() const
 ModelPtr Geom::GetModel() const
 {
   return this->body->GetModel();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the friction mode of the geom
-void Geom::SetFrictionMode( const bool &v )
-{
-  this->surface->enableFriction = v;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a pointer to the mass
-const Mass &Geom::GetMass() const
-{
-  return this->mass;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

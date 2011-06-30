@@ -45,25 +45,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~TrimeshShape();
   
-      /// \brief Update function 
-      public: void Update();
+      public: virtual void Update() {}
   
       /// \brief Load the trimesh
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Init the trimesh shape
       public: virtual void Init();
   
-      /// \brief Save child parameters
-      protected: virtual void Save(std::string &prefix, std::ostream &stream);
-   
-      ///  name of the mesh
-      protected: common::ParamT<std::string> *meshNameP;
-  
-      protected: common::ParamT<math::Vector3> *scaleP;
-      protected: common::ParamT<std::string> *centerMeshP;
-      protected: common::ParamT<bool> *genTexCoordP;
- 
       protected: const common::Mesh *mesh;
     };
   }

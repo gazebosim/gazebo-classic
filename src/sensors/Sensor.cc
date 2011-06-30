@@ -22,7 +22,6 @@
 #include "common/Timer.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
 
 #include "sensors/Sensor.hh"
 
@@ -44,9 +43,16 @@ Sensor::~Sensor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the sensor
-void Sensor::Load(sdf::ElementPtr _sdf )
+void Sensor::Load( sdf::ElementPtr &_sdf )
 {
   this->sdf = _sdf;
+  this->Load();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load the sensor
+void Sensor::Load()
+{
 }
 
  
@@ -91,7 +97,7 @@ std::string Sensor::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a controller helper function
-void Sensor::LoadController(common::XMLConfigNode * /*node_*/)
+void Sensor::LoadPlugin( sdf::ElementPtr &/*_sdf*/ )
 {
   /*
   if (!node)
@@ -102,7 +108,6 @@ void Sensor::LoadController(common::XMLConfigNode * /*node_*/)
 
 
   //Iface *iface;
-  //XMLConfigNode *childNode;
   std::ostringstream stream;
 
   // Get the controller's type

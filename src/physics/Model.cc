@@ -29,7 +29,6 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/XMLConfig.hh"
 
 #include "physics/Joint.hh"
 #include "physics/Body.hh"
@@ -62,32 +61,6 @@ Model::Model(BasePtr parent)
   : Entity(parent)
 {
   this->AddType(MODEL);
-
-  common::Param::Begin(&this->parameters);
-  this->canonicalBodyNameP = new common::ParamT<std::string>("canonicalBody",
-                                                   std::string(),0);
-
-  this->xyzP = new common::ParamT<math::Vector3>("xyz", math::Vector3(0,0,0), 0);
-  this->xyzP->Callback(&Entity::SetRelativePosition, (Entity*)this);
-
-  this->rpyP = new common::ParamT<math::Quaternion>("rpy", math::Quaternion(1,0,0,0), 0);
-  this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
-
-  this->enableGravityP = new common::ParamT<bool>("enable_gravity", true, 0);
-  this->enableGravityP->Callback( &Model::SetGravityMode, this );
-
-  this->enableFrictionP = new common::ParamT<bool>("enable_friction", true, 0);
-  this->enableFrictionP->Callback( &Model::SetFrictionMode, this );
-
-  this->collideP = new common::ParamT<std::string>("collide", "all", 0);
-  this->collideP->Callback( &Model::SetCollideMode, this );
-
-  this->laserFiducialP = new common::ParamT<int>("laser_fiducial_id", -1, 0);
-  this->laserFiducialP->Callback( &Model::SetLaserFiducialId, this );
-
-  this->laserRetroP = new common::ParamT<float>("laser_retro", -1, 0);
-  this->laserRetroP->Callback( &Model::SetLaserRetro, this );
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,28 +115,35 @@ Model::~Model()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the model
-void Model::Load(common::XMLConfigNode *node)
+void Model::Load( sdf::ElementPtr &_sdf )
 {
-  Entity::Load(node);
-
-  common::XMLConfigNode *childNode;
-
-  this->staticP->Load(node);
-  this->canonicalBodyNameP->Load(node);
-  this->enableGravityP->Load(node);
-  this->enableFrictionP->Load(node);
-  this->collideP->Load(node);
-  this->laserFiducialP->Load(node);
-  this->laserRetroP->Load(node);
-
+  Entity::Load(_sdf);
 
   // TODO: check for duplicate model, and raise an error
   //BasePtr dup = Base::GetByName(this->GetScopedName());
-  childNode = node->GetChild("origin");
-  this->xyzP->Load(childNode);
-  this->rpyP->Load(childNode);
 
-  this->LoadChildrenAndJoints(node);
+  // Load the bodies
+  sdf::ElementPtr linkElem = _sdf->GetElement("link");
+  while (linkElem)
+  {
+    // Create a new body
+    BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
+        boost::shared_static_cast<Model>(shared_from_this()));
+
+    // Load the body using the config node. This also loads all of the
+    // bodies geometries
+    body->Load(linkElem);
+
+    linkElem = _sdf->GetNextElement("link", linkElem);
+  }
+
+  // Load the joints
+  sdf::ElementPtr jointElem = _sdf->GetElement("joint");
+  while (jointElem)
+  {
+    this->LoadJoint(jointElem);
+    jointElem = _sdf->GetNextElement("link", jointElem);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,44 +152,26 @@ void Model::Init()
 {
   math::Pose pose;
 
-  this->SetStatic( **(this->staticP) );
+  this->SetStatic( this->sdf->GetValueBool("static") );
 
   // Get the position and orientation of the model (relative to parent)
-  pose.pos = **this->xyzP;
-  pose.rot = **this->rpyP;
+  pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
 
   this->SetRelativePose( pose );
 
   // Record the model's initial pose (for reseting)
   this->SetInitialPose( pose );
 
-  if (this->canonicalBodyNameP->GetValue().empty())
+  /// FIXME: Model::pose is set to the pose of first body
+  ///        seems like there should be a warning for users
+  for (unsigned int i=0; i < this->children.size(); i++)
   {
-    /// FIXME: Model::pose is set to the pose of first body
-    ///        seems like there should be a warning for users
-    for (unsigned int i=0; i < this->children.size(); i++)
+    if (this->children[i]->HasType(BODY))
     {
-      if (this->children[i]->HasType(BODY))
-      {
-        this->canonicalBodyNameP->SetValue( this->children[i]->GetName() );
-        break;
-      }
+      this->canonicalBody = boost::shared_static_cast<Body>(this->children[i]);
+      break;
     }
   }
-
-  this->canonicalBody = boost::shared_dynamic_cast<Body>(this->GetChild(**this->canonicalBodyNameP));
-
-  // This must be placed after creation of the bodies
-  // Static variable overrides the gravity
-  if (**this->staticP == false)
-    this->SetGravityMode( **this->enableGravityP );
-
-  //global fiducial and retro id
-  if (**this->laserFiducialP != -1.0 )
-    this->SetLaserFiducialId(**this->laserFiducialP);
-
-  if (**this->laserRetroP != -1.0)
-    this->SetLaserRetro(**this->laserRetroP);
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin(); 
@@ -230,70 +192,6 @@ void Model::Init()
     (*iter)->Init();
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Save the model in XML format
-void Model::Save(std::string &prefix, std::ostream &stream)
-{
-  std::string p = prefix + "  ";
-  std::string typeName;
-  Base_V::iterator bodyIter;
-  Joint_V::iterator jointIter;
-
-  this->xyzP->SetValue( this->GetRelativePose().pos );
-  this->rpyP->SetValue( this->GetRelativePose().rot );
-
-
-  stream << prefix << "<model";
-  stream << " name=\"" << this->GetName() << "\">\n"; 
-  stream << prefix << "  " << *(this->xyzP) << "\n";
-  stream << prefix << "  " << *(this->rpyP) << "\n";
-  stream << prefix << "  " << *(this->enableGravityP) << "\n";
-  stream << prefix << "  " << *(this->enableFrictionP) << "\n";
-  stream << prefix << "  " << *(this->collideP) << "\n";
-
-  stream << prefix << "  " << *(this->staticP) << "\n";
-
-  for (bodyIter=this->children.begin(); bodyIter!=this->children.end(); bodyIter++)
-  {
-    stream << "\n";
-    EntityPtr entity = boost::shared_dynamic_cast<Entity>(*bodyIter);
-    if (entity && entity->HasType(BODY))
-    {
-      boost::shared_static_cast<Body>(entity)->Save(p, stream);
-    }
-  }
-
-  // Save all the joints
-  for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
-  {
-    if (*jointIter)
-      (*jointIter)->Save(p, stream);
-  }
-
-  // Save all the controllers
-  /*for (contIter=this->controllers.begin();
-      contIter!=this->controllers.end(); contIter++)
-  {
-    if (contIter->second)
-      contIter->second->Save(p, stream);
-  }
-  */
-
-  // Save all child models
-  Base_V::iterator eiter;
-  for (eiter = this->children.begin(); eiter != this->children.end(); eiter++)
-  {
-    if (*eiter && (*eiter)->HasType(MODEL))
-    {
-      ModelPtr cmodel = boost::static_pointer_cast<Model>(*eiter);
-      cmodel->Save(p, stream);
-    }
-  }
-
-  stream << prefix << "</model:" << typeName << ">\n";
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -692,21 +590,18 @@ BodyPtr Model::GetBody(const std::string &name) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new joint helper function
-void Model::LoadJoint(common::XMLConfigNode *node)
+void Model::LoadJoint( sdf::ElementPtr &_sdf )
 {
-  if (!node)
-    gzthrow("Trying to load a joint with NULL XML information");
-
   JointPtr joint;
 
-  std::string type = node->GetString("type","hinge",1);
+  std::string type = _sdf->GetValueString("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint( type );
 
   joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
 
   // Load the joint
-  joint->Load(node);
+  joint->Load(_sdf);
 
   if (this->GetJoint( joint->GetName() ) != NULL)
     gzthrow( "can't have two joint with the same name");
@@ -729,20 +624,6 @@ void Model::SetGravityMode( const bool &v )
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the gravity mode of the model
-void Model::SetFrictionMode( const bool &v )
-{
-  Base_V::iterator iter;
-
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
-  {
-    if ((*iter) && (*iter)->HasType(BODY))
-    {
-      boost::shared_static_cast<Body>(*iter)->SetFrictionMode( v );
-    }
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide mode of the model
@@ -759,20 +640,6 @@ void Model::SetCollideMode( const std::string &m )
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the Fiducial Id of the model
-void Model::SetLaserFiducialId( const int &id )
-{
-  Base_V::iterator iter;
-
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
-  {
-    if (*iter && (*iter)->HasType(BODY))
-    {
-      boost::shared_static_cast<Body>(*iter)->SetLaserFiducialId( id );
-    }
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the Laser retro property of the model
@@ -786,45 +653,5 @@ void Model::SetLaserRetro( const float &retro )
     {
        boost::shared_static_cast<Body>(*iter)->SetLaserRetro(retro);
     }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Load a physical model
-void Model::LoadChildrenAndJoints(common::XMLConfigNode *node)
-{
-  common::XMLConfigNode *childNode = NULL;
-
-  // Load the bodies
-  childNode = node->GetChild("link");
-  while (childNode)
-  {
-    // Create a new body
-    BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
-        boost::shared_static_cast<Model>(shared_from_this()));
-
-    // Load the body using the config node. This also loads all of the
-    // bodies geometries
-    body->Load(childNode);
-
-    childNode = childNode->GetNext("link");
-  }
-
-  // Load the joints
-  childNode = node->GetChild("joint");
-  while (childNode)
-  {
-    try
-    {
-      this->LoadJoint(childNode);
-    }
-    catch (common::Exception e)
-    {
-      gzerr << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
-      gzerr <<  e << std::endl;
-      childNode = childNode->GetNext("joint");
-      continue;
-    }
-    childNode = childNode->GetNext("joint");
   }
 }

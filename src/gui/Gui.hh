@@ -21,7 +21,7 @@ namespace gazebo
 {
   namespace gui
   {
-    void load(const std::string &load);
+    void load();
     void init();
     void run();
     void stop();

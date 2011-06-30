@@ -19,6 +19,7 @@
 
 #include "msgs/MessageTypes.hh"
 #include "math/MathTypes.hh"
+#include "sdf/interface/sdf.h"
 
 #include "common/Color.hh"
 #include "math/Vector3.hh"
@@ -31,8 +32,6 @@ namespace gazebo
 {
 	namespace common
   {
-    class XMLConfigNode;
-
     class Message
     {
       public:
@@ -69,11 +68,11 @@ namespace gazebo
         static void Set(msgs::Time *t, const Time &v);
         static void Set(msgs::Plane *p, const math::Plane &v);
   
-        static msgs::Light      LightFromXML(XMLConfigNode *node);
-        static msgs::Visual     VisualFromXML(XMLConfigNode *node);
-        static msgs::Shadows    ShadowsFromXML(XMLConfigNode *node);
-        static msgs::Fog     FogFromXML(XMLConfigNode *node);
-        static msgs::Scene     SceneFromXML(XMLConfigNode *node);
+        static msgs::Light      LightFromSDF(sdf::ElementPtr _sdf);
+        static msgs::Visual     VisualFromSDF(sdf::ElementPtr _sdf);
+        static msgs::Shadows    ShadowsFromSDF(sdf::ElementPtr _sdf);
+        static msgs::Fog     FogFromSDF(sdf::ElementPtr _sdf);
+        static msgs::Scene     SceneFromSDF(sdf::ElementPtr _sdf);
   
       private:
   

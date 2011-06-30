@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for a surface 
+/* Desc: common::Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
+ * SVN: $Id$
  */
 
-#ifndef SURFACEPARAMS_HH
-#define SURFACEPARAMS_HH
-
-#include "sdf/interface/sdf.h"
+#ifndef CONTACTPARAMS_HH
+#define CONTACTPARAMS_HH
 
 namespace gazebo
 {
@@ -37,11 +36,32 @@ namespace gazebo
       /// \brief Load the contact params
       public: virtual void Load( sdf::ElementPtr &_sdf );
    
+      /// Spring constant
+      public: double kp;   
+    
+      /// Damping constant
+      public: double kd;
+    
       /// 0..1, 0=no bounciness
       public: double bounce;
       
+      /// first coefficient of friction 
+      public: double mu1;
+    
+      /// second coefficient of friction 
+      public: double mu2;
+    
+      /// Force-dependent-slip direction 1
+      public: double slip1;
+    
+      /// Force-dependent-slip direction 2
+      public: double slip2;   
+    
       /// \brief bounce vel
       public: double bounceThreshold;
+    
+      /// \brief soft constraint force mixing
+      public: double softCfm;
     };
   }
 }

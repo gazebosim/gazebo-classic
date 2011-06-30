@@ -28,16 +28,10 @@
 
 #include "common/Events.hh"
 #include "common/Time.hh"
-#include "common/Param.hh"
 #include "math/Pose.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class XMLConfigNode;
-  }
-
   namespace sensors
   {
     /// \addtogroup gazebo_sensor
@@ -53,12 +47,12 @@ namespace gazebo
       /// \brief  Destructor
       public: virtual ~Sensor();
     
-      ///  \brief Load the sensor
-      /// \param node XMLConfigNode pointer
-      public: virtual void Load( sdf::ElementPtr _sdf );
-  
-      /// \brief Save the sensor info in XML format
-      public: void Save(std::string &prefix, std::ostream &stream);
+      /// \brief Load the sensor with SDF parameters
+      /// \param _sdf SDF Sensor parameteres
+      public: virtual void Load( sdf::ElementPtr &_sdf );
+
+      /// \brief Load the sensor with default parameters
+      public: virtual void Load();
   
       /// \brief  Initialize the sensor
       public: virtual void Init();
@@ -83,22 +77,15 @@ namespace gazebo
 
       public: bool IsActive();
     
-      /// \brief Load a controller for this sensor
-      /// \param node XML configure parameter node
-      private: void LoadController(common::XMLConfigNode *node);
+      /// \brief Load a plugin for this sensor
+      /// \param _sdf SDF parameters
+      private: void LoadPlugin( sdf::ElementPtr &_sdf );
     
-      /// \brief Pointer to the controller of the sensor
-      //
-      //protected: Controller *controller;
-  
       /// \brief True if active
       protected: bool active;
       protected: sdf::ElementPtr sdf; 
-
       protected: math::Pose pose;
-  
       protected: std::string typeName;
-
       protected: std::vector<event::ConnectionPtr> connections;
     };
     /// \}

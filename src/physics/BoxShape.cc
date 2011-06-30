@@ -16,7 +16,6 @@
 */
 
 #include "math/Vector3.hh"
-#include "common/XMLConfig.hh"
 #include "BoxShape.hh"
 
 using namespace gazebo;
@@ -28,45 +27,31 @@ using namespace physics;
 BoxShape::BoxShape(GeomPtr parent) : Shape(parent)
 {
   this->AddType(Base::BOX_SHAPE);
-
-  common::Param::Begin(&this->parameters);
-  this->sizeP = new common::ParamT<math::Vector3>("size", math::Vector3(1,1,1),1);
-  this->sizeP->Callback( &BoxShape::SetSize, this );
-  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 BoxShape::~BoxShape()
 {
-  delete this->sizeP;
 } 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the box
-void BoxShape::Load(common::XMLConfigNode *node)
+void BoxShape::Load( sdf::ElementPtr &_sdf )
 {
-  Shape::Load(node);
-  this->sizeP->Load( node->GetChild("box") );
+  Shape::Load(_sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the box
 void BoxShape::Init()
 {
-  this->SetSize( **this->sizeP );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void BoxShape::Save(std::string &prefix, std::ostream &stream)
-{
-  stream << prefix << *(this->sizeP) << "\n";
+  this->SetSize( this->sdf->GetValueVector3("size") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size of the box
 void BoxShape::SetSize( const math::Vector3 &size )
 {
-  this->sizeP->SetValue( size );
+  this->sdf->GetAttribute("size")->Set( size );
 }

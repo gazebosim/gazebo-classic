@@ -40,11 +40,6 @@ Base::Base(BasePtr parent)
   this->id = ++idCounter;
   this->saveable = true;
   this->selected = false;
-
-  common::Param::Begin(&this->parameters);
-  this->nameP = new common::ParamT<std::string>("name","noname",1);
-  common::Param::End();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,27 +59,19 @@ Base::~Base()
       (*iter)->SetParent(BasePtr());
   }
   this->children.clear();
-
-  delete this->nameP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load 
-void Base::Load(common::XMLConfigNode *node)
+void Base::Load( sdf::ElementPtr _sdf )
 {
-  this->nameP->Load(node);
+  this->sdf = _sdf;
 
   if (this->parent)
   {
     this->world = this->parent->GetWorld();
     this->parent->AddChild(shared_from_this());
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Save function
-void Base::Save(const std::string &/*_prefix*/, std::ostream &/*stream*/)
-{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,57 +82,16 @@ void Base::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of the entity
-void Base::SetName(const std::string &name)
+void Base::SetName(const std::string &_name)
 {
-  this->nameP->SetDefaultValue(name);
-  this->nameP->SetValue( name );
+  this->sdf->GetAttribute("name")->Set(_name);
 }
   
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of the entity
 std::string Base::GetName() const
 {
-  return **this->nameP;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the count of the parameters
-unsigned int Base::GetParamCount() const
-{
-  return this->parameters.size();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a param by index
-common::Param *Base::GetParam(unsigned int index) const
-{
-  if (index < this->parameters.size())
-    return this->parameters[index];
-  else
-    gzerr << "Invalid index[" << index << "]\n";
-  return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a parameter by name
-common::Param *Base::GetParam(const std::string &key) const
-{
-  common::Param_V::const_iterator iter;
-  common::Param *result = NULL;
-
-  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
-  {
-    if ((*iter)->GetKey() == key)
-    {
-      result = *iter;
-      break;
-    }
-  }
-
-  if (result == NULL)
-    gzerr << "Unable to find Param using key[" << key << "]\n";
-
-  return result;
+  return this->sdf->GetValueString("name");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

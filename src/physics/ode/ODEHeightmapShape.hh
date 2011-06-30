@@ -39,9 +39,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();
   
-      /// \brief Update function 
-      public: void Update();
-  
       /// \brief Load the heightmap
       public: virtual void Init();
   

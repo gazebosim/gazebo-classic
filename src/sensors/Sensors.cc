@@ -42,7 +42,7 @@ sensors::SensorPtr sensors::create_sensor(const std::string &type)
 
   if (sensor)
   {
-    sensor->Load( sdf::ElementPtr() );
+    sensor->Load();
     sensor->Init();
   }
   else

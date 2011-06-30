@@ -22,7 +22,6 @@
 #ifndef SPHERESHAPE_HH
 #define SPHERESHAPE_HH
 
-#include "common/Param.hh"
 #include "physics/Shape.hh"
 #include "physics/PhysicsTypes.hh"
 
@@ -40,18 +39,13 @@ namespace gazebo
       public: virtual ~SphereShape();
   
       /// \brief Load the sphere
-      public: virtual void Load(common::XMLConfigNode *node);
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Initialize the sphere
       public: virtual void Init();
  
-      /// \brief Save shape parameters
-      public: virtual void Save(std::string &prefix, std::ostream &stream);
-  
       /// \brief Set the size
       public: virtual void SetSize(const double &radius);
-  
-      private: common::ParamT<double> *radiusP;
     };
   }
 }
