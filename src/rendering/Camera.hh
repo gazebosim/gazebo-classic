@@ -29,7 +29,7 @@
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
 
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 // Forward Declarations
 namespace Ogre

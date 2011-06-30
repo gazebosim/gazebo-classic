@@ -18,8 +18,8 @@
 #include "common/SystemPaths.hh"
 #include "common/Exception.hh"
 
-#include "sdf/interface/sdf.h"
-#include "sdf/parser/parser.hh"
+#include "sdf/sdf.h"
+#include "sdf/sdf_parser.h"
 
 #include "physics/Physics.hh"
 

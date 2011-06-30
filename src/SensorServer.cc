@@ -20,8 +20,10 @@
 
 #include "sensors/Sensors.hh"
 
-#include "sdf/interface/sdf.h"
 #include "rendering/Rendering.hh"
+
+#include "sdf/sdf.h"
+#include "sdf/sdf_parser.h"
 
 #include "SensorServer.hh"
 

@@ -5,8 +5,8 @@
 #include "common/Exception.hh"
 #include "common/SystemPaths.hh"
 
-#include "sdf/interface/sdf.h"
-#include "sdf/parser/parser.hh"
+#include "sdf/sdf.h"
+#include "sdf/sdf_parser.h"
 
 #include "sensors/Sensors.hh"
 #include "transport/Transport.hh"
@@ -114,6 +114,12 @@ void Server::Load(const std::string &filename)
   std::string host = "";
   unsigned short port = 0;
 
+  // Load the world file
+  sdf::SDFPtr sdf(new sdf::SDF);
+
+  sdf::init(sdf);
+  sdf::readFile(filename, sdf);
+
   gazebo::transport::get_master_uri(host,port);
 
   this->master = new gazebo::Master();
@@ -126,11 +132,6 @@ void Server::Load(const std::string &filename)
   /// Init the sensors library
   sensors::init("default");
 
-  // Load the world file
-  sdf::SDFPtr sdf(new sdf::SDF);
-
-  sdf::initFile(filename, sdf);
-  sdf::readFile(filename, sdf);
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   while(worldElem)

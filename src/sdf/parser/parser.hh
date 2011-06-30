@@ -24,6 +24,9 @@
 
 namespace sdf
 {
+  /// \brief Init based on the installed sdf_format.xml file
+  bool init( SDFPtr _sdf );
+
   // \brief Initialize the SDF interface using a file
   bool initFile(const std::string &_filename, SDFPtr _sdf);
 

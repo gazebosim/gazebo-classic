@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#include "sdf/interface/sdf.h"
-#include "sdf/parser/parser.hh"
+#include "sdf/sdf.h"
+#include "sdf/sdf_parser.h"
 
+#include "common/SystemPaths.hh"
 #include "common/Console.hh"
 #include "common/Color.hh"
 #include "math/Vector3.hh"
@@ -24,6 +25,23 @@
 
 namespace sdf
 {
+
+////////////////////////////////////////////////////////////////////////////////
+/// Init based on the installed sdf_format.xml file
+bool init( SDFPtr _sdf )
+{
+  const std::list<std::string> paths = gazebo::common::SystemPaths::Instance()->GetGazeboPaths();
+  std::list<std::string>::const_iterator iter;
+  for ( iter = paths.begin(); iter != paths.end(); iter++)
+  {
+    std::string filename = (*iter) + "/sdf_format.xml";
+    FILE *ftest = fopen(filename.c_str(), "r");
+    if (ftest && initFile(filename, _sdf))
+        return true;
+  }
+
+  return false;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, SDFPtr _sdf)

@@ -22,7 +22,7 @@
 #ifndef SURFACEPARAMS_HH
 #define SURFACEPARAMS_HH
 
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 namespace gazebo
 {

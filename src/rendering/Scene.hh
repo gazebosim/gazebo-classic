@@ -21,7 +21,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 #include "rendering/ogre.h"
 

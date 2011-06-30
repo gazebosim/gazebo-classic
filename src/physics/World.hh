@@ -35,7 +35,7 @@
 #include "common/Messages.hh"
 
 #include "physics/PhysicsTypes.hh"
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 namespace boost
 {

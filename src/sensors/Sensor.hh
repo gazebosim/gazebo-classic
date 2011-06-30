@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 #include "common/Events.hh"
 #include "common/Time.hh"

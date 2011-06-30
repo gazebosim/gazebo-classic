@@ -19,7 +19,7 @@
 
 #include "msgs/MessageTypes.hh"
 #include "math/MathTypes.hh"
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 #include "common/Color.hh"
 #include "math/Vector3.hh"

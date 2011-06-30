@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   }
- 
+
   server = new gazebo::Server();
   server->Load(config_filename);
   server->SetParams( params );

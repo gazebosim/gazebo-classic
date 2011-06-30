@@ -32,7 +32,7 @@
 #include "math/Vector2d.hh"
 #include "common/Messages.hh"
 
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 #include "rendering/RenderTypes.hh"
 
 namespace Ogre

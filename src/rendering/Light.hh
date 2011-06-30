@@ -30,7 +30,7 @@
 #include "common/Color.hh"
 #include "common/Messages.hh"
 
-#include "sdf/interface/sdf.h"
+#include "sdf/sdf.h"
 
 namespace Ogre
 {
