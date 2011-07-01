@@ -22,7 +22,8 @@
 #include <sstream>
 #include <float.h>
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
+
 #include "common/Events.hh"
 #include "math/Quaternion.hh"
 #include "common/Console.hh"
@@ -58,7 +59,7 @@ Body::~Body()
   for (unsigned int i=0; i < this->visuals.size(); i++)
   {
     msgs::Visual msg;
-    common::Message::Init(msg, this->visuals[i]);
+    msgs::Init(msg, this->visuals[i]);
     msg.set_action( msgs::Visual::DELETE );
     this->visPub->Publish(msg);
   }
@@ -69,7 +70,7 @@ Body::~Body()
     for (unsigned int i=0; i < this->cgVisuals.size(); i++)
     {
       msgs::Visual msg;
-      common::Message::Init(msg, this->cgVisuals[i]);
+      msgs::Init(msg, this->cgVisuals[i]);
       msg.set_action( msgs::Visual::DELETE );
       this->visPub->Publish(msg);
     }
@@ -98,8 +99,8 @@ void Body::Load( sdf::ElementPtr &_sdf )
     visname << this->GetCompleteScopedName() << "::VISUAL_" << 
                this->visuals.size();
 
-    msgs::Visual msg = common::Message::VisualFromSDF(visualElem);
-    common::Message::Init(msg, visname.str());
+    msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+    msgs::Init(msg, visname.str());
     msg.set_parent_id( this->GetCompleteScopedName() );
     msg.set_is_static( this->IsStatic() );
 
@@ -164,7 +165,7 @@ void Body::Init()
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
     msgs::Visual msg;
-    common::Message::Init(msg, visname.str());
+    msgs::Init(msg, visname.str());
     msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
     msg.set_render_type( msgs::Visual::MESH_RESOURCE );
     msg.set_mesh( "unit_box" );
@@ -172,14 +173,14 @@ void Body::Init()
     msg.set_cast_shadows( false );
     msg.set_attach_axes( true );
     msg.set_visible( false );
-    common::Message::Set(msg.mutable_scale(), math::Vector3(0.1, 0.1, 0.1));
+    msgs::Set(msg.mutable_scale(), math::Vector3(0.1, 0.1, 0.1));
     this->vis_pub->Publish(msg);
     this->cgVisuals.push_back( msg.header().str_id() );
 
     if (this->children.size() > 1)
     {
       msgs::Visual g_msg;
-      common::Message::Init(g_msg, visname.str() + "_connectors");
+      msgs::Init(g_msg, visname.str() + "_connectors");
 
       g_msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
       g_msg.set_render_type( msgs::Visual::LINE_LIST );

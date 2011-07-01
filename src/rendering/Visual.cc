@@ -21,7 +21,7 @@
 
 #include "rendering/ogre.h"
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "common/Events.hh"
 
 #include "rendering/Conversions.hh"
@@ -136,7 +136,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->mesh_type() == msgs::Visual::BOX)
   {
     sdf::ElementPtr elem = geomElem->AddElement("box");
-    elem->GetAttribute("size")->Set(common::Message::Convert(msg->scale()));
+    elem->GetAttribute("size")->Set(msgs::Convert(msg->scale()));
   }
   else if (msg->mesh_type() == msgs::Visual::SPHERE)
   {
@@ -151,7 +151,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   }
   else if (msg->mesh_type() == msgs::Visual::PLANE)
   {
-    math::Plane plane = common::Message::Convert(msg->plane());
+    math::Plane plane = msgs::Convert(msg->plane());
     sdf::ElementPtr elem = geomElem->AddElement("plane");
     elem->GetAttribute("normal")->Set(plane.normal);
   }
@@ -163,7 +163,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 
   /*if (msg->has_plane())
   {
-    math::Plane plane = common::Message::Convert(msg->plane());
+    math::Plane plane = msgs::Convert(msg->plane());
     common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
         math::Vector2d(2,2), 
         math::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
@@ -173,8 +173,8 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->has_pose())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("origin");
-    math::Pose p( common::Message::Convert(msg->pose().position()),
-                  common::Message::Convert(msg->pose().orientation()) );
+    math::Pose p( msgs::Convert(msg->pose().position()),
+                  msgs::Convert(msg->pose().orientation()) );
 
     elem->GetAttribute("pose")->Set( p );
   }
@@ -189,7 +189,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
     elem->GetOrCreateElement("color")->GetAttribute("rgba")->Set(
-        common::Message::Convert(msg->material_color()));
+        msgs::Convert(msg->material_color()));
   }
 
   if (msg->has_cast_shadows())
@@ -1127,10 +1127,10 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
     this->MakeStatic();
 
   if (msg->has_pose())
-    this->SetPose( common::Message::Convert(msg->pose()) );
+    this->SetPose( msgs::Convert(msg->pose()) );
 
   if (msg->has_scale())
-    this->SetScale( common::Message::Convert(msg->scale()) );
+    this->SetScale( msgs::Convert(msg->scale()) );
 
   if (msg->has_visible())
     this->SetVisible(msg->visible());

@@ -24,8 +24,9 @@
 
 #include <string>
 
+#include "msgs/msgs.h"
+
 #include "transport/TransportTypes.hh"
-#include "msgs/MessageTypes.hh"
 #include "common/CommonTypes.hh"
 #include "math/MathTypes.hh"
 #include "math/Box.hh"

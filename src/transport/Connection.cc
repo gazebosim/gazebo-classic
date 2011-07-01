@@ -17,7 +17,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "common/Console.hh"
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 
 #include "transport/IOManager.hh"
 #include "transport/Connection.hh"

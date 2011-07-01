@@ -34,10 +34,10 @@ DirectionalLightMaker::DirectionalLightMaker()
   this->state = 0;
 
   this->msg.set_type( msgs::Light::DIRECTIONAL );
-  common::Message::Set( this->msg.mutable_diffuse(),common::Color(0.2, 0.2, 0.2, 1));
-  common::Message::Set( this->msg.mutable_specular(), common::Color(0.01, 0.01, 0.01, 1));
-  common::Message::Set( this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.001));
-  common::Message::Set( this->msg.mutable_direction(), math::Vector3(.1, .1, -0.9));
+  msgs::Set( this->msg.mutable_diffuse(),common::Color(0.2, 0.2, 0.2, 1));
+  msgs::Set( this->msg.mutable_specular(), common::Color(0.01, 0.01, 0.01, 1));
+  msgs::Set( this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.001));
+  msgs::Set( this->msg.mutable_direction(), math::Vector3(.1, .1, -0.9));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( true );
 }
@@ -74,7 +74,7 @@ void DirectionalLightMaker::MousePushCB(const common::MouseEvent &event)
   norm.Set(0,0,1);
 
   /* NATY: Fixe camera issue
-  common::Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0));
+  msgs::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0));
   this->msg.mutable_pose()->mutable_position()->set_z(5);
   */
 }
@@ -96,6 +96,6 @@ void DirectionalLightMaker::MouseDragCB(const common::MouseEvent & /*event*/)
 
 void DirectionalLightMaker::CreateTheEntity()
 {
-  common::Message::Stamp(this->msg.mutable_header());
+  msgs::Stamp(this->msg.mutable_header());
   //Simulator::Instance()->SendMessage(this->msg);
 }

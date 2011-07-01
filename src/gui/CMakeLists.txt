@@ -44,8 +44,9 @@ QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
                                          
-target_link_libraries(gazebo_gui Xpm ${QT_LIBRARIES} ${ogre_libraries} ${boost_libraries} gazebo_physics)
+target_link_libraries(gazebo_gui Xpm ${QT_LIBRARIES} ${ogre_libraries} ${boost_libraries} gazebo_physics gazebo_msgs)
 
+                                
 set_target_properties(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
 
 INSTALL_LIBRARY(gazebo_gui)

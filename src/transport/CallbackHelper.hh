@@ -8,7 +8,7 @@
 #include <google/protobuf/message.h>
 
 #include "common/Console.hh"
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "common/Exception.hh"
 
 namespace gazebo

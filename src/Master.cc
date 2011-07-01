@@ -65,7 +65,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   msgs::String msg;
   msg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
 
-  new_connection->EnqueueMsg( common::Message::Package("init", msg), true );
+  new_connection->EnqueueMsg( msgs::Package("init", msg), true );
 
   this->connections.push_back(new_connection);
   new_connection->StartRead( boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
@@ -93,7 +93,7 @@ void Master::OnRead(const unsigned int connectionIndex,
     {
       if (iter->first.topic() == pub.topic())
       {
-        iter->second->EnqueueMsg(common::Message::Package("publisher_update", pub));
+        iter->second->EnqueueMsg(msgs::Package("publisher_update", pub));
       }
     }
   }
@@ -109,7 +109,7 @@ void Master::OnRead(const unsigned int connectionIndex,
     {
       if (iter->first.topic() == pub.topic())
       {
-        iter->second->EnqueueMsg(common::Message::Package("unadvertise", pub));
+        iter->second->EnqueueMsg(msgs::Package("unadvertise", pub));
       }
     }
 
@@ -126,7 +126,7 @@ void Master::OnRead(const unsigned int connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
-        iter->second->EnqueueMsg(common::Message::Package("unsubscribe", sub));
+        iter->second->EnqueueMsg(msgs::Package("unsubscribe", sub));
       }
     }
 
@@ -158,7 +158,7 @@ void Master::OnRead(const unsigned int connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
-        conn->EnqueueMsg(common::Message::Package("publisher_update", iter->first), true);
+        conn->EnqueueMsg(msgs::Package("publisher_update", iter->first), true);
       }
     }
   }
@@ -177,7 +177,7 @@ void Master::OnRead(const unsigned int connectionIndex,
         msgs::Publish *pub = msg.add_publisher();
         pub->CopyFrom( iter->first );
       }
-      conn->EnqueueMsg( common::Message::Package("publisher_list", msg), true );
+      conn->EnqueueMsg( msgs::Package("publisher_list", msg), true );
     }
     else if (req.request() == "topic_info")
     {
@@ -210,7 +210,7 @@ void Master::OnRead(const unsigned int connectionIndex,
         }
       }
 
-      conn->EnqueueMsg( common::Message::Package("topic_info_response", ti), true );
+      conn->EnqueueMsg( msgs::Package("topic_info_response", ti), true );
     }
   }
   else

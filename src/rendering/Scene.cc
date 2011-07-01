@@ -17,6 +17,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "rendering/ogre.h"
+#include "msgs/msgs.h"
 
 #include "common/Global.hh"
 #include "common/Exception.hh"
@@ -819,7 +820,7 @@ void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
   }
 
   if (msg->has_ambient())
-    this->SetAmbientColor( common::Message::Convert(msg->ambient()) );
+    this->SetAmbientColor( msgs::Convert(msg->ambient()) );
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -863,7 +864,7 @@ void Scene::PreRender()
     Visual_M::iterator iter = this->visuals.find((*pIter)->header().str_id());
     if (iter != this->visuals.end())
     {
-      iter->second->SetPose( common::Message::Convert(*(*pIter)) );
+      iter->second->SetPose( msgs::Convert(*(*pIter)) );
       PoseMsgs_L::iterator prev = pIter++;
       this->poseMsgs.erase( prev );
     }

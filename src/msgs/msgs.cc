@@ -25,27 +25,26 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 
-using namespace gazebo;
-using namespace common;
+namespace gazebo { namespace msgs {
 
 
-const google::protobuf::FieldDescriptor *Message::GetFD(google::protobuf::Message &message, const std::string &name)
+const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name)
 {
   return message.GetDescriptor()->FindFieldByName(name);
 }
 
-msgs::Header *Message::GetHeader(google::protobuf::Message &message)
+msgs::Header *GetHeader(google::protobuf::Message &message)
 {
   google::protobuf::Message *msg = NULL;
  
-  if (Message::GetFD(message, "str_id"))
+  if (GetFD(message, "str_id"))
     msg = &message;
   else 
   {
     const google::protobuf::FieldDescriptor *fd;
-    fd = Message::GetFD(message, "header");
+    fd = GetFD(message, "header");
 
     if (fd)
       msg = message.GetReflection()->MutableMessage(&message, fd);
@@ -54,38 +53,38 @@ msgs::Header *Message::GetHeader(google::protobuf::Message &message)
   return (msgs::Header*)msg;
 }
 
-void Message::Init(google::protobuf::Message &message, const std::string &id)
+void Init(google::protobuf::Message &message, const std::string &id)
 {
-  msgs::Header *header = Message::GetHeader(message);
+  msgs::Header *header = GetHeader(message);
 
   if ( header )
   {
     header->set_str_id(id);
-    Message::Stamp(header->mutable_stamp());
+    Stamp(header->mutable_stamp());
   }
   else
     gzerr << "Header is non-existant\n";
 }
 
-void Message::Stamp(msgs::Header *hdr)
+void Stamp(msgs::Header *hdr)
 {
-  Message::Stamp(hdr->mutable_stamp());
+  Stamp(hdr->mutable_stamp());
 }
 
-void Message::Stamp(msgs::Time *time)
+void Stamp(msgs::Time *time)
 {
-  Time tm = Time::GetWallTime();
+  common::Time tm = common::Time::GetWallTime();
 
   time->set_sec(tm.sec);
   time->set_nsec(tm.nsec);
 }
 
-std::string Message::Package(const std::string &type, 
+std::string Package(const std::string &type, 
                              const google::protobuf::Message &message)
 {
   std::string data;
   msgs::Packet pkg;
-  Message::Stamp( pkg.mutable_stamp() );
+  Stamp( pkg.mutable_stamp() );
   pkg.set_type(type);
 
   std::string *serialized_data = pkg.mutable_serialized_data();
@@ -98,11 +97,11 @@ std::string Message::Package(const std::string &type,
   return data;
 }
 
-msgs::Packet Message::Package2(const std::string &type, 
+msgs::Packet Package2(const std::string &type, 
                                const google::protobuf::Message &message)
 {
   msgs::Packet pkg;
-  Message::Stamp( pkg.mutable_stamp() );
+  Stamp( pkg.mutable_stamp() );
   pkg.set_type(type);
 
   std::string *serialized_data = pkg.mutable_serialized_data();
@@ -112,14 +111,14 @@ msgs::Packet Message::Package2(const std::string &type,
   return pkg;
 }
 
-void Message::Set(msgs::Point *pt, const math::Vector3 &v)
+void Set(msgs::Point *pt, const math::Vector3 &v)
 {
   pt->set_x(v.x);
   pt->set_y(v.y);
   pt->set_z(v.z);
 }
 
-void Message::Set(msgs::Quaternion *q, const math::Quaternion &v)
+void Set(msgs::Quaternion *q, const math::Quaternion &v)
 {
   q->set_x(v.x);
   q->set_y(v.y);
@@ -127,13 +126,13 @@ void Message::Set(msgs::Quaternion *q, const math::Quaternion &v)
   q->set_w(v.w);
 }
 
-void Message::Set(msgs::Pose *p, const math::Pose &v)
+void Set(msgs::Pose *p, const math::Pose &v)
 {
-  Message::Set( p->mutable_position(), v.pos );
-  Message::Set( p->mutable_orientation(), v.rot );
+  Set( p->mutable_position(), v.pos );
+  Set( p->mutable_orientation(), v.rot );
 }
 
-void Message::Set(msgs::Color *c, const Color &v)
+void Set(msgs::Color *c, const common::Color &v)
 {
   c->set_r(v.R());
   c->set_g(v.G());
@@ -141,21 +140,22 @@ void Message::Set(msgs::Color *c, const Color &v)
   c->set_a(v.A());
 }
 
-void Message::Set(msgs::Time *t, const Time &v)
+void Set(msgs::Time *t, const common::Time &v)
 {
   t->set_sec(v.sec);
   t->set_nsec(v.nsec);
 }
 
-void Message::Set(msgs::Plane *p, const math::Plane &v)
+
+void Set(msgs::Plane *p, const math::Plane &v)
 {
-  Message::Set( p->mutable_normal(), v.normal );
+  Set( p->mutable_normal(), v.normal );
   p->set_size_x( v.size.x );
   p->set_size_y( v.size.y );
   p->set_d( v.d );
 }
 
-msgs::Point Message::Convert(const math::Vector3 &v)
+msgs::Point Convert(const math::Vector3 &v)
 {
   msgs::Point result;
   result.set_x(v.x);
@@ -164,7 +164,7 @@ msgs::Point Message::Convert(const math::Vector3 &v)
   return result;
 }
 
-msgs::Quaternion Message::Convert(const math::Quaternion &q)
+msgs::Quaternion Convert(const math::Quaternion &q)
 {
   msgs::Quaternion result;
   result.set_x(q.x);
@@ -174,7 +174,7 @@ msgs::Quaternion Message::Convert(const math::Quaternion &q)
   return result;
 }
 
-msgs::Pose Message::Convert(const math::Pose &p)
+msgs::Pose Convert(const math::Pose &p)
 {
   msgs::Pose result;
   result.mutable_position()->CopyFrom( Convert(p.pos) );
@@ -182,7 +182,7 @@ msgs::Pose Message::Convert(const math::Pose &p)
   return result;
 }
 
-msgs::Color Message::Convert(const Color &c)
+msgs::Color Convert(const common::Color &c)
 {
   msgs::Color result;
   result.set_r(c.R());
@@ -192,7 +192,7 @@ msgs::Color Message::Convert(const Color &c)
   return result;
 }
 
-msgs::Time Message::Convert(const Time &t)
+msgs::Time Convert(const common::Time &t)
 {
   msgs::Time result;
   result.set_sec(t.sec);
@@ -200,7 +200,7 @@ msgs::Time Message::Convert(const Time &t)
   return result;
 }
 
-msgs::Plane Message::Convert(const math::Plane &p)
+msgs::Plane Convert(const math::Plane &p)
 {
   msgs::Plane result;
   result.mutable_normal()->CopyFrom( Convert(p.normal) );
@@ -210,49 +210,50 @@ msgs::Plane Message::Convert(const math::Plane &p)
   return result;
 }
 
-math::Vector3 Message::Convert(const msgs::Point &v)
+math::Vector3 Convert(const msgs::Point &v)
 {
   return math::Vector3(v.x(), v.y(), v.z());
 }
 
-math::Quaternion Message::Convert(const msgs::Quaternion &q)
+math::Quaternion Convert(const msgs::Quaternion &q)
 {
   return math::Quaternion(q.w(), q.x(), q.y(), q.z());
 }
 
-math::Pose Message::Convert(const msgs::Pose &p)
+math::Pose Convert(const msgs::Pose &p)
 {
-  return math::Pose( Message::Convert(p.position()), 
-                 Message::Convert(p.orientation()) );
+  return math::Pose( Convert(p.position()), 
+                 Convert(p.orientation()) );
 }
 
-Color Message::Convert(const msgs::Color &c)
+common::Color Convert(const msgs::Color &c)
 {
-  return Color( c.r(), c.g(), c.b(), c.a() );
+  return common::Color( c.r(), c.g(), c.b(), c.a() );
 }
 
-Time Message::Convert(const msgs::Time &t)
+common::Time Convert(const msgs::Time &t)
 {
-  return Time(t.sec(), t.nsec());
+  return common::Time(t.sec(), t.nsec());
 }
 
-math::Plane Message::Convert(const msgs::Plane &p)
+math::Plane Convert(const msgs::Plane &p)
 {
-  return math::Plane(Message::Convert(p.normal()), 
+  return math::Plane(Convert(p.normal()), 
                math::Vector2d(p.size_x(), p.size_y()),
                p.d() );
 }
 
 
-msgs::Light Message::LightFromSDF( sdf::ElementPtr _sdf )
+msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Light result;
-  /*XMLConfigNode *cnode = NULL;
 
-  std::string type = node->GetString("type","point",1);
+  std::string type = _sdf->GetValueString("type");
   std::transform( type.begin(), type.end(), type.begin(), ::tolower);
 
-  Message::Init(result,node->GetString("name","light",1));
+  Init(result, _sdf->GetValueString("name"));
+
+  result.set_cast_shadows( _sdf->GetValueBool("cast_shadows") );
 
   if (type == "point")
     result.set_type(msgs::Light::POINT);
@@ -261,49 +262,52 @@ msgs::Light Message::LightFromSDF( sdf::ElementPtr _sdf )
   else if (type == "directional")
     result.set_type(msgs::Light::DIRECTIONAL);
 
-  if ((cnode = node->GetChild("origin")) != NULL)
+  if (_sdf->HasElement("origin"))
   {
-    result.mutable_pose()->mutable_position()->CopyFrom( 
-        Convert(cnode->GetVector3("xyz",math::Vector3(0,0,0))) );  
-    result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(cnode->GetRotation("rpy", math::Quaternion() )) );
+    result.mutable_pose()->CopyFrom( 
+        Convert(_sdf->GetElement("origin")->GetValuePose("pose") ) );
   }
 
-  if ((cnode = node->GetChild("diffuse")) != NULL)
+  if (_sdf->HasElement("diffuse"))
   {
     result.mutable_diffuse()->CopyFrom( 
-        Convert( cnode->GetColor("color", Color(1,1,1,1)) ) );
+        Convert( _sdf->GetElement("diffuse")->GetValueColor("rgba")) );
   }
 
-  if ((cnode = node->GetChild("specular")) != NULL)
+  if (_sdf->HasElement("specular"))
   {
-    result.mutable_specular()->CopyFrom( 
-        Convert( cnode->GetColor("color", Color(0,0,0,1)) ) );
+    result.mutable_diffuse()->CopyFrom( 
+        Convert( _sdf->GetElement("specular")->GetValueColor("rgba")) );
   }
 
-  if ((cnode = node->GetChild("attenuation")) != NULL)
+  if (_sdf->HasElement("attenuation"))
   {
-    result.set_attenuation_constant(cnode->GetFloat("constant",0.2,1));
-    result.set_attenuation_linear(cnode->GetFloat("linear",0.1,1));
-    result.set_attenuation_linear(cnode->GetFloat("quadratic",0.0,1));
+    sdf::ElementPtr elem = _sdf->GetElement("attenuation");
+    result.set_attenuation_constant(elem->GetValueDouble("constant"));
+    result.set_attenuation_linear(elem->GetValueDouble("linear"));
+    result.set_attenuation_linear(elem->GetValueDouble("quadratic"));
+    result.set_range( elem->GetValueDouble("range") );
   }
 
-  result.mutable_direction()->CopyFrom( 
-      Convert( node->GetVector3("direction",math::Vector3(0, 0, -1)) ) );
-  result.set_range( node->GetDouble("range",20,1) );
-  result.set_cast_shadows( node->GetBool("cast_shadows",false,0) );
+  if (_sdf->HasElement("attenuation"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("attenuation");
+    result.mutable_direction()->CopyFrom( 
+      Convert( elem->GetValueVector3("direction") ) );
+  }
 
-  if (node->GetChild("spot_inner_angle"))
-    result.set_spot_inner_angle( node->GetFloat("spot_inner_angle",0,0) );
-  if (node->GetChild("spot_outer_angle"))
-    result.set_spot_outer_angle( node->GetFloat("spot_outer_angle",0,0) );
-  if (node->GetChild("spot_falloff"))
-    result.set_spot_falloff( node->GetFloat("spot_falloff",0,0) );
+  if (_sdf->HasElement("spot"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("spot");
+    result.set_spot_inner_angle( elem->GetValueDouble("spot_inner_angle") );
+    result.set_spot_outer_angle( elem->GetValueDouble("spot_outer_angle") );
+    result.set_spot_falloff(     elem->GetValueDouble("spot_falloff") );
+  }
 
-    */
   return result;
 }
 
-msgs::Visual Message::VisualFromSDF( sdf::ElementPtr _sdf )
+msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Visual result;
 /*  XMLConfigNode *cnode = NULL;
@@ -358,7 +362,7 @@ msgs::Visual Message::VisualFromSDF( sdf::ElementPtr _sdf )
     if ( ccnode )
     {
       result.mutable_plane()->mutable_normal()->CopyFrom( 
-          Message::Convert( ccnode->GetVector3("normal",math::Vector3(0,0,1))) );
+          Convert( ccnode->GetVector3("normal",math::Vector3(0,0,1))) );
       result.mutable_plane()->set_d( ccnode->GetDouble("offset", 0, 0) );
       result.mutable_plane()->set_size_x(ccnode->GetTupleDouble("size", 0, 1));
       result.mutable_plane()->set_size_y(ccnode->GetTupleDouble("size", 1, 1));
@@ -387,7 +391,7 @@ msgs::Visual Message::VisualFromSDF( sdf::ElementPtr _sdf )
   return result;
 }
 
-msgs::Shadows Message::ShadowsFromSDF( sdf::ElementPtr _sdf )
+msgs::Shadows ShadowsFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Shadows result;
 
@@ -402,13 +406,13 @@ msgs::Shadows Message::ShadowsFromSDF( sdf::ElementPtr _sdf )
     result.set_type( msgs::Shadows::TEXTURE_MODULATIVE);
 
   result.mutable_color()->CopyFrom( 
-      Message::Convert(node->GetColor("color",Color(1,1,1,1))) );
+      Convert(node->GetColor("color",Color(1,1,1,1))) );
       */
 
   return result;
 }
 
-msgs::Fog Message::FogFromSDF( sdf::ElementPtr _sdf )
+msgs::Fog FogFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Fog result;
 
@@ -423,7 +427,7 @@ msgs::Fog Message::FogFromSDF( sdf::ElementPtr _sdf )
     gzerr << "Unknown fog type[" << type << "]\n";
 
   result.mutable_color()->CopyFrom( 
-      Message::Convert(node->GetColor("color",Color(1,1,1,1))) );
+      Convert(node->GetColor("color",Color(1,1,1,1))) );
   result.set_density(node->GetFloat("density",1,1));
   result.set_start(node->GetFloat("start",0,1));
   result.set_end(node->GetFloat("end",1,1));
@@ -432,29 +436,29 @@ msgs::Fog Message::FogFromSDF( sdf::ElementPtr _sdf )
   return result;
 }
 
-msgs::Scene Message::SceneFromSDF(sdf::ElementPtr _sdf)
+msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Scene result;
 /*
-  Message::Init(result,"scene");
+  Init(result,"scene");
   XMLConfigNode *cnode = NULL;
 
   if (node)
   {
     result.mutable_ambient()->CopyFrom( 
-        Message::Convert(node->GetColor("ambient",Color(1,1,1,1))) );
+        Convert(node->GetColor("ambient",Color(1,1,1,1))) );
 
     result.mutable_background()->CopyFrom( 
-        Message::Convert(node->GetColor("background_color",Color(1,1,1,1))) );
+        Convert(node->GetColor("background_color",Color(1,1,1,1))) );
 
     if (!node->GetString("sky_material","",0).empty())
       result.set_sky_material( node->GetString("sky_material","",1) );
 
     if ( (cnode = node->GetChild("fog")) != NULL)
-      result.mutable_fog()->CopyFrom( Message::FogFromXML(cnode) );
+      result.mutable_fog()->CopyFrom( FogFromXML(cnode) );
 
     if ( (cnode = node->GetChild("shadows")) != NULL && cnode->GetBool("enabled",true,0))
-      result.mutable_shadows()->CopyFrom( Message::ShadowsFromXML(cnode) );
+      result.mutable_shadows()->CopyFrom( ShadowsFromXML(cnode) );
   }
   else
     gzwarn << "node is null\n";
@@ -462,3 +466,5 @@ msgs::Scene Message::SceneFromSDF(sdf::ElementPtr _sdf)
 
   return result;
 }
+
+} }

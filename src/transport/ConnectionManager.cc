@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "transport/IOManager.hh"
 #include "transport/TopicManager.hh"
 #include "transport/ConnectionManager.hh"
@@ -245,7 +245,7 @@ void ConnectionManager::Advertise(const std::string &topic,
   msg.set_host( this->serverConn->GetLocalAddress() );
   msg.set_port( this->serverConn->GetLocalPort() );
 
-  this->masterConn->EnqueueMsg(common::Message::Package("advertise", msg));
+  this->masterConn->EnqueueMsg(msgs::Package("advertise", msg));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ void ConnectionManager::Unadvertise( const std::string &topic )
 
   if (this->masterConn)
   {
-    this->masterConn->EnqueueMsg(common::Message::Package("unadvertise", msg));
+    this->masterConn->EnqueueMsg(msgs::Package("unadvertise", msg));
   }
 }
 
@@ -280,7 +280,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
   //this->masterConn->Shutdown();
 
   // Get the list of publishers
-  this->masterConn->EnqueueMsg( common::Message::Package("request", request) );
+  this->masterConn->EnqueueMsg( msgs::Package("request", request) );
 
   this->masterConn->Read(data);
 
@@ -300,7 +300,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 void ConnectionManager::Unsubscribe( const msgs::Subscribe &msg )
 {
   // Inform the master that we want to unsubscribe from a topic.
-  this->masterConn->EnqueueMsg(common::Message::Package("unsubscribe", msg));
+  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg));
 }
 
 void ConnectionManager::Subscribe(const std::string &topic, 
@@ -326,7 +326,7 @@ void ConnectionManager::Subscribe(const std::string &topic,
     // Inform the master that we want to subscribe to a topic.
     // This will result in Connection::OnMasterRead getting called with a 
     // packet type of "publisher_update"
-    this->masterConn->EnqueueMsg(common::Message::Package("subscribe", msg));
+    this->masterConn->EnqueueMsg(msgs::Package("subscribe", msg));
   }
 }
 

@@ -19,7 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
+
 #include "common/Console.hh"
 
 #include "transport/Publisher.hh"
@@ -88,7 +89,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 
   this->visPub->Publish(*this->visualMsg);
 
-  common::Message::Init( *this->poseMsg, this->GetCompleteScopedName() );
+  msgs::Init( *this->poseMsg, this->GetCompleteScopedName() );
 }
  
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +264,7 @@ void Entity::SetRelativeRotation(const math::Quaternion &rot)
 void Entity::PoseChange(bool notify)
 {
   msgs::Pose msg;
-  common::Message::Set( this->poseMsg, this->GetRelativePose());
+  msgs::Set( this->poseMsg, this->GetRelativePose());
   this->posePub->Publish( *this->poseMsg);
 
   if (notify)

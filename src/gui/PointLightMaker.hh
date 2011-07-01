@@ -17,7 +17,7 @@
 #ifndef POINTLIGHTMAKER_HH
 #define POINTLIGHTMAKER_HH
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "gui/EntityMaker.hh"
 
 namespace gazebo

@@ -16,7 +16,7 @@
 */
 #include <sstream>
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
 #include "math/Quaternion.hh"
@@ -41,7 +41,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->set_mesh_type( msgs::Visual::CYLINDER );
   this->visualMsg->set_material_script( "Gazebo/TurquoiseGlowOutline" );
 
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -118,7 +118,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   p2 = this->GetSnappedPoint( p2 );
 
   if (this->state == 1)
-    common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
+    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
 
   math::Vector3 p( this->visualMsg->pose().position().x(),
              this->visualMsg->pose().position().y(),
@@ -142,8 +142,8 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
     p.z = scale.z/2.0;
   }
 
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
-  common::Message::Set(this->visualMsg->mutable_scale(), scale );
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
+  msgs::Set(this->visualMsg->mutable_scale(), scale );
 
   this->visPub->Publish(*this->visualMsg);
 }
@@ -151,7 +151,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
 void CylinderMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  common::Message::Init(msg,"new cylinder");
+  msgs::Init(msg,"new cylinder");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
@@ -183,13 +183,13 @@ void CylinderMaker::CreateTheEntity()
 
   msg.set_xml( newModelStr.str() );
 
-  common::Message::Stamp(this->visualMsg->mutable_header());
+  msgs::Stamp(this->visualMsg->mutable_header());
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
   (this->createCB)(
-      common::Message::Convert(this->visualMsg->pose().position()), 
-      common::Message::Convert(this->visualMsg->scale()) );
+      msgs::Convert(this->visualMsg->pose().position()), 
+      msgs::Convert(this->visualMsg->scale()) );
 
   //this->makerPub->Publish(msg);
 }

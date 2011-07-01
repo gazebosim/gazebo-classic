@@ -40,6 +40,9 @@ Base::Base(BasePtr parent)
   this->id = ++idCounter;
   this->saveable = true;
   this->selected = false;
+
+  this->sdf.reset( new sdf::Element );
+  this->sdf->AddAttribute("name","string","__default__",true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

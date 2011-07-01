@@ -17,7 +17,7 @@
 #ifndef DIRECTIONALLIGHTMAKER_HH
 #define DIRECTIONALLIGHTMAKER_HH
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "gui/EntityMaker.hh"
 
 namespace gazebo

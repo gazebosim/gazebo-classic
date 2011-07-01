@@ -16,7 +16,7 @@
 */
 
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "transport/Publication.hh"
 #include "transport/TopicManager.hh"
 

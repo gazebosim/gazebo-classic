@@ -139,6 +139,8 @@ ElementPtr Element::Clone() const
     clone->elementDescriptions.push_back((*eiter)->Clone());
   }
 
+  if (this->value)
+    clone->value = this->value->Clone();
   return clone;
 }
 

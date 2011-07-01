@@ -148,6 +148,7 @@ ODEPhysics::~ODEPhysics()
 // Load the ODE engine
 void ODEPhysics::Load( sdf::ElementPtr _sdf)
 {
+  this->sdf = _sdf;
   sdf::ElementPtr odeElem = _sdf->GetElement("ode");
 
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
@@ -436,7 +437,7 @@ int ODEPhysics::GetSORPGSIters()
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetSORPGSW()
 {
-  return this->sdf->GetElement("ode")->GetElement("solver")->GetValueInt("sor");
+  return this->sdf->GetElement("ode")->GetElement("solver")->GetValueDouble("sor");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "physics/MultiRayShape.hh"
 
 using namespace gazebo;
@@ -209,8 +209,8 @@ void MultiRayShape::Update()
 
       (*iter)->GetRelativePoints(a,b);
 
-      common::Message::Set(this->rayFanMsg->mutable_points(i), b );
-      common::Message::Set(this->rayFanOutlineMsg->mutable_points(i), b );
+      msgs::Set(this->rayFanMsg->mutable_points(i), b );
+      msgs::Set(this->rayFanOutlineMsg->mutable_points(i), b );
     }
   }*/
 }
@@ -228,17 +228,17 @@ void MultiRayShape::AddRay(const math::Vector3 &/*start*/, const math::Vector3 &
     if (this->rayFanMsg->points_size() == 0)
     {
       pt = this->rayFanMsg->add_points();
-      common::Message::Set(pt, start );
+      msgs::Set(pt, start );
 
       pt = this->rayFanOutlineMsg->add_points();
-      common::Message::Set(pt, start);
+      msgs::Set(pt, start);
     }
 
     pt = this->rayFanMsg->add_points();
-    common::Message::Set(pt, end);
+    msgs::Set(pt, end);
 
     pt = this->rayFanOutlineMsg->add_points();
-    common::Message::Set(pt, end);
+    msgs::Set(pt, end);
   }*/
 }
 

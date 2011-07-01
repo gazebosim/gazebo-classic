@@ -19,7 +19,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 
 namespace gazebo
 {

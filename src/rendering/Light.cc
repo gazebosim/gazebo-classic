@@ -24,7 +24,8 @@
 
 #include "rendering/ogre.h"
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
+
 #include "common/Events.hh"
 #include "common/Exception.hh"
 #include "common/Global.hh"
@@ -140,18 +141,18 @@ void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
   if (msg->has_diffuse())
   {
     this->sdf->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
-        common::Message::Convert(msg->diffuse()) );
+        msgs::Convert(msg->diffuse()) );
   }
 
   if (msg->has_specular())
   {
     this->sdf->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
-        common::Message::Convert(msg->diffuse()) );
+        msgs::Convert(msg->diffuse()) );
   }
 
   if (msg->has_direction())
   {
-    this->sdf->GetOrCreateElement("directional")->GetAttribute("direction")->Set( common::Message::Convert(msg->direction()) );
+    this->sdf->GetOrCreateElement("directional")->GetAttribute("direction")->Set( msgs::Convert(msg->direction()) );
   }
 
   if (msg->has_attenuation_constant())
@@ -202,7 +203,7 @@ void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
   this->Load();
 
   if (msg->has_pose())
-    this->SetPosition(common::Message::Convert(msg->pose().position()));
+    this->SetPosition(msgs::Convert(msg->pose().position()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

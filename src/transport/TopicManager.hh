@@ -22,7 +22,7 @@
 #include <boost/bind.hpp>
 
 #include "common/Exception.hh"
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "common/SingletonT.hh"
 
 #include "transport/TransportTypes.hh"

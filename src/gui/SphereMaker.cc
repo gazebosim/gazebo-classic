@@ -16,7 +16,7 @@
 */
 #include <sstream>
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
 #include "math/Quaternion.hh"
@@ -40,7 +40,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
   this->visualMsg->set_mesh_type( msgs::Visual::SPHERE );
   this->visualMsg->set_material_script( "Gazebo/TurquoiseGlowOutline" );
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 
 SphereMaker::~SphereMaker()
@@ -113,7 +113,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
   p2 = this->camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
   math::Vector3 p( this->visualMsg->pose().position().x(),
@@ -122,15 +122,15 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
 
   p.z = scale;
 
-  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
-  common::Message::Set(this->visualMsg->mutable_scale(),math::Vector3(scale,scale,scale));
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_scale(),math::Vector3(scale,scale,scale));
   this->visPub->Publish(*this->visualMsg);
 }
 
 void SphereMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  common::Message::Init(msg, "new_sphere");
+  msgs::Init(msg, "new_sphere");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
@@ -159,13 +159,13 @@ void SphereMaker::CreateTheEntity()
 
   msg.set_xml( newModelStr.str() );
 
-  common::Message::Stamp(this->visualMsg->mutable_header());
+  msgs::Stamp(this->visualMsg->mutable_header());
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
   (this->createCB)(
-      common::Message::Convert(this->visualMsg->pose().position()), 
-      common::Message::Convert(this->visualMsg->scale()) );
+      msgs::Convert(this->visualMsg->pose().position()), 
+      msgs::Convert(this->visualMsg->scale()) );
 
   //this->makerPub->Publish(msg);
 }

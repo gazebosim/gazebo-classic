@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Events.hh"
@@ -106,7 +106,7 @@ PhysicsEngine::~PhysicsEngine()
   if (!this->visual.empty())
   {
     msgs::Visual msg;
-    common::Message::Init(msg, this->visual);
+    msgs::Init(msg, this->visual);
     msg.set_action( msgs::Visual::DELETE );
     this->vis_pub->Publish(msg);
   }
@@ -167,7 +167,7 @@ void PhysicsEngine::AddContactVisual(const math::Vector3 &/*pos_*/,
 void PhysicsEngine::ShowContacts(const bool &show)
 {
   msgs::Visual msg;
-  common::Message::Init(msg, this->visual);
+  msgs::Init(msg, this->visual);
   msg.set_visible( show );
   this->vis_pub->Publish(msg);
 

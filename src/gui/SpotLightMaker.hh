@@ -17,7 +17,7 @@
 #ifndef SPOTLIGHTMAKER_HH
 #define SPOTLIGHTMAKER_HH
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "gui/EntityMaker.hh"
 
 namespace gazebo

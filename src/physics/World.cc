@@ -97,7 +97,7 @@ void World::Load( sdf::ElementPtr _sdf )
 {
   this->sdf = _sdf;
   this->sceneMsg.CopyFrom( 
-        common::Message::SceneFromSDF(_sdf->GetElement("scene")) );
+        msgs::SceneFromSDF(_sdf->GetElement("scene")) );
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
@@ -105,7 +105,7 @@ void World::Load( sdf::ElementPtr _sdf )
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0,200000000);
 
-  common::Message::Init( this->worldStatsMsg, "statistics" );
+  msgs::Init( this->worldStatsMsg, "statistics" );
 
   this->factorySub = this->node->Subscribe("~/factory", 
                                            &World::OnFactoryMsg, this);
@@ -210,13 +210,10 @@ void World::RunLoop()
     /// Send statistics about the world simulation
     if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
     {
-      common::Message::Stamp( this->worldStatsMsg.mutable_header() );
-      common::Message::Set( this->worldStatsMsg.mutable_sim_time(), 
-          this->GetSimTime());
-      common::Message::Set( this->worldStatsMsg.mutable_real_time(),
-          this->GetRealTime() );
-      common::Message::Set( this->worldStatsMsg.mutable_pause_time(),
-          this->GetPauseTime());
+      msgs::Stamp( this->worldStatsMsg.mutable_header() );
+      msgs::Set( this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+      msgs::Set( this->worldStatsMsg.mutable_real_time(), this->GetRealTime() );
+      msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
 
       this->statPub->Publish( this->worldStatsMsg );
       this->prevStatTime = common::Time::GetWallTime();
@@ -351,7 +348,7 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
   event::Events::addEntitySignal(model->GetCompleteScopedName());
 
   msgs::Entity msg;
-  common::Message::Init(msg, model->GetCompleteScopedName() );
+  msgs::Init(msg, model->GetCompleteScopedName() );
   msg.set_name(model->GetCompleteScopedName());
 
   this->newEntityPub->Publish(msg);
@@ -378,7 +375,7 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
   while (childElem)
   {
     msgs::Light *lm = this->sceneMsg.add_light();
-    lm->CopyFrom( common::Message::LightFromSDF(childElem) );
+    lm->CopyFrom( msgs::LightFromSDF(childElem) );
 
     childElem = _sdf->GetNextElement("light", childElem);
   }
@@ -544,7 +541,7 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
 {
-  common::Message::Stamp(this->sceneMsg.mutable_header());
+  msgs::Stamp(this->sceneMsg.mutable_header());
 
   this->sceneMsg.clear_pose();
   if (this->rootElement)
@@ -564,8 +561,8 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
     {
       msgs::Pose *poseMsg = scene.add_pose();
       math::Pose pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
-      poseMsg->CopyFrom( common::Message::Convert(pose) );
-      common::Message::Init(*poseMsg, entity->GetCompleteScopedName() );
+      poseMsg->CopyFrom( msgs::Convert(pose) );
+      msgs::Init(*poseMsg, entity->GetCompleteScopedName() );
     }
 
     for (unsigned int i=0; i < entity->GetChildCount(); i++)

@@ -40,7 +40,7 @@ void PublicationTransport::Init(const ConnectionPtr &conn_)
   sub.set_host( this->connection->GetLocalAddress() );
   sub.set_port( this->connection->GetLocalPort() );
 
-  this->connection->EnqueueMsg( common::Message::Package("sub",sub) );
+  this->connection->EnqueueMsg( msgs::Package("sub",sub) );
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher
   this->connection->StartRead(boost::bind(&PublicationTransport::OnPublish, this, _1));

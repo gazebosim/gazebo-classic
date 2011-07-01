@@ -106,7 +106,7 @@ void InsertModelWidget::OnModelSelection()
 
       // Create the model-level visual msg
       msgs::Visual visMsg;
-      common::Message::Init(visMsg, modelName);
+      msgs::Init(visMsg, modelName);
       this->visualPub->Publish(visMsg);
 
       common::XMLConfigNode *linkNode = modelNode->GetChild("link");
@@ -124,9 +124,9 @@ void InsertModelWidget::OnModelSelection()
           rot = originNode->GetRotation("rpy",math::Quaternion());
         }
 
-        common::Message::Init(visMsg, modelName+"::"+linkName);
-        common::Message::Set(visMsg.mutable_pose()->mutable_position(), pos);
-        common::Message::Set(visMsg.mutable_pose()->mutable_orientation(), rot);
+        msgs::Init(visMsg, modelName+"::"+linkName);
+        msgs::Set(visMsg.mutable_pose()->mutable_position(), pos);
+        msgs::Set(visMsg.mutable_pose()->mutable_orientation(), rot);
 
         visMsg.set_parent_id(modelName);
         this->visualPub->Publish(visMsg);
@@ -136,8 +136,8 @@ void InsertModelWidget::OnModelSelection()
         {
           std::string name = boost::lexical_cast<std::string>(count++);
 
-          visMsg = common::Message::VisualFromXML(visualNode);
-          common::Message::Init(visMsg, name);
+          visMsg = msgs::VisualFromXML(visualNode);
+          msgs::Init(visMsg, name);
           visMsg.set_parent_id(modelName + "::" + linkName);
 
           this->visualPub->Publish(visMsg);
@@ -149,12 +149,12 @@ void InsertModelWidget::OnModelSelection()
     }
 
     msgs::Selection selectMsg;
-    common::Message::Init(selectMsg, modelName);
+    msgs::Init(selectMsg, modelName);
     selectMsg.set_selected(true);
     this->selectionPub->Publish(selectMsg);
 
     //msgs::Factory msg;
-    //common::Message::Init(msg, "new");
+    //msgs::Init(msg, "new");
     //msg.set_filename(path+filename);
 
     //this->factoryPub->Publish(msg);

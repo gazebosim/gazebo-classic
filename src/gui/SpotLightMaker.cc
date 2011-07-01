@@ -34,10 +34,10 @@ SpotLightMaker::SpotLightMaker()
   this->state = 0;
 
   this->msg.set_type( msgs::Light::SPOT );
-  common::Message::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
-  common::Message::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
-  common::Message::Set(this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.0));
-  common::Message::Set(this->msg.mutable_direction(), math::Vector3(0,0,-1));
+  msgs::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
+  msgs::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+  msgs::Set(this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.0));
+  msgs::Set(this->msg.mutable_direction(), math::Vector3(0,0,-1));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( false );
   this->msg.set_spot_inner_angle( 20 );
@@ -77,7 +77,7 @@ void SpotLightMaker::MousePushCB(const common::MouseEvent &event)
   norm.Set(0,0,1);
 
   /* NATY: Fix camera issue
-  common::Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0) );
+  msgs::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0) );
   this->msg.mutable_pose()->mutable_position()->set_z( 1.0 );
   */
 }
@@ -99,6 +99,6 @@ void SpotLightMaker::MouseDragCB(const common::MouseEvent & /*event*/)
 
 void SpotLightMaker::CreateTheEntity()
 {
-  common::Message::Stamp(this->msg.mutable_header());
+  msgs::Stamp(this->msg.mutable_header());
   //Simulator::Instance()->SendMessage(this->msg);
 }

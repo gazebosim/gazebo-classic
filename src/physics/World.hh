@@ -30,9 +30,10 @@
 
 #include "transport/TransportTypes.hh"
 
+#include "msgs/msgs.h"
+
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
-#include "common/Messages.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.h"

@@ -6,7 +6,7 @@
 #include <deque>
 #include <boost/shared_ptr.hpp>
 
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 #include "transport/Connection.hh"
 
 namespace gazebo

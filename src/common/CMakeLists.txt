@@ -18,8 +18,7 @@ link_directories(
  ${tinyxml_library_dirs}
 )
 
-set ( sources Messages.cc
-              AssimpLoader.cc
+set ( sources AssimpLoader.cc
               Color.cc
               Diagnostics.cc
               Event.cc
@@ -40,7 +39,6 @@ set ( sources Messages.cc
 )
 
 set ( headers CommonTypes.hh
-              Messages.hh
               AssimpLoader.hh
               Color.hh
               Diagnostics.hh
@@ -66,8 +64,7 @@ set ( headers CommonTypes.hh
 
 add_library(gazebo_common SHARED ${sources})
 
-target_link_libraries( gazebo_common gazebo_msgs
-                                     gazebo_math
+target_link_libraries( gazebo_common gazebo_math
                                      ${libdl_library}
                                      ${tinyxml_libraries}
                                      ${boost_libraries}

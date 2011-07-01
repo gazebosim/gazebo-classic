@@ -104,7 +104,7 @@ void MainWindow::About()
 void MainWindow::Play()
 {
   msgs::WorldControl msg;
-  common::Message::Init(msg,"world_control");
+  msgs::Init(msg,"world_control");
   msg.set_pause(false);
 
   this->worldControlPub->Publish(msg);
@@ -113,7 +113,7 @@ void MainWindow::Play()
 void MainWindow::Pause()
 {
   msgs::WorldControl msg;
-  common::Message::Init(msg,"world_control");
+  msgs::Init(msg,"world_control");
   msg.set_pause(true);
 
   this->worldControlPub->Publish(msg);
@@ -122,7 +122,7 @@ void MainWindow::Pause()
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
-  common::Message::Init(msg,"world_control");
+  msgs::Init(msg,"world_control");
   msg.set_step(true);
 
   this->worldControlPub->Publish(msg);

@@ -108,11 +108,11 @@ void Joint::Init()
   //a JointMessage.
   /// Add a renderable for the joint
   /*msgs::Visual msg;
-  common::Message::Init(msg, visname.str());
+  msgs::Init(msg, visname.str());
   msg.set_parent_id( this->GetName() );
   msg.set_render_type( msgs::Visual::MESH_RESOURCE );
-  common::Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos );
-  common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0) );
+  msgs::Set(msg.mutable_pose()->mutable_position(), this->anchorPos );
+  msgs::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0) );
   msg.set_cast_shadows( false );
   msg.set_mesh( "joint_anchor" );
   msg.set_material( "Gazebo/JointAnchor" );
@@ -120,14 +120,14 @@ void Joint::Init()
   this->vis_pub->Publish(msg);
   this->visual = msg.header().str_id();
  
-  common::Message::Init(msg, visname.str() + "/line1"); 
+  msgs::Init(msg, visname.str() + "/line1"); 
   msg.set_parent_id( visname.str() );
   msg.set_render_type( msgs::Visual::LINE_LIST );
   msg.set_material( "Gazebo/BlueGlow" );
   this->vis_pub->Publish(msg);
   this->line1 = msg.header().str_id();
 
-  common::Message::Init(msg, visname.str() + "/line2"); 
+  msgs::Init(msg, visname.str() + "/line2"); 
   msg.set_parent_id( visname.str() );
   msg.set_render_type( msgs::Visual::LINE_LIST );
   msg.set_material( "Gazebo/BlueGlow" );
@@ -153,14 +153,14 @@ void Joint::Update()
   /*if (this->showJoints)
   {
     msgs::Visual msg;
-    common::Message::Init(msg, this->visual);
-    common::Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos);
-    common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0) );
+    msgs::Init(msg, this->visual);
+    msgs::Set(msg.mutable_pose()->mutable_position(), this->anchorPos);
+    msgs::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0) );
     this->vis_pub->Publish(msg);
 
     if (this->childBody) 
     {
-      common::Message::Init(msg, this->line1);
+      msgs::Init(msg, this->line1);
       msgs::Point *pt;
 
       pt = msg.add_points();
@@ -169,14 +169,14 @@ void Joint::Update()
       pt->set_z(0);
 
       pt = msg.add_points();
-      common::Message::Set(pt, this->childBody->GetWorldPose().pos - this->anchorPos );
+      msgs::Set(pt, this->childBody->GetWorldPose().pos - this->anchorPos );
 
       this->vis_pub->Publish(msg);
     }
 
     if (this->parentBody)
     {
-      common::Message::Init(msg, this->line2);
+      msgs::Init(msg, this->line2);
       msgs::Point *pt;
 
       pt = msg.add_points();
@@ -185,7 +185,7 @@ void Joint::Update()
       pt->set_z(0);
 
       pt = msg.add_points();
-      common::Message::Set(pt, this->parentBody->GetWorldPose().pos - this->anchorPos);
+      msgs::Set(pt, this->parentBody->GetWorldPose().pos - this->anchorPos);
       this->vis_pub->Publish(msg);
     }
   }*/
@@ -197,7 +197,7 @@ void Joint::Update()
 void Joint::ShowJoints(const bool & /*s_*/)
 {
   /*msgs::Visual msg;
-  common::Message::Init(msg, this->visual);
+  msgs::Init(msg, this->visual);
   msg.set_visible(s);
   this->vis_pub->Publish(msg);
   this->showJoints = s;

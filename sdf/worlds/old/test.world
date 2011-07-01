@@ -216,6 +216,7 @@
           <sensor:contact name="base_contact_sensor">
               <updateRate>100.0</updateRate>
               <controller:gazebo_ros_bumper name="base_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                <data name="alwayson" value="true"/>
                   <alwaysOn>true</alwaysOn>
                   <updateRate>100.0</updateRate>
                   <bumperTopicName>base_bumper</bumperTopicName>

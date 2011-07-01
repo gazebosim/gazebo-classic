@@ -22,12 +22,12 @@
 #include <boost/shared_ptr.hpp>
 
 #include "sdf/sdf.h"
+#include "msgs/msgs.h"
 
 #include "rendering/ogre.h"
 
 #include "transport/TransportTypes.hh"
 #include "common/Events.hh"
-#include "common/Messages.hh"
 #include "common/Color.hh"
 #include "math/Vector2i.hh"
 
@@ -42,10 +42,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Message;
-  }
 
 	namespace rendering
   {

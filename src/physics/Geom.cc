@@ -21,8 +21,9 @@
 
 #include <sstream>
 
+#include "msgs/msgs.h"
+
 #include "common/Events.hh"
-#include "common/Messages.hh"
 #include "common/Console.hh"
 
 #include "transport/Publisher.hh"
@@ -60,7 +61,7 @@ Geom::~Geom()
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    common::Message::Init(msg, this->bbVisual);
+    msgs::Init(msg, this->bbVisual);
     msg.set_action( msgs::Visual::DELETE);
     this->visPub->Publish(msg);
   }
@@ -125,9 +126,9 @@ void Geom::CreateBoundingBox()
     else
       msg.set_material_script( "Gazebo/GreenTransparent" );
 
-    common::Message::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
-    common::Message::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
-    common::Message::Set(msg.mutable_pose()->mutable_orientation(), math::Quaternion(1,0,0,0));
+    msgs::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
+    msgs::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
+    msgs::Set(msg.mutable_pose()->mutable_orientation(), math::Quaternion(1,0,0,0));
     msg.set_transparency( .5 );
 
     this->visPub->Publish(msg);
@@ -183,7 +184,7 @@ void Geom::ShowBoundingBox(const bool &show)
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    common::Message::Init(msg, this->bbVisual);
+    msgs::Init(msg, this->bbVisual);
     msg.set_visible( show );
     msg.set_action( msgs::Visual::UPDATE );
     this->visPub->Publish(msg);
@@ -273,7 +274,7 @@ Contact Geom::GetContact(unsigned int /*_i*/) const
 void Geom::EnabledCB(bool enabled)
 {
   msgs::Visual msg;
-  common::Message::Init(msg, this->bbVisual);
+  msgs::Init(msg, this->bbVisual);
 
   if (enabled)
     msg.set_material_script( "Gazebo/GreenTransparent" );

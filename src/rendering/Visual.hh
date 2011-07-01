@@ -30,9 +30,9 @@
 #include "math/Quaternion.hh"
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
-#include "common/Messages.hh"
 
 #include "sdf/sdf.h"
+#include "msgs/msgs.h"
 #include "rendering/RenderTypes.hh"
 
 namespace Ogre

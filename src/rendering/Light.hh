@@ -28,7 +28,6 @@
 
 #include "common/Event.hh"
 #include "common/Color.hh"
-#include "common/Messages.hh"
 
 #include "sdf/sdf.h"
 

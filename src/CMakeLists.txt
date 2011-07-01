@@ -44,6 +44,7 @@ add_executable(gzserver server.cc Server.cc Master.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport
+                                gazebo_sdf_interface
                                 gazebo_msgs
                                 ${boost_libraries}
                                 ${freeimage_library}

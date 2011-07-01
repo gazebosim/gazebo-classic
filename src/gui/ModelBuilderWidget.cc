@@ -81,7 +81,7 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   this->world->SetPaused(true);
   
   msgs::Factory msg;
-  common::Message::Init(msg, "new_box");
+  msgs::Init(msg, "new_box");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";

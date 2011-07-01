@@ -21,7 +21,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "common/SingletonT.hh"
-#include "common/Messages.hh"
+#include "msgs/msgs.h"
 
 #include "transport/Publisher.hh"
 #include "transport/Connection.hh"
