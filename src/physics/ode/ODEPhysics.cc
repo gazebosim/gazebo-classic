@@ -471,7 +471,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 ////////////////////////////////////////////////////////////////////////////////
 int ODEPhysics::GetMaxContacts()
 {
-  return this->sdf->GetElement("ode")->GetOrCreateElement("max_contacts")->GetValueInt();
+  return this->sdf->GetOrCreateElement("max_contacts")->GetValueInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

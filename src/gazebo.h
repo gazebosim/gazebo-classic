@@ -13,6 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#include <gazebo/gazebo_config.h>
-//#include <gazebo/gz.h>
+ */
+#include "transport/Transport.hh"
+#include "common/SystemPaths.hh"
+#include "gazebo_config.h"
+
+namespace gazebo
+{
+  void load()
+  {
+    gazebo::common::SystemPaths::Instance()->Load();
+
+    // Start the transport system by connecting to the master.
+    gazebo::transport::init();
+  }
+  void init()
+  {
+  }
+
+  void run()
+  {
+    // Run transport loop. Starts a thread
+    gazebo::transport::run();
+  }
+
+  void stop()
+  {
+    gazebo::transport::stop();
+  }
+  void fini()
+  {
+    gazebo::transport::fini();
+  }
+}

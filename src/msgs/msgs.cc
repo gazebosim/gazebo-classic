@@ -310,84 +310,77 @@ msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
 msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Visual result;
-/*  XMLConfigNode *cnode = NULL;
 
-  result.set_cast_shadows( node->GetBool("cast_shadows",true,0) );
-  result.set_visible( node->GetBool("visible",true,0) );
-  result.set_transparency( node->GetDouble("transparency",0.0,0) );
+  result.set_cast_shadows( _sdf->GetValueBool("cast_shadows") );
+  result.set_transparency( _sdf->GetValueDouble("transparency") );
 
   // Load the geometry
-  if ( (cnode = node->GetChild("geometry")) != NULL )
+  if (_sdf->HasElement("geometry"))
   {
-    XMLConfigNode *ccnode = NULL;
+    sdf::ElementPtr geomElem = _sdf->GetElement("geometry")->GetFirstElement();
+    math::Vector3 scale;
 
-    ccnode = cnode->GetChild("mesh");
-    if (ccnode)
+    if (geomElem->GetName() == "box")
     {
-      result.set_mesh( ccnode->GetString("filename","",0) );
-      result.mutable_scale()->CopyFrom( 
-          Convert( ccnode->GetVector3("scale", math::Vector3(1,1,1)) ) );
+      scale = geomElem->GetValueVector3("size");
+      result.set_mesh_type( msgs::Visual::BOX );
     }
+    else if (geomElem->GetName() == "cylinder")
+    {
+      scale.x = scale.y = geomElem->GetValueDouble("radius");
+      scale.z = geomElem->GetValueDouble("length");
+      result.set_mesh_type( msgs::Visual::CYLINDER );
+    }
+    else if (geomElem->GetName() == "sphere")
+    {
+      scale.x = scale.y = scale.z = geomElem->GetValueDouble("radius");
+      result.set_mesh_type( msgs::Visual::SPHERE );
+    }
+    else if (geomElem->GetName() == "plane")
+      result.set_mesh_type( msgs::Visual::PLANE );
+    else if (geomElem->GetName() == "image")
+    {
+      scale.x = scale.y = geomElem->GetValueDouble("scale");
+      scale.z = geomElem->GetValueDouble("height");
+      result.set_mesh_type( msgs::Visual::IMAGE );
+    }
+    else if (geomElem->GetName() == "heightmap")
+    {
+      scale= geomElem->GetValueDouble("size");
+      result.set_mesh_type( msgs::Visual::HEIGHTMAP );
+    }
+    else if (geomElem->GetName() == "mesh")
+    {
+      scale= geomElem->GetValueDouble("scale");
+      result.set_mesh_type( msgs::Visual::MESH );
+    }
+    else
+      gzerr << "Unknown geometry type\n";
 
-    ccnode = cnode->GetChild("cylinder");
-    if (ccnode)
-    {
-      result.set_mesh("unit_cylinder");
-      double radius = ccnode->GetDouble("radius",1,1);
-      double length = ccnode->GetDouble("length",1,1);
-      result.mutable_scale()->set_x(radius*2);
-      result.mutable_scale()->set_y(radius*2);
-      result.mutable_scale()->set_z(length);
-    }
-
-    ccnode = cnode->GetChild("sphere");
-    if (ccnode)
-    {
-      result.set_mesh("unit_sphere");
-      double radius = ccnode->GetDouble("radius",1,1);
-      result.mutable_scale()->set_x(radius*2);
-      result.mutable_scale()->set_y(radius*2);
-      result.mutable_scale()->set_z(radius*2);
-    }
-
-    ccnode = cnode->GetChild("box");
-    if (ccnode)
-    {
-      result.set_mesh("unit_box");
-      result.mutable_scale()->CopyFrom( 
-          Convert( ccnode->GetVector3("size", math::Vector3(1,1,1)) ) );
-    }
-
-    ccnode = cnode->GetChild("plane");
-    if ( ccnode )
-    {
-      result.mutable_plane()->mutable_normal()->CopyFrom( 
-          Convert( ccnode->GetVector3("normal",math::Vector3(0,0,1))) );
-      result.mutable_plane()->set_d( ccnode->GetDouble("offset", 0, 0) );
-      result.mutable_plane()->set_size_x(ccnode->GetTupleDouble("size", 0, 1));
-      result.mutable_plane()->set_size_y(ccnode->GetTupleDouble("size", 1, 1));
-    }
+    if (result.mesh_type() == msgs::Visual::IMAGE || 
+        result.mesh_type() == msgs::Visual::MESH || 
+        result.mesh_type() == msgs::Visual::HEIGHTMAP)
+      result.set_filename( geomElem->GetValueString("filename") ); 
   }
 
   /// Load the material
-  if ( (cnode = node->GetChild("material")) != NULL)
+  if (_sdf->HasElement("material"))
   {
-    result.set_material( cnode->GetString("name","",1) );
-    result.set_uv_tile_x( cnode->GetTupleDouble("uv_tile",0,1) );
-    result.set_uv_tile_y( cnode->GetTupleDouble("uv_tile",1,1) );
+    sdf::ElementPtr elem = _sdf->GetElement("material");
+    result.set_material_script(elem->GetValueString("script"));
+    if (elem->HasElement("color"))
+      result.mutable_material_color()->CopyFrom( 
+          Convert(elem->GetElement("color")->GetValueColor("rgba")));
   }
 
   // Set the origin of the visual
-  if (node->GetChild("origin"))
+  if (_sdf->HasElement("origin"))
   {
+    sdf::ElementPtr elem = _sdf->GetElement("origin");
     result.mutable_pose()->mutable_position()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetVector3("xyz",math::Vector3())));
-
-    result.mutable_pose()->mutable_orientation()->CopyFrom( 
-        Convert(node->GetChild("origin")->GetRotation("rpy",math::Quaternion())));
+        Convert(_sdf->GetValuePose("pose")));
   }
 
-*/
   return result;
 }
 

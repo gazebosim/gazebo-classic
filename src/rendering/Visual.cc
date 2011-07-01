@@ -158,7 +158,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   else if (msg->mesh_type() == msgs::Visual::MESH)
   {
     sdf::ElementPtr elem = geomElem->AddElement("mesh");
-    elem->GetAttribute("filename")->Set( msg->mesh_filename() );
+    elem->GetAttribute("filename")->Set( msg->filename() );
   }
 
   /*if (msg->has_plane())

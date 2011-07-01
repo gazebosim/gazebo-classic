@@ -8,7 +8,6 @@
 
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
-#include "gui/ModelBuilderWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
@@ -130,10 +129,11 @@ void MainWindow::Step()
 
 void MainWindow::NewModel()
 {
-  ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
+  /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
   modelBuilder->Init();
   modelBuilder->show();
   modelBuilder->resize(800,600);
+  */
 }
 
 void MainWindow::CreateBox()
