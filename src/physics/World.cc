@@ -360,25 +360,31 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 // Load a model
 void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
 {
-  sdf::ElementPtr childElem = _sdf->GetElement("model");
-
-  while (childElem)
+  if (_sdf->HasElement("model"))
   {
-    this->LoadModel(childElem, _parent);
+    sdf::ElementPtr childElem = _sdf->GetElement("model");
 
-    // TODO : Put back in the ability to nest models. We should do this
-    // without requiring a joint.
+    while (childElem)
+    {
+      this->LoadModel(childElem, _parent);
 
-    childElem = _sdf->GetNextElement("model", childElem);
+      // TODO : Put back in the ability to nest models. We should do this
+      // without requiring a joint.
+
+      childElem = _sdf->GetNextElement("model", childElem);
+    }
   }
 
-  childElem = _sdf->GetElement("light");
-  while (childElem)
+  if (_sdf->HasElement("light"))
   {
-    msgs::Light *lm = this->sceneMsg.add_light();
-    lm->CopyFrom( msgs::LightFromSDF(childElem) );
+    sdf::ElementPtr childElem = _sdf->GetElement("light");
+    while (childElem)
+    {
+      msgs::Light *lm = this->sceneMsg.add_light();
+      lm->CopyFrom( msgs::LightFromSDF(childElem) );
 
-    childElem = _sdf->GetNextElement("light", childElem);
+      childElem = _sdf->GetNextElement("light", childElem);
+    }
   }
 }
 

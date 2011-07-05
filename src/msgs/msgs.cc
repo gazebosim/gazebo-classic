@@ -289,9 +289,9 @@ msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
     result.set_range( elem->GetValueDouble("range") );
   }
 
-  if (_sdf->HasElement("attenuation"))
+  if (_sdf->HasElement("directional"))
   {
-    sdf::ElementPtr elem = _sdf->GetElement("attenuation");
+    sdf::ElementPtr elem = _sdf->GetElement("directional");
     result.mutable_direction()->CopyFrom( 
       Convert( elem->GetValueVector3("direction") ) );
   }

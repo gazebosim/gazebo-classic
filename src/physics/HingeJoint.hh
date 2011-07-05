@@ -50,7 +50,7 @@ namespace gazebo
                    this->SetAxis(0, 
                      _sdf->GetElement("axis")->GetValueVector3("xyz"));
 
-                   if (_sdf->GetElement("axis")->GetElement("limit"))
+                   if (_sdf->GetElement("axis")->HasElement("limit"))
                    {
                      sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
 

@@ -54,7 +54,7 @@ namespace gazebo
                      _sdf->GetElement("axis2")->GetValueVector3("xyz"));
 
 
-                 if (_sdf->GetElement("axis")->GetElement("limit"))
+                 if (_sdf->GetElement("axis")->HasElement("limit"))
                  {
                    sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
                    // Perform this three step ordering to ensure the parameters 
@@ -64,7 +64,7 @@ namespace gazebo
                    this->SetHighStop(0,limitElem->GetValueDouble("upper"));
                  }
  
-                 if (_sdf->GetElement("axis2")->GetElement("limit"))
+                 if (_sdf->GetElement("axis2")->HasElement("limit"))
                  {
                    sdf::ElementPtr limitElem = _sdf->GetElement("axis2")->GetElement("limit");
                    // Perform this three step ordering to ensure the parameters 

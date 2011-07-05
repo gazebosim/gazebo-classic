@@ -123,26 +123,32 @@ void Model::Load( sdf::ElementPtr &_sdf )
   //BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
-  sdf::ElementPtr linkElem = _sdf->GetElement("link");
-  while (linkElem)
+  if (_sdf->HasElement("link"))
   {
-    // Create a new body
-    BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
-        boost::shared_static_cast<Model>(shared_from_this()));
+    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    while (linkElem)
+    {
+      // Create a new body
+      BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
+          boost::shared_static_cast<Model>(shared_from_this()));
 
-    // Load the body using the config node. This also loads all of the
-    // bodies geometries
-    body->Load(linkElem);
+      // Load the body using the config node. This also loads all of the
+      // bodies geometries
+      body->Load(linkElem);
 
-    linkElem = _sdf->GetNextElement("link", linkElem);
+      linkElem = _sdf->GetNextElement("link", linkElem);
+    }
   }
 
   // Load the joints
-  sdf::ElementPtr jointElem = _sdf->GetElement("joint");
-  while (jointElem)
+  if (_sdf->HasElement("joint"))
   {
-    this->LoadJoint(jointElem);
-    jointElem = _sdf->GetNextElement("joint", jointElem);
+    sdf::ElementPtr jointElem = _sdf->GetElement("joint");
+    while (jointElem)
+    {
+      this->LoadJoint(jointElem);
+      jointElem = _sdf->GetNextElement("joint", jointElem);
+    }
   }
 }
 
