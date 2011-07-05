@@ -45,8 +45,10 @@ Entity::Entity(BasePtr parent)
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
-  this->visualMsg = new msgs::Visual();
-  this->poseMsg = new msgs::Pose();
+  this->visualMsg = new msgs::Visual;
+  this->poseMsg = new msgs::Pose;
+
+  this->visualMsg->set_mesh_type( msgs::Visual::UNKNOWN );
 
   if (this->parent && this->parent->HasType(ENTITY))
   {

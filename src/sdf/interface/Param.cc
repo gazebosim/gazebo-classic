@@ -242,7 +242,8 @@ bool Param::Get(double &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a double\n";
+    gzerr << "Parameter [" << this->key << "] is a [" 
+          << this->typeName << "], attempting to get as a double.\n";
     return false;
   }
 }

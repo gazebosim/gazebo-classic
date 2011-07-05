@@ -500,11 +500,11 @@ JointPtr ODEPhysics::CreateJoint(const std::string &type)
 {
   JointPtr joint;
 
-  if (type == "slider")
+  if (type == "prismatic")
     joint.reset( new ODESliderJoint(this->worldId) );
-  if (type == "hinge")
+  if (type == "revolute")
     joint.reset( new ODEHingeJoint(this->worldId) );
-  if (type == "hinge2")
+  if (type == "revolute2")
     joint.reset( new ODEHinge2Joint(this->worldId) );
   if (type == "ball")
     joint.reset( new ODEBallJoint(this->worldId) );

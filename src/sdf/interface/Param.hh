@@ -148,6 +148,11 @@ namespace sdf
        return boost::lexical_cast<std::string>(this->value);
     }
 
+    /// \brief Set the parameter value from a string
+    public: virtual bool SetFromString(const std::string &_value) 
+    { return this->Set(_value); }
+
+
     public: virtual std::string GetDefaultAsString() const
     {
       return boost::lexical_cast<std::string>(this->defaultValue);

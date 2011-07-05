@@ -2,7 +2,7 @@
   <attribute name="version" type="string" default="1.0" required="1"/>
 
   <element name="world" required="*">
-    <attribute name="name" type="string" default="world" required="1"/>
+    <attribute name="name" type="string" default="__default__" required="1"/>
 
     <!-- Physics -->
     <element name="physics" required="1">
@@ -96,7 +96,7 @@
 
     <!-- Model -->
     <element name="model" required="*">
-      <attribute name="name" type="string" default="model" required="1"/>
+      <attribute name="name" type="string" default="__default__" required="1"/>
       <attribute name="static" type="bool" default="false" required="0"/>
 
       <element name="origin" required="0">
@@ -105,7 +105,7 @@
  
       <!-- Link -->
       <element name="link" required="+">
-        <attribute name="name" type="string" default="link" required="1"/>
+        <attribute name="name" type="string" default="__default__" required="1"/>
         <attribute name="gravity" type="bool" default="true" required="0"/>
         <attribute name="self_collide" type="bool" default="false" required="0"/>
         <attribute name="kinematic" type="bool" default="false" required="0"/>
@@ -134,7 +134,7 @@
         <!-- Collision -->
         <element name="collision" required="*">
           <element name="max_contacts" type="int" default="50" required="0"/>
-          <attribute name="name" type="string" default="collision" required="0"/>
+          <attribute name="name" type="string" default="__default__" required="0"/>
           <attribute name="laser_retro" type="double" default="0" required="0"/>
           <element name="max_contacts" type="int" default="50" required="0"/>
           <element name="origin" required="0">
@@ -152,7 +152,7 @@
               <attribute name="length" type="double" default="0" required="1"/>
             </element> <!-- End Cylinder -->
             <element name="mesh" required="0">
-              <attribute name="filename" type="string" default="file" required="1"/>
+              <attribute name="filename" type="string" default="__default__" required="1"/>
               <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
             </element> <!-- End Mesh -->
             <element name="plane" required="0">
@@ -191,7 +191,7 @@
   
         <!-- Visual -->
         <element name="visual" required="*">
-          <attribute name="name" type="string" default="visual" required="0"/>
+          <attribute name="name" type="string" default="__default__" required="0"/>
           <attribute name="cast_shadows" type="bool" default="true" required="0"/>
           <attribute name="laser_retro" type="double" default="0.0" required="0"/>
           <attribute name="transparency" type="double" default="0.0" required="0"/>
@@ -199,7 +199,7 @@
             <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
           </element> <!-- End Origin -->
           <element name="material" required="0">
-            <attribute name="script" type="string" default="script" required="0"/>
+            <attribute name="script" type="string" default="__default__" required="0"/>
             <attribute name="normal_map" type="string" default="__default__" required="0"/>
             <element name="color" required="0">
               <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
@@ -219,7 +219,7 @@
               <attribute name="length" type="double" default="0" required="1"/>
             </element> <!-- End Cylinder -->
             <element name="mesh" required="0">
-              <attribute name="filename" type="string" default="file" required="1"/>
+              <attribute name="filename" type="string" default="__default__" required="1"/>
               <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
             </element> <!-- End Mesh -->
             <element name="plane" required="0">
@@ -244,18 +244,18 @@
   
         <!-- Sensor -->
         <element name="sensor" required="0">
-          <attribute name="name" type="string" default="sensor" required="1"/>
+          <attribute name="name" type="string" default="__default__" required="1"/>
           <attribute name="always_on" type="bool" default="false" required="0"/>
           <attribute name="update_rate" type="double" default="0" required="0"/>
           <element name="origin" required="0">
             <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
           </element> <!-- End Origin -->
           <element name="plugin" required="*">
-            <attribute name="name" type="string" default="name" required="1"/>
-            <attribute name="filename" type="string" default="filenam" required="1"/>
+            <attribute name="name" type="string" default="__default__" required="1"/>
+            <attribute name="filename" type="string" default="__default__" required="1"/>
             <element name="data" required="*">
-              <attribute name="name" type="string" default="name" required="1"/>
-              <attribute name="value" type="string" default="value" required="1"/>
+              <attribute name="name" type="string" default="__default__" required="1"/>
+              <attribute name="value" type="string" default="__default__" required="1"/>
             </element>
           </element> <!-- End Plugin -->
 
@@ -274,7 +274,7 @@
             </element> <!-- End Clip -->
             <element name="save" required="0">
               <attribute name="enabled" type="bool" default="false" required="1"/>
-              <attribute name="path" type="string" default="path" required="1"/>
+              <attribute name="path" type="string" default="__default__" required="1"/>
             </element> <!-- End Save -->
           </element> <!-- End Camera -->
   
@@ -375,8 +375,8 @@
         <attribute name="name" type="string" default="__default__" required="1"/>
         <attribute name="filename" type="string" default="__default__" required="1"/>
         <element name="data" required="*">
-          <attribute name="name" type="string" default="name" required="1"/>
-          <attribute name="value" type="string" default="value" required="1"/>
+          <attribute name="name" type="string" default="__default__" required="1"/>
+          <attribute name="value" type="string" default="__default__" required="1"/>
         </element>
       </element> <!-- End Plugin -->
     </element> <!-- End Model -->
@@ -386,8 +386,8 @@
       <attribute name="name" type="string" default="__default__" required="1"/>
       <attribute name="filename" type="string" default="__default__" required="1"/>
       <element name="data" required="*">
-        <attribute name="name" type="string" default="name" required="1"/>
-        <attribute name="value" type="string" default="value" required="1"/>
+        <attribute name="name" type="string" default="__default__" required="1"/>
+        <attribute name="value" type="string" default="__default__" required="1"/>
       </element>
     </element> <!-- End Plugin -->
 
@@ -455,7 +455,7 @@
 
   <!-- Model -->
   <element name="model" required="*">
-    <attribute name="name" type="string" default="model" required="1"/>
+    <attribute name="name" type="string" default="__default__" required="1"/>
     <attribute name="static" type="bool" default="false" required="0"/>
 
     <element name="origin" required="0">
@@ -464,7 +464,7 @@
  
     <!-- Link -->
     <element name="link" required="+">
-      <attribute name="name" type="string" default="link" required="1"/>
+      <attribute name="name" type="string" default="__default__" required="1"/>
       <attribute name="gravity" type="bool" default="true" required="0"/>
       <attribute name="self_collide" type="bool" default="false" required="0"/>
       <attribute name="kinematic" type="bool" default="false" required="0"/>
@@ -492,7 +492,7 @@
 
       <!-- Collision -->
       <element name="collision" required="*">
-        <attribute name="name" type="string" default="collision" required="0"/>
+        <attribute name="name" type="string" default="__default__" required="0"/>
         <attribute name="laser_retro" type="double" default="0" required="0"/>
 
         <element name="max_contacts" type="int" default="50" required="0"/>
@@ -511,7 +511,7 @@
             <attribute name="length" type="double" default="0" required="1"/>
           </element> <!-- End Cylinder -->
           <element name="mesh" required="0">
-            <attribute name="filename" type="string" default="file" required="1"/>
+            <attribute name="filename" type="string" default="__default__" required="1"/>
             <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
           </element> <!-- End Mesh -->
           <element name="plane" required="0">
@@ -550,7 +550,7 @@
   
       <!-- Visual -->
       <element name="visual" required="*">
-        <attribute name="name" type="string" default="visual" required="0"/>
+        <attribute name="name" type="string" default="__default__" required="0"/>
         <attribute name="cast_shadows" type="bool" default="true" required="0"/>
         <attribute name="laser_retro" type="double" default="0.0" required="0"/>
         <attribute name="transparency" type="double" default="0.0" required="0"/>
@@ -558,7 +558,7 @@
           <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
         </element> <!-- End Origin -->
         <element name="material" required="0">
-          <attribute name="script" type="string" default="script" required="0"/>
+          <attribute name="script" type="string" default="__default__" required="0"/>
           <attribute name="normal_map" type="string" default="__default__" required="0"/>
           <element name="color" required="0">
             <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
@@ -576,7 +576,7 @@
             <attribute name="length" type="double" default="0" required="1"/>
           </element> <!-- End Cylinder -->
           <element name="mesh" required="0">
-            <attribute name="filename" type="string" default="file" required="1"/>
+            <attribute name="filename" type="string" default="__default__" required="1"/>
             <attribute name="scale" type="vector3" default="1 1 1" required="0"/>
           </element> <!-- End Mesh -->
           <element name="plane" required="0">
@@ -588,18 +588,18 @@
   
       <!-- Sensor -->
       <element name="sensor" required="0">
-        <attribute name="name" type="string" default="sensor" required="1"/>
+        <attribute name="name" type="string" default="__default__" required="1"/>
         <attribute name="always_on" type="bool" default="false" required="0"/>
         <attribute name="update_rate" type="double" default="0" required="0"/>
         <element name="origin" required="0">
           <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
         </element> <!-- End Origin -->
         <element name="plugin" required="*">
-          <attribute name="name" type="string" default="name" required="1"/>
-          <attribute name="filename" type="string" default="filenam" required="1"/>
+          <attribute name="name" type="string" default="__default__" required="1"/>
+          <attribute name="filename" type="string" default="__default__" required="1"/>
           <element name="data" required="*">
-            <attribute name="name" type="string" default="name" required="1"/>
-            <attribute name="value" type="string" default="value" required="1"/>
+            <attribute name="name" type="string" default="__default__" required="1"/>
+            <attribute name="value" type="string" default="__default__" required="1"/>
           </element>
         </element> <!-- End Plugin -->
 
@@ -618,7 +618,7 @@
           </element> <!-- End Clip -->
           <element name="save" required="0">
             <attribute name="enabled" type="bool" default="false" required="1"/>
-            <attribute name="path" type="string" default="path" required="1"/>
+            <attribute name="path" type="string" default="__default__" required="1"/>
           </element> <!-- End Save -->
         </element> <!-- End Camera -->
   
@@ -719,8 +719,8 @@
       <attribute name="name" type="string" default="__default__" required="1"/>
       <attribute name="filename" type="string" default="__default__" required="1"/>
       <element name="data" required="*">
-        <attribute name="name" type="string" default="name" required="1"/>
-        <attribute name="value" type="string" default="value" required="1"/>
+        <attribute name="name" type="string" default="__default__" required="1"/>
+        <attribute name="value" type="string" default="__default__" required="1"/>
       </element>
     </element> <!-- End Plugin -->
   </element> <!-- End Model -->

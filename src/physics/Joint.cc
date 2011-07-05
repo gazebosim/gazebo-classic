@@ -94,7 +94,9 @@ void Joint::Load(sdf::ElementPtr &_sdf)
   if (!this->childBody && childName != std::string("world"))
     gzthrow("Couldn't Find Child Body[" + childName);
 
-  math::Pose offset = _sdf->GetElement("origin")->GetValuePose("pose");
+  math::Pose offset;
+  if (_sdf->HasElement("origin"))
+    offset = _sdf->GetElement("origin")->GetValuePose("pose");
 
   // setting anchor relative to gazebo body frame origin
   this->anchorPos = (offset + this->anchorBody->GetWorldPose()).pos ;

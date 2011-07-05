@@ -50,19 +50,30 @@ namespace gazebo
                    this->SetAxis(1,
                        _sdf->GetElement("axis2")->GetValueVector3("xyz"));
     
-                   // Perform this three step ordering to ensure the parameters 
-                   // are set properly. This is taken from the ODE wiki.
-                   sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
-                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                   this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-    
-                   // Perform this three step ordering to ensure the parameters 
-                   // are set properly. This is taken from the ODE wiki.
-                   limitElem = _sdf->GetElement("axis2")->GetElement("limit");
-                   this->SetHighStop(1,limitElem->GetValueDouble("upper"));
-                   this->SetLowStop( 1,limitElem->GetValueDouble("lower"));
-                   this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                   if (_sdf->GetElement("axis")->GetElement("limit"))
+                   {
+                     sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
+
+                     // Perform this three step ordering to ensure the 
+                     // parameters are set properly. 
+                     // This is taken from the ODE wiki.
+                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                     this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                   }
+
+                   if (_sdf->GetElement("axis2")->GetElement("limit"))
+                   {
+                     sdf::ElementPtr limitElem = _sdf->GetElement("axis2")->GetElement("limit");
+
+                     // Perform this three step ordering to ensure the 
+                     // parameters  are set properly. 
+                     // This is taken from the ODE wiki.
+                     limitElem = _sdf->GetElement("axis2")->GetElement("limit");
+                     this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                     this->SetLowStop( 1,limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                   }
                  }
     };
   }

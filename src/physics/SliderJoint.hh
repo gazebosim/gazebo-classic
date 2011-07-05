@@ -49,12 +49,15 @@ namespace gazebo
                    this->SetAxis(0, 
                        _sdf->GetElement("axis")->GetValueVector3("xyz"));
   
-                   sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
-                   // Perform this three step ordering to ensure the parameters 
-                   // are set properly. This is taken from the ODE wiki.
-                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                   this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                   if (_sdf->GetElement("axis")->GetElement("limit"))
+                   {
+                     sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
+                     // Perform this three step ordering to ensure the parameters 
+                     // are set properly. This is taken from the ODE wiki.
+                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                     this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                   }
                  }
     
       /// \brief Set the anchor

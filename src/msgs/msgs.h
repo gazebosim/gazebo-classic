@@ -33,7 +33,8 @@ namespace gazebo
 {
 	namespace msgs
   {
-    void Init(google::protobuf::Message &message, const std::string &id);
+    void Init(google::protobuf::Message &message, const std::string &id="");
+
 
     void Stamp(msgs::Header *);
     void Stamp(msgs::Time *);

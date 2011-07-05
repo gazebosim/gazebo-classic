@@ -142,7 +142,7 @@ void Model::Load( sdf::ElementPtr &_sdf )
   while (jointElem)
   {
     this->LoadJoint(jointElem);
-    jointElem = _sdf->GetNextElement("link", jointElem);
+    jointElem = _sdf->GetNextElement("joint", jointElem);
   }
 }
 
@@ -597,8 +597,10 @@ void Model::LoadJoint( sdf::ElementPtr &_sdf )
   std::string type = _sdf->GetValueString("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint( type );
+  if (!joint)
+    gzthrow("Unable to create joint of type[" + type + "]\n");
 
-  joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
+  joint->SetModel( boost::shared_static_cast<Model>(shared_from_this()) );
 
   // Load the joint
   joint->Load(_sdf);

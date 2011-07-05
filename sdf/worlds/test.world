@@ -28,22 +28,22 @@
   <model name="default_pioneer_model">
   
     <link name="chassis_body">
-      <origin xyz="0.0 0.0 0.16" rpy="0 0 0"/>
+      <origin pose="0.0 0.0 0.16 0 0 0"/>
   
       <inertial mass="1.0">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
       </inertial>
   
       <collision name="collision_1">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
   
       <collision name="collision_2">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
@@ -59,7 +59,7 @@
       </collision>
     
       <visual name="visual_1">
-        <origin xyz="0 0 0.04" rpy="0 180 0"/>
+        <origin pose="0 0 0.04 0 180 0"/>
         <geometry>
           <box size="1 2 3"/>
         </geometry>
@@ -67,7 +67,7 @@
       </visual>
   
        <visual name="visual_2" cast_shadows="true">
-        <origin xyz="0 0 0.04" rpy="0 180 0"/>
+        <origin pose="0 0 0.04 0 180 0"/>
         <geometry>
           <box size="1 2 3"/>
         </geometry>
@@ -77,29 +77,29 @@
     </link>
   
      <link name="body_2">
-      <origin xyz="0.0 0.0 0.16" rpy="0 0 0"/>
+      <origin pose="0.0 0.0 0.16 0 0 0"/>
   
       <inertial mass="1.0">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
       </inertial>
   
       <collision name="chassis_geom">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
   
       <collision name="chassis_geom_2">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
     
       <visual name="visual1" cast_shadows="true">
-        <origin xyz="0 0 0.04" rpy="0 180 0"/>
+        <origin pose="0 0 0.04 0 180 0"/>
         <geometry>
           <box size="1 2 3"/>
         </geometry>
@@ -107,7 +107,7 @@
       </visual>
   
        <visual name="visual2" cast_shadows="true">
-        <origin xyz="0 0 0.04" rpy="0 180 0"/>
+        <origin pose="0 0 0.04 0 180 0"/>
         <geometry>
           <box size="1 2 3"/>
         </geometry>
@@ -120,7 +120,7 @@
           <sensor_more value="hello"/>
         </plugin>
   
-        <origin xyz="1 2 3" rpy="0 0 0"/>
+        <origin pose="1 2 3 0 0 0"/>
         <horizontal_fov angle="1.57"/>
         <image width="640" height="480" format="L8"/>
         <clip near="0.1" far="1000"/>
@@ -149,29 +149,29 @@
   
   <model name="other_model">
     <link name="body_2">
-      <origin xyz="0.0 0.0 0.16"  rpy="0 0 0"/>
+      <origin pose="0.0 0.0 0.16 0 0 0"/>
     
       <inertial mass="1.0">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
       </inertial>
     
       <collision name="chassis_geom">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
     
       <collision name="chassis_geom_2">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin pose="0 0 0 0 0 0"/>
         <geometry>
           <box size="0.445 0.277 0.17"/>
         </geometry>
       </collision>
     
       <visual name="visual1" cast_shadows="true">
-        <origin xyz="0 0 0.04" rpy="0 180 0"/>
+        <origin pose="0 0 0.04 0 180 0"/>
         <geometry>
           <box size="1 2 3"/>
         </geometry>
@@ -179,7 +179,7 @@
       </visual>
     
        <visual name="visual2" cast_shadows="true">
-        <origin xyz="0 0 0.04" rpy="0 180 0"/>
+        <origin pose="0 0 0.04 0 180 0"/>
         <geometry>
           <box size="1 2 3"/>
         </geometry>
@@ -192,7 +192,7 @@
           <sensor_more value="hello"/>
         </plugin>
     
-        <origin xyz="1 2 3" rpy="0 0 0"/>
+        <origin pose="1 2 3 0 0 0"/>
         <horizontal_fov angle="1.57"/>
         <image width="640" height="480" format="L8"/>
         <clip near="0.1" far="1000"/>

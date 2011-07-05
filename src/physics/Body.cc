@@ -89,7 +89,7 @@ void Body::Load( sdf::ElementPtr &_sdf )
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide( this->sdf->GetValueDouble("self_collide") );
+  this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
 
   // TODO: this shouldn't be in the physics sim
   sdf::ElementPtr visualElem = this->sdf->GetElement("visual");

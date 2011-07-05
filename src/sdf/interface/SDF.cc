@@ -203,7 +203,7 @@ ParamPtr Element::GetAttribute(const std::string &_key)
     if ( (*iter)->GetKey() == _key)
       return (*iter);
   }
-  gzerr << "Unable to find attribute [" << _key << "]\n";
+  gzerr << "Element[" << this->GetName() << "] does not have attribute [" << _key << "]\n";
   return ParamPtr();
 }
 

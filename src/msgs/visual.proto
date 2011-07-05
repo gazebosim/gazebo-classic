@@ -30,15 +30,16 @@ message Visual
 
   enum MeshType
   {
-    BOX        = 1;
-    CYLINDER   = 2;
-    SPHERE     = 3;
-    PLANE      = 4;
-    MESH       = 5;
-    IMAGE      = 6;
-    HEIGHTMAP  = 7;
+    UNKNOWN        = 1;
+    BOX            = 2;
+    CYLINDER       = 3;
+    SPHERE         = 4;
+    PLANE          = 5;
+    MESH           = 6;
+    IMAGE          = 7;
+    HEIGHTMAP      = 8;
   }
-  required MeshType mesh_type   = 4;
+  optional MeshType mesh_type   = 4;
   optional string filename = 5;
 
   optional string parent_id        = 6;

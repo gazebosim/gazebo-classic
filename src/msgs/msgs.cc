@@ -377,8 +377,8 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
   if (_sdf->HasElement("origin"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("origin");
-    result.mutable_pose()->mutable_position()->CopyFrom( 
-        Convert(_sdf->GetValuePose("pose")));
+    result.mutable_pose()->CopyFrom( 
+        Convert(elem->GetValuePose("pose")));
   }
 
   return result;
@@ -433,7 +433,7 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Scene result;
 /*
-  Init(result,"scene");
+  Init(&result,"scene");
   XMLConfigNode *cnode = NULL;
 
   if (node)

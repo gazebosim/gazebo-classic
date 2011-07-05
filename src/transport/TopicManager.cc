@@ -58,7 +58,7 @@ void TopicManager::Publish( const std::string &topic,
 {
   if (!message.IsInitialized())
   {
-    gzthrow("Simulator::SendMessage Message is not initialized[" + message.InitializationErrorString() + "]");
+    gzthrow( "Publishing and uninitialized message on topic[" + topic + "]. Required field [" + message.InitializationErrorString() + "] missing." );
   }
 
   PublicationPtr pub = this->FindPublication(topic);

@@ -343,6 +343,7 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 {
   ModelPtr model( new Model(_parent) );
   model->SetWorld(shared_from_this());
+
   model->Load(_sdf);
 
   event::Events::addEntitySignal(model->GetCompleteScopedName());
