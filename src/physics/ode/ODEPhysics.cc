@@ -358,13 +358,13 @@ dWorldID ODEPhysics::GetWorldId()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert an odeMass to Mass
-void ODEPhysics::ConvertMass(Mass *mass, void *engineMass)
+void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *engineMass)
 {
   dMass *odeMass = (dMass*)engineMass;
 
-  mass->SetMass(odeMass->mass);
-  mass->SetCoG( odeMass->c[0], odeMass->c[1], odeMass->c[2] );
-  mass->SetInertiaMatrix( odeMass->I[0*4+0], odeMass->I[1*4+1],
+  _inertial->SetMass(odeMass->mass);
+  _inertial->SetCoG( odeMass->c[0], odeMass->c[1], odeMass->c[2] );
+  _inertial->SetInertiaMatrix( odeMass->I[0*4+0], odeMass->I[1*4+1],
       odeMass->I[2*4+2], odeMass->I[0*4+1],
       odeMass->I[0*4+2], odeMass->I[1*4+2] );
 }
@@ -476,22 +476,22 @@ int ODEPhysics::GetMaxContacts()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert an odeMass to Mass
-void ODEPhysics::ConvertMass(void *engineMass, const Mass &mass)
+void ODEPhysics::ConvertMass(void *engineMass, const InertialPtr &_inertial)
 {
   dMass *odeMass = (dMass*)(engineMass);
 
-  odeMass->mass = mass.GetAsDouble();
-  odeMass->c[0] = mass.GetCoG()[0];
-  odeMass->c[1] = mass.GetCoG()[1];
-  odeMass->c[2] = mass.GetCoG()[2];
+  odeMass->mass = _inertial->GetMass();
+  odeMass->c[0] = _inertial->GetCoG()[0];
+  odeMass->c[1] = _inertial->GetCoG()[1];
+  odeMass->c[2] = _inertial->GetCoG()[2];
 
-  odeMass->I[0*4+0] = mass.GetPrincipalMoments()[0];
-  odeMass->I[1*4+1] = mass.GetPrincipalMoments()[1];
-  odeMass->I[2*4+2] = mass.GetPrincipalMoments()[2];
+  odeMass->I[0*4+0] = _inertial->GetPrincipalMoments()[0];
+  odeMass->I[1*4+1] = _inertial->GetPrincipalMoments()[1];
+  odeMass->I[2*4+2] = _inertial->GetPrincipalMoments()[2];
 
-  odeMass->I[0*4+1] = mass.GetProductsofInertia()[0];
-  odeMass->I[0*4+2] = mass.GetProductsofInertia()[1];
-  odeMass->I[1*4+2] = mass.GetProductsofInertia()[2];
+  odeMass->I[0*4+1] = _inertial->GetProductsofInertia()[0];
+  odeMass->I[0*4+2] = _inertial->GetProductsofInertia()[1];
+  odeMass->I[1*4+2] = _inertial->GetProductsofInertia()[2];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

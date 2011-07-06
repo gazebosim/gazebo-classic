@@ -97,7 +97,7 @@ void Console::SetQuiet( bool q )
 std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 {
   //if (**this->quietP)
-    return this->nullStream;
+    //return this->nullStream;
   //else
   //{
     *this->msgStream << "\033[1;" << color << "m" << lbl <<  "\033[0m ";

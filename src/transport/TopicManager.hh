@@ -67,6 +67,8 @@ namespace gazebo
       public: template<typename M>
               PublisherPtr Advertise(const std::string &topic)
               {
+                std::string dbgTopic = topic + "/__dbg";
+
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
@@ -77,21 +79,36 @@ namespace gazebo
                 {
                   ConnectionManager::Instance()->Advertise(topic,
                                                            msg->GetTypeName());
+
+                  // Also create a debug topic
+                  msgs::String tmp;
+                  ConnectionManager::Instance()->Advertise(dbgTopic,
+                                                           tmp.GetTypeName());
                 }
 
+               
                 // Connect all local subscription to the publisher
-                PublicationPtr publication = this->FindPublication( topic );
-                SubMap::iterator iter;
-                for (iter = this->subscribed_topics.begin(); 
-                     iter != this->subscribed_topics.end(); iter++)
-                {
-                  if ( iter->first == topic )
+                for (int i=0; i < 2; i ++)
+                { 
+                  std::string t;
+                  if (i==0)
+                    t = topic;
+                  else
+                    t = dbgTopic;
+
+                  PublicationPtr publication = this->FindPublication( t );
+                  SubMap::iterator iter;
+                  for (iter = this->subscribed_topics.begin(); 
+                      iter != this->subscribed_topics.end(); iter++)
                   {
-                    std::list<CallbackHelperPtr>::iterator liter;
-                    for (liter = iter->second.begin(); 
-                         liter != iter->second.end(); liter++)
+                    if ( iter->first == t )
                     {
-                      publication->AddSubscription( *liter );
+                      std::list<CallbackHelperPtr>::iterator liter;
+                      for (liter = iter->second.begin(); 
+                          liter != iter->second.end(); liter++)
+                      {
+                        publication->AddSubscription( *liter );
+                      }
                     }
                   }
                 }

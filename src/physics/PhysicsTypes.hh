@@ -35,6 +35,7 @@ namespace gazebo
     class SurfaceParams;
     class Shape;
     class RayShape;
+    class Inertial;
 
     typedef boost::shared_ptr<Base> BasePtr;
     typedef boost::shared_ptr<Entity> EntityPtr;
@@ -47,6 +48,7 @@ namespace gazebo
     typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
     typedef boost::shared_ptr<Shape> ShapePtr;
     typedef boost::shared_ptr<RayShape> RayShapePtr;
+    typedef boost::shared_ptr<Inertial> InertialPtr;
 
     typedef std::vector<BasePtr> Base_V;
     typedef std::vector<ModelPtr> Model_V;

@@ -4,7 +4,8 @@
 #include <google/protobuf/message.h>
 
 #include "transport/Transport.hh"
-#include "common/Messages.hh"
+#include "transport/TransportTypes.hh"
+#include "transport/Node.hh"
 
 #include "gazebo_config.h"
 
@@ -88,7 +89,7 @@ void list()
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
   request.set_request("get_publishers");
-  connection->Write( common::Message::Package("request", request) );
+  connection->EnqueueMsg( msgs::Package("request", request), true );
 
   connection->Read(data);
   packet.ParseFromString(data);
@@ -97,13 +98,14 @@ void list()
   for (int i=0; i < pubs.publisher_size(); i++)
   {
     const msgs::Publish &p = pubs.publisher(i);
-    std::cout << p.topic() << std::endl;
+    if (p.topic().find("__dbg") == std::string::npos)
+      std::cout << p.topic() << std::endl;
   }
 }
 
-void echo_cb(const boost::shared_ptr<msgs::String const> &data)
+void echo_cb(const boost::shared_ptr<msgs::String const> &_data)
 {
-  std::cout << "Here\n";
+  std::cout << _data->data() << "\n";
 }
 
 msgs::TopicInfo get_topic_info(const std::string topic)
@@ -117,7 +119,7 @@ msgs::TopicInfo get_topic_info(const std::string topic)
 
   request.set_request("topic_info");
   request.set_str_data(topic);
-  connection->Write( common::Message::Package("request", request) );
+  connection->EnqueueMsg( msgs::Package("request", request), true );
   connection->Read(data);
 
   packet.ParseFromString(data);
@@ -154,23 +156,30 @@ void print_topic_info(const std::string topic)
 
 void echo()
 {
-  transport::init("localhost", 11345);
+  transport::init();
+
+  transport::NodePtr node(new transport::Node());
+  node->Init("");
 
   std::string topic = params[1];
-  std::cout << "Topic[" << topic << "]\n";
-  transport::SubscriberPtr sub = transport::subscribe(topic, echo_cb);
+  topic +=  "/__dbg";
+
+  transport::SubscriberPtr sub = node->Subscribe(topic, echo_cb);
+
+  // Run the transport loop: starts a new thread
+  transport::run();
 
   while(true)
     usleep(10000);
-}
 
+  transport::fini();
+}
 
 
 int main(int argc, char **argv)
 {
   if (!parse(argc, argv))
     return 0;
-
 
   if (params[0] == "list")
     list();

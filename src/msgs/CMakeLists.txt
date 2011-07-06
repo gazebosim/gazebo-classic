@@ -33,8 +33,8 @@ set (headers msgs.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
-add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
-target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY})
+add_library(gazebo_msgs SHARED ${PROTO_SRCS} ${sources})
+target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY} gazebo_sdf_interface)
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
 

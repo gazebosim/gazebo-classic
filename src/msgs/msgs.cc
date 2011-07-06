@@ -84,6 +84,7 @@ std::string Package(const std::string &type,
 {
   std::string data;
   msgs::Packet pkg;
+
   Stamp( pkg.mutable_stamp() );
   pkg.set_type(type);
 

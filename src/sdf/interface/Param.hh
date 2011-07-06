@@ -196,7 +196,7 @@ namespace sdf
         }
         else
         {
-          gzerr << "Unable to read value [" <<  _str << "]\n";
+          gzerr << "Unable to set value [" <<  _str << "] for key[" << this->key << "]\n";
           return false;
         }
       }

@@ -395,7 +395,8 @@ std::size_t Connection::ParseHeader( const std::string &header )
     // Header doesn't seem to be valid. Inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
     std::ostringstream stream;
-    stream << "Invalid header[" << error.message() << "] Data Size[" << data_size << "]";
+    stream << "Invalid header[" << error.message() << "] Data Size[" 
+           << data_size << "] on Connection[" << this->id << "]";
     gzthrow(stream.str());
   }
 

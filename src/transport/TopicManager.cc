@@ -62,8 +62,13 @@ void TopicManager::Publish( const std::string &topic,
   }
 
   PublicationPtr pub = this->FindPublication(topic);
+  PublicationPtr dbgPub = this->FindPublication(topic+"/__dbg");
 
   pub->Publish( message, cb ); 
+
+  msgs::String dbgMsg;
+  dbgMsg.set_data(message.DebugString());
+  dbgPub->Publish( dbgMsg ); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,9 +231,14 @@ bool TopicManager::UpdatePublications( const std::string &topic,
   }
   else
   {
+    PublicationPtr dbgPub;
+    msgs::String tmp;
+
     inserted = true;
     pub = PublicationPtr( new Publication(topic, msgType) );
+    dbgPub = PublicationPtr( new Publication(topic+"/__dbg", tmp.GetTypeName()) );
     this->advertisedTopics.push_back( pub );
+    this->advertisedTopics.push_back( dbgPub );
   }
 
   return inserted;

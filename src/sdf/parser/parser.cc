@@ -31,11 +31,11 @@ namespace sdf
 /// Init based on the installed sdf_format.xml file
 bool init( SDFPtr _sdf )
 {
-  const char *path = getenv("GAZEBO_PATH");
+  const char *path = getenv("GAZEBO_RESOURCE_PATH");
   if (path == NULL)
-    gzerr << "GAZEBO_PATH environment variable is not set\n";
+    gzerr << "GAZEBO_RESOURCE_PATH environment variable is not set\n";
 
-  std::string filename = std::string(path) + "/share/gazebo/sdf/gazebo.sdf";
+  std::string filename = std::string(path) + "/sdf/gazebo.sdf";
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -189,11 +189,11 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
   for (TiXmlElement *child = _xml->FirstChildElement("include"); 
       child; child = child->NextSiblingElement("include"))
   {
-    const char *path = getenv("GAZEBO_PATH");
+    const char *path = getenv("GAZEBO_RESOURCE_PATH");
     if (path == NULL)
-      gzerr << "GAZEBO_PATH environment variable is not set\n";
+      gzerr << "GAZEBO_RESOURCE_PATH environment variable is not set\n";
 
-    std::string filename = std::string(path) + "/share/gazebo/sdf/" + child->Attribute("filename");
+    std::string filename = std::string(path) + "/sdf/" + child->Attribute("filename");
 
     ElementPtr element(new Element);
 

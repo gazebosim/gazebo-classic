@@ -15,7 +15,6 @@ set (sources Base.cc
              Geom.cc
              HeightmapShape.cc
              Joint.cc
-             Mass.cc
              MapShape.cc
              Model.cc
              MultiRayShape.cc
@@ -46,7 +45,6 @@ set (headers BallJoint.hh
              Joint.hh
              JointFeedback.hh
              MapShape.hh
-             Mass.hh
              Model.hh
              MultiRayShape.hh
              Physics.hh

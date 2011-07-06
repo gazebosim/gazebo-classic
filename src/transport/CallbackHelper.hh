@@ -95,7 +95,8 @@ namespace gazebo
 
     class DebugCallbackHelper : public CallbackHelper
     {
-      public: DebugCallbackHelper( const boost::function<void (const boost::shared_ptr<msgs::String const> &)> &cb) : callback(cb) 
+      public: DebugCallbackHelper( 
+                  const boost::function<void (const boost::shared_ptr<msgs::String const> &)> &cb) : callback(cb) 
               {
               }
 
@@ -106,16 +107,29 @@ namespace gazebo
                 return m.GetTypeName();
               }
 
+      public: virtual bool HandleMessage(const google::protobuf::Message *msg)
+              {
+                //std::string data;
+                //msg->SerializeToString(data);
+
+                return this->HandleData( msg->DebugString()  );
+              }
+
       public: virtual bool HandleData(const std::string &newdata)
               {
-                msgs::Packet packet;
+                /*msgs::Packet packet;
                 packet.ParseFromString(newdata);
 
                 // TODO: Handle this error properly
                 if (packet.type() != "data")
                   gzerr << "CallbackHelperT::HandleData Invalid message!!!\n";
+                  */
+
+                msgs::Packet packet;
+                packet.ParseFromString(newdata);
+
                 boost::shared_ptr<msgs::String> m( new msgs::String );
-                m->ParseFromString( packet.serialized_data() );
+                m->ParseFromString( newdata );
                 this->callback( m );
                 return true;
               }

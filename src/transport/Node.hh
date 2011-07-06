@@ -46,7 +46,7 @@ namespace gazebo
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
 
-        return transport::TopicManager::Instance()->Advertise<M>(decodedTopic);
+        return transport::TopicManager::Instance()->Advertise<M>(decodedTopic); 
       }
 
       /// \brief Subscribe to a topic, and return data on the callback

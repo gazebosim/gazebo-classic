@@ -75,7 +75,7 @@ Scene::Scene(const std::string &name_)
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_PATH") ) + "/share/gazebo/sdf/scene.sdf", this->sdf );
+  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/scene.sdf", this->sdf );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

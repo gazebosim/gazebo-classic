@@ -94,10 +94,10 @@ namespace gazebo
     public: dWorldID GetWorldId();
   
     /// \brief Convert an odeMass to Mass
-    public: static void ConvertMass(Mass *mass, void *odeMass);
+    public: static void ConvertMass(InertialPtr &_interial, void *odeMass);
   
     /// \brief Convert an odeMass to Mass
-    public: static void ConvertMass(void *odeMass, const Mass &mass);
+    public: static void ConvertMass(void *odeMass, const InertialPtr &_inertial);
   
     /// \brief Get the step type
     public: virtual std::string GetStepType() const;

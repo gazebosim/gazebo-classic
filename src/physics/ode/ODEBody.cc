@@ -246,14 +246,14 @@ void ODEBody::UpdateMass()
   // The CoG must always be (0,0,0)
   math::Vector3 cog;
 
-  math::Vector3 principals = this->inertial.GetMass().GetPrincipalMoments();
-  math::Vector3 products = this->inertial.GetMass().GetProductsofInertia();
+  math::Vector3 principals = this->inertial->GetPrincipalMoments();
+  math::Vector3 products = this->inertial->GetProductsofInertia();
 
-  dMassSetParameters(&odeMass, this->inertial.GetMass().GetAsDouble(),
+  dMassSetParameters(&odeMass, this->inertial->GetMass(),
       cog.x, cog.y, cog.z,
       principals.x, principals.y, principals.z,
       products.x, products.y, products.z);
-  if (this->inertial.GetMass().GetAsDouble() > 0)
+  if (this->inertial->GetMass() > 0)
     dBodySetMass(this->bodyId, &odeMass);
   else
     gzthrow("Setting custom body " + this->GetName()+"mass to zero!");

@@ -84,8 +84,8 @@ void Body::Load( sdf::ElementPtr &_sdf )
 {
   Entity::Load(_sdf);
 
-  if (this->sdf->GetElement("inertial"))
-    this->inertial.Load(this->sdf->GetElement("inertial"));
+  if (this->sdf->HasElement("inertial"))
+    this->inertial->Load(this->sdf->GetElement("inertial"));
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
@@ -147,10 +147,10 @@ void Body::Init()
     this->SetGravityMode(false);
 
   // global-inertial damping is implemented in ode svn trunk
-  if(this->GetId())
+  if(this->inertial)
   {
-    this->SetLinearDamping( this->inertial.GetLinearDamping() );
-    this->SetAngularDamping( this->inertial.GetAngularDamping() );
+    this->SetLinearDamping( this->inertial->GetLinearDamping() );
+    this->SetAngularDamping( this->inertial->GetAngularDamping() );
   }
 
   this->linearAccel.Set(0,0,0);
@@ -332,7 +332,7 @@ void Body::SetLinearAccel(const math::Vector3 &accel)
 void Body::SetAngularAccel(const math::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
-  this->angularAccel = accel * this->inertial.GetMass().GetAsDouble();
+  this->angularAccel = accel * this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,28 +353,28 @@ math::Vector3 Body::GetRelativeAngularVel() const
 /// Get the linear acceleration of the body
 math::Vector3 Body::GetRelativeLinearAccel() const
 {
-  return this->GetRelativeForce() / this->inertial.GetMass().GetAsDouble();
+  return this->GetRelativeForce() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
 math::Vector3 Body::GetWorldLinearAccel() const
 {
-  return this->GetWorldForce() / this->inertial.GetMass().GetAsDouble();
+  return this->GetWorldForce() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
 math::Vector3 Body::GetRelativeAngularAccel() const
 {
-  return this->GetRelativeTorque() / this->inertial.GetMass().GetAsDouble();
+  return this->GetRelativeTorque() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
 math::Vector3 Body::GetWorldAngularAccel() const
 {
-  return this->GetWorldTorque() / this->inertial.GetMass().GetAsDouble();
+  return this->GetWorldTorque() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -431,7 +431,7 @@ bool Body::SetSelected( bool s )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Mass
-void Body::SetMass(Mass /*_mass*/)
+void Body::SetInertial(const InertialPtr &/*_inertial*/)
 {
   gzwarn << "Body::SetMass is empty\n";
 }

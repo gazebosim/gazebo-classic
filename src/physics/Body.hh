@@ -28,7 +28,6 @@
 #include "common/CommonTypes.hh"
 
 #include "physics/Entity.hh"
-#include "physics/Mass.hh"
 #include "physics/Inertial.hh"
 
 namespace gazebo
@@ -148,10 +147,10 @@ namespace gazebo
       public: ModelPtr GetModel() const;
   
       /// \brief Get the mass of the body
-      public: const Inertial &GetInertial() const { return this->inertial; }
+      public: InertialPtr GetInertial() const { return this->inertial; }
   
       /// \brief Set the mass of the body
-      public: void SetMass(Mass _mass);
+      public: void SetInertial(const InertialPtr &_inertial);
   
       /// Load a new geom helper function
       /// \param _sdf SDF element used to load the geom
@@ -196,7 +195,7 @@ namespace gazebo
       /// as the body's pose offset.
       protected: math::Pose relativePose;
  
-      protected: Inertial inertial;
+      protected: InertialPtr inertial;
 
       protected: std::vector< std::string > cgVisuals;
   

@@ -24,7 +24,6 @@
 #include "common/Console.hh"
 #include "math/Box.hh"
 
-#include "physics/Mass.hh"
 #include "physics/SurfaceParams.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODEBody.hh"
