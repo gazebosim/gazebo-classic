@@ -38,7 +38,7 @@
             <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -49,7 +49,7 @@
             <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
           <surface>
             <friction>
