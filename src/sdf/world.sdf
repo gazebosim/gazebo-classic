@@ -1,0 +1,12 @@
+<element name="world" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
+
+  <include filename="physics.sdf" required="1"/>
+  <include filename="scene.sdf" required="1"/>
+  <include filename="light.sdf" required="*"/>
+
+  <include filename="model.sdf" required="*"/>
+  <include filename="plugin.sdf" required="*"/>
+  <include filename="joint.sdf" required="*"/>
+
+</element> <!-- End World -->

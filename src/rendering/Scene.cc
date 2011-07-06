@@ -18,6 +18,7 @@
 
 #include "rendering/ogre.h"
 #include "msgs/msgs.h"
+#include "sdf/sdf_parser.h"
 
 #include "common/Global.hh"
 #include "common/Exception.hh"
@@ -74,6 +75,7 @@ Scene::Scene(const std::string &name_)
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_PATH") ) + "/share/gazebo/sdf/scene.sdf", this->sdf );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +332,7 @@ CameraPtr Scene::GetCamera(unsigned int index) const
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
   UserCameraPtr camera( new UserCamera(this->name + "::" + name_, this) );
-  camera->Load( sdf::ElementPtr() );
+  camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);
 

@@ -67,6 +67,6 @@ void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
 /// Set the normal
 void PlaneShape::SetNormal( const math::Vector3 &norm )
 {
-  this->sdf->GetAttribute("normal")->Set(norm);
+  this->sdf->GetElement("plane")->GetAttribute("normal")->Set(norm);
   this->CreatePlane();
 }

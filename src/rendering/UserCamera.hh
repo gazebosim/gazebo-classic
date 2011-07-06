@@ -51,6 +51,7 @@ namespace gazebo
   
       /// \brief Load the user camera
       public: void Load( sdf::ElementPtr _sdf );
+      public: void Load( );
   
       /// \brief Initialize
       public: void Init();

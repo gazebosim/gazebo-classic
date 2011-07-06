@@ -143,7 +143,7 @@ void Body::Init()
   this->SetKinematic( this->sdf->GetValueBool("kinematic") );
 
   // If no geoms are attached, then don't let gravity affect the body.
-  if (this->children.size()==0 || !this->sdf->GetValueDouble("gravity"))
+  if (this->children.size()==0 || !this->sdf->GetValueBool("gravity"))
     this->SetGravityMode(false);
 
   // global-inertial damping is implemented in ode svn trunk

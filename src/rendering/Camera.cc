@@ -23,6 +23,8 @@
 #include <sstream>
 #include <dirent.h>
 
+
+#include "sdf/sdf_parser.h"
 #include "rendering/ogre.h"
 
 #include "common/Events.hh"
@@ -46,6 +48,9 @@ unsigned int Camera::cameraCounter = 0;
 // Constructor
 Camera::Camera(const std::string &namePrefix_, Scene *scene_)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_PATH") ) + "/share/gazebo/sdf/camera.sdf", this->sdf );
+
   this->windowId = 0;
   this->scene = scene_;
 
@@ -69,11 +74,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->camera = NULL;
   this->viewport = NULL;
 
-  double updateRate = this->sdf->GetValueDouble("update_rate");
-  if (updateRate == 0)
-    this->renderPeriod = common::Time(0.0);
-  else
-    this->renderPeriod = common::Time(1.0/updateRate);
+  this->renderPeriod = common::Time(0.0);
 
   this->renderingEnabled = true;
 

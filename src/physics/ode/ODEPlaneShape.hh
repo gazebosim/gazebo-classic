@@ -38,7 +38,7 @@ namespace gazebo
     
         double altitude = 0;
   
-        math::Vector3 n = this->sdf->GetValueVector3("normal");
+        math::Vector3 n = this->sdf->GetElement("plane")->GetValueVector3("normal");
         odeParent->SetGeom(dCreatePlane(odeParent->GetSpaceId(), 
                            n.x, n.y, n.z, altitude), false);
       }

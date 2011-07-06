@@ -22,64 +22,6 @@
 
 using namespace gazebo;
 
-const std::string default_config =
-"<?xml version='1.0'?>\
-<gazebo>\
-  <config>\
-    <gui>\
-      <size>800 600</size>\
-      <pos>0 0</pos>\
-    </gui>\
-  </config>\
-  <world name='default'>\
-    <scene>\
-      <ambient>0.2 0.2 0.2 1</ambient>\
-      <background_color>.1 .1 .1 1.0</background_color>\
-      <shadows enabled='false' color='0.2 0.2 0.2 1.0' type='texture_modulative'/>\
-      <grid>false</grid>\
-    </scene>\
-    <physics type='ode'>\
-      <step_time>0.001</step_time>\
-      <gravity>0 0 -9.8</gravity>\
-      <cfm>0.0000000001</cfm>\
-      <erp>0.2</erp>\
-      <step_type>quick</step_type>\
-      <step_iters>10</step_iters>\
-      <stepW>1.3</stepW>\
-      <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
-      <contact_surface_layer>0.0</contact_surface_layer>\
-    </physics>\
-    <light name='point_white' type='point'>\
-      <origin xyz='0 0 10' rpy='0 0 0'/>\
-      <diffuse color='1.0 1.0 1.0 1.0'/>\
-      <specular color='.1 .1 .1 1.0'/>\
-      <attenuation constant='.2' linear='0.01' quadratic='0.0'/>\
-      <range>40</range>\
-      <direction>0 0 -1.0</direction>\
-      <cast_shadows>false</cast_shadows>\
-    </light>\
-    <!--<model name='box_model'>\
-      <static>false</static>\
-      <origin xyz='0 0 0.5'/>\
-      <link name='body'>\
-        <collision name='geom'>\
-          <geometry>\
-            <box size='1 1 1'/>\
-          </geometry>\
-          <mass>1.0</mass>\
-        </collision>\
-        <visual>\
-          <geometry>\
-            <box size='1 1 1'/>\
-          </geometry>\
-          <material name='Gazebo/Grey'/>\
-          <cast_shadows>true</cast_shadows>\
-        </visual>\
-      </link>\
-    </model>-->\
-  </world>\
-</gazebo>";
-
 
 Server::Server()
 {
@@ -131,7 +73,6 @@ void Server::Load(const std::string &filename)
 
   /// Init the sensors library
   sensors::init("default");
-
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   while(worldElem)

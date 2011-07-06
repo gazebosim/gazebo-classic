@@ -37,7 +37,7 @@
 #include <iostream>
 #include <libxml/parser.h>
 
-#include "sdf/parser/parser.hh"
+#include "sdf/sdf_parser.h"
 #include "sdf/parser_deprecated/parser_deprecated.hh"
 
 using namespace sdf;
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
   }
 
   boost::shared_ptr<sdf::SDF> sdf(new sdf::SDF);
-  if (!initFile(argv[1], sdf))
+  if (!init(sdf))
   {
     std::cerr << "ERROR: SDF Parsing the xml failed" << std::endl;
     return -1;

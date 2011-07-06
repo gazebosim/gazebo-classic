@@ -20,6 +20,7 @@
  */
 
 #include "rendering/ogre.h"
+#include "sdf/sdf_parser.h"
 
 #include "msgs/msgs.h"
 #include "common/Events.hh"
@@ -59,7 +60,6 @@ Visual::Visual(const std::string &name_, Visual *parent_)
 
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
-  this->sdf.reset(new sdf::Element);
   this->Init();
 }
 
@@ -117,6 +117,9 @@ Visual::~Visual()
 // Helper for the contructor
 void Visual::Init()
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_PATH") ) + "/share/gazebo/sdf/visual.sdf", this->sdf );
+
   this->transparency = 0.0;
   this->isStatic = false;
   this->useRTShader = true;
@@ -130,7 +133,7 @@ void Visual::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 {
-  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+  sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
   geomElem->ClearElements();
 
   if (msg->mesh_type() == msgs::Visual::BOX)
@@ -160,6 +163,8 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
     sdf::ElementPtr elem = geomElem->AddElement("mesh");
     elem->GetAttribute("filename")->Set( msg->filename() );
   }
+  else
+    gzerr << "Unknown geometry type[" << msg->mesh_type() << "]\n";
 
   /*if (msg->has_plane())
   {

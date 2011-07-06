@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
+#include <stdlib.h>
+
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
 
-#include "common/SystemPaths.hh"
 #include "common/Console.hh"
 #include "common/Color.hh"
 #include "math/Vector3.hh"
@@ -30,16 +31,15 @@ namespace sdf
 /// Init based on the installed sdf_format.xml file
 bool init( SDFPtr _sdf )
 {
-  const std::list<std::string> paths = gazebo::common::SystemPaths::Instance()->GetGazeboPaths();
-  std::list<std::string>::const_iterator iter;
-  for ( iter = paths.begin(); iter != paths.end(); iter++)
-  {
-    std::string filename = (*iter) + "/sdf_format.xml";
-    FILE *ftest = fopen(filename.c_str(), "r");
-    if (ftest && initFile(filename, _sdf))
-        return true;
-  }
+  const char *path = getenv("GAZEBO_PATH");
+  if (path == NULL)
+    gzerr << "GAZEBO_PATH environment variable is not set\n";
 
+  std::string filename = std::string(path) + "/share/gazebo/sdf/gazebo.sdf";
+
+  FILE *ftest = fopen(filename.c_str(), "r");
+  if (ftest && initFile(filename, _sdf))
+    return true;
   return false;
 }
 
@@ -47,8 +47,26 @@ bool init( SDFPtr _sdf )
 bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
-  xmlDoc.LoadFile(_filename);
-  return initDoc(&xmlDoc, _sdf);
+  if (xmlDoc.LoadFile(_filename))
+  {
+    return initDoc(&xmlDoc, _sdf);
+  }
+  else
+    gzerr << "Unable to load file[" << _filename << "]\n";
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool initFile(const std::string &_filename, ElementPtr _sdf)
+{
+  TiXmlDocument xmlDoc;
+  if (xmlDoc.LoadFile(_filename))
+    return initDoc(&xmlDoc, _sdf);
+  else
+    gzerr << "Unable to load file[" << _filename << "]\n";
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +98,25 @@ bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
+{
+  if (!_xmlDoc)
+  {
+    gzerr << "Could not parse the xml\n";
+    return false;
+  }
+
+  TiXmlElement *xml = _xmlDoc->FirstChildElement("element");
+  if (!xml)
+  {
+    gzerr << "Could not find the 'element' element in the xml file\n";
+    return false;
+  }
+
+  return initXml(xml, _sdf);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 {
   const char *nameString = _xml->Attribute("name");
@@ -97,7 +134,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     return false;
   }
   _sdf->SetRequired( requiredString );
- 
+
   const char *elemTypeString = _xml->Attribute("type");
   if (elemTypeString)
   {
@@ -105,7 +142,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     const char *elemDefaultValue = _xml->Attribute("default");
     _sdf->AddValue(elemTypeString, elemDefaultValue, required);
   }
-  
+
   // Get all attributes
   for (TiXmlElement *child = _xml->FirstChildElement("attribute"); 
       child; child = child->NextSiblingElement("attribute"))
@@ -138,15 +175,32 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 
     _sdf->AddAttribute(name, type, defaultValue, required);
   }
-  
+
   // Get all child elements
   for (TiXmlElement *child = _xml->FirstChildElement("element"); 
-       child; child = child->NextSiblingElement("element"))
+      child; child = child->NextSiblingElement("element"))
   {
     ElementPtr element(new Element);
     initXml(child, element);
     _sdf->elementDescriptions.push_back(element);
   }
+
+  // Get all include elements
+  for (TiXmlElement *child = _xml->FirstChildElement("include"); 
+      child; child = child->NextSiblingElement("include"))
+  {
+    const char *path = getenv("GAZEBO_PATH");
+    if (path == NULL)
+      gzerr << "GAZEBO_PATH environment variable is not set\n";
+
+    std::string filename = std::string(path) + "/share/gazebo/sdf/" + child->Attribute("filename");
+
+    ElementPtr element(new Element);
+
+    initFile(filename, element);
+    _sdf->elementDescriptions.push_back(element);
+  }
+
 
   return true;
 }
