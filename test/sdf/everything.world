@@ -38,7 +38,7 @@
             <box size="1.0 1.0 2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -48,7 +48,7 @@
             <cylinder radius="1.0" length="2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -58,7 +58,7 @@
             <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -68,7 +68,7 @@
             <plane normal="0.0 0.0 1.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -78,7 +78,7 @@
             <image filename="test.png" scale="2.0" threshold="10" height="3.0" granularity="2"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -88,7 +88,7 @@
             <heightmap filename="test.png" size="1.0 1.0 2.0" offset="0.0 0.0 0.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -98,7 +98,7 @@
             <mesh filename="test.dae" scale="1.0 1.0 2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -110,7 +110,7 @@
           </geometry>
           <surface>
             <friction>
-              <ode mu="0.5" mu2="0.2" fdir1="1.0 0 0" slip1="0" slip2="0"/>
+              <ode mu="0.5" mu2="0.2" fdir1="1.0 0.0 0.0" slip1="0" slip2="0"/>
             </friction>
             <bounce restitution_coefficient="0" threshold="1000000.0"/>
             <contact>
@@ -143,7 +143,7 @@
             <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
           <surface>
             <friction>
@@ -269,7 +269,7 @@
             <box size="1.0 1.0 2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -308,7 +308,7 @@
             <box size="1.0 1.0 2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -374,7 +374,7 @@
             <box size="1.0 1.0 2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -417,7 +417,7 @@
             <cylinder radius="1.0" length="2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -460,7 +460,7 @@
             <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -471,7 +471,7 @@
             <sphere radius="0.5"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
           <surface>
             <friction>
@@ -506,7 +506,7 @@
             <plane normal="0.0 0.0 1.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -549,7 +549,7 @@
             <image filename="test.png" scale="2.0" threshold="10" height="3.0" granularity="2"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -592,7 +592,7 @@
             <heightmap filename="test.png" size="1.0 1.0 2.0" offset="0.0 0.0 0.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -635,7 +635,7 @@
             <mesh filename="test.dae" scale="1.0 1.0 2.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5"/>
+            <color rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
