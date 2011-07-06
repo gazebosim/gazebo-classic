@@ -550,5 +550,6 @@ void Entity::Print(std::string prefix)
 /// A helper routine to make objects static. This is called at the very end of initialize at the model level
 void Entity::MakeStatic()
 {
-  this->visualNode->MakeStatic();
+  if (this->visualNode)
+    this->visualNode->MakeStatic();
 }
