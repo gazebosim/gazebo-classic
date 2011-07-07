@@ -24,6 +24,7 @@
 
 #include "rendering/ogre.h"
 
+#include "sdf/sdf_parser.h"
 #include "msgs/msgs.h"
 
 #include "common/Events.hh"
@@ -54,6 +55,11 @@ Light::Light(Scene *scene_)
   this->lightCounter++;
 
   this->showLightsConnection = event::Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
+
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/light.sdf", this->sdf );
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

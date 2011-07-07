@@ -142,22 +142,7 @@ void Scene::Init()
 
   // Create the sky
   if ( this->sdf->HasElement("sky") )
-  {
-    try
-    {
-      Ogre::Quaternion orientation;
-      orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-      this->manager->setSkyDome(true, 
-          this->sdf->GetElement("sky")->GetValueString("material"),
-          10,8, 4, true, orientation);
-    }
-    catch (int)
-    {
-      gzwarn << "Unable to set sky dome to material[" 
-             << this->sdf->GetElement("sky")->GetValueString("material")
-             << "]\n";
-    }
-  }
+    this->SetSky(this->sdf->GetElement("sky")->GetValueString("material"));
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -823,6 +808,12 @@ void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 
   if (msg->has_ambient())
     this->SetAmbientColor( msgs::Convert(msg->ambient()) );
+
+  if (msg->has_background())
+    this->SetBackgroundColor( msgs::Convert(msg->background()) );
+
+  if (msg->has_sky_material())
+    this->SetSky(msg->sky_material());
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -888,12 +879,12 @@ void Scene::PreRender()
 }
 
 
-void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg_)
+void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
 {
   Visual_M::iterator iter;
-  iter = this->visuals.find(msg_->header().str_id());
+  iter = this->visuals.find(_msg->header().str_id());
 
-  if (msg_->has_action() && msg_->action() == msgs::Visual::DELETE)
+  if (_msg->has_action() && _msg->action() == msgs::Visual::DELETE)
   {
     if (iter != this->visuals.end() )
     {
@@ -904,29 +895,29 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg_)
   }
   else if (iter != this->visuals.end())
   {
-    iter->second->UpdateFromMsg(msg_);
+    iter->second->UpdateFromMsg(_msg);
   }
   else
   {
     Visual *visual = NULL;
 
-    if (msg_->has_parent_id())
-      iter = this->visuals.find(msg_->parent_id());
+    if (_msg->has_parent_id())
+      iter = this->visuals.find(_msg->parent_id());
     else
       iter = this->visuals.end();
 
     if (iter != this->visuals.end())
-      visual = new Visual(msg_->header().str_id(), iter->second);
+      visual = new Visual(_msg->header().str_id(), iter->second);
     else 
-      visual = new Visual(msg_->header().str_id(), this);
+      visual = new Visual(_msg->header().str_id(), this);
 
-    visual->LoadFromMsg(msg_);
-    gzdbg << "New Visual[" << msg_->header().str_id() << "]\n";
-    this->visuals[msg_->header().str_id()] = visual;
+    visual->LoadFromMsg(_msg);
+    gzdbg << "New Visual[" << _msg->header().str_id() << "]\n";
+    this->visuals[_msg->header().str_id()] = visual;
   }
 }
 
-void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg_)
+void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
@@ -934,36 +925,54 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg_)
   // Find an old pose message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
   {
-    if ( (*iter)->header().str_id() == msg_->header().str_id() )
+    if ( (*iter)->header().str_id() == _msg->header().str_id() )
     {
       this->poseMsgs.erase(iter);
       break;
     }
   }
 
-  this->poseMsgs.push_back( msg_ );
+  this->poseMsgs.push_back( _msg );
 }
 
-void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg_)
+void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->lightMsgs.push_back(msg_);
+  this->lightMsgs.push_back(_msg);
 }
 
-void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg_)
+void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 {
   Light_M::iterator iter;
-  iter = this->lights.find(msg_->header().str_id());
+  iter = this->lights.find(_msg->header().str_id());
 
   if (iter == this->lights.end())
   {
     Light *light = new Light(this);
-    light->LoadFromMsg(msg_);
-    this->lights[msg_->header().str_id()] = light;
+    light->LoadFromMsg(_msg);
+    this->lights[_msg->header().str_id()] = light;
   }
 }
 
-void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg_)
+void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
 {
-  this->selectionMsg = msg_;
+  this->selectionMsg = _msg;
+}
+
+void Scene::SetSky(const std::string &_material)
+{
+  this->sdf->GetOrCreateElement("background")->GetOrCreateElement("sky")->GetAttribute("material")->Set(_material);
+
+  gzdbg << "Set Sky[" << _material << "]\n";
+  try
+  {
+    Ogre::Quaternion orientation;
+    orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
+    if (this->manager)
+      this->manager->setSkyDome(true, _material, 10,8, 4, true, orientation);
+  }
+  catch (int)
+  {
+    gzwarn << "Unable to set sky dome to material[" << _material << "]\n"; 
+  }
 }

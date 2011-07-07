@@ -161,6 +161,7 @@ namespace gazebo
                                           Ogre::Node *node);
   
       public: void InitShadows();
+      public: void SetSky(const std::string &_material);
 
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData

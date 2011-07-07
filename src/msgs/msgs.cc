@@ -389,7 +389,7 @@ msgs::Shadows ShadowsFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Shadows result;
 
-  /*std::string type = node->GetString("type","stencil_modulative",0);
+  std::string type = _sdf->GetValueString("type");
   if (type == "stencil_modulative")
     result.set_type( msgs::Shadows::STENCIL_MODULATIVE);
   else if (type == "stencil_additive")
@@ -399,9 +399,7 @@ msgs::Shadows ShadowsFromSDF( sdf::ElementPtr _sdf )
   else if (type == "texture_modulative")
     result.set_type( msgs::Shadows::TEXTURE_MODULATIVE);
 
-  result.mutable_color()->CopyFrom( 
-      Convert(node->GetColor("color",Color(1,1,1,1))) );
-      */
+  result.mutable_color()->CopyFrom( Convert(_sdf->GetValueColor("rgba")) );
 
   return result;
 }
@@ -410,7 +408,7 @@ msgs::Fog FogFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Fog result;
 
-  /*std::string type = node->GetString("type","linear",1);
+  std::string type = _sdf->GetValueString("type");
   if (type == "linear")
     result.set_type(msgs::Fog::LINEAR);
   else if (type == "exp")
@@ -420,43 +418,41 @@ msgs::Fog FogFromSDF( sdf::ElementPtr _sdf )
   else
     gzerr << "Unknown fog type[" << type << "]\n";
 
-  result.mutable_color()->CopyFrom( 
-      Convert(node->GetColor("color",Color(1,1,1,1))) );
-  result.set_density(node->GetFloat("density",1,1));
-  result.set_start(node->GetFloat("start",0,1));
-  result.set_end(node->GetFloat("end",1,1));
-  */
-
+  result.mutable_color()->CopyFrom( Convert(_sdf->GetValueColor("rgba")) );
+  result.set_density( _sdf->GetValueDouble("density") );
+  result.set_start( _sdf->GetValueDouble("start") );
+  result.set_end( _sdf->GetValueDouble("end") );
   return result;
 }
 
 msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
 {
   msgs::Scene result;
-/*
-  Init(&result,"scene");
-  XMLConfigNode *cnode = NULL;
 
-  if (node)
-  {
+  Init(result,"scene");
+
+  if (_sdf->HasElement("ambient"))
     result.mutable_ambient()->CopyFrom( 
-        Convert(node->GetColor("ambient",Color(1,1,1,1))) );
+        Convert( _sdf->GetElement("ambient")->GetValueColor("rgba")) );
+
+  if (_sdf->HasElement("background"))
+  {
+    sdf::ElementPtr elem = _sdf->GetElement("background");
 
     result.mutable_background()->CopyFrom( 
-        Convert(node->GetColor("background_color",Color(1,1,1,1))) );
+        Convert(elem->GetValueColor("rgba")) );
 
-    if (!node->GetString("sky_material","",0).empty())
-      result.set_sky_material( node->GetString("sky_material","",1) );
-
-    if ( (cnode = node->GetChild("fog")) != NULL)
-      result.mutable_fog()->CopyFrom( FogFromXML(cnode) );
-
-    if ( (cnode = node->GetChild("shadows")) != NULL && cnode->GetBool("enabled",true,0))
-      result.mutable_shadows()->CopyFrom( ShadowsFromXML(cnode) );
+    if (elem->HasElement("sky"))
+      result.set_sky_material( 
+          elem->GetElement("sky")->GetValueString("material"));
   }
-  else
-    gzwarn << "node is null\n";
-    */
+
+  if (_sdf->HasElement("fog"))
+    result.mutable_fog()->CopyFrom( FogFromSDF(_sdf->GetElement("fog")) );
+
+  if (_sdf->HasElement("shadows"))
+    result.mutable_shadows()->CopyFrom( ShadowsFromSDF(_sdf->GetElement("shadows")) );
+
 
   return result;
 }

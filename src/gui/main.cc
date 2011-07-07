@@ -102,13 +102,11 @@ int main(int argc, char **argv)
   }
 
   gazebo::load();
-  gazebo::gui::load();
-
   gazebo::init();
-  gazebo::gui::init();
-
-  // Run Gui.
   gazebo::run();
+
+  gazebo::gui::load();
+  gazebo::gui::init();
   gazebo::gui::run();
 
   gazebo::fini();

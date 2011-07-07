@@ -118,7 +118,7 @@ Visual::~Visual()
 void Visual::Init()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_PATH") ) + "/share/gazebo/sdf/visual.sdf", this->sdf );
+  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/visual.sdf", this->sdf );
 
   this->transparency = 0.0;
   this->isStatic = false;
@@ -154,9 +154,16 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   }
   else if (msg->mesh_type() == msgs::Visual::PLANE)
   {
+    gzdbg << "Plane visual\n";
     math::Plane plane = msgs::Convert(msg->plane());
     sdf::ElementPtr elem = geomElem->AddElement("plane");
     elem->GetAttribute("normal")->Set(plane.normal);
+
+    //common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
+    common::MeshManager::Instance()->CreatePlane("HELLO", plane,
+        math::Vector2d(2,2), 
+        math::Vector2d(1,1) );
+    //mesh = msg->header().str_id();
   }
   else if (msg->mesh_type() == msgs::Visual::MESH)
   {
@@ -165,15 +172,6 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   }
   else
     gzerr << "Unknown geometry type[" << msg->mesh_type() << "]\n";
-
-  /*if (msg->has_plane())
-  {
-    math::Plane plane = msgs::Convert(msg->plane());
-    common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
-        math::Vector2d(2,2), 
-        math::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
-    mesh = msg->header().str_id();
-  }*/
 
   if (msg->has_pose())
   {
@@ -239,6 +237,7 @@ void Visual::Load()
       {
         common::MeshManager::Instance()->Load(meshName);
       }
+
 
       // Add the mesh into OGRE
       this->InsertMesh( common::MeshManager::Instance()->GetMesh(meshName) );
@@ -981,6 +980,8 @@ void Visual::InsertMesh( const common::Mesh *mesh)
 
   try
   {
+    gzdbg << "CreateMesh[" << mesh->GetName() << "] SubMeshCount[" << mesh->GetSubMeshCount() << "]\n";
+
     // Create a new mesh specifically for manual definition.
     ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -994,7 +995,6 @@ void Visual::InsertMesh( const common::Mesh *mesh)
       Ogre::HardwareIndexBufferSharedPtr iBuf;
       float *vertices;
       unsigned short *indices;
-
 
       size_t currOffset = 0;
 
