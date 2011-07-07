@@ -32,7 +32,7 @@ namespace gazebo
   {
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) { std::cout << "NEW ODE BOX SHAPE\n";}
+      public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) {}
       public: virtual ~ODEBoxShape() {}
       public: virtual void SetSize( const math::Vector3 &size )
       {
@@ -41,10 +41,10 @@ namespace gazebo
         ODEGeomPtr oParent;
         oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
 
+
+        gzdbg << "ODEBoxShape SetSize[" << size << "]\n";
         oParent->SetGeom( dCreateBox( 0, size.x, size.y, size.z), true );
       }
-    
-    
     };
   }
 }

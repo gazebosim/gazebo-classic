@@ -53,6 +53,7 @@ Entity::Entity(BasePtr parent)
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
+    this->SetStatic( this->parentEntity->IsStatic() );
   }
 }
 
@@ -89,7 +90,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   if (this->parent)
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
 
-  //this->visPub->Publish(*this->visualMsg);
+  this->visPub->Publish(*this->visualMsg);
 
   msgs::Init( *this->poseMsg, this->GetCompleteScopedName() );
 }

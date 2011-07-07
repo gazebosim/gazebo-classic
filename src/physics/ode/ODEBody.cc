@@ -150,7 +150,8 @@ void ODEBody::SetGravityMode(bool mode)
 {
   if (this->bodyId)
   {
-    dBodySetGravityMode(this->bodyId, mode ? 1: 0);
+    gzdbg << "Set Gravity Mode[" << mode << "]\n";
+    //dBodySetGravityMode(this->bodyId, mode ? 1: 0);
   }
 }
 
@@ -181,7 +182,6 @@ void ODEBody::OnPoseChange()
 {
   if (this->bodyId == NULL)
     return;
-
   //this->SetEnabled(true);
 
   //math::Pose pose = this->comEntity->GetWorldPose();
@@ -225,7 +225,7 @@ void ODEBody::SetEnabled(bool /*_enable*/) const
 /// Get whether this body is enabled in the physics engine
 bool ODEBody::GetEnabled() const
 {
-  bool result = false;
+  bool result = true;
 
   if (this->bodyId)
     result = dBodyIsEnabled(this->bodyId);
@@ -244,7 +244,7 @@ void ODEBody::UpdateMass()
   dMassSetZero(&odeMass);
 
   // The CoG must always be (0,0,0)
-  math::Vector3 cog;
+  math::Vector3 cog(0,0,0);
 
   math::Vector3 principals = this->inertial->GetPrincipalMoments();
   math::Vector3 products = this->inertial->GetProductsofInertia();
@@ -253,6 +253,7 @@ void ODEBody::UpdateMass()
       cog.x, cog.y, cog.z,
       principals.x, principals.y, principals.z,
       products.x, products.y, products.z);
+
   if (this->inertial->GetMass() > 0)
     dBodySetMass(this->bodyId, &odeMass);
   else

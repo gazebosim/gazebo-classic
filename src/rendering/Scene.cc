@@ -139,7 +139,6 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->manager->showBoundingBoxes(true);
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();

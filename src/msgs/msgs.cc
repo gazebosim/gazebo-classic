@@ -323,7 +323,6 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
 
     if (geomElem->GetName() == "box")
     {
-      gzdbg << "HERE B[" << geomElem->GetValueVector3("size") << "]\n";
       scale = geomElem->GetValueVector3("size");
       result.set_mesh_type( msgs::Visual::BOX );
     }

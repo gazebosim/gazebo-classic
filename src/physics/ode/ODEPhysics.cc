@@ -167,7 +167,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId,1);
+  dWorldSetAutoDisableFlag(this->worldId,0);
 
   /*dWorldSetAutoDisableTime(this->worldId, 1);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
@@ -181,6 +181,9 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
   math::Vector3 g = this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
+  if (g == math::Vector3(0,0,0))
+    gzwarn << "Gravity vector is (0,0,0). Objects will float.\n";
+
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
 
   if (odeElem->HasElement("constraints"))
@@ -223,6 +226,8 @@ void ODEPhysics::UpdateCollision()
   unsigned int i;
   this->colliders.clear();
   this->trimeshColliders.clear();
+
+  std::cout << "SpaceId[" << this->spaceId << "]\n";
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
@@ -275,7 +280,7 @@ void ODEPhysics::UpdateCollision()
 void ODEPhysics::UpdatePhysics()
 {
   this->UpdateCollision();
-  
+ 
   // Update the dynamical model
   (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
 
@@ -550,6 +555,7 @@ void ODEPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
 // Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
+  gzdbg << "Collision Callback\n";
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 

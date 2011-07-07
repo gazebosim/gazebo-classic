@@ -39,6 +39,8 @@ namespace gazebo
         double altitude = 0;
   
         math::Vector3 n = this->sdf->GetElement("plane")->GetValueVector3("normal");
+        gzdbg << "ODEPlaneShape CreatePlane[" << n << "]\n";
+
         odeParent->SetGeom(dCreatePlane(odeParent->GetSpaceId(), 
                            n.x, n.y, n.z, altitude), false);
       }
@@ -56,6 +58,9 @@ namespace gazebo
     
         // Compute "altitude": scalar product of position and normal
         vec4[3] = vec4[0] * pos.x + vec4[1] * pos.y + vec4[2] * pos.z;
+
+
+        gzdbg << "ODEPlaneShape vec4[" << vec4[0] << " " << vec4[1] << " " << vec4[2] << " " << vec4[3] << "]\n";
         dGeomPlaneSetParams(odeParent->GetGeomId(), vec4[0], vec4[1], 
                             vec4[2], vec4[3]);
       }

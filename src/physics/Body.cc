@@ -47,6 +47,7 @@ Body::Body(EntityPtr parent)
     : Entity(parent)
 {
   this->AddType(Base::BODY);
+  this->inertial.reset(new Inertial);
 }
 
 
@@ -84,10 +85,12 @@ void Body::Load( sdf::ElementPtr &_sdf )
 {
   Entity::Load(_sdf);
 
-  if (this->sdf->HasElement("inertial"))
+  if (!this->IsStatic())
   {
-    this->inertial.reset(new Inertial);
-    this->inertial->Load(this->sdf->GetElement("inertial"));
+    if (this->sdf->HasElement("inertial"))
+      this->inertial->Load(this->sdf->GetElement("inertial"));
+    else
+      gzerr << "Non-static body has no interial sdf element.\n";
   }
 
   // before loading child geometry, we have to figure out of selfCollide is true
@@ -150,7 +153,7 @@ void Body::Init()
     this->SetGravityMode(false);
 
   // global-inertial damping is implemented in ode svn trunk
-  if(this->inertial)
+  if (this->inertial)
   {
     this->SetLinearDamping( this->inertial->GetLinearDamping() );
     this->SetAngularDamping( this->inertial->GetAngularDamping() );
@@ -287,17 +290,17 @@ void Body::SetLaserRetro(float retro)
 void Body::Update()
 {
   // Apply our linear accel
-  this->SetForce(this->linearAccel);
+  //this->SetForce(this->linearAccel);
 
   // Apply our angular accel
-  this->SetTorque(this->angularAccel);
+  //this->SetTorque(this->angularAccel);
 
   // FIXME: FIXME: @todo: @todo: race condition on factory-based model loading!!!!!
-   if (this->GetEnabled() != this->enabled)
+   /*if (this->GetEnabled() != this->enabled)
    {
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
-   }
+   }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////

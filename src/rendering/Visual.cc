@@ -49,8 +49,6 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &_name, Visual *_parent)
 {
-  gzdbg << "New Visual1[" <<  _name << "]\n";
-
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -69,8 +67,6 @@ Visual::Visual(const std::string &_name, Visual *_parent)
 /// Constructor
 Visual::Visual (const std::string &_name, Ogre::SceneNode *parent_)
 {
-  gzdbg << "New Visual2[" <<  _name << "]\n";
-
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -83,7 +79,6 @@ Visual::Visual (const std::string &_name, Ogre::SceneNode *parent_)
 /// Constructor
 Visual::Visual (const std::string &_name, Scene *scene_)
 {
-  gzdbg << "New Visual3[" <<  _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -122,7 +117,6 @@ Visual::~Visual()
 // Helper for the contructor
 void Visual::Init()
 {
-  std::cout << "visual[" << this->name << "} init\n";
   this->sdf.reset(new sdf::Element);
   sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/visual.sdf", this->sdf );
 
@@ -170,8 +164,6 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
     sdf::ElementPtr elem = geomElem->AddElement("mesh");
     elem->GetAttribute("filename")->Set( msg->filename() );
   }
-  else
-    gzerr << "Unknown geometry type[" << msg->mesh_type() << "]\n";
 
   if (msg->has_pose())
   {
@@ -226,18 +218,17 @@ void Visual::Load()
 
   std::string meshName = this->GetMeshName();
 
-  try
+  if (!meshName.empty())
   {
-    // Create the visual
-    stream << "VISUAL_" << this->sceneNode->getName();
-
-    if (!meshName.empty())
+    try
     {
+      // Create the visual
+      stream << "VISUAL_" << this->sceneNode->getName();
+
       if (!common::MeshManager::Instance()->HasMesh(meshName))
       {
         common::MeshManager::Instance()->Load(meshName);
       }
-
 
       // Add the mesh into OGRE
       this->InsertMesh( common::MeshManager::Instance()->GetMesh(meshName) );
@@ -248,15 +239,11 @@ void Visual::Load()
       else
         obj = (Ogre::MovableObject*)mgr->createEntity( stream.str(), meshName);
     }
-    else
+    catch (Ogre::Exception e)
     {
-      gzerr << "Mesh name is empty\n";
+      gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+      gzthrow("Unable to create a mesh from " + meshName);
     }
-  }
-  catch (Ogre::Exception e)
-  {
-    gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-    gzthrow("Unable to create a mesh from " + meshName);
   }
 
   // Attach the entity to the node
@@ -445,7 +432,7 @@ void Visual::SetScale(const math::Vector3 &scale )
 /// Get the scale
 math::Vector3 Visual::GetScale()
 {
-  math::Vector3 result;
+  math::Vector3 result(1,1,1);
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
@@ -465,8 +452,6 @@ math::Vector3 Visual::GetScale()
     result.Set(1,1,1);
   else if (geomElem->HasElement("mesh"))
     result = geomElem->GetElement("mesh")->GetValueVector3("scale");
-  else
-    gzerr << "Unknown geometry type\n";
 
   return result;
 }
@@ -732,6 +717,7 @@ void Visual::SetRotation( const math::Quaternion &rot)
 // Set the pose of the visual
 void Visual::SetPose( const math::Pose &pose)
 {
+  gzdbg << "Set Pose[" << pose << "] Visual[" << this->name << "]\n";
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }
@@ -980,8 +966,6 @@ void Visual::InsertMesh( const common::Mesh *mesh)
 
   try
   {
-    gzdbg << "CreateMesh[" << mesh->GetName() << "] SubMeshCount[" << mesh->GetSubMeshCount() << "]\n";
-
     // Create a new mesh specifically for manual definition.
     ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -1168,8 +1152,6 @@ std::string Visual::GetMeshName() const
     return "unit_plane";
   else if (geomElem->HasElement("mesh"))
     return geomElem->GetValueString("filename");
-  else
-    gzerr << "Unknown geometry type\n";
 
   return std::string();
 }

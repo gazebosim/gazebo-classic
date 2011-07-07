@@ -119,6 +119,8 @@ void Model::Load( sdf::ElementPtr &_sdf )
 {
   Entity::Load(_sdf);
 
+  this->SetStatic( this->sdf->GetValueBool("static") );
+
   // TODO: check for duplicate model, and raise an error
   //BasePtr dup = Base::GetByName(this->GetScopedName());
 
@@ -158,7 +160,6 @@ void Model::Init()
 {
   math::Pose pose;
 
-  this->SetStatic( this->sdf->GetValueBool("static") );
 
   // Get the position and orientation of the model (relative to parent)
   pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");

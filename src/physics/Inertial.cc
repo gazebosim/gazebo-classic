@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "sdf/sdf_parser.h"
 #include "Inertial.hh"
 
 using namespace gazebo;
@@ -26,12 +27,18 @@ Inertial::Inertial()
   this->mass = 0;
   this->principals.Set(0,0,0);
   this->products.Set(0,0,0);
+
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/inertial.sdf", this->sdf );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Inertial::Inertial(double m)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/inertial.sdf", this->sdf );
+
   this->mass = m;
   this->cog.Set(0,0,0);
   this->principals.Set(0,0,0);
@@ -42,6 +49,9 @@ Inertial::Inertial(double m)
 /// Copy constructor
 Inertial::Inertial(const Inertial &_inertial)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/inertial.sdf", this->sdf );
+
   (*this) = _inertial;
 }
 
