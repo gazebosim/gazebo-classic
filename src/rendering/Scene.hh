@@ -175,6 +175,7 @@ namespace gazebo
                                        const Ogre::Vector3 &scale);
   
       private: void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
+      private: void ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg);
 
       private: void ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
       private: void ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
@@ -210,6 +211,9 @@ namespace gazebo
 
       typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
       private: PoseMsgs_L poseMsgs;
+
+      typedef std::list<boost::shared_ptr<msgs::Scene const> > SceneMsgs_L;
+      private: SceneMsgs_L sceneMsgs;
   
       typedef std::map<std::string, Visual*> Visual_M;
       private: Visual_M visuals;

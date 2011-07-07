@@ -121,10 +121,6 @@ ScenePtr RenderEngine::CreateScene(const std::string &name)
   if (this->initialized)
     scene->Init();
 
-  scene->SetAmbientColor(common::Color(0.5, 0.5, 0.5));
-  scene->SetBackgroundColor(common::Color(0.5, 0.5, 0.5, 1.0));
-  scene->CreateGrid( 10, 1, 0.03, common::Color(1,1,1,1));
-
   this->scenes.push_back(scene);
   return scene;
 }

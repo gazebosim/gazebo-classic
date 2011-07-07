@@ -1,14 +1,14 @@
 <!-- Geometry -->
 <element name="geometry" required="1">
   <element name="box" required="0">
-    <attribute name="size" type="vector3" default="0 0 0" required="1"/>
+    <attribute name="size" type="vector3" default="1 1 1" required="1"/>
   </element> <!-- End Box -->
   <element name="sphere" required="0">
-    <attribute name="radius" type="double" default="0" required="1"/>
+    <attribute name="radius" type="double" default="1" required="1"/>
   </element> <!-- End Sphere -->
   <element name="cylinder" required="0">
-    <attribute name="radius" type="double" default="0" required="1"/>
-    <attribute name="length" type="double" default="0" required="1"/>
+    <attribute name="radius" type="double" default="1" required="1"/>
+    <attribute name="length" type="double" default="1" required="1"/>
   </element> <!-- End Cylinder -->
   <element name="mesh" required="0">
     <attribute name="filename" type="string" default="__default__" required="1"/>

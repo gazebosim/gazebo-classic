@@ -319,10 +319,11 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
   if (_sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = _sdf->GetElement("geometry")->GetFirstElement();
-    math::Vector3 scale;
+    math::Vector3 scale(1,1,1);
 
     if (geomElem->GetName() == "box")
     {
+      gzdbg << "HERE B[" << geomElem->GetValueVector3("size") << "]\n";
       scale = geomElem->GetValueVector3("size");
       result.set_mesh_type( msgs::Visual::BOX );
     }
@@ -357,6 +358,8 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
     }
     else
       gzerr << "Unknown geometry type\n";
+
+    result.mutable_scale()->CopyFrom( msgs::Convert(scale) );
 
     if (result.mesh_type() == msgs::Visual::IMAGE || 
         result.mesh_type() == msgs::Visual::MESH || 

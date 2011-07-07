@@ -85,7 +85,10 @@ void Body::Load( sdf::ElementPtr &_sdf )
   Entity::Load(_sdf);
 
   if (this->sdf->HasElement("inertial"))
+  {
+    this->inertial.reset(new Inertial);
     this->inertial->Load(this->sdf->GetElement("inertial"));
+  }
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId

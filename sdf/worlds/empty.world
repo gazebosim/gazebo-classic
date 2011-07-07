@@ -2,10 +2,8 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="1.0 1.0 1.0 1"/>
-      <background rgba=".5 .5 .5 1.0">
-        <sky material="Gazebo/CloudySky"/>
-      </background>
+      <ambient rgba="0.5 0.5 0.5 1"/>
+      <background rgba="0 0 0 1.0"/>
       <shadows enabled="true" rgba="0.2 0.2 0.2 1.0" type="texture_modulative"/>
     </scene>
 
@@ -20,9 +18,7 @@
 
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">
-      <origin pose="0 0 0 0 0 0"/>
       <link name="body">
-        <origin pose="0 0 0 0 0 0"/>
         <collision name="geom">
           <geometry>
             <plane normal="0 0 1"/>
@@ -39,8 +35,8 @@
       </link>
     </model>
 
-    <model name="box" static="true">
-      <origin pose="0 0 2 0 0 0"/>
+    <model name="box_model" static="true">
+      <origin pose="0 0 1 0 0 0"/>
       <link name="body">
         <collision name="geom">
           <geometry>
@@ -54,15 +50,15 @@
           </geometry>
           <material script="Gazebo/GreyGrid"/>
         </visual>
-
       </link>
     </model>
 
-    <light type="point" name="my_light">
+    <light type="directional" name="my_light">
       <origin pose="0 0 10 0 0 0"/>
       <diffuse rgba="1 1 1 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
+      <directional direction="0 0 -1"/>
     </light>
 
   </world>

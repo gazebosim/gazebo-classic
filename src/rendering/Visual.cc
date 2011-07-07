@@ -47,14 +47,16 @@ unsigned int Visual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Visual::Visual(const std::string &name_, Visual *parent_)
+Visual::Visual(const std::string &_name, Visual *_parent)
 {
-  this->SetName(name_);
+  gzdbg << "New Visual1[" <<  _name << "]\n";
+
+  this->SetName(_name);
   this->sceneNode = NULL;
 
   Ogre::SceneNode *pnode = NULL;
-  if (parent_)
-    pnode = parent_->GetSceneNode();
+  if (_parent)
+    pnode = _parent->GetSceneNode();
   else
     gzerr << "Create a visual, invalid parent!!!\n";
 
@@ -65,9 +67,11 @@ Visual::Visual(const std::string &name_, Visual *parent_)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Visual::Visual (const std::string &name_, Ogre::SceneNode *parent_)
+Visual::Visual (const std::string &_name, Ogre::SceneNode *parent_)
 {
-  this->SetName(name_);
+  gzdbg << "New Visual2[" <<  _name << "]\n";
+
+  this->SetName(_name);
   this->sceneNode = NULL;
 
   this->sceneNode = parent_->createChildSceneNode( this->GetName() );
@@ -77,9 +81,10 @@ Visual::Visual (const std::string &name_, Ogre::SceneNode *parent_)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Visual::Visual (const std::string &name_, Scene *scene_)
+Visual::Visual (const std::string &_name, Scene *scene_)
 {
-  this->SetName(name_);
+  gzdbg << "New Visual3[" <<  _name << "]\n";
+  this->SetName(_name);
   this->sceneNode = NULL;
 
   this->sceneNode = scene_->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
@@ -117,6 +122,7 @@ Visual::~Visual()
 // Helper for the contructor
 void Visual::Init()
 {
+  std::cout << "visual[" << this->name << "} init\n";
   this->sdf.reset(new sdf::Element);
   sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/visual.sdf", this->sdf );
 
@@ -139,6 +145,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->mesh_type() == msgs::Visual::BOX)
   {
     sdf::ElementPtr elem = geomElem->AddElement("box");
+    std::cout << "Box Scale[" << msgs::Convert(msg->scale()) << "]\n";
     elem->GetAttribute("size")->Set(msgs::Convert(msg->scale()));
   }
   else if (msg->mesh_type() == msgs::Visual::SPHERE)
@@ -154,16 +161,9 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   }
   else if (msg->mesh_type() == msgs::Visual::PLANE)
   {
-    gzdbg << "Plane visual\n";
     math::Plane plane = msgs::Convert(msg->plane());
     sdf::ElementPtr elem = geomElem->AddElement("plane");
     elem->GetAttribute("normal")->Set(plane.normal);
-
-    //common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
-    common::MeshManager::Instance()->CreatePlane("HELLO", plane,
-        math::Vector2d(2,2), 
-        math::Vector2d(1,1) );
-    //mesh = msg->header().str_id();
   }
   else if (msg->mesh_type() == msgs::Visual::MESH)
   {

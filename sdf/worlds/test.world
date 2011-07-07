@@ -4,8 +4,8 @@
 
   <scene>
     <ambient rgba="0.1 0.1 0.1 1"/>
-    <background rgba=".1 .1 .1 1.0">
-      <sky material="Gazebo/Sky"/>
+    <background rgba=".5 .0 .1 1.0">
+      <sky material="Gazebo/CloudySky"/>
     </background>
     <shadows enabled="true" rgba="0.2 0.2 0.2 1.0" type="texture_modulative"/>
   </scene>

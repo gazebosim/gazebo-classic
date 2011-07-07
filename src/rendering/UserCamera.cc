@@ -81,9 +81,6 @@ UserCamera::~UserCamera()
 void UserCamera::Load( sdf::ElementPtr _sdf )
 {
   Camera::Load(_sdf);
-
-  this->SetFOV( DTOR(60) );
-  this->SetClipDist(0.001, 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,9 +88,6 @@ void UserCamera::Load( sdf::ElementPtr _sdf )
 void UserCamera::Load( )
 {
   Camera::Load();
-
-  this->SetFOV( DTOR(60) );
-  this->SetClipDist(0.001, 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +95,8 @@ void UserCamera::Load( )
 void UserCamera::Init()
 {
   Camera::Init();
+  this->SetFOV( DTOR(60) );
+  this->SetClipDist(0.001, 100);
 
   this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 
@@ -253,7 +249,7 @@ void UserCamera::SetViewController( const std::string &type )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Resize the camera
-/* NATY: probably can remove if window resize workd
+/* NATY: probably can remove if window resize worked
 void UserCamera::Resize(unsigned int w, unsigned int h)
 {
   if (this->viewport)

@@ -401,7 +401,6 @@ void Camera::SetClipDist(float _near, float _far)
   elem->GetAttribute("near")->Set(_near);
   elem->GetAttribute("far")->Set(_far);
 
-  std::cout << "Clip Distance[" << _near << " " << _far << "]\n";
   if (camera)
   {
     this->camera->setNearClipDistance(_near);

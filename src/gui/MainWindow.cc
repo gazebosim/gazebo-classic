@@ -46,7 +46,7 @@ MainWindow::MainWindow()
   //leftFrame->setFrameShadow(QFrame::Sunken);
   //leftFrame->setFrameShape(QFrame::Box);
 
-  splitter->addWidget(insertModel);
+//  splitter->addWidget(insertModel);
   splitter->addWidget(this->glWidget);
   //mainLayout->addWidget( this->glWidget );
   mainLayout->addWidget(splitter);

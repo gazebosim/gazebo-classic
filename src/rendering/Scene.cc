@@ -64,6 +64,9 @@ Scene::Scene(const std::string &name_)
 
   Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
   this->grids.push_back(grid);
+
+  grid = new Grid(this, 10, 1, 20, common::Color(1,1,1,1));
+  this->grids.push_back(grid);
   
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
@@ -136,6 +139,7 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
+  this->manager->showBoundingBoxes(true);
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();
@@ -785,35 +789,40 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
   }
 }
 
-void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
+void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  for (int i=0; i < msg->visual_size(); i++)
+  this->sceneMsgs.push_back(_msg);
+}
+
+void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
+{
+  for (int i=0; i < _msg->visual_size(); i++)
   {
-    boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(msg->visual(i)) );
-    this->visualMsgs.push_back( vm );
+    boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(_msg->visual(i)) );
+    this->visualMsgs.push_back(vm);
   }
 
-  for (int i=0; i < msg->pose_size(); i++)
+  for (int i=0; i < _msg->pose_size(); i++)
   {
-    boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(msg->pose(i)) );
+    boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->pose(i)) );
     this->poseMsgs.push_back( pm );
   }
 
-  for (int i=0; i < msg->light_size(); i++)
+  for (int i=0; i < _msg->light_size(); i++)
   {
-    boost::shared_ptr<msgs::Light> lm( new msgs::Light(msg->light(i)) );
+    boost::shared_ptr<msgs::Light> lm( new msgs::Light(_msg->light(i)) );
     this->lightMsgs.push_back( lm );
   }
 
-  if (msg->has_ambient())
-    this->SetAmbientColor( msgs::Convert(msg->ambient()) );
+  if (_msg->has_ambient())
+    this->SetAmbientColor( msgs::Convert(_msg->ambient()) );
 
-  if (msg->has_background())
-    this->SetBackgroundColor( msgs::Convert(msg->background()) );
+  if (_msg->has_background())
+    this->SetBackgroundColor( msgs::Convert(_msg->background()) );
 
-  if (msg->has_sky_material())
-    this->SetSky(msg->sky_material());
+  if (_msg->has_sky_material())
+    this->SetSky(_msg->sky_material());
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -828,9 +837,18 @@ void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
+  SceneMsgs_L::iterator sIter;
   VisualMsgs_L::iterator vIter;
   LightMsgs_L::iterator lIter;
   PoseMsgs_L::iterator pIter;
+
+  // Process the scene messages. DO THIS FIRST
+  for (sIter = this->sceneMsgs.begin(); 
+       sIter != this->sceneMsgs.end(); sIter++)
+  {
+    this->ProcessSceneMsg( *sIter );
+  }
+  this->sceneMsgs.clear();
 
   // Process the visual messages
   for (vIter = this->visualMsgs.begin(); 
@@ -912,7 +930,6 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
       visual = new Visual(_msg->header().str_id(), this);
 
     visual->LoadFromMsg(_msg);
-    gzdbg << "New Visual[" << _msg->header().str_id() << "]\n";
     this->visuals[_msg->header().str_id()] = visual;
   }
 }
@@ -963,13 +980,11 @@ void Scene::SetSky(const std::string &_material)
 {
   this->sdf->GetOrCreateElement("background")->GetOrCreateElement("sky")->GetAttribute("material")->Set(_material);
 
-  gzdbg << "Set Sky[" << _material << "]\n";
   try
   {
     Ogre::Quaternion orientation;
     orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-    if (this->manager)
-      this->manager->setSkyDome(true, _material, 10,8, 4, true, orientation);
+    this->manager->setSkyDome(true, _material, 10,8, 4, true, orientation);
   }
   catch (int)
   {

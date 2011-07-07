@@ -3,11 +3,22 @@ import * from "perpixel.program"
 
 material Gazebo/GreyGrid : shadow_receiver_template
 {
-  set_texture_alias ambient_tex grayGrid.png
-  set_texture_alias diffuse_tex grayGrid.png
+  //set_texture_alias ambient_tex grayGrid.png
+  //set_texture_alias diffuse_tex grayGrid.png
 
   technique
   {
+    pass ambient
+    {
+      ambient .1 .1 .1 
+    }
+
+    pass light
+    {
+      diffuse .5 .5 .5
+      specular .1 .1 .1 128
+    }
+
     pass spot
     {
       specular 0.5 0.5 0.5 128

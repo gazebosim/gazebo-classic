@@ -32,7 +32,7 @@ namespace gazebo
   {
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) {}
+      public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) { std::cout << "NEW ODE BOX SHAPE\n";}
       public: virtual ~ODEBoxShape() {}
       public: virtual void SetSize( const math::Vector3 &size )
       {
