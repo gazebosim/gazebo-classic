@@ -319,6 +319,7 @@ BodyPtr ODEPhysics::CreateBody(EntityPtr parent)
   ODEBodyPtr body( new ODEBody(parent) );
 
   body->SetSpaceId( this->spaces[parent->GetName()] );
+  body->SetWorld( parent->GetWorld() );
 
   return body;
 }
