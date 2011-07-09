@@ -55,13 +55,13 @@ ODEBody::~ODEBody()
 // Load the body
 void ODEBody::Load( sdf::ElementPtr &_sdf)
 {
-  Body::Load(_sdf);
-
   this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->odePhysics == NULL)
     gzthrow("Not using the ode physics engine");
+
+  Body::Load(_sdf);
 }
 
 
@@ -92,6 +92,18 @@ void ODEBody::Init()
         if (g->IsPlaceable() && g->GetGeomId())
         {
           dGeomSetBody(g->GetGeomId(), this->bodyId);
+          // update pose immediately
+          math::Pose localPose = g->GetRelativePose();
+          dQuaternion q;
+          q[0] = localPose.rot.w;
+          q[1] = localPose.rot.x;
+          q[2] = localPose.rot.y;
+          q[3] = localPose.rot.z;
+          // Set the pose of the encapsulated geom; this is always relative
+          // to the CoM
+          dGeomSetOffsetPosition(g->GetGeomId(), localPose.pos.x, localPose.pos.y, 
+              localPose.pos.z);
+          dGeomSetOffsetQuaternion(g->GetGeomId(), q);
         }
       }
     }
