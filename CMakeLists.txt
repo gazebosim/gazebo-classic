@@ -44,7 +44,7 @@ endif()
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
-set (INCLUDE_INSTALL_DIR "include/gazebo")
+set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo")
 set (LIB_INSTALL_DIR "lib")
 set (BIN_INSTALL_DIR "bin")
 
@@ -140,9 +140,7 @@ else (build_errors)
   ########################################
   # Write the config.h file
   configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
-  INSTALL_INCLUDES(${PROJECT_BINARY_DIR}/gazebo_config.h "")
-  install(FILES ${PROJECT_BINARY_DIR}/gazebo_config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
-
+  INSTALL_INCLUDES("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
 
   ########################################
   # Make the gazebo rc file
@@ -170,14 +168,13 @@ else (build_errors)
 
   ########################################
   # Make the package config files
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_transport_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+  set (pkgconfig_files gazebo_transport)
 
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_server_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_server.pc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_server.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+  foreach (pkgconfig ${pkgconfig_files})
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
+  endforeach()
 
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_client_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_client.pc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_client.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
 
   ########################################
   # Package Creation: 

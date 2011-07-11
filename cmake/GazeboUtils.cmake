@@ -90,12 +90,12 @@ macro (BUILD_WARNING)
   endforeach (str ${ARGN})
 endmacro (BUILD_WARNING)
 
-
 macro (INSTALL_INCLUDES _subdir)
   install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
 endmacro(INSTALL_INCLUDES)
 
 macro (INSTALL_LIBRARY _name)
+  set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR})
 endmacro (INSTALL_LIBRARY _name)
 
