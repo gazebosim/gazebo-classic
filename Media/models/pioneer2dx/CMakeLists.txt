@@ -8,4 +8,4 @@ SET (files chassis.mesh
            wheel.mesh
 )
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models/Pioneer2dx)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models/Pioneer2dx)

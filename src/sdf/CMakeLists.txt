@@ -25,4 +25,4 @@ set (sdfs gazebo.sdf
 
 INSTALL_INCLUDES("sdf" ${headers})
 
-INSTALL(FILES ${sdfs} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/sdf/)
+INSTALL(FILES ${sdfs} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/sdf/)

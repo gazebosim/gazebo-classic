@@ -100,6 +100,7 @@ macro (INSTALL_LIBRARY _name)
 endmacro (INSTALL_LIBRARY _name)
 
 macro (INSTALL_EXECUTABLE _name)
+  set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION})
   install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
 endmacro (INSTALL_EXECUTABLE _name)
 

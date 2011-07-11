@@ -12,6 +12,6 @@ SET (files shadow_caster_fp.glsl
            perpixel_fp.glsl
 ) 
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/programs/)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/programs/)
 
 
