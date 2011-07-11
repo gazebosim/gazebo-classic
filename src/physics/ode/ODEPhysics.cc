@@ -227,8 +227,6 @@ void ODEPhysics::UpdateCollision()
   this->colliders.clear();
   this->trimeshColliders.clear();
 
-  std::cout << "SpaceId[" << this->spaceId << "]\n";
-
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
@@ -556,7 +554,6 @@ void ODEPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
 // Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
-  gzdbg << "Collision Callback\n";
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 
