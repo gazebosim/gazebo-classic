@@ -16,6 +16,7 @@
 */
 
 #include "physics/PhysicsTypes.hh"
+#include "sdf/sdf.h"
 
 namespace gazebo
 {

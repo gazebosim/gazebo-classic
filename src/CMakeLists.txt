@@ -34,9 +34,7 @@ add_dependencies( gazebo_physics_ode gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
 add_dependencies( gazebo_sensors gazebo_rendering )
 
-add_executable(gzphysics physics_server.cc PhysicsServer.cc)
 add_executable(gzmaster master.cc Master.cc)
-add_executable(gzsensor sensor_server.cc SensorServer.cc)
 add_executable(gzserver server.cc Server.cc Master.cc)
 
 target_link_libraries( gzmaster gazebo_common
@@ -60,25 +58,9 @@ target_link_libraries( gzserver gazebo_common
                                 pthread
                                 ${tinyxml_libraries})
 
-target_link_libraries( gzphysics gazebo_common
-                                 gazebo_transport
-                                 gazebo_physics
-                                 gazebo_sdf_interface
-                                 gazebo_sdf_parser
-                                 gazebo_msgs
-                                 assimp
-                                 pthread)
 
-target_link_libraries( gzsensor gazebo_common
-                                gazebo_transport
-                                gazebo_sensors
-                                gazebo_rendering
-                                gazebo_msgs
-                                pthread)
 
 INSTALL_EXECUTABLE( gzmaster )
-INSTALL_EXECUTABLE( gzphysics )
-INSTALL_EXECUTABLE( gzsensor )
 INSTALL_EXECUTABLE( gzserver )
 
 add_library(gazebo_server SHARED Server.cc Master.cc ${sources})

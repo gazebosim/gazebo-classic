@@ -76,5 +76,15 @@ if (INCLUDE_ODE)
   target_link_libraries(gazebo_physics gazebo_physics_ode)
 endif()
 
+add_executable(gzphysics server.cc)
+target_link_libraries( gzphysics gazebo_common
+                                 gazebo_transport
+                                 gazebo_physics
+                                 gazebo_sdf_interface
+                                 gazebo_sdf_parser
+                                 gazebo_msgs
+                                 assimp
+                                 pthread)
+INSTALL_EXECUTABLE( gzphysics )
 INSTALL_LIBRARY(gazebo_physics)
 INSTALL_INCLUDES("physics" ${headers})

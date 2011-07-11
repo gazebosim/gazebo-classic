@@ -16,6 +16,7 @@
  */
 #include "transport/Transport.hh"
 #include "common/SystemPaths.hh"
+#include "common/Console.hh"
 #include "gazebo_config.h"
 
 namespace gazebo
