@@ -123,6 +123,16 @@ Simulator::Simulator()
   this->pause = false;
   this->physicsThread = NULL;
   this->ogreLog = false;
+
+  /* test sleep one nanosleep cycle to check kernel timer granularity */
+  /* disable nanosleep if timer granularity is too large              */
+  Time time1 = this->GetRealTime();
+  struct timespec timeSpec;
+  timeSpec.tv_sec = 0;
+  timeSpec.tv_nsec = 1;
+  nanosleep(&timeSpec, NULL);  // test sleep 1ns
+  Time time2 = this->GetRealTime();
+  this->min_nanosleep_time =(time2 - time1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -487,19 +497,25 @@ void Simulator::MainLoop()
       if (currTime - lastTime < 1/freq)
       {
         Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
-        timeSpec.tv_sec = sleepTime.sec;
-        timeSpec.tv_nsec = sleepTime.nsec;
+        if (this->min_nanosleep_time < 1/freq && this->min_nanosleep_time < sleepTime)
+        {
+          timeSpec.tv_sec = sleepTime.sec;
+          timeSpec.tv_nsec = sleepTime.nsec;
 
-        nanosleep(&timeSpec, NULL);
+          nanosleep(&timeSpec, NULL);
+        }
       }
 
     }
     else
     {
       Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
-      timeSpec.tv_sec = sleepTime.sec;
-      timeSpec.tv_nsec = sleepTime.nsec;
-      nanosleep(&timeSpec, NULL);
+      if (this->min_nanosleep_time < 1/freq && this->min_nanosleep_time < sleepTime)
+      {
+        timeSpec.tv_sec = sleepTime.sec;
+        timeSpec.tv_nsec = sleepTime.nsec;
+        nanosleep(&timeSpec, NULL);
+      }
     }
   }
   // signal physics to quit after render completes
@@ -763,7 +779,10 @@ void Simulator::PhysicsLoop()
       req.tv_nsec = diffTime.nsec;
     }
 
-    nanosleep(&req, &rem);
+    //nanosleep on storm servers are taking up about 10ms per call
+    //definitely a buggy setting on the storm servers
+    if (this->min_nanosleep_time < physicsUpdatePeriod && this->min_nanosleep_time < diffTime)
+      nanosleep(&req, &rem);
     
     /*{
       DIAGNOSTICTIMER(timer1("PHYSICS UpdateSimIfaces ",6));

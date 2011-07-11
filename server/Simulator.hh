@@ -294,6 +294,7 @@ namespace gazebo
     private: static std::string defaultWorld;
 
     private: std::vector<Plugin*> plugins;
+    private: Time min_nanosleep_time;
 };
 
 
