@@ -582,11 +582,11 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   {
     if (sdfParent->GetAttribute("link")->GetAsString() == getValue(body1Xml))
     {
-      initAttr(_config, "body1", sdfChild->GetAttribute("link"));
+      initAttr(_config, "body2", sdfChild->GetAttribute("link"));
     }
     else if (sdfParent->GetAttribute("link")->GetAsString() == getValue(body2Xml))
     {
-      initAttr(_config, "body2", sdfChild->GetAttribute("link"));
+      initAttr(_config, "body1", sdfChild->GetAttribute("link"));
     }
     else
     {
