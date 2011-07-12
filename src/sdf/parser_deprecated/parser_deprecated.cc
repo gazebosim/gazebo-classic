@@ -618,32 +618,51 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   {
     sdf::ElementPtr sdfAxis = _sdf->AddElement("axis");
     initAttr(_config, "axis", sdfAxis->GetAttribute("xyz"));
+
+    sdf::ElementPtr sdfDynamics = sdfAxis->AddElement("dynamics");
+    if (firstChildElement(_config, "damping"))
+    {
+      initAttr(_config, "damping", sdfDynamics->GetAttribute("damping"));
+    }
+
+    sdf::ElementPtr sdfLimit = sdfAxis->AddElement("limit");
+
+    // Get limit
+    if (firstChildElement(_config, "lowStop"))
+    {
+      initAttr(_config, "lowStop", sdfLimit->GetAttribute("lower"));
+    }
+    if (firstChildElement(_config, "hiStop"))
+    {
+      initAttr(_config, "hiStop", sdfLimit->GetAttribute("upper"));
+    }
+
   }
 
   if ( firstChildElement(_config,"axis2"))
   {
     sdf::ElementPtr sdfAxis = _sdf->AddElement("axis2");
     initAttr(_config, "axis", sdfAxis->GetAttribute("xyz"));
-  }
 
-  sdf::ElementPtr sdfLimit = _sdf->AddElement("limit");
+    sdf::ElementPtr sdfDynamics = sdfAxis->AddElement("dynamics");
+    if (firstChildElement(_config, "damping"))
+    {
+      initAttr(_config, "damping", sdfDynamics->GetAttribute("damping"));
+    }
 
-  // Get limit
-  if (firstChildElement(_config, "lowStop"))
-  {
-    initAttr(_config, "lowStop", sdfLimit->GetAttribute("lower"));
-  }
-  if (firstChildElement(_config, "hiStop"))
-  {
-    initAttr(_config, "hiStop", sdfLimit->GetAttribute("upper"));
-  }
+    sdf::ElementPtr sdfLimit = sdfAxis->AddElement("limit");
 
-  sdf::ElementPtr sdfDynamics = _sdf->AddElement("dynamics");
-  if (firstChildElement(_config, "damping"))
-  {
-    initAttr(_config, "damping", sdfDynamics->GetAttribute("damping"));
-  }
+    // Get limit
+    if (firstChildElement(_config, "lowStop"))
+    {
+      initAttr(_config, "lowStop", sdfLimit->GetAttribute("lower"));
+    }
+    if (firstChildElement(_config, "hiStop"))
+    {
+      initAttr(_config, "hiStop", sdfLimit->GetAttribute("upper"));
+    }
 
+  }
   return true;
 }
 
