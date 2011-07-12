@@ -57,7 +57,10 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
 
   this->SetSpaceId( boost::shared_static_cast<ODEBody>(this->body)->GetSpaceId() );
 
-  /*if (this->geomId && this->placeable)
+  /*std::cout << "\n\n\nODEGeom::Load test\n\n\n" <<  this->geomId
+            << "\n\n" << this->placeable << "\n\n\n";
+
+  if (this->geomId && this->placeable)
   {
     math::Pose localPose;
     dQuaternion q;
@@ -65,7 +68,7 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
     // Transform into CoM relative Pose
     localPose = this->GetRelativePose();
 
-    q[0] = localPose.rot.u;
+    q[0] = localPose.rot.w;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;

@@ -462,6 +462,14 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         gzerr << "Unable to parse visual\n";
         return false;
       }
+      // In order to parse old gazebo xml (nested format)
+      // to new sdf, we need to unwrap visual pose from within collision.
+      // take origin of visual, multiply it by reverse traansform collision
+      gazebo::math::Pose col_pose = sdfCollision->GetValuePose("origin");
+      gazebo::math::Pose vis_pose = sdfVisual->GetValuePose("origin");
+      vis_pose = col_pose.GetInverse()*vis_pose;
+      // update the sdf pose
+      sdfVisual->GetAttribute("origin")->Set(vis_pose);
     }
     // TODO: check for duplicate geoms
   }
