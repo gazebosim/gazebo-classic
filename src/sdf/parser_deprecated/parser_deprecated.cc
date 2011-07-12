@@ -465,11 +465,11 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       // In order to parse old gazebo xml (nested format)
       // to new sdf, we need to unwrap visual pose from within collision.
       // take origin of visual, multiply it by reverse traansform collision
-      gazebo::math::Pose col_pose = sdfCollision->GetValuePose("origin");
-      gazebo::math::Pose vis_pose = sdfVisual->GetValuePose("origin");
+      gazebo::math::Pose col_pose = sdfCollision->GetElement("origin")->GetValuePose("pose");
+      gazebo::math::Pose vis_pose = sdfVisual->GetElement("origin")->GetValuePose("pose");
       vis_pose = col_pose.GetInverse()*vis_pose;
       // update the sdf pose
-      sdfVisual->GetAttribute("origin")->Set(vis_pose);
+      sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
     }
     // TODO: check for duplicate geoms
   }
