@@ -4,6 +4,7 @@ SET (files Gazebo.material
            perpixel.program
            blur.compositor
            blur.material
+           pssm.material
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/scripts/)
