@@ -40,7 +40,7 @@
 #include "common/SystemPaths.hh"
 #include "common/Global.hh"
 
-//#include "rendering/RTShaderSystem.hh"
+#include "rendering/RTShaderSystem.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"
 #include "rendering/Grid.hh"
@@ -229,9 +229,9 @@ void RenderEngine::Init()
   Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
   //if (this->HasGLSL())
-  //  RTShaderSystem::Instance()->Init();
+    RTShaderSystem::Instance()->Init();
   //if (this->HasGLSL())
-  //  RTShaderSystem::Instance()->UpdateShaders();
+    //RTShaderSystem::Instance()->UpdateShaders();
 
   for (unsigned int i=0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();

@@ -22,7 +22,6 @@
 #ifndef RTSHADERSYSTEM_HH
 #define RTSHADERSYSTEM_HH
 
-// TODO: remove this line
 #include "rendering/ogre.h"
 
 #include <list>
@@ -61,7 +60,7 @@ namespace gazebo
     public: void Fini();
 
     /// \brief Add a scene manager
-    public: void AddScene(Scene *scene);
+    public: void AddScene(Scene *_scene);
 
     /// \brief Remove a scene
     public: void RemoveScene( Scene *scene );

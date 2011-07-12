@@ -199,12 +199,6 @@ namespace gazebo
       /// \brief Get the size of the bounding box
       public: math::Vector3 GetBoundingBoxSize() const;
   
-      /// \brief Set whether to use the RT Shader system
-      public: void SetUseRTShader(bool value);
-  
-      /// \brief Get whether to user the RT shader system
-      public: bool GetUseRTShader() const;
-  
       /// \brief Add a line to the visual
       public: DynamicLines *AddDynamicLine(RenderOpType type);
   
@@ -245,7 +239,6 @@ namespace gazebo
   
       private: Ogre::RibbonTrail *ribbonTrail;
   
-      private: bool useRTShader;
       private: event::ConnectionPtr preRenderConnection;
   
       // List of all the lines created

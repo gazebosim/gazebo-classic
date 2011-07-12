@@ -277,7 +277,7 @@ msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
 
   if (_sdf->HasElement("specular"))
   {
-    result.mutable_diffuse()->CopyFrom( 
+    result.mutable_specular()->CopyFrom( 
         Convert( _sdf->GetElement("specular")->GetValueColor("rgba")) );
   }
 
@@ -286,23 +286,23 @@ msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
     sdf::ElementPtr elem = _sdf->GetElement("attenuation");
     result.set_attenuation_constant(elem->GetValueDouble("constant"));
     result.set_attenuation_linear(elem->GetValueDouble("linear"));
-    result.set_attenuation_linear(elem->GetValueDouble("quadratic"));
+    result.set_attenuation_quadratic(elem->GetValueDouble("quadratic"));
     result.set_range( elem->GetValueDouble("range") );
   }
 
-  if (_sdf->HasElement("directional"))
+  if (_sdf->HasElement("direction"))
   {
-    sdf::ElementPtr elem = _sdf->GetElement("directional");
+    sdf::ElementPtr elem = _sdf->GetElement("direction");
     result.mutable_direction()->CopyFrom( 
-      Convert( elem->GetValueVector3("direction") ) );
+      Convert( elem->GetValueVector3("xyz") ) );
   }
 
   if (_sdf->HasElement("spot"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("spot");
-    result.set_spot_inner_angle( elem->GetValueDouble("spot_inner_angle") );
-    result.set_spot_outer_angle( elem->GetValueDouble("spot_outer_angle") );
-    result.set_spot_falloff(     elem->GetValueDouble("spot_falloff") );
+    result.set_spot_inner_angle( elem->GetValueDouble("inner_angle") );
+    result.set_spot_outer_angle( elem->GetValueDouble("outer_angle") );
+    result.set_spot_falloff(     elem->GetValueDouble("falloff") );
   }
 
   return result;
@@ -328,13 +328,13 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
     }
     else if (geomElem->GetName() == "cylinder")
     {
-      scale.x = scale.y = geomElem->GetValueDouble("radius");
+      scale.x = scale.y = (2*geomElem->GetValueDouble("radius"));
       scale.z = geomElem->GetValueDouble("length");
       result.set_mesh_type( msgs::Visual::CYLINDER );
     }
     else if (geomElem->GetName() == "sphere")
     {
-      scale.x = scale.y = scale.z = geomElem->GetValueDouble("radius");
+      scale.x = scale.y = scale.z = (2*geomElem->GetValueDouble("radius"));
       result.set_mesh_type( msgs::Visual::SPHERE );
     }
     else if (geomElem->GetName() == "plane")

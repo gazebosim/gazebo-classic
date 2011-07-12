@@ -97,6 +97,7 @@ namespace sdf
     public: bool Set(const double &_value);
     public: bool Set(const char &_value);
     public: bool Set(const std::string &_value);
+    public: bool Set(const char *_value);
     public: bool Set(const gazebo::math::Vector3 &_value);
     public: bool Set(const gazebo::math::Quaternion &_value);
     public: bool Set(const gazebo::math::Pose &_value);

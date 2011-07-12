@@ -33,7 +33,7 @@
 #include "rendering/Grid.hh"
 #include "rendering/SelectionObj.hh"
 
-//#include "rendering/RTShaderSystem.hh"
+#include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 
@@ -96,7 +96,7 @@ Scene::~Scene()
   this->lights.clear();
 
   // Remove a scene
-  //RTShaderSystem::Instance()->RemoveScene( this );
+  RTShaderSystem::Instance()->RemoveScene( this );
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     delete this->grids[i];
@@ -139,6 +139,8 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
+  RTShaderSystem::Instance()->AddScene(this);
+  RTShaderSystem::Instance()->ApplyShadows(this);
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();
@@ -166,10 +168,14 @@ void Scene::Init()
   if (this->sdf->HasElement("shadows") && 
       this->sdf->GetElement("shadows")->GetValueBool("enabled"))
   {
+    gzdbg << "Apply shadows\n";
     sdf::ElementPtr shadowElem = this->sdf->GetElement("shadows");
-    this->manager->setShadowTextureSize( 512);
-    this->manager->setShadowTextureCount( 4 );
-    this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+
+    //this->SetShadows( shadowElem->GetValueColor("rgba") );
+    //this->manager->setShadowTextureSize( 512);
+    //this->manager->setShadowTextureCount( 4 );
+    //this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+
 
     //if (*shadowElem-GetAttribute("type") == "stencil_additive")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
@@ -183,9 +189,6 @@ void Scene::Init()
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
     //else if (*shadowElem-GetAttribute("type") == "texture_modulative_integrated")
     //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-
-    this->manager->setShadowColour( 
-        Conversions::Color(shadowElem->GetValueColor("rgba")) );
   }
 
   // Send a request to get the current world state
@@ -196,10 +199,7 @@ void Scene::Init()
 
   this->scenePub->Publish(req);
 
-  //this->InitShadows();
-
   // Register this scene the the real time shaders system
-  //RTShaderSystem::Instance()->AddScene(this);
   
   this->selectionObj->Init();
 }
@@ -569,12 +569,12 @@ void Scene::SetVisible(const std::string &name_, bool visible_)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scene::InitShadows()
+/// Deprecated: use RTShader::ApplyShadows
+/*void Scene::InitShadows()
 {
-  // Allow a total of 4 shadow casters per scene
+  // Allow a total of 3 shadow casters per scene
   const int numShadowTextures = 3;
 
-  //START
   this->manager->setShadowFarDistance(500);
   this->manager->setShadowTextureCount(numShadowTextures);
 
@@ -643,7 +643,7 @@ void Scene::InitShadows()
     overlay->add2D(debugPanel);
     overlay->show();
   }
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the scene ID
@@ -822,6 +822,9 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 
   if (_msg->has_sky_material())
     this->SetSky(_msg->sky_material());
+
+  if (_msg->has_shadows())
+    this->SetShadows( msgs::Convert( _msg->shadows().color() ) );
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -973,6 +976,12 @@ void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
 {
   this->selectionMsg = _msg;
+}
+
+void Scene::SetShadows(const common::Color &_color)
+{
+  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+  this->manager->setShadowColour( Conversions::Color(_color) );
 }
 
 void Scene::SetSky(const std::string &_material)

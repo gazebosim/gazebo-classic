@@ -27,7 +27,7 @@
 #include "common/Console.hh"
 #include "rendering/RTShaderSystem.hh"
 
-#define MINOR_VERSION 700
+#define MINOR_VERSION 7
 using namespace gazebo;
 using namespace rendering;
 
@@ -67,19 +67,11 @@ void RTShaderSystem::Init()
 
     this->shaderGenerator->setTargetLanguage("glsl");
 
-    /*for (unsigned int s=0; s < OgreAdaptor::Instance()->GetSceneMgrCount();s++)
-    {
-      std::string sceneName = OgreAdaptor::Instance()->GetSceneMgr(s)->getName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
-
-      // Set the scene manager
-      this->shaderGenerator->addSceneManager(
-          OgreAdaptor::Instance()->GetSceneMgr(s));
-    }*/
-
     this->initialized = true;
   }
   else
     gzerr << "RT Shader system failed to initialize\n";
+
 #endif
 }
 
@@ -103,13 +95,13 @@ void RTShaderSystem::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a scene manager
-void RTShaderSystem::AddScene(Scene * /*scene_*/)
+void RTShaderSystem::AddScene(Scene *_scene)
 {
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   // Set the scene manager
-  this->shaderGenerator->addSceneManager( scene->GetManager() );
-  this->shaderGenerator->createScheme( scene->GetName() +Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME  );
-  this->scenes.push_back(scene);
+  this->shaderGenerator->addSceneManager( _scene->GetManager() );
+  this->shaderGenerator->createScheme( _scene->GetName() +Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME  );
+  this->scenes.push_back(_scene);
 #endif
 }
 
@@ -153,10 +145,10 @@ void RTShaderSystem::DetachEntity(Visual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a viewport to use shaders
-void RTShaderSystem::AttachViewport(Ogre::Viewport *viewport, Scene *scene)
+void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, Scene *_scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  viewport->setMaterialScheme( scene->GetName() +
+  _viewport->setMaterialScheme( _scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 #endif
@@ -170,6 +162,7 @@ void RTShaderSystem::UpdateShaders()
   if (!this->initialized)
     return;
 
+
   std::list<Visual*>::iterator iter;
 
   // Update all the shaders
@@ -181,8 +174,11 @@ void RTShaderSystem::UpdateShaders()
 /// Generate shaders for an entity
 void RTShaderSystem::GenerateShaders(Visual *vis)
 {
-  if (!this->initialized || !vis->GetUseRTShader())
+  if (!this->initialized)
+  {
+    gzwarn << "RTShader system not initialized.\n";
     return;
+  }
 
   for (unsigned int k=0; k < vis->GetSceneNode()->numAttachedObjects(); k++)
   {
@@ -204,7 +200,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
         success = this->shaderGenerator->createShaderBasedTechnique(
             curMaterialName,
             Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-            this->scenes[s]->GetIdString() + 
+            this->scenes[s]->GetName() + 
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 
@@ -219,7 +215,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
           // each one of them as desired.
           Ogre::RTShader::RenderState* renderState = 
             this->shaderGenerator->getRenderState(
-                this->scenes[s]->GetIdString() + 
+                this->scenes[s]->GetName() + 
                 Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, 
                 curMaterialName, 0);
 
@@ -234,16 +230,17 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             renderState->addTemplateSubRenderState(perPerVertexLightModel);
           }
 #endif
+*/
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-          else if (vis->GetShader() == "pixel")
+          //else if (vis->GetShader() == "pixel")
           {
             Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 
             renderState->addTemplateSubRenderState(perPixelLightModel);
           }
 
-          else if (vis->GetShader() == "normal_map_objectspace")
+          /*else if (vis->GetShader() == "normal_map_objectspace")
           {
             Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
             Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
@@ -261,15 +258,14 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
-          }
+          }*/
 #endif
-          */
         }
 
 
       // Invalidate this material in order to re-generate its shaders.
       this->shaderGenerator->invalidateMaterial(
-          this->scenes[s]->GetIdString() + 
+          this->scenes[s]->GetName() + 
           Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName); 
       }
     }
@@ -359,86 +355,57 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   return true;
 }
 
-
 void RTShaderSystem::ApplyShadows(Scene *scene)
 {
   Ogre::SceneManager *sceneMgr;
-  Ogre::RTShader::RenderState* schemeRenderState;
-
   sceneMgr = this->shaderGenerator->getActiveSceneManager();
 
-	schemeRenderState = this->shaderGenerator->getRenderState(
-      scene->GetIdString() + 
-      Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+	// Grab the scheme render state.												
+	Ogre::RTShader::RenderState* schemRenderState = this->shaderGenerator->getRenderState(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+{
+		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
-  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-  sceneMgr->setShadowFarDistance(1000);
-  sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
-  sceneMgr->setShadowColour(Ogre::ColourValue(0.5, 0.5, 0.5));
+		// 3 textures per directional light
+		sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+		sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+		sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
+		sceneMgr->setShadowTextureSettings(1024, 3, Ogre::PF_FLOAT32_R);
+		sceneMgr->setShadowTextureSelfShadow(true);
 
+		// Set up caster material - this is just a standard depth/shadow map caster
+		sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+		
+		
+		// Disable fog on the caster pass.
+		Ogre::MaterialPtr passCaterMaterial = Ogre::MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
+		Ogre::Pass* pssmCasterPass = passCaterMaterial->getTechnique(0)->getPass(0);
+		pssmCasterPass->setFog(true);
 
-  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+		// shadow camera setup
+    Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
+		pssmSetup->calculateSplitPoints(3, 1, 1000);
+		pssmSetup->setSplitPadding(10);
+		pssmSetup->setOptimalAdjustFactor(0, 2);
+		pssmSetup->setOptimalAdjustFactor(1, 1);
+		pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
-  // 3 textures per directional light
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 3);
-  sceneMgr->setShadowTextureSettings(1024, 3, Ogre::PF_FLOAT16_R);
-  sceneMgr->setShadowTextureSelfShadow(true);
+		sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
-  // Disable fog on the caster pass.
-  /*Ogre::MaterialPtr passCaterMaterial
-    //= Ogre::MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
-    = Ogre::MaterialManager::getSingleton().getByName("pssm_vsm_caster");
-  Ogre::Pass* pssmCasterPass
-    = passCaterMaterial->getTechnique(0)->getPass(0);
-  pssmCasterPass->setFog(true);
-*/
-    
-  // shadow camera setup
-  Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
-  pssmSetup->calculateSplitPoints(3, 0.1, 1000);
-  pssmSetup->setSplitPadding(.5);
-  pssmSetup->setUseSimpleOptimalAdjust(true);
-  pssmSetup->setOptimalAdjustFactor(0, 3);
-  pssmSetup->setOptimalAdjustFactor(1, 1);
-  pssmSetup->setOptimalAdjustFactor(2, 0.5);
+		Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
+		Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
+		const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
+		Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
 
-  sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
+		for (unsigned int i=0; i < srcSplitPoints.size(); ++i)
+		{
+			dstSplitPoints.push_back(srcSplitPoints[i]);
+		}
 
-  // Set up caster material - this is just a standard depth/shadow map caster
-  //sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
-  sceneMgr->setShadowTextureCasterMaterial("pssm_vsm_caster");
-  sceneMgr->setShadowCasterRenderBackFaces(false);
+		pssm3SubRenderState->setSplitPoints(dstSplitPoints);
+		schemRenderState->addTemplateSubRenderState(subRenderState);		
+	}
 
-  Ogre::RTShader::SubRenderState *subRenderState;
-  Ogre::RTShader::IntegratedPSSM3 *pssm3SubRenderState;
-  Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
+	this->shaderGenerator->invalidateScheme(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-  subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
-  pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
-  const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
-
-  for (unsigned int i=0; i < srcSplitPoints.size(); ++i)
-  {
-    dstSplitPoints.push_back(srcSplitPoints[i]);
-  }
-
-  pssm3SubRenderState->setSplitPoints(dstSplitPoints);
-  schemeRenderState->addTemplateSubRenderState(subRenderState);		
-
-  // set the receiver params for any materials that need the split point information
-  Ogre::Vector4 splitPoints;
-  for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
-  {
-    splitPoints[i] = srcSplitPoints[i];
-  }
-
-  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName("Gazebo/GrayGrid");
-  for(int i = 0; i < mat->getNumTechniques(); ++i) 
-  {
-    mat->getTechnique(i)->getPass(1)->getFragmentProgramParameters()->setNamedConstant("pssmSplitPoints", splitPoints);
-  }
-
-  this->shaderGenerator->invalidateScheme(
-      scene->GetIdString() + 
-      Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  this->UpdateShaders();
 }

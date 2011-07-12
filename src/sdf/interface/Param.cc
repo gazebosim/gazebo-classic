@@ -190,7 +190,12 @@ bool Param::Set(const char &_value)
 ////////////////////////////////////////////////////////////////////////////////
 bool Param::Set(const std::string &_value)
 {
-  return this->SetFromString(boost::lexical_cast<std::string>(_value));
+  return this->SetFromString(_value);
+}
+
+bool Param::Set(const char *_value)
+{
+  return this->SetFromString(std::string(_value));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -56,6 +56,4 @@ void SphereShape::Init()
 void SphereShape::SetSize(const double &radius)
 {
   this->sdf->GetElement("sphere")->GetAttribute("radius")->Set(radius);
-
-  this->SetSize( this->sdf->GetElement("sphere")->GetValueDouble("radius") );
 }

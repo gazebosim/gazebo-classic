@@ -159,8 +159,11 @@ namespace gazebo
       /// \brief Print scene graph
       private: void PrintSceneGraphHelper(const std::string &prefix, 
                                           Ogre::Node *node);
-  
-      public: void InitShadows();
+ 
+      /// \brief Deprecated: use RTShader::ApplyShadows
+      //public: void InitShadows();
+
+      public: void SetShadows(const common::Color &_color);
       public: void SetSky(const std::string &_material);
 
       // \brief Get the mesh information for the given mesh.

@@ -8,14 +8,14 @@
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
 
-#include "sensors/Sensors.hh"
+//#include "sensors/Sensors.hh"
 #include "transport/Transport.hh"
 #include "transport/IOManager.hh"
 
 #include "physics/Physics.hh"
 #include "physics/World.hh"
 #include "physics/Base.hh"
-#include "rendering/Rendering.hh"
+//#include "rendering/Rendering.hh"
 
 #include "Master.hh"
 #include "Server.hh"
@@ -72,7 +72,7 @@ void Server::Load(const std::string &filename)
   physics::init();
 
   /// Init the sensors library
-  sensors::init("default");
+  //sensors::init("default");
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   while(worldElem)
@@ -94,7 +94,7 @@ void Server::Load(const std::string &filename)
     worldElem = sdf->root->GetNextElement("world", worldElem);
   }
 
-  // Load the rendering system
+  /*// Load the rendering system
   if (!rendering::load())
     gzthrow("Unable to load the rendering engine");
 
@@ -103,6 +103,7 @@ void Server::Load(const std::string &filename)
     gzthrow("Unable to intialize the rendering engine");
 
   rendering::create_scene("default");
+  */
 }
 
 void Server::Init()
@@ -120,7 +121,7 @@ void Server::Fini()
 {
   transport::fini();
   physics::fini();
-  rendering::fini();
+  //rendering::fini();
 
   this->master->Fini();
   delete this->master;
@@ -140,7 +141,7 @@ void Server::Run()
   this->stop = false;
   while (!this->stop)
   {
-    sensors::run_once(true);
+    //sensors::run_once(true);
     usleep(10000);
   }
 

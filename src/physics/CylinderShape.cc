@@ -74,6 +74,4 @@ void CylinderShape::SetSize( const double &radius, const double &length )
 {
   this->sdf->GetElement("cylinder")->GetAttribute("radius")->Set(radius);
   this->sdf->GetElement("cylinder")->GetAttribute("length")->Set(length);
-  this->SetSize( this->sdf->GetElement("cylinder")->GetValueDouble("radius"), 
-                 this->sdf->GetElement("cylinder")->GetValueDouble("length") );
 }

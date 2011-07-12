@@ -180,6 +180,7 @@ namespace gazebo
   
       /// \brief Get a pointer to the ogre camera
       public: Ogre::Camera *GetOgreCamera() const;
+      public: Ogre::Viewport *GetViewport() const;
   
       /// \brief Get the viewport width in pixels
       public: unsigned int GetViewportWidth() const;

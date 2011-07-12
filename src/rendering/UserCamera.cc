@@ -33,7 +33,7 @@
 #include "rendering/OrbitViewController.hh"
 #include "rendering/RenderTypes.hh"
 #include "rendering/Scene.hh"
-//#include "rendering/RTShaderSystem.hh"
+#include "rendering/RTShaderSystem.hh"
 #include "rendering/Camera.hh"
 #include "rendering/Visual.hh"
 #include "rendering/DynamicLines.hh"
@@ -164,7 +164,7 @@ void UserCamera::Init()
   //this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
   //this->viewport->setVisibilityMask(this->visibilityMask);
 
-  //RTShaderSystem::AttachViewport(this);
+  //RTShaderSystem::AttachViewport(this->viewport, this->scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

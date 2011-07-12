@@ -29,7 +29,7 @@
 #include "rendering/DynamicLines.hh"
 #include "rendering/Scene.hh"
 #include "rendering/SelectionObj.hh"
-//#include "rendering/RTShaderSystem.hh"
+#include "rendering/RTShaderSystem.hh"
 #include "common/MeshManager.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -100,7 +100,7 @@ Visual::~Visual()
     delete *iter;
   this->lines.clear();
 
-  //RTShaderSystem::Instance()->DetachEntity(this);
+  RTShaderSystem::Instance()->DetachEntity(this);
 
   if (this->sceneNode != NULL)
   {
@@ -122,12 +122,11 @@ void Visual::Init()
 
   this->transparency = 0.0;
   this->isStatic = false;
-  this->useRTShader = true;
   this->visible = true;
   this->ribbonTrail = NULL;
   this->staticGeom = NULL;
 
-  //RTShaderSystem::Instance()->AttachEntity(this);
+  RTShaderSystem::Instance()->AttachEntity(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,7 +278,7 @@ void Visual::Load()
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
+  this->SetCastShadows(true);//this->sdf->GetValueBool("cast_shadows"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,7 +337,7 @@ void Visual::DetachVisual(Visual *vis)
 void Visual::AttachObject( Ogre::MovableObject *obj)
 {
   this->sceneNode->attachObject(obj);
-  //RTShaderSystem::Instance()->UpdateShaders();
+  RTShaderSystem::Instance()->UpdateShaders();
 
   obj->setUserAny( Ogre::Any(this) );
 }
@@ -422,8 +421,6 @@ void Visual::SetScale(const math::Vector3 &scale )
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetAttribute("scale")->Set(scale);
-  else
-    gzerr << "Unknown geometry type\n";
 
   this->sceneNode->setScale(Conversions::Vector3(scale));
 }
@@ -499,19 +496,6 @@ void Visual::SetMaterial(const std::string &materialName)
   else
     myMaterial = origMaterial->clone(this->myMaterialName);
 
-  Ogre::Material::TechniqueIterator techniqueIt = myMaterial->getTechniqueIterator ();
-
-  /*while (techniqueIt.hasMoreElements ())
-  {
-    Ogre::Technique *t = techniqueIt.getNext ();
-    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-    while (passIt.hasMoreElements ())
-    {
-      passIt.peekNext ()->setDepthWriteEnabled (true);
-      passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
-      passIt.moveNext ();
-    }
-  }*/
 
   try
   {
@@ -520,9 +504,11 @@ void Visual::SetMaterial(const std::string &materialName)
       Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
       if (dynamic_cast<Ogre::Entity*>(obj))
-        ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
+        //((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
+        ((Ogre::Entity*)obj)->setMaterialName(this->origMaterialName);
       else
-        ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
+        //((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
+        ((Ogre::SimpleRenderable*)obj)->setMaterial(this->origMaterialName);
     }
 
   }
@@ -717,7 +703,6 @@ void Visual::SetRotation( const math::Quaternion &rot)
 // Set the pose of the visual
 void Visual::SetPose( const math::Pose &pose)
 {
-  gzdbg << "Set Pose[" << pose << "] Visual[" << this->name << "]\n";
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }
@@ -815,7 +800,7 @@ std::string Visual::GetNormalMap() const
 void Visual::SetNormalMap(const std::string &nmap)
 {
   this->sdf->GetOrCreateElement("material")->GetAttribute("normal_map")->Set(nmap);
-  //RTShaderSystem::Instance()->UpdateShaders();
+  RTShaderSystem::Instance()->UpdateShaders();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -860,19 +845,6 @@ math::Vector3 Visual::GetBoundingBoxSize() const
   return math::Vector3(size.x, size.y, size.z);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to use the RT Shader system
-void Visual::SetUseRTShader(bool value)
-{
-  this->useRTShader = value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether to user the RT shader system
-bool Visual::GetUseRTShader() const
-{
-  return this->useRTShader;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
@@ -905,7 +877,7 @@ void Visual::DeleteDynamicLine(DynamicLines *line)
 /// Get the name of the material
 std::string Visual::GetMaterialName() const
 {
-  return this->myMaterialName;
+  return this->origMaterialName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

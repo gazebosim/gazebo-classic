@@ -1,7 +1,7 @@
 import * from "shadow_receiver.program"
 import * from "perpixel.program"
 
-material Gazebo/GreyGrid : shadow_receiver_template
+material Gazebo/GreyGrid //: shadow_receiver_template
 {
   //set_texture_alias ambient_tex grayGrid.png
   //set_texture_alias diffuse_tex grayGrid.png
@@ -619,8 +619,7 @@ material Gazebo/Gold
 		{
 			ambient 0.400000 0.248690 0.020759 1.000000
 			diffuse 0.800000 0.648690 0.120759 1.000000
-			specular 0.500000 0.500000 0.500000 1.000000 12.500000
-			emissive 0.000000 0.000000 0.000000 1.000000
+			specular 0.400000 0.400000 0.400000 1.000000 12.500000
 		}
 	}
 }

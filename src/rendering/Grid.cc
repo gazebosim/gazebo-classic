@@ -118,6 +118,8 @@ void Grid::SetHeight(uint32_t height_)
 void Grid::Init()
 {
   this->manualObject = this->scene->GetManager()->createManualObject( this->name );
+  this->manualObject->setDynamic(true);
+  this->manualObject->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY - 1);
 
   Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
 

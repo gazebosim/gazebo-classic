@@ -23,7 +23,7 @@
 #include "common/Exception.hh"
 
 #include "rendering/RenderEngine.hh"
-//#include "rendering/RTShaderSystem.hh"
+#include "rendering/RTShaderSystem.hh"
 #include "rendering/Camera.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/WindowManager.hh"
@@ -66,7 +66,7 @@ void WindowManager::SetCamera( int windowId, CameraPtr camera)
 {
   this->windows[windowId]->removeAllViewports(); 
   camera->SetRenderTarget( this->windows[windowId] );
-  //RTShaderSystem::AttachViewport(viewport, camera->GetScene());
+  RTShaderSystem::AttachViewport(camera->GetViewport(), camera->GetScene());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
