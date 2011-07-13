@@ -54,7 +54,6 @@
                    izz="1.0"/>
         </inertial>
 
-        <!--
         <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <geometry>
@@ -82,7 +81,6 @@
           </surface>
           
         </collision>
-        -->
       </link>
 
     </model>
