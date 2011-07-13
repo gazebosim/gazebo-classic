@@ -1,4 +1,4 @@
-<?xml version="0.9"?>
+<?xml version="1.0"?>
 
 <gazebo:world 
   xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -204,13 +204,13 @@
               <xyz>0 0 0.051</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/base_L.stl</mesh>
+              <mesh>pr2/base_v0/base_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/base.dae</mesh>
+                  <mesh>pr2/base_v0/base.dae</mesh>
               </visual>
           </geom:trimesh>
           <sensor:contact name="base_contact_sensor">
@@ -267,13 +267,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
                   <material>PR2/caster_texture</material>
               </visual>
           </geom:trimesh>
@@ -314,7 +314,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -354,7 +354,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -385,13 +385,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
               <genTexCoord>false</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
                   <material>PR2/caster_texture</material>
               </visual>
           </geom:trimesh>
@@ -432,7 +432,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -472,7 +472,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -503,13 +503,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
                   <material>PR2/caster_texture</material>
               </visual>
           </geom:trimesh>
@@ -550,7 +550,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -590,7 +590,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -621,13 +621,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
                   <material>PR2/caster_texture</material>
               </visual>
           </geom:trimesh>
@@ -668,7 +668,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -708,7 +708,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>-90 0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
               </visual>
           </geom:cylinder>
           <turnGravityOff>false</turnGravityOff>
@@ -739,13 +739,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/torso_v0/torso_lift_L.stl</mesh>
+              <mesh>pr2/torso_v0/torso_lift_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/torso_v0/torso_lift.dae</mesh>
+                  <mesh>pr2/torso_v0/torso_lift.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>false</turnGravityOff>
@@ -788,12 +788,12 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/head_v0/head_pan_L.stl</mesh>
+              <mesh>pr2/head_v0/head_pan_L.stl</mesh>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/head_v0/head_pan.dae</mesh>
+                  <mesh>pr2/head_v0/head_pan.dae</mesh>
               </visual>
           </geom:trimesh>
       </body:empty>
@@ -824,12 +824,12 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/head_v0/head_tilt_L.stl</mesh>
+              <mesh>pr2/head_v0/head_tilt_L.stl</mesh>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/head_v0/head_tilt.dae</mesh>
+                  <mesh>pr2/head_v0/head_tilt.dae</mesh>
               </visual>
           </geom:trimesh>
           <geom:box name="head_tilt_link_geom_head_plate_frame">
@@ -1024,13 +1024,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.stl</mesh>
+              <mesh>pr2/shoulder_v0/shoulder_pan.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.dae</mesh>
+                  <mesh>pr2/shoulder_v0/shoulder_pan.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1066,13 +1066,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.stl</mesh>
+              <mesh>pr2/shoulder_v0/shoulder_lift.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.dae</mesh>
+                  <mesh>pr2/shoulder_v0/shoulder_lift.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1108,13 +1108,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll_L.stl</mesh>
+              <mesh>pr2/shoulder_v0/upper_arm_roll_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll.stl</mesh>
+                  <mesh>pr2/shoulder_v0/upper_arm_roll.stl</mesh>
                   <material>PR2/RollLinks</material>
               </visual>
           </geom:trimesh>
@@ -1122,13 +1122,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.stl</mesh>
+              <mesh>pr2/upper_arm_v0/upper_arm.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.dae</mesh>
+                  <mesh>pr2/upper_arm_v0/upper_arm.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1165,13 +1165,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.stl</mesh>
+              <mesh>pr2/upper_arm_v0/elbow_flex.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.dae</mesh>
+                  <mesh>pr2/upper_arm_v0/elbow_flex.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1208,13 +1208,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll_L.stl</mesh>
+              <mesh>pr2/upper_arm_v0/forearm_roll_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll.stl</mesh>
+                  <mesh>pr2/upper_arm_v0/forearm_roll.stl</mesh>
                   <material>PR2/RollLinks</material>
               </visual>
           </geom:trimesh>
@@ -1222,13 +1222,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/forearm.stl</mesh>
+              <mesh>pr2/forearm_v0/forearm.stl</mesh>
               <genTexCoord>false</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/forearm.dae</mesh>
+                  <mesh>pr2/forearm_v0/forearm.dae</mesh>
               </visual>
           </geom:trimesh>
           <sensor:camera name="l_forearm_cam_sensor">
@@ -1291,13 +1291,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.stl</mesh>
+              <mesh>pr2/forearm_v0/wrist_flex.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.dae</mesh>
+                  <mesh>pr2/forearm_v0/wrist_flex.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1333,13 +1333,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll_L.stl</mesh>
+              <mesh>pr2/forearm_v0/wrist_roll_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll.stl</mesh>
+                  <mesh>pr2/forearm_v0/wrist_roll.stl</mesh>
                   <material>PR2/RollLinks</material>
               </visual>
           </geom:trimesh>
@@ -1358,13 +1358,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.stl</mesh>
+              <mesh>pr2/gripper_v0/gripper_palm.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.dae</mesh>
+                  <mesh>pr2/gripper_v0/gripper_palm.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1408,7 +1408,7 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+06</kp>
@@ -1418,7 +1418,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1466,7 +1466,7 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+07</kp>
@@ -1476,7 +1476,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1524,7 +1524,7 @@
               <xyz>0 0 0</xyz>
               <rpy>-180 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+06</kp>
@@ -1534,7 +1534,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1582,7 +1582,7 @@
               <xyz>0 0 0</xyz>
               <rpy>-180 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+07</kp>
@@ -1592,7 +1592,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1640,12 +1640,12 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/tilting_laser_v0/tilting_hokuyo_L.stl</mesh>
+              <mesh>pr2/tilting_laser_v0/tilting_hokuyo_L.stl</mesh>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/tilting_laser_v0/tilting_hokuyo.dae</mesh>
+                  <mesh>pr2/tilting_laser_v0/tilting_hokuyo.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>false</turnGravityOff>
@@ -1701,13 +1701,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.stl</mesh>
+              <mesh>pr2/shoulder_v0/shoulder_pan.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.dae</mesh>
+                  <mesh>pr2/shoulder_v0/shoulder_pan.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1743,13 +1743,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.stl</mesh>
+              <mesh>pr2/shoulder_v0/shoulder_lift.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.dae</mesh>
+                  <mesh>pr2/shoulder_v0/shoulder_lift.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1785,13 +1785,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll_L.stl</mesh>
+              <mesh>pr2/shoulder_v0/upper_arm_roll_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll.stl</mesh>
+                  <mesh>pr2/shoulder_v0/upper_arm_roll.stl</mesh>
                   <material>PR2/RollLinks</material>
               </visual>
           </geom:trimesh>
@@ -1799,13 +1799,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.stl</mesh>
+              <mesh>pr2/upper_arm_v0/upper_arm.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.dae</mesh>
+                  <mesh>pr2/upper_arm_v0/upper_arm.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1842,13 +1842,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.stl</mesh>
+              <mesh>pr2/upper_arm_v0/elbow_flex.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.dae</mesh>
+                  <mesh>pr2/upper_arm_v0/elbow_flex.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -1885,13 +1885,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll_L.stl</mesh>
+              <mesh>pr2/upper_arm_v0/forearm_roll_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll.stl</mesh>
+                  <mesh>pr2/upper_arm_v0/forearm_roll.stl</mesh>
                   <material>PR2/RollLinks</material>
               </visual>
           </geom:trimesh>
@@ -1899,13 +1899,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/forearm.stl</mesh>
+              <mesh>pr2/forearm_v0/forearm.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/forearm.dae</mesh>
+                  <mesh>pr2/forearm_v0/forearm.dae</mesh>
               </visual>
           </geom:trimesh>
           <sensor:camera name="r_forearm_cam_sensor">
@@ -1968,13 +1968,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.stl</mesh>
+              <mesh>pr2/forearm_v0/wrist_flex.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.dae</mesh>
+                  <mesh>pr2/forearm_v0/wrist_flex.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -2010,13 +2010,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll_L.stl</mesh>
+              <mesh>pr2/forearm_v0/wrist_roll_L.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll.stl</mesh>
+                  <mesh>pr2/forearm_v0/wrist_roll.stl</mesh>
                   <material>PR2/RollLinks</material>
               </visual>
           </geom:trimesh>
@@ -2035,13 +2035,13 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.stl</mesh>
+              <mesh>pr2/gripper_v0/gripper_palm.stl</mesh>
               <genTexCoord>true</genTexCoord>
               <visual>
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.dae</mesh>
+                  <mesh>pr2/gripper_v0/gripper_palm.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -2085,7 +2085,7 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+06</kp>
@@ -2095,7 +2095,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -2143,7 +2143,7 @@
               <xyz>0 0 0</xyz>
               <rpy>0 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+07</kp>
@@ -2153,7 +2153,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -2201,7 +2201,7 @@
               <xyz>0 0 0</xyz>
               <rpy>-180 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+06</kp>
@@ -2211,7 +2211,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
@@ -2259,7 +2259,7 @@
               <xyz>0 0 0</xyz>
               <rpy>-180 -0 0</rpy>
               <scale>1 1 1</scale>
-              <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
               <mu1>500</mu1>
               <mu2>500</mu2>
               <kp>1e+07</kp>
@@ -2269,7 +2269,7 @@
                   <xyz>0 0 0</xyz>
                   <rpy>0 -0 0</rpy>
                   <scale>1 1 1</scale>
-                  <mesh>/home/hsu/projects/unstable_release/stacks/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
               </visual>
           </geom:trimesh>
           <turnGravityOff>true</turnGravityOff>
