@@ -341,13 +341,14 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
       result.set_mesh_type( msgs::Visual::PLANE );
     else if (geomElem->GetName() == "image")
     {
-      scale.x = scale.y = geomElem->GetValueDouble("scale");
+      scale.x = geomElem->GetValueDouble("scale");
+      scale.y = geomElem->GetValueDouble("scale");
       scale.z = geomElem->GetValueDouble("height");
       result.set_mesh_type( msgs::Visual::IMAGE );
     }
     else if (geomElem->GetName() == "heightmap")
     {
-      scale= geomElem->GetValueDouble("size");
+      scale= geomElem->GetValueVector3("size");
       result.set_mesh_type( msgs::Visual::HEIGHTMAP );
     }
     else if (geomElem->GetName() == "mesh")
