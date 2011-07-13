@@ -81,7 +81,7 @@ void Geom::Load( sdf::ElementPtr &_sdf )
   Entity::Load(_sdf);
 
   if (this->shape)
-    this->shape->Load(this->sdf->GetElement("geometry"));
+    this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
 

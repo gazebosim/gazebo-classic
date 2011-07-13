@@ -17,7 +17,6 @@
 /* Desc: Dynamic line generator
  * Author: Nate Koenig
  * Date: 28 June 2007
- * CVS: $Id$
  */
 
 #include "rendering/ogre.h"

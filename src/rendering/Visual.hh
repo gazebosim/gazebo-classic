@@ -200,10 +200,14 @@ namespace gazebo
       public: math::Vector3 GetBoundingBoxSize() const;
   
       /// \brief Add a line to the visual
-      public: DynamicLines *AddDynamicLine(RenderOpType type);
+      public: DynamicLines *CreateDynamicLine(RenderOpType type);
   
       /// \brief Delete a dynamic line
       public: void DeleteDynamicLine(DynamicLines *line);
+
+      /// \brief Attach a vertex of a line to the position of the visual 
+      public: void AttachLineVertex( DynamicLines *_line, 
+                                     unsigned int _index );
   
       /// \brief Get the name of the material
       public: std::string GetMaterialName() const;
@@ -243,6 +247,8 @@ namespace gazebo
   
       // List of all the lines created
       private: std::list<DynamicLines*> lines;
+
+      private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
 
       private: std::string name;
 

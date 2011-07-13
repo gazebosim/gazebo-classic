@@ -48,7 +48,7 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the map
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load( sdf::ElementPtr _sdf );
 
       /// \brief Init the map
       public: virtual void Init();

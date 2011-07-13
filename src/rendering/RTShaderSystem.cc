@@ -360,52 +360,52 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
   Ogre::SceneManager *sceneMgr;
   sceneMgr = this->shaderGenerator->getActiveSceneManager();
 
-	// Grab the scheme render state.												
-	Ogre::RTShader::RenderState* schemRenderState = this->shaderGenerator->getRenderState(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-{
-		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+  // Grab the scheme render state.												
+  Ogre::RTShader::RenderState* schemRenderState = this->shaderGenerator->getRenderState(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-		// 3 textures per directional light
-		sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-		sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
-		sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
-		sceneMgr->setShadowTextureSettings(1024, 3, Ogre::PF_FLOAT32_R);
-		sceneMgr->setShadowTextureSelfShadow(true);
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
-		// Set up caster material - this is just a standard depth/shadow map caster
-		sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
-		
-		
-		// Disable fog on the caster pass.
-		Ogre::MaterialPtr passCaterMaterial = Ogre::MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
-		Ogre::Pass* pssmCasterPass = passCaterMaterial->getTechnique(0)->getPass(0);
-		pssmCasterPass->setFog(true);
+  // 3 textures per directional light
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
+  sceneMgr->setShadowTextureSettings(1024, 3, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureSelfShadow(true);
 
-		// shadow camera setup
-    Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
-		pssmSetup->calculateSplitPoints(3, 1, 1000);
-		pssmSetup->setSplitPadding(10);
-		pssmSetup->setOptimalAdjustFactor(0, 2);
-		pssmSetup->setOptimalAdjustFactor(1, 1);
-		pssmSetup->setOptimalAdjustFactor(2, 0.5);
+  // Set up caster material - this is just a standard depth/shadow map caster
+  sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
 
-		sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
-		Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
-		Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
-		const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
-		Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
+  // Disable fog on the caster pass.
+  Ogre::MaterialPtr passCaterMaterial = Ogre::MaterialManager::getSingleton().getByName("PSSM/shadow_caster");
+  Ogre::Pass* pssmCasterPass = passCaterMaterial->getTechnique(0)->getPass(0);
+  pssmCasterPass->setFog(true);
 
-		for (unsigned int i=0; i < srcSplitPoints.size(); ++i)
-		{
-			dstSplitPoints.push_back(srcSplitPoints[i]);
-		}
+  // shadow camera setup
+  Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
+  pssmSetup->calculateSplitPoints(3, 1, 1000);
+  pssmSetup->setSplitPadding(10);
+  pssmSetup->setOptimalAdjustFactor(0, 2);
+  pssmSetup->setOptimalAdjustFactor(1, 1);
+  pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
-		pssm3SubRenderState->setSplitPoints(dstSplitPoints);
-		schemRenderState->addTemplateSubRenderState(subRenderState);		
-	}
+  sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
-	this->shaderGenerator->invalidateScheme(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
+  Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
+  const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
+  Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
+
+  for (unsigned int i=0; i < srcSplitPoints.size(); ++i)
+  {
+    dstSplitPoints.push_back(srcSplitPoints[i]);
+  }
+
+  pssm3SubRenderState->setSplitPoints(dstSplitPoints);
+  schemRenderState->addTemplateSubRenderState(subRenderState);		
+
+
+  this->shaderGenerator->invalidateScheme(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
   this->UpdateShaders();
 }

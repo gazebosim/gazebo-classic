@@ -36,6 +36,8 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Model.hh"
 
+#include "transport/Node.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -119,6 +121,8 @@ void Model::Load( sdf::ElementPtr &_sdf )
 {
   Entity::Load(_sdf);
 
+  this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
+
   this->SetStatic( this->sdf->GetValueBool("static") );
 
   // TODO: check for duplicate model, and raise an error
@@ -159,7 +163,6 @@ void Model::Load( sdf::ElementPtr &_sdf )
 void Model::Init()
 {
   math::Pose pose;
-
 
   // Get the position and orientation of the model (relative to parent)
   pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
@@ -614,6 +617,13 @@ void Model::LoadJoint( sdf::ElementPtr &_sdf )
 
   if (this->GetJoint( joint->GetName() ) != NULL)
     gzthrow( "can't have two joint with the same name");
+
+  msgs::Joint msg;
+  msgs::Init(msg, joint->GetName() );
+  msg.set_type( msgs::Joint::REVOLUTE );
+  msg.set_parent( joint->GetParent()->GetScopedName() );
+  msg.set_child( joint->GetChild()->GetScopedName() );
+  this->jointPub->Publish(msg);
 
   this->joints.push_back( joint );
 }

@@ -33,6 +33,7 @@ SET (files
             terrain_texture.jpg
             willowMap.png
             WoodPallet.png 
+            test.png
 )
 
 

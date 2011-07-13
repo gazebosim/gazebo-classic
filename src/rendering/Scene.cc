@@ -32,6 +32,7 @@
 #include "rendering/Camera.hh"
 #include "rendering/Grid.hh"
 #include "rendering/SelectionObj.hh"
+#include "rendering/DynamicLines.hh"
 
 #include "rendering/RTShaderSystem.hh"
 #include "transport/Transport.hh"
@@ -139,8 +140,9 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
+  this->worldSceneNode = this->manager->getRootSceneNode()->createChildSceneNode(this->GetName() + "__world_node__");
+
   RTShaderSystem::Instance()->AddScene(this);
-  RTShaderSystem::Instance()->ApplyShadows(this);
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();
@@ -168,27 +170,7 @@ void Scene::Init()
   if (this->sdf->HasElement("shadows") && 
       this->sdf->GetElement("shadows")->GetValueBool("enabled"))
   {
-    gzdbg << "Apply shadows\n";
-    sdf::ElementPtr shadowElem = this->sdf->GetElement("shadows");
-
-    //this->SetShadows( shadowElem->GetValueColor("rgba") );
-    //this->manager->setShadowTextureSize( 512);
-    //this->manager->setShadowTextureCount( 4 );
-    //this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-
-
-    //if (*shadowElem-GetAttribute("type") == "stencil_additive")
-    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-    //else if (*shadowElem-GetAttribute("type") == "stencil_modulative")
-    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-    //else if (*shadowElem-GetAttribute("type") == "texture_additive")
-    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
-    //else if (*shadowElem-GetAttribute("type") == "texture_modulative")
-    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-    //else if (*shadowElem-GetAttribute("type") == "texture_additive_integrated")
-    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-    //else if (*shadowElem-GetAttribute("type") == "texture_modulative_integrated")
-    //  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+    RTShaderSystem::Instance()->ApplyShadows(this);
   }
 
   // Send a request to get the current world state
@@ -344,6 +326,18 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
     cam = this->userCameras[index];
 
   return cam;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a visual by name 
+Visual *Scene::GetVisual( const std::string &_name ) const
+{
+  Visual_M::const_iterator iter = this->visuals.find(_name);
+  if (iter != this->visuals.end())
+    return iter->second;
+  else 
+    return NULL;
 }
 
 
@@ -814,6 +808,12 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
     this->lightMsgs.push_back( lm );
   }
 
+  for (int i=0; i < _msg->joint_size(); i++)
+  {
+    boost::shared_ptr<msgs::Joint> jm( new msgs::Joint(_msg->joint(i)) );
+    this->jointMsgs.push_back(jm);
+  }
+
   if (_msg->has_ambient())
     this->SetAmbientColor( msgs::Convert(_msg->ambient()) );
 
@@ -823,8 +823,8 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   if (_msg->has_sky_material())
     this->SetSky(_msg->sky_material());
 
-  if (_msg->has_shadows())
-    this->SetShadows( msgs::Convert( _msg->shadows().color() ) );
+  if (_msg->has_shadows() && _msg->shadows())
+    RTShaderSystem::Instance()->ApplyShadows(this);
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -843,6 +843,7 @@ void Scene::PreRender()
   VisualMsgs_L::iterator vIter;
   LightMsgs_L::iterator lIter;
   PoseMsgs_L::iterator pIter;
+  JointMsgs_L::iterator jIter;
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin(); 
@@ -867,6 +868,15 @@ void Scene::PreRender()
     this->ProcessLightMsg( *lIter );
   }
   this->lightMsgs.clear();
+
+  // Process the joint messages
+  for (jIter =  this->jointMsgs.begin(); 
+       jIter != this->jointMsgs.end(); jIter++)
+  {
+    this->ProcessJointMsg( *jIter );
+  }
+  this->jointMsgs.clear();
+
 
   // Process all the Pose messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
@@ -898,6 +908,39 @@ void Scene::PreRender()
   }
 }
 
+
+void Scene::ReceiveJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->jointMsgs.push_back(_msg);
+}
+
+void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
+{
+  Visual *parentVis = this->GetVisual(_msg->parent());
+  Visual *childVis = this->GetVisual(_msg->child());
+
+  if (parentVis && childVis)
+  {
+    gzdbg << "Here Parent[" << _msg->parent() << "] Child[" << _msg->child() << "]\n";
+    DynamicLines *line= new DynamicLines();
+    this->worldSceneNode->attachObject(line);
+
+    line->AddPoint( math::Vector3(0,0,0) );
+    line->AddPoint( math::Vector3(0,0,0) );
+
+    parentVis->AttachLineVertex( line, 0);
+    childVis->AttachLineVertex( line, 1);
+  }
+  else
+  {
+    gzwarn << "Unable to create joint visual.\n";
+    if (!parentVis)
+      gzdbg << "No parent[" << _msg->parent() << "]\n";
+    if (!childVis)
+      gzdbg << "No child[" << _msg->child() << "]\n";
+  }
+}
 
 void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
 {
@@ -976,12 +1019,6 @@ void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
 {
   this->selectionMsg = _msg;
-}
-
-void Scene::SetShadows(const common::Color &_color)
-{
-  this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-  this->manager->setShadowColour( Conversions::Color(_color) );
 }
 
 void Scene::SetSky(const std::string &_material)

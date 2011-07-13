@@ -101,7 +101,7 @@ void UserCamera::Init()
   this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 
   // The lines draw a visualization of the camera
-  DynamicLines *line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
+  DynamicLines *line = this->visual->CreateDynamicLine( RENDERING_LINE_LIST );
 
   float f = 0.2;
 

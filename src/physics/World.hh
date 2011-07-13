@@ -172,6 +172,7 @@ namespace gazebo
       private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
 
       private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
+      private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);
 
       private: void OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &data);
 
@@ -211,7 +212,7 @@ namespace gazebo
       private: transport::NodePtr node;    
       private: transport::PublisherPtr selectionPub, scenePub;
       private: transport::PublisherPtr statPub, worldPub, newEntityPub;
-      private: transport::SubscriberPtr visSub, sceneSub, controlSub, factorySub;
+      private: transport::SubscriberPtr visSub, sceneSub, controlSub, factorySub, jointSub;
 
       private: msgs::WorldStatistics worldStatsMsg;
       private: msgs::Scene sceneMsg;

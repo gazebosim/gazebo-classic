@@ -151,6 +151,8 @@ namespace gazebo
       private: BodyPtr canonicalBody;
 
       private: Joint_V joints;
+
+      private: transport::PublisherPtr jointPub;
     };
   }
 }

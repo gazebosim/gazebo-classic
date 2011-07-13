@@ -231,7 +231,7 @@ std::string Light::GetName() const
 void Light::CreateVisual()
 {
   // The lines draw a visualization of the camera
-  this->line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
+  this->line = this->visual->CreateDynamicLine( RENDERING_LINE_LIST );
 
   std::string lightType = this->sdf->GetValueString("type");
 

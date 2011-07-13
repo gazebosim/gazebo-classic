@@ -678,7 +678,7 @@ bool Visual::GetVisible() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-void Visual::SetPosition( const math::Vector3 &pos)
+void Visual::SetPosition( const math::Vector3 &_pos)
 {
   /*if (this->IsStatic() && this->staticGeom)
   {
@@ -688,9 +688,18 @@ void Visual::SetPosition( const math::Vector3 &pos)
     //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
   }*/
 
-  this->sceneNode->setPosition(pos.x, pos.y, pos.z);
+  this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
+
+  std::list< std::pair<DynamicLines*, unsigned int> >::iterator iter;
+  for (iter = this->lineVertices.begin(); iter != this->lineVertices.end(); iter++)
+  {
+    iter->first->SetPoint( iter->second, 
+        Conversions::Vector3(this->sceneNode->_getDerivedPosition()) );
+    iter->first->Update();
+  }
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
@@ -848,7 +857,7 @@ math::Vector3 Visual::GetBoundingBoxSize() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
-DynamicLines *Visual::AddDynamicLine(RenderOpType type)
+DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 {
   this->preRenderConnection = event::Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 
@@ -873,6 +882,14 @@ void Visual::DeleteDynamicLine(DynamicLines *line)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Attach a vertex of a line to the position of the visual 
+void Visual::AttachLineVertex( DynamicLines *_line, unsigned int _index )
+{
+  this->lineVertices.push_back( std::make_pair(_line, _index) );
+  _line->SetPoint( _index, this->GetWorldPose().pos);
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the name of the material
 std::string Visual::GetMaterialName() const

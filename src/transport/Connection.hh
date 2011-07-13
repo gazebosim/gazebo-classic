@@ -79,7 +79,7 @@ namespace gazebo
       private: void Cancel();
 
       /// \brief Read data from the socket
-      public: void Read(std::string &data);
+      public: bool Read(std::string &data);
 
       /// \brief Write data to the socket
       public: void EnqueueMsg(const std::string &buffer, bool force = false);

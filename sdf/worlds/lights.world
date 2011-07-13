@@ -4,7 +4,7 @@
     <scene>
       <ambient rgba="0.0 0.0 0.0 1"/>
       <background rgba="0 0 0 1.0"/>
-      <shadows enabled="true" rgba="1.0 0.0 0.0 1.0" type="texture_modulative"/>
+      <shadows enabled="false"/>
     </scene>
 
     <physics type="ode">
@@ -53,7 +53,7 @@
 
     <light type="directional" name="directional" cast_shadows="true">
       <origin pose="0 -2 2 0 0 0"/>
-      <diffuse rgba="0 0 .5 1"/>
+      <diffuse rgba="0 0 1 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="100" constant="0.2" linear="0.01" quadratic="0.0"/>
       <direction xyz="0 0 -1"/>

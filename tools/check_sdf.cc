@@ -25,8 +25,8 @@ int main(int argc, char** argv)
   }
   
 
-  sdf->PrintDescription();
-//  sdf->PrintValues();
+//  sdf->PrintDescription();
+  sdf->PrintValues();
 
   return 0;
 }

@@ -68,7 +68,6 @@ namespace gazebo
 
     msgs::Light      LightFromSDF(sdf::ElementPtr _sdf);
     msgs::Visual     VisualFromSDF(sdf::ElementPtr _sdf);
-    msgs::Shadows    ShadowsFromSDF(sdf::ElementPtr _sdf);
     msgs::Fog        FogFromSDF(sdf::ElementPtr _sdf);
     msgs::Scene      SceneFromSDF(sdf::ElementPtr _sdf);
 

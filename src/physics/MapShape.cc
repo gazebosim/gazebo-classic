@@ -68,15 +68,16 @@ void MapShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void MapShape::Load( sdf::ElementPtr &_sdf )
+void MapShape::Load( sdf::ElementPtr _sdf )
 {
   Shape::Load(_sdf);
+
   std::string imageFilename = _sdf->GetValueString("filename");
 
   // Make sure they are ok
   if (_sdf->GetValueDouble("scale") <= 0) 
     _sdf->GetAttribute("scale")->Set( 0.1 );
-  if (this->sdf->GetValueDouble("threshold") <=0) 
+  if (this->sdf->GetValueInt("threshold") <=0) 
     _sdf->GetAttribute("threshold")->Set(200);
   if (this->sdf->GetValueDouble("height") <= 0) 
     _sdf->GetAttribute("height")->Set( 1.0 );
@@ -114,7 +115,7 @@ void MapShape::Init()
 
 //////////////////////////////////////////////////////////////////////////////
 // Create the ODE boxes
-void MapShape::CreateBoxes(QuadNode *node)
+void MapShape::CreateBoxes(QuadNode * /*_node*/)
 {
   /*TODO: fix this to use SDF 
   if (node->leaf)
@@ -375,10 +376,10 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
       pixColor = this->mapImage->GetPixel(x, y);
 
       v = (unsigned char)(255 * ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
-      if (this->sdf->GetValueBool("negative"))
-        v = 255 - v;
+      //if (this->sdf->GetValueBool("negative"))
+        //v = 255 - v;
 
-      if (v > this->sdf->GetValueDouble("threshold"))
+      if (v > this->sdf->GetValueInt("threshold"))
         freePixels++;
       else
         occPixels++;

@@ -46,12 +46,12 @@ void BoxShape::Load( sdf::ElementPtr &_sdf )
 // Initialize the box
 void BoxShape::Init()
 {
-  this->SetSize( this->sdf->GetElement("box")->GetValueVector3("size") );
+  this->SetSize( this->sdf->GetValueVector3("size") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size of the box
 void BoxShape::SetSize( const math::Vector3 &size )
 {
-  this->sdf->GetElement("box")->GetAttribute("size")->Set( size );
+  this->sdf->GetAttribute("size")->Set( size );
 }

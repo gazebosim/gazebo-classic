@@ -12,8 +12,6 @@
 
   <element name="shadows" required="0">
     <attribute name="enabled" type="bool" default="true" required="1"/>
-    <attribute name="rgba" type="color" default="0 0 0 1.0" required="1"/>
-    <attribute name="type" type="string" default="texture_gpu" required="0"/>
   </element>
 
   <element name="fog" required="0">

@@ -142,6 +142,12 @@ namespace gazebo
   
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute( Attribute, int index, double value) = 0;
+
+      /// \brief Get the child link
+      public: BodyPtr GetChild() const;
+
+      /// \brief Get the child link
+      public: BodyPtr GetParent() const;
     
       /// The first body this joint connects to
       protected: BodyPtr childBody;

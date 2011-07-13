@@ -343,7 +343,7 @@ GeomPtr ODEPhysics::CreateGeom(const std::string &type, BodyPtr body)
     shape.reset( new ODETrimeshShape(geom) );
   else if ( type == "heightmap")
     shape.reset( new ODEHeightmapShape(geom) );
-  else if ( type == "map")
+  else if ( type == "map" || type == "image" )
     shape.reset( new MapShape(geom) );
   else
     gzerr << "Unable to create geom of type[" << type << "]\n";

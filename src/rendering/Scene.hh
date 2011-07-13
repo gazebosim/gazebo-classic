@@ -120,7 +120,10 @@ namespace gazebo
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(unsigned int index) const;
   
-  
+
+      /// \brief Get a visual by name 
+      public: Visual *GetVisual( const std::string &_name ) const;
+
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking. 
       /// \param camera The ogre camera, used to do mouse picking
@@ -163,7 +166,6 @@ namespace gazebo
       /// \brief Deprecated: use RTShader::ApplyShadows
       //public: void InitShadows();
 
-      public: void SetShadows(const common::Color &_color);
       public: void SetSky(const std::string &_material);
 
       // \brief Get the mesh information for the given mesh.
@@ -177,6 +179,9 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
   
+      private: void ReceiveJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
+      private: void ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
+
       private: void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
       private: void ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg);
 
@@ -217,12 +222,17 @@ namespace gazebo
 
       typedef std::list<boost::shared_ptr<msgs::Scene const> > SceneMsgs_L;
       private: SceneMsgs_L sceneMsgs;
-  
+
+      typedef std::list<boost::shared_ptr<msgs::Joint const> > JointMsgs_L;
+      private: JointMsgs_L jointMsgs;
+
+ 
       typedef std::map<std::string, Visual*> Visual_M;
       private: Visual_M visuals;
 
       typedef std::map<std::string, Light*> Light_M;
       private: Light_M lights;
+
 
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;
 
@@ -239,6 +249,8 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
       private: SelectionObj *selectionObj;
+
+      private: Ogre::SceneNode *worldSceneNode;
     };
   }
 }

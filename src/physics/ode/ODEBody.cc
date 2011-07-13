@@ -134,12 +134,6 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
   self->SetWorldPose(pose);
-
-  /*pose = self->GetRelativePose().GetInverse() + pose;
-  pose.Correct();
-
-  self->SetWorldPose(pose);
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,8 +156,7 @@ void ODEBody::SetGravityMode(bool mode)
 {
   if (this->bodyId)
   {
-    gzdbg << "Set Gravity Mode[" << mode << "]\n";
-    //dBodySetGravityMode(this->bodyId, mode ? 1: 0);
+    dBodySetGravityMode(this->bodyId, mode ? 1: 0);
   }
 }
 

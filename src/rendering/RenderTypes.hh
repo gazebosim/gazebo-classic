@@ -27,11 +27,13 @@ namespace gazebo
     class Light;
     class Camera;
     class UserCamera;
+    class DynamicLines;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;
     typedef boost::shared_ptr<Camera> CameraPtr;
     typedef boost::shared_ptr<UserCamera> UserCameraPtr;
+    typedef boost::shared_ptr<DynamicLines> DynamicLinesPtr;
 
     enum RenderOpType 
     {

@@ -39,6 +39,8 @@ Connection::Connection()
   this->acceptor = NULL;
   this->readThread = NULL;
   this->readQuit = false;
+  //boost::asio::socket_base::send_buffer_size(8192*1);
+  //boost::asio::socket_base::receive_buffer_size(8192*1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,9 +157,12 @@ void Connection::EnqueueMsg(const std::string &buffer, bool force)
     return;
   }
 
-  boost::mutex::scoped_lock( *this->writeMutex );
-  this->writeQueue.push_back(header_stream.str());
-  this->writeQueue.push_back(buffer);
+  {
+    boost::mutex::scoped_lock( *this->writeMutex );
+    this->writeQueue.push_back(header_stream.str());
+    this->writeQueue.push_back(buffer);
+  }
+  //gzdbg << "Enque Size[" << this->writeQueue.size() << "]\n";
 
   if (force)
     this->ProcessWriteQueue();
@@ -182,6 +187,8 @@ void Connection::ProcessWriteQueue()
       for (i=sum; i < this->writeQueue.size(); i++)
         buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
       this->writeCounts.push_back( buffer.size() );
+
+      //gzdbg << "Write Sum[" << sum << "] QueueSize[" << this->writeQueue.size() << "] Counts[" << this->writeCounts.size() << "] Buffer[" << buffer.size() << "]\n";
 
       // Write the serialized data to the socket. We use
       // "gather-write" to send both the head and the data in
@@ -223,7 +230,9 @@ void Connection::OnWrite(const boost::system::error_code &e)
     for (unsigned int i=0; i < this->writeCounts[0]; i++)
       this->writeQueue.pop_front();
 
+    //gzdbg << "OnWrite PopCount[" << this->writeCounts[0] << "]\n";
     this->writeCounts.pop_front();
+    
   }
 }
 
@@ -309,9 +318,9 @@ void Connection::Cancel()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read data from the socket
-void Connection::Read(std::string &data)
+bool Connection::Read(std::string &data)
 {
-
+  bool result = false;
   char header[HEADER_LENGTH];
   std::vector<char> incoming;
 
@@ -328,15 +337,20 @@ void Connection::Read(std::string &data)
 
   // Parse the header to get the size of the incoming data packet
   incoming_size = this->ParseHeader( header );
+  if (incoming_size > 0)
+  {
+    incoming.resize( incoming_size );
 
-  incoming.resize( incoming_size );
+    // Read in the actual data
+    this->socket.read_some( boost::asio::buffer(incoming), error );
+    if (error)
+      throw boost::system::system_error(error);
 
-  // Read in the actual data
-  this->socket.read_some( boost::asio::buffer(incoming), error );
-  if (error)
-    throw boost::system::system_error(error);
+    data = std::string(&incoming[0], incoming.size());
+    result = true;
+  }
 
-  data = std::string(&incoming[0], incoming.size());
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -393,11 +407,12 @@ std::size_t Connection::ParseHeader( const std::string &header )
   if (!(is >> std::hex >> data_size))
   {
     // Header doesn't seem to be valid. Inform the caller
-    boost::system::error_code error(boost::asio::error::invalid_argument);
+    /*boost::system::error_code error(boost::asio::error::invalid_argument);
     std::ostringstream stream;
     stream << "Invalid header[" << error.message() << "] Data Size[" 
            << data_size << "] on Connection[" << this->id << "]";
     gzthrow(stream.str());
+    */
   }
 
   return data_size;
@@ -421,12 +436,12 @@ void Connection::ReadLoop(const ReadCallback &cb)
       boost::this_thread::interruption_point();
       if (this->socket.available() >= HEADER_LENGTH)
       {
-        this->Read(data);
-        (cb)(data);
+        if (this->Read(data))
+          (cb)(data);
       }
       else
       {
-        usleep(3300);
+        usleep(1000);
         continue;
       }
     }

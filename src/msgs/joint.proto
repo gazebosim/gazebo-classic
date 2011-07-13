@@ -1,0 +1,20 @@
+package gazebo.msgs;
+import "header.proto";
+import "point.proto";
+
+message Joint
+{
+  required Header header = 1;
+  enum Type
+  {
+    REVOLUTE  = 1;
+    REVOLUTE2 = 2;
+    PRISMATIC = 3;
+    UNIVERSAL = 4;
+    BALL      = 5;
+  }
+  required Type type     = 2;
+  required string parent = 3;
+  required string child  = 4;
+  optional Point axis    = 5;
+}

@@ -6,6 +6,7 @@ import "shadows.proto";
 import "visual.proto";
 import "pose.proto";
 import "light.proto";
+import "joint.proto";
 
 message Scene
 {
@@ -13,10 +14,11 @@ message Scene
   optional Color ambient       = 2;
   optional Color background    = 3;
   optional string sky_material = 4;
-  optional Shadows shadows     = 5;
+  optional bool shadows        = 5 [default = true];
   optional Fog fog             = 6;
 
   repeated Visual visual       = 7;
   repeated Pose pose           = 8;
   repeated Light light         = 9; 
+  repeated Joint joint         = 10;
 }

@@ -117,6 +117,7 @@ void World::Load( sdf::ElementPtr _sdf )
   this->sceneSub = this->node->Subscribe("~/publish_scene", 
                                         &World::PublishScene, this);
   this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
+  this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
 
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
@@ -598,6 +599,27 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
   {
     msgs::Visual *newVis = this->sceneMsg.add_visual();
     newVis->CopyFrom(*msg);
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+// Log the joint, which allows the world to maintain the current state of
+// the scene. This in turns allows a gui to query the latest state.
+void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
+{
+  int i = 0;
+  for (; i < this->sceneMsg.joint_size(); i++)
+  {
+    if (this->sceneMsg.joint(i).header().str_id() == msg->header().str_id())
+    {
+      this->sceneMsg.mutable_joint(i)->CopyFrom(*msg);
+      break;
+    }
+  }
+
+  if (i >= this->sceneMsg.joint_size())
+  {
+    msgs::Joint *newJoint = this->sceneMsg.add_joint();
+    newJoint->CopyFrom(*msg);
   }
 }
 

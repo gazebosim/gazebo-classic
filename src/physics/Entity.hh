@@ -162,8 +162,8 @@ namespace gazebo
       private: math::Pose initialPose;
       private: math::Pose relativePose;
 
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr posePub;
+      protected: transport::NodePtr node;
+      protected: transport::PublisherPtr posePub;
       protected: transport::PublisherPtr visPub;
 
       protected: msgs::Visual *visualMsg;

@@ -25,11 +25,11 @@ set (msgs color.proto
           world_stats.proto
           world_control.proto
           entity.proto
+          joint.proto
 )
 
 set (sources msgs.cc)
 set (headers msgs.h)
-
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})

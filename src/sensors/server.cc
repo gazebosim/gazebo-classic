@@ -51,7 +51,7 @@ void Run()
   }
 }
 
-int main(int argc, char **argv)
+int main(int /*argc*/, char ** /*argv*/)
 {
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
