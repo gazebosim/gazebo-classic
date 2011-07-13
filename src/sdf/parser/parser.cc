@@ -261,16 +261,40 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     _sdf->value->SetFromString( _xml->GetText() );
   }
 
-  // Read all the attributes
   Param_V::iterator iter;
+  TiXmlAttribute *attribute = _xml->FirstAttribute();
+  // Iterate over all the attributes defined in the give XML element
+  while (attribute)
+  {
+    // Find the matching attribute in SDF
+    for (iter = _sdf->attributes.begin(); 
+         iter != _sdf->attributes.end(); iter++)
+    {
+      if ( (*iter)->GetKey() == attribute->Name() )
+      {
+        // Set the value of the SDF attribute
+        if ( !(*iter)->SetFromString( attribute->ValueStr() ) )
+        {
+          gzerr << "Unable to read attribute[" << (*iter)->GetKey() << "]\n";
+          return false;
+        }
+        break;
+      }
+    }
+
+    if (iter == _sdf->attributes.end())
+      gzwarn << "XML Attribute[" << attribute->Name() << "] in element[" << _xml->Value() << "] not defined in SDF, ignoring.\n";
+
+    attribute = attribute->Next();
+  }
+
+  // Check that all required attributes have been set
   for (iter = _sdf->attributes.begin(); 
        iter != _sdf->attributes.end(); iter++)
   {
-    const char *str = _xml->Attribute( (*iter)->GetKey().c_str() );
-    if ( str && !(*iter)->SetFromString( str ))
+    if ((*iter)->GetRequired() && !(*iter)->GetSet())
     {
-      gzerr << "Unable to read attribute[" << (*iter)->GetKey() << "]\n";
-      return false;
+      gzerr << "Required attribute[" << (*iter)->GetKey() << "] in element[" << _xml->Value() << "] is not specified in SDF.\n";
     }
   }
 

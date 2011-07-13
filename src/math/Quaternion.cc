@@ -484,3 +484,16 @@ Vector3 Quaternion::GetZAxis() const
   return Vector3(fTxz+fTwy, fTyz-fTwx, 1.0f-(fTxx+fTyy));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Equality operator
+bool Quaternion::operator==(const Quaternion &_qt) const
+{
+  return this->x == _qt.x && this->y == _qt.y && this->z == _qt.z && this->w == _qt.w;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Inequality operator
+bool Quaternion::operator!=(const Quaternion &_qt) const
+{
+  return this->x != _qt.x || this->y != _qt.y || this->z != _qt.z || this->w != _qt.w;
+}

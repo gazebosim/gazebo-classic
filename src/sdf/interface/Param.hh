@@ -76,6 +76,9 @@ namespace sdf
     public: std::string GetTypeName() const;
     public: bool GetRequired() const { return this->required; }
 
+    /// \brief Return true if the parameter has been set
+    public: bool GetSet() const { return this->set; }
+
     public: virtual boost::shared_ptr<Param> Clone() const = 0;
 
     public: bool IsBool() const;
@@ -120,6 +123,7 @@ namespace sdf
   
     protected: std::string key; 
     protected: bool required;
+    protected: bool set;
     protected: std::string typeName;
   };
   
@@ -138,6 +142,7 @@ namespace sdf
 
       this->Set(_default);
       this->defaultValue = this->value;
+      this->set = false;
     }
    
     /// \brief Destructor
@@ -202,7 +207,8 @@ namespace sdf
         }
       }
 
-      return true;
+      this->set = true;
+      return this->set;
     } 
 
     /// \brief Get the value
@@ -215,12 +221,14 @@ namespace sdf
     public: void SetValue(const T &_value)
     {
       this->value = _value;
+      this->set = true;
     }
 
     /// \brief Reset to default value
     public: virtual void Reset()
     {
       this->value = this->defaultValue;
+      this->set = false;
     }
 
     public: virtual boost::shared_ptr<Param> Clone() const

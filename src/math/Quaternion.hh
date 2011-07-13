@@ -149,6 +149,16 @@ namespace gazebo
     /// \brief Vector3 multiplication operator
     public: Vector3 operator*( const Vector3 &v ) const;
   
+    /// \brief Equality operator
+    /// \param _qt Quaternion for comparison
+    /// \return True if equal
+    public: bool operator==(const Quaternion &_qt) const;
+
+    /// \brief Inequality operator
+    /// \param _qt Quaternion for comparison
+    /// \return True if not equal
+    public: bool operator!=(const Quaternion &_qt) const;
+
     /// \brief Rotate a vector using the quaternion
     /// \return The rotated vector
     public: Vector3 RotateVector(Vector3 vec) const;

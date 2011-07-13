@@ -3,8 +3,10 @@
   <world name="default">
     <scene>
       <ambient rgba="0.5 0.5 0.5 1"/>
-      <background rgba="0 0 0 1.0"/>
-      <shadows enabled="true" rgba="0.2 0.2 0.2 1.0" type="texture_modulative"/>
+      <background rgba="0 0 0 1">
+        <sky material="Gazebo/CloudySky"/>
+      </background>
+      <shadows enabled="true"/>
     </scene>
 
     <physics type="ode">
@@ -26,7 +28,7 @@
 
         <visual>
           <geometry>
-            <plane normal="0 0 1" size="100 100" offset="0"/>
+            <plane normal="0 0 1"/>
           </geometry>
           <material script="Gazebo/GreyGrid"/>
           <cast_shadows>false</cast_shadows>

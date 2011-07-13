@@ -113,14 +113,26 @@ Pose Pose::operator-(const Pose &obj) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj
-const Pose &Pose::operator-=(const Pose &obj)
+const Pose &Pose::operator-=(const Pose &_obj)
 {
-  this->pos = this->CoordPositionSub(obj);
-  this->rot = this->CoordRotationSub(obj.rot);
+  this->pos = this->CoordPositionSub(_obj);
+  this->rot = this->CoordRotationSub(_obj.rot);
 
   return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+bool Pose::operator==(const Pose &_pose) const
+{
+  return this->pos == _pose.pos && this->rot == _pose.rot;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Pose::operator!=(const Pose &_pose) const
+{
+  return this->pos != _pose.pos || this->rot != _pose.rot;
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Multiplication operator
 Pose Pose::operator*(const Pose &pose)

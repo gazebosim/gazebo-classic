@@ -163,9 +163,12 @@ math::Pose Entity::GetRelativePose() const
 /// Set the pose of the entity relative to its parent
 void Entity::SetRelativePose(const math::Pose &pose, bool notify)
 {
-  this->relativePose = pose;
-  this->relativePose.Correct();
-  this->PoseChange(notify);
+  if (pose != this->relativePose)
+  {
+    this->relativePose = pose;
+    this->relativePose.Correct();
+    this->PoseChange(notify);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

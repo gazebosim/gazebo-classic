@@ -81,7 +81,17 @@ namespace gazebo
       /// \brief Subtraction operator
       /// \param pose Pose to subtract from this one
       /// \return The resulting pose
-      public: const Pose &operator-=(const Pose &pose);
+      public: const Pose &operator-=(const Pose &_pose);
+
+      /// \brief Equality operator
+      /// \param _pose Pose for comparison
+      /// \return True if equal
+      public: bool operator==(const Pose &_pose) const;
+
+      /// \brief Inequality operator
+      /// \param _pose Pose for comparison
+      /// \return True if not equal
+      public: bool operator!=(const Pose &_pose) const;
     
       /// \brief Multiplication operator
       public: Pose operator*(const Pose &pose);

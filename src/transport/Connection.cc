@@ -148,6 +148,8 @@ void Connection::EnqueueMsg(const std::string &buffer, bool force)
 {
   std::ostringstream header_stream;
   header_stream << std::setw(HEADER_LENGTH) << std::hex << buffer.size();
+  if (buffer.size() <= 0)
+    gzerr << "\n\nEnqueue ZERO!!!\n\n";
 
   if (!header_stream || header_stream.str().size() != HEADER_LENGTH)
   {
@@ -170,10 +172,10 @@ void Connection::EnqueueMsg(const std::string &buffer, bool force)
 
 void Connection::ProcessWriteQueue()
 {
-  boost::mutex::scoped_lock( *this->writeMutex );
 
   if (this->writeQueue.size() > 0)
   {
+    boost::mutex::scoped_lock( *this->writeMutex );
     unsigned int sum = 0;
     unsigned int i = 0;
 
@@ -407,12 +409,11 @@ std::size_t Connection::ParseHeader( const std::string &header )
   if (!(is >> std::hex >> data_size))
   {
     // Header doesn't seem to be valid. Inform the caller
-    /*boost::system::error_code error(boost::asio::error::invalid_argument);
+    boost::system::error_code error(boost::asio::error::invalid_argument);
     std::ostringstream stream;
-    stream << "Invalid header[" << error.message() << "] Data Size[" 
+    gzerr << "Invalid header[" << error.message() << "] Data Size[" 
            << data_size << "] on Connection[" << this->id << "]";
-    gzthrow(stream.str());
-    */
+    //gzthrow(stream.str());
   }
 
   return data_size;

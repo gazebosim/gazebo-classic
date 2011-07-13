@@ -33,6 +33,7 @@ std::vector<Param*> *Param::params = NULL;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Param::Param(Param *_newParam) 
+  : key(""), required(false), set(false), typeName("")
 {
   /*if (params == NULL)
     gzthrow("Param vector is NULL\n");
