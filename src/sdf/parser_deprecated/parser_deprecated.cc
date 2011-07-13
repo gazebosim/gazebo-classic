@@ -67,7 +67,7 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       else
         sdfPlugin->GetAttribute("filename")->SetFromString((const char*)pluginXml->name);
 
-      std::cout << "Getting plugin[" << sdfPlugin->GetAttribute("filename")->GetAsString() << "]\n";
+      //gzdbg << "Getting plugin[" << sdfPlugin->GetAttribute("filename")->GetAsString() << "]\n";
       for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
            dataXml != NULL; dataXml = dataXml->next)
       {
@@ -770,10 +770,12 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   }
 
   sdf::ElementPtr sdfShadow = _sdf->AddElement("shadows");
-  sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
 
   initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
-  initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
+
+  //  per pixel shading does not allow options
+  //sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
+  //initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
 
   return true;
 }
