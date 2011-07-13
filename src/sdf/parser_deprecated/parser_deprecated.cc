@@ -467,7 +467,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       // take origin of visual, multiply it by reverse traansform collision
       gazebo::math::Pose col_pose = sdfCollision->GetElement("origin")->GetValuePose("pose");
       gazebo::math::Pose vis_pose = sdfVisual->GetElement("origin")->GetValuePose("pose");
-      vis_pose = col_pose.GetInverse()*vis_pose;
+      vis_pose = col_pose*vis_pose;
       // update the sdf pose
       sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
     }

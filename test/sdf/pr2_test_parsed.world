@@ -1,8 +1,8 @@
 <gazebo version='1.0' >
   <world name='old_gazebo_xml_deprecated' >
     <scene >
-      <ambient rgba='0.5 0.5 0.5 1.0' />
-      <background rgba='0.5 0.5 0.5 1.0' >
+      <ambient rgba='0.5 0.5 0.5 0.5' />
+      <background rgba='0.5 0.5 0.5 1' >
         <sky material='Gazebo/CloudySky' />
       </background>
       <shadows enabled='0' />
@@ -29,7 +29,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='-2.2 0 -0.071 0 -0 0' />
+          <origin pose='2.2 0 -0.071 0 -0 0' />
           <geometry >
             <box size='0.01 0.01 0.01' />
           </geometry>
@@ -58,7 +58,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 -0.142 0 -0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <box size='0.01 0.01 0.01' />
           </geometry>
@@ -70,7 +70,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0.29 0 -0.851 0 -0 0' />
+          <origin pose='-0.29 0 0.851 0 -0 0' />
           <geometry >
             <box size='0.05 0.37 0.3' />
           </geometry>
@@ -83,7 +83,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 -0.051 0 -0 0' />
+          <origin pose='0 0 0.051 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/base.dae' scale='1 1 1' />
           </geometry>
@@ -122,7 +122,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -141,7 +141,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -180,7 +180,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -199,7 +199,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -238,7 +238,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -257,7 +257,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -296,7 +296,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -315,7 +315,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 -180 0 0' />
+          <origin pose='0 0 0 0 -0 0' />
           <geometry >
             <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1' />
           </geometry>
@@ -384,7 +384,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='-0.0232 0 -0.0645 0 -0 0' />
+          <origin pose='0.0232 0 0.0645 0 -0 0' />
           <geometry >
             <box size='0.01 0.01 0.01' />
           </geometry>
@@ -626,7 +626,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 180 -0 0' />
+          <origin pose='0 0 0 -180 0 0' />
           <geometry >
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
@@ -645,7 +645,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 180 -0 0' />
+          <origin pose='0 0 0 -180 0 0' />
           <geometry >
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
@@ -905,7 +905,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 180 -0 0' />
+          <origin pose='0 0 0 -180 0 0' />
           <geometry >
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
@@ -924,7 +924,7 @@
           </geometry>
         </collision>
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0' >
-          <origin pose='0 0 0 180 -0 0' />
+          <origin pose='0 0 0 -180 0 0' />
           <geometry >
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
