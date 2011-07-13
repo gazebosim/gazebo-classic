@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  if (!deprecated_sdf::initWorldFile(argv[2], sdf))
+  if (!deprecated_sdf::initWorldFile(argv[1], sdf))
   {
     std::cerr << "ERROR: parsing old xml file\n";
     return -1;

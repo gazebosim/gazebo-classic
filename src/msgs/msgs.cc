@@ -341,7 +341,8 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
       result.set_mesh_type( msgs::Visual::PLANE );
     else if (geomElem->GetName() == "image")
     {
-      scale.x = scale.y = geomElem->GetValueDouble("scale");
+      scale.x = geomElem->GetValueDouble("scale");
+      scale.y = geomElem->GetValueDouble("scale");
       scale.z = geomElem->GetValueDouble("height");
       result.set_mesh_type( msgs::Visual::IMAGE );
     }
