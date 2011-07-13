@@ -7,7 +7,7 @@
     <background rgba=".5 .0 .1 1.0">
       <sky material="Gazebo/CloudySky"/>
     </background>
-    <shadows enabled="true" rgba="0.2 0.2 0.2 1.0" type="texture_modulative"/>
+    <shadows enabled="true"/>
   </scene>
 
   <physics type="ode">
@@ -49,7 +49,7 @@
         </geometry>
         <surface>
           <friction>
-            <ode mu="1.0" mu2="0" fdir1="1.1" slip1="0.1" slip2="0.2"/>
+            <ode mu="1.0" mu2="0" fdir1="1 0 0" slip1="0.1" slip2="0.2"/>
           </friction>
           <bounce restitution_coefficient="0.5" threshold="0.2"/>
           <contact>
@@ -114,17 +114,19 @@
         <material script="Gazebo/Pioneer2Body"/>
       </visual>
   
-      <sensor name="my_sensor" type="camera" always_on="true" update_rate="3">
+      <sensor name="my_sensor" always_on="true" update_rate="3">
         <plugin name="sensor_plugin" filename="/tmp/sensor_plugin.so">  
           <sensor_funky_xml>so sensor funky</sensor_funky_xml>
           <sensor_more value="hello"/>
         </plugin>
-  
-        <origin pose="1 2 3 0 0 0"/>
-        <horizontal_fov angle="1.57"/>
-        <image width="640" height="480" format="L8"/>
-        <clip near="0.1" far="1000"/>
-        <save enabled="false" path="/tmp"/>
+ 
+        <camera> 
+          <origin pose="1 2 3 0 0 0"/>
+          <horizontal_fov angle="1.57"/>
+          <image width="640" height="480" format="L8"/>
+          <clip near="0.1" far="1000"/>
+          <save enabled="false" path="/tmp"/>
+        </camera>
       </sensor>
    
     </link>
@@ -186,17 +188,19 @@
         <material script="Gazebo/Pioneer2Body"/>
       </visual>
     
-      <sensor name="my_sensor" type="camera" always_on="true" update_rate="3">
+      <sensor name="my_sensor" always_on="true" update_rate="3">
         <plugin name="sensor_plugin" filename="/tmp/sensor_plugin.so">  
           <sensor_funky_xml>so sensor funky</sensor_funky_xml>
           <sensor_more value="hello"/>
         </plugin>
-    
-        <origin pose="1 2 3 0 0 0"/>
-        <horizontal_fov angle="1.57"/>
-        <image width="640" height="480" format="L8"/>
-        <clip near="0.1" far="1000"/>
-        <save enabled="false" path="/tmp"/>
+   
+        <camera> 
+          <origin pose="1 2 3 0 0 0"/>
+          <horizontal_fov angle="1.57"/>
+          <image width="640" height="480" format="L8"/>
+          <clip near="0.1" far="1000"/>
+          <save enabled="false" path="/tmp"/>
+        </camera>
       </sensor>
     
     </link>
@@ -222,7 +226,7 @@
     <background rgba=".1 .1 .1 1.0">
       <sky material="Gazebo/Sky"/>
     </background>
-    <shadows enabled="true" rgba="0.2 0.2 0.2 1.0" type="texture_modulative"/>
+    <shadows enabled="true"/>
   </scene>
 
   <physics type="ode">

@@ -27,7 +27,7 @@
 
         <visual>
           <geometry>
-            <plane normal="0 0 1" size="100 100" offset="0"/>
+            <plane normal="0 0 1"/>
           </geometry>
           <material script="Gazebo/Gold"/>
           <cast_shadows>false</cast_shadows>
