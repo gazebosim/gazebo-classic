@@ -35,7 +35,7 @@
         <visual cast_shadows="true" name="visual_mesh_stl" laser_retro="100.0">
           <origin pose="0.0 0.0 1.0 0.0 0.0 0.0"/>
           <geometry>
-            <mesh filename="pr2/gripper_v0/l_finger_tip.stl" scale="0.01 0.01 0.01"/>
+            <mesh filename="pr2/gripper_v0/l_finger_tip.stl" scale="1 1 1"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
             <color rgba="0.03 0.5 0.5 1.0"/>
@@ -46,7 +46,7 @@
           <origin pose="0.0 0.0 1.0 0.0 0.0 0.0"/>
           <max_contacts>250</max_contacts>
           <geometry>
-            <mesh filename="pr2/gripper_v0/l_finger_tip.stl" scale="0.01 0.01 0.01"/>
+            <mesh filename="pr2/gripper_v0/l_finger_tip.stl" scale="1 1 1"/>
           </geometry>
           <surface>
             <friction>
@@ -62,7 +62,7 @@
         <visual cast_shadows="true" name="visual_mesh_dae" laser_retro="100.0">
           <origin pose="0.0 0.0 2.0 0.0 0.0 0.0"/>
           <geometry>
-            <mesh filename="pr2/gripper_v0/l_finger_tip.dae" scale="0.01 0.01 0.01"/>
+            <mesh filename="pr2/gripper_v0/l_finger_tip.dae" scale="1 1 1"/>
           </geometry>
         </visual>
 
@@ -70,7 +70,7 @@
           <origin pose="0.0 0.0 2.0 0.0 0.0 0.0"/>
           <max_contacts>250</max_contacts>
           <geometry>
-            <mesh filename="pr2/gripper_v0/l_finger_tip.dae" scale="0.01 0.01 0.01"/>
+            <mesh filename="pr2/gripper_v0/l_finger_tip.dae" scale="1 1 1"/>
           </geometry>
           <surface>
             <friction>
