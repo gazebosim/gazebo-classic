@@ -68,12 +68,14 @@ math::Vector3 Mesh::GetMax() const
   max.y = -FLT_MAX;
   max.z = -FLT_MAX;
 
+  std::cout << "Get Max[" << this->GetName() << "] Submeshes[" << this->submeshes.size() << "]\n";
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
     math::Vector3 smax = (*iter)->GetMax();
+    std::cout << "  Vert Count[" << (*iter)->GetVertexCount() << "] Max[" << smax << "]\n";
     max.x = std::max(max.x, smax.x);
     max.y = std::max(max.y, smax.y);
     max.z = std::max(max.z, smax.z);

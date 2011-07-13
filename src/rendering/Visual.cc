@@ -191,6 +191,9 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
     this->sdf->GetAttribute("cast_shadows")->Set(msg->cast_shadows());
   }
 
+  if (msg->has_scale())
+    this->SetScale( msgs::Convert(msg->scale()) );
+
   this->Load();
   this->UpdateFromMsg(msg);
 }
@@ -1083,6 +1086,7 @@ void Visual::InsertMesh( const common::Mesh *mesh)
       gzthrow("Min bounding box is not finite[" << min << "]\n");
 
 
+    gzdbg << "Mesh[" << mesh->GetName() << "] Bounds: Min[" << min << "] Max[" << max << "]\n";
     ogreMesh->_setBounds( Ogre::AxisAlignedBox(
           Ogre::Vector3(min.x, min.y, min.z),
           Ogre::Vector3(max.x, max.y, max.z)), 
@@ -1140,7 +1144,7 @@ std::string Visual::GetMeshName() const
   else if (geomElem->HasElement("plane"))
     return "unit_plane";
   else if (geomElem->HasElement("mesh"))
-    return geomElem->GetValueString("filename");
+    return geomElem->GetElement("mesh")->GetValueString("filename");
 
   return std::string();
 }
