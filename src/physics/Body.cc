@@ -98,31 +98,37 @@ void Body::Load( sdf::ElementPtr &_sdf )
   this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
 
   // TODO: this shouldn't be in the physics sim
-  sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-  while (visualElem)
+  if (this->sdf->HasElement("visual"))
   {
-    std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "::VISUAL_" << 
-               this->visuals.size();
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      std::ostringstream visname;
+      visname << this->GetCompleteScopedName() << "::VISUAL_" << 
+        this->visuals.size();
 
-    msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-    msgs::Init(msg, visname.str());
-    msg.set_parent_id( this->GetCompleteScopedName() );
-    msg.set_is_static( this->IsStatic() );
+      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      msgs::Init(msg, visname.str());
+      msg.set_parent_id( this->GetCompleteScopedName() );
+      msg.set_is_static( this->IsStatic() );
 
-    this->visPub->Publish(msg);
-    this->visuals.push_back(msg.header().str_id());
-  
-    visualElem = this->sdf->GetNextElement("visual", visualElem); 
+      this->visPub->Publish(msg);
+      this->visuals.push_back(msg.header().str_id());
+
+      visualElem = this->sdf->GetNextElement("visual", visualElem); 
+    }
   }
  
   // Load the geometries
-  sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
-  while (collisionElem)
+  if (this->sdf->HasElement("collision"))
   {
-    // Create and Load a geom, which will belong to this body.
-    this->LoadGeom(collisionElem);
-    collisionElem = this->sdf->GetNextElement("collision", collisionElem); 
+    sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
+    while (collisionElem)
+    {
+      // Create and Load a geom, which will belong to this body.
+      this->LoadGeom(collisionElem);
+      collisionElem = this->sdf->GetNextElement("collision", collisionElem); 
+    }
   }
 }
 
