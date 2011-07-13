@@ -118,7 +118,7 @@ Visual::~Visual()
 void Visual::Init()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/visual.sdf", this->sdf );
+  sdf::initFile( "/sdf/visual.sdf", this->sdf );
 
   this->transparency = 0.0;
   this->isStatic = false;

@@ -49,7 +49,7 @@ unsigned int Camera::cameraCounter = 0;
 Camera::Camera(const std::string &namePrefix_, Scene *scene_)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/camera.sdf", this->sdf );
+  sdf::initFile( "/sdf/camera.sdf", this->sdf );
 
   this->windowId = 0;
   this->scene = scene_;

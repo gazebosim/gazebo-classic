@@ -29,7 +29,7 @@ Inertial::Inertial()
   this->products.Set(0,0,0);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/inertial.sdf", this->sdf );
+  sdf::initFile( "/sdf/inertial.sdf", this->sdf );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ Inertial::Inertial()
 Inertial::Inertial(double m)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/inertial.sdf", this->sdf );
+  sdf::initFile( "/sdf/inertial.sdf", this->sdf );
 
   this->mass = m;
   this->cog.Set(0,0,0);
@@ -50,7 +50,7 @@ Inertial::Inertial(double m)
 Inertial::Inertial(const Inertial &_inertial)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/inertial.sdf", this->sdf );
+  sdf::initFile( "/sdf/inertial.sdf", this->sdf );
 
   (*this) = _inertial;
 }

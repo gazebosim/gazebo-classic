@@ -88,9 +88,6 @@ const Mesh *MeshManager::Load(const std::string &filename)
     return NULL;
   }
 
-  struct stat st;
-  std::string fullname;
-  bool found = false;
   Mesh *mesh = NULL;
 
   std::string extension;
@@ -112,33 +109,9 @@ const Mesh *MeshManager::Load(const std::string &filename)
   }
 
 
-  fullname =  std::string("./")+filename;
-  if (stat(fullname.c_str(), &st) == 0)
-  {
-    found = true;
-  }
-  else if ( stat(filename.c_str(), &st) == 0)
-  {
-    fullname =  filename;
-    found = true;
-  }
-  else
-  {
-    std::list<std::string> gazeboPaths;
-    gazeboPaths = SystemPaths::Instance()->GetGazeboPaths();
-    for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
-        iter!=gazeboPaths.end(); ++iter)
-    {
-      fullname = (*iter)+"/Media/models/"+filename;
-      if (stat(fullname.c_str(), &st) == 0)
-      {
-        found = true;
-        break;
-      }
-    }
-  }
+  std::string fullname = SystemPaths::Instance()->FindFileWithGazeboPaths(filename);
 
-  if (found)
+  if (!fullname.empty())
   {
     extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
     std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);

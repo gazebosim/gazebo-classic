@@ -83,13 +83,6 @@ void SignalHandler( int )
 // Main function
 int main(int argc, char **argv)
 {
-  char *path = getenv("GAZEBO_RESOURCE_PATH");
-  if (!path)
-  {
-    gzerr << "GAZEBO_RESOURCE_PATH environment variable is not set. Please set to Gazebo's installation directory.\n";
-    return -1;
-  }
-
   if (ParseArgs(argc, argv) != 0)
     return -1;
 

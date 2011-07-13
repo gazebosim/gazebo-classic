@@ -57,7 +57,7 @@ Light::Light(Scene *scene_)
   this->showLightsConnection = event::Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( std::string( getenv("GAZEBO_RESOURCE_PATH") ) + "/sdf/light.sdf", this->sdf );
+  sdf::initFile( "/sdf/light.sdf", this->sdf );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

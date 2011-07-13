@@ -23,8 +23,10 @@
 #include <fstream>
 #include <sstream>
 #include <tinyxml.h>
+#include <sys/stat.h>
 
 #include "common/SystemPaths.hh"
+#include "common/Exception.hh"
 #include "common/Console.hh"
 
 using namespace gazebo;
@@ -216,4 +218,53 @@ void SystemPaths::AddPluginPaths(std::string gazebo_plugin_path)
     }
     this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,gazebo_plugin_path.size()-pos1));
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// search for file given GAZEBO_RESOURCE_PATHS
+const std::string SystemPaths::FindFileWithGazeboPaths(std::string filename) const
+{
+  struct stat st;
+  std::string fullname =  std::string("./")+filename;
+  bool found = false;
+
+  if (stat(fullname.c_str(), &st) == 0)
+  {
+    found = true;
+  }
+  else if ( stat(filename.c_str(), &st) == 0)
+  {
+    fullname =  filename;
+    found = true;
+  }
+  else
+  {
+    for (std::list<std::string>::const_iterator iter=this->gazeboPaths.begin(); 
+        iter!=this->gazeboPaths.end(); ++iter)
+    {
+      fullname = (*iter)+"/"+filename;
+      if (stat(fullname.c_str(), &st) == 0)
+      {
+        found = true;
+        break;
+      }
+      // also search under some default hardcoded subdirectories
+      // is this a good idea?
+      fullname = (*iter)+"/Media/models/"+filename;
+      if (stat(fullname.c_str(), &st) == 0)
+      {
+        found = true;
+        break;
+      }
+    }
+  }
+
+  if (!found)
+  {
+    fullname.clear();
+    gzerr << "cannot load file [" << filename << "]in GAZEBO_RESOURCE_PATHS\n";
+  }
+
+  return fullname;
+
 }
