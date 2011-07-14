@@ -142,7 +142,7 @@ void MainWindow::EditScene()
   EditSceneWidget *editScene = new EditSceneWidget();
   editScene->Init();
   editScene->show();
-  editScene->resize(800,600);
+  //editScene->resize(800,600);
 }
 
 void MainWindow::CreateBox()

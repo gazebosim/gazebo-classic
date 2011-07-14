@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QFrame>
 #include <QCheckBox>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
 
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
@@ -23,6 +25,7 @@ namespace gazebo
 
       private slots: void AmbientColor();
       private slots: void BackgroundColor();
+      private slots: void FogColor();
       private slots: void Shadows(bool _state=false);
 
       private: QPushButton *ambientColorButton;
@@ -32,6 +35,11 @@ namespace gazebo
       private: QFrame *backgroundColorFrame;
 
       private: QCheckBox *shadowsButton;
+
+      private: QPushButton *fogColorButton;
+      private: QLineEdit *fogStart;
+      private: QLineEdit *fogEnd;
+      private: QDoubleSpinBox *fogDensitySpin;
 
       protected: transport::NodePtr node;
 
