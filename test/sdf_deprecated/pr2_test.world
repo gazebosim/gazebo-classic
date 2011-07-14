@@ -81,23 +81,8 @@
     <xyz>0 0 0</xyz>	
     <rpy>0 0 0</rpy>
     <static>true</static>
-
     <body:plane name="plane">
-      <massMatrix>true</massMatrix>
-      <mass>118.001</mass>
-      <ixx>8.36506</ixx>
-      <ixy>-0.00971993</ixy>
-      <ixz>1.88991</ixz>
-      <iyy>8.46638</iyy>
-      <iyz>-0.00737958</iyz>
-      <izz>3.78747</izz>
-      <cx>0</cx> <!-- this is for inertial -->
-      <cy>0</cy>
-      <cz>0</cz>
-      <xyz>1.2 0 0</xyz> <!-- this is for body -->
-      <rpy>0 -0 0</rpy>
-      <geom:plane name="myplane">
-        <xyz>2.2 0 0</xyz> <!-- this is for collision -->
+      <geom:plane name="plane">
         <laserRetro>2000.0</laserRetro>
         <mu1>50.0</mu1>
         <mu2>50.0</mu2>
@@ -109,42 +94,11 @@
         <uvTile>100 100</uvTile>
         <material>Gazebo/GrayGrid</material>
         <visual>
-            <xyz>0 0 -0.071</xyz>
-            <rpy>0 -0 0</rpy>
-            <scale>0.01 0.01 0.01</scale>
-            <mesh>unit_box</mesh>
-            <normal>1 0 0</normal>
-            <material>Gazebo/Red</material>
+          <normal>0 0 1</normal>
         </visual>
       </geom:plane>
     </body:plane>
   </model:physical>
-
-<!--
-  <model:physical name="walls">
-    <include embedded="false">
-      <xi:include href="tests/willow-walls.model" />
-    </include>
-  </model:physical>
--->
-<!--
-  <model:physical name="willow_map">
-   <xyz>-25.65 25.65 1.0</xyz>	
-   <rpy>180 0 0</rpy>
-   <static>true</static>
-   <body:map name="willow_map_body">
-     <geom:map name="willow_map_geom">
-       <image>willowMap.png</image>
-       <threshold>200</threshold>
-       <granularity>1</granularity>
-       <negative>false</negative>
-       <scale>0.1</scale>
-       <offset>0 0 0</offset>
-       <material>Gazebo/Rocky</material>
-     </geom:map>
-   </body:map>
-  </model:physical>
--->
 
   <!-- White Point light -->
   <model:renderable name="point_white">
