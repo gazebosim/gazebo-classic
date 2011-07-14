@@ -621,8 +621,14 @@ void Model::LoadJoint( sdf::ElementPtr &_sdf )
   msgs::Joint msg;
   msgs::Init(msg, joint->GetName() );
   msg.set_type( msgs::Joint::REVOLUTE );
-  msg.set_parent( joint->GetParent()->GetScopedName() );
-  msg.set_child( joint->GetChild()->GetScopedName() );
+  if(joint->GetParent())
+    msg.set_parent( joint->GetParent()->GetScopedName() );
+  else
+    msg.set_parent( "world" );
+  if(joint->GetChild())
+    msg.set_child( joint->GetChild()->GetScopedName() );
+  if(joint->GetChild())
+    msg.set_child( "world" );
   this->jointPub->Publish(msg);
 
   this->joints.push_back( joint );

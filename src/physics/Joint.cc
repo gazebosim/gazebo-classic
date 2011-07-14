@@ -96,7 +96,10 @@ void Joint::Load(sdf::ElementPtr &_sdf)
     offset = _sdf->GetElement("origin")->GetValuePose("pose");
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = (offset + this->anchorBody->GetWorldPose()).pos ;
+  if (this->anchorBody)
+    this->anchorPos = (offset + this->anchorBody->GetWorldPose()).pos ;
+  else
+    this->anchorPos = math::Vector3(0,0,0); // default for world
 }
 
 void Joint::Init()
@@ -104,10 +107,7 @@ void Joint::Init()
   this->Attach(this->childBody, this->parentBody);
 
   // Set the anchor vector
-  if (this->anchorBody)
-  {
-    this->SetAnchor(0, this->anchorPos);
-  }
+  this->SetAnchor(0, this->anchorPos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
