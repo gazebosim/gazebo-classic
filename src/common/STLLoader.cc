@@ -132,11 +132,8 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
         vertex.y = r2;
         vertex.z = r3;
 
-        if (!subMesh->HasVertex(vertex))
-        {
-          subMesh->AddVertex(vertex);
-          subMesh->AddNormal(normal);
-        }
+        subMesh->AddVertex(vertex);
+        subMesh->AddNormal(normal);
         subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
         ivert = ivert + 1;
@@ -173,7 +170,7 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 /// Reads a binary STL (stereolithography) file.
 void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 {
-  // Unused: short int attribute = 0;
+  short int attribute = 0;
   char c;
   int i;
   int iface;
@@ -211,15 +208,12 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
       vertex.y = this->FloatRead(filein);
       vertex.z = this->FloatRead(filein);
 
-      if (!subMesh->HasVertex(vertex))
-      {
-        subMesh->AddVertex(vertex);
-        subMesh->AddNormal(normal);
-      }
+      subMesh->AddVertex(vertex);
+      subMesh->AddNormal(normal);
       subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
     }
 
-    // Unused: attribute = ShortIntRead ( filein );
+    attribute = ShortIntRead ( filein );
   }
 }
 

@@ -392,27 +392,21 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
   xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
-  if (!xyz_xml && !rpy_xml)
-  {
-    gzwarn << "INFO: xyz & rpy tag not present for link element, using default (Identity)\n";
-  }
+
+  sdf::ElementPtr origin = _sdf->AddElement("origin");
+  std::string poseStr;
+
+  if (xyz_xml) 
+    poseStr += getValue(xyz_xml) + " ";
   else
-  {
-    sdf::ElementPtr origin = _sdf->AddElement("origin");
-    std::string poseStr;
+    poseStr += "0 0 0 ";
 
-    if (xyz_xml) 
-      poseStr += getValue(xyz_xml) + " ";
-    else
-      poseStr += "0 0 0 ";
+  if (rpy_xml) 
+    poseStr += getValue(rpy_xml);
+  else
+    poseStr += "0 0 0";
 
-    if (rpy_xml) 
-      poseStr += getValue(rpy_xml);
-    else
-      poseStr += "0 0 0";
-
-    origin->GetAttribute("pose")->SetFromString( poseStr );
-  }
+  origin->GetAttribute("pose")->SetFromString( poseStr );
 
   return true;
 }
@@ -457,17 +451,19 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
     {
       sdf::ElementPtr sdfVisual = _sdf->AddElement("visual");
+
       if (!initVisual(visual_xml, sdfVisual))
       {
         gzerr << "Unable to parse visual\n";
         return false;
       }
+
       // In order to parse old gazebo xml (nested format)
       // to new sdf, we need to unwrap visual pose from within collision.
-      // take origin of visual, multiply it by reverse traansform collision
+      // take origin of visual, multiply it by collision's transform
       gazebo::math::Pose col_pose = sdfCollision->GetElement("origin")->GetValuePose("pose");
       gazebo::math::Pose vis_pose = sdfVisual->GetElement("origin")->GetValuePose("pose");
-      vis_pose = col_pose.GetInverse()*vis_pose;
+      vis_pose = col_pose*vis_pose;
       // update the sdf pose
       sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
     }
@@ -502,7 +498,9 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   sdf::ElementPtr sdfGeom = _sdf->AddElement("geometry");
 
-  if (getNodeValue(_config, "mesh") == "unit_box")
+  std::string mesh_attribute = getNodeValue(_config,"mesh");
+  // check each mesh type
+  if (mesh_attribute == "unit_box")
   {
     sdf::ElementPtr sdfBox = sdfGeom->AddElement("box");
     if (firstChildElement(_config,"scale"))
@@ -510,7 +508,7 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     else
       sdfBox->GetAttribute("size")->SetFromString("1 1 1");
   }
-  else if (getNodeValue(_config, "mesh") == "unit_sphere")
+  else if (mesh_attribute == "unit_sphere")
   {
     sdf::ElementPtr sdfSphere = sdfGeom->AddElement("sphere");
     if (firstChildElement(_config,"scale"))
@@ -518,7 +516,7 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     else
       sdfSphere->GetAttribute("radius")->SetFromString( "1.0" );
   }
-  else if (getNodeValue(_config, "mesh") == "unit_cylinder")
+  else if (mesh_attribute == "unit_cylinder")
   {
     sdf::ElementPtr sdfCylinder = sdfGeom->AddElement("cylinder");
 
@@ -533,13 +531,18 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       sdfCylinder->GetAttribute("length")->SetFromString( "1" );
     }
   }
-  else
+  else if (!mesh_attribute.empty())
   {
     sdf::ElementPtr sdfMesh = sdfGeom->AddElement("mesh");
-    sdfMesh->GetAttribute("filename")->SetFromString( getNodeValue(_config,"mesh") );
+    sdfMesh->GetAttribute("filename")->SetFromString( mesh_attribute );
 
     if (firstChildElement(_config, "scale"))
       sdfMesh->GetAttribute("scale")->SetFromString( getNodeValue(_config,"scale") );
+  }
+  else
+  {
+    sdf::ElementPtr sdfPlane = sdfGeom->AddElement("plane");
+    sdfPlane->GetAttribute("normal")->SetFromString( getNodeValue(_config, "normal") );
   }
 
   // Material

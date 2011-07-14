@@ -64,11 +64,8 @@ int main(int argc, char** argv)
   }
 
   // get info from parser
-  std::cout << "---------- Successfully Parsed XML ---------------" << std::endl;
-
   sdf->PrintValues();
 
-  std::cout << "\n";
 
   //saveXml("/tmp/test.xml", world);
   

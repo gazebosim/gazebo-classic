@@ -262,6 +262,17 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
     return false;
   }
 
+/* check gazebo version
+  if (!_sdf->root->HasElement("gazebo") ||
+       _sdf->root->GetElement("gazebo")->GetValueString("version") != "1.0")
+  {
+    gzerr << "Gazebo SDF version ["
+          << _sdf->root->GetElement("gazebo")->GetValueString("version")
+          << "] is not 1.0\n";
+    return false;
+  }
+*/
+
   return true;
 }
 
