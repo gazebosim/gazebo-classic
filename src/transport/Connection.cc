@@ -39,6 +39,7 @@ Connection::Connection()
   this->acceptor = NULL;
   this->readThread = NULL;
   this->readQuit = false;
+  this->writeQueue.clear();
   //boost::asio::socket_base::send_buffer_size(8192*1);
   //boost::asio::socket_base::receive_buffer_size(8192*1);
 }
@@ -48,6 +49,7 @@ Connection::Connection()
 Connection::~Connection()
 {
   this->Shutdown();
+  this->writeQueue.clear();
 
   delete this->writeMutex;
   IOManager::Instance()->DecCount();
@@ -72,6 +74,8 @@ void Connection::Connect(const std::string &host, unsigned short port)
     this->socket.close();
     this->socket.connect(*endpoint_iter++, error);
   }
+
+  this->writeQueue.clear();
 
   if (error)
     gzthrow ("Unable to connect to " << host << ":" << port);
@@ -144,11 +148,14 @@ void Connection::StopRead()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Write data out
-void Connection::EnqueueMsg(const std::string &buffer, bool force)
+void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
+  boost::mutex::scoped_lock( *this->writeMutex );
+
   std::ostringstream header_stream;
-  header_stream << std::setw(HEADER_LENGTH) << std::hex << buffer.size();
-  if (buffer.size() <= 0)
+
+  header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
+  if (_buffer.size() <= 0)
     gzerr << "\n\nEnqueue ZERO!!!\n\n";
 
   if (!header_stream || header_stream.str().size() != HEADER_LENGTH)
@@ -159,46 +166,63 @@ void Connection::EnqueueMsg(const std::string &buffer, bool force)
     return;
   }
 
-  {
-    boost::mutex::scoped_lock( *this->writeMutex );
-    this->writeQueue.push_back(header_stream.str());
-    this->writeQueue.push_back(buffer);
-  }
-  //gzdbg << "Enque Size[" << this->writeQueue.size() << "]\n";
+  this->writeQueue.push_back(header_stream.str());
+  this->writeQueue.push_back(_buffer);
 
-  if (force)
+  if (_force)
     this->ProcessWriteQueue();
 }
 
 void Connection::ProcessWriteQueue()
 {
+  std::list<boost::asio::const_buffer> buffer;
 
-  if (this->writeQueue.size() > 0)
   {
     boost::mutex::scoped_lock( *this->writeMutex );
-    unsigned int sum = 0;
-    unsigned int i = 0;
 
-    for (; i < this->writeCounts.size(); i++)
-      sum += this->writeCounts[i];
+    //std::cout << "ProcessWriteQueue.      Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
 
-    if (sum < this->writeQueue.size())
+    if (this->writeQueue.size() > 0)
     {
-      std::list<boost::asio::const_buffer> buffer;
+      unsigned int sum = 0;
+      unsigned int i = 0;
 
-      for (i=sum; i < this->writeQueue.size(); i++)
-        buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
-      this->writeCounts.push_back( buffer.size() );
+      for (; i < this->writeCounts.size(); i++)
+        sum += this->writeCounts[i];
 
-      //gzdbg << "Write Sum[" << sum << "] QueueSize[" << this->writeQueue.size() << "] Counts[" << this->writeCounts.size() << "] Buffer[" << buffer.size() << "]\n";
+      if (sum < this->writeQueue.size())
+      {
 
-      // Write the serialized data to the socket. We use
-      // "gather-write" to send both the head and the data in
-      // a single write operation
-      boost::asio::async_write( this->socket, buffer, 
-          boost::bind(&Connection::OnWrite, shared_from_this(), 
-            boost::asio::placeholders::error));
+        int j = this->writeQueue.size();
+        int k = this->writeCounts.size();
+        if (this->writeQueue.size() > 200)
+          std::cout << "  Sum[" << sum << "] WriteQueue[" << this->writeQueue.size() << "]\n";
+        for (i=sum; i < this->writeQueue.size(); i++)
+        {
+          //printf ("ID[%d] I[%d] Size[%d]\n", this->id, i, this->writeQueue.size());
+          if (this->writeQueue[i].empty())
+            std::cout << "  Write Queue has empty size\n";
+          buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
+        }
+        this->writeCounts.push_back( buffer.size() );
+
+        //gzdbg << "Write Sum[" << sum << "] QueueSize[" << this->writeQueue.size() << "] Counts[" << this->writeCounts.size() << "] Buffer[" << buffer.size() << "]\n";
+
+      }
     }
+
+    //std::cout << "Done ProcessWriteQueue. Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
+  }
+
+  if (buffer.size() > 0)
+  {
+    boost::mutex::scoped_lock( *this->writeMutex );
+    // Write the serialized data to the socket. We use
+    // "gather-write" to send both the head and the data in
+    // a single write operation
+    boost::asio::async_write( this->socket, buffer, 
+        boost::bind(&Connection::OnWrite, shared_from_this(), 
+          boost::asio::placeholders::error));
   }
 }
 
@@ -229,12 +253,27 @@ void Connection::OnWrite(const boost::system::error_code &e)
   else
   {
     boost::mutex::scoped_lock( *this->writeMutex );
-    for (unsigned int i=0; i < this->writeCounts[0]; i++)
-      this->writeQueue.pop_front();
+    unsigned int startSize = this->writeQueue.size();
 
-    //gzdbg << "OnWrite PopCount[" << this->writeCounts[0] << "]\n";
+    //std::cout << "On Write.      Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
+
+    //std::cout << "  Before: WriteCount[" << this->writeCounts[0] << "]  WriteQueue[" << this->writeQueue.size() << "]\n";
+
+    std::swap_ranges( this->writeQueue.begin()+this->writeCounts[0], 
+                      this->writeQueue.end(), this->writeQueue.begin());
+    this->writeQueue.resize(this->writeQueue.size() - this->writeCounts[0]);
+
+    unsigned int endSize = this->writeQueue.size();
+
+    //std::cout << "  After: WriteCount[" << this->writeCounts[0] << "]  WriteQueue[" << this->writeQueue.size() << "]\n";
+
+    /*if (endSize > startSize)
+      std::cout << "  EndSize[" << endSize << "] Larger than StartSize[" << startSize << "] [" << this->writeQueue.size() << "]\n";
+      */
+
     this->writeCounts.pop_front();
-    
+
+    //std::cout << "Done On Write. Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
   }
 }
 
@@ -403,7 +442,6 @@ unsigned short Connection::GetRemotePort() const
 std::size_t Connection::ParseHeader( const std::string &header )
 {
   std::size_t data_size = 0;
-
   std::istringstream is(header);
 
   if (!(is >> std::hex >> data_size))
@@ -412,7 +450,7 @@ std::size_t Connection::ParseHeader( const std::string &header )
     boost::system::error_code error(boost::asio::error::invalid_argument);
     std::ostringstream stream;
     gzerr << "Invalid header[" << error.message() << "] Data Size[" 
-           << data_size << "] on Connection[" << this->id << "]";
+           << data_size << "] on Connection[" << this->id << "]. Header[" << header << "]\n";
     //gzthrow(stream.str());
   }
 

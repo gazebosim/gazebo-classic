@@ -142,7 +142,7 @@ void Server::Run()
   while (!this->stop)
   {
     //sensors::run_once(true);
-    usleep(10000);
+    usleep(1000000);
   }
 
   // Stop all the worlds

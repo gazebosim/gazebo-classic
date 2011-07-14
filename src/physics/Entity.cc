@@ -221,7 +221,7 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose
-      math::Pose relative_pose = pose - this->parentEntity->GetWorldPose();
+      math::Pose relative_pose( pose - this->parentEntity->GetWorldPose());
       // relative pose is the pose relative to the parent
       // if this is called from MoveCallback, notify is false
       // FIXME: if this is called by user, and notify is true

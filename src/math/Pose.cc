@@ -29,23 +29,22 @@ using namespace math;
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructors
 Pose::Pose()
+  : pos(0,0,0), rot(0,0,0,1)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Pose::Pose( const Vector3 &pos, const Quaternion &rot)
+Pose::Pose( const Vector3 &_pos, const Quaternion &_rot)
+  : pos(_pos), rot(_rot)
 {
-  this->pos = pos;
-  this->rot = rot;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Copy constructor
-Pose::Pose( const Pose &pose )
+Pose::Pose( const Pose &_pose )
+  : pos(_pose.pos), rot(_pose.rot)
 {
-  this->pos = pose.pos;
-  this->rot = pose.rot;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,12 +100,12 @@ const Pose &Pose::operator+=(const Pose &obj)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj
-Pose Pose::operator-(const Pose &obj) const
+Pose Pose::operator-(const Pose &_obj) const
 {
   Pose result;
 
-  result.pos = this->CoordPositionSub(obj);
-  result.rot = this->CoordRotationSub(obj.rot);
+  result.pos = this->CoordPositionSub(_obj);
+  result.rot = this->CoordRotationSub(_obj.rot);
 
   return result;
 }

@@ -235,7 +235,7 @@ void Master::RunLoop()
       else
         std::cout << "Master connection has closed\n";
     }
-    usleep(100000);
+    usleep(10000);
   }
 }
 

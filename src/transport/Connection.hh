@@ -82,7 +82,7 @@ namespace gazebo
       public: bool Read(std::string &data);
 
       /// \brief Write data to the socket
-      public: void EnqueueMsg(const std::string &buffer, bool force = false);
+      public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
 
       /// \brief Get the local URI
       public: std::string GetLocalURI() const;

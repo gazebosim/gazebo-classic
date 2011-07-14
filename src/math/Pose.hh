@@ -142,7 +142,7 @@ namespace gazebo
       /// \param pose Pose to output
       /// \return the Ostream
       public: friend std::ostream &operator<<(std::ostream &out, 
-                  const gazebo::math::Pose &pose)
+                                              const gazebo::math::Pose &pose)
               {
                 out << pose.pos << " " << pose.rot;
                 return out;

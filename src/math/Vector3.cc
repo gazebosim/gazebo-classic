@@ -36,15 +36,15 @@ Vector3::Vector3()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Vector3::Vector3( const double &x, const double &y, const double &z )
-    : x(x), y(y), z(z)
+Vector3::Vector3( const double &_x, const double &_y, const double &_z )
+    : x(_x), y(_y), z(_z)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Copy Constructor
-Vector3::Vector3( const Vector3 &pt )
-    : x(pt.x), y(pt.y), z(pt.z)
+Vector3::Vector3( const Vector3 &_pt )
+    : x(_pt.x), y(_pt.y), z(_pt.z)
 {
 }
 
@@ -334,9 +334,9 @@ const Vector3 &Vector3::operator*=( double v)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equality operator
-bool Vector3::operator==( const Vector3 &pt ) const
+bool Vector3::operator==( const Vector3 &_pt ) const
 {
-  return this->x == pt.x && this->y == pt.y && this->z == pt.z;
+  return (this->x == _pt.x) && (this->y == _pt.y) && (this->z == _pt.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -92,7 +92,7 @@ namespace gazebo
   
     /// \brief Return the rotation in Euler angles
     /// \return This quaternion as an Euler vector
-    public: Vector3 GetAsEuler();
+    public: Vector3 GetAsEuler() const;
   
     /// \brief Convert euler angles to quatern.
     public: static Quaternion EulerToQuaternion( const Vector3 &vec );
@@ -196,7 +196,7 @@ namespace gazebo
     public: friend  std::ostream &operator<<( std::ostream &out, 
                 const gazebo::math::Quaternion &q )
     {
-      Vector3 v = const_cast<Quaternion*>(&q)->GetAsEuler();
+      Vector3 v( q.GetAsEuler() );
       v.x = v.x * 180.0 / M_PI;
       v.y = v.y * 180.0 / M_PI;
       v.z = v.z * 180.0 / M_PI;

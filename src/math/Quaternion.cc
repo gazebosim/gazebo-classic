@@ -113,7 +113,7 @@ Quaternion Quaternion::GetInverse() const
 // Normalize the quaternion
 void Quaternion::Normalize()
 {
-  double s;
+  double s = 0;
 
   s = sqrt(this->w * this->w + this->x * this->x + this->y * this->y + this->z * this->z);
 
@@ -191,33 +191,34 @@ void Quaternion::SetFromEuler(const Vector3 &vec)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the rotation in Euler angles
-Vector3 Quaternion::GetAsEuler()
+Vector3 Quaternion::GetAsEuler() const
 {
   Vector3 vec;
 
+  Quaternion copy = *this;
   double squ;
   double sqx;
   double sqy;
   double sqz;
 
-  this->Normalize();
+  copy.Normalize();
 
-  squ = this->w * this->w;
-  sqx = this->x * this->x;
-  sqy = this->y * this->y;
-  sqz = this->z * this->z;
+  squ = copy.w * copy.w;
+  sqx = copy.x * copy.x;
+  sqy = copy.y * copy.y;
+  sqz = copy.z * copy.z;
 
-  this->Normalize();
+  copy.Normalize();
 
   // Roll
-  vec.x = atan2(2 * (this->y*this->z + this->w*this->x), squ - sqx - sqy + sqz);
+  vec.x = atan2(2 * (copy.y*copy.z + copy.w*copy.x), squ - sqx - sqy + sqz);
 
   // Pitch
-  double sarg = -2 * (this->x*this->z - this->w * this->y);
+  double sarg = -2 * (copy.x*copy.z - copy.w * copy.y);
   vec.y = sarg <= -1.0 ? -0.5*M_PI : (sarg >= 1.0 ? 0.5*M_PI : asin(sarg));
 
   // Yaw
-  vec.z = atan2(2 * (this->x*this->y + this->w*this->z), squ + sqx - sqy - sqz);
+  vec.z = atan2(2 * (copy.x*copy.y + copy.w*copy.z), squ + sqx - sqy - sqz);
 
   return vec;
 }

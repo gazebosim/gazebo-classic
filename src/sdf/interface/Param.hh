@@ -178,8 +178,8 @@ namespace sdf
         return true;
       }
 
-      std::string tmp = _str;
-      std::string lowerTmp = _str;
+      std::string tmp( _str );
+      std::string lowerTmp( _str );
       boost::to_lower(lowerTmp);
 
       // "true" and "false" doesn't work properly

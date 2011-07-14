@@ -51,7 +51,7 @@ void physics::init_world(WorldPtr world)
 
 void physics::run_world(WorldPtr world)
 {
-    world->Start();
+  world->Start();
 }
 
 void physics::pause_world(WorldPtr world, bool pause)

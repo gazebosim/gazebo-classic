@@ -220,7 +220,6 @@ void World::RunLoop()
       this->prevStatTime = common::Time::GetWallTime();
     }
 
-
     if (this->IsPaused() && !this->stepInc)
       this->pauseTime += step;
     else
