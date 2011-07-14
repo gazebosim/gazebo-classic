@@ -133,6 +133,7 @@ Simulator::Simulator()
   nanosleep(&timeSpec, NULL);  // test sleep 1ns
   Time time2 = this->GetRealTime();
   this->min_nanosleep_time =(time2 - time1);
+  //printf("init: %f\n",this->min_nanosleep_time.Double());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -497,11 +498,13 @@ void Simulator::MainLoop()
       if (currTime - lastTime < Time(1/freq))
       {
         Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+        //printf("gui1: %f, %f\n",Time(1.0/freq).Double(),sleepTime.Double());
+        //nanosleep on some kernels are taking up about 10ms per call due to kernel time resolution
+        //check to make sure sleep time is larger than minimum sleep time
         if (this->min_nanosleep_time.Double() < 1/freq && this->min_nanosleep_time.Double() < sleepTime.Double())
         {
           timeSpec.tv_sec = sleepTime.sec;
           timeSpec.tv_nsec = sleepTime.nsec;
-
           nanosleep(&timeSpec, NULL);
         }
       }
@@ -510,6 +513,9 @@ void Simulator::MainLoop()
     else
     {
       Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+      //printf("gui2: %f, %f\n",Time(1.0/freq).Double(),sleepTime.Double());
+      //nanosleep on some kernels are taking up about 10ms per call due to kernel time resolution
+      //check to make sure sleep time is larger than minimum sleep time
       if (this->min_nanosleep_time.Double() < 1/freq && this->min_nanosleep_time.Double() < sleepTime.Double())
       {
         timeSpec.tv_sec = sleepTime.sec;
@@ -757,31 +763,30 @@ void Simulator::PhysicsLoop()
     // is less efficient, but allows changing update rate dynamically
     double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
     Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+    //printf("debug: %f %f\n", 1.0 / physicsUpdateRate, physicsUpdateRate);
     // If the physicsUpdateRate < 0, then we should try to match the
     // update rate to real time
-    if ( physicsUpdateRate < 0 &&
-        (this->GetSimTime() + this->GetPauseTime()) > 
-        this->GetRealTime()) 
+    if ( physicsUpdateRate < 0 && (this->GetSimTime() + this->GetPauseTime()) > this->GetRealTime()) 
     {
-      diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
-                 this->GetRealTime();
+      diffTime = (this->GetSimTime() + this->GetPauseTime()) - this->GetRealTime();
       req.tv_sec  = diffTime.sec;
       req.tv_nsec = diffTime.nsec;
     }
     // Otherwise try to match the update rate to the one specified in
     // the xml file
-    else if (physicsUpdateRate > 0 && 
-        currTime - lastTime < physicsUpdatePeriod)
+    else if (physicsUpdateRate > 0 && currTime - lastTime < physicsUpdatePeriod)
     {
       diffTime = physicsUpdatePeriod - (currTime - lastTime);
-
       req.tv_sec  = diffTime.sec;
       req.tv_nsec = diffTime.nsec;
     }
 
-    //nanosleep on storm servers are taking up about 10ms per call
-    //definitely a buggy setting on the storm servers
-    if (physicsUpdateRate > 0 && this->min_nanosleep_time < physicsUpdatePeriod && this->min_nanosleep_time < diffTime)
+    //printf("phys: %f, %f, %f\n",this->min_nanosleep_time.Double(),physicsUpdatePeriod.Double(),diffTime.Double());
+    // nanosleep on some kernels are taking up about 10ms per call
+    // as a hackish fix for the large kernel time resolution (10ms) problem,
+    //   throttle according to physics time step size, 
+    //   this way, at least we are not infringing upon trying to run physics near real-time
+    if (this->min_nanosleep_time.Double() < 0.5*world->GetPhysicsEngine()->GetStepTime().Double())
       nanosleep(&req, &rem);
     
     /*{
