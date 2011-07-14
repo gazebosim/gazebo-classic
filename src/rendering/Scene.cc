@@ -837,7 +837,7 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
     if (_msg->shadows())
       RTShaderSystem::Instance()->ApplyShadows(this);
     else
-      RTShaderSystem::Instance()->RemoveScene(this);
+      RTShaderSystem::Instance()->RemoveShadows(this);
   }
 }
 

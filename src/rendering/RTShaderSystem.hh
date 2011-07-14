@@ -84,6 +84,7 @@ namespace gazebo
     public: void GenerateShaders(Visual *vis);
 
     public: void ApplyShadows(Scene *scene);
+    public: void RemoveShadows(Scene *_scene);
 
     /// \brief Get paths for the shader system
     private: bool GetPaths(std::string &coreLibsPath, std::string &cachePath);
@@ -96,6 +97,7 @@ namespace gazebo
     private: bool initialized;
 
     private: std::vector< Scene * > scenes;
+    private: Ogre::RTShader::SubRenderState *shadowRenderState;
 
     private: friend class SingletonT<RTShaderSystem>;
   };

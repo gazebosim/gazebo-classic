@@ -107,20 +107,25 @@ void RTShaderSystem::AddScene(Scene *_scene)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove a scene
-void RTShaderSystem::RemoveScene( Scene *scene )
+void RTShaderSystem::RemoveScene( Scene *_scene )
 {
+  //std::remove(this->scenes.begin(), this->scenes.end(), scene);
+
+  std::cout << "Remove Scene[" << this->scenes.size() << "]\n";
   std::vector<Scene*>::iterator iter;
   for (iter = this->scenes.begin(); iter != scenes.end(); iter++)
-    if ( (*iter) == scene )
+    if ( (*iter) == _scene )
       break;
 
   if (iter != this->scenes.end())
   {
-    delete *iter;
     this->scenes.erase(iter);
+    this->shaderGenerator->invalidateScheme( _scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME );
+    this->UpdateShaders();
   }
-}
 
+  std::cout << "   Remove Scene[" << this->scenes.size() << "]\n";
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set an Ogre::Entity to use RT shaders
@@ -355,10 +360,27 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   return true;
 }
 
+void RTShaderSystem::RemoveShadows(Scene *_scene)
+{
+  _scene->GetManager()->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+  _scene->GetManager()->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr());
+
+  Ogre::RTShader::RenderState* schemeRenderState = 
+    this->shaderGenerator->getRenderState(
+        _scene->GetName() + 
+        Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+  schemeRenderState->removeTemplateSubRenderState(this->shadowRenderState);
+
+  this->shaderGenerator->invalidateScheme(_scene->GetName() + 
+      Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  this->UpdateShaders();
+}
+
 void RTShaderSystem::ApplyShadows(Scene *scene)
 {
-  Ogre::SceneManager *sceneMgr;
-  sceneMgr = this->shaderGenerator->getActiveSceneManager();
+  Ogre::SceneManager *sceneMgr = scene->GetManager();
+  //sceneMgr = this->shaderGenerator->getActiveSceneManager();
 
   // Grab the scheme render state.												
   Ogre::RTShader::RenderState* schemRenderState = this->shaderGenerator->getRenderState(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -391,8 +413,8 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
 
   sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
-  Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
-  Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(subRenderState);
+  this->shadowRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type);	
+  Ogre::RTShader::IntegratedPSSM3* pssm3SubRenderState = static_cast<Ogre::RTShader::IntegratedPSSM3*>(this->shadowRenderState);
   const Ogre::PSSMShadowCameraSetup::SplitPointList& srcSplitPoints = pssmSetup->getSplitPoints();
   Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
 
@@ -402,7 +424,7 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
   }
 
   pssm3SubRenderState->setSplitPoints(dstSplitPoints);
-  schemRenderState->addTemplateSubRenderState(subRenderState);		
+  schemRenderState->addTemplateSubRenderState(this->shadowRenderState);		
 
 
   this->shaderGenerator->invalidateScheme(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);

@@ -32,6 +32,7 @@ EditSceneWidget::EditSceneWidget( QWidget *parent )
   backgroundLayout->addWidget(this->backgroundColorFrame);
 
   this->shadowsButton = new QCheckBox("Shadows");
+  this->shadowsButton->setCheckState( Qt::Checked );
 
   mainLayout->addLayout(ambientLayout);
   mainLayout->addLayout(backgroundLayout);
@@ -44,9 +45,12 @@ EditSceneWidget::EditSceneWidget( QWidget *parent )
   this->node->Init("default");
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
 
-  connect( this->ambientColorButton, SIGNAL(clicked()), this, SLOT(AmbientColor()) );
-  connect( this->backgroundColorButton, SIGNAL(clicked()), this, SLOT(BackgroundColor()) );
-  connect( this->shadowsButton, SIGNAL(toggled(bool)), this, SLOT(Shadows(bool)) );
+  connect( this->ambientColorButton, SIGNAL(clicked()), 
+           this, SLOT(AmbientColor()) );
+  connect( this->backgroundColorButton, SIGNAL(clicked()), 
+           this, SLOT(BackgroundColor()) );
+  connect( this->shadowsButton, SIGNAL(toggled(bool)), 
+           this, SLOT(Shadows(bool)) );
 }
 
 EditSceneWidget::~EditSceneWidget()
@@ -93,6 +97,8 @@ void EditSceneWidget::BackgroundColor()
 
 void EditSceneWidget::Shadows(bool _state)
 {
+  std::cout << "Shadows[" << _state << "]\n";
+
   msgs::Scene msg;
   msgs::Init(msg, "default");
   msg.set_shadows( _state );
