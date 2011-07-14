@@ -230,6 +230,15 @@ void Scene::SetBackgroundColor(const common::Color &color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
   elem->GetAttribute("rgba")->Set(color);
+
+  std::vector<CameraPtr>::iterator iter;
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+    (*iter)->GetViewport()->setBackgroundColour( Conversions::Color(color) );
+
+  std::vector<UserCameraPtr>::iterator iter2;
+  for (iter2 = this->userCameras.begin(); iter2 != this->userCameras.end(); iter2++)
+    (*iter2)->GetViewport()->setBackgroundColour( Conversions::Color(color) );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -823,8 +832,13 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   if (_msg->has_sky_material())
     this->SetSky(_msg->sky_material());
 
-  if (_msg->has_shadows() && _msg->shadows())
-    RTShaderSystem::Instance()->ApplyShadows(this);
+  if (_msg->has_shadows())
+  {
+    if (_msg->shadows())
+      RTShaderSystem::Instance()->ApplyShadows(this);
+    else
+      RTShaderSystem::Instance()->RemoveScene(this);
+  }
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)

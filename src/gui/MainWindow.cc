@@ -8,6 +8,7 @@
 
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
+#include "gui/EditSceneWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
@@ -138,11 +139,10 @@ void MainWindow::NewModel()
 
 void MainWindow::EditScene()
 {
-  /*EditSceneWidget *editScene = new EditSceneWidget();
+  EditSceneWidget *editScene = new EditSceneWidget();
   editScene->Init();
   editScene->show();
   editScene->resize(800,600);
-  */
 }
 
 void MainWindow::CreateBox()
