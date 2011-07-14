@@ -126,10 +126,10 @@ Simulator::Simulator()
 
   /* test sleep one nanosleep cycle to check kernel timer granularity */
   /* disable nanosleep if timer granularity is too large              */
-  Time time1 = this->GetRealTime();
   struct timespec timeSpec;
   timeSpec.tv_sec = 0;
   timeSpec.tv_nsec = 1;
+  Time time1 = this->GetRealTime();
   nanosleep(&timeSpec, NULL);  // test sleep 1ns
   Time time2 = this->GetRealTime();
   this->min_nanosleep_time =(time2 - time1);
@@ -460,7 +460,7 @@ void Simulator::MainLoop()
 
     currTime = Time::GetWallTime();
 
-    if ( currTime - lastTime > 1.0/freq)
+    if ( currTime - lastTime > Time(1.0/freq))
     {
       lastTime = Time::GetWallTime();
 
@@ -494,10 +494,10 @@ void Simulator::MainLoop()
         World::Instance()->ProcessEntitiesToDelete();
       }
 
-      if (currTime - lastTime < 1/freq)
+      if (currTime - lastTime < Time(1/freq))
       {
         Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
-        if (this->min_nanosleep_time < 1/freq && this->min_nanosleep_time < sleepTime)
+        if (this->min_nanosleep_time.Double() < 1/freq && this->min_nanosleep_time.Double() < sleepTime.Double())
         {
           timeSpec.tv_sec = sleepTime.sec;
           timeSpec.tv_nsec = sleepTime.nsec;
@@ -510,7 +510,7 @@ void Simulator::MainLoop()
     else
     {
       Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
-      if (this->min_nanosleep_time < 1/freq && this->min_nanosleep_time < sleepTime)
+      if (this->min_nanosleep_time.Double() < 1/freq && this->min_nanosleep_time.Double() < sleepTime.Double())
       {
         timeSpec.tv_sec = sleepTime.sec;
         timeSpec.tv_nsec = sleepTime.nsec;
@@ -781,7 +781,7 @@ void Simulator::PhysicsLoop()
 
     //nanosleep on storm servers are taking up about 10ms per call
     //definitely a buggy setting on the storm servers
-    if (this->min_nanosleep_time < physicsUpdatePeriod && this->min_nanosleep_time < diffTime)
+    if (physicsUpdateRate > 0 && this->min_nanosleep_time < physicsUpdatePeriod && this->min_nanosleep_time < diffTime)
       nanosleep(&req, &rem);
     
     /*{
