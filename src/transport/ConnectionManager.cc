@@ -137,7 +137,7 @@ void ConnectionManager::Run()
         this->connections.erase( iter++);
       }
     }
-    usleep(1000);
+    usleep(1000000);
   }
 }
 

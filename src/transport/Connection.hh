@@ -186,7 +186,9 @@ namespace gazebo
      /// \brief Handle on write callbacks
      public: void ProcessWriteQueue();
 
-     private: void OnWrite(const boost::system::error_code &e);
+     private: void OnWrite(const boost::system::error_code &e,
+                  boost::asio::streambuf *_b);
+           //std::list<boost::asio::const_buffer> *_buffer);
 
      /// \brief Handle new connections, if this is a server
      private: void OnAccept(const boost::system::error_code &e);

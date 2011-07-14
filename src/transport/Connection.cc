@@ -75,8 +75,6 @@ void Connection::Connect(const std::string &host, unsigned short port)
     this->socket.connect(*endpoint_iter++, error);
   }
 
-  this->writeQueue.clear();
-
   if (error)
     gzthrow ("Unable to connect to " << host << ":" << port);
 }
@@ -175,51 +173,39 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 
 void Connection::ProcessWriteQueue()
 {
-  std::list<boost::asio::const_buffer> buffer;
+  boost::mutex::scoped_lock( *this->writeMutex );
 
+  if (this->writeQueue.size() > 0)
   {
-    boost::mutex::scoped_lock( *this->writeMutex );
+    unsigned int sum = 0;
+    unsigned int i = 0;
 
-    //std::cout << "ProcessWriteQueue.      Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
+    //for (; i < this->writeCounts.size(); i++)
+      //sum += this->writeCounts[i];
 
-    if (this->writeQueue.size() > 0)
-    {
-      unsigned int sum = 0;
-      unsigned int i = 0;
+    //if (sum < this->writeQueue.size())
+    //{
+      //std::list<boost::asio::const_buffer> *buffer =
+        //new std::list<boost::asio::const_buffer>;
 
-      for (; i < this->writeCounts.size(); i++)
-        sum += this->writeCounts[i];
+      boost::asio::streambuf *b = new boost::asio::streambuf;
+      std::ostream os(b);
 
-      if (sum < this->writeQueue.size())
+      for (i=sum; i < this->writeQueue.size(); i++)
       {
-        //if (this->writeQueue.size() > 200)
-          //std::cout << "  Sum[" << sum << "] WriteQueue[" << this->writeQueue.size() << "]\n";
-        for (i=sum; i < this->writeQueue.size(); i++)
-        {
-          //printf ("ID[%d] I[%d] Size[%d]\n", this->id, i, this->writeQueue.size());
-          //if (this->writeQueue[i].empty())
-            //std::cout << "  Write Queue has empty size\n";
-          buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
-        }
-        this->writeCounts.push_back( buffer.size() );
-
-        //gzdbg << "Write Sum[" << sum << "] QueueSize[" << this->writeQueue.size() << "] Counts[" << this->writeCounts.size() << "] Buffer[" << buffer.size() << "]\n";
-
+        os << this->writeQueue[i];
+        //buffer->push_back( boost::asio::buffer( this->writeQueue[i] ) );
       }
-    }
+      //this->writeCounts.push_back( buffer->size() );
 
-    //std::cout << "Done ProcessWriteQueue. Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
-  }
-
-  if (buffer.size() > 0)
-  {
-    boost::mutex::scoped_lock( *this->writeMutex );
-    // Write the serialized data to the socket. We use
-    // "gather-write" to send both the head and the data in
-    // a single write operation
-    boost::asio::async_write( this->socket, buffer, 
-        boost::bind(&Connection::OnWrite, shared_from_this(), 
-          boost::asio::placeholders::error));
+      // Write the serialized data to the socket. We use
+      // "gather-write" to send both the head and the data in
+      // a single write operation
+      boost::asio::async_write( this->socket, b->data(), 
+          boost::bind(&Connection::OnWrite, shared_from_this(), 
+            boost::asio::placeholders::error, b));
+    //}
+    this->writeQueue.clear();
   }
 }
 
@@ -240,8 +226,12 @@ std::string Connection::GetRemoteURI() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handle on write callbacks
-void Connection::OnWrite(const boost::system::error_code &e)
+void Connection::OnWrite(const boost::system::error_code &e, 
+    boost::asio::streambuf *_b)
+    //std::list<boost::asio::const_buffer> *_buffer)
 {
+  //delete _buffer;
+
   if (e)
   {
     // It will reach this point if the remote connection disconnects.
@@ -249,6 +239,7 @@ void Connection::OnWrite(const boost::system::error_code &e)
   }
   else
   {
+    /*
     boost::mutex::scoped_lock( *this->writeMutex );
     unsigned int startSize = this->writeQueue.size();
 
@@ -264,13 +255,10 @@ void Connection::OnWrite(const boost::system::error_code &e)
 
     //std::cout << "  After: WriteCount[" << this->writeCounts[0] << "]  WriteQueue[" << this->writeQueue.size() << "]\n";
 
-    /*if (endSize > startSize)
-      std::cout << "  EndSize[" << endSize << "] Larger than StartSize[" << startSize << "] [" << this->writeQueue.size() << "]\n";
-      */
-
     this->writeCounts.pop_front();
 
     //std::cout << "Done On Write. Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
+    */
   }
 }
 

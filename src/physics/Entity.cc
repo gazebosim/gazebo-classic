@@ -168,6 +168,10 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
     this->relativePose = pose;
     this->relativePose.Correct();
     this->PoseChange(notify);
+
+    msgs::Pose msg;
+    msgs::Set( this->poseMsg, this->GetRelativePose());
+    this->posePub->Publish( *this->poseMsg);
   }
 }
 
@@ -269,10 +273,6 @@ void Entity::SetRelativeRotation(const math::Quaternion &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
-  msgs::Pose msg;
-  msgs::Set( this->poseMsg, this->GetRelativePose());
-  this->posePub->Publish( *this->poseMsg);
-
   if (notify)
   {
     this->OnPoseChange();
