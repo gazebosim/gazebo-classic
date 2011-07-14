@@ -192,16 +192,13 @@ void Connection::ProcessWriteQueue()
 
       if (sum < this->writeQueue.size())
       {
-
-        int j = this->writeQueue.size();
-        int k = this->writeCounts.size();
-        if (this->writeQueue.size() > 200)
-          std::cout << "  Sum[" << sum << "] WriteQueue[" << this->writeQueue.size() << "]\n";
+        //if (this->writeQueue.size() > 200)
+          //std::cout << "  Sum[" << sum << "] WriteQueue[" << this->writeQueue.size() << "]\n";
         for (i=sum; i < this->writeQueue.size(); i++)
         {
           //printf ("ID[%d] I[%d] Size[%d]\n", this->id, i, this->writeQueue.size());
-          if (this->writeQueue[i].empty())
-            std::cout << "  Write Queue has empty size\n";
+          //if (this->writeQueue[i].empty())
+            //std::cout << "  Write Queue has empty size\n";
           buffer.push_back( boost::asio::buffer( this->writeQueue[i] ) );
         }
         this->writeCounts.push_back( buffer.size() );

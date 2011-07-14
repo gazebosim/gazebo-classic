@@ -136,6 +136,15 @@ void MainWindow::NewModel()
   */
 }
 
+void MainWindow::EditScene()
+{
+  /*EditSceneWidget *editScene = new EditSceneWidget();
+  editScene->Init();
+  editScene->show();
+  editScene->resize(800,600);
+  */
+}
+
 void MainWindow::CreateBox()
 {
 }
@@ -194,6 +203,11 @@ void MainWindow::CreateActions()
   this->newModelAct->setStatusTip(tr("Create a new model"));
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
+  this->editSceneAct = new QAction(tr("&Scene"), this);
+  this->editSceneAct->setShortcut(tr("Ctrl+S"));
+  this->editSceneAct->setStatusTip(tr("Edit Scene Properties"));
+  connect(this->editSceneAct, SIGNAL(triggered()), this, SLOT(EditScene()));
+
 
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   this->playAct->setStatusTip(tr("Run the world"));
@@ -248,6 +262,7 @@ void MainWindow::CreateMenus()
 
   this->editMenu = this->menuBar()->addMenu(tr("&Edit"));
   this->editMenu->addAction(this->newModelAct);
+  this->editMenu->addAction(this->editSceneAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
 
