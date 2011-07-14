@@ -152,7 +152,7 @@ namespace gazebo
       public: void SetFog( const std::string &_type, 
                            const common::Color &_color, 
                            double _density, double _start, double _end );
-  
+
       // Get the scene ID
       public: unsigned int GetId() const;
   

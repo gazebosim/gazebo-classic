@@ -1085,8 +1085,6 @@ void Visual::InsertMesh( const common::Mesh *mesh)
     if (!min.IsFinite())
       gzthrow("Min bounding box is not finite[" << min << "]\n");
 
-
-    gzdbg << "Mesh[" << mesh->GetName() << "] Bounds: Min[" << min << "] Max[" << max << "]\n";
     ogreMesh->_setBounds( Ogre::AxisAlignedBox(
           Ogre::Vector3(min.x, min.y, min.z),
           Ogre::Vector3(max.x, max.y, max.z)), 

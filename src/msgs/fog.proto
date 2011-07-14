@@ -5,9 +5,10 @@ message Fog
 {
   enum FogType
   {
-    LINEAR       = 1;
-    EXPONENTIAL  = 2;
-    EXPONENTIAL2 = 3;
+    NONE         = 1;
+    LINEAR       = 2;
+    EXPONENTIAL  = 3;
+    EXPONENTIAL2 = 4;
   }
   optional FogType type = 1 [default = LINEAR];
   optional Color color = 2;

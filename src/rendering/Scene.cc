@@ -839,6 +839,44 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
     else
       RTShaderSystem::Instance()->RemoveShadows(this);
   }
+
+  if (_msg->has_fog())
+  {
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
+
+    if (_msg->fog().has_color())
+      elem->GetAttribute("rgba")->Set( msgs::Convert(_msg->fog().color()) );
+
+    if (_msg->fog().has_density())
+      elem->GetAttribute("density")->Set( _msg->fog().density() );
+
+    if (_msg->fog().has_start())
+      elem->GetAttribute("start")->Set( _msg->fog().start() );
+
+    if (_msg->fog().has_end())
+      elem->GetAttribute("end")->Set( _msg->fog().end() );
+
+    if (_msg->fog().has_type())
+    {
+      std::string type;
+      if (_msg->fog().type() == msgs::Fog::LINEAR)
+        type = "linear";
+      else if (_msg->fog().type() == msgs::Fog::EXPONENTIAL)
+        type = "exp";
+      else if (_msg->fog().type() == msgs::Fog::EXPONENTIAL2)
+        type = "exp2";
+      else
+        type = "none";
+
+      elem->GetAttribute("type")->Set( type );
+    }
+
+    this->SetFog( elem->GetValueString("type"),
+                  elem->GetValueColor("rgba"),
+                  elem->GetValueDouble("density"),
+                  elem->GetValueDouble("start"),
+                  elem->GetValueDouble("end"));
+  }
 }
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -936,7 +974,6 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 
   if (parentVis && childVis)
   {
-    gzdbg << "Here Parent[" << _msg->parent() << "] Child[" << _msg->child() << "]\n";
     DynamicLines *line= new DynamicLines();
     this->worldSceneNode->attachObject(line);
 
@@ -949,10 +986,6 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
   else
   {
     gzwarn << "Unable to create joint visual.\n";
-    if (!parentVis)
-      gzdbg << "No parent[" << _msg->parent() << "]\n";
-    if (!childVis)
-      gzdbg << "No child[" << _msg->child() << "]\n";
   }
 }
 

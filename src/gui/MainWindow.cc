@@ -8,7 +8,7 @@
 
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
-#include "gui/EditSceneWidget.hh"
+#include "gui/WorldPropertiesWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
@@ -40,7 +40,7 @@ MainWindow::MainWindow()
 
   this->timePanel = new TimePanel(mainWidget);
 
-  InsertModelWidget *insertModel = new InsertModelWidget();
+  //InsertModelWidget *insertModel = new InsertModelWidget();
 
   //QFrame *leftFrame = new QFrame;
   //leftFrame->setLineWidth(1);
@@ -139,8 +139,7 @@ void MainWindow::NewModel()
 
 void MainWindow::EditScene()
 {
-  EditSceneWidget *editScene = new EditSceneWidget();
-  editScene->Init();
+  WorldPropertiesWidget *editScene = new WorldPropertiesWidget();
   editScene->show();
   //editScene->resize(800,600);
 }

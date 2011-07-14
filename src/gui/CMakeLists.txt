@@ -14,7 +14,7 @@ set (sources main.cc
              GLWidget.cc 
              TimePanel.cc
              InsertModelWidget.cc
-             EditSceneWidget.cc
+             WorldPropertiesWidget.cc
              EntityMaker.cc
              BoxMaker.cc
              SphereMaker.cc
@@ -27,7 +27,7 @@ set (qt_headers
              GLWidget.hh 
              TimePanel.hh
              InsertModelWidget.hh
-             EditSceneWidget.hh
+             WorldPropertiesWidget.hh
              )
 
 set (headers Gui.hh
