@@ -4,6 +4,7 @@
 #include "gazebo_config.h"
 
 gazebo::Master *master = NULL;
+bool stop = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print the version/licence string
@@ -17,6 +18,7 @@ void PrintVersion()
 void SignalHandler( int /*dummy*/ )
 {
   master->Stop();
+  stop=true;
   return;
 }
 
@@ -38,6 +40,13 @@ int main(int /*argc*/, char ** /*argv*/)
   master = new gazebo::Master();
   master->Init(port);
   master->Run();
+
+  // wait loop
+  while (!stop)
+  {
+    usleep(1000000);
+  }
+
   master->Fini();
 
   delete master;
