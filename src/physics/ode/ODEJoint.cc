@@ -158,6 +158,7 @@ void ODEJoint::Attach(BodyPtr parent, BodyPtr child)
   if (odechild == NULL && odeparent == NULL)
     gzthrow("ODEJoint requires at least one ODE body\n");
 
+  
   if (!odechild && odeparent)
   {
     dJointAttach( this->jointId, 0, odeparent->GetODEId() );

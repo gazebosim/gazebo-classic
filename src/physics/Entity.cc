@@ -87,6 +87,12 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 
   this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
 
+  if (_sdf->HasElement("origin"))
+  {
+     this->SetRelativePose( _sdf->GetElement("origin")->GetValuePose("pose") );
+  }
+
+
   if (this->parent)
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
 

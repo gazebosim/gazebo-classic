@@ -133,7 +133,11 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.pos.Set(p[0], p[1], p[2]);
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
-  self->SetWorldPose(pose);
+  // subtracting cog location from ode pose
+  math::Vector3 cog_vec = pose.rot.RotateVector(self->inertial->GetCoG());
+  pose.pos -= cog_vec;
+
+  self->SetWorldPose(pose,false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,6 +196,10 @@ void ODEBody::OnPoseChange()
   //math::Pose pose = this->comEntity->GetWorldPose();
   math::Pose pose = this->GetWorldPose();
 
+  math::Vector3 cog_vec = pose.rot.RotateVector(this->inertial->GetCoG());
+
+  // adding cog location for ode pose
+  pose.pos += cog_vec;
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
   dQuaternion q;

@@ -12,16 +12,16 @@
     <physics type="ode">
       <gravity xyz="0.0 0.0 -9.81"/>
       <ode>
-        <solver type="quick" dt="0.001" iters="20" sor="1.3"/>
+        <solver type="quick" dt="0.001" iters="100" sor="1.3"/>
         <constraints cfm="0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.0"/>
       </ode>
     </physics>
 
     <model name="model_1" static="false">
 
-      <origin pose="0.0 0.0 2.1 30.0 30.0 0.0"/>
+      <origin pose="0.0 0.0 2.1 30.0 0.0 0.0"/>
 
-      <link name="link_1" self_collide="true" gravity="false" kinematic="false">
+      <link name="link_1" self_collide="true" gravity="true" kinematic="false">
 
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
@@ -119,7 +119,7 @@
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
             <limit cfm="0" erp="0.1"/>
-            <suspension cfm="1.0" erp="1.0"/>
+            <suspension cfm="0.0" erp="0.2"/>
           </ode>
         </physics>
       </joint>
@@ -140,7 +140,7 @@
             <velocity>0.0</velocity>
             <fudge_factor>0.0</fudge_factor>
             <limit cfm="0" erp="0.1"/>
-            <suspension cfm="1.0" erp="1.0"/>
+            <suspension cfm="0.0" erp="0.2"/>
           </ode>
         </physics>
       </joint>

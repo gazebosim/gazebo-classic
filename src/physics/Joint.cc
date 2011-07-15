@@ -83,7 +83,6 @@ void Joint::Load(sdf::ElementPtr &_sdf)
         this->GetWorld()->GetByName( parentName ));
   }
 
-  this->anchorBody = this->parentBody;
 
   if (!this->parentBody && parentName != std::string("world"))
     gzthrow("Couldn't Find Parent Body[" + parentName );
@@ -96,15 +95,15 @@ void Joint::Load(sdf::ElementPtr &_sdf)
     offset = _sdf->GetElement("origin")->GetValuePose("pose");
 
   // setting anchor relative to gazebo body frame origin
-  if (this->anchorBody)
-    this->anchorPos = (offset + this->anchorBody->GetWorldPose()).pos ;
+  if (this->childBody)
+    this->anchorPos = (offset + this->childBody->GetWorldPose()).pos ;
   else
     this->anchorPos = math::Vector3(0,0,0); // default for world
 }
 
 void Joint::Init()
 {
-  this->Attach(this->childBody, this->parentBody);
+  this->Attach(this->parentBody, this->childBody);
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
@@ -119,7 +118,7 @@ void Joint::Update()
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint to show visuals
-void Joint::ShowJoints(const bool & /*s_*/)
+void Joint::ShowJoints(const bool & /*s_kk*/)
 {
   /*msgs::Visual msg;
   msgs::Init(msg, this->visual);
