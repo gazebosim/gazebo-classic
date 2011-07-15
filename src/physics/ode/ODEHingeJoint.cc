@@ -75,7 +75,7 @@ void ODEHingeJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
   if (this->parentBody) 
     this->parentBody->SetEnabled(true);
 
-  printf("debug hing joint anchor %s %f %f %f\n",this->GetName().c_str(),anchor.x, anchor.y, anchor.z );
+  //printf("debug hing joint anchor %s %f %f %f\n",this->GetName().c_str(),anchor.x, anchor.y, anchor.z );
   dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
 }
 

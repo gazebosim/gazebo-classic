@@ -104,9 +104,17 @@ void Joint::Load(sdf::ElementPtr &_sdf)
 void Joint::Init()
 {
   this->Attach(this->parentBody, this->childBody);
+  //this->Attach(this->childBody, this->parentBody);
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
+
+  // Set joint axis
+  if (this->sdf->HasElement("axis"))
+    this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+  if (this->sdf->HasElement("axis2"))
+    this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

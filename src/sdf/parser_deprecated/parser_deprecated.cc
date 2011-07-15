@@ -576,20 +576,20 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
           << _sdf->GetAttribute("name")->GetAsString() << "]\n";
     return false;
   }
-  initAttr(_config, "anchor", sdfParent->GetAttribute("link"));
+  initAttr(_config, "anchor", sdfChild->GetAttribute("link"));
 
   // Get Child Link
   xmlNodePtr body1Xml = firstChildElement(_config, "body1");
   xmlNodePtr body2Xml = firstChildElement(_config, "body2");
   if (body1Xml && body2Xml)
   {
-    if (sdfParent->GetAttribute("link")->GetAsString() == getValue(body1Xml))
+    if (sdfChild->GetAttribute("link")->GetAsString() == getValue(body1Xml))
     {
-      initAttr(_config, "body2", sdfChild->GetAttribute("link"));
+      initAttr(_config, "body2", sdfParent->GetAttribute("link"));
     }
-    else if (sdfParent->GetAttribute("link")->GetAsString() == getValue(body2Xml))
+    else if (sdfChild->GetAttribute("link")->GetAsString() == getValue(body2Xml))
     {
-      initAttr(_config, "body1", sdfChild->GetAttribute("link"));
+      initAttr(_config, "body1", sdfParent->GetAttribute("link"));
     }
     else
     {
