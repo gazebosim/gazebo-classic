@@ -105,7 +105,8 @@ void list()
 
 void echo_cb(const boost::shared_ptr<msgs::String const> &_data)
 {
-  std::cout << _data->data() << "\n";
+  std::cout << "data\n";
+  //std::cout << _data->data() << "\n";
 }
 
 msgs::TopicInfo get_topic_info(const std::string topic)

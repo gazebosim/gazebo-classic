@@ -212,7 +212,7 @@ namespace gazebo
 
       private: std::deque<std::string> writeQueue;
       private: std::deque<unsigned int> writeCounts;
-      private: boost::mutex *writeMutex;
+      private: boost::recursive_mutex *writeMutex;
 
       // Called when a new connection is received
       private: AcceptCallback acceptCB;

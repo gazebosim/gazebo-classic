@@ -35,7 +35,8 @@ Connection::Connection()
   IOManager::Instance()->IncCount();
   this->id = idCounter++;
 
-  this->writeMutex = new boost::mutex();
+
+  this->writeMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readThread = NULL;
   this->readQuit = false;
@@ -148,19 +149,20 @@ void Connection::StopRead()
 // Write data out
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
-  boost::mutex::scoped_lock( *this->writeMutex );
+  this->writeMutex->lock();
+  //boost::recursive_mutex::scoped_lock( *this->writeMutex );
 
   std::ostringstream header_stream;
 
   header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
-  if (_buffer.size() <= 0)
-    gzerr << "\n\nEnqueue ZERO!!!\n\n";
 
-  if (!header_stream || header_stream.str().size() != HEADER_LENGTH)
+  if ( header_stream.str().empty() ||
+       header_stream.str().size() != HEADER_LENGTH)
   {
     //Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
     gzerr << "Connection::Write error[" << error.message() << "]\n";
+  this->writeMutex->unlock();
     return;
   }
 
@@ -169,44 +171,50 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 
   if (_force)
     this->ProcessWriteQueue();
+
+  this->writeMutex->unlock();
 }
 
 void Connection::ProcessWriteQueue()
 {
-  boost::mutex::scoped_lock( *this->writeMutex );
+  //boost::recursive_mutex::scoped_lock( *this->writeMutex );
+  this->writeMutex->lock();
+
+  unsigned int startSize = this->writeQueue.size();
 
   if (this->writeQueue.size() > 0)
   {
-    unsigned int sum = 0;
-    unsigned int i = 0;
-
     //for (; i < this->writeCounts.size(); i++)
-      //sum += this->writeCounts[i];
+    //sum += this->writeCounts[i];
 
     //if (sum < this->writeQueue.size())
     //{
-      //std::list<boost::asio::const_buffer> *buffer =
-        //new std::list<boost::asio::const_buffer>;
+    //std::list<boost::asio::const_buffer> *buffer =
+    //new std::list<boost::asio::const_buffer>;
 
-      boost::asio::streambuf *b = new boost::asio::streambuf;
-      std::ostream os(b);
+    boost::asio::streambuf *b = new boost::asio::streambuf;
+    std::ostream os(b);
 
-      for (i=sum; i < this->writeQueue.size(); i++)
-      {
-        os << this->writeQueue[i];
-        //buffer->push_back( boost::asio::buffer( this->writeQueue[i] ) );
-      }
-      //this->writeCounts.push_back( buffer->size() );
 
-      // Write the serialized data to the socket. We use
-      // "gather-write" to send both the head and the data in
-      // a single write operation
-      boost::asio::async_write( this->socket, b->data(), 
-          boost::bind(&Connection::OnWrite, shared_from_this(), 
-            boost::asio::placeholders::error, b));
+    for (unsigned int i=0; i < this->writeQueue.size(); i++)
+    {
+      os << this->writeQueue[i];
+      //buffer->push_back( boost::asio::buffer( this->writeQueue[i] ) );
+    }
+    //this->writeCounts.push_back( buffer->size() );
+
+    // Write the serialized data to the socket. We use
+    // "gather-write" to send both the head and the data in
+    // a single write operation
+    boost::asio::async_write( this->socket, b->data(), 
+        boost::bind(&Connection::OnWrite, shared_from_this(), 
+          boost::asio::placeholders::error, b));
     //}
+    //
+
     this->writeQueue.clear();
   }
+  this->writeMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -465,7 +473,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
       }
       else
       {
-        usleep(1000);
+        usleep(10000);
         continue;
       }
     }
