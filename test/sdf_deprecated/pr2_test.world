@@ -27,7 +27,7 @@
   <physics:ode>
     <stepTime>0.001</stepTime>
 
-    <gravity>0 0 -9.8</gravity>
+    <gravity>0 5 -9.8</gravity>
 
     <cfm>0.0000000001</cfm>
     <erp>0.2</erp>
