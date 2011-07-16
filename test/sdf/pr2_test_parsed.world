@@ -8,7 +8,7 @@
       <shadows enabled='0' />
     </scene>
     <physics type='ode' >
-      <gravity xyz='0 0 -9.8' />
+      <gravity xyz='0 1 -9.8' />
       <ode >
         <solver type='quick' dt='0.001' iters='10' sor='1.3' />
         <constraints cfm='1e-10' erp='0.20000000000000001' contact_max_correcting_vel='100' contact_surface_layer='0.001' />
@@ -386,7 +386,7 @@
           <material script='Gazebo/Grey' normal_map='__default__' />
         </visual>
       </link>
-      <link name='l_shoulder_pan_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='-0.05 0.188 0.790675 0 -0 0' />
         <inertial mass='25.799299999999999' >
           <origin pose='-0.001201 0.024513 -0.098231 0 -0 0' />
@@ -405,7 +405,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_shoulder_lift_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_shoulder_lift_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.05 0.188 0.790675 0 -0 0' />
         <inertial mass='2.7498800000000001' >
           <origin pose='0.02195 -0.02664 -0.03127 0 -0 0' />
@@ -424,7 +424,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_upper_arm_roll_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_upper_arm_roll_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.05 0.188 0.790675 0 -0 0' />
         <inertial mass='6.1176899999999996' >
           <origin pose='0 0 0 0 -0 0' />
@@ -456,7 +456,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_elbow_flex_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_elbow_flex_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.45 0.188 0.790675 0 -0 0' />
         <inertial mass='1.90327' >
           <origin pose='0.01014 0.00032 -0.01211 0 -0 0' />
@@ -475,7 +475,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_forearm_roll_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_forearm_roll_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.45 0.188 0.790675 0 -0 0' />
         <inertial mass='2.6896800000000001' >
           <origin pose='0 0 0 0 -0 0' />
@@ -507,7 +507,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_wrist_flex_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_wrist_flex_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.771 0.188 0.790675 0 -0 0' />
         <inertial mass='0.61402000000000001' >
           <origin pose='-0.00157 0 -0.00075 0 -0 0' />
@@ -526,7 +526,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_wrist_roll_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_wrist_roll_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.771 0.188 0.790675 0 -0 0' />
         <inertial mass='0.68106999999999995' >
           <origin pose='0 0 0 0 -0 0' />
@@ -570,7 +570,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_gripper_l_finger_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 0.198 0.790675 0 -0 0' />
         <inertial mass='0.17126' >
           <origin pose='0.03598 0.0173 -0.00164 0 -0 0' />
@@ -589,7 +589,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_gripper_l_finger_tip_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 0.20295 0.790675 0 -0 0' />
         <inertial mass='0.04419' >
           <origin pose='0.00423 0.00284 0 0 -0 0' />
@@ -608,7 +608,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_gripper_r_finger_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 0.178 0.790675 0 -0 0' />
         <inertial mass='0.17388999999999999' >
           <origin pose='0.03576 -0.01736 -0.00095 0 -0 0' />
@@ -627,7 +627,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='l_gripper_r_finger_tip_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 0.17305 0.790675 0 -0 0' />
         <inertial mass='0.04419' >
           <origin pose='0.00423 -0.00284 0 0 -0 0' />
@@ -665,7 +665,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_shoulder_pan_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='-0.05 -0.188 0.790675 0 -0 0' />
         <inertial mass='25.799299999999999' >
           <origin pose='-0.001201 0.024513 -0.098231 0 -0 0' />
@@ -684,7 +684,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_shoulder_lift_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_shoulder_lift_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.05 -0.188 0.790675 0 -0 0' />
         <inertial mass='2.7498800000000001' >
           <origin pose='0.02195 -0.02664 -0.03127 0 -0 0' />
@@ -703,7 +703,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_upper_arm_roll_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_upper_arm_roll_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.05 -0.188 0.790675 0 -0 0' />
         <inertial mass='6.1176899999999996' >
           <origin pose='0 0 0 0 -0 0' />
@@ -735,7 +735,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_elbow_flex_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_elbow_flex_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.45 -0.188 0.790675 0 -0 0' />
         <inertial mass='1.90327' >
           <origin pose='0.01014 0.00032 -0.01211 0 -0 0' />
@@ -754,7 +754,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_forearm_roll_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_forearm_roll_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.45 -0.188 0.790675 0 -0 0' />
         <inertial mass='2.6896800000000001' >
           <origin pose='0 0 0 0 -0 0' />
@@ -786,7 +786,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_wrist_flex_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_wrist_flex_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.771 -0.188 0.790675 0 -0 0' />
         <inertial mass='0.61402000000000001' >
           <origin pose='-0.00157 0 -0.00075 0 -0 0' />
@@ -805,7 +805,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_wrist_roll_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_wrist_roll_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.771 -0.188 0.790675 0 -0 0' />
         <inertial mass='0.68106999999999995' >
           <origin pose='0 0 0 0 -0 0' />
@@ -849,7 +849,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_gripper_l_finger_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 -0.178 0.790675 0 -0 0' />
         <inertial mass='0.17126' >
           <origin pose='0.03598 0.0173 -0.00164 0 -0 0' />
@@ -868,7 +868,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_gripper_l_finger_tip_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 -0.17305 0.790675 0 -0 0' />
         <inertial mass='0.04419' >
           <origin pose='0.00423 0.00284 0 0 -0 0' />
@@ -887,7 +887,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_gripper_r_finger_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 -0.198 0.790675 0 -0 0' />
         <inertial mass='0.17388999999999999' >
           <origin pose='0.03576 -0.01736 -0.00095 0 -0 0' />
@@ -906,7 +906,7 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_gripper_r_finger_tip_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 -0.20295 0.790675 0 -0 0' />
         <inertial mass='0.04419' >
           <origin pose='0.00423 -0.00284 0 0 -0 0' />
@@ -925,28 +925,28 @@
           </geometry>
         </visual>
       </link>
-      <link name='r_gripper_l_parallel_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_gripper_l_parallel_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.82991 -0.157 0.790675 0 -0 0' />
         <inertial mass='0.17126' >
           <origin pose='0.03598 0.0173 -0.00164 0 -0 0' />
           <inertia ixx='7.7562e-05' ixy='1.4909500000000001e-06' ixz='-9.8338500000000007e-06' iyy='0.000197083' iyz='-3.0612500000000001e-06' izz='0.00018105399999999999' />
         </inertial>
       </link>
-      <link name='r_gripper_r_parallel_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='r_gripper_r_parallel_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.82991 -0.219 0.790675 0 -0 0' />
         <inertial mass='0.17388999999999999' >
           <origin pose='0.03576 -0.01736 -0.00095 0 -0 0' />
           <inertia ixx='7.7384099999999997e-05' ixy='-2.0930900000000001e-06' ixz='-8.3622799999999998e-06' iyy='0.000198474' iyz='2.4611e-06' izz='0.00018107' />
         </inertial>
       </link>
-      <link name='l_gripper_l_parallel_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_gripper_l_parallel_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.82991 0.219 0.790675 0 -0 0' />
         <inertial mass='0.17126' >
           <origin pose='0.03598 0.0173 -0.00164 0 -0 0' />
           <inertia ixx='7.7562e-05' ixy='1.4909500000000001e-06' ixz='-9.8338500000000007e-06' iyy='0.000197083' iyz='-3.0612500000000001e-06' izz='0.00018105399999999999' />
         </inertial>
       </link>
-      <link name='l_gripper_r_parallel_link' gravity='1' self_collide='0' kinematic='0' >
+      <link name='l_gripper_r_parallel_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.82991 0.157 0.790675 0 -0 0' />
         <inertial mass='0.17388999999999999' >
           <origin pose='0.03576 -0.01736 -0.00095 0 -0 0' />

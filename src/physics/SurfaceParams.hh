@@ -42,6 +42,17 @@ namespace gazebo
       
       /// \brief bounce vel
       public: double bounceThreshold;
+
+      public: double kp;
+      public: double kd;
+
+      public: double cfm;
+      public: double erp;
+      public: double mu1;
+      public: double mu2;
+      public: double slip1;
+      public: double slip2;
+      public: bool enableFriction;
     };
   }
 }

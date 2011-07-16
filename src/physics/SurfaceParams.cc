@@ -34,6 +34,16 @@ SurfaceParams::SurfaceParams()
 
   // Minumum velocity before bounce is applied
   this->bounceThreshold = 10.0;
+
+  this->kp = 1000000.0;
+  this->kd = 10000.0;
+  this->cfm = 0;
+  this->erp = 0.2;
+  this->mu1 = 1.0;
+  this->mu2 = 1.0;
+  this->slip1 = 0.0;
+  this->slip2 = 0.0;
+  this->enableFriction = true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -46,4 +56,6 @@ void SurfaceParams::Load( sdf::ElementPtr &_sdf )
     this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
     this->bounceThreshold = bounceElem->GetValueDouble("threshold");
   }
+
+  // TODO: read kp, kd, mu1, mu2, cfm, erp, slip1, slip2 from sdf
 }

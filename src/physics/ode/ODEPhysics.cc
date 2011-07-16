@@ -653,11 +653,13 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
       // TODO: put this back in.
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
-      /*h = this->stepTimeDouble;
-      kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
-      kd = geom1->surface->kd + geom2->surface->kd;
+      double h = this->stepTimeDouble;
+      double kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
+      double kd = geom1->surface->kd + geom2->surface->kd;
       contact.surface.soft_erp = h * kp / (h * kp + kd);
       contact.surface.soft_cfm = 1.0 / (h * kp + kd);
+      //contact.surface.soft_erp = 0.5*(geom1->surface->erp+geom2->surface->erp);
+      //contact.surface.soft_cfm = 0.5*(geom1->surface->cfm+geom2->surface->cfm);
 
       if (geom1->surface->enableFriction && geom2->surface->enableFriction)
       {
@@ -677,7 +679,6 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
         contact.surface.slip1 = 0.1;
         contact.surface.slip2 = 0.1;
       }
-      */
 
       contact.surface.bounce = std::min(geom1->surface->bounce, 
                                         geom2->surface->bounce);

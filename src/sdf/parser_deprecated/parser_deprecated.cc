@@ -418,6 +418,19 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   initAttr(_config, "name", _sdf->GetAttribute("name"));
   initOrigin(_config, _sdf);
 
+  // optional features (turnGravityOff, selfCollide)
+  initAttr(_config, "selfCollide", _sdf->GetAttribute("self_collide"));
+
+  // kind of tricky, new attribute gravity is opposite of turnGravityOff
+  initAttr(_config, "", _sdf->GetAttribute("gravity"));
+  xmlNodePtr tgo = firstChildElement(_config, "turnGravityOff");
+  if (tgo)
+  {
+    sdf::ParamT<bool> tgoP("turnGravity","false",false);
+    tgoP.SetFromString( getValue(tgo).c_str() );
+    _sdf->GetAttribute("gravity")->Set(!tgoP.GetValue());
+  }
+
   // Inertial (optional)
   xmlNodePtr mm = firstChildElement(_config, "massMatrix");
   if (mm)
