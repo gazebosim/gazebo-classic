@@ -48,6 +48,8 @@ namespace gazebo
 
       public: double cfm;
       public: double erp;
+      public: double max_vel;
+      public: double min_depth;
       public: double mu1;
       public: double mu2;
       public: double slip1;

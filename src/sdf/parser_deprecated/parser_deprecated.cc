@@ -390,21 +390,36 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdf::ElementPtr sdfSurfaceFriction = sdfSurface->AddElement("friction");
   sdf::ElementPtr sdfSurfaceFrictionOde = sdfSurfaceFriction->AddElement("ode");
   // mu1 --> mu
+  initAttr(_config, "mu1", sdfSurfaceFrictionOde->GetAttribute("mu"));
   // mu2 --> mu2
+  initAttr(_config, "mu2", sdfSurfaceFrictionOde->GetAttribute("mu2"));
+  // fdir1 --> fdir1
+  initAttr(_config, "fdir1", sdfSurfaceFrictionOde->GetAttribute("fdir1"));
+  // slip1 --> slip1
+  initAttr(_config, "slip1", sdfSurfaceFrictionOde->GetAttribute("slip1"));
+  // slip2 --> slip2
+  initAttr(_config, "slip2", sdfSurfaceFrictionOde->GetAttribute("slip2"));
 
   // bounce has restitution_coefficient and threshold attributes
   sdf::ElementPtr sdfSurfaceBounce = sdfSurface->AddElement("bounce");
   // bounce --> restitution_coefficient
+  initAttr(_config, "bounce", sdfSurfaceBounce->GetAttribute("restitution_coefficient"));
   // bounceVel --> threshold
+  initAttr(_config, "bounceVel", sdfSurfaceBounce->GetAttribute("threshold"));
 
   // contact ode has soft_cfm, kp, kd, max_vel, min_depth attributes
   sdf::ElementPtr sdfSurfaceContact = sdfSurface->AddElement("contact");
   sdf::ElementPtr sdfSurfaceContactOde = sdfSurfaceContact->AddElement("ode");
   // kp --> kp
+  initAttr(_config, "kp", sdfSurfaceContactOde->GetAttribute("kp"));
   // kd --> kd
+  initAttr(_config, "kd", sdfSurfaceContactOde->GetAttribute("kd"));
   // softCFM --> soft_cfm
+  initAttr(_config, "softCFM", sdfSurfaceContactOde->GetAttribute("soft_cfm"));
   // maxVel --> max_vel
+  initAttr(_config, "maxVel", sdfSurfaceContactOde->GetAttribute("max_vel"));
   // minDepth --> min_depth
+  initAttr(_config, "minDepth", sdfSurfaceContactOde->GetAttribute("min_depth"));
 
   return true;
 }
