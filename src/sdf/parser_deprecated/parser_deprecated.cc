@@ -382,6 +382,30 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     initAttr(_config, "scale", sdfMesh->GetAttribute("scale"));
   }
 
+  //
+  // TODO: parse surface properties
+  //
+  sdf::ElementPtr sdfSurface = _sdf->AddElement("surface");
+  // friction ode has mu, mu2, fdir1, slip1, slip2 attributes
+  sdf::ElementPtr sdfSurfaceFriction = sdfSurface->AddElement("friction");
+  sdf::ElementPtr sdfSurfaceFrictionOde = sdfSurfaceFriction->AddElement("ode");
+  // mu1 --> mu
+  // mu2 --> mu2
+
+  // bounce has restitution_coefficient and threshold attributes
+  sdf::ElementPtr sdfSurfaceBounce = sdfSurface->AddElement("bounce");
+  // bounce --> restitution_coefficient
+  // bounceVel --> threshold
+
+  // contact ode has soft_cfm, kp, kd, max_vel, min_depth attributes
+  sdf::ElementPtr sdfSurfaceContact = sdfSurface->AddElement("contact");
+  sdf::ElementPtr sdfSurfaceContactOde = sdfSurfaceContact->AddElement("ode");
+  // kp --> kp
+  // kd --> kd
+  // softCFM --> soft_cfm
+  // maxVel --> max_vel
+  // minDepth --> min_depth
+
   return true;
 }
 

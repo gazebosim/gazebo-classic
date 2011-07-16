@@ -44,6 +44,7 @@ SurfaceParams::SurfaceParams()
   this->slip1 = 0.0;
   this->slip2 = 0.0;
   this->enableFriction = true;
+  this->fdir1 = math::Vector3(0,0,0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

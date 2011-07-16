@@ -53,6 +53,7 @@ namespace gazebo
       public: double slip1;
       public: double slip2;
       public: bool enableFriction;
+      public: math::Vector3 fdir1;
     };
   }
 }
