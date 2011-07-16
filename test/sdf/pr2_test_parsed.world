@@ -1067,7 +1067,7 @@
         <child link='torso_lift_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='20000' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.0054105206811824215' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='head_pan_joint' type='revolute' >
@@ -1076,7 +1076,7 @@
         <child link='head_pan_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='1' friction='0' />
-          <limit lower='-172.28800000000001' upper='0' effort='0' velocity='0' />
+          <limit lower='-3.0069928616759904' upper='3.0069928616759904' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='head_tilt_joint' type='revolute' >
@@ -1085,7 +1085,7 @@
         <child link='head_tilt_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='1' friction='0' />
-          <limit lower='-26.9999' upper='0' effort='0' velocity='0' />
+          <limit lower='-0.47123715270921696' upper='1.3962599109369596' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_shoulder_pan_joint' type='revolute' >
@@ -1094,7 +1094,7 @@
         <child link='l_shoulder_pan_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='10' friction='0' />
-          <limit lower='-40.9437' upper='0' effort='0' velocity='0' />
+          <limit lower='-0.71460237294880236' upper='2.2854039357314546' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_shoulder_lift_joint' type='revolute' >
@@ -1103,7 +1103,7 @@
         <child link='l_shoulder_lift_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='10' friction='0' />
-          <limit lower='-30.0001' upper='0' effort='0' velocity='0' />
+          <limit lower='-0.52360052092755083' upper='1.3963000535097554' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_upper_arm_roll_joint' type='revolute' >
@@ -1112,7 +1112,7 @@
         <child link='l_upper_arm_roll_link' />
         <axis xyz='1 0 0' >
           <dynamics damping='0.10000000000000001' friction='0' />
-          <limit lower='-45.836599999999997' upper='0' effort='0' velocity='0' />
+          <limit lower='-0.79999958791963277' upper='3.9000080267514092' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_elbow_flex_joint' type='revolute' >
@@ -1121,7 +1121,7 @@
         <child link='l_elbow_flex_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='1' friction='0' />
-          <limit lower='-133.001' upper='100' effort='0' velocity='0' />
+          <limit lower='-2.3213053584449783' upper='0' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_forearm_roll_joint' type='revolute' >
@@ -1139,7 +1139,7 @@
         <child link='l_wrist_flex_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='0.10000000000000001' friction='0' />
-          <limit lower='-124.905' upper='0' effort='0' velocity='0' />
+          <limit lower='-2.1800035022035171' upper='0' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_wrist_roll_joint' type='revolute' >
@@ -1157,7 +1157,7 @@
         <child link='l_gripper_l_finger_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='0.20000000000000001' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_gripper_l_finger_tip_joint' type='revolute' >
@@ -1166,7 +1166,7 @@
         <child link='l_gripper_l_finger_tip_link' />
         <axis xyz='0 0 -1' >
           <dynamics damping='0.01' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_gripper_r_finger_joint' type='revolute' >
@@ -1175,7 +1175,7 @@
         <child link='l_gripper_r_finger_link' />
         <axis xyz='0 0 -1' >
           <dynamics damping='0.20000000000000001' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='l_gripper_r_finger_tip_joint' type='revolute' >
@@ -1184,7 +1184,7 @@
         <child link='l_gripper_r_finger_tip_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='0.01' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='laser_tilt_mount_joint' type='revolute' >
@@ -1193,7 +1193,7 @@
         <child link='laser_tilt_mount_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='0.0080000000000000002' friction='0' />
-          <limit lower='-45.000100000000003' upper='0' effort='0' velocity='0' />
+          <limit lower='-0.7853999087267004' upper='1.4835298641951802' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_shoulder_pan_joint' type='revolute' >
@@ -1202,7 +1202,7 @@
         <child link='r_shoulder_pan_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='10' friction='0' />
-          <limit lower='-130.94399999999999' upper='0' effort='0' velocity='0' />
+          <limit lower='-2.2854039357314546' upper='0.71460237294880236' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_shoulder_lift_joint' type='revolute' >
@@ -1211,7 +1211,7 @@
         <child link='r_shoulder_lift_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='10' friction='0' />
-          <limit lower='-30.0001' upper='0' effort='0' velocity='0' />
+          <limit lower='-0.52360052092755083' upper='1.3963000535097554' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_upper_arm_roll_joint' type='revolute' >
@@ -1220,7 +1220,7 @@
         <child link='r_upper_arm_roll_link' />
         <axis xyz='1 0 0' >
           <dynamics damping='0.10000000000000001' friction='0' />
-          <limit lower='-223.45400000000001' upper='0' effort='0' velocity='0' />
+          <limit lower='-3.9000080267514092' upper='0.79999958791963277' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_elbow_flex_joint' type='revolute' >
@@ -1229,7 +1229,7 @@
         <child link='r_elbow_flex_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='1' friction='0' />
-          <limit lower='-133.001' upper='0' effort='0' velocity='0' />
+          <limit lower='-2.3213053584449783' upper='0' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_forearm_roll_joint' type='revolute' >
@@ -1247,7 +1247,7 @@
         <child link='r_wrist_flex_link' />
         <axis xyz='0 1 0' >
           <dynamics damping='0.10000000000000001' friction='0' />
-          <limit lower='-124.905' upper='0' effort='0' velocity='0' />
+          <limit lower='-2.1800035022035171' upper='0' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_wrist_roll_joint' type='revolute' >
@@ -1265,7 +1265,7 @@
         <child link='r_gripper_l_finger_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='0.20000000000000001' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_gripper_l_finger_tip_joint' type='revolute' >
@@ -1274,7 +1274,7 @@
         <child link='r_gripper_l_finger_tip_link' />
         <axis xyz='0 0 -1' >
           <dynamics damping='0.01' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_gripper_r_finger_joint' type='revolute' >
@@ -1283,7 +1283,7 @@
         <child link='r_gripper_r_finger_link' />
         <axis xyz='0 0 -1' >
           <dynamics damping='0.20000000000000001' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_gripper_r_finger_tip_joint' type='revolute' >
@@ -1292,7 +1292,7 @@
         <child link='r_gripper_r_finger_tip_link' />
         <axis xyz='0 0 1' >
           <dynamics damping='0.01' friction='0' />
-          <limit lower='0' upper='0' effort='0' velocity='0' />
+          <limit lower='0' upper='0.54800022387043157' effort='0' velocity='0' />
         </axis>
       </joint>
       <joint name='r_gripper_r_parallel_root_joint' type='revolute' >

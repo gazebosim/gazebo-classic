@@ -633,11 +633,13 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     // Get limit
     if (firstChildElement(_config, "lowStop"))
     {
-      initAttr(_config, "lowStop", sdfLimit->GetAttribute("lower"));
+      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"lowStop"));
+      sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
     }
-    if (firstChildElement(_config, "hiStop"))
+    if (firstChildElement(_config, "highStop"))
     {
-      initAttr(_config, "hiStop", sdfLimit->GetAttribute("upper"));
+      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"highStop"));
+      sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
     }
 
   }
@@ -658,11 +660,13 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     // Get limit
     if (firstChildElement(_config, "lowStop"))
     {
-      initAttr(_config, "lowStop", sdfLimit->GetAttribute("lower"));
+      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"lowStop"));
+      sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
     }
-    if (firstChildElement(_config, "hiStop"))
+    if (firstChildElement(_config, "highStop"))
     {
-      initAttr(_config, "hiStop", sdfLimit->GetAttribute("upper"));
+      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"highStop"));
+      sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
     }
 
   }
