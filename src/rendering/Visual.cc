@@ -138,7 +138,6 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->mesh_type() == msgs::Visual::BOX)
   {
     sdf::ElementPtr elem = geomElem->AddElement("box");
-    std::cout << "Box Scale[" << msgs::Convert(msg->scale()) << "]\n";
     elem->GetAttribute("size")->Set(msgs::Convert(msg->scale()));
   }
   else if (msg->mesh_type() == msgs::Visual::SPHERE)

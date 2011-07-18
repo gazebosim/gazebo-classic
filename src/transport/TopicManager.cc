@@ -72,7 +72,7 @@ void TopicManager::Publish( const std::string &topic,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PublicationPtr TopicManager::FindPublication(const std::string &topic)
+PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 {
   std::vector<PublicationPtr>::iterator iter;
   PublicationPtr pub;
@@ -81,7 +81,7 @@ PublicationPtr TopicManager::FindPublication(const std::string &topic)
   for (iter = this->advertisedTopics.begin(); 
       iter != this->advertisedTopics.end(); iter++)
   {
-    if ((*iter)->GetTopic() == topic)
+    if ((*iter)->GetTopic() == _topic)
     {
       pub = *iter;
       break;
@@ -215,7 +215,7 @@ void TopicManager::ConnectSubToPub( const std::string &topic,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a new publication to the list of advertised publication
-bool TopicManager::UpdatePublications( const std::string &topic, 
+PublicationPtr TopicManager::UpdatePublications( const std::string &topic, 
                                        const std::string &msgType )
 {
   bool inserted = false;
@@ -241,26 +241,27 @@ bool TopicManager::UpdatePublications( const std::string &topic,
     this->advertisedTopics.push_back( dbgPub );
   }
 
-  return inserted;
+  return pub;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Stop advertising on a topic
-void TopicManager::Unadvertise(const std::string &topic)
+void TopicManager::Unadvertise(const std::string &_topic)
 {
-  int count = 0;
-  std::vector<PublicationPtr>::iterator iter;
+  std::string t;
 
-  for (iter = this->advertisedTopics.begin(); 
-       iter != this->advertisedTopics.end(); iter++)
-  {
-    if ((*iter)->GetTopic() == topic)
-      count++;
-  }
+  for (int i=0; i < 2; i ++)
+  { 
+    if (i==0)
+      t = _topic;
+    else
+      t = _topic + "/__dbg";
 
-  // Tell the master we are 
-  if (count <= 1)
-  {
-    ConnectionManager::Instance()->Unadvertise(topic);
+    PublicationPtr publication = this->FindPublication( t );
+    if (publication && publication->GetLocallyAdvertised())
+    {
+      publication->SetLocallyAdvertised(false);
+      ConnectionManager::Instance()->Unadvertise(t);
+    }
   }
 }

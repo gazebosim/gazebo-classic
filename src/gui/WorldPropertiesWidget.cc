@@ -15,11 +15,11 @@ WorldPropertiesWidget::WorldPropertiesWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   QTabWidget *tabWidget = new QTabWidget;
-  QWidget *sceneWidget = new SceneWidget;
-  QWidget *physicsWidget = new PhysicsWidget;
+  this->sceneWidget = new SceneWidget;
+  this->physicsWidget = new PhysicsWidget;
 
-  tabWidget->addTab(sceneWidget, tr("Scene") );
-  tabWidget->addTab(physicsWidget, tr("Physics") );
+  tabWidget->addTab(this->sceneWidget, tr("Scene") );
+  tabWidget->addTab(this->physicsWidget, tr("Physics") );
 
   mainLayout->addWidget(tabWidget);
 
@@ -32,6 +32,16 @@ WorldPropertiesWidget::~WorldPropertiesWidget()
 {
 }
 
+void WorldPropertiesWidget::showEvent(QShowEvent * /*_event*/)
+{
+  this->sceneWidget->Init();
+}
+
+void WorldPropertiesWidget::closeEvent(QCloseEvent * /*_event*/)
+{
+  this->sceneWidget->initialized = false;
+  std::cout << "Close\n";
+}
 
 PhysicsWidget::PhysicsWidget(QWidget *parent )
   : QWidget(parent)
@@ -167,11 +177,6 @@ SceneWidget::SceneWidget(QWidget *parent )
   this->sceneSub = this->node->Subscribe("~/scene", &SceneWidget::ReceiveSceneMsg, this);
 
   this->sceneRequestPub = this->node->Advertise<msgs::Request>("~/publish_scene");
-  msgs::Request req;
-  req.set_request("publish");
-
-  this->sceneRequestPub->Publish(req);
-
   connect( this->ambientColorButton, SIGNAL(clicked()), 
            this, SLOT(OnAmbientColor()) );
   connect( this->backgroundColorButton, SIGNAL(clicked()), 
@@ -201,15 +206,22 @@ SceneWidget::~SceneWidget()
   std::cout << "Destructor\n";
 }
 
-void SceneWidget::closeEvent(QCloseEvent * /*_event*/)
+void SceneWidget::Init()
 {
-  std::cout << "Close\n";
+  this->initialized = false;
+  std::cout << "Scene Init\n";
+  msgs::Request req;
+  req.set_request("publish");
+
+  this->sceneRequestPub->Publish(req);
 }
 
 void SceneWidget::OnFogToggle(bool _value)
 {
   if (!this->initialized)
     return;
+
+  gzdbg << "Send Fog Message\n";
   msgs::Scene msg;
   msgs::Init(msg, "default");
   if (_value)
@@ -229,6 +241,9 @@ void SceneWidget::OnFogType(int _index)
     return;
   msgs::Scene msg;
   msgs::Init(msg, "default");
+
+  gzdbg << "OnFogType[" << _index << "]\n";
+
   if (_index == 0)
     msg.mutable_fog()->set_type( msgs::Fog::LINEAR );
   else if (_index == 1)
@@ -282,6 +297,7 @@ void SceneWidget::OnAmbientColor()
   if (!this->initialized)
     return;
 
+  gzdbg << "OnAmbientColor\n";
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
@@ -303,6 +319,7 @@ void SceneWidget::OnBackgroundColor()
 {
   if (!this->initialized)
     return;
+  gzdbg << "OnBackgroundColor\n";
 
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
@@ -328,6 +345,7 @@ void SceneWidget::OnFogColor()
     return;
 
 
+  gzdbg << "OnFogColor\n";
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
@@ -350,6 +368,7 @@ void SceneWidget::OnShadows(bool _state)
   if (!this->initialized)
     return;
 
+  gzdbg << "OnShadows\n";
   msgs::Scene msg;
   msgs::Init(msg, "default");
   msg.set_shadows( _state );
@@ -386,9 +405,9 @@ void SceneWidget::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_m
   else
     this->shadowsButton->setCheckState(Qt::Unchecked);
 
-  if (_msg->has_fog())
+  if (_msg->has_fog() && _msg->fog().type() != msgs::Fog::NONE)
   {
-    this->fogBox->setChecked(false);
+    this->fogBox->setChecked(true);
 
     if (_msg->fog().has_color())
     {

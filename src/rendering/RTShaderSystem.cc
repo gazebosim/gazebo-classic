@@ -380,7 +380,6 @@ void RTShaderSystem::RemoveShadows(Scene *_scene)
 void RTShaderSystem::ApplyShadows(Scene *scene)
 {
   Ogre::SceneManager *sceneMgr = scene->GetManager();
-  //sceneMgr = this->shaderGenerator->getActiveSceneManager();
 
   // Grab the scheme render state.												
   Ogre::RTShader::RenderState* schemRenderState = this->shaderGenerator->getRenderState(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);

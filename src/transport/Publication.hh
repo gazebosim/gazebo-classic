@@ -35,6 +35,17 @@ namespace gazebo
 
       public: void RemoveTransport(const std::string &host, unsigned int port);
 
+      public: unsigned int GetTransportCount();
+      public: unsigned int GetCallbackCount();
+      public: unsigned int GetRemoteSubscriptionCount();
+
+      /// \brief Return true if the topic has been advertised from this
+      ///        process.
+      public: bool GetLocallyAdvertised() const;
+
+      /// \brief Set whether this topic has been advertised from this process
+      public: void SetLocallyAdvertised(bool _value);
+
       /// \brief Publish data
       public: void Publish(const std::string &data);
       public: void LocalPublish(const std::string &data);
@@ -51,6 +62,8 @@ namespace gazebo
       private: std::list<PublicationTransportPtr> transports;
 
       private: google::protobuf::Message *prevMsg;
+
+      private: bool locallyAdvertised;
     };
     typedef boost::shared_ptr<Publication> PublicationPtr;
   }

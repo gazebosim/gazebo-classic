@@ -51,6 +51,11 @@ namespace gazebo
 
       public: PublicationPtr FindPublication(const std::string &topic);
 
+      /// \brief Returns true if the topic has been advertised
+      /// \param _topic The name of the topic to check
+      /// \return True if the topic has been advertised
+      public: bool IsAdvertised(const std::string &_topic);
+
       /// \brief Subscribe to a topic
       //public: template<class M>
       public: SubscriberPtr Subscribe(const SubscribeOptions &options);
@@ -67,36 +72,40 @@ namespace gazebo
       public: template<typename M>
               PublisherPtr Advertise(const std::string &topic)
               {
-                std::string dbgTopic = topic + "/__dbg";
-
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                if (this->UpdatePublications(topic, msg->GetTypeName()))
-                {
-                  ConnectionManager::Instance()->Advertise(topic,
-                                                           msg->GetTypeName());
+                this->UpdatePublications(topic, msg->GetTypeName());
+              
+                std::string msgTypename;
 
-                  // Also create a debug topic
-                  msgs::String tmp;
-                  ConnectionManager::Instance()->Advertise(dbgTopic,
-                                                           tmp.GetTypeName());
-                }
-
-               
                 // Connect all local subscription to the publisher
                 for (int i=0; i < 2; i ++)
                 { 
                   std::string t;
                   if (i==0)
+                  {
                     t = topic;
+                    msgTypename = msg->GetTypeName();
+                  }
                   else
-                    t = dbgTopic;
+                  {
+                    t = topic + "/__dbg";
+                    msgs::String tmp;
+                    msgTypename = tmp.GetTypeName();
+                  }
 
                   PublicationPtr publication = this->FindPublication( t );
+                  if (!publication->GetLocallyAdvertised())
+                  {
+                    ConnectionManager::Instance()->Advertise(t, msgTypename);
+                  }
+
+                  publication->SetLocallyAdvertised(true);
+
                   SubMap::iterator iter;
                   for (iter = this->subscribed_topics.begin(); 
                       iter != this->subscribed_topics.end(); iter++)
@@ -152,8 +161,8 @@ namespace gazebo
 
       /// \brief Update our list of advertised topics
       /// \return True if the provided params define a new publisher.
-      public: bool UpdatePublications( const std::string &topic, 
-                                       const std::string &msgType );
+      public: PublicationPtr UpdatePublications( const std::string &topic, 
+                                                 const std::string &msgType );
 
       private: void HandleIncoming();
 

@@ -168,6 +168,13 @@ namespace gazebo
 
       public: void SetSky(const std::string &_material);
 
+      /// \brief Set whether shadows are on or off
+      /// \param _value True to enable shadows, False to disable
+      public: void SetShadowsEnabled(bool _value);
+
+      /// \brief Get whether shadows are on or off
+      public: bool GetShadowsEnabled() const;
+
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::MeshPtr mesh,
@@ -251,6 +258,7 @@ namespace gazebo
       private: SelectionObj *selectionObj;
 
       private: Ogre::SceneNode *worldSceneNode;
+      private: bool shadowsEnabled;
     };
   }
 }

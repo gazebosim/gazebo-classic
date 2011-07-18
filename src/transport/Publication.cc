@@ -7,7 +7,7 @@ using namespace transport;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Publication::Publication( const std::string &topic, const std::string &msgType )
-  : topic(topic), msgType(msgType)
+  : topic(topic), msgType(msgType), locallyAdvertised(false)
 {
   this->prevMsg = NULL;
 }
@@ -121,7 +121,7 @@ void Publication::Publish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
-  
+
   while (iter != this->callbacks.end())
   {
     if ((*iter)->HandleData(data))
@@ -137,7 +137,7 @@ void Publication::LocalPublish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
-  
+
   while (iter != this->callbacks.end())
   {
     if ((*iter)->IsLocal())
@@ -184,3 +184,41 @@ std::string Publication::GetMsgType() const
 }
 
 
+unsigned int Publication::GetTransportCount()
+{
+  return this->transports.size();
+}
+
+unsigned int Publication::GetCallbackCount()
+{
+  return this->callbacks.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned int Publication::GetRemoteSubscriptionCount()
+{
+  std::list< CallbackHelperPtr >::iterator iter;
+  unsigned int count = 0;
+
+  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
+  {
+    if ( !(*iter)->IsLocal() )
+      count++;
+  }
+
+  return count;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the topic has been advertised from this process.
+bool Publication::GetLocallyAdvertised() const
+{
+  return this->locallyAdvertised;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether this topic has been advertised from this process
+void Publication::SetLocallyAdvertised(bool _value)
+{
+  this->locallyAdvertised = _value;
+}

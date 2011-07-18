@@ -59,6 +59,8 @@ Scene::Scene(const std::string &name_)
   this->manager = NULL;
   this->raySceneQuery = NULL;
 
+  this->shadowsEnabled = false;
+
   this->receiveMutex = new boost::mutex();
 
   this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
@@ -833,12 +835,7 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
     this->SetSky(_msg->sky_material());
 
   if (_msg->has_shadows())
-  {
-    if (_msg->shadows())
-      RTShaderSystem::Instance()->ApplyShadows(this);
-    else
-      RTShaderSystem::Instance()->RemoveShadows(this);
-  }
+    this->SetShadowsEnabled( _msg->shadows() );
 
   if (_msg->has_fog())
   {
@@ -1082,4 +1079,23 @@ void Scene::SetSky(const std::string &_material)
   {
     gzwarn << "Unable to set sky dome to material[" << _material << "]\n"; 
   }
+}
+
+/// Set whether shadows are on or off
+void Scene::SetShadowsEnabled(bool _value)
+{
+  if (_value != this->shadowsEnabled)
+  {
+    this->shadowsEnabled = _value;
+    if (this->shadowsEnabled)
+      RTShaderSystem::Instance()->ApplyShadows(this);
+    else
+      RTShaderSystem::Instance()->RemoveShadows(this);
+  }
+}
+
+/// Get whether shadows are on or off
+bool Scene::GetShadowsEnabled() const
+{
+  return this->shadowsEnabled;
 }

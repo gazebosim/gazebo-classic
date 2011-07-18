@@ -58,6 +58,8 @@ MainWindow::MainWindow()
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowIconText(tr("Gazebo"));
   this->setWindowTitle(tr("Gazebo"));
+
+  this->worldPropertiesWidget = NULL;
 }
 
 MainWindow::~MainWindow()
@@ -139,9 +141,10 @@ void MainWindow::NewModel()
 
 void MainWindow::EditScene()
 {
-  WorldPropertiesWidget *editScene = new WorldPropertiesWidget();
-  editScene->show();
-  //editScene->resize(800,600);
+  if (!this->worldPropertiesWidget)
+    this->worldPropertiesWidget = new WorldPropertiesWidget();
+
+  this->worldPropertiesWidget->show();
 }
 
 void MainWindow::CreateBox()

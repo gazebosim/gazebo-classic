@@ -19,11 +19,20 @@ namespace gazebo
 {
   namespace gui
   {
+    class SceneWidget;
+    class PhysicsWidget;
+
     class WorldPropertiesWidget : public QWidget
     {
       Q_OBJECT
       public: WorldPropertiesWidget( QWidget *parent = 0 );
       public: virtual ~WorldPropertiesWidget();
+
+      protected: void closeEvent(QCloseEvent * /*_event*/);
+      protected: void showEvent(QShowEvent * /*_event*/);
+
+      private: SceneWidget *sceneWidget;
+      private: PhysicsWidget *physicsWidget;
     };
 
     class PhysicsWidget : public QWidget
@@ -42,8 +51,8 @@ namespace gazebo
       Q_OBJECT
       public: SceneWidget( QWidget *parent = 0 );
       public: virtual ~SceneWidget();
+      public: void Init();
 
-      public slots: void closeEvent(QCloseEvent * /*_event*/);
       private slots: void OnAmbientColor();
       private slots: void OnBackgroundColor();
 
@@ -58,6 +67,7 @@ namespace gazebo
 
       private: void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg);
 
+      public: bool initialized;
       private: QPushButton *ambientColorButton;
       private: QFrame *ambientColorFrame;
 
@@ -77,7 +87,6 @@ namespace gazebo
       private: transport::PublisherPtr scenePub, sceneRequestPub;
       private: transport::SubscriberPtr sceneSub;
 
-      private: bool initialized;
     };
   }
 }

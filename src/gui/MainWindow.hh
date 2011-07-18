@@ -12,6 +12,8 @@ namespace gazebo
     class TimePanel;
     class GLWidget;
 
+    class WorldPropertiesWidget;
+
     class MainWindow : public QMainWindow
     {
       Q_OBJECT
@@ -81,6 +83,8 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
+
+      private: WorldPropertiesWidget *worldPropertiesWidget;
     };
   }
 }

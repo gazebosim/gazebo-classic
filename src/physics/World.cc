@@ -114,12 +114,17 @@ void World::Load( sdf::ElementPtr _sdf )
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);
 
-  this->sceneSub = this->node->Subscribe("~/publish_scene", 
+  this->sceneRequestSub = this->node->Subscribe("~/publish_scene", 
                                         &World::PublishScene, this);
+
+  this->sceneSub = this->node->Subscribe("~/scene", 
+                                        &World::OnScene, this);
+
   this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
 
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
+
   this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
   this->newEntityPub = this->node->Advertise<msgs::Entity>("~/new_entity");
@@ -544,6 +549,11 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
   if (data->has_step())
     this->OnStep();
+}
+
+void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
+{
+  this->sceneMsg.MergeFrom( *_data );
 }
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
