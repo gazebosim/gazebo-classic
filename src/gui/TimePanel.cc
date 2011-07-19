@@ -24,14 +24,11 @@ TimePanel::TimePanel( QWidget *parent )
   this->realTimeEdit->setReadOnly(true);
   this->realTimeEdit->setFixedWidth(110);
 
-  this->pauseTimeEdit = new QLineEdit;
-  this->pauseTimeEdit->setReadOnly(true);
-  this->pauseTimeEdit->setFixedWidth(90);
+  this->pauseLabel = new QLabel(tr("<font style='color:'#dddddd'>Paused</font>"));
 
   QLabel *percentRealTimeLabel = new QLabel(tr("Real Time Factor:"));
   QLabel *simTimeLabel = new QLabel(tr("Sim Time:"));
   QLabel *realTimeLabel = new QLabel(tr("Real Time:"));
-  QLabel *pauseTimeLabel = new QLabel(tr("Pause Time:"));
 
   mainLayout->addWidget(percentRealTimeLabel);
   mainLayout->addWidget(this->percentRealTimeEdit);
@@ -42,8 +39,7 @@ TimePanel::TimePanel( QWidget *parent )
   mainLayout->addWidget(realTimeLabel);
   mainLayout->addWidget(this->realTimeEdit);
 
-  mainLayout->addWidget(pauseTimeLabel);
-  mainLayout->addWidget(this->pauseTimeEdit);
+  mainLayout->addWidget(this->pauseLabel);
   mainLayout->addItem(new QSpacerItem(20,20,QSizePolicy::Expanding, QSizePolicy::Minimum));
 
   this->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -66,11 +62,14 @@ TimePanel::~TimePanel()
 {
 }
 
-void TimePanel::OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &msg)
+void TimePanel::OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
 {
-  this->simTime  = msgs::Convert( msg->sim_time() );
-  this->realTime = msgs::Convert( msg->real_time() );
-  this->pauseTime = msgs::Convert( msg->pause_time() );
+  this->simTime  = msgs::Convert( _msg->sim_time() );
+  this->realTime = msgs::Convert( _msg->real_time() );
+  if (_msg->paused())
+    this->pauseLabel->setText("<font style='color:green;font-weight:bold;'>Paused</font>");
+  else
+    this->pauseLabel->setText("<font style='color:green;font-weight:bold;'>      </font>");
 }
 
 void TimePanel::Update()
@@ -113,9 +112,4 @@ void TimePanel::Update()
 
   this->simTimeEdit->setText( tr(sim.str().c_str()));
   this->realTimeEdit->setText( tr(real.str().c_str()) );
-
-  pause << std::fixed << std::setprecision(2) << pauseTime.Double();
-  this->pauseTimeEdit->setText( tr(pause.str().c_str()) );
 }
-
-

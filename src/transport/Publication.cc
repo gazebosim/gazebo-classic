@@ -16,6 +16,8 @@ Publication::Publication( const std::string &topic, const std::string &msgType )
 // Destructor
 Publication::~Publication()
 {
+  delete this->prevMsg;
+  this->prevMsg = NULL;
 }
         
 ////////////////////////////////////////////////////////////////////////////////

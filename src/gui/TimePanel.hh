@@ -7,6 +7,7 @@
 #include "common/Time.hh"
 
 class QLineEdit;
+class QLabel;
 
 namespace gazebo
 {
@@ -20,12 +21,12 @@ namespace gazebo
 
       private slots: void Update();
 
-      private: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &msg);
+      private: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg);
 
       private: QLineEdit *percentRealTimeEdit;
       private: QLineEdit *simTimeEdit;
       private: QLineEdit *realTimeEdit;
-      private: QLineEdit *pauseTimeEdit;
+      private: QLabel *pauseLabel;
 
       private: common::Time lastUpdateTime,statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;

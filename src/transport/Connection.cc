@@ -177,40 +177,24 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 
 void Connection::ProcessWriteQueue()
 {
-  //boost::recursive_mutex::scoped_lock( *this->writeMutex );
   this->writeMutex->lock();
-
-  unsigned int startSize = this->writeQueue.size();
 
   if (this->writeQueue.size() > 0)
   {
-    //for (; i < this->writeCounts.size(); i++)
-    //sum += this->writeCounts[i];
-
-    //if (sum < this->writeQueue.size())
-    //{
-    //std::list<boost::asio::const_buffer> *buffer =
-    //new std::list<boost::asio::const_buffer>;
-
-    boost::asio::streambuf *b = new boost::asio::streambuf;
-    std::ostream os(b);
-
+    boost::asio::streambuf *buffer = new boost::asio::streambuf;
+    std::ostream os(buffer);
 
     for (unsigned int i=0; i < this->writeQueue.size(); i++)
     {
       os << this->writeQueue[i];
-      //buffer->push_back( boost::asio::buffer( this->writeQueue[i] ) );
     }
-    //this->writeCounts.push_back( buffer->size() );
 
     // Write the serialized data to the socket. We use
     // "gather-write" to send both the head and the data in
     // a single write operation
-    boost::asio::async_write( this->socket, b->data(), 
+    boost::asio::async_write( this->socket, buffer->data(), 
         boost::bind(&Connection::OnWrite, shared_from_this(), 
-          boost::asio::placeholders::error, b));
-    //}
-    //
+          boost::asio::placeholders::error, buffer));
 
     this->writeQueue.clear();
   }
@@ -235,38 +219,14 @@ std::string Connection::GetRemoteURI() const
 ////////////////////////////////////////////////////////////////////////////////
 // Handle on write callbacks
 void Connection::OnWrite(const boost::system::error_code &e, 
-    boost::asio::streambuf *_b)
-    //std::list<boost::asio::const_buffer> *_buffer)
+    boost::asio::streambuf *_buffer)
 {
-  //delete _buffer;
+  delete _buffer;
 
   if (e)
   {
     // It will reach this point if the remote connection disconnects.
     this->Shutdown();
-  }
-  else
-  {
-    /*
-    boost::mutex::scoped_lock( *this->writeMutex );
-    unsigned int startSize = this->writeQueue.size();
-
-    //std::cout << "On Write.      Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
-
-    //std::cout << "  Before: WriteCount[" << this->writeCounts[0] << "]  WriteQueue[" << this->writeQueue.size() << "]\n";
-
-    std::swap_ranges( this->writeQueue.begin()+this->writeCounts[0], 
-                      this->writeQueue.end(), this->writeQueue.begin());
-    this->writeQueue.resize(this->writeQueue.size() - this->writeCounts[0]);
-
-    unsigned int endSize = this->writeQueue.size();
-
-    //std::cout << "  After: WriteCount[" << this->writeCounts[0] << "]  WriteQueue[" << this->writeQueue.size() << "]\n";
-
-    this->writeCounts.pop_front();
-
-    //std::cout << "Done On Write. Thread[" << boost::this_thread::get_id() << "] ID[" << this->id << "]\n";
-    */
   }
 }
 

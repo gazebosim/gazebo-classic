@@ -51,7 +51,7 @@ bool sensors::init()
 
   // TODO: defaults to the "default" world. need to change this to handle
   // multiple worlds
-  //gazebo::rendering::create_scene("default");
+  gazebo::rendering::create_scene("default");
 
   return true;
 }

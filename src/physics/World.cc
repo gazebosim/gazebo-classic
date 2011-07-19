@@ -220,6 +220,7 @@ void World::RunLoop()
       msgs::Set( this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
       msgs::Set( this->worldStatsMsg.mutable_real_time(), this->GetRealTime() );
       msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
+      this->worldStatsMsg.set_paused( this->IsPaused() ); 
 
       this->statPub->Publish( this->worldStatsMsg );
       this->prevStatTime = common::Time::GetWallTime();
