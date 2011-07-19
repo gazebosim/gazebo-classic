@@ -1067,6 +1067,7 @@ void Visual::InsertMesh( const common::Mesh *mesh)
       material = mesh->GetMaterial( subMesh->GetMaterialIndex() );
       if (material)
       {
+        rendering::Material::Update( material );
         ogreSubMesh->setMaterialName( material->GetName() );
       }
 

@@ -937,7 +937,6 @@
           </geometry>
         </visual>
       </link>
-      <!--
       <link name='l_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 0.17305 0.790675 0 -0 0' />
         <inertial mass='0.04419' >
@@ -1960,7 +1959,6 @@
         <data name='xyz' value='0 0 0' />
         <data name='rpy' value='0 -0 0' />
       </plugin>
-    -->
     </model>
   </world>
 </gazebo>

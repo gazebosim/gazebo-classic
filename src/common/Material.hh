@@ -131,8 +131,6 @@ namespace gazebo
                 return out;
               }
   
-      protected: virtual void Update();
-  
       protected: std::string name;
       protected: std::string texImage;
       protected: Color ambient;

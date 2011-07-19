@@ -2,7 +2,7 @@
  * Copyright 2011 Nate Koenig & Andrew Howard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use _mat file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "common/Color.hh"
 #include "rendering/ogre.h"
 #include "rendering/Material.hh"
 
@@ -21,36 +22,36 @@ using namespace gazebo;
 using namespace rendering;
 
 ////////////////////////////////////////////////////////////////////////////////
-void Material::Update()
+void Material::Update(const gazebo::common::Material *_mat)
 {
   Ogre::MaterialPtr matPtr;
 
-  if (Ogre::MaterialManager::getSingleton().resourceExists(this->GetName()))
+  if (Ogre::MaterialManager::getSingleton().resourceExists(_mat->GetName()))
     matPtr = Ogre::MaterialManager::getSingleton().getByName(
-        this->GetName(), "General");
+        _mat->GetName(), "General");
   else
    matPtr = Ogre::MaterialManager::getSingleton().create(
-                  this->GetName(),"General");
+                  _mat->GetName(),"General");
 
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
-  Color ambient =  this->GetAmbient();
-  Color diffuse =  this->GetDiffuse();
-  Color specular = this->GetSpecular();
-  Color emissive = this->GetEmissive();
+  common::Color ambient =  _mat->GetAmbient();
+  common::Color diffuse =  _mat->GetDiffuse();
+  common::Color specular = _mat->GetSpecular();
+  common::Color emissive = _mat->GetEmissive();
 
   matPtr->getTechnique(0)->setLightingEnabled(true);
   pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
   pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
-  pass->setPointSize(this->GetPointSize());
+  pass->setPointSize(_mat->GetPointSize());
 
   pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
   pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
-  pass->setShininess(this->GetShininess());
+  pass->setShininess(_mat->GetShininess());
 
-  if (!this->GetTextureImage().empty())
+  if (!_mat->GetTextureImage().empty())
   {
     Ogre::TextureUnitState *texState = pass->createTextureUnitState();
-    texState->setTextureName( this->GetTextureImage() );
+    texState->setTextureName( _mat->GetTextureImage() );
   }
 }

@@ -23,9 +23,9 @@ namespace gazebo
 {
 	namespace rendering
   {
-    class Material : public gazebo::common::Material
+    class Material
     {
-      protected: virtual void Update();
+      public: static void Update(const gazebo::common::Material *_mat);
     };
   }
 

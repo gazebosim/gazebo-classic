@@ -8,13 +8,10 @@
 #include "sdf/sdf_parser.h"
 
 #include "sensors/Sensors.hh"
-//#include "transport/Transport.hh"
-//#include "transport/IOManager.hh"
 
 #include "physics/Physics.hh"
 #include "physics/World.hh"
 #include "physics/Base.hh"
-//#include "rendering/Rendering.hh"
 
 #include "gazebo.h"
 #include "Master.hh"
@@ -40,14 +37,6 @@ Server::Server()
 Server::~Server()
 {
   delete this->master;
-
-  // TODO: probably should clean this up. Make sure this is needed.
-  /*while (transport::IOManager::Instance()->GetCount() > 0)
-  {
-    usleep(100000);
-    gzdbg << "Connectionmanager::Destructor IOCount[" << transport::IOManager::Instance()->GetCount() << "]\n";
-  }
-  */
 }
 
 void Server::Load(const std::string &filename)
@@ -85,17 +74,6 @@ void Server::Load(const std::string &filename)
 
     worldElem = sdf->root->GetNextElement("world", worldElem);
   }
-
-  /*// Load the rendering system
-  if (!rendering::load())
-    gzthrow("Unable to load the rendering engine");
-
-  // The rendering engine will run headless 
-  if (!rendering::init())
-    gzthrow("Unable to intialize the rendering engine");
-
-  rendering::create_scene("default");
-  */
 }
 
 void Server::Init()
@@ -118,8 +96,6 @@ void Server::Fini()
   physics::fini();
   sensors::fini();
 
-  //rendering::fini();
-
   this->master->Fini();
   delete this->master;
   this->master = NULL;
@@ -127,7 +103,7 @@ void Server::Fini()
 
 void Server::Run()
 {
-  // Run the transport loop: starts a new thread
+  // Run the gazebo, starts a new thread
   gazebo::run();
 
   // Run each world. Each world starts a new thread
@@ -147,7 +123,7 @@ void Server::Run()
 
   sensors::stop();
 
-  // Stop the transport loop
+  // Stop gazebo
   gazebo::stop();
 
   // Stop the master 
