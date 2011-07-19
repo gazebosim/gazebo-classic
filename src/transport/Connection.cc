@@ -150,19 +150,18 @@ void Connection::StopRead()
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
   this->writeMutex->lock();
-  //boost::recursive_mutex::scoped_lock( *this->writeMutex );
 
   std::ostringstream header_stream;
 
   header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
 
   if ( header_stream.str().empty() ||
-       header_stream.str().size() != HEADER_LENGTH)
+      header_stream.str().size() != HEADER_LENGTH)
   {
     //Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
     gzerr << "Connection::Write error[" << error.message() << "]\n";
-  this->writeMutex->unlock();
+    this->writeMutex->unlock();
     return;
   }
 
@@ -188,6 +187,7 @@ void Connection::ProcessWriteQueue()
     {
       os << this->writeQueue[i];
     }
+    this->writeQueue.clear();
 
     // Write the serialized data to the socket. We use
     // "gather-write" to send both the head and the data in
@@ -196,7 +196,6 @@ void Connection::ProcessWriteQueue()
         boost::bind(&Connection::OnWrite, shared_from_this(), 
           boost::asio::placeholders::error, buffer));
 
-    this->writeQueue.clear();
   }
   this->writeMutex->unlock();
 }
@@ -335,8 +334,16 @@ bool Connection::Read(std::string &data)
   {
     incoming.resize( incoming_size );
 
-    // Read in the actual data
-    this->socket.read_some( boost::asio::buffer(incoming), error );
+    std::size_t len = 0;
+    do
+    {
+      // Read in the actual data
+      len += this->socket.read_some(boost::asio::buffer(&incoming[len], incoming_size - len), error);
+    } while ( len < incoming_size && !error);
+
+    if (len != incoming_size)
+      gzerr << "Did not read everying. Read[" << len << "] Needed[" << incoming_size << "]\n";
+
     if (error)
       throw boost::system::system_error(error);
 

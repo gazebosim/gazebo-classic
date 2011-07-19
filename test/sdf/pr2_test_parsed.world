@@ -14,6 +14,7 @@
         <constraints cfm='1e-10' erp='0.20000000000000001' contact_max_correcting_vel='100' contact_surface_layer='0.001' />
       </ode>
     </physics>
+
     <model name='gplane' static='1' >
       <origin pose='0 0 0 0 -0 0' />
       <link name='plane' gravity='1' self_collide='0' kinematic='0' >
@@ -47,8 +48,10 @@
       <specular rgba='0.1 0.1 0.1 1' />
       <attenuation range='10' linear='0.10000000000000001' constant='0.20000000000000001' quadratic='0' />
     </light>
+
     <model name='pr2' static='0' >
       <origin pose='0 0 0 0 -0 0' />
+
       <link name='base_footprint' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='0 0 0 0 -0 0' />
         <inertial mass='118.001' >
@@ -120,6 +123,7 @@
           </geometry>
         </visual>
       </link>
+
       <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='-0.2246 0.2246 0.0792 0 -0 0' />
         <inertial mass='3.4730799999999999' >
@@ -933,6 +937,7 @@
           </geometry>
         </visual>
       </link>
+      <!--
       <link name='l_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 0.17305 0.790675 0 -0 0' />
         <inertial mass='0.04419' >
@@ -1955,6 +1960,7 @@
         <data name='xyz' value='0 0 0' />
         <data name='rpy' value='0 -0 0' />
       </plugin>
+    -->
     </model>
   </world>
 </gazebo>
