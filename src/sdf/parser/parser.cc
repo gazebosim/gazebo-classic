@@ -19,6 +19,8 @@
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
 
+#include "parser_deprecated.hh"
+
 #include "common/Console.hh"
 #include "common/Color.hh"
 #include "math/Vector3.hh"
@@ -234,7 +236,25 @@ bool readFile(const std::string &_filename, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.LoadFile(_filename);
-  return readDoc(&xmlDoc, _sdf);
+  if (readDoc(&xmlDoc, _sdf))
+    return true;
+  else
+  {
+    gzwarn << "parse as sdf version 1.0 failed, trying to parse as old deprecated format\n";
+    if (deprecated_sdf::initWorldFile(_filename,_sdf))
+      return true;
+    else
+    {
+      gzwarn << "parse as old deprecated world file failed, trying old model format.\n";
+      if (deprecated_sdf::initModelFile(_filename,_sdf->root))
+        return true;
+      else
+      {
+        gzerr << "parse as old deprecated model file failed.\n";
+        return false;
+      }
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,28 +270,40 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 {
   if (!_xmlDoc)
   {
-    gzerr << "Could not parse the xml\n";
+    gzwarn << "Could not parse the xml\n";
     return false;
   }
 
-  TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
-   
-  if (!readXml( elemXml, _sdf->root))
+  /* check gazebo version, use old parser if necessary */
+  TiXmlElement* gazebo_node = _xmlDoc->FirstChildElement("gazebo");
+  if (gazebo_node &&
+      gazebo_node->Attribute("version") &&
+      (strcmp(gazebo_node->Attribute("version") , "1.0") == 0) )
   {
-    gzerr << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";
+    /* parse new sdf xml */
+    TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
+     
+    if (!readXml( elemXml, _sdf->root))
+    {
+      gzwarn << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";
+      return false;
+    }
+  }
+  else
+  {
+    // try to use the old deprecated parser
+    if (!gazebo_node)
+      gzwarn << "Gazebo SDF has no gazebo element\n";
+    else if (!gazebo_node->Attribute("version"))
+      gzwarn << "Gazebo SDF gazebo element has no version\n";
+    else if (strcmp(gazebo_node->Attribute("version") , "1.0") != 0)
+      gzwarn << "Gazebo SDF version ["
+            << gazebo_node->Attribute("version")
+            << "] is not 1.0\n";
     return false;
+
   }
 
-/* check gazebo version
-  if (!_sdf->root->HasElement("gazebo") ||
-       _sdf->root->GetElement("gazebo")->GetValueString("version") != "1.0")
-  {
-    gzerr << "Gazebo SDF version ["
-          << _sdf->root->GetElement("gazebo")->GetValueString("version")
-          << "] is not 1.0\n";
-    return false;
-  }
-*/
 
   return true;
 }

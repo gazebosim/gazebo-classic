@@ -16,6 +16,3 @@ add_executable( gztopic gztopic.cc )
 target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport )
 INSTALL_EXECUTABLE( gztopic )
 
-
-add_executable( check_sdf_deprecated check_sdf_deprecated.cpp )
-target_link_libraries(check_sdf_deprecated ${XML_LIBRARIES} gazebo_sdf_parser_deprecated gazebo_sdf_parser)

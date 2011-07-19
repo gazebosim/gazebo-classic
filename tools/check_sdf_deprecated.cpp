@@ -38,7 +38,7 @@
 #include <libxml/parser.h>
 
 #include "sdf/sdf_parser.h"
-#include "sdf/parser_deprecated/parser_deprecated.hh"
+#include "sdf/parser/parser_deprecated.hh"
 
 using namespace sdf;
 

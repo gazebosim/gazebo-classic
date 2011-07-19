@@ -1,6 +1,5 @@
 add_subdirectory(interface)
 add_subdirectory(parser)
-add_subdirectory(parser_deprecated)
 
 set (headers sdf.h sdf_parser.h)
 set (sdfs gazebo.sdf 
