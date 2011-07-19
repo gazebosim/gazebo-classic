@@ -35,16 +35,7 @@ namespace sdf
 /// Init based on the installed sdf_format.xml file
 bool init( SDFPtr _sdf )
 {
-  try
-  {
-   gazebo::common::SystemPaths::Instance()->Load();
-  }
-  catch (gazebo::common::Exception e)
-  {
-    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
-  }
-
-  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths("/sdf/gazebo.sdf");
+  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths("/sdf/gazebo.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -55,15 +46,7 @@ bool init( SDFPtr _sdf )
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
-  try
-  {
-   gazebo::common::SystemPaths::Instance()->Load();
-  }
-  catch (gazebo::common::Exception e)
-  {
-    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
-  }
-  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
+  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(_filename);
 
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
@@ -79,15 +62,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
-  try
-  {
-   gazebo::common::SystemPaths::Instance()->Load();
-  }
-  catch (gazebo::common::Exception e)
-  {
-    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
-  }
-  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
+  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(_filename);
 
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
@@ -218,7 +193,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
   for (TiXmlElement *child = _xml->FirstChildElement("include"); 
       child; child = child->NextSiblingElement("include"))
   {
-    std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(std::string("/sdf/") + child->Attribute("filename"));
+    std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(std::string("/sdf/") + child->Attribute("filename"));
 
     ElementPtr element(new Element);
 

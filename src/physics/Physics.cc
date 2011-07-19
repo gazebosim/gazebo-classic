@@ -21,7 +21,7 @@
 
 using namespace gazebo;
 
-bool physics::init()
+bool physics::load()
 {
   physics::PhysicsFactory::RegisterAll();
   return true;

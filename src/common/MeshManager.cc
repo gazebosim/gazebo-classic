@@ -109,7 +109,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   }
 
 
-  std::string fullname = SystemPaths::Instance()->FindFileWithGazeboPaths(filename);
+  std::string fullname = SystemPaths::FindFileWithGazeboPaths(filename);
 
   if (!fullname.empty())
   {

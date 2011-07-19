@@ -81,7 +81,6 @@ void RenderEngine::Load()
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
-  
 
   if (this->root)
   {
@@ -101,6 +100,7 @@ void RenderEngine::Load()
 
   // Load all the plugins
   this->LoadPlugins();
+
 
   // Setup the rendering system, and create the context
   this->SetupRenderSystem();
@@ -233,6 +233,7 @@ void RenderEngine::Init()
   //if (this->HasGLSL())
     //RTShaderSystem::Instance()->UpdateShaders();
 
+  //if (this->HasGLSL())
   for (unsigned int i=0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();
 
@@ -301,7 +302,7 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
-  std::list<std::string> ogrePaths = common::SystemPaths::Instance()->GetOgrePaths();
+  std::list<std::string> ogrePaths = common::SystemPaths::GetOgrePaths();
  
   for (iter=ogrePaths.begin(); 
        iter!=ogrePaths.end(); ++iter)
@@ -350,9 +351,9 @@ void RenderEngine::SetupResources()
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::const_iterator iter;
+  std::list<std::string> paths = common::SystemPaths::GetGazeboPaths();
 
-  for (iter= common::SystemPaths::Instance()->GetGazeboPaths().begin();
-       iter!=common::SystemPaths::Instance()->GetGazeboPaths().end(); iter++)
+  for (iter= paths.begin(); iter != paths.end(); iter++)
   {
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)

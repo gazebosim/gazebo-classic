@@ -26,7 +26,6 @@
 #include "transport/Transport.hh"
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
-#include "common/SystemPaths.hh"
 #include "gazebo_config.h"
 
 // Command line options
@@ -90,18 +89,8 @@ void SignalHandler( int )
 
 void Load()
 {
-  // load the configuration options 
-  try
-  {
-    gazebo::common::SystemPaths::Instance()->Load();
-  }
-  catch (gazebo::common::Exception e)
-  {
-    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
-  }
-
   gazebo::transport::init();
-  gazebo::physics::init();
+  gazebo::physics::load();
 
 
   // Load the world file

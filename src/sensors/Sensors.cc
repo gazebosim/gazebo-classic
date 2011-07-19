@@ -19,6 +19,8 @@
 
 #include "transport/Transport.hh"
 
+#include "rendering/Rendering.hh"
+
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
 #include "sensors/Sensor.hh"
@@ -26,13 +28,38 @@
 
 using namespace gazebo;
 
-bool g_sensors_done = false;
-
-bool sensors::init(const std::string & /*worldName_*/)
+bool sensors::load()
 {
   // Register all the sensor types
   sensors::SensorFactory::RegisterAll();
 
+  // Load the rendering system
+  if (!gazebo::rendering::load())
+    gzthrow("Unable to load the rendering engine");
+
+  return true;
+}
+
+bool sensors::init()
+{
+  // The rendering engine will run headless 
+  if (!gazebo::rendering::init())
+  {
+    gzthrow("Unable to intialize the rendering engine");
+    return false;
+  }
+
+  // TODO: defaults to the "default" world. need to change this to handle
+  // multiple worlds
+  //gazebo::rendering::create_scene("default");
+
+  return true;
+}
+
+
+bool sensors::fini()
+{
+  rendering::fini();
   return true;
 }
 
@@ -53,12 +80,8 @@ sensors::SensorPtr sensors::create_sensor(const std::string &type)
 
 void sensors::run()
 {
-  g_sensors_done = false;
-  while (!g_sensors_done)
-  {
-    sensors::SensorManager::Instance()->Update(false);
-  }
-}
+  sensors::SensorManager::Instance()->Run();
+ }
 
 void sensors::run_once(bool /*force_*/)
 {
@@ -67,5 +90,6 @@ void sensors::run_once(bool /*force_*/)
 
 void sensors::stop()
 {
-  g_sensors_done = true;
+  sensors::SensorManager::Instance()->Stop();
 }
+

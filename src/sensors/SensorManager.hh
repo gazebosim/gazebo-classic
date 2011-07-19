@@ -24,6 +24,7 @@
 #define SENSORMANAGER_HH
 
 #include <list>
+#include <boost/thread.hpp>
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"
@@ -43,10 +44,16 @@ namespace gazebo
       public: virtual ~SensorManager();
 
       /// \brief Update all the sensors
-      public: void Update(bool force);
+      public: void Update(bool force=false);
 
       /// \brief Init all the sensors
       public: void Init();
+
+      /// \brief Run the sensor manager update in a new thread
+      public: void Run();
+
+      /// \brief Stop the run thread
+      public: void Stop();
 
       /// \brief Finalize all the sensors
       public: void Fini();
@@ -54,8 +61,14 @@ namespace gazebo
       /// \brief Add a sensor
       public: void AddSensor(SensorPtr sensor);
 
-              /// \brief Remove a sensor
+      /// \brief Remove a sensor
       public: void RemoveSensor(SensorPtr sensor);
+
+      /// \brief Update loop
+      private: void RunLoop();
+
+      private: bool stop;
+      private: boost::thread *runThread;
 
       private: std::list<SensorPtr > sensors;
 

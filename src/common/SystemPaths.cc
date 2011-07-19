@@ -34,199 +34,127 @@ using namespace common;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-SystemPaths::SystemPaths()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
-SystemPaths::~SystemPaths()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Loads the configuration file 
-void SystemPaths::Load()
-{
-  std::ifstream cfgFile;
-
-  std::string rcFilename = getenv("HOME");
-  rcFilename += "/.gazeborc";
-
-  cfgFile.open(rcFilename.c_str(), std::ios::in);
-
-  std::string delim(":");
-
-  char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
-  if(ogre_resource_path) 
-    this->AddOgrePaths(std::string(ogre_resource_path));
-
-  char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
-  if(gazebo_resource_path) 
-    this->AddGazeboPaths(std::string(gazebo_resource_path));
-
-  char *gazebo_plugin_path = getenv("GAZEBO_PLUGIN_PATH");
-  if(gazebo_plugin_path) 
-    this->AddPluginPaths(std::string(gazebo_plugin_path));
-
-  if (cfgFile.is_open())
-  {
-    TiXmlDocument xmlDoc;
-    xmlDoc.LoadFile(rcFilename);
-
-    TiXmlElement *rootnode = xmlDoc.FirstChildElement("gazeborc");
-    
-    // if gazebo path is set, skip reading from .gazeborc
-    if(!ogre_resource_path)
-    {
-      TiXmlElement *node = rootnode->FirstChildElement("gazeboPath");
-      while (node)
-      {
-        std::string path = node->GetText();
-        this->gazeboPaths.push_back(path);
-        this->AddPluginPaths(path+"/plugins");
-        node = node->NextSiblingElement("gazeboPath");
-      }
-    }
-
-    // if ogre path is set, skip reading from .gazeborc
-    if(!ogre_resource_path)
-    {
-      TiXmlElement *node = rootnode->FirstChildElement("ogrePath");
-      while (node)
-      {
-        this->ogrePaths.push_back( node->GetText() );
-        node = node->NextSiblingElement("ogrePath");
-      }
-    }
-
-  }
-  else
-  {
-    gzwarn << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
-
-    if (!gazebo_resource_path )
-    {
-      this->gazeboPaths.push_back("/usr/local/share/gazebo");
-      this->AddPluginPaths("/usr/local/share/gazebo/plugins");
-    }
-
-    if (!ogre_resource_path )
-    {
-      this->ogrePaths.push_back("/usr/local/lib/OGRE");
-      this->ogrePaths.push_back("/usr/lib/OGRE");
-    }
-
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the gazebo install paths
-const std::list<std::string> &SystemPaths::GetGazeboPaths() const
+const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
-  return this->gazeboPaths;
+  static std::list<std::string> gazeboPaths;
+
+  if (gazeboPaths.size() == 0)
+  {
+    std::string delim(":");
+    std::string path;
+
+    char *pathCStr = getenv("GAZEBO_RESOURCE_PATH");
+    if (!pathCStr || strlen(pathCStr) == 0)
+    {
+      gzerr << "GAZEBO_RESOURCE_PATH doesn't exist. Set GAZEBO_RESOURCE_PATH to gazebo's installation path.\n";
+      return gazeboPaths;
+    }
+    path = pathCStr;
+
+    int pos1 = 0;
+    int pos2 = path.find(delim);
+    while (pos2 != (int)std::string::npos)
+    {
+      gazeboPaths.push_back(path.substr(pos1,pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = path.find(delim,pos2+1);
+    }
+    gazeboPaths.push_back(path.substr(pos1,path.size()-pos1));
+  }
+
+  return gazeboPaths;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the ogre install paths  
-const std::list<std::string> &SystemPaths::GetOgrePaths() const
+const std::list<std::string> &SystemPaths::GetOgrePaths()
 {
-  return this->ogrePaths;
+  static std::list<std::string> ogrePaths;
+
+  if (ogrePaths.size() == 0)
+  {
+    std::string delim(":");
+    std::string path;
+
+    char *pathCStr = getenv("OGRE_RESOURCE_PATH");
+    if (!pathCStr || strlen(pathCStr) == 0)
+    {
+      gzerr << "OGRE_RESOURCE_PATH doesn't exist. Set OGRE_RESOURCE_PATH to Ogre's installation path.\n";
+      return ogrePaths;
+    }
+    path = pathCStr;
+
+    int pos1 = 0;
+    int pos2 = path.find(delim);
+    while (pos2 != (int)std::string::npos)
+    {
+      ogrePaths.push_back(path.substr(pos1,pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = path.find(delim,pos2+1);
+    }
+    ogrePaths.push_back(path.substr(pos1,path.size()-pos1));
+  }
+
+  return ogrePaths;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the plugin paths  
-const std::list<std::string> &SystemPaths::GetPluginPaths() const
+const std::list<std::string> &SystemPaths::GetPluginPaths()
 {
-  return this->pluginPaths;
+  static std::list<std::string> pluginPaths;
+
+  if (pluginPaths.size() == 0)
+  {
+    std::string delim(":");
+    std::string path;
+
+    char *pathCStr = getenv("GAZEBO_PLUGIN_PATH");
+    if (!pathCStr || strlen(pathCStr) == 0)
+    {
+      gzerr << "GAZEBO_PLUGIN_PATH doesn't exist. Set GAZEBO_PLUGIN_PATH to Ogre's installation path.\n";
+      return pluginPaths;
+    }
+    path = pathCStr;
+
+    int pos1 = 0;
+    int pos2 = path.find(delim);
+    while (pos2 != (int)std::string::npos)
+    {
+      pluginPaths.push_back(path.substr(pos1,pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = path.find(delim,pos2+1);
+    }
+    pluginPaths.push_back(path.substr(pos1,path.size()-pos1));
+  }
+
+  return pluginPaths;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the model path extension
-std::string SystemPaths::GetModelPathExtension() const
+std::string SystemPaths::GetModelPathExtension() 
 {
-  return "/models";
+  return "/sdf/models";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world path extension
-std::string SystemPaths::GetWorldPathExtension() const
+std::string SystemPaths::GetWorldPathExtension()
 {
-  return "/worlds";
-}
-
-void SystemPaths::ClearGazeboPaths()
-{
-  this->gazeboPaths.clear();
-}
-void SystemPaths::ClearOgrePaths()
-{
-  this->ogrePaths.clear();
-}
-void SystemPaths::ClearPluginPaths()
-{
-  this->pluginPaths.clear();
-}
-
-void SystemPaths::AddGazeboPaths(std::string gazebo_resource_path)
-{
-  std::string delim(":");
-  if(!gazebo_resource_path.empty()) 
-  {
-    int pos1 = 0;
-    int pos2 = gazebo_resource_path.find(delim);
-    while (pos2 != (int)std::string::npos)
-    {
-      this->gazeboPaths.push_back(gazebo_resource_path.substr(pos1,pos2-pos1));
-      pos1 = pos2+1;
-      pos2 = gazebo_resource_path.find(delim,pos2+1);
-    }
-    this->gazeboPaths.push_back(gazebo_resource_path.substr(pos1,gazebo_resource_path.size()-pos1));
-  }
-}
-
-void SystemPaths::AddOgrePaths(std::string ogre_resource_path)
-{
-  std::string delim(":");
-  if(!ogre_resource_path.empty()) 
-  {
-    int pos1 = 0;
-    int pos2 = ogre_resource_path.find(delim);
-    while (pos2 != (int)std::string::npos)
-    {
-      this->ogrePaths.push_back(ogre_resource_path.substr(pos1,pos2-pos1));
-      pos1 = pos2+1;
-      pos2 = ogre_resource_path.find(delim,pos2+1);
-    }
-    this->ogrePaths.push_back(ogre_resource_path.substr(pos1,ogre_resource_path.size()-pos1));
-  }
-}
-
-void SystemPaths::AddPluginPaths(std::string gazebo_plugin_path)
-{
-  std::string delim(":");
-  if(!gazebo_plugin_path.empty()) 
-  {
-    int pos1 = 0;
-    int pos2 = gazebo_plugin_path.find(delim);
-    while (pos2 != (int)std::string::npos)
-    {
-      this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,pos2-pos1));
-      pos1 = pos2+1;
-      pos2 = gazebo_plugin_path.find(delim,pos2+1);
-    }
-    this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,gazebo_plugin_path.size()-pos1));
-  }
+  return "/sdf/worlds";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// search for file given GAZEBO_RESOURCE_PATHS
-const std::string SystemPaths::FindFileWithGazeboPaths(std::string filename) const
+std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
 {
   struct stat st;
   std::string fullname =  std::string("./")+filename;
   bool found = false;
+
+  std::list<std::string> paths = GetGazeboPaths();
 
   if (stat(fullname.c_str(), &st) == 0)
   {
@@ -239,8 +167,8 @@ const std::string SystemPaths::FindFileWithGazeboPaths(std::string filename) con
   }
   else
   {
-    for (std::list<std::string>::const_iterator iter=this->gazeboPaths.begin(); 
-        iter!=this->gazeboPaths.end(); ++iter)
+    for (std::list<std::string>::const_iterator iter = paths.begin(); 
+        iter != paths.end(); ++iter)
     {
       fullname = (*iter)+"/"+filename;
       if (stat(fullname.c_str(), &st) == 0)

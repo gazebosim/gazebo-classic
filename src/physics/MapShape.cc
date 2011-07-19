@@ -21,7 +21,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "common/SystemPaths.hh"
 #include "common/Image.hh"
 #include "common/Exception.hh"
 

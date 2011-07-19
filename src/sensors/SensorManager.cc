@@ -29,6 +29,7 @@ using namespace sensors;
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 SensorManager::SensorManager()
+  : stop(false), runThread(NULL)
 {
 }
 
@@ -37,6 +38,32 @@ SensorManager::SensorManager()
 SensorManager::~SensorManager()
 {
   this->sensors.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Run the sensor manager update in a new thread
+void SensorManager::Run()
+{
+  this->runThread = new boost::thread( 
+      boost::bind(&SensorManager::RunLoop, this));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Stop the run thread
+void SensorManager::Stop()
+{
+  this->stop = true;
+  this->runThread->join();
+  delete this->runThread;
+  this->runThread = NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Update loop
+void SensorManager::RunLoop()
+{
+  while (!this->stop)
+    this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

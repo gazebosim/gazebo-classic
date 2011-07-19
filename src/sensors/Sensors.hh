@@ -23,10 +23,8 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// \brief Initialize the sensor library
-    /// \param world_name: Name of the gazebo world
-    /// \return True on success
-    bool init(const std::string &world_name);
+    /// \brief Load the sensor library
+    bool load();
 
     /// \brief Create a sensor
     /// \param type: Type name of the sensors (camera, laser, etc)
@@ -43,6 +41,9 @@ namespace gazebo
 
     /// \brief Stop the sensor generation loop.
     void stop();
+
+    bool init();
+    bool fini();
   }
 }
 #endif

@@ -41,60 +41,26 @@ namespace gazebo
 {
 	namespace common
   {
-    class SystemPaths : public SingletonT<SystemPaths>
+    class SystemPaths
     {
-      /// \brief Constructor
-      private: SystemPaths();
-  
-      /// \brief destructor
-      private: ~SystemPaths();
-  
-      /// \brief True if the string is null
-      public: void Load();
- 
       /// \brief Get the gazebo install paths
-      public: const std::list<std::string> &GetGazeboPaths() const; 
-
-      /// \brief Get the model path extension
-      public: std::string GetModelPathExtension() const;
-
-     /// \brief Get the world path extension
-      public: std::string GetWorldPathExtension() const;
+      public: static const std::list<std::string> &GetGazeboPaths(); 
 
       /// \brief Get the ogre install paths  
-      public: const std::list<std::string> &GetOgrePaths() const; 
+      public: static const std::list<std::string> &GetOgrePaths(); 
 
       /// \brief Get the plugin paths  
-      public: const std::list<std::string> &GetPluginPaths() const; 
+      public: static const std::list<std::string> &GetPluginPaths(); 
 
-      /// \brief Add colon delimited paths to Gazebo install 
-      public: void AddGazeboPaths(std::string path);
-  
-      /// \brief Add colon delimited paths to ogre install
-      public: void AddOgrePaths(std::string path);
-   
-      /// \brief Add colon delimited paths to plugins
-      public: void AddPluginPaths(std::string path);
-  
-      public: void ClearGazeboPaths();
-      public: void ClearOgrePaths();
-      public: void ClearPluginPaths();
+      /// \brief Get the model path extension
+      public: static std::string GetModelPathExtension();
 
-      public: const std::string FindFileWithGazeboPaths(std::string filename) const;
+     /// \brief Get the world path extension
+      public: static std::string GetWorldPathExtension();
+
+      public: static std::string FindFileWithGazeboPaths(std::string filename);
   
-      /// Paths gazebo install
-      private: std::list<std::string> gazeboPaths;
-      
-      /// Paths to the ogre install
-      private: std::list<std::string> ogrePaths;
-  
-      /// Paths to the plugins
-      private: std::list<std::string> pluginPaths;
-  
-      //Singleton implementation
-      private: friend class SingletonT<SystemPaths>;
     };
   }
-
 }
 #endif

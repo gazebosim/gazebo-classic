@@ -3,7 +3,8 @@
 #include "common/SystemPaths.hh"
 #include "transport/Transport.hh"
 #include "sensors/Sensors.hh"
-#include "rendering/Rendering.hh"
+
+#include "gazebo.h"
 
 bool quit = false;
 
@@ -16,31 +17,11 @@ void SignalHandler( int )
 
 void Load(const std::string &/*filename*/)
 {
-  // load the configuration options 
-  try
-  {
-    gazebo::common::SystemPaths::Instance()->Load();
-  }
-  catch (gazebo::common::Exception e)
-  {
-    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
-  }
-
-  // Start the transport system by connecting to the master.
-  gazebo::transport::init();
+  gazebo::load();
 
   /// Init the sensors library
-  gazebo::sensors::init("default");
-
-  // Load the rendering system
-  if (!gazebo::rendering::load())
-    gzthrow("Unable to load the rendering engine");
-
-  // The rendering engine will run headless 
-  if (!gazebo::rendering::init())
-    gzthrow("Unable to intialize the rendering engine");
-
-  gazebo::rendering::create_scene("default");
+  gazebo::sensors::load();
+  gazebo::sensors::init();
 }
 
 void Run()

@@ -3,20 +3,20 @@
 
 #include "common/Timer.hh"
 #include "common/Exception.hh"
-#include "common/SystemPaths.hh"
 
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
 
-//#include "sensors/Sensors.hh"
-#include "transport/Transport.hh"
-#include "transport/IOManager.hh"
+#include "sensors/Sensors.hh"
+//#include "transport/Transport.hh"
+//#include "transport/IOManager.hh"
 
 #include "physics/Physics.hh"
 #include "physics/World.hh"
 #include "physics/Base.hh"
 //#include "rendering/Rendering.hh"
 
+#include "gazebo.h"
 #include "Master.hh"
 #include "Server.hh"
 
@@ -27,15 +27,14 @@ Server::Server()
 {
   this->stop = false;
 
-  // load the configuration options 
-  try
-  {
-    common::SystemPaths::Instance()->Load();
-  }
-  catch (common::Exception e)
-  {
-    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
-  }
+  std::string host = "";
+  unsigned short port = 0;
+
+  gazebo::transport::get_master_uri(host,port);
+
+  this->master = new gazebo::Master();
+  this->master->Init(port);
+  this->master->Run();
 }
 
 Server::~Server()
@@ -53,26 +52,19 @@ Server::~Server()
 
 void Server::Load(const std::string &filename)
 {
-  std::string host = "";
-  unsigned short port = 0;
+  // Load gazebo
+  gazebo::load();
 
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
-
   sdf::init(sdf);
   sdf::readFile(filename, sdf);
 
-  gazebo::transport::get_master_uri(host,port);
+  /// Load the physics library
+  physics::load();
 
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->Run();
-
-  transport::init();
-  physics::init();
-
-  /// Init the sensors library
-  //sensors::init("default");
+  /// Load the sensors library
+  sensors::load();
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   while(worldElem)
@@ -108,8 +100,11 @@ void Server::Load(const std::string &filename)
 
 void Server::Init()
 {
+  sensors::init();
+
   for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::init_world(this->worlds[i]);
+
 }
 
 void Server::Stop()
@@ -119,8 +114,11 @@ void Server::Stop()
 
 void Server::Fini()
 {
-  transport::fini();
+  gazebo::fini();
+
   physics::fini();
+  sensors::fini();
+
   //rendering::fini();
 
   this->master->Fini();
@@ -131,11 +129,13 @@ void Server::Fini()
 void Server::Run()
 {
   // Run the transport loop: starts a new thread
-  transport::run();
+  gazebo::run();
 
   // Run each world. Each world starts a new thread
   for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
+
+  //sensors::run();
 
   // Update the sensors.
   this->stop = false;
@@ -149,8 +149,10 @@ void Server::Run()
   for (unsigned int i=0; i < this->worlds.size(); i++)
     physics::stop_world(this->worlds[i]);
 
+  sensors::stop();
+
   // Stop the transport loop
-  transport::stop();
+  gazebo::stop();
 
   // Stop the master 
   this->master->Stop();

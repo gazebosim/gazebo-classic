@@ -15,7 +15,6 @@
  *
  */
 #include "transport/Transport.hh"
-#include "common/SystemPaths.hh"
 #include "common/Console.hh"
 #include "gazebo_config.h"
 
@@ -23,11 +22,10 @@ namespace gazebo
 {
   void load()
   {
-    gazebo::common::SystemPaths::Instance()->Load();
-
     // Start the transport system by connecting to the master.
     gazebo::transport::init();
   }
+
   void init()
   {
   }

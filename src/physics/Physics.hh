@@ -22,7 +22,7 @@ namespace gazebo
 {
   namespace physics
   {
-    bool init();
+    bool load();
     bool fini();
 
     WorldPtr create_world(const std::string &name);
