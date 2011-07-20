@@ -30,52 +30,57 @@ namespace gazebo
 {
 	namespace physics
   {
-   /// \brief A two axis hinge joint
-  template< class T>
-  class Hinge2Joint : public T
-  {
-    /// \brief Constructor
-    public: Hinge2Joint() : T()
-            { this->AddType(Base::HINGE2_JOINT); }
-  
-    /// \brief Destructor
-    public: virtual ~Hinge2Joint()
-            { }
-  
-    /// \brief Load the joint
-    protected: virtual void Load( sdf::ElementPtr &_sdf )
-               {
-                 T::Load(_sdf);
-
-                 this->SetAxis(0, 
-                     _sdf->GetElement("axis")->GetValueVector3("xyz"));
-
-                 this->SetAxis(1, 
-                     _sdf->GetElement("axis2")->GetValueVector3("xyz"));
+    /// \addtogroup gazebo_physics
+    /// \{
 
 
-                 if (_sdf->GetElement("axis")->HasElement("limit"))
+    /// \brief A two axis hinge joint
+    template< class T>
+    class Hinge2Joint : public T
+    {
+      /// \brief Constructor
+      public: Hinge2Joint() : T()
+              { this->AddType(Base::HINGE2_JOINT); }
+    
+      /// \brief Destructor
+      public: virtual ~Hinge2Joint()
+              { }
+    
+      /// \brief Load the joint
+      protected: virtual void Load( sdf::ElementPtr &_sdf )
                  {
-                   sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
-                   // Perform this three step ordering to ensure the parameters 
-                   // are set properly. This is taken from the ODE wiki.
-                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                   this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                   this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                 }
+                   T::Load(_sdf);
+
+                   this->SetAxis(0, 
+                       _sdf->GetElement("axis")->GetValueVector3("xyz"));
+
+                   this->SetAxis(1, 
+                       _sdf->GetElement("axis2")->GetValueVector3("xyz"));
+
+
+                   if (_sdf->GetElement("axis")->HasElement("limit"))
+                   {
+                     sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
+                     // Perform this three step ordering to ensure the parameters 
+                     // are set properly. This is taken from the ODE wiki.
+                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                     this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                   }
  
-                 if (_sdf->GetElement("axis2")->HasElement("limit"))
-                 {
-                   sdf::ElementPtr limitElem = _sdf->GetElement("axis2")->GetElement("limit");
-                   // Perform this three step ordering to ensure the parameters 
-                   // are set properly. This is taken from the ODE wiki.
-                   this->SetHighStop(1,limitElem->GetValueDouble("upper"));
-                   this->SetLowStop( 1,limitElem->GetValueDouble("lower"));
-                   this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                   if (_sdf->GetElement("axis2")->HasElement("limit"))
+                   {
+                     sdf::ElementPtr limitElem = _sdf->GetElement("axis2")->GetElement("limit");
+                     // Perform this three step ordering to ensure the parameters 
+                     // are set properly. This is taken from the ODE wiki.
+                     this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                     this->SetLowStop( 1,limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                   }
                  }
-               }
-  
-  };
+    
+    };
+    /// \}
   }
 }
 #endif

@@ -25,6 +25,10 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief A class for inertial information about a link
     class Inertial
     {
       /// \brief Default Constructor
@@ -96,6 +100,7 @@ namespace gazebo
       private: math::Vector3 products;
       private: sdf::ElementPtr sdf;
     };
+    /// \}
   }
 }
 

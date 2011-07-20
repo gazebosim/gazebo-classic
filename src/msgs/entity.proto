@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Entity 
+/// \brief Information about an entity
+/// \verbatim
+
 import "header.proto";
 
 message Entity
@@ -6,3 +12,4 @@ message Entity
   required Header header = 1;
   required string name = 2;
 }
+/// \endverbatim

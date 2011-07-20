@@ -23,6 +23,9 @@ namespace gazebo
 {
   namespace sensors
   {
+    /// \addtogroup gazebo_sensors
+    /// \{
+ 
     /// \brief Load the sensor library
     bool load();
 
@@ -44,6 +47,7 @@ namespace gazebo
 
     bool init();
     bool fini();
+    /// \}
   }
 }
 #endif

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef HANDLER_HH
-#define HANDLER_HH
+#ifndef PLUGIN_HH
+#define PLUGIN_HH
 
 #include <string>
 #include <boost/signals.hpp>
@@ -23,27 +23,37 @@
 namespace gazebo
 {
 	namespace common
-{
-  class Event;
-
-  class Plugin : public boost::signals::trackable
   {
-    public: Plugin();
-    public: virtual ~Plugin();
-    public: virtual void Load() = 0;
+    class Event;
 
-    /// \brief Get the name of the handler
-    public: std::string GetFilename() const;
+    /// \addtogroup gazebo_common Common 
+    /// \{
 
-    /// \brief Get the short name of the handler
-    public: std::string GetHandle() const;
+    /// \brief A class which all plugins must inherit from
+    class Plugin : public boost::signals::trackable
+    {
+      /// \brief Constructor
+      public: Plugin();
 
-    public: static Plugin *Create(const std::string &filename, const std::string &handle);
+      /// \brief Destructor
+      public: virtual ~Plugin();
 
-    protected: std::string filename;
-    protected: std::string handle;
-  };
-}
+      /// \brief Load function
+      public: virtual void Load() = 0;
+  
+      /// \brief Get the name of the handler
+      public: std::string GetFilename() const;
+  
+      /// \brief Get the short name of the handler
+      public: std::string GetHandle() const;
+  
+      public: static Plugin *Create(const std::string &filename, const std::string &handle);
+  
+      protected: std::string filename;
+      protected: std::string handle;
+    };
+    /// \}
+  }
 
 #define GZ_REGISTER_PLUGIN(name, classname) \
 extern "C" gazebo::Plugin *RegisterPlugin(); \

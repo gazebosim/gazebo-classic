@@ -32,6 +32,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Base class for all geoms
     class Geom : public Entity
     {
@@ -167,6 +170,7 @@ namespace gazebo
       public: event::EventT< void (const Contact &)> contactSignal;
       private: std::vector<event::ConnectionPtr> connections;
     };
+    /// \}
   }
 }
 #endif

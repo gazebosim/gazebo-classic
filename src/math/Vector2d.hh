@@ -30,11 +30,10 @@ namespace gazebo
 {
 	namespace math
   {
-    /// \addtogroup gazebo_server
-    /// \brief Generic x,y vector 
+    /// \addtogroup gazebo_math
     /// \{
     
-    /// \brief Generic x,y vector 
+    /// \brief Generic double x,y vector 
     class Vector2d
     {
       /// \brief Constructor

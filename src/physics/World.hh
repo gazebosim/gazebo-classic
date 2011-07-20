@@ -48,6 +48,10 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
+
     /// \brief The World
     /*
      * The world class keps a list of all models, handles loading and saving,
@@ -229,6 +233,7 @@ namespace gazebo
       private: sdf::ElementPtr sdf;
     };
 
+    /// \}
   }
 }
 #endif

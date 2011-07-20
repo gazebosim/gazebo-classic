@@ -29,6 +29,10 @@ namespace gazebo
 {
   namespace common
   {
+    /// \addtogroup gazebo_common Common 
+    /// \{
+
+    /// \brief Defines a color 
     class Color
     {
       /// \brief Constructor
@@ -136,6 +140,7 @@ namespace gazebo
       // The values
       private: float r, g, b, a;
     };
+    /// \}
   }
 }
 #endif

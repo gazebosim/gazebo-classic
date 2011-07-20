@@ -28,6 +28,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+ 
     /// \brief Cylinder geom
     class CylinderShape : public Shape
     {
@@ -54,7 +57,6 @@ namespace gazebo
       public: virtual void SetSize( const double &radius, const double &length  );
   
     };
-  
     /// \}
   }
 }

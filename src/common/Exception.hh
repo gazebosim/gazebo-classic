@@ -31,10 +31,14 @@ namespace gazebo
 {
 	namespace common
   {
+    /// \addtogroup gazebo_common
+    /// \{
+
     /// Throw an error
     #define gzthrow(msg) {std::ostringstream throwStream; throwStream << "Exception: " << msg << std::endl << std::flush; throw gazebo::common::Exception(__FILE__,__LINE__,throwStream.str()); }
   
-    
+   
+    /// \brief Class for generating exceptions
     class Exception
     {
       /// \brief Constructor
@@ -81,6 +85,7 @@ namespace gazebo
                            << " : " << err.GetErrorStr();
               }
     };
+    /// \}
   }
 }
 

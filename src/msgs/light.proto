@@ -1,4 +1,11 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Light 
+/// \brief Message for a light
+/// \verbatim
+
+
 import "header.proto";
 import "pose.proto";
 import "point.proto";
@@ -28,3 +35,5 @@ message Light
   optional float spot_outer_angle        = 13;
   optional float spot_falloff            = 14;
 }
+
+/// \endverbatim

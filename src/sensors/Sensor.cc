@@ -19,6 +19,8 @@
  * Date: 25 May 2007
  */
 
+#include "sdf/sdf_parser.h"
+
 #include "common/Timer.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -32,6 +34,9 @@ using namespace sensors;
 // Constructor
 Sensor::Sensor()
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( "/sdf/sensor.sdf", this->sdf );
+
   this->active = true;
 }
 
@@ -53,8 +58,11 @@ void Sensor::Load( sdf::ElementPtr &_sdf )
 // Load the sensor
 void Sensor::Load()
 {
+  if (this->sdf->HasElement("origin"))
+  {
+     this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
+  }
 }
-
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the sensor

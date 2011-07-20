@@ -25,7 +25,11 @@ namespace gazebo
 	namespace rendering
   {
     class Visual;
-  
+
+    /// \addtogroup gazebo_rendering 
+    /// \{
+
+    /// \brief Orbit view controller  
     class OrbitViewController : public ViewController
     {
       /// \brief Constructor
@@ -58,7 +62,7 @@ namespace gazebo
   
       private: Visual *refVisual;
     };
+    /// \}
   }
-
 }
 #endif

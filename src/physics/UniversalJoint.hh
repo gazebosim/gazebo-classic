@@ -28,6 +28,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief A universal joint
     template<class T>
     class UniversalJoint : public T
@@ -76,6 +79,7 @@ namespace gazebo
                    }
                  }
     };
+    /// \}
   }
 }
 #endif

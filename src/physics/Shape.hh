@@ -28,6 +28,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Base class for all shapes
     class Shape : public Base
     {
@@ -46,7 +49,7 @@ namespace gazebo
       protected: GeomPtr geomParent;
       protected: sdf::ElementPtr sdf;
     };
+    /// \}
   }
-
 }
 #endif

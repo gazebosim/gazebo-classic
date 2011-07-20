@@ -36,17 +36,13 @@ namespace gazebo
   // Prototype for sensor factory functions
   typedef Sensor* (*SensorFactoryFn) ();
   
-  /// \addtogroup gazebo_sensor
-  /// \brief The sensor factory; the class is just for namespacing purposes.
+  /// \addtogroup gazebo_sensors
   /// \{
   
   /// \brief The sensor factory; the class is just for namespacing purposes.
   class SensorFactory
   {
     public: static void RegisterAll();
-
-    /// \brief Register all known sensors.
-    //public: static void RegisterAll();
     
     /// \brief Register a sensor class (called by sensor registration function).
     public: static void RegisterSensor(const std::string &classname,
@@ -75,6 +71,7 @@ namespace gazebo
   {\
     SensorFactory::RegisterSensor( name, New##classname);\
   }
+  /// \}
   }
 }
 

@@ -33,6 +33,9 @@ namespace gazebo
 {
 	namespace common
   {
+    /// \addtogroup gazebo_common Common 
+    /// \{
+
     /// \brief Output a message 
     #define gzmsg (gazebo::common::Console::Instance()->ColorMsg("Msg", 32))
 
@@ -47,7 +50,8 @@ namespace gazebo
    
     /// Log a message
     #define gzlog (gazebo::common::Console::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
-    
+
+    /// \brief Message, error, warning, and logging functionality   
     class Console
     {
       /// \brief Default constructor
@@ -93,7 +97,8 @@ namespace gazebo
       /// Pointer to myself
       private: static Console *myself;
     };
-  
+
+    /// \}  
   }
 }
 #endif

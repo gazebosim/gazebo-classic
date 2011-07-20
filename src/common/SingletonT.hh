@@ -22,6 +22,9 @@
 #ifndef SINGLETONT_HH
 #define SINGLETONT_HH
 
+/// \addtogroup gazebo_common Common 
+/// \{
+
 /// \brief Singleton class
 template <class T>
 class SingletonT
@@ -49,5 +52,6 @@ class SingletonT
 
 template <class T>
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
+/// \}
 
 #endif

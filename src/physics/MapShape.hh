@@ -34,7 +34,10 @@ namespace gazebo
   {
     class SpaceTree;
     class QuadNode;
-  
+
+    /// \addtogroup gazebo_physics
+    /// \{ 
+    
     /// \brief Map geom
     class MapShape : public Shape
     {
@@ -119,9 +122,8 @@ namespace gazebo
       public: bool leaf;
   
       public: bool valid;
-  
     };
+    /// \}
   }
-
 }
 #endif

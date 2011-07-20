@@ -26,9 +26,15 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_physics
+  /// \brief Physics namespace
 	namespace physics
   {
-     /// \brief A ball joint
+    /// \addtogroup gazebo_physics Physics 
+    /// \brief A set of physics related class, functions, and definitions
+    /// \{
+
+    /// \brief A ball joint
     template< class T>
     class BallJoint : public T
     {
@@ -68,6 +74,7 @@ namespace gazebo
               { return math::Angle();}
   
     };
+    /// \}
   }
 }
 #endif

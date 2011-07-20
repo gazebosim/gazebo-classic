@@ -34,6 +34,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Base class for all joints
     class Joint : public Base
     {
@@ -172,6 +175,7 @@ namespace gazebo
       protected: double damping_coefficient;
       protected: transport::PublisherPtr vis_pub;
     };
+    /// \}
   }
 }
 #endif

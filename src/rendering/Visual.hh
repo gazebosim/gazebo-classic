@@ -34,6 +34,7 @@
 #include "sdf/sdf.h"
 #include "msgs/msgs.h"
 #include "rendering/RenderTypes.hh"
+#include "common/CommonTypes.hh"
 
 namespace Ogre
 {
@@ -46,18 +47,12 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Mesh;
-  }
-
 	namespace rendering
   { 
-    class SelectionObj;
-    class Scene;
-    class DynamicLines;
-  
-    /// \brief Ogre Visual Object
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief A renderable object
     class Visual 
     {
       /// \brief Constructor
@@ -255,6 +250,7 @@ namespace gazebo
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;
     };
+    /// \}
   }
 
 }

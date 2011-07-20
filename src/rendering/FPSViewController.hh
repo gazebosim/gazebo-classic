@@ -23,6 +23,10 @@ namespace gazebo
 {
 	namespace rendering
   {
+    /// \addtogroup gazebo_rendering 
+    /// \{
+
+    /// \brief First Person Shooter style view controller
     class FPSViewController : public ViewController
     {
       /// \brief Constructor
@@ -41,6 +45,7 @@ namespace gazebo
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);
   
     };
+    /// \}
   }
 }
 #endif

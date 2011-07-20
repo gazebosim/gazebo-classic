@@ -29,6 +29,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Geom for an infinite plane.
     /// 
     /// This geom is used primarily for ground planes.  Note that while
@@ -57,6 +60,7 @@ namespace gazebo
       /// \brief Set the normal
       public: void SetNormal( const math::Vector3 &norm );
     };
+    /// \}
   }
 }
 #endif

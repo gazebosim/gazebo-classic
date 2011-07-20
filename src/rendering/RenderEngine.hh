@@ -64,10 +64,9 @@ namespace gazebo
     class Visual;
     class Scene;
     
-    /// \brief Adptor to Ogre3d
+    /// \brief Adaptor to Ogre3d
     class RenderEngine : public SingletonT<RenderEngine>
     {
-    
       /// \brief Constructor
       private: RenderEngine();
     
@@ -94,7 +93,10 @@ namespace gazebo
   
       /// \brief Remove a scene
       public: void RemoveScene(const std::string &name);
-  
+
+      /// \brief Get a scene 
+      public: ScenePtr GetScene(const std::string &_name);
+
       /// \brief Get a scene manager
       public: ScenePtr GetScene(unsigned int index);
   
@@ -141,10 +143,7 @@ namespace gazebo
    
       private: friend class SingletonT<RenderEngine>;
     };
-    
-   
     /// \}
-  
   }
 }
 #endif

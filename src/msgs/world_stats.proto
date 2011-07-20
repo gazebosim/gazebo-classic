@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface WorldStatistics
+/// \brief A message statiscs about a world
+/// \verbatim
+
 import "header.proto";
 import "time.proto";
 
@@ -11,3 +17,5 @@ message WorldStatistics
   required bool  paused      = 5;
   optional int32 model_count = 6;
 }
+
+/// \endverbatim

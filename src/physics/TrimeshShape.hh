@@ -29,13 +29,11 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Mesh;
-  }
-
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Triangle mesh geom
     class TrimeshShape : public Shape
     {
@@ -55,6 +53,7 @@ namespace gazebo
   
       protected: const common::Mesh *mesh;
     };
+    /// \}
   }
 }
 #endif

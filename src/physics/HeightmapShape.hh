@@ -30,6 +30,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Height map geom
     class HeightmapShape : public Shape
     {
@@ -51,8 +54,8 @@ namespace gazebo
       protected: std::vector<double> heights;
   
       protected: common::Image img;
-      // NATY: protected: OgreHeightmap *ogreHeightmap;
     };
+    /// \}
   }
 
 }

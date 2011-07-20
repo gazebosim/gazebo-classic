@@ -31,43 +31,48 @@
 namespace gazebo
 {
 	namespace common
-{
-  class Logger : public SingletonT<Logger>
   {
-    /// \brief Constructor
-    public: Logger();
+    /// \addtogroup gazebo_common Common 
+    /// \{
 
-    /// \brief Destructor
-    public: virtual ~Logger();
-
-    /// \brief Add a log file
-    public: void AddLog(const std::string &model, const std::string &filename);
-
-    /// \brief Remove a log
-    public: void RemoveLog(const std::string &entity);
-
-    /// \brief Update the log files
-    public: void Update();
-
-    private: class LogObj
-             {
-               public: LogObj(const std::string &entityName, 
-                              const std::string &filename);
-               public: virtual ~LogObj();
-               public: void Update();
-               public: std::string GetEntityName() const;
-
-               public: bool valid;
-               private: Entity *entity;
-               private: std::fstream logFile;
-               private: Time startSimTime;
-               private: Time startRealTime;
-             };
-
-    private: std::vector<LogObj*> logObjects;
-
-    private: friend class SingletonT<Logger>;
-  };
-}
+    /// \brief Handles logging of data to disk
+    class Logger : public SingletonT<Logger>
+    {
+      /// \brief Constructor
+      public: Logger();
+  
+      /// \brief Destructor
+      public: virtual ~Logger();
+  
+      /// \brief Add a log file
+      public: void AddLog(const std::string &model, const std::string &filename);
+  
+      /// \brief Remove a log
+      public: void RemoveLog(const std::string &entity);
+  
+      /// \brief Update the log files
+      public: void Update();
+  
+      private: class LogObj
+               {
+                 public: LogObj(const std::string &entityName, 
+                                const std::string &filename);
+                 public: virtual ~LogObj();
+                 public: void Update();
+                 public: std::string GetEntityName() const;
+  
+                 public: bool valid;
+                 private: Entity *entity;
+                 private: std::fstream logFile;
+                 private: Time startSimTime;
+                 private: Time startRealTime;
+               };
+  
+      private: std::vector<LogObj*> logObjects;
+  
+      private: friend class SingletonT<Logger>;
+    };
+    /// \}
+  }
 }
 #endif

@@ -40,7 +40,10 @@ namespace gazebo
 	namespace rendering
   {
     class Scene;
-    
+
+    /// \addtogroup gazebo_rendering 
+    /// \{
+   
     /**
      * \class Grid
      * \brief Displays a grid of cells, drawn with lines
@@ -106,6 +109,7 @@ namespace gazebo
   
       private: Scene *scene;
     };
+    /// \}
   
   }
 

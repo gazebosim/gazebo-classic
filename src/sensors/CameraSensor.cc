@@ -42,11 +42,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
-  rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(0);
-  this->camera = scene->CreateCamera("mono_camera");
-
   this->typeName = "monocamera";
-  this->camera->SetCaptureData(true);
 
   this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&CameraSensor::Render, this)) );
 }
@@ -62,7 +58,8 @@ CameraSensor::~CameraSensor()
 // Load the camera with SDF parameters
 void CameraSensor::Load( sdf::ElementPtr &_sdf )
 {
-  this->sdf = _sdf;
+  std::cout << "HLSDKFJLDSKFJ!!!\n\n";
+  Sensor::Load(_sdf);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -70,7 +67,37 @@ void CameraSensor::Load( sdf::ElementPtr &_sdf )
 void CameraSensor::Load()
 {
   Sensor::Load();
-  this->camera->Load( this->sdf );
+
+  std::string worldName;
+
+  sdf::ElementPtr sdfParent = this->sdf->GetParent();
+  while (sdfParent && sdfParent->GetName() != "world")
+  {
+    sdfParent = sdfParent->GetParent();
+  }
+
+  if (!sdfParent)
+  {
+    gzerr << "Unable to get camera sensor world name\n";
+    return;
+  }
+
+  worldName = sdfParent->GetValueString("name");
+
+  rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
+  if (!scene)
+    scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
+
+  this->camera = scene->CreateCamera("mono_camera");
+  if (!this->camera)
+  {
+    gzerr << "Unable to create camera sensor[mono_camera]\n";
+    return;
+  }
+  this->camera->SetCaptureData(true);
+
+  sdf::ElementPtr cameraSdf = this->sdf->GetOrCreateElement("camera");
+  this->camera->Load( cameraSdf );
 
   // Do some sanity checks
   if (this->camera->GetImageWidth() == 0 || 
@@ -86,6 +113,8 @@ void CameraSensor::Init()
 {
   Sensor::Init();
   this->camera->Init();
+  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+  this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
 
   // Create the render texture
   this->ogreTextureName = this->GetName() + "_RttTex";
@@ -126,8 +155,11 @@ void CameraSensor::Render()
 void CameraSensor::Update(bool force)
 {
   Sensor::Update(force);
-  this->camera->Render();
-  this->camera->PostRender();
+  /*if (this->camera)
+  {
+    this->camera->Render();
+    this->camera->PostRender();
+  }*/
 
   // NATY
   //if (this->active || **this->alwaysActiveP)

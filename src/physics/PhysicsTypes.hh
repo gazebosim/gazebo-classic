@@ -18,6 +18,9 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+/// \file
+/// \ingroup gazebo_physics
+/// \brief Physics forward declarations and type defines
 namespace gazebo
 {
   namespace physics

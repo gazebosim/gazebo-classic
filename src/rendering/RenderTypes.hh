@@ -19,6 +19,9 @@
 
 #include <boost/shared_ptr.hpp>
 
+/// \file
+/// \ingroup gazebo_rendering
+/// \brief Forward declarations and type defs for rendering
 namespace gazebo
 {
   namespace rendering
@@ -28,6 +31,7 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class DynamicLines;
+    class SelectionObj;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;

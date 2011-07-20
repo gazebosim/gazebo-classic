@@ -20,6 +20,7 @@
  * Date: 18 Dec 2009
  */
 
+#include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
 #include "sensors/SensorManager.hh"
 
@@ -70,6 +71,8 @@ void SensorManager::RunLoop()
 /// Update all the sensors
 void SensorManager::Update(bool force)
 {
+  rendering::RenderEngine::Instance()->UpdateScenes();
+
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Update(force);

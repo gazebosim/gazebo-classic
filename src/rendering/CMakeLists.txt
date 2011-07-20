@@ -23,7 +23,6 @@ set (sources MovableText.cc
              OrbitViewController.cc
              Grid.cc
              Scene.cc
-             RenderState.cc
              WindowManager.cc
              Conversions.cc
              Rendering.cc
@@ -46,7 +45,6 @@ set (headers MovableText.hh
              OrbitViewController.hh
              Grid.hh
              Scene.hh
-             RenderState.hh
              WindowManager.hh
              RenderTypes.hh
              Conversions.hh

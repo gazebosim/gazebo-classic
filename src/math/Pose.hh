@@ -31,12 +31,10 @@ namespace gazebo
 {
 	namespace math
   {
-  
-    /// \addtogroup gazebo_server
-    /// \brief Pose encapsulates a position and rotation in three space
+    /// \addtogroup gazebo_math
     /// \{
     
-    /// \brief Pose encapsulates a position and rotation in three space
+    /// \brief Encapsulates a position and rotation in three space
     class Pose
     {
       /// \brief Default constructors
@@ -159,7 +157,6 @@ namespace gazebo
     };
     
     /// \}
-  
   }
 
 }

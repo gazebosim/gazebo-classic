@@ -36,79 +36,126 @@
 
 namespace gazebo
 {
+
+  /// \ingroup gazebo_math
+  /// \brief Math namespace
   namespace math
   {
 
-  /// \addtogroup gazebo_server
-  /// \brief Angle class
+  /// \addtogroup gazebo_math Math
+  /// \brief A set of classes that encapsulate math related properties and
+  ///        functions.
   /// \{
   
-  /// \brief Angle class
+  /// \brief An angle and related functions. 
   class Angle
   {
     /// \brief Constructor
     public: Angle();
 
-    /// \brief Constructor
-    public: Angle(double radian);
+    /// \brief Copy Constructor
+    /// \param _radian Radians
+    public: Angle(double _radian);
 
     /// \brief Copy constructor
+    /// \param _angle Angle to copy
     public: Angle(const Angle &angle);
   
     /// \brief Destructor
     public: virtual ~Angle();
   
     /// \brief Set the value from an angle in radians
-    public: void SetFromRadian( double radian );
+    /// \param _radian Radian value
+    public: void SetFromRadian( double _radian );
   
     /// \brief Set the value from an angle in degrees
+    /// \param _degree Degree value
     public: void SetFromDegree( double degree );
   
     /// \brief Get the angle in radians
+    /// \return Double containing the angle's radian value
     public: double GetAsRadian() const;
   
     /// \brief Get the angle in degrees
+    /// \return Double containing the angle's degree value
     public: double GetAsDegree() const;
 
     /// \brief Normalize the angle
     public: void Normalize();
 
     /// \brief Dereference operator
+    /// \return Double containing the angle's radian value
     public: inline double operator*() const { return value; }
 
-    /// \brief Substraction
-    public: Angle operator-(const Angle &angle) const;
-    /// \brief Addition
-    public: Angle operator+(const Angle &angle) const;
-    /// \brief Multiplication
-    public: Angle operator*(const Angle &angle) const;
-    /// \brief Division
-    public: Angle operator/(const Angle &angle) const;
+    /// \brief Substraction, result = this - _angle
+    /// \param _angle Angle for substraction
+    /// \return The new angle
+    public: Angle operator-(const Angle &_angle) const;
 
-    /// \brief Add set
-    public: Angle operator-=(const Angle &angle);
-    /// \brief Sub set
-    public: Angle operator+=(const Angle &angle);
-    /// \brief Mul set
-    public: Angle operator*=(const Angle &angle);
-    /// \brief Div set
-    public: Angle operator/=(const Angle &angle);
+    /// \brief Addition, result = this + _angle
+    /// \param _angle Angle for addition
+    /// \return The new angle
+    public: Angle operator+(const Angle &_angle) const;
 
-    /// \brief Equality
-    public: bool operator==(const Angle &angle) const;
+    /// \brief Multiplication, result = this * _angle
+    /// \param _angle Angle for multiplication
+    /// \return The new angle
+    public: Angle operator*(const Angle &_angle) const;
+
+    /// \brief Division, result = this / _angle
+    /// \param _angle Angle for division
+    /// \return The new angle
+    public: Angle operator/(const Angle &_angle) const;
+
+    /// \brief Subtraction set, this = this - _angle
+    /// \param _angle Angle for subtraction
+    /// \return This angle
+    public: Angle operator-=(const Angle &_angle);
+
+    /// \brief Addition set, this = this + _angle
+    /// \param _angle Angle for addition
+    /// \return This angle
+    public: Angle operator+=(const Angle &_angle);
+
+    /// \brief Multiplication set, this = this * _angle
+    /// \param _angle Angle for multiplication
+    /// \return This angle
+    public: Angle operator*=(const Angle &_angle);
+
+    /// \brief Division set, this = this / _angle
+    /// \param _angle Angle for division
+    /// \return This angle
+    public: Angle operator/=(const Angle &_angle);
+
+    /// \brief Equality operator, result = this == _angle
+    /// \param _angle Angle to check for equality
+    /// \return True if this == _angle
+    public: bool operator==(const Angle &_angle) const;
 
     /// \brief Inequality
-    public: bool operator!=(const Angle &angle) const;
+    /// \param _angle Angle to check for inequality
+    /// \return True if this != _angle
+    public: bool operator!=(const Angle &_angle) const;
 
-    /// \brief Less
-    public: bool operator<(const Angle &angle) const;
-    /// \brief Less equal
-    public: bool operator<=(const Angle &angle) const;
+    /// \brief Less than operator
+    /// \param _angle Angle to check
+    /// \return True if this < _angle
+    public: bool operator<(const Angle &_angle) const;
 
-    /// \brief Greater
-    public: bool operator>(const Angle &angle) const;
+    /// \brief Less or equal operator
+    /// \param _angle Angle to check
+    /// \return True if this <= _angle
+    public: bool operator<=(const Angle &_angle) const;
+
+    /// \brief Greater than operator
+    /// \param _angle Angle to check
+    /// \return True if this > _angle
+    public: bool operator>(const Angle &_angle) const;
+
     /// \brief Greater equal
-    public: bool operator>=(const Angle &angle) const;
+    /// \param _angle Angle to check
+    /// \return True if this >= _angle
+    public: bool operator>=(const Angle &_angle) const;
 
     /// \brief Ostream operator. Outputs in degrees
     /// \param out Ostream

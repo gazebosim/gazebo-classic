@@ -32,6 +32,10 @@ namespace gazebo
 {
 	namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Class to mangage render windows 
     class WindowManager : public SingletonT<WindowManager>
     {
       public: WindowManager();
@@ -67,6 +71,7 @@ namespace gazebo
   
       private: friend class SingletonT<WindowManager>;
     };
+    /// \}
   }
 }
 #endif

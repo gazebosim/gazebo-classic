@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface WorldControl
+/// \brief A message that allows for control of world functions
+/// \verbatim
+
 import "header.proto";
 
 message WorldControl
@@ -7,3 +13,5 @@ message WorldControl
   optional bool pause = 2;
   optional bool step = 4;
 }
+
+/// \endverbatim

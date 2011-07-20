@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Scene
+/// \brief A message containing a description of a scene
+/// \verbatim
+
 import "header.proto";
 import "color.proto";
 import "fog.proto";
@@ -22,3 +28,5 @@ message Scene
   repeated Light light         = 9; 
   repeated Joint joint         = 10;
 }
+
+/// \endverbatim

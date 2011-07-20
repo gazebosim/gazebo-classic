@@ -33,6 +33,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief A model
     class Model : public Entity
     {
@@ -154,6 +157,7 @@ namespace gazebo
 
       private: transport::PublisherPtr jointPub;
     };
+    /// \}
   }
 }
 #endif

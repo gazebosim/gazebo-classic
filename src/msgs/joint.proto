@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joint 
+/// \brief Message for joints
+/// \verbatim
+
 import "header.proto";
 import "point.proto";
 
@@ -18,3 +24,4 @@ message Joint
   required string child  = 4;
   optional Point axis    = 5;
 }
+/// \endverbatim

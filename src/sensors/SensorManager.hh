@@ -33,7 +33,9 @@ namespace gazebo
 {
   namespace sensors
   {
-
+    /// \addtogroup gazebo_sensors
+    /// \{
+ 
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {
@@ -74,6 +76,7 @@ namespace gazebo
 
       private: friend class SingletonT<SensorManager>;
     };
+    /// \}
   }
 }
 #endif

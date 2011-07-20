@@ -37,6 +37,9 @@ namespace gazebo
 
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Laser geom contains a set of ray-geoms, structured to simulate
     ///        a laser range scanner
     class MultiRayShape : public Shape
@@ -109,6 +112,7 @@ namespace gazebo
   
       protected: math::Vector3 offset;
     };
+    /// \}
   
   }
 

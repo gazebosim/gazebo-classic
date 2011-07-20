@@ -33,13 +33,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+ 
     // Prototype for sensor factory functions
     typedef PhysicsEnginePtr (*PhysicsFactoryFn) (WorldPtr world);
-    
-    /// \addtogroup gazebo_physics
-    /// \brief The physics factory
-    /// \{
-    
+   
     /// \brief The physics factory
     class PhysicsFactory
     {
@@ -72,7 +71,8 @@ namespace gazebo
   {\
     PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\
   }
-    
+   
+   /// \} 
   }
 
 }

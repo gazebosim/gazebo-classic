@@ -28,6 +28,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Surface params
     class SurfaceParams
     {
@@ -57,6 +60,7 @@ namespace gazebo
       public: bool enableFriction;
       public: math::Vector3 fdir1;
     };
+    /// \}
   }
 }
 #endif

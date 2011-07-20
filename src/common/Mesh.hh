@@ -28,7 +28,11 @@ namespace gazebo
   {
     class Material;
     class SubMesh;
-  
+
+    /// \addtogroup gazebo_common Common 
+    /// \{
+
+    /// \brief A 3D mesh
     class Mesh
     {
       /// \brief Constructor
@@ -99,7 +103,8 @@ namespace gazebo
       private: std::vector<SubMesh *> submeshes;
       private: std::vector<Material *> materials;
     };
-  
+ 
+    /// \brief A child mesh 
     class SubMesh
     {
       /// \brief Constructor
@@ -200,6 +205,7 @@ namespace gazebo
   
       private: int materialIndex;
     };
+    /// \}
   }
 
 }

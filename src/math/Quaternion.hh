@@ -35,8 +35,7 @@ namespace gazebo
 	namespace math
   {
   
-  /// \addtogroup gazebo_server
-  /// \brief A quaternion class
+  /// \addtogroup gazebo_math
   /// \{
   
   /// \brief A quaternion class

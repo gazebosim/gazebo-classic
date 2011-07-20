@@ -23,18 +23,20 @@
 #define CAMERASENSOR_HH
 
 #include "sensors/Sensor.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
-  namespace rendering
-  {
-    class Camera;
-  }
-
+  
+  /// \ingroup gazebo_sensors
+  /// \brief Sensors namespace
   namespace sensors
   {
+    /// \addtogroup gazebo_sensors Sensors 
+    /// \brief A set of sensor classes, functions, and definitions
+    /// \{
+ 
     /// \brief Basic camera sensor
-    ///
     /// This sensor is used for simulating standard monocular cameras
     class CameraSensor : public Sensor
     {
@@ -69,7 +71,7 @@ namespace gazebo
     
       protected: std::string ogreTextureName;
     };
-
+    /// \}
   }
 }
 #endif

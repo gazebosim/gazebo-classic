@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Shadows
+/// \brief A message for shadow data
+/// \verbatim
+
 import "color.proto";
 
 message Shadows
@@ -13,3 +19,5 @@ message Shadows
   optional ShadowType type = 5;
   optional Color color = 6;
 }
+
+/// \endverbatim

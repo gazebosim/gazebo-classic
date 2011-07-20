@@ -30,13 +30,10 @@ namespace gazebo
 {
 	namespace common
   {
-    /// \addtogroup gazebo_server
-    /// \brief A Time class
+    /// \addtogroup gazebo_common
     /// \{
     
-    
     /// \brief A Time class
-    /// \todo: replace this with Boost
     class Time
     {
       /// \brief Constructors

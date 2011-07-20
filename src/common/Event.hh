@@ -29,8 +29,13 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_event
+  /// \brief Event namespace
   namespace event
   {
+    /// \addtogroup gazebo_event Events 
+    /// \{
+
     /// \brief Base class for all events
     class Event
     { 
@@ -217,6 +222,7 @@ namespace gazebo
         this->connections.erase(this->connections.begin()+id);
       }
     }
+    /// \}
   }
 }
 #endif

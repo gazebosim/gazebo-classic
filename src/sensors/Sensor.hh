@@ -34,8 +34,7 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// \addtogroup gazebo_sensor
-    /// \brief Base class for sensors
+    /// \addtogroup gazebo_sensors
     /// \{
     
     /// \brief Base class for sensors

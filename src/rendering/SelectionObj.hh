@@ -25,7 +25,11 @@ namespace gazebo
   {
     class Visual;
     class Scene;
-  
+
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief A graphical selection object 
     class SelectionObj
     {
       /// \brief Constructor
@@ -42,6 +46,7 @@ namespace gazebo
       private: Visual *node;
       private: Scene *scene;
     };
+    /// \brief 
   }
 }
 #endif

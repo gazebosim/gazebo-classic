@@ -23,11 +23,15 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering
+    /// \{
+ 
     bool load();
     bool init();
     bool fini();
 
     rendering::ScenePtr create_scene(const std::string &name);
+    /// \}
   }
 }
 #endif

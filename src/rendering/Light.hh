@@ -44,7 +44,10 @@ namespace gazebo
     class Visual;
     class Scene;
     class DynamicLines;
-  
+
+    /// \addtogroup gazebo_rendering 
+    /// \{
+ 
     /// \brief Wrapper around an ogre light source
     class Light
     {
@@ -132,6 +135,7 @@ namespace gazebo
       private: static unsigned int lightCounter;
       private: Scene *scene;
     };
+    /// \}
   }
 }
 #endif

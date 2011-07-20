@@ -27,8 +27,14 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_common
+  /// \brief Common namespace
   namespace common
   {
+    /// \addtogroup gazebo_common Common 
+    /// \brief A set of common class, functions, and definitions
+    /// \{
+    
     /// \brief Wrapper around the Assimp asset loader
     class AssimpLoader : public MeshLoader
     {
@@ -46,6 +52,7 @@ namespace gazebo
     
       private: Assimp::Importer importer;
     };
+    /// \}
   }
 }
 

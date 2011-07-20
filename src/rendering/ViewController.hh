@@ -17,17 +17,18 @@
 #ifndef VIEWCONTROLLER_HH
 #define VIEWCONTROLLER_HH
 
+#include "common/CommonTypes.hh"
+
 namespace gazebo
 {
-  namespace common
-  {
-    class MouseEvent;
-  }
-
 	namespace rendering
   {
     class UserCamera;
-  
+
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Base class for view controllers
     class ViewController
     {
       /// \brief Constructor
@@ -43,6 +44,7 @@ namespace gazebo
   
       protected: UserCamera *camera; 
     };
+    /// \}
   }
 }
 #endif

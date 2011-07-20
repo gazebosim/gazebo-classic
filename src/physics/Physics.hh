@@ -22,6 +22,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     bool load();
     bool fini();
 
@@ -31,5 +34,6 @@ namespace gazebo
     void run_world(WorldPtr world);
     void stop_world(WorldPtr world);
     void pause_world(WorldPtr world, bool pause);
+    /// \}
   }
 }

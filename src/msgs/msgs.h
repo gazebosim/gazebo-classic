@@ -31,50 +31,154 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_msgs Messages
+  /// \brief Messages namespace
 	namespace msgs
   {
-    void Init(google::protobuf::Message &message, const std::string &id="");
+    /// \addtogroup gazebo_msgs Messages 
+    /// \brief All messages and helper functions
+    /// \{
+ 
+    /// \brief Initialize a message
+    /// \param _message Message to initialize
+    /// \param _id Optional string id
+    void Init(google::protobuf::Message &_message, const std::string &_id="");
 
+    /// \brief Time stamp a header
+    /// \param _header Header to stamp
+    void Stamp(msgs::Header *_header);
 
-    void Stamp(msgs::Header *);
-    void Stamp(msgs::Time *);
+    /// \brief Set the time in a time message
+    /// \param _time A Time message
+    void Stamp(msgs::Time *_time);
 
+    /// \cond
+    /// \brief Package up a message with a type descriptor.
+    /// \param _type A string describing the type of message
     std::string Package(const std::string &type, 
         const google::protobuf::Message &message);
+    /// \endcond
 
-    msgs::Packet Package2(const std::string &type, 
-        const google::protobuf::Message &message);
+    /// \brief Convert a math::Vector3 to a msgs::Point
+    /// \param _v The vector to convert
+    /// \return A msgs::Point object
+    msgs::Point      Convert(const math::Vector3 &_v);
 
-    msgs::Point      Convert(const math::Vector3 &v);
-    msgs::Quaternion Convert(const math::Quaternion &q);
-    msgs::Pose       Convert(const math::Pose &p);
-    msgs::Color      Convert(const common::Color &c);
-    msgs::Time       Convert(const common::Time &t);
-    msgs::Plane      Convert(const math::Plane &p);
+    /// \brief Convert a math::Quaternion to a msgs::Quaternion
+    /// \param _q The quaternion to convert
+    /// \return A msgs::Quaternion object
+    msgs::Quaternion Convert(const math::Quaternion &_q);
 
-    math::Vector3    Convert(const msgs::Point &v);
-    math::Quaternion Convert(const msgs::Quaternion &q);
-    math::Pose       Convert(const msgs::Pose &p);
-    common::Color    Convert(const msgs::Color &c);
-    common::Time     Convert(const msgs::Time &t);
-    math::Plane      Convert(const msgs::Plane &p);
+    /// \brief Convert a math::Pose to a msgs::Pose
+    /// \param _p The pose to convert
+    /// \return A msgs::Pose object
+    msgs::Pose       Convert(const math::Pose &_p);
 
-    void Set(msgs::Point *pt, const math::Vector3 &v);
-    void Set(msgs::Quaternion *q, const math::Quaternion &v);
-    void Set(msgs::Pose *p, const math::Pose &v);
-    void Set(msgs::Color *c, const common::Color &v);
-    void Set(msgs::Time *t, const common::Time &v);
-    void Set(msgs::Plane *p, const math::Plane &v);
+    /// \brief Convert a common::Color to a msgs::Color
+    /// \param _c The color to convert
+    /// \return A msgs::Color object
+    msgs::Color      Convert(const common::Color &_c);
 
+    /// \brief Convert a common::Time to a msgs::Time
+    /// \param _t The time to convert
+    /// \return A msgs::Time object
+    msgs::Time       Convert(const common::Time &_t);
+
+    /// \brief Convert a math::Plane to a msgs::Plane
+    /// \param _p The plane to convert
+    /// \return A msgs::Plane object
+    msgs::Plane      Convert(const math::Plane &_p);
+
+    /// \brief Convert a msgs::Point to a math::Vector
+    /// \param _v The plane to convert
+    /// \return A math::Vector3 object
+    math::Vector3    Convert(const msgs::Point &_v);
+
+    /// \brief Convert a msgs::Quaternion to a math::Quaternion
+    /// \param _q The quaternion to convert
+    /// \return A math::Quaternion object
+    math::Quaternion Convert(const msgs::Quaternion &_q);
+
+    /// \brief Convert a msgs::Pose to a math::Pose
+    /// \param _q The pose to convert
+    /// \return A math::Pose object
+    math::Pose       Convert(const msgs::Pose &_p);
+
+    /// \brief Convert a msgs::Color to a common::Color
+    /// \param _c The color to convert
+    /// \return A common::Color object
+    common::Color    Convert(const msgs::Color &_c);
+
+    /// \brief Convert a msgs::Time to a common::Time
+    /// \param _t The time to convert
+    /// \return A common::Time object
+    common::Time     Convert(const msgs::Time &_t);
+
+    /// \brief Convert a msgs::Plane to a common::Plane
+    /// \param _p The plane to convert
+    /// \return A common::Plane object
+    math::Plane      Convert(const msgs::Plane &_p);
+
+    /// \brief Set a msgs::Point from a math::Vector3
+    /// \param _pt A msgs::Point pointer
+    /// \param _v A math::Vector3 reference
+    void Set(msgs::Point *_pt, const math::Vector3 &_v);
+
+    /// \brief Set a msgs::Quaternion from a math::Quaternion
+    /// \param _q A msgs::Quaternion pointer
+    /// \param _v A math::Quaternion reference
+    void Set(msgs::Quaternion *_q, const math::Quaternion &_v);
+
+    /// \brief Set a msgs::Pose from a math::Pose
+    /// \param _p A msgs::Pose pointer
+    /// \param _v A math::Pose reference
+    void Set(msgs::Pose *_p, const math::Pose &_v);
+
+    /// \brief Set a msgs::Color from a common::Color
+    /// \param _p A msgs::Color pointer
+    /// \param _v A common::Color reference
+    void Set(msgs::Color *_c, const common::Color &_v);
+
+    /// \brief Set a msgs::Time from a common::Time
+    /// \param _p A msgs::Time pointer
+    /// \param _v A common::Time reference
+    void Set(msgs::Time *_t, const common::Time &_v);
+
+    /// \brief Set a msgs::Plane from a math::Plane
+    /// \param _p A msgs::Plane pointer
+    /// \param _v A math::Plane reference
+    void Set(msgs::Plane *_p, const math::Plane &_v);
+
+    /// \brief Create a msgs::Light from a light SDF element
+    /// \param _sdf The sdf element
+    /// \return The new msgs::Light object
     msgs::Light      LightFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Visual from a visual SDF element
+    /// \param _sdf The sdf element
+    /// \return The new msgs::Visual object
     msgs::Visual     VisualFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Fog from a fog SDF element
+    /// \param _sdf The sdf element
+    /// \return The new msgs::Fog object
     msgs::Fog        FogFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Scene from a scene SDF element
+    /// \param _sdf The sdf element
+    /// \return The new msgs::Scene object
     msgs::Scene      SceneFromSDF(sdf::ElementPtr _sdf);
 
-
+    /// \cond
     const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
+    /// \endcond
 
-    msgs::Header *GetHeader(google::protobuf::Message &message);
+    /// \brief Get the header from a protobuf message
+    /// \param _message A google protobuf message
+    /// \return A pointer to the message's header
+    msgs::Header *GetHeader(google::protobuf::Message &_message);
+
+    /// \}
   }
 }
 

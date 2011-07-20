@@ -51,10 +51,13 @@ namespace gazebo
     class Camera;
     class UserCamera;
     class SelectionObj;
-  
+
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief Representation of an entire scene graph  
     class Scene
     {
-  
       public: enum SceneType {BSP, GENERIC};
 
       private: Scene() {}
@@ -257,9 +260,10 @@ namespace gazebo
 
       private: SelectionObj *selectionObj;
 
-      private: Ogre::SceneNode *worldSceneNode;
+      private: Visual *worldVisual;
       private: bool shadowsEnabled;
     };
+    /// \}
   }
 }
 #endif 

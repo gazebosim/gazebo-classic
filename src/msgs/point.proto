@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Point 
+/// \brief Message for a point
+/// \verbatim
+
 import "header.proto";
 
 message Point
@@ -8,3 +14,5 @@ message Point
   required double y = 3;
   required double z = 4;
 }
+
+/// \endverbatim

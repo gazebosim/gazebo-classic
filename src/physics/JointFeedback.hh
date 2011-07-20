@@ -28,6 +28,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
     class JointFeedback
     {
       /// \brief Operator =
@@ -47,7 +50,7 @@ namespace gazebo
       public: math::Vector3 body1Torque;
       public: math::Vector3 body2Torque;
     };
+    /// \}
   }
-
 }
 #endif

@@ -37,11 +37,6 @@ bool sensors::load()
   if (!gazebo::rendering::load())
     gzthrow("Unable to load the rendering engine");
 
-  return true;
-}
-
-bool sensors::init()
-{
   // The rendering engine will run headless 
   if (!gazebo::rendering::init())
   {
@@ -49,10 +44,11 @@ bool sensors::init()
     return false;
   }
 
-  // TODO: defaults to the "default" world. need to change this to handle
-  // multiple worlds
-  gazebo::rendering::create_scene("default");
+  return true;
+}
 
+bool sensors::init()
+{
   return true;
 }
 

@@ -23,10 +23,14 @@ namespace gazebo
 {
 	namespace rendering
   {
+    /// \addtogroup gazebo_rendering 
+    /// \{
+ 
     class Material
     {
       public: static void Update(const gazebo::common::Material *_mat);
     };
+    /// \}
   }
 
 }

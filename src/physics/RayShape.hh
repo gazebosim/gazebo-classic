@@ -31,6 +31,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Ray geom 
     class RayShape : public Shape
     {
@@ -107,6 +110,7 @@ namespace gazebo
       protected: math::Vector3 globalEndPos;
       protected: transport::PublisherPtr vis_pub;
     };
+    /// \}
   }
 }
 #endif

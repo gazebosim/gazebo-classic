@@ -44,12 +44,18 @@ namespace Ogre
 namespace gazebo
 {
 
+  /// \ingroup gazebo_rendering
+  /// \brief Rendering namespace
 	namespace rendering
   {
     class MouseEvent;
     class ViewController;
     class Scene;
-   
+
+    /// \addtogroup gazebo_rendering Rendering 
+    /// \brief A set of rendering related class, functions, and definitions
+    /// \{
+
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
@@ -304,7 +310,6 @@ namespace gazebo
       private: friend class Scene;
     };
     
-    /// \}
     /// \}
   }
 }

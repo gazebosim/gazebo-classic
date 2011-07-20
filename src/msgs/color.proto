@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Color 
+/// \brief Color message
+/// \verbatim
+
 import "header.proto";
 
 message Color
@@ -9,3 +15,5 @@ message Color
   required float b = 4;
   required float a = 5;
 }
+
+/// \endverbatim

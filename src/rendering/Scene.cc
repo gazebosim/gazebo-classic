@@ -142,7 +142,7 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->worldSceneNode = this->manager->getRootSceneNode()->createChildSceneNode(this->GetName() + "__world_node__");
+  this->worldVisual = new Visual( "__world_node__", this );
 
   RTShaderSystem::Instance()->AddScene(this);
 
@@ -795,12 +795,17 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
 {
+  gzdbg << "Receive Scene Msg\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }
 
 void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 {
+  gzdbg << "Process Scene Msg. Visuals[" << _msg->visual_size() 
+        << "] Poses[" << _msg->pose_size() << "] Lights[" 
+        << _msg->light_size() << "]\n";
+
   for (int i=0; i < _msg->visual_size(); i++)
   {
     boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(_msg->visual(i)) );
@@ -878,6 +883,7 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
+  gzdbg << "ReceiveVisual Message\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(msg);
 }
@@ -886,6 +892,7 @@ void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 // Process all incoming messages before rendering
 void Scene::PreRender()
 {
+  gzdbg << "Scene[" << this->GetName() << "] PreRender!\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
   SceneMsgs_L::iterator sIter;
@@ -967,12 +974,17 @@ void Scene::ReceiveJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 {
   Visual *parentVis = this->GetVisual(_msg->parent());
-  Visual *childVis = this->GetVisual(_msg->child());
+  Visual *childVis = NULL;
+
+  if (_msg->child() == "world")
+    childVis = this->worldVisual;
+  else
+   childVis = this->GetVisual(_msg->child());
 
   if (parentVis && childVis)
   {
     DynamicLines *line= new DynamicLines();
-    this->worldSceneNode->attachObject(line);
+    this->worldVisual->AttachObject(line);
 
     line->AddPoint( math::Vector3(0,0,0) );
     line->AddPoint( math::Vector3(0,0,0) );
@@ -982,7 +994,7 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
   }
   else
   {
-    gzwarn << "Unable to create joint visual.\n";
+    gzwarn << "Unable to create joint visual. Parent[" << _msg->parent() << "] Child[" << _msg->child() << "].\n";
   }
 }
 
@@ -1043,6 +1055,7 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
 void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 {
+  gzdbg << "Got a light\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->lightMsgs.push_back(_msg);
 }

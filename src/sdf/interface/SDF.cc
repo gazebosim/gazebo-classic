@@ -22,6 +22,16 @@
 
 using namespace sdf;
 
+ElementPtr Element::GetParent() const
+{
+  return this->parent;
+}
+
+void Element::SetParent(const ElementPtr &_parent)
+{
+  this->parent = _parent;
+}
+
 void Element::SetName(const std::string &_name)
 {
   this->name = _name;
@@ -124,6 +134,7 @@ ElementPtr Element::Clone() const
   ElementPtr clone(new Element);
   clone->name = this->name;
   clone->required = this->required;
+  clone->parent = this->parent;
 
   Param_V::const_iterator aiter;
   for (aiter = this->attributes.begin(); 
@@ -274,7 +285,9 @@ ElementPtr Element::AddElement(const std::string &_name)
   {
     if ((*iter)->name == _name)
     {
-      this->elements.push_back( (*iter)->Clone() );
+      ElementPtr elem = (*iter)->Clone();
+      elem->SetParent( shared_from_this() );
+      this->elements.push_back( elem );
       return this->elements.back();
     }
   }

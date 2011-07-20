@@ -15,7 +15,6 @@
  *
 */
 /* Desc: Gazebo configuration on this computer 
- * Author: Jordi Polo
  * Date: 3 May 2008
  */
 
@@ -41,6 +40,10 @@ namespace gazebo
 {
 	namespace common
   {
+    /// \addtogroup gazebo_common Common 
+    /// \{
+
+    /// \brief Functions to handle getting system paths
     class SystemPaths
     {
       /// \brief Get the gazebo install paths
@@ -61,6 +64,7 @@ namespace gazebo
       public: static std::string FindFileWithGazeboPaths(std::string filename);
   
     };
+    /// \}
   }
 }
 #endif

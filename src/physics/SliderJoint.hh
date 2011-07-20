@@ -29,6 +29,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief A slider joint
     template<class T>
     class SliderJoint : public T
@@ -68,6 +71,7 @@ namespace gazebo
    
       protected: math::Vector3 fakeAnchor;
     };
+    /// \}
     
   }
 }

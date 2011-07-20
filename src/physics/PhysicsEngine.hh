@@ -30,7 +30,9 @@ namespace gazebo
 {
 	namespace physics
   {
-   
+    /// \addtogroup gazebo_physics
+    /// \{
+  
     /// \brief Base class for a physics engine
     class PhysicsEngine
     {
@@ -133,7 +135,7 @@ namespace gazebo
       //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
     };
     
-    /** \}*/
+    /// \}
   }
 
 }

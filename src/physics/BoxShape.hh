@@ -28,6 +28,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Box geom
     class BoxShape : public Shape
     {
@@ -46,6 +49,7 @@ namespace gazebo
       /// \brief Set the size of the box
       public: virtual void SetSize( const math::Vector3 &size );
     };
+    /// \}
   }
 }
 #endif

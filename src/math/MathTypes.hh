@@ -1,9 +1,12 @@
 #ifndef GAZEBO_MATH_TYPES_HH
 #define GAZEBO_MATH_TYPES_HH
 
+/// \file
+/// \ingroup gazebo_math
+/// \brief Forward declarations for the math classes
 namespace gazebo
 {
-  namespace common
+  namespace math
   {
     class Quaternion;
     class Vector2i;

@@ -28,79 +28,82 @@
 namespace gazebo
 {
 	namespace common
-{
-
-#define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
-
-  class DiagnosticTimer;
-  typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
-
-  /// \brief A diagnostic manager class
-  class DiagnosticManager : public SingletonT<DiagnosticManager>
   {
-    /// \brief Constructor
-    private: DiagnosticManager();
+    /// \addtogroup gazebo_common Common 
+    /// \{
 
-    /// \brief Destructor
-    private: virtual ~DiagnosticManager();
+    #define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
+  
+    class DiagnosticTimer;
+    typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
+  
+    /// \brief A diagnostic manager class
+    class DiagnosticManager : public SingletonT<DiagnosticManager>
+    {
+      /// \brief Constructor
+      private: DiagnosticManager();
+  
+      /// \brief Destructor
+      private: virtual ~DiagnosticManager();
+  
+      public: DiagnosticTimerPtr CreateTimer(const std::string &name);
+  
+      /// \brief A diagnostic timer has started
+      public: void TimerStart(DiagnosticTimer *timer);
+  
+      /// \brief A diagnostic timer has stoped
+      public: void TimerStop(DiagnosticTimer *timer);
+  
+      /// \brief Get the number of timers
+      public: int GetTimerCount() const;
+  
+      /// \brief Get a specific time
+      public: Time GetTime(int index) const;
+  
+      /// \brief Get a time based on a label
+      public: Time GetTime(const std::string &label) const;
+  
+      /// \brief Get a label for a timer
+      public: std::string GetLabel(int index) const;
+  
+      public: void SetEnabled(bool e) {this->enabled = e;}
+  
+      public: inline bool GetEnabled() const {return this->enabled;}
+  
+      private: bool enabled;
+  
+      private: std::map<std::string, Time> timers;
+  
+      //Singleton implementation
+      private: friend class SingletonT<DiagnosticManager>;
+    };
+  
+    /// \brief A timer designed for diagnostics
+    class DiagnosticTimer : public Timer
+    {
+      /// \brief Constructor
+      public: DiagnosticTimer(const std::string &name) : Timer() 
+              {
+                this->Start();
+                this->name = name; 
+                this->diagManager->TimerStart(this);
+              }
+  
+      /// \brief Destructor
+      public: virtual ~DiagnosticTimer() 
+              { 
+                this->diagManager->TimerStop(this);
+              }
+  
+      public: inline const std::string GetName() const 
+              { return this->name; }
+  
+      private: std::string name;
+      private: static DiagnosticManager *diagManager;
+    };
 
-    public: DiagnosticTimerPtr CreateTimer(const std::string &name);
-
-    /// \brief A diagnostic timer has started
-    public: void TimerStart(DiagnosticTimer *timer);
-
-    /// \brief A diagnostic timer has stoped
-    public: void TimerStop(DiagnosticTimer *timer);
-
-    /// \brief Get the number of timers
-    public: int GetTimerCount() const;
-
-    /// \brief Get a specific time
-    public: Time GetTime(int index) const;
-
-    /// \brief Get a time based on a label
-    public: Time GetTime(const std::string &label) const;
-
-    /// \brief Get a label for a timer
-    public: std::string GetLabel(int index) const;
-
-    public: void SetEnabled(bool e) {this->enabled = e;}
-
-    public: inline bool GetEnabled() const {return this->enabled;}
-
-    private: bool enabled;
-
-    private: std::map<std::string, Time> timers;
-
-    //Singleton implementation
-    private: friend class SingletonT<DiagnosticManager>;
-  };
-
-  /// \brief A timer designed for diagnostics
-  class DiagnosticTimer : public Timer
-  {
-    /// \brief Constructor
-    public: DiagnosticTimer(const std::string &name) : Timer() 
-            {
-              this->Start();
-              this->name = name; 
-              this->diagManager->TimerStart(this);
-            }
-
-    /// \brief Destructor
-    public: virtual ~DiagnosticTimer() 
-            { 
-              this->diagManager->TimerStop(this);
-            }
-
-    public: inline const std::string GetName() const 
-            { return this->name; }
-
-    private: std::string name;
-    private: static DiagnosticManager *diagManager;
-  };
-
-}
+    /// \}  
+  }
  
 }
 #endif

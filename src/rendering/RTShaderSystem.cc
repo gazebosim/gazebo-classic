@@ -109,9 +109,6 @@ void RTShaderSystem::AddScene(Scene *_scene)
 // Remove a scene
 void RTShaderSystem::RemoveScene( Scene *_scene )
 {
-  //std::remove(this->scenes.begin(), this->scenes.end(), scene);
-
-  std::cout << "Remove Scene[" << this->scenes.size() << "]\n";
   std::vector<Scene*>::iterator iter;
   for (iter = this->scenes.begin(); iter != scenes.end(); iter++)
     if ( (*iter) == _scene )
@@ -123,8 +120,6 @@ void RTShaderSystem::RemoveScene( Scene *_scene )
     this->shaderGenerator->invalidateScheme( _scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME );
     this->UpdateShaders();
   }
-
-  std::cout << "   Remove Scene[" << this->scenes.size() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

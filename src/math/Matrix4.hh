@@ -25,48 +25,101 @@
 namespace gazebo
 {
 	namespace math
-{
-  class Matrix4
   {
-    public: Matrix4();
-    public: Matrix4(const Matrix4 &m);
-    public: Matrix4(double v00, double v01, double v02, double v03,
-                    double v10, double v11, double v12, double v13,
-                    double v20, double v21, double v22, double v23,
-                    double v30, double v31, double v32, double v33);
+    /// \addtogroup gazebo_math
+    /// \{
+  
+    /// \brief A 3x3 matrix class
+    class Matrix4
+    {
+      /// \brief Constructor
+      public: Matrix4();
 
-    public: virtual ~Matrix4();
+      /// \brief Copy constructor
+      /// \param _m Matrix to copy
+      public: Matrix4(const Matrix4 &m);
 
-    public: void SetTrans(const Vector3 &t);
+      /// \brief Constructor
+      /// \param _v00 Row 0, Col 0 value
+      /// \param _v01 Row 0, Col 1 value
+      /// \param _v02 Row 0, Col 2 value
+      /// \param _v03 Row 0, Col 3 value
+      /// \param _v10 Row 1, Col 0 value
+      /// \param _v11 Row 1, Col 1 value
+      /// \param _v12 Row 1, Col 2 value
+      /// \param _v13 Row 1, Col 3 value
+      /// \param _v20 Row 2, Col 0 value
+      /// \param _v21 Row 2, Col 1 value
+      /// \param _v22 Row 2, Col 2 value
+      /// \param _v23 Row 2, Col 3 value
+      /// \param _v30 Row 3, Col 0 value
+      /// \param _v31 Row 3, Col 1 value
+      /// \param _v32 Row 3, Col 2 value
+      /// \param _v33 Row 3, Col 3 value
+      public: Matrix4(double _v00, double _v01, double _v02, double _v03,
+                      double _v10, double _v11, double _v12, double _v13,
+                      double _v20, double _v21, double _v22, double _v23,
+                      double _v30, double _v31, double _v32, double _v33);
 
-    public: bool IsAffine() const;
-    public: Vector3 TransformAffine( const Vector3 &v ) const;
+      /// \brief Destructor 
+      public: virtual ~Matrix4();
+ 
+      /// \brief Set the translational values [ (0,3) (1,3) (2,3) ]
+      /// \param _t Values to set
+      public: void SetTrans(const Vector3 &t);
+ 
+      /// \brief Return true if the matrix is affine 
+      /// \return True if the matrix is affine
+      public: bool IsAffine() const;
 
-    public: const Matrix4 &operator=( const Matrix4 &mat );
-    public: const Matrix4 & operator=( const Matrix3 &mat );
+      /// \brief Perform an affine transformation
+      /// \param _v Vector3 value for the transformation
+      /// \return The result of the transformation
+      public: Vector3 TransformAffine( const Vector3 &_v ) const;
+ 
+      /// \brief Equal operator. this = _mat
+      /// \param _mat Incoming matrix
+      /// \return The resulting matrix
+      public: const Matrix4 &operator=( const Matrix4 &_mat );
 
-    public: Matrix4 operator*(const Matrix4 &mat);
-
-    public: friend std::ostream &operator<<( std::ostream &out, const gazebo::math::Matrix4 &m )
-          {
-            for (int i=0; i < 4; i++)
+      /// \brief Equal operator for 3x3 matrix
+      /// \param _mat Incoming matrix
+      /// \return The resulting matrix
+      public: const Matrix4 & operator=( const Matrix3 &_mat );
+ 
+      /// \brief Multiplication operator 
+      /// \param _mat Incoming matrix
+      /// \return This matrix * _mat
+      public: Matrix4 operator*(const Matrix4 &_mat);
+ 
+      /// \brief Output operator 
+      /// \param _out Output stream
+      /// \param _m Matrix to output
+      public: friend std::ostream &operator<<( std::ostream &_out, 
+                                               const gazebo::math::Matrix4 &_m )
             {
-              for (int j=0; j < 4; j++)
+              for (int i=0; i < 4; i++)
               {
-                out << m.m[i][j] << " ";
+                for (int j=0; j < 4; j++)
+                {
+                  _out << _m.m[i][j] << " ";
+                }
+                _out << "\n";
               }
-              out << "\n";
+  
+              return _out;
             }
+ 
+      /// \brief Identity matrix 
+      public: static const Matrix4 IDENTITY;
 
-            return out;
-          }
-
-    public: static const Matrix4 IDENTITY;
-    public: static const Matrix4 ZERO;
-
-
-    protected: double m[4][4];
-  };
-}
+      /// \brief Zero matrix 
+      public: static const Matrix4 ZERO;
+  
+      /// \brief The 4x4 matrix 
+      protected: double m[4][4];
+    };
+    /// \}
+  }
 }
 #endif

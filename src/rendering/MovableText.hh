@@ -36,6 +36,9 @@ namespace gazebo
 {
 	namespace rendering
   {
+    /// \addtogroup gazebo_rendering 
+    /// \{
+ 
     /// \brief Movable text
     class MovableText : public Ogre::MovableObject, public Ogre::Renderable
     {
@@ -178,6 +181,7 @@ namespace gazebo
   
       private: boost::recursive_mutex *mutex;
     };
+    /// \}
   }
 
 }

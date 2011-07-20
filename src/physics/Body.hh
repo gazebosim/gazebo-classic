@@ -24,6 +24,8 @@
 #include <map>
 #include <vector>
 
+#include "sensors/SensorTypes.hh"
+
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
@@ -38,10 +40,9 @@ namespace gazebo
     class Geom;
   
     /// \addtogroup gazebo_physics
-    /// \brief The body class
     /// \{
-  
-    /// Body class
+
+    /// \brief Body class
     class Body : public Entity
     {
       /// \brief Constructor
@@ -156,8 +157,8 @@ namespace gazebo
       /// \param _sdf SDF element used to load the geom
       private: void LoadGeom( sdf::ElementPtr &_sdf );
   
-      /// \brief Load a renderable
-      private: void LoadVisual( sdf::ElementPtr &_sdf );
+      /// \brief Load a sensor
+      private: void LoadSensor( sdf::ElementPtr &_sdf );
   
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
@@ -213,6 +214,7 @@ namespace gazebo
       protected: math::Pose newPose;
   
       private: std::vector<event::ConnectionPtr> connections;
+      private: sensors::Sensor_V sensors;
     };
     /// \}
   }

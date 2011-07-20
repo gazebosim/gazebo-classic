@@ -6,6 +6,9 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+/// \file
+/// \ingroup gazebo_common
+/// \brief Forward declarations for the common classes
 namespace gazebo
 {
   namespace common
@@ -13,6 +16,8 @@ namespace gazebo
     class Param;
     class Time;
     class Image;
+    class Mesh;
+    class MouseEvent;
 
     template <typename T>
     class ParamT;

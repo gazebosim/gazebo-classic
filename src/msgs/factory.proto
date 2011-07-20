@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Factory 
+/// \brief Message to create new model in gazebo
+/// \verbatim
+
 import "header.proto";
 
 message Factory
@@ -7,3 +13,4 @@ message Factory
   optional string xml      = 2;
   optional string filename = 3;
 }
+/// \endverbatim

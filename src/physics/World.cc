@@ -143,8 +143,10 @@ void World::Load( sdf::ElementPtr _sdf )
   this->rootElement->SetName("root");
   this->rootElement->SetWorld(shared_from_this());
 
+  gzdbg << "Load Entities!\n";
   // Create all the entities
   this->LoadEntities(_sdf, this->rootElement);
+  gzdbg << "Done load Entities!\n";
 
   // TODO: Performance test to see if TBB model updating is necessary
   // Choose threaded or unthreaded model updating depending on the number of
@@ -366,6 +368,19 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 // Load a model
 void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
 {
+  if (_sdf->HasElement("light"))
+  {
+    gzdbg << "LIGHT!\n";
+    sdf::ElementPtr childElem = _sdf->GetElement("light");
+    while (childElem)
+    {
+      msgs::Light *lm = this->sceneMsg.add_light();
+      lm->CopyFrom( msgs::LightFromSDF(childElem) );
+
+      childElem = _sdf->GetNextElement("light", childElem);
+    }
+  }
+
   if (_sdf->HasElement("model"))
   {
     sdf::ElementPtr childElem = _sdf->GetElement("model");
@@ -381,17 +396,7 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
     }
   }
 
-  if (_sdf->HasElement("light"))
-  {
-    sdf::ElementPtr childElem = _sdf->GetElement("light");
-    while (childElem)
-    {
-      msgs::Light *lm = this->sceneMsg.add_light();
-      lm->CopyFrom( msgs::LightFromSDF(childElem) );
 
-      childElem = _sdf->GetNextElement("light", childElem);
-    }
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -559,6 +564,7 @@ void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
 {
+  gzdbg << "Publish scene\n";
   msgs::Stamp(this->sceneMsg.mutable_header());
 
   this->sceneMsg.clear_pose();

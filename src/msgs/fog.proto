@@ -1,4 +1,11 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Fog 
+/// \brief Message for fog data
+/// \verbatim
+
+
 import "color.proto";
 
 message Fog

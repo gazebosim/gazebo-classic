@@ -32,44 +32,46 @@
 namespace gazebo
 {
 	namespace physics
-{
-  class Geom;
- 
-  /// \brief A contact between two geoms. Each contact can consist of
-  ///        a numnber of contact points 
-  class Contact
   {
-    /// \brief Constructor
-    public: Contact();
-
-    /// \brief Copy constructor
-    public: Contact(const Contact &c);
-
-    /// \brief Destructor
-    public: virtual ~Contact();
-
-    /// \brief Clone the contact
-    public: Contact Clone() const;
+    class Geom;
+    /// \addtogroup gazebo_physics
+    /// \{
+   
+    /// \brief A contact between two geoms. Each contact can consist of
+    ///        a numnber of contact points 
+    class Contact
+    {
+      /// \brief Constructor
+      public: Contact();
   
-    /// \brief Operator =
-    public: const Contact &operator=(const Contact &contact);
-
-    /// \brief Reset
-    public: void Reset();
+      /// \brief Copy constructor
+      public: Contact(const Contact &c);
   
-    public: Geom *geom1;
-    public: Geom *geom2;
- 
-    public: std::vector<JointFeedback> forces;
-
-    public: std::vector<math::Vector3> positions;
-    public: std::vector<math::Vector3> normals;
+      /// \brief Destructor
+      public: virtual ~Contact();
   
-    public: std::vector<double> depths;
-
-    public: common::Time time;
-  };
-}
-
+      /// \brief Clone the contact
+      public: Contact Clone() const;
+    
+      /// \brief Operator =
+      public: const Contact &operator=(const Contact &contact);
+  
+      /// \brief Reset
+      public: void Reset();
+    
+      public: Geom *geom1;
+      public: Geom *geom2;
+   
+      public: std::vector<JointFeedback> forces;
+  
+      public: std::vector<math::Vector3> positions;
+      public: std::vector<math::Vector3> normals;
+    
+      public: std::vector<double> depths;
+  
+      public: common::Time time;
+    };
+    /// \}
+  }
 }
 #endif

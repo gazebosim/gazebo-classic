@@ -1,6 +1,7 @@
 <!-- Sensor -->
 <element name="sensor" required="0">
   <attribute name="name" type="string" default="__default__" required="1"/>
+  <attribute name="type" type="string" default="__default__" required="1"/>
   <attribute name="always_on" type="bool" default="false" required="0"/>
   <attribute name="update_rate" type="double" default="0" required="0"/>
 

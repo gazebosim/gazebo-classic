@@ -35,12 +35,16 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics Physics 
+    /// \{
+
     static std::string EntityTypename[] = { 
       "common", "entity", "model", "body", "geom", "ball", "box", "cylinder", 
       "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", 
       "plane", "shape", "slider", "sphere", "trimesh", "universal", "light",
       "visual" };
 
+    /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
       public: enum EntityType{BASE, ENTITY, MODEL, BODY, GEOM, 
@@ -196,6 +200,7 @@ namespace gazebo
   
       private: WorldPtr world;
     };
+    /// \}
   }
 
 }

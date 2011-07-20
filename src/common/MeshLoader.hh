@@ -22,21 +22,26 @@
 namespace gazebo
 {
 	namespace common
-{
-  class Mesh;
-
-  class MeshLoader
   {
-    /// \brief Constructor
-    public: MeshLoader();
+    class Mesh;
 
-    /// \brief Destructor
-    public: virtual ~MeshLoader();
+    /// \addtogroup gazebo_common Common 
+    /// \{
 
-    /// \brief Load a 3D mesh
-    public: virtual Mesh *Load(const std::string &filename) = 0;
-  };
-}
+    /// \brief Base class for loading meshes 
+    class MeshLoader
+    {
+      /// \brief Constructor
+      public: MeshLoader();
+  
+      /// \brief Destructor
+      public: virtual ~MeshLoader();
+  
+      /// \brief Load a 3D mesh
+      public: virtual Mesh *Load(const std::string &filename) = 0;
+    };
+    /// \}
+  }
 
 }
 #endif

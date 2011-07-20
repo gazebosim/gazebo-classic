@@ -80,6 +80,7 @@ add_executable(gzphysics server.cc)
 target_link_libraries( gzphysics gazebo_common
                                  gazebo_transport
                                  gazebo_physics
+                                 gazebo_sensors
                                  gazebo_sdf_interface
                                  gazebo_sdf_parser
                                  gazebo_msgs

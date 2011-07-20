@@ -23,6 +23,7 @@
 #define USERCAMERA_HH
 
 #include "rendering/Camera.hh"
+#include "common/CommonTypes.hh"
 
 namespace Ogre
 {
@@ -32,15 +33,14 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace common
-  {
-    class MouseEvent;
-  }
-
 	namespace rendering
   {
     class Visual;
-  
+
+    /// \addtogroup gazebo_rendering
+    /// \{
+
+    /// \brief A camera used for user visualization of a scene
     class UserCamera : public Camera
     {
       /// \brief Constructor
@@ -105,6 +105,7 @@ namespace gazebo
   
       private: Ogre::AnimationState *animState;
     };
+    /// \}
   }
 
 }

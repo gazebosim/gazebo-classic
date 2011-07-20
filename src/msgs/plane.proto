@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Plane 
+/// \brief Message for a plane
+/// \verbatim
+
 import "point.proto";
 import "header.proto";
 
@@ -10,3 +16,5 @@ message Plane
   required double size_y = 4;
   optional double d      = 5 [default = 0];
 }
+
+/// \endverbatim

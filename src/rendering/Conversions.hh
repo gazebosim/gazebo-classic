@@ -27,6 +27,11 @@ namespace gazebo
 {
   namespace rendering
   {
+    /// \addtogroup gazebo_rendering 
+    /// \{
+
+    /// \brief A set of utility function to convert between Gazebo and Ogre
+    /// data types
     class Conversions
     {
       /// \brief Return the equivalent ogre color
@@ -45,6 +50,7 @@ namespace gazebo
       public: static math::Quaternion Quaternion(const Ogre::Quaternion &v);
 
     };
+    /// \}
   }
 }
 #endif

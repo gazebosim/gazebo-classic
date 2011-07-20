@@ -143,6 +143,19 @@ void RenderEngine::RemoveScene(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a scene 
+ScenePtr RenderEngine::GetScene(const std::string &_name)
+{
+  std::vector<ScenePtr>::iterator iter;
+
+  for (iter = this->scenes.begin(); iter != this->scenes.end(); iter++)
+    if ((*iter)->GetName() == _name)
+      return (*iter);
+
+  return ScenePtr();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a scene 
 ScenePtr RenderEngine::GetScene(unsigned int index)
 {
   if (index < this->scenes.size())

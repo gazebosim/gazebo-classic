@@ -1,4 +1,10 @@
 package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Quaternion
+/// \brief A message for a quaternion
+/// \verbatim
+
 import "header.proto";
 
 message Quaternion
@@ -9,3 +15,5 @@ message Quaternion
   required double z = 4;
   required double w = 5;
 }
+
+/// \endverbatim

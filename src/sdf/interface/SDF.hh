@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
 #include "sdf/interface/Param.hh"
 
@@ -31,10 +32,12 @@ namespace sdf
   typedef boost::shared_ptr<Element> ElementPtr;
   typedef std::vector< ElementPtr > ElementPtr_V;
 
-  class Element
+  class Element : public boost::enable_shared_from_this<Element>
   {
-
     public: boost::shared_ptr<Element> Clone() const;
+
+    public: ElementPtr GetParent() const;
+    public: void SetParent(const ElementPtr &_parent);
 
     public: void SetName(const std::string &_name);
     public: const std::string &GetName() const;
@@ -90,6 +93,8 @@ namespace sdf
 
     private: std::string name;
     private: std::string required;
+
+    private: ElementPtr parent;
 
     // Attributes of this element
     public: Param_V attributes;

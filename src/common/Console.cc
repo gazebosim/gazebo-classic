@@ -88,7 +88,7 @@ void Console::Load()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the verbosity
-void Console::SetQuiet( bool q )
+void Console::SetQuiet( bool /*_q*/ )
 {
 }
 

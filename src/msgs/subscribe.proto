@@ -1,5 +1,10 @@
 package gazebo.msgs;
 
+/// \ingroup gazebo_msgs
+/// \interface Subscribe
+/// \brief A message for subscription data
+/// \verbatim
+
 message Subscribe
 {
   required string topic    = 1;
@@ -7,3 +12,5 @@ message Subscribe
   required uint32 port     = 3;
   required string msg_type = 4;
 }
+
+/// \endverbatim

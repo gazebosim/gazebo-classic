@@ -34,7 +34,10 @@ namespace gazebo
 	namespace rendering
   {
     class Scene;
-  
+
+    /// \addtogroup gazebo_rendering 
+    /// \{
+ 
     /// \brief Height map geom
     class Heightmap : public Ogre::RaySceneQueryListener
     {
@@ -67,6 +70,7 @@ namespace gazebo
       private: double distToTerrain;
       private: Scene *scene;
     };
+    /// \}
   }
 
 }

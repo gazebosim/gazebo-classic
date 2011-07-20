@@ -24,21 +24,46 @@ namespace gazebo
 {
 	namespace math
   {
+    /// \addtogroup gazebo_math
+    /// \{
+ 
+    /// \brief A plane and related functions. 
     class Plane
     {
+      /// \brief Constructor
       public: Plane();
-      public: Plane(Vector3 normal, Vector2d size, double offset);
+
+      /// \brief Constructor
+      /// \param _normal The plane normal
+      /// \param _size Size of the plane
+      /// \param _offset Offset along the normal
+      public: Plane(const Vector3 &_normal, const Vector2d &_size, 
+                    double _offset);
+
+      /// \brief Destructor
       public: virtual ~Plane();
   
-      public: void Set(Vector3 normal, Vector2d size, double offset);
+      /// \brief Set the plane
+      /// \param _normal The plane normal
+      /// \param _size Size of the plane
+      /// \param _offset Offset along the normal
+      public: void Set(const Vector3 &_normal, const Vector2d &_size, 
+                       double offset);
   
       /// \brief Equal operator
-      public: const Plane &operator=(const Plane & p);
-  
+      /// \param _p Plane values
+      public: const Plane &operator=(const Plane &_p);
+ 
+      /// \brief Plane normal 
       public: Vector3 normal;
+
+      /// \brief Plane size 
       public: Vector2d size;
+
+      /// \brief Plane offset 
       public: double d;
     };
+    /// \}
   }
 }
 #endif

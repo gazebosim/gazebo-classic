@@ -19,6 +19,9 @@
 
 #include <boost/shared_ptr.hpp>
 
+/// \file
+/// \ingroup gazebo_sensors
+/// \brief Forward declarations and typedefs for sensors
 namespace gazebo
 {
   namespace sensors
@@ -26,6 +29,7 @@ namespace gazebo
     class Sensor;
 
     typedef boost::shared_ptr<Sensor> SensorPtr;
+    typedef std::vector<SensorPtr> Sensor_V;
   }
 }
  

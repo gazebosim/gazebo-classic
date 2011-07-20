@@ -25,29 +25,29 @@ Plane::Plane()
   this->d = 0.0;
 }
 
-Plane::Plane(Vector3 normal, Vector2d size, double offset)
+Plane::Plane(const Vector3 &_normal, const Vector2d &_size, double _offset)
 {
-  this->Set(normal, size, offset);
+  this->Set(_normal, _size, _offset);
 }
 
 Plane::~Plane()
 {
 }
 
-void Plane::Set(Vector3 n, Vector2d s, double offset)
+void Plane::Set(const Vector3 &_n, const Vector2d &_s, double _offset)
 {
-  this->normal = n;
-  this->size = s;
-  this->d = offset;
+  this->normal = _n;
+  this->size = _s;
+  this->d = _offset;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Equal operator
-const Plane &Plane::operator=(const Plane & p)
+const Plane &Plane::operator=(const Plane & _p)
 {
-  this->normal = p.normal;
-  this->size = p.size;
-  this->d = p.d;
+  this->normal = _p.normal;
+  this->size = _p.size;
+  this->d = _p.d;
 
   return *this;
 }

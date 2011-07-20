@@ -30,6 +30,9 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 
+#include "sensors/SensorFactory.hh"
+#include "sensors/Sensor.hh"
+
 #include "physics/Model.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -97,6 +100,16 @@ void Body::Load( sdf::ElementPtr &_sdf )
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
 
+  if (this->sdf->HasElement("sensor"))
+  {
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      this->LoadSensor(sensorElem);
+      sensorElem = this->sdf->GetNextElement("visual", sensorElem); 
+    }
+  }
+
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
   {
@@ -144,6 +157,12 @@ void Body::Init()
       GeomPtr g = boost::shared_static_cast<Geom>(*iter);
       g->Init();
     }
+  }
+
+  sensors::Sensor_V::iterator siter;
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    (*siter)->Init();
   }
 
   // save transform from this Parent Model Frame to this Body Frame
@@ -307,6 +326,23 @@ void Body::Update()
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a new sensor helper function
+void Body::LoadSensor( sdf::ElementPtr &_sdf )
+{
+  std::string type = _sdf->GetValueString("type");
+  sensors::SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
+  if (!sensor)
+  {
+    gzerr << "Unable to create sensor of type[" << type << "]\n";
+    return;
+  }
+
+  sensor->Load(_sdf);
+  this->sensors.push_back(sensor);
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

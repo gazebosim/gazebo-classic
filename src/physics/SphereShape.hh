@@ -29,6 +29,9 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+
     /// \brief Sphere geom
     class SphereShape : public Shape
     {
@@ -47,6 +50,7 @@ namespace gazebo
       /// \brief Set the size
       public: virtual void SetSize(const double &radius);
     };
+    /// \}
   }
 }
 #endif

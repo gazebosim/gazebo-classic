@@ -111,11 +111,12 @@ void Server::Run()
     physics::run_world(this->worlds[i]);
 
   // Update the sensors.
-  sensors::run();
-
   this->stop = false;
   while (!this->stop)
+  {
+    sensors::run_once(true);
     usleep(1000000);
+  }
 
   // Stop all the worlds
   for (unsigned int i=0; i < this->worlds.size(); i++)

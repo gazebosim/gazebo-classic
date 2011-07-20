@@ -23,6 +23,10 @@ namespace gazebo
 {
   namespace common
   {
+    /// \addtogroup gazebo_common
+    /// \{
+
+    /// \brief Generic description of a mouse event
     class MouseEvent
     {
       public: enum ButtonState {DOWN, UP, SCROLL};
@@ -45,6 +49,7 @@ namespace gazebo
       public: ButtonState right;
       public: ButtonState middle;
     };
+    /// \}
   }
 }
 #endif

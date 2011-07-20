@@ -25,6 +25,11 @@ namespace gazebo
 {
 	namespace common
   {
+
+    /// \addtogroup gazebo_common Common 
+    /// \{
+
+    /// \brief Encapsulates a description of a material
     class Material
     {
       public: enum ShadeMode{FLAT, GOURAUD, PHONG, SHADE_COUNT};
@@ -146,7 +151,7 @@ namespace gazebo
   
       private: static unsigned int counter;
     };
+    /// \}
   }
-
 }
 #endif
