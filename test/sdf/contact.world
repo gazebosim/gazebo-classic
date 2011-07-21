@@ -68,11 +68,11 @@
     </model>
 
     <plugin name="plugin_1" filename="libgazebo_ros_bumper.so">
-      <sensor>model_1::sensor_contact</sensor>
-      <alwaysOn>true</alwaysOn>
-      <updateRate>100.0</updateRate>
-      <frameName>r_gripper_palm_link</frameName>
-      <bumperTopicName>r_gripper_palm_bumper</bumperTopicName>
+      <data name="sensor" value="model_1::sensor_contact" />
+      <data name="alwaysOn" value="true" />
+      <data name="updateRate" value="100.0" />
+      <data name="frameName" value="r_gripper_palm_link" />
+      <data name="bumperTopicName" value="r_gripper_palm_bumper" />
     </plugin>
 
   </world>
