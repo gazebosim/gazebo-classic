@@ -207,6 +207,10 @@ void World::RunLoop()
 
   this->startTime = common::Time::GetWallTime();
 
+  // This fixes a minor issue when the world is paused before it's started
+  if (this->IsPaused())
+    this->pauseStartTime = this->startTime;
+
   // Set a default sleep time
   req.tv_sec  = 0;
   req.tv_nsec = 10000;
