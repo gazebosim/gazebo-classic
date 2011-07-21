@@ -80,7 +80,8 @@ namespace gazebo
       /// \brief Advertise on a topic
       /// \param topic The name of the topic
       public: template<typename M>
-              PublisherPtr Advertise(const std::string &topic)
+              PublisherPtr Advertise(const std::string &_topic,
+                                     unsigned int _queueLimit)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -88,7 +89,7 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                this->UpdatePublications(topic, msg->GetTypeName());
+                this->UpdatePublications(_topic, msg->GetTypeName());
               
                 std::string msgTypename;
 
@@ -98,12 +99,12 @@ namespace gazebo
                   std::string t;
                   if (i==0)
                   {
-                    t = topic;
+                    t = _topic;
                     msgTypename = msg->GetTypeName();
                   }
                   else
                   {
-                    t = topic + "/__dbg";
+                    t = _topic + "/__dbg";
                     msgs::String tmp;
                     msgTypename = tmp.GetTypeName();
                   }
@@ -132,7 +133,8 @@ namespace gazebo
                   }
                 }
 
-                return PublisherPtr( new Publisher(topic, msg->GetTypeName()) );
+                return PublisherPtr( new Publisher(_topic, msg->GetTypeName(),
+                                                   _queueLimit) );
               }
 
       /// \brief Stop advertising on a topic

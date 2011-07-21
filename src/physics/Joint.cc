@@ -83,7 +83,6 @@ void Joint::Load(sdf::ElementPtr &_sdf)
         this->GetWorld()->GetByName( parentName ));
   }
 
-
   if (!this->parentBody && parentName != std::string("world"))
     gzthrow("Couldn't Find Parent Body[" + parentName );
 

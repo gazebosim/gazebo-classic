@@ -164,6 +164,7 @@ else (build_errors)
     add_subdirectory(Media)
     add_subdirectory(test)
     add_subdirectory(tools)
+    add_subdirectory(plugins)
    
     #if (INCLUDE_PLAYER)
     #  add_subdirectory(player)
@@ -173,10 +174,10 @@ else (build_errors)
 
   ########################################
   # Make the package config files
-  set (pkgconfig_files gazebo_transport)
+  set (pkgconfig_files gazebo_transport gazebo)
 
   foreach (pkgconfig ${pkgconfig_files})
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
   endforeach()
 

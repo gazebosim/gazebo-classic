@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: gazebo
+Description: Gazebo Libraries
+Version: @GAZEBO_VERSION@
+Requires:
+Libs: -L${libdir} -lgazebo_server 
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@

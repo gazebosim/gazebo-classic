@@ -22,8 +22,8 @@
     <attribute name="quadratic" type="double" default="0" required="0"/>
   </element> <!-- End Attenuation -->
 
-  <element name="directional" required="0">
-    <attribute name="direction" type="vector3" default="0 0 -1" required="1"/>
+  <element name="direction" required="0">
+    <attribute name="xyz" type="vector3" default="0 0 -1" required="1"/>
   </element><!-- End Directional -->
 
   <element name="spot" required="0">

@@ -49,8 +49,6 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &_name, Visual *_parent)
 {
-  gzdbg << "New Visual[" << _name << "]\n";
-
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -69,7 +67,6 @@ Visual::Visual(const std::string &_name, Visual *_parent)
 /// Constructor
 Visual::Visual (const std::string &_name, Ogre::SceneNode *parent_)
 {
-  gzdbg << "New Visual[" << _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -82,7 +79,6 @@ Visual::Visual (const std::string &_name, Ogre::SceneNode *parent_)
 /// Constructor
 Visual::Visual (const std::string &_name, Scene *scene_)
 {
-  gzdbg << "New Visual[" << _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -716,10 +712,10 @@ void Visual::SetRotation( const math::Quaternion &rot)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
-void Visual::SetPose( const math::Pose &pose)
+void Visual::SetPose( const math::Pose &_pose)
 {
-  this->SetPosition( pose.pos );
-  this->SetRotation( pose.rot);
+  this->SetPosition( _pose.pos );
+  this->SetRotation( _pose.rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

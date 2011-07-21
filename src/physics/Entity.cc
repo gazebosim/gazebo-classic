@@ -82,8 +82,8 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose");
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
+  this->posePub = this->node->Advertise<msgs::Pose>("~/pose", 5);
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 5);
 
   this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
 

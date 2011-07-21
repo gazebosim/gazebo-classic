@@ -35,12 +35,13 @@ namespace gazebo
     class Publisher
     {
       /// \brief Default Constructor
-      public: Publisher() {pubCount = 0;}
+      public: Publisher(unsigned int _limit);
 
       /// \brief Use this constructor
       /// \param topic Name of topic
       /// \param msg_type Type of the message which is to be published
-      public: Publisher(const std::string &topic, const std::string &msg_type);
+      public: Publisher(const std::string &topic, const std::string &msg_type,
+                        unsigned int _limit);
 
       /// \brief Destructor
       public: virtual ~Publisher();
@@ -62,8 +63,8 @@ namespace gazebo
                
       private: std::string topic;
       private: std::string msgType;
-      private: unsigned int pubCount;
-      private: google::protobuf::Message *message;
+      private: unsigned int queueLimit;
+      private: std::list<google::protobuf::Message *> messages;
       private: boost::recursive_mutex *mutex;
     };
     /// \}

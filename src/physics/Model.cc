@@ -25,6 +25,7 @@
 #include <sstream>
 #include <float.h>
 
+#include "common/Plugin.hh"
 #include "common/Events.hh"
 #include "common/Global.hh"
 #include "common/Exception.hh"
@@ -154,6 +155,17 @@ void Model::Load( sdf::ElementPtr &_sdf )
     {
       this->LoadJoint(jointElem);
       jointElem = _sdf->GetNextElement("joint", jointElem);
+    }
+  }
+
+  // Load the plugins
+  if (_sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = _sdf->GetNextElement("plugin", pluginElem);
     }
   }
 }
@@ -621,17 +633,34 @@ void Model::LoadJoint( sdf::ElementPtr &_sdf )
   msgs::Joint msg;
   msgs::Init(msg, joint->GetName() );
   msg.set_type( msgs::Joint::REVOLUTE );
+
   if(joint->GetParent())
     msg.set_parent( joint->GetParent()->GetScopedName() );
   else
     msg.set_parent( "world" );
+
   if(joint->GetChild())
     msg.set_child( joint->GetChild()->GetScopedName() );
-  if(joint->GetChild())
+  else
     msg.set_child( "world" );
+  
   this->jointPub->Publish(msg);
 
   this->joints.push_back( joint );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a plugin
+void Model::LoadPlugin( sdf::ElementPtr &_sdf )
+{
+  /*std::string name = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  common::PluginPtr plugin = common::Plugin::Create(filename, name);
+  plugin->Load(_sdf);
+  this->plugins.push_back( plugin );
+
+  gzdbg << "Load a plugin Name[" << name << "] Filename[" << filename << "]\n"; 
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

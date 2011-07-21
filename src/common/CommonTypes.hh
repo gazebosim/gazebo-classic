@@ -18,6 +18,9 @@ namespace gazebo
     class Image;
     class Mesh;
     class MouseEvent;
+    class Plugin;
+
+    typedef boost::shared_ptr<Plugin> PluginPtr;
 
     template <typename T>
     class ParamT;

@@ -69,10 +69,13 @@ target_link_libraries( gazebo_server gazebo_common
                                      gazebo_physics
                                      gazebo_sensors
                                      gazebo_rendering
+                                     gazebo_sdf_parser
+                                     gazebo_sdf_interface
                                      gazebo_msgs
+                                     gazebo_math
                                      assimp
-                                     pthread
-                                     gazebo_sdf_parser)
+                                     pthread)
+
 add_dependencies( gazebo_server gazebo_msgs )
 INSTALL_LIBRARY(gazebo_server)
 

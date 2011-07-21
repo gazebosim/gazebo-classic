@@ -19,6 +19,8 @@
 
 #include <string>
 #include <boost/signals.hpp>
+#include "common/CommonTypes.hh"
+#include "sdf/sdf.h"
 
 namespace gazebo
 {
@@ -39,7 +41,7 @@ namespace gazebo
       public: virtual ~Plugin();
 
       /// \brief Load function
-      public: virtual void Load() = 0;
+      public: virtual void Load( sdf::ElementPtr &_sdf ) = 0;
   
       /// \brief Get the name of the handler
       public: std::string GetFilename() const;
@@ -47,7 +49,8 @@ namespace gazebo
       /// \brief Get the short name of the handler
       public: std::string GetHandle() const;
   
-      public: static Plugin *Create(const std::string &filename, const std::string &handle);
+      public: static PluginPtr Create(const std::string &_filename, 
+                                      const std::string &_handle);
   
       protected: std::string filename;
       protected: std::string handle;
@@ -56,8 +59,8 @@ namespace gazebo
   }
 
 #define GZ_REGISTER_PLUGIN(name, classname) \
-extern "C" gazebo::Plugin *RegisterPlugin(); \
-gazebo::Plugin *RegisterPlugin() \
+extern "C" gazebo::common::Plugin *RegisterPlugin(); \
+gazebo::common::Plugin *RegisterPlugin() \
 {\
   return new classname();\
 }

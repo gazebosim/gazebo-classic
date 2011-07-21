@@ -27,25 +27,32 @@ using namespace transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Publisher::Publisher(const std::string &topic, const std::string &msg_type)
-  : topic(topic), msgType(msg_type)
+Publisher::Publisher(unsigned int _limit)
 {
-  this->pubCount = 0;
+  this->queueLimit = _limit;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType, unsigned int _limit)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit)
+{
   this->mutex = new boost::recursive_mutex();
-  this->message = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Publisher::~Publisher()
 {
-  if (this->pubCount > 0)
-    gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->pubCount << " outstanding publications.\n";
+  if (this->messages.size() > 0)
+  {
+    gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
+  }
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 
-  delete this->message;
+  this->messages.clear();
   delete this->mutex;
 }
 
@@ -58,16 +65,14 @@ void Publisher::Publish(google::protobuf::Message &_message )
 
   // Save the latest message
   this->mutex->lock();
-  this->pubCount = 1;
-  if (!this->message)
-    this->message = _message.New();
-  this->message->CopyFrom( _message );
+  if (this->messages.size() < this->queueLimit)
+  {
+    google::protobuf::Message *msg = _message.New();
+    msg->CopyFrom( _message );
+    this->messages.push_back( msg );
+  }
   this->mutex->unlock();
 
-  /*this->pubCount += 1;
-  TopicManager::Instance()->Publish(this->topic, message, 
-      boost::bind(&Publisher::OnPublishComplete, this));
-      */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,14 +80,19 @@ void Publisher::Publish(google::protobuf::Message &_message )
 void Publisher::SendMessage()
 {
   this->mutex->lock();
-  if (this->pubCount > 0)
+  if (this->messages.size() > 0)
   {
-    // Send the latested message.
-    TopicManager::Instance()->Publish(this->topic, *this->message, 
-        boost::bind(&Publisher::OnPublishComplete, this));
+    std::list<google::protobuf::Message *>::iterator iter;
+    for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
+    {
+      // Send the latest message.
+      TopicManager::Instance()->Publish(this->topic, **iter, 
+          boost::bind(&Publisher::OnPublishComplete, this));
+    }
+
+    this->messages.clear();
   }
 
-  this->pubCount = 0;
   this->mutex->unlock();
 }
 
@@ -104,5 +114,4 @@ std::string Publisher::GetMsgType() const
 // Callback when a publish is completed
 void Publisher::OnPublishComplete()
 {
-  //this->pubCount -= 1;
 }

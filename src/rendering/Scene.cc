@@ -978,7 +978,7 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
   if (_msg->child() == "world")
     childVis = this->worldVisual;
   else
-   childVis = this->GetVisual(_msg->child());
+    childVis = this->GetVisual(_msg->child());
 
   if (parentVis && childVis)
   {

@@ -150,10 +150,16 @@ namespace gazebo
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint( sdf::ElementPtr &_sdf );
-    
+   
+      /// \brief Load a plugin helper function 
+      /// \param _sdf SDF parameter
+      private: void LoadPlugin( sdf::ElementPtr &_sdf );
+
       private: BodyPtr canonicalBody;
 
       private: Joint_V joints;
+
+      private: std::vector<common::PluginPtr> plugins;
 
       private: transport::PublisherPtr jointPub;
     };

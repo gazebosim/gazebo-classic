@@ -54,9 +54,10 @@ std::string Plugin::GetHandle() const
   return this->handle;
 }
 
-Plugin *Plugin::Create(const std::string &filename, const std::string &shortname)
+PluginPtr Plugin::Create(const std::string &_filename, 
+                         const std::string &_shortname)
 {
-  Plugin *result = NULL;
+  PluginPtr result;
   struct stat st;
   bool found = false;
   std::string fullname;
@@ -65,10 +66,16 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
 
   for (iter=pluginPaths.begin(); iter!=pluginPaths.end(); ++iter)
   {
-    fullname = (*iter)+std::string("/")+filename;
-    if (stat(fullname.c_str(), &st) == 0) {found=true; break;}
+    fullname = (*iter)+std::string("/")+_filename;
+    if (stat(fullname.c_str(), &st) == 0) 
+    {
+      found=true; 
+      break;
+    }
   }
-  if (!found) fullname = filename;
+
+  if (!found) 
+    fullname = _filename;
   std::string registerName = "RegisterPlugin";
 
 #ifdef HAVE_DL
@@ -76,18 +83,18 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
   if (!handle)
   {
     gzerr << "Failed to load plugin " << fullname << ": " << dlerror();
-    return NULL;
+    return result;
   }
 
   Plugin *(*registerFunc)() = (Plugin *(*)())dlsym(handle, registerName.c_str());
   if(!registerFunc)
   {
     gzerr << "Failed to resolve " << registerName << ": " << dlerror();
-    return NULL;
+    return result;
   }
 
   // Register the new controller.
-  result = registerFunc();
+  result.reset( registerFunc() );
 
 #elif HAVE_LTDL
 
@@ -122,7 +129,7 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
   }
 
   // Register the new controller.
-  result = registerFunc();
+  result.result( registerFunc() );
 
 #else // HAVE_LTDL
 
@@ -130,8 +137,8 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
 
 #endif // HAVE_LTDL
 
-  result->handle = shortname;
-  result->filename = filename;
+  result->handle = _shortname;
+  result->filename = _filename;
 
   return result;
 }
