@@ -231,7 +231,7 @@
             <horizontal_fov angle="1.57"/>
             <image width="2560" height="1600" format="BAYER_BGGR8"/>
             <clip near="0.01" far="100.0"/>
-            <save enable="false" path="/tmp"/>
+            <save enabled="false" path="/tmp"/>
           </camera>
         </sensor>
 
