@@ -20,26 +20,28 @@
  * SVN: $Id$
 */
 
-#include "World.hh"
-#include "math/Vector3.hh"
-#include "SensorFactory.hh"
-#include "MultiRayShape.hh"
-#include "PhysicsEngine.hh"
+#include "physics/World.hh"
+#include "physics/MultiRayShape.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/Geom.hh"
 #include "common/Exception.hh"
-#include "MultiRayShape.hh"
-#include "RaySensor.hh"
+
+#include "math/Vector3.hh"
+
+#include "sensors/SensorFactory.hh"
+#include "sensors/RaySensor.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("ray", RaySensor);
+GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-RaySensor::RaySensor(Body *body)
-    : Sensor(body)
+RaySensor::RaySensor()
+    : Sensor()
 {
   this->active = false;
-
   this->typeName = "ray";
 }
 
@@ -56,14 +58,20 @@ RaySensor::~RaySensor()
 /// Load the ray using parameter from an SDF 
 void RaySensor::LoadChild( sdf::ElementPtr &_sdf )
 {
+  gzerr << "LOADING RaySensor\n";
+
+/*
   if (this->body == NULL)
     gzthrow("Null body in the ray sensor");
 
   this->laserGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(
       "multiray", this->body);
+*/
   this->laserGeom->SetName("Ray Sensor Geom");
 
-  this->laserShape = (MultiRayShape*)(this->laserGeom->GetShape());
+/* use boost cast
+  this->laserShape = (gazebo::physics::MultiRayShape*)(this->laserGeom->GetShape());
+*/
 
   this->laserShape->Load( _sdf );
 }
@@ -72,9 +80,10 @@ void RaySensor::LoadChild( sdf::ElementPtr &_sdf )
 // Init the ray
 void RaySensor::InitChild()
 {
-  Pose bodyPose;
-
+  gazebo::math::Pose bodyPose;
+/*
   bodyPose = this->body->GetWorldPose();
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -85,14 +94,14 @@ void RaySensor::FiniChild()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum angle
-Angle RaySensor::GetMinAngle() const
+gazebo::math::Angle RaySensor::GetMinAngle() const
 {
   return this->laserShape->GetMinAngle();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the maximum angle
-Angle RaySensor::GetMaxAngle() const
+gazebo::math::Angle RaySensor::GetMaxAngle() const
 {
   return this->laserShape->GetMaxAngle();
 }
@@ -122,40 +131,40 @@ double RaySensor::GetResRange() const
 /// Get the ray count
 int RaySensor::GetRayCount() const
 {
-  return this->laserShape->GetRayCount();
+  return this->GetRayCount();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the range count
 int RaySensor::GetRangeCount() const
 {
-  return this->laserShape->GetRangeCount();
+  return this->GetRangeCount();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical scan line count
 int RaySensor::GetVerticalRayCount() const
 {
-  return this->laserShape->GetVerticalRayCount();
+  return this->GetVerticalRayCount();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical scan line count
 int RaySensor::GetVerticalRangeCount() const
 {
-  return this->laserShape->GetVerticalRangeCount();
+  return this->GetVerticalRangeCount();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical min angle
-Angle RaySensor::GetVerticalMinAngle() const
+gazebo::math::Angle RaySensor::GetVerticalMinAngle() const
 {
   return this->laserShape->GetVerticalMinAngle();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical max angle
-Angle RaySensor::GetVerticalMaxAngle() const
+gazebo::math::Angle RaySensor::GetVerticalMaxAngle() const
 {
   return this->laserShape->GetVerticalMaxAngle();
 }
@@ -185,6 +194,8 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild()
 {
+/*
   if (this->active || (**this->alwaysActiveP))
     this->laserShape->Update();
+*/
 }
