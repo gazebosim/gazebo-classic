@@ -149,7 +149,6 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
-  initAttr(_config, "type", _sdf->GetAttribute("type"));
   initAttr(_config, "alwaysOn", _sdf->GetAttribute("always_on"));
   initAttr(_config, "updateRate", _sdf->GetAttribute("update_rate"));
 
@@ -159,16 +158,34 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   {
     sdf::ElementPtr contact = _sdf->AddElement("contact");
     initContact(_config, contact);
+
+    if (!_sdf->GetAttribute("type")->SetFromString("contact"))
+    {
+      gzerr << "Unable to set type to contact\n";
+      return false;
+    } 
   }
   else if ( std::string((const char*)_config->name) == "camera" )
   {
     sdf::ElementPtr camera = _sdf->AddElement("camera");
     initCamera(_config, camera);
+
+    if (!_sdf->GetAttribute("type")->SetFromString("camera"))
+    {
+      gzerr << "Unable to set type to camera\n";
+      return false;
+    } 
   }
-  else if ( std::string((const char*)_config->name) == "camera" )
+  else if ( std::string((const char*)_config->name) == "ray" )
   {
     sdf::ElementPtr ray = _sdf->AddElement("ray");
     initRay(_config, ray);
+
+    if (!_sdf->GetAttribute("type")->SetFromString("ray"))
+    {
+      gzerr << "Unable to set type to ray\n";
+      return false;
+    } 
   }
 
   /// Get all the plugins
@@ -181,7 +198,13 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
 
   sdf::ElementPtr sdfHFOV = _sdf->AddElement("horizontal_fov");
-  initAttr(_config, "hfov", sdfHFOV->GetAttribute("angle"));
+  double hfov = boost::lexical_cast<double>(getNodeValue(_config,"hfov"));
+  if (!sdfHFOV->GetAttribute("angle")->SetFromString( 
+        boost::lexical_cast<std::string>(DTOR(hfov)) ))
+  {
+    gzerr << "Unable to parse hfov angle\n";
+    return false;
+  } 
 
   sdf::ElementPtr sdfImage = _sdf->AddElement("image");
   initAttr(_config, "imageWidth", sdfImage->GetAttribute("width"));

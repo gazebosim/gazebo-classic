@@ -119,7 +119,7 @@
             <mesh filename='pr2/base_v0/base.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='base_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='base_footprint_geom_base_link' />
@@ -130,8 +130,14 @@
             <data name='bumperTopicName' value='base_bumper' />
           </plugin>
         </sensor>
-        <sensor name='base_laser' type='__default__' always_on='0' update_rate='20' >
+        <sensor name='base_laser' type='ray' always_on='0' update_rate='20' >
           <origin pose='0.275 0 0.303 0 -0 0' />
+          <ray >
+            <scan display='1' >
+              <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423' />
+            </scan>
+            <range min='0.080000000000000002' max='10' resolution='0.01' />
+          </ray>
           <plugin name='gazebo_ros_base_laser_controller' filename='libgazebo_ros_laser.so' >
             <data name='gaussianNoise' value='0.005' />
             <data name='alwaysOn' value='1' />
@@ -508,7 +514,7 @@
             <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='torso_lift_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='torso_lift_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='torso_lift_link_geom' />
@@ -597,10 +603,10 @@
           </geometry>
           <material script='Gazebo/Grey' normal_map='__default__' />
         </visual>
-        <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+        <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' >
           <origin pose='0.0232 0.06 0.098 0 -0 0' />
           <camera >
-            <horizontal_fov angle='45' />
+            <horizontal_fov angle='0.78539816339744828' />
             <image width='320' height='240' format='L8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -622,10 +628,10 @@
             <data name='distortion_t2' value='0.0' />
           </plugin>
         </sensor>
-        <sensor name='narrow_stereo_gazebo_r_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+        <sensor name='narrow_stereo_gazebo_r_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' >
           <origin pose='0.0232 -0.03 0.098 0 -0 0' />
           <camera >
-            <horizontal_fov angle='45' />
+            <horizontal_fov angle='0.78539816339744828' />
             <image width='320' height='240' format='L8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -647,10 +653,10 @@
             <data name='distortion_t2' value='0.0' />
           </plugin>
         </sensor>
-        <sensor name='wide_stereo_gazebo_l_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+        <sensor name='wide_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' >
           <origin pose='0.0232 0.03 0.098 0 -0 0' />
           <camera >
-            <horizontal_fov angle='90' />
+            <horizontal_fov angle='1.5707963267948966' />
             <image width='320' height='240' format='BAYER_BGGR8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -672,10 +678,10 @@
             <data name='distortion_t2' value='0.0' />
           </plugin>
         </sensor>
-        <sensor name='wide_stereo_gazebo_r_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+        <sensor name='wide_stereo_gazebo_r_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' >
           <origin pose='0.0232 -0.06 0.098 0 -0 0' />
           <camera >
-            <horizontal_fov angle='90' />
+            <horizontal_fov angle='1.5707963267948966' />
             <image width='320' height='240' format='BAYER_BGGR8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -697,10 +703,10 @@
             <data name='distortion_t2' value='0.0' />
           </plugin>
         </sensor>
-        <sensor name='high_def_sensor' type='__default__' always_on='0' update_rate='20' >
+        <sensor name='high_def_sensor' type='camera' always_on='0' update_rate='20' >
           <origin pose='0.0232 -0.109 0.0995 0 -0 0' />
           <camera >
-            <horizontal_fov angle='45' />
+            <horizontal_fov angle='0.78539816339744828' />
             <image width='320' height='240' format='R8G8B8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -906,10 +912,10 @@
             <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='l_forearm_cam_sensor' type='__default__' always_on='0' update_rate='25' >
+        <sensor name='l_forearm_cam_sensor' type='camera' always_on='0' update_rate='25' >
           <origin pose='0.135 0 0.044 -90 -32.25 3.76073e-15' />
           <camera >
-            <horizontal_fov angle='90' />
+            <horizontal_fov angle='1.5707963267948966' />
             <image width='320' height='240' format='L8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -1030,7 +1036,7 @@
             <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='l_gripper_palm_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='l_gripper_palm_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='l_wrist_roll_link_geom_l_gripper_palm_link' />
@@ -1070,7 +1076,7 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='l_gripper_l_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='l_gripper_l_finger_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='l_gripper_l_finger_link_geom' />
@@ -1110,7 +1116,7 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='l_gripper_l_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='l_gripper_l_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='l_gripper_l_finger_tip_link_geom' />
@@ -1150,7 +1156,7 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='l_gripper_r_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='l_gripper_r_finger_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='l_gripper_r_finger_link_geom' />
@@ -1190,7 +1196,7 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='l_gripper_r_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='l_gripper_r_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='l_gripper_r_finger_tip_link_geom' />
@@ -1230,8 +1236,14 @@
             <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='laser_tilt' type='__default__' always_on='0' update_rate='40' >
+        <sensor name='laser_tilt' type='ray' always_on='0' update_rate='40' >
           <origin pose='0 0 0.03 0 -0 0' />
+          <ray >
+            <scan display='1' >
+              <horizontal samples='640' resolution='1' min_angle='-1.3962634000002327' max_angle='1.3962634000002327' />
+            </scan>
+            <range min='0.080000000000000002' max='10' resolution='0.01' />
+          </ray>
           <plugin name='gazebo_ros_laser_tilt_controller' filename='libgazebo_ros_laser.so' >
             <data name='gaussianNoise' value='0.005' />
             <data name='alwaysOn' value='1' />
@@ -1424,10 +1436,10 @@
             <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='r_forearm_cam_sensor' type='__default__' always_on='0' update_rate='25' >
+        <sensor name='r_forearm_cam_sensor' type='camera' always_on='0' update_rate='25' >
           <origin pose='0.135 0 0.044 90 -32.25 -3.76073e-15' />
           <camera >
-            <horizontal_fov angle='90' />
+            <horizontal_fov angle='1.5707963267948966' />
             <image width='320' height='240' format='L8' />
             <clip near='0.10000000000000001' far='100' />
           </camera>
@@ -1548,7 +1560,7 @@
             <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='r_gripper_palm_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='r_gripper_palm_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='r_wrist_roll_link_geom_r_gripper_palm_link' />
@@ -1588,7 +1600,7 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='r_gripper_l_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='r_gripper_l_finger_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='r_gripper_l_finger_link_geom' />
@@ -1628,7 +1640,7 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='r_gripper_l_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='r_gripper_l_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='r_gripper_l_finger_tip_link_geom' />
@@ -1668,7 +1680,7 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='r_gripper_r_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='r_gripper_r_finger_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='r_gripper_r_finger_link_geom' />
@@ -1708,7 +1720,7 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
-        <sensor name='r_gripper_r_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+        <sensor name='r_gripper_r_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100' >
           <origin pose='0 0 0 0 -0 0' />
           <contact >
             <collision name='r_gripper_r_finger_tip_link_geom' />
