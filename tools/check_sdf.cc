@@ -12,6 +12,7 @@ void help()
   std::cout << "Commands:\n";
   std::cout << "\tgzsdf describe\tPrint the SDF format\n";
   std::cout << "\tgzsdf check\tCheck the SDF format for the given file\n\n";
+  std::cout << "\tgzsdf print\tPrints SDF, useful for debugging parser and as a conversion tool\n\n";
 }
 
 int main(int argc, char** argv)
@@ -50,11 +51,26 @@ int main(int argc, char** argv)
       return -1;
     }
     std::cout << "Check complete\n";
-    //sdf->PrintValues();
   }
   else if (params[0] == "describe")
   {
     sdf->PrintDescription();
+  }
+  else if (params[0] == "print")
+  {
+    if (params.size() < 2)
+    {
+      std::cerr << "Error: Expecting an xml file to parse\n\n";
+      help();
+      return -1;
+    }
+
+    if (!readFile(params[1], sdf))
+    {
+      std::cerr << "Error: SDF parsing the xml failed\n";
+      return -1;
+    }
+    sdf->PrintValues();
   }
   else
   {
