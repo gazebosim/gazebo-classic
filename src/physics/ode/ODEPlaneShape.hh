@@ -24,6 +24,13 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
+    /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {
       public: ODEPlaneShape(GeomPtr parent) : PlaneShape(parent) {}
@@ -61,6 +68,8 @@ namespace gazebo
                             vec4[2], vec4[3]);
       }
     };
+    /// \}
+    /// \}
   }
 }
 #endif

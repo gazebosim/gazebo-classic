@@ -17,6 +17,10 @@
 
 #include <boost/shared_ptr.hpp>
 
+/// \file
+/// \ingroup gazebo_physics
+/// \ingroup gazebo_physics_ode
+/// \brief ODE wrapper forward declarations and typedefs
 namespace gazebo
 {
   namespace physics

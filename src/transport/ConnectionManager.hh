@@ -30,6 +30,10 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief Manager of connections
     class ConnectionManager : public SingletonT<ConnectionManager>
     {
       /// \brief Constructor
@@ -93,6 +97,7 @@ namespace gazebo
       //Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
     };
+    /// \}
   }
 }
 

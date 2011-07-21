@@ -13,8 +13,16 @@
 
 namespace gazebo
 {
+  /// \ingroup gazebo_common
+  /// \brief Common namespace
   namespace transport
   {
+
+    /// \addtogroup gazebo_transport Transport 
+    /// \brief Handles transportation of messages
+    /// \{
+
+    /// \brief A helper class to handle callbacks when messages arrive 
     class CallbackHelper
     {
       public: CallbackHelper() {}
@@ -32,6 +40,7 @@ namespace gazebo
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
 
 
+    /// \brief Callback helper Template
     template<class M>
     class CallbackHelperT : public CallbackHelper
     {
@@ -141,6 +150,7 @@ namespace gazebo
 
       private: boost::function<void (const boost::shared_ptr<msgs::String const> &)> callback;
     };
+    /// \}
   }
 }
 

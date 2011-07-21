@@ -39,6 +39,10 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+
     /// \brief Manages topics and their subscriptions
     class TopicManager : public SingletonT<TopicManager>
     {
@@ -176,6 +180,7 @@ namespace gazebo
       //Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
+    /// \}
   }
 }
 

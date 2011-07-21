@@ -30,6 +30,13 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
+    /// \brief ODE Box shape 
     class ODEBoxShape : public BoxShape
     {
       public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) {}
@@ -44,6 +51,8 @@ namespace gazebo
         oParent->SetGeom( dCreateBox( 0, size.x, size.y, size.z), true );
       }
     };
+    /// \}
+    /// \}
   }
 }
 #endif

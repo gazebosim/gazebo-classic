@@ -156,6 +156,8 @@ else (build_errors)
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
+  add_subdirectory(doc)
+
   if (BUILD_GAZEBO)
     add_subdirectory(src)
     add_subdirectory(sdf)
@@ -177,16 +179,6 @@ else (build_errors)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION lib/pkgconfig COMPONENT pkgconfig)
   endforeach()
-
-  find_package(Doxygen)
-  if (DOXYGEN_FOUND)
-    configure_file(${CMAKE_SOURCE_DIR}/doc/gazebo.in ${CMAKE_BINARY_DIR}/gazebo.dox @ONLY)
-    add_custom_target(doc ${DOXYGEN_EXECUTABLE} 
-      ${CMAKE_BINARY_DIR}/gazebo.dox
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      COMMENT "Generating API documentation with Doxygen" VERBATIM)
-  endif()
-
 
   ########################################
   # Package Creation: 

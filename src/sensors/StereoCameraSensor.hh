@@ -41,14 +41,7 @@ namespace Ogre
 
 namespace gazebo
 {
-  /// \addtogroup gazebo_sensor
-  /// \brief Stereo camera sensor
-  /// \{
-  /// \defgroup gazebo_stereo_camera Stereo Camera
-  /// \brief Stereo camera sensor
-  // \{
-  
-  
+ 
   /// \brief Stereo camera sensor
   ///
   /// This sensor is used for simulating a stereo camera.

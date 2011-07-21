@@ -25,7 +25,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering 
     /// \{
- 
+
+    /// \brief Rendering material. Just a helper function for now
     class Material
     {
       public: static void Update(const gazebo::common::Material *_mat);

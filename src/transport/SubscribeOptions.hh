@@ -9,6 +9,10 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief Options for a subscription
     class SubscribeOptions
     {
       public: SubscribeOptions()
@@ -49,6 +53,7 @@ namespace gazebo
       private: std::string msgType;
       private: CallbackHelperPtr subscription;
     };
+    /// \}
   }
 }
 

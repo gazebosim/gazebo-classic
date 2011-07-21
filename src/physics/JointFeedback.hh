@@ -30,7 +30,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
+   
+    /// \brief Feedback information from a joint
     class JointFeedback
     {
       /// \brief Operator =

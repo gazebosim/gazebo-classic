@@ -4,13 +4,19 @@
 #include <boost/shared_ptr.hpp>
 #include <list>
 
-#include "CallbackHelper.hh"
-#include "PublicationTransport.hh"
+#include "transport/CallbackHelper.hh"
+#include "transport/TransportTypes.hh"
+#include "transport/PublicationTransport.hh"
 
 namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief A publication for a topic. This facilitates transport of
+    ///messages
     class Publication
     {
       /// \brief Constructor
@@ -65,7 +71,7 @@ namespace gazebo
 
       private: bool locallyAdvertised;
     };
-    typedef boost::shared_ptr<Publication> PublicationPtr;
+    /// \}
   }
 }
 #endif

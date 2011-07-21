@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
     /// \brief A publisher of messages on a topic
     class Publisher
     {
@@ -57,6 +60,7 @@ namespace gazebo
       private: std::string msgType;
       private: unsigned int pubCount;
     };
+    /// \}
   }
 }
 

@@ -28,12 +28,18 @@
 
 namespace gazebo
 {
-
 	namespace physics
   {
     class ODEPhysics;
 
-    /// Body class
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \brief ODE Physics wrapper
+    /// \{
+ 
+    /// \brief ODE Body class
     class ODEBody : public Body
     {
       /// \brief Constructor
@@ -136,6 +142,8 @@ namespace gazebo
     };
   
     /// \}
+    /// \}
+    
   }
 
 }

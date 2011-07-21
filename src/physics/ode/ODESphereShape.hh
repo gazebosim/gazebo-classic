@@ -27,6 +27,13 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
+    /// \brief And ODE sphere shape
     class ODESphereShape : public SphereShape
     {
       public: ODESphereShape(ODEGeomPtr parent) : SphereShape(parent) {}
@@ -42,6 +49,9 @@ namespace gazebo
       }
     
     };
+    /// \}
+    /// \}
+
   }
 }
 #endif

@@ -42,6 +42,10 @@ namespace gazebo
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief TCP/IP Connection
     class Connection : public boost::enable_shared_from_this<Connection>
     {
       /// \brief Constructor
@@ -229,7 +233,7 @@ namespace gazebo
 
       private: event::EventT<void()> shutdownSignal;
     };
-
+    /// \}
   }
 }
 

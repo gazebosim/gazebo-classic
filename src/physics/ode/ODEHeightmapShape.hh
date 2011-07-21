@@ -30,6 +30,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
     /// \brief ODE Height map geom
     class ODEHeightmapShape : public HeightmapShape
     {
@@ -56,6 +62,7 @@ namespace gazebo
       private: std::vector<double> heights;
     };
   
+    /// \}
     /// \}
   }
 }

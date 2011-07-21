@@ -25,6 +25,11 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief A node can advertise and subscribe topics, publish on
+    ///        advertised topics and listen to subscribed topics. 
     class Node
     {
       public: Node();
@@ -73,6 +78,7 @@ namespace gazebo
 
       private: std::string topicNamespace;
     };
+    /// \}
   }
 }
 #endif

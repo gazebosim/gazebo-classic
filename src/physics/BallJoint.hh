@@ -30,7 +30,7 @@ namespace gazebo
   /// \brief Physics namespace
 	namespace physics
   {
-    /// \addtogroup gazebo_physics Physics 
+    /// \addtogroup gazebo_physics 
     /// \brief A set of physics related class, functions, and definitions
     /// \{
 

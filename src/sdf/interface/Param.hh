@@ -40,6 +40,7 @@ namespace sdf
   typedef boost::shared_ptr< Param > ParamPtr;
   typedef std::vector< ParamPtr > Param_V;
 
+  /// \brief A parameter class
   class Param
   {
     /// \brief Constructor
@@ -127,7 +128,8 @@ namespace sdf
     protected: std::string typeName;
   };
   
-  
+ 
+  /// \brief Templatized parameter class 
   template< typename T>
   class ParamT : public Param
   {

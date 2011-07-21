@@ -32,6 +32,7 @@ namespace sdf
   typedef boost::shared_ptr<Element> ElementPtr;
   typedef std::vector< ElementPtr > ElementPtr_V;
 
+  /// \brief SDF Element class
   class Element : public boost::enable_shared_from_this<Element>
   {
     public: boost::shared_ptr<Element> Clone() const;
@@ -110,6 +111,7 @@ namespace sdf
   };
 
 
+  /// \brief Base SDF class
   class SDF
   {
     public: SDF();

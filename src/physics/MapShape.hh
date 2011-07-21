@@ -84,7 +84,8 @@ namespace gazebo
       private: static unsigned int geomCounter;
     };
   
-  
+ 
+    /// \cond 
     class QuadNode
     {
       public: QuadNode( QuadNode *_parent ) 
@@ -123,6 +124,8 @@ namespace gazebo
   
       public: bool valid;
     };
+    /// \endcond 
+
     /// \}
   }
 }

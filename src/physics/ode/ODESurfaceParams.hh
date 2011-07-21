@@ -27,6 +27,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
     /// \brief Surface params
     class SurfaceParams
     {
@@ -63,6 +69,8 @@ namespace gazebo
       /// \brief soft constraint force mixing
       public: double softCfm;
     };
+    /// \}
+    /// \}
   }
 }
 #endif

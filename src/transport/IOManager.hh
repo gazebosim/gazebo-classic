@@ -25,6 +25,10 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief Managers boost::asio IO
     class IOManager : public SingletonT<IOManager>
     {
       public: boost::asio::io_service &GetIO();
@@ -49,6 +53,7 @@ namespace gazebo
       //Singleton implementation
       private: friend class SingletonT<IOManager>;
     };
+    /// \}
   }
 }
 

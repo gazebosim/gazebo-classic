@@ -23,6 +23,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE specific version of MultiRayShape
     class ODEMultiRayShape : public MultiRayShape
     {
@@ -45,6 +51,9 @@ namespace gazebo
       private: dSpaceID superSpaceId;
       private: dSpaceID raySpaceId; 
     };
+    /// \}
+    /// \}
+
   }
 }
 #endif

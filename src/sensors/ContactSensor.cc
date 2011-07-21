@@ -36,6 +36,7 @@
 #include "math/Vector3.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor);
 

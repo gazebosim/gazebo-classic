@@ -9,6 +9,11 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief Reads data from a remote advertiser, and passes the data
+    /// along to local subscribers
     class PublicationTransport
     {
       public: PublicationTransport(const std::string &topic, 
@@ -30,9 +35,8 @@ namespace gazebo
       private: ConnectionPtr connection;
       private: boost::function<void (const std::string &)> callback;
       private: event::ConnectionPtr shutdownConnectionPtr;
-      //private: PublicationPtr pub;
     };
-    typedef boost::shared_ptr<PublicationTransport> PublicationTransportPtr;
+    /// \}
   }
 }
 

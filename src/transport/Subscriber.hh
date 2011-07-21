@@ -30,6 +30,10 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+    /// \brief A subscriber to a topic
     class Subscriber
     {
       /// \brief Constructor
@@ -53,6 +57,7 @@ namespace gazebo
       private: std::string topic;
       private: CallbackHelperPtr subscription;
     };
+    /// \}
   }
 }
 

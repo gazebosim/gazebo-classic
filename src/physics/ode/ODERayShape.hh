@@ -30,6 +30,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
     /// \brief Ray geom 
     class ODERayShape : public RayShape
     {
@@ -51,6 +57,8 @@ namespace gazebo
       public: virtual void SetPoints(const math::Vector3 &posStart, 
                                      const math::Vector3 &posEnd);
     };
+    /// \}
+    /// \}
   }
 }
 #endif

@@ -10,6 +10,11 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
+
+
+    /// \brief Handles sending data over the wire to remote subscribers
     class SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
@@ -38,7 +43,7 @@ namespace gazebo
 
       private: ConnectionPtr connection;
     };
-    typedef boost::shared_ptr<SubscriptionTransport> SubscriptionTransportPtr;
+    /// \}
   }
 }
 

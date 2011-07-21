@@ -84,24 +84,3 @@ div.submenu dd {
 div.submenu dd .secondline {
   margin-left: 12px;
 }
-
-a:link {
-  color: #A00;
-}
-
-a:visited {
-  color: #244c92;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-h1 {
-  font-size: 160%;
-}
-

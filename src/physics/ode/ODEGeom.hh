@@ -33,7 +33,13 @@ namespace gazebo
 {
 	namespace physics
   {
-    /// \brief Base class for all geoms
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
+    /// \brief Base class for all ODE geoms
     class ODEGeom : public Geom
     {
       /// \brief Constructor
@@ -80,6 +86,7 @@ namespace gazebo
       protected: dGeomID geomId;
     };
   
+    /// \}
     /// \}
   
   }

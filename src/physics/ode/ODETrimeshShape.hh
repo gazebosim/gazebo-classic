@@ -29,6 +29,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
     /// \brief Triangle mesh geom
     class ODETrimeshShape : public TrimeshShape
     {
@@ -49,6 +55,8 @@ namespace gazebo
       private: dReal matrix_dblbuff[16*2];
       private: int last_matrix_index;
     };
+    /// \}
+    /// \}
   }
 }
 #endif

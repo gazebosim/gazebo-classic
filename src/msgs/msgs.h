@@ -53,8 +53,6 @@ namespace gazebo
     void Stamp(msgs::Time *_time);
 
     /// \cond
-    /// \brief Package up a message with a type descriptor.
-    /// \param _type A string describing the type of message
     std::string Package(const std::string &type, 
         const google::protobuf::Message &message);
     /// \endcond

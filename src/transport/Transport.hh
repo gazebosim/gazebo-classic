@@ -27,6 +27,8 @@ namespace gazebo
 {
   namespace transport
   {
+    /// \addtogroup gazebo_transport
+    /// \{
 
     /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
     /// environment variable
@@ -51,6 +53,7 @@ namespace gazebo
 
     /// \brief Cleanup the transport component
     void fini();
+    /// \}
   }
 }
 

@@ -32,6 +32,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
     ///\brief A single axis hinge joint
     class ODEHingeJoint : public HingeJoint<ODEJoint>
     {
@@ -89,6 +95,7 @@ namespace gazebo
       private: event::ConnectionPtr jointUpdateConnection;
     };
   
+    /// \}
     /// \}
     
   }

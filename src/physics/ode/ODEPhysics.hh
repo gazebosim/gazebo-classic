@@ -47,6 +47,13 @@ namespace gazebo
       public: std::vector<dJointFeedback> feedbacks;
     };
 
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \{
+
+
   /// \brief ODE physics engine
   class ODEPhysics : public PhysicsEngine
   {
@@ -181,7 +188,7 @@ namespace gazebo
   };
   
   
-  /** \}*/
+  /// \}
   /// \}
   }
 }

@@ -29,6 +29,12 @@ namespace gazebo
 {
 	namespace physics
   {
+    /// \addtogroup gazebo_physics
+    /// \{
+    
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
@@ -104,8 +110,9 @@ namespace gazebo
     
       /// Feedback data for this joint
       private: dJointFeedback *feedback;
-    
     };
+    /// \}
+    /// \}
   }
 }
 #endif
