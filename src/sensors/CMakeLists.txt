@@ -5,6 +5,7 @@ set (sources Sensors.cc
              SensorFactory.cc
              SensorManager.cc
              CameraSensor.cc
+             RaySensor.cc
 ) 
 
 set (headers Sensors.hh
@@ -13,12 +14,14 @@ set (headers Sensors.hh
              SensorFactory.hh
              SensorManager.hh
              CameraSensor.hh
+             RaySensor.hh
 )
 
 add_library(gazebo_sensors SHARED ${sources})
 
 target_link_libraries(gazebo_sensors gazebo_common 
                                      gazebo_rendering
+                                     gazebo_physics
                                      ${libtool_library} 
                                      ${boost_libraries}
                                      )

@@ -25,6 +25,7 @@
 #include "sensors/Sensor.hh"
 
 void RegisterCameraSensor();
+void RegisterRaySensor();
 
 using namespace gazebo;
 using namespace sensors;
@@ -34,6 +35,7 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensor_map;
 void SensorFactory::RegisterAll()
 {
   RegisterCameraSensor();
+  RegisterRaySensor();
 }
 
 // Register a model class.  Use by dynamically loaded modules

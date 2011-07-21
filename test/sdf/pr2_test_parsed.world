@@ -14,7 +14,6 @@
         <constraints cfm='1e-10' erp='0.20000000000000001' contact_max_correcting_vel='100' contact_surface_layer='0.001' />
       </ode>
     </physics>
-
     <model name='gplane' static='1' >
       <origin pose='0 0 0 0 -0 0' />
       <link name='plane' gravity='1' self_collide='0' kinematic='0' >
@@ -48,10 +47,8 @@
       <specular rgba='0.1 0.1 0.1 1' />
       <attenuation range='10' linear='0.10000000000000001' constant='0.20000000000000001' quadratic='0' />
     </light>
-
     <model name='pr2' static='0' >
       <origin pose='0 0 0 0 -0 0' />
-
       <link name='base_footprint' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='0 0 0 0 -0 0' />
         <inertial mass='118.001' >
@@ -122,8 +119,28 @@
             <mesh filename='pr2/base_v0/base.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='base_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='base_footprint_geom_base_link' />
+          </contact>
+          <plugin name='base_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='base_bumper' />
+          </plugin>
+        </sensor>
+        <sensor name='base_laser' type='__default__' always_on='0' update_rate='20' >
+          <origin pose='0.275 0 0.303 0 -0 0' />
+          <plugin name='gazebo_ros_base_laser_controller' filename='libgazebo_ros_laser.so' >
+            <data name='gaussianNoise' value='0.005' />
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='20' />
+            <data name='topicName' value='base_scan' />
+            <data name='frameName' value='base_laser_link' />
+          </plugin>
+        </sensor>
       </link>
-
       <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='-0.2246 0.2246 0.0792 0 -0 0' />
         <inertial mass='3.4730799999999999' >
@@ -491,6 +508,17 @@
             <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='torso_lift_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='torso_lift_link_geom' />
+          </contact>
+          <plugin name='torso_lift_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='torso_lift_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='head_pan_link' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='-0.06707 0 1.17213 0 -0 0' />
@@ -569,6 +597,131 @@
           </geometry>
           <material script='Gazebo/Grey' normal_map='__default__' />
         </visual>
+        <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+          <origin pose='0.0232 0.06 0.098 0 -0 0' />
+          <camera >
+            <horizontal_fov angle='45' />
+            <image width='320' height='240' format='L8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='narrow_stereo_gazebo_l_stereo_camera_controller' filename='libgazebo_ros_camera.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='25.0' />
+            <data name='imageTopicName' value='narrow_stereo/left/image_raw' />
+            <data name='cameraInfoTopicName' value='narrow_stereo/left/camera_info' />
+            <data name='frameName' value='narrow_stereo_optical_frame' />
+            <data name='hackBaseline' value='0' />
+            <data name='CxPrime' value='320.5' />
+            <data name='Cx' value='320.5' />
+            <data name='Cy' value='240.5' />
+            <data name='focal_length' value='772.55' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
+        <sensor name='narrow_stereo_gazebo_r_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+          <origin pose='0.0232 -0.03 0.098 0 -0 0' />
+          <camera >
+            <horizontal_fov angle='45' />
+            <image width='320' height='240' format='L8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='narrow_stereo_gazebo_r_stereo_camera_controller' filename='libgazebo_ros_camera.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='25.0' />
+            <data name='imageTopicName' value='narrow_stereo/right/image_raw' />
+            <data name='cameraInfoTopicName' value='narrow_stereo/right/camera_info' />
+            <data name='frameName' value='narrow_stereo_optical_frame' />
+            <data name='hackBaseline' value='0.09' />
+            <data name='CxPrime' value='320.5' />
+            <data name='Cx' value='320.5' />
+            <data name='Cy' value='240.5' />
+            <data name='focal_length' value='772.55' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
+        <sensor name='wide_stereo_gazebo_l_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+          <origin pose='0.0232 0.03 0.098 0 -0 0' />
+          <camera >
+            <horizontal_fov angle='90' />
+            <image width='320' height='240' format='BAYER_BGGR8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='wide_stereo_gazebo_l_stereo_camera_controller' filename='libgazebo_ros_camera.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='25.0' />
+            <data name='imageTopicName' value='wide_stereo/left/image_raw' />
+            <data name='cameraInfoTopicName' value='wide_stereo/left/camera_info' />
+            <data name='frameName' value='wide_stereo_optical_frame' />
+            <data name='hackBaseline' value='0' />
+            <data name='CxPrime' value='320.5' />
+            <data name='Cx' value='320.5' />
+            <data name='Cy' value='240.5' />
+            <data name='focal_length' value='320' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
+        <sensor name='wide_stereo_gazebo_r_stereo_camera_sensor' type='__default__' always_on='0' update_rate='25' >
+          <origin pose='0.0232 -0.06 0.098 0 -0 0' />
+          <camera >
+            <horizontal_fov angle='90' />
+            <image width='320' height='240' format='BAYER_BGGR8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='wide_stereo_gazebo_r_stereo_camera_controller' filename='libgazebo_ros_camera.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='25.0' />
+            <data name='imageTopicName' value='wide_stereo/right/image_raw' />
+            <data name='cameraInfoTopicName' value='wide_stereo/right/camera_info' />
+            <data name='frameName' value='wide_stereo_optical_frame' />
+            <data name='hackBaseline' value='0.09' />
+            <data name='CxPrime' value='320.5' />
+            <data name='Cx' value='320.5' />
+            <data name='Cy' value='240.5' />
+            <data name='focal_length' value='320' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
+        <sensor name='high_def_sensor' type='__default__' always_on='0' update_rate='20' >
+          <origin pose='0.0232 -0.109 0.0995 0 -0 0' />
+          <camera >
+            <horizontal_fov angle='45' />
+            <image width='320' height='240' format='R8G8B8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='high_def_controller' filename='libgazebo_ros_prosilica.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='20.0' />
+            <data name='imageTopicName' value='/prosilica/image_raw' />
+            <data name='cameraInfoTopicName' value='/prosilica/camera_info' />
+            <data name='pollServiceName' value='/prosilica/request_image' />
+            <data name='frameName' value='high_def_frame' />
+            <data name='CxPrime' value='1224.5' />
+            <data name='Cx' value='1224.5' />
+            <data name='Cy' value='1025.5' />
+            <data name='focal_length' value='2955' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
       </link>
       <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='-0.05 0.188 0.790675 0 -0 0' />
@@ -753,6 +906,31 @@
             <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='l_forearm_cam_sensor' type='__default__' always_on='0' update_rate='25' >
+          <origin pose='0.135 0 0.044 -90 -32.25 3.76073e-15' />
+          <camera >
+            <horizontal_fov angle='90' />
+            <image width='320' height='240' format='L8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='l_forearm_cam_controller' filename='libgazebo_ros_camera.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='25.0' />
+            <data name='imageTopicName' value='l_forearm_cam/image_raw' />
+            <data name='cameraInfoTopicName' value='l_forearm_cam/camera_info' />
+            <data name='frameName' value='l_forearm_cam_optical_frame' />
+            <data name='hackBaseline' value='0' />
+            <data name='CxPrime' value='320.5' />
+            <data name='Cx' value='320.5' />
+            <data name='Cy' value='240.5' />
+            <data name='focal_length' value='320' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
       </link>
       <link name='l_wrist_flex_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.771 0.188 0.790675 0 -0 0' />
@@ -852,6 +1030,18 @@
             <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='l_gripper_palm_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='l_wrist_roll_link_geom_l_gripper_palm_link' />
+          </contact>
+          <plugin name='l_gripper_palm_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='100.0' />
+            <data name='frameName' value='l_gripper_palm_link' />
+            <data name='bumperTopicName' value='l_gripper_palm_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='l_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 0.198 0.790675 0 -0 0' />
@@ -880,6 +1070,18 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='l_gripper_l_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='l_gripper_l_finger_link_geom' />
+          </contact>
+          <plugin name='l_gripper_l_finger_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='100.0' />
+            <data name='frameName' value='l_gripper_l_finger_link' />
+            <data name='bumperTopicName' value='l_gripper_l_finger_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='l_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 0.20295 0.790675 0 -0 0' />
@@ -908,6 +1110,18 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='l_gripper_l_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='l_gripper_l_finger_tip_link_geom' />
+          </contact>
+          <plugin name='l_gripper_l_finger_tip_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='frameName' value='l_gripper_l_finger_tip_link' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='l_gripper_l_finger_tip_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='l_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 0.178 0.790675 0 -0 0' />
@@ -936,6 +1150,18 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='l_gripper_r_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='l_gripper_r_finger_link_geom' />
+          </contact>
+          <plugin name='l_gripper_r_finger_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='frameName' value='l_gripper_r_finger_link' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='l_gripper_r_finger_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='l_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 0.17305 0.790675 0 -0 0' />
@@ -964,6 +1190,18 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='l_gripper_r_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='l_gripper_r_finger_tip_link_geom' />
+          </contact>
+          <plugin name='l_gripper_r_finger_tip_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='frameName' value='l_gripper_r_finger_tip_link' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='l_gripper_r_finger_tip_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='laser_tilt_mount_link' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='0.04893 0 1.01768 0 -0 0' />
@@ -992,6 +1230,16 @@
             <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='laser_tilt' type='__default__' always_on='0' update_rate='40' >
+          <origin pose='0 0 0.03 0 -0 0' />
+          <plugin name='gazebo_ros_laser_tilt_controller' filename='libgazebo_ros_laser.so' >
+            <data name='gaussianNoise' value='0.005' />
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='40' />
+            <data name='topicName' value='tilt_scan' />
+            <data name='frameName' value='laser_tilt_link' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='-0.05 -0.188 0.790675 0 -0 0' />
@@ -1176,6 +1424,31 @@
             <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='r_forearm_cam_sensor' type='__default__' always_on='0' update_rate='25' >
+          <origin pose='0.135 0 0.044 90 -32.25 -3.76073e-15' />
+          <camera >
+            <horizontal_fov angle='90' />
+            <image width='320' height='240' format='L8' />
+            <clip near='0.10000000000000001' far='100' />
+          </camera>
+          <plugin name='r_forearm_cam_controller' filename='libgazebo_ros_camera.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='25.0' />
+            <data name='imageTopicName' value='r_forearm_cam/image_raw' />
+            <data name='cameraInfoTopicName' value='r_forearm_cam/camera_info' />
+            <data name='frameName' value='r_forearm_cam_optical_frame' />
+            <data name='hackBaseline' value='0' />
+            <data name='CxPrime' value='320.5' />
+            <data name='Cx' value='320.5' />
+            <data name='Cy' value='240.5' />
+            <data name='focal_length' value='320' />
+            <data name='distortion_k1' value='0.0' />
+            <data name='distortion_k2' value='0.0' />
+            <data name='distortion_k3' value='0.0' />
+            <data name='distortion_t1' value='0.0' />
+            <data name='distortion_t2' value='0.0' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_wrist_flex_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.771 -0.188 0.790675 0 -0 0' />
@@ -1275,6 +1548,18 @@
             <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='r_gripper_palm_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='r_wrist_roll_link_geom_r_gripper_palm_link' />
+          </contact>
+          <plugin name='r_gripper_palm_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='100.0' />
+            <data name='frameName' value='r_gripper_palm_link' />
+            <data name='bumperTopicName' value='r_gripper_palm_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 -0.178 0.790675 0 -0 0' />
@@ -1303,6 +1588,18 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='r_gripper_l_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='r_gripper_l_finger_link_geom' />
+          </contact>
+          <plugin name='r_gripper_l_finger_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='updateRate' value='100.0' />
+            <data name='frameName' value='r_gripper_l_finger_link' />
+            <data name='bumperTopicName' value='r_gripper_l_finger_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 -0.17305 0.790675 0 -0 0' />
@@ -1331,6 +1628,18 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='r_gripper_l_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='r_gripper_l_finger_tip_link_geom' />
+          </contact>
+          <plugin name='r_gripper_l_finger_tip_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='frameName' value='r_gripper_l_finger_tip_link' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='r_gripper_l_finger_tip_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.84791 -0.198 0.790675 0 -0 0' />
@@ -1359,6 +1668,18 @@
             <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='r_gripper_r_finger_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='r_gripper_r_finger_link_geom' />
+          </contact>
+          <plugin name='r_gripper_r_finger_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='frameName' value='r_gripper_r_finger_link' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='r_gripper_r_finger_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.93928 -0.20295 0.790675 0 -0 0' />
@@ -1387,6 +1708,18 @@
             <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1' />
           </geometry>
         </visual>
+        <sensor name='r_gripper_r_finger_tip_contact_sensor' type='__default__' always_on='0' update_rate='100' >
+          <origin pose='0 0 0 0 -0 0' />
+          <contact >
+            <collision name='r_gripper_r_finger_tip_link_geom' />
+          </contact>
+          <plugin name='r_gripper_r_finger_tip_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so' >
+            <data name='alwaysOn' value='1' />
+            <data name='frameName' value='r_gripper_r_finger_tip_link' />
+            <data name='updateRate' value='100.0' />
+            <data name='bumperTopicName' value='r_gripper_r_finger_tip_bumper' />
+          </plugin>
+        </sensor>
       </link>
       <link name='r_gripper_l_parallel_link' gravity='0' self_collide='0' kinematic='0' >
         <origin pose='0.82991 -0.157 0.790675 0 -0 0' />

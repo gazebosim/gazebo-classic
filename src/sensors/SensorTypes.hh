@@ -17,6 +17,7 @@
 #ifndef SENSORTYPES_HH
 #define SENSORTYPES_HH
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 /// \file

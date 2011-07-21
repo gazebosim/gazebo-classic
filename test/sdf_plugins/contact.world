@@ -3,7 +3,7 @@
     <scene>
       <ambient rgba="0.5 0.5 0.5 1.0"/>
       <background rgba="0.5 0.5 0.5 1.0">
-        <sky mateiral="Gazebo/CloudSky"/>
+        <sky material="Gazebo/CloudSky"/>
       </background>
       <shadows enabled="true" rgba="0.0 0.0 0.5 0.5" type="texture_gpu"/>
       <fog rgba="0.0 0.0 0.5 0.5" type="linear" start="2.0" end="10.0" density="0.5"/>
@@ -68,11 +68,11 @@
     </model>
 
     <plugin name="plugin_1" filename="libgazebo_ros_bumper.so">
-      <sensor>model_1::sensor_contact</sensor>
-      <alwaysOn>true</alwaysOn>
-      <updateRate>100.0</updateRate>
-      <frameName>r_gripper_palm_link</frameName>
-      <bumperTopicName>r_gripper_palm_bumper</bumperTopicName>
+      <data name="sensor" value="model_1::sensor_contact" />
+      <data name="alwaysOn" value="true" />
+      <data name="updateRate" value="100.0" />
+      <data name="frameName" value="r_gripper_palm_link" />
+      <data name="bumperTopicName" value="r_gripper_palm_bumper" />
     </plugin>
 
   </world>

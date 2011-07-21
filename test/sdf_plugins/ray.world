@@ -3,15 +3,15 @@
     <scene>
       <ambient rgba="0.5 0.5 0.5 1.0"/>
       <background rgba="0.5 0.5 0.5 1.0">
-        <sky mateiral="Gazebo/CloudSky"/>
+        <sky material="Gazebo/CloudSky"/>
       </background>
       <shadows enabled="true" rgba="0.0 0.0 0.5 0.5" type="texture_gpu"/>
       <fog rgba="0.0 0.0 0.5 0.5" type="linear" start="2.0" end="10.0" density="0.5"/>
     </scene>
 
     <physics type="ode">
+      <max_contacts>250</max_contacts>
       <ode>
-        <max_contacts>250</max_contacts>
         <solver type="quick" dt="0.001" iters="20" sor="1.3"/>
         <constraints cfm="0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.0"/>
       </ode>
@@ -59,14 +59,14 @@
           </surface>
         </collision>
 
-        <sensor name="sensor_ray" always_on="true" update_rate="2.0">
+        <sensor name="sensor_ray" type="ray" always_on="true" update_rate="2.0">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <ray>
             <scan display="true">
-              <horizontal sampes="500" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
-              <vertical sampes="300" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
-              <range min="0.01" max="30.0"/>
+              <horizontal samples="500" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
+              <vertical samples="300" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
             </scan>
+            <range min="0.01" max="30.0"/>
           </ray>
         </sensor>
 
@@ -152,12 +152,12 @@
     </light>
 
     <plugin name="plugin_1" filename="libgazebo_ros_laser.so">
-      <sensor>model_1::sensor_ray</sensor>
-      <gaussianNoise>0.005</gaussianNoise>
-      <alwaysOn>true</alwaysOn>
-      <updateRate>20</updateRate>
-      <topicName>base_scan</topicName>
-      <frameName>base_laser_link</frameName>
+      <data name="sensor" value="model_1::sensor_ray" />
+      <data name="gaussianNoise" value="0.005" />
+      <data name="alwaysOn" value="true" />
+      <data name="updateRate" value="20" />
+      <data name="topicName" value="base_scan" />
+      <data name="frameName" value="base_laser_link" />
     </plugin>
 
   </world>

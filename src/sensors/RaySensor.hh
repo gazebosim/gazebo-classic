@@ -25,9 +25,9 @@
 
 #include <vector>
 
-#include "common/Angle.hh"
-#include "Sensor.hh"
-#include "Body.hh"
+#include "math/Angle.hh"
+#include "math/Pose.hh"
+#include "sensors/Sensor.hh"
 
 namespace gazebo
 {
@@ -49,9 +49,7 @@ namespace gazebo
     class RaySensor: public Sensor
     {
       /// \brief Constructor
-      /// \param body The underlying collision test uses an ODE geom, so
-      ///             ray sensors must be attached to a body.
-      public: RaySensor(Body *body);
+      public: RaySensor();
     
       /// \brief Destructor
       public: virtual ~RaySensor();
@@ -71,11 +69,11 @@ namespace gazebo
     
       /// \brief Get the minimum angle
       /// \return The minimum angle
-      public: Angle GetMinAngle() const;
+      public: gazebo::math::Angle GetMinAngle() const;
     
       /// \brief Get the maximum angle
       /// \return the maximum angle
-      public: Angle GetMaxAngle() const;
+      public: gazebo::math::Angle GetMaxAngle() const;
     
       /// \brief Get the minimum range
       /// \return The minimum range
@@ -106,11 +104,11 @@ namespace gazebo
     
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: Angle GetVerticalMinAngle() const;
+      public: gazebo::math::Angle GetVerticalMinAngle() const;
     
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: Angle GetVerticalMaxAngle() const;
+      public: gazebo::math::Angle GetVerticalMaxAngle() const;
 
       /// \brief Get detected range for a ray.
       /// \returns Returns DBL_MAX for no detection.
@@ -122,9 +120,9 @@ namespace gazebo
       /// \brief Get detected fiducial value for a ray.
       public: int GetFiducial(int index);   
     
-      private: Pose prevPose;
-      private: Geom *laserGeom;
-      private: MultiRayShape *laserShape;
+      private: gazebo::math::Pose prevPose;
+      private: gazebo::physics::Geom *laserGeom;
+      private: gazebo::physics::MultiRayShape *laserShape;
     };
     /// \}
   }

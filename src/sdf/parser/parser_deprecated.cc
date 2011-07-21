@@ -149,6 +149,7 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
+  initAttr(_config, "type", _sdf->GetAttribute("type"));
   initAttr(_config, "alwaysOn", _sdf->GetAttribute("always_on"));
   initAttr(_config, "updateRate", _sdf->GetAttribute("update_rate"));
 
@@ -524,11 +525,11 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   // Get all sensor elements
   // FIXME: instead of child elements, get namespace == sensor blocks
-  for (xmlNodePtr  sensorXml = firstChildElement(_config, "sensor"); 
-      sensorXml; sensorXml = nextSiblingElement(sensorXml, "sensor"))
+  for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor"); 
+      sensor_xml; sensor_xml = getNextByNSPrefix(sensor_xml, "sensor"))
   {
     sdf::ElementPtr sdfSensor = _sdf->AddElement("sensor");
-    if (!initSensor(sensorXml,sdfSensor))
+    if (!initSensor(sensor_xml,sdfSensor))
     {
       gzerr << "Unable to parse sensor\n";
       return false;
