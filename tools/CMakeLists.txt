@@ -16,3 +16,7 @@ add_executable( gztopic gztopic.cc )
 target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport )
 INSTALL_EXECUTABLE( gztopic )
 
+add_executable( gzstats gzstats.cc )
+target_link_libraries(gzstats gazebo_msgs gazebo_common gazebo_transport )
+INSTALL_EXECUTABLE( gzstats )
+
