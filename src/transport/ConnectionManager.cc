@@ -123,6 +123,7 @@ void ConnectionManager::Run()
   while (!this->stop)
   {
     this->masterConn->ProcessWriteQueue();
+    TopicManager::Instance()->ProcessNodes();
 
     iter = this->connections.begin();
     while (iter != this->connections.end())

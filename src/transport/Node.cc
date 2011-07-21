@@ -21,17 +21,22 @@
 using namespace gazebo;
 using namespace transport;
 
+unsigned int Node::idCounter = 0;
+
 Node::Node()
 {
+  this->id = idCounter++;
   this->topicNamespace = "";
 }
 
 Node::~Node()
 {
+  TopicManager::Instance()->RemoveNode( shared_from_this() );
 }
 
 void Node::Init(const std::string &space)
 {
+  TopicManager::Instance()->AddNode( shared_from_this() );
   this->topicNamespace = space;
 }
 
@@ -50,4 +55,19 @@ std::string Node::EncodeTopicName(const std::string &topic)
   boost::replace_first(result, "//", "/");
 
   return result;
+}
+
+/// Get the unique ID of the node
+unsigned int Node::GetId() const
+{
+  return this->id;
+}
+
+void Node::ProcessPublishers()
+{
+  std::vector<PublisherPtr>::iterator iter;
+  for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
+  {
+    (*iter)->SendMessage();
+  }
 }

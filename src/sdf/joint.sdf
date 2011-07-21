@@ -26,7 +26,7 @@
     </element> <!-- End Limit -->
   </element> <!-- End Axis -->
 
-  <element name="axis2" required="1">
+  <element name="axis2" required="0">
     <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
     <element name="dynamics" required="0">
       <attribute name="damping" type="double" default="0" required="0"/>

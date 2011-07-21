@@ -156,26 +156,26 @@ void Publication::LocalPublish(const std::string &data)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Publication::Publish(const google::protobuf::Message &msg,
-                          const boost::function<void()> &cb)
+void Publication::Publish(const google::protobuf::Message &_msg,
+                          const boost::function<void()> &_cb)
 {
   std::list< CallbackHelperPtr >::iterator iter;
 
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
-    if ((*iter)->HandleMessage(&msg))
+    if ((*iter)->HandleMessage(&_msg))
       iter++;
     else
       this->callbacks.erase( iter++ );
   }
-  if (cb)
-    (cb)();
+  if (_cb)
+    (_cb)();
 
   if (!this->prevMsg)
-    this->prevMsg = msg.New();
+    this->prevMsg = _msg.New();
 
-  this->prevMsg->CopyFrom(msg);
+  this->prevMsg->CopyFrom(_msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

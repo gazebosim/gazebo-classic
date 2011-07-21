@@ -892,7 +892,6 @@ void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 // Process all incoming messages before rendering
 void Scene::PreRender()
 {
-  gzdbg << "Scene[" << this->GetName() << "] PreRender!\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
   SceneMsgs_L::iterator sIter;

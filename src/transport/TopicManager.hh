@@ -55,6 +55,12 @@ namespace gazebo
 
       public: PublicationPtr FindPublication(const std::string &topic);
 
+      public: void AddNode( NodePtr _node );
+
+      public: void RemoveNode( NodePtr _node );
+
+      public: void ProcessNodes();
+
       /// \brief Returns true if the topic has been advertised
       /// \param _topic The name of the topic to check
       /// \return True if the topic has been advertised
@@ -176,6 +182,7 @@ namespace gazebo
 
       private: std::vector<PublicationPtr> advertisedTopics;
       private: SubMap subscribed_topics; 
+      private: std::vector<NodePtr> nodes;
 
       //Singleton implementation
       private: friend class SingletonT<TopicManager>;

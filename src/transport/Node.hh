@@ -18,6 +18,8 @@
 #ifndef NODE_HH
 #define NODE_HH
 
+#include <boost/enable_shared_from_this.hpp>
+
 #include "transport/TransportTypes.hh"
 #include "transport/TopicManager.hh"
 
@@ -30,9 +32,12 @@ namespace gazebo
 
     /// \brief A node can advertise and subscribe topics, publish on
     ///        advertised topics and listen to subscribed topics. 
-    class Node
+    class Node : public boost::enable_shared_from_this<Node>
     {
+      /// \brief Constructor
       public: Node();
+
+      /// \brief Destructor
       public: virtual ~Node();
 
       /// \brief Init the node
@@ -45,13 +50,22 @@ namespace gazebo
       /// \brief Encode a topic name
       public: std::string EncodeTopicName(const std::string &topic);
 
+      /// \brief Get the unique ID of the node
+      public: unsigned int GetId() const;
+
+      /// \brief Process all publishers, which has each publisher send it's
+      /// most recent message over the wire. This is for internal use only
+      public: void ProcessPublishers();
+
       /// \brief Adverise a topic
       template<typename M>
       transport::PublisherPtr Advertise(const std::string &topic)
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
+        PublisherPtr publisher = transport::TopicManager::Instance()->Advertise<M>(decodedTopic);
+        this->publishers.push_back(publisher);
 
-        return transport::TopicManager::Instance()->Advertise<M>(decodedTopic); 
+        return publisher;
       }
 
       /// \brief Subscribe to a topic, and return data on the callback
@@ -77,6 +91,9 @@ namespace gazebo
       }
 
       private: std::string topicNamespace;
+      private: std::vector<PublisherPtr> publishers;
+      private: static unsigned int idCounter;
+      private: unsigned int id;
     };
     /// \}
   }

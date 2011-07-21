@@ -31,6 +31,8 @@ Publisher::Publisher(const std::string &topic, const std::string &msg_type)
   : topic(topic), msgType(msg_type)
 {
   this->pubCount = 0;
+  this->mutex = new boost::recursive_mutex();
+  this->message = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,18 +44,46 @@ Publisher::~Publisher()
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
+
+  delete this->message;
+  delete this->mutex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Publish a message
-void Publisher::Publish(google::protobuf::Message &message )
+void Publisher::Publish(google::protobuf::Message &_message )
 {
-  if (message.GetTypeName() != this->msgType)
+  if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  this->pubCount += 1;
+  // Save the latest message
+  this->mutex->lock();
+  this->pubCount = 1;
+  if (!this->message)
+    this->message = _message.New();
+  this->message->CopyFrom( _message );
+  this->mutex->unlock();
+
+  /*this->pubCount += 1;
   TopicManager::Instance()->Publish(this->topic, message, 
       boost::bind(&Publisher::OnPublishComplete, this));
+      */
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Send the lastest message
+void Publisher::SendMessage()
+{
+  this->mutex->lock();
+  if (this->pubCount > 0)
+  {
+    // Send the latested message.
+    TopicManager::Instance()->Publish(this->topic, *this->message, 
+        boost::bind(&Publisher::OnPublishComplete, this));
+  }
+
+  this->pubCount = 0;
+  this->mutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,5 +104,5 @@ std::string Publisher::GetMsgType() const
 // Callback when a publish is completed
 void Publisher::OnPublishComplete()
 {
-  this->pubCount -= 1;
+  //this->pubCount -= 1;
 }

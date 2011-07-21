@@ -129,7 +129,6 @@ void Camera::Load()
 
   std::string imgFmt = imageElem->GetValueString("format");
 
-  gzdbg << "Image Format[" << imgFmt << "]\n";
   if (imgFmt == "L8")
     this->imageFormat = (int)Ogre::PF_L8;
   else if (imgFmt == "R8G8B8")
@@ -268,7 +267,6 @@ bool Camera::GetRenderingEnabled() const
 // Render the camera
 void Camera::Render()
 {
-  gzdbg << "Camera Render[" << this->GetWorldPose() << "]\n";
   this->newData = true;
   this->renderTarget->update(false);
 }
@@ -276,7 +274,6 @@ void Camera::Render()
 ////////////////////////////////////////////////////////////////////////////////
 void Camera::PostRender()
 {
-  gzdbg << "Camera Post Render\n";
   this->renderTarget->swapBuffers();
 
   if (this->newData && this->captureData)
@@ -368,7 +365,6 @@ void Camera::SetWorldRotation(const math::Quaternion &quant)
   this->pose.rot = quant;
   this->pose.Correct();
 
- gzdbg << "Set World Rotation[" << quant << "]\n"; 
   this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
 }
 
@@ -393,7 +389,6 @@ void Camera::RotateYaw( float angle )
 // Rotate the camera around the pitch axis
 void Camera::RotatePitch( float angle )
 {
-  gzdbg << "Rotate Pitch[" << angle << "]\n";
   this->pitchNode->yaw(Ogre::Radian(angle));
 }
 
@@ -920,8 +915,6 @@ void Camera::SetCaptureData( bool value )
 /// Set the render target
 void Camera::CreateRenderTexture( const std::string &textureName )
 {
-  gzdbg << "Creating render texture\n";
-
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       textureName,
@@ -993,7 +986,6 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
                    (double)this->viewport->getActualHeight();
 
     double hfov = this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
-    gzdbg << "HFOV[" << hfov << "]\n";
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));

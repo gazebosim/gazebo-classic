@@ -17,6 +17,7 @@
 
 
 #include "msgs/msgs.h"
+#include "transport/Node.hh"
 #include "transport/Publication.hh"
 #include "transport/TopicManager.hh"
 
@@ -49,26 +50,57 @@ void TopicManager::Fini()
   this->subscribed_topics.clear();
 }
 
+void TopicManager::AddNode( NodePtr _node )
+{
+  this->nodes.push_back(_node);
+}
+
+void TopicManager::RemoveNode( NodePtr _node )
+{
+  std::vector<NodePtr>::iterator iter;
+  for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
+  {
+    if ( (*iter)->GetId() == _node->GetId())
+    {
+      this->nodes.erase(iter);
+      break;
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Process all nodes
+void TopicManager::ProcessNodes()
+{
+  std::vector<NodePtr>::iterator iter;
+  for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
+  {
+    (*iter)->ProcessPublishers();
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
-void TopicManager::Publish( const std::string &topic, 
-                            google::protobuf::Message &message,
-                            const boost::function<void()> &cb)
+void TopicManager::Publish( const std::string &_topic, 
+                            google::protobuf::Message &_message,
+                            const boost::function<void()> &_cb)
 {
-  if (!message.IsInitialized())
+  if (!_message.IsInitialized())
   {
-    gzthrow( "Publishing and uninitialized message on topic[" + topic + "]. Required field [" + message.InitializationErrorString() + "] missing." );
+    gzthrow( "Publishing and uninitialized message on topic[" + _topic + "]. Required field [" + _message.InitializationErrorString() + "] missing." );
   }
 
-  PublicationPtr pub = this->FindPublication(topic);
-  PublicationPtr dbgPub = this->FindPublication(topic+"/__dbg");
+  PublicationPtr pub = this->FindPublication(_topic);
+  PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
-  pub->Publish( message, cb ); 
+  pub->Publish( _message, _cb ); 
 
-  msgs::String dbgMsg;
-  dbgMsg.set_data(message.DebugString());
-  dbgPub->Publish( dbgMsg ); 
+  if (dbgPub->GetCallbackCount() > 0)
+  {
+    msgs::String dbgMsg;
+    dbgMsg.set_data(_message.DebugString());
+    dbgPub->Publish( dbgMsg ); 
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
