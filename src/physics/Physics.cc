@@ -15,11 +15,15 @@
  *
 */
 
+#include "common/Console.hh"
+
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Physics.hh"
 
 using namespace gazebo;
+
+std::map<std::string, physics::WorldPtr> g_worlds;
 
 bool physics::load()
 {
@@ -33,10 +37,60 @@ bool physics::fini()
   return true;
 }
 
-physics::WorldPtr physics::create_world(const std::string &name)
+physics::WorldPtr physics::create_world(const std::string &_name)
 {
-  physics::WorldPtr world( new physics::World(name) );
+  physics::WorldPtr world( new physics::World(_name) );
+  g_worlds[_name] = world;
   return world;
+}
+
+physics::WorldPtr physics::get_world(const std::string &_name)
+{
+  physics::WorldPtr result;
+  std::map<std::string, WorldPtr>::iterator iter;
+  iter = g_worlds.find(_name);
+
+  if (iter != g_worlds.end())
+    result = iter->second;
+  else
+    gzerr << "Unable to find world[" << _name << "]\n";
+
+  return result;
+}
+
+void physics::load_worlds(sdf::ElementPtr &_sdf)
+{
+  std::map<std::string, WorldPtr>::iterator iter;
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+    iter->second->Load(_sdf);
+}
+
+void physics::init_worlds()
+{
+  std::map<std::string, WorldPtr>::iterator iter;
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+    iter->second->Init();
+}
+
+void physics::run_worlds()
+{
+  std::map<std::string, WorldPtr>::iterator iter;
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+    iter->second->Run();
+}
+
+void physics::pause_worlds(bool _pause)
+{
+  std::map<std::string, WorldPtr>::iterator iter;
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+    iter->second->SetPaused(_pause);
+}
+
+void physics::stop_worlds()
+{
+  std::map<std::string, WorldPtr>::iterator iter;
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+    iter->second->Stop();
 }
 
 void physics::load_world(WorldPtr world, sdf::ElementPtr &_sdf)
@@ -51,7 +105,7 @@ void physics::init_world(WorldPtr world)
 
 void physics::run_world(WorldPtr world)
 {
-  world->Start();
+  world->Run();
 }
 
 void physics::pause_world(WorldPtr world, bool pause)

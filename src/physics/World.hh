@@ -72,8 +72,8 @@ namespace gazebo
       /// \brief Initialize the world
       public: void Init();
     
-      /// \briefRun the world in a thread
-      public: void Start();
+      /// \brief Run the world in a thread
+      public: void Run();
     
       /// \brief Stop the world
       public: void Stop();
@@ -140,6 +140,9 @@ namespace gazebo
     
       /// \brief Get an element by name
       public: BasePtr GetByName(const std::string &name);
+
+      /// \brief Get a model by name
+      public: ModelPtr GetModelByName(const std::string &name);
 
       /// \brief Create all entities
       /// \param _sdf SDF element

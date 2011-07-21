@@ -275,11 +275,11 @@ void ODEBody::UpdateMass()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void ODEBody::SetLinearVel(const math::Vector3 &vel)
+void ODEBody::SetLinearVel(const math::Vector3 &_vel)
 {
   if (this->bodyId)
   {
-    dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
+    dBodySetLinearVel(this->bodyId, _vel.x, _vel.y, _vel.z);
   }
 }
 

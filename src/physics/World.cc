@@ -170,7 +170,7 @@ void World::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run the world in a thread
-void World::Start()
+void World::Run()
 {
   this->stop = false;
   this->thread = new boost::thread( 
@@ -342,9 +342,16 @@ void World::DeleteEntityCB(const std::string &/*_name*/)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get an element by name
-BasePtr World::GetByName(const std::string &name)
+BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(this->rootElement->GetName() + "::" + name);
+  return this->rootElement->GetByName(this->rootElement->GetName() + "::" + _name);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a model by name
+ModelPtr World::GetModelByName(const std::string &_name)
+{
+  return boost::shared_dynamic_cast<Model>( this->GetByName( _name ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

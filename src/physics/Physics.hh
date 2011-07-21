@@ -29,11 +29,20 @@ namespace gazebo
     bool fini();
 
     WorldPtr create_world(const std::string &name);
+    WorldPtr get_world(const std::string &name);
+
     void load_world(WorldPtr world, sdf::ElementPtr &_sdf);
     void init_world(WorldPtr world);
     void run_world(WorldPtr world);
     void stop_world(WorldPtr world);
     void pause_world(WorldPtr world, bool pause);
+
+    void load_worlds(sdf::ElementPtr &_sdf);
+    void init_worlds();
+    void run_worlds();
+    void stop_worlds();
+    void pause_worlds( bool pause);
+
     /// \}
   }
 }

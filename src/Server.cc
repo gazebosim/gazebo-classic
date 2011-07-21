@@ -60,8 +60,6 @@ void Server::Load(const std::string &filename)
   {
     physics::WorldPtr world = physics::create_world("default");
 
-    this->worlds.push_back(world);
-
     //Create the world
     try
     {
@@ -80,8 +78,7 @@ void Server::Init()
 {
   sensors::init();
 
-  for (unsigned int i=0; i < this->worlds.size(); i++)
-    physics::init_world(this->worlds[i]);
+  physics::init_worlds();
 }
 
 void Server::Stop()
@@ -107,8 +104,7 @@ void Server::Run()
   gazebo::run();
 
   // Run each world. Each world starts a new thread
-  for (unsigned int i=0; i < this->worlds.size(); i++)
-    physics::run_world(this->worlds[i]);
+  physics::run_worlds();
 
   // Update the sensors.
   this->stop = false;
@@ -119,8 +115,7 @@ void Server::Run()
   }
 
   // Stop all the worlds
-  for (unsigned int i=0; i < this->worlds.size(); i++)
-    physics::stop_world(this->worlds[i]);
+  physics::stop_worlds();
 
   sensors::stop();
 
@@ -158,22 +153,8 @@ void Server::SetParams( const common::StrStr_M &params )
                 << iter->second << "]\n";
       }
 
-      for (unsigned int i=0; i < this->worlds.size(); i++)
-        physics::pause_world(this->worlds[i], p);
+      physics::pause_worlds(p);
     }
   }
 }
 
-
-physics::BasePtr Server::GetByName(const std::string &name)
-{
-  physics::BasePtr result;
-  result.reset();
-  for (unsigned int i=0; i < this->worlds.size(); i++)
-  {
-    std::cout << "world " << i << " : " << "\n";
-    result = this->worlds[i]->GetByName(name);
-    if (result) break;
-  }
-  return result;
-}

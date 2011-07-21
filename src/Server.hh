@@ -30,15 +30,10 @@ namespace gazebo
 
     private: void RunLoop();
 
-    private: std::vector< physics::WorldPtr > worlds;
     private: bool stop;
 
     private: Master *master;
     private: boost::thread *masterThread;
-
-    /// accessor for getting a child by name
-    public: physics::BasePtr GetByName(const std::string &name);
-
   };
 }
 
