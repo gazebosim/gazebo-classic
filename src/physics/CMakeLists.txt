@@ -67,6 +67,8 @@ add_library(gazebo_physics SHARED ${sources} ${sources})
 
 target_link_libraries(gazebo_physics gazebo_common 
                                      gazebo_sdf_parser
+                                     ${ODE_LIBRARIES}
+                                     ${ODE_LDFLAGS}
                                      ${TBB_LIBRARIES} 
                                      ${libtool_library} 
                                      ${boost_libraries}

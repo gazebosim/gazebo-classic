@@ -24,6 +24,7 @@ target_link_libraries(gazebo_sensors gazebo_common
                                      gazebo_physics
                                      ${libtool_library} 
                                      ${boost_libraries}
+                                     ${ogre_ldflags}
                                      )
 
 add_executable(gzsensor server.cc)
