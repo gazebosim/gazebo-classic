@@ -38,8 +38,8 @@ ODESurfaceParams::ODESurfaceParams()
   this->softCFM = 0.0;
   this->softERP = 0.2;
 
-  this->mu1 = 1.0;
-  this->mu2 = 1.0;
+  this->mu1 = 0.0;
+  this->mu2 = 0.0;
   this->slip1 = 0.0;
   this->slip2 = 0.0;
   this->fdir1 = math::Vector3(0,0,0);

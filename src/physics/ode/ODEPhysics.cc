@@ -647,9 +647,14 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
 
       contact.geom = contactGeoms[j];
 
-      contact.surface.mode = dContactMu2 | dContactFDir1 | dContactBounce |
-                             dContactSoftERP | dContactSoftCFM | 
-                             dContactSlip1 | dContactSlip2 | dContactApprox1;
+      contact.surface.mode = //dContactFDir1 | 
+                             dContactBounce |
+                             dContactMu2 |
+                             dContactSoftERP | 
+                             dContactSoftCFM | 
+                             dContactSlip1 | 
+                             dContactSlip2 | 
+                             dContactApprox1;
 
 
       // TODO: put this back in.
@@ -661,30 +666,25 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
       contact.surface.soft_erp = h * kp / (h * kp + kd);
       contact.surface.soft_cfm = 1.0 / (h * kp + kd);
       */
+     
+      /* 
+      contact.fdir1[0] = 0.5*(geom1->surface->fdir1.x+geom2->surface->fdir1.x);
+      contact.fdir1[1] = 0.5*(geom1->surface->fdir1.y+geom2->surface->fdir1.y);
+      contact.fdir1[2] = 0.5*(geom1->surface->fdir1.z+geom2->surface->fdir1.z);
+      */
+
       contact.surface.soft_erp = 0.5*(geom1->surface->softERP +
                                       geom2->surface->softERP);
       contact.surface.soft_cfm = 0.5*(geom1->surface->softCFM +
                                       geom2->surface->softCFM);
 
-      //if (geom1->surface->enableFriction && geom2->surface->enableFriction)
-      //{
-        contact.surface.mu = std::min(geom1->surface->mu1, 
-                                      geom2->surface->mu1);
-        contact.surface.mu2 = std::min(geom1->surface->mu2, 
-                                       geom2->surface->mu2);
-        contact.surface.slip1 = std::min(geom1->surface->slip1, 
-                                         geom2->surface->slip1);
-        contact.surface.slip2 = std::min(geom1->surface->slip2, 
-                                         geom2->surface->slip2);
-      /*}
-      else
-      {
-        
-        contact.surface.mu = 0; 
-        contact.surface.mu2 = 0;
-        contact.surface.slip1 = 0.1;
-        contact.surface.slip2 = 0.1;
-      }*/
+      contact.surface.mu = std::min(geom1->surface->mu1, geom2->surface->mu1);
+      contact.surface.mu2 = std::min(geom1->surface->mu2, geom2->surface->mu2);
+
+      contact.surface.slip1 = std::min(geom1->surface->slip1, 
+                                       geom2->surface->slip1);
+      contact.surface.slip2 = std::min(geom1->surface->slip2, 
+                                       geom2->surface->slip2);
 
       contact.surface.bounce = std::min(geom1->surface->bounce, 
                                         geom2->surface->bounce);
