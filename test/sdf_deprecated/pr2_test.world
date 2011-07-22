@@ -110,6 +110,7 @@
       <specularColor>.1 .1 .1 1.0</specularColor>
       <attenuation>0.2 0.1 0</attenuation>
       <range>10</range>
+      <direction>0 0 -2</direction>
     </light>
   </model:renderable>
 

@@ -80,7 +80,7 @@ PluginPtr Plugin::Create(const std::string &_filename,
   void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (!handle)
   {
-    gzerr << "Failed to load plugin " << fullname << ": " << dlerror();
+    gzerr << "Failed to load plugin " << fullname << ": " << dlerror() << "\n";
     return result;
   }
 

@@ -77,7 +77,7 @@
       <origin pose="0.0 0.0 10.0 0.0 0.0 0.0"/>
       <diffuse rgba="0.5 0.5 0.5 0.5"/>
       <attenuation range="1000.0" constant="0.01" quadratic="0.0001"/>
-      <directional direction="0 0 -1"/>
+      <direction xyz="0 0 -1"/>
       <spot inner_angle="1.57" outer_angle="1.57" falloff="1.0" />
     </light>
 

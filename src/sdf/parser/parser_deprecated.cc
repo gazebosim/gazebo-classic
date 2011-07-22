@@ -131,6 +131,9 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdfAttenuation->GetAttribute("linear")->SetFromString( getNodeTuple(lightNode, "attenuation",1));
   sdfAttenuation->GetAttribute("quadratic")->SetFromString( getNodeTuple(lightNode, "attenuation",2));
 
+  sdf::ElementPtr sdfDirection = _sdf->AddElement("direction");
+  initAttr(lightNode, "direction", sdfDirection->GetAttribute("xyz"));
+
   if (firstChildElement(lightNode,"sportCone"))
   {
     sdf::ElementPtr sdfSpot = _sdf->AddElement("spot");

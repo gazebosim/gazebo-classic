@@ -1,5 +1,5 @@
 <!-- Inertial -->
-<element name="inertial" required="1">
+<element name="inertial" required="0">
   <attribute name="mass" type="double" default="1.0" required="1"/>
   <element name="origin" required="0">
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
