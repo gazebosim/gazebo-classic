@@ -679,6 +679,7 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
       /*}
       else
       {
+        
         contact.surface.mu = 0; 
         contact.surface.mu2 = 0;
         contact.surface.slip1 = 0.1;

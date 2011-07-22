@@ -159,7 +159,7 @@ namespace gazebo
 
       private: Joint_V joints;
 
-      private: std::vector<common::PluginPtr> plugins;
+      private: std::vector<PluginPtr> plugins;
 
       private: transport::PublisherPtr jointPub;
     };

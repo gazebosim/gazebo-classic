@@ -82,8 +82,8 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose", 5);
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 5);
+  this->posePub = this->node->Advertise<msgs::Pose>("~/pose", 10);
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
 
   this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
 
@@ -91,7 +91,6 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   {
      this->SetRelativePose( _sdf->GetElement("origin")->GetValuePose("pose") );
   }
-
 
   if (this->parent)
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );

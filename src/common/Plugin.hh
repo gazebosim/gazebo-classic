@@ -24,43 +24,40 @@
 
 namespace gazebo
 {
-	namespace common
+  class Event;
+
+  /// \addtogroup gazebo_common Common 
+  /// \{
+
+  /// \brief A class which all plugins must inherit from
+  class Plugin : public boost::signals::trackable
   {
-    class Event;
+    /// \brief Constructor
+    public: Plugin();
 
-    /// \addtogroup gazebo_common Common 
-    /// \{
+    /// \brief Destructor
+    public: virtual ~Plugin();
 
-    /// \brief A class which all plugins must inherit from
-    class Plugin : public boost::signals::trackable
-    {
-      /// \brief Constructor
-      public: Plugin();
+    /// \brief Load function
+    public: virtual void Load( sdf::ElementPtr &_sdf ) = 0;
 
-      /// \brief Destructor
-      public: virtual ~Plugin();
+    /// \brief Get the name of the handler
+    public: std::string GetFilename() const;
 
-      /// \brief Load function
-      public: virtual void Load( sdf::ElementPtr &_sdf ) = 0;
-  
-      /// \brief Get the name of the handler
-      public: std::string GetFilename() const;
-  
-      /// \brief Get the short name of the handler
-      public: std::string GetHandle() const;
-  
-      public: static PluginPtr Create(const std::string &_filename, 
-                                      const std::string &_handle);
-  
-      protected: std::string filename;
-      protected: std::string handle;
-    };
-    /// \}
-  }
+    /// \brief Get the short name of the handler
+    public: std::string GetHandle() const;
 
-#define GZ_REGISTER_PLUGIN(name, classname) \
-extern "C" gazebo::common::Plugin *RegisterPlugin(); \
-gazebo::common::Plugin *RegisterPlugin() \
+    public: static PluginPtr Create(const std::string &_filename, 
+                                    const std::string &_handle);
+
+    protected: std::string filename;
+    protected: std::string handle;
+  };
+  /// \}
+
+#define GZ_REGISTER_PLUGIN(classname) \
+extern "C" gazebo::Plugin *RegisterPlugin(); \
+gazebo::Plugin *RegisterPlugin() \
 {\
   return new classname();\
 }

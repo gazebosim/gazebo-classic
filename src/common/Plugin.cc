@@ -34,8 +34,6 @@
 
 
 using namespace gazebo;
-using namespace common;
-
 
 Plugin::Plugin() {}
 Plugin::~Plugin() {}
@@ -62,7 +60,7 @@ PluginPtr Plugin::Create(const std::string &_filename,
   bool found = false;
   std::string fullname;
   std::list<std::string>::iterator iter;
-  std::list<std::string> pluginPaths= SystemPaths::GetPluginPaths();
+  std::list<std::string> pluginPaths= common::SystemPaths::GetPluginPaths();
 
   for (iter=pluginPaths.begin(); iter!=pluginPaths.end(); ++iter)
   {

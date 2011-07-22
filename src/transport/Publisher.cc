@@ -65,7 +65,7 @@ void Publisher::Publish(google::protobuf::Message &_message )
 
   // Save the latest message
   this->mutex->lock();
-  if (this->messages.size() < this->queueLimit)
+  //if (this->messages.size() < this->queueLimit)
   {
     google::protobuf::Message *msg = _message.New();
     msg->CopyFrom( _message );
@@ -88,6 +88,7 @@ void Publisher::SendMessage()
       // Send the latest message.
       TopicManager::Instance()->Publish(this->topic, **iter, 
           boost::bind(&Publisher::OnPublishComplete, this));
+      delete *iter;
     }
 
     this->messages.clear();

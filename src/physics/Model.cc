@@ -653,11 +653,12 @@ void Model::LoadJoint( sdf::ElementPtr &_sdf )
 // Load a plugin
 void Model::LoadPlugin( sdf::ElementPtr &_sdf )
 {
-  std::string name = _sdf->GetValueString("name");
+  /*std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  common::PluginPtr plugin = common::Plugin::Create(filename, name);
+  PluginPtr plugin = Plugin::Create(filename, name);
   plugin->Load(_sdf);
   this->plugins.push_back( plugin );
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

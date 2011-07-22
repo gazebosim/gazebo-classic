@@ -1,10 +1,9 @@
 include_directories( 
   ${PROJECT_BINARY_DIR}/src 
-  ${PROJECT_BINARY_DIR}/src/common 
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-set (plugins box_push)
+set (plugins model_push)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

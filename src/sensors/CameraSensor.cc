@@ -58,7 +58,6 @@ CameraSensor::~CameraSensor()
 // Load the camera with SDF parameters
 void CameraSensor::Load( sdf::ElementPtr &_sdf )
 {
-  std::cout << "HLSDKFJLDSKFJ!!!\n\n";
   Sensor::Load(_sdf);
 }
 

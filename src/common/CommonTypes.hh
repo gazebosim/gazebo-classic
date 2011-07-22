@@ -11,6 +11,9 @@
 /// \brief Forward declarations for the common classes
 namespace gazebo
 {
+  class Plugin;
+  typedef boost::shared_ptr<Plugin> PluginPtr;
+
   namespace common
   {
     class Param;
@@ -18,9 +21,7 @@ namespace gazebo
     class Image;
     class Mesh;
     class MouseEvent;
-    class Plugin;
 
-    typedef boost::shared_ptr<Plugin> PluginPtr;
 
     template <typename T>
     class ParamT;
