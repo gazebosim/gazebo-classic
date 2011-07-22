@@ -35,7 +35,6 @@ namespace gazebo
     class Contact;
     class PhysicsEngine;
     class Mass;
-    class SurfaceParams;
     class Shape;
     class RayShape;
     class Inertial;
@@ -48,7 +47,6 @@ namespace gazebo
     typedef boost::shared_ptr<Geom> GeomPtr;
     typedef boost::shared_ptr<Joint> JointPtr;
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
-    typedef boost::shared_ptr<SurfaceParams> SurfaceParamsPtr;
     typedef boost::shared_ptr<Shape> ShapePtr;
     typedef boost::shared_ptr<RayShape> RayShapePtr;
     typedef boost::shared_ptr<Inertial> InertialPtr;

@@ -52,6 +52,12 @@ set (headers MovableText.hh
              Material.hh
 )
 
+set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(rendering_headers "Rendering Headers" "#include \"rendering/${hdr}\"\n")
+endforeach()
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/rendering.h.in ${CMAKE_CURRENT_BINARY_DIR}/rendering.h )
+
 add_library(gazebo_rendering SHARED ${sources})
 
 target_link_libraries( gazebo_rendering gazebo_common 

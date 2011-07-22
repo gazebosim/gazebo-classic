@@ -17,6 +17,13 @@ set (headers Sensors.hh
              RaySensor.hh
 )
 
+set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(sensors_headers "sensors headers" "#include \"sensors/${hdr}\"\n")
+endforeach()
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/sensors.h.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.h )
+
+
 add_library(gazebo_sensors SHARED ${sources})
 
 target_link_libraries(gazebo_sensors gazebo_common 

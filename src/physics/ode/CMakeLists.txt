@@ -13,6 +13,7 @@ set (sources ODEPhysics.cc
              ODERayShape.cc
              ODEMultiRayShape.cc
              ODEHeightmapShape.cc
+             ODESurfaceParams.cc
 )
 
 SET (headers ODEPhysics.hh
@@ -29,6 +30,7 @@ SET (headers ODEPhysics.hh
              ODEMultiRayShape.hh
              ODEHeightmapShape.hh
              ODETypes.hh
+             ODESurfaceParams.hh
 )
 
 add_library(gazebo_physics_ode SHARED ${sources})

@@ -39,6 +39,7 @@ ODEGeom::ODEGeom( BodyPtr _body )
 {
   this->SetName("ODE_Geom");
   this->geomId = NULL;
+  this->surface.reset(new ODESurfaceParams());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +55,9 @@ ODEGeom::~ODEGeom()
 void ODEGeom::Load( sdf::ElementPtr &_sdf )
 {
   Geom::Load(_sdf);
+
+  if (_sdf->HasElement("surface"))
+    this->surface->Load( _sdf->GetElement("surface") );
 
   this->SetSpaceId( boost::shared_static_cast<ODEBody>(this->body)->GetSpaceId() );
 

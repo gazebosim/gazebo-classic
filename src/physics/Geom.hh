@@ -150,9 +150,7 @@ namespace gazebo
       /// \brief Create the bounding box for the geom
       private: void CreateBoundingBox();
   
-      ///  Contact parameters
-      public: SurfaceParamsPtr surface; 
-  
+ 
       /// The body this geom belongs to
       protected: BodyPtr body;
     

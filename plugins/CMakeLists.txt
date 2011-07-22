@@ -1,5 +1,6 @@
 include_directories( 
   ${PROJECT_BINARY_DIR}/src 
+  ${PROJECT_BINARY_DIR}/src/common 
   ${PROJECT_SOURCE_DIR}/src 
 )
 

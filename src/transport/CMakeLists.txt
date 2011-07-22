@@ -32,6 +32,13 @@ set (headers TopicManager.hh
              Node.hh
 )
 
+set (transport_headers "" CACHE INTERNAL "transport headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(transport_headers "Transport Headers" "#include \"transport/${hdr}\"\n")
+endforeach()
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/transport.h.in ${CMAKE_CURRENT_BINARY_DIR}/transport.h )
+
+
 add_library(gazebo_transport SHARED ${sources})
 
 target_link_libraries(gazebo_transport gazebo_common 

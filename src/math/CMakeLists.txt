@@ -29,6 +29,13 @@ set ( headers Angle.hh
               MathTypes.hh
 )
 
+set (math_headers "" CACHE INTERNAL "transport headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(math_headers "Math Headers" "#include \"math/${hdr}\"\n")
+endforeach()
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/gzmath.h.in ${CMAKE_CURRENT_BINARY_DIR}/gzmath.h )
+
+
 add_library(gazebo_math SHARED ${sources})
 
 target_link_libraries( gazebo_math ${boost_libraries} )

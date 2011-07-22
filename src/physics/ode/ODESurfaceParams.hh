@@ -17,11 +17,12 @@
 /* Desc: common::Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
- * SVN: $Id$
  */
 
-#ifndef CONTACTPARAMS_HH
-#define CONTACTPARAMS_HH
+#ifndef ODESURFACEPARAMS_HH
+#define ODESURFACEPARAMS_HH
+
+#include "sdf/sdf.h"
 
 namespace gazebo
 {
@@ -34,41 +35,53 @@ namespace gazebo
     /// \{
 
     /// \brief Surface params
-    class SurfaceParams
+    class ODESurfaceParams
     {
       /// Constructor
-      public: SurfaceParams();
+      public: ODESurfaceParams();
     
       /// \brief Load the contact params
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load( sdf::ElementPtr _sdf );
    
-      /// Spring constant
+      /// \brief dynamically "stiffness"-equivalent coefficient for contact
+      /// joints 
       public: double kp;   
     
-      /// Damping constant
+      /// \brief dynamically "damping"-equivalent coefficient for contact
+      /// joints 
       public: double kd;
     
-      /// 0..1, 0=no bounciness
+      /// \brief 0..1, 0=no bounciness
       public: double bounce;
-      
-      /// first coefficient of friction 
-      public: double mu1;
-    
-      /// second coefficient of friction 
-      public: double mu2;
-    
-      /// Force-dependent-slip direction 1
-      public: double slip1;
-    
-      /// Force-dependent-slip direction 2
-      public: double slip2;   
-    
+
       /// \brief bounce vel
       public: double bounceThreshold;
+      
+      /// \brief  first coefficient of friction 
+      public: double mu1;
     
+      /// \brief  second coefficient of friction 
+      public: double mu2;
+    
+      /// \brief  Force-dependent-slip direction 1
+      public: double slip1;
+    
+      /// \brief Force-dependent-slip direction 2
+      public: double slip2;   
+
+      /// \brief Direction of m1 in the collision local frame
+      public: math::Vector3 fdir1;
+   
       /// \brief soft constraint force mixing
-      public: double softCfm;
+      public: double softCFM;
+
+      /// \brief soft error reduction parameter
+      public: double softERP;
+
+      public: double maxVel;
+      public: double minDepth;
     };
+    typedef  boost::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
     /// \}
     /// \}
   }
