@@ -14,8 +14,12 @@
  * limitations under the License.
  *
  */
-#include "transport/Transport.hh"
-#include "common/Console.hh"
+#include "common/common.h"
+#include "math/gzmath.h"
+#include "msgs/msgs.h"
+#include "sdf/sdf.h"
+#include "transport/transport.h"
+
 #include "gazebo_config.h"
 
 namespace gazebo

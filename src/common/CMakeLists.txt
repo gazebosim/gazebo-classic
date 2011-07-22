@@ -62,6 +62,13 @@ set ( headers CommonTypes.hh
               MouseEvent.hh
 )
 
+set (common_headers "" CACHE INTERNAL "common headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(common_headers "Common Headers" "#include \"common/${hdr}\"\n")
+endforeach()
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/common.h.in ${CMAKE_CURRENT_BINARY_DIR}/common.h )
+
+
 add_library(gazebo_common SHARED ${sources})
 
 target_link_libraries( gazebo_common gazebo_math
@@ -74,4 +81,4 @@ target_link_libraries( gazebo_common gazebo_math
                      )
 
 INSTALL_LIBRARY(gazebo_common)
-INSTALL_INCLUDES("common" ${headers})
+INSTALL_INCLUDES("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.h)

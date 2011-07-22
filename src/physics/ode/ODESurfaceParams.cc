@@ -20,42 +20,61 @@
  */
 
 #include <float.h>
-#include "physics/SurfaceParams.hh"
+#include "physics/ode/ODESurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Default constructor
-SurfaceParams::SurfaceParams()
+ODESurfaceParams::ODESurfaceParams()
 {
-  this->kp = 100000000.0;
+  this->kp = 1000000.0;
+  this->kd = 10000.0;
 
-  // Damping constraint
-  this->kd = 1.0;
-
-  // Bounce param
   this->bounce = 0.0;
-
-  // Minumum velocity before bounce is applied
   this->bounceThreshold = 10.0;
 
-  this->softCfm = 0.01;
+  this->softCFM = 0.0;
+  this->softERP = 0.2;
 
-  this->mu1 = FLT_MAX;
-  this->mu2 = FLT_MAX;
-  this->slip1 = 0.01;
-  this->slip2 = 0.01;
+  this->mu1 = 1.0;
+  this->mu2 = 1.0;
+  this->slip1 = 0.0;
+  this->slip2 = 0.0;
+  this->fdir1 = math::Vector3(0,0,0);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the contact params
-void SurfaceParams::Load( sdf::ElementPtr &_sdf )
+void ODESurfaceParams::Load( sdf::ElementPtr _sdf )
 {
-  sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-  if (bounceElem)
+  if (_sdf->HasElement("friction"))
   {
+    sdf::ElementPtr friction = _sdf->GetElement("friction")->GetElement("ode");
+    this->mu1 = friction->GetValueDouble("mu");
+    this->mu2 = friction->GetValueDouble("mu2");
+    this->slip1 = friction->GetValueDouble("slip1");
+    this->slip2 = friction->GetValueDouble("slip2");
+    this->fdir1 = friction->GetValueVector3("fdir1");
+  }
+
+  if (_sdf->HasElement("bounce"))
+  {
+    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
     this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
     this->bounceThreshold = bounceElem->GetValueDouble("threshold");
   }
+
+  if (_sdf->HasElement("contact"))
+  {
+    sdf::ElementPtr contact = _sdf->GetElement("contact")->GetElement("ode");
+    this->softCFM = contact->GetValueDouble("soft_cfm");
+    this->softERP = contact->GetValueDouble("soft_erp");
+    this->kp = contact->GetValueDouble("kp");
+    this->kd = contact->GetValueDouble("kd");
+    this->maxVel = contact->GetValueDouble("max_vel");
+    this->minDepth = contact->GetValueDouble("min_depth");
+  }
+
 }

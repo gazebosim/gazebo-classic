@@ -25,6 +25,7 @@
 #include "physics/ode/ode_inc.h"
 
 #include "common/CommonTypes.hh"
+#include "physics/ode/ODESurfaceParams.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/Geom.hh"
@@ -84,6 +85,9 @@ namespace gazebo
   
       ///  ID for the sub-geom
       protected: dGeomID geomId;
+
+      ///  Contact parameters
+      public: ODESurfaceParamsPtr surface; 
     };
   
     /// \}

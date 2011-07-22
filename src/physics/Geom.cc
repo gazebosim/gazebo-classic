@@ -45,7 +45,6 @@ Geom::Geom( BodyPtr body )
   this->AddType(Base::GEOM);
 
   this->body = body;
-  this->surface.reset( new SurfaceParams() );
 
   this->transparency = 0;
   this->contactsEnabled = false;

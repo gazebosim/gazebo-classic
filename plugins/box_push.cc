@@ -15,15 +15,9 @@
  *
 */
 #include <boost/bind.hpp>
-#include "common/Plugin.hh"
-#include "common/Console.hh"
-#include "common/Events.hh"
 
-#include "physics/Physics.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/World.hh"
-#include "physics/Base.hh"
-#include "physics/Model.hh"
+#include "physics/physics.h"
+#include "gazebo.h"
 
 namespace gazebo
 {
@@ -32,10 +26,10 @@ namespace gazebo
     class BoxPush : public Plugin
     {
       public: BoxPush() : Plugin() 
-      { }
+      {}
 
       public: ~BoxPush()
-      { }
+      {}
 
       public: void Load( sdf::ElementPtr &_sdf )
       {
@@ -44,20 +38,17 @@ namespace gazebo
         physics::WorldPtr world = physics::get_world("default");
         this->model = world->GetModelByName(modelName);
 
-        if (this->model)
-        {
-          gzdbg << "Model[" << this->model->GetName() << "]\n";
-        }
-        else
-          gzerr << "Unable to get model\n";
+        if (!this->model)
+          gzerr << "Unable to get parent model\n";
 
+        /// Listen to the update signal
         this->updateConnection = event::Events::ConnectWorldUpdateStartSignal(
             boost::bind(&BoxPush::UpdateCB, this));
       }
 
       public: void UpdateCB()
       {
-        this->model->SetLinearVel( math::Vector3(.1, 0, 0) );
+        this->model->SetLinearVel( math::Vector3(.03, 0, 0) );
       }
 
       private: physics::ModelPtr model;

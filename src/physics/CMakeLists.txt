@@ -25,7 +25,6 @@ set (sources Base.cc
              RayShape.cc
              Shape.cc
              SphereShape.cc
-             SurfaceParams.cc
              TrimeshShape.cc
              World.cc
              Inertial.cc
@@ -56,12 +55,17 @@ set (headers BallJoint.hh
              Shape.hh
              SliderJoint.hh
              SphereShape.hh
-             SurfaceParams.hh
              TrimeshShape.hh
              UniversalJoint.hh
              World.hh
              Inertial.hh
 )
+
+set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
+foreach (hdr ${headers})
+  APPEND_TO_CACHED_STRING(physics_headers "Physics Headers" "#include \"physics/${hdr}\"\n")
+endforeach()
+configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/physics.h.in ${CMAKE_CURRENT_BINARY_DIR}/physics.h )
 
 add_library(gazebo_physics SHARED ${sources} ${sources})
 
