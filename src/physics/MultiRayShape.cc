@@ -60,6 +60,7 @@ void MultiRayShape::Load( sdf::ElementPtr &_sdf)
 /// Init the shape 
 void MultiRayShape::Init()
 {
+  gzerr << "initialize MultiRayShape " << this->GetName() << "\n";
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle; 
   double pDiff, yDiff;
@@ -73,24 +74,25 @@ void MultiRayShape::Init()
 
   double minRange, maxRange;
 
-  sdf::ElementPtr scanElem = this->sdf->GetElement("scan");
-  sdf::ElementPtr horzElem = scanElem->GetElement("horiz");
+  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  sdf::ElementPtr scanElem = rayElem->GetElement("scan");
+  sdf::ElementPtr horzElem = scanElem->GetElement("horizontal");
   sdf::ElementPtr vertElem = scanElem->GetElement("vertical");
-  sdf::ElementPtr rangeElem = scanElem->GetElement("range");
+  sdf::ElementPtr rangeElem = rayElem->GetElement("range");
 
   if (vertElem)
   {
     vertMinAngle = vertElem->GetValueDouble("min_angle");
     vertMaxAngle = vertElem->GetValueDouble("max_angle");
-    vertSamples = vertElem->GetValueInt("samples");
-    vertResolution = vertElem->GetValueInt("resolution");
+    vertSamples = vertElem->GetValueUInt("samples");
+    vertResolution = vertElem->GetValueDouble("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
   horzMinAngle = horzElem->GetValueDouble("min_angle");
   horzMaxAngle = horzElem->GetValueDouble("max_angle");
-  horzSamples = horzElem->GetValueInt("samples");
-  horzResolution = horzElem->GetValueInt("resolution");
+  horzSamples = horzElem->GetValueUInt("samples");
+  horzResolution = horzElem->GetValueDouble("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
   minRange = rangeElem->GetValueDouble("min");
@@ -118,14 +120,14 @@ void MultiRayShape::Init()
   }
 
   //TODO: this doesn't belong here
-  /*if (**this->displayTypeP == "fan")
+  //if (**this->displayTypeP == "fan")
   {
     msgs::Point *pt = this->rayFanMsg->add_points();
     (*pt) = this->rayFanMsg->points(0);
 
     pt = this->rayFanOutlineMsg->add_points();
     (*pt) = this->rayFanOutlineMsg->points(0);
-  }*/
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +201,7 @@ void MultiRayShape::Update()
   this->UpdateRays();
 
   //TODO: move to rendering engine
-  /*if (**this->displayTypeP == "fan")
+  /*if (**this->displayTypeP == "fan")*/
   { 
     i = 1;
     for (iter = this->rays.begin(); 
@@ -212,18 +214,18 @@ void MultiRayShape::Update()
       msgs::Set(this->rayFanMsg->mutable_points(i), b );
       msgs::Set(this->rayFanOutlineMsg->mutable_points(i), b );
     }
-  }*/
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
-void MultiRayShape::AddRay(const math::Vector3 &/*start*/, const math::Vector3 &/*end*/ )
+void MultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
 {
-  //msgs::Point *pt = NULL;
+  msgs::Point *pt = NULL;
 
   //TODO: move to rendering engine
   // Add to the renderable
-  /*if (**this->displayTypeP == "fan")
+  /*if (**this->displayTypeP == "fan")*/
   {
     if (this->rayFanMsg->points_size() == 0)
     {
@@ -239,7 +241,7 @@ void MultiRayShape::AddRay(const math::Vector3 &/*start*/, const math::Vector3 &
 
     pt = this->rayFanOutlineMsg->add_points();
     msgs::Set(pt, end);
-  }*/
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////

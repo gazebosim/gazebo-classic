@@ -23,7 +23,11 @@
 #include "physics/World.hh"
 #include "physics/MultiRayShape.hh"
 #include "physics/PhysicsEngine.hh"
+#include "physics/Physics.hh"
+#include "physics/Model.hh"
+#include "physics/Body.hh"
 #include "physics/Geom.hh"
+#include "physics/World.hh"
 #include "common/Exception.hh"
 
 #include "math/Vector3.hh"
@@ -50,40 +54,91 @@ RaySensor::RaySensor()
 // Destructor
 RaySensor::~RaySensor()
 {
-  if (this->laserGeom)
-    delete this->laserGeom;
+  //if (this->laserGeom)
+  //  delete this->laserGeom;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the ray using parameter from an SDF 
-void RaySensor::LoadChild( sdf::ElementPtr &_sdf )
+void RaySensor::Load( sdf::ElementPtr &_sdf )
 {
-  gzerr << "LOADING RaySensor\n";
+  Sensor::Load(_sdf);
+}
+void RaySensor::Load( )
+{
+  // get parent body name by looking through sdf
+  sdf::ElementPtr sdfParentBody = this->sdf->GetParent();
+  while (sdfParentBody && sdfParentBody->GetName() != "link")
+  {
+    sdfParentBody = sdfParentBody->GetParent();
+  }
+  if (!sdfParentBody)
+  {
+    gzerr << "Unable to get camera sensor parent body name\n";
+    return;
+  }
+  std::string bodyName = sdfParentBody->GetValueString("name");
+  gzerr << "parent body name : " << bodyName << "\n";
 
-/*
+  // get parent model name by looking through sdf
+  sdf::ElementPtr sdfParentModel = this->sdf->GetParent();
+  while (sdfParentModel && sdfParentModel->GetName() != "model")
+  {
+    sdfParentModel = sdfParentModel->GetParent();
+  }
+  if (!sdfParentModel)
+  {
+    gzerr << "Unable to get camera sensor parent model name\n";
+    return;
+  }
+  std::string modelName = sdfParentModel->GetValueString("name");
+  gzerr << "parent model name : " << modelName << "\n";
+
+  // get parent body by looking at real parent
+  std::string bodyFullyScopedName = "root::" + modelName + "::" + bodyName;
+  gzerr << "scoped body name : " << bodyFullyScopedName << "\n";
+
+
+  // get parent world name by looking through sdf
+  sdf::ElementPtr sdfParent = this->sdf->GetParent();
+  while (sdfParent && sdfParent->GetName() != "world")
+  {
+    sdfParent = sdfParent->GetParent();
+  }
+  if (!sdfParent)
+  {
+    gzerr << "Unable to get camera sensor world name\n";
+    return;
+  }
+  std::string worldName = sdfParent->GetValueString("name");
+  gzerr << "parent world name : " << worldName << "\n";
+
+
+  worldName = "default"; // HACK!!! for now there is only one default world
+  this->world = gazebo::physics::get_world(worldName);
+  this->model = this->world->GetModelByName(modelName);
+  this->body = boost::dynamic_pointer_cast<gazebo::physics::Body>(this->model->GetByName(bodyFullyScopedName));
+
   if (this->body == NULL)
     gzthrow("Null body in the ray sensor");
-
-  this->laserGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(
+  this->laserGeom = this->world->GetPhysicsEngine()->CreateGeom(
       "multiray", this->body);
-*/
+
   this->laserGeom->SetName("Ray Sensor Geom");
 
-/* use boost cast
-  this->laserShape = (gazebo::physics::MultiRayShape*)(this->laserGeom->GetShape());
-*/
+  this->laserShape = boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(this->laserGeom->GetShape());
 
-  this->laserShape->Load( _sdf );
+  this->laserShape->Load( this->sdf );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the ray
 void RaySensor::InitChild()
 {
+  gzerr << "Initializing RaySensor\n";
+  this->laserShape->Init( );
   gazebo::math::Pose bodyPose;
-/*
   bodyPose = this->body->GetWorldPose();
-*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -194,8 +249,6 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild()
 {
-/*
-  if (this->active || (**this->alwaysActiveP))
+  //if (this->active || (**this->alwaysActiveP))
     this->laserShape->Update();
-*/
 }

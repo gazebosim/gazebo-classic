@@ -56,7 +56,8 @@ namespace gazebo
     
       /// Load the ray using parameter from an SDF
       /// \param node The XMLConfig node
-      protected: virtual void LoadChild( sdf::ElementPtr &_sdf );
+      protected: virtual void Load( sdf::ElementPtr &_sdf );
+      protected: virtual void Load( );
     
       /// Initialize the ray
       protected: virtual void InitChild();
@@ -121,8 +122,11 @@ namespace gazebo
       public: int GetFiducial(int index);   
     
       private: gazebo::math::Pose prevPose;
-      private: gazebo::physics::Geom *laserGeom;
-      private: gazebo::physics::MultiRayShape *laserShape;
+      private: gazebo::physics::WorldPtr world;
+      private: gazebo::physics::ModelPtr model;
+      private: gazebo::physics::BodyPtr body;
+      private: gazebo::physics::GeomPtr laserGeom;
+      private: gazebo::physics::MultiRayShapePtr laserShape;
     };
     /// \}
   }

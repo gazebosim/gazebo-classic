@@ -37,6 +37,7 @@ namespace gazebo
     class Mass;
     class Shape;
     class RayShape;
+    class MultiRayShape;
     class Inertial;
 
     typedef boost::shared_ptr<Base> BasePtr;
@@ -49,6 +50,7 @@ namespace gazebo
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
     typedef boost::shared_ptr<Shape> ShapePtr;
     typedef boost::shared_ptr<RayShape> RayShapePtr;
+    typedef boost::shared_ptr<MultiRayShape> MultiRayShapePtr;
     typedef boost::shared_ptr<Inertial> InertialPtr;
 
     typedef std::vector<BasePtr> Base_V;

@@ -55,6 +55,11 @@ namespace gazebo
   
       /// \brief  Initialize the sensor
       public: virtual void Init();
+
+      /// \brief FIXME?
+      /// \brief this mechanism is used to get to RaySensor::InitChild()
+      /// \brief FIXME?
+      public: virtual void InitChild() {};
     
       /// \brief  Update the sensor
       public: virtual void Update(bool force);
