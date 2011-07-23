@@ -41,4 +41,4 @@ add_library(gazebo_math SHARED ${sources})
 target_link_libraries( gazebo_math ${boost_libraries} )
 
 INSTALL_LIBRARY(gazebo_math)
-INSTALL_INCLUDES("math" ${headers})
+INSTALL_INCLUDES("math" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gzmath.h)
