@@ -63,7 +63,7 @@ namespace gazebo
       protected: virtual void InitChild();
     
       ///  Update sensed values
-      protected: virtual void UpdateChild();
+      protected: virtual void Update(bool force);
       
       /// Finalize the ray
       protected: virtual void FiniChild();

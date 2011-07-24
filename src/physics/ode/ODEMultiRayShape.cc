@@ -164,6 +164,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &e
   odeGeom->SetSpaceId(this->raySpaceId);
 
   ODERayShapePtr ray( new ODERayShape(odeGeom, true ));
+  odeGeom->SetShape(ray);
 
   ray->SetPoints(start,end);
   this->rays.push_back(ray);

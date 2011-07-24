@@ -23,7 +23,9 @@
       <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
       <link name="link_1" self_collide="true" gravity="false" kinematic="false">
-        <origin pose="1.0 0.0 0.0 0.0 0.0 0.0"/>
+
+        <origin pose="-1.0 0.0 0.0 0.0 0.0 0.0"/>
+
         <inertial mass="10.0">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <damping linear="0.0" angular="0.0" />
@@ -79,7 +81,9 @@
       <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
 
       <link name="link_1" self_collide="true" gravity="false" kinematic="false">
+
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
+
         <inertial mass="10.0">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <damping linear="0.0" angular="0.0" />
@@ -145,7 +149,7 @@
 
     <model name="model_3" static="false">
 
-      <origin pose="-0.2 0.0 0.0 0.0 0.0 0.0"/>
+      <origin pose="0.2 0.0 0.0 0.0 0.0 0.0"/>
 
       <link name="link_1" self_collide="true" gravity="false" kinematic="false">
         <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>

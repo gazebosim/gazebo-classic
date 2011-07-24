@@ -129,6 +129,9 @@ void RaySensor::Load( )
   this->laserShape = boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(this->laserGeom->GetShape());
 
   this->laserShape->Load( this->sdf );
+  this->laserShape->SetWorld(this->world);
+
+  this->laserGeom->SetShape(this->laserShape);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -247,7 +250,7 @@ int RaySensor::GetFiducial(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void RaySensor::UpdateChild()
+void RaySensor::Update(bool force)
 {
   //if (this->active || (**this->alwaysActiveP))
     this->laserShape->Update();

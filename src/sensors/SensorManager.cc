@@ -75,7 +75,10 @@ void SensorManager::Update(bool force)
 
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  {
+    //gzerr << "SensorManager Update [" << (*iter)->GetName() << "]\n";
     (*iter)->Update(force);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

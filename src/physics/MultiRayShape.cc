@@ -184,7 +184,9 @@ void MultiRayShape::Update()
   math::Vector3 a, b;
   int i = 1;
 
-  double maxRange = this->sdf->GetElement("range")->GetValueDouble("max");
+  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  sdf::ElementPtr rangeElem = rayElem->GetElement("range");
+  double maxRange = rangeElem->GetValueDouble("max");
 
   // Reset the ray lengths and mark the geoms as dirty (so they get
   // redrawn)
@@ -213,6 +215,8 @@ void MultiRayShape::Update()
 
       msgs::Set(this->rayFanMsg->mutable_points(i), b );
       msgs::Set(this->rayFanOutlineMsg->mutable_points(i), b );
+      gzerr << "ray [" << i << "]"
+            << " length [" << (*iter)->GetLength() << "]\n";
     }
   }
 }
