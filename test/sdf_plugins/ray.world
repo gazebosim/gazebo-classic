@@ -65,8 +65,8 @@
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <ray>
             <scan display="true">
-              <horizontal samples="50" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
-              <vertical samples="30" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
+              <horizontal samples="3" resolution="1.0" min_angle="-0.5236" max_angle="0.5236" />
+              <vertical samples="3" resolution="1.0" min_angle="-0.5236" max_angle="0.5236" />
             </scan>
             <range min="0.05" max="30.0"/>
           </ray>
@@ -164,7 +164,7 @@
         <visual cast_shadows="true" name="visual_box" laser_retro="100.0">
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <geometry>
-            <box size="0.1 30.0 1.0"/>
+            <box size="0.1 30.0 30.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
             <color rgba="0.03 0.5 0.5 1.0"/>
@@ -175,7 +175,7 @@
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <max_contacts>250</max_contacts>
           <geometry>
-            <box size="0.1 30.0 1.0"/>
+            <box size="0.1 30.0 30.0"/>
           </geometry>
           <surface>
             <friction>
