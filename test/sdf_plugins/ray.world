@@ -63,8 +63,8 @@
           <origin pose="0.0 0.0 0.0 0.0 0.0 0.0"/>
           <ray>
             <scan display="true">
-              <horizontal samples="500" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
-              <vertical samples="300" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
+              <horizontal samples="50" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
+              <vertical samples="30" resolution="1.0" min_angle="-1.57" max_angle="1.57" />
             </scan>
             <range min="0.05" max="30.0"/>
           </ray>

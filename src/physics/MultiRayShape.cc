@@ -60,7 +60,7 @@ void MultiRayShape::Load( sdf::ElementPtr &_sdf)
 /// Init the shape 
 void MultiRayShape::Init()
 {
-  gzerr << "initialize MultiRayShape " << this->GetName() << "\n";
+  //gzerr << "initialize MultiRayShape " << this->GetName() << "\n";
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle; 
   double pDiff, yDiff;

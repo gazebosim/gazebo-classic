@@ -78,7 +78,7 @@ void RaySensor::Load( )
     return;
   }
   std::string bodyName = sdfParentBody->GetValueString("name");
-  gzerr << "parent body name : " << bodyName << "\n";
+  //gzerr << "parent body name : " << bodyName << "\n";
 
   // get parent model name by looking through sdf
   sdf::ElementPtr sdfParentModel = this->sdf->GetParent();
@@ -92,11 +92,11 @@ void RaySensor::Load( )
     return;
   }
   std::string modelName = sdfParentModel->GetValueString("name");
-  gzerr << "parent model name : " << modelName << "\n";
+  //gzerr << "parent model name : " << modelName << "\n";
 
   // get parent body by looking at real parent
   std::string bodyFullyScopedName = "root::" + modelName + "::" + bodyName;
-  gzerr << "scoped body name : " << bodyFullyScopedName << "\n";
+  //gzerr << "scoped body name : " << bodyFullyScopedName << "\n";
 
 
   // get parent world name by looking through sdf
@@ -111,7 +111,7 @@ void RaySensor::Load( )
     return;
   }
   std::string worldName = sdfParent->GetValueString("name");
-  gzerr << "parent world name : " << worldName << "\n";
+  //gzerr << "parent world name : " << worldName << "\n";
 
 
   worldName = "default"; // HACK!!! for now there is only one default world
@@ -135,7 +135,7 @@ void RaySensor::Load( )
 // Init the ray
 void RaySensor::InitChild()
 {
-  gzerr << "Initializing RaySensor\n";
+  //gzerr << "Initializing RaySensor\n";
   this->laserShape->Init( );
   gazebo::math::Pose bodyPose;
   bodyPose = this->body->GetWorldPose();

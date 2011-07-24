@@ -161,6 +161,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &e
   MultiRayShape::AddRay(start,end);
   ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetBody()) );
   odeGeom->SetName("ODE Ray Geom");
+  odeGeom->SetSpaceId(this->raySpaceId);
 
   ODERayShapePtr ray( new ODERayShape(odeGeom, true ));
 
