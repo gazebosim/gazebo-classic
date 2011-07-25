@@ -74,6 +74,15 @@
 
       </link>
 
+      <plugin name="plugin_1" filename="libray_test.so">
+        <data name="sensor" value="model_1::sensor_ray" />
+        <data name="gaussianNoise" value="0.005" />
+        <data name="alwaysOn" value="true" />
+        <data name="updateRate" value="20" />
+        <data name="topicName" value="base_scan" />
+        <data name="frameName" value="base_laser_link" />
+      </plugin>
+
     </model>
 
     <model name="model_2" static="false">
@@ -199,15 +208,6 @@
       <direction xyz="0 0 -1"/>
       <spot inner_angle="1.57" outer_angle="1.57" falloff="1.0" />
     </light>
-
-    <plugin name="plugin_1" filename="libgazebo_ros_laser.so">
-      <data name="sensor" value="model_1::sensor_ray" />
-      <data name="gaussianNoise" value="0.005" />
-      <data name="alwaysOn" value="true" />
-      <data name="updateRate" value="20" />
-      <data name="topicName" value="base_scan" />
-      <data name="frameName" value="base_laser_link" />
-    </plugin>
 
   </world>
 </gazebo>
