@@ -18,6 +18,10 @@
 #include "physics/physics.h"
 #include "gazebo.h"
 
+#include "transport/TransportTypes.hh"
+#include "msgs/MessageTypes.hh"
+#include "common/Time.hh"
+
 namespace gazebo
 {
   class RayTest : public Plugin
@@ -43,14 +47,29 @@ namespace gazebo
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateStartSignal(
           boost::bind(&RayTest::OnUpdate, this));
-      gzerr << "plugin model name: " << modelName << "\n";
+      gzdbg << "plugin model name: " << modelName << "\n";
+
+
+      this->node = transport::NodePtr(new transport::Node());
+      this->node->Init("default");
+      this->statsSub = this->node->Subscribe("~/world_stats", &RayTest::OnStats, this);
+
     }
 
     // Called by the world update start event
     public: void OnUpdate()
     {
       // do something on update
-      gzerr << "plugin update\n";
+      //gzdbg << "plugin update\n";
+    }
+
+    public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+    {
+      this->simTime  = msgs::Convert( _msg->sim_time() );
+      math::Pose pose;
+      pose.pos.x = 0.1*sin(this->simTime.Double());
+      //this->model->SetWorldPose( pose, true );
+      //gzdbg << "plugin simTime [" << this->simTime.Double() << "] update pose [" << pose.pos.x << "]\n";
     }
 
     // Pointer to the model
@@ -58,6 +77,12 @@ namespace gazebo
 
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
+
+    // subscribe to world stats
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr statsSub;
+    private: common::Time simTime;
+
   };
 
   // Register this plugin with the simulator
