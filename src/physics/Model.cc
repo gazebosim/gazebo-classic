@@ -30,6 +30,7 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
+#include "common/CommonTypes.hh"
 
 #include "physics/Joint.hh"
 #include "physics/Body.hh"
@@ -655,12 +656,12 @@ void Model::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  /*common::PluginPtr plugin = common::Plugin::Create(filename, name);
+  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
   if (plugin)
   {
     plugin->Load(_sdf);
     this->plugins.push_back( plugin );
-  }*/
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

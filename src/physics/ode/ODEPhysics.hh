@@ -28,7 +28,6 @@
 #include <tbb/concurrent_vector.h>
 
 #include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "physics/ode/ODETypes.hh"
 

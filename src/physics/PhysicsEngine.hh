@@ -25,6 +25,7 @@
 #include "common/CommonTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "physics/PhysicsTypes.hh"
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace gazebo
 {
@@ -133,6 +134,11 @@ namespace gazebo
   
       //private: std::vector<OgreDynamicLines*> contactLines;
       //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
+
+      /// this is only needed because we are not starting another gzserver
+      /// for ray sensors
+      public: boost::recursive_mutex* odeRaySensorMutex;
+
     };
     
     /// \}

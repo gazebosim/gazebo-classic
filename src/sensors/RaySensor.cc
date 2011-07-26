@@ -121,7 +121,8 @@ void RaySensor::Load( )
 
   if (this->body == NULL)
     gzthrow("Null body in the ray sensor");
-  this->laserGeom = this->world->GetPhysicsEngine()->CreateGeom(
+  this->physicsEngine = this->world->GetPhysicsEngine();
+  this->laserGeom = this->physicsEngine->CreateGeom(
       "multiray", this->body);
 
   this->laserGeom->SetName("Ray Sensor Geom");
@@ -252,6 +253,8 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::Update(bool force)
 {
+  this->physicsEngine->odeRaySensorMutex->lock();
   //if (this->active || (**this->alwaysActiveP))
     this->laserShape->Update();
+  this->physicsEngine->odeRaySensorMutex->unlock();
 }

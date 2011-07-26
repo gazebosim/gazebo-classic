@@ -123,6 +123,8 @@ ODEPhysics::ODEPhysics(WorldPtr world)
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
+
+  this->odeRaySensorMutex = new boost::recursive_mutex();
 }
 
 
@@ -142,6 +144,9 @@ ODEPhysics::~ODEPhysics()
 
   this->spaceId = NULL;
   this->worldId = NULL;
+
+  delete this->odeRaySensorMutex;
+  this->odeRaySensorMutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,9 +284,12 @@ void ODEPhysics::UpdateCollision()
 void ODEPhysics::UpdatePhysics()
 {
   this->UpdateCollision();
- 
-  // Update the dynamical model
-  (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+  {
+    this->odeRaySensorMutex->lock();
+    // Update the dynamical model
+    (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+    this->odeRaySensorMutex->unlock();
+  }
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
