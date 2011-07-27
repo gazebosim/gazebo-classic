@@ -30,7 +30,7 @@
 #include "physics/Geom.hh"
 #include "physics/Model.hh"
 #include "physics/World.hh"
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Entity.hh"
 
@@ -42,6 +42,7 @@ using namespace physics;
 Entity::Entity(BasePtr parent)
   : Base(parent)
 {
+  this->isCanonicalLink = false;
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
@@ -164,29 +165,36 @@ math::Pose Entity::GetRelativePose() const
   return this->relativePose;
 }
 
-// Am I a canonical Body for my Model parent?
-bool Entity::IsCanonicalBody() const
+// Set to true if this entity is a canonical link for a model.
+void Entity::SetCanonicalLink(bool _value)
 {
-  // test if this entity is the canonical body of parent model
+  this->isCanonicalLink = _value;
+}
+
+// Am I a canonical Link for my Model parent?
+bool Entity::IsCanonicalLink() const
+{
+  /*// test if this entity is the canonical link of parent model
   ModelPtr parentModel;
-  BodyPtr canonicalBody;
+  LinkPtr canonicalLink;
   if (this->parent && this->parent->HasType(MODEL))
   {
     parentModel = boost::shared_static_cast<Model>(this->parent);
     //gzdbg << "pm " << parentModel->GetCompleteScopedName() << "\n";
     if (parentModel)
     {
-      canonicalBody = parentModel->GetBody();
-      if (canonicalBody)
+      canonicalLink = parentModel->GetLink();
+      if (canonicalLink)
       {
-        //gzdbg << "cb " << canonicalBody->GetCompleteScopedName()
+        //gzdbg << "cb " << canonicalLink->GetCompleteScopedName()
         //      << "b " << this->GetCompleteScopedName() << "\n";
-        if (canonicalBody->GetCompleteScopedName() == this->GetCompleteScopedName())
+        if (canonicalLink->GetCompleteScopedName() == this->GetCompleteScopedName())
           return true;
       }
     }
   }
-  return false;
+  */
+  return this->isCanonicalLink;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -219,13 +227,13 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
 
       // update all children pose, moving them with the model.
       // this happens when OnPoseChange uses GetWorldPose and
-      // finds each body's world pose has changed due to parent
+      // finds each link's world pose has changed due to parent
       // relative pose change above.
       this->UpdatePhysicsPose(true);
 
       // unlock physics
     }
-    else if (this->IsCanonicalBody())
+    else if (this->IsCanonicalLink())
     {
       // lock physics
 
@@ -235,7 +243,7 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
            (pose - this->GetRelativePose());
 
       // let the visualizer know that the parent pose has changed
-      // given the canonical body relative pose is the same, this
+      // given the canonical link relative pose is the same, this
       // is needed to show movement in visualizer
       parentModel->PublishPose();
 
@@ -246,14 +254,14 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
         if ((*iter)->HasType(ENTITY))
         {
           EntityPtr ent = boost::shared_static_cast<Entity>(*iter);
-          if (!ent->IsCanonicalBody())
+          if (!ent->IsCanonicalLink())
           {
             ent->relativePose = ent->relativePose +
                (pose - this->GetRelativePose());
           }
         }
       }
-      // push changes for this canonical body back to the physics engine
+      // push changes for this canonical link back to the physics engine
       this->UpdatePhysicsPose(true);
 
       // unlock physics
@@ -262,7 +270,8 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
     {
       this->relativePose = pose;
       this->relativePose.Correct();
-      if (notify) this->UpdatePhysicsPose(true);
+      if (notify) 
+        this->UpdatePhysicsPose(true);
     }
 
     // do we really need to do this still?
