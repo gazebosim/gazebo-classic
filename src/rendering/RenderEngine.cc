@@ -57,8 +57,6 @@ using namespace rendering;
 /// Constructor
 RenderEngine::RenderEngine()
 {
-  this->headless = false;
-
   this->logManager = NULL;
   this->root = NULL;
 
@@ -78,6 +76,8 @@ RenderEngine::~RenderEngine()
 /// Load the parameters for Ogre
 void RenderEngine::Load()
 {
+  this->CreateContext();
+
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
@@ -110,6 +110,11 @@ void RenderEngine::Load()
 
   // Setup the available resources
   this->SetupResources();
+
+  std::stringstream stream;
+  stream << (int32_t)this->dummyWindowId;
+
+  WindowManager::Instance()->CreateWindow( stream.str(), 1, 1 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -203,34 +208,7 @@ void RenderEngine::Init()
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
   /// initialize properly
-  //if (this->headless)
-  {
-    this->dummyDisplay = XOpenDisplay(0);
-    if (!this->dummyDisplay) 
-      gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
-
-    int screen = DefaultScreen(this->dummyDisplay);
-
-    int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
-                        GLX_STENCIL_SIZE, 8, None };
-
-    XVisualInfo *dummyVisual = glXChooseVisual((Display*)this->dummyDisplay, 
-                                               screen, (int *)attribList);
-
-    this->dummyWindowId = XCreateSimpleWindow((Display*)this->dummyDisplay, 
-        RootWindow((Display*)this->dummyDisplay, screen), 0, 0, 1, 1, 0, 0, 0);
-
-    this->dummyContext = glXCreateContext((Display*)this->dummyDisplay, 
-                                          dummyVisual, NULL, 1);
-
-    glXMakeCurrent((Display*)this->dummyDisplay, 
-                   this->dummyWindowId, (GLXContext)this->dummyContext);
-
-    std::stringstream stream;
-    stream << (int32_t)this->dummyWindowId;
-
-    WindowManager::Instance()->CreateWindow( stream.str(), 1, 1 );
-  }
+  
   
 
   // Set default mipmap level (NB some APIs ignore this)
@@ -476,16 +454,27 @@ bool RenderEngine::HasGLSL()
   return iter != profiles.end();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// True if the gui is to be used
-void RenderEngine::SetHeadless( bool enabled )
-{
-  this->headless = enabled;
-}
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the gui is enabled
-bool RenderEngine::GetHeadless() const
+void RenderEngine::CreateContext()
 {
-  return this->headless;
+  this->dummyDisplay = XOpenDisplay(0);
+  if (!this->dummyDisplay) 
+    gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
+
+  int screen = DefaultScreen(this->dummyDisplay);
+
+  int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
+    GLX_STENCIL_SIZE, 8, None };
+
+  XVisualInfo *dummyVisual = glXChooseVisual((Display*)this->dummyDisplay, 
+      screen, (int *)attribList);
+
+  this->dummyWindowId = XCreateSimpleWindow((Display*)this->dummyDisplay, 
+      RootWindow((Display*)this->dummyDisplay, screen), 0, 0, 1, 1, 0, 0, 0);
+
+  this->dummyContext = glXCreateContext((Display*)this->dummyDisplay, 
+      dummyVisual, NULL, 1);
+
+  glXMakeCurrent((Display*)this->dummyDisplay, 
+      this->dummyWindowId, (GLXContext)this->dummyContext);
 }

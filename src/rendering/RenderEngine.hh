@@ -109,12 +109,8 @@ namespace gazebo
       /// \brief Returns true if the graphics card support GLSL
       public: bool HasGLSL();
   
-      /// \brief True if the gui is to be used
-      public: void SetHeadless( bool enabled );
-  
-      /// \brief Return true if the gui is enabled
-      public: bool GetHeadless() const;
-   
+      private: void CreateContext();
+
       private: void LoadPlugins();
       private: void SetupResources();
       private: void SetupRenderSystem();

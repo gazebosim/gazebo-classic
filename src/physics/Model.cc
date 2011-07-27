@@ -30,6 +30,7 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
+#include "common/CommonTypes.hh"
 
 #include "physics/Joint.hh"
 #include "physics/Body.hh"
@@ -185,11 +186,13 @@ void Model::Init()
   this->SetInitialPose( pose );
 
   /// FIXME: Model::pose is set to the pose of first body
-  ///        seems like there should be a warning for users
+  ///        warn users for now, need  to add parsing of
+  ///        the canonical tag in sdf
   for (unsigned int i=0; i < this->children.size(); i++)
   {
     if (this->children[i]->HasType(BODY))
     {
+      gzwarn << "Model Canonical Body is presetting to first body for now, ignoring any canonical tag if one exists in your xml\n";
       this->canonicalBody = boost::shared_static_cast<Body>(this->children[i]);
       break;
     }
@@ -655,13 +658,12 @@ void Model::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  /*PluginPtr plugin = Plugin::Create(filename, name);
+  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
   if (plugin)
   {
     plugin->Load(_sdf);
     this->plugins.push_back( plugin );
   }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

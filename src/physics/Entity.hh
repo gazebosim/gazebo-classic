@@ -143,7 +143,9 @@ namespace gazebo
       /// \return A math::Vector3 for the acceleration
       public: virtual math::Vector3 GetWorldAngularAccel() const
               {return math::Vector3();}
-  
+ 
+      private: void PublishPose();
+ 
       /// \brief Get the parent model, if one exists
       /// \return Pointer to a model, or NULL if no parent model exists
       public: ModelPtr GetParentModel() const;
@@ -153,10 +155,13 @@ namespace gazebo
       protected: virtual void OnPoseChange() {}
   
       /// \brief Handle a change of pose
-      private: void PoseChange(bool notify = true);
+      private: void UpdatePhysicsPose(bool update_children = true);
   
       /// A helper that prevents numerous dynamic_casts
       private: EntityPtr parentEntity;
+
+      /// A helper function that checks if this is a canonical body
+      private: bool IsCanonicalBody() const;
 
       private: bool isStatic;
 

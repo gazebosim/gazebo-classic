@@ -262,6 +262,7 @@ namespace gazebo
 
       private: Visual *worldVisual;
       private: bool shadowsEnabled;
+
     };
     /// \}
   }
