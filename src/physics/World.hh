@@ -190,6 +190,8 @@ namespace gazebo
       /// \brief Single loop verison of model updating
       private: void ModelUpdateSingleLoop();
 
+      private: void LoadPlugin( sdf::ElementPtr &_sdf );
+
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
     
@@ -234,6 +236,8 @@ namespace gazebo
 
       private: boost::mutex *updateMutex;
       private: sdf::ElementPtr sdf;
+
+      private: std::vector<PluginPtr> plugins;
     };
 
     /// \}

@@ -15,6 +15,7 @@
       </ode>
     </physics>
 
+    <plugin name="world_edit" filename="libworld_edit.so"/>
 
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">

@@ -80,6 +80,9 @@ namespace gazebo
     /// \brief Finilize the ODE engine
     public: virtual void Fini();
 
+    /// \brief Set the step time
+    public: void SetStepTime(double _value);
+
     /// \brief Get the simulation step time
     public: virtual double GetStepTime();
  
@@ -160,6 +163,10 @@ namespace gazebo
 
     protected: virtual void OnPhysicsRequest( 
                  const boost::shared_ptr<msgs::Request const> &/*_msg*/ );
+
+    protected: virtual void OnPhysicsMsg( 
+                 const boost::shared_ptr<msgs::Physics const> &/*_msg*/ );
+
 
     /// \brief Top-level world for all bodies
     private: dWorldID worldId;

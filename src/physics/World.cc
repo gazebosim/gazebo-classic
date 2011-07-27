@@ -35,6 +35,7 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
+#include "common/Plugin.hh"
 
 #include "physics/Link.hh"
 #include "physics/PhysicsEngine.hh"
@@ -411,7 +412,16 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
     }
   }
 
-
+  // Load the plugins
+  if (_sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = _sdf->GetNextElement("plugin", pluginElem);
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -690,5 +700,19 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
     // Add the new models into the World
     ModelPtr model = this->LoadModel( factorySDF->root, this->rootElement );
     model->Init();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a plugin
+void World::LoadPlugin( sdf::ElementPtr &_sdf )
+{
+  std::string name = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
+  if (plugin)
+  {
+    plugin->Load(_sdf);
+    this->plugins.push_back( plugin );
   }
 }

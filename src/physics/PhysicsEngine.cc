@@ -41,6 +41,9 @@ PhysicsEngine::PhysicsEngine(WorldPtr world)
   this->node->Init(world->GetName());
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+  this->physicsSub = this->node->Subscribe("~/physics",
+      &PhysicsEngine::OnPhysicsMsg, this);
+
   this->physicsRequestSub = this->node->Subscribe("~/physics_request", 
                                         &PhysicsEngine::OnPhysicsRequest, this);
 

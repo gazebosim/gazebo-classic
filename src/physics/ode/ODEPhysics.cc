@@ -220,7 +220,9 @@ void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> 
   msgs::Physics msg;
   msgs::Init(msg, "ode_physics");
   msg.set_type( msgs::Physics::ODE );
+
   msg.set_solver_type( this->stepType );
+
   msg.set_dt( this->stepTimeDouble );
   msg.set_iters( this->GetSORPGSIters() );
   msg.set_sor( this->GetSORPGSW() );
@@ -233,6 +235,15 @@ void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> 
   gzdbg << "Publish physics msg\n";
 
 }
+
+void ODEPhysics::OnPhysicsMsg( const boost::shared_ptr<msgs::Physics const> &_msg )
+{
+  if (_msg->has_dt())
+    this->SetStepTime(_msg->dt());
+
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the ODE engine
@@ -322,6 +333,14 @@ void ODEPhysics::UpdatePhysics()
 // Finilize the ODE engine
 void ODEPhysics::Fini()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the step time
+void ODEPhysics::SetStepTime(double _value)
+{
+  this->sdf->GetOrCreateElement("solver")->GetAttribute("dt")->Set(_value);
+  this->stepTimeDouble = _value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

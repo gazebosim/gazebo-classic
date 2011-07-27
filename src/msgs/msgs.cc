@@ -62,8 +62,6 @@ void Init(google::protobuf::Message &message, const std::string &id)
     header->set_str_id(id);
     Stamp(header->mutable_stamp());
   }
-  else
-    gzerr << "Header is non-existant\n";
 }
 
 void Stamp(msgs::Header *hdr)

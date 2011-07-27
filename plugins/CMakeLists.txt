@@ -3,7 +3,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-set (plugins model_push ray_test)
+set (plugins model_push ray_test world_edit)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

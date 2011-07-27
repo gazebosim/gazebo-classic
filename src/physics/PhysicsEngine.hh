@@ -128,6 +128,11 @@ namespace gazebo
                  const boost::shared_ptr<msgs::Request const> &/*_msg*/ )
                  {}
 
+      protected: virtual void OnPhysicsMsg( 
+                 const boost::shared_ptr<msgs::Physics const> &/*_msg*/ )
+                 {}
+
+
 
       protected: WorldPtr world;
       protected: sdf::ElementPtr sdf;
@@ -136,7 +141,7 @@ namespace gazebo
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr visPub;
       protected: transport::PublisherPtr physicsPub;
-      protected: transport::SubscriberPtr physicsRequestSub;
+      protected: transport::SubscriberPtr physicsSub, physicsRequestSub;
       private: event::ConnectionPtr showContactConnection; 
   
       //private: std::vector<OgreDynamicLines*> contactLines;
