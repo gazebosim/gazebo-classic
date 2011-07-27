@@ -31,20 +31,6 @@ char **g_argv;
 
 using namespace gazebo;
 
-const std::string default_config =
-"<?xml version='1.0'?>\
-<gazebo>\
-  <config>\
-    <verbosity>4</verbosity>\
-    <gui>\
-      <size>800 600</size>\
-      <pos>0 0</pos>\
-    </gui>\
-  </config>\
-</gazebo>\
-";
-
-
 QApplication *g_app;
 gui::MainWindow *g_main_win;
 
@@ -76,6 +62,7 @@ void gui::init()
 
 void gui::run()
 {
+
   g_app->exec();
 }
 
