@@ -164,20 +164,118 @@ math::Pose Entity::GetRelativePose() const
   return this->relativePose;
 }
 
+// Am I a canonical Body for my Model parent?
+bool Entity::IsCanonicalBody() const
+{
+  // test if this entity is the canonical body of parent model
+  ModelPtr parentModel;
+  BodyPtr canonicalBody;
+  if (this->parent && this->parent->HasType(MODEL))
+  {
+    parentModel = boost::shared_static_cast<Model>(this->parent);
+    //gzdbg << "pm " << parentModel->GetCompleteScopedName() << "\n";
+    if (parentModel)
+    {
+      canonicalBody = parentModel->GetBody();
+      if (canonicalBody)
+      {
+        //gzdbg << "cb " << canonicalBody->GetCompleteScopedName()
+        //      << "b " << this->GetCompleteScopedName() << "\n";
+        if (canonicalBody->GetCompleteScopedName() == this->GetCompleteScopedName())
+          return true;
+      }
+    }
+  }
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the pose of the entity relative to its parent
 void Entity::SetRelativePose(const math::Pose &pose, bool notify)
 {
+  // debugging
+  // if (this->GetCompleteScopedName() == "root::model_1::link_1")
+  // {
+  //   if (abs(this->relativePose.pos.x - pose.pos.x) > 0.00001)
+  //   {
+  //     gzdbg << "setting relative pose name [" << this->GetName()
+  //           << "] old [" << this->relativePose
+  //           << "] new [" << pose
+  //           << "]\n";
+  //     gzdbg << "diff [" << abs(this->relativePose.pos.x - pose.pos.x) << "]\n";
+  //     printf("ok\n");
+  //   }
+  // }
+
   //if (pose != this->relativePose)
   {
-    this->relativePose = pose;
-    this->relativePose.Correct();
-    this->PoseChange(notify);
+    if (this->HasType(MODEL))
+    {
+      // lock physics
 
-    msgs::Pose msg;
-    msgs::Set( this->poseMsg, this->GetRelativePose());
-    this->posePub->Publish( *this->poseMsg);
+      // set relative pose of this model
+      this->relativePose = pose;
+      this->relativePose.Correct();
+
+      // update all children pose, moving them with the model.
+      // this happens when OnPoseChange uses GetWorldPose and
+      // finds each body's world pose has changed due to parent
+      // relative pose change above.
+      this->UpdatePhysicsPose(true);
+
+      // unlock physics
+    }
+    else if (this->IsCanonicalBody())
+    {
+      // lock physics
+
+      // set relative pose of the parent model
+      ModelPtr parentModel = boost::shared_static_cast<Model>(this->parent);
+      parentModel->relativePose = parentModel->relativePose +
+           (pose - this->GetRelativePose());
+
+      // let the visualizer know that the parent pose has changed
+      // given the canonical body relative pose is the same, this
+      // is needed to show movement in visualizer
+      parentModel->PublishPose();
+
+      // loop through non-canonical bodies, so their worldPose remain unchanged
+      for  (Base_V::iterator iter = parentModel->children.begin();
+            iter != parentModel->children.end(); iter++)
+      {
+        if ((*iter)->HasType(ENTITY))
+        {
+          EntityPtr ent = boost::shared_static_cast<Entity>(*iter);
+          if (!ent->IsCanonicalBody())
+          {
+            ent->relativePose = ent->relativePose +
+               (pose - this->GetRelativePose());
+          }
+        }
+      }
+      // push changes for this canonical body back to the physics engine
+      this->UpdatePhysicsPose(true);
+
+      // unlock physics
+    }
+    else
+    {
+      this->relativePose = pose;
+      this->relativePose.Correct();
+      if (notify) this->UpdatePhysicsPose(true);
+    }
+
+    // do we really need to do this still?
+    //if (notify) this->UpdatePhysicsPose(false);
+
+    this->PublishPose();
   }
+}
+
+void Entity::PublishPose()
+{
+  msgs::Set( this->poseMsg, this->GetRelativePose());
+  this->posePub->Publish( *this->poseMsg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,67 +294,13 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
   if (this->parent && this->parent->HasType(ENTITY))
   {
-    // TODO: I took out the first if clause because it would cause other
-    // bodies in a model to penetrate the ground since they were not the 
-    // canonical body
-    // if this is the canonical body of a model, then
-    // we want to SetWorldPose of the parent model
-    // by doing some backwards transform
-    /*if (this->parent->HasType(MODEL) && 
-        boost::shared_static_cast<Model>(this->parent)->GetBody("canonical")->GetId() == this->GetId())
-    {
-      // abs pose of the model + relative pose of cb = abs pose of cb 
-      // so to get abs pose of the model, we need
-      // start with abs pose of cb, inverse rotate by relative pose of cb
-      //  then, inverse translate by relative pose of cb
-      math::Pose model_abs_pose;
-      math::Pose cb_rel_pose = this->GetRelativePose();
-      // anti-rotate cb-abs by cb-rel = model-abs
-      model_abs_pose.rot = pose.rot * this->GetRelativePose().rot.GetInverse();
-      // rotate cb-rel pos by cb-rel rot to get pos offset
-      //math::Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
-      // finally, model-abs pos is cb-abs pos - pos_offset
-      //model_abs_pose.pos = cb->GetWorldPose().pos - pos_offset;
-      model_abs_pose.pos = pose.pos - model_abs_pose.rot * this->GetRelativePose().pos;
-      //model_abs_pose.pos = pose.pos - this->GetRelativePose().pos;
-      // set abs pose of parent model without propagating
-      // changes to children
-      boost::shared_static_cast<Entity>(this->parent)->SetWorldPose(model_abs_pose,false);
-      // that should be all, as relative pose of a canonical model
-      // should not change
-    }
-    else
-    */
-    {
-      // this is not a canonical Body of a model
-      // simply update it's own RelativePose
-      math::Pose relative_pose( pose - this->parentEntity->GetWorldPose());
-      // relative pose is the pose relative to the parent
-      // if this is called from MoveCallback, notify is false
-      // FIXME: if this is called by user, and notify is true
-      //        use may end up updating the entire model trying
-      //        to set abs pose of a body?  no, the body has no
-      //        children
-      this->SetRelativePose(relative_pose, notify);
-    }
-  }
-  else if (this->HasType(MODEL))
-  {
-    // race condition with MoveCallback from canonical body calling SetWorldPose
-    // we need to stop canonicalBody from calling SetWorldPose in MoveCallback
-    // so this user request is not overwritten
-    // if this is a model with no parent,
-    // then set own relative pose as incoming
-    // pose and notify all children
-    //  this has to propagate through before MoveCallback
-    //  triggers another SetWorldPose() and overwrites this change
-    this->SetRelativePose(pose, notify);
-    //then, set abs pose of the canonical body
-    //Body* cb = ((Model*)this)->GetBody("canonical");
+    math::Pose relative_pose(pose - this->parentEntity->GetWorldPose());
+    this->SetRelativePose(relative_pose, notify);
   }
   else
   {
-    gzerr << "No parent and not a model, strange\n";
+    // no parent, relative pose is the absolute world pose
+    this->SetRelativePose(pose, notify);
   }
 }
 
@@ -276,14 +320,14 @@ void Entity::SetRelativeRotation(const math::Quaternion &rot)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handle a change of pose
-void Entity::PoseChange(bool notify)
+void Entity::UpdatePhysicsPose(bool update_children)
 {
-  if (notify)
-  {
-    this->OnPoseChange();
+  this->OnPoseChange();
 
-    Base_V::iterator iter;
-    for  (iter = this->children.begin(); iter != this->children.end(); iter++)
+  if (update_children)
+  {
+    for  (Base_V::iterator iter = this->children.begin();
+          iter != this->children.end(); iter++)
     {
       if ((*iter)->HasType(ENTITY))
         boost::shared_static_cast<Entity>(*iter)->OnPoseChange();

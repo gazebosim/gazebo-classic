@@ -67,9 +67,11 @@ namespace gazebo
     {
       this->simTime  = msgs::Convert( _msg->sim_time() );
       math::Pose pose;
-      pose.pos.x = 0.1*sin(this->simTime.Double());
-      //this->model->SetWorldPose( pose, true );
-      //gzdbg << "plugin simTime [" << this->simTime.Double() << "] update pose [" << pose.pos.x << "]\n";
+      pose.pos.x = 0.5*sin(0.01*this->simTime.Double());
+      math::Pose orig_pose = this->model->GetWorldPose();
+      if (this->simTime.Double() > 10.0)
+        this->model->SetWorldPose( pose );
+      gzdbg << "plugin simTime [" << this->simTime.Double() << "] update pose [" << pose.pos.x << "] orig pose [" << orig_pose << "]\n";
     }
 
     // Pointer to the model

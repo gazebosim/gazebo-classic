@@ -186,11 +186,13 @@ void Model::Init()
   this->SetInitialPose( pose );
 
   /// FIXME: Model::pose is set to the pose of first body
-  ///        seems like there should be a warning for users
+  ///        warn users for now, need  to add parsing of
+  ///        the canonical tag in sdf
   for (unsigned int i=0; i < this->children.size(); i++)
   {
     if (this->children[i]->HasType(BODY))
     {
+      gzwarn << "Model Canonical Body is presetting to first body for now, ignoring any canonical tag if one exists in your xml\n";
       this->canonicalBody = boost::shared_static_cast<Body>(this->children[i]);
       break;
     }
