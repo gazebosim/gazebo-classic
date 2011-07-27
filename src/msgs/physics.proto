@@ -1,0 +1,27 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Physics
+/// \brief A message containing a description of the global physics properties
+/// \verbatim
+
+import "point.proto";
+
+message Physics
+{
+  enum Type
+  {
+    ODE = 1;
+  }
+  required Type type = 1;
+
+  optional string solver_type = 2;
+  optional double dt = 3;
+  optional int32 iters = 4;
+  optional double sor = 5;
+  optional double cfm = 6;
+  optional double erp = 7;
+  optional double contact_max_correcting_vel = 8;
+  optional double contact_surface_layer = 9;
+  optional Point gravity = 10;
+}
