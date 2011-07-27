@@ -31,7 +31,7 @@
 #include "physics/Contact.hh"
 #include "physics/Shape.hh"
 #include "physics/SurfaceParams.hh"
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/Geom.hh"
 
 using namespace gazebo;
@@ -39,7 +39,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( BodyPtr body )
+Geom::Geom( LinkPtr body )
     : Entity(body)
 {
   this->AddType(Base::GEOM);
@@ -192,7 +192,7 @@ void Geom::ShowBoundingBox(const bool &show)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the body this geom belongs to
-BodyPtr Geom::GetBody() const
+LinkPtr Geom::GetLink() const
 {
   return this->body;
 }

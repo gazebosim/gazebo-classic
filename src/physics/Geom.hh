@@ -39,7 +39,7 @@ namespace gazebo
     class Geom : public Entity
     {
       /// \brief Constructor
-      public: Geom(BodyPtr body);
+      public: Geom(LinkPtr body);
     
       /// \brief Destructor
       public: virtual ~Geom();
@@ -79,7 +79,7 @@ namespace gazebo
       public: void ShowBoundingBox(const bool &show);
   
       /// \brief Get the body this geom belongs to
-      public: BodyPtr GetBody() const;
+      public: LinkPtr GetLink() const;
   
       /// \brief Get the model this geom belongs to
       public: ModelPtr GetModel() const;
@@ -152,7 +152,7 @@ namespace gazebo
   
  
       /// The body this geom belongs to
-      protected: BodyPtr body;
+      protected: LinkPtr body;
     
       protected: bool placeable;
   
