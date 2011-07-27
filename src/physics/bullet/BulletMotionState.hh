@@ -31,12 +31,12 @@ namespace gazebo
 	namespace physics
 {
   class Visual;
-  class Body;
+  class Link;
 
   class BulletMotionState : public btMotionState
   {
     /// \brief Constructor
-    public: BulletMotionState(Body *body);
+    public: BulletMotionState(Link *body);
 
     /// \brief Constructor
     //public: BulletMotionState(const math::Pose &initPose);
@@ -73,7 +73,7 @@ namespace gazebo
     private: Visual *visual;
     private: math::Pose worldPose;
     private: math::Pose comOffset;
-    private: Body *body;
+    private: Link *body;
   };
 }
 }

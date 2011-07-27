@@ -49,10 +49,10 @@ namespace gazebo
   class BulletRayGeom : public RayGeom<BulletGeom>
   {
     /// \brief Constructor
-    /// \param body Body the ray is attached to
+    /// \param body Link the ray is attached to
     /// \param displayRays Indicates if the rays should be displayed when 
     ///        rendering images
-    public: BulletRayGeom( Body *body, bool displayRays );
+    public: BulletRayGeom( Link *body, bool displayRays );
   
     /// \brief Destructor
     public: virtual ~BulletRayGeom();

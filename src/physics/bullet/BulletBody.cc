@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Body class
+/* Desc: Link class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id: Body.cc 7640 2009-05-13 02:06:08Z natepak $
+ * SVN: $Id: Link.cc 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #include <sstream>
@@ -35,7 +35,7 @@
 #include "Mass.hh"
 #include "rendering/Visual.hh"
 
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -47,12 +47,12 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletBody::BulletBody(Entity *parent)
-    : Body(parent)
+BulletLink::BulletLink(Entity *parent)
+    : Link(parent)
 {
   this->bulletPhysics = dynamic_cast<BulletPhysics*>(this->physicsEngine);
 
-  this->rigidBody = NULL;
+  this->rigidLink = NULL;
   this->compoundShape = new btCompoundShape;
   this->motionState = new BulletMotionState(this);
 
@@ -63,17 +63,17 @@ BulletBody::BulletBody(Entity *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-BulletBody::~BulletBody()
+BulletLink::~BulletLink()
 {
-  if (this->rigidBody)
-    delete this->rigidBody;
+  if (this->rigidLink)
+    delete this->rigidLink;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the body based on an common::XMLConfig node
-void BulletBody::Load(common::XMLConfigNode *node)
+void BulletLink::Load(common::XMLConfigNode *node)
 {
-  Body::Load(node);
+  Link::Load(node);
   btScalar btMass = 0.0;
   btmath::Vector3 fallInertia(0,0,0);
 
@@ -153,12 +153,12 @@ void BulletBody::Load(common::XMLConfigNode *node)
   }
     
   // Create a construction info object
-  btRigidBody::btRigidBodyConstructionInfo
-    rigidBodyCI(btMass, this->motionState, this->compoundShape, fallInertia);
+  btRigidLink::btRigidLinkConstructionInfo
+    rigidLinkCI(btMass, this->motionState, this->compoundShape, fallInertia);
   
   // Create the new rigid body 
-  this->rigidBody = new btRigidBody( rigidBodyCI );
-  this->rigidBody->setUserPointer(this);
+  this->rigidLink = new btRigidLink( rigidLinkCI );
+  this->rigidLink->setUserPointer(this);
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
@@ -172,65 +172,65 @@ void BulletBody::Load(common::XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Init the Bullet body
-void BulletBody::Init() 
+void BulletLink::Init() 
 {
-  Body::Init();
+  Link::Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Finalize the body
-void BulletBody::Fini()
+void BulletLink::Fini()
 {
-  Body::Fini();
+  Link::Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the body
-void BulletBody::Update()
+void BulletLink::Update()
 {
-  Body::Update();
+  Link::Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether gravity affects this body
-void BulletBody::SetGravityMode(bool mode)
+void BulletLink::SetGravityMode(bool mode)
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return;
 
   if (mode == false)
-    this->rigidBody->setMassProps(btScalar(0), btmath::Vector3(0,0,0));
+    this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0,0,0));
   else
   {
     btScalar btMass = this->mass.GetAsDouble();
     btmath::Vector3 fallInertia(0,0,0);
 
     this->compoundShape->calculateLocalInertia(btMass,fallInertia);
-    this->rigidBody->setMassProps(btMass, fallInertia);
+    this->rigidLink->setMassProps(btMass, fallInertia);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the gravity mode
-bool BulletBody::GetGravityMode()
+bool BulletLink::GetGravityMode()
 {
   bool result;
-  gzerr << "BulletBody::GetGravityMode not implemented, returning spurious result\n";
+  gzerr << "BulletLink::GetGravityMode not implemented, returning spurious result\n";
 
   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether this body will collide with others in the model
-void BulletBody::SetSelfCollide(bool collide)
+void BulletLink::SetSelfCollide(bool collide)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach a geom to this body
-void BulletBody::AttachGeom( Geom *geom )
+void BulletLink::AttachGeom( Geom *geom )
 {
-  Body::AttachGeom(geom);
+  Link::AttachGeom(geom);
 
   BulletGeom *bgeom = dynamic_cast<BulletGeom*>(geom);
 
@@ -248,26 +248,26 @@ void BulletBody::AttachGeom( Geom *geom )
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Called when the pose of the entity (or one of its parents) has
 /// changed
-void BulletBody::OnPoseChange()
+void BulletLink::OnPoseChange()
 {
   math::Pose pose = this->GetWorldPose();
 
   this->motionState->SetWorldPose(pose);
-  if (this->rigidBody)
-    this->rigidBody->setMotionState(this->motionState);
+  if (this->rigidLink)
+    this->rigidLink->setMotionState(this->motionState);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this body is enabled
-void BulletBody::SetEnabled(bool enable) const
+void BulletLink::SetEnabled(bool enable) const
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return;
 
   if (enable)
-    this->rigidBody->activate(true);
+    this->rigidLink->activate(true);
   else
-    this->rigidBody->setActivationState(WANTS_DEACTIVATION);
+    this->rigidLink->setActivationState(WANTS_DEACTIVATION);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -286,130 +286,130 @@ void BulletBody::SetEnabled(bool enable) const
   the Bullet-pose of the geoms, to keep everything in the same place in the
   Gazebo cs.  Simple, neh?
 */
-void BulletBody::UpdateCoM()
+void BulletLink::UpdateCoM()
 {
-  Body::UpdateCoM();
+  Link::UpdateCoM();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void BulletBody::SetLinearVel(const math::Vector3 &vel)
+void BulletLink::SetLinearVel(const math::Vector3 &vel)
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return;
 
-  this->rigidBody->setLinearVelocity( btmath::Vector3(vel.x, vel.y, vel.z) );
+  this->rigidLink->setLinearVelocity( btmath::Vector3(vel.x, vel.y, vel.z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body
-math::Vector3 BulletBody::GetWorldLinearVel() const
+math::Vector3 BulletLink::GetWorldLinearVel() const
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return math::Vector3(0,0,0);
 
-  btmath::Vector3 btVec = this->rigidBody->getLinearVelocity();
+  btmath::Vector3 btVec = this->rigidLink->getLinearVelocity();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void BulletBody::SetAngularVel(const math::Vector3 &vel)
+void BulletLink::SetAngularVel(const math::Vector3 &vel)
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return;
 
-  this->rigidBody->setAngularVelocity( btmath::Vector3(vel.x, vel.y, vel.z) );
+  this->rigidLink->setAngularVelocity( btmath::Vector3(vel.x, vel.y, vel.z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body
-math::Vector3 BulletBody::GetWorldAngularVel() const
+math::Vector3 BulletLink::GetWorldAngularVel() const
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return math::Vector3(0,0,0);
 
-  btmath::Vector3 btVec = this->rigidBody->getAngularVelocity();
+  btmath::Vector3 btVec = this->rigidLink->getAngularVelocity();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the force applied to the body
-void BulletBody::SetForce(const math::Vector3 &force)
+void BulletLink::SetForce(const math::Vector3 &force)
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return;
 
-  this->rigidBody->applyCentralForce(btmath::Vector3(force.x, force.y, force.z) );
+  this->rigidLink->applyCentralForce(btmath::Vector3(force.x, force.y, force.z) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force applied to the body
-math::Vector3 BulletBody::GetWorldForce() const
+math::Vector3 BulletLink::GetWorldForce() const
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return math::Vector3(0,0,0);
 
   btmath::Vector3 btVec;
 
-  btVec = this->rigidBody->getTotalForce();
+  btVec = this->rigidLink->getTotalForce();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the torque applied to the body
-void BulletBody::SetTorque(const math::Vector3 &torque)
+void BulletLink::SetTorque(const math::Vector3 &torque)
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return;
 
-  this->rigidBody->applyTorque(btmath::Vector3(torque.x, torque.y, torque.z));
+  this->rigidLink->applyTorque(btmath::Vector3(torque.x, torque.y, torque.z));
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the torque applied to the body
-math::Vector3 BulletBody::GetWorldTorque() const
+math::Vector3 BulletLink::GetWorldTorque() const
 {
-  if (!this->rigidBody)
+  if (!this->rigidLink)
     return math::Vector3(0,0,0);
 
   btmath::Vector3 btVec;
 
-  btVec = this->rigidBody->getTotalTorque();
+  btVec = this->rigidLink->getTotalTorque();
 
   return math::Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bullet rigid body
-btRigidBody *BulletBody::GetBulletBody() const
+btRigidLink *BulletLink::GetBulletLink() const
 {
-  return this->rigidBody;
+  return this->rigidLink;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear damping factor
-void BulletBody::SetLinearDamping(double damping)
+void BulletLink::SetLinearDamping(double damping)
 {
-  this->rigidBody->setDamping((btScalar)damping, 
-      (btScalar)this->rigidBody->getAngularDamping());
+  this->rigidLink->setDamping((btScalar)damping, 
+      (btScalar)this->rigidLink->getAngularDamping());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular damping factor
-void BulletBody::SetAngularDamping(double damping)
+void BulletLink::SetAngularDamping(double damping)
 {
-  this->rigidBody->setDamping(
-      (btScalar)this->rigidBody->getLinearDamping(), (btScalar)damping);
+  this->rigidLink->setDamping(
+      (btScalar)this->rigidLink->getLinearDamping(), (btScalar)damping);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the relative pose of a child geom.
-void BulletBody::SetGeomRelativePose(BulletGeom *geom, const math::Pose &newPose)
+void BulletLink::SetGeomRelativePose(BulletGeom *geom, const math::Pose &newPose)
 {
   std::map<std::string, Geom*>::iterator iter;
   unsigned int i;

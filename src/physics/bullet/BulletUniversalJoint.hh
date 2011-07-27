@@ -100,7 +100,7 @@ namespace gazebo
     public: virtual ~BulletUniversalJoint();
 
     /// \brief Attach the two bodies with this joint
-    public: void Attach( Body *one, Body *two );
+    public: void Attach( Link *one, Link *two );
 
     /// \brief Get the anchor point
     public: virtual math::Vector3 GetAnchor(int index) const;

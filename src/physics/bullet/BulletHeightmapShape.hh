@@ -79,7 +79,7 @@ namespace gazebo
   class BulletHeightmapGeom : public BulletGeom
   {
     /// \brief Constructor
-    public: BulletHeightmapGeom(Body *body);
+    public: BulletHeightmapGeom(Link *body);
 
     /// \brief Destructor
     public: virtual ~BulletHeightmapGeom();

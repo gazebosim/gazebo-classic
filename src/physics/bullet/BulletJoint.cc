@@ -20,7 +20,7 @@
  * SVN: $Id$
  */
 
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "BulletJoint.hh"
@@ -59,22 +59,22 @@ void BulletJoint::Load(common::XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the body to which the joint is attached according the _index
-Body *BulletJoint::GetJointBody( int index ) const
+Link *BulletJoint::GetJointLink( int index ) const
 {
-  Body *result=NULL;
+  Link *result=NULL;
 
   if (this->constraint == NULL)
     gzthrow("Attach bodies to the joint first");
 
   if (index == 0 || index ==1)
   {
-    BulletBody *bulletBody1 = dynamic_cast<BulletBody*>(this->body1);
-    BulletBody *bulletBody2 = dynamic_cast<BulletBody*>(this->body2);
-    btRigidBody rigidBody = this->constraint->getRigidBodyA();
+    BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
+    BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
+    btRigidLink rigidLink = this->constraint->getRigidLinkA();
 
-    if (bulletBody1 && rigidBody.getUserPointer() == bulletBody1)
+    if (bulletLink1 && rigidLink.getUserPointer() == bulletLink1)
       result = this->body1;
-    else if (bulletBody2)
+    else if (bulletLink2)
       result = this->body2;
   }
 
@@ -84,7 +84,7 @@ Body *BulletJoint::GetJointBody( int index ) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Determines of the two bodies are connected by a joint
-bool BulletJoint::AreConnected( Body *one, Body *two ) const
+bool BulletJoint::AreConnected( Link *one, Link *two ) const
 {
   return this->constraint && ((this->body1 == one && this->body2 == two) || 
          (this->body1 == two && this->body2 == one));

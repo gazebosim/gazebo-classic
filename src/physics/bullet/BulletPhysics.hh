@@ -117,16 +117,16 @@ class BulletPhysics : public PhysicsEngine
   public: virtual void RemoveEntity(Entity *entity);
 
   /// \brief Create a new body
-  public: virtual Body *CreateBody(Entity *parent);
+  public: virtual Link *CreateLink(Entity *parent);
 
   /// \brief Create a new geom
-  public: virtual Geom *CreateGeom(std::string type, Body *body);
+  public: virtual Geom *CreateGeom(std::string type, Link *body);
 
   /// \brief Create a new joint
   public: virtual Joint *CreateJoint(std::string type);
 
   /// \brief Create a physics based ray sensor
-  //public: virtual PhysicsRaySensor *CreateRaySensor(Body *body);
+  //public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
  
   /// \brief Convert an bullet mass to a gazebo Mass
   public: virtual void ConvertMass(Mass *mass, void *engineMass);

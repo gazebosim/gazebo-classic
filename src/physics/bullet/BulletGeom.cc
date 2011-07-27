@@ -29,7 +29,7 @@
 #include "common/Global.hh"
 #include "common/Console.hh"
 #include "World.hh"
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 
 #include "BulletGeom.hh"
 
@@ -43,7 +43,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletGeom::BulletGeom( Body *_body )
+BulletGeom::BulletGeom( Link *_body )
     : Geom(_body)
 {
   this->SetName("Bullet Geom");
@@ -87,7 +87,7 @@ void BulletGeom::Update()
 void BulletGeom::OnPoseChange()
 {
   math::Pose pose = this->GetRelativePose();
-  BulletBody *bbody = (BulletBody*)(this->body);
+  BulletLink *bbody = (BulletLink*)(this->body);
 
   bbody->SetGeomRelativePose(this, pose);
 }
@@ -106,7 +106,7 @@ void BulletGeom::SetCollideBits(unsigned int bits)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the mass of the geom
-Mass BulletGeom::GetBodyMassMatrix()
+Mass BulletGeom::GetLinkMassMatrix()
 {
   Mass result;
   return result;

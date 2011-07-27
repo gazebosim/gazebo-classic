@@ -94,7 +94,7 @@ namespace gazebo
     protected: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Attach the two bodies with this joint
-    public: virtual void Attach( Body *one, Body *two );
+    public: virtual void Attach( Link *one, Link *two );
 
     /// \brief Get the anchor point
     public: virtual math::Vector3 GetAnchor(int index) const;

@@ -57,10 +57,10 @@ namespace gazebo
     public: void Reset() {}
 
     /// \brief Get the body to which the joint is attached according the _index
-    public: Body *GetJointBody( int index ) const;
+    public: Link *GetJointLink( int index ) const;
 
     /// \brief Determines of the two bodies are connected by a joint
-    public: bool AreConnected( Body *one, Body *two ) const;
+    public: bool AreConnected( Link *one, Link *two ) const;
 
     /// \brief Detach this joint from all bodies
     public: virtual void Detach();
@@ -81,12 +81,12 @@ namespace gazebo
 
     /// \brief Get the force the joint applies to the first body
     /// \param index The index of the body( 0 or 1 )
-    public: virtual math::Vector3 GetBodyForce(unsigned int index) const
+    public: virtual math::Vector3 GetLinkForce(unsigned int index) const
             {gzerr << "Not implement in Bullet\n"; return math::Vector3();}
 
     /// \brief Get the torque the joint applies to the first body
     /// \param index The index of the body( 0 or 1 )
-    public: virtual math::Vector3 GetBodyTorque(unsigned int index) const
+    public: virtual math::Vector3 GetLinkTorque(unsigned int index) const
             {gzerr << "Not implement in Bullet\n"; return math::Vector3();}
 
     /// \brief Set a parameter for the joint

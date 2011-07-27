@@ -22,7 +22,7 @@
 
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
-#include "Body.hh"
+#include "Link.hh"
 #include "common/Exception.hh"
 #include "BulletTrimeshShape.hh"
 

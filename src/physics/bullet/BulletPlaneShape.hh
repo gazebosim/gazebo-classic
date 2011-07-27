@@ -32,7 +32,7 @@ namespace gazebo
 {
 	namespace physics
 {
-  class Body;
+  class Link;
   class XMLConfig;
 
   /// \brief Bullet geom for an infinite plane.

@@ -22,7 +22,7 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "BulletBallJoint.hh"
 
 using namespace gazebo;
@@ -70,17 +70,17 @@ void BulletBallJoint::SetDamping( int /*index*/, const double damping )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void BulletBallJoint::Attach( Body *one, Body *two )
+void BulletBallJoint::Attach( Link *one, Link *two )
 {
   BallJoint<BulletJoint>::Attach(one,two);
-  BulletBody *bulletBody1 = dynamic_cast<BulletBody*>(this->body1);
-  BulletBody *bulletBody2 = dynamic_cast<BulletBody*>(this->body2);
+  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
+  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
-  if (!bulletBody1 || !bulletBody2)
+  if (!bulletLink1 || !bulletLink2)
     gzthrow("Requires bullet bodies");
 
-  btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
-  btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
+  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
+  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
 
   math::Vector3 pivotA, pivotB;
 
@@ -88,7 +88,7 @@ void BulletBallJoint::Attach( Body *one, Body *two )
   pivotA = this->anchorPos - this->body1->GetWorldPose().pos;
   pivotB = this->anchorPos - this->body2->GetWorldPose().pos;
 
-  this->constraint = new btPoint2PointConstraint( *rigidBody1, *rigidBody2,
+  this->constraint = new btPoint2PointConstraint( *rigidLink1, *rigidLink2,
       btmath::Vector3(pivotA.x, pivotA.y, pivotA.z),
       btmath::Vector3(pivotB.x, pivotB.y, pivotB.z)); 
 

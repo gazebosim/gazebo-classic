@@ -35,7 +35,7 @@ namespace gazebo
 {
 	namespace physics
 {
-  class Body;
+  class Link;
   class XMLConfigNode;
   class BulletPhysics;
 
@@ -48,8 +48,8 @@ namespace gazebo
   {
   
     /// \brief Constructor
-    //public: Geom(Body *body, const std::string &name);
-    public: BulletGeom(Body *body);
+    //public: Geom(Link *body, const std::string &name);
+    public: BulletGeom(Link *body);
   
     /// \brief Destructor
     public: virtual ~BulletGeom();
@@ -75,7 +75,7 @@ namespace gazebo
     public: virtual void SetCollideBits(unsigned int bits);
   
     /// \brief Get the mass of the geom
-    public: Mass GetBodyMassMatrix();
+    public: Mass GetLinkMassMatrix();
   
     /// \brief Get the bounding box, defined by the physics engine
     public: virtual void GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const;

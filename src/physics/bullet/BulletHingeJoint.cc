@@ -24,7 +24,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "BulletPhysics.hh"
 #include "common/XMLConfig.hh"
 #include "common/Global.hh"
@@ -63,17 +63,17 @@ void BulletHingeJoint::Load(common::XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void BulletHingeJoint::Attach( Body *one, Body *two )
+void BulletHingeJoint::Attach( Link *one, Link *two )
 {
   HingeJoint<BulletJoint>::Attach(one,two);
-  BulletBody *bulletBody1 = dynamic_cast<BulletBody*>(this->body1);
-  BulletBody *bulletBody2 = dynamic_cast<BulletBody*>(this->body2);
+  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
+  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
-  if (!bulletBody1 || !bulletBody2)
+  if (!bulletLink1 || !bulletLink2)
     gzthrow("Requires bullet bodies");
 
-  btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
-  btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
+  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
+  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
 
   math::Vector3 pivotA, pivotB;
   btmath::Vector3 axisA, axisB;
@@ -85,7 +85,7 @@ void BulletHingeJoint::Attach( Body *one, Body *two )
   axisA = btmath::Vector3((**this->axisP).x,(**this->axisP).y,(**this->axisP).z);
   axisB = btmath::Vector3((**this->axisP).x,(**this->axisP).y,(**this->axisP).z);
 
-  this->constraint = new btHingeConstraint( *rigidBody1, *rigidBody2,
+  this->constraint = new btHingeConstraint( *rigidLink1, *rigidLink2,
       btmath::Vector3(pivotA.x, pivotA.y, pivotA.z),
       btmath::Vector3(pivotB.x, pivotB.y, pivotB.z), axisA, axisB); 
 
@@ -102,7 +102,7 @@ void BulletHingeJoint::Attach( Body *one, Body *two )
 math::Vector3 BulletHingeJoint::GetAnchor(int index ) const
 {
   btTransform trans = ((btHingeConstraint*)this->constraint)->getAFrame();
-  trans.getOrigin() += this->constraint->getRigidBodyA().getCenterOfMassTransform().getOrigin();
+  trans.getOrigin() += this->constraint->getRigidLinkA().getCenterOfMassTransform().getOrigin();
   return math::Vector3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
 }
 

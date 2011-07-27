@@ -20,7 +20,7 @@
  * SVN: $Id:$
  */
 
-#include "Body.hh"
+#include "Link.hh"
 #include "BulletRayGeom.hh"
 
 using namespace gazebo;
@@ -33,7 +33,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletRayGeom::BulletRayGeom( Body *body, bool displayRays )
+BulletRayGeom::BulletRayGeom( Link *body, bool displayRays )
     : RayGeom<BulletGeom>(body, displayRays)
 {
 }

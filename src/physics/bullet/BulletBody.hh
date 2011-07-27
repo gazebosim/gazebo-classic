@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet Body class
+/* Desc: Bullet Link class
  * Author: Nate Koenig
  * Date: 15 May 2009
  * SVN: $Id$
@@ -24,7 +24,7 @@
 #define BulletBODY_HH
 
 #include "BulletPhysics.hh"
-#include "Body.hh"
+#include "Link.hh"
 
 namespace gazebo
 {
@@ -38,14 +38,14 @@ namespace gazebo
   /// \brief The body class
   /// \{
 
-  /// Body class
-  class BulletBody : public Body
+  /// Link class
+  class BulletLink : public Link
   {
     /// \brief Constructor
-    public: BulletBody(Entity *parent);
+    public: BulletLink(Entity *parent);
 
     /// \brief Destructor
-    public: virtual ~BulletBody();
+    public: virtual ~BulletLink();
 
     /// \brief Load the body based on an common::XMLConfig node
     /// \param node common::XMLConfigNode pointer
@@ -111,7 +111,7 @@ namespace gazebo
     public: void SetSelfCollide(bool collide);
 
     /// \brief Get the bullet rigid body
-    public: btRigidBody *GetBulletBody() const;
+    public: btRigidLink *GetBulletLink() const;
 
     /// \brief Set the linear damping factor
     public: virtual void SetLinearDamping(double damping);
@@ -124,7 +124,7 @@ namespace gazebo
 
     private: btCompoundShape *compoundShape;
     private: BulletMotionState *motionState;
-    private: btRigidBody *rigidBody;
+    private: btRigidLink *rigidLink;
     private: BulletPhysics *bulletPhysics;
 
     protected: math::Pose pose;

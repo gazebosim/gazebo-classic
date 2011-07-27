@@ -109,7 +109,7 @@ namespace gazebo
     protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream);
    
     /// \brief Attach the two bodies with this joint
-    public: virtual void Attach( Body *one, Body *two );
+    public: virtual void Attach( Link *one, Link *two );
 
     /// \brief Set the anchor point
     public: virtual void SetAnchor( int index, const math::Vector3 &anchor );

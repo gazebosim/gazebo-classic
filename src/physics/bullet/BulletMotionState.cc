@@ -21,7 +21,7 @@
 
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
-#include "Body.hh"
+#include "Link.hh"
 #include "BulletMotionState.hh"
 
 using namespace gazebo;
@@ -34,7 +34,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletMotionState::BulletMotionState(Body *body)
+BulletMotionState::BulletMotionState(Link *body)
   : btMotionState()
 {
   this->body = body;

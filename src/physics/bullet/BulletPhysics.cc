@@ -20,7 +20,7 @@
  * SVN: $Id: BulletPhysics.cc 7714 2009-05-23 18:08:49Z natepak $
  */
 
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "BulletPlaneShape.hh"
 #include "BulletSphereShape.hh"
 #include "BulletBoxShape.hh"
@@ -176,32 +176,32 @@ void BulletPhysics::RemoveEntity(Entity *entity)
 // Add an entity to the world
 void BulletPhysics::AddEntity(Entity *entity)
 {
-  BulletBody *body = dynamic_cast<BulletBody*>(entity);
+  BulletLink *body = dynamic_cast<BulletLink*>(entity);
 
-  this->dynamicsWorld->addRigidBody(body->GetBulletBody());
+  this->dynamicsWorld->addRigidLink(body->GetBulletLink());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
-Body *BulletPhysics::CreateBody(Entity *parent)
+Link *BulletPhysics::CreateLink(Entity *parent)
 {
-  BulletBody *body = new BulletBody(parent);
+  BulletLink *body = new BulletLink(parent);
 
   return body;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a new geom
-Geom *BulletPhysics::CreateGeom(std::string type, Body *parent)
+Geom *BulletPhysics::CreateGeom(std::string type, Link *parent)
 {
   BulletGeom *geom = NULL;
   Shape *shape = NULL;
-  BulletBody *body = NULL;
+  BulletLink *body = NULL;
 
-  body = dynamic_cast<BulletBody*>(parent);
+  body = dynamic_cast<BulletLink*>(parent);
 
   if (body == NULL)
-    gzthrow("CreateGeom requires an BulletBody as a parent");
+    gzthrow("CreateGeom requires an BulletLink as a parent");
 
   geom = new BulletGeom(parent);
 
@@ -258,7 +258,7 @@ void BulletPhysics::ConvertMass(void *engineMass, const Mass &mass)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create an object to hold a set of ray geoms
-/*PhysicsRaySensor *BulletPhysics::CreateRaySensor(Body *body)
+/*PhysicsRaySensor *BulletPhysics::CreateRaySensor(Link *body)
 {
   return NULL;
 }*/

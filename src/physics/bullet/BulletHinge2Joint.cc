@@ -23,7 +23,7 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "common/XMLConfig.hh"
 #include "BulletPhysics.hh"
 #include "BulletHinge2Joint.hh"
@@ -67,17 +67,17 @@ void BulletHinge2Joint::SaveJoint(std::string &prefix, std::ostream &stream)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void BulletHinge2Joint::Attach( Body *one, Body *two )
+void BulletHinge2Joint::Attach( Link *one, Link *two )
 {
   Hinge2Joint<BulletJoint>::Attach(one,two);
-  BulletBody *bulletBody1 = dynamic_cast<BulletBody*>(this->body1);
-  BulletBody *bulletBody2 = dynamic_cast<BulletBody*>(this->body2);
+  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
+  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
-  if (!bulletBody1 || !bulletBody2)
+  if (!bulletLink1 || !bulletLink2)
     gzthrow("Requires bullet bodies");
 
-  btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
-  btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
+  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
+  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
 
   btmath::Vector3 anchor, axis1, axis2;
 
@@ -85,7 +85,7 @@ void BulletHinge2Joint::Attach( Body *one, Body *two )
   axis1 = btmath::Vector3((**this->axis1P).x,(**this->axis1P).y,(**this->axis1P).z);
   axis2 = btmath::Vector3((**this->axis2P).x,(**this->axis2P).y,(**this->axis2P).z);
 
-  this->constraint = new btHinge2Constraint( *rigidBody1, *rigidBody2,
+  this->constraint = new btHinge2Constraint( *rigidLink1, *rigidLink2,
       anchor, axis1, axis2); 
 
   // Add the joint to the world

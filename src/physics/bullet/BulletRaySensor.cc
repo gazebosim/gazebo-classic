@@ -25,7 +25,7 @@
 
 #include "BulletRayGeom.hh"
 #include "BulletPhysics.hh"
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "BulletRaySensor.hh"
 
 using namespace gazebo;
@@ -38,13 +38,13 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-BulletRaySensor::BulletRaySensor(Body *_body)
+BulletRaySensor::BulletRaySensor(Link *_body)
   : PhysicsRaySensor(_body)
 {
-  this->body = dynamic_cast<BulletBody*>(_body);
+  this->body = dynamic_cast<BulletLink*>(_body);
 
   if (this->body == NULL)
-    gzthrow("BulletRaySensor requires an BulletBody");
+    gzthrow("BulletRaySensor requires an BulletLink");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

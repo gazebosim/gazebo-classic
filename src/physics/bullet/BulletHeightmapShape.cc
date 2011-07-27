@@ -30,7 +30,7 @@
 #include "common/Global.hh"
 #include "rendering/OgreHeightmap.hh"
 #include "common/Exception.hh"
-#include "Body.hh"
+#include "Link.hh"
 #include "BulletHeightmapGeom.hh"
 
 using namespace gazebo;
@@ -43,7 +43,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletHeightmapGeom::BulletHeightmapGeom(Body *body)
+BulletHeightmapGeom::BulletHeightmapGeom(Link *body)
     : BulletGeom(body)
 {
   common::Param::Begin(&this->parameters);

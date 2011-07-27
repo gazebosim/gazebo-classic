@@ -23,7 +23,7 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletBody.hh"
+#include "BulletLink.hh"
 #include "common/XMLConfig.hh"
 #include "BulletSliderJoint.hh"
 
@@ -59,24 +59,24 @@ void BulletSliderJoint::Load(common::XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void BulletSliderJoint::Attach( Body *one, Body *two )
+void BulletSliderJoint::Attach( Link *one, Link *two )
 {
   SliderJoint<BulletJoint>::Attach(one,two);
-  BulletBody *bulletBody1 = dynamic_cast<BulletBody*>(this->body1);
-  BulletBody *bulletBody2 = dynamic_cast<BulletBody*>(this->body2);
+  BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
+  BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
-  if (!bulletBody1 || !bulletBody2)
+  if (!bulletLink1 || !bulletLink2)
     gzthrow("Requires bullet bodies");
 
-  btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
-  btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
+  btRigidLink *rigidLink1 = bulletLink1->GetBulletLink();
+  btRigidLink *rigidLink2 = bulletLink2->GetBulletLink();
 
   btmath::Vector3 anchor, axis1, axis2;
   btTransform frame1, frame2;
   frame1 = btTransform::getIdentity();
   frame2 = btTransform::getIdentity();
 
-  this->constraint = new btSliderConstraint( *rigidBody1, *rigidBody2,
+  this->constraint = new btSliderConstraint( *rigidLink1, *rigidLink2,
       frame1, frame2, true); 
 
   // Add the joint to the world
