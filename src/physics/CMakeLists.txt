@@ -7,7 +7,7 @@ link_directories( ${tinyxml_library_dirs})
 add_definitions(${tinyxml_cflags})
 
 set (sources Base.cc
-             Body.cc
+             Link.cc
              BoxShape.cc
              Contact.cc
              CylinderShape.cc
@@ -32,7 +32,7 @@ set (sources Base.cc
 
 set (headers BallJoint.hh
              Base.hh
-             Body.hh
+             Link.hh
              BoxShape.hh
              Contact.hh
              CylinderShape.hh
