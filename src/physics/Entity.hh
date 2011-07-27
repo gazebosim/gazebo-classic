@@ -143,7 +143,14 @@ namespace gazebo
       /// \return A math::Vector3 for the acceleration
       public: virtual math::Vector3 GetWorldAngularAccel() const
               {return math::Vector3();}
- 
+
+      /// \brief Set to true if this entity is a canonical link for a model.
+      /// \param _value True if the link is canonical.
+      public: void SetCanonicalLink(bool _value);
+
+      /// \brief A helper function that checks if this is a canonical body
+      public: bool IsCanonicalLink() const;
+
       private: void PublishPose();
  
       /// \brief Get the parent model, if one exists
@@ -160,11 +167,11 @@ namespace gazebo
       /// A helper that prevents numerous dynamic_casts
       private: EntityPtr parentEntity;
 
-      /// A helper function that checks if this is a canonical body
-      private: bool IsCanonicalBody() const;
-
       private: bool isStatic;
 
+      /// \brief Only used by Links. Included here for performance.
+      private: bool isCanonicalLink;
+  
       /// The initial pose of the entity
       private: math::Pose initialPose;
       private: math::Pose relativePose;
