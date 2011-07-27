@@ -29,6 +29,7 @@
 #include "common/Events.hh"
 #include "common/Time.hh"
 #include "math/Pose.hh"
+#include "transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -91,6 +92,8 @@ namespace gazebo
       protected: math::Pose pose;
       protected: std::string typeName;
       protected: std::vector<event::ConnectionPtr> connections;
+      protected: transport::NodePtr node;
+      protected: transport::SubscriberPtr poseSub;
     };
     /// \}
   }

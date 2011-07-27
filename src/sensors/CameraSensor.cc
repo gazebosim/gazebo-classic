@@ -25,6 +25,8 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 
+#include "transport/transport.h"
+
 #include "rendering/Camera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/RenderEngine.hh"
@@ -66,7 +68,11 @@ void CameraSensor::Load( sdf::ElementPtr &_sdf )
 void CameraSensor::Load()
 {
   Sensor::Load();
+  this->poseSub = this->node->Subscribe("~/pose", 
+                                        &CameraSensor::OnPose, this );
 }
+
+
  
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
@@ -103,8 +109,8 @@ void CameraSensor::Init()
   this->ogreTextureName = this->GetName() + "_RttTex";
   this->camera->CreateRenderTexture(this->ogreTextureName);
 
-  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-  this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+//  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+ // this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
 
 }
 
@@ -162,4 +168,9 @@ void CameraSensor::Update(bool force)
   if (this->active)
     this->UpdateCam();
     */
+}
+
+void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
+{
+  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
 }

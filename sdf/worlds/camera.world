@@ -40,7 +40,8 @@
         </visual>
       </link>
     </model>
-    <model name="camera_model" static="true">
+
+    <model name="camera_model" static="false">
       <origin pose="0 0 5 0.0 0.0 0"/>
       <link name="my_link">
         <inertial mass="1.0">

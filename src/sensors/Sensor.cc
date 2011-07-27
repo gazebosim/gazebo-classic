@@ -20,6 +20,7 @@
  */
 
 #include "sdf/sdf_parser.h"
+#include "transport/transport.h"
 
 #include "common/Timer.hh"
 #include "common/Console.hh"
@@ -38,6 +39,8 @@ Sensor::Sensor()
   sdf::initFile( "/sdf/sensor.sdf", this->sdf );
 
   this->active = true;
+
+  this->node = transport::NodePtr(new transport::Node());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +65,9 @@ void Sensor::Load()
   {
      this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
   }
+
+  // FIXME: this->sdf->GetWorldName()
+  this->node->Init("default");
 }
  
 ////////////////////////////////////////////////////////////////////////////////
