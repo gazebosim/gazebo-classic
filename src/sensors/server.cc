@@ -3,6 +3,8 @@
 #include "common/SystemPaths.hh"
 #include "transport/Transport.hh"
 #include "sensors/Sensors.hh"
+#include "rendering/Rendering.hh"
+#include "rendering/RenderEngine.hh"
 
 #include "gazebo.h"
 
@@ -15,20 +17,25 @@ void SignalHandler( int )
   quit = true;
 }
 
-void Load(const std::string &/*filename*/)
+void Load()
 {
   gazebo::load();
 
   /// Init the sensors library
   gazebo::sensors::load();
   gazebo::sensors::init();
+
+  gazebo::rendering::create_scene("default");
+  usleep(100000);
 }
 
 void Run()
 {
+  gazebo::run();
   while (!quit)
   {
     gazebo::sensors::run_once(true);
+    usleep(1000000);
   }
 }
 
@@ -40,7 +47,7 @@ int main(int /*argc*/, char ** /*argv*/)
     return -1;
   }
 
-  Load("");
+  Load();
   Run();
 
   return 0;
