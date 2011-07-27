@@ -192,10 +192,6 @@ namespace gazebo
       // Helper entity for separating body pose from center-of-mass pose
       protected: EntityPtr comEntity;
   
-      /// The pose of the body relative to the model. Can also think of this
-      /// as the body's pose offset.
-      protected: math::Pose relativePose;
- 
       protected: InertialPtr inertial;
 
       protected: std::vector< std::string > cgVisuals;

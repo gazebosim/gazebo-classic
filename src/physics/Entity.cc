@@ -174,26 +174,6 @@ void Entity::SetCanonicalLink(bool _value)
 // Am I a canonical Link for my Model parent?
 bool Entity::IsCanonicalLink() const
 {
-  /*// test if this entity is the canonical link of parent model
-  ModelPtr parentModel;
-  LinkPtr canonicalLink;
-  if (this->parent && this->parent->HasType(MODEL))
-  {
-    parentModel = boost::shared_static_cast<Model>(this->parent);
-    //gzdbg << "pm " << parentModel->GetCompleteScopedName() << "\n";
-    if (parentModel)
-    {
-      canonicalLink = parentModel->GetLink();
-      if (canonicalLink)
-      {
-        //gzdbg << "cb " << canonicalLink->GetCompleteScopedName()
-        //      << "b " << this->GetCompleteScopedName() << "\n";
-        if (canonicalLink->GetCompleteScopedName() == this->GetCompleteScopedName())
-          return true;
-      }
-    }
-  }
-  */
   return this->isCanonicalLink;
 }
 
@@ -262,7 +242,7 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
         }
       }
       // push changes for this canonical link back to the physics engine
-      this->UpdatePhysicsPose(true);
+      //this->UpdatePhysicsPose(false);
 
       // unlock physics
     }

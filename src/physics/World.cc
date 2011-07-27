@@ -65,13 +65,13 @@ class ModelUpdate_TBB
 
 ////////////////////////////////////////////////////////////////////////////////
 // constructor
-World::World(const std::string &name)
+World::World(const std::string &_name)
 {
   this->stepInc = false;
   this->pause = false;
   this->thread = NULL;
 
-  this->name = name;
+  this->name = _name;
 
   this->updateMutex = new boost::mutex();
 
@@ -96,6 +96,12 @@ World::~World()
 void World::Load( sdf::ElementPtr _sdf )
 {
   this->sdf = _sdf;
+
+  if (this->sdf->GetValueString("name").empty())
+    gzwarn << "create_world(world_name=[" << this->name << "]) overwrites sdf world name\n!";
+  else
+    this->name = this->sdf->GetValueString("name");
+
   this->sceneMsg.CopyFrom( 
         msgs::SceneFromSDF(_sdf->GetElement("scene")) );
 

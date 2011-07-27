@@ -73,17 +73,18 @@ void RaySensor::Load( )
   std::string modelName = this->sdf->GetModelName();
   //gzerr << "parent model name : " << modelName << "\n";
 
-  // get parent link by looking at real parent
-  std::string linkFullyScopedName = "root::" + modelName + "::" + linkName;
-  //gzerr << "scoped link name : " << linkFullyScopedName << "\n";
-
   std::string worldName = this->sdf->GetWorldName();
   //gzerr << "parent world name : " << worldName << "\n";
 
+  // get parent link by looking at real parent
+  std::string linkFullyScopedName = worldName + "::" + modelName + "::" + linkName;
+  //gzerr << "scoped link name : " << linkFullyScopedName << "\n";
 
-  worldName = "default"; // TODO: HACK!! for now there is only one default world
+
   this->world = gazebo::physics::get_world(worldName);
   this->model = this->world->GetModelByName(modelName);
+  gazebo::physics::BasePtr tmp = this->model->GetByName(linkFullyScopedName);
+  printf("ok\n");
   this->link = boost::dynamic_pointer_cast<gazebo::physics::Link>(this->model->GetByName(linkFullyScopedName));
 
   if (this->link == NULL)

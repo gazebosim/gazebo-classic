@@ -33,8 +33,9 @@ namespace gazebo
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->GetValueString("name");
 
-      // Get the default world.
-      physics::WorldPtr world = physics::get_world("default");
+      // Get the world name.
+      std::string worldName = _sdf->GetWorldName();
+      physics::WorldPtr world = physics::get_world(worldName);
 
       // Get a pointer to the model
       this->model = world->GetModelByName(modelName);
@@ -51,7 +52,7 @@ namespace gazebo
 
 
       this->node = transport::NodePtr(new transport::Node());
-      this->node->Init("default");
+      this->node->Init(worldName);
       this->statsSub = this->node->Subscribe("~/world_stats", &RayTest::OnStats, this);
 
     }

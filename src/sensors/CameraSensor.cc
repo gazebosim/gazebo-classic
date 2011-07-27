@@ -176,6 +176,6 @@ void CameraSensor::Update(bool force)
 
 void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
 {
-  if (_msg->header().str_id() == "default::camera_model")
-    gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
+  //if (_msg->header().str_id() == "world_1::camera_model")
+  //  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
 }

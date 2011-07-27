@@ -191,6 +191,7 @@ void Model::Init()
 
   // Record the model's initial pose (for reseting)
   this->SetInitialPose( pose );
+  //this->SetInitialPose( this->GetWorldPose() );
 
   /// FIXME: Model::pose is set to the pose of first link
   ///        warn users for now, need  to add parsing of
@@ -201,6 +202,7 @@ void Model::Init()
     {
       gzwarn << "Model Canonical Link is presetting to first link for now, ignoring any canonical tag if one exists in your xml\n";
       this->canonicalLink = boost::shared_static_cast<Link>(this->children[i]);
+      //this->canonicalLink->SetCanonicalLink(true);
       break;
     }
   }
@@ -359,6 +361,7 @@ void Model::Reset()
   std::map<std::string, Controller* >::iterator citer;
   math::Vector3 v(0,0,0);
 
+  //this->SetWorldPose(this->initPose);  // this has to be relative for nested models to work
   this->SetRelativePose(this->initPose);  // this has to be relative for nested models to work
 
   for (citer=this->controllers.begin(); citer!=this->controllers.end(); citer++)
@@ -665,13 +668,12 @@ void Model::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  /*gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
+  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
   if (plugin)
   {
     plugin->Load(_sdf);
     this->plugins.push_back( plugin );
   }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

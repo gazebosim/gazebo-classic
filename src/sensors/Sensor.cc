@@ -66,8 +66,7 @@ void Sensor::Load()
      this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
   }
 
-  // FIXME: this->sdf->GetWorldName()
-  this->node->Init("default");
+  this->node->Init(this->sdf->GetWorldName());
 }
  
 ////////////////////////////////////////////////////////////////////////////////

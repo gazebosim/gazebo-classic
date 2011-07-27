@@ -23,7 +23,7 @@ RenderWidget::RenderWidget( QWidget *parent )
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->glWidget = new GLWidget(mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene("default");
+  rendering::ScenePtr scene = rendering::create_scene("world_1");
   this->glWidget->ViewScene( scene );
 
   this->xPosEdit = new QLineEdit;

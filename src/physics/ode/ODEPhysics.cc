@@ -697,23 +697,23 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
       // TODO: put this back in.
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
-      /*double h = this->stepTimeDouble;
+      double h = this->stepTimeDouble;
       double kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
       double kd = geom1->surface->kd + geom2->surface->kd;
       contact.surface.soft_erp = h * kp / (h * kp + kd);
       contact.surface.soft_cfm = 1.0 / (h * kp + kd);
+      /*
+      contact.surface.soft_erp = 0.5*(geom1->surface->softERP +
+                                      geom2->surface->softERP);
+      contact.surface.soft_cfm = 0.5*(geom1->surface->softCFM +
+                                      geom2->surface->softCFM);
       */
-     
+
       /* 
       contact.fdir1[0] = 0.5*(geom1->surface->fdir1.x+geom2->surface->fdir1.x);
       contact.fdir1[1] = 0.5*(geom1->surface->fdir1.y+geom2->surface->fdir1.y);
       contact.fdir1[2] = 0.5*(geom1->surface->fdir1.z+geom2->surface->fdir1.z);
       */
-
-      contact.surface.soft_erp = 0.5*(geom1->surface->softERP +
-                                      geom2->surface->softERP);
-      contact.surface.soft_cfm = 0.5*(geom1->surface->softCFM +
-                                      geom2->surface->softCFM);
 
       contact.surface.mu = std::min(geom1->surface->mu1, geom2->surface->mu1);
       contact.surface.mu2 = std::min(geom1->surface->mu2, geom2->surface->mu2);

@@ -58,7 +58,7 @@ void Server::Load(const std::string &filename)
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   while(worldElem)
   {
-    physics::WorldPtr world = physics::create_world("default");
+    physics::WorldPtr world = physics::create_world();
 
     //Create the world
     try

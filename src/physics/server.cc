@@ -102,7 +102,7 @@ void Load()
 
   while(worldElem)
   {
-    gazebo::physics::WorldPtr world = gazebo::physics::create_world("default");
+    gazebo::physics::WorldPtr world = gazebo::physics::create_world(worldElem->GetValueString("name"));
 
     worlds.push_back(world);
 

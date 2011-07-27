@@ -60,7 +60,7 @@ namespace gazebo
     class World : public boost::enable_shared_from_this<World>
     {
       /// Private constructor
-      public: World(const std::string &name);
+      public: World(const std::string &_name="");
     
       /// Private destructor
       public: ~World();

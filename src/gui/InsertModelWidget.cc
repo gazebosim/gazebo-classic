@@ -66,7 +66,7 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
   }
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init("world_1");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->visualPub = this->node->Advertise<msgs::Visual>("~/visual");

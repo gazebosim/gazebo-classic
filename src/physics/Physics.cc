@@ -16,6 +16,7 @@
 */
 
 #include "common/Console.hh"
+#include "common/Exception.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
@@ -23,7 +24,7 @@
 
 using namespace gazebo;
 
-std::map<std::string, physics::WorldPtr> g_worlds;
+std::vector<physics::WorldPtr> g_worlds;
 
 bool physics::load()
 {
@@ -40,57 +41,54 @@ bool physics::fini()
 physics::WorldPtr physics::create_world(const std::string &_name)
 {
   physics::WorldPtr world( new physics::World(_name) );
-  g_worlds[_name] = world;
+  g_worlds.push_back(world);
   return world;
 }
 
 physics::WorldPtr physics::get_world(const std::string &_name)
 {
-  physics::WorldPtr result;
-  std::map<std::string, WorldPtr>::iterator iter;
-  iter = g_worlds.find(_name);
-
-  if (iter != g_worlds.end())
-    result = iter->second;
-  else
-    gzerr << "Unable to find world[" << _name << "]\n";
-
-  return result;
+  for( std::vector<WorldPtr>::iterator iter = g_worlds.begin();
+       iter != g_worlds.end(); iter++)
+  {
+    if ((*iter)->GetName() == _name)
+      return (*iter);
+  }
+  gzthrow("Unable to find world by name in physics::get_world(world_name)");
 }
 
 void physics::load_worlds(sdf::ElementPtr &_sdf)
 {
-  std::map<std::string, WorldPtr>::iterator iter;
+  std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
-    iter->second->Load(_sdf);
+    (*iter)->Load(_sdf);
 }
 
 void physics::init_worlds()
 {
-  std::map<std::string, WorldPtr>::iterator iter;
+  std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
-    iter->second->Init();
+    (*iter)->Init();
 }
 
 void physics::run_worlds()
 {
-  std::map<std::string, WorldPtr>::iterator iter;
+  std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
-    iter->second->Run();
+    (*iter)->Run();
 }
 
 void physics::pause_worlds(bool _pause)
 {
-  std::map<std::string, WorldPtr>::iterator iter;
+  std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
-    iter->second->SetPaused(_pause);
+    (*iter)->SetPaused(_pause);
 }
 
 void physics::stop_worlds()
 {
-  std::map<std::string, WorldPtr>::iterator iter;
+  std::vector<WorldPtr>::iterator iter;
   for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
-    iter->second->Stop();
+    (*iter)->Stop();
 }
 
 void physics::load_world(WorldPtr world, sdf::ElementPtr &_sdf)

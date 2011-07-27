@@ -32,7 +32,7 @@ MainWindow::MainWindow()
   mainWidget->show();
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init("world_1");
   this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->glWidget = new RenderWidget(mainWidget);
