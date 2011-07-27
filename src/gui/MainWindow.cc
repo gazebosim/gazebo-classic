@@ -57,8 +57,11 @@ MainWindow::MainWindow()
 
   this->setCentralWidget(mainWidget);
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
-  this->setWindowIconText(tr("Gazebo"));
-  this->setWindowTitle(tr("Gazebo"));
+
+  std::string title = "Gazebo : ";
+  title += gui::get_world();
+  this->setWindowIconText(tr(title.c_str()));
+  this->setWindowTitle(tr(title.c_str()));
 
   this->worldPropertiesWidget = NULL;
 }
