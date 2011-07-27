@@ -169,11 +169,7 @@ void Scene::Init()
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
-  /*if (this->sdf->HasElement("shadows") && 
-      this->sdf->GetElement("shadows")->GetValueBool("enabled"))
-  {
-    RTShaderSystem::Instance()->ApplyShadows(this);
-  }*/
+  RTShaderSystem::Instance()->ApplyShadows(this);
 
   // Send a request to get the current world state
   // TODO: Use RPC or some service call to get this properly
@@ -1109,14 +1105,14 @@ void Scene::SetSky(const std::string &_material)
 /// Set whether shadows are on or off
 void Scene::SetShadowsEnabled(bool _value)
 {
-  /*if (_value != this->shadowsEnabled)
+  if (_value != this->shadowsEnabled)
   {
     this->shadowsEnabled = _value;
     if (this->shadowsEnabled)
       RTShaderSystem::Instance()->ApplyShadows(this);
     else
       RTShaderSystem::Instance()->RemoveShadows(this);
-  }*/
+  }
 }
 
 /// Get whether shadows are on or off
