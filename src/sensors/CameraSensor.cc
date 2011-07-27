@@ -66,22 +66,15 @@ void CameraSensor::Load( sdf::ElementPtr &_sdf )
 void CameraSensor::Load()
 {
   Sensor::Load();
+}
+ 
+//////////////////////////////////////////////////////////////////////////////
+// Initialize the camera
+void CameraSensor::Init()
+{
+  Sensor::Init();
 
-  std::string worldName;
-
-  sdf::ElementPtr sdfParent = this->sdf->GetParent();
-  while (sdfParent && sdfParent->GetName() != "world")
-  {
-    sdfParent = sdfParent->GetParent();
-  }
-
-  if (!sdfParent)
-  {
-    gzerr << "Unable to get camera sensor world name\n";
-    return;
-  }
-
-  worldName = sdfParent->GetValueString("name");
+  std::string worldName = "default";//this->sdf->GetWorldName("name");
 
   rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
   if (!scene)
@@ -104,20 +97,15 @@ void CameraSensor::Load()
   {
     gzthrow("image has zero size");
   }
-}
- 
-//////////////////////////////////////////////////////////////////////////////
-// Initialize the camera
-void CameraSensor::Init()
-{
-  Sensor::Init();
-  this->camera->Init();
-  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-  this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
 
+  this->camera->Init();
   // Create the render texture
   this->ogreTextureName = this->GetName() + "_RttTex";
   this->camera->CreateRenderTexture(this->ogreTextureName);
+
+  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+  this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+
 }
 
 //////////////////////////////////////////////////////////////////////////////

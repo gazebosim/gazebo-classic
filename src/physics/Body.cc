@@ -100,16 +100,6 @@ void Body::Load( sdf::ElementPtr &_sdf )
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
 
-  if (this->sdf->HasElement("sensor"))
-  {
-    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
-    while (sensorElem)
-    {
-      this->LoadSensor(sensorElem);
-      sensorElem = this->sdf->GetNextElement("visual", sensorElem); 
-    }
-  }
-
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
   {
@@ -141,6 +131,16 @@ void Body::Load( sdf::ElementPtr &_sdf )
       // Create and Load a geom, which will belong to this body.
       this->LoadGeom(collisionElem);
       collisionElem = this->sdf->GetNextElement("collision", collisionElem); 
+    }
+  }
+
+  if (this->sdf->HasElement("sensor"))
+  {
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      this->LoadSensor(sensorElem);
+      sensorElem = this->sdf->GetNextElement("visual", sensorElem); 
     }
   }
 }
