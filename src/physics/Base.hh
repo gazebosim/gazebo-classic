@@ -73,7 +73,7 @@ namespace gazebo
       public: virtual void Update() {}
 
       /// \brief Set the name of the entity
-      /// \param name Body name
+      /// \param name Link name
       public: virtual void SetName(const std::string &name);
     
       /// \brief Return the name of the entity
