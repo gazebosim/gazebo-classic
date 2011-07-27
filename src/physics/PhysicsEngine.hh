@@ -23,6 +23,7 @@
 
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
+#include "msgs/msgs.h"
 #include "transport/TransportTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
@@ -122,13 +123,19 @@ namespace gazebo
       /// \brief Add a contact visual
       protected: void AddContactVisual(const math::Vector3 &pos_, 
                                        const math::Vector3 &norm_);
-  
+      protected: virtual void OnPhysicsRequest( 
+                 const boost::shared_ptr<msgs::Request const> &/*_msg*/ )
+                 {}
+
+
       protected: WorldPtr world;
       protected: sdf::ElementPtr sdf;
   
       protected: std::string visual;
       protected: transport::NodePtr node;
-      protected: transport::PublisherPtr vis_pub;
+      protected: transport::PublisherPtr visPub;
+      protected: transport::PublisherPtr physicsPub;
+      protected: transport::SubscriberPtr physicsRequestSub;
       private: event::ConnectionPtr showContactConnection; 
   
       //private: std::vector<OgreDynamicLines*> contactLines;

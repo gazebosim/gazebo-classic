@@ -223,7 +223,8 @@ void MultiRayShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
-void MultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
+void MultiRayShape::AddRay(const math::Vector3 &start, 
+                           const math::Vector3 &end )
 {
   msgs::Point *pt = NULL;
 

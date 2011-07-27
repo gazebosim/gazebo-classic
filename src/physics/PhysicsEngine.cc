@@ -39,7 +39,10 @@ PhysicsEngine::PhysicsEngine(WorldPtr world)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(world->GetName());
-  this->vis_pub = this->node->Advertise<msgs::Visual>("~/visual");
+  this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
+  this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+  this->physicsRequestSub = this->node->Subscribe("~/physics_request", 
+                                        &PhysicsEngine::OnPhysicsRequest, this);
 
   {
     /*this->visualMsg = new VisualMsg();
@@ -108,7 +111,7 @@ PhysicsEngine::~PhysicsEngine()
     msgs::Visual msg;
     msgs::Init(msg, this->visual);
     msg.set_action( msgs::Visual::DELETE );
-    this->vis_pub->Publish(msg);
+    this->visPub->Publish(msg);
   }
 }
 
@@ -169,7 +172,7 @@ void PhysicsEngine::ShowContacts(const bool &show)
   msgs::Visual msg;
   msgs::Init(msg, this->visual);
   msg.set_visible( show );
-  this->vis_pub->Publish(msg);
+  this->visPub->Publish(msg);
 
   /* TODO put back in
   if (show)

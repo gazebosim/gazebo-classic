@@ -29,6 +29,8 @@
 #include "math/Vector3.hh"
 #include "common/Time.hh"
 
+#include "transport/Publisher.hh"
+
 #include "physics/PhysicsFactory.hh"
 #include "physics/World.hh"
 #include "physics/Entity.hh"
@@ -205,6 +207,26 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
     this->physicsStepFunc = &dWorldStep;
   else
     gzthrow(std::string("Invalid step type[") + this->stepType);
+
+}
+
+void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
+{
+  msgs::Physics msg;
+  msgs::Init(msg, "ode_physics");
+  msg.set_type( msgs::Physics::ODE );
+  msg.set_solver_type( this->stepType );
+  msg.set_dt( this->stepTimeDouble );
+  msg.set_iters( this->GetSORPGSIters() );
+  msg.set_sor( this->GetSORPGSW() );
+  msg.set_cfm( this->GetWorldCFM() );
+  msg.set_erp( this->GetWorldERP() );
+  msg.set_contact_max_correcting_vel( this->GetContactMaxCorrectingVel() );
+  msg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
+  msg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
+  this->physicsPub->Publish( msg );
+  gzdbg << "Publish physics msg\n";
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -549,6 +571,13 @@ void ODEPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
 {
   this->sdf->GetOrCreateElement("gravity")->GetAttribute("xyz")->Set(gravity);
   dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get gravity vector
+math::Vector3 ODEPhysics::GetGravity() const
+{
+  return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -114,7 +114,10 @@ namespace gazebo
   
     /// \brief Set the gavity vector
     public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
-  
+
+    /// \brief Get gravity vector
+    public: math::Vector3 GetGravity() const;
+
     /// \brief access functions to set ODE parameters
     public: void SetWorldCFM(double cfm);
     /// \brief access functions to set ODE parameters
@@ -155,6 +158,9 @@ namespace gazebo
                          dContactGeom *contactGeoms);
   
     public: void ProcessContactFeedback(ContactFeedback &feedback);
+
+    protected: virtual void OnPhysicsRequest( 
+                 const boost::shared_ptr<msgs::Request const> &/*_msg*/ );
 
     /// \brief Top-level world for all bodies
     private: dWorldID worldId;
