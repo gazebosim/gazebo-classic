@@ -24,7 +24,7 @@
 #include "common/Console.hh"
 #include "common/Global.hh"
 
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
 
 using namespace gazebo;
@@ -70,8 +70,8 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int index) const
 // Set the anchor point
 void ODEHinge2Joint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 {
-  if (this->childBody) this->childBody->SetEnabled(true);
-  if (this->parentBody) this->parentBody->SetEnabled(true);
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
   dJointSetHinge2Anchor( this->jointId, anchor.x, anchor.y, anchor.z );
 }
 
@@ -79,8 +79,8 @@ void ODEHinge2Joint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 // Set the first axis of rotation
 void ODEHinge2Joint::SetAxis( int index, const math::Vector3 &axis )
 {
-  if (this->childBody) this->childBody->SetEnabled(true);
-  if (this->parentBody) this->parentBody->SetEnabled(true);
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 
   if (index == 0)
     dJointSetHinge2Axis1( this->jointId, axis.x, axis.y, axis.z );
@@ -176,8 +176,8 @@ void ODEHinge2Joint::SetMaxForce(int index, double t)
 // Set _parameter with _value
 void ODEHinge2Joint::SetForce(int index, double torque)
 {
-  if (this->childBody) this->childBody->SetEnabled(true);
-  if (this->parentBody) this->parentBody->SetEnabled(true);
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 
   if (index == 0)
     dJointAddHinge2Torques(this->jointId, torque, 0);

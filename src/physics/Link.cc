@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Body class
+/* Desc: Link class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
@@ -37,7 +37,7 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Geom.hh"
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 
 #include "transport/Publisher.hh"
 
@@ -46,7 +46,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Body::Body(EntityPtr parent)
+Link::Link(EntityPtr parent)
     : Entity(parent)
 {
   this->AddType(Base::BODY);
@@ -56,7 +56,7 @@ Body::Body(EntityPtr parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Body::~Body()
+Link::~Link()
 {
   std::vector<Entity*>::iterator iter;
 
@@ -84,7 +84,7 @@ Body::~Body()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the body
-void Body::Load( sdf::ElementPtr &_sdf )
+void Link::Load( sdf::ElementPtr &_sdf )
 {
   Entity::Load(_sdf);
 
@@ -147,7 +147,7 @@ void Body::Load( sdf::ElementPtr &_sdf )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
-void Body::Init()
+void Link::Init()
 {
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
@@ -165,8 +165,8 @@ void Body::Init()
     (*siter)->Init();
   }
 
-  // save transform from this Parent Model Frame to this Body Frame
-  // this is only used in setting Model pose from canonicalBody
+  // save transform from this Parent Model Frame to this Link Frame
+  // this is only used in setting Model pose from canonicalLink
   // the true model pose given a canonical body is
   //   this body's pose - this body's offsetFromModelFrame
   this->initModelOffset = this->GetRelativePose().CoordPoseSolve(math::Pose());
@@ -250,7 +250,7 @@ void Body::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the body
-void Body::Fini()
+void Link::Fini()
 {
   Base_V::iterator giter;
 
@@ -262,7 +262,7 @@ void Body::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide mode of the body
-void Body::SetCollideMode( const std::string &m )
+void Link::SetCollideMode( const std::string &m )
 {
   Base_V::iterator giter;
 
@@ -292,14 +292,14 @@ void Body::SetCollideMode( const std::string &m )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return Self-Collision Setting
-bool Body::GetSelfCollide()
+bool Link::GetSelfCollide()
 {
   return this->sdf->GetValueBool("self_collide");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser retro reflectiveness of this body
-void Body::SetLaserRetro(float retro)
+void Link::SetLaserRetro(float retro)
 {
   Base_V::iterator iter;
 
@@ -312,7 +312,7 @@ void Body::SetLaserRetro(float retro)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the body
-void Body::Update()
+void Link::Update()
 {
   // Apply our linear accel
   //this->SetForce(this->linearAccel);
@@ -330,7 +330,7 @@ void Body::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new sensor helper function
-void Body::LoadSensor( sdf::ElementPtr &_sdf )
+void Link::LoadSensor( sdf::ElementPtr &_sdf )
 {
   std::string type = _sdf->GetValueString("type");
   sensors::SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
@@ -347,7 +347,7 @@ void Body::LoadSensor( sdf::ElementPtr &_sdf )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new geom helper function
-void Body::LoadGeom( sdf::ElementPtr &_sdf )
+void Link::LoadGeom( sdf::ElementPtr &_sdf )
 {
   GeomPtr geom;
   std::string type = _sdf->GetElement("geometry")->GetFirstElement()->GetName();
@@ -357,7 +357,7 @@ void Body::LoadGeom( sdf::ElementPtr &_sdf )
     */
 
   geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( type, 
-      boost::shared_static_cast<Body>(shared_from_this()) );
+      boost::shared_static_cast<Link>(shared_from_this()) );
 
   if (!geom)
     gzthrow("Unknown Geometry Type["+type +"]");
@@ -367,7 +367,7 @@ void Body::LoadGeom( sdf::ElementPtr &_sdf )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear acceleration of the body
-void Body::SetLinearAccel(const math::Vector3 &accel)
+void Link::SetLinearAccel(const math::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->linearAccel = accel;// * this->GetMass();
@@ -377,7 +377,7 @@ void Body::SetLinearAccel(const math::Vector3 &accel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular acceleration of the body
-void Body::SetAngularAccel(const math::Vector3 &accel)
+void Link::SetAngularAccel(const math::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->angularAccel = accel * this->inertial->GetMass();
@@ -385,70 +385,70 @@ void Body::SetAngularAccel(const math::Vector3 &accel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the body
-math::Vector3 Body::GetRelativeLinearVel() const
+math::Vector3 Link::GetRelativeLinearVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldLinearVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the body
-math::Vector3 Body::GetRelativeAngularVel() const
+math::Vector3 Link::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldAngularVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the body
-math::Vector3 Body::GetRelativeLinearAccel() const
+math::Vector3 Link::GetRelativeLinearAccel() const
 {
   return this->GetRelativeForce() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-math::Vector3 Body::GetWorldLinearAccel() const
+math::Vector3 Link::GetWorldLinearAccel() const
 {
   return this->GetWorldForce() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-math::Vector3 Body::GetRelativeAngularAccel() const
+math::Vector3 Link::GetRelativeAngularAccel() const
 {
   return this->GetRelativeTorque() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-math::Vector3 Body::GetWorldAngularAccel() const
+math::Vector3 Link::GetWorldAngularAccel() const
 {
   return this->GetWorldTorque() / this->inertial->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force applied to the body
-math::Vector3 Body::GetRelativeForce() const
+math::Vector3 Link::GetRelativeForce() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque applied to the body
-math::Vector3 Body::GetRelativeTorque() const
+math::Vector3 Link::GetRelativeTorque() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldTorque());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the model that this body belongs to
-ModelPtr Body::GetModel() const
+ModelPtr Link::GetModel() const
 {
   return boost::shared_dynamic_cast<Model>(this->GetParent());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the body
-math::Box Body::GetBoundingBox() const
+math::Box Link::GetBoundingBox() const
 {
   math::Box box;
   Base_V::const_iterator iter;
@@ -467,7 +467,7 @@ math::Box Body::GetBoundingBox() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether this entity has been selected by the user through the gui
-bool Body::SetSelected( bool s )
+bool Link::SetSelected( bool s )
 {
   Entity::SetSelected(s);
 
@@ -479,7 +479,7 @@ bool Body::SetSelected( bool s )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Mass
-void Body::SetInertial(const InertialPtr &/*_inertial*/)
+void Link::SetInertial(const InertialPtr &/*_inertial*/)
 {
-  gzwarn << "Body::SetMass is empty\n";
+  gzwarn << "Link::SetMass is empty\n";
 }

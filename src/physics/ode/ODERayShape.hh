@@ -40,7 +40,7 @@ namespace gazebo
     class ODERayShape : public RayShape
     {
       /// \brief Constructor
-      /// \param body Body the ray is attached to
+      /// \param body Link the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when rendering images
       public: ODERayShape( GeomPtr geom, bool displayRays );
     

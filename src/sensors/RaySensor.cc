@@ -25,7 +25,7 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Physics.hh"
 #include "physics/Model.hh"
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/Geom.hh"
 #include "physics/World.hh"
 #include "common/Exception.hh"
@@ -45,6 +45,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 RaySensor::RaySensor()
     : Sensor()
 {
+  gzdbg << "New Ray Sensor\n";
   this->active = false;
   this->typeName = "ray";
 }
@@ -66,15 +67,15 @@ void RaySensor::Load( sdf::ElementPtr &_sdf )
 }
 void RaySensor::Load( )
 {
-  std::string bodyName = this->sdf->GetLinkName();
-  //gzerr << "parent body name : " << bodyName << "\n";
+  std::string linkName = this->sdf->GetLinkName();
+  //gzerr << "parent link name : " << linkName << "\n";
 
   std::string modelName = this->sdf->GetModelName();
   //gzerr << "parent model name : " << modelName << "\n";
 
-  // get parent body by looking at real parent
-  std::string bodyFullyScopedName = "root::" + modelName + "::" + bodyName;
-  //gzerr << "scoped body name : " << bodyFullyScopedName << "\n";
+  // get parent link by looking at real parent
+  std::string linkFullyScopedName = "root::" + modelName + "::" + linkName;
+  //gzerr << "scoped link name : " << linkFullyScopedName << "\n";
 
   std::string worldName = this->sdf->GetWorldName();
   //gzerr << "parent world name : " << worldName << "\n";
@@ -83,13 +84,13 @@ void RaySensor::Load( )
   worldName = "default"; // TODO: HACK!! for now there is only one default world
   this->world = gazebo::physics::get_world(worldName);
   this->model = this->world->GetModelByName(modelName);
-  this->body = boost::dynamic_pointer_cast<gazebo::physics::Body>(this->model->GetByName(bodyFullyScopedName));
+  this->link = boost::dynamic_pointer_cast<gazebo::physics::Link>(this->model->GetByName(linkFullyScopedName));
 
-  if (this->body == NULL)
-    gzthrow("Null body in the ray sensor");
+  if (this->link == NULL)
+    gzthrow("Null link in the ray sensor");
   this->physicsEngine = this->world->GetPhysicsEngine();
   this->laserGeom = this->physicsEngine->CreateGeom(
-      "multiray", this->body);
+      "multiray", this->link);
 
   this->laserGeom->SetName("Ray Sensor Geom");
 
@@ -107,8 +108,8 @@ void RaySensor::InitChild()
 {
   //gzerr << "Initializing RaySensor\n";
   this->laserShape->Init( );
-  gazebo::math::Pose bodyPose;
-  bodyPose = this->body->GetWorldPose();
+  gazebo::math::Pose linkPose;
+  linkPose = this->link->GetWorldPose();
 }
 
 //////////////////////////////////////////////////////////////////////////////

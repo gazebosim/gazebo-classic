@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Body class
+/* Desc: Link class
  * Author: Nate Koenig
  */
 
-#ifndef BODY_HH
-#define BODY_HH
+#ifndef LINK_HH
+#define LINK_HH
 
 #include <map>
 #include <vector>
@@ -42,14 +42,14 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Body class
-    class Body : public Entity
+    /// \brief Link class
+    class Link : public Entity
     {
       /// \brief Constructor
-      public: Body(EntityPtr parent);
+      public: Link(EntityPtr parent);
   
       /// \brief Destructor
-      public: virtual ~Body();
+      public: virtual ~Link();
   
       /// \brief Load the body based on an SDF element
       /// \param _sdf SDF parameters
@@ -210,7 +210,7 @@ namespace gazebo
   
       /// This flag is used to trigger the enabledSignal
       private: bool enabled;
-  
+
       protected: math::Pose newPose;
   
       private: std::vector<event::ConnectionPtr> connections;

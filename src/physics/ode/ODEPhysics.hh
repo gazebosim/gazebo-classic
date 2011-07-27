@@ -84,11 +84,11 @@ namespace gazebo
     public: virtual double GetStepTime();
  
     /// \brief Create a new body
-    public: virtual BodyPtr CreateBody(EntityPtr parent);
+    public: virtual LinkPtr CreateLink(EntityPtr parent);
   
     /// \brief Create a geom
     public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
-                                       BodyPtr parent);
+                                       LinkPtr parent);
    
     /// \brief Create a new joint
     public: virtual JointPtr CreateJoint(const std::string &type);

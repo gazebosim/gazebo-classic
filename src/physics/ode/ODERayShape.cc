@@ -19,7 +19,7 @@
  * Date: 14 Oct 2009
  */
 
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODEGeom.hh"
 #include "physics/ode/ODERayShape.hh"
@@ -55,9 +55,9 @@ void ODERayShape::Update()
 
   math::Vector3 dir;
 
-  this->globalStartPos = this->geomParent->GetBody()->GetWorldPose().CoordPositionAdd(
+  this->globalStartPos = this->geomParent->GetLink()->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
-  this->globalEndPos = this->geomParent->GetBody()->GetWorldPose().CoordPositionAdd(
+  this->globalEndPos = this->geomParent->GetLink()->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
   dir = this->globalEndPos - this->globalStartPos;

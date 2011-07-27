@@ -33,7 +33,7 @@
 #include "common/CommonTypes.hh"
 
 #include "physics/Joint.hh"
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Model.hh"
@@ -43,9 +43,9 @@
 using namespace gazebo;
 using namespace physics;
 
-class BodyUpdate_TBB
+class LinkUpdate_TBB
 {
-  public: BodyUpdate_TBB(Body_V *bodies) : bodies(bodies) {}
+  public: LinkUpdate_TBB(Link_V *bodies) : bodies(bodies) {}
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
@@ -55,7 +55,7 @@ class BodyUpdate_TBB
     }
   }
 
-  private: Body_V *bodies;
+  private: Link_V *bodies;
 };
 
 
@@ -109,10 +109,10 @@ Model::~Model()
   }
   this->controllers.clear();
 
-  if (this->myBodyNameP)
+  if (this->myLinkNameP)
   {
-    delete this->myBodyNameP;
-    this->myBodyNameP = NULL;
+    delete this->myLinkNameP;
+    this->myLinkNameP = NULL;
   }
   */
 }
@@ -134,15 +134,22 @@ void Model::Load( sdf::ElementPtr &_sdf )
   if (_sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    bool first = false;
     while (linkElem)
     {
-      // Create a new body
-      BodyPtr body = this->GetWorld()->GetPhysicsEngine()->CreateBody(
+      // Create a new link
+      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
           boost::shared_static_cast<Model>(shared_from_this()));
 
-      // Load the body using the config node. This also loads all of the
+      if (first)
+      {
+        link->SetCanonicalLink(true);
+        first = false;
+      }
+
+      // Load the link using the config node. This also loads all of the
       // bodies geometries
-      body->Load(linkElem);
+      link->Load(linkElem);
 
       linkElem = _sdf->GetNextElement("link", linkElem);
     }
@@ -185,15 +192,15 @@ void Model::Init()
   // Record the model's initial pose (for reseting)
   this->SetInitialPose( pose );
 
-  /// FIXME: Model::pose is set to the pose of first body
+  /// FIXME: Model::pose is set to the pose of first link
   ///        warn users for now, need  to add parsing of
   ///        the canonical tag in sdf
   for (unsigned int i=0; i < this->children.size(); i++)
   {
     if (this->children[i]->HasType(BODY))
     {
-      gzwarn << "Model Canonical Body is presetting to first body for now, ignoring any canonical tag if one exists in your xml\n";
-      this->canonicalBody = boost::shared_static_cast<Body>(this->children[i]);
+      gzwarn << "Model Canonical Link is presetting to first link for now, ignoring any canonical tag if one exists in your xml\n";
+      this->canonicalLink = boost::shared_static_cast<Link>(this->children[i]);
       break;
     }
   }
@@ -203,7 +210,7 @@ void Model::Init()
        iter!=this->children.end(); iter++)
   {
     if ((*iter)->HasType(BODY))
-      boost::shared_static_cast<Body>(*iter)->Init();
+      boost::shared_static_cast<Link>(*iter)->Init();
     else if ((*iter)->HasType(MODEL))
     {
       boost::shared_static_cast<Model>(*iter)->Init();
@@ -231,7 +238,7 @@ void Model::Update()
   if (!this->IsStatic())
   {
     tbb::parallel_for( tbb::blocked_range<size_t>(0, this->bodies.size(), 10),
-        BodyUpdate_TBB(&this->bodies) );
+        LinkUpdate_TBB(&this->bodies) );
   }
 
   this->contacts.clear();
@@ -276,12 +283,12 @@ void Model::RemoveChild(EntityPtr child)
         if (!(*jiter))
           continue;
 
-        BodyPtr jbody0 = (*jiter)->GetJointBody(0);
-        BodyPtr jbody1 = (*jiter)->GetJointBody(1);
+        LinkPtr jlink0 = (*jiter)->GetJointLink(0);
+        LinkPtr jlink1 = (*jiter)->GetJointLink(1);
 
-        if (!jbody0 || !jbody1 || jbody0->GetName() == child->GetName() ||
-            jbody1->GetName() == child->GetName() ||
-            jbody0->GetName() == jbody1->GetName())
+        if (!jlink0 || !jlink1 || jlink0->GetName() == child->GetName() ||
+            jlink1->GetName() == child->GetName() ||
+            jlink0->GetName() == jlink1->GetName())
         {
           this->joints.erase( jiter );
           done = false;
@@ -296,7 +303,7 @@ void Model::RemoveChild(EntityPtr child)
   Base_V::iterator iter;
   for (iter =this->children.begin(); iter != this->children.end(); iter++)
     if (*iter && (*iter)->HasType(BODY))
-      boost::static_pointer_cast<Body>(*iter)->SetEnabled(true);
+      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
 
 }
 
@@ -318,8 +325,8 @@ void Model::Fini()
   {
     if (*biter && (*biter)->HasType(BODY))
     {
-      Body *body = (Body*)*biter;
-      body->Fini();
+      Link *link = (Link*)*biter;
+      link->Fini();
     }
   }
 
@@ -368,11 +375,11 @@ void Model::Reset()
   {
     if (*biter && (*biter)->HasType(BODY))
     {
-      Body *body = (Body*)*biter;
-      body->SetLinearVel(v);
-      body->SetAngularVel(v);
-      body->SetForce(v);
-      body->SetTorque(v);
+      Link *link = (Link*)*biter;
+      link->SetLinearVel(v);
+      link->SetAngularVel(v);
+      link->SetForce(v);
+      link->SetTorque(v);
     }
   }
   */
@@ -388,9 +395,9 @@ void Model::SetLinearVel( const math::Vector3 &vel )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      BodyPtr body = boost::shared_static_cast<Body>(*iter);
-      body->SetEnabled(true);
-      body->SetLinearVel( vel );
+      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      link->SetEnabled(true);
+      link->SetLinearVel( vel );
     }
   }
 }
@@ -405,9 +412,9 @@ void Model::SetAngularVel( const math::Vector3 &vel )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      BodyPtr body = boost::shared_static_cast<Body>(*iter);
-      body->SetEnabled(true);
-      body->SetAngularVel( vel );
+      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      link->SetEnabled(true);
+      link->SetAngularVel( vel );
     }
   }
 }
@@ -422,9 +429,9 @@ void Model::SetLinearAccel( const math::Vector3 &accel )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      BodyPtr body = boost::shared_static_cast<Body>(*iter);
-      body->SetEnabled(true);
-      body->SetLinearAccel( accel );
+      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      link->SetEnabled(true);
+      link->SetLinearAccel( accel );
     }
   }
 }
@@ -439,9 +446,9 @@ void Model::SetAngularAccel( const math::Vector3 &accel )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      BodyPtr body = boost::shared_static_cast<Body>(*iter);
-      body->SetEnabled(true);
-      body->SetAngularAccel( accel );
+      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      link->SetEnabled(true);
+      link->SetAngularAccel( accel );
     }
   }
 }
@@ -450,8 +457,8 @@ void Model::SetAngularAccel( const math::Vector3 &accel )
 /// Get the linear velocity of the model
 math::Vector3 Model::GetRelativeLinearVel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetRelativeLinearVel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetRelativeLinearVel();
   else
     return math::Vector3(0,0,0);
 }
@@ -460,8 +467,8 @@ math::Vector3 Model::GetRelativeLinearVel() const
 /// Get the linear velocity of the entity in the world frame
 math::Vector3 Model::GetWorldLinearVel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetWorldLinearVel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetWorldLinearVel();
   else
     return math::Vector3(0,0,0);
 }
@@ -470,8 +477,8 @@ math::Vector3 Model::GetWorldLinearVel() const
 /// Get the angular velocity of the model
 math::Vector3 Model::GetRelativeAngularVel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetRelativeAngularVel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetRelativeAngularVel();
   else
     return math::Vector3(0,0,0);
 }
@@ -480,8 +487,8 @@ math::Vector3 Model::GetRelativeAngularVel() const
 /// Get the angular velocity of the model in the world frame
 math::Vector3 Model::GetWorldAngularVel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetWorldAngularVel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetWorldAngularVel();
   else
     return math::Vector3(0,0,0);
 }
@@ -491,8 +498,8 @@ math::Vector3 Model::GetWorldAngularVel() const
 /// Get the linear acceleration of the model
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetRelativeLinearAccel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetRelativeLinearAccel();
   else
     return math::Vector3(0,0,0);
 }
@@ -501,8 +508,8 @@ math::Vector3 Model::GetRelativeLinearAccel() const
 /// Get the linear acceleration of the model in the world frame
 math::Vector3 Model::GetWorldLinearAccel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetWorldLinearAccel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetWorldLinearAccel();
   else
     return math::Vector3(0,0,0);
 }
@@ -511,8 +518,8 @@ math::Vector3 Model::GetWorldLinearAccel() const
 /// Get the angular acceleration of the model
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetRelativeAngularAccel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetRelativeAngularAccel();
   else
     return math::Vector3(0,0,0);
 }
@@ -521,8 +528,8 @@ math::Vector3 Model::GetRelativeAngularAccel() const
 /// Get the angular acceleration of the model in the world frame
 math::Vector3 Model::GetWorldAngularAccel() const
 {
-  if (!this->GetBody("canonical"))
-    return this->GetBody("canonical")->GetWorldAngularAccel();
+  if (!this->GetLink("canonical"))
+    return this->GetLink("canonical")->GetWorldAngularAccel();
   else
     return math::Vector3(0,0,0);
 }
@@ -541,10 +548,10 @@ math::Box Model::GetBoundingBox() const
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      math::Box bodyBox;
-      BodyPtr body = boost::shared_static_cast<Body>(*iter);
-      bodyBox = body->GetBoundingBox();
-      box += bodyBox;
+      math::Box linkBox;
+      LinkPtr link = boost::shared_static_cast<Link>(*iter);
+      linkBox = link->GetBoundingBox();
+      box += linkBox;
     }
   }
 
@@ -588,15 +595,15 @@ JointPtr Model::GetJoint(const std::string &name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get a body by name
-BodyPtr Model::GetBody(const std::string &name) const
+/// Get a link by name
+LinkPtr Model::GetLink(const std::string &name) const
 {
   Base_V::const_iterator biter;
-  BodyPtr result;
+  LinkPtr result;
 
   if (name == "canonical")
   {
-    result = this->canonicalBody;
+    result = this->canonicalLink;
   }
   else
   {
@@ -604,7 +611,7 @@ BodyPtr Model::GetBody(const std::string &name) const
     {
       if ((*biter)->GetName() == name)
       {
-        result = boost::shared_dynamic_cast<Body>(*biter);
+        result = boost::shared_dynamic_cast<Link>(*biter);
         break;
       }
     }
@@ -658,12 +665,13 @@ void Model::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
+  /*gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
   if (plugin)
   {
     plugin->Load(_sdf);
     this->plugins.push_back( plugin );
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -676,7 +684,7 @@ void Model::SetGravityMode( const bool &v )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      boost::shared_static_cast<Body>(*iter)->SetGravityMode( v );
+      boost::shared_static_cast<Link>(*iter)->SetGravityMode( v );
     }
   }
 }
@@ -692,7 +700,7 @@ void Model::SetCollideMode( const std::string &m )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-      boost::shared_static_cast<Body>(*iter)->SetCollideMode( m );
+      boost::shared_static_cast<Link>(*iter)->SetCollideMode( m );
     }
   }
 }
@@ -708,7 +716,7 @@ void Model::SetLaserRetro( const float &retro )
   {
     if (*iter && (*iter)->HasType(BODY))
     {
-       boost::shared_static_cast<Body>(*iter)->SetLaserRetro(retro);
+       boost::shared_static_cast<Link>(*iter)->SetLaserRetro(retro);
     }
   }
 }

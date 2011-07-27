@@ -125,7 +125,7 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     std::ostringstream stream;
 
     // Create the box geometry
-    GeomPtr geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetBody());
+    GeomPtr geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetLink());
     geom->SetSaveable(false);
 
     stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 

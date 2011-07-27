@@ -38,7 +38,7 @@
 #include "physics/MapShape.hh"
 
 #include "physics/ode/ODEGeom.hh"
-#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEHingeJoint.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
 #include "physics/ode/ODESliderJoint.hh"
@@ -334,10 +334,10 @@ double ODEPhysics::GetStepTime()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
-BodyPtr ODEPhysics::CreateBody(EntityPtr parent)
+LinkPtr ODEPhysics::CreateLink(EntityPtr parent)
 {
   if (parent == NULL)
-    gzthrow("Body must have a parent\n");
+    gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
   iter = this->spaces.find(parent->GetName());
@@ -345,17 +345,17 @@ BodyPtr ODEPhysics::CreateBody(EntityPtr parent)
   if (iter == this->spaces.end())
     this->spaces[parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
 
-  ODEBodyPtr body( new ODEBody(parent) );
+  ODELinkPtr link( new ODELink(parent) );
 
-  body->SetSpaceId( this->spaces[parent->GetName()] );
-  body->SetWorld( parent->GetWorld() );
+  link->SetSpaceId( this->spaces[parent->GetName()] );
+  link->SetWorld( parent->GetWorld() );
 
-  return body;
+  return link;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new geom
-GeomPtr ODEPhysics::CreateGeom(const std::string &type, BodyPtr body)
+GeomPtr ODEPhysics::CreateGeom(const std::string &type, LinkPtr body)
 {
   ODEGeomPtr geom( new ODEGeom(body) );
   ShapePtr shape;

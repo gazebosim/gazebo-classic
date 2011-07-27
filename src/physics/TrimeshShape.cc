@@ -95,7 +95,7 @@ void TrimeshShape::Init()
       stream << "</visual>";
 
       GeomPtr newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( 
-          "trimesh", this->geomParent->GetBody() );
+          "trimesh", this->geomParent->GetLink() );
 
       // TODO: need to implement this function properly.
       newGeom->SetSaveable(false);

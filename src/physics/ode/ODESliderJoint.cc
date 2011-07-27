@@ -23,7 +23,7 @@
 #include "gazebo_config.h"
 #include "common/Console.hh"
 
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/ode/ODESliderJoint.hh"
 
 using namespace gazebo;
@@ -87,9 +87,9 @@ void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 // Set the axis of motion
 void ODESliderJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
 {
-  if (this->childBody) 
-    this->childBody->SetEnabled(true);
-  if (this->parentBody) this->parentBody->SetEnabled(true);
+  if (this->childLink) 
+    this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
 }
@@ -120,8 +120,8 @@ void ODESliderJoint::ApplyDamping()
 // Set the slider force
 void ODESliderJoint::SetForce(int /*index*/, double force)
 {
-  if (this->childBody) this->childBody->SetEnabled(true);
-  if (this->parentBody) this->parentBody->SetEnabled(true);
+  if (this->childLink) this->childLink->SetEnabled(true);
+  if (this->parentLink) this->parentLink->SetEnabled(true);
 
   dJointAddSliderForce(this->jointId, force);
 }

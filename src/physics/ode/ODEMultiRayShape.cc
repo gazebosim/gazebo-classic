@@ -16,7 +16,7 @@
 */
 #include "physics/World.hh"
 #include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEGeom.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODERayShape.hh"
@@ -43,8 +43,8 @@ ODEMultiRayShape::ODEMultiRayShape(GeomPtr parent)
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  ODEBodyPtr pBody = boost::shared_static_cast<ODEBody>(this->geomParent->GetBody());
-  pBody->SetSpaceId( this->raySpaceId );
+  ODELinkPtr pLink = boost::shared_static_cast<ODELink>(this->geomParent->GetLink());
+  pLink->SetSpaceId( this->raySpaceId );
   boost::shared_static_cast<ODEGeom>(parent)->SetSpaceId(this->raySpaceId);
 }
 
@@ -159,7 +159,7 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
 {
   MultiRayShape::AddRay(start,end);
-  ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetBody()) );
+  ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetLink()) );
   odeGeom->SetName("ODE Ray Geom");
   odeGeom->SetSpaceId(this->raySpaceId);
 

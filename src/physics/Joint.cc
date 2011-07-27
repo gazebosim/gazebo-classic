@@ -27,7 +27,7 @@
 #include "common/Console.hh"
 
 #include "physics/PhysicsEngine.hh"
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/Model.hh"
 #include "physics/World.hh"
 #include "physics/Joint.hh"
@@ -70,40 +70,40 @@ void Joint::Load(sdf::ElementPtr &_sdf)
     visname << this->model->GetScopedName() 
             << "::" << this->GetName() << "_VISUAL";
 
-    this->childBody = this->model->GetBody( childName );
-    this->parentBody = this->model->GetBody( parentName );
+    this->childLink = this->model->GetLink( childName );
+    this->parentLink = this->model->GetLink( parentName );
   }
   else
   {
     visname << this->GetName() << "_VISUAL";
-    this->childBody = boost::shared_dynamic_cast<Body>(
+    this->childLink = boost::shared_dynamic_cast<Link>(
         this->GetWorld()->GetByName( childName) );
 
-    this->parentBody = boost::shared_dynamic_cast<Body>(
+    this->parentLink = boost::shared_dynamic_cast<Link>(
         this->GetWorld()->GetByName( parentName ));
   }
 
-  if (!this->parentBody && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Body[" + parentName );
+  if (!this->parentLink && parentName != std::string("world"))
+    gzthrow("Couldn't Find Parent Link[" + parentName );
 
-  if (!this->childBody && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Body[" + childName);
+  if (!this->childLink && childName != std::string("world"))
+    gzthrow("Couldn't Find Child Link[" + childName);
 
   math::Pose offset;
   if (_sdf->HasElement("origin"))
     offset = _sdf->GetElement("origin")->GetValuePose("pose");
 
-  // setting anchor relative to gazebo body frame origin
-  if (this->childBody)
-    this->anchorPos = (offset + this->childBody->GetWorldPose()).pos ;
+  // setting anchor relative to gazebo link frame origin
+  if (this->childLink)
+    this->anchorPos = (offset + this->childLink->GetWorldPose()).pos ;
   else
     this->anchorPos = math::Vector3(0,0,0); // default for world
 }
 
 void Joint::Init()
 {
-  this->Attach(this->parentBody, this->childBody);
-  //this->Attach(this->childBody, this->parentBody);
+  this->Attach(this->parentLink, this->childLink);
+  //this->Attach(this->childLink, this->parentLink);
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
@@ -146,10 +146,10 @@ void Joint::Reset()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void Joint::Attach( BodyPtr parent, BodyPtr child )
+void Joint::Attach( LinkPtr parent, LinkPtr child )
 {
-  this->parentBody = parent;
-  this->childBody = child;
+  this->parentLink = parent;
+  this->childLink = child;
 }
 
 
@@ -163,14 +163,14 @@ void Joint::SetModel(ModelPtr model)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the child link
-BodyPtr Joint::GetChild() const
+LinkPtr Joint::GetChild() const
 {
-  return this->childBody;
+  return this->childLink;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the child link
-BodyPtr Joint::GetParent() const
+LinkPtr Joint::GetParent() const
 {
-  return this->parentBody;
+  return this->parentLink;
 }

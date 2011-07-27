@@ -1063,7 +1063,6 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
 void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 {
-  gzdbg << "Got a light\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->lightMsgs.push_back(_msg);
 }

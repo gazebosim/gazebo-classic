@@ -130,7 +130,7 @@ void Run()
 
   while (!quit)
   {
-    usleep(1000000);
+    usleep(500000);
   }
 }
 

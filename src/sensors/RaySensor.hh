@@ -124,7 +124,7 @@ namespace gazebo
       private: gazebo::math::Pose prevPose;
       private: gazebo::physics::WorldPtr world;
       private: gazebo::physics::ModelPtr model;
-      private: gazebo::physics::BodyPtr body;
+      private: gazebo::physics::LinkPtr link;
       private: gazebo::physics::GeomPtr laserGeom;
       private: gazebo::physics::PhysicsEnginePtr physicsEngine;
       private: gazebo::physics::MultiRayShapePtr laserShape;

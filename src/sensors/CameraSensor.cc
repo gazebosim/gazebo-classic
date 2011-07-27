@@ -80,38 +80,42 @@ void CameraSensor::Init()
 {
   Sensor::Init();
 
-  std::string worldName = "default";//this->sdf->GetWorldName("name");
+  std::string worldName = this->sdf->GetWorldName();
 
-  rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
-  if (!scene)
-    scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
-
-  this->camera = scene->CreateCamera("mono_camera");
-  if (!this->camera)
+  if (!worldName.empty())
   {
-    gzerr << "Unable to create camera sensor[mono_camera]\n";
-    return;
+    rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
+    if (!scene)
+      scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
+
+    this->camera = scene->CreateCamera("mono_camera");
+    if (!this->camera)
+    {
+      gzerr << "Unable to create camera sensor[mono_camera]\n";
+      return;
+    }
+    this->camera->SetCaptureData(true);
+
+    sdf::ElementPtr cameraSdf = this->sdf->GetOrCreateElement("camera");
+    this->camera->Load( cameraSdf );
+
+    // Do some sanity checks
+    if (this->camera->GetImageWidth() == 0 || 
+        this->camera->GetImageHeight() == 0)
+    {
+      gzthrow("image has zero size");
+    }
+
+    this->camera->Init();
+    // Create the render texture
+    this->ogreTextureName = this->GetName() + "_RttTex";
+    this->camera->CreateRenderTexture(this->ogreTextureName);
+
+    //  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+    // this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
   }
-  this->camera->SetCaptureData(true);
-
-  sdf::ElementPtr cameraSdf = this->sdf->GetOrCreateElement("camera");
-  this->camera->Load( cameraSdf );
-
-  // Do some sanity checks
-  if (this->camera->GetImageWidth() == 0 || 
-      this->camera->GetImageHeight() == 0)
-  {
-    gzthrow("image has zero size");
-  }
-
-  this->camera->Init();
-  // Create the render texture
-  this->ogreTextureName = this->GetName() + "_RttTex";
-  this->camera->CreateRenderTexture(this->ogreTextureName);
-
-//  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
- // this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
-
+  else
+    gzerr << "No world name\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -172,5 +176,6 @@ void CameraSensor::Update(bool force)
 
 void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
 {
-  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
+  if (_msg->header().str_id() == "default::camera_model")
+    gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
 }

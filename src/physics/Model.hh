@@ -134,7 +134,7 @@ namespace gazebo
  
       /// \brief Get a body by name
       /// \return Pointer to the body
-      public: BodyPtr GetBody(const std::string &name="canonical") const;
+      public: LinkPtr GetLink(const std::string &name="canonical") const;
  
       /// \brief Set the gravity mode of the model
       public: void SetGravityMode( const bool &v );
@@ -155,7 +155,7 @@ namespace gazebo
       /// \param _sdf SDF parameter
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
-      private: BodyPtr canonicalBody;
+      private: LinkPtr canonicalLink;
 
       private: Joint_V joints;
 

@@ -25,7 +25,7 @@
 #include "common/Console.hh"
 #include "common/Global.hh"
 
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/ode/ODEHingeJoint.hh"
 
 using namespace gazebo;
@@ -70,10 +70,10 @@ math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEHingeJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 {
-  if (this->childBody) 
-    this->childBody->SetEnabled(true);
-  if (this->parentBody) 
-    this->parentBody->SetEnabled(true);
+  if (this->childLink) 
+    this->childLink->SetEnabled(true);
+  if (this->parentLink) 
+    this->parentLink->SetEnabled(true);
 
   //printf("debug hing joint anchor %s %f %f %f\n",this->GetName().c_str(),anchor.x, anchor.y, anchor.z );
   dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
@@ -95,10 +95,10 @@ math::Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 // Set the axis of rotation
 void ODEHingeJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
 {
-  if (this->childBody) 
-    this->childBody->SetEnabled(true);
-  if (this->parentBody) 
-    this->parentBody->SetEnabled(true);
+  if (this->childLink) 
+    this->childLink->SetEnabled(true);
+  if (this->parentLink) 
+    this->parentLink->SetEnabled(true);
 
   dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
 }
@@ -167,10 +167,10 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 // Set the torque of this joint
 void ODEHingeJoint::SetForce(int /*index*/, double torque)
 {
-  if (this->childBody) 
-    this->childBody->SetEnabled(true);
-  if (this->parentBody) 
-    this->parentBody->SetEnabled(true);
+  if (this->childLink) 
+    this->childLink->SetEnabled(true);
+  if (this->parentLink) 
+    this->parentLink->SetEnabled(true);
   dJointAddHingeTorque( this->jointId, torque );
 }
 

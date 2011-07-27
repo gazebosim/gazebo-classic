@@ -35,7 +35,7 @@ void Run()
   while (!quit)
   {
     gazebo::sensors::run_once(true);
-    usleep(1000000);
+    usleep(100000);
   }
 }
 

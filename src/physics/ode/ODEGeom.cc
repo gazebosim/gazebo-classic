@@ -26,7 +26,7 @@
 
 #include "physics/SurfaceParams.hh"
 #include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODELink.hh"
 #include "physics/ode/ODEGeom.hh"
 
 using namespace gazebo;
@@ -34,7 +34,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEGeom::ODEGeom( BodyPtr _body )
+ODEGeom::ODEGeom( LinkPtr _body )
     : Geom(_body)
 {
   this->SetName("ODE_Geom");
@@ -59,7 +59,7 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
   if (_sdf->HasElement("surface"))
     this->surface->Load( _sdf->GetElement("surface") );
 
-  this->SetSpaceId( boost::shared_static_cast<ODEBody>(this->body)->GetSpaceId() );
+  this->SetSpaceId( boost::shared_static_cast<ODELink>(this->body)->GetSpaceId() );
 
   /*std::cout << "\n\n\nODEGeom::Load test\n\n\n" <<  this->geomId
             << "\n\n" << this->placeable << "\n\n\n";

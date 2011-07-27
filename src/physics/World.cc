@@ -36,7 +36,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
-#include "physics/Body.hh"
+#include "physics/Link.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Model.hh"
@@ -140,7 +140,7 @@ void World::Load( sdf::ElementPtr _sdf )
   this->physicsEngine->Load( _sdf->GetElement("physics") );
 
   this->rootElement.reset(new Base(BasePtr()));
-  this->rootElement->SetName("root");
+  this->rootElement->SetName(this->GetName());
   this->rootElement->SetWorld(shared_from_this());
 
   // Create all the entities
