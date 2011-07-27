@@ -317,7 +317,7 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
   camera->Init();
   this->userCameras.push_back(camera);
 
-  gzdbg << "Create Camera\n";
+  /*gzdbg << "Create Camera\n";
   this->testCam.reset(new Camera(this->GetName() + ":Test:" + name_, this) );
   this->testCam->Load();
   this->testCam->Init();
@@ -328,6 +328,7 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
   this->testCam->SetSaveFramePathname("/tmp/camera");
 
   this->cameras.push_back(this->testCam);
+  */
 
   return camera;
 }
