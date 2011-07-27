@@ -68,11 +68,11 @@ namespace gazebo
       public: virtual void Fini() = 0;
   
       /// \brief Create a new body
-      public: virtual BodyPtr CreateBody(EntityPtr parent) = 0;
+      public: virtual LinkPtr CreateLink(EntityPtr parent) = 0;
   
       /// \brief Create a geom
       public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
-                                         BodyPtr body) = 0;
+                                         LinkPtr body) = 0;
   
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string &type) = 0;
