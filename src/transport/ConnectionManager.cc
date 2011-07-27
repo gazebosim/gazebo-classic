@@ -311,7 +311,13 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 
 void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespaces)
 {
-  this->masterConn->StopRead(); 
+  gzdbg << "Stopping Read\n";
+  ConnectionPtr tmpConn(new Connection());
+  tmpConn->Connect(this->masterConn->GetRemoteAddress(),
+                   this->masterConn->GetRemotePort() );
+
+  std::string initData;
+  tmpConn->Read(initData);
 
   std::string data;
   msgs::Request request;
@@ -321,9 +327,9 @@ void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespace
   request.set_request("get_topic_namespaces");
 
   // Get the list of publishers
-  this->masterConn->EnqueueMsg( msgs::Package("request", request), true );
+  tmpConn->EnqueueMsg( msgs::Package("request", request), true );
 
-  this->masterConn->Read(data);
+  tmpConn->Read(data);
   packet.ParseFromString( data );
   result.ParseFromString( packet.serialized_data() );
 
@@ -331,9 +337,6 @@ void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespace
   {
     _namespaces.push_back(result.data(i));
   }
-
-  this->masterConn->StartRead( 
-      boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 }
 
 void ConnectionManager::Unsubscribe( const msgs::Subscribe &msg )

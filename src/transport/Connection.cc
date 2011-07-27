@@ -141,7 +141,6 @@ void Connection::StopRead()
   {
     this->readQuit = true;
     this->readThread->interrupt();
-    this->readThread->join();
     delete this->readThread;
   }
   this->readThread = NULL;
