@@ -32,6 +32,55 @@ void Element::SetParent(const ElementPtr &_parent)
   this->parent = _parent;
 }
 
+/// Get the name of the parent link. 
+std::string Element::GetLinkName() const
+{
+  std::string result;
+
+  // get parent body name by looking through sdf
+  sdf::ElementPtr sdfParent = this->GetParent();
+  while (sdfParent && sdfParent->GetName() != "link")
+    sdfParent = sdfParent->GetParent();
+
+  if (sdfParent)
+   result = sdfParent->GetValueString("name");
+
+  return result;
+}
+
+/// Get the name of the parent model. 
+std::string Element::GetModelName() const
+{
+  std::string result;
+
+  // get parent body name by looking through sdf
+  sdf::ElementPtr sdfParent = this->GetParent();
+  while (sdfParent && sdfParent->GetName() != "model")
+    sdfParent = sdfParent->GetParent();
+
+  if (sdfParent)
+   result = sdfParent->GetValueString("name");
+
+  return result;
+}
+
+/// Get the name of the parent world. 
+std::string Element::GetWorldName() const
+{
+  std::string result;
+
+  // get parent body name by looking through sdf
+  sdf::ElementPtr sdfParent = this->GetParent();
+  while (sdfParent && sdfParent->GetName() != "world")
+    sdfParent = sdfParent->GetParent();
+
+  if (sdfParent)
+   result = sdfParent->GetValueString("name");
+
+  return result;
+}
+
+
 void Element::SetName(const std::string &_name)
 {
   this->name = _name;
