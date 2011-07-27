@@ -23,20 +23,6 @@
 
 using namespace gazebo;
 
-const std::string default_config =
-"<?xml version='1.0'?>\
-<gazebo>\
-  <config>\
-    <verbosity>4</verbosity>\
-    <gui>\
-      <size>800 600</size>\
-      <pos>0 0</pos>\
-    </gui>\
-  </config>\
-</gazebo>\
-";
-
-
 bool rendering::load()
 {
   bool result = true;
@@ -91,7 +77,6 @@ rendering::ScenePtr rendering::create_scene(const std::string &name)
   {
     gzerr <<"Failed to create a scene in the Rendering engine" << e ;
   }
-  
 
   return scene;
 }
