@@ -66,55 +66,21 @@ void RaySensor::Load( sdf::ElementPtr &_sdf )
 }
 void RaySensor::Load( )
 {
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParentBody = this->sdf->GetParent();
-  while (sdfParentBody && sdfParentBody->GetName() != "link")
-  {
-    sdfParentBody = sdfParentBody->GetParent();
-  }
-  if (!sdfParentBody)
-  {
-    gzerr << "Unable to get camera sensor parent body name\n";
-    return;
-  }
-  std::string bodyName = sdfParentBody->GetValueString("name");
+  std::string bodyName = this->sdf->GetLinkName();
   //gzerr << "parent body name : " << bodyName << "\n";
 
-  // get parent model name by looking through sdf
-  sdf::ElementPtr sdfParentModel = this->sdf->GetParent();
-  while (sdfParentModel && sdfParentModel->GetName() != "model")
-  {
-    sdfParentModel = sdfParentModel->GetParent();
-  }
-  if (!sdfParentModel)
-  {
-    gzerr << "Unable to get camera sensor parent model name\n";
-    return;
-  }
-  std::string modelName = sdfParentModel->GetValueString("name");
+  std::string modelName = this->sdf->GetModelName();
   //gzerr << "parent model name : " << modelName << "\n";
 
   // get parent body by looking at real parent
   std::string bodyFullyScopedName = "root::" + modelName + "::" + bodyName;
   //gzerr << "scoped body name : " << bodyFullyScopedName << "\n";
 
-
-  // get parent world name by looking through sdf
-  sdf::ElementPtr sdfParent = this->sdf->GetParent();
-  while (sdfParent && sdfParent->GetName() != "world")
-  {
-    sdfParent = sdfParent->GetParent();
-  }
-  if (!sdfParent)
-  {
-    gzerr << "Unable to get camera sensor world name\n";
-    return;
-  }
-  std::string worldName = sdfParent->GetValueString("name");
+  std::string worldName = this->sdf->GetWorldName();
   //gzerr << "parent world name : " << worldName << "\n";
 
 
-  worldName = "default"; // HACK!!! for now there is only one default world
+  worldName = "default"; // TODO: HACK!! for now there is only one default world
   this->world = gazebo::physics::get_world(worldName);
   this->model = this->world->GetModelByName(modelName);
   this->body = boost::dynamic_pointer_cast<gazebo::physics::Body>(this->model->GetByName(bodyFullyScopedName));
@@ -253,5 +219,5 @@ int RaySensor::GetFiducial(int index)
 void RaySensor::Update(bool force)
 {
   //if (this->active || (**this->alwaysActiveP))
-    this->laserShape->Update();
+  this->laserShape->Update();
 }
