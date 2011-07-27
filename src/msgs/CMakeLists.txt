@@ -26,6 +26,7 @@ set (msgs color.proto
           world_control.proto
           entity.proto
           joint.proto
+          physics.proto
 )
 
 set (sources msgs.cc)
