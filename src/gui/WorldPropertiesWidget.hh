@@ -35,14 +35,43 @@ namespace gazebo
       private: PhysicsWidget *physicsWidget;
     };
 
+
     class PhysicsWidget : public QWidget
     {
       Q_OBJECT
       public: PhysicsWidget( QWidget *parent = 0 );
       public: virtual ~PhysicsWidget();
 
-      protected: transport::NodePtr node;
-      private: transport::PublisherPtr physicsPub;
+      public: void Init();
+
+      private slots: void OnSolverType(int _index);
+
+      private slots: void OnDt();
+      private slots: void OnSOR();
+      private slots: void OnIters();
+      private slots: void OnCFM();
+      private slots: void OnERP();
+      private slots: void OnMaxVel();
+      private slots: void OnSurfaceLayer();
+
+      private: void OnPhysicsMsg(const boost::shared_ptr<msgs::Physics const> &_msg);
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr physicsPub, physicsRequestPub;
+      private: transport::SubscriberPtr physicsSub;
+      private: bool initialized;
+
+      private: QLineEdit *gravityXLineEdit;
+      private: QLineEdit *gravityYLineEdit;
+      private: QLineEdit *gravityZLineEdit;
+      private: QComboBox *solverTypeBox;
+      private: QLineEdit *dtLineEdit;
+      private: QLineEdit *itersLineEdit;
+      private: QLineEdit *sorLineEdit;
+      private: QLineEdit *cfmLineEdit;
+      private: QLineEdit *erpLineEdit;
+      private: QLineEdit *maxVelLineEdit;
+      private: QLineEdit *surfaceLayerLineEdit;
     };
 
 

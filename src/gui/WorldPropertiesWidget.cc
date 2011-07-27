@@ -35,6 +35,7 @@ WorldPropertiesWidget::~WorldPropertiesWidget()
 void WorldPropertiesWidget::showEvent(QShowEvent * /*_event*/)
 {
   this->sceneWidget->Init();
+  this->physicsWidget->Init();
 }
 
 void WorldPropertiesWidget::closeEvent(QCloseEvent * /*_event*/)
@@ -51,15 +52,227 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
 
   this->setLayout(mainLayout);
   //this->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+  
+  QHBoxLayout *gravityLayout = new QHBoxLayout;
+  this->gravityXLineEdit = new QLineEdit;
+  this->gravityXLineEdit->setValidator(new QDoubleValidator(this->gravityXLineEdit) );
+  this->gravityXLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->gravityXLineEdit->setFixedWidth(40);
 
+  this->gravityYLineEdit = new QLineEdit;
+  this->gravityYLineEdit->setValidator(new QDoubleValidator(this->gravityYLineEdit) );
+  this->gravityYLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->gravityYLineEdit->setFixedWidth(40);
+
+  this->gravityZLineEdit = new QLineEdit;
+  this->gravityZLineEdit->setValidator(new QDoubleValidator(this->gravityZLineEdit) );
+  this->gravityZLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->gravityZLineEdit->setFixedWidth(40);
+
+  QLabel *gravityLabel = new QLabel(tr("Gravity:"));
+  gravityLayout->addWidget(gravityLabel);
+  gravityLayout->addWidget(this->gravityXLineEdit);
+  gravityLayout->addWidget(this->gravityYLineEdit);
+  gravityLayout->addWidget(this->gravityZLineEdit);
+
+
+  QGroupBox *solverBox = new QGroupBox( tr("Solver") );
+  solverBox->setStyleSheet(tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
+  QVBoxLayout *solverBoxLayout = new QVBoxLayout;
+  solverBox->setLayout(solverBoxLayout);
+
+
+  QHBoxLayout *solverTypeLayout = new QHBoxLayout;
+  this->solverTypeBox = new QComboBox();
+  this->solverTypeBox->addItem( tr("quick") );
+  this->solverTypeBox->addItem( tr("world") );
+  QLabel *solverTypeLabel = new QLabel(tr("Type:"));
+  solverTypeLayout->addWidget(solverTypeLabel);
+  solverTypeLayout->addWidget(this->solverTypeBox);
+  solverTypeLayout->insertStretch(1,0);
+
+  QHBoxLayout *dtLayout = new QHBoxLayout;
+  this->dtLineEdit = new QLineEdit;
+  this->dtLineEdit->setValidator(new QDoubleValidator(this->dtLineEdit) );
+  this->dtLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->dtLineEdit->setFixedWidth(80);
+  QLabel *dtLabel = new QLabel(tr("Step Duration:"));
+  dtLayout->addWidget(dtLabel);
+  dtLayout->addWidget(this->dtLineEdit);
+  dtLayout->insertStretch(1,0);
+
+  QHBoxLayout *itersLayout = new QHBoxLayout;
+  this->itersLineEdit = new QLineEdit;
+  this->itersLineEdit->setValidator(new QIntValidator(this->itersLineEdit) );
+  this->itersLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->itersLineEdit->setFixedWidth(80);
+  QLabel *itersLabel = new QLabel(tr("Iterations:"));
+  itersLayout->addWidget(itersLabel);
+  itersLayout->addWidget(this->itersLineEdit);
+  itersLayout->insertStretch(1,0);
+
+  QHBoxLayout *sorLayout = new QHBoxLayout;
+  this->sorLineEdit = new QLineEdit;
+  this->sorLineEdit->setValidator(new QDoubleValidator(this->sorLineEdit) );
+  this->sorLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->sorLineEdit->setFixedWidth(80);
+  QLabel *sorLabel = new QLabel(tr("SOR:"));
+  sorLayout->addWidget(sorLabel);
+  sorLayout->addWidget(this->sorLineEdit);
+  sorLayout->insertStretch(1,0);
+
+  solverBoxLayout->addLayout(solverTypeLayout);
+  solverBoxLayout->addLayout( itersLayout );
+  solverBoxLayout->addLayout( sorLayout );
+  solverBoxLayout->addLayout( dtLayout );
+
+  QGroupBox *constraintsBox = new QGroupBox( tr("Constraints") );
+  constraintsBox->setStyleSheet(tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
+  QVBoxLayout *constraintsBoxLayout = new QVBoxLayout;
+  constraintsBox->setLayout(constraintsBoxLayout);
+
+  QHBoxLayout *cfmLayout = new QHBoxLayout;
+  this->cfmLineEdit = new QLineEdit;
+  this->cfmLineEdit->setValidator(new QDoubleValidator(this->cfmLineEdit) );
+  this->cfmLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->cfmLineEdit->setFixedWidth(80);
+  QLabel *cfmLabel = new QLabel(tr("CFM:"));
+  cfmLayout->addWidget(cfmLabel);
+  cfmLayout->addWidget(this->cfmLineEdit);
+  cfmLayout->insertStretch(1,0);
+
+  QHBoxLayout *erpLayout = new QHBoxLayout;
+  this->erpLineEdit = new QLineEdit;
+  this->erpLineEdit->setValidator(new QDoubleValidator(this->erpLineEdit) );
+  this->erpLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->erpLineEdit->setFixedWidth(80);
+  QLabel *erpLabel = new QLabel(tr("ERP:"));
+  erpLayout->addWidget(erpLabel);
+  erpLayout->addWidget(this->erpLineEdit);
+  erpLayout->insertStretch(1,0);
+
+  QHBoxLayout *maxVelLayout = new QHBoxLayout;
+  this->maxVelLineEdit = new QLineEdit;
+  this->maxVelLineEdit->setValidator(new QDoubleValidator(this->maxVelLineEdit) );
+  this->maxVelLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->maxVelLineEdit->setFixedWidth(80);
+  QLabel *maxVelLabel = new QLabel(tr("Max Velocity:"));
+  maxVelLayout->addWidget(maxVelLabel);
+  maxVelLayout->addWidget(this->maxVelLineEdit);
+  maxVelLayout->insertStretch(1,0);
+
+  QHBoxLayout *surfaceLayerLayout = new QHBoxLayout;
+  this->surfaceLayerLineEdit = new QLineEdit;
+  this->surfaceLayerLineEdit->setValidator(new QDoubleValidator(this->surfaceLayerLineEdit) );
+  this->surfaceLayerLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
+  this->surfaceLayerLineEdit->setFixedWidth(80);
+  QLabel *surfaceLayerLabel = new QLabel(tr("Surface Layer:"));
+  surfaceLayerLayout->addWidget(surfaceLayerLabel);
+  surfaceLayerLayout->addWidget(this->surfaceLayerLineEdit);
+  surfaceLayerLayout->insertStretch(1,0);
+
+  constraintsBoxLayout->addLayout( cfmLayout );
+  constraintsBoxLayout->addLayout( erpLayout );
+  constraintsBoxLayout->addLayout( maxVelLayout );
+  constraintsBoxLayout->addLayout( surfaceLayerLayout );
+
+  mainLayout->addLayout( gravityLayout ); 
+  mainLayout->addWidget( solverBox ); 
+  mainLayout->addWidget( constraintsBox );
+ 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("default");
-  this->physicsPub = this->node->Advertise<msgs::Scene>("~/physics");
+  this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+  this->physicsSub = this->node->Subscribe("~/physics", 
+      &PhysicsWidget::OnPhysicsMsg, this);
+  this->physicsRequestPub = this->node->Advertise<msgs::Request>(
+      "~/physics_request");
+
+  connect( this->solverTypeBox, SIGNAL(currentIndexChanged(int)),
+           this, SLOT(OnSolverType(int)) );
+  connect( this->dtLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnDt()) );
+  connect( this->sorLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnSOR()) );
+  connect( this->itersLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnIters()) );
+  connect( this->cfmLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnCFM()) );
+  connect( this->erpLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnERP()) );
+  connect( this->maxVelLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnMaxVel()) );
+  connect( this->surfaceLayerLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnSurfaceLayer()) );
 }
 
 PhysicsWidget::~PhysicsWidget()
 {
 }
+
+void PhysicsWidget::Init()
+{
+  gzdbg << "Physics Init\n";
+  this->initialized = false;
+  msgs::Request req;
+  req.set_request("publish");
+
+  this->physicsRequestPub->Publish(req);
+}
+
+void PhysicsWidget::OnPhysicsMsg(const boost::shared_ptr<msgs::Physics const> &_msg)
+{
+  std::cout << "Physics[" << _msg->DebugString() << "]\n";
+}
+
+void PhysicsWidget::OnSolverType(int _index)
+{
+  std::cout << "Index[" << _index << "]\n";
+}
+
+void PhysicsWidget::OnDt()
+{
+  std::string value = this->dtLineEdit->text().toStdString();
+  std::cout << "On DT[" << value << "]\n";
+}
+
+void PhysicsWidget::OnSOR()
+{
+  std::string value = this->sorLineEdit->text().toStdString();
+  std::cout << "On SOR[" << value << "]\n";
+}
+
+void PhysicsWidget::OnIters()
+{
+  std::string value = this->itersLineEdit->text().toStdString();
+  std::cout << "On iter[" << value << "]\n";
+}
+
+void PhysicsWidget::OnCFM()
+{
+  std::string value = this->cfmLineEdit->text().toStdString();
+  std::cout << "On cfm[" << value << "]\n";
+}
+
+void PhysicsWidget::OnERP()
+{
+  std::string value = this->erpLineEdit->text().toStdString();
+  std::cout << "On erp[" << value << "]\n";
+}
+
+void PhysicsWidget::OnMaxVel()
+{
+  std::string value = this->maxVelLineEdit->text().toStdString();
+  std::cout << "On maxVel[" << value << "]\n";
+}
+
+void PhysicsWidget::OnSurfaceLayer()
+{
+  std::string value = this->surfaceLayerLineEdit->text().toStdString();
+  std::cout << "On surfaceLayer[" << value << "]\n";
+}
+
+
 
 
 SceneWidget::SceneWidget(QWidget *parent )
