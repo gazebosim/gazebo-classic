@@ -49,11 +49,11 @@ void Server::Load(const std::string &filename)
   sdf::init(sdf);
   sdf::readFile(filename, sdf);
 
-  /// Load the physics library
-  physics::load();
-
   /// Load the sensors library
   sensors::load();
+
+  /// Load the physics library
+  physics::load();
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
   while(worldElem)

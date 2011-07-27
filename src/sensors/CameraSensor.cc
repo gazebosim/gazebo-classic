@@ -25,6 +25,8 @@
 #include "common/Global.hh"
 #include "common/Exception.hh"
 
+#include "transport/transport.h"
+
 #include "rendering/Camera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/RenderEngine.hh"
@@ -66,22 +68,19 @@ void CameraSensor::Load( sdf::ElementPtr &_sdf )
 void CameraSensor::Load()
 {
   Sensor::Load();
+  this->poseSub = this->node->Subscribe("~/pose", 
+                                        &CameraSensor::OnPose, this );
+}
 
-  std::string worldName;
 
-  sdf::ElementPtr sdfParent = this->sdf->GetParent();
-  while (sdfParent && sdfParent->GetName() != "world")
-  {
-    sdfParent = sdfParent->GetParent();
-  }
+ 
+//////////////////////////////////////////////////////////////////////////////
+// Initialize the camera
+void CameraSensor::Init()
+{
+  Sensor::Init();
 
-  if (!sdfParent)
-  {
-    gzerr << "Unable to get camera sensor world name\n";
-    return;
-  }
-
-  worldName = sdfParent->GetValueString("name");
+  std::string worldName = "default";//this->sdf->GetWorldName("name");
 
   rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
   if (!scene)
@@ -104,20 +103,15 @@ void CameraSensor::Load()
   {
     gzthrow("image has zero size");
   }
-}
- 
-//////////////////////////////////////////////////////////////////////////////
-// Initialize the camera
-void CameraSensor::Init()
-{
-  Sensor::Init();
-  this->camera->Init();
-  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-  this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
 
+  this->camera->Init();
   // Create the render texture
   this->ogreTextureName = this->GetName() + "_RttTex";
   this->camera->CreateRenderTexture(this->ogreTextureName);
+
+//  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+ // this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -174,4 +168,9 @@ void CameraSensor::Update(bool force)
   if (this->active)
     this->UpdateCam();
     */
+}
+
+void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
+{
+  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
 }

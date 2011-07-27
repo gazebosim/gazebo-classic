@@ -65,6 +65,7 @@ namespace gazebo
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
     
+      private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
       private: void Render();
     
       private: rendering::CameraPtr camera;

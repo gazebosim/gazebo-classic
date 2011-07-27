@@ -195,6 +195,9 @@ void Camera::Init()
   this->saveCount = 0;
 
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
+
+  this->SetFOV( DTOR(60) );
+  this->SetClipDist(0.001, 100);
 }
 
 //////////////////////////////////////////////////////////////////////////////

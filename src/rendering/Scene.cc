@@ -169,11 +169,7 @@ void Scene::Init()
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
-  if (this->sdf->HasElement("shadows") && 
-      this->sdf->GetElement("shadows")->GetValueBool("enabled"))
-  {
-    RTShaderSystem::Instance()->ApplyShadows(this);
-  }
+  RTShaderSystem::Instance()->ApplyShadows(this);
 
   // Send a request to get the current world state
   // TODO: Use RPC or some service call to get this properly
@@ -312,10 +308,23 @@ CameraPtr Scene::GetCamera(unsigned int index) const
 // Create a user camera
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
-  UserCameraPtr camera( new UserCamera(this->name + "::" + name_, this) );
+  UserCameraPtr camera( new UserCamera(this->GetName() + "::" + name_, this) );
   camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);
+
+  /*gzdbg << "Create Camera\n";
+  this->testCam.reset(new Camera(this->GetName() + ":Test:" + name_, this) );
+  this->testCam->Load();
+  this->testCam->Init();
+  this->testCam->CreateRenderTexture("RenderTexture");
+
+  this->testCam->SetCaptureData(true);
+  this->testCam->EnableSaveFrame(true);
+  this->testCam->SetSaveFramePathname("/tmp/camera");
+
+  this->cameras.push_back(this->testCam);
+  */
 
   return camera;
 }
