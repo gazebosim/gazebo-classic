@@ -250,6 +250,17 @@ void ConnectionManager::Advertise(const std::string &topic,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
+{
+  if (!this->initialized)
+    return;
+
+  msgs::String msg;
+  msg.set_data( _name );
+  this->masterConn->EnqueueMsg(msgs::Package("register_topic_namespace", msg));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void ConnectionManager::Unadvertise( const std::string &topic )
 {
   msgs::Publish msg;
@@ -292,6 +303,33 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
   {
     const msgs::Publish &p = pubs.publisher(i);
     publishers.push_back(p);
+  }
+
+  this->masterConn->StartRead( 
+      boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
+}
+
+void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespaces)
+{
+  this->masterConn->StopRead(); 
+
+  std::string data;
+  msgs::Request request;
+  msgs::Packet packet;
+  msgs::String_V result;
+
+  request.set_request("get_topic_namespaces");
+
+  // Get the list of publishers
+  this->masterConn->EnqueueMsg( msgs::Package("request", request), true );
+
+  this->masterConn->Read(data);
+  packet.ParseFromString( data );
+  result.ParseFromString( packet.serialized_data() );
+
+  for (int i=0; i < result.data_size(); i++)
+  {
+    _namespaces.push_back(result.data(i));
   }
 
   this->masterConn->StartRead( 

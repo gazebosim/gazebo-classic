@@ -4,6 +4,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/Rendering.hh"
 
+#include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
 #include "gui/RenderWidget.hh"
 
@@ -23,7 +24,7 @@ RenderWidget::RenderWidget( QWidget *parent )
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->glWidget = new GLWidget(mainFrame);
-  rendering::ScenePtr scene = rendering::create_scene("world_1");
+  rendering::ScenePtr scene = rendering::create_scene(gui::get_world());
   this->glWidget->ViewScene( scene );
 
   this->xPosEdit = new QLineEdit;

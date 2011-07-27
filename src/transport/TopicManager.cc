@@ -297,3 +297,17 @@ void TopicManager::Unadvertise(const std::string &_topic)
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Register a new topic namespace 
+void TopicManager::RegisterTopicNamespace(const std::string &_name)
+{
+  ConnectionManager::Instance()->RegisterTopicNamespace(_name);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get all the topic namespaces
+void TopicManager::GetTopicNamespaces(std::vector<std::string> &_namespaces)
+{
+  ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
+}

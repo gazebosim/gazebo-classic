@@ -41,8 +41,14 @@ namespace gazebo
       public: virtual ~Node();
 
       /// \brief Init the node
-      /// \param space Set the global namespace of all topics
-      public: void Init(const std::string &space);
+      /// \param space Set the global namespace of all topics. If left
+      ///              blank, the topic will initialize to the first 
+      ///              namespace on the Master
+      public: void Init(const std::string &_space="");
+
+      /// \brief Get the topic namespace for this node
+      /// \return The namespace
+      public: std::string GetTopicNamespace() const;
 
       /// \brief Decode a topic name
       public: std::string DecodeTopicName(const std::string &topic);

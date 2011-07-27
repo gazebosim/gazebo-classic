@@ -78,7 +78,21 @@ void Master::OnRead(const unsigned int connectionIndex,
   msgs::Packet packet;
   packet.ParseFromString(data);
 
-  if (packet.type() == "advertise")
+  if (packet.type() == "register_topic_namespace")
+  {
+    msgs::String worldNameMsg;
+    worldNameMsg.ParseFromString( packet.serialized_data() );
+
+    std::list<std::string>::iterator iter;
+    iter = std::find(this->worldNames.begin(), this->worldNames.end(),
+                     worldNameMsg.data());
+    if (iter == this->worldNames.end())
+    {
+      std::cout << "Register world[" << worldNameMsg.data() << "]\n";
+      this->worldNames.push_back( worldNameMsg.data() );
+    }
+  }
+  else if (packet.type() == "advertise")
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
@@ -211,6 +225,21 @@ void Master::OnRead(const unsigned int connectionIndex,
       }
 
       conn->EnqueueMsg( msgs::Package("topic_info_response", ti), true );
+    }
+    else if (req.request() == "get_topic_namespaces")
+    {
+      msgs::String_V msg;
+      std::list<std::string>::iterator iter;
+      for (iter = this->worldNames.begin(); 
+          iter != this->worldNames.end(); iter++)
+      {
+        msg.add_data(*iter);
+      }
+      conn->EnqueueMsg(msgs::Package("get_topic_namespaces_response", msg), true);
+    }
+    else
+    {
+      gzerr << "Unknown request[" << req.request() << "]\n";
     }
   }
   else

@@ -32,7 +32,8 @@ MainWindow::MainWindow()
   mainWidget->show();
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("world_1");
+  this->node->Init();
+  gui::set_world( this->node->GetTopicNamespace() );
   this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->glWidget = new RenderWidget(mainWidget);

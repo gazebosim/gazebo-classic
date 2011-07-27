@@ -29,6 +29,8 @@
 int g_argc = 1;
 char **g_argv;
 
+std::string g_worldname = "default";
+
 using namespace gazebo;
 
 QApplication *g_app;
@@ -75,3 +77,15 @@ void gui::fini()
 {
   rendering::fini();
 }
+
+void gui::set_world( const std::string& _name)
+{
+  g_worldname = _name;
+}
+
+std::string gui::get_world()
+{
+  return g_worldname;
+}
+
+

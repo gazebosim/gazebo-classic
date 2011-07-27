@@ -34,10 +34,30 @@ Node::~Node()
   TopicManager::Instance()->RemoveNode( shared_from_this() );
 }
 
-void Node::Init(const std::string &space)
+void Node::Init(const std::string &_space)
 {
+  this->topicNamespace = _space;
+
+  if (_space.empty())
+  {
+    std::vector<std::string> namespaces;
+    TopicManager::Instance()->GetTopicNamespaces(namespaces);
+    if (namespaces.size() > 0)
+      this->topicNamespace = namespaces[0];
+    else
+      gzerr << "No topic namespaces specifed\n";
+  }
+  else
+    TopicManager::Instance()->RegisterTopicNamespace( _space );
+
   TopicManager::Instance()->AddNode( shared_from_this() );
-  this->topicNamespace = space;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the topic namespace for this node
+std::string Node::GetTopicNamespace() const
+{
+  return this->topicNamespace;
 }
 
 std::string Node::DecodeTopicName(const std::string &topic)

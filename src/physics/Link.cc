@@ -140,7 +140,7 @@ void Link::Load( sdf::ElementPtr &_sdf )
     while (sensorElem)
     {
       this->LoadSensor(sensorElem);
-      sensorElem = this->sdf->GetNextElement("visual", sensorElem); 
+      sensorElem = this->sdf->GetNextElement("sensor", sensorElem); 
     }
   }
 }

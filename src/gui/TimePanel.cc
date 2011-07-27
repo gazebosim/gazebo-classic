@@ -47,7 +47,7 @@ TimePanel::TimePanel( QWidget *parent )
   this->layout()->setContentsMargins(0,0,0,0);
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("world_1");
+  this->node->Init();
 
   this->statsSub = this->node->Subscribe("~/world_stats", &TimePanel::OnStats, this);
 

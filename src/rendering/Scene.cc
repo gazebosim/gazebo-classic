@@ -48,14 +48,14 @@ unsigned int Scene::idCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Scene::Scene(const std::string &name_)
+Scene::Scene(const std::string &_name)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(name_);
+  this->node->Init(_name);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
-  this->name = name_;
+  this->name = _name;
   this->manager = NULL;
   this->raySceneQuery = NULL;
 
@@ -312,19 +312,6 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
   camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);
-
-  /*gzdbg << "Create Camera\n";
-  this->testCam.reset(new Camera(this->GetName() + ":Test:" + name_, this) );
-  this->testCam->Load();
-  this->testCam->Init();
-  this->testCam->CreateRenderTexture("RenderTexture");
-
-  this->testCam->SetCaptureData(true);
-  this->testCam->EnableSaveFrame(true);
-  this->testCam->SetSaveFramePathname("/tmp/camera");
-
-  this->cameras.push_back(this->testCam);
-  */
 
   return camera;
 }
@@ -804,17 +791,12 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
 {
-  gzdbg << "Receive Scene Msg\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }
 
 void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 {
-  gzdbg << "Process Scene Msg. Visuals[" << _msg->visual_size() 
-        << "] Poses[" << _msg->pose_size() << "] Lights[" 
-        << _msg->light_size() << "]\n";
-
   for (int i=0; i < _msg->visual_size(); i++)
   {
     boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(_msg->visual(i)) );
@@ -892,7 +874,6 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  gzdbg << "ReceiveVisual Message\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(msg);
 }

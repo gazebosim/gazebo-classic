@@ -69,7 +69,13 @@ namespace gazebo
 
       /// \brief Remove a connection
       public: void RemoveConnection(ConnectionPtr &conn);
- 
+
+      /// \brief Register a new topic namespace 
+      public: void RegisterTopicNamespace(const std::string &_name);
+
+      /// \brief Get all the topic namespaces
+      public: void GetTopicNamespaces(std::vector<std::string> &_namespaces);
+
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host, 
                                             unsigned short port);

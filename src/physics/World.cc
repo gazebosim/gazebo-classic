@@ -81,6 +81,7 @@ World::World(const std::string &_name)
      event::Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
   this->connections.push_back(
      event::Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

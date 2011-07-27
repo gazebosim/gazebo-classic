@@ -181,7 +181,7 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
   mainLayout->addWidget( constraintsBox );
  
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("world_1");
+  this->node->Init();
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
   this->physicsSub = this->node->Subscribe("~/physics", 
       &PhysicsWidget::OnPhysicsMsg, this);
@@ -385,7 +385,7 @@ SceneWidget::SceneWidget(QWidget *parent )
   //this->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("world_1");
+  this->node->Init();
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->sceneSub = this->node->Subscribe("~/scene", &SceneWidget::ReceiveSceneMsg, this);
 
@@ -434,9 +434,8 @@ void SceneWidget::OnFogToggle(bool _value)
   if (!this->initialized)
     return;
 
-  gzdbg << "Send Fog Message\n";
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
   if (_value)
   {
     int index = this->fogTypeBox->currentIndex();
@@ -453,7 +452,7 @@ void SceneWidget::OnFogType(int _index)
   if (!this->initialized)
     return;
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
 
   gzdbg << "OnFogType[" << _index << "]\n";
 
@@ -471,7 +470,7 @@ void SceneWidget::OnFogDensity(double _density)
   if (!this->initialized)
     return;
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
   msg.mutable_fog()->set_density(_density );
   this->scenePub->Publish(msg);
 }
@@ -481,7 +480,7 @@ void SceneWidget::OnFogStart()
   if (!this->initialized)
     return;
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
   std::string value = this->fogStart->text().toStdString();
   if (!value.empty())
   {
@@ -495,7 +494,7 @@ void SceneWidget::OnFogEnd()
   if (!this->initialized)
     return;
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
   std::string value = this->fogEnd->text().toStdString();
   if (!value.empty())
   {
@@ -520,7 +519,7 @@ void SceneWidget::OnAmbientColor()
   this->ambientColorButton->setStyleSheet(style.str().c_str());
 
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
   msg.mutable_ambient()->set_r( color.red() /256.0 );
   msg.mutable_ambient()->set_g( color.green() /256.0 );
   msg.mutable_ambient()->set_b( color.blue() /256.0 );
@@ -532,7 +531,6 @@ void SceneWidget::OnBackgroundColor()
 {
   if (!this->initialized)
     return;
-  gzdbg << "OnBackgroundColor\n";
 
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
@@ -544,7 +542,7 @@ void SceneWidget::OnBackgroundColor()
 
 
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "bgcolor");
   msg.mutable_background()->set_r( color.red() / 256.0 );
   msg.mutable_background()->set_g( color.green() / 256.0 );
   msg.mutable_background()->set_b( color.blue() / 256.0 );
@@ -568,7 +566,7 @@ void SceneWidget::OnFogColor()
   this->fogColorButton->setStyleSheet(style.str().c_str());
 
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "fog");
   msg.mutable_fog()->mutable_color()->set_r( color.red() / 256.0 );
   msg.mutable_fog()->mutable_color()->set_g( color.green() / 256.0 );
   msg.mutable_fog()->mutable_color()->set_b( color.blue() / 256.0 );
@@ -581,9 +579,8 @@ void SceneWidget::OnShadows(bool _state)
   if (!this->initialized)
     return;
 
-  gzdbg << "OnShadows\n";
   msgs::Scene msg;
-  msgs::Init(msg, "world_1");
+  msgs::Init(msg, "shadows");
   msg.set_shadows( _state );
   this->scenePub->Publish(msg);
 }

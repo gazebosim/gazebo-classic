@@ -27,6 +27,7 @@ set (msgs color.proto
           entity.proto
           joint.proto
           physics.proto
+          string_v.proto
 )
 
 set (sources msgs.cc)

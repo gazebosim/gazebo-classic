@@ -176,6 +176,12 @@ namespace gazebo
       public: PublicationPtr UpdatePublications( const std::string &topic, 
                                                  const std::string &msgType );
 
+      /// \brief Register a new topic namespace 
+      public: void RegisterTopicNamespace(const std::string &_name);
+
+      /// \brief Get all the topic namespaces
+      public: void GetTopicNamespaces(std::vector<std::string> &_namespaces);
+
       private: void HandleIncoming();
 
       /// \brief A map <subscribed_topic_name, subscription_callbacks> of 

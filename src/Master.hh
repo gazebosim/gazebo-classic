@@ -39,6 +39,8 @@ namespace gazebo
     private: PubList publishers;
     private: SubList subscribers;
 
+    private: std::list< std::string > worldNames;
+
     private: transport::ConnectionPtr connection;
     private: boost::thread *runThread;
     private: bool stop;

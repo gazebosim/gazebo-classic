@@ -44,6 +44,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
+  gzdbg << "New Camera\n";
   this->typeName = "monocamera";
 
   this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&CameraSensor::Render, this)) );
@@ -88,7 +89,7 @@ void CameraSensor::Init()
     if (!scene)
       scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
-    this->camera = scene->CreateCamera("mono_camera");
+    this->camera = scene->CreateCamera(this->sdf->GetValueString("name"));
     if (!this->camera)
     {
       gzerr << "Unable to create camera sensor[mono_camera]\n";
@@ -111,8 +112,8 @@ void CameraSensor::Init()
     this->ogreTextureName = this->GetName() + "_RttTex";
     this->camera->CreateRenderTexture(this->ogreTextureName);
 
-    //  this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-    // this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+    this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+    this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
   }
   else
     gzerr << "No world name\n";

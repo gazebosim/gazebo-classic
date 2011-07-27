@@ -26,6 +26,9 @@ namespace gazebo
     void run();
     void stop();
     void fini();
+
+    void set_world( const std::string& _name);
+    std::string get_world();
   }
 }
 
