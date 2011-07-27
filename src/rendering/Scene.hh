@@ -262,6 +262,8 @@ namespace gazebo
 
       private: Visual *worldVisual;
       private: bool shadowsEnabled;
+
+      private: CameraPtr testCam;
     };
     /// \}
   }
