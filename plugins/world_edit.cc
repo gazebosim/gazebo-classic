@@ -14,9 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
 #include "physics/physics.h"
-#include "transport/transport.h"
 #include "msgs/msgs.h"
 #include "gazebo.h"
 
@@ -43,6 +41,7 @@ namespace gazebo
       sceneMsg.mutable_ambient()->set_a(1.0);
       scenePub->Publish( sceneMsg );
 
+      // Set the step time
       msgs::Physics physicsMsg;
       msgs::Init(physicsMsg);
       physicsMsg.set_type(msgs::Physics::ODE);

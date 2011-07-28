@@ -29,6 +29,8 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 
+#include "sdf/sdf_parser.h"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -37,6 +39,9 @@ using namespace physics;
 PhysicsEngine::PhysicsEngine(WorldPtr world)
   : world(world)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile( "/sdf/physics.sdf", this->sdf );
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(world->GetName());
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");

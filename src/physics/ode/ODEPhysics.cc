@@ -232,8 +232,6 @@ void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> 
   msg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
   msg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
   this->physicsPub->Publish( msg );
-  gzdbg << "Publish physics msg\n";
-
 }
 
 void ODEPhysics::OnPhysicsMsg( const boost::shared_ptr<msgs::Physics const> &_msg )
@@ -339,7 +337,7 @@ void ODEPhysics::Fini()
 // Set the step time
 void ODEPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetOrCreateElement("solver")->GetAttribute("dt")->Set(_value);
+  this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver")->GetAttribute("dt")->Set(_value);
   this->stepTimeDouble = _value;
 }
 

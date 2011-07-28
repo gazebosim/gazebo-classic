@@ -88,7 +88,6 @@ void Master::OnRead(const unsigned int connectionIndex,
                      worldNameMsg.data());
     if (iter == this->worldNames.end())
     {
-      std::cout << "Register world[" << worldNameMsg.data() << "]\n";
       this->worldNames.push_back( worldNameMsg.data() );
     }
   }
