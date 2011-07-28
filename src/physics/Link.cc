@@ -165,12 +165,6 @@ void Link::Init()
     (*siter)->Init();
   }
 
-  // save transform from this Parent Model Frame to this Link Frame
-  // this is only used in setting Model pose from canonicalLink
-  // the true model pose given a canonical body is
-  //   this body's pose - this body's offsetFromModelFrame
-  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(math::Pose());
-
   this->SetKinematic( this->sdf->GetValueBool("kinematic") );
 
   // If no geoms are attached, then don't let gravity affect the body.
@@ -246,6 +240,7 @@ void Link::Init()
   // DO THIS LAST!
   sdf::ElementPtr originElem = this->sdf->GetOrCreateElement("origin");
   this->SetRelativePose( originElem->GetValuePose("pose") );
+  this->SetInitialRelativePose( originElem->GetValuePose("pose") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -67,11 +67,14 @@ namespace gazebo
     public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
     {
       this->simTime  = msgs::Convert( _msg->sim_time() );
+
       math::Pose pose;
       pose.pos.x = 0.5*sin(0.01*this->simTime.Double());
       math::Pose orig_pose = this->model->GetWorldPose();
-      if (this->simTime.Double() > 10.0)
+
+      if (this->simTime.Double() > 20.0)
         this->model->SetWorldPose( pose );
+
       gzdbg << "plugin simTime [" << this->simTime.Double() << "] update pose [" << pose.pos.x << "] orig pose [" << orig_pose << "]\n";
     }
 

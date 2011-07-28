@@ -201,6 +201,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
     dWorldSetERP(this->worldId, 
         odeElem->GetElement("constraints")->GetValueDouble("erp"));
   }
+    dWorldSetERP(this->worldId, 0.2);
 
   dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters() );
   dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());

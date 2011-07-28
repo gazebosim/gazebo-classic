@@ -42,6 +42,7 @@ namespace boost
 {
   class thread;
   class mutex;
+  class recursive_mutex;
 }
 
 namespace gazebo
@@ -236,6 +237,9 @@ namespace gazebo
 
       private: boost::mutex *updateMutex;
       private: sdf::ElementPtr sdf;
+
+      /// lock all pose updates when worldPose is being updated for a model
+      public: boost::recursive_mutex* modelWorldPoseUpdateMutex;
 
       private: std::vector<PluginPtr> plugins;
     };

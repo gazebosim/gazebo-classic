@@ -185,10 +185,6 @@ namespace gazebo
   
       protected: bool isStatic;
   
-      /// Used by Model if this body is the canonical body
-      ///   model pose = body pose + initModelOffset
-      public: math::Pose initModelOffset;
-  
       // Helper entity for separating body pose from center-of-mass pose
       protected: EntityPtr comEntity;
   

@@ -71,7 +71,7 @@ namespace gazebo
 
       /// \brief Set the initial pose
       /// \param p The initial pose
-      public: void SetInitialPose( const math::Pose &p );
+      public: void SetInitialRelativePose( const math::Pose &p );
 
       /// \brief Return the bounding box for the entity 
       public: virtual math::Box GetBoundingBox() const;
@@ -82,9 +82,6 @@ namespace gazebo
       /// \brief Get the pose of the entity relative to its parent
       public: math::Pose GetRelativePose() const;
   
-      /// \brief Get the pose relative to the model this entity belongs to
-      public: math::Pose GetModelRelativePose() const;
-  
       /// \brief Set the pose of the entity relative to its parent
       /// \param pose The new pose
       /// \param notify True = tell children of the pose change
@@ -94,14 +91,6 @@ namespace gazebo
       /// \param pose The new world pose
       /// \param notify True = tell children of the pose change
       public: void SetWorldPose(const math::Pose &pose, bool notify=true);
-  
-      /// \brief Set the position of the entity relative to its parent
-      /// \param pos The new X,Y,Z position
-      public: void SetRelativePosition(const math::Vector3 &pos);
-  
-      /// \brief Set the rotation of the entity relative to its parent
-      /// \param rot The new Quaternion rotation
-      public: void SetRelativeRotation(const math::Quaternion &rot);
   
       /// \brief Get the linear velocity of the entity
       /// \return A math::Vector3 for the linear velocity
@@ -173,8 +162,8 @@ namespace gazebo
       private: bool isCanonicalLink;
   
       /// The initial pose of the entity
-      private: math::Pose initialPose;
-      private: math::Pose relativePose;
+      private: math::Pose initialRelativePose;
+      private: math::Pose worldPose;
 
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr posePub;

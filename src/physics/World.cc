@@ -20,6 +20,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -75,6 +76,7 @@ World::World(const std::string &_name)
   this->name = _name;
 
   this->updateMutex = new boost::mutex();
+  this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
 
   this->connections.push_back( 
      event::Events::ConnectStepSignal( boost::bind(&World::OnStep, this) ) );
@@ -89,6 +91,12 @@ World::World(const std::string &_name)
 // Private destructor
 World::~World()
 {
+  delete this->updateMutex;
+  this->updateMutex = NULL;
+
+  delete this->modelWorldPoseUpdateMutex;
+  this->modelWorldPoseUpdateMutex = NULL;
+
   this->connections.clear();
   this->Fini();
 }

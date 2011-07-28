@@ -134,18 +134,18 @@ void Model::Load( sdf::ElementPtr &_sdf )
   if (_sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
-    bool first = false;
+    //bool first = false;
     while (linkElem)
     {
       // Create a new link
       LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
           boost::shared_static_cast<Model>(shared_from_this()));
 
-      if (first)
-      {
-        link->SetCanonicalLink(true);
-        first = false;
-      }
+      // if (first)
+      // {
+      //   link->SetCanonicalLink(true);
+      //   first = false;
+      // }
 
       // Load the link using the config node. This also loads all of the
       // bodies geometries
@@ -187,13 +187,11 @@ void Model::Init()
   // Get the position and orientation of the model (relative to parent)
   pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
 
-  this->SetRelativePose( pose );
-
   // Record the model's initial pose (for reseting)
-  this->SetInitialPose( pose );
-  //this->SetInitialPose( this->GetWorldPose() );
+  this->SetInitialRelativePose( pose );
 
-  /// FIXME: Model::pose is set to the pose of first link
+
+  /// FIXME: canonical link is hardcoded to the first link.
   ///        warn users for now, need  to add parsing of
   ///        the canonical tag in sdf
   for (unsigned int i=0; i < this->children.size(); i++)
@@ -202,10 +200,12 @@ void Model::Init()
     {
       gzwarn << "Model Canonical Link is presetting to first link for now, ignoring any canonical tag if one exists in your xml\n";
       this->canonicalLink = boost::shared_static_cast<Link>(this->children[i]);
-      //this->canonicalLink->SetCanonicalLink(true);
+      this->canonicalLink->SetCanonicalLink(true);
       break;
     }
   }
+
+  this->SetRelativePose( pose );
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin(); 
