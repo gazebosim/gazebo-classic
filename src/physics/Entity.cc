@@ -330,7 +330,7 @@ ModelPtr Entity::GetParentModel() const
 {
   BasePtr p = this->parent;
 
-  while (p && p->HasType(MODEL))
+  while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
 
   return boost::shared_dynamic_cast<Model>(p);
