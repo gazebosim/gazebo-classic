@@ -1,5 +1,5 @@
 <gazebo version='1.0' >
-  <world name='world_1' >
+  <world name='old_gazebo_xml_deprecated' >
     <scene >
       <ambient rgba='0.5 0.5 0.5 0.5' />
       <background rgba='0.5 0.5 0.5 1' >
@@ -49,7 +49,6 @@
       <direction xyz='0 0 -2' />
     </light>
     <model name='pr2' static='0' >
-      <plugin name="plugin_1" filename="libpr2_pose_test.so"/>
       <origin pose='0 0 0 0 -0 0' />
       <link name='base_footprint' gravity='1' self_collide='0' kinematic='0' >
         <origin pose='0 0 0 0 -0 0' />
@@ -2306,6 +2305,7 @@
         <data name='xyz' value='0 0 0' />
         <data name='rpy' value='0 -0 0' />
       </plugin>
+      <plugin name='plugin_1_name' filename='libpr2_pose_test.so' />
     </model>
   </world>
 </gazebo>
