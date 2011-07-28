@@ -26,10 +26,16 @@ namespace gazebo
 
     public: void Load( sdf::ElementPtr &_sdf )
     {
+      // Create a new transport node
       transport::NodePtr node(new transport::Node());
+
+      // Initialize the node with the world name
       node->Init(_sdf->GetWorldName());
-     
+    
+      // Create a publisher on the ~/scene topic 
       transport::PublisherPtr scenePub = node->Advertise<msgs::Scene>("~/scene");
+
+      // Create a publisher on the ~/physics topic
       transport::PublisherPtr physicsPub = node->Advertise<msgs::Physics>("~/physics");
 
       // Set the ambient color to red
