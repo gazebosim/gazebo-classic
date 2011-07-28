@@ -13,8 +13,8 @@
 
 namespace gazebo
 {
-  /// \ingroup gazebo_common
-  /// \brief Common namespace
+  /// \ingroup gazebo_transport
+  /// \brief Transport namespace
   namespace transport
   {
 
