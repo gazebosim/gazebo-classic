@@ -202,42 +202,73 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
 /// Get the absolute pose of the entity
 math::Pose Entity::GetWorldPose() const
 {
-  // if this is a model, simply return canonical pose - initial relative pose
+  /* debugging
   if (this->HasType(MODEL))
   {
     //gzerr << "GWP [" << this->GetName() << "]\n";
-
     // simply check that WP = CWP - CIRP for assurance
     const Model* model = dynamic_cast<const Model*>(this);
     LinkPtr link = model->GetLink();
     if (!link)
       gzerr << "  No CB for [" << this->GetName() << "] Init?\n";
-    /*
     else
     {
-      gzerr << "        GWP[ " << this->worldPose << "]\n";
-      gzerr << "   CWP-CIRP[ " << link->worldPose + link->initialRelativePose.GetInverse() << "]\n";
 
-      math::Pose model_abs_pose;
+      math::Pose model_abs_pose1 = link->worldPose + link->initialRelativePose.GetInverse();
+      math::Pose model_abs_pose2;
       math::Pose cb_rel_pose = this->GetRelativePose();
       // anti-rotate cb-abs by cb-rel = model-abs
-      model_abs_pose.rot = link->worldPose.rot * link->initialRelativePose.rot.GetInverse();
+      model_abs_pose2.rot = link->worldPose.rot * link->initialRelativePose.rot.GetInverse();
       // rotate cb-rel pos by cb-rel rot to get pos offset
       //Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
       // finally, model-abs pos is cb-abs pos - pos_offset
-      //model_abs_pose.pos = cb->GetWorldPose().pos - pos_offset;
-      model_abs_pose.pos = link->worldPose.pos - model_abs_pose.rot * link->initialRelativePose.pos;
-      //model_abs_pose.pos = pose.pos - this->GetRelativePose().pos;
+      //model_abs_pose2.pos = cb->GetWorldPose().pos - pos_offset;
+      model_abs_pose2.pos = link->worldPose.pos - model_abs_pose2.rot * link->initialRelativePose.pos;
+      //model_abs_pose2.pos = pose.pos - this->GetRelativePose().pos;
       // set abs pose of parent model without propagating
       // changes to children
-      gzerr << "  *CWP-CIRP[ " << model_abs_pose << "]\n";
-    }
-    */
 
-    return this->worldPose;
+      if (this->worldPose != model_abs_pose1 || this->worldPose != model_abs_pose2)
+      {
+        gzerr << "        GWP[ " << this->worldPose << "]\n";
+        gzerr << "  *CWP-CIRP[ " << model_abs_pose1 << "]\n";
+        gzerr << "  *CWP-CIRP[ " << model_abs_pose2 << "]\n";
+      }
+    }
   }
-  else
-    return this->worldPose;
+  */
+
+  return this->worldPose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the abs twist of the entity
+void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren)
+{
+  if (this->HasType(BODY) || this->HasType(MODEL))
+  {
+    if (this->HasType(BODY))
+    {
+      Link* link = dynamic_cast<Link*>(this);
+      link->SetLinearVel(linear);
+      link->SetAngularVel(angular);
+    }
+    if (updateChildren)
+    {
+      // force an update of all children
+      for  (Base_V::iterator iter = this->children.begin();
+            iter != this->children.end(); iter++)
+      {
+        if ((*iter)->HasType(ENTITY))
+        {
+          EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
+          entity->SetWorldTwist(linear,angular,updateChildren);
+        }
+      }
+    }
+  }
+  //else
+  //  gzdbg << "Setting Twist of a non-ODE body [" << this->GetName() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,9 +302,9 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
       {
         EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
         if (entity->IsCanonicalLink())
-          entity->worldPose = (pose + entity->initialRelativePose);
+          entity->worldPose = (entity->initialRelativePose + pose);
         else
-          entity->worldPose = (entity->worldPose + (pose - oldModelWorldPose));
+          entity->worldPose = ((entity->worldPose - oldModelWorldPose) + pose);
         if (notify) entity->UpdatePhysicsPose(false);
         entity->PublishPose();
         //printf("SWP Model Body [%s]\t",(*iter)->GetName().c_str());

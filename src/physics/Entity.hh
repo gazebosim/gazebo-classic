@@ -161,6 +161,8 @@ namespace gazebo
       /// \brief Only used by Links. Included here for performance.
       private: bool isCanonicalLink;
   
+      public: void SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren=true);
+
       /// The initial pose of the entity
       private: math::Pose initialRelativePose;
       private: math::Pose worldPose;

@@ -215,8 +215,8 @@ void MultiRayShape::Update()
 
       msgs::Set(this->rayFanMsg->mutable_points(i), b );
       msgs::Set(this->rayFanOutlineMsg->mutable_points(i), b );
-      gzdbg << "ray [" << i << "]"
-            << " length [" << (*iter)->GetLength() << "]\n";
+      //gzdbg << "ray [" << i << "]"
+      //      << " length [" << (*iter)->GetLength() << "]\n";
     }
   }
 }
