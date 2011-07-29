@@ -94,4 +94,4 @@ target_link_libraries( gzphysics gazebo_common
                                  pthread)
 INSTALL_EXECUTABLE( gzphysics )
 INSTALL_LIBRARY(gazebo_physics)
-INSTALL_INCLUDES("physics" ${headers})
+INSTALL_INCLUDES("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)
