@@ -64,15 +64,16 @@ namespace gazebo
 
       math::Pose orig_pose = this->model->GetWorldPose();
       math::Pose pose = orig_pose;
-      pose.pos.x = 0.5*sin(0.1*this->simTime.Double());
-      pose.rot.SetFromEuler(math::Vector3(0,0,this->simTime.Double()));
+      pose.pos.x = 5.0*sin(0.1*this->simTime.Double());
+      pose.rot.SetFromEuler(math::Vector3(0,0,2.0*this->simTime.Double()));
 
       if (this->simTime.Double() > 10.0 && this->simTime.Double() < 300.0)
       {
         this->model->SetWorldPose( pose );
-        this->model->SetWorldTwist( math::Vector3(0,0,0),math::Vector3(0,0,0),true );
         printf("test plugin OnUpdate simTime [%f] update pose [%f,%f,%f:%f,%f,%f,%f] orig pose.x [%f]\n",
                this->simTime.Double(), pose.pos.x, pose.pos.y, pose.pos.z, pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
+        if (this->simTime.Double() > 20.0)
+          this->model->SetWorldTwist( math::Vector3(0,0,0),math::Vector3(0,0,0),true );
       }
     }
 
