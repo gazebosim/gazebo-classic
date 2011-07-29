@@ -89,6 +89,10 @@ void Joint::Load(sdf::ElementPtr &_sdf)
   if (!this->childLink && childName != std::string("world"))
     gzthrow("Couldn't Find Child Link[" + childName);
 
+  BasePtr myBase = shared_from_this();
+  this->parentLink->AddChildJoint(boost::shared_static_cast<Joint>(myBase));
+  this->childLink->AddParentJoint(boost::shared_static_cast<Joint>(myBase));
+
   math::Pose offset;
   if (_sdf->HasElement("origin"))
     offset = _sdf->GetElement("origin")->GetValuePose("pose");

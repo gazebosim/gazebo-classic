@@ -51,6 +51,8 @@ Link::Link(EntityPtr parent)
 {
   this->AddType(Base::BODY);
   this->inertial.reset(new Inertial);
+  this->parentJoints.clear();
+  this->childJoints.clear();
 }
 
 
@@ -477,4 +479,18 @@ bool Link::SetSelected( bool s )
 void Link::SetInertial(const InertialPtr &/*_inertial*/)
 {
   gzwarn << "Link::SetMass is empty\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a parent joint
+void Link::AddParentJoint(JointPtr joint)
+{
+  this->parentJoints.push_back(joint);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a child joint
+void Link::AddChildJoint(JointPtr joint)
+{
+  this->childJoints.push_back(joint);
 }

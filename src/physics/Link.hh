@@ -31,6 +31,7 @@
 
 #include "physics/Entity.hh"
 #include "physics/Inertial.hh"
+#include "physics/Joint.hh"
 
 namespace gazebo
 {
@@ -207,6 +208,14 @@ namespace gazebo
   
       private: std::vector<event::ConnectionPtr> connections;
       private: sensors::Sensor_V sensors;
+
+      /// \brief Joints that have this Link as a child Link
+      private: std::vector< JointPtr > parentJoints;
+      public: void AddParentJoint(JointPtr joint);
+
+      /// \brief Joints that have this Link as a parent Link
+      private: std::vector< JointPtr > childJoints;
+      public: void AddChildJoint(JointPtr joint);
     };
     /// \}
   }
