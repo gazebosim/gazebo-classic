@@ -61,7 +61,6 @@ namespace gazebo
     public: void OnUpdate()
     {
       this->simTime  = this->world->GetSimTime();
-      //static double a = 0; a = a+0.2; this->simTime  = a;
 
       math::Pose orig_pose = this->model->GetWorldPose();
       math::Pose pose = orig_pose;
@@ -79,19 +78,18 @@ namespace gazebo
 
     public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
     {
-      //this->simTime  = this->world->GetSimTime();
-      static double fake_time = 0; fake_time = fake_time+0.2; this->simTime = fake_time;
+      static double fake_time = 0; fake_time = fake_time+0.2;
 
       math::Pose orig_pose = this->model->GetWorldPose();
       math::Pose pose = orig_pose;
-      pose.pos.x = 0.5*sin(0.1*this->simTime.Double());
-      pose.rot.SetFromEuler(math::Vector3(0,0,this->simTime.Double()));
+      pose.pos.x = 0.5*sin(0.1*fake_time);
+      pose.rot.SetFromEuler(math::Vector3(0,0,fake_time));
 
-      if (this->simTime.Double() < 10.0)
+      if (this->world->GetSimTime().Double() < 10.0)
       {
         this->model->SetWorldPose( pose );
         printf("test plugin OnStats simTime [%f] update pose [%f,%f,%f:%f,%f,%f,%f] orig pose.x [%f]\n",
-               this->simTime.Double(), pose.pos.x, pose.pos.y, pose.pos.z, pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
+               fake_time, pose.pos.x, pose.pos.y, pose.pos.z, pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
       }
 
     }
