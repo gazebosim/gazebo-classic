@@ -65,7 +65,8 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if (xmlGetProp(pluginXml, (xmlChar*)"plugin"))
         initAttr(pluginXml, "plugin", sdfPlugin->GetAttribute("filename"));
       else
-        sdfPlugin->GetAttribute("filename")->SetFromString((const char*)pluginXml->name);
+        //sdfPlugin->GetAttribute("filename")->SetFromString((const char*)pluginXml->name);
+        initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
 
       //gzdbg << "Getting plugin[" << sdfPlugin->GetAttribute("filename")->GetAsString() << "]\n";
       for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;

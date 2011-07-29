@@ -33,6 +33,7 @@
 #include "physics/Link.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Entity.hh"
+#include <boost/thread/recursive_mutex.hpp>
 
 using namespace gazebo;
 using namespace physics;
@@ -90,7 +91,12 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 
   if (_sdf->HasElement("origin"))
   {
-     this->SetRelativePose( _sdf->GetElement("origin")->GetValuePose("pose") );
+    if (this->parent && this->parentEntity)
+      this->worldPose = _sdf->GetElement("origin")->GetValuePose("pose") +
+                        this->parentEntity->worldPose;
+    else
+      this->worldPose = _sdf->GetElement("origin")->GetValuePose("pose");
+    this->initialRelativePose = _sdf->GetElement("origin")->GetValuePose("pose");
   }
 
   if (this->parent)
@@ -135,9 +141,9 @@ bool Entity::IsStatic() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the initial pose
-void Entity::SetInitialPose(const math::Pose &p )
+void Entity::SetInitialRelativePose(const math::Pose &p )
 {
-  this->initialPose = p;
+  this->initialRelativePose = p;
 }
 
 
@@ -146,23 +152,6 @@ void Entity::SetInitialPose(const math::Pose &p )
 math::Box Entity::GetBoundingBox() const
 {
   return math::Box(math::Vector3(0,0,0), math::Vector3(1,1,1));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the absolute pose of the entity
-math::Pose Entity::GetWorldPose() const
-{
-  if (this->parent && this->parentEntity)
-    return this->GetRelativePose() + this->parentEntity->GetWorldPose();
-  else
-    return this->GetRelativePose();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the pose of the entity relative to its parent
-math::Pose Entity::GetRelativePose() const
-{
-  return this->relativePose;
 }
 
 // Set to true if this entity is a canonical link for a model.
@@ -177,90 +166,6 @@ bool Entity::IsCanonicalLink() const
   return this->isCanonicalLink;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the pose of the entity relative to its parent
-void Entity::SetRelativePose(const math::Pose &pose, bool notify)
-{
-  // debugging
-  // if (this->GetCompleteScopedName() == "root::model_1::link_1")
-  // {
-  //   if (abs(this->relativePose.pos.x - pose.pos.x) > 0.00001)
-  //   {
-  //     gzdbg << "setting relative pose name [" << this->GetName()
-  //           << "] old [" << this->relativePose
-  //           << "] new [" << pose
-  //           << "]\n";
-  //     gzdbg << "diff [" << abs(this->relativePose.pos.x - pose.pos.x) << "]\n";
-  //     printf("ok\n");
-  //   }
-  // }
-
-  //if (pose != this->relativePose)
-  {
-    if (this->HasType(MODEL))
-    {
-      // lock physics
-
-      // set relative pose of this model
-      this->relativePose = pose;
-      this->relativePose.Correct();
-
-      // update all children pose, moving them with the model.
-      // this happens when OnPoseChange uses GetWorldPose and
-      // finds each link's world pose has changed due to parent
-      // relative pose change above.
-      this->UpdatePhysicsPose(true);
-
-      // unlock physics
-    }
-    else if (this->IsCanonicalLink())
-    {
-      // lock physics
-
-      // set relative pose of the parent model
-      ModelPtr parentModel = boost::shared_static_cast<Model>(this->parent);
-      parentModel->relativePose = parentModel->relativePose +
-           (pose - this->GetRelativePose());
-
-      // let the visualizer know that the parent pose has changed
-      // given the canonical link relative pose is the same, this
-      // is needed to show movement in visualizer
-      parentModel->PublishPose();
-
-      // loop through non-canonical bodies, so their worldPose remain unchanged
-      for  (Base_V::iterator iter = parentModel->children.begin();
-            iter != parentModel->children.end(); iter++)
-      {
-        if ((*iter)->HasType(ENTITY))
-        {
-          EntityPtr ent = boost::shared_static_cast<Entity>(*iter);
-          if (!ent->IsCanonicalLink())
-          {
-            ent->relativePose = ent->relativePose +
-               (pose - this->GetRelativePose());
-          }
-        }
-      }
-      // push changes for this canonical link back to the physics engine
-      //this->UpdatePhysicsPose(false);
-
-      // unlock physics
-    }
-    else
-    {
-      this->relativePose = pose;
-      this->relativePose.Correct();
-      if (notify) 
-        this->UpdatePhysicsPose(true);
-    }
-
-    // do we really need to do this still?
-    //if (notify) this->UpdatePhysicsPose(false);
-
-    this->PublishPose();
-  }
-}
-
 void Entity::PublishPose()
 {
   msgs::Set( this->poseMsg, this->GetRelativePose());
@@ -268,43 +173,181 @@ void Entity::PublishPose()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the pose relative to the model this entity belongs to
-math::Pose Entity::GetModelRelativePose() const
+// Get the pose of the entity relative to its parent
+math::Pose Entity::GetRelativePose() const
 {
-  if (this->HasType(MODEL) || !this->parent)
-    return math::Pose();
+  if (this->IsCanonicalLink())
+  {
+    return this->initialRelativePose; // this should never change for canonical
+  }
+  else if (this->parent && this->parentEntity)
+  {
+    return this->worldPose - this->parentEntity->GetWorldPose();
+  }
+  else
+    return this->worldPose;
+}
 
-  return this->GetRelativePose() + this->parentEntity->GetModelRelativePose();
+////////////////////////////////////////////////////////////////////////////////
+/// Set the pose of the entity relative to its parent
+void Entity::SetRelativePose(const math::Pose &pose, bool notify)
+{
+  if (this->parent && this->parentEntity)
+    this->SetWorldPose(pose + this->parentEntity->GetWorldPose(), notify);
+  else
+    this->SetWorldPose(pose, notify);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the absolute pose of the entity
+math::Pose Entity::GetWorldPose() const
+{
+  /* debugging
+  if (this->HasType(MODEL))
+  {
+    //gzerr << "GWP [" << this->GetName() << "]\n";
+    // simply check that WP = CWP - CIRP for assurance
+    const Model* model = dynamic_cast<const Model*>(this);
+    LinkPtr link = model->GetLink();
+    if (!link)
+      gzerr << "  No CB for [" << this->GetName() << "] Init?\n";
+    else
+    {
+
+      math::Pose model_abs_pose1 = link->worldPose + link->initialRelativePose.GetInverse();
+      math::Pose model_abs_pose2;
+      math::Pose cb_rel_pose = this->GetRelativePose();
+      // anti-rotate cb-abs by cb-rel = model-abs
+      model_abs_pose2.rot = link->worldPose.rot * link->initialRelativePose.rot.GetInverse();
+      // rotate cb-rel pos by cb-rel rot to get pos offset
+      //Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
+      // finally, model-abs pos is cb-abs pos - pos_offset
+      //model_abs_pose2.pos = cb->GetWorldPose().pos - pos_offset;
+      model_abs_pose2.pos = link->worldPose.pos - model_abs_pose2.rot * link->initialRelativePose.pos;
+      //model_abs_pose2.pos = pose.pos - this->GetRelativePose().pos;
+      // set abs pose of parent model without propagating
+      // changes to children
+
+      if (this->worldPose != model_abs_pose1 || this->worldPose != model_abs_pose2)
+      {
+        gzerr << "        GWP[ " << this->worldPose << "]\n";
+        gzerr << "  *CWP-CIRP[ " << model_abs_pose1 << "]\n";
+        gzerr << "  *CWP-CIRP[ " << model_abs_pose2 << "]\n";
+      }
+    }
+  }
+  */
+
+  return this->worldPose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the abs twist of the entity
+void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren)
+{
+  if (this->HasType(BODY) || this->HasType(MODEL))
+  {
+    if (this->HasType(BODY))
+    {
+      Link* link = dynamic_cast<Link*>(this);
+      link->SetLinearVel(linear);
+      link->SetAngularVel(angular);
+    }
+    if (updateChildren)
+    {
+      // force an update of all children
+      for  (Base_V::iterator iter = this->children.begin();
+            iter != this->children.end(); iter++)
+      {
+        if ((*iter)->HasType(ENTITY))
+        {
+          EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
+          entity->SetWorldTwist(linear,angular,updateChildren);
+        }
+      }
+    }
+  }
+  //else
+  //  gzdbg << "Setting Twist of a non-ODE body [" << this->GetName() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
 void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
-  if (this->parent && this->parent->HasType(ENTITY))
+  if (this->HasType(MODEL))
   {
-    math::Pose relative_pose(pose - this->parentEntity->GetWorldPose());
-    this->SetRelativePose(relative_pose, notify);
+    this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+
+    //gzerr << "SWP [" << this->GetName() << "]\n";
+    //printf("\nSWP Model [%s]\n",this->GetName().c_str());
+
+    math::Pose oldModelWorldPose = this->worldPose;
+
+    // initialization: (no children?) set own worldPose
+    this->worldPose = pose;
+    this->worldPose.Correct();
+    if (notify) this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
+
+    //
+    // user deliberate setting: lock and update all children's wp
+    //
+
+    // force an update of all children
+    // update all children pose, moving them with the model.
+    for  (Base_V::iterator iter = this->children.begin();
+          iter != this->children.end(); iter++)
+    {
+      if ((*iter)->HasType(ENTITY))
+      {
+        EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
+        if (entity->IsCanonicalLink())
+          entity->worldPose = (entity->initialRelativePose + pose);
+        else
+          entity->worldPose = ((entity->worldPose - oldModelWorldPose) + pose);
+        if (notify) entity->UpdatePhysicsPose(false);
+        entity->PublishPose();
+        //printf("SWP Model Body [%s]\t",(*iter)->GetName().c_str());
+      }
+    }
+
+    //printf("\nSWP Model [%s] DONE\n\n",this->GetName().c_str());
+    this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
+  }
+  else if (this->IsCanonicalLink())
+  {
+    this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+    //printf("c[%s]",this->GetName().c_str());
+    this->worldPose = pose;
+    this->worldPose.Correct();
+    if (notify) this->UpdatePhysicsPose(true);
+
+    // also update parent model's pose
+    if (this->parentEntity->HasType(MODEL))
+    {
+      this->parentEntity->worldPose = pose - this->initialRelativePose;
+      this->parentEntity->worldPose.Correct();
+      if (notify) this->parentEntity->UpdatePhysicsPose(false);
+      this->parentEntity->PublishPose();
+    }
+    else
+      gzerr << "SWP for CB[" << this->GetName() << "] but parent["
+            << this->parentEntity->GetName() << "] is not a MODEL!\n";
+    //printf("C[%s]",this->GetName().c_str());
+    this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
   }
   else
   {
-    // no parent, relative pose is the absolute world pose
-    this->SetRelativePose(pose, notify);
+    this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+    //printf("b[%s]",this->GetName().c_str());
+    this->worldPose = pose;
+    this->worldPose.Correct();
+    if (notify) this->UpdatePhysicsPose(true);
+    //printf("B[%s]",this->GetName().c_str());
+    this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
   }
-}
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the position of the entity relative to its parent
-void Entity::SetRelativePosition(const math::Vector3 &pos)
-{
-  this->SetRelativePose( math::Pose( pos, this->GetRelativePose().rot), true );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the rotation of the entity relative to its parent
-void Entity::SetRelativeRotation(const math::Quaternion &rot)
-{
-  this->SetRelativePose( math::Pose( this->GetRelativePose().pos, rot), true );
+  this->PublishPose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

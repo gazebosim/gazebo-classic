@@ -35,10 +35,10 @@ namespace gazebo
 
       // Get the world name.
       std::string worldName = _sdf->GetWorldName();
-      physics::WorldPtr world = physics::get_world(worldName);
+      this->world = physics::get_world(worldName);
 
       // Get a pointer to the model
-      this->model = world->GetModelByName(modelName);
+      this->model = this->world->GetModelByName(modelName);
 
       // Error message if the model couldn't be found
       if (!this->model)
@@ -60,26 +60,43 @@ namespace gazebo
     // Called by the world update start event
     public: void OnUpdate()
     {
-      // do something on update
-      //gzdbg << "plugin update\n";
+      this->simTime  = this->world->GetSimTime();
+
+      math::Pose orig_pose = this->model->GetWorldPose();
+      math::Pose pose = orig_pose;
+      pose.pos.x = 0.5*sin(0.1*this->simTime.Double());
+      pose.rot.SetFromEuler(math::Vector3(0,0,this->simTime.Double()));
+
+      if (this->simTime.Double() > 10.0 && this->simTime.Double() < 300.0)
+      {
+        this->model->SetWorldPose( pose );
+        this->model->SetWorldTwist( math::Vector3(0,0,0),math::Vector3(0,0,0),true );
+        printf("test plugin OnUpdate simTime [%f] update pose [%f,%f,%f:%f,%f,%f,%f] orig pose.x [%f]\n",
+               this->simTime.Double(), pose.pos.x, pose.pos.y, pose.pos.z, pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
+      }
     }
 
     public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
     {
-      this->simTime  = msgs::Convert( _msg->sim_time() );
+      static double fake_time = 0; fake_time = fake_time+0.2;
 
-      math::Pose pose;
-      pose.pos.x = 0.5*sin(0.01*this->simTime.Double());
       math::Pose orig_pose = this->model->GetWorldPose();
+      math::Pose pose = orig_pose;
+      pose.pos.x = 0.5*sin(0.1*fake_time);
+      pose.rot.SetFromEuler(math::Vector3(0,0,fake_time));
 
-      if (this->simTime.Double() > 20.0)
+      if (this->world->GetSimTime().Double() < 10.0)
+      {
         this->model->SetWorldPose( pose );
+        printf("test plugin OnStats simTime [%f] update pose [%f,%f,%f:%f,%f,%f,%f] orig pose.x [%f]\n",
+               fake_time, pose.pos.x, pose.pos.y, pose.pos.z, pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
+      }
 
-      gzdbg << "plugin simTime [" << this->simTime.Double() << "] update pose [" << pose.pos.x << "] orig pose [" << orig_pose << "]\n";
     }
 
     // Pointer to the model
     private: physics::ModelPtr model;
+    private: physics::WorldPtr world;
 
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;

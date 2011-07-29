@@ -2305,6 +2305,7 @@
         <data name='xyz' value='0 0 0' />
         <data name='rpy' value='0 -0 0' />
       </plugin>
+      <plugin name='plugin_1_name' filename='libpr2_pose_test.so' />
     </model>
   </world>
 </gazebo>

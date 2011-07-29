@@ -45,7 +45,6 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 RaySensor::RaySensor()
     : Sensor()
 {
-  gzdbg << "New Ray Sensor\n";
   this->active = false;
   this->typeName = "ray";
 }
