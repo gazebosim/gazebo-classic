@@ -261,8 +261,6 @@ namespace gazebo
       private: SelectionObj *selectionObj;
 
       private: Visual *worldVisual;
-      private: bool shadowsEnabled;
-
     };
     /// \}
   }

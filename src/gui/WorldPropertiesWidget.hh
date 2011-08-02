@@ -46,6 +46,7 @@ namespace gazebo
 
       private slots: void OnSolverType(int _index);
 
+      private slots: void OnGravity();
       private slots: void OnDt();
       private slots: void OnSOR();
       private slots: void OnIters();

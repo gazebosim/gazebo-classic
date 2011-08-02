@@ -59,8 +59,6 @@ Scene::Scene(const std::string &_name)
   this->manager = NULL;
   this->raySceneQuery = NULL;
 
-  this->shadowsEnabled = false;
-
   this->receiveMutex = new boost::mutex();
 
   this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
@@ -169,6 +167,9 @@ void Scene::Init()
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
+  // Force shadows on.
+  sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
+  shadowElem->GetAttribute("enabled")->Set(true);
   RTShaderSystem::Instance()->ApplyShadows(this);
 
   // Send a request to get the current world state
@@ -1085,10 +1086,11 @@ void Scene::SetSky(const std::string &_material)
 /// Set whether shadows are on or off
 void Scene::SetShadowsEnabled(bool _value)
 {
-  if (_value != this->shadowsEnabled)
+  sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
+  if (_value != shadowElem->GetValueBool("enabled"))
   {
-    this->shadowsEnabled = _value;
-    if (this->shadowsEnabled)
+    shadowElem->GetAttribute("enabled")->Set(_value);
+    if (_value)
       RTShaderSystem::Instance()->ApplyShadows(this);
     else
       RTShaderSystem::Instance()->RemoveShadows(this);
@@ -1098,5 +1100,6 @@ void Scene::SetShadowsEnabled(bool _value)
 /// Get whether shadows are on or off
 bool Scene::GetShadowsEnabled() const
 {
-  return this->shadowsEnabled;
+  sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
+  return shadowElem->GetValueBool("enabled");
 }

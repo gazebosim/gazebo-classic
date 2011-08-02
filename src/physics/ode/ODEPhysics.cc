@@ -219,7 +219,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
 void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
 {
   msgs::Physics msg;
-  msgs::Init(msg, "ode_physics");
+  msgs::Init(msg, "physics");
   msg.set_type( msgs::Physics::ODE );
 
   msg.set_solver_type( this->stepType );
@@ -237,9 +237,47 @@ void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> 
 
 void ODEPhysics::OnPhysicsMsg( const boost::shared_ptr<msgs::Physics const> &_msg )
 {
-  if (_msg->has_dt())
-    this->SetStepTime(_msg->dt());
 
+  if (_msg->has_dt())
+  {
+    this->SetStepTime(_msg->dt());
+  }
+
+  if (_msg->has_solver_type())
+  {
+    sdf::ElementPtr solverElem = this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver");
+    if (_msg->solver_type() == "quick")
+    {
+      solverElem->GetAttribute("type")->Set("quick");
+      this->physicsStepFunc = &dWorldQuickStep;
+    }
+    else if (_msg->solver_type() == "world")
+    {
+      solverElem->GetAttribute("type")->Set("world");
+      this->physicsStepFunc = &dWorldStep;
+    }
+  }
+
+  if (_msg->has_iters())
+    this->SetSORPGSIters(_msg->iters());
+
+  if (_msg->has_sor())
+    this->SetSORPGSW(_msg->sor());
+
+  if (_msg->has_cfm())
+    this->SetWorldCFM( _msg->cfm() );
+
+  if (_msg->has_erp())
+    this->SetWorldCFM( _msg->erp() );
+
+  if (_msg->has_contact_max_correcting_vel())
+    this->SetContactMaxCorrectingVel( _msg->contact_max_correcting_vel() );
+
+  if (_msg->has_contact_surface_layer())
+    this->SetContactSurfaceLayer( _msg->contact_surface_layer() );
+
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()) );
 }
 
 
@@ -339,6 +377,7 @@ void ODEPhysics::Fini()
 void ODEPhysics::SetStepTime(double _value)
 {
   this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver")->GetAttribute("dt")->Set(_value);
+
   this->stepTimeDouble = _value;
 }
 
@@ -441,7 +480,7 @@ void ODEPhysics::SetSORPGSW(double w)
 void ODEPhysics::SetWorldCFM(double cfm)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem->GetOrCreateElement("constraints");
+  elem =elem->GetOrCreateElement("constraints");
   elem->GetAttribute("cfm")->Set(cfm);
 
   dWorldSetCFM(this->worldId, cfm );
@@ -451,7 +490,7 @@ void ODEPhysics::SetWorldCFM(double cfm)
 void ODEPhysics::SetWorldERP(double erp)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem->GetOrCreateElement("constraints");
+  elem = elem->GetOrCreateElement("constraints");
   elem->GetAttribute("erp")->Set(erp);
   dWorldSetERP(this->worldId, erp);
 }
@@ -459,7 +498,7 @@ void ODEPhysics::SetWorldERP(double erp)
 ////////////////////////////////////////////////////////////////////////////////
 void ODEPhysics::SetContactMaxCorrectingVel(double _vel)
 {
-  this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetAttribute("contact_max_Correcting_vel")->Set(_vel);
+  this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetAttribute("contact_max_correcting_vel")->Set(_vel);
   dWorldSetContactMaxCorrectingVel(this->worldId, _vel);
 }
 
@@ -497,7 +536,7 @@ double ODEPhysics::GetSORPGSW()
 double ODEPhysics::GetWorldCFM()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem->GetOrCreateElement("constraints");
+  elem = elem->GetOrCreateElement("constraints");
   return elem->GetValueDouble("cfm");
 }
 
@@ -505,14 +544,14 @@ double ODEPhysics::GetWorldCFM()
 double ODEPhysics::GetWorldERP()
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode");
-  elem->GetOrCreateElement("constraints");
+  elem = elem->GetOrCreateElement("constraints");
   return elem->GetValueDouble("erp");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 double ODEPhysics::GetContactMaxCorrectingVel()
 {
-  return this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetValueDouble("contact_max_Correcting_vel");
+  return this->sdf->GetElement("ode")->GetOrCreateElement("constraints")->GetValueDouble("contact_max_correcting_vel");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

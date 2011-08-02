@@ -41,12 +41,13 @@ void WorldPropertiesWidget::showEvent(QShowEvent * /*_event*/)
 void WorldPropertiesWidget::closeEvent(QCloseEvent * /*_event*/)
 {
   this->sceneWidget->initialized = false;
-  std::cout << "Close\n";
 }
 
 PhysicsWidget::PhysicsWidget(QWidget *parent )
   : QWidget(parent)
 {
+  this->initialized = false;
+
   this->setWindowTitle("Gazebo: Physics");
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -57,17 +58,17 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
   this->gravityXLineEdit = new QLineEdit;
   this->gravityXLineEdit->setValidator(new QDoubleValidator(this->gravityXLineEdit) );
   this->gravityXLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->gravityXLineEdit->setFixedWidth(40);
+  this->gravityXLineEdit->setFixedWidth(50);
 
   this->gravityYLineEdit = new QLineEdit;
   this->gravityYLineEdit->setValidator(new QDoubleValidator(this->gravityYLineEdit) );
   this->gravityYLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->gravityYLineEdit->setFixedWidth(40);
+  this->gravityYLineEdit->setFixedWidth(50);
 
   this->gravityZLineEdit = new QLineEdit;
   this->gravityZLineEdit->setValidator(new QDoubleValidator(this->gravityZLineEdit) );
   this->gravityZLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
-  this->gravityZLineEdit->setFixedWidth(40);
+  this->gravityZLineEdit->setFixedWidth(50);
 
   QLabel *gravityLabel = new QLabel(tr("Gravity:"));
   gravityLayout->addWidget(gravityLabel);
@@ -188,6 +189,13 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
   this->physicsRequestPub = this->node->Advertise<msgs::Request>(
       "~/physics_request");
 
+  connect( this->gravityXLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnGravity()) );
+  connect( this->gravityYLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnGravity()) );
+  connect( this->gravityZLineEdit, SIGNAL(editingFinished()),
+           this, SLOT(OnGravity()) );
+
   connect( this->solverTypeBox, SIGNAL(currentIndexChanged(int)),
            this, SLOT(OnSolverType(int)) );
   connect( this->dtLineEdit, SIGNAL(editingFinished()),
@@ -212,7 +220,6 @@ PhysicsWidget::~PhysicsWidget()
 
 void PhysicsWidget::Init()
 {
-  gzdbg << "Physics Init\n";
   this->initialized = false;
   msgs::Request req;
   req.set_request("publish");
@@ -222,54 +229,220 @@ void PhysicsWidget::Init()
 
 void PhysicsWidget::OnPhysicsMsg(const boost::shared_ptr<msgs::Physics const> &_msg)
 {
-  std::cout << "Physics[" << _msg->DebugString() << "]\n";
+  if (this->initialized)
+    return;
+
+  if (_msg->has_gravity())
+  {
+    std::ostringstream x,y,z;
+    double xDbl = _msg->gravity().x();
+    double yDbl = _msg->gravity().y();
+    double zDbl = _msg->gravity().z();
+
+    x << std::fixed << std::setprecision(3) << xDbl;
+    y << std::fixed << std::setprecision(3) << yDbl;
+    z << std::fixed << std::setprecision(3) << zDbl;
+
+    this->gravityXLineEdit->setText( tr(x.str().c_str()) );
+    this->gravityYLineEdit->setText( tr(y.str().c_str()) );
+    this->gravityZLineEdit->setText( tr(z.str().c_str()) );
+  }
+
+  if (_msg->has_iters())
+  {
+    std::ostringstream iters;
+    iters << std::fixed << std::setprecision(0) << _msg->iters();
+    this->itersLineEdit->setText( tr(iters.str().c_str()) );
+  }
+  else
+    this->itersLineEdit->setText( tr("0") );
+
+  if (_msg->has_solver_type())
+  {
+    int index = this->solverTypeBox->findText(_msg->solver_type().c_str());
+    if (index >= 0)
+      this->solverTypeBox->setCurrentIndex(index);
+    else
+      gzerr << "Unknown physics solver type\n";
+  }
+
+  if (_msg->has_dt())
+  {
+    std::ostringstream dt;
+    dt << std::fixed << std::setprecision(5) << _msg->dt();
+    this->dtLineEdit->setText( tr(dt.str().c_str()) );
+  }
+  else
+    this->dtLineEdit->setText( tr("0") );
+
+
+  if (_msg->has_sor())
+  {
+    std::ostringstream sor;
+    sor << std::fixed << std::setprecision(3) << _msg->sor();
+    this->sorLineEdit->setText( tr(sor.str().c_str()) );
+  }
+  else
+    this->sorLineEdit->setText( tr("0") );
+
+  if (_msg->has_cfm())
+  {
+    std::ostringstream cfm;
+    cfm << std::fixed << std::setprecision(3) << _msg->cfm();
+    this->cfmLineEdit->setText( tr(cfm.str().c_str()) );
+  }
+  else
+    this->cfmLineEdit->setText( tr("0") );
+
+  if (_msg->has_erp())
+  {
+    std::ostringstream erp;
+    erp << std::fixed << std::setprecision(3) << _msg->erp();
+    this->erpLineEdit->setText( tr(erp.str().c_str()) );
+  }
+  else
+    this->erpLineEdit->setText( tr("0") );
+
+  if (_msg->has_contact_max_correcting_vel())
+  {
+    std::ostringstream max;
+    max << std::fixed << std::setprecision(3) << _msg->contact_max_correcting_vel();
+    this->maxVelLineEdit->setText( tr(max.str().c_str()) );
+  }
+  else
+    this->maxVelLineEdit->setText( tr("0") );
+
+  if (_msg->has_contact_surface_layer())
+  {
+    std::ostringstream sur;
+    sur << std::fixed << std::setprecision(3) << _msg->contact_surface_layer();
+    this->surfaceLayerLineEdit->setText( tr(sur.str().c_str()) );
+  }
+  else
+    this->surfaceLayerLineEdit->setText( tr("0") );
+
+  this->initialized = true;
 }
 
 void PhysicsWidget::OnSolverType(int _index)
 {
-  std::cout << "Index[" << _index << "]\n";
+  if (!this->initialized)
+    return;
+
+  std::string value = this->solverTypeBox->itemText(_index).toStdString();
+
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_solver_type( value );
+ 
+  this->physicsPub->Publish( msg ); 
+}
+
+void PhysicsWidget::OnGravity()
+{
+  if (!this->initialized)
+    return;
+
+  std::string valueX = this->gravityXLineEdit->text().toStdString();
+  std::string valueY = this->gravityYLineEdit->text().toStdString();
+  std::string valueZ = this->gravityZLineEdit->text().toStdString();
+
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.mutable_gravity()->set_x( boost::lexical_cast<double>(valueX) );
+  msg.mutable_gravity()->set_y( boost::lexical_cast<double>(valueY) );
+  msg.mutable_gravity()->set_z( boost::lexical_cast<double>(valueZ) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 void PhysicsWidget::OnDt()
 {
+  if (!this->initialized)
+    return;
+
   std::string value = this->dtLineEdit->text().toStdString();
-  std::cout << "On DT[" << value << "]\n";
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_dt( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 void PhysicsWidget::OnSOR()
 {
+  if (!this->initialized)
+    return;
+
   std::string value = this->sorLineEdit->text().toStdString();
-  std::cout << "On SOR[" << value << "]\n";
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_sor( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 void PhysicsWidget::OnIters()
 {
   std::string value = this->itersLineEdit->text().toStdString();
-  std::cout << "On iter[" << value << "]\n";
+
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_iters( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 void PhysicsWidget::OnCFM()
 {
   std::string value = this->cfmLineEdit->text().toStdString();
-  std::cout << "On cfm[" << value << "]\n";
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_cfm( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 void PhysicsWidget::OnERP()
 {
   std::string value = this->erpLineEdit->text().toStdString();
-  std::cout << "On erp[" << value << "]\n";
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_erp( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 void PhysicsWidget::OnMaxVel()
 {
   std::string value = this->maxVelLineEdit->text().toStdString();
-  std::cout << "On maxVel[" << value << "]\n";
+
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_contact_max_correcting_vel( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
+
 }
 
 void PhysicsWidget::OnSurfaceLayer()
 {
   std::string value = this->surfaceLayerLineEdit->text().toStdString();
-  std::cout << "On surfaceLayer[" << value << "]\n";
+
+  msgs::Physics msg;
+  msgs::Init(msg, "physics");
+  msg.set_type(msgs::Physics::ODE);
+  msg.set_contact_surface_layer( boost::lexical_cast<double>(value) );
+ 
+  this->physicsPub->Publish( msg ); 
 }
 
 
@@ -416,13 +589,11 @@ SceneWidget::SceneWidget(QWidget *parent )
 
 SceneWidget::~SceneWidget()
 {
-  std::cout << "Destructor\n";
 }
 
 void SceneWidget::Init()
 {
   this->initialized = false;
-  std::cout << "Scene Init\n";
   msgs::Request req;
   req.set_request("publish");
 
@@ -453,8 +624,6 @@ void SceneWidget::OnFogType(int _index)
     return;
   msgs::Scene msg;
   msgs::Init(msg, "fog");
-
-  gzdbg << "OnFogType[" << _index << "]\n";
 
   if (_index == 0)
     msg.mutable_fog()->set_type( msgs::Fog::LINEAR );
@@ -509,7 +678,6 @@ void SceneWidget::OnAmbientColor()
   if (!this->initialized)
     return;
 
-  gzdbg << "OnAmbientColor\n";
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
@@ -520,9 +688,9 @@ void SceneWidget::OnAmbientColor()
 
   msgs::Scene msg;
   msgs::Init(msg, "fog");
-  msg.mutable_ambient()->set_r( color.red() /256.0 );
-  msg.mutable_ambient()->set_g( color.green() /256.0 );
-  msg.mutable_ambient()->set_b( color.blue() /256.0 );
+  msg.mutable_ambient()->set_r( color.red() /255.0 );
+  msg.mutable_ambient()->set_g( color.green() /255.0 );
+  msg.mutable_ambient()->set_b( color.blue() /255.0 );
   msg.mutable_ambient()->set_a( 1.0 );
   this->scenePub->Publish(msg);
 }
@@ -543,9 +711,9 @@ void SceneWidget::OnBackgroundColor()
 
   msgs::Scene msg;
   msgs::Init(msg, "bgcolor");
-  msg.mutable_background()->set_r( color.red() / 256.0 );
-  msg.mutable_background()->set_g( color.green() / 256.0 );
-  msg.mutable_background()->set_b( color.blue() / 256.0 );
+  msg.mutable_background()->set_r( color.red() / 255.0 );
+  msg.mutable_background()->set_g( color.green() / 255.0 );
+  msg.mutable_background()->set_b( color.blue() / 255.0 );
   msg.mutable_background()->set_a( 1.0 );
   this->scenePub->Publish(msg);
 }
@@ -555,8 +723,6 @@ void SceneWidget::OnFogColor()
   if (!this->initialized)
     return;
 
-
-  gzdbg << "OnFogColor\n";
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
@@ -567,9 +733,9 @@ void SceneWidget::OnFogColor()
 
   msgs::Scene msg;
   msgs::Init(msg, "fog");
-  msg.mutable_fog()->mutable_color()->set_r( color.red() / 256.0 );
-  msg.mutable_fog()->mutable_color()->set_g( color.green() / 256.0 );
-  msg.mutable_fog()->mutable_color()->set_b( color.blue() / 256.0 );
+  msg.mutable_fog()->mutable_color()->set_r( color.red() / 255.0 );
+  msg.mutable_fog()->mutable_color()->set_g( color.green() / 255.0 );
+  msg.mutable_fog()->mutable_color()->set_b( color.blue() / 255.0 );
   msg.mutable_fog()->mutable_color()->set_a( 1.0 );
   this->scenePub->Publish(msg);
 }
@@ -593,9 +759,9 @@ void SceneWidget::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_m
   if (_msg->has_ambient())
   {
     std::ostringstream style;
-    style << "background-color:rgb(" << _msg->ambient().r()*256 
-      << "," << _msg->ambient().g() * 256 << "," 
-      << _msg->ambient().b()*256 << ");";
+    style << "background-color:rgb(" << _msg->ambient().r()*255 
+      << "," << _msg->ambient().g() * 255 << "," 
+      << _msg->ambient().b()*255 << ");";
     this->ambientColorButton->setAutoFillBackground( true );
     this->ambientColorButton->setStyleSheet(style.str().c_str());
   }
@@ -603,9 +769,9 @@ void SceneWidget::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_m
   if (_msg->has_background())
   {
     std::ostringstream style;
-    style << "background-color:rgb(" << _msg->background().r()*256 
-      << "," << _msg->background().g() * 256 << "," 
-      << _msg->background().b()*256 << ");";
+    style << "background-color:rgb(" << _msg->background().r()*255 
+      << "," << _msg->background().g() * 255 << "," 
+      << _msg->background().b()*255 << ");";
     this->backgroundColorButton->setAutoFillBackground( true );
     this->backgroundColorButton->setStyleSheet(style.str().c_str());
   }
@@ -623,9 +789,9 @@ void SceneWidget::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_m
     {
       std::ostringstream style;
       style << "background-color:rgb(" 
-        << _msg->fog().color().r()*256 
-        << "," << _msg->fog().color().g() * 256 << "," 
-        << _msg->fog().color().b()*256 << ");";
+        << _msg->fog().color().r()*255 
+        << "," << _msg->fog().color().g() * 255 << "," 
+        << _msg->fog().color().b()*255 << ");";
       this->fogColorButton->setAutoFillBackground( true );
       this->fogColorButton->setStyleSheet(style.str().c_str());
     }
