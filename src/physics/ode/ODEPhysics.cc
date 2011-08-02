@@ -242,8 +242,8 @@ void ODEPhysics::OnPhysicsMsg( const boost::shared_ptr<msgs::Physics const> &_ms
   {
     this->SetStepTime(_msg->dt());
   }
-
   if (_msg->has_solver_type())
+
   {
     sdf::ElementPtr solverElem = this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver");
     if (_msg->solver_type() == "quick")
@@ -268,7 +268,7 @@ void ODEPhysics::OnPhysicsMsg( const boost::shared_ptr<msgs::Physics const> &_ms
     this->SetWorldCFM( _msg->cfm() );
 
   if (_msg->has_erp())
-    this->SetWorldCFM( _msg->erp() );
+    this->SetWorldERP( _msg->erp() );
 
   if (_msg->has_contact_max_correcting_vel())
     this->SetContactMaxCorrectingVel( _msg->contact_max_correcting_vel() );
