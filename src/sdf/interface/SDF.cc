@@ -246,14 +246,14 @@ void Element::PrintDescription(std::string _prefix)
 
 void Element::PrintValues(std::string _prefix)
 {
-  std::cout << _prefix << "<" << this->name << " ";
+  std::cout << _prefix << "<" << this->name;
 
   Param_V::iterator aiter;
   for (aiter = this->attributes.begin(); 
       aiter != this->attributes.end(); aiter++)
   {
-    std::cout << (*aiter)->GetKey() << "='" 
-      << (*aiter)->GetAsString() << "' ";
+    std::cout << " " << (*aiter)->GetKey() << "='" 
+      << (*aiter)->GetAsString() << "'";
   }
 
   if(this->elements.size() > 0)
