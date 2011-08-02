@@ -184,9 +184,19 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
   for (TiXmlElement *child = _xml->FirstChildElement("element"); 
       child; child = child->NextSiblingElement("element"))
   {
-    ElementPtr element(new Element);
-    initXml(child, element);
-    _sdf->elementDescriptions.push_back(element);
+    const char *copyDataString = child->Attribute("copy_data");
+    if (copyDataString && 
+        (std::string(copyDataString) == "true" ||
+         std::string(copyDataString) == "1"))
+    {
+      _sdf->SetCopyChildren(true);
+    }
+    else
+    {
+      ElementPtr element(new Element);
+      initXml(child, element);
+      _sdf->elementDescriptions.push_back(element);
+    }
   }
 
   // Get all include elements
@@ -200,7 +210,6 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     initFile(filename, element);
     _sdf->elementDescriptions.push_back(element);
   }
-
 
   return true;
 }
@@ -340,51 +349,74 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     }
   }
 
+  if ( _sdf->GetCopyChildren() )
+  {
+    copyChildren(_sdf, _xml);
+  }
+  else
+  {
+    // Iterate over all the child elements
+    TiXmlElement* elemXml = NULL;
+    for (elemXml = _xml->FirstChildElement(); elemXml; 
+        elemXml = elemXml->NextSiblingElement())
+    {
+
+      // Find the matching element in SDF
+      ElementPtr_V::iterator eiter;
+      for (eiter = _sdf->elementDescriptions.begin(); 
+          eiter != _sdf->elementDescriptions.end(); eiter++)
+      {
+        if ((*eiter)->GetName() == elemXml->Value())
+        {
+          ElementPtr element = (*eiter)->Clone();
+          element->SetParent( _sdf );
+          if (readXml( elemXml, element ) )
+            _sdf->elements.push_back(element);
+          else
+            gzerr << "Error reading element\n";
+          break;
+        }
+      }
+
+      if (eiter == _sdf->elementDescriptions.end())
+      {
+        gzerr << "XML Element[" << elemXml->Value() 
+          << "], child of element[" << _xml->Value() 
+          << "] not defined in SDF. Ignoring.[" << _sdf->GetName() << "]\n";
+      }
+    }
+
+    // Chek that all required elements have been set
+    ElementPtr_V::iterator eiter;
+    for (eiter = _sdf->elementDescriptions.begin(); 
+        eiter != _sdf->elementDescriptions.end(); eiter++)
+    {
+      if ( (*eiter)->GetRequired() == "1" || (*eiter)->GetRequired() == "+")
+      {
+        if (!_sdf->HasElement( (*eiter)->GetName() ))
+          gzerr << "XML Missing required element[" << (*eiter)->GetName() 
+            << "], child of element[" << _sdf->GetName() << "]\n";
+      }
+    }
+  }
+
+  return true;
+}
+
+void copyChildren( ElementPtr &_sdf, TiXmlElement *_xml)
+{
   // Iterate over all the child elements
   TiXmlElement* elemXml = NULL;
   for (elemXml = _xml->FirstChildElement(); elemXml; 
        elemXml = elemXml->NextSiblingElement())
   {
-    
-    // Find the matching element in SDF
-    ElementPtr_V::iterator eiter;
-    for (eiter = _sdf->elementDescriptions.begin(); 
-         eiter != _sdf->elementDescriptions.end(); eiter++)
-    {
-      if ((*eiter)->GetName() == elemXml->Value())
-      {
-        ElementPtr element = (*eiter)->Clone();
-        element->SetParent( _sdf );
-        if (readXml( elemXml, element ) )
-          _sdf->elements.push_back(element);
-        else
-          gzerr << "Error reading element\n";
-        break;
-      }
-    }
+    ElementPtr element(new Element);
+    element->SetParent( _sdf );
+    element->SetName( elemXml->ValueStr() );
+    element->AddValue("string", elemXml->GetText(), "1");
 
-    if (eiter == _sdf->elementDescriptions.end())
-    {
-      gzerr << "XML Element[" << elemXml->Value() 
-            << "], child of element[" << _xml->Value() 
-            << "] not defined in SDF. Ignoring.[" << _sdf->GetName() << "]\n";
-    }
+    _sdf->elements.push_back( element );
   }
-
-  // Chek that all required elements have been set
-  ElementPtr_V::iterator eiter;
-  for (eiter = _sdf->elementDescriptions.begin(); 
-       eiter != _sdf->elementDescriptions.end(); eiter++)
-  {
-    if ( (*eiter)->GetRequired() == "1" || (*eiter)->GetRequired() == "+")
-    {
-      if (!_sdf->HasElement( (*eiter)->GetName() ))
-        gzerr << "XML Missing required element[" << (*eiter)->GetName() 
-          << "], child of element[" << _sdf->GetName() << "]\n";
-    }
-  }
-
-  return true;
 }
 
 }

@@ -35,6 +35,7 @@ namespace sdf
   /// \brief SDF Element class
   class Element : public boost::enable_shared_from_this<Element>
   {
+    public: Element();
     public: boost::shared_ptr<Element> Clone() const;
 
     public: ElementPtr GetParent() const;
@@ -57,6 +58,9 @@ namespace sdf
 
     public: void SetRequired(const std::string &_req);
     public: const std::string &GetRequired() const;
+
+    public: void SetCopyChildren( bool _value );
+    public: bool GetCopyChildren() const;
 
     public: void PrintDescription(std::string _prefix);
     public: void PrintValues(std::string _prefix);
@@ -106,6 +110,7 @@ namespace sdf
 
     private: std::string name;
     private: std::string required;
+    private: bool copyChildren;
 
     private: ElementPtr parent;
 
@@ -120,6 +125,7 @@ namespace sdf
 
     // The possible child elements
     public: ElementPtr_V elementDescriptions;
+
   };
 
 

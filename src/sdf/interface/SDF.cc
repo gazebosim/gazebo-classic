@@ -22,6 +22,11 @@
 
 using namespace sdf;
 
+Element::Element()
+{
+  this->copyChildren = false;
+}
+
 ElementPtr Element::GetParent() const
 {
   return this->parent;
@@ -99,6 +104,16 @@ void Element::SetRequired(const std::string &_req)
 const std::string &Element::GetRequired() const
 {
   return this->required;
+}
+
+void Element::SetCopyChildren( bool _value )
+{
+  this->copyChildren = _value;
+}
+
+bool Element::GetCopyChildren() const
+{
+  return this->copyChildren;
 }
 
 void Element::AddValue(const std::string &_type, 
@@ -184,6 +199,7 @@ ElementPtr Element::Clone() const
   clone->name = this->name;
   clone->required = this->required;
   clone->parent = this->parent;
+  clone->copyChildren = this->copyChildren;
 
   Param_V::const_iterator aiter;
   for (aiter = this->attributes.begin(); 
@@ -214,6 +230,9 @@ void Element::PrintDescription(std::string _prefix)
   {
     std::cout << _prefix << "  <attribute name='" << (*aiter)->GetKey() << "' type='" << (*aiter)->GetTypeName() << "' default='" << (*aiter)->GetDefaultAsString() << "' required='" << (*aiter)->GetRequired() << "'/>\n";
   }
+
+  if (this->GetCopyChildren())
+    std::cout << _prefix << "  <element copy_data='true' required='*'/>\n";
 
   ElementPtr_V::iterator eiter;
   for (eiter = this->elementDescriptions.begin(); 
@@ -249,7 +268,17 @@ void Element::PrintValues(std::string _prefix)
     std::cout << _prefix << "</" << this->name << ">\n";
   }
   else
-    std::cout << "/>\n";
+  {
+    if (this->value)
+    {
+      std::cout << ">" << this->value->GetAsString() 
+                << "</" << this->name << ">\n";
+    }
+    else
+    {
+      std::cout << "/>\n";
+    }
+  }
 }
 
 

@@ -56,6 +56,8 @@ namespace sdf
 
   // \brief For internal use only. Do not use this function.
   bool readXml(TiXmlElement *_xml, ElementPtr &_sdf);
+
+  void copyChildren( ElementPtr &_sdf, TiXmlElement *_xml);
 }
 
 #endif
