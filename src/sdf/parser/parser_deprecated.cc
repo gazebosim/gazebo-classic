@@ -50,6 +50,40 @@
 namespace deprecated_sdf
 {
 
+void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+{
+  // Iterate over all the child elements
+  for (xmlNodePtr elemXml = xmlFirstElementChild(_config);
+       elemXml != NULL; elemXml = xmlNextElementSibling(elemXml))
+  {
+    sdf::ElementPtr element(new sdf::Element);
+    element->SetParent( _sdf );
+
+    // copy name (with prefix if exists?
+    std::string prefix;
+    if (elemXml->ns) prefix = (const char*)elemXml->ns->prefix;
+    if (prefix.empty())
+      element->SetName( (const char*)elemXml->name );
+    else
+      element->SetName( prefix + ":" + (const char*)elemXml->name );
+
+    // copy attributes
+    for (xmlAttrPtr attrXml = elemXml->properties;
+         attrXml && attrXml->name && attrXml->children; attrXml = attrXml->next)
+    {
+      element->AddAttribute((const char*)attrXml->name,"string","defaultvalue",false);
+      initAttr(elemXml, (const char*)attrXml->name, element->GetAttribute((const char*)attrXml->name));
+    }
+
+    // copy value
+    std::string value = getValue(elemXml);
+    if (!value.empty())
+      element->AddValue("string", value, "1");
+
+    _sdf->elements.push_back( element );
+  }
+}
+
 bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Get all plugins 
@@ -57,7 +91,7 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
        pluginXml != NULL; pluginXml = pluginXml->next)
   {
     if (pluginXml->ns && 
-        std::string("controller") == (const char*)pluginXml->ns->prefix)
+         (const char*)pluginXml->ns->prefix == std::string("controller"))
     {
       sdf::ElementPtr sdfPlugin = _sdf->AddElement("plugin");
       initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
@@ -69,22 +103,13 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
 
       //gzdbg << "Getting plugin[" << sdfPlugin->GetAttribute("filename")->GetAsString() << "]\n";
-      for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
-           dataXml != NULL; dataXml = dataXml->next)
-      {
-        if (!dataXml->ns || std::string( (const char*) dataXml->ns->prefix ) != "interface")
-        {
-          if (!getValue(dataXml).empty())
-          {
-            sdf::ElementPtr sdfData = sdfPlugin->AddElement("data");
-            sdfData->GetAttribute("name")->SetFromString( (const char*)dataXml->name );
-            sdfData->GetAttribute("value")->SetFromString( getValue(dataXml) );
-          }
-        }
-      }
+      deprecated_sdf::copyChildren(pluginXml, sdfPlugin);
+
     }
     else if (std::string((const char*)pluginXml->name) == "plugin")
     {
+      gzerr << "there is a <plugin> block in the deprecated xml\n";
+
       sdf::ElementPtr sdfPlugin = _sdf->AddElement("plugin");
       initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
       initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
@@ -97,6 +122,8 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
           sdf::ElementPtr sdfData = sdfPlugin->AddElement("data");
           sdfData->GetAttribute("value")->SetFromString( getValue(dataXml) );
         }
+        else
+          gzerr << "<interface:...> are not copied\n";
       }
     }
   }

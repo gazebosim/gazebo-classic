@@ -273,6 +273,10 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
+//   The entity stores an initialRelativePose and dynamic worldPose
+//   When calling SetWroldPose (SWP) or SetRelativePose on an entity
+//   that is a Model (M), Canonical Body (CB) or Body (B), different
+//   considerations need to be taken.
 void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
   if (this->HasType(MODEL))
