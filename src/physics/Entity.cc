@@ -277,6 +277,31 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 //   When calling SetWroldPose (SWP) or SetRelativePose on an entity
 //   that is a Model (M), Canonical Body (CB) or Body (B), different
 //   considerations need to be taken.
+// Below is a table that summarizes the current code.
+//  +----------------------------------------------------------+
+//  |     |     M          |  CB             |  B              |
+//  |----------------------------------------------------------|
+//  |SWP  | Lock           | Lock            | Set BWP         |
+//  |     | Update MWP     | Set CBWP        |                 |
+//  |     | SWP Children   | SWP M=CB-CBRP   |                 |
+//  |----------------------------------------------------------|
+//  |SRP  | WP = RP + PP   | WP = RP + PP    | WP = RP + PP    |
+//  |----------------------------------------------------------|
+//  |GWP  | return WP      | return WP       | return WP       |
+//  |----------------------------------------------------------|
+//  |GRP  | RP = WP - RP   | return CBRP     | RP = WP - RP    |
+//  +----------------------------------------------------------+
+//  Legends
+//    M    - Model
+//    CB   - Canonical Body
+//    B    - Non-Canonical Body
+//    *WP  - *WorldPose
+//    *RP  - *RelativePose (relative to parent)
+//    SWP  - SetWorldPose
+//    GWP  - GetWorldPose
+//    MWP  - Model World Pose
+//    CBRP - Canonical Body Relative (to Model) Pose
+//
 void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
   if (this->HasType(MODEL))
