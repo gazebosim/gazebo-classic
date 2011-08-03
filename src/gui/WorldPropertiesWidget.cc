@@ -186,6 +186,7 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
   this->physicsSub = this->node->Subscribe("~/physics", 
       &PhysicsWidget::OnPhysicsMsg, this);
+
   this->physicsRequestPub = this->node->Advertise<msgs::Request>(
       "~/physics_request");
 
@@ -223,12 +224,16 @@ void PhysicsWidget::Init()
   this->initialized = false;
   msgs::Request req;
   req.set_request("publish");
+  req.set_index(1);
 
   this->physicsRequestPub->Publish(req);
 }
 
 void PhysicsWidget::OnPhysicsMsg(const boost::shared_ptr<msgs::Physics const> &_msg)
 {
+  if (_msg->header().index() != 2)
+    return;
+
   if (this->initialized)
     return;
 
@@ -368,7 +373,7 @@ void PhysicsWidget::OnDt()
   msgs::Init(msg, "physics");
   msg.set_type(msgs::Physics::ODE);
   msg.set_dt( boost::lexical_cast<double>(value) );
- 
+
   this->physicsPub->Publish( msg ); 
 }
 
@@ -388,6 +393,9 @@ void PhysicsWidget::OnSOR()
 
 void PhysicsWidget::OnIters()
 {
+  if (!this->initialized)
+    return;
+
   std::string value = this->itersLineEdit->text().toStdString();
 
   msgs::Physics msg;
@@ -400,6 +408,9 @@ void PhysicsWidget::OnIters()
 
 void PhysicsWidget::OnCFM()
 {
+  if (!this->initialized)
+    return;
+
   std::string value = this->cfmLineEdit->text().toStdString();
   msgs::Physics msg;
   msgs::Init(msg, "physics");
@@ -411,6 +422,9 @@ void PhysicsWidget::OnCFM()
 
 void PhysicsWidget::OnERP()
 {
+  if (!this->initialized)
+    return;
+
   std::string value = this->erpLineEdit->text().toStdString();
   msgs::Physics msg;
   msgs::Init(msg, "physics");
@@ -422,6 +436,8 @@ void PhysicsWidget::OnERP()
 
 void PhysicsWidget::OnMaxVel()
 {
+  if (!this->initialized)
+    return;
   std::string value = this->maxVelLineEdit->text().toStdString();
 
   msgs::Physics msg;
@@ -435,6 +451,9 @@ void PhysicsWidget::OnMaxVel()
 
 void PhysicsWidget::OnSurfaceLayer()
 {
+  if (!this->initialized)
+    return;
+
   std::string value = this->surfaceLayerLineEdit->text().toStdString();
 
   msgs::Physics msg;

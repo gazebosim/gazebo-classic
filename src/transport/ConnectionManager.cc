@@ -156,25 +156,17 @@ void ConnectionManager::OnMasterRead( const std::string &data)
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
+    // Connect to the remote publisher
+    ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 
-    // If we are connecting to a remote publisher, then make a proper
-    // transport mechanism. Otherwise, the subscriber should have already
-    // been locally connected in TopicManager::Advertise.
-    if (pub.host() != this->serverConn->GetLocalAddress() ||
-        pub.port() != this->serverConn->GetLocalPort())
-    {
-      // Connect to the remote publisher
-      ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
+    // Create a transport link that will read from the connection, and 
+    // send data to a Publication.
+    PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
+          pub.msg_type()));
+    publink->Init( conn );
 
-      // Create a transport link that will read from the connection, and 
-      // send data to a Publication.
-      PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
-                                      pub.msg_type()));
-      publink->Init( conn );
-
-      // Connect local subscribers to the publication transport link
-      TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
-    }
+    // Connect local subscribers to the publication transport link
+    TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
   }
   else if (packet.type() == "unsubscribe")
   {

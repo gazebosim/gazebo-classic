@@ -9,6 +9,7 @@ message Request
 {
   required string request = 1;
   optional string str_data = 2;
+  optional int32 index = 3;
 }
 
 /// \endverbatim

@@ -142,7 +142,6 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   SubscriberPtr sub( new Subscriber(ops.GetTopic(), subscription) );
 
   ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());
-
   return sub;
 }
 

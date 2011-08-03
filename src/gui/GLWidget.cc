@@ -149,6 +149,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
   if (this->entityMaker)
     this->entityMaker->OnMouseRelease(this->mouseEvent);
+  else if (this->mouseEvent.dragging == false && 
+           event->button() & Qt::RightButton)
+  {
+    gzdbg << "Get Visual At[" << this->mouseEvent.pos << "]\n";
+    this->userCamera->GetVisualAt(this->mouseEvent.pos);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

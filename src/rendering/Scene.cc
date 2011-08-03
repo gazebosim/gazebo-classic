@@ -351,10 +351,9 @@ Visual *Scene::GetVisual( const std::string &_name ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-/*Visual *Scene::GetVisualAt(CameraPtr camera, 
-                                   Vector2i mousePos, std::string &mod) 
+Visual *Scene::GetVisualAt(CameraPtr camera, 
+                           math::Vector2i mousePos, std::string &mod) 
 {
-  Visual *visual = NULL;
   Ogre::Camera *ogreCam = camera->GetOgreCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
 
@@ -427,22 +426,20 @@ Visual *Scene::GetVisual( const std::string &_name ) const
 
     Visual* const* vis = Ogre::any_cast<Visual*>(&closestEntity->getUserAny());
 
-    if (vis && (*vis)->GetOwner())
+    if (vis)
     {
-      entity = (*vis)->GetOwner();
-      return entity;
+      return (*vis);
     }
   }
 
   return NULL;
-}*/
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world pos of a the first contact at a pixel location
-/*math::Vector3 Scene::GetFirstContact(Camera *camera, 
-                                       math::Vector2i mousePos)
+math::Vector3 Scene::GetFirstContact(CameraPtr camera, math::Vector2i mousePos)
 {
-  Ogre::Camera *ogreCam = camera->GetCamera();
+  Ogre::Camera *ogreCam = camera->GetOgreCamera();
   //Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
       (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
@@ -457,7 +454,7 @@ Visual *Scene::GetVisual( const std::string &_name ) const
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
   return math::Vector3(pt.x, pt.y, pt.z);
-}*/
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Print scene graph

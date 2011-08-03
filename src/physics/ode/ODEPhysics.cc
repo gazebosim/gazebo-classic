@@ -216,10 +216,11 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
 
 }
 
-void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
+void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> &_data )
 {
   msgs::Physics msg;
   msgs::Init(msg, "physics");
+  msg.mutable_header()->set_index( _data->index() + 1 );
   msg.set_type( msgs::Physics::ODE );
 
   msg.set_solver_type( this->stepType );
@@ -232,6 +233,7 @@ void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> 
   msg.set_contact_max_correcting_vel( this->GetContactMaxCorrectingVel() );
   msg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
   msg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
+
   this->physicsPub->Publish( msg );
 }
 

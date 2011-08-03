@@ -132,15 +132,13 @@ namespace gazebo
       /// \param camera The ogre camera, used to do mouse picking
       /// \param mousePos The position of the mouse in screen coordinates
       /// \return The selected entity, or NULL
-      /*public: Visual *GetVisualAt(Camera *camera, 
+      public: Visual *GetVisualAt(CameraPtr camera, 
                                   math::Vector2i mousePos, 
                                   std::string &mod);
-                                  */
   
       /// \brief Get the world pos of a the first contact at a pixel location
-      /*public: math::Vector3 GetFirstContact(CameraPtr camera, 
-                                              math::Vector2i mousePos);
-                                              */
+      public: math::Vector3 GetFirstContact(CameraPtr camera, 
+                                            math::Vector2i mousePos);
   
       public: void PrintSceneGraph();
   

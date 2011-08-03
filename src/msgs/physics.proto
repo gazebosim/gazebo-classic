@@ -6,22 +6,24 @@ package gazebo.msgs;
 /// \verbatim
 
 import "point.proto";
+import "header.proto";
 
 message Physics
 {
+  optional Header header = 1;
   enum Type
   {
     ODE = 1;
   }
-  required Type type = 1;
+  required Type type = 2;
 
-  optional string solver_type = 2;
-  optional double dt = 3;
-  optional int32 iters = 4;
-  optional double sor = 5;
-  optional double cfm = 6;
-  optional double erp = 7;
-  optional double contact_max_correcting_vel = 8;
-  optional double contact_surface_layer = 9;
-  optional Point gravity = 10;
+  optional string solver_type = 3;
+  optional double dt = 4;
+  optional int32 iters = 5;
+  optional double sor = 6;
+  optional double cfm = 7;
+  optional double erp = 8;
+  optional double contact_max_correcting_vel = 9;
+  optional double contact_surface_layer = 10;
+  optional Point gravity = 11;
 }

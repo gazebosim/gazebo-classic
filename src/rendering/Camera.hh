@@ -22,6 +22,8 @@
 #ifndef RENDERING_CAMERA_HH
 #define RENDERING_CAMERA_HH
 
+#include <boost/enable_shared_from_this.hpp>
+
 #include "common/Event.hh"
 #include "common/Time.hh"
 
@@ -59,7 +61,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera 
+    class Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       public: Camera(const std::string &namePrefix, Scene *scene);
@@ -235,7 +237,10 @@ namespace gazebo
   
       /// \brief Set whether to view the world in wireframe
       public: void ShowWireframe(bool s);
-  
+
+      /// \brief Get a visual at the 2D screen coordiantes 
+      public: void GetVisualAt(math::Vector2i mousePos); 
+
       /// \brief Get a world space ray as cast from the camer through the viewport
       public: void GetCameraToViewportRay(int screenx, int screeny,
                                           math::Vector3 &origin, math::Vector3 &dir);
