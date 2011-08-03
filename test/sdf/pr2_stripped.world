@@ -1416,49 +1416,6 @@
           <origin pose='0.03576 -0.01736 -0.00095 0 -0 0' />
           <inertia ixx='7.7384099999999997e-05' ixy='-2.0930900000000001e-06' ixz='-8.3622799999999998e-06' iyy='0.000198474' iyz='2.4611e-06' izz='0.00018107' />
         </inertial>
-
-        <sensor name="camera1" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 5 0 0 0"/>
-          <camera>
-            <horizontal_fov angle="1.04719755"/>
-            <image width="640" height="480" format="R8G8B8"/>
-            <clip near="0.1" far="50"/>
-            <save enabled="true" path="/tmp/camera"/>
-          </camera>
-        </sensor>
-
-        <sensor name="camera2" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 5 0 0 0"/>
-          <camera>
-            <horizontal_fov angle="1.04719755"/>
-            <image width="640" height="480" format="R8G8B8"/>
-            <clip near="0.1" far="50"/>
-            <save enabled="true" path="/tmp/camera"/>
-          </camera>
-        </sensor>
-
-        <sensor name="camera3" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 5 0 0 0"/>
-          <camera>
-            <horizontal_fov angle="1.04719755"/>
-            <image width="640" height="480" format="R8G8B8"/>
-            <clip near="0.1" far="50"/>
-            <save enabled="true" path="/tmp/camera"/>
-          </camera>
-        </sensor>
-
-        <sensor name="camera4" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 5 0 0 0"/>
-          <camera>
-            <horizontal_fov angle="1.04719755"/>
-            <image width="640" height="480" format="R8G8B8"/>
-            <clip near="0.1" far="50"/>
-            <save enabled="true" path="/tmp/camera"/>
-          </camera>
-        </sensor>
-
-
-
       </link>
       <joint name='bl_caster_rotation_joint' type='revolute' >
         <origin pose='0 0 0 0 -0 0' />

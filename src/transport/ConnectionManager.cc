@@ -311,7 +311,6 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 
 void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespaces)
 {
-  gzdbg << "Stopping Read\n";
   ConnectionPtr tmpConn(new Connection());
   tmpConn->Connect(this->masterConn->GetRemoteAddress(),
                    this->masterConn->GetRemotePort() );
