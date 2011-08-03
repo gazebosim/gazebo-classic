@@ -788,18 +788,6 @@ void Camera::ShowWireframe(bool s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get a visual at the 2D screen coordiantes 
-void Camera::GetVisualAt(math::Vector2i mousePos)
-{
-  std::string mod;
-  Visual *vis = this->scene->GetVisualAt(shared_from_this(), mousePos, mod);
-  math::Vector3 p = this->scene->GetFirstContact(shared_from_this(), mousePos);
-
-  gzdbg << "Camera got visual[" << vis->GetName() << "] Pos[" << p << "]\n";
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get a world space ray as cast from the camer through the viewport
 void Camera::GetCameraToViewportRay(int screenx, int screeny,
                                         math::Vector3 &origin, math::Vector3 &dir)

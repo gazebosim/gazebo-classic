@@ -238,9 +238,6 @@ namespace gazebo
       /// \brief Set whether to view the world in wireframe
       public: void ShowWireframe(bool s);
 
-      /// \brief Get a visual at the 2D screen coordiantes 
-      public: void GetVisualAt(math::Vector2i mousePos); 
-
       /// \brief Get a world space ray as cast from the camer through the viewport
       public: void GetCameraToViewportRay(int screenx, int screeny,
                                           math::Vector3 &origin, math::Vector3 &dir);

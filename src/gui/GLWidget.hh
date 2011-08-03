@@ -55,6 +55,7 @@ namespace gazebo
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
+      private: rendering::ScenePtr scene;
       private: QFrame *renderFrame;
       private: common::MouseEvent mouseEvent;
 

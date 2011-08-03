@@ -76,6 +76,7 @@ World::World(const std::string &_name)
   this->name = _name;
 
   this->updateMutex = new boost::mutex();
+  this->incomingMsgMutex = new boost::recursive_mutex();
   this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
 
   this->connections.push_back( 
@@ -93,6 +94,10 @@ World::~World()
 {
   delete this->updateMutex;
   this->updateMutex = NULL;
+
+  delete this->incomingMsgMutex;
+  this->incomingMsgMutex = NULL;
+
 
   delete this->modelWorldPoseUpdateMutex;
   this->modelWorldPoseUpdateMutex = NULL;
@@ -592,7 +597,9 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
 void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
 {
+  this->incomingMsgMutex->lock();
   this->sceneMsg.MergeFrom( *_data );
+  this->incomingMsgMutex->unlock();
 }
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )

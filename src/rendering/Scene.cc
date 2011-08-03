@@ -348,6 +348,16 @@ Visual *Scene::GetVisual( const std::string &_name ) const
     return NULL;
 }
 
+void Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
+{
+  std::string mod;
+  Visual *vis = this->GetVisualAt(camera,mousePos, mod);
+  if (vis)
+  {
+    gzdbg << "Camera got visual[" << vis->GetName() << "]\n";
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 

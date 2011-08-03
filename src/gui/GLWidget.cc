@@ -153,18 +153,19 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
            event->button() & Qt::RightButton)
   {
     gzdbg << "Get Visual At[" << this->mouseEvent.pos << "]\n";
-    this->userCamera->GetVisualAt(this->mouseEvent.pos);
+    this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create the camera
-void GLWidget::ViewScene(rendering::ScenePtr scene)
+void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
-  if (scene->GetUserCameraCount() == 0)
-    this->userCamera = scene->CreateUserCamera("rc_camera");
+  if (_scene->GetUserCameraCount() == 0)
+    this->userCamera = _scene->CreateUserCamera("rc_camera");
   else
-    this->userCamera = scene->GetUserCamera(0);
+    this->userCamera = _scene->GetUserCamera(0);
+  this->scene =_scene;
 
   this->userCamera->SetWorldPosition( math::Vector3(-5,0,5) );
   this->userCamera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );

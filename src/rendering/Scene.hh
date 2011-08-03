@@ -127,6 +127,8 @@ namespace gazebo
       /// \brief Get a visual by name 
       public: Visual *GetVisual( const std::string &_name ) const;
 
+      public: void SelectVisualAt(CameraPtr camera, math::Vector2i mousePos);
+
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking. 
       /// \param camera The ogre camera, used to do mouse picking
