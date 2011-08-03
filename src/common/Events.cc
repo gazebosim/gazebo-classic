@@ -23,10 +23,7 @@ EventT<void (bool)> Events::pauseSignal;
 EventT<void ()> Events::stepSignal;
 EventT<void ()> Events::quitSignal;
 
-EventT<void (bool)> Events::moveModeSignal;
-EventT<void (bool)> Events::manipModeSignal;
-
-EventT<void (std::string)> Events::createEntitySignal;
+EventT<void (std::string)> Events::entityCreatedSignal;
 EventT<void (std::string)> Events::setSelectedEntitySignal;
 EventT<void (std::string)> Events::addEntitySignal;
 EventT<void (std::string)> Events::deleteEntitySignal;

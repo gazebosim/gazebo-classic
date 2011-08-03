@@ -19,6 +19,7 @@ set (sources main.cc
              BoxMaker.cc
              SphereMaker.cc
              CylinderMaker.cc
+             GuiEvents.cc
              )
 
 set (qt_headers 
@@ -35,6 +36,7 @@ set (headers Gui.hh
              BoxMaker.hh
              SphereMaker.hh
              CylinderMaker.hh
+             GuiEvents.hh
              )
 
 

@@ -30,7 +30,7 @@ double EntityMaker::snapGridSize = 1.0;
 EntityMaker::EntityMaker()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("model_builder");
+  this->node->Init();
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
 }

@@ -336,12 +336,18 @@ void Visual::DetachVisual(Visual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
-void Visual::AttachObject( Ogre::MovableObject *obj)
+void Visual::AttachObject( Ogre::MovableObject *_obj)
 {
-  this->sceneNode->attachObject(obj);
+  // This code makes plane render before grids. This allows grids to overlay
+  // planes, and then other elements to overlay both planes and grids.
+  if (this->sdf->HasElement("geometry"))
+    if (this->sdf->GetElement("geometry")->HasElement("plane"))
+      _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 2);
+
+  this->sceneNode->attachObject(_obj);
   RTShaderSystem::Instance()->UpdateShaders();
 
-  obj->setUserAny( Ogre::Any(this) );
+  _obj->setUserAny( Ogre::Any(this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

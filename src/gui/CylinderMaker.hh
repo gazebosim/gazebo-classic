@@ -34,8 +34,8 @@ namespace gazebo
       public: CylinderMaker();
       public: virtual ~CylinderMaker();
     
-      public: virtual void Start(const rendering::UserCameraPtr camera,
-                                 const CreateCallback &cb);
+      public: virtual void Start(const rendering::UserCameraPtr camera);
+                                 //const CreateCallback &cb);
 
       public: virtual void Stop();
       public: virtual bool IsActive() const;

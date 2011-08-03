@@ -59,30 +59,11 @@ namespace gazebo
       /// \brief Connect a boost::slot the the add entity signal
       public: template<typename T>
               static ConnectionPtr ConnectCreateEntitySignal( T subscriber )
-              { return createEntitySignal.Connect(subscriber); }
+              { return entityCreatedSignal.Connect(subscriber); }
 
       public: static void DisconnectCreateEntitySignal( ConnectionPtr subscriber)
-              { createEntitySignal.Disconnect(subscriber); }
+              { entityCreatedSignal.Disconnect(subscriber); }
 
-
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the move mode signal
-      public: template<typename T>
-              static ConnectionPtr ConnectMoveModeSignal( T subscriber )
-              { return moveModeSignal.Connect(subscriber); }
-
-      public: static void DisconnectMoveModeSignal( ConnectionPtr subscriber)
-              { moveModeSignal.Disconnect(subscriber); }
-
-
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the manip mode signal
-      public: template<typename T>
-              static ConnectionPtr ConnectManipModeSignal( T subscriber )
-              { return manipModeSignal.Connect(subscriber); }
-
-      public: static void DisconnectManipModeSignal( ConnectionPtr subscriber)
-              { manipModeSignal.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the set selected entity
@@ -251,14 +232,8 @@ namespace gazebo
       /// \brief Quit the simulation once signal
       public: static EventT<void ()> quitSignal;
 
-      /// \brief Signal that indicates the user is moving the camera
-      public: static EventT<void (bool)>  moveModeSignal;
-
-      /// \brief Signal that indicates the user is manipulating an object
-      public: static EventT<void (bool)>  manipModeSignal;
-
       /// \brief An entity has been created
-      public: static EventT<void (std::string)> createEntitySignal;
+      public: static EventT<void (std::string)> entityCreatedSignal;
 
       /// \brief An entity has been selected
       public: static EventT<void (std::string)> setSelectedEntitySignal;

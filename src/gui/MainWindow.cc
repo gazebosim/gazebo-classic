@@ -13,13 +13,14 @@
 #include "gui/RenderWidget.hh"
 #include "gui/GLWidget.hh"
 #include "gui/MainWindow.hh"
+#include "gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 
 MainWindow::MainWindow()
-  : glWidget(0)
+  : renderWidget(0)
 {
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -36,8 +37,8 @@ MainWindow::MainWindow()
   gui::set_world( this->node->GetTopicNamespace() );
   this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
 
-  this->glWidget = new RenderWidget(mainWidget);
-  this->glWidget->hide();
+  this->renderWidget = new RenderWidget(mainWidget);
+  this->renderWidget->hide();
 
   this->timePanel = new TimePanel(mainWidget);
 
@@ -49,8 +50,8 @@ MainWindow::MainWindow()
   //leftFrame->setFrameShape(QFrame::Box);
 
 //  splitter->addWidget(insertModel);
-  splitter->addWidget(this->glWidget);
-  //mainLayout->addWidget( this->glWidget );
+  splitter->addWidget(this->renderWidget);
+  //mainLayout->addWidget( this->renderWidget );
   mainLayout->addWidget(splitter);
   mainLayout->addWidget( this->timePanel );
   mainWidget->setLayout(mainLayout);
@@ -76,12 +77,12 @@ void MainWindow::Load()
 
 void MainWindow::Init()
 {
-  this->glWidget->show();
+  this->renderWidget->show();
 }
 
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  delete this->glWidget;
+  delete this->renderWidget;
   delete this->timePanel;
 }
 
@@ -142,7 +143,7 @@ void MainWindow::NewModel()
   */
 }
 
-void MainWindow::EditScene()
+void MainWindow::EditWorldProperties()
 {
   if (!this->worldPropertiesWidget)
     this->worldPropertiesWidget = new WorldPropertiesWidget();
@@ -152,26 +153,32 @@ void MainWindow::EditScene()
 
 void MainWindow::CreateBox()
 {
+  gui::Events::createEntitySignal("box");
 }
 
 void MainWindow::CreateSphere()
 {
+  gui::Events::createEntitySignal("sphere");
 }
 
 void MainWindow::CreateCylinder()
 {
+  gui::Events::createEntitySignal("cylinder");
 }
 
 void MainWindow::CreatePointLight()
 {
+  gui::Events::createEntitySignal("pointlight");
 }
 
 void MainWindow::CreateSpotLight()
 {
+  gui::Events::createEntitySignal("spotlight");
 }
 
 void MainWindow::CreateDirectionalLight()
 {
+  gui::Events::createEntitySignal("directionallight");
 }
 
 void MainWindow::InsertModel()
@@ -208,10 +215,10 @@ void MainWindow::CreateActions()
   this->newModelAct->setStatusTip(tr("Create a new model"));
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
-  this->editSceneAct = new QAction(tr("&Scene"), this);
-  this->editSceneAct->setShortcut(tr("Ctrl+S"));
-  this->editSceneAct->setStatusTip(tr("Edit Scene Properties"));
-  connect(this->editSceneAct, SIGNAL(triggered()), this, SLOT(EditScene()));
+  this->editWorldPropertiesAct = new QAction(tr("&World"), this);
+  this->editWorldPropertiesAct->setShortcut(tr("Ctrl+W"));
+  this->editWorldPropertiesAct->setStatusTip(tr("Edit World Properties"));
+  connect(this->editWorldPropertiesAct, SIGNAL(triggered()), this, SLOT(EditWorldProperties()));
 
 
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
@@ -267,7 +274,7 @@ void MainWindow::CreateMenus()
 
   this->editMenu = this->menuBar()->addMenu(tr("&Edit"));
   this->editMenu->addAction(this->newModelAct);
-  this->editMenu->addAction(this->editSceneAct);
+  this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
 

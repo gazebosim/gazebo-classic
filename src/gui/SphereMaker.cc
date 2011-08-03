@@ -17,7 +17,7 @@
 #include <sstream>
 
 #include "msgs/msgs.h"
-#include "common/Events.hh"
+#include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
 #include "math/Quaternion.hh"
 
@@ -48,10 +48,10 @@ SphereMaker::~SphereMaker()
   delete this->visualMsg;
 }
 
-void SphereMaker::Start(const rendering::UserCameraPtr camera,
-                        const CreateCallback &cb)
+void SphereMaker::Start(const rendering::UserCameraPtr camera)
+                        //const CreateCallback &cb)
 {
-  this->createCB = cb;
+  //this->createCB = cb;
   this->camera = camera;
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
@@ -66,7 +66,7 @@ void SphereMaker::Stop()
   this->visPub->Publish(*this->visualMsg);
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
-  event::Events::moveModeSignal(true);
+  gui::Events::moveModeSignal(true);
   this->state = 0;
 }
 
@@ -117,10 +117,10 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
 
   double scale = p1.Distance(p2);
   math::Vector3 p( this->visualMsg->pose().position().x(),
-                     this->visualMsg->pose().position().y(),
-                     this->visualMsg->pose().position().z() );
+                   this->visualMsg->pose().position().y(),
+                   this->visualMsg->pose().position().z() );
 
-  p.z = scale;
+  p.z = scale*0.5;
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   msgs::Set(this->visualMsg->mutable_scale(),math::Vector3(scale,scale,scale));
@@ -133,29 +133,29 @@ void SphereMaker::CreateTheEntity()
   msgs::Init(msg, "new_sphere");
   std::ostringstream newModelStr;
 
-  newModelStr << "<?xml version='1.0'?>";
-
-  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "_model'>\
-    <origin xyz='" << this->visualMsg->pose().position().x() << " " 
+  newModelStr << "<gazebo version='1.0'>\
+    <model name='" << this->visualMsg->header().str_id() << "_model'>\
+    <origin pose='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
-                    << this->visualMsg->pose().position().z() << "'/>\
+                    << this->visualMsg->scale().x() * 0.5 << " 0 0 0'/>\
     <link name='body'>\
+      <inertial mass='1.0'>\
+          <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
+      </inertial>\
       <collision name='geom'>\
         <geometry>\
-          <sphere radius='" << this->visualMsg->scale().x() << "'/>\
+          <sphere radius='" << this->visualMsg->scale().x()*.5 << "'/>\
         </geometry>\
-        <mass>0.5</mass>\
       </collision>\
-      <visual>\
+      <visual cast_shadows='true'>\
         <geometry>\
-          <sphere radius='" << this->visualMsg->scale().x() << "'/>\
+          <sphere radius='" << this->visualMsg->scale().x()*.5 << "'/>\
         </geometry>\
-        <material name='Gazebo/Grey'/>\
-        <cast_shadows>true</cast_shadows>\
-        <shader>pixel</shader>\
+        <material script='Gazebo/Grey'/>\
       </visual>\
     </link>\
-  </model>";
+  </model>\
+  </gazebo>";
 
   msg.set_xml( newModelStr.str() );
 
@@ -163,9 +163,10 @@ void SphereMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  (this->createCB)(
+  /*(this->createCB)(
       msgs::Convert(this->visualMsg->pose().position()), 
       msgs::Convert(this->visualMsg->scale()) );
+      */
 
-  //this->makerPub->Publish(msg);
+  this->makerPub->Publish(msg);
 }

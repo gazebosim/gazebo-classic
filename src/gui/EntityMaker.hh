@@ -43,8 +43,8 @@ namespace gazebo
       /// \brief Set whether to snap to grid
       public: static void SetSnapToGrid(bool snap);
   
-      public: virtual void Start(const rendering::UserCameraPtr camera, 
-                                 const CreateCallback &cb) = 0;
+      public: virtual void Start(const rendering::UserCameraPtr camera) = 0;
+                                 //const CreateCallback &cb) = 0;
 
       public: virtual void Stop() = 0;
       public: virtual bool IsActive() const = 0;

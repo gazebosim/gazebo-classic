@@ -25,6 +25,7 @@
 #include "common/Timer.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
+#include "common/Plugin.hh"
 
 #include "sensors/Sensor.hh"
 
@@ -64,6 +65,17 @@ void Sensor::Load()
   if (this->sdf->HasElement("origin"))
   {
      this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
+  }
+
+  // Load the plugins
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      this->LoadPlugin(pluginElem);
+      pluginElem = this->sdf->GetNextElement("plugin", pluginElem);
+    }
   }
 
   this->node->Init(this->sdf->GetWorldName());
@@ -111,58 +123,18 @@ std::string Sensor::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a controller helper function
-void Sensor::LoadPlugin( sdf::ElementPtr &/*_sdf*/ )
+void Sensor::LoadPlugin( sdf::ElementPtr &_sdf )
 {
-  /*
-  if (!node)
+  std::string name = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
+
+  gzdbg << "Sensor load plugin[" << name << "] file[" << filename << "]\n";
+  if (plugin)
   {
-    gzwarn << this->GetName() << " sensor has no controller.\n";
-    return;
+    plugin->Load(_sdf);
+    this->plugins.push_back( plugin );
   }
-
-
-  //Iface *iface;
-  std::ostringstream stream;
-
-  // Get the controller's type
-  std::string controllerType = node->GetName();
-
-  // Get the unique name of the controller
-  std::string controllerName = node->GetString("name","",1);
-
-  // Create the interface
-  //if ( (childNode = node->GetChildByNSPrefix("interface")) )
-  //{
-  //  // Get the type of the interface (eg: laser)
-  //  std::string ifaceType = childNode->GetName();
-
-  //  // Get the name of the iface
-  //  std::string ifaceName = childNode->GetString("name","",1);
-
-  //  // Use the factory to get a new iface based on the type
-  //  iface = IfaceFactory::NewIface(ifaceType);
-
-  //  // Create the iface
-  //  iface->Create(this->GetWorld()->GetGzServer(), ifaceName);
-
-  //}
-  //else
-  //{
-  //  stream << "No interface defined for " << controllerName << "controller";
-  //  gzthrow(stream.str());
-  //}
-  
-  // See if the controller is in a plugin
-  std::string pluginName = node->GetString("plugin","",0);
-  if (pluginName != "")
-    ControllerFactory::LoadPlugin(pluginName, controllerType);
-
-  // Create the controller based on it's type
-  this->controller = ControllerFactory::NewController(controllerType, this);
-
-  // Load the controller if it's available
-  if (this->controller) this->controller->Load(node);
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

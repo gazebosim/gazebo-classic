@@ -66,7 +66,7 @@ Scene::Scene(const std::string &_name)
   Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
   this->grids.push_back(grid);
 
-  grid = new Grid(this, 10, 1, 20, common::Color(1,1,1,1));
+  grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
   this->grids.push_back(grid);
   
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);

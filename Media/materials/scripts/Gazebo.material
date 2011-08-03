@@ -290,37 +290,36 @@ material Gazebo/TurquoiseGlow : Gazebo/Turquoise
 	}
 }
 
-material Gazebo/TurquoiseGlowOutline : Gazebo/Turquoise
+material Gazebo/TurquoiseGlowOutline
 {
 	technique
 	{
+
     pass ambient
     {
-      ambient 0 1 1
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 1 1
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
     }
 
-    pass ambient2
+    pass ambient
     {
-      ambient 0 1 1
+      scene_blend alpha_blend
+      depth_write off
+      lighting off
+
       polygon_mode wireframe
-    }
-
-		pass light
-		{
-      diffuse 0 1 1
-		}
-
-		pass light2
-		{
-			emissive 0 1 1
-      diffuse 0 1 1
-      polygon_mode wireframe
-		}
-
-
-    pass decal
-    {
-      polygon_mode wireframe
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 1 1
+        alpha_op_ex source1 src_manual src_current 0.9
+      }
     }
 	}
 }

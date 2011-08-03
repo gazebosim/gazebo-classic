@@ -94,6 +94,8 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: transport::NodePtr node;
       protected: transport::SubscriberPtr poseSub;
+
+      protected: std::vector<PluginPtr> plugins;
     };
     /// \}
   }

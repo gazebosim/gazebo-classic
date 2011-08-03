@@ -19,7 +19,7 @@
 #include "msgs/msgs.h"
 
 #include "common/Console.hh"
-#include "common/Events.hh"
+#include "gui/GuiEvents.hh"
 #include "math/Quaternion.hh"
 #include "common/MouseEvent.hh"
 
@@ -50,10 +50,10 @@ BoxMaker::~BoxMaker()
   delete this->visualMsg;
 }
 
-void BoxMaker::Start(const rendering::UserCameraPtr camera, 
-                     const CreateCallback &cb)
+void BoxMaker::Start(const rendering::UserCameraPtr camera)
+                     //const CreateCallback &cb)
 {
-  this->createCB = cb;
+  //this->createCB = cb;
   this->camera = camera;
 
   std::ostringstream stream;
@@ -70,7 +70,7 @@ void BoxMaker::Stop()
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   this->state = 0;
-  event::Events::moveModeSignal(true);
+  gui::Events::moveModeSignal(true);
 }
 
 bool BoxMaker::IsActive() const
@@ -151,34 +151,33 @@ void BoxMaker::CreateTheEntity()
 
   std::ostringstream newModelStr;
 
-  newModelStr << "<?xml version='1.0'?>";
-
-  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "_model'>\
-    <static>true</static>\
-    <origin xyz='" << this->visualMsg->pose().position().x() << " " 
+  newModelStr << "<gazebo version='1.0'>\
+    <model name='" << this->visualMsg->header().str_id() << "_model'>\
+    <origin pose='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
-                    << this->visualMsg->pose().position().z() << "'/>\
+                    << this->visualMsg->pose().position().z() << " 0 0 0'/>\
     <link name='body'>\
+      <inertial mass='1.0'>\
+          <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
+      </inertial>\
       <collision name='geom'>\
         <geometry>\
           <box size='" << this->visualMsg->scale().x() << " "
                        << this->visualMsg->scale().y() << " "
                        << this->visualMsg->scale().z() << "'/>\
         </geometry>\
-        <mass>0.5</mass>\
       </collision>\
-      <visual>\
+      <visual cast_shadows='true'>\
         <geometry>\
           <box size='" << this->visualMsg->scale().x() << " "
                        << this->visualMsg->scale().y() << " "
                        << this->visualMsg->scale().z() << "'/>\
         </geometry>\
-        <material name='Gazebo/Grey'/>\
-        <cast_shadows>true</cast_shadows>\
-        <shader>pixel</shader>\
+        <material script='Gazebo/Grey'/>\
       </visual>\
     </link>\
-  </model>";
+  </model>\
+  </gazebo>";
 
   msg.set_xml( newModelStr.str() );
 
@@ -186,8 +185,9 @@ void BoxMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  (this->createCB)(
+  /*(this->createCB)(
       msgs::Convert(this->visualMsg->pose().position()), 
       msgs::Convert(this->visualMsg->scale()) );
-  //this->makerPub->Publish(msg);
+      */
+  this->makerPub->Publish(msg);
 }

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "common/Events.hh"
+#include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
 
 #include "gui/SpotLightMaker.hh"
@@ -60,7 +60,7 @@ void SpotLightMaker::Start()
 void SpotLightMaker::Stop()
 {
   this->state = 0;
-  event::Events::moveModeSignal(true);
+  gui::Events::moveModeSignal(true);
 }
 
 bool SpotLightMaker::IsActive() const

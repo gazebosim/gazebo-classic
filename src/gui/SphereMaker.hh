@@ -35,8 +35,9 @@ namespace gazebo
      public: SphereMaker();
      public: virtual ~SphereMaker();
    
-     public: virtual void Start(const rendering::UserCameraPtr camera,
-                                 const CreateCallback &cb);
+     public: virtual void Start(const rendering::UserCameraPtr camera);
+                                 //const CreateCallback &cb);
+     
      public: virtual void Stop();
      public: virtual bool IsActive() const;
  

@@ -17,7 +17,7 @@
 #include <sstream>
 
 #include "msgs/msgs.h"
-#include "common/Events.hh"
+#include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
 #include "math/Quaternion.hh"
 
@@ -49,10 +49,10 @@ CylinderMaker::~CylinderMaker()
   delete this->visualMsg;
 }
 
-void CylinderMaker::Start(const rendering::UserCameraPtr camera,
-                          const CreateCallback &cb)
+void CylinderMaker::Start(const rendering::UserCameraPtr camera)
+                          //const CreateCallback &cb)
 {
-  this->createCB = cb;
+  //this->createCB = cb;
   this->camera = camera;
   std::ostringstream stream;
   stream <<  "user_cylinder_" << counter++;
@@ -67,7 +67,7 @@ void CylinderMaker::Stop()
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   this->state = 0;
-  event::Events::moveModeSignal(true);
+  gui::Events::moveModeSignal(true);
 }
 
 bool CylinderMaker::IsActive() const
@@ -154,32 +154,32 @@ void CylinderMaker::CreateTheEntity()
   msgs::Init(msg,"new cylinder");
   std::ostringstream newModelStr;
 
-  newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model name='" << this->visualMsg->header().str_id() << "_model'>\
-    <static>false</static>\
-    <origin xyz='" << this->visualMsg->pose().position().x() << " " 
-                   << this->visualMsg->pose().position().y() << " " 
-                   << this->visualMsg->pose().position().z() << "'/>\
-    <link name='body'>\
-      <collision name='geom'>\
-        <geometry>\
-          <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
-                    length='" << this->visualMsg->scale().z() << "'/>\
-        </geometry>\
-        <mass>0.5</mass>\
-      </collision>\
-      <visual>\
-        <geometry>\
-          <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
-                    length='" << this->visualMsg->scale().z() << "'/>\
-        </geometry>\
-        <material name='Gazebo/Grey'/>\
-        <shader>pixel</shader>\
-        <cast_shadows>pixel</cast_shadows>\
-      </visual>\
-    </link>\
-  </model>";
+  newModelStr << "<gazebo version='1.0'>\
+    <model name='" << this->visualMsg->header().str_id() << "_model'>\
+      <origin pose='" << this->visualMsg->pose().position().x() << " " 
+                      << this->visualMsg->pose().position().y() << " " 
+                      << this->visualMsg->pose().position().z() << " 0 0 0'/>\
+      <link name='body'>\
+        <inertial mass='1.0'>\
+            <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
+        </inertial>\
+        <collision name='geom'>\
+          <geometry>\
+            <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
+                      length='" << this->visualMsg->scale().z() << "'/>\
+          </geometry>\
+        </collision>\
+        <visual cast_shadows='true'>\
+          <geometry>\
+            <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
+                      length='" << this->visualMsg->scale().z() << "'/>\
+          </geometry>\
+          <material script='Gazebo/Grey'/>\
+        </visual>\
+      </link>\
+    </model>\
+    </gazebo>";
 
   msg.set_xml( newModelStr.str() );
 
@@ -187,10 +187,11 @@ void CylinderMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  (this->createCB)(
+  /*(this->createCB)(
       msgs::Convert(this->visualMsg->pose().position()), 
       msgs::Convert(this->visualMsg->scale()) );
+      */
 
-  //this->makerPub->Publish(msg);
+  this->makerPub->Publish(msg);
 }
 

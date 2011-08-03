@@ -11,7 +11,8 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/OrbitViewController.hh"
 
-#include "GLWidget.hh"
+#include "gui/GuiEvents.hh"
+#include "gui/GLWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -37,8 +38,13 @@ GLWidget::GLWidget( QWidget *parent )
   this->layout()->setContentsMargins(0,0,0,0);
 
   this->connections.push_back( 
-      event::Events::ConnectMoveModeSignal( 
+      gui::Events::ConnectMoveModeSignal( 
         boost::bind(&GLWidget::OnMoveMode, this, _1) ) );
+
+  this->connections.push_back( 
+      gui::Events::ConnectCreateEntitySignal( 
+        boost::bind(&GLWidget::OnCreateEntity, this, _1) ) );
+
 
   this->entityMaker = NULL;
 }
@@ -189,8 +195,8 @@ std::string GLWidget::GetOgreHandle() const
   return handle;
 }
 
-void GLWidget::CreateEntity(const std::string &name, 
-                            const EntityMaker::CreateCallback &cb)
+void GLWidget::CreateEntity(const std::string &name)
+                            //const EntityMaker::CreateCallback &cb)
 {
   if (this->entityMaker)
     this->entityMaker->Stop();
@@ -207,7 +213,7 @@ void GLWidget::CreateEntity(const std::string &name,
   if (this->entityMaker)
   {
     // TODO: change the cursor to a cross
-    this->entityMaker->Start(this->userCamera, cb);
+    this->entityMaker->Start(this->userCamera);
   }
   else
   {
@@ -222,4 +228,9 @@ void GLWidget::OnMoveMode(bool mode)
     // TODO: set cursor to default state
     this->entityMaker = NULL;
   }
+}
+
+void GLWidget::OnCreateEntity( const std::string &_type )
+{
+  this->CreateEntity(_type);
 }

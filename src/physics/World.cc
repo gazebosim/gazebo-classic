@@ -690,23 +690,23 @@ void World::ModelUpdateSingleLoop()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Received a factory msg
-void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &msg)
+void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
 {
   sdf::SDFPtr factorySDF(new sdf::SDF);
+  sdf::initFile( "/sdf/gazebo.sdf", factorySDF );
 
-  //TODO: Fill in the sdfFOrmatString
-  std::string sdfFormatString;
-  sdf::initString(sdfFormatString, factorySDF);
-
-  if (msg->has_xml())
-    sdf::readString( msg->xml(), factorySDF);
+  if (_msg->has_xml())
+  {
+    sdf::readString( _msg->xml(), factorySDF );
+  }
   else
-    sdf::readFile( msg->filename(), factorySDF);
+    sdf::readFile( _msg->filename(), factorySDF);
 
   {
     boost::mutex::scoped_lock lock(*this->updateMutex);
     // Add the new models into the World
-    ModelPtr model = this->LoadModel( factorySDF->root, this->rootElement );
+    sdf::ElementPtr elem = factorySDF->root->GetElement("model");
+    ModelPtr model = this->LoadModel( elem, this->rootElement );
     model->Init();
   }
 }

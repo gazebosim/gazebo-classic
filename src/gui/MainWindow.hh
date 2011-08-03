@@ -35,7 +35,7 @@ namespace gazebo
       private slots: void Step();
 
       private slots: void NewModel();
-      private slots: void EditScene();
+      private slots: void EditWorldProperties();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -63,7 +63,7 @@ namespace gazebo
       private: QAction *quitAct;
 
       private: QAction *newModelAct;
-      private: QAction *editSceneAct;
+      private: QAction *editWorldPropertiesAct;
 
       private: QAction *playAct;
       private: QAction *pauseAct;
@@ -79,7 +79,7 @@ namespace gazebo
       private: QAction *insertModelAct;
 
       private: TimePanel *timePanel;
-      private: RenderWidget *glWidget;
+      private: RenderWidget *renderWidget;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;

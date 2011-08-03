@@ -266,7 +266,6 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
   {
     /* parse new sdf xml */
     TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
-     
     if (!readXml( elemXml, _sdf->root))
     {
       gzwarn << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";

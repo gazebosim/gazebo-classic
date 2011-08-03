@@ -39,7 +39,7 @@ Grid::Grid( Scene *scene_,  unsigned int cellCount_, float cellLength_,
   this->cellLengthP = cellLength_;
   this->lineWidthP = lineWidth_;
   this->colorP = color_;
-  this->h_offsetP = 0.005;
+  this->h_offsetP = 0.001;
 
   static uint32_t gridCount = 0;
   std::stringstream ss;
@@ -91,15 +91,12 @@ void Grid::SetColor(const common::Color& color_)
   this->material->setAmbient( color_.R(), color_.G(), color_.B() );
 
   if ( (this->colorP).A() < 0.9998 )
-  {
     this->material->setSceneBlending( Ogre::SBT_TRANSPARENT_ALPHA );
-    this->material->setDepthWriteEnabled( false );
-  }
   else
-  {
     this->material->setSceneBlending( Ogre::SBT_REPLACE );
-    this->material->setDepthWriteEnabled( true );
-  }
+
+  this->material->setDepthWriteEnabled( false );
+  this->material->setDepthCheckEnabled( false );
 
   this->Create();
 }
@@ -119,7 +116,7 @@ void Grid::Init()
 {
   this->manualObject = this->scene->GetManager()->createManualObject( this->name );
   this->manualObject->setDynamic(true);
-  this->manualObject->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY - 1);
+  this->manualObject->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
   Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
 

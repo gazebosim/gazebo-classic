@@ -17,7 +17,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "common/Events.hh"
+#include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
 
 #include "gui/PointLightMaker.hh"
@@ -56,7 +56,7 @@ void PointLightMaker::Start( )
 void PointLightMaker::Stop()
 {
   this->state = 0;
-  event::Events::moveModeSignal(true);
+  gui::Events::moveModeSignal(true);
 }
 
 bool PointLightMaker::IsActive() const

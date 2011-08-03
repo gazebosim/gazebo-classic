@@ -68,6 +68,7 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
+
       </link>
 
       <plugin name="my_plugin" filename="libmodel_push.so"/>
