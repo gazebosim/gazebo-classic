@@ -127,12 +127,12 @@ void Sensor::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
+  gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   gzdbg << "Sensor load plugin[" << name << "] file[" << filename << "]\n";
   if (plugin)
   {
-    plugin->Load(_sdf);
+    plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back( plugin );
   }
 }

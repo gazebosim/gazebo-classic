@@ -20,11 +20,9 @@
 
 namespace gazebo
 {
-  class WorldEdit : public Plugin
+  class WorldEdit : public WorldPlugin
   {
-    public: WorldEdit() : Plugin() {}
-
-    public: void Load( sdf::ElementPtr &_sdf )
+    public: void Load( physics::WorldPtr _parent, sdf::ElementPtr &_sdf )
     {
       // Create a new transport node
       transport::NodePtr node(new transport::Node());
@@ -57,5 +55,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_PLUGIN(WorldEdit)
+  GZ_REGISTER_WORLD_PLUGIN(WorldEdit)
 }

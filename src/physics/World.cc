@@ -724,10 +724,10 @@ void World::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::PluginPtr plugin = gazebo::Plugin::Create(filename, name);
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename, name);
   if (plugin)
   {
-    plugin->Load(_sdf);
+    plugin->Load(shared_from_this(),_sdf);
     this->plugins.push_back( plugin );
   }
 }

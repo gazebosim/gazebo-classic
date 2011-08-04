@@ -244,7 +244,7 @@ namespace gazebo
 
       private: boost::recursive_mutex *incomingMsgMutex;
 
-      private: std::vector<PluginPtr> plugins;
+      private: std::vector<WorldPluginPtr> plugins;
     };
 
     /// \}

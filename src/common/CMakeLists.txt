@@ -30,7 +30,6 @@ set ( sources AssimpLoader.cc
               MeshLoader.cc
               MeshManager.cc
               OgreLoader.cc
-              Plugin.cc
               STLLoader.cc
               Time.cc
               Timer.cc

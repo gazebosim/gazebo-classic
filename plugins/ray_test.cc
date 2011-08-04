@@ -24,11 +24,9 @@
 
 namespace gazebo
 {
-  class RayTest : public Plugin
+  class RayTest : public SensorPlugin
   {
-    public: RayTest() : Plugin() {}
-
-    public: void Load( sdf::ElementPtr &_sdf )
+    public: void Load( sensors::SensorPtr _parent, sdf::ElementPtr &_sdf )
     {
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->GetValueString("name");
@@ -92,5 +90,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_PLUGIN(RayTest)
+  GZ_REGISTER_SENSOR_PLUGIN(RayTest)
 }

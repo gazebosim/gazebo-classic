@@ -23,6 +23,7 @@
 #define SENSOR_HH
 
 #include <vector>
+#include <boost/enable_shared_from_this.hpp>
 
 #include "sdf/sdf.h"
 
@@ -39,7 +40,7 @@ namespace gazebo
     /// \{
     
     /// \brief Base class for sensors
-    class Sensor
+    class Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief  Constructor
       public: Sensor();
@@ -95,7 +96,7 @@ namespace gazebo
       protected: transport::NodePtr node;
       protected: transport::SubscriberPtr poseSub;
 
-      protected: std::vector<PluginPtr> plugins;
+      protected: std::vector<SensorPluginPtr> plugins;
     };
     /// \}
   }

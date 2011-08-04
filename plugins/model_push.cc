@@ -20,20 +20,19 @@
 
 namespace gazebo
 {
-  class BoxPush : public Plugin
+  class BoxPush : public ModelPlugin
   {
-    public: BoxPush() : Plugin() {}
-
-    public: void Load( sdf::ElementPtr &_sdf )
+    public: void Load( physics::ModelPtr _parent, sdf::ElementPtr & /*_sdf*/ )
     {
       // Get then name of the parent model
-      std::string modelName = _sdf->GetParent()->GetValueString("name");
+      //std::string modelName = _sdf->GetParent()->GetValueString("name");
+      this->model = _parent;
 
       // Get the default world.
-      physics::WorldPtr world = physics::get_world("default");
+      //physics::WorldPtr world = physics::get_world("default");
 
       // Get a pointer to the model
-      this->model = world->GetModelByName(modelName);
+      //this->model = world->GetModelByName(modelName);
 
       // Error message if the model couldn't be found
       if (!this->model)
@@ -60,5 +59,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_PLUGIN(BoxPush)
+  GZ_REGISTER_MODEL_PLUGIN(BoxPush)
 }
