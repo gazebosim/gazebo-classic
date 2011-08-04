@@ -24,9 +24,9 @@
 
 namespace gazebo
 {
-  class RayTest : public SensorPlugin
+  class PR2PoseTest : public ModelPlugin
   {
-    public: void Load( sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf )
+    public: void Load( physics::ModelPtr &_parent, sdf::ElementPtr &_sdf )
     {
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->GetValueString("name");
@@ -45,13 +45,13 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateStartSignal(
-          boost::bind(&RayTest::OnUpdate, this));
+          boost::bind(&PR2PoseTest::OnUpdate, this));
       gzdbg << "plugin model name: " << modelName << "\n";
 
 
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init(worldName);
-      this->statsSub = this->node->Subscribe("~/world_stats", &RayTest::OnStats, this);
+      this->statsSub = this->node->Subscribe("~/world_stats", &PR2PoseTest::OnStats, this);
 
     }
 
@@ -108,5 +108,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_SENSOR_PLUGIN(RayTest)
+  GZ_REGISTER_MODEL_PLUGIN(PR2PoseTest)
 }
