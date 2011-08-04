@@ -132,7 +132,8 @@ void Sensor::LoadPlugin( sdf::ElementPtr &_sdf )
   gzdbg << "Sensor load plugin[" << name << "] file[" << filename << "]\n";
   if (plugin)
   {
-    plugin->Load(shared_from_this(), _sdf);
+    SensorPtr myself = shared_from_this();
+    plugin->Load(myself, _sdf);
     this->plugins.push_back( plugin );
   }
 }

@@ -727,7 +727,8 @@ void World::LoadPlugin( sdf::ElementPtr &_sdf )
   gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename, name);
   if (plugin)
   {
-    plugin->Load(shared_from_this(),_sdf);
+    WorldPtr myself = shared_from_this();
+    plugin->Load(myself,_sdf);
     this->plugins.push_back( plugin );
   }
 }

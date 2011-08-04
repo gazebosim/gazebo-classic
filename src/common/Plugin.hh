@@ -55,9 +55,6 @@ namespace gazebo
   {
     public: typedef boost::shared_ptr<T> TPtr;
 
-    /// \brief Load function
-    public: virtual void Load( sdf::ElementPtr & /*_sdf*/ ) {}
-
     /// \brief Get the name of the handler
     public: std::string GetFilename() const
     {
@@ -94,7 +91,15 @@ namespace gazebo
       if (!found) 
         fullname = _filename;
       std::string registerName = "RegisterPlugin";
-    
+
+    typedef T *(*fptr)();
+    typedef union
+    {
+      fptr func;
+      void *ptr;
+    } fptr_union;
+    fptr_union registerFunc;
+   
     #ifdef HAVE_DL
       void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
       if (!handle)
@@ -102,17 +107,17 @@ namespace gazebo
         gzerr << "Failed to load plugin " << fullname << ": " << dlerror() << "\n";
         return result;
       }
-    
-      //Plugin *(*registerFunc)() = (Plugin *(*)())dlsym(handle, registerName.c_str());
-      T *(*registerFunc)() = (T *(*)())dlsym(handle, registerName.c_str());
-      if(!registerFunc)
+
+      registerFunc.ptr = dlsym(handle, registerName.c_str());
+
+      if(!registerFunc.ptr)
       {
         gzerr << "Failed to resolve " << registerName << ": " << dlerror();
         return result;
       }
     
       // Register the new controller.
-      result.reset( registerFunc() );
+      result.reset( registerFunc.func() );
     
     #elif HAVE_LTDL
     
@@ -138,17 +143,17 @@ namespace gazebo
         gzerr << "Failed to load " << fullname << ": " << lt_dlerror();
         return NULL;
       }
-    
-      //Plugin *(*registerFunc)() = (Plugin *(*)())lt_dlsym(handle, registerName.c_str());
+
       T *(*registerFunc)() = (T *(*)())lt_dlsym(handle, registerName.c_str());
-      if(!registerFunc)
+      resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
+      if(!registerFunc.ptr)
       {
         gzerr << "Failed to resolve " << registerName << ": " << lt_dlerror();
         return NULL;
       }
     
       // Register the new controller.
-      result.result( registerFunc() );
+      result.result( registerFunc.func() );
     
     #else // HAVE_LTDL
     
@@ -169,19 +174,19 @@ namespace gazebo
   class WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Load function
-    public: virtual void Load( physics::WorldPtr world, sdf::ElementPtr &_sdf ) = 0;
+    public: virtual void Load( physics::WorldPtr &_world, sdf::ElementPtr &_sdf ) = 0;
   };
 
   class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Load function
-    public: virtual void Load( physics::ModelPtr world, sdf::ElementPtr &_sdf ) = 0;
+    public: virtual void Load( physics::ModelPtr &_model, sdf::ElementPtr &_sdf ) = 0;
   };
 
   class SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Load function
-    public: virtual void Load( sensors::SensorPtr world, sdf::ElementPtr &_sdf ) = 0;
+    public: virtual void Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf ) = 0;
   };
 
 

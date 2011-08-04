@@ -671,7 +671,8 @@ void Model::LoadPlugin( sdf::ElementPtr &_sdf )
   gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
   if (plugin)
   {
-    plugin->Load(boost::shared_static_cast<Model>(shared_from_this()), _sdf);
+    ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
+    plugin->Load(myself, _sdf);
     this->plugins.push_back( plugin );
   }
 }
