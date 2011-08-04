@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  */
+#ifndef GAZEBO_HH
+#define GAZEBO_HH
+
 #include "common/common.h"
 #include "math/gzmath.h"
 #include "msgs/msgs.h"
@@ -50,3 +53,4 @@ namespace gazebo
     gazebo::transport::fini();
   }
 }
+#endif
