@@ -122,7 +122,10 @@ namespace gazebo
   
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(unsigned int index) const;
-  
+ 
+      /// \brief Select an object by name 
+      /// \param _vis Name of the visual to select
+      public: void SelectObject( const std::string &_vis );
 
       /// \brief Get a visual by name 
       public: Visual *GetVisual( const std::string &_name ) const;

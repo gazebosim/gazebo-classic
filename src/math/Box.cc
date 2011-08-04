@@ -15,6 +15,7 @@
  *
 */
 #include <math.h>
+#include <float.h>
 #include "math/Box.hh"
 
 using namespace gazebo;
@@ -24,6 +25,8 @@ using namespace math;
 /// Default constructor
 Box::Box()
 {
+  this->min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  this->max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 }
 
 

@@ -355,7 +355,10 @@ void Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
   if (vis)
   {
     gzdbg << "Camera got visual[" << vis->GetName() << "]\n";
+    this->selectionObj->Attach(vis);
   }
+  else
+    gzdbg << "No visual\n";
 }
 
 
@@ -950,15 +953,19 @@ void Scene::PreRender()
 
   if (this->selectionMsg)
   {
-    Visual_M::iterator viter;
-    viter = this->visuals.find(this->selectionMsg->header().str_id());
-    if (viter != this->visuals.end())
-      this->selectionObj->Attach( viter->second );
-    else
-      this->selectionObj->Attach( NULL );
-
+    this->SelectObject(this->selectionMsg->header().str_id());
     this->selectionMsg.reset();
   }
+}
+
+void Scene::SelectObject( const std::string &_vis )
+{
+  Visual_M::iterator viter;
+  viter = this->visuals.find(_vis);
+  if (viter != this->visuals.end())
+    this->selectionObj->Attach( viter->second );
+  else
+    this->selectionObj->Attach( NULL );
 }
 
 

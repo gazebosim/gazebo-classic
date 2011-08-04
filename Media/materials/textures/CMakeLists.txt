@@ -34,6 +34,9 @@ SET (files
             willowMap.png
             WoodPallet.png 
             test.png
+            redSelect.png
+            greenSelect.png
+            blueSelect.png
 )
 
 

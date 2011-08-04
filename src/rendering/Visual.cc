@@ -416,7 +416,7 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const math::Vector3 &scale )
 {
-  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+  sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
 
   if (geomElem->HasElement("box"))
     geomElem->GetElement("box")->GetAttribute("size")->Set(scale);
@@ -938,7 +938,9 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
       Ogre::Vector3 min = bb.getMinimum();
       Ogre::Vector3 max = bb.getMaximum();
-      box.Merge(math::Box(math::Vector3(min.x, min.y, min.z), math::Vector3(max.x, max.y, max.z)));
+
+      box.Merge(math::Box(math::Vector3(min.x, min.y, min.z), 
+                          math::Vector3(max.x, max.y, max.z)));
     }
   }
 
