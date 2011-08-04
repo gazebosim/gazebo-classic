@@ -87,8 +87,6 @@ Scene::Scene(const std::string &_name)
 Scene::~Scene()
 {
   Visual_M::iterator iter;
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-    delete iter->second;
   this->visuals.clear();
 
   Light_M::iterator lightIter;
@@ -140,7 +138,7 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->worldVisual = new Visual( "__world_node__", this );
+  this->worldVisual.reset( new Visual( "__world_node__", this ) );
 
   RTShaderSystem::Instance()->AddScene(this);
 
@@ -339,32 +337,30 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a visual by name 
-Visual *Scene::GetVisual( const std::string &_name ) const
+VisualPtr Scene::GetVisual( const std::string &_name ) const
 {
+  VisualPtr result;
   Visual_M::const_iterator iter = this->visuals.find(_name);
   if (iter != this->visuals.end())
-    return iter->second;
-  else 
-    return NULL;
+    result = iter->second;
+
+  return result;
 }
 
-void Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
+VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 {
   std::string mod;
-  Visual *vis = this->GetVisualAt(camera,mousePos, mod);
+  VisualPtr vis = this->GetVisualAt(camera,mousePos, mod);
   if (vis)
-  {
-    gzdbg << "Camera got visual[" << vis->GetName() << "]\n";
     this->selectionObj->Attach(vis);
-  }
-  else
-    gzdbg << "No visual\n";
+
+  return vis;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Visual *Scene::GetVisualAt(CameraPtr camera, 
+VisualPtr Scene::GetVisualAt(CameraPtr camera, 
                            math::Vector2i mousePos, std::string &mod) 
 {
   Ogre::Camera *ogreCam = camera->GetOgreCamera();
@@ -431,6 +427,8 @@ Visual *Scene::GetVisualAt(CameraPtr camera,
     }
   }
 
+  VisualPtr visual;
+
   mod = "";
   if (closestEntity)
   {
@@ -438,14 +436,11 @@ Visual *Scene::GetVisualAt(CameraPtr camera,
       mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
 
     Visual* const* vis = Ogre::any_cast<Visual*>(&closestEntity->getUserAny());
-
     if (vis)
-    {
-      return (*vis);
-    }
+      visual.reset( *vis );
   }
 
-  return NULL;
+  return visual;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -965,7 +960,7 @@ void Scene::SelectObject( const std::string &_vis )
   if (viter != this->visuals.end())
     this->selectionObj->Attach( viter->second );
   else
-    this->selectionObj->Attach( NULL );
+    this->selectionObj->Clear( );
 }
 
 
@@ -977,8 +972,8 @@ void Scene::ReceiveJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 
 void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 {
-  Visual *parentVis = this->GetVisual(_msg->parent());
-  Visual *childVis = NULL;
+  VisualPtr parentVis = this->GetVisual(_msg->parent());
+  VisualPtr childVis;
 
   if (_msg->child() == "world")
     childVis = this->worldVisual;
@@ -1011,8 +1006,6 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
   {
     if (iter != this->visuals.end() )
     {
-      delete iter->second;
-      iter->second = NULL;
       this->visuals.erase(iter);
     }
   }
@@ -1022,7 +1015,7 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
   }
   else
   {
-    Visual *visual = NULL;
+    VisualPtr visual;
 
     if (_msg->has_parent_id())
       iter = this->visuals.find(_msg->parent_id());
@@ -1030,9 +1023,9 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
       iter = this->visuals.end();
 
     if (iter != this->visuals.end())
-      visual = new Visual(_msg->header().str_id(), iter->second);
+      visual.reset( new Visual(_msg->header().str_id(), iter->second) );
     else 
-      visual = new Visual(_msg->header().str_id(), this);
+      visual.reset( new Visual(_msg->header().str_id(), this) );
 
     visual->LoadFromMsg(_msg);
     this->visuals[_msg->header().str_id()] = visual;

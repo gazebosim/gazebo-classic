@@ -165,13 +165,9 @@ void SelectionObj::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach to a scene node
-void SelectionObj::Attach( Visual *visual )
+void SelectionObj::Attach( VisualPtr visual )
 {
-  if (this->node->GetSceneNode()->getParentSceneNode())
-    this->node->GetSceneNode()->getParentSceneNode()->removeChild( this->node->GetSceneNode());
-
-  this->node->SetVisible(false);
-
+  this->Clear();
   if (visual)
   {
     math::Box box = visual->GetBounds();
@@ -183,4 +179,12 @@ void SelectionObj::Attach( Visual *visual )
     this->node->SetScale( math::Vector3(max, max, max) );
     this->node->SetVisible(true);
   }
+}
+
+void SelectionObj::Clear()
+{
+  if (this->node->GetSceneNode()->getParentSceneNode())
+    this->node->GetSceneNode()->getParentSceneNode()->removeChild( this->node->GetSceneNode());
+
+  this->node->SetVisible(false);
 }

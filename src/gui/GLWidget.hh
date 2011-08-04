@@ -52,6 +52,9 @@ namespace gazebo
       private: void OnMoveMode(bool mode);
       private: void OnCreateEntity( const std::string &_type );
 
+      private: void RotateEntity( rendering::VisualPtr &_vis );
+      private: void TranslateEntity( rendering::VisualPtr &_vis );
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
@@ -65,6 +68,9 @@ namespace gazebo
       private: BoxMaker boxMaker;
       private: SphereMaker sphereMaker;
       private: CylinderMaker cylinderMaker;
+
+      private: rendering::VisualPtr selection;
+      private: std::string selectionMod;
     };
   }
 }

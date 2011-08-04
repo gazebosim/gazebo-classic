@@ -18,12 +18,12 @@
 #define SELECTION_OBJ
 
 #include "math/Vector3.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
 	namespace rendering
   {
-    class Visual;
     class Scene;
 
     /// \addtogroup gazebo_rendering
@@ -41,7 +41,8 @@ namespace gazebo
       public: void Init();
   
       /// \brief Set the position of the node
-      public: void Attach( Visual *visual );
+      public: void Attach( VisualPtr visual );
+      public: void Clear( );
   
       private: Visual *node;
       private: Scene *scene;

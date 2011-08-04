@@ -56,7 +56,7 @@ namespace gazebo
     class Visual 
     {
       /// \brief Constructor
-      public: Visual (const std::string &name, Visual *parent);
+      public: Visual (const std::string &name, VisualPtr parent);
   
       /// \brief Constructor
       public: Visual (const std::string &name, Ogre::SceneNode *parent);
@@ -166,7 +166,10 @@ namespace gazebo
   
       /// \brief Get the global pose of the node
       public: math::Pose GetWorldPose() const;
-  
+ 
+      /// \brief Set the world pose of the visual 
+      public: void SetWorldPose(const math::Pose _pose);
+
       /// \brief Return the scene Node of this visual entity
       public: Ogre::SceneNode *GetSceneNode() const;
   

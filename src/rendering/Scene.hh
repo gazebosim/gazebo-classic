@@ -25,13 +25,13 @@
 #include "msgs/msgs.h"
 
 #include "rendering/ogre.h"
+#include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
 #include "common/Events.hh"
 #include "common/Color.hh"
 #include "math/Vector2i.hh"
 
-#include "rendering/RenderTypes.hh"
 
 namespace Ogre
 {
@@ -128,18 +128,18 @@ namespace gazebo
       public: void SelectObject( const std::string &_vis );
 
       /// \brief Get a visual by name 
-      public: Visual *GetVisual( const std::string &_name ) const;
+      public: VisualPtr GetVisual( const std::string &_name ) const;
 
-      public: void SelectVisualAt(CameraPtr camera, math::Vector2i mousePos);
+      public: VisualPtr SelectVisualAt(CameraPtr camera, math::Vector2i mousePos);
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking. 
       /// \param camera The ogre camera, used to do mouse picking
       /// \param mousePos The position of the mouse in screen coordinates
       /// \return The selected entity, or NULL
-      public: Visual *GetVisualAt(CameraPtr camera, 
-                                  math::Vector2i mousePos, 
-                                  std::string &mod);
+      public: VisualPtr GetVisualAt(CameraPtr camera, 
+                                    math::Vector2i mousePos, 
+                                    std::string &mod);
   
       /// \brief Get the world pos of a the first contact at a pixel location
       public: math::Vector3 GetFirstContact(CameraPtr camera, 
@@ -240,7 +240,7 @@ namespace gazebo
       private: JointMsgs_L jointMsgs;
 
  
-      typedef std::map<std::string, Visual*> Visual_M;
+      typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;
 
       typedef std::map<std::string, Light*> Light_M;
@@ -263,7 +263,7 @@ namespace gazebo
 
       private: SelectionObj *selectionObj;
 
-      private: Visual *worldVisual;
+      private: VisualPtr worldVisual;
     };
     /// \}
   }

@@ -4,8 +4,10 @@
 #include <math.h>
 
 #include "common/Exception.hh"
+#include "math/gzmath.h"
 
 #include "rendering/Rendering.hh"
+#include "rendering/Visual.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
@@ -114,6 +116,11 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
+  else if (this->selection)
+  {
+    this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos, 
+                             this->selectionMod);
+  }
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
@@ -130,6 +137,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
   if (this->entityMaker)
     this->entityMaker->OnMouseDrag(this->mouseEvent);
+  else if (this->selection && !this->selectionMod.empty())
+  {
+    if (this->selectionMod.substr(0,3) == "rot")
+      this->RotateEntity(this->selection);
+    else
+      this->TranslateEntity(this->selection);
+  }
   else
     this->userCamera->HandleMouseEvent(this->mouseEvent);
 
@@ -152,8 +166,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   else if (this->mouseEvent.dragging == false && 
            event->button() & Qt::RightButton)
   {
-    gzdbg << "Get Visual At[" << this->mouseEvent.pos << "]\n";
-    this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
+    this->selection = this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
   }
 }
 
@@ -240,4 +253,132 @@ void GLWidget::OnMoveMode(bool mode)
 void GLWidget::OnCreateEntity( const std::string &_type )
 {
   this->CreateEntity(_type);
+}
+
+void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
+{
+  math::Vector3 planeNorm, planeNorm2;
+  math::Vector3 p1, p2;
+  math::Vector3 a,b;
+  math::Vector3 ray(0,0,0);
+
+  math::Pose pose = _vis->GetWorldPose();
+  gzdbg << "Old[" << pose.pos << "] New[";
+
+  // Figure out which axis to rotate around
+  if (this->selectionMod == "rotx")
+    ray.x = 1.0;
+  else if (this->selectionMod == "roty")
+    ray.y = 1.0;
+  else if (this->selectionMod == "rotz")
+    ray.z = 1.0;
+
+  // Compute the normal to the plane on which to rotate
+  planeNorm = pose.rot.RotateVector(ray);
+  double d = -pose.pos.GetDotProd(planeNorm);
+
+  p1 = this->userCamera->GetWorldPointOnPlane( this->mouseEvent.pos.x,
+       this->mouseEvent.pos.y, planeNorm, d);
+
+  p2 = this->userCamera->GetWorldPointOnPlane( this->mouseEvent.prevPos.x,
+       this->mouseEvent.prevPos.y, planeNorm, d);
+
+  // Get point vectors relative to the entity's pose
+  a = p1 - _vis->GetWorldPose().pos;
+  b = p2 - _vis->GetWorldPose().pos;
+
+  a.Normalize();
+  b.Normalize();
+
+  // Get the angle between the two vectors. This is the amount to
+  // rotate the entity 
+  float angle = acos(a.GetDotProd(b));
+  if (isnan(angle))
+    angle = 0;
+
+  // Compute the normal to the plane which is defined by the
+  // direction of rotation
+  planeNorm2 = a.GetCrossProd(b);
+  planeNorm2.Normalize();
+
+  // Switch rotation direction if the two normals don't line up
+  if ( planeNorm.GetDotProd(planeNorm2) > 0)
+    angle *= -1;
+
+    math::Quaternion delta;
+    delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
+
+    pose.rot = pose.rot * delta;
+    _vis->SetWorldPose(pose);
+
+    //TODO: send message
+
+/*  if (entity->GetType() == Entity::MODEL)
+  {
+    Quatern delta;
+    delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
+
+    pose.rot = pose.rot * delta;
+    entity->SetWorldPose(pose);
+  }
+  else
+  {
+    ((Body*)entity)->SetTorque(planeNorm * angle * Gui::forceMultiplier);
+  }
+*/
+}
+
+void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
+{
+  math::Pose pose = _vis->GetWorldPose();
+
+  math::Vector3 origin1, dir1, p1;
+  math::Vector3 origin2, dir2, p2;
+
+  gzdbg << "Translate entity\n";
+  // Cast two rays from the camera into the world
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
+      this->mouseEvent.pos.y, origin1, dir1);
+  this->userCamera->GetCameraToViewportRay(this->mouseEvent.prevPos.x,
+      this->mouseEvent.prevPos.y, origin2, dir2);
+
+  math::Vector3 moveVector(0,0,0);
+  math::Vector3 planeNorm(0,0,1);
+  if (this->selectionMod == "transx")
+    moveVector.x = 1;
+  else if (this->selectionMod == "transy")
+    moveVector.y = 1;
+  else if (this->selectionMod == "transz")
+  {
+    moveVector.z = 1;
+    planeNorm.Set(1,0,0);
+  }
+
+  // Compute the distance from the camera to plane of translation
+  double d = -pose.pos.GetDotProd(planeNorm);
+  double dist1 = origin1.GetDistToPlane(dir1, planeNorm, d);
+  double dist2 = origin2.GetDistToPlane(dir2, planeNorm, d);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  p1 = origin1 + dir1 * dist1;
+  p2 = origin2 + dir2 * dist2;
+
+  moveVector *= p1 - p2;
+
+  _vis->SetPose(pose);
+
+  /*if (entity->GetType() == Entity::MODEL)
+  {
+    pose.pos += moveVector;
+    entity->SetRelativePose(pose);
+  }
+  else if (entity->GetType() == Entity::BODY)
+  {
+    Body *body = (Body*)(entity);
+    moveVector *= Gui::forceMultiplier;
+    body->SetForce(moveVector);
+  }
+*/
+
 }

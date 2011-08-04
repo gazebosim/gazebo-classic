@@ -47,7 +47,7 @@ unsigned int Visual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Visual::Visual(const std::string &_name, Visual *_parent)
+Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -746,6 +746,24 @@ math::Pose Visual::GetPose() const
   pos.pos=this->GetPosition();
   pos.rot=this->GetRotation();
   return pos;
+}
+
+void Visual::SetWorldPose(const math::Pose _pose)
+{
+  Ogre::Vector3 vpos;
+  Ogre::Quaternion vquatern;
+
+  vpos.x = _pose.pos.x;
+  vpos.y = _pose.pos.y;
+  vpos.z = _pose.pos.z;
+
+  vquatern.w = _pose.rot.w;
+  vquatern.x = _pose.rot.x;
+  vquatern.y = _pose.rot.y;
+  vquatern.z = _pose.rot.z;
+
+  this->sceneNode->_setDerivedPosition( vpos );
+  this->sceneNode->_setDerivedOrientation( vquatern );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
