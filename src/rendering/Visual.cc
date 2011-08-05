@@ -60,6 +60,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
+  this->parent = _parent;
   this->Init();
 }
 
@@ -1157,6 +1158,13 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
   */
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the parent visual, if one exists
+VisualPtr Visual::GetParent() const
+{
+  return this->parent;
+}
+ 
 std::string Visual::GetMeshName() const
 {
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");

@@ -146,6 +146,9 @@ namespace gazebo
       /// \return Pointer to a model, or NULL if no parent model exists
       public: ModelPtr GetParentModel() const;
 
+      /// \brief Called when a new pose message arrives
+      private: void OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg);
+
       /// \brief This function is called when the entity's (or one of its parents)
       ///        pose of the parent has changed
       protected: virtual void OnPoseChange() {}
@@ -169,6 +172,7 @@ namespace gazebo
 
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr posePub;
+      protected: transport::SubscriberPtr poseSub;
       protected: transport::PublisherPtr visPub;
 
       protected: msgs::Visual *visualMsg;

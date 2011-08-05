@@ -232,6 +232,8 @@ namespace gazebo
       private: ConnectionPtr acceptConn;
 
       private: event::EventT<void()> shutdownSignal;
+
+      public: bool debug;
     };
     /// \}
   }

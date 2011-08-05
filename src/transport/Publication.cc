@@ -48,8 +48,27 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
 // A a transport
 void Publication::AddTransport( const PublicationTransportPtr &publink)
 {
-  publink->AddCallback( boost::bind(&Publication::LocalPublish, this, _1) );
-  this->transports.push_back( publink );
+  bool add = true;
+
+  // Find an existing publication transport
+  std::list<PublicationTransportPtr>::iterator iter;
+  for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
+  {
+    if ((*iter)->GetTopic() == publink->GetTopic() &&
+        (*iter)->GetMsgType() == publink->GetMsgType() &&
+        (*iter)->GetConnection()->GetRemoteURI() == publink->GetConnection()->GetRemoteURI())
+    {
+      add = false;
+      break;
+    }
+  }
+
+  // Don't add a duplicate transport
+  if (add)
+  {
+    publink->AddCallback( boost::bind(&Publication::LocalPublish, this, _1) );
+    this->transports.push_back( publink );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

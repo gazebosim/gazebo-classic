@@ -21,6 +21,7 @@
  */
 
 #include <math.h>
+#include "math/Comparison.hh"
 #include "math/Vector3.hh"
 
 using namespace gazebo;
@@ -336,7 +337,9 @@ const Vector3 &Vector3::operator*=( double v)
 // Equality operator
 bool Vector3::operator==( const Vector3 &_pt ) const
 {
-  return (this->x == _pt.x) && (this->y == _pt.y) && (this->z == _pt.z);
+  return equal(this->x, _pt.x,0.001) && 
+         equal(this->y, _pt.y,0.001) && 
+         equal(this->z, _pt.z,0.001);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

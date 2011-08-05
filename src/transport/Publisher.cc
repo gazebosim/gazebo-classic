@@ -63,17 +63,14 @@ void Publisher::Publish(google::protobuf::Message &_message )
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  //TopicManager::Instance()->Publish(this->topic, _message, 
-      //boost::bind(&Publisher::OnPublishComplete, this));
-
   // Save the latest message
   this->mutex->lock();
-  if (this->messages.size() < this->queueLimit)
-  {
-    google::protobuf::Message *msg = _message.New();
-    msg->CopyFrom( _message );
-    this->messages.push_back( msg );
-  }
+  google::protobuf::Message *msg = _message.New();
+  msg->CopyFrom( _message );
+  this->messages.push_back( msg );
+
+  if (this->messages.size() > this->queueLimit)
+    this->messages.pop_front();
   this->mutex->unlock();
 
 }
@@ -83,6 +80,7 @@ void Publisher::Publish(google::protobuf::Message &_message )
 void Publisher::SendMessage()
 {
   this->mutex->lock();
+
   if (this->messages.size() > 0)
   {
     std::list<google::protobuf::Message *>::iterator iter;

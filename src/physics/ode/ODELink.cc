@@ -137,6 +137,7 @@ void ODELink::MoveCallback(dBodyID id)
   math::Vector3 cog_vec = pose.rot.RotateVector(self->inertial->GetCoG());
   pose.pos -= cog_vec;
 
+  gzdbg << "MoveCallback. Entity[" << self->GetCompleteScopedName() << "] Pos[" << pose.pos << "]\n";
   self->SetWorldPose(pose,false);
 }
 
@@ -193,13 +194,18 @@ void ODELink::OnPoseChange()
     return;
   //this->SetEnabled(true);
 
+
   //math::Pose pose = this->comEntity->GetWorldPose();
   math::Pose pose = this->GetWorldPose();
+
 
   math::Vector3 cog_vec = pose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
   pose.pos += cog_vec;
+
+  gzdbg << "ODE[" << this->GetName() << "] OnPoseChange[" << this->GetWorldPose() << "] COG_VEC[" << cog_vec << "] Result[" << pose << "]\n";
+
   dBodySetPosition(this->linkId, pose.pos.x, pose.pos.y, pose.pos.z);
 
   dQuaternion q;

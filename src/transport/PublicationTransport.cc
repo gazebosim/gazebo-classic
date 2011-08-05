@@ -5,10 +5,13 @@
 using namespace gazebo;
 using namespace transport;
 
+int PublicationTransport::counter = 0;
+
 PublicationTransport::PublicationTransport(const std::string &topic, 
                                            const std::string &msgType)
  : topic(topic), msgType(msgType)
 {
+  this->id = counter++;
   TopicManager::Instance()->UpdatePublications(topic, msgType);
 }
 
@@ -62,12 +65,22 @@ void PublicationTransport::AddCallback(const boost::function<void(const std::str
 void PublicationTransport::OnPublish(const std::string &data)
 {
   if (this->callback)
-  {
     (this->callback)(data);
-  }
 }
 
 const ConnectionPtr PublicationTransport::GetConnection() const
 {
   return this->connection;
 }
+
+std::string PublicationTransport::GetTopic() const
+{
+  return this->topic;
+}
+
+std::string PublicationTransport::GetMsgType() const
+{
+  return this->msgType;
+}
+
+

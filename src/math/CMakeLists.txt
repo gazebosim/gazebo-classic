@@ -12,6 +12,7 @@ set ( sources Angle.cc
               Vector2i.cc
               Vector3.cc
               Vector4.cc
+              Comparison.cc
 )
 
 set ( headers Angle.hh
@@ -27,6 +28,7 @@ set ( headers Angle.hh
               Vector3.hh
               Vector4.hh
               MathTypes.hh
+              Comparison.hh
 )
 
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)

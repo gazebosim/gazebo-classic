@@ -54,7 +54,7 @@ GLWidget::GLWidget( QWidget *parent )
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose");
+  this->posePub = this->node->Advertise<msgs::Pose>("~/set_pose");
 }
 
 GLWidget::~GLWidget()
@@ -173,12 +173,18 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
            event->button() & Qt::RightButton)
   {
     this->selection = this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
+    this->selectionPoseOrig = this->selection->GetPose();
   }
   else if ( !this->selectionMod.empty() && this->selection)
   {
     msgs::Pose msg;
-    msgs::Init(msg, this->selection->GetName());
-    msgs::Set( &msg, this->selection->GetPose());
+    if (this->selection->GetParent())
+      msgs::Init(msg, this->selection->GetParent()->GetName());
+    else
+      msgs::Init(msg, this->selection->GetName());
+    msgs::Set( &msg, this->selection->GetWorldPose());
+    this->selection->SetPose( this->selectionPoseOrig );
+
     this->posePub->Publish(msg);
   }
 }
@@ -322,7 +328,8 @@ void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
 
     pose.rot = pose.rot * delta;
     _vis->SetPose(pose);
-    
+
+   
     //TODO: send message
 
 /*  if (entity->GetType() == Entity::MODEL)
@@ -376,8 +383,8 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
   p2 = origin2 + dir2 * dist2;
 
   moveVector *= p1 - p2;
-
   pose.pos += moveVector;
+
   _vis->SetPose(pose);
 
   /*if (entity->GetType() == Entity::MODEL)

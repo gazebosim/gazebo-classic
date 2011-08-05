@@ -219,6 +219,9 @@ namespace gazebo
   
       /// \brief Update a visual based on a message
       public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
+
+      /// \brief Get the parent visual, if one exists
+      public: VisualPtr GetParent() const;
   
       private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
       private: std::string GetMeshName() const;
@@ -251,6 +254,7 @@ namespace gazebo
 
       private: std::string name;
       private: std::string physicsEntityName;
+      private: VisualPtr parent;
 
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;

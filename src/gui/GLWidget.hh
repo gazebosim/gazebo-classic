@@ -10,6 +10,8 @@
 #include "common/MouseEvent.hh"
 #include "common/Event.hh"
 
+#include "math/Pose.hh"
+
 #include "gui/BoxMaker.hh"
 #include "gui/SphereMaker.hh"
 #include "gui/CylinderMaker.hh"
@@ -69,6 +71,7 @@ namespace gazebo
 
       private: rendering::VisualPtr selection;
       private: std::string selectionMod;
+      private: math::Pose selectionPoseOrig;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr posePub;

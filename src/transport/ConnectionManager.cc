@@ -156,17 +156,22 @@ void ConnectionManager::OnMasterRead( const std::string &data)
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
-    // Connect to the remote publisher
-    ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 
-    // Create a transport link that will read from the connection, and 
-    // send data to a Publication.
-    PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
-          pub.msg_type()));
-    publink->Init( conn );
+    if (pub.host() != this->serverConn->GetLocalAddress() ||
+        pub.port() != this->serverConn->GetLocalPort())
+    {
+      // Connect to the remote publisher
+      ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 
-    // Connect local subscribers to the publication transport link
-    TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
+      // Create a transport link that will read from the connection, and 
+      // send data to a Publication.
+      PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
+            pub.msg_type()));
+      publink->Init( conn );
+
+      // Connect local subscribers to the publication transport link
+      TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
+    }
   }
   else if (packet.type() == "unsubscribe")
   {
@@ -373,11 +378,15 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost( const std::string &host,
   if (!this->initialized)
     return conn;
 
-  // Connect to the remote host
-  conn.reset(new Connection());
-  conn->Connect(host, port);
+  conn = this->FindConnection(host,port);
+  if (!conn)
+  {
+    // Connect to the remote host
+    conn.reset(new Connection());
+    conn->Connect(host, port);
 
-  this->connections.push_back( conn );
+    this->connections.push_back( conn );
+  }
 
   return conn;
 }
@@ -408,12 +417,13 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &host,
 
   std::list<ConnectionPtr>::iterator iter;
 
+  std::string uri = "http://" + host + ":" + boost::lexical_cast<std::string>(port);
+
   // Check to see if we are already connected to the remote publisher
   for (iter = this->connections.begin(); 
        iter != this->connections.end(); iter++)
   {
-    if ( (*iter)->GetRemoteAddress() == host && 
-         (*iter)->GetRemotePort() == port)
+    if ( (*iter)->GetRemoteURI() == uri)
       conn = *iter;
   }
 

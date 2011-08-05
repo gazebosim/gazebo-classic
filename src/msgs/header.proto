@@ -10,7 +10,7 @@ import "time.proto";
 message Header
 {
   optional string str_id = 1;
-  optional Time stamp = 2;
-  optional int32 index = 3;
+  optional Time stamp    = 2;
+  optional int32 index   = 3;
 } 
 /// \endverbatim

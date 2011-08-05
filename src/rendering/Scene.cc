@@ -939,7 +939,7 @@ void Scene::PreRender()
     Visual_M::iterator iter = this->visuals.find((*pIter)->header().str_id());
     if (iter != this->visuals.end())
     {
-      iter->second->SetPose( msgs::Convert(*(*pIter)) );
+      iter->second->SetWorldPose( msgs::Convert(*(*pIter)) );
       PoseMsgs_L::iterator prev = pIter++;
       this->poseMsgs.erase( prev );
     }
@@ -1037,6 +1037,11 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
+
+  math::Pose p = msgs::Convert(*_msg);
+
+  if (_msg->header().str_id().find("box") != std::string::npos)
+    gzdbg << "ID[" << _msg->header().str_id() << "] PoseMsg[" << p.pos << "]\n";
 
   // Find an old pose message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)

@@ -19,6 +19,7 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
+#include "math/Comparison.hh"
 #include "math/Quaternion.hh"
 
 using namespace gazebo;
@@ -489,12 +490,18 @@ Vector3 Quaternion::GetZAxis() const
 /// Equality operator
 bool Quaternion::operator==(const Quaternion &_qt) const
 {
-  return this->x == _qt.x && this->y == _qt.y && this->z == _qt.z && this->w == _qt.w;
+  return equal(this->x, _qt.x, 0.001) && 
+         equal(this->y, _qt.y, 0.001) && 
+         equal(this->z, _qt.z, 0.001) && 
+         equal(this->w, _qt.w, 0.001);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Inequality operator
 bool Quaternion::operator!=(const Quaternion &_qt) const
 {
-  return this->x != _qt.x || this->y != _qt.y || this->z != _qt.z || this->w != _qt.w;
+  return !equal(this->x, _qt.x, 0.001) || 
+         !equal(this->y, _qt.y, 0.001) || 
+         !equal(this->z, _qt.z, 0.001) || 
+         !equal(this->w, _qt.w, 0.001);
 }

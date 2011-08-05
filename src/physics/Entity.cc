@@ -85,6 +85,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
   this->posePub = this->node->Advertise<msgs::Pose>("~/pose", 10);
+  this->poseSub = this->node->Subscribe("~/set_pose", &Entity::OnPoseMsg, this);
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
 
   this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
@@ -105,7 +106,9 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   this->visPub->Publish(*this->visualMsg);
 
   msgs::Init( *this->poseMsg, this->GetCompleteScopedName() );
+  this->poseMsg->mutable_header()->set_index(0);
 }
+
  
 ////////////////////////////////////////////////////////////////////////////////
 // Set the name of the entity
@@ -168,8 +171,12 @@ bool Entity::IsCanonicalLink() const
 
 void Entity::PublishPose()
 {
-  msgs::Set( this->poseMsg, this->GetRelativePose());
-  this->posePub->Publish( *this->poseMsg);
+  if (this->GetRelativePose() != msgs::Convert(*this->poseMsg))
+  {
+    this->poseMsg->mutable_header()->set_index( this->poseMsg->header().index() + 1);
+    msgs::Set( this->poseMsg, this->GetWorldPose());
+    this->posePub->Publish( *this->poseMsg);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -316,7 +323,8 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     // initialization: (no children?) set own worldPose
     this->worldPose = pose;
     this->worldPose.Correct();
-    if (notify) this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
+    if (notify) 
+      this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
 
     //
     // user deliberate setting: lock and update all children's wp
@@ -334,7 +342,8 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
           entity->worldPose = (entity->initialRelativePose + pose);
         else
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + pose);
-        if (notify) entity->UpdatePhysicsPose(false);
+        if (notify) 
+          entity->UpdatePhysicsPose(false);
         entity->PublishPose();
         //printf("SWP Model Body [%s]\t",(*iter)->GetName().c_str());
       }
@@ -349,7 +358,8 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     //printf("c[%s]",this->GetName().c_str());
     this->worldPose = pose;
     this->worldPose.Correct();
-    if (notify) this->UpdatePhysicsPose(true);
+    if (notify) 
+      this->UpdatePhysicsPose(true);
 
     // also update parent model's pose
     if (this->parentEntity->HasType(MODEL))
@@ -407,3 +417,17 @@ ModelPtr Entity::GetParentModel() const
 
   return boost::shared_dynamic_cast<Model>(p);
 }
+
+/// Called when a new pose message arrives
+void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
+{
+  if (_msg->header().str_id() == this->GetCompleteScopedName())
+  {
+    math::Pose p = msgs::Convert(*_msg);
+    p.pos.z = 1.5;
+    gzdbg << "Entity[" << this->GetCompleteScopedName() << "] SetPose[" << p.pos << "]\n";
+    this->SetWorldPose( p );
+  }
+}
+
+

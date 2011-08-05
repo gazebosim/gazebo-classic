@@ -141,6 +141,16 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   // function
   SubscriberPtr sub( new Subscriber(ops.GetTopic(), subscription) );
 
+  // Find a current publication
+  PublicationPtr pub = this->FindPublication(ops.GetTopic());
+
+  // If the publication exits, just add the subscription to it 
+  if (pub)
+  {
+    pub->AddSubscription( subscription );
+  }
+
+  // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());
   return sub;
 }

@@ -34,6 +34,7 @@ Connection::Connection()
 {
   IOManager::Instance()->IncCount();
   this->id = idCounter++;
+  this->debug = false;
 
 
   this->writeMutex = new boost::recursive_mutex();
@@ -436,8 +437,16 @@ void Connection::ReadLoop(const ReadCallback &cb)
       boost::this_thread::interruption_point();
       if (this->socket.available() >= HEADER_LENGTH)
       {
+        if (debug)
+          printf("Avail[%d]\n", this->socket.available());
         if (this->Read(data))
+        {
+          if (debug)
+            printf("Read some\n");
           (cb)(data);
+        }
+        if (debug)
+          printf("Avail[%d]\n", this->socket.available());
       }
       else
       {

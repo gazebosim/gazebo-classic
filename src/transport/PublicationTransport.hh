@@ -25,6 +25,8 @@ namespace gazebo
       public: void AddCallback(const boost::function<void(const std::string &)> &cb);
 
       public: const ConnectionPtr GetConnection() const;
+      public: std::string GetTopic() const;
+      public: std::string GetMsgType() const;
 
       private: void OnConnectionShutdown();
 
@@ -35,6 +37,9 @@ namespace gazebo
       private: ConnectionPtr connection;
       private: boost::function<void (const std::string &)> callback;
       private: event::ConnectionPtr shutdownConnectionPtr;
+
+      private: static int counter;
+      private: int id;
     };
     /// \}
   }
