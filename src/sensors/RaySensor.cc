@@ -66,6 +66,8 @@ void RaySensor::Load( sdf::ElementPtr &_sdf )
 }
 void RaySensor::Load( )
 {
+  Sensor::Load();
+
   std::string linkName = this->sdf->GetLinkName();
   //gzerr << "parent link name : " << linkName << "\n";
 
