@@ -249,65 +249,87 @@ void MultiRayShape::AddRay(const math::Vector3 &start,
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the minimum angle
-math::Angle MultiRayShape::GetMinAngle() const
-{
-  return this->sdf->GetElement("scan")->GetElement("horizontal")->GetValueDouble("min_angle");
-}
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the maximum angle
-math::Angle MultiRayShape::GetMaxAngle() const
-{
-  return this->sdf->GetElement("scan")->GetElement("horizontal")->GetValueDouble("max_angle");
-}
+
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum range
 double MultiRayShape::GetMinRange() const
 {
-  return this->sdf->GetElement("range")->GetValueDouble("min");
+  return this->sdf->GetElement("ray")->GetElement("range")->GetValueDouble("min");
 }
-
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the maximum range
 double MultiRayShape::GetMaxRange() const
 {
-  return this->sdf->GetElement("range")->GetValueDouble("max");
+  return this->sdf->GetElement("ray")->GetElement("range")->GetValueDouble("max");
 }
-
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the range resolution
 double MultiRayShape::GetResRange() const
 {
-  return this->sdf->GetElement("range")->GetValueDouble("resolution");
+  return this->sdf->GetElement("ray")->GetElement("range")->GetValueDouble("resolution");
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the sample count
 int MultiRayShape::GetSampleCount() const
 {
-  return this->sdf->GetElement("scan")->GetElement("horizontal")->GetValueDouble("samples");
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueUInt("samples");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get the vertical scan line count
+///  Get the range resolution
+double MultiRayShape::GetScanResolution() const
+{
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueDouble("resolution");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the minimum range
+math::Angle MultiRayShape::GetMinAngle() const
+{
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueDouble("min_angle");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+///  Get the maximum range
+math::Angle MultiRayShape::GetMaxAngle() const
+{
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueDouble("max_angle");
+}
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical sample count
 int MultiRayShape::GetVerticalSampleCount() const
 {
-  return this->sdf->GetElement("scan")->GetElement("vertical")->GetValueDouble("samples");
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueUInt("samples");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get the vertical min angle
+///  Get the vertical range resolution
+double MultiRayShape::GetVerticalScanResolution() const
+{
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueDouble("resolution");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical minimum range
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
-  return this->sdf->GetElement("scan")->GetElement("vertical")->GetValueDouble("min_angle");
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueDouble("min_angle");
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get the vertical max angle
+///  Get the vertical maximum range
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
-  return this->sdf->GetElement("scan")->GetElement("vertical")->GetValueDouble("max_angle");
+  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueDouble("max_angle");
 }
+

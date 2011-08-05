@@ -159,28 +159,28 @@ double RaySensor::GetResRange() const
 /// Get the ray count
 int RaySensor::GetRayCount() const
 {
-  return this->GetRayCount();
+  return this->laserShape->GetSampleCount();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the range count
 int RaySensor::GetRangeCount() const
 {
-  return this->GetRangeCount();
+  return this->laserShape->GetSampleCount()*this->laserShape->GetScanResolution();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical scan line count
 int RaySensor::GetVerticalRayCount() const
 {
-  return this->GetVerticalRayCount();
+  return this->laserShape->GetVerticalSampleCount();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical scan line count
 int RaySensor::GetVerticalRangeCount() const
 {
-  return this->GetVerticalRangeCount();
+  return this->laserShape->GetVerticalSampleCount()*this->laserShape->GetVerticalScanResolution();
 }
 
 //////////////////////////////////////////////////////////////////////////////

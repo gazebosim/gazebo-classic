@@ -68,26 +68,36 @@ namespace gazebo
       /// \brief Get detected fiducial value for a ray.
       public: int GetFiducial(int index);
   
-      /// \brief Get the minimum angle
-      public: math::Angle GetMinAngle() const;
-              
-      /// \brief Get the maximum angle
-      public: math::Angle GetMaxAngle() const;
-  
       /// \brief Get the minimum range
       public: double GetMinRange() const;
   
       /// \brief Get the maximum range
       public: double GetMaxRange() const;
-  
+
       /// \brief Get the range resolution
       public: double GetResRange() const;
-  
+
+
       /// \brief Get the horizontal sample count
       public: int GetSampleCount() const;
   
+      /// \brief Get the range resolution
+      public: double GetScanResolution() const;
+  
+      /// \brief Get the minimum angle
+      public: math::Angle GetMinAngle() const;
+              
+      /// \brief Get the maximum angle
+      public: math::Angle GetMaxAngle() const;
+
+
+
+  
       /// \brief Get the vertical sample count
       public: int GetVerticalSampleCount() const;
+  
+      /// \brief Get the vertical range resolution
+      public: double GetVerticalScanResolution() const;
   
       /// \brief Get the vertical min angle
       public: math::Angle GetVerticalMinAngle() const;
