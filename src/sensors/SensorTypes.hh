@@ -28,9 +28,12 @@ namespace gazebo
   namespace sensors
   {
     class Sensor;
+    class RaySensor;
 
     typedef boost::shared_ptr<Sensor> SensorPtr;
+    typedef boost::shared_ptr<RaySensor> RaySensorPtr;
     typedef std::vector<SensorPtr> Sensor_V;
+    typedef std::vector<RaySensorPtr> RaySensor_V;
   }
 }
  
