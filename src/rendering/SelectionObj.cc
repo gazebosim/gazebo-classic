@@ -77,49 +77,49 @@ void SelectionObj::Init()
   }
 
 
-  Ogre::MovableObject *tubeObj1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJ1", "selection_tube"));
+  Ogre::MovableObject *tubeObj1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJ1__", "selection_tube"));
   tubeObj1->setCastShadows(false);
   tubeObj1->setUserAny( Ogre::Any(std::string("rotx")) );
   ((Ogre::Entity*)tubeObj1)->setMaterialName("Gazebo/RedSelection");
 
-  Ogre::MovableObject *tubeObj2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJ2", "selection_tube"));
+  Ogre::MovableObject *tubeObj2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJ2__", "selection_tube"));
   tubeObj2->setCastShadows(false);
   tubeObj2->setUserAny( Ogre::Any(std::string("roty")) );
   ((Ogre::Entity*)tubeObj2)->setMaterialName("Gazebo/GreenSelection");
 
-  Ogre::MovableObject *tubeObj3 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJ3", "selection_tube"));
+  Ogre::MovableObject *tubeObj3 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJ3__", "selection_tube"));
   tubeObj3->setCastShadows(false);
   tubeObj3->setUserAny( Ogre::Any(std::string("rotz")) );
   ((Ogre::Entity*)tubeObj3)->setMaterialName("Gazebo/BlueSelection");
 
-  Ogre::MovableObject *boxObjX1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJX1", "unit_box"));
+  Ogre::MovableObject *boxObjX1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJX1__", "unit_box"));
   boxObjX1->setCastShadows(false);
   boxObjX1->setUserAny( Ogre::Any(std::string("transx")) );
   ((Ogre::Entity*)boxObjX1)->setMaterialName("Gazebo/RedTransparent");
 
-  Ogre::MovableObject *boxObjX2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJX2", "unit_box"));
+  Ogre::MovableObject *boxObjX2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJX2__", "unit_box"));
   boxObjX2->setCastShadows(false);
   boxObjX2->setUserAny( Ogre::Any(std::string("transx")) );
   ((Ogre::Entity*)boxObjX2)->setMaterialName("Gazebo/RedTransparent");
 
 
-  Ogre::MovableObject *boxObjY1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJY1", "unit_box"));
+  Ogre::MovableObject *boxObjY1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJY1__", "unit_box"));
   boxObjY1->setCastShadows(false);
   boxObjY1->setUserAny( Ogre::Any(std::string("transy")) );
   ((Ogre::Entity*)boxObjY1)->setMaterialName("Gazebo/GreenTransparent");
 
-  Ogre::MovableObject *boxObjY2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJY2", "unit_box"));
+  Ogre::MovableObject *boxObjY2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJY2__", "unit_box"));
   boxObjY2->setCastShadows(false);
   boxObjY2->setUserAny( Ogre::Any(std::string("transy")) );
   ((Ogre::Entity*)boxObjY2)->setMaterialName("Gazebo/GreenTransparent");
 
 
-  Ogre::MovableObject *boxObjZ1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJZ1", "unit_box"));
+  Ogre::MovableObject *boxObjZ1 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJZ1__", "unit_box"));
   boxObjZ1->setCastShadows(false);
   boxObjZ1->setUserAny( Ogre::Any(std::string("transz")) );
   ((Ogre::Entity*)boxObjZ1)->setMaterialName("Gazebo/BlueTransparent");
 
-  Ogre::MovableObject *boxObjZ2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("SELECTION_OBJZ2", "unit_box"));
+  Ogre::MovableObject *boxObjZ2 = (Ogre::MovableObject*)(this->scene->GetManager()->createEntity("__SELECTION_OBJZ2__", "unit_box"));
   boxObjZ2->setCastShadows(false);
   boxObjZ2->setUserAny( Ogre::Any(std::string("transz")) );
   ((Ogre::Entity*)boxObjZ2)->setMaterialName("Gazebo/BlueTransparent");

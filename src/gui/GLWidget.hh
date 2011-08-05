@@ -4,6 +4,9 @@
 #include <QtGui>
 
 #include "rendering/RenderTypes.hh"
+
+#include "transport/TransportTypes.hh"
+
 #include "common/MouseEvent.hh"
 #include "common/Event.hh"
 
@@ -13,11 +16,6 @@
 
 namespace gazebo
 {
-  namespace rendering
-  {
-    class UserCamera;
-  }
-
   namespace gui
   {
     class GLWidget : public QWidget
@@ -71,6 +69,9 @@ namespace gazebo
 
       private: rendering::VisualPtr selection;
       private: std::string selectionMod;
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr posePub;
     };
   }
 }

@@ -6,6 +6,8 @@
 #include "common/Exception.hh"
 #include "math/gzmath.h"
 
+#include "transport/transport.h"
+
 #include "rendering/Rendering.hh"
 #include "rendering/Visual.hh"
 #include "rendering/WindowManager.hh"
@@ -49,6 +51,10 @@ GLWidget::GLWidget( QWidget *parent )
 
 
   this->entityMaker = NULL;
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->posePub = this->node->Advertise<msgs::Pose>("~/pose");
 }
 
 GLWidget::~GLWidget()
@@ -168,6 +174,13 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   {
     this->selection = this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
   }
+  else if ( !this->selectionMod.empty() && this->selection)
+  {
+    msgs::Pose msg;
+    msgs::Init(msg, this->selection->GetName());
+    msgs::Set( &msg, this->selection->GetPose());
+    this->posePub->Publish(msg);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,8 +275,7 @@ void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
   math::Vector3 a,b;
   math::Vector3 ray(0,0,0);
 
-  math::Pose pose = _vis->GetWorldPose();
-  gzdbg << "Old[" << pose.pos << "] New[";
+  math::Pose pose = _vis->GetPose();
 
   // Figure out which axis to rotate around
   if (this->selectionMod == "rotx")
@@ -309,8 +321,8 @@ void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
     delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
 
     pose.rot = pose.rot * delta;
-    _vis->SetWorldPose(pose);
-
+    _vis->SetPose(pose);
+    
     //TODO: send message
 
 /*  if (entity->GetType() == Entity::MODEL)
@@ -330,12 +342,11 @@ void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
 
 void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
 {
-  math::Pose pose = _vis->GetWorldPose();
+  math::Pose pose = _vis->GetPose();
 
   math::Vector3 origin1, dir1, p1;
   math::Vector3 origin2, dir2, p2;
 
-  gzdbg << "Translate entity\n";
   // Cast two rays from the camera into the world
   this->userCamera->GetCameraToViewportRay(this->mouseEvent.pos.x,
       this->mouseEvent.pos.y, origin1, dir1);
@@ -366,6 +377,7 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
 
   moveVector *= p1 - p2;
 
+  pose.pos += moveVector;
   _vis->SetPose(pose);
 
   /*if (entity->GetType() == Entity::MODEL)

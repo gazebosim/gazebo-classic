@@ -91,6 +91,7 @@ Visual::Visual (const std::string &_name, Scene *scene_)
 /// Destructor
 Visual::~Visual()
 {
+  gzdbg << "Delete Visual[" << this->name << "]\n"; 
   if (this->preRenderConnection)
     event::Events::DisconnectPreRenderSignal( this->preRenderConnection );
 
@@ -347,7 +348,7 @@ void Visual::AttachObject( Ogre::MovableObject *_obj)
   this->sceneNode->attachObject(_obj);
   RTShaderSystem::Instance()->UpdateShaders();
 
-  _obj->setUserAny( Ogre::Any(this) );
+  _obj->setUserAny( Ogre::Any(this->GetName()) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

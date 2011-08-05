@@ -360,8 +360,8 @@ VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-VisualPtr Scene::GetVisualAt(CameraPtr camera, 
-                           math::Vector2i mousePos, std::string &mod) 
+VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos, 
+                             std::string &_mod) 
 {
   Ogre::Camera *ogreCam = camera->GetOgreCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
@@ -429,15 +429,16 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera,
 
   VisualPtr visual;
 
-  mod = "";
+  _mod = "";
   if (closestEntity)
   {
-    if (closestEntity->getUserAny().getType() == typeid(std::string))
-      mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+    // Make sure we set the _mod only if we have found a selection object
+    if (closestEntity->getName().substr(0,15) == "__SELECTION_OBJ" &&
+        closestEntity->getUserAny().getType() == typeid(std::string))
+      _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
 
-    Visual* const* vis = Ogre::any_cast<Visual*>(&closestEntity->getUserAny());
-    if (vis)
-      visual.reset( *vis );
+    visual = this->GetVisual(Ogre::any_cast<std::string>(
+          closestEntity->getUserAny()));
   }
 
   return visual;

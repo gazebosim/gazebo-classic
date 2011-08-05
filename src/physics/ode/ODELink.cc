@@ -76,7 +76,7 @@ void ODELink::Init()
 
     dBodySetData(this->linkId, this);
     dBodySetAutoDisableDefaults(this->linkId);
-    dBodySetAutoDisableFlag(this->linkId, 0);
+    dBodySetAutoDisableFlag(this->linkId, 1);
   }
 
   Link::Init();

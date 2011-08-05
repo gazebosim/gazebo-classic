@@ -22,6 +22,7 @@
 #ifndef OGREVISUAL_HH
 #define OGREVISUAL_HH
 
+#include <boost/enable_shared_from_this.hpp>
 #include <string>
 
 #include "common/Event.hh"
@@ -53,7 +54,7 @@ namespace gazebo
     /// \{
 
     /// \brief A renderable object
-    class Visual 
+    class Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       public: Visual (const std::string &name, VisualPtr parent);
@@ -249,6 +250,7 @@ namespace gazebo
       private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
 
       private: std::string name;
+      private: std::string physicsEntityName;
 
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;
