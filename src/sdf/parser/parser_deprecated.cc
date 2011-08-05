@@ -63,24 +63,30 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     std::string prefix;
     if (elemXml->ns) prefix = (const char*)elemXml->ns->prefix;
     if (prefix.empty())
-      element->SetName( (const char*)elemXml->name );
-    else
-      element->SetName( prefix + ":" + (const char*)elemXml->name );
-
-    // copy attributes
-    for (xmlAttrPtr attrXml = elemXml->properties;
-         attrXml && attrXml->name && attrXml->children; attrXml = attrXml->next)
     {
-      element->AddAttribute((const char*)attrXml->name,"string","defaultvalue",false);
-      initAttr(elemXml, (const char*)attrXml->name, element->GetAttribute((const char*)attrXml->name));
+      element->SetName( (const char*)elemXml->name );
+
+      // copy attributes
+      for (xmlAttrPtr attrXml = elemXml->properties;
+           attrXml && attrXml->name && attrXml->children; attrXml = attrXml->next)
+      {
+        element->AddAttribute((const char*)attrXml->name,"string","defaultvalue",false);
+        initAttr(elemXml, (const char*)attrXml->name, element->GetAttribute((const char*)attrXml->name));
+      }
+
+      // copy value
+      std::string value = getValue(elemXml);
+      if (!value.empty())
+        element->AddValue("string", value, "1");
+
+      _sdf->elements.push_back( element );
+    }
+    else // copy namespaced element
+    {
+      gzwarn << "skipping prefixed element [" << prefix << ":" << (const char*)elemXml->name << "] when copying plugins\n";
+      //element->SetName( prefix + ":" + (const char*)elemXml->name );
     }
 
-    // copy value
-    std::string value = getValue(elemXml);
-    if (!value.empty())
-      element->AddValue("string", value, "1");
-
-    _sdf->elements.push_back( element );
   }
 }
 
@@ -194,7 +200,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     {
       gzerr << "Unable to set type to contact\n";
       return false;
-    } 
+    }
   }
   else if ( std::string((const char*)_config->name) == "camera" )
   {
