@@ -331,7 +331,7 @@ material Gazebo/RedSelection
     pass
     {
       scene_blend alpha_blend
-      depth_write off
+      depth_write on
       lighting off
 
       texture_unit
@@ -351,7 +351,7 @@ material Gazebo/BlueSelection
     pass
     {
       scene_blend alpha_blend
-      depth_write off
+      depth_write on
       lighting off
 
       texture_unit
@@ -371,7 +371,7 @@ material Gazebo/GreenSelection
     pass
     {
       scene_blend alpha_blend
-      depth_write off
+      depth_write on
       lighting off
 
       texture_unit
