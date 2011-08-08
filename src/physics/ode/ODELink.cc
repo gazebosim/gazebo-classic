@@ -76,7 +76,7 @@ void ODELink::Init()
 
     dBodySetData(this->linkId, this);
     dBodySetAutoDisableDefaults(this->linkId);
-    dBodySetAutoDisableFlag(this->linkId, 0);
+    dBodySetAutoDisableFlag(this->linkId, 1);
   }
 
   Link::Init();
@@ -126,6 +126,7 @@ void ODELink::MoveCallback(dBodyID id)
   const dReal *p;
   const dReal *r;
   ODELink *self = (ODELink*)(dBodyGetData(id));
+  self->poseMutex->lock();
 
   p = dBodyGetPosition(id);
   r = dBodyGetQuaternion(id);
@@ -137,8 +138,9 @@ void ODELink::MoveCallback(dBodyID id)
   math::Vector3 cog_vec = pose.rot.RotateVector(self->inertial->GetCoG());
   pose.pos -= cog_vec;
 
-  gzdbg << "MoveCallback. Entity[" << self->GetCompleteScopedName() << "] Pos[" << pose.pos << "]\n";
   self->SetWorldPose(pose,false);
+
+  self->poseMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +194,7 @@ void ODELink::OnPoseChange()
 {
   if (this->linkId == NULL)
     return;
-  //this->SetEnabled(true);
+  this->SetEnabled(true);
 
 
   //math::Pose pose = this->comEntity->GetWorldPose();
@@ -203,8 +205,6 @@ void ODELink::OnPoseChange()
 
   // adding cog location for ode pose
   pose.pos += cog_vec;
-
-  gzdbg << "ODE[" << this->GetName() << "] OnPoseChange[" << this->GetWorldPose() << "] COG_VEC[" << cog_vec << "] Result[" << pose << "]\n";
 
   dBodySetPosition(this->linkId, pose.pos.x, pose.pos.y, pose.pos.z);
 
@@ -228,16 +228,15 @@ dBodyID ODELink::GetODEId() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this link is enabled
-void ODELink::SetEnabled(bool /*_enable*/) const
+void ODELink::SetEnabled(bool _enable) const
 {
   if (!this->linkId)
     return;
 
-/*  if (enable)
+  if (_enable)
     dBodyEnable(this->linkId);
   else
     dBodyDisable(this->linkId);
-    */
 }
 
 /////////////////////////////////////////////////////////////////////

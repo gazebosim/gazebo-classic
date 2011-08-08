@@ -136,14 +136,14 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
 /// Get the model path extension
 std::string SystemPaths::GetModelPathExtension() 
 {
-  return "/sdf/models";
+  return "/models";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world path extension
 std::string SystemPaths::GetWorldPathExtension()
 {
-  return "/sdf/worlds";
+  return "/worlds";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

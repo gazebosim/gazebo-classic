@@ -440,25 +440,28 @@ void Visual::SetScale(const math::Vector3 &scale )
 math::Vector3 Visual::GetScale()
 {
   math::Vector3 result(1,1,1);
-  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
-  if (geomElem->HasElement("box"))
-    result = geomElem->GetElement("box")->GetValueVector3("size");
-  else if (geomElem->HasElement("sphere"))
-  {
-    double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
-    result.Set(r,r,r);
+    if (geomElem->HasElement("box"))
+      result = geomElem->GetElement("box")->GetValueVector3("size");
+    else if (geomElem->HasElement("sphere"))
+    {
+      double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
+      result.Set(r,r,r);
+    }
+    else if (geomElem->HasElement("cylinder"))
+    {
+      double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
+      double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
+      result.Set(r,r,l);
+    }
+    else if (geomElem->HasElement("plane"))
+      result.Set(1,1,1);
+    else if (geomElem->HasElement("mesh"))
+      result = geomElem->GetElement("mesh")->GetValueVector3("scale");
   }
-  else if (geomElem->HasElement("cylinder"))
-  {
-    double r = geomElem->GetElement("cylinder")->GetValueDouble("radius");
-    double l = geomElem->GetElement("cylinder")->GetValueDouble("length");
-    result.Set(r,r,l);
-  }
-  else if (geomElem->HasElement("plane"))
-    result.Set(1,1,1);
-  else if (geomElem->HasElement("mesh"))
-    result = geomElem->GetElement("mesh")->GetValueVector3("scale");
 
   return result;
 }
@@ -638,6 +641,13 @@ void Visual::SetTransparency( float trans )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Apply a glow to the visual
+void Visual::SetGlow( common::Color &_color )
+{
+
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 /// Get the transparency
 float Visual::GetTransparency()
 {
@@ -722,6 +732,8 @@ void Visual::SetRotation( const math::Quaternion &rot)
 // Set the pose of the visual
 void Visual::SetPose( const math::Pose &_pose)
 {
+  printf("Visual::SetPose[%s] Pos[%4.2f %4.2f %4.2f]\n",this->GetName().c_str(), _pose.pos.x, _pose.pos.y, _pose.pos.z);
+
   this->SetPosition( _pose.pos );
   this->SetRotation( _pose.rot);
 }
@@ -752,6 +764,8 @@ math::Pose Visual::GetPose() const
 
 void Visual::SetWorldPose(const math::Pose _pose)
 {
+  printf("Visual::SetWorldPose[%s] Pos[%4.2f %4.2f %4.2f]\n",this->GetName().c_str(), _pose.pos.x, _pose.pos.y, _pose.pos.z);
+
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
@@ -873,17 +887,6 @@ void Visual::SetRibbonTrail(bool value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the size of the bounding box
-math::Vector3 Visual::GetBoundingBoxSize() const
-{
-  this->sceneNode->_updateBounds();
-  Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
-  Ogre::Vector3 size = box.getSize();
-  return math::Vector3(size.x, size.y, size.z);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
 DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 {
@@ -927,7 +930,7 @@ std::string Visual::GetMaterialName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bounds
-math::Box Visual::GetBounds() const
+math::Box Visual::GetBoundingBox() const
 {
   math::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
@@ -1135,7 +1138,7 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
     this->MakeStatic();
 
   if (msg->has_pose())
-    this->SetPose( msgs::Convert(msg->pose()) );
+    this->SetWorldPose( msgs::Convert(msg->pose()) );
 
   if (msg->has_scale())
     this->SetScale( msgs::Convert(msg->scale()) );
@@ -1167,17 +1170,20 @@ VisualPtr Visual::GetParent() const
  
 std::string Visual::GetMeshName() const
 {
-  sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
-  if (geomElem->HasElement("box"))
-    return "unit_box";
-  else if (geomElem->HasElement("sphere"))
-    return "unit_sphere";
-  else if (geomElem->HasElement("cylinder"))
-    return "unit_cylinder";
-  else if (geomElem->HasElement("plane"))
-    return "unit_plane";
-  else if (geomElem->HasElement("mesh"))
-    return geomElem->GetElement("mesh")->GetValueString("filename");
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+    if (geomElem->HasElement("box"))
+      return "unit_box";
+    else if (geomElem->HasElement("sphere"))
+      return "unit_sphere";
+    else if (geomElem->HasElement("cylinder"))
+      return "unit_cylinder";
+    else if (geomElem->HasElement("plane"))
+      return "unit_plane";
+    else if (geomElem->HasElement("mesh"))
+      return geomElem->GetElement("mesh")->GetValueString("filename");
+  }
 
   return std::string();
 }

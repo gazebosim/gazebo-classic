@@ -6,11 +6,13 @@ package gazebo.msgs;
 /// \verbatim
 
 import "header.proto";
+import "pose.proto";
 
 message Factory
 {
   required Header header   = 1;
   optional string xml      = 2;
   optional string filename = 3;
+  optional Pose pose       = 4;
 }
 /// \endverbatim

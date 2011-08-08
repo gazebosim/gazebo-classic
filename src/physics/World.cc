@@ -624,7 +624,7 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
     if (entity->HasType(Entity::ENTITY))
     {
       msgs::Pose *poseMsg = scene.add_pose();
-      math::Pose pose = boost::shared_static_cast<Entity>(entity)->GetRelativePose();
+      math::Pose pose = boost::shared_static_cast<Entity>(entity)->GetWorldPose();
       poseMsg->CopyFrom( msgs::Convert(pose) );
       msgs::Init(*poseMsg, entity->GetCompleteScopedName() );
     }
@@ -715,6 +715,9 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
     // Add the new models into the World
     sdf::ElementPtr elem = factorySDF->root->GetElement("model");
     ModelPtr model = this->LoadModel( elem, this->rootElement );
+    if (_msg->has_pose())
+      model->SetWorldPose( msgs::Convert( _msg->pose() ) );
+
     model->Init();
   }
 }

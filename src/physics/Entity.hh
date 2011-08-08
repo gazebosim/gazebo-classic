@@ -36,6 +36,11 @@
 
 #include "physics/Base.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 	namespace physics
@@ -177,6 +182,8 @@ namespace gazebo
 
       protected: msgs::Visual *visualMsg;
       protected: msgs::Pose *poseMsg;
+
+      protected: boost::recursive_mutex *poseMutex;
     };
     
     /// \}

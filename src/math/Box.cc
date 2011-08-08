@@ -52,24 +52,41 @@ Box::~Box()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the length along the x dimension
-double Box::GetXLength()
+double Box::GetXLength() const
 {
   return fabs(max.x - min.x);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the length along the y dimension
-double Box::GetYLength()
+double Box::GetYLength() const
 {
   return fabs(max.y - min.y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the length along the z dimension
-double Box::GetZLength()
+double Box::GetZLength() const
 {
   return fabs(max.z - min.z);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the size of the box
+math::Vector3 Box::GetSize() const
+{
+  return math::Vector3(this->GetXLength(), this->GetYLength(), this->GetZLength());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the box center
+math::Vector3 Box::GetCenter() const
+{
+  Vector3 size = this->GetSize();
+  size /= 2.0;
+  return this->min + size;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Merge a box with this box

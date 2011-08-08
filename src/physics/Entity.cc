@@ -50,6 +50,8 @@ Entity::Entity(BasePtr parent)
   this->visualMsg = new msgs::Visual;
   this->poseMsg = new msgs::Pose;
 
+  this->poseMutex = new boost::recursive_mutex();
+
   this->visualMsg->set_mesh_type( msgs::Visual::UNKNOWN );
 
   if (this->parent && this->parent->HasType(ENTITY))
@@ -76,6 +78,8 @@ Entity::~Entity()
 
   delete this->poseMsg;
   this->poseMsg = NULL;
+
+  delete this->poseMutex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,8 +278,6 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
       }
     }
   }
-  //else
-  //  gzdbg << "Setting Twist of a non-ODE body [" << this->GetName() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,6 +313,8 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 //
 void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
+  this->poseMutex->lock();
+
   if (this->HasType(MODEL))
   {
     this->GetWorld()->modelWorldPoseUpdateMutex->lock();
@@ -323,6 +327,7 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     // initialization: (no children?) set own worldPose
     this->worldPose = pose;
     this->worldPose.Correct();
+
     if (notify) 
       this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
 
@@ -344,6 +349,8 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + pose);
         if (notify) 
           entity->UpdatePhysicsPose(false);
+
+        entity->sdf->GetOrCreateElement("origin")->GetAttribute("pose")->Set(entity->GetRelativePose());
         entity->PublishPose();
         //printf("SWP Model Body [%s]\t",(*iter)->GetName().c_str());
       }
@@ -354,19 +361,28 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
   }
   else if (this->IsCanonicalLink())
   {
+
     this->GetWorld()->modelWorldPoseUpdateMutex->lock();
     //printf("c[%s]",this->GetName().c_str());
     this->worldPose = pose;
     this->worldPose.Correct();
+
     if (notify) 
       this->UpdatePhysicsPose(true);
 
     // also update parent model's pose
     if (this->parentEntity->HasType(MODEL))
     {
+
       this->parentEntity->worldPose = pose - this->initialRelativePose;
+      this->parentEntity->worldPose.pos = pose.pos - pose.rot.RotateVector(this->initialRelativePose.pos);
+
       this->parentEntity->worldPose.Correct();
-      if (notify) this->parentEntity->UpdatePhysicsPose(false);
+
+      this->parentEntity->sdf->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->parentEntity->GetRelativePose());
+
+      if (notify) 
+        this->parentEntity->UpdatePhysicsPose(false);
       this->parentEntity->PublishPose();
     }
     else
@@ -381,12 +397,18 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     //printf("b[%s]",this->GetName().c_str());
     this->worldPose = pose;
     this->worldPose.Correct();
-    if (notify) this->UpdatePhysicsPose(true);
+
+    if (notify) 
+      this->UpdatePhysicsPose(true);
     //printf("B[%s]",this->GetName().c_str());
     this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
   }
 
+  this->sdf->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->GetRelativePose());
+
   this->PublishPose();
+
+  this->poseMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -421,13 +443,15 @@ ModelPtr Entity::GetParentModel() const
 /// Called when a new pose message arrives
 void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
+  this->poseMutex->lock();
   if (_msg->header().str_id() == this->GetCompleteScopedName())
   {
     math::Pose p = msgs::Convert(*_msg);
-    p.pos.z = 1.5;
-    gzdbg << "Entity[" << this->GetCompleteScopedName() << "] SetPose[" << p.pos << "]\n";
+    math::Vector3 rpy = p.rot.GetAsEuler();
+
     this->SetWorldPose( p );
   }
+  this->poseMutex->unlock();
 }
 
 

@@ -249,13 +249,21 @@ void UserCamera::SetViewController( const std::string &type )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Resize the camera
-/* NATY: probably can remove if window resize worked
 void UserCamera::Resize(unsigned int w, unsigned int h)
 {
   if (this->viewport)
+  {
     this->viewport->setDimensions(0,0,1,1);
+    double ratio = (double)this->viewport->getActualWidth() / 
+                   (double)this->viewport->getActualHeight();
+
+    double hfov = this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
+    double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+  }
+
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the dimensions of the viewport
@@ -332,7 +340,7 @@ void UserCamera::MoveToVisual( Visual *visual_)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  math::Vector3 size = visual_->GetBoundingBoxSize();
+  math::Vector3 size = visual_->GetBoundingBox().GetSize();
 
   double scale = std::max(std::max(size.x, size.y), size.z);
   scale += 0.5;

@@ -129,6 +129,9 @@ namespace gazebo
   
       /// \brief Get the transparency
       public: float GetTransparency();
+
+      /// \brief Apply a glow to the visual
+      public: void SetGlow( common::Color &_color );
   
       /// \brief Set highlighted or no
       public: void SetHighlight( bool highlight);
@@ -195,8 +198,8 @@ namespace gazebo
       /// \brief True on or off a ribbon trail
       public: void SetRibbonTrail(bool value);
   
-      /// \brief Get the size of the bounding box
-      public: math::Vector3 GetBoundingBoxSize() const;
+      /// \brief Get the bounding box for the visual
+      public: math::Box GetBoundingBox() const;
   
       /// \brief Add a line to the visual
       public: DynamicLines *CreateDynamicLine(RenderOpType type);
@@ -211,9 +214,7 @@ namespace gazebo
       /// \brief Get the name of the material
       public: std::string GetMaterialName() const;
   
-      /// \brief Get the bounding box for the visual
-      public: math::Box GetBounds() const;
-  
+ 
       /// \brief Insert a mesh into Ogre 
       public: static void InsertMesh( const common::Mesh *mesh);
   

@@ -15,6 +15,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/OrbitViewController.hh"
 
+#include "gui/Gui.hh"
 #include "gui/GuiEvents.hh"
 #include "gui/GLWidget.hh"
 
@@ -28,7 +29,7 @@ GLWidget::GLWidget( QWidget *parent )
 
   setAttribute(Qt::WA_OpaquePaintEvent,true);
   setAttribute(Qt::WA_PaintOnScreen,true);
-  setMinimumSize(320,240);
+//  setMinimumSize(320,240);
 
   this->renderFrame = new QFrame;
   this->renderFrame->setLineWidth(1);
@@ -55,6 +56,7 @@ GLWidget::GLWidget( QWidget *parent )
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->posePub = this->node->Advertise<msgs::Pose>("~/set_pose");
+  this->selectionSub = this->node->Subscribe("~/selection", &GLWidget::OnSelectionMsg, this);
 }
 
 GLWidget::~GLWidget()
@@ -107,6 +109,7 @@ void GLWidget::resizeEvent(QResizeEvent *e)
   {
     rendering::WindowManager::Instance()->Resize( this->windowId, 
         e->size().width(), e->size().height());
+    this->userCamera->Resize(e->size().width(), e->size().height());
   }
 }
 
@@ -172,18 +175,21 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   else if (this->mouseEvent.dragging == false && 
            event->button() & Qt::RightButton)
   {
-    this->selection = this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
-    this->selectionPoseOrig = this->selection->GetPose();
+    //this->selection = this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
+    std::string mod;
+    this->selection = this->scene->GetVisualAt(this->userCamera, 
+                                               this->mouseEvent.pos, mod);
+
+    // Get the model associated with the visual
+    this->selection = this->selection->GetParent()->GetParent();
+    this->scene->SelectVisual(this->selection->GetName());
   }
   else if ( !this->selectionMod.empty() && this->selection)
   {
     msgs::Pose msg;
-    if (this->selection->GetParent())
-      msgs::Init(msg, this->selection->GetParent()->GetName());
-    else
-      msgs::Init(msg, this->selection->GetName());
+
+    msgs::Init(msg, this->selection->GetName());
     msgs::Set( &msg, this->selection->GetWorldPose());
-    this->selection->SetPose( this->selectionPoseOrig );
 
     this->posePub->Publish(msg);
   }
@@ -197,6 +203,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     this->userCamera = _scene->CreateUserCamera("rc_camera");
   else
     this->userCamera = _scene->GetUserCamera(0);
+
+  gui::set_active_camera(this->userCamera);
   this->scene =_scene;
 
   this->userCamera->SetWorldPosition( math::Vector3(-5,0,5) );
@@ -326,9 +334,7 @@ void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
     math::Quaternion delta;
     delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
 
-    pose.rot = pose.rot * delta;
-    _vis->SetPose(pose);
-
+    _vis->SetRotation(pose.rot * delta);
    
     //TODO: send message
 
@@ -400,4 +406,9 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
   }
 */
 
+}
+
+void GLWidget::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
+{
+  this->selection = this->scene->GetVisual(_msg->header().str_id() );
 }

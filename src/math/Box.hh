@@ -47,15 +47,23 @@ namespace gazebo
 
       /// \brief Get the length along the x dimension
       /// \return Double value of the length in the x dimension
-      public: double GetXLength();
+      public: double GetXLength() const;
 
       /// \brief Get the length along the y dimension
       /// \return Double value of the length in the y dimension
-      public: double GetYLength();
+      public: double GetYLength() const;
 
       /// \brief Get the length along the z dimension
       /// \return Double value of the length in the z dimension
-      public: double GetZLength();
+      public: double GetZLength() const;
+
+      /// \brief Get the size of the box
+      /// \return Size of the box
+      public: math::Vector3 GetSize() const;
+
+      /// \brief Get the box center
+      /// \return The center position of the box
+      public: math::Vector3 GetCenter() const;
 
       /// \brief Merge a box with this box
       /// \param _box Box to add to this box

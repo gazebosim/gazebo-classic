@@ -1,106 +1,38 @@
-<model type="physical" name="default_pioneer_model">
-
-  <link name="chassis_body">
-    <origin xyz="0.0 0.0 0.16" />
-
+<gazebo version="1.0">
+<model name="box_model">
+  <link name="body">
+    <origin pose="0 0 0.5 0 0 0"/>
     <inertial mass="1.0">
-      <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
     </inertial>
 
-    <collision name="collision_1">
+    <collision name="geom">
       <geometry>
-        <box size="0.445 0.277 0.17"/>
+        <box size="1 1 1"/>
       </geometry>
     </collision>
-
-    <collision name="collision_2">
+    <visual>
       <geometry>
-        <box size="0.445 0.277 0.17"/>
+        <box size="1 1 1"/>
+      </geometry>
+      <material script="Gazebo/WoodPallet"/>
+    </visual>
+
+
+    <collision name="geom2">
+      <origin pose="0 0 1.0 0 0 0"/>
+      <geometry>
+        <box size=".5 .5 .5"/>
       </geometry>
     </collision>
-  
-    <visual name="visual_1">
-      <origin xyz="0 0 0.04" rpy="0 180 0"/>
+    <visual>
+      <origin pose="0 0 1.0 0 0 0"/>
       <geometry>
-        <box size="1 2 3"/>
+        <box size=".5 .5 .5"/>
       </geometry>
-      <material script="Gazebo/Pioneer2Body"/>
+      <material script="Gazebo/Red"/>
     </visual>
 
-     <visual name="visual_2">
-      <origin xyz="0 0 0.04" rpy="0 180 0"/>
-      <geometry>
-        <box size="1 2 3"/>
-      </geometry>
-      <material script="Gazebo/Pioneer2Body"/>
-    </visual>
- 
   </link>
-
-   <link name="body_2">
-    <origin xyz="0.0 0.0 0.16" />
-
-    <inertial mass="1.0">
-      <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
-    </inertial>
-
-    <collision name="chassis_geom">
-      <geometry>
-        <box size="0.445 0.277 0.17"/>
-      </geometry>
-    </collision>
-
-    <collision name="chassis_geom_2">
-      <geometry>
-        <box size="0.445 0.277 0.17"/>
-      </geometry>
-    </collision>
-  
-    <visual name="visual1">
-      <origin xyz="0 0 0.04" rpy="0 180 0"/>
-      <geometry>
-        <box size="1 2 3"/>
-      </geometry>
-      <material script="Gazebo/Pioneer2Body"/>
-    </visual>
-
-     <visual name="visual2">
-      <origin xyz="0 0 0.04" rpy="0 180 0"/>
-      <geometry>
-        <box size="1 2 3"/>
-      </geometry>
-      <material script="Gazebo/Pioneer2Body"/>
-    </visual>
-
-    <sensor name="my_sensor" type="camera" always_on="true" update_rate="3">
-      <plugin name="sensor_plugin" filename="/tmp/sensor_plugin.so">  
-        <sensor_funky_xml>so sensor funky</sensor_funky_xml>
-        <sensor_more value="hello"/>
-      </plugin>
-
-      <origin xyz="1 2 3"/>
-      <horizontal_fov angle="1.57"/>
-      <image width="640" height="480" format="L8"/>
-      <clip near="0.1" far="1000"/>
-      <save enabled="false" path="/tmp"/>
-    </sensor>
- 
-  </link>
-
-  <joint name="super_awesome_joint" type="ball">
-    <parent link="chassis_body"/>
-    <child link="body_2"/>
-  </joint>
-
-   <joint name="less_awesome_joint" type="revolute">
-    <parent link="chassis_body"/>
-    <child link="body_2"/>
-    <axis xyz="0 1 0"/>
-  </joint>
-
-  <plugin name="best_plugin" filename="/tmp/good_plugin.so">  
-    <funky_xml>so funky</funky_xml>
-    <more value="hello"/>
-  </plugin>
-
 </model>
+</gazebo>

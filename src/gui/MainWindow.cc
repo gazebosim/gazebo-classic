@@ -42,15 +42,16 @@ MainWindow::MainWindow()
 
   this->timePanel = new TimePanel(mainWidget);
 
-  //InsertModelWidget *insertModel = new InsertModelWidget();
+  InsertModelWidget *insertModel = new InsertModelWidget();
 
   //QFrame *leftFrame = new QFrame;
   //leftFrame->setLineWidth(1);
   //leftFrame->setFrameShadow(QFrame::Sunken);
   //leftFrame->setFrameShape(QFrame::Box);
 
-//  splitter->addWidget(insertModel);
+  splitter->addWidget(insertModel);
   splitter->addWidget(this->renderWidget);
+
   //mainLayout->addWidget( this->renderWidget );
   mainLayout->addWidget(splitter);
   mainLayout->addWidget( this->timePanel );

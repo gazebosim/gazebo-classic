@@ -2,8 +2,16 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "sdf/sdf.h"
+#include "sdf/sdf_parser.h"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
+
+#include "rendering/Rendering.hh"
+#include "rendering/Scene.hh"
+#include "rendering/UserCamera.hh"
+#include "rendering/Visual.hh"
+#include "gui/Gui.hh"
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
@@ -19,12 +27,22 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
   this->fileTreeWidget->setColumnCount(1);
-  connect(this->fileTreeWidget, SIGNAL(itemSelectionChanged()),
-          this, SLOT(OnModelSelection()) );
+  connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+          this, SLOT(OnModelSelection(QTreeWidgetItem *, int)) );
 
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
+  this->addButton = new QPushButton(tr("Apply"));
+  connect(this->addButton, SIGNAL(clicked()), this, SLOT(OnApply()));
+
+  this->cancelButton = new QPushButton(tr("Cancel"));
+  connect(this->cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+
+  buttonLayout->addWidget(this->addButton);
+  buttonLayout->addWidget(this->cancelButton);
 
 
   mainLayout->addWidget(this->fileTreeWidget);
+  mainLayout->addLayout(buttonLayout);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
 
@@ -77,87 +95,111 @@ InsertModelWidget::~InsertModelWidget()
 {
 }
 
-void InsertModelWidget::OnModelSelection()
+//void InsertModelWidget::OnModelSelection()
+void InsertModelWidget::OnModelSelection(QTreeWidgetItem *item, int column)
 {
-  /*QTreeWidgetItem* selected = this->fileTreeWidget->selectedItems().at(0);
+  gzdbg << "OnModelSelection\n";
+  QTreeWidgetItem* selected = this->fileTreeWidget->currentItem();
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+
+  scene->RemoveVisual( this->modelVisual );
+  this->visuals.clear();
+
   if (selected)
   {
-    std::string path = selected->parent()->text(0).toStdString() + "/";
-    std::string filename = selected->text(0).toStdString();
+    std::string path, filename;
+
+    if (selected->parent())
+      path = selected->parent()->text(0).toStdString() + "/";
+
+    filename = selected->text(0).toStdString();
+    this->selectedModel = path+filename;
+
+    if (filename.find(".model") == std::string::npos)
+      return;
+
+    sdf::SDFPtr modelSDF(new sdf::SDF);
+    sdf::initFile( "/sdf/gazebo.sdf", modelSDF );
+    sdf::readFile( this->selectedModel, modelSDF);
 
     // Load the world file
-    gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
-    try
-    {
-      xmlFile->Load(path + filename);
-    }
-    catch (common::Exception e)
-    {
-      gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-    }
-
     std::string modelName;
+    math::Pose modelPose, linkPose, visualPose;
 
-    common::XMLConfigNode *modelNode = xmlFile->GetRootNode();
-    if (modelNode)
+    sdf::ElementPtr modelElem = modelSDF->root->GetElement("model");
+    if (modelElem->HasElement("origin"))
+      modelPose = modelElem->GetElement("origin")->GetValuePose("pose");
+
+    modelName = modelElem->GetValueString("name");
+    this->modelVisual.reset(new rendering::Visual(modelName, scene));
+    this->modelVisual->Load();
+    this->modelVisual->SetPose(modelPose);
+
+    scene->AddVisual(modelVisual);
+
+    this->visuals.push_back(modelVisual);
+
+    sdf::ElementPtr linkElem = modelElem->GetElement("link");
+    while (linkElem)
     {
-      int count = 0;
-      modelName = modelNode->GetString("name","",1);
+      std::string linkName = linkElem->GetValueString("name");
+      if (linkElem->HasElement("origin"))
+        linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
 
-      // Create the model-level visual msg
-      msgs::Visual visMsg;
-      msgs::Init(visMsg, modelName);
-      this->visualPub->Publish(visMsg);
+      gzdbg << "LinkName[" << linkName << "]\n";
 
-      common::XMLConfigNode *linkNode = modelNode->GetChild("link");
-      while (linkNode)
+      rendering::VisualPtr linkVisual( new rendering::Visual(modelName+"::"+linkName, modelVisual) );
+      linkVisual->Load();
+      linkVisual->SetPose( linkPose );
+      this->visuals.push_back(linkVisual);
+
+      int visualIndex = 0;
+      sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+      while (visualElem)
       {
-        std::string linkName = linkNode->GetString("name","",1);
-        common::XMLConfigNode *originNode = linkNode->GetChild("origin");
+        if (visualElem->HasElement("origin"))
+          visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
 
-        math::Vector3 pos;
-        math::Quaternion rot;
+        std::ostringstream visualName;
+        visualName << modelName << "::" << linkName << "::Visual_" 
+                   << visualIndex++;
+        rendering::VisualPtr visVisual( new rendering::Visual(visualName.str(), linkVisual) );
+        visVisual->Load(visualElem);
+        visVisual->SetTransparency(0.5);
+        this->visuals.push_back(visVisual);
 
-        if (originNode)
-        {
-          pos = originNode->GetVector3("xyz", math::Vector3());
-          rot = originNode->GetRotation("rpy",math::Quaternion());
-        }
 
-        msgs::Init(visMsg, modelName+"::"+linkName);
-        msgs::Set(visMsg.mutable_pose()->mutable_position(), pos);
-        msgs::Set(visMsg.mutable_pose()->mutable_orientation(), rot);
-
-        visMsg.set_parent_id(modelName);
-        this->visualPub->Publish(visMsg);
-
-        common::XMLConfigNode *visualNode = linkNode->GetChild("visual");
-        while (visualNode)
-        {
-          std::string name = boost::lexical_cast<std::string>(count++);
-
-          visMsg = msgs::VisualFromXML(visualNode);
-          msgs::Init(visMsg, name);
-          visMsg.set_parent_id(modelName + "::" + linkName);
-
-          this->visualPub->Publish(visMsg);
-
-          visualNode = visualNode->GetNext("visual");
-        }
-        linkNode = linkNode->GetNext("link");
+        visualElem = linkElem->GetNextElement("visual", visualElem);
       }
+ 
+      linkElem = modelElem->GetNextElement("link", linkElem);
     }
 
     msgs::Selection selectMsg;
     msgs::Init(selectMsg, modelName);
     selectMsg.set_selected(true);
     this->selectionPub->Publish(selectMsg);
-
-    //msgs::Factory msg;
-    //msgs::Init(msg, "new");
-    //msg.set_filename(path+filename);
-
-    //this->factoryPub->Publish(msg);
   }
-*/
+}
+
+void InsertModelWidget::OnApply()
+{
+  msgs::Factory msg;
+  msgs::Init(msg, "new_model");
+  msg.set_filename(this->selectedModel);
+
+  gzdbg << "Pose[" << this->modelVisual->GetWorldPose()  << "]\n";
+  msg.mutable_pose()->CopyFrom( msgs::Convert(this->modelVisual->GetWorldPose()) );
+  this->factoryPub->Publish(msg);
+
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  scene->RemoveVisual( this->modelVisual );
+  this->visuals.clear();
+}
+
+void InsertModelWidget::OnCancel()
+{
+  rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  scene->RemoveVisual( this->modelVisual );
+  this->visuals.clear();
 }

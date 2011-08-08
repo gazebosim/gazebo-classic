@@ -17,6 +17,8 @@
 #ifndef GAZEBO_GUI_HH
 #define GAZEBO_GUI_HH
 
+#include "rendering/Rendering.hh"
+
 namespace gazebo
 {
   namespace gui
@@ -29,6 +31,9 @@ namespace gazebo
 
     void set_world( const std::string& _name);
     std::string get_world();
+
+    void set_active_camera( rendering::UserCameraPtr _cam );
+    rendering::UserCameraPtr get_active_camera();
   }
 }
 

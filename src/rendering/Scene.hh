@@ -122,15 +122,13 @@ namespace gazebo
   
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(unsigned int index) const;
- 
-      /// \brief Select an object by name 
-      /// \param _vis Name of the visual to select
-      public: void SelectObject( const std::string &_vis );
 
       /// \brief Get a visual by name 
       public: VisualPtr GetVisual( const std::string &_name ) const;
 
       public: VisualPtr SelectVisualAt(CameraPtr camera, math::Vector2i mousePos);
+      /// \brief Select a visual by name
+      public: void SelectVisual( const std::string &_name ) const;
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       ///        mouse picking. 
@@ -180,6 +178,12 @@ namespace gazebo
 
       /// \brief Get whether shadows are on or off
       public: bool GetShadowsEnabled() const;
+
+      /// \brief Add a visual to the scene
+      public: void AddVisual( VisualPtr &_vis );
+
+      /// \brief Remove a visual from the scene
+      public: void RemoveVisual( VisualPtr &_vis );
 
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData

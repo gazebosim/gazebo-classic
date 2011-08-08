@@ -347,6 +347,15 @@ VisualPtr Scene::GetVisual( const std::string &_name ) const
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Select a visual by name
+void Scene::SelectVisual( const std::string &_name ) const
+{
+  VisualPtr vis = this->GetVisual(_name);
+  if (vis)
+    this->selectionObj->Attach(vis);
+}
+
 VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 {
   std::string mod;
@@ -949,21 +958,10 @@ void Scene::PreRender()
 
   if (this->selectionMsg)
   {
-    this->SelectObject(this->selectionMsg->header().str_id());
+    this->SelectVisual(this->selectionMsg->header().str_id());
     this->selectionMsg.reset();
   }
 }
-
-void Scene::SelectObject( const std::string &_vis )
-{
-  Visual_M::iterator viter;
-  viter = this->visuals.find(_vis);
-  if (viter != this->visuals.end())
-    this->selectionObj->Attach( viter->second );
-  else
-    this->selectionObj->Clear( );
-}
-
 
 void Scene::ReceiveJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 {
@@ -1040,8 +1038,7 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
   math::Pose p = msgs::Convert(*_msg);
 
-  if (_msg->header().str_id().find("box") != std::string::npos)
-    gzdbg << "ID[" << _msg->header().str_id() << "] PoseMsg[" << p.pos << "]\n";
+  gzdbg << "Scene::ReceivePoseMsg ID[" << _msg->header().str_id() << "] PoseMsg[" << p.pos << "]\n";
 
   // Find an old pose message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
@@ -1115,4 +1112,24 @@ bool Scene::GetShadowsEnabled() const
 {
   sdf::ElementPtr shadowElem = this->sdf->GetOrCreateElement("shadows");
   return shadowElem->GetValueBool("enabled");
+}
+
+/// Add a visual to the scene
+void Scene::AddVisual( VisualPtr &_vis )
+{
+  this->visuals[_vis->GetName()] = _vis;
+}
+
+/// Remove a visual from the scene
+void Scene::RemoveVisual( VisualPtr &_vis )
+{
+  if (_vis)
+  {
+    Visual_M::iterator iter = this->visuals.find( _vis->GetName() );
+    if (iter != this->visuals.end())
+      this->visuals.erase(iter);
+
+    if (this->selectionObj->GetVisualName() == _vis->GetName())
+      this->selectionObj->Clear();
+  }
 }

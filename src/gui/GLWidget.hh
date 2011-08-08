@@ -12,6 +12,8 @@
 
 #include "math/Pose.hh"
 
+#include "msgs/msgs.h"
+
 #include "gui/BoxMaker.hh"
 #include "gui/SphereMaker.hh"
 #include "gui/CylinderMaker.hh"
@@ -55,6 +57,8 @@ namespace gazebo
       private: void RotateEntity( rendering::VisualPtr &_vis );
       private: void TranslateEntity( rendering::VisualPtr &_vis );
 
+      private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
@@ -75,6 +79,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr posePub;
+      private: transport::SubscriberPtr selectionSub;
     };
   }
 }

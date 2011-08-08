@@ -19,7 +19,6 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "rendering/Rendering.hh"
 #include "gui/MainWindow.hh"
 #include "gui/Gui.hh"
 
@@ -35,6 +34,7 @@ using namespace gazebo;
 
 QApplication *g_app;
 gui::MainWindow *g_main_win;
+rendering::UserCameraPtr g_active_camera;
 
 void gui::load()
 {
@@ -88,4 +88,12 @@ std::string gui::get_world()
   return g_worldname;
 }
 
+void gui::set_active_camera( rendering::UserCameraPtr _cam )
+{
+  g_active_camera = _cam;
+}
 
+rendering::UserCameraPtr gui::get_active_camera()
+{
+  return g_active_camera;
+}

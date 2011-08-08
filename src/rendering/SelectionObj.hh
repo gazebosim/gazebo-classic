@@ -43,9 +43,13 @@ namespace gazebo
       /// \brief Set the position of the node
       public: void Attach( VisualPtr visual );
       public: void Clear( );
+
+      /// \brief Get the name of the visual the seleciton obj is attached to
+      public: std::string GetVisualName() const;
   
       private: Visual *node;
       private: Scene *scene;
+      private: std::string visualName;
     };
     /// \brief 
   }

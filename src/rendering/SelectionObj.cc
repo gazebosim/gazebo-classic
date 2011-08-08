@@ -165,19 +165,20 @@ void SelectionObj::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach to a scene node
-void SelectionObj::Attach( VisualPtr visual )
+void SelectionObj::Attach( VisualPtr _visual )
 {
   this->Clear();
-  if (visual)
+  if (_visual)
   {
-    math::Box box = visual->GetBounds();
+    math::Box box = _visual->GetBoundingBox();
     math::Vector3 scale = box.max - box.min;
 
     double max = std::max(scale.x, scale.y);
     max = std::max(max, scale.z);
-    visual->AttachVisual(this->node);
+    _visual->AttachVisual(this->node);
     this->node->SetScale( math::Vector3(max, max, max) );
     this->node->SetVisible(true);
+    this->visualName = _visual->GetName();
   }
 }
 
@@ -187,4 +188,10 @@ void SelectionObj::Clear()
     this->node->GetSceneNode()->getParentSceneNode()->removeChild( this->node->GetSceneNode());
 
   this->node->SetVisible(false);
+}
+
+/// Get the name of the visual the seleciton obj is attached to
+std::string SelectionObj::GetVisualName() const
+{
+  return this->visualName;
 }
