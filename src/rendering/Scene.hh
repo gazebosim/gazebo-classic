@@ -50,7 +50,6 @@ namespace gazebo
     class Grid;
     class Camera;
     class UserCamera;
-    class SelectionObj;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -174,6 +173,9 @@ namespace gazebo
  
       /// \brief Get a unique scene node node 
       public: std::string GetUniqueName(const std::string &_prefix);
+
+      /// \brief Get the selection object
+      public: SelectionObj *GetSelectionObj() const;
 
       /// \brief Print scene graph
       private: void PrintSceneGraphHelper(const std::string &prefix, 

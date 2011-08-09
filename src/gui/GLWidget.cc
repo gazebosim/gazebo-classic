@@ -13,6 +13,7 @@
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
+#include "rendering/SelectionObj.hh"
 #include "rendering/OrbitViewController.hh"
 
 #include "gui/Gui.hh"
@@ -183,10 +184,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
   if (this->mouseEvent.dragging)
   {
+    this->scene->GetSelectionObj()->SetActive(false);
+
     if (this->entityMaker)
       this->entityMaker->OnMouseDrag(this->mouseEvent);
     else if (this->selection && !this->selectionMod.empty())
     {
+      this->scene->GetSelectionObj()->SetActive(true);
       if (this->selectionMod.substr(0,3) == "rot")
         this->RotateEntity(this->selection);
       else
@@ -209,6 +213,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   this->mouseEvent.middle = event->buttons() & Qt::MidButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
 
   emit clicked();
+
+  this->scene->GetSelectionObj()->SetActive(false);
 
   if (this->entityMaker)
     this->entityMaker->OnMouseRelease(this->mouseEvent);

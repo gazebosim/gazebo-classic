@@ -31,6 +31,7 @@ using namespace rendering;
 SelectionObj::SelectionObj(Scene *scene_)
   : scene(scene_)
 {
+  this->active = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,3 +196,17 @@ std::string SelectionObj::GetVisualName() const
 {
   return this->visualName;
 }
+
+/// Return true if the user is move the selection obj
+bool SelectionObj::IsActive() const
+{
+  return this->active;
+}
+
+/// Set true if the user is moving the selection obj
+void SelectionObj::SetActive( bool _active )
+{
+  this->active = _active;
+}
+
+

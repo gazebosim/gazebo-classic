@@ -970,7 +970,6 @@ void Scene::PreRender()
   }
   this->jointMsgs.clear();
 
-
   // Process all the Pose messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
   // over the wire before  we recieve the visual
@@ -980,7 +979,13 @@ void Scene::PreRender()
     Visual_M::iterator iter = this->visuals.find((*pIter)->header().str_id());
     if (iter != this->visuals.end())
     {
-      iter->second->SetWorldPose( msgs::Convert(*(*pIter)) );
+      // If an object is selected, don't let the physics engine move it.
+      if (this->selectionObj->GetVisualName().empty() || 
+          !this->selectionObj->IsActive() ||
+          iter->first.find(this->selectionObj->GetVisualName()) == std::string::npos)
+      {
+        iter->second->SetWorldPose( msgs::Convert(*(*pIter)) );
+      }
       PoseMsgs_L::iterator prev = pIter++;
       this->poseMsgs.erase( prev );
     }
@@ -1177,4 +1182,10 @@ std::string Scene::GetUniqueName(const std::string &_prefix)
   }
 
   return test.str();
+}
+
+/// Get the selection object
+SelectionObj *Scene::GetSelectionObj() const
+{
+  return this->selectionObj;
 }

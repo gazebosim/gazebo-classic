@@ -44,12 +44,20 @@ namespace gazebo
       public: void Attach( VisualPtr visual );
       public: void Clear( );
 
+      /// \brief Return true if the user is move the selection obj
+      public: bool IsActive() const;
+
+      /// \brief Set true if the user is moving the selection obj
+      public: void SetActive( bool _active );
+
       /// \brief Get the name of the visual the seleciton obj is attached to
       public: std::string GetVisualName() const;
   
       private: Visual *node;
       private: Scene *scene;
       private: std::string visualName;
+
+      private: bool active;
     };
     /// \brief 
   }

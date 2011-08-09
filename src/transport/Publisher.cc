@@ -70,7 +70,10 @@ void Publisher::Publish(google::protobuf::Message &_message )
   this->messages.push_back( msg );
 
   if (this->messages.size() > this->queueLimit)
+  {
+    delete this->messages.front();
     this->messages.pop_front();
+  }
   this->mutex->unlock();
 
 }
