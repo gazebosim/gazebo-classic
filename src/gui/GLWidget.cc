@@ -50,6 +50,8 @@ GLWidget::GLWidget( QWidget *parent )
       gui::Events::ConnectCreateEntitySignal( 
         boost::bind(&GLWidget::OnCreateEntity, this, _1) ) );
 
+  this->renderFrame->setMouseTracking(true);
+  this->setMouseTracking(true);
 
   this->entityMaker = NULL;
 
@@ -142,21 +144,59 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
   this->mouseEvent.pos.Set( event->pos().x(), event->pos().y() );
-  this->mouseEvent.dragging = true;
 
-  if (this->entityMaker)
-    this->entityMaker->OnMouseDrag(this->mouseEvent);
-  else if (this->selection && !this->selectionMod.empty())
+  if (event->buttons())
   {
-    if (this->selectionMod.substr(0,3) == "rot")
-      this->RotateEntity(this->selection);
-    else
-      this->TranslateEntity(this->selection);
+    this->mouseEvent.dragging = true;
   }
   else
-    this->userCamera->HandleMouseEvent(this->mouseEvent);
+  {
+    std::string mod;
+    this->mouseEvent.dragging = false;
+    if (this->selection)
+    {
+      this->hoverVis = 
+        this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pos, mod);
 
-  this->mouseEvent.prevPos = this->mouseEvent.pos;
+    }
+    else
+    {
+      this->hoverVis = this->scene->GetVisualAt(this->userCamera, 
+                                                this->mouseEvent.pos);
+    }
+
+    if (!mod.empty())
+      this->setCursor(Qt::SizeAllCursor);
+    else if (this->hoverVis)
+    {
+      if (!this->hoverVis->IsPlane())
+        this->setCursor(Qt::PointingHandCursor);
+      else
+      {
+        this->setCursor(Qt::ArrowCursor);
+        this->hoverVis.reset();
+      }
+    }
+    else
+      this->setCursor(Qt::ArrowCursor);
+  }
+
+  if (this->mouseEvent.dragging)
+  {
+    if (this->entityMaker)
+      this->entityMaker->OnMouseDrag(this->mouseEvent);
+    else if (this->selection && !this->selectionMod.empty())
+    {
+      if (this->selectionMod.substr(0,3) == "rot")
+        this->RotateEntity(this->selection);
+      else
+        this->TranslateEntity(this->selection);
+    }
+    else
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
+    this->mouseEvent.prevPos = this->mouseEvent.pos;
+  }
+
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -172,17 +212,25 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
   if (this->entityMaker)
     this->entityMaker->OnMouseRelease(this->mouseEvent);
-  else if (this->mouseEvent.dragging == false && 
-           event->button() & Qt::RightButton)
+  else if (this->mouseEvent.dragging == false)
   {
-    //this->selection = this->scene->SelectVisualAt(this->userCamera, this->mouseEvent.pos);
-    std::string mod;
-    this->selection = this->scene->GetVisualAt(this->userCamera, 
-                                               this->mouseEvent.pos, mod);
-
-    // Get the model associated with the visual
-    this->selection = this->selection->GetParent()->GetParent();
-    this->scene->SelectVisual(this->selection->GetName());
+    if (event->button() & Qt::LeftButton)
+    {
+      if (this->hoverVis)
+      {
+        this->selection = this->hoverVis;
+        if (this->selection)
+        {
+          // Get the model associated with the visual
+          this->selection = this->selection->GetParent()->GetParent();
+          this->scene->SelectVisual(this->selection->GetName());
+        }
+      }
+      else
+        this->scene->SelectVisual("");
+    }
+    else
+      this->scene->SelectVisual("");
   }
   else if ( !this->selectionMod.empty() && this->selection)
   {
@@ -410,5 +458,11 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
 
 void GLWidget::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
 {
-  this->selection = this->scene->GetVisual(_msg->header().str_id() );
+  if (_msg->has_selected())
+  {
+    if (_msg->selected())
+      this->selection = this->scene->GetVisual(_msg->header().str_id() );
+    else
+      this->selection.reset();
+  }
 }

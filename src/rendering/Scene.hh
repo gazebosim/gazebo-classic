@@ -134,11 +134,20 @@ namespace gazebo
       ///        mouse picking. 
       /// \param camera The ogre camera, used to do mouse picking
       /// \param mousePos The position of the mouse in screen coordinates
+      /// \param _mod Used for object manipulation
       /// \return The selected entity, or NULL
       public: VisualPtr GetVisualAt(CameraPtr camera, 
                                     math::Vector2i mousePos, 
                                     std::string &mod);
-  
+
+      /// \brief Get a visual at a mouse position
+      public: VisualPtr GetVisualAt(CameraPtr camera, math::Vector2i mousePos);
+ 
+      /// \brief Helper function for GetVisualAt functions 
+      private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera, 
+                                             math::Vector2i _mousePos,
+                                             bool _ignorSelectionObj);
+
       /// \brief Get the world pos of a the first contact at a pixel location
       public: math::Vector3 GetFirstContact(CameraPtr camera, 
                                             math::Vector2i mousePos);

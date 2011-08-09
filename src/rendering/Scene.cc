@@ -354,6 +354,8 @@ void Scene::SelectVisual( const std::string &_name ) const
   VisualPtr vis = this->GetVisual(_name);
   if (vis)
     this->selectionObj->Attach(vis);
+  else
+    this->selectionObj->Clear();
 }
 
 VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
@@ -362,6 +364,8 @@ VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
   VisualPtr vis = this->GetVisualAt(camera,mousePos, mod);
   if (vis)
     this->selectionObj->Attach(vis);
+  else
+    this->selectionObj->Clear();
 
   return vis;
 }
@@ -372,13 +376,51 @@ VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos, 
                              std::string &_mod) 
 {
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
+  VisualPtr visual;
+  Ogre::Entity *closestEntity = this->GetOgreEntityAt(camera, mousePos, false);
+
+  _mod = "";
+  if (closestEntity)
+  {
+    // Make sure we set the _mod only if we have found a selection object
+    if (closestEntity->getName().substr(0,15) == "__SELECTION_OBJ" &&
+        closestEntity->getUserAny().getType() == typeid(std::string))
+      _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
+
+    visual = this->GetVisual(Ogre::any_cast<std::string>(
+          closestEntity->getUserAny()));
+  }
+
+  return visual;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get an entity at a pixel location using a camera. Used for mouse picking. 
+VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
+{
+  VisualPtr visual;
+
+  Ogre::Entity *closestEntity = this->GetOgreEntityAt(camera, mousePos, true);
+  if (closestEntity)
+  {
+    visual = this->GetVisual(Ogre::any_cast<std::string>(
+          closestEntity->getUserAny()));
+  }
+
+  return visual;
+}
+
+Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera, 
+                                     math::Vector2i _mousePos,
+                                     bool _ignoreSelectionObj)
+{
+  Ogre::Camera *ogreCam = _camera->GetOgreCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
-      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
+      (float)_mousePos.x / ogreCam->getViewport()->getActualWidth(), 
+      (float)_mousePos.y / ogreCam->getViewport()->getActualHeight() );
 
   this->raySceneQuery->setRay( mouseRay );
 
@@ -392,6 +434,10 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
     // is the result a MovableObject
     if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
     {
+      if (_ignoreSelectionObj && 
+          iter->movable->getName().substr(0,15) == "__SELECTION_OBJ")
+        continue;
+
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
 
       // mesh data to retrieve         
@@ -436,21 +482,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
     }
   }
 
-  VisualPtr visual;
-
-  _mod = "";
-  if (closestEntity)
-  {
-    // Make sure we set the _mod only if we have found a selection object
-    if (closestEntity->getName().substr(0,15) == "__SELECTION_OBJ" &&
-        closestEntity->getUserAny().getType() == typeid(std::string))
-      _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
-
-    visual = this->GetVisual(Ogre::any_cast<std::string>(
-          closestEntity->getUserAny()));
-  }
-
-  return visual;
+  return closestEntity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

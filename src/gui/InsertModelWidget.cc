@@ -27,6 +27,7 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
   this->fileTreeWidget->setColumnCount(1);
+  this->fileTreeWidget->headerItem()->setText(0, tr("Models") );
   connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)) );
 
@@ -95,12 +96,12 @@ InsertModelWidget::~InsertModelWidget()
 {
 }
 
-void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int column)
+void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
-  gzdbg << "OnModelSelection\n";
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
   scene->RemoveVisual( this->modelVisual );
+  this->modelVisual.reset();
   this->visuals.clear();
 
   if (_item)
@@ -127,17 +128,16 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int column)
     if (modelElem->HasElement("origin"))
       modelPose = modelElem->GetElement("origin")->GetValuePose("pose");
 
-    this->modelVisual.reset(new rendering::Visual(modelElem->GetValueString("name"), scene));
+    modelName = this->node->GetTopicNamespace() + "::"+ modelElem->GetValueString("name");
+
+    this->modelVisual.reset(new rendering::Visual(modelName, scene));
     this->modelVisual->Load();
     this->modelVisual->SetPose(modelPose);
 
     modelName = this->modelVisual->GetName();
-    gzdbg << "\n MY NAME[" << modelName << "]\n";
     modelElem->GetAttribute("name")->Set(modelName);
 
-    scene->AddVisual(modelVisual);
-
-    this->visuals.push_back(modelVisual);
+    scene->AddVisual(this->modelVisual);
 
     sdf::ElementPtr linkElem = modelElem->GetElement("link");
     while (linkElem)
@@ -146,9 +146,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int column)
       if (linkElem->HasElement("origin"))
         linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
 
-      gzdbg << "LinkName[" << linkName << "]\n";
 
-      rendering::VisualPtr linkVisual( new rendering::Visual(modelName+"::"+linkName, modelVisual) );
+      rendering::VisualPtr linkVisual( new rendering::Visual(modelName+"::"+linkName, this->modelVisual) );
       linkVisual->Load();
       linkVisual->SetPose( linkPose );
       this->visuals.push_back(linkVisual);
@@ -165,7 +164,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int column)
                    << visualIndex++;
         rendering::VisualPtr visVisual( new rendering::Visual(visualName.str(), linkVisual) );
         visVisual->Load(visualElem);
-        visVisual->SetTransparency(0.5);
+        visVisual->SetTransparency(0.4);
         this->visuals.push_back(visVisual);
 
 
@@ -184,22 +183,53 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int column)
 
 void InsertModelWidget::OnApply()
 {
-  msgs::Factory msg;
-  msgs::Init(msg, this->modelSDF->root->GetElement("model")->GetValueString("name"));
-
-  this->modelSDF->root->GetElement("model")->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->modelVisual->GetWorldPose());
-  msg.set_xml(this->modelSDF->ToString());
-
-  this->factoryPub->Publish(msg);
-
+  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
+  std::string modelName = modelElem->GetValueString("name");
+ 
+  // Remove the selection 
+  msgs::Selection selectMsg;
+  msgs::Init(selectMsg, modelName);
+  selectMsg.set_selected(false);
+  this->selectionPub->Publish(selectMsg);
+ 
+  // Remove the topic namespace from the model name. This will get re-inserted
+  // by the World automatically
+  modelName.erase(0, this->node->GetTopicNamespace().size()+2);
+
+  // The the SDF model's name
+  modelElem->GetAttribute("name")->Set(modelName);
+  modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+      this->modelVisual->GetWorldPose());
+
+
+  // Remove the temporary visual from the scene
   scene->RemoveVisual( this->modelVisual );
+  this->modelVisual.reset();
   this->visuals.clear();
+
+  msgs::Factory msg;
+  msgs::Init(msg, modelName);
+  msg.set_xml(this->modelSDF->ToString());
+  this->factoryPub->Publish(msg);
+  this->fileTreeWidget->clearSelection();
 }
 
 void InsertModelWidget::OnCancel()
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
+
   scene->RemoveVisual( this->modelVisual );
+  this->modelVisual.reset();
   this->visuals.clear();
+
+  // Get the name of the model
+  std::string modelName = this->modelSDF->root->GetElement("model")->GetValueString("name");
+ 
+  // Remove the selection 
+  msgs::Selection selectMsg;
+  msgs::Init(selectMsg, modelName);
+  selectMsg.set_selected(false);
+  this->selectionPub->Publish(selectMsg);
+  this->fileTreeWidget->clearSelection();
 }

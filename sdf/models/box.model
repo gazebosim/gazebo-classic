@@ -17,22 +17,6 @@
       </geometry>
       <material script="Gazebo/WoodPallet"/>
     </visual>
-
-
-    <collision name="geom2">
-      <origin pose="0 0 1.0 0 0 0"/>
-      <geometry>
-        <box size=".5 .5 .5"/>
-      </geometry>
-    </collision>
-    <visual>
-      <origin pose="0 0 1.0 0 0 0"/>
-      <geometry>
-        <box size=".5 .5 .5"/>
-      </geometry>
-      <material script="Gazebo/Red"/>
-    </visual>
-
   </link>
 </model>
 </gazebo>

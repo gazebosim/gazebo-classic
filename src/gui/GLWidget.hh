@@ -73,7 +73,7 @@ namespace gazebo
       private: SphereMaker sphereMaker;
       private: CylinderMaker cylinderMaker;
 
-      private: rendering::VisualPtr selection;
+      private: rendering::VisualPtr selection, hoverVis;
       private: std::string selectionMod;
       private: math::Pose selectionPoseOrig;
 

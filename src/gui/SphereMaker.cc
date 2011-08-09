@@ -163,10 +163,5 @@ void SphereMaker::CreateTheEntity()
   this->visualMsg->set_action( msgs::Visual::DELETE );
   this->visPub->Publish(*this->visualMsg);
 
-  /*(this->createCB)(
-      msgs::Convert(this->visualMsg->pose().position()), 
-      msgs::Convert(this->visualMsg->scale()) );
-      */
-
   this->makerPub->Publish(msg);
 }

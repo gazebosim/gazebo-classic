@@ -249,7 +249,7 @@ void UserCamera::SetViewController( const std::string &type )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Resize the camera
-void UserCamera::Resize(unsigned int w, unsigned int h)
+void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
   if (this->viewport)
   {

@@ -64,6 +64,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
     uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
 
   this->SetName(uniqueName);
+
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
   this->parent = _parent;
@@ -98,9 +99,10 @@ Visual::Visual (const std::string &_name, Scene *_scene)
   std::string uniqueName = this->GetName();
   int index = 0;
   while (_scene->GetManager()->hasSceneNode( uniqueName ))
+  {
     uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
+  }
 
-  gzdbg << "Unique Name[" << uniqueName << "]\n";
 
   this->SetName(uniqueName);
   this->sceneNode = _scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
@@ -132,6 +134,8 @@ Visual::~Visual()
       this->sceneNode->getParentSceneNode()->removeAndDestroyChild( this->sceneNode->getName() );
     this->sceneNode = NULL;
   }
+
+  this->parent.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,7 +370,7 @@ void Visual::AttachObject( Ogre::MovableObject *_obj)
       _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 2);
 
   this->sceneNode->attachObject(_obj);
-  RTShaderSystem::Instance()->UpdateShaders();
+  //RTShaderSystem::Instance()->UpdateShaders();
 
   _obj->setUserAny( Ogre::Any(this->GetName()) );
 }
@@ -493,6 +497,15 @@ void Visual::SetMaterial(const std::string &materialName)
   if (materialName.empty())
     return;
 
+  // Create a custom material name
+  std::string newMaterialName;
+  newMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
+
+  if (this->GetMaterialName() == newMaterialName)
+    return;
+
+  this->myMaterialName = newMaterialName;
+
   Ogre::MaterialPtr origMaterial;
 
   try
@@ -516,17 +529,18 @@ void Visual::SetMaterial(const std::string &materialName)
   }
 
 
-  // Create a custom material name
-  this->myMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
-
   Ogre::MaterialPtr myMaterial;
 
   // Clone the material. This will allow us to change the look of each geom
   // individually.
   if (Ogre::MaterialManager::getSingleton().resourceExists(this->myMaterialName))
+  {
     myMaterial = (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(this->myMaterialName));
+  }
   else
+  {
     myMaterial = origMaterial->clone(this->myMaterialName);
+  }
 
 
   try
@@ -536,19 +550,18 @@ void Visual::SetMaterial(const std::string &materialName)
       Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
       if (dynamic_cast<Ogre::Entity*>(obj))
-        //((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
-        ((Ogre::Entity*)obj)->setMaterialName(this->origMaterialName);
+        ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
       else
-        //((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
-        ((Ogre::SimpleRenderable*)obj)->setMaterial(this->origMaterialName);
+        ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
-
   }
   catch (Ogre::Exception e)
   {
-    gzwarn << "Unable to set Material[" << myMaterialName << "] to Geometry["
+    gzwarn << "Unable to set Material[" << this->myMaterialName << "] to Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
   }
+
+  RTShaderSystem::Instance()->UpdateShaders();
 }
 
 /// Set the color of the visual
@@ -660,13 +673,6 @@ void Visual::SetTransparency( float trans )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Apply a glow to the visual
-void Visual::SetGlow( common::Color &_color )
-{
-
-}
- 
-////////////////////////////////////////////////////////////////////////////////
 /// Get the transparency
 float Visual::GetTransparency()
 {
@@ -751,8 +757,6 @@ void Visual::SetRotation( const math::Quaternion &rot)
 // Set the pose of the visual
 void Visual::SetPose( const math::Pose &_pose)
 {
-  printf("Visual::SetPose[%s] Pos[%4.2f %4.2f %4.2f]\n",this->GetName().c_str(), _pose.pos.x, _pose.pos.y, _pose.pos.z);
-
   this->SetPosition( _pose.pos );
   this->SetRotation( _pose.rot);
 }
@@ -783,8 +787,6 @@ math::Pose Visual::GetPose() const
 
 void Visual::SetWorldPose(const math::Pose _pose)
 {
-  printf("Visual::SetWorldPose[%s] Pos[%4.2f %4.2f %4.2f]\n",this->GetName().c_str(), _pose.pos.x, _pose.pos.y, _pose.pos.z);
-
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
@@ -944,7 +946,7 @@ void Visual::AttachLineVertex( DynamicLines *_line, unsigned int _index )
 /// Get the name of the material
 std::string Visual::GetMaterialName() const
 {
-  return this->origMaterialName;
+  return this->myMaterialName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1171,6 +1173,7 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
   if (msg->has_material_script())
     this->SetMaterial(msg->material_script());
 
+
   /*if (msg->points.size() > 0)
   {
     DynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);
@@ -1187,6 +1190,16 @@ VisualPtr Visual::GetParent() const
   return this->parent;
 }
  
+bool Visual::IsPlane() const
+{
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+    return geomElem->HasElement("plane");
+  }
+  return false;
+}
+
 std::string Visual::GetMeshName() const
 {
   if (this->sdf->HasElement("geometry"))

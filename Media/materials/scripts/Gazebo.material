@@ -31,7 +31,7 @@ material Gazebo/GreyGrid //: shadow_receiver_template
  }
 }
 
-material Gazebo/Grey : perpixel_template
+material Gazebo/Grey
 {
   technique
   {
@@ -294,32 +294,24 @@ material Gazebo/TurquoiseGlowOutline
 {
 	technique
 	{
-
     pass ambient
     {
       scene_blend alpha_blend
-      depth_write off
-      lighting off
+      //lighting off
 
-      texture_unit
-      {
-        colour_op_ex source1 src_manual src_current 0 1 1
-        alpha_op_ex source1 src_manual src_current 0.5
-      }
+			diffuse 0 1 1 1
+			specular .1 .1 .1 128 
     }
 
-    pass ambient
+    pass ambient2
     {
       scene_blend alpha_blend
-      depth_write off
-      lighting off
+
+			diffuse 0 1 1 
+			specular .1 .1 .1 128 
+			emissive 0 1 1
 
       polygon_mode wireframe
-      texture_unit
-      {
-        colour_op_ex source1 src_manual src_current 0 1 1
-        alpha_op_ex source1 src_manual src_current 0.9
-      }
     }
 	}
 }

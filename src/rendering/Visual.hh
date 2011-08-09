@@ -130,9 +130,6 @@ namespace gazebo
       /// \brief Get the transparency
       public: float GetTransparency();
 
-      /// \brief Apply a glow to the visual
-      public: void SetGlow( common::Color &_color );
-  
       /// \brief Set highlighted or no
       public: void SetHighlight( bool highlight);
   
@@ -220,6 +217,10 @@ namespace gazebo
   
       /// \brief Update a visual based on a message
       public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
+
+
+      /// \brief Return true if the visual is a plane
+      public: bool IsPlane() const;
 
       /// \brief Get the parent visual, if one exists
       public: VisualPtr GetParent() const;
