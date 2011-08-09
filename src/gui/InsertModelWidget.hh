@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "sdf/sdf.h"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
@@ -33,7 +34,7 @@ namespace gazebo
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
-      private: std::string selectedModel;
+      private: sdf::SDFPtr modelSDF;
     };
   }
 }

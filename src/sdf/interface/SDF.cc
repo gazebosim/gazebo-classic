@@ -282,6 +282,41 @@ void Element::PrintValues(std::string _prefix)
 }
 
 
+void Element::ToString(const std::string &_prefix, std::ostringstream &_out) const
+{
+  _out << _prefix << "<" << this->name;
+
+  Param_V::const_iterator aiter;
+  for (aiter = this->attributes.begin(); 
+      aiter != this->attributes.end(); aiter++)
+  {
+    _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
+  }
+
+  if(this->elements.size() > 0)
+  {
+    _out << ">\n";
+    ElementPtr_V::const_iterator eiter;
+    for (eiter = this->elements.begin(); 
+         eiter != this->elements.end(); eiter++)
+    {
+      (*eiter)->ToString(_prefix + "  ", _out);
+    }
+    _out << _prefix << "</" << this->name << ">\n";
+  }
+  else
+  {
+    if (this->value)
+    {
+      _out << ">" << this->value->GetAsString() << "</" << this->name << ">\n";
+    }
+    else
+    {
+      _out << "/>\n";
+    }
+  }
+}
+
 
 ParamPtr Element::GetAttribute(const std::string &_key)
 {
@@ -561,4 +596,12 @@ void SDF::PrintDescription()
 void SDF::PrintValues()
 {
   this->root->PrintValues("");
+}
+
+std::string SDF::ToString() const
+{
+  std::ostringstream out;
+  this->root->ToString("",out);
+
+  return out.str();
 }

@@ -162,7 +162,10 @@ namespace gazebo
   
       // Get the scene Id as a string
       public: std::string GetIdString() const;
-  
+ 
+      /// \brief Get a unique scene node node 
+      public: std::string GetUniqueName(const std::string &_prefix);
+
       /// \brief Print scene graph
       private: void PrintSceneGraphHelper(const std::string &prefix, 
                                           Ogre::Node *node);

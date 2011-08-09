@@ -65,6 +65,8 @@ namespace sdf
     public: void PrintDescription(std::string _prefix);
     public: void PrintValues(std::string _prefix);
 
+    public: void ToString(const std::string &_prefix, std::ostringstream &_out) const;
+
 
     public: void AddAttribute(const std::string &_key, 
                               const std::string &_type, 
@@ -135,6 +137,7 @@ namespace sdf
     public: SDF();
     public: void PrintDescription();
     public: void PrintValues();
+    public: std::string ToString() const;
 
     public: ElementPtr root;
   };

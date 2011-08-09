@@ -1038,8 +1038,6 @@ void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
   math::Pose p = msgs::Convert(*_msg);
 
-  gzdbg << "Scene::ReceivePoseMsg ID[" << _msg->header().str_id() << "] PoseMsg[" << p.pos << "]\n";
-
   // Find an old pose message, and remove them
   for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
   {
@@ -1132,4 +1130,19 @@ void Scene::RemoveVisual( VisualPtr &_vis )
     if (this->selectionObj->GetVisualName() == _vis->GetName())
       this->selectionObj->Clear();
   }
+}
+
+std::string Scene::GetUniqueName(const std::string &_prefix)
+{
+  std::ostringstream test;
+  bool exists = true;
+  int index = 0;
+  while (exists)
+  {
+    test.str("");
+    test << _prefix << "_" << index++;
+    exists = this->manager->hasSceneNode( test.str() );
+  }
+
+  return test.str();
 }

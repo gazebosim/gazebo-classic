@@ -58,6 +58,12 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
   else
     gzerr << "Create a visual, invalid parent!!!\n";
 
+  std::string uniqueName = this->GetName();
+  int index = 0;
+  while (pnode->getCreator()->hasSceneNode( uniqueName ))
+    uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
+
+  this->SetName(uniqueName);
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
   this->parent = _parent;
@@ -66,24 +72,38 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Visual::Visual (const std::string &_name, Ogre::SceneNode *parent_)
+Visual::Visual (const std::string &_name, Ogre::SceneNode *_parent)
 {
   this->SetName(_name);
   this->sceneNode = NULL;
 
-  this->sceneNode = parent_->createChildSceneNode( this->GetName() );
+  std::string uniqueName = this->GetName();
+  int index = 0;
+  while (_parent->getCreator()->hasSceneNode( uniqueName ))
+    uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
+  this->SetName(uniqueName);
+
+  this->sceneNode = _parent->createChildSceneNode( this->GetName() );
 
   this->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Visual::Visual (const std::string &_name, Scene *scene_)
+Visual::Visual (const std::string &_name, Scene *_scene)
 {
   this->SetName(_name);
   this->sceneNode = NULL;
 
-  this->sceneNode = scene_->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
+  std::string uniqueName = this->GetName();
+  int index = 0;
+  while (_scene->GetManager()->hasSceneNode( uniqueName ))
+    uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
+
+  gzdbg << "Unique Name[" << uniqueName << "]\n";
+
+  this->SetName(uniqueName);
+  this->sceneNode = _scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
 
   this->Init();
 }
@@ -92,7 +112,6 @@ Visual::Visual (const std::string &_name, Scene *scene_)
 /// Destructor
 Visual::~Visual()
 {
-  gzdbg << "Delete Visual[" << this->name << "]\n"; 
   if (this->preRenderConnection)
     event::Events::DisconnectPreRenderSignal( this->preRenderConnection );
 

@@ -95,45 +95,45 @@ InsertModelWidget::~InsertModelWidget()
 {
 }
 
-//void InsertModelWidget::OnModelSelection()
-void InsertModelWidget::OnModelSelection(QTreeWidgetItem *item, int column)
+void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int column)
 {
   gzdbg << "OnModelSelection\n";
-  QTreeWidgetItem* selected = this->fileTreeWidget->currentItem();
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
   scene->RemoveVisual( this->modelVisual );
   this->visuals.clear();
 
-  if (selected)
+  if (_item)
   {
     std::string path, filename;
 
-    if (selected->parent())
-      path = selected->parent()->text(0).toStdString() + "/";
+    if (_item->parent())
+      path = _item->parent()->text(0).toStdString() + "/";
 
-    filename = selected->text(0).toStdString();
-    this->selectedModel = path+filename;
+    filename = _item->text(0).toStdString();
 
     if (filename.find(".model") == std::string::npos)
       return;
 
-    sdf::SDFPtr modelSDF(new sdf::SDF);
-    sdf::initFile( "/sdf/gazebo.sdf", modelSDF );
-    sdf::readFile( this->selectedModel, modelSDF);
+    this->modelSDF.reset(new sdf::SDF);
+    sdf::initFile( "/sdf/gazebo.sdf", this->modelSDF );
+    sdf::readFile( path+filename, this->modelSDF);
 
     // Load the world file
     std::string modelName;
     math::Pose modelPose, linkPose, visualPose;
 
-    sdf::ElementPtr modelElem = modelSDF->root->GetElement("model");
+    sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
     if (modelElem->HasElement("origin"))
       modelPose = modelElem->GetElement("origin")->GetValuePose("pose");
 
-    modelName = modelElem->GetValueString("name");
-    this->modelVisual.reset(new rendering::Visual(modelName, scene));
+    this->modelVisual.reset(new rendering::Visual(modelElem->GetValueString("name"), scene));
     this->modelVisual->Load();
     this->modelVisual->SetPose(modelPose);
+
+    modelName = this->modelVisual->GetName();
+    gzdbg << "\n MY NAME[" << modelName << "]\n";
+    modelElem->GetAttribute("name")->Set(modelName);
 
     scene->AddVisual(modelVisual);
 
@@ -185,11 +185,11 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *item, int column)
 void InsertModelWidget::OnApply()
 {
   msgs::Factory msg;
-  msgs::Init(msg, "new_model");
-  msg.set_filename(this->selectedModel);
+  msgs::Init(msg, this->modelSDF->root->GetElement("model")->GetValueString("name"));
 
-  gzdbg << "Pose[" << this->modelVisual->GetWorldPose()  << "]\n";
-  msg.mutable_pose()->CopyFrom( msgs::Convert(this->modelVisual->GetWorldPose()) );
+  this->modelSDF->root->GetElement("model")->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->modelVisual->GetWorldPose());
+  msg.set_xml(this->modelSDF->ToString());
+
   this->factoryPub->Publish(msg);
 
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
