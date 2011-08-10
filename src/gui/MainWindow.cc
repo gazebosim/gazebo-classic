@@ -8,6 +8,7 @@
 
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
+#include "gui/ModelListWidget.hh"
 #include "gui/WorldPropertiesWidget.hh"
 #include "gui/TimePanel.hh"
 #include "gui/RenderWidget.hh"
@@ -22,42 +23,50 @@ using namespace gui;
 MainWindow::MainWindow()
   : renderWidget(0)
 {
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  gui::set_world( this->node->GetTopicNamespace() );
+  this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
+
+
+
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
   this->CreateMenus();
   this->CreateToolbars();
 
-  QSplitter *splitter = new QSplitter;  
   QWidget *mainWidget = new QWidget;
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainWidget->show();
+  this->setCentralWidget(mainWidget);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  gui::set_world( this->node->GetTopicNamespace() );
-  this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->setDockOptions(QMainWindow::ForceTabbedDocks |
+                       QMainWindow::AllowTabbedDocks |
+                       QMainWindow::AnimatedDocks |
+                       QMainWindow::VerticalTabs);
+
+  QDockWidget *dock = new QDockWidget(tr("Insert Model"), this);
+  dock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  InsertModelWidget *insertModel = new InsertModelWidget();
+  dock->setWidget(insertModel);
+  this->addDockWidget(Qt::LeftDockWidgetArea, dock);
+
+/*  dock = new QDockWidget(tr("Models"), this);
+  dock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  ModelListWidget *modelListWidget = new ModelListWidget();
+  dock->setWidget(modelListWidget);
+  this->addDockWidget(Qt::LeftDockWidgetArea, dock);
+  */
 
   this->renderWidget = new RenderWidget(mainWidget);
   this->renderWidget->hide();
 
   this->timePanel = new TimePanel(mainWidget);
 
-  InsertModelWidget *insertModel = new InsertModelWidget();
-
-  //QFrame *leftFrame = new QFrame;
-  //leftFrame->setLineWidth(1);
-  //leftFrame->setFrameShadow(QFrame::Sunken);
-  //leftFrame->setFrameShape(QFrame::Box);
-
-  splitter->addWidget(insertModel);
-  splitter->addWidget(this->renderWidget);
-
-  //mainLayout->addWidget( this->renderWidget );
-  mainLayout->addWidget(splitter);
+  mainLayout->addWidget( this->renderWidget );
   mainLayout->addWidget( this->timePanel );
   mainWidget->setLayout(mainLayout);
 
-  this->setCentralWidget(mainWidget);
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
   std::string title = "Gazebo : ";

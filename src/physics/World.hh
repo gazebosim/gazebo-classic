@@ -177,6 +177,8 @@ namespace gazebo
       private: void PublishScene( const boost::shared_ptr<msgs::Request const> &data );
 
       private: void OnScene( const boost::shared_ptr<msgs::Scene const> &_data );
+      private: void OnRequestEntities( const boost::shared_ptr<msgs::Request const> &_data );
+
       /// \brief Construct a scene message from the known world state
       private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
 
@@ -223,7 +225,9 @@ namespace gazebo
       private: transport::NodePtr node;    
       private: transport::PublisherPtr selectionPub, scenePub;
       private: transport::PublisherPtr statPub, worldPub, newEntityPub;
-      private: transport::SubscriberPtr visSub, sceneRequestSub, controlSub, factorySub, jointSub, sceneSub;
+      private: transport::SubscriberPtr visSub, sceneRequestSub, controlSub;
+      private: transport::SubscriberPtr factorySub, jointSub, sceneSub;
+      private: transport::SubscriberPtr entitiesRequestSub;
 
       private: msgs::WorldStatistics worldStatsMsg;
       private: msgs::Scene sceneMsg;

@@ -25,6 +25,7 @@ set (msgs color.proto
           world_stats.proto
           world_control.proto
           entity.proto
+          entities.proto
           joint.proto
           physics.proto
           string_v.proto

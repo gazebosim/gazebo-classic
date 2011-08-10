@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Entities 
+/// \brief Information about all entities in a world
+/// \verbatim
+
+import "header.proto";
+import "entity.proto";
+
+message Entities
+{
+  required Header header = 1;
+  repeated Entity entities = 2;
+}
+/// \endverbatim

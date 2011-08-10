@@ -138,6 +138,9 @@ void World::Load( sdf::ElementPtr _sdf )
   this->sceneRequestSub = this->node->Subscribe("~/publish_scene", 
                                         &World::PublishScene, this);
 
+  this->entitiesRequestSub = this->node->Subscribe("~/request_entities", 
+                                             &World::OnRequestEntities, this);
+
   this->sceneSub = this->node->Subscribe("~/scene", 
                                         &World::OnScene, this);
 
@@ -594,6 +597,11 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
   if (data->has_step())
     this->OnStep();
+}
+
+void World::OnRequestEntities( const boost::shared_ptr<msgs::Request const> &_data )
+{
+  gzdbg << "Request Entities\n";
 }
 
 void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )

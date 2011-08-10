@@ -9,7 +9,7 @@ import "header.proto";
 
 message Entity
 {
-  required Header header = 1;
+  optional Header header = 1;
   required string name = 2;
 }
 /// \endverbatim
