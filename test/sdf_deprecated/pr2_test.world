@@ -73,7 +73,7 @@
     <grid>false</grid>
     <maxUpdateRate>10.</maxUpdateRate>
     <shadowTechnique>none</shadowTechnique>
-    <shadows>false</shadows>
+    <shadows>true</shadows>
   </rendering:ogre>
 
   <!-- ground plane -->
@@ -105,7 +105,7 @@
     <xyz>0.0 0.0 8</xyz>
     <enableGravity>false</enableGravity>
     <light>
-      <type>point</type>
+      <type>directional</type>
       <diffuseColor>0.5 0.5 0.5 1.0</diffuseColor>
       <specularColor>.1 .1 .1 1.0</specularColor>
       <attenuation>0.2 0.1 0</attenuation>

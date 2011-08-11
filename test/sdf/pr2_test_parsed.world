@@ -5,7 +5,7 @@
       <background rgba='0.5 0.5 0.5 1'>
         <sky material='Gazebo/CloudySky'/>
       </background>
-      <shadows enabled='0'/>
+      <shadows enabled='1'/>
     </scene>
     <physics type='ode'>
       <gravity xyz='0 5 -9.8'/>
@@ -41,12 +41,11 @@
         </visual>
       </link>
     </model>
-    <light name='point_white' type='point' cast_shadows='0'>
+    <light name='point_white' type='directional'>
       <origin pose='0 0 8 0 -0 0'/>
       <diffuse rgba='0.1 0.1 0.1 1'/>
       <specular rgba='0.1 0.1 0.1 1'/>
       <attenuation range='10' linear='0.10000000000000001' constant='0.20000000000000001' quadratic='0'/>
-      <direction xyz='0 0 -2'/>
     </light>
     <model name='pr2' static='0'>
       <origin pose='0 0 0 0 -0 0'/>
