@@ -99,9 +99,6 @@ void GLWidget::paintEvent(QPaintEvent *e)
     event::Events::renderSignal();
 
     event::Events::postRenderSignal();
-
-    //this->userCamera->Render();
-    //this->userCamera->PostRender();
   }
   e->accept();
 }
