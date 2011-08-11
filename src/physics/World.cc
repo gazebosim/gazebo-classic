@@ -306,8 +306,31 @@ void World::Update()
   // TODO: put back in
   //Logger::Instance()->Update();
 
+  this->ProcessEntityMsgs();
+
   event::Events::worldUpdateEndSignal();
 }
+
+void World::ProcessEntityMsgs()
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  std::list< boost::shared_ptr<msgs::Entity const> >::iterator iter;
+  for (iter = this->entityMsgs.begin(); iter != this->entityMsgs.end(); iter++)
+  {
+    BasePtr entity = this->rootElement->GetByName((*iter)->name());
+
+    if (!entity)
+      gzerr << "Unable to find entity[" << (*iter)->name() << "]\n";
+    else if ((*iter)->has_request_delete() && (*iter)->request_delete())
+    {
+      this->rootElement->RemoveChild((*iter)->name());
+    } 
+  }
+
+  this->entityMsgs.clear();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the world
@@ -389,23 +412,17 @@ ModelPtr World::GetModelByName(const std::string &_name)
 ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 {
   ModelPtr model( new Model(_parent) );
-  gzdbg << "1 Model Use Count[" << model.use_count() << "]\n";
   model->SetWorld(shared_from_this());
-  gzdbg << "2 Model Use Count[" << model.use_count() << "]\n";
 
   model->Load(_sdf);
-  gzdbg << "3 Model Use Count[" << model.use_count() << "]\n";
 
   event::Events::addEntitySignal(model->GetCompleteScopedName());
-  gzdbg << "4 Model Use Count[" << model.use_count() << "]\n";
 
   msgs::Entity msg;
   msgs::Init(msg, model->GetCompleteScopedName() );
   msg.set_name(model->GetCompleteScopedName());
-  gzdbg << "5 Model Use Count[" << model.use_count() << "]\n";
 
   this->newEntityPub->Publish(msg);
-  gzdbg << "6 Model Use Count[" << model.use_count() << "]\n";
   return model;
 }
 
@@ -759,16 +776,6 @@ void World::OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg)
   {
     this->entityMsgs.push_back(_msg);
   }
-  /*
-    BasePtr entity = this->rootElement->GetByName(_msg->name());
-    if (!entity)
-     gzerr << "Unable to find entity[" << _msg->name() << "]\n";
-    else
-    {
-      this->rootElement->RemoveChild(_msg->name());
-    } 
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

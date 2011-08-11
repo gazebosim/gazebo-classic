@@ -320,7 +320,6 @@ void UserCamera::MoveTo( VisualPtr _visual)
   if (!_visual)
     return;
 
-  gzdbg << "Move to visual[" << _visual->GetName() << "]\n";
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");

@@ -196,6 +196,8 @@ namespace gazebo
 
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
+      private: void ProcessEntityMsgs();
+
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
     

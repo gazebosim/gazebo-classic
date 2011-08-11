@@ -82,7 +82,6 @@ void Base::Load( sdf::ElementPtr _sdf )
 void Base::Fini()
 {
   Base_V::iterator iter;
-  gzdbg << "Base[" << this->GetCompleteScopedName() << "] Fini Children Count[" << this->children.size() << "]\n";
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
     (*iter)->Fini();
@@ -209,8 +208,6 @@ BasePtr Base::GetChild(const std::string &name )
 /// Remove a child by name
 void Base::RemoveChild( const std::string &_name)
 {
-  gzdbg << "Base::removeChild[" << _name << "]\n";
-
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); 
@@ -222,12 +219,8 @@ void Base::RemoveChild( const std::string &_name)
 
   if (iter != this->children.end())
   {
-    gzdbg << "Remove Child[" << (*iter)->GetName() << "] Child[" << (*iter)->GetChildCount() << "]\n";
-    gzdbg << "Use Count[" << (*iter).use_count() << "]\n";
     (*iter)->Fini();
-    gzdbg << "Use Count[" << (*iter).use_count() << "]\n";
     this->children.erase( iter );
-    gzdbg << "User Count[" << (*iter).use_count() << "]\n";
   }
 }
 

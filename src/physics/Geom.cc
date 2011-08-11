@@ -57,7 +57,6 @@ Geom::Geom( LinkPtr body )
 // Destructor
 Geom::~Geom()
 {
-  gzdbg << "Delete Geom[" << this->GetName() << "]\n";
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
@@ -73,7 +72,6 @@ void Geom::Fini()
 {
   this->body.reset();
   this->shape.reset();
-  gzdbg << "Geom[" << this->GetCompleteScopedName() << "] Fini\n";
   this->connections.clear();
 }
 

@@ -68,7 +68,6 @@ ModelListWidget::~ModelListWidget()
 
 void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
-  gzdbg << "OnModel Selection\n";
   if (_item)
   {
   }
@@ -78,7 +77,9 @@ void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_ms
 {
   std::string name = _msg->name();
 
-  QList<QTreeWidgetItem*> list = this->modelTreeWidget->findItems( name.c_str(), Qt::MatchExactly);
+  QList<QTreeWidgetItem*> list = this->modelTreeWidget->findItems( 
+      name.c_str(), Qt::MatchExactly);
+
   if (list.size() == 0)
   {
     if (!_msg->has_request_delete() || !_msg->request_delete())
@@ -89,6 +90,20 @@ void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_ms
       this->modelTreeWidget->addTopLevelItem(topItem);
     }
   }
+  else
+  {
+    if (_msg->has_request_delete() && _msg->request_delete())
+    {
+      QList<QTreeWidgetItem*>::Iterator iter;
+      for (iter = list.begin(); iter != list.end(); iter++)
+      {
+        int i = this->modelTreeWidget->indexOfTopLevelItem(*iter);
+        this->modelTreeWidget->takeTopLevelItem(i);
+        delete *iter;
+      }
+    }
+  }
+
 }
 
 void ModelListWidget::OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg )

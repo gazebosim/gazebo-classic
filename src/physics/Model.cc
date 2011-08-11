@@ -71,50 +71,6 @@ Model::Model(BasePtr parent)
 // Destructor
 Model::~Model()
 {
-  /*Base_V::iterator eiter;
-  for (eiter =this->children.begin(); eiter != this->children.end();)
-    if (*eiter && (*eiter)->HasType(BODY))
-    {
-      delete (*eiter);
-      *eiter = NULL;
-      this->children.erase(eiter); // effectively remove child
-    }
-    else
-      eiter++;
-      */
-
-  /* NATY: Put this back in 
-  JointContainer::iterator jiter;
-  std::map< std::string, Controller* >::iterator citer;
-
-  if (this->graphicsHandler)
-  {
-    delete this->graphicsHandler;
-    this->graphicsHandler = NULL;
-  }
-
-  for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
-    if (*jiter)
-      delete *jiter;
-  this->joints.clear();
-
-  for (citer = this->controllers.begin();
-       citer != this->controllers.end(); citer++)
-  {
-    if (citer->second)
-    {
-      delete citer->second;
-      citer->second = NULL;
-    }
-  }
-  this->controllers.clear();
-
-  if (this->myLinkNameP)
-  {
-    delete this->myLinkNameP;
-    this->myLinkNameP = NULL;
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -315,11 +271,9 @@ void Model::Fini()
 {
   Entity::Fini();
 
-  gzdbg << "MOdel Fini\n";
   this->joints.clear();
   this->plugins.clear();
   this->canonicalLink.reset();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

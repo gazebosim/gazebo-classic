@@ -456,7 +456,6 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
 void Entity::Fini()
 {
-  gzdbg << "Entity[" << this->GetCompleteScopedName() << "] Fini\n";
   this->parentEntity.reset();
   Base::Fini();
 }
