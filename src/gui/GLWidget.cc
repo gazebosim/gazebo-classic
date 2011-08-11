@@ -151,32 +151,53 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
   {
     std::string mod;
     this->mouseEvent.dragging = false;
+
+    rendering::VisualPtr newHoverVis;
+
     if (this->selection)
     {
-      this->hoverVis = 
+      newHoverVis = 
         this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pos, mod);
-
     }
     else
     {
-      this->hoverVis = this->scene->GetVisualAt(this->userCamera, 
-                                                this->mouseEvent.pos);
+      newHoverVis = this->scene->GetVisualAt(this->userCamera, 
+                                          this->mouseEvent.pos);
     }
 
     if (!mod.empty())
-      this->setCursor(Qt::SizeAllCursor);
-    else if (this->hoverVis)
     {
-      if (!this->hoverVis->IsPlane())
+      this->setCursor(Qt::SizeAllCursor);
+      this->scene->GetSelectionObj()->SetHighlight( mod );
+    }
+    else if (newHoverVis)
+    {
+
+      this->scene->GetSelectionObj()->SetHighlight( "" );
+      if (this->hoverVis)
+        this->hoverVis->SetEmissive(common::Color(0,0,0));
+
+      if (!newHoverVis->IsPlane())
+      {
+        newHoverVis->SetEmissive(common::Color(.5,.5,.5));
         this->setCursor(Qt::PointingHandCursor);
+      }
       else
       {
         this->setCursor(Qt::ArrowCursor);
-        this->hoverVis.reset();
+        newHoverVis.reset();
       }
     }
     else
+    {
+      this->scene->GetSelectionObj()->SetHighlight( "" );
+      if (this->hoverVis)
+        this->hoverVis->SetEmissive(common::Color(0,0,0));
+
       this->setCursor(Qt::ArrowCursor);
+    }
+
+    this->hoverVis = newHoverVis;
   }
 
   if (this->mouseEvent.dragging)

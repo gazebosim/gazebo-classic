@@ -52,6 +52,9 @@ namespace gazebo
 
       /// \brief Get the name of the visual the seleciton obj is attached to
       public: std::string GetVisualName() const;
+
+      /// \brief Highlight the selection object based on a modifier
+      public: void SetHighlight( const std::string &_mod );
   
       private: Visual *node;
       private: Scene *scene;

@@ -209,4 +209,77 @@ void SelectionObj::SetActive( bool _active )
   this->active = _active;
 }
 
+/// Highlight the selection object based on a modifier
+void SelectionObj::SetHighlight( const std::string &_mod )
+{
+  std::string name;
 
+  Ogre::ColourValue color;
+
+  std::list<std::string> matNames;
+  matNames.push_back("Gazebo/RedSelection");
+  matNames.push_back("Gazebo/GreenSelection");
+  matNames.push_back("Gazebo/BlueSelection");
+  matNames.push_back("Gazebo/RedTransparent");
+  matNames.push_back("Gazebo/GreenTransparent");
+  matNames.push_back("Gazebo/BlueTransparent");
+
+  if (_mod == "rotz")
+  {
+    name = "Gazebo/BlueSelection";
+    color.r = 0.0; 
+    color.g = 0.0; 
+    color.b = 1.0;
+  }
+  else if (_mod == "rotx")
+  {
+    name = "Gazebo/RedSelection";
+    color.r = 1.0; 
+    color.g = 0.0; 
+    color.b = 0.0;
+  }
+  else if (_mod == "roty")
+  {
+    name = "Gazebo/GreenSelection";
+    color.r = 0.0; 
+    color.g = 1.0; 
+    color.b = 0.0;
+  }
+  else if (_mod == "transx")
+  {
+    name = "Gazebo/RedTransparent";
+    color.r = 1.0; 
+    color.g = 0.0; 
+    color.b = 0.0;
+  }
+  else if (_mod == "transy")
+  {
+    name = "Gazebo/GreenTransparent";
+    color.r = 0.0; 
+    color.g = 1.0; 
+    color.b = 0.0;
+
+  }
+  else if (_mod == "transz")
+  {
+    name = "Gazebo/BlueTransparent";
+    color.r = 0.0; 
+    color.g = 0.0; 
+    color.b = 1.0;
+  }
+
+
+  for (std::list<std::string>::iterator iter = matNames.begin(); 
+       iter != matNames.end(); iter++)
+  {
+    Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(*iter);
+    Ogre::Technique *technique = mat->getTechnique(0);
+    Ogre::Pass *pass = technique->getPass(0);
+
+    if (*iter != name)
+      pass->setSelfIllumination( Ogre::ColourValue(.5,.5,.5, 1.0 ) );
+    else
+      pass->setSelfIllumination( color );
+  }
+
+}

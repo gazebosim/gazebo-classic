@@ -673,17 +673,53 @@ void Visual::SetTransparency( float trans )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the emissive value
+void Visual::SetEmissive( const common::Color &_color )
+{
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount=0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setSelfIllumination( Conversions::Color(_color) );
+        }
+      }
+    }
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the transparency
 float Visual::GetTransparency()
 {
   return this->transparency;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void Visual::SetHighlight(bool /*highlight*/)
-{
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual should cast shadows
