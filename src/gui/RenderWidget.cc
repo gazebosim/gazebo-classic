@@ -57,18 +57,19 @@ RenderWidget::RenderWidget( QWidget *parent )
   this->yawEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->yawEdit->setFixedWidth(100);
 
-  this->fpsEdit = new QLineEdit;
+  /*this->fpsEdit = new QLineEdit;
   this->fpsEdit->setReadOnly(true);
   this->fpsEdit->setFixedWidth(50);
 
   this->trianglesEdit = new QLineEdit;
   this->trianglesEdit->setReadOnly(true);
   this->trianglesEdit->setFixedWidth(80);
+  */ 
 
   QLabel *xyzLabel = new QLabel(tr("XYZ:"));
   QLabel *rpyLabel = new QLabel(tr("RPY:"));
-  QLabel *fpsLabel = new QLabel(tr("FPS:"));
-  QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
+  //QLabel *fpsLabel = new QLabel(tr("FPS:"));
+  //QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
 
   QHBoxLayout *bottomBarLayout = new QHBoxLayout;
   bottomBarLayout->addWidget(xyzLabel);
@@ -83,10 +84,10 @@ RenderWidget::RenderWidget( QWidget *parent )
   bottomBarLayout->addWidget(this->yawEdit);
 
   bottomBarLayout->addItem(new QSpacerItem(40,20,QSizePolicy::Expanding, QSizePolicy::Minimum));
-  bottomBarLayout->addWidget(fpsLabel);
-  bottomBarLayout->addWidget(this->fpsEdit);
-  bottomBarLayout->addWidget(trianglesLabel);
-  bottomBarLayout->addWidget(this->trianglesEdit);
+  //bottomBarLayout->addWidget(fpsLabel);
+  //bottomBarLayout->addWidget(this->fpsEdit);
+  //bottomBarLayout->addWidget(trianglesLabel);
+  //bottomBarLayout->addWidget(this->trianglesEdit);
   bottomBarLayout->addSpacing(10);
 
   frameLayout->addWidget(this->glWidget);
@@ -117,8 +118,8 @@ void RenderWidget::update()
   if (!cam)
     return;
 
-  float fps = cam->GetAvgFPS();
-  int triangleCount = cam->GetTriangleCount();
+  //float fps = cam->GetAvgFPS();
+  //int triangleCount = cam->GetTriangleCount();
   math::Pose pose = cam->GetWorldPose();
 
   std::ostringstream stream;
@@ -147,12 +148,13 @@ void RenderWidget::update()
   this->yawEdit->setText(tr(stream.str().c_str()));
   stream.str("");
 
-  stream << std::fixed << std::setprecision(1) << fps;
+  /*stream << std::fixed << std::setprecision(1) << fps;
   this->fpsEdit->setText(tr(stream.str().c_str()));
   stream.str("");
 
   stream << std::fixed << std::setprecision(2) << triangleCount;
   this->trianglesEdit->setText( tr(stream.str().c_str()) );
+  */
 
   this->glWidget->update();
 }

@@ -2519,6 +2519,6 @@
           <rpy>0 -0 0</rpy>
       </controller:gazebo_ros_p3d>
 
-      <controller:plugin_1 name="plugin_1_name" filename="libpr2_pose_test.so"/>
+      <!--<controller:plugin_1 name="plugin_1_name" filename="libpr2_pose_test.so"/>-->
   </model:physical>
 </gazebo:world>

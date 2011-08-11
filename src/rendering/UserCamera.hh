@@ -23,11 +23,11 @@
 #define USERCAMERA_HH
 
 #include "rendering/Camera.hh"
+#include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
 
 namespace Ogre
 {
-  class RenderWindow;
   class AnimationState;
 }
 
@@ -85,7 +85,8 @@ namespace gazebo
 
 
       /// \brief Move the camera to focus on a scene node
-      public: void MoveToVisual(Visual *visual);
+      public: void MoveTo(VisualPtr _visual);
+      public: void MoveTo(const std::string &_visualName);
   
       /// \brief Set the camera to track a scene node
       public: void TrackVisual( Visual *visual );

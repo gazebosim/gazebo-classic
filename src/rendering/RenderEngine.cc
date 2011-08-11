@@ -63,12 +63,20 @@ RenderEngine::RenderEngine()
   this->dummyDisplay = NULL;
 
   this->initialized = false;
+
+  this->connections.push_back( event::Events::ConnectPreRenderSignal( 
+        boost::bind(&RenderEngine::PreRender, this) ) );
+  this->connections.push_back( event::Events::ConnectRenderSignal( 
+        boost::bind(&RenderEngine::Render, this) ) );
+  this->connections.push_back( event::Events::ConnectPostRenderSignal( 
+        boost::bind(&RenderEngine::PostRender, this) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 RenderEngine::~RenderEngine()
 {
+  this->connections.clear();
   this->Fini();
 }
 
@@ -179,22 +187,19 @@ unsigned int RenderEngine::GetSceneCount() const
   return this->scenes.size();
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// Update all the scenes 
-void RenderEngine::UpdateScenes()
+void RenderEngine::PreRender()
 {
-  event::Events::preRenderSignal();
-
   this->root->_fireFrameStarted();
+}
 
-  event::Events::renderSignal();
-
+void RenderEngine::Render()
+{
   this->root->_fireFrameRenderingQueued();
+}
 
+void RenderEngine::PostRender()
+{
   this->root->_fireFrameEnded();
-
-  event::Events::postRenderSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

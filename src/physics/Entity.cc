@@ -313,7 +313,7 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 //
 void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
-  this->poseMutex->lock();
+  //this->poseMutex->lock();
 
   if (this->HasType(MODEL))
   {
@@ -375,7 +375,7 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     {
 
       this->parentEntity->worldPose = pose - this->initialRelativePose;
-      this->parentEntity->worldPose.pos = pose.pos - pose.rot.RotateVector(this->initialRelativePose.pos);
+      //this->parentEntity->worldPose.pos = pose.pos - pose.rot.RotateVector(this->initialRelativePose.pos);
 
       this->parentEntity->worldPose.Correct();
 
@@ -408,7 +408,7 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 
   this->PublishPose();
 
-  this->poseMutex->unlock();
+//  this->poseMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -443,7 +443,7 @@ ModelPtr Entity::GetParentModel() const
 /// Called when a new pose message arrives
 void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
-  this->poseMutex->lock();
+  //this->poseMutex->lock();
   if (_msg->header().str_id() == this->GetCompleteScopedName())
   {
     math::Pose p = msgs::Convert(*_msg);
@@ -451,7 +451,12 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
     this->SetWorldPose( p );
   }
-  this->poseMutex->unlock();
+  //this->poseMutex->unlock();
 }
 
-
+void Entity::Fini()
+{
+  gzdbg << "Entity[" << this->GetCompleteScopedName() << "] Fini\n";
+  this->parentEntity.reset();
+  Base::Fini();
+}

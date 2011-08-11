@@ -393,21 +393,21 @@ double ODEPhysics::GetStepTime()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
-LinkPtr ODEPhysics::CreateLink(EntityPtr parent)
+LinkPtr ODEPhysics::CreateLink(EntityPtr _parent)
 {
-  if (parent == NULL)
+  if (_parent == NULL)
     gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
-  iter = this->spaces.find(parent->GetName());
+  iter = this->spaces.find(_parent->GetName());
 
   if (iter == this->spaces.end())
-    this->spaces[parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
+    this->spaces[_parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
 
-  ODELinkPtr link( new ODELink(parent) );
+  ODELinkPtr link( new ODELink(_parent) );
 
-  link->SetSpaceId( this->spaces[parent->GetName()] );
-  link->SetWorld( parent->GetWorld() );
+  link->SetSpaceId( this->spaces[_parent->GetName()] );
+  link->SetWorld( _parent->GetWorld() );
 
   return link;
 }

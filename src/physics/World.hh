@@ -177,7 +177,7 @@ namespace gazebo
       private: void PublishScene( const boost::shared_ptr<msgs::Request const> &data );
 
       private: void OnScene( const boost::shared_ptr<msgs::Scene const> &_data );
-      private: void OnRequestEntities( const boost::shared_ptr<msgs::Request const> &_data );
+      private: void OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_data );
 
       /// \brief Construct a scene message from the known world state
       private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
@@ -186,6 +186,7 @@ namespace gazebo
       private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);
 
       private: void OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &data);
+      private: void OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();
@@ -225,9 +226,11 @@ namespace gazebo
       private: transport::NodePtr node;    
       private: transport::PublisherPtr selectionPub, scenePub;
       private: transport::PublisherPtr statPub, worldPub, newEntityPub;
+      private: transport::PublisherPtr entitiesPub;
+
       private: transport::SubscriberPtr visSub, sceneRequestSub, controlSub;
       private: transport::SubscriberPtr factorySub, jointSub, sceneSub;
-      private: transport::SubscriberPtr entitiesRequestSub;
+      private: transport::SubscriberPtr entitiesRequestSub, entitySub;
 
       private: msgs::WorldStatistics worldStatsMsg;
       private: msgs::Scene sceneMsg;
@@ -249,6 +252,9 @@ namespace gazebo
       private: boost::recursive_mutex *incomingMsgMutex;
 
       private: std::vector<WorldPluginPtr> plugins;
+      private: std::list< boost::shared_ptr<msgs::Entity const> > entityMsgs;
+
+      private: boost::mutex *receiveMutex;
     };
 
     /// \}

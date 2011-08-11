@@ -84,6 +84,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->origParentNode = NULL;
 
   // Connect to the render signal
+  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Camera::Update, this) ) );
   this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&Camera::Render, this) ) );
   this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Camera::PostRender, this) ) );
   this->connections.push_back( event::Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) ));
@@ -348,7 +349,7 @@ void Camera::SetWorldPose(const math::Pose &pose_)
   this->pose = pose_;
   this->pose.Correct();
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
-  //this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
+  this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

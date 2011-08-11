@@ -41,22 +41,21 @@ MainWindow::MainWindow()
   this->setCentralWidget(mainWidget);
 
   this->setDockOptions(QMainWindow::ForceTabbedDocks |
-                       QMainWindow::AllowTabbedDocks |
-                       QMainWindow::AnimatedDocks |
+//                       QMainWindow::AllowTabbedDocks |
+//                       QMainWindow::AnimatedDocks |
                        QMainWindow::VerticalTabs);
 
-  QDockWidget *dock = new QDockWidget(tr("Insert Model"), this);
-  dock->setAllowedAreas(Qt::LeftDockWidgetArea);
-  InsertModelWidget *insertModel = new InsertModelWidget();
-  dock->setWidget(insertModel);
-  this->addDockWidget(Qt::LeftDockWidgetArea, dock);
-
-/*  dock = new QDockWidget(tr("Models"), this);
-  dock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  QDockWidget *modelsDock = new QDockWidget(tr("Models"), this);
+  modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
   ModelListWidget *modelListWidget = new ModelListWidget();
-  dock->setWidget(modelListWidget);
-  this->addDockWidget(Qt::LeftDockWidgetArea, dock);
-  */
+  modelsDock->setWidget(modelListWidget);
+  this->addDockWidget(Qt::LeftDockWidgetArea, modelsDock);
+
+  QDockWidget *insertModelsDock = new QDockWidget(tr("Insert Model"), this);
+  insertModelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  InsertModelWidget *insertModel = new InsertModelWidget();
+  insertModelsDock->setWidget(insertModel);
+  this->addDockWidget(Qt::LeftDockWidgetArea, insertModelsDock);
 
   this->renderWidget = new RenderWidget(mainWidget);
   this->renderWidget->hide();
@@ -66,6 +65,8 @@ MainWindow::MainWindow()
   mainLayout->addWidget( this->renderWidget );
   mainLayout->addWidget( this->timePanel );
   mainWidget->setLayout(mainLayout);
+
+  this->tabifyDockWidget(modelsDock, insertModelsDock);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 

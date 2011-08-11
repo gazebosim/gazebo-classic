@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "common/SingletonT.hh"
+#include "common/Event.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace Ogre
@@ -103,9 +104,6 @@ namespace gazebo
       /// \brief Get the number of scene managers
       public: unsigned int GetSceneCount() const;
   
-      /// \brief Update all the scenes 
-      public: void UpdateScenes();
-  
       /// \brief Returns true if the graphics card support GLSL
       public: bool HasGLSL();
   
@@ -115,6 +113,10 @@ namespace gazebo
       private: void SetupResources();
       private: void SetupRenderSystem();
   
+      private: void PreRender();
+      private: void Render();
+      private: void PostRender();
+
       /// Pointer to the root scene node
       public: Ogre::Root *root;
     
@@ -137,6 +139,7 @@ namespace gazebo
 
       private: bool initialized;
    
+      private: std::vector<event::ConnectionPtr> connections;
       private: friend class SingletonT<RenderEngine>;
     };
     /// \}

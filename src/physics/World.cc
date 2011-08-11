@@ -69,6 +69,8 @@ class ModelUpdate_TBB
 // constructor
 World::World(const std::string &_name)
 {
+  this->receiveMutex = new boost::mutex();
+
   this->stepInc = false;
   this->pause = false;
   this->thread = NULL;
@@ -139,7 +141,8 @@ void World::Load( sdf::ElementPtr _sdf )
                                         &World::PublishScene, this);
 
   this->entitiesRequestSub = this->node->Subscribe("~/request_entities", 
-                                             &World::OnRequestEntities, this);
+                                             &World::OnEntitiesRequest, this);
+  this->entitiesPub = this->node->Advertise<msgs::Entities>("~/entities");
 
   this->sceneSub = this->node->Subscribe("~/scene", 
                                         &World::OnScene, this);
@@ -151,7 +154,9 @@ void World::Load( sdf::ElementPtr _sdf )
 
   this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
-  this->newEntityPub = this->node->Advertise<msgs::Entity>("~/new_entity");
+  this->newEntityPub = this->node->Advertise<msgs::Entity>("~/entity");
+  this->entitySub = this->node->Subscribe<msgs::Entity>("~/entity",
+      &World::OnEntityMsg, this);
 
   std::string type = _sdf->GetElement("physics")->GetValueString("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 
@@ -384,17 +389,23 @@ ModelPtr World::GetModelByName(const std::string &_name)
 ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 {
   ModelPtr model( new Model(_parent) );
+  gzdbg << "1 Model Use Count[" << model.use_count() << "]\n";
   model->SetWorld(shared_from_this());
+  gzdbg << "2 Model Use Count[" << model.use_count() << "]\n";
 
   model->Load(_sdf);
+  gzdbg << "3 Model Use Count[" << model.use_count() << "]\n";
 
   event::Events::addEntitySignal(model->GetCompleteScopedName());
+  gzdbg << "4 Model Use Count[" << model.use_count() << "]\n";
 
   msgs::Entity msg;
   msgs::Init(msg, model->GetCompleteScopedName() );
   msg.set_name(model->GetCompleteScopedName());
+  gzdbg << "5 Model Use Count[" << model.use_count() << "]\n";
 
   this->newEntityPub->Publish(msg);
+  gzdbg << "6 Model Use Count[" << model.use_count() << "]\n";
   return model;
 }
 
@@ -599,9 +610,20 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
     this->OnStep();
 }
 
-void World::OnRequestEntities( const boost::shared_ptr<msgs::Request const> &_data )
+void World::OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_data )
 {
-  gzdbg << "Request Entities\n";
+  msgs::Entities msg;
+  msgs::Init(msg, "entities");
+  msg.mutable_header()->set_index( _data->index() );
+
+  for (unsigned int i=0; i < this->rootElement->GetChildCount(); i++)
+  {
+    BasePtr entity = this->rootElement->GetChild(i);
+    msgs::Entity *entityMsg = msg.add_entities();
+    entityMsg->set_name( entity->GetCompleteScopedName() );
+  }
+
+  this->entitiesPub->Publish( msg );
 }
 
 void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
@@ -728,6 +750,25 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
 
     model->Init();
   }
+}
+
+void World::OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  if (_msg->has_request_delete())
+  {
+    this->entityMsgs.push_back(_msg);
+  }
+  /*
+    BasePtr entity = this->rootElement->GetByName(_msg->name());
+    if (!entity)
+     gzerr << "Unable to find entity[" << _msg->name() << "]\n";
+    else
+    {
+      this->rootElement->RemoveChild(_msg->name());
+    } 
+  }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,63 +27,39 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
-  this->modelTreeWidget->headerItem()->setText(0, tr("Models") );
+  this->modelTreeWidget->setContextMenuPolicy( Qt::CustomContextMenu );
+  this->modelTreeWidget->header()->hide();
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)) );
-
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-  this->moveToButton = new QPushButton(tr("MoveTo"));
-  connect(this->moveToButton, SIGNAL(clicked()), this, SLOT(OnMoveTo()));
-
-  buttonLayout->addWidget(this->moveToButton);
+  connect(this->modelTreeWidget, 
+      SIGNAL( customContextMenuRequested(const QPoint &)),
+      this, SLOT(OnCustomContextMenu(const QPoint &)));
 
   mainLayout->addWidget(this->modelTreeWidget);
-  mainLayout->addLayout(buttonLayout);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2,2,2,2);
-
-  QList<QTreeWidgetItem*> items;
-  std::list<std::string> gazeboPaths = common::SystemPaths::GetGazeboPaths();
-
-  // Iterate over all the gazebo paths
-  for (std::list<std::string>::iterator iter = gazeboPaths.begin(); 
-       iter != gazeboPaths.end(); iter++)
-  {
-    // This is the full model path
-    std::string path = (*iter) + common::SystemPaths::GetModelPathExtension();
-
-    // Create a top-level tree item for the path
-    QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, QStringList(QString("%1").arg( QString::fromStdString(path)) ));
-    this->modelTreeWidget->addTopLevelItem(topItem);
-
-    boost::filesystem::path dir(path);
-    boost::filesystem::directory_iterator endIter;
-    std::list<boost::filesystem::path> resultSet;
-
-    if ( boost::filesystem::exists(dir) && 
-         boost::filesystem::is_directory(dir) )
-    {
-      // Iterate over all the model in the current gazebo path
-      for( boost::filesystem::directory_iterator dirIter(dir); 
-           dirIter != endIter; ++dirIter)
-      {
-        if ( boost::filesystem::is_regular_file(dirIter->status()) )
-        {
-          // Add a child item for the model
-          QTreeWidgetItem *childItem = new QTreeWidgetItem( topItem, 
-              QStringList(QString("%1").arg( 
-                  QString::fromStdString( dirIter->path().leaf() )) ));
-          this->modelTreeWidget->addTopLevelItem(childItem);
-        }
-      }
-    }
-  }
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   this->entitiesRequestPub = this->node->Advertise<msgs::Request>("~/request_entities");
   this->entitiesSub = this->node->Subscribe("~/entities", &ModelListWidget::OnEntities, this);
+  this->entityPub = this->node->Advertise<msgs::Entity>("~/entity");
+  this->newEntitySub = this->node->Subscribe("~/entity", &ModelListWidget::OnEntity, this);
+
+  msgs::Request msg;
+  msg.set_index( 1 );
+  msg.set_request( "entities" );
+
+  this->entitiesRequestPub->Publish( msg );
+
+  this->moveToAction = new QAction(tr("Move To"), this);
+  this->moveToAction->setStatusTip(tr("Move camera to the selection"));
+  connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
+
+  this->deleteAction = new QAction(tr("Delete"), this);
+  this->deleteAction->setStatusTip(tr("Delete the selection"));
+  connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
 }
 
 ModelListWidget::~ModelListWidget()
@@ -92,15 +68,73 @@ ModelListWidget::~ModelListWidget()
 
 void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
+  gzdbg << "OnModel Selection\n";
   if (_item)
   {
   }
 }
 
+void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg )
+{
+  std::string name = _msg->name();
+
+  QList<QTreeWidgetItem*> list = this->modelTreeWidget->findItems( name.c_str(), Qt::MatchExactly);
+  if (list.size() == 0)
+  {
+    if (!_msg->has_request_delete() || !_msg->request_delete())
+    {
+      // Create a top-level tree item for the path
+      QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
+          QStringList(QString("%1").arg( QString::fromStdString(name)) ));
+      this->modelTreeWidget->addTopLevelItem(topItem);
+    }
+  }
+}
+
 void ModelListWidget::OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg )
 {
+  for (int i=0; i < _msg->entities_size(); i++)
+  {
+    std::string name = _msg->entities(i).name();
+
+    // Create a top-level tree item for the path
+    QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
+        QStringList(QString("%1").arg( QString::fromStdString(name)) ));
+    this->modelTreeWidget->addTopLevelItem(topItem);
+  }
+}
+
+void ModelListWidget::OnDelete()
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
+  std::string modelName = item->text(0).toStdString();
+
+  msgs::Entity msg;
+  msgs::Init(msg, modelName);
+  msg.set_name( modelName );
+  msg.set_request_delete( true );
+
+  this->entityPub->Publish(msg);
 }
 
 void ModelListWidget::OnMoveTo()
 {
+  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
+  std::string modelName = item->text(0).toStdString();
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->MoveTo(modelName);
+}
+
+void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->itemAt(_pt);
+
+  if (item)
+  {
+    QMenu menu(this->modelTreeWidget);
+    menu.addAction(moveToAction);
+    menu.addAction(deleteAction);
+    menu.exec(this->modelTreeWidget->mapToGlobal(_pt));
+  }
 }

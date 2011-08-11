@@ -51,7 +51,10 @@ namespace gazebo
   
       /// \brief Load the geom
       public: virtual void Load( sdf::ElementPtr &_sdf );
-  
+
+      /// \brief Finalize the geom
+      public: void Fini();
+ 
       /// \brief Set the encapsulated geometry object
       public: void SetGeom(dGeomID geomId, bool placeable);
     

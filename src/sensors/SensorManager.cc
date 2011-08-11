@@ -71,7 +71,12 @@ void SensorManager::RunLoop()
 /// Update all the sensors
 void SensorManager::Update(bool force)
 {
-  rendering::RenderEngine::Instance()->UpdateScenes();
+  event::Events::preRenderSignal();
+
+  // Tell all the cameras to render
+  event::Events::renderSignal();
+
+  event::Events::postRenderSignal();
 
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)

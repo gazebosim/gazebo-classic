@@ -24,14 +24,19 @@ namespace gazebo
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
+      private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
       private slots: void OnMoveTo();
+      private slots: void OnDelete();
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
 
       private: QTreeWidget *modelTreeWidget;
-      private: QPushButton *moveToButton;
+      private: QAction *moveToAction;
+      private: QAction *deleteAction;
+
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr entitiesRequestPub;
-      private: transport::SubscriberPtr entitiesSub;
+      private: transport::PublisherPtr entitiesRequestPub, entityPub;
+      private: transport::SubscriberPtr entitiesSub, newEntitySub;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;

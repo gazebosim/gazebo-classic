@@ -78,7 +78,7 @@ namespace gazebo
   
       /// \brief Initialize the camera
       public: void Init();
-  
+
       /// \brief Render the camera
       public: virtual void Render();
   

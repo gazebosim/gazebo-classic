@@ -147,6 +147,14 @@ void ODELink::MoveCallback(dBodyID id)
 /// Finalize the link
 void ODELink::Fini()
 {
+  if (this->linkId)
+  {
+    dBodySetMovedCallback(this->linkId, NULL);
+    dBodyDestroy(this->linkId);
+  }
+
+  gzdbg << "ODELink[" << this->GetCompleteScopedName() << "] Fini\n";
+  this->odePhysics.reset();
   Link::Fini();
 }
 

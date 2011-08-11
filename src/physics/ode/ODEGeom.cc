@@ -92,6 +92,13 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
   }
 }
 
+/// \brief Finalize the geom
+void ODEGeom::Fini()
+{
+  this->surface.reset();
+  Geom::Fini();
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Pose change callback
 void ODEGeom::OnPoseChange()

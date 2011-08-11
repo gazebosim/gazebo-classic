@@ -313,42 +313,13 @@ void Model::RemoveChild(EntityPtr child)
 // Finalize the model
 void Model::Fini()
 {
-  /* TODO: Put back in
-  Base_V::iterator biter;
-  std::map<std::string, Controller* >::iterator contIter;
+  Entity::Fini();
 
-  for (contIter = this->controllers.begin();
-       contIter != this->controllers.end(); contIter++)
-  {
-    contIter->second->Fini();
-  }
+  gzdbg << "MOdel Fini\n";
+  this->joints.clear();
+  this->plugins.clear();
+  this->canonicalLink.reset();
 
-  for (biter=this->children.begin(); biter != this->children.end(); biter++)
-  {
-    if (*biter && (*biter)->HasType(BODY))
-    {
-      Link *link = (Link*)*biter;
-      link->Fini();
-    }
-  }
-
-  if (this->graphicsHandler)
-  {
-    delete this->graphicsHandler;
-    this->graphicsHandler = NULL;
-  }
-
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
-  {
-    if (*iter && (*iter)->HasType(MODEL))
-    {
-      Model *m = (Model*)*iter;
-      m->Fini();
-    }
-  }
-
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

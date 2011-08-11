@@ -113,7 +113,10 @@ namespace gazebo
       /// \brief Remove a child from this entity
       /// \param child Child to remove
       public: virtual void RemoveChild(unsigned int id);
-   
+  
+      /// \brief Remove all children 
+      public: void RemoveChildren();
+
       /// \brief Get the number of children
       /// \return The number of children
       public: unsigned int GetChildCount() const;
@@ -128,6 +131,9 @@ namespace gazebo
   
       /// \brief Get a child by name
       public: BasePtr GetChild(const std::string &name );
+
+      /// \brief Remove a child by name
+      public: void RemoveChild( const std::string &_name);
   
       /// \brief Add a type specifier
       public: void AddType( EntityType type );

@@ -28,6 +28,7 @@
 #include "common/Events.hh"
 
 
+#include "rendering/Conversions.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/FPSViewController.hh"
 #include "rendering/OrbitViewController.hh"
@@ -55,6 +56,8 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
 
+  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&UserCamera::Update, this) ) );
+  
   this->connections.push_back( event::Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
   this->animState = NULL;
 
@@ -301,12 +304,23 @@ void UserCamera::ShowVisual(bool s)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Move the camera to focus on an scene node
-void UserCamera::MoveToVisual( Visual *visual_)
+void UserCamera::MoveTo( const std::string &_name )
 {
-  if (!visual_)
+  VisualPtr visual = this->scene->GetVisual(_name);
+  if (visual)
+    this->MoveTo(visual);
+  else
+    gzerr << "MoveTo Unknown visual[" << _name << "]\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Move the camera to focus on an scene node
+void UserCamera::MoveTo( VisualPtr _visual)
+{
+  if (!_visual)
     return;
 
+  gzdbg << "Move to visual[" << _visual->GetName() << "]\n";
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
   {
     this->scene->GetManager()->destroyAnimation("cameratrack");
@@ -319,17 +333,39 @@ void UserCamera::MoveToVisual( Visual *visual_)
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
   Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
 
+  math::Box box = _visual->GetBoundingBox();
+  math::Vector3 size = box.GetSize();
+  double maxSize = std::max(std::max(size.x, size.y), size.z);
+
+
   math::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  math::Vector3 end = visual_->GetWorldPose().pos;
+  math::Vector3 end = box.GetCenter();
   end.Correct();
   math::Vector3 dir = end - start;
   dir.Correct();
+  dir.Normalize();
+
+  double dist = start.Distance(end) - maxSize;
+
+  math::Vector3 mid = start + dir*(dist*.5);
+  mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
+
+  dir = end - mid;
+  dir.Correct();
+
+  dist = mid.Distance(end) - maxSize;
 
   double yawAngle = atan2(dir.y,dir.x);
   double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
   Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0,0,1));
   Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0,1,0));
+
+  dir.Normalize();
+
+  double scale = maxSize / tan( (this->GetHFOV()/2.0).GetAsRadian() );
+
+  end = mid + dir*(dist - scale);
 
   Ogre::TransformKeyFrame *key;
 
@@ -340,15 +376,6 @@ void UserCamera::MoveToVisual( Visual *visual_)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  math::Vector3 size = visual_->GetBoundingBox().GetSize();
-
-  double scale = std::max(std::max(size.x, size.y), size.z);
-  scale += 0.5;
-
-  dir.Normalize();
-  double dist = start.Distance(end);
-
-  math::Vector3 mid = start + dir*(dist*.5 - scale);
   key = strack->createNodeKeyFrame(.2);
   key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
   key->setRotation(yawFinal);
@@ -356,7 +383,6 @@ void UserCamera::MoveToVisual( Visual *visual_)
   key = ptrack->createNodeKeyFrame(.2);
   key->setRotation(pitchFinal);
 
-  end = start + dir*(dist - scale);
   key = strack->createNodeKeyFrame(.5);
   key->setTranslate( Ogre::Vector3(end.x, end.y, end.z));
   key->setRotation(yawFinal);
@@ -365,6 +391,8 @@ void UserCamera::MoveToVisual( Visual *visual_)
   key->setRotation(pitchFinal);
 
   this->animState = this->scene->GetManager()->createAnimationState("cameratrack");
+
+  this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
 }
