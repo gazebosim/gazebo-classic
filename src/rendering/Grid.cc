@@ -158,14 +158,14 @@ void Grid::Create()
       Ogre::Vector3 p4(extent, inc, h_real );
 
       this->manualObject->position(p1);
-      this->manualObject->colour( Conversions::Color(this->colorP) );
+      this->manualObject->colour( Conversions::Convert(this->colorP) );
       this->manualObject->position(p2);
-      this->manualObject->colour( Conversions::Color(this->colorP) );
+      this->manualObject->colour( Conversions::Convert(this->colorP) );
 
       this->manualObject->position(p3);
-      this->manualObject->colour( Conversions::Color(this->colorP) );
+      this->manualObject->colour( Conversions::Convert(this->colorP) );
       this->manualObject->position(p4);
-      this->manualObject->colour( Conversions::Color(this->colorP) );
+      this->manualObject->colour( Conversions::Convert(this->colorP) );
     }
   }
 
@@ -182,9 +182,9 @@ void Grid::Create()
         float z_bottom = -z_top;
 
         this->manualObject->position( x_real, y_real, z_bottom );
-        this->manualObject->colour( Conversions::Color(this->colorP) );
+        this->manualObject->colour( Conversions::Convert(this->colorP) );
         this->manualObject->position(x_real, y_real, z_bottom);
-        this->manualObject->colour( Conversions::Color(this->colorP) );
+        this->manualObject->colour( Conversions::Convert(this->colorP) );
       }
     }
   }

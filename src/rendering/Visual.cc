@@ -455,7 +455,7 @@ void Visual::SetScale(const math::Vector3 &scale )
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetAttribute("scale")->Set(scale);
 
-  this->sceneNode->setScale(Conversions::Vector3(scale));
+  this->sceneNode->setScale(Conversions::Convert(scale));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -706,7 +706,7 @@ void Visual::SetEmissive( const common::Color &_color )
         for (passCount=0; passCount < technique->getNumPasses(); passCount++)
         {
           pass = technique->getPass(passCount);
-          pass->setSelfIllumination( Conversions::Color(_color) );
+          pass->setSelfIllumination( Conversions::Convert(_color) );
         }
       }
     }
@@ -775,7 +775,7 @@ void Visual::SetPosition( const math::Vector3 &_pos)
   for (iter = this->lineVertices.begin(); iter != this->lineVertices.end(); iter++)
   {
     iter->first->SetPoint( iter->second, 
-        Conversions::Vector3(this->sceneNode->_getDerivedPosition()) );
+        Conversions::Convert(this->sceneNode->_getDerivedPosition()) );
     iter->first->Update();
   }
 
@@ -801,14 +801,14 @@ void Visual::SetPose( const math::Pose &_pose)
 // Set the position of the visual
 math::Vector3 Visual::GetPosition() const
 {
-  return Conversions::Vector3(this->sceneNode->getPosition());
+  return Conversions::Convert(this->sceneNode->getPosition());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
 math::Quaternion Visual::GetRotation( ) const
 {
-  return Conversions::Quaternion(this->sceneNode->getOrientation());
+  return Conversions::Convert(this->sceneNode->getOrientation());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

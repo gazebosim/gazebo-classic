@@ -22,35 +22,35 @@ using namespace rendering;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the equivalent ogre color
-Ogre::ColourValue Conversions::Color(const common::Color &color)
+Ogre::ColourValue Conversions::Convert(const common::Color &color)
 {
   return Ogre::ColourValue(color.R(), color.G(), color.B(), color.A());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Ogre Vector from gazebo Vector3
-Ogre::Vector3 Conversions::Vector3(const math::Vector3 &v)
+Ogre::Vector3 Conversions::Convert(const math::Vector3 &v)
 {
   return Ogre::Vector3(v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief return gazebo Vector from ogre Vector3
-math::Vector3 Conversions::Vector3(const Ogre::Vector3 &v)
+math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
 {
   return math::Vector3(v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Gazebo quaternion to Ogre quaternion
-Ogre::Quaternion Conversions::Quaternion(const math::Quaternion &v)
+Ogre::Quaternion Conversions::Convert(const math::Quaternion &v)
 {
   return Ogre::Quaternion(v.w, v.x, v.y, v.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Ogre quaternion to Gazebo quaternion
-math::Quaternion Conversions::Quaternion(const Ogre::Quaternion &v)
+math::Quaternion Conversions::Convert(const Ogre::Quaternion &v)
 {
   return math::Quaternion(v.w, v.x, v.y, v.z);
 }

@@ -56,6 +56,8 @@ namespace gazebo
       /// \brief Highlight the selection object based on a modifier
       public: void SetHighlight( const std::string &_mod );
   
+      private: void CreateMaterials();
+
       private: Visual *node;
       private: Scene *scene;
       private: std::string visualName;
