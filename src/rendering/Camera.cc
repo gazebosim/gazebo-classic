@@ -329,8 +329,8 @@ void Camera::PostRender()
 // Get the global pose of the camera
 math::Pose Camera::GetWorldPose()
 {
-  this->pose.pos = Conversions::Vector3(this->camera->getRealPosition());
-  this->pose.rot = Conversions::Quaternion(this->camera->getRealOrientation());
+  this->pose.pos = Conversions::Convert(this->camera->getRealPosition());
+  this->pose.rot = Conversions::Convert(this->camera->getRealOrientation());
   return this->pose;
 }
 
@@ -984,7 +984,7 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
-    this->viewport->setBackgroundColour( Conversions::Color( this->scene->GetBackgroundColor() ) );
+    this->viewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
 
     double ratio = (double)this->viewport->getActualWidth() / 
                    (double)this->viewport->getActualHeight();

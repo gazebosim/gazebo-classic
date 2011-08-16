@@ -130,9 +130,9 @@ namespace gazebo
       /// \brief Get the transparency
       public: float GetTransparency();
 
-      /// \brief Set highlighted or no
-      public: void SetHighlight( bool highlight);
-  
+      /// \brief Set the emissive value
+      public: void SetEmissive( const common::Color &_color );
+
       /// \brief Set whether the visual should cast shadows
       public: void SetCastShadows(const bool &shadows);
   

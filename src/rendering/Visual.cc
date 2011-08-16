@@ -455,7 +455,7 @@ void Visual::SetScale(const math::Vector3 &scale )
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetAttribute("scale")->Set(scale);
 
-  this->sceneNode->setScale(Conversions::Vector3(scale));
+  this->sceneNode->setScale(Conversions::Convert(scale));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -673,17 +673,53 @@ void Visual::SetTransparency( float trans )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the emissive value
+void Visual::SetEmissive( const common::Color &_color )
+{
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount=0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setSelfIllumination( Conversions::Convert(_color) );
+        }
+      }
+    }
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the transparency
 float Visual::GetTransparency()
 {
   return this->transparency;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void Visual::SetHighlight(bool /*highlight*/)
-{
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual should cast shadows
@@ -739,7 +775,7 @@ void Visual::SetPosition( const math::Vector3 &_pos)
   for (iter = this->lineVertices.begin(); iter != this->lineVertices.end(); iter++)
   {
     iter->first->SetPoint( iter->second, 
-        Conversions::Vector3(this->sceneNode->_getDerivedPosition()) );
+        Conversions::Convert(this->sceneNode->_getDerivedPosition()) );
     iter->first->Update();
   }
 
@@ -765,14 +801,14 @@ void Visual::SetPose( const math::Pose &_pose)
 // Set the position of the visual
 math::Vector3 Visual::GetPosition() const
 {
-  return Conversions::Vector3(this->sceneNode->getPosition());
+  return Conversions::Convert(this->sceneNode->getPosition());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
 math::Quaternion Visual::GetRotation( ) const
 {
-  return Conversions::Quaternion(this->sceneNode->getOrientation());
+  return Conversions::Convert(this->sceneNode->getOrientation());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

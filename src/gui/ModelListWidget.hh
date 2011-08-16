@@ -29,6 +29,8 @@ namespace gazebo
       private slots: void OnDelete();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
 
+      private: void ProcessEntity( const msgs::Entity &_msg );
+
       private: QTreeWidget *modelTreeWidget;
       private: QAction *moveToAction;
       private: QAction *deleteAction;

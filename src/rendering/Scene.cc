@@ -209,7 +209,7 @@ void Scene::SetAmbientColor(const common::Color &color)
   if (this->manager)
   {
     this->manager->setAmbientLight(
-        Conversions::Color(elem->GetValueColor("rgba")));
+        Conversions::Convert(elem->GetValueColor("rgba")));
   }
 }
 
@@ -230,11 +230,11 @@ void Scene::SetBackgroundColor(const common::Color &color)
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-    (*iter)->GetViewport()->setBackgroundColour( Conversions::Color(color) );
+    (*iter)->GetViewport()->setBackgroundColour( Conversions::Convert(color) );
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->userCameras.begin(); iter2 != this->userCameras.end(); iter2++)
-    (*iter2)->GetViewport()->setBackgroundColour( Conversions::Color(color) );
+    (*iter2)->GetViewport()->setBackgroundColour( Conversions::Convert(color) );
 
 }
 
@@ -602,7 +602,7 @@ void Scene::SetFog( const std::string &_type, const common::Color &_color,
   elem->GetAttribute("end")->Set(_end);
 
   if (this->manager)
-    this->manager->setFog( fogType, Conversions::Color(_color), 
+    this->manager->setFog( fogType, Conversions::Convert(_color), 
                            _density, _start, _end );
 }
 

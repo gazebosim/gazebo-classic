@@ -316,66 +316,6 @@ material Gazebo/TurquoiseGlowOutline
 	}
 }
 
-material Gazebo/RedSelection
-{
-	technique
-	{
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write on
-      lighting off
-
-      texture_unit
-      {
-        texture redSelect.png
-        scale 0.04  1.0
-        alpha_op_ex source1 src_manual src_current 0.5
-      }
-    }
-	}
-}
-
-material Gazebo/BlueSelection
-{
-	technique
-	{
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write on
-      lighting off
-
-      texture_unit
-      {
-        texture blueSelect.png
-        scale 0.04  1.0
-        alpha_op_ex source1 src_manual src_current 0.5
-      }
-    }
-	}
-}
-
-material Gazebo/GreenSelection
-{
-	technique
-	{
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write on
-      lighting off
-
-      texture_unit
-      {
-        texture greenSelect.png
-        scale 0.04  1.0
-        alpha_op_ex source1 src_manual src_current 0.5
-      }
-    }
-	}
-}
-
 material Gazebo/RedTransparent
 {
 	technique
@@ -411,7 +351,7 @@ material Gazebo/GreenTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
 	}
@@ -432,7 +372,7 @@ material Gazebo/BlueTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
 	}

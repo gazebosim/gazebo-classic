@@ -116,6 +116,18 @@ namespace gazebo
   
       /// \brief Get the point size
       public: double GetPointSize() const;
+
+      /// \brief Set depth write
+      public: void SetDepthWrite( bool _value );
+
+      /// \brief Get depth write
+      public: bool GetDepthWrite() const;
+
+      /// \brief Set lighting enabled
+      public: void SetLighting( bool _value );
+
+      /// \brief Get lighting enabled
+      public: bool GetLighting() const;
   
       /// \brief Ostream operator
       public: friend std::ostream &operator<<( std::ostream &out, 
@@ -133,6 +145,7 @@ namespace gazebo
                 out << "\tShininess: " << m.shininess << "\n";
                 out << "\tBlendMode: " << BlendModeStr[m.blendMode] << "\n";
                 out << "\tShadeMode: " << ShadeModeStr[m.shadeMode] << "\n";
+                out << "\tDepthWrite: " << m.depthWrite << "\n";
                 return out;
               }
   
@@ -150,6 +163,9 @@ namespace gazebo
       protected: ShadeMode shadeMode;
   
       private: static unsigned int counter;
+
+      private: bool depthWrite;
+      private: bool lighting;
     };
     /// \}
   }
