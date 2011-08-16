@@ -357,8 +357,23 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     // Iterate over all the child elements
     TiXmlElement* elemXml = NULL;
     for (elemXml = _xml->FirstChildElement(); elemXml; 
-        elemXml = elemXml->NextSiblingElement())
+         elemXml = elemXml->NextSiblingElement())
     {
+
+      if (std::string("include") == elemXml->Value())
+      {
+        std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(std::string("models/") + elemXml->Attribute("filename"));
+        SDFPtr includeSDF(new SDF); 
+        init(includeSDF);
+
+        readFile(filename, includeSDF);
+
+        includeSDF->root->GetFirstElement()->SetParent( _sdf );
+        _sdf->elements.push_back(includeSDF->root->GetFirstElement());
+
+        //includeSDF.reset();
+        continue;
+      }
 
       // Find the matching element in SDF
       ElementPtr_V::iterator eiter;

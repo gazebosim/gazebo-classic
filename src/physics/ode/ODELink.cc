@@ -69,7 +69,6 @@ void ODELink::Load( sdf::ElementPtr &_sdf)
 // Init the ODE link
 void ODELink::Init() 
 {
-
   if ( !this->IsStatic() )
   {
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
@@ -197,10 +196,8 @@ void ODELink::OnPoseChange()
     return;
   this->SetEnabled(true);
 
-
   //math::Pose pose = this->comEntity->GetWorldPose();
   math::Pose pose = this->GetWorldPose();
-
 
   math::Vector3 cog_vec = pose.rot.RotateVector(this->inertial->GetCoG());
 

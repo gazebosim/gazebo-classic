@@ -237,7 +237,8 @@ void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> 
   this->physicsPub->Publish( msg );
 }
 
-void ODEPhysics::OnPhysicsMsg( const boost::shared_ptr<msgs::Physics const> &_msg )
+void ODEPhysics::OnPhysicsMsg( 
+    const boost::shared_ptr<msgs::Physics const> &_msg )
 {
 
   if (_msg->has_dt())

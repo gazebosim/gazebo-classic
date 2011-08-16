@@ -153,7 +153,11 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
       this->visuals.push_back(linkVisual);
 
       int visualIndex = 0;
-      sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+      sdf::ElementPtr visualElem;
+
+      if (linkElem->HasElement("visual"))
+        visualElem = linkElem->GetElement("visual");
+
       while (visualElem)
       {
         if (visualElem->HasElement("origin"))
@@ -164,7 +168,6 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
                    << visualIndex++;
         rendering::VisualPtr visVisual( new rendering::Visual(visualName.str(), linkVisual) );
         visVisual->Load(visualElem);
-        visVisual->SetTransparency(0.4);
         this->visuals.push_back(visVisual);
 
 
