@@ -42,12 +42,14 @@ void TopicManager::Init()
 {
   this->advertisedTopics.clear();
   this->subscribed_topics.clear();
+  this->nodes.clear();
 }
 
 void TopicManager::Fini()
 {
   this->advertisedTopics.clear();
   this->subscribed_topics.clear();
+  this->nodes.clear();
 }
 
 void TopicManager::AddNode( NodePtr _node )

@@ -88,6 +88,8 @@ void Server::Stop()
 
 void Server::Fini()
 {
+  this->Stop();
+
   gazebo::fini();
 
   physics::fini();

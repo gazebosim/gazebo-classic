@@ -54,9 +54,12 @@ void SensorManager::Run()
 void SensorManager::Stop()
 {
   this->stop = true;
-  this->runThread->join();
-  delete this->runThread;
-  this->runThread = NULL;
+  if (this->runThread)
+  {
+    this->runThread->join();
+    delete this->runThread;
+    this->runThread = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
