@@ -18,7 +18,7 @@ link_directories(
 enable_testing()
 find_package( GTest REQUIRED )
 include_directories( ${GTEST_INCLUDE_DIRS} )
-add_subdirectory( benchmarks )
+add_subdirectory( regression )
 
 #add_executable(factory factory.cc ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
 

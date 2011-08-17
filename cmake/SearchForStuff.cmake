@@ -49,6 +49,8 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(valgrind valgrind)
+
   #################################################
   # Find tinyxml
   pkg_check_modules(tinyxml tinyxml)

@@ -16,6 +16,7 @@ link_directories(
   ${assimp_library_dirs} 
   ${ODE_LIBRARY_DIRS}
   ${tinyxml_library_dirs}
+  ${valgrind_LIBRARY_DIRS}
 )
 
 add_subdirectory(msgs)
@@ -56,7 +57,9 @@ target_link_libraries( gzserver gazebo_common
                                 gazebo_msgs
                                 assimp
                                 pthread
-                                ${tinyxml_libraries})
+                                ${tinyxml_libraries}
+                                ${valgrind_LIBRARIES}
+                                )
 
 
 
