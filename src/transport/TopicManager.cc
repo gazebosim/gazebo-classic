@@ -57,12 +57,12 @@ void TopicManager::AddNode( NodePtr _node )
   this->nodes.push_back(_node);
 }
 
-void TopicManager::RemoveNode( NodePtr _node )
+void TopicManager::RemoveNode( unsigned int _id )
 {
   std::vector<NodePtr>::iterator iter;
   for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
   {
-    if ( (*iter)->GetId() == _node->GetId())
+    if ( (*iter)->GetId() == _id)
     {
       this->nodes.erase(iter);
       break;

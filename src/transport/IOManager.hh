@@ -48,7 +48,7 @@ namespace gazebo
       private: boost::asio::io_service::work work;
       private: unsigned int count;
 
-      private: boost::thread thread;
+      private: boost::thread *thread;
 
       //Singleton implementation
       private: friend class SingletonT<IOManager>;

@@ -77,6 +77,7 @@ void transport::stop()
 {
   IOManager::Instance()->Stop();
   transport::ConnectionManager::Instance()->Stop();
+
   runThread->join();
   delete runThread;
   runThread = NULL;

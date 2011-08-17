@@ -47,6 +47,8 @@ void SensorManager::Run()
 {
   this->runThread = new boost::thread( 
       boost::bind(&SensorManager::RunLoop, this));
+
+  gzdbg << "Created thread[" << this->runThread->get_id() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +58,7 @@ void SensorManager::Stop()
   this->stop = true;
   if (this->runThread)
   {
+    gzdbg << "Created thread[" << this->runThread->get_id() << "]\n";
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;

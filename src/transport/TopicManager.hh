@@ -57,7 +57,7 @@ namespace gazebo
 
       public: void AddNode( NodePtr _node );
 
-      public: void RemoveNode( NodePtr _node );
+      public: void RemoveNode( unsigned int _id );
 
       public: void ProcessNodes();
 

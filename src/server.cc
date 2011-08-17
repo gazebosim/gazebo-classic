@@ -3,7 +3,6 @@
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
-#include <valgrind/callgrind.h>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 #include "gazebo_config.h"
@@ -75,8 +74,6 @@ void SignalHandler( int )
 
 int main(int argc, char **argv)
 {
-  CALLGRIND_STOP_INSTRUMENTATION;
-
   //Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
@@ -93,17 +90,8 @@ int main(int argc, char **argv)
   server->Load(config_filename);
   server->SetParams( params );
   server->Init();
-  CALLGRIND_DUMP_STATS;
-  CALLGRIND_ZERO_STATS;
-  CALLGRIND_START_INSTRUMENTATION;
 
-  printf("RUNNING!\n");
   server->Run();
-
-  CALLGRIND_DUMP_STATS;
-  CALLGRIND_ZERO_STATS;
-  CALLGRIND_STOP_INSTRUMENTATION;
-
 
   server->Fini();
 

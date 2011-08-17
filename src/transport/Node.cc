@@ -31,7 +31,7 @@ Node::Node()
 
 Node::~Node()
 {
-  TopicManager::Instance()->RemoveNode( shared_from_this() );
+  TopicManager::Instance()->RemoveNode( this->id );
 }
 
 void Node::Init(const std::string &_space)

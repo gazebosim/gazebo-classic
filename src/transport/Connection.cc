@@ -36,6 +36,7 @@ Connection::Connection()
   this->id = idCounter++;
   this->debug = false;
 
+  gzdbg << "Creating Connection[" << this->id << "]\n";
 
   this->writeMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
@@ -50,6 +51,7 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
+  gzdbg << "Deleting Connection[" << this->id << "]\n";
   this->Shutdown();
   this->writeQueue.clear();
 
@@ -138,13 +140,16 @@ void Connection::StartRead(const ReadCallback &cb)
 /// Stop the read loop 
 void Connection::StopRead()
 {
+  gzdbg << "Connection Stop Read[" << this->id << "]\n";
+  this->readQuit = true;
   if (this->readThread)
   {
-    this->readQuit = true;
+    gzdbg << "Deleting the thread\n";
     this->readThread->interrupt();
     delete this->readThread;
   }
   this->readThread = NULL;
+  gzdbg << "Connection DONE Stop Read[" << this->id << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +346,7 @@ bool Connection::Read(std::string &data)
     {
       // Read in the actual data
       len += this->socket.read_some(boost::asio::buffer(&incoming[len], incoming_size - len), error);
-    } while ( len < incoming_size && !error);
+    } while ( len < incoming_size && !error && !this->readQuit);
 
     if (len != incoming_size)
       gzerr << "Did not read everying. Read[" << len << "] Needed[" << incoming_size << "]\n";
@@ -437,16 +442,10 @@ void Connection::ReadLoop(const ReadCallback &cb)
       boost::this_thread::interruption_point();
       if (this->socket.available() >= HEADER_LENGTH)
       {
-        if (debug)
-          printf("Avail[%d]\n", this->socket.available());
         if (this->Read(data))
         {
-          if (debug)
-            printf("Read some\n");
           (cb)(data);
         }
-        if (debug)
-          printf("Avail[%d]\n", this->socket.available());
       }
       else
       {
@@ -460,6 +459,8 @@ void Connection::ReadLoop(const ReadCallback &cb)
       break;
     }
   }
+
+  gzdbg << "Ending ReadLoop[" << this->id << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

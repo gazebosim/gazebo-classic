@@ -95,7 +95,10 @@ void ConnectionManager::Fini()
 
   this->Stop();
 
+  gzdbg << "Delete Master Conn[" << this->masterConn->id << "] Use[" << this->masterConn.use_count() << "]\n";
   this->masterConn.reset();
+  gzdbg << "Done Master conn delete\n";
+
   this->serverConn.reset();
   this->connections.clear();
 }
@@ -105,12 +108,18 @@ void ConnectionManager::Fini()
 // Stop the conneciton manager
 void ConnectionManager::Stop()
 {
+  gzdbg << "ConnectionManager::Stop\n";
   this->stop = true;
   if (this->thread)
   {
     this->thread->join();
     delete this->thread;
     this->thread = NULL;
+  }
+
+  if (this->masterConn)
+  {
+    this->masterConn->Shutdown();
   }
 }
 
@@ -140,6 +149,8 @@ void ConnectionManager::Run()
     }
     usleep(100000);
   }
+
+  gzdbg << "ConnectionManager::Run complete\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
