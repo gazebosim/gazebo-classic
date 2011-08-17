@@ -219,18 +219,20 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 bool readFile(const std::string &_filename, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
-  xmlDoc.LoadFile(_filename);
+  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(_filename);
+
+  xmlDoc.LoadFile(filename);
   if (readDoc(&xmlDoc, _sdf))
     return true;
   else
   {
     gzwarn << "parse as sdf version 1.0 failed, trying to parse as old deprecated format\n";
-    if (deprecated_sdf::initWorldFile(_filename,_sdf))
+    if (deprecated_sdf::initWorldFile(filename, _sdf))
       return true;
     else
     {
       gzwarn << "parse as old deprecated world file failed, trying old model format.\n";
-      if (deprecated_sdf::initModelFile(_filename,_sdf->root))
+      if (deprecated_sdf::initModelFile(filename,_sdf->root))
         return true;
       else
       {

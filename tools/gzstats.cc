@@ -27,14 +27,19 @@ void cb(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
       percent, simTime.Double(), realTime.Double(), paused);
 }
 
-int main(int /*argc*/, char ** /*argv*/)
+int main(int argc, char **argv)
 {
   transport::init();
 
   transport::NodePtr node(new transport::Node());
-  node->Init("");
 
-  std::string topic = "/gazebo/default/world_stats";
+  std::string worldName = "default";
+  if (argc > 1)
+    worldName = argv[1];
+
+  node->Init(worldName);
+
+  std::string topic = "~/world_stats";
 
   transport::SubscriberPtr sub = node->Subscribe(topic, cb);
   transport::run();
