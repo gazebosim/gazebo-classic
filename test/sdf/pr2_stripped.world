@@ -119,34 +119,6 @@
             <mesh filename='pr2/base_v0/base.dae' scale='1 1 1'/>
           </geometry>
         </visual>
-        <!--<sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100'>
-          <origin pose='0 0 0 0 -0 0'/>
-          <contact>
-            <collision name='base_footprint_geom_base_link'/>
-          </contact>
-          <plugin name='base_gazebo_ros_bumper_controller' filename='libgazebo_ros_bumper.so'>
-            <alwaysOn>1</alwaysOn>
-            <updateRate>100.0</updateRate>
-            <bumperTopicName>base_bumper</bumperTopicName>
-          </plugin>
-        </sensor>
-        <sensor name='base_laser' type='ray' always_on='0' update_rate='20'>
-          <origin pose='0.275 0 0.303 0 -0 0'/>
-          <ray>
-            <scan display='1'>
-              <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423'/>
-            </scan>
-            <range min='0.080000000000000002' max='10' resolution='0.01'/>
-          </ray>
-          <plugin name='gazebo_ros_base_laser_controller' filename='libgazebo_ros_laser.so'>
-            <gaussianNoise>0.005</gaussianNoise>
-            <alwaysOn>1</alwaysOn>
-            <updateRate>20</updateRate>
-            <topicName>base_scan</topicName>
-            <frameName>base_laser_link</frameName>
-          </plugin>
-        </sensor>
-        -->
       </link>
       <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
         <origin pose='-0.2246 0.2246 0.0792 0 -0 0'/>
@@ -593,15 +565,6 @@
           </geometry>
           <material script='Gazebo/Grey' normal_map='__default__'/>
         </visual>
-        <!--<sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25'>
-          <origin pose='0.0232 0.06 0.098 0 -0 0'/>
-          <camera>
-            <horizontal_fov angle='0.78539816339744828'/>
-            <image width='320' height='240' format='L8'/>
-            <clip near='0.10000000000000001' far='100'/>
-          </camera>
-        </sensor>
-        -->
       </link>
       <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
         <origin pose='-0.05 0.188 0.790675 0 -0 0'/>
