@@ -26,6 +26,7 @@
 
 void RegisterCameraSensor();
 void RegisterRaySensor();
+void RegisterContactSensor();
 
 using namespace gazebo;
 using namespace sensors;
@@ -36,6 +37,7 @@ void SensorFactory::RegisterAll()
 {
   RegisterCameraSensor();
   RegisterRaySensor();
+  RegisterContactSensor();
 }
 
 // Register a model class.  Use by dynamically loaded modules
