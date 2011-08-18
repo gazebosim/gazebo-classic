@@ -51,7 +51,7 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
-  gzdbg << "Deleting Connection[" << this->id << "]\n";
+  gzwarn << "Deleting Connection[" << this->id << "]\n";
   this->Shutdown();
   this->writeQueue.clear();
 
@@ -283,6 +283,7 @@ void Connection::Close()
   {
     try
     {
+      gzdbg << "Close Acceptor[" << this->id << "]\n";
       this->acceptor->close();
     }
     catch (boost::system::system_error &e)

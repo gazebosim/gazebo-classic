@@ -48,7 +48,9 @@ TEST(Shapes, Regression)
 
   delete server;
 
-  usleep(1000000);
+  printf("Sleeping\n");
+  usleep(5000000);
+  printf("DONE Sleeping\n");
 }
 
 TEST(PR2, Regression)

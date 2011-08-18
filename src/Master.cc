@@ -44,7 +44,11 @@ Master::~Master()
   }
 
   this->connections.clear();
+
+  gzdbg << "Master::Delete DelConnection[" << this->connection->id << "] Count[" << this->connection.use_count() << "]\n";
   this->connection->Shutdown();
+  gzdbg << "Master::Delete PostShutdown[" << this->connection->id << "] Count[" << this->connection.use_count() << "]\n";
+
   this->connection.reset();
 }
 
@@ -52,7 +56,9 @@ void Master::Init(unsigned short port)
 {
   try
   {
+    gzdbg << "Master Count[" << this->connection.use_count() << "]\n";
     this->connection->Listen(port, boost::bind(&Master::OnAccept, this, _1));
+    gzdbg << "Master Count[" << this->connection.use_count() << "]\n";
   }
   catch (std::exception &e)
   {
