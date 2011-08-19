@@ -83,7 +83,8 @@ void RTShaderSystem::Fini()
     return;
 
   // Restore default scheme.
-  Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+  Ogre::MaterialManager::getSingleton().setActiveScheme(
+      Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
   // Finalize RTShader system.
   if (this->shaderGenerator != NULL)
@@ -91,6 +92,8 @@ void RTShaderSystem::Fini()
     Ogre::RTShader::ShaderGenerator::finalize();
     this->shaderGenerator = NULL;
   }
+
+  this->initialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

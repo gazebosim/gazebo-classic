@@ -76,7 +76,6 @@ RenderEngine::RenderEngine()
 /// Destructor
 RenderEngine::~RenderEngine()
 {
-  this->connections.clear();
   this->Fini();
 }
 
@@ -241,6 +240,11 @@ void RenderEngine::Init()
 /// Finalize
 void RenderEngine::Fini()
 {
+  if (!this->initialized)
+    return;
+
+  this->connections.clear();
+
   // TODO: this was causing a segfault on shutdown
   // Close all the windows first;
   /*WindowManager::Instance()->Fini();
@@ -257,8 +261,10 @@ void RenderEngine::Fini()
 
   this->scenes.clear();
 
+  RTShaderSystem::Instance()->Fini();
+
   // TODO: this was causing a segfault. Need to debug, and put back in
- if (this->root)
+  if (this->root)
   {
     /*const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
 
@@ -269,7 +275,7 @@ void RenderEngine::Fini()
     }
     */
     // TODO: this was causing a segfault on shutdown
-    //delete this->root;
+    delete this->root;
   }
   this->root = NULL;
 

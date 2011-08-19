@@ -51,7 +51,7 @@ unsigned int Scene::idCounter = 0;
 Scene::Scene(const std::string &_name)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_name);
+  this->node->Init("default");//_name);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -86,6 +86,7 @@ Scene::Scene(const std::string &_name)
 /// Destructor
 Scene::~Scene()
 {
+  printf("Scene::Destructor\n");
   Visual_M::iterator iter;
   this->visuals.clear();
 
@@ -111,6 +112,8 @@ Scene::~Scene()
     //RenderEngine::Instance()->root->destroySceneManager(this->manager);
     this->manager = NULL;
   }
+
+  printf("Scene Destructor DOne\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -839,6 +842,7 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
 {
+  printf("Got Scene Message\n");
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }

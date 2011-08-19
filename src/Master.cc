@@ -45,9 +45,7 @@ Master::~Master()
 
   this->connections.clear();
 
-  gzdbg << "Master::Delete DelConnection[" << this->connection->id << "] Count[" << this->connection.use_count() << "]\n";
   this->connection->Shutdown();
-  gzdbg << "Master::Delete PostShutdown[" << this->connection->id << "] Count[" << this->connection.use_count() << "]\n";
 
   this->connection.reset();
 }
@@ -56,9 +54,7 @@ void Master::Init(unsigned short port)
 {
   try
   {
-    gzdbg << "Master Count[" << this->connection.use_count() << "]\n";
     this->connection->Listen(port, boost::bind(&Master::OnAccept, this, _1));
-    gzdbg << "Master Count[" << this->connection.use_count() << "]\n";
   }
   catch (std::exception &e)
   {
@@ -74,7 +70,8 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   new_connection->EnqueueMsg( msgs::Package("init", msg), true );
 
   this->connections.push_back(new_connection);
-  new_connection->StartRead( boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
+  //new_connection->StartRead( boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
+  new_connection->AsyncRead( boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
 }
 
 void Master::OnRead(const unsigned int connectionIndex, 
@@ -164,6 +161,7 @@ void Master::OnRead(const unsigned int connectionIndex,
   }
   else if (packet.type() == "subscribe")
   {
+    //gzdbg << "Subscribe!\n";
     msgs::Subscribe sub;
     sub.ParseFromString( packet.serialized_data() );
 
@@ -249,6 +247,8 @@ void Master::OnRead(const unsigned int connectionIndex,
   }
   else
     std::cerr << "Master Unknown message type\n";
+
+  conn->AsyncRead( boost::bind(&Master::OnRead, this, connectionIndex, _1));
 }
 
 void Master::Run()
@@ -264,10 +264,10 @@ void Master::RunLoop()
     for (iter = this->connections.begin(); 
          iter != this->connections.end(); iter++)
     {
-      if ((*iter)->IsOpen())
+      if ( (*iter)->IsOpen() )
         (*iter)->ProcessWriteQueue();
       else
-        std::cout << "Master connection has closed\n";
+        gzwarn << "Master connection has closed\n";
     }
     usleep(100000);
   }

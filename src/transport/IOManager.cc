@@ -21,28 +21,42 @@ using namespace gazebo;
 using namespace transport;
 
 IOManager::IOManager()
-  : work(this->io_service), count(0)
+  : count(0)
 {
+  this->io_service = new boost::asio::io_service;
+  this->work = new boost::asio::io_service::work(*this->io_service); 
   this->thread = new boost::thread( boost::bind(&boost::asio::io_service::run, 
-                                                &this->io_service) );
+                                                this->io_service) );
 }
 
 IOManager::~IOManager()
 {
   this->Stop();
+
+  if (this->work)
+    delete this->work;
+  this->work = NULL;
+
+  if (this->io_service)
+    delete this->io_service;
+  this->io_service = NULL;
 }
 
 void IOManager::Stop()
 {
-  this->io_service.stop();
-  this->thread->join();
-  delete this->thread;
-  this->thread = NULL;
+  this->io_service->reset();
+  this->io_service->stop();
+  if (this->thread)
+  {
+    this->thread->join();
+    delete this->thread;
+    this->thread = NULL;
+  }
 }
 
 boost::asio::io_service &IOManager::GetIO()
 {
-  return this->io_service;
+  return *this->io_service;
 }
 
 void IOManager::IncCount()

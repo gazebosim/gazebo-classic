@@ -313,8 +313,6 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 //
 void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 {
-  //this->poseMutex->lock();
-
   if (this->HasType(MODEL))
   {
     this->GetWorld()->modelWorldPoseUpdateMutex->lock();
@@ -350,7 +348,6 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
         if (notify) 
           entity->UpdatePhysicsPose(false);
 
-  //      entity->sdf->GetOrCreateElement("origin")->GetAttribute("pose")->Set(entity->GetRelativePose());
         entity->PublishPose();
         //printf("SWP Model Body [%s]\t",(*iter)->GetName().c_str());
       }
@@ -379,8 +376,6 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
 
       this->parentEntity->worldPose.Correct();
 
-      //this->parentEntity->sdf->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->parentEntity->GetRelativePose());
-
       if (notify) 
         this->parentEntity->UpdatePhysicsPose(false);
       this->parentEntity->PublishPose();
@@ -404,11 +399,7 @@ void Entity::SetWorldPose(const math::Pose &pose, bool notify)
     this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
   }
 
-  //this->sdf->GetOrCreateElement("origin")->GetAttribute("pose")->Set(this->GetRelativePose());
-
   this->PublishPose();
-
-//  this->poseMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

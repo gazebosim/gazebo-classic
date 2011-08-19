@@ -86,6 +86,8 @@ void list()
   msgs::Request request;
   msgs::Publishers pubs;
 
+  transport::init();
+
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
   request.set_request("get_publishers");
@@ -159,7 +161,7 @@ void echo()
   transport::init();
 
   transport::NodePtr node(new transport::Node());
-  node->Init("");
+  node->Init("default");
 
   std::string topic = params[1];
   topic +=  "/__dbg";

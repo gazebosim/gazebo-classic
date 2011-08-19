@@ -26,17 +26,22 @@ using namespace gazebo;
 using namespace transport;
 
 unsigned int Connection::idCounter = 0;
+IOManager *Connection::iomanager = NULL;//new IOManager();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Connection::Connection()
-  : socket( IOManager::Instance()->GetIO() )
+  //: socket( iomanager->GetIO() )
 {
-  IOManager::Instance()->IncCount();
-  this->id = idCounter++;
-  this->debug = false;
+  if (iomanager == NULL)
+    iomanager = new IOManager();
 
-  gzdbg << "Creating Connection[" << this->id << "]\n";
+  this->socket = new boost::asio::ip::tcp::socket(iomanager->GetIO());
+
+  iomanager->IncCount();
+  this->id = idCounter++;
+
+  this->debug = false;
 
   this->writeMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
@@ -51,12 +56,20 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
-  gzwarn << "Deleting Connection[" << this->id << "]\n";
   this->Shutdown();
   this->writeQueue.clear();
 
   delete this->writeMutex;
-  IOManager::Instance()->DecCount();
+
+  if (iomanager)
+  {
+    iomanager->DecCount();
+    if (iomanager->GetCount() == 0)
+    {
+      delete iomanager;
+      iomanager = NULL;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +79,7 @@ void Connection::Connect(const std::string &host, unsigned short port)
   std::string service = boost::lexical_cast<std::string>(port);
 
   // Resolve the host name into an IP address
-  boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
+  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(host, service);
   boost::asio::ip::tcp::resolver::iterator endpoint_iter = resolver.resolve(query);
   boost::asio::ip::tcp::resolver::iterator end;
@@ -75,8 +88,8 @@ void Connection::Connect(const std::string &host, unsigned short port)
 
   while (error && endpoint_iter != end)
   {
-    this->socket.close();
-    this->socket.connect(*endpoint_iter++, error);
+    this->socket->close();
+    this->socket->connect(*endpoint_iter++, error);
   }
 
   if (error)
@@ -89,7 +102,7 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
 {
   this->acceptCB = accept_cb;
 
-  this->acceptor = new boost::asio::ip::tcp::acceptor(IOManager::Instance()->GetIO());
+  this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
   this->acceptor->open(endpoint.protocol());
   this->acceptor->set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
@@ -98,8 +111,8 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
 
   this->acceptConn = ConnectionPtr(new Connection());
 
-  this->acceptor->async_accept(this->acceptConn->socket,
-      boost::bind(&Connection::OnAccept, shared_from_this(), 
+  this->acceptor->async_accept(*this->acceptConn->socket,
+      boost::bind(&Connection::OnAccept, this, 
                   boost::asio::placeholders::error));
 }
 
@@ -115,8 +128,8 @@ void Connection::OnAccept(const boost::system::error_code &e)
 
     this->acceptConn = ConnectionPtr(new Connection());
 
-    this->acceptor->async_accept(this->acceptConn->socket, 
-        boost::bind(&Connection::OnAccept, shared_from_this(), 
+    this->acceptor->async_accept(*this->acceptConn->socket, 
+        boost::bind(&Connection::OnAccept, this, 
           boost::asio::placeholders::error));
   }
   else
@@ -133,23 +146,20 @@ void Connection::OnAccept(const boost::system::error_code &e)
 /// new message to the ReadCallback
 void Connection::StartRead(const ReadCallback &cb)
 {
-  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, shared_from_this(), cb ) ); 
+  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, this, cb ) ); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Stop the read loop 
 void Connection::StopRead()
 {
-  gzdbg << "Connection Stop Read[" << this->id << "]\n";
   this->readQuit = true;
   if (this->readThread)
   {
-    gzdbg << "Deleting the thread\n";
-    this->readThread->interrupt();
+    this->readThread->join();
     delete this->readThread;
   }
   this->readThread = NULL;
-  gzdbg << "Connection DONE Stop Read[" << this->id << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,8 +209,8 @@ void Connection::ProcessWriteQueue()
     // Write the serialized data to the socket. We use
     // "gather-write" to send both the head and the data in
     // a single write operation
-    boost::asio::async_write( this->socket, buffer->data(), 
-        boost::bind(&Connection::OnWrite, shared_from_this(), 
+    boost::asio::async_write( *this->socket, buffer->data(), 
+        boost::bind(&Connection::OnWrite, this, 
           boost::asio::placeholders::error, buffer));
 
   }
@@ -243,13 +253,13 @@ void Connection::Shutdown()
   this->shutdownSignal();
   this->StopRead();
 
-  if (this->socket.is_open())
+  if (this->socket->is_open())
   {
     boost::system::error_code ec;
-    this->socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   }
 
-  //this->Cancel();
+  this->Cancel();
   this->Close();
   //this->acceptor = NULL;
   //this->readThread = NULL;
@@ -259,7 +269,9 @@ void Connection::Shutdown()
 /// Return true if the connection is open
 bool Connection::IsOpen() const
 {
-  return this->socket.is_open();
+  if (this->socket)
+    return this->socket->is_open();
+  return false;
 }
 
 
@@ -267,11 +279,11 @@ bool Connection::IsOpen() const
 // Close a connection
 void Connection::Close()
 {
-  if (this->socket.is_open())
+  if (this->socket->is_open())
   {
     try
     {
-      this->socket.close();
+      this->socket->close();
     }
     catch (boost::system::system_error &e)
     {
@@ -283,7 +295,6 @@ void Connection::Close()
   {
     try
     {
-      gzdbg << "Close Acceptor[" << this->id << "]\n";
       this->acceptor->close();
     }
     catch (boost::system::system_error &e)
@@ -291,6 +302,8 @@ void Connection::Close()
       gzwarn <<"Error closing acceptor[" << this->id << "]\n";// msg[" << e.what() << "]\n";
     }
 
+    delete this->acceptor;
+    this->acceptor = NULL;
   }
 }
 
@@ -313,8 +326,8 @@ void Connection::Cancel()
     this->acceptor = NULL;
   }
 
-  if (this->socket.is_open())
-    this->socket.cancel();
+  if (this->socket->is_open())
+    this->socket->cancel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -329,7 +342,7 @@ bool Connection::Read(std::string &data)
   boost::system::error_code error;
 
   // First read the header
-  this->socket.read_some( boost::asio::buffer(header), error );
+  this->socket->read_some( boost::asio::buffer(header), error );
   if (error)
   {
     gzerr << "Connection[" << this->id << "] Closed during Read\n";
@@ -346,7 +359,7 @@ bool Connection::Read(std::string &data)
     do
     {
       // Read in the actual data
-      len += this->socket.read_some(boost::asio::buffer(&incoming[len], incoming_size - len), error);
+      len += this->socket->read_some(boost::asio::buffer(&incoming[len], incoming_size - len), error);
     } while ( len < incoming_size && !error && !this->readQuit);
 
     if (len != incoming_size)
@@ -373,8 +386,8 @@ std::string Connection::GetLocalAddress() const
 /// Get the port of this connection
 unsigned short Connection::GetLocalPort() const
 {
-  if (this->socket.is_open())
-    return this->socket.local_endpoint().port();
+  if (this->socket->is_open())
+    return this->socket->local_endpoint().port();
   else if (this->acceptor)
     return this->acceptor->local_endpoint().port();
   else
@@ -387,8 +400,8 @@ unsigned short Connection::GetLocalPort() const
 /// Get the remote address
 std::string Connection::GetRemoteAddress() const
 {
-  if (this->socket.is_open())
-    return this->socket.remote_endpoint().address().to_string();
+  if (this->socket->is_open())
+    return this->socket->remote_endpoint().address().to_string();
   else
     return "";
 }
@@ -397,8 +410,8 @@ std::string Connection::GetRemoteAddress() const
 /// Get the remote port number
 unsigned short Connection::GetRemotePort() const
 {
-  if (this->socket.is_open())
-    return this->socket.remote_endpoint().port();
+  if (this->socket->is_open())
+    return this->socket->remote_endpoint().port();
   else
     return 0;
 }
@@ -440,19 +453,19 @@ void Connection::ReadLoop(const ReadCallback &cb)
   {
     try
     {
-      boost::this_thread::interruption_point();
-      if (this->socket.available() >= HEADER_LENGTH)
+      //if (this->socket->available() >= HEADER_LENGTH)
       {
         if (this->Read(data))
         {
           (cb)(data);
         }
       }
-      else
+      /*else
       {
         usleep(10000);
         continue;
       }
+      */
     }
     catch (std::exception &e)
     {
@@ -460,15 +473,13 @@ void Connection::ReadLoop(const ReadCallback &cb)
       break;
     }
   }
-
-  gzdbg << "Ending ReadLoop[" << this->id << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the local endpoint
 boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 {
-  boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
+  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(boost::asio::ip::host_name(), "");
   boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
   boost::asio::ip::tcp::resolver::iterator end; // End marker.
@@ -483,12 +494,12 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 {
   //if (this->socket.is_open())
-    return this->socket.remote_endpoint();
+    return this->socket->remote_endpoint();
 }
 
 std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep) const
 {
-  boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
+  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(ep);
   boost::asio::ip::tcp::resolver::iterator end;
 

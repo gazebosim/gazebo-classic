@@ -15,7 +15,6 @@
  *
 */
 #include "msgs/msgs.h"
-#include "transport/IOManager.hh"
 #include "transport/TopicManager.hh"
 #include "transport/ConnectionManager.hh"
 
@@ -75,7 +74,8 @@ void ConnectionManager::Init(const std::string &master_host,
   else
     gzerr << "Didn't receive an init from the master\n";
 
-  this->masterConn->StartRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
+  this->masterConn->AsyncRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
+  //this->masterConn->StartRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 
   this->initialized = true;
   this->stop = false;
@@ -95,9 +95,8 @@ void ConnectionManager::Fini()
 
   this->Stop();
 
-  gzdbg << "Delete Master Conn[" << this->masterConn->id << "] Use[" << this->masterConn.use_count() << "]\n";
   this->masterConn.reset();
-  gzdbg << "Done Master conn delete\n";
+  this->masterConn2.reset();
 
   this->serverConn.reset();
   this->connections.clear();
@@ -108,7 +107,6 @@ void ConnectionManager::Fini()
 // Stop the conneciton manager
 void ConnectionManager::Stop()
 {
-  gzdbg << "ConnectionManager::Stop\n";
   this->stop = true;
   if (this->thread)
   {
@@ -149,8 +147,6 @@ void ConnectionManager::Run()
     }
     usleep(100000);
   }
-
-  gzdbg << "ConnectionManager::Run complete\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,6 +198,8 @@ void ConnectionManager::OnMasterRead( const std::string &data)
   }
   else
     gzerr << "ConnectionManager::OnMasterRead unknown type[" << packet.type() << "]\n";
+
+  this->masterConn->AsyncRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -297,12 +295,10 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
   msgs::Publishers pubs;
   request.set_request("get_publishers");
 
-  //this->masterConn->Shutdown();
-
   // Get the list of publishers
-  this->masterConn->EnqueueMsg( msgs::Package("request", request) );
+  this->masterConn2->EnqueueMsg( msgs::Package("request", request) );
 
-  this->masterConn->Read(data);
+  this->masterConn2->Read(data);
 
   packet.ParseFromString( data );
 
@@ -312,19 +308,19 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
     const msgs::Publish &p = pubs.publisher(i);
     publishers.push_back(p);
   }
-
-  this->masterConn->StartRead( 
-      boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 }
 
 void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespaces)
 {
-  ConnectionPtr tmpConn(new Connection());
-  tmpConn->Connect(this->masterConn->GetRemoteAddress(),
-                   this->masterConn->GetRemotePort() );
+  if (!this->masterConn2)
+  {
+    this->masterConn2.reset(new Connection());
+    this->masterConn2->Connect(this->masterConn->GetRemoteAddress(),
+                               this->masterConn->GetRemotePort() );
 
-  std::string initData;
-  tmpConn->Read(initData);
+    std::string initData;
+    this->masterConn2->Read(initData);
+  }
 
   std::string data;
   msgs::Request request;
@@ -334,9 +330,9 @@ void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespace
   request.set_request("get_topic_namespaces");
 
   // Get the list of publishers
-  tmpConn->EnqueueMsg( msgs::Package("request", request), true );
+  this->masterConn2->EnqueueMsg( msgs::Package("request", request), true );
 
-  tmpConn->Read(data);
+  this->masterConn2->Read(data);
   packet.ParseFromString( data );
   result.ParseFromString( packet.serialized_data() );
 

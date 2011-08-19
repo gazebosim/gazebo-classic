@@ -119,7 +119,7 @@ namespace gazebo
                 void (Connection::*f)(const boost::system::error_code &,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
-                boost::asio::async_read(this->socket,
+                boost::asio::async_read(*this->socket,
                     boost::asio::buffer(this->inbound_header),
                     boost::bind(f, this, boost::asio::placeholders::error,
                                 boost::make_tuple(handler)) );
@@ -135,8 +135,10 @@ namespace gazebo
                 if (e_)
                 {
                   if (e_.message() != "End of File")
-                    gzerr << "An error occrured reading a header[" 
-                      << e_.message() << "]\n";
+                  {
+                    // This will occur when the other side closes the
+                    // connection
+                  }
                 }
                 else
                 {
@@ -150,16 +152,23 @@ namespace gazebo
                     gzerr << "Error[" << e << "]\n";
                   }
 
-                  // Start the asynchronous call to receive data
-                  this->inbound_data.resize(inbound_data_size);
+                  if (inbound_data_size > 0)
+                  {
+                    // Start the asynchronous call to receive data
+                    this->inbound_data.resize(inbound_data_size);
 
-                  void (Connection::*f)(const boost::system::error_code &e,
-                     boost::tuple<Handler>) = &Connection::OnReadData<Handler>;
+                    void (Connection::*f)(const boost::system::error_code &e,
+                        boost::tuple<Handler>) = &Connection::OnReadData<Handler>;
 
-                  boost::asio::async_read( this->socket, 
-                      boost::asio::buffer(this->inbound_data), 
-                      boost::bind(f, this, boost::asio::placeholders::error, 
-                                  handler_) );
+                    boost::asio::async_read( *this->socket, 
+                        boost::asio::buffer(this->inbound_data), 
+                        boost::bind(f, this, boost::asio::placeholders::error, 
+                          handler_) );
+                  }
+                  else
+                  {
+                   boost::get<0>(handler_)("");
+                  }
                 }
               }
 
@@ -167,11 +176,7 @@ namespace gazebo
               void OnReadData(const boost::system::error_code &e,
                               boost::tuple<Handler> handler)
                {
-                 if (e)
-                 {
-                   gzerr << "Error:" << e.message() << std::endl;
-                 }
-                 else
+                 if (!e)
                  {
                    // Inform caller that data has been received
                    std::string data(&this->inbound_data[0], 
@@ -211,7 +216,7 @@ namespace gazebo
 
      private: std::string GetHostname(boost::asio::ip::tcp::endpoint ep) const;
 
-      private: boost::asio::ip::tcp::socket socket;
+      private: boost::asio::ip::tcp::socket *socket;
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
       private: std::deque<std::string> writeQueue;
@@ -232,6 +237,7 @@ namespace gazebo
       private: ConnectionPtr acceptConn;
 
       private: event::EventT<void()> shutdownSignal;
+      private: static IOManager *iomanager;
 
       public: bool debug;
     };

@@ -47,10 +47,6 @@ TEST(Shapes, Regression)
   ASSERT_NO_THROW(server->Fini());
 
   delete server;
-
-  printf("Sleeping\n");
-  usleep(5000000);
-  printf("DONE Sleeping\n");
 }
 
 TEST(PR2, Regression)
@@ -69,10 +65,7 @@ TEST(PR2, Regression)
 
   g_percent = -1;
   while (g_percent < 0)
-  {
-    printf("Waiting\n");
     usleep(100000);
-  }
 
   EXPECT_GT(g_percent, 2.0);
 

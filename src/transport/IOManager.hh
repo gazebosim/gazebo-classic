@@ -29,7 +29,7 @@ namespace gazebo
     /// \{
 
     /// \brief Managers boost::asio IO
-    class IOManager : public SingletonT<IOManager>
+    class IOManager //: public SingletonT<IOManager>
     {
       public: boost::asio::io_service &GetIO();
 
@@ -39,19 +39,19 @@ namespace gazebo
 
       public: void Stop();
 
-      private: IOManager();
-      private: ~IOManager();
+      public: IOManager();
+      public: ~IOManager();
 
-      private: boost::asio::io_service io_service;
+      private: boost::asio::io_service *io_service;
 
       // Use io_service::work to keep the io_service running in thread
-      private: boost::asio::io_service::work work;
+      private: boost::asio::io_service::work *work;
       private: unsigned int count;
 
       private: boost::thread *thread;
 
       //Singleton implementation
-      private: friend class SingletonT<IOManager>;
+//      private: friend class SingletonT<IOManager>;
     };
     /// \}
   }
