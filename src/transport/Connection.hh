@@ -86,7 +86,7 @@ namespace gazebo
       public: bool Read(std::string &data);
 
       /// \brief Write data to the socket
-      public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
+      public: void EnqueueMsg(const std::string &_buffer, bool _force = false, bool _debug = false);
 
       /// \brief Get the local URI
       public: std::string GetLocalURI() const;
@@ -143,14 +143,7 @@ namespace gazebo
                 else
                 {
                   std::size_t inbound_data_size = 0;
-                  try
-                  {
-                    inbound_data_size = this->ParseHeader(this->inbound_header);
-                  }
-                  catch (gazebo::common::Exception &e)
-                  {
-                    gzerr << "Error[" << e << "]\n";
-                  }
+                  inbound_data_size = this->ParseHeader(this->inbound_header);
 
                   if (inbound_data_size > 0)
                   {
@@ -239,7 +232,7 @@ namespace gazebo
       private: event::EventT<void()> shutdownSignal;
       private: static IOManager *iomanager;
 
-      public: bool debug;
+      public: unsigned int writeCount;
     };
     /// \}
   }

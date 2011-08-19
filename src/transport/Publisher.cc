@@ -49,6 +49,8 @@ Publisher::~Publisher()
     gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
   }
 
+  gzdbg << "Publisher::Destructor[" << this->topic << "]\n";
+
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 

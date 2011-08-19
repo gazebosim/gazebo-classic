@@ -19,7 +19,6 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
-#include "common/SingletonT.hh"
 
 namespace gazebo
 {
@@ -29,8 +28,11 @@ namespace gazebo
     /// \{
 
     /// \brief Managers boost::asio IO
-    class IOManager //: public SingletonT<IOManager>
+    class IOManager
     {
+      public: IOManager();
+      public: ~IOManager();
+
       public: boost::asio::io_service &GetIO();
 
       public: void IncCount();
@@ -39,9 +41,6 @@ namespace gazebo
 
       public: void Stop();
 
-      public: IOManager();
-      public: ~IOManager();
-
       private: boost::asio::io_service *io_service;
 
       // Use io_service::work to keep the io_service running in thread
@@ -49,9 +48,6 @@ namespace gazebo
       private: unsigned int count;
 
       private: boost::thread *thread;
-
-      //Singleton implementation
-//      private: friend class SingletonT<IOManager>;
     };
     /// \}
   }

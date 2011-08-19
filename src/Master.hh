@@ -44,6 +44,8 @@ namespace gazebo
     private: transport::ConnectionPtr connection;
     private: boost::thread *runThread;
     private: bool stop;
+
+    private: boost::recursive_mutex *connectionMutex;
   };
 }
 

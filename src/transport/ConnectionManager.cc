@@ -27,14 +27,21 @@ using namespace transport;
 // Constructor
 ConnectionManager::ConnectionManager()
 {
+  this->tmpIndex = 0;
   this->initialized = false;
+  this->stop = false;
   this->thread = NULL;
+
+  this->masterConn2Mutex = new boost::recursive_mutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 ConnectionManager::~ConnectionManager()
 {
+  delete this->masterConn2Mutex;
+  this->masterConn2Mutex = NULL;
+
   this->Fini();
 }
 
@@ -44,6 +51,7 @@ void ConnectionManager::Init(const std::string &master_host,
                              unsigned short master_port)
 {
   this->masterConn.reset( new Connection() );
+  this->masterConn2.reset( new Connection() );
   this->serverConn.reset( new Connection() );
 
   // Create a new TCP server on a free port
@@ -74,8 +82,12 @@ void ConnectionManager::Init(const std::string &master_host,
   else
     gzerr << "Didn't receive an init from the master\n";
 
-  this->masterConn->AsyncRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
-  //this->masterConn->StartRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
+  this->masterConn2->Connect(this->masterConn->GetRemoteAddress(),
+                             this->masterConn->GetRemotePort() );
+  this->masterConn2->Read(initData);
+
+  this->masterConn->AsyncRead( 
+      boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 
   this->initialized = true;
   this->stop = false;
@@ -85,21 +97,23 @@ void ConnectionManager::Init(const std::string &master_host,
 // Finalize
 void ConnectionManager::Fini()
 {
-  this->initialized = false;
-  if (this->thread)
-  {
-    this->thread->interrupt();
-    delete this->thread;
-  }
-  this->thread = NULL;
+  if (!this->initialized)
+    return;
 
-  this->Stop();
-
+  this->masterConn->ProcessWriteQueue();
   this->masterConn.reset();
+
+  this->masterConn2->ProcessWriteQueue();
   this->masterConn2.reset();
 
+  this->serverConn->ProcessWriteQueue();
   this->serverConn.reset();
+
   this->connections.clear();
+  this->initialized = false;
+
+  this->Stop();
+  this->initialized = false;
 }
 
 
@@ -153,53 +167,59 @@ void ConnectionManager::Run()
 // On read master
 void ConnectionManager::OnMasterRead( const std::string &data)
 {
-  msgs::Packet packet;
-  packet.ParseFromString(data);
-
-  // Publisher_update. This occurs when we try to subscribe to a topic, and
-  // the master informs us of a remote host that is publishing on our
-  // requested topic
-  if (packet.type() == "publisher_update")
+  if (!data.empty())
   {
-    msgs::Publish pub;
-    pub.ParseFromString( packet.serialized_data() );
+    msgs::Packet packet;
+    packet.ParseFromString(data);
 
-    if (pub.host() != this->serverConn->GetLocalAddress() ||
-        pub.port() != this->serverConn->GetLocalPort())
+    // Publisher_update. This occurs when we try to subscribe to a topic, and
+    // the master informs us of a remote host that is publishing on our
+    // requested topic
+    if (packet.type() == "publisher_update")
     {
-      // Connect to the remote publisher
-      ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
+      msgs::Publish pub;
+      pub.ParseFromString( packet.serialized_data() );
 
-      // Create a transport link that will read from the connection, and 
-      // send data to a Publication.
-      PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
-            pub.msg_type()));
-      publink->Init( conn );
+      if (pub.host() != this->serverConn->GetLocalAddress() ||
+          pub.port() != this->serverConn->GetLocalPort())
+      {
+        // Connect to the remote publisher
+        ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 
-      // Connect local subscribers to the publication transport link
-      TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
+        // Create a transport link that will read from the connection, and 
+        // send data to a Publication.
+        PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
+              pub.msg_type()));
+        publink->Init( conn );
+
+        // Connect local subscribers to the publication transport link
+        TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
+      }
     }
-  }
-  else if (packet.type() == "unsubscribe")
-  {
-    msgs::Subscribe sub;
-    sub.ParseFromString( packet.serialized_data() );
+    else if (packet.type() == "unsubscribe")
+    {
+      msgs::Subscribe sub;
+      sub.ParseFromString( packet.serialized_data() );
 
-    // Disconnect a local publisher from a remote subscriber
-    TopicManager::Instance()->DisconnectPubFromSub(sub.topic(), sub.host(), sub.port());
-  }
-  else if (packet.type() == "unadvertise")
-  {
-    msgs::Publish pub;
-    pub.ParseFromString( packet.serialized_data() );
+      // Disconnect a local publisher from a remote subscriber
+      TopicManager::Instance()->DisconnectPubFromSub(sub.topic(), sub.host(), sub.port());
+    }
+    else if (packet.type() == "unadvertise")
+    {
+      msgs::Publish pub;
+      pub.ParseFromString( packet.serialized_data() );
 
-    // Disconnection all local subscribers from a remote publisher
-    TopicManager::Instance()->DisconnectSubFromPub(pub.topic(), pub.host(), pub.port());
-  }
-  else
-    gzerr << "ConnectionManager::OnMasterRead unknown type[" << packet.type() << "]\n";
+      // Disconnection all local subscribers from a remote publisher
+      TopicManager::Instance()->DisconnectSubFromPub(pub.topic(), 
+                                                     pub.host(), pub.port());
+    }
+    else
+      gzerr << "ConnectionManager::OnMasterRead unknown type[" << packet.type() << "]\n";
 
-  this->masterConn->AsyncRead( boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
+  }
+
+  this->masterConn->AsyncRead( 
+      boost::bind(&ConnectionManager::OnMasterRead, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,10 +235,18 @@ void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
 
 ////////////////////////////////////////////////////////////////////////////////
 // On read header
-void ConnectionManager::OnRead(const ConnectionPtr &connection, const std::string &data )
+void ConnectionManager::OnRead(const ConnectionPtr &_connection, 
+                               const std::string &_data )
 {
+  if (_data.empty())
+  {
+    _connection->AsyncRead(
+        boost::bind(&ConnectionManager::OnRead, this, _connection, _1) );
+    return;
+  }
+
   msgs::Packet packet;
-  packet.ParseFromString(data);
+  packet.ParseFromString(_data);
 
   // If we have an incoming (remote) subscription
   if (packet.type() == "sub")
@@ -229,7 +257,7 @@ void ConnectionManager::OnRead(const ConnectionPtr &connection, const std::strin
     // Create a transport link for the publisher to the remote subscriber
     // via the connection
     SubscriptionTransportPtr subLink( new SubscriptionTransport() );
-    subLink->Init( connection );
+    subLink->Init( _connection );
 
     // Connect the publisher to this transport mechanism
     TopicManager::Instance()->ConnectPubToSub(sub.topic(), subLink);
@@ -281,7 +309,7 @@ void ConnectionManager::Unadvertise( const std::string &topic )
 
   if (this->masterConn)
   {
-    this->masterConn->EnqueueMsg(msgs::Package("unadvertise", msg));
+    this->masterConn->EnqueueMsg(msgs::Package("unadvertise", msg), true);
   }
 }
 
@@ -296,9 +324,10 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
   request.set_request("get_publishers");
 
   // Get the list of publishers
-  this->masterConn2->EnqueueMsg( msgs::Package("request", request) );
-
+  this->masterConn2Mutex->lock();
+  this->masterConn2->EnqueueMsg( msgs::Package("request", request), true );
   this->masterConn2->Read(data);
+  this->masterConn2Mutex->unlock();
 
   packet.ParseFromString( data );
 
@@ -312,27 +341,22 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
 
 void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespaces)
 {
-  if (!this->masterConn2)
-  {
-    this->masterConn2.reset(new Connection());
-    this->masterConn2->Connect(this->masterConn->GetRemoteAddress(),
-                               this->masterConn->GetRemotePort() );
-
-    std::string initData;
-    this->masterConn2->Read(initData);
-  }
-
   std::string data;
   msgs::Request request;
   msgs::Packet packet;
   msgs::String_V result;
 
+  request.set_index(this->tmpIndex++);
   request.set_request("get_topic_namespaces");
 
-  // Get the list of publishers
-  this->masterConn2->EnqueueMsg( msgs::Package("request", request), true );
+  this->masterConn2Mutex->lock();
+  this->masterConn2->EnqueueMsg( msgs::Package("request", request), true, true );
 
+  printf("Master2 Read[%d]\n", this->tmpIndex - 1);
   this->masterConn2->Read(data);
+  printf("   Master2 Got Read\n");
+  this->masterConn2Mutex->unlock();
+
   packet.ParseFromString( data );
   result.ParseFromString( packet.serialized_data() );
 
@@ -342,10 +366,23 @@ void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespace
   }
 }
 
-void ConnectionManager::Unsubscribe( const msgs::Subscribe &msg )
+void ConnectionManager::Unsubscribe( const msgs::Subscribe &_sub )
 {
   // Inform the master that we want to unsubscribe from a topic.
-  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg));
+  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", _sub), true);
+}
+
+void ConnectionManager::Unsubscribe( const std::string &_topic,
+                                     const std::string &_msgType )
+{
+  msgs::Subscribe msg;
+  msg.set_topic( _topic );
+  msg.set_msg_type( _msgType );
+  msg.set_host( this->serverConn->GetLocalAddress() );
+  msg.set_port( this->serverConn->GetLocalPort() );
+
+  // Inform the master that we want to unsubscribe from a topic.
+  this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
 }
 
 void ConnectionManager::Subscribe(const std::string &topic, 

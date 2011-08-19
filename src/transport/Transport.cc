@@ -74,15 +74,28 @@ void transport::run()
 
 void transport::stop()
 {
-  transport::ConnectionManager::Instance()->Stop();
+  /*transport::ConnectionManager::Instance()->Stop();
 
-  runThread->join();
-  delete runThread;
-  runThread = NULL;
+  if (runThread)
+  {
+    runThread->join();
+    delete runThread;
+    runThread = NULL;
+  }
+  */
 }
 
 void transport::fini()
 {
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
+transport::ConnectionManager::Instance()->Stop();
+
+  if (runThread)
+  {
+    runThread->join();
+    delete runThread;
+    runThread = NULL;
+  }
+
 }

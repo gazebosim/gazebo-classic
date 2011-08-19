@@ -57,7 +57,10 @@ namespace gazebo
       public: void Subscribe( const std::string &topic, 
                               const std::string &msgType);
 
-      public: void Unsubscribe( const msgs::Subscribe &msg );
+      public: void Unsubscribe( const msgs::Subscribe &_sub );
+
+      public: void Unsubscribe( const std::string &_topic,
+                                const std::string &_msgType );
 
       public: void Advertise( const std::string &topic, 
                               const std::string &msgType);
@@ -99,6 +102,9 @@ namespace gazebo
       private: bool initialized;
       private: bool stop;
       private: boost::thread *thread;
+
+      private: unsigned int tmpIndex;
+      private: boost::recursive_mutex *masterConn2Mutex;
 
       //Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

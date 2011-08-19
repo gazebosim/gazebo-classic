@@ -26,12 +26,11 @@ using namespace gazebo;
 using namespace transport;
 
 unsigned int Connection::idCounter = 0;
-IOManager *Connection::iomanager = NULL;//new IOManager();
+IOManager *Connection::iomanager = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Connection::Connection()
-  //: socket( iomanager->GetIO() )
 {
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -41,13 +40,12 @@ Connection::Connection()
   iomanager->IncCount();
   this->id = idCounter++;
 
-  this->debug = false;
-
   this->writeMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readThread = NULL;
   this->readQuit = false;
   this->writeQueue.clear();
+  this->writeCount = 0;
   //boost::asio::socket_base::send_buffer_size(8192*1);
   //boost::asio::socket_base::receive_buffer_size(8192*1);
 }
@@ -60,12 +58,14 @@ Connection::~Connection()
   this->writeQueue.clear();
 
   delete this->writeMutex;
+  this->writeMutex = NULL;
 
   if (iomanager)
   {
     iomanager->DecCount();
     if (iomanager->GetCount() == 0)
     {
+      this->idCounter = 0;
       delete iomanager;
       iomanager = NULL;
     }
@@ -164,10 +164,8 @@ void Connection::StopRead()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Write data out
-void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
+void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug)
 {
-  this->writeMutex->lock();
-
   std::ostringstream header_stream;
 
   header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
@@ -178,17 +176,33 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     //Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
     gzerr << "Connection::Write error[" << error.message() << "]\n";
-    this->writeMutex->unlock();
     return;
   }
 
-  this->writeQueue.push_back(header_stream.str());
-  this->writeQueue.push_back(_buffer);
-
   if (_force)
-    this->ProcessWriteQueue();
+  {
+    boost::asio::streambuf *buffer = new boost::asio::streambuf;
+    std::ostream os(buffer);
+    os << header_stream.str() << _buffer;
 
-  this->writeMutex->unlock();
+    std::size_t written = 0;
+
+    written = boost::asio::write(*this->socket, buffer->data());
+
+    if (written != buffer->size())
+      gzerr << "Didn't write all the data\n";
+
+    delete buffer;
+  }
+  else
+  {
+    this->writeMutex->lock();
+    this->writeQueue.push_back(header_stream.str());
+    this->writeQueue.push_back(_buffer);
+    this->writeMutex->unlock();
+  }
+
+
 }
 
 void Connection::ProcessWriteQueue()
@@ -205,6 +219,8 @@ void Connection::ProcessWriteQueue()
       os << this->writeQueue[i];
     }
     this->writeQueue.clear();
+
+    this->writeCount++;
 
     // Write the serialized data to the socket. We use
     // "gather-write" to send both the head and the data in
@@ -239,6 +255,10 @@ void Connection::OnWrite(const boost::system::error_code &e,
 {
   delete _buffer;
 
+  this->writeMutex->lock();
+  this->writeCount--;
+  this->writeMutex->unlock();
+
   if (e)
   {
     // It will reach this point if the remote connection disconnects.
@@ -250,6 +270,11 @@ void Connection::OnWrite(const boost::system::error_code &e,
 // Shutdown the socket
 void Connection::Shutdown()
 {
+  this->ProcessWriteQueue();
+
+  while (this->writeCount > 0)
+    usleep(10000);
+
   this->shutdownSignal();
   this->StopRead();
 
@@ -428,11 +453,8 @@ std::size_t Connection::ParseHeader( const std::string &header )
   if (!(is >> std::hex >> data_size))
   {
     // Header doesn't seem to be valid. Inform the caller
-    boost::system::error_code error(boost::asio::error::invalid_argument);
-    std::ostringstream stream;
-    gzerr << "Invalid header[" << error.message() << "] Data Size[" 
-           << data_size << "] on Connection[" << this->id << "]. Header[" << header << "]\n";
-    //gzthrow(stream.str());
+    //boost::system::error_code error(boost::asio::error::invalid_argument);
+    //gzerr << "Invalid header[" << error.message() << "] Data Size[" << data_size << "] on Connection[" << this->id << "]. Header[" << header << "]\n";
   }
 
   return data_size;
@@ -453,19 +475,18 @@ void Connection::ReadLoop(const ReadCallback &cb)
   {
     try
     {
-      //if (this->socket->available() >= HEADER_LENGTH)
+      if (this->socket->available() >= HEADER_LENGTH)
       {
         if (this->Read(data))
         {
           (cb)(data);
         }
       }
-      /*else
+      else
       {
         usleep(10000);
         continue;
       }
-      */
     }
     catch (std::exception &e)
     {

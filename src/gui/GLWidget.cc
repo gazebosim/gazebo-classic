@@ -64,7 +64,6 @@ GLWidget::GLWidget( QWidget *parent )
 
 GLWidget::~GLWidget()
 {
-  printf("GLWIDGET DESTRUCTOR\n");
   this->userCamera.reset();
 }
 

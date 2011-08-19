@@ -34,7 +34,7 @@ bool physics::load()
 
 bool physics::fini()
 {
-  // Empty for now
+  g_worlds.clear();
   return true;
 }
 

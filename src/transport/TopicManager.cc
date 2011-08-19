@@ -28,12 +28,15 @@ using namespace transport;
 // Constructor
 TopicManager::TopicManager()
 {
+  this->nodeMutex = new boost::recursive_mutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 TopicManager::~TopicManager()
 {
+  delete this->nodeMutex;
+  this->nodeMutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +50,24 @@ void TopicManager::Init()
 
 void TopicManager::Fini()
 {
+  std::vector<PublicationPtr>::iterator iter;
+  for (iter = this->advertisedTopics.begin(); 
+       iter != this->advertisedTopics.end(); iter++)
+  {
+    this->Unadvertise( (*iter)->GetTopic() );
+  }
+
+  SubMap::iterator iter2;
+  for (iter2 = this->subscribed_topics.begin(); 
+       iter2 != this->subscribed_topics.end(); iter2++)
+  {
+    std::list<CallbackHelperPtr>::iterator iter3;
+    while (iter2->second.size() > 0)
+    {
+      this->Unsubscribe( iter2->first, iter2->second.front() );
+    }
+  }
+
   this->advertisedTopics.clear();
   this->subscribed_topics.clear();
   this->nodes.clear();
@@ -54,12 +75,15 @@ void TopicManager::Fini()
 
 void TopicManager::AddNode( NodePtr _node )
 {
+  this->nodeMutex->lock();
   this->nodes.push_back(_node);
+  this->nodeMutex->unlock();
 }
 
 void TopicManager::RemoveNode( unsigned int _id )
 {
   std::vector<NodePtr>::iterator iter;
+  this->nodeMutex->lock();
   for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
   {
     if ( (*iter)->GetId() == _id)
@@ -68,6 +92,7 @@ void TopicManager::RemoveNode( unsigned int _id )
       break;
     }
   }
+  this->nodeMutex->unlock();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,10 +100,13 @@ void TopicManager::RemoveNode( unsigned int _id )
 void TopicManager::ProcessNodes()
 {
   std::vector<NodePtr>::iterator iter;
+
+  this->nodeMutex->lock();
   for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
   {
     (*iter)->ProcessPublishers();
   }
+  this->nodeMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,15 +196,17 @@ void TopicManager::HandleIncoming()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unsubscribe from a topic
-void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
+void TopicManager::Unsubscribe( const std::string &_topic, 
+                                const CallbackHelperPtr &_sub)
 {
-  PublicationPtr publication = this->FindPublication(topic);
+  PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
-    publication->RemoveSubscription(sub);
+    publication->RemoveSubscription(_sub);
+    ConnectionManager::Instance()->Unsubscribe(_topic, _sub->GetMsgType() );
   }
 
-  this->subscribed_topics[topic].remove( sub );
+  this->subscribed_topics[_topic].remove( _sub );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +231,8 @@ void TopicManager::DisconnectPubFromSub( const std::string &topic, const std::st
 void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::string &host, unsigned int port)
 {
   PublicationPtr publication = this->FindPublication(topic);
-  publication->RemoveTransport(host, port);
+  if (publication)
+    publication->RemoveTransport(host, port);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -72,6 +72,7 @@ void Server::Load(const std::string &filename)
 
     worldElem = sdf->root->GetNextElement("world", worldElem);
   }
+
 }
 
 void Server::Init()

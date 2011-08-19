@@ -75,7 +75,8 @@ namespace gazebo
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
-      public: void Unsubscribe(const std::string &topic, CallbackHelperPtr sub);
+      public: void Unsubscribe(const std::string &topic, 
+                               const CallbackHelperPtr &_sub);
 
       /// \brief Advertise on a topic
       /// \param topic The name of the topic
@@ -191,6 +192,8 @@ namespace gazebo
       private: std::vector<PublicationPtr> advertisedTopics;
       private: SubMap subscribed_topics; 
       private: std::vector<NodePtr> nodes;
+
+      private: boost::recursive_mutex *nodeMutex;
 
       //Singleton implementation
       private: friend class SingletonT<TopicManager>;
