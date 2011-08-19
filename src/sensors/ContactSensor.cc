@@ -25,25 +25,26 @@
 #include <sstream>
 
 #include "common/Global.hh"
-
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
-#include "Simulator.hh"
-#include "SensorFactory.hh"
-#include "Geom.hh"
-#include "ContactSensor.hh"
+#include "physics/World.hh"
+#include "physics/Model.hh"
+#include "physics/Link.hh"
+#include "physics/Geom.hh"
+
+#include "sensors/SensorFactory.hh"
+#include "sensors/ContactSensor.hh"
 
 #include "math/Vector3.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor);
+GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ContactSensor::ContactSensor(Body *body)
-    : Sensor(body)
+ContactSensor::ContactSensor()
+    : Sensor()
 {
   this->active = false;
   this->typeName = "contact";
@@ -54,6 +55,7 @@ ContactSensor::ContactSensor(Body *body)
 // Destructor
 ContactSensor::~ContactSensor()
 {
+/*
   std::vector< ParamT<std::string> *>::iterator iter;
   std::vector<Contact>::iterator citer;
 
@@ -62,14 +64,23 @@ ContactSensor::~ContactSensor()
   this->geomNamesP.clear();
 
   this->geoms.clear();
+*/
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+///
+void ContactSensor::Load()
+{
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Load the ray using parameter from an XMLConfig node
-void ContactSensor::LoadChild(XMLConfigNode *node)
+/// Load the contact using parameter from an XMLConfig node
+void ContactSensor::Load(sdf::ElementPtr &_sdf)
 {
+/*
   XMLConfigNode *geomNode = NULL;
-
   if (this->body == NULL)
     gzthrow("Null body in the contact sensor");
 
@@ -84,12 +95,14 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
     geomNode = geomNode->GetNext("geom");
   }
   Param::End();
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the contact
 void ContactSensor::InitChild()
 {
+/*
   std::vector< ParamT<std::string> *>::iterator iter;
 
   for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
@@ -99,27 +112,18 @@ void ContactSensor::InitChild()
     geom->SetContactsEnabled(true);
     this->geoms.push_back(geom);
   }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save the sensor info in XML format
-void ContactSensor::SaveChild(std::string &prefix, std::ostream &stream)
-{
-  std::vector< ParamT<std::string> *>::iterator iter;
-
-  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
-    stream << prefix << "  " << *(iter) << "\n";
+*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void ContactSensor::UpdateChild()
+void ContactSensor::Update(bool force)
 {
   //this->contacts.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Init the ray
+// shutdown the contact
 void ContactSensor::FiniChild()
 {
 }
@@ -135,28 +139,34 @@ unsigned int ContactSensor::GetGeomCount() const
 /// Return the number of contacts for an observed geom
 unsigned int ContactSensor::GetGeomContactCount(unsigned int geomIndex) const
 {
+/*
   if (geomIndex < this->geoms.size())
     return this->geoms[geomIndex]->GetContactCount();
+*/
 
   return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a contact for a geom by index
-Contact ContactSensor::GetGeomContact(unsigned int geom, unsigned int index) const
+physics::Contact ContactSensor::GetGeomContact(unsigned int geom, unsigned int index) const
 {
+/*
   if (geom < this->geoms.size())
     return this->geoms[geom]->GetContact( index );
+*/
 
-  return Contact();
+  return physics::Contact();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a contact for a geom by index
-Geom* ContactSensor::GetGeom(unsigned int geom) const
+physics::Geom* ContactSensor::GetGeom(unsigned int geom) const
 {
+/*
   if (geom < this->geoms.size())
     return this->geoms[geom];
+*/
 
   return NULL;
 }

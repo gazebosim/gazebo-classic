@@ -26,10 +26,9 @@
 
 #include <stdint.h>
 
-#include "common/Angle.hh"
-#include "Sensor.hh"
-#include "Body.hh"
-#include "Contact.hh"
+#include "math/Angle.hh"
+#include "sensors/Sensor.hh"
+#include "physics/Contact.hh"
 
 namespace gazebo
 {
@@ -46,24 +45,22 @@ namespace gazebo
       /// \brief Constructor
       /// \param body The underlying collision test uses an ODE geom, so
       ///             ray sensors must be attached to a body.
-      public: ContactSensor(Body *body);
+      public: ContactSensor();
     
       /// \brief Destructor
       public: virtual ~ContactSensor();
   
       /// Load the contact sensor using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      protected: virtual void LoadChild(XMLConfigNode *node);
+      protected: virtual void Load( sdf::ElementPtr &_sdf );
+      protected: virtual void Load( );
     
       /// Initialize the sensor
       protected: virtual void InitChild();
     
       ///  Update sensed values
-      protected: virtual void UpdateChild();
+      protected: virtual void Update(bool force);
   
-       /// \brief Save the sensor info in XML format
-      protected: virtual void SaveChild(std::string &prefix,std::ostream &stream);
-     
       /// Finalize the sensor
       protected: virtual void FiniChild();
   
@@ -71,18 +68,15 @@ namespace gazebo
       public: unsigned int GetGeomCount() const;
   
       /// \brief Get a geom
-      public: Geom *GetGeom(unsigned int index) const;
+      public: physics::Geom *GetGeom(unsigned int index) const;
   
       /// \brief Return the number of contacts for an observed geom
       public: unsigned int GetGeomContactCount(unsigned int geomIndex) const;
   
       /// \brief Get a contact for a geom by index
-      public: Contact GetGeomContact(unsigned int geom, unsigned int index) const;
+      public: physics::Contact GetGeomContact(unsigned int geom, unsigned int index) const;
   
-      /// Geom name parameter
-      private: std::vector< ParamT<std::string> *> geomNamesP;
-  
-      private: std::vector<Geom *> geoms;
+      private: std::vector<physics::Geom *> geoms;
     };
     /// \}
   }

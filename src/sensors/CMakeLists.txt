@@ -6,6 +6,7 @@ set (sources Sensors.cc
              SensorManager.cc
              CameraSensor.cc
              RaySensor.cc
+             ContactSensor.cc
 ) 
 
 set (headers Sensors.hh
@@ -15,6 +16,7 @@ set (headers Sensors.hh
              SensorManager.hh
              CameraSensor.hh
              RaySensor.hh
+             ContactSensor.hh
 )
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
