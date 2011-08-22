@@ -59,6 +59,9 @@ void ConnectionManager::Init(const std::string &master_host,
 
   this->masterConn->Connect(master_host, master_port);
 
+  gzdbg << "Server URI[" << this->serverConn->GetLocalURI() << "]\n";
+  gzdbg << "Master URI[" << this->masterConn->GetLocalURI() << "]\n";
+
   std::string initData;
   this->masterConn->Read(initData);
   msgs::Packet packet;
@@ -159,18 +162,18 @@ void ConnectionManager::Run()
         this->connections.erase( iter++);
       }
     }
-    usleep(100000);
+    usleep(1000000);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // On read master
-void ConnectionManager::OnMasterRead( const std::string &data)
+void ConnectionManager::OnMasterRead( const std::string &_data)
 {
-  if (!data.empty())
+  if (!_data.empty())
   {
     msgs::Packet packet;
-    packet.ParseFromString(data);
+    packet.ParseFromString(_data);
 
     // Publisher_update. This occurs when we try to subscribe to a topic, and
     // the master informs us of a remote host that is publishing on our
@@ -180,9 +183,13 @@ void ConnectionManager::OnMasterRead( const std::string &data)
       msgs::Publish pub;
       pub.ParseFromString( packet.serialized_data() );
 
+      if (pub.topic().find("scene") != std::string::npos)
+        printf("ConnectionManager::OnMatsterRead Pub Update Topic[%s]\n",pub.topic().c_str());
+
       if (pub.host() != this->serverConn->GetLocalAddress() ||
           pub.port() != this->serverConn->GetLocalPort())
       {
+
         // Connect to the remote publisher
         ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 
@@ -352,9 +359,7 @@ void ConnectionManager::GetTopicNamespaces( std::vector<std::string> &_namespace
   this->masterConn2Mutex->lock();
   this->masterConn2->EnqueueMsg( msgs::Package("request", request), true, true );
 
-  printf("Master2 Read[%d]\n", this->tmpIndex - 1);
   this->masterConn2->Read(data);
-  printf("   Master2 Got Read\n");
   this->masterConn2Mutex->unlock();
 
   packet.ParseFromString( data );

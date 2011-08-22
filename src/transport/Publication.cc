@@ -31,17 +31,22 @@ std::string Publication::GetTopic() const
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
-  std::list< CallbackHelperPtr >::iterator iter;
+  printf("Add Subscription[%s]\n", this->topic.c_str());
+  /*std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
   if (iter == this->callbacks.end())
   {
+  */
     this->callbacks.push_back(callback);
 
     if (this->prevMsg && this->prevMsg->IsInitialized())
     {
       callback->HandleMessage(this->prevMsg);
     }
-  } 
+  /*} 
+  else
+    gzerr << "DUplicate callback\n";
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,14 +185,27 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 {
   std::list< CallbackHelperPtr >::iterator iter;
 
+  std::string data;
+  _msg.SerializeToString(&data);
+
+  if (this->topic.find("scene") != std::string::npos)
+    gzdbg << "Publication Topic[" << this->topic << "] Serialize msg Count[" << this->callbacks.size() << "]\n";// [" << _msg.DebugString() << "]\n";
+
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
-    if ((*iter)->HandleMessage(&_msg))
+    if ((*iter)->HandleData(data))
+    {
       iter++;
+    }
     else
+    {
+      printf("!!!! Delete callback!!!\n");
       this->callbacks.erase( iter++ );
+    }
   }
+  if (this->topic.find("scene") != std::string::npos)
+    printf("    Done with loop\n");
   if (_cb)
     (_cb)();
 

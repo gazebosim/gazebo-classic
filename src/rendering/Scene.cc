@@ -178,7 +178,9 @@ void Scene::Init()
   this->scenePub = this->node->Advertise<msgs::Request>("~/publish_scene");
   msgs::Request req;
   req.set_request("publish");
+  req.set_index(1234);
 
+  printf("Request Scene!\n");
   this->scenePub->Publish(req);
 
   // Register this scene the the real time shaders system

@@ -44,9 +44,11 @@ void PublicationTransport::Init(const ConnectionPtr &conn_)
   sub.set_port( this->connection->GetLocalPort() );
 
   this->connection->EnqueueMsg( msgs::Package("sub",sub) );
+
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher
   this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
+  //this->connection->StartRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
 
   this->shutdownConnectionPtr = this->connection->ConnectToShutdownSignal(
       boost::bind(&PublicationTransport::OnConnectionShutdown, this));
@@ -64,13 +66,14 @@ void PublicationTransport::AddCallback(const boost::function<void(const std::str
 
 void PublicationTransport::OnPublish(const std::string &data)
 {
+  //gzdbg << "On Publish\n";
+  this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
+
   if (!data.empty())
   {
     if (this->callback)
       (this->callback)(data);
   }
-
-  this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
 }
 
 const ConnectionPtr PublicationTransport::GetConnection() const

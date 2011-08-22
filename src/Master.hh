@@ -23,6 +23,10 @@ namespace gazebo
     public: void Fini();
 
     public: void RunLoop();
+
+    private: void ProcessMessage(const unsigned int _connectionIndex,
+                                 const std::string &_data);
+
     private: void OnRead(const unsigned int connectionIndex,
                          const std::string &data);
 
@@ -40,12 +44,13 @@ namespace gazebo
     private: SubList subscribers;
 
     private: std::list< std::string > worldNames;
+    private: std::list< std::pair<unsigned int, std::string> > msgs;
 
     private: transport::ConnectionPtr connection;
     private: boost::thread *runThread;
     private: bool stop;
 
-    private: boost::recursive_mutex *connectionMutex;
+    private: boost::recursive_mutex *connectionMutex, *msgsMutex;
   };
 }
 

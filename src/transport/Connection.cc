@@ -32,6 +32,7 @@ IOManager *Connection::iomanager = NULL;
 // Constructor
 Connection::Connection()
 {
+  this->reading = false;
   if (iomanager == NULL)
     iomanager = new IOManager();
 
@@ -41,6 +42,7 @@ Connection::Connection()
   this->id = idCounter++;
 
   this->writeMutex = new boost::recursive_mutex();
+  this->readMutex = new boost::recursive_mutex();
   this->acceptor = NULL;
   this->readThread = NULL;
   this->readQuit = false;
@@ -179,8 +181,9 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
     return;
   }
 
-  if (_force)
-  {
+  //if (_force)
+  //{
+    this->writeMutex->lock();
     boost::asio::streambuf *buffer = new boost::asio::streambuf;
     std::ostream os(buffer);
     os << header_stream.str() << _buffer;
@@ -193,7 +196,8 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
       gzerr << "Didn't write all the data\n";
 
     delete buffer;
-  }
+    this->writeMutex->unlock();
+  /*}
   else
   {
     this->writeMutex->lock();
@@ -201,36 +205,40 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
     this->writeQueue.push_back(_buffer);
     this->writeMutex->unlock();
   }
-
-
+  */
 }
 
 void Connection::ProcessWriteQueue()
 {
-  this->writeMutex->lock();
-
-  if (this->writeQueue.size() > 0)
+  /*this->writeMutex->lock();
+  if (this->writeQueue.size() == 0)
   {
-    boost::asio::streambuf *buffer = new boost::asio::streambuf;
-    std::ostream os(buffer);
-
-    for (unsigned int i=0; i < this->writeQueue.size(); i++)
-    {
-      os << this->writeQueue[i];
-    }
-    this->writeQueue.clear();
-
-    this->writeCount++;
-
-    // Write the serialized data to the socket. We use
-    // "gather-write" to send both the head and the data in
-    // a single write operation
-    boost::asio::async_write( *this->socket, buffer->data(), 
-        boost::bind(&Connection::OnWrite, this, 
-          boost::asio::placeholders::error, buffer));
-
+    this->writeMutex->unlock();
+    return;
   }
+
+  boost::asio::streambuf *buffer = new boost::asio::streambuf;
+  std::ostream os(buffer);
+
+  for (unsigned int i=0; i < this->writeQueue.size(); i++)
+  {
+    os << this->writeQueue[i];
+  }
+
+  this->writeCount++;
+
+  // Write the serialized data to the socket. We use
+  // "gather-write" to send both the head and the data in
+  // a single write operation
+  //boost::asio::async_write( *this->socket, buffer->data(), 
+  //  boost::bind(&Connection::OnWrite, this, 
+  //  boost::asio::placeholders::error, buffer));
+  boost::asio::write( *this->socket, buffer->data() );
+  this->writeQueue.clear();
+  delete buffer;
+  usleep(10000);
   this->writeMutex->unlock();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,9 +263,10 @@ void Connection::OnWrite(const boost::system::error_code &e,
 {
   delete _buffer;
 
-  this->writeMutex->lock();
+  /*this->writeMutex->lock();
   this->writeCount--;
   this->writeMutex->unlock();
+  */
 
   if (e)
   {
@@ -272,8 +281,9 @@ void Connection::Shutdown()
 {
   this->ProcessWriteQueue();
 
-  while (this->writeCount > 0)
+  /*while (this->writeCount > 0)
     usleep(10000);
+    */
 
   this->shutdownSignal();
   this->StopRead();
@@ -366,6 +376,14 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
+  if (this->reading)
+    gzthrow("Already reading!\n");
+  
+  this->reading = true;
+
+  printf("LockRead[%s]\n",this->GetLocalURI().c_str());
+  this->readMutex->lock();
+
   // First read the header
   this->socket->read_some( boost::asio::buffer(header), error );
   if (error)
@@ -397,6 +415,9 @@ bool Connection::Read(std::string &data)
     result = true;
   }
 
+  this->reading = false;
+  this->readMutex->unlock();
+  printf("UnLockRead[%s]\n",this->GetLocalURI().c_str());
   return result;
 }
 

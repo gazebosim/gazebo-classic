@@ -179,6 +179,11 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   {
     pub->AddSubscription( subscription );
   }
+  else
+  {
+    if (ops.GetTopic().find("scene") != std::string::npos)
+      gzerr << "No publication for topic[" << ops.GetTopic() << "]\n";
+  }
 
   // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());
@@ -237,13 +242,16 @@ void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::st
 
 ////////////////////////////////////////////////////////////////////////////////
 // Connect all subscribers on a topic to known publishers
-void TopicManager::ConnectSubscibers(const std::string &topic)
+void TopicManager::ConnectSubscibers(const std::string &_topic)
 {
-  SubMap::iterator iter = this->subscribed_topics.find(topic);
+  SubMap::iterator iter = this->subscribed_topics.find(_topic);
+
+  if (_topic.find("scene") != std::string::npos)
+    printf("Connect Subscribers to topic[%s]\n", _topic.c_str());
 
   if (iter != this->subscribed_topics.end())
   {
-    PublicationPtr publication = this->FindPublication(topic);
+    PublicationPtr publication = this->FindPublication(_topic);
 
     // Add all of our subscriptions to the publication
     std::list<CallbackHelperPtr>::iterator cbIter;
@@ -253,7 +261,7 @@ void TopicManager::ConnectSubscibers(const std::string &topic)
     }
   }
   else
-    gzerr << "Shouldn't get here\n";//TODO: Properly handle this error
+    gzerr << "Shouldn't get here topic[" << _topic << "]\n";//TODO: Properly handle this error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,6 +269,10 @@ void TopicManager::ConnectSubscibers(const std::string &topic)
 void TopicManager::ConnectSubToPub( const std::string &topic,
                                     const PublicationTransportPtr &publink )
 {
+
+  if (topic.find("scene") != std::string::npos)
+    printf("TopicManager::ConnectSubToPub [%s]\n", topic.c_str());
+
   // Add the publication transport mechanism to the publication.
   if (publink)
   {
@@ -270,6 +282,8 @@ void TopicManager::ConnectSubToPub( const std::string &topic,
     else
       gzerr << "Attempting to connect a remote publisher...but we don't have a publication. This shouldn't happen\n";
   }
+  else
+    gzerr << "Bad Publink[" << topic << "]!!\n";
 
   this->ConnectSubscibers(topic);
 }

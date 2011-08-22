@@ -88,6 +88,8 @@ namespace gazebo
                 m->ParseFromString( packet.serialized_data() );
                 */
 
+                printf("Other2 handle data\n");
+
                 boost::shared_ptr<M> m( new M );
                 m->ParseFromString( newdata );
                 this->callback( m );
@@ -133,6 +135,8 @@ namespace gazebo
                 if (packet.type() != "data")
                   gzerr << "CallbackHelperT::HandleData Invalid message!!!\n";
                   */
+
+                printf("Other Handle Data\n");
 
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);

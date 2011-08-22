@@ -115,6 +115,8 @@ namespace gazebo
                   {
                     ConnectionManager::Instance()->Advertise(t, msgTypename);
                   }
+                  else
+                    gzerr << "Not advertising[" << t << "]\n";
 
                   publication->SetLocallyAdvertised(true);
 

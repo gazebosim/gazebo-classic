@@ -116,9 +116,12 @@ namespace gazebo
       public: template<typename Handler>
               void AsyncRead(Handler handler)
               {
+                printf("AsyncRead[%s]\n",this->GetLocalURI().c_str());
                 void (Connection::*f)(const boost::system::error_code &,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
+                this->readMutex->lock();
+                memset(this->inbound_header,0,HEADER_LENGTH);
                 boost::asio::async_read(*this->socket,
                     boost::asio::buffer(this->inbound_header),
                     boost::bind(f, this, boost::asio::placeholders::error,
@@ -132,8 +135,12 @@ namespace gazebo
                void OnReadHeader(const boost::system::error_code &e_,
                                  boost::tuple<Handler> handler_)
               {
+                printf("OnReadHeader[%s]\n",this->GetLocalURI().c_str());
+
                 if (e_)
                 {
+                  this->readMutex->unlock();
+                  gzerr << "OnREadHeader error[" << this->GetLocalURI() << "]\n";
                   if (e_.message() != "End of File")
                   {
                     // This will occur when the other side closes the
@@ -160,6 +167,8 @@ namespace gazebo
                   }
                   else
                   {
+                    this->readMutex->unlock();
+                    gzerr << "Bad header[" << this->inbound_header << "] URI[" << this->GetLocalURI() << "]\n";
                    boost::get<0>(handler_)("");
                   }
                 }
@@ -168,15 +177,21 @@ namespace gazebo
      private: template<typename Handler>
               void OnReadData(const boost::system::error_code &e,
                               boost::tuple<Handler> handler)
-               {
-                 if (!e)
-                 {
-                   // Inform caller that data has been received
-                   std::string data(&this->inbound_data[0], 
-                                    this->inbound_data.size());
-                   boost::get<0>(handler)(data);
-                 }
-               }
+              {
+                printf("OnReadData[%s]\n",this->GetLocalURI().c_str());
+
+                if (e)
+                  gzerr << "Error Reading data!\n";
+
+                // Inform caller that data has been received
+                std::string data(&this->inbound_data[0], 
+                    this->inbound_data.size());
+                this->inbound_data.clear();
+                this->readMutex->unlock();
+
+                if (!e)
+                  boost::get<0>(handler)(data);
+              }
 
      public: event::ConnectionPtr ConnectToShutdownSignal( boost::function<void()> subscriber_ ) 
              { return this->shutdownSignal.Connect(subscriber_); }
@@ -215,6 +230,7 @@ namespace gazebo
       private: std::deque<std::string> writeQueue;
       private: std::deque<unsigned int> writeCounts;
       private: boost::recursive_mutex *writeMutex;
+      private: boost::recursive_mutex *readMutex;
 
       // Called when a new connection is received
       private: AcceptCallback acceptCB;
@@ -233,6 +249,7 @@ namespace gazebo
       private: static IOManager *iomanager;
 
       public: unsigned int writeCount;
+      private: bool reading;
     };
     /// \}
   }

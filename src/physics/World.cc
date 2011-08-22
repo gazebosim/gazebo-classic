@@ -255,7 +255,7 @@ void World::RunLoop()
       msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
       this->worldStatsMsg.set_paused( this->IsPaused() ); 
 
-      this->statPub->Publish( this->worldStatsMsg );
+      //this->statPub->Publish( this->worldStatsMsg );
       this->prevStatTime = common::Time::GetWallTime();
     }
 
@@ -652,14 +652,17 @@ void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
 {
+  printf("Publish Scene!\n");
   msgs::Stamp(this->sceneMsg.mutable_header());
+  this->scenePub->Publish( this->sceneMsg );
 
   this->sceneMsg.clear_pose();
-  if (this->rootElement)
+  /*if (this->rootElement)
   {
     this->BuildSceneMsg(this->sceneMsg, this->rootElement);
     this->scenePub->Publish( this->sceneMsg );
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

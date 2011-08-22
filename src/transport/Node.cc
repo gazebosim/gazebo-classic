@@ -27,10 +27,13 @@ Node::Node()
 {
   this->id = idCounter++;
   this->topicNamespace = "";
+  this->publisherMutex = new boost::recursive_mutex();
 }
 
 Node::~Node()
 {
+  delete this->publisherMutex;
+  this->publisherMutex = NULL;
   TopicManager::Instance()->RemoveNode( this->id );
 }
 
@@ -46,9 +49,7 @@ void Node::Init(const std::string &_space)
     unsigned int limit = 10;
     while (namespaces.size() == 0 && trys < limit)
     {
-      printf("....attempt\n");
       TopicManager::Instance()->GetTopicNamespaces(namespaces);
-      printf("....sleeping\n");
       usleep(100000);
       trys++;
     }
@@ -100,8 +101,11 @@ unsigned int Node::GetId() const
 void Node::ProcessPublishers()
 {
   std::vector<PublisherPtr>::iterator iter;
+
+  this->publisherMutex->lock();
   for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
   {
     (*iter)->SendMessage();
   }
+  this->publisherMutex->unlock();
 }
