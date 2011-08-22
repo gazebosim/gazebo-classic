@@ -43,12 +43,13 @@ void Node::Init(const std::string &_space)
 
   if (_space.empty())
   {
-    std::vector<std::string> namespaces;
+    std::list<std::string> namespaces;
 
     unsigned int trys = 0;
     unsigned int limit = 10;
     while (namespaces.size() == 0 && trys < limit)
     {
+      gzdbg << "Try[" << trys << "]\n";
       TopicManager::Instance()->GetTopicNamespaces(namespaces);
       usleep(100000);
       trys++;
@@ -60,7 +61,7 @@ void Node::Init(const std::string &_space)
       return;
     }
 
-    this->topicNamespace = namespaces[0];
+    this->topicNamespace = namespaces.front();
   }
   else
     TopicManager::Instance()->RegisterTopicNamespace( _space );

@@ -351,7 +351,7 @@ void TopicManager::RegisterTopicNamespace(const std::string &_name)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get all the topic namespaces
-void TopicManager::GetTopicNamespaces(std::vector<std::string> &_namespaces)
+void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
 }

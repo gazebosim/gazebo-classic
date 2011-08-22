@@ -68,7 +68,8 @@ Scene::Scene(const std::string &_name)
 
   grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
   this->grids.push_back(grid);
-  
+ 
+  gzdbg << "Scene Subscribe to ~/scene\n"; 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
   this->visSub = this->node->Subscribe("~/visual", &Scene::ReceiveVisualMsg, this);

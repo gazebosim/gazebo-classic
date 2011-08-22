@@ -88,8 +88,6 @@ namespace gazebo
                 m->ParseFromString( packet.serialized_data() );
                 */
 
-                printf("Other2 handle data\n");
-
                 boost::shared_ptr<M> m( new M );
                 m->ParseFromString( newdata );
                 this->callback( m );

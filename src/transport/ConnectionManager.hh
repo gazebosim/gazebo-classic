@@ -77,7 +77,7 @@ namespace gazebo
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
-      public: void GetTopicNamespaces(std::vector<std::string> &_namespaces);
+      public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host, 
@@ -94,6 +94,8 @@ namespace gazebo
       private: void OnRead( const ConnectionPtr &new_connection,
                             const std::string &data );
 
+      private: void ProcessMessage(const msgs::Packet &_packet);
+
       private: ConnectionPtr masterConn, masterConn2;
       private: ConnectionPtr serverConn;
 
@@ -105,6 +107,11 @@ namespace gazebo
 
       private: unsigned int tmpIndex;
       private: boost::recursive_mutex *masterConn2Mutex;
+      private: boost::recursive_mutex *masterMessagesMutex;
+
+      private: std::list<msgs::Publish> publishers;
+      private: std::list<std::string> namespaces;
+      private: std::list<std::string> masterMessages;
 
       //Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

@@ -31,7 +31,8 @@ std::string Publication::GetTopic() const
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
-  printf("Add Subscription[%s]\n", this->topic.c_str());
+  printf("Publication::AddSubscription[%s]\n", this->topic.c_str());
+
   /*std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
   if (iter == this->callbacks.end())

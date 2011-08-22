@@ -94,6 +94,9 @@ void Connection::Connect(const std::string &host, unsigned short port)
     this->socket->connect(*endpoint_iter++, error);
   }
 
+  if (this->socket->available() > 0)
+    gzerr << "\n\n\n Shouldn't get here\n\n\n";
+
   if (error)
     gzthrow ("Unable to connect to " << host << ":" << port);
 }
@@ -114,7 +117,7 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
   this->acceptConn = ConnectionPtr(new Connection());
 
   this->acceptor->async_accept(*this->acceptConn->socket,
-      boost::bind(&Connection::OnAccept, this, 
+      boost::bind(&Connection::OnAccept, shared_from_this(), 
                   boost::asio::placeholders::error));
 }
 
@@ -131,7 +134,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket, 
-        boost::bind(&Connection::OnAccept, this, 
+        boost::bind(&Connection::OnAccept, shared_from_this(), 
           boost::asio::placeholders::error));
   }
   else
@@ -148,7 +151,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
 /// new message to the ReadCallback
 void Connection::StartRead(const ReadCallback &cb)
 {
-  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, this, cb ) ); 
+  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, shared_from_this(), cb ) ); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +171,9 @@ void Connection::StopRead()
 // Write data out
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug)
 {
+  if (_buffer.empty())
+    gzerr << "\n\n!!!!! ENQUEUE MESSAGE EMPTY DATA!!!!\n\n";
+
   std::ostringstream header_stream;
 
   header_stream << std::setw(HEADER_LENGTH) << std::hex << _buffer.size();
@@ -181,36 +187,35 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
     return;
   }
 
-  //if (_force)
-  //{
+  /*if (_force)
+  {
+
     this->writeMutex->lock();
     boost::asio::streambuf *buffer = new boost::asio::streambuf;
     std::ostream os(buffer);
     os << header_stream.str() << _buffer;
 
     std::size_t written = 0;
-
     written = boost::asio::write(*this->socket, buffer->data());
-
     if (written != buffer->size())
       gzerr << "Didn't write all the data\n";
 
     delete buffer;
     this->writeMutex->unlock();
-  /*}
+  }
   else
   {
+  */
     this->writeMutex->lock();
     this->writeQueue.push_back(header_stream.str());
     this->writeQueue.push_back(_buffer);
     this->writeMutex->unlock();
-  }
-  */
+  //}
 }
 
 void Connection::ProcessWriteQueue()
 {
-  /*this->writeMutex->lock();
+  this->writeMutex->lock();
   if (this->writeQueue.size() == 0)
   {
     this->writeMutex->unlock();
@@ -224,21 +229,17 @@ void Connection::ProcessWriteQueue()
   {
     os << this->writeQueue[i];
   }
+  this->writeQueue.clear();
+  this->writeMutex->unlock();
 
   this->writeCount++;
 
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  //boost::asio::async_write( *this->socket, buffer->data(), 
-  //  boost::bind(&Connection::OnWrite, this, 
-  //  boost::asio::placeholders::error, buffer));
-  boost::asio::write( *this->socket, buffer->data() );
-  this->writeQueue.clear();
-  delete buffer;
-  usleep(10000);
-  this->writeMutex->unlock();
-  */
+  boost::asio::async_write( *this->socket, buffer->data(), 
+    boost::bind(&Connection::OnWrite, shared_from_this(), 
+    boost::asio::placeholders::error, buffer));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,10 +264,9 @@ void Connection::OnWrite(const boost::system::error_code &e,
 {
   delete _buffer;
 
-  /*this->writeMutex->lock();
+  this->writeMutex->lock();
   this->writeCount--;
   this->writeMutex->unlock();
-  */
 
   if (e)
   {
@@ -381,11 +381,12 @@ bool Connection::Read(std::string &data)
   
   this->reading = true;
 
-  printf("LockRead[%s]\n",this->GetLocalURI().c_str());
   this->readMutex->lock();
 
   // First read the header
+  printf("Read_som[%d]\n",this->GetLocalPort());
   this->socket->read_some( boost::asio::buffer(header), error );
+  printf("   Done Read_som[%d]\n",this->GetLocalPort());
   if (error)
   {
     gzerr << "Connection[" << this->id << "] Closed during Read\n";
@@ -394,6 +395,7 @@ bool Connection::Read(std::string &data)
 
   // Parse the header to get the size of the incoming data packet
   incoming_size = this->ParseHeader( header );
+  printf("Incoming size[%d]\n",incoming_size);
   if (incoming_size > 0)
   {
     incoming.resize( incoming_size );
@@ -411,13 +413,13 @@ bool Connection::Read(std::string &data)
     if (error)
       throw boost::system::system_error(error);
 
+    printf("  Read amount[%d]\n",len);
     data = std::string(&incoming[0], incoming.size());
     result = true;
   }
 
-  this->reading = false;
   this->readMutex->unlock();
-  printf("UnLockRead[%s]\n",this->GetLocalURI().c_str());
+  this->reading = false;
   return result;
 }
 
@@ -474,8 +476,8 @@ std::size_t Connection::ParseHeader( const std::string &header )
   if (!(is >> std::hex >> data_size))
   {
     // Header doesn't seem to be valid. Inform the caller
-    //boost::system::error_code error(boost::asio::error::invalid_argument);
-    //gzerr << "Invalid header[" << error.message() << "] Data Size[" << data_size << "] on Connection[" << this->id << "]. Header[" << header << "]\n";
+    boost::system::error_code error(boost::asio::error::invalid_argument);
+    gzerr << "Invalid header[" << error.message() << "] Data Size[" << data_size << "] on Port[" << this->GetLocalPort() << "] From[" << this->GetRemotePort() << "] Header[" << header << "]\n";
   }
 
   return data_size;

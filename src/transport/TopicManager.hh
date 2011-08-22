@@ -183,7 +183,7 @@ namespace gazebo
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
-      public: void GetTopicNamespaces(std::vector<std::string> &_namespaces);
+      public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
       private: void HandleIncoming();
 
