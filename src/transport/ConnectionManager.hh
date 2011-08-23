@@ -94,7 +94,7 @@ namespace gazebo
       private: void OnRead( const ConnectionPtr &new_connection,
                             const std::string &data );
 
-      private: void ProcessMessage(const msgs::Packet &_packet);
+      private: void ProcessMessage(const std::string &_packet);
 
       private: ConnectionPtr masterConn, masterConn2;
       private: ConnectionPtr serverConn;

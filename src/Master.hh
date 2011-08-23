@@ -50,6 +50,8 @@ namespace gazebo
     private: boost::thread *runThread;
     private: bool stop;
 
+    private: std::map<unsigned short,int> debugMap;
+
     private: boost::recursive_mutex *connectionMutex, *msgsMutex;
   };
 }

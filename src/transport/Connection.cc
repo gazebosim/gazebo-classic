@@ -32,6 +32,7 @@ IOManager *Connection::iomanager = NULL;
 // Constructor
 Connection::Connection()
 {
+  this->test = false;
   this->reading = false;
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -207,8 +208,14 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
   {
   */
     this->writeMutex->lock();
+    if (this->test)
+      printf("\n\n\nBADD!!!!\n\n\n");
     this->writeQueue.push_back(header_stream.str());
+    if (this->test)
+      printf("\n\n\nBADD!!!!\n\n\n");
     this->writeQueue.push_back(_buffer);
+    if (this->test)
+      printf("\n\n\nBADD!!!!\n\n\n");
     this->writeMutex->unlock();
   //}
 }
@@ -216,8 +223,11 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
 void Connection::ProcessWriteQueue()
 {
   this->writeMutex->lock();
+  this->test = true;
+
   if (this->writeQueue.size() == 0)
   {
+    this->test = false;
     this->writeMutex->unlock();
     return;
   }
@@ -227,9 +237,17 @@ void Connection::ProcessWriteQueue()
 
   for (unsigned int i=0; i < this->writeQueue.size(); i++)
   {
+    if (this->GetRemotePort() == 11345)
+      printf("Slave[%d]: write to master [%d]\n", this->GetLocalPort(), this->writeQueue[i].size());
+
+    if (this->GetLocalPort() == 11345)
+      printf("Master: write to slave[%d] [%d]\n", this->GetRemotePort(), this->writeQueue[i].size());
+
+
     os << this->writeQueue[i];
   }
   this->writeQueue.clear();
+  this->test = false;
   this->writeMutex->unlock();
 
   this->writeCount++;
@@ -477,7 +495,7 @@ std::size_t Connection::ParseHeader( const std::string &header )
   {
     // Header doesn't seem to be valid. Inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
-    gzerr << "Invalid header[" << error.message() << "] Data Size[" << data_size << "] on Port[" << this->GetLocalPort() << "] From[" << this->GetRemotePort() << "] Header[" << header << "]\n";
+    gzerr << "Invalid header. Data Size[" << data_size << "] on Port[" << this->GetLocalPort() << "] From[" << this->GetRemotePort() << "] Header[" << header << "]\n";
   }
 
   return data_size;

@@ -119,6 +119,7 @@ namespace gazebo
                 void (Connection::*f)(const boost::system::error_code &,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
+                this->inbound_header.resize(HEADER_LENGTH);
                 boost::asio::async_read(*this->socket,
                     boost::asio::buffer(this->inbound_header),
                     boost::bind(f, shared_from_this(), 
@@ -144,9 +145,19 @@ namespace gazebo
                 else
                 {
                   std::size_t inbound_data_size = 0;
-                  inbound_data_size = this->ParseHeader(this->inbound_header);
+                  std::string header(&this->inbound_header[0], 
+                    this->inbound_header.size());
+                  this->inbound_header.clear();
 
-                  if (inbound_data_size > 0)
+                  inbound_data_size = this->ParseHeader(header);
+
+                  if (this->GetLocalPort() == 11345)
+                    printf("Master: receive header from[%d] [%d]\n", this->GetRemotePort(), inbound_data_size);
+
+                  if (this->GetRemotePort() == 11345)
+                    printf("Slave[%d]: receive header [%d]\n", this->GetLocalPort(), inbound_data_size);
+
+                 if (inbound_data_size > 0)
                   {
                     // Start the asynchronous call to receive data
                     this->inbound_data.resize(inbound_data_size);
@@ -165,7 +176,7 @@ namespace gazebo
                   {
                     gzerr << "Header is empty\n";
 
-                    void (Connection::*f)(const boost::system::error_code &,
+                   /* void (Connection::*f)(const boost::system::error_code &,
                         boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
 
@@ -174,7 +185,8 @@ namespace gazebo
                         boost::bind(f, shared_from_this(), 
                           boost::asio::placeholders::error,
                           handler_) );
-                   //boost::get<0>(handler_)("");
+                          */
+                   boost::get<0>(handler_)("");
                   }
                 }
               }
@@ -195,6 +207,13 @@ namespace gazebo
                 std::string data(&this->inbound_data[0], 
                     this->inbound_data.size());
                 this->inbound_data.clear();
+
+                if (this->GetLocalPort() == 11345)
+                  printf("Master: receive data from[%d] [%d]\n", this->GetRemotePort(), data.size());
+
+                  if (this->GetRemotePort() == 11345)
+                    printf("Slave[%d]: receive data [%d]\n", this->GetLocalPort(), data.size());
+
 
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
@@ -245,7 +264,8 @@ namespace gazebo
       // Called when a new connection is received
       private: AcceptCallback acceptCB;
 
-      private: char inbound_header[HEADER_LENGTH];
+      //private: char inbound_header[HEADER_LENGTH];
+      private: std::vector<char> inbound_header;
       private: std::vector<char> inbound_data;
 
       private: boost::thread *readThread;
@@ -260,6 +280,8 @@ namespace gazebo
 
       public: unsigned int writeCount;
       private: bool reading;
+
+      private: bool test;
     };
     /// \}
   }

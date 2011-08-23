@@ -91,9 +91,9 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 
   this->connectionMutex->lock();
   this->connections.push_back(new_connection);
-  this->connectionMutex->unlock();
   new_connection->AsyncRead( 
       boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
+  this->connectionMutex->unlock();
 
   //new_connection->StartRead( 
       //boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
@@ -104,23 +104,30 @@ void Master::OnRead(const unsigned int _connectionIndex,
                     const std::string &_data)
 {
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
+  conn->AsyncRead( boost::bind(&Master::OnRead, this, _connectionIndex, _1));
+
+  this->debugMap[conn->GetRemotePort()]++;
+  printf( "Count[%d][%d]\n",conn->GetRemotePort(),
+          this->debugMap[conn->GetRemotePort()] );
 
   if (!_data.empty())
   {
     this->msgsMutex->lock();
+    printf("Master::OnRead pushback message size[%d]\n",_data.size());
     this->msgs.push_back( std::make_pair(_connectionIndex,_data) );
     this->msgsMutex->unlock();
   }
   else
     gzerr << "Master got empty data message from[" << conn->GetRemotePort() << "]\n";
 
-  conn->AsyncRead( boost::bind(&Master::OnRead, this, _connectionIndex, _1));
 }
 
 void Master::ProcessMessage(const unsigned int _connectionIndex,
                             const std::string &_data)
 {
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
+
+  printf("Master::ProcessMessage size[%d]\n",_data.size());
 
   msgs::Packet packet;
   packet.ParseFromString(_data);
@@ -137,12 +144,14 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       this->worldNames.push_back( worldNameMsg.data() );
 
+      this->connectionMutex->lock();
       std::deque<transport::ConnectionPtr>::iterator iter2;
       for (iter2 = this->connections.begin(); 
           iter2 != this->connections.end(); iter2++)
       {
         (*iter2)->EnqueueMsg( msgs::Package("topic_namespace_add", worldNameMsg));
       }
+      this->connectionMutex->unlock();
 
     }
 
@@ -152,12 +161,14 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
 
+    this->connectionMutex->lock();
     std::deque<transport::ConnectionPtr>::iterator iter2;
     for (iter2 = this->connections.begin(); 
          iter2 != this->connections.end(); iter2++)
     {
       (*iter2)->EnqueueMsg(msgs::Package("publisher_add", pub)); 
     }
+    this->connectionMutex->unlock();
 
     bool debug = false;
     if (pub.topic().find("scene") != std::string::npos)
@@ -188,12 +199,14 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
 
+    this->connectionMutex->lock();
     std::deque<transport::ConnectionPtr>::iterator iter2;
     for (iter2 = this->connections.begin(); 
          iter2 != this->connections.end(); iter2++)
     {
       (*iter2)->EnqueueMsg(msgs::Package("publisher_del", pub)); 
     }
+    this->connectionMutex->unlock();
 
     if (pub.topic().find("scene") != std::string::npos)
       printf("Master got UNadvertise[%s]\n", pub.topic().c_str());
@@ -364,8 +377,6 @@ void Master::RunLoop()
   std::deque<transport::ConnectionPtr>::iterator iter;
   while (!this->stop)
   {
-    this->connectionMutex->lock();
-
     this->msgsMutex->lock();
     while (this->msgs.size() > 0)
     {
@@ -375,6 +386,7 @@ void Master::RunLoop()
     }
     this->msgsMutex->unlock();
 
+    this->connectionMutex->lock();
     for (iter = this->connections.begin(); 
          iter != this->connections.end();)
     {
@@ -390,6 +402,7 @@ void Master::RunLoop()
       }
     }
     this->connectionMutex->unlock();
+
     usleep(1000000);
   }
 }

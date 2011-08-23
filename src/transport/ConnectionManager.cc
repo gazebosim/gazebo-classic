@@ -192,9 +192,7 @@ void ConnectionManager::Run()
     this->masterMessagesMutex->lock();
     while (this->masterMessages.size() > 0)
     {
-      msgs::Packet packet;
-      packet.ParseFromString(this->masterMessages.front());
-      this->ProcessMessage( packet );
+      this->ProcessMessage( this->masterMessages.front() );
       this->masterMessages.pop_front();
     }
     this->masterMessagesMutex->unlock();
@@ -229,26 +227,33 @@ void ConnectionManager::OnMasterRead( const std::string &_data)
   if (!_data.empty())
   {
     this->masterMessagesMutex->lock();
-    this->masterMessages.push_back(_data);
+    printf("CM::OnMasterRead pushback message size[%d]\n",_data.size());
+
+    this->masterMessages.push_back( std::string(_data) );
     this->masterMessagesMutex->unlock();
   }
   else
-    gzerr << "ConnectionManager got empty data\n";
+    gzerr << "ConnectionManager::OnMasterRead empty data\n";
 }
 
 
-void ConnectionManager::ProcessMessage(const msgs::Packet &_packet)
+void ConnectionManager::ProcessMessage(const std::string &_data)
 {
-  if (_packet.type() == "publisher_add")
+  msgs::Packet packet;
+  packet.ParseFromString(_data);
+
+  printf("CM::ProcessMessage size[%d]\n",_data.size());
+
+  if (packet.type() == "publisher_add")
   {
     msgs::Publish result;
-    result.ParseFromString( _packet.serialized_data() );
+    result.ParseFromString( packet.serialized_data() );
     this->publishers.push_back(result);
   }
-  else if (_packet.type() == "publisher_del")
+  else if (packet.type() == "publisher_del")
   {
     msgs::Publish result;
-    result.ParseFromString( _packet.serialized_data() );
+    result.ParseFromString( packet.serialized_data() );
     std::list<msgs::Publish>::iterator iter = this->publishers.begin();
     while (iter != this->publishers.end())
     {
@@ -260,10 +265,10 @@ void ConnectionManager::ProcessMessage(const msgs::Packet &_packet)
         iter++;
     }
   }
-  else if (_packet.type() == "topic_namespace_add")
+  else if (packet.type() == "topic_namespace_add")
   {
     msgs::String result;
-    result.ParseFromString( _packet.serialized_data() );
+    result.ParseFromString( packet.serialized_data() );
     this->masterConn2Mutex->lock();
     this->namespaces.push_back( std::string(result.data()) );
     this->masterConn2Mutex->unlock();
@@ -272,10 +277,10 @@ void ConnectionManager::ProcessMessage(const msgs::Packet &_packet)
   // Publisher_update. This occurs when we try to subscribe to a topic, and
   // the master informs us of a remote host that is publishing on our
   // requested topic
-  else if (_packet.type() == "publisher_update")
+  else if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
-    pub.ParseFromString( _packet.serialized_data() );
+    pub.ParseFromString( packet.serialized_data() );
 
     if (pub.topic().find("scene") != std::string::npos)
       printf("ConnectionManager::OnMatsterRead Pub Update Topic[%s]\n",pub.topic().c_str());
@@ -297,18 +302,18 @@ void ConnectionManager::ProcessMessage(const msgs::Packet &_packet)
       TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
     }
   }
-  else if (_packet.type() == "unsubscribe")
+  else if (packet.type() == "unsubscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString( _packet.serialized_data() );
+    sub.ParseFromString( packet.serialized_data() );
 
     // Disconnect a local publisher from a remote subscriber
     TopicManager::Instance()->DisconnectPubFromSub(sub.topic(), sub.host(), sub.port());
   }
-  else if (_packet.type() == "unadvertise")
+  else if (packet.type() == "unadvertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString( _packet.serialized_data() );
+    pub.ParseFromString( packet.serialized_data() );
 
     // Disconnection all local subscribers from a remote publisher
     TopicManager::Instance()->DisconnectSubFromPub(pub.topic(), 
@@ -317,7 +322,7 @@ void ConnectionManager::ProcessMessage(const msgs::Packet &_packet)
   else
   {
     gzerr << "ConnectionManager::OnMasterRead unknown type[" 
-          << _packet.type() << "][" << _packet.serialized_data() << "]\n";
+          << packet.type() << "][" << packet.serialized_data() << "] Data[" << _data << "]\n";
   }
 }
 
