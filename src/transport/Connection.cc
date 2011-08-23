@@ -32,8 +32,6 @@ IOManager *Connection::iomanager = NULL;
 // Constructor
 Connection::Connection()
 {
-  this->test = false;
-  this->reading = false;
   if (iomanager == NULL)
     iomanager = new IOManager();
 
@@ -170,7 +168,7 @@ void Connection::StopRead()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Write data out
-void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug)
+void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
   if (_buffer.empty())
     gzerr << "\n\n!!!!! ENQUEUE MESSAGE EMPTY DATA!!!!\n\n";
@@ -208,14 +206,8 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
   {
   */
     this->writeMutex->lock();
-    if (this->test)
-      printf("\n\n\nBADD!!!!\n\n\n");
     this->writeQueue.push_back(header_stream.str());
-    if (this->test)
-      printf("\n\n\nBADD!!!!\n\n\n");
     this->writeQueue.push_back(_buffer);
-    if (this->test)
-      printf("\n\n\nBADD!!!!\n\n\n");
     this->writeMutex->unlock();
   //}
 }
@@ -223,11 +215,9 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force, bool _debug
 void Connection::ProcessWriteQueue()
 {
   this->writeMutex->lock();
-  this->test = true;
 
   if (this->writeQueue.size() == 0)
   {
-    this->test = false;
     this->writeMutex->unlock();
     return;
   }
@@ -237,20 +227,19 @@ void Connection::ProcessWriteQueue()
 
   for (unsigned int i=0; i < this->writeQueue.size(); i++)
   {
+    /* DEBUG
     if (this->GetRemotePort() == 11345)
-      printf("Slave[%d]: write to master [%d]\n", this->GetLocalPort(), this->writeQueue[i].size());
+      printf("Slave[%d]: write to master [%d]\n", this->GetLocalPort(), (int)this->writeQueue[i].size());
 
     if (this->GetLocalPort() == 11345)
-      printf("Master: write to slave[%d] [%d]\n", this->GetRemotePort(), this->writeQueue[i].size());
-
+      printf("Master: write to slave[%d] [%d]\n", this->GetRemotePort(), (int)this->writeQueue[i].size());
+      */
 
     os << this->writeQueue[i];
   }
   this->writeQueue.clear();
-  this->test = false;
-  this->writeMutex->unlock();
-
   this->writeCount++;
+  this->writeMutex->unlock();
 
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
@@ -280,9 +269,9 @@ std::string Connection::GetRemoteURI() const
 void Connection::OnWrite(const boost::system::error_code &e, 
     boost::asio::streambuf *_buffer)
 {
-  delete _buffer;
 
   this->writeMutex->lock();
+  delete _buffer;
   this->writeCount--;
   this->writeMutex->unlock();
 
@@ -299,9 +288,8 @@ void Connection::Shutdown()
 {
   this->ProcessWriteQueue();
 
-  /*while (this->writeCount > 0)
-    usleep(10000);
-    */
+  while (this->writeCount > 0)
+    usleep(100000);
 
   this->shutdownSignal();
   this->StopRead();
@@ -394,17 +382,10 @@ bool Connection::Read(std::string &data)
   std::size_t incoming_size;
   boost::system::error_code error;
 
-  if (this->reading)
-    gzthrow("Already reading!\n");
-  
-  this->reading = true;
-
   this->readMutex->lock();
 
   // First read the header
-  printf("Read_som[%d]\n",this->GetLocalPort());
   this->socket->read_some( boost::asio::buffer(header), error );
-  printf("   Done Read_som[%d]\n",this->GetLocalPort());
   if (error)
   {
     gzerr << "Connection[" << this->id << "] Closed during Read\n";
@@ -413,7 +394,6 @@ bool Connection::Read(std::string &data)
 
   // Parse the header to get the size of the incoming data packet
   incoming_size = this->ParseHeader( header );
-  printf("Incoming size[%d]\n",incoming_size);
   if (incoming_size > 0)
   {
     incoming.resize( incoming_size );
@@ -431,13 +411,11 @@ bool Connection::Read(std::string &data)
     if (error)
       throw boost::system::system_error(error);
 
-    printf("  Read amount[%d]\n",len);
     data = std::string(&incoming[0], incoming.size());
     result = true;
   }
 
   this->readMutex->unlock();
-  this->reading = false;
   return result;
 }
 

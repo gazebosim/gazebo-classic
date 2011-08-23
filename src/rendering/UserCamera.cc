@@ -68,7 +68,6 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 /// Destructor
 UserCamera::~UserCamera()
 {
-  printf("UserCamera::Destructor\n");
   if (this->visual)
   {
     delete this->visual;

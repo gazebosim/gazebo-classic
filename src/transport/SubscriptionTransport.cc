@@ -53,10 +53,8 @@ bool SubscriptionTransport::HandleData(const std::string &newdata)
 {
   bool result = false;
   std::string data;
-  printf("Handle data\n");
   if (this->connection->IsOpen())
   {
-    printf("EnqueueMsg\n");
     this->connection->EnqueueMsg( newdata );
     result = true;
   }

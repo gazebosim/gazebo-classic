@@ -26,7 +26,7 @@ namespace gazebo
 {
   class PR2PoseTest : public ModelPlugin
   {
-    public: void Load( physics::ModelPtr &_parent, sdf::ElementPtr &_sdf )
+    public: void Load( physics::ModelPtr &/*_parent*/, sdf::ElementPtr &_sdf )
     {
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->GetValueString("name");
@@ -75,7 +75,7 @@ namespace gazebo
       }
     }
 
-    public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+    public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &/*_msg*/)
     {
       static double fake_time = 0; fake_time = fake_time+0.2;
 

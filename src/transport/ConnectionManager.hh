@@ -96,7 +96,7 @@ namespace gazebo
 
       private: void ProcessMessage(const std::string &_packet);
 
-      private: ConnectionPtr masterConn, masterConn2;
+      private: ConnectionPtr masterConn;
       private: ConnectionPtr serverConn;
 
       private: std::list<ConnectionPtr> connections;
@@ -106,7 +106,7 @@ namespace gazebo
       private: boost::thread *thread;
 
       private: unsigned int tmpIndex;
-      private: boost::recursive_mutex *masterConn2Mutex;
+      private: boost::recursive_mutex *listMutex;
       private: boost::recursive_mutex *masterMessagesMutex;
 
       private: std::list<msgs::Publish> publishers;

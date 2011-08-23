@@ -179,11 +179,6 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   {
     pub->AddSubscription( subscription );
   }
-  else
-  {
-    if (ops.GetTopic().find("scene") != std::string::npos)
-      gzerr << "No publication for topic[" << ops.GetTopic() << "]\n";
-  }
 
   // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());
@@ -246,9 +241,6 @@ void TopicManager::ConnectSubscibers(const std::string &_topic)
 {
   SubMap::iterator iter = this->subscribed_topics.find(_topic);
 
-  if (_topic.find("scene") != std::string::npos)
-    printf("Connect Subscribers to topic[%s]\n", _topic.c_str());
-
   if (iter != this->subscribed_topics.end())
   {
     PublicationPtr publication = this->FindPublication(_topic);
@@ -269,10 +261,6 @@ void TopicManager::ConnectSubscibers(const std::string &_topic)
 void TopicManager::ConnectSubToPub( const std::string &topic,
                                     const PublicationTransportPtr &publink )
 {
-
-  if (topic.find("scene") != std::string::npos)
-    printf("TopicManager::ConnectSubToPub [%s]\n", topic.c_str());
-
   // Add the publication transport mechanism to the publication.
   if (publink)
   {

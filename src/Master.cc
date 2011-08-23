@@ -52,11 +52,11 @@ Master::~Master()
   this->connection.reset();
 }
 
-void Master::Init(unsigned short port)
+void Master::Init(unsigned short _port)
 {
   try
   {
-    this->connection->Listen(port, boost::bind(&Master::OnAccept, this, _1));
+    this->connection->Listen(_port, boost::bind(&Master::OnAccept, this, _1));
   }
   catch (std::exception &e)
   {
@@ -64,12 +64,15 @@ void Master::Init(unsigned short port)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 {
+  // Send the gazebo version string
   msgs::String versionMsg;
   versionMsg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
   new_connection->EnqueueMsg( msgs::Package("version_init", versionMsg), true );
 
+  // Send all the current topic namespaces
   msgs::String_V namespacesMsg;
   std::list<std::string>::iterator iter;
   for (iter = this->worldNames.begin(); 
@@ -77,8 +80,10 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   {
     namespacesMsg.add_data(*iter);
   }
-  new_connection->EnqueueMsg( msgs::Package("topic_namepaces_init", namespacesMsg), true);
+  new_connection->EnqueueMsg( msgs::Package("topic_namepaces_init", 
+                              namespacesMsg), true);
 
+  // Send all the publishers
   msgs::Publishers publishersMsg;
   PubList::iterator pubiter;
   for (pubiter = this->publishers.begin(); 
@@ -87,47 +92,49 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
     msgs::Publish *pub = publishersMsg.add_publisher();
     pub->CopyFrom( pubiter->first );
   }
-  new_connection->EnqueueMsg( msgs::Package("publishers_init", publishersMsg),true);
+  new_connection->EnqueueMsg( 
+      msgs::Package("publishers_init", publishersMsg),true);
 
+
+  // Add the connection to our list
   this->connectionMutex->lock();
   this->connections.push_back(new_connection);
+
+  // Start reading from the connection
   new_connection->AsyncRead( 
       boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
   this->connectionMutex->unlock();
-
-  //new_connection->StartRead( 
-      //boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
-
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Master::OnRead(const unsigned int _connectionIndex, 
                     const std::string &_data)
 {
+  // Get the connection
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
+
+  // Read the next message
   conn->AsyncRead( boost::bind(&Master::OnRead, this, _connectionIndex, _1));
 
-  this->debugMap[conn->GetRemotePort()]++;
-  printf( "Count[%d][%d]\n",conn->GetRemotePort(),
-          this->debugMap[conn->GetRemotePort()] );
-
+  // Store the message if it's not empty
   if (!_data.empty())
   {
     this->msgsMutex->lock();
-    printf("Master::OnRead pushback message size[%d]\n",_data.size());
     this->msgs.push_back( std::make_pair(_connectionIndex,_data) );
     this->msgsMutex->unlock();
   }
   else
-    gzerr << "Master got empty data message from[" << conn->GetRemotePort() << "]\n";
-
+  {
+    gzerr << "Master got empty data message from[" 
+          << conn->GetRemotePort() << "]\n";
+  }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Master::ProcessMessage(const unsigned int _connectionIndex,
                             const std::string &_data)
 {
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
-
-  printf("Master::ProcessMessage size[%d]\n",_data.size());
 
   msgs::Packet packet;
   packet.ParseFromString(_data);
@@ -170,12 +177,14 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     this->connectionMutex->unlock();
 
+    /* DEBUG
     bool debug = false;
     if (pub.topic().find("scene") != std::string::npos)
     {
       debug = true;
       printf("Master got advertise[%s]\n", pub.topic().c_str());
     }
+    */
 
     this->publishers.push_back( std::make_pair(pub, conn) );
 
@@ -187,9 +196,11 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == pub.topic())
       {
+        /* DEBUG
         if (debug)
           printf("Master sending advert topic[%s] host[%d]\n",
               iter->first.topic().c_str(), iter->second->GetRemotePort());
+              */
         iter->second->EnqueueMsg(msgs::Package("publisher_update", pub));
       }
     }
@@ -208,8 +219,10 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     this->connectionMutex->unlock();
 
+    /* DEBUG
     if (pub.topic().find("scene") != std::string::npos)
       printf("Master got UNadvertise[%s]\n", pub.topic().c_str());
+      */
 
     SubList::iterator iter;
     // Find all subscribers of the topic
@@ -271,12 +284,14 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     msgs::Subscribe sub;
     sub.ParseFromString( packet.serialized_data() );
 
+    /* DEBUG CODE
     bool debug = false;
     if (sub.topic().find("scene") != std::string::npos)
     {
-      printf("Master got subscribe[%s] Port\n", sub.topic().c_str(), conn->GetRemotePort());
+      printf("Master got subscribe[%s] Port[%d]\n", sub.topic().c_str(), conn->GetRemotePort());
       debug = true;
     }
+    */
 
     this->subscribers.push_back( std::make_pair(sub, conn) );
 
@@ -288,9 +303,11 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
+        /* DEBUG CODE
         if (debug)
           printf("Master sending publisher topic[%s] host[%d]\n",
               iter->first.topic().c_str(), conn->GetRemotePort());
+              */
  
         conn->EnqueueMsg(msgs::Package("publisher_update", iter->first));
       }
@@ -348,7 +365,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     else if (req.request() == "get_topic_namespaces")
     {
-      printf("get_topic_namespaces[%d]\n",req.index());
       msgs::String_V msg;
       std::list<std::string>::iterator iter;
       for (iter = this->worldNames.begin(); 
@@ -367,16 +383,21 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     std::cerr << "Master Unknown message type[" << packet.type() << "] From[" << conn->GetRemotePort() << "]\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Start the master running
 void Master::Run()
 {
   this->runThread = new boost::thread(boost::bind(&Master::RunLoop, this));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// The master run loop
 void Master::RunLoop()
 {
   std::deque<transport::ConnectionPtr>::iterator iter;
   while (!this->stop)
   {
+    // Process the incoming message queue
     this->msgsMutex->lock();
     while (this->msgs.size() > 0)
     {
@@ -386,6 +407,7 @@ void Master::RunLoop()
     }
     this->msgsMutex->unlock();
 
+    // Process all the connections
     this->connectionMutex->lock();
     for (iter = this->connections.begin(); 
          iter != this->connections.end();)
@@ -403,10 +425,11 @@ void Master::RunLoop()
     }
     this->connectionMutex->unlock();
 
-    usleep(1000000);
+    usleep(10000);
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Master::Stop()
 {
   this->stop = true;
@@ -418,12 +441,14 @@ void Master::Stop()
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Master::Fini()
 {
   this->Stop();
 }
 
-msgs::Publish Master::GetPublisher( const std::string &topic )
+////////////////////////////////////////////////////////////////////////////////
+msgs::Publish Master::GetPublisher( const std::string &_topic )
 {
   msgs::Publish msg;
 
@@ -433,7 +458,7 @@ msgs::Publish Master::GetPublisher( const std::string &topic )
   for (iter = this->publishers.begin(); 
        iter != this->publishers.end(); iter++)
   {
-    if (iter->first.topic() == topic)
+    if (iter->first.topic() == _topic)
     {
       msg = iter->first;
       break;
@@ -443,17 +468,19 @@ msgs::Publish Master::GetPublisher( const std::string &topic )
   return msg;
 }
 
-transport::ConnectionPtr Master::FindConnection(const std::string &host, unsigned short port)
+////////////////////////////////////////////////////////////////////////////////
+transport::ConnectionPtr Master::FindConnection(const std::string &_host, 
+                                                unsigned short _port)
 {
   transport::ConnectionPtr conn;
   std::deque<transport::ConnectionPtr>::iterator iter;
-
 
   this->connectionMutex->lock();
   for (iter = this->connections.begin(); 
        iter != this->connections.end(); iter++)
   {
-    if ((*iter)->GetRemoteAddress() == host && (*iter)->GetRemotePort() == port)
+    if ((*iter)->GetRemoteAddress() == _host && 
+        (*iter)->GetRemotePort() == _port)
     {
       conn = (*iter);
       break;

@@ -94,7 +94,6 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
 // Destructor
 Camera::~Camera()
 {
-  printf("Camera Destructor\n");
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
 

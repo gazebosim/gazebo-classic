@@ -86,7 +86,7 @@ namespace gazebo
       public: bool Read(std::string &data);
 
       /// \brief Write data to the socket
-      public: void EnqueueMsg(const std::string &_buffer, bool _force = false, bool _debug = false);
+      public: void EnqueueMsg(const std::string &_buffer, bool _force = false);
 
       /// \brief Get the local URI
       public: std::string GetLocalURI() const;
@@ -151,11 +151,14 @@ namespace gazebo
 
                   inbound_data_size = this->ParseHeader(header);
 
+
+                  /* DEBUG
                   if (this->GetLocalPort() == 11345)
-                    printf("Master: receive header from[%d] [%d]\n", this->GetRemotePort(), inbound_data_size);
+                    printf("Master: receive header from[%d] [%d]\n", this->GetRemotePort(), (int)inbound_data_size);
 
                   if (this->GetRemotePort() == 11345)
-                    printf("Slave[%d]: receive header [%d]\n", this->GetLocalPort(), inbound_data_size);
+                    printf("Slave[%d]: receive header [%d]\n", this->GetLocalPort(), (int)inbound_data_size);
+                    */
 
                  if (inbound_data_size > 0)
                   {
@@ -208,12 +211,14 @@ namespace gazebo
                     this->inbound_data.size());
                 this->inbound_data.clear();
 
+
+                /* DEBUG
                 if (this->GetLocalPort() == 11345)
-                  printf("Master: receive data from[%d] [%d]\n", this->GetRemotePort(), data.size());
+                  printf("Master: receive data from[%d] [%d]\n", this->GetRemotePort(), (int)data.size());
 
                   if (this->GetRemotePort() == 11345)
-                    printf("Slave[%d]: receive data [%d]\n", this->GetLocalPort(), data.size());
-
+                    printf("Slave[%d]: receive data [%d]\n", this->GetLocalPort(), (int)data.size());
+                    */
 
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
@@ -279,9 +284,6 @@ namespace gazebo
       private: static IOManager *iomanager;
 
       public: unsigned int writeCount;
-      private: bool reading;
-
-      private: bool test;
     };
     /// \}
   }

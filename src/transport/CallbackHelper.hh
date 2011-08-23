@@ -134,8 +134,6 @@ namespace gazebo
                   gzerr << "CallbackHelperT::HandleData Invalid message!!!\n";
                   */
 
-                printf("Other Handle Data\n");
-
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);
 

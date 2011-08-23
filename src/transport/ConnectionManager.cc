@@ -33,7 +33,7 @@ ConnectionManager::ConnectionManager()
   this->stop = false;
   this->thread = NULL;
 
-  this->masterConn2Mutex = new boost::recursive_mutex();
+  this->listMutex = new boost::recursive_mutex();
   this->masterMessagesMutex = new boost::recursive_mutex();
 }
 
@@ -41,8 +41,8 @@ ConnectionManager::ConnectionManager()
 // Destructor
 ConnectionManager::~ConnectionManager()
 {
-  delete this->masterConn2Mutex;
-  this->masterConn2Mutex = NULL;
+  delete this->listMutex;
+  this->listMutex = NULL;
 
   delete this->masterMessagesMutex;
   this->masterMessagesMutex = NULL;
@@ -57,7 +57,6 @@ void ConnectionManager::Init(const std::string &master_host,
                              unsigned short master_port)
 {
   this->masterConn.reset( new Connection() );
-  //this->masterConn2.reset( new Connection() );
   this->serverConn.reset( new Connection() );
 
   // Create a new TCP server on a free port
@@ -97,13 +96,12 @@ void ConnectionManager::Init(const std::string &master_host,
   {
     msgs::String_V result;
     result.ParseFromString( packet.serialized_data() );
-    this->masterConn2Mutex->lock();
+    this->listMutex->lock();
     for (int i=0; i < result.data_size(); i++)
     {
-      gzdbg << "InitNamespace[" << result.data(i) << "]\n";
       this->namespaces.push_back( std::string(result.data(i)) );
     }
-    this->masterConn2Mutex->unlock();
+    this->listMutex->unlock();
   }
   else
     gzerr << "Did not get topic_namespaces_init msg from master\n";
@@ -113,23 +111,21 @@ void ConnectionManager::Init(const std::string &master_host,
   {
     msgs::Publishers pubs;
     pubs.ParseFromString( packet.serialized_data() );
+    this->listMutex->lock();
     for (int i=0; i < pubs.publisher_size(); i++)
     {
       const msgs::Publish &p = pubs.publisher(i);
       this->publishers.push_back(p);
     }
+    this->listMutex->unlock();
   }
   else
     gzerr << "Did not get publishers_init msg from master\n";
 
-  /*this->masterConn2->Connect(this->masterConn->GetRemoteAddress(),
-                             this->masterConn->GetRemotePort() );
-  this->masterConn2->Read(initData);
-  */
-
+  /* DEBUG
   gzdbg << "Server URI[" << this->serverConn->GetLocalURI() << "]\n";
   gzdbg << "Master URI[" << this->masterConn->GetLocalURI() << "]\n";
-  //gzdbg << "Master2 URI[" << this->masterConn2->GetLocalURI() << "]\n";
+  */
 
   this->masterConn->AsyncRead( 
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
@@ -147,9 +143,6 @@ void ConnectionManager::Fini()
 
   this->masterConn->ProcessWriteQueue();
   this->masterConn.reset();
-
-  //this->masterConn2->ProcessWriteQueue();
-  //this->masterConn2.reset();
 
   this->serverConn->ProcessWriteQueue();
   this->serverConn.reset();
@@ -213,7 +206,7 @@ void ConnectionManager::Run()
         this->connections.erase( iter++);
       }
     }
-    usleep(1000000);
+    usleep(10000);
   }
 }
 
@@ -227,7 +220,8 @@ void ConnectionManager::OnMasterRead( const std::string &_data)
   if (!_data.empty())
   {
     this->masterMessagesMutex->lock();
-    printf("CM::OnMasterRead pushback message size[%d]\n",_data.size());
+    
+    //DEBUG:printf("CM::OnMasterRead pushback message size[%d]\n",_data.size());
 
     this->masterMessages.push_back( std::string(_data) );
     this->masterMessagesMutex->unlock();
@@ -242,7 +236,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   msgs::Packet packet;
   packet.ParseFromString(_data);
 
-  printf("CM::ProcessMessage size[%d]\n",_data.size());
+  //DEBUG: printf("CM::ProcessMessage size[%d]\n",_data.size());
 
   if (packet.type() == "publisher_add")
   {
@@ -269,9 +263,9 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   {
     msgs::String result;
     result.ParseFromString( packet.serialized_data() );
-    this->masterConn2Mutex->lock();
+    this->listMutex->lock();
     this->namespaces.push_back( std::string(result.data()) );
-    this->masterConn2Mutex->unlock();
+    this->listMutex->unlock();
   }
 
   // Publisher_update. This occurs when we try to subscribe to a topic, and
@@ -282,8 +276,10 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
 
+    /* DEBUG
     if (pub.topic().find("scene") != std::string::npos)
       printf("ConnectionManager::OnMatsterRead Pub Update Topic[%s]\n",pub.topic().c_str());
+      */
 
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
@@ -330,8 +326,6 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 // On accept
 void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
 {
-  gzdbg << "ConnectionManager::OnAccept[" << newConnection->GetRemoteURI() << "]\n";
-
   newConnection->AsyncRead( 
       boost::bind(&ConnectionManager::OnRead, this, newConnection, _1));
 
@@ -421,79 +415,27 @@ void ConnectionManager::Unadvertise( const std::string &topic )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get all the publishers the master knows about
-void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &publishers)
+void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
 {
-  publishers.clear();
-  std::copy(this->publishers.begin(), this->publishers.end(), publishers.begin());
+  _publishers.clear();
+  std::list<msgs::Publish>::iterator iter;
 
-/*  std::string data;
-  msgs::Request request;
-  msgs::Packet packet;
-  msgs::Publishers pubs;
-  request.set_request("get_publishers");
-
-  // Get the list of publishers
-  this->masterConn2Mutex->lock();
-  this->masterConn2->EnqueueMsg( msgs::Package("request", request), true );
-
-  printf("B Master2 Read\n");
-  this->masterConn2->Read(data);
-  printf("B Master2 Read Done\n");
-  this->masterConn2Mutex->unlock();
-
-  packet.ParseFromString( data );
-
-  pubs.ParseFromString( packet.serialized_data() );
-  for (int i=0; i < pubs.publisher_size(); i++)
-  {
-    const msgs::Publish &p = pubs.publisher(i);
-    publishers.push_back(p);
-  }
-  */
+  this->listMutex->lock();
+  for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
+    _publishers.push_back(*iter);
+  this->listMutex->unlock();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void ConnectionManager::GetTopicNamespaces( std::list<std::string> &_namespaces)
 {
   _namespaces.clear();
   std::list<std::string>::iterator iter;
 
-  this->masterConn2Mutex->lock();
-  gzdbg << "------\n";
+  this->listMutex->lock();
   for (iter = this->namespaces.begin(); iter != this->namespaces.end(); iter++)
-  {
-    gzdbg << "Namespace[" << *iter << "]\n";
     _namespaces.push_back(*iter);
-  }
-
-  //std::copy(this->namespaces.begin(), this->namespaces.end(), _namespaces.begin());
-  this->masterConn2Mutex->unlock();
-/*
-
-  std::string data;
-  msgs::Request request;
-  msgs::Packet packet;
-  msgs::String_V result;
-
-  request.set_index(this->tmpIndex++);
-  request.set_request("get_topic_namespaces");
-
-  this->masterConn2Mutex->lock();
-  this->masterConn2->EnqueueMsg( msgs::Package("request", request), true, true );
-
-  printf("A Master2 GetTopicNamespaces[%d]\n", this->tmpIndex - 1);
-  this->masterConn2->Read(data);
-  printf("A Master2 Read Done\n");
-  this->masterConn2Mutex->unlock();
-
-  packet.ParseFromString( data );
-  result.ParseFromString( packet.serialized_data() );
-
-  for (int i=0; i < result.data_size(); i++)
-  {
-    _namespaces.push_back(result.data(i));
-  }
-  */
+  this->listMutex->unlock();
 }
 
 void ConnectionManager::Unsubscribe( const msgs::Subscribe &_sub )

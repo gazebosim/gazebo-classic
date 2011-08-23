@@ -49,9 +49,8 @@ void Node::Init(const std::string &_space)
     unsigned int limit = 10;
     while (namespaces.size() == 0 && trys < limit)
     {
-      gzdbg << "Try[" << trys << "]\n";
       TopicManager::Instance()->GetTopicNamespaces(namespaces);
-      usleep(100000);
+      usleep(500000);
       trys++;
     }
 

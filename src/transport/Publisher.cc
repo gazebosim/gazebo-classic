@@ -74,9 +74,6 @@ void Publisher::Publish(google::protobuf::Message &_message )
 
   if (this->messages.size() > this->queueLimit)
   {
-    printf("Publisher[%s] Deleting front message\n",this->topic.c_str());
-    gzdbg << this->messages.front()->DebugString();
-
     delete this->messages.front();
     this->messages.pop_front();
   }

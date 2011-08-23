@@ -69,7 +69,6 @@ Scene::Scene(const std::string &_name)
   grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
   this->grids.push_back(grid);
  
-  gzdbg << "Scene Subscribe to ~/scene\n"; 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
   this->visSub = this->node->Subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
@@ -87,7 +86,6 @@ Scene::Scene(const std::string &_name)
 /// Destructor
 Scene::~Scene()
 {
-  printf("Scene::Destructor\n");
   Visual_M::iterator iter;
   this->visuals.clear();
 
@@ -113,8 +111,6 @@ Scene::~Scene()
     //RenderEngine::Instance()->root->destroySceneManager(this->manager);
     this->manager = NULL;
   }
-
-  printf("Scene Destructor DOne\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +177,6 @@ void Scene::Init()
   req.set_request("publish");
   req.set_index(1234);
 
-  printf("Request Scene!\n");
   this->scenePub->Publish(req);
 
   // Register this scene the the real time shaders system
@@ -845,7 +840,6 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
 {
-  printf("Got Scene Message\n");
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }
