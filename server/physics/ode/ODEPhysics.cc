@@ -1066,6 +1066,9 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
         dJointAttach (c, b1, b2);
         contact_created = true;
+
+        World::ContactJoint wc; wc.b1 = geom1->GetBody(); wc.b2 = geom2->GetBody();
+        World::Instance()->AddContactJoint(wc);
       }
 
       if (contact_created)

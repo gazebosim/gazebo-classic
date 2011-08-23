@@ -443,6 +443,21 @@ class World : public SingletonT<World>
   private: Timer saveStateTimer;
   private: ParamT<Time> *saveStateTimeoutP;
   private: ParamT<unsigned int> *saveStateBufferSizeP;
+
+  public: class ContactJoint
+  {
+    public: Body* b1;
+    public: Body* b2;
+  };
+  private: std::vector<ContactJoint> contact_joints;
+  public: void AddContactJoint(ContactJoint joint) {this->contact_joints.push_back(joint);};
+  public: void ClearContactJoints() {this->contact_joints.clear();};
+  public: unsigned int GetContactJointCount() {return this->contact_joints.size();};
+  public: ContactJoint GetContactJoint(unsigned int index) {
+    if (index>this->contact_joints.size())
+      gzthrow("Invalid contact joint index[" << index << "]\n");
+    return this->contact_joints[index];
+  };
 };
 
 class WorldState

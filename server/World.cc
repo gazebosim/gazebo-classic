@@ -348,6 +348,7 @@ void World::Update()
   if (!Simulator::Instance()->IsPaused() &&
        Simulator::Instance()->GetPhysicsEnabled())
   {
+    this->ClearContactJoints();
     {
       DIAGNOSTICTIMER(timer("World::Update Physics",6));
       this->physicsEngine->UpdatePhysics();
@@ -368,6 +369,7 @@ void World::Update()
   //Logger::Instance()->Update();
 
   this->worldUpdateEndSignal();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
