@@ -98,11 +98,13 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 
   // Add the connection to our list
   this->connectionMutex->lock();
-  this->connections.push_back(new_connection);
+  int index = this->connections.size();
+  printf("Creating a connection\n");
+  this->connections[index] = new_connection;
 
   // Start reading from the connection
   new_connection->AsyncRead( 
-      boost::bind(&Master::OnRead, this, this->connections.size()-1, _1));
+      boost::bind(&Master::OnRead, this, index, _1));
   this->connectionMutex->unlock();
 }
 
@@ -110,6 +112,10 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 void Master::OnRead(const unsigned int _connectionIndex, 
                     const std::string &_data)
 {
+  if (!this->connections[_connectionIndex] ||
+      !this->connections[_connectionIndex]->IsOpen())
+    return;
+
   // Get the connection
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
 
@@ -134,6 +140,10 @@ void Master::OnRead(const unsigned int _connectionIndex,
 void Master::ProcessMessage(const unsigned int _connectionIndex,
                             const std::string &_data)
 {
+  if (!this->connections[_connectionIndex] ||
+      !this->connections[_connectionIndex]->IsOpen())
+    return;
+
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
 
   msgs::Packet packet;
@@ -152,11 +162,11 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       this->worldNames.push_back( worldNameMsg.data() );
 
       this->connectionMutex->lock();
-      std::deque<transport::ConnectionPtr>::iterator iter2;
+      Connection_M::iterator iter2;
       for (iter2 = this->connections.begin(); 
           iter2 != this->connections.end(); iter2++)
       {
-        (*iter2)->EnqueueMsg( msgs::Package("topic_namespace_add", worldNameMsg));
+        iter2->second->EnqueueMsg( msgs::Package("topic_namespace_add", worldNameMsg));
       }
       this->connectionMutex->unlock();
 
@@ -169,11 +179,11 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     pub.ParseFromString( packet.serialized_data() );
 
     this->connectionMutex->lock();
-    std::deque<transport::ConnectionPtr>::iterator iter2;
+    Connection_M::iterator iter2;
     for (iter2 = this->connections.begin(); 
          iter2 != this->connections.end(); iter2++)
     {
-      (*iter2)->EnqueueMsg(msgs::Package("publisher_add", pub)); 
+      iter2->second->EnqueueMsg(msgs::Package("publisher_add", pub)); 
     }
     this->connectionMutex->unlock();
 
@@ -209,75 +219,13 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
-
-    this->connectionMutex->lock();
-    std::deque<transport::ConnectionPtr>::iterator iter2;
-    for (iter2 = this->connections.begin(); 
-         iter2 != this->connections.end(); iter2++)
-    {
-      (*iter2)->EnqueueMsg(msgs::Package("publisher_del", pub)); 
-    }
-    this->connectionMutex->unlock();
-
-    /* DEBUG
-    if (pub.topic().find("scene") != std::string::npos)
-      printf("Master got UNadvertise[%s]\n", pub.topic().c_str());
-      */
-
-    SubList::iterator iter;
-    // Find all subscribers of the topic
-    for (iter = this->subscribers.begin(); 
-        iter != this->subscribers.end(); iter++)
-    {
-      if (iter->first.topic() == pub.topic())
-      {
-        iter->second->EnqueueMsg(msgs::Package("unadvertise", pub));
-      }
-    }
-
-    PubList::iterator pubIter = this->publishers.begin();
-    while (pubIter != this->publishers.end())
-    {
-      if (pubIter->first.topic() == pub.topic() &&
-          pubIter->first.host() == pub.host() &&
-          pubIter->first.port() == pub.port())
-      {
-        this->publishers.erase( pubIter++ );
-      }
-      else
-        pubIter++;
-    }
-
+    this->RemovePublisher(pub);
   }
   else if (packet.type() == "unsubscribe")
   {
     msgs::Subscribe sub;
     sub.ParseFromString( packet.serialized_data() );
-
-    SubList::iterator subiter = this->subscribers.begin();
-
-    // Find all publishers of the topic, and remove the subscriptions
-    for (PubList::iterator iter = this->publishers.begin(); 
-        iter != this->publishers.end(); iter++)
-    {
-      if (iter->first.topic() == sub.topic())
-      {
-        iter->second->EnqueueMsg(msgs::Package("unsubscribe", sub));
-      }
-    }
-
-    // Remove the subscribers from our list
-    while (subiter != this->subscribers.end())
-    {
-      if (subiter->first.topic() == sub.topic() && 
-          subiter->first.host() == sub.host() &&
-          subiter->first.port() == sub.port())
-      {
-        this->subscribers.erase(subiter++);
-      }
-      else
-        subiter++;
-    }
+    this->RemoveSubscriber(sub);
   }
   else if (packet.type() == "subscribe")
   {
@@ -328,7 +276,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
         msgs::Publish *pub = msg.add_publisher();
         pub->CopyFrom( iter->first );
       }
-      conn->EnqueueMsg( msgs::Package("publisher_list", msg));
+      conn->EnqueueMsg( msgs::Package("publisher_list", msg), true);
     }
     else if (req.request() == "topic_info")
     {
@@ -394,38 +342,157 @@ void Master::Run()
 // The master run loop
 void Master::RunLoop()
 {
-  std::deque<transport::ConnectionPtr>::iterator iter;
   while (!this->stop)
   {
-    // Process the incoming message queue
-    this->msgsMutex->lock();
-    while (this->msgs.size() > 0)
-    {
-      this->ProcessMessage( this->msgs.front().first, 
-                            this->msgs.front().second );
-      this->msgs.pop_front();
-    }
-    this->msgsMutex->unlock();
-
-    // Process all the connections
-    this->connectionMutex->lock();
-    for (iter = this->connections.begin(); 
-         iter != this->connections.end();)
-    {
-      if ( (*iter)->IsOpen() )
-      {
-        (*iter)->ProcessWriteQueue();
-        iter++;
-      }
-      else
-      {
-        this->connections.erase(iter);
-        iter++;
-      }
-    }
-    this->connectionMutex->unlock();
-
+    this->RunOnce();
     usleep(10000);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Master::RunOnce()
+{
+  Connection_M::iterator iter;
+
+  // Process the incoming message queue
+  this->msgsMutex->lock();
+  while (this->msgs.size() > 0)
+  {
+    this->ProcessMessage( this->msgs.front().first, 
+        this->msgs.front().second );
+    this->msgs.pop_front();
+  }
+  this->msgsMutex->unlock();
+
+  // Process all the connections
+  this->connectionMutex->lock();
+  for (iter = this->connections.begin(); 
+       iter != this->connections.end();)
+  {
+    if (iter->second->IsOpen())
+    {
+      iter->second->ProcessWriteQueue();
+      iter++;
+    }
+    else
+    {
+      printf("Remove a connection\n");
+      this->RemoveConnection( iter->first );
+      iter++;
+    }
+  }
+  this->connectionMutex->unlock();
+}
+
+void Master::RemoveConnection(unsigned int _index)
+{
+  std::list< std::pair<unsigned int, std::string> >::iterator msgIter;
+  Connection_M::iterator connIter;
+  connIter = this->connections.find(_index);
+
+  if (connIter == this->connections.end() || !connIter->second)
+    return;
+
+  // Remove all messages for this connection
+  this->msgsMutex->lock();
+  msgIter = this->msgs.begin();
+  while (msgIter != this->msgs.end())
+  {
+    if ( (*msgIter).first == _index)
+      this->msgs.erase(msgIter++);
+    else
+      msgIter++;
+  }
+  this->msgsMutex->unlock();
+
+  // Remove all publishers for this connection
+  PubList::iterator pubIter;
+  for (pubIter = this->publishers.begin(); 
+       pubIter != this->publishers.end(); pubIter++)
+  {
+    if ((*pubIter).second->id == 
+        connIter->second->id)
+      this->RemovePublisher((*pubIter).first);
+  }
+
+  // Remove all subscribers for this connection
+  SubList::iterator subIter;
+  for (subIter = this->subscribers.begin(); 
+       subIter != this->subscribers.end(); subIter++)
+  {
+    if ((*subIter).second->id == connIter->second->id)
+      this->RemoveSubscriber((*subIter).first);
+  }
+
+  this->connections.erase(connIter);
+}
+
+void Master::RemovePublisher(const msgs::Publish &_pub)
+{
+
+  this->connectionMutex->lock();
+  Connection_M::iterator iter2;
+  for (iter2 = this->connections.begin(); 
+      iter2 != this->connections.end(); iter2++)
+  {
+    iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub)); 
+  }
+  this->connectionMutex->unlock();
+
+  /* DEBUG
+     if (pub.topic().find("scene") != std::string::npos)
+     printf("Master got UNadvertise[%s]\n", pub.topic().c_str());
+     */
+
+  SubList::iterator iter;
+  // Find all subscribers of the topic
+  for (iter = this->subscribers.begin(); 
+      iter != this->subscribers.end(); iter++)
+  {
+    if (iter->first.topic() == _pub.topic())
+    {
+      iter->second->EnqueueMsg(msgs::Package("unadvertise", _pub));
+    }
+  }
+
+  PubList::iterator pubIter = this->publishers.begin();
+  while (pubIter != this->publishers.end())
+  {
+    if (pubIter->first.topic() == _pub.topic() &&
+        pubIter->first.host() == _pub.host() &&
+        pubIter->first.port() == _pub.port())
+    {
+      this->publishers.erase( pubIter++ );
+    }
+    else
+      pubIter++;
+  }
+}
+
+void Master::RemoveSubscriber(const msgs::Subscribe &_sub)
+{
+  // Find all publishers of the topic, and remove the subscriptions
+  for (PubList::iterator iter = this->publishers.begin(); 
+      iter != this->publishers.end(); iter++)
+  {
+    if (iter->first.topic() == _sub.topic())
+    {
+      iter->second->EnqueueMsg(msgs::Package("unsubscribe", _sub));
+    }
+  }
+
+  // Remove the subscribers from our list
+  SubList::iterator subiter = this->subscribers.begin();
+  while (subiter != this->subscribers.end())
+  {
+    if (subiter->first.topic() == _sub.topic() && 
+        subiter->first.host() == _sub.host() &&
+        subiter->first.port() == _sub.port())
+    {
+      this->subscribers.erase(subiter++);
+    }
+    else
+      subiter++;
   }
 }
 
@@ -473,16 +540,16 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
                                                 unsigned short _port)
 {
   transport::ConnectionPtr conn;
-  std::deque<transport::ConnectionPtr>::iterator iter;
+  Connection_M::iterator iter;
 
   this->connectionMutex->lock();
   for (iter = this->connections.begin(); 
        iter != this->connections.end(); iter++)
   {
-    if ((*iter)->GetRemoteAddress() == _host && 
-        (*iter)->GetRemotePort() == _port)
+    if (iter->second->GetRemoteAddress() == _host && 
+        iter->second->GetRemotePort() == _port)
     {
-      conn = (*iter);
+      conn = iter->second;
       break;
     }
   }

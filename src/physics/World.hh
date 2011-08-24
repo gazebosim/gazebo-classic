@@ -75,7 +75,7 @@ namespace gazebo
     
       /// \brief Run the world in a thread
       public: void Run();
-    
+
       /// \brief Stop the world
       public: void Stop();
  

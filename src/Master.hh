@@ -27,6 +27,9 @@ namespace gazebo
     /// \brief Run the master in a new thread
     public: void Run();
 
+    /// \brief Run the master one iteration 
+    public: void RunOnce();
+
     /// \brief Stop the master
     public: void Stop();
 
@@ -67,12 +70,17 @@ namespace gazebo
                                                      unsigned short _port);
 
 
+    private: void RemoveConnection(unsigned int _index);
+    private: void RemovePublisher(const msgs::Publish &_pub);
+    private: void RemoveSubscriber(const msgs::Subscribe &_sub);
+
+    typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
     typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> > PubList;
     typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> > SubList;
     private: PubList publishers;
     private: SubList subscribers;
 
-    private: std::deque<transport::ConnectionPtr> connections;
+    private: Connection_M connections;
     private: std::list< std::string > worldNames;
     private: std::list< std::pair<unsigned int, std::string> > msgs;
 

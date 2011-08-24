@@ -57,7 +57,7 @@ bool parse(int argc, char **argv)
 
 transport::ConnectionPtr connect_to_master(const std::string &host, unsigned short port)
 {
-  std::string data;
+  std::string data, namespacesData, publishersData;
   msgs::Packet packet;
 
   // Connect to the master
@@ -66,6 +66,8 @@ transport::ConnectionPtr connect_to_master(const std::string &host, unsigned sho
 
   // Read the verification message
   connection->Read(data);
+  connection->Read(namespacesData);
+  connection->Read(publishersData);
 
   packet.ParseFromString(data);
   if (packet.type() == "init")
@@ -86,23 +88,25 @@ void list()
   msgs::Request request;
   msgs::Publishers pubs;
 
-  transport::init();
-
+  printf("Creating master connection\n");
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
   request.set_request("get_publishers");
   connection->EnqueueMsg( msgs::Package("request", request), true );
-
   connection->Read(data);
-  packet.ParseFromString(data);
 
+  packet.ParseFromString(data);
   pubs.ParseFromString( packet.serialized_data() );
+
   for (int i=0; i < pubs.publisher_size(); i++)
   {
     const msgs::Publish &p = pubs.publisher(i);
     if (p.topic().find("__dbg") == std::string::npos)
       std::cout << p.topic() << std::endl;
   }
+
+  printf("Closing master connection\n");
+  connection.reset();
 }
 
 void echo_cb(const boost::shared_ptr<msgs::String const> &_data)

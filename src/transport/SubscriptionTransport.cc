@@ -59,7 +59,10 @@ bool SubscriptionTransport::HandleData(const std::string &newdata)
     result = true;
   }
   else
+  {
+    this->connection.reset();
     gzerr << "Connection is closed!\n";
+  }
 
   return result;
 }

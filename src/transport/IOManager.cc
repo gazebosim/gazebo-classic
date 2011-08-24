@@ -31,6 +31,7 @@ IOManager::IOManager()
 
 IOManager::~IOManager()
 {
+  printf("IOManager::Destructor\n");
   this->Stop();
 
   if (this->work)

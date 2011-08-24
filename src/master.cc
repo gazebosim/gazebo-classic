@@ -39,12 +39,12 @@ int main(int /*argc*/, char ** /*argv*/)
 
   master = new gazebo::Master();
   master->Init(port);
-  master->Run();
 
   // wait loop
   while (!stop)
   {
-    usleep(1000000);
+    master->RunOnce();
+    usleep(10000);
   }
 
   master->Fini();

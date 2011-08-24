@@ -47,7 +47,6 @@ ConnectionManager::~ConnectionManager()
   delete this->masterMessagesMutex;
   this->masterMessagesMutex = NULL;
 
-
   this->Fini();
 }
 
@@ -122,11 +121,6 @@ void ConnectionManager::Init(const std::string &master_host,
   else
     gzerr << "Did not get publishers_init msg from master\n";
 
-  /* DEBUG
-  gzdbg << "Server URI[" << this->serverConn->GetLocalURI() << "]\n";
-  gzdbg << "Master URI[" << this->masterConn->GetLocalURI() << "]\n";
-  */
-
   this->masterConn->AsyncRead( 
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
 
@@ -142,6 +136,7 @@ void ConnectionManager::Fini()
     return;
 
   this->masterConn->ProcessWriteQueue();
+  printf("Killing master conn\n");
   this->masterConn.reset();
 
   this->serverConn->ProcessWriteQueue();
@@ -214,7 +209,8 @@ void ConnectionManager::Run()
 // On read master
 void ConnectionManager::OnMasterRead( const std::string &_data)
 {
-  this->masterConn->AsyncRead( 
+  if (this->masterConn && this->masterConn->IsOpen())
+    this->masterConn->AsyncRead( 
         boost::bind(&ConnectionManager::OnMasterRead, this, _1));
 
   if (!_data.empty())
@@ -254,7 +250,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
       if ((*iter).topic() == result.topic() &&
           (*iter).host() == result.host() &&
           (*iter).port() == result.port())
-        this->publishers.erase(iter);
+        this->publishers.erase(iter++);
       else
         iter++;
     }

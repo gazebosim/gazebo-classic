@@ -47,14 +47,13 @@ Connection::Connection()
   this->readQuit = false;
   this->writeQueue.clear();
   this->writeCount = 0;
-  //boost::asio::socket_base::send_buffer_size(8192*1);
-  //boost::asio::socket_base::receive_buffer_size(8192*1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Connection::~Connection()
 {
+  printf("Connection::Destructor\n");
   this->Shutdown();
   this->writeQueue.clear();
 
@@ -94,10 +93,12 @@ void Connection::Connect(const std::string &host, unsigned short port)
   }
 
   if (this->socket->available() > 0)
-    gzerr << "\n\n\n Shouldn't get here\n\n\n";
+    gzerr << "Shouldn't get here";
 
   if (error)
+  {
     gzthrow ("Unable to connect to " << host << ":" << port);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,10 +211,16 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     this->writeQueue.push_back(_buffer);
     this->writeMutex->unlock();
   //}
+  
+    if (_force)
+      this->ProcessWriteQueue();
 }
 
 void Connection::ProcessWriteQueue()
 {
+  if (!this->IsOpen())
+    return;
+
   this->writeMutex->lock();
 
   if (this->writeQueue.size() == 0)
@@ -294,25 +301,22 @@ void Connection::Shutdown()
   this->shutdownSignal();
   this->StopRead();
 
+  this->Cancel();
+
   if (this->socket->is_open())
   {
     boost::system::error_code ec;
     this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   }
 
-  this->Cancel();
   this->Close();
-  //this->acceptor = NULL;
-  //this->readThread = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the connection is open
 bool Connection::IsOpen() const
 {
-  if (this->socket)
-    return this->socket->is_open();
-  return false;
+  return this->socket->is_open();
 }
 
 
@@ -324,6 +328,7 @@ void Connection::Close()
   {
     try
     {
+      printf("CloseSocket[%d]\n", this->id);
       this->socket->close();
     }
     catch (boost::system::system_error &e)

@@ -32,7 +32,6 @@
 std::string config_filename = "";
 
 bool quit = false;
-std::vector< gazebo::physics::WorldPtr > worlds;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -104,8 +103,6 @@ void Load()
   {
     gazebo::physics::WorldPtr world = gazebo::physics::create_world(worldElem->GetValueString("name"));
 
-    worlds.push_back(world);
-
     //Create the world
     try
     {
@@ -119,14 +116,12 @@ void Load()
     worldElem = sdf->root->GetNextElement("world", worldElem);
   }
 
-  for (unsigned int i=0; i < worlds.size(); i++)
-    gazebo::physics::init_world(worlds[i]);
+  gazebo::physics::init_worlds();
 }
 
 void Run()
 {
-  for (unsigned int i=0; i < worlds.size(); i++)
-    gazebo::physics::run_world(worlds[i]);
+  gazebo::physics::run_worlds();
 
   while (!quit)
   {
