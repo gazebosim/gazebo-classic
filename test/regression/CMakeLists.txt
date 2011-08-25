@@ -14,22 +14,35 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-
-enable_testing()
 find_package( GTest REQUIRED )
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
-add_executable(speed speed.cc ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
+set (gtest_sources speed.cc)
 
-target_link_libraries( speed ${GTEST_BOTH_LIBRARIES} 
-                               gazebo_common 
-                               gazebo_transport 
-                               gazebo_physics
-                               gazebo_sensors
-                               gazebo_rendering
-                               gazebo_msgs
-                               assimp
-                               pthread 
-                               )
+foreach(GTEST_SOURCE_file ${gtest_sources})
+  string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+  add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
 
-add_test(PR2Test speed)
+  target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
+                         gazebo_common 
+                         gazebo_transport 
+                         gazebo_physics
+                         gazebo_sensors
+                         gazebo_rendering
+                         gazebo_msgs
+                         assimp
+                         pthread 
+                         )
+
+  file(STRINGS ${GTEST_SOURCE_file} GTEST_NAMES REGEX ^TEST)
+  foreach(GTEST_NAME ${GTEST_NAMES})
+
+    string(REGEX REPLACE ["\) \(,"] ";" GTEST_NAME ${GTEST_NAME})
+
+    list(GET GTEST_NAME 1 GTEST_GROUP_NAME)
+    list(GET GTEST_NAME 3 GTEST_NAME)
+    add_test(${GTEST_GROUP_NAME}.${GTEST_NAME}
+             ${CMAKE_CURRENT_BINARY_DIR}/speed
+             --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
+  endforeach()
+endforeach()
