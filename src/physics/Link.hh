@@ -157,6 +157,12 @@ namespace gazebo
       /// Load a new geom helper function
       /// \param _sdf SDF element used to load the geom
       private: void LoadGeom( sdf::ElementPtr &_sdf );
+
+      /// \bridf keep a list of geoms for this body
+      private: std::vector<GeomPtr> geoms;
+
+      /// \bridf accessor for geoms
+      public: GeomPtr GetGeom(std::string name);
   
       /// \brief Load a sensor
       private: void LoadSensor( sdf::ElementPtr &_sdf );

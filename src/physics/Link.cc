@@ -356,6 +356,24 @@ void Link::LoadGeom( sdf::ElementPtr &_sdf )
     gzthrow("Unknown Geometry Type["+type +"]");
 
   geom->Load(_sdf);
+  this->geoms.push_back(geom);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the geom by name
+GeomPtr Link::GetGeom(std::string name)
+{
+  Geom_V::const_iterator giter;
+  GeomPtr result;
+  for (giter=this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    if ((*giter)->GetName() == name)
+    {
+      result = boost::shared_dynamic_cast<Geom>(*giter);
+      break;
+    }
+  }
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
