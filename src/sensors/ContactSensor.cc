@@ -26,6 +26,7 @@
 
 #include "common/Global.hh"
 #include "common/Exception.hh"
+#include "physics/Physics.hh"
 #include "physics/World.hh"
 #include "physics/Model.hh"
 #include "physics/Link.hh"
@@ -73,6 +74,39 @@ ContactSensor::~ContactSensor()
 void ContactSensor::Load()
 {
 
+  Sensor::Load();
+
+  std::string linkName = this->sdf->GetLinkName();
+  //gzerr << "parent link name : " << linkName << "\n";
+
+  std::string modelName = this->sdf->GetModelName();
+  //gzerr << "parent model name : " << modelName << "\n";
+
+  std::string worldName = this->sdf->GetWorldName();
+  //gzerr << "parent world name : " << worldName << "\n";
+
+  // get parent link by looking at real parent
+  std::string linkFullyScopedName = worldName + "::" + modelName + "::" + linkName;
+  //gzerr << "scoped link name : " << linkFullyScopedName << "\n";
+
+
+  this->world = gazebo::physics::get_world(worldName);
+  this->model = this->world->GetModelByName(modelName);
+  gazebo::physics::BasePtr tmp = this->model->GetByName(linkFullyScopedName);
+  printf("ok\n");
+  this->link = boost::dynamic_pointer_cast<gazebo::physics::Link>(this->model->GetByName(linkFullyScopedName));
+
+  if (this->link == NULL)
+    gzthrow("Null link in the contact sensor");
+
+  // get geom name
+  std::string geom_name = this->sdf->GetElement("contact")->GetElement("collision")->GetValueString("name");
+
+  this->geom = this->link->GetGeom(geom_name);
+
+  if (this->geom == NULL)
+    gzthrow("Null geom in the contact sensor");
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -96,6 +130,8 @@ void ContactSensor::Load(sdf::ElementPtr &_sdf)
   }
   Param::End();
 */
+
+  Sensor::Load(_sdf);
 }
 
 //////////////////////////////////////////////////////////////////////////////

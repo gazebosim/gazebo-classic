@@ -77,6 +77,11 @@ namespace gazebo
       public: physics::Contact GetGeomContact(unsigned int geom, unsigned int index) const;
   
       private: std::vector<physics::Geom *> geoms;
+
+      private: gazebo::physics::WorldPtr world;
+      private: gazebo::physics::ModelPtr model;
+      private: gazebo::physics::LinkPtr link;
+      private: gazebo::physics::GeomPtr geom;
     };
     /// \}
   }
