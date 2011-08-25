@@ -46,6 +46,10 @@ void SpeedTest(const std::string &worldFile, double minSpeed)
   ASSERT_NO_THROW(server->Fini());
 
   delete server;
+
+  //TODO: this sleep should get removed...there is a timing issue with
+  // cleanup. Some of the singletons don't shutdown in time.
+  usleep(100000);
 }
 
 TEST(Speed, EmptyWorld)
