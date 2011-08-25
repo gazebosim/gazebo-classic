@@ -31,6 +31,8 @@ std::string Publication::GetTopic() const
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
+//  printf("Publication::AddSubscription[%s]\n", this->topic.c_str());
+
   std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
   if (iter == this->callbacks.end())
@@ -180,13 +182,20 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 {
   std::list< CallbackHelperPtr >::iterator iter;
 
+  std::string data;
+  _msg.SerializeToString(&data);
+
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
-    if ((*iter)->HandleMessage(&_msg))
+    if ((*iter)->HandleData(data))
+    {
       iter++;
+    }
     else
+    {
       this->callbacks.erase( iter++ );
+    }
   }
   if (_cb)
     (_cb)();

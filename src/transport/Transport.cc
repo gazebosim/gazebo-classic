@@ -19,7 +19,6 @@
 #include <boost/lexical_cast.hpp>
 #include <string>
 
-#include "transport/IOManager.hh"
 #include "transport/Publisher.hh"
 #include "transport/Subscriber.hh"
 #include "transport/ConnectionManager.hh"
@@ -75,16 +74,28 @@ void transport::run()
 
 void transport::stop()
 {
-  IOManager::Instance()->Stop();
-  transport::ConnectionManager::Instance()->Stop();
+  /*transport::ConnectionManager::Instance()->Stop();
 
-  runThread->join();
-  delete runThread;
-  runThread = NULL;
+  if (runThread)
+  {
+    runThread->join();
+    delete runThread;
+    runThread = NULL;
+  }
+  */
 }
 
 void transport::fini()
 {
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Fini();
+transport::ConnectionManager::Instance()->Stop();
+
+  if (runThread)
+  {
+    runThread->join();
+    delete runThread;
+    runThread = NULL;
+  }
+
 }

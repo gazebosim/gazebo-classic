@@ -57,7 +57,10 @@ namespace gazebo
       public: void Subscribe( const std::string &topic, 
                               const std::string &msgType);
 
-      public: void Unsubscribe( const msgs::Subscribe &msg );
+      public: void Unsubscribe( const msgs::Subscribe &_sub );
+
+      public: void Unsubscribe( const std::string &_topic,
+                                const std::string &_msgType );
 
       public: void Advertise( const std::string &topic, 
                               const std::string &msgType);
@@ -74,7 +77,7 @@ namespace gazebo
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
-      public: void GetTopicNamespaces(std::vector<std::string> &_namespaces);
+      public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host, 
@@ -91,6 +94,8 @@ namespace gazebo
       private: void OnRead( const ConnectionPtr &new_connection,
                             const std::string &data );
 
+      private: void ProcessMessage(const std::string &_packet);
+
       private: ConnectionPtr masterConn;
       private: ConnectionPtr serverConn;
 
@@ -99,6 +104,14 @@ namespace gazebo
       private: bool initialized;
       private: bool stop;
       private: boost::thread *thread;
+
+      private: unsigned int tmpIndex;
+      private: boost::recursive_mutex *listMutex;
+      private: boost::recursive_mutex *masterMessagesMutex;
+
+      private: std::list<msgs::Publish> publishers;
+      private: std::list<std::string> namespaces;
+      private: std::list<std::string> masterMessages;
 
       //Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

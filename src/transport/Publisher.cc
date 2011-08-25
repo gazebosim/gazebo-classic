@@ -49,6 +49,8 @@ Publisher::~Publisher()
     gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
   }
 
+  gzdbg << "Publisher::Destructor[" << this->topic << "]\n";
+
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 
@@ -64,9 +66,10 @@ void Publisher::Publish(google::protobuf::Message &_message )
     gzthrow("Invalid message type\n");
 
   // Save the latest message
-  this->mutex->lock();
   google::protobuf::Message *msg = _message.New();
   msg->CopyFrom( _message );
+
+  this->mutex->lock();
   this->messages.push_back( msg );
 
   if (this->messages.size() > this->queueLimit)

@@ -205,7 +205,7 @@ void World::Run()
   this->thread = new boost::thread( 
       boost::bind(&World::RunLoop, this));
 }
-
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Stop the world
 void World::Stop()
@@ -228,21 +228,11 @@ void World::RunLoop()
 
   common::Time step = this->physicsEngine->GetStepTime();
 
-  //bool userStepped;
-  common::Time diffTime;
-  common::Time currTime;
-  common::Time lastTime = this->GetRealTime();
-  struct timespec req;//, rem;
-
   this->startTime = common::Time::GetWallTime();
 
   // This fixes a minor issue when the world is paused before it's started
   if (this->IsPaused())
     this->pauseStartTime = this->startTime;
-
-  // Set a default sleep time
-  req.tv_sec  = 0;
-  req.tv_nsec = 10000;
 
   while (!this->stop)
   {
@@ -268,8 +258,6 @@ void World::RunLoop()
       this->Update();
     }
 
-    //nanosleep(&req, &rem);
-
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
@@ -279,15 +267,7 @@ void World::RunLoop()
 
     if (this->IsPaused() && this->stepInc)
       this->stepInc = false;
-
-    // TODO: Fix stepping
-    /*if (userStepped)
-    {
-      this->SetStepInc(false);
-      this->SetPaused(true);
-    }*/
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

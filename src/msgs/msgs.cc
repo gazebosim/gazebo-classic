@@ -78,7 +78,7 @@ void Stamp(msgs::Time *time)
 }
 
 std::string Package(const std::string &type, 
-                             const google::protobuf::Message &message)
+                    const google::protobuf::Message &message)
 {
   std::string data;
   msgs::Packet pkg;

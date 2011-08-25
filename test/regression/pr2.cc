@@ -21,66 +21,46 @@ void OnStats(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
     g_percent  = (simTime / realTime).Double();
 }
 
-
-TEST(Shapes, Regression)
+void SpeedTest(const std::string &worldFile, double minSpeed)
 {
   Server *server = NULL;
 
   ASSERT_NO_THROW(server = new Server());
-  ASSERT_NO_THROW(server->Load("worlds/shapes.world"));
+  ASSERT_NO_THROW(server->Load(worldFile));
   ASSERT_NO_THROW(server->Init());
 
   boost::thread thread(boost::bind(&Server::Run, server));
 
   transport::NodePtr node = transport::NodePtr( new transport::Node() );
-  ASSERT_NO_THROW(node->Init("default"));
+  ASSERT_NO_THROW(node->Init());
   transport::SubscriberPtr sub = node->Subscribe("~/world_stats", OnStats);
 
   g_percent = -1;
   while (g_percent < 0)
     usleep(100000);
 
-  EXPECT_GT(g_percent, 2.0);
+  EXPECT_GT(g_percent, minSpeed);
 
   ASSERT_NO_THROW(server->Stop());
   thread.join();
   ASSERT_NO_THROW(server->Fini());
 
   delete server;
-
-  printf("Sleeping\n");
-  usleep(5000000);
-  printf("DONE Sleeping\n");
 }
 
-TEST(PR2, Regression)
+TEST(Speed, EmptyWorld)
 {
-  Server *server = NULL;
+  SpeedTest("worlds/empty.world", 2700.0);
+}
 
-  ASSERT_NO_THROW(server = new Server());
-  ASSERT_NO_THROW(server->Load("worlds/pr2.world"));
-  ASSERT_NO_THROW(server->Init());
+TEST(Speed, ShapesWorld)
+{
+  SpeedTest("worlds/shapes.world", 1700.0);
+}
 
-  boost::thread thread(boost::bind(&Server::Run, server));
-
-  transport::NodePtr node = transport::NodePtr( new transport::Node() );
-  ASSERT_NO_THROW(node->Init("default"));
-  transport::SubscriberPtr sub = node->Subscribe("~/world_stats", OnStats);
-
-  g_percent = -1;
-  while (g_percent < 0)
-  {
-    printf("Waiting\n");
-    usleep(100000);
-  }
-
-  EXPECT_GT(g_percent, 2.0);
-
-  ASSERT_NO_THROW(server->Stop());
-  thread.join();
-  ASSERT_NO_THROW(server->Fini());
-
-  delete server;
+TEST(Speed, PR2World)
+{
+  SpeedTest("worlds/pr2.world", 2.0);
 }
 
 int main(int argc, char **argv)

@@ -51,7 +51,7 @@ unsigned int Scene::idCounter = 0;
 Scene::Scene(const std::string &_name)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_name);
+  this->node->Init("default");//_name);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -68,7 +68,7 @@ Scene::Scene(const std::string &_name)
 
   grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
   this->grids.push_back(grid);
-  
+ 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
   this->visSub = this->node->Subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
@@ -175,6 +175,7 @@ void Scene::Init()
   this->scenePub = this->node->Advertise<msgs::Request>("~/publish_scene");
   msgs::Request req;
   req.set_request("publish");
+  req.set_index(1234);
 
   this->scenePub->Publish(req);
 

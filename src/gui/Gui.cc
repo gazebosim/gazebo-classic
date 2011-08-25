@@ -70,11 +70,13 @@ void gui::run()
 
 void gui::stop()
 {
+  g_active_camera.reset();
   g_app->quit();
 }
 
 void gui::fini()
 {
+  g_active_camera.reset();
   rendering::fini();
 }
 

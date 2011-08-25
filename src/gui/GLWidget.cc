@@ -64,6 +64,7 @@ GLWidget::GLWidget( QWidget *parent )
 
 GLWidget::~GLWidget()
 {
+  this->userCamera.reset();
 }
 
 void GLWidget::showEvent(QShowEvent *event)

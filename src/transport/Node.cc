@@ -27,10 +27,13 @@ Node::Node()
 {
   this->id = idCounter++;
   this->topicNamespace = "";
+  this->publisherMutex = new boost::recursive_mutex();
 }
 
 Node::~Node()
 {
+  delete this->publisherMutex;
+  this->publisherMutex = NULL;
   TopicManager::Instance()->RemoveNode( this->id );
 }
 
@@ -40,12 +43,24 @@ void Node::Init(const std::string &_space)
 
   if (_space.empty())
   {
-    std::vector<std::string> namespaces;
-    TopicManager::Instance()->GetTopicNamespaces(namespaces);
-    if (namespaces.size() > 0)
-      this->topicNamespace = namespaces[0];
-    else
-      gzerr << "No topic namespaces specifed\n";
+    std::list<std::string> namespaces;
+
+    unsigned int trys = 0;
+    unsigned int limit = 10;
+    while (namespaces.size() == 0 && trys < limit)
+    {
+      TopicManager::Instance()->GetTopicNamespaces(namespaces);
+      usleep(500000);
+      trys++;
+    }
+
+    if (trys > limit)
+    {
+      gzerr << "Unable to get topic namespaces from Master.Node is uninitialized!\n";
+      return;
+    }
+
+    this->topicNamespace = namespaces.front();
   }
   else
     TopicManager::Instance()->RegisterTopicNamespace( _space );
@@ -86,8 +101,11 @@ unsigned int Node::GetId() const
 void Node::ProcessPublishers()
 {
   std::vector<PublisherPtr>::iterator iter;
+
+  this->publisherMutex->lock();
   for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
   {
     (*iter)->SendMessage();
   }
+  this->publisherMutex->unlock();
 }

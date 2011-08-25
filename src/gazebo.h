@@ -45,7 +45,7 @@ namespace gazebo
 
   void stop()
   {
-    gazebo::transport::stop();
+//    gazebo::transport::stop();
   }
   
   void fini()

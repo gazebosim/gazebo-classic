@@ -47,11 +47,11 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->entityPub = this->node->Advertise<msgs::Entity>("~/entity");
   this->newEntitySub = this->node->Subscribe("~/entity", &ModelListWidget::OnEntity, this);
 
-  msgs::Request msg;
+  /*msgs::Request msg;
   msg.set_index( 1 );
   msg.set_request( "entities" );
-
   this->entitiesRequestPub->Publish( msg );
+  */
 
   this->moveToAction = new QAction(tr("Move To"), this);
   this->moveToAction->setStatusTip(tr("Move camera to the selection"));

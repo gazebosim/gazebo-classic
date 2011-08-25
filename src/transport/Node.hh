@@ -70,7 +70,10 @@ namespace gazebo
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
         PublisherPtr publisher = transport::TopicManager::Instance()->Advertise<M>(decodedTopic, _queueLimit);
+
+        this->publisherMutex->lock();
         this->publishers.push_back(publisher);
+        this->publisherMutex->unlock();
 
         return publisher;
       }
@@ -101,6 +104,8 @@ namespace gazebo
       private: std::vector<PublisherPtr> publishers;
       private: static unsigned int idCounter;
       private: unsigned int id;
+
+      private: boost::recursive_mutex *publisherMutex;
     };
     /// \}
   }

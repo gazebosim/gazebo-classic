@@ -43,6 +43,7 @@ int main(int argc, char **argv)
 
   transport::SubscriberPtr sub = node->Subscribe(topic, cb);
   transport::run();
+
   while(true)
     usleep(10000);
 
