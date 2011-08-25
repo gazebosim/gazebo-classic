@@ -88,7 +88,6 @@ void list()
   msgs::Request request;
   msgs::Publishers pubs;
 
-  printf("Creating master connection\n");
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
   request.set_request("get_publishers");
@@ -105,7 +104,6 @@ void list()
       std::cout << p.topic() << std::endl;
   }
 
-  printf("Closing master connection\n");
   connection.reset();
 }
 

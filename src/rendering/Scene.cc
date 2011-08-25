@@ -51,7 +51,7 @@ unsigned int Scene::idCounter = 0;
 Scene::Scene(const std::string &_name)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");//_name);
+  this->node->Init(_name);
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
