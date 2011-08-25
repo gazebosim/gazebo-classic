@@ -119,8 +119,6 @@ namespace gazebo
                 void (Connection::*f)(const boost::system::error_code &,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
 
-                printf("AsyncRead[%d]\n",this->GetRemotePort());
-
                 this->inbound_header.resize(HEADER_LENGTH);
                 boost::asio::async_read(*this->socket,
                     boost::asio::buffer(this->inbound_header),
@@ -140,7 +138,6 @@ namespace gazebo
                 {
                   if (e_.message() != "End of File")
                   {
-                    printf("EOF[%d]\n",this->GetRemotePort());
                     this->Close();
                     // This will occur when the other side closes the
                     // connection

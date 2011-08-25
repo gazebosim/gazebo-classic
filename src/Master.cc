@@ -99,7 +99,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   // Add the connection to our list
   this->connectionMutex->lock();
   int index = this->connections.size();
-  printf("Creating a connection\n");
+
   this->connections[index] = new_connection;
 
   // Start reading from the connection
@@ -187,15 +187,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     this->connectionMutex->unlock();
 
-    /* DEBUG
-    bool debug = false;
-    if (pub.topic().find("scene") != std::string::npos)
-    {
-      debug = true;
-      printf("Master got advertise[%s]\n", pub.topic().c_str());
-    }
-    */
-
     this->publishers.push_back( std::make_pair(pub, conn) );
 
     SubList::iterator iter;
@@ -206,11 +197,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == pub.topic())
       {
-        /* DEBUG
-        if (debug)
-          printf("Master sending advert topic[%s] host[%d]\n",
-              iter->first.topic().c_str(), iter->second->GetRemotePort());
-              */
         iter->second->EnqueueMsg(msgs::Package("publisher_update", pub));
       }
     }
@@ -232,15 +218,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     msgs::Subscribe sub;
     sub.ParseFromString( packet.serialized_data() );
 
-    /* DEBUG CODE
-    bool debug = false;
-    if (sub.topic().find("scene") != std::string::npos)
-    {
-      printf("Master got subscribe[%s] Port[%d]\n", sub.topic().c_str(), conn->GetRemotePort());
-      debug = true;
-    }
-    */
-
     this->subscribers.push_back( std::make_pair(sub, conn) );
 
     PubList::iterator iter;
@@ -251,12 +228,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
-        /* DEBUG CODE
-        if (debug)
-          printf("Master sending publisher topic[%s] host[%d]\n",
-              iter->first.topic().c_str(), conn->GetRemotePort());
-              */
- 
         conn->EnqueueMsg(msgs::Package("publisher_update", iter->first));
       }
     }
@@ -376,7 +347,6 @@ void Master::RunOnce()
     }
     else
     {
-      printf("Remove a connection\n");
       this->RemoveConnection( iter->first );
       iter++;
     }
@@ -406,28 +376,50 @@ void Master::RemoveConnection(unsigned int _index)
   this->msgsMutex->unlock();
 
   // Remove all publishers for this connection
-  PubList::iterator pubIter;
-  for (pubIter = this->publishers.begin(); 
-       pubIter != this->publishers.end(); pubIter++)
+  bool done = false;
+  while (!done)
   {
-    if ((*pubIter).second->id == 
-        connIter->second->id)
-      this->RemovePublisher((*pubIter).first);
+    done = true;
+    PubList::iterator pubIter = this->publishers.begin();
+    while (pubIter != this->publishers.end())
+    {
+      if ((*pubIter).second->id == 
+          connIter->second->id)
+      {
+        this->RemovePublisher((*pubIter).first);
+        done = false;
+        break;
+      }
+      else
+        pubIter++;
+    }
   }
 
-  // Remove all subscribers for this connection
-  SubList::iterator subIter;
-  for (subIter = this->subscribers.begin(); 
-       subIter != this->subscribers.end(); subIter++)
+
+  done = false;
+  while (!done)
   {
-    if ((*subIter).second->id == connIter->second->id)
-      this->RemoveSubscriber((*subIter).first);
+    done = true;
+
+    // Remove all subscribers for this connection
+    SubList::iterator subIter = this->subscribers.begin();
+    while (subIter != this->subscribers.end())
+    {
+      if ((*subIter).second->id == connIter->second->id)
+      {
+        this->RemoveSubscriber((*subIter).first);
+        done = false;
+        break;
+      }
+      else
+        subIter++;
+    }
   }
 
   this->connections.erase(connIter);
 }
 
-void Master::RemovePublisher(const msgs::Publish &_pub)
+void Master::RemovePublisher(const msgs::Publish _pub)
 {
 
   this->connectionMutex->lock();
@@ -438,11 +430,6 @@ void Master::RemovePublisher(const msgs::Publish &_pub)
     iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub)); 
   }
   this->connectionMutex->unlock();
-
-  /* DEBUG
-     if (pub.topic().find("scene") != std::string::npos)
-     printf("Master got UNadvertise[%s]\n", pub.topic().c_str());
-     */
 
   SubList::iterator iter;
   // Find all subscribers of the topic
@@ -462,14 +449,14 @@ void Master::RemovePublisher(const msgs::Publish &_pub)
         pubIter->first.host() == _pub.host() &&
         pubIter->first.port() == _pub.port())
     {
-      this->publishers.erase( pubIter++ );
+      pubIter = this->publishers.erase( pubIter );
     }
     else
       pubIter++;
   }
 }
 
-void Master::RemoveSubscriber(const msgs::Subscribe &_sub)
+void Master::RemoveSubscriber(const msgs::Subscribe _sub)
 {
   // Find all publishers of the topic, and remove the subscriptions
   for (PubList::iterator iter = this->publishers.begin(); 
@@ -489,7 +476,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe &_sub)
         subiter->first.host() == _sub.host() &&
         subiter->first.port() == _sub.port())
     {
-      this->subscribers.erase(subiter++);
+      subiter = this->subscribers.erase(subiter);
     }
     else
       subiter++;

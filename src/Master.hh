@@ -71,8 +71,8 @@ namespace gazebo
 
 
     private: void RemoveConnection(unsigned int _index);
-    private: void RemovePublisher(const msgs::Publish &_pub);
-    private: void RemoveSubscriber(const msgs::Subscribe &_sub);
+    private: void RemovePublisher(const msgs::Publish _pub);
+    private: void RemoveSubscriber(const msgs::Subscribe _sub);
 
     typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
     typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> > PubList;

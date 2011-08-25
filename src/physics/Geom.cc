@@ -70,6 +70,7 @@ Geom::~Geom()
 /// Finalize the geom
 void Geom::Fini()
 {
+  Entity::Fini();
   this->body.reset();
   this->shape.reset();
   this->connections.clear();

@@ -87,6 +87,7 @@ void Base::Fini()
     (*iter)->Fini();
 
   this->children.clear();
+  this->world.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,9 +354,9 @@ bool Base::operator==(const Base &ent) const
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world this object belongs to. This will also set the world for all 
 /// children
-void Base::SetWorld(WorldPtr newWorld)
+void Base::SetWorld(const WorldPtr &_newWorld)
 {
-  this->world = newWorld;
+  this->world = _newWorld;
 
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
@@ -366,7 +367,7 @@ void Base::SetWorld(WorldPtr newWorld)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world this object is in
-WorldPtr Base::GetWorld() const
+const WorldPtr &Base::GetWorld() const
 {
   return this->world;
 }

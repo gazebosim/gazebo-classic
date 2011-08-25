@@ -45,6 +45,7 @@ IOManager::~IOManager()
 
 void IOManager::Stop()
 {
+  printf("IOManager::Stop\n");
   this->io_service->reset();
   this->io_service->stop();
   if (this->thread)

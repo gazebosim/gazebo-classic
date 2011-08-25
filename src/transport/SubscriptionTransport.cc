@@ -61,7 +61,6 @@ bool SubscriptionTransport::HandleData(const std::string &newdata)
   else
   {
     this->connection.reset();
-    gzerr << "Connection is closed!\n";
   }
 
   return result;

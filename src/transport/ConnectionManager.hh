@@ -108,6 +108,7 @@ namespace gazebo
       private: unsigned int tmpIndex;
       private: boost::recursive_mutex *listMutex;
       private: boost::recursive_mutex *masterMessagesMutex;
+      private: boost::recursive_mutex *connectionMutex;
 
       private: std::list<msgs::Publish> publishers;
       private: std::list<std::string> namespaces;

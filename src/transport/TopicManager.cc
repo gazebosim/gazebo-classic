@@ -258,22 +258,22 @@ void TopicManager::ConnectSubscibers(const std::string &_topic)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Connect a local subscriber to a remote publisher
-void TopicManager::ConnectSubToPub( const std::string &topic,
-                                    const PublicationTransportPtr &publink )
+void TopicManager::ConnectSubToPub( const std::string &_topic,
+                                    const PublicationTransportPtr &_publink )
 {
   // Add the publication transport mechanism to the publication.
-  if (publink)
+  if (_publink)
   {
-    PublicationPtr publication = this->FindPublication(topic);
+    PublicationPtr publication = this->FindPublication(_topic);
     if (publication)
-      publication->AddTransport( publink );
+      publication->AddTransport( _publink );
     else
       gzerr << "Attempting to connect a remote publisher...but we don't have a publication. This shouldn't happen\n";
   }
   else
-    gzerr << "Bad Publink[" << topic << "]!!\n";
+    gzerr << "Bad Publink[" << _topic << "]!!\n";
 
-  this->ConnectSubscibers(topic);
+  this->ConnectSubscibers(_topic);
 }
 
 

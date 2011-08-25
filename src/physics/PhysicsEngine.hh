@@ -51,6 +51,9 @@ namespace gazebo
     
       /// \brief Initialize the physics engine
       public: virtual void Init() = 0;
+
+      /// \brief Finilize the physics engine
+      public: virtual void Fini();
    
       /// \brief Init the engine for threads. 
       public: virtual void InitForThread() = 0;
@@ -64,9 +67,6 @@ namespace gazebo
       /// \brief Update the physics engine
       public: virtual void UpdatePhysics() {}
     
-      /// \brief Finilize the physics engine
-      public: virtual void Fini() = 0;
-  
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(EntityPtr parent) = 0;
   

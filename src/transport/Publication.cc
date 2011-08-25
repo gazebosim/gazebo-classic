@@ -48,7 +48,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
 
 ////////////////////////////////////////////////////////////////////////////////
 // A a transport
-void Publication::AddTransport( const PublicationTransportPtr &publink)
+void Publication::AddTransport( const PublicationTransportPtr &_publink)
 {
   bool add = true;
 
@@ -56,9 +56,9 @@ void Publication::AddTransport( const PublicationTransportPtr &publink)
   std::list<PublicationTransportPtr>::iterator iter;
   for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
   {
-    if ((*iter)->GetTopic() == publink->GetTopic() &&
-        (*iter)->GetMsgType() == publink->GetMsgType() &&
-        (*iter)->GetConnection()->GetRemoteURI() == publink->GetConnection()->GetRemoteURI())
+    if ((*iter)->GetTopic() == _publink->GetTopic() &&
+        (*iter)->GetMsgType() == _publink->GetMsgType() &&
+        (*iter)->GetConnection()->GetRemoteURI() == _publink->GetConnection()->GetRemoteURI())
     {
       add = false;
       break;
@@ -68,8 +68,8 @@ void Publication::AddTransport( const PublicationTransportPtr &publink)
   // Don't add a duplicate transport
   if (add)
   {
-    publink->AddCallback( boost::bind(&Publication::LocalPublish, this, _1) );
-    this->transports.push_back( publink );
+    _publink->AddCallback( boost::bind(&Publication::LocalPublish, this, _1) );
+    this->transports.push_back( _publink );
   }
 }
 
@@ -81,8 +81,9 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
   iter = this->transports.begin(); 
   while (iter != this->transports.end())
   {
-    if ((*iter)->GetConnection()->GetRemoteAddress() == host_ &&
-        (*iter)->GetConnection()->GetRemotePort() == port_)
+    if (!(*iter)->GetConnection()->IsOpen() || 
+        ((*iter)->GetConnection()->GetRemoteAddress() == host_ &&
+         (*iter)->GetConnection()->GetRemotePort() == port_) )
     {
       this->transports.erase( iter++ );
     }
@@ -122,8 +123,9 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
   while (iter != this->callbacks.end())
   {
     subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
-    if (subptr && subptr->GetConnection()->GetRemoteAddress() == host &&
-        subptr->GetConnection()->GetRemotePort() == port)
+    if (!subptr || !subptr->GetConnection()->IsOpen() ||
+        (subptr->GetConnection()->GetRemoteAddress() == host &&
+         subptr->GetConnection()->GetRemotePort() == port))
     {
       this->callbacks.erase(iter++);
     }

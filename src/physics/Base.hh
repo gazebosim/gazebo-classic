@@ -178,10 +178,10 @@ namespace gazebo
   
       /// \brief Set the world this object belongs to. This will also 
       ///        set the world for all children
-      public: void SetWorld(WorldPtr newWorld);
+      public: void SetWorld(const WorldPtr &_newWorld);
     
       /// \brief Get the world this object is in
-      public: WorldPtr GetWorld() const;
+      public: const WorldPtr &GetWorld() const;
   
       protected: sdf::ElementPtr sdf;
 

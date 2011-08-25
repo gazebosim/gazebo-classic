@@ -31,10 +31,11 @@ ConnectionManager::ConnectionManager()
   this->tmpIndex = 0;
   this->initialized = false;
   this->stop = false;
-  this->thread = NULL;
+  //this->thread = NULL;
 
   this->listMutex = new boost::recursive_mutex();
   this->masterMessagesMutex = new boost::recursive_mutex();
+  this->connectionMutex = new boost::recursive_mutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +47,9 @@ ConnectionManager::~ConnectionManager()
 
   delete this->masterMessagesMutex;
   this->masterMessagesMutex = NULL;
+
+  delete this->connectionMutex;
+  this->connectionMutex = NULL;
 
   this->Fini();
 }
@@ -136,7 +140,6 @@ void ConnectionManager::Fini()
     return;
 
   this->masterConn->ProcessWriteQueue();
-  printf("Killing master conn\n");
   this->masterConn.reset();
 
   this->serverConn->ProcessWriteQueue();
@@ -155,12 +158,13 @@ void ConnectionManager::Fini()
 void ConnectionManager::Stop()
 {
   this->stop = true;
-  if (this->thread)
+  /*if (this->thread)
   {
     this->thread->join();
     delete this->thread;
     this->thread = NULL;
   }
+  */
 
   if (this->masterConn)
   {
@@ -176,7 +180,6 @@ void ConnectionManager::Run()
   this->stop = false;
   while (!this->stop)
   {
-
     this->masterMessagesMutex->lock();
     while (this->masterMessages.size() > 0)
     {
@@ -188,6 +191,7 @@ void ConnectionManager::Run()
     this->masterConn->ProcessWriteQueue();
     TopicManager::Instance()->ProcessNodes();
 
+    this->connectionMutex->lock();
     iter = this->connections.begin();
     while (iter != this->connections.end())
     {
@@ -198,9 +202,10 @@ void ConnectionManager::Run()
       }
       else
       {
-        this->connections.erase( iter++);
+        iter = this->connections.erase( iter);
       }
     }
+    this->connectionMutex->unlock();
     usleep(10000);
   }
 }
@@ -217,8 +222,6 @@ void ConnectionManager::OnMasterRead( const std::string &_data)
   {
     this->masterMessagesMutex->lock();
     
-    //DEBUG:printf("CM::OnMasterRead pushback message size[%d]\n",_data.size());
-
     this->masterMessages.push_back( std::string(_data) );
     this->masterMessagesMutex->unlock();
   }
@@ -231,8 +234,6 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 {
   msgs::Packet packet;
   packet.ParseFromString(_data);
-
-  //DEBUG: printf("CM::ProcessMessage size[%d]\n",_data.size());
 
   if (packet.type() == "publisher_add")
   {
@@ -271,11 +272,6 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
-
-    /* DEBUG
-    if (pub.topic().find("scene") != std::string::npos)
-      printf("ConnectionManager::OnMatsterRead Pub Update Topic[%s]\n",pub.topic().c_str());
-      */
 
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
@@ -326,7 +322,9 @@ void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
       boost::bind(&ConnectionManager::OnRead, this, newConnection, _1));
 
   // Add the connection to the list of connections
+  this->connectionMutex->lock();
   this->connections.push_back( newConnection );
+  this->connectionMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -500,7 +498,9 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost( const std::string &host,
     conn.reset(new Connection());
     conn->Connect(host, port);
 
+    this->connectionMutex->lock();
     this->connections.push_back( conn );
+    this->connectionMutex->unlock();
   }
 
   return conn;
@@ -512,6 +512,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 {
   std::list<ConnectionPtr>::iterator iter;
 
+  this->connectionMutex->lock();
   iter = this->connections.begin(); 
   while (iter != this->connections.end())
   {
@@ -520,6 +521,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
     else
       iter++;
   }
+  this->connectionMutex->unlock();
 } 
 
 
@@ -535,12 +537,14 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &host,
   std::string uri = "http://" + host + ":" + boost::lexical_cast<std::string>(port);
 
   // Check to see if we are already connected to the remote publisher
+  this->connectionMutex->lock();
   for (iter = this->connections.begin(); 
        iter != this->connections.end(); iter++)
   {
-    if ( (*iter)->GetRemoteURI() == uri)
+    if ( (*iter)->IsOpen() && (*iter)->GetRemoteURI() == uri)
       conn = *iter;
   }
+  this->connectionMutex->unlock();
 
   return conn;
 }

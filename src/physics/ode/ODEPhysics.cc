@@ -108,8 +108,8 @@ class Colliders_TBB
  
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEPhysics::ODEPhysics(WorldPtr world)
-    : PhysicsEngine(world)
+ODEPhysics::ODEPhysics(WorldPtr _world)
+    : PhysicsEngine(_world)
 {
   this->contactGeoms = NULL;
 
@@ -373,6 +373,7 @@ void ODEPhysics::UpdatePhysics()
 // Finilize the ODE engine
 void ODEPhysics::Fini()
 {
+  PhysicsEngine::Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

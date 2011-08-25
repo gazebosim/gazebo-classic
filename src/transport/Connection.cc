@@ -53,7 +53,6 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
-  printf("Connection::Destructor\n");
   this->Shutdown();
   this->writeQueue.clear();
 
@@ -151,7 +150,8 @@ void Connection::OnAccept(const boost::system::error_code &e)
 /// new message to the ReadCallback
 void Connection::StartRead(const ReadCallback &cb)
 {
-  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, shared_from_this(), cb ) ); 
+  gzerr << "\n\n\n\n DONT USE \n\n\n\n";
+  //this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, shared_from_this(), cb ) ); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,14 +234,6 @@ void Connection::ProcessWriteQueue()
 
   for (unsigned int i=0; i < this->writeQueue.size(); i++)
   {
-    /* DEBUG
-    if (this->GetRemotePort() == 11345)
-      printf("Slave[%d]: write to master [%d]\n", this->GetLocalPort(), (int)this->writeQueue[i].size());
-
-    if (this->GetLocalPort() == 11345)
-      printf("Master: write to slave[%d] [%d]\n", this->GetRemotePort(), (int)this->writeQueue[i].size());
-      */
-
     os << this->writeQueue[i];
   }
   this->writeQueue.clear();
@@ -284,6 +276,7 @@ void Connection::OnWrite(const boost::system::error_code &e,
 
   if (e)
   {
+    gzerr << "onWrite error[" << e.message() << "]\n";
     // It will reach this point if the remote connection disconnects.
     this->Shutdown();
   }
@@ -299,24 +292,36 @@ void Connection::Shutdown()
     usleep(100000);
 
   this->shutdownSignal();
-  this->StopRead();
+  //this->StopRead();
 
   this->Cancel();
 
-  if (this->socket->is_open())
+  if (this->socket && this->socket->is_open())
   {
     boost::system::error_code ec;
     this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   }
 
   this->Close();
+  delete this->socket;
+  this->socket = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the connection is open
 bool Connection::IsOpen() const
 {
-  return this->socket->is_open();
+  bool result = this->socket && this->socket->is_open();
+  try
+  {
+    this->GetRemoteURI();
+  }
+  catch (...)
+  {
+    result = false;
+  }
+
+  return result;
 }
 
 
@@ -324,16 +329,16 @@ bool Connection::IsOpen() const
 // Close a connection
 void Connection::Close()
 {
-  if (this->socket->is_open())
+  if (this->socket && this->socket->is_open())
   {
     try
     {
-      printf("CloseSocket[%d]\n", this->id);
       this->socket->close();
     }
     catch (boost::system::system_error &e)
     {
-      gzwarn <<"Error closing socket[" << this->id << "]\n";// msg[" << e.what() << "]\n";
+      gzwarn << "Error closing socket[" << this->id << "] [" 
+             << e.what() << "]\n";
     }
   }
 
@@ -372,7 +377,7 @@ void Connection::Cancel()
     this->acceptor = NULL;
   }
 
-  if (this->socket->is_open())
+  if (this->socket && this->socket->is_open())
     this->socket->cancel();
 }
 
@@ -435,12 +440,10 @@ std::string Connection::GetLocalAddress() const
 /// Get the port of this connection
 unsigned short Connection::GetLocalPort() const
 {
-  if (this->socket->is_open())
+  if (this->socket && this->socket->is_open())
     return this->socket->local_endpoint().port();
   else if (this->acceptor)
     return this->acceptor->local_endpoint().port();
-  else
-    gzerr << "No socket is open, unable to get port information.\n";
 
   return 0;
 }
@@ -449,7 +452,7 @@ unsigned short Connection::GetLocalPort() const
 /// Get the remote address
 std::string Connection::GetRemoteAddress() const
 {
-  if (this->socket->is_open())
+  if (this->socket && this->socket->is_open())
     return this->socket->remote_endpoint().address().to_string();
   else
     return "";
@@ -459,7 +462,7 @@ std::string Connection::GetRemoteAddress() const
 /// Get the remote port number
 unsigned short Connection::GetRemotePort() const
 {
-  if (this->socket->is_open())
+  if (this->socket && this->socket->is_open())
     return this->socket->remote_endpoint().port();
   else
     return 0;
@@ -538,8 +541,11 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 
 boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
 {
-  //if (this->socket.is_open())
-    return this->socket->remote_endpoint();
+  boost::asio::ip::tcp::endpoint ep;
+  if (this->socket)
+    ep = this->socket->remote_endpoint();
+
+  return ep;
 }
 
 std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep) const

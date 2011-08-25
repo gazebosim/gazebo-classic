@@ -170,7 +170,8 @@ void World::Load( sdf::ElementPtr _sdf )
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
-  this->rootElement->SetWorld(shared_from_this());
+  WorldPtr me = shared_from_this();
+  this->rootElement->SetWorld(me);
 
   // Create all the entities
   this->LoadEntities(_sdf, this->rootElement);
@@ -316,6 +317,8 @@ void World::ProcessEntityMsgs()
 // Finilize the world
 void World::Fini()
 {
+  this->Stop();
+
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Fini();
 

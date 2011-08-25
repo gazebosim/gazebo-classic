@@ -36,14 +36,14 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-PhysicsEngine::PhysicsEngine(WorldPtr world)
-  : world(world)
+PhysicsEngine::PhysicsEngine(WorldPtr _world)
+  : world(_world)
 {
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/physics.sdf", this->sdf );
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(world->GetName());
+  this->node->Init(this->world->GetName());
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
   this->physicsSub = this->node->Subscribe("~/physics",
@@ -108,6 +108,11 @@ PhysicsEngine::PhysicsEngine(WorldPtr world)
     //delete mat;
   }
 
+}
+
+void PhysicsEngine::Fini()
+{
+  this->world.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
