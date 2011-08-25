@@ -19,9 +19,9 @@ enable_testing()
 find_package( GTest REQUIRED )
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
-add_executable(pr2 pr2.cc ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
+add_executable(speed speed.cc ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
 
-target_link_libraries( pr2 ${GTEST_BOTH_LIBRARIES} 
+target_link_libraries( speed ${GTEST_BOTH_LIBRARIES} 
                                gazebo_common 
                                gazebo_transport 
                                gazebo_physics
@@ -32,4 +32,4 @@ target_link_libraries( pr2 ${GTEST_BOTH_LIBRARIES}
                                pthread 
                                )
 
-add_test(PR2Test pr2)
+add_test(PR2Test speed)

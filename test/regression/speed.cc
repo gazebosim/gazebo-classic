@@ -54,17 +54,17 @@ void SpeedTest(const std::string &worldFile, double minSpeed)
 
 TEST(Speed, EmptyWorld)
 {
-  SpeedTest("worlds/empty.world", 2700.0);
+  SpeedTest("worlds/empty.world", 1600.0);
 }
 
 TEST(Speed, ShapesWorld)
 {
-  SpeedTest("worlds/shapes.world", 1700.0);
+  SpeedTest("worlds/shapes.world", 1100.0);
 }
 
 TEST(Speed, PR2World)
 {
-  SpeedTest("worlds/pr2.world", 2.0);
+  SpeedTest("worlds/pr2.world", 1.2);
 }
 
 int main(int argc, char **argv)
