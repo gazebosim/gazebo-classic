@@ -91,9 +91,6 @@ void Connection::Connect(const std::string &host, unsigned short port)
     this->socket->connect(*endpoint_iter++, error);
   }
 
-  if (this->socket->available() > 0)
-    gzerr << "Shouldn't get here";
-
   if (error)
   {
     gzthrow ("Unable to connect to " << host << ":" << port);

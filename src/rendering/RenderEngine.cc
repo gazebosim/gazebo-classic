@@ -275,7 +275,11 @@ void RenderEngine::Fini()
     }
     */
     // TODO: this was causing a segfault on shutdown
-    delete this->root;
+    try
+    {
+      delete this->root;
+    }
+    catch (...) {}
   }
   this->root = NULL;
 

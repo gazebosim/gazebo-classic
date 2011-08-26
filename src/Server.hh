@@ -20,7 +20,7 @@ namespace gazebo
     public: Server();
     public: virtual ~Server();
 
-    public: void Load(const std::string &filename);
+    public: bool Load(const std::string &filename);
     public: void Init();
     public: void Run();
     public: void Stop();

@@ -17,7 +17,7 @@ link_directories(
 find_package( GTest REQUIRED )
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
-set (gtest_sources speed.cc)
+set (gtest_sources transport.cc speed.cc)
 
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
@@ -33,16 +33,15 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
                          assimp
                          pthread 
                          )
+  add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
 
-  file(STRINGS ${GTEST_SOURCE_file} GTEST_NAMES REGEX ^TEST)
-  foreach(GTEST_NAME ${GTEST_NAMES})
-
-    string(REGEX REPLACE ["\) \(,"] ";" GTEST_NAME ${GTEST_NAME})
-
-    list(GET GTEST_NAME 1 GTEST_GROUP_NAME)
-    list(GET GTEST_NAME 3 GTEST_NAME)
-    add_test(${GTEST_GROUP_NAME}.${GTEST_NAME}
-             ${CMAKE_CURRENT_BINARY_DIR}/speed
-             --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
-  endforeach()
+  #file(STRINGS ${GTEST_SOURCE_file} GTEST_NAMES REGEX ^TEST)
+    #foreach(GTEST_NAME ${GTEST_NAMES})
+      #  string(REGEX REPLACE ["\) \(,"] ";" GTEST_NAME ${GTEST_NAME})
+      #  list(GET GTEST_NAME 1 GTEST_GROUP_NAME)
+      #  list(GET GTEST_NAME 3 GTEST_NAME)
+      #  add_test(${GTEST_GROUP_NAME}.${GTEST_NAME}
+      #           ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
+      #           --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
+  #endforeach()
 endforeach()

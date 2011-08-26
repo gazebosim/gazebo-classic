@@ -24,6 +24,15 @@ Server::Server()
 {
   this->stop = false;
 
+}
+
+Server::~Server()
+{
+  delete this->master;
+}
+
+bool Server::Load(const std::string &_filename)
+{
   std::string host = "";
   unsigned short port = 0;
 
@@ -32,22 +41,25 @@ Server::Server()
   this->master = new gazebo::Master();
   this->master->Init(port);
   this->master->Run();
-}
 
-Server::~Server()
-{
-  delete this->master;
-}
 
-void Server::Load(const std::string &filename)
-{
-  // Load gazebo
-  gazebo::load();
 
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
-  sdf::init(sdf);
-  sdf::readFile(filename, sdf);
+  if (!sdf::init(sdf))
+  {
+    gzerr << "Unable to initialize sdf\n";
+    return false;
+  }
+
+  if (!sdf::readFile(_filename, sdf))
+  {
+    gzerr << "Unable to read sdf file[" << _filename << "]\n";
+    return false;
+  }
+
+  // Load gazebo
+  gazebo::load();
 
   /// Load the sensors library
   sensors::load();
@@ -73,6 +85,7 @@ void Server::Load(const std::string &filename)
     worldElem = sdf->root->GetNextElement("world", worldElem);
   }
 
+  return true;
 }
 
 void Server::Init()
@@ -80,6 +93,7 @@ void Server::Init()
   sensors::init();
 
   physics::init_worlds();
+  this->stop = false;
 }
 
 void Server::Stop()
@@ -96,13 +110,15 @@ void Server::Fini()
   physics::fini();
   sensors::fini();
 
-  this->master->Fini();
+  if (this->master)
+    this->master->Fini();
   delete this->master;
   this->master = NULL;
 }
 
 void Server::Run()
 {
+
   // Run the gazebo, starts a new thread
   gazebo::run();
 
@@ -110,11 +126,10 @@ void Server::Run()
   physics::run_worlds();
 
   // Update the sensors.
-  this->stop = false;
   while (!this->stop)
   {
     sensors::run_once(true);
-    usleep(100000);
+    usleep(10000);
   }
 
   // Stop all the worlds

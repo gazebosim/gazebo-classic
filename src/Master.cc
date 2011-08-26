@@ -35,6 +35,8 @@ Master::Master()
 
 Master::~Master()
 {
+  this->Fini();
+
   delete this->connectionMutex;
   this->connectionMutex = NULL;
 
@@ -112,6 +114,9 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 void Master::OnRead(const unsigned int _connectionIndex, 
                     const std::string &_data)
 {
+  if (this->stop)
+    return;
+
   if (!this->connections[_connectionIndex] ||
       !this->connections[_connectionIndex]->IsOpen())
     return;
@@ -120,7 +125,8 @@ void Master::OnRead(const unsigned int _connectionIndex,
   transport::ConnectionPtr conn = this->connections[_connectionIndex];
 
   // Read the next message
-  conn->AsyncRead( boost::bind(&Master::OnRead, this, _connectionIndex, _1));
+  if (conn && conn->IsOpen())
+    conn->AsyncRead( boost::bind(&Master::OnRead, this, _connectionIndex, _1));
 
   // Store the message if it's not empty
   if (!_data.empty())
