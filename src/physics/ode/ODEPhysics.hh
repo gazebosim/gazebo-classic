@@ -38,7 +38,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     class ContactFeedback
     {
@@ -53,151 +53,151 @@ namespace gazebo
     /// \{
 
 
-  /// \brief ODE physics engine
-  class ODEPhysics : public PhysicsEngine
-  {
-    /// \brief Constructor
-    public: ODEPhysics(WorldPtr world);
-  
-    /// \brief Destructor
-    public: virtual ~ODEPhysics();
-  
-    /// \brief Load the ODE engine
-    public: virtual void Load( sdf::ElementPtr _sdf );
-  
-    /// \brief Initialize the ODE engine
-    public: virtual void Init();
-  
-    /// \brief Init the engine for threads. 
-    public: virtual void InitForThread();
-  
-    /// \brief Update the ODE collision
-    public: virtual void UpdateCollision();
-  
-    /// \brief Update the ODE engine
-    public: virtual void UpdatePhysics();
-  
-    /// \brief Finilize the ODE engine
-    public: virtual void Fini();
+    /// \brief ODE physics engine
+    class ODEPhysics : public PhysicsEngine
+    {
+      /// \brief Constructor
+      public: ODEPhysics(WorldPtr world);
+    
+      /// \brief Destructor
+      public: virtual ~ODEPhysics();
+    
+      /// \brief Load the ODE engine
+      public: virtual void Load( sdf::ElementPtr _sdf );
+    
+      /// \brief Initialize the ODE engine
+      public: virtual void Init();
+    
+      /// \brief Init the engine for threads. 
+      public: virtual void InitForThread();
+    
+      /// \brief Update the ODE collision
+      public: virtual void UpdateCollision();
+    
+      /// \brief Update the ODE engine
+      public: virtual void UpdatePhysics();
+    
+      /// \brief Finilize the ODE engine
+      public: virtual void Fini();
 
-    /// \brief Set the step time
-    public: void SetStepTime(double _value);
+      /// \brief Set the step time
+      public: void SetStepTime(double _value);
 
-    /// \brief Get the simulation step time
-    public: virtual double GetStepTime();
- 
-    /// \brief Create a new body
-    public: virtual LinkPtr CreateLink(EntityPtr parent);
-  
-    /// \brief Create a geom
-    public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
-                                       LinkPtr parent);
+      /// \brief Get the simulation step time
+      public: virtual double GetStepTime();
    
-    /// \brief Create a new joint
-    public: virtual JointPtr CreateJoint(const std::string &type);
-  
-    /// \brief Return the space id 
-    public: dSpaceID GetSpaceId() const;
-  
-    /// \brief Get the world id
-    public: dWorldID GetWorldId();
-  
-    /// \brief Convert an odeMass to Mass
-    public: static void ConvertMass(InertialPtr &_interial, void *odeMass);
-  
-    /// \brief Convert an odeMass to Mass
-    public: static void ConvertMass(void *odeMass, const InertialPtr &_inertial);
-  
-    /// \brief Get the step type
-    public: virtual std::string GetStepType() const;
-  
-    /// \brief Set the step type
-    public: virtual void SetStepType(const std::string type);
-  
-    /// \brief Set the gavity vector
-    public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
+      /// \brief Create a new body
+      public: virtual LinkPtr CreateLink(EntityPtr parent);
+    
+      /// \brief Create a geom
+      public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
+                                         LinkPtr parent);
+     
+      /// \brief Create a new joint
+      public: virtual JointPtr CreateJoint(const std::string &type);
+    
+      /// \brief Return the space id 
+      public: dSpaceID GetSpaceId() const;
+    
+      /// \brief Get the world id
+      public: dWorldID GetWorldId();
+    
+      /// \brief Convert an odeMass to Mass
+      public: static void ConvertMass(InertialPtr &_interial, void *odeMass);
+    
+      /// \brief Convert an odeMass to Mass
+      public: static void ConvertMass(void *odeMass, const InertialPtr &_inertial);
+    
+      /// \brief Get the step type
+      public: virtual std::string GetStepType() const;
+    
+      /// \brief Set the step type
+      public: virtual void SetStepType(const std::string type);
+    
+      /// \brief Set the gavity vector
+      public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
-    /// \brief Get gravity vector
-    public: math::Vector3 GetGravity() const;
+      /// \brief Get gravity vector
+      public: math::Vector3 GetGravity() const;
 
-    /// \brief access functions to set ODE parameters
-    public: void SetWorldCFM(double cfm);
-    /// \brief access functions to set ODE parameters
-    public: void SetWorldERP(double erp);
-    /// \brief access functions to set ODE parameters
-    public: void SetSORPGSIters(unsigned int iters);
-    /// \brief access functions to set ODE parameters
-    public: void SetSORPGSW(double w);
-    /// \brief access functions to set ODE parameters
-    public: void SetContactMaxCorrectingVel(double vel);
-    /// \brief access functions to set ODE parameters
-    public: void SetContactSurfaceLayer(double layer_depth);
-    /// \brief access functions to set ODE parameters
-    public: void SetMaxContacts(unsigned int max_contacts);
-  
-    /// \brief access functions to set ODE parameters
-    public: double GetWorldCFM();
-    /// \brief access functions to set ODE parameters
-    public: double GetWorldERP();
-    /// \brief access functions to set ODE parameters
-    public: int GetSORPGSIters();
-    /// \brief access functions to set ODE parameters
-    public: double GetSORPGSW();
-    /// \brief access functions to set ODE parameters
-    public: double GetContactMaxCorrectingVel();
-    /// \brief access functions to set ODE parameters
-    public: double GetContactSurfaceLayer();
-    /// \brief access functions to set ODE parameters
-    public: int GetMaxContacts();
-  
-    public: void CreateContact(ODEGeom *geom1, ODEGeom *geom2);
-  
-    /// \brief Do collision detection
-    private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
-  
-    /// \brief Collide two geoms
-    public: void Collide(ODEGeom *geom1, ODEGeom *geom2, 
-                         dContactGeom *contactGeoms);
-  
-    public: void ProcessContactFeedback(ContactFeedback &feedback);
+      /// \brief access functions to set ODE parameters
+      public: void SetWorldCFM(double cfm);
+      /// \brief access functions to set ODE parameters
+      public: void SetWorldERP(double erp);
+      /// \brief access functions to set ODE parameters
+      public: void SetSORPGSIters(unsigned int iters);
+      /// \brief access functions to set ODE parameters
+      public: void SetSORPGSW(double w);
+      /// \brief access functions to set ODE parameters
+      public: void SetContactMaxCorrectingVel(double vel);
+      /// \brief access functions to set ODE parameters
+      public: void SetContactSurfaceLayer(double layer_depth);
+      /// \brief access functions to set ODE parameters
+      public: void SetMaxContacts(unsigned int max_contacts);
+    
+      /// \brief access functions to set ODE parameters
+      public: double GetWorldCFM();
+      /// \brief access functions to set ODE parameters
+      public: double GetWorldERP();
+      /// \brief access functions to set ODE parameters
+      public: int GetSORPGSIters();
+      /// \brief access functions to set ODE parameters
+      public: double GetSORPGSW();
+      /// \brief access functions to set ODE parameters
+      public: double GetContactMaxCorrectingVel();
+      /// \brief access functions to set ODE parameters
+      public: double GetContactSurfaceLayer();
+      /// \brief access functions to set ODE parameters
+      public: int GetMaxContacts();
+    
+      public: void CreateContact(ODEGeom *geom1, ODEGeom *geom2);
+    
+      /// \brief Do collision detection
+      private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
+    
+      /// \brief Collide two geoms
+      public: void Collide(ODEGeom *geom1, ODEGeom *geom2, 
+                           dContactGeom *contactGeoms);
+    
+      public: void ProcessContactFeedback(ContactFeedback* feedback);
 
-    protected: virtual void OnPhysicsRequest( 
-                 const boost::shared_ptr<msgs::Request const> &/*_msg*/ );
+      protected: virtual void OnPhysicsRequest( 
+                   const boost::shared_ptr<msgs::Request const> &/*_msg*/ );
 
-    protected: virtual void OnPhysicsMsg( 
-                 const boost::shared_ptr<msgs::Physics const> &/*_msg*/ );
+      protected: virtual void OnPhysicsMsg( 
+                   const boost::shared_ptr<msgs::Physics const> &/*_msg*/ );
 
 
-    /// \brief Top-level world for all bodies
-    private: dWorldID worldId;
-  
-    /// \brief Top-level space for all sub-spaces/geoms
-    private: dSpaceID spaceId;
-  
-    /// \brief Collision attributes
-    private: dJointGroupID contactGroup;
-  
-    /// Store the value of the stepTime parameter in doubl form. To improve
-    /// efficiency
-    private: double stepTimeDouble; 
-    private: std::string stepType;
+      /// \brief Top-level world for all bodies
+      private: dWorldID worldId;
+    
+      /// \brief Top-level space for all sub-spaces/geoms
+      private: dSpaceID spaceId;
+    
+      /// \brief Collision attributes
+      private: dJointGroupID contactGroup;
+    
+      /// Store the value of the stepTime parameter in doubl form. To improve
+      /// efficiency
+      private: double stepTimeDouble; 
+      private: std::string stepType;
 
-    private: tbb::concurrent_vector<ContactFeedback> contactFeedbacks;
-  
-    private: std::map<std::string, dSpaceID> spaces;
+      private: std::vector<ContactFeedback*> contactFeedbacks;
+    
+      private: std::map<std::string, dSpaceID> spaces;
 
-    private: std::vector< std::pair<ODEGeom*, ODEGeom*> > colliders;
-    private: std::vector< std::pair<ODEGeom*, ODEGeom*> > trimeshColliders;
-  
-    private: tbb::spin_mutex collideMutex;
+      private: std::vector< std::pair<ODEGeom*, ODEGeom*> > colliders;
+      private: std::vector< std::pair<ODEGeom*, ODEGeom*> > trimeshColliders;
+    
+      private: tbb::spin_mutex collideMutex;
 
-    private: dContactGeom *contactGeoms;
-#if ODE_WG_TRUNK
-    private: int (*physicsStepFunc)(dxWorld*, dReal);
-#else
-    private: void (*physicsStepFunc)(dxWorld*, dReal);
-#endif
-  };
+      private: dContactGeom *contactGeoms;
+  #if ODE_WG_TRUNK
+      private: int (*physicsStepFunc)(dxWorld*, dReal);
+  #else
+      private: void (*physicsStepFunc)(dxWorld*, dReal);
+  #endif
+    };
   
   
   /// \}

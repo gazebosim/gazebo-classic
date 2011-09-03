@@ -60,6 +60,7 @@ using namespace physics;
 
 GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics)
 
+/*
 class ContactUpdate_TBB
 {
   public: ContactUpdate_TBB(tbb::concurrent_vector<ContactFeedback> *contacts) 
@@ -77,6 +78,7 @@ class ContactUpdate_TBB
   private: tbb::concurrent_vector<ContactFeedback> *contacts;
   private: ODEPhysics *engine;
 };
+*/
 
 class Colliders_TBB
 {
@@ -136,6 +138,8 @@ ODEPhysics::~ODEPhysics()
 {
   dCloseODE();
 
+  for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
+    delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();
 
   if (this->spaceId)
@@ -182,12 +186,6 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   dWorldSetAutoDisableSteps(this->worldId, 10);
   */
   
-  this->contactFeedbacks.resize(10);
-
-  // NATY: not sure if I can remove this...check
-  // Reset the contact pointer
-  //this->contactFeedbackIter = this->contactFeedbacks.begin();
-
   math::Vector3 g = this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
   if (g == math::Vector3(0,0,0))
     gzwarn << "Gravity vector is (0,0,0). Objects will float.\n";
@@ -302,19 +300,20 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-  unsigned int i;
   this->colliders.clear();
   this->trimeshColliders.clear();
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
+  for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
+    delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();
 
   // Collide all the geoms
   if (this->colliders.size() < 50)
   {
-    for (i=0; i<this->colliders.size(); i++)
+    for (unsigned int i=0; i<this->colliders.size(); i++)
     {
       this->Collide(this->colliders[i].first, 
                     this->colliders[i].second, this->contactGeoms);
@@ -327,7 +326,7 @@ void ODEPhysics::UpdateCollision()
   }
 
   // Trimesh collision must happen in this thread sequentially
-  for (i=0; i<this->trimeshColliders.size(); i++)
+  for (unsigned int i=0; i<this->trimeshColliders.size(); i++)
   {
     ODEGeom *geom1 = this->trimeshColliders[i].first;
     ODEGeom *geom2 = this->trimeshColliders[i].second;
@@ -335,6 +334,7 @@ void ODEPhysics::UpdateCollision()
   }
 
   // Process all the contact feedbacks
+  /* tbb not has memeory issues
   if (this->contactFeedbacks.size() < 50)
   {
     for (i=0; i < this->contactFeedbacks.size(); i++)
@@ -350,6 +350,9 @@ void ODEPhysics::UpdateCollision()
           this->contactFeedbacks.size(), 20), 
         ContactUpdate_TBB(&this->contactFeedbacks) );
   }
+  */
+  for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
+    this->ProcessContactFeedback( this->contactFeedbacks[i] );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -727,14 +730,12 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
 
   if (numc != 0)
   {
-    /* NATY: Put this functionality back in, but needs to be faster.
-    ContactFeedback contactFeedback;
-
-    contactFeedback.contact.Reset();
-    contactFeedback.contact.geom1 = geom1;
-    contactFeedback.contact.geom2 = geom2;
-    contactFeedback.feedbacks.resize(numc);
-    */
+    // NATY: Put this functionality back in, but needs to be faster.
+    ContactFeedback* contactFeedback = new ContactFeedback();
+    contactFeedback->contact.Reset();
+    contactFeedback->contact.geom1 = geom1;
+    contactFeedback->contact.geom2 = geom2;
+    contactFeedback->feedbacks.resize(numc);
 
     //double h, kp, kd;
     for (j=0; j<numc; j++)
@@ -791,40 +792,35 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
 
       dJointID c;
 
-      // NATY: Put this functionality back in, but needs to be faster.
-      /*math::Vector3 contactPos;
+      math::Vector3 contactPos;
       math::Vector3 contactNorm;
-      */
 
       {
         tbb::spin_mutex::scoped_lock lock(this->collideMutex);
         c = dJointCreateContact (this->worldId, this->contactGroup, &contact);
 
-        /* NATY: Put back in, but improve performance
+        // NATY: improve performance
         contactPos.Set(contact.geom.pos[0], contact.geom.pos[1], 
             contact.geom.pos[2]);
         contactNorm.Set(contact.geom.normal[0], contact.geom.normal[1], 
             contact.geom.normal[2]);
 
         this->AddContactVisual( contactPos, contactNorm );
-        */
       }
 
-
-      /* NATY: Put back in, but improve performance
+      // NATY: improve performance
       // Store the contact info 
       if (geom1->GetContactsEnabled() ||
           geom2->GetContactsEnabled())
       {
-        contactFeedback.contact.depths.push_back(
+        contactFeedback->contact.depths.push_back(
             contact.geom.depth);
-        contactFeedback.contact.positions.push_back(contactPos);
-        contactFeedback.contact.normals.push_back(contactNorm);
-        contactFeedback.contact.time = 
+        contactFeedback->contact.positions.push_back(contactPos);
+        contactFeedback->contact.normals.push_back(contactNorm);
+        contactFeedback->contact.time = 
           this->world->GetSimTime();
-        dJointSetFeedback(c, &(contactFeedback.feedbacks[j]));
+        dJointSetFeedback(c, &(contactFeedback->feedbacks[j]));
       }
-      */
 
       dBodyID b1 = dGeomGetBody(geom1->GetGeomId());
       dBodyID b2 = dGeomGetBody(geom2->GetGeomId());
@@ -832,31 +828,31 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2,
       dJointAttach (c, b1, b2);
     }
 
-    /* NATY: Put back in, but improve performance
-    if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
-    {
+    // NATY: improve performance // FIXME: this happens on a different thread then UpdateCollision?
+    if (geom1->GetContactsEnabled() ||
+        geom2->GetContactsEnabled())
       this->contactFeedbacks.push_back( contactFeedback );
-    }
-    */
+    else
+      delete contactFeedback;
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ODEPhysics::ProcessContactFeedback(ContactFeedback &feedback)
+void ODEPhysics::ProcessContactFeedback(ContactFeedback* feedback)
 {
   std::vector<dJointFeedback>::iterator jiter;
 
-  if (feedback.contact.geom1 == NULL)
+  if (feedback->contact.geom1 == NULL)
     gzerr << "collision update Geom1 is null\n";
 
-  if (feedback.contact.geom2 == NULL)
+  if (feedback->contact.geom2 == NULL)
     gzerr << "Collision update Geom2 is null\n";
 
-  feedback.contact.forces.clear();
+  feedback->contact.forces.clear();
 
   // Copy all the joint forces to the contact
-  for (jiter = feedback.feedbacks.begin(); 
-      jiter != feedback.feedbacks.end(); jiter++)
+  for (jiter = feedback->feedbacks.begin(); 
+      jiter != feedback->feedbacks.end(); jiter++)
   {
     JointFeedback joint;
     joint.body1Force.Set( (*jiter).f1[0], (*jiter).f1[1], (*jiter).f1[2] );
@@ -865,10 +861,10 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback &feedback)
     joint.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
     joint.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
 
-    feedback.contact.forces.push_back(joint);
+    feedback->contact.forces.push_back(joint);
   }
 
   // Add the contact to each geom
-  feedback.contact.geom1->AddContact( feedback.contact );
-  feedback.contact.geom2->AddContact( feedback.contact );
+  feedback->contact.geom1->AddContact( feedback->contact );
+  feedback->contact.geom2->AddContact( feedback->contact );
 }

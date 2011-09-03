@@ -233,12 +233,14 @@ ShapePtr Geom::GetShape() const
 void Geom::SetContactsEnabled(const bool &enable)
 {
   this->contactsEnabled = enable;
+  //gzerr << "setting " << this->GetName() << " contacts enabled " << this->contactsEnabled << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return true of contact recording is on
 bool Geom::GetContactsEnabled() const
 {
+  //gzerr << "checking " << this->GetName() << " contacts enabled " << this->contactsEnabled << "\n";
   return this->contactsEnabled;
 }
 
