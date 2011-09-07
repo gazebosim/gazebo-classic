@@ -46,7 +46,6 @@ unsigned int Light::lightCounter = 0;
 /// Constructor
 Light::Light(Scene *scene_)
 {
-  printf("New Light\n");
   this->scene = scene_;
 
   std::ostringstream stream;

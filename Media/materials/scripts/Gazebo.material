@@ -634,3 +634,22 @@ material Gazebo/WoodPallet
 		}
 	}
 }
+
+material Gazebo/Wood
+{
+	technique
+	{
+		pass
+		{
+			ambient 1.0 1.0 1.0 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.2 0.2 0.2 1.0 12.5
+
+			texture_unit
+			{
+				texture wood.jpg
+				filtering trilinear
+			}
+		}
+	}
+}

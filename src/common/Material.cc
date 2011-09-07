@@ -39,7 +39,7 @@ Material::Material()
   this->shininess = 0;
   this->ambient.Set(1,1,1,1);
   this->diffuse.Set(1,1,1,1);
-  this->lighting = true;
+  this->lighting = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ Material::Material(const Color &clr)
   this->shininess = 0;
   this->ambient = clr;
   this->diffuse = clr;
-  this->lighting = true;
+  this->lighting = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

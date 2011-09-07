@@ -37,6 +37,7 @@ SET (files
             redSelect.png
             greenSelect.png
             blueSelect.png
+            wood.jpg
 )
 
 

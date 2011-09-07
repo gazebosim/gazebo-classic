@@ -74,11 +74,15 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
       {
         if ( boost::filesystem::is_regular_file(dirIter->status()) )
         {
-          // Add a child item for the model
-          QTreeWidgetItem *childItem = new QTreeWidgetItem( topItem, 
-              QStringList(QString("%1").arg( 
-                  QString::fromStdString( dirIter->path().leaf() )) ));
-          this->fileTreeWidget->addTopLevelItem(childItem);
+          std::string modelName = dirIter->path().leaf();
+          if (modelName.find(".model") != std::string::npos)
+          {
+            // Add a child item for the model
+            QTreeWidgetItem *childItem = new QTreeWidgetItem( topItem, 
+                QStringList(QString("%1").arg( 
+                    QString::fromStdString( dirIter->path().leaf() )) ));
+            this->fileTreeWidget->addTopLevelItem(childItem);
+          }
         }
       }
     }
