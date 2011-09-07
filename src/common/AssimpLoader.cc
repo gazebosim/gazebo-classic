@@ -109,21 +109,16 @@ Mesh *AssimpLoader::Load(const std::string &filename)
       {
         aiColor3D clr;
         amat->Get(AI_MATKEY_COLOR_AMBIENT, clr);
-        // if color are zeros, use 1, otherwise a black object
-        if (clr.r == 0 && clr.g == 0 && clr.b == 0)
-          mat->SetAmbient( Color(1,1,1) ); // model database has wrong ambient (0,0,0,1)
-        else
-          mat->SetAmbient( Color(clr.r, clr.g, clr.b) );
+        if (clr.r == 0 && clr.g == 0 && clr.b ==0)
+          clr.r = clr.g = clr.b = 1.0;
+
+        mat->SetAmbient( Color(clr.r, clr.g, clr.b) );
       }
       else if (propKey == "$clr.specular")
       {
         aiColor3D clr;
         amat->Get(AI_MATKEY_COLOR_SPECULAR, clr);
-        // if color are zeros, use 1, otherwise a black object
-        if (clr.r == 0 && clr.g == 0 && clr.b == 0)
-          mat->SetSpecular( Color(1,1,1) ); // model database has wrong specular (0,0,0,1)
-        else
-          mat->SetSpecular( Color(clr.r, clr.g, clr.b) );
+        mat->SetSpecular( Color(clr.r, clr.g, clr.b) );
       }
       else if (propKey == "$clr.emissive")
       {

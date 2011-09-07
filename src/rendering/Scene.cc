@@ -458,7 +458,11 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
       {
         // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, vertices[indices[i]], vertices[indices[i+1]], vertices[indices[i+2]], true, false);
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, 
+            vertices[indices[i]], 
+            vertices[indices[i+1]], 
+            vertices[indices[i+2]], 
+            true, false);
 
         // if it was a hit check if its the closest
         if (hit.first)
@@ -767,7 +771,8 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ? mesh->sharedVertexData : submesh->vertexData;
 
-    if((!submesh->useSharedVertices)||(submesh->useSharedVertices && !added_shared))
+    if ((!submesh->useSharedVertices) || 
+        (submesh->useSharedVertices && !added_shared))
     {
       if(submesh->useSharedVertices)
       {
@@ -784,18 +789,17 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
       unsigned char* vertex =
         static_cast<unsigned char*>(vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
 
-      // There is _no_ baseVertexPointerToElement() which takes an Ogre::Real or a double
-      //  as second argument. So make it float, to avoid trouble when Ogre::Real will
-      //  be comiled/typedefed as double:
+      // There is _no_ baseVertexPointerToElement() which takes an 
+      // Ogre::Real or a double as second argument. So make it float, 
+      // to avoid trouble when Ogre::Real will be comiled/typedefed as double:
       //      Ogre::Real* pReal;
       float* pReal;
 
-      for( size_t j = 0; j < vertex_data->vertexCount; ++j, vertex += vbuf->getVertexSize())
+      for( size_t j = 0; j < vertex_data->vertexCount; 
+           ++j, vertex += vbuf->getVertexSize())
       {
         posElem->baseVertexPointerToElement(vertex, &pReal);
-
         Ogre::Vector3 pt(pReal[0], pReal[1], pReal[2]);
-
         vertices[current_offset + j] = (orient * (pt * scale)) + position;
       }
 
@@ -803,33 +807,24 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
       next_offset += vertex_data->vertexCount;
     }
 
-
     Ogre::IndexData* index_data = submesh->indexData;
-    size_t numTris = index_data->indexCount / 3;
     Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
 
-    bool use32bitindexes = (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT);
-
     unsigned long*  pLong = static_cast<unsigned long*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-    unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
 
-
-    //size_t offset = (submesh->useSharedVertices)? shared_offset : current_offset;
-
-    // Ogre 1.6 patch (commenting the static_cast...) - index offsets start from 0 for each submesh
-    if ( use32bitindexes )
+    if ( (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT) )
     {
-      for ( size_t k = 0; k < numTris*3; ++k)
+      for ( size_t k = 0; k < index_data->indexCount; k++)
       {
-        indices[index_offset++] = pLong[k] /*+ static_cast<unsigned long>(offset)*/;
+        indices[index_offset++] = pLong[k];
       }
     }
     else
     {
-      for ( size_t k = 0; k < numTris*3; ++k)
+      unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
+      for ( size_t k = 0; k < index_data->indexCount; k++)
       {
-        indices[index_offset++] = static_cast<unsigned long>(pShort[k]) /*+
-                                                                          static_cast<unsigned long>(offset)*/;
+        indices[index_offset++] = static_cast<unsigned long>(pShort[k]);
       }
     }
 

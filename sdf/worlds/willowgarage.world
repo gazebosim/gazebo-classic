@@ -2,8 +2,8 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.2 0.2 0.2 1"/>
-      <background rgba="0 0 0 1.0"/>
+      <ambient rgba="0.5 0.5 0.5 1"/>
+      <background rgba="0 0 0 1"/>
       <shadows enabled="true"/>
     </scene>
 
@@ -28,19 +28,29 @@
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
-          <material script="Gazebo/Grey"/>
+          <material script="Gazebo/GreyGrid"/>
         </visual>
       </link>
     </model>
 
-    <light type="directional" name="sun" cast_shadows="true">
-      <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba=".8 .8 .8 1"/>
-      <specular rgba=".1 .1 .1 1"/>
-      <attenuation range="10" constant="0.8" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0 .5 -.5"/>
+    <light type="directional" name="my_light" cast_shadows="false">
+      <origin pose="0 0 100 0 0 0"/>
+      <diffuse rgba="1.0 1.0 1.0 1"/>
+      <specular rgba="0 0 0 1"/>
+      <attenuation range="20"/>
+      <direction xyz="0 0.2 -0.8"/>
     </light>
 
-    <include filename="pr2.model"/>
+    <!--<light type="directional" name="my_light" cast_shadows="true">
+      <origin pose="0 0 100 0 0 0"/>
+      <diffuse rgba="0.1 0.1 0.1 1"/>
+      <specular rgba="0.1 0.1 0.1 1"/>
+      <attenuation range="20"/>
+      <direction xyz="0 0.4 -0.6"/>
+    </light>
+    -->
+
+
+    <include filename="wg.model"/>
   </world>
 </gazebo>

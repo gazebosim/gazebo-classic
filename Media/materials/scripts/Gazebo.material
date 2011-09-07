@@ -1,49 +1,34 @@
 import * from "shadow_receiver.program"
 import * from "perpixel.program"
 
-material Gazebo/GreyGrid //: shadow_receiver_template
+material Gazebo/GreyGrid
 {
-  //set_texture_alias ambient_tex grayGrid.png
-  //set_texture_alias diffuse_tex grayGrid.png
-
   technique
   {
     pass ambient
     {
-      ambient .1 .1 .1 
+      ambient .5 .5 .5 1
+      diffuse .5 .5 .5 
     }
 
     pass light
     {
       diffuse .5 .5 .5
       specular .1 .1 .1 128
-    }
-
-    pass spot
-    {
-      specular 0.5 0.5 0.5 128
-    }
-
-    pass directional
-    {
-      specular 0.5 0.5 0.5 128
     }
  }
 }
 
 material Gazebo/Grey
 {
+	receive_shadows on
   technique
   {
-    pass ambient
+    pass
     {
-      ambient .1 .1 .1 
-    }
-
-    pass light
-    {
-      diffuse .5 .5 .5
-      specular .1 .1 .1 128
+      ambient .1 .1 .1  1.0
+      diffuse .5 .5 .5  1.0
+			specular 0.1 0.1 0.1 1.000000 12.500000
     }
   }
 }

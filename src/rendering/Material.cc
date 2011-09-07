@@ -16,6 +16,7 @@
 */
 #include "common/Color.hh"
 #include "rendering/ogre.h"
+#include "common/Console.hh"
 #include "rendering/Material.hh"
 
 using namespace gazebo;
@@ -43,12 +44,14 @@ void Material::Update(const gazebo::common::Material *_mat)
   matPtr->getTechnique(0)->setLightingEnabled( _mat->GetLighting() );
   pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
   pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
-  pass->setPointSize(_mat->GetPointSize());
+
+  //pass->setPointSize(_mat->GetPointSize());
 
   pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
   pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
+  
   pass->setShininess(_mat->GetShininess());
-
+  
   if (!_mat->GetTextureImage().empty())
   {
     Ogre::TextureUnitState *texState = pass->createTextureUnitState();
