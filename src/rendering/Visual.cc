@@ -203,11 +203,32 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
     elem->GetAttribute("script")->Set(msg->material_script());
   }
 
-  if (msg->has_material_color())
+  if (msg->has_ambient())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("color")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->material_color()));
+    elem->GetOrCreateElement("ambient")->GetAttribute("rgba")->Set(
+        msgs::Convert(msg->ambient()));
+  }
+
+  if (msg->has_diffuse())
+  {
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+    elem->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
+        msgs::Convert(msg->diffuse()));
+  }
+
+  if (msg->has_specular())
+  {
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+    elem->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
+        msgs::Convert(msg->specular()));
+  }
+
+  if (msg->has_emissive())
+  {
+    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+    elem->GetOrCreateElement("emissive")->GetAttribute("rgb")->Set(
+        msgs::Convert(msg->emissive()));
   }
 
   if (msg->has_cast_shadows())
@@ -298,10 +319,15 @@ void Visual::Load()
     std::string script = matElem->GetValueString("script");
     if (!script.empty())
       this->SetMaterial(script);
-    else if (matElem->HasElement("color"))
-    {
-      this->SetColor( matElem->GetElement("color")->GetValueColor("rgba") );
-    }
+    else if (matElem->HasElement("ambient"))
+      this->SetAmbient( matElem->GetElement("ambient")->GetValueColor("rgba") );
+    else if (matElem->HasElement("diffuse"))
+      this->SetDiffuse( matElem->GetElement("diffuse")->GetValueColor("rgba") );
+    else if (matElem->HasElement("specular"))
+      this->SetSpecular(matElem->GetElement("speclar")->GetValueColor("rgba"));
+    else if (matElem->HasElement("emissive"))
+      this->SetEmissive(matElem->GetElement("emissive")->GetValueColor("rgb"));
+
   }
 
   // Allow the mesh to cast shadows
@@ -494,7 +520,7 @@ math::Vector3 Visual::GetScale()
 // Set the material
 void Visual::SetMaterial(const std::string &materialName)
 {
-  if (materialName.empty())
+  if (materialName.empty() || materialName == "__default__")
     return;
 
   // Create a custom material name
@@ -512,7 +538,7 @@ void Visual::SetMaterial(const std::string &materialName)
   {
     this->origMaterialName = materialName;
     // Get the original material
-    origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);;
+    origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);
   }
   catch (Ogre::Exception e)
   {
@@ -564,11 +590,150 @@ void Visual::SetMaterial(const std::string &materialName)
   RTShaderSystem::Instance()->UpdateShaders();
 }
 
-/// Set the color of the visual
-void Visual::SetColor(const common::Color &/*_color*/)
+/// Set the ambient color of the visual
+void Visual::SetAmbient(const common::Color &_color)
 {
-  // TODO: implement this 
+  if (this->myMaterialName.empty())
+  {
+    std::string matName = this->GetName() + "_MATERIAL_";
+    Ogre::MaterialManager::getSingleton().create(matName,"General");
+    this->SetMaterial(matName);
+  }
+
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+        technique->setLightingEnabled( true );
+
+        for (passCount=0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setAmbient( Conversions::Convert(_color) );
+        }
+      }
+    }
+  }
 }
+
+/// Set the diffuse color of the visual
+void Visual::SetDiffuse(const common::Color &_color)
+{
+  if (this->myMaterialName.empty())
+  {
+    std::string matName = this->GetName() + "_MATERIAL_";
+    Ogre::MaterialManager::getSingleton().create(matName,"General");
+    this->SetMaterial(matName);
+  }
+
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+        technique->setLightingEnabled( true );
+
+        for (passCount=0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setDiffuse( Conversions::Convert(_color) );
+        }
+      }
+    }
+  }
+}
+
+/// Set the specular color of the visual
+void Visual::SetSpecular(const common::Color &_color)
+{
+  if (this->myMaterialName.empty())
+  {
+    std::string matName = this->GetName() + "_MATERIAL_";
+    Ogre::MaterialManager::getSingleton().create(matName,"General");
+    this->SetMaterial(matName);
+  }
+
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::Entity *entity = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+
+    if (!entity)
+      continue;
+
+    // For each ogre::entity
+    for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
+    {
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue dc;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
+           techniqueCount++)
+      {
+        technique = material->getTechnique(techniqueCount);
+        technique->setLightingEnabled( true );
+
+        for (passCount=0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          pass->setSpecular( Conversions::Convert(_color) );
+        }
+      }
+    }
+  }
+}
+
 
 void Visual::AttachAxes()
 {
@@ -1206,9 +1371,20 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
   if (msg->has_transparency())
     this->SetTransparency(msg->transparency());
 
-  if (msg->has_material_script())
+  if (msg->has_material_script() && !msg->material_script().empty() )
     this->SetMaterial(msg->material_script());
 
+  if (msg->has_ambient())
+    this->SetAmbient( msgs::Convert(msg->ambient()) );
+
+  if (msg->has_diffuse())
+    this->SetDiffuse( msgs::Convert(msg->diffuse()) );
+
+  if (msg->has_specular())
+    this->SetSpecular( msgs::Convert(msg->specular()) );
+
+  if (msg->has_emissive())
+    this->SetEmissive( msgs::Convert(msg->emissive()) );
 
   /*if (msg->points.size() > 0)
   {

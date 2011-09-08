@@ -1,4 +1,5 @@
 SET (files Gazebo.material 
+           kitchen.material
            shadow_receiver.program 
            shadow_caster.program
            perpixel.program

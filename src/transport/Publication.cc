@@ -170,7 +170,7 @@ void Publication::LocalPublish(const std::string &data)
       if ((*iter)->HandleData(data))
         iter++;
       else
-        this->callbacks.erase( iter++ );
+        iter = this->callbacks.erase( iter );
     }
     else
       iter++;

@@ -130,6 +130,7 @@ ScenePtr RenderEngine::CreateScene(const std::string &name)
 {
   ScenePtr scene( new Scene(name) );
 
+  scene->Load();
   if (this->initialized)
     scene->Init();
 

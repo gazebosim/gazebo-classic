@@ -202,7 +202,7 @@ void ConnectionManager::Run()
       }
       else
       {
-        iter = this->connections.erase( iter);
+        iter = this->connections.erase( iter );
       }
     }
     this->connectionMutex->unlock();
@@ -251,7 +251,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
       if ((*iter).topic() == result.topic() &&
           (*iter).host() == result.host() &&
           (*iter).port() == result.port())
-        this->publishers.erase(iter++);
+        iter = this->publishers.erase(iter);
       else
         iter++;
     }
@@ -517,7 +517,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
   while (iter != this->connections.end())
   {
     if ( (*iter) == conn )
-      this->connections.erase( iter++);
+      iter = this->connections.erase( iter );
     else
       iter++;
   }

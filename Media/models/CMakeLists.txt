@@ -9,6 +9,7 @@ add_subdirectory(rovio)
 add_subdirectory(pr2_gripper)
 add_subdirectory(pr2)
 add_subdirectory(wg)
+add_subdirectory(kitchen)
 
 set (files column.mesh
            geosphere4500.mesh

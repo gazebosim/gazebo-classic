@@ -53,8 +53,8 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
-  this->Shutdown();
   this->writeQueue.clear();
+  this->Shutdown();
 
   delete this->writeMutex;
   this->writeMutex = NULL;

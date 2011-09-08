@@ -27,7 +27,8 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
   this->fileTreeWidget->setColumnCount(1);
-  this->fileTreeWidget->headerItem()->setText(0, tr("Insert Model") );
+  this->fileTreeWidget->setContextMenuPolicy( Qt::CustomContextMenu );
+  this->fileTreeWidget->header()->hide();
   connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
           this, SLOT(OnModelSelection(QTreeWidgetItem *, int)) );
 

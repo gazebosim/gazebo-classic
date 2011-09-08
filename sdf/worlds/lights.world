@@ -41,6 +41,7 @@
       <attenuation range="20" constant="0.8" linear="0.2" quadratic="0.01"/>
     </light>
 
+    <!--
     <light type="spot" name="spot" cast_shadows="false">
       <origin pose="0 2 2 0 0 0"/>
       <diffuse rgba="0 1 0 1"/>
@@ -57,6 +58,7 @@
       <attenuation range="100" constant="0.2" linear="0.01" quadratic="0.0"/>
       <direction xyz="0 0 -1"/>
     </light>
+    -->
 
   </world>
 </gazebo>

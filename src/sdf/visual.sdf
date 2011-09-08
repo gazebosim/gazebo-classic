@@ -12,9 +12,18 @@
   <element name="material" required="0">
     <attribute name="script" type="string" default="__default__" required="0"/>
     <attribute name="normal_map" type="string" default="__default__" required="0"/>
-    <element name="color" required="0">
+    <element name="ambient" required="0">
       <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
-    </element> <!-- End Color -->
+    </element>
+    <element name="diffuse" required="0">
+      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
+    </element>
+    <element name="specular" required="0">
+      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
+    </element>
+    <element name="emissive" required="0">
+      <attribute name="rgb" type="color" default="0 0 0 1" required="1"/>
+    </element>
   </element> <!-- End Material -->
 
   <include filename="geometry.sdf" required="1"/>

@@ -199,6 +199,10 @@ namespace gazebo
       /// \brief Remove a visual from the scene
       public: void RemoveVisual( VisualPtr &_vis );
 
+      /// \brief Set the grid on or off
+      /// \param _enabled Set to true to turn on the grid
+      public: void SetGrid( bool _enabled );
+
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::MeshPtr mesh,

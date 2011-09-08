@@ -122,6 +122,9 @@ TEST_F(MasterTest, MasterConnect)
   }
 }
 
+void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &/*_msg*/)
+{
+}
 
 TEST_F(ServerTest, ServerConstructor)
 {
@@ -130,6 +133,36 @@ TEST_F(ServerTest, ServerConstructor)
     Load("worlds/empty.world");
     Unload();
   }
+}
+
+
+TEST_F(ServerTest, PubSub)
+{
+  Load("worlds/empty.world");
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+  transport::PublisherPtr scenePub = node->Advertise<msgs::Scene>("~/scene");
+  transport::SubscriberPtr sceneSub = node->Subscribe("~/scene", &ReceiveSceneMsg);
+
+  msgs::Scene msg;
+  msgs::Init(msg, "test");
+
+  scenePub->Publish( msg );
+
+  std::vector<transport::PublisherPtr> pubs;
+  std::vector<transport::SubscriberPtr> subs;
+
+  for (unsigned int i=0; i < 100; i++)
+  {
+    pubs.push_back( node->Advertise<msgs::Scene>("~/scene") );
+    subs.push_back( node->Subscribe("~/scene", &ReceiveSceneMsg) );
+    scenePub->Publish( msg );
+  }
+
+  pubs.clear();
+  subs.clear();
+
+  Unload();
 }
 
 int main(int argc, char **argv)

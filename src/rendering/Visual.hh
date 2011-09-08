@@ -119,9 +119,15 @@ namespace gazebo
       /// \brief Set the material
       public: void SetMaterial(const std::string &materialName);
 
-      /// \brief Set the color of the visual
-      public: void SetColor(const common::Color &_color);
-  
+      /// \brief Set the ambient color of the visual
+      public: void SetAmbient(const common::Color &_color);
+
+      /// \brief Set the diffuse color of the visual
+      public: void SetDiffuse(const common::Color &_color);
+
+      /// \brief Set the specular color of the visual
+      public: void SetSpecular(const common::Color &_color);
+
       public: void AttachAxes();
   
       /// \brief Set the transparency

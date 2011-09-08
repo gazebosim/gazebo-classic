@@ -22,11 +22,12 @@ message Scene
   optional string sky_material = 4;
   optional bool shadows        = 5 [default = true];
   optional Fog fog             = 6;
+  optional bool grid           = 7;
 
-  repeated Visual visual       = 7;
-  repeated Pose pose           = 8;
-  repeated Light light         = 9; 
-  repeated Joint joint         = 10;
+  repeated Visual visual       = 8;
+  repeated Pose pose           = 9;
+  repeated Light light         = 10; 
+  repeated Joint joint         = 11;
 }
 
 /// \endverbatim

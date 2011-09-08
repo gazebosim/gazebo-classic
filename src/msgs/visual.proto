@@ -48,18 +48,21 @@ message Visual
   optional MeshType mesh_type   = 4;
   optional string filename = 5;
 
-  optional string parent_id        = 6;
-  optional string material_script  = 7;
-  optional Color material_color    = 8;
-  optional bool cast_shadows      = 9;
-  optional bool attach_axes       = 10;
-  optional bool visible           = 11;
-  optional float transparency     = 12;
-  optional Pose pose              = 13;
-  optional Point scale            = 14;
-  repeated Point points           = 15;
-  optional Plane plane            = 16;
-  optional bool is_static         = 17;
+  optional string parent_id       = 6;
+  optional string material_script = 7;
+  optional Color ambient          = 8;
+  optional Color diffuse          = 9;
+  optional Color specular         = 10;
+  optional Color emissive         = 11;
+  optional bool cast_shadows      = 12;
+  optional bool attach_axes       = 13;
+  optional bool visible           = 14;
+  optional float transparency     = 15;
+  optional Pose pose              = 16;
+  optional Point scale            = 17;
+  repeated Point points           = 18;
+  optional Plane plane            = 19;
+  optional bool is_static         = 20;
 }
 
 /// \endverbatim

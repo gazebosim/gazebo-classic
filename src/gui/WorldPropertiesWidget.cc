@@ -16,10 +16,10 @@ WorldPropertiesWidget::WorldPropertiesWidget( QWidget *parent )
 
   QTabWidget *tabWidget = new QTabWidget;
   this->sceneWidget = new SceneWidget;
-  this->physicsWidget = new PhysicsWidget;
+  //this->physicsWidget = new PhysicsWidget;
 
-  tabWidget->addTab(this->sceneWidget, tr("Scene") );
-  tabWidget->addTab(this->physicsWidget, tr("Physics") );
+  //tabWidget->addTab(this->sceneWidget, tr("Scene") );
+  //tabWidget->addTab(this->physicsWidget, tr("Physics") );
 
   mainLayout->addWidget(tabWidget);
 
@@ -34,8 +34,8 @@ WorldPropertiesWidget::~WorldPropertiesWidget()
 
 void WorldPropertiesWidget::showEvent(QShowEvent * /*_event*/)
 {
-  this->sceneWidget->Init();
-  this->physicsWidget->Init();
+  //this->sceneWidget->Init();
+  //this->physicsWidget->Init();
 }
 
 void WorldPropertiesWidget::closeEvent(QCloseEvent * /*_event*/)
@@ -580,8 +580,10 @@ SceneWidget::SceneWidget(QWidget *parent )
   this->node->Init();
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->sceneSub = this->node->Subscribe("~/scene", &SceneWidget::ReceiveSceneMsg, this);
-
+  /*
   this->sceneRequestPub = this->node->Advertise<msgs::Request>("~/publish_scene");
+  */
+
   connect( this->ambientColorButton, SIGNAL(clicked()), 
            this, SLOT(OnAmbientColor()) );
   connect( this->backgroundColorButton, SIGNAL(clicked()), 
@@ -616,7 +618,7 @@ void SceneWidget::Init()
   msgs::Request req;
   req.set_request("publish");
 
-  this->sceneRequestPub->Publish(req);
+  //this->sceneRequestPub->Publish(req);
 }
 
 void SceneWidget::OnFogToggle(bool _value)
@@ -693,9 +695,10 @@ void SceneWidget::OnFogEnd()
 
 void SceneWidget::OnAmbientColor()
 {
-
   if (!this->initialized)
     return;
+
+  printf("OnAmbientColor\n");
 
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);

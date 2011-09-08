@@ -63,12 +63,7 @@ Scene::Scene(const std::string &_name)
 
   this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
 
-  Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
-  this->grids.push_back(grid);
 
-  grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
-  this->grids.push_back(grid);
- 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
 
   this->visSub = this->node->Subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
@@ -126,6 +121,9 @@ void Scene::Load(sdf::ElementPtr &_sdf)
 void Scene::Load()
 {
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -877,6 +875,9 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   if (_msg->has_shadows())
     this->SetShadowsEnabled( _msg->shadows() );
 
+  if (_msg->has_grid())
+    this->SetGrid(_msg->grid());
+
   if (_msg->has_fog())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
@@ -1184,4 +1185,18 @@ std::string Scene::GetUniqueName(const std::string &_prefix)
 SelectionObj *Scene::GetSelectionObj() const
 {
   return this->selectionObj;
+}
+
+void Scene::SetGrid( bool _enabled )
+{
+  if (_enabled)
+  {
+    Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
+    grid->Init();
+    this->grids.push_back(grid);
+
+    grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
+    grid->Init();
+    this->grids.push_back(grid);
+  }
 }

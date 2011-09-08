@@ -356,9 +356,18 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
   {
     sdf::ElementPtr elem = _sdf->GetElement("material");
     result.set_material_script(elem->GetValueString("script"));
-    if (elem->HasElement("color"))
-      result.mutable_material_color()->CopyFrom( 
-          Convert(elem->GetElement("color")->GetValueColor("rgba")));
+    if (elem->HasElement("ambient"))
+      result.mutable_ambient()->CopyFrom( 
+          Convert(elem->GetElement("ambient")->GetValueColor("rgba")));
+    if (elem->HasElement("diffuse"))
+      result.mutable_diffuse()->CopyFrom( 
+          Convert(elem->GetElement("diffuse")->GetValueColor("rgba")));
+    if (elem->HasElement("specular"))
+      result.mutable_specular()->CopyFrom( 
+          Convert(elem->GetElement("specular")->GetValueColor("rgba")));
+    if (elem->HasElement("emissive"))
+      result.mutable_emissive()->CopyFrom( 
+          Convert(elem->GetElement("emissive")->GetValueColor("rgb")));
   }
 
   // Set the origin of the visual
@@ -400,6 +409,11 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
   msgs::Scene result;
 
   Init(result,"scene");
+
+  if (_sdf->HasElement("grid"))
+    result.set_grid( _sdf->GetElement("grid")->GetValueBool("enabled") );
+  else
+    result.set_grid( true );
 
   if (_sdf->HasElement("ambient"))
     result.mutable_ambient()->CopyFrom( 

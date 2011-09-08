@@ -21,6 +21,9 @@
     <attribute name="end" type="double" default="100.0" required="0"/>
     <attribute name="density" type="double" default="1.0" required="0"/>
   </element>
+  <element name="grid" required="0">
+    <attribute name="enabled" type="bool" default="true" required="1"/>
+  </element>
 </element> <!-- End Scene -->
 
 

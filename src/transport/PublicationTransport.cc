@@ -65,7 +65,6 @@ void PublicationTransport::AddCallback(const boost::function<void(const std::str
 
 void PublicationTransport::OnPublish(const std::string &data)
 {
-  //gzdbg << "On Publish\n";
   this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
 
   if (!data.empty())
