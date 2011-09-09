@@ -227,7 +227,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   if (msg->has_emissive())
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("emissive")->GetAttribute("rgb")->Set(
+    elem->GetOrCreateElement("emissive")->GetAttribute("rgba")->Set(
         msgs::Convert(msg->emissive()));
   }
 
@@ -326,7 +326,7 @@ void Visual::Load()
     else if (matElem->HasElement("specular"))
       this->SetSpecular(matElem->GetElement("speclar")->GetValueColor("rgba"));
     else if (matElem->HasElement("emissive"))
-      this->SetEmissive(matElem->GetElement("emissive")->GetValueColor("rgb"));
+      this->SetEmissive(matElem->GetElement("emissive")->GetValueColor("rgba"));
 
   }
 

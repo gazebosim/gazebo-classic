@@ -367,7 +367,7 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
           Convert(elem->GetElement("specular")->GetValueColor("rgba")));
     if (elem->HasElement("emissive"))
       result.mutable_emissive()->CopyFrom( 
-          Convert(elem->GetElement("emissive")->GetValueColor("rgb")));
+          Convert(elem->GetElement("emissive")->GetValueColor("rgba")));
   }
 
   // Set the origin of the visual

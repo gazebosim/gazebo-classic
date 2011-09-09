@@ -22,7 +22,7 @@
       <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
     </element>
     <element name="emissive" required="0">
-      <attribute name="rgb" type="color" default="0 0 0 1" required="1"/>
+      <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
     </element>
   </element> <!-- End Material -->
 
