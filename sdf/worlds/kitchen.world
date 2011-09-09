@@ -65,26 +65,11 @@
           </geometry>
         </collision>
         <visual>
-          <origin pose="0.65 0 0.05 0 0 0"/>
+          <origin pose="0.65 0 1.5 0 0 0"/>
           <geometry>
-            <box size="0.3 10.0 0.1"/>
+            <box size="0.3 10.0 3.0"/>
           </geometry>
-          <material>
-            <ambient rgba="0 0 0 1"/>
-            <diffuse rgba="0 0 0 1"/>
-            <specular rgba=".1 .1 .1 1"/> 
-          </material>
-        </visual>
-        <visual>
-          <origin pose="0.65 0 1.55 0 0 0"/>
-          <geometry>
-            <box size="0.3 10.0 2.9"/>
-          </geometry>
-          <material>
-            <ambient rgba="1 1 1 1"/>
-            <diffuse rgba="1 1 1 1"/>
-            <specular rgba=".1 .1 .1 1"/> 
-          </material>
+          <material script="Kitchen/Wall"/>
         </visual>
 
 

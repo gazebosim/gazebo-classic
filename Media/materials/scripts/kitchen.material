@@ -16,3 +16,21 @@ material Kitchen/WoodFloor
     }
   }
 }
+
+material Kitchen/Wall
+{
+  receive_shadows on
+  technique
+  {
+    pass
+    {
+			ambient 1.0 1.0 1.0 1.000000
+
+      texture_unit
+      {
+        texture beigeWall.jpg
+        //scale .01 .01
+      }
+    }
+  }
+}
