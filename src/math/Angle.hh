@@ -176,7 +176,6 @@ namespace gazebo
       // Skip white spaces
       in.setf( std::ios_base::skipws );
       in >> a.value;
-      a.value = a.value * M_PI / 180.0; 
       return in;
     }
   

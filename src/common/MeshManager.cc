@@ -26,7 +26,7 @@
 #include "common/Console.hh"
 #include "common/Mesh.hh"
 #include "common/OgreLoader.hh"
-#include "common/AssimpLoader.hh"
+#include "common/ColladaLoader.hh"
 #include "common/STLLoader.hh"
 
 #include "common/MeshManager.hh"
@@ -39,7 +39,7 @@ using namespace common;
 /// Constructor
 MeshManager::MeshManager()
 {
-  this->assimpLoader = new AssimpLoader();
+  this->colladaLoader = new ColladaLoader();
   this->ogreLoader = new OgreLoader();
   this->stlLoader = new STLLoader();
 
@@ -73,7 +73,7 @@ MeshManager::MeshManager()
 /// Destructor
 MeshManager::~MeshManager()
 {
-  delete this->assimpLoader;
+  delete this->colladaLoader;
   delete this->ogreLoader;
   delete this->stlLoader;
 }
@@ -121,8 +121,10 @@ const Mesh *MeshManager::Load(const std::string &filename)
       loader = this->ogreLoader;
     else if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader= this->stlLoader;
+    else if (extension == "dae")
+      loader = this->colladaLoader;
     else
-      loader = this->assimpLoader;
+      gzerr << "Unsupported mesh format for file[" << filename << "]\n";
 
     try 
     {

@@ -5,6 +5,7 @@ set (files pioneer2dx.model
            table.model
            bookshelf.model
            kitchen_counter.model
+           man_standing.model
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models/)

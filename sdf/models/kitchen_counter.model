@@ -7,54 +7,70 @@
     </inertial>
 
     <collision name="surface_1">
-      <origin pose="0 0 1.0 0 0 0"/>
+      <origin pose="0 0 0.8 0 0 0"/>
       <geometry>
         <box size="1.0 4.0 0.1"/>
       </geometry>
     </collision>
     <visual>
-      <origin pose="0 0 1.0 0 0 0"/>
+      <origin pose="0 0 0.8 0 0 0"/>
       <geometry>
         <box size="1.0 4.0 0.1"/>
       </geometry>
+      <material script="Kitchen/CounterTop_H"/>
     </visual>
-    <collision name="cabinet_1">
-      <origin pose="0.05 -0.1 0.475 0 0 0"/>
+
+<!--    <visual>
+      <origin pose="0 0 0.9 0 0 0"/>
       <geometry>
-        <box size="0.9 4.05 0.95"/>
+        <mesh filename="stovetop.stl" scale=".0254 .0254 0.0254"/>
+      </geometry>
+      <material script="Gazebo/Grey"/>
+    </visual>
+    -->
+
+
+    <collision name="cabinet_1">
+      <origin pose="0.05 -0.1 0.375 0 0 0"/>
+      <geometry>
+        <box size="0.9 4.05 0.75"/>
       </geometry>
     </collision>
     <visual>
-      <origin pose="0.05 -0.1 0.475 0 0 0"/>
+      <origin pose="0.05 -0.1 0.375 0 0 0"/>
       <geometry>
-        <box size="0.9 4.05 0.95"/>
+        <box size="0.9 4.05 0.75"/>
       </geometry>
+      <material script="Kitchen/Cabinet"/>
     </visual>
 
 
     <collision name="surface_2">
-      <origin pose="-1.0 -2.5 1.0 0 0 0"/>
+      <origin pose="-1.0 -2.5 0.8 0 0 0"/>
       <geometry>
         <box size="3.0 1.0 0.1"/>
       </geometry>
     </collision>
     <visual>
-      <origin pose="-1.0 -2.5 1.0 0 0 0"/>
+      <origin pose="-1.0 -2.5 0.8 0 0 0"/>
       <geometry>
         <box size="3.0 1.0 0.1"/>
       </geometry>
+      <material script="Kitchen/CounterTop"/>
     </visual>
+
     <collision name="cabinet_2">
-      <origin pose="-1.0 -2.55 0.475 0 0 0"/>
+      <origin pose="-1.0 -2.55 0.375 0 0 0"/>
       <geometry>
-        <box size="3.0 0.9 0.95"/>
+        <box size="3.0 0.9 0.75"/>
       </geometry>
     </collision>
     <visual>
-      <origin pose="-1.0 -2.55 0.475 0 0 0"/>
+      <origin pose="-1.0 -2.55 0.375 0 0 0"/>
       <geometry>
-        <box size="3.0 0.9 0.95"/>
+        <box size="3.0 0.9 0.75"/>
       </geometry>
+      <material script="Kitchen/Cabinet"/>
     </visual>
   </link>
 

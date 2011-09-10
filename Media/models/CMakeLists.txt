@@ -10,6 +10,7 @@ add_subdirectory(pr2_gripper)
 add_subdirectory(pr2)
 add_subdirectory(wg)
 add_subdirectory(kitchen)
+add_subdirectory(stovetop)
 
 set (files column.mesh
            geosphere4500.mesh
@@ -29,6 +30,7 @@ set (files column.mesh
            hanoi_blue_disk.dae
            cup.mesh
            test.dae
+           man_standing.dae
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models)

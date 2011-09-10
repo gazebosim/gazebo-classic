@@ -29,8 +29,58 @@ material Kitchen/Wall
       texture_unit
       {
         texture beigeWall.jpg
-        //scale .01 .01
       }
+    }
+  }
+}
+
+material Kitchen/CounterTop
+{
+  receive_shadows on
+  technique
+  {
+    pass
+    {
+			ambient 1.0 1.0 1.0 1.000000
+
+      texture_unit
+      {
+        texture granite2.jpg
+        //rotate 90
+        scale 1 .2
+      }
+    }
+  }
+}
+
+material Kitchen/CounterTop_H
+{
+  receive_shadows on
+  technique
+  {
+    pass
+    {
+			ambient 1.0 1.0 1.0 1.000000
+
+      texture_unit
+      {
+        texture granite.jpg
+        scale .2 1
+      }
+    }
+  }
+}
+
+material Kitchen/Cabinet
+{
+  receive_shadows on
+  technique
+  {
+    pass
+    {
+			ambient .604 .423 .0313 
+			diffuse .604 .423 .0313 1.000000
+			specular 0.1 0.1 0.1 1.0 128
     }
   }
 }

@@ -949,9 +949,17 @@ void Visual::SetPosition( const math::Vector3 &_pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void Visual::SetRotation( const math::Quaternion &rot)
+void Visual::SetRotation( const math::Quaternion &_rot)
 {
-  this->sceneNode->setOrientation(rot.w, rot.x, rot.y, rot.z);
+  //this->sceneNode->setOrientation(_rot.w, _rot.x, _rot.y, _rot.z);
+
+  /*if (this->GetName() == "default::kitchen::body::VISUAL_0")
+    gzdbg << "SetRotation[" << _rot << "][" 
+      << this->sceneNode->_getDerivedOrientation().getRoll()
+      << this->sceneNode->_getDerivedOrientation().getPitch()
+      << this->sceneNode->_getDerivedOrientation().getYaw()
+      << "]\n";
+      */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -989,16 +997,11 @@ math::Pose Visual::GetPose() const
 void Visual::SetWorldPose(const math::Pose _pose)
 {
   Ogre::Vector3 vpos;
-  Ogre::Quaternion vquatern;
+  Ogre::Quaternion vquatern(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
 
   vpos.x = _pose.pos.x;
   vpos.y = _pose.pos.y;
   vpos.z = _pose.pos.z;
-
-  vquatern.w = _pose.rot.w;
-  vquatern.x = _pose.rot.x;
-  vquatern.y = _pose.rot.y;
-  vquatern.z = _pose.rot.z;
 
   this->sceneNode->_setDerivedPosition( vpos );
   this->sceneNode->_setDerivedOrientation( vquatern );

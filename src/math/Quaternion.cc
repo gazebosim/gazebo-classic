@@ -174,13 +174,13 @@ void Quaternion::Set(double u, double x, double y, double z)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the quaternion from Euler angles
-void Quaternion::SetFromEuler(const Vector3 &vec)
+void Quaternion::SetFromEuler(const Vector3 &_vec)
 {
   double phi, the, psi;
 
-  phi = vec.x / 2.0;
-  the = vec.y / 2.0;
-  psi = vec.z / 2.0;
+  phi = _vec.x / 2.0;
+  the = _vec.y / 2.0;
+  psi = _vec.z / 2.0;
 
   this->w = cos(phi) * cos(the) * cos(psi) + sin(phi) * sin(the) * sin(psi);
   this->x = sin(phi) * cos(the) * cos(psi) - cos(phi) * sin(the) * sin(psi);

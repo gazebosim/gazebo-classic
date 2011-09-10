@@ -51,6 +51,8 @@
     </light>
 
     <include filename="kitchen_counter.model"/>
+    <include filename="pr2.model"/>
+    <include filename="man_standing.model"/>
 
     <model name="walls" static="true">
       <link name="link">
@@ -72,7 +74,6 @@
           <material script="Kitchen/Wall"/>
         </visual>
 
-
         <collision name="wall_2">
           <origin pose="-4.2 -5.15 1.5 0 0 0"/>
           <geometry>
@@ -84,11 +85,7 @@
           <geometry>
             <box size="10.0 0.3 3.0"/>
           </geometry>
-          <material>
-            <ambient rgba="1 1 1 1"/>
-            <diffuse rgba="1 1 1 1"/>
-            <specular rgba=".1 .1 .1 1"/> 
-          </material>
+          <material script="Kitchen/Wall"/>
         </visual>
 
         <collision name="wall_3">
@@ -102,11 +99,7 @@
           <geometry>
             <box size="0.3 10.0 3.0"/>
           </geometry>
-          <material>
-            <ambient rgba="1 1 1 1"/>
-            <diffuse rgba="1 1 1 1"/>
-            <specular rgba=".1 .1 .1 1"/> 
-          </material>
+          <material script="Kitchen/Wall"/>
         </visual>
 
         <collision name="wall_4">
@@ -120,11 +113,7 @@
           <geometry>
             <box size="10.0 0.3 3.0"/>
           </geometry>
-          <material>
-            <ambient rgba="1 1 1 1"/>
-            <diffuse rgba="1 1 1 1"/>
-            <specular rgba=".1 .1 .1 1"/> 
-          </material>
+          <material script="Kitchen/Wall"/>
         </visual>
 
       </link>

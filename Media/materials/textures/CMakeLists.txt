@@ -39,6 +39,8 @@ SET (files
             blueSelect.png
             wood.jpg
             beigeWall.jpg
+            granite.jpg
+            granite2.jpg
 )
 
 

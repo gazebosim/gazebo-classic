@@ -18,7 +18,7 @@ link_directories(
  ${tinyxml_library_dirs}
 )
 
-set ( sources AssimpLoader.cc
+set ( sources ColladaLoader.cc
               Color.cc
               Diagnostics.cc
               Event.cc
@@ -38,7 +38,7 @@ set ( sources AssimpLoader.cc
 )
 
 set ( headers CommonTypes.hh
-              AssimpLoader.hh
+              ColladaLoader.hh
               Color.hh
               Diagnostics.hh
               Event.hh

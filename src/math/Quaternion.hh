@@ -224,7 +224,7 @@ namespace gazebo
       // Skip white spaces
       in.setf( std::ios_base::skipws );
       in >> r >> p >> y;
-  
+
       q.SetFromEuler(Vector3(*r,*p,*y));
   
       return in;
