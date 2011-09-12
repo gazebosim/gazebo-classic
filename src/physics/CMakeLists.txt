@@ -90,7 +90,6 @@ target_link_libraries( gzphysics gazebo_common
                                  gazebo_sdf_interface
                                  gazebo_sdf_parser
                                  gazebo_msgs
-                                 assimp
                                  pthread)
 INSTALL_EXECUTABLE( gzphysics )
 INSTALL_LIBRARY(gazebo_physics)

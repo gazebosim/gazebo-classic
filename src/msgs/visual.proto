@@ -63,6 +63,8 @@ message Visual
   repeated Point points           = 18;
   optional Plane plane            = 19;
   optional bool is_static         = 20;
+  optional string normal_map      = 21;
+  optional string shader_type     = 22;
 }
 
 /// \endverbatim

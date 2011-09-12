@@ -24,7 +24,7 @@ using namespace common;
 
 unsigned int Material::counter = 0;
 
-std::string Material::ShadeModeStr[SHADE_COUNT] = {"FLAT", "GOURAUD", "PHONG"};
+std::string Material::ShadeModeStr[SHADE_COUNT] = {"FLAT", "GOURAUD", "PHONG", "BLINN"};
 
 std::string Material::BlendModeStr[BLEND_COUNT] = {"ADD", "MODULATE", "REPLACE"};
 
@@ -39,6 +39,7 @@ Material::Material()
   this->shininess = 0;
   this->ambient.Set(1,1,1,1);
   this->diffuse.Set(1,1,1,1);
+  this->specular.Set(0,0,0,1);
   this->lighting = false;
 }
 
@@ -111,6 +112,7 @@ Color Material::GetAmbient() const
 void Material::SetDiffuse(const Color &clr)
 {
   this->diffuse = clr;
+  this->lighting = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,6 +127,7 @@ Color Material::GetDiffuse() const
 void Material::SetSpecular(const Color &clr)
 {
   this->specular = clr;
+  this->lighting = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,6 +157,7 @@ void Material::SetTransparency(float t)
 {
   this->transparency = std::min(t, (float)1.0);
   this->transparency = std::max(this->transparency, (float)0.0);
+  this->lighting = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +172,7 @@ float Material::SetTransparency() const
 void Material::SetShininess(float s)
 {
   this->shininess = s;
+  this->lighting = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

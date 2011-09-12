@@ -122,7 +122,9 @@ const Mesh *MeshManager::Load(const std::string &filename)
     else if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader= this->stlLoader;
     else if (extension == "dae")
+    {
       loader = this->colladaLoader;
+    }
     else
       gzerr << "Unsupported mesh format for file[" << filename << "]\n";
 
@@ -335,7 +337,7 @@ void MeshManager::CreatePlane(const std::string &name, const math::Vector3 &norm
 
   rot = rot3;
  
-  xlate.SetTrans( normal * -d );
+  xlate.SetTranslate( normal * -d );
   xform = xlate * rot;
 
   math::Vector3 vec;

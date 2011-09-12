@@ -6,10 +6,6 @@ SET(ODE_JOINT_DAMPING_VERSION 0.11.1.1 CACHE INTERNAL "ODE version with joint da
 
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
-set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
-set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
-set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
-
 set (tinyxml_include_dirs "" CACHE STRING "Tinyxml include paths. Use this to override automatic detection.")
 set (tinyxml_library_dirs "" CACHE STRING "Tinyxml library paths. Use this to override automatic detection.")
 set (tinyxml_libraries "" CACHE STRING "Tinyxml libraries Use this to override automatic detection.")
@@ -390,37 +386,6 @@ if (libdl_library AND libdl_include_dir)
 else (libdl_library AND libdl_include_dir)
   SET (HAVE_DL FALSE)
 endif (libdl_library AND libdl_include_dir)
-
-########################################
-# Find assimp
-if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
-
-  find_path(assimp_include_dir assimp/assimp.hpp ${assimp_include_dirs} ENV CPATH)
-  
-  if (NOT assimp_include_dir)
-    message (STATUS "Looking for assimp/assimp.hpp - not found.")
-    set (assimp_include_dirs /usr/include CACHE STRING
-      "Assimp include paths. Use this to override automatic detection.")
-  else (NOT assimp_include_dir)
-    message (STATUS "Looking for assimp/assimp.hpp - found")
-    set (assim_include_dirs ${assimp_include_dir} CACHE STRING
-      "Assimp include paths. Use this to override automatic detection.")
-  endif (NOT assimp_include_dir)
-  
-  find_library(assimp_library assimp ENV LD_LIBRARY_PATH)
-  
-  if (assimp_library)
-    message (STATUS "Looking for libassimp - found")
-    APPEND_TO_CACHED_LIST(assimp_libraries
-                          "Assimp libraries Use this to override automatic detection."
-                          ${assimp_library})
-  endif (assimp_library)
- 
-  if (NOT assimp_include_dir OR NOT assimp_library)
-    BUILD_ERROR("Missing: Assimp(http://assimp.sourceforge.net)")
-  endif (NOT assimp_include_dir OR NOT assimp_library)
-
-endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
 ########################################
 # Find bullet

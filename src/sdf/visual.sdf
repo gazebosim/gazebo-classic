@@ -11,7 +11,11 @@
 
   <element name="material" required="0">
     <attribute name="script" type="string" default="__default__" required="0"/>
-    <attribute name="normal_map" type="string" default="__default__" required="0"/>
+
+    <element name="shader" required="0">
+      <attribute name="type" type="string" default="pixel" required="1"/>
+      <element name="normal_map" type="string" default="__default__" required="0"/>
+    </element>
     <element name="ambient" required="0">
       <attribute name="rgba" type="color" default="0 0 0 1" required="1"/>
     </element>

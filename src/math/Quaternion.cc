@@ -163,6 +163,13 @@ void Quaternion::SetFromAxis(double ax, double ay, double az, double aa)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the quaternion from an axis and angle
+void Quaternion::SetFromAxis(const Vector3 &_axis, double _a)
+{
+  this->SetFromAxis(_axis.x, _axis.y, _axis.z, _a);
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 /// Set this quaternion from another
 void Quaternion::Set(double u, double x, double y, double z)
 {
@@ -504,4 +511,30 @@ bool Quaternion::operator!=(const Quaternion &_qt) const
          !equal(this->y, _qt.y, 0.001) || 
          !equal(this->z, _qt.z, 0.001) || 
          !equal(this->w, _qt.w, 0.001);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the quaternion as a 3x3 matrix
+Matrix3 Quaternion::GetAsMatrix3() const
+{
+  Quaternion q = *this;
+  q.Normalize();
+  return Matrix3(1 - 2*q.y*q.y - 2 *q.z*q.z,
+                 2 * q.x*q.y - 2*q.z*q.w,
+                 2 * q.x * q.z + 2 * q.y * q.w,
+                 2 * q.x * q.y + 2 * q.z * q.w,
+                 1 - 2*q.x*q.x - 2 * q.z*q.z,
+                 2 * q.y * q.z - 2 * q.x * q.w,
+                 2 * q.x * q.z - 2 * q.y * q.w,
+                 2 * q.y * q.z + 2 * q.x * q.w,
+                 1 - 2 * q.x*q.x - 2 * q.y*q.y );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the quaternion as a 4x4 matrix
+Matrix4 Quaternion::GetAsMatrix4() const
+{
+  Matrix4 result( Matrix4::IDENTITY );
+  result = this->GetAsMatrix3();
+  return result;
 }

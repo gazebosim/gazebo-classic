@@ -15,6 +15,7 @@
  *
 */
 #include <string.h>
+#include <math.h>
 
 #include "common/Exception.hh"
 #include "math/Matrix3.hh"
@@ -70,6 +71,26 @@ void Matrix3::SetFromAxes(const Vector3 &xAxis, const Vector3 &yAxis,
   this->SetCol(2, zAxis);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the matrix from an axis and angle
+void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
+{
+  double c = cos(_angle);
+  double s = sin(_angle);
+  double C = 1-c;
+
+  this->m[0][0] = _axis.x*_axis.x*C + c;
+  this->m[0][1] = _axis.x*_axis.y*C - _axis.z*s;
+  this->m[0][2] = _axis.x*_axis.z*C + _axis.y*s;
+
+  this->m[1][0] = _axis.y*_axis.x*C + _axis.z*s;
+  this->m[1][1] = _axis.y*_axis.y*C + c;
+  this->m[1][2] = _axis.y*_axis.z*C - _axis.x*s;
+
+  this->m[2][0] = _axis.z*_axis.x*C - _axis.y*s;
+  this->m[2][1] = _axis.z*_axis.y*C + _axis.x*s;
+  this->m[2][2] = _axis.z*_axis.z*C + c;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a column

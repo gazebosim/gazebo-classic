@@ -34,6 +34,7 @@ void Material::Update(const gazebo::common::Material *_mat)
    matPtr = Ogre::MaterialManager::getSingleton().create(
                   _mat->GetName(),"General");
 
+  matPtr->setReceiveShadows(false);
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
   common::Color ambient =  _mat->GetAmbient();
@@ -41,7 +42,7 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
 
-  matPtr->getTechnique(0)->setLightingEnabled( _mat->GetLighting() );
+  pass->setLightingEnabled( _mat->GetLighting() );
   pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
   pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
 
@@ -57,4 +58,5 @@ void Material::Update(const gazebo::common::Material *_mat)
     Ogre::TextureUnitState *texState = pass->createTextureUnitState();
     texState->setTextureName( _mat->GetTextureImage() );
   }
+  
 }

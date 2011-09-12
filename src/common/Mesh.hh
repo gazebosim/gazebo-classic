@@ -72,13 +72,14 @@ namespace gazebo
       public: unsigned int GetSubMeshCount() const;
   
       /// \brief Add a material to the mesh
-      public: void AddMaterial( Material *mat );
+      /// \return Index of this material
+      public: unsigned int AddMaterial( Material *mat );
   
       /// \brief Get the number of materials
       public: unsigned int GetMaterialCount() const;
   
       /// \brief Get a material
-      public: const Material *GetMaterial(unsigned int index) const;
+      public: const Material *GetMaterial(int index) const;
   
       /// \brief Get a child
       public: const SubMesh *GetSubMesh(unsigned int i) const;
@@ -107,11 +108,37 @@ namespace gazebo
     /// \brief A child mesh 
     class SubMesh
     {
+      public: enum PrimitiveType {LINES, LINESTRIPS, TRIANGLES, TRIFANS, TRISTRIPS};
+
       /// \brief Constructor
       public: SubMesh();
   
       /// \brief Destructor
       public: virtual ~SubMesh();
+
+      /// \brief Set the primitive type
+      public: void SetPrimitiveType( PrimitiveType _type );
+
+      /// \brief Get the primitive type
+      public: PrimitiveType GetPrimitiveType() const;
+
+      /// \brief Copy vertices from a vector
+      public: void CopyVertices( const std::vector<math::Vector3> &_verts );
+
+      /// \brief Copy normals from a vector
+      public: void CopyNormals( const std::vector<math::Vector3> &_norms );
+
+      /// \brief Resize the vertex array
+      public: void SetVertexCount( unsigned int _count );
+
+      /// \brief Resize the index array
+      public: void SetIndexCount( unsigned int _count );
+
+      /// \brief Resize the normal array
+      public: void SetNormalCount( unsigned int _count );
+
+      /// \brief Resize the texture coordinate  array
+      public: void SetTexCoordCount( unsigned int _count );
   
       /// \brief Add an index to the mesh
       public: void AddIndex( unsigned int i);
@@ -202,7 +229,8 @@ namespace gazebo
       private: std::vector< math::Vector2d > texCoords;
       private: std::vector<unsigned int> indices;
   
-  
+      private: PrimitiveType primitiveType;
+
       private: int materialIndex;
     };
     /// \}

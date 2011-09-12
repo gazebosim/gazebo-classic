@@ -202,9 +202,10 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a material to the mesh
-void Mesh::AddMaterial( Material *mat )
+unsigned int Mesh::AddMaterial( Material *mat )
 {
   this->materials.push_back(mat);
+  return this->materials.size()-1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,9 +217,9 @@ unsigned int Mesh::GetMaterialCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a material
-const Material *Mesh::GetMaterial(unsigned int index) const
+const Material *Mesh::GetMaterial(int index) const
 {
-  if (index < this->materials.size())
+  if (index >= 0 && index < (int)this->materials.size())
     return this->materials[index];
 
   return NULL;
@@ -301,7 +302,8 @@ void Mesh::RecalculateNormals()
 // Constructor
 SubMesh::SubMesh()
 {
-  this->materialIndex = 0;
+  this->materialIndex = -1;
+  this->primitiveType = TRIANGLES;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -310,6 +312,75 @@ SubMesh::~SubMesh()
 {
   this->vertices.clear();
   this->indices.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the primitive type
+void SubMesh::SetPrimitiveType( PrimitiveType _type )
+{
+  this->primitiveType = _type;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the primitive type
+SubMesh::PrimitiveType SubMesh::GetPrimitiveType() const
+{
+  return this->primitiveType;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Copy vertices from a vector
+void SubMesh::CopyVertices( const std::vector<math::Vector3> &_verts )
+{
+  this->vertices.clear();
+  this->vertices.resize(_verts.size());
+  std::copy(_verts.begin(), _verts.end(), this->vertices.begin());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Copy normals from a vector
+void SubMesh::CopyNormals( const std::vector<math::Vector3> &_norms )
+{
+  this->normals.clear();
+  this->normals.resize(_norms.size());
+  for (unsigned int i=0; i < _norms.size(); i++)
+  {
+    this->normals[i] = _norms[i];
+    this->normals[i].Normalize();
+    if (this->normals[i].GetLength() == 0.0)
+    {
+      std::cout << "Bad Normals[" << this->normals[i] << "]\n";
+      this->normals[i].Set(0,0,1);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Resize the vertex array
+void SubMesh::SetVertexCount( unsigned int _count )
+{
+  this->vertices.resize(_count);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Resize the index array
+void SubMesh::SetIndexCount( unsigned int _count )
+{
+  this->indices.resize(_count);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Resize the normal array
+void SubMesh::SetNormalCount( unsigned int _count )
+{
+  this->normals.resize(_count);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Resize the texture coordinate array
+void SubMesh::SetTexCoordCount( unsigned int _count )
+{
+  this->texCoords.resize(_count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

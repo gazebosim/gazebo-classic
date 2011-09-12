@@ -48,7 +48,7 @@
         <geometry>
           <box size='0.05 0.37 0.3'/>
         </geometry>
-        <material script='PR2/Black' normal_map='__default__'/>
+        <material script='PR2/Black'/>
       </visual>
       <collision name='base_footprint_geom_base_link' laser_retro='0'>
         <origin pose='0 0 0.051 0 -0 0'/>
@@ -70,6 +70,11 @@
         <geometry>
           <mesh filename='pr2/base_v0/base.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/base_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
       <!--
       <sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100'>
@@ -129,7 +134,7 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture' normal_map='__default__'/>
+        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='bl_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -139,7 +144,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='bl_caster_l_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -158,6 +163,11 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='bl_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -167,7 +177,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='bl_caster_r_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -186,6 +196,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='br_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
@@ -214,7 +230,7 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture' normal_map='__default__'/>
+        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='br_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -224,7 +240,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='br_caster_l_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -243,6 +259,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='br_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -252,7 +274,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='br_caster_r_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -271,6 +293,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='fl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
@@ -299,7 +327,7 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture' normal_map='__default__'/>
+        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='fl_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -309,7 +337,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='fl_caster_l_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -328,6 +356,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='fl_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -337,7 +371,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='fl_caster_r_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -356,6 +390,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='fr_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
@@ -384,7 +424,7 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture' normal_map='__default__'/>
+        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='fr_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -394,7 +434,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='fr_caster_l_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -413,6 +453,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='fr_caster_r_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -422,7 +468,7 @@
         <inertia ixx='0.012411800000000001' ixy='-0.000711734' ixz='0.00050272999999999995' iyy='0.015218199999999999' iyz='-4.2734700000000003e-06' izz='0.011764'/>
       </inertial>
       <collision name='fr_caster_r_wheel_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 90 -0 0'/>
+        <origin pose='0 0 0 1.5707 -0 0'/>
         <geometry>
           <cylinder radius='0.074791999999999997' length='0.034000000000000002'/>
         </geometry>
@@ -441,6 +487,12 @@
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='torso_lift_link' gravity='1' self_collide='0' kinematic='0'>
@@ -469,6 +521,11 @@
         <geometry>
           <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1'/>
         </geometry>
+        <material> 
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/torso_v0/torso_lift_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='head_pan_link' gravity='1' self_collide='0' kinematic='0'>
@@ -497,6 +554,12 @@
         <geometry>
           <mesh filename='pr2/head_v0/head_pan.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/head_v0/head_pan_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='head_tilt_link' gravity='1' self_collide='0' kinematic='0'>
@@ -520,11 +583,16 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/head_v0/head_tilt.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/head_v0/head_tilt_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
       <collision name='head_tilt_link_geom_head_plate_frame' laser_retro='0'>
         <origin pose='0.0232 0 0.0645 0 -0 0'/>
@@ -546,7 +614,7 @@
         <geometry>
           <box size='0.01 0.01 0.01'/>
         </geometry>
-        <material script='Gazebo/Grey' normal_map='__default__'/>
+        <material script='Gazebo/Grey'/>
       </visual>
       <!--
       <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25'>
@@ -585,6 +653,11 @@
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/shoulder_v0/shoulder_pan_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='l_shoulder_lift_link' gravity='0' self_collide='0' kinematic='0'>
@@ -613,6 +686,11 @@
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/shoulder_v0/shoulder_lift_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='l_upper_arm_roll_link' gravity='0' self_collide='0' kinematic='0'>
@@ -639,9 +717,14 @@
       <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
-          <mesh filename='pr2/shoulder_v0/upper_arm_roll.stl' scale='1 1 1'/>
+          <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks' normal_map='__default__'/>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/shoulder_v0/upper_arm_roll_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
       <collision name='l_upper_arm_roll_link_geom_l_upper_arm_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -663,7 +746,14 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
         </geometry>
+        <material> 
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/upper_arm_v0/upper_arm_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
+
     </link>
     <link name='l_elbow_flex_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='0.45 0.188 0.790675 0 -0 0'/>
@@ -691,6 +781,12 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
         </geometry>
+        <material> 
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/upper_arm_v0/elbow_flex_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='l_forearm_roll_link' gravity='0' self_collide='0' kinematic='0'>
@@ -719,7 +815,7 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks' normal_map='__default__'/>
+        <material script='PR2/RollLinks'/>
       </visual>
       <collision name='l_forearm_roll_link_geom_l_forearm_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -741,6 +837,11 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/forearm_v0/forearm_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='l_wrist_flex_link' gravity='0' self_collide='0' kinematic='0'>
@@ -769,6 +870,12 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/forearm_v0/wrist_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='l_wrist_roll_link' gravity='0' self_collide='0' kinematic='0'>
@@ -797,7 +904,7 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks' normal_map='__default__'/>
+        <material script='PR2/RollLinks'/>
       </visual>
       <collision name='l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -840,6 +947,12 @@
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/gripper_palm_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='l_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0'>
@@ -868,6 +981,12 @@
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='l_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
@@ -896,6 +1015,12 @@
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='l_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0'>
@@ -905,7 +1030,7 @@
         <inertia ixx='7.7384099999999997e-05' ixy='-2.0930900000000001e-06' ixz='-8.3622799999999998e-06' iyy='0.000198474' iyz='2.4611e-06' izz='0.00018107'/>
       </inertial>
       <collision name='l_gripper_r_finger_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 -180 -0 0'/>
+        <origin pose='0 0 0 -3.1415 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1 1 1'/>
         </geometry>
@@ -920,10 +1045,16 @@
         </surface>
       </collision>
       <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
-        <origin pose='0 0 0 -180 0 0'/>
+        <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='l_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
@@ -933,7 +1064,7 @@
         <inertia ixx='8.3704700000000002e-06' ixy='-5.8363200000000001e-06' ixz='0' iyy='9.8706699999999998e-06' iyz='0' izz='1.54177e-05'/>
       </inertial>
       <collision name='l_gripper_r_finger_tip_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 -180 -0 0'/>
+        <origin pose='0 0 0 -3.1415 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
         </geometry>
@@ -948,10 +1079,16 @@
         </surface>
       </collision>
       <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
-        <origin pose='0 0 0 -180 0 0'/>
+        <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='laser_tilt_mount_link' gravity='1' self_collide='0' kinematic='0'>
@@ -980,6 +1117,12 @@
         <geometry>
           <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/tilting_laser_v0/tilting_hokuyo_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1008,6 +1151,11 @@
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/shoulder_v0/shoulder_pan_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='r_shoulder_lift_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1036,6 +1184,11 @@
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/shoulder_v0/shoulder_lift_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='r_upper_arm_roll_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1062,9 +1215,13 @@
       <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
-          <mesh filename='pr2/shoulder_v0/upper_arm_roll.stl' scale='1 1 1'/>
+          <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks' normal_map='__default__'/>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/shoulder_v0/upper_arm_roll_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
       <collision name='r_upper_arm_roll_link_geom_r_upper_arm_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -1086,6 +1243,11 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
         </geometry>
+        <material> 
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/upper_arm_v0/upper_arm_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='r_elbow_flex_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1114,6 +1276,11 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
         </geometry>
+        <material> 
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/upper_arm_v0/elbow_flex_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='r_forearm_roll_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1142,7 +1309,6 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks' normal_map='__default__'/>
       </visual>
       <collision name='r_forearm_roll_link_geom_r_forearm_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -1164,6 +1330,11 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/forearm_v0/forearm_normals.tif</normal_map>
+          </shader>
+        </material>
       </visual>
     </link>
     <link name='r_wrist_flex_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1192,6 +1363,12 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/forearm_v0/wrist_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_wrist_roll_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1220,7 +1397,7 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks' normal_map='__default__'/>
+        <material script='PR2/RollLinks'/>
       </visual>
       <collision name='r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -1263,6 +1440,12 @@
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/gripper_palm_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_gripper_l_finger_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1291,6 +1474,12 @@
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_gripper_l_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1319,6 +1508,12 @@
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_gripper_r_finger_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1328,7 +1523,7 @@
         <inertia ixx='7.7384099999999997e-05' ixy='-2.0930900000000001e-06' ixz='-8.3622799999999998e-06' iyy='0.000198474' iyz='2.4611e-06' izz='0.00018107'/>
       </inertial>
       <collision name='r_gripper_r_finger_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 -180 -0 0'/>
+        <origin pose='0 0 0 -3.1415 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1 1 1'/>
         </geometry>
@@ -1343,10 +1538,16 @@
         </surface>
       </collision>
       <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
-        <origin pose='0 0 0 -180 0 0'/>
+        <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_gripper_r_finger_tip_link' gravity='0' self_collide='0' kinematic='0'>
@@ -1356,7 +1557,7 @@
         <inertia ixx='8.3704700000000002e-06' ixy='-5.8363200000000001e-06' ixz='0' iyy='9.8706699999999998e-06' iyz='0' izz='1.54177e-05'/>
       </inertial>
       <collision name='r_gripper_r_finger_tip_link_geom' laser_retro='0'>
-        <origin pose='0 0 0 -180 -0 0'/>
+        <origin pose='0 0 0 -3.1415 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
         </geometry>
@@ -1371,10 +1572,16 @@
         </surface>
       </collision>
       <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
-        <origin pose='0 0 0 -180 0 0'/>
+        <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
+        <material>
+          <shader type="normal_map_objectspace">
+            <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
+          </shader>
+        </material>
+
       </visual>
     </link>
     <link name='r_gripper_l_parallel_link' gravity='0' self_collide='0' kinematic='0'>

@@ -61,11 +61,33 @@ namespace gazebo
                                const Vector3 &_yAxis, 
                                const Vector3 &_zAxis);
   
+
+      /// \brief Set the matrix from an axis and angle
+      public: void SetFromAxis(const Vector3 &_axis, double _angle);
+
       /// \brief Set a column
       /// \param _c The colum index (0,1,2)
       /// \param _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
- 
+
+      /// \brief Output operator 
+      /// \param _out Output stream
+      /// \param _m Matrix to output
+      public: friend std::ostream &operator<<( std::ostream &_out, 
+                                               const gazebo::math::Matrix3 &_m )
+            {
+              for (int i=0; i < 3; i++)
+              {
+                for (int j=0; j < 3; j++)
+                {
+                  _out << _m.m[i][j] << " ";
+                }
+                _out << "\n";
+              }
+  
+              return _out;
+            }
+
       /// \brief the 3x3 matrix  
       protected: double m[3][3];
       friend class Matrix4;

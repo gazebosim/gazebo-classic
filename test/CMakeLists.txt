@@ -10,7 +10,6 @@ include_directories (
 link_directories(  
   ${OGRE_LIBRARY_PATH}
   ${BOOST_LIBRARY_DIRS} 
-  ${assimp_library_dirs} 
   ${ODE_LIBRARY_DIRS}
 )
 
@@ -29,7 +28,6 @@ add_subdirectory( regression )
 #                               gazebo_sensors
 #                               gazebo_rendering
 #                               gazebo_msgs
-#                               assimp
 #                               pthread 
 #                               )
 #

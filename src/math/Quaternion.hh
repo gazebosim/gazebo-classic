@@ -29,6 +29,8 @@
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
+#include "math/Matrix3.hh"
+#include "math/Matrix4.hh"
 
 namespace gazebo
 {
@@ -81,6 +83,11 @@ namespace gazebo
     /// \param z Z axis
     /// \param a Angle in radians
     public: void SetFromAxis(double x, double y, double z, double a);
+
+    /// \brief Set the quaternion from an axis and angle
+    /// \param _axis Axis
+    /// \param _a Angle in radians
+    public: void SetFromAxis(const Vector3 &_axis, double _a);
   
     /// \brief Set this quaternion from another
     public: void Set(double u, double x, double y, double z);
@@ -171,6 +178,12 @@ namespace gazebo
   
     /// \brief Correct any nan
     public: void Correct();
+
+    /// \brief Get the quaternion as a 3x3 matrix
+    public: Matrix3 GetAsMatrix3() const;
+
+     /// \brief Get the quaternion as a 4x4 matrix
+    public: Matrix4 GetAsMatrix4() const;
   
     public: Vector3 GetXAxis() const;
     public: Vector3 GetYAxis() const;

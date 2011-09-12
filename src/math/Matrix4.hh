@@ -66,7 +66,11 @@ namespace gazebo
  
       /// \brief Set the translational values [ (0,3) (1,3) (2,3) ]
       /// \param _t Values to set
-      public: void SetTrans(const Vector3 &t);
+      public: void SetTranslate(const Vector3 &_t);
+
+      /// \brief Set the scale
+      /// \param _s scale
+      public: void SetScale(const Vector3 &_s);
  
       /// \brief Return true if the matrix is affine 
       /// \return True if the matrix is affine
@@ -91,6 +95,17 @@ namespace gazebo
       /// \param _mat Incoming matrix
       /// \return This matrix * _mat
       public: Matrix4 operator*(const Matrix4 &_mat);
+
+      /// \brief Multiplication operator 
+      /// \param _mat Incoming matrix
+      /// \return This matrix * _mat
+      public: Matrix4 operator*(const Matrix3 &_mat);
+
+
+      /// \brief Multiplication operator
+      /// \param _vec Vector3
+      /// \return Resulting vector from multiplication
+      public: Vector3 operator*(const Vector3 &_vec) const;
  
       /// \brief Output operator 
       /// \param _out Output stream

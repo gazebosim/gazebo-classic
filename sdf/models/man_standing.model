@@ -13,9 +13,12 @@
     </collision>
     <visual>
       <geometry>
-        <mesh filename="man_standing.dae" scale="0.0254 0.0254 0.0254"/>
+        <!--<mesh filename="stovetop/stovetop.dae"/>-->
+        <!--<mesh filename="man_standing.dae"/>-->
+        <!--<mesh filename="hanoi_blue_disk.dae"/>-->
+        <mesh filename="willowgarage.dae"/>
       </geometry>
-      <material script="Gazebo/Grey"/>
+      <!--<material script="Gazebo/Grey"/>-->
     </visual>
   </link>
 </model>

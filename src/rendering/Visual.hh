@@ -224,12 +224,17 @@ namespace gazebo
       /// \brief Update a visual based on a message
       public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
 
-
       /// \brief Return true if the visual is a plane
       public: bool IsPlane() const;
 
       /// \brief Get the parent visual, if one exists
       public: VisualPtr GetParent() const;
+
+      /// \brief Get the shader type
+      public: std::string GetShaderType() const;
+
+      /// \brief Set the shader type
+      public: void SetShaderType( const std::string &_type );
   
       private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
       private: std::string GetMeshName() const;

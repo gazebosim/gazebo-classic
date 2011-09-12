@@ -65,7 +65,7 @@
 	</library_effects>
 	<library_images>
 		<image id="texture0_jpg-img" name="texture0_jpg-img">
-			<init_from>texture0.jpg</init_from>
+      <init_from>stovetop/texture0.jpg</init_from>
 		</image>
 	</library_images>
 	<library_materials>

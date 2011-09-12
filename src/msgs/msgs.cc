@@ -356,6 +356,14 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
   {
     sdf::ElementPtr elem = _sdf->GetElement("material");
     result.set_material_script(elem->GetValueString("script"));
+    if (elem->HasElement("shader"))
+    {
+      sdf::ElementPtr shaderElem = elem->GetElement("shader");
+      result.set_shader_type( shaderElem->GetValueString("type") );
+      if (shaderElem->HasElement("normal_map"))
+          result.set_normal_map( 
+            shaderElem->GetElement("normal_map")->GetValueString());
+    }
     if (elem->HasElement("ambient"))
       result.mutable_ambient()->CopyFrom( 
           Convert(elem->GetElement("ambient")->GetValueColor("rgba")));

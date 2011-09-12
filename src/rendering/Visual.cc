@@ -1066,18 +1066,32 @@ void Visual::DisableTrackVisual()
 /// Get the normal map
 std::string Visual::GetNormalMap() const
 {
-  if (this->sdf->HasElement("material"))
-    return this->sdf->GetElement("material")->GetValueString("normal_map");
-  return std::string();
+  return this->sdf->GetOrCreateElement("material")->GetOrCreateElement("shader")->GetOrCreateElement("normal_map")->GetValueString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the normal map
-void Visual::SetNormalMap(const std::string &nmap)
+void Visual::SetNormalMap(const std::string &_nmap)
 {
-  this->sdf->GetOrCreateElement("material")->GetAttribute("normal_map")->Set(nmap);
+  this->sdf->GetOrCreateElement("material")->GetOrCreateElement("shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
   RTShaderSystem::Instance()->UpdateShaders();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the shader type 
+std::string Visual::GetShaderType() const
+{
+  return this->sdf->GetOrCreateElement("material")->GetOrCreateElement("shader")->GetValueString("type");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the shader type map
+void Visual::SetShaderType(const std::string &_type)
+{
+  this->sdf->GetOrCreateElement("material")->GetOrCreateElement("shader")->GetAttribute("type")->Set(_type);
+  RTShaderSystem::Instance()->UpdateShaders();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void Visual::SetRibbonTrail(bool value)
@@ -1233,6 +1247,20 @@ void Visual::InsertMesh( const common::Mesh *mesh)
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
+      if (subMesh->GetPrimitiveType() == common::SubMesh::TRIANGLES)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
+      else if (subMesh->GetPrimitiveType() == common::SubMesh::LINES)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_LINE_LIST;
+      else if (subMesh->GetPrimitiveType() == common::SubMesh::LINESTRIPS)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_LINE_STRIP;
+      else if (subMesh->GetPrimitiveType() == common::SubMesh::TRIFANS)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
+      else if (subMesh->GetPrimitiveType() == common::SubMesh::TRISTRIPS)
+        ogreSubMesh->operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
+      else
+        gzerr << "Unknown primitive type[" 
+              << subMesh->GetPrimitiveType() << "]\n";
+
       ogreSubMesh->vertexData = new Ogre::VertexData();
       vertexData = ogreSubMesh->vertexData;
       vertexDecl = vertexData->vertexDeclaration;
@@ -1351,7 +1379,7 @@ void Visual::InsertMesh( const common::Mesh *mesh)
   }
   catch (Ogre::Exception e)
   {
-    gzerr << "Unable to create a basic Unit cylinder object" << std::endl;
+    gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
   }
 }
 
@@ -1388,6 +1416,14 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
 
   if (msg->has_emissive())
     this->SetEmissive( msgs::Convert(msg->emissive()) );
+
+  if (msg->has_shader_type())
+  {
+    this->SetShaderType(msg->shader_type());
+    if (msg->has_normal_map())
+      this->SetNormalMap(msg->normal_map());
+  }
+  
 
   /*if (msg->points.size() > 0)
   {
@@ -1434,4 +1470,3 @@ std::string Visual::GetMeshName() const
 
   return std::string();
 }
-

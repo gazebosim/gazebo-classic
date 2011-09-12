@@ -2,19 +2,15 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 ########################################
 # Include all the search paths for headers
-string (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
-string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
 
 add_definitions(${tinyxml_cflags})
 
 include_directories( 
   ${PROJECT_BINARY_DIR}/src 
-  ${assimp_include_dirs_split}
   ${tinyxml_include_dirs}
 )
 
 link_directories(  
- ${assimp_library_dirs_split} 
  ${tinyxml_library_dirs}
 )
 
@@ -74,7 +70,6 @@ target_link_libraries( gazebo_common gazebo_math
                                      ${libdl_library}
                                      ${tinyxml_libraries}
                                      ${boost_libraries}
-                                     ${assimp_libraries}
                                      ${freeimage_library}
                                      ${tinyxml_libraries}
                      )

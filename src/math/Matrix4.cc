@@ -86,12 +86,23 @@ Matrix4::~Matrix4()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set translation
-void Matrix4::SetTrans(const Vector3 &t)
+void Matrix4::SetTranslate(const Vector3 &t)
 {
   this->m[0][3] = t.x;
   this->m[1][3] = t.y;
   this->m[2][3] = t.z;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the scale
+void Matrix4::SetScale(const Vector3 &_s)
+{
+  this->m[0][0] = _s.x;
+  this->m[1][1] = _s.y;
+  this->m[2][2] = _s.z;
+  this->m[3][3] = 1.0;
+}
+ 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equality operator
@@ -123,6 +134,28 @@ const Matrix4 &Matrix4::operator=( const Matrix3 &mat )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mult operator
+Matrix4 Matrix4::operator*(const Matrix3 &m2)
+{
+  Matrix4 r;
+  r = *this;
+
+  r.m[0][0] = m[0][0]*m2.m[0][0] + m[0][1]*m2.m[1][0] + m[0][2] * m2.m[2][0];
+  r.m[0][1] = m[0][0]*m2.m[0][1] + m[0][1]*m2.m[1][1] + m[0][2] * m2.m[2][1];
+  r.m[0][2] = m[0][0]*m2.m[0][2] + m[0][1]*m2.m[1][2] + m[0][2] * m2.m[2][2];
+
+  r.m[1][0] = m[1][0]*m2.m[0][0] + m[1][1]*m2.m[1][0] + m[1][2] * m2.m[2][0];
+  r.m[1][1] = m[1][0]*m2.m[0][1] + m[1][1]*m2.m[1][1] + m[1][2] * m2.m[2][1];
+  r.m[1][2] = m[1][0]*m2.m[0][2] + m[1][1]*m2.m[1][2] + m[1][2] * m2.m[2][2];
+
+  r.m[2][0] = m[2][0]*m2.m[0][0] + m[2][1]*m2.m[1][0] + m[2][2] * m2.m[2][0];
+  r.m[2][1] = m[2][0]*m2.m[0][1] + m[2][1]*m2.m[1][1] + m[2][2] * m2.m[2][1];
+  r.m[2][2] = m[2][0]*m2.m[0][2] + m[2][1]*m2.m[1][2] + m[2][2] * m2.m[2][2];
+
+  return r;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Mult operator
 Matrix4 Matrix4::operator*(const Matrix4 &m2)
 {
   Matrix4 r;
@@ -148,6 +181,16 @@ Matrix4 Matrix4::operator*(const Matrix4 &m2)
   r.m[3][3] = this->m[3][0] * m2.m[0][3] + this->m[3][1] * m2.m[1][3] + this->m[3][2] * m2.m[2][3] + this->m[3][3] * m2.m[3][3];
 
   return r;
+}
+////////////////////////////////////////////////////////////////////////////////
+/// Multiplication operator
+Vector3 Matrix4::operator*(const Vector3 &_vec) const
+{
+  Vector3 result;
+  result.x = this->m[0][0]*_vec.x + this->m[0][1]*_vec.y + this->m[0][2]*_vec.z + this->m[0][3];
+  result.y = this->m[1][0]*_vec.x + this->m[1][1]*_vec.y + this->m[1][2]*_vec.z + this->m[1][3];
+  result.z = this->m[2][0]*_vec.x + this->m[2][1]*_vec.y + this->m[2][2]*_vec.z + this->m[2][3];
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

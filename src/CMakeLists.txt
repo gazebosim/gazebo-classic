@@ -13,7 +13,6 @@ include_directories(
 link_directories(  
   ${OGRE_LIBRARY_PATH}
   ${BOOST_LIBRARY_DIRS} 
-  ${assimp_library_dirs} 
   ${ODE_LIBRARY_DIRS}
   ${tinyxml_library_dirs}
 )
@@ -43,7 +42,6 @@ target_link_libraries( gzmaster gazebo_common
                                 gazebo_msgs
                                 ${boost_libraries}
                                 ${freeimage_library}
-                                ${assimp_libraries}
                                 ${PROTOBUF_LIBRARY})
 
 target_link_libraries( gzserver gazebo_common
@@ -54,7 +52,6 @@ target_link_libraries( gzserver gazebo_common
                                 gazebo_sensors
                                 gazebo_rendering
                                 gazebo_msgs
-                                assimp
                                 pthread
                                 ${tinyxml_libraries}
                                 )
@@ -74,7 +71,6 @@ target_link_libraries( gazebo_server gazebo_common
                                      gazebo_sdf_interface
                                      gazebo_msgs
                                      gazebo_math
-                                     assimp
                                      pthread)
 
 add_dependencies( gazebo_server gazebo_msgs )
