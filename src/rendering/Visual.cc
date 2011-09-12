@@ -331,7 +331,7 @@ void Visual::Load()
   }
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(true);//this->sdf->GetValueBool("cast_shadows"));
+  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
