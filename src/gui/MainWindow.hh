@@ -2,6 +2,7 @@
 #define MAINWINDOW_HH
 
 #include <qmainwindow.h>
+#include "common/Event.hh"
 #include "transport/TransportTypes.hh"
 
 namespace gazebo
@@ -44,6 +45,9 @@ namespace gazebo
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
+      private slots: void ViewFullScreen();
+
+      private: void OnFullScreen(bool _value);
 
       private: void CreateActions();
       private: void CreateMenus();
@@ -77,6 +81,7 @@ namespace gazebo
       private: QAction *dirLghtCreateAct;
 
       private: QAction *insertModelAct;
+      private: QAction *viewFullScreenAct;
 
       private: TimePanel *timePanel;
       private: RenderWidget *renderWidget;
@@ -85,6 +90,10 @@ namespace gazebo
       private: transport::PublisherPtr worldControlPub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
+      private: QDockWidget *modelsDock;
+      private: QDockWidget *insertModelsDock;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

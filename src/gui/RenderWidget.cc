@@ -6,6 +6,7 @@
 
 #include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
+#include "gui/GuiEvents.hh"
 #include "gui/RenderWidget.hh"
 
 using namespace gazebo;
@@ -15,15 +16,15 @@ RenderWidget::RenderWidget( QWidget *parent )
   : QWidget(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  QFrame *mainFrame = new QFrame;
-  mainFrame->setLineWidth(1);
-  mainFrame->setFrameShadow(QFrame::Sunken);
-  mainFrame->setFrameShape(QFrame::Box);
-  mainFrame->show();
+  this->mainFrame = new QFrame;
+  this->mainFrame->setLineWidth(1);
+  this->mainFrame->setFrameShadow(QFrame::Sunken);
+  this->mainFrame->setFrameShape(QFrame::Box);
+  this->mainFrame->show();
 
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
-  this->glWidget = new GLWidget(mainFrame);
+  this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world());
   this->glWidget->ViewScene( scene );
 
@@ -66,19 +67,19 @@ RenderWidget::RenderWidget( QWidget *parent )
   this->trianglesEdit->setFixedWidth(80);
   */ 
 
-  QLabel *xyzLabel = new QLabel(tr("XYZ:"));
-  QLabel *rpyLabel = new QLabel(tr("RPY:"));
+  this->xyzLabel = new QLabel(tr("XYZ:"));
+  this->rpyLabel = new QLabel(tr("RPY:"));
   //QLabel *fpsLabel = new QLabel(tr("FPS:"));
   //QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
 
-  QHBoxLayout *bottomBarLayout = new QHBoxLayout;
-  bottomBarLayout->addWidget(xyzLabel);
+  bottomBarLayout = new QHBoxLayout;
+  bottomBarLayout->addWidget(this->xyzLabel);
   bottomBarLayout->addWidget(this->xPosEdit);
   bottomBarLayout->addWidget(this->yPosEdit);
   bottomBarLayout->addWidget(this->zPosEdit);
 
   bottomBarLayout->addItem(new QSpacerItem(10,20));
-  bottomBarLayout->addWidget(rpyLabel);
+  bottomBarLayout->addWidget(this->rpyLabel);
   bottomBarLayout->addWidget(this->rollEdit);
   bottomBarLayout->addWidget(this->pitchEdit);
   bottomBarLayout->addWidget(this->yawEdit);
@@ -93,10 +94,10 @@ RenderWidget::RenderWidget( QWidget *parent )
   frameLayout->addWidget(this->glWidget);
   frameLayout->addLayout(bottomBarLayout);
 
-  mainFrame->setLayout(frameLayout);
-  mainFrame->layout()->setContentsMargins(4,4,4,4);
+  this->mainFrame->setLayout(frameLayout);
+  this->mainFrame->layout()->setContentsMargins(4,4,4,4);
 
-  mainLayout->addWidget(mainFrame);
+  mainLayout->addWidget(this->mainFrame);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
@@ -104,11 +105,57 @@ RenderWidget::RenderWidget( QWidget *parent )
   QTimer *timer = new QTimer(this);
   connect( timer, SIGNAL(timeout()), this, SLOT(update()) );
   timer->start(33);
+
+  this->connections.push_back( 
+      gui::Events::ConnectFullScreenSignal( 
+        boost::bind(&RenderWidget::OnFullScreen, this, _1) ) );
 }
 
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
+}
+
+void RenderWidget::OnFullScreen(bool &_value)
+{
+  if (_value)
+  {
+    this->mainFrame->layout()->removeItem(this->bottomBarLayout);
+    this->mainFrame->setLineWidth(0);
+    this->mainFrame->layout()->setContentsMargins(0,0,0,0);
+    this->glWidget->layout()->setContentsMargins(0,0,0,0);
+    this->layout()->setContentsMargins(0,0,0,0);
+    this->xyzLabel->hide();
+    this->rpyLabel->hide();
+
+    this->xPosEdit->hide();
+    this->yPosEdit->hide();
+    this->zPosEdit->hide();
+
+    this->rollEdit->hide();
+    this->pitchEdit->hide();
+    this->yawEdit->hide();
+    //this->fpsEdit->hide();
+    //this->trianglesEdit->hide();
+  }
+  else
+  {
+    this->mainFrame->layout()->addItem(this->bottomBarLayout);
+    this->mainFrame->setLineWidth(1);
+    this->mainFrame->layout()->setContentsMargins(4,4,4,4);
+    this->xyzLabel->show();
+    this->rpyLabel->show();
+
+    this->xPosEdit->show();
+    this->yPosEdit->show();
+    this->zPosEdit->show();
+
+    this->rollEdit->show();
+    this->pitchEdit->show();
+    this->yawEdit->show();
+    //this->fpsEdit->show();
+    //this->trianglesEdit->show();
+  }
 }
 
 void RenderWidget::update()

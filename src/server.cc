@@ -87,6 +87,12 @@ int main(int argc, char **argv)
   }
 
   server = new gazebo::Server();
+  if (config_filename.empty())
+  {
+    printf("Error: no world filename specified on the command line\n");
+    return -1;
+  }
+
   server->Load(config_filename);
   server->SetParams( params );
   server->Init();

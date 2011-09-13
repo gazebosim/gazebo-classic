@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"
+#include "common/Event.hh"
 #include "common/Time.hh"
 
 class QLineEdit;
@@ -21,6 +22,7 @@ namespace gazebo
 
       private slots: void Update();
 
+      private: void OnFullScreen(bool &_value);
       private: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg);
 
       private: QLineEdit *percentRealTimeEdit;
@@ -33,6 +35,8 @@ namespace gazebo
       private: transport::SubscriberPtr statsSub;
 
       private: transport::NodePtr node;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

@@ -35,6 +35,7 @@ using namespace gazebo;
 QApplication *g_app;
 gui::MainWindow *g_main_win;
 rendering::UserCameraPtr g_active_camera;
+bool g_fullscreen = false;
 
 void gui::load()
 {

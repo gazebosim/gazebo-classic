@@ -23,9 +23,13 @@
 using namespace gazebo;
 using namespace gui;
 
+extern bool g_fullscreen;
+
 GLWidget::GLWidget( QWidget *parent )
   : QWidget(parent)
 {
+  this->setFocusPolicy(Qt::StrongFocus);
+
   this->windowId = -1;
 
   setAttribute(Qt::WA_OpaquePaintEvent,true);
@@ -41,7 +45,6 @@ GLWidget::GLWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0,0,0,0);
 
   this->connections.push_back( 
       gui::Events::ConnectMoveModeSignal( 
@@ -78,6 +81,7 @@ void GLWidget::showEvent(QShowEvent *event)
   if (this->userCamera)
     rendering::WindowManager::Instance()->SetCamera(this->windowId, 
                                                     this->userCamera);
+  this->setFocus();
 }
 
 void GLWidget::moveEvent(QMoveEvent *e)
@@ -114,6 +118,24 @@ void GLWidget::resizeEvent(QResizeEvent *e)
   }
 }
 
+void GLWidget::keyPressEvent( QKeyEvent *_event)
+{
+  std::string keyText = _event->text().toStdString();
+  this->keyModifiers = _event->modifiers();
+
+  // Toggle full screen
+  if (_event->key() == Qt::Key_F11)
+  {
+    g_fullscreen = !g_fullscreen;
+    gui::Events::fullScreenSignal(g_fullscreen);
+  }
+}
+
+void GLWidget::keyReleaseEvent( QKeyEvent *_event)
+{
+  this->keyModifiers = _event->modifiers();
+}
+
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
   this->mouseEvent.pressPos.Set( event->pos().x(), event->pos().y() );
@@ -148,7 +170,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
   {
     this->mouseEvent.dragging = true;
   }
-  else
+  else if (this->keyModifiers & Qt::ControlModifier)
   {
     std::string mod;
     this->mouseEvent.dragging = false;

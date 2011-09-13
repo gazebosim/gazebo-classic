@@ -19,6 +19,8 @@
 using namespace gazebo;
 using namespace gui;
 
+extern bool g_fullscreen;
+
 
 MainWindow::MainWindow()
   : renderWidget(0)
@@ -45,17 +47,17 @@ MainWindow::MainWindow()
 //                       QMainWindow::AnimatedDocks |
                        QMainWindow::VerticalTabs);
 
-  QDockWidget *modelsDock = new QDockWidget(tr("Models"), this);
-  modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  this->modelsDock = new QDockWidget(tr("Models"), this);
+  this->modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
   ModelListWidget *modelListWidget = new ModelListWidget();
-  modelsDock->setWidget(modelListWidget);
-  this->addDockWidget(Qt::LeftDockWidgetArea, modelsDock);
+  this->modelsDock->setWidget(modelListWidget);
+  this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
 
-  QDockWidget *insertModelsDock = new QDockWidget(tr("Insert Model"), this);
-  insertModelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+  this->insertModelsDock = new QDockWidget(tr("Insert Model"), this);
+  this->insertModelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
   InsertModelWidget *insertModel = new InsertModelWidget();
-  insertModelsDock->setWidget(insertModel);
-  this->addDockWidget(Qt::LeftDockWidgetArea, insertModelsDock);
+  this->insertModelsDock->setWidget(insertModel);
+  this->addDockWidget(Qt::LeftDockWidgetArea, this->insertModelsDock);
 
   this->renderWidget = new RenderWidget(mainWidget);
   this->renderWidget->hide();
@@ -66,7 +68,7 @@ MainWindow::MainWindow()
   mainLayout->addWidget( this->timePanel );
   mainWidget->setLayout(mainLayout);
 
-  this->tabifyDockWidget(modelsDock, insertModelsDock);
+  this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
@@ -76,6 +78,10 @@ MainWindow::MainWindow()
   this->setWindowTitle(tr(title.c_str()));
 
   this->worldPropertiesWidget = NULL;
+
+  this->connections.push_back( 
+      gui::Events::ConnectFullScreenSignal( 
+        boost::bind(&MainWindow::OnFullScreen, this, _1) ) );
 }
 
 MainWindow::~MainWindow()
@@ -196,6 +202,38 @@ void MainWindow::InsertModel()
 {
 }
 
+void MainWindow::OnFullScreen(bool _value)
+{
+  if (_value)
+  {
+    this->showFullScreen();
+    this->removeDockWidget(this->modelsDock);
+    this->removeDockWidget(this->insertModelsDock);
+    this->playToolbar->hide();
+    this->editToolbar->hide();
+    this->menuBar()->hide();
+  }
+  else
+  {
+    this->showNormal();
+    this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, this->insertModelsDock);
+    this->modelsDock->show();
+    this->insertModelsDock->show();
+    this->playToolbar->show();
+    this->editToolbar->show();
+    this->menuBar()->show();
+
+    this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
+  }
+}
+
+void MainWindow::ViewFullScreen()
+{
+  g_fullscreen = !g_fullscreen;
+  gui::Events::fullScreenSignal(g_fullscreen);
+}
+
 void MainWindow::CreateActions()
 {
   this->newAct = new QAction(tr("&New"), this);
@@ -272,6 +310,10 @@ void MainWindow::CreateActions()
   this->insertModelAct->setStatusTip(tr("Insert a model"));
   connect(this->insertModelAct, SIGNAL(triggered()), this, SLOT(InsertModel()));
 
+  this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
+  this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
+  connect(this->viewFullScreenAct, SIGNAL(triggered()), this, SLOT(ViewFullScreen()));
+
 }
 
 void MainWindow::CreateMenus()
@@ -288,6 +330,7 @@ void MainWindow::CreateMenus()
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
+  this->viewMenu->addAction(this->viewFullScreenAct);
 
   this->menuBar()->addSeparator();
 

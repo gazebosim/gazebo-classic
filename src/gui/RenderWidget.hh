@@ -2,7 +2,12 @@
 #define RENDER_WIDGET_HH
 
 #include <QWidget>
+#include "common/Event.hh"
+
 class QLineEdit;
+class QLabel;
+class QFrame;
+class QHBoxLayout;
 
 namespace gazebo
 {
@@ -18,18 +23,24 @@ namespace gazebo
 
       private slots: virtual void update();
 
-      private: GLWidget *glWidget;
+      private: void OnFullScreen(bool &_value);
 
+      private: QHBoxLayout *bottomBarLayout;
+      private: GLWidget *glWidget;
+      private: QFrame *mainFrame;
+      private: QLabel *xyzLabel;
       private: QLineEdit *xPosEdit;
       private: QLineEdit *yPosEdit;
       private: QLineEdit *zPosEdit;
 
+      private: QLabel *rpyLabel;
       private: QLineEdit *rollEdit;
       private: QLineEdit *pitchEdit;
       private: QLineEdit *yawEdit;
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

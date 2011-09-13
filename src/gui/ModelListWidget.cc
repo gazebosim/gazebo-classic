@@ -64,6 +64,7 @@ ModelListWidget::ModelListWidget( QWidget *parent )
 
 ModelListWidget::~ModelListWidget()
 {
+  printf("ModelListWidget destructor\n");
 }
 
 void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)

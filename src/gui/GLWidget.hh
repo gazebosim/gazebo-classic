@@ -44,6 +44,8 @@ namespace gazebo
       protected: virtual void showEvent(QShowEvent *e);
 
 
+      protected: void keyPressEvent( QKeyEvent *_event);
+      protected: void keyReleaseEvent( QKeyEvent *_event);
       protected: void wheelEvent(QWheelEvent *event);
       protected: void mousePressEvent(QMouseEvent *event);
       protected: void mouseMoveEvent(QMouseEvent *event);
@@ -80,6 +82,8 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr posePub;
       private: transport::SubscriberPtr selectionSub;
+
+      private: Qt::KeyboardModifiers keyModifiers;
     };
   }
 }

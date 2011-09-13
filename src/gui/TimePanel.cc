@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "transport/Node.hh"
+#include "gui/GuiEvents.hh"
 #include "gui/TimePanel.hh"
 
 using namespace gazebo;
@@ -55,7 +56,19 @@ TimePanel::TimePanel( QWidget *parent )
   connect( timer, SIGNAL(timeout()), this, SLOT(Update()) );
   timer->start(33);
 
+  this->connections.push_back( 
+      gui::Events::ConnectFullScreenSignal( 
+        boost::bind(&TimePanel::OnFullScreen, this, _1) ) );
+
   this->simTime.Set(0);
+}
+
+void TimePanel::OnFullScreen(bool &_value)
+{
+  if (_value)
+    this->hide();
+  else
+    this->show();
 }
 
 TimePanel::~TimePanel()

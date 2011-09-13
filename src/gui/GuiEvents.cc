@@ -23,5 +23,6 @@ using namespace gui;
 event::EventT<void (std::string)> Events::createEntitySignal;
 event::EventT<void (bool)> Events::moveModeSignal;
 event::EventT<void (bool)> Events::manipModeSignal;
+event::EventT<void (bool)> Events::fullScreenSignal;
 
 

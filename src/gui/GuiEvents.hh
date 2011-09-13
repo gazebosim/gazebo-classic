@@ -50,6 +50,15 @@ namespace gazebo
       public: static void DisconnectManipModeSignal( event::ConnectionPtr subscriber)
               { manipModeSignal.Disconnect(subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the fullscreen signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectFullScreenSignal(T subscriber)
+              { return fullScreenSignal.Connect(subscriber); }
+
+      public: static void DisconnectFullScreenSignal( event::ConnectionPtr subscriber)
+              { fullScreenSignal.Disconnect(subscriber); }
+
 
       /// Signal that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveModeSignal;
@@ -58,6 +67,7 @@ namespace gazebo
       public: static event::EventT<void (bool)>  manipModeSignal;
 
       public: static event::EventT<void (std::string)> createEntitySignal;
+      public: static event::EventT<void (bool)> fullScreenSignal;
     };
   }
 }
