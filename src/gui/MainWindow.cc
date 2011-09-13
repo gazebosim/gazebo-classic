@@ -30,8 +30,6 @@ MainWindow::MainWindow()
   gui::set_world( this->node->GetTopicNamespace() );
   this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
 
-
-
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
   this->CreateMenus();
@@ -206,6 +204,7 @@ void MainWindow::OnFullScreen(bool _value)
 {
   if (_value)
   {
+    this->centralWidget()->layout()->setContentsMargins(0,0,0,0);
     this->showFullScreen();
     this->removeDockWidget(this->modelsDock);
     this->removeDockWidget(this->insertModelsDock);
@@ -215,6 +214,7 @@ void MainWindow::OnFullScreen(bool _value)
   }
   else
   {
+    this->centralWidget()->layout()->setContentsMargins(4,4,4,4);
     this->showNormal();
     this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
     this->addDockWidget(Qt::LeftDockWidgetArea, this->insertModelsDock);
