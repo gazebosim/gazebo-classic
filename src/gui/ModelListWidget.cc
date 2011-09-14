@@ -16,6 +16,8 @@
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
+#include "gui/qtpropertybrowser/qttreepropertybrowser.h"
+#include "gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gui/ModelListWidget.hh"
 
 using namespace gazebo;
@@ -35,13 +37,18 @@ ModelListWidget::ModelListWidget( QWidget *parent )
       SIGNAL( customContextMenuRequested(const QPoint &)),
       this, SLOT(OnCustomContextMenu(const QPoint &)));
 
-  this->propTreeWidget = new QTreeWidget();
-  this->propTreeWidget->setHeaderLabel(tr("Properties"));
-  this->propTreeWidget->setColumnCount(1);
-  this->propTreeWidget->setContextMenuPolicy( Qt::CustomContextMenu );
+  this->variantManager = new QtVariantPropertyManager();
+  this->propTreeBrowser = new QtTreePropertyBrowser();
+  QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory();
+  this->propTreeBrowser->setFactoryForManager( this->variantManager, variantFactory);
+
+
+  //this->propTreeBrowser->setHeaderLabel(tr("Properties"));
+  //this->propTreeBrowser->setColumnCount(1);
+  //this->propTreeBrowser->setContextMenuPolicy( Qt::CustomContextMenu );
 
   mainLayout->addWidget(this->modelTreeWidget);
-  mainLayout->addWidget(this->propTreeWidget);
+  mainLayout->addWidget(this->propTreeBrowser);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2,2,2,2);
 
@@ -71,15 +78,92 @@ ModelListWidget::ModelListWidget( QWidget *parent )
 
 ModelListWidget::~ModelListWidget()
 {
-  delete this->propTreeWidget;
-  this->propTreeWidget = NULL;
 }
 
 void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem)
 {
+  QtProperty *topItem = this->variantManager->addProperty(QtVariantPropertyManager::groupTypeId(), QLatin1String(_elem->GetName().c_str()));
+
+  this->propTreeBrowser->addProperty(topItem);
+
   for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
       iter != _elem->attributes.end(); iter++)
   {
+    QtVariantProperty *item;
+    if ((*iter)->IsStr())
+    {
+      item = this->variantManager->addProperty( QVariant::String, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      std::string value;
+      (*iter)->Get( value ); 
+      item->setValue( value.c_str() );
+      topItem->addSubProperty(item);
+    }
+    else if ((*iter)->IsBool())
+    {
+      item = this->variantManager->addProperty( QVariant::Bool, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      bool value;
+      (*iter)->Get(value); 
+      item->setValue( value );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsPose() )
+    {
+      math::Pose value;
+      (*iter)->Get(value); 
+      math::Vector3 rpy = value.rot.GetAsEuler();
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "X" ));
+      item->setValue( value.pos.x );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Y" ));
+      item->setValue( value.pos.y );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Z" ));
+      item->setValue( value.pos.z );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Roll" ));
+      item->setValue( rpy.x );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Pitch" ));
+      item->setValue( rpy.y );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Yaw" ));
+      item->setValue( rpy.z );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsInt() )
+    {
+      item = this->variantManager->addProperty( QVariant::Int, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      int value;
+      (*iter)->Get(value); 
+      item->setValue( value );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsInt() )
+    {
+      item = this->variantManager->addProperty( QVariant::Int, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      int value;
+      (*iter)->Get(value); 
+      item->setValue( value );
+      topItem->addSubProperty(item);
+    }
+
+
     std::cout << "Param[" << (*iter)->GetKey() 
               << "] Type[" << (*iter)->GetTypeName() << "]\n";
   }
@@ -103,6 +187,8 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     std::cout << "Data[" << data << "]\n";
     sdf::ElementPtr sdf(new sdf::Element);
     sdf::initFile( data, sdf);
+
+
 
     this->FillPropertyTree( sdf );
   }

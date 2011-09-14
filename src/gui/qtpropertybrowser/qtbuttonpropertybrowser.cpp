@@ -40,67 +40,15 @@
 
 #include "qtbuttonpropertybrowser.h"
 #include <QtCore/QSet>
-#include <QtGui/QGridLayout>
-#include <QtGui/QLabel>
 #include <QtCore/QTimer>
 #include <QtCore/QMap>
-#include <QtGui/QToolButton>
 #include <QtGui/QStyle>
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
 #endif
 
-class QtButtonPropertyBrowserPrivate
-{
-    QtButtonPropertyBrowser *q_ptr;
-    Q_DECLARE_PUBLIC(QtButtonPropertyBrowser)
-public:
 
-    void init(QWidget *parent);
-
-    void propertyInserted(QtBrowserItem *index, QtBrowserItem *afterIndex);
-    void propertyRemoved(QtBrowserItem *index);
-    void propertyChanged(QtBrowserItem *index);
-    QWidget *createEditor(QtProperty *property, QWidget *parent) const
-        { return q_ptr->createEditor(property, parent); }
-
-    void slotEditorDestroyed();
-    void slotUpdate();
-    void slotToggled(bool checked);
-
-    struct WidgetItem
-    {
-        WidgetItem() : widget(0), label(0), widgetLabel(0),
-                button(0), container(0), layout(0), /*line(0), */parent(0), expanded(false) { }
-        QWidget *widget; // can be null
-        QLabel *label; // main label with property name
-        QLabel *widgetLabel; // label substitute showing the current value if there is no widget
-        QToolButton *button; // expandable button for items with children
-        QWidget *container; // container which is expanded when the button is clicked
-        QGridLayout *layout; // layout in container
-        WidgetItem *parent;
-        QList<WidgetItem *> children;
-        bool expanded;
-    };
-private:
-    void updateLater();
-    void updateItem(WidgetItem *item);
-    void insertRow(QGridLayout *layout, int row) const;
-    void removeRow(QGridLayout *layout, int row) const;
-    int gridRow(WidgetItem *item) const;
-    int gridSpan(WidgetItem *item) const;
-    void setExpanded(WidgetItem *item, bool expanded);
-    QToolButton *createButton(QWidget *panret = 0) const;
-
-    QMap<QtBrowserItem *, WidgetItem *> m_indexToItem;
-    QMap<WidgetItem *, QtBrowserItem *> m_itemToIndex;
-    QMap<QWidget *, WidgetItem *> m_widgetToItem;
-    QMap<QObject *, WidgetItem *> m_buttonToItem;
-    QGridLayout *m_mainLayout;
-    QList<WidgetItem *> m_children;
-    QList<WidgetItem *> m_recreateQueue;
-};
 
 QToolButton *QtButtonPropertyBrowserPrivate::createButton(QWidget *parent) const
 {

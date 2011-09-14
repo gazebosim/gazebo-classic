@@ -7,83 +7,7 @@ link_directories(
 
 add_definitions( ${QT_DEFINITIONS} )
 
-#add_subdirectory(qtpropertybrowser)
-
-#include_directories ( ${CMAKE_CURRENT_BINARY_DIR})
-#include_directories ( ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser)
-#include_directories( ${QT_INCLUDE_DIR} )
-#
-#set(qtpropertyeditor_SRCS qtpropertybrowser/qtpropertybrowser.cpp
-#                          qtpropertybrowser/qtpropertymanager.cpp
-#                          qtpropertybrowser/qteditorfactory.cpp
-#                          qtpropertybrowser/qtvariantproperty.cpp
-#                          qtpropertybrowser/qttreepropertybrowser.cpp
-#                          qtpropertybrowser/qtbuttonpropertybrowser.cpp
-#                          qtpropertybrowser/qtgroupboxpropertybrowser.cpp
-#                          qtpropertybrowser/qtpropertybrowserutils.cpp
-#)
-#
-#qt4_generate_moc( qtpropertybrowser/qtpropertybrowser.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtpropertybrowser.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qtpropertymanager.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtpropertymanager.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qteditorfactory.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qteditorfactory.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qtvariantproperty.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtvariantproperty.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qttreepropertybrowser.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qttreepropertybrowser.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qtbuttonpropertybrowser.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtbuttonpropertybrowser.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qtgroupboxpropertybrowser.h
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtgroupboxpropertybrowser.cpp
-#)
-#qt4_generate_moc( qtpropertybrowser/qtpropertymanager.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/qtpropertymanager.moc
-#)
-#qt4_generate_moc( qtpropertybrowser/qteditorfactory.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/qteditorfactory.moc
-#)
-#qt4_generate_moc( qtpropertybrowser/qttreepropertybrowser.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/qttreepropertybrowser.moc
-#)
-#
-#set( qtpropertyeditor_HEADERS_ONLY_MOC
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtpropertybrowser.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtpropertymanager.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qteditorfactory.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtvariantproperty.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qttreepropertybrowser.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtbuttonpropertybrowser.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/moc_qtgroupboxpropertybrowser.cpp
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/qtpropertymanager.moc
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/qteditorfactory.moc
-#  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser/qttreepropertybrowser.moc
-#)
-#
-#set_source_files_properties(
-#  ${qtpropertyeditor_HEADERS_ONLY_MOC}
-#  PROPERTIES
-#    HEADER_FILE_ONLY true
-#)
-#
-#qt4_add_resources(
-#  qtpropertyeditor_RESOURCES
-#  qtpropertybrowser/qtpropertybrowser.qrc
-#)
-#
-#qt4_add_resources(RESOURCE_SRCS qtpropertybrowser/qtpropertybrowser.qrc)
-#
-#set(SRCS ${qtpropertyeditor_SRCS}
-#         ${qtpropertyeditor_RESOURCES}
-#)
-
+add_subdirectory(qtpropertybrowser)
 
 set (sources main.cc 
              Gui.cc 
@@ -133,6 +57,7 @@ target_link_libraries( gzclient gazebo_common
                                 gazebo_sdf_parser
                                 gazebo_rendering
                                 gazebo_msgs
+                                gzqtpropertybrowser 
                                 Xpm 
                                 ${QT_LIBRARIES} 
                                 ${ogre_libraries} 

@@ -11,6 +11,8 @@
 class QTreeWidget;
 class QTreeWidgetItem;
 class QPushButton;
+class QtTreePropertyBrowser;
+class QtVariantPropertyManager;
 
 namespace gazebo
 {
@@ -35,7 +37,8 @@ namespace gazebo
 
       private: void FillPropertyTree(sdf::ElementPtr &_elem);
 
-      private: QTreeWidget *modelTreeWidget, *propTreeWidget;
+      private: QTreeWidget *modelTreeWidget;
+      private: QtTreePropertyBrowser *propTreeBrowser;
       private: QAction *moveToAction;
       private: QAction *deleteAction;
 
@@ -48,6 +51,7 @@ namespace gazebo
       private: sdf::SDFPtr modelSDF;
 
       private: ModelEditWidget *modelEditWidget;
+      private: QtVariantPropertyManager *variantManager;
     };
   }
 }
