@@ -13,6 +13,8 @@
 #include "rendering/Visual.hh"
 #include "gui/Gui.hh"
 
+#include "gui/ModelEditWidget.hh"
+
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
@@ -24,6 +26,8 @@ using namespace gui;
 ModelListWidget::ModelListWidget( QWidget *parent )
   : QWidget( parent )
 {
+  this->modelEditWidget = NULL;
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
@@ -35,7 +39,13 @@ ModelListWidget::ModelListWidget( QWidget *parent )
       SIGNAL( customContextMenuRequested(const QPoint &)),
       this, SLOT(OnCustomContextMenu(const QPoint &)));
 
+  this->propTreeWidget = new QTreeWidget();
+  this->propTreeWidget->setHeaderLabel(tr("Properties"));
+  this->propTreeWidget->setColumnCount(1);
+  this->propTreeWidget->setContextMenuPolicy( Qt::CustomContextMenu );
+
   mainLayout->addWidget(this->modelTreeWidget);
+  mainLayout->addWidget(this->propTreeWidget);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2,2,2,2);
 
@@ -60,17 +70,51 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->deleteAction = new QAction(tr("Delete"), this);
   this->deleteAction->setStatusTip(tr("Delete the selection"));
   connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
+
+  this->editAction = new QAction(tr("Edit"), this);
+  this->editAction->setStatusTip(tr("Edit the selection"));
+  connect(this->editAction, SIGNAL(triggered()), this, SLOT(OnEdit()));
 }
 
 ModelListWidget::~ModelListWidget()
 {
-  printf("ModelListWidget destructor\n");
+  delete this->modelEditWidget;
+  this->modelEditWidget = NULL;
+
+  delete this->propTreeWidget;
+  this->propTreeWidget = NULL;
+}
+
+void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem)
+{
+  for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
+      iter != _elem->attributes.end(); iter++)
+  {
+    std::cout << "Param[" << (*iter)->GetKey() 
+              << "] Type[" << (*iter)->GetTypeName() << "]\n";
+  }
+
+  for (sdf::ElementPtr_V::iterator iter = _elem->elementDescriptions.begin();
+      iter != _elem->elementDescriptions.end(); iter++)
+  {
+    if ((*iter)->GetRequired() == "0" || (*iter)->GetRequired() == "1")
+    {
+      std::cout << "Elem[" << (*iter)->GetName() << "]\n";
+      this->FillPropertyTree((*iter));
+    }
+  }
 }
 
 void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item)
   {
+    std::string data = _item->data(0, Qt::UserRole).toString().toStdString();
+    std::cout << "Data[" << data << "]\n";
+    sdf::ElementPtr sdf(new sdf::Element);
+    sdf::initFile( data, sdf);
+
+    this->FillPropertyTree( sdf );
   }
 }
 
@@ -123,6 +167,7 @@ void ModelListWidget::ProcessEntity( const msgs::Entity &_msg )
       // Create a top-level tree item for the path
       QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
           QStringList(QString("%1").arg( QString::fromStdString(name)) ));
+      topItem->setData(0, Qt::UserRole, QVariant("/sdf/model.sdf"));
       this->modelTreeWidget->addTopLevelItem(topItem);
     }
   }
@@ -157,6 +202,14 @@ void ModelListWidget::OnEntities( const boost::shared_ptr<msgs::Entities const> 
   }
 }
 
+void ModelListWidget::OnEdit()
+{
+  if (!this->modelEditWidget)
+    this->modelEditWidget = new ModelEditWidget();
+
+  this->modelEditWidget->show();
+}
+
 void ModelListWidget::OnDelete()
 {
   QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
@@ -186,6 +239,7 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (item)
   {
     QMenu menu(this->modelTreeWidget);
+    menu.addAction(editAction);
     menu.addAction(moveToAction);
     menu.addAction(deleteAction);
     menu.exec(this->modelTreeWidget->mapToGlobal(_pt));

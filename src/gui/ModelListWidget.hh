@@ -16,6 +16,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ModelEditWidget;
+
     class ModelListWidget : public QWidget
     {
       Q_OBJECT
@@ -27,14 +29,17 @@ namespace gazebo
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
       private slots: void OnMoveTo();
       private slots: void OnDelete();
+      private slots: void OnEdit();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
 
       private: void ProcessEntity( const msgs::Entity &_msg );
 
-      private: QTreeWidget *modelTreeWidget;
+      private: void FillPropertyTree(sdf::ElementPtr &_elem);
+
+      private: QTreeWidget *modelTreeWidget, *propTreeWidget;
       private: QAction *moveToAction;
       private: QAction *deleteAction;
-
+      private: QAction *editAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr entitiesRequestPub, entityPub;
@@ -43,6 +48,8 @@ namespace gazebo
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
       private: sdf::SDFPtr modelSDF;
+
+      private: ModelEditWidget *modelEditWidget;
     };
   }
 }
