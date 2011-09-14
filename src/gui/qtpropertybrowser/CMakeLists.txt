@@ -73,18 +73,6 @@ set(
   ${CMAKE_CURRENT_BINARY_DIR}/qttreepropertybrowser.moc
 )
 
-#set (sources
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qtbuttonpropertybrowser.cxx    
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertymanager.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qteditorfactory.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qttreepropertybrowser.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qtgroupboxpropertybrowser.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qtvariantproperty.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowser.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/qrc_qtpropertybrowser.cxx
-#${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowserutils_p.cxx
-#)
-
 set_source_files_properties(
   ${qtpropertyeditor_HEADERS_ONLY_MOC}
   PROPERTIES

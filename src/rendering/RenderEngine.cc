@@ -224,12 +224,8 @@ void RenderEngine::Init()
 
   Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
-  //if (this->HasGLSL())
-    RTShaderSystem::Instance()->Init();
-  //if (this->HasGLSL())
-    //RTShaderSystem::Instance()->UpdateShaders();
+  RTShaderSystem::Instance()->Init();
 
-  //if (this->HasGLSL())
   for (unsigned int i=0; i < this->scenes.size(); i++)
     this->scenes[i]->Init();
 

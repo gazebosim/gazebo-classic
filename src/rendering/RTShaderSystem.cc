@@ -391,19 +391,22 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
   Ogre::SceneManager *sceneMgr = scene->GetManager();
 
   // Grab the scheme render state.												
-  Ogre::RTShader::RenderState* schemRenderState = this->shaderGenerator->getRenderState(scene->GetName() + Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  Ogre::RTShader::RenderState* schemRenderState = 
+    this->shaderGenerator->getRenderState(scene->GetName() + 
+        Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 
   // 3 textures per directional light
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
+  sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 4);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
   sceneMgr->setShadowTextureSettings(1024, 3, Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureSelfShadow(true);
 
   // Set up caster material - this is just a standard depth/shadow map caster
   sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
+  //sceneMgr->setShadowTextureCasterMaterial("shadow_caster");
 
 
   // Disable fog on the caster pass.
@@ -413,7 +416,7 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
 
   // shadow camera setup
   Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
-  pssmSetup->calculateSplitPoints(3, 1, 1000);
+  pssmSetup->calculateSplitPoints(3, 1, 500);
   pssmSetup->setSplitPadding(10);
   pssmSetup->setOptimalAdjustFactor(0, 2);
   pssmSetup->setOptimalAdjustFactor(1, 1);

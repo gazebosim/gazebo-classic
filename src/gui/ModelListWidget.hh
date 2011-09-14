@@ -29,7 +29,6 @@ namespace gazebo
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
       private slots: void OnMoveTo();
       private slots: void OnDelete();
-      private slots: void OnEdit();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
 
       private: void ProcessEntity( const msgs::Entity &_msg );
@@ -39,7 +38,6 @@ namespace gazebo
       private: QTreeWidget *modelTreeWidget, *propTreeWidget;
       private: QAction *moveToAction;
       private: QAction *deleteAction;
-      private: QAction *editAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr entitiesRequestPub, entityPub;

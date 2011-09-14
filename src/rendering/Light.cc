@@ -603,8 +603,10 @@ void Light::SetupShadows()
       }
     }
   }
-  else if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+  /*else if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup()));
   }
+  */
 }
+

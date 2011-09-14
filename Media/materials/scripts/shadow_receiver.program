@@ -123,10 +123,10 @@ abstract material shadow_receiver_template
 {
   technique
   {
-    pass ambient
+    /*pass ambient
     {
-      ambient  1 1 1
-      diffuse  0 0 0
+      ambient  1 1 1 1
+      diffuse  1 1 1 1
       specular 0 0 0 0
       emissive 0 0 0
 
@@ -138,10 +138,11 @@ abstract material shadow_receiver_template
       //{
       //}
 
-      texture_unit ambient_tex 
-      { }
-    }
+      //texture_unit ambient_tex 
+      //{ }
+    }*/
 
+/*
     pass spot
     {
       max_lights 4
@@ -168,15 +169,16 @@ abstract material shadow_receiver_template
 
       texture_unit diffuse_tex {}
     }
+    */
 
     pass directional
     {
-      max_lights 4
-      scene_blend add
-      iteration once_per_light directional
+      //max_lights 2
+      //scene_blend add
+      //iteration once_per_light directional
 
-      ambient  0 0 0
-      diffuse  1 1 1
+      ambient  1 1 1 1
+      diffuse  1 1 1 1
       specular .1 .1 .1 128
 
       vertex_program_ref directional_receiver_vp_glsl {}
@@ -186,33 +188,37 @@ abstract material shadow_receiver_template
       texture_unit shadow_tex0
       {
         content_type shadow
-        filtering anisotropic
-        max_anisotropy 16
-        tex_address_mode border
-        tex_border_colour 1 1 1
+        //filtering anisotropic
+        //max_anisotropy 16
+        tex_address_mode clamp
+        //tex_border_colour 1 1 1
       }
 
       texture_unit shadow_tex1
       {
         content_type shadow
-        filtering anisotropic
-        max_anisotropy 16
-        tex_address_mode border
-        tex_border_colour 1 1 1
+        //filtering anisotropic
+        //max_anisotropy 16
+        tex_address_mode clamp
+        //tex_border_colour 1 1 1
       }
 
       texture_unit shadow_tex2
       {
         content_type shadow
-        filtering anisotropic
-        max_anisotropy 16
-        tex_address_mode border
-        tex_border_colour 1 1 1
+        //filtering anisotropic
+        //max_anisotropy 16
+        tex_address_mode clamp
+        //tex_border_colour 1 1 1
       }
 
-      texture_unit diffuse_tex {}
+      texture_unit diffuse_tex 
+      {
+				texture granite.jpg
+      }
+     
     }
-
+/*
     pass point
     {
       max_lights 4
@@ -229,5 +235,6 @@ abstract material shadow_receiver_template
 
       texture_unit diffuse_tex {}
     }
+    */
   }
 }

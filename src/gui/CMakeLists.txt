@@ -7,7 +7,7 @@ link_directories(
 
 add_definitions( ${QT_DEFINITIONS} )
 
-add_subdirectory(qtpropertybrowser)
+#add_subdirectory(qtpropertybrowser)
 
 #include_directories ( ${CMAKE_CURRENT_BINARY_DIR})
 #include_directories ( ${CMAKE_CURRENT_BINARY_DIR}/qtpropertybrowser)

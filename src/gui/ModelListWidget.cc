@@ -13,8 +13,6 @@
 #include "rendering/Visual.hh"
 #include "gui/Gui.hh"
 
-#include "gui/ModelEditWidget.hh"
-
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
@@ -26,8 +24,6 @@ using namespace gui;
 ModelListWidget::ModelListWidget( QWidget *parent )
   : QWidget( parent )
 {
-  this->modelEditWidget = NULL;
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
@@ -71,16 +67,10 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->deleteAction->setStatusTip(tr("Delete the selection"));
   connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
 
-  this->editAction = new QAction(tr("Edit"), this);
-  this->editAction->setStatusTip(tr("Edit the selection"));
-  connect(this->editAction, SIGNAL(triggered()), this, SLOT(OnEdit()));
 }
 
 ModelListWidget::~ModelListWidget()
 {
-  delete this->modelEditWidget;
-  this->modelEditWidget = NULL;
-
   delete this->propTreeWidget;
   this->propTreeWidget = NULL;
 }
@@ -202,14 +192,6 @@ void ModelListWidget::OnEntities( const boost::shared_ptr<msgs::Entities const> 
   }
 }
 
-void ModelListWidget::OnEdit()
-{
-  if (!this->modelEditWidget)
-    this->modelEditWidget = new ModelEditWidget();
-
-  this->modelEditWidget->show();
-}
-
 void ModelListWidget::OnDelete()
 {
   QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
@@ -239,7 +221,6 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (item)
   {
     QMenu menu(this->modelTreeWidget);
-    menu.addAction(editAction);
     menu.addAction(moveToAction);
     menu.addAction(deleteAction);
     menu.exec(this->modelTreeWidget->mapToGlobal(_pt));

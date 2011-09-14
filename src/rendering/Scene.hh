@@ -182,7 +182,7 @@ namespace gazebo
                                           Ogre::Node *node);
  
       /// \brief Deprecated: use RTShader::ApplyShadows
-      //public: void InitShadows();
+      public: void InitShadows();
 
       public: void SetSky(const std::string &_material);
 

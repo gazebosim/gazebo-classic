@@ -396,7 +396,7 @@ void Visual::AttachObject( Ogre::MovableObject *_obj)
       _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 2);
 
   this->sceneNode->attachObject(_obj);
-  //RTShaderSystem::Instance()->UpdateShaders();
+  RTShaderSystem::Instance()->UpdateShaders();
 
   _obj->setUserAny( Ogre::Any(this->GetName()) );
 }
@@ -1073,7 +1073,7 @@ std::string Visual::GetNormalMap() const
 /// Set the normal map
 void Visual::SetNormalMap(const std::string &_nmap)
 {
-  this->sdf->GetOrCreateElement("material")->GetOrCreateElement("shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
+  this->sdf->GetOrCreateElement("material")->GetOrCreateElement("shader")->GetOrCreateElement("normal_map")->GetValue()->Set(_nmap);
   RTShaderSystem::Instance()->UpdateShaders();
 }
 
