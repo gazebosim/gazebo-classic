@@ -96,63 +96,67 @@ void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string 
   {
     std::ostringstream stream;
     stream << "Failed to load " << fullname << ": " << dlerror();
-    gzthrow(stream.str());
+    gzerr(0) << stream.str() << "\n";
   }
-
-  std::string registerName = "RegisterPluginController";
-  void *(*registerFunc)() = (void *(*)())dlsym(handle, registerName.c_str());
-  if(!registerFunc)
+  else
   {
-    std::ostringstream stream;
-    stream << "Failed to resolve " << registerName << ": " << dlerror();
-    gzthrow(stream.str());
-  }
+    std::string registerName = "RegisterPluginController";
+    void *(*registerFunc)() = (void *(*)())dlsym(handle, registerName.c_str());
+    if(!registerFunc)
+    {
+      std::ostringstream stream;
+      stream << "Failed to resolve " << registerName << ": " << dlerror();
+      gzthrow(stream.str());
+    }
 
-	// Register the new controller.
-  registerFunc();
+    // Register the new controller.
+    registerFunc();
+  }
 
 #elif HAVE_LTDL
 
-	static bool init_done = false;
+  static bool init_done = false;
 
-	if (!init_done)
-	{
-		int errors = lt_dlinit();
-		if (errors)
-		{
-			std::ostringstream stream;
-		    stream << "Error(s) initializing dynamic loader (" 
-               << errors << ", " << lt_dlerror() << ")";
-		    gzthrow(stream.str());
-		}
-		else
-			init_done = true;
-	}
-	
-	lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-	
-	if (!handle)
-	{
-		std::ostringstream stream;
-		stream << "Failed to load " << fullname << ": " << lt_dlerror();
-		gzthrow(stream.str());
-	}
-	
-	std::string registerName = "RegisterPluginController";
-	void *(*registerFunc)() = (void *(*)())lt_dlsym(handle, registerName.c_str());
-	if(!registerFunc)
-	{
-    	std::ostringstream stream;
-    	stream << "Failed to resolve " << registerName << ": " << lt_dlerror();
-    	gzthrow(stream.str());
-	}
+  if (!init_done)
+  {
+          int errors = lt_dlinit();
+          if (errors)
+          {
+                  std::ostringstream stream;
+              stream << "Error(s) initializing dynamic loader (" 
+         << errors << ", " << lt_dlerror() << ")";
+              gzthrow(stream.str());
+          }
+          else
+                  init_done = true;
+  }
+  
+  lt_dlhandle handle = lt_dlopenext(fullname.c_str());
+  
+  if (!handle)
+  {
+    std::ostringstream stream;
+    stream << "Failed to load " << fullname << ": " << lt_dlerror();
+    gzerr(0) << stream.str() << "\n";
+  }
+  else
+  {
+    std::string registerName = "RegisterPluginController";
+    void *(*registerFunc)() = (void *(*)())lt_dlsym(handle, registerName.c_str());
+    if(!registerFunc)
+    {
+      std::ostringstream stream;
+      stream << "Failed to resolve " << registerName << ": " << lt_dlerror();
+      gzthrow(stream.str());
+    }
 
-	// Register the new controller.
-  registerFunc();
+    // Register the new controller.
+    registerFunc();
+  }
 
 #else // HAVE_LTDL
 	
-    gzthrow("Cannot load plugins as libtool is not installed.");
+  gzthrow("Cannot load plugins as libtool is not installed.");
 	
 #endif // HAVE_LTDL
 
