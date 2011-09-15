@@ -3,7 +3,7 @@
     <scene>
       <ambient rgba="0.5 0.5 0.5 1.0"/>
       <background rgba="0.5 0.5 0.5 1.0">
-        <sky material='Gazebo/CloudySky' />
+        <sky material="Gazebo/CloudySky"/>
       </background>
       <shadows enabled="true" rgba="0.0 0.0 0.5 0.5" type="texture_gpu"/>
       <fog rgba="0.0 0.0 0.5 0.5" type="linear" start="2.0" end="10.0" density="0.5"/>
@@ -40,7 +40,7 @@
             <box size="0.05 0.05 0.05"/>
           </geometry>
           <material script="Gazebo/Red" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5 1.0"/>
+            <ambient rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -100,7 +100,7 @@
             <mesh filename="pr2/gripper_v0/l_finger_tip.stl" scale="1 1 1"/>
           </geometry>
           <material script="Gazebo/Red" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5 1.0"/>
+            <ambient rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
@@ -169,7 +169,7 @@
             <box size="0.1 30.0 30.0"/>
           </geometry>
           <material script="Gazebo/Green" normal_map="normal_map.png">
-            <color rgba="0.03 0.5 0.5 1.0"/>
+            <ambient rgba="0.03 0.5 0.5 1.0"/>
           </material>
         </visual>
 
