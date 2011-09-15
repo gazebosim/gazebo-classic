@@ -429,7 +429,10 @@ void copyChildren( ElementPtr &_sdf, TiXmlElement *_xml)
     ElementPtr element(new Element);
     element->SetParent( _sdf );
     element->SetName( elemXml->ValueStr() );
-    element->AddValue("string", elemXml->GetText(), "1");
+    if (elemXml->GetText() != NULL)
+      element->AddValue("string", elemXml->GetText(), "1");
+    else
+      gzerr << "trying to copy stuff inside <plugin> block, but they have NULL contents\n";
 
     _sdf->elements.push_back( element );
   }
