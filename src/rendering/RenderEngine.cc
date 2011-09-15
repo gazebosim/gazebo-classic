@@ -305,7 +305,7 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
-  std::list<std::string> ogrePaths = common::SystemPaths::GetOgrePaths();
+  std::list<std::string> ogrePaths = common::SystemPaths::Instance()->GetOgrePaths();
  
   for (iter=ogrePaths.begin(); 
        iter!=ogrePaths.end(); ++iter)
@@ -354,7 +354,7 @@ void RenderEngine::SetupResources()
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::const_iterator iter;
-  std::list<std::string> paths = common::SystemPaths::GetGazeboPaths();
+  std::list<std::string> paths = common::SystemPaths::Instance()->GetGazeboPaths();
 
   for (iter= paths.begin(); iter != paths.end(); iter++)
   {
