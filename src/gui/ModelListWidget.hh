@@ -14,6 +14,8 @@ class QPushButton;
 class QtTreePropertyBrowser;
 class QtVariantPropertyManager;
 class QtProperty;
+class QtTreePropertyItem;
+
 namespace gazebo
 {
   namespace gui
@@ -28,6 +30,8 @@ namespace gazebo
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();
+      private slots: void OnPropertyChanged(QtProperty *_item, 
+                                           const QVariant &_val);
 
       private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );

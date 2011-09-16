@@ -41,7 +41,9 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->propTreeBrowser = new QtTreePropertyBrowser();
   QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager( this->variantManager, variantFactory);
-
+  connect( this->variantManager, 
+           SIGNAL(valueChanged(QtProperty*, const QVariant &)), 
+           this, SLOT(OnPropertyChanged(QtProperty *, const QVariant &)));
 
   //this->propTreeBrowser->setHeaderLabel(tr("Properties"));
   //this->propTreeBrowser->setColumnCount(1);
@@ -235,13 +237,12 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
     }
     else if ( (*iter)->IsColor() )
     {
-      /*common::Color value;
+      common::Color value;
       (*iter)->Get(value); 
 
       item = this->variantManager->addProperty( QVariant::Color, 
           QLatin1String( (*iter)->GetKey().c_str() ));
       topItem->addSubProperty(item);
-      */
     }
   }
 
@@ -430,3 +431,14 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
     menu.exec(this->modelTreeWidget->mapToGlobal(_pt));
   }
 }
+
+void ModelListWidget::OnPropertyChanged(QtProperty *_item, const QVariant &_val)
+{
+  std::string name = _item->propertyName().toStdString();
+  std::string value = _item->valueText().toStdString();
+
+  // TODO: convert the property browser back to SDF, and transmitt over the
+  // wire.
+}
+
+
