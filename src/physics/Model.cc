@@ -37,6 +37,7 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Model.hh"
+#include "physics/Contact.hh"
 
 #include "transport/Node.hh"
 
@@ -188,6 +189,12 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
+  // clear contacts
+  for (std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
+       iter != this->contacts.end() ; iter++)
+    (iter->second).clear();
+  this->contacts.clear();
+
   // NATY: Make this work without renderstate
   /*
   if (this->controllers.size() == 0 && this->IsStatic())
@@ -648,5 +655,23 @@ void Model::SetLaserRetro( const float &retro )
     {
        boost::shared_static_cast<Link>(*iter)->SetLaserRetro(retro);
     }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Store a geom, contact pair
+void Model::StoreContact(GeomPtr geom, Contact contact)
+{
+  //gzerr << "here I shall add the contact and geom pair under link, to be retrieved later by plugin\n";
+  std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
+  if (iter == this->contacts.end())
+  {
+    std::vector<Contact> contact_list;
+    contact_list.push_back(contact);
+    this->contacts.insert( std::make_pair( geom, contact_list ) );
+  }
+  else
+  {
+    (iter->second).push_back(contact);
   }
 }

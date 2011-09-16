@@ -31,8 +31,9 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
+    class Contact;
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -162,6 +163,9 @@ namespace gazebo
       private: std::vector<ModelPluginPtr> plugins;
 
       private: transport::PublisherPtr jointPub;
+
+      public: void StoreContact(GeomPtr geom, Contact contact);
+      private: std::map<GeomPtr, std::vector<Contact> > contacts;
     };
     /// \}
   }

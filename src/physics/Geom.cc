@@ -31,6 +31,7 @@
 #include "physics/Contact.hh"
 #include "physics/Shape.hh"
 #include "physics/SurfaceParams.hh"
+#include "physics/Model.hh"
 #include "physics/Link.hh"
 #include "physics/Geom.hh"
 
@@ -264,10 +265,7 @@ void Geom::AddContact(const Contact &_contact)
 
   //gzerr << "Add Contact to parent Link of thie Geom \n";
   // TODO: redo this
-  //this->GetParentModel()->StoreContact(shared_from_this(), _contact);
-  //this->contactSignal( _contact );
-
-  this->link->StoreContact(boost::shared_dynamic_cast<Geom>(shared_from_this()),_contact.Clone());
+  this->GetParentModel()->StoreContact(boost::shared_dynamic_cast<Geom>(shared_from_this()),_contact.Clone());
   this->contactSignal( _contact );
 
 }           

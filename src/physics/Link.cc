@@ -38,7 +38,6 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Geom.hh"
 #include "physics/Link.hh"
-#include "physics/Contact.hh"
 
 #include "transport/Publisher.hh"
 
@@ -320,11 +319,6 @@ void Link::Update()
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
-
-  for (std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
-       iter != this->contacts.end() ; iter++)
-    (iter->second).clear();
-  this->contacts.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -515,20 +509,3 @@ void Link::AddChildJoint(JointPtr joint)
   this->childJoints.push_back(joint);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Store a geom, contact pair
-void Link::StoreContact(GeomPtr geom, Contact contact)
-{
-  //gzerr << "here I shall add the contact and geom pair under link, to be retrieved later by plugin\n";
-  std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
-  if (iter == this->contacts.end())
-  {
-    std::vector<Contact> contact_list;
-    //contact_list.push_back(contact);
-    //this->contacts.insert( std::make_pair( geom, contact_list ) );
-  }
-  else
-  {
-    //(iter->second).push_back(contact);
-  }
-}
