@@ -39,18 +39,18 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( LinkPtr body )
-    : Entity(body)
+Geom::Geom( LinkPtr link )
+    : Entity(link)
 {
   this->AddType(Base::GEOM);
 
-  this->body = body;
+  this->link = link;
 
   this->transparency = 0;
   this->contactsEnabled = false;
 
   this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
-  this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
+  this->connections.push_back( this->link->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ Geom::~Geom()
 void Geom::Fini()
 {
   Entity::Fini();
-  this->body.reset();
+  this->link.reset();
   this->shape.reset();
   this->connections.clear();
 }
@@ -194,17 +194,17 @@ void Geom::ShowBoundingBox(const bool &show)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the body this geom belongs to
+/// Get the link this geom belongs to
 LinkPtr Geom::GetLink() const
 {
-  return this->body;
+  return this->link;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the model this geom belongs to
 ModelPtr Geom::GetModel() const
 {
-  return this->body->GetModel();
+  return this->link->GetModel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,14 +254,22 @@ unsigned int Geom::GetContactCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add an occurance of a contact to this geom
-void Geom::AddContact(const Contact &/*_contact*/)
+void Geom::AddContact(const Contact &_contact)
 {
   if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
     return;
 
+  // previously, Geom keeps a list of contacts, Nate was trying to do this on a per moel basis
+  // for now, I'll recover the Geom storage behavior
+
+  //gzerr << "Add Contact to parent Link of thie Geom \n";
   // TODO: redo this
-  //this->GetParentModel()->StoreContact(shared_from_this(), contact);
-  //this->contactSignal( contact );
+  //this->GetParentModel()->StoreContact(shared_from_this(), _contact);
+  //this->contactSignal( _contact );
+
+  this->link->StoreContact(boost::shared_dynamic_cast<Geom>(shared_from_this()),_contact.Clone());
+  this->contactSignal( _contact );
+
 }           
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,7 +282,7 @@ Contact Geom::GetContact(unsigned int /*_i*/) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Enable callback: Called when the body changes
+/// Enable callback: Called when the link changes
 void Geom::EnabledCB(bool enabled)
 {
   msgs::Visual msg;
@@ -292,8 +300,8 @@ void Geom::EnabledCB(bool enabled)
 /// Get the linear velocity of the geom
 math::Vector3 Geom::GetRelativeLinearVel() const
 {
-  if (this->body)
-    return this->body->GetRelativeLinearVel();
+  if (this->link)
+    return this->link->GetRelativeLinearVel();
   else
     return math::Vector3();
 }
@@ -302,8 +310,8 @@ math::Vector3 Geom::GetRelativeLinearVel() const
 /// Get the linear velocity of the geom in the world frame
 math::Vector3 Geom::GetWorldLinearVel() const
 {
-  if (this->body)
-    return this->body->GetWorldLinearVel();
+  if (this->link)
+    return this->link->GetWorldLinearVel();
   else
     return math::Vector3();
 }
@@ -312,8 +320,8 @@ math::Vector3 Geom::GetWorldLinearVel() const
 /// Get the angular velocity of the geom
 math::Vector3 Geom::GetRelativeAngularVel() const
 {
-  if (this->body)
-    return this->body->GetRelativeAngularVel();
+  if (this->link)
+    return this->link->GetRelativeAngularVel();
   else
     return math::Vector3();
 }
@@ -322,8 +330,8 @@ math::Vector3 Geom::GetRelativeAngularVel() const
 /// Get the angular velocity of the geom in the world frame
 math::Vector3 Geom::GetWorldAngularVel() const
 {
-  if (this->body)
-    return this->body->GetWorldAngularVel();
+  if (this->link)
+    return this->link->GetWorldAngularVel();
   else
     return math::Vector3();
 }
@@ -332,8 +340,8 @@ math::Vector3 Geom::GetWorldAngularVel() const
 /// Get the linear acceleration of the geom
 math::Vector3 Geom::GetRelativeLinearAccel() const
 {
-  if (this->body)
-    return this->body->GetRelativeLinearAccel();
+  if (this->link)
+    return this->link->GetRelativeLinearAccel();
   else
     return math::Vector3();
 }
@@ -342,8 +350,8 @@ math::Vector3 Geom::GetRelativeLinearAccel() const
 /// Get the linear acceleration of the geom in the world frame
 math::Vector3 Geom::GetWorldLinearAccel() const
 {
-  if (this->body)
-    return this->body->GetWorldLinearAccel();
+  if (this->link)
+    return this->link->GetWorldLinearAccel();
   else
     return math::Vector3();
 }
@@ -352,8 +360,8 @@ math::Vector3 Geom::GetWorldLinearAccel() const
 /// Get the angular acceleration of the geom
 math::Vector3 Geom::GetRelativeAngularAccel() const
 {
-  if (this->body)
-    return this->body->GetRelativeAngularAccel();
+  if (this->link)
+    return this->link->GetRelativeAngularAccel();
   else
     return math::Vector3();
 }
@@ -362,8 +370,8 @@ math::Vector3 Geom::GetRelativeAngularAccel() const
 /// Get the angular acceleration of the geom in the world frame
 math::Vector3 Geom::GetWorldAngularAccel() const
 {
-  if (this->body)
-    return this->body->GetWorldAngularAccel();
+  if (this->link)
+    return this->link->GetWorldAngularAccel();
   else
     return math::Vector3();
 }

@@ -306,6 +306,11 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
+  // for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
+  //   gzerr << this->contactFeedbacks.size()
+  //         << " " << i
+  //         << " " << this->contactFeedbacks[i]->feedbacks.size()
+  //         << "\n";
   for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
     delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();

@@ -222,6 +222,10 @@ namespace gazebo
       /// \brief Joints that have this Link as a parent Link
       private: std::vector< JointPtr > childJoints;
       public: void AddChildJoint(JointPtr joint);
+
+      public: void StoreContact(GeomPtr geom, Contact contact);
+      private: std::map<GeomPtr, std::vector<Contact> > contacts;
+
     };
     /// \}
   }

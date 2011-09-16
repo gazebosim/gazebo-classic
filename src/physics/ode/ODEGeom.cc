@@ -34,8 +34,8 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEGeom::ODEGeom( LinkPtr _body )
-    : Geom(_body)
+ODEGeom::ODEGeom( LinkPtr _link )
+    : Geom(_link)
 {
   this->SetName("ODE_Geom");
   this->geomId = NULL;
@@ -59,7 +59,7 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
   if (_sdf->HasElement("surface"))
     this->surface->Load( _sdf->GetElement("surface") );
 
-  this->SetSpaceId( boost::shared_static_cast<ODELink>(this->body)->GetSpaceId() );
+  this->SetSpaceId( boost::shared_static_cast<ODELink>(this->link)->GetSpaceId() );
 
   /*std::cout << "\n\n\nODEGeom::Load test\n\n\n" <<  this->geomId
             << "\n\n" << this->placeable << "\n\n\n";
@@ -108,7 +108,7 @@ void ODEGeom::OnPoseChange()
 
   if (this->IsStatic() && this->geomId && this->placeable)
   {
-    // Transform into global pose since a static geom does not have a body 
+    // Transform into global pose since a static geom does not have a link 
     localPose = this->GetWorldPose();
 
     q[0] = localPose.rot.w;

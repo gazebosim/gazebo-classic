@@ -44,7 +44,7 @@ namespace gazebo
     class ODEGeom : public Geom
     {
       /// \brief Constructor
-      public: ODEGeom(LinkPtr body);
+      public: ODEGeom(LinkPtr link);
     
       /// \brief Destructor
       public: virtual ~ODEGeom();

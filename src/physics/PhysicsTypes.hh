@@ -41,6 +41,7 @@ namespace gazebo
     class Inertial;
 
     typedef boost::shared_ptr<Base> BasePtr;
+    typedef boost::shared_ptr<Contact> ContactPtr;
     typedef boost::shared_ptr<Entity> EntityPtr;
     typedef boost::shared_ptr<World> WorldPtr;
     typedef boost::shared_ptr<Model> ModelPtr;

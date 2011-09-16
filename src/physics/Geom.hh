@@ -39,7 +39,7 @@ namespace gazebo
     class Geom : public Entity
     {
       /// \brief Constructor
-      public: Geom(LinkPtr body);
+      public: Geom(LinkPtr link);
     
       /// \brief Destructor
       public: virtual ~Geom();
@@ -78,7 +78,7 @@ namespace gazebo
       /// \brief Set the visibility of the bounding box
       public: void ShowBoundingBox(const bool &show);
   
-      /// \brief Get the body this geom belongs to
+      /// \brief Get the link this geom belongs to
       public: LinkPtr GetLink() const;
   
       /// \brief Get the model this geom belongs to
@@ -144,15 +144,15 @@ namespace gazebo
       public: void DisconnectContactCallback( event::ConnectionPtr &c )
               { contactSignal.Disconnect(c); }
   
-      /// \brief Enable callback: Called when the body changes
+      /// \brief Enable callback: Called when the link changes
       private: void EnabledCB(bool enabled);
   
       /// \brief Create the bounding box for the geom
       private: void CreateBoundingBox();
   
  
-      /// The body this geom belongs to
-      protected: LinkPtr body;
+      /// The link this geom belongs to
+      protected: LinkPtr link;
     
       protected: bool placeable;
   
@@ -162,7 +162,7 @@ namespace gazebo
       private: std::string bbVisual;
   
       protected: ShapePtr shape;
-  
+
       private: bool contactsEnabled;
   
       public: event::EventT< void (const Contact &)> contactSignal;
