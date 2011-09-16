@@ -166,6 +166,7 @@ namespace gazebo
 
       public: void StoreContact(GeomPtr geom, Contact contact);
       private: std::map<GeomPtr, std::vector<Contact> > contacts;
+      public: std::vector<Contact> GetContacts(GeomPtr geom);
     };
     /// \}
   }

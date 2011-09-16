@@ -82,6 +82,10 @@ namespace gazebo
       private: gazebo::physics::ModelPtr model;
       private: gazebo::physics::LinkPtr link;
       private: gazebo::physics::GeomPtr geom;
+
+      public: gazebo::physics::ModelPtr GetParentModel() {return this->model;};
+
+      public: std::vector<physics::Contact> GetContacts();
     };
     /// \}
   }

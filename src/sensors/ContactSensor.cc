@@ -31,6 +31,7 @@
 #include "physics/Model.hh"
 #include "physics/Link.hh"
 #include "physics/Geom.hh"
+#include "physics/Contact.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/ContactSensor.hh"
@@ -205,4 +206,17 @@ physics::Geom* ContactSensor::GetGeom(unsigned int geom) const
 */
 
   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// retrieve list of contacts for a geom
+std::vector<gazebo::physics::Contact> ContactSensor::GetContacts()
+{
+  if (this->model)
+    return this->model->GetContacts(this->geom);
+  else
+  {
+    gzerr << "model not setup yet, are you calling GetContacts during Load?\n";
+    return std::vector<gazebo::physics::Contact>();
+  }
 }

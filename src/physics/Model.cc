@@ -675,3 +675,14 @@ void Model::StoreContact(GeomPtr geom, Contact contact)
     (iter->second).push_back(contact);
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// retrieve list of contacts for a geom
+std::vector<Contact> Model::GetContacts(GeomPtr geom)
+{
+  std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
+  if (iter == this->contacts.end())
+    return std::vector<Contact>(); // return empty list
+  else
+    return iter->second;
+}
