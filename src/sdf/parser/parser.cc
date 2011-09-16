@@ -252,6 +252,14 @@ bool readString(const std::string &_xmlString, SDFPtr &_sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+bool readString(const std::string &_xmlString, ElementPtr &_sdf)
+{
+  TiXmlDocument xmlDoc;
+  xmlDoc.Parse(_xmlString.c_str());
+  return readDoc(&xmlDoc, _sdf);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 {
   if (!_xmlDoc)
@@ -289,6 +297,48 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 
   }
 
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
+{
+  if (!_xmlDoc)
+  {
+    gzwarn << "Could not parse the xml\n";
+    return false;
+  }
+
+  /* check gazebo version, use old parser if necessary */
+  TiXmlElement* gazeboNode = _xmlDoc->FirstChildElement("gazebo");
+  if (gazeboNode &&
+      gazeboNode->Attribute("version") &&
+      (strcmp(gazeboNode->Attribute("version") , "1.0") == 0) )
+  {
+    /* parse new sdf xml */
+    TiXmlElement* elemXml = gazeboNode->FirstChildElement( _sdf->GetName() );
+    if (!readXml( elemXml, _sdf))
+    {
+      gzwarn << "Unable to parse sdf element[" 
+             << _sdf->GetName() << "]\n";
+      return false;
+    }
+  }
+  else
+  {
+    // try to use the old deprecated parser
+    if (!gazeboNode)
+      gzwarn << "Gazebo SDF has no gazebo element\n";
+    else if (!gazeboNode->Attribute("version"))
+      gzwarn << "Gazebo SDF gazebo element has no version\n";
+    else if (strcmp(gazeboNode->Attribute("version") , "1.0") != 0)
+      gzwarn << "Gazebo SDF version ["
+            << gazeboNode->Attribute("version")
+            << "] is not 1.0\n";
+    return false;
+
+  }
 
   return true;
 }

@@ -107,7 +107,7 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
     </link>\
   </model>";
 
-  msg.set_xml( newModelStr.str() );
+  msg.set_sdf( newModelStr.str() );
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("model_builder");

@@ -256,9 +256,9 @@ math::Pose Entity::GetWorldPose() const
 // Set the abs twist of the entity
 void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren)
 {
-  if (this->HasType(BODY) || this->HasType(MODEL))
+  if (this->HasType(LINK) || this->HasType(MODEL))
   {
-    if (this->HasType(BODY))
+    if (this->HasType(LINK))
     {
       Link* link = dynamic_cast<Link*>(this);
       link->SetLinearVel(linear);

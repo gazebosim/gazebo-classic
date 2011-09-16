@@ -371,3 +371,10 @@ const WorldPtr &Base::GetWorld() const
 {
   return this->world;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the SDF values for the model
+const sdf::ElementPtr &Base::GetSDF() const
+{
+  return this->sdf;
+}

@@ -49,7 +49,7 @@ using namespace physics;
 Link::Link(EntityPtr parent)
     : Entity(parent)
 {
-  this->AddType(Base::BODY);
+  this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
   this->parentJoints.clear();
   this->childJoints.clear();

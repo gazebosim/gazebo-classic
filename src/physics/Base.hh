@@ -47,7 +47,7 @@ namespace gazebo
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
-      public: enum EntityType{BASE, ENTITY, MODEL, BODY, GEOM, 
+      public: enum EntityType{BASE, ENTITY, MODEL, LINK, GEOM, 
                               BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, 
                               HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, 
                               JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, 
@@ -182,7 +182,10 @@ namespace gazebo
     
       /// \brief Get the world this object is in
       public: const WorldPtr &GetWorld() const;
-  
+
+      /// \brief Get the SDF values for the model
+      public: const sdf::ElementPtr &GetSDF() const;
+
       protected: sdf::ElementPtr sdf;
 
       /// \brief Parent of this entity

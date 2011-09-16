@@ -197,6 +197,7 @@ namespace gazebo
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
       private: void ProcessEntityMsgs();
+      private: void FillEntityMsg( msgs::Entity &_msg, ModelPtr &_model );
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
@@ -229,6 +230,7 @@ namespace gazebo
       private: transport::PublisherPtr selectionPub, scenePub;
       private: transport::PublisherPtr statPub, worldPub, newEntityPub;
       private: transport::PublisherPtr entitiesPub;
+      private: transport::PublisherPtr entityInfoPub;
 
       private: transport::SubscriberPtr visSub, sceneRequestSub, controlSub;
       private: transport::SubscriberPtr factorySub, jointSub, sceneSub;

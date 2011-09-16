@@ -41,6 +41,5 @@
       <direction xyz="0 0 -1"/>
     </light>
 
-    <include filename="man_standing.model"/>
   </world>
 </gazebo>

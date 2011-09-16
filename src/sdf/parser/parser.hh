@@ -51,8 +51,12 @@ namespace sdf
   /// \brief Populate the SDF values from a string
   bool readString(const std::string &_xmlString, SDFPtr &_sdf);
 
+  bool readString(const std::string &_xmlString, ElementPtr &_sdf);
+
   /// \brief Populate the SDF values from a TinyXML document
   bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf);
+
+  bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf);
 
   // \brief For internal use only. Do not use this function.
   bool readXml(TiXmlElement *_xml, ElementPtr &_sdf);

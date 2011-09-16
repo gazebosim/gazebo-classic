@@ -219,7 +219,7 @@ void InsertModelWidget::OnApply()
 
   msgs::Factory msg;
   msgs::Init(msg, modelName);
-  msg.set_xml(this->modelSDF->ToString());
+  msg.set_sdf(this->modelSDF->ToString());
   this->factoryPub->Publish(msg);
   this->fileTreeWidget->clearSelection();
 }

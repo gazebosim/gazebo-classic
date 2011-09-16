@@ -181,7 +181,7 @@ void CylinderMaker::CreateTheEntity()
     </model>\
     </gazebo>";
 
-  msg.set_xml( newModelStr.str() );
+  msg.set_sdf( newModelStr.str() );
 
   msgs::Stamp(this->visualMsg->mutable_header());
   this->visualMsg->set_action( msgs::Visual::DELETE );

@@ -158,6 +158,9 @@ void World::Load( sdf::ElementPtr _sdf )
   this->entitySub = this->node->Subscribe<msgs::Entity>("~/entity",
       &World::OnEntityMsg, this);
 
+  this->entityInfoPub = this->node->Advertise<msgs::Factory>("~/entity_info");
+
+
   std::string type = _sdf->GetElement("physics")->GetValueString("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 
                                                           shared_from_this());
@@ -403,7 +406,7 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 
   msgs::Entity msg;
   msgs::Init(msg, model->GetCompleteScopedName() );
-  msg.set_name(model->GetCompleteScopedName());
+  this->FillEntityMsg(msg, model);
 
   this->newEntityPub->Publish(msg);
   return model;
@@ -620,10 +623,24 @@ void World::OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_da
   {
     BasePtr entity = this->rootElement->GetChild(i);
     msgs::Entity *entityMsg = msg.add_entities();
-    entityMsg->set_name( entity->GetCompleteScopedName() );
+    if (entity->HasType(Base::MODEL))
+    {
+      ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+      this->FillEntityMsg(*entityMsg, model);
+    }
   }
 
   this->entitiesPub->Publish( msg );
+}
+
+void World::FillEntityMsg( msgs::Entity &_msg, ModelPtr &_model )
+{
+  _msg.set_name( _model->GetCompleteScopedName() );
+  for (unsigned int j=0; j < _model->GetChildCount(); j++)
+  {
+    if (_model->GetChild(j)->HasType(Base::LINK))
+      *(_msg.add_link_names()) = _model->GetChild(j)->GetCompleteScopedName();
+  }
 }
 
 void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
@@ -733,12 +750,12 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   sdf::SDFPtr factorySDF(new sdf::SDF);
   sdf::initFile( "/sdf/gazebo.sdf", factorySDF );
 
-  if (_msg->has_xml())
+  if (_msg->has_sdf())
   {
-    sdf::readString( _msg->xml(), factorySDF );
+    sdf::readString( _msg->sdf(), factorySDF );
   }
   else
-    sdf::readFile( _msg->filename(), factorySDF);
+    sdf::readFile( _msg->sdf_filename(), factorySDF);
 
   {
     boost::mutex::scoped_lock lock(*this->updateMutex);
@@ -758,6 +775,24 @@ void World::OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg)
   if (_msg->has_request_delete())
   {
     this->entityMsgs.push_back(_msg);
+  }
+  else if (_msg->has_request_info())
+  {
+    msgs::Factory msg;
+    msgs::Init(msg, "entity_info");
+    BasePtr entity = this->rootElement->GetByName( _msg->name() );
+
+    const sdf::ElementPtr sdfValue = entity->GetSDF();
+    msg.set_sdf( sdfValue->ToString("") );
+
+    if (entity->HasType(Base::MODEL))
+        msg.set_sdf_description_filename("sdf/model.sdf");
+    else if (entity->HasType(Base::LINK))
+        msg.set_sdf_description_filename("sdf/link.sdf");
+    else if (entity->HasType(Base::GEOM))
+        msg.set_sdf_description_filename("sdf/collision.sdf");
+
+    this->entityInfoPub->Publish(msg);
   }
 }
 

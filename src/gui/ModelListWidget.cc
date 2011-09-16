@@ -57,6 +57,7 @@ ModelListWidget::ModelListWidget( QWidget *parent )
 
   this->entitiesRequestPub = this->node->Advertise<msgs::Request>("~/request_entities");
   this->entitiesSub = this->node->Subscribe("~/entities", &ModelListWidget::OnEntities, this);
+  this->entityInfoSub = this->node->Subscribe("~/entity_info", &ModelListWidget::OnEntityInfo, this);
   this->entityPub = this->node->Advertise<msgs::Entity>("~/entity");
   this->newEntitySub = this->node->Subscribe("~/entity", &ModelListWidget::OnEntity, this);
 
@@ -73,18 +74,18 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->deleteAction = new QAction(tr("Delete"), this);
   this->deleteAction->setStatusTip(tr("Delete the selection"));
   connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
-
 }
 
 ModelListWidget::~ModelListWidget()
 {
 }
 
-void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem)
+void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
+                                       QtProperty *_parentItem)
 {
-  QtProperty *topItem = this->variantManager->addProperty(QtVariantPropertyManager::groupTypeId(), QLatin1String(_elem->GetName().c_str()));
-
-  this->propTreeBrowser->addProperty(topItem);
+  QtProperty *topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), 
+      QLatin1String( _elem->GetName().c_str() ));
 
   for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
       iter != _elem->attributes.end(); iter++)
@@ -153,45 +154,146 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem)
       item->setValue( value );
       topItem->addSubProperty(item);
     }
-    else if ( (*iter)->IsInt() )
+    else if ( (*iter)->IsUInt() )
     {
       item = this->variantManager->addProperty( QVariant::Int, 
           QLatin1String( (*iter)->GetKey().c_str() ));
-      int value;
+      unsigned int value;
+      (*iter)->Get(value); 
+      item->setValue( value );
+      item->setAttribute( "minimum", 0 );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsFloat() )
+    {
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      float value;
       (*iter)->Get(value); 
       item->setValue( value );
       topItem->addSubProperty(item);
     }
-
-
-    std::cout << "Param[" << (*iter)->GetKey() 
-              << "] Type[" << (*iter)->GetTypeName() << "]\n";
-  }
-
-  for (sdf::ElementPtr_V::iterator iter = _elem->elementDescriptions.begin();
-      iter != _elem->elementDescriptions.end(); iter++)
-  {
-    if ((*iter)->GetRequired() == "0" || (*iter)->GetRequired() == "1")
+    else if ( (*iter)->IsDouble() )
     {
-      std::cout << "Elem[" << (*iter)->GetName() << "]\n";
-      this->FillPropertyTree((*iter));
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      double value;
+      (*iter)->Get(value); 
+      item->setValue( value );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsChar() )
+    {
+      item = this->variantManager->addProperty( QVariant::Char, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      char value;
+      (*iter)->Get(value); 
+      item->setValue( value );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsVector3() )
+    {
+      math::Vector3 value;
+      (*iter)->Get(value); 
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "X" ));
+      item->setValue( value.x );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Y" ));
+      item->setValue( value.y );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Z" ));
+      item->setValue( value.z );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsQuaternion() )
+    {
+      math::Quaternion value;
+      math::Vector3 rpy;
+      (*iter)->Get(value); 
+      rpy = value.GetAsEuler();
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Roll" ));
+      item->setValue( value.x );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Pitch" ));
+      item->setValue( value.y );
+      topItem->addSubProperty(item);
+
+      item = this->variantManager->addProperty( QVariant::Double, 
+          QLatin1String( "Yaw" ));
+      item->setValue( value.z );
+      topItem->addSubProperty(item);
+    }
+    else if ( (*iter)->IsColor() )
+    {
+      /*common::Color value;
+      (*iter)->Get(value); 
+
+      item = this->variantManager->addProperty( QVariant::Color, 
+          QLatin1String( (*iter)->GetKey().c_str() ));
+      topItem->addSubProperty(item);
+      */
     }
   }
+
+  if (_parentItem)
+    _parentItem->addSubProperty(topItem);
+  else
+  this->propTreeBrowser->addProperty(topItem);
+
+
+  for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
+       iter != _elem->elements.end(); iter++)
+  {
+    this->FillPropertyTree((*iter), topItem);
+  }
+  
 }
 
 void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item)
   {
-    std::string data = _item->data(0, Qt::UserRole).toString().toStdString();
-    std::cout << "Data[" << data << "]\n";
-    sdf::ElementPtr sdf(new sdf::Element);
-    sdf::initFile( data, sdf);
+    std::string modelName = _item->text(0).toStdString();
 
+    msgs::Entity msg;
+    msgs::Init(msg, modelName);
+    msg.set_name( modelName );
+    msg.set_request_info( true );
 
-
-    this->FillPropertyTree( sdf );
+    QTimer::singleShot(200,this,SLOT(Update()));
+    this->entityPub->Publish(msg);
   }
+}
+
+void ModelListWidget::Update()
+{
+  if (this->sdfElement)
+  {
+    this->propTreeBrowser->clear();
+    this->FillPropertyTree(this->sdfElement, NULL);
+  }
+  else
+  {
+    QTimer::singleShot(200,this,SLOT(Update));
+  }
+}
+
+void ModelListWidget::OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg )
+{
+  printf("OnEntityInfo\n");
+  this->sdfElement.reset(new sdf::Element);
+  sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
+  sdf::readString( _msg->sdf(), this->sdfElement );
 }
 
 void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg )
@@ -234,7 +336,7 @@ void ModelListWidget::ProcessEntity( const msgs::Entity &_msg )
   std::string name = _msg.name();
 
   QList<QTreeWidgetItem*> list = this->modelTreeWidget->findItems( 
-      name.c_str(), Qt::MatchExactly);
+      name.c_str(), Qt::MatchExactly | Qt::MatchRecursive);
 
   if (list.size() == 0)
   {
@@ -243,8 +345,24 @@ void ModelListWidget::ProcessEntity( const msgs::Entity &_msg )
       // Create a top-level tree item for the path
       QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
           QStringList(QString("%1").arg( QString::fromStdString(name)) ));
-      topItem->setData(0, Qt::UserRole, QVariant("/sdf/model.sdf"));
+
+      topItem->setData(0, Qt::UserRole, QVariant(name.c_str()));
       this->modelTreeWidget->addTopLevelItem(topItem);
+
+      for (int i=0; i < _msg.link_names_size(); i++)
+      {
+        std::string linkName = _msg.link_names(i);
+        int index = linkName.rfind("::") + 2;
+        std::string linkNameShort = linkName.substr(
+            index, linkName.size() - index);
+
+        QTreeWidgetItem *linkItem = new QTreeWidgetItem( topItem, 
+          QStringList(QString("%1").arg( 
+              QString::fromStdString( linkNameShort )) ));
+
+        linkItem->setData(0, Qt::UserRole, QVariant( linkName.c_str() ) );
+        this->modelTreeWidget->addTopLevelItem( linkItem );
+      }
     }
   }
   else

@@ -13,7 +13,7 @@ class QTreeWidgetItem;
 class QPushButton;
 class QtTreePropertyBrowser;
 class QtVariantPropertyManager;
-
+class QtProperty;
 namespace gazebo
 {
   namespace gui
@@ -27,15 +27,21 @@ namespace gazebo
       public: virtual ~ModelListWidget();
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
+      private slots: void Update();
+
       private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
+
+      private: void OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg );
+
       private slots: void OnMoveTo();
       private slots: void OnDelete();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
 
       private: void ProcessEntity( const msgs::Entity &_msg );
 
-      private: void FillPropertyTree(sdf::ElementPtr &_elem);
+      private: void FillPropertyTree(sdf::ElementPtr &_elem,
+                                     QtProperty *_parentItem);
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -44,7 +50,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr entitiesRequestPub, entityPub;
-      private: transport::SubscriberPtr entitiesSub, newEntitySub;
+      private: transport::SubscriberPtr entitiesSub, newEntitySub,entityInfoSub ;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
@@ -52,6 +58,8 @@ namespace gazebo
 
       private: ModelEditWidget *modelEditWidget;
       private: QtVariantPropertyManager *variantManager;
+
+      private: sdf::ElementPtr sdfElement;
     };
   }
 }

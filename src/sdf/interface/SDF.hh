@@ -24,6 +24,8 @@
 
 #include "sdf/interface/Param.hh"
 
+#define SDF_VERSION "1.0"
+
 namespace sdf
 {
   class SDF;
@@ -65,8 +67,8 @@ namespace sdf
     public: void PrintDescription(std::string _prefix);
     public: void PrintValues(std::string _prefix);
 
-    public: void ToString(const std::string &_prefix, std::ostringstream &_out) const;
-
+    private: void ToString(const std::string &_prefix, std::ostringstream &_out) const;
+    public: std::string ToString(const std::string &_prefix) const;
 
     public: void AddAttribute(const std::string &_key, 
                               const std::string &_type, 

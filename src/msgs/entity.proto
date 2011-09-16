@@ -11,6 +11,9 @@ message Entity
 {
   optional Header header       = 1;
   required string name         = 2;
-  optional bool request_delete = 3;
+  repeated string link_names   = 3;
+  repeated string joint_names  = 4;
+  optional bool request_delete = 5;
+  optional bool request_info   = 6;
 }
 /// \endverbatim

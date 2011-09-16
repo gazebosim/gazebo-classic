@@ -152,7 +152,7 @@ void Model::Init()
   ///        the canonical tag in sdf
   for (unsigned int i=0; i < this->children.size(); i++)
   {
-    if (this->children[i]->HasType(BODY))
+    if (this->children[i]->HasType(LINK))
     {
       gzwarn << "Model Canonical Link is presetting to first link for now, ignoring any canonical tag if one exists in your xml\n";
       this->canonicalLink = boost::shared_static_cast<Link>(this->children[i]);
@@ -167,7 +167,7 @@ void Model::Init()
   for (Base_V::iterator iter = this->children.begin(); 
        iter!=this->children.end(); iter++)
   {
-    if ((*iter)->HasType(BODY))
+    if ((*iter)->HasType(LINK))
       boost::shared_static_cast<Link>(*iter)->Init();
     else if ((*iter)->HasType(MODEL))
     {
@@ -228,7 +228,7 @@ void Model::RemoveChild(EntityPtr child)
 {
   Joint_V::iterator jiter;
 
-  if (child->HasType(BODY))
+  if (child->HasType(LINK))
   {
     bool done = false;
 
@@ -260,7 +260,7 @@ void Model::RemoveChild(EntityPtr child)
 
   Base_V::iterator iter;
   for (iter =this->children.begin(); iter != this->children.end(); iter++)
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
 
 }
@@ -276,6 +276,8 @@ void Model::Fini()
   this->canonicalLink.reset();
 }
 
+
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Reset the model
 void Model::Reset()
@@ -301,7 +303,7 @@ void Model::Reset()
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if (*biter && (*biter)->HasType(BODY))
+    if (*biter && (*biter)->HasType(LINK))
     {
       Link *link = (Link*)*biter;
       link->SetLinearVel(v);
@@ -321,7 +323,7 @@ void Model::SetLinearVel( const math::Vector3 &vel )
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
@@ -338,7 +340,7 @@ void Model::SetAngularVel( const math::Vector3 &vel )
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
@@ -355,7 +357,7 @@ void Model::SetLinearAccel( const math::Vector3 &accel )
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
@@ -372,7 +374,7 @@ void Model::SetAngularAccel( const math::Vector3 &accel )
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
@@ -474,7 +476,7 @@ math::Box Model::GetBoundingBox() const
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       math::Box linkBox;
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
@@ -610,7 +612,7 @@ void Model::SetGravityMode( const bool &v )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       boost::shared_static_cast<Link>(*iter)->SetGravityMode( v );
     }
@@ -626,7 +628,7 @@ void Model::SetCollideMode( const std::string &m )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
       boost::shared_static_cast<Link>(*iter)->SetCollideMode( m );
     }
@@ -642,7 +644,7 @@ void Model::SetLaserRetro( const float &retro )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType(BODY))
+    if (*iter && (*iter)->HasType(LINK))
     {
        boost::shared_static_cast<Link>(*iter)->SetLaserRetro(retro);
     }

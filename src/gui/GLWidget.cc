@@ -493,7 +493,7 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
     pose.pos += moveVector;
     entity->SetRelativePose(pose);
   }
-  else if (entity->GetType() == Entity::BODY)
+  else if (entity->GetType() == Entity::LINK)
   {
     Body *body = (Body*)(entity);
     moveVector *= Gui::forceMultiplier;

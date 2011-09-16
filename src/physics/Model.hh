@@ -58,7 +58,7 @@ namespace gazebo
 
       /// \brief Finalize the model
       public: virtual void Fini();
-  
+
       /// \brief Remove a child
       /// \param child Remove a child entity
       public: virtual void RemoveChild(EntityPtr child);
