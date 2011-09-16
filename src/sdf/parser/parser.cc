@@ -35,7 +35,7 @@ namespace sdf
 /// Init based on the installed sdf_format.xml file
 bool init( SDFPtr _sdf )
 {
-  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths("/sdf/gazebo.sdf");
+  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths("/sdf/gazebo.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -46,7 +46,7 @@ bool init( SDFPtr _sdf )
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, SDFPtr _sdf)
 {
-  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(_filename);
+  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
@@ -62,7 +62,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
-  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(_filename);
+  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 
   TiXmlDocument xmlDoc;
   if (xmlDoc.LoadFile(filename))
@@ -203,7 +203,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
   for (TiXmlElement *child = _xml->FirstChildElement("include"); 
       child; child = child->NextSiblingElement("include"))
   {
-    std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(std::string("/sdf/") + child->Attribute("filename"));
+    std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(std::string("/sdf/") + child->Attribute("filename"));
 
     ElementPtr element(new Element);
 
@@ -219,7 +219,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 bool readFile(const std::string &_filename, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
-  std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(_filename);
+  std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 
   xmlDoc.LoadFile(filename);
   if (readDoc(&xmlDoc, _sdf))
@@ -414,7 +414,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
 
       if (std::string("include") == elemXml->Value())
       {
-        std::string filename = gazebo::common::SystemPaths::FindFileWithGazeboPaths(std::string("models/") + elemXml->Attribute("filename"));
+        std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(std::string("models/") + elemXml->Attribute("filename"));
         SDFPtr includeSDF(new SDF); 
         init(includeSDF);
 
@@ -479,7 +479,10 @@ void copyChildren( ElementPtr &_sdf, TiXmlElement *_xml)
     ElementPtr element(new Element);
     element->SetParent( _sdf );
     element->SetName( elemXml->ValueStr() );
-    element->AddValue("string", elemXml->GetText(), "1");
+    if (elemXml->GetText() != NULL)
+      element->AddValue("string", elemXml->GetText(), "1");
+    else
+      gzerr << "trying to copy stuff inside <plugin> block, but they have NULL contents\n";
 
     _sdf->elements.push_back( element );
   }

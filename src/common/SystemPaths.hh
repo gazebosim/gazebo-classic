@@ -38,31 +38,56 @@
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
     /// \addtogroup gazebo_common Common 
     /// \{
 
     /// \brief Functions to handle getting system paths
-    class SystemPaths
+    class SystemPaths : public SingletonT<SystemPaths>
     {
+      SystemPaths();
+
       /// \brief Get the gazebo install paths
-      public: static const std::list<std::string> &GetGazeboPaths(); 
+      public: const std::list<std::string> &GetGazeboPaths(); 
 
       /// \brief Get the ogre install paths  
-      public: static const std::list<std::string> &GetOgrePaths(); 
+      public: const std::list<std::string> &GetOgrePaths(); 
 
       /// \brief Get the plugin paths  
-      public: static const std::list<std::string> &GetPluginPaths(); 
+      public: const std::list<std::string> &GetPluginPaths(); 
 
       /// \brief Get the model path extension
-      public: static std::string GetModelPathExtension();
+      public: std::string GetModelPathExtension();
 
-     /// \brief Get the world path extension
-      public: static std::string GetWorldPathExtension();
+      /// \brief Get the world path extension
+      public: std::string GetWorldPathExtension();
 
-      public: static std::string FindFileWithGazeboPaths(std::string filename);
-  
+      public: std::string FindFileWithGazeboPaths(std::string filename);
+
+      /// \brief Add colon delimited paths to Gazebo install 
+      public: void AddGazeboPaths(std::string path);
+
+      /// \brief Add colon delimited paths to ogre install
+      public: void AddOgrePaths(std::string path);
+   
+      /// \brief Add colon delimited paths to plugins
+      public: void AddPluginPaths(std::string path);
+
+      public: void ClearGazeboPaths();
+      public: void ClearOgrePaths();
+      public: void ClearPluginPaths();
+ 
+      /// Paths gazebo install
+      private: std::list<std::string> gazeboPaths;
+      
+      /// Paths to the ogre install
+      private: std::list<std::string> ogrePaths;
+
+      /// Paths to the plugins
+      private: std::list<std::string> pluginPaths;
+ 
+      private: friend class SingletonT<SystemPaths>;
     };
     /// \}
   }

@@ -49,14 +49,14 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
   this->layout()->setContentsMargins(0,0,0,0);
 
   QList<QTreeWidgetItem*> items;
-  std::list<std::string> gazeboPaths = common::SystemPaths::GetGazeboPaths();
+  std::list<std::string> gazeboPaths = common::SystemPaths::Instance()->GetGazeboPaths();
 
   // Iterate over all the gazebo paths
   for (std::list<std::string>::iterator iter = gazeboPaths.begin(); 
        iter != gazeboPaths.end(); iter++)
   {
     // This is the full model path
-    std::string path = (*iter) + common::SystemPaths::GetModelPathExtension();
+    std::string path = (*iter) + common::SystemPaths::Instance()->GetModelPathExtension();
 
     // Create a top-level tree item for the path
     QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, QStringList(QString("%1").arg( QString::fromStdString(path)) ));

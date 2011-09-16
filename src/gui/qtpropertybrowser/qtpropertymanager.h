@@ -47,6 +47,7 @@
 #include <QtCore/QMetaEnum>
 #include <QLineEdit>
 #include <QtGui/QIcon>
+#include <climits>
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
