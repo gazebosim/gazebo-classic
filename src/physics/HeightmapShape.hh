@@ -33,11 +33,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Height map geom
+    /// \brief Height map collision
     class HeightmapShape : public Shape
     {
       /// \brief Constructor
-      public: HeightmapShape(GeomPtr parent);
+      public: HeightmapShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~HeightmapShape();

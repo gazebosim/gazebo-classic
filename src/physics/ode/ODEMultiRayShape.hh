@@ -33,7 +33,7 @@ namespace gazebo
     class ODEMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
-      public: ODEMultiRayShape(GeomPtr parent);
+      public: ODEMultiRayShape(CollisionPtr parent);
     
       /// \brief Destructor
       public: virtual ~ODEMultiRayShape();
@@ -44,7 +44,7 @@ namespace gazebo
       /// \brief Ray-intersection callback
       private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
   
-      /// \brief Add a ray to the geom
+      /// \brief Add a ray to the collision
       protected: void AddRay(const math::Vector3 &start, const math::Vector3 &end );
   
       /// Ray space for collision detector

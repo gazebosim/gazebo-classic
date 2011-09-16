@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
+/* Desc: Trimesh collisionetry
  * Author: Nate Keonig
  * Date: 21 May 2009
  * SVN: $Id:$
@@ -31,15 +31,15 @@ namespace gazebo
 {
   class Visual;
 
-  /// \addtogroup gazebo_physics_geom
+  /// \addtogroup gazebo_physics_collision
   /// \{
-  /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
-      \brief Trimesh geom
+  /** \defgroup gazebo_trimesh_collision Triangle Mesh collision
+      \brief Trimesh collision
 
     \par Attributes
     The following attributes are supported.
 
-    \htmlinclude default_geom_attr_include.html
+    \htmlinclude default_collision_attr_include.html
 
     - scale (float tuple, meters)
       - Scale of the trimesh
@@ -47,7 +47,7 @@ namespace gazebo
 
     \par Example
     \verbatim
-      <geom:trimesh name="pallet_geom">
+      <collision:trimesh name="pallet_collision">
         <mesh>WoodPallet.mesh</mesh>
         <scale>.2 .2 .2</scale>
         <mass>0.1</mass>
@@ -57,19 +57,19 @@ namespace gazebo
           <material>Gazebo/WoodPallet</material>
           <mesh>WoodPallet.mesh</mesh>
         </visual>
-      </geom:trimesh>
+      </collision:trimesh>
     \endverbatim
   */
   /// \}
-  /// \addtogroup gazebo_trimesh_geom 
+  /// \addtogroup gazebo_trimesh_collision 
   /// \{
 
 
-  /// \brief Triangle mesh geom
+  /// \brief Triangle mesh collision
   class BulletTrimeshShape : public TrimeshShape
   {
     /// \brief Constructor
-    public: BulletTrimeshShape(Geom *parent);
+    public: BulletTrimeshShape(Collision *parent);
 
     /// \brief Destructor
     public: virtual ~BulletTrimeshShape();

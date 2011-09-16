@@ -12,7 +12,7 @@ set (sources Base.cc
              Contact.cc
              CylinderShape.cc
              Entity.cc
-             Geom.cc
+             Collision.cc
              HeightmapShape.cc
              Joint.cc
              MapShape.cc
@@ -37,7 +37,7 @@ set (headers BallJoint.hh
              Contact.hh
              CylinderShape.hh
              Entity.hh
-             Geom.hh
+             Collision.hh
              HeightmapShape.hh
              Hinge2Joint.hh
              HingeJoint.hh

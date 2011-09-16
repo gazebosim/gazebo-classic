@@ -24,7 +24,7 @@
 
 #include "physics/HeightmapShape.hh"
 #include "physics/ode/ODEPhysics.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 
 namespace gazebo
 {
@@ -36,11 +36,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
-    /// \brief ODE Height map geom
+    /// \brief ODE Height map collision
     class ODEHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor
-      public: ODEHeightmapShape(GeomPtr parent);
+      public: ODEHeightmapShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();

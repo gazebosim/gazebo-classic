@@ -36,8 +36,9 @@
 #include "physics/Model.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/Link.hh"
+#include "physics/Contact.hh"
 
 #include "transport/Publisher.hh"
 
@@ -98,7 +99,7 @@ void Link::Load( sdf::ElementPtr &_sdf )
       gzerr << "Non-static body has no interial sdf element.\n";
   }
 
-  // before loading child geometry, we have to figure out of selfCollide is true
+  // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
 
@@ -130,8 +131,8 @@ void Link::Load( sdf::ElementPtr &_sdf )
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      // Create and Load a geom, which will belong to this body.
-      this->LoadGeom(collisionElem);
+      // Create and Load a collision, which will belong to this body.
+      this->LoadCollision(collisionElem);
       collisionElem = this->sdf->GetNextElement("collision", collisionElem); 
     }
   }
@@ -156,7 +157,7 @@ void Link::Init()
   {
     if ((*iter)->HasType(Base::GEOM))
     {
-      GeomPtr g = boost::shared_static_cast<Geom>(*iter);
+      CollisionPtr g = boost::shared_static_cast<Collision>(*iter);
       g->Init();
     }
   }
@@ -169,7 +170,7 @@ void Link::Init()
 
   this->SetKinematic( this->sdf->GetValueBool("kinematic") );
 
-  // If no geoms are attached, then don't let gravity affect the body.
+  // If no collisions are attached, then don't let gravity affect the body.
   if (this->children.size()==0 || !this->sdf->GetValueBool("gravity"))
     this->SetGravityMode(false);
 
@@ -215,7 +216,7 @@ void Link::Init()
       g_msg.set_material( "Gazebo/GreenGlow" );
       g_msg.set_visible( false );
 
-      // Create a line to each geom
+      // Create a line to each collision
       for (Base_V::iterator giter = this->children.begin(); 
            giter != this->children.end(); giter++)
       {
@@ -254,6 +255,61 @@ void Link::Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Update the parameters using new sdf values
+void Link::UpdateParameters( sdf::ElementPtr &_sdf )
+{
+  Entity::UpdateParameters(_sdf);
+
+  if (this->sdf->HasElement("inertial"))
+  {
+    sdf::ElementPtr inertialElem = this->sdf->GetElement("inertial");
+    this->inertial->UpdateParameters( inertialElem );
+  }
+
+  // before loading child collsiion, we have to figure out of selfCollide is true
+  // and modify parent class Entity so this body has its own spaceId
+  this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
+
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      // TODO: Update visuals properly
+      /*std::ostringstream visname;
+      visname << this->GetCompleteScopedName() << "::VISUAL_" << 
+        this->visuals.size();
+
+      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+      msgs::Init(msg, visname.str());
+      msg.set_parent_id( this->GetCompleteScopedName() );
+      msg.set_is_static( this->IsStatic() );
+
+      this->visPub->Publish(msg);
+      this->visuals.push_back(msg.header().str_id());
+      */
+
+      visualElem = this->sdf->GetNextElement("visual", visualElem); 
+    }
+  }
+
+  if (this->sdf->HasElement("collision"))
+  {
+    sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
+    while (collisionElem)
+    {
+      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(this->GetChild( collisionElem->GetValueString("name") ) );
+
+      if (collision)
+        collision->UpdateParameters(collisionElem);
+      collisionElem = this->sdf->GetNextElement("collision", collisionElem);
+    }
+  }
+ 
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the collide mode of the body
 void Link::SetCollideMode( const std::string &m )
 {
@@ -276,7 +332,7 @@ void Link::SetCollideMode( const std::string &m )
   }
 
   // TODO: Put this back in
-  /*for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  /*for (giter = this->collisions.begin(); giter != this->collisions.end(); giter++)
   {
     (*giter)->SetCategoryBits(collideBits);
     (*giter)->SetCollideBits(collideBits);
@@ -299,7 +355,7 @@ void Link::SetLaserRetro(float retro)
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if ((*iter)->HasType(Base::GEOM))
-      boost::shared_static_cast<Geom>(*iter)->SetLaserRetro( retro );
+      boost::shared_static_cast<Collision>(*iter)->SetLaserRetro( retro );
   }
 }
 
@@ -319,6 +375,11 @@ void Link::Update()
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+
+  for (std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
+       iter != this->contacts.end() ; iter++)
+    (iter->second).clear();
+  this->contacts.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -339,37 +400,37 @@ void Link::LoadSensor( sdf::ElementPtr &_sdf )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load a new geom helper function
-void Link::LoadGeom( sdf::ElementPtr &_sdf )
+// Load a new collision helper function
+void Link::LoadCollision( sdf::ElementPtr &_sdf )
 {
-  GeomPtr geom;
+  CollisionPtr collision;
   std::string type = _sdf->GetElement("geometry")->GetFirstElement()->GetName();
 
   /*if (type == "heightmap" || type == "map")
     this->SetStatic(true);
     */
 
-  geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( type, 
+  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision( type, 
       boost::shared_static_cast<Link>(shared_from_this()) );
 
-  if (!geom)
-    gzthrow("Unknown Geometry Type["+type +"]");
+  if (!collision)
+    gzthrow("Unknown Collisionetry Type["+type +"]");
 
-  geom->Load(_sdf);
-  this->geoms.push_back(geom);
+  collision->Load(_sdf);
+  this->collisions.push_back(collision);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the geom by name
-GeomPtr Link::GetGeom(std::string name)
+/// Get the collision by name
+CollisionPtr Link::GetCollision(std::string name)
 {
-  Geom_V::const_iterator giter;
-  GeomPtr result;
-  for (giter=this->geoms.begin(); giter != this->geoms.end(); giter++)
+  Collision_V::const_iterator giter;
+  CollisionPtr result;
+  for (giter=this->collisions.begin(); giter != this->collisions.end(); giter++)
   {
     if ((*giter)->GetName() == name)
     {
-      result = boost::shared_dynamic_cast<Geom>(*giter);
+      result = boost::shared_dynamic_cast<Collision>(*giter);
       break;
     }
   }
@@ -470,7 +531,7 @@ math::Box Link::GetBoundingBox() const
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
     if ((*iter)->HasType(Base::GEOM))
-      box += boost::shared_static_cast<Geom>(*iter)->GetBoundingBox();
+      box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
   }
 
   return box;
@@ -509,3 +570,20 @@ void Link::AddChildJoint(JointPtr joint)
   this->childJoints.push_back(joint);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Store a collision, contact pair
+void Link::StoreContact(CollisionPtr _collision, Contact /*_contact*/)
+{
+  //gzerr << "here I shall add the contact and collision pair under link, to be retrieved later by plugin\n";
+  std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.find( _collision );
+  if (iter == this->contacts.end())
+  {
+    std::vector<Contact> contact_list;
+    //contact_list.push_back(contact);
+    //this->contacts.insert( std::make_pair( collision, contact_list ) );
+  }
+  else
+  {
+    //(iter->second).push_back(contact);
+  }
+}

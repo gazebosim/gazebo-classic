@@ -31,11 +31,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Box geom
+    /// \brief Box geometry
     class BoxShape : public Shape
     {
       /// \brief Constructor
-      public: BoxShape(GeomPtr parent);
+      public: BoxShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~BoxShape();

@@ -33,20 +33,20 @@ namespace gazebo
     /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {
-      public: ODEPlaneShape(GeomPtr parent) : PlaneShape(parent) {}
+      public: ODEPlaneShape(CollisionPtr parent) : PlaneShape(parent) {}
       public: virtual ~ODEPlaneShape() {}
     
       /// \brief Create the plane
       public: void CreatePlane()
       {
         PlaneShape::CreatePlane();
-        ODEGeomPtr odeParent;
-        odeParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
+        ODECollisionPtr odeParent;
+        odeParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
     
         double altitude = 0;
   
         math::Vector3 n = this->sdf->GetValueVector3("normal");
-        odeParent->SetGeom(dCreatePlane(odeParent->GetSpaceId(), 
+        odeParent->SetCollision(dCreatePlane(odeParent->GetSpaceId(), 
                            n.x, n.y, n.z, altitude), false);
       }
     
@@ -54,17 +54,17 @@ namespace gazebo
       public: void SetAltitude(const math::Vector3 &pos)
       {
         PlaneShape::SetAltitude(pos);
-        ODEGeomPtr odeParent;
-        odeParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
+        ODECollisionPtr odeParent;
+        odeParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
   
         dVector4 vec4;
     
-        dGeomPlaneGetParams(odeParent->GetGeomId(), vec4);
+        dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
     
         // Compute "altitude": scalar product of position and normal
         vec4[3] = vec4[0] * pos.x + vec4[1] * pos.y + vec4[2] * pos.z;
 
-        dGeomPlaneSetParams(odeParent->GetGeomId(), vec4[0], vec4[1], 
+        dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1], 
                             vec4[2], vec4[3]);
       }
     };

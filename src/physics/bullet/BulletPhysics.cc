@@ -191,36 +191,36 @@ Link *BulletPhysics::CreateLink(Entity *parent)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Create a new geom
-Geom *BulletPhysics::CreateGeom(std::string type, Link *parent)
+/// Create a new collision
+Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 {
-  BulletGeom *geom = NULL;
+  BulletCollision *collision = NULL;
   Shape *shape = NULL;
   BulletLink *body = NULL;
 
   body = dynamic_cast<BulletLink*>(parent);
 
   if (body == NULL)
-    gzthrow("CreateGeom requires an BulletLink as a parent");
+    gzthrow("CreateCollision requires an BulletLink as a parent");
 
-  geom = new BulletGeom(parent);
+  collision = new BulletCollision(parent);
 
   if (type == "sphere")
-    shape = new BulletSphereShape(geom);
+    shape = new BulletSphereShape(collision);
   if (type == "box")
-    shape = new BulletBoxShape(geom);
+    shape = new BulletBoxShape(collision);
   if (type == "cylinder")
-    shape = new BulletCylinderShape(geom);
+    shape = new BulletCylinderShape(collision);
   if (type == "plane")
-    shape = new BulletPlaneShape(geom);
+    shape = new BulletPlaneShape(collision);
   if (type == "trimesh")
-    shape = new BulletTrimeshShape(geom);
+    shape = new BulletTrimeshShape(collision);
   if (type == "map")
-    shape = new MapShape(geom);
+    shape = new MapShape(collision);
   else 
-    gzthrow("Unable to create a geom of type[" << type << "]");
+    gzthrow("Unable to create a collision of type[" << type << "]");
 
-  return geom;
+  return collision;
 }
 
 
@@ -257,7 +257,7 @@ void BulletPhysics::ConvertMass(void *engineMass, const Mass &mass)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Create an object to hold a set of ray geoms
+// Create an object to hold a set of ray collisions
 /*PhysicsRaySensor *BulletPhysics::CreateRaySensor(Link *body)
 {
   return NULL;

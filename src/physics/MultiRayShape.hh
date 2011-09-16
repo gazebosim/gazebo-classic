@@ -24,7 +24,7 @@
 #include "math/Vector3.hh"
 #include "math/Angle.hh"
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/Shape.hh"
 #include "physics/RayShape.hh"
 
@@ -40,12 +40,12 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Laser geom contains a set of ray-geoms, structured to simulate
+    /// \brief Laser collision contains a set of ray-collisions, structured to simulate
     ///        a laser range scanner
     class MultiRayShape : public Shape
     {
       /// \brief Constructor
-      public: MultiRayShape(GeomPtr parent);
+      public: MultiRayShape(CollisionPtr parent);
     
       /// \brief Destructor
       public: virtual ~MultiRayShape();
@@ -105,13 +105,13 @@ namespace gazebo
       /// \brief Get the vertical max angle
       public: math::Angle GetVerticalMaxAngle() const;
   
-      /// \brief Update the geom
+      /// \brief Update the collision
       public: void Update();
     
        /// \brief Physics engine specific method for updating the rays
       protected: virtual void UpdateRays() = 0;
     
-      /// \brief Add a ray to the geom
+      /// \brief Add a ray to the collision
       protected: virtual void AddRay(const math::Vector3 &start, const math::Vector3 &end );
     
       protected: msgs::Visual *rayFanMsg;

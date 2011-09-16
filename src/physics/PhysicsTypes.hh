@@ -30,7 +30,7 @@ namespace gazebo
     class World;
     class Model;
     class Link;
-    class Geom;
+    class Collision;
     class Joint;
     class Contact;
     class PhysicsEngine;
@@ -46,7 +46,7 @@ namespace gazebo
     typedef boost::shared_ptr<World> WorldPtr;
     typedef boost::shared_ptr<Model> ModelPtr;
     typedef boost::shared_ptr<Link> LinkPtr;
-    typedef boost::shared_ptr<Geom> GeomPtr;
+    typedef boost::shared_ptr<Collision> CollisionPtr;
     typedef boost::shared_ptr<Joint> JointPtr;
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
     typedef boost::shared_ptr<Shape> ShapePtr;
@@ -58,7 +58,7 @@ namespace gazebo
     typedef std::vector<ModelPtr> Model_V;
     typedef std::vector<JointPtr> Joint_V;
     typedef std::vector<LinkPtr>  Link_V;
-    typedef std::vector<GeomPtr>  Geom_V;
+    typedef std::vector<CollisionPtr>  Collision_V;
 
     #ifndef GZ_COLLIDE_BITS
     

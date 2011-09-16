@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef POSE3D_HH
-#define POSE3D_HH
+#ifndef POSE_HH
+#define POSE_HH
 
 #include <iostream>
 

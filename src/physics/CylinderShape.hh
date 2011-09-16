@@ -31,11 +31,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
  
-    /// \brief Cylinder geom
+    /// \brief Cylinder collision
     class CylinderShape : public Shape
     {
       /// \brief Constructor
-      public: CylinderShape(GeomPtr parent);
+      public: CylinderShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~CylinderShape();

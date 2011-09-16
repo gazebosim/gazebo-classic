@@ -22,7 +22,7 @@
 
 #include "common/Global.hh"
 #include "common/Exception.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEHeightmapShape.hh"
 
 using namespace gazebo;
@@ -31,7 +31,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEHeightmapShape::ODEHeightmapShape(GeomPtr parent)
+ODEHeightmapShape::ODEHeightmapShape(CollisionPtr parent)
     : HeightmapShape(parent)
 {
 }
@@ -70,17 +70,17 @@ void ODEHeightmapShape::FillHeightMap()
 // Called by ODE to get the height at a vertex
 dReal ODEHeightmapShape::GetHeightCallback(void *data, int x, int y)
 {
-  ODEHeightmapShape *geom = (ODEHeightmapShape*)(data);
+  ODEHeightmapShape *collision = (ODEHeightmapShape*)(data);
 
   // Return the height at a specific vertex
-  return geom->heights[y * geom->odeVertSize + x];
+  return collision->heights[y * collision->odeVertSize + x];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
 void ODEHeightmapShape::Init()
 {
-  ODEGeomPtr oParent = boost::shared_static_cast<ODEGeom>(this->geomParent);
+  ODECollisionPtr oParent = boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   math::Vector3 terrainSize = this->sdf->GetValueVector3("size");
 
@@ -95,7 +95,7 @@ void ODEHeightmapShape::Init()
   // query functionality
   this->FillHeightMap();
 
-  // Step 3: Create the ODE heightfield geom
+  // Step 3: Create the ODE heightfield collision
   this->odeData = dGeomHeightfieldDataCreate();
 
   // Step 4: Setup a callback method for ODE
@@ -116,7 +116,7 @@ void ODEHeightmapShape::Init()
   // Step 5: Restrict the bounds of the AABB to improve efficiency
   dGeomHeightfieldDataSetBounds( this->odeData, 0, terrainSize.z);
 
-  oParent->SetGeom(dCreateHeightfield( 0, this->odeData, 1), false);
+  oParent->SetCollision(dCreateHeightfield( 0, this->odeData, 1), false);
   oParent->SetStatic(true);
 
   //Rotate so Z is up, not Y (which is the default orientation)
@@ -134,5 +134,5 @@ void ODEHeightmapShape::Init()
   q[2] = pose.rot.y;
   q[3] = pose.rot.z;
 
-  dGeomSetQuaternion(oParent->GetGeomId(), q);
+  dGeomSetQuaternion(oParent->GetCollisionId(), q);
 }

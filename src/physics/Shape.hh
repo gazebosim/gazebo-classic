@@ -35,7 +35,7 @@ namespace gazebo
     class Shape : public Base
     {
       /// \brief Constructor
-      public: Shape(GeomPtr p);
+      public: Shape(CollisionPtr p);
   
       /// \brief Destructor
       public: virtual ~Shape();
@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
 
-      protected: GeomPtr geomParent;
+      protected: CollisionPtr collisionParent;
       protected: sdf::ElementPtr sdf;
     };
     /// \}

@@ -30,8 +30,8 @@ using namespace physics;
 /// Constructor
 Contact::Contact()
 {
-  this->geom1 = NULL;
-  this->geom2 = NULL;
+  this->collision1 = NULL;
+  this->collision2 = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,8 +59,8 @@ Contact Contact::Clone() const
 // Operator =
 const Contact &Contact::operator=(const Contact &contact) 
 {
-  this->geom1 = contact.geom1;
-  this->geom2 = contact.geom2;
+  this->collision1 = contact.collision1;
+  this->collision2 = contact.collision2;
 
   this->forces.clear();
   this->positions.clear();

@@ -128,6 +128,13 @@ void Joint::Update()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// update the parameters using new sdf values
+void Joint::UpdateParameters( sdf::ElementPtr &_sdf )
+{
+  Base::UpdateParameters(_sdf);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Set the joint to show visuals
 void Joint::ShowJoints(const bool & /*s_kk*/)
 {

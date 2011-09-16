@@ -21,7 +21,7 @@
 
 #include "physics/Link.hh"
 #include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODERayShape.hh"
 
 using namespace gazebo;
@@ -30,15 +30,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODERayShape::ODERayShape( GeomPtr parent, bool displayRays )
+ODERayShape::ODERayShape( CollisionPtr parent, bool displayRays )
     : RayShape(parent, displayRays)
 {
   this->SetName("ODE Ray Shape");
 
-  ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
+  ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   // Create default ray with unit length
-  geom->SetGeom( dCreateRay( geom->GetSpaceId(), 1.0 ),  false );
+  collision->SetCollision( dCreateRay( collision->GetSpaceId(), 1.0 ),  false );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -48,16 +48,16 @@ ODERayShape::~ODERayShape()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Update the ray geom
+// Update the ray collision
 void ODERayShape::Update()
 {
-  ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
+  ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   math::Vector3 dir;
 
-  this->globalStartPos = this->geomParent->GetLink()->GetWorldPose().CoordPositionAdd(
+  this->globalStartPos = this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
-  this->globalEndPos = this->geomParent->GetLink()->GetWorldPose().CoordPositionAdd(
+  this->globalEndPos = this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
   dir = this->globalEndPos - this->globalStartPos;
@@ -65,11 +65,11 @@ void ODERayShape::Update()
 
   if (this->contactLen != 0)
   {
-    dGeomRaySet(geom->GetGeomId(), this->globalStartPos.x,
+    dGeomRaySet(collision->GetCollisionId(), this->globalStartPos.x,
         this->globalStartPos.y, this->globalStartPos.z,
         dir.x, dir.y, dir.z);
 
-    dGeomRaySetLength( geom->GetGeomId(),
+    dGeomRaySetLength( collision->GetCollisionId(),
         this->globalStartPos.Distance(this->globalEndPos) );
   }
 }
@@ -79,17 +79,17 @@ void ODERayShape::Update()
 void ODERayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
 {
   math::Vector3 dir;
-  ODEGeomPtr geom = boost::shared_static_cast<ODEGeom>(this->geomParent);
+  ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   RayShape::SetPoints(posStart, posEnd);
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(geom->GetGeomId(), this->globalStartPos.x,
+  dGeomRaySet(collision->GetCollisionId(), this->globalStartPos.x,
               this->globalStartPos.y, this->globalStartPos.z,
               dir.x, dir.y, dir.z);
 
-  dGeomRaySetLength( geom->GetGeomId(),
+  dGeomRaySetLength( collision->GetCollisionId(),
                      this->globalStartPos.Distance(this->globalEndPos) );
 }

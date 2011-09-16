@@ -23,7 +23,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-CylinderShape::CylinderShape(GeomPtr parent) : Shape(parent)
+CylinderShape::CylinderShape(CollisionPtr parent) : Shape(parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
 }

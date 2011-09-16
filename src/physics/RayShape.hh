@@ -34,14 +34,14 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Ray geom 
+    /// \brief Ray collision 
     class RayShape : public Shape
     {
       /// \brief Constructor
       /// \param body Link the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when 
       ///        rendering images
-      public: RayShape( GeomPtr parent, bool displayRays );
+      public: RayShape( CollisionPtr parent, bool displayRays );
     
       /// \brief Destructor
       public: virtual ~RayShape();
@@ -74,7 +74,7 @@ namespace gazebo
       /// \brief Get the length of the ray
       public: double GetLength() const;
   
-      /// \brief Update the tay geom
+      /// \brief Update the tay collision
       public: virtual void Update() = 0;
     
       /// \brief Set the retro-reflectivness detected by this ray

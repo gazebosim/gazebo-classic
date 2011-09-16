@@ -15,7 +15,7 @@
  *
 */
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/PlaneShape.hh"
 
 using namespace gazebo;
@@ -24,7 +24,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-PlaneShape::PlaneShape(GeomPtr parent) 
+PlaneShape::PlaneShape(CollisionPtr parent) 
   : Shape(parent)
 {
   this->AddType(PLANE_SHAPE);

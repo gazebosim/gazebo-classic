@@ -64,7 +64,10 @@ namespace gazebo
 
       /// \brief Finalize the entity
       public: virtual void Fini();
-  
+
+      /// \brief Update the parameters using new sdf values
+      public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
+
       /// \brief Set the name of the entity 
       /// \param name The new name
       public: virtual void SetName(const std::string &name);

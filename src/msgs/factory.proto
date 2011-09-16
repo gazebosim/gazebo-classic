@@ -15,5 +15,6 @@ message Factory
   optional string sdf                       = 3;
   optional string sdf_filename              = 4;
   optional Pose pose                        = 5;
+  optional string edit_name                 = 6;
 }
 /// \endverbatim

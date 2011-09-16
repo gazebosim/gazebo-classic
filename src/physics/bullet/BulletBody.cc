@@ -25,8 +25,8 @@
 #include "common/XMLConfig.hh"
 #include "common/Console.hh"
 
-#include "physics/Geom.hh"
-#include "BulletGeom.hh"
+#include "physics/Collision.hh"
+#include "BulletCollision.hh"
 #include "BulletMotionState.hh"
 #include "math/Quaternion.hh"
 #include "common/Exception.hh"
@@ -93,11 +93,11 @@ void BulletLink::Load(common::XMLConfigNode *node)
 
     /*int i;
 
-    btScalar *masses = new btScalar[this->geoms.size()];
-    std::map< std::string, Geom* >::iterator iter;
+    btScalar *masses = new btScalar[this->collisions.size()];
+    std::map< std::string, Collision* >::iterator iter;
 
-    // Get a list of all the geom masses
-    for (iter = this->geoms.begin(), i=0; iter != geoms.end(); iter++, i++)
+    // Get a list of all the collision masses
+    for (iter = this->collisions.begin(), i=0; iter != collisions.end(); iter++, i++)
       masses[i] = iter->second->GetMass().GetAsDouble();
 
     // Calculate the center of mass of the compound shape
@@ -116,31 +116,31 @@ void BulletLink::Load(common::XMLConfigNode *node)
     tmp.pos += princ.pos;
     this->SetRelativePose(tmp, false);
 
-    // Move all the geoms relative to the center of mass
-    for (iter = this->geoms.begin(),i = 0; i < this->geoms.size(); i++, iter++)
+    // Move all the collisions relative to the center of mass
+    for (iter = this->collisions.begin(),i = 0; i < this->collisions.size(); i++, iter++)
     {
       math::Pose origPose, newPose;
 
-      // The original pose of the geometry
+      // The original pose of the collisionetry
       origPose = BulletPhysics::ConvertPose(
                                   this->compoundShape->getChildTransform(i));
      
-      // Rotate the geometry around it's own axis. This will allow us to 
-      // translate the geom so that the CoG is at the body's (0,0,0)
+      // Rotate the collisionetry around it's own axis. This will allow us to 
+      // translate the collision so that the CoG is at the body's (0,0,0)
       newPose.rot = origPose.CoordRotationAdd(princ.rot);
 
-      // Translate the geometry according the center of mass
+      // Translate the collisionetry according the center of mass
       newPose.pos = origPose.pos;
       newPose.pos = newPose.CoordPositionAdd(inverse.pos);
 
-      // Restore the original rotation of the geom.
+      // Restore the original rotation of the collision.
       newPose.rot = origPose.rot;
 
-      // Set the pose of the geom in Bullet
+      // Set the pose of the collision in Bullet
       this->compoundShape->updateChildTransform(i, 
           BulletPhysics::ConvertPose(newPose));
 
-      // Tell the Gazebo Geom that it's pose has changed. This will
+      // Tell the Gazebo Collision that it's pose has changed. This will
       // change the visual accordingly
       iter->second->SetRelativePose(newPose);//, false);
 
@@ -160,7 +160,7 @@ void BulletLink::Load(common::XMLConfigNode *node)
   this->rigidLink = new btRigidLink( rigidLinkCI );
   this->rigidLink->setUserPointer(this);
 
-  // before loading child geometry, we have to figure out of selfCollide is true
+  // before loading child collisionetry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   if (**this->selfCollideP)
   {
@@ -227,22 +227,22 @@ void BulletLink::SetSelfCollide(bool collide)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Attach a geom to this body
-void BulletLink::AttachGeom( Geom *geom )
+// Attach a collision to this body
+void BulletLink::AttachCollision( Collision *collision )
 {
-  Link::AttachGeom(geom);
+  Link::AttachCollision(collision);
 
-  BulletGeom *bgeom = dynamic_cast<BulletGeom*>(geom);
+  BulletCollision *bcollision = dynamic_cast<BulletCollision*>(collision);
 
-  if (geom == NULL)
-    gzthrow("requires BulletGeom");
+  if (collision == NULL)
+    gzthrow("requires BulletCollision");
 
   btTransform trans;
-  math::Pose relativePose = geom->GetRelativePose();
+  math::Pose relativePose = collision->GetRelativePose();
   trans = BulletPhysics::ConvertPose(relativePose);
 
-  bgeom->SetCompoundShapeIndex( this->compoundShape->getNumChildShapes() );
-  this->compoundShape->addChildShape(trans, bgeom->GetCollisionShape());
+  bcollision->SetCompoundShapeIndex( this->compoundShape->getNumChildShapes() );
+  this->compoundShape->addChildShape(trans, bcollision->GetCollisionShape());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,8 +282,8 @@ void BulletLink::SetEnabled(bool enable) const
   Bullet functions, one must use apply this factor appropriately.
 
   The UpdateCoM() function is used to compute this offset, based on
-  the mass distribution of attached geoms.  This function also shifts
-  the Bullet-pose of the geoms, to keep everything in the same place in the
+  the mass distribution of attached collisions.  This function also shifts
+  the Bullet-pose of the collisions, to keep everything in the same place in the
   Gazebo cs.  Simple, neh?
 */
 void BulletLink::UpdateCoM()
@@ -408,21 +408,21 @@ void BulletLink::SetAngularDamping(double damping)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the relative pose of a child geom.
-void BulletLink::SetGeomRelativePose(BulletGeom *geom, const math::Pose &newPose)
+/// Set the relative pose of a child collision.
+void BulletLink::SetCollisionRelativePose(BulletCollision *collision, const math::Pose &newPose)
 {
-  std::map<std::string, Geom*>::iterator iter;
+  std::map<std::string, Collision*>::iterator iter;
   unsigned int i;
 
-  for (iter=this->geoms.begin(), i=0; iter != this->geoms.end(); iter++, i++)
+  for (iter=this->collisions.begin(), i=0; iter != this->collisions.end(); iter++, i++)
   {
-    if (iter->second == geom)
+    if (iter->second == collision)
       break;
   }
 
-  if (i < this->geoms.size())
+  if (i < this->collisions.size())
   {
-    // Set the pose of the geom in Bullet
+    // Set the pose of the collision in Bullet
     this->compoundShape->updateChildTransform(i, 
         BulletPhysics::ConvertPose(newPose));
   }

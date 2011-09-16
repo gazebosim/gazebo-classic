@@ -36,18 +36,18 @@ namespace gazebo
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
-    /// \brief Ray geom 
+    /// \brief Ray collision 
     class ODERayShape : public RayShape
     {
       /// \brief Constructor
       /// \param body Link the ray is attached to
       /// \param displayRays Indicates if the rays should be displayed when rendering images
-      public: ODERayShape( GeomPtr geom, bool displayRays );
+      public: ODERayShape( CollisionPtr collision, bool displayRays );
     
       /// \brief Destructor
       public: virtual ~ODERayShape();
   
-      /// \brief Update the tay geom
+      /// \brief Update the tay collision
       public: virtual void Update();
    
       /// \brief Set the ray based on starting and ending points relative to the 

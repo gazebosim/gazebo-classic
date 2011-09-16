@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Geom class
+/* Desc: Collision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
 
-#ifndef GEOM_HH
-#define GEOM_HH
+#ifndef COLLISION_HH
+#define COLLISION_HH
 
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
@@ -35,30 +35,30 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Base class for all geoms
-    class Geom : public Entity
+    /// \brief Base class for all collision entities
+    class Collision : public Entity
     {
       /// \brief Constructor
-      public: Geom(LinkPtr link);
+      public: Collision(LinkPtr link);
     
       /// \brief Destructor
-      public: virtual ~Geom();
+      public: virtual ~Collision();
   
-      /// \brief Finalize the geom
+      /// \brief Finalize the collision
       public: void Fini();
   
-      /// \brief Load the geom
+      /// \brief Load the collision
       public: virtual void Load( sdf::ElementPtr &_sdf );
 
       public: virtual void Init();
   
-      /// \brief Load the geom
+      /// \brief Load the collision
       public: void Save(std::string &prefix, std::ostream &stream);
    
-      /// \brief Set the encapsulated geometry object
-      public: void SetGeom(bool placeable);
+      /// \brief Set the encapsulated collsion object
+      public: void SetCollision(bool placeable);
     
-      /// \brief Return whether this geom is placeable
+      /// \brief Return whether this collision is placeable
       public: bool IsPlaceable() const;
       
       /// \brief Set the category bits, used during collision detection
@@ -78,19 +78,19 @@ namespace gazebo
       /// \brief Set the visibility of the bounding box
       public: void ShowBoundingBox(const bool &show);
   
-      /// \brief Get the link this geom belongs to
+      /// \brief Get the link this collision belongs to
       public: LinkPtr GetLink() const;
   
-      /// \brief Get the model this geom belongs to
+      /// \brief Get the model this collision belongs to
       public: ModelPtr GetModel() const;
   
-      /// \brief Get the bounding box for this geom
+      /// \brief Get the bounding box for this collision
       public: virtual math::Box GetBoundingBox() const = 0;
   
       /// \brief Get the shape type
       public: Base::EntityType GetShapeType();
   
-      /// \brief Set the shape for this geom
+      /// \brief Set the shape for this collision
       public: void SetShape(ShapePtr shape);
               
       /// \brief Get the attached shape
@@ -102,7 +102,7 @@ namespace gazebo
       /// \brief Return true of contact recording is on
       public: bool GetContactsEnabled() const;
   
-      /// \brief Add an occurance of a contact to this geom
+      /// \brief Add an occurance of a contact to this collision
       public: void AddContact(const Contact &contact);
   
       /// \brief Clear all contact info
@@ -114,28 +114,28 @@ namespace gazebo
       /// \brief Get a specific contact
       public: Contact GetContact(unsigned int i) const;
   
-      /// \brief Get the linear velocity of the geom
+      /// \brief Get the linear velocity of the collision
       public: virtual math::Vector3 GetRelativeLinearVel() const;
   
-      /// \brief Get the linear velocity of the geom in the world frame
+      /// \brief Get the linear velocity of the collision in the world frame
       public: virtual math::Vector3 GetWorldLinearVel() const;
   
-      /// \brief Get the angular velocity of the geom
+      /// \brief Get the angular velocity of the collision
       public: virtual math::Vector3 GetRelativeAngularVel() const;
   
-      /// \brief Get the angular velocity of the geom in the world frame
+      /// \brief Get the angular velocity of the collision in the world frame
       public: virtual math::Vector3 GetWorldAngularVel() const;
   
-      /// \brief Get the linear acceleration of the geom
+      /// \brief Get the linear acceleration of the collision
       public: virtual math::Vector3 GetRelativeLinearAccel() const;
               
-      /// \brief Get the linear acceleration of the geom in the world frame
+      /// \brief Get the linear acceleration of the collision in the world frame
       public: virtual math::Vector3 GetWorldLinearAccel() const;
   
-      /// \brief Get the angular acceleration of the geom
+      /// \brief Get the angular acceleration of the collision
       public: virtual math::Vector3 GetRelativeAngularAccel() const;
   
-      /// \brief Get the angular acceleration of the geom in the world frame
+      /// \brief Get the angular acceleration of the collision in the world frame
       public: virtual math::Vector3 GetWorldAngularAccel() const;
   
       public: template< typename T>
@@ -147,11 +147,11 @@ namespace gazebo
       /// \brief Enable callback: Called when the link changes
       private: void EnabledCB(bool enabled);
   
-      /// \brief Create the bounding box for the geom
+      /// \brief Create the bounding box for the collision
       private: void CreateBoundingBox();
   
  
-      /// The link this geom belongs to
+      /// The link this collision belongs to
       protected: LinkPtr link;
     
       protected: bool placeable;

@@ -33,15 +33,15 @@ namespace gazebo
     /// \brief ODE cylinder shape 
     class ODECylinderShape : public CylinderShape
     {
-      public: ODECylinderShape(GeomPtr parent) : CylinderShape(parent) {}
+      public: ODECylinderShape(CollisionPtr parent) : CylinderShape(parent) {}
       public: virtual ~ODECylinderShape() {}
       public: void SetSize(const double &radius, const double &length)
       {
         CylinderShape::SetSize(radius, length);
-        ODEGeomPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
+        ODECollisionPtr oParent;
+        oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
   
-        oParent->SetGeom( dCreateCylinder( 0, radius, length ), true );
+        oParent->SetCollision( dCreateCylinder( 0, radius, length ), true );
       }
     };
 

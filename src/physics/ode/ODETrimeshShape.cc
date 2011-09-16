@@ -23,7 +23,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODETrimeshShape.hh"
 
@@ -33,7 +33,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODETrimeshShape::ODETrimeshShape(GeomPtr parent) : TrimeshShape(parent)
+ODETrimeshShape::ODETrimeshShape(CollisionPtr parent) : TrimeshShape(parent)
 {
 }
 
@@ -48,7 +48,7 @@ ODETrimeshShape::~ODETrimeshShape()
 /// Update function.
 void ODETrimeshShape::Update()
 {
-  ODEGeomPtr ogeom = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
+  ODECollisionPtr ocollision = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
 
   /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
@@ -56,8 +56,8 @@ void ODETrimeshShape::Update()
 
   // Fill in the (4x4) matrix.
   dReal* p_matrix = this->matrix_dblbuff + ( this->last_matrix_index * 16 );
-  const dReal *Pos = dGeomGetPosition(ogeom->GetGeomId());
-  const dReal *Rot = dGeomGetRotation(ogeom->GetGeomId());
+  const dReal *Pos = dGeomGetPosition(ocollision->GetCollisionId());
+  const dReal *Rot = dGeomGetRotation(ocollision->GetCollisionId());
 
   p_matrix[ 0 ] = Rot[ 0 ];
   p_matrix[ 1 ] = Rot[ 1 ];
@@ -79,7 +79,7 @@ void ODETrimeshShape::Update()
   // Flip to other matrix.
   this->last_matrix_index = !this->last_matrix_index;
 
-  dGeomTriMeshSetLastTransform( ogeom->GetGeomId(),
+  dGeomTriMeshSetLastTransform( ocollision->GetCollisionId(),
       *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
 }
 
@@ -92,7 +92,7 @@ void ODETrimeshShape::Load( sdf::ElementPtr &_sdf )
 
 void ODETrimeshShape::Init()
 {
-  ODEGeomPtr pgeom = boost::shared_static_cast<ODEGeom>(this->geomParent);
+  ODECollisionPtr pcollision = boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   TrimeshShape::Init();
 
@@ -132,8 +132,8 @@ void ODETrimeshShape::Init()
       (float*)vertices, 3*sizeof(float), numVertices,
       (int*)indices, numIndices, 3*sizeof(int));
 
-  pgeom->SetSpaceId( dSimpleSpaceCreate(pgeom->GetSpaceId()) );
-  pgeom->SetGeom( dCreateTriMesh(pgeom->GetSpaceId(), odeData,0,0,0 ), true);
+  pcollision->SetSpaceId( dSimpleSpaceCreate(pcollision->GetSpaceId()) );
+  pcollision->SetCollision( dCreateTriMesh(pcollision->GetSpaceId(), odeData,0,0,0 ), true);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;

@@ -33,11 +33,11 @@ namespace gazebo
 {
 	namespace physics
   {
-    class Geom;
+    class Collision;
     /// \addtogroup gazebo_physics
     /// \{
    
-    /// \brief A contact between two geoms. Each contact can consist of
+    /// \brief A contact between two collisions. Each contact can consist of
     ///        a numnber of contact points 
     class Contact
     {
@@ -59,8 +59,8 @@ namespace gazebo
       /// \brief Reset
       public: void Reset();
     
-      public: Geom *geom1;
-      public: Geom *geom2;
+      public: Collision *collision1;
+      public: Collision *collision2;
    
       public: std::vector<JointFeedback> forces;
   

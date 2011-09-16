@@ -78,6 +78,14 @@ void Base::Load( sdf::ElementPtr _sdf )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//// Update the parameters using new sdf values
+void Base::UpdateParameters( sdf::ElementPtr &_sdf )
+{
+  this->sdf = _sdf;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /// Finialize the object
 void Base::Fini()
 {
@@ -234,7 +242,8 @@ void Base::RemoveChildren()
 // Get by name helper
 BasePtr Base::GetByName(const std::string &_name)
 {
-  if (this->GetCompleteScopedName() == _name)
+  if (this->GetCompleteScopedName() == _name ||
+      this->GetName() == _name)
     return shared_from_this();
 
   BasePtr result;

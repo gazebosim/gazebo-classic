@@ -43,7 +43,7 @@ namespace gazebo
     class ContactSensor: public Sensor
     {
       /// \brief Constructor
-      /// \param body The underlying collision test uses an ODE geom, so
+      /// \param body The underlying collision test uses an ODE collision, so
       ///             ray sensors must be attached to a body.
       public: ContactSensor();
     
@@ -64,24 +64,24 @@ namespace gazebo
       /// Finalize the sensor
       protected: virtual void FiniChild();
   
-      /// \brief Get the number of geoms that the sensor is observing
-      public: unsigned int GetGeomCount() const;
+      /// \brief Get the number of collisions that the sensor is observing
+      public: unsigned int GetCollisionCount() const;
   
-      /// \brief Get a geom
-      public: physics::Geom *GetGeom(unsigned int index) const;
+      /// \brief Get a collision
+      public: physics::Collision *GetCollision(unsigned int index) const;
   
-      /// \brief Return the number of contacts for an observed geom
-      public: unsigned int GetGeomContactCount(unsigned int geomIndex) const;
+      /// \brief Return the number of contacts for an observed collision
+      public: unsigned int GetCollisionContactCount(unsigned int collisionIndex) const;
   
-      /// \brief Get a contact for a geom by index
-      public: physics::Contact GetGeomContact(unsigned int geom, unsigned int index) const;
+      /// \brief Get a contact for a collision by index
+      public: physics::Contact GetCollisionContact(unsigned int collision, unsigned int index) const;
   
-      private: std::vector<physics::Geom *> geoms;
+      private: std::vector<physics::Collision *> collisions;
 
       private: gazebo::physics::WorldPtr world;
       private: gazebo::physics::ModelPtr model;
       private: gazebo::physics::LinkPtr link;
-      private: gazebo::physics::GeomPtr geom;
+      private: gazebo::physics::CollisionPtr collision;
 
       public: gazebo::physics::ModelPtr GetParentModel() {return this->model;};
 

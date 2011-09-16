@@ -38,7 +38,7 @@ namespace gazebo
 	namespace physics
   {
     class Model;
-    class Geom;
+    class Collision;
   
     /// \addtogroup gazebo_physics
     /// \{
@@ -61,7 +61,10 @@ namespace gazebo
   
       /// \brief Finalize the body
       public: void Fini();
-  
+
+      /// \brief Update the parameters using new sdf values
+      public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
+
       /// \brief Update the body
       public: virtual void Update();
   
@@ -154,15 +157,15 @@ namespace gazebo
       /// \brief Set the mass of the body
       public: void SetInertial(const InertialPtr &_inertial);
   
-      /// Load a new geom helper function
-      /// \param _sdf SDF element used to load the geom
-      private: void LoadGeom( sdf::ElementPtr &_sdf );
+      /// Load a new collision helper function
+      /// \param _sdf SDF element used to load the collision
+      private: void LoadCollision( sdf::ElementPtr &_sdf );
 
-      /// \bridf keep a list of geoms for this body
-      private: std::vector<GeomPtr> geoms;
+      /// \bridf keep a list of collisions for this body
+      private: std::vector<CollisionPtr> collisions;
 
-      /// \bridf accessor for geoms
-      public: GeomPtr GetGeom(std::string name);
+      /// \bridf accessor for collisions
+      public: CollisionPtr GetCollision(std::string name);
   
       /// \brief Load a sensor
       private: void LoadSensor( sdf::ElementPtr &_sdf );
@@ -222,6 +225,9 @@ namespace gazebo
       /// \brief Joints that have this Link as a parent Link
       private: std::vector< JointPtr > childJoints;
       public: void AddChildJoint(JointPtr joint);
+
+      public: void StoreContact(CollisionPtr collision, Contact contact);
+      private: std::map<CollisionPtr, std::vector<Contact> > contacts;
 
     };
     /// \}

@@ -34,11 +34,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Triangle mesh geom
+    /// \brief Triangle mesh collision
     class TrimeshShape : public Shape
     {
       /// \brief Constructor
-      public: TrimeshShape(GeomPtr parent);
+      public: TrimeshShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~TrimeshShape();

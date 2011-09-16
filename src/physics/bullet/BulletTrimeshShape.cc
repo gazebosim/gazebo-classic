@@ -36,7 +36,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletTrimeshShape::BulletTrimeshShape(Geom *parent) 
+BulletTrimeshShape::BulletTrimeshShape(Collision *parent) 
   : TrimeshShape(parent)
 {
 }

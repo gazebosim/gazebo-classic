@@ -23,8 +23,8 @@
 #ifndef BULLETRAYGEOM_HH
 #define BULLETRAYGEOM_HH
 
-#include "BulletGeom.hh"
-#include "RayGeom.hh"
+#include "BulletCollision.hh"
+#include "RayCollision.hh"
 
 namespace gazebo
 {
@@ -33,29 +33,29 @@ namespace gazebo
   class OgreDynamicLines;
   class Visual;
 
-  /// \addtogroup gazebo_physics_geom
+  /// \addtogroup gazebo_physics_collision
   /// \{
-  /** \defgroup gazebo_ray_geom Ray geom
-      \brief Ray geom
+  /** \defgroup gazebo_ray_collision Ray collision
+      \brief Ray collision
 
-      This geom is used soley by ray sensors. It should not be directly 
+      This collision is used soley by ray sensors. It should not be directly 
       included in a world file.
   */
   /// \}
-  /// \addtogroup gazebo_ray_geom 
+  /// \addtogroup gazebo_ray_collision 
   /// \{
 
-  /// \brief Ray geom 
-  class BulletRayGeom : public RayGeom<BulletGeom>
+  /// \brief Ray collision 
+  class BulletRayCollision : public RayCollision<BulletCollision>
   {
     /// \brief Constructor
     /// \param body Link the ray is attached to
     /// \param displayRays Indicates if the rays should be displayed when 
     ///        rendering images
-    public: BulletRayGeom( Link *body, bool displayRays );
+    public: BulletRayCollision( Link *body, bool displayRays );
   
     /// \brief Destructor
-    public: virtual ~BulletRayGeom();
+    public: virtual ~BulletRayCollision();
   
     /// \brief Set the ray based on starting and ending points relative to 
     ///        the body
@@ -63,7 +63,7 @@ namespace gazebo
     /// \param posEnd End position, relative to the body
     public: void SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd);
   
-    /// \brief Update the tay geom
+    /// \brief Update the tay collision
     public: void Update();
   };
   

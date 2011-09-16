@@ -105,7 +105,7 @@ void Model::Load( sdf::ElementPtr &_sdf )
       // }
 
       // Load the link using the config node. This also loads all of the
-      // bodies geometries
+      // bodies collisionetries
       link->Load(linkElem);
 
       linkElem = _sdf->GetNextElement("link", linkElem);
@@ -190,7 +190,7 @@ void Model::Init()
 void Model::Update()
 {
   // clear contacts
-  for (std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
+  for (std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
        iter != this->contacts.end() ; iter++)
     (iter->second).clear();
   this->contacts.clear();
@@ -283,7 +283,36 @@ void Model::Fini()
   this->canonicalLink.reset();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//// Update the parameters using new sdf values
+void Model::UpdateParameters( sdf::ElementPtr &_sdf )
+{
+  Entity::UpdateParameters( _sdf );
 
+  if (_sdf->HasElement("link"))
+  {
+    sdf::ElementPtr linkElem = _sdf->GetElement("link");
+    while (linkElem)
+    {
+      LinkPtr link = boost::shared_dynamic_cast<Link>(
+          this->GetChild(linkElem->GetValueString("name")));
+      link->UpdateParameters(linkElem);
+      linkElem = _sdf->GetNextElement("link", linkElem);
+    }
+  }
+
+  if (_sdf->HasElement("joint"))
+  {
+    sdf::ElementPtr jointElem = _sdf->GetElement("joint");
+    while (jointElem)
+    {
+      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
+      joint->UpdateParameters(jointElem);
+      jointElem = _sdf->GetNextElement("joint", jointElem);
+    }
+  }
+
+}
  
 ////////////////////////////////////////////////////////////////////////////////
 // Reset the model
@@ -660,10 +689,10 @@ void Model::SetLaserRetro( const float &retro )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Store a geom, contact pair
-void Model::StoreContact(GeomPtr geom, Contact contact)
+void Model::StoreContact(CollisionPtr geom, Contact contact)
 {
   //gzerr << "here I shall add the contact and geom pair under link, to be retrieved later by plugin\n";
-  std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
+  std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
   if (iter == this->contacts.end())
   {
     std::vector<Contact> contact_list;
@@ -678,9 +707,9 @@ void Model::StoreContact(GeomPtr geom, Contact contact)
 
 ////////////////////////////////////////////////////////////////////////////////
 // retrieve list of contacts for a geom
-std::vector<Contact> Model::GetContacts(GeomPtr geom)
+std::vector<Contact> Model::GetContacts(CollisionPtr geom)
 {
-  std::map<GeomPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
+  std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
   if (iter == this->contacts.end())
     return std::vector<Contact>(); // return empty list
   else

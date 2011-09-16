@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     static std::string EntityTypename[] = { 
-      "common", "entity", "model", "body", "geom", "ball", "box", "cylinder", 
+      "common", "entity", "model", "body", "collision", "ball", "box", "cylinder", 
       "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", 
       "plane", "shape", "slider", "sphere", "trimesh", "universal", "light",
       "visual" };
@@ -71,6 +71,9 @@ namespace gazebo
       public: virtual void Init() {}
       public: virtual void Reset() {}
       public: virtual void Update() {}
+
+      /// \brief Update the parameters using new sdf values
+      public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
 
       /// \brief Set the name of the entity
       /// \param name Link name
@@ -154,7 +157,7 @@ namespace gazebo
       ///        model1::...::modelN::entityName
       public: std::string GetScopedName() const;
   
-      /// \brief Return the name of this entity with the model+body+geom scope
+      /// \brief Return the name of this entity with the model+body+collision scope
       ///        model1::...::modelN::bodyN::entityName
       public: std::string GetCompleteScopedName() const;
   

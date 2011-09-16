@@ -64,13 +64,18 @@ Inertial::~Inertial()
 ////////////////////////////////////////////////////////////////////////////////
 void Inertial::Load( sdf::ElementPtr _sdf)
 {
+  this->UpdateParameters(_sdf);
+}
+
+/// update the parameters using new sdf values
+void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
+{
   this->sdf = _sdf;
 
   math::Vector3 center(0,0,0);
   if (this->sdf->HasElement("origin"))
     center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
   this->SetCoG(center.x, center.y, center.z);
-
  
   sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia"); 
   this->SetInertiaMatrix( 

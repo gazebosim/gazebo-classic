@@ -70,8 +70,8 @@ namespace gazebo
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(EntityPtr parent) = 0;
   
-      /// \brief Create a geom
-      public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
+      /// \brief Create a collision
+      public: virtual CollisionPtr CreateCollision(const std::string &shapeTypename, 
                                          LinkPtr body) = 0;
   
       /// \brief Create a new joint

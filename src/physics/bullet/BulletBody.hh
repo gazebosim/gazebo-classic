@@ -32,7 +32,7 @@ namespace gazebo
 {
   class XMLConfigNode;
   class BulletMotionState;
-  class BulletGeom;
+  class BulletCollision;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -60,9 +60,9 @@ namespace gazebo
     /// \brief Update the body
     public: virtual void Update();
 
-    /// \brief Attach a geom to this body
-    /// \param geom Geometery to attach to this body
-    public: virtual void AttachGeom( Geom *geom );
+    /// \brief Attach a collision to this body
+    /// \param collision Collisionetery to attach to this body
+    public: virtual void AttachCollision( Collision *collision );
 
     /// \brief Called when the pose of the entity (or one of its parents) has
     /// changed
@@ -119,8 +119,8 @@ namespace gazebo
     /// \brief Set the angular damping factor
     public: virtual void SetAngularDamping(double damping);
 
-    /// \brief Set the relative pose of a child geom.
-    public: void SetGeomRelativePose(BulletGeom *geom, const math::Pose &newPose);
+    /// \brief Set the relative pose of a child collision.
+    public: void SetCollisionRelativePose(BulletCollision *collision, const math::Pose &newPose);
 
     private: btCompoundShape *compoundShape;
     private: BulletMotionState *motionState;

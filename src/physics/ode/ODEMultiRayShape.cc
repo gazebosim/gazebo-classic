@@ -17,7 +17,7 @@
 #include "physics/World.hh"
 #include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODELink.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODERayShape.hh"
 #include "physics/ode/ODEMultiRayShape.hh"
@@ -28,7 +28,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-ODEMultiRayShape::ODEMultiRayShape(GeomPtr parent)
+ODEMultiRayShape::ODEMultiRayShape(CollisionPtr parent)
   : MultiRayShape(parent)
 {
   this->SetName("ODE Multiray Shape");
@@ -43,9 +43,9 @@ ODEMultiRayShape::ODEMultiRayShape(GeomPtr parent)
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  ODELinkPtr pLink = boost::shared_static_cast<ODELink>(this->geomParent->GetLink());
+  ODELinkPtr pLink = boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
   pLink->SetSpaceId( this->raySpaceId );
-  boost::shared_static_cast<ODEGeom>(parent)->SetSpaceId(this->raySpaceId);
+  boost::shared_static_cast<ODECollision>(parent)->SetSpaceId(this->raySpaceId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,9 +78,9 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 {
   int n = 0;
   dContactGeom contact;
-  ODEGeom *geom1, *geom2 = NULL;
-  ODEGeom *rayGeom = NULL;
-  ODEGeom *hitGeom = NULL;
+  ODECollision *collision1, *collision2 = NULL;
+  ODECollision *rayCollision = NULL;
+  ODECollision *hitCollision = NULL;
   ODEMultiRayShape *self = NULL;
 
   self = (ODEMultiRayShape*) data;
@@ -98,56 +98,56 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
   }
   else
   {
-    geom1 = NULL;
-    geom2 = NULL;
+    collision1 = NULL;
+    collision2 = NULL;
 
-    // Get pointers to the underlying geoms
+    // Get pointers to the underlying collisions
     if (dGeomGetClass(o1) == dGeomTransformClass)
-      geom1 = (ODEGeom*) dGeomGetData(dGeomTransformGetGeom(o1));
+      collision1 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(o1));
     else
-      geom1 = (ODEGeom*) dGeomGetData(o1);
+      collision1 = (ODECollision*) dGeomGetData(o1);
 
     if (dGeomGetClass(o2) == dGeomTransformClass)
-      geom2 = (ODEGeom*) dGeomGetData(dGeomTransformGetGeom(o2));
+      collision2 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(o2));
     else
-      geom2 = (ODEGeom*) dGeomGetData(o2);
+      collision2 = (ODECollision*) dGeomGetData(o2);
 
-    assert(geom1 && geom2);
+    assert(collision1 && collision2);
 
-    rayGeom = NULL;
-    hitGeom = NULL;
+    rayCollision = NULL;
+    hitCollision = NULL;
 
     // Figure out which one is a ray; note that this assumes
-    // that the ODE dRayClass is used *soley* by the RayGeom.
+    // that the ODE dRayClass is used *soley* by the RayCollision.
     if (dGeomGetClass(o1) == dRayClass)
     {
-      rayGeom = (ODEGeom*) geom1;
-      hitGeom = (ODEGeom*) geom2;
+      rayCollision = (ODECollision*) collision1;
+      hitCollision = (ODECollision*) collision2;
       dGeomRaySetParams(o1, 0, 0);
       dGeomRaySetClosestHit(o1, 1);
     }
 
     if (dGeomGetClass(o2) == dRayClass)
     {
-      assert(rayGeom == NULL);
-      rayGeom = (ODEGeom*) geom2;
-      hitGeom = (ODEGeom* )geom1;
+      assert(rayCollision == NULL);
+      rayCollision = (ODECollision*) collision2;
+      hitCollision = (ODECollision* )collision1;
       dGeomRaySetParams(o2, 0, 0);
       dGeomRaySetClosestHit(o2, 1);
     }
 
-    // Check for ray/geom intersections
-    if (rayGeom && hitGeom)
+    // Check for ray/collision intersections
+    if (rayCollision && hitCollision)
     {
       n = dCollide(o1, o2, 1, &contact, sizeof(contact));
 
       if ( n > 0 )
       {
-        RayShapePtr shape = boost::shared_static_cast<RayShape>(rayGeom->GetShape());
+        RayShapePtr shape = boost::shared_static_cast<RayShape>(rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {
           shape->SetLength(contact.depth );
-          shape->SetRetro( hitGeom->GetLaserRetro() );
+          shape->SetRetro( hitCollision->GetLaserRetro() );
         }
       }
     }
@@ -155,16 +155,16 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Add a ray to the geom
+/// Add a ray to the collision
 void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
 {
   MultiRayShape::AddRay(start,end);
-  ODEGeomPtr odeGeom( new ODEGeom(this->geomParent->GetLink()) );
-  odeGeom->SetName("ODE Ray Geom");
-  odeGeom->SetSpaceId(this->raySpaceId);
+  ODECollisionPtr odeCollision( new ODECollision(this->collisionParent->GetLink()) );
+  odeCollision->SetName("ODE Ray Collision");
+  odeCollision->SetSpaceId(this->raySpaceId);
 
-  ODERayShapePtr ray( new ODERayShape(odeGeom, true ));
-  odeGeom->SetShape(ray);
+  ODERayShapePtr ray( new ODERayShape(odeCollision, true ));
+  odeCollision->SetShape(ray);
 
   ray->SetPoints(start,end);
   this->rays.push_back(ray);

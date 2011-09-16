@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: BulletGeom class
+/* Desc: BulletCollision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id:$
@@ -31,7 +31,7 @@
 #include "World.hh"
 #include "BulletLink.hh"
 
-#include "BulletGeom.hh"
+#include "BulletCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -43,17 +43,17 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletGeom::BulletGeom( Link *_body )
-    : Geom(_body)
+BulletCollision::BulletCollision( Link *_body )
+    : Collision(_body)
 {
-  this->SetName("Bullet Geom");
+  this->SetName("Bullet Collision");
   this->bulletPhysics = dynamic_cast<BulletPhysics*>(this->physicsEngine);
   this->collisionShape = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-BulletGeom::~BulletGeom()
+BulletCollision::~BulletCollision()
 {
   if (this->collisionShape)
     delete this->collisionShape;
@@ -61,52 +61,52 @@ BulletGeom::~BulletGeom()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the geom
-void BulletGeom::Load(common::XMLConfigNode *node)
+/// Load the collision
+void BulletCollision::Load(common::XMLConfigNode *node)
 {
-  Geom::Load(node);
+  Collision::Load(node);
 //  this->visualNode->SetPose( this->GetRelativePose() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the body based on our common::XMLConfig node
-void BulletGeom::Save(std::string &prefix, std::ostream &stream)
+void BulletCollision::Save(std::string &prefix, std::ostream &stream)
 {
-  Geom::Save(prefix, stream);
+  Collision::Save(prefix, stream);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update
-void BulletGeom::Update()
+void BulletCollision::Update()
 {
-  Geom::Update();
+  Collision::Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // On pose change
-void BulletGeom::OnPoseChange()
+void BulletCollision::OnPoseChange()
 {
   math::Pose pose = this->GetRelativePose();
   BulletLink *bbody = (BulletLink*)(this->body);
 
-  bbody->SetGeomRelativePose(this, pose);
+  bbody->SetCollisionRelativePose(this, pose);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the category bits, used during collision detection
-void BulletGeom::SetCategoryBits(unsigned int bits)
+void BulletCollision::SetCategoryBits(unsigned int bits)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
-void BulletGeom::SetCollideBits(unsigned int bits)
+void BulletCollision::SetCollideBits(unsigned int bits)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the mass of the geom
-Mass BulletGeom::GetLinkMassMatrix()
+/// Get the mass of the collision
+Mass BulletCollision::GetLinkMassMatrix()
 {
   Mass result;
   return result;
@@ -114,7 +114,7 @@ Mass BulletGeom::GetLinkMassMatrix()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void BulletGeom::GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const
+void BulletCollision::GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const
 {
   if (this->collisionShape)
   {
@@ -128,7 +128,7 @@ void BulletGeom::GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the collision shape
-void BulletGeom::SetCollisionShape( btCollisionShape *shape ) 
+void BulletCollision::SetCollisionShape( btCollisionShape *shape ) 
 {
   this->collisionShape = shape;
 
@@ -141,14 +141,14 @@ void BulletGeom::SetCollisionShape( btCollisionShape *shape )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bullet collision shape
-btCollisionShape *BulletGeom::GetCollisionShape() const
+btCollisionShape *BulletCollision::GetCollisionShape() const
 {
   return this->collisionShape;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the index of the compound shape
-void BulletGeom::SetCompoundShapeIndex( int index )
+void BulletCollision::SetCompoundShapeIndex( int index )
 {
   this->compoundShapeIndex = 0;
 }

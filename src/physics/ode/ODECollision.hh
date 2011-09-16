@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Geom class
+/* Desc: Collision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
@@ -28,7 +28,7 @@
 #include "physics/ode/ODESurfaceParams.hh"
 
 #include "physics/PhysicsTypes.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 
 namespace gazebo
 {
@@ -40,30 +40,30 @@ namespace gazebo
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
-    /// \brief Base class for all ODE geoms
-    class ODEGeom : public Geom
+    /// \brief Base class for all ODE collisions
+    class ODECollision : public Collision
     {
       /// \brief Constructor
-      public: ODEGeom(LinkPtr link);
+      public: ODECollision(LinkPtr link);
     
       /// \brief Destructor
-      public: virtual ~ODEGeom();
+      public: virtual ~ODECollision();
   
-      /// \brief Load the geom
+      /// \brief Load the collision
       public: virtual void Load( sdf::ElementPtr &_sdf );
 
-      /// \brief Finalize the geom
+      /// \brief Finalize the collision
       public: void Fini();
  
       /// \brief Set the encapsulated geometry object
-      public: void SetGeom(dGeomID geomId, bool placeable);
+      public: void SetCollision(dGeomID collisionId, bool placeable);
     
-      /// \brief Return the geom id
-      /// \return The geom id
-      public: dGeomID GetGeomId() const;
+      /// \brief Return the collision id
+      /// \return The collision id
+      public: dGeomID GetCollisionId() const;
     
-      /// \brief Get the ODE geom class
-      public: int GetGeomClass() const;
+      /// \brief Get the ODE collision class
+      public: int GetCollisionClass() const;
     
       public: virtual void OnPoseChange();
   
@@ -78,16 +78,16 @@ namespace gazebo
       /// \brief Get the bounding box, defined by the physics engine
       public: virtual math::Box GetBoundingBox() const;
   
-      /// \brief Get the geom's space ID
+      /// \brief Get the collision's space ID
       public: dSpaceID GetSpaceId() const;
   
-      /// \brief Set the geom's space ID
+      /// \brief Set the collision's space ID
       public: void SetSpaceId(dSpaceID spaceid);
   
       protected: dSpaceID spaceId;
   
-      ///  ID for the sub-geom
-      protected: dGeomID geomId;
+      ///  ID for the sub-collision
+      protected: dGeomID collisionId;
 
       ///  Contact parameters
       public: ODESurfaceParamsPtr surface; 

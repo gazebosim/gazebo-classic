@@ -23,7 +23,7 @@
 #include "common/Global.hh"
 #include "World.hh"
 
-#include "BulletRayGeom.hh"
+#include "BulletRayCollision.hh"
 #include "BulletPhysics.hh"
 #include "BulletLink.hh"
 #include "BulletRaySensor.hh"
@@ -51,7 +51,7 @@ BulletRaySensor::BulletRaySensor(Link *_body)
 /// Destructor
 BulletRaySensor::~BulletRaySensor()
 {
-  std::vector<BulletRayGeom*>::iterator iter;
+  std::vector<BulletRayCollision*>::iterator iter;
 
   for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
   {
@@ -65,15 +65,15 @@ BulletRaySensor::~BulletRaySensor()
 void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end, double minRange, 
                           double maxRange, bool display)
 {
-  BulletRayGeom *rayGeom;
+  BulletRayCollision *rayCollision;
   
-  rayGeom = (BulletRayGeom*)this->GetWorld()->CreateGeom("ray", this->body );
-  rayGeom->SetDisplayRays(display);
-  rayGeom->SetMinLength(minRange);
-  rayGeom->SetMaxLength(maxRange);
+  rayCollision = (BulletRayCollision*)this->GetWorld()->CreateCollision("ray", this->body );
+  rayCollision->SetDisplayRays(display);
+  rayCollision->SetMinLength(minRange);
+  rayCollision->SetMaxLength(maxRange);
 
-  rayGeom->SetPoints(start,end);
-  this->rays.push_back(rayGeom);
+  rayCollision->SetPoints(start,end);
+  this->rays.push_back(rayCollision);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ double BulletRaySensor::GetFiducial(int index) const
 /// Update the ray sensor
 void BulletRaySensor::Update()
 {
-  std::vector<BulletRayGeom*>::iterator iter;
+  std::vector<BulletRayCollision*>::iterator iter;
 
   for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
   {

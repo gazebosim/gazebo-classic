@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
+/* Desc: Heightmap collisionetry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: BulletHeightmapGeom.cc 7640 2009-05-13 02:06:08Z natepak $
+ * CVS: $Id: BulletHeightmapCollision.cc 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #include <iostream>
@@ -31,7 +31,7 @@
 #include "rendering/OgreHeightmap.hh"
 #include "common/Exception.hh"
 #include "Link.hh"
-#include "BulletHeightmapGeom.hh"
+#include "BulletHeightmapCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -43,8 +43,8 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletHeightmapGeom::BulletHeightmapGeom(Link *body)
-    : BulletGeom(body)
+BulletHeightmapCollision::BulletHeightmapCollision(Link *body)
+    : BulletCollision(body)
 {
   common::Param::Begin(&this->parameters);
   this->imageFilenameP = new common::ParamT<std::string>("image","",1);
@@ -60,7 +60,7 @@ BulletHeightmapGeom::BulletHeightmapGeom(Link *body)
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-BulletHeightmapGeom::~BulletHeightmapGeom()
+BulletHeightmapCollision::~BulletHeightmapCollision()
 {
   delete this->imageFilenameP;
   delete this->worldTextureP;
@@ -73,14 +73,14 @@ BulletHeightmapGeom::~BulletHeightmapGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void BulletHeightmapGeom::Update()
+void BulletHeightmapCollision::Update()
 {
-  BulletGeom::Update();
+  BulletCollision::Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a lookup table of the terrain's height
-void BulletHeightmapGeom::FillHeightMap()
+void BulletHeightmapCollision::FillHeightMap()
 {
   unsigned int x,y;
   float *heights = new float[this->width * this->height];
@@ -124,7 +124,7 @@ void BulletHeightmapGeom::FillHeightMap()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void BulletHeightmapGeom::Load(common::XMLConfigNode *node)
+void BulletHeightmapCollision::Load(common::XMLConfigNode *node)
 {
 
   Image tmpImage;
@@ -155,14 +155,14 @@ void BulletHeightmapGeom::Load(common::XMLConfigNode *node)
   // Step 2: Fill the bullet heightmap 
   this->FillHeightMap();
 
-  BulletGeom::Load(node);
+  BulletCollision::Load(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
-void BulletHeightmapGeom::Save(std::string &prefix, std::ostream &stream)
+void BulletHeightmapCollision::Save(std::string &prefix, std::ostream &stream)
 {
-  BulletGeom::Save(prefix, stream);
+  BulletCollision::Save(prefix, stream);
   stream << prefix << *(this->imageFilenameP) << "\n";
   stream << prefix << *(this->worldTextureP) << "\n";
   stream << prefix << *(this->detailTextureP) << "\n";

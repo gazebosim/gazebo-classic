@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: ODEGeom class
+/* Desc: ODECollision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
@@ -27,44 +27,44 @@
 #include "physics/SurfaceParams.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODELink.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEGeom::ODEGeom( LinkPtr _link )
-    : Geom(_link)
+ODECollision::ODECollision( LinkPtr _link )
+    : Collision(_link)
 {
-  this->SetName("ODE_Geom");
-  this->geomId = NULL;
+  this->SetName("ODE_Collision");
+  this->collisionId = NULL;
   this->surface.reset(new ODESurfaceParams());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-ODEGeom::~ODEGeom()
+ODECollision::~ODECollision()
 {
-  if (this->geomId)
-    dGeomDestroy(this->geomId);
+  if (this->collisionId)
+    dGeomDestroy(this->collisionId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the geom
-void ODEGeom::Load( sdf::ElementPtr &_sdf )
+/// Load the collision
+void ODECollision::Load( sdf::ElementPtr &_sdf )
 {
-  Geom::Load(_sdf);
+  Collision::Load(_sdf);
 
   if (_sdf->HasElement("surface"))
     this->surface->Load( _sdf->GetElement("surface") );
 
   this->SetSpaceId( boost::shared_static_cast<ODELink>(this->link)->GetSpaceId() );
 
-  /*std::cout << "\n\n\nODEGeom::Load test\n\n\n" <<  this->geomId
+  /*std::cout << "\n\n\nODECollision::Load test\n\n\n" <<  this->collisionId
             << "\n\n" << this->placeable << "\n\n\n";
 
-  if (this->geomId && this->placeable)
+  if (this->collisionId && this->placeable)
   {
     math::Pose localPose;
     dQuaternion q;
@@ -77,11 +77,11 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
 
-    // Set the pose of the encapsulated geom; this is always relative
+    // Set the pose of the encapsulated collision; this is always relative
     // to the CoM
-    dGeomSetOffsetPosition(this->geomId, localPose.pos.x, localPose.pos.y, 
+    dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
         localPose.pos.z);
-    dGeomSetOffsetQuaternion(this->geomId, q);
+    dGeomSetOffsetQuaternion(this->collisionId, q);
   }*/
 
 
@@ -92,23 +92,23 @@ void ODEGeom::Load( sdf::ElementPtr &_sdf )
   }
 }
 
-/// \brief Finalize the geom
-void ODEGeom::Fini()
+/// \brief Finalize the collision
+void ODECollision::Fini()
 {
   this->surface.reset();
-  Geom::Fini();
+  Collision::Fini();
 }
  
 ////////////////////////////////////////////////////////////////////////////////
 // Pose change callback
-void ODEGeom::OnPoseChange()
+void ODECollision::OnPoseChange()
 {
   math::Pose localPose;
   dQuaternion q;
 
-  if (this->IsStatic() && this->geomId && this->placeable)
+  if (this->IsStatic() && this->collisionId && this->placeable)
   {
-    // Transform into global pose since a static geom does not have a link 
+    // Transform into global pose since a static collision does not have a link 
     localPose = this->GetWorldPose();
 
     q[0] = localPose.rot.w;
@@ -116,11 +116,11 @@ void ODEGeom::OnPoseChange()
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
 
-    dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, 
+    dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
                      localPose.pos.z);
-    dGeomSetQuaternion(this->geomId, q);
+    dGeomSetQuaternion(this->collisionId, q);
   }
-  else if (this->geomId && this->placeable)
+  else if (this->collisionId && this->placeable)
   {
     // Transform into CoM relative Pose
     localPose = this->GetRelativePose();
@@ -130,48 +130,48 @@ void ODEGeom::OnPoseChange()
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
 
-    // Set the pose of the encapsulated geom; this is always relative
+    // Set the pose of the encapsulated collision; this is always relative
     // to the CoM
-    dGeomSetOffsetPosition(this->geomId, localPose.pos.x, localPose.pos.y, 
+    dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
         localPose.pos.z);
-    dGeomSetOffsetQuaternion(this->geomId, q);
+    dGeomSetOffsetQuaternion(this->collisionId, q);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
-void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
+void ODECollision::SetCollision(dGeomID collisionId, bool placeable)
 {
   // Must go first in this function
-  this->geomId = geomId;
+  this->collisionId = collisionId;
 
-  Geom::SetGeom(placeable);
+  Collision::SetCollision(placeable);
 
-  if ( dGeomGetSpace(this->geomId) == 0 )
+  if ( dGeomGetSpace(this->collisionId) == 0 )
   {
-    dSpaceAdd(this->spaceId, this->geomId);
-    assert(dGeomGetSpace(this->geomId) != 0);
+    dSpaceAdd(this->spaceId, this->collisionId);
+    assert(dGeomGetSpace(this->collisionId) != 0);
   }
 
-  dGeomSetData(this->geomId, this);
+  dGeomSetData(this->collisionId, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Return the geom id
-dGeomID ODEGeom::GetGeomId() const
+// Return the collision id
+dGeomID ODECollision::GetCollisionId() const
 {
-  return this->geomId;
+  return this->collisionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the ODE geom class
-int ODEGeom::GetGeomClass() const
+/// Get the ODE collision class
+int ODECollision::GetCollisionClass() const
 {
   int result = 0;
 
-  if (this->geomId)
+  if (this->collisionId)
   {
-    result = dGeomGetClass( this->geomId );
+    result = dGeomGetClass( this->collisionId );
   }
 
   return result;
@@ -180,35 +180,35 @@ int ODEGeom::GetGeomClass() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the category bits, used during collision detection
-void ODEGeom::SetCategoryBits(unsigned int bits)
+void ODECollision::SetCategoryBits(unsigned int bits)
 {
-  if (this->geomId)
-    dGeomSetCategoryBits(this->geomId, bits);
+  if (this->collisionId)
+    dGeomSetCategoryBits(this->collisionId, bits);
   if (this->spaceId)
     dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
-void ODEGeom::SetCollideBits(unsigned int bits)
+void ODECollision::SetCollideBits(unsigned int bits)
 {
-  if (this->geomId)
-    dGeomSetCollideBits(this->geomId, bits);
+  if (this->collisionId)
+    dGeomSetCollideBits(this->collisionId, bits);
   if (this->spaceId)
     dGeomSetCollideBits((dGeomID)this->spaceId, bits);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-math::Box ODEGeom::GetBoundingBox() const
+math::Box ODECollision::GetBoundingBox() const
 {
   math::Box box;
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));
 
-  //if (this->geomId && this->type != Shape::PLANE)
-  dGeomGetAABB(this->geomId, aabb);
+  //if (this->collisionId && this->type != Shape::PLANE)
+  dGeomGetAABB(this->collisionId, aabb);
 
   box.min.Set(aabb[0], aabb[2], aabb[4]);
   box.max.Set(aabb[1], aabb[3], aabb[5]);
@@ -218,14 +218,14 @@ math::Box ODEGeom::GetBoundingBox() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bodies space ID
-dSpaceID ODEGeom::GetSpaceId() const
+dSpaceID ODECollision::GetSpaceId() const
 {
   return this->spaceId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the bodies space ID
-void ODEGeom::SetSpaceId(dSpaceID spaceid)
+void ODECollision::SetSpaceId(dSpaceID spaceid)
 {
   this->spaceId = spaceid;
 }

@@ -25,9 +25,9 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/World.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODELink.hh"
 
@@ -87,10 +87,10 @@ void ODELink::Init()
     {
       if ((*iter)->HasType(Base::GEOM))
       {
-        ODEGeomPtr g = boost::shared_static_cast<ODEGeom>(*iter);
-        if (g->IsPlaceable() && g->GetGeomId())
+        ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
+        if (g->IsPlaceable() && g->GetCollisionId())
         {
-          dGeomSetBody(g->GetGeomId(), this->linkId);
+          dGeomSetBody(g->GetCollisionId(), this->linkId);
           // update pose immediately
           math::Pose localPose = g->GetRelativePose();
           dQuaternion q;
@@ -98,11 +98,11 @@ void ODELink::Init()
           q[1] = localPose.rot.x;
           q[2] = localPose.rot.y;
           q[3] = localPose.rot.z;
-          // Set the pose of the encapsulated geom; this is always relative
+          // Set the pose of the encapsulated collision; this is always relative
           // to the CoM
-          dGeomSetOffsetPosition(g->GetGeomId(), localPose.pos.x, localPose.pos.y, 
+          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x, localPose.pos.y, 
               localPose.pos.z);
-          dGeomSetOffsetQuaternion(g->GetGeomId(), q);
+          dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
         }
       }
     }

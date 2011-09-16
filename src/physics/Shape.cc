@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/Shape.hh"
 
 using namespace gazebo;
@@ -22,11 +22,11 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Shape::Shape(GeomPtr p)
+Shape::Shape(CollisionPtr p)
   : Base(p) 
 {
   this->AddType(Base::SHAPE);
-  this->geomParent = p;
+  this->collisionParent = p;
   this->SetName("shape");
 }
 
@@ -34,8 +34,8 @@ Shape::Shape(GeomPtr p)
 // Destructor
 Shape::~Shape()
 {
-  if (this->geomParent)
-    this->geomParent->SetShape(ShapePtr());
+  if (this->collisionParent)
+    this->collisionParent->SetShape(ShapePtr());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

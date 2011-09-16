@@ -31,7 +31,7 @@
 
 #include "common/Param.hh"
 #include "PhysicsEngine.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "Shape.hh"
 
 namespace gazebo
@@ -119,8 +119,8 @@ class BulletPhysics : public PhysicsEngine
   /// \brief Create a new body
   public: virtual Link *CreateLink(Entity *parent);
 
-  /// \brief Create a new geom
-  public: virtual Geom *CreateGeom(std::string type, Link *body);
+  /// \brief Create a new collision
+  public: virtual Collision *CreateCollision(std::string type, Link *body);
 
   /// \brief Create a new joint
   public: virtual Joint *CreateJoint(std::string type);

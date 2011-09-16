@@ -58,6 +58,9 @@ namespace gazebo
       /// \brief Update the joint
       public: void Update();
   
+      /// \brief update the parameters using new sdf values
+      public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
+
       /// \brief Set the joint to show visuals
       public: void ShowJoints(const bool &s);
   

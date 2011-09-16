@@ -42,8 +42,8 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager( this->variantManager, variantFactory);
   connect( this->variantManager, 
-           SIGNAL(valueChanged(QtProperty*, const QVariant &)), 
-           this, SLOT(OnPropertyChanged(QtProperty *, const QVariant &)));
+           SIGNAL(propertyChanged(QtProperty*)), 
+           this, SLOT(OnPropertyChanged(QtProperty *)));
 
   //this->propTreeBrowser->setHeaderLabel(tr("Properties"));
   //this->propTreeBrowser->setColumnCount(1);
@@ -62,6 +62,8 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->entityInfoSub = this->node->Subscribe("~/entity_info", &ModelListWidget::OnEntityInfo, this);
   this->entityPub = this->node->Advertise<msgs::Entity>("~/entity");
   this->newEntitySub = this->node->Subscribe("~/entity", &ModelListWidget::OnEntity, this);
+
+  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
   /*msgs::Request msg;
   msg.set_index( 1 );
@@ -249,7 +251,7 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
   if (_parentItem)
     _parentItem->addSubProperty(topItem);
   else
-  this->propTreeBrowser->addProperty(topItem);
+    this->propTreeBrowser->addProperty(topItem);
 
 
   for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
@@ -264,11 +266,12 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item)
   {
-    std::string modelName = _item->text(0).toStdString();
+    std::string listText = _item->text(0).toStdString();
+    std::string listData = _item->data(0, Qt::UserRole ).toString().toStdString();
 
     msgs::Entity msg;
-    msgs::Init(msg, modelName);
-    msg.set_name( modelName );
+    msgs::Init(msg, listData);
+    msg.set_name( listData );
     msg.set_request_info( true );
 
     QTimer::singleShot(200,this,SLOT(Update()));
@@ -281,7 +284,9 @@ void ModelListWidget::Update()
   if (this->sdfElement)
   {
     this->propTreeBrowser->clear();
+    this->fillingPropertyTree = true;
     this->FillPropertyTree(this->sdfElement, NULL);
+    this->fillingPropertyTree = false;
   }
   else
   {
@@ -291,7 +296,6 @@ void ModelListWidget::Update()
 
 void ModelListWidget::OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg )
 {
-  printf("OnEntityInfo\n");
   this->sdfElement.reset(new sdf::Element);
   sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
   sdf::readString( _msg->sdf(), this->sdfElement );
@@ -300,46 +304,38 @@ void ModelListWidget::OnEntityInfo( const boost::shared_ptr<msgs::Factory const>
 void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg )
 {
   this->ProcessEntity(*_msg);
-  /*std::string name = _msg->name();
-
-  QList<QTreeWidgetItem*> list = this->modelTreeWidget->findItems( 
-      name.c_str(), Qt::MatchExactly);
-
-  if (list.size() == 0)
-  {
-    if (!_msg->has_request_delete() || !_msg->request_delete())
-    {
-      // Create a top-level tree item for the path
-      QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
-          QStringList(QString("%1").arg( QString::fromStdString(name)) ));
-      this->modelTreeWidget->addTopLevelItem(topItem);
-    }
-  }
-  else
-  {
-    if (_msg->has_request_delete() && _msg->request_delete())
-    {
-      QList<QTreeWidgetItem*>::Iterator iter;
-      for (iter = list.begin(); iter != list.end(); iter++)
-      {
-        int i = this->modelTreeWidget->indexOfTopLevelItem(*iter);
-        this->modelTreeWidget->takeTopLevelItem(i);
-        delete *iter;
-      }
-    }
-  }
-  */
-
 }
 
 void ModelListWidget::ProcessEntity( const msgs::Entity &_msg )
 {
   std::string name = _msg.name();
 
-  QList<QTreeWidgetItem*> list = this->modelTreeWidget->findItems( 
-      name.c_str(), Qt::MatchExactly | Qt::MatchRecursive);
+  QTreeWidgetItem *listItem = NULL;
 
-  if (list.size() == 0)
+  // Find an existing element with the name from the message
+  for (int i=0; i < this->modelTreeWidget->topLevelItemCount() && !listItem;i++)
+  {
+    QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
+    std::string data = item->data(0, Qt::UserRole).toString().toStdString();
+    if (data == name)
+    {
+      listItem = item;
+      break;
+    }
+
+    for (int j=0; j < item->childCount(); j++)
+    {
+      QTreeWidgetItem *childItem = item->child(j);
+      data = childItem->data(0, Qt::UserRole).toString().toStdString();
+      if (data == name)
+      {
+        listItem = childItem;
+        break;
+      }
+    }
+  }
+
+  if (!listItem)
   {
     if (!_msg.has_request_delete() || !_msg.request_delete())
     {
@@ -370,13 +366,8 @@ void ModelListWidget::ProcessEntity( const msgs::Entity &_msg )
   {
     if (_msg.has_request_delete() && _msg.request_delete())
     {
-      QList<QTreeWidgetItem*>::Iterator iter;
-      for (iter = list.begin(); iter != list.end(); iter++)
-      {
-        int i = this->modelTreeWidget->indexOfTopLevelItem(*iter);
-        this->modelTreeWidget->takeTopLevelItem(i);
-        delete *iter;
-      }
+      int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
+      this->modelTreeWidget->takeTopLevelItem(i);
     }
   }
 }
@@ -432,13 +423,174 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   }
 }
 
-void ModelListWidget::OnPropertyChanged(QtProperty *_item, const QVariant &_val)
+void ModelListWidget::OnPropertyChanged(QtProperty *_item)
+{
+  if (this->fillingPropertyTree)
+    return;
+
+  msgs::Factory msg;
+  msgs::Init(msg,"update");
+  msg.set_edit_name( this->sdfElement->GetValueString("name") );
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin(); 
+       iter != properties.end(); iter++)
+  {
+    if ( (*iter)->propertyName().toStdString() == this->sdfElement->GetName())
+    {
+      this->FillSDF( (*iter), this->sdfElement);
+    }
+  }
+
+  msg.set_sdf( this->sdfElement->ToString("") );
+
+  std::string str =  this->sdfElement->ToString("");
+  std::cout << "ToString[" << str << "]\n";
+  this->factoryPub->Publish(msg);
+}
+
+void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
+{
+  // Set all the attribute values
+  for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
+      iter != _elem->attributes.end(); iter++)
+  {
+    if ( (*iter)->IsPose())
+    {
+      math::Pose pose;
+      math::Vector3 rpy;
+
+      QList<QtProperty*> subProperties = _item->subProperties();
+      for (QList<QtProperty*>::iterator propIter = subProperties.begin();
+          propIter != subProperties.end(); propIter++)
+      {
+        if ( (*propIter)->propertyName() == "X")
+          pose.pos.x = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Y")
+          pose.pos.y = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Z")
+          pose.pos.z = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Roll")
+          rpy.x = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Pitch")
+          rpy.y = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Yaw")
+          rpy.z = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+      }
+      pose.rot.SetFromEuler( rpy );
+      (*iter)->Set( pose );
+    }
+    else if ( (*iter)->IsVector3() )
+    {
+      math::Vector3 xyz;
+      QList<QtProperty*> subProperties = _item->subProperties();
+      for (QList<QtProperty*>::iterator propIter = subProperties.begin();
+          propIter != subProperties.end(); propIter++)
+      {
+        if ( (*propIter)->propertyName() == "X")
+          xyz.x = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Y")
+          xyz.y = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Z")
+          xyz.z = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+      }
+
+      (*iter)->Set(xyz);
+    }
+    else if ( (*iter)->IsQuaternion())
+    {
+      math::Quaternion q;
+      math::Vector3 rpy;
+      QList<QtProperty*> subProperties = _item->subProperties();
+      for (QList<QtProperty*>::iterator propIter = subProperties.begin();
+          propIter != subProperties.end(); propIter++)
+      {
+        if ( (*propIter)->propertyName() == "Roll")
+          rpy.x = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Pitch")
+          rpy.y = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+        else if ( (*propIter)->propertyName() == "Yaw")
+          rpy.z = boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString());
+      }
+      q.SetFromEuler( rpy );
+      (*iter)->Set(q);
+    }
+    else if ((*iter)->IsColor())
+    {
+      QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
+      std::string color = childItem->valueText().toStdString();
+      gzerr << "Setting color needs to be implemented[" << color << "]\n";
+    }
+    else
+    {
+      QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
+      (*iter)->SetFromString( childItem->valueText().toStdString() );
+    }
+  }
+
+  for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
+       iter != _elem->elements.end(); iter++)
+  {
+    this->FillSDF( this->GetChildItem( _item, (*iter)->GetName()), (*iter) );
+  }
+}
+
+QtProperty *ModelListWidget::GetChildItem(QtProperty *_item, const std::string &_name)
+{
+  QList<QtProperty*> subProperties = _item->subProperties();
+  for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
+      iter != subProperties.end(); iter++)
+  {
+    if ( (*iter)->propertyName().toStdString() == _name )
+    {
+      return (*iter);
+    }
+  }
+
+  return NULL;
+}
+
+/*void ModelListWidget::FillSDF( QtProperty *_item, QtProperty *_parent, 
+                               std::string &_sdf )
 {
   std::string name = _item->propertyName().toStdString();
   std::string value = _item->valueText().toStdString();
 
-  // TODO: convert the property browser back to SDF, and transmitt over the
-  // wire.
-}
+  if (_item->hasValue())
+  {
+    std::cout << " " << name << "='" << value << "'";
+  }
+  else
+  {
+    std::cout << "<" << name;
+
+    bool closed = false;
+    QList<QtProperty*> subProperties = _item->subProperties();
+    for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
+        iter != subProperties.end(); iter++)
+    {
+      if ( !(*iter)->hasValue() && !closed )
+      {
+        closed = true;
+        std::cout << ">\n";
+      }
+      this->FillSDF(*iter, _item, _sdf);
+    }
+
+    std::cout << "</" << name << ">\n";
+  }
+}*/
 
 

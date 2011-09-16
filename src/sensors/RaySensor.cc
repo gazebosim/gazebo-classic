@@ -26,7 +26,7 @@
 #include "physics/Physics.hh"
 #include "physics/Model.hh"
 #include "physics/Link.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/World.hh"
 #include "common/Exception.hh"
 
@@ -54,8 +54,8 @@ RaySensor::RaySensor()
 // Destructor
 RaySensor::~RaySensor()
 {
-  //if (this->laserGeom)
-  //  delete this->laserGeom;
+  //if (this->laserCollision)
+  //  delete this->laserCollision;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -91,17 +91,17 @@ void RaySensor::Load( )
   if (this->link == NULL)
     gzthrow("Null link in the ray sensor");
   this->physicsEngine = this->world->GetPhysicsEngine();
-  this->laserGeom = this->physicsEngine->CreateGeom(
+  this->laserCollision = this->physicsEngine->CreateCollision(
       "multiray", this->link);
 
-  this->laserGeom->SetName("Ray Sensor Geom");
+  this->laserCollision->SetName("Ray Sensor Collision");
 
-  this->laserShape = boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(this->laserGeom->GetShape());
+  this->laserShape = boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(this->laserCollision->GetShape());
 
   this->laserShape->Load( this->sdf );
   this->laserShape->SetWorld(this->world);
 
-  this->laserGeom->SetShape(this->laserShape);
+  this->laserCollision->SetShape(this->laserShape);
 }
 
 //////////////////////////////////////////////////////////////////////////////

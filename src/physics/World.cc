@@ -44,7 +44,7 @@
 #include "physics/Model.hh"
 #include "physics/World.hh"
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -757,6 +757,23 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   else
     sdf::readFile( _msg->sdf_filename(), factorySDF);
 
+  if (_msg->has_edit_name())
+  {
+    std::cout << "Edit with[";
+    factorySDF->PrintValues();
+    BasePtr base = this->rootElement->GetByName( _msg->edit_name() );
+    if (base)
+    {
+      sdf::ElementPtr elem;
+      if (factorySDF->root->GetName() == "gazebo")
+        elem = factorySDF->root->GetFirstElement();
+      else
+        elem = factorySDF->root;
+
+      base->UpdateParameters( elem );
+    }
+  }
+  else
   {
     boost::mutex::scoped_lock lock(*this->updateMutex);
     // Add the new models into the World
@@ -782,15 +799,18 @@ void World::OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg)
     msgs::Init(msg, "entity_info");
     BasePtr entity = this->rootElement->GetByName( _msg->name() );
 
-    const sdf::ElementPtr sdfValue = entity->GetSDF();
-    msg.set_sdf( sdfValue->ToString("") );
+    if (entity)
+    {
+      const sdf::ElementPtr sdfValue = entity->GetSDF();
+      msg.set_sdf( sdfValue->ToString("") );
 
-    if (entity->HasType(Base::MODEL))
+      if (entity->HasType(Base::MODEL))
         msg.set_sdf_description_filename("sdf/model.sdf");
-    else if (entity->HasType(Base::LINK))
+      else if (entity->HasType(Base::LINK))
         msg.set_sdf_description_filename("sdf/link.sdf");
-    else if (entity->HasType(Base::GEOM))
+      else if (entity->HasType(Base::GEOM))
         msg.set_sdf_description_filename("sdf/collision.sdf");
+    }
 
     this->entityInfoPub->Publish(msg);
   }

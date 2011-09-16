@@ -24,7 +24,7 @@
 #define BULLETCYLINDERSHAPE_HH
 
 #include "common/Exception.hh"
-#include "BulletGeom.hh"
+#include "BulletCollision.hh"
 #include "BulletPhysics.hh"
 #include "CylinderShape.hh"
 
@@ -32,11 +32,11 @@ namespace gazebo
 {
 	namespace physics
 {
-  /// \brief Cylinder geom
+  /// \brief Cylinder collision
   class BulletCylinderShape : public CylinderShape
   {
     /// \brief Constructor
-    public: BulletCylinderShape(Geom *parent) : CylinderShape(parent) {}
+    public: BulletCylinderShape(Collision *parent) : CylinderShape(parent) {}
 
     /// \brief Destructor
     public: virtual ~BulletCylinderShape() {}
@@ -45,7 +45,7 @@ namespace gazebo
     public: void SetSize( const math::Vector2d &size )
             {
               CylinderShape::SetSize(size);
-              BulletGeom *bParent = (BulletGeom*)(this->parent);
+              BulletCollision *bParent = (BulletCollision*)(this->parent);
   
               bParent->SetCollisionShape( new btCylinderShapeZ(
                   btmath::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)) );

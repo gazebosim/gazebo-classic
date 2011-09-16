@@ -34,7 +34,7 @@
 #include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.h"
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/RayShape.hh"
 
 using namespace gazebo;
@@ -43,7 +43,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-RayShape::RayShape( GeomPtr _parent, bool /*_displayRays*/ ) 
+RayShape::RayShape( CollisionPtr _parent, bool /*_displayRays*/ ) 
   : Shape(_parent)
 {
   this->AddType(RAY_SHAPE);
@@ -54,7 +54,7 @@ RayShape::RayShape( GeomPtr _parent, bool /*_displayRays*/ )
   {
     msgs::Visual msg;
     msgs::Init(msg, this->GetName());
-    msg.set_parent_id( this->geomParent->GetName() );
+    msg.set_parent_id( this->collisionParent->GetName() );
     msg.set_render_type( msgs::Visual::LINE_LIST );
 
     msg.set_material( "Gazebo/BlueGlow" );
@@ -68,7 +68,7 @@ RayShape::RayShape( GeomPtr _parent, bool /*_displayRays*/ )
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
-  this->geomParent->SetSaveable(false);
+  this->collisionParent->SetSaveable(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,9 +85,9 @@ void RayShape::SetDisplayType( bool /*_displayRays*/ )
   if (Simulator::Instance()->GetRenderEngineEnabled() )
   {
     if (!displayRays)
-      this->geomParent->GetVisualNode()->DetachObjects();
+      this->collisionParent->GetVisualNode()->DetachObjects();
     else
-      this->geomParent->GetVisualNode()->AttachObject(this->line);
+      this->collisionParent->GetVisualNode()->AttachObject(this->line);
   }
   */
 }
@@ -101,9 +101,9 @@ void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &pos
   this->relativeStartPos = posStart;
   this->relativeEndPos = posEnd;
 
-  this->globalStartPos = this->geomParent->GetWorldPose().CoordPositionAdd(
+  this->globalStartPos = this->collisionParent->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
-  this->globalEndPos = this->geomParent->GetWorldPose().CoordPositionAdd(
+  this->globalEndPos = this->collisionParent->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
   // Compute the direction of the ray

@@ -27,7 +27,7 @@
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/Model.hh"
 #include "physics/World.hh"
 #include "physics/Link.hh"
@@ -450,3 +450,19 @@ void Entity::Fini()
   this->parentEntity.reset();
   Base::Fini();
 }
+
+//// Update the parameters using new sdf values
+void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
+{
+  Base::UpdateParameters(_sdf);
+
+  math::Pose pose;
+  if (this->parent && this->parentEntity)
+    pose = this->parentEntity->worldPose;
+
+  std::cout << "Set World Pose[" <<  this->GetWorldPose() << "] to [" << 
+_sdf->GetElement("origin")->GetValuePose("pose") + pose  << "]\n";
+  this->SetWorldPose( _sdf->GetElement("origin")->GetValuePose("pose") + pose );
+}
+
+

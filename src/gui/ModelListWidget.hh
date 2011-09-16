@@ -30,8 +30,7 @@ namespace gazebo
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();
-      private slots: void OnPropertyChanged(QtProperty *_item, 
-                                           const QVariant &_val);
+      private slots: void OnPropertyChanged(QtProperty *_item);
 
       private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
@@ -47,13 +46,18 @@ namespace gazebo
       private: void FillPropertyTree(sdf::ElementPtr &_elem,
                                      QtProperty *_parentItem);
 
+      private: void FillSDF( QtProperty *_item, sdf::ElementPtr &_elem );
+
+      private: QtProperty *GetChildItem(QtProperty *_item, 
+                                        const std::string &_name);
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
       private: QAction *moveToAction;
       private: QAction *deleteAction;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr entitiesRequestPub, entityPub;
+      private: transport::PublisherPtr entitiesRequestPub, entityPub, factoryPub;
       private: transport::SubscriberPtr entitiesSub, newEntitySub,entityInfoSub ;
 
       private: rendering::VisualPtr modelVisual;
@@ -64,6 +68,7 @@ namespace gazebo
       private: QtVariantPropertyManager *variantManager;
 
       private: sdf::ElementPtr sdfElement;
+      private: bool fillingPropertyTree;
     };
   }
 }

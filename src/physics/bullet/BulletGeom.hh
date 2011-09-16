@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Geom class
+/* Desc: Collision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id: Geom.hh 7640 2009-05-13 02:06:08Z natepak $
+ * SVN: $Id: Collision.hh 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #ifndef BulletGEOM_HH
@@ -27,7 +27,7 @@
 #include "Entity.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 
 class btCollisionShape;
 
@@ -40,27 +40,27 @@ namespace gazebo
   class BulletPhysics;
 
   /// \addtogroup gazebo_physics_ode
-  /// \brief Base class for all Bullet geoms
+  /// \brief Base class for all Bullet collisions
   /// \{
 
-  /// \brief Base class for all geoms
-  class BulletGeom : public Geom
+  /// \brief Base class for all collisions
+  class BulletCollision : public Collision
   {
   
     /// \brief Constructor
-    //public: Geom(Link *body, const std::string &name);
-    public: BulletGeom(Link *body);
+    //public: Collision(Link *body, const std::string &name);
+    public: BulletCollision(Link *body);
   
     /// \brief Destructor
-    public: virtual ~BulletGeom();
+    public: virtual ~BulletCollision();
 
-    /// \brief Load the geom
+    /// \brief Load the collision
     public: virtual void Load(common::XMLConfigNode *node);
 
-    /// \brief Load the geom
+    /// \brief Load the collision
     public: virtual void Save(std::string &prefix, std::ostream &stream);
 
-    /// \brief Update function for geoms
+    /// \brief Update function for collisions
     public: virtual void Update();
 
     /// \brief On pose change
@@ -74,7 +74,7 @@ namespace gazebo
     /// \param bits The bits
     public: virtual void SetCollideBits(unsigned int bits);
   
-    /// \brief Get the mass of the geom
+    /// \brief Get the mass of the collision
     public: Mass GetLinkMassMatrix();
   
     /// \brief Get the bounding box, defined by the physics engine

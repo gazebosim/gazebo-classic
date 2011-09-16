@@ -32,15 +32,15 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Geom for an infinite plane.
+    /// \brief Collision for an infinite plane.
     /// 
-    /// This geom is used primarily for ground planes.  Note that while
+    /// This collision is used primarily for ground planes.  Note that while
     /// the plane in infinite, only the part near the camera is drawn.  
     class PlaneShape : public Shape
     {
       /// \brief Constructor
       /// \param body Link to which we are attached.
-      public: PlaneShape(GeomPtr parent);
+      public: PlaneShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~PlaneShape();

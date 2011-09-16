@@ -21,7 +21,7 @@
  */
 
 #include "Link.hh"
-#include "BulletRayGeom.hh"
+#include "BulletRayCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,27 +33,27 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletRayGeom::BulletRayGeom( Link *body, bool displayRays )
-    : RayGeom<BulletGeom>(body, displayRays)
+BulletRayCollision::BulletRayCollision( Link *body, bool displayRays )
+    : RayCollision<BulletCollision>(body, displayRays)
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-BulletRayGeom::~BulletRayGeom()
+BulletRayCollision::~BulletRayCollision()
 {
 }
  
 //////////////////////////////////////////////////////////////////////////////
-// Update the ray geom
-void BulletRayGeom::Update()
+// Update the ray collision
+void BulletRayCollision::Update()
 {
-  RayGeom<BulletGeom>::Update();
+  RayCollision<BulletCollision>::Update();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the starting point and direction
-void BulletRayGeom::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
+void BulletRayCollision::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
 {
-  RayGeom<BulletGeom>::SetPoints(posStart, posEnd);
+  RayCollision<BulletCollision>::SetPoints(posStart, posEnd);
 }

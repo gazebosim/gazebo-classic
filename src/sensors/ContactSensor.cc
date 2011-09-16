@@ -30,8 +30,7 @@
 #include "physics/World.hh"
 #include "physics/Model.hh"
 #include "physics/Link.hh"
-#include "physics/Geom.hh"
-#include "physics/Contact.hh"
+#include "physics/Collision.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/ContactSensor.hh"
@@ -61,11 +60,11 @@ ContactSensor::~ContactSensor()
   std::vector< ParamT<std::string> *>::iterator iter;
   std::vector<Contact>::iterator citer;
 
-  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
+  for (iter = this->collisionNamesP.begin(); iter != this->collisionNamesP.end(); iter++)
     delete *iter;
-  this->geomNamesP.clear();
+  this->collisionNamesP.clear();
 
-  this->geoms.clear();
+  this->collisions.clear();
 */
 }
 
@@ -100,13 +99,13 @@ void ContactSensor::Load()
   if (this->link == NULL)
     gzthrow("Null link in the contact sensor");
 
-  // get geom name
-  std::string geom_name = this->sdf->GetElement("contact")->GetElement("collision")->GetValueString("name");
+  // get collision name
+  std::string collision_name = this->sdf->GetElement("contact")->GetElement("collision")->GetValueString("name");
 
-  this->geom = this->link->GetGeom(geom_name);
+  this->collision = this->link->GetCollision(collision_name);
 
-  if (this->geom == NULL)
-    gzthrow("Null geom in the contact sensor");
+  if (this->collision == NULL)
+    gzthrow("Null collision in the contact sensor");
 
 }
 
@@ -115,19 +114,19 @@ void ContactSensor::Load()
 void ContactSensor::Load(sdf::ElementPtr &_sdf)
 {
 /*
-  XMLConfigNode *geomNode = NULL;
+  XMLConfigNode *collisionNode = NULL;
   if (this->body == NULL)
     gzthrow("Null body in the contact sensor");
 
   Param::Begin(&this->parameters);
-  geomNode = node->GetChild("geom");
+  collisionNode = node->GetChild("collision");
 
-  while (geomNode)
+  while (collisionNode)
   {
-    ParamT<std::string> *geomName = new ParamT<std::string>("geom","",1);
-    geomName->SetValue( geomNode->GetValue() );
-    this->geomNamesP.push_back(geomName);
-    geomNode = geomNode->GetNext("geom");
+    ParamT<std::string> *collisionName = new ParamT<std::string>("collision","",1);
+    collisionName->SetValue( collisionNode->GetValue() );
+    this->collisionNamesP.push_back(collisionName);
+    collisionNode = collisionNode->GetNext("collision");
   }
   Param::End();
 */
@@ -142,19 +141,19 @@ void ContactSensor::InitChild()
 /*
   std::vector< ParamT<std::string> *>::iterator iter;
 
-  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
+  for (iter = this->collisionNamesP.begin(); iter != this->collisionNamesP.end(); iter++)
   {
-    // Get the geom from the body
-    Geom *geom = this->body->GetGeom( **(*iter) );
-    this->geoms.push_back(geom);
+    // Get the collision from the body
+    Collision *collision = this->body->GetCollision( **(*iter) );
+    this->collisions.push_back(collision);
   }
 */
-  this->geom->SetContactsEnabled(true);
+  this->collision->SetContactsEnabled(true);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void ContactSensor::Update(bool force)
+void ContactSensor::Update(bool /*_force*/)
 {
   //this->contacts.clear();
 }
@@ -166,43 +165,43 @@ void ContactSensor::FiniChild()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get the number of geoms that the sensor is observing
-unsigned int ContactSensor::GetGeomCount() const
+/// Get the number of collisions that the sensor is observing
+unsigned int ContactSensor::GetCollisionCount() const
 {
-  return this->geoms.size();
+  return this->collisions.size();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Return the number of contacts for an observed geom
-unsigned int ContactSensor::GetGeomContactCount(unsigned int geomIndex) const
+/// Return the number of contacts for an observed collision
+unsigned int ContactSensor::GetCollisionContactCount(unsigned int /*_collisionIndex*/) const
 {
 /*
-  if (geomIndex < this->geoms.size())
-    return this->geoms[geomIndex]->GetContactCount();
+  if (collisionIndex < this->collisions.size())
+    return this->collisions[collisionIndex]->GetContactCount();
 */
 
   return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get a contact for a geom by index
-physics::Contact ContactSensor::GetGeomContact(unsigned int geom, unsigned int index) const
+/// Get a contact for a collision by index
+physics::Contact ContactSensor::GetCollisionContact(unsigned int /*_collision*/, unsigned int /*_index*/) const
 {
 /*
-  if (geom < this->geoms.size())
-    return this->geoms[geom]->GetContact( index );
+  if (collision < this->collisions.size())
+    return this->collisions[collision]->GetContact( index );
 */
 
   return physics::Contact();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get a contact for a geom by index
-physics::Geom* ContactSensor::GetGeom(unsigned int geom) const
+/// Get a contact for a collision by index
+physics::Collision* ContactSensor::GetCollision(unsigned int /*_collision*/) const
 {
 /*
-  if (geom < this->geoms.size())
-    return this->geoms[geom];
+  if (collision < this->collisions.size())
+    return this->collisions[collision];
 */
 
   return NULL;
@@ -213,7 +212,7 @@ physics::Geom* ContactSensor::GetGeom(unsigned int geom) const
 std::vector<gazebo::physics::Contact> ContactSensor::GetContacts()
 {
   if (this->model)
-    return this->model->GetContacts(this->geom);
+    return this->model->GetContacts(this->collision);
   else
   {
     gzerr << "model not setup yet, are you calling GetContacts during Load?\n";

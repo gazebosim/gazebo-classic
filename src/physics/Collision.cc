@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Geom class
+/* Desc: Collision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
@@ -33,14 +33,14 @@
 #include "physics/SurfaceParams.hh"
 #include "physics/Model.hh"
 #include "physics/Link.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( LinkPtr link )
+Collision::Collision( LinkPtr link )
     : Entity(link)
 {
   this->AddType(Base::GEOM);
@@ -50,13 +50,13 @@ Geom::Geom( LinkPtr link )
   this->transparency = 0;
   this->contactsEnabled = false;
 
-  this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
-  this->connections.push_back( this->link->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Collision::ShowBoundingBox, this, _1) ) );
+  this->connections.push_back( this->link->ConnectEnabledSignal( boost::bind(&Collision::EnabledCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Geom::~Geom()
+Collision::~Collision()
 {
   if (!this->bbVisual.empty())
   {
@@ -68,8 +68,8 @@ Geom::~Geom()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Finalize the geom
-void Geom::Fini()
+/// Finalize the collision
+void Collision::Fini()
 {
   Entity::Fini();
   this->link.reset();
@@ -79,7 +79,7 @@ void Geom::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 // First step in the loading process
-void Geom::Load( sdf::ElementPtr &_sdf )
+void Collision::Load( sdf::ElementPtr &_sdf )
 {
   Entity::Load(_sdf);
 
@@ -92,7 +92,7 @@ void Geom::Load( sdf::ElementPtr &_sdf )
   //this->CreateBoundingBox();
 }
 
-void Geom::Init()
+void Collision::Init()
 {
   this->SetContactsEnabled(false);
   this->SetRelativePose( 
@@ -101,8 +101,8 @@ void Geom::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Create the bounding box for the geom
-void Geom::CreateBoundingBox()
+// Create the bounding box for the collision
+void Collision::CreateBoundingBox()
 {
   // Create the bounding box
   if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
@@ -139,8 +139,7 @@ void Geom::CreateBoundingBox()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the encapsulated geometry object
-void Geom::SetGeom(bool placeable)
+void Collision::SetCollision(bool placeable)
 {
   this->placeable = placeable;
 
@@ -158,8 +157,8 @@ void Geom::SetGeom(bool placeable)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Return whether this is a placeable geom.
-bool Geom::IsPlaceable() const
+// Return whether this is a placeable collision.
+bool Collision::IsPlaceable() const
 {
   return this->placeable;
 }
@@ -167,22 +166,22 @@ bool Geom::IsPlaceable() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser retro reflectiveness
-void Geom::SetLaserRetro(float retro)
+void Collision::SetLaserRetro(float retro)
 {
   this->sdf->GetAttribute("laser_retro")->Set(retro);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the laser retro reflectiveness
-float Geom::GetLaserRetro() const
+float Collision::GetLaserRetro() const
 {
   return this->sdf->GetValueDouble("laser_retro");
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the Bounding box of this geometry
-void Geom::ShowBoundingBox(const bool &show)
+/// Set the visibility of the Bounding box
+void Collision::ShowBoundingBox(const bool &show)
 {
   if (!this->bbVisual.empty())
   {
@@ -195,43 +194,43 @@ void Geom::ShowBoundingBox(const bool &show)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the link this geom belongs to
-LinkPtr Geom::GetLink() const
+/// Get the link this collision belongs to
+LinkPtr Collision::GetLink() const
 {
   return this->link;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the model this geom belongs to
-ModelPtr Geom::GetModel() const
+/// Get the model this collision belongs to
+ModelPtr Collision::GetModel() const
 {
   return this->link->GetModel();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-Base::EntityType Geom::GetShapeType()
+Base::EntityType Collision::GetShapeType()
 {
   return this->shape->GetLeafType();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the shape for this geom
-void Geom::SetShape(ShapePtr shape)
+/// Set the shape for this collision
+void Collision::SetShape(ShapePtr shape)
 {
   this->shape = shape;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the attached shape
-ShapePtr Geom::GetShape() const
+ShapePtr Collision::GetShape() const
 {
   return this->shape;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Turn contact recording on or off
-void Geom::SetContactsEnabled(const bool &enable)
+void Collision::SetContactsEnabled(const bool &enable)
 {
   this->contactsEnabled = enable;
   //gzerr << "setting " << this->GetName() << " contacts enabled " << this->contactsEnabled << "\n";
@@ -239,7 +238,7 @@ void Geom::SetContactsEnabled(const bool &enable)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return true of contact recording is on
-bool Geom::GetContactsEnabled() const
+bool Collision::GetContactsEnabled() const
 {
   //gzerr << "checking " << this->GetName() << " contacts enabled " << this->contactsEnabled << "\n";
   return this->contactsEnabled;
@@ -247,32 +246,34 @@ bool Geom::GetContactsEnabled() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of contacts
-unsigned int Geom::GetContactCount() const
+unsigned int Collision::GetContactCount() const
 {
   // TODO: redo this
   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Add an occurance of a contact to this geom
-void Geom::AddContact(const Contact &_contact)
+/// Add an occurance of a contact to this collision
+void Collision::AddContact(const Contact &_contact)
 {
   if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
     return;
 
-  // previously, Geom keeps a list of contacts, Nate was trying to do this on a per moel basis
-  // for now, I'll recover the Geom storage behavior
+  // previously, Collision keeps a list of contacts, Nate was trying to do this on a per moel basis
+  // for now, I'll recover the Collision storage behavior
 
-  //gzerr << "Add Contact to parent Link of thie Geom \n";
+  //gzerr << "Add Contact to parent Link of thie Collision \n";
   // TODO: redo this
-  this->GetParentModel()->StoreContact(boost::shared_dynamic_cast<Geom>(shared_from_this()),_contact.Clone());
+  this->GetParentModel()->StoreContact(
+      boost::shared_dynamic_cast<Collision>(shared_from_this()), 
+      _contact.Clone());
   this->contactSignal( _contact );
 
 }           
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific contact
-Contact Geom::GetContact(unsigned int /*_i*/) const
+Contact Collision::GetContact(unsigned int /*_i*/) const
 {
   return Contact();
   // TODO: redo this
@@ -281,7 +282,7 @@ Contact Geom::GetContact(unsigned int /*_i*/) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Enable callback: Called when the link changes
-void Geom::EnabledCB(bool enabled)
+void Collision::EnabledCB(bool enabled)
 {
   msgs::Visual msg;
   msgs::Init(msg, this->bbVisual);
@@ -295,8 +296,8 @@ void Geom::EnabledCB(bool enabled)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the geom
-math::Vector3 Geom::GetRelativeLinearVel() const
+/// Get the linear velocity of the collision
+math::Vector3 Collision::GetRelativeLinearVel() const
 {
   if (this->link)
     return this->link->GetRelativeLinearVel();
@@ -305,8 +306,8 @@ math::Vector3 Geom::GetRelativeLinearVel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the geom in the world frame
-math::Vector3 Geom::GetWorldLinearVel() const
+/// Get the linear velocity of the collision in the world frame
+math::Vector3 Collision::GetWorldLinearVel() const
 {
   if (this->link)
     return this->link->GetWorldLinearVel();
@@ -315,8 +316,8 @@ math::Vector3 Geom::GetWorldLinearVel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the geom
-math::Vector3 Geom::GetRelativeAngularVel() const
+/// Get the angular velocity of the collision
+math::Vector3 Collision::GetRelativeAngularVel() const
 {
   if (this->link)
     return this->link->GetRelativeAngularVel();
@@ -325,8 +326,8 @@ math::Vector3 Geom::GetRelativeAngularVel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the geom in the world frame
-math::Vector3 Geom::GetWorldAngularVel() const
+/// Get the angular velocity of the collision in the world frame
+math::Vector3 Collision::GetWorldAngularVel() const
 {
   if (this->link)
     return this->link->GetWorldAngularVel();
@@ -335,8 +336,8 @@ math::Vector3 Geom::GetWorldAngularVel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the geom
-math::Vector3 Geom::GetRelativeLinearAccel() const
+/// Get the linear acceleration of the collision
+math::Vector3 Collision::GetRelativeLinearAccel() const
 {
   if (this->link)
     return this->link->GetRelativeLinearAccel();
@@ -345,8 +346,8 @@ math::Vector3 Geom::GetRelativeLinearAccel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the geom in the world frame
-math::Vector3 Geom::GetWorldLinearAccel() const
+/// Get the linear acceleration of the collision in the world frame
+math::Vector3 Collision::GetWorldLinearAccel() const
 {
   if (this->link)
     return this->link->GetWorldLinearAccel();
@@ -355,8 +356,8 @@ math::Vector3 Geom::GetWorldLinearAccel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the geom
-math::Vector3 Geom::GetRelativeAngularAccel() const
+/// Get the angular acceleration of the collision
+math::Vector3 Collision::GetRelativeAngularAccel() const
 {
   if (this->link)
     return this->link->GetRelativeAngularAccel();
@@ -365,8 +366,8 @@ math::Vector3 Geom::GetRelativeAngularAccel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the geom in the world frame
-math::Vector3 Geom::GetWorldAngularAccel() const
+/// Get the angular acceleration of the collision in the world frame
+math::Vector3 Collision::GetWorldAngularAccel() const
 {
   if (this->link)
     return this->link->GetWorldAngularAccel();

@@ -32,11 +32,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \brief Sphere geom
+    /// \brief Sphere collision
     class SphereShape : public Shape
     {
       /// \brief Constructor
-      public: SphereShape(GeomPtr parent);
+      public: SphereShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~SphereShape();

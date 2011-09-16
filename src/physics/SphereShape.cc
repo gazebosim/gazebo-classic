@@ -25,7 +25,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-SphereShape::SphereShape(GeomPtr parent) 
+SphereShape::SphereShape(CollisionPtr parent) 
   : Shape(parent)
 {
   this->AddType(Base::SPHERE_SHAPE);

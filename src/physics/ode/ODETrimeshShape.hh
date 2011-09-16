@@ -35,11 +35,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
 
-    /// \brief Triangle mesh geom
+    /// \brief Triangle mesh collision
     class ODETrimeshShape : public TrimeshShape
     {
       /// \brief Constructor
-      public: ODETrimeshShape(GeomPtr parent);
+      public: ODETrimeshShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~ODETrimeshShape();

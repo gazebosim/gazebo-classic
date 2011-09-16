@@ -23,7 +23,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-MultiRayShape::MultiRayShape(GeomPtr parent) 
+MultiRayShape::MultiRayShape(CollisionPtr parent) 
   : Shape(parent)
 {
   this->AddType(MULTIRAY_SHAPE);
@@ -31,13 +31,13 @@ MultiRayShape::MultiRayShape(GeomPtr parent)
 
   this->rayFanMsg = new msgs::Visual();
   this->rayFanMsg->mutable_header()->set_str_id( this->GetName()+"_fan" );
-  this->rayFanMsg->set_parent_id( this->geomParent->GetName() );
+  this->rayFanMsg->set_parent_id( this->collisionParent->GetName() );
   this->rayFanMsg->set_render_type( msgs::Visual::TRIANGLE_FAN );
   this->rayFanMsg->set_material_script( "Gazebo/BlueLaser" );
 
   this->rayFanOutlineMsg = new msgs::Visual();
   this->rayFanOutlineMsg->mutable_header()->set_str_id( this->GetName()+"_fanoutline" );
-  this->rayFanOutlineMsg->set_parent_id( this->geomParent->GetName() );
+  this->rayFanOutlineMsg->set_parent_id( this->collisionParent->GetName() );
   this->rayFanOutlineMsg->set_render_type( msgs::Visual::LINE_STRIP );
   this->rayFanOutlineMsg->set_material_script( "Gazebo/BlueGlow" );
 }
@@ -98,7 +98,7 @@ void MultiRayShape::Init()
   minRange = rangeElem->GetValueDouble("min");
   maxRange = rangeElem->GetValueDouble("max");
 
-  // Create and array of ray geoms
+  // Create and array of ray collisions
   for (int j = 0; j < vertSamples; j++)
   {
     for (int i = 0; i < horzSamples; i++)
@@ -177,7 +177,7 @@ int MultiRayShape::GetFiducial(int index)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Update the geom
+/// Update the collision
 void MultiRayShape::Update()
 {
   std::vector<RayShapePtr>::iterator iter;
@@ -188,7 +188,7 @@ void MultiRayShape::Update()
   sdf::ElementPtr rangeElem = rayElem->GetElement("range");
   double maxRange = rangeElem->GetValueDouble("max");
 
-  // Reset the ray lengths and mark the geoms as dirty (so they get
+  // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
   for (iter = this->rays.begin(); 
       iter != this->rays.end(); iter++, i++)
@@ -222,7 +222,7 @@ void MultiRayShape::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Add a ray to the geom
+/// Add a ray to the collision
 void MultiRayShape::AddRay(const math::Vector3 &start, 
                            const math::Vector3 &end )
 {

@@ -21,7 +21,7 @@
 
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/BoxShape.hh"
@@ -39,16 +39,16 @@ namespace gazebo
     /// \brief ODE Box shape 
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(ODEGeomPtr parent) : BoxShape(parent) {}
+      public: ODEBoxShape(ODECollisionPtr parent) : BoxShape(parent) {}
       public: virtual ~ODEBoxShape() {}
       public: virtual void SetSize( const math::Vector3 &size )
       {
         BoxShape::SetSize(size);
 
-        ODEGeomPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
+        ODECollisionPtr oParent;
+        oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
 
-        oParent->SetGeom( dCreateBox( 0, size.x, size.y, size.z), true );
+        oParent->SetCollision( dCreateBox( 0, size.x, size.y, size.z), true );
       }
     };
     /// \}

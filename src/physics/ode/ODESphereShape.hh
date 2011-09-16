@@ -18,7 +18,7 @@
 #define ODESPHERESHAPE_HH
 
 #include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODECollision.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/SphereShape.hh"
@@ -36,16 +36,16 @@ namespace gazebo
     /// \brief And ODE sphere shape
     class ODESphereShape : public SphereShape
     {
-      public: ODESphereShape(ODEGeomPtr parent) : SphereShape(parent) {}
+      public: ODESphereShape(ODECollisionPtr parent) : SphereShape(parent) {}
       public: virtual ~ODESphereShape() {}
       public: void SetSize(const double &radius)
       {
         SphereShape::SetSize(radius);
-        ODEGeomPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODEGeom>(this->geomParent);
+        ODECollisionPtr oParent;
+        oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
   
         // Create the sphere geometry
-        oParent->SetGeom( dCreateSphere(0, radius), true);
+        oParent->SetCollision( dCreateSphere(0, radius), true);
       }
     
     };

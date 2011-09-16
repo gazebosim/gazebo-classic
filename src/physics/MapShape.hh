@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Occupancy grid geom
+/* Desc: Occupancy grid collision
  * Author: Nate Koenig
 */
 
@@ -25,7 +25,7 @@
 
 #include "common/CommonTypes.hh"
 
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/Shape.hh"
 
 namespace gazebo
@@ -38,11 +38,11 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{ 
     
-    /// \brief Map geom
+    /// \brief Map collision
     class MapShape : public Shape
     {
       /// \brief Constructor
-      public: MapShape(GeomPtr parent);
+      public: MapShape(CollisionPtr parent);
   
       /// \brief Destructor
       public: virtual ~MapShape();
@@ -81,7 +81,7 @@ namespace gazebo
       private: QuadNode *root;
   
       private: bool merged;
-      private: static unsigned int geomCounter;
+      private: static unsigned int collisionCounter;
     };
   
  

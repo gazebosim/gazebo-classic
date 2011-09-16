@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
+/* Desc: Trimesh collisionetry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: BulletHeightmapGeom.hh 7640 2009-05-13 02:06:08Z natepak $
+ * CVS: $Id: BulletHeightmapCollision.hh 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #ifndef BULLETHEIGHTMAPGEOM_HH
@@ -26,7 +26,7 @@
 //#include <btBulletDynamicsCommon.h>
 //#include <btBulletCollisionCommon.h>
 #include "math::Vector2.hh"
-#include "BulletGeom.hh"
+#include "BulletCollision.hh"
 
 class btHeightfieldTerrainShape;
 
@@ -36,10 +36,10 @@ namespace gazebo
 {
   class OgreHeightmap;
 
-  /// \addtogroup gazebo_physics_geom
+  /// \addtogroup gazebo_physics_collision
   /// \{
-  /** \defgroup gazebo_heightmap_geom Height map geom
-      \brief Height map geom
+  /** \defgroup gazebo_heightmap_collision Height map collision
+      \brief Height map collision
 
     \par Attributes
     The following attributes are supported.
@@ -62,27 +62,27 @@ namespace gazebo
 
     \par Example
     \verbatim
-      <geom:heightmap name="terrain_geom">
+      <collision:heightmap name="terrain_collision">
         <image>terrain.png</image>
         <worldTexture>terrain_texture.jpg</worldTexture>
         <detailTexture>terrain_detail.jpg</detailTexture>
         <size>1000 1000 10.0</size>
-      </geom:heightmap>
+      </collision:heightmap>
     \endverbatim
     */
   /// \}
-  /// \addtogroup gazebo_heightmap_geom 
+  /// \addtogroup gazebo_heightmap_collision 
   /// \{
 
 
-  /// \brief Height map geom
-  class BulletHeightmapGeom : public BulletGeom
+  /// \brief Height map collision
+  class BulletHeightmapCollision : public BulletCollision
   {
     /// \brief Constructor
-    public: BulletHeightmapGeom(Link *body);
+    public: BulletHeightmapCollision(Link *body);
 
     /// \brief Destructor
-    public: virtual ~BulletHeightmapGeom();
+    public: virtual ~BulletHeightmapCollision();
 
     /// \brief Update function 
     public: void Update();

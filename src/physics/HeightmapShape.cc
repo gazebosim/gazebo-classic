@@ -34,7 +34,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-HeightmapShape::HeightmapShape(GeomPtr parent)
+HeightmapShape::HeightmapShape(CollisionPtr parent)
     : Shape(parent)
 {
   this->AddType(Base::HEIGHTMAP_SHAPE);

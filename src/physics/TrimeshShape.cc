@@ -25,7 +25,7 @@
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/TrimeshShape.hh"
 
 using namespace gazebo;
@@ -33,7 +33,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-TrimeshShape::TrimeshShape(GeomPtr parent) 
+TrimeshShape::TrimeshShape(CollisionPtr parent) 
   : Shape(parent)
 {
   this->AddType(Base::TRIMESH_SHAPE);
@@ -94,12 +94,12 @@ void TrimeshShape::Init()
       stream << "  </geometry>";
       stream << "</visual>";
 
-      GeomPtr newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( 
-          "trimesh", this->geomParent->GetLink() );
+      CollisionPtr newCollision = this->GetWorld()->GetPhysicsEngine()->CreateCollision( 
+          "trimesh", this->collisionParent->GetLink() );
 
       // TODO: need to implement this function properly.
-      newGeom->SetSaveable(false);
-      //newGeom->Load( config->GetRootNode()->GetChild() );
+      newCollision->SetSaveable(false);
+      //newCollision->Load( config->GetRootNode()->GetChild() );
     }
   }
 }

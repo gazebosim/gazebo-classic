@@ -68,17 +68,17 @@ void IRSensor::LoadChild( sdf::ElementPtr &_sdf )
   }
 
   XMLConfigNode *iNode;
-  Geom *laserGeom;
+  Collision *laserCollision;
   MultiRayShape *laserShape;
 
   iNode = node->GetChild("ir");
   while (iNode)
   {
-    laserGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(
+    laserCollision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(
                      "multiray", this->body);
-    laserGeom->SetName("IR Sensor Geom");
+    laserCollision->SetName("IR Sensor Collision");
 
-    laserShape = (MultiRayShape*)(laserGeom->GetShape());
+    laserShape = (MultiRayShape*)(laserCollision->GetShape());
 
     //laserShape->SetDisplayType( (**this->displayRaysP) );
     laserShape->Load(iNode);
@@ -131,8 +131,8 @@ void IRSensor::LoadChild( sdf::ElementPtr &_sdf )
   this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
 
   // Set collision bits
-  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
-  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
+  dCollisionSetCategoryBits((dCollisionID) this->raySpaceId, GZ_SENSOR_COLLIDE);
+  dCollisionSetCollideBits((dCollisionID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
   */
   /* BULLET
@@ -148,13 +148,13 @@ void IRSensor::InitChild()
   /*Pose bodyPose;
   double angle;
   Vector3 start, end, axis;
-  RayGeom *ray;
+  RayCollision *ray;
   */
 
   /*bodyPose = this->body->GetWorldPose();
   //this->prevPose = bodyPose;
 
-  // Create and array of ray geoms
+  // Create and array of ray collisions
   //for (int i = 0; i < this->rayCount; i++)
   for(unsigned int j=0; j<this->irBeams.size(); j++)
   {
@@ -172,7 +172,7 @@ void IRSensor::InitChild()
       end = (axis * this->maxRange[j]) + this->origin[j];
 
       // BULLET
-      //ray = new RayGeom(this->body, displayRays);
+      //ray = new RayCollision(this->body, displayRays);
 
       ray->SetPoints(start, end);
 

@@ -24,7 +24,7 @@
 #define BULLETPLANESHAPE_HH
 
 #include "common/Exception.hh"
-#include "BulletGeom.hh"
+#include "BulletCollision.hh"
 #include "BulletPhysics.hh"
 #include "PlaneShape.hh"
 
@@ -35,11 +35,11 @@ namespace gazebo
   class Link;
   class XMLConfig;
 
-  /// \brief Bullet geom for an infinite plane.
+  /// \brief Bullet collision for an infinite plane.
   class BulletPlaneShape : public PlaneShape
   {
     /// \brief Constructor
-    public: BulletPlaneShape(Geom *parent) : PlaneShape(parent) {}
+    public: BulletPlaneShape(Collision *parent) : PlaneShape(parent) {}
 
     /// \brief Destructor
     public: virtual ~BulletPlaneShape() {}
@@ -53,7 +53,7 @@ namespace gazebo
     /// \brief Create the plane
     public: void CreatePlane()
             {
-              BulletGeom *bParent = (BulletGeom*)(this->parent);
+              BulletCollision *bParent = (BulletCollision*)(this->parent);
               PlaneShape::CreatePlane();
 
               btmath::Vector3 vec( (**normalP).x, (**normalP).y, (**normalP).z);

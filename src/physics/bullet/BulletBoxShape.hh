@@ -24,7 +24,7 @@
 #define BULLETBOXSHAPE_HH
 
 #include "common/Exception.hh"
-#include "BulletGeom.hh"
+#include "BulletCollision.hh"
 #include "BulletPhysics.hh"
 #include "BoxShape.hh"
 
@@ -32,11 +32,11 @@ namespace gazebo
 {
 	namespace physics
 {
-  /// \brief Box geom
+  /// \brief Box collision
   class BulletBoxShape : public BoxShape
   {
     /// \brief Constructor
-    public: BulletBoxShape(Geom *parent) : BoxShape(parent) {}
+    public: BulletBoxShape(Collision *parent) : BoxShape(parent) {}
 
     /// \brief Destructor
     public: virtual ~BulletBoxShape() {}
@@ -45,7 +45,7 @@ namespace gazebo
     public: void SetSize( const math::Vector3 &size )
             {
               BoxShape::SetSize(size);
-              BulletGeom *bParent = (BulletGeom*)(this->parent);
+              BulletCollision *bParent = (BulletCollision*)(this->parent);
 
               /// Bullet requires the half-extents of the box 
               bParent->SetCollisionShape( new btBoxShape(

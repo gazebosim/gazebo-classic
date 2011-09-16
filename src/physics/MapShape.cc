@@ -27,18 +27,18 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/BoxShape.hh"
-#include "physics/Geom.hh"
+#include "physics/Collision.hh"
 #include "physics/MapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 
-unsigned int MapShape::geomCounter = 0;
+unsigned int MapShape::collisionCounter = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-MapShape::MapShape(GeomPtr parent)
+MapShape::MapShape(CollisionPtr parent)
     : Shape(parent)
 {
   this->AddType(Base::MAP_SHAPE);
@@ -125,10 +125,10 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     std::ostringstream stream;
 
     // Create the box geometry
-    GeomPtr geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetLink());
-    geom->SetSaveable(false);
+    CollisionPtr collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision("box", this->collisionParent->GetLink());
+    collision->SetSaveable(false);
 
-    stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
+    stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">"; 
 
     float x = (node->x + node->width / 2.0) * this->sdf->GetValueDouble("scale");
     float y = (node->y + node->height / 2.0) * this->sdf->GetValueDouble("scale");
@@ -137,10 +137,10 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     float ySize = (node->height) * this->sdf->GetValueDouble("scale");
     float zSize = this->sdf->GetValueDouble("height");
 
-    char geomName[256];
-    sprintf(geomName,"map_geom_%d",geomCounter++);
+    char collisionName[256];
+    sprintf(collisionName,"map_collision_%d",collisionCounter++);
 
-    stream << "<geom:box name='" << geomName << "'>";
+    stream << "<collision:box name='" << collisionName << "'>";
     stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
     stream << "  <rpy>0 0 0</rpy>";
     stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
@@ -150,13 +150,13 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     stream << "    <material>" << this->materialP->GetValue() << "</material>";
     stream << "    <size>" << xSize << " "<< ySize << " " << zSize << "</size>";
     stream << "  </visual>";
-    stream << "</geom:box>";
+    stream << "</collision:box>";
     stream << "</gazebo:world>";
 
     boxConfig->LoadString( stream.str() );
 
-    geom->SetStatic(true);
-    geom->Load( boxConfig->GetRootNode()->GetChild() );
+    collision->SetStatic(true);
+    collision->Load( boxConfig->GetRootNode()->GetChild() );
 
     delete boxConfig;
   }

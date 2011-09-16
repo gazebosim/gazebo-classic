@@ -89,8 +89,8 @@ namespace gazebo
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(EntityPtr parent);
     
-      /// \brief Create a geom
-      public: virtual GeomPtr CreateGeom(const std::string &shapeTypename, 
+      /// \brief Create a collision
+      public: virtual CollisionPtr CreateCollision(const std::string &shapeTypename, 
                                          LinkPtr parent);
      
       /// \brief Create a new joint
@@ -150,14 +150,14 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: int GetMaxContacts();
     
-      public: void CreateContact(ODEGeom *geom1, ODEGeom *geom2);
+      public: void CreateContact(ODECollision *collision1, ODECollision *collision2);
     
       /// \brief Do collision detection
       private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
     
-      /// \brief Collide two geoms
-      public: void Collide(ODEGeom *geom1, ODEGeom *geom2, 
-                           dContactGeom *contactGeoms);
+      /// \brief Collide two collisions
+      public: void Collide(ODECollision *collision1, ODECollision *collision2, 
+                           dContactGeom *contactCollisions);
     
       public: void ProcessContactFeedback(ContactFeedback* feedback);
 
@@ -171,7 +171,7 @@ namespace gazebo
       /// \brief Top-level world for all bodies
       private: dWorldID worldId;
     
-      /// \brief Top-level space for all sub-spaces/geoms
+      /// \brief Top-level space for all sub-spaces/collisions
       private: dSpaceID spaceId;
     
       /// \brief Collision attributes
@@ -186,12 +186,12 @@ namespace gazebo
     
       private: std::map<std::string, dSpaceID> spaces;
 
-      private: std::vector< std::pair<ODEGeom*, ODEGeom*> > colliders;
-      private: std::vector< std::pair<ODEGeom*, ODEGeom*> > trimeshColliders;
+      private: std::vector< std::pair<ODECollision*, ODECollision*> > colliders;
+      private: std::vector< std::pair<ODECollision*, ODECollision*> > trimeshColliders;
     
       private: tbb::spin_mutex collideMutex;
 
-      private: dContactGeom *contactGeoms;
+      private: dContactGeom *contactCollisions;
   #if ODE_WG_TRUNK
       private: int (*physicsStepFunc)(dxWorld*, dReal);
   #else

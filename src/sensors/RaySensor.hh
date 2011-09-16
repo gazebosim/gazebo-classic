@@ -32,7 +32,7 @@
 namespace gazebo
 {
   class OgreDynamicLines;
-  class Geom;
+  class Collision;
   class MultiRayShape;
 
   namespace sensors
@@ -125,7 +125,7 @@ namespace gazebo
       private: gazebo::physics::WorldPtr world;
       private: gazebo::physics::ModelPtr model;
       private: gazebo::physics::LinkPtr link;
-      private: gazebo::physics::GeomPtr laserGeom;
+      private: gazebo::physics::CollisionPtr laserCollision;
       private: gazebo::physics::PhysicsEnginePtr physicsEngine;
       private: gazebo::physics::MultiRayShapePtr laserShape;
     };

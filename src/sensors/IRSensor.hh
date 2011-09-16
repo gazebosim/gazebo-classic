@@ -29,7 +29,7 @@
 
 namespace gazebo
 {
-  class RayGeom;
+  class RayCollision;
   class RaySensor;
 
   namespace sensors
@@ -45,7 +45,7 @@ namespace gazebo
     class IRSensor: public Sensor
     {
       /// \brief Constructor
-      /// \param body The underlying collision test uses an ODE geom, so
+      /// \param body The underlying collision test uses an ODE collision, so
       ///             ray sensors must be attached to a body.
       public: IRSensor(Body *body);
     

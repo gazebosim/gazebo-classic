@@ -24,7 +24,7 @@ using namespace physics;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-BoxShape::BoxShape(GeomPtr parent) : Shape(parent)
+BoxShape::BoxShape(CollisionPtr parent) : Shape(parent)
 {
   this->AddType(Base::BOX_SHAPE);
 }

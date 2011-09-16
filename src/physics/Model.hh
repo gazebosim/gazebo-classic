@@ -60,6 +60,9 @@ namespace gazebo
       /// \brief Finalize the model
       public: virtual void Fini();
 
+      /// \brief update the parameters using new sdf values
+      public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
+
       /// \brief Remove a child
       /// \param child Remove a child entity
       public: virtual void RemoveChild(EntityPtr child);
@@ -156,6 +159,10 @@ namespace gazebo
       /// \param _sdf SDF parameter
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
+      public: void StoreContact(CollisionPtr collision, Contact contact);
+      private: std::map<CollisionPtr, std::vector<Contact> > contacts;
+      public: std::vector<Contact> GetContacts(CollisionPtr geom);
+
       private: LinkPtr canonicalLink;
 
       private: Joint_V joints;
@@ -164,9 +171,6 @@ namespace gazebo
 
       private: transport::PublisherPtr jointPub;
 
-      public: void StoreContact(GeomPtr geom, Contact contact);
-      private: std::map<GeomPtr, std::vector<Contact> > contacts;
-      public: std::vector<Contact> GetContacts(GeomPtr geom);
     };
     /// \}
   }

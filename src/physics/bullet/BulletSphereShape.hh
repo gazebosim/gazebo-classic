@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere geometry
+/* Desc: Sphere collisionetry
  * Author: Nate Keonig
  * Date: 21 May 2009
  * SVN: $Id:$
@@ -31,11 +31,11 @@ namespace gazebo
 {
 	namespace physics
 {
-  /// \brief Bullet sphere geom
+  /// \brief Bullet sphere collision
   class BulletSphereShape : public SphereShape
   {
     /// \brief Constructor
-    public: BulletSphereShape(Geom *parent) : SphereShape(parent) {}
+    public: BulletSphereShape(Collision *parent) : SphereShape(parent) {}
 
     /// \brief Destructor
     public: virtual ~BulletSphereShape() {}
@@ -44,7 +44,7 @@ namespace gazebo
     public: void SetSize(const double &radius)
             {
               SphereShape::SetSize(radius);
-              BulletGeom *bParent = (BulletGeom*)(this->parent);
+              BulletCollision *bParent = (BulletCollision*)(this->parent);
               bParent->SetCollisionShape( new btSphereShape(radius) );
             }
   };
