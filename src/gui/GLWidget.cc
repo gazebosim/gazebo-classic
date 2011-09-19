@@ -170,54 +170,52 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
   {
     this->mouseEvent.dragging = true;
   }
-  else if (this->keyModifiers & Qt::ControlModifier)
+  else
   {
     std::string mod;
     this->mouseEvent.dragging = false;
 
     rendering::VisualPtr newHoverVis;
 
-    if (this->selection)
+    if (this->keyModifiers & Qt::ControlModifier)
     {
-      newHoverVis = 
-        this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pos, mod);
-    }
-    else
-    {
-      newHoverVis = this->scene->GetVisualAt(this->userCamera, 
-                                          this->mouseEvent.pos);
-    }
+      if (this->selection)
+        newHoverVis = 
+          this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pos, mod);
+      else
+        newHoverVis = this->scene->GetVisualAt(this->userCamera, 
+            this->mouseEvent.pos);
 
-    if (!mod.empty())
-    {
-      this->setCursor(Qt::SizeAllCursor);
-      this->scene->GetSelectionObj()->SetHighlight( mod );
-    }
-    else if (newHoverVis)
-    {
-
-      this->scene->GetSelectionObj()->SetHighlight( "" );
-      if (this->hoverVis)
-        this->hoverVis->SetEmissive(common::Color(0,0,0));
-
-      if (!newHoverVis->IsPlane())
+      if (!mod.empty())
       {
-        newHoverVis->SetEmissive(common::Color(.5,.5,.5));
-        this->setCursor(Qt::PointingHandCursor);
+        this->setCursor(Qt::SizeAllCursor);
+        this->scene->GetSelectionObj()->SetHighlight( mod );
+      }
+      else if (newHoverVis)
+      {
+        this->scene->GetSelectionObj()->SetHighlight( "" );
+        if (this->hoverVis)
+          this->hoverVis->SetEmissive(common::Color(0,0,0));
+
+        if (!newHoverVis->IsPlane())
+        {
+          newHoverVis->SetEmissive(common::Color(.5,.5,.5));
+          this->setCursor(Qt::PointingHandCursor);
+        }
+        else
+        {
+          this->setCursor(Qt::ArrowCursor);
+          newHoverVis.reset();
+        }
       }
       else
       {
-        this->setCursor(Qt::ArrowCursor);
-        newHoverVis.reset();
-      }
-    }
-    else
-    {
-      this->scene->GetSelectionObj()->SetHighlight( "" );
-      if (this->hoverVis)
-        this->hoverVis->SetEmissive(common::Color(0,0,0));
+        this->scene->GetSelectionObj()->SetHighlight( "" );
+        if (this->hoverVis)
+          this->hoverVis->SetEmissive(common::Color(0,0,0));
 
-      this->setCursor(Qt::ArrowCursor);
+        this->setCursor(Qt::ArrowCursor);
+      }
     }
 
     this->hoverVis = newHoverVis;
