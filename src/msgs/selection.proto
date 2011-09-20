@@ -9,8 +9,9 @@ import "header.proto";
 
 message Selection
 {
-  required Header header = 1;
-  optional bool selected = 2 [default = false];
+  optional Header header = 1;
+  required string name   = 2;
+  optional bool selected = 3 [default = false];
 }
 
 /// \endverbatim

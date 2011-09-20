@@ -16,6 +16,8 @@
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
+#include "math/Angle.hh"
+
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gui/ModelListWidget.hh"
@@ -60,10 +62,11 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->entitiesRequestPub = this->node->Advertise<msgs::Request>("~/request_entities");
   this->entitiesSub = this->node->Subscribe("~/entities", &ModelListWidget::OnEntities, this);
   this->entityInfoSub = this->node->Subscribe("~/entity_info", &ModelListWidget::OnEntityInfo, this);
-  this->entityPub = this->node->Advertise<msgs::Entity>("~/entity");
   this->newEntitySub = this->node->Subscribe("~/entity", &ModelListWidget::OnEntity, this);
 
+  this->entityPub = this->node->Advertise<msgs::Entity>("~/entity");
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
 
   /*msgs::Request msg;
   msg.set_index( 1 );
@@ -87,31 +90,67 @@ ModelListWidget::~ModelListWidget()
 void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
                                        QtProperty *_parentItem)
 {
-  QtProperty *topItem = this->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(), 
-      QLatin1String( _elem->GetName().c_str() ));
+  QtProperty *topItem = NULL;
+
+  if (!_parentItem)
+  {
+    QList<QtProperty*> props = this->propTreeBrowser->properties();
+    for (QList<QtProperty*>::iterator iter = props.begin(); 
+         iter != props.end(); iter++)
+    {
+      if ( (*iter)->propertyName().toStdString() == _elem->GetName())
+      {
+        topItem = (*iter);
+        break;
+      }
+    }
+
+    if (!topItem)
+    {
+      topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), 
+          QLatin1String( _elem->GetName().c_str() ));
+      this->propTreeBrowser->addProperty(topItem);
+    }
+  }
+  else
+  {
+    if ( (topItem = this->GetChildItem(_parentItem,_elem->GetName())) == NULL)
+    {
+      topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), 
+          QLatin1String( _elem->GetName().c_str() ));
+      _parentItem->addSubProperty(topItem);
+    }
+  }
 
   for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
       iter != _elem->attributes.end(); iter++)
   {
-    QtVariantProperty *item;
+    QtVariantProperty *item = (QtVariantProperty*)(this->GetChildItem(topItem, (*iter)->GetKey()));
     if ((*iter)->IsStr())
     {
-      item = this->variantManager->addProperty( QVariant::String, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::String, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       std::string value;
       (*iter)->Get( value ); 
       item->setValue( value.c_str() );
-      topItem->addSubProperty(item);
     }
     else if ((*iter)->IsBool())
     {
-      item = this->variantManager->addProperty( QVariant::Bool, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Bool, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       bool value;
       (*iter)->Get(value); 
       item->setValue( value );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsPose() )
     {
@@ -119,101 +158,144 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
       (*iter)->Get(value); 
       math::Vector3 rpy = value.rot.GetAsEuler();
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "X" ));
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "X")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "X" ));
+        topItem->addSubProperty(item);
+      }
       item->setValue( value.pos.x );
-      topItem->addSubProperty(item);
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Y" ));
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Y")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Y" ));
+        topItem->addSubProperty(item);
+      }
       item->setValue( value.pos.y );
-      topItem->addSubProperty(item);
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Z" ));
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Z")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Z" ));
+        topItem->addSubProperty(item);
+      }
       item->setValue( value.pos.z );
-      topItem->addSubProperty(item);
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Roll" ));
-      item->setValue( rpy.x );
-      topItem->addSubProperty(item);
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Roll")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Roll" ));
+        topItem->addSubProperty(item);
+      }
+      item->setValue( DTOR(rpy.x) );
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Pitch" ));
-      item->setValue( rpy.y );
-      topItem->addSubProperty(item);
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Pitch")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Pitch" ));
+        topItem->addSubProperty(item);
+      }
+      item->setValue( DTOR(rpy.y) );
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Yaw" ));
-      item->setValue( rpy.z );
-      topItem->addSubProperty(item);
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Yaw")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Yaw" ));
+        topItem->addSubProperty(item);
+      }
+      item->setValue( DTOR(rpy.z) );
     }
     else if ( (*iter)->IsInt() )
     {
-      item = this->variantManager->addProperty( QVariant::Int, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Int, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       int value;
       (*iter)->Get(value); 
       item->setValue( value );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsUInt() )
     {
-      item = this->variantManager->addProperty( QVariant::Int, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Int, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       unsigned int value;
       (*iter)->Get(value); 
       item->setValue( value );
       item->setAttribute( "minimum", 0 );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsFloat() )
     {
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       float value;
       (*iter)->Get(value); 
       item->setValue( value );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsDouble() )
     {
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       double value;
       (*iter)->Get(value); 
       item->setValue( value );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsChar() )
     {
-      item = this->variantManager->addProperty( QVariant::Char, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Char, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
       char value;
       (*iter)->Get(value); 
       item->setValue( value );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsVector3() )
     {
       math::Vector3 value;
       (*iter)->Get(value); 
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "X" ));
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "X")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "X" ));
+        topItem->addSubProperty(item);
+      }
       item->setValue( value.x );
-      topItem->addSubProperty(item);
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Y" ));
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Y")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Y" ));
+        topItem->addSubProperty(item);
+      }
       item->setValue( value.y );
-      topItem->addSubProperty(item);
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Z" ));
+
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Z")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Z" ));
+        topItem->addSubProperty(item);
+      }
       item->setValue( value.z );
-      topItem->addSubProperty(item);
     }
     else if ( (*iter)->IsQuaternion() )
     {
@@ -222,36 +304,43 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
       (*iter)->Get(value); 
       rpy = value.GetAsEuler();
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Roll" ));
-      item->setValue( value.x );
-      topItem->addSubProperty(item);
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Roll")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Roll" ));
+        topItem->addSubProperty(item);
+      }
+      item->setValue( DTOR(value.x) );
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Pitch" ));
-      item->setValue( value.y );
-      topItem->addSubProperty(item);
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Pitch")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Pitch" ));
+        topItem->addSubProperty(item);
+      }
+      item->setValue( DTOR(value.y) );
 
-      item = this->variantManager->addProperty( QVariant::Double, 
-          QLatin1String( "Yaw" ));
-      item->setValue( value.z );
-      topItem->addSubProperty(item);
+      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Pitch")) == NULL)
+      {
+        item = this->variantManager->addProperty( QVariant::Double, 
+            QLatin1String( "Yaw" ));
+        topItem->addSubProperty(item);
+      }
+      item->setValue( DTOR(value.z) );
     }
     else if ( (*iter)->IsColor() )
     {
       common::Color value;
       (*iter)->Get(value); 
 
-      item = this->variantManager->addProperty( QVariant::Color, 
-          QLatin1String( (*iter)->GetKey().c_str() ));
-      topItem->addSubProperty(item);
+      if (!item)
+      {
+        item = this->variantManager->addProperty( QVariant::Color, 
+            QLatin1String( (*iter)->GetKey().c_str() ));
+        topItem->addSubProperty(item);
+      }
     }
   }
-
-  if (_parentItem)
-    _parentItem->addSubProperty(topItem);
-  else
-    this->propTreeBrowser->addProperty(topItem);
 
 
   for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
@@ -266,39 +355,59 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 {
   if (_item)
   {
-    std::string listText = _item->text(0).toStdString();
-    std::string listData = _item->data(0, Qt::UserRole ).toString().toStdString();
+    msgs::Selection msg;
 
-    msgs::Entity msg;
-    msgs::Init(msg, listData);
-    msg.set_name( listData );
-    msg.set_request_info( true );
+    if (!this->selectedModelName.empty())
+    {
+      msg.set_name( this->selectedModelName );
+      msg.set_selected( false );
+      this->selectionPub->Publish(msg);
+    }
 
-    QTimer::singleShot(200,this,SLOT(Update()));
-    this->entityPub->Publish(msg);
+    this->propTreeBrowser->clear();
+    this->selectedModelName = _item->data(0,Qt::UserRole).toString().toStdString();
+    msg.set_name( this->selectedModelName );
+    msg.set_selected( true );
+    printf("Publish selection msg\n");
+    this->selectionPub->Publish(msg);
+
+    this->Update();
   }
+  else
+    this->selectedModelName.clear();
 }
 
 void ModelListWidget::Update()
 {
+  if (!this->selectedModelName.empty())
+  {
+    msgs::Entity msg;
+    msgs::Init(msg, this->selectedModelName );
+    msg.set_name( this->selectedModelName );
+    msg.set_request_info( true );
+    this->entityPub->Publish(msg);
+  }
+
   if (this->sdfElement)
   {
-    this->propTreeBrowser->clear();
     this->fillingPropertyTree = true;
     this->FillPropertyTree(this->sdfElement, NULL);
     this->fillingPropertyTree = false;
   }
-  else
-  {
-    QTimer::singleShot(200,this,SLOT(Update));
-  }
+
+  QTimer::singleShot( 500, this, SLOT(Update()) );
 }
+
 
 void ModelListWidget::OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg )
 {
-  this->sdfElement.reset(new sdf::Element);
-  sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
-  sdf::readString( _msg->sdf(), this->sdfElement );
+  if (!this->fillingPropertyTree)
+  {
+    this->sdfElement.reset(new sdf::Element);
+    sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
+    sdf::readString( _msg->sdf(), this->sdfElement );
+
+  }
 }
 
 void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg )
@@ -474,14 +583,14 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
           pose.pos.z = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
         else if ( (*propIter)->propertyName() == "Roll")
-          rpy.x = boost::lexical_cast<double>(
-              (*propIter)->valueText().toStdString());
+          rpy.x = RTOD( boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString()) );
         else if ( (*propIter)->propertyName() == "Pitch")
-          rpy.y = boost::lexical_cast<double>(
-              (*propIter)->valueText().toStdString());
+          rpy.y = RTOD( boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString()) );
         else if ( (*propIter)->propertyName() == "Yaw")
-          rpy.z = boost::lexical_cast<double>(
-              (*propIter)->valueText().toStdString());
+          rpy.z = RTOD( boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString()) );
       }
       pose.rot.SetFromEuler( rpy );
       (*iter)->Set( pose );
@@ -515,14 +624,14 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
           propIter != subProperties.end(); propIter++)
       {
         if ( (*propIter)->propertyName() == "Roll")
-          rpy.x = boost::lexical_cast<double>(
-              (*propIter)->valueText().toStdString());
+          rpy.x = RTOD( boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString()) );
         else if ( (*propIter)->propertyName() == "Pitch")
-          rpy.y = boost::lexical_cast<double>(
-              (*propIter)->valueText().toStdString());
+          rpy.y = RTOD( boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString()) );
         else if ( (*propIter)->propertyName() == "Yaw")
-          rpy.z = boost::lexical_cast<double>(
-              (*propIter)->valueText().toStdString());
+          rpy.z = RTOD( boost::lexical_cast<double>(
+              (*propIter)->valueText().toStdString()) );
       }
       q.SetFromEuler( rpy );
       (*iter)->Set(q);

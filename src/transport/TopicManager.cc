@@ -165,6 +165,9 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   //CallbackHelperPtr subscription( new CallbackHelperT<M>( callback ) );
   //this->subscribed_topics[topic].push_back(subscription);
   
+  if (ops.GetTopic() == "/gazebo/default/selection")
+    printf("Subscribe to selection\n");
+  
   this->subscribed_topics[ops.GetTopic()].push_back(subscription);
 
   // The object that gets returned to the caller of this
@@ -179,6 +182,8 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   {
     pub->AddSubscription( subscription );
   }
+  else if (ops.GetTopic() == "/gazebo/default/selection")
+    gzdbg << "No publication\n";
 
   // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());

@@ -57,7 +57,8 @@ namespace gazebo
       private: QAction *deleteAction;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr entitiesRequestPub, entityPub, factoryPub;
+      private: transport::PublisherPtr entitiesRequestPub, entityPub;
+      private: transport::PublisherPtr selectionPub, factoryPub;
       private: transport::SubscriberPtr entitiesSub, newEntitySub,entityInfoSub ;
 
       private: rendering::VisualPtr modelVisual;
@@ -69,6 +70,7 @@ namespace gazebo
 
       private: sdf::ElementPtr sdfElement;
       private: bool fillingPropertyTree;
+      private: std::string selectedModelName;
     };
   }
 }

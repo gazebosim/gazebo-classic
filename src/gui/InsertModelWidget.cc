@@ -184,7 +184,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
     }
 
     msgs::Selection selectMsg;
-    msgs::Init(selectMsg, modelName);
+    selectMsg.set_name( modelName );
     selectMsg.set_selected(true);
     this->selectionPub->Publish(selectMsg);
   }
@@ -198,7 +198,7 @@ void InsertModelWidget::OnApply()
  
   // Remove the selection 
   msgs::Selection selectMsg;
-  msgs::Init(selectMsg, modelName);
+  selectMsg.set_name( modelName );
   selectMsg.set_selected(false);
   this->selectionPub->Publish(selectMsg);
  
@@ -237,7 +237,7 @@ void InsertModelWidget::OnCancel()
  
   // Remove the selection 
   msgs::Selection selectMsg;
-  msgs::Init(selectMsg, modelName);
+  selectMsg.set_name( modelName );
   selectMsg.set_selected(false);
   this->selectionPub->Publish(selectMsg);
   this->fileTreeWidget->clearSelection();

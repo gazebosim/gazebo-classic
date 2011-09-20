@@ -504,7 +504,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   // unselect selectedEntity
   if (this->selectedEntity)
   {
-    msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
+    msg.set_name( this->selectedEntity->GetCompleteScopedName() );
     msg.set_selected( false );
     this->selectionPub->Publish(msg);
 
@@ -518,8 +518,9 @@ void World::SetSelectedEntityCB( const std::string &name )
     this->selectedEntity = ent;
     this->selectedEntity->SetSelected(true);
 
-    msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
+    msg.set_name( this->selectedEntity->GetCompleteScopedName() );
     msg.set_selected( true );
+
     this->selectionPub->Publish(msg);
   }
   else

@@ -175,10 +175,14 @@ bool Entity::IsCanonicalLink() const
 
 void Entity::PublishPose()
 {
-  if (this->GetRelativePose() != msgs::Convert(*this->poseMsg))
+  math::Pose relativePose = this->GetRelativePose();
+  if (relativePose != msgs::Convert(*this->poseMsg))
   {
+    if (this->sdf->HasElement("origin"))
+      this->sdf->GetElement("origin")->GetAttribute("pose")->Set(relativePose);
+
     this->poseMsg->mutable_header()->set_index( this->poseMsg->header().index() + 1);
-    msgs::Set( this->poseMsg, this->GetWorldPose());
+    msgs::Set( this->poseMsg, this->worldPose);
     this->posePub->Publish( *this->poseMsg);
   }
 }
@@ -213,42 +217,6 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
 /// Get the absolute pose of the entity
 math::Pose Entity::GetWorldPose() const
 {
-  /* debugging
-  if (this->HasType(MODEL))
-  {
-    //gzerr << "GWP [" << this->GetName() << "]\n";
-    // simply check that WP = CWP - CIRP for assurance
-    const Model* model = dynamic_cast<const Model*>(this);
-    LinkPtr link = model->GetLink();
-    if (!link)
-      gzerr << "  No CB for [" << this->GetName() << "] Init?\n";
-    else
-    {
-
-      math::Pose model_abs_pose1 = link->worldPose + link->initialRelativePose.GetInverse();
-      math::Pose model_abs_pose2;
-      math::Pose cb_rel_pose = this->GetRelativePose();
-      // anti-rotate cb-abs by cb-rel = model-abs
-      model_abs_pose2.rot = link->worldPose.rot * link->initialRelativePose.rot.GetInverse();
-      // rotate cb-rel pos by cb-rel rot to get pos offset
-      //Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
-      // finally, model-abs pos is cb-abs pos - pos_offset
-      //model_abs_pose2.pos = cb->GetWorldPose().pos - pos_offset;
-      model_abs_pose2.pos = link->worldPose.pos - model_abs_pose2.rot * link->initialRelativePose.pos;
-      //model_abs_pose2.pos = pose.pos - this->GetRelativePose().pos;
-      // set abs pose of parent model without propagating
-      // changes to children
-
-      if (this->worldPose != model_abs_pose1 || this->worldPose != model_abs_pose2)
-      {
-        gzerr << "        GWP[ " << this->worldPose << "]\n";
-        gzerr << "  *CWP-CIRP[ " << model_abs_pose1 << "]\n";
-        gzerr << "  *CWP-CIRP[ " << model_abs_pose2 << "]\n";
-      }
-    }
-  }
-  */
-
   return this->worldPose;
 }
 
@@ -460,8 +428,6 @@ void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
   if (this->parent && this->parentEntity)
     pose = this->parentEntity->worldPose;
 
-  std::cout << "Set World Pose[" <<  this->GetWorldPose() << "] to [" << 
-_sdf->GetElement("origin")->GetValuePose("pose") + pose  << "]\n";
   this->SetWorldPose( _sdf->GetElement("origin")->GetValuePose("pose") + pose );
 }
 

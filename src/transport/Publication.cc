@@ -31,12 +31,16 @@ std::string Publication::GetTopic() const
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
-//  printf("Publication::AddSubscription[%s]\n", this->topic.c_str());
+  if (this->topic == "/gazebo/default/selection")
+    printf("Publication::AddSubscription[%s]\n", this->topic.c_str());
 
   std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
   if (iter == this->callbacks.end())
   {
+    if (this->topic == "/gazebo/default/selection")
+      printf("Adding...\n");
+
     this->callbacks.push_back(callback);
 
     if (this->prevMsg && this->prevMsg->IsInitialized())
@@ -44,6 +48,11 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
       callback->HandleMessage(this->prevMsg);
     }
   } 
+  else if (this->topic == "/gazebo/default/selection")
+    printf("Duplicate subscription found[%s]\n", this->topic.c_str());
+
+  if (this->topic == "/gazebo/default/selection")
+    printf("Done with add subscription\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,12 +156,19 @@ void Publication::Publish(const std::string &data)
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
 
+  if (this->topic == "/default/gazebo/selection")
+    printf("Size[%d]\n", this->callbacks.size());
+
   while (iter != this->callbacks.end())
   {
     if ((*iter)->HandleData(data))
       iter++;
     else
+    {
+      if (this->topic == "/default/gazebo/selection")
+        printf("DELETE callback\n");
       this->callbacks.erase( iter++ );
+    }
   }
 }
 
@@ -162,6 +178,9 @@ void Publication::LocalPublish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
+
+  if (this->topic == "/default/gazebo/selection")
+    printf("Local publish\n");
 
   while (iter != this->callbacks.end())
   {
@@ -186,6 +205,9 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   std::string data;
   _msg.SerializeToString(&data);
+
+  if (this->topic == "/default/gazebo/selection")
+    printf("Publish msg\n");
 
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
