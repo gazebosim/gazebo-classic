@@ -715,3 +715,17 @@ std::vector<Contact> Model::GetContacts(CollisionPtr geom)
   else
     return iter->second;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// retrieve list of contacts for a geom
+Contact Model::GetContact(CollisionPtr _geom, unsigned int _i)
+{
+  std::vector<Contact> geom_contacts = this->GetContacts(_geom);
+  if (geom_contacts.empty())
+    return Contact();
+  else
+    if (_i < geom_contacts.size())
+      return geom_contacts[_i];
+    else
+      return Contact();
+}

@@ -173,36 +173,30 @@ unsigned int ContactSensor::GetCollisionCount() const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Return the number of contacts for an observed collision
-unsigned int ContactSensor::GetCollisionContactCount(unsigned int /*_collisionIndex*/) const
+unsigned int ContactSensor::GetCollisionContactCount(unsigned int _collisionIndex) const
 {
-/*
-  if (collisionIndex < this->collisions.size())
-    return this->collisions[collisionIndex]->GetContactCount();
-*/
+  if (_collisionIndex < this->collisions.size())
+    return this->collisions[_collisionIndex]->GetContactCount();
 
   return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a contact for a collision by index
-physics::Contact ContactSensor::GetCollisionContact(unsigned int /*_collision*/, unsigned int /*_index*/) const
+physics::Contact ContactSensor::GetCollisionContact(unsigned int _collisionIndex, unsigned int _index) const
 {
-/*
-  if (collision < this->collisions.size())
-    return this->collisions[collision]->GetContact( index );
-*/
+  if (_collisionIndex < this->collisions.size())
+    return this->collisions[_collisionIndex]->GetContact( _index );
 
   return physics::Contact();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a contact for a collision by index
-physics::Collision* ContactSensor::GetCollision(unsigned int /*_collision*/) const
+physics::Collision* ContactSensor::GetCollision(unsigned int _collisionIndex) const
 {
-/*
-  if (collision < this->collisions.size())
-    return this->collisions[collision];
-*/
+  if (_collisionIndex < this->collisions.size())
+    return this->collisions[_collisionIndex];
 
   return NULL;
 }

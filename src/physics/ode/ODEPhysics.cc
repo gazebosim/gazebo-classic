@@ -356,8 +356,6 @@ void ODEPhysics::UpdateCollision()
         ContactUpdate_TBB(&this->contactFeedbacks) );
   }
   */
-  for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
-    this->ProcessContactFeedback( this->contactFeedbacks[i] );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,6 +369,8 @@ void ODEPhysics::UpdatePhysics()
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
     this->odeRaySensorMutex->unlock();
   }
+  for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
+    this->ProcessContactFeedback( this->contactFeedbacks[i] );
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
@@ -866,6 +866,10 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback* feedback)
     joint.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
     joint.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
 
+    // gzerr << " force " << (*jiter).f1[0]
+    //       << " , "     << (*jiter).f1[1]
+    //       << " , "     << (*jiter).f1[2]
+    //       << "\n";
     feedback->contact.forces.push_back(joint);
   }
 
