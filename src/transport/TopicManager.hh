@@ -155,9 +155,7 @@ namespace gazebo
                                     const SubscriptionTransportPtr &sublink );
 
       /// \brief Connect a local Subscriber to a remote Publisher
-      public: void ConnectSubToPub( const std::string &topic,
-                                    const PublicationTransportPtr &publink );
-
+      public: void ConnectSubToPub( const msgs::Publish &_pub );
 
       /// \brief Disconnect a local publisher from a remote subscriber
       public: void DisconnectPubFromSub( const std::string &topic, 
@@ -170,7 +168,7 @@ namespace gazebo
                                          unsigned int port);
 
       /// \brief Connect all subscribers on a topic to known publishers
-      public: void ConnectSubscibers(const std::string &topic);
+      public: void ConnectSubscribers(const std::string &topic);
 
       /// \brief Update our list of advertised topics
       /// \return True if the provided params define a new publisher.

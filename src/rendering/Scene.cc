@@ -70,7 +70,6 @@ Scene::Scene(const std::string &_name)
   this->lightSub = this->node->Subscribe("~/light", &Scene::ReceiveLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose", &Scene::ReceivePoseMsg, this);
   this->selectionSub = this->node->Subscribe("~/selection", &Scene::OnSelectionMsg, this);
-  std::cout << "Scene create selection sub[" << _name << "]\n";
 
   this->selectionObj = new SelectionObj(this);
 
@@ -1119,7 +1118,6 @@ void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 
 void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
 {
-  printf("On Selection\n");
   this->selectionMsg = _msg;
 }
 

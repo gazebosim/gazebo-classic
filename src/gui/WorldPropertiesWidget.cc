@@ -698,8 +698,6 @@ void SceneWidget::OnAmbientColor()
   if (!this->initialized)
     return;
 
-  printf("OnAmbientColor\n");
-
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 

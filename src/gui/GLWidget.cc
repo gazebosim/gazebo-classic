@@ -503,7 +503,6 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
 
 void GLWidget::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
 {
-  printf("GLWidget::OnSelection\n");
   if (_msg->has_selected())
   {
     if (_msg->selected())

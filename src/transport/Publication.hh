@@ -60,7 +60,10 @@ namespace gazebo
                            const boost::function<void()> &cb = NULL);
 
       public: void AddTransport( const PublicationTransportPtr &publink );
+      public: bool HasTransport( const std::string &_host, unsigned int _port );
 
+      private: unsigned int id;
+      private: static unsigned int idCounter;
       private: std::string topic;
       private: std::string msgType;
       private: std::list< CallbackHelperPtr > callbacks;

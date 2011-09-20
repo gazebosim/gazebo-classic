@@ -276,18 +276,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
-
-      // Connect to the remote publisher
-      ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
-
-      // Create a transport link that will read from the connection, and 
-      // send data to a Publication.
-      PublicationTransportPtr publink(new PublicationTransport(pub.topic(), 
-            pub.msg_type()));
-      publink->Init( conn );
-
-      // Connect local subscribers to the publication transport link
-      TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
+      TopicManager::Instance()->ConnectSubToPub(pub);
     }
   }
   else if (packet.type() == "unsubscribe")

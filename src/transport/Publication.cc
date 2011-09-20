@@ -4,11 +4,14 @@
 using namespace gazebo;
 using namespace transport;
 
+unsigned int Publication::idCounter = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Publication::Publication( const std::string &topic, const std::string &msgType )
   : topic(topic), msgType(msgType), locallyAdvertised(false)
 {
+  this->id = idCounter++;
   this->prevMsg = NULL;
 }
 
@@ -31,16 +34,10 @@ std::string Publication::GetTopic() const
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
-  if (this->topic == "/gazebo/default/selection")
-    printf("Publication::AddSubscription[%s]\n", this->topic.c_str());
-
   std::list< CallbackHelperPtr >::iterator iter;
   iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
   if (iter == this->callbacks.end())
   {
-    if (this->topic == "/gazebo/default/selection")
-      printf("Adding...\n");
-
     this->callbacks.push_back(callback);
 
     if (this->prevMsg && this->prevMsg->IsInitialized())
@@ -48,11 +45,6 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
       callback->HandleMessage(this->prevMsg);
     }
   } 
-  else if (this->topic == "/gazebo/default/selection")
-    printf("Duplicate subscription found[%s]\n", this->topic.c_str());
-
-  if (this->topic == "/gazebo/default/selection")
-    printf("Done with add subscription\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +74,21 @@ void Publication::AddTransport( const PublicationTransportPtr &_publink)
   }
 }
 
+bool Publication::HasTransport( const std::string &_host, unsigned int _port )
+{
+  std::list<PublicationTransportPtr>::iterator iter;
+  for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
+  {
+    if ( (*iter)->GetConnection()->GetRemoteAddress() == _host &&
+         (*iter)->GetConnection()->GetRemotePort() == _port)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Remove a transport
 void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
@@ -105,6 +112,7 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 {
   std::list< CallbackHelperPtr >::iterator iter;
+
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
     if (*iter == callback)
@@ -125,6 +133,7 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 // Remove a subscription
 void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 {
+
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
 
@@ -156,17 +165,12 @@ void Publication::Publish(const std::string &data)
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
 
-  if (this->topic == "/default/gazebo/selection")
-    printf("Size[%d]\n", this->callbacks.size());
-
   while (iter != this->callbacks.end())
   {
     if ((*iter)->HandleData(data))
       iter++;
     else
     {
-      if (this->topic == "/default/gazebo/selection")
-        printf("DELETE callback\n");
       this->callbacks.erase( iter++ );
     }
   }
@@ -178,9 +182,6 @@ void Publication::LocalPublish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
   iter = this->callbacks.begin();
-
-  if (this->topic == "/default/gazebo/selection")
-    printf("Local publish\n");
 
   while (iter != this->callbacks.end())
   {
@@ -205,9 +206,6 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   std::string data;
   _msg.SerializeToString(&data);
-
-  if (this->topic == "/default/gazebo/selection")
-    printf("Publish msg\n");
 
   iter = this->callbacks.begin();
   while (iter != this->callbacks.end())

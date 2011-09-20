@@ -165,9 +165,6 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   //CallbackHelperPtr subscription( new CallbackHelperT<M>( callback ) );
   //this->subscribed_topics[topic].push_back(subscription);
   
-  if (ops.GetTopic() == "/gazebo/default/selection")
-    printf("Subscribe to selection\n");
-  
   this->subscribed_topics[ops.GetTopic()].push_back(subscription);
 
   // The object that gets returned to the caller of this
@@ -242,13 +239,15 @@ void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::st
 
 ////////////////////////////////////////////////////////////////////////////////
 // Connect all subscribers on a topic to known publishers
-void TopicManager::ConnectSubscibers(const std::string &_topic)
+void TopicManager::ConnectSubscribers(const std::string &_topic)
 {
   SubMap::iterator iter = this->subscribed_topics.find(_topic);
 
   if (iter != this->subscribed_topics.end())
   {
     PublicationPtr publication = this->FindPublication(_topic);
+    if (!publication)
+      return;
 
     // Add all of our subscriptions to the publication
     std::list<CallbackHelperPtr>::iterator cbIter;
@@ -263,29 +262,35 @@ void TopicManager::ConnectSubscibers(const std::string &_topic)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Connect a local subscriber to a remote publisher
-void TopicManager::ConnectSubToPub( const std::string &_topic,
-                                    const PublicationTransportPtr &_publink )
+void TopicManager::ConnectSubToPub( const msgs::Publish &_pub)
 {
-  // Add the publication transport mechanism to the publication.
-  if (_publink)
-  {
-    PublicationPtr publication = this->FindPublication(_topic);
-    if (publication)
-      publication->AddTransport( _publink );
-    else
-      gzerr << "Attempting to connect a remote publisher...but we don't have a publication. This shouldn't happen\n";
-  }
-  else
-    gzerr << "Bad Publink[" << _topic << "]!!\n";
+  this->UpdatePublications(_pub.topic(), _pub.msg_type());
 
-  this->ConnectSubscibers(_topic);
+  PublicationPtr publication = this->FindPublication(_pub.topic());
+
+  if (publication && !publication->HasTransport(_pub.host(), _pub.port()))
+  {
+    // Connect to the remote publisher
+    ConnectionPtr conn = ConnectionManager::Instance()->ConnectToRemoteHost(
+        _pub.host(), _pub.port());
+
+    // Create a transport link that will read from the connection, and 
+    // send data to a Publication.
+    PublicationTransportPtr publink(new PublicationTransport(_pub.topic(), 
+          _pub.msg_type()));
+    publink->Init( conn );
+
+    publication->AddTransport( publink );
+  }
+
+  this->ConnectSubscribers(_pub.topic());
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a new publication to the list of advertised publication
 PublicationPtr TopicManager::UpdatePublications( const std::string &topic, 
-                                       const std::string &msgType )
+                                                 const std::string &msgType )
 {
   bool inserted = false;
 

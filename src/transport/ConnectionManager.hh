@@ -84,7 +84,7 @@ namespace gazebo
                                             unsigned short port);
              
       /// \brief Connect to a remote server
-      private: ConnectionPtr ConnectToRemoteHost( const std::string &host,
+      public: ConnectionPtr ConnectToRemoteHost( const std::string &host,
                                                   unsigned short port);
 
       private: void OnMasterRead( const std::string &data );

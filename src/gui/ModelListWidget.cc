@@ -368,7 +368,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     this->selectedModelName = _item->data(0,Qt::UserRole).toString().toStdString();
     msg.set_name( this->selectedModelName );
     msg.set_selected( true );
-    printf("Publish selection msg\n");
     this->selectionPub->Publish(msg);
 
     this->Update();

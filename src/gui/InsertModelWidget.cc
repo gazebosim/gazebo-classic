@@ -99,7 +99,6 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
 
 InsertModelWidget::~InsertModelWidget()
 {
-  printf("InsertModelWidget destructor\n");
 }
 
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
