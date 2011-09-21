@@ -165,6 +165,7 @@ namespace gazebo
       public: void StoreContact(CollisionPtr collision, Contact contact);
       private: std::map<CollisionPtr, std::vector<Contact> > contacts;
       public: std::vector<Contact> GetContacts(CollisionPtr geom);
+      public: Contact GetContact(CollisionPtr geom, unsigned int _i);
 
       private: LinkPtr canonicalLink;
 

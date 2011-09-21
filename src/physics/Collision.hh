@@ -115,7 +115,7 @@ namespace gazebo
       public: unsigned int GetContactCount() const;
               
       /// \brief Get a specific contact
-      public: Contact GetContact(unsigned int i) const;
+      public: Contact GetContact(unsigned int i);
   
       /// \brief Get the linear velocity of the collision
       public: virtual math::Vector3 GetRelativeLinearVel() const;

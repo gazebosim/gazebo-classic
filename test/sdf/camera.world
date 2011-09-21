@@ -82,24 +82,24 @@
     </light>
 
     <plugin name="plugin_1" filename="libgazebo_ros_camera.so">
-      <data name="sensor" value="model_1::sensor_camera" />
-      <data name="alwaysOn" value="true" />
-      <data name="updateRate" value="25.0" />
-      <data name="imageTopicName" value="narrow_stereo/left/image_raw" />
-      <data name="cameraInfoTopicName" value="narrow_stereo/left/camera_info" />
-      <data name="frameName" value="narrow_stereo_optical_frame" />
-      <data name="hackBaseline" value="0" />
-      <data name="CxPrime" value="320.5" />
-      <data name="Cx" value="320.5" />
-      <data name="Cy" value="240.5" />
+      <sensor>model_1::sensor_camera</sensor>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>25.0</updateRate>
+      <imageTopicName>narrow_stereo/left/image_raw</imageTopicName>
+      <cameraInfoTopicName>narrow_stereo/left/camera_info</cameraInfoTopicName>
+      <frameName>narrow_stereo_optical_frame</frameName>
+      <hackBaseline>0</hackBaseline>
+      <CxPrime>320.5</CxPrime>
+      <Cx>320.5</Cx>
+      <Cy>240.5</Cy>
       <!-- image_width / (2*tan(hfov_radian /2)) -->
       <!-- 320 for wide and 772.55 for narrow stereo camera -->
-      <data name="focal_length" value="772.55" />
-      <data name="distortion_k1" value="0.0" />
-      <data name="distortion_k2" value="0.0" />
-      <data name="distortion_k3" value="0.0" />
-      <data name="distortion_t1" value="0.0" />
-      <data name="distortion_t2" value="0.0" />
+      <focal_length>772.55</focal_length>
+      <distortion_k1>0.0</distortion_k1>
+      <distortion_k2>0.0</distortion_k2>
+      <distortion_k3>0.0</distortion_k3>
+      <distortion_t1>0.0</distortion_t1>
+      <distortion_t2>0.0</distortion_t2>
     </plugin>
 
   </world>

@@ -273,11 +273,12 @@ void Collision::AddContact(const Contact &_contact)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific contact
-Contact Collision::GetContact(unsigned int /*_i*/) const
+Contact Collision::GetContact(unsigned int _i)
 {
-  return Contact();
+  //return Contact();
   // TODO: redo this
-  //return this->GetParentModel()->RetrieveContact(, _i);
+  return this->GetParentModel()->GetContact(
+      boost::shared_dynamic_cast<Collision>(shared_from_this()), _i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
