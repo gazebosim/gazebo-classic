@@ -63,6 +63,9 @@ namespace gazebo
       /// \brief update the parameters using new sdf values
       public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
 
+      /// \brief Get the SDF values for the model
+      public: virtual const sdf::ElementPtr &GetSDF() const;
+
       /// \brief Remove a child
       /// \param child Remove a child entity
       public: virtual void RemoveChild(EntityPtr child);

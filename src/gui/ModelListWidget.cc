@@ -1,6 +1,7 @@
 #include <QtGui>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
@@ -28,6 +29,8 @@ using namespace gui;
 ModelListWidget::ModelListWidget( QWidget *parent )
   : QWidget( parent )
 {
+  this->propMutex = new boost::recursive_mutex();
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
@@ -81,10 +84,19 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->deleteAction = new QAction(tr("Delete"), this);
   this->deleteAction->setStatusTip(tr("Delete the selection"));
   connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
+
+  this->fillingPropertyTree = false;
 }
 
 ModelListWidget::~ModelListWidget()
 {
+  delete this->propMutex;
+}
+
+bool ModelListWidget::eventFilter(QObject *_object, QEvent *_event)
+{
+  std::cout << "Event[" << _event->type() << "] Obj[" << _object->objectName().toStdString() << "]\n";
+  return true;
 }
 
 void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
@@ -128,6 +140,7 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
       iter != _elem->attributes.end(); iter++)
   {
     QtVariantProperty *item = (QtVariantProperty*)(this->GetChildItem(topItem, (*iter)->GetKey()));
+
     if ((*iter)->IsStr())
     {
       if (!item)
@@ -389,9 +402,15 @@ void ModelListWidget::Update()
 
   if (this->sdfElement)
   {
+    this->propMutex->lock();
     this->fillingPropertyTree = true;
-    this->FillPropertyTree(this->sdfElement, NULL);
+    for (sdf::ElementPtr_V::iterator iter = this->sdfElement->elements.begin();
+         iter != this->sdfElement->elements.end(); iter++)
+    {
+      this->FillPropertyTree((*iter), NULL);
+    }
     this->fillingPropertyTree = false;
+    this->propMutex->unlock();
   }
 
   QTimer::singleShot( 500, this, SLOT(Update()) );
@@ -400,13 +419,11 @@ void ModelListWidget::Update()
 
 void ModelListWidget::OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg )
 {
-  if (!this->fillingPropertyTree)
-  {
-    this->sdfElement.reset(new sdf::Element);
-    sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
-    sdf::readString( _msg->sdf(), this->sdfElement );
-
-  }
+  this->propMutex->lock();
+  this->sdfElement.reset(new sdf::Element);
+  sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
+  sdf::readString( _msg->sdf(), this->sdfElement );
+  this->propMutex->unlock();
 }
 
 void ModelListWidget::OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg )
@@ -533,8 +550,12 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
+  this->propMutex->lock();
   if (this->fillingPropertyTree)
+  {
+    this->propMutex->unlock();
     return;
+  }
 
   msgs::Factory msg;
   msgs::Init(msg,"update");
@@ -544,9 +565,12 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   for (QList<QtProperty*>::iterator iter = properties.begin(); 
        iter != properties.end(); iter++)
   {
-    if ( (*iter)->propertyName().toStdString() == this->sdfElement->GetName())
+    sdf::ElementPtr elem = this->sdfElement->GetElement(
+        (*iter)->propertyName().toStdString() );
+    if (elem)
     {
-      this->FillSDF( (*iter), this->sdfElement);
+      std::cout << "PropName[" << (*iter)->propertyName().toStdString() << "] ElementName[" << elem->GetName() << "]\n";
+      this->FillSDF( (*iter), elem);
     }
   }
 
@@ -555,10 +579,15 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   std::string str =  this->sdfElement->ToString("");
   std::cout << "ToString[" << str << "]\n";
   this->factoryPub->Publish(msg);
+
+  this->propMutex->unlock();
 }
 
 void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
 {
+  if (!_item)
+    return;
+
   // Set all the attribute values
   for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
       iter != _elem->attributes.end(); iter++)
@@ -591,8 +620,12 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
           rpy.z = RTOD( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
       }
-      pose.rot.SetFromEuler( rpy );
-      (*iter)->Set( pose );
+
+      if (subProperties.size() > 0)
+      {
+        pose.rot.SetFromEuler( rpy );
+        (*iter)->Set( pose );
+      }
     }
     else if ( (*iter)->IsVector3() )
     {
@@ -612,7 +645,8 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
               (*propIter)->valueText().toStdString());
       }
 
-      (*iter)->Set(xyz);
+      if (subProperties.size() > 0)
+        (*iter)->Set(xyz);
     }
     else if ( (*iter)->IsQuaternion())
     {
@@ -632,19 +666,24 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
           rpy.z = RTOD( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
       }
-      q.SetFromEuler( rpy );
-      (*iter)->Set(q);
+
+      if (subProperties.size() > 0)
+      {
+        q.SetFromEuler( rpy );
+        (*iter)->Set(q);
+      }
     }
     else if ((*iter)->IsColor())
     {
       QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
-      std::string color = childItem->valueText().toStdString();
-      gzerr << "Setting color needs to be implemented[" << color << "]\n";
+      if (childItem)
+        std::string color = childItem->valueText().toStdString();
     }
     else
     {
       QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
-      (*iter)->SetFromString( childItem->valueText().toStdString() );
+      if (childItem)
+        (*iter)->SetFromString( childItem->valueText().toStdString() );
     }
   }
 
@@ -657,6 +696,9 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
 
 QtProperty *ModelListWidget::GetChildItem(QtProperty *_item, const std::string &_name)
 {
+  if (!_item)
+    return NULL;
+
   QList<QtProperty*> subProperties = _item->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
       iter != subProperties.end(); iter++)

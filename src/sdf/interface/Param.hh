@@ -25,6 +25,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/any.hpp>
+#include <boost/function.hpp>
 #include <typeinfo>
 #include <string>
 
@@ -82,6 +84,12 @@ namespace sdf
 
     public: virtual boost::shared_ptr<Param> Clone() const = 0;
 
+    /// \brief Update function
+    public: template<typename T> void SetUpdateFunc( T _updateFunc )
+            { this->updateFunc = _updateFunc; }
+
+    public: virtual void Update() = 0;
+
     public: bool IsBool() const;
     public: bool IsInt() const;
     public: bool IsUInt() const;
@@ -126,6 +134,8 @@ namespace sdf
     protected: bool required;
     protected: bool set;
     protected: std::string typeName;
+
+    protected: boost::function<boost::any ()> updateFunc;
   };
   
  
@@ -149,7 +159,16 @@ namespace sdf
    
     /// \brief Destructor
     public: virtual ~ParamT() {}
- 
+
+    public: virtual void Update()
+            {
+              if (this->updateFunc)
+              {
+                const T value = boost::any_cast<T>(this->updateFunc());
+                Param::Set( value );
+              }
+            }
+
     /// \brief Get the parameter value as a string
     public: virtual std::string GetAsString() const
     {
@@ -248,9 +267,8 @@ namespace sdf
               return _out;
             }
   
-    private: T value;
-    private: T defaultValue;
+    protected: T value;
+    protected: T defaultValue;
   };
-
 }
 #endif

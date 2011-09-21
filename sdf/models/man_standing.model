@@ -11,7 +11,7 @@
         <box size="0.1 0.1 0.1"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual1">
       <geometry>
         <!--<mesh filename="stovetop/stovetop.dae"/>-->
         <!--<mesh filename="man_standing.dae"/>-->

@@ -67,6 +67,7 @@ MainWindow::MainWindow()
   mainWidget->setLayout(mainLayout);
 
   this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
+  this->modelsDock->raise();
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 

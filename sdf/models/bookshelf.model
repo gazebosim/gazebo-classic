@@ -11,7 +11,7 @@
         <box size="0.9 0.01 1.2"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual1">
       <origin pose="0 0.005 0.6 0 0 0"/>
       <geometry>
         <box size="0.9 0.01 1.2"/>
@@ -25,7 +25,7 @@
         <box size="0.02 0.4 1.2"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual2">
       <origin pose="0.45 -0.195 0.6 0 0 0"/>
       <geometry>
         <box size="0.02 0.4 1.2"/>
@@ -39,7 +39,7 @@
         <box size="0.02 0.4 1.2"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual3">
       <origin pose="-0.45 -0.195 0.6 0 0 0"/>
       <geometry>
         <box size="0.02 0.4 1.2"/>
@@ -53,7 +53,7 @@
         <box size="0.88 0.4 0.06"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual4">
       <origin pose="0 -0.195 0.03 0 0 0"/>
       <geometry>
         <box size="0.88 0.4 0.06"/>
@@ -67,7 +67,7 @@
         <box size="0.88 0.4 0.02"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual5">
       <origin pose="0 -0.195 1.19 0 0 0"/>
       <geometry>
         <box size="0.88 0.4 0.02"/>
@@ -81,7 +81,7 @@
         <box size="0.88 0.4 0.02"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual6">
       <origin pose="0 -0.195 0.43 0 0 0"/>
       <geometry>
         <box size="0.88 0.4 0.02"/>
@@ -95,7 +95,7 @@
         <box size="0.88 0.4 0.02"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual7">
       <origin pose="0 -0.195 0.8 0 0 0"/>
       <geometry>
         <box size="0.88 0.4 0.02"/>

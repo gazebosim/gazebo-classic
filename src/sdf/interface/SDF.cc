@@ -220,6 +220,31 @@ ElementPtr Element::Clone() const
   return clone;
 }
 
+/// \brief Copy values from an Element
+void Element::Copy( const ElementPtr &_elem )
+{
+  for (Param_V::iterator iter = this->attributes.begin(); 
+       iter != this->attributes.end(); iter++)
+  {
+    ParamPtr param = _elem->GetAttribute( (*iter)->GetKey() );
+    if (param)
+    {
+      (*iter)->SetFromString( param->GetAsString() );
+    }
+  }
+
+  if (this->value && _elem->GetValue())
+    this->value->SetFromString( _elem->GetValue()->GetAsString() );
+
+  for (ElementPtr_V::iterator iter = this->elements.begin();
+       iter != this->elements.end(); iter++)
+  {
+    ElementPtr elem = _elem->GetElement( (*iter)->GetName() );
+    if (elem)
+      (*iter)->Copy( elem );
+  }
+}
+
 void Element::PrintDescription(std::string _prefix)
 {
   std::cout << _prefix << "<element name='" << this->name << "' required='" << this->required << "'>\n";
@@ -610,4 +635,19 @@ void SDF::PrintValues()
 std::string SDF::ToString() const
 {
   return this->root->ToString("");
+}
+
+void Element::Update()
+{
+  for (sdf::Param_V::iterator iter = this->attributes.begin();
+       iter != this->attributes.end(); iter++)
+  {
+    (*iter)->Update();
+  }
+
+  for (sdf::ElementPtr_V::iterator iter = this->elements.begin();
+       iter != this->elements.end(); iter++)
+  {
+    (*iter)->Update();
+  }
 }

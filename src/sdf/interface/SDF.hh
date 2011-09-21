@@ -40,6 +40,9 @@ namespace sdf
     public: Element();
     public: boost::shared_ptr<Element> Clone() const;
 
+    /// \brief Copy values from an Element
+    public: void Copy( const ElementPtr &_elem );
+
     public: ElementPtr GetParent() const;
     public: void SetParent(const ElementPtr &_parent);
 
@@ -102,11 +105,13 @@ namespace sdf
     public: ElementPtr GetElement(const std::string &_name) const;
     public: ElementPtr GetFirstElement() const;
     public: ElementPtr GetNextElement(const std::string &_name, 
-                                       const ElementPtr &_elem) const;
+                                      const ElementPtr &_elem) const;
 
     public: ElementPtr GetOrCreateElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
     public: void ClearElements();
+
+    public: void Update();
 
     private: boost::shared_ptr<Param> CreateParam(const std::string &_key, 
                  const std::string &_type, const std::string &_defaultValue, 

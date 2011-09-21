@@ -25,7 +25,7 @@
           </geometry>
         </collision>
 
-        <visual cast_shadows="false">
+        <visual name="visual" cast_shadows="false">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
@@ -48,7 +48,7 @@
           </geometry>
         </collision>
 
-        <visual>
+        <visual name="visual">
           <geometry>
             <box size="1 1 1"/>
           </geometry>
@@ -72,7 +72,7 @@
           </geometry>
         </collision>
 
-        <visual>
+        <visual name="visual">
           <geometry>
             <sphere radius="0.5"/>
           </geometry>
@@ -94,7 +94,7 @@
           </geometry>
         </collision>
 
-        <visual>
+        <visual name="visual">
           <geometry>
             <cylinder radius="0.5" length="1.0"/>
           </geometry>

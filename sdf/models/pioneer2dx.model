@@ -13,7 +13,7 @@
       <mass>1.0</mass>
     </collision>
   
-    <visual>
+    <visual name="visual1">
       <origin xyz="0 0 0.04" rpy="0 180 0"/>
       <geometry>
         <mesh filename="Pioneer2dx/chassis.mesh"/>
@@ -21,7 +21,7 @@
       <material script="Gazebo/Pioneer2Body"/>
     </visual>
   
-    <visual>
+    <visual name="visual2">
       <origin xyz="0.015 0 0.095"/>
       <geometry>
         <mesh filename="Pioneer2dx/chassis_top.mesh"/>
@@ -29,7 +29,7 @@
       <material script="Gazebo/Black"/>
     </visual>
   
-    <visual>
+    <visual name="visual3">
       <origin xyz="0.21 0.0 0.068"/>
       <geometry>
         <mesh filename="Pioneer2dx/sonarbank.mesh"/>
@@ -37,7 +37,7 @@
       <material script="Gazebo/Gold"/>
     </visual>
   
-    <visual>
+    <visual name="visual4">
       <origin xyz="-0.178 0.0 0.068" rpy="0 0 180"/>
       <geometry>
         <mesh filename="Pioneer2dx/sonarbank.mesh"/>
@@ -57,21 +57,21 @@
       <mass>0.1</mass>
     </collision>
   
-    <visual>
+    <visual name="visual1">
       <geometry>
         <mesh filename="Pioneer2dx/tire.mesh"/>
       </geometry>
       <material script="Gazebo/Black"/>
     </visual>
   
-    <visual>
+    <visual name="visual2">
       <geometry>
         <mesh filename="Pioneer2dx/wheel.mesh"/>
       </geometry>
       <material script="Gazebo/Gold"/>
     </visual>
   
-    <visual>
+    <visual name="visual3">
       <origin xyz="0 0 0.015"/>
       <geometry>
         <cylinder radius="0.04" length="0.08"/>
@@ -90,21 +90,21 @@
       <mass>0.1</mass>
     </collision>
   
-    <visual>
+    <visual name="visual1">
       <geometry>
         <mesh filename="Pioneer2dx/tire.mesh"/>
       </geometry>
       <material script="Gazebo/Black"/>
     </visual>
   
-    <visual>
+    <visual name="visual2">
       <geometry>
         <mesh filename="Pioneer2dx/wheel.mesh"/>
       </geometry>
       <material script="Gazebo/Gold"/>
     </visual>
   
-    <visual>
+    <visual name="visual3">
       <origin xyz="0 0 -0.015"/>
       <geometry>
         <cylinder radius="0.04" length="0.08"/>
@@ -123,7 +123,7 @@
       <mass>0.1</mass>
     </collision>
   
-    <visual>
+    <visual name="visual1">
       <geometry>
         <sphere radius="0.02"/>
       </geometry>

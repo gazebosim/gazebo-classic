@@ -1,7 +1,7 @@
 <!-- Collision -->
 <element name="collision" required="*">
+  <attribute name="name" type="string" default="__default__" required="1"/>
   <element name="max_contacts" type="int" default="10" required="0"/>
-  <attribute name="name" type="string" default="__default__" required="0"/>
   <attribute name="laser_retro" type="double" default="0" required="0"/>
 
   <element name="max_contacts" type="int" default="10" required="0"/>

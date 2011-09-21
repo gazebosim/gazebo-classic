@@ -16,6 +16,11 @@ class QtVariantPropertyManager;
 class QtProperty;
 class QtTreePropertyItem;
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
   namespace gui
@@ -31,6 +36,8 @@ namespace gazebo
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();
       private slots: void OnPropertyChanged(QtProperty *_item);
+
+      private slots: bool eventFilter(QObject *_object, QEvent *_event);
 
       private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
@@ -68,9 +75,10 @@ namespace gazebo
       private: ModelEditWidget *modelEditWidget;
       private: QtVariantPropertyManager *variantManager;
 
+      private: boost::recursive_mutex *propMutex;
       private: sdf::ElementPtr sdfElement;
-      private: bool fillingPropertyTree;
       private: std::string selectedModelName;
+      private: bool fillingPropertyTree;
     };
   }
 }

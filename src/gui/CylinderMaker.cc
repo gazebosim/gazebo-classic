@@ -170,7 +170,7 @@ void CylinderMaker::CreateTheEntity()
                       length='" << this->visualMsg->scale().z() << "'/>\
           </geometry>\
         </collision>\
-        <visual cast_shadows='true'>\
+        <visual name='visual' cast_shadows='true'>\
           <geometry>\
             <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
                       length='" << this->visualMsg->scale().z() << "'/>\

@@ -200,9 +200,9 @@ namespace gazebo
     };
 
     template<typename T>
-    ConnectionPtr EventT<T>::Connect(const boost::function<T> &subscriber)
+    ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
-      this->connections.push_back(new boost::function<T>(subscriber) );
+      this->connections.push_back(new boost::function<T>(_subscriber) );
       return ConnectionPtr( new Connection(this, this->connections.size()-1) );
     }
     

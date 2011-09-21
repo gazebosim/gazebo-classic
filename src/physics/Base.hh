@@ -187,7 +187,7 @@ namespace gazebo
       public: const WorldPtr &GetWorld() const;
 
       /// \brief Get the SDF values for the model
-      public: const sdf::ElementPtr &GetSDF() const;
+      public: virtual const sdf::ElementPtr &GetSDF();
 
       protected: sdf::ElementPtr sdf;
 

@@ -11,7 +11,7 @@
         <box size="1 1 1"/>
       </geometry>
     </collision>
-    <visual>
+    <visual name="visual1">
       <geometry>
         <box size="1 1 1"/>
       </geometry>

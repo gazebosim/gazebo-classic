@@ -26,7 +26,7 @@
           </geometry>
         </collision>
 
-        <visual>
+        <visual name="visual">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>

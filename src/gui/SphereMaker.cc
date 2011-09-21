@@ -147,7 +147,7 @@ void SphereMaker::CreateTheEntity()
           <sphere radius='" << this->visualMsg->scale().x()*.5 << "'/>\
         </geometry>\
       </collision>\
-      <visual cast_shadows='true'>\
+      <visual name='visual' cast_shadows='true'>\
         <geometry>\
           <sphere radius='" << this->visualMsg->scale().x()*.5 << "'/>\
         </geometry>\

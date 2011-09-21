@@ -583,7 +583,7 @@
           </contact>
         </surface>
       </collision>
-      <visual cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name="visual1" cast_shadows='1' laser_retro='0' transparency='0'>
         <geometry>
           <mesh filename='pr2/head_v0/head_tilt.dae' scale='1 1 1'/>
         </geometry>

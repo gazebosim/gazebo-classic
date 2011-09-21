@@ -81,7 +81,7 @@ void Base::Load( sdf::ElementPtr _sdf )
 //// Update the parameters using new sdf values
 void Base::UpdateParameters( sdf::ElementPtr &_sdf )
 {
-  this->sdf = _sdf;
+  this->sdf->Copy( _sdf );
 }
 
 
@@ -383,7 +383,8 @@ const WorldPtr &Base::GetWorld() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the SDF values for the model
-const sdf::ElementPtr &Base::GetSDF() const
+const sdf::ElementPtr &Base::GetSDF()
 {
+  this->sdf->Update();
   return this->sdf;
 }

@@ -94,14 +94,18 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 
   this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
 
-  if (_sdf->HasElement("origin"))
+  if (this->sdf->HasElement("origin"))
   {
+    sdf::ElementPtr originElem = this->sdf->GetElement("origin");
     if (this->parent && this->parentEntity)
-      this->worldPose = _sdf->GetElement("origin")->GetValuePose("pose") +
+      this->worldPose = originElem->GetValuePose("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = _sdf->GetElement("origin")->GetValuePose("pose");
-    this->initialRelativePose = _sdf->GetElement("origin")->GetValuePose("pose");
+      this->worldPose = originElem->GetValuePose("pose");
+    this->initialRelativePose = originElem->GetValuePose("pose");
+
+    originElem->GetAttribute("pose")->SetUpdateFunc( 
+        boost::bind( &Entity::GetRelativePose, this ) );
   }
 
   if (this->parent)
@@ -178,10 +182,8 @@ void Entity::PublishPose()
   math::Pose relativePose = this->GetRelativePose();
   if (relativePose != msgs::Convert(*this->poseMsg))
   {
-    if (this->sdf->HasElement("origin"))
-      this->sdf->GetElement("origin")->GetAttribute("pose")->Set(relativePose);
-
-    this->poseMsg->mutable_header()->set_index( this->poseMsg->header().index() + 1);
+    this->poseMsg->mutable_header()->set_index( 
+        this->poseMsg->header().index() + 1);
     msgs::Set( this->poseMsg, this->worldPose);
     this->posePub->Publish( *this->poseMsg);
   }
@@ -424,11 +426,23 @@ void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
 {
   Base::UpdateParameters(_sdf);
 
-  math::Pose pose;
+  math::Pose parentPose;
   if (this->parent && this->parentEntity)
-    pose = this->parentEntity->worldPose;
+    parentPose = this->parentEntity->worldPose;
 
-  this->SetWorldPose( _sdf->GetElement("origin")->GetValuePose("pose") + pose );
+  math::Pose newPose = _sdf->GetElement("origin")->GetValuePose("pose");
+  math::Pose result = newPose + parentPose;
+
+  this->SetRelativePose( newPose );
+
+  std::cout << "Update Pose[" << this->GetWorldPose().pos << "] New[" 
+            << newPose.pos << "] Parent[" << parentPose.pos << "] Result[" 
+            << result.pos << "] After[" << this->GetWorldPose().pos << "]\n";
 }
 
+const sdf::ElementPtr &Entity::GetSDF()
+{
+  this->sdf->GetElement("origin")->GetAttribute("pose")->Update();
+  return Base::GetSDF();
+}
 

@@ -762,6 +762,7 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   {
     std::cout << "Edit with[";
     factorySDF->PrintValues();
+
     BasePtr base = this->rootElement->GetByName( _msg->edit_name() );
     if (base)
     {
@@ -771,6 +772,7 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
       else
         elem = factorySDF->root;
 
+      boost::mutex::scoped_lock lock(*this->updateMutex);
       base->UpdateParameters( elem );
     }
   }

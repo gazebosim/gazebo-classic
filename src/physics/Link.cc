@@ -277,18 +277,12 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
     while (visualElem)
     {
       // TODO: Update visuals properly
-      /*std::ostringstream visname;
-      visname << this->GetCompleteScopedName() << "::VISUAL_" << 
-        this->visuals.size();
-
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-      msgs::Init(msg, visname.str());
+      msgs::Init(msg, visualElem->GetValueString("name"));
       msg.set_parent_id( this->GetCompleteScopedName() );
       msg.set_is_static( this->IsStatic() );
 
       this->visPub->Publish(msg);
-      this->visuals.push_back(msg.header().str_id());
-      */
 
       visualElem = this->sdf->GetNextElement("visual", visualElem); 
     }
@@ -306,7 +300,6 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
       collisionElem = this->sdf->GetNextElement("collision", collisionElem);
     }
   }
- 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

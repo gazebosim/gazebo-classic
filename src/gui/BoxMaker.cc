@@ -167,7 +167,7 @@ void BoxMaker::CreateTheEntity()
                        << this->visualMsg->scale().z() << "'/>\
         </geometry>\
       </collision>\
-      <visual cast_shadows='true'>\
+      <visual name='visual' cast_shadows='true'>\
         <geometry>\
           <box size='" << this->visualMsg->scale().x() << " "
                        << this->visualMsg->scale().y() << " "
