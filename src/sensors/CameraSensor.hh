@@ -69,6 +69,7 @@ namespace gazebo
       private: void Render();
     
       private: rendering::CameraPtr camera;
+      public: rendering::CameraPtr GetCamera() const {return this->camera; };
     
       protected: std::string ogreTextureName;
     };
