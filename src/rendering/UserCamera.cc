@@ -239,6 +239,9 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &evt)
 // Set view controller
 void UserCamera::SetViewController( const std::string &type )
 {
+  if (this->viewController->GetTypeString() == type)
+    return;
+
   delete this->viewController;
   this->viewController = NULL;
 
@@ -304,18 +307,18 @@ void UserCamera::ShowVisual(bool s)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void UserCamera::MoveTo( const std::string &_name )
+void UserCamera::MoveToVisual( const std::string &_name )
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
-    this->MoveTo(visual);
+    this->MoveToVisual(visual);
   else
     gzerr << "MoveTo Unknown visual[" << _name << "]\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Move the camera to focus on an scene node
-void UserCamera::MoveTo( VisualPtr _visual)
+void UserCamera::MoveToVisual( VisualPtr _visual)
 {
   if (!_visual)
     return;
@@ -398,16 +401,26 @@ void UserCamera::MoveTo( VisualPtr _visual)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the camera to track a scene node
-void UserCamera::TrackVisual( Visual * /*visual_*/ )
+void UserCamera::TrackVisual( const std::string &_name )
 {
-  /* NATY: Put back in
+  VisualPtr visual = this->scene->GetVisual(_name);
+  if (visual)
+    this->TrackVisual(visual);
+  else
+    gzerr << "MoveTo Unknown visual[" << _name << "]\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the camera to track a scene node
+void UserCamera::TrackVisual( VisualPtr _visual )
+{
   this->sceneNode->getParent()->removeChild(this->sceneNode);
 
-  if (model)
+  if (_visual)
   {
-    Body *b = model->GetCanonicalBody();
-    b->GetVisualNode()->GetSceneNode()->addChild(this->sceneNode);
-    this->camera->setAutoTracking(true, b->GetVisualNode()->GetSceneNode() );
+    _visual->GetSceneNode()->addChild(this->sceneNode);
+    this->camera->setAutoTracking(true, _visual->GetSceneNode() );
+    this->SetViewController(OrbitViewController::GetTypeString());
   }
   else
   {
@@ -415,6 +428,6 @@ void UserCamera::TrackVisual( Visual * /*visual_*/ )
     this->camera->setAutoTracking(false, NULL);
     this->camera->setPosition(Ogre::Vector3(0,0,0));
     this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
+    this->SetViewController(FPSViewController::GetTypeString());
   }
-  */
 }

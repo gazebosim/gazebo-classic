@@ -22,18 +22,21 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/OrbitViewController.hh"
 
+#define TYPE_STRING "OrbitViewController"
+
 using namespace gazebo;
 using namespace rendering;
 
 
 static const float PITCH_LIMIT_LOW = 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI - 0.001;
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 OrbitViewController::OrbitViewController(UserCamera *camera)
   : ViewController(camera), distance(5.0f)
 {
+  this->typeString = TYPE_STRING;
+
   math::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
 
   this->yaw = rpy.z;
@@ -143,3 +146,11 @@ void OrbitViewController::NormalizePitch(float &v)
   else if (v > PITCH_LIMIT_HIGH)
     v = PITCH_LIMIT_HIGH;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type name of this view controller
+std::string OrbitViewController::GetTypeString() 
+{
+  return TYPE_STRING;
+}
+ 

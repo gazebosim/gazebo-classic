@@ -41,8 +41,11 @@ namespace gazebo
   
       /// \brief Handle a mouse event
       public: virtual void HandleMouseEvent(const common::MouseEvent &event)=0;
+
+      public: std::string GetTypeString() const;
   
       protected: UserCamera *camera; 
+      protected: std::string typeString;
     };
     /// \}
   }

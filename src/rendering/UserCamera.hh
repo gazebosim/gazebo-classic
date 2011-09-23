@@ -35,6 +35,8 @@ namespace gazebo
 {
 	namespace rendering
   {
+    class OrbitViewController;
+    class FPSViewController;
     class Visual;
 
     /// \addtogroup gazebo_rendering
@@ -85,11 +87,14 @@ namespace gazebo
 
 
       /// \brief Move the camera to focus on a scene node
-      public: void MoveTo(VisualPtr _visual);
-      public: void MoveTo(const std::string &_visualName);
-  
+      public: void MoveToVisual(VisualPtr _visual);
+      public: void MoveToVisual(const std::string &_visualName);
+
       /// \brief Set the camera to track a scene node
-      public: void TrackVisual( Visual *visual );
+      public: void TrackVisual( const std::string &_visualName);
+ 
+      /// \brief Set the camera to track a scene node
+      public: void TrackVisual( VisualPtr _visual );
    
       /// \brief Toggle whether to show the visual
       private: void ToggleShowVisual();

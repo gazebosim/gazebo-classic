@@ -39,7 +39,7 @@ namespace gazebo
       public: virtual void Update();
   
       /// \brief Get the type name of this view controller
-      public: static std::string GetTypeString() {return "FPSViewController";}
+      public: static std::string GetTypeString();
   
       /// \brief Handle a mouse event
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);

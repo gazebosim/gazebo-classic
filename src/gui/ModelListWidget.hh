@@ -38,9 +38,9 @@ namespace gazebo
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();
       private slots: void OnPropertyChanged(QtProperty *_item);
-      private slots: bool eventFilter(QObject *_object, QEvent *_event);
       private slots: void OnMoveTo();
       private slots: void OnDelete();
+      private slots: void OnFollow();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
 
@@ -67,6 +67,7 @@ namespace gazebo
       private: QtTreePropertyBrowser *propTreeBrowser;
       private: QAction *moveToAction;
       private: QAction *deleteAction;
+      private: QAction *followAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr entitiesRequestPub, entityPub;

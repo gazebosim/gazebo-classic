@@ -88,6 +88,10 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   msg.set_request("entities");
   this->entitiesRequestPub->Publish(msg);
 
+  this->followAction = new QAction(tr("Follow"), this);
+  this->followAction->setStatusTip(tr("Follow the selection"));
+  connect(this->followAction, SIGNAL(triggered()), this, SLOT(OnFollow()));
+
   this->moveToAction = new QAction(tr("Move To"), this);
   this->moveToAction->setStatusTip(tr("Move camera to the selection"));
   connect(this->moveToAction, SIGNAL(triggered()), this, SLOT(OnMoveTo()));
@@ -103,12 +107,6 @@ ModelListWidget::ModelListWidget( QWidget *parent )
 ModelListWidget::~ModelListWidget()
 {
   delete this->propMutex;
-}
-
-bool ModelListWidget::eventFilter(QObject *_object, QEvent *_event)
-{
-  std::cout << "Event[" << _event->type() << "] Obj[" << _object->objectName().toStdString() << "]\n";
-  return true;
 }
 
 void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
@@ -591,13 +589,22 @@ void ModelListWidget::OnDelete()
   this->entityPub->Publish(msg);
 }
 
+void ModelListWidget::OnFollow()
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
+  std::string modelName = item->text(0).toStdString();
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  cam->TrackVisual(modelName);
+}
+
 void ModelListWidget::OnMoveTo()
 {
   QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
   std::string modelName = item->text(0).toStdString();
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  cam->MoveTo(modelName);
+  cam->MoveToVisual(modelName);
 }
 
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
@@ -607,8 +614,9 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   if (item)
   {
     QMenu menu(this->modelTreeWidget);
-    menu.addAction(moveToAction);
-    menu.addAction(deleteAction);
+    menu.addAction(this->moveToAction);
+    menu.addAction(this->followAction);
+    menu.addAction(this->deleteAction);
     menu.exec(this->modelTreeWidget->mapToGlobal(_pt));
   }
 }

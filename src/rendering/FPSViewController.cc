@@ -21,6 +21,8 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/FPSViewController.hh"
 
+#define TYPE_STRING "FPSViewController"
+
 using namespace gazebo;
 using namespace rendering;
 
@@ -29,6 +31,7 @@ using namespace rendering;
 FPSViewController::FPSViewController(UserCamera *camera_)
   : ViewController(camera_)
 {
+  this->typeString = TYPE_STRING;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,4 +83,11 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &event)
   }
 
   this->camera->Translate(directionVec);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type name of this view controller
+std::string FPSViewController::GetTypeString() 
+{
+  return TYPE_STRING;
 }

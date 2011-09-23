@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);
   
       /// \brief Get the type name of this view controller
-      public: static std::string GetTypeString() {return "OrbitViewController";}
+      public: static std::string GetTypeString();
   
       /// \brief Translate the focal point
       private: void Translate(math::Vector3 vec);

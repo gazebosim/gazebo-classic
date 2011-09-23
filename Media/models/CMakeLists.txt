@@ -31,7 +31,7 @@ set (files column.mesh
            cup.mesh
            test.dae
            man_standing.dae
-           steel_stovetop2.dae
+           steel_stovetop.dae
            bowl.dae
 )
 

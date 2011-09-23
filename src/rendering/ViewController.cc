@@ -34,3 +34,9 @@ ViewController::~ViewController()
 {
   this->camera = NULL;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+std::string ViewController::GetTypeString() const
+{
+  return this->typeString;
+}
