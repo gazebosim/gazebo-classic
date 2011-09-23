@@ -135,6 +135,7 @@
           <ray>
             <scan display='1'>
               <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423'/>
+              <vertical samples='1' resolution='1' min_angle='0' max_angle='0'/>
             </scan>
             <range min='0.080000000000000002' max='10' resolution='0.01'/>
           </ray>
@@ -603,7 +604,7 @@
           </geometry>
           <material script='Gazebo/Grey' normal_map='__default__'/>
         </visual>
-        <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25'>
+        <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='1' update_rate='25'>
           <origin pose='0.0232 0.06 0.098 0 -0 0'/>
           <camera>
             <horizontal_fov angle='0.78539816339744828'/>
@@ -628,12 +629,13 @@
             <distortion_t2>0.0</distortion_t2>
           </plugin>
         </sensor>
-        <sensor name='narrow_stereo_gazebo_r_stereo_camera_sensor' type='camera' always_on='0' update_rate='25'>
+        <sensor name='narrow_stereo_gazebo_r_stereo_camera_sensor' type='camera' always_on='1' update_rate='25'>
           <origin pose='0.0232 -0.03 0.098 0 -0 0'/>
           <camera>
             <horizontal_fov angle='0.78539816339744828'/>
             <image width='320' height='240' format='L8'/>
             <clip near='0.10000000000000001' far='100'/>
+            <save enabled="false" path="/tmp"/>
           </camera>
           <plugin name='narrow_stereo_gazebo_r_stereo_camera_controller' filename='libgazebo_ros_camera.so'>
             <alwaysOn>1</alwaysOn>
@@ -1241,6 +1243,7 @@
           <ray>
             <scan display='1'>
               <horizontal samples='640' resolution='1' min_angle='-1.3962634000002327' max_angle='1.3962634000002327'/>
+              <vertical samples='1' resolution='1' min_angle='0' max_angle='0'/>
             </scan>
             <range min='0.080000000000000002' max='10' resolution='0.01'/>
           </ray>

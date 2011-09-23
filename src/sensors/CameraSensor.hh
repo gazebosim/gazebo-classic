@@ -54,7 +54,7 @@ namespace gazebo
       protected: virtual void Load();
     
       /// \brief Initialize the camera
-      protected: virtual void Init();
+      protected: virtual void InitChild();
     
       /// \brief Update the sensor information
       protected: virtual void Update(bool force);

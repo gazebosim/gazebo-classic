@@ -67,6 +67,16 @@ void Sensor::Load()
      this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
   }
 
+  this->node->Init(this->sdf->GetWorldName());
+
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the sensor
+void Sensor::Init()
+{
+  this->InitChild();
+
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {
@@ -77,15 +87,6 @@ void Sensor::Load()
       pluginElem = this->sdf->GetNextElement("plugin", pluginElem);
     }
   }
-
-  this->node->Init(this->sdf->GetWorldName());
-}
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Initialize the sensor
-void Sensor::Init()
-{
-  this->InitChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
