@@ -11,6 +11,7 @@ add_subdirectory(pr2)
 add_subdirectory(wg)
 add_subdirectory(kitchen)
 add_subdirectory(stovetop)
+add_subdirectory(saucepan)
 
 set (files column.mesh
            geosphere4500.mesh

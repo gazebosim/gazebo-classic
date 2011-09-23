@@ -41,6 +41,7 @@ SET (files
             beigeWall.jpg
             granite.jpg
             granite2.jpg
+            grass.jpg
 )
 
 

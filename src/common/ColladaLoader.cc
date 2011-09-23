@@ -493,8 +493,9 @@ void ColladaLoader::LoadTriangles( TiXmlElement *_trianglesXml,
         subMesh->AddTexCoord( texcoords[values[iter->second]].x,
             texcoords[values[iter->second]].y);
       }
-      else
+      /*else
         gzerr << "Unhandled semantic[" << iter->first << "]\n";
+        */
     }
   } while (iss);
 

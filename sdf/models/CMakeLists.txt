@@ -7,6 +7,7 @@ set (files pioneer2dx.model
            kitchen_counter.model
            man_standing.model
            bowl.model
+           saucepan.model
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models/)
