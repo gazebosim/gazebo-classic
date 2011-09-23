@@ -77,10 +77,8 @@ void CameraSensor::Load()
  
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
-void CameraSensor::Init()
+void CameraSensor::InitChild()
 {
-  Sensor::Init();
-
   std::string worldName = this->sdf->GetWorldName();
 
   if (!worldName.empty())
