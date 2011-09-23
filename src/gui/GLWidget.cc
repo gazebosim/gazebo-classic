@@ -63,11 +63,24 @@ GLWidget::GLWidget( QWidget *parent )
   this->node->Init();
   this->posePub = this->node->Advertise<msgs::Pose>("~/set_pose");
   this->selectionSub = this->node->Subscribe("~/selection", &GLWidget::OnSelectionMsg, this);
+
+  this->installEventFilter(this);
 }
 
 GLWidget::~GLWidget()
 {
   this->userCamera.reset();
+}
+
+bool GLWidget::eventFilter(QObject *obj, QEvent *event)
+{
+  if (event->type() == QEvent::Enter)
+  {
+    this->setFocus(Qt::OtherFocusReason );
+    return true;
+  }
+
+  return false;
 }
 
 void GLWidget::showEvent(QShowEvent *event)
@@ -180,8 +193,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (this->keyModifiers & Qt::ControlModifier)
     {
       if (this->selection)
+      {
+        printf("Get new hover vis, has selection\n");
         newHoverVis = 
           this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pos, mod);
+      }
       else
         newHoverVis = this->scene->GetVisualAt(this->userCamera, 
             this->mouseEvent.pos);
@@ -263,9 +279,11 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     {
       if (this->hoverVis)
       {
+        printf("Setting selection\n");
         this->selection = this->hoverVis;
         if (this->selection)
         {
+          printf("Setting selection2\n");
           // Get the model associated with the visual
           this->selection = this->selection->GetParent()->GetParent();
           this->scene->SelectVisual(this->selection->GetName());
@@ -506,8 +524,14 @@ void GLWidget::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_m
   if (_msg->has_selected())
   {
     if (_msg->selected())
+    {
+      printf("Setting selection3\n");
       this->selection = this->scene->GetVisual(_msg->header().str_id() );
+    }
     else
+    {
+      printf("selection reset\n");
       this->selection.reset();
+    }
   }
 }

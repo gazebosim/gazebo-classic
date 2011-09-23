@@ -380,4 +380,5 @@ math::Vector3 Collision::GetWorldAngularAccel() const
 /// Update the parameters using new sdf values
 void Collision::UpdateParameters( sdf::ElementPtr &_sdf )
 {
+  Entity::UpdateParameters(_sdf);
 }

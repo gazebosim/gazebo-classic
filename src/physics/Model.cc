@@ -300,6 +300,7 @@ void Model::UpdateParameters( sdf::ElementPtr &_sdf )
       linkElem = _sdf->GetNextElement("link", linkElem);
     }
   }
+  /*
 
   if (_sdf->HasElement("joint"))
   {
@@ -311,7 +312,7 @@ void Model::UpdateParameters( sdf::ElementPtr &_sdf )
       jointElem = _sdf->GetNextElement("joint", jointElem);
     }
   }
-
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

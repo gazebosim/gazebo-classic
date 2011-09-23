@@ -61,6 +61,7 @@ namespace gazebo
 
       private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg);
 
+      private: bool eventFilter(QObject *obj, QEvent *event);
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;

@@ -303,19 +303,25 @@ ENDIF (HAVE_FFMPEG)
 
 ########################################
 # Find profiler library, optional
-#FIND_LIBRARY(PROFILER "profiler")
-#IF (PROFILER)
-#  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
-#       CACHE INTERNAL "Link flags for profile" FORCE)
-#ENDIF (PROFILER)
+find_library(PROFILER "profiler")
+if (PROFILER)
+  message (STATUS "Looking for libprofiler - found")
+  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
+       CACHE INTERNAL "Link flags for profile" FORCE)
+else ()
+  message (STATUS "Looking for libprofiler - not found")
+endif ()
 
 ########################################
 # Find tcmalloc library, optional
-FIND_LIBRARY(TCMALLOC "tcmalloc")
-IF (TCMALLOC)
-  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
+find_library(TCMALLOC "tcmalloc")
+if (TCMALLOC)
+  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
        CACHE INTERNAL "Link flags for profile" FORCE)
-ENDIF (TCMALLOC)
+  message (STATUS "Looking for libtcmalloc - found")
+else ()
+  message (STATUS "Looking for libtcmalloc - not found")
+endif ()
 
 ########################################
 # Find libtool

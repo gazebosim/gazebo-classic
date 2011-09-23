@@ -102,20 +102,22 @@ void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
   }
 }
 
-TiXmlElement *ColladaLoader::GetElementId( const std::string &_id)
+TiXmlElement *ColladaLoader::GetElementId( const std::string &_name, const std::string &_id)
 {
-  return this->GetElementId(this->colladaXml, _id);
+  return this->GetElementId(this->colladaXml, _name, _id);
 }
 
 TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent, 
+                                          const std::string &_name,
                                           const std::string &_id)
 {
   std::string id = _id;
   if (id.find("#") != std::string::npos)
     id.erase(id.find("#"),1);
 
-  if ((_parent->Attribute("id")  && _parent->Attribute("id") == id) ||
-      (_parent->Attribute("sid") && _parent->Attribute("sid") == id))
+  if ( (id.empty() && _parent->Value() == _name) ||
+       (_parent->Attribute("id")  && _parent->Attribute("id") == id) ||
+       (_parent->Attribute("sid") && _parent->Attribute("sid") == id) )
   {
     return _parent;
   }
@@ -123,7 +125,7 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
   TiXmlElement *elem = _parent->FirstChildElement();
   while (elem)
   {
-    TiXmlElement *result = this->GetElementId(elem, _id);
+    TiXmlElement *result = this->GetElementId(elem, _name, _id);
     if (result)
       return result;
 
@@ -133,12 +135,70 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
   return NULL;
 }
 
+math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
+{
+  math::Matrix4 transform(math::Matrix4::IDENTITY);
+
+  if (_elem->FirstChildElement("matrix"))
+  {
+    std::string matrixStr = _elem->FirstChildElement("matrix")->GetText();
+    std::istringstream iss(matrixStr);
+    std::vector<double> values(16);
+    for (unsigned int i=0; i < 16; i++)
+      iss >> values[i];
+    transform.Set(values[0], values[1], values[2], values[3],
+                  values[4], values[5], values[6], values[7],
+                  values[8], values[9], values[10], values[11],
+                  values[12], values[13], values[14], values[15]);
+  }
+
+  if (_elem->FirstChildElement("translate"))
+  {
+    std::string transStr = _elem->FirstChildElement("translate")->GetText();
+    math::Vector3 translate;
+    translate = boost::lexical_cast<math::Vector3>(transStr);
+    //translate *= this->meter;
+    transform.SetTranslate( translate );
+  }
+
+  TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
+  while (rotateXml)
+  {
+    math::Matrix3 mat;
+    math::Vector3 axis;
+    double angle;
+
+    std::string rotateStr = rotateXml->GetText();
+    std::istringstream iss(rotateStr);
+
+    iss >> axis.x >> axis.y >> axis.z;
+    iss >> angle;
+    mat.SetFromAxis(axis,DTOR(angle));
+
+    transform = transform * mat;
+
+    rotateXml = rotateXml->NextSiblingElement("rotate");
+  }
+
+  if (_elem->FirstChildElement("scale"))
+  {
+    std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
+    math::Vector3 scale;
+    scale = boost::lexical_cast<math::Vector3>(scaleStr);
+    math::Matrix4 scaleMat;
+    scaleMat.SetScale( scale );
+    transform = transform * scaleMat;
+  }
+
+  return transform;
+}
+
 void ColladaLoader::LoadVertices(const std::string &_id, 
                                  const math::Matrix4 &_transform,
                                  std::vector<math::Vector3> &_verts,
                                  std::vector<math::Vector3> &_norms)
 {
-  TiXmlElement *verticesXml = this->GetElementId(this->colladaXml, _id);
+  TiXmlElement *verticesXml = this->GetElementId(this->colladaXml, "vertices", _id);
   if (!verticesXml)
     gzerr << "Unable to find vertices[" << _id << "] in collada file\n";
 
@@ -164,7 +224,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
                                   const math::Matrix4 &_transform,
                                   std::vector<math::Vector3> &_values)
 {
-  TiXmlElement *sourceXml = this->GetElementId(_id);
+  TiXmlElement *sourceXml = this->GetElementId("source", _id);
   TiXmlElement *floatArrayXml = sourceXml->FirstChildElement("float_array");
   if (!floatArrayXml)
     gzerr << "Vertex source missing float_array element\n";
@@ -187,7 +247,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
 void ColladaLoader::LoadNormals(const std::string &_id, 
                                std::vector<math::Vector3> &_values)
 {
-  TiXmlElement *normalsXml = this->GetElementId(this->colladaXml, _id);
+  TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
     gzerr << "Unable to find normals[" << _id << "] in collada file\n";
 
@@ -213,7 +273,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
 void ColladaLoader::LoadTexCoords(const std::string &_id, 
                                std::vector<math::Vector2d> &_values)
 {
-  TiXmlElement *xml = this->GetElementId(this->colladaXml, _id);
+  TiXmlElement *xml = this->GetElementId("source", _id);
   if (!xml)
     gzerr << "Unable to find tex coords[" << _id << "] in collada file\n";
 
@@ -240,9 +300,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
   Material *mat = new Material();
 
-  TiXmlElement *matXml = this->GetElementId(_name);
+  TiXmlElement *matXml = this->GetElementId("material", _name);
   std::string effectName = matXml->FirstChildElement("instance_effect")->Attribute("url");
-  TiXmlElement *effectXml = this->GetElementId(effectName);
+  TiXmlElement *effectXml = this->GetElementId("effect", effectName);
 
   TiXmlElement *commonXml = effectXml->FirstChildElement("profile_COMMON");
   if (commonXml)
@@ -324,14 +384,14 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   else if (typeElem->FirstChildElement("texture"))
   {
     std::string textureName = typeElem->FirstChildElement("texture")->Attribute("texture");
-    TiXmlElement *textureXml = this->GetElementId(textureName);
+    TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
     TiXmlElement *sampler = textureXml->FirstChildElement("sampler2D");
     std::string sourceName = sampler->FirstChildElement("source")->GetText();
-    TiXmlElement *sourceXml = this->GetElementId(sourceName);
+    TiXmlElement *sourceXml = this->GetElementId("newparam", sourceName);
     TiXmlElement *surfaceXml = sourceXml->FirstChildElement("surface");
     if (surfaceXml->FirstChildElement("init_from"))
     {
-      TiXmlElement *imageXml = this->GetElementId(
+      TiXmlElement *imageXml = this->GetElementId("image",
           surfaceXml->FirstChildElement("init_from")->GetText());
       if (imageXml->FirstChildElement("init_from"))
       {
@@ -481,82 +541,77 @@ void ColladaLoader::LoadScene( Mesh *_mesh )
 {
   TiXmlElement *sceneXml = this->colladaXml->FirstChildElement("scene");
   std::string sceneURL = sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
-  TiXmlElement *visSceneXml = this->GetElementId(sceneURL);
+
+  TiXmlElement *visSceneXml = this->GetElementId("visual_scene", sceneURL);
+
+  if (!visSceneXml)
+    gzerr << "Unable to find visual_scene id='" << sceneURL << "'\n";
 
   TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
-  TiXmlElement *instGeomXml;
   while (nodeXml)
   {
-    instGeomXml = nodeXml->FirstChildElement("instance_geometry");
-    while (instGeomXml)
-    {
-      std::string geomURL = instGeomXml->Attribute("url");
-      TiXmlElement *geomXml = this->GetElementId(geomURL);
-
-      math::Matrix4 transform(math::Matrix4::IDENTITY);
-
-      if (nodeXml->FirstChildElement("translate"))
-      {
-        std::string transStr = nodeXml->FirstChildElement("translate")->GetText();
-        math::Vector3 translate;
-        translate = boost::lexical_cast<math::Vector3>(transStr);
-        //translate *= this->meter;
-        transform.SetTranslate( translate );
-      }
-
-      TiXmlElement *rotateXml = nodeXml->FirstChildElement("rotate");
-      while (rotateXml)
-      {
-        math::Matrix3 mat;
-        math::Vector3 axis;
-        double angle;
-
-        std::string rotateStr = rotateXml->GetText();
-        std::istringstream iss(rotateStr);
-
-        iss >> axis.x >> axis.y >> axis.z;
-        iss >> angle;
-        mat.SetFromAxis(axis,DTOR(angle));
-
-        transform = transform * mat;
-
-        rotateXml = rotateXml->NextSiblingElement("rotate");
-      }
-
-      if (nodeXml->FirstChildElement("scale"))
-      {
-        std::string scaleStr = nodeXml->FirstChildElement("scale")->GetText();
-        math::Vector3 scale;
-        scale = boost::lexical_cast<math::Vector3>(scaleStr);
-        math::Matrix4 scaleMat;
-        scaleMat.SetScale( scale );
-        transform = transform * scaleMat;
-      }
-
-      this->materialMap.clear();
-      TiXmlElement *bindMatXml, *techniqueXml, *matXml;
-      bindMatXml = instGeomXml->FirstChildElement("bind_material");
-      while (bindMatXml)
-      {
-        if ((techniqueXml = bindMatXml->FirstChildElement("technique_common")))
-        {
-          matXml = techniqueXml->FirstChildElement("instance_material");
-          while (matXml)
-          {
-            std::string symbol = matXml->Attribute("symbol");
-            std::string target = matXml->Attribute("target");
-            this->materialMap[symbol] = target;
-            matXml = matXml->NextSiblingElement("instance_material");
-          }
-        }
-        bindMatXml = bindMatXml->NextSiblingElement("bind_material");
-      }
-
-      this->LoadGeometry(geomXml, transform, _mesh);
-      instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
-    }
+    this->LoadNode( nodeXml , _mesh);
     nodeXml = nodeXml->NextSiblingElement("node");
   }
+}
+
+void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh)
+{
+  TiXmlElement *nodeXml;
+  TiXmlElement *instGeomXml;
+
+  nodeXml = _elem->FirstChildElement("node");
+  while (nodeXml)
+  {
+    this->LoadNode(nodeXml,_mesh);
+    nodeXml = nodeXml->NextSiblingElement("node");
+  }
+
+  math::Matrix4 transform = this->LoadNodeTransform( _elem );
+
+  if (_elem->FirstChildElement("instance_node"))
+  {
+    std::string nodeURLStr = _elem->FirstChildElement("instance_node")->Attribute("url");
+
+    nodeXml = this->GetElementId("node", nodeURLStr);
+    if (!nodeXml)
+    {
+      gzerr << "Unable to find node[" << nodeURLStr << "]\n";
+      return;
+    }
+  }
+  else 
+    nodeXml = _elem;
+
+  instGeomXml = nodeXml->FirstChildElement("instance_geometry");
+  while (instGeomXml)
+  {
+    std::string geomURL = instGeomXml->Attribute("url");
+    TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
+
+    this->materialMap.clear();
+    TiXmlElement *bindMatXml, *techniqueXml, *matXml;
+    bindMatXml = instGeomXml->FirstChildElement("bind_material");
+    while (bindMatXml)
+    {
+      if ((techniqueXml = bindMatXml->FirstChildElement("technique_common")))
+      {
+        matXml = techniqueXml->FirstChildElement("instance_material");
+        while (matXml)
+        {
+          std::string symbol = matXml->Attribute("symbol");
+          std::string target = matXml->Attribute("target");
+          this->materialMap[symbol] = target;
+          matXml = matXml->NextSiblingElement("instance_material");
+        }
+      }
+      bindMatXml = bindMatXml->NextSiblingElement("bind_material");
+    }
+
+    this->LoadGeometry(geomXml, transform, _mesh);
+    instGeomXml = instGeomXml->NextSiblingElement("instance_geometry");
+  }
+
 }
 
 float ColladaLoader::LoadFloat(TiXmlElement *_elem)

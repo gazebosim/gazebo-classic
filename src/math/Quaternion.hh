@@ -189,6 +189,9 @@ namespace gazebo
     public: Vector3 GetYAxis() const;
     public: Vector3 GetZAxis() const;
   
+    /// \brief Round all values to _precision decimal places
+    public: void Round(int _precision);
+
     /// \brief Attributes of the quaternion 
     public: double w;
   
@@ -209,16 +212,17 @@ namespace gazebo
                 const gazebo::math::Quaternion &q )
     {
       Vector3 v( q.GetAsEuler() );
-      v.x = v.x * 180.0 / M_PI;
-      v.y = v.y * 180.0 / M_PI;
-      v.z = v.z * 180.0 / M_PI;
+      //v.x = v.x * 180.0 / M_PI;
+      //v.y = v.y * 180.0 / M_PI;
+      //v.z = v.z * 180.0 / M_PI;
   
-      if (std::isnan(v.x))
+      /*if (std::isnan(v.x))
         v.x = 90.0;
       if (std::isnan(v.y))
         v.y = 90.0;
       if (std::isnan(v.z))
         v.z = 90.0;
+        */
   
       out << v.x << " " << v.y << " " << v.z;
   

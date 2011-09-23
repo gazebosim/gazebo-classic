@@ -20,15 +20,12 @@
       <material script="Kitchen/CounterTop_H"/>
     </visual>
 
-<!--    <visual name="visual2">
-      <origin pose="0 0 0.9 0 0 0"/>
+    <visual name="visual2">
+      <origin pose="-0.2 0 0.9 0 0 1.57079633"/>
       <geometry>
-        <mesh filename="stovetop.stl" scale=".0254 .0254 0.0254"/>
+        <mesh filename="steel_stovetop.dae" scale=".0254 .0254 0.0254"/>
       </geometry>
-      <material script="Gazebo/Grey"/>
     </visual>
-    -->
-
 
     <collision name="cabinet_1">
       <origin pose="0.05 -0.1 0.375 0 0 0"/>

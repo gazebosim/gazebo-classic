@@ -48,6 +48,7 @@ namespace gazebo
       private slots: void ViewFullScreen();
 
       private: void OnFullScreen(bool _value);
+      private: void OnMoveMode(bool mode);
 
       private: void CreateActions();
       private: void CreateMenus();
@@ -80,7 +81,7 @@ namespace gazebo
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
 
-      private: QAction *insertModelAct;
+      //private: QAction *insertModelAct;
       private: QAction *viewFullScreenAct;
 
       private: TimePanel *timePanel;

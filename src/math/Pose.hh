@@ -128,6 +128,9 @@ namespace gazebo
     
       /// \brief Rotate vector part of a pose about the origin
       public: Pose RotatePositionAboutOrigin(const Quaternion &rot) const;
+
+      /// \brief Round all values to _precision decimal places
+      public: void Round(int _precision);
     
       /// \brief The position
       public: Vector3 pos;

@@ -57,6 +57,25 @@ Matrix4::Matrix4(double v00, double v01, double v02, double v03,
                  double v20, double v21, double v22, double v23,
                  double v30, double v31, double v32, double v33)
 {
+  this->Set( v00, v01, v02, v03,
+             v10, v11, v12, v13,
+             v20, v21, v22, v23,
+             v30, v31, v32, v33);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
+Matrix4::~Matrix4()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
+void Matrix4::Set(double v00, double v01, double v02, double v03,
+                  double v10, double v11, double v12, double v13,
+                  double v20, double v21, double v22, double v23,
+                  double v30, double v31, double v32, double v33)
+{
   this->m[0][0] = v00;
   this->m[0][1] = v01;
   this->m[0][2] = v02;
@@ -76,12 +95,6 @@ Matrix4::Matrix4(double v00, double v01, double v02, double v03,
   this->m[3][1] = v31;
   this->m[3][2] = v32;
   this->m[3][3] = v33;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
-Matrix4::~Matrix4()
-{
 }
 
 ////////////////////////////////////////////////////////////////////////////////

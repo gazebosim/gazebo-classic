@@ -285,6 +285,11 @@ namespace gazebo
       private: static IOManager *iomanager;
 
       public: unsigned int writeCount;
+
+      private: std::string localURI;
+      private: std::string localAddress;
+      private: std::string remoteURI;
+      private: std::string remoteAddress;
     };
     /// \}
   }

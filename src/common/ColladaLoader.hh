@@ -47,9 +47,13 @@ namespace gazebo
       private: void LoadGeometry(TiXmlElement *_xml, 
                                  const math::Matrix4 &_transform, Mesh *_mesh);
       private: TiXmlElement *GetElementId(TiXmlElement *_parent, 
-                                        const std::string &_id);
-      private: TiXmlElement *GetElementId( const std::string &_id);
+                                          const std::string &_name,
+                                          const std::string &_id);
+      private: TiXmlElement *GetElementId( const std::string &_name,
+                                           const std::string &_id);
 
+      private: void LoadNode(TiXmlElement *_elem, Mesh *_mesh);
+      private: math::Matrix4 LoadNodeTransform(TiXmlElement *_elem);
 
       private: void LoadVertices(const std::string &_id, 
                                  const math::Matrix4 &_transform,

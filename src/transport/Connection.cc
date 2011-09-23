@@ -95,6 +95,14 @@ void Connection::Connect(const std::string &host, unsigned short port)
   {
     gzthrow ("Unable to connect to " << host << ":" << port);
   }
+
+  this->localURI = std::string("http://") + this->GetLocalHostname() + ":" + boost::lexical_cast<std::string>(this->GetLocalPort());
+  this->localAddress = this->GetLocalEndpoint().address().to_string();
+
+  this->remoteURI =  std::string("http://") + this->GetRemoteHostname() + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
+
+  if (this->socket && this->socket->is_open())
+    this->remoteAddress = this->socket->remote_endpoint().address().to_string();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +153,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
 ////////////////////////////////////////////////////////////////////////////////
 /// Start a thread that reads from the connection, and passes
 /// new message to the ReadCallback
-void Connection::StartRead(const ReadCallback &cb)
+void Connection::StartRead(const ReadCallback & /*_cb*/)
 {
   gzerr << "\n\n\n\n DONT USE \n\n\n\n";
   //this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, shared_from_this(), cb ) ); 
@@ -249,16 +257,15 @@ void Connection::ProcessWriteQueue()
 /// Get the local URI
 std::string Connection::GetLocalURI() const
 {
-  return "http://" + this->GetLocalHostname() + ":" + boost::lexical_cast<std::string>(this->GetLocalPort()); 
+  return this->localURI;
 }
               
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the remote URI
 std::string Connection::GetRemoteURI() const
 {
-  return "http://" + this->GetRemoteHostname() + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
+  return this->remoteURI;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handle on write callbacks
@@ -430,7 +437,7 @@ bool Connection::Read(std::string &data)
 /// Get the address of this connection
 std::string Connection::GetLocalAddress() const
 {
-  return this->GetLocalEndpoint().address().to_string();
+  return this->localAddress;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -449,10 +456,7 @@ unsigned short Connection::GetLocalPort() const
 /// Get the remote address
 std::string Connection::GetRemoteAddress() const
 {
-  if (this->socket && this->socket->is_open())
-    return this->socket->remote_endpoint().address().to_string();
-  else
-    return "";
+  return this->remoteAddress;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

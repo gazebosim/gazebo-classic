@@ -81,6 +81,10 @@ MainWindow::MainWindow()
   this->connections.push_back( 
       gui::Events::ConnectFullScreenSignal( 
         boost::bind(&MainWindow::OnFullScreen, this, _1) ) );
+
+  this->connections.push_back( 
+      gui::Events::ConnectMoveModeSignal( 
+        boost::bind(&MainWindow::OnMoveMode, this, _1) ) );
 }
 
 MainWindow::~MainWindow()
@@ -285,31 +289,39 @@ void MainWindow::CreateActions()
 
   this->boxCreateAct = new QAction(QIcon(":/images/box.png"), tr("Box"), this);
   this->boxCreateAct->setStatusTip(tr("Create a box"));
+  this->boxCreateAct->setCheckable(true);
   connect(this->boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
 
   this->sphereCreateAct = new QAction(QIcon(":/images/sphere.png"), tr("Sphere"), this);
   this->sphereCreateAct->setStatusTip(tr("Create a sphere"));
+  this->sphereCreateAct->setCheckable(true);
   connect(this->sphereCreateAct, SIGNAL(triggered()), this, SLOT(CreateSphere()));
 
   this->cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"), tr("Cylinder"), this);
   this->cylinderCreateAct->setStatusTip(tr("Create a sphere"));
+  this->cylinderCreateAct->setCheckable(true);
   connect(this->cylinderCreateAct, SIGNAL(triggered()), this, SLOT(CreateCylinder()));
 
   this->pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"), tr("Point Light"), this);
   this->pointLghtCreateAct->setStatusTip(tr("Create a point light"));
+  this->pointLghtCreateAct->setCheckable(true);
   connect(this->pointLghtCreateAct, SIGNAL(triggered()), this, SLOT(CreatePointLight()));
 
   this->spotLghtCreateAct = new QAction(QIcon(":/images/spotlight.png"), tr("Spot Light"), this);
   this->spotLghtCreateAct->setStatusTip(tr("Create a spot light"));
+  this->spotLghtCreateAct->setCheckable(true);
   connect(this->spotLghtCreateAct, SIGNAL(triggered()), this, SLOT(CreateSpotLight()));
 
   this->dirLghtCreateAct = new QAction(QIcon(":/images/directionallight.png"), tr("Directional Light"), this);
   this->dirLghtCreateAct->setStatusTip(tr("Create a directional light"));
+  this->dirLghtCreateAct->setCheckable(true);
   connect(this->dirLghtCreateAct, SIGNAL(triggered()), this, SLOT(CreateDirectionalLight()));
 
-  this->insertModelAct = new QAction(QIcon(":/images/insertModel.png"), tr("Insert Model"), this);
+  /*this->insertModelAct = new QAction(QIcon(":/images/insertModel.png"), tr("Insert Model"), this);
   this->insertModelAct->setStatusTip(tr("Insert a model"));
+  this->rLghtCreateAct->setCheckable(true);
   connect(this->insertModelAct, SIGNAL(triggered()), this, SLOT(InsertModel()));
+  */
 
   this->viewFullScreenAct = new QAction(tr("Full Screen"), this);
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
@@ -354,6 +366,19 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);
   this->editToolbar->addAction(this->dirLghtCreateAct);
-  this->editToolbar->addSeparator();
-  this->editToolbar->addAction(this->insertModelAct);
+  //this->editToolbar->addSeparator();
+  //this->editToolbar->addAction(this->insertModelAct);
+}
+
+void MainWindow::OnMoveMode(bool mode)
+{
+  if (mode)
+  {
+    this->boxCreateAct->setChecked(false);
+    this->sphereCreateAct->setChecked(false);
+    this->cylinderCreateAct->setChecked(false);
+    this->pointLghtCreateAct->setChecked(false);
+    this->spotLghtCreateAct->setChecked(false);
+    this->dirLghtCreateAct->setChecked(false);
+  }
 }

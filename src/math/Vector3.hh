@@ -152,7 +152,10 @@ namespace gazebo
     
       /// \brief [] operator
       public: double operator[](unsigned int index) const;
-    
+
+      /// \brief Round all values to _precision decimal places
+      public: void Round(int _precision);
+
       /// \brief X location
       public: double x;
     

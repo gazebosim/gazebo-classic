@@ -31,6 +31,8 @@ set (files column.mesh
            cup.mesh
            test.dae
            man_standing.dae
+           steel_stovetop2.dae
+           bowl.dae
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models)

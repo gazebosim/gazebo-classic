@@ -107,6 +107,13 @@ if (NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
+set (build_errors "" CACHE INTERNAL "build errors" FORCE)
+set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
+
+message (STATUS "\n\n====== Finding 3rd Party Packages ======")
+include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+message (STATUS "----------------------------------------\n")
+
 #####################################
 # Set all the global build flags
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
@@ -114,13 +121,6 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
 set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-
-set (build_errors "" CACHE INTERNAL "build errors" FORCE)
-set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
-
-message (STATUS "\n\n====== Finding 3rd Party Packages ======")
-include (${gazebo_cmake_dir}/SearchForStuff.cmake)
-message (STATUS "----------------------------------------\n")
 
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")

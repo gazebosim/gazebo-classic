@@ -63,6 +63,30 @@ namespace gazebo
 
       /// \brief Destructor 
       public: virtual ~Matrix4();
+
+      /// \brief Set
+      /// \param _v00 Row 0, Col 0 value
+      /// \param _v01 Row 0, Col 1 value
+      /// \param _v02 Row 0, Col 2 value
+      /// \param _v03 Row 0, Col 3 value
+      /// \param _v10 Row 1, Col 0 value
+      /// \param _v11 Row 1, Col 1 value
+      /// \param _v12 Row 1, Col 2 value
+      /// \param _v13 Row 1, Col 3 value
+      /// \param _v20 Row 2, Col 0 value
+      /// \param _v21 Row 2, Col 1 value
+      /// \param _v22 Row 2, Col 2 value
+      /// \param _v23 Row 2, Col 3 value
+      /// \param _v30 Row 3, Col 0 value
+      /// \param _v31 Row 3, Col 1 value
+      /// \param _v32 Row 3, Col 2 value
+      /// \param _v33 Row 3, Col 3 value
+      public: void Set(double _v00, double _v01, double _v02, double _v03,
+                       double _v10, double _v11, double _v12, double _v13,
+                       double _v20, double _v21, double _v22, double _v23,
+                       double _v30, double _v31, double _v32, double _v33);
+
+
  
       /// \brief Set the translational values [ (0,3) (1,3) (2,3) ]
       /// \param _t Values to set

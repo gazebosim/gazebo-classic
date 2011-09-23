@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Comparison.hh"
+#include "math/Helpers.hh"
 #include "math/Quaternion.hh"
 
 using namespace gazebo;
@@ -537,4 +537,14 @@ Matrix4 Quaternion::GetAsMatrix4() const
   Matrix4 result( Matrix4::IDENTITY );
   result = this->GetAsMatrix3();
   return result;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Round all values to _decimalPlaces
+void Quaternion::Round(int _precision)
+{
+  this->x = precision(this->x, _precision);
+  this->y = precision(this->y, _precision);
+  this->z = precision(this->z, _precision);
+  this->w = precision(this->w, _precision);
 }

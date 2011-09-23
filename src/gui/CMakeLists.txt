@@ -67,5 +67,3 @@ target_link_libraries( gzclient gazebo_common
 add_definitions(${QT_DEFINITIONS})
 
 INSTALL_EXECUTABLE( gzclient )
-
-

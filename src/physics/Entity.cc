@@ -431,13 +431,10 @@ void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
     parentPose = this->parentEntity->worldPose;
 
   math::Pose newPose = _sdf->GetElement("origin")->GetValuePose("pose");
-  math::Pose result = newPose + parentPose;
-
-  this->SetRelativePose( newPose );
-
-  std::cout << "Update Pose[" << this->GetWorldPose().pos << "] New[" 
-            << newPose.pos << "] Parent[" << parentPose.pos << "] Result[" 
-            << result.pos << "] After[" << this->GetWorldPose().pos << "]\n";
+  if (newPose != this->GetRelativePose())
+  {
+    this->SetRelativePose( newPose );
+  }
 }
 
 const sdf::ElementPtr &Entity::GetSDF()

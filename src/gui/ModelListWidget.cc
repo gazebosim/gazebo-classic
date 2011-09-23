@@ -18,6 +18,7 @@
 #include "transport/Publisher.hh"
 
 #include "math/Angle.hh"
+#include "math/Helpers.hh"
 
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
@@ -26,11 +27,22 @@
 using namespace gazebo;
 using namespace gui;
 
+const unsigned short dgrsUnicode = 0x00b0;
+const std::string dgrsStdStr = QString::fromUtf16(&dgrsUnicode, 1).toStdString();
+const std::string rollLbl = std::string("Roll") + dgrsStdStr;
+const std::string pitchLbl = std::string("Pitch") + dgrsStdStr;
+const std::string yawLbl = std::string("Yaw") + dgrsStdStr;
+const std::string xLbl = std::string("X");
+const std::string yLbl = std::string("Y");
+const std::string zLbl = std::string("Z");
+
+
 ModelListWidget::ModelListWidget( QWidget *parent )
   : QWidget( parent )
 {
   this->propMutex = new boost::recursive_mutex();
 
+  setMinimumWidth(280);
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
@@ -44,18 +56,19 @@ ModelListWidget::ModelListWidget( QWidget *parent )
 
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
-  QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory();
-  this->propTreeBrowser->setFactoryForManager( this->variantManager, variantFactory);
+  this->variantFactory = new QtVariantEditorFactory();
+  this->propTreeBrowser->setFactoryForManager( this->variantManager, 
+                                               this->variantFactory);
   connect( this->variantManager, 
            SIGNAL(propertyChanged(QtProperty*)), 
            this, SLOT(OnPropertyChanged(QtProperty *)));
+  connect( this->propTreeBrowser, 
+           SIGNAL(currentItemChanged(QtBrowserItem*)), 
+           this, SLOT(OnCurrentPropertyChanged(QtBrowserItem *)));
 
-  //this->propTreeBrowser->setHeaderLabel(tr("Properties"));
-  //this->propTreeBrowser->setColumnCount(1);
-  //this->propTreeBrowser->setContextMenuPolicy( Qt::CustomContextMenu );
 
-  mainLayout->addWidget(this->modelTreeWidget);
-  mainLayout->addWidget(this->propTreeBrowser);
+  mainLayout->addWidget(this->modelTreeWidget,0);
+  mainLayout->addWidget(this->propTreeBrowser,1);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2,2,2,2);
 
@@ -71,11 +84,9 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
 
-  /*msgs::Request msg;
-  msg.set_index( 1 );
-  msg.set_request( "entities" );
-  this->entitiesRequestPub->Publish( msg );
-  */
+  msgs::Request msg;
+  msg.set_request("entities");
+  this->entitiesRequestPub->Publish(msg);
 
   this->moveToAction = new QAction(tr("Move To"), this);
   this->moveToAction->setStatusTip(tr("Move camera to the selection"));
@@ -86,6 +97,7 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
 
   this->fillingPropertyTree = false;
+  this->selectedProperty = NULL;
 }
 
 ModelListWidget::~ModelListWidget()
@@ -136,10 +148,15 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
     }
   }
 
+  QList<QtProperty*> subprops = topItem->subProperties();
+
   for (sdf::Param_V::iterator iter = _elem->attributes.begin(); 
       iter != _elem->attributes.end(); iter++)
   {
-    QtVariantProperty *item = (QtVariantProperty*)(this->GetChildItem(topItem, (*iter)->GetKey()));
+    QtVariantProperty *item = (QtVariantProperty*)this->PopChildItem( subprops, (*iter)->GetKey() );
+
+    //if (item == this->selectedProperty)
+      //continue;
 
     if ((*iter)->IsStr())
     {
@@ -169,55 +186,78 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
     {
       math::Pose value;
       (*iter)->Get(value); 
-      math::Vector3 rpy = value.rot.GetAsEuler();
+      value.Round(6);
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "X")) == NULL)
+      math::Vector3 rpy = value.rot.GetAsEuler();
+      rpy.Round(6);
+
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,xLbl))== NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "X" ));
+            QString::fromStdString(xLbl));
         topItem->addSubProperty(item);
+
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
+      //if (item == this->selectedProperty)
+        //continue;
       item->setValue( value.pos.x );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Y")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,yLbl))== NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Y" ));
+            QString::fromStdString(yLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
+      //if (item == this->selectedProperty)
+        //continue;
       item->setValue( value.pos.y );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Z")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,zLbl))== NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Z" ));
+            QString::fromStdString(zLbl));
         topItem->addSubProperty(item);
+
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
+      //if (item == this->selectedProperty)
+        //continue;
       item->setValue( value.pos.z );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Roll")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops, rollLbl)) == NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Roll" ));
+            QString::fromStdString(rollLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
-      item->setValue( DTOR(rpy.x) );
+      //if (item == this->selectedProperty)
+        //continue;
+      item->setValue( RTOD(rpy.x) );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Pitch")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops, pitchLbl)) == NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Pitch" ));
+            QString::fromStdString(pitchLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
-      item->setValue( DTOR(rpy.y) );
+      //if (item == this->selectedProperty)
+        //continue;
+      item->setValue( RTOD(rpy.y) );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Yaw")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops, yawLbl)) == NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Yaw" ));
+            QString::fromStdString(yawLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
-      item->setValue( DTOR(rpy.z) );
+      //if (item == this->selectedProperty)
+        //continue;
+      item->setValue( RTOD(rpy.z) );
     }
     else if ( (*iter)->IsInt() )
     {
@@ -226,6 +266,7 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
         item = this->variantManager->addProperty( QVariant::Int, 
             QLatin1String( (*iter)->GetKey().c_str() ));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
       int value;
       (*iter)->Get(value); 
@@ -251,9 +292,11 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
         item = this->variantManager->addProperty( QVariant::Double, 
             QLatin1String( (*iter)->GetKey().c_str() ));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
       float value;
       (*iter)->Get(value); 
+      value = gazebo::math::precision(value,6);
       item->setValue( value );
     }
     else if ( (*iter)->IsDouble() )
@@ -263,9 +306,11 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
         item = this->variantManager->addProperty( QVariant::Double, 
             QLatin1String( (*iter)->GetKey().c_str() ));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
       double value;
       (*iter)->Get(value); 
+      value = gazebo::math::precision(value,6);
       item->setValue( value );
     }
     else if ( (*iter)->IsChar() )
@@ -285,29 +330,38 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
       math::Vector3 value;
       (*iter)->Get(value); 
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "X")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,xLbl))== NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "X" ));
+            QString::fromStdString(xLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
+      //if (item == this->selectedProperty)
+        //continue;
       item->setValue( value.x );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Y")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,yLbl))== NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Y" ));
+            QString::fromStdString(yLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
+      //if (item == this->selectedProperty)
+        //continue;
       item->setValue( value.y );
 
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Z")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,zLbl))== NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Z" ));
+            QString::fromStdString(zLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
+      //if (item == this->selectedProperty)
+        //continue;
       item->setValue( value.z );
     }
     else if ( (*iter)->IsQuaternion() )
@@ -317,29 +371,38 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
       (*iter)->Get(value); 
       rpy = value.GetAsEuler();
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Roll")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,rollLbl)) == NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Roll" ));
+            QString::fromStdString(rollLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
-      item->setValue( DTOR(value.x) );
+      //if (item == this->selectedProperty)
+        //continue;
+      item->setValue( RTOD(value.x) );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Pitch")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops,pitchLbl)) == NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Pitch" ));
+            QString::fromStdString(pitchLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
-      item->setValue( DTOR(value.y) );
+      //if (item == this->selectedProperty)
+        //continue;
+      item->setValue( RTOD(value.y) );
 
-      if ((item = (QtVariantProperty*)this->GetChildItem(topItem, "Pitch")) == NULL)
+      if ((item = (QtVariantProperty*)this->PopChildItem(subprops, yawLbl)) == NULL)
       {
         item = this->variantManager->addProperty( QVariant::Double, 
-            QLatin1String( "Yaw" ));
+            QString::fromStdString(yawLbl));
         topItem->addSubProperty(item);
+        ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
       }
-      item->setValue( DTOR(value.z) );
+      //if (item == this->selectedProperty)
+        //continue;
+      item->setValue( RTOD(value.z) );
     }
     else if ( (*iter)->IsColor() )
     {
@@ -355,11 +418,17 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
     }
   }
 
-
   for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
        iter != _elem->elements.end(); iter++)
   {
+    this->PopChildItem( subprops, (*iter)->GetName() ); 
     this->FillPropertyTree((*iter), topItem);
+  }
+
+   for (QList<QtProperty*>::iterator siter = subprops.begin(); 
+      siter != subprops.end(); siter++)
+  {
+    topItem->removeSubProperty(*siter);
   }
   
 }
@@ -383,6 +452,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     msg.set_selected( true );
     this->selectionPub->Publish(msg);
 
+    this->sdfElement.reset();
     this->Update();
   }
   else
@@ -404,6 +474,7 @@ void ModelListWidget::Update()
   {
     this->propMutex->lock();
     this->fillingPropertyTree = true;
+
     for (sdf::ElementPtr_V::iterator iter = this->sdfElement->elements.begin();
          iter != this->sdfElement->elements.end(); iter++)
     {
@@ -412,8 +483,10 @@ void ModelListWidget::Update()
     this->fillingPropertyTree = false;
     this->propMutex->unlock();
   }
-
-  QTimer::singleShot( 500, this, SLOT(Update()) );
+  else
+  {
+    QTimer::singleShot( 500, this, SLOT(Update()) );
+  }
 }
 
 
@@ -502,14 +575,6 @@ void ModelListWidget::OnEntities( const boost::shared_ptr<msgs::Entities const> 
   for (int i=0; i < _msg->entities_size(); i++)
   {
     this->ProcessEntity(_msg->entities(i));
-
-    /*std::string name = _msg->entities(i).name();
-
-    // Create a top-level tree item for the path
-    QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
-        QStringList(QString("%1").arg( QString::fromStdString(name)) ));
-    this->modelTreeWidget->addTopLevelItem(topItem);
-    */
   }
 }
 
@@ -548,9 +613,15 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
   }
 }
 
+void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem * /*_item*/)
+{
+  //this->selectedProperty = _item->property();
+}
+
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
   this->propMutex->lock();
+
   if (this->fillingPropertyTree)
   {
     this->propMutex->unlock();
@@ -570,7 +641,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     if (elem)
     {
       std::cout << "PropName[" << (*iter)->propertyName().toStdString() << "] ElementName[" << elem->GetName() << "]\n";
-      this->FillSDF( (*iter), elem);
+      this->FillSDF( (*iter), elem, _item);
     }
   }
 
@@ -583,7 +654,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   this->propMutex->unlock();
 }
 
-void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
+void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem, QtProperty *_changedItem)
 {
   if (!_item)
     return;
@@ -596,78 +667,106 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
     {
       math::Pose pose;
       math::Vector3 rpy;
+      (*iter)->Get(pose);
+      rpy = pose.rot.GetAsEuler();
 
+      bool changed = false;
       QList<QtProperty*> subProperties = _item->subProperties();
       for (QList<QtProperty*>::iterator propIter = subProperties.begin();
           propIter != subProperties.end(); propIter++)
       {
-        if ( (*propIter)->propertyName() == "X")
+        if ( (*propIter) != _changedItem)
+          continue;
+
+        changed = true;
+
+        if ( (*propIter)->propertyName().toStdString() == xLbl)
           pose.pos.x = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
-        else if ( (*propIter)->propertyName() == "Y")
+        else if ( (*propIter)->propertyName().toStdString() == yLbl)
           pose.pos.y = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
-        else if ( (*propIter)->propertyName() == "Z")
+        else if ( (*propIter)->propertyName().toStdString() == zLbl)
           pose.pos.z = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
-        else if ( (*propIter)->propertyName() == "Roll")
-          rpy.x = RTOD( boost::lexical_cast<double>(
+        else if ( (*propIter)->propertyName().toStdString() == rollLbl)
+          rpy.x = DTOR( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
-        else if ( (*propIter)->propertyName() == "Pitch")
-          rpy.y = RTOD( boost::lexical_cast<double>(
+        else if ((*propIter)->propertyName().toStdString() == pitchLbl)
+          rpy.y = DTOR( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
-        else if ( (*propIter)->propertyName() == "Yaw")
-          rpy.z = RTOD( boost::lexical_cast<double>(
+        else if ( (*propIter)->propertyName().toStdString() == yawLbl)
+          rpy.z = DTOR( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
       }
 
-      if (subProperties.size() > 0)
+      if (changed)
       {
         pose.rot.SetFromEuler( rpy );
         (*iter)->Set( pose );
+        (*iter)->Get(pose);
       }
     }
     else if ( (*iter)->IsVector3() )
     {
       math::Vector3 xyz;
+      (*iter)->Get(xyz);
+
+      bool changed = false;
+
       QList<QtProperty*> subProperties = _item->subProperties();
       for (QList<QtProperty*>::iterator propIter = subProperties.begin();
           propIter != subProperties.end(); propIter++)
       {
-        if ( (*propIter)->propertyName() == "X")
+        if ( (*propIter) != _changedItem)
+          continue;
+        changed = true;
+
+        if ( (*propIter)->propertyName().toStdString() == xLbl)
           xyz.x = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
-        else if ( (*propIter)->propertyName() == "Y")
+        else if ( (*propIter)->propertyName().toStdString() == yLbl)
           xyz.y = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
-        else if ( (*propIter)->propertyName() == "Z")
+        else if ( (*propIter)->propertyName().toStdString() == zLbl)
           xyz.z = boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString());
       }
 
-      if (subProperties.size() > 0)
+      if (changed)
+      {
         (*iter)->Set(xyz);
+      }
     }
     else if ( (*iter)->IsQuaternion())
     {
       math::Quaternion q;
+      (*iter)->Get(q);
       math::Vector3 rpy;
+      rpy = q.GetAsEuler();
+
+      bool changed = false;
+
       QList<QtProperty*> subProperties = _item->subProperties();
       for (QList<QtProperty*>::iterator propIter = subProperties.begin();
           propIter != subProperties.end(); propIter++)
       {
-        if ( (*propIter)->propertyName() == "Roll")
-          rpy.x = RTOD( boost::lexical_cast<double>(
+        if ( (*propIter) != _changedItem)
+          continue;
+        changed = true;
+
+        if ( (*propIter)->propertyName().toStdString() == rollLbl)
+          rpy.x = DTOR( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
-        else if ( (*propIter)->propertyName() == "Pitch")
-          rpy.y = RTOD( boost::lexical_cast<double>(
+        else if ((*propIter)->propertyName().toStdString() == pitchLbl)
+          rpy.y = DTOR( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
-        else if ( (*propIter)->propertyName() == "Yaw")
-          rpy.z = RTOD( boost::lexical_cast<double>(
+        else if ((*propIter)->propertyName().toStdString() == yawLbl)
+          rpy.z = DTOR( boost::lexical_cast<double>(
               (*propIter)->valueText().toStdString()) );
       }
 
-      if (subProperties.size() > 0)
+      if (changed)
       {
         q.SetFromEuler( rpy );
         (*iter)->Set(q);
@@ -676,22 +775,43 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem)
     else if ((*iter)->IsColor())
     {
       QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
-      if (childItem)
+
+      if (childItem && childItem == _changedItem)
+      {
         std::string color = childItem->valueText().toStdString();
+      }
     }
     else
     {
       QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
-      if (childItem)
+
+      if (childItem && childItem == _changedItem)
+      {
         (*iter)->SetFromString( childItem->valueText().toStdString() );
+      }
     }
   }
 
   for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
        iter != _elem->elements.end(); iter++)
   {
-    this->FillSDF( this->GetChildItem( _item, (*iter)->GetName()), (*iter) );
+    this->FillSDF( this->GetChildItem( _item, (*iter)->GetName()), (*iter), _changedItem );
   }
+}
+
+QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list, const std::string &_name)
+{
+  for (QList<QtProperty*>::iterator iter = _list.begin(); 
+      iter != _list.end(); iter++)
+  {
+    if ( (*iter)->propertyName().toStdString() == _name )
+    {
+      _list.erase(iter);
+      return (*iter);
+    }
+  }
+
+  return NULL;
 }
 
 QtProperty *ModelListWidget::GetChildItem(QtProperty *_item, const std::string &_name)

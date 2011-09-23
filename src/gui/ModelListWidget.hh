@@ -15,6 +15,8 @@ class QtTreePropertyBrowser;
 class QtVariantPropertyManager;
 class QtProperty;
 class QtTreePropertyItem;
+class QtBrowserItem;
+class QtVariantEditorFactory;
 
 namespace boost
 {
@@ -36,25 +38,28 @@ namespace gazebo
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
       private slots: void Update();
       private slots: void OnPropertyChanged(QtProperty *_item);
-
       private slots: bool eventFilter(QObject *_object, QEvent *_event);
+      private slots: void OnMoveTo();
+      private slots: void OnDelete();
+      private slots: void OnCustomContextMenu(const QPoint &_pt);
+      private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
+
 
       private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
       private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
 
       private: void OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg );
 
-      private slots: void OnMoveTo();
-      private slots: void OnDelete();
-      private slots: void OnCustomContextMenu(const QPoint &_pt);
-
       private: void ProcessEntity( const msgs::Entity &_msg );
 
       private: void FillPropertyTree(sdf::ElementPtr &_elem,
                                      QtProperty *_parentItem);
 
-      private: void FillSDF( QtProperty *_item, sdf::ElementPtr &_elem );
+      private: void FillSDF( QtProperty *_item, sdf::ElementPtr &_elem,
+                             QtProperty *_changedItem );
 
+      private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
+                                        const std::string &_name);
       private: QtProperty *GetChildItem(QtProperty *_item, 
                                         const std::string &_name);
 
@@ -74,11 +79,12 @@ namespace gazebo
 
       private: ModelEditWidget *modelEditWidget;
       private: QtVariantPropertyManager *variantManager;
-
+      private: QtVariantEditorFactory *variantFactory;
       private: boost::recursive_mutex *propMutex;
       private: sdf::ElementPtr sdfElement;
       private: std::string selectedModelName;
       private: bool fillingPropertyTree;
+      private: QtProperty *selectedProperty;
     };
   }
 }

@@ -21,7 +21,7 @@
  */
 
 #include <math.h>
-#include "math/Comparison.hh"
+#include "math/Helpers.hh"
 #include "math/Vector3.hh"
 
 using namespace gazebo;
@@ -384,3 +384,12 @@ double Vector3::operator[](unsigned int index) const
       return 0;
   }
 }
+
+/// Round all values to _decimalPlaces
+void Vector3::Round(int _precision)
+{
+  this->x = precision(this->x, _precision);
+  this->y = precision(this->y, _precision);
+  this->z = precision(this->z, _precision);
+}
+

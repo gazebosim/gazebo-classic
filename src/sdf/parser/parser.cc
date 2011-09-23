@@ -415,6 +415,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
       if (std::string("include") == elemXml->Value())
       {
         std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(std::string("models/") + elemXml->Attribute("filename"));
+
         SDFPtr includeSDF(new SDF); 
         init(includeSDF);
 
@@ -422,6 +423,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
 
         includeSDF->root->GetFirstElement()->SetParent( _sdf );
         _sdf->elements.push_back(includeSDF->root->GetFirstElement());
+
+        if (elemXml->Attribute("model_name"))
+          includeSDF->root->GetElement("model")->GetAttribute("name")->SetFromString(elemXml->Attribute("model_name"));
+        if (elemXml->Attribute("model_pose"))
+          includeSDF->root->GetElement("model")->GetOrCreateElement("origin")->GetAttribute("pose")->SetFromString(elemXml->Attribute("model_pose"));
 
         //includeSDF.reset();
         continue;

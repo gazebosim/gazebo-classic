@@ -263,3 +263,11 @@ Pose Pose::RotatePositionAboutOrigin(const Quaternion &rot) const
             +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.y*rot.y) * this->pos.z;
   return a;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Round all values to _decimalPlaces
+void Pose::Round(int _precision)
+{
+  this->rot.Round(_precision);
+  this->pos.Round(_precision);
+}

@@ -2,7 +2,7 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.2 0.2 0.2 1"/>
+      <ambient rgba="0.1 0.1 0.1 1"/>
       <background rgba="1 0 0 1">
         <sky material="Gazebo/CloudySky"/>
       </background>
@@ -37,7 +37,7 @@
 
     <light type="directional" name="my_light">
       <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba="1 1 1 1"/>
+      <diffuse rgba=".8 .8 .8 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
       <direction xyz="0 0 -1"/>
@@ -45,14 +45,16 @@
 
     <light type="point" name="point_light" cast_shadows="false">
       <origin pose="-5 0 5 0 0 0"/>
-      <diffuse rgba="1 1 1 1"/>
-      <specular rgba=".1 .1 .1 1"/>
+      <diffuse rgba=".8 .8 .8 1"/>
+      <specular rgba=".0 .0 .0 1"/>
       <attenuation range="20" constant="0.8" linear="0.2" quadratic="0.01" />
     </light>
 
     <include filename="kitchen_counter.model"/>
-    <include filename="pr2.model"/>
     <include filename="man_standing.model"/>
+    <!--<include filename="pr2.model" model_pose="-1.5 -1.4 0 0 0 0"/>-->
+    <include filename="table.model" model_pose="-5.5 0 0 0 0 0"/>
+    <include filename="bowl.model" model_name="bowl" model_pose="-2 -2.5 0.867 0 0 0"/>
 
     <model name="walls" static="true">
       <link name="link">
