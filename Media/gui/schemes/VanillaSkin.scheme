@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="VanillaSkin">
+	<Imageset Filename="Vanilla.imageset" />
+	<LookNFeel Filename="Vanilla.looknfeel" />
+	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
+	<FalagardMapping WindowType="Vanilla/Titlebar" TargetType="CEGUI/Titlebar" Renderer="Falagard/Titlebar" LookNFeel="Vanilla/Titlebar" />
+	<FalagardMapping WindowType="Vanilla/Button" TargetType="CEGUI/PushButton" Renderer="Falagard/Button" LookNFeel="Vanilla/Button" />
+	<FalagardMapping WindowType="Vanilla/FrameWindow" TargetType="CEGUI/FrameWindow" Renderer="Falagard/FrameWindow" LookNFeel="Vanilla/FrameWindow" />
+	<FalagardMapping WindowType="Vanilla/Editbox" TargetType="CEGUI/Editbox" Renderer="Falagard/Editbox" LookNFeel="Vanilla/Editbox" />
+	<FalagardMapping WindowType="Vanilla/VerticalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="Vanilla/VerticalScrollbarThumb" />
+	<FalagardMapping WindowType="Vanilla/VerticalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="Vanilla/VerticalScrollbar" />
+	<FalagardMapping WindowType="Vanilla/HorizontalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="Vanilla/HorizontalScrollbarThumb" />
+	<FalagardMapping WindowType="Vanilla/HorizontalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="Vanilla/HorizontalScrollbar" />
+	<FalagardMapping WindowType="Vanilla/StaticImage" TargetType="DefaultWindow" Renderer="Falagard/StaticImage" LookNFeel="Vanilla/StaticImage" />
+	<FalagardMapping WindowType="Vanilla/StaticText" TargetType="DefaultWindow" Renderer="Falagard/StaticText" LookNFeel="Vanilla/StaticText" />
+	<FalagardMapping WindowType="Vanilla/Listbox" TargetType="CEGUI/Listbox" Renderer="Falagard/Listbox" LookNFeel="Vanilla/Listbox" />
+	<FalagardMapping WindowType="Vanilla/MultiLineEditbox" TargetType="CEGUI/MultiLineEditbox" Renderer="Falagard/MultiLineEditbox" LookNFeel="Vanilla/MultiLineEditbox" />
+	<FalagardMapping WindowType="Vanilla/ComboDropList" TargetType="CEGUI/ComboDropList" Renderer="Falagard/Listbox" LookNFeel="Vanilla/ComboDropList" />
+	<FalagardMapping WindowType="Vanilla/Combobox" TargetType="CEGUI/Combobox" Renderer="Falagard/Default" LookNFeel="Vanilla/Combobox" />
+	<FalagardMapping WindowType="Vanilla/ProgressBar" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="Vanilla/ProgressBar" />
+<!--	
+	<FalagardMapping WindowType="Vanilla/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="Vanilla/ScrollablePane" />
+	<FalagardMapping WindowType="Vanilla/Checkbox" TargetType="Falagard/Checkbox" LookNFeel="Vanilla/Checkbox" />
+	<FalagardMapping WindowType="Vanilla/RadioButton" TargetType="Falagard/RadioButton" LookNFeel="Vanilla/RadioButton" />
+	<FalagardMapping WindowType="Vanilla/ScrollablePane" TargetType="Falagard/ScrollablePane" LookNFeel="Vanilla/ScrollablePane" />
+-->
+</GUIScheme>

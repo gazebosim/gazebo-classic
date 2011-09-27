@@ -106,7 +106,6 @@ namespace gazebo
       /// \brief Get whether the rendering is enabled
       public: bool GetRenderingEnabled() const;
   
-  
       /// \brief Get the global pose of the camera
       public: math::Pose GetWorldPose();
   
@@ -254,7 +253,7 @@ namespace gazebo
       /// \brief Get point on a plane
       public: math::Vector3 GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm, double d);
   
-      public: void SetRenderTarget( Ogre::RenderTarget *target );
+      public: virtual void SetRenderTarget( Ogre::RenderTarget *target );
 
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
       private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);

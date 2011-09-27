@@ -38,6 +38,7 @@ namespace gazebo
     class OrbitViewController;
     class FPSViewController;
     class Visual;
+    class GUIOverlay;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -95,6 +96,9 @@ namespace gazebo
  
       /// \brief Set the camera to track a scene node
       public: void TrackVisual( VisualPtr _visual );
+
+      /// \brief Set to true to enable rendering
+      public: virtual void SetRenderTarget( Ogre::RenderTarget *_target );
    
       /// \brief Toggle whether to show the visual
       private: void ToggleShowVisual();
@@ -110,6 +114,8 @@ namespace gazebo
       private: ViewController *viewController;
   
       private: Ogre::AnimationState *animState;
+
+      private: GUIOverlay *gui;
     };
     /// \}
   }

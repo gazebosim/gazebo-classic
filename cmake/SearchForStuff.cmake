@@ -45,6 +45,11 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(CEGUI CEGUI-OGRE)
+  if (NOT CEGUI_FOUND)
+    BUILD_ERROR ("CEGUI-OGRE package not found")
+  endif()
+
   #################################################
   # Find tinyxml
   pkg_check_modules(tinyxml tinyxml)

@@ -286,6 +286,7 @@ namespace gazebo
       private: SelectionObj *selectionObj;
 
       private: VisualPtr worldVisual;
+
     };
     /// \}
   }

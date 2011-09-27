@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Font Name="FairChar-30" Filename="FairChar.imageset" Type="Pixmap" NativeHorzRes="640" NativeVertRes="480" AutoScaled="false">
+	<Mapping Codepoint="32" Image=" " HorzAdvance="15" />
+	<Mapping Codepoint="65" Image="A" />
+	<Mapping Codepoint="66" Image="B" />
+	<Mapping Codepoint="67" Image="C" />
+	<Mapping Codepoint="68" Image="D" />
+	<Mapping Codepoint="69" Image="E" />
+	<Mapping Codepoint="70" Image="F" />
+	<Mapping Codepoint="71" Image="G" />
+	<Mapping Codepoint="72" Image="H" />
+	<Mapping Codepoint="73" Image="I" />
+	<Mapping Codepoint="74" Image="J" />
+	<Mapping Codepoint="75" Image="K" />
+	<Mapping Codepoint="76" Image="L" />
+	<Mapping Codepoint="77" Image="M" />
+	<Mapping Codepoint="78" Image="N" />
+	<Mapping Codepoint="79" Image="O" />
+	<Mapping Codepoint="80" Image="P" />
+	<Mapping Codepoint="81" Image="Q" />
+	<Mapping Codepoint="82" Image="R" />
+	<Mapping Codepoint="83" Image="S" />
+	<Mapping Codepoint="84" Image="T" />
+	<Mapping Codepoint="85" Image="U" />
+	<Mapping Codepoint="86" Image="V" />
+	<Mapping Codepoint="87" Image="W" />
+	<Mapping Codepoint="88" Image="X" />
+	<Mapping Codepoint="89" Image="Y" />
+	<Mapping Codepoint="90" Image="Z" />
+</Font>

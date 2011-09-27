@@ -28,6 +28,7 @@
 #include "common/Events.hh"
 
 
+#include "rendering/GUIOverlay.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/FPSViewController.hh"
@@ -62,6 +63,8 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   this->animState = NULL;
 
   this->viewController = new FPSViewController(this);
+
+  this->gui = new GUIOverlay();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +171,7 @@ void UserCamera::Init()
   //this->viewport->setVisibilityMask(this->visibilityMask);
 
   //RTShaderSystem::AttachViewport(this->viewport, this->scene);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -431,3 +435,12 @@ void UserCamera::TrackVisual( VisualPtr _visual )
     this->SetViewController(FPSViewController::GetTypeString());
   }
 }
+
+//////////////////////////////////////////////////////////////////////////////
+void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )
+{
+  Camera::SetRenderTarget(_target);
+
+  this->gui->Init(this->renderTarget);
+}
+ 

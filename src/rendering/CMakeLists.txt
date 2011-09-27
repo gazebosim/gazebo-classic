@@ -5,6 +5,8 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src/msgs
   ${OGRE_INCLUDE_DIRS}
+  ${CEGUI_include_dirs}
+  ${CEGUI_INCLUDE_DIRS}
 )
 
 set (sources MovableText.cc
@@ -27,6 +29,7 @@ set (sources MovableText.cc
              Conversions.cc
              Rendering.cc
              Material.cc
+             GUIOverlay.cc
 )
 
 set (headers MovableText.hh
@@ -50,6 +53,7 @@ set (headers MovableText.hh
              Conversions.hh
              Rendering.hh
              Material.hh
+             GUIOverlay.hh
 )
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
@@ -65,6 +69,7 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         gazebo_sdf_parser
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
+                                        ${CEGUI_LIBRARIES}
                                         X11 )
 INSTALL_LIBRARY(gazebo_rendering)
 INSTALL_INCLUDES("rendering" ${headers})

@@ -194,11 +194,12 @@ void RenderEngine::PreRender()
 
 void RenderEngine::Render()
 {
-  this->root->_fireFrameRenderingQueued();
 }
 
 void RenderEngine::PostRender()
 {
+  //_fireFrameRenderingQueued needs to be here for CEGUI to work
+  this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
 }
 
@@ -351,8 +352,8 @@ void RenderEngine::LoadPlugins()
 // Setup resources
 void RenderEngine::SetupResources()
 {
-  std::vector<std::string> archNames;
-  std::vector<std::string>::iterator aiter;
+  std::vector< std::pair<std::string,std::string> > archNames;
+  std::vector< std::pair<std::string, std::string> >::iterator aiter;
   std::list<std::string>::const_iterator iter;
   std::list<std::string> paths = common::SystemPaths::Instance()->GetGazeboPaths();
 
@@ -365,35 +366,24 @@ void RenderEngine::SetupResources()
     }
     closedir(dir);
 
-    archNames.push_back((*iter)+"/");
-    archNames.push_back((*iter)+"/Media");
-    archNames.push_back((*iter)+"/Media/fonts");
-    archNames.push_back((*iter)+"/Media/rtshaderlib");
-    archNames.push_back((*iter)+"/Media/materials/programs");
-    archNames.push_back((*iter)+"/Media/materials/scripts");
-    archNames.push_back((*iter)+"/Media/materials/textures");
-    archNames.push_back((*iter)+"/Media/models");
-    archNames.push_back((*iter)+"/Media/sets");
-    archNames.push_back((*iter)+"/Media/maps");
-
-    //we want to add all the material files of the sets
-    if ((dir=opendir(((*iter)+"/Media/sets").c_str()))!= NULL)
-    {
-      std::string filename;
-      struct dirent *dir_entry_p;
-      while ( (dir_entry_p = readdir(dir))!=NULL )
-      {
-        filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
-        archNames.push_back(filename);
-      }
-      closedir(dir);
-    }
+    archNames.push_back(std::make_pair( (*iter)+"/", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/rtshaderlib", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/materials/programs", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/materials/scripts", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/materials/textures", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/models", "General") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/looknfeel", "LookNFeel") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/schemes", "Schemes") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/imagesets", "Imagesets") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/fonts", "Fonts") );
 
     for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {
       try
       {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( *aiter, "FileSystem", "General");
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( 
+            aiter->first, "FileSystem", aiter->second);
       }
       catch (Ogre::Exception)
       {
