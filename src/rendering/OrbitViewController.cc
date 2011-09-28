@@ -81,38 +81,39 @@ void OrbitViewController::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse event
-void OrbitViewController::HandleMouseEvent(const common::MouseEvent &event)
+void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
   if (!this->camera->GetUserMovable())
     return;
 
-  math::Vector2i drag = event.pos - event.prevPos;
+  math::Vector2i drag = _event.pos - _event.prevPos;
 
   math::Vector3 directionVec(0,0,0);
 
-  if (event.left == common::MouseEvent::DOWN)
+
+  if (_event.buttons & common::MouseEvent::LEFT)
   {
     this->refVisual->SetVisible(true);
-    this->yaw += drag.x * event.moveScale * -0.1;
-    this->pitch += drag.y * event.moveScale * -0.1;
+    this->yaw += drag.x * _event.moveScale * -0.1;
+    this->pitch += drag.y * _event.moveScale * -0.1;
 
     this->NormalizeYaw(this->yaw);
     this->NormalizePitch(this->pitch);
   }
-  else if (event.middle == common::MouseEvent::SCROLL)
+  else if (_event.type == common::MouseEvent::SCROLL)
   {
     this->refVisual->SetVisible(true);
-    distance +=  50.0 * event.scroll.y * event.moveScale;
+    distance +=  50.0 * _event.scroll.y * _event.moveScale;
   }
-  else if (event.right == common::MouseEvent::DOWN)
+  else if (_event.buttons & common::MouseEvent::RIGHT)
   {
     this->refVisual->SetVisible(true);
-    this->Translate(math::Vector3(0, drag.x * event.moveScale, drag.y * event.moveScale));
+    this->Translate(math::Vector3(0, drag.x * _event.moveScale, drag.y * _event.moveScale));
   }
-  else if (event.middle == common::MouseEvent::DOWN)
+  else if (_event.buttons & common::MouseEvent::MIDDLE)
   {
     this->refVisual->SetVisible(true);
-    this->Translate(math::Vector3(drag.y * event.moveScale,0,0));
+    this->Translate(math::Vector3(drag.y * _event.moveScale,0,0));
   }
   else
     this->refVisual->SetVisible(false);

@@ -29,11 +29,12 @@ namespace gazebo
     /// \brief Generic description of a mouse event
     class MouseEvent
     {
-      public: enum ButtonState {DOWN, UP, SCROLL};
+      public: enum Buttons {NO_BUTTON = 0x0, LEFT = 0x1, MIDDLE = 0x2, RIGHT = 0x4};
+      public: enum EventType {NO_EVENT, MOVE, PRESS, RELEASE, SCROLL};
 
       public: MouseEvent()
               : pos(0,0), prevPos(0,0), pressPos(0,0), scroll(0,0),
-                moveScale(0.01),dragging(false), left(UP), right(UP), middle(UP)
+                moveScale(0.01),dragging(false), type(NO_EVENT), buttons(NO_BUTTON) 
               {}
 
       public: math::Vector2i pos; 
@@ -42,12 +43,10 @@ namespace gazebo
       public: math::Vector2i scroll; 
 
       public: float moveScale;
-
       public: bool dragging;
 
-      public: ButtonState left;
-      public: ButtonState right;
-      public: ButtonState middle;
+      public: EventType type;
+      public: unsigned int buttons;
     };
     /// \}
   }

@@ -1,7 +1,5 @@
 set (files Font.xsd
            baemuk.txt
-           Batang-26.font
-           batang.ttf
            DejaVuSans-10.font
            DejaVuSans.ttf
            FairChar-30.font

@@ -72,7 +72,7 @@ GLWidget::~GLWidget()
   this->userCamera.reset();
 }
 
-bool GLWidget::eventFilter(QObject *obj, QEvent *event)
+bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *event)
 {
   if (event->type() == QEvent::Enter)
   {
@@ -154,9 +154,16 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
   this->mouseEvent.pressPos.Set( event->pos().x(), event->pos().y() );
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
-  this->mouseEvent.left = event->buttons() & Qt::LeftButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
-  this->mouseEvent.right = event->buttons() & Qt::RightButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
-  this->mouseEvent.middle = event->buttons() & Qt::MidButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
+  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
+  this->mouseEvent.type = common::MouseEvent::PRESS;
+
+  this->mouseEvent.buttons |= event->buttons() & Qt::LeftButton ? 
+    common::MouseEvent::LEFT : 0x0;
+  this->mouseEvent.buttons |= event->buttons() & Qt::RightButton ? 
+    common::MouseEvent::RIGHT : 0x0;
+  this->mouseEvent.buttons |= event->buttons() & Qt::MidButton ? 
+    common::MouseEvent::MIDDLE : 0x0;
+
   this->mouseEvent.dragging = false;
 
   if (this->entityMaker)
@@ -166,18 +173,34 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos, 
                              this->selectionMod);
   }
+
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
   this->mouseEvent.scroll.y = event->delta() > 0 ? -1 : 1;
-  this->mouseEvent.middle = common::MouseEvent::SCROLL;
+  this->mouseEvent.type = common::MouseEvent::SCROLL;
+  this->mouseEvent.buttons |= event->buttons() & Qt::LeftButton ? 
+    common::MouseEvent::LEFT : 0x0;
+  this->mouseEvent.buttons |= event->buttons() & Qt::RightButton ? 
+    common::MouseEvent::RIGHT : 0x0;
+  this->mouseEvent.buttons |= event->buttons() & Qt::MidButton ? 
+    common::MouseEvent::MIDDLE : 0x0;
+
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
   this->mouseEvent.pos.Set( event->pos().x(), event->pos().y() );
+  this->mouseEvent.type = common::MouseEvent::MOVE;
+  this->mouseEvent.buttons |= event->buttons() & Qt::LeftButton ? 
+    common::MouseEvent::LEFT : 0x0;
+  this->mouseEvent.buttons |= event->buttons() & Qt::RightButton ? 
+    common::MouseEvent::RIGHT : 0x0;
+  this->mouseEvent.buttons |= event->buttons() & Qt::MidButton ? 
+    common::MouseEvent::MIDDLE : 0x0;
 
   if (event->buttons())
   {
@@ -263,9 +286,17 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   this->mouseEvent.pos.Set( event->pos().x(), event->pos().y() );
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 
-  this->mouseEvent.left = event->buttons() & Qt::LeftButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
-  this->mouseEvent.right = event->buttons() & Qt::RightButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
-  this->mouseEvent.middle = event->buttons() & Qt::MidButton ? common::MouseEvent::DOWN : common::MouseEvent::UP;
+  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
+  this->mouseEvent.type = common::MouseEvent::RELEASE;
+
+  this->mouseEvent.buttons |= event->buttons() & Qt::LeftButton ? 
+    common::MouseEvent::LEFT : 0x0;
+
+  this->mouseEvent.buttons |= event->buttons() & Qt::RightButton ? 
+    common::MouseEvent::RIGHT : 0x0;
+
+  this->mouseEvent.buttons |= event->buttons() & Qt::MidButton ? 
+    common::MouseEvent::MIDDLE : 0x0;
 
   emit clicked();
 
@@ -304,6 +335,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
     this->posePub->Publish(msg);
   }
+
+  this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

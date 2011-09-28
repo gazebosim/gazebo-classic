@@ -234,9 +234,10 @@ void UserCamera::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse event
-void UserCamera::HandleMouseEvent(const common::MouseEvent &evt)
+void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  this->viewController->HandleMouseEvent(evt);
+  if ( !this->gui->HandleMouseEvent(_evt) )
+    this->viewController->HandleMouseEvent(_evt);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

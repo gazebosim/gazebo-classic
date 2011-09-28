@@ -48,36 +48,36 @@ void FPSViewController::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse event
-void FPSViewController::HandleMouseEvent(const common::MouseEvent &event)
+void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
   if (!this->camera->GetUserMovable())
     return;
 
-  math::Vector2i drag = event.pos - event.prevPos;
+  math::Vector2i drag = _event.pos - _event.prevPos;
 
   math::Vector3 directionVec(0,0,0);
 
-  if (event.left == common::MouseEvent::DOWN)
+  if (_event.buttons & common::MouseEvent::LEFT)
   {
     this->camera->RotateYaw(DTOR(drag.x * 0.1));
     this->camera->RotatePitch(DTOR(-drag.y * 0.1));
   }
-  else if (event.right == common::MouseEvent::DOWN)
+  else if (_event.buttons & common::MouseEvent::RIGHT)
   {
     // interactively pan view
     directionVec.x = 0;
-    directionVec.y =  drag.x * event.moveScale;
-    directionVec.z =  drag.y * event.moveScale;
+    directionVec.y =  drag.x * _event.moveScale;
+    directionVec.z =  drag.y * _event.moveScale;
   }
-  else if (event.middle == common::MouseEvent::DOWN)
+  else if (_event.buttons & common::MouseEvent::MIDDLE)
   {
-    directionVec.x =  drag.y * event.moveScale;
+    directionVec.x =  drag.y * _event.moveScale;
     directionVec.y =  0;
     directionVec.z =  0;
   }
-  else if (event.middle == common::MouseEvent::SCROLL)
+  else if (_event.type == common::MouseEvent::SCROLL)
   {
-    directionVec.x -=  50.0 * event.scroll.y * event.moveScale;
+    directionVec.x -=  50.0 * _event.scroll.y * _event.moveScale;
     directionVec.y =  0;
     directionVec.z =  0;
   }

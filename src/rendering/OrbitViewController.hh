@@ -59,7 +59,7 @@ namespace gazebo
       private: float yaw, pitch;
       private: float distance;
       private: math::Vector3 focalPoint;
-  
+
       private: Visual *refVisual;
     };
     /// \}
