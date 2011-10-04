@@ -147,7 +147,6 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
 void CylinderMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  msgs::Init(msg,"new cylinder");
   std::ostringstream newModelStr;
 
 

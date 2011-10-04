@@ -10,7 +10,6 @@ import "pose.proto";
 
 message Factory
 {
-  required Header header                    = 1;
   optional string sdf_description_filename  = 2;
   optional string sdf                       = 3;
   optional string sdf_filename              = 4;

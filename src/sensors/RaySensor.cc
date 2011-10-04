@@ -220,7 +220,7 @@ int RaySensor::GetFiducial(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void RaySensor::Update(bool force)
+void RaySensor::Update(bool /*_force*/)
 {
   this->physicsEngine->odeRaySensorMutex->lock();
   //if (this->active || (**this->alwaysActiveP))

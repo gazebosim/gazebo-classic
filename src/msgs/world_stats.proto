@@ -10,7 +10,6 @@ import "time.proto";
 
 message WorldStatistics
 {
-  required Header header     = 1;
   required Time  sim_time    = 2;
   required Time  pause_time  = 3;
   required Time  real_time   = 4;

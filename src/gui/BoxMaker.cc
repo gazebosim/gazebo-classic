@@ -147,7 +147,6 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
 void BoxMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  msgs::Init(msg, "new_box");
 
   std::ostringstream newModelStr;
 

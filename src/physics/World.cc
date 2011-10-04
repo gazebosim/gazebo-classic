@@ -128,8 +128,6 @@ void World::Load( sdf::ElementPtr _sdf )
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0,200000000);
 
-  msgs::Init( this->worldStatsMsg, "statistics" );
-
   this->factorySub = this->node->Subscribe("~/factory", 
                                            &World::OnFactoryMsg, this);
 
@@ -235,7 +233,6 @@ void World::RunLoop()
     /// Send statistics about the world simulation
     if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
     {
-      msgs::Stamp( this->worldStatsMsg.mutable_header() );
       msgs::Set( this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
       msgs::Set( this->worldStatsMsg.mutable_real_time(), this->GetRealTime() );
       msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
@@ -605,7 +602,8 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 
   msgs::Response response;
   response.set_id( _msg->id() );
-  std::string *serializedData = response.mutable_serialized_data();
+  response.set_request( _msg->request() );
+  response.set_response( "success" );
 
   if (_msg->request() == "entity_list")
   {
@@ -622,6 +620,8 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
       }
     }
 
+    response.set_type( modelVMsg.GetTypeName() );
+    std::string *serializedData = response.mutable_serialized_data();
     modelVMsg.SerializeToString( serializedData );
   }
   else if (_msg->request() == "entity_delete")
@@ -638,36 +638,50 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
         msgs::Model modelMsg;
         ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
         model->FillModelMsg(modelMsg);
+
+        std::string *serializedData = response.mutable_serialized_data();
         modelMsg.SerializeToString( serializedData );
+        response.set_type( modelMsg.GetTypeName() );
       }
       else if (entity->HasType(Base::LINK))
       {
         msgs::Link linkMsg;
         LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
         link->FillLinkMsg(linkMsg);
+
+        std::string *serializedData = response.mutable_serialized_data();
         linkMsg.SerializeToString( serializedData );
+        response.set_type( linkMsg.GetTypeName() );
       }
       else if (entity->HasType(Base::COLLISION))
       {
         msgs::Collision collisionMsg;
         CollisionPtr collision = boost::shared_dynamic_cast<Collision>(entity);
         collision->FillCollisionMsg( collisionMsg );
+
+        std::string *serializedData = response.mutable_serialized_data();
         collisionMsg.SerializeToString( serializedData );
+        response.set_type( collisionMsg.GetTypeName() );
       }
       else if (entity->HasType(Base::JOINT))
       {
         msgs::Joint jointMsg;
         JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
         joint->FillJointMsg( jointMsg );
+
+        std::string *serializedData = response.mutable_serialized_data();
         jointMsg.SerializeToString( serializedData );
+        response.set_type( jointMsg.GetTypeName() );
       }
     }
   }
   else if (_msg->request() == "scene_info")
   {
-    msgs::Scene sceneMsg;
-    this->BuildSceneMsg( sceneMsg, this->rootElement );
-    sceneMsg.SerializeToString( serializedData );
+    this->BuildSceneMsg( this->sceneMsg, this->rootElement );
+
+    std::string *serializedData = response.mutable_serialized_data();
+    this->sceneMsg.SerializeToString( serializedData );
+    response.set_type( sceneMsg.GetTypeName() );
   }
 
   this->responsePub->Publish( response );
@@ -777,7 +791,6 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
 
   if (_msg->has_edit_name())
   {
-    std::cout << "Edit with[";
     factorySDF->PrintValues();
 
     BasePtr base = this->rootElement->GetByName( _msg->edit_name() );
@@ -806,7 +819,7 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   }
 }
 
-void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)
+void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &/*_msg*/)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 }

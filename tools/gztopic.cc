@@ -90,6 +90,7 @@ void list()
 
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
+  request.set_id(0);
   request.set_request("get_publishers");
   connection->EnqueueMsg( msgs::Package("request", request), true );
   connection->Read(data);

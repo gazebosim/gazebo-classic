@@ -139,7 +139,7 @@ void Joint::UpdateParameters( sdf::ElementPtr &_sdf )
 void Joint::ShowJoints(const bool & /*s_kk*/)
 {
   /*msgs::Visual msg;
-  msgs::Init(msg, this->visual);
+  msg.set_name( this->visual);
   msg.set_visible(s);
   this->vis_pub->Publish(msg);
   this->showJoints = s;

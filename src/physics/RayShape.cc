@@ -53,7 +53,7 @@ RayShape::RayShape( CollisionPtr _parent, bool /*_displayRays*/ )
   if (displayRays)
   {
     msgs::Visual msg;
-    msgs::Init(msg, this->GetName());
+    msg.SetName( this->GetName() );
     msg.set_parent_id( this->collisionParent->GetName() );
     msg.set_render_type( msgs::Visual::LINE_LIST );
 
@@ -111,7 +111,7 @@ void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &pos
   dir.Normalize();
 
   msgs::Visual msg;
-  msgs::Init(msg, this->GetName());
+  msg.set_name( this->GetName() );
 
   msgs::Vector3d *pt = msg.mutable_geometry()->add_points(); 
   msgs::Set( pt,  this->relativeStartPos );
@@ -150,7 +150,7 @@ void RayShape::SetLength( double len )
 
 
   msgs::Visual msg;
-  msgs::Init(msg, this->GetName());
+  msg.set_name( this->GetName() );
 
   msgs::Vector3d *pt = msg.mutable_geometry()->add_points(); 
   msgs::Set(pt, this->relativeStartPos );

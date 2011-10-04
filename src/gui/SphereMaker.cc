@@ -130,7 +130,6 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
 void SphereMaker::CreateTheEntity()
 {
   msgs::Factory msg;
-  msgs::Init(msg, "new_sphere");
   std::ostringstream newModelStr;
 
   newModelStr << "<gazebo version='1.0'>\

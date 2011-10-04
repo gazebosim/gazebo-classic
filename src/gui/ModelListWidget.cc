@@ -243,7 +243,7 @@ void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> 
   msgs::Model_V modelVMsg;
   msgs::Model modelMsg;
   msgs::String stringMsg;
-  if (_msg->type() == modelVMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
   {
     modelVMsg.ParseFromString( _msg->serialized_data() );
 
@@ -252,7 +252,7 @@ void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> 
       this->ProcessModel( modelVMsg.models(i) );
     }
   }
-  else if (_msg->type() == modelMsg.GetTypeName())
+  else if (_msg->has_type() && _msg->type() == modelMsg.GetTypeName())
   {
     printf("gazebo.msgs.Model NOT Handled\n");
     //this->propMutex->lock();
@@ -261,7 +261,7 @@ void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> 
     //sdf::readString( _msg->sdf(), this->sdfElement );
     //this->propMutex->unlock();
   }
-  else if (_msg->type() == stringMsg.GetTypeName())
+  else if (_msg->has_type() && _msg->type() == stringMsg.GetTypeName())
   {
   }
   else
@@ -328,7 +328,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   }
 
   msgs::Factory msg;
-  msgs::Init(msg,"update");
   msg.set_edit_name( this->sdfElement->GetValueString("name") );
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();

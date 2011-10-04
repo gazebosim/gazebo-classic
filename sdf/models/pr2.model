@@ -71,7 +71,7 @@
           <mesh filename='pr2/base_v0/base.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/base_normals.tif</normal_map>
           </shader>
         </material>
@@ -164,7 +164,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -197,7 +197,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -260,7 +260,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -294,7 +294,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -357,7 +357,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -391,7 +391,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -454,7 +454,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -488,7 +488,7 @@
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/base_v0/wheel_normals.tif</normal_map>
           </shader>
         </material>
@@ -522,7 +522,7 @@
           <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1'/>
         </geometry>
         <material> 
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/torso_v0/torso_lift_normals.tif</normal_map>
           </shader>
         </material>
@@ -555,7 +555,7 @@
           <mesh filename='pr2/head_v0/head_pan.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/head_v0/head_pan_normals.tif</normal_map>
           </shader>
         </material>
@@ -588,7 +588,7 @@
           <mesh filename='pr2/head_v0/head_tilt.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/head_v0/head_tilt_normals.tif</normal_map>
           </shader>
         </material>
@@ -653,7 +653,7 @@
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/shoulder_v0/shoulder_pan_normals.tif</normal_map>
           </shader>
         </material>
@@ -686,7 +686,7 @@
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/shoulder_v0/shoulder_lift_normals.tif</normal_map>
           </shader>
         </material>
@@ -719,7 +719,7 @@
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/shoulder_v0/upper_arm_roll_normals.tif</normal_map>
           </shader>
         </material>
@@ -746,7 +746,7 @@
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
         </geometry>
         <material> 
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/upper_arm_v0/upper_arm_normals.tif</normal_map>
           </shader>
         </material>
@@ -781,7 +781,7 @@
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
         </geometry>
         <material> 
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/upper_arm_v0/elbow_flex_normals.tif</normal_map>
           </shader>
         </material>
@@ -837,7 +837,7 @@
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/forearm_v0/forearm_normals.tif</normal_map>
           </shader>
         </material>
@@ -870,7 +870,7 @@
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/forearm_v0/wrist_normals.tif</normal_map>
           </shader>
         </material>
@@ -947,7 +947,7 @@
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/gripper_palm_normals.tif</normal_map>
           </shader>
         </material>
@@ -981,7 +981,7 @@
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
           </shader>
         </material>
@@ -1015,7 +1015,7 @@
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
           </shader>
         </material>
@@ -1049,7 +1049,7 @@
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
           </shader>
         </material>
@@ -1083,7 +1083,7 @@
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
           </shader>
         </material>
@@ -1117,7 +1117,7 @@
           <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/tilting_laser_v0/tilting_hokuyo_normals.tif</normal_map>
           </shader>
         </material>
@@ -1151,7 +1151,7 @@
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/shoulder_v0/shoulder_pan_normals.tif</normal_map>
           </shader>
         </material>
@@ -1184,7 +1184,7 @@
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/shoulder_v0/shoulder_lift_normals.tif</normal_map>
           </shader>
         </material>
@@ -1217,7 +1217,7 @@
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/shoulder_v0/upper_arm_roll_normals.tif</normal_map>
           </shader>
         </material>
@@ -1243,7 +1243,7 @@
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
         </geometry>
         <material> 
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/upper_arm_v0/upper_arm_normals.tif</normal_map>
           </shader>
         </material>
@@ -1276,7 +1276,7 @@
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
         </geometry>
         <material> 
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/upper_arm_v0/elbow_flex_normals.tif</normal_map>
           </shader>
         </material>
@@ -1330,7 +1330,7 @@
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/forearm_v0/forearm_normals.tif</normal_map>
           </shader>
         </material>
@@ -1363,7 +1363,7 @@
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/forearm_v0/wrist_normals.tif</normal_map>
           </shader>
         </material>
@@ -1440,7 +1440,7 @@
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/gripper_palm_normals.tif</normal_map>
           </shader>
         </material>
@@ -1474,7 +1474,7 @@
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
           </shader>
         </material>
@@ -1508,7 +1508,7 @@
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
           </shader>
         </material>
@@ -1542,7 +1542,7 @@
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_normals.tif</normal_map>
           </shader>
         </material>
@@ -1576,7 +1576,7 @@
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
         </geometry>
         <material>
-          <shader type="normal_map_objectspace">
+          <shader type="normal_map_object_space">
             <normal_map>pr2/gripper_v0/l_finger_tip_normals.tif</normal_map>
           </shader>
         </material>

@@ -8,9 +8,10 @@ package gazebo.msgs;
 message Response
 {
   required int32 id              = 1;
-  required string type           = 2;
-  required bytes serialized_data = 3;
-  required string response       = 4;
+  required string request        = 2;
+  required string response       = 3;
+  optional string type           = 4;
+  optional bytes serialized_data = 5;
 }
 
 /// \endverbatim

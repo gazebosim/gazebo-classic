@@ -348,6 +348,8 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
     else if (geomElem->GetName() == "plane")
     {
       geomMsg->set_type( msgs::Geometry::PLANE );
+      msgs::Set( geomMsg->mutable_plane()->mutable_normal(),
+                 geomElem->GetValueVector3("normal") );
     }
     else if (geomElem->GetName() == "image")
     {
@@ -390,16 +392,16 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
     {
       sdf::ElementPtr shaderElem = elem->GetElement("shader");
 
-      if (shaderElem->GetValueString() == "pixel")
+      if (shaderElem->GetValueString("type") == "pixel")
         matMsg->set_shader_type( msgs::Material::PIXEL );
-      else if (shaderElem->GetValueString() == "vertex")
+      else if (shaderElem->GetValueString("type") == "vertex")
         matMsg->set_shader_type( msgs::Material::VERTEX );
-      else if (shaderElem->GetValueString() == "normal_map_object_space")
+      else if (shaderElem->GetValueString("type") == "normal_map_object_space")
         matMsg->set_shader_type( msgs::Material::NORMAL_MAP_OBJECT_SPACE );
-      else if (shaderElem->GetValueString() == "normal_map_tangent_space")
+      else if (shaderElem->GetValueString("type") == "normal_map_tangent_space")
         matMsg->set_shader_type( msgs::Material::NORMAL_MAP_TANGENT_SPACE );
       else
-        gzerr << "Unknown shader type[" << shaderElem->GetValueString() << "]\n";
+        gzerr << "Unknown shader type[" << shaderElem->GetValueString("type") << "]\n";
 
      if (shaderElem->HasElement("normal_map"))
           matMsg->set_normal_map( 

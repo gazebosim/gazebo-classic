@@ -230,13 +230,13 @@ void PhysicsWidget::Init()
 void PhysicsWidget::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
 {
   if (this->initialized || !this->requestMsg || 
-      this->requestMsg->id() != _msg->id());
+      this->requestMsg->id() != _msg->id())
   {
     return;
   }
 
   msgs::Physics physicsMsg;
-  if (_msg->type() == physicsMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == physicsMsg.GetTypeName())
   {
     physicsMsg.ParseFromString( _msg->serialized_data() );
 
@@ -771,13 +771,13 @@ void SceneWidget::OnShadows(bool _state)
 void SceneWidget::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
 {
   if (this->initialized || !this->requestMsg || 
-      this->requestMsg->id() != _msg->id());
+      this->requestMsg->id() != _msg->id())
   {
     return;
   }
 
   msgs::Scene sceneMsg;
-  if (_msg->type() == sceneMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
   {
     sceneMsg.ParseFromString( _msg->serialized_data() );
 

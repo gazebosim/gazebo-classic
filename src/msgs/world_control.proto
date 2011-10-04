@@ -9,9 +9,8 @@ import "header.proto";
 
 message WorldControl
 {
-  required Header header = 1;
-  optional bool pause = 2;
-  optional bool step = 4;
+  optional bool pause = 1;
+  optional bool step  = 2;
 }
 
 /// \endverbatim

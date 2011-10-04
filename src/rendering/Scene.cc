@@ -844,10 +844,9 @@ void Scene::OnResponse( const boost::shared_ptr<msgs::Response const> &_msg)
 
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   boost::shared_ptr<msgs::Scene> sm( new msgs::Scene() );
-  if (_msg->type() == sm->GetTypeName())
+  if (_msg->has_type() && _msg->type() == sm->GetTypeName())
   {
     sm->ParseFromString( _msg->serialized_data() );
-
     this->sceneMsgs.push_back( sm );
   }
 }

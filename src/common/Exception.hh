@@ -35,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// Throw an error
-    #define gzthrow(msg) {std::ostringstream throwStream; throwStream << "Exception: " << msg << std::endl << std::flush; throw gazebo::common::Exception(__FILE__,__LINE__,throwStream.str()); }
+    #define gzthrow(msg) {std::ostringstream throwStream; throwStream << msg << std::endl << std::flush; throw gazebo::common::Exception(__FILE__,__LINE__,throwStream.str()); }
   
    
     /// \brief Class for generating exceptions
@@ -80,9 +80,11 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream& out, 
                   const gazebo::common::Exception &err)
               {
-                return out << err.GetErrorFile()
+                /*return out << err.GetErrorFile()
                            << ":" << err.GetErrorLine() 
                            << " : " << err.GetErrorStr();
+                           */
+                return out << err.GetErrorStr();
               }
     };
     /// \}

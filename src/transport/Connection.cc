@@ -47,6 +47,9 @@ Connection::Connection()
   this->readQuit = false;
   this->writeQueue.clear();
   this->writeCount = 0;
+
+  this->localURI = std::string("http://") + this->GetLocalHostname() + ":" + boost::lexical_cast<std::string>(this->GetLocalPort());
+  this->localAddress = this->GetLocalEndpoint().address().to_string();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,9 +98,6 @@ void Connection::Connect(const std::string &host, unsigned short port)
   {
     gzthrow ("Unable to connect to " << host << ":" << port);
   }
-
-  this->localURI = std::string("http://") + this->GetLocalHostname() + ":" + boost::lexical_cast<std::string>(this->GetLocalPort());
-  this->localAddress = this->GetLocalEndpoint().address().to_string();
 
   this->remoteURI =  std::string("http://") + this->GetRemoteHostname() + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
 
@@ -280,7 +280,7 @@ void Connection::OnWrite(const boost::system::error_code &e,
 
   if (e)
   {
-    gzerr << "onWrite error[" << e.message() << "]\n";
+    //gzerr << "onWrite error[" << e.message() << "]\n";
     // It will reach this point if the remote connection disconnects.
     this->Shutdown();
   }

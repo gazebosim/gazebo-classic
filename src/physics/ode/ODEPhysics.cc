@@ -218,6 +218,8 @@ void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 {
   msgs::Response response;
   response.set_id( _msg->id() );
+  response.set_request( _msg->request() );
+  response.set_response( "success" );
   std::string *serializedData = response.mutable_serialized_data();
 
   if (_msg->request() == "physics_info" )
@@ -234,6 +236,7 @@ void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
     physicsMsg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
     physicsMsg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
 
+    response.set_type( physicsMsg.GetTypeName() );
     physicsMsg.SerializeToString( serializedData );
   }
 

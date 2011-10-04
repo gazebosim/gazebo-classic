@@ -590,7 +590,8 @@ void Link::StoreContact(CollisionPtr _collision, Contact /*_contact*/)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Fill a link message
-void Link::FillLinkMsg( msgs::Link &/*_msg*/ )
+void Link::FillLinkMsg( msgs::Link &_msg )
 {
+  _msg.set_name( this->GetCompleteScopedName() );
 }
 

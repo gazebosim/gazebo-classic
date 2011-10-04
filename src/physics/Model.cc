@@ -616,7 +616,7 @@ void Model::LoadJoint( sdf::ElementPtr &_sdf )
     gzthrow( "can't have two joint with the same name");
 
   msgs::Joint msg;
-  msgs::Init(msg, joint->GetName() );
+  msg.set_name( joint->GetName() );
   msg.set_type( msgs::Joint::REVOLUTE );
 
   if(joint->GetParent())

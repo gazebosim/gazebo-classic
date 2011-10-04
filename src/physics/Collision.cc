@@ -285,7 +285,7 @@ Contact Collision::GetContact(unsigned int _i)
 void Collision::EnabledCB(bool enabled)
 {
   msgs::Visual msg;
-  msgs::Init(msg, this->bbVisual);
+  msg.set_name( this->bbVisual);
 
   if (enabled)
     msg.mutable_material()->set_script( "Gazebo/GreenTransparent" );

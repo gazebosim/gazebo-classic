@@ -103,7 +103,6 @@ Visual::Visual (const std::string &_name, Scene *_scene)
     uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
   }
 
-
   this->SetName(uniqueName);
   this->sceneNode = _scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
 
@@ -160,33 +159,36 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
   geomElem->ClearElements();
 
-  if (_msg->geometry().type() == msgs::Geometry::BOX)
+  if (_msg->has_geometry())
   {
-    sdf::ElementPtr elem = geomElem->AddElement("box");
-    elem->GetAttribute("size")->Set(
-        msgs::Convert( _msg->geometry().box().size()) );
-  }
-  else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
-  {
-    sdf::ElementPtr elem = geomElem->AddElement("sphere");
-    elem->GetAttribute("radius")->Set( _msg->geometry().sphere().radius() );
-  }
-  else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
-  {
-    sdf::ElementPtr elem = geomElem->AddElement("cylinder");
-    elem->GetAttribute("radius")->Set( _msg->geometry().cylinder().radius() );
-    elem->GetAttribute("length")->Set( _msg->geometry().cylinder().length() );
-  }
-  else if (_msg->geometry().type() == msgs::Geometry::PLANE)
-  {
-    math::Plane plane = msgs::Convert( _msg->geometry().plane() );
-    sdf::ElementPtr elem = geomElem->AddElement("plane");
-    elem->GetAttribute("normal")->Set(plane.normal);
-  }
-  else if (_msg->geometry().type() == msgs::Geometry::MESH)
-  {
-    sdf::ElementPtr elem = geomElem->AddElement("mesh");
-    elem->GetAttribute("filename")->Set( _msg->geometry().mesh().filename() );
+    if (_msg->geometry().type() == msgs::Geometry::BOX)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("box");
+      elem->GetAttribute("size")->Set(
+          msgs::Convert( _msg->geometry().box().size()) );
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("sphere");
+      elem->GetAttribute("radius")->Set( _msg->geometry().sphere().radius() );
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("cylinder");
+      elem->GetAttribute("radius")->Set( _msg->geometry().cylinder().radius() );
+      elem->GetAttribute("length")->Set( _msg->geometry().cylinder().length() );
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::PLANE)
+    {
+      math::Plane plane = msgs::Convert( _msg->geometry().plane() );
+      sdf::ElementPtr elem = geomElem->AddElement("plane");
+      elem->GetAttribute("normal")->Set(plane.normal);
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::MESH)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("mesh");
+      elem->GetAttribute("filename")->Set( _msg->geometry().mesh().filename() );
+    }
   }
 
   if ( _msg->has_pose() )
@@ -467,23 +469,23 @@ void Visual::AttachMesh( const std::string &meshName )
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Set the scale
-void Visual::SetScale(const math::Vector3 &scale )
+void Visual::SetScale(const math::Vector3 &_scale )
 {
   sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
 
   if (geomElem->HasElement("box"))
-    geomElem->GetElement("box")->GetAttribute("size")->Set(scale);
+    geomElem->GetElement("box")->GetAttribute("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
-    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(scale.x);
+    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(_scale.x);
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(scale.x);
-    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(scale.y);
+    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x);
+    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.y);
   }
   else if (geomElem->HasElement("mesh"))
-    geomElem->GetElement("mesh")->GetAttribute("scale")->Set(scale);
+    geomElem->GetElement("mesh")->GetAttribute("scale")->Set(_scale);
 
-  this->sceneNode->setScale(Conversions::Convert(scale));
+  this->sceneNode->setScale(Conversions::Convert(_scale));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -496,7 +498,9 @@ math::Vector3 Visual::GetScale()
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
     if (geomElem->HasElement("box"))
+    {
       result = geomElem->GetElement("box")->GetValueVector3("size");
+    }
     else if (geomElem->HasElement("sphere"))
     {
       double r = geomElem->GetElement("sphere")->GetValueDouble("radius");
@@ -509,9 +513,13 @@ math::Vector3 Visual::GetScale()
       result.Set(r,r,l);
     }
     else if (geomElem->HasElement("plane"))
+    {
       result.Set(1,1,1);
+    }
     else if (geomElem->HasElement("mesh"))
+    {
       result = geomElem->GetElement("mesh")->GetValueVector3("scale");
+    }
   }
 
   return result;
@@ -951,7 +959,7 @@ void Visual::SetPosition( const math::Vector3 &_pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void Visual::SetRotation( const math::Quaternion &_rot)
+void Visual::SetRotation( const math::Quaternion & /*_rot*/)
 {
   //this->sceneNode->setOrientation(_rot.w, _rot.x, _rot.y, _rot.z);
 
@@ -1452,8 +1460,12 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &_msg)
       scale.x = scale.y = scale.z = _msg->geometry().sphere().radius() * 2.0;
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      scale.x = _msg->geometry().plane().size().x();
-      scale.y = _msg->geometry().plane().size().y();
+      scale.x = scale.y = 1.0;
+      if (_msg->geometry().plane().has_size())
+      {
+        scale.x = _msg->geometry().plane().size().x();
+        scale.y = _msg->geometry().plane().size().y();
+      }
       scale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
