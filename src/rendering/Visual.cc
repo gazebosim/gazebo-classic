@@ -155,92 +155,94 @@ void Visual::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
+void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
   sdf::ElementPtr geomElem = this->sdf->GetOrCreateElement("geometry");
   geomElem->ClearElements();
 
-  if (msg->mesh_type() == msgs::Visual::BOX)
+  if (_msg->geometry().type() == msgs::Geometry::BOX)
   {
     sdf::ElementPtr elem = geomElem->AddElement("box");
-    elem->GetAttribute("size")->Set(msgs::Convert(msg->scale()));
+    elem->GetAttribute("size")->Set(
+        msgs::Convert( _msg->geometry().box().size()) );
   }
-  else if (msg->mesh_type() == msgs::Visual::SPHERE)
+  else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
   {
     sdf::ElementPtr elem = geomElem->AddElement("sphere");
-    elem->GetAttribute("radius")->Set(msg->scale().x());
+    elem->GetAttribute("radius")->Set( _msg->geometry().sphere().radius() );
   }
-  else if (msg->mesh_type() == msgs::Visual::CYLINDER)
+  else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
   {
     sdf::ElementPtr elem = geomElem->AddElement("cylinder");
-    elem->GetAttribute("radius")->Set(msg->scale().x());
-    elem->GetAttribute("length")->Set(msg->scale().y());
+    elem->GetAttribute("radius")->Set( _msg->geometry().cylinder().radius() );
+    elem->GetAttribute("length")->Set( _msg->geometry().cylinder().length() );
   }
-  else if (msg->mesh_type() == msgs::Visual::PLANE)
+  else if (_msg->geometry().type() == msgs::Geometry::PLANE)
   {
-    math::Plane plane = msgs::Convert(msg->plane());
+    math::Plane plane = msgs::Convert( _msg->geometry().plane() );
     sdf::ElementPtr elem = geomElem->AddElement("plane");
     elem->GetAttribute("normal")->Set(plane.normal);
   }
-  else if (msg->mesh_type() == msgs::Visual::MESH)
+  else if (_msg->geometry().type() == msgs::Geometry::MESH)
   {
     sdf::ElementPtr elem = geomElem->AddElement("mesh");
-    elem->GetAttribute("filename")->Set( msg->filename() );
+    elem->GetAttribute("filename")->Set( _msg->geometry().mesh().filename() );
   }
 
-  if (msg->has_pose())
+  if ( _msg->has_pose() )
   {
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("origin");
-    math::Pose p( msgs::Convert(msg->pose().position()),
-                  msgs::Convert(msg->pose().orientation()) );
+    math::Pose p( msgs::Convert(_msg->pose().position()),
+                  msgs::Convert(_msg->pose().orientation()) );
 
     elem->GetAttribute("pose")->Set( p );
   }
 
-  if (msg->has_material_script())
+  if (_msg->has_material())
   {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetAttribute("script")->Set(msg->material_script());
+    if( _msg->material().has_script())
+    {
+      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+      elem->GetAttribute("script")->Set( _msg->material().script() );
+    }
+
+    if (_msg->material().has_ambient())
+    {
+      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+      elem->GetOrCreateElement("ambient")->GetAttribute("rgba")->Set(
+          msgs::Convert( _msg->material().ambient() ) );
+    }
+  
+    if (_msg->material().has_diffuse())
+    {
+      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+      elem->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
+          msgs::Convert( _msg->material().diffuse()) );
+    }
+  
+    if (_msg->material().has_specular())
+    {
+      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+      elem->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
+          msgs::Convert(_msg->material().specular()));
+    }
+  
+    if (_msg->material().has_emissive())
+    {
+      sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
+      elem->GetOrCreateElement("emissive")->GetAttribute("rgba")->Set(
+          msgs::Convert(_msg->material().emissive()));
+    }
   }
 
-  if (msg->has_ambient())
-  {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("ambient")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->ambient()));
-  }
+  if (_msg->has_cast_shadows())
+    this->sdf->GetAttribute("cast_shadows")->Set( _msg->cast_shadows() );
 
-  if (msg->has_diffuse())
-  {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->diffuse()));
-  }
-
-  if (msg->has_specular())
-  {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->specular()));
-  }
-
-  if (msg->has_emissive())
-  {
-    sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
-    elem->GetOrCreateElement("emissive")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->emissive()));
-  }
-
-  if (msg->has_cast_shadows())
-  {
-    this->sdf->GetAttribute("cast_shadows")->Set(msg->cast_shadows());
-  }
-
-  if (msg->has_scale())
-    this->SetScale( msgs::Convert(msg->scale()) );
+  //if (msg->has_scale())
+   // this->SetScale( msgs::Convert(msg->scale()) );
 
   this->Load();
-  this->UpdateFromMsg(msg);
+  this->UpdateFromMsg(_msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1385,45 +1387,86 @@ void Visual::InsertMesh( const common::Mesh *mesh)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update a visual based on a message
-void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
+void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &_msg)
 {
-  if (msg->has_is_static() && msg->is_static())
+  // TODO: Put back in, and check for performance improvements.
+  /*if (msg->has_is_static() && msg->is_static())
     this->MakeStatic();
+    */
 
-  if (msg->has_pose())
-    this->SetWorldPose( msgs::Convert(msg->pose()) );
+  if (_msg->has_pose())
+    this->SetWorldPose( msgs::Convert(_msg->pose()) );
 
-  if (msg->has_scale())
-    this->SetScale( msgs::Convert(msg->scale()) );
+  if (_msg->has_visible())
+    this->SetVisible(_msg->visible());
 
-  if (msg->has_visible())
-    this->SetVisible(msg->visible());
+  if (_msg->has_transparency())
+    this->SetTransparency(_msg->transparency());
 
-  if (msg->has_transparency())
-    this->SetTransparency(msg->transparency());
+  if (_msg->has_material())
+  { 
+    if (_msg->material().has_script() && !_msg->material().script().empty() )
+      this->SetMaterial( _msg->material().script() );
 
-  if (msg->has_material_script() && !msg->material_script().empty() )
-    this->SetMaterial(msg->material_script());
-
-  if (msg->has_ambient())
-    this->SetAmbient( msgs::Convert(msg->ambient()) );
-
-  if (msg->has_diffuse())
-    this->SetDiffuse( msgs::Convert(msg->diffuse()) );
-
-  if (msg->has_specular())
-    this->SetSpecular( msgs::Convert(msg->specular()) );
-
-  if (msg->has_emissive())
-    this->SetEmissive( msgs::Convert(msg->emissive()) );
-
-  if (msg->has_shader_type())
-  {
-    this->SetShaderType(msg->shader_type());
-    if (msg->has_normal_map())
-      this->SetNormalMap(msg->normal_map());
-  }
+    if (_msg->material().has_ambient())
+      this->SetAmbient( msgs::Convert(_msg->material().ambient()) );
   
+    if (_msg->material().has_diffuse())
+      this->SetDiffuse( msgs::Convert(_msg->material().diffuse()) );
+  
+    if (_msg->material().has_specular())
+      this->SetSpecular( msgs::Convert(_msg->material().specular()) );
+
+    if (_msg->material().has_emissive())
+      this->SetEmissive( msgs::Convert(_msg->material().emissive()) );
+
+    if (_msg->material().has_shader_type())
+    {
+      if (_msg->material().shader_type() == msgs::Material::VERTEX)
+        this->SetShaderType("vertex");
+      else if (_msg->material().shader_type() == msgs::Material::PIXEL)
+        this->SetShaderType("pixel");
+      else if (_msg->material().shader_type() == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+        this->SetShaderType("normal_map_object_space");
+      else if (_msg->material().shader_type() == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+        this->SetShaderType("normal_map_tangent_space");
+
+      if (_msg->material().has_normal_map())
+        this->SetNormalMap(_msg->material().normal_map());
+    }
+  }
+
+  if (_msg->has_geometry() && _msg->geometry().has_type())
+  {
+    math::Vector3 scale;
+
+    if (_msg->geometry().type() == msgs::Geometry::BOX)
+      scale = msgs::Convert(_msg->geometry().box().size());
+    else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
+    {
+      scale.x = _msg->geometry().cylinder().radius() * 2.0;
+      scale.y = _msg->geometry().cylinder().radius() * 2.0;
+      scale.z = _msg->geometry().cylinder().length();
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
+      scale.x = scale.y = scale.z = _msg->geometry().sphere().radius() * 2.0;
+    else if (_msg->geometry().type() == msgs::Geometry::PLANE)
+    {
+      scale.x = _msg->geometry().plane().size().x();
+      scale.y = _msg->geometry().plane().size().y();
+      scale.z = 1.0;
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
+      scale.x = scale.y = scale.z = _msg->geometry().image().scale();
+    else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
+      scale = msgs::Convert(_msg->geometry().heightmap().size());
+    else if (_msg->geometry().type() == msgs::Geometry::MESH)
+      scale = msgs::Convert(_msg->geometry().mesh().scale());
+    else
+      gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
+
+    this->SetScale( scale );
+  }
 
   /*if (msg->points.size() > 0)
   {

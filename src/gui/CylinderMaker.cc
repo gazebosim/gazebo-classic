@@ -37,10 +37,8 @@ CylinderMaker::CylinderMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
-  this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
-  this->visualMsg->set_mesh_type( msgs::Visual::CYLINDER );
-  this->visualMsg->set_material_script( "Gazebo/TurquoiseGlowOutline" );
-
+  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::SPHERE );
+  this->visualMsg->mutable_material()->set_script( "Gazebo/TurquoiseGlowOutline" );
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 
@@ -56,15 +54,16 @@ void CylinderMaker::Start(const rendering::UserCameraPtr camera)
   this->camera = camera;
   std::ostringstream stream;
   stream <<  "user_cylinder_" << counter++;
-  this->visualMsg->mutable_header()->set_str_id( stream.str() );
+  this->visualMsg->set_name( stream.str() );
   this->state = 1;
 }
 
 void CylinderMaker::Stop()
 {
-  this->visualMsg->set_action( msgs::Visual::DELETE );
-  this->visPub->Publish(*this->visualMsg);
-  this->visualMsg->set_action( msgs::Visual::UPDATE );
+  msgs::Request *msg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+
+  this->requestPub->Publish(*msg);
+  delete msg;
 
   this->state = 0;
   gui::Events::moveModeSignal(true);
@@ -129,22 +128,19 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   if (this->state == 1)
   {
     double dist = p1.Distance(p2);
-    scale.x = dist*2;
-    scale.y = dist*2;
-    scale.z = 0.01;
+
+    this->visualMsg->mutable_geometry()->mutable_cylinder()->set_radius(dist);
+    this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(0.01);
   }
   else
   {
-    scale.Set( this->visualMsg->scale().x(),
-               this->visualMsg->scale().y(),
-               this->visualMsg->scale().z() );
-    scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
-    p.z = scale.z/2.0;
+    this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(
+        (this->mousePushPos.y - event.pos.y)*0.01);
+
+    p.z = ((this->mousePushPos.y - event.pos.y)*0.01)/2.0;
   }
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
-  msgs::Set(this->visualMsg->mutable_scale(), scale );
-
   this->visPub->Publish(*this->visualMsg);
 }
 
@@ -156,7 +152,7 @@ void CylinderMaker::CreateTheEntity()
 
 
   newModelStr << "<gazebo version='1.0'>\
-    <model name='" << this->visualMsg->header().str_id() << "_model'>\
+    <model name='" << this->visualMsg->name() << "_model'>\
       <origin pose='" << this->visualMsg->pose().position().x() << " " 
                       << this->visualMsg->pose().position().y() << " " 
                       << this->visualMsg->pose().position().z() << " 0 0 0'/>\
@@ -166,14 +162,14 @@ void CylinderMaker::CreateTheEntity()
         </inertial>\
         <collision name='geom'>\
           <geometry>\
-            <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
-                      length='" << this->visualMsg->scale().z() << "'/>\
+            <cylinder radius='" << this->visualMsg->geometry().cylinder().radius() << "'\
+                      length='" << this->visualMsg->geometry().cylinder().length() << "'/>\
           </geometry>\
         </collision>\
         <visual name='visual' cast_shadows='true'>\
           <geometry>\
-            <cylinder radius='" << this->visualMsg->scale().x()*.5 << "'\
-                      length='" << this->visualMsg->scale().z() << "'/>\
+            <cylinder radius='" << this->visualMsg->geometry().cylinder().radius() << "'\
+                      length='" << this->visualMsg->geometry().cylinder().length() << "'/>\
           </geometry>\
           <material script='Gazebo/Grey'/>\
         </visual>\
@@ -183,14 +179,9 @@ void CylinderMaker::CreateTheEntity()
 
   msg.set_sdf( newModelStr.str() );
 
-  msgs::Stamp(this->visualMsg->mutable_header());
-  this->visualMsg->set_action( msgs::Visual::DELETE );
-  this->visPub->Publish(*this->visualMsg);
-
-  /*(this->createCB)(
-      msgs::Convert(this->visualMsg->pose().position()), 
-      msgs::Convert(this->visualMsg->scale()) );
-      */
+  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+  this->requestPub->Publish(*requestMsg);
+  delete requestMsg;
 
   this->makerPub->Publish(msg);
 }

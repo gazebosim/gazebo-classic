@@ -6,13 +6,13 @@ package gazebo.msgs;
 /// \verbatim
 
 import "header.proto";
-import "point.proto";
+import "vector3d.proto";
 import "quaternion.proto";
 
 message Pose
 {
-  optional Header header = 1;
-  required Point position = 2;
+  optional string name            = 1;
+  required Vector3d position      = 2;
   required Quaternion orientation = 3;
 }
 

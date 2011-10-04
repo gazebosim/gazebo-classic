@@ -17,6 +17,11 @@
 
 namespace gazebo
 {
+  namespace msgs
+  {
+    class RequestMsg;
+  }
+
   namespace gui
   {
     class SceneWidget;
@@ -55,11 +60,12 @@ namespace gazebo
       private slots: void OnMaxVel();
       private slots: void OnSurfaceLayer();
 
-      private: void OnPhysicsMsg(const boost::shared_ptr<msgs::Physics const> &_msg);
+      private: void OnResponse(const boost::shared_ptr<msgs::Response const> &_msg);
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr physicsPub, physicsRequestPub;
-      private: transport::SubscriberPtr physicsSub;
+      private: transport::PublisherPtr physicsPub, requestPub;
+      private: transport::SubscriberPtr responseSub;
+      private: msgs::Request *requestMsg;
       private: bool initialized;
 
       private: QLineEdit *gravityXLineEdit;
@@ -95,7 +101,7 @@ namespace gazebo
 
       private slots: void OnShadows(bool _state=false);
 
-      private: void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg);
+      private: void OnResponse(const boost::shared_ptr<msgs::Response const> &_msg);
 
       public: bool initialized;
       private: QPushButton *ambientColorButton;
@@ -114,9 +120,9 @@ namespace gazebo
       private: QComboBox *fogTypeBox;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr scenePub, sceneRequestPub;
-      private: transport::SubscriberPtr sceneSub;
-
+      private: transport::PublisherPtr scenePub, requestPub;
+      private: transport::SubscriberPtr responseSub;
+      private: msgs::Request *requestMsg;
     };
   }
 }

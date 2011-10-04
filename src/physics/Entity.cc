@@ -52,8 +52,6 @@ Entity::Entity(BasePtr parent)
 
   this->poseMutex = new boost::recursive_mutex();
 
-  this->visualMsg->set_mesh_type( msgs::Visual::UNKNOWN );
-
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
@@ -70,9 +68,6 @@ Entity::~Entity()
   // TODO: put this back in
   //this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
-  // Tell all renderers that I'm gone
-  this->visualMsg->set_action( msgs::Visual::DELETE );
-  this->visPub->Publish(*this->visualMsg);
   delete this->visualMsg;
   this->visualMsg = NULL;
 
@@ -88,11 +83,11 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
-  this->posePub = this->node->Advertise<msgs::Pose>("~/pose", 10);
-  this->poseSub = this->node->Subscribe("~/set_pose", &Entity::OnPoseMsg, this);
+  this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
+  this->poseSub = this->node->Subscribe("~/pose/modify", &Entity::OnPoseMsg, this);
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
 
-  this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
+  this->visualMsg->set_name( this->GetCompleteScopedName() );
 
   if (this->sdf->HasElement("origin"))
   {
@@ -109,12 +104,11 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   }
 
   if (this->parent)
-    this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
+    this->visualMsg->set_parent_name( this->parent->GetCompleteScopedName() );
 
   this->visPub->Publish(*this->visualMsg);
 
-  msgs::Init( *this->poseMsg, this->GetCompleteScopedName() );
-  this->poseMsg->mutable_header()->set_index(0);
+  this->poseMsg->set_name( this->GetCompleteScopedName() );
 }
 
  
@@ -182,8 +176,6 @@ void Entity::PublishPose()
   math::Pose relativePose = this->GetRelativePose();
   if (relativePose != msgs::Convert(*this->poseMsg))
   {
-    this->poseMsg->mutable_header()->set_index( 
-        this->poseMsg->header().index() + 1);
     msgs::Set( this->poseMsg, this->worldPose);
     this->posePub->Publish( *this->poseMsg);
   }
@@ -405,7 +397,7 @@ ModelPtr Entity::GetParentModel() const
 void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
   //this->poseMutex->lock();
-  if (_msg->header().str_id() == this->GetCompleteScopedName())
+  if (_msg->name() == this->GetCompleteScopedName())
   {
     math::Pose p = msgs::Convert(*_msg);
     math::Vector3 rpy = p.rot.GetAsEuler();

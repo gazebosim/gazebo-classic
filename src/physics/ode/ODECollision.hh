@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef ODEGEOM_HH
-#define ODEGEOM_HH
+#ifndef ODECOLLISION_HH
+#define ODECOLLISION_HH
 
 #include "physics/ode/ode_inc.h"
 

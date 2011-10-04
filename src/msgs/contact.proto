@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Contact 
+/// \brief Information about contact
+/// \verbatim
+
+message Contact
+{
+  optional double ode_soft_cfm  = 1;
+  optional double ode_soft_erp  = 2;
+  optional double ode_kp        = 3;
+  optional double ode_kd        = 4;
+  optional double ode_max_vel   = 5;
+  optional double ode_min_depth = 6;
+}
+/// \endverbatim

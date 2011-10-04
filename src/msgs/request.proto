@@ -7,9 +7,9 @@ package gazebo.msgs;
 
 message Request
 {
-  required string request = 1;
-  optional string str_data = 2;
-  optional int32 index = 3;
+  required string request  = 1;
+  required int32 id        = 2;
+  optional string data     = 3;
 }
 
 /// \endverbatim

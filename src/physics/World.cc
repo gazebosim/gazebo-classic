@@ -137,28 +137,20 @@ void World::Load( sdf::ElementPtr _sdf )
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);
 
-  this->sceneRequestSub = this->node->Subscribe("~/publish_scene", 
-                                        &World::PublishScene, this);
-
-  this->entitiesRequestSub = this->node->Subscribe("~/request_entities", 
-                                             &World::OnEntitiesRequest, this);
-  this->entitiesPub = this->node->Advertise<msgs::Entities>("~/entities");
-
+  this->requestSub = this->node->Subscribe("~/request",&World::OnRequest, this);
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->sceneSub = this->node->Subscribe("~/scene", 
                                         &World::OnScene, this);
 
   this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
 
-  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
-
   this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
-  this->newEntityPub = this->node->Advertise<msgs::Entity>("~/entity");
-  this->entitySub = this->node->Subscribe<msgs::Entity>("~/entity",
-      &World::OnEntityMsg, this);
+  this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
 
-  this->entityInfoPub = this->node->Advertise<msgs::Factory>("~/entity_info");
+  this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
+      &World::OnModelMsg, this);
 
 
   std::string type = _sdf->GetElement("physics")->GetValueString("type");
@@ -299,20 +291,14 @@ void World::ProcessEntityMsgs()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
-  std::list< boost::shared_ptr<msgs::Entity const> >::iterator iter;
-  for (iter = this->entityMsgs.begin(); iter != this->entityMsgs.end(); iter++)
+  std::list< std::string >::iterator iter;
+  for (iter = this->deleteEntity.begin(); 
+       iter != this->deleteEntity.end(); iter++)
   {
-    BasePtr entity = this->rootElement->GetByName((*iter)->name());
-
-    if (!entity)
-      gzerr << "Unable to find entity[" << (*iter)->name() << "]\n";
-    else if ((*iter)->has_request_delete() && (*iter)->request_delete())
-    {
-      this->rootElement->RemoveChild((*iter)->name());
-    } 
+    this->rootElement->RemoveChild( (*iter) );
   }
 
-  this->entityMsgs.clear();
+  this->deleteEntity.clear();
 }
 
 
@@ -404,11 +390,10 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 
   event::Events::addEntitySignal(model->GetCompleteScopedName());
 
-  msgs::Entity msg;
-  msgs::Init(msg, model->GetCompleteScopedName() );
-  this->FillEntityMsg(msg, model);
+  msgs::Model msg;
+  model->FillModelMsg(msg);
+  this->modelPub->Publish(msg);
 
-  this->newEntityPub->Publish(msg);
   return model;
 }
 
@@ -614,34 +599,78 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
     this->OnStep();
 }
 
-void World::OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_data )
+void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 {
-  msgs::Entities msg;
-  msgs::Init(msg, "entities");
-  msg.mutable_header()->set_index( _data->index() );
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
 
-  for (unsigned int i=0; i < this->rootElement->GetChildCount(); i++)
+  msgs::Response response;
+  response.set_id( _msg->id() );
+  std::string *serializedData = response.mutable_serialized_data();
+
+  if (_msg->request() == "entity_list")
   {
-    BasePtr entity = this->rootElement->GetChild(i);
-    msgs::Entity *entityMsg = msg.add_entities();
-    if (entity->HasType(Base::MODEL))
+    msgs::Model_V modelVMsg;
+
+    for (unsigned int i=0; i < this->rootElement->GetChildCount(); i++)
     {
-      ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
-      this->FillEntityMsg(*entityMsg, model);
+      BasePtr entity = this->rootElement->GetChild(i);
+      msgs::Model *modelMsg = modelVMsg.add_models();
+      if (entity->HasType(Base::MODEL))
+      {
+        ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+        model->FillModelMsg( *modelMsg );
+      }
+    }
+
+    modelVMsg.SerializeToString( serializedData );
+  }
+  else if (_msg->request() == "entity_delete")
+  {
+    this->deleteEntity.push_back( _msg->data() );
+  }
+  else if (_msg->request() == "entity_info")
+  {
+    BasePtr entity = this->rootElement->GetByName( _msg->data() );
+    if (entity)
+    {
+      if (entity->HasType(Base::MODEL))
+      {
+        msgs::Model modelMsg;
+        ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+        model->FillModelMsg(modelMsg);
+        modelMsg.SerializeToString( serializedData );
+      }
+      else if (entity->HasType(Base::LINK))
+      {
+        msgs::Link linkMsg;
+        LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
+        link->FillLinkMsg(linkMsg);
+        linkMsg.SerializeToString( serializedData );
+      }
+      else if (entity->HasType(Base::COLLISION))
+      {
+        msgs::Collision collisionMsg;
+        CollisionPtr collision = boost::shared_dynamic_cast<Collision>(entity);
+        collision->FillCollisionMsg( collisionMsg );
+        collisionMsg.SerializeToString( serializedData );
+      }
+      else if (entity->HasType(Base::JOINT))
+      {
+        msgs::Joint jointMsg;
+        JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
+        joint->FillJointMsg( jointMsg );
+        jointMsg.SerializeToString( serializedData );
+      }
     }
   }
-
-  this->entitiesPub->Publish( msg );
-}
-
-void World::FillEntityMsg( msgs::Entity &_msg, ModelPtr &_model )
-{
-  _msg.set_name( _model->GetCompleteScopedName() );
-  for (unsigned int j=0; j < _model->GetChildCount(); j++)
+  else if (_msg->request() == "scene_info")
   {
-    if (_model->GetChild(j)->HasType(Base::LINK))
-      *(_msg.add_link_names()) = _model->GetChild(j)->GetCompleteScopedName();
+    msgs::Scene sceneMsg;
+    this->BuildSceneMsg( sceneMsg, this->rootElement );
+    sceneMsg.SerializeToString( serializedData );
   }
+
+  this->responsePub->Publish( response );
 }
 
 void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
@@ -649,18 +678,6 @@ void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
   this->incomingMsgMutex->lock();
   this->sceneMsg.MergeFrom( *_data );
   this->incomingMsgMutex->unlock();
-}
-
-void World::PublishScene( const boost::shared_ptr<msgs::Request const> &/*_data*/ )
-{
-  msgs::Stamp(this->sceneMsg.mutable_header());
-
-  this->sceneMsg.clear_pose();
-  if (this->rootElement)
-  {
-    this->BuildSceneMsg(this->sceneMsg, this->rootElement);
-    this->scenePub->Publish( this->sceneMsg );
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -671,10 +688,10 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
   {
     if (entity->HasType(Entity::ENTITY))
     {
-      msgs::Pose *poseMsg = scene.add_pose();
+      msgs::Model *modelMsg = scene.add_model();
       math::Pose pose = boost::shared_static_cast<Entity>(entity)->GetWorldPose();
-      poseMsg->CopyFrom( msgs::Convert(pose) );
-      msgs::Init(*poseMsg, entity->GetCompleteScopedName() );
+      modelMsg->set_name( entity->GetCompleteScopedName() );
+      msgs::Set( modelMsg->mutable_pose(), pose );
     }
 
     for (unsigned int i=0; i < entity->GetChildCount(); i++)
@@ -692,7 +709,7 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
   int i = 0;
   for (; i < this->sceneMsg.visual_size(); i++)
   {
-    if (this->sceneMsg.visual(i).header().str_id() == msg->header().str_id())
+    if (this->sceneMsg.visual(i).name() == msg->name())
     {
       this->sceneMsg.mutable_visual(i)->CopyFrom(*msg);
       break;
@@ -713,7 +730,7 @@ void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
   int i = 0;
   for (; i < this->sceneMsg.joint_size(); i++)
   {
-    if (this->sceneMsg.joint(i).header().str_id() == msg->header().str_id())
+    if (this->sceneMsg.joint(i).name() == msg->name())
     {
       this->sceneMsg.mutable_joint(i)->CopyFrom(*msg);
       break;
@@ -789,34 +806,9 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   }
 }
 
-void World::OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg)
+void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  if (_msg->has_request_delete())
-  {
-    this->entityMsgs.push_back(_msg);
-  }
-  else if (_msg->has_request_info())
-  {
-    msgs::Factory msg;
-    msgs::Init(msg, "entity_info");
-    BasePtr entity = this->rootElement->GetByName( _msg->name() );
-
-    if (entity)
-    {
-      const sdf::ElementPtr sdfValue = entity->GetSDF();
-      msg.set_sdf( sdfValue->ToString("") );
-
-      if (entity->HasType(Base::MODEL))
-        msg.set_sdf_description_filename("sdf/model.sdf");
-      else if (entity->HasType(Base::LINK))
-        msg.set_sdf_description_filename("sdf/link.sdf");
-      else if (entity->HasType(Base::GEOM))
-        msg.set_sdf_description_filename("sdf/collision.sdf");
-    }
-
-    this->entityInfoPub->Publish(msg);
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

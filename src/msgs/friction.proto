@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Frction 
+/// \brief Information about friction
+/// \verbatim
+
+message Friction
+{
+  optional double ode_mu    = 1;
+  optional double ode_mu2   = 2;
+  optional double ode_fdr1  = 3;
+  optional double ode_slip1 = 4;
+  optional double ode_slip2 = 5;
+}
+/// \endverbatim

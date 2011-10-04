@@ -13,10 +13,10 @@ import "visual.proto";
 import "pose.proto";
 import "light.proto";
 import "joint.proto";
+import "model.proto";
 
 message Scene
 {
-  required Header header       = 1;
   optional Color ambient       = 2;
   optional Color background    = 3;
   optional string sky_material = 4;
@@ -25,7 +25,7 @@ message Scene
   optional bool grid           = 7;
 
   repeated Visual visual       = 8;
-  repeated Pose pose           = 9;
+  repeated Model model         = 9;
   repeated Light light         = 10; 
   repeated Joint joint         = 11;
 }

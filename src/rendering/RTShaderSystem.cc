@@ -242,7 +242,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(perPixelLightModel);
           }
-          else if (vis->GetShaderType() == "normal_map_objectspace")
+          else if (vis->GetShaderType() == "normal_map_object_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState = 
               this->shaderGenerator->createSubRenderState(
@@ -257,7 +257,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "normal_map_tangetspace")
+          else if (vis->GetShaderType() == "normal_map_tangent_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState = 
               this->shaderGenerator->createSubRenderState(

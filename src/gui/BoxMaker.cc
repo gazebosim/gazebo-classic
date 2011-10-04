@@ -39,9 +39,8 @@ BoxMaker::BoxMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
-  this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
-  this->visualMsg->set_mesh_type( msgs::Visual::BOX );
-  this->visualMsg->set_material_script( "Gazebo/TurquoiseGlowOutline" );
+  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::BOX );
+  this->visualMsg->mutable_material()->set_script( "Gazebo/TurquoiseGlowOutline" );
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }
 
@@ -58,16 +57,17 @@ void BoxMaker::Start(const rendering::UserCameraPtr camera)
 
   std::ostringstream stream;
   stream << "user_box_" << counter++;
-  this->visualMsg->mutable_header()->set_str_id( stream.str() );
+  this->visualMsg->set_name( stream.str() );
 
   this->state = 1;
 }
 
 void BoxMaker::Stop()
 {
-  this->visualMsg->set_action( msgs::Visual::DELETE );
-  this->visPub->Publish(*this->visualMsg);
-  this->visualMsg->set_action( msgs::Visual::UPDATE );
+  msgs::Request *msg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+
+  this->requestPub->Publish(*msg);
+  delete msg;
 
   this->state = 0;
   gui::Events::moveModeSignal(true);
@@ -131,15 +131,15 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   }
   else
   {
-    scale.Set( this->visualMsg->scale().x(),
-               this->visualMsg->scale().y(),
-               this->visualMsg->scale().z() );
+    scale.Set( this->visualMsg->geometry().box().size().x(),
+               this->visualMsg->geometry().box().size().y(),
+               this->visualMsg->geometry().box().size().z() );
     scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
-  msgs::Set(this->visualMsg->mutable_scale(), scale );
+  msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(), scale );
 
   this->visPub->Publish(*this->visualMsg);
 }
@@ -152,7 +152,7 @@ void BoxMaker::CreateTheEntity()
   std::ostringstream newModelStr;
 
   newModelStr << "<gazebo version='1.0'>\
-    <model name='" << this->visualMsg->header().str_id() << "_model'>\
+    <model name='" << this->visualMsg->name() << "_model'>\
     <origin pose='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
                     << this->visualMsg->pose().position().z() << " 0 0 0'/>\
@@ -162,16 +162,16 @@ void BoxMaker::CreateTheEntity()
       </inertial>\
       <collision name='geom'>\
         <geometry>\
-          <box size='" << this->visualMsg->scale().x() << " "
-                       << this->visualMsg->scale().y() << " "
-                       << this->visualMsg->scale().z() << "'/>\
+          <box size='" << this->visualMsg->geometry().box().size().x() << " "
+                       << this->visualMsg->geometry().box().size().y() << " "
+                       << this->visualMsg->geometry().box().size().z() << "'/>\
         </geometry>\
       </collision>\
       <visual name='visual' cast_shadows='true'>\
         <geometry>\
-          <box size='" << this->visualMsg->scale().x() << " "
-                       << this->visualMsg->scale().y() << " "
-                       << this->visualMsg->scale().z() << "'/>\
+          <box size='" << this->visualMsg->geometry().box().size().x() << " "
+                       << this->visualMsg->geometry().box().size().y() << " "
+                       << this->visualMsg->geometry().box().size().z() << "'/>\
         </geometry>\
         <material script='Gazebo/Grey'/>\
       </visual>\
@@ -181,9 +181,10 @@ void BoxMaker::CreateTheEntity()
 
   msg.set_sdf( newModelStr.str() );
 
-  msgs::Stamp(this->visualMsg->mutable_header());
-  this->visualMsg->set_action( msgs::Visual::DELETE );
-  this->visPub->Publish(*this->visualMsg);
+  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete", 
+      this->visualMsg->name());
+  this->requestPub->Publish(*requestMsg);
+  delete requestMsg;
 
   this->makerPub->Publish(msg);
 }

@@ -81,7 +81,7 @@ namespace gazebo
       private: math::Pose selectionPoseOrig;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr posePub;
+      private: transport::PublisherPtr modelPub;
       private: transport::SubscriberPtr selectionSub;
 
       private: Qt::KeyboardModifiers keyModifiers;

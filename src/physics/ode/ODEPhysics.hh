@@ -161,7 +161,7 @@ namespace gazebo
     
       public: void ProcessContactFeedback(ContactFeedback* feedback);
 
-      protected: virtual void OnPhysicsRequest( 
+      protected: virtual void OnRequest( 
                    const boost::shared_ptr<msgs::Request const> &/*_msg*/ );
 
       protected: virtual void OnPhysicsMsg( 

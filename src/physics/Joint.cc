@@ -185,3 +185,9 @@ LinkPtr Joint::GetParent() const
 {
   return this->parentLink;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Fill a joint message
+void Joint::FillJointMsg( msgs::Joint &/*_msg*/ )
+{
+}

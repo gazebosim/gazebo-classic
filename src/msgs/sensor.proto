@@ -1,0 +1,24 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Sensor 
+/// \brief Information about a sensor element
+/// \verbatim
+
+import "pose.proto";
+import "camerasensor.proto";
+import "raysensor.proto";
+import "contactsensor.proto";
+
+message Sensor
+{
+  required string name             = 1;
+  required string type             = 2;
+  optional bool always_on          = 3;
+  optional double update_rate      = 4;
+  optional Pose pose               = 5;
+  optional CameraSensor camera     = 6;
+  optional RaySensor ray           = 7;
+  optional ContactSensor contact   = 8;
+}
+/// \endverbatim

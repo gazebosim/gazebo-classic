@@ -63,6 +63,7 @@ namespace gazebo
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr visPub;
       protected: transport::PublisherPtr makerPub;
+      protected: transport::PublisherPtr requestPub;
       protected: CreateCallback createCB;
                
 

@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Surface 
+/// \brief Information about a surface element
+/// \verbatim
+
+import "contact.proto";
+import "friction.proto";
+
+message Surface
+{
+  optional Friction friction                = 1;
+  optional double restitution_coefficient   = 2;
+  optional double bounce_threshould         = 3;
+  optional Contact contact                  = 4;
+}
+/// \endverbatim

@@ -5,14 +5,27 @@ package gazebo.msgs;
 /// \brief A message containing visual information
 /// \verbatim
 
-import "header.proto";
 import "pose.proto";
-import "point.proto";
-import "plane.proto";
-import "color.proto";
+import "geometry.proto";
+import "material.proto";
 
 message Visual
 {
+  required string name         = 1;
+  optional string parent_name  = 2;
+  optional bool cast_shadows   = 3;
+  optional double transparency = 4;
+  optional double laser_retro  = 5;
+  optional Pose pose           = 6;
+  optional Geometry geometry   = 7;
+  optional Material material   = 8;
+
+  optional bool visible        = 9;
+  optional bool delete_me      = 11;
+  optional bool is_static      = 12;
+}
+
+/*
   required Header header = 1;
 
   enum ActionType
@@ -59,12 +72,13 @@ message Visual
   optional bool visible           = 14;
   optional float transparency     = 15;
   optional Pose pose              = 16;
-  optional Point scale            = 17;
-  repeated Point points           = 18;
-  optional Plane plane            = 19;
+  optional Vector3d scale            = 17;
+  repeated Vector3d points           = 18;
+  optional PlaneGeom plane            = 19;
   optional bool is_static         = 20;
   optional string normal_map      = 21;
   optional string shader_type     = 22;
 }
+*/
 
 /// \endverbatim

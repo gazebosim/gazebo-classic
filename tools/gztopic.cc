@@ -122,7 +122,7 @@ msgs::TopicInfo get_topic_info(const std::string topic)
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
   request.set_request("topic_info");
-  request.set_str_data(topic);
+  request.set_data(topic);
   connection->EnqueueMsg( msgs::Package("request", request), true );
   connection->Read(data);
 

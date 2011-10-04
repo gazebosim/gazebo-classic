@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include "msgs/msgs.h"
+#include "msgs/MessageTypes.hh"
 
 #include "common/Events.hh"
 #include "common/Console.hh"
@@ -43,7 +44,7 @@ using namespace physics;
 Collision::Collision( LinkPtr link )
     : Entity(link)
 {
-  this->AddType(Base::GEOM);
+  this->AddType(Base::COLLISION);
 
   this->link = link;
 
@@ -61,8 +62,8 @@ Collision::~Collision()
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    msgs::Init(msg, this->bbVisual);
-    msg.set_action( msgs::Visual::DELETE);
+    msg.set_name( this->bbVisual );
+    msg.set_delete_me( true );
     this->visPub->Publish(msg);
   }
 }
@@ -115,21 +116,19 @@ void Collision::CreateBoundingBox()
     visname << this->GetCompleteScopedName() << "::BBVISUAL" ;
 
     msgs::Visual msg;
-    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
-    msg.set_parent_id( this->GetCompleteScopedName() );
-    msg.mutable_header()->set_str_id( this->GetCompleteScopedName() + "_BBVISUAL" );
+    msg.mutable_geometry()->set_type( msgs::Geometry::BOX );
+    msg.set_parent_name( this->GetCompleteScopedName() );
+    msg.set_name( this->GetCompleteScopedName() + "_BBVISUAL" );
     msg.set_cast_shadows(false);
-    // NATY: Set it so bounding boxes are visible upon creation if a flag is
-    // set. The flag should exist only on the rendering side. May need to
-    // put something in the message to indicate that this is a bounding box
-    //msg.set_visible( RenderState::GetShowBoundingBoxes() );
-    msg.set_mesh_type( msgs::Visual::BOX );
-    if (this->IsStatic() )
-      msg.set_material_script( "Gazebo/YellowTransparent" );
-    else
-      msg.set_material_script( "Gazebo/GreenTransparent" );
 
-    msgs::Set(msg.mutable_scale(), (box.max - box.min) * 1.05);
+    //msg.set_visible( RenderState::GetShowBoundingBoxes() );
+    if (this->IsStatic() )
+      msg.mutable_material()->set_script( "Gazebo/YellowTransparent" );
+    else
+      msg.mutable_material()->set_script( "Gazebo/GreenTransparent" );
+
+    msgs::Set( msg.mutable_geometry()->mutable_box()->mutable_size(), 
+               (box.max - box.min) * 1.05 );
     msgs::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
     msgs::Set(msg.mutable_pose()->mutable_orientation(), math::Quaternion(1,0,0,0));
     msg.set_transparency( .5 );
@@ -186,9 +185,9 @@ void Collision::ShowBoundingBox(const bool &show)
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    msgs::Init(msg, this->bbVisual);
+    msg.set_name( this->bbVisual );
     msg.set_visible( show );
-    msg.set_action( msgs::Visual::UPDATE );
+    msg.set_delete_me( true );
     this->visPub->Publish(msg);
   }
 }
@@ -289,9 +288,9 @@ void Collision::EnabledCB(bool enabled)
   msgs::Init(msg, this->bbVisual);
 
   if (enabled)
-    msg.set_material_script( "Gazebo/GreenTransparent" );
+    msg.mutable_material()->set_script( "Gazebo/GreenTransparent" );
   else
-    msg.set_material_script( "Gazebo/RedTransparent" );
+    msg.mutable_material()->set_script( "Gazebo/RedTransparent" );
 
   this->visPub->Publish(msg);
 }
@@ -382,3 +381,13 @@ void Collision::UpdateParameters( sdf::ElementPtr &_sdf )
 {
   Entity::UpdateParameters(_sdf);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Fill a collision message
+void Collision::FillCollisionMsg( msgs::Collision &_msg )
+{
+  msgs::Set( _msg.mutable_pose(), this->GetWorldPose() );
+  _msg.set_name( this->GetCompleteScopedName() );
+  _msg.set_laser_retro( this->GetLaserRetro() );
+}
+ 

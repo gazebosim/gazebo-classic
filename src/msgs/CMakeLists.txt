@@ -1,34 +1,55 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (msgs color.proto
-          header.proto
+set (msgs axis.proto
+          boxgeom.proto
+          camerasensor.proto
+          collision.proto
+          color.proto
+          contact.proto
+          contactsensor.proto
+          cylindergeom.proto
           factory.proto
-          light.proto
-          plane.proto
-          point.proto
-          pose.proto
-          quaternion.proto
-          time.proto
-          visual.proto
-          selection.proto
-          shadows.proto
-          scene.proto
           fog.proto
+          friction.proto
+          geometry.proto
+          header.proto
+          heightmapgeom.proto
+          imagegeom.proto
+          inertial.proto
           int.proto
-          string.proto
-          packet.proto
-          publish.proto
-          subscribe.proto
-          publishers.proto
-          request.proto
-          topic_info.proto
-          world_stats.proto
-          world_control.proto
-          entity.proto
-          entities.proto
           joint.proto
+          light.proto
+          link.proto
+          material.proto
+          meshgeom.proto
+          model.proto
+          model_v.proto
+          packet.proto
           physics.proto
+          planegeom.proto
+          vector3d.proto
+          pose.proto
+          publishers.proto
+          publish.proto
+          quaternion.proto
+          raysensor.proto
+          request.proto
+          response.proto
+          scene.proto
+          selection.proto
+          sensor.proto
+          shadows.proto
+          spheregeom.proto
+          string.proto
           string_v.proto
+          subscribe.proto
+          surface.proto
+          time.proto
+          topic_info.proto
+          vector2d.proto
+          visual.proto
+          world_control.proto
+          world_stats.proto 
 )
 
 set (sources msgs.cc)
@@ -50,3 +71,5 @@ configure_file ( ${PROJECT_SOURCE_DIR}/src/msgs/MessageTypes.hh.in ${CMAKE_CURRE
 
 INSTALL_LIBRARY(gazebo_msgs)
 INSTALL_INCLUDES("msgs" ${PROTO_HDRS} ${headers} ${CMAKE_CURRENT_BINARY_DIR}/MessageTypes.hh)
+
+

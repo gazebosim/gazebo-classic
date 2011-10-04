@@ -317,8 +317,10 @@ void Model::UpdateParameters( sdf::ElementPtr &_sdf )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the SDF values for the model
-const sdf::ElementPtr &Model::GetSDF() const
+const sdf::ElementPtr &Model::GetSDF()
 {
+  Entity::GetSDF();
+  return this->sdf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -735,4 +737,26 @@ Contact Model::GetContact(CollisionPtr _geom, unsigned int _i)
       return geom_contacts[_i];
     else
       return Contact();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Model::FillModelMsg( msgs::Model &_msg )
+{
+  _msg.set_name( this->GetCompleteScopedName() );
+  _msg.set_is_static( this->IsStatic() );
+  _msg.mutable_pose()->CopyFrom( msgs::Convert(this->GetWorldPose()) );
+
+  for (unsigned int j=0; j < this->GetChildCount(); j++)
+  {
+    if (this->GetChild(j)->HasType(Base::LINK))
+    {
+      LinkPtr link = boost::shared_dynamic_cast<Link>( this->GetChild(j) );
+      link->FillLinkMsg( *_msg.add_links() );
+    }
+    if (this->GetChild(j)->HasType(Base::JOINT))
+    {
+      JointPtr joint = boost::shared_dynamic_cast<Joint>( this->GetChild(j) );
+      joint->FillJointMsg( *_msg.add_joints() );
+    }
+  }
 }

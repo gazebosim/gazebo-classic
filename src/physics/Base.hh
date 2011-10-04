@@ -47,7 +47,7 @@ namespace gazebo
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
-      public: enum EntityType{BASE, ENTITY, MODEL, LINK, GEOM, 
+      public: enum EntityType{BASE, ENTITY, MODEL, LINK, COLLISION, 
                               BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, 
                               HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, 
                               JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, 

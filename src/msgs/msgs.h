@@ -38,7 +38,15 @@ namespace gazebo
     /// \addtogroup gazebo_msgs Messages 
     /// \brief All messages and helper functions
     /// \{
- 
+    
+    /// \brief Create a request message
+    /// \param _request Request string
+    /// \param _data Optional data string
+    /// \return A Request message
+    msgs::Request *CreateRequest( const std::string &_request, 
+                                  const std::string &_data = "" );
+
+
     /// \brief Initialize a message
     /// \param _message Message to initialize
     /// \param _id Optional string id
@@ -57,10 +65,10 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Point
+    /// \brief Convert a math::Vector3 to a msgs::Vector3d
     /// \param _v The vector to convert
-    /// \return A msgs::Point object
-    msgs::Point      Convert(const math::Vector3 &_v);
+    /// \return A msgs::Vector3d object
+    msgs::Vector3d      Convert(const math::Vector3 &_v);
 
     /// \brief Convert a math::Quaternion to a msgs::Quaternion
     /// \param _q The quaternion to convert
@@ -82,15 +90,15 @@ namespace gazebo
     /// \return A msgs::Time object
     msgs::Time       Convert(const common::Time &_t);
 
-    /// \brief Convert a math::Plane to a msgs::Plane
+    /// \brief Convert a math::Plane to a msgs::PlaneGeom
     /// \param _p The plane to convert
-    /// \return A msgs::Plane object
-    msgs::Plane      Convert(const math::Plane &_p);
+    /// \return A msgs::PlaneGeom object
+    msgs::PlaneGeom Convert(const math::Plane &_p);
 
-    /// \brief Convert a msgs::Point to a math::Vector
+    /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param _v The plane to convert
     /// \return A math::Vector3 object
-    math::Vector3    Convert(const msgs::Point &_v);
+    math::Vector3    Convert(const msgs::Vector3d &_v);
 
     /// \brief Convert a msgs::Quaternion to a math::Quaternion
     /// \param _q The quaternion to convert
@@ -112,15 +120,20 @@ namespace gazebo
     /// \return A common::Time object
     common::Time     Convert(const msgs::Time &_t);
 
-    /// \brief Convert a msgs::Plane to a common::Plane
+    /// \brief Convert a msgs::PlaneGeom to a common::Plane
     /// \param _p The plane to convert
     /// \return A common::Plane object
-    math::Plane      Convert(const msgs::Plane &_p);
+    math::Plane      Convert(const msgs::PlaneGeom &_p);
 
-    /// \brief Set a msgs::Point from a math::Vector3
-    /// \param _pt A msgs::Point pointer
+    /// \brief Set a msgs::Vector3d from a math::Vector3
+    /// \param _pt A msgs::Vector3d pointer
     /// \param _v A math::Vector3 reference
-    void Set(msgs::Point *_pt, const math::Vector3 &_v);
+    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v);
+
+    /// \brief Set a msgs::Vector2d from a math::Vector3
+    /// \param _pt A msgs::Vector2d pointer
+    /// \param _v A math::Vector2d reference
+    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v);
 
     /// \brief Set a msgs::Quaternion from a math::Quaternion
     /// \param _q A msgs::Quaternion pointer
@@ -145,7 +158,7 @@ namespace gazebo
     /// \brief Set a msgs::Plane from a math::Plane
     /// \param _p A msgs::Plane pointer
     /// \param _v A math::Plane reference
-    void Set(msgs::Plane *_p, const math::Plane &_v);
+    void Set(msgs::PlaneGeom *_p, const math::Plane &_v);
 
     /// \brief Create a msgs::Light from a light SDF element
     /// \param _sdf The sdf element

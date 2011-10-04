@@ -257,7 +257,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     else if (req.request() == "topic_info")
     {
-      msgs::Publish pub = this->GetPublisher( req.str_data() );
+      msgs::Publish pub = this->GetPublisher( req.data() );
       msgs::TopicInfo ti;
       ti.set_msg_type( pub.msg_type() );
 
@@ -268,7 +268,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       for (piter = this->publishers.begin(); 
           piter != this->publishers.end(); piter++)
       {
-        if ( piter->first.topic() == req.str_data())
+        if ( piter->first.topic() == req.data())
         {
           msgs::Publish *pubPtr = ti.add_publisher();
           pubPtr->CopyFrom( piter->first );
@@ -279,7 +279,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       for (siter = this->subscribers.begin(); 
           siter != this->subscribers.end(); siter++)
       {
-        if ( siter->first.topic() == req.str_data())
+        if ( siter->first.topic() == req.data())
         {
           msgs::Subscribe *sub = ti.add_subscriber();
           sub->CopyFrom( siter->first );

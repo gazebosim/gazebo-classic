@@ -192,7 +192,11 @@ namespace gazebo
   
       public: void DisconnectEnabledSignal( event::ConnectionPtr &c )
               { enabledSignal.Disconnect(c); }
-  
+
+      /// \brief Fill a link message
+      /// \param _msg Message to fill
+      public: void FillLinkMsg( msgs::Link &_msg );
+
       protected: bool isStatic;
   
       // Helper entity for separating body pose from center-of-mass pose

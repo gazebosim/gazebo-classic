@@ -61,7 +61,7 @@ GLWidget::GLWidget( QWidget *parent )
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->posePub = this->node->Advertise<msgs::Pose>("~/set_pose");
+  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->selectionSub = this->node->Subscribe("~/selection", &GLWidget::OnSelectionMsg, this);
 
   this->installEventFilter(this);
@@ -328,12 +328,10 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
   }
   else if ( !this->selectionMod.empty() && this->selection)
   {
-    msgs::Pose msg;
-
-    msgs::Init(msg, this->selection->GetName());
-    msgs::Set( &msg, this->selection->GetWorldPose());
-
-    this->posePub->Publish(msg);
+    msgs::Model msg;
+    msg.set_name(this->selection->GetName());
+    msgs::Set( msg.mutable_pose(), this->selection->GetWorldPose() );
+    this->modelPub->Publish(msg);
   }
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);

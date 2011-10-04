@@ -64,7 +64,7 @@ namespace gazebo
       public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
 
       /// \brief Get the SDF values for the model
-      public: virtual const sdf::ElementPtr &GetSDF() const;
+      public: virtual const sdf::ElementPtr &GetSDF();
 
       /// \brief Remove a child
       /// \param child Remove a child entity
@@ -153,7 +153,11 @@ namespace gazebo
       /// \brief Set the laser retro reflectiveness of the model
       /// \param retro Retro reflectance value
       public: void SetLaserRetro( const float &retro );
-  
+
+      /// \brief Fill a model message
+      /// \param _msg Message to fill
+      public: void FillModelMsg( msgs::Model &_msg );
+
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint( sdf::ElementPtr &_sdf );

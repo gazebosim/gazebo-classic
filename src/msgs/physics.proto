@@ -5,12 +5,11 @@ package gazebo.msgs;
 /// \brief A message containing a description of the global physics properties
 /// \verbatim
 
-import "point.proto";
+import "vector3d.proto";
 import "header.proto";
 
 message Physics
 {
-  optional Header header = 1;
   enum Type
   {
     ODE = 1;
@@ -25,5 +24,5 @@ message Physics
   optional double erp = 8;
   optional double contact_max_correcting_vel = 9;
   optional double contact_surface_layer = 10;
-  optional Point gravity = 11;
+  optional Vector3d gravity = 11;
 }

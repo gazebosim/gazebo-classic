@@ -214,25 +214,30 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
 
 }
 
-void ODEPhysics::OnPhysicsRequest( const boost::shared_ptr<msgs::Request const> &_data )
+void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 {
-  msgs::Physics msg;
-  msgs::Init(msg, "physics");
-  msg.mutable_header()->set_index( _data->index() + 1 );
-  msg.set_type( msgs::Physics::ODE );
+  msgs::Response response;
+  response.set_id( _msg->id() );
+  std::string *serializedData = response.mutable_serialized_data();
 
-  msg.set_solver_type( this->stepType );
+  if (_msg->request() == "physics_info" )
+  {
+    msgs::Physics physicsMsg;
+    physicsMsg.set_type( msgs::Physics::ODE );
+    physicsMsg.set_solver_type( this->stepType );
+    physicsMsg.set_dt( this->stepTimeDouble );
+    physicsMsg.set_iters( this->GetSORPGSIters() );
+    physicsMsg.set_sor( this->GetSORPGSW() );
+    physicsMsg.set_cfm( this->GetWorldCFM() );
+    physicsMsg.set_erp( this->GetWorldERP() );
+    physicsMsg.set_contact_max_correcting_vel( this->GetContactMaxCorrectingVel() );
+    physicsMsg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
+    physicsMsg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
 
-  msg.set_dt( this->stepTimeDouble );
-  msg.set_iters( this->GetSORPGSIters() );
-  msg.set_sor( this->GetSORPGSW() );
-  msg.set_cfm( this->GetWorldCFM() );
-  msg.set_erp( this->GetWorldERP() );
-  msg.set_contact_max_correcting_vel( this->GetContactMaxCorrectingVel() );
-  msg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
-  msg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
+    physicsMsg.SerializeToString( serializedData );
+  }
 
-  this->physicsPub->Publish( msg );
+  this->responsePub->Publish( response );
 }
 
 void ODEPhysics::OnPhysicsMsg( 

@@ -85,7 +85,7 @@ void ODELink::Init()
     Base_V::iterator iter;
     for (iter = this->children.begin(); iter != this->children.end(); iter++)
     {
-      if ((*iter)->HasType(Base::GEOM))
+      if ((*iter)->HasType(Base::COLLISION))
       {
         ODECollisionPtr g = boost::shared_static_cast<ODECollision>(*iter);
         if (g->IsPlaceable() && g->GetCollisionId())

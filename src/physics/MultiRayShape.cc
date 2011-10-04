@@ -30,16 +30,16 @@ MultiRayShape::MultiRayShape(CollisionPtr parent)
   this->SetName("multiray");
 
   this->rayFanMsg = new msgs::Visual();
-  this->rayFanMsg->mutable_header()->set_str_id( this->GetName()+"_fan" );
-  this->rayFanMsg->set_parent_id( this->collisionParent->GetName() );
-  this->rayFanMsg->set_render_type( msgs::Visual::TRIANGLE_FAN );
-  this->rayFanMsg->set_material_script( "Gazebo/BlueLaser" );
+  this->rayFanMsg->set_name( this->GetName()+"_fan" );
+  this->rayFanMsg->set_parent_name( this->collisionParent->GetName() );
+  this->rayFanMsg->mutable_geometry()->set_type(msgs::Geometry::TRIANGLE_FAN);
+  this->rayFanMsg->mutable_material()->set_script( "Gazebo/BlueLaser" );
 
   this->rayFanOutlineMsg = new msgs::Visual();
-  this->rayFanOutlineMsg->mutable_header()->set_str_id( this->GetName()+"_fanoutline" );
-  this->rayFanOutlineMsg->set_parent_id( this->collisionParent->GetName() );
-  this->rayFanOutlineMsg->set_render_type( msgs::Visual::LINE_STRIP );
-  this->rayFanOutlineMsg->set_material_script( "Gazebo/BlueGlow" );
+  this->rayFanOutlineMsg->set_name( this->GetName()+"_fanoutline" );
+  this->rayFanOutlineMsg->set_parent_name( this->collisionParent->GetName() );
+  this->rayFanOutlineMsg->mutable_geometry()->set_type(msgs::Geometry::LINE_STRIP);
+  this->rayFanOutlineMsg->mutable_material()->set_script( "Gazebo/BlueGlow" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,11 +122,11 @@ void MultiRayShape::Init()
   //TODO: this doesn't belong here
   //if (**this->displayTypeP == "fan")
   {
-    msgs::Point *pt = this->rayFanMsg->add_points();
-    (*pt) = this->rayFanMsg->points(0);
+    msgs::Vector3d *pt = this->rayFanMsg->mutable_geometry()->add_points();
+    (*pt) = this->rayFanMsg->geometry().points(0);
 
-    pt = this->rayFanOutlineMsg->add_points();
-    (*pt) = this->rayFanOutlineMsg->points(0);
+    pt = this->rayFanOutlineMsg->mutable_geometry()->add_points();
+    (*pt) = this->rayFanOutlineMsg->geometry().points(0);
   }
 }
 
@@ -213,8 +213,8 @@ void MultiRayShape::Update()
 
       (*iter)->GetRelativePoints(a,b);
 
-      msgs::Set(this->rayFanMsg->mutable_points(i), b );
-      msgs::Set(this->rayFanOutlineMsg->mutable_points(i), b );
+      msgs::Set(this->rayFanMsg->mutable_geometry()->mutable_points(i), b );
+      msgs::Set(this->rayFanOutlineMsg->mutable_geometry()->mutable_points(i), b );
       //gzdbg << "ray [" << i << "]"
       //      << " length [" << (*iter)->GetLength() << "]\n";
     }
@@ -226,25 +226,25 @@ void MultiRayShape::Update()
 void MultiRayShape::AddRay(const math::Vector3 &start, 
                            const math::Vector3 &end )
 {
-  msgs::Point *pt = NULL;
+  msgs::Vector3d *pt = NULL;
 
   //TODO: move to rendering engine
   // Add to the renderable
   /*if (**this->displayTypeP == "fan")*/
   {
-    if (this->rayFanMsg->points_size() == 0)
+    if (this->rayFanMsg->geometry().points_size() == 0)
     {
-      pt = this->rayFanMsg->add_points();
+      pt = this->rayFanMsg->mutable_geometry()->add_points();
       msgs::Set(pt, start );
 
-      pt = this->rayFanOutlineMsg->add_points();
+      pt = this->rayFanOutlineMsg->mutable_geometry()->add_points();
       msgs::Set(pt, start);
     }
 
-    pt = this->rayFanMsg->add_points();
+    pt = this->rayFanMsg->mutable_geometry()->add_points();
     msgs::Set(pt, end);
 
-    pt = this->rayFanOutlineMsg->add_points();
+    pt = this->rayFanOutlineMsg->mutable_geometry()->add_points();
     msgs::Set(pt, end);
   }
 }

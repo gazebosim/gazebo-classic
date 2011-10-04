@@ -113,9 +113,9 @@ void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &pos
   msgs::Visual msg;
   msgs::Init(msg, this->GetName());
 
-  msgs::Point *pt = msg.add_points(); 
+  msgs::Vector3d *pt = msg.mutable_geometry()->add_points(); 
   msgs::Set( pt,  this->relativeStartPos );
-  pt = msg.add_points();
+  pt = msg.mutable_geometry()->add_points();
   msgs::Set(pt, this->relativeEndPos );
 
   //this->vis_pub->Publish(msg);
@@ -152,9 +152,9 @@ void RayShape::SetLength( double len )
   msgs::Visual msg;
   msgs::Init(msg, this->GetName());
 
-  msgs::Point *pt = msg.add_points(); 
+  msgs::Vector3d *pt = msg.mutable_geometry()->add_points(); 
   msgs::Set(pt, this->relativeStartPos );
-  pt = msg.add_points();
+  pt = msg.mutable_geometry()->add_points();
   msgs::Set(pt,  this->relativeEndPos );
   //this->vis_pub->Publish(msg);
 }

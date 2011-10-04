@@ -22,6 +22,7 @@
 #include "math/Pose.hh"
 #include "math/Quaternion.hh"
 #include "math/Plane.hh"
+#include "math/Rand.hh"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -29,6 +30,18 @@
 
 namespace gazebo { namespace msgs {
 
+/// Create a request message
+msgs::Request *CreateRequest( const std::string &_request, 
+                              const std::string &_data )
+{
+  msgs::Request *request = new msgs::Request;
+
+  request->set_request( _request );
+  request->set_data( _data );
+  request->set_id( math::Rand::GetIntUniform(1, 10000) );
+
+  return request;
+}
 
 const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name)
 {
@@ -96,11 +109,17 @@ std::string Package(const std::string &type,
   return data;
 }
 
-void Set(msgs::Point *pt, const math::Vector3 &v)
+void Set(msgs::Vector3d *pt, const math::Vector3 &v)
 {
   pt->set_x(v.x);
   pt->set_y(v.y);
   pt->set_z(v.z);
+}
+
+void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
+{
+  _pt->set_x(_v.x);
+  _pt->set_y(_v.y);
 }
 
 void Set(msgs::Quaternion *q, const math::Quaternion &v)
@@ -132,17 +151,17 @@ void Set(msgs::Time *t, const common::Time &v)
 }
 
 
-void Set(msgs::Plane *p, const math::Plane &v)
+void Set(msgs::PlaneGeom *p, const math::Plane &v)
 {
   Set( p->mutable_normal(), v.normal );
-  p->set_size_x( v.size.x );
-  p->set_size_y( v.size.y );
+  p->mutable_size()->set_x( v.size.x );
+  p->mutable_size()->set_y( v.size.y );
   p->set_d( v.d );
 }
 
-msgs::Point Convert(const math::Vector3 &v)
+msgs::Vector3d Convert(const math::Vector3 &v)
 {
-  msgs::Point result;
+  msgs::Vector3d result;
   result.set_x(v.x);
   result.set_y(v.y);
   result.set_z(v.z);
@@ -185,17 +204,17 @@ msgs::Time Convert(const common::Time &t)
   return result;
 }
 
-msgs::Plane Convert(const math::Plane &p)
+msgs::PlaneGeom Convert(const math::Plane &p)
 {
-  msgs::Plane result;
+  msgs::PlaneGeom result;
   result.mutable_normal()->CopyFrom( Convert(p.normal) );
-  result.set_size_x( p.size.x );
-  result.set_size_y( p.size.y );
+  result.mutable_size()->set_x( p.size.x );
+  result.mutable_size()->set_y( p.size.y );
   result.set_d( p.d );
   return result;
 }
 
-math::Vector3 Convert(const msgs::Point &v)
+math::Vector3 Convert(const msgs::Vector3d &v)
 {
   return math::Vector3(v.x(), v.y(), v.z());
 }
@@ -221,10 +240,10 @@ common::Time Convert(const msgs::Time &t)
   return common::Time(t.sec(), t.nsec());
 }
 
-math::Plane Convert(const msgs::Plane &p)
+math::Plane Convert(const msgs::PlaneGeom &p)
 {
   return math::Plane(Convert(p.normal()), 
-               math::Vector2d(p.size_x(), p.size_y()),
+               math::Vector2d(p.size().x(), p.size().y()),
                p.d() );
 }
 
@@ -304,86 +323,108 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
   {
     sdf::ElementPtr geomElem = _sdf->GetElement("geometry")->GetFirstElement();
     math::Vector3 scale(1,1,1);
+    msgs::Geometry *geomMsg = result.mutable_geometry();
 
     if (geomElem->GetName() == "box")
     {
-      scale = geomElem->GetValueVector3("size");
-      result.set_mesh_type( msgs::Visual::BOX );
+      geomMsg->set_type( msgs::Geometry::BOX );
+      msgs::Set( geomMsg->mutable_box()->mutable_size(), 
+                 geomElem->GetValueVector3("size") );
     }
     else if (geomElem->GetName() == "cylinder")
     {
-      scale.x = scale.y = (2*geomElem->GetValueDouble("radius"));
-      scale.z = geomElem->GetValueDouble("length");
-      result.set_mesh_type( msgs::Visual::CYLINDER );
+      geomMsg->set_type( msgs::Geometry::CYLINDER );
+      geomMsg->mutable_cylinder()->set_radius( 
+          geomElem->GetValueDouble("radius") );
+      geomMsg->mutable_cylinder()->set_length( 
+          geomElem->GetValueDouble("length") );
     }
     else if (geomElem->GetName() == "sphere")
     {
-      scale.x = scale.y = scale.z = (2*geomElem->GetValueDouble("radius"));
-      result.set_mesh_type( msgs::Visual::SPHERE );
+      geomMsg->set_type( msgs::Geometry::SPHERE );
+      geomMsg->mutable_sphere()->set_radius( 
+          geomElem->GetValueDouble("radius") );
     }
     else if (geomElem->GetName() == "plane")
-      result.set_mesh_type( msgs::Visual::PLANE );
+    {
+      geomMsg->set_type( msgs::Geometry::PLANE );
+    }
     else if (geomElem->GetName() == "image")
     {
-      scale.x = geomElem->GetValueDouble("scale");
-      scale.y = geomElem->GetValueDouble("scale");
-      scale.z = geomElem->GetValueDouble("height");
-      result.set_mesh_type( msgs::Visual::IMAGE );
+      geomMsg->set_type( msgs::Geometry::IMAGE );
+      geomMsg->mutable_image()->set_scale( 
+          geomElem->GetValueDouble("scale") );
+      geomMsg->mutable_image()->set_height( 
+          geomElem->GetValueDouble("height") );
+      geomMsg->mutable_image()->set_filename( 
+          geomElem->GetValueString("filename") ); 
     }
     else if (geomElem->GetName() == "heightmap")
     {
-      scale= geomElem->GetValueVector3("size");
-      result.set_mesh_type( msgs::Visual::HEIGHTMAP );
+      geomMsg->set_type( msgs::Geometry::HEIGHTMAP );
+      msgs::Set( geomMsg->mutable_heightmap()->mutable_size(), 
+                 geomElem->GetValueVector3("size") );
+      geomMsg->mutable_heightmap()->set_filename( 
+          geomElem->GetValueString("filename") ); 
     }
     else if (geomElem->GetName() == "mesh")
     {
-      scale= geomElem->GetValueVector3("scale");
-      result.set_mesh_type( msgs::Visual::MESH );
+      geomMsg->set_type( msgs::Geometry::MESH );
+      msgs::Set( geomMsg->mutable_mesh()->mutable_scale(), 
+                 geomElem->GetValueVector3("scale") );
+      geomMsg->mutable_mesh()->set_filename( 
+          geomElem->GetValueString("filename") ); 
     }
     else
       gzerr << "Unknown geometry type\n";
-
-    result.mutable_scale()->CopyFrom( msgs::Convert(scale) );
-
-    if (result.mesh_type() == msgs::Visual::IMAGE || 
-        result.mesh_type() == msgs::Visual::MESH || 
-        result.mesh_type() == msgs::Visual::HEIGHTMAP)
-      result.set_filename( geomElem->GetValueString("filename") ); 
   }
 
   /// Load the material
   if (_sdf->HasElement("material"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("material");
-    result.set_material_script(elem->GetValueString("script"));
+    msgs::Material *matMsg = result.mutable_material();
+    matMsg->set_script(elem->GetValueString("script"));
+
     if (elem->HasElement("shader"))
     {
       sdf::ElementPtr shaderElem = elem->GetElement("shader");
-      result.set_shader_type( shaderElem->GetValueString("type") );
-      if (shaderElem->HasElement("normal_map"))
-          result.set_normal_map( 
+
+      if (shaderElem->GetValueString() == "pixel")
+        matMsg->set_shader_type( msgs::Material::PIXEL );
+      else if (shaderElem->GetValueString() == "vertex")
+        matMsg->set_shader_type( msgs::Material::VERTEX );
+      else if (shaderElem->GetValueString() == "normal_map_object_space")
+        matMsg->set_shader_type( msgs::Material::NORMAL_MAP_OBJECT_SPACE );
+      else if (shaderElem->GetValueString() == "normal_map_tangent_space")
+        matMsg->set_shader_type( msgs::Material::NORMAL_MAP_TANGENT_SPACE );
+      else
+        gzerr << "Unknown shader type[" << shaderElem->GetValueString() << "]\n";
+
+     if (shaderElem->HasElement("normal_map"))
+          matMsg->set_normal_map( 
             shaderElem->GetElement("normal_map")->GetValueString());
     }
+
     if (elem->HasElement("ambient"))
-      result.mutable_ambient()->CopyFrom( 
-          Convert(elem->GetElement("ambient")->GetValueColor("rgba")));
+      msgs::Set( matMsg->mutable_ambient(),
+                 elem->GetElement("ambient")->GetValueColor("rgba") );
     if (elem->HasElement("diffuse"))
-      result.mutable_diffuse()->CopyFrom( 
-          Convert(elem->GetElement("diffuse")->GetValueColor("rgba")));
+      msgs::Set( matMsg->mutable_diffuse(),
+                 elem->GetElement("diffuse")->GetValueColor("rgba") );
     if (elem->HasElement("specular"))
-      result.mutable_specular()->CopyFrom( 
-          Convert(elem->GetElement("specular")->GetValueColor("rgba")));
+      msgs::Set( matMsg->mutable_specular(),
+                 elem->GetElement("specular")->GetValueColor("rgba"));
     if (elem->HasElement("emissive"))
-      result.mutable_emissive()->CopyFrom( 
-          Convert(elem->GetElement("emissive")->GetValueColor("rgba")));
+      msgs::Set( matMsg->mutable_emissive(),
+                 elem->GetElement("emissive")->GetValueColor("rgba") );
   }
 
   // Set the origin of the visual
   if (_sdf->HasElement("origin"))
   {
     sdf::ElementPtr elem = _sdf->GetElement("origin");
-    result.mutable_pose()->CopyFrom( 
-        Convert(elem->GetValuePose("pose")));
+    msgs::Set( result.mutable_pose(), elem->GetValuePose("pose") );
   }
 
   return result;
@@ -447,5 +488,6 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
 
   return result;
 }
+
 
 } }

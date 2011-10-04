@@ -124,7 +124,7 @@ namespace gazebo
       /// \brief Add a contact visual
       protected: void AddContactVisual(const math::Vector3 &pos_, 
                                        const math::Vector3 &norm_);
-      protected: virtual void OnPhysicsRequest( 
+      protected: virtual void OnRequest( 
                  const boost::shared_ptr<msgs::Request const> &/*_msg*/ )
                  {}
 
@@ -140,8 +140,8 @@ namespace gazebo
       protected: std::string visual;
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr visPub;
-      protected: transport::PublisherPtr physicsPub;
-      protected: transport::SubscriberPtr physicsSub, physicsRequestSub;
+      protected: transport::PublisherPtr responsePub;
+      protected: transport::SubscriberPtr physicsSub, requestSub;
       private: event::ConnectionPtr showContactConnection; 
   
       //private: std::vector<OgreDynamicLines*> contactLines;

@@ -66,8 +66,8 @@ Link::~Link()
   for (unsigned int i=0; i < this->visuals.size(); i++)
   {
     msgs::Visual msg;
-    msgs::Init(msg, this->visuals[i]);
-    msg.set_action( msgs::Visual::DELETE );
+    msg.set_name(this->visuals[i] );
+    msg.set_delete_me( true );
     this->visPub->Publish(msg);
   }
   this->visuals.clear();
@@ -77,8 +77,8 @@ Link::~Link()
     for (unsigned int i=0; i < this->cgVisuals.size(); i++)
     {
       msgs::Visual msg;
-      msgs::Init(msg, this->cgVisuals[i]);
-      msg.set_action( msgs::Visual::DELETE );
+      msg.set_name(this->cgVisuals[i] );
+      msg.set_delete_me( true );
       this->visPub->Publish(msg);
     }
     this->cgVisuals.clear();
@@ -114,12 +114,12 @@ void Link::Load( sdf::ElementPtr &_sdf )
         this->visuals.size();
 
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-      msgs::Init(msg, visname.str());
-      msg.set_parent_id( this->GetCompleteScopedName() );
+      msg.set_name( visname.str() );
+      msg.set_parent_name( this->GetCompleteScopedName() );
       msg.set_is_static( this->IsStatic() );
 
       this->visPub->Publish(msg);
-      this->visuals.push_back(msg.header().str_id());
+      this->visuals.push_back(msg.name());
 
       visualElem = this->sdf->GetNextElement("visual", visualElem); 
     }
@@ -155,7 +155,7 @@ void Link::Init()
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if ((*iter)->HasType(Base::GEOM))
+    if ((*iter)->HasType(Base::COLLISION))
     {
       CollisionPtr g = boost::shared_static_cast<Collision>(*iter);
       g->Init();
@@ -193,7 +193,7 @@ void Link::Init()
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
     msgs::Visual msg;
-    msgs::Init(msg, visname.str());
+    msg.set_name( visname.str() );
     msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
     msg.set_render_type( msgs::Visual::MESH_RESOURCE );
     msg.set_mesh( "unit_box" );
@@ -208,7 +208,7 @@ void Link::Init()
     if (this->children.size() > 1)
     {
       msgs::Visual g_msg;
-      msgs::Init(g_msg, visname.str() + "_connectors");
+      g_msg.set_name( visname.str() + "_connectors" );
 
       g_msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
       g_msg.set_render_type( msgs::Visual::LINE_LIST );
@@ -285,8 +285,8 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
     {
       // TODO: Update visuals properly
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-      msgs::Init(msg, visualElem->GetValueString("name"));
-      msg.set_parent_id( this->GetCompleteScopedName() );
+      msg.set_name(visualElem->GetValueString("name"));
+      msg.set_parent_name( this->GetCompleteScopedName() );
       msg.set_is_static( this->IsStatic() );
 
       this->visPub->Publish(msg);
@@ -354,7 +354,7 @@ void Link::SetLaserRetro(float retro)
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if ((*iter)->HasType(Base::GEOM))
+    if ((*iter)->HasType(Base::COLLISION))
       boost::shared_static_cast<Collision>(*iter)->SetLaserRetro( retro );
   }
 }
@@ -530,7 +530,7 @@ math::Box Link::GetBoundingBox() const
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if ((*iter)->HasType(Base::GEOM))
+    if ((*iter)->HasType(Base::COLLISION))
       box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
   }
 
@@ -587,3 +587,10 @@ void Link::StoreContact(CollisionPtr _collision, Contact /*_contact*/)
     //(iter->second).push_back(contact);
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Fill a link message
+void Link::FillLinkMsg( msgs::Link &/*_msg*/ )
+{
+}
+

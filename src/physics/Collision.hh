@@ -146,6 +146,9 @@ namespace gazebo
               { return contactSignal.Connect(subscriber); }
       public: void DisconnectContactCallback( event::ConnectionPtr &c )
               { contactSignal.Disconnect(c); }
+
+      /// \brief Fill a collision message
+      public: void FillCollisionMsg( msgs::Collision &_msg );
   
       /// \brief Enable callback: Called when the link changes
       private: void EnabledCB(bool enabled);

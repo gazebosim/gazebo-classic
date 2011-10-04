@@ -214,21 +214,23 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
   
-      private: void ReceiveJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
+      private: void OnRequest( const boost::shared_ptr<msgs::Request const> &_msg);
+      private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg);
+      private: void OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
       private: void ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
 
-      private: void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
+      private: void OnSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
       private: void ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg);
 
-      private: void ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
+      private: void OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
       private: void ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
 
-      private: void ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
+      private: void OnLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
       private: void ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
 
       private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
                
-      private: void ReceivePoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
+      private: void OnPoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
 
       private: std::string name;
 
@@ -279,13 +281,16 @@ namespace gazebo
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;
       private: transport::SubscriberPtr selectionSub;
-      private: transport::PublisherPtr scenePub;
+      private: transport::SubscriberPtr responseSub;
+      private: transport::SubscriberPtr requestSub;
+      private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;
 
       private: SelectionObj *selectionObj;
 
       private: VisualPtr worldVisual;
+      private: msgs::Request *requestMsg;
 
     };
     /// \}

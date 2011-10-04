@@ -5,15 +5,12 @@ package gazebo.msgs;
 /// \brief Color message
 /// \verbatim
 
-import "header.proto";
-
 message Color
 {
-  optional Header header = 1;
   required float r = 2;
   required float g = 3;
   required float b = 4;
-  required float a = 5;
+  optional float a = 5 [default = 1.0];
 }
 
 /// \endverbatim

@@ -167,6 +167,8 @@ namespace gazebo
 
       private: void OnControl( const boost::shared_ptr<msgs::WorldControl const> &data );
     
+      private: void OnRequest( const boost::shared_ptr<msgs::Request const> &_msg );
+
       /// \brief Delete an entity by name
       /// \param name The name of the entity to delete
       private: void DeleteEntityCB(const std::string &name);
@@ -174,8 +176,6 @@ namespace gazebo
       /// \brief Set the selected entity
       private: void SetSelectedEntityCB( const std::string &name );
     
-      private: void PublishScene( const boost::shared_ptr<msgs::Request const> &data );
-
       private: void OnScene( const boost::shared_ptr<msgs::Scene const> &_data );
       private: void OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_data );
 
@@ -186,7 +186,7 @@ namespace gazebo
       private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);
 
       private: void OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &data);
-      private: void OnEntityMsg( const boost::shared_ptr<msgs::Entity const> &_msg);
+      private: void OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();
@@ -197,7 +197,7 @@ namespace gazebo
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
       private: void ProcessEntityMsgs();
-      private: void FillEntityMsg( msgs::Entity &_msg, ModelPtr &_model );
+      private: void FillModelMsg( msgs::Model &_msg, ModelPtr &_model );
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
@@ -227,14 +227,12 @@ namespace gazebo
       private: event::Connection_V connections;
 
       private: transport::NodePtr node;    
-      private: transport::PublisherPtr selectionPub, scenePub;
-      private: transport::PublisherPtr statPub, worldPub, newEntityPub;
-      private: transport::PublisherPtr entitiesPub;
-      private: transport::PublisherPtr entityInfoPub;
+      private: transport::PublisherPtr selectionPub;
+      private: transport::PublisherPtr statPub, responsePub, modelPub;
 
-      private: transport::SubscriberPtr visSub, sceneRequestSub, controlSub;
+      private: transport::SubscriberPtr visSub, controlSub;
       private: transport::SubscriberPtr factorySub, jointSub, sceneSub;
-      private: transport::SubscriberPtr entitiesRequestSub, entitySub;
+      private: transport::SubscriberPtr modelSub, requestSub;
 
       private: msgs::WorldStatistics worldStatsMsg;
       private: msgs::Scene sceneMsg;
@@ -256,7 +254,7 @@ namespace gazebo
       private: boost::recursive_mutex *incomingMsgMutex;
 
       private: std::vector<WorldPluginPtr> plugins;
-      private: std::list< boost::shared_ptr<msgs::Entity const> > entityMsgs;
+      private: std::list<std::string> deleteEntity;
 
       private: boost::mutex *receiveMutex;
     };

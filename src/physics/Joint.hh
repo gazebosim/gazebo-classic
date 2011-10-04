@@ -27,6 +27,7 @@
 #include "math/Vector3.hh"
 #include "common/Global.hh"
 #include "transport/TransportTypes.hh"
+#include "msgs/MessageTypes.hh"
 
 #include "physics/Base.hh"
 
@@ -154,7 +155,10 @@ namespace gazebo
 
       /// \brief Get the child link
       public: LinkPtr GetParent() const;
-    
+
+      /// Fill a joint message
+      public: void FillJointMsg( msgs::Joint &_msg );
+
       /// The first link this joint connects to
       protected: LinkPtr childLink;
   

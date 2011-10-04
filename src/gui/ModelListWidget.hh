@@ -45,12 +45,10 @@ namespace gazebo
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
 
 
-      private: void OnEntities( const boost::shared_ptr<msgs::Entities const> &_msg );
-      private: void OnEntity( const boost::shared_ptr<msgs::Entity const> &_msg );
+      private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg );
+      private: void OnModel( const boost::shared_ptr<msgs::Model const> &_msg );
 
-      private: void OnEntityInfo( const boost::shared_ptr<msgs::Factory const> &_msg );
-
-      private: void ProcessEntity( const msgs::Entity &_msg );
+      private: void ProcessModel( const msgs::Model &_msg );
 
       private: void FillPropertyTree(sdf::ElementPtr &_elem,
                                      QtProperty *_parentItem);
@@ -70,9 +68,9 @@ namespace gazebo
       private: QAction *followAction;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr entitiesRequestPub, entityPub;
+      private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr selectionPub, factoryPub;
-      private: transport::SubscriberPtr entitiesSub, newEntitySub,entityInfoSub ;
+      private: transport::SubscriberPtr responseSub, newEntitySub;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
@@ -86,6 +84,8 @@ namespace gazebo
       private: std::string selectedModelName;
       private: bool fillingPropertyTree;
       private: QtProperty *selectedProperty;
+
+      private: msgs::Request *requestMsg;
     };
   }
 }

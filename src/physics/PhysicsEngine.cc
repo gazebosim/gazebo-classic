@@ -45,12 +45,12 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
-  this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
   this->physicsSub = this->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
-  this->physicsRequestSub = this->node->Subscribe("~/physics_request", 
-                                        &PhysicsEngine::OnPhysicsRequest, this);
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->requestSub = this->node->Subscribe("~/request", 
+                                           &PhysicsEngine::OnRequest, this);
 
   {
     /*this->visualMsg = new VisualMsg();
@@ -122,8 +122,8 @@ PhysicsEngine::~PhysicsEngine()
   if (!this->visual.empty())
   {
     msgs::Visual msg;
-    msgs::Init(msg, this->visual);
-    msg.set_action( msgs::Visual::DELETE );
+    msg.set_name(this->visual);
+    msg.set_delete_me( true );
     this->visPub->Publish(msg);
   }
 }
@@ -180,11 +180,11 @@ void PhysicsEngine::AddContactVisual(const math::Vector3 &/*pos_*/,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether to show contacts
-void PhysicsEngine::ShowContacts(const bool &show)
+void PhysicsEngine::ShowContacts(const bool &_show)
 {
   msgs::Visual msg;
-  msgs::Init(msg, this->visual);
-  msg.set_visible( show );
+  msg.set_name(this->visual);
+  msg.set_visible( _show );
   this->visPub->Publish(msg);
 
   /* TODO put back in
