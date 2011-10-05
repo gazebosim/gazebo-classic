@@ -25,6 +25,7 @@
 #include "sensors/Sensor.hh"
 
 void RegisterCameraSensor();
+void RegisterDepthCameraSensor();
 void RegisterRaySensor();
 void RegisterContactSensor();
 
@@ -36,6 +37,7 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensor_map;
 void SensorFactory::RegisterAll()
 {
   RegisterCameraSensor();
+  RegisterDepthCameraSensor();
   RegisterRaySensor();
   RegisterContactSensor();
 }

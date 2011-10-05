@@ -5,6 +5,7 @@ set (sources Sensors.cc
              SensorFactory.cc
              SensorManager.cc
              CameraSensor.cc
+             DepthCameraSensor.cc
              RaySensor.cc
              ContactSensor.cc
 ) 
@@ -15,6 +16,7 @@ set (headers Sensors.hh
              SensorFactory.hh
              SensorManager.hh
              CameraSensor.hh
+             DepthCameraSensor.hh
              RaySensor.hh
              ContactSensor.hh
 )

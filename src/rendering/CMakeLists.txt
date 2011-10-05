@@ -15,6 +15,7 @@ set (sources MovableText.cc
              DynamicLines.cc
              Visual.cc
              Camera.cc
+             DepthCamera.cc
              UserCamera.cc
              Heightmap.cc
              Light.cc
@@ -38,6 +39,7 @@ set (headers MovableText.hh
              DynamicLines.hh
              Visual.hh
              Camera.hh
+             DepthCamera.hh
              UserCamera.hh
              Heightmap.hh
              Light.hh
