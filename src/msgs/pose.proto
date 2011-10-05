@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \brief Message for a pose
 /// \verbatim
 
-import "header.proto";
 import "vector3d.proto";
 import "quaternion.proto";
 

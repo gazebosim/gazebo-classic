@@ -15,6 +15,8 @@
  *
 */
 #include <boost/bind.hpp>
+
+#include "physics/World.hh"
 #include "gazebo.h"
 
 namespace gazebo
@@ -23,7 +25,24 @@ namespace gazebo
   {
     public: void Load( physics::WorldPtr &_parent, sdf::ElementPtr & /*_sdf*/ )
     {
+      printf("Load gui test\n");
+      this->node = transport::NodePtr(new transport::Node());
+      this->node->Init(_parent->GetName());
+
+      this->guiConfigPub = this->node->Advertise<msgs::GUIOverlayConfig>("~/gui_overlay_config");
+      this->CreateGUI();
     }
+
+    private: void CreateGUI()
+    {
+      msgs::GUIOverlayConfig msg;
+
+      msg.set_layout_filename( "gui_test.layout" );
+      this->guiConfigPub->Publish(msg);
+    }
+
+    private: transport::NodePtr node;
+    private: transport::PublisherPtr guiConfigPub;
   };
   
   // Register this plugin with the simulator

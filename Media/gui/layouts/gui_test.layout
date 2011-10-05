@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout >
+    <Window Type="DefaultWindow" Name="Root" >
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Window Type="Vanilla/StaticImage" Name="Root/CameraView" >
+            <Property Name="UnifiedAreaRect" Value="{{0.0138672,0},{0.678195,0},{0.264844,0},{0.953764,0}}" />
+        </Window>
+        <Window Type="Vanilla/Button" Name="Root/VerbButton" >
+            <Property Name="Text" >Verb
+</Property>
+            <Property Name="UnifiedAreaRect" Value="{{0.641992,0},{0.915072,0},{0.791992,0},{0.969916,0}}" />
+        </Window>
+        <Window Type="Vanilla/Button" Name="Root/PrepositionButton" >
+            <Property Name="Text" Value="Preposition" />
+            <Property Name="UnifiedAreaRect" Value="{{0.8,0},{0.9,0},{0.95,0},{0.97,0}}" />
+        </Window>
+    </Window>
+</GUILayout>

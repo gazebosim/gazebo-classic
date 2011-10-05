@@ -27,7 +27,6 @@
 #include "common/Exception.hh"
 #include "common/Events.hh"
 
-
 #include "rendering/GUIOverlay.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/WindowManager.hh"
@@ -444,4 +443,9 @@ void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )
 
   this->gui->Init(this->renderTarget);
 }
- 
+
+//////////////////////////////////////////////////////////////////////////////
+GUIOverlay *UserCamera::GetGUIOverlay()
+{
+  return this->gui;
+}

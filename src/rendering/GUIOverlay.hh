@@ -5,8 +5,12 @@
 #include <map>
 
 #include "common/MouseEvent.hh"
+#include "common/Events.hh"
+
 #include "gazebo_config.h"
+#include "msgs/MessageTypes.hh"
 #include "math/MathTypes.hh"
+#include "transport/TransportTypes.hh"
 
 namespace Ogre
 {
@@ -40,11 +44,20 @@ namespace gazebo
       public: bool HandleMouseEvent( const common::MouseEvent &_evt);
 
 
+      private: void OnConfig( const boost::shared_ptr<msgs::GUIOverlayConfig const> &_msg);
+
+      private: void PreRender();
+
 #ifdef HAVE_CEGUI
       private: CEGUI::OgreRenderer *guiRenderer;
       private: std::map<std::string, CEGUI::Window*> windows;
 #endif
 
+      private: transport::NodePtr node;  
+      private: transport::SubscriberPtr configSub;  
+
+      private: std::vector<event::ConnectionPtr> connections;
+      private: boost::shared_ptr<msgs::GUIOverlayConfig const> configMsg;
     };
   }
 }

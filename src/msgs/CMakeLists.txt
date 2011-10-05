@@ -50,6 +50,7 @@ set (msgs axis.proto
           visual.proto
           world_control.proto
           world_stats.proto 
+          gui_overlay_config.proto
 )
 
 set (sources msgs.cc)

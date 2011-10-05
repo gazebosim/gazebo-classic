@@ -99,7 +99,10 @@ namespace gazebo
 
       /// \brief Set to true to enable rendering
       public: virtual void SetRenderTarget( Ogre::RenderTarget *_target );
-   
+
+      /// \brief Get the GUI overlay 
+      public: GUIOverlay *GetGUIOverlay();
+
       /// \brief Toggle whether to show the visual
       private: void ToggleShowVisual();
   

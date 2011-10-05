@@ -6,6 +6,9 @@
 #include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
 #endif
 
+#include "msgs/msgs.h"
+#include "transport/Transport.hh"
+#include "transport/Node.hh"
 #include "math/Vector2d.hh"
 
 using namespace gazebo;
@@ -13,6 +16,8 @@ using namespace rendering;
 
 GUIOverlay::GUIOverlay()
 {
+
+  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&GUIOverlay::PreRender, this) ) );
 }
 
 GUIOverlay::~GUIOverlay()
@@ -21,8 +26,6 @@ GUIOverlay::~GUIOverlay()
   CEGUI::OgreRenderer::destroySystem();
 #endif
 }
-
-
 
 void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
 {
@@ -36,21 +39,23 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
 
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+  CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
   CEGUI::FontManager::getSingleton().create("DejaVuSans-10.font");
   //CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
-
 
   // clearing this queue actually make sure it's created
   this->guiRenderer->getDefaultRenderingRoot().clearGeometry(CEGUI::RQ_OVERLAY);
 
   // Create a root window, and set it as the root window
-  this->windows["root"] = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
-  CEGUI::System::getSingleton().setGUISheet( this->windows["root"] );
-
-  //this->CreateWindow("TaharezLook/Button", "VerbButton", "root",
-      //math::Vector2d(0.2, 0.2), math::Vector2d(0.2, 0.2), "Verb");
-  //this->SubscribeEvent( "VerbButton", &GUIOverlay::OnButton, this);
+  CEGUI::Window *rootWindow  = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
+  CEGUI::System::getSingleton().setGUISheet( rootWindow );
 #endif
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+
+  this->configSub = this->node->Subscribe("~/gui_overlay_config",
+      &GUIOverlay::OnConfig, this);
 }
 
 void GUIOverlay::CreateWindow( const std::string &_type, 
@@ -88,7 +93,7 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
 {
   bool result = false;
 #ifdef HAVE_CEGUI
-  CEGUI::System *system = CEGUI::System::getSingletonPtr();
+  //CEGUI::System *system = CEGUI::System::getSingletonPtr();
   //result = result || system->injectMousePosition( _evt.pos.x, _evt.pos.y);
 /*
   if (_evt. == common::MouseEvent::DOWN)
@@ -104,4 +109,21 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
 #endif
 
   return result;
+}
+
+void GUIOverlay::OnConfig( const boost::shared_ptr<msgs::GUIOverlayConfig const> &_msg)
+{
+  this->configMsg = _msg;
+}
+
+void GUIOverlay::PreRender()
+{
+#ifdef HAVE_CEGUI
+  if (this->configMsg)
+  {
+    CEGUI::Window *newWindow = CEGUI::WindowManager::getSingleton().loadWindowLayout( this->configMsg->layout_filename() );
+    this->windows["root"]->addChildWindow( newWindow );
+    this->configMsg.reset();
+  }
+#endif
 }

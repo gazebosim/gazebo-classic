@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<GUILayout>
+  <Window Type='TaharezLook/FrameWindow' Name='ConsoleRoot' >
+    <Property Name='Text' Value='Chat Window' />
+    <!--<Property Name='TitlebarFont' Value='DejaVuSans-10' />
+    <Property Name='TitlebarEnabled' Value='True' />
+    <Property Name='UnifiedAreaRect' Value='{{0.114991,0},{0.358182,0},{0.519469,0},{0.775455,0}}' />
+    <Window Type='TaharezLook/Editbox' Name='ConsoleRoot/EditBox' >
+      <Property Name='MaxTextLength' Value='1073741823' />
+      <Property Name='UnifiedAreaRect' Value='{{0.0201637,0},{0.787097,0},{0.694549,0},{0.957693,0}}' />
+      <Property Name='TextParsingEnabled' Value='False' />
+    </Window>
+    <Window Type='TaharezLook/Button' Name='ConsoleRoot/SendButton' >
+      <Property Name='Text' Value='Send' />
+      <Property Name='UnifiedAreaRect' Value='{{0.732211,0},{0.812349,0},{0.928283,0},{0.946832,0}}' />
+    </Window>
+    <Window Type='TaharezLook/Listbox' Name='ConsoleRoot/ChatBox' >
+      <Property Name='UnifiedAreaRect' Value='{{0.00534809,0},{0.0131038,0},{0.949636,0},{0.762443,0}}' />
+    </Window>
+    -->
+  </Window>
+</GUILayout>
+
+
