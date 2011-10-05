@@ -37,7 +37,7 @@ CylinderMaker::CylinderMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
-  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::SPHERE );
+  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::CYLINDER );
   this->visualMsg->mutable_material()->set_script( "Gazebo/TurquoiseGlowOutline" );
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
 }

@@ -120,7 +120,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
                    this->visualMsg->pose().position().y(),
                    this->visualMsg->pose().position().z() );
 
-  p.z = scale*0.5;
+  p.z = scale;
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   this->visualMsg->mutable_geometry()->mutable_sphere()->set_radius(scale);

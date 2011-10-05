@@ -33,6 +33,7 @@ EntityMaker::EntityMaker()
   this->node->Init();
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
   this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
