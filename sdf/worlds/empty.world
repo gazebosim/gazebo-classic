@@ -33,12 +33,21 @@
       </link>
     </model>
 
+    <!--
     <light type="directional" name="my_light" cast_shadows="false">
       <origin pose="0 0 10 0 0 0"/>
       <diffuse rgba=".9 .9 .9 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
       <direction xyz="0 0 -1"/>
+    </light>
+    -->
+
+    <light type="point" name="point_light" cast_shadows="false">
+      <origin pose="0 0 5 0 0 0"/>
+      <diffuse rgba=".9 .9 .9 1"/>
+      <specular rgba=".1 .1 .1 1"/>
+      <attenuation range="20" constant="0.8" linear="0.001" />
     </light>
 
   </world>

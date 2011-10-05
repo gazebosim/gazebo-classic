@@ -22,6 +22,7 @@ set (sources main.cc
              BoxMaker.cc
              SphereMaker.cc
              CylinderMaker.cc
+             LightMaker.cc
              GuiEvents.cc
              ModelEditWidget.cc
 )
@@ -42,6 +43,7 @@ set (headers Gui.hh
              SphereMaker.hh
              CylinderMaker.hh
              GuiEvents.hh
+             LightMaker.hh
 )
 
 set (resources images.qrc)

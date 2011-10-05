@@ -13,7 +13,7 @@ import "color.proto";
 
 message Light
 {
-  required Header header           = 1;
+  required string name                   = 1;
   enum LightType
   {
     POINT       = 1;

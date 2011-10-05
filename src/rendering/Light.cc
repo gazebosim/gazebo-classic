@@ -135,7 +135,7 @@ void Light::Load()
 /// Load from a light message
 void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
-  this->sdf->GetAttribute("name")->Set( msg->header().str_id() );
+  this->sdf->GetAttribute("name")->Set( msg->name() );
 
   if (msg->has_type() && msg->type() == msgs::Light::POINT)
     this->sdf->GetAttribute("type")->Set("point");

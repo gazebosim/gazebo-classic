@@ -255,7 +255,7 @@ msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
   std::string type = _sdf->GetValueString("type");
   std::transform( type.begin(), type.end(), type.begin(), ::tolower);
 
-  Init(result, _sdf->GetValueString("name"));
+  result.set_name( _sdf->GetValueString("name") );
 
   result.set_cast_shadows( _sdf->GetValueBool("cast_shadows") );
 

@@ -4,17 +4,13 @@ import * from "perpixel.program"
 
 material Gazebo/GreyGrid
 {
+  receive_shadows_on
   technique
   {
     pass ambient
     {
       ambient .5 .5 .5 1
       diffuse .5 .5 .5 
-    }
-
-    pass light
-    {
-      diffuse .5 .5 .5
       specular .1 .1 .1 128
     }
  }

@@ -49,11 +49,11 @@ BoxMaker::~BoxMaker()
   delete this->visualMsg;
 }
 
-void BoxMaker::Start(const rendering::UserCameraPtr camera)
+void BoxMaker::Start(const rendering::UserCameraPtr _camera)
                      //const CreateCallback &cb)
 {
   //this->createCB = cb;
-  this->camera = camera;
+  this->camera = _camera;
 
   std::ostringstream stream;
   stream << "user_box_" << counter++;

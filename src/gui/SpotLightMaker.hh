@@ -29,14 +29,14 @@ namespace gazebo
       public: SpotLightMaker();
       public: virtual ~SpotLightMaker();
     
-      public: virtual void Start();
+      public: virtual void Start(const rendering::UserCameraPtr camera);
       public: virtual void Stop();
       public: virtual bool IsActive() const;
-  
-      public: virtual void MousePushCB(const common::MouseEvent &event);
-      public: virtual void MouseReleaseCB(const common::MouseEvent &event);
-      public: virtual void MouseDragCB(const common::MouseEvent &event);
-    
+
+      public: virtual void OnMousePush(const common::MouseEvent &_event);
+      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+ 
       private: virtual void CreateTheEntity();
       private: int state;
       private: msgs::Light msg;

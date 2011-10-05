@@ -396,6 +396,12 @@ void GLWidget::CreateEntity(const std::string &name)
     this->entityMaker = &this->sphereMaker;
   else if (name == "cylinder")
     this->entityMaker = &this->cylinderMaker;
+  else if (name == "pointlight")
+    this->entityMaker =  &this->pointLightMaker;
+  else if (name == "spotlight")
+    this->entityMaker =  &this->spotLightMaker;
+  else if (name == "directionallight")
+    this->entityMaker =  &this->directionalLightMaker;
   else
     this->entityMaker = NULL;
 

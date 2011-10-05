@@ -17,6 +17,7 @@
 #include "gui/BoxMaker.hh"
 #include "gui/SphereMaker.hh"
 #include "gui/CylinderMaker.hh"
+#include "gui/LightMaker.hh"
 
 namespace gazebo
 {
@@ -75,6 +76,9 @@ namespace gazebo
       private: BoxMaker boxMaker;
       private: SphereMaker sphereMaker;
       private: CylinderMaker cylinderMaker;
+      private: PointLightMaker pointLightMaker;
+      private: SpotLightMaker spotLightMaker;
+      private: DirectionalLightMaker directionalLightMaker;
 
       private: rendering::VisualPtr selection, hoverVis;
       private: std::string selectionMod;

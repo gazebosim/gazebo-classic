@@ -1126,13 +1126,13 @@ void Scene::OnLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
 {
   Light_M::iterator iter;
-  iter = this->lights.find(_msg->header().str_id());
+  iter = this->lights.find(_msg->name());
 
   if (iter == this->lights.end())
   {
     Light *light = new Light(this);
     light->LoadFromMsg(_msg);
-    this->lights[_msg->header().str_id()] = light;
+    this->lights[_msg->name()] = light;
   }
 }
 

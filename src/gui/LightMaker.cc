@@ -14,73 +14,77 @@
  * limitations under the License.
  *
 */
+
 #include <iostream>
 #include <sstream>
 
+#include "transport/Node.hh"
 #include "gui/GuiEvents.hh"
 #include "common/MouseEvent.hh"
+#include "rendering/UserCamera.hh"
 
-#include "gui/PointLightMaker.hh"
+#include "gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
+unsigned int LightMaker::counter = 0;
 
-unsigned int PointLightMaker::counter = 0;
-
-PointLightMaker::PointLightMaker()
-  : EntityMaker()
+LightMaker::LightMaker() : EntityMaker()
 {
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+
   this->state = 0;
 
-  this->msg.set_type( msgs::Light::POINT );
   msgs::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
-  msgs::Set(this->msg.mutable_attenuation(), math::Vector3(0.5, 0.01, 0.001));
+
+  this->msg.set_attenuation_constant(0.5);
+  this->msg.set_attenuation_linear(0.01);
+  this->msg.set_attenuation_quadratic(0.001);
   this->msg.set_range( 20 );
-  this->msg.set_cast_shadows( false );
+
 }
 
-PointLightMaker::~PointLightMaker()
+void LightMaker::Start(const rendering::UserCameraPtr _camera)
 {
-}
+  this->camera = _camera;
 
-void PointLightMaker::Start( )
-{
   std::ostringstream stream;
-  stream << "user_point_light_" << counter++;
-  this->msg.mutable_header()->set_str_id( stream.str() );
+  stream << "user_" << this->lightTypename << "_light_" << counter++;
+  this->msg.set_name( stream.str() );
   this->state = 1;
 }
 
-void PointLightMaker::Stop()
+void LightMaker::Stop()
 {
   this->state = 0;
   gui::Events::moveModeSignal(true);
 }
 
-bool PointLightMaker::IsActive() const
+bool LightMaker::IsActive() const
 {
   return this->state > 0;
 }
 
-void PointLightMaker::MousePushCB(const common::MouseEvent &event)
+void LightMaker::OnMousePush(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
-  math::Vector3 norm;
+  math::Quaternion orient;
+  math::Vector3 norm, point;
   norm.Set(0,0,1);
 
-  /* NATY: Fix the camera issue
-  msgs::Set(this->msg.mutable_pose()->mutable_position(), 
-      event.camera->GetWorldPointOnPlane(event.pressPos.x, 
-                                         event.pressPos.y, norm, 0));
+  point = this->camera->GetWorldPointOnPlane(_event.pressPos.x, 
+      _event.pressPos.y, norm, 0);
+
+  msgs::Set(this->msg.mutable_pose()->mutable_position(), point);
+  msgs::Set(this->msg.mutable_pose()->mutable_orientation(), orient);
   this->msg.mutable_pose()->mutable_position()->set_z(1);
-  */
 }
 
-void PointLightMaker::MouseReleaseCB(const common::MouseEvent &event)
+void LightMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 {
   if (this->state == 0)
     return;
@@ -91,12 +95,7 @@ void PointLightMaker::MouseReleaseCB(const common::MouseEvent &event)
   this->Stop();
 }
 
-void PointLightMaker::MouseDragCB(const common::MouseEvent & /*event*/)
+void LightMaker::CreateTheEntity()
 {
-}
-
-void PointLightMaker::CreateTheEntity()
-{
-  msgs::Stamp(this->msg.mutable_header());
-  //Simulator::Instance()->SendMessage(this->msg);
+  this->lightPub->Publish(this->msg);
 }

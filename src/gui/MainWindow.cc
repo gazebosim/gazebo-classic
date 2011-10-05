@@ -132,6 +132,7 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
+  this->pauseAct->setChecked(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -140,6 +141,7 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
+  this->playAct->setChecked(false);
   this->worldControlPub->Publish(msg);
 }
 
@@ -274,10 +276,12 @@ void MainWindow::CreateActions()
 
   this->playAct = new QAction(QIcon(":/images/play.png"), tr("Play"), this);
   this->playAct->setStatusTip(tr("Run the world"));
+  this->playAct->setCheckable(true);
   connect(this->playAct, SIGNAL(triggered()), this, SLOT(Play()));
 
   this->pauseAct = new QAction(QIcon(":/images/pause.png"), tr("Pause"), this);
   this->pauseAct->setStatusTip(tr("Pause the world"));
+  this->pauseAct->setCheckable(true);
   connect(this->pauseAct, SIGNAL(triggered()), this, SLOT(Pause()));
 
   this->stepAct = new QAction(QIcon(":/images/end.png"), tr("Step"), this);
