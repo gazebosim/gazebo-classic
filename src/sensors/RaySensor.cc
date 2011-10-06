@@ -46,7 +46,6 @@ RaySensor::RaySensor()
     : Sensor()
 {
   this->active = false;
-  this->typeName = "ray";
 }
 
 

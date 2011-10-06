@@ -44,12 +44,11 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
-  gzdbg << "New Camera\n";
-  this->typeName = "monocamera";
-
-  this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&CameraSensor::Render, this)) );
+/*  this->connections.push_back( 
+      event::Events::ConnectRenderSignal( 
+        boost::bind(&CameraSensor::Render, this)) );
+        */
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -57,6 +56,14 @@ CameraSensor::~CameraSensor()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Set the parent of the sensor
+void CameraSensor::SetParent( const std::string &_name )
+{
+  Sensor::SetParent(_name);
+  this->camera->AttachToVisual( _name );
+}
+   
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera with SDF parameters
 void CameraSensor::Load( sdf::ElementPtr &_sdf )
@@ -72,8 +79,6 @@ void CameraSensor::Load()
   this->poseSub = this->node->Subscribe("~/pose", 
                                         &CameraSensor::OnPose, this );
 }
-
-
  
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
@@ -106,12 +111,8 @@ void CameraSensor::InitChild()
     }
 
     this->camera->Init();
-    // Create the render texture
-    this->ogreTextureName = this->GetName() + "_RttTex";
-    this->camera->CreateRenderTexture(this->ogreTextureName);
-
-    this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-    this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+    this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
+    this->camera->SetWorldPose( this->pose );
   }
   else
     gzerr << "No world name\n";
@@ -135,7 +136,7 @@ void CameraSensor::SetActive(bool value)
 
 //////////////////////////////////////////////////////////////////////////////
 // Render new data
-void CameraSensor::Render()
+/*void CameraSensor::Render()
 {
   //if (this->active || **this->alwaysActiveP)
   {
@@ -144,13 +145,15 @@ void CameraSensor::Render()
     //this->camera->PostRender();
   }
   
-}
+}*/
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void CameraSensor::Update(bool force)
 {
   Sensor::Update(force);
+
+
   /*if (this->camera)
   {
     this->camera->Render();

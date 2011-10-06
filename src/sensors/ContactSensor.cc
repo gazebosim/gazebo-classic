@@ -48,7 +48,6 @@ ContactSensor::ContactSensor()
     : Sensor()
 {
   this->active = false;
-  this->typeName = "contact";
 }
 
 

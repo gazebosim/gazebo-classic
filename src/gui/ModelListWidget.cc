@@ -254,7 +254,7 @@ void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> 
   }
   else if (_msg->has_type() && _msg->type() == modelMsg.GetTypeName())
   {
-    printf("gazebo.msgs.Model NOT Handled\n");
+    //printf("gazebo.msgs.Model NOT Handled\n");
     //this->propMutex->lock();
     //this->sdfElement.reset(new sdf::Element);
     //sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);

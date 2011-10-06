@@ -92,10 +92,7 @@ namespace gazebo
       public: void MoveToVisual(const std::string &_visualName);
 
       /// \brief Set the camera to track a scene node
-      public: void TrackVisual( const std::string &_visualName);
- 
-      /// \brief Set the camera to track a scene node
-      public: void TrackVisual( VisualPtr _visual );
+      protected: virtual bool TrackVisualImpl( VisualPtr _visual );
 
       /// \brief Set to true to enable rendering
       public: virtual void SetRenderTarget( Ogre::RenderTarget *_target );

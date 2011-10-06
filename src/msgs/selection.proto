@@ -9,7 +9,6 @@ import "header.proto";
 
 message Selection
 {
-  optional Header header = 1;
   required string name   = 2;
   optional bool selected = 3 [default = false];
 }

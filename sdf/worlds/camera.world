@@ -2,11 +2,11 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.2 0.2 0.2 1"/>
+      <ambient rgba="0.1 0.1 0.1 1"/>
       <background rgba="0 0 0 1">
         <sky material="Gazebo/CloudySky"/>
       </background>
-      <shadows enabled="true"/>
+      <shadows enabled="false"/>
     </scene>
 
     <physics type="ode">
@@ -19,20 +19,14 @@
 
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">
-      <origin pose="0 0 -10 0 0 0"/>
       <link name="body">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0"
-                   iyy="1" iyz="0"
-                   izz="1"/>
-        </inertial>
-        <collision name="geom">
+        <collision name="geom_1">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
         </collision>
 
-        <visual name="visual" cast_shadows="false">
+        <visual name="visual_1" cast_shadows="false">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
@@ -41,8 +35,9 @@
       </link>
     </model>
 
+
     <model name="camera_model" static="false">
-      <origin pose="0 0 5 0.0 0.0 0"/>
+      <origin pose="0 0 .5 0.0 0.0 0"/>
       <link name="my_link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" 
@@ -50,14 +45,14 @@
                    izz="1"/>
         </inertial>
 
-        <collision>
+        <collision name="collision">
           <geometry>
             <box size="1 1 1"/>
           </geometry>
         </collision>
 
         <sensor name="camera" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 5 0 0 0"/>
+          <origin pose="0 0 10 0 1.5707 0"/>
           <camera>
             <horizontal_fov angle="1.04719755"/>
             <image width="640" height="480" format="R8G8B8"/>
@@ -68,9 +63,9 @@
       </link>
     </model>
 
-    <light type="directional" name="my_light">
+    <light type="directional" name="my_light" cast_shadows="false">
       <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba=".4 .4 .4 1"/>
+      <diffuse rgba=".9 .9 .9 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
       <direction xyz="0 0 -1"/>

@@ -34,7 +34,7 @@
       </link>
     </model>
     
-    <model name="box_model" static="false">
+    <model name="box_model">
       <origin pose="0 0 0.0 0 0 0"/>
       <link name="body">
         <origin pose="0 0 0.5 0 0 0"/>

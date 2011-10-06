@@ -239,6 +239,17 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     this->viewController->HandleMouseEvent(_evt);
 }
 
+bool UserCamera::TrackVisualImpl( VisualPtr _visual )
+{
+  Camera::TrackVisualImpl( _visual );
+  if (_visual)
+    this->SetViewController(OrbitViewController::GetTypeString());
+  else
+    this->SetViewController(FPSViewController::GetTypeString());
+
+  return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set view controller
 void UserCamera::SetViewController( const std::string &type )
@@ -405,36 +416,7 @@ void UserCamera::MoveToVisual( VisualPtr _visual)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the camera to track a scene node
-void UserCamera::TrackVisual( const std::string &_name )
-{
-  VisualPtr visual = this->scene->GetVisual(_name);
-  if (visual)
-    this->TrackVisual(visual);
-  else
-    gzerr << "MoveTo Unknown visual[" << _name << "]\n";
-}
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the camera to track a scene node
-void UserCamera::TrackVisual( VisualPtr _visual )
-{
-  this->sceneNode->getParent()->removeChild(this->sceneNode);
-
-  if (_visual)
-  {
-    _visual->GetSceneNode()->addChild(this->sceneNode);
-    this->camera->setAutoTracking(true, _visual->GetSceneNode() );
-    this->SetViewController(OrbitViewController::GetTypeString());
-  }
-  else
-  {
-    this->origParentNode->addChild(this->sceneNode);
-    this->camera->setAutoTracking(false, NULL);
-    this->camera->setPosition(Ogre::Vector3(0,0,0));
-    this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
-    this->SetViewController(FPSViewController::GetTypeString());
-  }
-}
 
 //////////////////////////////////////////////////////////////////////////////
 void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )

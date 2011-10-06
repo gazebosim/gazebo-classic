@@ -30,6 +30,7 @@
 #include "rendering/RenderEngine.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/Camera.hh"
+#include "rendering/DepthCamera.hh"
 #include "rendering/Grid.hh"
 #include "rendering/SelectionObj.hh"
 #include "rendering/DynamicLines.hh"
@@ -357,9 +358,18 @@ Grid *Scene::GetGrid(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 //Create a camera
-CameraPtr Scene::CreateCamera(const std::string &name_)
+CameraPtr Scene::CreateCamera(const std::string &_name)
 {
-  CameraPtr camera( new Camera(this->name + "::" + name_, this) );
+  CameraPtr camera( new Camera(this->name + "::" + _name, this) );
+  this->cameras.push_back(camera);
+
+  return camera;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+DepthCameraPtr Scene::CreateDepthCamera( const std::string &_name )
+{
+  DepthCameraPtr camera( new DepthCamera(this->name + "::" + _name, this) );
   this->cameras.push_back(camera);
 
   return camera;
@@ -433,6 +443,7 @@ VisualPtr Scene::GetVisual( const std::string &_name ) const
 /// Select a visual by name
 void Scene::SelectVisual( const std::string &_name ) const
 {
+  gzdbg << "Scene::SelectVisual[" << _name << "]\n";
   VisualPtr vis = this->GetVisual(_name);
   if (vis)
     this->selectionObj->Attach(vis);

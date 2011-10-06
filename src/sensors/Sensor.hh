@@ -58,6 +58,9 @@ namespace gazebo
       /// \brief  Initialize the sensor
       public: virtual void Init();
 
+      /// \brief Set the parent of the sensor
+      public: virtual void SetParent( const std::string &_name );
+
       /// \brief FIXME?
       /// \brief this mechanism is used to get to RaySensor::InitChild()
       /// \brief FIXME?
@@ -72,9 +75,6 @@ namespace gazebo
       /// \brief Get name 
       public: std::string GetName() const;
 
-      /// \brief Get the type of the sensor
-      public: std::string GetSensorType(){return typeName;}
-  
       /// \brief Get the current pose
       public: virtual math::Pose GetPose() const;
   
@@ -91,11 +91,11 @@ namespace gazebo
       protected: bool active;
       protected: sdf::ElementPtr sdf; 
       protected: math::Pose pose;
-      protected: std::string typeName;
       protected: std::vector<event::ConnectionPtr> connections;
       protected: transport::NodePtr node;
       protected: transport::SubscriberPtr poseSub;
 
+      protected: std::string parentName;
       protected: std::vector<SensorPluginPtr> plugins;
     };
     /// \}

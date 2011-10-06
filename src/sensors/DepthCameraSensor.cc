@@ -45,11 +45,11 @@ DepthCameraSensor::DepthCameraSensor()
     : Sensor()
 {
   gzdbg << "New DepthCamera\n";
-  this->typeName = "monocamera";
-
-  this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&DepthCameraSensor::Render, this)) );
+  /*this->connections.push_back( 
+      event::Events::ConnectRenderSignal( 
+        boost::bind(&DepthCameraSensor::Render, this)) );
+        */
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -72,8 +72,6 @@ void DepthCameraSensor::Load()
   this->poseSub = this->node->Subscribe("~/pose", 
                                         &DepthCameraSensor::OnPose, this );
 }
-
-
  
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
@@ -87,10 +85,10 @@ void DepthCameraSensor::InitChild()
     if (!scene)
       scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
-    this->camera = scene->CreateCamera(this->sdf->GetValueString("name"));
+    this->camera = scene->CreateDepthCamera(this->sdf->GetValueString("name"));
     if (!this->camera)
     {
-      gzerr << "Unable to create camera sensor[mono_camera]\n";
+      gzerr << "Unable to create depth camera sensor\n";
       return;
     }
     this->camera->SetCaptureData(true);
@@ -106,12 +104,9 @@ void DepthCameraSensor::InitChild()
     }
 
     this->camera->Init();
-    // Create the render texture
-    this->ogreTextureName = this->GetName() + "_RttTex";
-    this->camera->CreateRenderTexture(this->ogreTextureName);
 
-    this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-    this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+    //this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
+    //this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
   }
   else
     gzerr << "No world name\n";
@@ -135,7 +130,7 @@ void DepthCameraSensor::SetActive(bool value)
 
 //////////////////////////////////////////////////////////////////////////////
 // Render new data
-void DepthCameraSensor::Render()
+/*void DepthCameraSensor::Render()
 {
   //if (this->active || **this->alwaysActiveP)
   {
@@ -144,7 +139,7 @@ void DepthCameraSensor::Render()
     //this->camera->PostRender();
   }
   
-}
+}*/
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing

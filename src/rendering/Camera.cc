@@ -251,6 +251,28 @@ void Camera::Update()
     this->pose.rot.y = q.y;
     this->pose.rot.z = q.z;
   }
+  
+
+  std::list<msgs::Request>::iterator iter = this->requests.begin();
+  while (iter != this->requests.end())
+  {
+    bool erase = false;
+    if ( (*iter).request() == "track_visual")
+    {
+      if (this->TrackVisualImpl( (*iter).data() ))
+        erase = true;
+    }
+    else if ( (*iter).request() == "attach_visual")
+    {
+      if (this->AttachToVisualImpl( (*iter).data() ))
+        erase = true;
+    }
+
+    if (erase)
+      iter = this->requests.erase(iter);
+    else
+      iter++;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -994,4 +1016,67 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
+}
+
+/// \brief Attach the camera to a scene node
+void Camera::AttachToVisual( const std::string &_visualName )
+{
+  msgs::Request request;
+  request.set_request("attach_visual");
+  request.set_data( _visualName );
+  request.set_id(0);
+  this->requests.push_back( request );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void Camera::TrackVisual( const std::string &_name )
+{
+  msgs::Request request;
+  request.set_request("track_visual");
+  request.set_data( _name );
+  request.set_id(0);
+  this->requests.push_back( request );
+}
+
+bool Camera::AttachToVisualImpl( const std::string &_name )
+{
+  VisualPtr visual = this->scene->GetVisual(_name);
+  if (visual)
+  {
+    this->sceneNode->getParent()->removeChild(this->sceneNode);
+    visual->GetSceneNode()->addChild(this->sceneNode);
+    return true;
+  }
+
+  return false;
+}
+
+bool Camera::TrackVisualImpl( const std::string &_name )
+{
+  VisualPtr visual = this->scene->GetVisual(_name);
+  if (visual)
+    return this->TrackVisualImpl(visual);
+
+  return false;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the camera to track a scene node
+bool Camera::TrackVisualImpl( VisualPtr _visual )
+{
+  this->sceneNode->getParent()->removeChild(this->sceneNode);
+
+  if (_visual)
+  {
+    _visual->GetSceneNode()->addChild(this->sceneNode);
+    this->camera->setAutoTracking(true, _visual->GetSceneNode() );
+  }
+  else
+  {
+    this->origParentNode->addChild(this->sceneNode);
+    this->camera->setAutoTracking(false, NULL);
+    this->camera->setPosition(Ogre::Vector3(0,0,0));
+    this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
+  }
+  return true;
 }

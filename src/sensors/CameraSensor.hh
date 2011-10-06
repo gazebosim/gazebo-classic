@@ -45,7 +45,10 @@ namespace gazebo
     
       /// \brief Destructor
       public: virtual ~CameraSensor();
-    
+
+      /// \brief Set the parent of the sensor
+      public: virtual void SetParent( const std::string &_name );
+   
       /// \brief Load the camera using parameter from an SDF element
       /// \param _sdf The SDF parameters
       protected: virtual void Load( sdf::ElementPtr &_sdf );
@@ -55,7 +58,7 @@ namespace gazebo
     
       /// \brief Initialize the camera
       protected: virtual void InitChild();
-    
+
       /// \brief Update the sensor information
       protected: virtual void Update(bool force);
     
@@ -66,12 +69,10 @@ namespace gazebo
       public: virtual void SetActive(bool value);
     
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
-      private: void Render();
+      //private: void Render();
     
       private: rendering::CameraPtr camera;
       public: rendering::CameraPtr GetCamera() const {return this->camera; };
-    
-      protected: std::string ogreTextureName;
     };
     /// \}
   }

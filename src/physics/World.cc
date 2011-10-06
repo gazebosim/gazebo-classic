@@ -366,7 +366,10 @@ void World::DeleteEntityCB(const std::string &/*_name*/)
 // Get an element by name
 BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(this->rootElement->GetName() + "::" + _name);
+  std::string name = _name;
+  if (_name.find(this->rootElement->GetName()) != 0)
+    name = this->rootElement->GetName() + "::" + _name;
+  return this->rootElement->GetByName(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -819,9 +822,20 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   }
 }
 
-void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &/*_msg*/)
+void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  ModelPtr model = this->GetModelByName( _msg->name() );
+  if (!model)
+  {
+    gzerr << "Unable to find model[" << _msg->name() << "]\n";
+    return;
+  }
+
+  if (_msg->has_pose())
+  {
+    model->SetWorldPose( msgs::Convert(_msg->pose()) );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -106,7 +106,10 @@ namespace gazebo
   
       /// \brief Create a camera
       public: CameraPtr CreateCamera(const std::string &name);
-  
+ 
+      /// \brief Create depth camera 
+      public: DepthCameraPtr CreateDepthCamera( const std::string &_name );
+
       /// \brief Get the number of cameras in this scene
       public: unsigned int GetCameraCount() const;
   

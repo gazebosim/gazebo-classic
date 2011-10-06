@@ -162,12 +162,6 @@ void Link::Init()
     }
   }
 
-  sensors::Sensor_V::iterator siter;
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-  {
-    (*siter)->Init();
-  }
-
   this->SetKinematic( this->sdf->GetValueBool("kinematic") );
 
   // If no collisions are attached, then don't let gravity affect the body.
@@ -237,6 +231,13 @@ void Link::Init()
       this->cgVisuals.push_back( g_msg.header().str_id() );
     }
   }*/
+
+  sensors::Sensor_V::iterator siter;
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    (*siter)->Init();
+    (*siter)->SetParent( this->GetCompleteScopedName() );
+  }
 
   this->enabled = true;
 

@@ -31,6 +31,8 @@
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
 
+#include "msgs/MessageTypes.hh"
+#include "rendering/RenderTypes.hh"
 #include "sdf/sdf.h"
 
 // Forward Declarations
@@ -255,6 +257,20 @@ namespace gazebo
   
       public: virtual void SetRenderTarget( Ogre::RenderTarget *target );
 
+      /// \brief Attach the camera to a scene node
+      public: void AttachToVisual( const std::string &_visualName );
+
+      /// \brief Set the camera to track a scene node
+      public: void TrackVisual( const std::string &_visualName);
+
+      protected: bool TrackVisualImpl( const std::string &_visualName);
+
+      /// \brief Attach the camera to a visual
+      protected: bool AttachToVisualImpl( const std::string &_name );
+
+      /// \brief Set the camera to track a scene node
+      protected: virtual bool TrackVisualImpl( VisualPtr _visual );
+
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
       private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
   
@@ -308,6 +324,7 @@ namespace gazebo
       protected: Scene *scene;
   
       protected: std::vector<event::ConnectionPtr> connections;
+      protected: std::list<msgs::Request> requests;
       private: friend class Scene;
     };
     

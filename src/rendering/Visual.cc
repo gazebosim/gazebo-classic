@@ -49,6 +49,7 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
+
   this->SetName(_name);
   this->sceneNode = NULL;
 
@@ -959,17 +960,10 @@ void Visual::SetPosition( const math::Vector3 &_pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void Visual::SetRotation( const math::Quaternion & /*_rot*/)
+void Visual::SetRotation( const math::Quaternion &_rot)
 {
-  //this->sceneNode->setOrientation(_rot.w, _rot.x, _rot.y, _rot.z);
-
-  /*if (this->GetName() == "default::kitchen::body::VISUAL_0")
-    gzdbg << "SetRotation[" << _rot << "][" 
-      << this->sceneNode->_getDerivedOrientation().getRoll()
-      << this->sceneNode->_getDerivedOrientation().getPitch()
-      << this->sceneNode->_getDerivedOrientation().getYaw()
-      << "]\n";
-      */
+  this->sceneNode->_setDerivedOrientation(
+      Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

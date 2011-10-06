@@ -66,12 +66,12 @@ namespace gazebo
       public: virtual void SetActive(bool value);
     
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
-      private: void Render();
+      //private: void Render();
     
-      private: rendering::CameraPtr camera;
-      public: rendering::CameraPtr GetCamera() const {return this->camera; };
+      public: rendering::DepthCameraPtr GetCamera() const 
+              {return this->camera; };
     
-      protected: std::string ogreTextureName;
+      private: rendering::DepthCameraPtr camera;
     };
     /// \}
   }
