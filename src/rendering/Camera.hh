@@ -300,7 +300,7 @@ namespace gazebo
       private: bool userMovable;
       protected: bool renderingEnabled;
   
-      private: bool newData;
+      protected: bool newData;
   
       protected: common::Time renderPeriod;
       protected: common::Time lastUpdate;

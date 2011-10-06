@@ -22,9 +22,9 @@
 #ifndef RENDERING_DEPTHCAMERA_HH
 #define RENDERING_DEPTHCAMERA_HH
 
-#include <boost/enable_shared_from_this.hpp>
 
 #include "rendering/Camera.hh"
+#include "rendering/ogre.h"
 
 #include "common/Event.hh"
 #include "common/Time.hh"
@@ -53,10 +53,10 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class DepthCamera : public Camera , public boost::enable_shared_from_this<DepthCamera>
+    class DepthCamera : public Camera
     {
       /// \brief Constructor
-      public: DepthCamera(const std::string &namePrefix, Scene *scene);
+      public: DepthCamera(const std::string &_namePrefix, Scene *_scene);
     
       /// \brief Destructor
       public: virtual ~DepthCamera();
@@ -71,25 +71,23 @@ namespace gazebo
       /// \brief Initialize the camera
       public: void Init();
 
-      /// \brief Update the sensor information
-      public: void Update();
-    
+      /// \brief Render the camera
+      public: virtual void Render();
+      public: virtual void PostRender();
+
       /// Finalize the camera
       public: void Fini();
 
       // All things needed to get back z buffer for depth data
-      public: virtual const float *GetDepthData(unsigned int i=0);
+      public: virtual const float* GetDepthData();
       protected: virtual void RenderDepthData();
-      protected: Ogre::TexturePtr CreateRTT(const std::string &name, bool depth);
       protected: float *saveDepthBuffer;
       public: Ogre::RenderTarget *depthTarget;
       protected: Ogre::TexturePtr depthTexture;
       private: Ogre::MaterialPtr depthMaterial;
       protected: std::string depthTextureName;
       protected: std::string depthMaterialName;
-      protected: bool simulateDepthData;
-      private: void CreateDepthTexture( const std::string &textureName );
-      public: virtual void PostRender();
+      private: void CreateDepthTexture();
 
 
     };
