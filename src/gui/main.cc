@@ -23,6 +23,7 @@
 #include "gazebo.h"
 
 std::string config_file = "";
+std::vector<std::string> plugins;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,13 +48,21 @@ int ParseArgs(int argc, char **argv)
 {
   int ch;
 
-  char *flags = (char*)("h");
+  char *flags = (char*)("hp:");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
   {
     switch (ch)
     {
+      case 'p':
+        {
+          if (optarg != NULL)
+            plugins.push_back( std::string(optarg) );
+          else
+            gzerr << "Missing plugin filename with -p argument\n";
+          break;
+        }
       case 'h':
       default:
         PrintUsage();
@@ -99,6 +108,13 @@ int main(int argc, char **argv)
   gazebo::run();
 
   gazebo::gui::load();
+
+  /// Load all the plugins specified on the command line
+  for (std::vector<std::string>::iterator iter = plugins.begin(); 
+       iter != plugins.end(); iter++)
+  {
+    gazebo::gui::load_plugin(*iter);
+  }
   gazebo::gui::init();
   gazebo::gui::run();
 

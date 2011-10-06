@@ -22,7 +22,6 @@
 #include <sys/types.h>
 #include <list>
 #include <sys/stat.h>
-#include <boost/signals.hpp>
 
 #include "common/CommonTypes.hh"
 #include "common/SystemPaths.hh"
@@ -189,6 +188,14 @@ namespace gazebo
     public: virtual void Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf ) = 0;
   };
 
+  class GUIPlugin : public PluginT<GUIPlugin>
+  {
+    /// \brief Load function
+    public: virtual void Load() = 0;
+    public: virtual void Init() = 0;
+  };
+
+
 
   /// \}
 
@@ -209,6 +216,13 @@ gazebo::WorldPlugin *RegisterPlugin() \
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
 extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
 gazebo::SensorPlugin *RegisterPlugin() \
+{\
+  return new classname();\
+}
+
+#define GZ_REGISTER_GUI_PLUGIN(classname) \
+extern "C" gazebo::GUIPlugin *RegisterPlugin(); \
+gazebo::GUIPlugin *RegisterPlugin() \
 {\
   return new classname();\
 }

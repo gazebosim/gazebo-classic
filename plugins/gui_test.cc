@@ -16,37 +16,43 @@
 */
 #include <boost/bind.hpp>
 
-#include "physics/World.hh"
+#include "gui/Gui.hh"
+#include "rendering/UserCamera.hh"
+#include "rendering/GUIOverlay.hh"
 #include "gazebo.h"
 
 namespace gazebo
 {
-  class GUITest : public WorldPlugin
+  class GUITest : public GUIPlugin
   {
-    public: void Load( physics::WorldPtr &_parent, sdf::ElementPtr & /*_sdf*/ )
+    public: void Load()
     {
       printf("Load gui test\n");
       this->node = transport::NodePtr(new transport::Node());
-      this->node->Init(_parent->GetName());
+      this->node->Init();
 
       this->guiConfigPub = this->node->Advertise<msgs::GUIOverlayConfig>("~/gui_overlay_config");
-      this->CreateGUI();
     }
 
-    private: void CreateGUI()
+    private: void Init()
     {
-      msgs::GUIOverlayConfig msg;
+      printf("gui_test Init\n");
+      rendering::UserCameraPtr camera = gui::get_active_camera();
+      if (camera && camera->GetGUIOverlay())
+      {
+        camera->GetGUIOverlay()->LoadLayout( "gui_test.layout" );
+      }
 
-      msg.set_layout_filename( "gui_test.layout" );
-      this->guiConfigPub->Publish(msg);
+      //msg.set_layout_filename( "gui_test.layout" );
+      //this->guiConfigPub->Publish(msg);
     }
+
 
     private: transport::NodePtr node;
     private: transport::PublisherPtr guiConfigPub;
   };
   
   // Register this plugin with the simulator
-  GZ_REGISTER_WORLD_PLUGIN(GUITest)
-
+  GZ_REGISTER_GUI_PLUGIN(GUITest)
 }
  

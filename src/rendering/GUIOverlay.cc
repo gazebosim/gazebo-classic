@@ -66,17 +66,11 @@ void GUIOverlay::CreateWindow( const std::string &_type,
                                const std::string &_text)
 {
 #ifdef HAVE_CEGUI
-  std::map<std::string, CEGUI::Window*>::iterator iter;
-  iter = this->windows.find(_parent);
-  if (iter == this->windows.end())
-  {
-    gzerr << "Unable to find parent window[" << _parent << "]\n";
-    return;
-  }
 
+  CEGUI::Window *parent = CEGUI::WindowManager::getSingleton().getWindow(_parent);
   CEGUI::Window *window = CEGUI::WindowManager::getSingleton().createWindow(_type, _name);
 
-  iter->second->addChildWindow( window );
+  parent->addChildWindow( window );
 
   window->setPosition( CEGUI::UVector2( CEGUI::UDim(_position.x, 0), 
                                              CEGUI::UDim(_position.y, 0) ) );
@@ -84,12 +78,10 @@ void GUIOverlay::CreateWindow( const std::string &_type,
   window->setSize( CEGUI::UVector2( CEGUI::UDim(_size.x, 0), 
                                          CEGUI::UDim(_size.y, 0) ) );
   window->setText( _text );
-
-  this->windows[_name] = window;
 #endif
 }
 
-bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
+bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &/*_evt*/)
 {
   bool result = false;
 #ifdef HAVE_CEGUI
@@ -111,6 +103,38 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
   return result;
 }
 
+bool GUIOverlay::IsInitialized() 
+{
+  return CEGUI::WindowManager::getSingletonPtr() != NULL;
+}
+  
+/// Load a CEGUI layout file
+CEGUI::Window *GUIOverlay::LoadLayout( const std::string &_filename )
+{
+  CEGUI::Window *window = NULL;
+  CEGUI::Window *rootWindow = NULL;
+
+  CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
+  if (!windowManager)
+  {
+    gzerr << "Attempting to create a GUI overlay window before load\n";
+    return window;
+  }
+
+  rootWindow = windowManager->getWindow("root");
+  if (rootWindow)
+  {
+    window = windowManager->loadWindowLayout( _filename );
+    rootWindow->addChildWindow( window );
+  }
+  else
+  {
+    gzerr << "Attempting to create a GUI overlay window before load\n";
+  }
+
+  return window;
+}
+
 void GUIOverlay::OnConfig( const boost::shared_ptr<msgs::GUIOverlayConfig const> &_msg)
 {
   this->configMsg = _msg;
@@ -121,9 +145,9 @@ void GUIOverlay::PreRender()
 #ifdef HAVE_CEGUI
   if (this->configMsg)
   {
-    CEGUI::Window *newWindow = CEGUI::WindowManager::getSingleton().loadWindowLayout( this->configMsg->layout_filename() );
-    this->windows["root"]->addChildWindow( newWindow );
+    this->LoadLayout( this->configMsg->layout_filename() );
     this->configMsg.reset();
   }
 #endif
 }
+

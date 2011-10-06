@@ -1,8 +1,6 @@
 <?xml version="1.0"?> 
 <gazebo version="1.0">
   <world name="default">
-    <plugin name="gui_test" filename="libgui_test.so"/>
-
     <scene>
       <ambient rgba="0.1 0.1 0.1 1"/>
       <background rgba="0 0 0 1"/>

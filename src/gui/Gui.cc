@@ -19,6 +19,8 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
+#include "common/Plugin.hh"
+#include "common/CommonTypes.hh"
 #include "gui/MainWindow.hh"
 #include "gui/Gui.hh"
 
@@ -28,9 +30,11 @@
 int g_argc = 1;
 char **g_argv;
 
-std::string g_worldname = "default";
 
 using namespace gazebo;
+
+std::string g_worldname = "default";
+std::vector<GUIPluginPtr> g_plugins;
 
 QApplication *g_app;
 gui::MainWindow *g_main_win;
@@ -61,11 +65,16 @@ void gui::init()
 {
   g_main_win->show();
   g_main_win->Init();
+
+  for (std::vector<GUIPluginPtr>::iterator iter = g_plugins.begin(); 
+       iter != g_plugins.end(); iter++)
+  {
+    (*iter)->Init();
+  }
 }
 
 void gui::run()
 {
-
   g_app->exec();
 }
 
@@ -99,4 +108,11 @@ void gui::set_active_camera( rendering::UserCameraPtr _cam )
 rendering::UserCameraPtr gui::get_active_camera()
 {
   return g_active_camera;
+}
+
+void gui::load_plugin( const std::string &_filename )
+{
+  gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename, _filename);
+  plugin->Load();
+  g_plugins.push_back( plugin );
 }

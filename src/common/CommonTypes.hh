@@ -11,14 +11,15 @@
 /// \brief Forward declarations for the common classes
 namespace gazebo
 {
-
   class WorldPlugin;
   class ModelPlugin;
   class SensorPlugin;
+  class GUIPlugin;
 
   typedef boost::shared_ptr<WorldPlugin> WorldPluginPtr;
   typedef boost::shared_ptr<ModelPlugin> ModelPluginPtr;
   typedef boost::shared_ptr<SensorPlugin> SensorPluginPtr;
+  typedef boost::shared_ptr<GUIPlugin> GUIPluginPtr;
 
   namespace common
   {

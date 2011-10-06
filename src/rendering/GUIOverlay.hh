@@ -2,7 +2,6 @@
 #define GUI_OVERLAY
 
 #include <string>
-#include <map>
 
 #include "common/MouseEvent.hh"
 #include "common/Events.hh"
@@ -34,6 +33,8 @@ namespace gazebo
 
       public: void Init( Ogre::RenderTarget *_renderTarget );
 
+      public: bool IsInitialized();
+
       public: void CreateWindow( const std::string &_type, 
                                  const std::string &_name,
                                  const std::string &_parent,
@@ -43,6 +44,8 @@ namespace gazebo
 
       public: bool HandleMouseEvent( const common::MouseEvent &_evt);
 
+      /// \brief Load a CEGUI layout file
+      public: CEGUI::Window *LoadLayout( const std::string &_filename );
 
       private: void OnConfig( const boost::shared_ptr<msgs::GUIOverlayConfig const> &_msg);
 
@@ -50,7 +53,6 @@ namespace gazebo
 
 #ifdef HAVE_CEGUI
       private: CEGUI::OgreRenderer *guiRenderer;
-      private: std::map<std::string, CEGUI::Window*> windows;
 #endif
 
       private: transport::NodePtr node;  
