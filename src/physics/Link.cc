@@ -61,6 +61,7 @@ Link::Link(EntityPtr parent)
 // Destructor
 Link::~Link()
 {
+  gzdbg << "Delete Link[" << this->GetName() << "]\n";
   std::vector<Entity*>::iterator iter;
 
   for (unsigned int i=0; i < this->visuals.size(); i++)

@@ -1070,7 +1070,7 @@ void Scene::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg)
     iter = this->visuals.find(_msg->data());
     if (iter != this->visuals.end() )
     {
-      this->visuals.erase( iter );
+      this->RemoveVisual( iter->second );
     }
   }
 }

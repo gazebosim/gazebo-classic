@@ -284,6 +284,7 @@ void World::Update()
   event::Events::worldUpdateEndSignal();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -385,7 +386,6 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
 {
   ModelPtr model( new Model(_parent) );
   model->SetWorld(shared_from_this());
-
   model->Load(_sdf);
 
   event::Events::addEntitySignal(model->GetCompleteScopedName());
@@ -676,6 +676,11 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
         jointMsg.SerializeToString( serializedData );
         response.set_type( jointMsg.GetTypeName() );
       }
+    }
+    else
+    {
+      response.set_type("error");
+      response.set_response( "nonexistant" );
     }
   }
   else if (_msg->request() == "scene_info")

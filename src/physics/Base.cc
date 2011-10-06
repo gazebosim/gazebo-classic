@@ -96,6 +96,7 @@ void Base::Fini()
 
   this->children.clear();
   this->world.reset();
+  this->parent.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,6 +177,7 @@ void Base::RemoveChild(unsigned int _id)
   {
     if ((*iter)->GetId() == (int)_id)
     {
+      (*iter)->Fini();
       this->children.erase(iter);
       break;
     }

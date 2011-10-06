@@ -61,6 +61,10 @@ namespace gazebo
       private: QtProperty *GetChildItem(QtProperty *_item, 
                                         const std::string &_name);
 
+      private: void RemoveEntity( const std::string &_name );
+
+      private: QTreeWidgetItem *GetModelListItem( const std::string &_name );
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
       private: QAction *moveToAction;

@@ -173,30 +173,7 @@ void ModelListWidget::ProcessModel( const msgs::Model &_msg )
 {
   std::string name = _msg.name();
 
-  QTreeWidgetItem *listItem = NULL;
-
-  // Find an existing element with the name from the message
-  for (int i=0; i < this->modelTreeWidget->topLevelItemCount() && !listItem;i++)
-  {
-    QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
-    std::string data = item->data(0, Qt::UserRole).toString().toStdString();
-    if (data == name)
-    {
-      listItem = item;
-      break;
-    }
-
-    for (int j=0; j < item->childCount(); j++)
-    {
-      QTreeWidgetItem *childItem = item->child(j);
-      data = childItem->data(0, Qt::UserRole).toString().toStdString();
-      if (data == name)
-      {
-        listItem = childItem;
-        break;
-      }
-    }
-  }
+  QTreeWidgetItem *listItem = this->GetModelListItem(name);
 
   if (!listItem)
   {
@@ -264,11 +241,60 @@ void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> 
   else if (_msg->has_type() && _msg->type() == stringMsg.GetTypeName())
   {
   }
-  else
-    gzerr << "Unable to process message type[" << _msg->type() << "]\n";
+  else if (_msg->has_type() && _msg->type() == "error")
+  {
+    if (_msg->response() == "nonexistant")
+    {
+      this->RemoveEntity(this->selectedModelName);
+    }
+  }
 
   delete this->requestMsg;
   this->requestMsg = NULL;
+}
+
+void ModelListWidget::RemoveEntity( const std::string &_name )
+{
+  QTreeWidgetItem *listItem = this->GetModelListItem( _name );
+  if (listItem)
+  {
+    int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
+    this->modelTreeWidget->takeTopLevelItem(i);
+
+    this->propTreeBrowser->clear();
+    this->selectedModelName.clear();
+    this->sdfElement.reset();
+  }
+}
+
+QTreeWidgetItem *ModelListWidget::GetModelListItem( const std::string &_name )
+{
+  QTreeWidgetItem *listItem = NULL;
+
+  // Find an existing element with the name from the message
+  for (int i=0; i < this->modelTreeWidget->topLevelItemCount() && !listItem;i++)
+  {
+    QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
+    std::string data = item->data(0, Qt::UserRole).toString().toStdString();
+    if (data == _name)
+    {
+      listItem = item;
+      break;
+    }
+
+    for (int j=0; j < item->childCount(); j++)
+    {
+      QTreeWidgetItem *childItem = item->child(j);
+      data = childItem->data(0, Qt::UserRole).toString().toStdString();
+      if (data == _name)
+      {
+        listItem = childItem;
+        break;
+      }
+    }
+  }
+
+  return listItem;
 }
 
 void ModelListWidget::OnDelete()

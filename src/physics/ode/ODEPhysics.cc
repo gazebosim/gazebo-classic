@@ -34,6 +34,7 @@
 #include "physics/PhysicsFactory.hh"
 #include "physics/World.hh"
 #include "physics/Entity.hh"
+#include "physics/Model.hh"
 #include "physics/SurfaceParams.hh"
 #include "physics/MapShape.hh"
 
@@ -411,7 +412,7 @@ double ODEPhysics::GetStepTime()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
-LinkPtr ODEPhysics::CreateLink(EntityPtr _parent)
+LinkPtr ODEPhysics::CreateLink(ModelPtr &_parent)
 {
   if (_parent == NULL)
     gzthrow("Link must have a parent\n");
