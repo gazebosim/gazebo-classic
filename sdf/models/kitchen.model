@@ -1,0 +1,27 @@
+<gazebo version="1.0">
+<model name="kitchen" static="true">
+
+  <origin pose="0 0 0 0 0 0"/>
+  <link name="body">
+    <inertial mass="1.0">
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+
+    <collision name="surface_1">
+      <origin pose="0 0 0.8 0 0 0"/>
+      <geometry>
+        <box size="1.0 4.0 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual name="visual2">
+      <origin pose="0 0 0 0 0 0"/>
+      <geometry>
+        <mesh filename="kitchen2/kitchen.dae" scale=".0254 .0254 0.0254"/>
+      </geometry>
+    </visual>
+  </link>
+
+</model>
+
+

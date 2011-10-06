@@ -10,6 +10,7 @@ add_subdirectory(pr2_gripper)
 add_subdirectory(pr2)
 add_subdirectory(wg)
 add_subdirectory(kitchen)
+add_subdirectory(kitchen2)
 add_subdirectory(stovetop)
 add_subdirectory(saucepan)
 

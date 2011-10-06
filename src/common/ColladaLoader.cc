@@ -81,6 +81,23 @@ Mesh *ColladaLoader::Load( const std::string &_filename )
   return mesh;
 }
 
+void ColladaLoader::LoadScene( Mesh *_mesh )
+{
+  TiXmlElement *sceneXml = this->colladaXml->FirstChildElement("scene");
+  std::string sceneURL = sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
+
+  TiXmlElement *visSceneXml = this->GetElementId("visual_scene", sceneURL);
+
+  if (!visSceneXml)
+    gzerr << "Unable to find visual_scene id='" << sceneURL << "'\n";
+
+  TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
+  while (nodeXml)
+  {
+    this->LoadNode( nodeXml , _mesh, math::Matrix4::IDENTITY);
+    nodeXml = nodeXml->NextSiblingElement("node");
+  }
+}
 void ColladaLoader::LoadGeometry(TiXmlElement *_xml, 
                                  const math::Matrix4 &_transform, Mesh *_mesh)
 {
@@ -151,43 +168,45 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
                   values[8], values[9], values[10], values[11],
                   values[12], values[13], values[14], values[15]);
   }
-
-  if (_elem->FirstChildElement("translate"))
+  else
   {
-    std::string transStr = _elem->FirstChildElement("translate")->GetText();
-    math::Vector3 translate;
-    translate = boost::lexical_cast<math::Vector3>(transStr);
-    //translate *= this->meter;
-    transform.SetTranslate( translate );
-  }
+    if (_elem->FirstChildElement("translate"))
+    {
+      std::string transStr = _elem->FirstChildElement("translate")->GetText();
+      math::Vector3 translate;
+      translate = boost::lexical_cast<math::Vector3>(transStr);
+      //translate *= this->meter;
+      transform.SetTranslate( translate );
+    }
 
-  TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
-  while (rotateXml)
-  {
-    math::Matrix3 mat;
-    math::Vector3 axis;
-    double angle;
+    TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
+    while (rotateXml)
+    {
+      math::Matrix3 mat;
+      math::Vector3 axis;
+      double angle;
 
-    std::string rotateStr = rotateXml->GetText();
-    std::istringstream iss(rotateStr);
+      std::string rotateStr = rotateXml->GetText();
+      std::istringstream iss(rotateStr);
 
-    iss >> axis.x >> axis.y >> axis.z;
-    iss >> angle;
-    mat.SetFromAxis(axis,DTOR(angle));
+      iss >> axis.x >> axis.y >> axis.z;
+      iss >> angle;
+      mat.SetFromAxis(axis,DTOR(angle));
 
-    transform = transform * mat;
+      transform = transform * mat;
 
-    rotateXml = rotateXml->NextSiblingElement("rotate");
-  }
+      rotateXml = rotateXml->NextSiblingElement("rotate");
+    }
 
-  if (_elem->FirstChildElement("scale"))
-  {
-    std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
-    math::Vector3 scale;
-    scale = boost::lexical_cast<math::Vector3>(scaleStr);
-    math::Matrix4 scaleMat;
-    scaleMat.SetScale( scale );
-    transform = transform * scaleMat;
+    if (_elem->FirstChildElement("scale"))
+    {
+      std::string scaleStr = _elem->FirstChildElement("scale")->GetText();
+      math::Vector3 scale;
+      scale = boost::lexical_cast<math::Vector3>(scaleStr);
+      math::Matrix4 scaleMat;
+      scaleMat.SetScale( scale );
+      transform = transform * scaleMat;
+    }
   }
 
   return transform;
@@ -538,37 +557,23 @@ void ColladaLoader::LoadLines( TiXmlElement *_xml,
   _mesh->AddSubMesh(subMesh);
 }
 
-void ColladaLoader::LoadScene( Mesh *_mesh )
-{
-  TiXmlElement *sceneXml = this->colladaXml->FirstChildElement("scene");
-  std::string sceneURL = sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
 
-  TiXmlElement *visSceneXml = this->GetElementId("visual_scene", sceneURL);
 
-  if (!visSceneXml)
-    gzerr << "Unable to find visual_scene id='" << sceneURL << "'\n";
-
-  TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
-  while (nodeXml)
-  {
-    this->LoadNode( nodeXml , _mesh);
-    nodeXml = nodeXml->NextSiblingElement("node");
-  }
-}
-
-void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh)
+void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh, 
+                             const math::Matrix4 &_transform)
 {
   TiXmlElement *nodeXml;
   TiXmlElement *instGeomXml;
 
+  math::Matrix4 transform = this->LoadNodeTransform( _elem );
+  transform = _transform * transform;
+
   nodeXml = _elem->FirstChildElement("node");
   while (nodeXml)
   {
-    this->LoadNode(nodeXml,_mesh);
+    this->LoadNode(nodeXml,_mesh, transform);
     nodeXml = nodeXml->NextSiblingElement("node");
   }
-
-  math::Matrix4 transform = this->LoadNodeTransform( _elem );
 
   if (_elem->FirstChildElement("instance_node"))
   {
@@ -580,6 +585,8 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh)
       gzerr << "Unable to find node[" << nodeURLStr << "]\n";
       return;
     }
+    this->LoadNode(nodeXml, _mesh, transform);
+    return;
   }
   else 
     nodeXml = _elem;

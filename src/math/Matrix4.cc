@@ -22,12 +22,12 @@
 using namespace gazebo;
 using namespace math;
 
-
 const Matrix4 Matrix4::IDENTITY(
        1.0, 0.0, 0.0, 0.0,
        0.0, 1.0, 0.0, 0.0,
        0.0, 0.0, 1.0, 0.0,
        0.0, 0.0, 0.0, 1.0 );
+
 
 const Matrix4 Matrix4::ZERO(
        0.0, 0.0, 0.0, 0.0,
@@ -147,7 +147,7 @@ const Matrix4 &Matrix4::operator=( const Matrix3 &mat )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mult operator
-Matrix4 Matrix4::operator*(const Matrix3 &m2)
+Matrix4 Matrix4::operator*(const Matrix3 &m2) const
 {
   Matrix4 r;
   r = *this;
@@ -169,7 +169,7 @@ Matrix4 Matrix4::operator*(const Matrix3 &m2)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mult operator
-Matrix4 Matrix4::operator*(const Matrix4 &m2)
+Matrix4 Matrix4::operator*(const Matrix4 &m2) const
 {
   Matrix4 r;
 

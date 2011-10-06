@@ -50,5 +50,6 @@
       <attenuation range="20" constant="0.8" linear="0.001" />
     </light>
 
+    <include filename="kitchen.model"/>
   </world>
 </gazebo>

@@ -118,12 +118,12 @@ namespace gazebo
       /// \brief Multiplication operator 
       /// \param _mat Incoming matrix
       /// \return This matrix * _mat
-      public: Matrix4 operator*(const Matrix4 &_mat);
+      public: Matrix4 operator*(const Matrix4 &_mat) const;
 
       /// \brief Multiplication operator 
       /// \param _mat Incoming matrix
       /// \return This matrix * _mat
-      public: Matrix4 operator*(const Matrix3 &_mat);
+      public: Matrix4 operator*(const Matrix3 &_mat) const;
 
 
       /// \brief Multiplication operator
