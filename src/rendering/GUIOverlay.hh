@@ -54,8 +54,10 @@ namespace gazebo
 
       private: void PreRender();
 
+#ifdef HAVE_CEGUI
       /// Load a CEGUI layout file
       private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
+#endif
 
 #ifdef HAVE_CEGUI_OGRE
       private: CEGUI::OgreRenderer *guiRenderer;

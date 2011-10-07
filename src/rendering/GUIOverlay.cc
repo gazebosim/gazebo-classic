@@ -104,7 +104,11 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &/*_evt*/)
 
 bool GUIOverlay::IsInitialized() 
 {
+#ifdef HAVE_CEGUI
   return CEGUI::WindowManager::getSingletonPtr() != NULL;
+#else
+  return false;
+#endif
 }
   
 /// Load a CEGUI layout file
@@ -125,6 +129,7 @@ void GUIOverlay::PreRender()
 }
 
 /// Load a CEGUI layout file
+#ifdef HAVE_CEGUI
 CEGUI::Window *GUIOverlay::LoadLayoutImpl( const std::string &_filename )
 {
   CEGUI::Window *window = NULL;
@@ -150,9 +155,11 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl( const std::string &_filename )
 
   return window;
 }
+#endif
 
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_windowName)
 {
+#ifdef HAVE_CEGUI
   CEGUI::Window *window = NULL;
   CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
 
@@ -188,7 +195,9 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
       CEGUI::Point(0.0f, 0.0f));
 
   window->setProperty("Image", CEGUI::PropertyHelper::imageToString(&imageSet.getImage("RTTImage")));
+  return true;
 
 #endif
-  return true;
+#endif
+  return false;
 }
