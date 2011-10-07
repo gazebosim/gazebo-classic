@@ -68,7 +68,7 @@ namespace gazebo
       public: virtual void UpdatePhysics() {}
     
       /// \brief Create a new body
-      public: virtual LinkPtr CreateLink(ModelPtr &_parent) = 0;
+      public: virtual LinkPtr CreateLink(ModelPtr _parent) = 0;
   
       /// \brief Create a collision
       public: virtual CollisionPtr CreateCollision(const std::string &shapeTypename, 

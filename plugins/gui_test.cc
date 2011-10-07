@@ -27,29 +27,23 @@ namespace gazebo
   {
     public: void Load()
     {
-      printf("Load gui test\n");
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init();
 
-      this->guiConfigPub = this->node->Advertise<msgs::GUIOverlayConfig>("~/gui_overlay_config");
     }
 
     private: void Init()
     {
-      printf("gui_test Init\n");
       rendering::UserCameraPtr camera = gui::get_active_camera();
       if (camera && camera->GetGUIOverlay())
       {
         camera->GetGUIOverlay()->LoadLayout( "gui_test.layout" );
       }
 
-      //msg.set_layout_filename( "gui_test.layout" );
-      //this->guiConfigPub->Publish(msg);
+      //camera->GetGUIOverlay()->AttachCameraToImage( "camera", "Root/CameraView");
     }
 
-
     private: transport::NodePtr node;
-    private: transport::PublisherPtr guiConfigPub;
   };
   
   // Register this plugin with the simulator

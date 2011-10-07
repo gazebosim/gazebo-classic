@@ -6,18 +6,21 @@
 #include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
 #endif
 
+#include "rendering/ogre.h"
 #include "msgs/msgs.h"
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 #include "math/Vector2d.hh"
+#include "rendering/Camera.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 GUIOverlay::GUIOverlay()
 {
-
-  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&GUIOverlay::PreRender, this) ) );
+  this->connections.push_back( 
+      event::Events::ConnectPreRenderSignal( 
+        boost::bind(&GUIOverlay::PreRender, this) ) );
 }
 
 GUIOverlay::~GUIOverlay()
@@ -50,12 +53,6 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
   CEGUI::Window *rootWindow  = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
   CEGUI::System::getSingleton().setGUISheet( rootWindow );
 #endif
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-
-  this->configSub = this->node->Subscribe("~/gui_overlay_config",
-      &GUIOverlay::OnConfig, this);
 }
 
 void GUIOverlay::CreateWindow( const std::string &_type, 
@@ -109,7 +106,24 @@ bool GUIOverlay::IsInitialized()
 }
   
 /// Load a CEGUI layout file
-CEGUI::Window *GUIOverlay::LoadLayout( const std::string &_filename )
+void GUIOverlay::LoadLayout( const std::string &_filename )
+{
+  this->layoutFilename = _filename;
+}
+
+void GUIOverlay::PreRender()
+{
+#ifdef HAVE_CEGUI
+  if (!this->layoutFilename.empty())
+  {
+    this->LoadLayoutImpl( this->layoutFilename );
+    this->layoutFilename.clear();
+  }
+#endif
+}
+
+/// Load a CEGUI layout file
+CEGUI::Window *GUIOverlay::LoadLayoutImpl( const std::string &_filename )
 {
   CEGUI::Window *window = NULL;
   CEGUI::Window *rootWindow = NULL;
@@ -135,19 +149,42 @@ CEGUI::Window *GUIOverlay::LoadLayout( const std::string &_filename )
   return window;
 }
 
-void GUIOverlay::OnConfig( const boost::shared_ptr<msgs::GUIOverlayConfig const> &_msg)
+bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_windowName)
 {
-  this->configMsg = _msg;
-}
+  CEGUI::Window *window = NULL;
+  CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
 
-void GUIOverlay::PreRender()
-{
-#ifdef HAVE_CEGUI
-  if (this->configMsg)
+  if (!windowManager)
   {
-    this->LoadLayout( this->configMsg->layout_filename() );
-    this->configMsg.reset();
+    gzerr << "CEGUI system not initialized\n";
+    return false;
   }
-#endif
-}
 
+  window = windowManager->getWindow(_windowName);
+  if (!window)
+  {
+    gzerr << "Unable to find window[" << _windowName << "]\n";
+    return false;
+  }
+
+  if (!_camera->GetRenderTexture())
+  {
+    gzerr << "Camera does not have a render texture\n";
+    return false;
+  }
+
+  Ogre::TexturePtr texPtr(_camera->GetRenderTexture());
+  CEGUI::Texture &guiTex = this->guiRenderer->createTexture(
+      texPtr );
+
+  CEGUI::Imageset &imageSet = CEGUI::ImagesetManager::getSingleton().create("RTTImageset", guiTex);
+
+  imageSet.defineImage("RTTImage", CEGUI::Point(0.0f, 0.0f),
+      CEGUI::Size(guiTex.getSize().d_width, 
+                  guiTex.getSize().d_height),
+      CEGUI::Point(0.0f, 0.0f));
+
+  window->setProperty("Image", CEGUI::PropertyHelper::imageToString(&imageSet.getImage("RTTImage")));
+
+  return true;
+}

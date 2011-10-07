@@ -95,8 +95,7 @@ void Model::Load( sdf::ElementPtr &_sdf )
     while (linkElem)
     {
       // Create a new link
-      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
-          boost::shared_static_cast<Model>(shared_from_this()));
+      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink( boost::shared_static_cast<Model>(shared_from_this()));
 
       // if (first)
       // {

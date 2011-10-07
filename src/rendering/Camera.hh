@@ -263,6 +263,9 @@ namespace gazebo
       /// \brief Set the camera to track a scene node
       public: void TrackVisual( const std::string &_visualName);
 
+      /// \brief Get the render texture
+      public: Ogre::Texture *GetRenderTexture() const;
+
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
       /// \brief Attach the camera to a visual

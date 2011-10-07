@@ -1080,3 +1080,11 @@ bool Camera::TrackVisualImpl( VisualPtr _visual )
   }
   return true;
 }
+
+/// \brief Get the render texture
+Ogre::Texture *Camera::GetRenderTexture() const
+{
+  return this->renderTexture;
+}
+
+

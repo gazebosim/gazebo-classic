@@ -7,8 +7,10 @@
 #include "common/Events.hh"
 
 #include "gazebo_config.h"
-#include "msgs/MessageTypes.hh"
 #include "math/MathTypes.hh"
+
+#include "rendering/RenderTypes.hh"
+#include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
 
 namespace Ogre
@@ -45,21 +47,22 @@ namespace gazebo
       public: bool HandleMouseEvent( const common::MouseEvent &_evt);
 
       /// \brief Load a CEGUI layout file
-      public: CEGUI::Window *LoadLayout( const std::string &_filename );
+      public: void LoadLayout( const std::string &_filename );
 
-      private: void OnConfig( const boost::shared_ptr<msgs::GUIOverlayConfig const> &_msg);
+      public: bool AttachCameraToImage(CameraPtr &_camera, 
+                  const std::string &_windowName);
 
       private: void PreRender();
+
+      /// Load a CEGUI layout file
+      private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
 
 #ifdef HAVE_CEGUI
       private: CEGUI::OgreRenderer *guiRenderer;
 #endif
 
-      private: transport::NodePtr node;  
-      private: transport::SubscriberPtr configSub;  
-
       private: std::vector<event::ConnectionPtr> connections;
-      private: boost::shared_ptr<msgs::GUIOverlayConfig const> configMsg;
+      private: std::string layoutFilename;
     };
   }
 }

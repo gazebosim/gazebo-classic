@@ -412,7 +412,7 @@ double ODEPhysics::GetStepTime()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new body
-LinkPtr ODEPhysics::CreateLink(ModelPtr &_parent)
+LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)
     gzthrow("Link must have a parent\n");
