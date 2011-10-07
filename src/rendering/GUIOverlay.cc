@@ -3,7 +3,9 @@
 
 #ifdef HAVE_CEGUI
 #include "CEGUI/CEGUI.h"
+#ifdef HAVE_CEGUI_OGRE
 #include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
+#endif
 #endif
 
 #include "rendering/ogre.h"
@@ -25,14 +27,14 @@ GUIOverlay::GUIOverlay()
 
 GUIOverlay::~GUIOverlay()
 {
-#ifdef HAVE_CEGUI
+#ifdef HAVE_CEGUI_OGRE
   CEGUI::OgreRenderer::destroySystem();
 #endif
 }
 
 void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
 {
-#ifdef HAVE_CEGUI
+#ifdef HAVE_CEGUI_OGRE
   this->guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*_renderTarget);
 
   CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
@@ -173,6 +175,7 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
     return false;
   }
 
+#ifdef HAVE_CEGUI_OGRE
   Ogre::TexturePtr texPtr(_camera->GetRenderTexture());
   CEGUI::Texture &guiTex = this->guiRenderer->createTexture(
       texPtr );
@@ -186,5 +189,6 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
 
   window->setProperty("Image", CEGUI::PropertyHelper::imageToString(&imageSet.getImage("RTTImage")));
 
+#endif
   return true;
 }

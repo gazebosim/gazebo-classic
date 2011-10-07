@@ -45,12 +45,21 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(CEGUI CEGUI-OGRE)
+  pkg_check_modules(CEGUI CEGUI)
   if (NOT CEGUI_FOUND)
-    BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
+    BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
     set (HAVE_CEGUI FALSE)
   else()
     set (HAVE_CEGUI TRUE)
+    message (STATUS "Looking for CEGUI, found")
+  endif()
+
+  pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
+  if (NOT CEGUI_OGRE_FOUND)
+    BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
+    set (HAVE_CEGUI_OGRE FALSE)
+  else()
+    set (HAVE_CEGUI_OGRE TRUE)
     message (STATUS "Looking for CEGUI-OGRE, found")
   endif()
 

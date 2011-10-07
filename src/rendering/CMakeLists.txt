@@ -7,6 +7,8 @@ include_directories (
   ${OGRE_INCLUDE_DIRS}
   ${CEGUI_include_dirs}
   ${CEGUI_INCLUDE_DIRS}
+  ${CEGUI_OGRE_include_dirs}
+  ${CEGUI_OGRE_INCLUDE_DIRS}
 )
 
 set (sources MovableText.cc
@@ -72,6 +74,7 @@ target_link_libraries( gazebo_rendering gazebo_common
                                         ${ogre_libraries} 
                                         ${OPENGL_LIBRARIES} 
                                         ${CEGUI_LIBRARIES}
+                                        ${CEGUI_OGRE_LIBRARIES}
                                         X11 )
 INSTALL_LIBRARY(gazebo_rendering)
 INSTALL_INCLUDES("rendering" ${headers})
