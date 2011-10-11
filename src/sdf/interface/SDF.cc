@@ -309,9 +309,7 @@ void Element::PrintValues(std::string _prefix)
 std::string Element::ToString(const std::string &_prefix) const
 {
   std::ostringstream out;
-  out << _prefix << "<gazebo version='" << SDF_VERSION << "'>\n";
   this->ToString(_prefix, out);
-  out << _prefix << "</gazebo>\n";
   return out.str();
 }
 
@@ -634,7 +632,17 @@ void SDF::PrintValues()
 
 std::string SDF::ToString() const
 {
-  return this->root->ToString("");
+  std::string result;
+
+  if (this->root->GetName() != "gazebo")
+    result = std::string("<gazebo version='") + SDF_VERSION + "'>";
+
+  result += this->root->ToString("");
+
+  if (this->root->GetName() != "gazebo")
+    result += "</gazebo>";
+
+  return result;
 }
 
 void Element::Update()

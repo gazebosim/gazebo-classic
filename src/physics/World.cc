@@ -792,6 +792,8 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
 
   if (_msg->has_sdf())
   {
+    gzdbg << "OnFactoryMsg readString\n";
+    gzdbg << _msg->sdf() << "\n";
     sdf::readString( _msg->sdf(), factorySDF );
   }
   else

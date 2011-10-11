@@ -12,6 +12,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/Visual.hh"
 #include "gui/Gui.hh"
+#include "gui/GuiEvents.hh"
 
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
@@ -113,6 +114,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
   {
     std::string path, filename;
 
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+
     if (_item->parent())
       path = _item->parent()->text(0).toStdString() + "/";
 
@@ -186,6 +189,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
     selectMsg.set_name( modelName );
     selectMsg.set_selected(true);
     this->selectionPub->Publish(selectMsg);
+
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
   }
 }
 
