@@ -236,22 +236,12 @@ void Camera::Update()
   if (this->sceneNode)
   {
     Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-
-    this->pose.pos.x = v.x;
-    this->pose.pos.y = v.y;
-    this->pose.pos.z = v.z;
   }
 
   if (this->pitchNode)
   {
     Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-
-    this->pose.rot.w = q.w;
-    this->pose.rot.x = q.x;
-    this->pose.rot.y = q.y;
-    this->pose.rot.z = q.z;
   }
-  
 
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
@@ -351,47 +341,52 @@ void Camera::PostRender()
 // Get the global pose of the camera
 math::Pose Camera::GetWorldPose()
 {
-  this->pose.pos = Conversions::Convert(this->camera->getRealPosition());
-  this->pose.rot = Conversions::Convert(this->camera->getRealOrientation());
-  return this->pose;
+  return math::Pose( this->GetWorldPosition(),  this->GetWorldRotation());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the camera position in the world
 math::Vector3 Camera::GetWorldPosition() const
 {
-  Ogre::Vector3 camPos = this->camera->getRealPosition();
-  return math::Vector3(camPos.x,camPos.y,camPos.z);
+  return Conversions::Convert( this->sceneNode->_getDerivedPosition() );
+}
+
+math::Quaternion Camera::GetWorldRotation() const
+{
+  math::Vector3 sRot, pRot;
+
+  sRot = Conversions::Convert(this->sceneNode->getOrientation()).GetAsEuler();
+  pRot = Conversions::Convert(this->pitchNode->getOrientation()).GetAsEuler();
+
+  return math::Quaternion( sRot.x, pRot.y, sRot.z );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the global pose of the camera
-void Camera::SetWorldPose(const math::Pose &pose_)
+void Camera::SetWorldPose(const math::Pose &_pose)
 {
-  this->pose = pose_;
-  this->pose.Correct();
-  this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
-  this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
+  this->SetWorldPosition( _pose.pos );
+  this->SetWorldRotation( _pose.rot );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world position
-void Camera::SetWorldPosition(const math::Vector3 &pos)
+void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  this->pose.pos = pos;
-  this->pose.Correct();
-  
-  this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
+  this->sceneNode->setPosition( _pos.x, _pos.y, _pos.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world orientation
-void Camera::SetWorldRotation(const math::Quaternion &quant)
+void Camera::SetWorldRotation(const math::Quaternion &_quant)
 {
-  this->pose.rot = quant;
-  this->pose.Correct();
+  math::Quaternion p, s;
+  math::Vector3 rpy = _quant.GetAsEuler();
+  p.SetFromEuler( math::Vector3(0,rpy.y, 0) );
+  s.SetFromEuler( math::Vector3(rpy.x, 0, rpy.z) );
 
-  this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
+  this->sceneNode->setOrientation( Ogre::Quaternion(s.w, s.x, s.y, s.z ));
+  this->pitchNode->setOrientation( Ogre::Quaternion(p.w, p.x, p.y, p.z ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -621,6 +616,13 @@ void Camera::SetAspectRatio( float ratio )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get the apect ratio 
+float Camera::GetAspectRatio() const
+{
+  return this->camera->getAspectRatio();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the viewport up vector
 math::Vector3 Camera::GetUp()
 {
@@ -811,16 +813,17 @@ void Camera::ShowWireframe(bool s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get a world space ray as cast from the camer through the viewport
-void Camera::GetCameraToViewportRay(int screenx, int screeny,
-                                        math::Vector3 &origin, math::Vector3 &dir)
+/// Get a world space ray as cast from the camera through the viewport
+void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
+                                    math::Vector3 &_origin, 
+                                    math::Vector3 &_dir)
 {
   Ogre::Ray ray = this->camera->getCameraToViewportRay(
-      (float)screenx / this->GetViewportWidth(),
-      (float)screeny / this->GetViewportHeight());
+      (float)_screenx / this->GetViewportWidth(),
+      (float)_screeny / this->GetViewportHeight());
 
-  origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
-  dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
+  _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
+  _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
 }
 
 
@@ -980,19 +983,25 @@ void Camera::CreateCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get point on a plane
-math::Vector3 Camera::GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm, double d)
+bool Camera::GetWorldPointOnPlane(int _x, int _y, 
+                                           const math::Vector3 &_planeNorm, 
+                                           double _d,
+                                           math::Vector3 &_result)
 {
   math::Vector3 origin, dir;
   double dist;
 
   // Cast two rays from the camera into the world
-  this->GetCameraToViewportRay(x, y, origin, dir);
+  this->GetCameraToViewportRay(_x, _y, origin, dir);
 
-  dist = origin.GetDistToPlane(dir, planeNorm, d);
+  dist = origin.GetDistToPlane(dir, _planeNorm, _d);
 
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  return origin + dir * dist; 
+  _result = origin + dir * dist;
+
+  if (dist != -1)
+    return true;
+  else
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1087,4 +1096,7 @@ Ogre::Texture *Camera::GetRenderTexture() const
   return this->renderTexture;
 }
 
-
+math::Vector3 Camera::GetDirection() const
+{
+  return Conversions::Convert( this->camera->getDerivedDirection() );
+}

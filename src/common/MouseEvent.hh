@@ -47,6 +47,9 @@ namespace gazebo
 
       public: EventType type;
       public: unsigned int buttons;
+
+      public: bool shift;
+      public: bool control;
     };
     /// \}
   }

@@ -15,6 +15,7 @@
 #include "rendering/UserCamera.hh"
 #include "rendering/SelectionObj.hh"
 #include "rendering/OrbitViewController.hh"
+#include "rendering/FPSViewController.hh"
 
 #include "gui/Gui.hh"
 #include "gui/GuiEvents.hh"
@@ -53,6 +54,14 @@ GLWidget::GLWidget( QWidget *parent )
   this->connections.push_back( 
       gui::Events::ConnectCreateEntitySignal( 
         boost::bind(&GLWidget::OnCreateEntity, this, _1) ) );
+
+  this->connections.push_back( 
+      gui::Events::ConnectFPSSignal( 
+        boost::bind(&GLWidget::OnFPS, this) ) );
+
+  this->connections.push_back( 
+      gui::Events::ConnectOrbitSignal( 
+        boost::bind(&GLWidget::OnOrbit, this) ) );
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -142,6 +151,9 @@ void GLWidget::keyPressEvent( QKeyEvent *_event)
     g_fullscreen = !g_fullscreen;
     gui::Events::fullScreenSignal(g_fullscreen);
   }
+
+  this->mouseEvent.control = this->keyModifiers & Qt::ControlModifier ? true : false;
+  this->mouseEvent.shift = this->keyModifiers & Qt::ShiftModifier ? true : false;
 }
 
 void GLWidget::keyReleaseEvent( QKeyEvent *_event)
@@ -150,6 +162,9 @@ void GLWidget::keyReleaseEvent( QKeyEvent *_event)
 
   if (!(this->keyModifiers & Qt::ControlModifier))
     this->setCursor(Qt::ArrowCursor);
+
+  this->mouseEvent.control = this->keyModifiers & Qt::ControlModifier ? true : false;
+  this->mouseEvent.shift = this->keyModifiers & Qt::ShiftModifier ? true : false;
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -356,7 +371,8 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   this->scene =_scene;
 
   this->userCamera->SetWorldPosition( math::Vector3(-5,0,5) );
-  this->userCamera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+  //this->userCamera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+  this->userCamera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, 0, 0) );
 
   if (this->windowId >= 0)
     rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
@@ -436,6 +452,17 @@ void GLWidget::OnCreateEntity( const std::string &_type )
   this->CreateEntity(_type);
 }
 
+void GLWidget::OnFPS()
+{
+  this->userCamera->SetViewController(
+      rendering::FPSViewController::GetTypeString());
+}
+
+void GLWidget::OnOrbit()
+{
+  this->userCamera->SetViewController(rendering::OrbitViewController::GetTypeString());
+}
+
 void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
 {
   math::Vector3 planeNorm, planeNorm2;
@@ -457,11 +484,17 @@ void GLWidget::RotateEntity( rendering::VisualPtr &_vis )
   planeNorm = pose.rot.RotateVector(ray);
   double d = -pose.pos.GetDotProd(planeNorm);
 
-  p1 = this->userCamera->GetWorldPointOnPlane( this->mouseEvent.pos.x,
-       this->mouseEvent.pos.y, planeNorm, d);
+  if (!this->userCamera->GetWorldPointOnPlane( this->mouseEvent.pos.x,
+       this->mouseEvent.pos.y, planeNorm, d, p1))
+  {
+    gzerr << "Invalid mouse point\n";
+  }
 
-  p2 = this->userCamera->GetWorldPointOnPlane( this->mouseEvent.prevPos.x,
-       this->mouseEvent.prevPos.y, planeNorm, d);
+  if (!this->userCamera->GetWorldPointOnPlane( this->mouseEvent.prevPos.x,
+       this->mouseEvent.prevPos.y, planeNorm, d, p2))
+  {
+    gzerr << "Invalid mouse point\n";
+  }
 
   // Get point vectors relative to the entity's pose
   a = p1 - _vis->GetWorldPose().pos;

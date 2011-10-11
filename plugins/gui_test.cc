@@ -17,6 +17,9 @@
 #include <boost/bind.hpp>
 
 #include "gui/Gui.hh"
+#include "rendering/Scene.hh"
+#include "rendering/Camera.hh"
+#include "rendering/RenderEngine.hh"
 #include "rendering/UserCamera.hh"
 #include "rendering/GUIOverlay.hh"
 #include "gazebo.h"
@@ -30,20 +33,52 @@ namespace gazebo
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init();
 
+      this->connections.push_back( 
+          event::Events::ConnectPreRenderSignal( 
+            boost::bind(&GUITest::PreRender, this) ) );
+
+
     }
+
+    private: void PreRender()
+             {
+               static bool connected = false;
+
+               if (!connected)
+               {
+                 rendering::UserCameraPtr userCam = gui::get_active_camera();
+                 rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene("default");
+                 if (!scene)
+                   gzerr << "Unable to find scene[default]\n";
+
+                 this->camera = scene->CreateCamera("my_camera");
+                 this->camera->Load();
+                 this->camera->Init();
+                 this->camera->CreateRenderTexture("help_me");
+
+                 if (!camera)
+                   gzerr << "Unable to find camera[camera]\n";
+
+                 userCam->GetGUIOverlay()->AttachCameraToImage( this->camera, "Root/CameraView");
+
+                 connected = true;
+               }
+
+             }
 
     private: void Init()
     {
-      rendering::UserCameraPtr camera = gui::get_active_camera();
-      if (camera && camera->GetGUIOverlay())
+      rendering::UserCameraPtr userCam = gui::get_active_camera();
+      if (userCam && userCam->GetGUIOverlay())
       {
-        camera->GetGUIOverlay()->LoadLayout( "gui_test.layout" );
+        userCam->GetGUIOverlay()->LoadLayout( "gui_test.layout" );
       }
 
-      //camera->GetGUIOverlay()->AttachCameraToImage( "camera", "Root/CameraView");
     }
 
     private: transport::NodePtr node;
+    private: std::vector<event::ConnectionPtr> connections;
+    private: rendering::CameraPtr camera;
   };
   
   // Register this plugin with the simulator

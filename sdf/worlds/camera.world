@@ -57,7 +57,7 @@
             <horizontal_fov angle="1.04719755"/>
             <image width="640" height="480" format="R8G8B8"/>
             <clip near="0.1" far="50"/>
-            <save enabled="true" path="/tmp/camera"/>
+            <save enabled="false" path="/tmp/camera"/>
           </camera>
         </sensor>
       </link>

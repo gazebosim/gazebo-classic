@@ -56,6 +56,8 @@ namespace gazebo
 
       private: void OnMoveMode(bool mode);
       private: void OnCreateEntity( const std::string &_type );
+      private: void OnFPS();
+      private: void OnOrbit();
 
       private: void RotateEntity( rendering::VisualPtr &_vis );
       private: void TranslateEntity( rendering::VisualPtr &_vis );

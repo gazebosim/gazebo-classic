@@ -38,6 +38,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~OrbitViewController();
   
+      public: virtual void Init();
+
       /// \brief Update
       public: virtual void Update();
   
@@ -49,6 +51,9 @@ namespace gazebo
   
       /// \brief Translate the focal point
       private: void Translate(math::Vector3 vec);
+
+      /// \brief Zoom the camera
+      private: void Zoom(float _amount);
   
       /// \brief Normalize yaw value
       private: void NormalizeYaw(float &v);
@@ -60,7 +65,7 @@ namespace gazebo
       private: float distance;
       private: math::Vector3 focalPoint;
 
-      private: Visual *refVisual;
+      private: VisualPtr refVisual;
     };
     /// \}
   }

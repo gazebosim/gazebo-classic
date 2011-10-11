@@ -13,6 +13,7 @@ add_subdirectory(kitchen)
 add_subdirectory(kitchen2)
 add_subdirectory(stovetop)
 add_subdirectory(saucepan)
+add_subdirectory(people)
 
 set (files column.mesh
            geosphere4500.mesh

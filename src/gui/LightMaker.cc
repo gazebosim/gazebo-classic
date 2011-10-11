@@ -76,8 +76,12 @@ void LightMaker::OnMousePush(const common::MouseEvent &_event)
   math::Vector3 norm, point;
   norm.Set(0,0,1);
 
-  point = this->camera->GetWorldPointOnPlane(_event.pressPos.x, 
-      _event.pressPos.y, norm, 0);
+  if (!this->camera->GetWorldPointOnPlane(_event.pressPos.x, 
+        _event.pressPos.y, norm, 0, point))
+  {
+    gzerr << "Inavlid mouse point\n";
+    return;
+  }
 
   msgs::Set(this->msg.mutable_pose()->mutable_position(), point);
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(), orient);

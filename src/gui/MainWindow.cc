@@ -238,6 +238,16 @@ void MainWindow::ViewFullScreen()
   gui::Events::fullScreenSignal(g_fullscreen);
 }
 
+void MainWindow::ViewFPS()
+{
+  gui::Events::fpsSignal();
+}
+
+void MainWindow::ViewOrbit()
+{
+  gui::Events::orbitSignal();
+}
+
 void MainWindow::CreateActions()
 {
   this->newAct = new QAction(tr("&New"), this);
@@ -328,6 +338,13 @@ void MainWindow::CreateActions()
   this->viewFullScreenAct->setStatusTip(tr("View Full Screen(F-11 to exit)"));
   connect(this->viewFullScreenAct, SIGNAL(triggered()), this, SLOT(ViewFullScreen()));
 
+  this->viewFPSAct = new QAction(tr("FPS View Control"), this);
+  this->viewFPSAct->setStatusTip(tr("First Person Shooter View Style"));
+  connect(this->viewFPSAct, SIGNAL(triggered()), this, SLOT(ViewFPS()));
+
+  this->viewOrbitAct = new QAction(tr("Orbit View Control"), this);
+  this->viewOrbitAct->setStatusTip(tr("Orbit View Style"));
+  connect(this->viewOrbitAct, SIGNAL(triggered()), this, SLOT(ViewOrbit()));
 }
 
 void MainWindow::CreateMenus()
@@ -345,6 +362,8 @@ void MainWindow::CreateMenus()
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
   this->viewMenu->addAction(this->viewFullScreenAct);
+  this->viewMenu->addAction(this->viewFPSAct);
+  this->viewMenu->addAction(this->viewOrbitAct);
 
   this->menuBar()->addSeparator();
 

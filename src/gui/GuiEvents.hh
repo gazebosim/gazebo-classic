@@ -59,6 +59,25 @@ namespace gazebo
       public: static void DisconnectFullScreenSignal( event::ConnectionPtr subscriber)
               { fullScreenSignal.Disconnect(subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the view FPS signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectFPSSignal(T subscriber)
+              { return fpsSignal.Connect(subscriber); }
+
+      public: static void DisconnectFPSSignal( event::ConnectionPtr subscriber)
+              { fpsSignal.Disconnect(subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the view Orbit signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectOrbitSignal(T subscriber)
+              { return orbitSignal.Connect(subscriber); }
+
+      public: static void DisconnectOrbitSignal( event::ConnectionPtr subscriber)
+              { orbitSignal.Disconnect(subscriber); }
+
+
 
       /// Signal that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveModeSignal;
@@ -68,6 +87,8 @@ namespace gazebo
 
       public: static event::EventT<void (std::string)> createEntitySignal;
       public: static event::EventT<void (bool)> fullScreenSignal;
+      public: static event::EventT<void ()> fpsSignal;
+      public: static event::EventT<void ()> orbitSignal;
     };
   }
 }

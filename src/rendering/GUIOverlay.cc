@@ -3,9 +3,7 @@
 
 #ifdef HAVE_CEGUI
 #include "CEGUI/CEGUI.h"
-#ifdef HAVE_CEGUI_OGRE
 #include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
-#endif
 #endif
 
 #include "rendering/ogre.h"
@@ -27,14 +25,14 @@ GUIOverlay::GUIOverlay()
 
 GUIOverlay::~GUIOverlay()
 {
-#ifdef HAVE_CEGUI_OGRE
+#ifdef HAVE_CEGUI
   CEGUI::OgreRenderer::destroySystem();
 #endif
 }
 
 void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
 {
-#ifdef HAVE_CEGUI_OGRE
+#ifdef HAVE_CEGUI
   this->guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*_renderTarget);
 
   CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
@@ -120,7 +118,7 @@ void GUIOverlay::LoadLayout( const std::string &_filename )
 void GUIOverlay::PreRender()
 {
 #ifdef HAVE_CEGUI
-  if (!this->layoutFilename.empty())
+  if (this->IsInitialized() && !this->layoutFilename.empty())
   {
     this->LoadLayoutImpl( this->layoutFilename );
     this->layoutFilename.clear();
@@ -157,6 +155,16 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl( const std::string &_filename )
 }
 #endif
 
+void GUIOverlay::Resize( unsigned int _width, unsigned int _height )
+{
+  this->guiRenderer->setDisplaySize( CEGUI::Size(_width, _height) );
+
+  CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
+
+  CEGUI::Window *rootWindow = windowManager->getWindow("root");
+  rootWindow->setArea( CEGUI::UDim(0,0), CEGUI::UDim(0,0), CEGUI::UDim(1,0), CEGUI::UDim(1,0));
+}
+
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_windowName)
 {
 #ifdef HAVE_CEGUI
@@ -182,7 +190,7 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
     return false;
   }
 
-#ifdef HAVE_CEGUI_OGRE
+#ifdef HAVE_CEGUI
   Ogre::TexturePtr texPtr(_camera->GetRenderTexture());
   CEGUI::Texture &guiTex = this->guiRenderer->createTexture(
       texPtr );

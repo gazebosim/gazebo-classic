@@ -8,9 +8,9 @@
     </inertial>
 
     <collision name="surface_1">
-      <origin pose="0 0 0.8 0 0 0"/>
+      <origin pose="0 0 0.1 0 0 0"/>
       <geometry>
-        <box size="1.0 4.0 0.1"/>
+        <box size="1.0 0.2 0.1"/>
       </geometry>
     </collision>
 

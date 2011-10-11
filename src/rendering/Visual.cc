@@ -1000,15 +1000,15 @@ math::Pose Visual::GetPose() const
 
 void Visual::SetWorldPose(const math::Pose _pose)
 {
-  Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
 
-  vpos.x = _pose.pos.x;
-  vpos.y = _pose.pos.y;
-  vpos.z = _pose.pos.z;
-
-  this->sceneNode->_setDerivedPosition( vpos );
+  this->SetWorldPosition( _pose.pos );
   this->sceneNode->_setDerivedOrientation( vquatern );
+}
+
+void Visual::SetWorldPosition(const math::Vector3 &_pos)
+{
+  this->sceneNode->_setDerivedPosition( Conversions::Convert(_pos) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

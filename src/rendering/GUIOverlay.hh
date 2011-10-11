@@ -52,6 +52,7 @@ namespace gazebo
       public: bool AttachCameraToImage(CameraPtr &_camera, 
                   const std::string &_windowName);
 
+      public: void Resize( unsigned int _width, unsigned int _height );
       private: void PreRender();
 
 #ifdef HAVE_CEGUI
@@ -59,7 +60,7 @@ namespace gazebo
       private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
 #endif
 
-#ifdef HAVE_CEGUI_OGRE
+#ifdef HAVE_CEGUI
       private: CEGUI::OgreRenderer *guiRenderer;
 #endif
 

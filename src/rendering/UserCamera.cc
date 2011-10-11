@@ -61,9 +61,11 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   this->connections.push_back( event::Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
   this->animState = NULL;
 
-  this->viewController = new FPSViewController(this);
-
   this->gui = new GUIOverlay();
+
+  this->orbitViewController = new OrbitViewController(this);
+  this->fpsViewController = new FPSViewController(this);
+  this->viewController = this->fpsViewController;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +78,8 @@ UserCamera::~UserCamera()
     this->visual = NULL;
   }
 
-  delete this->viewController;
+  delete this->orbitViewController;
+  delete this->fpsViewController;
 
   this->connections.clear();
 }
@@ -257,15 +260,17 @@ void UserCamera::SetViewController( const std::string &type )
   if (this->viewController->GetTypeString() == type)
     return;
 
-  delete this->viewController;
-  this->viewController = NULL;
+  //delete this->viewController;
+  //this->viewController = NULL;
 
   if (type == OrbitViewController::GetTypeString())
-    this->viewController = new OrbitViewController(this);
+    this->viewController = this->orbitViewController;
   else if (type == FPSViewController::GetTypeString())
-    this->viewController = new FPSViewController(this);
+    this->viewController = this->fpsViewController;
   else
     gzthrow("Invalid view controller type: " + type );
+
+  this->viewController->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,6 +287,9 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
+
+    if (this->gui)
+      this->gui->Resize( this->viewport->getActualWidth(), this->viewport->getActualHeight());
   }
 
 }

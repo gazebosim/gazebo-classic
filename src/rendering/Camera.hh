@@ -113,15 +113,18 @@ namespace gazebo
   
       /// \brief Get the camera position in the world
       public: math::Vector3 GetWorldPosition() const;
+
+      /// \brief Get the camera's orientation in the world
+      public: math::Quaternion GetWorldRotation() const;
   
       /// \brief Set the global pose of the camera
-      public: void SetWorldPose(const math::Pose &pose);
+      public: void SetWorldPose(const math::Pose &_pose);
   
       /// \brief Set the world position
-      public: void SetWorldPosition(const math::Vector3 &pos);
+      public: void SetWorldPosition(const math::Vector3 &_pos);
   
       /// \brief Set the world orientation
-      public: void SetWorldRotation(const math::Quaternion &quant);
+      public: void SetWorldRotation(const math::Quaternion &_quant);
   
     
       /// \brief Translate the camera
@@ -211,7 +214,10 @@ namespace gazebo
   
       /// \brief Set the aspect ratio
       public: void SetAspectRatio( float ratio );
-  
+
+      /// \brief Get the apect ratio 
+      public: float GetAspectRatio() const;
+
       /// \brief Set whether the user can move the camera via the GUI
       public: void SetUserMovable( bool movable );
   
@@ -253,7 +259,10 @@ namespace gazebo
       public: Scene *GetScene() const;
   
       /// \brief Get point on a plane
-      public: math::Vector3 GetWorldPointOnPlane(int x, int y, math::Vector3 planeNorm, double d);
+      /// \return True if a valid point was found
+      public: bool GetWorldPointOnPlane(int _x, int _y, 
+                  const math::Vector3 &_planeNorm, double _d, 
+                  math::Vector3 &_result);
   
       public: virtual void SetRenderTarget( Ogre::RenderTarget *target );
 
@@ -265,6 +274,9 @@ namespace gazebo
 
       /// \brief Get the render texture
       public: Ogre::Texture *GetRenderTexture() const;
+
+      /// \brief Get the camera's direction vector
+      public: math::Vector3 GetDirection() const;
 
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
@@ -284,7 +296,6 @@ namespace gazebo
       private: void CreateCamera();
   
       private: std::string name;
-      private: math::Pose pose;
       protected: sdf::ElementPtr sdf;
 
       protected: unsigned int windowId;

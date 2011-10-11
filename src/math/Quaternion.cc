@@ -41,6 +41,20 @@ Quaternion::Quaternion( const double &w, const double &x, const double &y, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Constructor
+Quaternion::Quaternion( const double &_roll, const double &_pitch, const double &_yaw )
+{
+  this->SetFromEuler(Vector3(_roll, _pitch, _yaw));
+}
+
+ ////////////////////////////////////////////////////////////////////////////////
+/// Constructor
+Quaternion::Quaternion( const Vector3 &_rpy)
+{
+  this->SetFromEuler(_rpy);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Copy Constructor
 Quaternion::Quaternion( const Quaternion &qt )
 {

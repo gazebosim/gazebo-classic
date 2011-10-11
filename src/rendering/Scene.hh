@@ -24,7 +24,7 @@
 #include "sdf/sdf.h"
 #include "msgs/msgs.h"
 
-#include "rendering/ogre.h"
+//#include "rendering/ogre.h"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
@@ -38,6 +38,15 @@ namespace Ogre
   class SceneManager;
   class RaySceneQuery;
   class Node;
+  class Entity;
+  class Mesh;
+  class Vector3;
+  class Quaternion;
+}
+
+namespace boost
+{
+  class mutex;
 }
 
 namespace gazebo
@@ -115,6 +124,9 @@ namespace gazebo
   
       /// \brief Get a camera
       public: CameraPtr GetCamera(unsigned int index) const;
+
+      /// \brief Get a camera by name
+      public: CameraPtr GetCamera( const std::string &_name ) const;
   
       /// \brief Create a user camera
       public: UserCameraPtr CreateUserCamera(const std::string &name);
@@ -208,7 +220,7 @@ namespace gazebo
 
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
-      private: void GetMeshInformation(const Ogre::MeshPtr mesh,
+      private: void GetMeshInformation(const Ogre::Mesh *mesh,
                                        size_t &vertex_count,
                                        Ogre::Vector3* &vertices,
                                        size_t &index_count,

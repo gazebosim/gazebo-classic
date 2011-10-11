@@ -394,7 +394,21 @@ CameraPtr Scene::GetCamera(unsigned int index) const
   return cam;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get a camera by name
+CameraPtr Scene::GetCamera( const std::string &_name ) const
+{
+  CameraPtr result;
+  std::vector<CameraPtr>::const_iterator iter;
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  {
+    if ((*iter)->GetName() == _name)
+      result = *iter;
+  }
 
+  return result;
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a user camera
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
@@ -540,7 +554,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       unsigned long *indices;
 
       // Get the mesh information
-      this->GetMeshInformation( pentity->getMesh(), vertex_count, 
+      this->GetMeshInformation( pentity->getMesh().get(), vertex_count, 
           vertices, index_count, indices,             
           pentity->getParentNode()->_getDerivedPosition(),
           pentity->getParentNode()->_getDerivedOrientation(),
@@ -732,7 +746,7 @@ std::string Scene::GetIdString() const
 ////////////////////////////////////////////////////////////////////////////////
 // Get the mesh information for the given mesh.
 // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
-void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
+void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
                                size_t &vertex_count,
                                Ogre::Vector3* &vertices,
                                size_t &index_count,

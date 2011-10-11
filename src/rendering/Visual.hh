@@ -176,6 +176,7 @@ namespace gazebo
  
       /// \brief Set the world pose of the visual 
       public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPosition(const math::Vector3 &_pos);
 
       /// \brief Return the scene Node of this visual entity
       public: Ogre::SceneNode *GetSceneNode() const;

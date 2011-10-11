@@ -46,6 +46,8 @@ namespace gazebo
       private slots: void CreateDirectionalLight();
       private slots: void InsertModel();
       private slots: void ViewFullScreen();
+      private slots: void ViewFPS();
+      private slots: void ViewOrbit();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool mode);
@@ -83,6 +85,8 @@ namespace gazebo
 
       //private: QAction *insertModelAct;
       private: QAction *viewFullScreenAct;
+      private: QAction *viewFPSAct;
+      private: QAction *viewOrbitAct;
 
       private: TimePanel *timePanel;
       private: RenderWidget *renderWidget;

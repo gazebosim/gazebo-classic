@@ -37,6 +37,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ViewController();
   
+      public: virtual void Init() = 0;
       public: virtual void Update() = 0;
   
       /// \brief Handle a mouse event

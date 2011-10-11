@@ -86,7 +86,9 @@ namespace gazebo
     
       /// \brief Get distance to a plane, given a direction. Treats this 
       ///        vector as a ray
-      public: double GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const;
+      public: double GetDistToPlane(const Vector3 &_dir, 
+                                    const Vector3 &_planeNormal, 
+                                    double _d) const;
     
       /// \brief Set this vector's components to the maximum of itself and the 
       ///        passed in vector

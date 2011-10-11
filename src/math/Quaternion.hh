@@ -51,8 +51,14 @@ namespace gazebo
     /// \param x X param
     /// \param y Y param
     /// \param z Z param
-    public: Quaternion( const double &u, const double &x, const double &y, const double &z);
-  
+    public: Quaternion( const double &w, const double &x, const double &y, const double &z);
+
+    /// \brief Constructor
+    public: Quaternion( const double &_roll, const double &_pitch, const double &_yaw );
+
+    /// \brief Constructor
+    public: Quaternion( const Vector3 &_rpy);
+ 
     /// \brief Copy constructor
     /// \param qt Quaternion to copy
     public: Quaternion( const Quaternion &qt );

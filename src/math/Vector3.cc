@@ -21,6 +21,7 @@
  */
 
 #include <math.h>
+
 #include "math/Helpers.hh"
 #include "math/Vector3.hh"
 
@@ -175,9 +176,10 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get a distance to a plane
-double Vector3::GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const
+double Vector3::GetDistToPlane(const Vector3 &_dir, 
+                               const Vector3 &_planeNormal, double _d) const
 {
-  double denom = planeNormal.GetDotProd(dir);
+  double denom = _planeNormal.GetDotProd(_dir);
 
   if (fabs(denom) < 1e-3)
   {
@@ -186,7 +188,7 @@ double Vector3::GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const
   }
   else
   {
-    double nom = this->GetDotProd(planeNormal) + d;
+    double nom = this->GetDotProd(_planeNormal) + _d;
     double t = -(nom/denom);
     return t;
   }

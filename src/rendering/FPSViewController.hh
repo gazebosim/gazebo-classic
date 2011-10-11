@@ -35,6 +35,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~FPSViewController();
   
+      public: virtual void Init();
+
       /// \brief Update
       public: virtual void Update();
   

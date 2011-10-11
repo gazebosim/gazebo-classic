@@ -64,14 +64,14 @@ bool rendering::fini()
   return true;
 }
 
-rendering::ScenePtr rendering::create_scene(const std::string &name)
+rendering::ScenePtr rendering::create_scene(const std::string &_name)
 {
   ScenePtr scene;
 
   // Create a default scene for the gui
   try
   {
-    scene = rendering::RenderEngine::Instance()->CreateScene(name);
+    scene = rendering::RenderEngine::Instance()->CreateScene(_name);
   }
   catch (common::Exception e)
   {
@@ -80,4 +80,3 @@ rendering::ScenePtr rendering::create_scene(const std::string &name)
 
   return scene;
 }
-

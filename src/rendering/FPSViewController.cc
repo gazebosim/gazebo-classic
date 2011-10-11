@@ -40,6 +40,10 @@ FPSViewController::~FPSViewController()
 {
 }
 
+void FPSViewController::Init()
+{
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Update
 void FPSViewController::Update()

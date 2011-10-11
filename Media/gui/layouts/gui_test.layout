@@ -4,16 +4,23 @@
     <Window Type="DefaultWindow" Name="Root" >
         <Property Name="UnifiedAreaRect" Value="{{0.00195312,0},{0,0},{1.00195,0},{1,0}}" />
         <Window Type="Vanilla/StaticImage" Name="Root/CameraView" >
-            <Property Name="UnifiedAreaRect" Value="{{0.00898439,0},{0.671447,0},{0.259961,0},{0.947016,0}}" />
+          <Property Name="UnifiedSize" Value="{{0,500}, {0,500}}" />
+          <Property Name="VerticalAlignment" Value="Bottom" />
+          <Property Name="UnifiedPosition" Value="{{0,20},{0,-20}}" />
         </Window>
         <Window Type="Vanilla/Button" Name="Root/VerbButton" >
-            <Property Name="Text" >Verb
-</Property>
-            <Property Name="UnifiedAreaRect" Value="{{0.641992,0},{0.92,0},{0.791992,0},{0.98,0}}" />
+          <Property Name="Text" Value="Verb"/>
+          <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
+          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-20}}"/>
+          <Property Name="VerticalAlignment" Value="Bottom" />
+          <Property Name="HorizontalAlignment" Value="Right" />
         </Window>
         <Window Type="Vanilla/Button" Name="Root/PrepositionButton" >
             <Property Name="Text" Value="Preposition" />
-            <Property Name="UnifiedAreaRect" Value="{{0.801953,0},{0.92,0},{0.951953,0},{0.98,0}}" />
+            <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,-20},{0,-20}}"/>
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
         </Window>
     </Window>
 </GUILayout>

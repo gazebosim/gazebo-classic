@@ -112,6 +112,8 @@ namespace gazebo
       private: Visual *visual;
   
       private: ViewController *viewController;
+      private: OrbitViewController *orbitViewController;
+      private: FPSViewController *fpsViewController;
   
       private: Ogre::AnimationState *animState;
 
