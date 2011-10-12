@@ -187,10 +187,10 @@ namespace gazebo
   
       /// \brief Connect a to the add entity signal
       public: template<typename T>
-              event::ConnectionPtr ConnectEnabledSignal( T subscriber )
+              event::ConnectionPtr ConnectEnabled( T subscriber )
               { return enabledSignal.Connect(subscriber); }
   
-      public: void DisconnectEnabledSignal( event::ConnectionPtr &c )
+      public: void DisconnectEnabled( event::ConnectionPtr &c )
               { enabledSignal.Disconnect(c); }
 
       /// \brief Fill a link message
@@ -214,7 +214,7 @@ namespace gazebo
       private: event::EventT<void (bool)> enabledSignal;
       private: event::ConnectionPtr showPhysicsConnection; 
   
-      /// This flag is used to trigger the enabledSignal
+      /// This flag is used to trigger the enabled
       private: bool enabled;
 
       protected: math::Pose newPose;

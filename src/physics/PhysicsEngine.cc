@@ -101,7 +101,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
     }
     */
 
-    this->showContactConnection = event::Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
+    this->showContactConnection = event::Events::ConnectShowContacts( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
 
     // TODO: put this back in
     //this->contactLinesIter = this->contactLines.begin();

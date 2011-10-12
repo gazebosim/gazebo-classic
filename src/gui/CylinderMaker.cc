@@ -66,7 +66,7 @@ void CylinderMaker::Stop()
   delete msg;
 
   this->state = 0;
-  gui::Events::moveModeSignal(true);
+  gui::Events::moveMode(true);
 }
 
 bool CylinderMaker::IsActive() const

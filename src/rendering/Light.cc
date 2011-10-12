@@ -54,7 +54,7 @@ Light::Light(Scene *scene_)
 
   this->lightCounter++;
 
-  this->showLightsConnection = event::Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
+  this->showLightsConnection = event::Events::ConnectShowLights(boost::bind(&Light::ToggleShowVisual, this));
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/light.sdf", this->sdf );

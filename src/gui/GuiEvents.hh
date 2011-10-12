@@ -25,70 +25,70 @@ namespace gazebo
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the add entity signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectCreateEntitySignal( T subscriber )
-              { return createEntitySignal.Connect(subscriber); }
+              static event::ConnectionPtr ConnectCreateEntity( T subscriber )
+              { return createEntity.Connect(subscriber); }
 
-      public: static void DisconnectCreateEntitySignal( event::ConnectionPtr subscriber)
-              { createEntitySignal.Disconnect(subscriber); }
+      public: static void DisconnectCreateEntity( event::ConnectionPtr subscriber)
+              { createEntity.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the move mode signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectMoveModeSignal( T subscriber )
-              { return moveModeSignal.Connect(subscriber); }
+              static event::ConnectionPtr ConnectMoveMode( T subscriber )
+              { return moveMode.Connect(subscriber); }
 
-      public: static void DisconnectMoveModeSignal( event::ConnectionPtr subscriber)
-              { moveModeSignal.Disconnect(subscriber); }
+      public: static void DisconnectMoveMode( event::ConnectionPtr subscriber)
+              { moveMode.Disconnect(subscriber); }
 
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the manip mode signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectManipModeSignal( T subscriber )
-              { return manipModeSignal.Connect(subscriber); }
+              static event::ConnectionPtr ConnectManipMode( T subscriber )
+              { return manipMode.Connect(subscriber); }
 
-      public: static void DisconnectManipModeSignal( event::ConnectionPtr subscriber)
-              { manipModeSignal.Disconnect(subscriber); }
+      public: static void DisconnectManipMode( event::ConnectionPtr subscriber)
+              { manipMode.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the fullscreen signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectFullScreenSignal(T subscriber)
-              { return fullScreenSignal.Connect(subscriber); }
+              static event::ConnectionPtr ConnectFullScreen(T subscriber)
+              { return fullScreen.Connect(subscriber); }
 
-      public: static void DisconnectFullScreenSignal( event::ConnectionPtr subscriber)
-              { fullScreenSignal.Disconnect(subscriber); }
+      public: static void DisconnectFullScreen( event::ConnectionPtr subscriber)
+              { fullScreen.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the view FPS signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectFPSSignal(T subscriber)
-              { return fpsSignal.Connect(subscriber); }
+              static event::ConnectionPtr ConnectFPS(T subscriber)
+              { return fps.Connect(subscriber); }
 
-      public: static void DisconnectFPSSignal( event::ConnectionPtr subscriber)
-              { fpsSignal.Disconnect(subscriber); }
+      public: static void DisconnectFPS( event::ConnectionPtr subscriber)
+              { fps.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the view Orbit signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectOrbitSignal(T subscriber)
-              { return orbitSignal.Connect(subscriber); }
+              static event::ConnectionPtr ConnectOrbit(T subscriber)
+              { return orbit.Connect(subscriber); }
 
-      public: static void DisconnectOrbitSignal( event::ConnectionPtr subscriber)
-              { orbitSignal.Disconnect(subscriber); }
+      public: static void DisconnectOrbit( event::ConnectionPtr subscriber)
+              { orbit.Disconnect(subscriber); }
 
 
 
-      /// Signal that indicates the user is moving the camera
-      public: static event::EventT<void (bool)>  moveModeSignal;
+      ///  that indicates the user is moving the camera
+      public: static event::EventT<void (bool)>  moveMode;
 
-      /// Signal that indicates the user is manipulating an object
-      public: static event::EventT<void (bool)>  manipModeSignal;
+      ///  that indicates the user is manipulating an object
+      public: static event::EventT<void (bool)>  manipMode;
 
-      public: static event::EventT<void (std::string)> createEntitySignal;
-      public: static event::EventT<void (bool)> fullScreenSignal;
-      public: static event::EventT<void ()> fpsSignal;
-      public: static event::EventT<void ()> orbitSignal;
+      public: static event::EventT<void (std::string)> createEntity;
+      public: static event::EventT<void (bool)> fullScreen;
+      public: static event::EventT<void ()> fps;
+      public: static event::EventT<void ()> orbit;
     };
   }
 }

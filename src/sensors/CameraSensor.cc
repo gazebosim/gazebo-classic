@@ -45,7 +45,7 @@ CameraSensor::CameraSensor()
     : Sensor()
 {
 /*  this->connections.push_back( 
-      event::Events::ConnectRenderSignal( 
+      event::Events::ConnectRender( 
         boost::bind(&CameraSensor::Render, this)) );
         */
 }
@@ -135,49 +135,12 @@ void CameraSensor::SetActive(bool value)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Render new data
-/*void CameraSensor::Render()
-{
-  //if (this->active || **this->alwaysActiveP)
-  {
-    //this->lastUpdate = this->GetWorld()->GetSimTime();
-    //this->camera->Render();
-    //this->camera->PostRender();
-  }
-  
-}*/
-
-//////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void CameraSensor::Update(bool force)
 {
   Sensor::Update(force);
-
-
-  /*if (this->camera)
-  {
-    this->camera->Render();
-    this->camera->PostRender();
-  }*/
-
-  // NATY
-  //if (this->active || **this->alwaysActiveP)
-    //this->camera->Update();
-
-  // Only continue if the controller has an active interface. Or frames need
-  // to be saved
-  /*if ( (this->controller && !this->controller->IsConnected()) &&
-       !this->saveFramesP->GetValue())
-    return;
-
-  // Or skip if user sets camera to inactive
-  if (this->active)
-    this->UpdateCam();
-    */
 }
 
 void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
-  //if (_msg->header().str_id() == "world_1::camera_model")
-  //  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
 }

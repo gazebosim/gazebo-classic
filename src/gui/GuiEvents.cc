@@ -20,11 +20,11 @@
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void (std::string)> Events::createEntitySignal;
-event::EventT<void (bool)> Events::moveModeSignal;
-event::EventT<void (bool)> Events::manipModeSignal;
-event::EventT<void (bool)> Events::fullScreenSignal;
-event::EventT<void ()> Events::fpsSignal;
-event::EventT<void ()> Events::orbitSignal;
+event::EventT<void (std::string)> Events::createEntity;
+event::EventT<void (bool)> Events::moveMode;
+event::EventT<void (bool)> Events::manipMode;
+event::EventT<void (bool)> Events::fullScreen;
+event::EventT<void ()> Events::fps;
+event::EventT<void ()> Events::orbit;
 
 

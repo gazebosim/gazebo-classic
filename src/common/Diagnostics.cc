@@ -54,7 +54,7 @@ DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &name)
 void DiagnosticManager::TimerStart(DiagnosticTimer *timer)
 {
   this->timers[timer->GetName()] = Time();
-  event::Events::diagTimerStartSignal(timer->GetName());
+  event::Events::diagTimerStart(timer->GetName());
 }
 
 
@@ -63,7 +63,7 @@ void DiagnosticManager::TimerStart(DiagnosticTimer *timer)
 void DiagnosticManager::TimerStop(DiagnosticTimer *timer)
 {
   this->timers[timer->GetName()] = timer->GetElapsed();
-  event::Events::diagTimerStopSignal(timer->GetName());
+  event::Events::diagTimerStop(timer->GetName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

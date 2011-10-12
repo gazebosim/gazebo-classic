@@ -62,7 +62,7 @@ Scene::Scene(const std::string &_name)
 
   this->receiveMutex = new boost::mutex();
 
-  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
+  this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
 

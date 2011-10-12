@@ -79,11 +79,11 @@ MainWindow::MainWindow()
   this->worldPropertiesWidget = NULL;
 
   this->connections.push_back( 
-      gui::Events::ConnectFullScreenSignal( 
+      gui::Events::ConnectFullScreen( 
         boost::bind(&MainWindow::OnFullScreen, this, _1) ) );
 
   this->connections.push_back( 
-      gui::Events::ConnectMoveModeSignal( 
+      gui::Events::ConnectMoveMode( 
         boost::bind(&MainWindow::OnMoveMode, this, _1) ) );
 }
 
@@ -172,32 +172,32 @@ void MainWindow::EditWorldProperties()
 
 void MainWindow::CreateBox()
 {
-  gui::Events::createEntitySignal("box");
+  gui::Events::createEntity("box");
 }
 
 void MainWindow::CreateSphere()
 {
-  gui::Events::createEntitySignal("sphere");
+  gui::Events::createEntity("sphere");
 }
 
 void MainWindow::CreateCylinder()
 {
-  gui::Events::createEntitySignal("cylinder");
+  gui::Events::createEntity("cylinder");
 }
 
 void MainWindow::CreatePointLight()
 {
-  gui::Events::createEntitySignal("pointlight");
+  gui::Events::createEntity("pointlight");
 }
 
 void MainWindow::CreateSpotLight()
 {
-  gui::Events::createEntitySignal("spotlight");
+  gui::Events::createEntity("spotlight");
 }
 
 void MainWindow::CreateDirectionalLight()
 {
-  gui::Events::createEntitySignal("directionallight");
+  gui::Events::createEntity("directionallight");
 }
 
 void MainWindow::InsertModel()
@@ -235,17 +235,17 @@ void MainWindow::OnFullScreen(bool _value)
 void MainWindow::ViewFullScreen()
 {
   g_fullscreen = !g_fullscreen;
-  gui::Events::fullScreenSignal(g_fullscreen);
+  gui::Events::fullScreen(g_fullscreen);
 }
 
 void MainWindow::ViewFPS()
 {
-  gui::Events::fpsSignal();
+  gui::Events::fps();
 }
 
 void MainWindow::ViewOrbit()
 {
-  gui::Events::orbitSignal();
+  gui::Events::orbit();
 }
 
 void MainWindow::CreateActions()

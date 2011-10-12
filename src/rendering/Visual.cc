@@ -115,7 +115,7 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 Visual::~Visual()
 {
   if (this->preRenderConnection)
-    event::Events::DisconnectPreRenderSignal( this->preRenderConnection );
+    event::Events::DisconnectPreRender( this->preRenderConnection );
 
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter=this->lines.begin();
@@ -1133,7 +1133,7 @@ void Visual::SetRibbonTrail(bool value)
 // Add a line to the visual
 DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 {
-  this->preRenderConnection = event::Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
+  this->preRenderConnection = event::Events::ConnectPreRender( boost::bind(&Visual::Update, this) );
 
   DynamicLines *line = new DynamicLines(type);
   this->lines.push_back(line);

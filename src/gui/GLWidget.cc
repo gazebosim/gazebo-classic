@@ -48,19 +48,19 @@ GLWidget::GLWidget( QWidget *parent )
   this->setLayout(mainLayout);
 
   this->connections.push_back( 
-      gui::Events::ConnectMoveModeSignal( 
+      gui::Events::ConnectMoveMode( 
         boost::bind(&GLWidget::OnMoveMode, this, _1) ) );
 
   this->connections.push_back( 
-      gui::Events::ConnectCreateEntitySignal( 
+      gui::Events::ConnectCreateEntity( 
         boost::bind(&GLWidget::OnCreateEntity, this, _1) ) );
 
   this->connections.push_back( 
-      gui::Events::ConnectFPSSignal( 
+      gui::Events::ConnectFPS( 
         boost::bind(&GLWidget::OnFPS, this) ) );
 
   this->connections.push_back( 
-      gui::Events::ConnectOrbitSignal( 
+      gui::Events::ConnectOrbit( 
         boost::bind(&GLWidget::OnOrbit, this) ) );
 
   this->renderFrame->setMouseTracking(true);
@@ -120,12 +120,12 @@ void GLWidget::paintEvent(QPaintEvent *e)
 {
   if (this->userCamera)
   {
-    event::Events::preRenderSignal();
+    event::Events::preRender();
 
     // Tell all the cameras to render
-    event::Events::renderSignal();
+    event::Events::render();
 
-    event::Events::postRenderSignal();
+    event::Events::postRender();
   }
   e->accept();
 }
@@ -149,7 +149,7 @@ void GLWidget::keyPressEvent( QKeyEvent *_event)
   if (_event->key() == Qt::Key_F11)
   {
     g_fullscreen = !g_fullscreen;
-    gui::Events::fullScreenSignal(g_fullscreen);
+    gui::Events::fullScreen(g_fullscreen);
   }
 
   this->mouseEvent.control = this->keyModifiers & Qt::ControlModifier ? true : false;

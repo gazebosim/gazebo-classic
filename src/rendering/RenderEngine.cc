@@ -64,11 +64,11 @@ RenderEngine::RenderEngine()
 
   this->initialized = false;
 
-  this->connections.push_back( event::Events::ConnectPreRenderSignal( 
+  this->connections.push_back( event::Events::ConnectPreRender( 
         boost::bind(&RenderEngine::PreRender, this) ) );
-  this->connections.push_back( event::Events::ConnectRenderSignal( 
+  this->connections.push_back( event::Events::ConnectRender( 
         boost::bind(&RenderEngine::Render, this) ) );
-  this->connections.push_back( event::Events::ConnectPostRenderSignal( 
+  this->connections.push_back( event::Events::ConnectPostRender( 
         boost::bind(&RenderEngine::PostRender, this) ) );
 }
 

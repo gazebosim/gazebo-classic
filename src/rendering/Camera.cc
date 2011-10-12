@@ -84,10 +84,10 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->origParentNode = NULL;
 
   // Connect to the render signal
-  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Camera::Update, this) ) );
-  this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&Camera::Render, this) ) );
-  this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Camera::PostRender, this) ) );
-  this->connections.push_back( event::Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) ));
+  this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Camera::Update, this) ) );
+  this->connections.push_back( event::Events::ConnectRender( boost::bind(&Camera::Render, this) ) );
+  this->connections.push_back( event::Events::ConnectPostRender( boost::bind(&Camera::PostRender, this) ) );
+  this->connections.push_back( event::Events::ConnectShowWireframe( boost::bind(&Camera::ToggleShowWireframe, this) ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -130,30 +130,7 @@ void Camera::Load()
 
   std::string imgFmt = imageElem->GetValueString("format");
 
-  if (imgFmt == "L8")
-    this->imageFormat = (int)Ogre::PF_L8;
-  else if (imgFmt == "R8G8B8")
-    this->imageFormat = (int)Ogre::PF_BYTE_RGB;
-  else if (imgFmt == "B8G8R8")
-    this->imageFormat = (int)Ogre::PF_BYTE_BGR;
-  else if (imgFmt == "FLOAT32")
-    this->imageFormat = (int)Ogre::PF_FLOAT32_R;
-  else if (imgFmt == "FLOAT16")
-    this->imageFormat = (int)Ogre::PF_FLOAT16_R;
-  else if ( (imgFmt == "BAYER_RGGB8") ||
-            (imgFmt == "BAYER_BGGR8") ||
-            (imgFmt == "BAYER_GBRG8") ||
-            (imgFmt == "BAYER_GRBG8") )
-  {
-    // let ogre generate rgb8 images for all bayer format requests
-    // then post process to produce actual bayer images
-    this->imageFormat = (int)Ogre::PF_BYTE_RGB;
-  }
-  else
-  {
-    gzerr << "Error parsing image format (" << imgFmt << "), using default Ogre::PF_R8G8B8\n";
-    this->imageFormat = (int)Ogre::PF_R8G8B8;
-  }
+  this->imageFormat = this->GetOgrePixelFormat( imgFmt );
 
   // Create the directory to store frames
   if (this->sdf->HasElement("save") && 
@@ -331,6 +308,8 @@ void Camera::PostRender()
     {
       this->SaveFrame();
     }
+
+    this->newFrame( this->saveFrameBuffer );
   }
 
   this->newData = false;
@@ -523,12 +502,52 @@ unsigned int Camera::GetTextureHeight() const
 size_t Camera::GetImageByteSize() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  return Ogre::PixelUtil::getMemorySize(elem->GetValueInt("width"),
-                                        elem->GetValueInt("height"),
-                                        1, 
-                                        (Ogre::PixelFormat)this->imageFormat);
+  return this->GetImageByteSize(elem->GetValueInt("width"),
+                                elem->GetValueInt("height"),
+                                this->GetImageFormat());
 }
 
+// Get the image size in bytes
+size_t Camera::GetImageByteSize(unsigned int _width, unsigned int _height, 
+                                const std::string &_format)
+{
+  Ogre::PixelFormat fmt = (Ogre::PixelFormat)(Camera::GetOgrePixelFormat( _format ));
+
+  return Ogre::PixelUtil::getMemorySize(_width, _height, 1, fmt);
+
+}
+
+int Camera::GetOgrePixelFormat( const std::string &_format )
+{
+  int result;
+
+  if (_format == "L8")
+    result = (int)Ogre::PF_L8;
+  else if (_format == "R8G8B8")
+    result = (int)Ogre::PF_BYTE_RGB;
+  else if (_format == "B8G8R8")
+    result = (int)Ogre::PF_BYTE_BGR;
+  else if (_format == "FLOAT32")
+    result = (int)Ogre::PF_FLOAT32_R;
+  else if (_format == "FLOAT16")
+    result = (int)Ogre::PF_FLOAT16_R;
+  else if ( (_format == "BAYER_RGGB8") ||
+            (_format == "BAYER_BGGR8") ||
+            (_format == "BAYER_GBRG8") ||
+            (_format == "BAYER_GRBG8") )
+  {
+    // let ogre generate rgb8 images for all bayer format requests
+    // then post process to produce actual bayer images
+    result = (int)Ogre::PF_BYTE_RGB;
+  }
+  else
+  {
+    gzerr << "Error parsing image format (" << _format << "), using default Ogre::PF_R8G8B8\n";
+    result = (int)Ogre::PF_R8G8B8;
+  }
+
+  return result;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Enable or disable saving
@@ -708,14 +727,6 @@ std::string Camera::GetName() const
 // Save the current frame to disk
 void Camera::SaveFrame()
 {
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-  std::ostringstream sstream;
-  Ogre::ImageCodec::ImageData *imgData;
-  Ogre::Codec * pCodec;
-  size_t size, pos;
-
-  this->GetImageData();
-
   sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
 
@@ -730,21 +741,6 @@ void Camera::SaveFrame()
     if (system(command.c_str()) < 0)
       gzerr << "Error making directory\n";
   }
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  // Create image data structure
-  imgData  = new Ogre::ImageCodec::ImageData();
-
-  imgData->width =  imageElem->GetValueInt("width");
-  imgData->height = imageElem->GetValueInt("height");
-  imgData->depth = this->GetImageDepth();
-  imgData->format = (Ogre::PixelFormat)this->imageFormat;
-  size = this->GetImageByteSize();
-
-  // Wrap buffer in a chunk
-  Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
 
   char tmp[1024];
   if (!path.empty())
@@ -763,8 +759,37 @@ void Camera::SaveFrame()
     sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
   }
 
+  this->SaveFrame(this->saveFrameBuffer, 
+                  this->GetImageWidth(), 
+                  this->GetImageHeight(), 
+                  this->GetImageDepth(),
+                  this->GetImageFormat(), tmp );
+
+  this->saveCount++;
+}
+
+void Camera::SaveFrame(const unsigned char *_image,
+                       unsigned int _width, unsigned int _height, int _depth,
+                       const std::string &_format,
+                       const std::string &_filename)
+{
+  Ogre::ImageCodec::ImageData *imgData;
+  Ogre::Codec * pCodec;
+  size_t size, pos;
+
+  // Create image data structure
+  imgData  = new Ogre::ImageCodec::ImageData();
+  imgData->width  =  _width;
+  imgData->height = _height;
+  imgData->depth  = _depth;
+  imgData->format = (Ogre::PixelFormat)Camera::GetOgrePixelFormat(_format);
+  size = Camera::GetImageByteSize(_width, _height, _format);
+
+  // Wrap buffer in a chunk
+  Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( const_cast<unsigned char*>(_image), size, false));
+
   // Get codec
-  Ogre::String filename = tmp;
+  Ogre::String filename = _filename;
   pos = filename.find_last_of(".");
   Ogre::String extension;
 
@@ -777,9 +802,6 @@ void Camera::SaveFrame()
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
   pCodec->codeToFile(stream, filename, codecDataPtr);
-
-  this->saveCount++;
-  
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -66,7 +66,7 @@ void SphereMaker::Stop()
   this->requestPub->Publish(*msg);
   delete msg;
 
-  gui::Events::moveModeSignal(true);
+  gui::Events::moveMode(true);
   this->state = 0;
 }
 

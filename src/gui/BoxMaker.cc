@@ -70,7 +70,7 @@ void BoxMaker::Stop()
   delete msg;
 
   this->state = 0;
-  gui::Events::moveModeSignal(true);
+  gui::Events::moveMode(true);
 }
 
 bool BoxMaker::IsActive() const

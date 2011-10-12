@@ -51,8 +51,8 @@ Collision::Collision( LinkPtr link )
   this->transparency = 0;
   this->contactsEnabled = false;
 
-  this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Collision::ShowBoundingBox, this, _1) ) );
-  this->connections.push_back( this->link->ConnectEnabledSignal( boost::bind(&Collision::EnabledCB, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectShowBoundingBoxes( boost::bind(&Collision::ShowBoundingBox, this, _1) ) );
+  this->connections.push_back( this->link->ConnectEnabled( boost::bind(&Collision::EnabledCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ void Collision::AddContact(const Contact &_contact)
   this->GetParentModel()->StoreContact(
       boost::shared_dynamic_cast<Collision>(shared_from_this()), 
       _contact.Clone());
-  this->contactSignal( _contact );
+  this->contact( _contact );
 
 }           
 

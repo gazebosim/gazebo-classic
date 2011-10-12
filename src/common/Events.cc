@@ -19,30 +19,30 @@
 using namespace gazebo;
 using namespace event;
 
-EventT<void (bool)> Events::pauseSignal;
-EventT<void ()> Events::stepSignal;
-EventT<void ()> Events::quitSignal;
+EventT<void (bool)> Events::pause;
+EventT<void ()> Events::step;
+EventT<void ()> Events::quit;
 
-EventT<void (std::string)> Events::entityCreatedSignal;
-EventT<void (std::string)> Events::setSelectedEntitySignal;
-EventT<void (std::string)> Events::addEntitySignal;
-EventT<void (std::string)> Events::deleteEntitySignal;
-EventT<void (bool)> Events::showLightsSignal;
-EventT<void (bool)> Events::showCamerasSignal;
-EventT<void (bool)> Events::showContactsSignal;
-EventT<void (bool)> Events::wireframeSignal;
-EventT<void (bool)> Events::showPhysicsSignal;
-EventT<void (bool)> Events::showJointsSignal;
-EventT<void (bool)> Events::showBoundingBoxesSignal;
-EventT<void (std::string)> Events::entitySelectedSignal;
+EventT<void (std::string)> Events::entityCreated;
+EventT<void (std::string)> Events::setSelectedEntity;
+EventT<void (std::string)> Events::addEntity;
+EventT<void (std::string)> Events::deleteEntity;
+EventT<void (bool)> Events::showLights;
+EventT<void (bool)> Events::showCameras;
+EventT<void (bool)> Events::showContacts;
+EventT<void (bool)> Events::wireframe;
+EventT<void (bool)> Events::showPhysics;
+EventT<void (bool)> Events::showJoints;
+EventT<void (bool)> Events::showBoundingBoxes;
+EventT<void (std::string)> Events::entitySelected;
 
-EventT<void ()> Events::worldUpdateStartSignal;
-EventT<void ()> Events::worldUpdateEndSignal;
+EventT<void ()> Events::worldUpdateStart;
+EventT<void ()> Events::worldUpdateEnd;
 
-EventT<void ()> Events::preRenderSignal;
-EventT<void ()> Events::renderSignal;
-EventT<void ()> Events::postRenderSignal;
+EventT<void ()> Events::preRender;
+EventT<void ()> Events::render;
+EventT<void ()> Events::postRender;
 
-EventT<void (std::string)> Events::diagTimerStartSignal;
-EventT<void (std::string)> Events::diagTimerStopSignal;
+EventT<void (std::string)> Events::diagTimerStart;
+EventT<void (std::string)> Events::diagTimerStop;
 

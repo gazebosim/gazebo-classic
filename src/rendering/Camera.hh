@@ -170,7 +170,11 @@ namespace gazebo
     
       /// \brief Get the image size in bytes
       public: size_t GetImageByteSize() const;
-    
+
+      public: static size_t GetImageByteSize(unsigned int _width, 
+                                      unsigned int _height, 
+                                      const std::string &_format);
+
       /// \brief Get the Z-buffer value at the given image coordinate.
       ///
       /// \param x, y Image coordinate; (0, 0) specifies the top-left corner.
@@ -278,6 +282,19 @@ namespace gazebo
       /// \brief Get the camera's direction vector
       public: math::Vector3 GetDirection() const;
 
+      /// \brief Connect a to the add entity signal
+      public: template<typename T>
+              event::ConnectionPtr ConnectNewFrame( T subscriber )
+              { return newFrame.Connect(subscriber); }
+  
+      public: void DisconnectNewFrame( event::ConnectionPtr &c )
+              { newFrame.Disconnect(c); }
+
+      public: static void SaveFrame(const unsigned char *_image,
+                  unsigned int _width, unsigned int _height, int _depth,
+                  const std::string &_format,
+                  const std::string &_filename);
+
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
       /// \brief Attach the camera to a visual
@@ -288,10 +305,12 @@ namespace gazebo
 
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
       private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
+
+      private: static int GetOgrePixelFormat( const std::string &_format );
   
       // Save the camera frame
       protected: virtual void SaveFrame();
-  
+
       // Create the ogre camera
       private: void CreateCamera();
   
@@ -336,7 +355,9 @@ namespace gazebo
       protected: common::Time lastUpdate;
   
       protected: Scene *scene;
-  
+
+      protected: event::EventT<void(const unsigned char *)> newFrame;
+
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;
       private: friend class Scene;

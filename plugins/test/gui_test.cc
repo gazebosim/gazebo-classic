@@ -34,7 +34,7 @@ namespace gazebo
       this->node->Init();
 
       this->connections.push_back( 
-          event::Events::ConnectPreRenderSignal( 
+          event::Events::ConnectPreRender( 
             boost::bind(&GUITest::PreRender, this) ) );
 
 

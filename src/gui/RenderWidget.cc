@@ -107,7 +107,7 @@ RenderWidget::RenderWidget( QWidget *parent )
   timer->start(33);
 
   this->connections.push_back( 
-      gui::Events::ConnectFullScreenSignal( 
+      gui::Events::ConnectFullScreen( 
         boost::bind(&RenderWidget::OnFullScreen, this, _1) ) );
 }
 

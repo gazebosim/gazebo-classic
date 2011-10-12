@@ -44,7 +44,7 @@ Joint::Joint()
   this->AddType(Base::JOINT);
   this->showJoints = false;
 
-  this->showJointsConnection = event::Events::ConnectShowJointsSignal(boost::bind(&Joint::ShowJoints, this, _1) );
+  this->showJointsConnection = event::Events::ConnectShowJoints(boost::bind(&Joint::ShowJoints, this, _1) );
 }
 
 
@@ -133,7 +133,7 @@ void Joint::Init()
 /// Update the joint
 void Joint::Update()
 {
-  this->jointUpdateSignal();
+  this->jointUpdate();
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -23,6 +23,7 @@
 #define CAMERASENSOR_HH
 
 #include "sensors/Sensor.hh"
+#include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -68,11 +69,11 @@ namespace gazebo
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
     
-      private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
-      //private: void Render();
-    
-      private: rendering::CameraPtr camera;
       public: rendering::CameraPtr GetCamera() const {return this->camera; };
+
+      private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
+
+      private: rendering::CameraPtr camera;
     };
     /// \}
   }

@@ -44,10 +44,11 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType, uns
 // Destructor
 Publisher::~Publisher()
 {
-  if (this->messages.size() > 0)
+  /*if (this->messages.size() > 0)
   {
     gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
   }
+*/
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);

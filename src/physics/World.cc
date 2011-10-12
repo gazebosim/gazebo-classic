@@ -82,11 +82,11 @@ World::World(const std::string &_name)
   this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
 
   this->connections.push_back( 
-     event::Events::ConnectStepSignal( boost::bind(&World::OnStep, this) ) );
+     event::Events::ConnectStep( boost::bind(&World::OnStep, this) ) );
   this->connections.push_back( 
-     event::Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
+     event::Events::ConnectSetSelectedEntity( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
   this->connections.push_back(
-     event::Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
+     event::Events::ConnectDeleteEntity( boost::bind(&World::DeleteEntityCB, this, _1) ) );
 
 }
 
@@ -267,7 +267,7 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
-  event::Events::worldUpdateStartSignal();
+  event::Events::worldUpdateStart();
 
   // Update all the models
   (*this.*modelUpdateFunc)();
@@ -281,7 +281,7 @@ void World::Update()
 
   this->ProcessEntityMsgs();
 
-  event::Events::worldUpdateEndSignal();
+  event::Events::worldUpdateEnd();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -388,7 +388,7 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
   model->SetWorld(shared_from_this());
   model->Load(_sdf);
 
-  event::Events::addEntitySignal(model->GetCompleteScopedName());
+  event::Events::addEntity(model->GetCompleteScopedName());
 
   msgs::Model msg;
   model->FillModelMsg(msg);
@@ -510,7 +510,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   }
   else
     this->selectedEntity.reset();
-  //event::Events::entitySelectedSignal(this->selectedEntity);
+  //event::Events::entitySelected(this->selectedEntity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -586,7 +586,7 @@ void World::SetPaused(bool p)
   else
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
-  event::Events::pauseSignal(p);
+  event::Events::pause(p);
   this->pause = p;
 }
 
@@ -690,6 +690,7 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
     std::string *serializedData = response.mutable_serialized_data();
     this->sceneMsg.SerializeToString( serializedData );
     response.set_type( sceneMsg.GetTypeName() );
+    
   }
 
   this->responsePub->Publish( response );
@@ -743,6 +744,7 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
     msgs::Visual *newVis = this->sceneMsg.add_visual();
     newVis->CopyFrom(*msg);
   }
+  
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Log the joint, which allows the world to maintain the current state of

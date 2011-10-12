@@ -56,9 +56,9 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
 
-  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&UserCamera::Update, this) ) );
+  this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&UserCamera::Update, this) ) );
   
-  this->connections.push_back( event::Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
+  this->connections.push_back( event::Events::ConnectShowCameras( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
   this->animState = NULL;
 
   this->gui = new GUIOverlay();

@@ -19,7 +19,7 @@ PublicationTransport::~PublicationTransport()
 {
   if (this->connection)
   {
-    this->connection->DisconnectShutdownSignal(this->shutdownConnectionPtr);
+    this->connection->DisconnectShutdown(this->shutdownConnectionPtr);
 
     msgs::Subscribe sub;
     sub.set_topic(this->topic);
@@ -49,7 +49,7 @@ void PublicationTransport::Init(const ConnectionPtr &conn_)
   // Start reading messages from the remote publisher
   this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
 
-  this->shutdownConnectionPtr = this->connection->ConnectToShutdownSignal(
+  this->shutdownConnectionPtr = this->connection->ConnectToShutdown(
       boost::bind(&PublicationTransport::OnConnectionShutdown, this));
 }
 

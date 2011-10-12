@@ -31,253 +31,253 @@ namespace gazebo
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
       public: template<typename T>
-              static ConnectionPtr ConnectPauseSignal( T subscriber )
-              { return pauseSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectPause( T subscriber )
+              { return pause.Connect(subscriber); }
 
-      public: static void DisconnectPauseSignal( ConnectionPtr subscriber)
-              { pauseSignal.Disconnect(subscriber); }
+      public: static void DisconnectPause( ConnectionPtr subscriber)
+              { pause.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the step signal
       public: template<typename T>
-              static ConnectionPtr ConnectStepSignal( T subscriber )
-              { return stepSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectStep( T subscriber )
+              { return step.Connect(subscriber); }
 
-      public: static void DisconnectStepSignal( ConnectionPtr subscriber)
-              { stepSignal.Disconnect(subscriber); }
+      public: static void DisconnectStep( ConnectionPtr subscriber)
+              { step.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the quit signal
       public: template<typename T>
-              static ConnectionPtr ConnectQuitSignal( T subscriber )
-              { return quitSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectQuit( T subscriber )
+              { return quit.Connect(subscriber); }
 
-      public: static void DisconnectQuitSignal( ConnectionPtr subscriber)
-              { quitSignal.Disconnect(subscriber); }
+      public: static void DisconnectQuit( ConnectionPtr subscriber)
+              { quit.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the add entity signal
       public: template<typename T>
-              static ConnectionPtr ConnectCreateEntitySignal( T subscriber )
-              { return entityCreatedSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectCreateEntity( T subscriber )
+              { return entityCreated.Connect(subscriber); }
 
-      public: static void DisconnectCreateEntitySignal( ConnectionPtr subscriber)
-              { entityCreatedSignal.Disconnect(subscriber); }
+      public: static void DisconnectCreateEntity( ConnectionPtr subscriber)
+              { entityCreated.Disconnect(subscriber); }
 
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the set selected entity
       public: template<typename T>
-              static ConnectionPtr ConnectSetSelectedEntitySignal( T subscriber )
-              { return setSelectedEntitySignal.Connect(subscriber); }
+              static ConnectionPtr ConnectSetSelectedEntity( T subscriber )
+              { return setSelectedEntity.Connect(subscriber); }
 
-      public: static void DisconnectSetSelectedEntitySignal(ConnectionPtr subscriber)
-              { setSelectedEntitySignal.Disconnect(subscriber); }
+      public: static void DisconnectSetSelectedEntity(ConnectionPtr subscriber)
+              { setSelectedEntity.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the delete entity
       public: template<typename T>
-              static ConnectionPtr ConnectDeleteEntitySignal( T subscriber )
-              { return deleteEntitySignal.Connect(subscriber); }
+              static ConnectionPtr ConnectDeleteEntity( T subscriber )
+              { return deleteEntity.Connect(subscriber); }
 
-      public: static void DisconnectDeleteEntitySignal( ConnectionPtr subscriber)
-              { deleteEntitySignal.Disconnect(subscriber); }
+      public: static void DisconnectDeleteEntity( ConnectionPtr subscriber)
+              { deleteEntity.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the add entity signal
       public: template<typename T>
-              static ConnectionPtr ConnectAddEntitySignal( T subscriber )
-              { return addEntitySignal.Connect(subscriber); }
-      public: static void DisconnectAddEntitySignal( ConnectionPtr subscriber)
-              { addEntitySignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectAddEntity( T subscriber )
+              { return addEntity.Connect(subscriber); }
+      public: static void DisconnectAddEntity( ConnectionPtr subscriber)
+              { addEntity.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show light source signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowLightsSignal( T subscriber )
-              { return showLightsSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectShowLights( T subscriber )
+              { return showLights.Connect(subscriber); }
 
-      public: static void DisconnectShowLightsSignal( ConnectionPtr subscriber )
-              { showLightsSignal.Disconnect(subscriber); }
+      public: static void DisconnectShowLights( ConnectionPtr subscriber )
+              { showLights.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show camera source signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowCamerasSignal( T subscriber )
-              { return showCamerasSignal.Connect(subscriber); }
-      public: static void DisconnectShowCamerasSignal( ConnectionPtr subscriber )
-              { showCamerasSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectShowCameras( T subscriber )
+              { return showCameras.Connect(subscriber); }
+      public: static void DisconnectShowCameras( ConnectionPtr subscriber )
+              { showCameras.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show contacts signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowContactsSignal( T subscriber )
-              { return showContactsSignal.Connect(subscriber); }
-      public: static void DisconnectShowContactsSignal( ConnectionPtr subscriber )
-              { showContactsSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectShowContacts( T subscriber )
+              { return showContacts.Connect(subscriber); }
+      public: static void DisconnectShowContacts( ConnectionPtr subscriber )
+              { showContacts.Disconnect(subscriber); }
 
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show wireframe signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowWireframeSignal( T subscriber )
-              { return wireframeSignal.Connect(subscriber); }
-      public: static void DisconnectShowWireframeSignal( ConnectionPtr subscriber )
-              { wireframeSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectShowWireframe( T subscriber )
+              { return wireframe.Connect(subscriber); }
+      public: static void DisconnectShowWireframe( ConnectionPtr subscriber )
+              { wireframe.Disconnect(subscriber); }
 
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show physics signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowPhysicsSignal( T subscriber )
-              { return showPhysicsSignal.Connect(subscriber); }
-      public: static void DisconnectShowPhysicsSignal( ConnectionPtr subscriber )
-              { showPhysicsSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectShowPhysics( T subscriber )
+              { return showPhysics.Connect(subscriber); }
+      public: static void DisconnectShowPhysics( ConnectionPtr subscriber )
+              { showPhysics.Disconnect(subscriber); }
 
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show joints signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowJointsSignal( T subscriber )
-              { return showJointsSignal.Connect(subscriber); }
-      public: static void DisconnectShowJointsSignal( ConnectionPtr subscriber )
-              { showJointsSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectShowJoints( T subscriber )
+              { return showJoints.Connect(subscriber); }
+      public: static void DisconnectShowJoints( ConnectionPtr subscriber )
+              { showJoints.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the show bounding boxes signal
       public: template<typename T>
-              static ConnectionPtr ConnectShowBoundingBoxesSignal( T subscriber )
-              { return showBoundingBoxesSignal.Connect(subscriber); }
-      public: static void DisconnectShowBoundingBoxesSignal(ConnectionPtr subscriber)
-              { showBoundingBoxesSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectShowBoundingBoxes( T subscriber )
+              { return showBoundingBoxes.Connect(subscriber); }
+      public: static void DisconnectShowBoundingBoxes(ConnectionPtr subscriber)
+              { showBoundingBoxes.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update start signal
       public: template<typename T>
-              static ConnectionPtr ConnectWorldUpdateStartSignal(T subscriber)
-              { return worldUpdateStartSignal.Connect(subscriber); }
-      public: static void DisconnectWorldUpdateStartSignal(ConnectionPtr subscriber )
-              { worldUpdateStartSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectWorldUpdateStart(T subscriber)
+              { return worldUpdateStart.Connect(subscriber); }
+      public: static void DisconnectWorldUpdateStart(ConnectionPtr subscriber )
+              { worldUpdateStart.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update end signal
       public: template<typename T>
-              static ConnectionPtr ConnectWorldUpdateEndSignal(T subscriber)
-              { return worldUpdateEndSignal.Connect(subscriber); }
-      public: static void DisconnectWorldUpdateEndSignal( ConnectionPtr subscriber )
-              { worldUpdateEndSignal.Disconnect(subscriber); }
+              static ConnectionPtr ConnectWorldUpdateEnd(T subscriber)
+              { return worldUpdateEnd.Connect(subscriber); }
+      public: static void DisconnectWorldUpdateEnd( ConnectionPtr subscriber )
+              { worldUpdateEnd.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the entity selected signal
       public: template<typename T>
-              static ConnectionPtr ConnectEntitySelectedSignal(T subscriber)
-              { return entitySelectedSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectEntitySelected(T subscriber)
+              { return entitySelected.Connect(subscriber); }
       /// \brief Disconnect a boost::slot the the entity selected signal
-      public: static void DisconnectEntitySelectedSignal( ConnectionPtr subscriber )
-              { entitySelectedSignal.Disconnect(subscriber); }
+      public: static void DisconnectEntitySelected( ConnectionPtr subscriber )
+              { entitySelected.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       public: template<typename T>
-              static ConnectionPtr ConnectPreRenderSignal(T subscriber)
-              { return preRenderSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectPreRender(T subscriber)
+              { return preRender.Connect(subscriber); }
 
       /// \brief Disconnect a render start signal
-      public: static void DisconnectPreRenderSignal( ConnectionPtr subscriber )
-              { preRenderSignal.Disconnect(subscriber); }
+      public: static void DisconnectPreRender( ConnectionPtr subscriber )
+              { preRender.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the render update signal
       public: template<typename T>
-              static ConnectionPtr ConnectRenderSignal( T subscriber )
-              { return renderSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectRender( T subscriber )
+              { return render.Connect(subscriber); }
 
-      public: static void DisconnectRenderSignal( ConnectionPtr subscriber)
-              { renderSignal.Disconnect(subscriber); }
+      public: static void DisconnectRender( ConnectionPtr subscriber)
+              { render.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the post render update signal
       public: template<typename T>
-              static ConnectionPtr ConnectPostRenderSignal( T subscriber )
-              { return postRenderSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectPostRender( T subscriber )
+              { return postRender.Connect(subscriber); }
 
-      public: static void DisconnectPostRenderSignal( ConnectionPtr subscriber)
-              { postRenderSignal.Disconnect(subscriber); }
+      public: static void DisconnectPostRender( ConnectionPtr subscriber)
+              { postRender.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the diagnostic timer start signal
       public: template<typename T>
-              static ConnectionPtr ConnectDiagTimerStartSignal( T subscriber )
-              { return diagTimerStartSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectDiagTimerStart( T subscriber )
+              { return diagTimerStart.Connect(subscriber); }
 
-      public: static void DisconnectDiagTimerStartSignal( ConnectionPtr subscriber)
-              { diagTimerStartSignal.Disconnect(subscriber); }
+      public: static void DisconnectDiagTimerStart( ConnectionPtr subscriber)
+              { diagTimerStart.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the diagnostic timer stop signal
       public: template<typename T>
-              static ConnectionPtr ConnectDiagTimerStopSignal( T subscriber )
-              { return diagTimerStopSignal.Connect(subscriber); }
+              static ConnectionPtr ConnectDiagTimerStop( T subscriber )
+              { return diagTimerStop.Connect(subscriber); }
 
-      public: static void DisconnectDiagTimerStopSignal( ConnectionPtr subscriber)
-              { diagTimerStopSignal.Disconnect(subscriber); }
+      public: static void DisconnectDiagTimerStop( ConnectionPtr subscriber)
+              { diagTimerStop.Disconnect(subscriber); }
 
 
       /// \brief Pause signal
-      public: static EventT<void (bool)> pauseSignal;
+      public: static EventT<void (bool)> pause;
 
       /// \brief Step the simulation once signal
-      public: static EventT<void ()> stepSignal;
+      public: static EventT<void ()> step;
 
       /// \brief Quit the simulation once signal
-      public: static EventT<void ()> quitSignal;
+      public: static EventT<void ()> quit;
 
       /// \brief An entity has been created
-      public: static EventT<void (std::string)> entityCreatedSignal;
+      public: static EventT<void (std::string)> entityCreated;
 
       /// \brief An entity has been selected
-      public: static EventT<void (std::string)> setSelectedEntitySignal;
+      public: static EventT<void (std::string)> setSelectedEntity;
 
       /// \brief An entity has been added
-      public: static EventT<void (std::string)> addEntitySignal;
+      public: static EventT<void (std::string)> addEntity;
 
       /// \brief An entity has been deleted
-      public: static EventT<void (std::string)> deleteEntitySignal;
+      public: static EventT<void (std::string)> deleteEntity;
 
       /// \brief Light visuals should be shown
-      public: static EventT<void (bool)> showLightsSignal;
+      public: static EventT<void (bool)> showLights;
       /// \brief Joint visuals should be shown
-      public: static EventT<void (bool)> showJointsSignal;
+      public: static EventT<void (bool)> showJoints;
       /// \brief Camera visuals should be shown
-      public: static EventT<void (bool)> showCamerasSignal;
+      public: static EventT<void (bool)> showCameras;
       /// \brief Contact visuals should be shown
-      public: static EventT<void (bool)> showContactsSignal;
+      public: static EventT<void (bool)> showContacts;
       /// \brief Wireframe enable signal
-      public: static EventT<void (bool)> wireframeSignal;
+      public: static EventT<void (bool)> wireframe;
       /// \brief Show masses
-      public: static EventT<void (bool)> showPhysicsSignal;
+      public: static EventT<void (bool)> showPhysics;
       /// \brief Show bounding boxes
-      public: static EventT<void (bool)> showBoundingBoxesSignal;
+      public: static EventT<void (bool)> showBoundingBoxes;
 
       /// \brief Entity has been selected
-      public: static EventT<void (std::string)> entitySelectedSignal;
+      public: static EventT<void (std::string)> entitySelected;
 
       /// \brief World update has started
-      public: static EventT<void ()> worldUpdateStartSignal;
+      public: static EventT<void ()> worldUpdateStart;
       /// \brief World update has ended
-      public: static EventT<void ()> worldUpdateEndSignal;
+      public: static EventT<void ()> worldUpdateEnd;
 
       /// \brief Pre-render
-      public: static EventT<void ()> preRenderSignal;
+      public: static EventT<void ()> preRender;
       /// \brief Render
-      public: static EventT<void ()> renderSignal;
+      public: static EventT<void ()> render;
       /// \brief Post-Render
-      public: static EventT<void ()> postRenderSignal;
+      public: static EventT<void ()> postRender;
 
       /// \brief Diagnostic timer start
-      public: static EventT<void (std::string)> diagTimerStartSignal;
+      public: static EventT<void (std::string)> diagTimerStart;
       /// \brief Diagnostic timer stop
-      public: static EventT<void (std::string)> diagTimerStopSignal;
+      public: static EventT<void (std::string)> diagTimerStop;
     };
     /// \}
   }

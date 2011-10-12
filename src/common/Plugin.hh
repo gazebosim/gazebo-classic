@@ -195,8 +195,6 @@ namespace gazebo
     public: virtual void Init() = 0;
   };
 
-
-
   /// \}
 
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \

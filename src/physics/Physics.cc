@@ -38,8 +38,6 @@ bool physics::fini()
        iter != g_worlds.end(); iter++)
   {
     (*iter)->Fini();
-    // TODO: shouldn't have to manually delete this. There is a problem here
-    delete (*iter).get();
     (*iter).reset();
   }
 

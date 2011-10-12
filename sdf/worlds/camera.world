@@ -59,6 +59,8 @@
             <clip near="0.1" far="50"/>
             <save enabled="false" path="/tmp/camera"/>
           </camera>
+
+          <plugin filename="libcamera_plugin.so" name="camera_plugin"/>
         </sensor>
       </link>
     </model>

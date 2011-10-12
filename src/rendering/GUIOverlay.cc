@@ -19,7 +19,7 @@ using namespace rendering;
 GUIOverlay::GUIOverlay()
 {
   this->connections.push_back( 
-      event::Events::ConnectPreRenderSignal( 
+      event::Events::ConnectPreRender( 
         boost::bind(&GUIOverlay::PreRender, this) ) );
 }
 

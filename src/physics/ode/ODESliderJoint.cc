@@ -104,7 +104,7 @@ void ODESliderJoint::SetDamping( int /*index*/, const double damping )
   dJointSetDamping( this->jointId, this->damping_coefficient);
 #else
   // alternaitvely, apply explicit damping
-  this->ConnectJointUpdateSignal(boost::bind(&ODESliderJoint::ApplyDamping,this));
+  this->ConnectJointUpdate(boost::bind(&ODESliderJoint::ApplyDamping,this));
 #endif
 }
 

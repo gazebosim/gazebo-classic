@@ -142,10 +142,10 @@ namespace gazebo
       public: virtual math::Vector3 GetWorldAngularAccel() const;
   
       public: template< typename T>
-              event::ConnectionPtr ConnectContactCallback( T subscriber )
-              { return contactSignal.Connect(subscriber); }
-      public: void DisconnectContactCallback( event::ConnectionPtr &c )
-              { contactSignal.Disconnect(c); }
+              event::ConnectionPtr ConnectContact( T subscriber )
+              { return contact.Connect(subscriber); }
+      public: void DisconnectContact( event::ConnectionPtr &c )
+              { contact.Disconnect(c); }
 
       /// \brief Fill a collision message
       public: void FillCollisionMsg( msgs::Collision &_msg );
@@ -171,7 +171,7 @@ namespace gazebo
 
       private: bool contactsEnabled;
   
-      public: event::EventT< void (const Contact &)> contactSignal;
+      public: event::EventT< void (const Contact &)> contact;
       private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}

@@ -59,7 +59,7 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
 void LightMaker::Stop()
 {
   this->state = 0;
-  gui::Events::moveModeSignal(true);
+  gui::Events::moveMode(true);
 }
 
 bool LightMaker::IsActive() const

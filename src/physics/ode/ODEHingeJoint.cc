@@ -112,7 +112,7 @@ void ODEHingeJoint::SetDamping( int /*index*/, const double damping )
   dJointSetDamping( this->jointId, this->damping_coefficient);
 #else
   // alternaitvely, apply explicit damping
-  this->jointUpdateConnection = this->ConnectJointUpdateSignal(boost::bind(&ODEHingeJoint::ApplyDamping,this));
+  this->jointUpdateConnection = this->ConnectJointUpdate(boost::bind(&ODEHingeJoint::ApplyDamping,this));
 #endif
 }
 

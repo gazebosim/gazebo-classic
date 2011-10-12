@@ -57,7 +57,7 @@ TimePanel::TimePanel( QWidget *parent )
   timer->start(33);
 
   this->connections.push_back( 
-      gui::Events::ConnectFullScreenSignal( 
+      gui::Events::ConnectFullScreen( 
         boost::bind(&TimePanel::OnFullScreen, this, _1) ) );
 
   this->simTime.Set(0);

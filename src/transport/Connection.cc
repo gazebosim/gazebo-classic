@@ -295,7 +295,7 @@ void Connection::Shutdown()
   while (this->writeCount > 0)
     usleep(100000);
 
-  this->shutdownSignal();
+  this->shutdown();
   //this->StopRead();
 
   this->Cancel();

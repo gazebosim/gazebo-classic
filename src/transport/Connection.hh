@@ -228,11 +228,11 @@ namespace gazebo
                   boost::get<0>(handler)(data);
               }
 
-     public: event::ConnectionPtr ConnectToShutdownSignal( boost::function<void()> subscriber_ ) 
-             { return this->shutdownSignal.Connect(subscriber_); }
+     public: event::ConnectionPtr ConnectToShutdown( boost::function<void()> subscriber_ ) 
+             { return this->shutdown.Connect(subscriber_); }
 
-     public: void DisconnectShutdownSignal( event::ConnectionPtr subscriber_)
-             {this->shutdownSignal.Disconnect(subscriber_);}
+     public: void DisconnectShutdown( event::ConnectionPtr subscriber_)
+             {this->shutdown.Disconnect(subscriber_);}
 
 
      /// \brief Handle on write callbacks
@@ -281,7 +281,7 @@ namespace gazebo
       private: static unsigned int idCounter;
       private: ConnectionPtr acceptConn;
 
-      private: event::EventT<void()> shutdownSignal;
+      private: event::EventT<void()> shutdown;
       private: static IOManager *iomanager;
 
       public: unsigned int writeCount;
