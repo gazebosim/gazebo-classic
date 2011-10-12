@@ -6,6 +6,7 @@
 #include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
 #endif
 
+#include "common/SystemPaths.hh"
 #include "rendering/ogre.h"
 #include "msgs/msgs.h"
 #include "transport/Transport.hh"
@@ -33,7 +34,20 @@ GUIOverlay::~GUIOverlay()
 void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
 {
 #ifdef HAVE_CEGUI
-  this->guiRenderer = &CEGUI::OgreRenderer::bootstrapSystem(*_renderTarget);
+  CEGUI::System::getSingletonPtr();
+
+  std::string logPath = common::SystemPaths::Instance()->GetLogPath();
+  logPath += "/cegui.log";
+
+  this->guiRenderer = &CEGUI::OgreRenderer::create(*_renderTarget);
+  CEGUI::OgreResourceProvider &ip = CEGUI::OgreRenderer::createOgreResourceProvider();
+  CEGUI::OgreImageCodec &ic = CEGUI::OgreRenderer::createOgreImageCodec();
+
+  CEGUI::System::create(*((CEGUI::Renderer*)this->guiRenderer), 
+      (CEGUI::ResourceProvider*)(&ip), 
+      static_cast<CEGUI::XMLParser*>(0), 
+      (CEGUI::ImageCodec*)(&ic),
+      NULL, "", logPath);
 
   CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
   CEGUI::Font::setDefaultResourceGroup("Fonts");

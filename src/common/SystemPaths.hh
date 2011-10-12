@@ -46,7 +46,10 @@ namespace gazebo
     /// \brief Functions to handle getting system paths
     class SystemPaths : public SingletonT<SystemPaths>
     {
-      SystemPaths();
+      private: SystemPaths();
+
+      /// \brief Get the log path
+      public: std::string GetLogPath() const;
 
       /// \brief Get the gazebo install paths
       public: const std::list<std::string> &GetGazeboPaths(); 
@@ -86,6 +89,8 @@ namespace gazebo
 
       /// Paths to the plugins
       private: std::list<std::string> pluginPaths;
+
+      private: std::string logPath;
  
       private: friend class SingletonT<SystemPaths>;
     };

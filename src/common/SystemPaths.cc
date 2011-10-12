@@ -23,7 +23,9 @@
 #include <fstream>
 #include <sstream>
 #include <tinyxml.h>
+#include <dirent.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include "common/SystemPaths.hh"
 #include "common/Exception.hh"
@@ -40,7 +42,33 @@ SystemPaths::SystemPaths()
   this->gazeboPaths.clear();
   this->ogrePaths.clear();
   this->pluginPaths.clear();
+
+  char *path = getenv("GAZEBO_LOG_PATH");
+  if (!path)
+  {
+    path = getenv("HOME");
+    if (!path)
+      path = strdup("/tmp/gazebo");
+    else
+      path = strcat(path, "/.gazebo");
+  }
+
+  DIR *dir = opendir(path); 
+  if (!dir)
+  {
+    mkdir(path, S_IRWXU | S_IRGRP | S_IROTH);
+  }
+  else
+    closedir(dir);
+
+  this->logPath = path;
 }
+
+std::string SystemPaths::GetLogPath() const
+{
+  return this->logPath;
+}
+
 
 const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {

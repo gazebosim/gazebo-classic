@@ -12,7 +12,6 @@
 
 
 #cmakedefine HAVE_CEGUI 1
-#cmakedefine HAVE_CEGUI_OGRE 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
 #cmakedefine HAVE_LTDL 1
