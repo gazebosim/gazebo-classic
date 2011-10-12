@@ -196,6 +196,7 @@ unsigned int Base::GetChildCount() const
 void Base::AddType( Base::EntityType t )
 {
   this->type.push_back(t);
+  std::sort(this->type.begin(),this->type.end()); // need sort for binary_search to work
 }
 
 ////////////////////////////////////////////////////////////////////////////////

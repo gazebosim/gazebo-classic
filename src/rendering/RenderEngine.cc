@@ -87,7 +87,11 @@ void RenderEngine::Load()
 
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
-  this->logManager->createLog("Ogre.log", true, false, false);
+
+  std::string logPath = common::SystemPaths::Instance()->GetLogPath();
+  logPath += "/ogre.log";
+
+  this->logManager->createLog(logPath, true, false, false);
 
   if (this->root)
   {
