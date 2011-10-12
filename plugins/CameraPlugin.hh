@@ -31,8 +31,8 @@ namespace gazebo
     protected: unsigned int width, height, depth;
     protected: std::string format;
 
-    private: sensors::CameraSensorPtr parentSensor;
-    private: rendering::CameraPtr camera;
+    protected: sensors::CameraSensorPtr parentSensor;
+    protected: rendering::CameraPtr camera;
 
     private: event::ConnectionPtr newFrameConnection;
   };
