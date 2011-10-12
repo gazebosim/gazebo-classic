@@ -60,7 +60,7 @@
             <save enabled="false" path="/tmp/camera"/>
           </camera>
 
-          <plugin filename="libcamera_plugin.so" name="camera_plugin"/>
+          <plugin filename="libCameraPlugin.so" name="camera_plugin"/>
         </sensor>
       </link>
     </model>
