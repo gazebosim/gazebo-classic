@@ -20,6 +20,7 @@ namespace gazebo
     public: Server();
     public: virtual ~Server();
 
+    public: void LoadPlugin(const std::string &_filename);
     public: bool Load(const std::string &filename);
     public: void Init();
     public: void Run();
@@ -34,6 +35,7 @@ namespace gazebo
 
     private: Master *master;
     private: boost::thread *masterThread;
+    private: std::vector<gazebo::ServerPluginPtr> plugins;
   };
 }
 

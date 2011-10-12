@@ -115,6 +115,7 @@ int main(int argc, char **argv)
   {
     gazebo::gui::load_plugin(*iter);
   }
+
   gazebo::gui::init();
   gazebo::gui::run();
 

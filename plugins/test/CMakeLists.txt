@@ -1,15 +1,12 @@
-add_subdirectory(test)
-
 include_directories( 
   ${PROJECT_BINARY_DIR}/src 
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-set (plugins CameraPlugin)
+set (plugins ServerPlugin)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} gazebo_server)
-  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/plugins/)
-  INSTALL_INCLUDES("plugins" ${src}.hh)
+  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/plugins/test)
 endforeach (src ${plugins})

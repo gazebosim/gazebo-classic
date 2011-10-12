@@ -15,11 +15,13 @@ namespace gazebo
   class ModelPlugin;
   class SensorPlugin;
   class GUIPlugin;
+  class ServerPlugin;
 
   typedef boost::shared_ptr<WorldPlugin> WorldPluginPtr;
   typedef boost::shared_ptr<ModelPlugin> ModelPluginPtr;
   typedef boost::shared_ptr<SensorPlugin> SensorPluginPtr;
   typedef boost::shared_ptr<GUIPlugin> GUIPluginPtr;
+  typedef boost::shared_ptr<ServerPlugin> ServerPluginPtr;
 
   namespace common
   {

@@ -195,6 +195,13 @@ namespace gazebo
     public: virtual void Init() = 0;
   };
 
+  class ServerPlugin : public PluginT<ServerPlugin>
+  {
+    /// \brief Load function
+    public: virtual void Load() = 0;
+  };
+
+
   /// \}
 
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
@@ -225,5 +232,11 @@ gazebo::GUIPlugin *RegisterPlugin() \
   return new classname();\
 }
 
+#define GZ_REGISTER_SERVER_PLUGIN(classname) \
+extern "C" gazebo::ServerPlugin *RegisterPlugin(); \
+gazebo::ServerPlugin *RegisterPlugin() \
+{\
+  return new classname();\
+}
 }
 #endif

@@ -3,6 +3,7 @@
 
 #include "common/Timer.hh"
 #include "common/Exception.hh"
+#include "common/Plugin.hh"
 
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
@@ -23,12 +24,17 @@ using namespace gazebo;
 Server::Server()
 {
   this->stop = false;
-
 }
 
 Server::~Server()
 {
   delete this->master;
+}
+
+void Server::LoadPlugin(const std::string &_filename)
+{
+  gazebo::ServerPluginPtr plugin = gazebo::ServerPlugin::Create(_filename, _filename);
+  this->plugins.push_back(plugin);
 }
 
 bool Server::Load(const std::string &_filename)
@@ -83,6 +89,11 @@ bool Server::Load(const std::string &_filename)
     }
 
     worldElem = sdf->root->GetNextElement("world", worldElem);
+  }
+
+  for (std::vector<gazebo::ServerPluginPtr>::iterator iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
+  {
+    (*iter)->Load();
   }
 
   return true;

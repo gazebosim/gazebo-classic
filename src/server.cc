@@ -15,6 +15,7 @@ gazebo::Server *server = NULL;
 
 std::string config_filename = "";
 gazebo::common::StrStr_M params;
+std::vector<std::string> plugins;
 
 boost::interprocess::interprocess_semaphore sem(0);
 
@@ -39,12 +40,21 @@ int ParseArgs(int argc, char **argv)
   //FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("u");
+  char *flags = (char*)("up:");
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
   {
     switch (ch)
     {
+      case 'p':
+        {
+          if (optarg != NULL)
+            plugins.push_back( std::string(optarg) );
+          else
+            gzerr << "Missing plugin filename with -p argument\n";
+          break;
+        }
+
       case 'u':
         params["pause"] = "true";
         break;
@@ -93,7 +103,16 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  // Construct plugins
+  /// Load all the plugins specified on the command line
+  for (std::vector<std::string>::iterator iter = plugins.begin(); 
+       iter != plugins.end(); iter++)
+  {
+    server->LoadPlugin(*iter);
+  }
+
   server->Load(config_filename);
+
   server->SetParams( params );
   server->Init();
 
@@ -103,5 +122,6 @@ int main(int argc, char **argv)
 
   delete server;
   server = NULL;
+  
   return 0;
 }
