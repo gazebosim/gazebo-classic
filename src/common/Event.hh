@@ -89,6 +89,63 @@ namespace gazebo
               void operator()(const P &p)
               { this->Signal(p); }
 
+      public: template< typename P1, typename P2 >
+              void operator()(const P1 &p1, const P2 &p2)
+              { this->Signal(p1, p2); }
+
+      public: template< typename P1, typename P2, typename P3 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3)
+              { this->Signal(p1, p2, p3); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4)
+              { this->Signal(p1, p2, p3, p4); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4, 
+                        typename P5 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4, const P5 &p5)
+              { this->Signal(p1, p2, p3, p4, p5); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4, 
+                        typename P5, typename P6 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4, const P5 &p5, const P6 &p6)
+              { this->Signal(p1, p2, p3, p4, p5, p6); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4, 
+                        typename P5, typename P6, typename P7 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4, const P5 &p5, const P6 &p6,
+                              const P7 &p7)
+              { this->Signal(p1, p2, p3, p4, p5, p6, p7); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4, 
+                        typename P5, typename P6, typename P7, typename P8 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4, const P5 &p5, const P6 &p6,
+                              const P7 &p7, const P8 &p8)
+              { this->Signal(p1, p2, p3, p4, p5, p6, p7, p8); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4, 
+                        typename P5, typename P6, typename P7, typename P8,
+                        typename P9 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4, const P5 &p5, const P6 &p6,
+                              const P7 &p7, const P8 &p8, const P9 &p9)
+              { this->Signal(p1, p2, p3, p4, p5, p6, p7, p8, p9); }
+
+      public: template< typename P1, typename P2, typename P3, typename P4, 
+                        typename P5, typename P6, typename P7, typename P8,
+                        typename P9, typename P10 >
+              void operator()(const P1 &p1, const P2 &p2, const P3 &p3, 
+                              const P4 &p4, const P5 &p5, const P6 &p6,
+                              const P7 &p7, const P8 &p8, const P9 &p9,
+                              const P10 &p10)
+              { this->Signal(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); }
+
+
       public: template< typename P >
               void Signal(const P &p)
               {

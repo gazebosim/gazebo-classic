@@ -160,7 +160,7 @@ namespace gazebo
       public: unsigned int GetImageHeight() const;
     
       /// \brief Get the height of the image
-      public: int GetImageDepth() const;
+      public: unsigned int GetImageDepth() const;
   
       /// \brief Get the height of the image
       public: std::string GetImageFormat() const;
@@ -356,7 +356,7 @@ namespace gazebo
   
       protected: Scene *scene;
 
-      protected: event::EventT<void(const unsigned char *)> newFrame;
+      protected: event::EventT<void(const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> newFrame;
 
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;

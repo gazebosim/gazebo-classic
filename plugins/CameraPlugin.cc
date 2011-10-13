@@ -39,12 +39,15 @@ void CameraPlugin::Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &/*_sdf*/)
   this->depth = this->camera->GetImageDepth();
   this->format = this->camera->GetImageFormat();
 
-  this->newFrameConnection = this->camera->ConnectNewFrame( boost::bind(&CameraPlugin::OnNewFrame, this, _1));
+  this->newFrameConnection = this->camera->ConnectNewFrame( 
+      boost::bind(&CameraPlugin::OnNewFrame, this, _1, _2, _3, _4, _5));
 
   this->parentSensor->SetActive(true);
 }
 
-void CameraPlugin::OnNewFrame(const unsigned char * /*_image*/)
+void CameraPlugin::OnNewFrame(const unsigned char * /*_image*/,
+                              unsigned int /*_width*/, unsigned int /*_height*/, 
+                              unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   /*rendering::Camera::SaveFrame( _image, this->width, 
     this->height, this->depth, this->format, 

@@ -284,12 +284,10 @@ void Camera::PostRender()
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
 
-    sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-    size = Ogre::PixelUtil::getMemorySize(
-        imageElem->GetValueInt("width"),
-        imageElem->GetValueInt("height"), 
-        1, 
-        format);
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
+
+    size = Ogre::PixelUtil::getMemorySize( width, height, 1, format);
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -297,9 +295,8 @@ void Camera::PostRender()
 
     memset(this->saveFrameBuffer,128,size);
 
-    Ogre::PixelBox box(imageElem->GetValueInt("width"), 
-                       imageElem->GetValueInt("height"),
-        1, (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
+    Ogre::PixelBox box(width, height, 1, 
+        (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
 
     pixelBuffer->blitToMemory( box );
 
@@ -309,7 +306,26 @@ void Camera::PostRender()
       this->SaveFrame();
     }
 
-    this->newFrame( this->saveFrameBuffer );
+    const unsigned char *buffer = this->saveFrameBuffer;
+
+    // do last minute conversion if Bayer pattern is requested, go from R8G8B8
+    if ( (this->GetImageFormat() == "BAYER_RGGB8") || 
+         (this->GetImageFormat() == "BAYER_BGGR8") ||
+         (this->GetImageFormat() == "BAYER_GBRG8") || 
+         (this->GetImageFormat() == "BAYER_GRBG8") )
+    {
+      if (!this->bayerFrameBuffer)
+        this->bayerFrameBuffer = new unsigned char[width, height];
+
+      this->ConvertRGBToBAYER(this->bayerFrameBuffer,
+          this->saveFrameBuffer, this->GetImageFormat(), 
+          width, height);
+
+      buffer = this->bayerFrameBuffer;
+    }
+
+    this->newFrame( buffer, width, height, this->GetImageDepth(), 
+                    this->GetImageFormat());
   }
 
   this->newData = false;
@@ -452,7 +468,7 @@ unsigned int Camera::GetImageHeight() const
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
-int Camera::GetImageDepth() const
+unsigned int Camera::GetImageDepth() const
 {
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
   std::string imgFmt = imageElem->GetValueString("format");
@@ -689,9 +705,9 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a pointer to the image data
-const unsigned char *Camera::GetImageData(unsigned int i)
+const unsigned char *Camera::GetImageData(unsigned int _i)
 {
-  if (i!=0)
+  if (_i!=0)
     gzerr << "Camera index must be zero for cam";
 
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
