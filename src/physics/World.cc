@@ -861,3 +861,50 @@ void World::LoadPlugin( sdf::ElementPtr &_sdf )
     this->plugins.push_back( plugin );
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Get a pointer to a model based on a name
+EntityPtr World::GetEntityByName(const std::string &_name) const
+{
+  EntityPtr result; // this should be a boost null pointer, right?
+  // Initialize all the entities
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+  {
+    if (this->rootElement->GetChild(i)->HasType(Base::MODEL))
+    {
+      result = this->GetEntityByNameHelper(_name,boost::shared_dynamic_cast<Entity>(this->rootElement->GetChild(i)));
+      if (result) return result;
+    }
+  }
+
+  gzdbg << "nothing found, returns boost null pointer\n";
+  return result;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get an entity by name
+EntityPtr World::GetEntityByNameHelper(const std::string &_name, EntityPtr _parent) const
+{
+  if (!_parent) // null ptr case
+    return _parent;
+
+  if (_parent->GetCompleteScopedName() == _name)
+    return _parent;
+
+  EntityPtr result;
+  for (unsigned int i = 0; i < _parent->GetChildCount(); i++)
+  {
+    if (_parent->GetChild(i)->HasType(Base::MODEL))
+    {
+      result = this->GetEntityByNameHelper(_name, boost::shared_dynamic_cast<Entity>(_parent->GetChild(i)));
+      if (result) return result;
+    }
+  }
+  gzdbg << "nothing found, returns boost null pointer\n";
+  return result;
+}
+
+
+
+
