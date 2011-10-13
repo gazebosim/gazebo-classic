@@ -492,7 +492,12 @@ double Element::GetValueDouble(const std::string &_key)
 {
   double result;
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value->IsStr())
+      result = boost::lexical_cast<double>(this->value->GetAsString());
+    else
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -507,7 +512,12 @@ unsigned int Element::GetValueUInt(const std::string &_key)
 {
   unsigned int result;
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value->IsStr())
+      result = boost::lexical_cast<unsigned int>(this->value->GetAsString());
+    else
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
@@ -522,7 +532,12 @@ char Element::GetValueChar(const std::string &_key)
 {
   char result;
   if (_key.empty())
-    this->value->Get(result);
+  {
+    if (this->value->IsStr())
+      result = boost::lexical_cast<char>(this->value->GetAsString());
+    else
+      this->value->Get(result);
+  }
   else
   {
     ParamPtr param = this->GetAttribute(_key);
