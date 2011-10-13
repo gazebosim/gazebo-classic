@@ -54,6 +54,12 @@ physics::WorldPtr physics::create_world(const std::string &_name)
 
 physics::WorldPtr physics::get_world(const std::string &_name)
 {
+  if (_name.empty())
+    if (g_worlds.empty())
+      gzerr << "no worlds\n";
+    else
+      return *(g_worlds.begin());
+  else
   for( std::vector<WorldPtr>::iterator iter = g_worlds.begin();
        iter != g_worlds.end(); iter++)
   {
