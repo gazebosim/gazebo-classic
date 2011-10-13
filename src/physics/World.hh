@@ -111,11 +111,6 @@ namespace gazebo
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;
 
-
-      /// \brief Get a pointer to a entity based on a name
-      public: EntityPtr GetEntityByName(const std::string &_name) const;
-      private: EntityPtr GetEntityByNameHelper(const std::string &_name, EntityPtr _parent) const;
-    
       /// \brief Print entity tree
       public: void PrintEntityTree();
     
@@ -149,6 +144,9 @@ namespace gazebo
 
       /// \brief Get a model by name
       public: ModelPtr GetModelByName(const std::string &name);
+
+      /// \brief Get a pointer to a entity based on a name
+      public: EntityPtr GetEntityByName(const std::string &_name);
 
       /// \brief Create all entities
       /// \param _sdf SDF element
