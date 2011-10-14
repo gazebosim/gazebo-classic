@@ -315,7 +315,7 @@ void Camera::PostRender()
          (this->GetImageFormat() == "BAYER_GRBG8") )
     {
       if (!this->bayerFrameBuffer)
-        this->bayerFrameBuffer = new unsigned char[width, height];
+        this->bayerFrameBuffer = new unsigned char[width * height];
 
       this->ConvertRGBToBAYER(this->bayerFrameBuffer,
           this->saveFrameBuffer, this->GetImageFormat(), 
@@ -710,22 +710,12 @@ const unsigned char *Camera::GetImageData(unsigned int _i)
   if (_i!=0)
     gzerr << "Camera index must be zero for cam";
 
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-
-  int width = elem->GetValueInt("width");
-  int height = elem->GetValueInt("height");
-  std::string imgFmt = elem->GetValueString("format");
-
   // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-  if ( (imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
-       (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8") )
+  if ( (this->GetImageFormat() == "BAYER_RGGB8") || 
+       (this->GetImageFormat() == "BAYER_BGGR8") ||
+       (this->GetImageFormat() == "BAYER_GBRG8") || 
+       (this->GetImageFormat() == "BAYER_GRBG8") )
   {
-    if (!this->bayerFrameBuffer)
-      this->bayerFrameBuffer = new unsigned char[width*height];
-
-    this->ConvertRGBToBAYER(this->bayerFrameBuffer,
-        this->saveFrameBuffer, imgFmt, width, height);
-
     return this->bayerFrameBuffer;
   }
   else

@@ -44,10 +44,6 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
-/*  this->connections.push_back( 
-      event::Events::ConnectRender( 
-        boost::bind(&CameraSensor::Render, this)) );
-        */
 }
 
 //////////////////////////////////////////////////////////////////////////////
