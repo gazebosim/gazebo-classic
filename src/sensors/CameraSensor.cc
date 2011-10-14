@@ -140,3 +140,10 @@ void CameraSensor::Update(bool force)
 void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
 }
+
+/// Set the update rate of the sensor
+void SetUpdateRate(double _hz) 
+{
+  //this->camera->SetUpdateRate(_hz);
+}
+ 

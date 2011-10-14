@@ -68,6 +68,9 @@ namespace gazebo
     
       /// \brief  Update the sensor
       public: virtual void Update(bool force);
+
+      /// \brief Set the update rate of the sensor
+      public: virtual void SetUpdateRate(double _hz) {};
     
       /// \brief  Finalize the sensor
       public: virtual void Fini();
