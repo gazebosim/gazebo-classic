@@ -41,7 +41,7 @@ void ModelEditWidget::closeEvent(QCloseEvent * /*_event*/)
 }
 
 
-ModelPropertyWidget::ModelPropertyWidget( QWidget *parent)
+ModelPropertyWidget::ModelPropertyWidget( QWidget * /*_parent*/)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
 

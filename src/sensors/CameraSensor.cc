@@ -127,7 +127,6 @@ void CameraSensor::Fini()
 void CameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
-  this->camera->SetRenderingEnabled(value);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -142,8 +141,8 @@ void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 }
 
 /// Set the update rate of the sensor
-void SetUpdateRate(double _hz) 
+void CameraSensor::SetUpdateRate(double _hz) 
 {
-  //this->camera->SetUpdateRate(_hz);
+  this->camera->SetRenderRate( _hz );
 }
  

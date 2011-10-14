@@ -44,11 +44,6 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 DepthCameraSensor::DepthCameraSensor()
     : Sensor()
 {
-  gzdbg << "New DepthCamera\n";
-  /*this->connections.push_back( 
-      event::Events::ConnectRenderSignal( 
-        boost::bind(&DepthCameraSensor::Render, this)) );
-        */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -125,7 +120,6 @@ void DepthCameraSensor::Fini()
 void DepthCameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
-  this->camera->SetRenderingEnabled(value);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -168,7 +162,7 @@ void DepthCameraSensor::Update(bool force)
     */
 }
 
-void DepthCameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
+void DepthCameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
   //if (_msg->header().str_id() == "world_1::camera_model")
   //  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";

@@ -81,6 +81,9 @@ namespace gazebo
       /// \brief Initialize the camera
       public: void Init();
 
+      /// \brief Set the render Hz rate
+      public: void SetRenderRate(double _hz);
+
       /// \brief Render the camera
       public: virtual void Render();
   
@@ -101,12 +104,6 @@ namespace gazebo
 
       /// \brief Set the scene this camera is viewing
       public: void SetScene( Scene *scene );
-  
-      /// \brief Set to true to enable rendering
-      public: void SetRenderingEnabled(bool value);
-  
-      /// \brief Get whether the rendering is enabled
-      public: bool GetRenderingEnabled() const;
   
       /// \brief Get the global pose of the camera
       public: math::Pose GetWorldPose();
@@ -222,12 +219,6 @@ namespace gazebo
       /// \brief Get the apect ratio 
       public: float GetAspectRatio() const;
 
-      /// \brief Set whether the user can move the camera via the GUI
-      public: void SetUserMovable( bool movable );
-  
-      /// \brief Get whether the user can move the camera via the GUI
-      public: bool GetUserMovable() const;
-  
       /// \brief Set the camera's scene node
       public: void SetSceneNode( Ogre::SceneNode *node );
   
@@ -342,18 +333,14 @@ namespace gazebo
       private: static unsigned int cameraCounter;
       private: unsigned int myCount;
   
-      protected: std::string uniqueName;
-  
       protected: bool captureData;
-  
-      private: bool userMovable;
-      protected: bool renderingEnabled;
   
       protected: bool newData;
   
       protected: common::Time renderPeriod;
-      protected: common::Time lastUpdate;
-  
+      protected: common::Time lastRenderTime;
+
+
       protected: Scene *scene;
 
       protected: event::EventT<void(const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> newFrame;

@@ -68,7 +68,6 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->name = stream.str();
 
   this->renderTarget = NULL;
-  this->userMovable = true;
 
   this->captureData = false;
 
@@ -76,8 +75,6 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->viewport = NULL;
 
   this->renderPeriod = common::Time(0.0);
-
-  this->renderingEnabled = true;
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
@@ -243,25 +240,22 @@ void Camera::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set to true to enable rendering
-void Camera::SetRenderingEnabled(bool value)
+// Set the render Hz rate
+void Camera::SetRenderRate(double _hz)
 {
-  this->renderingEnabled = value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether the rendering is enabled
-bool Camera::GetRenderingEnabled() const
-{
-  return this->renderingEnabled;
+  this->renderPeriod = 1.0/_hz;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Render the camera
 void Camera::Render()
 {
-  this->newData = true;
-  this->renderTarget->update(false);
+  if (common::Time::GetWallTime() - this->lastRenderTime >= this->renderPeriod)
+  {
+    this->newData = true;
+    this->renderTarget->update(false);
+    this->lastRenderTime = common::Time::GetWallTime();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -671,22 +665,6 @@ math::Vector3 Camera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
   return math::Vector3(right.x,right.y,right.z);
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether the user can move the camera via the GUI
-void Camera::SetUserMovable( bool movable )
-{
-  this->userMovable = movable;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether the user can move the camera via the GUI
-bool Camera::GetUserMovable() const
-{
-  return this->userMovable;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
