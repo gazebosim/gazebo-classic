@@ -102,9 +102,10 @@ void TopicManager::ProcessNodes()
   std::vector<NodePtr>::iterator iter;
 
   this->nodeMutex->lock();
-  for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
+  int s = this->nodes.size(); // store as size might change (spawning)
+  for (int i = 0; i < s; i ++)
   {
-    (*iter)->ProcessPublishers();
+    this->nodes[i]->ProcessPublishers();
   }
   this->nodeMutex->unlock();
 }
