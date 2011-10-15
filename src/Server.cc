@@ -49,6 +49,11 @@ bool Server::Load(const std::string &_filename)
   this->master->Run();
 
 
+  for (std::vector<gazebo::ServerPluginPtr>::iterator iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
+  {
+    (*iter)->Load();
+  }
+
 
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
@@ -89,11 +94,6 @@ bool Server::Load(const std::string &_filename)
     }
 
     worldElem = sdf->root->GetNextElement("world", worldElem);
-  }
-
-  for (std::vector<gazebo::ServerPluginPtr>::iterator iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
-  {
-    (*iter)->Load();
   }
 
   return true;
