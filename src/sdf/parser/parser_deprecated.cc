@@ -583,6 +583,30 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     // TODO: check for duplicate geoms
   }
 
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
+  return true;
+
   // Get all sensor elements
   // FIXME: instead of child elements, get namespace == sensor blocks
   for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor"); 
@@ -973,7 +997,7 @@ bool initAttr(xmlNodePtr _node, const std::string _key,
   return true;
 }
 ////////////////////////////////////////////////////////////////////////////////
-bool initModelFile(const std::string &_filename, sdf::ElementPtr &_sdf)
+bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   std::ifstream fin;
   fin.open(_filename.c_str(), std::ios::in);
@@ -995,7 +1019,7 @@ bool initModelFile(const std::string &_filename, sdf::ElementPtr &_sdf)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initModelString(const std::string &_xmlString, sdf::ElementPtr &_sdf)
+bool initModelString(const std::string &_xmlString, sdf::SDFPtr &_sdf)
 {
   xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
 
@@ -1004,7 +1028,7 @@ bool initModelString(const std::string &_xmlString, sdf::ElementPtr &_sdf)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Load Model from xmlDoc
-bool initModelDoc(xmlDocPtr _xmlDoc, sdf::ElementPtr &_sdf)
+bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 {
   if (!_xmlDoc)
   {
@@ -1012,23 +1036,20 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::ElementPtr &_sdf)
     return false;
   }
 
-  //xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
-  //xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "physical");
-  //xmlNodePtr modelXml = firstChildElement(_xmlDoc, "model");
-  xmlNodePtr modelXml = firstChildElement(_xmlDoc, "physical");
-  /*
-  xmlNodePtr modelXml = xmlDocGetRootElement(_xmlDoc);
-  if (strcmp((const char*)modelXml->name, "model")==0)
-    modelXml = nextSiblingElement(modelXml,"model");
-  */
-
-  if (!modelXml)
+  bool model_initialized = false;
+  xmlNodePtr modelXml = firstChildElement(_xmlDoc, "physical" );
+  while (modelXml)
   {
-    gzerr << "Could not find the 'model' element in the xml file\n";
-    return false;
+    sdf::ElementPtr model = _sdf->root->AddElement("model");
+    initModel(modelXml, model);
+
+    modelXml = nextSiblingElement(modelXml,"physical");
+    model_initialized = true; // need at least one model, otherwise, return false and try as model
   }
 
-  return initModel(modelXml, _sdf);
+  if (model_initialized) return true;
+  else return false;
+
 }
 
 
@@ -1050,8 +1071,7 @@ bool initWorldFile(const std::string &_filename,
   std::string output;
   PreParser(_filename, output);
 
-  initWorldString(output, _sdf);
-  return true;
+  return initWorldString(output, _sdf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1072,19 +1092,24 @@ bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     return false;
   }
 
-  // Old world files do not have a the <gazebo> ... </gazebo> structure
-  _sdf->root->GetAttribute("version")->SetFromString("1.0");
+  // add or set version string if needed
+  if (_sdf->root->GetAttribute("version"))
+    _sdf->root->GetAttribute("version")->SetFromString("1.0");
+  else
+    _sdf->root->AddAttribute("version", "string", "1.0", false);
 
+  bool world_initialized = false;
   xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world" );
   while (worldXml)
   {
     sdf::ElementPtr world = _sdf->root->AddElement("world");
-    initWorld(worldXml, world);
-
+    world_initialized = initWorld(worldXml, world);
     worldXml = nextSiblingElement(worldXml,"world");
   }
 
-  return true;
+  // need all worlds successfully initialized, otherwise, return false and try as model
+  if (world_initialized) return true;
+  else return false;
 }
 
 xmlNodePtr firstChildElement( xmlDocPtr node, const std::string &name)

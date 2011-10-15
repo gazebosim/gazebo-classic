@@ -61,16 +61,16 @@ namespace deprecated_sdf
   bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf);
 
   /// \brief Load Model given a filename
-  bool initModelFile(const std::string &_filename, sdf::ElementPtr &_sdf);
+  bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf);
 
  /// \brief Load Model from a XML-string
-  bool initModelString(const std::string &_xmlstring, sdf::ElementPtr &_sdf);
+  bool initModelString(const std::string &_xmlstring, sdf::SDFPtr &_sdf);
 
   /// \brief Load Model from TiXMLDocument
-  bool initModelDoc(xmlDocPtr _xml, sdf::ElementPtr &_sdf);
+  bool initModelDoc(xmlDocPtr _xml, sdf::SDFPtr &_sdf);
 
   /// \brief Load Model from TiXMLElement
-  bool initModelXml(xmlNodePtr _xml, sdf::ElementPtr &_sdf);
+  bool initModelXml(xmlNodePtr _xml, sdf::SDFPtr &_sdf);
 
 
   /// \brief Load world given a filename
