@@ -182,7 +182,6 @@ int MultiRayShape::GetFiducial(int index)
 /// Update the collision
 void MultiRayShape::Update()
 {
-  std::vector<RayShapePtr>::iterator iter;
   math::Vector3 a, b;
   int i = 1;
 
@@ -192,14 +191,14 @@ void MultiRayShape::Update()
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
-  for (iter = this->rays.begin(); 
-      iter != this->rays.end(); iter++, i++)
+  unsigned int ray_size = this->rays.size();
+  for (unsigned int i; i < ray_size; i++)
   {
-    (*iter)->SetLength( maxRange );
-    (*iter)->SetRetro( 0.0 );
+    this->rays[i]->SetLength( maxRange );
+    this->rays[i]->SetRetro( 0.0 );
 
     // Get the global points of the line
-    (*iter)->Update();
+    this->rays[i]->Update();
   }
 
   this->UpdateRays();
@@ -208,17 +207,16 @@ void MultiRayShape::Update()
   /*if (**this->displayTypeP == "fan")*/
   { 
     i = 1;
-    for (iter = this->rays.begin(); 
-        iter != this->rays.end(); iter++, i++)
+    for (unsigned int i; i < ray_size; i++)
     {
-      (*iter)->Update();
+      this->rays[i]->Update();
 
-      (*iter)->GetRelativePoints(a,b);
+      this->rays[i]->GetRelativePoints(a,b);
 
       msgs::Set(this->rayFanMsg->mutable_geometry()->mutable_points(i), b );
       msgs::Set(this->rayFanOutlineMsg->mutable_geometry()->mutable_points(i), b );
       //gzdbg << "ray [" << i << "]"
-      //      << " length [" << (*iter)->GetLength() << "]\n";
+      //      << " length [" << this->rays[i]->GetLength() << "]\n";
     }
   }
 }
@@ -229,6 +227,9 @@ void MultiRayShape::AddRay(const math::Vector3 &start,
                            const math::Vector3 &end )
 {
   msgs::Vector3d *pt = NULL;
+
+  //FIXME: need to lock this when spawning models with ray.
+  //       This fails because RaySensor::laserShape->Update() is called before rays could be constructed.
 
   //TODO: move to rendering engine
   // Add to the renderable

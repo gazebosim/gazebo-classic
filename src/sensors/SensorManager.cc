@@ -85,7 +85,8 @@ void SensorManager::Update(bool force)
   event::Events::postRender();
 
   std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  std::list<SensorPtr>::iterator end = this->sensors.end(); // in case things are spawn, sensors length changes
+  for (iter = this->sensors.begin(); iter != end; iter++)
   {
     //gzerr << "SensorManager Update [" << (*iter)->GetName() << "]\n";
     (*iter)->Update(force);

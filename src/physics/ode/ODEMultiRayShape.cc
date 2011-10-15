@@ -64,7 +64,8 @@ void ODEMultiRayShape::UpdateRays()
   if (ode == NULL)
     gzthrow( "Invalid physics engine. Must use ODE." );
 
-  // TODO: Do we need to lock the physics engine here?
+  // FIXME: Do we need to lock the physics engine here? YES!
+  //        especially when spawning models with sensors
   
   // Do collision detection
   dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),

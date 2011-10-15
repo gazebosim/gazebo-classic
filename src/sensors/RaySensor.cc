@@ -101,6 +101,8 @@ void RaySensor::Load( )
   this->laserShape->SetWorld(this->world);
 
   this->laserCollision->SetShape(this->laserShape);
+
+  this->laserShape->Init( );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -108,9 +110,9 @@ void RaySensor::Load( )
 void RaySensor::InitChild()
 {
   //gzerr << "Initializing RaySensor\n";
-  this->laserShape->Init( );
-  gazebo::math::Pose linkPose;
-  linkPose = this->link->GetWorldPose();
+  //this->laserShape->Init( );
+  //gazebo::math::Pose linkPose;
+  //linkPose = this->link->GetWorldPose();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -223,6 +225,8 @@ void RaySensor::Update(bool /*_force*/)
 {
   this->physicsEngine->odeRaySensorMutex->lock();
   //if (this->active || (**this->alwaysActiveP))
-    this->laserShape->Update();
+  // FIXME:  There is a race condition that causes below to be called before laserShape is fully
+  //         instantiated when spawning a model
+  this->laserShape->Update();
   this->physicsEngine->odeRaySensorMutex->unlock();
 }
