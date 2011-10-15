@@ -727,9 +727,18 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     _sdf->GetAttribute("type")->SetFromString("ball");
   else if (std::string((const char*)_config->name) == "universal")
     _sdf->GetAttribute("type")->SetFromString("universal");
+  else if (std::string((const char*)_config->name) == "screw")
+    _sdf->GetAttribute("type")->SetFromString("screw");
   else
     gzerr << "Unknown joint type[" << (const char*)_config->name << "]\n";
 
+  // for screw joints, if threadPitch exists, translate to "thread_pitch" in sdf
+  xmlNodePtr threadPitchXml = firstChildElement(_config, "threadPitch");
+  if (threadPitchXml)
+    _sdf->GetOrCreateElement("thread_pitch")->GetValue()->SetFromString( getValue(threadPitchXml) );
+    //_sdf->GetOrCreateElement("thread_pitch")->value->SetFromString( getValue(threadPitchXml) );
+
+  initAttr(_config, "anchor", sdfChild->GetAttribute("link"));
   if ( firstChildElement(_config,"axis"))
   {
     sdf::ElementPtr sdfAxis = _sdf->AddElement("axis");
@@ -829,7 +838,7 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Set world name
-  if (!_sdf->GetAttribute("name")->SetFromString( "old_gazebo_xml_deprecated" ))
+  if (!_sdf->GetAttribute("name")->SetFromString( "default" ))
   {
     gzerr << "Unable to set world name\n";
     return false;
@@ -1003,7 +1012,16 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::ElementPtr &_sdf)
     return false;
   }
 
-  xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
+  //xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "model");
+  //xmlNodePtr modelXml = firstChildElement(xmlDocGetRootElement(_xmlDoc), "physical");
+  //xmlNodePtr modelXml = firstChildElement(_xmlDoc, "model");
+  xmlNodePtr modelXml = firstChildElement(_xmlDoc, "physical");
+  /*
+  xmlNodePtr modelXml = xmlDocGetRootElement(_xmlDoc);
+  if (strcmp((const char*)modelXml->name, "model")==0)
+    modelXml = nextSiblingElement(modelXml,"model");
+  */
+
   if (!modelXml)
   {
     gzerr << "Could not find the 'model' element in the xml file\n";
