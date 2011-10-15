@@ -12,6 +12,8 @@
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
 
+  <element name="thread_pitch" type="double" default="1.0" required="0"/>
+
   <element name="axis" required="1">
     <attribute name="xyz" type="vector3" default="0 0 1" required="1"/>
     <element name="dynamics" required="0">
