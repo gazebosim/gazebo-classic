@@ -63,14 +63,16 @@ void MultiRayShape::Init()
   //gzerr << "initialize MultiRayShape " << this->GetName() << "\n";
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle; 
-  double pDiff, yDiff;
+  double yDiff;
   double horzMinAngle, horzMaxAngle;
-  double vertMinAngle, vertMaxAngle;
-
   int horzSamples = 1;
   double horzResolution = 1.0;
+
+  double pDiff = 0;
   int vertSamples = 1;
   double vertResolution = 1.0;
+  double vertMinAngle = 0;
+  double vertMaxAngle = 0;
 
   double minRange, maxRange;
 
