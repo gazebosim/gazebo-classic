@@ -49,7 +49,7 @@ namespace gazebo
                  {
                    T::Load(_sdf);
   
-                   if (_sdf->HasElement("limit"))
+                   if (_sdf->HasElement("axis"))
                    {
                      sdf::ElementPtr axisElem = _sdf->GetElement("axis");
                      this->SetAxis(0, axisElem->GetValueVector3("xyz"));
