@@ -6,5 +6,5 @@ Name: gazebo
 Description: Gazebo Libraries
 Version: @GAZEBO_VERSION@
 Requires:
-Libs: -L${libdir} -L${prefix}/lib -L${prefix}/share/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_server 
+Libs: -L${libdir} -L${prefix}/share/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_server 
 CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo
