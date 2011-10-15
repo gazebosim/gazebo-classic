@@ -141,6 +141,20 @@ if (PKG_CONFIG_FOUND)
     message(STATUS "Include support for ODE trunk")
   ENDIF (NOT ODE_WG_TRUNK_FOUND)
 
+  ##############################################
+  #                                            #
+  #   patched ode version with screw joint     #
+  #                                            #
+  ##############################################
+  SET(ODE_WG_SCREW_PATCHES_VERSION 0.11.1.70 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
+  pkg_check_modules(ODE_WG_SCREW_PATCHES ode>=${ODE_WG_SCREW_PATCHES_VERSION})
+  IF (NOT ODE_WG_SCREW_PATCHES_FOUND)
+    SET (ODE_SCREW_JOINT FALSE CACHE BOOL "support for ODE quickstep experimental screw stuff")
+  ELSE (NOT ODE_WG_SCREW_PATCHES_FOUND)
+    SET (ODE_SCREW_JOINT TRUE CACHE BOOL "support for ODE quickstep experimental screw stuff")
+  ENDIF (NOT ODE_WG_SCREW_PATCHES_FOUND)
+
+
   #################################################
   # Find OGRE 
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})

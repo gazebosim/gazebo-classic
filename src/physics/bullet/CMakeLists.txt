@@ -59,6 +59,10 @@ SET (sources BulletPhysics.cc
              #BulletRayGeom.cc
 )
 
+if (ODE_SCREW_JOINT)
+set (sources ${sources} BulletScrewJoint.cc)
+endif (ODE_SCREW_JOINT)
+
 add_definitions(${bullet_cflags})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 add_library(gazebo_physics_bullet SHARED ${sources})

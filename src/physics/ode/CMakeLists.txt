@@ -33,6 +33,12 @@ SET (headers ODEPhysics.hh
              ODESurfaceParams.hh
 )
 
+if (ODE_SCREW_JOINT)
+set (headers ${headers} ODEScrewJoint.hh)
+set (sources ${sources} ODEScrewJoint.cc)
+endif (ODE_SCREW_JOINT)
+
+
 add_library(gazebo_physics_ode SHARED ${sources})
 
 LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")

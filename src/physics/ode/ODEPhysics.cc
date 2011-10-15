@@ -19,6 +19,7 @@
  * Date: 11 June 2007
  */
 
+#include "gazebo_config.h"
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -40,6 +41,9 @@
 
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODELink.hh"
+#ifdef ODE_SCREW_JOINT
+#include "physics/ode/ODEScrewJoint.hh"
+#endif
 #include "physics/ode/ODEHingeJoint.hh"
 #include "physics/ode/ODEHinge2Joint.hh"
 #include "physics/ode/ODESliderJoint.hh"
@@ -615,6 +619,10 @@ JointPtr ODEPhysics::CreateJoint(const std::string &type)
 
   if (type == "prismatic")
     joint.reset( new ODESliderJoint(this->worldId) );
+#ifdef ODE_SCREW_JOINT
+  if (type == "screw")
+    joint.reset( new ODEScrewJoint(this->worldId) );
+#endif
   if (type == "revolute")
     joint.reset( new ODEHingeJoint(this->worldId) );
   if (type == "revolute2")

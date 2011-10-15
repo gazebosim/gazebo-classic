@@ -66,6 +66,7 @@ physics::WorldPtr physics::get_world(const std::string &_name)
     if ((*iter)->GetName() == _name)
       return (*iter);
   }
+  gzerr << "Unable to find world by name in physics::get_world[" << _name.c_str() << "]\n";
   gzthrow("Unable to find world by name in physics::get_world(world_name)");
 }
 

@@ -61,6 +61,10 @@ set (headers BallJoint.hh
              Inertial.hh
 )
 
+if (ODE_SCREW_JOINT)
+set (headers ${headers} ScrewJoint.hh)
+endif (ODE_SCREW_JOINT)
+
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(physics_headers "Physics Headers" "#include \"physics/${hdr}\"\n")

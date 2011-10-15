@@ -51,7 +51,7 @@ namespace gazebo
                               BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, 
                               HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, 
                               JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, 
-                              PLANE_SHAPE, SHAPE, SLIDER_JOINT, SPHERE_SHAPE, 
+                              PLANE_SHAPE, SHAPE, SLIDER_JOINT, SCREW_JOINT, SPHERE_SHAPE, 
                               TRIMESH_SHAPE, UNIVERSAL_JOINT, LIGHT, VISUAL};
 
       /// \brief Constructor
