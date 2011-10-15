@@ -248,7 +248,25 @@ bool readString(const std::string &_xmlString, SDFPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
-  return readDoc(&xmlDoc, _sdf);
+  if (readDoc(&xmlDoc, _sdf))
+    return true;
+  else
+  {
+    gzwarn << "parse as sdf version 1.0 failed, trying to parse as old deprecated format\n";
+    if (deprecated_sdf::initWorldString(_xmlString, _sdf))
+      return true;
+    else
+    {
+      gzwarn << "parse as old deprecated world file failed, trying old model format.\n";
+      if (deprecated_sdf::initModelString(_xmlString,_sdf->root))
+        return true;
+      else
+      {
+        gzerr << "parse as old deprecated model file failed.\n";
+        return false;
+      }
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +274,13 @@ bool readString(const std::string &_xmlString, ElementPtr &_sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
-  return readDoc(&xmlDoc, _sdf);
+  if (readDoc(&xmlDoc, _sdf))
+    return true;
+  else
+  {
+    gzerr << "parse as sdf version 1.0 failed, should try to parse as old deprecated format\n";
+    return false;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
