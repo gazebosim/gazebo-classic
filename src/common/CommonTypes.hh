@@ -6,6 +6,29 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+/////////////////////////////////////////////////////////////////////////////
+// Defines
+/////////////////////////////////////////////////////////////////////////////
+#ifndef NULL
+#define NULL 0
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+// Macros
+/////////////////////////////////////////////////////////////////////////////
+
+#if defined(__GNUC__)
+#define GAZEBO_DEPRECATED __attribute__((deprecated))
+#define GAZEBO_FORCEINLINE __attribute__((always_inline))
+#elif defined(MSVC)
+#define GAZEBO_DEPRECATED
+#define GAZEBO_FORCEINLINE __forceinline
+#else
+#define GAZEBO_DEPRECATED
+#define GAZEBO_FORCEINLINE
+#endif
+
+
 /// \file
 /// \ingroup gazebo_common
 /// \brief Forward declarations for the common classes

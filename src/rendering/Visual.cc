@@ -33,7 +33,6 @@
 #include "common/MeshManager.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
-#include "common/Global.hh"
 #include "common/Mesh.hh"
 #include "rendering/Material.hh"
 #include "rendering/Visual.hh"
@@ -302,7 +301,7 @@ void Visual::Load()
   if (obj)
   {
     this->AttachObject(obj);
-    obj->setVisibilityFlags(GZ_ALL_CAMERA);
+    obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
   }
 
   // Set the pose of the scene node

@@ -42,7 +42,6 @@ set ( headers CommonTypes.hh
               SystemPaths.hh
               Exception.hh
               Console.hh
-              Global.hh
               Mesh.hh
               MeshLoader.hh
               MeshManager.hh

@@ -26,7 +26,6 @@
 #include "PhysicsEngine.hh"
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
-#include "common/Global.hh"
 #include "common/Console.hh"
 #include "World.hh"
 #include "BulletLink.hh"

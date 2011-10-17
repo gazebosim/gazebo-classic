@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "common/Image.hh"
-#include "common/Global.hh"
 #include "common/Exception.hh"
 
 #include "physics/HeightmapShape.hh"

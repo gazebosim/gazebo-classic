@@ -30,7 +30,6 @@
 
 #include "common/Events.hh"
 #include "common/Console.hh"
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "math/Pose.hh"
 
@@ -173,6 +172,7 @@ void Camera::Init()
 
   this->SetFOV( DTOR(60) );
   this->SetClipDist(0.001, 100);
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1022,6 +1022,7 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
     this->viewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
+    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
     double ratio = (double)this->viewport->getActualWidth() / 
                    (double)this->viewport->getActualHeight();

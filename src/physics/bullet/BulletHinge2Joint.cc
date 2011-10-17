@@ -20,7 +20,6 @@
  * CVS: $Id: BulletHinge2Joint.cc 7129 2008-11-12 19:38:15Z natepak $
  */
 
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "BulletLink.hh"

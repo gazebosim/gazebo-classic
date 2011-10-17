@@ -22,7 +22,6 @@
 #include <sstream>
 
 #include "common/Events.hh"
-#include "common/Global.hh"
 #include "common/Exception.hh"
 
 #include "transport/transport.h"

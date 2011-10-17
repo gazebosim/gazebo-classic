@@ -38,7 +38,6 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/SystemPaths.hh"
-#include "common/Global.hh"
 
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/WindowManager.hh"

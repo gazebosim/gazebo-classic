@@ -25,7 +25,6 @@
 #include "common/Event.hh"
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "common/Global.hh"
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"
 

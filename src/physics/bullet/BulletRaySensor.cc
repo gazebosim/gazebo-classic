@@ -20,7 +20,6 @@
  * SVN: $Id:$
  */
 
-#include "common/Global.hh"
 #include "World.hh"
 
 #include "BulletRayCollision.hh"

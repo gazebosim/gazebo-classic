@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-#include "common/Global.hh"
 #include "RayShape.hh"
 #include "MultiRayShape.hh"
 #include "RaySensor.hh"

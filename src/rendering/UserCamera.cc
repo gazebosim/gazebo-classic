@@ -22,7 +22,6 @@
 #include "rendering/ogre.h"
 #include <sstream>
 
-#include "common/Global.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Events.hh"
@@ -157,7 +156,7 @@ void UserCamera::Init()
   line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1)); 
 
   line->setMaterial("Gazebo/WhiteGlow");
-  line->setVisibilityFlags(GZ_LASER_CAMERA);
+  line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->visual->SetVisible(false);
 
@@ -170,7 +169,6 @@ void UserCamera::Init()
 
   //this->viewport->setClearEveryFrame(true);
   //this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
-  //this->viewport->setVisibilityMask(this->visibilityMask);
 
   //RTShaderSystem::AttachViewport(this->viewport, this->scene);
 
@@ -431,6 +429,7 @@ void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )
 {
   Camera::SetRenderTarget(_target);
 
+  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
   this->gui->Init(this->renderTarget);
 }
 

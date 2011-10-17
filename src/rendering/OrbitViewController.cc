@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include "common/Global.hh"
 #include "common/MouseEvent.hh"
 #include "math/Vector2i.hh"
 #include "math/Angle.hh"

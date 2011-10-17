@@ -27,7 +27,6 @@
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
 #include "common/Image.hh"
-#include "common/Global.hh"
 #include "rendering/OgreHeightmap.hh"
 #include "common/Exception.hh"
 #include "Link.hh"

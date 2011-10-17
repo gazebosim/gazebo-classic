@@ -27,7 +27,6 @@
 #include "common/Events.hh"
 #include "math/Quaternion.hh"
 #include "common/Console.hh"
-#include "common/Global.hh"
 #include "common/Exception.hh"
 
 #include "sensors/SensorFactory.hh"

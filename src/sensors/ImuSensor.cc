@@ -26,7 +26,6 @@
 
 #include "SensorFactory.hh"
 #include "common/XMLConfig.hh"
-#include "common/Global.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "common/Exception.hh"

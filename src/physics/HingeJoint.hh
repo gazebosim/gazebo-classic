@@ -24,7 +24,6 @@
 
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
-#include "common/Global.hh"
 
 namespace gazebo
 {

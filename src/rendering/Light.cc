@@ -29,7 +29,6 @@
 
 #include "common/Events.hh"
 #include "common/Exception.hh"
-#include "common/Global.hh"
 #include "common/Console.hh"
 
 #include "rendering/Scene.hh"
@@ -338,7 +337,7 @@ void Light::CreateVisual()
   }
 
   this->line->setMaterial("Gazebo/LightOn");
-  this->line->setVisibilityFlags(GZ_LASER_CAMERA);
+  this->line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   // turn off light source box visuals by default
   this->visual->SetVisible(true);

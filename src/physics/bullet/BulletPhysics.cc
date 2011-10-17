@@ -36,7 +36,6 @@
 
 #include "PhysicsFactory.hh"
 #include "Mass.hh"
-#include "common/Global.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"

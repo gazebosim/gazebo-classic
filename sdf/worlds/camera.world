@@ -52,7 +52,7 @@
         </collision>
 
         <sensor name="camera" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 10 0 1.5707 0"/>
+          <origin pose="0 0 10 0 0 0"/>
           <camera>
             <horizontal_fov angle="1.04719755"/>
             <image width="640" height="480" format="R8G8B8"/>

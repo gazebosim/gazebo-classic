@@ -24,7 +24,6 @@
 #include <tbb/blocked_range.h>
 
 #include "common/Diagnostics.hh"
-#include "common/Global.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "math/Vector3.hh"

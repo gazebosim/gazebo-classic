@@ -27,7 +27,6 @@
 
 #include "common/Plugin.hh"
 #include "common/Events.hh"
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/CommonTypes.hh"

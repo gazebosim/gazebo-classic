@@ -23,7 +23,6 @@
 
 #include "gazebo_config.h"
 #include "common/Console.hh"
-#include "common/Global.hh"
 
 #include "physics/Link.hh"
 #include "physics/ode/ODEHingeJoint.hh"

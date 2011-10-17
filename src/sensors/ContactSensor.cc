@@ -24,7 +24,6 @@
 #include <float.h>
 #include <sstream>
 
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "physics/Physics.hh"
 #include "physics/World.hh"

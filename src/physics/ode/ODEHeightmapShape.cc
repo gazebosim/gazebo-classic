@@ -20,7 +20,6 @@
  * SVN: $Id:$
  */
 
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEHeightmapShape.hh"

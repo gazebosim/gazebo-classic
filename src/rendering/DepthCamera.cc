@@ -30,7 +30,6 @@
 
 #include "common/Events.hh"
 #include "common/Console.hh"
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "math/Pose.hh"
 

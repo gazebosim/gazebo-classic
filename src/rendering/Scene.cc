@@ -20,7 +20,6 @@
 #include "msgs/msgs.h"
 #include "sdf/sdf_parser.h"
 
-#include "common/Global.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
