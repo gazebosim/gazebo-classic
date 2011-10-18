@@ -793,9 +793,12 @@ void Visual::AttachAxes()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the transparency
-void Visual::SetTransparency( float trans )
+void Visual::SetTransparency( float _trans )
 {
-  this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
+  if (_trans == this->transparency)
+    return;
+
+  this->transparency = std::min(std::max(_trans, (float)0.0), (float)1.0);
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;

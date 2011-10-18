@@ -51,6 +51,9 @@ set (msgs axis.proto
           world_control.proto
           world_stats.proto 
           gui_overlay_config.proto
+          gui_camera.proto
+          gui.proto
+          track_visual.proto
 )
 
 set (sources msgs.cc)

@@ -61,11 +61,6 @@ namespace gazebo
       /// \brief Set the parent of the sensor
       public: virtual void SetParent( const std::string &_name );
 
-      /// \brief FIXME?
-      /// \brief this mechanism is used to get to RaySensor::InitChild()
-      /// \brief FIXME?
-      public: virtual void InitChild() {};
-    
       /// \brief  Update the sensor
       public: virtual void Update(bool force);
 

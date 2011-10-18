@@ -85,7 +85,8 @@ namespace gazebo
       public: void SetRenderRate(double _hz);
 
       /// \brief Render the camera
-      public: virtual void Render();
+      public: void Render();
+      private: virtual void RenderImpl();
   
       /// \brief Post render
       public: virtual void PostRender();
@@ -262,7 +263,8 @@ namespace gazebo
       public: virtual void SetRenderTarget( Ogre::RenderTarget *target );
 
       /// \brief Attach the camera to a scene node
-      public: void AttachToVisual( const std::string &_visualName );
+      public: void AttachToVisual( const std::string &_visualName, 
+                                   double _minDist=0, double _maxDist=0 );
 
       /// \brief Set the camera to track a scene node
       public: void TrackVisual( const std::string &_visualName);
@@ -275,11 +277,11 @@ namespace gazebo
 
       /// \brief Connect a to the add entity signal
       public: template<typename T>
-              event::ConnectionPtr ConnectNewFrame( T subscriber )
-              { return newFrame.Connect(subscriber); }
+              event::ConnectionPtr ConnectNewImageFrame( T subscriber )
+              { return newImageFrame.Connect(subscriber); }
   
-      public: void DisconnectNewFrame( event::ConnectionPtr &c )
-              { newFrame.Disconnect(c); }
+      public: void DisconnectNewImageFrame( event::ConnectionPtr &c )
+              { newImageFrame.Disconnect(c); }
 
       public: static void SaveFrame(const unsigned char *_image,
                   unsigned int _width, unsigned int _height, int _depth,
@@ -288,11 +290,16 @@ namespace gazebo
 
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
-      /// \brief Attach the camera to a visual
-      protected: bool AttachToVisualImpl( const std::string &_name );
-
       /// \brief Set the camera to track a scene node
       protected: virtual bool TrackVisualImpl( VisualPtr _visual );
+
+      /// \brief Attach the camera to a visual
+      protected: virtual bool AttachToVisualImpl( const std::string &_name,
+                    double _minDist=0, double _maxDist=0 );
+
+      /// \brief Attach the camera to a visual
+      protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
+                    double _minDist=0, double _maxDist=0 );
 
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
       private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
@@ -340,10 +347,9 @@ namespace gazebo
       protected: common::Time renderPeriod;
       protected: common::Time lastRenderTime;
 
-
       protected: Scene *scene;
 
-      protected: event::EventT<void(const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> newFrame;
+      protected: event::EventT<void(const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> newImageFrame;
 
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;

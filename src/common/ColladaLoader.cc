@@ -337,8 +337,16 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       this->LoadColorOrTexture(lambertXml, "diffuse", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
       if (lambertXml->FirstChildElement("transparency"))
+      {
         mat->SetTransparency( 
             this->LoadFloat(lambertXml->FirstChildElement("transparency")) );
+      }
+
+      if (lambertXml->FirstChildElement("transparent"))
+      {
+        TiXmlElement *transXml = lambertXml->FirstChildElement("transparent");
+        this->LoadTransparent( transXml, mat );
+      }
     }
     else if (phongXml)
     {
@@ -353,6 +361,12 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       if (phongXml->FirstChildElement("transparency"))
         mat->SetTransparency( 
             this->LoadFloat(phongXml->FirstChildElement("transparency")) );
+      if (phongXml->FirstChildElement("transparent"))
+      {
+        TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
+        this->LoadTransparent( transXml, mat );
+      }
+
     }
     else if (blinnXml)
     {
@@ -367,6 +381,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       if (blinnXml->FirstChildElement("transparency"))
         mat->SetTransparency( 
             this->LoadFloat(blinnXml->FirstChildElement("transparency")) );
+      if (phongXml->FirstChildElement("transparent"))
+      {
+        TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
+        this->LoadTransparent( transXml, mat );
+      }
     }
   }
 
@@ -633,4 +652,38 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
   }
 
   return value;
+}
+
+void ColladaLoader::LoadTransparent( TiXmlElement *_elem, Material *_mat )
+{
+  const char *opaque = _elem->Attribute("opaque");
+  if (!opaque)
+    gzerr << "No Opaque set\n";
+
+  const char *colorStr =_elem->FirstChildElement("color")->GetText();
+  if (!colorStr)
+    gzerr << "No color string\n";
+
+  /*std::string opaque = 
+  std::string colorStr = _elem->FirstChildElement("color")->GetText();
+  Color color = boost::lexical_cast<Color>(colorStr);
+  */
+
+  //double srcFactor, dstFactor;
+
+  /*if (opaque == "RGB_ZERO")
+  {
+    //srcFactor = color.R() * _mat->GetTransparency();
+    //dstFactor = 1.0 - color.R() * _mat->GetTransparency();
+  }
+  else if (opaque == "A_ONE")
+  {
+   // _mat->SetBlendFactors( ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
+    //srcFactor = 1.0 - color.A() * _mat->GetTransparency();
+    //dstFactor = color.A() * _mat->GetTransparency();
+  }
+  */
+
+  //_mat->SetBlendFactors( ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
+  //_mat->SetBlendFactors(srcFactor, dstFactor);
 }

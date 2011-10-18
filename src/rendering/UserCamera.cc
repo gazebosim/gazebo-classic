@@ -227,6 +227,25 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     this->viewController->HandleMouseEvent(_evt);
 }
 
+bool UserCamera::AttachToVisualImpl( VisualPtr _visual,
+                                     double _minDist, double _maxDist )
+{
+  Camera::AttachToVisualImpl(_visual);
+  if (_visual)
+  {
+    math::Box bb = _visual->GetBoundingBox();
+    math::Vector3 pos = bb.GetCenter();
+    pos.z = bb.max.z; 
+
+    this->SetViewController(OrbitViewController::GetTypeString(), pos);
+    ((OrbitViewController*)this->viewController)->SetDistanceRange( _minDist, _maxDist );
+  }
+  else
+    this->SetViewController(FPSViewController::GetTypeString());
+
+  return true;
+}
+
 bool UserCamera::TrackVisualImpl( VisualPtr _visual )
 {
   Camera::TrackVisualImpl( _visual );
@@ -245,9 +264,6 @@ void UserCamera::SetViewController( const std::string &type )
   if (this->viewController->GetTypeString() == type)
     return;
 
-  //delete this->viewController;
-  //this->viewController = NULL;
-
   if (type == OrbitViewController::GetTypeString())
     this->viewController = this->orbitViewController;
   else if (type == FPSViewController::GetTypeString())
@@ -256,6 +272,24 @@ void UserCamera::SetViewController( const std::string &type )
     gzthrow("Invalid view controller type: " + type );
 
   this->viewController->Init();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set view controller
+void UserCamera::SetViewController( const std::string &type, 
+                                    const math::Vector3 &_pos )
+{
+  if (this->viewController->GetTypeString() == type)
+    return;
+
+  if (type == OrbitViewController::GetTypeString())
+    this->viewController = this->orbitViewController;
+  else if (type == FPSViewController::GetTypeString())
+    this->viewController = this->fpsViewController;
+  else
+    gzthrow("Invalid view controller type: " + type );
+
+  this->viewController->Init(_pos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

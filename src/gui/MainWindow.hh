@@ -3,6 +3,7 @@
 
 #include <qmainwindow.h>
 #include "common/Event.hh"
+#include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
 
 namespace gazebo
@@ -26,6 +27,8 @@ namespace gazebo
       public: void Init();
 
       protected: void closeEvent(QCloseEvent *event);
+
+      private: void OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg);
 
       private slots: void New();
       private slots: void Open();
@@ -93,6 +96,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
+      private: transport::SubscriberPtr guiSub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *modelsDock;

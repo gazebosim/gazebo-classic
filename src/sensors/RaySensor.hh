@@ -56,17 +56,17 @@ namespace gazebo
     
       /// Load the ray using parameter from an SDF
       /// \param node The XMLConfig node
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
-      protected: virtual void Load( );
+      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load( );
     
       /// Initialize the ray
-      protected: virtual void InitChild();
+      public: virtual void Init();
     
       ///  Update sensed values
-      protected: virtual void Update(bool force);
+      public: virtual void Update(bool force);
       
       /// Finalize the ray
-      protected: virtual void FiniChild();
+      protected: virtual void Fini();
     
       /// \brief Get the minimum angle
       /// \return The minimum angle

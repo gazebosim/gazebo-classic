@@ -34,11 +34,15 @@ namespace gazebo
     {
       /// \brief Constructor
       public: OrbitViewController(UserCamera *camera);
-  
+
       /// \brief Destructor
       public: virtual ~OrbitViewController();
   
       public: virtual void Init();
+      public: virtual void Init(const math::Vector3 &_focalPoint);
+
+      /// Set the min and max distance from the focal point
+      public: void SetDistanceRange(double _minDist, double _maxDist);
 
       /// \brief Update
       public: virtual void Update();
@@ -63,6 +67,7 @@ namespace gazebo
   
       private: float yaw, pitch;
       private: float distance;
+      private: float minDist, maxDist;
       private: math::Vector3 focalPoint;
 
       private: VisualPtr refVisual;

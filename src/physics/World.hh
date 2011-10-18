@@ -232,6 +232,7 @@ namespace gazebo
       private: transport::NodePtr node;    
       private: transport::PublisherPtr selectionPub;
       private: transport::PublisherPtr statPub, responsePub, modelPub;
+      private: transport::PublisherPtr guiPub;
 
       private: transport::SubscriberPtr visSub, controlSub;
       private: transport::SubscriberPtr factorySub, jointSub, sceneSub;
@@ -258,6 +259,7 @@ namespace gazebo
 
       private: std::vector<WorldPluginPtr> plugins;
       private: std::list<std::string> deleteEntity;
+
 
       private: boost::mutex *receiveMutex;
     };

@@ -7,16 +7,16 @@
     </inertial>
 
     <collision name="collision">
+      <origin pose="0.0 0 0 0 0 1.5707"/>
       <geometry>
         <box size="0.1 0.1 0.1"/>
       </geometry>
     </collision>
     <visual name="visual1">
+      <origin pose="0.0 0 0 0 0 1.5707"/>
       <geometry>
-        <mesh filename="people/female_standing/female_standing.dae" scale="0.009 0.009 0.009"/>
+        <mesh filename="people/female_standing/female_standing.dae" scale="0.01 0.01 0.01"/>
       </geometry>
     </visual>
   </link>
 </model>
-
-

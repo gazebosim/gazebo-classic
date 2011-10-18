@@ -38,6 +38,7 @@ namespace gazebo
       public: virtual ~ViewController();
   
       public: virtual void Init() = 0;
+      public: virtual void Init(const math::Vector3 & /*_focalPoint*/) {}
       public: virtual void Update() = 0;
   
       /// \brief Handle a mouse event

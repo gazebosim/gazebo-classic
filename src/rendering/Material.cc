@@ -46,6 +46,11 @@ void Material::Update(const gazebo::common::Material *_mat)
   pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
   pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
 
+  if (diffuse.A() < 1.0)
+  {
+    pass->setDepthWriteEnabled(false);
+    pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+  }
   //pass->setPointSize(_mat->GetPointSize());
 
   pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());

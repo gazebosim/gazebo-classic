@@ -47,7 +47,14 @@ namespace gazebo
       public: virtual ~Publisher();
 
       /// \brief Publish a message on the topic
-      public: void Publish( google::protobuf::Message &message );
+      public: void Publish( const google::protobuf::Message &_message )
+              { this->PublishImpl(_message); }
+
+      public: template< typename M>
+              void Publish( M _message )
+              { this->PublishImpl( _message); }
+
+      private: void PublishImpl(const google::protobuf::Message &_message );
 
       /// \brief Get the topic name
       public: std::string GetTopic() const;

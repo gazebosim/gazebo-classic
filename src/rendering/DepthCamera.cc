@@ -49,6 +49,7 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene) :
 {
   this->renderTarget = NULL;
   this->depthBuffer = NULL;
+  this->depthMaterial = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -123,28 +124,17 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Render the camera
-void DepthCamera::Render()
-{
-  // produce depth data for the camera
-  if (!this->newData)
-  {
-    this->newData = true;
-    this->RenderDepthData();
-  }
-  //this->renderTarget->update(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
-  //this->renderTarget->swapBuffers();
+  this->renderTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
     size_t size;
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
     pixelBuffer = this->renderTexture->getBuffer();
@@ -152,12 +142,7 @@ void DepthCamera::PostRender()
     Ogre::PixelFormat format = pixelBuffer->getFormat();
 
     sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-    size = Ogre::PixelUtil::getMemorySize(
-        imageElem->GetValueInt("width"),
-        imageElem->GetValueInt("height"), 
-        1, 
-        format);
-
+    size = Ogre::PixelUtil::getMemorySize( width, height, 1, format );
 
     // Blit the depth buffer if needed
     if (!this->depthBuffer)
@@ -165,40 +150,29 @@ void DepthCamera::PostRender()
 
     pixelBuffer = this->renderTexture->getBuffer(0, 0);
     pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
-    Ogre::Box src_box(0,0,this->GetImageWidth(), this->GetImageHeight());
-    Ogre::PixelBox dst_box(this->GetImageWidth(), this->GetImageHeight(),
+    Ogre::Box src_box(0,0,width, height);
+    Ogre::PixelBox dst_box(width, height,
         1, Ogre::PF_FLOAT32_R, this->depthBuffer);
 
     pixelBuffer->blitToMemory(src_box, dst_box);
     pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
-    // Update the last captured render time
-    //this->lastRenderTime = this->lastRenderTimeNotCaptured;
-   
-    float min = 1000;
-    float max = 0; 
-    for (unsigned int i=0; i < size; i++)
-    {
-      if (this->depthBuffer[i] > max)
-        max = this->depthBuffer[i];
-      if (this->depthBuffer[i] < min)
-        min = this->depthBuffer[i];
-    }
-
-    std::cout << "Min[" << min << "] Max[" << max << "] Mid[" << this->depthBuffer[size/2] << "]\n";
+    this->newDepthFrame( this->depthBuffer, width, height, 1, "FLOAT32");
   }
+
   this->newData = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Simulate Depth Data
-void DepthCamera::RenderDepthData()
+void DepthCamera::RenderImpl()
 {
-  Ogre::RenderSystem *renderSys = this->scene->GetManager()->getDestinationRenderSystem();
+  Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
   Ogre::Pass *pass;
 
+  renderSys = this->scene->GetManager()->getDestinationRenderSystem();
   sceneMgr->_suppressRenderStateChanges(true);
 
   // Get pointer to the material pass

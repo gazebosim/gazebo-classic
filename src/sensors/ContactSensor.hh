@@ -52,17 +52,17 @@ namespace gazebo
   
       /// Load the contact sensor using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
-      protected: virtual void Load( );
+      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load( );
     
       /// Initialize the sensor
-      protected: virtual void InitChild();
+      public: virtual void Init();
     
       ///  Update sensed values
-      protected: virtual void Update(bool force);
+      public: virtual void Update(bool force);
   
       /// Finalize the sensor
-      protected: virtual void FiniChild();
+      protected: virtual void Fini();
   
       /// \brief Get the number of collisions that the sensor is observing
       public: unsigned int GetCollisionCount() const;

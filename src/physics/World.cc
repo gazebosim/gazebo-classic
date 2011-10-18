@@ -114,22 +114,28 @@ void World::Load( sdf::ElementPtr _sdf )
   this->sdf = _sdf;
 
   if (this->sdf->GetValueString("name").empty())
-    gzwarn << "create_world(world_name=[" << this->name << "]) overwrites sdf world name\n!";
+    gzwarn << "create_world(world_name=[" 
+           << this->name << "]) overwrites sdf world name\n!";
   else
     this->name = this->sdf->GetValueString("name");
 
   this->sceneMsg.CopyFrom( 
         msgs::SceneFromSDF(_sdf->GetElement("scene")) );
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->GetName());
-
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0,200000000);
 
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(this->GetName());
+
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
+
+  if (this->sdf->HasElement("gui"))
+    this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
+
   this->factorySub = this->node->Subscribe("~/factory", 
                                            &World::OnFactoryMsg, this);
-
 
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);

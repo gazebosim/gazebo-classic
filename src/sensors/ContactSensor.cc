@@ -134,7 +134,7 @@ void ContactSensor::Load(sdf::ElementPtr &_sdf)
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the contact
-void ContactSensor::InitChild()
+void ContactSensor::Init()
 {
 /*
   std::vector< ParamT<std::string> *>::iterator iter;
@@ -147,6 +147,8 @@ void ContactSensor::InitChild()
   }
 */
   this->collision->SetContactsEnabled(true);
+
+  Sensor::Init();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -158,8 +160,9 @@ void ContactSensor::Update(bool /*_force*/)
 
 //////////////////////////////////////////////////////////////////////////////
 // shutdown the contact
-void ContactSensor::FiniChild()
+void ContactSensor::Fini()
 {
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////////////////////////////////

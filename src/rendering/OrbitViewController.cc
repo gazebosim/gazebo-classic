@@ -38,6 +38,8 @@ static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 OrbitViewController::OrbitViewController(UserCamera *camera)
   : ViewController(camera), distance(5.0f)
 {
+  this->minDist = MIN_DISTANCE;
+  this->maxDist = 0;
   this->typeString = TYPE_STRING;
 
   this->refVisual.reset( new Visual("OrbitViewController", this->camera->GetScene()));
@@ -57,37 +59,59 @@ OrbitViewController::~OrbitViewController()
   this->refVisual.reset();
 }
 
-void OrbitViewController::Init()
+void OrbitViewController::Init(const math::Vector3 &_focalPoint)
 {
   math::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
   this->yaw = rpy.z; 
   this->pitch = rpy.y;
 
+  this->focalPoint = _focalPoint;
+  this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
+
+  std::cout << "OrbitInit. FP[" << this->focalPoint << "] Distance[" << this->distance << "] Pos[" << this->camera->GetWorldPosition() << "]\n";
+
+  this->refVisual->SetVisible(false);
+  this->refVisual->SetWorldPosition( this->focalPoint );
+}
+
+/// Set the min and max distance from the focal point
+void OrbitViewController::SetDistanceRange(double _minDist, double _maxDist)
+{
+  this->minDist = _minDist;
+  this->maxDist = _maxDist;
+  if (this->distance > this->maxDist)
+    this->distance = this->maxDist;
+  if (this->distance < this->minDist)
+    this->distance = this->minDist;
+}
+
+
+void OrbitViewController::Init()
+{
   int width = this->camera->GetViewportWidth();
   int height = this->camera->GetViewportHeight();
 
-  this->distance = -1;
+  double dist = -1;
+  math::Vector3 fp;
 
   // Try to get a point on a plane to use as the reference point
   if (this->camera->GetWorldPointOnPlane( width/2.0, height/2.0, 
                                           math::Vector3(0,0,1), 0, 
-                                          this->focalPoint))
+                                          fp))
   {
-    this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
+    dist = this->camera->GetWorldPosition().Distance(fp);
   }
 
   // If the plane is too far away, or non-existant, then pick a point 10m in
   // front of the camera.
-  if (this->distance < 0 || this->distance > 20)
+  if (dist < 0 || dist > 20)
   {
     math::Vector3 dir = this->camera->GetDirection();
     dir.Normalize();
-    this->focalPoint =  this->camera->GetWorldPose().pos + dir * 10;
-    this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
+    fp =  this->camera->GetWorldPose().pos + dir * 10;
   }
 
-  this->refVisual->SetVisible(false);
-  this->refVisual->SetWorldPosition( this->focalPoint );
+  this->Init(fp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,8 +230,10 @@ void OrbitViewController::NormalizePitch(float &v)
 void OrbitViewController::Zoom( float _amount )
 {
   this->distance -= _amount;
-  if (this->distance <= MIN_DISTANCE)
-    this->distance = MIN_DISTANCE;
+  if (this->distance <= this->minDist )
+    this->distance = this->minDist;
+  if (this->maxDist > 0 && this->distance >= this->maxDist )
+    this->distance = this->maxDist;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

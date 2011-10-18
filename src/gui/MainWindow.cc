@@ -6,6 +6,8 @@
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
 
+#include "rendering/UserCamera.hh"
+
 #include "gui/Gui.hh"
 #include "gui/InsertModelWidget.hh"
 #include "gui/ModelListWidget.hh"
@@ -29,6 +31,7 @@ MainWindow::MainWindow()
   this->node->Init();
   gui::set_world( this->node->GetTopicNamespace() );
   this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
+
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -85,6 +88,7 @@ MainWindow::MainWindow()
   this->connections.push_back( 
       gui::Events::ConnectMoveMode( 
         boost::bind(&MainWindow::OnMoveMode, this, _1) ) );
+
 }
 
 MainWindow::~MainWindow()
@@ -93,6 +97,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::Load()
 {
+  this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this);
 }
 
 void MainWindow::Init()
@@ -400,5 +405,34 @@ void MainWindow::OnMoveMode(bool mode)
     this->pointLghtCreateAct->setChecked(false);
     this->spotLghtCreateAct->setChecked(false);
     this->dirLghtCreateAct->setChecked(false);
+  }
+}
+
+void MainWindow::OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg)
+{
+  if (_msg->has_fullscreen() && _msg->fullscreen())
+  {
+    ViewFullScreen();
+  }
+
+  if (_msg->has_camera())
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    if (_msg->camera().has_track())
+    {
+      std::string name = _msg->camera().track().name();
+
+      double minDist, maxDist;
+      minDist = maxDist = 0;
+
+      if ( _msg->camera().track().has_min_dist())
+        minDist = _msg->camera().track().min_dist();
+      if ( _msg->camera().track().has_max_dist())
+        maxDist = _msg->camera().track().max_dist();
+
+      std::cout << "HasTrack. Name[" << name << "] min[" << minDist << "] Max[" << maxDist << "]\n";
+
+      cam->AttachToVisual( name, minDist, maxDist );
+    }
   }
 }

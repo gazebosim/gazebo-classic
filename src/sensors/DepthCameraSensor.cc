@@ -77,13 +77,15 @@ void DepthCameraSensor::Load()
  
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
-void DepthCameraSensor::InitChild()
+void DepthCameraSensor::Init()
 {
   std::string worldName = this->sdf->GetWorldName();
 
   if (!worldName.empty())
   {
-    rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
+    rendering::ScenePtr scene = 
+      rendering::RenderEngine::Instance()->GetScene(worldName);
+
     if (!scene)
       scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
@@ -111,6 +113,8 @@ void DepthCameraSensor::InitChild()
   }
   else
     gzerr << "No world name\n";
+
+  Sensor::Init();
 }
 
 //////////////////////////////////////////////////////////////////////////////

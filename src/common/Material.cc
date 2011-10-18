@@ -41,6 +41,7 @@ Material::Material()
   this->diffuse.Set(1,1,1,1);
   this->specular.Set(0,0,0,1);
   this->lighting = false;
+  this->dstBlendFactor = this->srcBlendFactor = 1.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,11 +159,12 @@ void Material::SetTransparency(float t)
   this->transparency = std::min(t, (float)1.0);
   this->transparency = std::max(this->transparency, (float)0.0);
   this->lighting = true;
+  std::cout << "SetTrans[" << this->name << "] [" << t << "] T[" << this->transparency << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the transparency percentage (0..1)
-float Material::SetTransparency() const
+float Material::GetTransparency() const
 {
   return this->transparency;
 }
@@ -183,11 +185,21 @@ float Material::GetShininess() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the shininess 
-float Material::GetTransparency() const
+/// Set the blende factors. Will be interpreted as:
+void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 {
-  return this->shininess;
+  this->srcBlendFactor = _srcFactor;
+  this->dstBlendFactor = _dstFactor;
 }
+ 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the blend factors 
+void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor)
+{
+  _srcFactor = this->srcBlendFactor;
+  _dstFactor = this->dstBlendFactor;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the blending mode

@@ -160,6 +160,16 @@ namespace gazebo
     /// \param _v A math::Plane reference
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v);
 
+    /// \brief Create a msgs::TrackVisual from a track visual SDF element
+    /// \param _sdf The sdf element
+    /// \return The new msgs::TrackVisual object
+    msgs::TrackVisual TrackVisualFromSDF( sdf::ElementPtr _sdf );
+
+    /// \brief Create a msgs::GUI from a GUI SDF element
+    /// \param _sdf The sdf element
+    /// \return The new msgs::GUI object
+    msgs::GUI      GUIFromSDF(sdf::ElementPtr _sdf);
+
     /// \brief Create a msgs::Light from a light SDF element
     /// \param _sdf The sdf element
     /// \return The new msgs::Light object

@@ -39,7 +39,7 @@ void CameraPlugin::Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &/*_sdf*/)
   this->depth = this->camera->GetImageDepth();
   this->format = this->camera->GetImageFormat();
 
-  this->newFrameConnection = this->camera->ConnectNewFrame( 
+  this->newFrameConnection = this->camera->ConnectNewImageFrame( 
       boost::bind(&CameraPlugin::OnNewFrame, this, _1, _2, _3, _4, _5));
 
   this->parentSensor->SetActive(true);

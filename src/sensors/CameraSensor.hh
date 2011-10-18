@@ -52,16 +52,16 @@ namespace gazebo
    
       /// \brief Load the camera using parameter from an SDF element
       /// \param _sdf The SDF parameters
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Load the camera using default parameters
-      protected: virtual void Load();
+      public: virtual void Load();
     
       /// \brief Initialize the camera
-      protected: virtual void InitChild();
+      public: virtual void Init();
 
       /// \brief Update the sensor information
-      protected: virtual void Update(bool force);
+      public: virtual void Update(bool force);
     
       /// Finalize the camera
       protected: virtual void Fini();

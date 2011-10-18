@@ -68,15 +68,12 @@ void Sensor::Load()
   }
 
   this->node->Init(this->sdf->GetWorldName());
-
 }
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the sensor
 void Sensor::Init()
 {
-  this->InitChild();
-
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {

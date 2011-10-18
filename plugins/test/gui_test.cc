@@ -58,7 +58,7 @@ namespace gazebo
                  this->camera->Load();
                  this->camera->Init();
                  this->camera->SetClipDist(0.1, 20);
-                 this->camera->SetCaptureData(true);
+                 this->camera->SetCaptureData(false);
 
                  //this->camera->CreateRenderTexture("help_me");
                  this->camera->CreateDepthTexture("help_me");

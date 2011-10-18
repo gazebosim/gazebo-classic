@@ -81,17 +81,25 @@ namespace gazebo
       public: void CreateDepthTexture(const std::string &_textureName);
 
       /// \brief Render the camera
-      public: virtual void Render();
       public: virtual void PostRender();
 
       // All things needed to get back z buffer for depth data
       public: virtual const float* GetDepthData();
 
-      private: virtual void RenderDepthData();
+      /// \brief Connect a to the add entity signal
+      public: template<typename T>
+              event::ConnectionPtr ConnectNewDepthFrame( T subscriber )
+              { return newDepthFrame.Connect(subscriber); }
+  
+      public: void DisconnectNewDepthFrame( event::ConnectionPtr &c )
+              { newDepthFrame.Disconnect(c); }
+
+      private: virtual void RenderImpl();
 
       private: float *depthBuffer;
-
       private: Ogre::Material *depthMaterial;
+
+      private: event::EventT<void(const float *, unsigned int, unsigned int, unsigned int, const std::string &)> newDepthFrame;
     };
     
     /// \}

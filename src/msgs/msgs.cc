@@ -247,6 +247,57 @@ math::Plane Convert(const msgs::PlaneGeom &p)
                p.d() );
 }
 
+msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
+{
+  msgs::GUI result;
+
+  result.set_fullscreen( _sdf->GetValueBool("fullscreen") );
+
+
+  if (_sdf->HasElement("camera"))
+  {
+    sdf::ElementPtr camSDF = _sdf->GetElement("camera");
+    msgs::GUICamera *guiCam = result.mutable_camera();
+
+    guiCam->set_name( camSDF->GetValueString("name") );
+
+    if (_sdf->HasElement("origin"))
+    {
+      msgs::Set( guiCam->mutable_origin(), 
+          camSDF->GetElement("origin")->GetValuePose("pose") );
+    }
+
+    if (camSDF->HasElement("view_controller"))
+    {
+        guiCam->set_view_controller( 
+            camSDF->GetElement("view_controller")->GetValueString("type") );
+    }
+
+    if (camSDF->HasElement("track_visual"))
+    {
+      guiCam->mutable_track()->CopyFrom( 
+          TrackVisualFromSDF( camSDF->GetElement("track_visual") ) );
+    }
+  }
+
+  return result;
+}
+
+msgs::TrackVisual TrackVisualFromSDF( sdf::ElementPtr _sdf )
+{
+  msgs::TrackVisual result;
+
+  result.set_name( _sdf->GetValueString("name") );
+
+  if (_sdf->HasElement("min_dist"))
+   result.set_min_dist( _sdf->GetElement("min_dist")->GetValueDouble() ); 
+
+  if (_sdf->HasElement("max_dist"))
+   result.set_max_dist( _sdf->GetElement("max_dist")->GetValueDouble() ); 
+
+  return result;
+}
+
 
 msgs::Light LightFromSDF( sdf::ElementPtr _sdf )
 {

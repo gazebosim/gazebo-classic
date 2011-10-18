@@ -98,7 +98,14 @@ namespace gazebo
     
       /// \brief Get the shininess 
       public: float GetTransparency() const;
-  
+
+      /// \brief Set the blende factors. Will be interpreted as:
+      ///        (texture * _srcFactor) + (scene_pixel * _dstFactor)
+      public: void SetBlendFactors(double _srcFactor, double _dstFactor);
+ 
+      /// \brief Get the blend factors 
+      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor);
+
       /// \brief Set the blending mode
       public: void SetBlendMode(BlendMode b);
   
@@ -166,6 +173,8 @@ namespace gazebo
 
       private: bool depthWrite;
       private: bool lighting;
+
+      private: double srcBlendFactor, dstBlendFactor;
     };
     /// \}
   }

@@ -10,6 +10,17 @@
       <grid enabled="false"/>
     </scene>
 
+    <gui fullscreen="true">
+      <camera name="user_camera">
+        <view_controller type="orbit"/>
+        <origin pose="0 0 0 0 0 0"/>
+        <track_visual name="default::female_standing">
+          <min_dist>0.5</min_dist>
+          <max_dist>2.5</max_dist>
+        </track_visual>
+      </camera>
+    </gui>
+
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
@@ -17,6 +28,29 @@
         <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
       </ode>
     </physics>
+
+    <model name="box_model" static="true">
+      <origin pose="5 5 0.0 0 0 0"/>
+      <link name="body">
+        <origin pose="0 0 0.1 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="geom">
+          <geometry>
+            <box size=".2 .2 .2"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size=".2 .2 .2"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
 
     <light type="directional" name="my_light">
       <origin pose="0 0 10 0 0 0"/>
@@ -35,8 +69,11 @@
 
 
     <include filename="kitchen.model"/>
-    <include filename="pr2.model" model_pose="1.42 1.16 0 0 0 -.5235"/>
-    <include filename="female_standing.model" model_pose="3.6 2.486 0 0 0 3.1414"/>
+    <!--<include filename="pr2.model" model_pose="1.42 1.16
+         0 0 0 -.5235"/>-->
+    <include filename="female_standing.model" model_pose="3.6 2.486 0 0 0 1.5707"/>
+    <!--<include filename="female_standing.model" model_pose="5 -5 -.5
+      0 0 0"/>-->
     <!--<include filename="table.model" model_pose="-3.0 0.5 0 0 0 1.5707"/>
     <include filename="bowl.model" model_name="bowl1" model_pose="-2 -2.5 0.867 0 0 0"/>
     <include filename="bowl.model" model_name="bowl2" model_pose="-1.5 -2.5 0.867 0 0 0"/>

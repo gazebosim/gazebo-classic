@@ -73,6 +73,10 @@ namespace gazebo
   
       /// \brief Set view controller
       public: void SetViewController( const std::string &type );
+
+       /// \brief Set view controller
+      public: void SetViewController( const std::string &type,
+                                      const math::Vector3 &_pos );
   
       /// \brief Resize the camera
       public: void Resize(unsigned int w, unsigned int h);
@@ -86,10 +90,13 @@ namespace gazebo
       /// \brief Get the triangle count 
       public: float GetTriangleCount() const;
 
-
       /// \brief Move the camera to focus on a scene node
       public: void MoveToVisual(VisualPtr _visual);
       public: void MoveToVisual(const std::string &_visualName);
+
+      /// \brief Set the camera to be attached to a scene node
+      protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
+                    double _minDist=0, double _maxDist=0 );
 
       /// \brief Set the camera to track a scene node
       protected: virtual bool TrackVisualImpl( VisualPtr _visual );

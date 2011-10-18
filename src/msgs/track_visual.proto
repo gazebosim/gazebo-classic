@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Track visual (used in the GUI) 
+/// \brief Message for a trackking a visual with a camera
+/// \verbatim
+
+message TrackVisual
+{
+  required string name                  = 1;
+  optional double min_dist = 2;
+  optional double max_dist = 3;
+}
+
+/// \endverbatim

@@ -107,18 +107,21 @@ void RaySensor::Load( )
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the ray
-void RaySensor::InitChild()
+void RaySensor::Init()
 {
   //gzerr << "Initializing RaySensor\n";
   //this->laserShape->Init( );
   //gazebo::math::Pose linkPose;
   //linkPose = this->link->GetWorldPose();
+
+  Sensor::Init();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Init the ray
-void RaySensor::FiniChild()
+// Fini the ray
+void RaySensor::Fini()
 {
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////////////////////////////////

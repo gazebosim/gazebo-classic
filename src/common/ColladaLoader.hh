@@ -87,6 +87,7 @@ namespace gazebo
       private: void LoadScene( Mesh *_mesh );
 
       private: float LoadFloat(TiXmlElement *_elem);
+      private: void LoadTransparent( TiXmlElement *_elem, Material *_mat );
 
       private: double meter;
       private: std::map<std::string, std::string> materialMap;

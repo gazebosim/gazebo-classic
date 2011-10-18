@@ -59,7 +59,7 @@ Publisher::~Publisher()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Publish a message
-void Publisher::Publish(google::protobuf::Message &_message )
+void Publisher::PublishImpl(const google::protobuf::Message &_message )
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");

@@ -23,6 +23,7 @@
 #define DEPTHCAMERASENSOR_HH
 
 #include "sensors/Sensor.hh"
+#include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -57,7 +58,7 @@ namespace gazebo
       protected: virtual void Load();
     
       /// \brief Initialize the camera
-      protected: virtual void InitChild();
+      protected: virtual void Init();
     
       /// \brief Update the sensor information
       protected: virtual void Update(bool force);

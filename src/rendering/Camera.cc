@@ -229,7 +229,9 @@ void Camera::Update()
     }
     else if ( (*iter).request() == "attach_visual")
     {
-      if (this->AttachToVisualImpl( (*iter).data() ))
+      msgs::TrackVisual msg;
+      msg.ParseFromString((*iter).data());
+      if (this->AttachToVisualImpl( msg.name(), msg.min_dist(), msg.max_dist() ))
         erase = true;
     }
 
@@ -254,9 +256,14 @@ void Camera::Render()
   if (common::Time::GetWallTime() - this->lastRenderTime >= this->renderPeriod)
   {
     this->newData = true;
-    this->renderTarget->update(false);
+    this->RenderImpl();
     this->lastRenderTime = common::Time::GetWallTime();
   }
+}
+
+void Camera::RenderImpl()
+{
+  this->renderTarget->update(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,7 +326,7 @@ void Camera::PostRender()
       buffer = this->bayerFrameBuffer;
     }
 
-    this->newFrame( buffer, width, height, this->GetImageDepth(), 
+    this->newImageFrame( buffer, width, height, this->GetImageDepth(), 
                     this->GetImageFormat());
   }
 
@@ -363,7 +370,7 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 /// Set the world position
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  this->sceneNode->setPosition( _pos.x, _pos.y, _pos.z);
+  this->sceneNode->_setDerivedPosition( Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -375,8 +382,11 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   p.SetFromEuler( math::Vector3(0,rpy.y, 0) );
   s.SetFromEuler( math::Vector3(rpy.x, 0, rpy.z) );
 
-  this->sceneNode->setOrientation( Ogre::Quaternion(s.w, s.x, s.y, s.z ));
-  this->pitchNode->setOrientation( Ogre::Quaternion(p.w, p.x, p.y, p.z ));
+  this->sceneNode->setOrientation( 
+      Ogre::Quaternion(s.w, s.x, s.y, s.z ));
+
+  this->pitchNode->setOrientation( 
+      Ogre::Quaternion(p.w, p.x, p.y, p.z ));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1036,11 +1046,20 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 }
 
 /// \brief Attach the camera to a scene node
-void Camera::AttachToVisual( const std::string &_visualName )
+void Camera::AttachToVisual( const std::string &_visualName,
+                             double _minDist, double _maxDist )
 {
   msgs::Request request;
+  msgs::TrackVisual track;
+
+  track.set_name(_visualName);
+  track.set_min_dist(_minDist);
+  track.set_max_dist( _maxDist );
+
+  std::string *serializedData = request.mutable_data();
+  track.SerializeToString( serializedData );
+
   request.set_request("attach_visual");
-  request.set_data( _visualName );
   request.set_id(0);
   this->requests.push_back( request );
 }
@@ -1055,13 +1074,44 @@ void Camera::TrackVisual( const std::string &_name )
   this->requests.push_back( request );
 }
 
-bool Camera::AttachToVisualImpl( const std::string &_name )
+bool Camera::AttachToVisualImpl( const std::string &_name, 
+    double _minDist, double _maxDist )
 {
   VisualPtr visual = this->scene->GetVisual(_name);
-  if (visual)
+  return this->AttachToVisualImpl(visual, _minDist, _maxDist);
+}
+
+bool Camera::AttachToVisualImpl( VisualPtr _visual, double _minDist, 
+                                 double _maxDist )
+{
+  if (this->sceneNode->getParent())
+      this->sceneNode->getParent()->removeChild(this->sceneNode);
+
+  if (_visual)
   {
-    this->sceneNode->getParent()->removeChild(this->sceneNode);
-    visual->GetSceneNode()->addChild(this->sceneNode);
+    math::Pose origPose = this->GetWorldPose();
+    _visual->GetSceneNode()->addChild(this->sceneNode);
+    this->sceneNode->setInheritOrientation(false);
+    //this->sceneNode->_setDerivedPosition(Conversions::Convert(origPose.pos));
+    this->SetWorldPose(origPose);
+
+    double yaw = atan2(origPose.pos.x - _visual->GetWorldPose().pos.x,
+                       origPose.pos.y - _visual->GetWorldPose().pos.y);
+    yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+
+    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
+    double pitch = 0;
+
+    if (fabs(zDiff) > 1e-3) 
+    {
+      double dist = _visual->GetWorldPose().pos.Distance( 
+          this->GetWorldPose().pos);
+      pitch = acos(zDiff/dist );
+    }
+
+    this->RotateYaw(yaw);
+    this->RotatePitch(pitch);
+
     return true;
   }
 
@@ -1073,6 +1123,8 @@ bool Camera::TrackVisualImpl( const std::string &_name )
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
     return this->TrackVisualImpl(visual);
+  else
+    gzdbg << "Unable to find visual[" << _name << "]\n";
 
   return false;
 }
