@@ -6,7 +6,7 @@
       <background rgba="0 0 0 1">
         <sky material="Gazebo/CloudySky"/>
       </background>
-      <shadows enabled="true"/>
+      <shadows enabled="false"/>
     </scene>
 
     <physics type="ode">
@@ -19,13 +19,7 @@
 
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">
-      <origin pose="0 0 -10 0 0 0"/>
       <link name="body">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0"
-                   iyy="1" iyz="0"
-                   izz="1"/>
-        </inertial>
         <collision name="geom">
           <geometry>
             <plane normal="0 0 1"/>
@@ -41,8 +35,57 @@
       </link>
     </model>
 
-    <model name="camera_model" static="false">
-      <origin pose="0 0 5 0.0 0.0 0"/>
+    <!--
+    <model name="box_model">
+      <origin pose="3 -0.5 0.0 0 0 0"/>
+      <link name="body">
+        <origin pose="0 0 0.5 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="geom">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_model2">
+      <origin pose="5 1.0 0.0 0 0 0"/>
+      <link name="body">
+        <origin pose="0 0 0.5 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="geom">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+    -->
+
+    <!--
+    <model name="camera_model" static="true">
+      <origin pose="0 0 .5 0 0 0"/>
       <link name="my_link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" 
@@ -50,27 +93,28 @@
                    izz="1"/>
         </inertial>
 
-        <collision>
+        <collision name="collision">
           <geometry>
             <box size="1 1 1"/>
           </geometry>
         </collision>
 
         <sensor name="camera" type="depth" always_on="true" update_rate="10">
-          <origin pose="0 0 5 0 0 0"/>
           <camera>
             <horizontal_fov angle="1.04719755"/>
             <image width="640" height="480" format="R8G8B8"/>
-            <clip near="0.1" far="50"/>
+            <clip near=".1" far="20"/>
             <save enabled="true" path="/tmp/camera"/>
           </camera>
         </sensor>
       </link>
     </model>
+    -->
 
-    <light type="directional" name="my_light">
+
+    <light type="directional" name="my_light" cast_shadows="false">
       <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba=".4 .4 .4 1"/>
+      <diffuse rgba=".9 .9 .9 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
       <direction xyz="0 0 -1"/>

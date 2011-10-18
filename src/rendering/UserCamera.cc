@@ -159,19 +159,6 @@ void UserCamera::Init()
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->visual->SetVisible(false);
-
-  //this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
-
- // double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
-  //double vfov = fabs(2.0 * atan(tan(this->GetHFOV().GetAsRadian() / 2.0) / ratio));
-  //this->GetCamera()->setAspectRatio(ratio);
-  //this->GetCamera()->setFOVy(Ogre::Radian(vfov));
-
-  //this->viewport->setClearEveryFrame(true);
-  //this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
-
-  //RTShaderSystem::AttachViewport(this->viewport, this->scene);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +416,7 @@ void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )
 {
   Camera::SetRenderTarget(_target);
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->gui->Init(this->renderTarget);
 }
 

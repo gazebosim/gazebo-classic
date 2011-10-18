@@ -24,7 +24,6 @@
 
 
 #include "rendering/Camera.hh"
-#include "rendering/ogre.h"
 
 #include "common/Event.hh"
 #include "common/Time.hh"
@@ -34,6 +33,11 @@
 #include "math/Vector2i.hh"
 
 #include "sdf/sdf.h"
+
+namespace Ogre
+{
+  class Material;
+}
 
 namespace gazebo
 {
@@ -71,25 +75,23 @@ namespace gazebo
       /// \brief Initialize the camera
       public: void Init();
 
+      /// Finalize the camera
+      public: void Fini();
+
+      public: void CreateDepthTexture(const std::string &_textureName);
+
       /// \brief Render the camera
       public: virtual void Render();
       public: virtual void PostRender();
 
-      /// Finalize the camera
-      public: void Fini();
-
       // All things needed to get back z buffer for depth data
       public: virtual const float* GetDepthData();
-      protected: virtual void RenderDepthData();
-      protected: float *saveDepthBuffer;
-      public: Ogre::RenderTarget *depthTarget;
-      protected: Ogre::TexturePtr depthTexture;
-      private: Ogre::MaterialPtr depthMaterial;
-      protected: std::string depthTextureName;
-      protected: std::string depthMaterialName;
-      private: void CreateDepthTexture();
 
+      private: virtual void RenderDepthData();
 
+      private: float *depthBuffer;
+
+      private: Ogre::Material *depthMaterial;
     };
     
     /// \}

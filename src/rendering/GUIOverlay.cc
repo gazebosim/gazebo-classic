@@ -7,12 +7,15 @@
 #endif
 
 #include "common/SystemPaths.hh"
-#include "rendering/ogre.h"
 #include "msgs/msgs.h"
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 #include "math/Vector2d.hh"
+
+#include "rendering/ogre.h"
+#include "rendering/RenderTypes.hh"
 #include "rendering/Camera.hh"
+#include "rendering/DepthCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -179,6 +182,14 @@ void GUIOverlay::Resize( unsigned int _width, unsigned int _height )
   CEGUI::Window *rootWindow = windowManager->getWindow("root");
   rootWindow->setArea( CEGUI::UDim(0,0), CEGUI::UDim(0,0), CEGUI::UDim(1,0), CEGUI::UDim(1,0));
 #endif
+}
+
+bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera, 
+                                     const std::string &_windowName)
+{
+  CameraPtr cam = boost::shared_dynamic_cast<Camera>(_camera);
+  return this->AttachCameraToImage(cam , _windowName);
+
 }
 
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_windowName)

@@ -47,8 +47,8 @@ using namespace rendering;
 DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene) :
              Camera(_namePrefix, _scene)
 {
-
-  this->depthTarget = NULL;
+  this->renderTarget = NULL;
+  this->depthBuffer = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -61,8 +61,7 @@ DepthCamera::~DepthCamera()
 // Load the camera
 void DepthCamera::Load( sdf::ElementPtr &_sdf )
 {
-  this->sdf = _sdf;
-  this->Load();
+  Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -72,59 +71,74 @@ void DepthCamera::Load()
   Camera::Load();
 }
 
-void DepthCamera::CreateDepthTexture()
+//////////////////////////////////////////////////////////////////////////////
+// Initialize the camera
+void DepthCamera::Init()
 {
+  Camera::Init();
+}
 
+//////////////////////////////////////////////////////////////////////////////
+// Finalize the camera
+void DepthCamera::Fini()
+{
+  Camera::Fini();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void DepthCamera::CreateDepthTexture( const std::string &_textureName )
+{
   // Create the depth buffer
-  this->depthTextureName = this->GetName() + "_RttTex_Camera_Depth";
-  this->depthMaterialName = this->GetName() + "_RttMat_Camera_Depth";
+  std::string depthMaterialName = this->GetName() + "_RttMat_Camera_Depth";
 
-  this->depthTexture = Ogre::TextureManager::getSingleton().createManual(
-      depthTextureName,
+  this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
+      _textureName,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(), this->GetImageHeight(), 0,
       Ogre::PF_FLOAT32_R,
-      Ogre::TU_RENDERTARGET);
+      Ogre::TU_RENDERTARGET).getPointer();
 
-  this->depthTarget = this->depthTexture->getBuffer()->getRenderTarget();
+  this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+  this->renderTarget->setAutoUpdated(false);
 
-  this->depthTarget->setAutoUpdated(false);
-  //
-  // Setup the viewport to use the texture
-  Ogre::Viewport *cviewport;
-  Ogre::MaterialPtr matPtr;
-  cviewport = this->depthTarget->addViewport(this->camera);
-  //cviewport->setClearEveryFrame(true);
-  cviewport->setOverlaysEnabled(false);
-  cviewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
+  this->SetRenderTarget( this->renderTarget );
 
+  this->viewport->setOverlaysEnabled(false);
 
-  // TODO: reimplement Visibility Mast
-  // cviewport->setVisibilityMask(this->visibilityMask);
-
-
-// Create materials for all the render textures.
-  matPtr = Ogre::MaterialManager::getSingleton().create(
+  // Create materials for all the render textures.
+  Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
       depthMaterialName,
-  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
   matPtr->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
   matPtr->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
   matPtr->getTechnique(0)->getPass(0)->setLightingEnabled(false);
 
   matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
-      depthTextureName );
+      _textureName );
 
-  //this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName(depthMaterialName);
-  this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap");
+  this->depthMaterial = (Ogre::Material*)(Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap").getPointer());
   this->depthMaterial->load();
-
 }
 
- 
+////////////////////////////////////////////////////////////////////////////////
+// Render the camera
+void DepthCamera::Render()
+{
+  // produce depth data for the camera
+  if (!this->newData)
+  {
+    this->newData = true;
+    this->RenderDepthData();
+  }
+  //this->renderTarget->update(false);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
+  //this->renderTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
@@ -146,33 +160,36 @@ void DepthCamera::PostRender()
 
 
     // Blit the depth buffer if needed
-    if (!this->saveDepthBuffer)
-      this->saveDepthBuffer = new float[size];
+    if (!this->depthBuffer)
+      this->depthBuffer = new float[size];
 
-    pixelBuffer = this->depthTexture->getBuffer(0, 0);
+    pixelBuffer = this->renderTexture->getBuffer(0, 0);
     pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
     Ogre::Box src_box(0,0,this->GetImageWidth(), this->GetImageHeight());
     Ogre::PixelBox dst_box(this->GetImageWidth(), this->GetImageHeight(),
-        1, Ogre::PF_FLOAT32_R, this->saveDepthBuffer);
+        1, Ogre::PF_FLOAT32_R, this->depthBuffer);
 
     pixelBuffer->blitToMemory(src_box, dst_box);
     pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
     // Update the last captured render time
     //this->lastRenderTime = this->lastRenderTimeNotCaptured;
+   
+    float min = 1000;
+    float max = 0; 
+    for (unsigned int i=0; i < size; i++)
+    {
+      if (this->depthBuffer[i] > max)
+        max = this->depthBuffer[i];
+      if (this->depthBuffer[i] < min)
+        min = this->depthBuffer[i];
+    }
 
+    std::cout << "Min[" << min << "] Max[" << max << "] Mid[" << this->depthBuffer[size/2] << "]\n";
   }
   this->newData = false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Render the camera
-void DepthCamera::Render()
-{
-  // produce depth data for the camera
-  this->RenderDepthData();
-  //this->depthTarget->update(false);
-}
 //////////////////////////////////////////////////////////////////////////////
 // Simulate Depth Data
 void DepthCamera::RenderDepthData()
@@ -181,24 +198,11 @@ void DepthCamera::RenderDepthData()
   Ogre::Viewport *vp = NULL;
   Ogre::SceneManager *sceneMgr = this->scene->GetManager();
   Ogre::Pass *pass;
-  Ogre::SceneNode *gridNode = NULL;
-
-  try
-  {
-    gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
-  }
-  catch (...)
-  {
-    gridNode = NULL;
-  }
 
   sceneMgr->_suppressRenderStateChanges(true);
 
   // Get pointer to the material pass
   pass = this->depthMaterial->getBestTechnique()->getPass(0);
-
-  if (gridNode)
-    gridNode->setVisible(false);
 
   // Render the depth texture
   // OgreSceneManager::_render function automatically sets farClip to 0.
@@ -208,7 +212,7 @@ void DepthCamera::RenderDepthData()
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  vp = this->depthTarget->getViewport(0);
+  vp = this->renderTarget->getViewport(0);
 
   // return 0 in case no renderable object is inside frustrum
   vp->setBackgroundColour( Ogre::ColourValue(Ogre::ColourValue(0,0,0)) );
@@ -220,7 +224,7 @@ void DepthCamera::RenderDepthData()
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(this->depthTarget);
+  autoParamDataSource.setCurrentRenderTarget(this->renderTarget);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
   autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
 
@@ -267,32 +271,14 @@ void DepthCamera::RenderDepthData()
   }
 
   // Does actual rendering
-  this->depthTarget->update();
+  this->renderTarget->update(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
-
-  if (gridNode)
-    gridNode->setVisible(true);
 }
+
 //////////////////////////////////////////////////////////////////////////////
 /// Get a pointer to the image data
 const float* DepthCamera::GetDepthData()
 {
-  return this->saveDepthBuffer;
+  return this->depthBuffer;
 }
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Initialize the camera
-void DepthCamera::Init()
-{
-
-  this->CreateDepthTexture();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Finalize the camera
-void DepthCamera::Fini()
-{
-}
-

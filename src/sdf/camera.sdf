@@ -8,8 +8,8 @@
     <attribute name="format" type="string" default="R8G8B8" required="0"/>
   </element> <!-- End Image -->
   <element name="clip" required="1">
-    <attribute name="near" type="double" default="0" required="1"/>
-    <attribute name="far" type="double" default="0" required="1"/>
+    <attribute name="near" type="double" default="1" required="1"/>
+    <attribute name="far" type="double" default="100" required="1"/>
   </element> <!-- End Clip -->
   <element name="save" required="0">
     <attribute name="enabled" type="bool" default="false" required="1"/>

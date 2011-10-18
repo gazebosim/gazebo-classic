@@ -45,6 +45,9 @@ namespace gazebo
     
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
+
+      /// \brief Set the parent of the sensor
+      public: virtual void SetParent( const std::string &_name );
     
       /// \brief Load the camera using parameter from an SDF element
       /// \param _sdf The SDF parameters
@@ -64,13 +67,15 @@ namespace gazebo
     
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
-    
-      private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
-      //private: void Render();
-    
+   
       public: rendering::DepthCameraPtr GetCamera() const 
               {return this->camera; };
-    
+
+       /// \brief Set the update rate of the sensor
+      public: virtual void SetUpdateRate(double _hz);
+
+      private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
+   
       private: rendering::DepthCameraPtr camera;
     };
     /// \}

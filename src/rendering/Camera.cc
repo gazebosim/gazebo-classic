@@ -54,6 +54,8 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->windowId = 0;
   this->scene = scene_;
 
+  this->newData = false;
+
   this->textureWidth = this->textureHeight = 0;
 
   this->saveFrameBuffer = NULL;
@@ -171,8 +173,7 @@ void Camera::Init()
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
   this->SetFOV( DTOR(60) );
-  this->SetClipDist(0.001, 100);
-
+  this->SetClipDist(0.01, 50);
 }
 
 //////////////////////////////////////////////////////////////////////////////

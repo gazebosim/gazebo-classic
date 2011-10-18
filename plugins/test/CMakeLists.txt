@@ -3,7 +3,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-set (plugins ServerPlugin)
+set (plugins gui_test)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

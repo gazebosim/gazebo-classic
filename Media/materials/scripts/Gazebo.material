@@ -1,6 +1,38 @@
 import * from "shadow_receiver.program"
 import * from "perpixel.program"
 
+vertex_program Gazebo/DepthMapVS glsl
+{
+  source depth_map.vert
+
+  default_params
+  {
+    param_named_auto texelOffsets texel_offsets
+  }
+}
+
+fragment_program Gazebo/DepthMapFS glsl
+{
+  source depth_map.frag
+
+  default_params
+  {
+    param_named_auto pNear near_clip_distance
+    param_named_auto pFar far_clip_distance
+  }
+}
+
+material Gazebo/DepthMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/DepthMapVS { }
+      fragment_program_ref Gazebo/DepthMapFS { }
+    }
+  }
+}
 
 material Gazebo/GreyGrid
 {

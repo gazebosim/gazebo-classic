@@ -52,6 +52,14 @@ DepthCameraSensor::~DepthCameraSensor()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Set the parent of the sensor
+void DepthCameraSensor::SetParent( const std::string &_name )
+{
+  Sensor::SetParent(_name);
+  this->camera->AttachToVisual( _name );
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Load the camera with SDF parameters
 void DepthCameraSensor::Load( sdf::ElementPtr &_sdf )
 {
@@ -98,9 +106,8 @@ void DepthCameraSensor::InitChild()
     }
 
     this->camera->Init();
-
-    //this->camera->SetWorldPosition(math::Vector3(0, 0, 5));
-    //this->camera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, DTOR(15), 0) );
+    this->camera->CreateDepthTexture(this->GetName() + "_RttTex");
+    this->camera->SetWorldPose( this->pose );
   }
   else
     gzerr << "No world name\n";
@@ -122,47 +129,18 @@ void DepthCameraSensor::SetActive(bool value)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Render new data
-/*void DepthCameraSensor::Render()
-{
-  //if (this->active || **this->alwaysActiveP)
-  {
-    //this->lastUpdate = this->GetWorld()->GetSimTime();
-    //this->camera->Render();
-    //this->camera->PostRender();
-  }
-  
-}*/
-
-//////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void DepthCameraSensor::Update(bool force)
 {
   Sensor::Update(force);
-  /*if (this->camera)
-  {
-    this->camera->Render();
-    this->camera->PostRender();
-  }*/
-
-  // NATY
-  //if (this->active || **this->alwaysActiveP)
-    //this->camera->Update();
-
-  // Only continue if the controller has an active interface. Or frames need
-  // to be saved
-  /*if ( (this->controller && !this->controller->IsConnected()) &&
-       !this->saveFramesP->GetValue())
-    return;
-
-  // Or skip if user sets camera to inactive
-  if (this->active)
-    this->UpdateCam();
-    */
 }
 
 void DepthCameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
-  //if (_msg->header().str_id() == "world_1::camera_model")
-  //  gzdbg << "On Pose[" << _msg->header().str_id() << "][" << _msg->position().z() << "]\n";
+}
+
+/// Set the update rate of the sensor
+void DepthCameraSensor::SetUpdateRate(double _hz) 
+{
+  this->camera->SetRenderRate( _hz );
 }

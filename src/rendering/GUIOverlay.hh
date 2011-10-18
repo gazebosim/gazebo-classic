@@ -50,7 +50,11 @@ namespace gazebo
       public: void LoadLayout( const std::string &_filename );
 
       public: bool AttachCameraToImage(CameraPtr &_camera, 
-                  const std::string &_windowName);
+                                       const std::string &_windowName);
+
+      public: bool AttachCameraToImage(DepthCameraPtr &_camera, 
+                                       const std::string &_windowName);
+
 
       public: void Resize( unsigned int _width, unsigned int _height );
       private: void PreRender();
