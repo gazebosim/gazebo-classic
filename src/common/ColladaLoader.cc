@@ -381,9 +381,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       if (blinnXml->FirstChildElement("transparency"))
         mat->SetTransparency( 
             this->LoadFloat(blinnXml->FirstChildElement("transparency")) );
-      if (phongXml->FirstChildElement("transparent"))
+      if (blinnXml->FirstChildElement("transparent"))
       {
-        TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
+        TiXmlElement *transXml = blinnXml->FirstChildElement("transparent");
         this->LoadTransparent( transXml, mat );
       }
     }
