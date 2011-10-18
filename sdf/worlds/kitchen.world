@@ -10,6 +10,17 @@
       <grid enabled="false"/>
     </scene>
 
+    <gui fullscreen="true">
+      <camera name="user_camera">
+        <view_controller type="orbit"/>
+        <origin pose="0 0 0 0 0 0"/>
+        <track_visual name="default::female_standing">
+          <min_dist>0.5</min_dist>
+          <max_dist>2.5</max_dist>
+        </track_visual>
+      </camera>
+    </gui>
+
     <physics type="ode">
       <gravity xyz="0 0 -9.8"/>
       <ode>
@@ -18,30 +29,26 @@
       </ode>
     </physics>
 
-    <model name="plane1_model" static="true">
+    <model name="box_model" static="true">
+      <origin pose="5 5 0.0 0 0 0"/>
       <link name="body">
+        <origin pose="0 0 0.1 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
         <collision name="geom">
           <geometry>
-            <plane normal="0 0 1"/>
+            <box size=".2 .2 .2"/>
           </geometry>
         </collision>
 
-        <visual name="visual" cast_shadows="false">
-          <origin pose="-4.5 0 0 0 0 0"/>
+        <visual name="visual">
           <geometry>
-            <box size="10 10 .1"/>
+            <box size=".2 .2 .2"/>
           </geometry>
-          <material script="Kitchen/WoodFloor"/>
+          <material script="Gazebo/WoodPallet"/>
         </visual>
-
-        <visual name="visual" cast_shadows="false">
-          <origin pose="0 0 -.1 0 0 0"/>
-          <geometry>
-            <plane normal="0 0 1"/>
-          </geometry>
-          <material script="Kitchen/Grass"/>
-        </visual>
-
       </link>
     </model>
 
@@ -60,88 +67,20 @@
       <attenuation range="40" constant="0.9" linear="0.01" quadratic="0.001" />
     </light>
 
-    <include filename="kitchen_counter.model"/>
-    <include filename="man_standing.model"/>
-    <include filename="pr2.model" model_pose="-1.5 -1.4 0 0 0 0"/>
-    <include filename="table.model" model_pose="-3.0 0.5 0 0 0 1.5707"/>
+
+    <include filename="kitchen.model"/>
+    <!--<include filename="pr2.model" model_pose="1.42 1.16
+         0 0 0 -.5235"/>-->
+    <include filename="female_standing.model" model_pose="3.6 2.486 0 0 0 1.5707"/>
+    <!--<include filename="female_standing.model" model_pose="5 -5 -.5
+      0 0 0"/>-->
+    <!--<include filename="table.model" model_pose="-3.0 0.5 0 0 0 1.5707"/>
     <include filename="bowl.model" model_name="bowl1" model_pose="-2 -2.5 0.867 0 0 0"/>
     <include filename="bowl.model" model_name="bowl2" model_pose="-1.5 -2.5 0.867 0 0 0"/>
     <include filename="bowl.model" model_name="bowl3" model_pose="-1.0 -2.5 0.867 0 0 0"/>
     <include filename="bowl.model" model_name="bowl4" model_pose="-0.5 -2.5 0.867 0 0 0"/>
     <include filename="saucepan.model" model_name="saucepan" model_pose="-0.3 -0.16 0.9 0 0 -1.5707"/>
-
-    <model name="walls" static="true">
-      <link name="link">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="wall_1">
-          <origin pose="0.65 0 3 0 0 0"/>
-          <geometry>
-            <box size="0.3 10.0 6.0"/>
-          </geometry>
-        </collision>
-        <visual name="visual1">
-          <!--<origin pose="0.65 0 3 0 0 0"/>-->
-          <origin pose=".5 0 0 0 0 -1.5707"/>
-          <geometry>
-            <!--<box size="0.3 10.0 6.0"/>-->
-            <mesh filename="kitchen/kitchen_walls.dae"/>
-          </geometry>
-          <!--<material script="Kitchen/Wall"/>-->
-        </visual>
-
-        <collision name="wall_2">
-          <origin pose="-4.2 -5.15 3 0 0 0"/>
-          <geometry>
-            <box size="10.0 0.3 6.0"/>
-          </geometry>
-        </collision>
-        <!--
-        <visual name="visual2">
-          <origin pose="-4.2 -5.15 3 0 0 0"/>
-          <geometry>
-            <box size="10.0 0.3 6.0"/>
-          </geometry>
-          <material script="Kitchen/Wall"/>
-        </visual>
-        -->
-
-        <collision name="wall_3">
-          <origin pose="-9.05 0 3 0 0 0"/>
-          <geometry>
-            <box size="0.3 10.0 6.0"/>
-          </geometry>
-        </collision>
-        <!--
-        <visual name="visual3">
-          <origin pose="-9.05 0 3 0 0 0"/>
-          <geometry>
-            <box size="0.3 10.0 6.0"/>
-          </geometry>
-          <material script="Kitchen/Wall"/>
-        </visual>
-        -->
-
-        <collision name="wall_4">
-          <origin pose="-4.2 5.15 3 0 0 0"/>
-          <geometry>
-            <box size="10.0 0.3 6.0"/>
-          </geometry>
-        </collision>
-        <!--
-        <visual name="visual4">
-          <origin pose="-4.2 5.15 3 0 0 0"/>
-          <geometry>
-            <box size="10.0 0.3 6.0"/>
-          </geometry>
-          <material script="Kitchen/Wall"/>
-        </visual>
-        -->
-
-      </link>
-    </model>
+    -->
 
   </world>
 </gazebo>
