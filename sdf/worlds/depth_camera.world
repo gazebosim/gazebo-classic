@@ -18,7 +18,7 @@
     </physics>
 
     <!-- Ground Plane -->
-    <model name="plane1_model" static="true">
+    <!--<model name="plane1_model" static="true">
       <link name="body">
         <collision name="geom">
           <geometry>
@@ -34,6 +34,7 @@
         </visual>
       </link>
     </model>
+    -->
 
     <!--
     <model name="box_model">
@@ -61,9 +62,8 @@
     -->
 
     <model name="sphere" static="true">
-      <origin pose="5 0 0.0 0 0 0"/>
+      <origin pose="2 0 0 0 0 0"/>
       <link name="body">
-        <origin pose="0 0 0.5 0 0 0"/>
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
@@ -83,9 +83,8 @@
       </link>
     </model>
 
-<!--
     <model name="camera_model" static="true">
-      <origin pose="0 0 .5 0 0 0"/>
+      <origin pose="0 0 0 0 0 0"/>
       <link name="my_link">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" 
@@ -111,7 +110,6 @@
         </sensor>
       </link>
     </model>
-    -->
 
 
     <light type="directional" name="my_light" cast_shadows="false">

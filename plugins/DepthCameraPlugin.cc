@@ -46,10 +46,24 @@ void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor,
   this->parentSensor->SetActive(true);
 }
 
-void DepthCameraPlugin::OnNewFrame(const float * /*_image*/,
-    unsigned int /*_width*/, unsigned int /*_height*/, 
+void DepthCameraPlugin::OnNewFrame(const float *_image,
+    unsigned int _width, unsigned int _height, 
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
+  float min, max;
+  min = 1000;
+  max = 0;
+  for (unsigned int i=0; i < _width * _height; i++)
+  {
+    if (_image[i] > max)
+      max = _image[i];
+    if (_image[i] < min)
+      min = _image[i];
+  }
+
+  int index =  ((_height * 0.5) * _width) + _width *0.5;
+  printf("W[%d] H[%d] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n", width, height, index, _image[index], min, max);
+
   /*rendering::Camera::SaveFrame( _image, this->width, 
     this->height, this->depth, this->format, 
     "/tmp/camera/me.jpg" );
