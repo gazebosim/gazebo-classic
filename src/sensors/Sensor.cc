@@ -74,6 +74,8 @@ void Sensor::Load()
 /// Initialize the sensor
 void Sensor::Init()
 {
+  this->SetUpdateRate( this->sdf->GetValueDouble("update_rate")  );
+
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
   {

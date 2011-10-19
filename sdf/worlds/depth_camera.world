@@ -83,7 +83,6 @@
     </model>
     -->
 
-    <!--
     <model name="camera_model" static="true">
       <origin pose="0 0 .5 0 0 0"/>
       <link name="my_link">
@@ -106,10 +105,11 @@
             <clip near=".1" far="20"/>
             <save enabled="true" path="/tmp/camera"/>
           </camera>
+          <plugin filename="libDepthCameraPlugin.so"
+            name="depth_camera_plugin"/>
         </sensor>
       </link>
     </model>
-    -->
 
 
     <light type="directional" name="my_light" cast_shadows="false">
