@@ -203,6 +203,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
     dWorldSetERP(this->worldId, 
         odeElem->GetElement("constraints")->GetValueDouble("erp"));
   }
+  else
     dWorldSetERP(this->worldId, 0.2);
 
   dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters() );
@@ -783,6 +784,10 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
       double h = this->stepTimeDouble;
       double kp = 1.0 / (1.0 / collision1->surface->kp + 1.0 / collision2->surface->kp);
       double kd = collision1->surface->kd + collision2->surface->kd;
+      //gzerr << "contact debug " << kp << " : " << kd
+      //      << " obj1 " << collision1->surface->kp << " : " << collision1->surface->kd
+      //      << " obj2 " << collision2->surface->kp << " : " << collision2->surface->kd
+      //      << " \n";
       contact.surface.soft_erp = h * kp / (h * kp + kd);
       contact.surface.soft_cfm = 1.0 / (h * kp + kd);
       /*
