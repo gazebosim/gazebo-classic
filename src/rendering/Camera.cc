@@ -456,6 +456,22 @@ math::Angle Camera::GetVFOV() const
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Set the image width
+void Camera::SetImageWidth( unsigned int _w )
+{
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  elem->GetAttribute("width")->Set(_w);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the image height
+void Camera::SetImageHeight( unsigned int _h )
+{
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  elem->GetAttribute("height")->Set(_h);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Get the width of the image
 unsigned int Camera::GetImageWidth() const
 {
@@ -1038,7 +1054,7 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     double ratio = (double)this->viewport->getActualWidth() / 
                    (double)this->viewport->getActualHeight();
 
-    double hfov = this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
+    double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
@@ -1081,8 +1097,8 @@ bool Camera::AttachToVisualImpl( const std::string &_name,
   return this->AttachToVisualImpl(visual, _minDist, _maxDist);
 }
 
-bool Camera::AttachToVisualImpl( VisualPtr _visual, double _minDist, 
-                                 double _maxDist )
+bool Camera::AttachToVisualImpl( VisualPtr _visual, double /*_minDist*/, 
+                                 double /*_maxDist*/ )
 {
   if (this->sceneNode->getParent())
       this->sceneNode->getParent()->removeChild(this->sceneNode);

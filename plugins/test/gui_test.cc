@@ -58,12 +58,15 @@ namespace gazebo
                  this->camera->Load();
                  this->camera->Init();
                  this->camera->SetClipDist(0.1, 20);
-                 this->camera->SetCaptureData(false);
+                 this->camera->SetCaptureData(true);
+                 this->camera->SetImageWidth(500);
+                 this->camera->SetImageHeight(500);
+                 this->camera->SetFOV( 1.5707 );
 
                  //this->camera->CreateRenderTexture("help_me");
                  this->camera->CreateDepthTexture("help_me");
 
-                 this->camera->SetWorldPosition( math::Vector3(0,0,.5) );
+                 this->camera->SetWorldPosition( math::Vector3(0,0,0.5) );
 
                  if (!camera)
                    gzerr << "Unable to find camera[camera]\n";

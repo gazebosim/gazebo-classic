@@ -148,6 +148,12 @@ namespace gazebo
       /// \brief Get the camera FOV (vertical)  
       public: math::Angle GetVFOV() const;
     
+      /// \brief Set the image height
+      public: void SetImageWidth( unsigned int _w );
+
+      /// \brief Set the image height
+      public: void SetImageHeight( unsigned int _h );
+
       /// \brief Get the width of the image
       public: unsigned int GetImageWidth() const;
     
