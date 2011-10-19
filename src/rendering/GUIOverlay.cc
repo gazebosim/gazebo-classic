@@ -34,7 +34,7 @@ GUIOverlay::~GUIOverlay()
 #endif
 }
 
-void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
+void GUIOverlay::Init( Ogre::RenderTarget * /*_renderTarget*/ )
 {
 #ifdef HAVE_CEGUI
   CEGUI::System::getSingletonPtr();

@@ -208,15 +208,15 @@ void Camera::SetScene( Scene *scene_ )
 // Update the drawing
 void Camera::Update()
 {
-  if (this->sceneNode)
-  {
-    Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-  }
+  //if (this->sceneNode)
+  //{
+    //Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
+  //}
 
-  if (this->pitchNode)
-  {
-    Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-  }
+  //if (this->pitchNode)
+  //{
+  //  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
+  //}
 
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
@@ -274,17 +274,13 @@ void Camera::PostRender()
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-    Ogre::RenderTexture *rTexture;
-    Ogre::Viewport* renderViewport;
 
     size_t size;
 
     // Get access to the buffer and make an image and write it to file
     pixelBuffer = this->renderTexture->getBuffer();
-    rTexture = pixelBuffer->getRenderTarget();
 
     Ogre::PixelFormat format = pixelBuffer->getFormat();
-    renderViewport = rTexture->getViewport(0);
 
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();

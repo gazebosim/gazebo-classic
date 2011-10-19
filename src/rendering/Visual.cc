@@ -625,7 +625,7 @@ void Visual::SetAmbient(const common::Color &_color)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
-      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+      //Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
@@ -673,7 +673,7 @@ void Visual::SetDiffuse(const common::Color &_color)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
-      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+      //Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
@@ -721,7 +721,7 @@ void Visual::SetSpecular(const common::Color &_color)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
-      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+      //Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
@@ -814,7 +814,7 @@ void Visual::SetTransparency( float _trans )
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
-      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+      //Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
@@ -869,7 +869,7 @@ void Visual::SetEmissive( const common::Color &_color )
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
-      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
+      //Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
