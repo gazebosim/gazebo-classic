@@ -132,7 +132,6 @@ void DepthCamera::PostRender()
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
-    size_t size;
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
@@ -141,19 +140,15 @@ void DepthCamera::PostRender()
 
     Ogre::PixelFormat format = pixelBuffer->getFormat();
 
-    sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-    size = Ogre::PixelUtil::getMemorySize( width, height, 1, format );
-
     // Blit the depth buffer if needed
     if (!this->depthBuffer)
-      this->depthBuffer = new float[size];
+      this->depthBuffer = new float[width*height];
 
-    pixelBuffer = this->renderTexture->getBuffer(0, 0);
-    pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
     Ogre::Box src_box(0,0,width, height);
     Ogre::PixelBox dst_box(width, height,
-        1, Ogre::PF_FLOAT32_R, this->depthBuffer);
+        1, format, this->depthBuffer);
 
+    pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
     pixelBuffer->blitToMemory(src_box, dst_box);
     pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 

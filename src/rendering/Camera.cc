@@ -274,20 +274,15 @@ void Camera::PostRender()
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-    Ogre::RenderTexture *rTexture;
-    Ogre::Viewport* renderViewport;
 
     size_t size;
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
     pixelBuffer = this->renderTexture->getBuffer();
-    rTexture = pixelBuffer->getRenderTarget();
 
     Ogre::PixelFormat format = pixelBuffer->getFormat();
-    renderViewport = rTexture->getViewport(0);
-
-    unsigned int width = this->GetImageWidth();
-    unsigned int height = this->GetImageHeight();
 
     size = Ogre::PixelUtil::getMemorySize( width, height, 1, format);
 
