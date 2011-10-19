@@ -1,0 +1,511 @@
+<?xml version="1.0" ?>
+<Falagard>
+  <WidgetLook name="Gazebo/Shared">
+    <ImagerySection name="Frame">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" />
+          </Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"> <UnifiedDim scale="1" type="BottomEdge"/></Dim>
+
+        </Area>
+        <Image type="TopLeftCorner" imageset="Gazebo-Images" image="FrameTopLeft" />
+        <Image type="TopRightCorner" imageset="Gazebo-Images" image="FrameTopRight" />
+        <Image type="BottomLeftCorner" imageset="Gazebo-Images" image="FrameBottomLeft" />
+        <Image type="BottomRightCorner" imageset="Gazebo-Images" image="FrameBottomRight" />
+        <Image type="LeftEdge" imageset="Gazebo-Images" image="FrameLeft" />
+        <Image type="TopEdge" imageset="Gazebo-Images" image="FrameTop" />
+        <Image type="RightEdge" imageset="Gazebo-Images" image="FrameRight" />
+        <Image type="BottomEdge" imageset="Gazebo-Images" image="FrameBottom" />
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+      </FrameComponent>
+    </ImagerySection>
+
+    <ImagerySection name="FrameOnly">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge">
+            <UnifiedDim scale="1" type="BottomEdge">
+              <DimOperator op="Subtract">
+                <UnifiedDim scale="0.4" type="Width"/>
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+        </Area>
+        <Image type="TopLeftCorner" imageset="Gazebo-Images" image="FrameTopLeft" />
+        <Image type="TopRightCorner" imageset="Gazebo-Images" image="FrameTopRight" />
+        <Image type="BottomLeftCorner" imageset="Gazebo-Images" image="FrameBottomLeft" />
+        <Image type="BottomRightCorner" imageset="Gazebo-Images" image="FrameBottomRight" />
+        <Image type="LeftEdge" imageset="Gazebo-Images" image="FrameLeft" />
+        <Image type="TopEdge" imageset="Gazebo-Images" image="FrameTop" />
+        <Image type="RightEdge" imageset="Gazebo-Images" image="FrameRight" />
+        <Image type="BottomEdge" imageset="Gazebo-Images" image="FrameBottom" />
+      </FrameComponent>
+    </ImagerySection>
+
+    <ImagerySection name="BackgroundOnly">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+          <Dim type="TopEdge"><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+          <Dim type="RightEdge">
+            <UnifiedDim scale="1" type="RightEdge">
+              <DimOperator op="Subtract">
+                <ImageDim imageset="Gazebo-Images" image="FrameRight" dimension="Width" />
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+          <Dim type="BottomEdge">
+            <UnifiedDim scale="1" type="BottomEdge">
+              <DimOperator op="Subtract">
+                <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+        </Area>
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+      </FrameComponent>
+    </ImagerySection>
+
+    <ImagerySection name="BackgroundOnlyFull">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+      </FrameComponent>
+    </ImagerySection>
+
+  </WidgetLook>
+
+  <WidgetLook name="Gazebo/HorizontalScrollbarThumb">
+    <Property name="HorzFree" value="True" />
+    <Property name="MouseInputPropagationEnabled" value="True" />
+    <ImagerySection name="thumb">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+        </Area>
+        <Image imageset="Gazebo-Images" image="ScrollbarThumb" />
+        <Colours topLeft="FF494949" topRight="FF494949" bottomLeft="FF494949" bottomRight="FF494949" />
+        <VertFormat type="Stretched" />
+        <HorzFormat type="Stretched" />
+      </ImageryComponent>
+    </ImagerySection>
+    <StateImagery name="Normal">
+      <Layer>
+        <Section section="thumb" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Hover">
+      <Layer>
+        <Section section="thumb" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Pushed">
+      <Layer>
+        <Section section="thumb" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+  <WidgetLook name="Gazebo/HorizontalScrollbar">
+    <NamedArea name="ThumbTrackArea">
+      <Area>
+        <Dim type="LeftEdge"><WidgetDim widget="__auto_decbtn__" dimension="RightEdge" /></Dim>
+        <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+        <Dim type="RightEdge">
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_incbtn__" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <Child  type="Gazebo/Button" nameSuffix="__auto_incbtn__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Height" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+      </Area>
+      <VertAlignment type="CentreAligned" />
+      <HorzAlignment type="RightAligned" />
+      <Property name="UseStandardImagery" value="False" />
+      <Property name="NormalImage" value="set:Gazebo-Images image:ScrollRightArrow" />
+      <Property name="HoverImage" value="set:Gazebo-Images image:ScrollRightArrow" />
+      <Property name="PushedImage" value="set:Gazebo-Images image:ScrollRightArrow" />
+    </Child>
+    <Child  type="Gazebo/Button" nameSuffix="__auto_decbtn__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Height" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+      </Area>
+      <VertAlignment type="CentreAligned" />
+      <Property name="UseStandardImagery" value="False" />
+      <Property name="NormalImage" value="set:Gazebo-Images image:ScrollLeftArrow" />
+      <Property name="HoverImage" value="set:Gazebo-Images image:ScrollLeftArrow" />
+      <Property name="PushedImage" value="set:Gazebo-Images image:ScrollLeftArrow" />
+    </Child>
+    <Child  type="Gazebo/HorizontalScrollbarThumb" nameSuffix="__auto_thumb__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Height" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+      </Area>
+    </Child>
+    <ImagerySection name="main">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge"><WidgetDim widget="__auto_decbtn__" dimension="RightEdge" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge">
+            <UnifiedDim scale="1" type="RightEdge">
+              <DimOperator op="Subtract">
+                <WidgetDim widget="__auto_incbtn__" dimension="Width" />
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <Image imageset="Gazebo-Images" image="HorzScrollContainer" />
+        <VertFormat type="Stretched" />
+        <HorzFormat type="Stretched" />
+      </ImageryComponent>
+    </ImagerySection>
+    <StateImagery name="Enabled">
+      <Layer>
+        <Section section="main" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section section="main" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+
+  <WidgetLook name="Gazebo/VerticalScrollbarThumb">
+    <Property name="VertFree" value="True" />
+    <Property name="MouseInputPropagationEnabled" value="True" />
+    <ImagerySection name="thumb">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+        </Area>
+        <Image imageset="Gazebo-Images" image="ScrollbarThumb" />
+        <Colours topLeft="FF494949" topRight="FF494949" bottomLeft="FF494949" bottomRight="FF494949" />
+        <VertFormat type="Stretched" />
+        <HorzFormat type="Stretched" />
+      </ImageryComponent>
+    </ImagerySection>
+    <StateImagery name="Normal">
+      <Layer>
+        <Section section="thumb" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Hover">
+      <Layer>
+        <Section section="thumb" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Pushed">
+      <Layer>
+        <Section section="thumb" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+  <WidgetLook name="Gazebo/VerticalScrollbar">
+    <Property name="VerticalScrollbar" value="True" />
+    <NamedArea name="ThumbTrackArea">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><WidgetDim widget="__auto_decbtn__" dimension="BottomEdge" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1.0" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <WidgetDim widget="__auto_incbtn__" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <Child  type="Gazebo/Button" nameSuffix="__auto_incbtn__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Width" /></Dim>
+      </Area>
+      <VertAlignment type="BottomAligned" />
+      <HorzAlignment type="CentreAligned" />
+      <Property name="UseStandardImagery" value="False" />
+      <Property name="NormalImage" value="set:Gazebo-Images image:ScrollDownArrow" />
+      <Property name="HoverImage" value="set:Gazebo-Images image:ScrollDownArrow" />
+      <Property name="PushedImage" value="set:Gazebo-Images image:ScrollDownArrow" />
+    </Child>
+    <Child  type="Gazebo/Button" nameSuffix="__auto_decbtn__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Width" /></Dim>
+      </Area>
+      <HorzAlignment type="CentreAligned" />
+      <Property name="UseStandardImagery" value="False" />
+      <Property name="NormalImage" value="set:Gazebo-Images image:ScrollUpArrow" />
+      <Property name="HoverImage" value="set:Gazebo-Images image:ScrollUpArrow" />
+      <Property name="PushedImage" value="set:Gazebo-Images image:ScrollUpArrow" />
+    </Child>
+    <Child  type="Gazebo/VerticalScrollbarThumb" nameSuffix="__auto_thumb__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Width" /></Dim>
+      </Area>
+    </Child>
+    <ImagerySection name="main">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><WidgetDim widget="__auto_decbtn__" dimension="BottomEdge" /></Dim>
+          <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge" >
+            <UnifiedDim scale="1.0" type="BottomEdge">
+              <DimOperator op="Subtract">
+                <WidgetDim widget="__auto_incbtn__" dimension="Height" />
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+        </Area>
+        <Image imageset="Gazebo-Images" image="VertScrollContainer" />
+        <VertFormat type="Stretched" />
+        <HorzFormat type="Stretched" />
+      </ImageryComponent>
+    </ImagerySection>
+    <StateImagery name="Enabled">
+      <Layer>
+        <Section section="main" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section section="main" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+  <!-- ///////////
+        Button 
+       //////////-->
+  <WidgetLook name="Gazebo/Button">
+    <PropertyDefinition name="NormalTextColor" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <PropertyDefinition name="HoverTextColor" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <PropertyDefinition name="PushedTextColor" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <PropertyDefinition name="DisabledTextColor" initialValue="FF888888" redrawOnWrite="true" />
+    <PropertyDefinition name="UseStandardImagery" initialValue="True" redrawOnWrite="true" />
+    <PropertyDefinition name="NormalImage" initialValue="" redrawOnWrite="true" />
+    <PropertyDefinition name="HoverImage" initialValue="" redrawOnWrite="true" />
+    <PropertyDefinition name="PushedImage" initialValue="" redrawOnWrite="true" />
+    <PropertyDefinition name="VertImageFormatting" initialValue="Stretched" redrawOnWrite="true" />
+    <PropertyDefinition name="HorzImageFormatting" initialValue="Stretched" redrawOnWrite="true" />
+    <PropertyDefinition name="NormalBackgroundColor" initialValue="FF7F7F7F" redrawOnWrite="true" />
+    <PropertyDefinition name="HoverBackgroundColor" initialValue="FF9F9F9F" redrawOnWrite="true" />
+    <PropertyDefinition name="PushedBackgroundColor" initialValue="FF6F6F6F" redrawOnWrite="true" />
+    <PropertyDefinition name="DisabledBackgroundColor" initialValue="FF3F3F3F" redrawOnWrite="true" />
+
+    <Property name="WantsMultiClickEvents" value="False" />
+    <ImagerySection name="label">
+      <TextComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-4" type="BottomEdge" /></Dim>
+        </Area>
+        <VertFormat type="CentreAligned" />
+        <HorzFormat type="WordWrapCentreAligned" />
+      </TextComponent>
+    </ImagerySection>
+    <ImagerySection name="normal_image">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <ImageProperty name="NormalImage" />
+        <VertFormatProperty name="VertImageFormatting" />
+        <HorzFormatProperty name="HorzImageFormatting" />
+      </ImageryComponent>
+    </ImagerySection>
+    <ImagerySection name="hover_image">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <ImageProperty name="HoverImage" />
+        <VertFormatProperty name="VertImageFormatting" />
+        <HorzFormatProperty name="HorzImageFormatting" />
+      </ImageryComponent>
+    </ImagerySection>
+    <ImagerySection name="pushed_image">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <ImageProperty name="PushedImage" />
+        <VertFormatProperty name="VertImageFormatting" />
+        <HorzFormatProperty name="HorzImageFormatting" />
+      </ImageryComponent>
+    </ImagerySection>
+
+    <StateImagery name="Normal">
+      <Layer>
+        <Section look="Gazebo/Shared" section="Frame" controlProperty="UseStandardImagery" >
+          <ColourProperty name="NormalBackgroundColor"/>
+        </Section>
+        <Section section="normal_image" />
+        <Section section="label">
+          <ColourProperty name="NormalTextColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Hover">
+      <Layer>
+        <Section look="Gazebo/Shared" section="Frame" controlProperty="UseStandardImagery" >
+          <ColourProperty name="HoverBackgroundColor"/>
+        </Section>
+        <Section section="hover_image" />
+        <Section section="label">
+          <ColourProperty name="HoverTextColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Pushed">
+      <Layer>
+        <Section look="Gazebo/Shared" section="Frame" controlProperty="UseStandardImagery" >
+          <ColourProperty name="PushedBackgroundColor"/>
+        </Section>
+        <Section section="pushed_image" />
+        <Section section="label">
+          <ColourProperty name="PushedTextColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section look="Gazebo/Shared" section="Frame" controlProperty="UseStandardImagery" >
+          <ColourProperty name="DisabledBackgroundColor"/>
+        </Section>
+        <Section section="normal_image">
+          <Colours topLeft="FF803737" topRight="FF803737" bottomLeft="FF803737" bottomRight="FF803737" />
+        </Section>
+        <Section section="label">
+          <ColourProperty name="DisabledTextColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+
+  <!-- ///////////
+        List Box 
+       //////////-->
+  <WidgetLook name="Gazebo/Listbox">
+    <Property name="ForceVertScrollbar" value="False" />
+
+    <PropertyDefinition name="NormalBackgroundColor" initialValue="FF7F7F7F" redrawOnWrite="true" />
+    <PropertyDefinition name="DisabledBackgroundColor" initialValue="FF3F3F3F" redrawOnWrite="true" />
+
+    <NamedArea name="ItemRenderingArea">
+      <Area>
+        <Dim type="LeftEdge" >
+          <ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" />
+        </Dim>
+        <Dim type="TopEdge" >
+          <ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim imageset="Gazebo-Images" image="FrameRight" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+
+    <Child  type="Gazebo/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="-5" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" offset="-25" type="Width" /></Dim>
+        <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+      </Area>
+      <VertAlignment type="BottomAligned" />
+    </Child>
+    <Child  type="Gazebo/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="-5" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
+        <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" offset="-10" type="Height" /></Dim>
+      </Area>
+      <HorzAlignment type="RightAligned" />
+    </Child>
+
+    <StateImagery name="Enabled">
+      <Layer>
+        <Section look="Gazebo/Shared" section="Frame">
+          <ColourProperty name="NormalBackgroundColor"/>
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section look="Gazebo/Shared" section="Frame">
+          <ColourProperty name="DisabledBackgroundColor"/>
+        </Section>
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+</Falagard>

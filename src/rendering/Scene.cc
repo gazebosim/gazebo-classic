@@ -456,7 +456,6 @@ VisualPtr Scene::GetVisual( const std::string &_name ) const
 /// Select a visual by name
 void Scene::SelectVisual( const std::string &_name ) const
 {
-  gzdbg << "Scene::SelectVisual[" << _name << "]\n";
   VisualPtr vis = this->GetVisual(_name);
   if (vis)
     this->selectionObj->Attach(vis);

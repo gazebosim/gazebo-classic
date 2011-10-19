@@ -14,6 +14,8 @@ set (files Imageset.xsd
            vanilla.tga
            WindowsLook.imageset
            WindowsLook.tga
+           gazebo.tga
+           Gazebo.imageset
 )
 
 

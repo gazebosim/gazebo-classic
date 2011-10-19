@@ -10,6 +10,7 @@ set (files Animation.xsd
            VanillaSkin.scheme
            WindowsLook.scheme
            WindowsLookWidgets.scheme
+           GazeboSkin.scheme
 )
 
 

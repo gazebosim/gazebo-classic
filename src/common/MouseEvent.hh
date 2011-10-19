@@ -46,6 +46,11 @@ namespace gazebo
       public: bool dragging;
 
       public: EventType type;
+
+      // The button which caused the event
+      public: unsigned int button;
+
+      /// \brief State of the buttons when the event was generated
       public: unsigned int buttons;
 
       public: bool shift;

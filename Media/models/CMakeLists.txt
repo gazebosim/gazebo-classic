@@ -10,20 +10,16 @@ add_subdirectory(pr2_gripper)
 add_subdirectory(pr2)
 add_subdirectory(wg)
 add_subdirectory(kitchen)
-add_subdirectory(kitchen2)
-add_subdirectory(stovetop)
 add_subdirectory(saucepan)
 add_subdirectory(people)
 
 set (files column.mesh
            geosphere4500.mesh
            geosphere8000.mesh
-           kitchen.mesh
            knot.mesh
            razor.mesh
            robot.mesh
            sicklms200.mesh
-           sphere.mesh
            unitpyramid.mesh
            wheel.mesh
            WoodPallet.mesh
@@ -32,9 +28,6 @@ set (files column.mesh
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
            cup.mesh
-           test.dae
-           man_standing.dae
-           steel_stovetop.dae
            bowl.dae
 )
 

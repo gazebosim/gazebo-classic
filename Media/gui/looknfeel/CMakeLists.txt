@@ -3,6 +3,7 @@ set (files Falagard.xsd
            TaharezLook.looknfeel
            Vanilla.looknfeel
            WindowsLook.looknfeel
+           Gazebo.looknfeel
 )
 
 

@@ -2,7 +2,6 @@
 #include "common/Console.hh"
 
 #ifdef HAVE_CEGUI
-#include "CEGUI/CEGUI.h"
 #include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
 #endif
 
@@ -60,6 +59,7 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
 
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
+  CEGUI::SchemeManager::getSingleton().create("GazeboSkin.scheme");
   CEGUI::FontManager::getSingleton().create("DejaVuSans-10.font");
   //CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
 
@@ -68,6 +68,7 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
 
   // Create a root window, and set it as the root window
   CEGUI::Window *rootWindow  = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
+  rootWindow->setMousePassThroughEnabled(true);
   CEGUI::System::getSingleton().setGUISheet( rootWindow );
 #endif
 }
@@ -95,23 +96,40 @@ void GUIOverlay::CreateWindow( const std::string &_type,
 #endif
 }
 
-bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &/*_evt*/)
+bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
 {
   bool result = false;
-#ifdef HAVE_CEGUI
-  //CEGUI::System *system = CEGUI::System::getSingletonPtr();
-  //result = result || system->injectMousePosition( _evt.pos.x, _evt.pos.y);
-/*
-  if (_evt. == common::MouseEvent::DOWN)
-    result = result || system->injectMouseButtonDown( CEGUI::LeftButton);
-  else if (_evt.left == common::MouseEvent::UP)
-    result = result || system->injectMouseButtonUp( CEGUI::LeftButton);
+  bool press, release, pos;
 
-  if (_evt.right == common::MouseEvent::DOWN)
-    result = result || system->injectMouseButtonDown( CEGUI::RightButton);
-  else if (_evt.right == common::MouseEvent::UP)
-    result = result ||system->injectMouseButtonUp( CEGUI::RightButton);
-    */
+  press = false;
+  release = false;
+  pos = false;
+
+#ifdef HAVE_CEGUI
+  CEGUI::System *system = CEGUI::System::getSingletonPtr();
+  pos = system->injectMousePosition( _evt.pos.x, _evt.pos.y);
+
+  if (_evt.type == common::MouseEvent::PRESS)
+  {
+    if (_evt.button == common::MouseEvent::LEFT)
+      press = system->injectMouseButtonDown( CEGUI::LeftButton );
+    if (_evt.button == common::MouseEvent::RIGHT)
+      press = system->injectMouseButtonDown( CEGUI::RightButton );
+    if (_evt.button == common::MouseEvent::MIDDLE)
+      press = system->injectMouseButtonDown( CEGUI::MiddleButton );
+  }
+
+  if (_evt.type == common::MouseEvent::RELEASE)
+  {
+    if (_evt.button == common::MouseEvent::LEFT)
+      release = system->injectMouseButtonUp( CEGUI::LeftButton );
+    if (_evt.button == common::MouseEvent::RIGHT)
+      release = system->injectMouseButtonUp( CEGUI::RightButton );
+    if (_evt.button == common::MouseEvent::MIDDLE)
+      release = system->injectMouseButtonUp( CEGUI::MiddleButton );
+  }
+
+  result = pos || release || press;
 #endif
 
   return result;
@@ -161,12 +179,16 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl( const std::string &_filename )
   if (rootWindow)
   {
     window = windowManager->loadWindowLayout( _filename );
+    if (window->getType() == "DefaultWindow")
+      window->setMousePassThroughEnabled(true);
     rootWindow->addChildWindow( window );
+
   }
   else
   {
     gzerr << "Attempting to create a GUI overlay window before load\n";
   }
+
 
   return window;
 }
@@ -235,4 +257,22 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
 #endif
 #endif
   return false;
+}
+
+bool GUIOverlay::OnButtonClicked(const CEGUI::EventArgs& _e)
+{
+  std::map<std::string, boost::function<void()> >::iterator iter;
+  CEGUI::WindowEventArgs *args = (CEGUI::WindowEventArgs*)(&_e);
+  std::string name = args->window->getName().c_str(); 
+
+  iter = this->callbacks.find(name);
+  if (iter != this->callbacks.end())
+    (iter->second) ();
+
+  return true;
+}
+
+CEGUI::Window *GUIOverlay::GetWindow( const std::string &_name )
+{
+  return CEGUI::WindowManager::getSingletonPtr()->getWindow(_name);
 }

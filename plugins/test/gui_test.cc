@@ -37,8 +37,6 @@ namespace gazebo
       this->connections.push_back( 
           event::Events::ConnectPreRender( 
             boost::bind(&GUITest::PreRender, this) ) );
-
-
     }
 
     private: void PreRender()
@@ -52,18 +50,16 @@ namespace gazebo
                  if (!scene)
                    gzerr << "Unable to find scene[default]\n";
 
-                 this->camera = scene->CreateDepthCamera("my_camera");
-                 //this->camera = scene->CreateCamera("my_camera");
+                 this->camera = scene->CreateCamera("my_camera");
 
                  this->camera->Load();
                  this->camera->Init();
-                 this->camera->SetClipDist(0.1, 20);
+                 this->camera->SetClipDist(0.1, 50);
                  this->camera->SetCaptureData(false);
 
-                 //this->camera->CreateRenderTexture("help_me");
-                 this->camera->CreateDepthTexture("help_me");
+                 this->camera->CreateRenderTexture("help_me");
 
-                 this->camera->SetWorldPosition( math::Vector3(0,0,.5) );
+                 this->camera->SetWorldPosition( math::Vector3(0,0,3) );
 
                  if (!camera)
                    gzerr << "Unable to find camera[camera]\n";
@@ -71,10 +67,36 @@ namespace gazebo
                  userCam->GetGUIOverlay()->AttachCameraToImage( this->camera, 
                      "Root/CameraView");
 
+                 userCam->GetGUIOverlay()->ButtonCallback( 
+                     "Root/PrepositionButton", 
+                     &GUITest::OnPrepositionButton, this  );
+
+                 userCam->GetGUIOverlay()->ButtonCallback( 
+                     "Root/VerbButton", &GUITest::OnVerbButton, this  );
+
+                 userCam->GetGUIOverlay()->GetWindow("Root/PrepositionButton")->hide();
+                 userCam->GetGUIOverlay()->GetWindow("Root/NounButton")->hide();
+                 userCam->GetGUIOverlay()->GetWindow("Root/VerbList")->hide();
+                 userCam->GetGUIOverlay()->GetWindow("Root/PrepositionList")->hide();
+                 userCam->GetGUIOverlay()->GetWindow("Root/NounList")->hide();
+
                  connected = true;
                }
-
              }
+    private: void OnPrepositionButton()
+             {
+               printf("GUITest::Prep Button\n");
+             }
+
+    private: void OnVerbButton()
+             {
+               rendering::UserCameraPtr userCam = gui::get_active_camera();
+               CEGUI::Listbox *win = (CEGUI::Listbox*)(userCam->GetGUIOverlay()->GetWindow("Root/VerbList"));
+               win->show();
+               
+               win->addItem(new CEGUI::ListboxTextItem("Hello") );
+             }
+
 
     private: void Init()
     {
@@ -88,7 +110,7 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: std::vector<event::ConnectionPtr> connections;
-    private: rendering::DepthCameraPtr camera;
+    private: rendering::CameraPtr camera;
   };
   
   // Register this plugin with the simulator

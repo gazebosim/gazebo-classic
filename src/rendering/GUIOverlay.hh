@@ -2,11 +2,16 @@
 #define GUI_OVERLAY
 
 #include <string>
+#include "gazebo_config.h"
+
+#ifdef HAVE_CEGUI
+#include "CEGUI/CEGUI.h"
+#include "CEGUI/CEGUIEventArgs.h"
+#endif
 
 #include "common/MouseEvent.hh"
 #include "common/Events.hh"
 
-#include "gazebo_config.h"
 #include "math/MathTypes.hh"
 
 #include "rendering/RenderTypes.hh"
@@ -59,9 +64,28 @@ namespace gazebo
       public: void Resize( unsigned int _width, unsigned int _height );
       private: void PreRender();
 
+
+      public: template<typename T>
+              void ButtonCallback( const std::string &_buttonName,
+                                   void (T::*_fp)(), T *_obj )
+              {
 #ifdef HAVE_CEGUI
+                CEGUI::Window *buttonWindow;
+                buttonWindow = CEGUI::WindowManager::getSingletonPtr()->getWindow(_buttonName);
+                buttonWindow->subscribeEvent( CEGUI::PushButton::EventClicked,
+                  CEGUI::Event::Subscriber(&GUIOverlay::OnButtonClicked, this));
+
+                this->callbacks[_buttonName] = boost::bind(_fp, _obj);
+#endif
+              }
+
+#ifdef HAVE_CEGUI
+      public: CEGUI::Window *GetWindow( const std::string &_name );
+
       /// Load a CEGUI layout file
       private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
+
+      private: bool OnButtonClicked(const CEGUI::EventArgs& _e);
 #endif
 
 #ifdef HAVE_CEGUI
@@ -70,6 +94,7 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
       private: std::string layoutFilename;
+      private: std::map<std::string, boost::function<void()> > callbacks;
     };
   }
 }

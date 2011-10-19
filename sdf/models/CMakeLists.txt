@@ -4,8 +4,6 @@ set (files pioneer2dx.model
            willowgarage.model
            table.model
            bookshelf.model
-           kitchen_counter.model
-           man_standing.model
            bowl.model
            saucepan.model
            kitchen.model
