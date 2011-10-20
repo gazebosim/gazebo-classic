@@ -349,23 +349,20 @@ void UserCamera::ShowVisual(bool s)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void UserCamera::MoveToVisual( const std::string &_name , double _dist, 
-                               double _endPitch, double _endYaw)
+void UserCamera::MoveToVisual( const std::string &_name )
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
-    this->MoveToVisual(visual, _dist, _endPitch, _endYaw);
+    this->MoveToVisual(visual);
   else
     gzerr << "MoveTo Unknown visual[" << _name << "]\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Move the camera to focus on an scene node
-void UserCamera::MoveToVisual( VisualPtr _visual, double _dist, 
-                               double _endPitch, double _endYaw)
+void UserCamera::MoveToVisual( VisualPtr _visual )
 {
-  /*
-  if (!_visual)
+    if (!_visual)
     return;
 
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
@@ -403,43 +400,16 @@ void UserCamera::MoveToVisual( VisualPtr _visual, double _dist,
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle;
-  double pitchAngle;
-
-  double midyawAngle = atan2(dir.y,dir.x);
-  double midpitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-
-
-  if (fabs(_endPitch) < M_PI)
-  {
-    dir.Set(0,0,1);
-    pitchAngle = _endPitch;
-  }
-  else
-     pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-
-  if (fabs(_endYaw) < M_PI)
-  {
-    dir.Set(0,0,1);
-    yawAngle = _endYaw;
-  }
-  else
-    yawAngle = atan2(dir.y,dir.x);
-
+  double yawAngle = atan2(dir.y,dir.x);
+  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
   Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0,0,1));
   Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0,1,0));
-
-  Ogre::Quaternion midyaw(Ogre::Radian(midyawAngle), Ogre::Vector3(0,0,1));
-  Ogre::Quaternion midpitch(Ogre::Radian(midpitchAngle), Ogre::Vector3(0,1,0));
-
 
   dir.Normalize();
 
   double scale = maxSize / tan( (this->GetHFOV()/2.0).GetAsRadian() );
-  scale = 0;
 
-  end = end + dir * _dist;
-  //end = mid + dir*(dist - scale);
+  end = mid + dir*(dist - scale);
 
   Ogre::TransformKeyFrame *key;
 
@@ -452,10 +422,10 @@ void UserCamera::MoveToVisual( VisualPtr _visual, double _dist,
 
   key = strack->createNodeKeyFrame(.2);
   key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
-  key->setRotation(midyaw);
+  key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(.2);
-  key->setRotation(midpitch);
+  key->setRotation(pitchFinal);
 
   key = strack->createNodeKeyFrame(.5);
   key->setTranslate( Ogre::Vector3(end.x, end.y, end.z));
@@ -469,10 +439,9 @@ void UserCamera::MoveToVisual( VisualPtr _visual, double _dist,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
-  */
 }
 
-void UserCamera::GlideTo( const math::Vector3 &_end, double _pitch, double _yaw, double _time)
+void UserCamera::MoveToPosition( const math::Vector3 &_end, double _pitch, double _yaw, double _time)
 {
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;
@@ -506,10 +475,6 @@ void UserCamera::GlideTo( const math::Vector3 &_end, double _pitch, double _yaw,
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
 }
-
-//////////////////////////////////////////////////////////////////////////////
-/// Set the camera to track a scene node
-
 
 //////////////////////////////////////////////////////////////////////////////
 void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )

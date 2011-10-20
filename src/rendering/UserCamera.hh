@@ -91,17 +91,10 @@ namespace gazebo
       public: float GetTriangleCount() const;
 
       /// \brief Move the camera to focus on a scene node
-      public: void MoveToVisual(VisualPtr _visual, 
-                  double _dist=0,  
-                  double _endPitch=M_PI+1, 
-                  double _endYaw=M_PI+1);
-      public: void MoveToVisual(const std::string &_visualName, 
-                  double _dist = 0,  
-                  double _endPitch = M_PI + 1, 
-                  double _endYaw = M_PI + 1);
+      public: void MoveToVisual(VisualPtr _visual );
+      public: void MoveToVisual(const std::string &_visualName );
 
-      public: void GlideTo( const math::Vector3 &_end, 
-                            double _pitch, double _yaw, double _time);
+      public: void MoveToPosition( const math::Vector3 &_end );
 
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,

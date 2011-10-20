@@ -155,10 +155,7 @@ void GLWidget::keyPressEvent( QKeyEvent *_event)
   this->mouseEvent.control = this->keyModifiers & Qt::ControlModifier ? true : false;
   this->mouseEvent.shift = this->keyModifiers & Qt::ShiftModifier ? true : false;
 
-  if (_event->key() == Qt::Key_Space)  
-    gui::Events::keyPress(" ");
-  else if (_event->key() == Qt::Key_Left)
-    gui::Events::keyPress("b");
+  // TODO: Broadcast gui events: gui::Events::keyPress(" ");
 }
 
 void GLWidget::keyReleaseEvent( QKeyEvent *_event)
