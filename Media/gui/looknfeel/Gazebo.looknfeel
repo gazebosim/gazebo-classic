@@ -442,7 +442,7 @@
   <!-- ///////////
         List Box 
        //////////-->
-  <WidgetLook name="Gazebo/Listbox">
+  <!--<WidgetLook name="Gazebo/Listbox">
     <Property name="ForceVertScrollbar" value="False" />
 
     <PropertyDefinition name="NormalBackgroundColor" initialValue="FF7F7F7F" redrawOnWrite="true" />
@@ -507,5 +507,6 @@
       </Layer>
     </StateImagery>
   </WidgetLook>
+  -->
 
 </Falagard>

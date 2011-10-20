@@ -63,7 +63,7 @@ namespace gazebo
             math::Vector3(0,0,3),M_PI*0.5,0,0.6) );
       this->states.push_back( new State("default::slide1",
             math::Vector3(0,0,3),M_PI*0.5,0,0.6) );
-      /*this->states.push_back( new State("default::slide2",
+      this->states.push_back( new State("default::slide2",
             math::Vector3(0,0,0.03),M_PI*0.5,0,0.6) );
       this->states.push_back( new State("default::slide3",
             math::Vector3(0,0,0.03),M_PI*0.5,-M_PI*0.5,0.5) );
@@ -71,9 +71,10 @@ namespace gazebo
             math::Vector3(0,0,0.03),M_PI*0.5,-M_PI*0.5,0.5) );
       this->states.push_back( new State("default::slide5",
             math::Vector3(0,0,0.03),M_PI*0.5,-M_PI*0.5,0.5) );
-            */
       this->states.push_back( new State("default::slide6",
-            math::Vector3(0,0,0.035),M_PI*0.5,-M_PI*0.5,0.0) );
+            math::Vector3(0,0,0.035),M_PI*0.5,-M_PI*0.5,0.5) );
+      this->states.push_back( new State("default::slide7",
+            math::Vector3(0,0,0.035),M_PI*0.5,-M_PI*0.5,0.5) );
 
       this->iter = this->states.begin();
     }
@@ -120,24 +121,6 @@ namespace gazebo
                      math::Vector3(0,(*this->iter)->pitch,(*this->iter)->yaw));
                  userCam->SetWorldPose(pose);
                }
-
-
-/*               if ((*iter)->slide == "default::slide3")
-               {
-                 rendering::Scene *scene = userCam->GetScene();
-                 rendering::VisualPtr visual = scene->GetVisual((*this->iter)->slide);
-                 math::Pose pose = visual->GetWorldPose();
-                 math::Vector3 p = pose.pos +  (*this->iter)->offset;
-
-                 userCam->GlideTo( p,1.5707,-1.5707,0.5);
-               }
-               else
-               {
-                 userCam->MoveToVisual((*this->iter)->slide, (*this->iter)->dist, 
-                     (*this->iter)->pitch, (*this->iter)->yaw);
-               }
-               */
-
              }
 
     private: transport::NodePtr node;
