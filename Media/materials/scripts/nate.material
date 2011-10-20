@@ -188,6 +188,7 @@ material nate/slide12
     }
   }
 }
+
 material nate/slide13
 {
   technique
@@ -199,6 +200,38 @@ material nate/slide13
       texture_unit
       {
         texture nate/slide13.png
+      }
+    }
+  }
+}
+
+material nate/slide14
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide14.png
+      }
+    }
+  }
+}
+
+material nate/slide15
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide15.png
       }
     }
   }

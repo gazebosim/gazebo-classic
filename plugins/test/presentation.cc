@@ -60,9 +60,9 @@ namespace gazebo
             boost::bind(&Presentation::KeyPress, this, _1) ) );
 
       this->states.push_back( new State("default::slide1",
-            math::Vector3(0,0,3),M_PI*0.5,0,0.6) );
+            math::Vector3(0,0,3.6),M_PI*0.5,0,0.6) );
       this->states.push_back( new State("default::slide1",
-            math::Vector3(0,0,3),M_PI*0.5,0,0.6) );
+            math::Vector3(0,0,3.6),M_PI*0.5,0,0.6) );
       this->states.push_back( new State("default::slide2",
             math::Vector3(0,0,0.03),M_PI*0.5,0,0.6) );
       this->states.push_back( new State("default::slide3",
@@ -75,6 +75,43 @@ namespace gazebo
             math::Vector3(0,0,0.035),M_PI*0.5,-M_PI*0.5,0.5) );
       this->states.push_back( new State("default::slide7",
             math::Vector3(0,0,0.035),M_PI*0.5,-M_PI*0.5,0.5) );
+            
+      this->states.push_back( new State("default::slide8",
+            math::Vector3(0,0,3.5),M_PI*0.5,0,0) );
+
+      this->states.push_back( new State("default::slide9",
+            math::Vector3(0,0,.037),M_PI*0.5,0,0.5) );
+      this->states.push_back( new State("default::slide10",
+            math::Vector3(0,0,.037),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide8",
+            math::Vector3(0,0,3.5),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide11",
+            math::Vector3(0,0,0.037),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide8",
+            math::Vector3(0,0,3.5),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide12",
+            math::Vector3(0,0,0.037),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide8",
+            math::Vector3(0,0,3.5),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide13",
+            math::Vector3(0,0,0.037),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide8",
+            math::Vector3(0,0,3.5),M_PI*0.5,0,0.5) );
+
+      this->states.push_back( new State("default::slide14",
+            math::Vector3(0,0,3.5),M_PI*0.5,M_PI*0.5,0.5) );
+
+      this->states.push_back( new State("default::slide15",
+            math::Vector3(0,0,3.5),M_PI*0.5,M_PI,0.5) );
+
+
 
       this->iter = this->states.begin();
     }
