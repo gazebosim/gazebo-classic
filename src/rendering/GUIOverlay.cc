@@ -266,6 +266,7 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
   return false;
 }
 
+#ifdef HAVE_CEGUI
 bool GUIOverlay::OnButtonClicked(const CEGUI::EventArgs& _e)
 {
   std::map<std::string, boost::function<void()> >::iterator iter;
@@ -283,3 +284,4 @@ CEGUI::Window *GUIOverlay::GetWindow( const std::string &_name )
 {
   return CEGUI::WindowManager::getSingletonPtr()->getWindow(_name);
 }
+#endif
