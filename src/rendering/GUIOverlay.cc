@@ -22,11 +22,13 @@ using namespace rendering;
 
 GUIOverlay::GUIOverlay()
 {
+#ifdef HAVE_CEGUI
   this->guiRenderer = NULL;
 
   this->connections.push_back( 
       event::Events::ConnectPreRender( 
         boost::bind(&GUIOverlay::PreRender, this) ) );
+#endif
 }
 
 GUIOverlay::~GUIOverlay()
