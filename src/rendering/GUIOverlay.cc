@@ -21,9 +21,13 @@ using namespace rendering;
 
 GUIOverlay::GUIOverlay()
 {
+#ifdef HAVE_CEGUI
+  this->guiRenderer = NULL;
+
   this->connections.push_back( 
       event::Events::ConnectPreRender( 
         boost::bind(&GUIOverlay::PreRender, this) ) );
+#endif
 }
 
 GUIOverlay::~GUIOverlay()
@@ -197,12 +201,15 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl( const std::string &_filename )
 void GUIOverlay::Resize( unsigned int _width, unsigned int _height )
 {
 #ifdef HAVE_CEGUI
-  this->guiRenderer->setDisplaySize( CEGUI::Size(_width, _height) );
+  if (this->guiRenderer)
+  {
+    this->guiRenderer->setDisplaySize( CEGUI::Size(_width, _height) );
 
-  CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
+    CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
 
-  CEGUI::Window *rootWindow = windowManager->getWindow("root");
-  rootWindow->setArea( CEGUI::UDim(0,0), CEGUI::UDim(0,0), CEGUI::UDim(1,0), CEGUI::UDim(1,0));
+    CEGUI::Window *rootWindow = windowManager->getWindow("root");
+    rootWindow->setArea( CEGUI::UDim(0,0), CEGUI::UDim(0,0), CEGUI::UDim(1,0), CEGUI::UDim(1,0));
+  }
 #endif
 }
 

@@ -500,6 +500,7 @@ material Gazebo/JointAnchor
   }
 }
 
+
 material Gazebo/WoodFloor
 {
   receive_shadows on

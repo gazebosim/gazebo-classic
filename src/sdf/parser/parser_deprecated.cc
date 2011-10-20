@@ -780,12 +780,18 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     if (firstChildElement(_config, "lowStop"))
     {
       double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"lowStop"));
-      sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
+      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+        sdfLimit->GetAttribute("lower")->Set(stop_angle);
+      else
+        sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
       double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"highStop"));
-      sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
+      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+        sdfLimit->GetAttribute("upper")->Set(stop_angle);
+      else
+        sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
     }
 
   }
@@ -807,12 +813,18 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     if (firstChildElement(_config, "lowStop"))
     {
       double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"lowStop"));
-      sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
+      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+        sdfLimit->GetAttribute("lower")->Set(stop_angle);
+      else
+        sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
       double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"highStop"));
-      sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
+      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+        sdfLimit->GetAttribute("upper")->Set(stop_angle);
+      else
+        sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
     }
 
   }

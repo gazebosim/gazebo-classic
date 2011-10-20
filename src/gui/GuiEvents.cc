@@ -26,5 +26,6 @@ event::EventT<void (bool)> Events::manipMode;
 event::EventT<void (bool)> Events::fullScreen;
 event::EventT<void ()> Events::fps;
 event::EventT<void ()> Events::orbit;
+event::EventT<void (std::string)> Events::keyPress;
 
 

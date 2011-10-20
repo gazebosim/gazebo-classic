@@ -44,5 +44,5 @@ add_library(gazebo_physics_ode SHARED ${sources})
 LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")
 
 set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}")
-target_link_libraries( gazebo_physics_ode ${ODE_LIBRARIES})
+target_link_libraries( gazebo_physics_ode ${ODE_LIBRARIES} ${TBB_LIBRARIES})
 INSTALL_LIBRARY(gazebo_physics_ode)

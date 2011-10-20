@@ -50,16 +50,21 @@ namespace gazebo
                  if (!scene)
                    gzerr << "Unable to find scene[default]\n";
 
-                 this->camera = scene->CreateCamera("my_camera");
+                 this->camera = scene->CreateDepthCamera("my_camera");
+                 //this->camera = scene->CreateCamera("my_camera");
 
                  this->camera->Load();
                  this->camera->Init();
-                 this->camera->SetClipDist(0.1, 50);
-                 this->camera->SetCaptureData(false);
+                 this->camera->SetClipDist(0.1, 20);
+                 this->camera->SetCaptureData(true);
+                 this->camera->SetImageWidth(500);
+                 this->camera->SetImageHeight(500);
+                 this->camera->SetFOV( 1.5707 );
 
-                 this->camera->CreateRenderTexture("help_me");
+                 //this->camera->CreateRenderTexture("help_me");
+                 this->camera->CreateDepthTexture("help_me");
 
-                 this->camera->SetWorldPosition( math::Vector3(0,0,3) );
+                 this->camera->SetWorldPosition( math::Vector3(0,0,0.5) );
 
                  if (!camera)
                    gzerr << "Unable to find camera[camera]\n";
@@ -110,7 +115,7 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: std::vector<event::ConnectionPtr> connections;
-    private: rendering::CameraPtr camera;
+    private: rendering::DepthCameraPtr camera;
   };
   
   // Register this plugin with the simulator

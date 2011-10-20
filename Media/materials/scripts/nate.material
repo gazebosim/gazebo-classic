@@ -1,0 +1,95 @@
+material nate/slide1
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide1.png
+      }
+    }
+  }
+}
+
+material nate/slide2
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide2.png
+      }
+    }
+  }
+}
+
+material nate/slide3
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide3.png
+      }
+    }
+  }
+}
+
+material nate/slide4
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide4.png
+      }
+    }
+  }
+}
+
+material nate/slide5
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide5.png
+      }
+    }
+  }
+}
+
+material nate/slide6
+{
+  technique
+  {
+    pass
+    {
+			ambient 1 1 1 1.000000
+
+      texture_unit
+      {
+        texture nate/slide6.png
+      }
+    }
+  }
+}

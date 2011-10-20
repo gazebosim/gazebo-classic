@@ -77,6 +77,15 @@ namespace gazebo
       public: static void DisconnectOrbit( event::ConnectionPtr subscriber)
               { orbit.Disconnect(subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the view KeyPress signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectKeyPress(T subscriber)
+              { return keyPress.Connect(subscriber); }
+
+      public: static void DisconnectKeyPress( event::ConnectionPtr subscriber)
+              { keyPress.Disconnect(subscriber); }
+
 
 
       ///  that indicates the user is moving the camera
@@ -89,6 +98,8 @@ namespace gazebo
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;
+
+      public: static event::EventT<void (std::string)> keyPress;
     };
   }
 }

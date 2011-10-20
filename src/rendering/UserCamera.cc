@@ -349,19 +349,22 @@ void UserCamera::ShowVisual(bool s)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void UserCamera::MoveToVisual( const std::string &_name )
+void UserCamera::MoveToVisual( const std::string &_name , double _dist, 
+                               double _endPitch, double _endYaw)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
-    this->MoveToVisual(visual);
+    this->MoveToVisual(visual, _dist, _endPitch, _endYaw);
   else
     gzerr << "MoveTo Unknown visual[" << _name << "]\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Move the camera to focus on an scene node
-void UserCamera::MoveToVisual( VisualPtr _visual)
+void UserCamera::MoveToVisual( VisualPtr _visual, double _dist, 
+                               double _endPitch, double _endYaw)
 {
+  /*
   if (!_visual)
     return;
 
@@ -400,16 +403,43 @@ void UserCamera::MoveToVisual( VisualPtr _visual)
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y,dir.x);
-  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
+  double yawAngle;
+  double pitchAngle;
+
+  double midyawAngle = atan2(dir.y,dir.x);
+  double midpitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
+
+
+  if (fabs(_endPitch) < M_PI)
+  {
+    dir.Set(0,0,1);
+    pitchAngle = _endPitch;
+  }
+  else
+     pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
+
+  if (fabs(_endYaw) < M_PI)
+  {
+    dir.Set(0,0,1);
+    yawAngle = _endYaw;
+  }
+  else
+    yawAngle = atan2(dir.y,dir.x);
+
   Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0,0,1));
   Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0,1,0));
+
+  Ogre::Quaternion midyaw(Ogre::Radian(midyawAngle), Ogre::Vector3(0,0,1));
+  Ogre::Quaternion midpitch(Ogre::Radian(midpitchAngle), Ogre::Vector3(0,1,0));
+
 
   dir.Normalize();
 
   double scale = maxSize / tan( (this->GetHFOV()/2.0).GetAsRadian() );
+  scale = 0;
 
-  end = mid + dir*(dist - scale);
+  end = end + dir * _dist;
+  //end = mid + dir*(dist - scale);
 
   Ogre::TransformKeyFrame *key;
 
@@ -422,16 +452,52 @@ void UserCamera::MoveToVisual( VisualPtr _visual)
 
   key = strack->createNodeKeyFrame(.2);
   key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
-  key->setRotation(yawFinal);
+  key->setRotation(midyaw);
 
   key = ptrack->createNodeKeyFrame(.2);
-  key->setRotation(pitchFinal);
+  key->setRotation(midpitch);
 
   key = strack->createNodeKeyFrame(.5);
   key->setTranslate( Ogre::Vector3(end.x, end.y, end.z));
   key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(.5);
+  key->setRotation(pitchFinal);
+
+  this->animState = this->scene->GetManager()->createAnimationState("cameratrack");
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  */
+}
+
+void UserCamera::GlideTo( const math::Vector3 &_end, double _pitch, double _yaw, double _time)
+{
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0,0,1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0,1,0));
+
+  Ogre::Animation *anim = this->scene->GetManager()->createAnimation("cameratrack",_time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  key = strack->createNodeKeyFrame(_time);
+  key->setTranslate( Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(_time);
   key->setRotation(pitchFinal);
 
   this->animState = this->scene->GetManager()->createAnimationState("cameratrack");

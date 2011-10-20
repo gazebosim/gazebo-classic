@@ -173,7 +173,7 @@ void Camera::Init()
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
   this->SetFOV( DTOR(60) );
-  this->SetClipDist(0.01, 50);
+  this->SetClipDist(0.001, 50);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -208,15 +208,15 @@ void Camera::SetScene( Scene *scene_ )
 // Update the drawing
 void Camera::Update()
 {
-  if (this->sceneNode)
-  {
-    Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-  }
+  //if (this->sceneNode)
+  //{
+    //Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
+  //}
 
-  if (this->pitchNode)
-  {
-    Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-  }
+  //if (this->pitchNode)
+  //{
+  //  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
+  //}
 
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
@@ -274,20 +274,15 @@ void Camera::PostRender()
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-    Ogre::RenderTexture *rTexture;
-    Ogre::Viewport* renderViewport;
 
     size_t size;
+    unsigned int width = this->GetImageWidth();
+    unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
     pixelBuffer = this->renderTexture->getBuffer();
-    rTexture = pixelBuffer->getRenderTarget();
 
     Ogre::PixelFormat format = pixelBuffer->getFormat();
-    renderViewport = rTexture->getViewport(0);
-
-    unsigned int width = this->GetImageWidth();
-    unsigned int height = this->GetImageHeight();
 
     size = Ogre::PixelUtil::getMemorySize( width, height, 1, format);
 
@@ -453,6 +448,22 @@ math::Angle Camera::GetHFOV() const
 math::Angle Camera::GetVFOV() const
 {
   return math::Angle(this->camera->getFOVy().valueRadians());
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the image width
+void Camera::SetImageWidth( unsigned int _w )
+{
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  elem->GetAttribute("width")->Set(_w);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the image height
+void Camera::SetImageHeight( unsigned int _h )
+{
+  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  elem->GetAttribute("height")->Set(_h);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1038,7 +1049,7 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     double ratio = (double)this->viewport->getActualWidth() / 
                    (double)this->viewport->getActualHeight();
 
-    double hfov = this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
+    double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
@@ -1081,8 +1092,8 @@ bool Camera::AttachToVisualImpl( const std::string &_name,
   return this->AttachToVisualImpl(visual, _minDist, _maxDist);
 }
 
-bool Camera::AttachToVisualImpl( VisualPtr _visual, double _minDist, 
-                                 double _maxDist )
+bool Camera::AttachToVisualImpl( VisualPtr _visual, double /*_minDist*/, 
+                                 double /*_maxDist*/ )
 {
   if (this->sceneNode->getParent())
       this->sceneNode->getParent()->removeChild(this->sceneNode);
