@@ -3,7 +3,9 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-set (plugins gui_test presentation)
+if (HAVE_CEGUI)
+  set (plugins gui_test presentation)
+endif (HAVE_CEGUI)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
