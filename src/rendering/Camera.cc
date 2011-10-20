@@ -208,15 +208,15 @@ void Camera::SetScene( Scene *scene_ )
 // Update the drawing
 void Camera::Update()
 {
-  if (this->sceneNode)
-  {
-    Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-  }
+  //if (this->sceneNode)
+  //{
+    //Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
+  //}
 
-  if (this->pitchNode)
-  {
-    Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-  }
+  //if (this->pitchNode)
+  //{
+  //  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
+  //}
 
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())

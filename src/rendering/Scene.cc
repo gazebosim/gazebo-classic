@@ -521,7 +521,6 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
                                      bool _ignoreSelectionObj)
 {
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
-  Ogre::Vector3 camPos = ogreCam->getPosition();
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
@@ -756,7 +755,6 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 {
   bool added_shared = false;
   size_t current_offset = 0;
-  size_t shared_offset = 0;
   size_t next_offset = 0;
   size_t index_offset = 0;
 
@@ -805,7 +803,6 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
       if(submesh->useSharedVertices)
       {
         added_shared = true;
-        shared_offset = current_offset;
       }
 
       const Ogre::VertexElement* posElem =

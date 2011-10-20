@@ -1,4 +1,5 @@
 #include <boost/lexical_cast.hpp>
+#include <signal.h>
 #include "transport/Transport.hh"
 #include "Master.hh"
 #include "gazebo_config.h"
