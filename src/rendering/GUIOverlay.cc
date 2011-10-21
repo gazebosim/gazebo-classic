@@ -60,6 +60,7 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
   CEGUI::Scheme::setDefaultResourceGroup("Schemes");
   CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
   CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+  CEGUI::AnimationManager::setDefaultResourceGroup("Animations");
 
   CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
   CEGUI::SchemeManager::getSingleton().create("VanillaSkin.scheme");
@@ -74,7 +75,14 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
   CEGUI::Window *rootWindow  = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
   rootWindow->setMousePassThroughEnabled(true);
   CEGUI::System::getSingleton().setGUISheet( rootWindow );
+
+  CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("fade.xml");
 #endif
+}
+
+void GUIOverlay::Update()
+{
+  CEGUI::System::getSingleton().injectTimePulse(0.01);
 }
 
 void GUIOverlay::CreateWindow( const std::string &_type, 

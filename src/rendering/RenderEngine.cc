@@ -381,6 +381,7 @@ void RenderEngine::SetupResources()
     archNames.push_back(std::make_pair( (*iter)+"/Media/gui/imagesets", "Imagesets") );
     archNames.push_back(std::make_pair( (*iter)+"/Media/gui/fonts", "Fonts") );
     archNames.push_back(std::make_pair( (*iter)+"/Media/gui/layouts", "Layouts") );
+    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/animations", "Animations") );
 
     for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {

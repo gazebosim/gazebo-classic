@@ -180,6 +180,9 @@ void UserCamera::Update()
       this->scene->GetManager()->destroyAnimationState("cameratrack");
     }
   }
+
+  if (this->gui)
+    this->gui->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

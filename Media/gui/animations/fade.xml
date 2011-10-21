@@ -1,0 +1,17 @@
+<Animations>
+  <AnimationDefinition name="fade_in" duration=".3" replayMode="once">
+    <Affector property="Alpha" interpolator="float">
+      <KeyFrame position="0.0" value="0.0" />
+      <KeyFrame position="0.3" value="1.0" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="scroll_up" duration=".1" replayMode="once">
+    <Affector property="UnifiedSize" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0.0, 150},{0.0,0.0}}" />
+      <KeyFrame position="0.3" value="{{0.0, 150},{0.0,200}}" />
+    </Affector>
+  </AnimationDefinition>
+
+
+</Animations>
