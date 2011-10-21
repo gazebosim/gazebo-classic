@@ -28,6 +28,7 @@
 #include "common/Plugin.hh"
 
 #include "sensors/Sensor.hh"
+#include "sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -86,6 +87,7 @@ void Sensor::Init()
       pluginElem = this->sdf->GetNextElement("plugin", pluginElem);
     }
   }
+  SensorManager::Instance()->AddSensor(shared_from_this());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -583,30 +583,6 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     // TODO: check for duplicate geoms
   }
 
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  /// HACK: FIXME: disable sensor loading for now due to race condition at spawning
-  return true;
-
   // Get all sensor elements
   // FIXME: instead of child elements, get namespace == sensor blocks
   for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor"); 

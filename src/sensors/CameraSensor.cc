@@ -56,7 +56,6 @@ CameraSensor::~CameraSensor()
 void CameraSensor::SetParent( const std::string &_name )
 {
   Sensor::SetParent(_name);
-  this->camera->AttachToVisual( _name );
 }
    
 //////////////////////////////////////////////////////////////////////////////
@@ -79,6 +78,8 @@ void CameraSensor::Load()
 // Initialize the camera
 void CameraSensor::Init()
 {
+  this->camera->AttachToVisual( this->parentName );
+
   std::string worldName = this->sdf->GetWorldName();
 
   if (!worldName.empty())
