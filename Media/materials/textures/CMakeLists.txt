@@ -1,5 +1,3 @@
-#add_subdirectory(nate)
-
 SET (files 
             box_create_blue.png
             box_create_grey.png

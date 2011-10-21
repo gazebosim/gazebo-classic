@@ -148,7 +148,7 @@ namespace gazebo
 
                if ((*this->iter)->duration >0)
                {
-               userCam->GlideTo( p,(*this->iter)->pitch,(*this->iter)->yaw,
+               userCam->MoveToPosition( p,(*this->iter)->pitch,(*this->iter)->yaw,
                    (*this->iter)->duration);
                }
                else
