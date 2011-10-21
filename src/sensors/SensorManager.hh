@@ -75,6 +75,8 @@ namespace gazebo
       private: std::list<SensorPtr > sensors;
 
       private: friend class SingletonT<SensorManager>;
+
+      private: std::list<SensorPtr > init_sensors;
     };
     /// \}
   }

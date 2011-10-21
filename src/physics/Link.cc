@@ -231,13 +231,6 @@ void Link::Init()
     }
   }*/
 
-  sensors::Sensor_V::iterator siter;
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-  {
-    (*siter)->Init();
-    (*siter)->SetParent( this->GetCompleteScopedName() );
-  }
-
   this->enabled = true;
 
   // DO THIS LAST!
@@ -395,6 +388,7 @@ void Link::LoadSensor( sdf::ElementPtr &_sdf )
   }
 
   sensor->Load(_sdf);
+  sensor->SetParent( this->GetCompleteScopedName() );
   this->sensors.push_back(sensor);
   
 }

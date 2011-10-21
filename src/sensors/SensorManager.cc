@@ -19,7 +19,6 @@
  * Author: Nate Koenig
  * Date: 18 Dec 2009
  */
-
 #include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
 #include "sensors/SensorManager.hh"
@@ -39,6 +38,7 @@ SensorManager::SensorManager()
 SensorManager::~SensorManager()
 {
   this->sensors.clear();
+  this->init_sensors.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +77,16 @@ void SensorManager::RunLoop()
 /// Update all the sensors
 void SensorManager::Update(bool force)
 {
+  std::list<SensorPtr>::iterator iter;
+  std::list<SensorPtr>::iterator end = this->init_sensors.end(); // in case things are spawn, sensors length changes
+  for (iter = this->init_sensors.begin(); iter != end; iter++)
+  {
+    //gzerr << "SensorManager Init [" << (*iter)->GetName() << "]\n";
+    (*iter)->Init();
+    this->sensors.push_back((*iter));
+  }
+  this->init_sensors.clear();
+
   event::Events::preRender();
 
   // Tell all the cameras to render
@@ -84,8 +94,7 @@ void SensorManager::Update(bool force)
 
   event::Events::postRender();
 
-  std::list<SensorPtr>::iterator iter;
-  std::list<SensorPtr>::iterator end = this->sensors.end(); // in case things are spawn, sensors length changes
+  end = this->sensors.end(); // in case things are spawn, sensors length changes
   for (iter = this->sensors.begin(); iter != end; iter++)
   {
     //gzerr << "SensorManager Update [" << (*iter)->GetName() << "]\n";
@@ -115,7 +124,7 @@ void SensorManager::Fini()
 /// Add a sensor
 void SensorManager::AddSensor(SensorPtr sensor)
 {
-  this->sensors.push_back(sensor);
+  this->init_sensors.push_back(sensor);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
