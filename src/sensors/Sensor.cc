@@ -75,6 +75,8 @@ void Sensor::Load()
 /// Initialize the sensor
 void Sensor::Init()
 {
+  //gzerr << "Sensor::Init()\n";
+
   this->SetUpdateRate( this->sdf->GetValueDouble("update_rate")  );
 
   // Load the plugins
@@ -87,7 +89,7 @@ void Sensor::Init()
       pluginElem = this->sdf->GetNextElement("plugin", pluginElem);
     }
   }
-  SensorManager::Instance()->AddSensor(shared_from_this());
+  //SensorManager::Instance()->AddSensor(shared_from_this());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +138,7 @@ void Sensor::LoadPlugin( sdf::ElementPtr &_sdf )
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
+  //gzerr << "Sensor LoadPlugin [" << name << "] [" << filename << "]\n";
   gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   if (plugin)

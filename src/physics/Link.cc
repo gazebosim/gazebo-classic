@@ -31,6 +31,7 @@
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/Sensor.hh"
+#include "sensors/SensorManager.hh"
 
 #include "physics/Model.hh"
 #include "physics/World.hh"
@@ -230,6 +231,14 @@ void Link::Init()
       this->cgVisuals.push_back( g_msg.header().str_id() );
     }
   }*/
+
+  sensors::Sensor_V::iterator siter;
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    //(*siter)->Init();
+    //(*siter)->SetParent( this->GetCompleteScopedName() );
+    sensors::SensorManager::Instance()->AddSensor(*siter);
+  }
 
   this->enabled = true;
 

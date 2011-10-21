@@ -78,7 +78,7 @@ void CameraSensor::Load()
 // Initialize the camera
 void CameraSensor::Init()
 {
-  this->camera->AttachToVisual( this->parentName );
+  //gzerr << "CameraSensor::Init()\n";
 
   std::string worldName = this->sdf->GetWorldName();
 
@@ -109,11 +109,13 @@ void CameraSensor::Init()
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     this->camera->SetWorldPose( this->pose );
+    this->camera->AttachToVisual( this->parentName );
   }
   else
     gzerr << "No world name\n";
 
   Sensor::Init();
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
