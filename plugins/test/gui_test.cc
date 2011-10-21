@@ -31,20 +31,18 @@ namespace gazebo
   {
     public: void Load()
     {
+
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init();
 
       this->connections.push_back( 
           event::Events::ConnectPreRender( 
             boost::bind(&GUITest::PreRender, this) ) );
+
+      this->verbs.push_back( "Move" );
+      this->verbs.push_back( "Pick" );
+      this->verbs.push_back( "Put" );
     }
-
-    private: bool OnSelect(const CEGUI::EventArgs& _e)
-             {
-               printf("OnSelect\n");
-               return true;
-             }
-
 
     private: void PreRender()
              {
@@ -96,8 +94,21 @@ namespace gazebo
                      CEGUI::Listbox::EventSelectionChanged, 
                      CEGUI::Event::Subscriber( &GUITest::OnSelect, this) );
 
+
                  connected = true;
                }
+             }
+
+    private: bool OnSelect(const CEGUI::EventArgs& _e)
+             {
+               rendering::UserCameraPtr userCam = gui::get_active_camera();
+               CEGUI::Listbox *win = (CEGUI::Listbox*)(userCam->GetGUIOverlay()->GetWindow("Root/VerbList"));
+               win->hide();
+
+               win = (CEGUI::Listbox*)(userCam->GetGUIOverlay()->GetWindow("Root/PrepositionButton"));
+               win->show();
+
+               return true;
              }
 
     private: void OnPrepositionButton()
@@ -107,19 +118,35 @@ namespace gazebo
 
     private: void OnVerbButton()
              {
+
                rendering::UserCameraPtr userCam = gui::get_active_camera();
                CEGUI::Listbox *win = (CEGUI::Listbox*)(userCam->GetGUIOverlay()->GetWindow("Root/VerbList"));
+               //win->setAlpha(0.0);
                win->show();
 
                win->resetList();
-               CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem("Hello");
-               item->setSelectionColours( CEGUI::colour(0.0, 1.0, 0.0, 1.0) );
-               win->addItem(item);
+               CEGUI::ListboxTextItem *item;
+
+               for (unsigned int i=0; i < this->verbs.size(); i++)
+               {
+                 item = new CEGUI::ListboxTextItem(this->verbs[i]);
+                 item->setSelectionColours(CEGUI::colour(0.32, 0.0, 0.0, 0.8));
+                 item->setSelectionBrushImage( "Gazebo-Images", "FrameTop" );
+                 win->addItem(item);
+
+               }
+               CEGUI::Animation* anim = CEGUI::AnimationManager::getSingleton().getAnimation("scroll_up");
+
+               CEGUI::AnimationInstance* instance = CEGUI::AnimationManager::getSingleton().instantiateAnimation(anim);
+
+               instance->setTargetWindow(win);
+               instance->start();
              }
 
 
     private: void Init()
     {
+
       rendering::UserCameraPtr userCam = gui::get_active_camera();
       if (userCam && userCam->GetGUIOverlay())
       {
@@ -131,6 +158,8 @@ namespace gazebo
     private: transport::NodePtr node;
     private: std::vector<event::ConnectionPtr> connections;
     private: rendering::CameraPtr camera;
+
+    private: std::vector< std::string > verbs;
   };
   
   // Register this plugin with the simulator

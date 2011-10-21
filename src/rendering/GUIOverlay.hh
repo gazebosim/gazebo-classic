@@ -40,6 +40,8 @@ namespace gazebo
 
       public: void Init( Ogre::RenderTarget *_renderTarget );
 
+      public: void Update();
+
       public: bool IsInitialized();
 
       public: void CreateWindow( const std::string &_type, 
@@ -86,9 +88,7 @@ namespace gazebo
       private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
 
       private: bool OnButtonClicked(const CEGUI::EventArgs& _e);
-#endif
 
-#ifdef HAVE_CEGUI
       private: CEGUI::OgreRenderer *guiRenderer;
 #endif
 
