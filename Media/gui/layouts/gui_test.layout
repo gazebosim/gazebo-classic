@@ -44,33 +44,33 @@
         <Window Type="Gazebo/Listbox" Name="Root/VerbList" >
           <Property Name="Text" Value="VerbList" />
           <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-100}}"/>
+          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-80}}"/>
 
           <Property Name="VerticalAlignment" Value="Bottom" />
           <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="ffb80000" />
-          <Property Name="DisabledBackgroundColor" Value="ff803737" />
+          <Property Name="NormalBackgroundColor" Value="e0b80000" />
+          <Property Name="DisabledBackgroundColor" Value="e0803737" />
         </Window>
         <Window Type="Gazebo/Listbox" Name="Root/PrepositionList" >
           <Property Name="Text" Value="VerbList" />
           <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-100}}"/>
+          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-80}}"/>
 
           <Property Name="VerticalAlignment" Value="Bottom" />
           <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="ffb008000" />
-          <Property Name="DisabledBackgroundColor" Value="ff378037" />
+          <Property Name="NormalBackgroundColor" Value="e0b008000" />
+          <Property Name="DisabledBackgroundColor" Value="e0378037" />
         </Window>
 
         <Window Type="Gazebo/Listbox" Name="Root/NounList" >
           <Property Name="Text" Value="VerbList" />
           <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-100}}"/>
+          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-70}}"/>
 
           <Property Name="VerticalAlignment" Value="Bottom" />
           <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="ffb000080" />
-          <Property Name="DisabledBackgroundColor" Value="ff373780" />
+          <Property Name="NormalBackgroundColor" Value="e0b000080" />
+          <Property Name="DisabledBackgroundColor" Value="e0373780" />
         </Window>
 
   </Window>

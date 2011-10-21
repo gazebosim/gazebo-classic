@@ -17,4 +17,6 @@
     <Image Name="ScrollRightArrow" XPos="390" YPos="10" Width="50" Height="50" />
     <Image Name="HorzScrollContainer" XPos="250" YPos="80" Width="1" Height="70" />
     <Image Name="VertScrollContainer" XPos="210" YPos="100" Width="70" Height="1" />
+    <Image Name="FancyFrameBottomLeft" XPos="2" YPos="194" Width="72" Height="53" />
+    <Image Name="FancyFrameBottonRight" XPos="110" YPos="195" Width="72" Height="52" />
 </Imageset>

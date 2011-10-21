@@ -39,6 +39,13 @@ namespace gazebo
             boost::bind(&GUITest::PreRender, this) ) );
     }
 
+    private: bool OnSelect(const CEGUI::EventArgs& _e)
+             {
+               printf("OnSelect\n");
+               return true;
+             }
+
+
     private: void PreRender()
              {
                static bool connected = false;
@@ -50,8 +57,8 @@ namespace gazebo
                  if (!scene)
                    gzerr << "Unable to find scene[default]\n";
 
-                 this->camera = scene->CreateDepthCamera("my_camera");
-                 //this->camera = scene->CreateCamera("my_camera");
+                 //this->camera = scene->CreateDepthCamera("my_camera");
+                 this->camera = scene->CreateCamera("my_camera");
 
                  this->camera->Load();
                  this->camera->Init();
@@ -61,8 +68,8 @@ namespace gazebo
                  this->camera->SetImageHeight(500);
                  this->camera->SetFOV( 1.5707 );
 
-                 //this->camera->CreateRenderTexture("help_me");
-                 this->camera->CreateDepthTexture("help_me");
+                 this->camera->CreateRenderTexture("help_me");
+                 //this->camera->CreateDepthTexture("help_me");
 
                  this->camera->SetWorldPosition( math::Vector3(0,0,0.5) );
 
@@ -85,9 +92,14 @@ namespace gazebo
                  userCam->GetGUIOverlay()->GetWindow("Root/PrepositionList")->hide();
                  userCam->GetGUIOverlay()->GetWindow("Root/NounList")->hide();
 
+                 ((CEGUI::Listbox*)userCam->GetGUIOverlay()->GetWindow("Root/VerbList"))->subscribeEvent( 
+                     CEGUI::Listbox::EventSelectionChanged, 
+                     CEGUI::Event::Subscriber( &GUITest::OnSelect, this) );
+
                  connected = true;
                }
              }
+
     private: void OnPrepositionButton()
              {
                printf("GUITest::Prep Button\n");
@@ -98,8 +110,11 @@ namespace gazebo
                rendering::UserCameraPtr userCam = gui::get_active_camera();
                CEGUI::Listbox *win = (CEGUI::Listbox*)(userCam->GetGUIOverlay()->GetWindow("Root/VerbList"));
                win->show();
-               
-               win->addItem(new CEGUI::ListboxTextItem("Hello") );
+
+               win->resetList();
+               CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem("Hello");
+               item->setSelectionColours( CEGUI::colour(0.0, 1.0, 0.0, 1.0) );
+               win->addItem(item);
              }
 
 
@@ -115,7 +130,7 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: std::vector<event::ConnectionPtr> connections;
-    private: rendering::DepthCameraPtr camera;
+    private: rendering::CameraPtr camera;
   };
   
   // Register this plugin with the simulator

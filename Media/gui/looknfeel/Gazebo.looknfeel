@@ -442,11 +442,12 @@
   <!-- ///////////
         List Box 
        //////////-->
-  <!--<WidgetLook name="Gazebo/Listbox">
-    <Property name="ForceVertScrollbar" value="False" />
+  <WidgetLook name="Gazebo/Listbox">
 
     <PropertyDefinition name="NormalBackgroundColor" initialValue="FF7F7F7F" redrawOnWrite="true" />
     <PropertyDefinition name="DisabledBackgroundColor" initialValue="FF3F3F3F" redrawOnWrite="true" />
+
+    <Property name="ForceVertScrollbar" value="False" />
 
     <NamedArea name="ItemRenderingArea">
       <Area>
@@ -507,6 +508,90 @@
       </Layer>
     </StateImagery>
   </WidgetLook>
-  -->
+
+  <WidgetLook name="Gazebo/ListboxItem">
+    <PropertyDefinition name="TextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <PropertyDefinition name="SelectedTextColour" initialValue="FF000000" redrawOnWrite="true" />
+		<PropertyDefinition name="SelectionBrush" initialValue="set:Gazebo image:DefaultBrush" redrawOnWrite="true" />
+		<PropertyDefinition name="SelectionColour" initialValue="FF3030FF" redrawOnWrite="true" />
+
+    <Property name="Selectable" value="True" />
+    <NamedArea name="ContentSize">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" >
+          <FontDim type="HorzExtent" padding="6"/>
+        </Dim>
+        <Dim type="Height" >
+          <FontDim type="LineSpacing"/>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <ImagerySection name="label">
+      <TextComponent>
+        <Area>
+          <Dim type="TopEdge">
+            <AbsoluteDim value="0" />
+          </Dim>
+          <Dim type="LeftEdge">
+            <AbsoluteDim value="3" />
+          </Dim>
+					<Dim type="RightEdge">
+						<UnifiedDim scale="1" offset="-3" type="RightEdge" />
+					</Dim>
+					<Dim type="BottomEdge">
+						<UnifiedDim scale="1" type="BottomEdge" />
+					</Dim>
+        </Area>
+      </TextComponent>
+    </ImagerySection>
+    <ImagerySection name="selection">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+          <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+        </Area>
+        <ImageProperty name="SelectionBrush" />
+        <ColourProperty name="SelectionColour" />
+      </ImageryComponent>
+    </ImagerySection>
+
+    <StateImagery name="Enabled">
+      <Layer>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section section="label">
+          <ColourProperty name="TextColour" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="SelectedEnabled">
+      <Layer>
+        <Section section="selection" />
+        <Section section="label">
+          <ColourProperty name="SelectedTextColour" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="SelectedDisabled">
+      <Layer>
+        <Section section="selection" />
+        <Section section="label">
+          <ColourProperty name="SelectedTextColour" />
+        </Section>
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+
+
 
 </Falagard>
