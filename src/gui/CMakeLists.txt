@@ -52,21 +52,41 @@ QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_executable(gzclient ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${headers} ${resources_RCC})
 
-target_link_libraries( gzclient gazebo_common
-                                gazebo_transport
-                                gazebo_sdf_interface
-                                gazebo_sdf_parser
-                                gazebo_rendering
-                                gazebo_sensors
-                                gazebo_msgs
-                                gzqtpropertybrowser 
-                                Xpm 
-                                ${QT_LIBRARIES} 
-                                ${ogre_libraries} 
-                                ${boost_libraries} 
-                                pthread)
+target_link_libraries( gazebo_gui gazebo_common
+                                  gazebo_transport
+                                  gazebo_sdf_interface
+                                  gazebo_sdf_parser
+                                  gazebo_rendering
+                                  gazebo_sensors
+                                  gazebo_msgs
+                                  gzqtpropertybrowser 
+                                  Xpm 
+                                  ${QT_LIBRARIES} 
+                                  ${ogre_libraries} 
+                                  ${boost_libraries} 
+                                  pthread)
+
+target_link_libraries( gzclient gazebo_gui)
+
+#  gazebo_common
+#                                gazebo_transport
+#                                gazebo_sdf_interface
+#                                gazebo_sdf_parser
+#                                gazebo_rendering
+#                                gazebo_sensors
+#                                gazebo_msgs
+#                                gzqtpropertybrowser 
+#                                Xpm 
+#                                ${QT_LIBRARIES} 
+#                                ${ogre_libraries} 
+#                                ${boost_libraries} 
+#                                pthread)
+#
 
 add_definitions(${QT_DEFINITIONS})
 
+INSTALL_LIBRARY(gazebo_gui)
+INSTALL_INCLUDES("gui" ${headers})
 INSTALL_EXECUTABLE( gzclient )
