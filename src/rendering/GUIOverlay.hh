@@ -95,6 +95,8 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
       private: std::string layoutFilename;
       private: std::map<std::string, boost::function<void()> > callbacks;
+               
+      private: unsigned int rttImageSetCount;
     };
   }
 }

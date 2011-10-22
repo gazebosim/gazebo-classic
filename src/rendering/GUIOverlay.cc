@@ -28,6 +28,7 @@ GUIOverlay::GUIOverlay()
       event::Events::ConnectPreRender( 
         boost::bind(&GUIOverlay::PreRender, this) ) );
 #endif
+  this->rttImageSetCount = 0;
 }
 
 GUIOverlay::~GUIOverlay()
@@ -261,7 +262,12 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera, const std::string &_win
   CEGUI::Texture &guiTex = this->guiRenderer->createTexture(
       texPtr );
 
-  CEGUI::Imageset &imageSet = CEGUI::ImagesetManager::getSingleton().create("RTTImageset", guiTex);
+  this->rttImageSetCount++;
+  std::ostringstream stream;
+  stream << "RTTImageset_" << this->rttImageSetCount;
+
+  CEGUI::Imageset &imageSet = CEGUI::ImagesetManager::getSingleton().create(
+      stream.str().c_str(), guiTex);
 
   imageSet.defineImage("RTTImage", CEGUI::Point(0.0f, 0.0f),
       CEGUI::Size(guiTex.getSize().d_width, 
