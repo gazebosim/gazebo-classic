@@ -142,9 +142,3 @@ void DepthCameraSensor::Update(bool force)
 void DepthCameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
 }
-
-/// Set the update rate of the sensor
-void DepthCameraSensor::SetUpdateRate(double _hz) 
-{
-  this->camera->SetRenderRate( _hz );
-}

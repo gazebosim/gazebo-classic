@@ -60,7 +60,7 @@ namespace gazebo
     class DepthCamera : public Camera
     {
       /// \brief Constructor
-      public: DepthCamera(const std::string &_namePrefix, Scene *_scene);
+      public: DepthCamera(const std::string &_namePrefix, Scene *_scene, bool _autoRender=true);
     
       /// \brief Destructor
       public: virtual ~DepthCamera();

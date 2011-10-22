@@ -44,8 +44,8 @@ using namespace rendering;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene) :
-             Camera(_namePrefix, _scene)
+DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene, bool _autoRender) :
+             Camera(_namePrefix, _scene, _autoRender)
 {
   this->renderTarget = NULL;
   this->depthBuffer = NULL;

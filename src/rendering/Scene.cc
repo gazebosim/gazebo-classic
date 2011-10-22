@@ -357,18 +357,18 @@ Grid *Scene::GetGrid(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 //Create a camera
-CameraPtr Scene::CreateCamera(const std::string &_name)
+CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
-  CameraPtr camera( new Camera(this->name + "::" + _name, this) );
+  CameraPtr camera( new Camera(this->name + "::" + _name, this, _autoRender) );
   this->cameras.push_back(camera);
 
   return camera;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DepthCameraPtr Scene::CreateDepthCamera( const std::string &_name )
+DepthCameraPtr Scene::CreateDepthCamera( const std::string &_name, bool _autoRender )
 {
-  DepthCameraPtr camera( new DepthCamera(this->name + "::" + _name, this) );
+  DepthCameraPtr camera( new DepthCamera(this->name + "::" + _name, this, _autoRender) );
   this->cameras.push_back(camera);
 
   return camera;

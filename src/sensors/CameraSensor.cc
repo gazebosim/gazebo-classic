@@ -26,6 +26,8 @@
 
 #include "transport/transport.h"
 
+#include "physics/World.hh"
+
 #include "rendering/Camera.hh"
 #include "rendering/Scene.hh"
 #include "rendering/RenderEngine.hh"
@@ -43,6 +45,10 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
+  this->connections.push_back( event::Events::ConnectRender(
+        boost::bind(&CameraSensor::Render, this)) );
+  this->connections.push_back( event::Events::ConnectPostRender(
+        boost::bind(&CameraSensor::PostRender, this)) );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -88,7 +94,7 @@ void CameraSensor::Init()
     if (!scene)
       scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
-    this->camera = scene->CreateCamera(this->sdf->GetValueString("name"));
+    this->camera = scene->CreateCamera(this->sdf->GetValueString("name"), false);
     if (!this->camera)
     {
       gzerr << "Unable to create camera sensor[mono_camera]\n";
@@ -146,10 +152,21 @@ void CameraSensor::Update(bool force)
 void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
 }
-
-/// Set the update rate of the sensor
-void CameraSensor::SetUpdateRate(double _hz) 
-{
-  this->camera->SetRenderRate( _hz );
-}
  
+////////////////////////////////////////////////////////////////////////////////
+// Render the camera
+void CameraSensor::Render()
+{
+  if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+  {
+    this->camera->Render();
+    this->lastUpdateTime = this->world->GetSimTime();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Post Render the camera
+void CameraSensor::PostRender()
+{
+  this->camera->PostRender();
+}

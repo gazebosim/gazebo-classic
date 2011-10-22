@@ -30,7 +30,6 @@
 #include "math/Angle.hh"
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
-#include "physics/Physics.hh"
 
 #include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
@@ -67,7 +66,7 @@ namespace gazebo
     class Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
-      public: Camera(const std::string &namePrefix, Scene *scene);
+      public: Camera(const std::string &namePrefix, Scene *scene, bool _autoRender=true);
     
       /// \brief Destructor
       public: virtual ~Camera();
@@ -295,6 +294,10 @@ namespace gazebo
                   const std::string &_format,
                   const std::string &_filename);
 
+
+      /// \brief Get the last time the camera was rendered
+      public: common::Time GetLastRenderWallTime();
+
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
       /// \brief Set the camera to track a scene node
@@ -351,9 +354,7 @@ namespace gazebo
   
       protected: bool newData;
   
-      protected: common::Time renderPeriod;
-      protected: common::Time lastRenderTime;
-      public: common::Time GetLastRenderTime();
+      protected: common::Time lastRenderWallTime;
 
       protected: Scene *scene;
 
@@ -362,10 +363,6 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;
       private: friend class Scene;
-
-      private: gazebo::physics::WorldPtr world;
-      ///\brief This stores last available render time. Time the render completed, but only after the data is blitted to memory
-
     };
     
     /// \}

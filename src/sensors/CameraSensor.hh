@@ -71,12 +71,18 @@ namespace gazebo
     
       public: rendering::CameraPtr GetCamera() const {return this->camera; };
 
-      /// \brief Set the update rate of the sensor
-      public: virtual void SetUpdateRate(double _hz);
-
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
 
+      /// \brief Render the camera
+      private: void Render();
+
+      /// \brief Post Render the camera
+      private: void PostRender();
+
       private: rendering::CameraPtr camera;
+
+      private: common::Time lastRenderTime;
+
     };
     /// \}
   }

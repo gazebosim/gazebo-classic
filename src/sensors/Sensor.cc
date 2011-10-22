@@ -22,6 +22,9 @@
 #include "sdf/sdf_parser.h"
 #include "transport/transport.h"
 
+#include "physics/Physics.hh"
+#include "physics/World.hh"
+
 #include "common/Timer.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -43,6 +46,8 @@ Sensor::Sensor()
   this->active = true;
 
   this->node = transport::NodePtr(new transport::Node());
+
+  this->updatePeriod = common::Time(0.0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,6 +62,7 @@ void Sensor::Load( sdf::ElementPtr &_sdf )
 {
   this->sdf = _sdf;
   this->Load();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,6 +76,11 @@ void Sensor::Load()
   }
 
   this->node->Init(this->sdf->GetWorldName());
+
+  // get world
+  std::string worldName = this->sdf->GetWorldName();
+  this->world = physics::get_world(worldName);
+  this->lastUpdateTime = this->world->GetSimTime(); //TODO: hmm, special case for start.
 }
  
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,3 +181,19 @@ math::Pose Sensor::GetPose() const
 {
   return this->pose;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the update Hz rate
+void Sensor::SetUpdateRate(double _hz)
+{
+  this->updatePeriod = 1.0/_hz;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// return last render time
+common::Time Sensor::GetLastUpdateTime()
+{
+  return this->lastUpdateTime;
+}
+
+

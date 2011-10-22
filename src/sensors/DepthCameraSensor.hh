@@ -72,9 +72,6 @@ namespace gazebo
       public: rendering::DepthCameraPtr GetCamera() const 
               {return this->camera; };
 
-       /// \brief Set the update rate of the sensor
-      public: virtual void SetUpdateRate(double _hz);
-
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
    
       private: rendering::DepthCameraPtr camera;

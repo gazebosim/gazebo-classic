@@ -38,8 +38,6 @@
 #include "rendering/Scene.hh"
 #include "rendering/Camera.hh"
 
-#include "physics/World.hh"
-
 using namespace gazebo;
 using namespace rendering;
 
@@ -48,7 +46,7 @@ unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-Camera::Camera(const std::string &namePrefix_, Scene *scene_)
+Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 {
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/camera.sdf", this->sdf );
@@ -77,17 +75,22 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_)
   this->camera = NULL;
   this->viewport = NULL;
 
-  this->renderPeriod = common::Time(0.0);
-
   this->pitchNode = NULL;
   this->sceneNode = NULL;
   this->origParentNode = NULL;
 
   // Connect to the render signal
   this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Camera::Update, this) ) );
-  this->connections.push_back( event::Events::ConnectRender( boost::bind(&Camera::Render, this) ) );
-  this->connections.push_back( event::Events::ConnectPostRender( boost::bind(&Camera::PostRender, this) ) );
+
   this->connections.push_back( event::Events::ConnectShowWireframe( boost::bind(&Camera::ToggleShowWireframe, this) ));
+
+  if (_autoRender)
+  {
+    this->connections.push_back( event::Events::ConnectRender( boost::bind(&Camera::Render, this) ) );
+    this->connections.push_back( event::Events::ConnectPostRender( boost::bind(&Camera::PostRender, this) ) );
+  }
+
+  this->lastRenderWallTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -153,11 +156,6 @@ void Camera::Load()
       gzthrow("Camera horizontal field of veiw invalid.");
     }
   }
-
-  // get world
-  std::string worldName = this->sdf->GetWorldName();
-  this->world = gazebo::physics::get_world(worldName);
-  lastRenderTime = this->world->GetSimTime(); //TODO: hmm, special case for start.
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -249,35 +247,25 @@ void Camera::Update()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the render Hz rate
-void Camera::SetRenderRate(double _hz)
-{
-  this->renderPeriod = 1.0/_hz;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// return last render time
-common::Time Camera::GetLastRenderTime()
-{
-  return this->lastRenderTime;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Render the camera
 void Camera::Render()
 {
-  if (common::Time::GetWallTime() - this->lastRenderTime >= this->renderPeriod)
-  {
-    this->newData = true;
-    this->RenderImpl();
-    this->lastRenderTime = this->world->GetSimTime();
-  }
+  this->newData = true;
+  this->RenderImpl();
 }
 
 void Camera::RenderImpl()
 {
   this->renderTarget->update(false);
+  this->lastRenderWallTime = common::Time::GetWallTime();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+common::Time Camera::GetLastRenderWallTime()
+{
+  return this->lastRenderWallTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

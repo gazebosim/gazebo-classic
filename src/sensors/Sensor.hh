@@ -27,6 +27,8 @@
 
 #include "sdf/sdf.h"
 
+#include "physics/PhysicsTypes.hh"
+
 #include "common/Events.hh"
 #include "common/Time.hh"
 #include "math/Pose.hh"
@@ -65,7 +67,7 @@ namespace gazebo
       public: virtual void Update(bool force);
 
       /// \brief Set the update rate of the sensor
-      public: virtual void SetUpdateRate(double /*_hz*/) {};
+      public: void SetUpdateRate(double _hz);
     
       /// \brief  Finalize the sensor
       public: virtual void Fini();
@@ -80,7 +82,10 @@ namespace gazebo
       public: virtual void SetActive(bool value);
 
       public: bool IsActive();
-    
+
+      /// \brief return last update time
+      public: common::Time GetLastUpdateTime();
+
       /// \brief Load a plugin for this sensor
       /// \param _sdf SDF parameters
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
@@ -95,6 +100,10 @@ namespace gazebo
 
       protected: std::string parentName;
       protected: std::vector<SensorPluginPtr> plugins;
+
+      protected: gazebo::physics::WorldPtr world;
+      protected: common::Time updatePeriod;
+      protected: common::Time lastUpdateTime;
     };
     /// \}
   }
