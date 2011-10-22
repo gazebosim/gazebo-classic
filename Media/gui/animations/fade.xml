@@ -6,12 +6,47 @@
     </Affector>
   </AnimationDefinition>
 
-  <AnimationDefinition name="scroll_up" duration=".1" replayMode="once">
+  <AnimationDefinition name="scroll_up" duration=".3" replayMode="once">
     <Affector property="UnifiedSize" interpolator="URect">
       <KeyFrame position="0.0" value="{{0.0, 150},{0.0,0.0}}" />
-      <KeyFrame position="0.3" value="{{0.0, 150},{0.0,200}}" />
+      <KeyFrame position="0.1" value="{{0.0, 150},{0.0,180}}" />
     </Affector>
   </AnimationDefinition>
 
+  <AnimationDefinition name="scroll_down" duration=".1" replayMode="once">
+    <Affector property="UnifiedSize" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0, 150},{0,180}}" />
+      <KeyFrame position="0.1" value="{{0, 150},{0,0}}" />
+    </Affector>
+  </AnimationDefinition>
+
+
+  <AnimationDefinition name="move_left_1" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-65},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-225},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="move_left_2" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,95},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-65},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="move_left_3" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,255},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,95},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <AnimationDefinition name="move_left_4" duration="0.1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-225},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-385},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
 
 </Animations>

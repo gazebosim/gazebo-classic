@@ -592,6 +592,410 @@
   </WidgetLook>
 
 
+  <WidgetLook name="Gazebo/Titlebar">
+    <PropertyDefinition name="CaptionColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <Property name="NonClient" value="True" />
+    <ImagerySection name="caption">
+      <TextComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <ColourProperty name="CaptionColour" />
+        <VertFormat type="CentreAligned" />
+        <HorzFormat type="CentreAligned" />
+      </TextComponent>
+    </ImagerySection>
+    <StateImagery name="Active">
+      <Layer>
+        <Section section="caption" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Inactive">
+      <Layer>
+        <Section section="caption" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="Disabled">
+      <Layer>
+        <Section section="caption" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+
+
+
+  <WidgetLook name="Gazebo/FrameWindow">
+    <PropertyDefinition name="BackgroundColor" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <PropertyLinkDefinition name="CaptionColour" widget="__auto_titlebar__" targetProperty="CaptionColour" initialValue="FFFFFFFF" />
+    <PropertyLinkDefinition name="TitlebarFont" widget="__auto_titlebar__" targetProperty="Font" />
+
+    <Property name="RollUpEnabled" value="False" />
+    <Property name="UnifiedMinSize" value="{{0.1,0},{0.1,0}}" />
+    <Property name="AutoRenderingSurface" value="True" />
+    <NamedArea name="ClientWithTitleWithFrame">
+      <Area>
+        <Dim type="LeftEdge"><AbsoluteDim value="7" /></Dim>
+        <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+        <Dim type="RightEdge"><UnifiedDim scale="1" offset="-7" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-7" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ClientWithTitleNoFrame">
+      <Area>
+        <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+        <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ClientNoTitleWithFrame">
+      <Area>
+        <Dim type="LeftEdge"><AbsoluteDim value="7" /></Dim>
+        <Dim type="TopEdge"><AbsoluteDim value="7" /></Dim>
+        <Dim type="RightEdge"><UnifiedDim scale="1" offset="-7" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge"><UnifiedDim scale="1" offset="-7" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="ClientNoTitleNoFrame">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+      </Area>
+    </NamedArea>
+    <Child type="Gazebo/Titlebar" nameSuffix="__auto_titlebar__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+        <Dim type="Height" ><FontDim type="LineSpacing" padding="14" /></Dim>
+      </Area>
+      <Property name="AlwaysOnTop" value="False" />
+    </Child>
+    <Child type="Gazebo/Button" nameSuffix="__auto_closebutton__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="-7" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="7" /></Dim>
+        <Dim type="Width" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Height" ><AbsoluteDim value="0" /></Dim>
+      </Area>
+      <HorzAlignment type="RightAligned" />
+      <Property name="NonClient" value="True" />
+      <Property name="AlwaysOnTop" value="True" />
+    </Child>
+
+    <ImagerySection name="withtitle_frame">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <Image type="TopLeftCorner" imageset="Gazebo-Images" image="FrameTopLeft" />
+        <Image type="TopRightCorner" imageset="Gazebo-Images" image="FrameTopRight" />
+        <Image type="BottomLeftCorner" imageset="Gazebo-Images" image="FrameBottomLeft" />
+        <Image type="BottomRightCorner" imageset="Gazebo-Images" image="FrameBottomRight" />
+        <Image type="LeftEdge" imageset="Gazebo-Images" image="FrameLeft" />
+        <Image type="TopEdge" imageset="Gazebo-Images" image="FrameTop" />
+        <Image type="RightEdge" imageset="Gazebo-Images" image="FrameRight" />
+        <Image type="BottomEdge" imageset="Gazebo-Images" image="FrameBottom" />
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+        <ColourProperty name="BackgroundColor" />
+      </FrameComponent>
+    </ImagerySection>
+    <ImagerySection name="notitle_frame">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <Image type="TopLeftCorner" imageset="Gazebo-Images" image="FrameTopLeft" />
+        <Image type="TopRightCorner" imageset="Gazebo-Images" image="FrameTopRight" />
+        <Image type="BottomLeftCorner" imageset="Gazebo-Images" image="FrameBottomLeft" />
+        <Image type="BottomRightCorner" imageset="Gazebo-Images" image="FrameBottomRight" />
+        <Image type="LeftEdge" imageset="Gazebo-Images" image="FrameLeft" />
+        <Image type="TopEdge" imageset="Gazebo-Images" image="FrameTop" />
+        <Image type="RightEdge" imageset="Gazebo-Images" image="FrameRight" />
+        <Image type="BottomEdge" imageset="Gazebo-Images" image="FrameBottom" />
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+        <ColourProperty name="BackgroundColor" />
+      </FrameComponent>
+    </ImagerySection>
+    <ImagerySection name="withtitle_noframe_client_area">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><WidgetDim widget="__auto_titlebar__" dimension="BottomEdge" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <Image type="TopLeftCorner" imageset="Gazebo-Images" image="FrameTopLeft" />
+        <Image type="TopRightCorner" imageset="Gazebo-Images" image="FrameTopRight" />
+        <Image type="BottomLeftCorner" imageset="Gazebo-Images" image="FrameBottomLeft" />
+        <Image type="BottomRightCorner" imageset="Gazebo-Images" image="FrameBottomRight" />
+        <Image type="LeftEdge" imageset="Gazebo-Images" image="FrameLeft" />
+        <Image type="TopEdge" imageset="Gazebo-Images" image="FrameTop" />
+        <Image type="RightEdge" imageset="Gazebo-Images" image="FrameRight" />
+        <Image type="BottomEdge" imageset="Gazebo-Images" image="FrameBottom" />
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+        <ColourProperty name="BackgroundColor" />
+      </FrameComponent>
+    </ImagerySection>
+    <ImagerySection name="notitle_noframe_client_area">
+      <FrameComponent>
+        <Area>
+          <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+        </Area>
+        <Image type="TopLeftCorner" imageset="Gazebo-Images" image="FrameTopLeft" />
+        <Image type="TopRightCorner" imageset="Gazebo-Images" image="FrameTopRight" />
+        <Image type="BottomLeftCorner" imageset="Gazebo-Images" image="FrameBottomLeft" />
+        <Image type="BottomRightCorner" imageset="Gazebo-Images" image="FrameBottomRight" />
+        <Image type="LeftEdge" imageset="Gazebo-Images" image="FrameLeft" />
+        <Image type="TopEdge" imageset="Gazebo-Images" image="FrameTop" />
+        <Image type="RightEdge" imageset="Gazebo-Images" image="FrameRight" />
+        <Image type="BottomEdge" imageset="Gazebo-Images" image="FrameBottom" />
+        <Image type="Background" imageset="Gazebo-Images" image="GenericBrush" />
+        <ColourProperty name="BackgroundColor" />
+      </FrameComponent>
+    </ImagerySection>
+    <StateImagery name="ActiveWithTitleWithFrame">
+      <Layer>
+        <Section section="withtitle_frame" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="InactiveWithTitleWithFrame">
+      <Layer>
+        <Section section="withtitle_frame" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="DisabledWithTitleWithFrame">
+      <Layer>
+        <Section section="withtitle_frame" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="ActiveWithTitleNoFrame">
+      <Layer>
+        <Section section="withtitle_noframe_client_area" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="InactiveWithTitleNoFrame">
+      <Layer>
+        <Section section="withtitle_noframe_client_area" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="DisabledWithTitleNoFrame">
+      <Layer>
+        <Section section="withtitle_noframe_client_area" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="ActiveNoTitleWithFrame">
+      <Layer>
+        <Section section="notitle_frame" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="InactiveNoTitleWithFrame">
+      <Layer>
+        <Section section="notitle_frame" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="DisabledNoTitleWithFrame">
+      <Layer>
+        <Section section="notitle_frame" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="ActiveNoTitleNoFrame">
+      <Layer>
+        <Section section="notitle_noframe_client_area" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="InactiveNoTitleNoFrame">
+      <Layer>
+        <Section section="notitle_noframe_client_area" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="DisabledNoTitleNoFrame">
+      <Layer>
+        <Section section="notitle_noframe_client_area" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
+
+  <WidgetLook name="Gazebo/StaticText">
+    <PropertyDefinition name="BackgroundColor" initialValue="FFFFFFFF" redrawOnWrite="true" />
+    <Property name="BackgroundEnabled" value="True" />
+    <Property name="FrameEnabled" value="False" />
+    <NamedArea name="WithFrameTextRenderArea">
+      <Area>
+        <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+        <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim imageset="Gazebo-Images" image="FrameRight" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="WithFrameTextRenderAreaHScroll">
+      <Area>
+        <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+        <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" type="RightEdge">
+            <DimOperator op="Subtract">
+              <ImageDim imageset="Gazebo-Images" image="FrameRight" dimension="Width" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" offset="-20" type="BottomEdge" />
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="WithFrameTextRenderAreaVScroll">
+      <Area>
+        <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+        <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" offset="-20" type="RightEdge" />
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" type="BottomEdge">
+            <DimOperator op="Subtract">
+              <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+            </DimOperator>
+          </UnifiedDim>
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="WithFrameTextRenderAreaHVScroll">
+      <Area>
+        <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+        <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1" offset="-20" type="RightEdge" />
+        </Dim>
+        <Dim type="BottomEdge" >
+          <UnifiedDim scale="1" offset="-20" type="BottomEdge" />
+        </Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="NoFrameTextRenderArea">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="NoFrameTextRenderAreaHScroll">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-20" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="NoFrameTextRenderAreaVScroll">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-20" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <NamedArea name="NoFrameTextRenderAreaHVScroll">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-20" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-20" type="BottomEdge" /></Dim>
+      </Area>
+    </NamedArea>
+    <Child  type="Gazebo/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" offset="-20" type="Width" /></Dim>
+        <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+      </Area>
+      <VertAlignment type="BottomAligned" />
+    </Child>
+    <Child  type="Gazebo/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+      <Area>
+        <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+        <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" offset="-20" type="Height" /></Dim>
+      </Area>
+      <HorzAlignment type="RightAligned" />
+    </Child>
+    <StateImagery name="Enabled" />
+    <StateImagery name="Disabled" />
+    <StateImagery name="EnabledFrame">
+      <Layer>
+        <Section look="Gazebo/Shared" section="FrameOnly">
+          <ColourProperty name="BackgroundColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="DisabledFrame">
+      <Layer>
+        <Section look="Gazebo/Shared" section="FrameOnly">
+          <ColourProperty name="BackgroundColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="WithFrameEnabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnly">
+          <ColourProperty name="BackgroundColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="WithFrameDisabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnly">
+          <ColourProperty name="BackgroundColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="NoFrameEnabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnlyFull">
+          <ColourProperty name="BackgroundColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="NoFrameDisabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnlyFull">
+          <ColourProperty name="BackgroundColor" />
+        </Section>
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
 
 
 </Falagard>

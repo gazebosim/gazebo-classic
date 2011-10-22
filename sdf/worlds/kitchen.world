@@ -3,9 +3,7 @@
   <world name="default">
     <scene>
       <ambient rgba="0.2 0.2 0.2 1"/>
-      <background rgba="1 0 0 1">
-        <sky material="Gazebo/CloudySky"/>
-      </background>
+      <background rgba="0.8 .8 .8 1"/>
       <shadows enabled="false"/>
       <grid enabled="false"/>
     </scene>
@@ -69,9 +67,9 @@
 
 
     <include filename="kitchen.model"/>
-    <!--<include filename="pr2.model" model_pose="1.42 1.16
-         0 0 0 -.5235"/>-->
+    <include filename="pr2.model" model_pose="1.42 1.16 0 0 0 -.5235"/>
     <include filename="female_standing.model" model_pose="3.6 2.486 0 0 0 1.5707"/>
+
     <!--<include filename="female_standing.model" model_pose="5 -5 -.5
       0 0 0"/>-->
     <!--<include filename="table.model" model_pose="-3.0 0.5 0 0 0 1.5707"/>

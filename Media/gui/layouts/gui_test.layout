@@ -4,73 +4,110 @@
   <Window Type="DefaultWindow" Name="Root" >
         <Property Name="UnifiedAreaRect" Value="{{0.00195312,0},{0,0},{1.00195,0},{1,0}}" />
         <Window Type="Vanilla/StaticImage" Name="Root/CameraView" >
-          <Property Name="UnifiedSize" Value="{{0,500}, {0,500}}" />
+          <Property Name="UnifiedSize" Value="{{0,100}, {0,100}}" />
           <Property Name="VerticalAlignment" Value="Bottom" />
           <Property Name="UnifiedPosition" Value="{{0,20},{0,-20}}" />
         </Window>
-        <Window Type="Gazebo/Button" Name="Root/VerbButton" >
-          <Property Name="Text" Value="Verb"/>
-          <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-20}}"/>
-          <Property Name="VerticalAlignment" Value="Bottom" />
-          <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="ffb80000" />
-          <Property Name="HoverBackgroundColor" Value="ffff1f1f" />
-          <Property Name="PushedBackgroundColor" Value="ff510000" />
-          <Property Name="DisabledBackgroundColor" Value="ff803737" />
-        </Window>
-        <Window Type="Gazebo/Button" Name="Root/PrepositionButton" >
-          <Property Name="Text" Value="Preposition" />
-          <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-20},{0,-20}}"/>
-          <Property Name="VerticalAlignment" Value="Bottom" />
-          <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="ff00b800" />
-          <Property Name="HoverBackgroundColor" Value="ff1fff1f" />
-          <Property Name="PushedBackgroundColor" Value="ff005100" />
-          <Property Name="DisabledBackgroundColor" Value="ff378037" />
-        </Window>
-        <Window Type="Gazebo/Button" Name="Root/NounButton" >
-          <Property Name="Text" Value="Preposition" />
-          <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-20},{0,-20}}"/>
-          <Property Name="VerticalAlignment" Value="Bottom" />
-          <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="ff0000b8" />
-          <Property Name="HoverBackgroundColor" Value="ff1f1fff" />
-          <Property Name="PushedBackgroundColor" Value="ff000051" />
-          <Property Name="DisabledBackgroundColor" Value="ff373780" />
-        </Window>
-        <Window Type="Gazebo/Listbox" Name="Root/VerbList" >
-          <Property Name="Text" Value="VerbList" />
-          <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-80}}"/>
 
+        <Window Type="Vanilla/StaticImage" Name="Root/OverheadView" >
+          <Property Name="UnifiedSize" Value="{{0,100}, {0,100}}" />
           <Property Name="VerticalAlignment" Value="Bottom" />
-          <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="e0b80000" />
-          <Property Name="DisabledBackgroundColor" Value="e0803737" />
-        </Window>
-        <Window Type="Gazebo/Listbox" Name="Root/PrepositionList" >
-          <Property Name="Text" Value="VerbList" />
-          <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-80}}"/>
-
-          <Property Name="VerticalAlignment" Value="Bottom" />
-          <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="e0b008000" />
-          <Property Name="DisabledBackgroundColor" Value="e0378037" />
+          <Property Name="UnifiedPosition" Value="{{0,140},{0,-20}}" />
         </Window>
 
-        <Window Type="Gazebo/Listbox" Name="Root/NounList" >
-          <Property Name="Text" Value="VerbList" />
-          <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
-          <Property Name="UnifiedPosition" Value="{{0,-180},{0,-70}}"/>
 
+        <Window Type="Gazebo/FrameWindow" Name="Root/ButtonFrame">
+          <Property Name="UnifiedSize" Value="{{0,300}, {0,360}}" />
+          <Property Name="UnifiedPosition" Value="{{0,-10},{0,-10}}" />
           <Property Name="VerticalAlignment" Value="Bottom" />
           <Property Name="HorizontalAlignment" Value="Right" />
-          <Property Name="NormalBackgroundColor" Value="e0b000080" />
-          <Property Name="DisabledBackgroundColor" Value="e0373780" />
+          <Property Name="BackgroundColor" Value="88eeeeee" />
+
+          <Window Type="Gazebo/StaticText" Name="Root/Sentence">
+            <Property Name="UnifiedSize" Value="{{.95,0}, {0,50}}" />
+            <Property Name="UnifiedPosition" Value="{{0.025,0},{0,-10}}" />
+            <Property Name="VerticalAlignment" Value="Top" />
+            <Property Name="HorizontalAlignment" Value="Left" />
+            <Property Name="BackgroundColor" Value="ff666666" />
+
+          </Window>
+
+         <Window Type="Gazebo/Button" Name="Root/VerbButton" >
+            <Property Name="Text" Value="Verb"/>
+            <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,-65},{0,-20}}"/>
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="ffb80000" />
+            <Property Name="HoverBackgroundColor" Value="ffff1f1f" />
+            <Property Name="PushedBackgroundColor" Value="ff510000" />
+            <Property Name="DisabledBackgroundColor" Value="ff803737" />
+          </Window>
+          <Window Type="Gazebo/Button" Name="Root/PrepositionButton" >
+            <Property Name="Text" Value="Preposition" />
+            <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,95},{0,-20}}"/>
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="ff00b800" />
+            <Property Name="HoverBackgroundColor" Value="ff1fff1f" />
+            <Property Name="PushedBackgroundColor" Value="ff005100" />
+            <Property Name="DisabledBackgroundColor" Value="ff378037" />
+          </Window>
+          <Window Type="Gazebo/Button" Name="Root/NounButton" >
+            <Property Name="Text" Value="Noun" />
+            <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,255},{0,-20}}"/>
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="ff0000b8" />
+            <Property Name="HoverBackgroundColor" Value="ff1f1fff" />
+            <Property Name="PushedBackgroundColor" Value="ff000051" />
+            <Property Name="DisabledBackgroundColor" Value="ff373780" />
+          </Window>
+         <Window Type="Gazebo/Button" Name="Root/SendButton" >
+            <Property Name="Text" Value="Send"/>
+            <Property Name="UnifiedSize" Value="{{0,150},{0,50}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,415},{0,-20}}"/>
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="ff0095a7" />
+            <Property Name="HoverBackgroundColor" Value="ff13e0f9" />
+            <Property Name="PushedBackgroundColor" Value="ff01383f" />
+            <Property Name="DisabledBackgroundColor" Value="ff366a70" />
+          </Window>
+
+          <Window Type="Gazebo/Listbox" Name="Root/VerbList" >
+            <Property Name="Text" Value="VerbList" />
+            <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,-65},{0,-80}}"/>
+
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="e0b80000" />
+            <Property Name="DisabledBackgroundColor" Value="e0803737" />
+          </Window>
+          <Window Type="Gazebo/Listbox" Name="Root/PrepositionList" >
+            <Property Name="Text" Value="VerbList" />
+            <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,-65},{0,-80}}"/>
+
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="e000b800" />
+            <Property Name="DisabledBackgroundColor" Value="e0378037" />
+          </Window>
+
+          <Window Type="Gazebo/Listbox" Name="Root/NounList" >
+            <Property Name="Text" Value="VerbList" />
+            <Property Name="UnifiedSize" Value="{{0,150},{0,200}}"/>
+            <Property Name="UnifiedPosition" Value="{{0,-65},{0,-80}}"/>
+
+            <Property Name="VerticalAlignment" Value="Bottom" />
+            <Property Name="HorizontalAlignment" Value="Right" />
+            <Property Name="NormalBackgroundColor" Value="e00000b8" />
+            <Property Name="DisabledBackgroundColor" Value="e0373780" />
+          </Window>
         </Window>
 
   </Window>
