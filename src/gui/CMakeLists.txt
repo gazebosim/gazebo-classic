@@ -58,6 +58,7 @@ target_link_libraries( gzclient gazebo_common
                                 gazebo_sdf_interface
                                 gazebo_sdf_parser
                                 gazebo_rendering
+                                gazebo_sensors
                                 gazebo_msgs
                                 gzqtpropertybrowser 
                                 Xpm 

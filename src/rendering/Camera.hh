@@ -30,6 +30,7 @@
 #include "math/Angle.hh"
 #include "math/Pose.hh"
 #include "math/Vector2i.hh"
+#include "physics/Physics.hh"
 
 #include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
@@ -352,6 +353,7 @@ namespace gazebo
   
       protected: common::Time renderPeriod;
       protected: common::Time lastRenderTime;
+      public: common::Time GetLastRenderTime();
 
       protected: Scene *scene;
 
@@ -360,6 +362,10 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;
       private: friend class Scene;
+
+      private: gazebo::physics::WorldPtr world;
+      ///\brief This stores last available render time. Time the render completed, but only after the data is blitted to memory
+
     };
     
     /// \}

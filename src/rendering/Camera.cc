@@ -38,6 +38,8 @@
 #include "rendering/Scene.hh"
 #include "rendering/Camera.hh"
 
+#include "physics/World.hh"
+
 using namespace gazebo;
 using namespace rendering;
 
@@ -151,6 +153,11 @@ void Camera::Load()
       gzthrow("Camera horizontal field of veiw invalid.");
     }
   }
+
+  // get world
+  std::string worldName = this->sdf->GetWorldName();
+  this->world = gazebo::physics::get_world(worldName);
+  lastRenderTime = this->world->GetSimTime(); //TODO: hmm, special case for start.
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -250,6 +257,13 @@ void Camera::SetRenderRate(double _hz)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// return last render time
+common::Time Camera::GetLastRenderTime()
+{
+  return this->lastRenderTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Render the camera
 void Camera::Render()
 {
@@ -257,7 +271,7 @@ void Camera::Render()
   {
     this->newData = true;
     this->RenderImpl();
-    this->lastRenderTime = common::Time::GetWallTime();
+    this->lastRenderTime = this->world->GetSimTime();
   }
 }
 
@@ -296,6 +310,9 @@ void Camera::PostRender()
         (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
 
     pixelBuffer->blitToMemory( box );
+
+    // record render time stamp
+
 
     if (this->sdf->HasElement("save") && 
         this->sdf->GetElement("save")->GetValueBool("enabled"))
