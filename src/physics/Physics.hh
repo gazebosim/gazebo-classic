@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#ifndef __PHYSICS_HH__
+#define __PHYSICS_HH__
 
 #include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.h"
@@ -46,3 +48,4 @@ namespace gazebo
     /// \}
   }
 }
+#endif
