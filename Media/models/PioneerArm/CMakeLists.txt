@@ -12,7 +12,6 @@ SET (files Base.mesh
            Link04.mesh.xml
            Link05.mesh
            Link05.mesh.xml
-           OgreXMLConverter.log
            PioneerArm.blend
            Scene.material
 )

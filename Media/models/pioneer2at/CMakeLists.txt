@@ -2,7 +2,6 @@ SET (files chassis.mesh
            chassis_top.mesh
            Cylinder.012.mesh.xml
            hub.mesh
-           OgreXMLConverter.log
            Scene.material
            sonarbank.mesh
            sonar.mesh
