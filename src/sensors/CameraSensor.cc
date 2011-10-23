@@ -157,7 +157,8 @@ void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 // Render the camera
 void CameraSensor::Render()
 {
-  if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+  //TODO: checking if this->camera is null is not the most efficient way to do this.
+  if (this->camera && this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
   {
     this->camera->Render();
     this->lastUpdateTime = this->world->GetSimTime();
@@ -168,5 +169,6 @@ void CameraSensor::Render()
 // Post Render the camera
 void CameraSensor::PostRender()
 {
-  this->camera->PostRender();
+  //TODO: checking if this->camera is null is not the most efficient way to do this.
+  if (this->camera) this->camera->PostRender();
 }
