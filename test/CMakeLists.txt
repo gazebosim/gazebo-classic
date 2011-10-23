@@ -13,22 +13,9 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-
 enable_testing()
-find_package( GTest REQUIRED )
-include_directories( ${GTEST_INCLUDE_DIRS} )
-add_subdirectory( regression )
-
-#add_executable(factory factory.cc ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
-
-#target_link_libraries( factory ${GTEST_BOTH_LIBRARIES} 
-#                               gazebo_common 
-#                               gazebo_transport 
-#                               gazebo_physics
-#                               gazebo_sensors
-#                               gazebo_rendering
-#                               gazebo_msgs
-#                               pthread 
-#                               )
-#
-#add_test(FactoryTest factory)
+find_package( GTest )
+if (GTest_FOUND)
+  include_directories( ${GTEST_INCLUDE_DIRS} )
+  add_subdirectory( regression )
+endif()
