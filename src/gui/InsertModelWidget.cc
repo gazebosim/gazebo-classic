@@ -1,4 +1,5 @@
 #include <QtGui>
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -76,13 +77,19 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
       {
         if ( boost::filesystem::is_regular_file(dirIter->status()) )
         {
-          std::string modelName = dirIter->path().filename().string();
+
+          // This is for boost::filesystem version 3+
+          // std::string modelName = dirIter->path().filename().string();
+          std::string modelName = dirIter->path().filename();
+
           if (modelName.find(".model") != std::string::npos)
           {
             // Add a child item for the model
             QTreeWidgetItem *childItem = new QTreeWidgetItem( topItem, 
                 QStringList(QString("%1").arg( 
-                    QString::fromStdString( dirIter->path().filename().string() )) ));
+                    // This is for boost::filesystem version 3+
+                    //QString::fromStdString( dirIter->path().filename().string() )) ));
+                    QString::fromStdString( dirIter->path().filename() )) ));
             this->fileTreeWidget->addTopLevelItem(childItem);
           }
         }
