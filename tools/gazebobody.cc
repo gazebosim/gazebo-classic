@@ -39,7 +39,7 @@ class BodyTool : public Toolbase
 
     unsigned int children;
     if (!this->simIface->GetNumChildren(name, children))
-      std::cerr << "Unable to get the number of children for model[" 
+      std::cerr << "Unable to get the number of children for model["
         << name << "]\n";
 
     for (unsigned int i=0; i < children; i++)
@@ -87,7 +87,8 @@ class BodyTool : public Toolbase
       {
         this->factoryIface->DeleteEntity( params[i] );
 
-        while (strcmp((const char*)this->factoryIface->data->deleteEntity,"") != 0)
+        while (strcmp(
+              (const char*)this->factoryIface->data->deleteEntity,"") != 0)
           usleep(10000);
       }
     }
@@ -112,7 +113,8 @@ class BodyTool : public Toolbase
   // Print out help information
   public: void Help()
   {
-    std::cout << "gazebobody is a command-line tool for manipulating bodies in a gazebo world.\n";
+    std::cout << "gazebobody is a command-line tool for manipulating bodies"
+              << "in a gazebo world.\n";
     std::cout << "\n";
     std::cout << "Usage: gazebobody <command> <option_1> ... <option_n>\n";
     std::cout << "\n";

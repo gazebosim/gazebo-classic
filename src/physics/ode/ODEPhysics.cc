@@ -157,6 +157,8 @@ ODEPhysics::~ODEPhysics()
 
   delete this->odeRaySensorMutex;
   this->odeRaySensorMutex = NULL;
+
+  delete [] this->contactCollisions;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
