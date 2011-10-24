@@ -230,12 +230,30 @@ void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
     this->viewController->HandleMouseEvent(_evt);
 }
 
-bool UserCamera::AttachToVisualImpl( VisualPtr _visual,
+bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,
                                      double _minDist, double _maxDist )
 {
-  Camera::AttachToVisualImpl(_visual);
+  Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
+    math::Pose origPose = this->GetWorldPose();
+    double yaw = atan2(origPose.pos.x - _visual->GetWorldPose().pos.x,
+                       origPose.pos.y - _visual->GetWorldPose().pos.y);
+    yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+
+    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
+    double pitch = 0;
+
+    if (fabs(zDiff) > 1e-3) 
+    {
+      double dist = _visual->GetWorldPose().pos.Distance( 
+          this->GetWorldPose().pos);
+      pitch = acos(zDiff/dist );
+    }
+
+    this->RotateYaw(yaw);
+    this->RotatePitch(pitch);
+
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();
     pos.z = bb.max.z; 
@@ -444,7 +462,8 @@ void UserCamera::MoveToVisual( VisualPtr _visual )
   this->animState->setLoop(false);
 }
 
-void UserCamera::MoveToPosition( const math::Vector3 &_end, double _pitch, double _yaw, double _time)
+void UserCamera::MoveToPosition( const math::Vector3 &_end, 
+                                 double _pitch, double _yaw, double _time)
 {
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;

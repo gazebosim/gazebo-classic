@@ -293,8 +293,6 @@ void TopicManager::ConnectSubToPub( const msgs::Publish &_pub)
 PublicationPtr TopicManager::UpdatePublications( const std::string &topic, 
                                                  const std::string &msgType )
 {
-  bool inserted = false;
-
   // Find a current publication on this topic
   PublicationPtr pub = this->FindPublication(topic);
 
@@ -309,7 +307,6 @@ PublicationPtr TopicManager::UpdatePublications( const std::string &topic,
     PublicationPtr dbgPub;
     msgs::String tmp;
 
-    inserted = true;
     pub = PublicationPtr( new Publication(topic, msgType) );
     dbgPub = PublicationPtr( new Publication(topic+"/__dbg", tmp.GetTypeName()) );
     this->advertisedTopics.push_back( pub );

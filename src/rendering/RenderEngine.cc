@@ -440,7 +440,7 @@ void RenderEngine::SetupRenderSystem()
   ///   FBO seem to be the only good option
   renderSys->setConfigOption("RTT Preferred Mode", "FBO");
 
-  renderSys->setConfigOption("FSAA", "2");
+  renderSys->setConfigOption("FSAA", "4");
 
   this->root->setRenderSystem(renderSys);
 }

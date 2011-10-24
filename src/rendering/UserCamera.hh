@@ -98,6 +98,7 @@ namespace gazebo
 
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
+                     bool _inheritOrientation,
                     double _minDist=0, double _maxDist=0 );
 
       /// \brief Set the camera to track a scene node

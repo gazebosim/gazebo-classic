@@ -44,6 +44,7 @@ namespace Ogre
   class StaticGeometry;
   class RibbonTrail;
   class AxisAlignedBox;
+  class AnimationState;
 }
 
 namespace gazebo
@@ -236,7 +237,12 @@ namespace gazebo
 
       /// \brief Set the shader type
       public: void SetShaderType( const std::string &_type );
-  
+
+      public: void MoveToPosition( const math::Vector3 &_end, 
+                                   double _pitch, double _yaw, double _time);
+
+      public: void ShowBoundingBox();
+
       private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
       private: std::string GetMeshName() const;
   
@@ -272,6 +278,8 @@ namespace gazebo
 
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;
+
+      private: Ogre::AnimationState *animState;
     };
     /// \}
   }

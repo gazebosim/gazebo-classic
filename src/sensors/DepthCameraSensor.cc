@@ -56,7 +56,7 @@ DepthCameraSensor::~DepthCameraSensor()
 void DepthCameraSensor::SetParent( const std::string &_name )
 {
   Sensor::SetParent(_name);
-  this->camera->AttachToVisual( _name );
+  this->camera->AttachToVisual( _name, true );
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -147,7 +147,10 @@ namespace gazebo
   
       /// \brief Get the camera FOV (vertical)  
       public: math::Angle GetVFOV() const;
-    
+  
+      /// \brief Set the image size 
+      public: void SetImageSize(unsigned int _w, unsigned int _h);
+
       /// \brief Set the image height
       public: void SetImageWidth( unsigned int _w );
 
@@ -270,7 +273,8 @@ namespace gazebo
 
       /// \brief Attach the camera to a scene node
       public: void AttachToVisual( const std::string &_visualName, 
-                                   double _minDist=0, double _maxDist=0 );
+                  bool _inheritOrientation,
+                  double _minDist=0, double _maxDist=0 );
 
       /// \brief Set the camera to track a scene node
       public: void TrackVisual( const std::string &_visualName);
@@ -305,11 +309,13 @@ namespace gazebo
 
       /// \brief Attach the camera to a visual
       protected: virtual bool AttachToVisualImpl( const std::string &_name,
-                    double _minDist=0, double _maxDist=0 );
+                     bool _inheritOrientation,
+                     double _minDist=0, double _maxDist=0 );
 
       /// \brief Attach the camera to a visual
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
-                    double _minDist=0, double _maxDist=0 );
+                     bool _inheritOrientation,
+                     double _minDist=0, double _maxDist=0 );
 
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
       private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);

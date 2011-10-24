@@ -492,11 +492,7 @@ std::size_t Connection::ParseHeader( const std::string &header )
 /// the read thread
 void Connection::ReadLoop(const ReadCallback &cb)
 {
-  struct timeval timeStruct;
   std::string data;
-
-  timeStruct.tv_sec = 1;
-  timeStruct.tv_usec = 0;
 
   this->readQuit = false;
   while (!this->readQuit)

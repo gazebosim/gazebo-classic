@@ -236,7 +236,8 @@ void Camera::Update()
     {
       msgs::TrackVisual msg;
       msg.ParseFromString((*iter).data());
-      if (this->AttachToVisualImpl( msg.name(), msg.min_dist(), msg.max_dist() ))
+      if (this->AttachToVisualImpl( msg.name(), msg.inherit_orientation(), 
+                                    msg.min_dist(), msg.max_dist() ))
         erase = true;
     }
 
@@ -453,6 +454,14 @@ math::Angle Camera::GetHFOV() const
 math::Angle Camera::GetVFOV() const
 {
   return math::Angle(this->camera->getFOVy().valueRadians());
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the image size 
+void Camera::SetImageSize(unsigned int _w, unsigned int _h)
+{
+  this->SetImageWidth(_w);
+  this->SetImageHeight(_h);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1062,8 +1071,9 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 }
 
 /// \brief Attach the camera to a scene node
-void Camera::AttachToVisual( const std::string &_visualName,
-                             double _minDist, double _maxDist )
+void Camera::AttachToVisual( const std::string &_visualName, 
+                             bool _inheritOrientation,
+                             double _minDist, double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;
@@ -1071,6 +1081,7 @@ void Camera::AttachToVisual( const std::string &_visualName,
   track.set_name(_visualName);
   track.set_min_dist(_minDist);
   track.set_max_dist( _maxDist );
+  track.set_inherit_orientation( _inheritOrientation );
 
   std::string *serializedData = request.mutable_data();
   track.SerializeToString( serializedData );
@@ -1091,14 +1102,14 @@ void Camera::TrackVisual( const std::string &_name )
 }
 
 bool Camera::AttachToVisualImpl( const std::string &_name, 
-    double _minDist, double _maxDist )
+    bool _inheritOrientation, double _minDist, double _maxDist )
 {
   VisualPtr visual = this->scene->GetVisual(_name);
-  return this->AttachToVisualImpl(visual, _minDist, _maxDist);
+  return this->AttachToVisualImpl(visual, _inheritOrientation, _minDist, _maxDist);
 }
 
-bool Camera::AttachToVisualImpl( VisualPtr _visual, double /*_minDist*/, 
-                                 double /*_maxDist*/ )
+bool Camera::AttachToVisualImpl( VisualPtr _visual, bool _inheritOrientation, 
+    double /*_minDist*/, double /*_maxDist*/ )
 {
   if (this->sceneNode->getParent())
       this->sceneNode->getParent()->removeChild(this->sceneNode);
@@ -1107,26 +1118,9 @@ bool Camera::AttachToVisualImpl( VisualPtr _visual, double /*_minDist*/,
   {
     math::Pose origPose = this->GetWorldPose();
     _visual->GetSceneNode()->addChild(this->sceneNode);
-    this->sceneNode->setInheritOrientation(false);
+    this->sceneNode->setInheritOrientation( _inheritOrientation );
     //this->sceneNode->_setDerivedPosition(Conversions::Convert(origPose.pos));
     this->SetWorldPose(origPose);
-
-    double yaw = atan2(origPose.pos.x - _visual->GetWorldPose().pos.x,
-                       origPose.pos.y - _visual->GetWorldPose().pos.y);
-    yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
-
-    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
-    double pitch = 0;
-
-    if (fabs(zDiff) > 1e-3) 
-    {
-      double dist = _visual->GetWorldPose().pos.Distance( 
-          this->GetWorldPose().pos);
-      pitch = acos(zDiff/dist );
-    }
-
-    this->RotateYaw(yaw);
-    this->RotatePitch(pitch);
 
     return true;
   }

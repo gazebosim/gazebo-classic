@@ -117,7 +117,7 @@ void CameraSensor::Init()
     //this->camera->SetRelativePose( this->pose );
     //this->camera->SetInitialRelativePose( this->pose );
     this->camera->SetWorldPose( this->pose );
-    this->camera->AttachToVisual( this->parentName );
+    this->camera->AttachToVisual( this->parentName, true );
   }
   else
     gzerr << "No world name\n";

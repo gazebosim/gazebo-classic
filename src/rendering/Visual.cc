@@ -51,6 +51,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 
   this->SetName(_name);
   this->sceneNode = NULL;
+  this->animState = NULL;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -77,6 +78,7 @@ Visual::Visual (const std::string &_name, Ogre::SceneNode *_parent)
 {
   this->SetName(_name);
   this->sceneNode = NULL;
+  this->animState = NULL;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -95,6 +97,7 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 {
   this->SetName(_name);
   this->sceneNode = NULL;
+  this->animState = NULL;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -350,6 +353,18 @@ void Visual::Update()
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
     (*iter)->Update();
+
+  if (this->animState)
+  {
+    this->animState->addTime(0.01);
+    if (this->animState->hasEnded())
+    {
+      this->animState = NULL;
+      this->sceneNode->getCreator()->destroyAnimation(this->GetName() + "_animation");
+      this->sceneNode->getCreator()->destroyAnimationState(this->GetName() + "_animation");
+      event::Events::DisconnectPreRender(this->preRenderConnection);
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1520,4 +1535,41 @@ std::string Visual::GetMeshName() const
   }
 
   return std::string();
+}
+
+void Visual::MoveToPosition( const math::Vector3 &_end, 
+                             double _pitch, double _yaw, double _time)
+{
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  math::Quaternion rotFinal( 0, _pitch, _yaw );
+
+  std::string animName = this->GetName() + "_animation";
+
+  Ogre::Animation *anim = this->sceneNode->getCreator()->createAnimation(animName,_time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = strack->createNodeKeyFrame(_time);
+  key->setTranslate( Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setRotation( Conversions::Convert(rotFinal) );
+
+  this->animState = this->sceneNode->getCreator()->createAnimationState(animName);
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+
+  this->preRenderConnection = event::Events::ConnectPreRender( boost::bind(&Visual::Update, this) );
+}
+
+void Visual::ShowBoundingBox()
+{
+  this->sceneNode->showBoundingBox(true);
 }
