@@ -88,7 +88,6 @@ void transport::stop()
 void transport::fini()
 {
   transport::TopicManager::Instance()->Fini();
-  transport::ConnectionManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Stop();
 
   if (g_runThread)
@@ -97,5 +96,5 @@ void transport::fini()
     delete g_runThread;
     g_runThread = NULL;
   }
-
+  transport::ConnectionManager::Instance()->Fini();
 }

@@ -42,6 +42,8 @@ ODETrimeshShape::ODETrimeshShape(CollisionPtr parent) : TrimeshShape(parent)
 // Destructor
 ODETrimeshShape::~ODETrimeshShape()
 {
+  delete [] this->vertices;
+  delete [] this->indices;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -112,25 +114,28 @@ void ODETrimeshShape::Init()
 
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
-  float *vertices = NULL;
-  unsigned int *indices = NULL;
+  this->vertices = NULL;
+  this->indices = NULL;
 
-  subMesh->FillArrays(&vertices, &indices);
+  subMesh->FillArrays(&this->vertices, &this->indices);
 
   numIndices = subMesh->GetIndexCount();
   numVertices = subMesh->GetVertexCount();
 
   for (unsigned int j=0;  j < numVertices; j++)
   {
-    vertices[j*3+0] = vertices[j*3+0] * this->sdf->GetValueVector3("scale").x;
-    vertices[j*3+1] = vertices[j*3+1] * this->sdf->GetValueVector3("scale").y;
-    vertices[j*3+2] = vertices[j*3+2] * this->sdf->GetValueVector3("scale").z;
+    this->vertices[j*3+0] = this-> vertices[j*3+0] * 
+      this->sdf->GetValueVector3("scale").x;
+    this->vertices[j*3+1] = this-> vertices[j*3+1] * 
+      this->sdf->GetValueVector3("scale").y;
+    this->vertices[j*3+2] = this-> vertices[j*3+2] * 
+      this->sdf->GetValueVector3("scale").z;
   }
 
   // Build the ODE triangle mesh
   dGeomTriMeshDataBuildSingle( odeData,
-      (float*)vertices, 3*sizeof(float), numVertices,
-      (int*)indices, numIndices, 3*sizeof(int));
+      (float*)this->vertices, 3*sizeof(float), numVertices,
+      (int*)this->indices, numIndices, 3*sizeof(int));
 
   pcollision->SetSpaceId( dSimpleSpaceCreate(pcollision->GetSpaceId()) );
   pcollision->SetCollision( dCreateTriMesh(pcollision->GetSpaceId(), odeData,0,0,0 ), true);

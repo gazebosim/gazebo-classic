@@ -139,6 +139,8 @@ void ConnectionManager::Fini()
   if (!this->initialized)
     return;
 
+  this->Stop();
+
   this->masterConn->ProcessWriteQueue();
   this->masterConn.reset();
 
@@ -148,7 +150,6 @@ void ConnectionManager::Fini()
   this->connections.clear();
   this->initialized = false;
 
-  this->Stop();
   this->initialized = false;
 }
 
@@ -158,18 +159,6 @@ void ConnectionManager::Fini()
 void ConnectionManager::Stop()
 {
   this->stop = true;
-  /*if (this->thread)
-  {
-    this->thread->join();
-    delete this->thread;
-    this->thread = NULL;
-  }
-  */
-
-  if (this->masterConn)
-  {
-    this->masterConn->Shutdown();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +166,6 @@ void ConnectionManager::Stop()
 void ConnectionManager::Run()
 {
   std::list<ConnectionPtr>::iterator iter;
-  this->stop = false;
   while (!this->stop)
   {
     this->masterMessagesMutex->lock();
@@ -206,8 +194,11 @@ void ConnectionManager::Run()
       }
     }
     this->connectionMutex->unlock();
-    usleep(10000);
+
+    common::Time::MSleep(1);
   }
+
+  this->masterConn->Shutdown();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

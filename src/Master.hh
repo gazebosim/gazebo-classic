@@ -24,8 +24,10 @@ namespace gazebo
     /// \param _port The master's port
     public: void Init(unsigned short _port);
 
-    /// \brief Run the master in a new thread
     public: void Run();
+
+    /// \brief Run the master in a new thread
+    public: void RunThread();
 
     /// \brief Run the master one iteration 
     public: void RunOnce();
@@ -35,9 +37,6 @@ namespace gazebo
 
     /// \brief Finalize the master
     public: void Fini();
-
-    /// \brief The run loop
-    private: void RunLoop();
 
     /// \brief Process a message
     /// \param _connectionIndex Index of the connection which generated the

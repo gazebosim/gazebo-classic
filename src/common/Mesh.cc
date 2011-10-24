@@ -21,6 +21,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
+#include "gazebo_config.h"
 
 using namespace gazebo;
 using namespace common;
@@ -622,6 +623,10 @@ unsigned int SubMesh::GetVertexIndex(const math::Vector3 &v) const
 // Put all the data into flat arrays
 void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
 {
+#ifdef BUILD_TYPE_PROFILE
+  HeapLeakChecker::Disabler disabler;
+#endif
+
   if (this->vertices.size() ==0 || this->indices.size() == 0)
     gzerr << "No vertices or indices\n";
 

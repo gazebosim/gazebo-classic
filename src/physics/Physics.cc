@@ -17,10 +17,10 @@
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
-
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/Physics.hh"
+#include "gazebo_config.h"
 
 using namespace gazebo;
 
@@ -47,6 +47,9 @@ bool physics::fini()
 
 physics::WorldPtr physics::create_world(const std::string &_name)
 {
+#ifdef BUILD_TYPE_PROFILE
+  HeapLeakChecker::Disabler disabler;
+#endif
   physics::WorldPtr world( new physics::World(_name) );
   g_worlds.push_back(world);
   return world;

@@ -190,6 +190,8 @@ class ModelTool : public Toolbase
       }
       else
         std::cerr << "Unable to open file[" << this->params[1] << "]\n";
+
+      fclose(file);
     }
   }
 

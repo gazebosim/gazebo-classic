@@ -97,7 +97,7 @@ namespace deprecated_sdf
   bool getPlugins(xmlNodePtr pluginXml, std::map<std::string, 
                   sdf::ElementPtr > &_sdf);
 
-  bool initAttr(xmlNodePtr _node, const std::string _key, sdf::ParamPtr _attr);
+  bool initAttr(xmlNodePtr _node, const std::string &_key, sdf::ParamPtr _attr);
 
   ////////////////////////////////////////////////////////////////////////////
   //

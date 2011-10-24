@@ -30,7 +30,6 @@ namespace gazebo
 {
 	namespace common
   {
-    class OgreLoader;
     class ColladaLoader;
     class STLLoader;
     class Mesh;
@@ -113,7 +112,6 @@ namespace gazebo
       /// \brief Create a Camera mesh
       public: void CreateCamera(const std::string &name, float scale);
    
-      private: OgreLoader *ogreLoader;
       private: ColladaLoader *colladaLoader;
       private: STLLoader *stlLoader;
   

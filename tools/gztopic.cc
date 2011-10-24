@@ -113,7 +113,7 @@ void echo_cb(const boost::shared_ptr<msgs::String const> &_data)
   std::cout << _data->data() << "\n";
 }
 
-msgs::TopicInfo get_topic_info(const std::string topic)
+msgs::TopicInfo get_topic_info(const std::string &_topic)
 {
   msgs::TopicInfo topic_info;
   std::string data, type;
@@ -123,7 +123,7 @@ msgs::TopicInfo get_topic_info(const std::string topic)
   transport::ConnectionPtr connection = connect_to_master("localhost", 11345);
 
   request.set_request("topic_info");
-  request.set_data(topic);
+  request.set_data(_topic);
   connection->EnqueueMsg( msgs::Package("request", request), true );
   connection->Read(data);
 
@@ -138,9 +138,9 @@ msgs::TopicInfo get_topic_info(const std::string topic)
   return topic_info;
 }
 
-void print_topic_info(const std::string topic)
+void print_topic_info(const std::string &_topic)
 {
-  msgs::TopicInfo info = get_topic_info(topic);
+  msgs::TopicInfo info = get_topic_info(_topic);
   std::cout << "Type: " << info.msg_type() << "\n\n";
 
   std::cout << "Publishers:\n";

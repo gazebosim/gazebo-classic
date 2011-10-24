@@ -96,6 +96,25 @@ double Time::Double() const
   return ((double)this->sec + (double)this->nsec*1e-9);
 }
 
+/// Millisecond sleep
+Time Time::MSleep(unsigned int _ms)
+{
+  Time result;
+
+  struct timespec interval;
+  struct timespec remainder;
+  interval.tv_sec = _ms / 1000;
+  interval.tv_nsec = (_ms % 1000) * 1000000;
+
+  if (nanosleep(&interval, &remainder) == -1)
+  {
+    result.sec = remainder.tv_sec;;
+    result.nsec = remainder.tv_nsec;;
+  }
+
+  return result;
+}
+ 
 // Equal opeators
 const Time &Time::operator=( const struct timeval &tv )
 {

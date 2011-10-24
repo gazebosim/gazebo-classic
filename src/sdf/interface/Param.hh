@@ -254,7 +254,9 @@ namespace sdf
 
     public: virtual boost::shared_ptr<Param> Clone() const
             {
-              boost::shared_ptr<ParamT<T> > clone(new ParamT<T>(this->GetKey(),this->GetDefaultAsString(), this->required ) );
+              boost::shared_ptr<ParamT<T> > clone(
+                  new ParamT<T>(this->GetKey(),this->GetDefaultAsString(), 
+                                this->required ) );
               return clone;
             }
 

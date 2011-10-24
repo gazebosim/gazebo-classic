@@ -26,6 +26,7 @@
 
 #include "common/Time.hh"
 #include "common/CommonTypes.hh"
+#include "gazebo_config.h"
 
 namespace gazebo
 {
@@ -49,8 +50,8 @@ namespace gazebo
       public: Connection() :event(NULL), id(-1), uniqueId(-1) {}
       public: Connection(Event *e, int i);
       public: ~Connection();
-      public: int Id() const;
-      public: int UniqueId() const;
+      public: int GetId() const;
+      public: int GetUniqueId() const;
       private: Event *event;
       private: int id;
 
@@ -65,6 +66,8 @@ namespace gazebo
     template< typename T>
     class EventT : public Event
     {
+      public: virtual ~EventT();
+    
       /// \brief Connect a callback to this event
       /// \return A Connection object, which will automatically call
       ///         Disconnect when it goes out of scope
@@ -257,8 +260,21 @@ namespace gazebo
     };
 
     template<typename T>
+    EventT<T>::~EventT()
+    {
+      for (unsigned int i = 0; i < this->connections.size(); i++)
+        delete this->connections[i];
+      this->connections.clear();
+    }
+
+
+    template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
+#ifdef BUILD_TYPE_PROFILE
+      HeapLeakChecker::Disabler disabler;
+#endif
+
       this->connections.push_back(new boost::function<T>(_subscriber) );
       return ConnectionPtr( new Connection(this, this->connections.size()-1) );
     }
@@ -266,7 +282,7 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(ConnectionPtr c)
     {
-      this->Disconnect(c->Id());
+      this->Disconnect(c->GetId());
       c->event = NULL;
       c->id = -1;
     }

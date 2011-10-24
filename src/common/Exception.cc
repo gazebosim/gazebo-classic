@@ -58,11 +58,3 @@ std::string Exception::GetErrorStr() const
 {
   return this->str;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return the error code
-int Exception::GetErrorLine() const
-{
-  return this->line;
-}
-

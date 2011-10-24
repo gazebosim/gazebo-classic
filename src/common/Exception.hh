@@ -59,10 +59,6 @@ namespace gazebo
       /// \return The error function name
       public: std::string GetErrorFile() const;
     
-      /// \brief Return the error line
-      /// \return The error line
-      public: int GetErrorLine() const;
-    
       /// \brief Return the error string
       /// \return The error string
       public: std::string GetErrorStr() const; 
@@ -80,10 +76,6 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream& out, 
                   const gazebo::common::Exception &err)
               {
-                /*return out << err.GetErrorFile()
-                           << ":" << err.GetErrorLine() 
-                           << " : " << err.GetErrorStr();
-                           */
                 return out << err.GetErrorStr();
               }
     };

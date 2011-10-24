@@ -78,7 +78,7 @@ const std::list<std::string> &SystemPaths::GetGazeboPaths()
     std::string path;
 
     char *pathCStr = getenv("GAZEBO_RESOURCE_PATH");
-    if (!pathCStr || strlen(pathCStr) == 0)
+    if (!pathCStr || *pathCStr == '\0')
     {
       gzerr << "GAZEBO_RESOURCE_PATH doesn't exist. Set GAZEBO_RESOURCE_PATH to gazebo's installation path.\n";
       return this->gazeboPaths;
@@ -109,7 +109,7 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
     std::string path;
 
     char *pathCStr = getenv("OGRE_RESOURCE_PATH");
-    if (!pathCStr || strlen(pathCStr) == 0)
+    if (!pathCStr || *pathCStr == '\0')
     {
       gzerr << "OGRE_RESOURCE_PATH doesn't exist. Set OGRE_RESOURCE_PATH to Ogre's installation path.\n";
       return this->ogrePaths;
@@ -140,7 +140,7 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     std::string path;
 
     char *pathCStr = getenv("GAZEBO_PLUGIN_PATH");
-    if (!pathCStr || strlen(pathCStr) == 0)
+    if (!pathCStr || *pathCStr == '\0')
     {
       gzerr << "GAZEBO_PLUGIN_PATH doesn't exist. Set GAZEBO_PLUGIN_PATH to Ogre's installation path.\n";
       return this->pluginPaths;

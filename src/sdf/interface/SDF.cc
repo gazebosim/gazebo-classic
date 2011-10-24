@@ -27,6 +27,32 @@ Element::Element()
   this->copyChildren = false;
 }
 
+Element::~Element()
+{
+  for (Param_V::iterator iter = this->attributes.begin(); 
+       iter != this->attributes.end(); iter++)
+  {
+    (*iter).reset();
+  }
+  this->attributes.clear();
+
+  for (ElementPtr_V::iterator iter = this->elements.begin(); 
+       iter != this->elements.end(); iter++)
+  {
+    (*iter).reset();
+  }
+  this->elements.clear();
+
+  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin(); 
+       iter != this->elementDescriptions.end(); iter++)
+  {
+    (*iter).reset();
+  }
+  this->elementDescriptions.clear();
+
+  this->value.reset();
+}
+
 ElementPtr Element::GetParent() const
 {
   return this->parent;
@@ -205,7 +231,7 @@ ElementPtr Element::Clone() const
   for (aiter = this->attributes.begin(); 
       aiter != this->attributes.end(); aiter++)
   {
-    clone->attributes.push_back((*aiter)->Clone());
+    clone->attributes.push_back( (*aiter)->Clone() );
   }
 
   ElementPtr_V::const_iterator eiter;
@@ -442,7 +468,7 @@ ElementPtr Element::AddElement(const std::string &_name)
 
 bool Element::GetValueBool(const std::string &_key)
 {
-  bool result;
+  bool result = false;
 
   if (_key.empty())
     this->value->Get(result);
@@ -459,7 +485,7 @@ bool Element::GetValueBool(const std::string &_key)
 
 int Element::GetValueInt(const std::string &_key)
 {
-  int result;
+  int result = 0;
   if (_key.empty())
     this->value->Get(result);
   else
@@ -475,7 +501,7 @@ int Element::GetValueInt(const std::string &_key)
 }
 float Element::GetValueFloat(const std::string &_key)
 {
-  float result;
+  float result = 0.0;
   if (_key.empty())
     this->value->Get(result);
   else
@@ -490,7 +516,7 @@ float Element::GetValueFloat(const std::string &_key)
 }
 double Element::GetValueDouble(const std::string &_key)
 {
-  double result;
+  double result = 0.0;
   if (_key.empty())
   {
     if (this->value->IsStr())
@@ -510,7 +536,7 @@ double Element::GetValueDouble(const std::string &_key)
 }
 unsigned int Element::GetValueUInt(const std::string &_key)
 {
-  unsigned int result;
+  unsigned int result = 0;
   if (_key.empty())
   {
     if (this->value->IsStr())
@@ -530,7 +556,7 @@ unsigned int Element::GetValueUInt(const std::string &_key)
 }
 char Element::GetValueChar(const std::string &_key)
 {
-  char result;
+  char result = '\0';
   if (_key.empty())
   {
     if (this->value->IsStr())
@@ -550,7 +576,7 @@ char Element::GetValueChar(const std::string &_key)
 }
 std::string Element::GetValueString(const std::string &_key)
 {
-  std::string result;
+  std::string result = "";
   if (_key.empty())
     this->value->Get(result);
   else

@@ -54,6 +54,8 @@ namespace gazebo
 
       private: dReal matrix_dblbuff[16*2];
       private: int last_matrix_index;
+      private: float *vertices;
+      private: unsigned int *indices;
     };
     /// \}
     /// \}

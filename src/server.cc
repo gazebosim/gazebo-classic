@@ -84,6 +84,10 @@ void SignalHandler( int )
 
 int main(int argc, char **argv)
 {
+#ifdef BUILD_TYPE_PROFILE
+  HeapLeakChecker heapChecker("gzserver_check");
+#endif
+
   //Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
@@ -123,5 +127,9 @@ int main(int argc, char **argv)
   delete server;
   server = NULL;
   
+#ifdef BUILD_TYPE_PROFILE
+  if (!heapChecker.NoLeaks())
+    assert (NULL == "heap memory leak");
+#endif
   return 0;
 }

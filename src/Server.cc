@@ -46,7 +46,7 @@ bool Server::Load(const std::string &_filename)
 
   this->master = new gazebo::Master();
   this->master->Init(port);
-  this->master->Run();
+  this->master->RunThread();
 
 
   for (std::vector<gazebo::ServerPluginPtr>::iterator iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
@@ -129,6 +129,8 @@ void Server::Fini()
 
 void Server::Run()
 {
+  if (this->stop)
+    return;
 
   // Run the gazebo, starts a new thread
   gazebo::run();
@@ -136,11 +138,12 @@ void Server::Run()
   // Run each world. Each world starts a new thread
   physics::run_worlds();
 
+  struct timeval timeout;
   // Update the sensors.
   while (!this->stop)
   {
     sensors::run_once(true);
-    usleep(10000);
+    common::Time::MSleep(1000);
   }
 
   // Stop all the worlds

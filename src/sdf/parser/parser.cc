@@ -35,12 +35,15 @@ namespace sdf
 /// Init based on the installed sdf_format.xml file
 bool init( SDFPtr _sdf )
 {
+  bool result = false;
   std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths("/sdf/gazebo.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
-    return true;
-  return false;
+    result = true;
+
+  fclose(ftest);
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

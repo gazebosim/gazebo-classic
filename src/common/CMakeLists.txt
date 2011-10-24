@@ -25,7 +25,6 @@ set ( sources ColladaLoader.cc
               Mesh.cc
               MeshLoader.cc
               MeshManager.cc
-              OgreLoader.cc
               STLLoader.cc
               Time.cc
               Timer.cc
@@ -45,7 +44,6 @@ set ( headers CommonTypes.hh
               Mesh.hh
               MeshLoader.hh
               MeshManager.hh
-              OgreLoader.hh
               Plugin.hh
               SingletonT.hh
               STLLoader.hh

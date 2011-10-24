@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <iostream>
 #include "common/SystemPaths.hh"
+#include "common/Time.hh"
 #include "transport/Transport.hh"
 #include "sensors/Sensors.hh"
 #include "rendering/Rendering.hh"
@@ -26,7 +27,7 @@ void Load()
   gazebo::sensors::init();
 
   gazebo::rendering::create_scene("world_1");
-  usleep(100000);
+  gazebo::common::Time::MSleep(10);
 }
 
 void Run()
@@ -35,7 +36,7 @@ void Run()
   while (!quit)
   {
     gazebo::sensors::run_once(true);
-    usleep(100000);
+    gazebo::common::Time::MSleep(10);
   }
 }
 

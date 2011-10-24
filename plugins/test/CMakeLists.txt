@@ -4,7 +4,7 @@ include_directories(
 )
 
 if (HAVE_CEGUI)
-  set (plugins gui_test presentation)
+  set (plugins presentation)
 endif (HAVE_CEGUI)
 
 foreach (src ${plugins})

@@ -77,6 +77,9 @@ namespace gazebo
       /// \brief Get the time as a double
       /// \return Time as a double
       public: double Double() const;
+
+      /// \brief Millisecond sleep
+      public: static Time MSleep(unsigned int _ms);
     
       /// \brief Equal opeator
       public: const Time &operator=( const struct timeval &tv );

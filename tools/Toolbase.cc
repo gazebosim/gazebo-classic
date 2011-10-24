@@ -23,7 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Toolbase::Toolbase()
+  : client(NULL), simIface(NULL), factoryIface(NULL),
 {
+  this->yamlValues.clear();
+  this->params.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,10 +227,10 @@ void Toolbase::ParseYAML()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print all the commands to stdout
-void Toolbase::PrintCommands(std::string prefix)
+void Toolbase::PrintCommands(const std::string &_prefix)
 {
-  std::cout << "\t" << prefix <<  " pause \t Pause the simulation\n";
-  std::cout << "\t" << prefix <<  " go \t\t Unpause the simulation\n";
-  std::cout << "\t" << prefix <<  " step \t Increment the simulation time\n";
-  std::cout << "\t" << prefix <<  " reset \t Reset the simulation\n";
+  std::cout << "\t" << _prefix <<  " pause \t Pause the simulation\n";
+  std::cout << "\t" << _prefix <<  " go \t\t Unpause the simulation\n";
+  std::cout << "\t" << _prefix <<  " step \t Increment the simulation time\n";
+  std::cout << "\t" << _prefix <<  " reset \t Reset the simulation\n";
 }

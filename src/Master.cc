@@ -309,21 +309,21 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Start the master running
-void Master::Run()
-{
-  this->runThread = new boost::thread(boost::bind(&Master::RunLoop, this));
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // The master run loop
-void Master::RunLoop()
+void Master::Run()
 {
   while (!this->stop)
   {
     this->RunOnce();
-    usleep(10000);
+    common::Time::MSleep(10);
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Start the master running
+void Master::RunThread()
+{
+  this->runThread = new boost::thread(boost::bind(&Master::Run, this));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -493,6 +493,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe _sub)
 void Master::Stop()
 {
   this->stop = true;
+  
   if (this->runThread)
   {
     this->runThread->join();

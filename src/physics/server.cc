@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "physics/Physics.hh"
+#include "common/Time.hh"
 #include "transport/Transport.hh"
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
@@ -125,7 +126,7 @@ void Run()
 
   while (!quit)
   {
-    usleep(500000);
+    gazebo::common::Time::MSleep(50);
   }
 }
 

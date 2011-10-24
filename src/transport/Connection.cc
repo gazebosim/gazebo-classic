@@ -62,6 +62,9 @@ Connection::~Connection()
   delete this->writeMutex;
   this->writeMutex = NULL;
 
+  delete this->readMutex;
+  this->readMutex = NULL;
+
   if (iomanager)
   {
     iomanager->DecCount();
@@ -293,7 +296,7 @@ void Connection::Shutdown()
   this->ProcessWriteQueue();
 
   while (this->writeCount > 0)
-    usleep(100000);
+    common::Time::MSleep(10);
 
   this->shutdown();
   //this->StopRead();
@@ -508,7 +511,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
       }
       else
       {
-        usleep(10000);
+        common::Time::MSleep(10);
         continue;
       }
     }

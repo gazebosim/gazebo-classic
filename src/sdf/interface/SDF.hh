@@ -38,6 +38,8 @@ namespace sdf
   class Element : public boost::enable_shared_from_this<Element>
   {
     public: Element();
+    public: virtual ~Element();
+
     public: boost::shared_ptr<Element> Clone() const;
 
     /// \brief Copy values from an Element

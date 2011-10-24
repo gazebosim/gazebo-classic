@@ -50,7 +50,7 @@ void Node::Init(const std::string &_space)
     while (namespaces.size() == 0 && trys < limit)
     {
       TopicManager::Instance()->GetTopicNamespaces(namespaces);
-      usleep(500000);
+      common::Time::MSleep(50);
       trys++;
     }
 

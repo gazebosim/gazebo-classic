@@ -957,7 +957,7 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 
-bool initAttr(xmlNodePtr _node, const std::string _key, 
+bool initAttr(xmlNodePtr _node, const std::string &_key, 
               sdf::ParamPtr _attr)
 {
   if (_node)

@@ -45,12 +45,12 @@ Connection::~Connection()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Connection::Id() const
+int Connection::GetId() const
 { 
   return this->id; 
 }
 
-int Connection::UniqueId() const
+int Connection::GetUniqueId() const
 {
   return this->uniqueId;
 }

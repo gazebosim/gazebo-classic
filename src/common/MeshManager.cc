@@ -25,7 +25,6 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
-#include "common/OgreLoader.hh"
 #include "common/ColladaLoader.hh"
 #include "common/STLLoader.hh"
 
@@ -40,7 +39,6 @@ using namespace common;
 MeshManager::MeshManager()
 {
   this->colladaLoader = new ColladaLoader();
-  this->ogreLoader = new OgreLoader();
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
@@ -74,8 +72,11 @@ MeshManager::MeshManager()
 MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
-  delete this->ogreLoader;
   delete this->stlLoader;
+  std::map<std::string, Mesh*>::iterator iter;
+  for (iter = this->meshes.begin(); iter != this->meshes.end(); iter++)
+    delete iter->second;
+  this->meshes.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,14 +118,10 @@ const Mesh *MeshManager::Load(const std::string &filename)
     std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);
     MeshLoader *loader = NULL;
 
-    if (extension == "mesh")
-      loader = this->ogreLoader;
-    else if (extension == "stl" || extension == "stlb" || extension == "stla")
+    if (extension == "stl" || extension == "stlb" || extension == "stla")
       loader= this->stlLoader;
     else if (extension == "dae")
-    {
       loader = this->colladaLoader;
-    }
     else
       gzerr << "Unsupported mesh format for file[" << filename << "]\n";
 
