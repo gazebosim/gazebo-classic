@@ -171,7 +171,13 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
   this->stepType = odeElem->GetElement("solver")->GetValueString("type");
 
+  {
+#ifdef BUILD_TYPE_PROFILE
+  HeapLeakChecker::Disabler disabler;
+#endif
+
   this->contactCollisions = new dContactGeom[this->GetMaxContacts()];
+  }
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, 
