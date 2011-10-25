@@ -61,7 +61,7 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Update the sensor information
-      public: virtual void Update(bool force);
+      protected: virtual void UpdateImpl(bool _force);
     
       /// Finalize the camera
       protected: virtual void Fini();
@@ -72,12 +72,6 @@ namespace gazebo
       public: rendering::CameraPtr GetCamera() const {return this->camera; };
 
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
-
-      /// \brief Render the camera
-      private: void Render();
-
-      /// \brief Post Render the camera
-      private: void PostRender();
 
       private: rendering::CameraPtr camera;
 
