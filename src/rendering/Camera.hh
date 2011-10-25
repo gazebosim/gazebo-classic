@@ -138,6 +138,7 @@ namespace gazebo
   
       /// \brief Set the clip distances
       public: void SetClipDist(float near, float far);
+      public: void SetClipDist();
   
       /// \brief Set the camera FOV (horizontal)  
       public: void SetFOV( float radians );
