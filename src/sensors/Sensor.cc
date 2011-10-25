@@ -133,8 +133,7 @@ void Sensor::Update(bool /*force_*/)
 /// Finalize the sensor
 void Sensor::Fini()
 {
-  //if (this->controller)
-    //this->controller->Fini();
+  this->plugins.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

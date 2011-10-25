@@ -310,6 +310,7 @@ void World::ProcessEntityMsgs()
 void World::Fini()
 {
   this->Stop();
+  this->plugins.clear();
 
   for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
     this->rootElement->GetChild(i)->Fini();
