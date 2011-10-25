@@ -153,7 +153,7 @@ void ContactSensor::Init()
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void ContactSensor::Update(bool /*_force*/)
+void ContactSensor::UpdateImpl(bool /*_force*/)
 {
   //this->contacts.clear();
 }

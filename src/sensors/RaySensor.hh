@@ -62,9 +62,9 @@ namespace gazebo
       /// Initialize the ray
       public: virtual void Init();
     
-      ///  Update sensed values
-      public: virtual void Update(bool force);
-      
+      /// \brief Update the sensor information
+      protected: virtual void UpdateImpl(bool _force);
+ 
       /// Finalize the ray
       protected: virtual void Fini();
     
