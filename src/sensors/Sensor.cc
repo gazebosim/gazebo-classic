@@ -190,7 +190,10 @@ math::Pose Sensor::GetPose() const
 // Set the update Hz rate
 void Sensor::SetUpdateRate(double _hz)
 {
-  this->updatePeriod = 1.0/_hz;
+  if (_hz > 0.0)
+    this->updatePeriod = 1.0/_hz;
+  else
+    this->updatePeriod = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
