@@ -348,6 +348,7 @@ namespace gazebo
       protected: unsigned int saveCount;
    
       protected: int imageFormat;
+      protected: int imageWidth, imageHeight;
   
       protected: Ogre::RenderTarget *renderTarget;
   

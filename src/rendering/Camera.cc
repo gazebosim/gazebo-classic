@@ -130,10 +130,15 @@ void Camera::Load()
 {
 
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
+  if (imageElem)
+  {
+    this->imageWidth = imageElem->GetValueInt("width");
+    this->imageHeight = imageElem->GetValueInt("height");
+    this->imageFormat = this->GetOgrePixelFormat( imageElem->GetValueString("format") );
+  }
+  else
+    gzthrow("Camera has no <image> tag.");
 
-  std::string imgFmt = imageElem->GetValueString("format");
-
-  this->imageFormat = this->GetOgrePixelFormat( imgFmt );
 
   // Create the directory to store frames
   if (this->sdf->HasElement("save") && 
@@ -155,7 +160,15 @@ void Camera::Load()
     {
       gzthrow("Camera horizontal field of veiw invalid.");
     }
+    this->SetFOV( angle );
   }
+
+  sdf::ElementPtr clipElem = this->sdf->GetOrCreateElement("clip");
+  if (clipElem)
+    this->SetClipDist(clipElem->GetValueDouble("near"), clipElem->GetValueDouble("far"));
+  else
+    gzthrow("Camera has no <clip> tag.");
+
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -177,8 +190,7 @@ void Camera::Init()
 
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
-  this->SetFOV( DTOR(60) );
-  this->SetClipDist(0.001, 50);
+  //this->SetClipDist(0.01, 100);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -371,7 +383,8 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 /// Set the world position
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  this->sceneNode->_setDerivedPosition( Ogre::Vector3(_pos.x, _pos.y, _pos.z));
+  //this->sceneNode->_setDerivedPosition( Ogre::Vector3(_pos.x, _pos.y, _pos.z));
+  this->sceneNode->setPosition( Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -424,7 +437,8 @@ void Camera::SetClipDist(float _near, float _far)
   elem->GetAttribute("near")->Set(_near);
   elem->GetAttribute("far")->Set(_far);
 
-  if (camera)
+  //gzerr << "debug clip " << _near << " " << _far << "\n";
+  if (this->camera)
   {
     this->camera->setNearClipDistance(_near);
     this->camera->setFarClipDistance(_far);
@@ -493,6 +507,7 @@ unsigned int Camera::GetImageWidth() const
 unsigned int Camera::GetImageHeight() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
+  //gzerr << "image height " << elem->GetValueInt("height") << "\n";
   return elem->GetValueInt("height");
 }
 
@@ -1065,6 +1080,7 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 
     double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
+    //gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }

@@ -72,7 +72,7 @@ void Sensor::Load()
   gzerr << "Sensor Load for pose\n";
   if (this->sdf->HasElement("origin"))
   {
-     this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
+    this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
   }
 
   this->node->Init(this->sdf->GetWorldName());
