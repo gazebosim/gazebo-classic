@@ -395,3 +395,10 @@ void Vector3::Round(int _precision)
   this->z = precision(this->z, _precision);
 }
 
+/// Returns true if the two vectors are exacatly equal 
+bool Vector3::Equal( const Vector3 &_v ) const
+{
+  return this->x == _v.x && this->y == _v.y && this->z == _v.z;
+}
+
+

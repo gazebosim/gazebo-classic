@@ -369,6 +369,8 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;
       private: friend class Scene;
+
+      private: sdf::ElementPtr imageElem;
     };
     
     /// \}

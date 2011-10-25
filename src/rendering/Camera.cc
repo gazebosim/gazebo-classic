@@ -129,9 +129,9 @@ void Camera::Load( sdf::ElementPtr &_sdf )
 void Camera::Load()
 {
 
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
+  this->imageElem = this->sdf->GetOrCreateElement("image");
 
-  std::string imgFmt = imageElem->GetValueString("format");
+  std::string imgFmt = this->imageElem->GetValueString("format");
 
   this->imageFormat = this->GetOgrePixelFormat( imgFmt );
 
@@ -468,40 +468,35 @@ void Camera::SetImageSize(unsigned int _w, unsigned int _h)
 // Set the image width
 void Camera::SetImageWidth( unsigned int _w )
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  elem->GetAttribute("width")->Set(_w);
+  this->imageElem->GetAttribute("width")->Set(_w);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the image height
 void Camera::SetImageHeight( unsigned int _h )
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  elem->GetAttribute("height")->Set(_h);
+  this->imageElem->GetAttribute("height")->Set(_h);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the width of the image
 unsigned int Camera::GetImageWidth() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  return elem->GetValueInt("width");
+  return this->imageElem->GetValueInt("width");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int Camera::GetImageHeight() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  return elem->GetValueInt("height");
+  return this->imageElem->GetValueInt("height");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int Camera::GetImageDepth() const
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  std::string imgFmt = imageElem->GetValueString("format");
+  std::string imgFmt = this->imageElem->GetValueString("format");
 
   if (imgFmt == "L8")
     return 1;
@@ -524,8 +519,7 @@ unsigned int Camera::GetImageDepth() const
 /// \brief Get the height of the image
 std::string Camera::GetImageFormat() const
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  return imageElem->GetValueString("format");
+  return this->imageElem->GetValueString("format");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -547,9 +541,8 @@ unsigned int Camera::GetTextureHeight() const
 // Get the image size in bytes
 size_t Camera::GetImageByteSize() const
 {
-  sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  return this->GetImageByteSize(elem->GetValueInt("width"),
-                                elem->GetValueInt("height"),
+  return this->GetImageByteSize(this->imageElem->GetValueInt("width"),
+                                this->imageElem->GetValueInt("height"),
                                 this->GetImageFormat());
 }
 
@@ -748,7 +741,6 @@ std::string Camera::GetName() const
 void Camera::SaveFrame()
 {
   sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
 
   std::string path = saveElem->GetValueString("path");
 

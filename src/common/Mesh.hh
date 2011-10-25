@@ -144,13 +144,13 @@ namespace gazebo
       public: void AddIndex( unsigned int i);
   
       /// \brief Add a vertex to the mesh
-      public: void AddVertex( math::Vector3 v );
+      public: void AddVertex( const math::Vector3 &_v );
   
       /// \brief Add a vertex to the mesh
       public: void AddVertex(double x, double y, double z );
   
       /// \brief Add a normal to the mesh
-      public: void AddNormal( math::Vector3 n );
+      public: void AddNormal( const math::Vector3 &_n );
   
       /// \brief Add a normal to the mesh
       public: void AddNormal(double x, double y, double z );
