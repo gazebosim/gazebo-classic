@@ -911,14 +911,14 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::stri
           // determine position
           if (j%2) // even column
             if (i%2) // even row, red
-              dst[i+j*width] = src[i*3+j*width*3+0];
+              dst[i+j*width] = src[i*3+j*width*3+2];
             else // odd row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
           else // odd column
             if (i%2) // even row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
             else // odd row, blue
-              dst[i+j*width] = src[i*3+j*width*3+2];
+              dst[i+j*width] = src[i*3+j*width*3+0];
         }
       }
     }
@@ -935,14 +935,14 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::stri
           // determine position
           if (j%2) // even column
             if (i%2) // even row, blue
-              dst[i+j*width] = src[i*3+j*width*3+2];
+              dst[i+j*width] = src[i*3+j*width*3+0];
             else // odd row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
           else // odd column
             if (i%2) // even row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
             else // odd row, red
-              dst[i+j*width] = src[i*3+j*width*3+0];
+              dst[i+j*width] = src[i*3+j*width*3+2];
         }
       }
     }
