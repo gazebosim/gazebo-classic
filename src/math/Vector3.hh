@@ -158,6 +158,9 @@ namespace gazebo
       /// \brief Round all values to _precision decimal places
       public: void Round(int _precision);
 
+      /// \brief Returns true if the two vectors are exacatly equal 
+      public: bool Equal( const Vector3 &_v ) const;
+
       /// \brief X location
       public: double x;
     

@@ -45,10 +45,6 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor()
 {
-  this->connections.push_back( event::Events::ConnectRender(
-        boost::bind(&CameraSensor::Render, this)) );
-  this->connections.push_back( event::Events::ConnectPostRender(
-        boost::bind(&CameraSensor::PostRender, this)) );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -144,31 +140,16 @@ void CameraSensor::SetActive(bool value)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void CameraSensor::Update(bool force)
+void CameraSensor::UpdateImpl(bool force)
 {
-  Sensor::Update(force);
-}
-
-void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
-{
-}
- 
-////////////////////////////////////////////////////////////////////////////////
-// Render the camera
-void CameraSensor::Render()
-{
-  //TODO: checking if this->camera is null is not the most efficient way to do this.
-  if (this->camera && this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+  if (this->camera)
   {
     this->camera->Render();
+    this->camera->PostRender();
     this->lastUpdateTime = this->world->GetSimTime();
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Post Render the camera
-void CameraSensor::PostRender()
+void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
-  //TODO: checking if this->camera is null is not the most efficient way to do this.
-  if (this->camera) this->camera->PostRender();
 }

@@ -312,11 +312,18 @@ void Scene::SetBackgroundColor(const common::Color &color)
 
   std::vector<CameraPtr>::iterator iter;
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-    (*iter)->GetViewport()->setBackgroundColour( Conversions::Convert(color) );
+  {
+    if ((*iter)->GetViewport())
+      (*iter)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
+  }
 
   std::vector<UserCameraPtr>::iterator iter2;
-  for (iter2 = this->userCameras.begin(); iter2 != this->userCameras.end(); iter2++)
-    (*iter2)->GetViewport()->setBackgroundColour( Conversions::Convert(color) );
+  for (iter2 = this->userCameras.begin(); 
+       iter2 != this->userCameras.end(); iter2++)
+  {
+    if ((*iter2)->GetViewport())
+      (*iter2)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
+  }
 
 }
 

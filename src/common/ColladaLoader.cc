@@ -535,6 +535,7 @@ void ColladaLoader::LoadTriangles( TiXmlElement *_trianglesXml,
         gzerr << "Unhandled semantic[" << iter->first << "]\n";
         */
     }
+    delete [] values;
   } while (iss);
 
   _mesh->AddSubMesh(subMesh);

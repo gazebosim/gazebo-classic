@@ -59,7 +59,7 @@ namespace gazebo
       public: virtual void Init();
     
       ///  Update sensed values
-      public: virtual void Update(bool force);
+      protected: virtual void UpdateImpl(bool force);
   
       /// Finalize the sensor
       protected: virtual void Fini();

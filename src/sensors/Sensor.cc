@@ -113,8 +113,13 @@ void Sensor::SetParent( const std::string &_name )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the sensor
-void Sensor::Update(bool /*force_*/)
+void Sensor::Update(bool _force)
 {
+  if (this->world->GetSimTime() - this->lastUpdateTime >= this->updatePeriod)
+  {
+    this->UpdateImpl(_force);
+  }
+
   //DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
   //Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();

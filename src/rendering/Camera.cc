@@ -190,7 +190,6 @@ void Camera::Init()
 
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
-  //this->SetClipDist(0.01, 100);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -383,7 +382,6 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 /// Set the world position
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  //this->sceneNode->_setDerivedPosition( Ogre::Vector3(_pos.x, _pos.y, _pos.z));
   this->sceneNode->setPosition( Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
@@ -437,7 +435,6 @@ void Camera::SetClipDist(float _near, float _far)
   elem->GetAttribute("near")->Set(_near);
   elem->GetAttribute("far")->Set(_far);
 
-  //gzerr << "debug clip " << _near << " " << _far << "\n";
   if (this->camera)
   {
     this->camera->setNearClipDistance(_near);
@@ -507,7 +504,6 @@ unsigned int Camera::GetImageWidth() const
 unsigned int Camera::GetImageHeight() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  //gzerr << "image height " << elem->GetValueInt("height") << "\n";
   return elem->GetValueInt("height");
 }
 
@@ -1080,7 +1076,6 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
 
     double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
-    //gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }

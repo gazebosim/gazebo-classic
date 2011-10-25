@@ -58,7 +58,9 @@ Mesh *STLLoader::Load( const std::string &filename )
     this->ReadBinary(file, mesh);
   */
 
+  printf("ReadBinary...[%s]\n", filename.c_str());
   this->ReadBinary(file, mesh);
+  printf("ReadBinary...done\n");
 
   fclose(file);
 
@@ -170,6 +172,8 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 /// Reads a binary STL (stereolithography) file.
 void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 {
+  char c;
+  short int attribute = 0;
   int i;
   int iface;
   int face_num;
@@ -178,10 +182,15 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
   mesh->AddSubMesh(subMesh);
 
   //80 byte Header.
-  for ( i = 0; i < 80 && fgetc(filein) != EOF; i++ );
+  for ( i = 0; i < 80; i++ )
+    c = (char)fgetc(filein);
 
   //Number of faces.
   face_num = this->LongIntRead(filein);
+  printf("Num faces[%d]\n", face_num);
+
+  math::Vector3 normal;
+  math::Vector3 vertex;
 
   //For each (triangular) face,
   //  components of normal vector,
@@ -189,28 +198,35 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
   //  2 byte "attribute".
   for (iface = 0; iface < face_num; iface++)
   {
-    math::Vector3 normal;
+    normal.x = this->FloatRead(filein);
+    normal.y = this->FloatRead(filein);
+    normal.z = this->FloatRead(filein);
+    
+    vertex.x = this->FloatRead(filein);
+    vertex.y = this->FloatRead(filein);
+    vertex.z = this->FloatRead(filein);
+    subMesh->AddVertex(vertex );
+    subMesh->AddNormal(normal);
+    subMesh->AddIndex( subMesh->GetVertexCount()-1 );
+    //subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
-    // Get the normal for the face
-    normal.x =  this->FloatRead(filein);
-    normal.y =  this->FloatRead(filein);
-    normal.z =  this->FloatRead(filein);
+    vertex.x = this->FloatRead(filein);
+    vertex.y = this->FloatRead(filein);
+    vertex.z = this->FloatRead(filein);
+    subMesh->AddVertex(vertex );
+    subMesh->AddNormal(normal);
+    subMesh->AddIndex( subMesh->GetVertexCount()-1 );
+    //subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
-    // Get three vertices
-    for (i = 0; i < 3; i++) 
-    {
-      math::Vector3 vertex;
+    vertex.x = this->FloatRead(filein);
+    vertex.y = this->FloatRead(filein);
+    vertex.z = this->FloatRead(filein);
+    subMesh->AddVertex(vertex );
+    subMesh->AddNormal(normal);
+    subMesh->AddIndex( subMesh->GetVertexCount()-1 );
+    //subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
-      vertex.x = this->FloatRead(filein);
-      vertex.y = this->FloatRead(filein);
-      vertex.z = this->FloatRead(filein);
-
-      subMesh->AddVertex(vertex);
-      subMesh->AddNormal(normal);
-      subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
-    }
-
-    ShortIntRead ( filein );
+    attribute = ShortIntRead ( filein );
   }
 }
 

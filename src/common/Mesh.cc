@@ -386,16 +386,16 @@ void SubMesh::SetTexCoordCount( unsigned int _count )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add an index to the mesh
-void SubMesh::AddIndex( unsigned int i)
+void SubMesh::AddIndex( unsigned int _i)
 {
-  this->indices.push_back( i );
+  this->indices.push_back( _i );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a vertex to the mesh
-void SubMesh::AddVertex( math::Vector3 v )
+void SubMesh::AddVertex( const math::Vector3 &_v )
 {
-  this->vertices.push_back( v );
+  this->vertices.push_back( _v );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -407,9 +407,9 @@ void SubMesh::AddVertex(double x, double y, double z )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a normal to the mesh
-void SubMesh::AddNormal( math::Vector3 n )
+void SubMesh::AddNormal( const math::Vector3 &_n )
 {
-  this->normals.push_back( n );
+  this->normals.push_back( _n );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -600,7 +600,7 @@ bool SubMesh::HasVertex( const math::Vector3 &v ) const
   std::vector< math::Vector3 >::const_iterator iter;
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
-    if (v == (*iter))
+    if (v.Equal(*iter))
       return true;
 
   return false;
@@ -608,12 +608,12 @@ bool SubMesh::HasVertex( const math::Vector3 &v ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the index of the vertex
-unsigned int SubMesh::GetVertexIndex(const math::Vector3 &v) const
+unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 {
   std::vector< math::Vector3 >::const_iterator iter;
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
-    if (v == (*iter))
+    if (_v.Equal(*iter))
       return iter - this->vertices.begin();
 
   return 0;
