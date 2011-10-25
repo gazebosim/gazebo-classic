@@ -244,8 +244,39 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   } 
 
   sdf::ElementPtr sdfImage = _sdf->AddElement("image");
-  initAttr(_config, "imageWidth", sdfImage->GetAttribute("width"));
-  initAttr(_config, "imageHeight", sdfImage->GetAttribute("height"));
+
+  // parse imageSize
+  std::string image_size_str = getNodeValue(_config, "imageSize");
+  std::vector<unsigned int> sizes;
+  std::vector<std::string> pieces;
+  boost::split( pieces, image_size_str, boost::is_any_of(" "));
+  for (unsigned int i = 0; i < pieces.size(); ++i)
+  {
+    if (pieces[i] != "")
+    {
+      try
+      {
+        sizes.push_back(boost::lexical_cast<unsigned int>(pieces[i].c_str()));
+      }
+      catch (boost::bad_lexical_cast &e)
+      {
+        gzerr << "<imageSize> value ["
+              << pieces[i] << "] is not a valid unsigned int from a 2-tuple\n";
+        return false;
+      }
+    }
+  }
+
+  if (sizes.size() != 2)
+  {
+    gzerr << "Vector contains [" << (int)sizes.size() << "] elements instead of 3 elements\n";
+    return false;
+  }
+
+  sdfImage->GetAttribute("width")->SetFromString(pieces[0]);
+  sdfImage->GetAttribute("height")->SetFromString(pieces[1]);
+
+
   initAttr(_config, "imageFormat", sdfImage->GetAttribute("format"));
 
   sdf::ElementPtr sdfClip = _sdf->AddElement("clip");
