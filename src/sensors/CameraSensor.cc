@@ -119,7 +119,6 @@ void CameraSensor::Init()
     gzerr << "No world name\n";
 
   Sensor::Init();
-  gzerr << "CameraSensor pose ["<< this->pose << "]\n";
 
 }
 
