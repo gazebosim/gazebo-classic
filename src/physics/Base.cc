@@ -62,6 +62,7 @@ Base::~Base()
       (*iter)->SetParent(BasePtr());
   }
   this->children.clear();
+  this->sdf.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

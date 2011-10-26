@@ -44,6 +44,7 @@ ODETrimeshShape::~ODETrimeshShape()
 {
   delete [] this->vertices;
   delete [] this->indices;
+  dGeomTriMeshDataDestroy(this->odeData);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -100,7 +101,6 @@ void ODETrimeshShape::Init()
 
   unsigned int i =0;
 
-  dTriMeshDataID odeData;
 
   const common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
   if (subMesh->GetVertexCount() < 3)
@@ -110,7 +110,7 @@ void ODETrimeshShape::Init()
   }
 
   /// This will hold the vertex data of the triangle mesh
-  odeData = dGeomTriMeshDataCreate();
+  this->odeData = dGeomTriMeshDataCreate();
 
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
@@ -133,12 +133,12 @@ void ODETrimeshShape::Init()
   }
 
   // Build the ODE triangle mesh
-  dGeomTriMeshDataBuildSingle( odeData,
+  dGeomTriMeshDataBuildSingle( this->odeData,
       (float*)this->vertices, 3*sizeof(float), numVertices,
       (int*)this->indices, numIndices, 3*sizeof(int));
 
   pcollision->SetSpaceId( dSimpleSpaceCreate(pcollision->GetSpaceId()) );
-  pcollision->SetCollision( dCreateTriMesh(pcollision->GetSpaceId(), odeData,0,0,0 ), true);
+  pcollision->SetCollision( dCreateTriMesh(pcollision->GetSpaceId(), this->odeData,0,0,0 ), true);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;

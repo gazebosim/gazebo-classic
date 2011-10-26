@@ -58,9 +58,7 @@ Mesh *STLLoader::Load( const std::string &filename )
     this->ReadBinary(file, mesh);
   */
 
-  printf("ReadBinary...[%s]\n", filename.c_str());
   this->ReadBinary(file, mesh);
-  printf("ReadBinary...done\n");
 
   fclose(file);
 
@@ -187,7 +185,6 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 
   //Number of faces.
   face_num = this->LongIntRead(filein);
-  printf("Num faces[%d]\n", face_num);
 
   math::Vector3 normal;
   math::Vector3 vertex;
@@ -208,7 +205,6 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
     subMesh->AddVertex(vertex );
     subMesh->AddNormal(normal);
     subMesh->AddIndex( subMesh->GetVertexCount()-1 );
-    //subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
     vertex.x = this->FloatRead(filein);
     vertex.y = this->FloatRead(filein);
@@ -216,7 +212,6 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
     subMesh->AddVertex(vertex );
     subMesh->AddNormal(normal);
     subMesh->AddIndex( subMesh->GetVertexCount()-1 );
-    //subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
     vertex.x = this->FloatRead(filein);
     vertex.y = this->FloatRead(filein);
@@ -224,7 +219,6 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
     subMesh->AddVertex(vertex );
     subMesh->AddNormal(normal);
     subMesh->AddIndex( subMesh->GetVertexCount()-1 );
-    //subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
     attribute = ShortIntRead ( filein );
   }

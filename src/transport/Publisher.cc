@@ -49,11 +49,14 @@ Publisher::~Publisher()
     gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
   }
 */
-
+  std::list<google::protobuf::Message *>::iterator iter;
+  for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
+    delete *iter;
+  this->messages.clear();
+ 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 
-  this->messages.clear();
   delete this->mutex;
 }
 

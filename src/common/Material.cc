@@ -159,7 +159,6 @@ void Material::SetTransparency(float t)
   this->transparency = std::min(t, (float)1.0);
   this->transparency = std::max(this->transparency, (float)0.0);
   this->lighting = true;
-  std::cout << "SetTrans[" << this->name << "] [" << t << "] T[" << this->transparency << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

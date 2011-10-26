@@ -94,7 +94,8 @@ void TrimeshShape::Init()
       stream << "  </geometry>";
       stream << "</visual>";
 
-      CollisionPtr newCollision = this->GetWorld()->GetPhysicsEngine()->CreateCollision( 
+      CollisionPtr newCollision = 
+        this->GetWorld()->GetPhysicsEngine()->CreateCollision( 
           "trimesh", this->collisionParent->GetLink() );
 
       // TODO: need to implement this function properly.

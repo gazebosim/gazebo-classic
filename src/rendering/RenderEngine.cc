@@ -248,17 +248,7 @@ void RenderEngine::Fini()
 
   // TODO: this was causing a segfault on shutdown
   // Close all the windows first;
-  /*WindowManager::Instance()->Fini();
-
-  if (this->dummyDisplay)
-  {
-    glXDestroyContext((Display*)this->dummyDisplay, 
-                      (GLXContext)this->dummyContext);
-    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
-    XCloseDisplay((Display*)this->dummyDisplay);
-    this->dummyDisplay = NULL;
-  }
-  */
+  /*WindowManager::Instance()->Fini();*/
 
   this->scenes.clear();
 
@@ -267,14 +257,15 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
   {
-    /*const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
+    
+    //const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
 
-    for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); iter != ll.end(); iter++)
-    {
-      this->root->unloadPlugin((*iter)->getName());
-      this->root->uninstallPlugin(*iter);
-    }
-    */
+    //for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); 
+    //     iter != ll.end(); iter++)
+    //{
+    //  this->root->unloadPlugin((*iter)->getName());
+    //  this->root->uninstallPlugin(*iter);
+    //}
     // TODO: this was causing a segfault on shutdown
     try
     {
@@ -284,14 +275,18 @@ void RenderEngine::Fini()
   }
   this->root = NULL;
 
-  if (this->logManager)
-  {
-    this->logManager->destroyLog("Ogre.log");
-    delete this->logManager;
-  }
+  delete this->logManager;
   this->logManager = NULL;
 
-  this->dummyDisplay = NULL;
+  if (this->dummyDisplay)
+  {
+    glXDestroyContext((Display*)this->dummyDisplay, 
+                      (GLXContext)this->dummyContext);
+    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
+    XCloseDisplay((Display*)this->dummyDisplay);
+    this->dummyDisplay = NULL;
+  }
+
   this->initialized = false;
 }
  

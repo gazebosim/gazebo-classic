@@ -146,6 +146,8 @@ ODEPhysics::~ODEPhysics()
     delete this->contactFeedbacks[i];
   this->contactFeedbacks.clear();
 
+  dJointGroupDestroy(this->contactGroup);
+
   if (this->spaceId)
     dSpaceDestroy(this->spaceId);
 
@@ -157,6 +159,7 @@ ODEPhysics::~ODEPhysics()
 
   delete this->odeRaySensorMutex;
   this->odeRaySensorMutex = NULL;
+
 
   delete [] this->contactCollisions;
 }

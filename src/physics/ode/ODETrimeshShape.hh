@@ -56,6 +56,7 @@ namespace gazebo
       private: int last_matrix_index;
       private: float *vertices;
       private: unsigned int *indices;
+      private: dTriMeshDataID odeData;
     };
     /// \}
     /// \}
