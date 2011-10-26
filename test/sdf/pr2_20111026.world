@@ -90,7 +90,7 @@
         <collision name='base_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/base_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/base_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -105,7 +105,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/base.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/base.dae' scale='1 1 1'/>
           </geometry>
         </visual>
         <sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100'>
@@ -181,7 +181,7 @@
         <collision name='bl_caster_rotation_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -196,7 +196,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/caster_texture'/>
         </visual>
@@ -225,7 +225,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -253,7 +253,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -266,7 +266,7 @@
         <collision name='br_caster_rotation_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -281,7 +281,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/caster_texture'/>
         </visual>
@@ -310,7 +310,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -338,7 +338,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -351,7 +351,7 @@
         <collision name='fl_caster_rotation_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -366,7 +366,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/caster_texture'/>
         </visual>
@@ -395,7 +395,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -423,7 +423,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -436,7 +436,7 @@
         <collision name='fr_caster_rotation_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -451,7 +451,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/caster.stl' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/caster_texture'/>
         </visual>
@@ -480,7 +480,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -508,7 +508,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/base_v0/wheel.dae' scale='1 1 1'/>
+            <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -521,7 +521,7 @@
         <collision name='torso_lift_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/torso_v0/torso_lift_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/torso_v0/torso_lift_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -536,7 +536,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/torso_v0/torso_lift.dae' scale='1 1 1'/>
+            <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1'/>
           </geometry>
         </visual>
         <sensor name='torso_lift_contact_sensor' type='contact' always_on='0' update_rate='100'>
@@ -560,7 +560,7 @@
         <collision name='head_pan_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/head_v0/head_pan_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/head_v0/head_pan_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -575,7 +575,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/head_v0/head_pan.dae' scale='1 1 1'/>
+            <mesh filename='pr2/head_v0/head_pan.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -588,7 +588,7 @@
         <collision name='head_tilt_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/head_v0/head_tilt_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/head_v0/head_tilt_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -603,7 +603,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/head_v0/head_tilt.dae' scale='1 1 1'/>
+            <mesh filename='pr2/head_v0/head_tilt.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -866,7 +866,7 @@
         <collision name='l_shoulder_pan_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_pan.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -881,7 +881,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -894,7 +894,7 @@
         <collision name='l_shoulder_lift_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_lift.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -909,7 +909,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -922,7 +922,7 @@
         <collision name='l_upper_arm_roll_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/upper_arm_roll_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -937,7 +937,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/upper_arm_roll.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/RollLinks'/>
         </visual>
@@ -951,7 +951,7 @@
         <collision name='l_upper_arm_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/upper_arm.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -966,7 +966,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -979,7 +979,7 @@
         <collision name='l_elbow_flex_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/elbow_flex.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -994,7 +994,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1007,7 +1007,7 @@
         <collision name='l_forearm_roll_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/forearm_roll_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1022,7 +1022,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/RollLinks'/>
         </visual>
@@ -1069,7 +1069,7 @@
         <collision name='l_forearm_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/forearm.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/forearm.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1084,7 +1084,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/forearm.dae' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1097,7 +1097,7 @@
         <collision name='l_wrist_flex_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_flex.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1112,7 +1112,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1125,7 +1125,7 @@
         <collision name='l_wrist_roll_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_roll_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1140,7 +1140,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/RollLinks'/>
         </visual>
@@ -1154,7 +1154,7 @@
         <collision name='l_gripper_palm_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/gripper_palm.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1169,7 +1169,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1182,7 +1182,7 @@
         <collision name='l_gripper_l_finger_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1197,7 +1197,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1210,7 +1210,7 @@
         <collision name='l_gripper_l_finger_tip_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1225,7 +1225,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
           </geometry>
         </visual>
         <sensor name='l_gripper_l_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100'>
@@ -1292,7 +1292,7 @@
         <collision name='l_gripper_r_finger_link_geom' laser_retro='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1307,7 +1307,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1320,7 +1320,7 @@
         <collision name='l_gripper_r_finger_tip_link_geom' laser_retro='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1335,7 +1335,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
           </geometry>
         </visual>
         <sensor name='l_gripper_r_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100'>
@@ -1367,7 +1367,7 @@
         <collision name='laser_tilt_mount_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/tilting_laser_v0/tilting_hokuyo_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1382,7 +1382,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1'/>
+            <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1418,7 +1418,7 @@
         <collision name='r_shoulder_pan_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_pan.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1433,7 +1433,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1446,7 +1446,7 @@
         <collision name='r_shoulder_lift_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_lift.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1461,7 +1461,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1474,7 +1474,7 @@
         <collision name='r_upper_arm_roll_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/upper_arm_roll_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1489,7 +1489,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll.stl' scale='1 1 1'/>
+            <mesh filename='pr2/shoulder_v0/upper_arm_roll.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/RollLinks'/>
         </visual>
@@ -1503,7 +1503,7 @@
         <collision name='r_upper_arm_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/upper_arm.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1518,7 +1518,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1531,7 +1531,7 @@
         <collision name='r_elbow_flex_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/elbow_flex.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1546,7 +1546,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1559,7 +1559,7 @@
         <collision name='r_forearm_roll_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/forearm_roll_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1574,7 +1574,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
+            <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/RollLinks'/>
         </visual>
@@ -1621,7 +1621,7 @@
         <collision name='r_forearm_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/forearm.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/forearm.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1636,7 +1636,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/forearm.dae' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1649,7 +1649,7 @@
         <collision name='r_wrist_flex_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_flex.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1664,7 +1664,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1677,7 +1677,7 @@
         <collision name='r_wrist_roll_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll_L.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_roll_L.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1692,7 +1692,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
+            <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
           </geometry>
           <material script='PR2/RollLinks'/>
         </visual>
@@ -1706,7 +1706,7 @@
         <collision name='r_gripper_palm_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/gripper_palm.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1721,7 +1721,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1734,7 +1734,7 @@
         <collision name='r_gripper_l_finger_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1749,7 +1749,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1762,7 +1762,7 @@
         <collision name='r_gripper_l_finger_tip_link_geom' laser_retro='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1777,7 +1777,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 0 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
           </geometry>
         </visual>
         <sensor name='r_gripper_l_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100'>
@@ -1844,7 +1844,7 @@
         <collision name='r_gripper_r_finger_link_geom' laser_retro='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1859,7 +1859,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
           </geometry>
         </visual>
       </link>
@@ -1872,7 +1872,7 @@
         <collision name='r_gripper_r_finger_tip_link_geom' laser_retro='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.stl' scale='1 1 1'/>
           </geometry>
           <surface>
             <friction>
@@ -1887,7 +1887,7 @@
         <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
           <origin pose='0 0 0 2.21237 -0 0'/>
           <geometry>
-            <mesh filename='/home/hsu/projects/electric_release/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
+            <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
           </geometry>
         </visual>
         <sensor name='r_gripper_r_finger_tip_contact_sensor' type='contact' always_on='0' update_rate='100'>
