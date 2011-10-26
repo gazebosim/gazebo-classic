@@ -232,4 +232,5 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   //         instantiated when spawning a model
   this->laserShape->Update();
   this->physicsEngine->odeRaySensorMutex->unlock();
+  this->lastUpdateTime = this->world->GetSimTime();
 }
