@@ -69,7 +69,6 @@ void Sensor::Load( sdf::ElementPtr &_sdf )
 // Load the sensor
 void Sensor::Load()
 {
-  gzerr << "Sensor Load for pose\n";
   if (this->sdf->HasElement("origin"))
   {
     this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
