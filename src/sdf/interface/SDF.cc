@@ -37,7 +37,23 @@ Element::~Element()
   }
   this->attributes.clear();
 
-  this->Reset();
+  for (ElementPtr_V::iterator iter = this->elements.begin(); 
+       iter != this->elements.end(); iter++)
+  {
+    (*iter).reset();
+  }
+
+  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin(); 
+       iter != this->elementDescriptions.end(); iter++)
+  {
+    (*iter).reset();
+  }
+  this->elements.clear();
+  this->elementDescriptions.clear();
+
+  this->value.reset();
+
+  //this->Reset();
 }
 
 ElementPtr Element::GetParent() const
