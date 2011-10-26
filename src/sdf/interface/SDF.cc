@@ -29,6 +29,7 @@ Element::Element()
 
 Element::~Element()
 {
+  this->parent.reset();
   for (Param_V::iterator iter = this->attributes.begin(); 
        iter != this->attributes.end(); iter++)
   {
@@ -36,21 +37,7 @@ Element::~Element()
   }
   this->attributes.clear();
 
-  for (ElementPtr_V::iterator iter = this->elements.begin(); 
-       iter != this->elements.end(); iter++)
-  {
-    (*iter).reset();
-  }
-  this->elements.clear();
-
-  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin(); 
-       iter != this->elementDescriptions.end(); iter++)
-  {
-    (*iter).reset();
-  }
-  this->elementDescriptions.clear();
-
-  this->value.reset();
+  this->Reset();
 }
 
 ElementPtr Element::GetParent() const
@@ -699,4 +686,27 @@ void Element::Update()
   {
     (*iter)->Update();
   }
+}
+
+void Element::Reset()
+{
+  this->parent.reset();
+
+  for (ElementPtr_V::iterator iter = this->elements.begin(); 
+       iter != this->elements.end(); iter++)
+  {
+    (*iter)->Reset();
+    (*iter).reset();
+  }
+
+  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin(); 
+       iter != this->elementDescriptions.end(); iter++)
+  {
+    (*iter)->Reset();
+    (*iter).reset();
+  }
+  this->elements.clear();
+  this->elementDescriptions.clear();
+
+  this->value.reset();
 }

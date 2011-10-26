@@ -31,7 +31,7 @@ namespace sdf
   bool initFile(const std::string &_filename, SDFPtr _sdf);
 
   // \brief Initialize and SDFElement interface using a file
-  bool initFile(const std::string &_filename, ElementPtr _sdf);
+  bool initFile(const std::string &_filename, ElementPtr &_sdf);
 
   // \brief Initialize the SDF interface using a string
   bool initString(const std::string &_xmlString, SDFPtr &_sdf);

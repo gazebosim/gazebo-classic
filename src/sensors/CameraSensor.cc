@@ -80,17 +80,17 @@ void CameraSensor::Load()
 // Initialize the camera
 void CameraSensor::Init()
 {
-  //gzerr << "CameraSensor::Init()\n";
-
   std::string worldName = this->sdf->GetWorldName();
 
   if (!worldName.empty())
   {
-    rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(worldName);
-    if (!scene)
-      scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
+    this->scene = rendering::RenderEngine::Instance()->GetScene(worldName);
+    if (!this->scene)
+      this->scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
-    this->camera = scene->CreateCamera(this->sdf->GetValueString("name"), false);
+    this->camera = this->scene->CreateCamera(
+        this->sdf->GetValueString("name"), false);
+
     if (!this->camera)
     {
       gzerr << "Unable to create camera sensor[mono_camera]\n";
@@ -119,7 +119,6 @@ void CameraSensor::Init()
     gzerr << "No world name\n";
 
   Sensor::Init();
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -128,6 +127,8 @@ void CameraSensor::Fini()
 {
   Sensor::Fini();
   this->camera->Fini();
+  this->camera.reset();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -63,7 +63,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initFile(const std::string &_filename, ElementPtr _sdf)
+bool initFile(const std::string &_filename, ElementPtr &_sdf)
 {
   std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 

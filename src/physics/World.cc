@@ -105,6 +105,9 @@ World::~World()
 
   this->connections.clear();
   this->Fini();
+
+  this->sdf->Reset();
+  this->rootElement.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,8 +315,7 @@ void World::Fini()
   this->Stop();
   this->plugins.clear();
 
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Fini();
+  this->rootElement->Fini();
 
   if (this->physicsEngine)
   {

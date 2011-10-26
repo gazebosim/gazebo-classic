@@ -114,6 +114,7 @@ namespace sdf
     public: void ClearElements();
 
     public: void Update();
+    public: void Reset();
 
     private: boost::shared_ptr<Param> CreateParam(const std::string &_key, 
                  const std::string &_type, const std::string &_defaultValue, 
@@ -136,7 +137,6 @@ namespace sdf
 
     // The possible child elements
     public: ElementPtr_V elementDescriptions;
-
   };
 
 

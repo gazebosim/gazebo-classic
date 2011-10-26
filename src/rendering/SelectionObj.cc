@@ -34,6 +34,7 @@ SelectionObj::SelectionObj(Scene *scene_)
 {
   this->active = false;
   this->CreateMaterials();
+  this->node = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

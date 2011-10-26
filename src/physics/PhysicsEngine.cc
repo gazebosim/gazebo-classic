@@ -126,6 +126,8 @@ PhysicsEngine::~PhysicsEngine()
     msg.set_delete_me( true );
     this->visPub->Publish(msg);
   }
+  this->sdf->Reset();
+  this->sdf.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

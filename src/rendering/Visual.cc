@@ -48,7 +48,6 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
-
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -116,6 +115,7 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 /// Destructor
 Visual::~Visual()
 {
+
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender( this->preRenderConnection );
 
@@ -137,6 +137,8 @@ Visual::~Visual()
     this->sceneNode = NULL;
   }
 
+  this->sdf->Reset();
+  this->sdf.reset();
   this->parent.reset();
 }
 
@@ -147,6 +149,7 @@ void Visual::Init()
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/visual.sdf", this->sdf );
 
+
   this->transparency = 0.0;
   this->isStatic = false;
   this->visible = true;
@@ -154,6 +157,7 @@ void Visual::Init()
   this->staticGeom = NULL;
 
   RTShaderSystem::Instance()->AttachEntity(this);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -248,6 +252,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   this->Load();
   this->UpdateFromMsg(_msg);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
