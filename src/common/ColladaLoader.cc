@@ -510,7 +510,10 @@ void ColladaLoader::LoadTriangles( TiXmlElement *_trianglesXml,
       iss >> values[i];
 
     if (!iss)
+    {
+      delete [] values;
       break;
+    }
 
     for (std::map<std::string,int>::iterator iter = inputs.begin();
         iter != inputs.end(); iter++)

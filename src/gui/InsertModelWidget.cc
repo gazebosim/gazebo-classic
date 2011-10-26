@@ -203,6 +203,9 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
 
 void InsertModelWidget::OnApply()
 {
+  msgs::Factory msg;
+  msg.set_sdf(this->modelSDF->ToString());
+
   sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
   std::string modelName = modelElem->GetValueString("name");
@@ -222,14 +225,11 @@ void InsertModelWidget::OnApply()
   modelElem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
       this->modelVisual->GetWorldPose());
 
-
   // Remove the temporary visual from the scene
   scene->RemoveVisual( this->modelVisual );
   this->modelVisual.reset();
   this->visuals.clear();
 
-  msgs::Factory msg;
-  msg.set_sdf(this->modelSDF->ToString());
   this->factoryPub->Publish(msg);
   this->fileTreeWidget->clearSelection();
 }
