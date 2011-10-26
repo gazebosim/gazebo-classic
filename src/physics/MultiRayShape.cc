@@ -101,9 +101,9 @@ void MultiRayShape::Init()
   maxRange = rangeElem->GetValueDouble("max");
 
   // Create and array of ray collisions
-  for (int j = 0; j < vertSamples; j++)
+  for (unsigned int j = 0; j < vertSamples; j++)
   {
-    for (int i = 0; i < horzSamples; i++)
+    for (unsigned int i = 0; i < horzSamples; i++)
     {
       yawAngle = (horzSamples == 1) ? 0 : 
         i * yDiff / (horzSamples - 1) + horzMinAngle;
@@ -183,7 +183,6 @@ int MultiRayShape::GetFiducial(int index)
 void MultiRayShape::Update()
 {
   math::Vector3 a, b;
-  int i = 1;
 
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   sdf::ElementPtr rangeElem = rayElem->GetElement("range");
@@ -192,7 +191,7 @@ void MultiRayShape::Update()
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
   unsigned int ray_size = this->rays.size();
-  for (unsigned int i; i < ray_size; i++)
+  for (unsigned int i=0; i < ray_size; i++)
   {
     this->rays[i]->SetLength( maxRange );
     this->rays[i]->SetRetro( 0.0 );
@@ -206,8 +205,7 @@ void MultiRayShape::Update()
   //TODO: move to rendering engine
   /*if (**this->displayTypeP == "fan")*/
   { 
-    i = 1;
-    for (unsigned int i; i < ray_size; i++)
+    for (unsigned int i=0; i < ray_size; i++)
     {
       this->rays[i]->Update();
 
