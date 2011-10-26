@@ -52,6 +52,7 @@ void SphereMaker::Start(const rendering::UserCameraPtr camera)
 {
   //this->createCB = cb;
   this->camera = camera;
+
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
   this->visualMsg->set_name( stream.str() );
@@ -61,13 +62,14 @@ void SphereMaker::Start(const rendering::UserCameraPtr camera)
 
 void SphereMaker::Stop()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+  msgs::Request *msg = msgs::CreateRequest("entity_delete", 
+                                           this ->visualMsg->name());
 
   this->requestPub->Publish(*msg);
   delete msg;
 
-  gui::Events::moveMode(true);
   this->state = 0;
+  gui::Events::moveMode(true);
 }
 
 bool SphereMaker::IsActive() const
