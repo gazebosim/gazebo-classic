@@ -119,6 +119,7 @@ void Server::Fini()
   gazebo::fini();
 
   physics::fini();
+
   sensors::fini();
 
   if (this->master)
@@ -138,7 +139,6 @@ void Server::Run()
   // Run each world. Each world starts a new thread
   physics::run_worlds();
 
-  struct timeval timeout;
   // Update the sensors.
   while (!this->stop)
   {

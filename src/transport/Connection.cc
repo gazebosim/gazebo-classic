@@ -295,8 +295,12 @@ void Connection::Shutdown()
 {
   this->ProcessWriteQueue();
 
-  while (this->writeCount > 0)
+  int iters = 0;
+  while (this->writeCount > 0 && iters < 50)
+  {
     common::Time::MSleep(10);
+    iters++;
+  }
 
   this->shutdown();
   //this->StopRead();

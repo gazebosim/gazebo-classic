@@ -195,7 +195,7 @@ void ConnectionManager::Run()
     }
     this->connectionMutex->unlock();
 
-    common::Time::MSleep(1);
+    common::Time::MSleep(5);
   }
 
   this->masterConn->Shutdown();
