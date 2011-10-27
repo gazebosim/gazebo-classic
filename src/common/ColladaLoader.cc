@@ -29,6 +29,7 @@
 #include "common/Material.hh"
 #include "common/Mesh.hh"
 #include "common/ColladaLoader.hh"
+#include "common/SystemPaths.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -54,7 +55,10 @@ Mesh *ColladaLoader::Load( const std::string &_filename )
 
   this->path.clear();
   if (_filename.rfind('/') != std::string::npos)
-    this->path = _filename.substr(0,_filename.rfind('/')+1);
+  {
+    this->path = _filename.substr(0,_filename.rfind('/'));
+    gazebo::common::SystemPaths::Instance()->AddGazeboPaths(this->path.c_str());
+  }
 
   if (!xmlDoc.LoadFile(_filename))
     gzerr << "Unable to load collada file[" << _filename << "]\n";
@@ -433,7 +437,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
           surfaceXml->FirstChildElement("init_from")->GetText());
       if (imageXml->FirstChildElement("init_from"))
       {
-        std::string imgFile = this->path + imageXml->FirstChildElement("init_from")->GetText();
+        std::string imgFile = imageXml->FirstChildElement("init_from")->GetText();
         _mat->SetTextureImage(imgFile );
       }
     }

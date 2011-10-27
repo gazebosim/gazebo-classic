@@ -110,7 +110,7 @@ namespace gazebo
       private: void CreateContext();
 
       private: void LoadPlugins();
-      private: void SetupResources();
+      public: void SetupResources();
       private: void SetupRenderSystem();
   
       private: void PreRender();

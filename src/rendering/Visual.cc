@@ -30,6 +30,7 @@
 #include "rendering/Scene.hh"
 #include "rendering/SelectionObj.hh"
 #include "rendering/RTShaderSystem.hh"
+#include "rendering/RenderEngine.hh"
 #include "common/MeshManager.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -283,6 +284,8 @@ void Visual::Load()
       {
         common::MeshManager::Instance()->Load(meshName);
       }
+      // dae paths are added to GazeboPaths via SystemConfig, setup resources
+      gazebo::rendering::RenderEngine::Instance()->SetupResources();
 
       // Add the mesh into OGRE
       this->InsertMesh( common::MeshManager::Instance()->GetMesh(meshName) );
