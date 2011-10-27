@@ -83,10 +83,25 @@ Scene::~Scene()
 {
   Visual_M::iterator iter;
   this->visuals.clear();
+  this->jointMsgs.clear();
+  this->sceneMsgs.clear();
+  this->poseMsgs.clear();
+  this->lightMsgs.clear();
+  this->visualMsgs.clear();
 
-  Light_M::iterator lightIter;
-  for (lightIter = this->lights.begin(); lightIter != this->lights.end(); lightIter++)
+
+  this->worldVisual.reset();
+  this->selectionMsg.reset();
+  delete this->selectionObj;
+  delete this->requestMsg;
+  delete this->receiveMutex;
+  delete this->raySceneQuery;
+
+  for (Light_M::iterator lightIter = this->lights.begin(); 
+       lightIter != this->lights.end(); lightIter++)
+  {
     delete lightIter->second;
+  }
   this->lights.clear();
 
   // Remove a scene
@@ -105,7 +120,21 @@ Scene::~Scene()
     //this->manager->clearScene();
     //RenderEngine::Instance()->root->destroySceneManager(this->manager);
     this->manager = NULL;
+    delete this->manager;
   }
+  this->connections.clear();
+  this->node.reset();  
+  this->sceneSub.reset();
+  this->visSub.reset();
+  this->lightSub.reset();
+  this->poseSub.reset();
+  this->selectionSub.reset();
+  this->responseSub.reset();
+  this->requestSub.reset();
+  this->requestPub.reset();
+
+  this->sdf->Reset();
+  this->sdf.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

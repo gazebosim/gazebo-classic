@@ -54,6 +54,9 @@ Sensor::Sensor()
 // Destructor
 Sensor::~Sensor()
 {
+  this->sdf->Reset();
+  this->sdf.reset();
+  this->node.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +65,6 @@ void Sensor::Load( sdf::ElementPtr &_sdf )
 {
   this->sdf = _sdf;
   this->Load();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

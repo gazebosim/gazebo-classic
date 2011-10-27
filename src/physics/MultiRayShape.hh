@@ -121,6 +121,11 @@ namespace gazebo
       protected: std::vector< RayShapePtr > rays;
   
       protected: math::Vector3 offset;
+      protected: sdf::ElementPtr rayElem;
+      protected: sdf::ElementPtr scanElem;
+      protected: sdf::ElementPtr horzElem;
+      protected: sdf::ElementPtr vertElem;
+      protected: sdf::ElementPtr rangeElem;
     };
     /// \}
   

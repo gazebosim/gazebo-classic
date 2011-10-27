@@ -64,7 +64,8 @@ void BoxMaker::Start(const rendering::UserCameraPtr _camera)
 
 void BoxMaker::Stop()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+  msgs::Request *msg = msgs::CreateRequest("entity_delete", 
+                                           this->visualMsg->name());
 
   this->requestPub->Publish(*msg);
   delete msg;

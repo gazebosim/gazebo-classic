@@ -59,6 +59,7 @@ Inertial::Inertial(const Inertial &_inertial)
 /// Destructor
 Inertial::~Inertial()
 {
+  this->sdf.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -257,7 +257,6 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
   {
-    
     //const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
 
     //for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); 

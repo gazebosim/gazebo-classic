@@ -106,6 +106,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   this->SetRenderTarget( this->renderTarget );
 
   this->viewport->setOverlaysEnabled(false);
+  this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
 
   // Create materials for all the render textures.
   Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
@@ -119,8 +120,25 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
       _textureName );
 
-  this->depthMaterial = (Ogre::Material*)(Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap").getPointer());
+  this->depthMaterial = (Ogre::Material*)(
+      Ogre::MaterialManager::getSingleton().getByName(
+        "Gazebo/DepthMap").getPointer());
+
   this->depthMaterial->load();
+
+  // Create a custom render queue invocation sequence for the depth 
+  // render texture
+  Ogre::RenderQueueInvocationSequence* invocationSequence =
+    Ogre::Root::getSingleton().createRenderQueueInvocationSequence(_textureName + "_DepthMap");
+
+  // Add a render queue invocation to the sequence, and disable shadows for it
+  Ogre::RenderQueueInvocation* invocation = 
+    invocationSequence->add(Ogre::RENDER_QUEUE_MAIN, _textureName + "_main");
+  invocation->setSuppressShadows(true);
+
+  // Set the render queue invocation sequence for the depth render texture 
+  // viewport
+  this->viewport->setRenderQueueInvocationSequenceName(_textureName + "_DepthMap");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +186,7 @@ void DepthCamera::RenderImpl()
   Ogre::Pass *pass;
 
   renderSys = this->scene->GetManager()->getDestinationRenderSystem();
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
   sceneMgr->_suppressRenderStateChanges(true);
 
   // Get pointer to the material pass
@@ -243,6 +262,7 @@ void DepthCamera::RenderImpl()
   this->renderTarget->update(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 }
 
 //////////////////////////////////////////////////////////////////////////////

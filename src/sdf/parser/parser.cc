@@ -63,7 +63,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool initFile(const std::string &_filename, ElementPtr _sdf)
+bool initFile(const std::string &_filename, ElementPtr &_sdf)
 {
   std::string filename = gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
 
@@ -456,7 +456,6 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
         if (elemXml->Attribute("model_pose"))
           includeSDF->root->GetElement("model")->GetOrCreateElement("origin")->GetAttribute("pose")->SetFromString(elemXml->Attribute("model_pose"));
 
-        //includeSDF.reset();
         continue;
       }
 

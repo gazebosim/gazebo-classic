@@ -76,29 +76,29 @@ void MultiRayShape::Init()
 
   double minRange, maxRange;
 
-  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
-  sdf::ElementPtr scanElem = rayElem->GetElement("scan");
-  sdf::ElementPtr horzElem = scanElem->GetElement("horizontal");
-  sdf::ElementPtr vertElem = scanElem->GetElement("vertical");
-  sdf::ElementPtr rangeElem = rayElem->GetElement("range");
+  this->rayElem = this->sdf->GetElement("ray");
+  this->scanElem = this->rayElem->GetElement("scan");
+  this->horzElem = this->scanElem->GetElement("horizontal");
+  this->vertElem = this->scanElem->GetElement("vertical");
+  this->rangeElem = this->rayElem->GetElement("range");
 
-  if (vertElem)
+  if (this->vertElem)
   {
-    vertMinAngle = vertElem->GetValueDouble("min_angle");
-    vertMaxAngle = vertElem->GetValueDouble("max_angle");
-    vertSamples = vertElem->GetValueUInt("samples");
-    vertResolution = vertElem->GetValueDouble("resolution");
+    vertMinAngle = this->vertElem->GetValueDouble("min_angle");
+    vertMaxAngle = this->vertElem->GetValueDouble("max_angle");
+    vertSamples = this->vertElem->GetValueUInt("samples");
+    vertResolution = this->vertElem->GetValueDouble("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
-  horzMinAngle = horzElem->GetValueDouble("min_angle");
-  horzMaxAngle = horzElem->GetValueDouble("max_angle");
-  horzSamples = horzElem->GetValueUInt("samples");
-  horzResolution = horzElem->GetValueDouble("resolution");
+  horzMinAngle = this->horzElem->GetValueDouble("min_angle");
+  horzMaxAngle = this->horzElem->GetValueDouble("max_angle");
+  horzSamples = this->horzElem->GetValueUInt("samples");
+  horzResolution = this->horzElem->GetValueDouble("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
-  minRange = rangeElem->GetValueDouble("min");
-  maxRange = rangeElem->GetValueDouble("max");
+  minRange = this->rangeElem->GetValueDouble("min");
+  maxRange = this->rangeElem->GetValueDouble("max");
 
   // Create and array of ray collisions
   for (unsigned int j = 0; j < vertSamples; j++)
@@ -184,9 +184,7 @@ int MultiRayShape::GetFiducial(int index)
 /// Update the collision
 void MultiRayShape::Update()
 {
-  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
-  sdf::ElementPtr rangeElem = rayElem->GetElement("range");
-  double maxRange = rangeElem->GetValueDouble("max");
+  double maxRange = this->rangeElem->GetValueDouble("max");
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
@@ -258,19 +256,19 @@ void MultiRayShape::AddRay(const math::Vector3 &start,
 /// Get the minimum range
 double MultiRayShape::GetMinRange() const
 {
-  return this->sdf->GetElement("ray")->GetElement("range")->GetValueDouble("min");
+  return this->rangeElem->GetValueDouble("min");
 }
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the maximum range
 double MultiRayShape::GetMaxRange() const
 {
-  return this->sdf->GetElement("ray")->GetElement("range")->GetValueDouble("max");
+  return this->rangeElem->GetValueDouble("max");
 }
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the range resolution
 double MultiRayShape::GetResRange() const
 {
-  return this->sdf->GetElement("ray")->GetElement("range")->GetValueDouble("resolution");
+  return this->rangeElem->GetValueDouble("resolution");
 }
 
 
@@ -279,28 +277,28 @@ double MultiRayShape::GetResRange() const
 /// Get the sample count
 int MultiRayShape::GetSampleCount() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueUInt("samples");
+  return this->horzElem->GetValueUInt("samples");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the range resolution
 double MultiRayShape::GetScanResolution() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueDouble("resolution");
+  return this->horzElem->GetValueDouble("resolution");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum range
 math::Angle MultiRayShape::GetMinAngle() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueDouble("min_angle");
+  return this->horzElem->GetValueDouble("min_angle");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the maximum range
 math::Angle MultiRayShape::GetMaxAngle() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("horizontal")->GetValueDouble("max_angle");
+  return this->horzElem->GetValueDouble("max_angle");
 }
 
 
@@ -311,27 +309,27 @@ math::Angle MultiRayShape::GetMaxAngle() const
 /// Get the vertical sample count
 int MultiRayShape::GetVerticalSampleCount() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueUInt("samples");
+  return this->vertElem->GetValueUInt("samples");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the vertical range resolution
 double MultiRayShape::GetVerticalScanResolution() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueDouble("resolution");
+  return this->vertElem->GetValueDouble("resolution");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical minimum range
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueDouble("min_angle");
+  return this->vertElem->GetValueDouble("min_angle");
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the vertical maximum range
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
-  return this->sdf->GetElement("ray")->GetElement("scan")->GetElement("vertical")->GetValueDouble("max_angle");
+  return this->vertElem->GetValueDouble("max_angle");
 }
 

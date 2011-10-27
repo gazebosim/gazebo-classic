@@ -55,6 +55,7 @@ bool sensors::init()
 
 bool sensors::fini()
 {
+  sensors::SensorManager::Instance()->Fini();
   rendering::fini();
   return true;
 }
@@ -79,9 +80,9 @@ void sensors::run()
   sensors::SensorManager::Instance()->Run();
  }
 
-void sensors::run_once(bool /*force_*/)
+void sensors::run_once(bool _force)
 {
-  sensors::SensorManager::Instance()->Update(true);
+  sensors::SensorManager::Instance()->Update(_force);
 }
 
 void sensors::stop()

@@ -67,6 +67,10 @@ Light::~Light()
   {
     this->scene->GetManager()->destroyLight(this->GetName());
   }
+
+  this->sdf->Reset();
+  this->sdf.reset();
+  delete this->visual;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

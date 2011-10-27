@@ -103,17 +103,25 @@ Camera::~Camera()
   if (this->bayerFrameBuffer)
     delete [] this->bayerFrameBuffer;
 
-  if (this->pitchNode)
-  {
-    this->sceneNode->removeAndDestroyChild( this->name + "PitchNode");
-    this->pitchNode = NULL;
-  }
+  this->sceneNode->removeAndDestroyAllChildren();
+  if (this->sceneNode->getParentSceneNode())
+      this->sceneNode->getParentSceneNode()->removeAndDestroyChild( 
+          this->sceneNode->getName() );
+ 
+  this->pitchNode = NULL;
+  this->sceneNode = NULL;
 
   if (this->camera)
   {
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
   }
+
+  this->connections.clear();
+
+  this->sdf->Reset();
+  this->imageElem.reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////////////////////////////////

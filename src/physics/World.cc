@@ -105,6 +105,9 @@ World::~World()
 
   this->connections.clear();
   this->Fini();
+
+  this->sdf->Reset();
+  this->rootElement.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,8 +315,7 @@ void World::Fini()
   this->Stop();
   this->plugins.clear();
 
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Fini();
+  this->rootElement->Fini();
 
   if (this->physicsEngine)
   {
@@ -808,8 +810,6 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
 
   if (_msg->has_sdf())
   {
-    gzdbg << "OnFactoryMsg readString\n";
-    //gzdbg << "incoming msg: " << _msg->sdf() << "\n";
     sdf::readString( _msg->sdf(), factorySDF ); // SDF Parsing happens here
   }
   else
@@ -838,13 +838,18 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
     // Add the new models into the World
     //gzgdb << "factorySDF [" << factorySDF->ToString() << "]\n";
     sdf::ElementPtr elem = factorySDF->root->GetElement("model");
-    if (!elem) elem = factorySDF->root->GetElement("world")->GetElement("model");
+    if (!elem) 
+      elem = factorySDF->root->GetElement("world")->GetElement("model");
+
     ModelPtr model = this->LoadModel( elem, this->rootElement );
     if (_msg->has_pose())
       model->SetWorldPose( msgs::Convert( _msg->pose() ) );
 
     model->Init();
   }
+
+  factorySDF->root->Reset();
+  factorySDF->root.reset();
 }
 
 void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)

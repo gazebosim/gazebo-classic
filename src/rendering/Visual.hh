@@ -55,7 +55,7 @@ namespace gazebo
     /// \{
 
     /// \brief A renderable object
-    class Visual : public boost::enable_shared_from_this<Visual>
+    class Visual 
     {
       /// \brief Constructor
       public: Visual (const std::string &name, VisualPtr parent);
