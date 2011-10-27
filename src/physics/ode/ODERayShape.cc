@@ -63,6 +63,7 @@ void ODERayShape::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
+  //gzerr << "contactLen[" << this->contactLen << "]";
   if (this->contactLen != 0)
   {
     dGeomRaySet(collision->GetCollisionId(), this->globalStartPos.x,
@@ -71,6 +72,14 @@ void ODERayShape::Update()
 
     dGeomRaySetLength( collision->GetCollisionId(),
         this->globalStartPos.Distance(this->globalEndPos) );
+
+    // gzerr << "  parent[" << this->collisionParent->GetLink()->GetName() << "]"
+    //       << "  pose[" << this->collisionParent->GetLink()->GetWorldPose() << "]"
+    //       << "  relative[" << this->relativeStartPos << "]"
+    //       << "  globalStartPos[" << this->globalStartPos << "]"
+    //       << "  globalEndPos[" << this->globalEndPos << "]"
+    //       << "  dir[" << dir << "]"
+    //       << "  dist[" << this->globalStartPos.Distance(this->globalEndPos) << "]\n";
   }
 }
 

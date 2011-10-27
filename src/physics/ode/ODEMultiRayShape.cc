@@ -77,7 +77,6 @@ void ODEMultiRayShape::UpdateRays()
 /// Ray-intersection callback
 void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 {
-  int n = 0;
   dContactGeom contact;
   ODECollision *collision1, *collision2 = NULL;
   ODECollision *rayCollision = NULL;
@@ -127,12 +126,11 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
       dGeomRaySetParams(o1, 0, 0);
       dGeomRaySetClosestHit(o1, 1);
     }
-
-    if (dGeomGetClass(o2) == dRayClass)
+    else if (dGeomGetClass(o2) == dRayClass)
     {
       assert(rayCollision == NULL);
       rayCollision = (ODECollision*) collision2;
-      hitCollision = (ODECollision* )collision1;
+      hitCollision = (ODECollision*) collision1;
       dGeomRaySetParams(o2, 0, 0);
       dGeomRaySetClosestHit(o2, 1);
     }
@@ -140,13 +138,24 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
     // Check for ray/collision intersections
     if (rayCollision && hitCollision)
     {
-      n = dCollide(o1, o2, 1, &contact, sizeof(contact));
+      int n = dCollide(o1, o2, 1, &contact, sizeof(contact));
 
       if ( n > 0 )
       {
         RayShapePtr shape = boost::shared_static_cast<RayShape>(rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {
+          //gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
+          //      << " depth[" << contact.depth << "]"
+          //      << " position[" << contact.pos[0]
+          //        << "," << contact.pos[1]
+          //        << "," << contact.pos[2]
+          //        << "," << "]"
+          //      << " ray[" << rayCollision->GetName() << "]"
+          //      << " pose[" << rayCollision->GetWorldPose() << "]"
+          //      << " hit[" << hitCollision->GetName() << "]"
+          //      << " pose[" << hitCollision->GetWorldPose() << "]"
+          //      << "\n";
           shape->SetLength(contact.depth );
           shape->SetRetro( hitCollision->GetLaserRetro() );
         }

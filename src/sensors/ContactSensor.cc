@@ -91,7 +91,6 @@ void ContactSensor::Load()
   this->world = gazebo::physics::get_world(worldName);
   this->model = this->world->GetModelByName(modelName);
   gazebo::physics::BasePtr tmp = this->model->GetByName(linkFullyScopedName);
-  printf("ok\n");
   this->link = boost::dynamic_pointer_cast<gazebo::physics::Link>(this->model->GetByName(linkFullyScopedName));
 
   if (this->link == NULL)
@@ -210,7 +209,7 @@ std::vector<gazebo::physics::Contact> ContactSensor::GetContacts()
     return this->model->GetContacts(this->collision);
   else
   {
-    gzerr << "model not setup yet, are you calling GetContacts during Load?\n";
+    gzwarn << "model not setup yet, are you calling GetContacts during Load?\n";
     return std::vector<gazebo::physics::Contact>();
   }
 }

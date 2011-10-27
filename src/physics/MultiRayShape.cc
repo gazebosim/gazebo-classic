@@ -117,6 +117,8 @@ void MultiRayShape::Init()
       start = (axis * minRange) + this->offset;
       end = (axis * maxRange) + this->offset;
 
+      // gzerr << "add ray debug [" << this->GetName() << "] "
+      //       << start << " " << end << "\n";
       this->AddRay(start,end);
     }
   }
@@ -182,8 +184,6 @@ int MultiRayShape::GetFiducial(int index)
 /// Update the collision
 void MultiRayShape::Update()
 {
-  math::Vector3 a, b;
-
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   sdf::ElementPtr rangeElem = rayElem->GetElement("range");
   double maxRange = rangeElem->GetValueDouble("max");
@@ -203,12 +203,12 @@ void MultiRayShape::Update()
   this->UpdateRays();
 
   //TODO: move to rendering engine
-  /*if (**this->displayTypeP == "fan")*/
+  /*if (**this->displayTypeP == "fan")
   { 
     for (unsigned int i=0; i < ray_size; i++)
     {
-      this->rays[i]->Update();
-
+      //this->rays[i]->Update();
+      math::Vector3 a, b;
       this->rays[i]->GetRelativePoints(a,b);
 
       msgs::Set(this->rayFanMsg->mutable_geometry()->mutable_points(i), b );
@@ -217,6 +217,7 @@ void MultiRayShape::Update()
       //      << " length [" << this->rays[i]->GetLength() << "]\n";
     }
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

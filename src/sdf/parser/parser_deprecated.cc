@@ -455,7 +455,7 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   else if (std::string((const char *)_config->name) == "sphere")
   {
     sdf::ElementPtr sdfSphere = sdfGeom->AddElement("sphere");
-    sdfSphere->GetAttribute("radius")->SetFromString( getNodeValue(_config, "radius") );
+    sdfSphere->GetAttribute("radius")->SetFromString( getNodeValue(_config, "size") );
   }
   else if (std::string((const char *)_config->name) == "cylinder")
   {

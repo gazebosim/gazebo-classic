@@ -84,7 +84,6 @@ void RaySensor::Load( )
   this->world = gazebo::physics::get_world(worldName);
   this->model = this->world->GetModelByName(modelName);
   gazebo::physics::BasePtr tmp = this->model->GetByName(linkFullyScopedName);
-  printf("ok\n");
   this->link = boost::dynamic_pointer_cast<gazebo::physics::Link>(this->model->GetByName(linkFullyScopedName));
 
   if (this->link == NULL)
@@ -102,18 +101,16 @@ void RaySensor::Load( )
 
   this->laserCollision->SetShape(this->laserShape);
 
+  //gzerr << "Initializing RaySensor\n";
   this->laserShape->Init( );
+  //gazebo::math::Pose linkPose;
+  //linkPose = this->link->GetWorldPose();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the ray
 void RaySensor::Init()
 {
-  //gzerr << "Initializing RaySensor\n";
-  //this->laserShape->Init( );
-  //gazebo::math::Pose linkPose;
-  //linkPose = this->link->GetWorldPose();
-
   Sensor::Init();
 }
 
