@@ -848,7 +848,6 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
     model->Init();
   }
 
-  factorySDF->root->Reset();
   factorySDF->root.reset();
 }
 

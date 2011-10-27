@@ -305,11 +305,11 @@ void Connection::Shutdown()
 
   if (this->socket && this->socket->is_open())
   {
+    this->Close();
     boost::system::error_code ec;
     this->socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
   }
 
-  this->Close();
   delete this->socket;
   this->socket = NULL;
 }
