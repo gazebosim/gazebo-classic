@@ -166,7 +166,7 @@ namespace gazebo
       /// \param _sdf SDF parameter
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
-      public: void StoreContact(CollisionPtr collision, Contact contact);
+      public: void StoreContact(CollisionPtr _collision, Contact _contact);
       private: std::map<CollisionPtr, std::vector<Contact> > contacts;
       public: std::vector<Contact> GetContacts(CollisionPtr geom);
       public: Contact GetContact(CollisionPtr geom, unsigned int _i);

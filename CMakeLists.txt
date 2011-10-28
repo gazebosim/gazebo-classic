@@ -83,13 +83,13 @@ include (${gazebo_cmake_dir}/DissectVersion.cmake)
 set (CMAKE_C_FLAGS_RELEASE " -O0 -DNDEBUG -Wall -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
-set (CMAKE_C_FLAGS_DEBUG " -ggdb -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
+set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 
-set (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
-set (CMAKE_C_FLAGS_CHECK " -ggdb -Wall -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow -pedantic -Wno-long-long -Wno-unused-value -fPIC" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_C_FLAGS_CHECK " -ggdb3 -Wall -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow -pedantic -Wno-long-long -Wno-unused-value -fPIC" CACHE INTERNAL "C Flags for static code checking" FORCE)
 set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
 
 #####################################

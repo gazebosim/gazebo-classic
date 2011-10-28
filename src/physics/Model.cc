@@ -188,43 +188,7 @@ void Model::Init()
 void Model::Update()
 {
   // clear contacts
-  for (std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
-       iter != this->contacts.end() ; iter++)
-    (iter->second).clear();
   this->contacts.clear();
-
-  // NATY: Make this work without renderstate
-  /*
-  if (this->controllers.size() == 0 && this->IsStatic())
-    return;
-
-  if (!this->IsStatic())
-  {
-    tbb::parallel_for( tbb::blocked_range<size_t>(0, this->bodies.size(), 10),
-        LinkUpdate_TBB(&this->bodies) );
-  }
-
-  this->contacts.clear();
-
-  std::map<std::string, Controller* >::iterator contIter;
-  for (contIter=this->controllers.begin();
-      contIter!=this->controllers.end(); contIter++)
-  {
-    if (contIter->second)
-    {
-      contIter->second->Update();
-    }
-  }
-
-  if (RenderState::GetShowJoints())
-  {
-    JointContainer::iterator jointIter;
-    for (jointIter = this->joints.begin(); 
-         jointIter != this->joints.end(); jointIter++)
-    {
-      (*jointIter)->Update();
-    }
-  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -696,19 +660,20 @@ void Model::SetLaserRetro( const float &retro )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Store a geom, contact pair
-void Model::StoreContact(CollisionPtr geom, Contact contact)
+void Model::StoreContact(CollisionPtr _geom, Contact _contact)
 {
-  //gzerr << "here I shall add the contact and geom pair under link, to be retrieved later by plugin\n";
-  std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
+  std::map<CollisionPtr, std::vector<Contact> >::iterator iter;
+
+  iter = this->contacts.find( _geom );
   if (iter == this->contacts.end())
   {
-    std::vector<Contact> contact_list;
-    contact_list.push_back(contact);
-    this->contacts.insert( std::make_pair( geom, contact_list ) );
+    std::vector<Contact> contactList;
+    contactList.push_back(_contact);
+    this->contacts.insert( std::make_pair( _geom, contactList ) );
   }
   else
   {
-    (iter->second).push_back(contact);
+    (iter->second).push_back( _contact);
   }
 }
 

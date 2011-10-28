@@ -167,6 +167,12 @@ namespace gazebo
       protected: virtual void OnPhysicsMsg( 
                    const boost::shared_ptr<msgs::Physics const> &/*_msg*/ );
 
+      private: void  AddTrimeshCollider( ODECollision *_collision1, 
+                                         ODECollision *_collision2 );
+
+
+      private: void  AddCollider( ODECollision *_collision1, 
+                                  ODECollision *_collision2 );
 
       /// \brief Top-level world for all bodies
       private: dWorldID worldId;
@@ -188,6 +194,7 @@ namespace gazebo
 
       private: std::vector< std::pair<ODECollision*, ODECollision*> > colliders;
       private: std::vector< std::pair<ODECollision*, ODECollision*> > trimeshColliders;
+      private: unsigned int collidersCount, trimeshCollidersCount;
     
       private: tbb::spin_mutex collideMutex;
 

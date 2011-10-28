@@ -324,8 +324,10 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-  this->colliders.clear();
-  this->trimeshColliders.clear();
+  this->collidersCount = 0;
+  this->trimeshCollidersCount = 0;
+  //this->colliders.clear();
+  //this->trimeshColliders.clear();
 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
@@ -340,9 +342,10 @@ void ODEPhysics::UpdateCollision()
   this->contactFeedbacks.clear();
 
   // Collide all the collisions
-  if (this->colliders.size() < 50)
+  //if (this->colliders.size() < 50)
+  if (this->collidersCount < 50)
   {
-    for (unsigned int i=0; i<this->colliders.size(); i++)
+    for (unsigned int i=0; i<this->collidersCount; i++)
     {
       this->Collide(this->colliders[i].first, 
                     this->colliders[i].second, this->contactCollisions);
@@ -351,11 +354,11 @@ void ODEPhysics::UpdateCollision()
   else
   {
     tbb::parallel_for( tbb::blocked_range<size_t>(0, 
-          this->colliders.size(), 10), Colliders_TBB(&this->colliders, this) );
+          this->collidersCount, 10), Colliders_TBB(&this->colliders, this) );
   }
 
   // Trimesh collision must happen in this thread sequentially
-  for (unsigned int i=0; i<this->trimeshColliders.size(); i++)
+  for (unsigned int i=0; i<this->trimeshCollidersCount; i++)
   {
     ODECollision *collision1 = this->trimeshColliders[i].first;
     ODECollision *collision2 = this->trimeshColliders[i].second;
@@ -732,7 +735,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         collision2->GetShapeType() == Base::TRIMESH_SHAPE )
       self->trimeshColliders.push_back( std::make_pair(collision1, collision2) );
     else
-      self->colliders.push_back( std::make_pair(collision1, collision2) );
+      self->AddCollider(collision1, collision2);
+      //self->colliders.push_back( std::make_pair(collision1, collision2) );
   }
 }
 
@@ -908,4 +912,26 @@ void ODEPhysics::ProcessContactFeedback(ContactFeedback* feedback)
   // Add the contact to each collision
   feedback->contact.collision1->AddContact( feedback->contact );
   feedback->contact.collision2->AddContact( feedback->contact );
+}
+
+void ODEPhysics::AddTrimeshCollider( ODECollision *_collision1, 
+                                     ODECollision *_collision2 )
+{
+  if (this->trimeshCollidersCount >= this->trimeshColliders.size())
+    this->trimeshColliders.resize(this->trimeshColliders.size() + 100);
+
+  this->trimeshColliders[this->trimeshCollidersCount].first  = _collision1;
+  this->trimeshColliders[this->trimeshCollidersCount].second = _collision2;
+  this->trimeshCollidersCount++;
+}
+
+void ODEPhysics::AddCollider( ODECollision *_collision1, 
+                              ODECollision *_collision2 )
+{
+  if (this->collidersCount >= this->colliders.size())
+    this->colliders.resize(this->colliders.size() + 100);
+
+  this->colliders[this->collidersCount].first  = _collision1;
+  this->colliders[this->collidersCount].second = _collision2;
+  this->collidersCount++;
 }
