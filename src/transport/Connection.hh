@@ -131,19 +131,18 @@ namespace gazebo
                     boost::bind(f, this, 
                                 boost::asio::placeholders::error,
                                 boost::make_tuple(handler)) );
-
               }
 
       // Handle a completed read of a message header. The handler is passed
       // using a tuple since boost::bind seems to have trouble binding
       // a function object created using boost::bind as a parameter
       private: template<typename Handler>
-               void OnReadHeader(const boost::system::error_code &e_,
-                                 boost::tuple<Handler> handler_)
+               void OnReadHeader(const boost::system::error_code &_e,
+                                 boost::tuple<Handler> _handler)
               {
-                if (e_)
+                if (_e)
                 {
-                  if (e_.message() != "End of File")
+                  if (_e.message() != "End of File")
                   {
                     this->Close();
                     // This will occur when the other side closes the
@@ -154,7 +153,7 @@ namespace gazebo
                 {
                   std::size_t inbound_data_size = 0;
                   std::string header(&this->inbound_header[0], 
-                    this->inbound_header.size());
+                                      this->inbound_header.size());
                   this->inbound_header.clear();
 
                   inbound_data_size = this->ParseHeader(header);
@@ -171,13 +170,23 @@ namespace gazebo
                         boost::asio::buffer(this->inbound_data), 
                         boost::bind(f, this, 
                                     boost::asio::placeholders::error, 
-                                    handler_) );
+                                    _handler) );
                   }
                   else
                   {
                     gzerr << "Header is empty\n";
+                    boost::get<0>(_handler)("");
+                    // This code tries to read the header again. We should
+                    // never get here.
+                    //this->inbound_header.resize(HEADER_LENGTH);
 
-                   boost::get<0>(handler_)("");
+                    //void (Connection::*f)(const boost::system::error_code &,
+                    //    boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
+
+                    //boost::asio::async_read(*this->socket,
+                    //    boost::asio::buffer(this->inbound_header),
+                    //    boost::bind(f, this, 
+                    //      boost::asio::placeholders::error, _handler) );
                   }
                 }
               }
@@ -192,12 +201,12 @@ namespace gazebo
 
                 // Inform caller that data has been received
                 std::string data(&this->inbound_data[0], 
-                    this->inbound_data.size());
+                                  this->inbound_data.size());
                 this->inbound_data.clear();
 
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
-                
+
                 if (!e) 
                 {
                   boost::get<0>(handler)(data);

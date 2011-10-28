@@ -231,7 +231,9 @@ void Connection::ProcessWriteQueue()
 
   this->writeMutex->lock();
 
-  if (this->writeQueue.size() == 0)
+  // async_write should only be called when the last async_write has
+  // completed. Therefore we have to check the writeCount attribute
+  if (this->writeQueue.size() == 0 || this->writeCount > 0)
   {
     this->writeMutex->unlock();
     return;
@@ -246,14 +248,28 @@ void Connection::ProcessWriteQueue()
   }
   this->writeQueue.clear();
   this->writeCount++;
-  this->writeMutex->unlock();
 
   // Write the serialized data to the socket. We use
   // "gather-write" to send both the head and the data in
   // a single write operation
-  boost::asio::async_write( *this->socket, buffer->data(), 
+  // Note: This seems to cause a memory leak.
+  /*boost::asio::async_write( *this->socket, buffer->data(), 
     boost::bind(&Connection::OnWrite, shared_from_this(), 
     boost::asio::placeholders::error, buffer));
+    */
+
+  try
+  {
+    boost::asio::write( *this->socket, buffer->data() );
+  } 
+  catch (...)
+  {
+    this->Shutdown();
+  }
+  
+  this->writeCount--;
+  delete buffer;
+  this->writeMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -273,9 +289,8 @@ std::string Connection::GetRemoteURI() const
 ////////////////////////////////////////////////////////////////////////////////
 // Handle on write callbacks
 void Connection::OnWrite(const boost::system::error_code &e, 
-    boost::asio::streambuf *_buffer)
+                         boost::asio::streambuf *_buffer)
 {
-
   this->writeMutex->lock();
   delete _buffer;
   this->writeCount--;
@@ -489,7 +504,7 @@ std::size_t Connection::ParseHeader( const std::string &header )
   {
     // Header doesn't seem to be valid. Inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
-    gzerr << "Invalid header. Data Size[" << data_size << "] on Port[" << this->GetLocalPort() << "] From[" << this->GetRemotePort() << "] Header[" << header << "]\n";
+    //gzerr << "Invalid header. Data Size[" << data_size << "] on Port[" << this->GetLocalPort() << "] From[" << this->GetRemotePort() << "] Header[" << header << "]\n";
   }
 
   return data_size;
