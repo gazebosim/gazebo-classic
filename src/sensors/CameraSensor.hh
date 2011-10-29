@@ -75,7 +75,6 @@ namespace gazebo
 
       private: rendering::CameraPtr camera;
 
-      private: common::Time lastRenderTime;
       private: rendering::ScenePtr scene;
     };
     /// \}

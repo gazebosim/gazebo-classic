@@ -110,8 +110,6 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    //this->camera->SetRelativePose( this->pose );
-    //this->camera->SetInitialRelativePose( this->pose );
     this->camera->SetWorldPose( this->pose );
     this->camera->AttachToVisual( this->parentName, true );
   }
