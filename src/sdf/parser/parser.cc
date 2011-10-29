@@ -456,6 +456,25 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
         if (elemXml->Attribute("model_pose"))
           includeSDF->root->GetElement("model")->GetOrCreateElement("origin")->GetAttribute("pose")->SetFromString(elemXml->Attribute("model_pose"));
 
+        for (TiXmlElement *childElemXml = elemXml->FirstChildElement(); 
+             childElemXml; childElemXml = childElemXml->NextSiblingElement())
+        {
+          if (std::string("plugin") == childElemXml->Value())
+          {
+            sdf::ElementPtr pluginElem;
+            pluginElem = includeSDF->root->GetElement(
+                "model")->AddElement("plugin");
+
+            pluginElem->GetAttribute("filename")->SetFromString( 
+                childElemXml->Attribute("filename") );
+            pluginElem->GetAttribute("name")->SetFromString( 
+                childElemXml->Attribute("name") );
+          }
+
+        }
+
+
+
         continue;
       }
 
