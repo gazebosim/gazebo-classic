@@ -188,7 +188,7 @@ APPEND_TO_CACHED_LIST(gazeboserver_ldflags
                       -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics )
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics assimp)
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )

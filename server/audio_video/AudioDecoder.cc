@@ -101,8 +101,13 @@ int AudioDecoder::Decode(uint8_t **outBuffer, unsigned int *outBufferSize)
       tmpBufsize = sizeof(tmpBuf);
 
       // Decode the frame
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+      bytesDecoded = avcodec_decode_audio3( this->codecCtx, (int16_t*)tmpBuf, 
+          &tmpBufsize, &packet);
+#else
       bytesDecoded = avcodec_decode_audio2( this->codecCtx, (int16_t*)tmpBuf, 
           &tmpBufsize, packet.data, packet.size );
+#endif
 
       if (bytesDecoded < 0)
       {
@@ -168,7 +173,11 @@ int AudioDecoder::SetFile(const std::string &filename)
   this->audioStream = -1;
   for (i=0; i < this->formatCtx->nb_streams; i++)
   {
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+    if (this->formatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+#else
     if (this->formatCtx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
+#endif
     {
       this->audioStream = i;
       break;
