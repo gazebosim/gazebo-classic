@@ -79,6 +79,9 @@ namespace gazebo
   
     /// \brief Set the quatern to the identity
     public: void SetToIdentity();
+
+    public: Quaternion GetLog() const;
+    public: Quaternion GetExp() const;
   
     /// \brief Normalize the quaternion
     public: void Normalize();
@@ -152,6 +155,11 @@ namespace gazebo
     /// \param qt Quaternion for multiplication
     /// \return This quatern multiplied by the parameter
     public: Quaternion operator*( const Quaternion &qt ) const;
+
+    /// \brief Multipcation operator
+    /// \param _f Double factor
+    /// \return Quaternion multiplied by _f
+    public: Quaternion operator*( const double &_f ) const;
   
     /// \brief Multiplication operator
     /// \param qt Quaternion for multiplication
@@ -170,6 +178,9 @@ namespace gazebo
     /// \param _qt Quaternion for comparison
     /// \return True if not equal
     public: bool operator!=(const Quaternion &_qt) const;
+
+    /// \brief Negate operator
+    public: Quaternion operator-() const;
 
     /// \brief Rotate a vector using the quaternion
     /// \return The rotated vector
@@ -197,6 +208,19 @@ namespace gazebo
   
     /// \brief Round all values to _precision decimal places
     public: void Round(int _precision);
+
+    /// \brief Dot product
+    public: double Dot(const Quaternion &_q) const;
+
+    /// \brief Spherical quadratic interpolation
+    public: static Quaternion Squad(double _fT, const Quaternion &_rkP,
+                const Quaternion &_rkA, const Quaternion &_rkB,
+                Quaternion &_rkQ, bool _shortestPath = false);
+
+    /// \brief Spherical linear interpolation
+    public: static Quaternion Slerp (double _fT, const Quaternion &_rkP,
+                const Quaternion &_rkQ, bool _shortestPath = false);
+                  
 
     /// \brief Attributes of the quaternion 
     public: double w;

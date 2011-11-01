@@ -255,7 +255,6 @@ void Link::Init()
 // Finalize the body
 void Link::Fini()
 {
-  this->connections.clear();
   Entity::Fini();
 }
 

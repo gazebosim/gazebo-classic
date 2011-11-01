@@ -30,6 +30,8 @@ set ( sources ColladaLoader.cc
               Timer.cc
               Image.cc
               Material.cc
+              KeyFrame.cc
+              Animation.cc
 )
 
 set ( headers CommonTypes.hh
@@ -52,6 +54,8 @@ set ( headers CommonTypes.hh
               Image.hh 
               Material.hh
               MouseEvent.hh
+              KeyFrame.hh
+              Animation.hh
 )
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)

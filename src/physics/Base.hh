@@ -197,6 +197,8 @@ namespace gazebo
       /// \brief Children of this entity
       protected: Base_V children;
 
+      protected: WorldPtr world;
+
       /// \brief Set to true if the object should be saved.
       private: bool saveable;
  
@@ -210,7 +212,6 @@ namespace gazebo
   
       private: bool selected;
   
-      private: WorldPtr world;
     };
     /// \}
   }

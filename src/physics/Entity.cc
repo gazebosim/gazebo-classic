@@ -21,7 +21,10 @@
 
 #include "msgs/msgs.h"
 
+#include "common/Events.hh"
 #include "common/Console.hh"
+#include "common/Animation.hh"
+#include "common/KeyFrame.hh"
 
 #include "transport/Publisher.hh"
 #include "transport/Transport.hh"
@@ -169,6 +172,17 @@ void Entity::SetCanonicalLink(bool _value)
 bool Entity::IsCanonicalLink() const
 {
   return this->isCanonicalLink;
+}
+
+/// Set an animation for this entity
+void Entity::SetAnimation( const common::AnimationPtr &_anim )
+{
+  this->animationStartPose = this->worldPose;
+  this->prevAnimationTime = this->world->GetSimTime();
+  this->animation = _anim;
+  this->connections.push_back(
+     event::Events::ConnectWorldUpdateStart(
+       boost::bind(&Entity::UpdateAnimation, this)));
 }
 
 void Entity::PublishPose()
@@ -409,6 +423,7 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
 void Entity::Fini()
 {
+  this->connections.clear();
   this->parentEntity.reset();
   Base::Fini();
 }
@@ -435,3 +450,18 @@ const sdf::ElementPtr &Entity::GetSDF()
   return Base::GetSDF();
 }
 
+void Entity::UpdateAnimation()
+{
+  common::KeyFrame kf(0);
+
+  this->animation->AddTime(
+      (this->world->GetSimTime() - this->prevAnimationTime).Double());
+  this->animation->GetInterpolatedKeyFrame(kf);
+ 
+  math::Pose offset;
+  offset.pos = kf.GetTranslate();
+  offset.rot = kf.GetRotation();
+
+  this->SetWorldPose(this->animationStartPose + offset);
+  this->prevAnimationTime = this->world->GetSimTime();
+}

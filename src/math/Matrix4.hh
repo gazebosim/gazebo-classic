@@ -18,6 +18,7 @@
 #define MATRIX4_HH
 
 #include <iostream>
+#include <assert.h>
 
 #include "math/Vector3.hh"
 #include "math/Matrix3.hh"
@@ -130,7 +131,19 @@ namespace gazebo
       /// \param _vec Vector3
       /// \return Resulting vector from multiplication
       public: Vector3 operator*(const Vector3 &_vec) const;
- 
+
+      public: inline double *operator [] (size_t _row) 
+              {
+                assert( _row < 4 );
+                return this->m[_row];
+              }
+
+       public: inline const double *operator [] (size_t _row) const
+              {
+                assert( _row < 4 );
+                return this->m[_row];
+              }
+
       /// \brief Output operator 
       /// \param _out Output stream
       /// \param _m Matrix to output

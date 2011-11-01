@@ -205,6 +205,16 @@ const Vector4 Vector4::operator*( const Vector4 &pt ) const
   return Vector4(this->x * pt.x, this->y * pt.y, this->z * pt.z, this->w*pt.w);
 }
 
+const Vector4 Vector4::operator*( const Matrix4 &_m ) const
+{
+  return Vector4(
+      this->x*_m[0][0] + this->y*_m[1][0] + this->z*_m[2][0] + this->w*_m[3][0],
+      this->x*_m[0][1] + this->y*_m[1][1] + this->z*_m[2][1] + this->w*_m[3][1],
+      this->x*_m[0][2] + this->y*_m[1][2] + this->z*_m[2][2] + this->w*_m[3][2],
+      this->x*_m[0][3] + this->y*_m[1][3] + this->z*_m[2][3] + this->w*_m[3][3]
+      );
+}
+
 const Vector4 &Vector4::operator*=( const Vector4 &pt )
 {
   this->x *= pt.x;

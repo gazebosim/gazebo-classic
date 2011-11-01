@@ -104,7 +104,7 @@ namespace gazebo
       /// \param pose The new world pose
       /// \param notify True = tell children of the pose change
       public: void SetWorldPose(const math::Pose &pose, bool notify=true);
-  
+
       /// \brief Get the linear velocity of the entity
       /// \return A math::Vector3 for the linear velocity
       public: virtual math::Vector3 GetRelativeLinearVel() const
@@ -153,6 +153,9 @@ namespace gazebo
       /// \brief A helper function that checks if this is a canonical body
       public: bool IsCanonicalLink() const;
 
+      /// \brief Set an animation for this entity
+      public: void SetAnimation( const common::AnimationPtr &_anim );
+
       private: void PublishPose();
  
       /// \brief Get the parent model, if one exists
@@ -162,12 +165,15 @@ namespace gazebo
       /// \brief Called when a new pose message arrives
       private: void OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg);
 
-      /// \brief This function is called when the entity's (or one of its parents)
-      ///        pose of the parent has changed
+      /// \brief This function is called when the entity's 
+      ///        (or one of its parents) pose of the parent has changed
       protected: virtual void OnPoseChange() {}
   
       /// \brief Handle a change of pose
       private: void UpdatePhysicsPose(bool update_children = true);
+
+      /// \brief Update an animation
+      private: void UpdateAnimation();
   
       /// A helper that prevents numerous dynamic_casts
       private: EntityPtr parentEntity;
@@ -192,6 +198,11 @@ namespace gazebo
       protected: msgs::Pose *poseMsg;
 
       protected: boost::recursive_mutex *poseMutex;
+      protected: common::AnimationPtr animation;
+      protected: common::Time prevAnimationTime;
+      protected: math::Pose animationStartPose;
+
+      protected: std::vector<event::ConnectionPtr> connections;
     };
     
     /// \}
