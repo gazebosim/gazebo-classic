@@ -126,6 +126,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
 
   this->depthMaterial->load();
 
+/*
   // Create a custom render queue invocation sequence for the depth 
   // render texture
   Ogre::RenderQueueInvocationSequence* invocationSequence =
@@ -139,6 +140,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   // Set the render queue invocation sequence for the depth render texture 
   // viewport
   this->viewport->setRenderQueueInvocationSequenceName(_textureName + "_DepthMap");
+*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
