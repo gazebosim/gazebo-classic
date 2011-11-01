@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "math/Matrix4.hh"
 
 namespace gazebo
 {
@@ -94,6 +95,8 @@ namespace gazebo
     
       /// \brief Multiplication operators
       public: const Vector4 operator*( const Vector4 &pt ) const;
+
+      public: const Vector4 operator*( const Matrix4 &_m ) const;
     
       /// \brief Multiplication operators
       public: const Vector4 &operator*=( const Vector4 &pt );

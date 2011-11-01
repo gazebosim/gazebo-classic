@@ -219,7 +219,6 @@ namespace gazebo
 
       protected: math::Pose newPose;
   
-      private: std::vector<event::ConnectionPtr> connections;
       private: sensors::Sensor_V sensors;
 
       /// \brief Joints that have this Link as a child Link

@@ -92,6 +92,66 @@ void Quaternion::SetToIdentity()
   this->z = 0.0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+Quaternion Quaternion::GetLog() const
+{
+  // If q = cos(A)+sin(A)*(x*i+y*j+z*k) where (x,y,z) is unit length, then
+  // log(q) = A*(x*i+y*j+z*k).  If sin(A) is near zero, use log(q) =
+  // sin(A)*(x*i+y*j+z*k) since sin(A)/A has limit 1.
+
+  Quaternion result;
+  result.w = 0.0;
+
+  if (std::fabs(this->w) < 1.0)
+  {
+    double fAngle = acos(this->w);
+    double fSin = sin(fAngle);
+    if (std::fabs(fSin) >= 1e-3 )
+    {
+      double fCoeff = fAngle/fSin;
+      result.x = fCoeff*x;
+      result.y = fCoeff*y;
+      result.z = fCoeff*z;
+      return result;
+    }
+  }
+
+  result.x = x;
+  result.y = y;
+  result.z = z;
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+Quaternion Quaternion::GetExp() const
+{
+  // If q = A*(x*i+y*j+z*k) where (x,y,z) is unit length, then
+  // exp(q) = cos(A)+sin(A)*(x*i+y*j+z*k).  If sin(A) is near zero,
+  // use exp(q) = cos(A)+A*(x*i+y*j+z*k) since A/sin(A) has limit 1.
+
+  double fAngle = sqrt(this->x*this->x+this->y*this->y+this->z*this->z);
+  double fSin = sin(fAngle);
+
+  Quaternion result;
+  result.w = cos(fAngle);
+
+  if ( std::fabs(fSin) >= 1e-3 )
+  {
+    double fCoeff = fSin/fAngle;
+    result.x = fCoeff*this->x; 
+    result.y = fCoeff*this->y;
+    result.z = fCoeff*this->z;
+  }
+  else
+  {
+    result.x = this->x;
+    result.y = this->y;
+    result.z = this->z;
+  }
+
+  return result;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Invert the quaternion
@@ -394,6 +454,13 @@ Vector3 Quaternion::operator*( const Vector3 &v ) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Multipcation operator
+Quaternion Quaternion::operator*( const double &_f ) const
+{
+  return Quaternion(this->w*_f, this->x*_f, this->y*_f, this->z*_f);
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 /// Rotate a vector using the quaternion
 Vector3 Quaternion::RotateVector(Vector3 vec) const
 {
@@ -528,6 +595,13 @@ bool Quaternion::operator!=(const Quaternion &_qt) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Negate operator
+Quaternion Quaternion::operator-() const
+{
+  return Quaternion(-this->w, -this->x, -this->y, -this->z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the quaternion as a 3x3 matrix
 Matrix3 Quaternion::GetAsMatrix3() const
 {
@@ -561,4 +635,65 @@ void Quaternion::Round(int _precision)
   this->y = precision(this->y, _precision);
   this->z = precision(this->z, _precision);
   this->w = precision(this->w, _precision);
+}
+
+/// Dot product
+double Quaternion::Dot(const Quaternion &_q) const
+{
+  return this->w*_q.w + this->x * _q.x + this->y*_q.y + this->z*_q.z;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+/// Spherical quadratic interpolation
+Quaternion Quaternion::Squad(double _fT, const Quaternion &_rkP,
+    const Quaternion &_rkA, const Quaternion &_rkB,
+    Quaternion &_rkQ, bool _shortestPath )
+{
+  double fSlerpT = 2.0f*_fT*(1.0f-_fT);
+  Quaternion kSlerpP = Slerp(_fT, _rkP, _rkQ, _shortestPath);
+  Quaternion kSlerpQ = Slerp(_fT, _rkA, _rkB);
+  return Slerp(fSlerpT, kSlerpP, kSlerpQ);
+}
+
+Quaternion Quaternion::Slerp (double _fT, const Quaternion &_rkP,
+    const Quaternion &_rkQ, bool _shortestPath)
+{ 
+  double fCos = _rkP.Dot(_rkQ);
+  Quaternion rkT;
+
+  // Do we need to invert rotation?
+  if (fCos < 0.0f && _shortestPath)
+  {
+    fCos = -fCos;
+    rkT = -_rkQ;
+  }
+  else
+  {
+    rkT = _rkQ;
+  }
+
+  if (std::fabs(fCos) < 1 - 1e-03)
+  {
+    // Standard case (slerp)
+    double fSin = sqrt(1 - (fCos*fCos));
+    double fAngle = atan2(fSin, fCos);
+    double fInvSin = 1.0f / fSin;
+    double fCoeff0 = sin((1.0f - _fT) * fAngle) * fInvSin;
+    double fCoeff1 = sin(_fT * fAngle) * fInvSin;
+    return _rkP * fCoeff0 + rkT * fCoeff1;
+  }
+  else
+  {
+    // There are two situations: 
+    // 1. "rkP" and "rkQ" are very close (fCos ~= +1), so we can do a linear
+    //    interpolation safely.
+    // 2. "rkP" and "rkQ" are almost inverse of each other (fCos ~= -1), there  
+    //    are an infinite number of possibilities interpolation. but we haven't 
+    //    have method to fix this case, so just use linear interpolation here.  
+    Quaternion t = _rkP * (1.0f - _fT) + rkT * _fT;
+    // taking the complement requires renormalisation
+    t.Normalize();
+    return t;
+  }
 }

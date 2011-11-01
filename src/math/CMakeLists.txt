@@ -13,6 +13,8 @@ set ( sources Angle.cc
               Vector3.cc
               Vector4.cc
               Helpers.cc
+              Spline.cc
+              RotationSpline.cc
 )
 
 set ( headers Angle.hh
@@ -29,6 +31,8 @@ set ( headers Angle.hh
               Vector4.hh
               MathTypes.hh
               Helpers.hh
+              Spline.hh
+              RotationSpline.hh
 )
 
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)
