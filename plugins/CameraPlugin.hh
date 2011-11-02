@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#ifndef __GAZEBO_CAMERA_PLUGIN_HH__
+#ifndef __GAZEBO_CAMERA_PLUGIN_HH__
 #include "sensors/CameraSensor.hh"
 #include "rendering/Camera.hh"
 #include "gazebo.h"
@@ -39,3 +41,4 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
   };
 }
+#endif

@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
+#ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 #include "sensors/DepthCameraSensor.hh"
 #include "rendering/DepthCamera.hh"
 #include "gazebo.h"
@@ -39,3 +42,4 @@ namespace gazebo
     private: event::ConnectionPtr newFrameConnection;
   };
 }
+#endif
