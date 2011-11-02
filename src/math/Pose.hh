@@ -76,8 +76,12 @@ namespace gazebo
       /// \brief Subtraction operator
       /// \param pose Pose to subtract from this one
       /// \return The resulting pose
-      public: Pose operator-(const Pose &pose) const;
-    
+      public: inline Pose operator-(const Pose &_pose) const
+              {
+                return Pose(this->CoordPositionSub(_pose), 
+                            this->CoordRotationSub(_pose.rot));
+              }
+
       /// \brief Subtraction operator
       /// \param pose Pose to subtract from this one
       /// \return The resulting pose
@@ -109,7 +113,17 @@ namespace gazebo
       /// \brief Subtract one position from another: result = this - pose
       /// \param pose Pose to subtract
       /// \return The resulting position
-      public: Vector3 CoordPositionSub(const Pose &pose) const;
+      public: inline Vector3 CoordPositionSub(const Pose &_pose) const
+              {
+                Quaternion tmp( 0.0,
+                    (this->pos - _pose.pos).x,
+                    (this->pos - _pose.pos).y,
+                    (this->pos - _pose.pos).z);
+
+                // result = pose.rot! * (this->pos - pose.pos) * pose.rot
+                tmp = _pose.rot.GetInverse() * (tmp * _pose.rot);
+                return Vector3(tmp.x, tmp.y, tmp.z);
+              }
     
       /// \brief Add one rotation to another: result =  this->rot + rot
       /// \param rot Rotation to add
@@ -119,7 +133,13 @@ namespace gazebo
       /// \brief Subtract one rotation from another: result = this->rot - rot
       /// \param rot The rotation to subtract
       /// \return The resulting rotation
-      public: Quaternion CoordRotationSub(const Quaternion &rot) const;
+      public: inline Quaternion CoordRotationSub(const Quaternion &rot) const
+              {
+                Quaternion result(rot.GetInverse() * this->rot);
+                result.Normalize();
+                return result;
+              }
+
     
       /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and 
       ///        this, find a

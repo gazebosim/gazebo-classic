@@ -92,18 +92,6 @@ const Pose &Pose::operator+=(const Pose &obj)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj
-Pose Pose::operator-(const Pose &_obj) const
-{
-  Pose result;
-
-  result.pos = this->CoordPositionSub(_obj);
-  result.rot = this->CoordRotationSub(_obj.rot);
-
-  return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Add two poses: result = this - obj
 const Pose &Pose::operator-=(const Pose &_obj)
 {
   this->pos = this->CoordPositionSub(_obj);
@@ -176,41 +164,10 @@ Vector3 Pose::CoordPositionAdd(const Pose &pose) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Subtract one position from another: result = this - pose
-Vector3 Pose::CoordPositionSub(const Pose &pose) const
-{
-  Quaternion tmp;
-  Vector3 result;
-
-  // result = pose.rot! * (this->pos - pose.pos) * pose.rot
-  tmp.x = (this->pos - pose.pos).x;
-  tmp.y = (this->pos - pose.pos).y;
-  tmp.z = (this->pos - pose.pos).z;
-  tmp.w = 0.0;
-
-  tmp = pose.rot.GetInverse() * (tmp * pose.rot);
-
-  result.x = tmp.x;
-  result.y = tmp.y;
-  result.z = tmp.z;
-
-  return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Add one rotation to another: result =  this->rot + rot
 Quaternion Pose::CoordRotationAdd(const Quaternion &rot) const
 {
   return Quaternion(rot * this->rot);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Subtract one rotation from another: result = this->rot - rot
-Quaternion Pose::CoordRotationSub(const Quaternion &rot) const
-{
-  Quaternion result(rot.GetInverse() * this->rot);
-  result.Normalize();
-  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
