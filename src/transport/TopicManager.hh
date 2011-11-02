@@ -188,6 +188,7 @@ namespace gazebo
       typedef std::map< std::string, std::list<CallbackHelperPtr> > SubMap;
 
       private: std::vector<PublicationPtr> advertisedTopics;
+      private: std::vector<PublicationPtr>::iterator advertisedTopicsEnd;
       private: SubMap subscribed_topics; 
       private: std::vector<NodePtr> nodes;
 

@@ -73,6 +73,7 @@ namespace gazebo
 
         this->publisherMutex->lock();
         this->publishers.push_back(publisher);
+        this->publishersEnd = this->publishers.end();
         this->publisherMutex->unlock();
 
         return publisher;
@@ -102,6 +103,8 @@ namespace gazebo
 
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;
+      private: std::vector<PublisherPtr>::iterator publishersIter;
+      private: std::vector<PublisherPtr>::iterator publishersEnd;
       private: static unsigned int idCounter;
       private: unsigned int id;
 

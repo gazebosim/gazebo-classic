@@ -29,6 +29,7 @@ using namespace transport;
 TopicManager::TopicManager()
 {
   this->nodeMutex = new boost::recursive_mutex();
+  this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +45,7 @@ TopicManager::~TopicManager()
 void TopicManager::Init()
 {
   this->advertisedTopics.clear();
+  this->advertisedTopicsEnd = this->advertisedTopics.end();
   this->subscribed_topics.clear();
   this->nodes.clear();
 }
@@ -69,6 +71,7 @@ void TopicManager::Fini()
   }
 
   this->advertisedTopics.clear();
+  this->advertisedTopicsEnd = this->advertisedTopics.end();
   this->subscribed_topics.clear();
   this->nodes.clear();
 }
@@ -142,7 +145,7 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 
   // Find the publication
   for (iter = this->advertisedTopics.begin(); 
-      iter != this->advertisedTopics.end(); iter++)
+      iter != this->advertisedTopicsEnd; iter++)
   {
     if ((*iter)->GetTopic() == _topic)
     {
@@ -311,6 +314,7 @@ PublicationPtr TopicManager::UpdatePublications( const std::string &topic,
     dbgPub = PublicationPtr( new Publication(topic+"/__dbg", tmp.GetTypeName()) );
     this->advertisedTopics.push_back( pub );
     this->advertisedTopics.push_back( dbgPub );
+    this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 
   return pub;

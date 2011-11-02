@@ -100,12 +100,11 @@ unsigned int Node::GetId() const
 
 void Node::ProcessPublishers()
 {
-  std::vector<PublisherPtr>::iterator iter;
-
   this->publisherMutex->lock();
-  for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
+  for (this->publishersIter = this->publishers.begin(); 
+       this->publishersIter != this->publishersEnd; this->publishersIter++)
   {
-    (*iter)->SendMessage();
+    (*this->publishersIter)->SendMessage();
   }
   this->publisherMutex->unlock();
 }
