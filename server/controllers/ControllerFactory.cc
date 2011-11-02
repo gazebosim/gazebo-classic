@@ -46,12 +46,14 @@
 
 using namespace gazebo;
 
-std::map<std::string, ControllerFactoryFn> ControllerFactory::controllers;
+std::map<std::string, ControllerFactoryFn> ControllerFactory::controllers = std::map<std::string, ControllerFactoryFn>();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register a controller class.  Use by dynamically loaded modules
 void ControllerFactory::RegisterController(std::string type, std::string classname, ControllerFactoryFn factoryfn)
 {
+  if (controllers.size() == 0) // bug in gcc 4.6 initialization of static map
+    controllers = std::map<std::string, ControllerFactoryFn>();
   controllers[classname] = factoryfn;
 }
 

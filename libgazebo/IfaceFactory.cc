@@ -38,6 +38,8 @@ std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
 // Register a iface class.  Use by dynamically loaded modules
 void IfaceFactory::RegisterIface(std::string classname, IfaceFactoryFn factoryfn)
 {
+  if (ifaces.size() == 0) // bug in gcc 4.6 initialization of static map
+    ifaces = std::map<std::string, IfaceFactoryFn>();
   ifaces[classname] = factoryfn;
 }
 
