@@ -16,7 +16,7 @@
 */
 
 #ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
-#ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
+#define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 #include "sensors/DepthCameraSensor.hh"
 #include "rendering/DepthCamera.hh"
 #include "gazebo.h"
