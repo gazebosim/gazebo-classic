@@ -174,13 +174,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
   this->stepType = odeElem->GetElement("solver")->GetValueString("type");
 
-  {
-#ifdef BUILD_TYPE_PROFILE
-  HeapLeakChecker::Disabler disabler;
-#endif
-
   this->contactCollisions = new dContactGeom[this->GetMaxContacts()];
-  }
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, 
@@ -767,12 +761,19 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
   if (numc != 0)
   {
-    // NATY: Put this functionality back in, but needs to be faster.
-    ContactFeedback* contactFeedback = new ContactFeedback();
-    contactFeedback->contact.Reset();
-    contactFeedback->contact.collision1 = collision1;
-    contactFeedback->contact.collision2 = collision2;
-    contactFeedback->feedbacks.resize(numc);
+    ContactFeedback *contactFeedback = NULL;
+
+    // NATY: improve performance 
+    // FIXME: this happens on a different thread then UpdateCollision?
+    if (collision1->GetContactsEnabled() || collision2->GetContactsEnabled())
+    {
+      // NATY: Put this functionality back in, but needs to be faster.
+      contactFeedback = new ContactFeedback();
+      contactFeedback->contact.collision1 = collision1;
+      contactFeedback->contact.collision2 = collision2;
+
+      this->contactFeedbacks.push_back( contactFeedback );
+    }
 
     //double h, kp, kd;
     for (j=0; j<numc; j++)
@@ -851,8 +852,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
       // NATY: improve performance
       // Store the contact info 
-      if (collision1->GetContactsEnabled() ||
-          collision2->GetContactsEnabled())
+      if (contactFeedback)
       {
         contactFeedback->contact.depths.push_back(
             contact.geom.depth);
@@ -868,13 +868,6 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
       dJointAttach (c, b1, b2);
     }
-
-    // NATY: improve performance // FIXME: this happens on a different thread then UpdateCollision?
-    if (collision1->GetContactsEnabled() ||
-        collision2->GetContactsEnabled())
-      this->contactFeedbacks.push_back( contactFeedback );
-    else
-      delete contactFeedback;
   }
 }
 

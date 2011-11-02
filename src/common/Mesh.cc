@@ -623,10 +623,6 @@ unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 // Put all the data into flat arrays
 void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
 {
-#ifdef BUILD_TYPE_PROFILE
-  HeapLeakChecker::Disabler disabler;
-#endif
-
   if (this->vertices.size() ==0 || this->indices.size() == 0)
     gzerr << "No vertices or indices\n";
 
