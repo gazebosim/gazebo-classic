@@ -75,7 +75,21 @@ namespace gazebo
   
     /// \brief Get the inverse of this quaternion
     /// \return Inverse quarenion
-    public: Quaternion GetInverse() const;
+    public: inline Quaternion GetInverse() const
+            {
+              Quaternion q;
+              double norm = this->w*this->w + this->x*this->x +
+                            this->y*this->y + this->z*this->z;
+
+              if (norm > 0.0)
+              {
+                q.w = this->w / norm;
+                q.x = -this->x / norm;
+                q.y = -this->y / norm;
+                q.z = -this->z / norm;
+              }
+              return q;
+            }
   
     /// \brief Set the quatern to the identity
     public: void SetToIdentity();
@@ -154,7 +168,14 @@ namespace gazebo
     /// \brief Multiplication operator
     /// \param qt Quaternion for multiplication
     /// \return This quatern multiplied by the parameter
-    public: Quaternion operator*( const Quaternion &qt ) const;
+    public: inline Quaternion operator*( const Quaternion &_q ) const
+            {
+              return Quaternion(
+                  this->w*_q.w - this->x*_q.x - this->y*_q.y - this->z*_q.z,
+                  this->w*_q.x + this->x*_q.w + this->y*_q.z - this->z*_q.y,
+                  this->w*_q.y - this->x*_q.z + this->y*_q.w + this->z*_q.x,
+                  this->w*_q.z + this->x*_q.y - this->y*_q.x + this->z*_q.w);
+            }
 
     /// \brief Multipcation operator
     /// \param _f Double factor
@@ -184,7 +205,12 @@ namespace gazebo
 
     /// \brief Rotate a vector using the quaternion
     /// \return The rotated vector
-    public: Vector3 RotateVector(Vector3 vec) const;
+    public: inline Vector3 RotateVector(const Vector3 &_vec) const
+            {
+              Quaternion tmp(0.0, _vec.x, _vec.y, _vec.z);
+              tmp = (*this) * (tmp * this->GetInverse());
+              return Vector3(tmp.x, tmp.y, tmp.z);
+            }
   
     /// \brief Do the reverse rotation of a vector by this quaternion
     public: Vector3 RotateVectorReverse(Vector3 vec) const;
@@ -194,7 +220,20 @@ namespace gazebo
     public: bool IsFinite() const;
   
     /// \brief Correct any nan
-    public: void Correct();
+    public: inline void Correct()
+            {
+              if (!finite(this->x))
+                this->x = 0;
+              if (!finite(this->y))
+                this->y = 0;
+              if (!finite(this->z))
+                this->z = 0;
+              if (!finite(this->w))
+                this->w = 1;
+
+              if (this->w == 0 && this->x == 0 && this->y == 0 && this->z == 0)
+                this->w = 1;
+            }
 
     /// \brief Get the quaternion as a 3x3 matrix
     public: Matrix3 GetAsMatrix3() const;

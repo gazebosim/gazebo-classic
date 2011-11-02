@@ -22,6 +22,7 @@
 #ifndef VECTOR3_HH
 #define VECTOR3_HH
 
+#include <math.h>
 #include <iostream>
 #include <fstream>
 
@@ -150,7 +151,15 @@ namespace gazebo
       public: bool IsFinite() const;
     
       /// \brief Corrects any nan values
-      public: void Correct();
+      public: inline void Correct()
+              {
+                if (!finite(this->x))
+                  this->x = 0;
+                if (!finite(this->y))
+                  this->y = 0;
+                if (!finite(this->z))
+                  this->z = 0;
+              }
     
       /// \brief [] operator
       public: double operator[](unsigned int index) const;

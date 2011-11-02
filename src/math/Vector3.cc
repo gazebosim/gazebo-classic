@@ -20,8 +20,6 @@
  * SVN: $Id$
  */
 
-#include <math.h>
-
 #include "math/Helpers.hh"
 #include "math/Vector3.hh"
 
@@ -356,18 +354,6 @@ bool Vector3::operator!=( const Vector3 &pt ) const
 bool Vector3::IsFinite() const
 {
   return finite(this->x) && finite(this->y) && finite(this->z);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Corrects any nan values
-void Vector3::Correct()
-{
-  if (!finite(this->x))
-    this->x = 0;
-  if (!finite(this->y))
-    this->y = 0;
-  if (!finite(this->z))
-    this->z = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

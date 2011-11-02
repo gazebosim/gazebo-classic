@@ -56,7 +56,9 @@ namespace gazebo
       public: bool IsFinite() const;
     
       /// \brief Fix any nan values
-      public: void Correct();
+      public: inline void Correct()
+              {  this->pos.Correct(); this->rot.Correct(); }
+
     
       /// \brief Get the inverse of this pose
       public: Pose GetInverse() const;

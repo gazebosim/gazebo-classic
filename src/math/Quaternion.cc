@@ -165,26 +165,6 @@ void Quaternion::Invert()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the inverse of this quaternion
-Quaternion Quaternion::GetInverse() const 
-{
-  Quaternion q;
-
-  double norm = this->w*this->w+this->x*this->x+this->y*this->y+this->z*this->z;
-
-  if (norm > 0.0)
-  {
-    q.w = this->w / norm;
-    q.x = -this->x / norm;
-    q.y = -this->y / norm;
-    q.z = -this->z / norm;
-  }
-
-  return q;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Normalize the quaternion
 void Quaternion::Normalize()
 {
@@ -412,20 +392,6 @@ Quaternion Quaternion::operator-( const Quaternion &qt ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Multiplication operator
-Quaternion Quaternion::operator*( const Quaternion &qt ) const
-{
-  Quaternion c;
-
-  c.x = this->w * qt.x + this->x * qt.w + this->y * qt.z - this->z * qt.y;
-  c.y = this->w * qt.y - this->x * qt.z + this->y * qt.w + this->z * qt.x;
-  c.z = this->w * qt.z + this->x * qt.y - this->y * qt.x + this->z * qt.w;
-  c.w = this->w * qt.w - this->x * qt.x - this->y * qt.y - this->z * qt.z;
-
-  return c;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Multiplication operator
 Quaternion Quaternion::operator*=( const Quaternion &qt )
 {
   *this = *this * qt;
@@ -459,27 +425,6 @@ Quaternion Quaternion::operator*( const double &_f ) const
 {
   return Quaternion(this->w*_f, this->x*_f, this->y*_f, this->z*_f);
 }
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Rotate a vector using the quaternion
-Vector3 Quaternion::RotateVector(Vector3 vec) const
-{
-  Quaternion tmp;
-  Vector3 result;
-
-  tmp.w = 0.0;
-  tmp.x = vec.x;
-  tmp.y = vec.y;
-  tmp.z = vec.z;
-
-  tmp = (*this) * (tmp * this->GetInverse());
-
-  result.x = tmp.x;
-  result.y = tmp.y;
-  result.z = tmp.z;
-
-  return result;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Do the reverse rotation of a vector by this quaternion
@@ -509,24 +454,6 @@ bool Quaternion::IsFinite() const
 {
   return finite(this->w) && finite(this->x) && finite(this->y) && finite(this->z);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Correct any nan
-void Quaternion::Correct()
-{
-  if (!finite(this->x))
-    this->x = 0;
-  if (!finite(this->y))
-    this->y = 0;
-  if (!finite(this->z))
-    this->z = 0;
-  if (!finite(this->w))
-    this->w = 1;
-
-  if (this->w == 0 && this->x == 0 && this->y == 0 && this->z == 0)
-    this->w = 1;
-}
-
 
 Vector3 Quaternion::GetXAxis() const
 {
