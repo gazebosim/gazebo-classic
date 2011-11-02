@@ -56,12 +56,13 @@ Base::~Base()
   this->SetParent(BasePtr());
 
   for (Base_V::iterator iter = this->children.begin(); 
-       iter != this->children.end(); iter++)
+       iter != this->childrenEnd; iter++)
   {
     if (*iter)
       (*iter)->SetParent(BasePtr());
   }
   this->children.clear();
+  this->childrenEnd = this->children.end();
   this->sdf.reset();
 }
 
@@ -92,10 +93,11 @@ void Base::Fini()
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
     (*iter)->Fini();
 
   this->children.clear();
+  this->childrenEnd = this->children.end();
   this->world.reset();
   this->parent.reset();
 }
@@ -167,6 +169,7 @@ void Base::AddChild(BasePtr child)
 
   // Add this child to our list
   this->children.push_back(child);
+  this->childrenEnd = this->children.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +177,7 @@ void Base::AddChild(BasePtr child)
 void Base::RemoveChild(unsigned int _id)
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
   {
     if ((*iter)->GetId() == (int)_id)
     {
@@ -183,6 +186,7 @@ void Base::RemoveChild(unsigned int _id)
       break;
     }
   }
+  this->childrenEnd = this->children.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,7 +228,7 @@ void Base::RemoveChild( const std::string &_name)
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); 
-       iter != this->children.end(); iter++)
+       iter != this->childrenEnd; iter++)
   {
     if ((*iter)->GetCompleteScopedName() == _name)
       break;
@@ -235,11 +239,13 @@ void Base::RemoveChild( const std::string &_name)
     (*iter)->Fini();
     this->children.erase( iter );
   }
+  this->childrenEnd = this->children.end();
 }
 
 void Base::RemoveChildren()
 {
   this->children.clear();
+  this->childrenEnd = this->children.end();
 }
  
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +260,7 @@ BasePtr Base::GetByName(const std::string &_name)
   Base_V::const_iterator iter;
 
   for (iter =  this->children.begin(); 
-       iter != this->children.end() && result ==NULL; iter++)
+       iter != this->childrenEnd && result ==NULL; iter++)
     result = (*iter)->GetByName(_name);
 
   return result;
@@ -333,7 +339,7 @@ void Base::Print(std::string prefix)
   gzmsg << prefix << this->GetName() << "\n";
 
   prefix += "  ";
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
     (*iter)->Print(prefix);
 }
 
@@ -344,7 +350,7 @@ bool Base::SetSelected( bool s )
   this->selected = s;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
     (*iter)->SetSelected(s);
 
   return true;
@@ -372,7 +378,7 @@ void Base::SetWorld(const WorldPtr &_newWorld)
   this->world = _newWorld;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
   {
     (*iter)->SetWorld(this->world);
   }

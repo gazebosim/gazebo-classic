@@ -121,7 +121,6 @@ void ODELink::Init()
 // Move callback. Use this to move the visuals
 void ODELink::MoveCallback(dBodyID id)
 {
-  math::Pose pose;
   const dReal *p;
   const dReal *r;
   ODELink *self = (ODELink*)(dBodyGetData(id));
@@ -130,14 +129,17 @@ void ODELink::MoveCallback(dBodyID id)
   p = dBodyGetPosition(id);
   r = dBodyGetQuaternion(id);
 
-  pose.pos.Set(p[0], p[1], p[2]);
-  pose.rot.Set(r[0], r[1], r[2], r[3] );
+  self->dirtyPose.pos.Set(p[0], p[1], p[2]);
+  self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3] );
 
   // subtracting cog location from ode pose
-  math::Vector3 cog_vec = pose.rot.RotateVector(self->inertial->GetCoG());
-  pose.pos -= cog_vec;
+  math::Vector3 cog_vec = self->dirtyPose.rot.RotateVector(
+      self->inertial->GetCoG());
 
-  self->SetWorldPose(pose,false);
+  self->dirtyPose.pos -= cog_vec;
+
+  self->world->dirtyPoses.push_back( self );
+  //self->SetWorldPose(self->dirtyPose,false);
 
   self->poseMutex->unlock();
 }
@@ -196,15 +198,15 @@ void ODELink::OnPoseChange()
     return;
   this->SetEnabled(true);
 
-  //math::Pose pose = this->comEntity->GetWorldPose();
-  math::Pose pose = this->GetWorldPose();
+  const math::Pose pose = this->GetWorldPose();
 
   math::Vector3 cog_vec = pose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
-  pose.pos += cog_vec;
-
-  dBodySetPosition(this->linkId, pose.pos.x, pose.pos.y, pose.pos.z);
+  dBodySetPosition(this->linkId, 
+      pose.pos.x + cog_vec.x, 
+      pose.pos.y + cog_vec.y, 
+      pose.pos.z + cog_vec.z);
 
   dQuaternion q;
   q[0] = pose.rot.w;

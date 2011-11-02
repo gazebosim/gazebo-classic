@@ -153,13 +153,6 @@ void Inertial::SetCoG(const math::Vector3 &c)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the center of gravity
-math::Vector3 Inertial::GetCoG() const
-{
-  return this->cog;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the mass matrix
 void Inertial::SetInertiaMatrix(double ixx, double iyy, double izz,
                                 double ixy, double ixz, double iyz)

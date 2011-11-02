@@ -88,7 +88,8 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const;
   
       /// \brief Get the absolute pose of the entity
-      public: virtual math::Pose GetWorldPose() const;
+      public: inline const math::Pose &GetWorldPose() const
+              { return this->worldPose; }
   
       /// \brief Get the pose of the entity relative to its parent
       public: math::Pose GetRelativePose() const;
@@ -151,7 +152,8 @@ namespace gazebo
       public: void SetCanonicalLink(bool _value);
 
       /// \brief A helper function that checks if this is a canonical body
-      public: bool IsCanonicalLink() const;
+      public: inline bool IsCanonicalLink() const
+              { return this->isCanonicalLink; }
 
       /// \brief Set an animation for this entity
       public: void SetAnimation( const common::AnimationPtr &_anim );
@@ -185,6 +187,12 @@ namespace gazebo
   
       public: void SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren=true);
 
+      public: const math::Pose &GetDirtyPose() const; 
+
+      private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify);
+
+      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify);
+
       /// The initial pose of the entity
       private: math::Pose initialRelativePose;
       private: math::Pose worldPose;
@@ -203,6 +211,8 @@ namespace gazebo
       protected: math::Pose animationStartPose;
 
       protected: std::vector<event::ConnectionPtr> connections;
+
+      protected: math::Pose dirtyPose;
     };
     
     /// \}

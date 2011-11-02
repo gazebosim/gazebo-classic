@@ -71,7 +71,9 @@ namespace gazebo
       public: void SetCoG(const math::Vector3 &c);
   
       /// \brief Get the center of gravity
-      public: math::Vector3 GetCoG() const;
+      public: inline const math::Vector3 &GetCoG() const
+              { return this->cog; }
+
   
       /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
       public: math::Vector3 GetPrincipalMoments() const;

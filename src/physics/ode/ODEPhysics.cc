@@ -383,7 +383,7 @@ void ODEPhysics::UpdateCollision()
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
-  this->UpdateCollision();
+  //this->UpdateCollision();
   {
     this->odeRaySensorMutex->lock();
     // Update the dynamical model

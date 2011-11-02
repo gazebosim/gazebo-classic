@@ -196,6 +196,7 @@ namespace gazebo
  
       /// \brief Children of this entity
       protected: Base_V children;
+      protected: Base_V::iterator childrenEnd;
 
       protected: WorldPtr world;
 

@@ -132,7 +132,7 @@ void Entity::SetStatic(const bool &s)
 
   this->isStatic = s ;
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
   {
     EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
     if (e)
@@ -166,12 +166,6 @@ math::Box Entity::GetBoundingBox() const
 void Entity::SetCanonicalLink(bool _value)
 {
   this->isCanonicalLink = _value;
-}
-
-// Am I a canonical Link for my Model parent?
-bool Entity::IsCanonicalLink() const
-{
-  return this->isCanonicalLink;
 }
 
 /// Set an animation for this entity
@@ -222,13 +216,6 @@ void Entity::SetRelativePose(const math::Pose &pose, bool notify)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the absolute pose of the entity
-math::Pose Entity::GetWorldPose() const
-{
-  return this->worldPose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set the abs twist of the entity
 void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren)
 {
@@ -244,7 +231,7 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->children.end(); iter++)
+            iter != this->childrenEnd; iter++)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -255,6 +242,66 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
     }
   }
 }
+
+void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
+{
+  math::Pose oldModelWorldPose = this->worldPose;
+
+  // initialization: (no children?) set own worldPose
+  this->worldPose = _pose;
+  this->worldPose.Correct();
+
+  if (_notify) 
+    this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
+
+  //
+  // user deliberate setting: lock and update all children's wp
+  //
+
+  // force an update of all children
+  // update all children pose, moving them with the model.
+  for (Base_V::iterator iter = this->children.begin();
+       iter != this->childrenEnd; iter++)
+  {
+    if ((*iter)->HasType(ENTITY))
+    {
+      Entity *entity = (Entity*)((*iter).get());
+      //EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
+      if (entity->IsCanonicalLink())
+        entity->worldPose = (entity->initialRelativePose + _pose);
+      else
+        entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+      if (_notify) 
+        entity->UpdatePhysicsPose(false);
+
+      entity->PublishPose();
+    }
+  }
+}
+
+void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
+{
+  this->worldPose = _pose;
+  this->worldPose.Correct();
+
+  if (_notify) 
+    this->UpdatePhysicsPose(true);
+
+  // also update parent model's pose
+  if (this->parentEntity->HasType(MODEL))
+  {
+    this->parentEntity->worldPose = _pose - this->initialRelativePose;
+    this->parentEntity->worldPose.Correct();
+
+    if (_notify) 
+      this->parentEntity->UpdatePhysicsPose(false);
+    this->parentEntity->PublishPose();
+  }
+  else
+    gzerr << "SWP for CB[" << this->GetName() << "] but parent["
+      << this->parentEntity->GetName() << "] is not a MODEL!\n";
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
@@ -287,110 +334,44 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &pose, bool notify)
+void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 {
+  this->GetWorld()->modelWorldPoseUpdateMutex->lock();
+
   if (this->HasType(MODEL))
-  {
-    this->GetWorld()->modelWorldPoseUpdateMutex->lock();
-
-    //gzerr << "SWP [" << this->GetName() << "]\n";
-    //printf("\nSWP Model [%s]\n",this->GetName().c_str());
-
-    math::Pose oldModelWorldPose = this->worldPose;
-
-    // initialization: (no children?) set own worldPose
-    this->worldPose = pose;
-    this->worldPose.Correct();
-
-    if (notify) 
-      this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
-
-    //
-    // user deliberate setting: lock and update all children's wp
-    //
-
-    // force an update of all children
-    // update all children pose, moving them with the model.
-    for  (Base_V::iterator iter = this->children.begin();
-          iter != this->children.end(); iter++)
-    {
-      if ((*iter)->HasType(ENTITY))
-      {
-        EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
-        if (entity->IsCanonicalLink())
-          entity->worldPose = (entity->initialRelativePose + pose);
-        else
-          entity->worldPose = ((entity->worldPose - oldModelWorldPose) + pose);
-        if (notify) 
-          entity->UpdatePhysicsPose(false);
-
-        entity->PublishPose();
-        //printf("SWP Model Body [%s]\t",(*iter)->GetName().c_str());
-      }
-    }
-
-    //printf("\nSWP Model [%s] DONE\n\n",this->GetName().c_str());
-    this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
-  }
+    this->SetWorldPoseModel(_pose, _notify);
   else if (this->IsCanonicalLink())
-  {
-
-    this->GetWorld()->modelWorldPoseUpdateMutex->lock();
-    //printf("c[%s]",this->GetName().c_str());
-    this->worldPose = pose;
-    this->worldPose.Correct();
-
-    if (notify) 
-      this->UpdatePhysicsPose(true);
-
-    // also update parent model's pose
-    if (this->parentEntity->HasType(MODEL))
-    {
-
-      this->parentEntity->worldPose = pose - this->initialRelativePose;
-      //this->parentEntity->worldPose.pos = pose.pos - pose.rot.RotateVector(this->initialRelativePose.pos);
-
-      this->parentEntity->worldPose.Correct();
-
-      if (notify) 
-        this->parentEntity->UpdatePhysicsPose(false);
-      this->parentEntity->PublishPose();
-    }
-    else
-      gzerr << "SWP for CB[" << this->GetName() << "] but parent["
-            << this->parentEntity->GetName() << "] is not a MODEL!\n";
-    //printf("C[%s]",this->GetName().c_str());
-    this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
-  }
+    this->SetWorldPoseCanonicalLink(_pose, _notify);
   else
   {
-    this->GetWorld()->modelWorldPoseUpdateMutex->lock();
-    //printf("b[%s]",this->GetName().c_str());
-    this->worldPose = pose;
+    this->worldPose = _pose;
     this->worldPose.Correct();
 
-    if (notify) 
+    if (_notify) 
       this->UpdatePhysicsPose(true);
-    //printf("B[%s]",this->GetName().c_str());
-    this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
   }
+
+  this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
 
   this->PublishPose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handle a change of pose
-void Entity::UpdatePhysicsPose(bool update_children)
+void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
-  if (update_children)
+  if (_updateChildren)
   {
     for  (Base_V::iterator iter = this->children.begin();
-          iter != this->children.end(); iter++)
+          iter != this->childrenEnd; iter++)
     {
       if ((*iter)->HasType(ENTITY))
-        boost::shared_static_cast<Entity>(*iter)->OnPoseChange();
+      {
+        ((Entity*)(*iter).get())->OnPoseChange();
+        //boost::shared_static_cast<Entity>(*iter)->OnPoseChange();
+      }
     }
   }
 }
@@ -464,4 +445,10 @@ void Entity::UpdateAnimation()
 
   this->SetWorldPose(this->animationStartPose + offset);
   this->prevAnimationTime = this->world->GetSimTime();
+}
+
+
+const math::Pose &Entity::GetDirtyPose() const
+{
+  return this->dirtyPose;
 }

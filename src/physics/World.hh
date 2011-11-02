@@ -260,6 +260,7 @@ namespace gazebo
       private: std::vector<WorldPluginPtr> plugins;
       private: std::list<std::string> deleteEntity;
 
+      public: std::list< Entity* > dirtyPoses;
 
       private: boost::mutex *receiveMutex;
     };

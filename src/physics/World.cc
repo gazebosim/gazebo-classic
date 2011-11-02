@@ -280,12 +280,23 @@ void World::Update()
   // Update all the models
   (*this.*modelUpdateFunc)();
 
-  // Update the physics engine
-  if (this->physicsEngine)
-    this->physicsEngine->UpdatePhysics();
-
   // TODO: put back in
   //Logger::Instance()->Update();
+
+  // Update the physics engine
+  if (this->physicsEngine)
+  {
+    this->physicsEngine->UpdateCollision();
+
+    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin(); 
+        iter != this->dirtyPoses.end(); iter++)
+    {
+      (*iter)->SetWorldPose( (*iter)->GetDirtyPose(), false );
+    }
+    this->dirtyPoses.clear();
+
+    this->physicsEngine->UpdatePhysics();
+  }
 
   this->ProcessEntityMsgs();
 
