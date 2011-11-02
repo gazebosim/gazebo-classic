@@ -39,20 +39,62 @@ namespace gazebo
     /// \{
 
     static std::string EntityTypename[] = { 
-      "common", "entity", "model", "body", "collision", "ball", "box", "cylinder", 
-      "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", 
-      "plane", "shape", "slider", "sphere", "trimesh", "universal", "light",
-      "visual" };
+      "common", 
+      "entity", 
+      "model", 
+      "link", 
+      "collision",
+      "light",
+      "visual",
+      "joint",
+      "ball",
+      "hinge2",
+      "hinge",
+      "slider",
+      "universal",
+      "shape",
+      "box",
+      "cylinder",
+      "heightmap",  
+      "map", 
+      "multiray", 
+      "ray", 
+      "plane",
+      "sphere", 
+      "trimesh"
+    };
 
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
-      public: enum EntityType{BASE, ENTITY, MODEL, LINK, COLLISION, 
-                              BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, 
-                              HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, 
-                              JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, 
-                              PLANE_SHAPE, SHAPE, SLIDER_JOINT, SCREW_JOINT, SPHERE_SHAPE, 
-                              TRIMESH_SHAPE, UNIVERSAL_JOINT, LIGHT, VISUAL};
+      public: enum EntityType{
+                BASE            = 0x00000001, 
+                ENTITY          = 0x00000002, 
+                MODEL           = 0x00000004, 
+                LINK            = 0x00000010, 
+                COLLISION       = 0x00000020, 
+                LIGHT           = 0x00000040, 
+                VISUAL          = 0x00000100,
+
+                JOINT           = 0x10000000, 
+                BALL_JOINT      = 0x10000001, 
+                HINGE2_JOINT    = 0x10000002, 
+                HINGE_JOINT     = 0x10000004, 
+                SLIDER_JOINT    = 0x10000010, 
+                SCREW_JOINT     = 0x10000020, 
+                UNIVERSAL_JOINT = 0x10000040, 
+
+                SHAPE           = 0x20000000, 
+                BOX_SHAPE       = 0x20000001, 
+                CYLINDER_SHAPE  = 0x20000002, 
+                HEIGHTMAP_SHAPE = 0x20000004, 
+                MAP_SHAPE       = 0x20000010, 
+                MULTIRAY_SHAPE  = 0x20000020, 
+                RAY_SHAPE       = 0x20000040, 
+                PLANE_SHAPE     = 0x20000100, 
+                SPHERE_SHAPE    = 0x20000200, 
+                TRIMESH_SHAPE   = 0x20000400
+              };
 
       /// \brief Constructor
       /// \param parent Parent of this object
@@ -139,19 +181,13 @@ namespace gazebo
       public: void RemoveChild( const std::string &_name);
   
       /// \brief Add a type specifier
-      public: void AddType( EntityType type );
+      public: void AddType( EntityType _type );
   
       /// \brief Get the type
-      public: bool HasType(const EntityType &t) const;
-  
-      /// \brief Get the number of types
-      public: unsigned int GetTypeCount() const;
+      public: bool HasType(const EntityType &_t) const;
   
       /// \brief Get a type by index
-      public: EntityType GetType(unsigned int index) const;
-  
-      /// \brief Get the leaf type (last type set)
-      public: EntityType GetLeafType() const;
+      public: unsigned int GetType() const;
   
       /// \brief Return the name of this entity with the model scope
       ///        model1::...::modelN::entityName
@@ -209,10 +245,9 @@ namespace gazebo
       /// \brief Used to automaticaly chose a unique ID on creation
       private: static unsigned int idCounter;
    
-      private: std::vector< EntityType > type;
+      private: unsigned int type;
   
       private: bool selected;
-  
     };
     /// \}
   }

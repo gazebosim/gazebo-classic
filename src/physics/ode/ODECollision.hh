@@ -84,6 +84,10 @@ namespace gazebo
       /// \brief Set the collision's space ID
       public: void SetSpaceId(dSpaceID spaceid);
   
+      private: void OnPoseChangeGlobal();
+      private: void OnPoseChangeRelative();
+      private: void OnPoseChangeNull();
+
       protected: dSpaceID spaceId;
   
       ///  ID for the sub-collision
@@ -91,6 +95,8 @@ namespace gazebo
 
       ///  Contact parameters
       public: ODESurfaceParamsPtr surface; 
+
+      private: void (ODECollision::*onPoseChangeFunc)();
     };
   
     /// \}

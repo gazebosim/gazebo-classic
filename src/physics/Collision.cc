@@ -208,9 +208,9 @@ ModelPtr Collision::GetModel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-Base::EntityType Collision::GetShapeType()
+unsigned int Collision::GetShapeType()
 {
-  return this->shape->GetLeafType();
+  return this->shape->GetType();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

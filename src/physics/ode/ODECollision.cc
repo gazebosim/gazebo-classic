@@ -40,6 +40,7 @@ ODECollision::ODECollision( LinkPtr _link )
   this->SetName("ODE_Collision");
   this->collisionId = NULL;
   this->surface.reset(new ODESurfaceParams());
+  this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,39 +104,13 @@ void ODECollision::Fini()
 // Pose change callback
 void ODECollision::OnPoseChange()
 {
-  math::Pose localPose;
-  dQuaternion q;
+  // Update all the models
+  //(*this.*onPoseChangeFunc)();
 
-  if (this->IsStatic() && this->collisionId && this->placeable)
-  {
-    // Transform into global pose since a static collision does not have a link 
-    localPose = this->GetWorldPose();
-
-    q[0] = localPose.rot.w;
-    q[1] = localPose.rot.x;
-    q[2] = localPose.rot.y;
-    q[3] = localPose.rot.z;
-
-    dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
-                     localPose.pos.z);
-    dGeomSetQuaternion(this->collisionId, q);
-  }
+ if (this->IsStatic() && this->collisionId && this->placeable)
+    this->OnPoseChangeGlobal();
   else if (this->collisionId && this->placeable)
-  {
-    // Transform into CoM relative Pose
-    localPose = this->GetRelativePose();
-
-    q[0] = localPose.rot.w;
-    q[1] = localPose.rot.x;
-    q[2] = localPose.rot.y;
-    q[3] = localPose.rot.z;
-
-    // Set the pose of the encapsulated collision; this is always relative
-    // to the CoM
-    dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
-        localPose.pos.z);
-    dGeomSetOffsetQuaternion(this->collisionId, q);
-  }
+    this->OnPoseChangeRelative();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,6 +127,16 @@ void ODECollision::SetCollision(dGeomID collisionId, bool placeable)
     dSpaceAdd(this->spaceId, this->collisionId);
     assert(dGeomGetSpace(this->collisionId) != 0);
   }
+
+  if (this->collisionId && this->placeable)
+  {
+    if (this->IsStatic())
+      this->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
+    else
+      this->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
+  }
+  else
+    this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   dGeomSetData(this->collisionId, this);
 }
@@ -228,4 +213,42 @@ dSpaceID ODECollision::GetSpaceId() const
 void ODECollision::SetSpaceId(dSpaceID spaceid)
 {
   this->spaceId = spaceid;
+}
+
+void ODECollision::OnPoseChangeGlobal()
+{
+  dQuaternion q;
+  // Transform into global pose since a static collision does not have a link 
+  const math::Pose localPose = this->GetWorldPose();
+
+  q[0] = localPose.rot.w;
+  q[1] = localPose.rot.x;
+  q[2] = localPose.rot.y;
+  q[3] = localPose.rot.z;
+
+  dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
+      localPose.pos.z);
+  dGeomSetQuaternion(this->collisionId, q);
+}
+
+void ODECollision::OnPoseChangeRelative()
+{
+  dQuaternion q;
+  // Transform into CoM relative Pose
+  const math::Pose localPose = this->GetRelativePose();
+
+  q[0] = localPose.rot.w;
+  q[1] = localPose.rot.x;
+  q[2] = localPose.rot.y;
+  q[3] = localPose.rot.z;
+
+  // Set the pose of the encapsulated collision; this is always relative
+  // to the CoM
+  dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
+      localPose.pos.z);
+  dGeomSetOffsetQuaternion(this->collisionId, q);
+}
+
+void ODECollision::OnPoseChangeNull()
+{
 }

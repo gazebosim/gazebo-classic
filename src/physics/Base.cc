@@ -36,7 +36,7 @@ unsigned int Base::idCounter = 0;
 Base::Base(BasePtr parent)
  : parent(parent)
 {
-  this->AddType(BASE);
+  this->type = BASE;
   this->id = ++idCounter;
   this->saveable = true;
   this->selected = false;
@@ -98,6 +98,7 @@ void Base::Fini()
 
   this->children.clear();
   this->childrenEnd = this->children.end();
+
   this->world.reset();
   this->parent.reset();
 }
@@ -198,10 +199,9 @@ unsigned int Base::GetChildCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a type specifier
-void Base::AddType( Base::EntityType t )
+void Base::AddType( Base::EntityType _t )
 {
-  this->type.push_back(t);
-  std::sort(this->type.begin(),this->type.end()); // need sort for binary_search to work
+  this->type = this->type | (unsigned int)_t;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +239,7 @@ void Base::RemoveChild( const std::string &_name)
     (*iter)->Fini();
     this->children.erase( iter );
   }
+
   this->childrenEnd = this->children.end();
 }
 
@@ -302,34 +303,16 @@ std::string Base::GetCompleteScopedName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the type
-bool Base::HasType(const Base::EntityType &t) const
+bool Base::HasType(const Base::EntityType &_t) const
 {
-  return std::binary_search(this->type.begin(), this->type.end(), t);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of types
-unsigned int Base::GetTypeCount() const
-{
-  return this->type.size();
+  return (_t & this->type) > 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a type by index
-Base::EntityType Base::GetType(unsigned int index) const
+unsigned int Base::GetType() const
 {
-  if (index < this->type.size())
-    return this->type[index];
-
-  gzthrow("Invalid type index");
-  return BASE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the leaf type (last type set)
-Base::EntityType Base::GetLeafType() const
-{
-  return this->type.back();
+  return this->type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

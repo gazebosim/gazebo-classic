@@ -91,7 +91,7 @@ namespace gazebo
       public: virtual math::Box GetBoundingBox() const = 0;
   
       /// \brief Get the shape type
-      public: Base::EntityType GetShapeType();
+      public: unsigned int GetShapeType();
   
       /// \brief Set the shape for this collision
       public: void SetShape(ShapePtr shape);
