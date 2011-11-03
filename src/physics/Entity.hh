@@ -192,6 +192,7 @@ namespace gazebo
       private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify);
 
       private: void SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify);
+      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
 
       /// The initial pose of the entity
       private: math::Pose initialRelativePose;
@@ -213,6 +214,8 @@ namespace gazebo
       protected: std::vector<event::ConnectionPtr> connections;
 
       protected: math::Pose dirtyPose;
+
+      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool);
     };
     
     /// \}

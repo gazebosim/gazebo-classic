@@ -19,7 +19,6 @@
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine INCLUDE_BULLET 1
 #cmakedefine INCLUDE_ODE 1
-#cmakedefine ODE_WG_TRUNK 1
 #cmakedefine ODE_SCREW_JOINT 1
 #cmakedefine INCLUDE_RTSHADER 1
 

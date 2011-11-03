@@ -165,7 +165,7 @@ else (build_errors)
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
   add_subdirectory(doc)
-  #add_subdirectory(deps)
+  add_subdirectory(deps)
 
   if (BUILD_GAZEBO)
     add_subdirectory(src)

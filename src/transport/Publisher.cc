@@ -34,10 +34,12 @@ Publisher::Publisher(unsigned int _limit)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType, unsigned int _limit)
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType, 
+                     unsigned int _limit, PublicationPtr &_publication)
   : topic(_topic), msgType(_msgType), queueLimit(_limit)
 {
   this->mutex = new boost::recursive_mutex();
+  this->publication = _publication;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,6 +68,10 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message )
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
+
+  if (!this->publication ||
+      (this->publication && this->publication->GetCallbackCount()==0))
+    return;
 
   // Save the latest message
   google::protobuf::Message *msg = _message.New();

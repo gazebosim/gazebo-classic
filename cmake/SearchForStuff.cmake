@@ -116,31 +116,6 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
   ENDIF (NOT TBB_FOUND)
 
-  #################################################
-  # Find ODE
-  pkg_check_modules(ODE ode>=${MIN_ODE_VERSION})
-  IF (NOT ODE_FOUND)
-    BUILD_ERROR ("Missing: ODE(http://www.ode.org)")
-    SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
-  ELSE (NOT ODE_FOUND)
-    SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
-  ENDIF (NOT ODE_FOUND)
-
-  ##############################################
-  #                                            #
-  #   USING ODE FROM TRUNK                     #
-  #                                            #
-  ##############################################
-  SET(ODE_WG_TRUNK_VERSION 0.11.1.68 CACHE INTERNAL "ODE version from trunk" FORCE)
-  pkg_check_modules(ODE_WG_TRUNK ode>=${ODE_WG_TRUNK_VERSION})
-  IF (NOT ODE_WG_TRUNK_FOUND)
-    SET (ODE_WG_TRUNK FALSE CACHE BOOL "No support for ODE trunk")
-    message(STATUS "No support for ODE trunk")
-  ELSE (NOT ODE_WG_TRUNK_FOUND)
-    SET (ODE_WG_TRUNK TRUE CACHE BOOL "Include support for ODE trunk")
-    message(STATUS "Include support for ODE trunk")
-  ENDIF (NOT ODE_WG_TRUNK_FOUND)
-
   ##############################################
   #                                            #
   #   patched ode version with screw joint     #
