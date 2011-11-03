@@ -1,9 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckCXXSourceCompiles)
 
-# John - ode version with joint damping
-SET(ODE_JOINT_DAMPING_VERSION 0.11.1.1 CACHE INTERNAL "ODE version with joint damping" FORCE)
-
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
 set (tinyxml_include_dirs "" CACHE STRING "Tinyxml include paths. Use this to override automatic detection.")
@@ -115,20 +112,6 @@ if (PKG_CONFIG_FOUND)
   IF (NOT TBB_FOUND)
     BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
   ENDIF (NOT TBB_FOUND)
-
-  ##############################################
-  #                                            #
-  #   patched ode version with screw joint     #
-  #                                            #
-  ##############################################
-  SET(ODE_WG_SCREW_PATCHES_VERSION 0.11.1.70 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
-  pkg_check_modules(ODE_WG_SCREW_PATCHES ode>=${ODE_WG_SCREW_PATCHES_VERSION})
-  IF (NOT ODE_WG_SCREW_PATCHES_FOUND)
-    SET (ODE_SCREW_JOINT FALSE CACHE BOOL "support for ODE quickstep experimental screw stuff")
-  ELSE (NOT ODE_WG_SCREW_PATCHES_FOUND)
-    SET (ODE_SCREW_JOINT TRUE CACHE BOOL "support for ODE quickstep experimental screw stuff")
-  ENDIF (NOT ODE_WG_SCREW_PATCHES_FOUND)
-
 
   #################################################
   # Find OGRE 

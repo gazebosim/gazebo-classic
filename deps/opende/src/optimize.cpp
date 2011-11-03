@@ -659,7 +659,7 @@ bool dOptimizeConvexPrimalDual(CvxOptParams& cparams, dReal eps_feas, dReal* x, 
   // verify that f is non-positive for constraint functions
   shared_array<dReal> fc(new dReal[m]);
   memcpy(fc.get(), f.get()+1, sizeof(dReal)*m);
-  dReal maxfc = *std::max_element(fc.get(), fc.get()+m);
+  //dReal maxfc = *std::max_element(fc.get(), fc.get()+m);
   dUASSERT(maxfc <= 0.0, "initial point infeasible");
 
   // setup lambda: must be greater than zero

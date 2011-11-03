@@ -57,11 +57,8 @@ set (headers BallJoint.hh
              UniversalJoint.hh
              World.hh
              Inertial.hh
+             ScrewJoint.hh
 )
-
-if (ODE_SCREW_JOINT)
-set (headers ${headers} ScrewJoint.hh)
-endif (ODE_SCREW_JOINT)
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)
 foreach (hdr ${headers})

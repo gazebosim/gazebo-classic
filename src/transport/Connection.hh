@@ -242,7 +242,7 @@ namespace gazebo
      /// \brief Get the remote endpoint
      private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
 
-     private: std::string GetHostname(boost::asio::ip::tcp::endpoint ep) const;
+     private: static std::string GetHostname(boost::asio::ip::tcp::endpoint ep);
 
       private: boost::asio::ip::tcp::socket *socket;
       private: boost::asio::ip::tcp::acceptor *acceptor;

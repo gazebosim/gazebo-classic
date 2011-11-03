@@ -60,13 +60,7 @@ void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &anchor)
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
-void ODEBallJoint::SetDamping( int /*_index*/, const double /*_damping*/ )
+void ODEBallJoint::SetDamping( int /*_index*/, const double _damping )
 {
-#ifdef INCLUDE_ODE_JOINT_DAMPING
-  dJointSetDamping( this->jointId, damping);
-#else
-  // alternaitvely, apply explicit damping
-  gzerr << "joint damping not implemented in ODE ball joint\n";
-#endif
+  dJointSetDamping( this->jointId, _damping);
 }
-

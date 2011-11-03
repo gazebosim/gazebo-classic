@@ -18,6 +18,7 @@ set (sources ODEPhysics.cc
              ODEMultiRayShape.cc
              ODEHeightmapShape.cc
              ODESurfaceParams.cc
+             ODEScrewJoint.cc
 )
 
 SET (headers ODEPhysics.hh
@@ -35,19 +36,14 @@ SET (headers ODEPhysics.hh
              ODEHeightmapShape.hh
              ODETypes.hh
              ODESurfaceParams.hh
+             ODEScrewJoint.hh
 )
-
-if (ODE_SCREW_JOINT)
-set (headers ${headers} ODEScrewJoint.hh)
-set (sources ${sources} ODEScrewJoint.cc)
-endif (ODE_SCREW_JOINT)
-
 
 add_library(gazebo_physics_ode SHARED ${sources})
 
 #LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")
-
 #set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}")
+
 set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC")
 target_link_libraries( gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
 INSTALL_LIBRARY(gazebo_physics_ode)

@@ -89,14 +89,9 @@ void ODEHinge2Joint::SetAxis( int index, const math::Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
-void ODEHinge2Joint::SetDamping( int /*_index*/, const double /*_damping*/ )
+void ODEHinge2Joint::SetDamping( int /*_index*/, const double _damping )
 {
-#ifdef INCLUDE_ODE_JOINT_DAMPING
-  // ode does not yet support Hinge2 joint damping
-  dJointSetDamping( this->jointId, damping);
-#else
-  gzerr << "joint damping not implemented in ODE hinge2 joint\n";
-#endif
+  dJointSetDamping( this->jointId, _damping);
 }
 
 //////////////////////////////////////////////////////////////////////////////

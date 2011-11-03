@@ -850,7 +850,7 @@ bool dxReallocateWorldProcessContext (dxWorld *world,
   //
   if (context)
   {
-    size_t stepperreq = BuildIslandsAndEstimateStepperMemoryRequirements(context, world, stepsize, stepperestimate);
+    /*size_t stepperreq =*/ BuildIslandsAndEstimateStepperMemoryRequirements(context, world, stepsize, stepperestimate);
     dIASSERT(stepperreq == dEFFICIENT_SIZE(stepperreq));
 
     // retrieve results of BuildIslandsAndEstimateStepperMemoryRequirements

@@ -24,9 +24,11 @@
 #cmakedefine HAVE_SQRTF 1
 #cmakedefine HAVE_VPRINTF 1
 #cmakedefine HAVE_VSNPRINTF 1
+#cmakedefine HAVE_SNPRINTF 1
 
-#cmakedefine HAVE_ALLOCA 1
 #cmakedefine HAVE_ALLOCA_H 1
+#cmakedefine HAVE_BOOST_SHARED_ARRAY_HPP 1
+#cmakedefine HAVE_FLOAT_H 1
 #cmakedefine HAVE_DLFCN_H 1
 #cmakedefine HAVE_GL_GLEXT_H 1
 #cmakedefine HAVE_GL_GLU_H 1
@@ -49,6 +51,10 @@
 #cmakedefine HAVE_SYS_TYPES_H 1
 #cmakedefine HAVE_TIME_H 1
 #cmakedefine HAVE_UNISTD_H 1
+#cmakedefine HAVE_LIMITS 1
+
+#cmakedefine HAVE_LIBM 1
+#cmakedefine HAVE_OBSTACK 1
 
 
 #ifdef HAVE_ALLOCA_H
@@ -69,10 +75,36 @@
  */
 typedef uintptr_t intP;
 
+/* Define to the type of arg 1 for `select'. */
+#define SELECT_TYPE_ARG1 int
+
+/* Define to the type of args 2, 3 and 4 for `select'. */
+#define SELECT_TYPE_ARG234 (fd_set *)
+
+/* Define to the type of arg 5 for `select'. */
+#define SELECT_TYPE_ARG5 (struct timeval *)
+
+
+/* compiling for a X86_64 system on a gcc-based platform? */
+#define X86_64_SYSTEM 1
+
+/* libou namespace for ODE */
+#define _OU_NAMESPACE odeou
+
+/* Atomic API of OU is enabled */
+#define dATOMICS_ENABLED 1
+
+/* Generic OU features are enabled */
+#define dOU_ENABLED 1
+
+/* Thread Local Storage API of OU is enabled */
+#define dTLS_ENABLED 1
+
 #define dDOUBLE 1
 #define dTRIMESH_ENABLED 1
 #define dTRIMESH_OPCODE 1
 #define __ODE__ 1
+#define STD_HEADERS 1
 
 #ifdef dSINGLE
        #define dEpsilon  FLT_EPSILON

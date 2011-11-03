@@ -107,12 +107,7 @@ void ODEScrewJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
 void ODEScrewJoint::SetDamping( int /*index*/, const double damping )
 {
   this->damping_coefficient = damping;
-#ifdef INCLUDE_ODE_JOINT_DAMPING
   dJointSetDamping( this->jointId, this->damping_coefficient);
-#else
-  // alternaitvely, apply explicit damping
-  this->ConnectJointUpdate(boost::bind(&ODEScrewJoint::ApplyDamping,this));
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////

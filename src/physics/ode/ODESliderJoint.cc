@@ -99,13 +99,7 @@ void ODESliderJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
 void ODESliderJoint::SetDamping( int /*index*/, const double damping )
 {
   this->damping_coefficient = damping;
-#ifdef INCLUDE_ODE_JOINT_DAMPING
-  // ode does not yet support slider joint damping
   dJointSetDamping( this->jointId, this->damping_coefficient);
-#else
-  // alternaitvely, apply explicit damping
-  this->ConnectJointUpdate(boost::bind(&ODESliderJoint::ApplyDamping,this));
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////

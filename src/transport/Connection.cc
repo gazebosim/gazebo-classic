@@ -567,7 +567,7 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
   return ep;
 }
 
-std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep) const
+std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep)
 {
   boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(ep);

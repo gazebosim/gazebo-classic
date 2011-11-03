@@ -5,12 +5,14 @@ include (CheckFunctionExists)
 include_directories( 
   ${CMAKE_CURRENT_BINARY_DIR} 
   ${CMAKE_SOURCE_DIR}/deps/opende/include
+  ${CMAKE_SOURCE_DIR}/deps/opende/ou/include
   ${CMAKE_SOURCE_DIR}/deps/libccd/include
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
   ${CMAKE_SOURCE_DIR}/deps/threadpool
 )
 
 add_subdirectory(OPCODE)
+add_subdirectory(ou)
 
 CHECK_CXX_SOURCE_COMPILES("#include <alloca.h> 
 int main() {alloca(0); return 1;}" HAVE_ALLOCA)
@@ -80,14 +82,27 @@ CHECK_CXX_SOURCE_COMPILES("#include <stdarg.h>
 #include <stdio.h>
 int main() {va_list ap; vsnprintf(0,0,0,ap); return 1;}" HAVE_VSNPRINTF)
 
-set (NDEBUG bool true)
+CHECK_CXX_SOURCE_COMPILES("#include <stdio.h> 
+int main() {snprintf(0,0,0); return 1;}" HAVE_SNPRINTF)
 
+CHECK_CXX_SOURCE_COMPILES("#include <limits> 
+int main() {return 1;}" HAVE_LIMITS)
+
+CHECK_CXX_SOURCE_COMPILES("#include <boost/shared_array.hpp> 
+int main() {return 1;}" HAVE_BOOST_SHARED_ARRAY_HPP)
+
+CHECK_CXX_SOURCE_COMPILES("#include <GL/gl.h>
+#include <GL/glext.h> 
+int main() {return 1;}" HAVE_GL_GLEXT_H)
+
+
+set (NDEBUG bool true)
 
 CHECK_INCLUDE_FILES(alloca.h HAVE_ALLOCA_H)
 CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)
-CHECK_INCLUDE_FILES(glext.h HAVE_GL_GLEXT_H)
-CHECK_INCLUDE_FILES(glu.h HAVE_GL_GLU_H)
-CHECK_INCLUDE_FILES(gl.h HAVE_GL_GL_H)
+CHECK_INCLUDE_FILES(float.h HAVE_FLOAT_H)
+CHECK_INCLUDE_FILES(GL/glu.h HAVE_GL_GLU_H)
+CHECK_INCLUDE_FILES(GL/gl.h HAVE_GL_GL_H)
 CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILES(malloc.h HAVE_MALLOC_H)
 CHECK_INCLUDE_FILES(math.h HAVE_MATH_H)
@@ -106,6 +121,9 @@ CHECK_INCLUDE_FILES(sys/time.h HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILES(sys/types.h HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILES(time.h HAVE_TIME_H)
 CHECK_INCLUDE_FILES(unistd.h HAVE_UNISTD_H)
+CHECK_INCLUDE_FILES(obstack.h HAVE_OBSTACK)
+
+CHECK_LIBRARY_EXISTS(m cos "" HAVE_LIBM)
 
 configure_file(${CMAKE_SOURCE_DIR}/deps/opende/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
@@ -219,10 +237,14 @@ include/ode/rotation.h
 include/ode/timer.h
 )
 
-add_library(gazebo_ode SHARED ${sources})
-target_link_libraries( gazebo_ode gazebo_opcode gazebo_ccd)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
+set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
-add_dependencies( gazebo_ode gazebo_opcode )
+add_library(gazebo_ode SHARED ${sources})
+target_link_libraries( gazebo_ode gazebo_opcode gazebo_ccd gazebo_opende_ou)
+
+add_dependencies( gazebo_ode gazebo_opcode)
+add_dependencies( gazebo_ode gazebo_opende_ou)
 
 INSTALL_LIBRARY(gazebo_ode)
 INSTALL_INCLUDES("ode" ${headers})

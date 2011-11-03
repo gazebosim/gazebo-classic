@@ -94,15 +94,9 @@ void ODEUniversalJoint::SetAxis( int index, const math::Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint damping
-void ODEUniversalJoint::SetDamping( int /*_index*/, const double /*_damping*/ )
+void ODEUniversalJoint::SetDamping( int /*_index*/, const double _damping )
 {
-#ifdef INCLUDE_ODE_JOINT_DAMPING
-  // ode does not yet support Universal joint damping
-  dJointSetDamping( this->jointId, damping);
-#else
-  // alternaitvely, apply explicit damping
-  gzerr << "joint damping not implemented in ODE ball joint\n";
-#endif
+  dJointSetDamping( this->jointId, _damping);
 }
 
 //////////////////////////////////////////////////////////////////////////////

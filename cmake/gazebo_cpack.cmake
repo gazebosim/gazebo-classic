@@ -16,7 +16,7 @@ list (APPEND CPACK_SOURCE_IGNORE_FILES ";Ogre.log;TODO;/.hg/;.swp$;/build/")
 include (InstallRequiredSystemLibraries)
 
 #execute_process(COMMAND dpkg --print-architecture _NPROCE)
-set (DEBIAN_PACKAGE_DEPENDS "libogre-dev (>=${MIN_OGRE_VERSION}), libode1 (>=${MIN_ODE_VERSION}), libboost-dev (>=${MIN_BOOST_VERSION}), libfreeimage (>=${MIN_FREEIMAGE_VERSION}), libqt4, libprotobuf, libtbb, libxml2, libboost-thread-dev, libboost-signals-dev, libyaml-dev, libbulletml-dev"  )
+set (DEBIAN_PACKAGE_DEPENDS "libogre-dev (>=${MIN_OGRE_VERSION}), libboost-dev (>=${MIN_BOOST_VERSION}), libfreeimage (>=${MIN_FREEIMAGE_VERSION}), libqt4, libprotobuf, libtbb, libxml2, libboost-thread-dev, libboost-signals-dev, libyaml-dev, libbulletml-dev"  )
 
 set (GAZEBO_CPACK_CFG_FILE "${PROJECT_BINARY_DIR}/cpack_options.cmake")
 
