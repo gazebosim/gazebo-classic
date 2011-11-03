@@ -28,7 +28,6 @@ void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor,
 {
   this->parentSensor = boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor);
   this->depthCamera = this->parentSensor->GetDepthCamera();
-  this->camera = this->parentSensor->GetCamera();
 
   if (!this->parentSensor)
   {
