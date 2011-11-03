@@ -105,8 +105,9 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
 
   this->SetDepthTarget( this->depthTarget );
 
-  this->viewport->setOverlaysEnabled(false);
-  this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
+  this->depthViewport->setOverlaysEnabled(false);
+  //this->depthViewport->setBackgroundColour(Ogre::ColourValue::Black);
+  this->depthViewport->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0,0,0)));
 
   // Create materials for all the render textures.
   Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
@@ -139,7 +140,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
 
   // Set the render queue invocation sequence for the depth render texture 
   // viewport
-  this->viewport->setRenderQueueInvocationSequenceName(_textureName + "_DepthMap");
+  this->depthViewport->setRenderQueueInvocationSequenceName(_textureName + "_DepthMap");
 */
 }
 
@@ -289,13 +290,13 @@ void DepthCamera::SetDepthTarget( Ogre::RenderTarget *target )
   if (this->depthTarget)
   {
     // Setup the viewport to use the texture
-    this->viewport = this->depthTarget->addViewport(this->camera);
-    this->viewport->setClearEveryFrame(true);
-    this->viewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
-    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->depthViewport = this->depthTarget->addViewport(this->camera);
+    this->depthViewport->setClearEveryFrame(true);
+    this->depthViewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
+    this->depthViewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
-    double ratio = (double)this->viewport->getActualWidth() / 
-                   (double)this->viewport->getActualHeight();
+    double ratio = (double)this->depthViewport->getActualWidth() / 
+                   (double)this->depthViewport->getActualHeight();
 
     double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);

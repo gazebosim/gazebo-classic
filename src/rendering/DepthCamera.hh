@@ -104,6 +104,7 @@ namespace gazebo
       protected: Ogre::Texture *depthTexture;
       protected: Ogre::RenderTarget *depthTarget;
       public: virtual void SetDepthTarget( Ogre::RenderTarget *target );
+      protected: Ogre::Viewport *depthViewport;
     };
     
     /// \}
