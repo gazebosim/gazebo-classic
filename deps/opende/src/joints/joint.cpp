@@ -57,6 +57,10 @@ dxJoint::dxJoint( dxWorld *w ) :
 
     w->nj++;
     feedback = 0;
+
+    // joint damping
+    use_damping = false;
+    damping_coefficient = 0.0;
 }
 
 dxJoint::~dxJoint()

@@ -25,6 +25,62 @@
 #include "hinge.h"
 #include "joint_internal.h"
 
+//****************************************************************************
+// helper function: shortest_angular_distance implementation
+    
+  /*!
+   * \brief normalize_angle_positive
+   *
+   *        Normalizes the angle to be 0 to 2*M_PI
+   *        It takes and returns radians.
+   */
+  static inline double normalize_angle_positive(double angle)
+  {
+    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
+  }
+
+
+  /*!
+   * \brief normalize
+   *
+   * Normalizes the angle to be -M_PI circle to +M_PI circle
+   * It takes and returns radians.
+   *
+   */    
+  static inline double normalize_angle(double angle)
+  {
+    double a = normalize_angle_positive(angle);
+    if (a > M_PI)
+      a -= 2.0 *M_PI;
+    return a;
+  }
+
+    
+  /*!
+   * \function
+   * \brief shortest_angular_distance
+   *
+   * Given 2 angles, this returns the shortest angular
+   * difference.  The inputs and ouputs are of course radians.
+   *
+   * The result
+   * would always be -pi <= result <= pi.  Adding the result
+   * to "from" will always get you an equivelent angle to "to".
+   */
+    
+  static inline double shortest_angular_distance(double from, double to)
+  {
+    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));
+	
+    if (result > M_PI)
+      // If the result > 180,
+      // It's shorter the other way.
+      result = -(2.0*M_PI - result);
+	
+    return normalize_angle(result);
+  }
+
+
 
 //****************************************************************************
 // hinge
@@ -40,6 +96,7 @@ dxJointHinge::dxJointHinge( dxWorld *w ) :
     axis2[0] = 1;
     dSetZero( qrel, 4 );
     limot.init( world );
+    cumulative_angle = 0;
 }
 
 
@@ -60,16 +117,22 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
         info->m = 6; // powered hinge needs an extra constraint row
     else info->m = 5;
 
+    // if proper joint limits are specified
     // see if we're at a joint limit.
-    if (( limot.lostop >= -M_PI || limot.histop <= M_PI ) &&
-            limot.lostop <= limot.histop )
+    if ( limot.lostop <= limot.histop )
     {
         dReal angle = getHingeAngle( node[0].body,
                                      node[1].body,
                                      axis1, qrel );
-        if ( limot.testRotationalLimit( angle ) )
+        // from angle, update cumulative_angle, which does not wrap
+        cumulative_angle = cumulative_angle + shortest_angular_distance(cumulative_angle,angle);
+
+        if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
     }
+    // joint damping
+    if ( use_damping )
+      info->m = 6;
 }
 
 
@@ -146,6 +209,22 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
 
     // if the hinge is powered, or has joint limits, add in the stuff
     limot.addLimot( this, info, 5, ax1, 1 );
+
+    // joint damping
+    if (this->use_damping)
+    {
+      // added J1ad and J2ad for damping, only 1 row
+      info->J1ad[0] = ax1[0];
+      info->J1ad[1] = ax1[1];
+      info->J1ad[2] = ax1[2];
+      if ( this->node[1].body )
+      {
+        info->J2ad[0] = -ax1[0];
+        info->J2ad[1] = -ax1[1];
+        info->J2ad[2] = -ax1[2];
+      }
+      // there's no rhs for damping setup, all we want to use is the jacobian information above
+    }
 }
 
 
@@ -296,10 +375,12 @@ dReal dJointGetHingeAngle( dJointID j )
                                    joint->node[1].body,
                                    joint->axis1,
                                    joint->qrel );
+        // from angle, update cumulative_angle, which does not wrap
+        joint->cumulative_angle = joint->cumulative_angle + shortest_angular_distance(joint->cumulative_angle,ang);
         if ( joint->flags & dJOINT_REVERSE )
-            return -ang;
+            return -joint->cumulative_angle;
         else
-            return ang;
+            return joint->cumulative_angle;
     }
     else return 0;
 }

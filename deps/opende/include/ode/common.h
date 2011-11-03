@@ -30,6 +30,9 @@
 extern "C" {
 #endif
 
+#define dDOUBLE 1
+#define __ODE__ 1
+
 
 #define PURE_INLINE static __inline
 
@@ -71,7 +74,7 @@ extern "C" {
        msg " in %s()", __FUNCTION__);
 #    define dDEBUGMSG(msg) dMessage (d_ERR_UASSERT,				\
        msg " in %s() File %s Line %d", __FUNCTION__, __FILE__,__LINE__);
-#  else
+#  else /* not __GNUC__*/
 #    define dIASSERT(a) if (!(a)) dDebug (d_ERR_IASSERT, \
        "assertion \"" #a "\" failed in %s:%d",__FILE__,__LINE__);
 #    define dUASSERT(a,msg) if (!(a)) dDebug (d_ERR_UASSERT, \
@@ -86,7 +89,7 @@ extern "C" {
 #endif
 #define dAASSERT(a) dUASSERT(a,"Bad argument(s)")
 
-/* Macro used to suppress unused variable warning */
+/* Macro used to suppress unused variable warning*/
 #define dVARIABLEUSED(a) ((void)a)
 
 /* floating point data type, vector, matrix and quaternion types */
@@ -110,16 +113,16 @@ typedef double dReal;
 #endif /* dTRIMESH_ENABLED */
 
 /* Define a type for indices, either 16 or 32 bit, based on build option
-TODO: Currently GIMPACT only supports 32 bit indices.*/
+ TODO: Currently GIMPACT only supports 32 bit indices.*/
 #if dTRIMESH_16BIT_INDICES
 #if dTRIMESH_GIMPACT
 typedef uint32 dTriIndex;
-#else /* dTRIMESH_GIMPACT */
+#else /* dTRIMESH_GIMPACT*/
 typedef uint16 dTriIndex;
-#endif /* dTRIMESH_GIMPACT */
+#endif /* dTRIMESH_GIMPACT*/
 #else /* dTRIMESH_16BIT_INDICES*/
 typedef uint32 dTriIndex;
-#endif /* dTRIMESH_16BIT_INDICES */
+#endif /* dTRIMESH_16BIT_INDICES*/
 
 /* round an integer up to a multiple of 4, except that 0 and 1 are unmodified
  * (used to compute matrix leading dimensions)
@@ -245,6 +248,7 @@ typedef enum {
   dJointTypeNone = 0,		/* or "unknown" */
   dJointTypeBall,
   dJointTypeHinge,
+  dJointTypeScrew,
   dJointTypeSlider,
   dJointTypeContact,
   dJointTypeUniversal,

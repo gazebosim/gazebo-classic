@@ -26,10 +26,12 @@
 #ifndef _ODE_OBJECT_H_
 #define _ODE_OBJECT_H_
 
+#include <limits>
 #include <ode/common.h>
 #include <ode/memory.h>
 #include <ode/mass.h>
 #include "array.h"
+#include <boost/threadpool.hpp>
 
 class dxStepWorkingMemory;
 
@@ -44,7 +46,7 @@ enum {
   dxBodyLinearDamping =             32, // use linear damping
   dxBodyAngularDamping =            64, // use angular damping
   dxBodyMaxAngularSpeed =           128,// use maximum angular speed
-  dxBodyGyroscopic =                256 // use gyroscopic term
+  dxBodyGyroscopic =                256// use gyroscopic term
 };
 
 
@@ -66,6 +68,7 @@ struct dObject : public dBase {
   dObject *next;		// next object of this type in list
   dObject **tome;		// pointer to previous object's next ptr
   int tag;			// used by dynamics algorithms
+  int island_tag;		// used by island algorithms for grouping
   void *userdata;		// user settable data
   dObject(dxWorld *w);
   virtual ~dObject() { }
@@ -93,10 +96,26 @@ struct dxDampingParameters {
 
 // quick-step parameters
 struct dxQuickStepParameters {
+  int precon_iterations;	// number of preconditioned SOR iterations to perform (without error correction)
   int num_iterations;		// number of SOR iterations to perform
   dReal w;			// the SOR over-relaxation parameter
+  int num_chunks;		// divide rows to these many chunks
+  int num_overlap;		// divide rows but over lap this many rows
+  dReal sor_lcp_tolerance;	// the stop if rms_error falls below this
+  dReal rms_error;      	// rms_error for this time step
 };
 
+// robust-step parameters
+struct dxRobustStepParameters {
+  dxRobustStepParameters() 
+  { 
+     eps_feas = eps = std::numeric_limits<dReal>::epsilon(); 
+     max_iterations = 100;
+  }
+  dReal eps_feas;                       // feasibility tolerance
+  dReal eps;                            // solution tolerance
+  int max_iterations;                   // maximum number of iterations
+};
 
 // contact generation parameters
 struct dxContactParameters {
@@ -138,6 +157,8 @@ struct dxBody : public dObject {
   dReal max_angular_speed;      // limit the angular velocity to this magnitude
 
   dxBody(dxWorld *w);
+
+  dxContactParameters* contactp; // option to set contact max_vel and min_depths per body
 };
 
 
@@ -151,11 +172,15 @@ struct dxWorld : public dBase {
   dxAutoDisable adis;		// auto-disable parameters
   int body_flags;               // flags for new bodies
   dxStepWorkingMemory *wmem; // Working memory object for dWorldStep/dWorldQuickStep
+  dxStepWorkingMemory *island_wmems[1000]; // Working memory object for dWorldStep/dWorldQuickStep
 
   dxQuickStepParameters qs;
+  dxRobustStepParameters rs;
   dxContactParameters contactp;
   dxDampingParameters dampingp; // damping parameters
   dReal max_angular_speed;      // limit the angular velocity to this magnitude
+  boost::threadpool::pool *threadpool;
+  boost::threadpool::pool *row_threadpool;
 };
 
 

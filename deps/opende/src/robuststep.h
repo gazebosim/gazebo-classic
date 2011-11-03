@@ -20,35 +20,17 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef _ODE_JOINT_HINGE_H_
-#define _ODE_JOINT_HINGE_H_
+#ifndef _ROBUST_STEP_H_
+#define _ROBUST_STEP_H_
 
-#include "joint.h"
+#include <ode/common.h>
 
+size_t dxEstimateRobustStepMemoryRequirements(dxBody* const* body, int nb, dxJoint* const* _joint, int _nj);
 
-// hinge
-
-struct dxJointHinge : public dxJoint
-{
-    dVector3 anchor1;   // anchor w.r.t first body
-    dVector3 anchor2;   // anchor w.r.t second body
-    dVector3 axis1;     // axis w.r.t first body
-    dVector3 axis2;     // axis w.r.t second body
-    dQuaternion qrel;   // initial relative rotation body1 -> body2
-    dxJointLimitMotor limot; // limit and motor information
-    dReal cumulative_angle; // save a cumulative angle so we can use larger then +/-pi limits
-
-    dxJointHinge( dxWorld *w );
-    virtual void getSureMaxInfo( SureMaxInfo* info );
-    virtual void getInfo1( Info1* info );
-    virtual void getInfo2( Info2* info );
-    virtual dJointType type() const;
-    virtual size_t size() const;
-
-    virtual void setRelativeValues();
-
-    void computeInitialRelativeRotation();
-};
+void dRobustStepIsland (dxWorldProcessContext* context, dxWorld *world,
+			dxBody * const *body, int nb,
+			dxJoint * const *joint, int nj,
+			dReal stepsize);
 
 
 

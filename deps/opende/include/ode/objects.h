@@ -76,6 +76,19 @@ ODE_API void dWorldDestroy (dWorldID world);
  */
 ODE_API void dWorldSetGravity (dWorldID, dReal x, dReal y, dReal z);
 
+/**
+ * @brief Set the number of thread pool threads for islands
+ *
+ * @ingroup world
+ */
+ODE_API void dWorldSetIslandThreads (dWorldID, int num_island_threads);
+
+/**
+ * @brief Set the number of thread pool threads for quickstep
+ *
+ * @ingroup world
+ */
+ODE_API void dWorldSetQuickStepThreads (dWorldID, int num_quickstep_threads);
 
 /**
  * @brief Get the gravity vector for a given world.
@@ -309,6 +322,16 @@ ODE_API int dWorldSetStepMemoryManager(dWorldID w, const dWorldStepMemoryFunctio
 ODE_API int dWorldStep (dWorldID w, dReal stepsize);
 
 /**
+ * @brief Step the world using the algorithm of Drumwright and Shell.
+ * This uses a "big matrix" method that takes time on the order of m^3.
+ * This is currently the most robust and accurate method.
+ * @ingroup world
+ * @param stepsize the number of seconds that the simulation has to advance.
+ * @returns 1 for success and 0 for failure
+ */
+ODE_API int dWorldRobustStep (dWorldID, dReal stepsize);
+
+/**
  * @brief Quick-step the world.
  *
  * This uses an iterative method that takes time on the order of m*N
@@ -372,6 +395,44 @@ ODE_API void dWorldImpulseToForce
  dReal ix, dReal iy, dReal iz, dVector3 force
  );
 
+/**
+ * @brief Set the maximum number of iterations that the RobustStep method 
+ *        performs per step.
+ * @ingroup world
+ * @remarks
+ * More iterations may give a more accurate solution, but may take
+ * longer to compute.
+ * @param num The default is 100 iterations.
+ */
+ODE_API void dWorldSetRobustStepMaxIterations (dWorldID, int num);
+
+
+/**
+ * @brief Set the tolerance of when sor lcp stops
+ * @param num The default is 1 chunk
+ */
+void dWorldSetQuickStepTolerance (dWorldID, dReal tol);
+
+/**
+ * @brief Set the number of chunks quickstep divide up constraint rows
+ * @param num The default is 1 chunk
+ */
+void dWorldSetQuickStepNumChunks (dWorldID, int num);
+
+/**
+ * @brief Set the number of overlap when quickstep divide up constraint rows
+ * @param num The default is 0 overlap
+ */
+void dWorldSetQuickStepNumOverlap (dWorldID, int num);
+
+/**
+ * @brief Get the maximum number of iterations that the RobustStep method 
+ *        performs per step.
+ * @ingroup world
+ * @return nr of iterations
+ */
+ODE_API int dWorldGetRobustStepMaxIterations (dWorldID);
+
 
 /**
  * @brief Set the number of iterations that the QuickStep method performs per
@@ -383,6 +444,18 @@ ODE_API void dWorldImpulseToForce
  * @param num The default is 20 iterations.
  */
 ODE_API void dWorldSetQuickStepNumIterations (dWorldID, int num);
+
+
+/**
+ * @brief Set the number of preconditioning iterations that the QuickStep method performs per
+ *        step.
+ * @ingroup world
+ * @remarks
+ * More iterations will give a more accurate solution, but will take
+ * longer to compute.
+ * @param num The default is 0 iterations.
+ */
+ODE_API void dWorldSetQuickStepPreconIterations (dWorldID, int num);
 
 
 /**
@@ -406,6 +479,13 @@ ODE_API void dWorldSetQuickStepW (dWorldID, dReal over_relaxation);
  * @returns the over-relaxation setting
  */
 ODE_API dReal dWorldGetQuickStepW (dWorldID);
+
+/**
+ * @brief Get the RMS error of the quickstep step
+ * @ingroup world
+ * @returns the rms error
+ */
+ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
 
 /* World contact parameter functions */
 
@@ -888,6 +968,26 @@ ODE_API void *dBodyGetData (dBodyID);
  * @ingroup bodies
  */
 ODE_API void dBodySetPosition   (dBodyID, dReal x, dReal y, dReal z);
+
+/**
+ * @brief Set the orientation of a body.
+ * @ingroup bodies
+ * @remarks
+ * After setting, the outcome of the simulation is undefined
+ * if the new configuration is inconsistent with the joints/constraints
+ * that are present.
+ */
+ODE_API void dBodySetMinDepth   (dBodyID, const double d);
+
+/**
+ * @brief Set the orientation of a body.
+ * @ingroup bodies
+ * @remarks
+ * After setting, the outcome of the simulation is undefined
+ * if the new configuration is inconsistent with the joints/constraints
+ * that are present.
+ */
+ODE_API void dBodySetMaxVel   (dBodyID, const double d);
 
 /**
  * @brief Set the orientation of a body.
@@ -1554,6 +1654,14 @@ ODE_API dJointID dJointCreateHinge (dWorldID, dJointGroupID);
 ODE_API dJointID dJointCreateSlider (dWorldID, dJointGroupID);
 
 /**
+ * @brief Create a new joint of the screw type.
+ * @ingroup joints
+ * @param dJointGroupID set to 0 to allocate the joint normally.
+ * If it is nonzero the joint is allocated in the given joint group.
+ */
+ODE_API dJointID dJointCreateScrew (dWorldID, dJointGroupID);
+
+/**
  * @brief Create a new joint of the contact type.
  * @ingroup joints
  * @param dJointGroupID set to 0 to allocate the joint normally.
@@ -1722,6 +1830,18 @@ ODE_API int dJointIsEnabled (dJointID);
 ODE_API void dJointSetData (dJointID, void *data);
 
 /**
+ * @brief Set screw joint thread pitch
+ * @ingroup joints
+ */
+ODE_API void dJointSetScrewThreadPitch (dJointID, dReal thread_pitch);
+
+/**
+ * @brief Set joint viscous damping coefficient
+ * @ingroup joints
+ */
+ODE_API void dJointSetDamping (dJointID, dReal damping);
+
+/**
  * @brief Get the user-data pointer
  * @ingroup joints
  */
@@ -1734,6 +1854,7 @@ ODE_API void *dJointGetData (dJointID);
  * \li dJointTypeBall
  * \li dJointTypeHinge
  * \li dJointTypeSlider
+ * \li dJointTypeScrew
  * \li dJointTypeContact
  * \li dJointTypeUniversal
  * \li dJointTypeHinge2
@@ -1882,6 +2003,34 @@ ODE_API void dJointSetSliderParam (dJointID, int parameter, dReal value);
  * @ingroup joints
  */
 ODE_API void dJointAddSliderForce(dJointID joint, dReal force);
+
+/**
+ * @brief set the joint axis
+ * @ingroup joints
+ */
+ODE_API void dJointSetScrewAxis (dJointID, dReal x, dReal y, dReal z);
+
+/**
+ * @ingroup joints
+ */
+ODE_API void dJointSetScrewAxisDelta (dJointID, dReal x, dReal y, dReal z, dReal ax, dReal ay, dReal az);
+
+/**
+ * @brief set joint parameter
+ * @ingroup joints
+ */
+ODE_API void dJointSetScrewParam (dJointID, int parameter, dReal value);
+
+/**
+ * @brief Applies the given force in the screw's direction.
+ *
+ * That is, it applies a force with specified magnitude, in the direction of
+ * screw's axis, to body1, and with the same magnitude but opposite
+ * direction to body2.  This function is just a wrapper for dBodyAddForce().
+ * @ingroup joints
+ */
+ODE_API void dJointAddScrewForce(dJointID joint, dReal force);
+ODE_API void dJointAddScrewTorque(dJointID joint, dReal torque);
 
 /**
  * @brief set anchor
@@ -2449,6 +2598,39 @@ ODE_API void dJointGetSliderAxis (dJointID, dVector3 result);
  * @ingroup joints
  */
 ODE_API dReal dJointGetSliderParam (dJointID, int parameter);
+
+/**
+ * @brief Get the screw linear position (i.e. the screw's extension)
+ *
+ * When the axis is set, the current position of the attached bodies is
+ * examined and that position will be the zero position.
+
+ * The position is the distance, with respect to the zero position,
+ * along the screw axis of body 1 with respect to
+ * body 2. (A NULL body is replaced by the world).
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetScrewPosition (dJointID);
+ODE_API dReal dJointGetScrewAngle (dJointID);
+
+/**
+ * @brief Get the screw linear position's time derivative.
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetScrewPositionRate (dJointID);
+ODE_API dReal dJointGetScrewAngleRate (dJointID);
+
+/**
+ * @brief Get the screw axis
+ * @ingroup joints
+ */
+ODE_API void dJointGetScrewAxis (dJointID, dVector3 result);
+
+/**
+ * @brief get joint parameter
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetScrewParam (dJointID, int parameter);
 
 /**
  * @brief Get the joint anchor point, in world coordinates.

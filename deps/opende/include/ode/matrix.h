@@ -187,7 +187,7 @@ ODE_API void dLDLTRemove (dReal **A, const int *p, dReal *L, dReal *d,
 ODE_API void dRemoveRowCol (dReal *A, int n, int nskip, int r);
 
 
-/*#if defined(__ODE__)*/
+#if defined(__ODE__)
 
 void _dSetZero (dReal *a, int n);
 void _dSetValue (dReal *a, int n, dReal value);
@@ -270,7 +270,7 @@ PURE_INLINE size_t _dEstimateLDLTRemoveTmpbufSize(int n2, int nskip)
 #define dEstimateLDLTRemoveTmpbufSize(n2, nskip) _dEstimateLDLTRemoveTmpbufSize(n2, nskip)
 
 
-/*#endif  defined(__ODE__) */
+#endif /* defined(__ODE__)*/
 
 
 #ifdef __cplusplus

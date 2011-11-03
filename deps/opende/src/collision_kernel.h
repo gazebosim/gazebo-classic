@@ -34,6 +34,7 @@ internal data structures and functions for collision detection.
 #include <ode/collision.h>
 #include "objects.h"
 #include "odetls.h"
+#include <boost/thread/mutex.hpp>
 
 //****************************************************************************
 // constants and macros
@@ -203,6 +204,8 @@ struct dxSpace : public dxGeom {
   int cleanup;			// cleanup mode, 1=destroy geoms on exit
   int sublevel;         // space sublevel (used in dSpaceCollide2). NOT TRACKED AUTOMATICALLY!!!
   unsigned tls_kind;	// space TLS kind to be used for global caches retrieval
+
+  boost::mutex mutex;
 
   // cached state for getGeom()
   int current_index;		// only valid if current_geom != 0

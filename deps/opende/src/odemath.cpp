@@ -119,7 +119,9 @@ void dNormalize3(dVector3 a)
 int _dSafeNormalize4 (dVector4 a)
 {
   dAASSERT (a);
+
   dReal l = dCalcVectorDot3(a,a)+a[3]*a[3];
+
   if (l > 0) {
     l = dRecipSqrt(l);
     a[0] *= l;

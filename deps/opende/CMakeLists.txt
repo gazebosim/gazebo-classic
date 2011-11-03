@@ -7,6 +7,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${CMAKE_SOURCE_DIR}/deps/libccd/include
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
+  ${CMAKE_SOURCE_DIR}/deps/threadpool
 )
 
 add_subdirectory(OPCODE)
@@ -145,10 +146,6 @@ src/convex.cpp
 src/cylinder.cpp
 src/error.cpp
 src/export-dif.cpp
-src/fastdot.c
-src/fastldlt.c
-src/fastlsolve.c
-src/fastltsolve.c
 src/heightfield.cpp
 src/lcp.cpp
 src/mass.cpp
@@ -156,21 +153,28 @@ src/mat.cpp
 src/matrix.cpp
 src/memory.cpp
 src/misc.cpp
-src/nextafterf.c
 src/obstack.cpp
 src/ode.cpp
 src/odeinit.cpp
 src/odemath.cpp
 src/odeou.cpp
 src/odetls.cpp
+src/optimize.cpp
 src/plane.cpp
 src/quickstep.cpp
 src/ray.cpp
+src/robuststep.cpp
 src/rotation.cpp
 src/sphere.cpp
 src/step.cpp
+src/symm.c
 src/timer.cpp
 src/util.cpp
+src/fastdot.c
+src/fastldlt.c
+src/fastlsolve.c
+src/fastltsolve.c
+src/nextafterf.c
 src/joints/amotor.cpp
 src/joints/ball.cpp
 src/joints/contact.cpp
@@ -178,12 +182,14 @@ src/joints/fixed.cpp
 src/joints/hinge2.cpp
 src/joints/hinge.cpp
 src/joints/joint.cpp
+src/joints/joints.h
 src/joints/lmotor.cpp
 src/joints/null.cpp
 src/joints/piston.cpp
 src/joints/plane2d.cpp
 src/joints/pr.cpp
 src/joints/pu.cpp
+src/joints/screw.cpp
 src/joints/slider.cpp
 src/joints/universal.cpp
 )
@@ -197,6 +203,7 @@ include/ode/compatibility.h
 include/ode/contact.h
 include/ode/error.h
 include/ode/export-dif.h
+include/ode/Makefile.am
 include/ode/mass.h
 include/ode/matrix.h
 include/ode/memory.h
@@ -209,6 +216,7 @@ include/ode/ode.h
 include/ode/odeinit.h
 include/ode/odemath.h
 include/ode/odemath_legacy.h
+include/ode/README
 include/ode/rotation.h
 include/ode/timer.h
 )
@@ -218,7 +226,5 @@ target_link_libraries( gazebo_ode gazebo_opcode gazebo_ccd)
 
 add_dependencies( gazebo_ode gazebo_opcode )
 
-
 INSTALL_LIBRARY(gazebo_ode)
 INSTALL_INCLUDES("ode" ${headers})
-

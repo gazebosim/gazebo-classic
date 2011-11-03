@@ -20,25 +20,27 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef _ODE_JOINT_HINGE_H_
-#define _ODE_JOINT_HINGE_H_
+#ifndef _ODE_JOINT_SCREW_H_
+#define _ODE_JOINT_SCREW_H_
 
 #include "joint.h"
 
 
-// hinge
+// screw
 
-struct dxJointHinge : public dxJoint
+struct dxJointScrew : public dxJoint
 {
     dVector3 anchor1;   // anchor w.r.t first body
     dVector3 anchor2;   // anchor w.r.t second body
     dVector3 axis1;     // axis w.r.t first body
     dVector3 axis2;     // axis w.r.t second body
+    dVector3 offset;    // point relative to body2 that should be // aligned with body1 center along axis1
     dQuaternion qrel;   // initial relative rotation body1 -> body2
     dxJointLimitMotor limot; // limit and motor information
     dReal cumulative_angle; // save a cumulative angle so we can use larger then +/-pi limits
+    dReal thread_pitch;  // set to be radians per meters
 
-    dxJointHinge( dxWorld *w );
+    dxJointScrew( dxWorld *w );
     virtual void getSureMaxInfo( SureMaxInfo* info );
     virtual void getInfo1( Info1* info );
     virtual void getInfo2( Info2* info );
@@ -47,6 +49,7 @@ struct dxJointHinge : public dxJoint
 
     virtual void setRelativeValues();
 
+    void computeOffset();
     void computeInitialRelativeRotation();
 };
 

@@ -23,6 +23,7 @@
 #ifndef _ODE_UTIL_H_
 #define _ODE_UTIL_H_
 
+#define SIZE_MAX ((size_t)(-1))
 #include "objects.h"
 
 
@@ -187,8 +188,8 @@ struct dxWorldProcessContext
 
   void CleanupContext();
 
-  void SavePreallocations(int islandcount, int const *islandsizes, dxBody *const *bodies, dxJoint *const *joints);
-  void RetrievePreallocations(int &islandcount, int const *&islandsizes, dxBody *const *&bodies, dxJoint *const *&joints);
+  void SavePreallocations(int islandcount, int const *islandsizes, dxBody *const *bodies, dxJoint *const *joints, size_t const *islandreqs);
+  void RetrievePreallocations(int &islandcount, int const *&islandsizes, dxBody *const *&bodies, dxJoint *const *&joints, size_t const *&islandreqs);
   void OffsetPreallocations(size_t stOffset);
   void CopyPreallocations(const dxWorldProcessContext *othercontext);
   void ClearPreallocations();
@@ -204,6 +205,7 @@ struct dxWorldProcessContext
 
   int m_IslandCount;
   int const *m_pIslandSizes;
+  size_t const *m_pIslandReqs;
   dxBody *const *m_pBodies;
   dxJoint *const *m_pJoints;
 
@@ -216,7 +218,7 @@ struct dxWorldProcessContext
 #define BEGIN_STATE_SAVE(context, state) void *state = context->SaveState();
 #define END_STATE_SAVE(context, state) context->RestoreState(state)
 
-typedef void (*dstepper_fn_t) (dxWorldProcessContext *context, 
+typedef void (*dstepper_fn_t) (dxWorldProcessContext *context,  // put island stepper context here
         dxWorld *world, dxBody * const *body, int nb,
         dxJoint * const *_joint, int _nj, dReal stepsize);
 

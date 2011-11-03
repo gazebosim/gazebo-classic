@@ -94,6 +94,10 @@ struct dxJoint : public dObject
         // J2xx pointers may be 0.
         dReal *J1l, *J1a, *J2l, *J2a;
 
+        // jacobians for joint damping
+        // angular ones are implemented first
+        dReal *J1ld, *J1ad, *J2ld, *J2ad;
+
         // elements to jump from one row to the next in J's
         int rowskip;
 
@@ -155,6 +159,12 @@ struct dxJoint : public dObject
 	// Test if this joint should be used in the simulation step
 	// (has the enabled flag set, and is attached to at least one dynamic body)
 	bool isEnabled() const;
+
+    // to use joint damping set use_damping to true
+    // and set damping_coefficient to the desired value
+    bool use_damping;
+    dReal damping_coefficient;
+
 };
 
 

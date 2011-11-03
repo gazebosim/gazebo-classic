@@ -135,6 +135,16 @@ void dPrintMatrix (const dReal *A, int n, int m, char *fmt, FILE *f)
   }
 }
 
+void dPrintIntMatrix (const int *A, int n, int m, char *fmt, FILE *f)
+{
+  int skip = 1;
+  const int *Arow = A;
+  for (int i=0; i<n; Arow+=skip, ++i) {
+    for (int j=0; j<m; ++j) fprintf (f,fmt,Arow[j]);
+    fprintf (f,"\n");
+  }
+}
+
 
 void dMakeRandomVector (dReal *A, int n, dReal range)
 {

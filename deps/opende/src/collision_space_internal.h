@@ -45,7 +45,7 @@ stuff common to all spaces
 // NOTE: this assumes that the geom AABBs are valid on entry
 // and that both geoms are enabled.
 
-static inline void collideAABBs (dxGeom *g1, dxGeom *g2,
+inline static void collideAABBs (dxGeom *g1, dxGeom *g2,
 			  void *data, dNearCallback *callback)
 {
   dIASSERT((g1->gflags & GEOM_AABB_BAD)==0);

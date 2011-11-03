@@ -30,6 +30,7 @@
 #include "ball.h"
 #include "hinge.h"
 #include "slider.h"
+#include "screw.h"
 #include "contact.h"
 #include "universal.h"
 #include "hinge2.h"

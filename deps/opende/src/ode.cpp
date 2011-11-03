@@ -39,6 +39,7 @@
 #include "quickstep.h"
 #include "util.h"
 #include "odetls.h"
+#include "robuststep.h"
 
 // misc defines
 #define ALLOCA dALLOCA16
@@ -290,6 +291,8 @@ dxBody *dBodyCreate (dxWorld *w)
 
   b->flags |= dxBodyGyroscopic;
 
+  b->contactp = NULL;
+
   return b;
 }
 
@@ -334,6 +337,8 @@ void dBodyDestroy (dxBody *b)
 	  b->average_avel_buffer = 0;
   }
 
+  if (b->contactp) delete b->contactp;
+
   delete b;
 }
 
@@ -349,6 +354,22 @@ void *dBodyGetData (dBodyID b)
 {
   dAASSERT (b);
   return b->userdata;
+}
+
+void dBodySetMinDepth (dBodyID b, dReal min_depth)
+{
+  dAASSERT (b);
+  if (b->contactp == NULL)
+    b->contactp = new dxContactParameters();
+  b->contactp->min_depth = min_depth;
+}
+
+void dBodySetMaxVel (dBodyID b, dReal max_vel)
+{
+  dAASSERT (b);
+  if (b->contactp == NULL)
+    b->contactp = new dxContactParameters();
+  b->contactp->max_vel = max_vel;
 }
 
 
@@ -1197,6 +1218,12 @@ dxJoint * dJointCreateSlider (dWorldID w, dJointGroupID group)
     return createJoint<dxJointSlider>(w,group);
 }
 
+dxJoint * dJointCreateScrew (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointScrew>(w,group);
+}
+
 
 dxJoint * dJointCreateContact (dWorldID w, dJointGroupID group,
 			       const dContact *c)
@@ -1454,6 +1481,37 @@ void dJointSetFeedback (dxJoint *joint, dJointFeedback *f)
   joint->feedback = f;
 }
 
+void dJointSetScrewThreadPitch (dxJoint *joint, dReal thread_pitch)
+{
+  dAASSERT (joint);
+
+  // make sure this is a dxJointScrew
+  if (joint->type() == dJointTypeScrew)
+  {
+    // set joint thread_pitch
+    ((dxJointScrew*)joint)->thread_pitch = thread_pitch;
+    //printf("setting thread_pitch to %f\n",thread_pitch);
+  }
+}
+
+void dJointSetDamping (dxJoint *joint, dReal damping)
+{
+  dAASSERT (joint);
+
+  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider || 
+      joint->type() == dJointTypeScrew)
+  {
+    if (damping != 0.0)
+    {
+      if (damping < 0.0) printf("bad to have negative viscous joint damping, make sure you know what's going on.\n");
+      // set use_damping to true
+      joint->use_damping = true;
+      // damping coefficient is in jicurr->info.damping_coefficient);
+      joint->damping_coefficient = damping;
+      // FIXME: only hinge, slider, screw(rotational) are implemented at this time, extend?
+    }
+  }
+}
 
 dJointFeedback *dJointGetFeedback (dxJoint *joint)
 {
@@ -1559,6 +1617,10 @@ dxWorld * dWorldCreate()
   w->body_flags = 0; // everything disabled
 
   w->wmem = 0;
+  for (int jj=0; jj < 1000; jj++)
+  {
+    w->island_wmems[jj] = 0;
+  }
 
   w->adis.idle_steps = 10;
   w->adis.idle_time = 0;
@@ -1567,7 +1629,11 @@ dxWorld * dWorldCreate()
   w->adis.linear_average_threshold = REAL(0.01)*REAL(0.01);		// (magnitude squared)
 
   w->qs.num_iterations = 20;
+  w->qs.precon_iterations = 0;
   w->qs.w = REAL(1.3);
+  w->qs.num_chunks = 1;
+  w->qs.num_overlap = 0;
+  w->qs.sor_lcp_tolerance = 0;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
@@ -1577,6 +1643,9 @@ dxWorld * dWorldCreate()
   w->dampingp.linear_threshold = REAL(0.01) * REAL(0.01);
   w->dampingp.angular_threshold = REAL(0.01) * REAL(0.01);  
   w->max_angular_speed = dInfinity;
+
+  w->threadpool = NULL; // new boost::threadpool::pool(0);
+  w->row_threadpool = NULL; // new boost::threadpool::pool(0);
 
   return w;
 }
@@ -1617,6 +1686,16 @@ void dWorldDestroy (dxWorld *w)
     w->wmem->Release();
   }
 
+  if (w->threadpool) {
+    w->threadpool->wait();
+    delete w->threadpool;
+  }
+
+  if (w->row_threadpool) {
+    w->row_threadpool->wait();
+    delete w->row_threadpool;
+  }
+
   delete w;
 }
 
@@ -1629,6 +1708,33 @@ void dWorldSetGravity (dWorldID w, dReal x, dReal y, dReal z)
   w->gravity[2] = z;
 }
 
+void dWorldSetIslandThreads (dWorldID w, int num_island_threads)
+{
+  dAASSERT (w);
+  if (w->threadpool) {
+    w->threadpool->wait();
+    delete w->threadpool;
+    w->threadpool = NULL;
+  }
+  if (num_island_threads > 0) {
+    w->threadpool = new boost::threadpool::pool(num_island_threads);
+    printf("setting island pool threads to %d\n",num_island_threads);
+  }
+}
+
+void dWorldSetQuickStepThreads (dWorldID w, int num_quickstep_threads)
+{
+  dAASSERT (w);
+  if (w->row_threadpool) {
+    w->row_threadpool->wait();
+    delete w->row_threadpool;
+    w->row_threadpool = NULL;
+  }
+  if (num_quickstep_threads > 0) {
+    w->row_threadpool = new boost::threadpool::pool(num_quickstep_threads);
+    printf("setting quickstep pool threads to %d\n",num_quickstep_threads);
+  }
+}
 
 void dWorldGetGravity (dWorldID w, dVector3 g)
 {
@@ -1818,6 +1924,19 @@ int dWorldQuickStep (dWorldID w, dReal stepsize)
   return result;
 }
 
+int dWorldRobustStep(dWorldID w, dReal stepsize)
+{
+  dUASSERT (w,"bad world argument");
+  dUASSERT (stepsize > 0,"stepsize must be > 0");
+  bool result = false;
+  if (dxReallocateWorldProcessContext(w, stepsize, &dxEstimateRobustStepMemoryRequirements))
+  {
+    dxProcessIslands(w, stepsize, &dRobustStepIsland);
+    result = true;
+  }
+
+  return result;
+}
 
 void dWorldImpulseToForce (dWorldID w, dReal stepsize,
 			   dReal ix, dReal iy, dReal iz,
@@ -2002,11 +2121,33 @@ void dWorldSetMaxAngularSpeed(dWorldID w, dReal max_speed)
         w->max_angular_speed = max_speed;
 }
 
+void dWorldSetQuickStepTolerance (dWorldID w, dReal tol)
+{
+	dAASSERT(w);
+	w->qs.sor_lcp_tolerance = tol;
+}
+
+void dWorldSetQuickStepNumChunks (dWorldID w, int num)
+{
+	dAASSERT(w);
+	w->qs.num_chunks = num;
+}
+
+void dWorldSetQuickStepNumOverlap (dWorldID w, int num)
+{
+	dAASSERT(w);
+	w->qs.num_overlap = num;
+}
 
 void dWorldSetQuickStepNumIterations (dWorldID w, int num)
 {
 	dAASSERT(w);
 	w->qs.num_iterations = num;
+}
+void dWorldSetQuickStepPreconIterations (dWorldID w, int num)
+{
+	dAASSERT(w);
+	w->qs.precon_iterations = num;
 }
 
 
@@ -2016,6 +2157,17 @@ int dWorldGetQuickStepNumIterations (dWorldID w)
 	return w->qs.num_iterations;
 }
 
+void dWorldSetRobustStepMaxIterations (dWorldID w, int num)
+{
+	dAASSERT(w);
+	w->rs.max_iterations = num;
+}
+
+int dWorldGetRobustStepMaxIterations (dWorldID w)
+{
+	dAASSERT(w);
+	return w->rs.max_iterations;
+}
 
 void dWorldSetQuickStepW (dWorldID w, dReal param)
 {
@@ -2028,6 +2180,12 @@ dReal dWorldGetQuickStepW (dWorldID w)
 {
 	dAASSERT(w);
 	return w->qs.w;
+}
+
+dReal dWorldGetQuickStepRMSError (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.rms_error;
 }
 
 
