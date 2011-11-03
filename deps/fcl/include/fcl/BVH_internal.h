@@ -54,7 +54,7 @@ enum BVHBuildState
   BVH_BUILD_STATE_PROCESSED,        // after tree has been build, ready for cd use
   BVH_BUILD_STATE_UPDATE_BEGUN,     // after beginUpdateModel(), state for updating geometry primitives
   BVH_BUILD_STATE_UPDATED,          // after tree has been build for updated geometry, ready for ccd use
-  BVH_BUILD_STATE_REPLACE_BEGUN,    // after beginReplaceModel(), state for replacing geometry primitives
+  BVH_BUILD_STATE_REPLACE_BEGUN    // after beginReplaceModel(), state for replacing geometry primitives
 };
 
 /** \brief Error code for BVH */

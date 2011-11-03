@@ -18,8 +18,8 @@
 #ifndef __CCD_SIMPLEX_H__
 #define __CCD_SIMPLEX_H__
 
-#include <ode/support.h>
-#include <ode/compiler.h>
+#include <ccd/support.h>
+#include <ccd/compiler.h>
 
 #ifdef __cplusplus
 extern "C" {

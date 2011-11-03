@@ -5,6 +5,7 @@ include (CheckFunctionExists)
 include_directories( 
   ${CMAKE_CURRENT_BINARY_DIR} 
   ${CMAKE_SOURCE_DIR}/deps/opende/include
+  ${CMAKE_SOURCE_DIR}/deps/libccd/include
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
 )
 
@@ -185,12 +186,6 @@ src/joints/pr.cpp
 src/joints/pu.cpp
 src/joints/slider.cpp
 src/joints/universal.cpp
-src/alloc.c
-src/ccd.c
-src/mpr.c
-src/polytope.c
-src/support.c
-src/vec3.c
 )
 
 set ( headers 
@@ -220,7 +215,7 @@ include/ode/timer.h
 )
 
 add_library(gazebo_ode SHARED ${sources})
-target_link_libraries( gazebo_ode gazebo_opcode)
+target_link_libraries( gazebo_ode gazebo_opcode gazebo_ccd)
 
 add_dependencies( gazebo_ode gazebo_opcode )
 

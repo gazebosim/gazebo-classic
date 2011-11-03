@@ -15,19 +15,20 @@
  *  See the License for more information.
  */
 
-#include <stdio.h>
-#include <ode/alloc.h>
+#include <ccd/support.h>
 
-void *ccdRealloc(void *ptr, size_t size)
+void __ccdSupport(const void *obj1, const void *obj2,
+                  const ccd_vec3_t *_dir, const ccd_t *ccd,
+                  ccd_support_t *supp)
 {
-    void *ret = realloc(ptr, size);
-    if (ret == NULL && size != 0){
-        fprintf(stderr, "Fatal error: Allocation of memory failed!\n");
-        fflush(stderr);
-        exit(-1);
-    }
+    ccd_vec3_t dir;
 
-    return ret;
+    ccdVec3Copy(&dir, _dir);
+
+    ccd->support1(obj1, &dir, &supp->v1);
+
+    ccdVec3Scale(&dir, -CCD_ONE);
+    ccd->support2(obj2, &dir, &supp->v2);
+
+    ccdVec3Sub2(&supp->v, &supp->v1, &supp->v2);
 }
-
-

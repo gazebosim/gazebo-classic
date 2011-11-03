@@ -21,8 +21,8 @@
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
-#include <ode/compiler.h>
-#include <ode/ccd_config.h>
+#include <ccd/compiler.h>
+#include <ccd/ccd_config.h>
 
 #ifdef __cplusplus
 extern "C" {

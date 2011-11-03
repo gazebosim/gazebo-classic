@@ -20,8 +20,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <ode/support.h>
-#include <ode/list.h>
+#include <ccd/support.h>
+#include <ccd/list.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -18,8 +18,8 @@
 #ifndef __CCD_QUAT_H__
 #define __CCD_QUAT_H__
 
-#include <ode/compiler.h>
-#include <ode/vec3.h>
+#include <ccd/compiler.h>
+#include <ccd/vec3.h>
 
 #ifdef __cplusplus
 extern "C" {

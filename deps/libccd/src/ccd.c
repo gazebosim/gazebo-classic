@@ -17,12 +17,12 @@
 
 #include <stdio.h>
 #include <float.h>
-#include <ode/ccd.h>
-#include <ode/vec3.h>
-#include <ode/simplex.h>
-#include <ode/polytope.h>
-#include <ode/alloc.h>
-#include <ode/dbg.h>
+#include <ccd/ccd.h>
+#include <ccd/vec3.h>
+#include <ccd/simplex.h>
+#include <ccd/polytope.h>
+#include <ccd/alloc.h>
+#include <ccd/dbg.h>
 
 
 /** Performs GJK algorithm. Returns 0 if intersection was found and simplex

@@ -112,6 +112,7 @@ set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
 
 #####################################
@@ -165,7 +166,6 @@ else (build_errors)
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
   add_subdirectory(doc)
-  add_subdirectory(deps)
 
   if (BUILD_GAZEBO)
     add_subdirectory(src)

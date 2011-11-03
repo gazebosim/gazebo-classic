@@ -19,7 +19,7 @@
 #define __CCD_LIST_H__
 
 #include <string.h>
-#include <ode/compiler.h>
+#include <ccd/compiler.h>
 
 #ifdef __cplusplus
 extern "C" {
