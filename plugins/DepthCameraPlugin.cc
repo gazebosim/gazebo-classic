@@ -28,7 +28,6 @@ void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor,
 {
   this->parentSensor = boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor);
   this->depthCamera = this->parentSensor->GetDepthCamera();
-  this->camera = this->parentSensor->GetCamera();
 
   if (!this->parentSensor)
   {
@@ -41,7 +40,7 @@ void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor,
   this->depth = this->depthCamera->GetImageDepth();
   this->format = this->depthCamera->GetImageFormat();
 
-  this->newFrameConnection = this->depthCamera->ConnectNewDepthFrame( 
+  this->newDepthFrameConnection = this->depthCamera->ConnectNewDepthFrame( 
       boost::bind(&DepthCameraPlugin::OnNewDepthFrame, this, _1, _2, _3, _4, _5));
 
   this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame( 
