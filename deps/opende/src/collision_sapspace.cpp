@@ -255,7 +255,7 @@ static void collideGeomsNoAABBs( dxGeom *g1, dxGeom *g2, void *data, dNearCallba
 
 	// the objects might actually intersect - call the space callback function
 	callback (data,g1,g2);
-};
+}
 
 
 dxSAPSpace::dxSAPSpace( dSpaceID _space, int axisorder ) : dxSpace( _space )

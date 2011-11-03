@@ -426,7 +426,7 @@ ODE_API int  dSafeNormalize4 (dVector4 a);
 ODE_API void dNormalize3 (dVector3 a); // Potentially asserts on zero vec
 ODE_API void dNormalize4 (dVector4 a); // Potentially asserts on zero vec
 
-#if defined(__ODE__)
+//#if defined(__ODE__)
 
 int  _dSafeNormalize3 (dVector3 a);
 int  _dSafeNormalize4 (dVector4 a);
@@ -451,7 +451,7 @@ PURE_INLINE void _dNormalize4(dVector4 a)
 #define dNormalize3(a) _dNormalize3(a)
 #define dNormalize4(a) _dNormalize4(a)
 
-#endif // defined(__ODE__)
+//#endif // defined(__ODE__)
 
 /*
  * given a unit length "normal" vector n, generate vectors p and q vectors

@@ -199,11 +199,7 @@ namespace gazebo
       private: tbb::spin_mutex collideMutex;
 
       private: dContactGeom *contactCollisions;
-  #if ODE_WG_TRUNK
       private: int (*physicsStepFunc)(dxWorld*, dReal);
-  #else
-      private: void (*physicsStepFunc)(dxWorld*, dReal);
-  #endif
     };
   
   

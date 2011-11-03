@@ -2,7 +2,6 @@
 #ifndef ODE_CONFIG_H
 #define ODE_CONFIG_H
 
-
 #cmakedefine HAVE_ALLOCA 1
 #cmakedefine HAVE_ATAN2F 1
 #cmakedefine HAVE_COPYSIGN 1
@@ -69,6 +68,11 @@
  * from without loss of bits.
  */
 typedef uintptr_t intP;
+
+#define dDOUBLE 1
+#define dTRIMESH_ENABLED 1
+#define dTRIMESH_OPCODE 1
+#define __ODE__ 1
 
 #ifdef dSINGLE
        #define dEpsilon  FLT_EPSILON

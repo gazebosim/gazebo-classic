@@ -44,7 +44,7 @@ enum {
   dxBodyLinearDamping =             32, // use linear damping
   dxBodyAngularDamping =            64, // use angular damping
   dxBodyMaxAngularSpeed =           128,// use maximum angular speed
-  dxBodyGyroscopic =                256,// use gyroscopic term
+  dxBodyGyroscopic =                256 // use gyroscopic term
 };
 
 

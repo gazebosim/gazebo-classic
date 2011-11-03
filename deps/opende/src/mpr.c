@@ -16,9 +16,9 @@
  */
 
 #include <stdlib.h>
-#include <ccd/ccd.h>
-#include <ccd/simplex.h>
-#include <ccd/dbg.h>
+#include <ode/ccd.h>
+#include <ode/simplex.h>
+#include <ode/dbg.h>
 
 /** Finds origin (center) of Minkowski difference (actually it can be any
  *  interior point of Minkowski difference. */

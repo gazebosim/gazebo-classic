@@ -60,7 +60,7 @@ using namespace Opcode;
 enum
 {
 	MAXCONTACT_X_NODE = 4,
-	CONTACTS_HASHSIZE = 256,
+	CONTACTS_HASHSIZE = 256
 };
 
 struct CONTACT_KEY
@@ -214,7 +214,7 @@ struct dxTriMeshData  : public dBase
         kVert1 = 0x10,
         kVert2 = 0x20,
 
-        kUseAll = 0xFF,
+        kUseAll = 0xFF
     };
 
     /* Setup the UseFlags array */
@@ -341,7 +341,7 @@ struct dxTriMesh : public dxGeom{
 #if dTRIMESH_OPCODE
 
 	enum {
-		MERGE_NORMALS__SPHERE_DEFAULT = DONT_MERGE_CONTACTS,
+		MERGE_NORMALS__SPHERE_DEFAULT = DONT_MERGE_CONTACTS
 	};
 	bool controlGeometry_SetMergeSphereContacts(int dataValue);
 	bool controlGeometry_GetMergeSphereContacts(int &returnValue);

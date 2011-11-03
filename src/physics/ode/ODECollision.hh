@@ -22,7 +22,7 @@
 #ifndef ODECOLLISION_HH
 #define ODECOLLISION_HH
 
-#include "physics/ode/ode_inc.h"
+#include "ode/ode.h"
 
 #include "common/CommonTypes.hh"
 #include "physics/ode/ODESurfaceParams.hh"

@@ -252,12 +252,16 @@ void dxSimpleSpace::collide (void *data, dNearCallback *callback)
   cleanGeoms();
 
   // intersect all bounding boxes
-  for (dxGeom *g1=first; g1; g1=g1->next) {
-    if (GEOM_ENABLED(g1)){
-      for (dxGeom *g2=g1->next; g2; g2=g2->next) {
-	if (GEOM_ENABLED(g2)){
-	  collideAABBs (g1,g2,data,callback);
-	}
+  for (dxGeom *g1=first; g1; g1=g1->next) 
+  {
+    if (GEOM_ENABLED(g1))
+    {
+      for (dxGeom *g2=g1->next; g2; g2=g2->next) 
+      {
+        if (GEOM_ENABLED(g2))
+        {
+          collideAABBs (g1,g2,data,callback);
+        }
       }
     }
   }

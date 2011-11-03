@@ -145,7 +145,7 @@ dJointType
 dxJointPlane2D::type() const
 {
     return dJointTypePlane2D;
-};
+}
 
 
 size_t

@@ -41,7 +41,7 @@
 		AABB_RENDER			= 0,	//!< AABB used for rendering. Not visible == not rendered.
 		AABB_UPDATE			= 1,	//!< AABB used for dynamic updates. Not visible == not updated.
 
-		AABB_FORCE_DWORD	= 0x7fffffff,
+		AABB_FORCE_DWORD	= 0x7fffffff
 	};
 
 #ifdef USE_MINMAX

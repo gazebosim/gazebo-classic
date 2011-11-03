@@ -190,7 +190,7 @@ struct dxHeightfield : public dxGeom
 		TEMP_PLANE_BUFFER_ELEMENT_COUNT_ALIGNMENT = 4,
 		TEMP_HEIGHT_BUFFER_ELEMENT_COUNT_ALIGNMENT_X = 4,
 		TEMP_HEIGHT_BUFFER_ELEMENT_COUNT_ALIGNMENT_Z = 4,
-		TEMP_TRIANGLE_BUFFER_ELEMENT_COUNT_ALIGNMENT = 1, // Triangles are easy to reallocate and hard to predict
+		TEMP_TRIANGLE_BUFFER_ELEMENT_COUNT_ALIGNMENT = 1 // Triangles are easy to reallocate and hard to predict
 	};
 
 	static inline size_t AlignBufferSize(size_t value, size_t alignment) { dIASSERT((alignment & (alignment - 1)) == 0); return (value + (alignment - 1)) & ~(alignment - 1); }

@@ -18,9 +18,9 @@
 #ifndef __CCD_SUPPORT_H__
 #define __CCD_SUPPORT_H__
 
-#include <ccd/compiler.h>
-#include <ccd/vec3.h>
-#include <ccd/ccd.h>
+#include <ode/compiler.h>
+#include <ode/vec3.h>
+#include <ode/ccd.h>
 
 #ifdef __cplusplus
 extern "C" {

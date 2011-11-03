@@ -2,9 +2,16 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckIncludeFiles)
 include (CheckFunctionExists)
 
+include_directories( 
+  ${CMAKE_CURRENT_BINARY_DIR} 
+  ${CMAKE_SOURCE_DIR}/deps/opende/include
+  ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
+)
+
+add_subdirectory(OPCODE)
+
 CHECK_CXX_SOURCE_COMPILES("#include <alloca.h> 
 int main() {alloca(0); return 1;}" HAVE_ALLOCA)
-
 
 CHECK_CXX_SOURCE_COMPILES("#include <math.h> 
 int main() {atan2f(0,0); return 1;}" HAVE_ATAN2F)
@@ -98,6 +105,10 @@ CHECK_INCLUDE_FILES(unistd.h HAVE_UNISTD_H)
 
 configure_file(${CMAKE_SOURCE_DIR}/deps/opende/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
+
+
+
+
 ########################################
 # Include all the search paths for headers
 
@@ -172,72 +183,46 @@ src/joints/pr.cpp
 src/joints/pu.cpp
 src/joints/slider.cpp
 src/joints/universal.cpp
+src/alloc.c
+src/ccd.c
+src/mpr.c
+src/polytope.c
+src/support.c
+src/vec3.c
 )
 
 set ( headers 
-src/collision_space_internal.h
-src/collision_std.h
-src/collision_transform.h
-src/collision_trimesh_colliders.h
-src/collision_libccd.h
-src/collision_kernel.h
-src/collision_trimesh_internal.h
-src/collision_util.h
-src/heightfield.h
-src/lcp.h
-src/mat.h
-src/objects.h
-src/obstack.h
-src/odeou.h
-src/odetls.h
-src/quickstep.h
-src/step.h
-src/util.h
-src/joints/amotor.h
-src/joints/ball.h
-src/joints/contact.h
-src/joints/fixed.h
-src/joints/hinge2.h
-src/joints/hinge.h
-src/joints/joint_internal.h
-src/joints/joint.h
-src/joints/joints.h
-src/joints/lmotor.h
-src/joints/null.h
-src/joints/plane2d.h
-src/joints/piston.h
-src/joints/pr.h
-src/joints/slider.h
-src/joints/universal.h
-src/joints/pu.h
-src/array.h
-include/collision.h
-include/collision_space.h
-include/collision_trimesh.h
-include/common.h
-include/compatibility.h
-include/contact.h
-include/error.h
-include/export-dif.h
-include/Makefile.am
-include/mass.h
-include/matrix.h
-include/memory.h
-include/misc.h
-include/objects.h
-include/odeconfig.h
-include/odecpp_collision.h
-include/odecpp.h
-include/ode.h
-include/odeinit.h
-include/odemath.h
-include/odemath_legacy.h
-include/rotation.h
-include/timer.h
+include/ode/collision.h
+include/ode/collision_space.h
+include/ode/collision_trimesh.h
+include/ode/common.h
+include/ode/compatibility.h
+include/ode/contact.h
+include/ode/error.h
+include/ode/export-dif.h
+include/ode/Makefile.am
+include/ode/mass.h
+include/ode/matrix.h
+include/ode/memory.h
+include/ode/misc.h
+include/ode/objects.h
+include/ode/odeconfig.h
+include/ode/odecpp_collision.h
+include/ode/odecpp.h
+include/ode/ode.h
+include/ode/odeinit.h
+include/ode/odemath.h
+include/ode/odemath_legacy.h
+include/ode/rotation.h
+include/ode/timer.h
 )
 
 add_library(gazebo_ode SHARED ${sources})
-#target_link_libraries( gazebo_ode )
+target_link_libraries( gazebo_ode gazebo_opcode)
+
+add_dependencies( gazebo_ode gazebo_opcode )
+
 
 INSTALL_LIBRARY(gazebo_ode)
 INSTALL_INCLUDES("ode" ${headers})
+

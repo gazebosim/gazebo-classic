@@ -89,4 +89,4 @@ float _nextafterf(float x, float y)
 }
 
 
-#endif // #if defined(_ODE__NEXTAFTERF_REQUIRED)
+#endif /* #if defined(_ODE__NEXTAFTERF_REQUIRED)*/

@@ -71,7 +71,7 @@ extern "C" {
        msg " in %s()", __FUNCTION__);
 #    define dDEBUGMSG(msg) dMessage (d_ERR_UASSERT,				\
        msg " in %s() File %s Line %d", __FUNCTION__, __FILE__,__LINE__);
-#  else // not __GNUC__
+#  else
 #    define dIASSERT(a) if (!(a)) dDebug (d_ERR_IASSERT, \
        "assertion \"" #a "\" failed in %s:%d",__FILE__,__LINE__);
 #    define dUASSERT(a,msg) if (!(a)) dDebug (d_ERR_UASSERT, \
@@ -86,7 +86,7 @@ extern "C" {
 #endif
 #define dAASSERT(a) dUASSERT(a,"Bad argument(s)")
 
-// Macro used to suppress unused variable warning
+/* Macro used to suppress unused variable warning */
 #define dVARIABLEUSED(a) ((void)a)
 
 /* floating point data type, vector, matrix and quaternion types */
@@ -95,31 +95,31 @@ extern "C" {
 typedef float dReal;
 #ifdef dDOUBLE
 #error You can only #define dSINGLE or dDOUBLE, not both.
-#endif // dDOUBLE
+#endif /* dDOUBLE */
 #elif defined(dDOUBLE)
 typedef double dReal;
 #else
 #error You must #define dSINGLE or dDOUBLE
 #endif
 
-// Detect if we've got both trimesh engines enabled.
+/* Detect if we've got both trimesh engines enabled. */
 #if dTRIMESH_ENABLED
 #if dTRIMESH_OPCODE && dTRIMESH_GIMPACT
 #error You can only #define dTRIMESH_OPCODE or dTRIMESH_GIMPACT, not both.
 #endif
-#endif // dTRIMESH_ENABLED
+#endif /* dTRIMESH_ENABLED */
 
-// Define a type for indices, either 16 or 32 bit, based on build option
-// TODO: Currently GIMPACT only supports 32 bit indices.
+/* Define a type for indices, either 16 or 32 bit, based on build option
+TODO: Currently GIMPACT only supports 32 bit indices.*/
 #if dTRIMESH_16BIT_INDICES
 #if dTRIMESH_GIMPACT
 typedef uint32 dTriIndex;
-#else // dTRIMESH_GIMPACT
+#else /* dTRIMESH_GIMPACT */
 typedef uint16 dTriIndex;
-#endif // dTRIMESH_GIMPACT
-#else // dTRIMESH_16BIT_INDICES
+#endif /* dTRIMESH_GIMPACT */
+#else /* dTRIMESH_16BIT_INDICES*/
 typedef uint32 dTriIndex;
-#endif // dTRIMESH_16BIT_INDICES
+#endif /* dTRIMESH_16BIT_INDICES */
 
 /* round an integer up to a multiple of 4, except that 0 and 1 are unmodified
  * (used to compute matrix leading dimensions)
@@ -309,14 +309,14 @@ enum {
   dParamSuspensionCFM, \
   dParamERP, \
 
-  //////////////////////////////////////////////////////////////////////////////
-  /// \enum  D_ALL_PARAM_NAMES_X
-  ///
-  /// \var dParamGroup This is the starting value of the different group
-  ///                  (i.e. dParamGroup1, dParamGroup2, dParamGroup3)
-  ///                  It also helps in the use of parameter
-  ///                  (dParamGroup2 | dParamFMax) == dParamFMax2
-  //////////////////////////////////////////////////////////////////////////////
+  /*
+   \enum  D_ALL_PARAM_NAMES_X
+  
+   \var dParamGroup This is the starting value of the different group
+                    (i.e. dParamGroup1, dParamGroup2, dParamGroup3)
+                    It also helps in the use of parameter
+                    (dParamGroup2 | dParamFMax) == dParamFMax2
+  */
 #define D_ALL_PARAM_NAMES_X(start,x) \
   dParamGroup ## x = start, \
   /* parameters for limits and motors */ \
@@ -336,7 +336,7 @@ enum {
 
 enum {
   D_ALL_PARAM_NAMES(0)
-  dParamsInGroup,     ///< Number of parameter in a group
+  dParamsInGroup,     /*< Number of parameter in a group*/
   D_ALL_PARAM_NAMES_X(0x000,1)
   D_ALL_PARAM_NAMES_X(0x100,2)
   D_ALL_PARAM_NAMES_X(0x200,3)

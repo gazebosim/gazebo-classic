@@ -1,7 +1,7 @@
 #include <ode/collision.h>
 #include <ode/odemath.h>
-#include <ccd/ccd.h>
-#include <ccd/quat.h>
+#include <ode/ccd.h>
+#include <ode/quat.h>
 #include "collision_libccd.h"
 #include "collision_std.h"
 
