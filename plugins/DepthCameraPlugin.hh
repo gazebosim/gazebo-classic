@@ -44,7 +44,7 @@ namespace gazebo
     protected: sensors::DepthCameraSensorPtr parentSensor;
     protected: rendering::DepthCameraPtr depthCamera;
 
-    private: event::ConnectionPtr newFrameConnection;
+    private: event::ConnectionPtr newDepthFrameConnection;
     private: event::ConnectionPtr newImageFrameConnection;
   };
 }
