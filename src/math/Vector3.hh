@@ -112,7 +112,10 @@ namespace gazebo
       public: const Vector3 &operator+=( const Vector3 &pt );
     
       /// \brief Subtraction operators 
-      public: Vector3 operator-( const Vector3 &pt ) const;
+      public: inline Vector3 operator-( const Vector3 &pt ) const
+              {
+                return Vector3(this->x - pt.x, this->y - pt.y, this->z - pt.z);
+              }
     
       /// \brief Subtraction operators 
       public: const Vector3 &operator-=( const Vector3 &pt );

@@ -93,6 +93,7 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
               
                 std::string msgTypename;
+                PublicationPtr publication;
 
                 // Connect all local subscription to the publisher
                 for (int i=0; i < 2; i ++)
@@ -110,7 +111,7 @@ namespace gazebo
                     msgTypename = tmp.GetTypeName();
                   }
 
-                  PublicationPtr publication = this->FindPublication( t );
+                  publication = this->FindPublication( t );
                   if (!publication->GetLocallyAdvertised())
                   {
                     ConnectionManager::Instance()->Advertise(t, msgTypename);
@@ -134,8 +135,9 @@ namespace gazebo
                   }
                 }
 
+                publication = this->FindPublication( _topic );
                 return PublisherPtr( new Publisher(_topic, msg->GetTypeName(),
-                                                   _queueLimit) );
+                                                   _queueLimit, publication) );
               }
 
       /// \brief Stop advertising on a topic
@@ -187,8 +189,11 @@ namespace gazebo
       ///        subscribers to topics
       typedef std::map< std::string, std::list<CallbackHelperPtr> > SubMap;
 
-      private: std::vector<PublicationPtr> advertisedTopics;
-      private: std::vector<PublicationPtr>::iterator advertisedTopicsEnd;
+      //private: std::vector<PublicationPtr> advertisedTopics;
+      //private: std::vector<PublicationPtr>::iterator advertisedTopicsEnd;
+      private: typedef std::map<std::string, PublicationPtr> PublicationPtr_M;
+      private: PublicationPtr_M advertisedTopics;
+      private: PublicationPtr_M::iterator advertisedTopicsEnd;
       private: SubMap subscribed_topics; 
       private: std::vector<NodePtr> nodes;
 

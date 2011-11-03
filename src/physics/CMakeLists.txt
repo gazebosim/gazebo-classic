@@ -1,6 +1,4 @@
-if (INCLUDE_ODE) 
-  add_subdirectory(ode)
-endif()
+add_subdirectory(ode)
 
 include_directories(${tinyxml_include_dirs})
 link_directories( ${tinyxml_library_dirs})
@@ -75,16 +73,12 @@ add_library(gazebo_physics SHARED ${sources} ${sources})
 
 target_link_libraries(gazebo_physics gazebo_common 
                                      gazebo_sdf_parser
-                                     ${ODE_LIBRARIES}
-                                     ${ODE_LDFLAGS}
+                                     gazebo_physics_ode
                                      ${TBB_LIBRARIES} 
                                      ${libtool_library} 
                                      ${boost_libraries}
-                                     ${tinyxml_libraries})
-
-if (INCLUDE_ODE) 
-  target_link_libraries(gazebo_physics gazebo_physics_ode)
-endif()
+                                     ${tinyxml_libraries}
+                                     )
 
 add_executable(gzphysics server.cc)
 target_link_libraries( gzphysics gazebo_common

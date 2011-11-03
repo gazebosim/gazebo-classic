@@ -23,6 +23,7 @@
 
 #include <boost/thread.hpp>
 #include <google/protobuf/message.h>
+#include "transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
       /// \param topic Name of topic
       /// \param msg_type Type of the message which is to be published
       public: Publisher(const std::string &topic, const std::string &msg_type,
-                        unsigned int _limit);
+                        unsigned int _limit, PublicationPtr &_publication);
 
       /// \brief Destructor
       public: virtual ~Publisher();
@@ -73,6 +74,7 @@ namespace gazebo
       private: unsigned int queueLimit;
       private: std::list<google::protobuf::Message *> messages;
       private: boost::recursive_mutex *mutex;
+      private: PublicationPtr publication;
     };
     /// \}
   }
