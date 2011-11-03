@@ -27,7 +27,7 @@ extern "C" {
 
 struct _ccd_simplex_t {
     ccd_support_t ps[4];
-    int last; //!< index of last added point
+    int last; /*!< index of last added point*/
 };
 typedef struct _ccd_simplex_t ccd_simplex_t;
 
@@ -63,7 +63,7 @@ _ccd_inline const ccd_support_t *ccdSimplexLast(const ccd_simplex_t *s)
 
 _ccd_inline const ccd_support_t *ccdSimplexPoint(const ccd_simplex_t *s, int idx)
 {
-    // here is no check on boundaries
+    /* here is no check on boundaries*/
     return &s->ps[idx];
 }
 _ccd_inline ccd_support_t *ccdSimplexPointW(ccd_simplex_t *s, int idx)
@@ -73,7 +73,7 @@ _ccd_inline ccd_support_t *ccdSimplexPointW(ccd_simplex_t *s, int idx)
 
 _ccd_inline void ccdSimplexAdd(ccd_simplex_t *s, const ccd_support_t *v)
 {
-    // here is no check on boundaries in sake of speed
+    /* here is no check on boundaries in sake of speed*/
     ++s->last;
     ccdSupportCopy(s->ps + s->last, v);
 }

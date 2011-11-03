@@ -78,6 +78,8 @@ CHECK_CXX_SOURCE_COMPILES("#include <stdarg.h>
 #include <stdio.h>
 int main() {va_list ap; vsnprintf(0,0,0,ap); return 1;}" HAVE_VSNPRINTF)
 
+set (NDEBUG bool true)
+
 
 CHECK_INCLUDE_FILES(alloca.h HAVE_ALLOCA_H)
 CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)

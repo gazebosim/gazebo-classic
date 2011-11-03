@@ -58,7 +58,7 @@ struct _ccd_pt_vertex_t {
 
     int id;
     ccd_support_t v;
-    ccd_list_t edges; //!< List of edges
+    ccd_list_t edges; /*!< List of edges*/
 };
 typedef struct _ccd_pt_vertex_t ccd_pt_vertex_t;
 
@@ -68,10 +68,10 @@ typedef struct _ccd_pt_vertex_t ccd_pt_vertex_t;
 struct _ccd_pt_edge_t {
     __CCD_PT_EL
 
-    ccd_pt_vertex_t *vertex[2]; //!< Reference to vertices
-    struct _ccd_pt_face_t *faces[2]; //!< Reference to faces
+    ccd_pt_vertex_t *vertex[2]; /*!< Reference to vertices*/
+    struct _ccd_pt_face_t *faces[2]; /*!< Reference to faces*/
 
-    ccd_list_t vertex_list[2]; //!< List items in vertices' lists
+    ccd_list_t vertex_list[2]; /*!< List items in vertices' lists*/
 };
 typedef struct _ccd_pt_edge_t ccd_pt_edge_t;
 
@@ -81,7 +81,7 @@ typedef struct _ccd_pt_edge_t ccd_pt_edge_t;
 struct _ccd_pt_face_t {
     __CCD_PT_EL
 
-    ccd_pt_edge_t *edge[3]; //!< Reference to surrounding edges
+    ccd_pt_edge_t *edge[3]; /*!< Reference to surrounding edges*/
 };
 typedef struct _ccd_pt_face_t ccd_pt_face_t;
 
@@ -90,9 +90,9 @@ typedef struct _ccd_pt_face_t ccd_pt_face_t;
  * Struct containing polytope.
  */
 struct _ccd_pt_t {
-    ccd_list_t vertices; //!< List of vertices
-    ccd_list_t edges; //!< List of edges
-    ccd_list_t faces; //!< List of faces
+    ccd_list_t vertices; /*!< List of vertices*/
+    ccd_list_t edges; /*!< List of edges*/
+    ccd_list_t faces; /*!< List of faces*/
 
     ccd_pt_el_t *nearest;
     ccd_real_t nearest_dist;
@@ -186,11 +186,11 @@ _ccd_inline ccd_pt_vertex_t *ccdPtAddVertexCoords(ccd_pt_t *pt,
 
 _ccd_inline int ccdPtDelVertex(ccd_pt_t *pt, ccd_pt_vertex_t *v)
 {
-    // test if any edge is connected to this vertex
+    /* test if any edge is connected to this vertex*/
     if (!ccdListEmpty(&v->edges))
         return -1;
 
-    // delete vertex from main list
+    /* delete vertex from main list*/
     ccdListDel(&v->list);
 
     if ((void *)pt->nearest == (void *)v){
@@ -203,16 +203,16 @@ _ccd_inline int ccdPtDelVertex(ccd_pt_t *pt, ccd_pt_vertex_t *v)
 
 _ccd_inline int ccdPtDelEdge(ccd_pt_t *pt, ccd_pt_edge_t *e)
 {
-    // text if any face is connected to this edge (faces[] is always
-    // aligned to lower indices)
+    /* text if any face is connected to this edge (faces[] is always*/
+    /* aligned to lower indices)*/
     if (e->faces[0] != NULL)
         return -1;
 
-    // disconnect edge from lists of edges in vertex struct
+    /* disconnect edge from lists of edges in vertex struct*/
     ccdListDel(&e->vertex_list[0]);
     ccdListDel(&e->vertex_list[1]);
 
-    // disconnect edge from main list
+    /* disconnect edge from main list */
     ccdListDel(&e->list);
 
     if ((void *)pt->nearest == (void *)e){
@@ -228,7 +228,7 @@ _ccd_inline int ccdPtDelFace(ccd_pt_t *pt, ccd_pt_face_t *f)
     ccd_pt_edge_t *e;
     size_t i;
 
-    // remove face from edges' recerence lists
+    /* remove face from edges' recerence lists*/
     for (i = 0; i < 3; i++){
         e = f->edge[i];
         if (e->faces[0] == f){
@@ -237,7 +237,7 @@ _ccd_inline int ccdPtDelFace(ccd_pt_t *pt, ccd_pt_face_t *f)
         e->faces[1] = NULL;
     }
 
-    // remove face from list of all faces
+    /* remove face from list of all faces*/
     ccdListDel(&f->list);
 
     if ((void *)pt->nearest == (void *)f){

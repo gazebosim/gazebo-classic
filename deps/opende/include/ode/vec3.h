@@ -43,7 +43,7 @@ extern "C" {
 
 typedef float ccd_real_t;
 
-//# define CCD_EPS 1E-6
+/*# define CCD_EPS 1E-6*/
 # define CCD_EPS FLT_EPSILON
 
 # define CCD_REAL_MAX FLT_MAX
@@ -58,7 +58,7 @@ typedef float ccd_real_t;
 #ifdef CCD_DOUBLE
 typedef double ccd_real_t;
 
-//# define CCD_EPS 1E-10
+/*# define CCD_EPS 1E-10*/
 # define CCD_EPS DBL_EPSILON
 
 # define CCD_REAL_MAX DBL_MAX
@@ -66,8 +66,8 @@ typedef double ccd_real_t;
 # define CCD_REAL(x) (x)       /*!< form a constant */
 # define CCD_SQRT(x) (sqrt(x)) /*!< square root */
 # define CCD_FABS(x) (fabs(x)) /*!< absolute value */
-# define CCD_FMAX(x, y) (max((x), (y))) /*!< maximum of two floats */
-# define CCD_FMIN(x, y) (min((x), (y))) /*!< minimum of two floats */
+# define CCD_FMAX(x, y) (fmax((x), (y))) /*!< maximum of two floats */
+# define CCD_FMIN(x, y) (fmin((x), (y))) /*!< minimum of two floats */
 #endif /* CCD_DOUBLE */
 
 #define CCD_ONE CCD_REAL(1.)

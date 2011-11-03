@@ -57,6 +57,7 @@
 */
 
 #else
+#pragma GCC system_header
 # define DBG(format, ...)
 # define DBG2(str)
 # define DBG_VEC3(v, prefix)

@@ -30,7 +30,7 @@
  * Marks inline function.
  */
 #ifdef __GNUC__
-//# define _ccd_inline static inline __attribute__((always_inline))
+/*# define _ccd_inline static inline __attribute__((always_inline))*/
 # define _ccd_inline static inline
 #else /* __GNUC__ */
 # define _ccd_inline static __inline
@@ -51,9 +51,9 @@
 
 
 #ifdef __ICC
-// disable unused parameter warning
+/* disable unused parameter warning*/
 # pragma warning(disable:869)
-// disable annoying "operands are evaluated in unspecified order" warning
+/* disable annoying "operands are evaluated in unspecified order" warning*/
 # pragma warning(disable:981)
 #endif /* __ICC */
 

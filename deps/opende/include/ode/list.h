@@ -107,9 +107,7 @@ _ccd_inline void ccdListDel(ccd_list_t *item);
 
 
 
-///
-/// INLINES:
-///
+/* INLINES:*/
 
 _ccd_inline void ccdListInit(ccd_list_t *l)
 {

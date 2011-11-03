@@ -27,9 +27,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 struct _ccd_support_t {
-    ccd_vec3_t v;  //!< Support point in minkowski sum
-    ccd_vec3_t v1; //!< Support point in obj1
-    ccd_vec3_t v2; //!< Support point in obj2
+    ccd_vec3_t v;  /*!< Support point in minkowski sum*/
+    ccd_vec3_t v1; /*!< Support point in obj1*/
+    ccd_vec3_t v2; /*!< Support point in obj2*/
 };
 typedef struct _ccd_support_t ccd_support_t;
 

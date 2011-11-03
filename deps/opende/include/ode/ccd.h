@@ -50,21 +50,21 @@ typedef void (*ccd_center_fn)(const void *obj1, ccd_vec3_t *center);
  * Main structure of CCD algorithm.
  */
 struct _ccd_t {
-    ccd_first_dir_fn first_dir; //!< Returns initial direction where first
-                                //!< support point will be searched
-    ccd_support_fn support1; //!< Function that returns support point of
-                             //!< first object
-    ccd_support_fn support2; //!< Function that returns support point of
-                             //!< second object
+    ccd_first_dir_fn first_dir; /*!< Returns initial direction where first*/
+                                /*!< support point will be searched*/
+    ccd_support_fn support1; /*!< Function that returns support point of*/
+                             /*!< first object*/
+    ccd_support_fn support2; /*!< Function that returns support point of*/
+                             /*!< second object*/
 
-    ccd_center_fn center1; //!< Function that returns geometric center of
-                           //!< first object
-    ccd_center_fn center2; //!< Function that returns geometric center of
-                           //!< second object
+    ccd_center_fn center1; /*!< Function that returns geometric center of*/
+                           /*!< first object*/
+    ccd_center_fn center2; /*!< Function that returns geometric center of*/
+                           /*!< second object*/
 
-    unsigned long max_iterations; //!< Maximal number of iterations
+    unsigned long max_iterations; /*!< Maximal number of iterations*/
     ccd_real_t epa_tolerance;
-    ccd_real_t mpr_tolerance; //!< Boundary tolerance for MPR algorithm
+    ccd_real_t mpr_tolerance; /*!< Boundary tolerance for MPR algorithm*/
 };
 typedef struct _ccd_t ccd_t;
 

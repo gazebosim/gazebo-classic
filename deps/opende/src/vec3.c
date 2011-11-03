@@ -75,28 +75,29 @@ _ccd_inline ccd_real_t __ccdVec3PointSegmentDist2(const ccd_vec3_t *P,
                                                   const ccd_vec3_t *b,
                                                   ccd_vec3_t *witness)
 {
-    // The computation comes from solving equation of segment:
-    //      S(t) = x0 + t.d
-    //          where - x0 is initial point of segment
-    //                - d is direction of segment from x0 (|d| > 0)
-    //                - t belongs to <0, 1> interval
-    // 
-    // Than, distance from a segment to some point P can be expressed:
-    //      D(t) = |x0 + t.d - P|^2
-    //          which is distance from any point on segment. Minimization
-    //          of this function brings distance from P to segment.
-    // Minimization of D(t) leads to simple quadratic equation that's
-    // solving is straightforward.
-    //
-    // Bonus of this method is witness point for free.
+    /* The computation comes from solving equation of segment:
+          S(t) = x0 + t.d
+              where - x0 is initial point of segment
+                    - d is direction of segment from x0 (|d| > 0)
+                    - t belongs to <0, 1> interval
+     
+     Than, distance from a segment to some point P can be expressed:
+          D(t) = |x0 + t.d - P|^2
+              which is distance from any point on segment. Minimization
+              of this function brings distance from P to segment.
+     Minimization of D(t) leads to simple quadratic equation that's
+     solving is straightforward.
+    
+     Bonus of this method is witness point for free.
+     */
 
     ccd_real_t dist, t;
     ccd_vec3_t d, a;
 
-    // direction of segment
+    /* direction of segment*/
     ccdVec3Sub2(&d, b, x0);
 
-    // precompute vector from P to x0
+    /* precompute vector from P to x0*/
     ccdVec3Sub2(&a, x0, P);
 
     t  = -CCD_REAL(1.) * ccdVec3Dot(&a, &d);
@@ -117,7 +118,7 @@ _ccd_inline ccd_real_t __ccdVec3PointSegmentDist2(const ccd_vec3_t *P,
             ccdVec3Add(witness, x0);
             dist = ccdVec3Dist2(witness, P);
         }else{
-            // recycling variables
+            /* recycling variables*/
             ccdVec3Scale(&d, t);
             ccdVec3Add(&d, &a);
             dist = ccdVec3Len2(&d);
@@ -139,15 +140,15 @@ ccd_real_t ccdVec3PointTriDist2(const ccd_vec3_t *P,
                                 const ccd_vec3_t *C,
                                 ccd_vec3_t *witness)
 {
-    // Computation comes from analytic expression for triangle (x0, B, C)
-    //      T(s, t) = x0 + s.d1 + t.d2, where d1 = B - x0 and d2 = C - x0 and
-    // Then equation for distance is:
-    //      D(s, t) = | T(s, t) - P |^2
-    // This leads to minimization of quadratic function of two variables.
-    // The solution from is taken only if s is between 0 and 1, t is
-    // between 0 and 1 and t + s < 1, otherwise distance from segment is
-    // computed.
-
+    /* Computation comes from analytic expression for triangle (x0, B, C)
+          T(s, t) = x0 + s.d1 + t.d2, where d1 = B - x0 and d2 = C - x0 and
+     Then equation for distance is:
+          D(s, t) = | T(s, t) - P |^2
+     This leads to minimization of quadratic function of two variables.
+     The solution from is taken only if s is between 0 and 1, t is
+     between 0 and 1 and t + s < 1, otherwise distance from segment is
+     computed.
+    */
     ccd_vec3_t d1, d2, a;
     ccd_real_t u, v, w, p, q, r;
     ccd_real_t s, t, dist, dist2;
