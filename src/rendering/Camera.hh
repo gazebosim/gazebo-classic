@@ -86,7 +86,7 @@ namespace gazebo
 
       /// \brief Render the camera
       public: void Render();
-      private: virtual void RenderImpl();
+      protected: virtual void RenderImpl();
   
       /// \brief Post render
       public: virtual void PostRender();

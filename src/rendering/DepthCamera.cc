@@ -47,7 +47,7 @@ using namespace rendering;
 DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene, bool _autoRender) :
              Camera(_namePrefix, _scene, _autoRender)
 {
-  this->renderTarget = NULL;
+  this->depthTarget = NULL;
   this->depthBuffer = NULL;
   this->depthMaterial = NULL;
 }
@@ -92,7 +92,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   // Create the depth buffer
   std::string depthMaterialName = this->GetName() + "_RttMat_Camera_Depth";
 
-  this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
+  this->depthTexture = Ogre::TextureManager::getSingleton().createManual(
       _textureName,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
@@ -100,10 +100,10 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
       Ogre::PF_FLOAT32_R,
       Ogre::TU_RENDERTARGET).getPointer();
 
-  this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
-  this->renderTarget->setAutoUpdated(false);
+  this->depthTarget = this->depthTexture->getBuffer()->getRenderTarget();
+  this->depthTarget->setAutoUpdated(false);
 
-  this->SetRenderTarget( this->renderTarget );
+  this->SetDepthTarget( this->depthTarget );
 
   this->viewport->setOverlaysEnabled(false);
   this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
@@ -146,7 +146,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
 ////////////////////////////////////////////////////////////////////////////////
 void DepthCamera::PostRender()
 {
-  this->renderTarget->swapBuffers();
+  this->depthTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
@@ -156,7 +156,7 @@ void DepthCamera::PostRender()
     unsigned int height = this->GetImageHeight();
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
+    pixelBuffer = this->depthTexture->getBuffer();
 
     Ogre::PixelFormat format = pixelBuffer->getFormat();
 
@@ -174,6 +174,9 @@ void DepthCamera::PostRender()
 
     this->newDepthFrame( this->depthBuffer, width, height, 1, "FLOAT32");
   }
+
+  // also new image frame for camera texture
+  Camera::PostRender();
 
   this->newData = false;
 }
@@ -202,7 +205,7 @@ void DepthCamera::RenderImpl()
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
-  vp = this->renderTarget->getViewport(0);
+  vp = this->depthTarget->getViewport(0);
 
   // return 0 in case no renderable object is inside frustrum
   vp->setBackgroundColour( Ogre::ColourValue(Ogre::ColourValue(0,0,0)) );
@@ -214,7 +217,7 @@ void DepthCamera::RenderImpl()
   sceneMgr->_setPass(pass, true, false);
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
-  autoParamDataSource.setCurrentRenderTarget(this->renderTarget);
+  autoParamDataSource.setCurrentRenderTarget(this->depthTarget);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
   autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
 
@@ -261,10 +264,13 @@ void DepthCamera::RenderImpl()
   }
 
   // Does actual rendering
-  this->renderTarget->update(false);
+  this->depthTarget->update(false);
 
   sceneMgr->_suppressRenderStateChanges(false);
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+
+  // for camera image
+  Camera::RenderImpl();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -273,3 +279,29 @@ const float* DepthCamera::GetDepthData()
 {
   return this->depthBuffer;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the render target for the camera
+void DepthCamera::SetDepthTarget( Ogre::RenderTarget *target )
+{
+  this->depthTarget = target;
+
+  if (this->depthTarget)
+  {
+    // Setup the viewport to use the texture
+    this->viewport = this->depthTarget->addViewport(this->camera);
+    this->viewport->setClearEveryFrame(true);
+    this->viewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
+    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+
+    double ratio = (double)this->viewport->getActualWidth() / 
+                   (double)this->viewport->getActualHeight();
+
+    double hfov = this->GetHFOV().GetAsRadian();
+    double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
+    //gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+  }
+}
+

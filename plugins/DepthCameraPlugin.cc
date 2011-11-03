@@ -27,26 +27,30 @@ void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor,
                               sdf::ElementPtr &/*_sdf*/)
 {
   this->parentSensor = boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor);
+  this->depthCamera = this->parentSensor->GetDepthCamera();
   this->camera = this->parentSensor->GetCamera();
 
   if (!this->parentSensor)
   {
-    gzerr << "DepthCameraPlugin not attached to a camera sensor\n";
+    gzerr << "DepthCameraPlugin not attached to a depthCamera sensor\n";
     return;
   }
 
-  this->width = this->camera->GetImageWidth();
-  this->height = this->camera->GetImageHeight();
-  this->depth = this->camera->GetImageDepth();
-  this->format = this->camera->GetImageFormat();
+  this->width = this->depthCamera->GetImageWidth();
+  this->height = this->depthCamera->GetImageHeight();
+  this->depth = this->depthCamera->GetImageDepth();
+  this->format = this->depthCamera->GetImageFormat();
 
-  this->newFrameConnection = this->camera->ConnectNewDepthFrame( 
-      boost::bind(&DepthCameraPlugin::OnNewFrame, this, _1, _2, _3, _4, _5));
+  this->newFrameConnection = this->depthCamera->ConnectNewDepthFrame( 
+      boost::bind(&DepthCameraPlugin::OnNewDepthFrame, this, _1, _2, _3, _4, _5));
+
+  this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame( 
+      boost::bind(&DepthCameraPlugin::OnNewImageFrame, this, _1, _2, _3, _4, _5));
 
   this->parentSensor->SetActive(true);
 }
 
-void DepthCameraPlugin::OnNewFrame(const float *_image,
+void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
     unsigned int _width, unsigned int _height, 
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
@@ -66,6 +70,16 @@ void DepthCameraPlugin::OnNewFrame(const float *_image,
 
   /*rendering::Camera::SaveFrame( _image, this->width, 
     this->height, this->depth, this->format, 
-    "/tmp/camera/me.jpg" );
+    "/tmp/depthCamera/me.jpg" );
+    */
+}
+
+void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
+                              unsigned int /*_width*/, unsigned int /*_height*/, 
+                              unsigned int /*_depth*/, const std::string &/*_format*/)
+{
+  /*rendering::Camera::SaveFrame( _image, this->width, 
+    this->height, this->depth, this->format, 
+    "/tmp/depthCamera/me.jpg" );
     */
 }

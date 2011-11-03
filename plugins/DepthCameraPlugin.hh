@@ -18,6 +18,7 @@
 #ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 #define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 #include "sensors/DepthCameraSensor.hh"
+#include "sensors/CameraSensor.hh"
 #include "rendering/DepthCamera.hh"
 #include "gazebo.h"
 
@@ -29,17 +30,23 @@ namespace gazebo
 
     public: void Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf );
 
-    public: virtual void OnNewFrame(const float *_image,
+    public: virtual void OnNewDepthFrame(const float *_image,
                 unsigned int _width, unsigned int _height, 
                 unsigned int _depth, const std::string &_format);
+
+    public: virtual void OnNewImageFrame(const unsigned char *_image,
+                              unsigned int _width, unsigned int _height, 
+                              unsigned int _depth, const std::string &_format);
 
     protected: unsigned int width, height, depth;
     protected: std::string format;
 
     protected: sensors::DepthCameraSensorPtr parentSensor;
-    protected: rendering::DepthCameraPtr camera;
+    protected: rendering::DepthCameraPtr depthCamera;
+    protected: rendering::CameraPtr camera;
 
     private: event::ConnectionPtr newFrameConnection;
+    private: event::ConnectionPtr newImageFrameConnection;
   };
 }
 #endif

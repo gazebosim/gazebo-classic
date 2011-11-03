@@ -100,6 +100,10 @@ namespace gazebo
       private: Ogre::Material *depthMaterial;
 
       private: event::EventT<void(const float *, unsigned int, unsigned int, unsigned int, const std::string &)> newDepthFrame;
+
+      protected: Ogre::Texture *depthTexture;
+      protected: Ogre::RenderTarget *depthTarget;
+      public: virtual void SetDepthTarget( Ogre::RenderTarget *target );
     };
     
     /// \}

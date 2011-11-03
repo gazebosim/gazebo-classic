@@ -61,7 +61,7 @@ namespace gazebo
       protected: virtual void Init();
     
       /// \brief Update the sensor information
-      protected: virtual void Update(bool force);
+      protected: virtual void UpdateImpl(bool _force);
     
       /// Finalize the camera
       protected: virtual void Fini();
@@ -69,12 +69,17 @@ namespace gazebo
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
    
-      public: rendering::DepthCameraPtr GetCamera() const 
+      public: rendering::DepthCameraPtr GetDepthCamera() const 
               {return this->camera; };
+
+      public: rendering::CameraPtr GetCamera() const 
+              {return boost::shared_static_cast<rendering::Camera>(this->camera); };
 
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
    
       private: rendering::DepthCameraPtr camera;
+
+      private: rendering::ScenePtr scene;
     };
     /// \}
   }

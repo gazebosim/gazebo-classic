@@ -21,6 +21,8 @@
 
 #include <sstream>
 
+#include "physics/World.hh"
+
 #include "common/Events.hh"
 #include "common/Exception.hh"
 
@@ -82,13 +84,14 @@ void DepthCameraSensor::Init()
 
   if (!worldName.empty())
   {
-    rendering::ScenePtr scene = 
+    this->scene = 
       rendering::RenderEngine::Instance()->GetScene(worldName);
 
-    if (!scene)
-      scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
+    if (!this->scene)
+      this->scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
-    this->camera = scene->CreateDepthCamera(this->sdf->GetValueString("name"));
+    this->camera = this->scene->CreateDepthCamera(this->sdf->GetValueString("name"));
+
     if (!this->camera)
     {
       gzerr << "Unable to create depth camera sensor\n";
@@ -107,7 +110,8 @@ void DepthCameraSensor::Init()
     }
 
     this->camera->Init();
-    this->camera->CreateDepthTexture(this->GetName() + "_RttTex");
+    this->camera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
+    this->camera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
     this->camera->SetWorldPose( this->pose );
     this->camera->AttachToVisual( this->parentName, true );
   }
@@ -123,6 +127,8 @@ void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
   this->camera->Fini();
+  this->camera.reset();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -134,9 +140,15 @@ void DepthCameraSensor::SetActive(bool value)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void DepthCameraSensor::Update(bool force)
+void DepthCameraSensor::UpdateImpl(bool force)
 {
-  Sensor::Update(force);
+  //Sensor::Update(force);
+  if (this->camera)
+  {
+    this->camera->Render();
+    this->camera->PostRender();
+    this->lastUpdateTime = this->world->GetSimTime();
+  }
 }
 
 void DepthCameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)

@@ -207,7 +207,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     sdf::ElementPtr camera = _sdf->AddElement("camera");
     initCamera(_config, camera);
 
-    if (!_sdf->GetAttribute("type")->SetFromString("camera"))
+    if (!_sdf->GetAttribute("type")->SetFromString("depth")) // convert all camera to depth cameras so we can get point cloud if needed
     {
       gzerr << "Unable to set type to camera\n";
       return false;
