@@ -197,7 +197,6 @@ include/ode/compatibility.h
 include/ode/contact.h
 include/ode/error.h
 include/ode/export-dif.h
-include/ode/Makefile.am
 include/ode/mass.h
 include/ode/matrix.h
 include/ode/memory.h
