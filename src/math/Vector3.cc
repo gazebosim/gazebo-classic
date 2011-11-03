@@ -253,13 +253,6 @@ const Vector3 &Vector3::operator+=( const Vector3 &pt )
   return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Subtraction operators
-Vector3 Vector3::operator-( const Vector3 &pt ) const
-{
-  return Vector3(this->x - pt.x, this->y - pt.y, this->z - pt.z);
-}
-
 const Vector3 &Vector3::operator-=( const Vector3 &pt )
 {
   this->x -= pt.x;

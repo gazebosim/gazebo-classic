@@ -52,11 +52,11 @@ void TopicManager::Init()
 
 void TopicManager::Fini()
 {
-  std::vector<PublicationPtr>::iterator iter;
+  PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin(); 
        iter != this->advertisedTopics.end(); iter++)
   {
-    this->Unadvertise( (*iter)->GetTopic() );
+    this->Unadvertise( iter->first );
   }
 
   SubMap::iterator iter2;
@@ -140,21 +140,11 @@ void TopicManager::Publish( const std::string &_topic,
 ////////////////////////////////////////////////////////////////////////////////
 PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 {
-  std::vector<PublicationPtr>::iterator iter;
-  PublicationPtr pub;
-
-  // Find the publication
-  for (iter = this->advertisedTopics.begin(); 
-      iter != this->advertisedTopicsEnd; iter++)
-  {
-    if ((*iter)->GetTopic() == _topic)
-    {
-      pub = *iter;
-      break;
-    }
-  }
-
-  return pub;
+  PublicationPtr_M::iterator iter = this->advertisedTopics.find(_topic);
+  if (iter != this->advertisedTopicsEnd)
+    return iter->second;
+  else
+    return PublicationPtr();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,8 +302,8 @@ PublicationPtr TopicManager::UpdatePublications( const std::string &topic,
 
     pub = PublicationPtr( new Publication(topic, msgType) );
     dbgPub = PublicationPtr( new Publication(topic+"/__dbg", tmp.GetTypeName()) );
-    this->advertisedTopics.push_back( pub );
-    this->advertisedTopics.push_back( dbgPub );
+    this->advertisedTopics[topic] =  pub;
+    this->advertisedTopics[topic+"/__dbg"] = dbgPub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
   }
 

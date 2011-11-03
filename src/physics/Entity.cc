@@ -112,6 +112,13 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   this->visPub->Publish(*this->visualMsg);
 
   this->poseMsg->set_name( this->GetCompleteScopedName() );
+
+  if (this->HasType(MODEL))
+    this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
+  else if (this->IsCanonicalLink())
+    this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalLink;
+  else
+    this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 }
 
  
@@ -302,6 +309,15 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
       << this->parentEntity->GetName() << "] is not a MODEL!\n";
 }
 
+void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
+{
+  this->worldPose = _pose;
+  this->worldPose.Correct();
+
+  if (_notify) 
+    this->UpdatePhysicsPose(true);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
@@ -338,18 +354,15 @@ void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 {
   this->GetWorld()->modelWorldPoseUpdateMutex->lock();
 
-  if (this->HasType(MODEL))
+  (*this.*setWorldPoseFunc)(_pose, _notify);
+
+  /*if (this->HasType(MODEL))
     this->SetWorldPoseModel(_pose, _notify);
   else if (this->IsCanonicalLink())
     this->SetWorldPoseCanonicalLink(_pose, _notify);
   else
-  {
-    this->worldPose = _pose;
-    this->worldPose.Correct();
-
-    if (_notify) 
-      this->UpdatePhysicsPose(true);
-  }
+    this->SetWorldPoseDefault(_pose, _notify);
+    */
 
   this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
 

@@ -27,9 +27,7 @@
 #include "common/Console.hh"
 #include "gazebo_config.h"
 
-#ifdef INCLUDE_ODE
 void RegisterODEPhysics();
-#endif
 
 #ifdef INCLUDE_BULLET
 void RegisterBulletPhysics();
@@ -45,9 +43,7 @@ std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 /// Register everything
 void PhysicsFactory::RegisterAll()
 {
-#ifdef INCLUDE_ODE
   RegisterODEPhysics();
-#endif
 
 #ifdef INCLUDE_BULLET
   RegisterBulletPhysics();
