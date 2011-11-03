@@ -203,7 +203,6 @@ include/ode/compatibility.h
 include/ode/contact.h
 include/ode/error.h
 include/ode/export-dif.h
-include/ode/Makefile.am
 include/ode/mass.h
 include/ode/matrix.h
 include/ode/memory.h
@@ -216,7 +215,6 @@ include/ode/ode.h
 include/ode/odeinit.h
 include/ode/odemath.h
 include/ode/odemath_legacy.h
-include/ode/README
 include/ode/rotation.h
 include/ode/timer.h
 )
