@@ -906,7 +906,7 @@ void dInternalStepIsland (dxWorldProcessContext *context,
   dInternalStepIsland_x2 (context,world,body,nb,joint,nj,stepsize);
 }
 
-size_t dxEstimateStepMemoryRequirements (dxBody * const *body, int nb, dxJoint * const *_joint, int _nj)
+size_t dxEstimateStepMemoryRequirements (dxBody * const * /*body*/, int nb, dxJoint * const *_joint, int _nj)
 {
   int nj, m;
 

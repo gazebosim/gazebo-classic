@@ -409,8 +409,8 @@ dxQuadTreeSpace::~dxQuadTreeSpace(){
 	dFree(CurrentChild, (Depth + 1) * sizeof(int));
 }
 
-dxGeom* dxQuadTreeSpace::getGeom(int Index){
-	dUASSERT(Index >= 0 && Index < count, "index out of range");
+dxGeom* dxQuadTreeSpace::getGeom(int /*Index*/){
+	//dUASSERT(Index >= 0 && Index < count, "index out of range");
 
 	//@@@
 	dDebug (0,"dxQuadTreeSpace::getGeom() not yet implemented");

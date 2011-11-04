@@ -51,12 +51,12 @@
 #include "collision_util.h"
 
 int dCollideCylinderSphere(dxGeom* Cylinder, dxGeom* Sphere, 
-                           int flags, dContactGeom *contact, int skip)
+                           int /*flags*/, dContactGeom *contact, int /*skip*/)
 {
-	dIASSERT (skip >= (int)sizeof(dContactGeom));
+	//dIASSERT (skip >= (int)sizeof(dContactGeom));
 	dIASSERT (Cylinder->type == dCylinderClass);
 	dIASSERT (Sphere->type == dSphereClass);
-	dIASSERT ((flags & NUMC_MASK) >= 1);
+	//dIASSERT ((flags & NUMC_MASK) >= 1);
 
 	//unsigned char* pContactData = (unsigned char*)contact;
 	int GeomCount = 0; // count of used contacts

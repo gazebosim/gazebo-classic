@@ -245,7 +245,7 @@ public:
   }
 
   /** \brief Compute the split rule according to a subset of geometry and the corresponding BV node */
-  void computeRule(const OBB& bv, unsigned int* primitive_indices, int num_primitives)
+  void computeRule(const OBB& bv, unsigned int* /*primitive_indices*/, int /*num_primitives*/)
   {
     Vec3f center = bv.center();
     split_vector = bv.axis[0];

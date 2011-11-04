@@ -384,10 +384,10 @@ dxGeom::~dxGeom()
 
 unsigned dxGeom::getParentSpaceTLSKind() const
 {
-  return parent_space ? parent_space->tls_kind : dSPACE_TLS_KIND_INIT_VALUE;
+  return parent_space ? parent_space->tls_kind : (int)dSPACE_TLS_KIND_INIT_VALUE;
 }
 
-int dxGeom::AABBTest (dxGeom *o, dReal aabb[6])
+int dxGeom::AABBTest (dxGeom * /*o*/, dReal /*aabb*/ [6])
 {
   return 1;
 }
@@ -464,7 +464,7 @@ void dxGeom::computePosr()
   dMultiply0_333 (final_posr->R,body->posr.R,offset_posr->R);
 }
 
- bool dxGeom::controlGeometry(int controlClass, int controlCode, void *dataValue, int *dataSize)
+ bool dxGeom::controlGeometry(int /*controlClass*/, int /*controlCode*/, void * /*dataValue*/, int *dataSize)
  {
    dAASSERT(false && "Control class/code is not supported for current geom");
 

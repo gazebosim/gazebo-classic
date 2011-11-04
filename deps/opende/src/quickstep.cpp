@@ -466,7 +466,7 @@ inline static void multiply_JM (const int nb, const int m, dRealPtr J, dRealPtr 
   tmp1 = 0;
 }
 
-void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb, dRealPtr invI, dRealPtr I, dxBody * const *body, const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J, int *jb, dRealMutablePtr rhs_precon)
+void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb, dRealPtr /*invI*/, dRealPtr I, dxBody * const *body, const dReal stepsize1, dRealMutablePtr c, dRealMutablePtr J, int *jb, dRealMutablePtr rhs_precon)
 {
     /************************************************************************************/
     /*                                                                                  */
@@ -568,11 +568,11 @@ static inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 }
 
 static void ComputeRows(
-                int thread_id,
+                int /*thread_id*/,
                 IndexError* order,
-                dxBody* const *body,
+                dxBody* const * /*body*/,
                 dxSORLCPParameters params,
-                boost::recursive_mutex* mutex)
+                boost::recursive_mutex* /*mutex*/)
 {
   struct timeval tv;
   double cur_time;
@@ -966,7 +966,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   dRealPtr invI, dRealPtr I, dRealMutablePtr lambda, dRealMutablePtr ac, dRealMutablePtr fc, dRealMutablePtr b, dRealMutablePtr b_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
   dxQuickStepParameters *qs,
-  dRealMutablePtr JiM, dRealMutablePtr JiMratio,
+  dRealMutablePtr /*JiM*/, dRealMutablePtr JiMratio,
 #ifdef USE_TPROW
   boost::threadpool::pool* row_threadpool,
 #endif
@@ -1807,7 +1807,7 @@ static size_t EstimateSOR_LCPMemoryRequirements(int m,int nb)
 }
 
 size_t dxEstimateQuickStepMemoryRequirements (
-  dxBody * const *body, int nb, dxJoint * const *_joint, int _nj)
+  dxBody * const * /*body*/, int nb, dxJoint * const *_joint, int _nj)
 {
   int nj, m, mfb;
 

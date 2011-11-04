@@ -1312,7 +1312,7 @@ void dJointDestroy (dxJoint *j)
 }
 
 
-dJointGroupID dJointGroupCreate (int max_size)
+dJointGroupID dJointGroupCreate (int /*max_size*/)
 {
     // not any more ... dUASSERT (max_size > 0,"max size must be > 0");
     dxJointGroup *group = new dxJointGroup;
@@ -1938,11 +1938,11 @@ int dWorldRobustStep(dWorldID w, dReal stepsize)
   return result;
 }
 
-void dWorldImpulseToForce (dWorldID w, dReal stepsize,
+void dWorldImpulseToForce (dWorldID /*w*/, dReal stepsize,
 			   dReal ix, dReal iy, dReal iz,
 			   dVector3 force)
 {
-  dAASSERT (w);
+  //dAASSERT (w);
   stepsize = dRecip(stepsize);
   force[0] = stepsize * ix;
   force[1] = stepsize * iy;

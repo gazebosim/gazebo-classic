@@ -188,7 +188,7 @@ bool HybridModel::Build(const OPCODECREATE& create)
 	struct Local
 	{
 		// A callback to count leaf nodes
-		static bool CountLeaves(const AABBTreeNode* current, udword depth, void* user_data)
+		static bool CountLeaves(const AABBTreeNode* current, udword /*depth*/, void* user_data)
 		{
 			if(current->IsLeaf())
 			{
@@ -199,7 +199,7 @@ bool HybridModel::Build(const OPCODECREATE& create)
 		}
 
 		// A callback to setup leaf nodes in our internal structures
-		static bool SetupLeafData(const AABBTreeNode* current, udword depth, void* user_data)
+		static bool SetupLeafData(const AABBTreeNode* current, udword /*depth*/, void* user_data)
 		{
 			if(current->IsLeaf())
 			{

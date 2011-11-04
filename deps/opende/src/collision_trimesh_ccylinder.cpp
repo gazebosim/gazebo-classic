@@ -352,9 +352,9 @@ BOOL sTrimeshCapsuleColliderData::_cldClipEdgeToPlane(
 }
 
 BOOL sTrimeshCapsuleColliderData::_cldTestAxis(
-						 const dVector3 &v0,
-						 const dVector3 &v1,
-						 const dVector3 &v2, 
+						 const dVector3 &/*v0*/,
+						 const dVector3 &/*v1*/,
+						 const dVector3 &/*v2*/, 
 						 dVector3 vAxis, 
 						 int iAxis,
 						 BOOL bNoFlip/* = FALSE*/) 
@@ -1089,7 +1089,7 @@ int dCollideCCTL(dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int s
 				dVector3 dv[3];
 				FetchTriangle(TriMesh, Triint, cData.m_mTriMeshPos, cData.m_mTriMeshRot, dv);
 
-				uint8 flags = UseFlags ? UseFlags[Triint] : dxTriMeshData::kUseAll;
+				uint8 flags = UseFlags ? (uint8) UseFlags[Triint] : (uint8) dxTriMeshData::kUseAll;
 
 				bool bFinishSearching;
 				ctContacts0 = cData.TestCollisionForSingleTriangle(ctContacts0, Triint, dv, flags, bFinishSearching);

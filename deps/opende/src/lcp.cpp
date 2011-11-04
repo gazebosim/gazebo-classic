@@ -145,11 +145,11 @@ rows/columns and manipulate C.
 // rows will be swapped by exchanging row pointers. otherwise the data will
 // be copied.
 
-static void swapRowsAndCols (ATYPE A, int n, int i1, int i2, int nskip, 
+static void swapRowsAndCols (ATYPE A, int n, int i1, int i2, int /*nskip*/, 
   int do_fast_row_swaps)
 {
-  dAASSERT (A && n > 0 && i1 >= 0 && i2 >= 0 && i1 < n && i2 < n &&
-    nskip >= n && i1 < i2);
+  //dAASSERT (A && n > 0 && i1 >= 0 && i2 >= 0 && i1 < n && i2 < n &&
+    //nskip >= n && i1 < i2);
 
 # ifdef ROWPTRS
   dReal *A_i1 = A[i1];
@@ -377,7 +377,7 @@ struct dLCP {
     bool *_state, int *_findex, int *_p, int *_C, dReal **Arows);
   int getNub() const { return m_nub; }
   void transfer_i_to_C (int i);
-  void transfer_i_to_N (int i) { m_nN++; }			// because we can assume C and N span 1:i-1
+  void transfer_i_to_N (int /*i*/) { m_nN++; }			// because we can assume C and N span 1:i-1
   void transfer_i_from_N_to_C (int i);
   void transfer_i_from_C_to_N (int i, void *tmpbuf);
   static size_t estimate_transfer_i_from_C_to_N_mem_req(int nC, int nskip) { return dEstimateLDLTRemoveTmpbufSize(nC, nskip); }

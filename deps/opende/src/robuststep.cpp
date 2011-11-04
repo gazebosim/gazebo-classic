@@ -276,10 +276,11 @@ static void det_orthonormal_vec(dReal* dir, dReal* v)
 } 
 
 // verifies that all elements of a vector are finite (for debugging/testing)
-static void verifyFinite(dReal* A, int n)
+static void verifyFinite(dReal* /*A*/, int /*n*/)
 {
-  for (int i=0; i< n; i++)
+  /*for (int i=0; i< n; i++)
     dIASSERT(!isnan(A[i]) && !isinf(A[i]));
+    */
 }
 
 // multiplies a nr x (nb*6) matrix (N, T1, or T2) by a (nb*6) x nc matrix
@@ -1144,7 +1145,7 @@ static void formXiMXT(shared_array<dReal>& XMXT, dReal* X, int nb, int n, dReal*
 //****************************************************************************
 // convex optimization objective / constraint functions (phase I) 
 //****************************************************************************
-static void copt_fx1(dReal* x, int n, dReal* f, int m, void* data)
+static void copt_fx1(dReal* x, int /*n*/, dReal* f, int /*m*/, void* data)
 {
   COptData& cd = *((COptData*) data);
   const dReal S_BUFFER = dSqrt(std::numeric_limits<dReal>::epsilon());
@@ -1213,7 +1214,7 @@ dIASSERT(!isnan(f[0]));
 //****************************************************************************
 // convex optimization objective / constraint functions (phase II) 
 //****************************************************************************
-static void copt_fx2(dReal* x, int n, dReal* f, int m, void* data)
+static void copt_fx2(dReal* x, int /*n*/, dReal* f, int /*m*/, void* data)
 {
   COptData& cd = *((COptData*) data);
   const dReal S_BUFFER = dSqrt(std::numeric_limits<dReal>::epsilon());

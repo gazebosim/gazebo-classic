@@ -84,6 +84,8 @@ static int nextSupport(const void *obj1, const void *obj2, const ccd_t *ccd,
 
 void ccdFirstDirDefault(const void *o1, const void *o2, ccd_vec3_t *dir)
 {
+  (void)(o1);
+  (void)(o2);
     ccdVec3Set(dir, CCD_ONE, CCD_ZERO, CCD_ZERO);
 }
 
@@ -132,10 +134,13 @@ static int penEPAPosCmp(const void *a, const void *b)
 static void penEPAPos(const ccd_pt_t *pt, const ccd_pt_el_t *nearest,
                       ccd_vec3_t *pos)
 {
+
     ccd_pt_vertex_t *v;
     ccd_pt_vertex_t **vs;
     size_t i, len;
     ccd_real_t scale;
+
+  (void)(nearest);
 
     /* compute median*/
     len = 0;

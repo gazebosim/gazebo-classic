@@ -454,7 +454,7 @@ bool CTLSStorageArray::FindFreeStorageBlock(CTLSStorageBlock *&psbOutFreeStorage
 
 
 bool CTLSStorageArray::FindFreeStorageBlockIndex(unsigned int &nOutFreeBlockIndex, 
-	tlsindextype iValueCount, bool bIsManualCleanup)
+	tlsindextype /*iValueCount*/, bool bIsManualCleanup)
 {
 	bool bResult = false;
 
@@ -491,7 +491,7 @@ bool CTLSStorageArray::FindFreeStorageBlockIndex(unsigned int &nOutFreeBlockInde
 }
 
 bool CTLSStorageArray::FindFreeStorageBlockIndexWithPossibilityVerified(unsigned int &nOutFreeBlockIndex, 
-	bool bIsManualCleanup)
+	bool /*bIsManualCleanup*/)
 {
 	unsigned int nBlockIndex = 0;
 

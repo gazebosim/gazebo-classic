@@ -138,7 +138,7 @@ void CameraSensor::SetActive(bool value)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void CameraSensor::UpdateImpl(bool force)
+void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)
   {

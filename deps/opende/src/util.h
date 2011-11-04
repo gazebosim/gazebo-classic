@@ -177,10 +177,10 @@ struct dxWorldProcessContext
   }
 
   template<typename ElementType>
-  void ShrinkArray(ElementType *arr, size_t oldcount, size_t newcount)
+  void ShrinkArray(ElementType *arr, size_t /*oldcount*/, size_t newcount)
   {
-    dIASSERT(newcount <= oldcount);
-    dIASSERT(dOFFSET_EFFICIENTLY(arr, oldcount * sizeof(ElementType)) == m_pAllocCurrent);
+    //dIASSERT(newcount <= oldcount);
+    //dIASSERT(dOFFSET_EFFICIENTLY(arr, oldcount * sizeof(ElementType)) == m_pAllocCurrent);
     m_pAllocCurrent = dOFFSET_EFFICIENTLY(arr, newcount * sizeof(ElementType));
   }
 

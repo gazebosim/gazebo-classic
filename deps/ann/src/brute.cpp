@@ -56,7 +56,7 @@ void ANNbruteForce::annkSearch(			// approx k near neighbor search
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor indices (returned)
 	ANNdistArray		dd,				// dist to near neighbors (returned)
-	double				eps)			// error bound (ignored)
+	double				/*eps*/)			// error bound (ignored)
 {
 	ANNmin_k mk(k);						// construct a k-limited priority queue
 	int i;
@@ -83,7 +83,7 @@ int ANNbruteForce::annkFRSearch(		// approx fixed-radius kNN search
 	int					k,				// number of near neighbors to return
 	ANNidxArray			nn_idx,			// nearest neighbor array (returned)
 	ANNdistArray		dd,				// dist to near neighbors (returned)
-	double				eps)			// error bound
+	double				/*eps*/)			// error bound
 {
 	ANNmin_k mk(k);						// construct a k-limited priority queue
 	int i;

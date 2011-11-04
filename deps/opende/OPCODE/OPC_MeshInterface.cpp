@@ -278,7 +278,7 @@ bool MeshInterface::SetStrides(udword tri_stride, udword vertex_stride)
 
 #ifndef OPC_USE_CALLBACKS
 #ifdef OPC_USE_STRIDE
-void MeshInterface::FetchTriangleFromSingles(VertexPointers& vp, udword index, ConversionArea vc) const
+void MeshInterface::FetchTriangleFromSingles(VertexPointers& vp, udword index, ConversionArea /*vc*/) const
 {	
 	const IndexedTriangle* T = (const IndexedTriangle*)(((ubyte*)mTris) + index * mTriStride);
 
@@ -306,7 +306,7 @@ void MeshInterface::FetchTriangleFromDoubles(VertexPointers& vp, udword index, C
 	}
 }
 
-void MeshInterface::FetchExTriangleFromSingles(VertexPointersEx& vpe, udword index, ConversionArea vc) const
+void MeshInterface::FetchExTriangleFromSingles(VertexPointersEx& vpe, udword index, ConversionArea /*vc*/) const
 {	
 	const IndexedTriangle* T = (const IndexedTriangle*)(((ubyte*)mTris) + index * mTriStride);
 

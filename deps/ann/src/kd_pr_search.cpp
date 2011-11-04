@@ -178,7 +178,7 @@ void ANNkd_split::ann_pri_search(ANNdist box_dist)
 //		This is virtually identical to the ann_search for standard search.
 //----------------------------------------------------------------------
 
-void ANNkd_leaf::ann_pri_search(ANNdist box_dist)
+void ANNkd_leaf::ann_pri_search(ANNdist /*box_dist*/)
 {
 	register ANNdist dist;				// distance to data point
 	register ANNcoord* pp;				// data coordinate pointer
