@@ -458,7 +458,7 @@ CollisionPtr ODEPhysics::CreateCollision(const std::string &type, LinkPtr body)
     shape.reset( new ODECylinderShape(collision) );
   else if ( type == "multiray")
     shape.reset( new ODEMultiRayShape(collision) );
-  else if ( type == "mesh")
+  else if ( type == "mesh" || type == "trimesh")
     shape.reset( new ODETrimeshShape(collision) );
   else if ( type == "heightmap")
     shape.reset( new ODEHeightmapShape(collision) );
@@ -468,6 +468,7 @@ CollisionPtr ODEPhysics::CreateCollision(const std::string &type, LinkPtr body)
     gzerr << "Unable to create collision of type[" << type << "]\n";
 
   collision->SetShape(shape);
+  shape->SetWorld(body->GetWorld());
 
   return collision;
 }
