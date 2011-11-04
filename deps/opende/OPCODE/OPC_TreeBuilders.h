@@ -87,7 +87,7 @@
 		 *	\return		splitting value
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual						float			GetSplittingValue(const dTriIndex* primitives, udword nb_prims, const AABB& global_box, udword axis)	const
+		virtual						float			GetSplittingValue(const dTriIndex* /*primitives*/, udword /*nb_prims*/, const AABB& global_box, udword axis)	const
 													{
 														// Default split value = middle of the axis (using only the box)
 														return global_box.GetCenter(axis);
@@ -102,7 +102,7 @@
 		 *	\return		TRUE if the node should be subdivised
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual						BOOL			ValidateSubdivision(const dTriIndex* primitives, udword nb_prims, const AABB& global_box)
+		virtual						BOOL			ValidateSubdivision(const dTriIndex* /*primitives*/, udword nb_prims, const AABB& /*global_box*/)
 													{
 														// Check the user-defined limit
 														if(nb_prims<=mSettings.mLimit)	return FALSE;

@@ -538,7 +538,7 @@ bool sCylinderTrimeshColliderData::_cldTestSeparatingAxes(
 }
 
 bool sCylinderTrimeshColliderData::_cldClipCylinderEdgeToTriangle(
-	const dVector3 &v0, const dVector3 &v1, const dVector3 &v2)
+	const dVector3 &v0, const dVector3 &/*v1*/, const dVector3 &/*v2*/)
 {
 	// translate cylinder
 	dReal fTemp = dVector3Dot(m_vCylinderAxis , m_vContactNormal);

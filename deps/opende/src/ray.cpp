@@ -232,13 +232,13 @@ static int ray_sphere_helper (dxRay *ray, dVector3 sphere_pos, dReal radius,
 }
 
 
-int dCollideRaySphere (dxGeom *o1, dxGeom *o2, int flags,
-		       dContactGeom *contact, int skip)
+int dCollideRaySphere (dxGeom *o1, dxGeom *o2, int /*flags*/,
+		       dContactGeom *contact, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dRayClass);
   dIASSERT (o2->type == dSphereClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   dxRay *ray = (dxRay*) o1;
   dxSphere *sphere = (dxSphere*) o2;
@@ -250,13 +250,13 @@ int dCollideRaySphere (dxGeom *o1, dxGeom *o2, int flags,
 }
 
 
-int dCollideRayBox (dxGeom *o1, dxGeom *o2, int flags,
-		    dContactGeom *contact, int skip)
+int dCollideRayBox (dxGeom *o1, dxGeom *o2, int /*flags*/,
+		    dContactGeom *contact, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dRayClass);
   dIASSERT (o2->type == dBoxClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   dxRay *ray = (dxRay*) o1;
   dxBox *box = (dxBox*) o2;
@@ -350,12 +350,12 @@ int dCollideRayBox (dxGeom *o1, dxGeom *o2, int flags,
 
 
 int dCollideRayCapsule (dxGeom *o1, dxGeom *o2,
-			  int flags, dContactGeom *contact, int skip)
+			  int /*flags*/, dContactGeom *contact, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dRayClass);
   dIASSERT (o2->type == dCapsuleClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   dxRay *ray = (dxRay*) o1;
   dxCapsule *ccyl = (dxCapsule*) o2;
@@ -464,13 +464,13 @@ int dCollideRayCapsule (dxGeom *o1, dxGeom *o2,
 }
 
 
-int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
-		      dContactGeom *contact, int skip)
+int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int /*flags*/,
+		      dContactGeom *contact, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dRayClass);
   dIASSERT (o2->type == dPlaneClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   dxRay *ray = (dxRay*) o1;
   dxPlane *plane = (dxPlane*) o2;
@@ -497,12 +497,12 @@ int dCollideRayPlane (dxGeom *o1, dxGeom *o2, int flags,
 }
 
 // Ray - Cylinder collider by David Walters (June 2006)
-int dCollideRayCylinder( dxGeom *o1, dxGeom *o2, int flags, dContactGeom *contact, int skip )
+int dCollideRayCylinder( dxGeom *o1, dxGeom *o2, int /*flags*/, dContactGeom *contact, int /*skip*/ )
 {
-	dIASSERT( skip >= (int)sizeof( dContactGeom ) );
+	//dIASSERT( skip >= (int)sizeof( dContactGeom ) );
 	dIASSERT( o1->type == dRayClass );
 	dIASSERT( o2->type == dCylinderClass );
-	dIASSERT( (flags & NUMC_MASK) >= 1 );
+	//dIASSERT( (flags & NUMC_MASK) >= 1 );
 
 	dxRay* ray = (dxRay*)( o1 );
 	dxCylinder* cyl = (dxCylinder*)( o2 );

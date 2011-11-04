@@ -454,7 +454,7 @@ int dBoxTouchesBox (const dVector3 p1, const dMatrix3 R1,
 //****************************************************************************
 // other utility functions
 
-void dInfiniteAABB (dxGeom *geom, dReal aabb[6])
+void dInfiniteAABB (dxGeom * /*geom*/, dReal aabb[6])
 {
   aabb[0] = -dInfinity;
   aabb[1] = dInfinity;

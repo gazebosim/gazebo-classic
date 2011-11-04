@@ -907,8 +907,8 @@ void IntervalTreeCollisionManager::getObjects(std::vector<CollisionObject*>& obj
   }
 }
 
-void IntervalTreeCollisionManager::checkColl(std::vector<CollisionObject*>::const_iterator pos_start, std::vector<CollisionObject*>::const_iterator pos_end,
-                                             CollisionObject* obj, void* cdata, CollisionCallBack callback) const
+void IntervalTreeCollisionManager::checkColl(std::vector<CollisionObject*>::const_iterator /*pos_start*/, std::vector<CollisionObject*>::const_iterator /*pos_end*/,
+                                             CollisionObject* /*obj*/, void* /*cdata*/, CollisionCallBack /*callback*/) const
 {
 
 }

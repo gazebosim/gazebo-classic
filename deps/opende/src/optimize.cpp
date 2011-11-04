@@ -271,11 +271,11 @@ struct FeasibilityData
 };
 
 // checks to see whether we can terminate early
-static bool make_feasible_tcheck(dReal* y, int n, void* data)
+static bool make_feasible_tcheck(dReal* y, int /*n*/, void* data)
 {
   // get the feasibility data
   FeasibilityData& fdata = *((FeasibilityData*) data);
-  dIASSERT(n == fdata.n+1);
+  //dIASSERT(n == fdata.n+1);
   const int OLDN = fdata.n;
   const int OLDM = fdata.m;
 
@@ -291,11 +291,11 @@ static bool make_feasible_tcheck(dReal* y, int n, void* data)
 }
 
 // evaluation function for making an initial point feasible
-static void make_feasible_fx(dReal* y, int n, dReal* f, int m, void* data)
+static void make_feasible_fx(dReal* y, int /*n*/, dReal* f, int /*m*/, void* data)
 {
   // get the feasibility data
   FeasibilityData& fdata = *((FeasibilityData*) data);
-  dIASSERT(n == fdata.n+1);
+  //dIASSERT(n == fdata.n+1);
   const int OLDN = fdata.n;
   const int OLDM = fdata.m;
 
@@ -377,7 +377,7 @@ static bool make_feasible_hess(dReal* y, int n, int idx, dReal* H, void* data)
 }
 
 // Hessian function for solving convex LCPs
-static bool lcp_ip_hess(dReal* x, int n, int idx, dReal* H, void* data)
+static bool lcp_ip_hess(dReal* /*x*/, int n, int idx, dReal* H, void* data)
 {
   // get the LCP data
   const LCPData& lcpdata = *((LCPData*) data);
@@ -433,7 +433,7 @@ static void lcp_ip_grad(dReal* x, int n, int idx, dReal* g, void* data)
 }
 
 // objective / constraint evaluation function for solving convex LCPs
-static void lcp_ip_fx(dReal* x, int n, dReal* f, int m, void* data)
+static void lcp_ip_fx(dReal* x, int n, dReal* f, int /*m*/, void* data)
 {
   const dReal S_BUFFER = std::numeric_limits<dReal>::epsilon();
 

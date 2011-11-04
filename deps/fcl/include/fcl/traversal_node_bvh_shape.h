@@ -75,7 +75,7 @@ public:
     return model1->getBV(b).rightChild();
   }
 
-  bool BVTesting(int b1, int b2) const
+  bool BVTesting(int b1, int /*b2*/) const
   {
     if(this->enable_statistics) num_bv_tests++;
     BV bv_shape;
@@ -190,7 +190,7 @@ public:
     enable_contact = false;
   }
 
-  void leafTesting(int b1, int b2) const
+  void leafTesting(int b1, int /*b2*/) const
   {
     if(this->enable_statistics) this->num_leaf_tests++;
     const BVNode<BV>& node = this->model1->getBV(b1);
@@ -249,7 +249,7 @@ public:
     R[2] = Vec3f(0, 0, 1);
   }
 
-  bool BVTesting(int b1, int b2) const
+  bool BVTesting(int b1, int /*b2*/) const
   {
     if(this->enable_statistics) this->num_bv_tests++;
     OBB bv_shape;
@@ -257,7 +257,7 @@ public:
     return !overlap(R, T, bv_shape, this->model1->getBV(b1).bv);
   }
 
-  void leafTesting(int b1, int b2) const
+  void leafTesting(int b1, int /*b2*/) const
   {
     if(this->enable_statistics) this->num_leaf_tests++;
     const BVNode<OBB>& node = this->model1->getBV(b1);

@@ -166,6 +166,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       int i;
       dReal *pos1, *pos2, *R1, *R2;
       dVector3 c;
+      c[0] = c[1] = c[2] = 0;
       pos1 = node[0].body->posr.pos;
       R1 = node[0].body->posr.R;
       if ( node[1].body )

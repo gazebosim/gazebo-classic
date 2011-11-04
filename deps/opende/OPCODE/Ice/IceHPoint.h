@@ -12,7 +12,7 @@
 #ifndef __ICEHPOINT_H__
 #define __ICEHPOINT_H__
 
-	class ICEMATHS_API HPoint : public Point
+	class __attribute__((__may_alias__)) ICEMATHS_API  HPoint : public Point
 	{
 		public:
 

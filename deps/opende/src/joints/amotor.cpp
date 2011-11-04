@@ -442,7 +442,7 @@ dReal dJointGetAMotorAngle( dJointID j, int anum )
 }
 
 
-dReal dJointGetAMotorAngleRate( dJointID j, int anum )
+dReal dJointGetAMotorAngleRate( dJointID /*j*/, int /*anum*/ )
 {
     //dxJointAMotor* joint = (dxJointAMotor*)j;
     // @@@

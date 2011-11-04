@@ -933,10 +933,10 @@ return (integer)(*x >= 0 ? floor(*x + .5) : -floor(.5 - *x));
 }
 #endif
 
-integer iparmq_(integer *ispec, char *name__, char *opts, integer *n, integer 
-	*ilo, integer *ihi, integer *lwork, ftnlen name_len, ftnlen opts_len)
+integer iparmq_(integer *ispec, char * name__, char * opts, integer *n, integer 
+	*ilo, integer *ihi, integer * lwork, ftnlen name_len, ftnlen opts_len)
 {
-    /* System generated locals */
+      /* System generated locals */
     integer ret_val, i__1, i__2;
     real r__1;
 
@@ -946,6 +946,14 @@ integer iparmq_(integer *ispec, char *name__, char *opts, integer *n, integer
 
     /* Local variables */
     static integer nh, ns;
+
+  (void)(name__);
+  (void)(n);
+  (void)(opts);
+  (void)(lwork);
+  (void)(name_len);
+  (void)(opts_len);
+
 
 
 /*  -- LAPACK auxiliary routine (version 3.2) -- */
@@ -1319,6 +1327,10 @@ logical lsame_(char *ca, char *cb, ftnlen ca_len, ftnlen cb_len)
     /* Local variables */
     static integer inta, intb, zcode;
 
+  (void)(ca_len);
+  (void)(cb_len);
+
+
 
 /*  -- LAPACK auxiliary routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -1552,6 +1564,9 @@ L40:
     static integer ncola;
     extern logical lsame_(char *, char *, ftnlen, ftnlen);
     static integer nrowa, nrowb;
+
+    (void)(transa_len);
+    (void)(transb_len);
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -1937,6 +1952,8 @@ L40:
     static real temp;
     static integer lenx, leny;
     extern logical lsame_(char *, char *, ftnlen, ftnlen);
+
+    (void)(trans_len);
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -2551,6 +2568,7 @@ static real c_b9 = 1.f;
     extern integer isamax_(integer *, real *, integer *);
     static real colmax, rowmax;
 
+  (void)(uplo_len);
 
 /*  -- LAPACK routine (version 3.2) -- */
 /*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
@@ -3461,6 +3479,8 @@ L40:
     static real temp;
     extern logical lsame_(char *, char *, ftnlen, ftnlen);
 
+  (void)(uplo_len);
+
 /*     .. Scalar Arguments .. */
 /*     .. */
 /*     .. Array Arguments .. */
@@ -3711,6 +3731,7 @@ static integer c_n1 = -1;
 	    integer *, integer *, real *, integer *, integer *, real *, 
 	    integer *, integer *, ftnlen);
 
+  (void)(uplo_len);
 
 /*  -- LAPACK driver routine (version 3.2) -- */
 /*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
@@ -3933,6 +3954,7 @@ static integer c_n1 = -1;
     static real rowmax;
 
 
+  (void)(uplo_len);
 /*  -- LAPACK routine (version 3.2) -- */
 /*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
 /*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..-- */
@@ -4528,6 +4550,7 @@ static integer c__2 = 2;
     static integer ldwork, lwkopt;
     static logical lquery;
 
+  (void)(uplo_len);
 
 /*  -- LAPACK routine (version 3.2) -- */
 /*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
@@ -4872,6 +4895,7 @@ static real c_b19 = 1.f;
 	    integer *);
 
 
+  (void)(uplo_len);
 /*  -- LAPACK routine (version 3.2) -- */
 /*  -- LAPACK is a software package provided by Univ. of Tennessee,    -- */
 /*  -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..-- */

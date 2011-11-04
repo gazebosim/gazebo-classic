@@ -206,27 +206,28 @@ public:
 public:
 	// Set value of flag indexed by enum
 	_OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_METHOD 
-	/*void */EnumSetEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int uiEnumeratedMaximum, bool bFlagValue) 
+	/*void */EnumSetEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int /*uiEnumeratedMaximum*/, bool bFlagValue) 
 	{
-		OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+		/*OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+     */
 
 		SetFlagsMaskValue(aoStartingFlag << uiEnumeratedValue, bFlagValue);
 	}
 
 	// Signal value of flag indexed by enum
 	_OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_METHOD 
-	/*void */EnumSignalEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int uiEnumeratedMaximum)
+	/*void */EnumSignalEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int /*uiEnumeratedMaximum*/)
 	{
-		OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+		//OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
 
 		SignalFlagsMaskValue(aoStartingFlag << uiEnumeratedValue);
 	}
 
 	// Drop value of flag indexed by enum
 	_OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_METHOD 
-	/*void */EnumDropEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int uiEnumeratedMaximum) 
+	/*void */EnumDropEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int /*uiEnumeratedMaximum*/) 
 	{
-		OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+		//OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
 		
 		DropFlagsMaskValue(aoStartingFlag << uiEnumeratedValue);
 	}
@@ -235,9 +236,9 @@ public:
 	// Can operate on single flag only
 	// Returns previous flag value
 	_OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_METHOD 
-	/*bool */EnumToggleEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int uiEnumeratedMaximum)
+	/*bool */EnumToggleEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int /*uiEnumeratedMaximum*/)
 	{
-		OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+		//OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
 		
 		return ToggleSingleFlagValue(aoStartingFlag << uiEnumeratedValue); 
 	}
@@ -245,9 +246,9 @@ public:
 	// Can operate on single flag only
 	// Returns if modification occurred
 	_OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_METHOD 
-	/*bool */EnumModifyEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int uiEnumeratedMaximum, bool bFlagValue)
+	/*bool */EnumModifyEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int /*uiEnumeratedMaximum*/, bool bFlagValue)
 	{
-		OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+		//OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
 
 		return ModifySingleFlagValue(aoStartingFlag << uiEnumeratedValue, bFlagValue);
 	}
@@ -274,9 +275,9 @@ public:
 	
 	// Retrieve value of flag indexed by enum
 	_OU_ALWAYSINLINE_PRE bool _OU_ALWAYSINLINE_IN _OU_CONVENTION_METHOD 
-	/*bool */EnumGetEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int uiEnumeratedMaximum) const
+	/*bool */EnumGetEnumeratedFlagValue(atomicord32 aoStartingFlag, unsigned int uiEnumeratedValue, unsigned int /*uiEnumeratedMaximum*/) const
 	{
-		OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
+		//OU_ASSERT(uiEnumeratedValue < uiEnumeratedMaximum && OU_FLAGS_ENUMFLAGS_START_VALID(atomicord32, aoStartingFlag, uiEnumeratedMaximum));
 
 		return GetFlagsMaskValue(aoStartingFlag << uiEnumeratedValue);
 	}

@@ -169,7 +169,7 @@ void ANNkd_split::ann_search(ANNdist box_dist)
 //		some fine tuning to replace indexing by pointer operations.
 //----------------------------------------------------------------------
 
-void ANNkd_leaf::ann_search(ANNdist box_dist)
+void ANNkd_leaf::ann_search(ANNdist /*box_dist*/)
 {
 	register ANNdist dist;				// distance to data point
 	register ANNcoord* pp;				// data coordinate pointer

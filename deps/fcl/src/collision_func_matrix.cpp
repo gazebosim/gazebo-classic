@@ -187,7 +187,7 @@ namespace fcl
 
 
 
-int BoxBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Box> node;
   const Box* obj1 = (Box*)o1;
@@ -195,7 +195,7 @@ int BoxBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_
   SHAPESHAPE_COMMON_CODE();
 }
 
-int BoxSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Sphere> node;
   const Box* obj1 = (Box*)o1;
@@ -203,7 +203,7 @@ int BoxSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int BoxCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Capsule> node;
   const Box* obj1 = (Box*)o1;
@@ -211,7 +211,7 @@ int BoxCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_
   SHAPESHAPE_COMMON_CODE();
 }
 
-int BoxConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Cone> node;
   const Box* obj1 = (Box*)o1;
@@ -219,7 +219,7 @@ int BoxConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num
   SHAPESHAPE_COMMON_CODE();
 }
 
-int BoxCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Cylinder> node;
   const Box* obj1 = (Box*)o1;
@@ -227,7 +227,7 @@ int BoxCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int BoxConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Convex> node;
   const Box* obj1 = (Box*)o1;
@@ -235,7 +235,7 @@ int BoxConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int BoxPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int BoxPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Box, Plane> node;
   const Box* obj1 = (Box*)o1;
@@ -243,7 +243,7 @@ int BoxPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int nu
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SphereBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SphereBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Box> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -251,7 +251,7 @@ int SphereBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SphereSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SphereSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Sphere> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -259,7 +259,7 @@ int SphereSphereCollide(const CollisionObject* o1, const CollisionObject* o2, in
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SphereCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SphereCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Capsule> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -267,7 +267,7 @@ int SphereCapCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SphereConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SphereConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Cone> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -275,7 +275,7 @@ int SphereConeCollide(const CollisionObject* o1, const CollisionObject* o2, int 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SphereCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SphereCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Cylinder> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -283,7 +283,7 @@ int SphereCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SphereConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SphereConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Convex> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -291,7 +291,7 @@ int SphereConvexCollide(const CollisionObject* o1, const CollisionObject* o2, in
   SHAPESHAPE_COMMON_CODE();
 }
 
-int SpherePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int SpherePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Sphere, Plane> node;
   const Sphere* obj1 = (Sphere*)o1;
@@ -299,7 +299,7 @@ int SpherePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Box> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -307,7 +307,7 @@ int CapBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Sphere> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -315,7 +315,7 @@ int CapSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Capsule> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -323,7 +323,7 @@ int CapCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Cone> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -331,7 +331,7 @@ int CapConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Cylinder> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -339,7 +339,7 @@ int CapCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Convex> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -347,7 +347,7 @@ int CapConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CapPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CapPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Capsule, Plane> node;
   const Capsule* obj1 = (Capsule*)o1;
@@ -355,7 +355,7 @@ int CapPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int nu
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConeBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConeBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Box> node;
   const Cone* obj1 = (Cone*)o1;
@@ -363,7 +363,7 @@ int ConeBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConeSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConeSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Sphere> node;
   const Cone* obj1 = (Cone*)o1;
@@ -371,7 +371,7 @@ int ConeSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConeCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConeCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Capsule> node;
   const Cone* obj1 = (Cone*)o1;
@@ -379,7 +379,7 @@ int ConeCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConeConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConeConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Cone> node;
   const Cone* obj1 = (Cone*)o1;
@@ -387,7 +387,7 @@ int ConeConeCollide(const CollisionObject* o1, const CollisionObject* o2, int nu
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConeCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConeCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Cylinder> node;
   const Cone* obj1 = (Cone*)o1;
@@ -395,7 +395,7 @@ int ConeCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, in
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConeConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConeConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Convex> node;
   const Cone* obj1 = (Cone*)o1;
@@ -403,7 +403,7 @@ int ConeConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cone, Plane> node;
   const Cone* obj1 = (Cone*)o1;
@@ -411,7 +411,7 @@ int ConePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Box> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -419,7 +419,7 @@ int CylinderBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Sphere> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -427,7 +427,7 @@ int CylinderSphereCollide(const CollisionObject* o1, const CollisionObject* o2, 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Capsule> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -435,7 +435,7 @@ int CylinderCapCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Cone> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -443,7 +443,7 @@ int CylinderConeCollide(const CollisionObject* o1, const CollisionObject* o2, in
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Cylinder> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -451,7 +451,7 @@ int CylinderCylinderCollide(const CollisionObject* o1, const CollisionObject* o2
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Convex> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -459,7 +459,7 @@ int CylinderConvexCollide(const CollisionObject* o1, const CollisionObject* o2, 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int CylinderPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int CylinderPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Cylinder, Plane> node;
   const Cylinder* obj1 = (Cylinder*)o1;
@@ -467,7 +467,7 @@ int CylinderPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, i
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Box> node;
   const Convex* obj1 = (Convex*)o1;
@@ -475,7 +475,7 @@ int ConvexBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Sphere> node;
   const Convex* obj1 = (Convex*)o1;
@@ -483,7 +483,7 @@ int ConvexSphereCollide(const CollisionObject* o1, const CollisionObject* o2, in
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Capsule> node;
   const Convex* obj1 = (Convex*)o1;
@@ -491,7 +491,7 @@ int ConvexCapCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Cone> node;
   const Convex* obj1 = (Convex*)o1;
@@ -499,7 +499,7 @@ int ConvexConeCollide(const CollisionObject* o1, const CollisionObject* o2, int 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Cylinder> node;
   const Convex* obj1 = (Convex*)o1;
@@ -507,7 +507,7 @@ int ConvexCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, 
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Convex> node;
   const Convex* obj1 = (Convex*)o1;
@@ -515,7 +515,7 @@ int ConvexConvexCollide(const CollisionObject* o1, const CollisionObject* o2, in
   SHAPESHAPE_COMMON_CODE();
 }
 
-int ConvexPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int ConvexPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Convex, Plane> node;
   const Convex* obj1 = (Convex*)o1;
@@ -523,7 +523,7 @@ int ConvexPlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlaneBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlaneBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Box> node;
   const Plane* obj1 = (Plane*)o1;
@@ -531,7 +531,7 @@ int PlaneBoxCollide(const CollisionObject* o1, const CollisionObject* o2, int nu
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlaneSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlaneSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Sphere> node;
   const Plane* obj1 = (Plane*)o1;
@@ -539,7 +539,7 @@ int PlaneSphereCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlaneCapCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlaneCapCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Capsule> node;
   const Plane* obj1 = (Plane*)o1;
@@ -547,7 +547,7 @@ int PlaneCapCollide(const CollisionObject* o1, const CollisionObject* o2, int nu
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlaneConeCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlaneConeCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Cone> node;
   const Plane* obj1 = (Plane*)o1;
@@ -555,7 +555,7 @@ int PlaneConeCollide(const CollisionObject* o1, const CollisionObject* o2, int n
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlaneCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlaneCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Cylinder> node;
   const Plane* obj1 = (Plane*)o1;
@@ -563,7 +563,7 @@ int PlaneCylinderCollide(const CollisionObject* o1, const CollisionObject* o2, i
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlaneConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlaneConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Convex> node;
   const Plane* obj1 = (Plane*)o1;
@@ -571,7 +571,7 @@ int PlaneConvexCollide(const CollisionObject* o1, const CollisionObject* o2, int
   SHAPESHAPE_COMMON_CODE();
 }
 
-int PlanePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int num_max_contacts, bool exhaustive, bool enable_contact, std::vector<Contact>& contacts)
+int PlanePlaneCollide(const CollisionObject* o1, const CollisionObject* o2, int /*num_max_contacts*/, bool /*exhaustive*/, bool enable_contact, std::vector<Contact>& contacts)
 {
   ShapeCollisionTraversalNode<Plane, Plane> node;
   const Plane* obj1 = (Plane*)o1;

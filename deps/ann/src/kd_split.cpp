@@ -44,7 +44,7 @@ const double FS_ASPECT_RATIO = 3.0;		// maximum allowed aspect ratio
 void kd_split(
 	ANNpointArray		pa,				// point array (permuted on return)
 	ANNidxArray			pidx,			// point indices
-	const ANNorthRect	&bnds,			// bounding rectangle for cell
+	const ANNorthRect	&/*bnds*/,			// bounding rectangle for cell
 	int					n,				// number of points
 	int					dim,			// dimension of space
 	int					&cut_dim,		// cutting dimension (returned)

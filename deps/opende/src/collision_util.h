@@ -42,8 +42,8 @@ some useful collision utility stuff.
 #if 1
 #include "collision_kernel.h"
 // Fetches a contact
-static inline dContactGeom* SAFECONTACT(int Flags, dContactGeom* Contacts, int Index, int Stride){
-	dIASSERT(Index >= 0 && Index < (Flags & NUMC_MASK));
+static inline dContactGeom* SAFECONTACT(int /*Flags*/, dContactGeom* Contacts, int Index, int Stride){
+	//dIASSERT(Index >= 0 && Index < (Flags & NUMC_MASK));
 	return ((dContactGeom*)(((char*)Contacts) + (Index * Stride)));
 }
 #endif

@@ -319,7 +319,7 @@ bool LSSCollider::Collide(LSSCache& cache, const LSS& lss, const AABBTree* tree)
  *	\return		true if the LSS contains the whole box
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline_ BOOL LSSCollider::LSSContainsBox(const Point& bc, const Point& be)
+inline_ BOOL LSSCollider::LSSContainsBox(const Point& /*bc*/, const Point& /*be*/)
 {
 	// Not implemented
 	return FALSE;

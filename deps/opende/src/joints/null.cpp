@@ -50,7 +50,7 @@ dxJointNull::getInfo1( dxJoint::Info1 *info )
 
 
 void
-dxJointNull::getInfo2( dxJoint::Info2 *info )
+dxJointNull::getInfo2( dxJoint::Info2 * /*info*/ )
 {
     dDebug( 0, "this should never get called" );
 }

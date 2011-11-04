@@ -18,6 +18,8 @@
 #ifndef __CCD_DBG_H__
 #define __CCD_DBG_H__
 
+#pragma GCC system_header
+
 /**
  * Some macros which can be used for printing debug info to stderr if macro
  * NDEBUG not defined.
@@ -28,6 +30,7 @@
 #ifndef NDEBUG
 
 #include <stdio.h>
+
 
 #ifndef DBG_PROLOGUE
 # define DBG_PROLOGUE
@@ -57,7 +60,6 @@
 */
 
 #else
-#pragma GCC system_header
 # define DBG(format, ...)
 # define DBG2(str)
 # define DBG_VEC3(v, prefix)

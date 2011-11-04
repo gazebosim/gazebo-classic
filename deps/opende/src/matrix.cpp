@@ -346,10 +346,10 @@ void _dLDLTAddTL (dReal *L, dReal *d, const dReal *a, int n, int nskip, void *tm
 
 
 void _dLDLTRemove (dReal **A, const int *p, dReal *L, dReal *d,
-    int n1, int n2, int r, int nskip, void *tmpbuf/*n2 + 2*nskip*/)
+    int /*n1*/, int n2, int r, int nskip, void *tmpbuf/*n2 + 2*nskip*/)
 {
-  dAASSERT(A && p && L && d && n1 > 0 && n2 > 0 && r >= 0 && r < n2 &&
-	   n1 >= n2 && nskip >= n1);
+  //dAASSERT(A && p && L && d && n1 > 0 && n2 > 0 && r >= 0 && r < n2 &&
+	   //n1 >= n2 && nskip >= n1);
   #ifndef dNODEBUG
   for (int i=0; i<n2; ++i) dIASSERT(p[i] >= 0 && p[i] < n1);
   #endif

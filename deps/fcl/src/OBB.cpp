@@ -375,7 +375,7 @@ OBB OBB::merge_smalldist(const OBB& b1, const OBB& b2)
 }
 
 
-BVH_REAL OBB::distance(const OBB& other, Vec3f* P, Vec3f* Q) const
+BVH_REAL OBB::distance(const OBB& /*other*/, Vec3f* /*P*/, Vec3f* /*Q*/) const
 {
   std::cerr << "OBB distance not implemented!" << std::endl;
   return 0.0;

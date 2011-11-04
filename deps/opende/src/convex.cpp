@@ -655,13 +655,13 @@ int dCollideConvexPlane (dxGeom *o1, dxGeom *o2, int flags,
 #undef LTEQ_ZERO
 }
 
-int dCollideSphereConvex (dxGeom *o1, dxGeom *o2, int flags,
-			  dContactGeom *contact, int skip)
+int dCollideSphereConvex (dxGeom *o1, dxGeom *o2, int /*flags*/,
+			  dContactGeom *contact, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
   dIASSERT (o1->type == dSphereClass);
   dIASSERT (o2->type == dConvexClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   dxSphere *Sphere = (dxSphere*) o1;
   dxConvex *Convex = (dxConvex*) o2;
@@ -783,13 +783,13 @@ int dCollideSphereConvex (dxGeom *o1, dxGeom *o2, int flags,
   return 0;
 }
 
-int dCollideConvexBox (dxGeom *o1, dxGeom *o2, int flags,
-		       dContactGeom *contact, int skip)
+int dCollideConvexBox (dxGeom * /*o1*/, dxGeom * /*o2*/, int /*flags*/,
+		       dContactGeom * /*contact*/, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
-  dIASSERT (o1->type == dConvexClass);
-  dIASSERT (o2->type == dBoxClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (o1->type == dConvexClass);
+  //dIASSERT (o2->type == dBoxClass);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   //dxConvex *Convex = (dxConvex*) o1;
   //dxBox *Box = (dxBox*) o2;
@@ -797,13 +797,13 @@ int dCollideConvexBox (dxGeom *o1, dxGeom *o2, int flags,
   return 0;
 }
 
-int dCollideConvexCapsule (dxGeom *o1, dxGeom *o2,
-			     int flags, dContactGeom *contact, int skip)
+int dCollideConvexCapsule (dxGeom * /*o1*/, dxGeom * /*o2*/,
+			     int /*flags*/, dContactGeom * /*contact*/, int /*skip*/)
 {
-  dIASSERT (skip >= (int)sizeof(dContactGeom));
-  dIASSERT (o1->type == dConvexClass);
-  dIASSERT (o2->type == dCapsuleClass);
-  dIASSERT ((flags & NUMC_MASK) >= 1);
+  //dIASSERT (skip >= (int)sizeof(dContactGeom));
+  //dIASSERT (o1->type == dConvexClass);
+  //dIASSERT (o2->type == dCapsuleClass);
+  //dIASSERT ((flags & NUMC_MASK) >= 1);
 
   //dxConvex *Convex = (dxConvex*) o1;
   //dxCapsule *Capsule = (dxCapsule*) o2;
@@ -1467,9 +1467,9 @@ int dCollideRayConvex (dxGeom *o1, dxGeom *o2, int flags,
 #else
 // Ray - Convex collider by David Walters, June 2006
 int dCollideRayConvex( dxGeom *o1, dxGeom *o2,
-					   int flags, dContactGeom *contact, int skip )
+					   int flags, dContactGeom *contact, int /*skip*/ )
 {
-	dIASSERT( skip >= (int)sizeof(dContactGeom) );
+	//dIASSERT( skip >= (int)sizeof(dContactGeom) );
 	dIASSERT( o1->type == dRayClass );
 	dIASSERT( o2->type == dConvexClass );
 	dIASSERT ((flags & NUMC_MASK) >= 1);

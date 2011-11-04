@@ -13,7 +13,7 @@
 #define __ICEPOINT_H__
 
 	// Forward declarations
-	class HPoint;
+	class __attribute__((__may_alias__)) HPoint;
 	class Plane;
 	class Matrix3x3;
 	class Matrix4x4;
@@ -22,7 +22,7 @@
 
 	const float EPSILON2 = 1.0e-20f;
 
-	class ICEMATHS_API Point
+	class __attribute__((__may_alias__)) ICEMATHS_API  Point
 	{
 		public:
 

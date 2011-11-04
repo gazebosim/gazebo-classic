@@ -248,7 +248,7 @@ static void ccdCenter(const void *obj, ccd_vec3_t *c)
 }
 
 static int ccdCollide(dGeomID o1, dGeomID o2, int flags,
-                      dContactGeom *contact, int skip,
+                      dContactGeom *contact, int /*skip*/,
                       void *obj1, ccd_support_fn supp1, ccd_center_fn cen1,
                       void *obj2, ccd_support_fn supp2, ccd_center_fn cen2)
 {

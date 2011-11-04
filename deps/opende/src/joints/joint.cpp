@@ -141,6 +141,8 @@ void setBall2( dxJoint *joint, dxJoint::Info2 *info,
 {
     // anchor points in global coordinates with respect to body PORs.
     dVector3 a1, a2;
+    a1[0] = a1[1] = a1[2] = 0;
+    a2[0] = a2[1] = a2[2] = 0;
 
     int i, s = info->rowskip;
 

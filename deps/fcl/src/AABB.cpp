@@ -49,7 +49,7 @@ AABB::AABB()
   max_ = Vec3f(-real_max, -real_max, -real_max);
 }
 
-BVH_REAL AABB::distance(const AABB& other, Vec3f* P, Vec3f* Q) const
+BVH_REAL AABB::distance(const AABB& /*other*/, Vec3f* /*P*/, Vec3f* /*Q*/) const
 {
   std::cerr << "AABB distance not implemented!" << std::endl;
   return 0.0;

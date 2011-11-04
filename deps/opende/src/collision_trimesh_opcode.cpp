@@ -660,7 +660,7 @@ bool dxTriMesh::controlGeometry_GetMergeSphereContacts(int &returnValue)
 	return true;
 }
 
-int dxTriMesh::AABBTest(dxGeom* g, dReal aabb[6]){
+int dxTriMesh::AABBTest(dxGeom* /*g*/, dReal /*aabb*/ [6]){
     return 1;
 }
 
