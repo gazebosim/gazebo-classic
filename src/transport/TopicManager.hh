@@ -120,14 +120,16 @@ namespace gazebo
                   publication->SetLocallyAdvertised(true);
 
                   SubMap::iterator iter;
+                  SubMap::iterator st_end = this->subscribed_topics.end();
                   for (iter = this->subscribed_topics.begin(); 
-                      iter != this->subscribed_topics.end(); iter++)
+                      iter != st_end; iter++)
                   {
                     if ( iter->first == t )
                     {
                       std::list<CallbackHelperPtr>::iterator liter;
+                      std::list<CallbackHelperPtr>::iterator l_end = iter->second.end();
                       for (liter = iter->second.begin(); 
-                          liter != iter->second.end(); liter++)
+                          liter != l_end; liter++)
                       {
                         publication->AddSubscription( *liter );
                       }
