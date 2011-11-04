@@ -44,28 +44,28 @@
 namespace fcl
 {
   template<typename BV>
-  void computeBV(const Box& s, BV& bv) {}
+  void computeBV(const Box& /*s*/, BV& /*bv*/) {}
 
   template<typename BV>
-  void computeBV(const Sphere& s, BV& bv) {}
+  void computeBV(const Sphere& /*s*/, BV& /*bv*/) {}
 
   template<typename BV>
-  void computeBV(const Capsule& s, BV& bv) {}
+  void computeBV(const Capsule& /*s*/, BV& /*bv*/) {}
 
   template<typename BV>
-  void computeBV(const Cone& s, BV& bv) {}
+  void computeBV(const Cone& /*s*/, BV& /*bv*/) {}
 
   template<typename BV>
-  void computeBV(const Cylinder& s, BV& bv) {}
+  void computeBV(const Cylinder& /*s*/, BV& /*bv*/) {}
 
   template<typename BV>
-  void computeBV(const Convex& s, BV& bv) {}
+  void computeBV(const Convex& /*s*/, BV& /*bv*/) {}
 
   /** the bounding volume for half space back of plane
    * for OBB, it is the plane itself
    */
   template<typename BV>
-  void computeBV(const Plane& s, BV& bv) {}
+  void computeBV(const Plane& /*s*/, BV& /*bv*/) {}
 
   /** For AABB */
   template<>

@@ -661,7 +661,7 @@ static void ComputeRows(
 */
 
 
-  double rms_error;
+  double rms_error = 0;
   int num_iterations = qs->num_iterations;
   int precon_iterations = qs->precon_iterations;
   double sor_lcp_tolerance = qs->sor_lcp_tolerance;

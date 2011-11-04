@@ -45,17 +45,17 @@ TraversalNodeBase::~TraversalNodeBase()
 {
 }
 
-bool TraversalNodeBase::isFirstNodeLeaf(int b) const
+bool TraversalNodeBase::isFirstNodeLeaf(int /*b*/) const
 {
   return true;
 }
 
-bool TraversalNodeBase::isSecondNodeLeaf(int b) const
+bool TraversalNodeBase::isSecondNodeLeaf(int /*b*/) const
 {
   return true;
 }
 
-bool TraversalNodeBase::firstOverSecond(int b1, int b2) const
+bool TraversalNodeBase::firstOverSecond(int /*b1*/, int /*b2*/) const
 {
   return true;
 }
@@ -84,12 +84,12 @@ CollisionTraversalNodeBase::~CollisionTraversalNodeBase()
 {
 }
 
-bool CollisionTraversalNodeBase::BVTesting(int b1, int b2) const
+bool CollisionTraversalNodeBase::BVTesting(int /*b1*/, int /*b2*/) const
 {
   return true;
 }
 
-void CollisionTraversalNodeBase::leafTesting(int b1, int b2) const
+void CollisionTraversalNodeBase::leafTesting(int /*b1*/, int /*b2*/) const
 {
 }
 
@@ -103,16 +103,16 @@ DistanceTraversalNodeBase::~DistanceTraversalNodeBase()
 {
 }
 
-BVH_REAL DistanceTraversalNodeBase::BVTesting(int b1, int b2) const
+BVH_REAL DistanceTraversalNodeBase::BVTesting(int /*b1*/, int /*b2*/) const
 {
   return std::numeric_limits<BVH_REAL>::max();
 }
 
-void DistanceTraversalNodeBase::leafTesting(int b1, int b2) const
+void DistanceTraversalNodeBase::leafTesting(int /*b1*/, int /*b2*/) const
 {
 }
 
-bool DistanceTraversalNodeBase::canStop(BVH_REAL c) const
+bool DistanceTraversalNodeBase::canStop(BVH_REAL /*c*/) const
 {
   return false;
 }

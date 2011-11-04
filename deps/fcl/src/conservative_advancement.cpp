@@ -52,7 +52,7 @@ int conservativeAdvancement(const CollisionObject* o1,
                             const CollisionObject* o2,
                             MotionBase<BV>* motion2,
                             int num_max_contacts, bool exhaustive, bool enable_contact,
-                            std::vector<Contact>& contacts,
+                            std::vector<Contact>& /*contacts*/,
                             BVH_REAL& toc)
 {
   if(num_max_contacts <= 0 && !exhaustive)

@@ -662,7 +662,7 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
   return value;
 }
 
-void ColladaLoader::LoadTransparent( TiXmlElement *_elem, Material *_mat )
+void ColladaLoader::LoadTransparent( TiXmlElement *_elem, Material * /*_mat*/ )
 {
   const char *opaque = _elem->Attribute("opaque");
   if (!opaque)

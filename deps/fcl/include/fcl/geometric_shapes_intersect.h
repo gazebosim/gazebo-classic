@@ -66,10 +66,10 @@ public:
    * Notice that only local transformation is applied.
    * Gloal transformation are considered later
    */
-  static void* createGJKObject(const T& s) { return NULL; }
+  static void* createGJKObject(const T& /*s*/) { return NULL; }
 
   /** \brief Delete GJK object */
-  static void deleteGJKObject(void* o) {}
+  static void deleteGJKObject(void* /*o*/) {}
 };
 
 /** \brief initialize GJK Cylinder */

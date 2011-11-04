@@ -39,7 +39,7 @@
 namespace fcl
 {
 
-void BVSplitter<OBB>::computeRule_bvcenter(const OBB& bv, unsigned int* primitive_indices, int num_primitives)
+void BVSplitter<OBB>::computeRule_bvcenter(const OBB& bv, unsigned int* /*primitive_indices*/, int /*num_primitives*/)
 {
   Vec3f center = bv.center();
   split_vector = bv.axis[0];

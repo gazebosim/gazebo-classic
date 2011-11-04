@@ -137,7 +137,7 @@ private:
   SplitMethodType split_method;
 
   /** \brief Split the node from center */
-  void computeRule_bvcenter(const BV& bv, unsigned int* primitive_indices, int num_primitives)
+  void computeRule_bvcenter(const BV& bv, unsigned int* /*primitive_indices*/, int /*num_primitives*/)
   {
     Vec3f center = bv.center();
     int axis = 2;
