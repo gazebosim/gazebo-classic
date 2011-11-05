@@ -62,7 +62,7 @@ class SensorFactory
   public: static Sensor *NewSensor(const std::string &classname, Body *body);
 
   /// \brief A list of registered sensor classes
-  private: static std::map<std::string, SensorFactoryFn> sensors;
+  private: static std::map<std::string, SensorFactoryFn> *sensors;
 };
 
 

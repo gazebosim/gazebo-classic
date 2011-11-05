@@ -33,23 +33,24 @@
 
 using namespace libgazebo;
 
-std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
+std::map<std::string, IfaceFactoryFn>* IfaceFactory::ifaces = NULL;
 
 // Register a iface class.  Use by dynamically loaded modules
 void IfaceFactory::RegisterIface(std::string classname, IfaceFactoryFn factoryfn)
 {
-  if (ifaces.size() == 0) // bug in gcc 4.6 initialization of static map
-    ifaces = std::map<std::string, IfaceFactoryFn>();
-  ifaces[classname] = factoryfn;
+  //if ((*ifaces).size() == 0) // bug in gcc 4.6 initialization of static map
+  if (ifaces == NULL)
+    ifaces = new std::map<std::string, IfaceFactoryFn>();
+  (*ifaces)[classname] = factoryfn;
 }
 
 // Create a new instance of a iface.  Used by the world when reading
 // the world file.
 Iface *IfaceFactory::NewIface(const std::string &classname)
 {
-  if (ifaces.find(classname) != ifaces.end())
+  if ((*ifaces).find(classname) != (*ifaces).end())
   {
-    return (ifaces[classname]) ();
+    return ((*ifaces)[classname]) ();
   }
   else
   {

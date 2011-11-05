@@ -63,7 +63,7 @@ class ControllerFactory
   public: static void LoadPlugin(const std::string &plugin, const std::string &classname);
 
   // A list of registered controller classes
-  private: static std::map<std::string, ControllerFactoryFn> controllers;
+  private: static std::map<std::string, ControllerFactoryFn> *controllers;
 
 };
 

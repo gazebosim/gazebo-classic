@@ -32,15 +32,15 @@
 
 using namespace gazebo;
 
-std::map<std::string, SensorFactoryFn> SensorFactory::sensors = std::map<std::string, SensorFactoryFn>();//std::make_pair(std::string("test"),SensorFactoryFn()));
+std::map<std::string, SensorFactoryFn>* SensorFactory::sensors = NULL;
 
 // Register a model class.  Use by dynamically loaded modules
 void SensorFactory::RegisterSensor(std::string type, std::string classname,
                                    SensorFactoryFn factoryfn)
 {
-  if (sensors.size() == 0)  // bug in gcc 4.6 initialization of static map
-    sensors = std::map<std::string, SensorFactoryFn>();
-  sensors[classname] = factoryfn;
+  if (sensors == NULL)
+    sensors = new std::map<std::string, SensorFactoryFn>();
+  (*sensors)[classname] = factoryfn;
 }
 
 
@@ -48,9 +48,9 @@ void SensorFactory::RegisterSensor(std::string type, std::string classname,
 // the world file.
 Sensor *SensorFactory::NewSensor(const std::string &classname, Body *body)
 {
-  if (sensors[classname])
+  if ((*sensors)[classname])
   {
-    Sensor *sensor = (sensors[classname]) (body);
+    Sensor *sensor = ((*sensors)[classname]) (body);
     SensorManager::Instance()->AddSensor(sensor);
     return sensor;
   }

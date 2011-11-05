@@ -63,7 +63,7 @@ namespace libgazebo
     public: static Iface *NewIface(const std::string &classname);
   
     // A list of registered iface classes
-    private: static std::map<std::string, IfaceFactoryFn> ifaces;
+    private: static std::map<std::string, IfaceFactoryFn>* ifaces;
   
   };
 
