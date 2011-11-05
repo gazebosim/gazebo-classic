@@ -149,7 +149,7 @@ add_library(gazebo_server SHARED ${gazeboserver_sources})
 set_target_properties(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
 
 add_executable(gazebo-exec main.cc)
-set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
+set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo-non-ros")
 
 # Removes colon separated rpath. This breaks Ubuntu-intrepid 
 # (possibly gcc-4.3.2).
