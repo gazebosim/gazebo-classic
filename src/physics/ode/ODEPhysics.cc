@@ -335,19 +335,19 @@ void ODEPhysics::UpdateCollision()
 
   // Collide all the collisions
   //if (this->colliders.size() < 50)
-  if (this->collidersCount < 50)
-  {
+  //if (this->collidersCount < 50)
+  //{
     for (unsigned int i=0; i<this->collidersCount; i++)
     {
       this->Collide(this->colliders[i].first, 
                     this->colliders[i].second, this->contactCollisions);
     }
-  }
-  else
-  {
-    tbb::parallel_for( tbb::blocked_range<size_t>(0, 
-          this->collidersCount, 10), Colliders_TBB(&this->colliders, this) );
-  }
+  //}
+  //else
+  //{
+  //  tbb::parallel_for( tbb::blocked_range<size_t>(0, 
+  //        this->collidersCount, 10), Colliders_TBB(&this->colliders, this) );
+  //}
 
   // Trimesh collision must happen in this thread sequentially
   for (unsigned int i=0; i<this->trimeshCollidersCount; i++)
