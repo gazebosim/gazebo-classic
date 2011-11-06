@@ -30,7 +30,7 @@
 
 #ifndef _OU_NAMESPACE
 
-#define _OU_NAMESPACE ou
+#define _OU_NAMESPACE gazebo_ou
 
 
 #endif // #ifndef _OU_NAMESPACE

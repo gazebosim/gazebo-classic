@@ -18,7 +18,7 @@ namespace gazebo
 
     class Animation
     {
-      public: Animation(const std::string _name, double _length);
+      public: Animation(const std::string _name, double _length, bool _loop);
       public: virtual ~Animation();
 
       public: double GetLength() const;

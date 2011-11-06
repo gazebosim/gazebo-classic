@@ -20,15 +20,14 @@ struct KeyFrameTimeLess
 }
 
 
-Animation::Animation(const std::string _name, double _length)
-  : name(_name), length(_length)
+Animation::Animation(const std::string _name, double _length, bool _loop)
+  : name(_name), length(_length), loop(_loop)
 {
   this->positionSpline = NULL;
   this->rotationSpline = NULL;
   this->timePos = 0;
 
   this->build = false;
-  this->loop = true;
 }
 
 Animation::~Animation()

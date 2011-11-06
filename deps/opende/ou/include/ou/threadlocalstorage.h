@@ -169,7 +169,7 @@ public: // Safe methods
 	{
 		bool bResult;
 		
-		CTLSStorageBlock *psbStorageBlock = GetKeyStorageBlock(hskStorageKey);
+		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
 			
 		if (psbStorageBlock)
 		{
@@ -187,11 +187,11 @@ public: // Safe methods
 	}
 
 	static _OU_ALWAYSINLINE_PRE tlsvaluetype _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
-	/*tlsvaluetype */GetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
+	/*tlsvaluetype */gzGetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
 	{
 		tlsvaluetype vValueData = 0;
 		
-		CTLSStorageBlock *psbStorageBlock = GetKeyStorageBlock(hskStorageKey);
+		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
 
 		if (psbStorageBlock)
 		{
@@ -205,14 +205,14 @@ public: // Unsafe methods
 	static _OU_ALWAYSINLINE_PRE void _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
 	/*void */UnsafeSetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex, tlsvaluetype vValueData)
 	{
-		CTLSStorageBlock *psbStorageBlock = GetKeyStorageBlock(hskStorageKey);
+		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
 		psbStorageBlock->SetValueData(iValueIndex, vValueData);
 	}
 
 	static _OU_ALWAYSINLINE_PRE tlsvaluetype _OU_ALWAYSINLINE_IN _OU_CONVENTION_API 
 	/*tlsvaluetype */UnsafeGetStorageValue(const HTLSKEY &hskStorageKey, tlsindextype iValueIndex)
 	{
-		CTLSStorageBlock *psbStorageBlock = GetKeyStorageBlock(hskStorageKey);
+		CTLSStorageBlock *psbStorageBlock = gzGetKeyStorageBlock(hskStorageKey);
 		return psbStorageBlock->GetValueData(iValueIndex);
 	}
 
@@ -238,7 +238,7 @@ private:
 #endif // #if _OU_TARGET_OS == ...
 	}
 
-	static inline CTLSStorageBlock *_OU_CONVENTION_API GetKeyStorageBlock(const HTLSKEYSELECTOR &hskStorageKey)
+	static inline CTLSStorageBlock *_OU_CONVENTION_API gzGetKeyStorageBlock(const HTLSKEYSELECTOR &hskStorageKey)
 	{
 #if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
 		
@@ -246,7 +246,7 @@ private:
 		
 		
 #else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
-		
+	
 		CTLSStorageBlock *psbStorageBlock = (CTLSStorageBlock *)pthread_getspecific((pthread_key_t)(size_t)(HTLSKEYVALUE::value_type)(*(HTLSKEYSELECTOR::value_type)hskStorageKey));
 		
 		

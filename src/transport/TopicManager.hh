@@ -92,6 +92,9 @@ namespace gazebo
 
                 this->UpdatePublications(_topic, msg->GetTypeName());
               
+                PublisherPtr pub = PublisherPtr( new Publisher(_topic, 
+                      msg->GetTypeName(), _queueLimit) );
+
                 std::string msgTypename;
                 PublicationPtr publication;
 
@@ -118,6 +121,7 @@ namespace gazebo
                   }
 
                   publication->SetLocallyAdvertised(true);
+                  pub->SetPublication( publication, i );
 
                   SubMap::iterator iter;
                   SubMap::iterator st_end = this->subscribed_topics.end();
@@ -137,9 +141,7 @@ namespace gazebo
                   }
                 }
 
-                publication = this->FindPublication( _topic );
-                return PublisherPtr( new Publisher(_topic, msg->GetTypeName(),
-                                                   _queueLimit, publication) );
+                return pub;
               }
 
       /// \brief Stop advertising on a topic

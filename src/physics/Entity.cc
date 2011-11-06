@@ -179,6 +179,7 @@ void Entity::SetCanonicalLink(bool _value)
 void Entity::SetAnimation( const common::AnimationPtr &_anim )
 {
   this->animationStartPose = this->worldPose;
+
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->connections.push_back(
@@ -456,7 +457,7 @@ void Entity::UpdateAnimation()
   offset.pos = kf.GetTranslate();
   offset.rot = kf.GetRotation();
 
-  this->SetWorldPose(this->animationStartPose + offset);
+  this->SetWorldPose(offset);
   this->prevAnimationTime = this->world->GetSimTime();
 }
 

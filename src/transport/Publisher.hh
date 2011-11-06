@@ -42,10 +42,12 @@ namespace gazebo
       /// \param topic Name of topic
       /// \param msg_type Type of the message which is to be published
       public: Publisher(const std::string &topic, const std::string &msg_type,
-                        unsigned int _limit, PublicationPtr &_publication);
+                        unsigned int _limit);
 
       /// \brief Destructor
       public: virtual ~Publisher();
+
+      public: void SetPublication(PublicationPtr &_publication, int _i);
 
       /// \brief Publish a message on the topic
       public: void Publish( const google::protobuf::Message &_message )
@@ -74,7 +76,7 @@ namespace gazebo
       private: unsigned int queueLimit;
       private: std::list<google::protobuf::Message *> messages;
       private: boost::recursive_mutex *mutex;
-      private: PublicationPtr publication;
+      private: PublicationPtr publications[2];
     };
     /// \}
   }

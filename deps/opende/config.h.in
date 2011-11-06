@@ -89,7 +89,7 @@ typedef uintptr_t intP;
 #define X86_64_SYSTEM 1
 
 /* libou namespace for ODE */
-#define _OU_NAMESPACE odeou
+#define _OU_NAMESPACE gazebo_odeou
 
 /* Atomic API of OU is enabled */
 #define dATOMICS_ENABLED 1

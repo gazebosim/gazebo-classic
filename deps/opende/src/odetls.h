@@ -66,7 +66,7 @@ enum EODETLSITEM
 };
 
 
-class COdeTls
+class GZCOdeTls
 {
 public:
 	static bool Initialize(EODETLSKIND tkTLSKind);
@@ -75,10 +75,10 @@ public:
 	static void CleanupForThread();
 
 public:
-	static unsigned GetDataAllocationFlags(EODETLSKIND tkTLSKind)
+	static unsigned gzGetDataAllocationFlags(EODETLSKIND tkTLSKind)
 	{
 		// Must be a safe call as it is used to test if TLS slot is allocated at all
-		return (unsigned)(size_t)CThreadLocalStorage::GetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_DATA_ALLOCATION_FLAGS);
+		return (unsigned)(size_t)CThreadLocalStorage::gzGetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_DATA_ALLOCATION_FLAGS);
 	}
 
 	static void SignalDataAllocationFlags(EODETLSKIND tkTLSKind, unsigned uFlagsMask)

@@ -1256,7 +1256,7 @@ void CTLSInitialization::CleanupOnThreadExit()
 		OU_ASSERT(psiStorageInstance->GetIsThreadManualCleanup());
 
 		const HTLSKEYSELECTOR &hksKeySelector = EncodeKeySelectorFromStorageKind(ikInstanceKind);
-		CTLSStorageBlock *psbStorageBlock = CThreadLocalStorage::GetKeyStorageBlock(hksKeySelector);
+		CTLSStorageBlock *psbStorageBlock = CThreadLocalStorage::gzGetKeyStorageBlock(hksKeySelector);
 		
 		if (psbStorageBlock)
 		{

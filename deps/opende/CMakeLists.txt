@@ -128,9 +128,6 @@ CHECK_LIBRARY_EXISTS(m cos "" HAVE_LIBM)
 configure_file(${CMAKE_SOURCE_DIR}/deps/opende/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 
-
-
-
 ########################################
 # Include all the search paths for headers
 

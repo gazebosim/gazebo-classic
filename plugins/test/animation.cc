@@ -28,7 +28,8 @@ namespace gazebo
   {
     public: void Load( physics::WorldPtr &_parent, sdf::ElementPtr & /*_sdf*/ )
     {
-      gazebo::common::AnimationPtr anim(new gazebo::common::Animation("test", 1000.0));
+      gazebo::common::AnimationPtr anim(
+          new gazebo::common::Animation("test", 1000.0, true));
 
       gazebo::common::KeyFrame *key;
 

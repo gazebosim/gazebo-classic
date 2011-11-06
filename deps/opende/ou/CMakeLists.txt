@@ -12,7 +12,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps/opende/ou/include
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -D_OU_NAMESPACE=odeou")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC -D_OU_NAMESPACE=gazebo_odeou")
 
 add_library(gazebo_opende_ou SHARED ${sources})
 #target_link_libraries( gazebo_fcl gazebo_ccd gazebo_ann)

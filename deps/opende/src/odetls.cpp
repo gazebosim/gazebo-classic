@@ -44,13 +44,13 @@ ODE Thread Local Storage access stub implementation.
 //////////////////////////////////////////////////////////////////////////
 // Class static fields
 
-HTLSKEY COdeTls::m_ahtkStorageKeys[OTK__MAX] = { 0 };
+HTLSKEY GZCOdeTls::m_ahtkStorageKeys[OTK__MAX] = { 0 };
 
 
 //////////////////////////////////////////////////////////////////////////
 // Initialization and finalization
 
-bool COdeTls::Initialize(EODETLSKIND tkTLSKind)
+bool GZCOdeTls::Initialize(EODETLSKIND tkTLSKind)
 {
 	dIASSERT(!m_ahtkStorageKeys[tkTLSKind]);
 
@@ -71,7 +71,7 @@ bool COdeTls::Initialize(EODETLSKIND tkTLSKind)
 	return bResult;
 }
 
-void COdeTls::Finalize(EODETLSKIND tkTLSKind)
+void GZCOdeTls::Finalize(EODETLSKIND tkTLSKind)
 {
 	CTLSInitialization::FinalizeTLSAPI();
 
@@ -79,7 +79,7 @@ void COdeTls::Finalize(EODETLSKIND tkTLSKind)
 }
 
 
-void COdeTls::CleanupForThread()
+void GZCOdeTls::CleanupForThread()
 {
 	if (m_ahtkStorageKeys[OTK_MANUALCLEANUP])
 	{
@@ -95,24 +95,24 @@ void COdeTls::CleanupForThread()
 //////////////////////////////////////////////////////////////////////////
 // Value modifiers
 
-bool COdeTls::AssignDataAllocationFlags(EODETLSKIND tkTLSKind, unsigned uInitializationFlags)
+bool GZCOdeTls::AssignDataAllocationFlags(EODETLSKIND tkTLSKind, unsigned uInitializationFlags)
 {
 	bool bResult = CThreadLocalStorage::SetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_DATA_ALLOCATION_FLAGS, (tlsvaluetype)(size_t)uInitializationFlags);
 	return bResult;
 }
 
 
-bool COdeTls::AssignTrimeshCollidersCache(EODETLSKIND tkTLSKind, TrimeshCollidersCache *pccInstance)
+bool GZCOdeTls::AssignTrimeshCollidersCache(EODETLSKIND tkTLSKind, TrimeshCollidersCache *pccInstance)
 {
-	dIASSERT(!CThreadLocalStorage::GetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_TRIMESH_TRIMESH_COLLIDER_CACHE));
+	dIASSERT(!CThreadLocalStorage::gzGetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_TRIMESH_TRIMESH_COLLIDER_CACHE));
 
-	bool bResult = CThreadLocalStorage::SetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_TRIMESH_TRIMESH_COLLIDER_CACHE, (tlsvaluetype)pccInstance, &COdeTls::FreeTrimeshCollidersCache_Callback);
+	bool bResult = CThreadLocalStorage::SetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_TRIMESH_TRIMESH_COLLIDER_CACHE, (tlsvaluetype)pccInstance, &GZCOdeTls::FreeTrimeshCollidersCache_Callback);
 	return bResult;
 }
 
-void COdeTls::DestroyTrimeshCollidersCache(EODETLSKIND tkTLSKind)
+void GZCOdeTls::DestroyTrimeshCollidersCache(EODETLSKIND tkTLSKind)
 {
-	TrimeshCollidersCache *pccCacheInstance = (TrimeshCollidersCache *)CThreadLocalStorage::GetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_TRIMESH_TRIMESH_COLLIDER_CACHE);
+	TrimeshCollidersCache *pccCacheInstance = (TrimeshCollidersCache *)CThreadLocalStorage::gzGetStorageValue(m_ahtkStorageKeys[tkTLSKind], OTI_TRIMESH_TRIMESH_COLLIDER_CACHE);
 
 	if (pccCacheInstance)
 	{
@@ -126,7 +126,7 @@ void COdeTls::DestroyTrimeshCollidersCache(EODETLSKIND tkTLSKind)
 //////////////////////////////////////////////////////////////////////////
 // Value type destructors
 
-void COdeTls::FreeTrimeshCollidersCache(TrimeshCollidersCache *pccCacheInstance)
+void GZCOdeTls::FreeTrimeshCollidersCache(TrimeshCollidersCache *pccCacheInstance)
 {
 	delete pccCacheInstance;
 }
@@ -135,7 +135,7 @@ void COdeTls::FreeTrimeshCollidersCache(TrimeshCollidersCache *pccCacheInstance)
 //////////////////////////////////////////////////////////////////////////
 // Value type destructor callbacks
 
-void COdeTls::FreeTrimeshCollidersCache_Callback(tlsvaluetype vValueData)
+void GZCOdeTls::FreeTrimeshCollidersCache_Callback(tlsvaluetype vValueData)
 {
 	TrimeshCollidersCache *pccCacheInstance = (TrimeshCollidersCache *)vValueData;
 	FreeTrimeshCollidersCache(pccCacheInstance);
