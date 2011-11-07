@@ -25,6 +25,8 @@
 #include <sstream>
 #include <float.h>
 
+#include "common/KeyFrame.hh"
+#include "common/Animation.hh"
 #include "common/Plugin.hh"
 #include "common/Events.hh"
 #include "common/Exception.hh"
@@ -180,6 +182,12 @@ void Model::Init()
   {
     (*iter)->Init();
   }
+
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); iter++)
+  {
+    (*iter)->Init();
+  }
 }
 
 
@@ -189,6 +197,33 @@ void Model::Update()
 {
   // clear contacts
   this->contacts.clear();
+
+  if (this->jointAnimations.size() > 0)
+  {
+    common::NumericKeyFrame kf(0);
+    std::map<std::string, double> jointPositions;
+    std::map<std::string, common::NumericAnimationPtr>::iterator iter;
+    for (iter = this->jointAnimations.begin(); 
+         iter != this->jointAnimations.end(); iter++)
+    {
+      iter->second->GetInterpolatedKeyFrame(kf);
+
+      double prev = kf.GetValue();
+      iter->second->AddTime(
+          (this->world->GetSimTime() - this->prevAnimationTime).Double());
+
+      if (iter->second->GetTime() < iter->second->GetLength())
+      {
+        iter->second->GetInterpolatedKeyFrame(kf);
+        jointPositions[iter->first] = kf.GetValue() - prev;
+      }
+    }
+    if (jointPositions.size() > 0)
+    {
+      this->SetJointPositions(jointPositions);
+    }
+    this->prevAnimationTime = this->world->GetSimTime();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -722,4 +757,175 @@ void Model::FillModelMsg( msgs::Model &_msg )
       joint->FillJointMsg( *_msg.add_joints() );
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Model::SetJointPositions( 
+    const std::map<std::string, double> &_jointPositions)
+{
+  // go through all joints in this model and update each one
+  //   for each joint update, recursively update all children
+  Joint_V::iterator iter;
+  std::map<std::string, double>::const_iterator jiter = _jointPositions.begin();
+  for (iter = this->joints.begin(); iter != this->joints.end() ; iter++)
+  {
+    double targetPosition = 0;
+    JointPtr joint = *iter;
+
+    std::map<std::string, double>::const_iterator jiter = 
+      _jointPositions.find(joint->GetName());
+    unsigned int type = joint->GetType();
+
+    // only deal with hinge and revolute joints in the user 
+    // request joint_names list
+    if ((type == Base::HINGE_JOINT || type == Base::SLIDER_JOINT) &&
+        jiter != _jointPositions.end())
+    {
+      LinkPtr parentLink = joint->GetParent();
+      LinkPtr childLink = joint->GetChild();
+
+      if (parentLink && childLink && 
+          parentLink->GetName() != childLink->GetName())
+      {
+        // transform about the current anchor, about the axis
+        switch(type)
+        {
+          case Base::HINGE_JOINT: 
+            {
+              // rotate child (childLink) about anchor point, by delta-angle 
+              // along axis
+              double dangle = jiter->second- joint->GetAngle(0).GetAsRadian();
+              this->RotateBodyAndChildren(childLink, 
+                  joint->GetAnchor(0), joint->GetAxis(0), dangle, true);
+              break;
+            }
+          case Base::SLIDER_JOINT: 
+            {
+              //double dposition = jiter->second - 
+              //                   joint->GetAngle(0).GetAsRadian();
+              //slideBodyAndChildren(childLink, joint->GetAnchor(0), 
+              //                     joint->GetAxis(0), dposition, true);
+              break;
+            }
+          default: 
+            {
+              gzwarn << "Setting non HINGE/SLIDER joint types not"
+                       << "implemented [" << joint->GetName() << "]\n";
+              break;
+            }
+        }
+      }
+    }
+  }
+}
+
+void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor, 
+    const math::Vector3 &_axis, double _dangle, bool _updateChildren)
+{
+  math::Pose worldPose = _body1->GetWorldPose();
+  
+  // relative to anchor point
+  math::Pose relativePose(worldPose.pos - _anchor, worldPose.rot);
+
+  // take axis rotation and turn it int a quaternion
+  math::Quaternion rotation(_axis, _dangle); 
+
+  // rotate relative pose by rotation
+  math::Pose newRelativePose;
+
+  newRelativePose.pos = rotation.RotateVector(relativePose.pos);
+  newRelativePose.rot = rotation * relativePose.rot;
+
+  math::Pose newWorldPose(newRelativePose.pos + _anchor,
+                          newRelativePose.rot);
+
+  _body1->SetWorldPose(newWorldPose);
+  //std::cout << "      body[" << _body1->GetName()
+  //          << "] wp[" << worldPose
+  //          << "] np[" << _body1->GetWorldPose() 
+  //          << "] anchor[" << _anchor
+  //          << "] axis[" << _axis
+  //          << "] dangle [" << _dangle
+  //          << "] rotation[" << rotation
+  //          << "]\n";
+
+  // recurse through children bodies
+  if (_updateChildren) 
+  {
+    std::vector<LinkPtr> bodies;
+    this->GetAllChildrenBodies(bodies, _body1);
+
+    for (std::vector<LinkPtr>::iterator biter = bodies.begin(); 
+        biter != bodies.end(); biter++)
+    {
+      this->RotateBodyAndChildren((*biter), _anchor, _axis, _dangle, false);
+    }
+  }
+}
+
+
+void Model::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies, 
+                                 const LinkPtr &_body)
+{
+  // strategy, for each child, recursively look for children
+  //           for each child, also look for parents to catch multiple roots
+  for (unsigned int i = 0; i < this->GetJointCount(); i++)
+  {
+    gazebo::physics::JointPtr joint = this->GetJoint(i);
+
+    // recurse through children connected by joints
+    LinkPtr parentLink = joint->GetParent();
+    LinkPtr childLink = joint->GetChild();
+    if (parentLink && childLink
+        && parentLink->GetName() != childLink->GetName()
+        && parentLink->GetName() == _body->GetName()
+        && !this->InBodies(childLink, _bodies))
+    {
+      _bodies.push_back(childLink);
+      this->GetAllChildrenBodies(_bodies, childLink);
+      this->GetAllParentBodies(_bodies, childLink, _body);
+    }
+  }
+}
+
+void Model::GetAllParentBodies(std::vector<LinkPtr> &_bodies, 
+    const LinkPtr &_body, const LinkPtr &_origParentBody)
+{
+  for (unsigned int i = 0; i < this->GetJointCount(); i++)
+  {
+    JointPtr joint = this->GetJoint(i);
+
+    // recurse through children connected by joints
+    LinkPtr parentLink = joint->GetParent();
+    LinkPtr childLink = joint->GetChild();
+
+    if (parentLink && childLink
+        && parentLink->GetName() != childLink->GetName()
+        && childLink->GetName() == _body->GetName()
+        && parentLink->GetName() != _origParentBody->GetName()
+        && !this->InBodies(parentLink, _bodies))
+    {
+      _bodies.push_back(parentLink);
+      this->GetAllParentBodies(_bodies, childLink, _origParentBody);
+    }
+  }
+}
+
+bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
+{
+  for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin(); 
+       bit != _bodies.end(); bit++)
+  {
+    if ((*bit)->GetName() == _body->GetName()) 
+      return true;
+  }
+
+  return false;
+}
+
+void Model::SetJointAnimation(const std::string &_jointName,
+                              const common::NumericAnimationPtr &_anim)
+{
+  this->jointAnimations[_jointName] = _anim;
+  this->prevAnimationTime = this->world->GetSimTime();
 }

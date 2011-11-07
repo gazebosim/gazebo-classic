@@ -15,6 +15,8 @@ namespace gazebo
   namespace common
   {
     class KeyFrame;
+    class PoseKeyFrame;
+    class NumericKeyFrame;
 
     class Animation
     {
@@ -24,21 +26,14 @@ namespace gazebo
       public: double GetLength() const;
       public: void SetLength(double _len);
 
-      public: KeyFrame *CreateKeyFrame(double _time);
-
       public: void SetTime(double _time);
       public: void AddTime(double _time);
-
-      public: void GetInterpolatedKeyFrame(KeyFrame &_kf) const;
-
-      protected: void GetInterpolatedKeyFrame(double _time, 
-                                              KeyFrame &_kf) const;
-
-      protected: void BuildInterpolationSplines() const;
+      public: double GetTime() const;
 
       protected: double GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
-                                       KeyFrame **_kf2, 
-                                       unsigned int &_firstKeyIndex) const;
+                                           KeyFrame **_kf2, 
+                                           unsigned int &_firstKeyIndex) const;
+
 
       protected: std::string name;
       protected: double length;
@@ -46,10 +41,38 @@ namespace gazebo
       protected: mutable bool build;
       protected: bool loop;
 
-      private: typedef std::vector<KeyFrame*> KeyFrame_V;
-      private: KeyFrame_V keyFrames;
+      protected: typedef std::vector<KeyFrame*> KeyFrame_V;
+      protected: KeyFrame_V keyFrames;
+    };
+
+    class PoseAnimation : public Animation
+    {
+      public: PoseAnimation(const std::string _name, 
+                            double _length, bool _loop);
+      public: virtual ~PoseAnimation();
+
+      public: PoseKeyFrame *CreateKeyFrame(double _time);
+
+      public: void GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const;
+
+      protected: void GetInterpolatedKeyFrame(double _time, 
+                                              PoseKeyFrame &_kf) const;
+
+      protected: void BuildInterpolationSplines() const;
+
       private: mutable math::Spline *positionSpline;
       private: mutable math::RotationSpline *rotationSpline;
+    };
+
+    class NumericAnimation : public Animation
+    {
+      public: NumericAnimation(const std::string _name, 
+                               double _length, bool _loop);
+      public: virtual ~NumericAnimation();
+
+      public: NumericKeyFrame *CreateKeyFrame(double _time);
+
+      public: void GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const;
     };
   }
 }

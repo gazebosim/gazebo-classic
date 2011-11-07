@@ -83,11 +83,11 @@ void ODEHingeJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 // Get the axis of rotation
 math::Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 {
-  dVector3 result;
-
+  return this->sdf->GetElement("axis")->GetValueVector3("xyz");
+  /*dVector3 result;
   dJointGetHingeAxis( this->jointId, result );
-
   return math::Vector3(result[0], result[1], result[2]);
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////

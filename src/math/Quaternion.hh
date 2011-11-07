@@ -47,14 +47,19 @@ namespace gazebo
     public: Quaternion();
   
     /// \brief Constructor
-    /// \param u U param
+    /// \param w W param
     /// \param x X param
     /// \param y Y param
     /// \param z Z param
-    public: Quaternion( const double &w, const double &x, const double &y, const double &z);
+    public: Quaternion( const double &w, const double &x, const double &y, 
+                        const double &z);
 
-    /// \brief Constructor
-    public: Quaternion( const double &_roll, const double &_pitch, const double &_yaw );
+    /// \brief Constructor from Euler angles
+    public: Quaternion( const double &_roll, const double &_pitch, 
+                        const double &_yaw );
+
+    /// \brief Constructor from axis angle
+    public: Quaternion( const Vector3 &_axis, const double &_angle );
 
     /// \brief Constructor
     public: Quaternion( const Vector3 &_rpy);

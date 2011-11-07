@@ -158,6 +158,26 @@ namespace gazebo
       /// \param _msg Message to fill
       public: void FillModelMsg( msgs::Model &_msg );
 
+      /// \brief Set the positions of a set of joints
+      public: void SetJointPositions(
+                  const std::map<std::string, double> &_jointPositions);
+
+      public: void SetJointAnimation(const std::string &_jointName,
+                                     const common::NumericAnimationPtr &_anim); 
+
+      private: void RotateBodyAndChildren(LinkPtr _body1, 
+                   const math::Vector3 &_anchor, const math::Vector3 &_axis, 
+                   double _dangle, bool _updateChildren);
+
+      private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies, 
+                   const LinkPtr &_body);
+
+      private: void GetAllParentBodies(std::vector<LinkPtr> &_bodies, 
+                   const LinkPtr &_body, const LinkPtr &_origParentBody);
+
+      private: bool InBodies(const LinkPtr &_body, 
+                             const std::vector<LinkPtr> &_bodies);
+
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
       private: void LoadJoint( sdf::ElementPtr &_sdf );
@@ -178,6 +198,8 @@ namespace gazebo
       private: std::vector<ModelPluginPtr> plugins;
 
       private: transport::PublisherPtr jointPub;
+      private: std::map<std::string, common::NumericAnimationPtr> jointAnimations;
+      private: common::Time prevAnimationTime;
 
     };
     /// \}

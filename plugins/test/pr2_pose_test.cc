@@ -75,7 +75,8 @@ namespace gazebo
       }
     }
 
-    public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &/*_msg*/)
+    public: void OnStats( 
+                const boost::shared_ptr<msgs::WorldStatistics const> &/*_msg*/)
     {
       static double fake_time = 0; fake_time = fake_time+0.2;
 
@@ -86,9 +87,10 @@ namespace gazebo
 
       if (this->world->GetSimTime().Double() < 10.0)
       {
-        this->model->SetWorldPose( pose );
+        this->model->SetWorldPose(pose);
         printf("test plugin OnStats simTime [%f] update pose [%f,%f,%f:%f,%f,%f,%f] orig pose.x [%f]\n",
-               fake_time, pose.pos.x, pose.pos.y, pose.pos.z, pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
+            fake_time, pose.pos.x, pose.pos.y, pose.pos.z, 
+            pose.rot.x, pose.rot.y, pose.rot.z, pose.rot.w, orig_pose.pos.x);
       }
 
     }

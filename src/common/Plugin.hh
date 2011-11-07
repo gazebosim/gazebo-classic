@@ -179,7 +179,9 @@ namespace gazebo
   class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Load function
-    public: virtual void Load( physics::ModelPtr &_model, sdf::ElementPtr &_sdf ) = 0;
+    public: virtual void Load(physics::ModelPtr &_model, 
+                              sdf::ElementPtr &_sdf ) = 0;
+    public: virtual void Init() {};
   };
 
   class SensorPlugin : public PluginT<SensorPlugin>

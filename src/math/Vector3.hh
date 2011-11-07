@@ -90,6 +90,8 @@ namespace gazebo
       public: double GetDistToPlane(const Vector3 &_dir, 
                                     const Vector3 &_planeNormal, 
                                     double _d) const;
+      /// \brief Get distance to a line
+      public: double GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2);
     
       /// \brief Set this vector's components to the maximum of itself and the 
       ///        passed in vector

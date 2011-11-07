@@ -122,6 +122,7 @@ int main(int argc, char **argv)
 
   delete server;
   server = NULL;
-  
+
+  printf("\n");  
   return 0;
 }

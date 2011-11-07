@@ -20,33 +20,102 @@
     </Affector>
   </AnimationDefinition>
 
-
-  <AnimationDefinition name="move_left_1" duration=".1" replayMode="once">
-    <Affector property="UnifiedPosition" interpolator="URect">
-      <KeyFrame position="0.0" value="{{0,-65},{0,-20}}" />
-      <KeyFrame position="0.1" value="{{0,-225},{0,-20}}" />
-    </Affector>
-  </AnimationDefinition>
-
-  <AnimationDefinition name="move_left_2" duration=".1" replayMode="once">
-    <Affector property="UnifiedPosition" interpolator="URect">
-      <KeyFrame position="0.0" value="{{0,95},{0,-20}}" />
-      <KeyFrame position="0.1" value="{{0,-65},{0,-20}}" />
-    </Affector>
-  </AnimationDefinition>
-
-  <AnimationDefinition name="move_left_3" duration=".1" replayMode="once">
+  <!-- off-screen right button to edge right -->
+  <AnimationDefinition name="RR_to_R" duration=".1" replayMode="once">
     <Affector property="UnifiedPosition" interpolator="URect">
       <KeyFrame position="0.0" value="{{0,255},{0,-20}}" />
       <KeyFrame position="0.1" value="{{0,95},{0,-20}}" />
     </Affector>
   </AnimationDefinition>
 
-  <AnimationDefinition name="move_left_4" duration="0.1" replayMode="once">
+  <!-- Right button to Middle -->
+  <AnimationDefinition name="R_to_M" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,95},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-65},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+
+  <!-- Mid button to Left edge -->
+  <AnimationDefinition name="M_to_L" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-65},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-225},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <!-- left-edge button to off-screen left -->
+  <AnimationDefinition name="L_to_LL" duration="0.1" replayMode="once">
     <Affector property="UnifiedPosition" interpolator="URect">
       <KeyFrame position="0.0" value="{{0,-225},{0,-20}}" />
       <KeyFrame position="0.1" value="{{0,-385},{0,-20}}" />
     </Affector>
   </AnimationDefinition>
+
+
+  <!-- Verb to start -->
+  <AnimationDefinition name="LLL_to_M" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-545},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-65},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <!-- Preposition to start -->
+  <AnimationDefinition name="LL_to_R" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-385},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,95},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <!-- Noun to start -->
+  <AnimationDefinition name="L_to_RR" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-225},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,255},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+  <!-- Send to start -->
+  <AnimationDefinition name="M_to_RRR" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-65},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,415},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+
+
+  <AnimationDefinition name="L_to_M" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-225},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-65},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+  <AnimationDefinition name="M_to_R" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-65},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,95},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+  <AnimationDefinition name="R_to_RR" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,95},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,255},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+  <AnimationDefinition name="LL_to_L" duration=".1" replayMode="once">
+    <Affector property="UnifiedPosition" interpolator="URect">
+      <KeyFrame position="0.0" value="{{0,-385},{0,-20}}" />
+      <KeyFrame position="0.1" value="{{0,-225},{0,-20}}" />
+    </Affector>
+  </AnimationDefinition>
+
+
+
+
+
 
 </Animations>

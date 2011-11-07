@@ -3,8 +3,10 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
 )
 
+set (plugins pr2_joint_test)
+
 if (HAVE_CEGUI)
-  set (plugins presentation animation)
+  set (plugins presentation animation ${plugins})
 endif (HAVE_CEGUI)
 
 foreach (src ${plugins})

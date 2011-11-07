@@ -114,7 +114,8 @@ namespace gazebo
       public: Grid *GetGrid(unsigned int index) const;
   
       /// \brief Create a camera
-      public: CameraPtr CreateCamera(const std::string &name, bool _autoRender=true);
+      public: CameraPtr CreateCamera(const std::string &name, 
+                                     bool _autoRender=true);
  
       /// \brief Create depth camera 
       public: DepthCameraPtr CreateDepthCamera( const std::string &_name, bool _autoRender=true);

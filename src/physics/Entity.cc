@@ -176,7 +176,7 @@ void Entity::SetCanonicalLink(bool _value)
 }
 
 /// Set an animation for this entity
-void Entity::SetAnimation( const common::AnimationPtr &_anim )
+void Entity::SetAnimation( const common::PoseAnimationPtr &_anim )
 {
   this->animationStartPose = this->worldPose;
 
@@ -357,14 +357,6 @@ void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 
   (*this.*setWorldPoseFunc)(_pose, _notify);
 
-  /*if (this->HasType(MODEL))
-    this->SetWorldPoseModel(_pose, _notify);
-  else if (this->IsCanonicalLink())
-    this->SetWorldPoseCanonicalLink(_pose, _notify);
-  else
-    this->SetWorldPoseDefault(_pose, _notify);
-    */
-
   this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
 
   this->PublishPose();
@@ -447,7 +439,7 @@ const sdf::ElementPtr &Entity::GetSDF()
 
 void Entity::UpdateAnimation()
 {
-  common::KeyFrame kf(0);
+  common::PoseKeyFrame kf(0);
 
   this->animation->AddTime(
       (this->world->GetSimTime() - this->prevAnimationTime).Double());

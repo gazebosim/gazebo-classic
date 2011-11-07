@@ -193,6 +193,15 @@ double Vector3::GetDistToPlane(const Vector3 &_dir,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get distance to a line
+double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
+{
+  double d = ((*this) - _pt1).GetCrossProd((*this) - _pt2).GetLength();
+  d = d / (_pt2 - _pt1).GetLength();
+  return d;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set this vector's components to the maximum of itself and the passed in 
 /// vector
 void Vector3::SetToMax(const Vector3 & v)

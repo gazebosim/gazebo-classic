@@ -53,14 +53,16 @@ namespace gazebo
     class Image;
     class Mesh;
     class MouseEvent;
-    class Animation;
+    class PoseAnimation;
+    class NumericAnimation;
 
     template <typename T>
     class ParamT;
 
     typedef std::vector<common::Param*> Param_V;
     typedef std::map<std::string, std::string> StrStr_M;
-    typedef boost::shared_ptr<Animation> AnimationPtr;
+    typedef boost::shared_ptr<PoseAnimation> PoseAnimationPtr;
+    typedef boost::shared_ptr<NumericAnimation> NumericAnimationPtr;
   }
 
   namespace event

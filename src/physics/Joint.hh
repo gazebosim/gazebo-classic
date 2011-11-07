@@ -41,7 +41,17 @@ namespace gazebo
     class Joint : public Base
     {
       /// \brief Type of joint
-      public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM, STOP_ERP,STOP_CFM,ERP,CFM,FMAX,VEL,HI_STOP,LO_STOP};
+      public: enum Attribute {FUDGE_FACTOR, 
+                              SUSPENSION_ERP, 
+                              SUSPENSION_CFM, 
+                              STOP_ERP,
+                              STOP_CFM,
+                              ERP,
+                              CFM,
+                              FMAX,
+                              VEL,
+                              HI_STOP,
+                              LO_STOP};
   
       /// \brief Constructor
       public: Joint();

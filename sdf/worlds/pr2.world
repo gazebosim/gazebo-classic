@@ -51,6 +51,9 @@
     -->
 
 
-    <include filename="pr2.model"/>
+    <include filename="pr2.model">
+      <plugin filename="test/libpr2_joint_test.so" name="pr2_joint_test"/>
+    </include>
+
   </world>
 </gazebo>

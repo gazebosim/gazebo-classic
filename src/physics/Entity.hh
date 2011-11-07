@@ -156,7 +156,7 @@ namespace gazebo
               { return this->isCanonicalLink; }
 
       /// \brief Set an animation for this entity
-      public: void SetAnimation( const common::AnimationPtr &_anim );
+      public: void SetAnimation( const common::PoseAnimationPtr &_anim );
 
       private: void PublishPose();
  
@@ -207,7 +207,7 @@ namespace gazebo
       protected: msgs::Pose *poseMsg;
 
       protected: boost::recursive_mutex *poseMutex;
-      protected: common::AnimationPtr animation;
+      protected: common::PoseAnimationPtr animation;
       protected: common::Time prevAnimationTime;
       protected: math::Pose animationStartPose;
 

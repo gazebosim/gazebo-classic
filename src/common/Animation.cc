@@ -12,7 +12,8 @@ namespace
 {
 struct KeyFrameTimeLess
 {
-  bool operator() (const common::KeyFrame *_kf, const common::KeyFrame *_kf2) const
+  bool operator() (const common::KeyFrame *_kf, 
+                   const common::KeyFrame *_kf2) const
   {
     return _kf->GetTime() < _kf2->GetTime();
   }
@@ -23,17 +24,12 @@ struct KeyFrameTimeLess
 Animation::Animation(const std::string _name, double _length, bool _loop)
   : name(_name), length(_length), loop(_loop)
 {
-  this->positionSpline = NULL;
-  this->rotationSpline = NULL;
   this->timePos = 0;
-
   this->build = false;
 }
 
 Animation::~Animation()
 {
-  delete this->positionSpline;
-  delete this->rotationSpline;
 }
 
 double Animation::GetLength() const
@@ -44,19 +40,6 @@ double Animation::GetLength() const
 void Animation::SetLength(double _len)
 {
   this->length = _len;
-}
-
-KeyFrame *Animation::CreateKeyFrame(double _time)
-{
-  KeyFrame *frame = new KeyFrame(_time);
-  std::vector<KeyFrame*>::iterator iter =
-    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(), frame, 
-        KeyFrameTimeLess() );
-
-  this->keyFrames.insert(iter, frame);
-  this->build = true;
-
-  return frame;
 }
 
 void Animation::SetTime(double _time)
@@ -85,62 +68,14 @@ void Animation::AddTime(double _time)
   this->SetTime(this->timePos + _time);
 }
 
-
-void Animation::BuildInterpolationSplines() const
+double Animation::GetTime() const
 {
-  if (!this->positionSpline)
-    this->positionSpline = new math::Spline();
-
-   if (!this->rotationSpline)
-    this->rotationSpline = new math::RotationSpline();
-  
-  this->positionSpline->SetAutoCalculate(false);
-  this->rotationSpline->SetAutoCalculate(false);
-
-  this->positionSpline->Clear();
-  this->rotationSpline->Clear();
-
-  for (KeyFrame_V::const_iterator iter = this->keyFrames.begin();
-       iter != this->keyFrames.end(); iter++)
-  {
-    this->positionSpline->AddPoint((*iter)->GetTranslate());
-    this->rotationSpline->AddPoint((*iter)->GetRotation());
-  }
-
-  this->positionSpline->RecalcTangents();
-  this->rotationSpline->RecalcTangents();
-  this->build = false;
-}
-
-void Animation::GetInterpolatedKeyFrame(KeyFrame &_kf) const
-{
-  this->GetInterpolatedKeyFrame(this->timePos, _kf);
-}
-
-void Animation::GetInterpolatedKeyFrame( double _time, KeyFrame &_kf) const
-{
-  KeyFrame *k1, *k2;
-  unsigned int firstKeyIndex;
-
-  if (this->build)
-    this->BuildInterpolationSplines();
-
-  double t = this->GetKeyFramesAtTime( _time, &k1, &k2, firstKeyIndex);
-
-  if (t == 0.0)
-  {
-    _kf.SetTranslate(k1->GetTranslate());
-  }
-  else
-  {
-    _kf.SetTranslate(this->positionSpline->Interpolate(firstKeyIndex, t));
-    _kf.SetRotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
-  }
+  return this->timePos;
 }
 
 double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1, 
-                                   KeyFrame **_kf2, 
-                                   unsigned int &_firstKeyIndex) const
+                                     KeyFrame **_kf2, 
+                                     unsigned int &_firstKeyIndex) const
 
 
 {
@@ -189,3 +124,145 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
 }
 
 
+
+
+
+
+PoseAnimation::PoseAnimation(const std::string _name, 
+                             double _length, bool _loop)
+  : Animation( _name, _length, _loop)
+{
+  this->positionSpline = NULL;
+  this->rotationSpline = NULL;
+}
+
+PoseAnimation::~PoseAnimation()
+{
+  delete this->positionSpline;
+  delete this->rotationSpline;
+}
+
+PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
+{
+  PoseKeyFrame *frame = new PoseKeyFrame(_time);
+  std::vector<KeyFrame*>::iterator iter =
+    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(), 
+        (KeyFrame*)frame, KeyFrameTimeLess() );
+
+  this->keyFrames.insert(iter, frame);
+  this->build = true;
+
+  return frame;
+}
+
+void PoseAnimation::BuildInterpolationSplines() const
+{
+  if (!this->positionSpline)
+    this->positionSpline = new math::Spline();
+
+   if (!this->rotationSpline)
+    this->rotationSpline = new math::RotationSpline();
+  
+  this->positionSpline->SetAutoCalculate(false);
+  this->rotationSpline->SetAutoCalculate(false);
+
+  this->positionSpline->Clear();
+  this->rotationSpline->Clear();
+
+  for (KeyFrame_V::const_iterator iter = this->keyFrames.begin();
+       iter != this->keyFrames.end(); iter++)
+  {
+    PoseKeyFrame *pkey = (PoseKeyFrame*)(*iter);
+    this->positionSpline->AddPoint(pkey->GetTranslate());
+    this->rotationSpline->AddPoint(pkey->GetRotation());
+  }
+
+  this->positionSpline->RecalcTangents();
+  this->rotationSpline->RecalcTangents();
+  this->build = false;
+}
+
+void PoseAnimation::GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const
+{
+  this->GetInterpolatedKeyFrame(this->timePos, _kf);
+}
+
+void PoseAnimation::GetInterpolatedKeyFrame(double _time, 
+                                            PoseKeyFrame &_kf) const
+{
+
+  KeyFrame *kBase1, *kBase2;
+  PoseKeyFrame *k1, *k2;
+  unsigned int firstKeyIndex;
+
+  if (this->build)
+    this->BuildInterpolationSplines();
+
+  double t = this->GetKeyFramesAtTime(_time, &kBase1, &kBase2, firstKeyIndex);
+
+  k1 = static_cast<PoseKeyFrame*>(kBase1);
+  k2 = static_cast<PoseKeyFrame*>(kBase2);
+
+  if (t == 0.0)
+  {
+    _kf.SetTranslate(k1->GetTranslate());
+  }
+  else
+  {
+    _kf.SetTranslate(this->positionSpline->Interpolate(firstKeyIndex, t));
+    _kf.SetRotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
+  }
+}
+
+
+
+NumericAnimation::NumericAnimation(const std::string _name, 
+                                   double _length, bool _loop)
+  : Animation(_name, _length, _loop)
+{
+}
+
+NumericAnimation::~NumericAnimation()
+{
+}
+
+NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
+{
+  NumericKeyFrame *frame = new NumericKeyFrame(_time);
+  std::vector<KeyFrame*>::iterator iter =
+    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(), 
+        (KeyFrame*)frame, 
+        KeyFrameTimeLess() );
+
+  this->keyFrames.insert(iter, frame);
+  this->build = true;
+  return frame;
+}
+
+void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
+{
+  //NumericKeyFrame *kret = static_cast<NumericKeyFrame*>(kf);
+
+  // Keyframe pointers
+  KeyFrame *kBase1, *kBase2;
+  NumericKeyFrame *k1, *k2;
+  unsigned int firstKeyIndex;
+
+  double t;
+  t = this->GetKeyFramesAtTime(this->timePos, &kBase1, &kBase2, firstKeyIndex);
+
+  k1 = static_cast<NumericKeyFrame*>(kBase1);
+  k2 = static_cast<NumericKeyFrame*>(kBase2);
+
+  if (t == 0.0)
+  {
+    // Just use k1
+    _kf.SetValue(k1->GetValue());
+  }
+  else
+  {
+    // Interpolate by t
+    double diff = k2->GetValue() - k1->GetValue();
+    _kf.SetValue(k1->GetValue() + diff * t);
+  }
+}
