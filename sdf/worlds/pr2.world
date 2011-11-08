@@ -50,10 +50,7 @@
     </light>
     -->
 
-
-    <include filename="pr2.model">
-      <plugin filename="test/libpr2_joint_test.so" name="pr2_joint_test"/>
-    </include>
+    <include filename="pr2.model"/>
 
   </world>
 </gazebo>
