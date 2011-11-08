@@ -81,11 +81,7 @@
         <contact>
           <collision name='base_footprint_geom_base_link'/>
         </contact>
-        <plugin name='gazebo_contact' filename='libContactPlugin.so'>
-          <alwaysOn>1</alwaysOn>
-          <updateRate>100.0</updateRate>
-          <bumperTopicName>base_bumper</bumperTopicName>
-        </plugin>
+        <plugin name='gazebo_contact' filename='libContactPlugin.so'/>
       </sensor>
       <sensor name='base_laser' type='ray' always_on='0' update_rate='20'>
         <origin pose='0.275 0 0.303 0 -0 0'/>
@@ -95,13 +91,7 @@
           </scan>
           <range min='0.080000000000000002' max='10' resolution='0.01'/>
         </ray>
-        <plugin name='gazebo_ros_base_laser_controller' filename='libgazebo_ros_laser.so'>
-          <gaussianNoise>0.005</gaussianNoise>
-          <alwaysOn>1</alwaysOn>
-          <updateRate>20</updateRate>
-          <topicName>base_scan</topicName>
-          <frameName>base_laser_link</frameName>
-        </plugin>
+        <plugin name='laser' filename='libRayPlugin.so'/>
       </sensor>
     </link>
     <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
