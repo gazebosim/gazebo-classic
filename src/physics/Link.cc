@@ -38,7 +38,6 @@
 #include "physics/PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "physics/Link.hh"
-#include "physics/Contact.hh"
 
 #include "transport/Publisher.hh"
 
@@ -379,11 +378,6 @@ void Link::Update()
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
-
-  for (std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.begin();
-       iter != this->contacts.end() ; iter++)
-    (iter->second).clear();
-  this->contacts.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -422,24 +416,6 @@ void Link::LoadCollision( sdf::ElementPtr &_sdf )
     gzthrow("Unknown Collisionetry Type["+type +"]");
 
   collision->Load(_sdf);
-  this->collisions.push_back(collision);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the collision by name
-CollisionPtr Link::GetCollision(std::string name)
-{
-  Collision_V::const_iterator giter;
-  CollisionPtr result;
-  for (giter=this->collisions.begin(); giter != this->collisions.end(); giter++)
-  {
-    if ((*giter)->GetName() == name)
-    {
-      result = boost::shared_dynamic_cast<Collision>(*giter);
-      break;
-    }
-  }
-  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -573,24 +549,6 @@ void Link::AddParentJoint(JointPtr joint)
 void Link::AddChildJoint(JointPtr joint)
 {
   this->childJoints.push_back(joint);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Store a collision, contact pair
-void Link::StoreContact(CollisionPtr _collision, Contact /*_contact*/)
-{
-  //gzerr << "here I shall add the contact and collision pair under link, to be retrieved later by plugin\n";
-  std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.find( _collision );
-  if (iter == this->contacts.end())
-  {
-    std::vector<Contact> contact_list;
-    //contact_list.push_back(contact);
-    //this->contacts.insert( std::make_pair( collision, contact_list ) );
-  }
-  else
-  {
-    //(iter->second).push_back(contact);
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

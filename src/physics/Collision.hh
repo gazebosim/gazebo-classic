@@ -100,22 +100,13 @@ namespace gazebo
       public: ShapePtr GetShape() const;
   
       /// \brief Turn contact recording on or off
-      public: void SetContactsEnabled(const bool &enable);
+      public: void SetContactsEnabled(bool _enable);
   
       /// \brief Return true of contact recording is on
       public: bool GetContactsEnabled() const;
   
       /// \brief Add an occurance of a contact to this collision
       public: void AddContact(const Contact &contact);
-  
-      /// \brief Clear all contact info
-      public: void ClearContacts();
-  
-      /// \brief Get the number of contacts
-      public: unsigned int GetContactCount() const;
-              
-      /// \brief Get a specific contact
-      public: Contact GetContact(unsigned int i);
   
       /// \brief Get the linear velocity of the collision
       public: virtual math::Vector3 GetRelativeLinearVel() const;
@@ -155,7 +146,6 @@ namespace gazebo
   
       /// \brief Create the bounding box for the collision
       private: void CreateBoundingBox();
-  
  
       /// The link this collision belongs to
       protected: LinkPtr link;
@@ -171,7 +161,8 @@ namespace gazebo
 
       private: bool contactsEnabled;
   
-      public: event::EventT< void (const Contact &)> contact;
+      public: event::EventT< void (const std::string &,
+                                   const Contact &)> contact;
       private: std::vector<event::ConnectionPtr> connections;
     };
     /// \}

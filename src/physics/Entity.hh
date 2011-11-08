@@ -164,6 +164,9 @@ namespace gazebo
       /// \return Pointer to a model, or NULL if no parent model exists
       public: ModelPtr GetParentModel() const;
 
+      /// \brief Get a child collision entity, if one exists
+      public: CollisionPtr GetChildCollision(const std::string &_name);
+
       /// \brief Called when a new pose message arrives
       private: void OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg);
 

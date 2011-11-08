@@ -17,10 +17,8 @@
 /* Desc: Contact sensor
  * Author: Nate Koenig
  * Date: 09 Sept. 2008
- * SVN: $Id$
 */
 
-#include <assert.h>
 #include <float.h>
 #include <sstream>
 
@@ -41,175 +39,170 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 ContactSensor::ContactSensor()
     : Sensor()
 {
-  this->active = false;
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 ContactSensor::~ContactSensor()
 {
-/*
-  std::vector< ParamT<std::string> *>::iterator iter;
-  std::vector<Contact>::iterator citer;
-
-  for (iter = this->collisionNamesP.begin(); iter != this->collisionNamesP.end(); iter++)
-    delete *iter;
-  this->collisionNamesP.clear();
-
   this->collisions.clear();
-*/
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-///
-void ContactSensor::Load()
-{
-
-  Sensor::Load();
-
-  std::string linkName = this->sdf->GetLinkName();
-  //gzerr << "parent link name : " << linkName << "\n";
-
-  std::string modelName = this->sdf->GetModelName();
-  //gzerr << "parent model name : " << modelName << "\n";
-
-  std::string worldName = this->sdf->GetWorldName();
-  //gzerr << "parent world name : " << worldName << "\n";
-
-  // get parent link by looking at real parent
-  std::string linkFullyScopedName = worldName + "::" + modelName + "::" + linkName;
-  //gzerr << "scoped link name : " << linkFullyScopedName << "\n";
-
-
-  this->world = gazebo::physics::get_world(worldName);
-  this->model = this->world->GetModelByName(modelName);
-  gazebo::physics::BasePtr tmp = this->model->GetByName(linkFullyScopedName);
-  this->link = boost::dynamic_pointer_cast<gazebo::physics::Link>(this->model->GetByName(linkFullyScopedName));
-
-  if (this->link == NULL)
-    gzthrow("Null link in the contact sensor");
-
-  // get collision name
-  std::string collision_name = this->sdf->GetElement("contact")->GetElement("collision")->GetValueString("name");
-
-  this->collision = this->link->GetCollision(collision_name);
-
-  if (this->collision == NULL)
-    gzthrow("Null collision in the contact sensor");
-
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Load the contact using parameter from an XMLConfig node
+//////////////////////////////////////////////////
 void ContactSensor::Load(sdf::ElementPtr &_sdf)
 {
-/*
-  XMLConfigNode *collisionNode = NULL;
-  if (this->body == NULL)
-    gzthrow("Null body in the contact sensor");
-
-  Param::Begin(&this->parameters);
-  collisionNode = node->GetChild("collision");
-
-  while (collisionNode)
-  {
-    ParamT<std::string> *collisionName = new ParamT<std::string>("collision","",1);
-    collisionName->SetValue( collisionNode->GetValue() );
-    this->collisionNamesP.push_back(collisionName);
-    collisionNode = collisionNode->GetNext("collision");
-  }
-  Param::End();
-*/
-
   Sensor::Load(_sdf);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Init the contact
+//////////////////////////////////////////////////
+void ContactSensor::Load()
+{
+  Sensor::Load();
+
+  physics::CollisionPtr collision;
+  std::string collisionName;
+  std::string collisionFullyScopedName;
+  std::string linkName = this->sdf->GetLinkName();
+  std::string modelName = this->sdf->GetModelName();
+  std::string worldName = this->sdf->GetWorldName();
+
+  physics::WorldPtr world = gazebo::physics::get_world(worldName);
+  this->model = world->GetModelByName(modelName);
+
+  sdf::ElementPtr collisionElem = 
+    this->sdf->GetElement("contact")->GetElement("collision");
+
+  // Get all the collision elements
+  while (collisionElem)
+  {
+    // get collision name
+    collisionName = collisionElem->GetValueString("name");
+    collisionFullyScopedName = worldName + "::" + modelName + "::" + 
+      linkName + "::" + collisionName;
+    collision = this->model->GetChildCollision(collisionFullyScopedName);
+
+    if (!collision)
+    {
+      gzerr << "Unable to find collision element[" 
+            << collisionFullyScopedName  << "]\n";
+    }
+    else
+    {
+      this->collisions.push_back(collision);
+      this->connections.push_back(collision->ConnectContact(
+            boost::bind(&ContactSensor::OnContact, this, _1, _2)));
+    }
+    collisionElem = this->sdf->GetElement("contact")->GetNextElement(
+        "collision", collisionElem);
+  }
+}
+
+//////////////////////////////////////////////////
 void ContactSensor::Init()
 {
-/*
-  std::vector< ParamT<std::string> *>::iterator iter;
-
-  for (iter = this->collisionNamesP.begin(); iter != this->collisionNamesP.end(); iter++)
-  {
-    // Get the collision from the body
-    Collision *collision = this->body->GetCollision( **(*iter) );
-    this->collisions.push_back(collision);
-  }
-*/
-  this->collision->SetContactsEnabled(true);
-
   Sensor::Init();
+
+  std::vector<physics::CollisionPtr>::iterator iter;
+  for (iter = this->collisions.begin(); iter != this->collisions.end(); iter++)
+  {
+    (*iter)->SetContactsEnabled(true);
+  }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Update the sensor information
+//////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
-  //this->contacts.clear();
+  this->contacts.clear();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// shutdown the contact
+//////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
   Sensor::Fini();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the number of collisions that the sensor is observing
+//////////////////////////////////////////////////
 unsigned int ContactSensor::GetCollisionCount() const
 {
   return this->collisions.size();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Return the number of contacts for an observed collision
-unsigned int ContactSensor::GetCollisionContactCount(unsigned int _collisionIndex) const
+//////////////////////////////////////////////////
+/// Get a collision name
+std::string ContactSensor::GetCollisionName(unsigned int _index) const
 {
-  if (_collisionIndex < this->collisions.size())
-    return this->collisions[_collisionIndex]->GetContactCount();
+  std::string result;
+
+  if (_index < this->collisions.size())
+    result = this->collisions[_index]->GetName();
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+unsigned int ContactSensor::GetCollisionContactCount(
+    const std::string &_collisionName) const
+{
+  Contact_M::const_iterator iter = this->contacts.find(_collisionName);
+
+  if (iter != this->contacts.end())
+    return iter->second.size();
+  else
+    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
+          << _collisionName << "]\n";
 
   return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get a contact for a collision by index
-physics::Contact ContactSensor::GetCollisionContact(unsigned int _collisionIndex, unsigned int _index) const
+//////////////////////////////////////////////////
+physics::Contact ContactSensor::GetCollisionContact(
+    const std::string &_collisionName, unsigned int _index) const
 {
-  if (_collisionIndex < this->collisions.size())
-    return this->collisions[_collisionIndex]->GetContact( _index );
+  Contact_M::const_iterator iter = this->contacts.find(_collisionName);
+
+  if (iter != this->contacts.end())
+  {
+    if (_index < iter->second.size())
+    {
+      return iter->second[_index];
+    }
+    else
+    {
+      gzerr << "Invalid index[" << _index 
+            << "] retreiving contact for collision[" << _collisionName 
+            << "] in contact sensor[" << this->GetName() << "]\n";
+    }
+  }
+  else
+  {
+    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
+          << _collisionName << "]\n";
+  }
 
   return physics::Contact();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get a contact for a collision by index
-physics::Collision* ContactSensor::GetCollision(unsigned int _collisionIndex) const
+//////////////////////////////////////////////////
+std::vector<gazebo::physics::Contact> ContactSensor::GetContacts(
+    const std::string &_collisionName)
 {
-  if (_collisionIndex < this->collisions.size())
-    return this->collisions[_collisionIndex];
+  Contact_M::const_iterator iter = this->contacts.find(_collisionName);
 
-  return NULL;
+  if (iter != this->contacts.end())
+    return iter->second;
+  else
+    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
+          << _collisionName << "]\n";
+
+  return std::vector<gazebo::physics::Contact>();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// retrieve list of contacts for a geom
-std::vector<gazebo::physics::Contact> ContactSensor::GetContacts()
+//////////////////////////////////////////////////
+void ContactSensor::OnContact(const std::string &_collisionName, 
+                              const physics::Contact &_contact)
 {
-  if (this->model)
-    return this->model->GetContacts(this->collision);
-  else
-  {
-    gzwarn << "model not setup yet, are you calling GetContacts during Load?\n";
-    return std::vector<gazebo::physics::Contact>();
-  }
+  this->contacts[_collisionName].push_back(_contact);
 }

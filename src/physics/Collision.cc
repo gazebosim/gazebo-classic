@@ -229,56 +229,29 @@ ShapePtr Collision::GetShape() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Turn contact recording on or off
-void Collision::SetContactsEnabled(const bool &enable)
+void Collision::SetContactsEnabled(bool _enable)
 {
-  this->contactsEnabled = enable;
-  //gzerr << "setting " << this->GetName() << " contacts enabled " << this->contactsEnabled << "\n";
+  this->contactsEnabled = _enable;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return true of contact recording is on
 bool Collision::GetContactsEnabled() const
 {
-  //gzerr << "checking " << this->GetName() << " contacts enabled " << this->contactsEnabled << "\n";
   return this->contactsEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of contacts
-unsigned int Collision::GetContactCount() const
-{
-  // TODO: redo this
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add an occurance of a contact to this collision
 void Collision::AddContact(const Contact &_contact)
 {
-  if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
+  if (!this->GetContactsEnabled() || 
+      this->GetShapeType() == RAY_SHAPE || 
+      this->GetShapeType() == PLANE_SHAPE)
     return;
 
-  // previously, Collision keeps a list of contacts, Nate was trying to do this on a per moel basis
-  // for now, I'll recover the Collision storage behavior
-
-  //gzerr << "Add Contact to parent Link of thie Collision \n";
-  // TODO: redo this
-  this->GetParentModel()->StoreContact(
-      boost::shared_dynamic_cast<Collision>(shared_from_this()), 
-      _contact.Clone());
-  this->contact( _contact );
-
+  this->contact(this->GetName(), _contact);
 }           
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a specific contact
-Contact Collision::GetContact(unsigned int _i)
-{
-  //return Contact();
-  // TODO: redo this
-  return this->GetParentModel()->GetContact(
-      boost::shared_dynamic_cast<Collision>(shared_from_this()), _i);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Enable callback: Called when the link changes

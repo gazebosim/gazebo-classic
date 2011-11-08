@@ -161,9 +161,6 @@ namespace gazebo
       /// \param _sdf SDF element used to load the collision
       private: void LoadCollision( sdf::ElementPtr &_sdf );
 
-      /// \bridf keep a list of collisions for this body
-      private: std::vector<CollisionPtr> collisions;
-
       /// \bridf accessor for collisions
       public: CollisionPtr GetCollision(std::string name);
   
@@ -228,10 +225,6 @@ namespace gazebo
       /// \brief Joints that have this Link as a parent Link
       private: std::vector< JointPtr > childJoints;
       public: void AddChildJoint(JointPtr joint);
-
-      public: void StoreContact(CollisionPtr collision, Contact contact);
-      private: std::map<CollisionPtr, std::vector<Contact> > contacts;
-
     };
     /// \}
   }

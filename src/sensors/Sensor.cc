@@ -43,7 +43,7 @@ Sensor::Sensor()
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/sensor.sdf", this->sdf );
 
-  this->active = true;
+  this->active = false;
 
   this->node = transport::NodePtr(new transport::Node());
 

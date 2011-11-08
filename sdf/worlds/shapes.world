@@ -19,7 +19,7 @@
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">
       <link name="body">
-        <collision name="geom">
+        <collision name="plane_geom">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
@@ -42,7 +42,7 @@
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
 
-        <collision name="geom">
+        <collision name="geom1">
           <geometry>
             <box size="1 1 1"/>
           </geometry>
@@ -54,6 +54,11 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
+        <sensor name="test"  type="contact" always_on="true">
+          <contact>
+            <collision name="geom1"/>
+          </contact>
+        </sensor>
       </link>
     </model>
 

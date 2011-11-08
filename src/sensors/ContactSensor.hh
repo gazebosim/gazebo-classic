@@ -34,6 +34,8 @@ namespace gazebo
 {
   namespace sensors
   {
+    class Contact;
+
     /// \addtogroup gazebo_sensors
     /// \{
    
@@ -67,25 +69,31 @@ namespace gazebo
       /// \brief Get the number of collisions that the sensor is observing
       public: unsigned int GetCollisionCount() const;
   
-      /// \brief Get a collision
-      public: physics::Collision *GetCollision(unsigned int index) const;
+      /// \brief Get a collision name
+      public: std::string GetCollisionName(unsigned int _index) const;
   
       /// \brief Return the number of contacts for an observed collision
-      public: unsigned int GetCollisionContactCount(unsigned int collisionIndex) const;
+      public: unsigned int GetCollisionContactCount(
+                  const std::string &_collisionName) const;
   
       /// \brief Get a contact for a collision by index
-      public: physics::Contact GetCollisionContact(unsigned int collision, unsigned int index) const;
-  
-      private: std::vector<physics::Collision *> collisions;
-
-      private: gazebo::physics::WorldPtr world;
-      private: gazebo::physics::ModelPtr model;
-      private: gazebo::physics::LinkPtr link;
-      private: gazebo::physics::CollisionPtr collision;
+      public: physics::Contact GetCollisionContact(
+                  const std::string &_collisionName, unsigned int _index) const;
 
       public: gazebo::physics::ModelPtr GetParentModel() {return this->model;};
 
-      public: std::vector<physics::Contact> GetContacts();
+      public: std::vector<physics::Contact> GetContacts(
+                  const std::string &_collisionName);
+
+      private: void OnContact(const std::string &_collisionName, 
+                              const physics::Contact &_contact);
+
+      private: std::vector<physics::CollisionPtr> collisions;
+
+      private: gazebo::physics::ModelPtr model;
+      private: typedef 
+               std::map<std::string, std::vector<physics::Contact> > Contact_M;
+      private: Contact_M contacts;
     };
     /// \}
   }

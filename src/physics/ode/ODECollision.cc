@@ -49,6 +49,7 @@ ODECollision::~ODECollision()
 {
   if (this->collisionId)
     dGeomDestroy(this->collisionId);
+  this->collisionId = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

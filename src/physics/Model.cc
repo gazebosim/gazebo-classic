@@ -195,9 +195,6 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
-  // clear contacts
-  this->contacts.clear();
-
   if (this->jointAnimations.size() > 0)
   {
     common::NumericKeyFrame kf(0);
@@ -691,50 +688,6 @@ void Model::SetLaserRetro( const float &retro )
        boost::shared_static_cast<Link>(*iter)->SetLaserRetro(retro);
     }
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Store a geom, contact pair
-void Model::StoreContact(CollisionPtr _geom, Contact _contact)
-{
-  std::map<CollisionPtr, std::vector<Contact> >::iterator iter;
-
-  iter = this->contacts.find( _geom );
-  if (iter == this->contacts.end())
-  {
-    std::vector<Contact> contactList;
-    contactList.push_back(_contact);
-    this->contacts.insert( std::make_pair( _geom, contactList ) );
-  }
-  else
-  {
-    (iter->second).push_back( _contact);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// retrieve list of contacts for a geom
-std::vector<Contact> Model::GetContacts(CollisionPtr geom)
-{
-  std::map<CollisionPtr, std::vector<Contact> >::iterator iter = this->contacts.find( geom );
-  if (iter == this->contacts.end())
-    return std::vector<Contact>(); // return empty list
-  else
-    return iter->second;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// retrieve list of contacts for a geom
-Contact Model::GetContact(CollisionPtr _geom, unsigned int _i)
-{
-  std::vector<Contact> geom_contacts = this->GetContacts(_geom);
-  if (geom_contacts.empty())
-    return Contact();
-  else
-    if (_i < geom_contacts.size())
-      return geom_contacts[_i];
-    else
-      return Contact();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -32,8 +32,9 @@
 
 #include "physics/Collision.hh"
 #include "physics/Model.hh"
-#include "physics/World.hh"
+#include "physics/Collision.hh"
 #include "physics/Link.hh"
+#include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Entity.hh"
 #include <boost/thread/recursive_mutex.hpp>
@@ -392,6 +393,17 @@ ModelPtr Entity::GetParentModel() const
     p = p->GetParent();
 
   return boost::shared_dynamic_cast<Model>(p);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a child collision entity, if one exists
+CollisionPtr Entity::GetChildCollision(const std::string &_name)
+{
+  BasePtr base = this->GetByName(_name);
+  if (base)
+    return boost::shared_dynamic_cast<Collision>(base);
+  
+  return CollisionPtr();
 }
 
 /// Called when a new pose message arrives
