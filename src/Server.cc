@@ -143,7 +143,7 @@ void Server::Run()
   while (!this->stop)
   {
     sensors::run_once(true);
-    common::Time::MSleep(1000);
+    common::Time::MSleep(1);
   }
 
   // Stop all the worlds
