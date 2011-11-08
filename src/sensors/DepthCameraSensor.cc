@@ -90,7 +90,7 @@ void DepthCameraSensor::Init()
     if (!this->scene)
       this->scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
 
-    this->camera = this->scene->CreateDepthCamera(this->sdf->GetValueString("name"));
+    this->camera = this->scene->CreateDepthCamera(this->sdf->GetValueString("name"),false);
 
     if (!this->camera)
     {
