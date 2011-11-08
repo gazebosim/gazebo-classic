@@ -339,12 +339,12 @@ void ODEPhysics::UpdateCollision()
   //}
 
   // Trimesh collision must happen in this thread sequentially
-  /*for (unsigned int i=0; i<this->trimeshCollidersCount; i++)
+  for (unsigned int i=0; i<this->trimeshCollidersCount; i++)
   {
     ODECollision *collision1 = this->trimeshColliders[i].first;
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
-  }*/
+  }
 
   //printf("ContactFeedbacks[%d]\n",this->contactFeedbacks.size());
   // Process all the contact feedbacks
