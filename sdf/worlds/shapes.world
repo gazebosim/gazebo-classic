@@ -54,10 +54,31 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-        <sensor name="test"  type="contact" always_on="true">
-          <contact>
-            <collision name="geom1"/>
-          </contact>
+      </link>
+    </model>
+
+    <model name="laser_model" static="true">
+      <origin pose="-2 0 0.5 0 0 0"/>
+      <link name="body">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <visual name="visual">
+          <geometry>
+            <box size=".1 .1 .1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+
+        <sensor name="laser" type="ray" always_on="true">
+          <ray>
+            <scan display="true">
+              <horizontal samples="3" resolution="1" min_angle="-1.5707"
+                max_angle="1.5707"/>
+            </scan>
+            <range min="0.1" max="10" resolution="0.1"/>
+          </ray>
         </sensor>
       </link>
     </model>

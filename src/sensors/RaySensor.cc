@@ -27,8 +27,11 @@
 #include "physics/Model.hh"
 #include "physics/Link.hh"
 #include "physics/Collision.hh"
-#include "physics/World.hh"
 #include "common/Exception.hh"
+
+#include "transport/Node.hh"
+#include "transport/Publisher.hh"
+#include "msgs/msgs.h"
 
 #include "math/Vector3.hh"
 
@@ -45,6 +48,7 @@ RaySensor::RaySensor()
     : Sensor()
 {
   this->active = false;
+  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
@@ -71,6 +75,9 @@ void RaySensor::Load( )
   std::string worldName = this->sdf->GetWorldName();
   std::string linkFullyScopedName = worldName + "::" + modelName + "::" + 
                                     linkName;
+
+  this->node->Init(worldName);
+  this->scanPub = this->node->Advertise<msgs::LaserScan>("~/laser_scan");
 
   physics::WorldPtr world = physics::get_world(worldName);
   this->link = world->GetModelByName(modelName)->GetChildLink(linkName);
@@ -107,31 +114,38 @@ void RaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetMinAngle() const
+math::Angle RaySensor::GetAngleMin() const
 {
   return this->laserShape->GetMinAngle();
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetMaxAngle() const
+math::Angle RaySensor::GetAngleMax() const
 {
   return this->laserShape->GetMaxAngle();
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetMinRange() const
+double RaySensor::GetRangeMin() const
 {
   return this->laserShape->GetMinRange();
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetMaxRange() const
+double RaySensor::GetRangeMax() const
 {
   return this->laserShape->GetMaxRange();
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetResRange() const
+double RaySensor::GetAngleResolution() const
+{
+  return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /  
+    this->GetRangeCount();
+}
+
+//////////////////////////////////////////////////
+double RaySensor::GetRangeResolution() const
 {
   return this->laserShape->GetResRange();
 }
@@ -163,13 +177,13 @@ int RaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalMinAngle() const
+math::Angle RaySensor::GetVerticalAngleMin() const
 {
   return this->laserShape->GetVerticalMinAngle();
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalMaxAngle() const
+math::Angle RaySensor::GetVerticalAngleMax() const
 {
   return this->laserShape->GetVerticalMaxAngle();
 }
@@ -197,4 +211,21 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 {
   this->laserShape->Update();
   this->lastUpdateTime = this->link->GetWorld()->GetSimTime();
+
+  msgs::LaserScan msg;
+
+  msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
+  msg.set_angle_max( this->GetAngleMax().GetAsRadian() );
+  msg.set_angle_step( this->GetAngleResolution() );
+
+  msg.set_range_min( this->GetRangeMin() );
+  msg.set_range_max( this->GetRangeMax() );
+
+  for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+  {
+    msg.add_ranges(this->laserShape->GetRange(i));
+    msg.add_intensities(0);
+  }
+
+  this->scanPub->Publish(msg);
 }
