@@ -53,7 +53,7 @@ void ODESliderJoint::Load( sdf::ElementPtr &_sdf )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-math::Vector3 ODESliderJoint::GetAxis(int /*_index*/) const
+math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 {
   dVector3 result;
   dJointGetSliderAxis( this->jointId, result );

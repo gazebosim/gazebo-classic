@@ -57,7 +57,7 @@ namespace gazebo
       public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
   
       /// Get the axis of rotation
-      public: virtual math::Vector3 GetAxis(int index) const;
+      public: virtual math::Vector3 GetGlobalAxis(int index) const;
   
       /// Set the axis of rotation
       public: virtual void SetAxis(int index, const math::Vector3 &axis);

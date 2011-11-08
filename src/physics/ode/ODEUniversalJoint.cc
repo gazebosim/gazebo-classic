@@ -66,7 +66,7 @@ void ODEUniversalJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the first axis of rotation
-math::Vector3 ODEUniversalJoint::GetAxis(int index ) const
+math::Vector3 ODEUniversalJoint::GetGlobalAxis(int index ) const
 {
   dVector3 result;
 

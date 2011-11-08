@@ -96,7 +96,7 @@ void ODEHinge2Joint::SetDamping( int /*_index*/, const double _damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get first axis of rotation
-math::Vector3 ODEHinge2Joint::GetAxis(int index) const
+math::Vector3 ODEHinge2Joint::GetGlobalAxis(int index) const
 {
   dVector3 result;
 

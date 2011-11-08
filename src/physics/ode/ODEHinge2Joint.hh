@@ -66,7 +66,7 @@ namespace gazebo
     public: virtual math::Vector3 GetAnchor(int index) const;
   
     /// \brief Get first axis of rotation
-    public: virtual math::Vector3 GetAxis(int index) const;
+    public: virtual math::Vector3 GetGlobalAxis(int index) const;
   
     /// \brief Get angle of rotation about first axis
     public: virtual math::Angle GetAngle(int index) const;

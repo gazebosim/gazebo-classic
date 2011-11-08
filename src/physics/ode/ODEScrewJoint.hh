@@ -52,7 +52,7 @@ namespace gazebo
       protected: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetAxis(int index) const;
+      public: virtual math::Vector3 GetGlobalAxis(int index) const;
 
       /// \brief Set the axis of motion
       public: virtual void SetAxis( int index, const math::Vector3 &axis );

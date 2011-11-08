@@ -794,9 +794,27 @@ void Model::SetJointPositions(
             {
               // rotate child (childLink) about anchor point, by delta-angle 
               // along axis
-              double dangle = jiter->second- joint->GetAngle(0).GetAsRadian();
-              this->RotateBodyAndChildren(childLink, 
-                  joint->GetAnchor(0), joint->GetAxis(0), dangle, true);
+              double dangle = jiter->second - joint->GetAngle(0).GetAsRadian();
+
+              math::Pose worldPose = childLink->GetWorldPose();
+
+              math::Vector3 anchor;
+              math::Vector3 axis;
+
+              if (this->IsStatic())
+              {
+                axis = worldPose.rot.RotateVector(joint->GetLocalAxis(0));
+                anchor = childLink->GetWorldPose().pos;
+              }
+              else
+              {
+                anchor = joint->GetAnchor(0);
+                axis = joint->GetGlobalAxis(0);
+              }
+
+
+              this->RotateBodyAndChildren(childLink, anchor,
+                  axis, dangle, true);
               break;
             }
           case Base::SLIDER_JOINT: 
@@ -823,7 +841,7 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
     const math::Vector3 &_axis, double _dangle, bool _updateChildren)
 {
   math::Pose worldPose = _body1->GetWorldPose();
-  
+
   // relative to anchor point
   math::Pose relativePose(worldPose.pos - _anchor, worldPose.rot);
 

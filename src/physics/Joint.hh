@@ -107,7 +107,8 @@ namespace gazebo
               { jointUpdate.Disconnect(c); }
   
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetAxis(int index) const = 0;
+      public: math::Vector3 GetLocalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(int _index) const = 0;
   
       /// \brief Set the anchor point
       public: virtual void SetAnchor( int index, const math::Vector3 &anchor ) = 0;

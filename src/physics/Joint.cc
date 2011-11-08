@@ -126,7 +126,18 @@ void Joint::Init()
     this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
   if (this->sdf->HasElement("axis2"))
     this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+}
 
+math::Vector3 Joint::GetLocalAxis(int _index) const
+{
+  math::Vector3 vec;
+
+  if (_index == 0)
+    vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
+  else
+    vec =this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+
+  return vec;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

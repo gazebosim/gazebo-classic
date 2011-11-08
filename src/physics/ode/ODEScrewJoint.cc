@@ -59,7 +59,7 @@ void ODEScrewJoint::Load( sdf::ElementPtr &_sdf )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-math::Vector3 ODEScrewJoint::GetAxis(int /*index*/) const
+math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 {
   dVector3 result;
   dJointGetScrewAxis( this->jointId, result );
