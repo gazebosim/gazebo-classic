@@ -406,6 +406,17 @@ CollisionPtr Entity::GetChildCollision(const std::string &_name)
   return CollisionPtr();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get a child collision entity, if one exists
+LinkPtr Entity::GetChildLink(const std::string &_name)
+{
+  BasePtr base = this->GetByName(_name);
+  if (base)
+    return boost::shared_dynamic_cast<Link>(base);
+  
+  return LinkPtr();
+}
+
 /// Called when a new pose message arrives
 void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {

@@ -70,11 +70,11 @@ namespace gazebo
     
       /// \brief Get the minimum angle
       /// \return The minimum angle
-      public: gazebo::math::Angle GetMinAngle() const;
+      public: math::Angle GetMinAngle() const;
     
       /// \brief Get the maximum angle
       /// \return the maximum angle
-      public: gazebo::math::Angle GetMaxAngle() const;
+      public: math::Angle GetMaxAngle() const;
     
       /// \brief Get the minimum range
       /// \return The minimum range
@@ -105,11 +105,11 @@ namespace gazebo
     
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: gazebo::math::Angle GetVerticalMinAngle() const;
+      public: math::Angle GetVerticalMinAngle() const;
     
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: gazebo::math::Angle GetVerticalMaxAngle() const;
+      public: math::Angle GetVerticalMaxAngle() const;
 
       /// \brief Get detected range for a ray.
       /// \returns Returns DBL_MAX for no detection.
@@ -121,13 +121,9 @@ namespace gazebo
       /// \brief Get detected fiducial value for a ray.
       public: int GetFiducial(int index);   
     
-      private: gazebo::math::Pose prevPose;
-      private: gazebo::physics::WorldPtr world;
-      private: gazebo::physics::ModelPtr model;
-      private: gazebo::physics::LinkPtr link;
-      private: gazebo::physics::CollisionPtr laserCollision;
-      private: gazebo::physics::PhysicsEnginePtr physicsEngine;
-      private: gazebo::physics::MultiRayShapePtr laserShape;
+      private: physics::LinkPtr link;
+      private: physics::CollisionPtr laserCollision;
+      private: physics::MultiRayShapePtr laserShape;
     };
     /// \}
   }

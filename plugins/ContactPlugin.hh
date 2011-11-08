@@ -49,7 +49,7 @@ namespace gazebo
     protected: physics::WorldPtr world;
 
     /// \brief The parent sensor
-    private: sensors::ContactSensorPtr parentSensor;
+    protected: sensors::ContactSensorPtr parentSensor;
   };
 }
 

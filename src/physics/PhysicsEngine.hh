@@ -146,11 +146,6 @@ namespace gazebo
   
       //private: std::vector<OgreDynamicLines*> contactLines;
       //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
-
-      /// this is only needed because we are not starting another gzserver
-      /// for ray sensors
-      public: boost::recursive_mutex* odeRaySensorMutex;
-
     };
     
     /// \}
