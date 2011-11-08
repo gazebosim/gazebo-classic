@@ -29,23 +29,23 @@
 using namespace gazebo;
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(GazeboContactPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(ContactPlugin)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-GazeboContactPlugin::GazeboContactPlugin()
+ContactPlugin::ContactPlugin()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-GazeboContactPlugin::~GazeboContactPlugin()
+ContactPlugin::~ContactPlugin()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
-void GazeboContactPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf)
+void ContactPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf)
 {
   // Get then name of the parent sensor
   this->parentSensor = 
@@ -54,5 +54,5 @@ void GazeboContactPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sd
   this->world = physics::get_world(_sdf->GetWorldName());
 
   if (!this->parentSensor)
-    gzthrow("GazeboContactPlugin requires a Contact Sensor as its parent");
+    gzthrow("ContactPlugin requires a Contact Sensor as its parent");
 }

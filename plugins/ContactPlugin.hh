@@ -33,13 +33,13 @@
 namespace gazebo
 {
   /// \brief A Bumper controller
-  class GazeboContactPlugin : public SensorPlugin
+  class ContactPlugin : public SensorPlugin
   {
     /// \brief Constructor
-    public: GazeboContactPlugin();
+    public: ContactPlugin();
 
     /// \brief  Destructor
-    public: ~GazeboContactPlugin();
+    public: ~ContactPlugin();
 
     /// \brief Load the plugin
     /// \param take in SDF root element
