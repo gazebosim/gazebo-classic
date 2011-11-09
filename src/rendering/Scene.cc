@@ -59,8 +59,9 @@ struct VisualMessageLess {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Scene::Scene(const std::string &_name)
+Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
+  this->enableVisualizations = _enableVisualizations;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_name);
   this->id = idCounter++;
@@ -1120,6 +1121,9 @@ void Scene::OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 
 void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
 {
+  if (!this->enableVisualizations)
+    return;
+
   if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
     if (!this->visuals[_msg->name()+"_laser_vis"])

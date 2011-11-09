@@ -30,7 +30,9 @@ namespace gazebo
     bool init();
     bool fini();
 
-    rendering::ScenePtr create_scene(const std::string &name);
+    rendering::ScenePtr get_scene(const std::string &_name);
+    rendering::ScenePtr create_scene(const std::string &name, 
+                                     bool _enableVisualizations);
     /// \}
   }
 }

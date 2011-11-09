@@ -83,7 +83,7 @@
         </contact>
         <plugin name='gazebo_contact' filename='libContactPlugin.so'/>
       </sensor>
-      <sensor name='base_laser' type='ray' always_on='0' update_rate='20' visualize='false'>
+      <sensor name='base_laser' type='ray' always_on='1' update_rate='20' visualize='true'>
         <origin pose='0.275 0 0.303 0 -0 0'/>
         <topic>~/laser_scan</topic>
         <ray>

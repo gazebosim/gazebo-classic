@@ -5,15 +5,18 @@ package gazebo.msgs;
 /// \brief Data from a laser scan
 /// \verbatim
 
+import "pose.proto";
+
 message LaserScan
 {
   required string frame       = 1;
-  required double angle_min   = 2;
-  required double angle_max   = 3;
-  required double angle_step  = 4;
-  required double range_min   = 5;
-  required double range_max   = 6;
+  required Pose offset        = 2;
+  required double angle_min   = 3;
+  required double angle_max   = 4;
+  required double angle_step  = 5;
+  required double range_min   = 6;
+  required double range_max   = 7;
 
-  repeated double ranges      = 7;
-  repeated double intensities = 8;
+  repeated double ranges      = 8;
+  repeated double intensities = 9;
 }

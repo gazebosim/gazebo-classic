@@ -220,7 +220,8 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   {
     msgs::LaserScan msg;
 
-    msg.set_frame( this->link->GetScopedName() );
+    msg.set_frame(this->link->GetScopedName());
+    msgs::Set(msg.mutable_offset(), this->GetPose());
     msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
     msg.set_angle_max( this->GetAngleMax().GetAsRadian() );
     msg.set_angle_step( this->GetAngleResolution() );

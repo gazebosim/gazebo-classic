@@ -71,7 +71,8 @@ namespace gazebo
       private: Scene() {}
   
       /// \brief Constructor
-      public: Scene(const std::string &name);
+      public: Scene(const std::string &_name, 
+                    bool _enableVisualizations=false);
   
       /// \brief Destructor
       public: virtual ~Scene();
@@ -312,6 +313,7 @@ namespace gazebo
       private: VisualPtr worldVisual;
       private: msgs::Request *requestMsg;
 
+      private: bool enableVisualizations;
     };
     /// \}
   }

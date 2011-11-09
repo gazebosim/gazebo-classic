@@ -31,7 +31,7 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   QVBoxLayout *frameLayout = new QVBoxLayout;
 
   this->glWidget = new GLWidget(renderFrame);
-  rendering::ScenePtr scene = rendering::create_scene("model_builder");
+  rendering::ScenePtr scene = rendering::create_scene("model_builder", true);
   this->glWidget->ViewScene( scene );
 
   frameLayout->addWidget(this->glWidget);

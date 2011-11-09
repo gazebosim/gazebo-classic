@@ -45,8 +45,6 @@ LaserVisual::LaserVisual (const std::string &_name, Scene *_scene,
   this->rayFanOutline->setMaterial("Gazebo/Red");
 
   this->rayFan->AddPoint(math::Vector3(0,0,0));
-
-  //this->SetWorldPosition(math::Vector3(-2,0,0.5));
 }
  
 LaserVisual::~LaserVisual()
@@ -66,17 +64,21 @@ void LaserVisual::OnScan( const boost::shared_ptr<msgs::LaserScan const> &_msg)
     VisualPtr vis = this->scene->GetVisual(_msg->frame());
     vis->AttachVisual(this);
     this->parent = vis;
+    std::cout << "Pose[" << this->GetWorldPose() << "]\n";
   }
 
   double angle = _msg->angle_min();
   double r;
   math::Vector3 pt;
+  math::Pose offset = msgs::Convert(_msg->offset());
 
   for (int i=0; i < _msg->ranges_size(); i++)
   {
     r = _msg->ranges(i) + _msg->range_min();
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle); 
+    pt.z = 0;
+    pt += offset.pos;
 
     if (i+1 >= (int)this->rayFan->GetPointCount())
       this->rayFan->AddPoint(pt);
