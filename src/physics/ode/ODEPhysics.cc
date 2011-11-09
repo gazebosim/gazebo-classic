@@ -733,7 +733,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
   // for now, only use maxContacts if both collisionetries are trimeshes
   // other types of collisionetries do not need too many contacts
-  if (collision1->GetShapeType() == Base::TRIMESH_SHAPE && 
+  if (collision1->GetShapeType() == Base::TRIMESH_SHAPE ||
       collision2->GetShapeType() == Base::TRIMESH_SHAPE)
   {
     numContacts = this->GetMaxContacts();
@@ -744,6 +744,11 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
     numc = dCollide(collision1->GetCollisionId(), collision2->GetCollisionId(), 
         numContacts, contactCollisions, sizeof(contactCollisions[0]) );
   }
+  //gzerr << "numContacts " << numContacts
+  //      << " numc " << numc
+  //      << " col1 " << collision1->GetName()
+  //      << " col2 " << collision2->GetName()
+  //      << "\n";
 
   if (numc != 0)
   {
