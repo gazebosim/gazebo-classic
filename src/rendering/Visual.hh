@@ -19,8 +19,8 @@
  * Date: 14 Dec 2007
  */
 
-#ifndef OGREVISUAL_HH
-#define OGREVISUAL_HH
+#ifndef VISUAL_HH
+#define VISUAL_HH
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
@@ -274,7 +274,7 @@ namespace gazebo
 
       private: std::string name;
       private: std::string physicsEntityName;
-      private: VisualPtr parent;
+      protected: VisualPtr parent;
 
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;

@@ -84,6 +84,9 @@ namespace gazebo
 
       public: bool IsActive();
 
+      /// \brief Get sensor type
+      public: std::string GetType() const;
+
       /// \brief return last update time
       public: common::Time GetLastUpdateTime();
 

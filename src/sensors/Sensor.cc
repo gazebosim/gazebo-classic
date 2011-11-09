@@ -210,4 +210,8 @@ common::Time Sensor::GetLastUpdateTime()
   return this->lastUpdateTime;
 }
 
-
+//////////////////////////////////////////////////
+std::string Sensor::GetType() const
+{
+  return this->sdf->GetValueString("type");
+}

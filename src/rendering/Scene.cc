@@ -23,6 +23,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
+#include "rendering/LaserVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
 #include "rendering/Visual.hh"
@@ -45,6 +46,16 @@ using namespace rendering;
 
 
 unsigned int Scene::idCounter = 0;
+
+struct VisualMessageLess {
+    bool operator() (boost::shared_ptr<msgs::Visual const> _i,
+                     boost::shared_ptr<msgs::Visual const> _j) 
+    { 
+      return _i->name().size() < _j->name().size();
+    }
+
+} VisualMessageLessOp;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -205,6 +216,7 @@ void Scene::Init()
   this->selectionObj->Init();
 
   //this->InitShadows();
+
 }
 
 // TODO: put this back in, and disable PSSM shadows in the RTShader. 
@@ -926,6 +938,20 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
     pm->set_name( _msg->model(i).name() );
     this->poseMsgs.push_back( pm );
+
+    for (int j=0; j < _msg->model(i).links_size(); j++)
+    {
+      boost::shared_ptr<msgs::Pose> pm2(new msgs::Pose(_msg->model(i).links(j).pose()));
+      pm2->set_name(_msg->model(i).links(j).name());
+      this->poseMsgs.push_back(pm2);
+
+      for (int k=0; k < _msg->model(i).links(j).sensors_size(); k++)
+      {
+        boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
+              _msg->model(i).links(j).sensors(k)));
+        this->sensorMsgs.push_back(sm);
+      }
+    }
   }
 
   for (int i=0; i < _msg->light_size(); i++)
@@ -1011,6 +1037,14 @@ void Scene::PreRender()
   LightMsgs_L::iterator lIter;
   PoseMsgs_L::iterator pIter;
   JointMsgs_L::iterator jIter;
+  SensorMsgs_L::iterator sensorIter;
+
+  for (sensorIter = this->sensorMsgs.begin(); 
+       sensorIter != this->sensorMsgs.end(); sensorIter++)
+  {
+    this->ProcessSensorMsg(*sensorIter);
+  }
+  this->sensorMsgs.clear();
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin(); 
@@ -1021,6 +1055,7 @@ void Scene::PreRender()
   this->sceneMsgs.clear();
 
   // Process the visual messages
+  this->visualMsgs.sort(VisualMessageLessOp);
   for (vIter = this->visualMsgs.begin(); 
        vIter != this->visualMsgs.end(); vIter++)
   {
@@ -1056,9 +1091,12 @@ void Scene::PreRender()
       // If an object is selected, don't let the physics engine move it.
       if (this->selectionObj->GetVisualName().empty() || 
           !this->selectionObj->IsActive() ||
-          iter->first.find(this->selectionObj->GetVisualName()) == std::string::npos)
+          iter->first.find(this->selectionObj->GetVisualName()) == 
+          std::string::npos)
       {
-        iter->second->SetWorldPose( msgs::Convert( *(*pIter) ) );
+        math::Pose pose = msgs::Convert( *(*pIter) );
+
+        iter->second->SetWorldPose( pose );
       }
       PoseMsgs_L::iterator prev = pIter++;
       this->poseMsgs.erase( prev );
@@ -1078,6 +1116,16 @@ void Scene::OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->jointMsgs.push_back(_msg);
+}
+
+void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
+{
+  if (_msg->type() == "ray")
+  {
+    LaserVisualPtr laserVis(new LaserVisual(
+          _msg->name()+"_laser_vis", this, _msg->topic()));
+    this->visuals[_msg->name()+"_laser_vis"] = laserVis;
+  }
 }
 
 void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
@@ -1148,7 +1196,9 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
     if (iter != this->visuals.end())
       visual.reset( new Visual(_msg->name(), iter->second) );
     else 
+    {
       visual.reset( new Visual(_msg->name(), this) );
+    }
 
     visual->LoadFromMsg(_msg);
     this->visuals[_msg->name()] = visual;

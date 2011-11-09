@@ -20,5 +20,7 @@ message Sensor
   optional CameraSensor camera     = 6;
   optional RaySensor ray           = 7;
   optional ContactSensor contact   = 8;
+  optional bool visualize          = 9;
+  optional string topic            = 10;
 }
 /// \endverbatim

@@ -395,7 +395,6 @@ void Link::LoadSensor( sdf::ElementPtr &_sdf )
   sensor->Load(_sdf);
   sensor->SetParent( this->GetCompleteScopedName() );
   this->sensors.push_back(sensor);
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -558,3 +557,17 @@ void Link::FillLinkMsg( msgs::Link &_msg )
   _msg.set_name( this->GetCompleteScopedName() );
 }
 
+//////////////////////////////////////////////////
+unsigned int Link::GetSensorCount() const
+{
+  return this->sensors.size();
+}
+
+//////////////////////////////////////////////////
+sensors::SensorPtr Link::GetSensor(unsigned int _i) const
+{
+  if (_i < this->sensors.size())
+    return this->sensors[_i];
+
+  return sensors::SensorPtr();
+}

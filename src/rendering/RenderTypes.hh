@@ -37,6 +37,7 @@ namespace gazebo
     class DynamicLines;
     class SelectionObj;
     class Visual;
+    class LaserVisual;
 
     typedef boost::shared_ptr<Scene> ScenePtr;
     typedef boost::shared_ptr<Light> LightPtr;
@@ -45,6 +46,7 @@ namespace gazebo
     typedef boost::shared_ptr<DepthCamera> DepthCameraPtr;
     typedef boost::shared_ptr<DynamicLines> DynamicLinesPtr;
     typedef boost::shared_ptr<Visual> VisualPtr;
+    typedef boost::shared_ptr<LaserVisual> LaserVisualPtr;
 
     enum RenderOpType 
     {

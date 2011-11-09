@@ -33,6 +33,7 @@ set (sources MovableText.cc
              Rendering.cc
              Material.cc
              GUIOverlay.cc
+             LaserVisual.cc
 )
 
 set (headers MovableText.hh
@@ -58,6 +59,7 @@ set (headers MovableText.hh
              Rendering.hh
              Material.hh
              GUIOverlay.hh
+             LaserVisual.hh
 )
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)

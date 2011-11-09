@@ -7,12 +7,13 @@ package gazebo.msgs;
 
 message LaserScan
 {
-  required double angle_min   = 1;
-  required double angle_max   = 2;
-  required double angle_step  = 3;
-  required double range_min   = 4;
-  required double range_max   = 5;
+  required string frame       = 1;
+  required double angle_min   = 2;
+  required double angle_max   = 3;
+  required double angle_step  = 4;
+  required double range_min   = 5;
+  required double range_max   = 6;
 
-  repeated double ranges      = 6;
-  repeated double intensities = 7;
+  repeated double ranges      = 7;
+  repeated double intensities = 8;
 }

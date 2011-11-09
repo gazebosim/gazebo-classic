@@ -32,6 +32,8 @@
 
 #include "msgs/msgs.h"
 
+#include "sensors/SensorTypes.hh"
+
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
 
@@ -184,6 +186,10 @@ namespace gazebo
 
       /// \brief Construct a scene message from the known world state
       private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
+      private: void BuildModelMsg(msgs::Model *_msg, ModelPtr _model);
+      private: void BuildLinkMsg(msgs::Link *_msg, LinkPtr _link);
+      private: void BuildSensorMsg(msgs::Sensor *_msg, 
+                                   sensors::SensorPtr _sensor);
 
       private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
       private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);

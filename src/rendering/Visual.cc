@@ -969,7 +969,6 @@ void Visual::SetPosition( const math::Vector3 &_pos)
     this->staticGeom = NULL;
     //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
   }*/
-
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 
   std::list< std::pair<DynamicLines*, unsigned int> >::iterator iter;

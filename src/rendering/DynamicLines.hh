@@ -64,7 +64,7 @@ namespace gazebo
     
       /// Return the total number of points in the point list
       /// \return Number of points
-      public: unsigned int GetNumPoints() const;
+      public: unsigned int GetPointCount() const;
     
       /// Remove all points from the point list
       public: void Clear();
