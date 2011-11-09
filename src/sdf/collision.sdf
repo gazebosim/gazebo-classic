@@ -3,9 +3,6 @@
   <attribute name="name" type="string" default="__default__" required="1"/>
   <element name="max_contacts" type="int" default="10" required="0"/>
   <attribute name="laser_retro" type="double" default="0" required="0"/>
-
-  <element name="max_contacts" type="int" default="10" required="0"/>
-
   <element name="origin" required="0">
     <attribute name="pose" type="pose" default="0 0 0 0 0 0" required="1"/>
   </element> <!-- End Origin -->
