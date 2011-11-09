@@ -19,7 +19,7 @@
 
     <model name="model_1" static="false">
 
-      <origin pose="0.0 0.0 2.1 30.0 0.0 0.0"/>
+      <origin pose="0.0 0.0 2.1 0.523598776 0.0 0.0"/>
 
       <link name="link_1" self_collide="true" gravity="true" kinematic="false">
 
@@ -151,7 +151,7 @@
 
     <model name="model_2" static="false">
 
-      <origin pose="0.0 1.5 2.1 30.0 0.0 0.0"/>
+      <origin pose="0.0 1.5 2.1 0.523598776 0.0 0.0"/>
 
       <link name="link_1" self_collide="true" gravity="true" kinematic="false">
 
@@ -281,7 +281,7 @@
 
     <model name="model_3" static="false">
 
-      <origin pose="0.0 -2.0 2.1 0.0 30.0 0.0"/>
+      <origin pose="0.0 -2.0 2.1 0.0 0.523598776 0.0"/>
 
       <link name="link_1" self_collide="true" gravity="true" kinematic="false">
 
