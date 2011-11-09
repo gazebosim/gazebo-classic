@@ -114,9 +114,6 @@ namespace gazebo
       /// \brief Add a ray to the collision
       protected: virtual void AddRay(const math::Vector3 &start, const math::Vector3 &end );
     
-      protected: msgs::Visual *rayFanMsg;
-      protected: msgs::Visual *rayFanOutlineMsg;
-    
       /// Ray data
       protected: std::vector< RayShapePtr > rays;
   

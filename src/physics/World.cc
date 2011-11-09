@@ -43,6 +43,8 @@
 #include "physics/Model.hh"
 #include "physics/World.hh"
 
+#include "sensors/Sensor.hh"
+
 #include "physics/Collision.hh"
 
 using namespace gazebo;
@@ -736,12 +738,10 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 {
   if (entity)
   {
-    if (entity->HasType(Entity::ENTITY))
+    if (entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = scene.add_model();
-      math::Pose pose = boost::shared_static_cast<Entity>(entity)->GetWorldPose();
-      modelMsg->set_name( entity->GetCompleteScopedName() );
-      msgs::Set( modelMsg->mutable_pose(), pose );
+      this->BuildModelMsg(modelMsg, boost::shared_static_cast<Model>(entity));
     }
 
     for (unsigned int i=0; i < entity->GetChildCount(); i++)
@@ -749,6 +749,48 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
       this->BuildSceneMsg( scene, entity->GetChild(i) );
     }
   }
+}
+
+void World::BuildModelMsg(msgs::Model *_msg, ModelPtr _model)
+{
+  math::Pose pose = _model->GetWorldPose();
+  _msg->set_name( _model->GetCompleteScopedName() );
+  msgs::Set(_msg->mutable_pose(), pose);
+
+  for (unsigned int i=0; i < _model->GetChildCount(); i++)
+  {
+    if (_model->GetChild(i)->HasType(Entity::LINK))
+    {
+      msgs::Link *linkMsg = _msg->add_links();
+      LinkPtr link = boost::shared_static_cast<Link>(_model->GetChild(i));
+      this->BuildLinkMsg(linkMsg, link);
+    }
+  }
+}
+
+void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
+{
+  math::Pose pose = _link->GetWorldPose();
+  _msg->set_name( _link->GetCompleteScopedName() );
+  msgs::Set(_msg->mutable_pose(), pose);
+
+  for (unsigned int i=0; i < _link->GetSensorCount(); i++)
+  {
+    msgs::Sensor *sensorMsg = _msg->add_sensors();
+    sensors::SensorPtr sensor = _link->GetSensor(i);
+    this->BuildSensorMsg(sensorMsg, sensor);
+  }
+}
+
+void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
+{
+  math::Pose pose = _sensor->GetPose();
+  _msg->set_name( _sensor->GetName() );
+  _msg->set_type( _sensor->GetType() );
+  msgs::Set(_msg->mutable_pose(), pose);
+
+  _msg->set_visualize(_sensor->GetVisualize());
+  _msg->set_topic(_sensor->GetTopic());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -129,9 +129,10 @@ void RenderEngine::Load()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a scene
-ScenePtr RenderEngine::CreateScene(const std::string &name)
+ScenePtr RenderEngine::CreateScene(const std::string &name, 
+                                   bool _enableVisualizations)
 {
-  ScenePtr scene( new Scene(name) );
+  ScenePtr scene(new Scene(name, _enableVisualizations));
 
   scene->Load();
   if (this->initialized)

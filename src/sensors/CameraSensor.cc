@@ -30,7 +30,7 @@
 
 #include "rendering/Camera.hh"
 #include "rendering/Scene.hh"
-#include "rendering/RenderEngine.hh"
+#include "rendering/Rendering.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/CameraSensor.hh"
@@ -84,9 +84,9 @@ void CameraSensor::Init()
 
   if (!worldName.empty())
   {
-    this->scene = rendering::RenderEngine::Instance()->GetScene(worldName);
+    this->scene = rendering::get_scene(worldName);
     if (!this->scene)
-      this->scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
+      this->scene = rendering::create_scene(worldName, false);
 
     this->camera = this->scene->CreateCamera(
         this->sdf->GetValueString("name"), false);

@@ -90,7 +90,8 @@ namespace gazebo
       public: double GetUpdateRate();
   
       /// \brief Create a scene
-      public: ScenePtr CreateScene(const std::string &name);
+      public: ScenePtr CreateScene(const std::string &name, 
+                                   bool _enableVisualizations);
   
       /// \brief Remove a scene
       public: void RemoveScene(const std::string &name);

@@ -671,8 +671,9 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 void ColladaLoader::LoadTransparent( TiXmlElement *_elem, Material * /*_mat*/ )
 {
   const char *opaque = _elem->Attribute("opaque");
-  if (!opaque)
+  /*if (!opaque)
     gzerr << "No Opaque set\n";
+    */
 
   const char *colorStr =_elem->FirstChildElement("color")->GetText();
   if (!colorStr)

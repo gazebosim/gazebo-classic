@@ -84,8 +84,15 @@ namespace gazebo
 
       public: bool IsActive();
 
+      /// \brief Get sensor type
+      public: std::string GetType() const;
+
       /// \brief return last update time
       public: common::Time GetLastUpdateTime();
+
+      public: bool GetVisualize() const;
+
+      public: std::string GetTopic() const;
 
       /// \brief Load a plugin for this sensor
       /// \param _sdf SDF parameters
@@ -105,6 +112,7 @@ namespace gazebo
       protected: gazebo::physics::WorldPtr world;
       protected: common::Time updatePeriod;
       protected: common::Time lastUpdateTime;
+
     };
     /// \}
   }

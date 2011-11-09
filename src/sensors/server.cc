@@ -26,7 +26,7 @@ void Load()
   gazebo::sensors::load();
   gazebo::sensors::init();
 
-  gazebo::rendering::create_scene("world_1");
+  gazebo::rendering::create_scene("world_1", false);
   gazebo::common::Time::MSleep(10);
 }
 

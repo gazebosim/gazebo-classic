@@ -71,7 +71,8 @@ namespace gazebo
       private: Scene() {}
   
       /// \brief Constructor
-      public: Scene(const std::string &name);
+      public: Scene(const std::string &_name, 
+                    bool _enableVisualizations=false);
   
       /// \brief Destructor
       public: virtual ~Scene();
@@ -233,6 +234,8 @@ namespace gazebo
       private: void OnRequest( const boost::shared_ptr<msgs::Request const> &_msg);
       private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg);
       private: void OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
+
+      private: void ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg);
       private: void ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
 
       private: void OnSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
@@ -286,6 +289,8 @@ namespace gazebo
       typedef std::map<std::string, Light*> Light_M;
       private: Light_M lights;
 
+      typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
+      private: SensorMsgs_L sensorMsgs;
 
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;
 
@@ -308,6 +313,7 @@ namespace gazebo
       private: VisualPtr worldVisual;
       private: msgs::Request *requestMsg;
 
+      private: bool enableVisualizations;
     };
     /// \}
   }

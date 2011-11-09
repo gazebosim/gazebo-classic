@@ -30,7 +30,7 @@
 
 #include "rendering/DepthCamera.hh"
 #include "rendering/Scene.hh"
-#include "rendering/RenderEngine.hh"
+#include "rendering/Rendering.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/DepthCameraSensor.hh"
@@ -84,11 +84,10 @@ void DepthCameraSensor::Init()
 
   if (!worldName.empty())
   {
-    this->scene = 
-      rendering::RenderEngine::Instance()->GetScene(worldName);
+    this->scene = rendering::get_scene(worldName);
 
     if (!this->scene)
-      this->scene = rendering::RenderEngine::Instance()->CreateScene(worldName);
+      this->scene = rendering::create_scene(worldName, false);
 
     this->camera = this->scene->CreateDepthCamera(this->sdf->GetValueString("name"),false);
 

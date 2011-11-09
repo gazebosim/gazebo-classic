@@ -76,8 +76,12 @@ void RaySensor::Load( )
   std::string linkFullyScopedName = worldName + "::" + modelName + "::" + 
                                     linkName;
 
-  this->node->Init(worldName);
-  this->scanPub = this->node->Advertise<msgs::LaserScan>("~/laser_scan");
+  if (this->sdf->GetElement("topic"))
+  {
+    this->node->Init(worldName);
+    this->scanPub = this->node->Advertise<msgs::LaserScan>(
+        this->sdf->GetElement("topic")->GetValueString());
+  }
 
   physics::WorldPtr world = physics::get_world(worldName);
   this->link = world->GetModelByName(modelName)->GetChildLink(linkName);
@@ -141,7 +145,7 @@ double RaySensor::GetRangeMax() const
 double RaySensor::GetAngleResolution() const
 {
   return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /  
-    this->GetRangeCount();
+    (this->GetRangeCount()-1);
 }
 
 //////////////////////////////////////////////////
@@ -212,20 +216,25 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->laserShape->Update();
   this->lastUpdateTime = this->link->GetWorld()->GetSimTime();
 
-  msgs::LaserScan msg;
-
-  msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
-  msg.set_angle_max( this->GetAngleMax().GetAsRadian() );
-  msg.set_angle_step( this->GetAngleResolution() );
-
-  msg.set_range_min( this->GetRangeMin() );
-  msg.set_range_max( this->GetRangeMax() );
-
-  for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+  if (this->scanPub)
   {
-    msg.add_ranges(this->laserShape->GetRange(i));
-    msg.add_intensities(0);
-  }
+    msgs::LaserScan msg;
 
-  this->scanPub->Publish(msg);
+    msg.set_frame(this->link->GetScopedName());
+    msgs::Set(msg.mutable_offset(), this->GetPose());
+    msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
+    msg.set_angle_max( this->GetAngleMax().GetAsRadian() );
+    msg.set_angle_step( this->GetAngleResolution() );
+
+    msg.set_range_min( this->GetRangeMin() );
+    msg.set_range_max( this->GetRangeMax() );
+
+    for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+    {
+      msg.add_ranges(this->laserShape->GetRange(i));
+      msg.add_intensities(0);
+    }
+
+    this->scanPub->Publish(msg);
+  }
 }

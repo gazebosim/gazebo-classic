@@ -181,6 +181,12 @@ namespace gazebo
   
       /// \brief Get whether this body is in the kinematic state
       public: virtual bool GetKinematic() const {return false;}
+
+      /// \brief Get sensor count
+      public: unsigned int GetSensorCount() const;
+
+      /// \brief Get sensor count
+      public: sensors::SensorPtr GetSensor(unsigned int _i) const;
   
       /// \brief Connect a to the add entity signal
       public: template<typename T>

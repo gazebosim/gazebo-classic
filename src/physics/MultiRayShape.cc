@@ -28,18 +28,6 @@ MultiRayShape::MultiRayShape(CollisionPtr parent)
 {
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
-
-  this->rayFanMsg = new msgs::Visual();
-  this->rayFanMsg->set_name( this->GetName()+"_fan" );
-  this->rayFanMsg->set_parent_name( this->collisionParent->GetName() );
-  this->rayFanMsg->mutable_geometry()->set_type(msgs::Geometry::TRIANGLE_FAN);
-  this->rayFanMsg->mutable_material()->set_script( "Gazebo/BlueLaser" );
-
-  this->rayFanOutlineMsg = new msgs::Visual();
-  this->rayFanOutlineMsg->set_name( this->GetName()+"_fanoutline" );
-  this->rayFanOutlineMsg->set_parent_name( this->collisionParent->GetName() );
-  this->rayFanOutlineMsg->mutable_geometry()->set_type(msgs::Geometry::LINE_STRIP);
-  this->rayFanOutlineMsg->mutable_material()->set_script( "Gazebo/BlueGlow" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,16 +110,6 @@ void MultiRayShape::Init()
       this->AddRay(start,end);
     }
   }
-
-  //TODO: this doesn't belong here
-  //if (**this->displayTypeP == "fan")
-  {
-    msgs::Vector3d *pt = this->rayFanMsg->mutable_geometry()->add_points();
-    (*pt) = this->rayFanMsg->geometry().points(0);
-
-    pt = this->rayFanOutlineMsg->mutable_geometry()->add_points();
-    (*pt) = this->rayFanOutlineMsg->geometry().points(0);
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,57 +177,18 @@ void MultiRayShape::Update()
   }
 
   this->UpdateRays();
-
-  //TODO: move to rendering engine
-  /*if (**this->displayTypeP == "fan")
-  { 
-    for (unsigned int i=0; i < ray_size; i++)
-    {
-      //this->rays[i]->Update();
-      math::Vector3 a, b;
-      this->rays[i]->GetRelativePoints(a,b);
-
-      msgs::Set(this->rayFanMsg->mutable_geometry()->mutable_points(i), b );
-      msgs::Set(this->rayFanOutlineMsg->mutable_geometry()->mutable_points(i), b );
-      //gzdbg << "ray [" << i << "]"
-      //      << " length [" << this->rays[i]->GetLength() << "]\n";
-    }
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the collision
-void MultiRayShape::AddRay(const math::Vector3 &start, 
-                           const math::Vector3 &end )
+void MultiRayShape::AddRay(const math::Vector3 &/*_start*/, 
+                           const math::Vector3 &/*_end*/ )
 {
-  msgs::Vector3d *pt = NULL;
+  //msgs::Vector3d *pt = NULL;
 
   //FIXME: need to lock this when spawning models with ray.
   //       This fails because RaySensor::laserShape->Update() is called before rays could be constructed.
-
-  //TODO: move to rendering engine
-  // Add to the renderable
-  /*if (**this->displayTypeP == "fan")*/
-  {
-    if (this->rayFanMsg->geometry().points_size() == 0)
-    {
-      pt = this->rayFanMsg->mutable_geometry()->add_points();
-      msgs::Set(pt, start );
-
-      pt = this->rayFanOutlineMsg->mutable_geometry()->add_points();
-      msgs::Set(pt, start);
-    }
-
-    pt = this->rayFanMsg->mutable_geometry()->add_points();
-    msgs::Set(pt, end);
-
-    pt = this->rayFanOutlineMsg->mutable_geometry()->add_points();
-    msgs::Set(pt, end);
-  }
 }
-
-
 
 
 //////////////////////////////////////////////////////////////////////////////

@@ -81,7 +81,7 @@ const math::Vector3& DynamicLines::GetPoint(unsigned int index) const
   return this->points[index];
 }
 
-unsigned int DynamicLines::GetNumPoints() const
+unsigned int DynamicLines::GetPointCount() const
 {
   return this->points.size();
 }
