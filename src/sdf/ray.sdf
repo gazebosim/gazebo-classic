@@ -1,5 +1,6 @@
 <element name="ray" required="0">
   <element name="scan" required="1">
+    <attribute name="display" type="bool" default="0" required="0"/>
     <element name="horizontal" required="1">
       <attribute name="samples" type="unsigned int" default="1" required="1"/>
       <attribute name="resolution" type="double" default="1" required="0"/>
