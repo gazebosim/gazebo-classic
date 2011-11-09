@@ -789,8 +789,8 @@ void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
   _msg->set_type( _sensor->GetType() );
   msgs::Set(_msg->mutable_pose(), pose);
 
-  _msg->set_visualize(true);
-  _msg->set_topic("~/laser_scan");
+  _msg->set_visualize(_sensor->GetVisualize());
+  _msg->set_topic(_sensor->GetTopic());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

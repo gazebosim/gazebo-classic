@@ -1120,11 +1120,14 @@ void Scene::OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 
 void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
 {
-  if (_msg->type() == "ray")
+  if (_msg->type() == "ray" && _msg->visualize() && !_msg->topic().empty())
   {
-    LaserVisualPtr laserVis(new LaserVisual(
-          _msg->name()+"_laser_vis", this, _msg->topic()));
-    this->visuals[_msg->name()+"_laser_vis"] = laserVis;
+    if (!this->visuals[_msg->name()+"_laser_vis"])
+    {
+      LaserVisualPtr laserVis(new LaserVisual(
+            _msg->name()+"_laser_vis", this, _msg->topic()));
+      this->visuals[_msg->name()+"_laser_vis"] = laserVis;
+    }
   }
 }
 

@@ -215,3 +215,20 @@ std::string Sensor::GetType() const
 {
   return this->sdf->GetValueString("type");
 }
+
+//////////////////////////////////////////////////
+bool Sensor::GetVisualize() const
+{
+  return this->sdf->GetValueBool("visualize");
+}
+
+//////////////////////////////////////////////////
+std::string Sensor::GetTopic() const
+{
+  std::string result;
+  if (this->sdf->HasElement("topic"))
+    result = this->sdf->GetElement("topic")->GetValueString();
+  return result;
+}
+
+
