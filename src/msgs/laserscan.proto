@@ -1,0 +1,18 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Laser ray scan message 
+/// \brief Data from a laser scan
+/// \verbatim
+
+message LaserScan
+{
+  required double angle_min   = 1;
+  required double angle_max   = 2;
+  required double angle_step  = 3;
+  required double range_min   = 4;
+  required double range_max   = 5;
+
+  repeated double ranges      = 6;
+  repeated double intensities = 7;
+}

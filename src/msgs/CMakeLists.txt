@@ -18,6 +18,7 @@ set (msgs axis.proto
           inertial.proto
           int.proto
           joint.proto
+          laserscan.proto
           light.proto
           link.proto
           material.proto

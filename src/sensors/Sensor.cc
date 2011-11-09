@@ -76,6 +76,9 @@ void Sensor::Load()
     this->pose =  this->sdf->GetElement("origin")->GetValuePose("pose");
   }
 
+  if (this->sdf->GetValueBool("always_on"))
+    this->SetActive(true);
+
   this->node->Init(this->sdf->GetWorldName());
 
   // get world

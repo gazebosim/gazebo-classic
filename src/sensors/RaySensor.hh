@@ -27,6 +27,7 @@
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"
+#include "transport/TransportTypes.hh"
 #include "sensors/Sensor.hh"
 
 namespace gazebo
@@ -70,22 +71,25 @@ namespace gazebo
     
       /// \brief Get the minimum angle
       /// \return The minimum angle
-      public: math::Angle GetMinAngle() const;
+      public: math::Angle GetAngleMin() const;
     
       /// \brief Get the maximum angle
       /// \return the maximum angle
-      public: math::Angle GetMaxAngle() const;
-    
+      public: math::Angle GetAngleMax() const;
+   
+      /// \brief Get radians between each range 
+      public: double GetAngleResolution() const;
+
       /// \brief Get the minimum range
       /// \return The minimum range
-      public: double GetMinRange() const;
+      public: double GetRangeMin() const;
     
       /// \brief Get the maximum range
       /// \return The maximum range
-      public: double GetMaxRange() const;
+      public: double GetRangeMax() const;
     
       /// \brief Get the range resolution
-      public: double GetResRange() const;
+      public: double GetRangeResolution() const;
     
       /// \brief Get the ray count
       /// \return The number of rays
@@ -105,11 +109,11 @@ namespace gazebo
     
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalMinAngle() const;
+      public: math::Angle GetVerticalAngleMin() const;
     
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalMaxAngle() const;
+      public: math::Angle GetVerticalAngleMax() const;
 
       /// \brief Get detected range for a ray.
       /// \returns Returns DBL_MAX for no detection.
@@ -124,6 +128,9 @@ namespace gazebo
       private: physics::LinkPtr link;
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr scanPub;
     };
     /// \}
   }
