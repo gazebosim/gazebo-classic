@@ -225,6 +225,10 @@ void ODECollision::OnPoseChangeGlobal()
   // un-offset cog location
   math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
+  // Hack:
+  if (this->IsStatic())
+    localPose += this->parentEntity->GetWorldPose();
+
 
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;

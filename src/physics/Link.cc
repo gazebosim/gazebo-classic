@@ -303,7 +303,8 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(this->GetChild( collisionElem->GetValueString("name") ) );
+      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(
+          this->GetChild( collisionElem->GetValueString("name") ) );
 
       if (collision)
         collision->UpdateParameters(collisionElem);

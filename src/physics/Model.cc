@@ -722,7 +722,6 @@ void Model::SetJointPositions(
   std::map<std::string, double>::const_iterator jiter = _jointPositions.begin();
   for (iter = this->joints.begin(); iter != this->joints.end() ; iter++)
   {
-    double targetPosition = 0;
     JointPtr joint = *iter;
 
     std::map<std::string, double>::const_iterator jiter = 

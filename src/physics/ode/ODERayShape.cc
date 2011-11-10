@@ -39,6 +39,8 @@ ODERayShape::ODERayShape( CollisionPtr parent, bool displayRays )
 
   // Create default ray with unit length
   collision->SetCollision( dCreateRay( collision->GetSpaceId(), 1.0 ),  false );
+  collision->SetCategoryBits(GZ_SENSOR_COLLIDE);
+  collision->SetCollideBits(~GZ_SENSOR_COLLIDE);
 }
 
 //////////////////////////////////////////////////////////////////////////////

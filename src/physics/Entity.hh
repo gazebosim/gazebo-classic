@@ -184,7 +184,7 @@ namespace gazebo
       private: void UpdateAnimation();
   
       /// A helper that prevents numerous dynamic_casts
-      private: EntityPtr parentEntity;
+      protected: EntityPtr parentEntity;
 
       private: bool isStatic;
 
