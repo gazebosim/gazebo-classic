@@ -105,7 +105,7 @@ namespace gazebo
   
       /// \brief Load 
       /// \param node Pointer to an SDF parameters
-      public: virtual void Load( sdf::ElementPtr _sdf );
+      public: virtual void Load( sdf::ElementPtr &_sdf );
 
       /// \brief Finialize the object
       public: virtual void Fini();

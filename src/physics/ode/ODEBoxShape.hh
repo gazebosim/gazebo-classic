@@ -46,7 +46,8 @@ namespace gazebo
         BoxShape::SetSize(size);
 
         ODECollisionPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+        oParent = boost::shared_dynamic_cast<ODECollision>(
+            this->collisionParent);
 
         oParent->SetCollision( dCreateBox( 0, size.x, size.y, size.z), true );
       }

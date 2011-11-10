@@ -46,9 +46,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~RayShape();
   
-      /// \brief Set to true in order to view individual rays
-      public: void SetDisplayType( bool displayRays );
-    
       /// \brief Set the ray based on starting and ending points relative to 
       ///        the body
       /// \param posStart Start position, relative the body
@@ -60,12 +57,14 @@ namespace gazebo
       /// \brief Get the relative starting and ending points
       /// \param posA Returns the starting point
       /// \param posB Returns the ending point
-      public: virtual void GetRelativePoints(math::Vector3 &posA, math::Vector3 &posB);
+      public: virtual void GetRelativePoints(math::Vector3 &posA, 
+                                             math::Vector3 &posB);
   
       /// \brief Get the global starting and ending points
       /// \param posA Returns the starting point
       /// \param posB Returns the ending point
-      public: virtual void GetGlobalPoints(math::Vector3 &posA, math::Vector3 &posB);
+      public: virtual void GetGlobalPoints(math::Vector3 &posA,
+                                           math::Vector3 &posB);
   
       /// \brief Set the length of the ray
       /// \param len Length of the array
@@ -108,7 +107,6 @@ namespace gazebo
       /// Start and end positions of the ray in global cs
       protected: math::Vector3 globalStartPos;
       protected: math::Vector3 globalEndPos;
-      protected: transport::PublisherPtr vis_pub;
     };
     /// \}
   }

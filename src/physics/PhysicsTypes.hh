@@ -65,7 +65,7 @@ namespace gazebo
     #define GZ_ALL_COLLIDE 0x0FFFFFFF
     #define GZ_NONE_COLLIDE 0x00000000
     #define GZ_FIXED_COLLIDE 0x00000001
-    #define GZ_SENSOR_COLLIDE 0x00000002
+    #define GZ_SENSOR_COLLIDE 0x00000003
     #define GZ_GHOST_COLLIDE 0x10000000
     
     #endif
