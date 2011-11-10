@@ -298,6 +298,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   sdf::ElementPtr sdfScan = _sdf->AddElement("scan");
 
+  /* FIXME: moved up to sensor/visualize attribute
   if (firstChildElement(_config, "displayRays"))
   {
     std::string display = getNodeValue(_config, "displayRays");
@@ -306,6 +307,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     else
       sdfScan->GetAttribute("display")->SetFromString("true");
   }
+  */
 
   sdf::ElementPtr sdfHoriz = sdfScan->AddElement("horizontal");
 
@@ -522,8 +524,8 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
-  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
 
+  // parse xyz
   sdf::ElementPtr origin = _sdf->AddElement("origin");
   std::string poseStr;
 
@@ -532,10 +534,57 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   else
     poseStr += "0 0 0 ";
 
-  if (rpy_xml) 
-    poseStr += getValue(rpy_xml);
+  // parse rpy
+  xmlNodePtr rpy_xml = firstChildElement(_config, "rpy");
+  if (rpy_xml != NULL)
+  {
+    std::string rpy_str = getNodeValue(rpy_xml, "rpy");
+    std::vector<double> degrees;
+    std::vector<std::string> pieces;
+    boost::split( pieces, rpy_str, boost::is_any_of(" "));
+    for (unsigned int i = 0; i < pieces.size(); ++i)
+    {
+      if (pieces[i] != "")
+      {
+        try
+        {
+          degrees.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+        }
+        catch (boost::bad_lexical_cast &e)
+        {
+          gzerr << "rpy value ["
+                << pieces[i] << "] is not a valid double from a 3-tuple\n";
+          return false;
+        }
+      }
+    }
+
+    if (degrees.size() == 0)
+    {
+      poseStr += "0 0 0";
+    }
+    else
+    {
+      if (degrees.size() != 3)
+      {
+        gzerr << "Vector contains [" << (int)degrees.size() << "] elements instead of 3 elements\n";
+        return false;
+      }
+      // convert degrees to radian
+      std::ostringstream rpy_stream;
+      rpy_stream << DTOR(degrees[0]) << " "
+                 << DTOR(degrees[1]) << " "
+                 << DTOR(degrees[2]);
+      if (rpy_stream.str().empty()) 
+      {
+        gzerr << "rpy_stream is empty, something is wrong\n";
+        return false;
+      }
+      poseStr += rpy_stream.str();
+    }
+  }
   else
-    poseStr += "0 0 0";
+      poseStr += "0 0 0";
 
   origin->GetAttribute("pose")->SetFromString( poseStr );
 
