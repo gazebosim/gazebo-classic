@@ -64,7 +64,6 @@ void LaserVisual::OnScan( const boost::shared_ptr<msgs::LaserScan const> &_msg)
     VisualPtr vis = this->scene->GetVisual(_msg->frame());
     vis->AttachVisual(this);
     this->parent = vis;
-    std::cout << "Pose[" << this->GetWorldPose() << "]\n";
   }
 
   double angle = _msg->angle_min();
@@ -72,6 +71,7 @@ void LaserVisual::OnScan( const boost::shared_ptr<msgs::LaserScan const> &_msg)
   math::Vector3 pt;
   math::Pose offset = msgs::Convert(_msg->offset());
 
+  this->rayFan->SetPoint(0, offset.pos);
   for (int i=0; i < _msg->ranges_size(); i++)
   {
     r = _msg->ranges(i) + _msg->range_min();

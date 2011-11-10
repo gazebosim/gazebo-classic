@@ -52,6 +52,12 @@ namespace gazebo
       /// \brief Load the collision
       public: virtual void Load( sdf::ElementPtr &_sdf );
 
+      /*public: virtual void Load()
+              {
+                Base::Load();
+              }
+              */
+
       /// \brief Finalize the collision
       public: void Fini();
  

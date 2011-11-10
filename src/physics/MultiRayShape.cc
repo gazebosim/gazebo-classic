@@ -88,6 +88,8 @@ void MultiRayShape::Init()
   minRange = this->rangeElem->GetValueDouble("min");
   maxRange = this->rangeElem->GetValueDouble("max");
 
+  this->offset = this->collisionParent->GetRelativePose().pos;
+
   // Create and array of ray collisions
   for (unsigned int j = 0; j < (unsigned int)vertSamples; j++)
   {
@@ -104,6 +106,8 @@ void MultiRayShape::Init()
 
       start = (axis * minRange) + this->offset;
       end = (axis * maxRange) + this->offset;
+
+      std::cout << "Start[" << start << "] End[" << end << "] Offset[" << this->offset << "]\n";
 
       // gzerr << "add ray debug [" << this->GetName() << "] "
       //       << start << " " << end << "\n";

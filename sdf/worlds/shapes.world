@@ -34,34 +34,41 @@
       </link>
     </model>
 
-    <model name="box_model" static="false">
-      <origin pose="0 0 0.5 0 0 0"/>
-      <link name="body">
+    <model name="box_model" static="true">
+      <origin pose="0 0 0.9 0 0 0"/>
+      <link name="box_body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
 
         <collision name="geom1">
           <geometry>
-            <box size="1 1 1"/>
+            <box size="1 1 2"/>
           </geometry>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <box size="1 1 1"/>
+            <box size="1 1 2"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
     </model>
 
-    <model name="laser_model" static="true">
-      <origin pose="-2 0 0.5 0 0 0"/>
-      <link name="body">
+    <model name="laser_model" static="false">
+      <origin pose="-5 0 0.5 0 0 0"/>
+      <link name="laser_body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
         </inertial>
+        <!--
+        <collision name="geom1">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+        </collision>
+        -->
 
         <visual name="visual">
           <geometry>
@@ -69,21 +76,21 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-
-        <sensor name="laser" type="ray" always_on="true" visualize="true">
+        <sensor name='base_laser' type='ray' always_on='1' update_rate='.01' visualize='true'>
+          <origin pose='0.0 0 0.0 0 -0 0'/>
           <topic>~/laser_scan</topic>
-
           <ray>
             <scan>
-              <horizontal samples="100" resolution="1" min_angle="-1.5707"
-                max_angle="1.5707"/>
+              <horizontal samples='1' resolution='1' min_angle='0' max_angle='0'/>
             </scan>
-            <range min="0.1" max="10" resolution="0.1"/>
+            <range min='0.0' max='10' resolution='0.01'/>
           </ray>
+          <plugin name='laser' filename='libRayPlugin.so'/>
         </sensor>
       </link>
     </model>
 
+ 
     <!--
 
     <model name="sphere_model">

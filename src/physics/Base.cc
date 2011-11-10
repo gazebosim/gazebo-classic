@@ -43,6 +43,11 @@ Base::Base(BasePtr parent)
 
   this->sdf.reset( new sdf::Element );
   this->sdf->AddAttribute("name","string","__default__",true);
+
+  if (this->parent)
+  {
+    this->world = this->parent->GetWorld();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,10 +73,9 @@ Base::~Base()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load 
-void Base::Load( sdf::ElementPtr _sdf )
+void Base::Load( sdf::ElementPtr &_sdf )
 {
   this->sdf = _sdf;
-
   if (this->parent)
   {
     this->world = this->parent->GetWorld();

@@ -863,7 +863,8 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
 
   if (_msg->has_sdf())
   {
-    sdf::readString( _msg->sdf(), factorySDF ); // SDF Parsing happens here
+    // SDF Parsing happens here
+    sdf::readString( _msg->sdf(), factorySDF );
   }
   else
     sdf::readFile( _msg->sdf_filename(), factorySDF);

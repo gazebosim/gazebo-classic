@@ -116,11 +116,10 @@ namespace gazebo
       public: inline Vector3 CoordPositionSub(const Pose &_pose) const
               {
                 Quaternion tmp( 0.0,
-                    (this->pos - _pose.pos).x,
-                    (this->pos - _pose.pos).y,
-                    (this->pos - _pose.pos).z);
+                    this->pos.x - _pose.pos.x,
+                    this->pos.y - _pose.pos.y,
+                    this->pos.z - _pose.pos.z);
 
-                // result = pose.rot! * (this->pos - pose.pos) * pose.rot
                 tmp = _pose.rot.GetInverse() * (tmp * _pose.rot);
                 return Vector3(tmp.x, tmp.y, tmp.z);
               }

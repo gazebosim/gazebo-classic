@@ -55,7 +55,7 @@ namespace gazebo
       /// \brief Update the parameters using new sdf values
       public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
 
-      /// \brief Load the collision
+      /// \brief Save the collision
       public: void Save(std::string &prefix, std::ostream &stream);
    
       /// \brief Set the encapsulated collsion object

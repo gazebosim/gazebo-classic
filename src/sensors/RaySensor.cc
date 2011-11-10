@@ -91,18 +91,19 @@ void RaySensor::Load( )
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
   this->laserCollision = physicsEngine->CreateCollision("multiray", this->link);
-
   this->laserCollision->SetName("ray_sensor_collision");
+  this->laserCollision->SetRelativePose(this->pose);
+  std::cout << "Link Pose[" << this->link->GetWorldPose() << "]\n";
+  std::cout << "  LaserCollPose[" << this->laserCollision->GetWorldPose() << "]\n";
 
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
       this->laserCollision->GetShape());
 
   this->laserShape->Load( this->sdf );
-  this->laserShape->SetWorld(world);
 
-  this->laserCollision->SetShape(this->laserShape);
 
-  this->laserShape->Init( );
+  this->laserShape->Init();
+
 }
 
 //////////////////////////////////////////////////
@@ -216,7 +217,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
   this->laserShape->Update();
   this->lastUpdateTime = this->link->GetWorld()->GetSimTime();
 
-  if (this->scanPub)
+  //if (this->scanPub)
   {
     msgs::LaserScan msg;
 
@@ -231,6 +232,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
     for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
     {
+      printf("Range[%f]\n",this->laserShape->GetRange(i));
       msg.add_ranges(this->laserShape->GetRange(i));
       msg.add_intensities(0);
     }

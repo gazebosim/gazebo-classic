@@ -29,7 +29,6 @@
 
 #include "common/CommonTypes.hh"
 #include "common/Event.hh"
-#include "msgs/msgs.h"
 
 #include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.h"
@@ -49,21 +48,6 @@ RayShape::RayShape( CollisionPtr _parent, bool /*_displayRays*/ )
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  /*this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
-  if (displayRays)
-  {
-    msgs::Visual msg;
-    msg.SetName( this->GetName() );
-    msg.set_parent_id( this->collisionParent->GetName() );
-    msg.set_render_type( msgs::Visual::LINE_LIST );
-
-    msg.set_material( "Gazebo/BlueGlow" );
-    this->vis_pub->Publish(msg);
-
-    // NATY: put back in
-    //this->lineMsg->visibility = GZ_LASER_CAMERA;
-  }*/
-
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
@@ -77,21 +61,6 @@ RayShape::~RayShape()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set to true in order to view individual rays
-void RayShape::SetDisplayType( bool /*_displayRays*/ )
-{
-  /* NATY: do we need this?
-  if (Simulator::Instance()->GetRenderEngineEnabled() )
-  {
-    if (!displayRays)
-      this->collisionParent->GetVisualNode()->DetachObjects();
-    else
-      this->collisionParent->GetVisualNode()->AttachObject(this->line);
-  }
-  */
-}
- 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the ray based on starting and ending points relative to the body
 void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
@@ -109,16 +78,6 @@ void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &pos
   // Compute the direction of the ray
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
-
-  msgs::Visual msg;
-  msg.set_name( this->GetName() );
-
-  msgs::Vector3d *pt = msg.mutable_geometry()->add_points(); 
-  msgs::Set( pt,  this->relativeStartPos );
-  pt = msg.mutable_geometry()->add_points();
-  msgs::Set(pt, this->relativeEndPos );
-
-  //this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,16 +106,6 @@ void RayShape::SetLength( double len )
   dir.Normalize();
 
   this->relativeEndPos = dir * len + this->relativeStartPos;
-
-
-  msgs::Visual msg;
-  msg.set_name( this->GetName() );
-
-  msgs::Vector3d *pt = msg.mutable_geometry()->add_points(); 
-  msgs::Set(pt, this->relativeStartPos );
-  pt = msg.mutable_geometry()->add_points();
-  msgs::Set(pt,  this->relativeEndPos );
-  //this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

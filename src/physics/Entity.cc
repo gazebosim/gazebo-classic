@@ -61,6 +61,8 @@ Entity::Entity(BasePtr parent)
     this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
     this->SetStatic( this->parentEntity->IsStatic() );
   }
+
+  this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +193,7 @@ void Entity::SetAnimation( const common::PoseAnimationPtr &_anim )
 void Entity::PublishPose()
 {
   math::Pose relativePose = this->GetRelativePose();
-  if (relativePose != msgs::Convert(*this->poseMsg))
+  if (this->posePub && relativePose != msgs::Convert(*this->poseMsg))
   {
     msgs::Set( this->poseMsg, this->worldPose);
     this->posePub->Publish( *this->poseMsg);
@@ -208,10 +210,18 @@ math::Pose Entity::GetRelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
+    math::Pose result = this->worldPose - this->parentEntity->GetWorldPose();
+
+    std::cout << "Worldpos[" << this->worldPose << "] P[" <<
+      this->parentEntity->GetWorldPose()<< "] R[" << result << "]\n";
+
     return this->worldPose - this->parentEntity->GetWorldPose();
   }
   else
+  {
+    printf("Get World pose\n");
     return this->worldPose;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,11 +285,11 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
     if ((*iter)->HasType(ENTITY))
     {
       Entity *entity = (Entity*)((*iter).get());
-      //EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
       if (entity->IsCanonicalLink())
         entity->worldPose = (entity->initialRelativePose + _pose);
       else
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+      std::cout << "Entity[" << entity->GetName() << "] New Pose[" << entity->worldPose << "]\n";
       if (_notify) 
         entity->UpdatePhysicsPose(false);
 
@@ -369,7 +379,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
-  if (_updateChildren)
+  if (_updateChildren || this->IsStatic())
   {
     for  (Base_V::iterator iter = this->children.begin();
           iter != this->childrenEnd; iter++)
@@ -377,7 +387,6 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       if ((*iter)->HasType(ENTITY))
       {
         ((Entity*)(*iter).get())->OnPoseChange();
-        //boost::shared_static_cast<Entity>(*iter)->OnPoseChange();
       }
     }
   }
@@ -424,10 +433,9 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
   if (_msg->name() == this->GetCompleteScopedName())
   {
     math::Pose p = msgs::Convert(*_msg);
-    math::Vector3 rpy = p.rot.GetAsEuler();
-
     this->SetWorldPose( p );
   }
+  
   //this->poseMutex->unlock();
 }
 

@@ -43,6 +43,7 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr parent)
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
+  // These three lines may be unessecary 
   ODELinkPtr pLink = boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
   pLink->SetSpaceId( this->raySpaceId );
   boost::shared_static_cast<ODECollision>(parent)->SetSpaceId(this->raySpaceId);
@@ -142,7 +143,8 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
       if ( n > 0 )
       {
-        RayShapePtr shape = boost::shared_static_cast<RayShape>(rayCollision->GetShape());
+        RayShapePtr shape = boost::shared_static_cast<RayShape>(
+            rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {
           //gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
@@ -166,17 +168,23 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the collision
-void ODEMultiRayShape::AddRay(const math::Vector3 &start, const math::Vector3 &end )
+void ODEMultiRayShape::AddRay(const math::Vector3 &_start, 
+                              const math::Vector3 &_end )
 {
-  MultiRayShape::AddRay(start,end);
-  ODECollisionPtr odeCollision( new ODECollision(this->collisionParent->GetLink()) );
+  MultiRayShape::AddRay(_start, _end);
+  ODECollisionPtr odeCollision(new ODECollision(this->collisionParent->GetLink()) );
+  this->collisionParent->GetLink()->AddChild( odeCollision );
   odeCollision->SetName("ODE Ray Collision");
   odeCollision->SetSpaceId(this->raySpaceId);
+
+  std::cout << "Link[" << this->collisionParent->GetLink() << "] ChildCount[" << this->collisionParent->GetLink()->GetChildCount() << "]\n";
 
   ODERayShapePtr ray( new ODERayShape(odeCollision, true ));
   odeCollision->SetShape(ray);
 
-  ray->SetPoints(start,end);
+  ray->SetPoints(_start,_end);
   this->rays.push_back(ray);
+  odeCollision->OnPoseChange();
+  std::cout << "Add Ray. Pose[" << odeCollision->GetWorldPose().pos << "]\n";
 }
 
