@@ -33,6 +33,11 @@ CameraVisual::CameraVisual (const std::string &_name, Scene *_scene)
 {
 }
 
+CameraVisual::~CameraVisual()
+{
+  this->camera.reset();
+}
+
 void CameraVisual::Load(unsigned int _width, unsigned int _height)
 {
   double dist = 2.0;
@@ -89,7 +94,4 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   this->camera->AttachToVisual(this->GetName(), true);
 }
  
-CameraVisual::~CameraVisual()
-{
-  this->camera.reset();
-}
+

@@ -25,6 +25,7 @@
 
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
+#include "rendering/ContactVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
 #include "rendering/Visual.hh"
@@ -1146,7 +1147,15 @@ void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
     cameraVis->Load(_msg->camera().image_size().x(),
                     _msg->camera().image_size().y());
 
-    this->visuals[_msg->name()+"_camera_vis"] = cameraVis;
+    this->visuals[cameraVis->GetName()] = cameraVis;
+  }
+  if (_msg->type() == "contact" && _msg->visualize() && !_msg->topic().empty())
+  {
+    printf("New Contact sensor\n");
+    ContactVisualPtr contactVis(new ContactVisual(
+          _msg->name()+"_contact_vis", this));
+
+    this->visuals[contactVis->GetName()] = contactVis;
   }
 }
 
