@@ -82,6 +82,7 @@ void ODELink::Init()
 
   if (this->linkId)
   {
+    math::Vector3 cog_vec = this->inertial->GetCoG();
     Base_V::iterator iter;
     for (iter = this->children.begin(); iter != this->children.end(); iter++)
     {
@@ -93,6 +94,7 @@ void ODELink::Init()
           dGeomSetBody(g->GetCollisionId(), this->linkId);
           // update pose immediately
           math::Pose localPose = g->GetRelativePose();
+          localPose.pos -= cog_vec;
           dQuaternion q;
           q[0] = localPose.rot.w;
           q[1] = localPose.rot.x;

@@ -220,7 +220,11 @@ void ODECollision::OnPoseChangeGlobal()
 {
   dQuaternion q;
   // Transform into global pose since a static collision does not have a link 
-  const math::Pose localPose = this->GetWorldPose();
+  math::Pose localPose = this->GetWorldPose();
+
+  // un-offset cog location
+  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
+  localPose.pos = localPose.pos - cog_vec;
 
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;
@@ -236,7 +240,11 @@ void ODECollision::OnPoseChangeRelative()
 {
   dQuaternion q;
   // Transform into CoM relative Pose
-  const math::Pose localPose = this->GetRelativePose();
+  math::Pose localPose = this->GetRelativePose();
+
+  // un-offset cog location
+  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
+  localPose.pos = localPose.pos - cog_vec;
 
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;
