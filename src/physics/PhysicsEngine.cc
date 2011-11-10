@@ -52,6 +52,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->requestSub = this->node->Subscribe("~/request", 
                                            &PhysicsEngine::OnRequest, this);
 
+  this->rayMutex = new boost::recursive_mutex();
   {
     /*this->visualMsg = new VisualMsg();
     this->visualMsg->parentId.clear();
@@ -128,6 +129,8 @@ PhysicsEngine::~PhysicsEngine()
   }
   this->sdf->Reset();
   this->sdf.reset();
+  delete this->rayMutex;
+  this->rayMutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

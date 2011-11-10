@@ -192,11 +192,14 @@ void Entity::SetAnimation( const common::PoseAnimationPtr &_anim )
 
 void Entity::PublishPose()
 {
-  math::Pose relativePose = this->GetRelativePose();
-  if (this->posePub && relativePose != msgs::Convert(*this->poseMsg))
+  if (this->posePub && this->posePub->HasConnections())
   {
-    msgs::Set( this->poseMsg, this->worldPose);
-    this->posePub->Publish( *this->poseMsg);
+    math::Pose relativePose = this->GetRelativePose();
+    if (relativePose != msgs::Convert(*this->poseMsg))
+    {
+      msgs::Set( this->poseMsg, this->worldPose);
+      this->posePub->Publish( *this->poseMsg);
+    }
   }
 }
 

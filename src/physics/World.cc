@@ -44,6 +44,7 @@
 #include "physics/World.hh"
 
 #include "sensors/Sensor.hh"
+#include "sensors/CameraSensor.hh"
 
 #include "physics/Collision.hh"
 
@@ -714,6 +715,7 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
   }
   else if (_msg->request() == "scene_info")
   {
+    this->sceneMsg.clear_model();
     this->BuildSceneMsg( this->sceneMsg, this->rootElement );
 
     std::string *serializedData = response.mutable_serialized_data();
@@ -787,10 +789,20 @@ void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
   math::Pose pose = _sensor->GetPose();
   _msg->set_name( _sensor->GetName() );
   _msg->set_type( _sensor->GetType() );
+  _msg->set_parent(_sensor->GetParentName());
   msgs::Set(_msg->mutable_pose(), pose);
 
   _msg->set_visualize(_sensor->GetVisualize());
   _msg->set_topic(_sensor->GetTopic());
+
+  if (_sensor->GetType() == "camera")
+  {
+    sensors::CameraSensorPtr camSensor =
+      boost::shared_static_cast<sensors::CameraSensor>(_sensor);
+    msgs::CameraSensor *camMsg = _msg->mutable_camera();
+    camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
+    camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

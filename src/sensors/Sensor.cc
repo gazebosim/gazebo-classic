@@ -115,6 +115,12 @@ void Sensor::SetParent( const std::string &_name )
   this->parentName = _name;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+std::string Sensor::GetParentName() const
+{
+  return this->parentName;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the sensor
 void Sensor::Update(bool _force)

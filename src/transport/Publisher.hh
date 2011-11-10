@@ -47,6 +47,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Publisher();
 
+      public: bool HasConnections() const;
+
       public: void SetPublication(PublicationPtr &_publication, int _i);
 
       /// \brief Publish a message on the topic

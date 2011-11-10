@@ -63,6 +63,8 @@ namespace gazebo
       /// \brief Set the parent of the sensor
       public: virtual void SetParent( const std::string &_name );
 
+      public: std::string GetParentName() const;
+
       /// \brief  Update the sensor
       public: void Update(bool _force);
       protected: virtual void UpdateImpl(bool /*_force*/) {}

@@ -602,7 +602,7 @@
         </geometry>
         <material script='Gazebo/Grey'/>
       </visual>
-      <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25'>
+      <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' visualize='true'>
         <origin pose='0.0232 0.06 0.098 0 -0 0'/>
         <camera>
           <horizontal_fov angle='0.78539816339744828'/>

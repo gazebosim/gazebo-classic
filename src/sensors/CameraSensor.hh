@@ -71,6 +71,9 @@ namespace gazebo
     
       public: rendering::CameraPtr GetCamera() const {return this->camera; };
 
+      public: unsigned int GetImageWidth() const;
+      public: unsigned int GetImageHeight() const;
+
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
 
       private: rendering::CameraPtr camera;

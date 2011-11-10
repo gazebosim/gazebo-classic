@@ -36,7 +36,7 @@
     </model>
 
 
-    <model name="camera_model" static="false">
+    <model name="camera_model" static="true">
       <origin pose="0 0 .5 0.0 0.0 0"/>
       <link name="my_link">
         <inertial mass="1.0">
@@ -51,8 +51,16 @@
           </geometry>
         </collision>
 
-        <sensor name="camera" type="camera" always_on="true" update_rate="10">
-          <origin pose="0 0 10 0 0 0"/>
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+
+
+        <sensor name="camera" type="camera" always_on="true" update_rate="10" visualize='true'>
+          <origin pose="0 0 1 0 0 0"/>
           <camera>
             <horizontal_fov angle="1.04719755"/>
             <image width="640" height="480" format="R8G8B8"/>

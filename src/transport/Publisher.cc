@@ -61,6 +61,21 @@ Publisher::~Publisher()
   delete this->mutex;
 }
 
+bool Publisher::HasConnections() const
+{
+  return ((this->publications[0] && 
+           this->publications[0]->GetCallbackCount() > 0) ||
+          (this->publications[1] && 
+           this->publications[1]->GetCallbackCount() > 0));
+
+  /*return (!this->publications[0] || !this->publications[1]) &&
+         ((this->publications[0] && 
+           this->publications[0]->GetCallbackCount()==0) ||
+          (this->publications[1] && 
+           this->publications[1]->GetCallbackCount()==0));
+           */
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Publish a message
 void Publisher::PublishImpl(const google::protobuf::Message &_message )
@@ -68,10 +83,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message )
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  if ((!this->publications[0] || !this->publications[1]) &&
-      ((this->publications[0] && this->publications[0]->GetCallbackCount()==0) 
-       ||
-      (this->publications[1] && this->publications[1]->GetCallbackCount()==0)))
+  if (!this->HasConnections())
     return;
 
   // Save the latest message

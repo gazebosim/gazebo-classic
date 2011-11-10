@@ -13,14 +13,15 @@ import "contactsensor.proto";
 message Sensor
 {
   required string name             = 1;
-  required string type             = 2;
-  optional bool always_on          = 3;
-  optional double update_rate      = 4;
-  optional Pose pose               = 5;
-  optional CameraSensor camera     = 6;
-  optional RaySensor ray           = 7;
-  optional ContactSensor contact   = 8;
-  optional bool visualize          = 9;
-  optional string topic            = 10;
+  required string parent           = 2;
+  required string type             = 3;
+  optional bool always_on          = 4;
+  optional double update_rate      = 5;
+  optional Pose pose               = 6;
+  optional CameraSensor camera     = 7;
+  optional RaySensor ray           = 8;
+  optional ContactSensor contact   = 9;
+  optional bool visualize          = 10;
+  optional string topic            = 11;
 }
 /// \endverbatim

@@ -345,6 +345,7 @@ void ODEPhysics::UpdateCollision()
     ODECollision *collision2 = this->trimeshColliders[i].second;
     this->Collide(collision1, collision2, this->contactCollisions);
   }
+  
 
   //printf("ContactFeedbacks[%d]\n",this->contactFeedbacks.size());
   // Process all the contact feedbacks
@@ -373,8 +374,10 @@ void ODEPhysics::UpdateCollision()
 void ODEPhysics::UpdatePhysics()
 {
   {
+    this->rayMutex->lock(); 
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
+    this->rayMutex->unlock(); 
   }
 
     for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)

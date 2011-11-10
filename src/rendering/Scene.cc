@@ -24,6 +24,7 @@
 #include "common/Console.hh"
 
 #include "rendering/LaserVisual.hh"
+#include "rendering/CameraVisual.hh"
 #include "rendering/Conversions.hh"
 #include "rendering/Light.hh"
 #include "rendering/Visual.hh"
@@ -1132,6 +1133,20 @@ void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
             _msg->name()+"_laser_vis", this, _msg->topic()));
       this->visuals[_msg->name()+"_laser_vis"] = laserVis;
     }
+  }
+  else if (_msg->type() == "camera" && _msg->visualize())
+  {
+    VisualPtr vi = this->GetVisual(_msg->parent());
+    CameraVisualPtr cameraVis(new CameraVisual(
+          _msg->name()+"_camera_vis", this));
+
+    cameraVis->SetPose(msgs::Convert(_msg->pose()));
+    vi->AttachVisual(cameraVis.get());
+
+    cameraVis->Load(_msg->camera().image_size().x(),
+                    _msg->camera().image_size().y());
+
+    this->visuals[_msg->name()+"_camera_vis"] = cameraVis;
   }
 }
 

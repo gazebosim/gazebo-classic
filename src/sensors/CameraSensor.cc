@@ -151,3 +151,19 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
 void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
 {
 }
+
+unsigned int CameraSensor::GetImageWidth() const
+{
+  if (this->camera)
+    return this->camera->GetImageWidth();
+  return 0;
+}
+
+unsigned int CameraSensor::GetImageHeight() const
+{
+  if (this->camera)
+    return this->camera->GetImageHeight();
+  return 0;
+}
+
+
