@@ -54,7 +54,7 @@ bool transport::get_master_uri(std::string &master_host,
 }
 
 
-void transport::init(const std::string &master_host, unsigned short master_port)
+bool transport::init(const std::string &master_host, unsigned short master_port)
 {
   std::string host = master_host;
   unsigned short port = master_port;
@@ -63,7 +63,10 @@ void transport::init(const std::string &master_host, unsigned short master_port)
     get_master_uri(host, port);
 
   transport::TopicManager::Instance()->Init();
-  transport::ConnectionManager::Instance()->Init( host, port );
+  if (!transport::ConnectionManager::Instance()->Init( host, port ))
+    return false;
+
+  return true;
 }
 
 void transport::run()
@@ -74,9 +77,9 @@ void transport::run()
 
 void transport::stop()
 {
-  /*transport::ConnectionManager::Instance()->Stop();
+  transport::ConnectionManager::Instance()->Stop();
 
-  if (runThread)
+  /*if (runThread)
   {
     runThread->join();
     delete runThread;

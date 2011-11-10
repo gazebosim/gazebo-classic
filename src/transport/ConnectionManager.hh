@@ -42,11 +42,14 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      public: void Init( const std::string &master_host, 
-                         unsigned short master_port);
+      public: bool Init(const std::string &master_host, 
+                        unsigned short master_port);
 
       /// \brief Run the connection manager loop
       public: void Run();
+
+      /// \brief Return true if running (not stopped)
+      public: bool IsRunning() const;
 
       /// \brief Finalize the conneciton manager
       public: void Fini();

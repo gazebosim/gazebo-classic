@@ -56,7 +56,7 @@ ConnectionManager::~ConnectionManager()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the connection manager
-void ConnectionManager::Init(const std::string &master_host, 
+bool ConnectionManager::Init(const std::string &master_host, 
                              unsigned short master_port)
 {
   this->masterConn.reset( new Connection() );
@@ -65,7 +65,18 @@ void ConnectionManager::Init(const std::string &master_host,
   // Create a new TCP server on a free port
   this->serverConn->Listen(0, boost::bind(&ConnectionManager::OnAccept, this, _1) );
 
-  this->masterConn->Connect(master_host, master_port);
+  gzmsg << "Waiting for master";
+  while (!this->masterConn->Connect(master_host, master_port) && 
+         this->IsRunning())
+  {
+    printf(".");
+    fflush(stdout);
+    usleep(1000000);
+  }
+  printf("\n");
+
+  if (!this->IsRunning())
+    return false;
 
   std::string initData, namespacesData, publishersData;
   this->masterConn->Read(initData);
@@ -130,6 +141,8 @@ void ConnectionManager::Init(const std::string &master_host,
 
   this->initialized = true;
   this->stop = false;
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +213,12 @@ void ConnectionManager::Run()
 
   this->masterConn->Shutdown();
 }
+
+bool ConnectionManager::IsRunning() const
+{
+  return !this->stop;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // On read master

@@ -103,8 +103,12 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  gazebo::load();
-  gazebo::init();
+  if (!gazebo::load())
+    return -1;
+
+  if (!gazebo::init())
+    return -1;
+
   gazebo::run();
 
   gazebo::gui::load();

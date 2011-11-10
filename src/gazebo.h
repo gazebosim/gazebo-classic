@@ -27,14 +27,15 @@
 
 namespace gazebo
 {
-  void load()
+  bool load()
   {
     // Start the transport system by connecting to the master.
-    gazebo::transport::init();
+    return gazebo::transport::init();
   }
 
-  void init()
+  bool init()
   {
+    return true;
   }
 
   void run()
@@ -45,7 +46,7 @@ namespace gazebo
 
   void stop()
   {
-//    gazebo::transport::stop();
+    gazebo::transport::stop();
   }
   
   void fini()

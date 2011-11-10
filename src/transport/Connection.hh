@@ -55,7 +55,7 @@ namespace gazebo
       public: virtual ~Connection();
 
       /// \brief Connect to a remote host
-      public: void Connect(const std::string &host,  unsigned short port);
+      public: bool Connect(const std::string &host,  unsigned short port);
 
       typedef boost::function<void(const ConnectionPtr&)> AcceptCallback;
 

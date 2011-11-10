@@ -79,7 +79,7 @@ Connection::~Connection()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Connect to a remote host
-void Connection::Connect(const std::string &host, unsigned short port)
+bool Connection::Connect(const std::string &host, unsigned short port)
 {
   std::string service = boost::lexical_cast<std::string>(port);
 
@@ -99,13 +99,16 @@ void Connection::Connect(const std::string &host, unsigned short port)
 
   if (error)
   {
-    gzthrow ("Unable to connect to " << host << ":" << port);
+   // gzerr << "Unable to connect to " << host << ":" << port << "\";
+    return false;
   }
 
   this->remoteURI =  std::string("http://") + this->GetRemoteHostname() + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
 
   if (this->socket && this->socket->is_open())
     this->remoteAddress = this->socket->remote_endpoint().address().to_string();
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
