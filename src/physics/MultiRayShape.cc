@@ -48,7 +48,6 @@ void MultiRayShape::Load( sdf::ElementPtr &_sdf)
 /// Init the shape 
 void MultiRayShape::Init()
 {
-  //gzerr << "initialize MultiRayShape " << this->GetName() << "\n";
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle; 
   double yDiff;
@@ -107,10 +106,6 @@ void MultiRayShape::Init()
       start = (axis * minRange) + this->offset;
       end = (axis * maxRange) + this->offset;
 
-      std::cout << "Start[" << start << "] End[" << end << "] Offset[" << this->offset << "]\n";
-
-      // gzerr << "add ray debug [" << this->GetName() << "] "
-      //       << start << " " << end << "\n";
       this->AddRay(start,end);
     }
   }

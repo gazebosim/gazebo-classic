@@ -38,7 +38,7 @@ ODERayShape::ODERayShape( CollisionPtr parent, bool displayRays )
   ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   // Create default ray with unit length
-  collision->SetCollision( dCreateRay( collision->GetSpaceId(), 1.0 ),  false );
+  collision->SetCollision(dCreateRay( collision->GetSpaceId(), 1.0 ),  false);
   collision->SetCategoryBits(GZ_SENSOR_COLLIDE);
   collision->SetCollideBits(~GZ_SENSOR_COLLIDE);
 }
@@ -59,6 +59,7 @@ void ODERayShape::Update()
 
   this->globalStartPos = this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
+
   this->globalEndPos = this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
@@ -68,20 +69,24 @@ void ODERayShape::Update()
   //gzerr << "contactLen[" << this->contactLen << "]";
   if (this->contactLen != 0)
   {
-    dGeomRaySet(collision->GetCollisionId(), this->globalStartPos.x,
-        this->globalStartPos.y, this->globalStartPos.z,
+    dGeomRaySet(collision->GetCollisionId(), 
+        this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
         dir.x, dir.y, dir.z);
 
     dGeomRaySetLength( collision->GetCollisionId(),
         this->globalStartPos.Distance(this->globalEndPos) );
 
-    // gzerr << "  parent[" << this->collisionParent->GetLink()->GetName() << "]"
-    //       << "  pose[" << this->collisionParent->GetLink()->GetWorldPose() << "]"
-    //       << "  relative[" << this->relativeStartPos << "]"
-    //       << "  globalStartPos[" << this->globalStartPos << "]"
-    //       << "  globalEndPos[" << this->globalEndPos << "]"
-    //       << "  dir[" << dir << "]"
-    //       << "  dist[" << this->globalStartPos.Distance(this->globalEndPos) << "]\n";
+     //gzerr << "  linkparent[" << this->collisionParent->GetLink()->GetName() << "]"
+     //      << "  linkpose[" << this->collisionParent->GetLink()->GetWorldPose() << "]"
+     //      << "  collparent[" << this->collisionParent->GetName() << "]"
+     //      << "  collpose[" << this->collisionParent->GetWorldPose() << "]"
+
+     //      << "  relativeStart[" << this->relativeStartPos << "]"
+     //      << "  relativeEnd[" << this->relativeEndPos << "]"
+     //      << "  globalStartPos[" << this->globalStartPos << "]"
+     //      << "  globalEndPos[" << this->globalEndPos << "]"
+     //      << "  dir[" << dir << "]"
+     //      << "  dist[" << this->globalStartPos.Distance(this->globalEndPos) << "]\n";
   }
 }
 

@@ -44,6 +44,9 @@ using namespace physics;
 Collision::Collision( LinkPtr link )
     : Entity(link)
 {
+//  this->sdf.reset(new sdf::Element);
+//  sdf::initFile( "/sdf/collision.sdf", this->sdf );
+
   this->AddType(Base::COLLISION);
 
   this->link = link;
@@ -96,8 +99,12 @@ void Collision::Load( sdf::ElementPtr &_sdf )
 void Collision::Init()
 {
   this->SetContactsEnabled(false);
-  this->SetRelativePose( 
-      this->sdf->GetOrCreateElement("origin")->GetValuePose("pose") );
+  if (this->sdf->HasElement("origin"))
+      this->SetRelativePose(
+        this->sdf->GetElement("origin")->GetValuePose("pose"));
+  else
+    this->SetRelativePose(
+        math::Pose(math::Vector3(0,0,0), math::Quaternion(0,0,0)));
   this->shape->Init();
 }
 
@@ -142,17 +149,18 @@ void Collision::SetCollision(bool placeable)
 {
   this->placeable = placeable;
 
-  if (this->IsStatic())
+  /*if (this->IsStatic())
   {
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
   else
   {
+  */
     // collide with all
     this->SetCategoryBits(GZ_ALL_COLLIDE);
     this->SetCollideBits(GZ_ALL_COLLIDE);
-  }
+  //}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -46,7 +46,7 @@ namespace gazebo
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
 
-      protected: CollisionPtr collisionParent;
+      public: CollisionPtr collisionParent;
       protected: sdf::ElementPtr sdf;
     };
     /// \}

@@ -206,20 +206,15 @@ math::Pose Entity::GetRelativePose() const
 {
   if (this->IsCanonicalLink())
   {
-    return this->initialRelativePose; // this should never change for canonical
+    // this should never change for canonical
+    return this->initialRelativePose;
   }
   else if (this->parent && this->parentEntity)
   {
-    math::Pose result = this->worldPose - this->parentEntity->GetWorldPose();
-
-    std::cout << "Worldpos[" << this->worldPose << "] P[" <<
-      this->parentEntity->GetWorldPose()<< "] R[" << result << "]\n";
-
     return this->worldPose - this->parentEntity->GetWorldPose();
   }
   else
   {
-    printf("Get World pose\n");
     return this->worldPose;
   }
 }
@@ -289,7 +284,6 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
         entity->worldPose = (entity->initialRelativePose + _pose);
       else
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-      std::cout << "Entity[" << entity->GetName() << "] New Pose[" << entity->worldPose << "]\n";
       if (_notify) 
         entity->UpdatePhysicsPose(false);
 

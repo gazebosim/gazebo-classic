@@ -92,18 +92,21 @@ void ODELink::Init()
         if (g->IsPlaceable() && g->GetCollisionId())
         {
           dGeomSetBody(g->GetCollisionId(), this->linkId);
+
           // update pose immediately
           math::Pose localPose = g->GetRelativePose();
           localPose.pos -= cog_vec;
+
           dQuaternion q;
           q[0] = localPose.rot.w;
           q[1] = localPose.rot.x;
           q[2] = localPose.rot.y;
           q[3] = localPose.rot.z;
+
           // Set the pose of the encapsulated collision; this is always relative
           // to the CoM
-          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x, localPose.pos.y, 
-              localPose.pos.z);
+          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x, 
+              localPose.pos.y, localPose.pos.z);
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
         }
       }

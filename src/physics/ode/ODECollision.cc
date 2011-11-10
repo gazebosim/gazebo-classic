@@ -63,30 +63,6 @@ void ODECollision::Load( sdf::ElementPtr &_sdf )
 
   this->SetSpaceId( boost::shared_static_cast<ODELink>(this->link)->GetSpaceId() );
 
-  /*std::cout << "\n\n\nODECollision::Load test\n\n\n" <<  this->collisionId
-            << "\n\n" << this->placeable << "\n\n\n";
-
-  if (this->collisionId && this->placeable)
-  {
-    math::Pose localPose;
-    dQuaternion q;
-
-    // Transform into CoM relative Pose
-    localPose = this->GetRelativePose();
-
-    q[0] = localPose.rot.w;
-    q[1] = localPose.rot.x;
-    q[2] = localPose.rot.y;
-    q[3] = localPose.rot.z;
-
-    // Set the pose of the encapsulated collision; this is always relative
-    // to the CoM
-    dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
-        localPose.pos.z);
-    dGeomSetOffsetQuaternion(this->collisionId, q);
-  }*/
-
-
   if (this->IsStatic())
   {
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
@@ -110,7 +86,7 @@ void ODECollision::OnPoseChange()
 
  if (this->IsStatic() && this->collisionId && this->placeable)
     this->OnPoseChangeGlobal();
-  else if (this->collisionId && this->placeable)
+ else if (this->collisionId && this->placeable)
     this->OnPoseChangeRelative();
 }
 
@@ -137,7 +113,9 @@ void ODECollision::SetCollision(dGeomID collisionId, bool placeable)
       this->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
   }
   else
+  {
     this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+  }
 
   dGeomSetData(this->collisionId, this);
 }
@@ -219,16 +197,19 @@ void ODECollision::SetSpaceId(dSpaceID spaceid)
 void ODECollision::OnPoseChangeGlobal()
 {
   dQuaternion q;
+
   // Transform into global pose since a static collision does not have a link 
   math::Pose localPose = this->GetWorldPose();
 
   // un-offset cog location
   math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
-  // Hack:
-  if (this->IsStatic())
-    localPose += this->parentEntity->GetWorldPose();
 
+  if (this->IsStatic())
+  {
+    localPose = this->parentEntity->GetWorldPose() + this->GetRelativePose();
+    std::cout << "Name[" << this->GetName() << "] REl Pose[" << this->GetRelativePose() << "] PW[" << this->parentEntity->GetWorldPose() << "] Local[" << localPose << "]\n";
+  }
 
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;
@@ -236,12 +217,13 @@ void ODECollision::OnPoseChangeGlobal()
   q[3] = localPose.rot.z;
 
   dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
-      localPose.pos.z);
+                   localPose.pos.z);
   dGeomSetQuaternion(this->collisionId, q);
 }
 
 void ODECollision::OnPoseChangeRelative()
 {
+  /*
   dQuaternion q;
   // Transform into CoM relative Pose
   math::Pose localPose = this->GetRelativePose();
@@ -260,6 +242,7 @@ void ODECollision::OnPoseChangeRelative()
   dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
       localPose.pos.z);
   dGeomSetOffsetQuaternion(this->collisionId, q);
+  */
 }
 
 void ODECollision::OnPoseChangeNull()

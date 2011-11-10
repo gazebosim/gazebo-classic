@@ -55,6 +55,7 @@
       </link>
     </model>
 
+    <include filename="pr2.model"/>
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>
@@ -72,8 +73,6 @@
       <direction xyz="0 0 -1.0"/>
     </light>
     -->
-
-    <include filename="pr2.model"/>
 
   </world>
 </gazebo>

@@ -172,19 +172,16 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
                               const math::Vector3 &_end )
 {
   MultiRayShape::AddRay(_start, _end);
-  ODECollisionPtr odeCollision(new ODECollision(this->collisionParent->GetLink()) );
-  this->collisionParent->GetLink()->AddChild( odeCollision );
-  odeCollision->SetName("ODE Ray Collision");
+
+  ODECollisionPtr odeCollision(new ODECollision(
+        this->collisionParent->GetLink()) );
+  odeCollision->SetName("ode_ray_collision");
   odeCollision->SetSpaceId(this->raySpaceId);
 
-  std::cout << "Link[" << this->collisionParent->GetLink() << "] ChildCount[" << this->collisionParent->GetLink()->GetChildCount() << "]\n";
-
-  ODERayShapePtr ray( new ODERayShape(odeCollision, true ));
+  ODERayShapePtr ray(new ODERayShape(odeCollision, true));
   odeCollision->SetShape(ray);
 
   ray->SetPoints(_start,_end);
   this->rays.push_back(ray);
-  odeCollision->OnPoseChange();
-  std::cout << "Add Ray. Pose[" << odeCollision->GetWorldPose().pos << "]\n";
 }
 

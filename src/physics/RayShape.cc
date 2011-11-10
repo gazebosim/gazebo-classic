@@ -63,12 +63,13 @@ RayShape::~RayShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the ray based on starting and ending points relative to the body
-void RayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
+void RayShape::SetPoints(const math::Vector3 &_posStart, 
+                         const math::Vector3 &_posEnd)
 {
   math::Vector3 dir;
 
-  this->relativeStartPos = posStart;
-  this->relativeEndPos = posEnd;
+  this->relativeStartPos = _posStart;
+  this->relativeEndPos = _posEnd;
 
   this->globalStartPos = this->collisionParent->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
