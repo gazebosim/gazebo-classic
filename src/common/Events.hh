@@ -56,6 +56,16 @@ namespace gazebo
               { quit.Disconnect(subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot the the world created signal
+      public: template<typename T>
+              static ConnectionPtr ConnectWorldCreated( T subscriber )
+              { return worldCreated.Connect(subscriber); }
+
+      public: static void DisconnectWorldCreated( ConnectionPtr subscriber)
+              { worldCreated.Disconnect(subscriber); }
+
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the add entity signal
       public: template<typename T>
               static ConnectionPtr ConnectCreateEntity( T subscriber )
@@ -231,6 +241,9 @@ namespace gazebo
 
       /// \brief Quit the simulation once signal
       public: static EventT<void ()> quit;
+
+      /// \brief A world has been created
+      public: static EventT<void (std::string)> worldCreated;
 
       /// \brief An entity has been created
       public: static EventT<void (std::string)> entityCreated;

@@ -1151,7 +1151,6 @@ void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
   }
   if (_msg->type() == "contact" && _msg->visualize() && !_msg->topic().empty())
   {
-    printf("New Contact sensor\n");
     ContactVisualPtr contactVis(new ContactVisual(
           _msg->name()+"_contact_vis", this));
 

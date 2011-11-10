@@ -23,6 +23,7 @@ EventT<void (bool)> Events::pause;
 EventT<void ()> Events::step;
 EventT<void ()> Events::quit;
 
+EventT<void (std::string)> Events::worldCreated;
 EventT<void (std::string)> Events::entityCreated;
 EventT<void (std::string)> Events::setSelectedEntity;
 EventT<void (std::string)> Events::addEntity;
