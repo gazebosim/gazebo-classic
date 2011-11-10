@@ -280,10 +280,15 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
     if ((*iter)->HasType(ENTITY))
     {
       Entity *entity = (Entity*)((*iter).get());
+
       if (entity->IsCanonicalLink())
+      {
         entity->worldPose = (entity->initialRelativePose + _pose);
+      }
       else
+      {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+      }
       if (_notify) 
         entity->UpdatePhysicsPose(false);
 

@@ -205,10 +205,10 @@ void ODECollision::OnPoseChangeGlobal()
   math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
 
+  // This is a hack...which hopefully works
   if (this->IsStatic())
   {
-    localPose = this->parentEntity->GetWorldPose() + this->GetRelativePose();
-    std::cout << "Name[" << this->GetName() << "] REl Pose[" << this->GetRelativePose() << "] PW[" << this->parentEntity->GetWorldPose() << "] Local[" << localPose << "]\n";
+    localPose = this->parentEntity->GetWorldPose();
   }
 
   q[0] = localPose.rot.w;

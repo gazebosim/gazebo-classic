@@ -34,7 +34,7 @@
       </link>
     </model>
 
-    <model name="box_model1" static="false">
+    <!--<model name="box_model1" static="false">
       <origin pose="2 0 1.249 0 0 0"/>
       <link name="box_body">
         <inertial mass="1.0">
@@ -55,6 +55,7 @@
         </visual>
       </link>
     </model>
+    -->
 
     <model name="box_model" static="true">
       <origin pose="2 0 0.249 0 0 0"/>
@@ -78,7 +79,7 @@
       </link>
     </model>
 
-    <model name="laser_model" static="false">
+    <model name="laser_model" static="true">
       <origin pose="-1 0 0.5 0 0 0"/>
       <link name="laser_body">
         <inertial mass="1.0">
