@@ -754,8 +754,21 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
-  initOrigin(_config, _sdf);
 
+  // old <anchorOffset> translates to origin in the new sdf context
+  xmlNodePtr anchor_offset_xml = firstChildElement(_config, "anchorOffset");
+  std::string poseStr;
+  if (anchor_offset_xml) 
+    poseStr += getValue(anchor_offset_xml) + " ";
+  else
+    poseStr += "0 0 0 ";
+  // for rpy, which doesn't exist in old model xml
+  poseStr += "0 0 0";
+  sdf::ElementPtr origin = _sdf->AddElement("origin");
+  origin->GetAttribute("pose")->SetFromString( poseStr );
+
+
+  // setup parent / child links
   sdf::ElementPtr sdfParent = _sdf->AddElement("parent");
   sdf::ElementPtr sdfChild = _sdf->AddElement("child");
 
