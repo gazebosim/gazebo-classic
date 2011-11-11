@@ -391,10 +391,7 @@ void World::DeleteEntityCB(const std::string &/*_name*/)
 // Get an element by name
 BasePtr World::GetByName(const std::string &_name)
 {
-  std::string name = _name;
-  if (_name.find(this->rootElement->GetName()) != 0)
-    name = this->rootElement->GetName() + "::" + _name;
-  return this->rootElement->GetByName(name);
+  return this->rootElement->GetByName(_name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
