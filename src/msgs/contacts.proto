@@ -5,15 +5,9 @@ package gazebo.msgs;
 /// \brief Contacts from collision detection
 /// \verbatim
 
-import "pose.proto";
+import "contact.proto";
 
 message Contacts
 {
-  required string frame      = 1;
-  required string collision1 = 2;
-  required string collision2 = 3;
-
-  repeated Vector3 position  = 4;
-  repeated Vector3 normal    = 5;
-  repeated double depth      = 6;
+  repeated Contact contact   = 1;
 }

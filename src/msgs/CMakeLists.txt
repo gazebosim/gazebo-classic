@@ -6,6 +6,7 @@ set (msgs axis.proto
           collision.proto
           color.proto
           contact.proto
+          contacts.proto
           contactsensor.proto
           cylindergeom.proto
           factory.proto

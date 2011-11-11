@@ -61,13 +61,13 @@ void ContactSensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
 
-  /*if (this->sdf->GetElement("topic"))
+  if (this->sdf->GetElement("topic"))
   {
+    std::string worldName = this->sdf->GetWorldName();
     this->node->Init(worldName);
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
         this->sdf->GetElement("topic")->GetValueString());
-  }*/
-
+  }
 }
 
 //////////////////////////////////////////////////
@@ -128,6 +128,41 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
+  if (this->contactsPub)
+  {
+    msgs::Contacts msg;
+
+    printf("contacts[%d]\n", this->contacts.size());
+    Contact_M::iterator iter;
+    std::vector<physics::Contact>::iterator iter2;
+    for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
+    {
+      for (iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++)
+      {
+        msgs::Contact *contactMsg = msg.add_contact();
+        contactMsg->set_collision1(
+            (*iter2).collision1->GetCompleteScopedName());
+        contactMsg->set_collision2(
+            (*iter2).collision2->GetCompleteScopedName());
+        for (unsigned int i=0; i < (*iter2).positions.size(); i++)
+        {
+          msgs::Vector3d *posMsg = contactMsg->add_position();
+          msgs::Vector3d *normalMsg = contactMsg->add_normal();
+          posMsg->set_x((*iter2).positions[i].x);
+          posMsg->set_y((*iter2).positions[i].y);
+          posMsg->set_z((*iter2).positions[i].z);
+
+          normalMsg->set_x((*iter2).normals[i].x);
+          normalMsg->set_y((*iter2).normals[i].y);
+          normalMsg->set_z((*iter2).normals[i].z);
+
+          contactMsg->add_depth((*iter2).depths[i]);
+        }
+      }
+    }
+
+    this->contactsPub->Publish(msg);
+  }
   this->contacts.clear();
 }
 
