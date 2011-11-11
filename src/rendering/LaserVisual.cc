@@ -39,21 +39,15 @@ LaserVisual::LaserVisual (const std::string &_name, Scene *_scene,
       &LaserVisual::OnScan, this);
 
   this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
-  this->rayFanOutline = new DynamicLines(rendering::RENDERING_LINE_STRIP);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
-  this->rayFanOutline->setMaterial("Gazebo/Red");
-
   this->rayFan->AddPoint(math::Vector3(0,0,0));
 }
  
 LaserVisual::~LaserVisual()
 {
   delete this->rayFan;
-  delete this->rayFanOutline;
-
   this->rayFan = NULL;
-  this->rayFanOutline = NULL;
 }
 
 

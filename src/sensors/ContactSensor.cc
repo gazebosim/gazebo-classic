@@ -48,12 +48,14 @@ ContactSensor::ContactSensor()
     : Sensor()
 {
   this->node = transport::NodePtr(new transport::Node());
+  this->mutex = new boost::mutex();
 }
 
 //////////////////////////////////////////////////
 ContactSensor::~ContactSensor()
 {
   this->collisions.clear();
+  delete this->mutex;
 }
 
 //////////////////////////////////////////////////
@@ -128,11 +130,11 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
+  this->mutex->lock();
   if (this->contactsPub)
   {
     msgs::Contacts msg;
 
-    printf("contacts[%d]\n", this->contacts.size());
     Contact_M::iterator iter;
     std::vector<physics::Contact>::iterator iter2;
     for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
@@ -163,7 +165,9 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
     this->contactsPub->Publish(msg);
   }
+
   this->contacts.clear();
+  this->mutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -252,5 +256,7 @@ std::vector<gazebo::physics::Contact> ContactSensor::GetContacts(
 void ContactSensor::OnContact(const std::string &_collisionName, 
                               const physics::Contact &_contact)
 {
+  this->mutex->lock();
   this->contacts[_collisionName].push_back(_contact);
+  this->mutex->unlock();
 }

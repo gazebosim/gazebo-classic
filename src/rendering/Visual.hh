@@ -251,7 +251,7 @@ namespace gazebo
       private: std::string myMaterialName;
       private: std::string origMaterialName;
   
-      private: Ogre::SceneNode *sceneNode;
+      protected: Ogre::SceneNode *sceneNode;
   
       private: float transparency;
   

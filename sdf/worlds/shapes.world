@@ -94,12 +94,14 @@
           </geometry>
         </collision>
 
+        <!--
         <visual name="visual">
           <geometry>
             <box size="1 1 1"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
+        -->
 
       <sensor name='contact_sensor' type='contact' always_on='1' update_rate='100' visualize="true">
         <topic>~/contact</topic>
