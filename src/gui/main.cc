@@ -103,6 +103,13 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  /// Load all the plugins specified on the command line
+  for (std::vector<std::string>::iterator iter = plugins.begin(); 
+       iter != plugins.end(); iter++)
+  {
+    gazebo::gui::load_plugin(*iter);
+  }
+
   if (!gazebo::load())
     return -1;
 
@@ -112,13 +119,6 @@ int main(int argc, char **argv)
   gazebo::run();
 
   gazebo::gui::load();
-
-  /// Load all the plugins specified on the command line
-  for (std::vector<std::string>::iterator iter = plugins.begin(); 
-       iter != plugins.end(); iter++)
-  {
-    gazebo::gui::load_plugin(*iter);
-  }
 
   gazebo::gui::init();
   gazebo::gui::run();

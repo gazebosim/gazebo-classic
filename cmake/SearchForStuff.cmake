@@ -155,14 +155,6 @@ if (PKG_CONFIG_FOUND)
 
 
   ########################################
-  # Find libXPM
-  pkg_check_modules(XPM xpm)
-  if (NOT XPM_FOUND)
-    BUILD_ERROR("Missing: libXpm(http://cgit.freedesktop.org/xorg/lib/libXpm)")
-  endif (NOT XPM_FOUND)
-
-
-  ########################################
   # Find OpenAL
   pkg_check_modules(OAL openal)
   if (NOT OAL_FOUND)
@@ -441,26 +433,26 @@ else (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags 
 endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
 # Check to make sure bullet was compiled with DOUBLE_PRECISION
-if (INCLUDE_BULLET)
-  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
-int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
-
-  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
-  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
-  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
-  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
-  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
-  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
-  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
-  set (CMAKE_REQUIRED_LIBRARIES)
-  set (CMAKE_REQUIRED_DEFINITIONS)
-  set( CMAKE_REQUIRED_INCLUDES)
-  set( CMAKE_REQUIRED_FLAGS)
-
-  if (NOT BULLET_DOUBLE_PRECISION)
-    BUILD_ERROR("Dependency: bullet was not compiled to use double precision.")
-    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-  endif (NOT BULLET_DOUBLE_PRECISION)
-endif (INCLUDE_BULLET)
+#if (INCLUDE_BULLET)
+#  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
+#int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
+#
+#  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
+#  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
+#  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
+#  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
+#  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
+#  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
+#  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
+#  set (CMAKE_REQUIRED_LIBRARIES)
+#  set (CMAKE_REQUIRED_DEFINITIONS)
+#  set( CMAKE_REQUIRED_INCLUDES)
+#  set( CMAKE_REQUIRED_FLAGS)
+#
+#  if (NOT BULLET_DOUBLE_PRECISION)
+#    BUILD_ERROR("Dependency: bullet was not compiled to use double precision.")
+#    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+#  endif (NOT BULLET_DOUBLE_PRECISION)
+#endif (INCLUDE_BULLET)
 
 
