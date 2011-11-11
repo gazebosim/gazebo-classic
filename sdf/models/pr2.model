@@ -76,7 +76,8 @@
           </shader>
         </material>
       </visual>
-      <sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100'>
+      <sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100' visualize="true">
+        <topic>~/contact</topic>
         <origin pose='0 0 0 0 -0 0'/>
         <contact>
           <collision name='base_footprint_geom_base_link'/>

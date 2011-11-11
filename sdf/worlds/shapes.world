@@ -101,6 +101,15 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
 
+      <sensor name='contact_sensor' type='contact' always_on='0' update_rate='100' visualize="true">
+        <topic>~/contact</topic>
+        <origin pose='0 0 0 0 -0 0'/>
+        <contact>
+          <collision name='geom1'/>
+        </contact>
+      </sensor>
+
+      <!--
         <sensor name='base_laser' type='ray' always_on='1' update_rate='1' visualize='true'>
           <origin pose='1.0 0 -0.1 0 -0 0'/>
           <topic>~/laser_scan</topic>
@@ -112,6 +121,7 @@
           </ray>
           <plugin name='laser' filename='libRayPlugin.so'/>
         </sensor>
+        -->
       </link>
     </model>
 

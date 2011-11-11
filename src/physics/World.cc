@@ -187,6 +187,8 @@ void World::Load( sdf::ElementPtr _sdf )
     this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
   //else
     //this->modelUpdateFunc = &World::ModelUpdateTBB;
+
+  event::Events::worldCreated(this->GetName());
 }
 
 

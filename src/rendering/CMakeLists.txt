@@ -35,6 +35,7 @@ set (sources MovableText.cc
              GUIOverlay.cc
              LaserVisual.cc
              CameraVisual.cc
+             ContactVisual.cc
 )
 
 set (headers MovableText.hh
@@ -62,6 +63,7 @@ set (headers MovableText.hh
              GUIOverlay.hh
              LaserVisual.hh
              CameraVisual.hh
+             ContactVisual.hh
 )
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
