@@ -94,6 +94,9 @@ namespace gazebo
       private: typedef 
                std::map<std::string, std::vector<physics::Contact> > Contact_M;
       private: Contact_M contacts;
+
+      private: transport::NodePtr node;
+      private: transport::PublisherPtr contactsPub;
     };
     /// \}
   }

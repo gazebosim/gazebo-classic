@@ -34,7 +34,7 @@ char **g_argv;
 using namespace gazebo;
 
 std::string g_worldname = "default";
-std::vector<GUIPluginPtr> g_plugins;
+std::vector<ServerPluginPtr> g_plugins;
 
 QApplication *g_app;
 gui::MainWindow *g_main_win;
@@ -66,7 +66,7 @@ void gui::init()
   g_main_win->show();
   g_main_win->Init();
 
-  for (std::vector<GUIPluginPtr>::iterator iter = g_plugins.begin(); 
+  for (std::vector<ServerPluginPtr>::iterator iter = g_plugins.begin(); 
        iter != g_plugins.end(); iter++)
   {
     (*iter)->Init();
@@ -112,7 +112,7 @@ rendering::UserCameraPtr gui::get_active_camera()
 
 void gui::load_plugin( const std::string &_filename )
 {
-  gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename, _filename);
+  gazebo::ServerPluginPtr plugin = gazebo::ServerPlugin::Create(_filename, _filename);
   plugin->Load();
   g_plugins.push_back( plugin );
 }

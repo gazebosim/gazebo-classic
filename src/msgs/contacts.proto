@@ -1,0 +1,19 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface A set of contacts message 
+/// \brief Contacts from collision detection
+/// \verbatim
+
+import "pose.proto";
+
+message Contacts
+{
+  required string frame      = 1;
+  required string collision1 = 2;
+  required string collision2 = 3;
+
+  repeated Vector3 position  = 4;
+  repeated Vector3 normal    = 5;
+  repeated double depth      = 6;
+}

@@ -22,6 +22,8 @@
 #include <float.h>
 #include <sstream>
 
+#include "msgs/msgs.h"
+
 #include "common/Exception.hh"
 #include "physics/Physics.hh"
 #include "physics/World.hh"
@@ -31,6 +33,8 @@
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/ContactSensor.hh"
+
+#include "transport/Node.hh"
 
 #include "math/Vector3.hh"
 
@@ -43,6 +47,7 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 ContactSensor::ContactSensor()
     : Sensor()
 {
+  this->node = transport::NodePtr(new transport::Node());
 }
 
 //////////////////////////////////////////////////
@@ -55,6 +60,14 @@ ContactSensor::~ContactSensor()
 void ContactSensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
+
+  /*if (this->sdf->GetElement("topic"))
+  {
+    this->node->Init(worldName);
+    this->contactsPub = this->node->Advertise<msgs::Contacts>(
+        this->sdf->GetElement("topic")->GetValueString());
+  }*/
+
 }
 
 //////////////////////////////////////////////////
