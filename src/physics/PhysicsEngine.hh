@@ -142,7 +142,8 @@ namespace gazebo
       protected: transport::PublisherPtr visPub;
       protected: transport::PublisherPtr responsePub;
       protected: transport::SubscriberPtr physicsSub, requestSub;
-      public: boost::recursive_mutex *rayMutex;
+      protected: boost::recursive_mutex *rayMutex;
+      public: boost::recursive_mutex* GetRayMutex() const { return this->rayMutex; }
       private: event::ConnectionPtr showContactConnection; 
 
       //private: std::vector<OgreDynamicLines*> contactLines;
