@@ -42,119 +42,92 @@ ContactVisual::ContactVisual (const std::string &_name, Scene *_scene,
   this->contactsSub = this->node->Subscribe(_topicName, 
       &ContactVisual::OnContact, this);
 
-  common::MeshManager::Instance()->CreateSphere("contact_sphere", 1.0, 5, 5);
+  common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.05, 10, 10);
 
   // Add the mesh into OGRE
   if (!this->sceneNode->getCreator()->hasEntity("contact_sphere") &&
       common::MeshManager::Instance()->HasMesh("contact_sphere"))
   {
-    const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh("contact_sphere");
-
-    this->InsertMesh( mesh );
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh("contact_sphere");
+    this->InsertMesh(mesh);
   }
 
-  this->instancedGeom = this->scene->GetManager()->createInstancedGeometry(
-      "contact_instanced_geom");
+  for (unsigned int i=0; i < 10; i++)
+  {
+    std::string name = this->GetName() + 
+        "_contactpoint_" + boost::lexical_cast<std::string>(i);
+    Ogre::Entity *obj = this->scene->GetManager()->createEntity(
+        name, "contact_sphere");
+    obj->setMaterialName("Gazebo/BlueLaser");
 
-  this->instancedGeom->setBatchInstanceDimensions (Ogre::Vector3(1000000, 1000000, 1000000));
-  this->instancedGeom->setCastShadows(false);
+    ContactVisual::ContactPoint *cp = new ContactVisual::ContactPoint();
+    cp->sceneNode = this->sceneNode->createChildSceneNode(name + "_node");
+    cp->sceneNode->attachObject(obj);
 
-  this->obj = this->scene->GetManager()->createEntity(
-      "contact bitch", "unit_sphere");
-  this->SetupInstancedMaterialToEntity(this->obj);
-  this->instancedGeom->addEntity(this->obj, Ogre::Vector3::ZERO);
+    cp->normal = new DynamicLines(RENDERING_LINE_LIST);
+    cp->depth = new DynamicLines(RENDERING_LINE_LIST);
 
-  this->instancedGeom->setOrigin(Ogre::Vector3::ZERO);
-  this->instancedGeom->build();
-  this->instancedGeom->addBatchInstance();
+    cp->normal->AddPoint(math::Vector3(0,0,0));
+    cp->normal->AddPoint(math::Vector3(0,0,0.1));
+
+    cp->depth->AddPoint(math::Vector3(0,0,0));
+    cp->depth->AddPoint(math::Vector3(0,0,-1));
+    cp->sceneNode->attachObject(cp->depth);
+    cp->sceneNode->attachObject(cp->normal);
+    cp->sceneNode->setVisible(false);
+
+    this->points.push_back(cp);
+  }
+
 
   this->connections.push_back( 
       event::Events::ConnectPreRender( 
         boost::bind(&ContactVisual::Update, this) ) );
-
-  this->instancedGeom->setVisible(true);
-  this->scene->GetManager()->destroyEntity(this->obj);
 }
 
 ContactVisual::~ContactVisual()
 {
-  this->instancedGeom->reset();
-  delete this->instancedGeom;
 }
 
 void ContactVisual::Update()
 {
-  /*
-  printf("Here\n");
-  Ogre::InstancedGeometry::BatchInstanceIterator regIt = this->instancedGeom->getBatchInstanceIterator();
-  Ogre::InstancedGeometry::BatchInstance *r = regIt.getNext();
-  Ogre::InstancedGeometry::BatchInstance::InstancedObjectIterator bit = r->getObjectIterator();
-  Ogre::InstancedGeometry::InstancedObject* obj = bit.getNext();
+  int c=0;
+  if (!this->contactsMsg)
+    return;
 
-  for (int i=0; this->contactsMsg && 
-       i < this->contactsMsg->contact_size(); i++)
+  for (int i=0; i < this->contactsMsg->contact_size(); i++)
   {
-    math::Vector3 pos = msgs::Convert(
-        this->contactsMsg->contact(i).position(0));
-    math::Vector3 normal = msgs::Convert(
-        this->contactsMsg->contact(i).normal(0));
-    double depth = this->contactsMsg->contact(i).depth(0);
-    obj->setPosition(Conversions::Convert(pos));
+    for (int j=0; 
+        c < 10 && j < this->contactsMsg->contact(i).position_size(); j++)
+    {
+      math::Vector3 pos = msgs::Convert(
+          this->contactsMsg->contact(i).position(j));
+      math::Vector3 normal = msgs::Convert(
+          this->contactsMsg->contact(i).normal(j));
+      double depth = this->contactsMsg->contact(i).depth(j);
 
-    std::cout << pos << "\n";
+      this->points[c]->sceneNode->setVisible(true);
+      std::cout << "Pos[" << pos << "]\n";
+      this->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
+
+      this->points[c]->normal->SetPoint(1,normal*0.1);
+      this->points[c]->depth->SetPoint(1,normal*-depth*10);
+
+      this->points[c]->normal->setMaterial("Gazebo/LightOn");
+      this->points[c]->depth->setMaterial("Gazebo/LightOff");
+      this->points[c]->depth->Update();
+      this->points[c]->normal->Update();
+      c++;
+    }
   }
-  */
+  for (;c<10;c++)
+    this->points[c]->sceneNode->setVisible(false);
+
 }
 
 void ContactVisual::OnContact(
     const boost::shared_ptr<msgs::Contacts const> &_msg)
 {
   this->contactsMsg = _msg;
-}
-
-void ContactVisual::SetupInstancedMaterialToEntity(Ogre::Entity *ent)
-{
-  for (Ogre::uint i = 0; i < ent->getNumSubEntities(); ++i)
-  {
-    Ogre::SubEntity* se = ent->getSubEntity(i);
-    Ogre::String materialName= se->getMaterialName();
-    se->setMaterialName(this->BuildInstancedMaterial("Gazebo/Red"));
-  }
-}
-
-Ogre::String ContactVisual::BuildInstancedMaterial(
-    const Ogre::String &originalMaterialName)
-{
-  // already instanced ?
-  if (originalMaterialName.find("/instanced"))
-    return originalMaterialName;
-
-  Ogre::MaterialPtr originalMaterial = 
-  Ogre::MaterialManager::getSingleton().getByName (originalMaterialName);
-
-  // if originalMat doesn't exists use "Instancing" material name
-  const Ogre::String instancedMaterialName(
-      originalMaterial.isNull() ? "Instancing" :
-      originalMaterialName + "/Instanced");
-
-  Ogre::MaterialPtr  instancedMaterial = 
-  Ogre::MaterialManager::getSingleton().getByName (instancedMaterialName);
-
-  // already exists ?
-  if (instancedMaterial.isNull())
-  {
-    instancedMaterial = originalMaterial->clone(instancedMaterialName);
-    instancedMaterial->load();
-    Ogre::Technique::PassIterator pIt = 
-      instancedMaterial->getBestTechnique ()->getPassIterator();
-    while (pIt.hasMoreElements())
-    {
-      Ogre::Pass * const p = pIt.getNext();
-      p->setVertexProgram("Instancing", false);
-      p->setShadowCasterVertexProgram("InstancingShadowCaster");
-    }
-  }
-
-  instancedMaterial->load();
-  return instancedMaterialName;
 }

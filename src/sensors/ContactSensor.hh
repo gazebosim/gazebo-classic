@@ -82,7 +82,7 @@ namespace gazebo
 
       public: gazebo::physics::ModelPtr GetParentModel() {return this->model;};
 
-      public: std::vector<physics::Contact> GetContacts(
+      public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
       private: void OnContact(const std::string &_collisionName, 
@@ -92,7 +92,7 @@ namespace gazebo
 
       private: gazebo::physics::ModelPtr model;
       private: typedef 
-               std::map<std::string, std::vector<physics::Contact> > Contact_M;
+               std::map<std::string, std::map<std::string, physics::Contact> > Contact_M;
       private: Contact_M contacts;
 
       private: transport::NodePtr node;

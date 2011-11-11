@@ -43,7 +43,8 @@ namespace gazebo
     class ContactFeedback
     {
       public: Contact contact;
-      public: std::vector<dJointFeedback> feedbacks;
+      public: dJointFeedback feedbacks[3];
+      public: int feedbackCount;
     };
 
     /// \addtogroup gazebo_physics
@@ -200,6 +201,8 @@ namespace gazebo
 
       private: dContactGeom *contactCollisions;
       private: int (*physicsStepFunc)(dxWorld*, dReal);
+
+      private: int indices[3];
     };
   
   

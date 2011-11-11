@@ -131,34 +131,37 @@ void ContactSensor::Init()
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
   this->mutex->lock();
-  if (this->contactsPub)
+  if (this->contactsPub && this->contactsPub->HasConnections() && 
+      this->contacts.size() > 0)
   {
     msgs::Contacts msg;
 
     Contact_M::iterator iter;
-    std::vector<physics::Contact>::iterator iter2;
+    std::map<std::string, physics::Contact>::iterator iter2;
     for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
     {
+      // Only transmit one contact
       for (iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++)
       {
         msgs::Contact *contactMsg = msg.add_contact();
         contactMsg->set_collision1(
-            (*iter2).collision1->GetCompleteScopedName());
+            iter2->second.collision1->GetCompleteScopedName());
         contactMsg->set_collision2(
-            (*iter2).collision2->GetCompleteScopedName());
-        for (unsigned int i=0; i < (*iter2).positions.size(); i++)
+            iter2->second.collision2->GetCompleteScopedName());
+
+        for (int i=0; i < iter2->second.count; i++)
         {
           msgs::Vector3d *posMsg = contactMsg->add_position();
           msgs::Vector3d *normalMsg = contactMsg->add_normal();
-          posMsg->set_x((*iter2).positions[i].x);
-          posMsg->set_y((*iter2).positions[i].y);
-          posMsg->set_z((*iter2).positions[i].z);
+          posMsg->set_x(iter2->second.positions[i].x);
+          posMsg->set_y(iter2->second.positions[i].y);
+          posMsg->set_z(iter2->second.positions[i].z);
 
-          normalMsg->set_x((*iter2).normals[i].x);
-          normalMsg->set_y((*iter2).normals[i].y);
-          normalMsg->set_z((*iter2).normals[i].z);
+          normalMsg->set_x(iter2->second.normals[i].x);
+          normalMsg->set_y(iter2->second.normals[i].y);
+          normalMsg->set_z(iter2->second.normals[i].z);
 
-          contactMsg->add_depth((*iter2).depths[i]);
+          contactMsg->add_depth(iter2->second.depths[i]);
         }
       }
     }
@@ -219,7 +222,10 @@ physics::Contact ContactSensor::GetCollisionContact(
   {
     if (_index < iter->second.size())
     {
-      return iter->second[_index];
+      std::map<std::string, physics::Contact>::const_iterator iter2;
+      iter2 = iter->second.begin();
+      std::advance(iter2,_index);
+      return iter2->second;
     }
     else
     {
@@ -238,7 +244,7 @@ physics::Contact ContactSensor::GetCollisionContact(
 }
 
 //////////////////////////////////////////////////
-std::vector<gazebo::physics::Contact> ContactSensor::GetContacts(
+std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
     const std::string &_collisionName)
 {
   Contact_M::const_iterator iter = this->contacts.find(_collisionName);
@@ -249,7 +255,7 @@ std::vector<gazebo::physics::Contact> ContactSensor::GetContacts(
     gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
           << _collisionName << "]\n";
 
-  return std::vector<gazebo::physics::Contact>();
+  return std::map<std::string, gazebo::physics::Contact>();
 }
 
 //////////////////////////////////////////////////
@@ -257,6 +263,6 @@ void ContactSensor::OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact)
 {
   this->mutex->lock();
-  this->contacts[_collisionName].push_back(_contact);
+  this->contacts[_collisionName][_contact.collision2->GetName()] = _contact;
   this->mutex->unlock();
 }

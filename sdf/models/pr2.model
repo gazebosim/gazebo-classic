@@ -76,7 +76,7 @@
           </shader>
         </material>
       </visual>
-      <sensor name='base_contact_sensor' type='contact' always_on='0' update_rate='100' visualize="true">
+      <sensor name='base_contact_sensor' type='contact' always_on='1' update_rate='100' visualize="true">
         <topic>~/contact</topic>
         <origin pose='0 0 0 0 -0 0'/>
         <contact>
@@ -84,6 +84,7 @@
         </contact>
         <plugin name='gazebo_contact' filename='libContactPlugin.so'/>
       </sensor>
+      <!--
       <sensor name='base_laser' type='ray' always_on='1' update_rate='20' visualize='true'>
         <origin pose='0.275 0 0.303 0 -0 0'/>
         <topic>~/laser_scan</topic>
@@ -95,6 +96,7 @@
         </ray>
         <plugin name='laser' filename='libRayPlugin.so'/>
       </sensor>
+      -->
     </link>
     <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.2246 0.2246 0.0792 0 -0 0'/>
@@ -603,6 +605,7 @@
         </geometry>
         <material script='Gazebo/Grey'/>
       </visual>
+      <!--
       <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' visualize='true'>
         <origin pose='0.0232 0.06 0.098 0 -0 0'/>
         <camera>
@@ -611,6 +614,7 @@
           <clip near='0.10000000000000001' far='100'/>
         </camera>
       </sensor>
+      -->
     </link>
     <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0.188 0.790675 0 -0 0'/>

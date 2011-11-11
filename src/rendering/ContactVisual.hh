@@ -45,10 +45,15 @@ namespace gazebo
       private: Scene *scene;
       private: transport::NodePtr node;
       private: transport::SubscriberPtr contactsSub;
-      private: Ogre::InstancedGeometry *instancedGeom;
       private: boost::shared_ptr<msgs::Contacts const> contactsMsg;
       private: std::vector<event::ConnectionPtr> connections;
-      private: Ogre::Entity *obj;
+
+      private: class ContactPoint
+               {
+                 public: Ogre::SceneNode *sceneNode;
+                 public: DynamicLines *normal, *depth;
+               };
+      private: std::vector<ContactVisual::ContactPoint*> points;
     };
   }
 }
