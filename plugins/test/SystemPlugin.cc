@@ -19,7 +19,7 @@
 
 namespace gazebo
 {
-  class ServerTest : public ServerPlugin
+  class ServerTest : public SystemPlugin
   {
     public: void Load()
     {
@@ -28,6 +28,6 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_SERVER_PLUGIN(ServerTest)
+  GZ_REGISTER_SYSTEM_PLUGIN(ServerTest)
 }
  

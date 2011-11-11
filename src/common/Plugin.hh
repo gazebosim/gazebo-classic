@@ -190,7 +190,7 @@ namespace gazebo
     public: virtual void Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf ) = 0;
   };
 
-  class ServerPlugin : public PluginT<ServerPlugin>
+  class SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Load function
     public: virtual void Load() = 0;
@@ -221,9 +221,9 @@ gazebo::SensorPlugin *RegisterPlugin() \
   return new classname();\
 }
 
-#define GZ_REGISTER_SERVER_PLUGIN(classname) \
-extern "C" gazebo::ServerPlugin *RegisterPlugin(); \
-gazebo::ServerPlugin *RegisterPlugin() \
+#define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
+extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
+gazebo::SystemPlugin *RegisterPlugin() \
 {\
   return new classname();\
 }

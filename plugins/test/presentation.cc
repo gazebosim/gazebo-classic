@@ -44,7 +44,7 @@ namespace gazebo
     public: double duration;
   };
 
-  class Presentation : public ServerPlugin
+  class Presentation : public SystemPlugin
   {
     public: void Load()
     {
@@ -167,5 +167,5 @@ namespace gazebo
   };
 
   // Register this plugin with the simulator
-  GZ_REGISTER_SERVER_PLUGIN(Presentation)
+  GZ_REGISTER_SYSTEM_PLUGIN(Presentation)
 }

@@ -35,7 +35,7 @@ namespace gazebo
 
     private: Master *master;
     private: boost::thread *masterThread;
-    private: std::vector<gazebo::ServerPluginPtr> plugins;
+    private: std::vector<gazebo::SystemPluginPtr> plugins;
   };
 }
 
