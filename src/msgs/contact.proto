@@ -1,17 +1,18 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Contact 
-/// \brief Information about contact
+/// \interface A Contact message
+/// \brief Contact info between two entities
 /// \verbatim
+
+import "vector3d.proto";
 
 message Contact
 {
-  optional double ode_soft_cfm  = 1;
-  optional double ode_soft_erp  = 2;
-  optional double ode_kp        = 3;
-  optional double ode_kd        = 4;
-  optional double ode_max_vel   = 5;
-  optional double ode_min_depth = 6;
+  required string collision1 = 1;
+  required string collision2 = 2;
+
+  repeated Vector3d position = 3;
+  repeated Vector3d normal   = 4;
+  repeated double depth      = 5;
 }
-/// \endverbatim

@@ -45,7 +45,6 @@ namespace gazebo
       private: transport::SubscriberPtr laserScanSub;
 
       private: DynamicLines *rayFan;
-      private: DynamicLines *rayFanOutline;
       private: Scene *scene;
     };
   }

@@ -29,11 +29,31 @@ namespace gazebo
   {
     class ContactVisual : public Visual
     {
-      public: ContactVisual(const std::string &_name, Scene *_scene);
+      public: ContactVisual(const std::string &_name, Scene *_scene,
+                            const std::string &_topicName);
 
       public: virtual ~ContactVisual();
 
+      private: void Update();
+      private: void OnContact(
+                   const boost::shared_ptr<msgs::Contacts const> &_msg);
+
+      private: void SetupInstancedMaterialToEntity(Ogre::Entity *ent);
+      private: Ogre::String BuildInstancedMaterial(
+                   const Ogre::String &originalMaterialName);
+
       private: Scene *scene;
+      private: transport::NodePtr node;
+      private: transport::SubscriberPtr contactsSub;
+      private: boost::shared_ptr<msgs::Contacts const> contactsMsg;
+      private: std::vector<event::ConnectionPtr> connections;
+
+      private: class ContactPoint
+               {
+                 public: Ogre::SceneNode *sceneNode;
+                 public: DynamicLines *normal, *depth;
+               };
+      private: std::vector<ContactVisual::ContactPoint*> points;
     };
   }
 }

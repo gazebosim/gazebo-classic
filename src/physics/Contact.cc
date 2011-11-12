@@ -32,6 +32,7 @@ Contact::Contact()
 {
   this->collision1 = NULL;
   this->collision2 = NULL;
+  this->count = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,18 +63,14 @@ const Contact &Contact::operator=(const Contact &contact)
   this->collision1 = contact.collision1;
   this->collision2 = contact.collision2;
 
-  this->forces.clear();
-  this->positions.clear();
-  this->normals.clear();
-
-  std::copy(contact.forces.begin(), contact.forces.end(), 
-            std::back_inserter(this->forces));
-  std::copy(contact.positions.begin(), contact.positions.end(), 
-            std::back_inserter(this->positions));
-  std::copy(contact.normals.begin(), contact.normals.end(), 
-            std::back_inserter(this->normals));
-  std::copy(contact.depths.begin(), contact.depths.end(), 
-            std::back_inserter(this->depths));
+  this->count = contact.count;
+  for (int i=0; i < 3; i++)
+  {
+    this->forces[i] = contact.forces[i];
+    this->positions[i] = contact.positions[i];
+    this->normals[i] = contact.normals[i];
+    this->depths[i] = contact.depths[i];
+  }
 
   return *this;
 }
@@ -82,8 +79,5 @@ const Contact &Contact::operator=(const Contact &contact)
 /// Reset
 void Contact::Reset()
 {
-  this->depths.clear();
-  this->positions.clear();
-  this->normals.clear();
-  this->forces.clear();
+  this->count = 0;
 }

@@ -109,15 +109,6 @@ Vector3 Vector3::GetRounded() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the contents of the vector
-void Vector3::Set(double x, double y, double z)
-{
-  this->x = x;
-  this->y = y;
-  this->z = z;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 Vector3 Vector3::GetCrossProd(const Vector3 &pt) const
 {
   Vector3 c(0,0,0);

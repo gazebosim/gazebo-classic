@@ -67,7 +67,12 @@ namespace gazebo
       public: Vector3 GetRounded() const;
     
       /// \brief Set the contents of the vector
-      public: void Set(double x = 0, double y =0 , double z = 0);
+      public: inline void Set(double x = 0, double y =0 , double z = 0)
+              {
+                this->x = x;
+                this->y = y;
+                this->z = z;
+              }
     
       /// \brief Return the cross product of this vector and pt
       public: Vector3 GetCrossProd(const Vector3 &pt) const;
