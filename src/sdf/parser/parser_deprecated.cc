@@ -715,8 +715,9 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
     if (firstChildElement(_config,"scale"))
     {
-      sdfCylinder->GetAttribute("radius")->SetFromString( getNodeTuple(_config, "scale", 0) );
-      sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "scale", 1) );
+      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
+      sdfCylinder->GetAttribute("radius")->Set( 0.5*sx );
+      sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "scale", 2) );
     }
     else
     {
