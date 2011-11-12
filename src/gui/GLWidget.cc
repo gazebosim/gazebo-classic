@@ -29,6 +29,9 @@ extern bool g_fullscreen;
 GLWidget::GLWidget( QWidget *parent )
   : QWidget(parent)
 {
+  // This mouse offset is a hack. The glwindow window is not properly sized 
+  // when first created....
+  this->mouseOffset = -10;
   this->setFocusPolicy(Qt::StrongFocus);
 
   this->windowId = -1;
@@ -42,7 +45,6 @@ GLWidget::GLWidget( QWidget *parent )
   this->renderFrame->setFrameShadow(QFrame::Sunken);
   this->renderFrame->setFrameShape(QFrame::Box);
   this->renderFrame->show();
-
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
   this->setLayout(mainLayout);
@@ -148,6 +150,7 @@ void GLWidget::keyPressEvent( QKeyEvent *_event)
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
   {
+    this->mouseOffset = 0;
     g_fullscreen = !g_fullscreen;
     gui::Events::fullScreen(g_fullscreen);
   }
@@ -171,7 +174,8 @@ void GLWidget::keyReleaseEvent( QKeyEvent *_event)
 
 void GLWidget::mousePressEvent(QMouseEvent *_event)
 {
-  this->mouseEvent.pressPos.Set( _event->pos().x(), _event->pos().y() );
+  this->mouseEvent.pressPos.Set( _event->pos().x() + this->mouseOffset,
+                                 _event->pos().y() + this->mouseOffset);
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
   /// Set the button which cause the press event
@@ -221,7 +225,8 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-  this->mouseEvent.pos.Set( event->pos().x(), event->pos().y() );
+  this->mouseEvent.pos.Set( event->pos().x()+this->mouseOffset, 
+                            event->pos().y()+this->mouseOffset );
   this->mouseEvent.type = common::MouseEvent::MOVE;
   this->mouseEvent.buttons |= event->buttons() & Qt::LeftButton ? 
     common::MouseEvent::LEFT : 0x0;
@@ -318,7 +323,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 {
-  this->mouseEvent.pos.Set( _event->pos().x(), _event->pos().y() );
+  this->mouseEvent.pos.Set( _event->pos().x()+this->mouseOffset, 
+                            _event->pos().y()+this->mouseOffset );
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 
   if (_event->button() == Qt::LeftButton)

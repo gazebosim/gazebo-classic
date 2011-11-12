@@ -37,9 +37,11 @@ CylinderMaker::CylinderMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
-  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::CYLINDER );
-  this->visualMsg->mutable_material()->set_script( "Gazebo/TurquoiseGlowOutline" );
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
+  this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
+  this->visualMsg->mutable_material()->set_script(
+      "Gazebo/TurquoiseGlowOutline");
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
+            math::Quaternion());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -53,14 +55,15 @@ void CylinderMaker::Start(const rendering::UserCameraPtr camera)
   //this->createCB = cb;
   this->camera = camera;
   std::ostringstream stream;
-  stream <<  "user_cylinder_" << counter++;
+  stream << "__GZ_USER_cylinder_" << counter++;
   this->visualMsg->set_name( stream.str() );
   this->state = 1;
 }
 
 void CylinderMaker::Stop()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+  msgs::Request *msg = msgs::CreateRequest("entity_delete",
+                                           this->visualMsg->name());
 
   this->requestPub->Publish(*msg);
   delete msg;
@@ -161,7 +164,7 @@ void CylinderMaker::CreateTheEntity()
 
 
   newModelStr << "<gazebo version='1.0'>\
-    <model name='" << this->visualMsg->name() << "_model'>\
+    <model name='custom_user_cylinder" << counter << "_model'>\
       <origin pose='" << this->visualMsg->pose().position().x() << " " 
                       << this->visualMsg->pose().position().y() << " " 
                       << this->visualMsg->pose().position().z() << " 0 0 0'/>\
@@ -188,7 +191,8 @@ void CylinderMaker::CreateTheEntity()
 
   msg.set_sdf( newModelStr.str() );
 
-  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
+      this->visualMsg->name());
   this->requestPub->Publish(*requestMsg);
   delete requestMsg;
 

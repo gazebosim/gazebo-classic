@@ -39,9 +39,10 @@ BoxMaker::BoxMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
-  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::BOX );
-  this->visualMsg->mutable_material()->set_script( "Gazebo/TurquoiseGlowOutline" );
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
+  this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::BOX);
+  this->visualMsg->mutable_material()->set_script("Gazebo/TurquoiseGlowOutline");
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
+            math::Quaternion());
 }
 
 BoxMaker::~BoxMaker()
@@ -56,7 +57,7 @@ void BoxMaker::Start(const rendering::UserCameraPtr _camera)
   this->camera = _camera;
 
   std::ostringstream stream;
-  stream << "user_box_" << counter++;
+  stream << "__GZ_USER_box_" << counter++;
   this->visualMsg->set_name( stream.str() );
 
   this->state = 1;
@@ -163,7 +164,7 @@ void BoxMaker::CreateTheEntity()
   std::ostringstream newModelStr;
 
   newModelStr << "<gazebo version='1.0'>\
-    <model name='" << this->visualMsg->name() << "_model'>\
+    <model name='custom_user_box" << counter << "_model'>\
     <origin pose='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
                     << this->visualMsg->pose().position().z() << " 0 0 0'/>\

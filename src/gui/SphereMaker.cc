@@ -54,7 +54,7 @@ void SphereMaker::Start(const rendering::UserCameraPtr camera)
   this->camera = camera;
 
   std::ostringstream stream;
-  stream << "user_sphere_" << counter++;
+  stream << "__GZ_USER_sphere_" << counter++;
   this->visualMsg->set_name( stream.str() );
 
   this->state = 1;
@@ -146,7 +146,7 @@ void SphereMaker::CreateTheEntity()
   std::ostringstream newModelStr;
 
   newModelStr << "<gazebo version='1.0'>\
-    <model name='" << this->visualMsg->name() << "_model'>\
+    <model name='custom_user_sphere" << counter << "_model'>\
     <origin pose='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
                     << this->visualMsg->geometry().sphere().radius() << " 0 0 0'/>\

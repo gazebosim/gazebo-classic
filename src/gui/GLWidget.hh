@@ -91,6 +91,7 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub;
 
       private: Qt::KeyboardModifiers keyModifiers;
+      private: int mouseOffset;
     };
   }
 }

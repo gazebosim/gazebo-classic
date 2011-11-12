@@ -809,6 +809,9 @@ void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
 // the scene. This in turns allows a gui to query the latest state.
 void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
 {
+  if (msg->name().find("__GZ_USER_") != std::string::npos)
+    return;
+
   int i = 0;
   for (; i < this->sceneMsg.visual_size(); i++)
   {
