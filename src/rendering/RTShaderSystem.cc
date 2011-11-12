@@ -36,6 +36,7 @@ using namespace rendering;
 /// Constructor
 RTShaderSystem::RTShaderSystem()
 {
+  this->initialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,7 @@ RTShaderSystem::~RTShaderSystem()
 /// Init the run time shader system
 void RTShaderSystem::Init()
 {
+  
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   if (Ogre::RTShader::ShaderGenerator::initialize())
   {
@@ -100,6 +102,9 @@ void RTShaderSystem::Fini()
 // Add a scene manager
 void RTShaderSystem::AddScene(Scene *_scene)
 {
+  if (!this->initialized)
+    return;
+
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   // Set the scene manager
   this->shaderGenerator->addSceneManager( _scene->GetManager() );
@@ -112,6 +117,9 @@ void RTShaderSystem::AddScene(Scene *_scene)
 // Remove a scene
 void RTShaderSystem::RemoveScene( Scene *_scene )
 {
+  if (!this->initialized)
+    return;
+
   std::vector<Scene*>::iterator iter;
   for (iter = this->scenes.begin(); iter != scenes.end(); iter++)
     if ( (*iter) == _scene )
@@ -164,7 +172,6 @@ void RTShaderSystem::UpdateShaders()
 {
   if (!this->initialized)
     return;
-
 
   std::list<Visual*>::iterator iter;
 
@@ -224,7 +231,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
           // Remove all sub render states.
           renderState->reset();
-//#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+
           if (vis->GetShaderType() == "vertex")
           {
             Ogre::RTShader::SubRenderState* perPerVertexLightModel = 
@@ -233,16 +240,15 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(perPerVertexLightModel);
           }
-//#endif
-
-//#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-          else if (vis->GetShaderType() == "pixel")
+          else //if (vis->GetShaderType() == "pixel")
           {
             Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 
             renderState->addTemplateSubRenderState(perPixelLightModel);
           }
-          else if (vis->GetShaderType() == "normal_map_object_space")
+
+          /// This doesn't seem to work properly.
+          /*if (vis->GetShaderType() == "normal_map_object_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState = 
               this->shaderGenerator->createSubRenderState(
@@ -257,7 +263,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
             normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (vis->GetShaderType() == "normal_map_tangent_space")
+          else if (vis->GetShaderType() == )
           {
             Ogre::RTShader::SubRenderState* subRenderState = 
               this->shaderGenerator->createSubRenderState(
@@ -273,9 +279,8 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-//#endif
+          */
         }
-
 
       // Invalidate this material in order to re-generate its shaders.
       this->shaderGenerator->invalidateMaterial(
