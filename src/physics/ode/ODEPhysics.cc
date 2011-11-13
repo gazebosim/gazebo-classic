@@ -312,6 +312,8 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
+  this->contactPairs.clear();
+
   this->collidersCount = 0;
   this->trimeshCollidersCount = 0;
 
@@ -866,6 +868,11 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
     }
 
     dJointAttach (c, b1, b2);
+
+    // my joints map
+    LinkPtr link1 = collision1->GetLink();
+    LinkPtr link2 = collision2->GetLink();
+    this->AddLinkPair(link1, link2);
   }
 }
 
