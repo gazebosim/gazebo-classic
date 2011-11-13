@@ -211,3 +211,16 @@ LinkPtr Joint::GetParent() const
 void Joint::FillJointMsg( msgs::Joint &/*_msg*/ )
 {
 }
+
+math::Angle Joint::GetAngle(int _index) const
+{
+  if (this->model->IsStatic())
+    return this->staticAngle;
+  else
+    return this->GetAngleImpl(_index);
+}
+
+void Joint::SetAngle(int /*index*/, math::Angle _angle)
+{
+  this->staticAngle = _angle;
+}

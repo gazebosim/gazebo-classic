@@ -67,7 +67,7 @@ namespace gazebo
       public: void ApplyDamping();
 
       /// \brief Get the position of the joint
-      public: virtual math::Angle GetAngle(int index) const;
+      public: virtual math::Angle GetAngleImpl(int index) const;
 
       /// \brief Get the rate of change
       public: virtual double GetVelocity(int index) const;

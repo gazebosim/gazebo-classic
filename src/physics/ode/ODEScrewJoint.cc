@@ -69,7 +69,7 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the position of the joint
-math::Angle ODEScrewJoint::GetAngle(int index) const
+math::Angle ODEScrewJoint::GetAngleImpl(int index) const
 {
   math::Angle result = dJointGetScrewPosition( this->jointId );
   

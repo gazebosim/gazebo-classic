@@ -69,7 +69,7 @@ namespace gazebo
       public: void ApplyDamping();
   
       /// Get the angle of rotation
-      public: virtual math::Angle GetAngle(int index) const;
+      public: virtual math::Angle GetAngleImpl(int index) const;
    
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double angle);

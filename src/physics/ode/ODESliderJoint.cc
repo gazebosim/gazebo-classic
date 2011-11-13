@@ -62,7 +62,7 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the position of the joint
-math::Angle ODESliderJoint::GetAngle(int /*_index*/) const
+math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result = dJointGetSliderPosition( this->jointId );
   return result;

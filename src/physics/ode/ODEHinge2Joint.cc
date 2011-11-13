@@ -110,7 +110,7 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(int index) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Get angle of rotation about first axis
-math::Angle ODEHinge2Joint::GetAngle(int index) const
+math::Angle ODEHinge2Joint::GetAngleImpl(int index) const
 {
   if (index == 0)
     return dJointGetHinge2Angle1( this->jointId );

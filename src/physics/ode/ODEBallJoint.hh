@@ -70,7 +70,7 @@ namespace gazebo
       public: virtual void SetMaxForce(int /*index*/, double /*t*/) {}
   
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngle(int /*index*/) const {return math::Angle(0);}
+      public: virtual math::Angle GetAngleImpl(int /*index*/) const {return math::Angle(0);}
    
     };
     

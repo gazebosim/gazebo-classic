@@ -147,7 +147,12 @@ namespace gazebo
       public: virtual double GetMaxForce(int index) = 0;
   
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngle(int index) const = 0;
+      public: math::Angle GetAngle(int index) const;
+
+      /// \brief Set the angle of rotation. This will not move the
+      ///        joint. The purpose of this function is purely to support
+      ///        animation of static models.
+      public: void SetAngle(int _index, math::Angle _angle);
   
       /// \brief Get the force the joint applies to the first link
       /// \param index The index of the link( 0 or 1 )
@@ -168,6 +173,8 @@ namespace gazebo
 
       /// Fill a joint message
       public: void FillJointMsg( msgs::Joint &_msg );
+
+      protected: virtual math::Angle GetAngleImpl(int _index) const = 0;
 
       /// The first link this joint connects to
       protected: LinkPtr childLink;
@@ -191,6 +198,7 @@ namespace gazebo
       // joint damping_coefficient
       protected: double damping_coefficient;
       protected: transport::PublisherPtr vis_pub;
+      private: math::Angle staticAngle;
     };
     /// \}
   }

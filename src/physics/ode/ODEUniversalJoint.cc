@@ -101,7 +101,7 @@ void ODEUniversalJoint::SetDamping( int /*_index*/, const double _damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of an axis
-math::Angle ODEUniversalJoint::GetAngle(int index) const
+math::Angle ODEUniversalJoint::GetAngleImpl(int index) const
 {
   math::Angle result;
 

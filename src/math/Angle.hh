@@ -163,7 +163,7 @@ namespace gazebo
     /// \return The Ostream
     public: friend std::ostream &operator<<( std::ostream &out, const gazebo::math::Angle &a )
     {
-      out << a.GetAsDegree();
+      out << a.GetAsRadian();
       return out;
     }
   

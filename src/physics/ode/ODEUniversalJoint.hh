@@ -60,7 +60,7 @@ namespace gazebo
       public: virtual void SetAxis( int index, const math::Vector3 &axis );
     
       /// \brief Get the angle of axis 
-      public: virtual math::Angle GetAngle(int index) const;
+      public: virtual math::Angle GetAngleImpl(int index) const;
   
       /// \brief Get the angular rate of an axis
       public: virtual double GetVelocity(int index) const;

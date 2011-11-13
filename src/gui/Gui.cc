@@ -59,6 +59,12 @@ void gui::load()
 
   g_main_win->Load();
   g_main_win->resize(1024,768);
+
+  for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
+       iter != g_plugins.end(); iter++)
+  {
+    (*iter)->Load();
+  }
 }
 
 void gui::init()
@@ -113,6 +119,5 @@ rendering::UserCameraPtr gui::get_active_camera()
 void gui::load_plugin( const std::string &_filename )
 {
   gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename, _filename);
-  plugin->Load();
   g_plugins.push_back( plugin );
 }

@@ -21,6 +21,7 @@
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include <sstream>
 #include <float.h>
@@ -67,12 +68,14 @@ Model::Model(BasePtr parent)
   : Entity(parent)
 {
   this->AddType(MODEL);
+  this->updateMutex = new boost::recursive_mutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Model::~Model()
 {
+  delete this->updateMutex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,13 +198,15 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
+  this->updateMutex->lock();
+
   if (this->jointAnimations.size() > 0)
   {
     common::NumericKeyFrame kf(0);
     std::map<std::string, double> jointPositions;
     std::map<std::string, common::NumericAnimationPtr>::iterator iter;
-    for (iter = this->jointAnimations.begin(); 
-         iter != this->jointAnimations.end(); iter++)
+    iter = this->jointAnimations.begin();
+    while (iter !=this->jointAnimations.end())
     {
       iter->second->GetInterpolatedKeyFrame(kf);
 
@@ -209,11 +214,17 @@ void Model::Update()
       iter->second->AddTime(
           (this->world->GetSimTime() - this->prevAnimationTime).Double());
 
+
       if (iter->second->GetTime() < iter->second->GetLength())
       {
         iter->second->GetInterpolatedKeyFrame(kf);
-        jointPositions[iter->first] = kf.GetValue() - prev;
+        jointPositions[iter->first] = kf.GetValue();
       }
+      else
+      {
+        this->jointAnimations.erase(iter);
+      }
+      iter++;
     }
     if (jointPositions.size() > 0)
     {
@@ -221,6 +232,8 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
+
+  this->updateMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -715,6 +728,7 @@ void Model::FillModelMsg( msgs::Model &_msg )
 ////////////////////////////////////////////////////////////////////////////////
 void Model::SetJointPositions( 
     const std::map<std::string, double> &_jointPositions)
+
 {
   // go through all joints in this model and update each one
   //   for each joint update, recursively update all children
@@ -747,7 +761,6 @@ void Model::SetJointPositions(
               // rotate child (childLink) about anchor point, by delta-angle 
               // along axis
               double dangle = jiter->second - joint->GetAngle(0).GetAsRadian();
-
               math::Pose worldPose = childLink->GetWorldPose();
 
               math::Vector3 anchor;
@@ -764,9 +777,8 @@ void Model::SetJointPositions(
                 axis = joint->GetGlobalAxis(0);
               }
 
-
               this->RotateBodyAndChildren(childLink, anchor,
-                  axis, dangle, true);
+                                          axis, dangle, true);
               break;
             }
           case Base::SLIDER_JOINT: 
@@ -775,6 +787,7 @@ void Model::SetJointPositions(
               //                   joint->GetAngle(0).GetAsRadian();
               //slideBodyAndChildren(childLink, joint->GetAnchor(0), 
               //                     joint->GetAxis(0), dposition, true);
+              //joint->SetAngle(0, jiter->second);
               break;
             }
           default: 
@@ -787,6 +800,12 @@ void Model::SetJointPositions(
       }
     }
   }
+
+  for (jiter = _jointPositions.begin(); jiter != _jointPositions.end(); jiter++)
+  {
+    JointPtr joint = this->GetJoint(jiter->first);
+    joint->SetAngle(0, jiter->second);
+  } 
 }
 
 void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor, 
@@ -893,9 +912,15 @@ bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
   return false;
 }
 
-void Model::SetJointAnimation(const std::string &_jointName,
-                              const common::NumericAnimationPtr &_anim)
+void Model::SetJointAnimation(
+    const std::map<std::string, common::NumericAnimationPtr> _anims)
 {
-  this->jointAnimations[_jointName] = _anim;
+  this->updateMutex->lock();
+  std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
+  for (iter = _anims.begin(); iter != _anims.end(); iter++)
+  {
+    this->jointAnimations[iter->first] = iter->second;
+  }
   this->prevAnimationTime = this->world->GetSimTime();
+  this->updateMutex->unlock();
 }

@@ -69,7 +69,7 @@ namespace gazebo
     public: virtual math::Vector3 GetGlobalAxis(int index) const;
   
     /// \brief Get angle of rotation about first axis
-    public: virtual math::Angle GetAngle(int index) const;
+    public: virtual math::Angle GetAngleImpl(int index) const;
   
     /// \brief Get rate of rotation about first axis
     public: virtual double GetVelocity(int index) const;

@@ -29,6 +29,11 @@
 
 #include "physics/Entity.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
   namespace physics
@@ -161,8 +166,8 @@ namespace gazebo
       public: void SetJointPositions(
                   const std::map<std::string, double> &_jointPositions);
 
-      public: void SetJointAnimation(const std::string &_jointName,
-                                     const common::NumericAnimationPtr &_anim); 
+      public: void SetJointAnimation(
+                  const std::map<std::string, common::NumericAnimationPtr> anims);
 
       private: void RotateBodyAndChildren(LinkPtr _body1, 
                    const math::Vector3 &_anchor, const math::Vector3 &_axis, 
@@ -195,6 +200,7 @@ namespace gazebo
       private: std::map<std::string, common::NumericAnimationPtr> jointAnimations;
       private: common::Time prevAnimationTime;
 
+      private: boost::recursive_mutex *updateMutex;
     };
     /// \}
   }

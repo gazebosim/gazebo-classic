@@ -118,7 +118,7 @@ void ODEHingeJoint::ApplyDamping()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of rotation
-math::Angle ODEHingeJoint::GetAngle(int /*index*/) const
+math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result = dJointGetHingeAngle( this->jointId );
 
