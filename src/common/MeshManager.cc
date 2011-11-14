@@ -131,6 +131,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
       {
         mesh = loader->Load(fullname);
         mesh->SetName(filename);
+        mesh->RecalculateNormals();
         this->meshes.insert( std::make_pair(filename, mesh) );
       }
       else
