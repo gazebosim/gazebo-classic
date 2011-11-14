@@ -626,6 +626,18 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
   if (data->has_step())
     this->OnStep();
+
+  if (data->has_save() && data->save())
+  {
+    std::string filename = data->save_filename();
+    std::string data = this->sdf->ToString("");
+    std::ofstream out(filename.c_str(), std::ios::out);
+    if (!out)
+      gzerr << "Unable to open file[" << filename << "]\n";
+    else
+      out << data;
+    out.close();
+  }
 }
 
 void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )

@@ -685,6 +685,20 @@ void SDF::PrintValues()
 {
   this->root->PrintValues("");
 }
+void SDF::Write(const std::string &_filename)
+{
+  std::string string = this->root->ToString("");
+
+  std::ofstream out(_filename.c_str(), std::ios::out);
+
+  if (!out)
+  {
+    gzerr << "Unable to open file[" << _filename << "] for writing\n";
+    return;
+  }
+  out << string;
+  out.close();
+}
 
 std::string SDF::ToString() const
 {

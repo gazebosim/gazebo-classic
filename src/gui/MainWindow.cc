@@ -123,7 +123,10 @@ void MainWindow::Open()
 
 void MainWindow::Save()
 {
-  gzdbg << "MainWindow::Save to file\n";
+  msgs::WorldControl msg;
+  msg.set_save(true);
+  msg.set_save_filename("/tmp/gazebo.sdf");
+  this->worldControlPub->Publish(msg);
 }
 
 void MainWindow::About()

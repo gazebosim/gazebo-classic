@@ -148,6 +148,7 @@ namespace sdf
     public: SDF();
     public: void PrintDescription();
     public: void PrintValues();
+    public: void Write(const std::string &_filename);
     public: std::string ToString() const;
 
     public: ElementPtr root;
