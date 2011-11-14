@@ -102,7 +102,7 @@ void Sensor::Init()
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
-      pluginElem = this->sdf->GetNextElement("plugin", pluginElem);
+      pluginElem = pluginElem->GetNextElement();
     }
   }
   //SensorManager::Instance()->AddSensor(shared_from_this());

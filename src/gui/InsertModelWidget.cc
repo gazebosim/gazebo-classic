@@ -186,10 +186,10 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
         this->visuals.push_back(visVisual);
 
 
-        visualElem = linkElem->GetNextElement("visual", visualElem);
+        visualElem = visualElem->GetNextElement();
       }
  
-      linkElem = modelElem->GetNextElement("link", linkElem);
+      linkElem = linkElem->GetNextElement();
     }
 
     msgs::Selection selectMsg;

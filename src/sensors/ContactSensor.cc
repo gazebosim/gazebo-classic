@@ -110,8 +110,7 @@ void ContactSensor::Load()
       this->connections.push_back(collision->ConnectContact(
             boost::bind(&ContactSensor::OnContact, this, _1, _2)));
     }
-    collisionElem = this->sdf->GetElement("contact")->GetNextElement(
-        "collision", collisionElem);
+    collisionElem = collisionElem->GetNextElement();
   }
 }
 

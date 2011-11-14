@@ -428,20 +428,32 @@ ElementPtr Element::GetFirstElement() const
   return this->elements.front();
 }
 
-ElementPtr Element::GetNextElement(const std::string &_name, 
-                          const ElementPtr &_elem) const
+ElementPtr Element::GetNextElement(const std::string &_name) const
 {
-  ElementPtr_V::const_iterator iter;
-  iter = std::find(this->elements.begin(), this->elements.end(), _elem);
-
-  for (iter++; iter != this->elements.end(); iter++)
+  if (this->parent)
   {
-    if ( (*iter)->GetName() == _name )
-      return (*iter);
+    ElementPtr_V::const_iterator iter;
+    iter = std::find(this->parent->elements.begin(), 
+        this->parent->elements.end(), shared_from_this());
+
+    if (iter == this->parent->elements.end())
+      return ElementPtr();
+
+    for (iter++; iter != this->parent->elements.end(); iter++)
+    {
+      if ( (*iter)->GetName() == _name )
+        return (*iter);
+    }
   }
 
   return ElementPtr();
 }
+
+ElementPtr Element::GetNextElement() const
+{
+  return this->GetNextElement(this->name);
+}
+
 
 boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
 {

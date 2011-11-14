@@ -93,7 +93,7 @@ bool Server::Load(const std::string &_filename)
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    worldElem = sdf->root->GetNextElement("world", worldElem);
+    worldElem = worldElem->GetNextElement();
   }
 
   return true;

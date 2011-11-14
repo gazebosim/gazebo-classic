@@ -114,7 +114,7 @@ void Load()
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    worldElem = sdf->root->GetNextElement("world", worldElem);
+    worldElem = worldElem->GetNextElement();
   }
 
   gazebo::physics::init_worlds();

@@ -438,7 +438,7 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
       msgs::Light *lm = this->sceneMsg.add_light();
       lm->CopyFrom( msgs::LightFromSDF(childElem) );
 
-      childElem = _sdf->GetNextElement("light", childElem);
+      childElem = childElem->GetNextElement();
     }
   }
 
@@ -453,7 +453,7 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
       // TODO : Put back in the ability to nest models. We should do this
       // without requiring a joint.
 
-      childElem = _sdf->GetNextElement("model", childElem);
+      childElem = childElem->GetNextElement();
     }
   }
 
@@ -464,7 +464,7 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
-      pluginElem = _sdf->GetNextElement("plugin", pluginElem);
+      pluginElem = pluginElem->GetNextElement();
     }
   }
 }

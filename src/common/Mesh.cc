@@ -669,9 +669,16 @@ void SubMesh::RecalculateNormals()
     math::Vector3 v2 = this->vertices[this->indices[i+1]];
     math::Vector3 v3 = this->vertices[this->indices[i+2]];
     math::Vector3 n = math::Vector3::GetNormal(v1, v2, v3);
-    this->normals[this->indices[i]] += n;
-    this->normals[this->indices[i+1]] += n;
-    this->normals[this->indices[i+2]] += n;
+
+    for (unsigned int j=0; j< this->vertices.size(); j++)
+    {
+      if (this->vertices[j] == v1 || 
+          this->vertices[j] == v2 ||
+          this->vertices[j] == v3)
+      {
+        this->normals[j] += n;
+      }
+    }
   }
 
   // Normalize the results

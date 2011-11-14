@@ -20,3 +20,7 @@ add_executable( gzstats gzstats.cc )
 target_link_libraries(gzstats gazebo_msgs gazebo_common gazebo_transport )
 INSTALL_EXECUTABLE( gzstats )
 
+add_executable( sdf2pov sdf2pov.cc )
+target_link_libraries(sdf2pov gazebo_common gazebo_sdf_parser)
+INSTALL_EXECUTABLE( sdf2pov )
+

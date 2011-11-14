@@ -106,8 +106,10 @@ namespace sdf
 
     public: ElementPtr GetElement(const std::string &_name) const;
     public: ElementPtr GetFirstElement() const;
-    public: ElementPtr GetNextElement(const std::string &_name, 
-                                      const ElementPtr &_elem) const;
+
+    public: ElementPtr GetNextElement(const std::string &_name) const;
+    public: ElementPtr GetNextElement() const;
+
 
     public: ElementPtr GetOrCreateElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);

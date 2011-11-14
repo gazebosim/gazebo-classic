@@ -123,7 +123,7 @@ void Link::Load( sdf::ElementPtr &_sdf )
       this->visPub->Publish(msg);
       this->visuals.push_back(msg.name());
 
-      visualElem = this->sdf->GetNextElement("visual", visualElem); 
+      visualElem = visualElem->GetNextElement(); 
     }
   }
  
@@ -135,7 +135,7 @@ void Link::Load( sdf::ElementPtr &_sdf )
     {
       // Create and Load a collision, which will belong to this body.
       this->LoadCollision(collisionElem);
-      collisionElem = this->sdf->GetNextElement("collision", collisionElem); 
+      collisionElem = collisionElem->GetNextElement(); 
     }
   }
 
@@ -145,7 +145,7 @@ void Link::Load( sdf::ElementPtr &_sdf )
     while (sensorElem)
     {
       this->LoadSensor(sensorElem);
-      sensorElem = this->sdf->GetNextElement("sensor", sensorElem); 
+      sensorElem = sensorElem->GetNextElement(); 
     }
   }
 }
@@ -294,7 +294,7 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
 
       this->visPub->Publish(msg);
 
-      visualElem = this->sdf->GetNextElement("visual", visualElem); 
+      visualElem = visualElem->GetNextElement(); 
     }
   }
 
@@ -308,7 +308,7 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
 
       if (collision)
         collision->UpdateParameters(collisionElem);
-      collisionElem = this->sdf->GetNextElement("collision", collisionElem);
+      collisionElem = collisionElem->GetNextElement();
     }
   }
 }
