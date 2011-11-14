@@ -59,13 +59,13 @@
         </visual>
 
 
-        <sensor name="camera" type="camera" always_on="true" update_rate="10" visualize='true'>
+        <sensor name="camera" type="camera" always_on="true" update_rate=".1" visualize='true'>
           <origin pose="0 0 1 0 0 0"/>
           <camera>
             <horizontal_fov angle="1.04719755"/>
             <image width="640" height="480" format="R8G8B8"/>
             <clip near="0.1" far="50"/>
-            <save enabled="false" path="/tmp/camera"/>
+            <save enabled="true" path="/tmp/camera"/>
           </camera>
 
           <plugin filename="libCameraPlugin.so" name="camera_plugin"/>

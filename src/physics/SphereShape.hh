@@ -48,7 +48,9 @@ namespace gazebo
       public: virtual void Init();
  
       /// \brief Set the size
-      public: virtual void SetSize(const double &radius);
+      public: virtual void SetRadius(const double &radius);
+
+      public: double GetRadius() const;
     };
     /// \}
   }

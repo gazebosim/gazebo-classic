@@ -38,9 +38,9 @@ namespace gazebo
     {
       public: ODESphereShape(ODECollisionPtr parent) : SphereShape(parent) {}
       public: virtual ~ODESphereShape() {}
-      public: void SetSize(const double &radius)
+      public: void SetRadius(const double &radius)
       {
-        SphereShape::SetSize(radius);
+        SphereShape::SetRadius(radius);
         ODECollisionPtr oParent;
         oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
   

@@ -34,7 +34,7 @@
     </model>
 
     <!--<include filename="pr2.model" />-->
-    <include filename="pr2.model"  model_pose="0 0 0 0 0 3.1415"/> 
+    <include filename="pr2.model"  model_pose="0 0 0 0 0 1.5707"/> 
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>

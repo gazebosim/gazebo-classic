@@ -27,13 +27,12 @@
 using namespace gazebo;
 using namespace rendering;
 
-/// \brief Constructor
-LaserVisual::LaserVisual (const std::string &_name, Scene *_scene,
+LaserVisual::LaserVisual (const std::string &_name, VisualPtr _vis,
                           const std::string &_topicName)
- : Visual(_name, _scene), scene(_scene)
+ : Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_scene->GetName());
+  this->node->Init(this->scene->GetName());
 
   this->laserScanSub = this->node->Subscribe(_topicName, 
       &LaserVisual::OnScan, this);
@@ -53,13 +52,6 @@ LaserVisual::~LaserVisual()
 
 void LaserVisual::OnScan( const boost::shared_ptr<msgs::LaserScan const> &_msg)
 {
-  if (!this->GetParent())
-  {
-    VisualPtr vis = this->scene->GetVisual(_msg->frame());
-    vis->AttachVisual(this);
-    this->parent = vis;
-  }
-
   double angle = _msg->angle_min();
   double r;
   math::Vector3 pt;

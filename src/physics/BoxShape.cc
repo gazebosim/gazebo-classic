@@ -55,3 +55,8 @@ void BoxShape::SetSize( const math::Vector3 &size )
 {
   this->sdf->GetAttribute("size")->Set( size );
 }
+
+math::Vector3 BoxShape::GetSize() const
+{
+  return this->sdf->GetValueVector3("size");
+}

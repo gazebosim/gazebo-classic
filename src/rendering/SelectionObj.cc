@@ -34,28 +34,32 @@ SelectionObj::SelectionObj(Scene *scene_)
 {
   this->active = false;
   this->CreateMaterials();
-  this->node = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 SelectionObj::~SelectionObj()
 {
-  delete this->node;
+  this->node.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
 void SelectionObj::Init()
 {
-  this->node = new Visual("selection_obj_visual", this->scene );
+  this->node.reset(new Visual("selection_obj_visual",
+                              this->scene->GetWorldVisual()));
 
   Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("selection_tube"));
   Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box"));
 
 
-  Ogre::SceneNode *rotNode = this->node->GetSceneNode()->createChildSceneNode("rot_node");
-  Ogre::SceneNode *transNode = this->node->GetSceneNode()->createChildSceneNode("trans_node");
+  Ogre::SceneNode *rotNode =
+    this->node->GetSceneNode()->createChildSceneNode("rot_node");
+
+  Ogre::SceneNode *transNode =
+    this->node->GetSceneNode()->createChildSceneNode("trans_node");
+
   transNode->setInheritOrientation(false);
 
   Ogre::SceneNode *xTube, *yTube, *zTube, *xBox[2], *yBox[2], *zBox[2];
@@ -197,7 +201,10 @@ void SelectionObj::Attach( VisualPtr _visual )
 void SelectionObj::Clear()
 {
   if (this->node->GetSceneNode()->getParentSceneNode())
-    this->node->GetSceneNode()->getParentSceneNode()->removeChild( this->node->GetSceneNode());
+  {
+    this->node->GetSceneNode()->getParentSceneNode()->removeChild(
+        this->node->GetSceneNode());
+  }
 
   this->node->SetVisible(false);
 }

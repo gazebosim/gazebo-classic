@@ -104,3 +104,13 @@ void TrimeshShape::Init()
     }
   }
 }
+
+math::Vector3 TrimeshShape::GetSize() const
+{
+  return this->sdf->GetValueVector3("scale");
+}
+
+std::string TrimeshShape::GetFilename() const
+{
+  return this->sdf->GetValueString("filename");
+}

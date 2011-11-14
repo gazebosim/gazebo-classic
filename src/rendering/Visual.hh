@@ -55,13 +55,10 @@ namespace gazebo
     /// \{
 
     /// \brief A renderable object
-    class Visual 
+    class Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
-      public: Visual (const std::string &name, VisualPtr parent);
-  
-      /// \brief Constructor
-      public: Visual (const std::string &name, Ogre::SceneNode *parent);
+      public: Visual (const std::string &name, VisualPtr _parent);
   
       /// \brief Constructor
       public: Visual (const std::string &name, Scene *scene);
@@ -91,10 +88,10 @@ namespace gazebo
       public: std::string GetName() const;
   
       /// \brief Attach a visual
-      public: void AttachVisual(Visual *vis);
+      public: void AttachVisual(VisualPtr _vis);
              
       /// \brief Detach a visual 
-      public: void DetachVisual(Visual *vis);
+      public: void DetachVisual(VisualPtr _vis);
   
       /// \brief Attach a renerable object to the visual
       public: void AttachObject( Ogre::MovableObject *obj);
@@ -102,11 +99,11 @@ namespace gazebo
       /// \brief Detach all objects
       public: void DetachObjects();
   
-      /// \brief Get the number of attached objects
-      public: unsigned short GetNumAttached();
+      /// \brief Get the number of attached visuals
+      public: unsigned int GetChildCount();
   
-      /// \brief Get an attached object
-      public: Ogre::MovableObject *GetAttached(unsigned short num);
+      /// \brief Get an attached visual
+      public: VisualPtr GetChild(unsigned int _num);
   
       /// \brief Attach a mesh to this visual by name
       public: void AttachMesh( const std::string &meshName );
@@ -178,6 +175,7 @@ namespace gazebo
       /// \brief Set the world pose of the visual 
       public: void SetWorldPose(const math::Pose _pose);
       public: void SetWorldPosition(const math::Vector3 &_pos);
+      public: void SetWorldRotation(const math::Quaternion &_q);
 
       /// \brief Return the scene Node of this visual entity
       public: Ogre::SceneNode *GetSceneNode() const;
@@ -242,8 +240,14 @@ namespace gazebo
                                    double _pitch, double _yaw, double _time);
 
       public: void ShowBoundingBox();
+      public: void ShowCollision(bool _show);
 
-      private: void GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const;
+      public: void SetScene(Scene *_scene);
+      public: Scene *GetScene() const;
+
+      private: void GetBoundsHelper(Ogre::SceneNode *node,
+                                    math::Box &box) const;
+
       private: std::string GetMeshName() const;
   
       private: sdf::ElementPtr sdf;
@@ -275,11 +279,13 @@ namespace gazebo
       private: std::string name;
       private: std::string physicsEntityName;
       protected: VisualPtr parent;
+      protected: std::vector<VisualPtr> children;
 
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;
 
       private: Ogre::AnimationState *animState;
+      protected: Scene *scene;
     };
     /// \}
   }

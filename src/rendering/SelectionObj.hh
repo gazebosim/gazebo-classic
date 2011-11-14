@@ -58,7 +58,7 @@ namespace gazebo
   
       private: void CreateMaterials();
 
-      private: Visual *node;
+      private: VisualPtr node;
       private: Scene *scene;
       private: std::string visualName;
 

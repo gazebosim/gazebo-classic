@@ -48,12 +48,17 @@ void SphereShape::Load( sdf::ElementPtr &_sdf )
 /// Initialize the sphere
 void SphereShape::Init()
 {
-  this->SetSize( this->sdf->GetValueDouble("radius") );
+  this->SetRadius(this->sdf->GetValueDouble("radius"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size
-void SphereShape::SetSize(const double &radius)
+void SphereShape::SetRadius(const double &_radius)
 {
-  this->sdf->GetAttribute("radius")->Set(radius);
+  this->sdf->GetAttribute("radius")->Set(_radius);
+}
+
+double SphereShape::GetRadius() const
+{
+  this->sdf->GetValueDouble("radius");
 }

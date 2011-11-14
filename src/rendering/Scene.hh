@@ -220,6 +220,8 @@ namespace gazebo
       /// \param _enabled Set to true to turn on the grid
       public: void SetGrid( bool _enabled );
 
+      public: VisualPtr GetWorldVisual() const;
+
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::Mesh *mesh,

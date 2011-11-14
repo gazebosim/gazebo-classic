@@ -62,32 +62,15 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
   std::string uniqueName = this->GetName();
   int index = 0;
   while (pnode->getCreator()->hasSceneNode( uniqueName ))
-    uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
+    uniqueName = this->GetName() + "_" + 
+                 boost::lexical_cast<std::string>(index++);
 
   this->SetName(uniqueName);
 
   this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
   this->parent = _parent;
-  this->Init();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-Visual::Visual (const std::string &_name, Ogre::SceneNode *_parent)
-{
-  this->SetName(_name);
-  this->sceneNode = NULL;
-  this->animState = NULL;
-
-  std::string uniqueName = this->GetName();
-  int index = 0;
-  while (_parent->getCreator()->hasSceneNode( uniqueName ))
-    uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
-  this->SetName(uniqueName);
-
-  this->sceneNode = _parent->createChildSceneNode( this->GetName() );
-
+  this->scene = this->parent->GetScene();
   this->Init();
 }
 
@@ -103,11 +86,15 @@ Visual::Visual (const std::string &_name, Scene *_scene)
   int index = 0;
   while (_scene->GetManager()->hasSceneNode( uniqueName ))
   {
-    uniqueName = this->GetName() + "_" + boost::lexical_cast<std::string>(index++);
+    uniqueName = this->GetName() + "_" +
+                 boost::lexical_cast<std::string>(index++);
   }
 
+  this->scene = _scene;
   this->SetName(uniqueName);
-  this->sceneNode = _scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
+  this->sceneNode = 
+    this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
+        this->GetName());
 
   this->Init();
 }
@@ -116,7 +103,6 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 /// Destructor
 Visual::~Visual()
 {
-
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender( this->preRenderConnection );
 
@@ -141,6 +127,7 @@ Visual::~Visual()
   this->sdf->Reset();
   this->sdf.reset();
   this->parent.reset();
+  this->children.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +145,6 @@ void Visual::Init()
   this->staticGeom = NULL;
 
   RTShaderSystem::Instance()->AttachEntity(this);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -272,6 +258,9 @@ void Visual::Load()
   math::Pose pose;
   Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
+
+  if (this->parent)
+    this->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
   pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
@@ -391,25 +380,38 @@ std::string Visual::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a visual
-void Visual::AttachVisual(Visual *vis)
+void Visual::AttachVisual(VisualPtr _vis)
 {
-  if (!vis)
+  if (!_vis)
     gzerr << "Visual is null\n";
   else
   {
-    if (vis->GetSceneNode()->getParentSceneNode())
+    if (_vis->GetSceneNode()->getParentSceneNode())
     {
-      vis->GetSceneNode()->getParentSceneNode()->removeChild(vis->GetSceneNode());
+      _vis->GetSceneNode()->getParentSceneNode()->removeChild(
+          _vis->GetSceneNode());
     }
-    this->sceneNode->addChild( vis->GetSceneNode() );
+    this->sceneNode->addChild(_vis->GetSceneNode());
+    this->children.push_back(_vis);
+    _vis->parent = shared_from_this();
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Detach a visual 
-void Visual::DetachVisual(Visual *vis)
+void Visual::DetachVisual(VisualPtr _vis)
 {
-  this->sceneNode->removeChild(vis->GetSceneNode());
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->GetName() == _vis->GetName())
+    {
+      this->sceneNode->removeChild(_vis->GetSceneNode());
+      this->children.erase(iter);
+      _vis->parent = this->scene->GetWorldVisual();
+      break;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -437,16 +439,18 @@ void Visual::DetachObjects()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of attached objects
-unsigned short Visual::GetNumAttached()
+unsigned int Visual::GetChildCount()
 {
-  return this->sceneNode->numAttachedObjects();
+  return this->children.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an attached object
-Ogre::MovableObject *Visual::GetAttached(unsigned short num)
+VisualPtr Visual::GetChild(unsigned int _num)
 {
-  return this->sceneNode->getAttachedObject(num);
+  if (_num < this->children.size())
+    return this->children[_num];
+  return VisualPtr();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -978,15 +982,13 @@ void Visual::SetPosition( const math::Vector3 &_pos)
         Conversions::Convert(this->sceneNode->_getDerivedPosition()) );
     iter->first->Update();
   }
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
 void Visual::SetRotation( const math::Quaternion &_rot)
 {
-  this->sceneNode->_setDerivedOrientation(
+  this->sceneNode->setOrientation(
       Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z ));
 }
 
@@ -1024,15 +1026,19 @@ math::Pose Visual::GetPose() const
 
 void Visual::SetWorldPose(const math::Pose _pose)
 {
-  Ogre::Quaternion vquatern(_pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
-
-  this->SetWorldPosition( _pose.pos );
-  this->sceneNode->_setDerivedOrientation( vquatern );
+  this->SetWorldPosition(_pose.pos);
+  this->SetWorldRotation(_pose.rot);
 }
 
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
   this->sceneNode->_setDerivedPosition( Conversions::Convert(_pos) );
+}
+
+void Visual::SetWorldRotation(const math::Quaternion &_q)
+{
+  Ogre::Quaternion vquatern(_q.w, _q.x, _q.y, _q.z);
+  this->sceneNode->_setDerivedOrientation(vquatern);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1157,7 +1163,8 @@ void Visual::SetRibbonTrail(bool value)
 // Add a line to the visual
 DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
 {
-  this->preRenderConnection = event::Events::ConnectPreRender( boost::bind(&Visual::Update, this) );
+  this->preRenderConnection = event::Events::ConnectPreRender(
+      boost::bind(&Visual::Update, this) );
 
   DynamicLines *line = new DynamicLines(type);
   this->lines.push_back(line);
@@ -1579,4 +1586,26 @@ void Visual::MoveToPosition( const math::Vector3 &_end,
 void Visual::ShowBoundingBox()
 {
   this->sceneNode->showBoundingBox(true);
+}
+
+void Visual::SetScene(Scene *_scene)
+{
+  this->scene = _scene;
+}
+
+Scene *Visual::GetScene() const
+{
+  return this->scene;
+}
+
+void Visual::ShowCollision(bool _show)
+{
+  if (this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+    this->SetVisible(_show);
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    (*iter)->ShowCollision(_show);
+  }
 }

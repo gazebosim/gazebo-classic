@@ -33,7 +33,7 @@ namespace gazebo
     class DynamicLines;
     class LaserVisual : public Visual
     {
-      public: LaserVisual(const std::string &_name, Scene *_scene, 
+      public: LaserVisual(const std::string &_name, VisualPtr _vis, 
                           const std::string &_topicName);
 
       public: virtual ~LaserVisual();
@@ -45,7 +45,6 @@ namespace gazebo
       private: transport::SubscriberPtr laserScanSub;
 
       private: DynamicLines *rayFan;
-      private: Scene *scene;
     };
   }
 }

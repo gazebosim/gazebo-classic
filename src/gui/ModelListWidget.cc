@@ -97,6 +97,13 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->deleteAction->setStatusTip(tr("Delete the selection"));
   connect(this->deleteAction, SIGNAL(triggered()), this, SLOT(OnDelete()));
 
+  this->showCollisionAction = new QAction(tr("Show Collision"), this);
+  this->showCollisionAction->setStatusTip(tr("Show Collision Entity"));
+  this->showCollisionAction->setCheckable(true);
+  connect(this->showCollisionAction, SIGNAL(triggered()), this, 
+          SLOT(OnShowCollision()));
+
+
   this->fillingPropertyTree = false;
   this->selectedProperty = NULL;
 
@@ -297,6 +304,19 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem( const std::string &_name )
   return listItem;
 }
 
+void ModelListWidget::OnShowCollision()
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
+  std::string modelName = item->text(0).toStdString();
+
+  if (this->showCollisionAction->isChecked())
+    this->requestMsg = msgs::CreateRequest( "show_collision", modelName );
+  else
+    this->requestMsg = msgs::CreateRequest( "hide_collision", modelName );
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
 void ModelListWidget::OnDelete()
 {
   QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
@@ -334,6 +354,7 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
     menu.addAction(this->moveToAction);
     menu.addAction(this->followAction);
     menu.addAction(this->deleteAction);
+    menu.addAction(this->showCollisionAction);
     menu.exec(this->modelTreeWidget->mapToGlobal(_pt));
   }
 }

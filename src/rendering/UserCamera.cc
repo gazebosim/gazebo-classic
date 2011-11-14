@@ -75,11 +75,8 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 /// Destructor
 UserCamera::~UserCamera()
 {
-  if (this->visual)
-  {
-    delete this->visual;
-    this->visual = NULL;
-  }
+  //delete this->visual;
+  //this->visual = NULL;
 
   delete this->orbitViewController;
   delete this->fpsViewController;
@@ -109,7 +106,7 @@ void UserCamera::Init()
   this->SetFOV( DTOR(60) );
   this->SetClipDist(0.001, 100);
 
-  this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
+  /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 
   // The lines draw a visualization of the camera
   DynamicLines *line = this->visual->CreateDynamicLine( RENDERING_LINE_LIST );
@@ -163,6 +160,7 @@ void UserCamera::Init()
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->visual->SetVisible(false);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -363,14 +361,14 @@ float UserCamera::GetTriangleCount() const
 // Toggle whether to show the visual
 void UserCamera::ToggleShowVisual()
 {
-  this->visual->ToggleVisible();
+  //this->visual->ToggleVisible();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether to show the visual
-void UserCamera::ShowVisual(bool s)
+void UserCamera::ShowVisual(bool /*_s*/)
 {
-  this->visual->SetVisible(s);
+  //this->visual->SetVisible(_s);
 }
 
 //////////////////////////////////////////////////////////////////////////////

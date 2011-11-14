@@ -42,7 +42,8 @@ OrbitViewController::OrbitViewController(UserCamera *camera)
   this->maxDist = 0;
   this->typeString = TYPE_STRING;
 
-  this->refVisual.reset( new Visual("OrbitViewController", this->camera->GetScene()));
+  this->refVisual.reset(new Visual("OrbitViewController", 
+                        this->camera->GetScene()->GetWorldVisual()));
   this->refVisual->Init();
   this->refVisual->AttachMesh("unit_sphere");
   this->refVisual->SetScale(math::Vector3(0.2,0.2,0.1));

@@ -31,6 +31,10 @@
 
 #include "physics/Contact.hh"
 #include "physics/Shape.hh"
+#include "physics/BoxShape.hh"
+#include "physics/CylinderShape.hh"
+#include "physics/TrimeshShape.hh"
+#include "physics/SphereShape.hh"
 #include "physics/SurfaceParams.hh"
 #include "physics/Model.hh"
 #include "physics/Link.hh"
@@ -44,9 +48,6 @@ using namespace physics;
 Collision::Collision( LinkPtr link )
     : Entity(link)
 {
-//  this->sdf.reset(new sdf::Element);
-//  sdf::initFile( "/sdf/collision.sdf", this->sdf );
-
   this->AddType(Base::COLLISION);
 
   this->link = link;
@@ -91,6 +92,81 @@ void Collision::Load( sdf::ElementPtr &_sdf )
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
+
+  if (this->shape->GetType() != MULTIRAY_SHAPE &&
+      this->shape->GetType() != RAY_SHAPE)
+  {
+    msgs::Visual msg;
+    msg.set_name(this->GetCompleteScopedName()+"__COLLISION_VISUAL__");
+    msg.set_parent_name(this->GetCompleteScopedName());
+    msg.set_is_static(this->IsStatic());
+    msg.set_cast_shadows(false);
+    msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
+    msgs::Geometry *geom = msg.mutable_geometry();
+    switch(this->shape->GetType())
+    {
+      case BOX_SHAPE:
+        {
+          BoxShape *box = (BoxShape*)(this->shape.get());
+          geom->set_type(msgs::Geometry::BOX);
+          math::Vector3 size = box->GetSize();
+          msgs::Set(geom->mutable_box()->mutable_size(), size);
+          break;
+        }
+
+      case CYLINDER_SHAPE:
+        {
+          CylinderShape *cyl = (CylinderShape*)(this->shape.get());
+          msg.mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
+          geom->mutable_cylinder()->set_radius(cyl->GetRadius());
+          geom->mutable_cylinder()->set_length(cyl->GetLength());
+          break;
+        }
+
+      case SPHERE_SHAPE:
+        {
+          SphereShape *sph = (SphereShape*)(this->shape.get());
+          msg.mutable_geometry()->set_type(msgs::Geometry::SPHERE);
+          geom->mutable_sphere()->set_radius(sph->GetRadius());
+          break;
+        }
+
+      case HEIGHTMAP_SHAPE:
+        {
+          msg.mutable_geometry()->set_type(msgs::Geometry::HEIGHTMAP);
+          break;
+        }
+
+      case MAP_SHAPE:
+        {
+          msg.mutable_geometry()->set_type(msgs::Geometry::IMAGE);
+          break;
+        }
+
+      case PLANE_SHAPE:
+        {
+          msg.mutable_geometry()->set_type(msgs::Geometry::PLANE);
+          break;
+        }
+
+      case TRIMESH_SHAPE:
+        {
+          TrimeshShape *msh = (TrimeshShape*)(this->shape.get());
+          msg.mutable_geometry()->set_type(msgs::Geometry::MESH);
+          math::Vector3 size = msh->GetSize();
+          msgs::Set(geom->mutable_mesh()->mutable_scale(), size);
+          geom->mutable_mesh()->set_filename(msh->GetFilename());
+          break;
+        }
+
+      default:
+        gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
+    };
+
+    msgs::Set(msg.mutable_pose(), this->GetRelativePose());
+
+    this->visPub->Publish(msg);
+  }
 
   //TODO: this shouldn't exist in the physics sim
   //this->CreateBoundingBox();

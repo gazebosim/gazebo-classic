@@ -48,6 +48,9 @@ namespace gazebo
  
       /// \brief Set the size of the box
       public: virtual void SetSize( const math::Vector3 &size );
+
+      /// \brief Get the size of the box
+      public: math::Vector3 GetSize() const;
     };
     /// \}
   }

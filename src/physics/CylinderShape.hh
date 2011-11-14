@@ -51,7 +51,12 @@ namespace gazebo
   
       /// \brief Set length
       public: void SetLength(const double &length);
+
+       /// \brief Get radius
+      public: double GetRadius() const;
   
+      /// \brief Get length
+      public: double GetLength() const;
   
       /// \brief Set the size of the cylinder
       public: virtual void SetSize( const double &radius, const double &length  );

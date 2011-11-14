@@ -82,7 +82,7 @@
     -->
 
     <model name="laser_model" static="false">
-      <origin pose="-1 0 0.5 0 0 0"/>
+      <origin pose="-1 0 0.5 0 0 1.5707"/>
       <link name="laser_body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -100,27 +100,26 @@
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>
-
-        <sensor name='contact_sensor' type='contact' always_on='1' update_rate='1' visualize="true">
-          <topic>~/contact</topic>
-          <contact>
-            <collision name='geom1'/>
-          </contact>
-        </sensor>
-
-      <!--
-        <sensor name='base_laser' type='ray' always_on='1' update_rate='1' visualize='true'>
-          <origin pose='1.0 0 -0.1 0 -0 0'/>
+        <!--
+        <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' visualize='true'>
+        <origin pose='0.0232 0.06 0.098 0 -0 0'/>
+        <camera>
+          <horizontal_fov angle='0.78539816339744828'/>
+          <image width='320' height='240' format='L8'/>
+          <clip near='0.10000000000000001' far='100'/>
+        </camera>
+      </sensor>
+      -->
+        <sensor name='base_laser' type='ray' always_on='1' update_rate='20' visualize='true'>
+          <origin pose='1.0 0 0.0 0 -0 0'/>
           <topic>~/laser_scan</topic>
           <ray>
             <scan>
-              <horizontal samples='20' resolution='1' min_angle='-1.5707' max_angle='1.5707'/>
+              <horizontal samples='640' resolution='1' min_angle='-2.2688999999959423' max_angle='2.2688999999959423'/>
             </scan>
-            <range min='0.0' max='10' resolution='0.01'/>
+            <range min='0.080000000000000002' max='10' resolution='0.01'/>
           </ray>
-          <plugin name='laser' filename='libRayPlugin.so'/>
         </sensor>
-        -->
       </link>
     </model>
 

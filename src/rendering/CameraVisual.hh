@@ -30,13 +30,12 @@ namespace gazebo
     class Camera;
     class CameraVisual : public Visual
     {
-      public: CameraVisual(const std::string &_name, Scene *_scene);
+      public: CameraVisual(const std::string &_name, VisualPtr _vis);
 
       public: void Load(unsigned int _width, unsigned int _height);
       public: virtual ~CameraVisual();
 
       private: CameraPtr camera;
-      private: Scene *scene;
     };
   }
 }

@@ -32,12 +32,12 @@ using namespace gazebo;
 using namespace rendering;
 
 /// \brief Constructor
-ContactVisual::ContactVisual (const std::string &_name, Scene *_scene, 
+ContactVisual::ContactVisual (const std::string &_name, VisualPtr _vis, 
                               const std::string &_topicName)
- : Visual(_name, _scene), scene(_scene)
+ : Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_scene->GetName());
+  this->node->Init(this->scene->GetName());
 
   this->contactsSub = this->node->Subscribe(_topicName, 
       &ContactVisual::OnContact, this);
@@ -108,7 +108,6 @@ void ContactVisual::Update()
       double depth = this->contactsMsg->contact(i).depth(j);
 
       this->points[c]->sceneNode->setVisible(true);
-      std::cout << "Pos[" << pos << "]\n";
       this->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
 
       this->points[c]->normal->SetPoint(1,normal*0.1);

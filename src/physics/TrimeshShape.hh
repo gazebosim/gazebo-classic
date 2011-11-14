@@ -50,6 +50,11 @@ namespace gazebo
 
       /// \brief Init the trimesh shape
       public: virtual void Init();
+
+      public: virtual math::Vector3 GetSize() const;
+
+      /// \brief Get the filename of the mesh data
+      public: std::string GetFilename() const;
   
       protected: const common::Mesh *mesh;
     };

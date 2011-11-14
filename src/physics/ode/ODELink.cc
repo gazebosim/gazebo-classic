@@ -144,7 +144,6 @@ void ODELink::MoveCallback(dBodyID id)
   self->dirtyPose.pos -= cog_vec;
 
   self->world->dirtyPoses.push_back( self );
-  //self->SetWorldPose(self->dirtyPose,false);
 
   self->poseMutex->unlock();
 }

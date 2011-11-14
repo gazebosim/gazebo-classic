@@ -43,7 +43,7 @@ namespace gazebo
       private slots: void OnFollow();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
-
+      private slots:void OnShowCollision();
 
       private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg );
       private: void OnModel( const boost::shared_ptr<msgs::Model const> &_msg );
@@ -70,6 +70,7 @@ namespace gazebo
       private: QAction *moveToAction;
       private: QAction *deleteAction;
       private: QAction *followAction;
+      private: QAction *showCollisionAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub;

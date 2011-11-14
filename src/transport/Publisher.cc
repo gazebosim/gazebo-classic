@@ -83,8 +83,8 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message )
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  if (!this->HasConnections())
-    return;
+  //if (!this->HasConnections())
+    //return;
 
   // Save the latest message
   google::protobuf::Message *msg = _message.New();

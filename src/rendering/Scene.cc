@@ -165,6 +165,10 @@ void Scene::Load()
 {
 }
 
+VisualPtr Scene::GetWorldVisual() const
+{
+  return this->worldVisual;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the scene
@@ -176,7 +180,7 @@ void Scene::Init()
     root->destroySceneManager(this->manager);
 
   this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->worldVisual.reset( new Visual( "__world_node__", this ) );
+  this->worldVisual.reset(new Visual( "__world_node__", this));
 
   RTShaderSystem::Instance()->AddScene(this);
 
@@ -1130,19 +1134,20 @@ void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
   {
     if (!this->visuals[_msg->name()+"_laser_vis"])
     {
+      VisualPtr parentVis = this->GetVisual(_msg->parent());
       LaserVisualPtr laserVis(new LaserVisual(
-            _msg->name()+"_laser_vis", this, _msg->topic()));
+            _msg->name()+"_laser_vis", parentVis, _msg->topic()));
+      laserVis->Load();
       this->visuals[_msg->name()+"_laser_vis"] = laserVis;
     }
   }
   else if (_msg->type() == "camera" && _msg->visualize())
   {
-    VisualPtr vi = this->GetVisual(_msg->parent());
+    VisualPtr parentVis = this->GetVisual(_msg->parent());
     CameraVisualPtr cameraVis(new CameraVisual(
-          _msg->name()+"_camera_vis", this));
+          _msg->name()+"_camera_vis", parentVis));
 
     cameraVis->SetPose(msgs::Convert(_msg->pose()));
-    vi->AttachVisual(cameraVis.get());
 
     cameraVis->Load(_msg->camera().image_size().x(),
                     _msg->camera().image_size().y());
@@ -1152,7 +1157,7 @@ void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
   if (_msg->type() == "contact" && _msg->visualize() && !_msg->topic().empty())
   {
     ContactVisualPtr contactVis(new ContactVisual(
-          _msg->name()+"_contact_vis", this, _msg->topic()));
+          _msg->name()+"_contact_vis", this->worldVisual, _msg->topic()));
 
     this->visuals[contactVis->GetName()] = contactVis;
   }
@@ -1196,6 +1201,19 @@ void Scene::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg)
       this->RemoveVisual( iter->second );
     }
   }
+  else if (_msg->request() == "show_collision")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCollision(true);
+  }
+  else if (_msg->request() == "hide_collision")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->ShowCollision(false);
+  }
+
 }
 
 void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
@@ -1224,14 +1242,20 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
       iter = this->visuals.end();
 
     if (iter != this->visuals.end())
-      visual.reset( new Visual(_msg->name(), iter->second) );
+    {
+      visual.reset(new Visual(_msg->name(), iter->second));
+    }
     else 
     {
-      visual.reset( new Visual(_msg->name(), this) );
+      visual.reset(new Visual(_msg->name(), this->worldVisual));
     }
 
     visual->LoadFromMsg(_msg);
     this->visuals[_msg->name()] = visual;
+    if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+    {
+      visual->SetVisible(false);
+    }
   }
 }
 
@@ -1330,7 +1354,10 @@ void Scene::RemoveVisual( VisualPtr &_vis )
   {
     Visual_M::iterator iter = this->visuals.find( _vis->GetName() );
     if (iter != this->visuals.end())
+    {
+      iter->second->GetParent()->DetachVisual(iter->second);
       this->visuals.erase(iter);
+    }
 
     if (this->selectionObj->GetVisualName() == _vis->GetName())
       this->selectionObj->Clear();

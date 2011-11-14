@@ -28,8 +28,8 @@ using namespace gazebo;
 using namespace rendering;
 
 /// \brief Constructor
-CameraVisual::CameraVisual (const std::string &_name, Scene *_scene)
- : Visual(_name, _scene), scene(_scene)
+CameraVisual::CameraVisual (const std::string &_name, VisualPtr _vis)
+ : Visual(_name, _vis)
 {
 }
 

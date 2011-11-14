@@ -145,7 +145,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
 
     modelName = this->node->GetTopicNamespace() + "::"+ modelElem->GetValueString("name");
 
-    this->modelVisual.reset(new rendering::Visual(modelName, scene));
+    this->modelVisual.reset(new rendering::Visual(modelName,
+                            scene->GetWorldVisual()));
     this->modelVisual->Load();
     this->modelVisual->SetPose(modelPose);
 

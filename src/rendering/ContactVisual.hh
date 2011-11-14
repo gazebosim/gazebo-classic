@@ -29,7 +29,7 @@ namespace gazebo
   {
     class ContactVisual : public Visual
     {
-      public: ContactVisual(const std::string &_name, Scene *_scene,
+      public: ContactVisual(const std::string &_name, VisualPtr _vis,
                             const std::string &_topicName);
 
       public: virtual ~ContactVisual();
@@ -42,7 +42,6 @@ namespace gazebo
       private: Ogre::String BuildInstancedMaterial(
                    const Ogre::String &originalMaterialName);
 
-      private: Scene *scene;
       private: transport::NodePtr node;
       private: transport::SubscriberPtr contactsSub;
       private: boost::shared_ptr<msgs::Contacts const> contactsMsg;

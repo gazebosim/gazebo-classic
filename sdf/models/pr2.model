@@ -1,5 +1,5 @@
 <gazebo version='1.0'>
-  <model name='pr2' static='0'>
+  <model name='pr2' static='1'>
     <origin pose='0 0 0 0 -0 0'/>
     <link name='base_footprint' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0 0 0 0 -0 0'/>
@@ -84,7 +84,6 @@
         </contact>
         <plugin name='gazebo_contact' filename='libContactPlugin.so'/>
       </sensor>
-      <!--
       <sensor name='base_laser' type='ray' always_on='1' update_rate='20' visualize='true'>
         <origin pose='0.275 0 0.303 0 -0 0'/>
         <topic>~/laser_scan</topic>
@@ -96,7 +95,6 @@
         </ray>
         <plugin name='laser' filename='libRayPlugin.so'/>
       </sensor>
-      -->
     </link>
     <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.2246 0.2246 0.0792 0 -0 0'/>

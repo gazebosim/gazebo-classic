@@ -49,7 +49,7 @@ Light::Light(Scene *scene_)
 
   std::ostringstream stream;
   stream << "LIGHT" << this->lightCounter << "_VISUAL";
-  this->visual = new Visual(stream.str(), this->scene);
+  this->visual = new Visual(stream.str(), this->scene->GetWorldVisual());
 
   this->lightCounter++;
 
