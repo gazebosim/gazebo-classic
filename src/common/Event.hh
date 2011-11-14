@@ -23,6 +23,7 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "common/Time.hh"
 #include "common/CommonTypes.hh"
@@ -257,6 +258,8 @@ namespace gazebo
               }
 
       private: std::vector< boost::function<T> *> connections;
+      private: std::vector<int> connection_ids;
+      private: boost::mutex lock;
     };
 
     template<typename T>
@@ -265,14 +268,19 @@ namespace gazebo
       for (unsigned int i = 0; i < this->connections.size(); i++)
         delete this->connections[i];
       this->connections.clear();
+      this->connection_ids.clear();
     }
 
 
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
+      this->lock.lock();
+      int index = this->connections.size();
       this->connections.push_back(new boost::function<T>(_subscriber) );
-      return ConnectionPtr( new Connection(this, this->connections.size()-1) );
+      this->connection_ids.push_back(index);
+      this->lock.unlock();
+      return ConnectionPtr( new Connection(this, index) );
     }
     
     template<typename T>
@@ -286,10 +294,18 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int id)
     {
-      if (id >=0 && id < (int)this->connections.size())
+      this->lock.lock();
+      // search for index of the connection based on id
+      for(unsigned int i=0; i < this->connection_ids.size(); i++)
       {
-        this->connections.erase(this->connections.begin()+id);
+        if (id == this->connection_ids[i])
+        {
+          this->connection_ids.erase(this->connection_ids.begin()+i);
+          this->connections.erase(this->connections.begin()+i);
+          break;
+        }
       }
+      this->lock.unlock();
     }
     /// \}
   }
