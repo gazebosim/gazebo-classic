@@ -87,6 +87,8 @@ void Model::Load( sdf::ElementPtr &_sdf )
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic( this->sdf->GetValueBool("static") );
+  this->sdf->GetAttribute("static")->SetUpdateFunc(
+      boost::bind(&Entity::IsStatic, this));
 
   // TODO: check for duplicate model, and raise an error
   //BasePtr dup = Base::GetByName(this->GetScopedName());
@@ -210,10 +212,8 @@ void Model::Update()
     {
       iter->second->GetInterpolatedKeyFrame(kf);
 
-      double prev = kf.GetValue();
       iter->second->AddTime(
           (this->world->GetSimTime() - this->prevAnimationTime).Double());
-
 
       if (iter->second->GetTime() < iter->second->GetLength())
       {

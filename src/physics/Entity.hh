@@ -94,8 +94,6 @@ namespace gazebo
       /// \brief Get the pose of the entity relative to its parent
       public: math::Pose GetRelativePose() const;
   
-      public: virtual const sdf::ElementPtr &GetSDF();
-
       /// \brief Set the pose of the entity relative to its parent
       /// \param pose The new pose
       /// \param notify True = tell children of the pose change

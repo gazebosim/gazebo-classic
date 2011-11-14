@@ -464,12 +464,6 @@ void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
   }
 }
 
-const sdf::ElementPtr &Entity::GetSDF()
-{
-  this->sdf->GetElement("origin")->GetAttribute("pose")->Update();
-  return Base::GetSDF();
-}
-
 void Entity::UpdateAnimation()
 {
   common::PoseKeyFrame kf(0);

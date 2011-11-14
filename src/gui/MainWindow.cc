@@ -123,9 +123,12 @@ void MainWindow::Open()
 
 void MainWindow::Save()
 {
+  std::string filename = QFileDialog::getSaveFileName(this,
+      tr("Save World"), "/home/nkoenig", tr("SDF Files (*.xml *.sdf)")).toStdString();
+
   msgs::WorldControl msg;
   msg.set_save(true);
-  msg.set_save_filename("/tmp/gazebo.sdf");
+  msg.set_save_filename(filename);
   this->worldControlPub->Publish(msg);
 }
 

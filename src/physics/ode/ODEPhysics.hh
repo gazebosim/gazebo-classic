@@ -202,7 +202,7 @@ namespace gazebo
       private: dContactGeom *contactCollisions;
       private: int (*physicsStepFunc)(dxWorld*, dReal);
 
-      private: int indices[3];
+      private: int indices[200];
     };
   
   

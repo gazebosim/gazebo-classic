@@ -463,6 +463,11 @@ boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
     return this->AddElement(_name);
 }
 
+void Element::InsertElement(ElementPtr _elem)
+{
+  this->elements.push_back(_elem);
+}
+
 ElementPtr Element::AddElement(const std::string &_name)
 {
   ElementPtr_V::const_iterator iter;

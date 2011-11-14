@@ -33,7 +33,8 @@ Server::~Server()
 
 void Server::LoadPlugin(const std::string &_filename)
 {
-  gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename, _filename);
+  gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename,
+                                                                _filename);
   this->plugins.push_back(plugin);
 }
 
@@ -48,12 +49,11 @@ bool Server::Load(const std::string &_filename)
   this->master->Init(port);
   this->master->RunThread();
 
-
-  for (std::vector<gazebo::SystemPluginPtr>::iterator iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
+  for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
+       this->plugins.begin(); iter != this->plugins.end(); iter++)
   {
     (*iter)->Load();
   }
-
 
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);

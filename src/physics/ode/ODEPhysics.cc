@@ -731,43 +731,34 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2, 
                          dContactGeom *contactCollisions)
 {
-  //int numContacts = 10;
   int j;
   int numc = 0;
   dContact contact;
 
-  // for now, only use maxContacts if both collisionetries are trimeshes
-  // other types of collisionetries do not need too many contacts
-  /*if (collision1->GetShapeType() == Base::TRIMESH_SHAPE ||
-    collision2->GetShapeType() == Base::TRIMESH_SHAPE)
-    {
-    numContacts = this->GetMaxContacts();
-    }*/
+  // maxCollide must less than the size of this->indices. Check the header
+  int maxCollide = 4;
 
-  {
-    //tbb::spin_mutex::scoped_lock lock(this->collideMutex);
-    numc = dCollide(collision1->GetCollisionId(), collision2->GetCollisionId(), 
-        10, contactCollisions, sizeof(contactCollisions[0]) );
-  }
+  numc = dCollide(collision1->GetCollisionId(), collision2->GetCollisionId(), 
+      this->GetMaxContacts(), contactCollisions, sizeof(contactCollisions[0]));
+
   if (numc <=0)
     return;
 
-  this->indices[0] = 0;
-  this->indices[1] = 1;
-  this->indices[2] = 2;
+  for (int i=0; i < maxCollide-1; i++)
+    this->indices[i] = i;
 
-  if (numc > 3)
+  if (numc > maxCollide)
   {
     double max = 0;
-    for (int i=2; i < numc; i++)
+    for (int i=maxCollide-1; i < numc; i++)
     {
       if (contactCollisions[i].depth > max)
       {
         max = contactCollisions[i].depth;
-        this->indices[2] = i;
+        this->indices[maxCollide-1] = i;
       }
     }
-    numc = 3;
+    numc = maxCollide;
   }
 
   /*gzerr << "numContacts " << numContacts

@@ -74,12 +74,21 @@ namespace gazebo
       public: inline const math::Vector3 &GetCoG() const
               { return this->cog; }
 
+      public: inline const math::Pose GetPose() const
+              { return math::Pose(this->cog, math::Quaternion());}
   
       /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
       public: math::Vector3 GetPrincipalMoments() const;
   
       /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
       public: math::Vector3 GetProductsofInertia() const;
+
+      public: double GetIXX() const;
+      public: double GetIYY() const;
+      public: double GetIZZ() const;
+      public: double GetIXY() const;
+      public: double GetIXZ() const;
+      public: double GetIYZ() const;
   
       /// \brief Rotate this mass
       public: void Rotate(const math::Quaternion &rot);

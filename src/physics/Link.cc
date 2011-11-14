@@ -104,6 +104,8 @@ void Link::Load( sdf::ElementPtr &_sdf )
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
+  this->sdf->GetAttribute("self_collide")->SetUpdateFunc(
+      boost::bind(&Link::GetSelfCollide,this));
 
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -269,11 +271,14 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
     this->inertial->UpdateParameters( inertialElem );
   }
 
+  this->sdf->GetAttribute("gravity")->SetUpdateFunc(
+      boost::bind(&Link::GetGravityMode,this));
+  this->sdf->GetAttribute("kinematic")->SetUpdateFunc(
+      boost::bind(&Link::GetKinematic,this));
+
+
   if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
-  {
-    printf("Set gravity mode\n");
     this->SetGravityMode( this->sdf->GetValueBool("gravity") );
-  }
 
   // before loading child collsiion, we have to figure out if 
   // selfCollide is true and modify parent class Entity so this 

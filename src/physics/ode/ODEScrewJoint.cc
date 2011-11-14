@@ -69,7 +69,7 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the position of the joint
-math::Angle ODEScrewJoint::GetAngleImpl(int index) const
+math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result = dJointGetScrewPosition( this->jointId );
   
@@ -155,14 +155,14 @@ double ODEScrewJoint::GetParam( int parameter ) const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
-void ODEScrewJoint::SetMaxForce(int index, double t) 
+void ODEScrewJoint::SetMaxForce(int /*_index*/, double _t) 
 {
-  this->SetParam(dParamFMax, t);
+  this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
-double ODEScrewJoint::GetMaxForce(int index)
+double ODEScrewJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }

@@ -81,7 +81,7 @@ void ODEHingeJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-math::Vector3 ODEHingeJoint::GetGlobalAxis(int index) const
+math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
     dVector3 result;
     dJointGetHingeAxis( this->jointId, result );

@@ -630,12 +630,19 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
   if (data->has_save() && data->save())
   {
     std::string filename = data->save_filename();
-    std::string data = this->sdf->ToString("");
+    this->sdf->Update();
+    std::string data;
+    data = "<?xml version='1.0'?>\n";
+    data += "<gazebo version='1.0'>\n";
+    data += this->sdf->ToString("");
+    data += "</gazebo>\n";
+
     std::ofstream out(filename.c_str(), std::ios::out);
     if (!out)
       gzerr << "Unable to open file[" << filename << "]\n";
     else
       out << data;
+
     out.close();
   }
 }
@@ -915,12 +922,12 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   else
   {
     boost::mutex::scoped_lock lock(*this->updateMutex);
-    // Add the new models into the World
-    //gzgdb << "factorySDF [" << factorySDF->ToString() << "]\n";
     sdf::ElementPtr elem = factorySDF->root->GetElement("model");
     if (!elem) 
       elem = factorySDF->root->GetElement("world")->GetElement("model");
 
+    elem->SetParent(this->sdf);
+    elem->GetParent()->InsertElement(elem);
     ModelPtr model = this->LoadModel( elem, this->rootElement );
     if (_msg->has_pose())
       model->SetWorldPose( msgs::Convert( _msg->pose() ) );

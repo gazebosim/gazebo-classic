@@ -113,6 +113,7 @@ namespace sdf
 
     public: ElementPtr GetOrCreateElement(const std::string &_name);
     public: ElementPtr AddElement(const std::string &_name);
+    public: void InsertElement(ElementPtr _elem);
     public: void ClearElements();
 
     public: void Update();

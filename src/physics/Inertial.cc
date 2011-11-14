@@ -75,7 +75,11 @@ void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
 
   math::Vector3 center(0,0,0);
   if (this->sdf->HasElement("origin"))
+  {
     center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
+    this->sdf->GetElement("origin")->GetAttribute("pose")->SetUpdateFunc(
+        boost::bind(&Inertial::GetPose, this));
+  }
   this->SetCoG(center.x, center.y, center.z);
  
   sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia"); 
@@ -86,8 +90,23 @@ void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
       inertiaElem->GetValueDouble("ixy"),
       inertiaElem->GetValueDouble("ixz"),
       inertiaElem->GetValueDouble("iyz"));
-      
+
+  inertiaElem->GetAttribute("ixx")->SetUpdateFunc(
+      boost::bind(&Inertial::GetIXX, this));
+  inertiaElem->GetAttribute("iyy")->SetUpdateFunc(
+      boost::bind(&Inertial::GetIYY, this));
+  inertiaElem->GetAttribute("izz")->SetUpdateFunc(
+      boost::bind(&Inertial::GetIZZ, this));
+  inertiaElem->GetAttribute("ixy")->SetUpdateFunc(
+      boost::bind(&Inertial::GetIXY, this));
+  inertiaElem->GetAttribute("ixz")->SetUpdateFunc(
+      boost::bind(&Inertial::GetIXZ, this));
+  inertiaElem->GetAttribute("iyz")->SetUpdateFunc(
+      boost::bind(&Inertial::GetIYZ, this));
+
   this->SetMass( this->sdf->GetValueDouble("mass") );
+  this->sdf->GetAttribute("mass")->SetUpdateFunc(
+      boost::bind(&Inertial::GetMass, this));
 }
 
 double Inertial::GetLinearDamping()
@@ -211,3 +230,32 @@ const Inertial &Inertial::operator+=(const Inertial &_inertial )
   return *this;
 }
 
+double Inertial::GetIXX() const
+{
+  return this->principals.x;
+}
+
+double Inertial::GetIYY() const
+{
+  return this->principals.y;
+}
+
+double Inertial::GetIZZ() const
+{
+  return this->principals.z;
+}
+
+double Inertial::GetIXY() const
+{
+  return this->products.x;
+}
+
+double Inertial::GetIXZ() const
+{
+  return this->products.y;
+}
+
+double Inertial::GetIYZ() const
+{
+  return this->products.z;
+}
