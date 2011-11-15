@@ -43,7 +43,7 @@ namespace gazebo
     class ContactFeedback
     {
       public: Contact contact;
-      public: dJointFeedback feedbacks[3];
+      public: dJointFeedback feedbacks[20];
       public: int feedbackCount;
     };
 

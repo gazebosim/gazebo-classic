@@ -62,12 +62,12 @@ namespace gazebo
       public: Collision *collision1;
       public: Collision *collision2;
    
-      public: JointFeedback forces[3];
+      public: JointFeedback forces[20];
   
-      public: math::Vector3 positions[3];
-      public: math::Vector3 normals[3];
+      public: math::Vector3 positions[20];
+      public: math::Vector3 normals[20];
     
-      public: double depths[3];
+      public: double depths[20];
 
       public: int count;
   
