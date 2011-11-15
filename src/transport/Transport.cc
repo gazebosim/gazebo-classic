@@ -27,6 +27,7 @@
 using namespace gazebo;
 
 boost::thread *g_runThread = NULL;
+bool g_stopped = false;
 
 /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
 /// environment variable
@@ -87,23 +88,24 @@ void transport::run()
 
   if (trys >= limit)
     gzerr << "Unable to get topic namespaces\n";
+
 }
+
+bool transport::is_stopped()
+{
+  return g_stopped;
+}
+
 
 void transport::stop()
 {
+  g_stopped = true;
   transport::ConnectionManager::Instance()->Stop();
-
-  /*if (runThread)
-  {
-    runThread->join();
-    delete runThread;
-    runThread = NULL;
-  }
-  */
 }
 
 void transport::fini()
 {
+  g_stopped = true;
   transport::TopicManager::Instance()->Fini();
   transport::ConnectionManager::Instance()->Stop();
 

@@ -38,6 +38,8 @@ namespace gazebo
 {
   namespace transport
   {
+    extern bool is_stopped();
+
     class IOManager;
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
@@ -207,7 +209,7 @@ namespace gazebo
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
 
-                if (!e) 
+                if (!e && !transport::is_stopped()) 
                 {
                   boost::get<0>(handler)(data);
                 }

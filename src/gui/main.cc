@@ -126,5 +126,6 @@ int main(int argc, char **argv)
   gazebo::fini();
   gazebo::gui::fini();
 
+  printf("done.\n");
   return 0;
 }

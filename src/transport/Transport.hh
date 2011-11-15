@@ -48,6 +48,9 @@ namespace gazebo
     ///        a blocking call
     void run();
 
+    /// \brief Return true if the transport system is stopped
+    bool is_stopped();
+
     /// \brief Stop the transport component from running.
     void stop();
 

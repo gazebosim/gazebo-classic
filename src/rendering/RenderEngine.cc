@@ -75,7 +75,7 @@ RenderEngine::RenderEngine()
 /// Destructor
 RenderEngine::~RenderEngine()
 {
-  this->Fini();
+  //this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -258,15 +258,16 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
   {
-    //const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
+    this->root->shutdown();
+    const Ogre::Root::PluginInstanceList ll = this->root->getInstalledPlugins();
 
-    //for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); 
-    //     iter != ll.end(); iter++)
-    //{
-    //  this->root->unloadPlugin((*iter)->getName());
-    //  this->root->uninstallPlugin(*iter);
-    //}
-    // TODO: this was causing a segfault on shutdown
+    for (Ogre::Root::PluginInstanceList::const_iterator iter = ll.begin(); 
+         iter != ll.end(); iter++)
+    {
+      this->root->unloadPlugin((*iter)->getName());
+      this->root->uninstallPlugin(*iter);
+    }
+
     try
     {
       delete this->root;
