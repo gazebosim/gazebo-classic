@@ -44,28 +44,13 @@ void Node::Init(const std::string &_space)
   if (_space.empty())
   {
     std::list<std::string> namespaces;
-
-    unsigned int trys = 0;
-    unsigned int limit = 10;
-    while (namespaces.size() == 0 && trys < limit)
-    {
-      TopicManager::Instance()->GetTopicNamespaces(namespaces);
-      common::Time::MSleep(50);
-      trys++;
-    }
-
-    if (trys > limit)
-    {
-      gzerr << "Unable to get topic namespaces from Master.Node is uninitialized!\n";
-      return;
-    }
-
+    TopicManager::Instance()->GetTopicNamespaces(namespaces);
     this->topicNamespace = namespaces.front();
   }
   else
-    TopicManager::Instance()->RegisterTopicNamespace( _space );
+    TopicManager::Instance()->RegisterTopicNamespace(_space);
 
-  TopicManager::Instance()->AddNode( shared_from_this() );
+  TopicManager::Instance()->AddNode(shared_from_this());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,9 +60,9 @@ std::string Node::GetTopicNamespace() const
   return this->topicNamespace;
 }
 
-std::string Node::DecodeTopicName(const std::string &topic)
+std::string Node::DecodeTopicName(const std::string &_topic)
 {
-  std::string result = topic;
+  std::string result = _topic;
   boost::replace_first(result, "~", "/gazebo/" + this->topicNamespace);
   boost::replace_first(result, "//", "/");
   return result;
