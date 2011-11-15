@@ -147,7 +147,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
   {
     this->refVisual->SetVisible(true);
     this->yaw += drag.x * _event.moveScale * -0.1;
-    this->pitch += drag.y * _event.moveScale * -0.1;
+    this->pitch += drag.y * _event.moveScale * 0.1;
 
     this->NormalizeYaw(this->yaw);
     this->NormalizePitch(this->pitch);
@@ -192,7 +192,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     int height = this->camera->GetViewportHeight();
 
     this->Translate( math::Vector3(0.0,
-        -(drag.x / (float)width)  * this->distance * tan( fovX / 2.0 ) * 2.0, 
+         (drag.x / (float)width)  * this->distance * tan( fovX / 2.0 ) * 2.0, 
          (drag.y / (float)height) * this->distance * tan( fovY / 2.0 ) * 2.0));
   }
   else
