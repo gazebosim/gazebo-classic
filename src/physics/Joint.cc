@@ -116,16 +116,24 @@ void Joint::Load(sdf::ElementPtr &_sdf)
 void Joint::Init()
 {
   this->Attach(this->parentLink, this->childLink);
-  //this->Attach(this->childLink, this->parentLink);
 
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
+  math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
+
   // Set joint axis
   if (this->sdf->HasElement("axis"))
-    this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+  {
+    this->SetAxis(0, modelPose.rot.RotateVector(
+          this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+  }
+
   if (this->sdf->HasElement("axis2"))
-    this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+  {
+    this->SetAxis(1, modelPose.rot.RotateVector(
+          this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
+  }
 }
 
 math::Vector3 Joint::GetLocalAxis(int _index) const
