@@ -106,7 +106,6 @@ void Collision::Load( sdf::ElementPtr &_sdf )
 
     if (this->shape->HasType(BOX_SHAPE))
     {
-      std::cout << "Collision[" << this->GetCompleteScopedName() << "] Type[" << this->shape->GetType() << "]\n";
       BoxShape *box = (BoxShape*)(this->shape.get());
       geom->set_type(msgs::Geometry::BOX);
       math::Vector3 size = box->GetSize();

@@ -69,6 +69,7 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
   this->name = stream.str();
 
   this->renderTarget = NULL;
+  this->renderTexture = NULL;
 
   this->captureData = false;
 
@@ -114,6 +115,9 @@ Camera::~Camera()
   this->pitchNode = NULL;
   this->sceneNode = NULL;
 
+  if (this->renderTexture)
+    Ogre::TextureManager::getSingleton().remove(this->renderTexture->getName());
+  
   if (this->camera)
   {
     this->scene->GetManager()->destroyCamera(this->name);
