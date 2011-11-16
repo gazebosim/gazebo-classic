@@ -43,7 +43,7 @@ namespace gazebo
     class ContactFeedback
     {
       public: Contact contact;
-      public: dJointFeedback feedbacks[20];
+      public: dJointFeedback feedbacks[DETECT_CONTACT_JOINTS];
       public: int feedbackCount;
     };
 
@@ -202,7 +202,7 @@ namespace gazebo
       private: dContactGeom *contactCollisions;
       private: int (*physicsStepFunc)(dxWorld*, dReal);
 
-      private: int indices[200];
+      private: int indices[DETECT_CONTACT_JOINTS];
     };
   
   

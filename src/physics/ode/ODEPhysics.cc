@@ -364,7 +364,7 @@ void ODEPhysics::UpdateCollision()
   //  // Process all the contacts, get the feedback info, and call the collision
   //  // callbacks
   //  tbb::parallel_for( tbb::blocked_range<size_t>(0, 
-  //        this->contactFeedbacks.size(), 20), 
+  //        this->contactFeedbacks.size(), DETECT_CONTACT_JOINTS), 
   //      ContactUpdate_TBB(&this->contactFeedbacks) );
   //}
 }
@@ -724,12 +724,11 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2, 
                          dContactGeom *contactCollisions)
 {
-  int j;
   int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
-  int maxCollide = 4;
+  int maxCollide = MAX_CONTACT_JOINTS;
 
   numc = dCollide(collision1->GetCollisionId(), collision2->GetCollisionId(), 
       this->GetMaxContacts(), contactCollisions, sizeof(contactCollisions[0]));
@@ -737,7 +736,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
   if (numc <=0)
     return;
 
-  for (int i=0; i < maxCollide-1; i++)
+  for (int i=0; i < maxCollide; i++)
     this->indices[i] = i;
 
   if (numc > maxCollide)
@@ -754,12 +753,13 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
     numc = maxCollide;
   }
 
-  /*gzerr << "numContacts " << numContacts
-    << " numc " << numc
-    << " col1 " << collision1->GetName()
-    << " col2 " << collision2->GetName()
-    << "\n";
-    */
+  /*if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
+    gzerr << "maxContacts: " << this->GetMaxContacts()
+          << " numc: " << numc
+          << " max used: " << maxCollide
+          << " col1: " << collision1->GetCompleteScopedName()
+          << " col2: " << collision2->GetCompleteScopedName()
+          << "\n";*/
 
   ContactFeedback *contactFeedback = NULL;
 
@@ -774,10 +774,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
     this->contactFeedbacks.push_back(contactFeedback);
   }
 
-  double h, kp, kd;
-  dJointID c;
-
-  h = this->stepTimeDouble;
+  double h = this->stepTimeDouble;
 
   contact.surface.mode = //dContactFDir1 | 
                          dContactBounce |
@@ -790,8 +787,8 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
   // Compute the CFM and ERP by assuming the two bodies form a
   // spring-damper system.
-  kp = 1.0 / (1.0 / collision1->surface->kp + 1.0 / collision2->surface->kp);
-  kd = collision1->surface->kd + collision2->surface->kd;
+  double kp = 1.0 / (1.0 / collision1->surface->kp + 1.0 / collision2->surface->kp);
+  double kd = collision1->surface->kd + collision2->surface->kd;
   contact.surface.soft_erp = h * kp / (h * kp + kd);
   contact.surface.soft_cfm = 1.0 / (h * kp + kd);
   //contact.surface.soft_erp = 0.5*(collision1->surface->softERP +
@@ -823,7 +820,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
   dBodyID b1 = dGeomGetBody(collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(collision2->GetCollisionId());
 
-  for (j=0; j<numc; j++)
+  for (int j=0; j<numc; j++)
   {
     // A depth of <0 may never occur. Commenting this out for now.
     // skip negative depth contacts
@@ -832,7 +829,12 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
       */
 
     contact.geom = contactCollisions[this->indices[j]];
-    c = dJointCreateContact (this->worldId, this->contactGroup, &contact);
+    dJointID contact_joint = dJointCreateContact (this->worldId, this->contactGroup, &contact);
+
+    /*if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
+      gzerr << "[" << j << "]"
+            << " depth: " << contact.geom.depth
+            << "\n";*/
 
     // Store the contact info 
     if (contactFeedback)
@@ -848,10 +850,10 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
       contactFeedback->contact.count++;
       contactFeedback->feedbackCount++;
 
-      dJointSetFeedback(c, &(contactFeedback->feedbacks[j]));
+      dJointSetFeedback(contact_joint, &(contactFeedback->feedbacks[j]));
     }
 
-    dJointAttach (c, b1, b2);
+    dJointAttach (contact_joint, b1, b2);
 
     // my joints map
     LinkPtr link1 = collision1->GetLink();
