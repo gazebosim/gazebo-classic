@@ -30,8 +30,10 @@ MainWindow::MainWindow()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world( this->node->GetTopicNamespace() );
-  this->worldControlPub = this->node->Advertise<msgs::WorldControl>("~/world_control");
-
+  this->worldControlPub =
+    this->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->serverControlPub =
+    this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -118,18 +120,25 @@ void MainWindow::New()
 
 void MainWindow::Open()
 {
-  gzdbg << "MainWindow::Open file\n";
+  std::string filename = QFileDialog::getOpenFileName(this,
+      tr("Open World"), "",
+      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
+
+  msgs::ServerControl msg;
+  msg.set_open_filename(filename);
+  this->serverControlPub->Publish(msg);
 }
 
 void MainWindow::Save()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
-      tr("Save World"), "/home/nkoenig", tr("SDF Files (*.xml *.sdf)")).toStdString();
+      tr("Save World"), "/home/nkoenig",
+      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  msgs::WorldControl msg;
-  msg.set_save(true);
+  msgs::ServerControl msg;
+  msg.set_save_world_name("default");
   msg.set_save_filename(filename);
-  this->worldControlPub->Publish(msg);
+  this->serverControlPub->Publish(msg);
 }
 
 void MainWindow::About()

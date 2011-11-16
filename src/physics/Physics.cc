@@ -34,14 +34,7 @@ bool physics::load()
 
 bool physics::fini()
 {
-  for( std::vector<WorldPtr>::iterator iter = g_worlds.begin();
-       iter != g_worlds.end(); iter++)
-  {
-    (*iter)->Fini();
-    (*iter).reset();
-  }
-
-  g_worlds.clear();
+  remove_worlds();
   return true;
 }
 
@@ -128,4 +121,16 @@ void physics::pause_world(WorldPtr world, bool pause)
 void physics::stop_world(WorldPtr world)
 {
   world->Stop();
+}
+
+void physics::remove_worlds()
+{
+  for( std::vector<WorldPtr>::iterator iter = g_worlds.begin();
+      iter != g_worlds.end(); iter++)
+  {
+    (*iter)->Fini();
+    (*iter).reset();
+  }
+
+  g_worlds.clear();
 }

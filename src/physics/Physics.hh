@@ -44,6 +44,7 @@ namespace gazebo
     void run_worlds();
     void stop_worlds();
     void pause_worlds( bool pause);
+    void remove_worlds();
 
     /// \}
   }

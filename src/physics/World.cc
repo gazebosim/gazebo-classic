@@ -191,6 +191,23 @@ void World::Load( sdf::ElementPtr _sdf )
   event::Events::worldCreated(this->GetName());
 }
 
+void World::Save(const std::string &_filename)
+{
+  this->sdf->Update();
+  std::string data;
+  data = "<?xml version='1.0'?>\n";
+  data += "<gazebo version='1.0'>\n";
+  data += this->sdf->ToString("");
+  data += "</gazebo>\n";
+
+  std::ofstream out(_filename.c_str(), std::ios::out);
+  if (!out)
+    gzerr << "Unable to open file[" << _filename << "]\n";
+  else
+    out << data;
+
+  out.close();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the world
@@ -619,6 +636,8 @@ void World::SetPaused(bool p)
   this->pause = p;
 }
 
+
+
 void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 {
   if (data->has_pause())
@@ -626,25 +645,6 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 
   if (data->has_step())
     this->OnStep();
-
-  if (data->has_save() && data->save())
-  {
-    std::string filename = data->save_filename();
-    this->sdf->Update();
-    std::string data;
-    data = "<?xml version='1.0'?>\n";
-    data += "<gazebo version='1.0'>\n";
-    data += this->sdf->ToString("");
-    data += "</gazebo>\n";
-
-    std::ofstream out(filename.c_str(), std::ios::out);
-    if (!out)
-      gzerr << "Unable to open file[" << filename << "]\n";
-    else
-      out << data;
-
-    out.close();
-  }
 }
 
 void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )

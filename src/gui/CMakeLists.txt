@@ -68,22 +68,20 @@ target_link_libraries( gazebo_gui gazebo_common
                                   ${boost_libraries} 
                                   pthread)
 
-target_link_libraries( gzclient gazebo_gui)
-
-#  gazebo_common
-#                                gazebo_transport
-#                                gazebo_sdf_interface
-#                                gazebo_sdf_parser
-#                                gazebo_rendering
-#                                gazebo_sensors
-#                                gazebo_msgs
-#                                gzqtpropertybrowser 
-#                                Xpm 
-#                                ${QT_LIBRARIES} 
-#                                ${ogre_libraries} 
-#                                ${boost_libraries} 
-#                                pthread)
-#
+target_link_libraries( gzclient  gazebo_common
+                                 gazebo_transport
+                                 gazebo_sdf_interface
+                                 gazebo_sdf_parser
+                                 gazebo_rendering
+                                 gazebo_sensors
+                                 gazebo_msgs
+                                 gzqtpropertybrowser 
+                                 Xpm 
+                                 ${QT_LIBRARIES} 
+                                 ${ogre_libraries} 
+                                 ${boost_libraries} 
+                                 pthread)
+ 
 
 add_definitions(${QT_DEFINITIONS})
 

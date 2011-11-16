@@ -81,6 +81,7 @@ Entity::~Entity()
   this->poseMsg = NULL;
 
   delete this->poseMutex;
+  this->requestPub.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +93,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
   this->poseSub = this->node->Subscribe("~/pose/modify", &Entity::OnPoseMsg, this);
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
   this->visualMsg->set_name( this->GetCompleteScopedName() );
 
@@ -443,6 +445,11 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
 void Entity::Fini()
 {
+  msgs::Request *msg = msgs::CreateRequest( "entity_delete", 
+      this->GetCompleteScopedName() );
+
+  this->requestPub->Publish(*msg);
+
   this->connections.clear();
   this->parentEntity.reset();
   Base::Fini();

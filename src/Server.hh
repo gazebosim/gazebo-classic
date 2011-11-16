@@ -6,6 +6,7 @@
 
 #include <boost/thread.hpp>
 
+#include "transport/TransportTypes.hh"
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/World.hh"
@@ -31,11 +32,16 @@ namespace gazebo
 
     private: void RunLoop();
 
+    private: void OnControl(
+                 const boost::shared_ptr<msgs::ServerControl const> &_msg);
+
     private: bool stop;
 
     private: Master *master;
     private: boost::thread *masterThread;
     private: std::vector<gazebo::SystemPluginPtr> plugins;
+    private: transport::NodePtr node;
+    private: transport::SubscriberPtr serverSub;
   };
 }
 
