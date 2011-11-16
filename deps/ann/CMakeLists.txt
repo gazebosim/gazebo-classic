@@ -22,7 +22,6 @@ src/kd_tree.cpp
 src/kd_tree.h
 src/kd_util.cpp
 src/kd_util.h
-src/Makefile
 src/perf.cpp
 src/pr_queue.h
 src/pr_queue_k.h

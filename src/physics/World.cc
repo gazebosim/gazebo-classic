@@ -894,13 +894,20 @@ void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
   sdf::SDFPtr factorySDF(new sdf::SDF);
   sdf::initFile( "/sdf/gazebo.sdf", factorySDF );
 
-  if (_msg->has_sdf())
+  if (_msg->has_sdf() && !_msg->sdf().empty())
   {
     // SDF Parsing happens here
     sdf::readString( _msg->sdf(), factorySDF );
   }
-  else
+  else if (_msg->has_sdf_filename() && !_msg->sdf_filename().empty())
+  {
     sdf::readFile( _msg->sdf_filename(), factorySDF);
+  }
+  else
+  {
+    gzerr << "Unable to load sdf from factory message."
+          << "No SDF or SDF filename specified.\n";
+  }
 
   if (_msg->has_edit_name())
   {

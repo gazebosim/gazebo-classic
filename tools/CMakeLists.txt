@@ -24,3 +24,7 @@ add_executable( sdf2pov sdf2pov.cc )
 target_link_libraries(sdf2pov gazebo_common gazebo_sdf_parser)
 INSTALL_EXECUTABLE( sdf2pov )
 
+add_executable( gzfactory gzfactory.cc )
+target_link_libraries(gzfactory gazebo_common gazebo_transport)
+INSTALL_EXECUTABLE( gzfactory )
+
