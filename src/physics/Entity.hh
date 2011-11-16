@@ -206,6 +206,7 @@ namespace gazebo
       protected: transport::PublisherPtr posePub;
       protected: transport::SubscriberPtr poseSub;
       protected: transport::PublisherPtr visPub;
+      private: transport::PublisherPtr requestPub;
 
       protected: msgs::Visual *visualMsg;
       protected: msgs::Pose *poseMsg;

@@ -69,6 +69,7 @@ Base::~Base()
   this->children.clear();
   this->childrenEnd = this->children.end();
   this->sdf.reset();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

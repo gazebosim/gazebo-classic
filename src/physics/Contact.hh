@@ -29,6 +29,10 @@
 #include "math/Vector3.hh"
 #include "JointFeedback.hh"
 
+// For the sake of efficiency, use fixed size arrays for collision
+#define MAX_CONTACT_JOINTS 4
+#define DETECT_CONTACT_JOINTS 20
+
 namespace gazebo
 {
 	namespace physics
@@ -62,12 +66,12 @@ namespace gazebo
       public: Collision *collision1;
       public: Collision *collision2;
    
-      public: JointFeedback forces[20];
+      public: JointFeedback forces[DETECT_CONTACT_JOINTS];
   
-      public: math::Vector3 positions[20];
-      public: math::Vector3 normals[20];
+      public: math::Vector3 positions[DETECT_CONTACT_JOINTS];
+      public: math::Vector3 normals[DETECT_CONTACT_JOINTS];
     
-      public: double depths[20];
+      public: double depths[DETECT_CONTACT_JOINTS];
 
       public: int count;
   

@@ -72,6 +72,8 @@ namespace gazebo
       /// \param _sdf SDF parameters
       public: void Load( sdf::ElementPtr _sdf );
     
+      public: void Save(const std::string &_filename);
+
       /// \brief Initialize the world
       public: void Init();
     

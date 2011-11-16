@@ -96,6 +96,11 @@ bool Server::Load(const std::string &_filename)
     worldElem = worldElem->GetNextElement();
   }
 
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("/gazebo");
+  this->serverSub = this->node->Subscribe("/gazebo/server/control",
+                                          &Server::OnControl, this);
+
   return true;
 }
 
@@ -190,3 +195,42 @@ void Server::SetParams( const common::StrStr_M &params )
   }
 }
 
+void Server::OnControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
+{
+  printf("On Control\n");
+  if (_msg->has_save_world_name() && _msg->has_save_filename())
+  {
+    physics::WorldPtr world = physics::get_world(_msg->save_world_name());
+    world->Save(_msg->save_filename());
+  }
+  else if (_msg->has_open_filename())
+  {
+    std::cout << "Open File[" << _msg->open_filename() << "]\n";
+
+    // Load the world file
+    sdf::SDFPtr sdf(new sdf::SDF);
+    if (!sdf::init(sdf))
+    {
+      gzerr << "Unable to initialize sdf\n";
+      return;
+    }
+
+    if (!sdf::readFile(_msg->open_filename(), sdf))
+    {
+      gzerr << "Unable to read sdf file[" << _msg->open_filename() << "]\n";
+      return;
+    }
+
+    // Stop all the worlds
+    physics::stop_worlds();
+    physics::remove_worlds();
+
+    //sensors::stop();
+
+    sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+    physics::WorldPtr world = physics::create_world();
+    physics::load_world(world, worldElem);
+    physics::init_world(world);
+    physics::run_world(world);
+  }
+}

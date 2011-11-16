@@ -96,6 +96,7 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
+      private: transport::PublisherPtr serverControlPub;
       private: transport::SubscriberPtr guiSub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;

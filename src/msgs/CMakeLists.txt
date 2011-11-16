@@ -40,6 +40,7 @@ set (msgs axis.proto
           scene.proto
           selection.proto
           sensor.proto
+          server_control.proto
           shadows.proto
           spheregeom.proto
           string.proto
