@@ -59,6 +59,8 @@ namespace gazebo
               void Publish( M _message )
               { this->PublishImpl( _message); }
 
+      public: unsigned int GetOutgoingCount() const;
+
       private: void PublishImpl(const google::protobuf::Message &_message );
 
       /// \brief Get the topic name

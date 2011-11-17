@@ -31,8 +31,8 @@ add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
 add_dependencies( gazebo_sensors gazebo_rendering )
 
-add_executable(gzmaster master.cc Master.cc)
-add_executable(gzserver server.cc Server.cc Master.cc)
+add_executable(gzmaster master_main.cc Master.cc)
+add_executable(gzserver server_main.cc Server.cc Master.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport

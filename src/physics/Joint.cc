@@ -120,20 +120,44 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
-
-  // Set joint axis
-  if (this->sdf->HasElement("axis"))
+  if (this->parentLink)
   {
-    this->SetAxis(0, modelPose.rot.RotateVector(
-          this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+    math::Pose modelPose = this->parentLink->GetModel()->GetWorldPose();
+    // Set joint axis
+    if (this->sdf->HasElement("axis"))
+    {
+      this->SetAxis(0, modelPose.rot.RotateVector(
+            this->sdf->GetElement("axis")->GetValueVector3("xyz")));
+    }
+
+    if (this->sdf->HasElement("axis2"))
+    {
+      this->SetAxis(1, modelPose.rot.RotateVector(
+            this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
+    }
+  }
+  else
+  {
+    if (this->sdf->HasElement("axis"))
+    {
+      this->SetAxis(0, this->sdf->GetElement("axis")->GetValueVector3("xyz"));
+      gzwarn << "joint [" << this->GetName() << "] has a non-real parentLink ["
+             << sdf->GetElement("parent")->GetValueString("link")
+             << "], loading axis from SDF ["
+             << this->sdf->GetElement("axis")->GetValueVector3("xyz")
+             << "]\n";
+    }
+    if (this->sdf->HasElement("axis2"))
+    {
+      this->SetAxis(1, this->sdf->GetElement("axis2")->GetValueVector3("xyz"));
+      gzwarn << "joint [" << this->GetName() << "] has a non-real parentLink ["
+             << sdf->GetElement("parent")->GetValueString("link")
+             << "], loading axis2 from SDF ["
+             << this->sdf->GetElement("axis2")->GetValueVector3("xyz")
+             << "]\n";
+    }
   }
 
-  if (this->sdf->HasElement("axis2"))
-  {
-    this->SetAxis(1, modelPose.rot.RotateVector(
-          this->sdf->GetElement("axis2")->GetValueVector3("xyz")));
-  }
 }
 
 math::Vector3 Joint::GetLocalAxis(int _index) const

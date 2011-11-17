@@ -67,13 +67,6 @@ bool Publisher::HasConnections() const
            this->publications[0]->GetCallbackCount() > 0) ||
           (this->publications[1] && 
            this->publications[1]->GetCallbackCount() > 0));
-
-  /*return (!this->publications[0] || !this->publications[1]) &&
-         ((this->publications[0] && 
-           this->publications[0]->GetCallbackCount()==0) ||
-          (this->publications[1] && 
-           this->publications[1]->GetCallbackCount()==0));
-           */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +116,14 @@ void Publisher::SendMessage()
   }
 
   this->mutex->unlock();
+}
+
+unsigned int Publisher::GetOutgoingCount() const
+{
+  this->mutex->lock();
+  unsigned int c = this->messages.size();
+  this->mutex->unlock();
+  return c;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

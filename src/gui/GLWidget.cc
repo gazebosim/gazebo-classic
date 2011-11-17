@@ -80,6 +80,11 @@ GLWidget::GLWidget( QWidget *parent )
 
 GLWidget::~GLWidget()
 {
+  this->connections.clear();
+  this->node.reset();
+  this->modelPub.reset();
+  this->selectionSub.reset();
+
   this->userCamera.reset();
 }
 
