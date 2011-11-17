@@ -41,6 +41,7 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   : QWidget( parent )
 {
   this->propMutex = new boost::recursive_mutex();
+  this->fillPropertyTree = false;
 
   setMinimumWidth(280);
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -109,6 +110,8 @@ ModelListWidget::ModelListWidget( QWidget *parent )
 
   this->requestMsg = msgs::CreateRequest("entity_list");
   this->requestPub->Publish(*this->requestMsg);
+
+  QTimer::singleShot( 500, this, SLOT(Update()) );
 }
 
 ModelListWidget::~ModelListWidget()
@@ -131,13 +134,15 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     }
 
     this->propTreeBrowser->clear();
-    this->selectedModelName = _item->data(0, Qt::UserRole).toString().toStdString();
+    this->selectedModelName = 
+      _item->data(0, Qt::UserRole).toString().toStdString();
     msg.set_name( this->selectedModelName );
     msg.set_selected( true );
     this->selectionPub->Publish(msg);
 
-    this->sdfElement.reset();
-    this->Update();
+    this->requestMsg = msgs::CreateRequest("entity_info",
+                                           this->selectedModelName );
+    this->requestPub->Publish( *this->requestMsg );
   }
   else
     this->selectedModelName.clear();
@@ -145,7 +150,15 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 
 void ModelListWidget::Update()
 {
-  if (!this->selectedModelName.empty())
+  if (this->fillPropertyTree)
+  {
+    this->FillPropertyTree(this->modelMsg,NULL);
+    this->fillPropertyTree = NULL;
+  }
+
+  QTimer::singleShot( 500, this, SLOT(Update()) );
+
+  /*if (!this->selectedModelName.empty())
   {
     this->requestMsg = msgs::CreateRequest("entity_info",
                                            this->selectedModelName );
@@ -167,16 +180,16 @@ void ModelListWidget::Update()
   }
   else
   {
-    QTimer::singleShot( 500, this, SLOT(Update()) );
   }
+  */
 }
 
 void ModelListWidget::OnModel(const boost::shared_ptr<msgs::Model const> &_msg )
 {
-  this->ProcessModel(*_msg);
+  this->AddModelToList(*_msg);
 }
 
-void ModelListWidget::ProcessModel( const msgs::Model &_msg )
+void ModelListWidget::AddModelToList( const msgs::Model &_msg )
 {
   std::string name = _msg.name();
 
@@ -219,7 +232,8 @@ void ModelListWidget::ProcessModel( const msgs::Model &_msg )
   }
 }
 
-void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> &_msg )
+void ModelListWidget::OnResponse(
+    const boost::shared_ptr<msgs::Response const> &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -227,23 +241,23 @@ void ModelListWidget::OnResponse( const boost::shared_ptr<msgs::Response const> 
   msgs::Model_V modelVMsg;
   msgs::Model modelMsg;
   msgs::String stringMsg;
+
   if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
   {
     modelVMsg.ParseFromString( _msg->serialized_data() );
 
     for (int i=0; i < modelVMsg.models_size(); i++)
     {
-      this->ProcessModel( modelVMsg.models(i) );
+      this->AddModelToList( modelVMsg.models(i) );
     }
   }
-  else if (_msg->has_type() && _msg->type() == modelMsg.GetTypeName())
+  else if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
-    //printf("gazebo.msgs.Model NOT Handled\n");
-    //this->propMutex->lock();
-    //this->sdfElement.reset(new sdf::Element);
-    //sdf::initFile(_msg->sdf_description_filename(), this->sdfElement);
-    //sdf::readString( _msg->sdf(), this->sdfElement );
-    //this->propMutex->unlock();
+    this->propMutex->lock();
+    this->modelMsg.ParseFromString(_msg->serialized_data());
+    this->propTreeBrowser->clear();
+    this->fillPropertyTree = true;
+    this->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() == stringMsg.GetTypeName())
   {
@@ -364,9 +378,9 @@ void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem * /*_item*/)
   //this->selectedProperty = _item->property();
 }
 
-void ModelListWidget::OnPropertyChanged(QtProperty *_item)
+void ModelListWidget::OnPropertyChanged(QtProperty * /*_item*/)
 {
-  this->propMutex->lock();
+  /*this->propMutex->lock();
 
   if (this->fillingPropertyTree)
   {
@@ -385,7 +399,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
         (*iter)->propertyName().toStdString() );
     if (elem)
     {
-      std::cout << "PropName[" << (*iter)->propertyName().toStdString() << "] ElementName[" << elem->GetName() << "]\n";
+      std::cout << "PropName[" << (*iter)->propertyName().toStdString() 
+                << "] ElementName[" << elem->GetName() << "]\n";
       this->FillSDF( (*iter), elem, _item);
     }
   }
@@ -397,6 +412,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   this->factoryPub->Publish(msg);
 
   this->propMutex->unlock();
+  */
 }
 
 void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem, QtProperty *_changedItem)
@@ -540,11 +556,13 @@ void ModelListWidget::FillSDF(QtProperty *_item, sdf::ElementPtr &_elem, QtPrope
   for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
        iter != _elem->elements.end(); iter++)
   {
-    this->FillSDF( this->GetChildItem( _item, (*iter)->GetName()), (*iter), _changedItem );
+    this->FillSDF( 
+        this->GetChildItem(_item, (*iter)->GetName()), (*iter), _changedItem);
   }
 }
 
-QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list, const std::string &_name)
+QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
+    const std::string &_name)
 {
   for (QList<QtProperty*>::iterator iter = _list.begin(); 
       iter != _list.end(); iter++)
@@ -610,12 +628,215 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item, const std::string &
 
 
 
-void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
-                                       QtProperty *_parentItem)
+void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
+                                       QtProperty *_parent)
 {
   QtProperty *topItem = NULL;
+  QtProperty *inertialItem = NULL;
+  QtVariantProperty *item = NULL;
 
-  if (!_parentItem)
+  item = this->variantManager->addProperty(QVariant::String,
+                                           QLatin1String("name"));
+  item->setValue(_msg.name().c_str());
+  _parent->addSubProperty(item);
+
+
+  // Self-collide
+  item = this->variantManager->addProperty(QVariant::Bool,
+                                           QLatin1String("self collide"));
+  if (_msg.has_self_collide())
+    item->setValue(_msg.self_collide());
+  else
+    item->setValue(true);
+  _parent->addSubProperty(item);
+
+  // gravity
+  item = this->variantManager->addProperty(QVariant::Bool,
+                                           QLatin1String("gravity"));
+  if (_msg.has_gravity())
+    item->setValue(_msg.gravity());
+  else
+    item->setValue(true);
+  _parent->addSubProperty(item);
+
+  // kinematic
+  item = this->variantManager->addProperty(QVariant::Bool,
+                                           QLatin1String("kinematic"));
+  if (_msg.has_kinematic())
+    item->setValue(_msg.kinematic());
+  else
+    item->setValue(false);
+  _parent->addSubProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      QLatin1String("Pose"));
+  _parent->addSubProperty(topItem);
+  this->FillPoseProperty(_msg.pose(), topItem);
+
+  // Inertial
+  inertialItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      QLatin1String("Inertial"));
+  _parent->addSubProperty(inertialItem);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      QLatin1String("Pose"));
+  inertialItem->addSubProperty(topItem);
+  this->FillPoseProperty(_msg.inertial().pose(), topItem);
+
+  // Inertial::Mass
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("mass"));
+  if (_msg.inertial().has_mass())
+    item->setValue(_msg.inertial().mass());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::LinearDamping
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("linear damping"));
+  if (_msg.inertial().has_linear_damping())
+    item->setValue(_msg.inertial().linear_damping());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::AngularDamping
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("angular damping"));
+  if (_msg.inertial().has_angular_damping())
+    item->setValue(_msg.inertial().angular_damping());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::ixx
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("ixx"));
+  if (_msg.inertial().has_ixx())
+    item->setValue(_msg.inertial().ixx());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::ixy
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("ixy"));
+  if (_msg.inertial().has_ixy())
+    item->setValue(_msg.inertial().ixy());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::ixz
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("ixz"));
+  if (_msg.inertial().has_ixz())
+    item->setValue(_msg.inertial().ixz());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::iyy
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("iyy"));
+  if (_msg.inertial().has_iyy())
+    item->setValue(_msg.inertial().iyy());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::iyz
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("iyz"));
+  if (_msg.inertial().has_iyz())
+    item->setValue(_msg.inertial().iyz());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  // Inertial::izz
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           QLatin1String("izz"));
+  if (_msg.inertial().has_izz())
+    item->setValue(_msg.inertial().izz());
+  else
+    item->setValue(0.0);
+  inertialItem->addSubProperty(item);
+
+  printf("Visuals[%d]\n",_msg.visuals_size());
+  for (int i=0; i < _msg.visuals_size(); i++)
+  {
+    topItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),
+        QLatin1String("visual"));
+    _parent->addSubProperty(topItem);
+ 
+    //this->FillPropertyTree(_msg.visuals(i),topItem);
+  }
+
+  for (int i=0; i < _msg.collisions_size(); i++)
+  {
+    topItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),
+        QLatin1String("collision"));
+    _parent->addSubProperty(topItem);
+ 
+    //this->FillPropertyTree(_msg.collisions(i),topItem);
+  }
+
+  for (int i=0; i < _msg.sensors_size(); i++)
+  {
+    topItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),
+        QLatin1String("sensor"));
+    _parent->addSubProperty(topItem);
+ 
+    //this->FillPropertyTree(_msg.sensors(i),topItem);
+  }
+
+}
+
+void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
+                                       QtProperty *_parent)
+{
+  QtProperty *topItem = NULL;
+  QtVariantProperty *item = NULL;
+
+  item = this->variantManager->addProperty(QVariant::String,
+                                           QLatin1String("name"));
+  item->setValue(_msg.name().c_str());
+  this->propTreeBrowser->addProperty(item);
+
+
+  item = this->variantManager->addProperty(QVariant::Bool,
+                                           QLatin1String("static"));
+  if (_msg.has_is_static())
+    item->setValue(_msg.is_static());
+  else
+    item->setValue(false);
+  this->propTreeBrowser->addProperty(item);
+
+  topItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(),
+      QLatin1String("Pose"));
+  this->propTreeBrowser->addProperty(topItem);
+  this->FillPoseProperty(_msg.pose(), topItem);
+
+  for (int i=0; i < _msg.links_size(); i++)
+  {
+    topItem = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),
+        QLatin1String("link"));
+    this->propTreeBrowser->addProperty(topItem);
+ 
+    this->FillPropertyTree(_msg.links(i),topItem);
+  }
+
+  /*if (!_parentItem)
   {
     QList<QtProperty*> props = this->propTreeBrowser->properties();
     for (QList<QtProperty*>::iterator iter = props.begin(); 
@@ -929,7 +1150,61 @@ void ModelListWidget::FillPropertyTree(sdf::ElementPtr &_elem,
   {
     topItem->removeSubProperty(*siter);
   }
+   */
   
 }
 
+void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
+                                       QtProperty *_parent)
+{
+  QtVariantProperty *item;
+  math::Pose value;
+  value = msgs::Convert(_msg);
+  value.Round(6);
 
+  math::Vector3 rpy = value.rot.GetAsEuler();
+  rpy.Round(6);
+
+  // Add X value
+  item = this->variantManager->addProperty(QVariant::Double, "X");
+  if (_parent)
+    _parent->addSubProperty(item);
+  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
+  item->setValue(value.pos.x);
+
+  // Add Y value
+  item = this->variantManager->addProperty(QVariant::Double, "Y");
+  if (_parent)
+    _parent->addSubProperty(item);
+  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
+  item->setValue(value.pos.y);
+
+  // Add Z value
+  item = this->variantManager->addProperty( QVariant::Double, "Z");
+  if (_parent)
+    _parent->addSubProperty(item);
+
+  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
+  item->setValue(value.pos.z);
+
+  // Add Roll value
+  item = this->variantManager->addProperty( QVariant::Double, "Roll");
+  if (_parent)
+    _parent->addSubProperty(item);
+  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
+  item->setValue(RTOD(rpy.x));
+
+  // Add Pitch value
+  item = this->variantManager->addProperty( QVariant::Double, "Pitch");
+  if (_parent)
+    _parent->addSubProperty(item);
+  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
+  item->setValue(RTOD(rpy.y));
+
+  // Add Yaw value
+  item = this->variantManager->addProperty( QVariant::Double, "Yaw");
+  if (_parent)
+    _parent->addSubProperty(item);
+  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
+  item->setValue(RTOD(rpy.z));
+}

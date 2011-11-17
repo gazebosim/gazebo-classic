@@ -48,10 +48,16 @@ namespace gazebo
       private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg );
       private: void OnModel( const boost::shared_ptr<msgs::Model const> &_msg );
 
-      private: void ProcessModel( const msgs::Model &_msg );
+      private: void AddModelToList( const msgs::Model &_msg );
 
-      private: void FillPropertyTree(sdf::ElementPtr &_elem,
+      private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parentItem);
+      private: void FillPropertyTree(const msgs::Link &_msg,
+                                     QtProperty *_parentItem);
+
+
+      //private: void FillPropertyTree(sdf::ElementPtr &_elem,
+                                     //QtProperty *_parentItem);
 
       private: void FillSDF( QtProperty *_item, sdf::ElementPtr &_elem,
                              QtProperty *_changedItem );
@@ -64,6 +70,9 @@ namespace gazebo
       private: void RemoveEntity( const std::string &_name );
 
       private: QTreeWidgetItem *GetModelListItem( const std::string &_name );
+
+      private: void FillPoseProperty(const msgs::Pose &_msg,
+                                     QtProperty *_parent);
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -91,6 +100,10 @@ namespace gazebo
       private: QtProperty *selectedProperty;
 
       private: msgs::Request *requestMsg;
+
+
+      private: msgs::Model modelMsg;
+      private: bool fillPropertyTree;
     };
   }
 }
