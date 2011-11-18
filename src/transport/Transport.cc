@@ -74,21 +74,20 @@ void transport::run()
 {
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
-  std::list<std::string> namespaces;
 
+  std::list<std::string> namespaces;
   // This chunk of code just waits until we get a list of topic namespaces.
   unsigned int trys = 0;
-  unsigned int limit = 200;
+  unsigned int limit = 50;
   while (namespaces.size() == 0 && trys < limit)
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
-    common::Time::MSleep(100);
+    common::Time::MSleep(50);
     trys++;
   }
 
   if (trys >= limit)
     gzerr << "Unable to get topic namespaces\n";
-
 }
 
 bool transport::is_stopped()

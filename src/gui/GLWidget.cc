@@ -76,6 +76,7 @@ GLWidget::GLWidget( QWidget *parent )
   this->selectionSub = this->node->Subscribe("~/selection", &GLWidget::OnSelectionMsg, this);
 
   this->installEventFilter(this);
+  this->keyModifiers = 0;
 }
 
 GLWidget::~GLWidget()
@@ -269,9 +270,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         this->setCursor(Qt::SizeAllCursor);
         this->scene->GetSelectionObj()->SetHighlight( mod );
       }
-      else if (newHoverVis)
+      else if (newHoverVis && !this->selection)
       {
-        this->scene->GetSelectionObj()->SetHighlight( "" );
+        this->scene->GetSelectionObj()->SetHighlight("");
+
         if (this->hoverVis)
           this->hoverVis->SetEmissive(common::Color(0,0,0));
 
@@ -297,6 +299,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
     else
     {
+      if (this->hoverVis)
+        this->hoverVis->SetEmissive(common::Color(0,0,0));
       this->setCursor(Qt::ArrowCursor);
     }
 

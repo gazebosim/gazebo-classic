@@ -83,7 +83,7 @@ void Material::SetTextureImage(const std::string &tex)
 void Material::SetTextureImage(const std::string &_tex,
                                const std::string &_resourcePath)
 {
-  this->texImage = _resourcePath + _tex;
+  this->texImage = _resourcePath +"/"+ _tex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

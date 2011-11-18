@@ -61,7 +61,6 @@ void Material::Update(const gazebo::common::Material *_mat)
   if (!_mat->GetTextureImage().empty())
   {
     Ogre::TextureUnitState *texState = pass->createTextureUnitState();
-    texState->setTextureName( _mat->GetTextureImage() );
+    texState->setTextureName(_mat->GetTextureImage());
   }
-  
 }

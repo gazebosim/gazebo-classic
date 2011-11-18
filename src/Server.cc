@@ -101,6 +101,9 @@ bool Server::Load(const std::string &_filename)
   this->serverSub = this->node->Subscribe("/gazebo/server/control",
                                           &Server::OnControl, this);
 
+  // Run the gazebo, starts a new thread
+  gazebo::run();
+
   return true;
 }
 
@@ -137,9 +140,6 @@ void Server::Run()
 {
   if (this->stop)
     return;
-
-  // Run the gazebo, starts a new thread
-  gazebo::run();
 
   // Run each world. Each world starts a new thread
   physics::run_worlds();

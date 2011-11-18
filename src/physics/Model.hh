@@ -172,6 +172,10 @@ namespace gazebo
       private: void RotateBodyAndChildren(LinkPtr _body1, 
                    const math::Vector3 &_anchor, const math::Vector3 &_axis, 
                    double _dangle, bool _updateChildren);
+               
+      private: void SlideBodyAndChildren(LinkPtr _body1,
+                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
+                   double _dposition, bool _updateChildren);
 
       private: void GetAllChildrenBodies(std::vector<LinkPtr> &_bodies, 
                    const LinkPtr &_body);
