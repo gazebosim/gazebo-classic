@@ -278,7 +278,6 @@ void Visual::Load()
       {
         mesh = common::MeshManager::Instance()->Load(meshName);
         RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
-
       }
       else
       {
