@@ -195,6 +195,12 @@ namespace gazebo
       /// \param _msg Message to fill
       public: void FillLinkMsg( msgs::Link &_msg );
 
+      /// \brief Joints that have this Link as a parent Link
+      public: void AddChildJoint(JointPtr joint);
+
+      /// \brief Joints that have this Link as a child Link
+      public: void AddParentJoint(JointPtr joint);
+
       protected: bool isStatic;
   
       // Helper entity for separating body pose from center-of-mass pose
@@ -219,13 +225,9 @@ namespace gazebo
   
       private: std::vector<std::string> sensors;
 
-      /// \brief Joints that have this Link as a child Link
       private: std::vector< JointPtr > parentJoints;
-      public: void AddParentJoint(JointPtr joint);
 
-      /// \brief Joints that have this Link as a parent Link
       private: std::vector< JointPtr > childJoints;
-      public: void AddChildJoint(JointPtr joint);
     };
     /// \}
   }

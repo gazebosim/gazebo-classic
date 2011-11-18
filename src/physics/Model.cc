@@ -230,6 +230,11 @@ void Model::Update()
     {
       this->SetJointPositions(jointPositions);
     }
+    else
+    {
+      this->onJointAnimationComplete();
+      this->onJointAnimationComplete.clear();
+    }
     this->prevAnimationTime = this->world->GetSimTime();
   }
 
@@ -963,7 +968,8 @@ bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
 }
 
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims)
+    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    boost::function<void()> _onComplete)
 {
   this->updateMutex->lock();
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
@@ -971,6 +977,31 @@ void Model::SetJointAnimation(
   {
     this->jointAnimations[iter->first] = iter->second;
   }
+  this->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
   this->updateMutex->unlock();
+}
+
+void Model::AttachStaticModel(ModelPtr &_model, 
+                             const std::string &_linkName, math::Pose _offset)
+{
+  if (!_model->IsStatic())
+  {
+    gzerr << "AttachStaticModel requires a static model\n";
+    return;
+  }
+  //LinkPtr link = this->GetLink(_linkName);
+  //link->AttachStaticModel(_model, _offset);
+
+  this->attachedModels.push_back(_model);
+  this->attachedModelsOffset.push_back(_offset);
+}
+
+void Model::OnPoseChange()
+{
+  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  {
+    math::Pose p = this->GetLink("r_gripper_l_finger_link")->GetWorldPose();
+    this->attachedModels[i]->SetWorldPose(p);
+  }
 }
