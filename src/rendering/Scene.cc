@@ -615,6 +615,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
       {
+        if (i+2 >= static_cast<int>(index_count)) break; // when indices size is not divisible by 3
         // check for a hit against this triangle
         std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, 
             vertices[indices[i]], 
