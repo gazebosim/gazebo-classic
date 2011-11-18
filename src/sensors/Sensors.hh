@@ -47,6 +47,9 @@ namespace gazebo
 
     bool init();
     bool fini();
+
+    // \brief Remove all sensors.
+    bool remove_sensors();
     /// \}
   }
 }

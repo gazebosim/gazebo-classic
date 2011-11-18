@@ -197,7 +197,6 @@ void Server::SetParams( const common::StrStr_M &params )
 
 void Server::OnControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
 {
-  printf("On Control\n");
   if (_msg->has_save_world_name() && _msg->has_save_filename())
   {
     physics::WorldPtr world = physics::get_world(_msg->save_world_name());
@@ -205,8 +204,6 @@ void Server::OnControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
   }
   else if (_msg->has_open_filename())
   {
-    std::cout << "Open File[" << _msg->open_filename() << "]\n";
-
     // Load the world file
     sdf::SDFPtr sdf(new sdf::SDF);
     if (!sdf::init(sdf))
@@ -223,14 +220,19 @@ void Server::OnControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
 
     // Stop all the worlds
     physics::stop_worlds();
+
     physics::remove_worlds();
 
-    //sensors::stop();
+    sensors::remove_sensors();
 
     sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+
     physics::WorldPtr world = physics::create_world();
+
     physics::load_world(world, worldElem);
+
     physics::init_world(world);
+
     physics::run_world(world);
   }
 }

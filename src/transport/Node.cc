@@ -32,6 +32,7 @@ Node::Node()
 
 Node::~Node()
 {
+  this->publishers.clear();
   delete this->publisherMutex;
   this->publisherMutex = NULL;
   TopicManager::Instance()->RemoveNode( this->id );

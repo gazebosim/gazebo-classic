@@ -203,8 +203,8 @@ namespace gazebo
       private: math::Pose worldPose;
 
       protected: transport::NodePtr node;
-      protected: transport::PublisherPtr posePub;
-      protected: transport::SubscriberPtr poseSub;
+      private: transport::PublisherPtr posePub;
+      private: transport::SubscriberPtr poseSub;
       protected: transport::PublisherPtr visPub;
       private: transport::PublisherPtr requestPub;
 

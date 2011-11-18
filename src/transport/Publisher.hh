@@ -52,16 +52,18 @@ namespace gazebo
       public: void SetPublication(PublicationPtr &_publication, int _i);
 
       /// \brief Publish a message on the topic
-      public: void Publish( const google::protobuf::Message &_message )
-              { this->PublishImpl(_message); }
+      public: void Publish( const google::protobuf::Message &_message,
+                 bool _block = false)
+              { this->PublishImpl(_message, _block); }
 
       public: template< typename M>
-              void Publish( M _message )
-              { this->PublishImpl( _message); }
+              void Publish(M _message, bool _block=false)
+              { this->PublishImpl(_message, _block); }
 
       public: unsigned int GetOutgoingCount() const;
 
-      private: void PublishImpl(const google::protobuf::Message &_message );
+      private: void PublishImpl(const google::protobuf::Message &_message,
+                                bool _block);
 
       /// \brief Get the topic name
       public: std::string GetTopic() const;

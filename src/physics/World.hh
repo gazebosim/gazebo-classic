@@ -271,6 +271,7 @@ namespace gazebo
       public: std::list< Entity* > dirtyPoses;
 
       private: boost::mutex *receiveMutex;
+      private: bool initialized;
     };
 
     /// \}

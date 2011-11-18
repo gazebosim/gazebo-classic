@@ -90,3 +90,9 @@ void sensors::stop()
   sensors::SensorManager::Instance()->Stop();
 }
 
+bool sensors::remove_sensors()
+{
+  sensors::SensorManager::Instance()->RemoveSensors();
+  return true;
+}
+

@@ -29,8 +29,6 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
-#include "sensors/SensorFactory.hh"
-#include "sensors/Sensor.hh"
 #include "sensors/SensorManager.hh"
 
 #include "physics/Model.hh"
@@ -146,7 +144,9 @@ void Link::Load( sdf::ElementPtr &_sdf )
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      this->LoadSensor(sensorElem);
+      std::string sensorName = sensors::SensorManager::Instance()->LoadSensor(
+          sensorElem, this->GetCompleteScopedName());
+      this->sensors.push_back(sensorName);
       sensorElem = sensorElem->GetNextElement(); 
     }
   }
@@ -235,14 +235,6 @@ void Link::Init()
       this->cgVisuals.push_back( g_msg.header().str_id() );
     }
   }*/
-
-  sensors::Sensor_V::iterator siter;
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-  {
-    //(*siter)->Init();
-    //(*siter)->SetParent( this->GetCompleteScopedName() );
-    sensors::SensorManager::Instance()->AddSensor(*siter);
-  }
 
   this->enabled = true;
 
@@ -386,24 +378,6 @@ void Link::Update()
    }*/
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a new sensor helper function
-void Link::LoadSensor( sdf::ElementPtr &_sdf )
-{
-  std::string type = _sdf->GetValueString("type");
-  sensors::SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
-  if (!sensor)
-  {
-    gzerr << "Unable to create sensor of type[" << type << "]\n";
-    return;
-  }
-
-  sensor->Load(_sdf);
-  sensor->SetParent( this->GetCompleteScopedName() );
-  this->sensors.push_back(sensor);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Load a new collision helper function
 void Link::LoadCollision( sdf::ElementPtr &_sdf )
 {
@@ -570,10 +544,10 @@ unsigned int Link::GetSensorCount() const
 }
 
 //////////////////////////////////////////////////
-sensors::SensorPtr Link::GetSensor(unsigned int _i) const
+std::string Link::GetSensorName(unsigned int _i) const
 {
   if (_i < this->sensors.size())
     return this->sensors[_i];
 
-  return sensors::SensorPtr();
+  return std::string();
 }

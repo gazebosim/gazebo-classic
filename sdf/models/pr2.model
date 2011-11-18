@@ -1,5 +1,5 @@
 <gazebo version='1.0'>
-  <model name='pr2' static='0'>
+  <model name='pr2' static='1'>
     <origin pose='0 0 0 0 -0 0'/>
     <link name='base_footprint' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0 0 0 0 -0 0'/>
@@ -48,7 +48,6 @@
         <geometry>
           <box size='0.05 0.37 0.3'/>
         </geometry>
-        <material script='PR2/Black'/>
       </visual>
       <collision name='base_footprint_geom_base_link' laser_retro='0'>
         <origin pose='0 0 0.051 0 -0 0'/>
@@ -122,7 +121,6 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='bl_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -218,7 +216,6 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='br_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -315,7 +312,6 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='fl_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -412,7 +408,6 @@
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/caster_texture'/>
       </visual>
     </link>
     <link name='fr_caster_l_wheel_link' gravity='1' self_collide='0' kinematic='0'>
@@ -603,7 +598,6 @@
         </geometry>
         <material script='Gazebo/Grey'/>
       </visual>
-      <!--
       <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='0' update_rate='25' visualize='true'>
         <origin pose='0.0232 0.06 0.098 0 -0 0'/>
         <camera>
@@ -612,7 +606,6 @@
           <clip near='0.10000000000000001' far='100'/>
         </camera>
       </sensor>
-      -->
     </link>
     <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0.188 0.790675 0 -0 0'/>
@@ -802,7 +795,6 @@
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks'/>
       </visual>
       <collision name='l_forearm_roll_link_geom_l_forearm_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -891,7 +883,6 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks'/>
       </visual>
       <collision name='l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>
@@ -1384,7 +1375,6 @@
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
         </geometry>
-        <material script='PR2/RollLinks'/>
       </visual>
       <collision name='r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link' laser_retro='0'>
         <origin pose='0 0 0 0 -0 0'/>

@@ -81,7 +81,11 @@ Entity::~Entity()
   this->poseMsg = NULL;
 
   delete this->poseMutex;
+  this->node.reset();
+  this->posePub.reset();
+  this->visPub.reset();
   this->requestPub.reset();
+  this->poseSub.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +95,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
   this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
+
   this->poseSub = this->node->Subscribe("~/pose/modify", &Entity::OnPoseMsg, this);
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
@@ -200,7 +205,7 @@ void Entity::PublishPose()
     if (relativePose != msgs::Convert(*this->poseMsg))
     {
       msgs::Set( this->poseMsg, this->worldPose);
-      this->posePub->Publish( *this->poseMsg);
+      this->posePub->Publish(*this->poseMsg);
     }
   }
 }
@@ -448,7 +453,7 @@ void Entity::Fini()
   msgs::Request *msg = msgs::CreateRequest( "entity_delete", 
       this->GetCompleteScopedName() );
 
-  this->requestPub->Publish(*msg);
+  this->requestPub->Publish(*msg, true);
 
   this->connections.clear();
   this->parentEntity.reset();

@@ -21,36 +21,34 @@
  */
 #include "rendering/RenderEngine.hh"
 #include "sensors/Sensor.hh"
+#include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 SensorManager::SensorManager()
-  : stop(false), runThread(NULL)
+  : stop(false), runThread(NULL), mutex(new boost::recursive_mutex())
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 SensorManager::~SensorManager()
 {
+  delete this->mutex;
   this->sensors.clear();
-  this->init_sensors.clear();
+  this->initSensors.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Run the sensor manager update in a new thread
+//////////////////////////////////////////////////
 void SensorManager::Run()
 {
   this->runThread = new boost::thread( 
       boost::bind(&SensorManager::RunLoop, this));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Stop the run thread
+//////////////////////////////////////////////////
 void SensorManager::Stop()
 {
   this->stop = true;
@@ -62,27 +60,28 @@ void SensorManager::Stop()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update loop
+//////////////////////////////////////////////////
 void SensorManager::RunLoop()
 {
   while (!this->stop)
     this->Update();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Update all the sensors
+//////////////////////////////////////////////////
 void SensorManager::Update(bool force)
 {
   std::list<SensorPtr>::iterator iter;
-  std::list<SensorPtr>::iterator end = this->init_sensors.end(); // in case things are spawn, sensors length changes
-  for (iter = this->init_sensors.begin(); iter != end; iter++)
+
+  this->mutex->lock();
+  // in case things are spawn, sensors length changes
+  std::list<SensorPtr>::iterator end = this->initSensors.end();
+  for (iter = this->initSensors.begin(); iter != end; iter++)
   {
-    //gzerr << "SensorManager Init [" << (*iter)->GetName() << "]\n";
     (*iter)->Init();
     this->sensors.push_back((*iter));
   }
-  this->init_sensors.clear();
+  this->initSensors.clear();
+  this->mutex->unlock();
 
   event::Events::preRender();
 
@@ -91,49 +90,99 @@ void SensorManager::Update(bool force)
 
   event::Events::postRender();
 
-  end = this->sensors.end(); // in case things are spawn, sensors length changes
+  this->mutex->lock();
+  // in case things are spawn, sensors length changes
+  end = this->sensors.end();
   for (iter = this->sensors.begin(); iter != end; iter++)
   {
     (*iter)->Update(force);
   }
+  this->mutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Init all the sensors
+//////////////////////////////////////////////////
 void SensorManager::Init()
 {
+  this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Init();
+  this->mutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Finalize all the sensors
+//////////////////////////////////////////////////
 void SensorManager::Fini()
 {
+  this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Fini();
+  this->mutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a sensor
-void SensorManager::AddSensor(SensorPtr sensor)
+//////////////////////////////////////////////////
+std::string SensorManager::LoadSensor(sdf::ElementPtr _elem,
+                                      const std::string &_parentName)
 {
-  this->init_sensors.push_back(sensor);
+  std::string type = _elem->GetValueString("type");
+  SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
+
+  if (!sensor)
+  {
+    gzerr << "Unable to create sensor of type[" << type << "]\n";
+    return std::string();
+  }
+
+  sensor->Load(_elem);
+  sensor->SetParent(_parentName);
+
+  this->mutex->lock();
+  this->initSensors.push_back(sensor);
+  this->mutex->unlock();
+
+  return sensor->GetName();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Remove a sensor
-void SensorManager::RemoveSensor(SensorPtr sensor)
+//////////////////////////////////////////////////
+SensorPtr SensorManager::GetSensor(const std::string &_name)
 {
+  SensorPtr result;
+
+  this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
-    if ((*iter)->GetName() == sensor->GetName())
+    if ((*iter)->GetName() == _name)
+      result = (*iter);
+  this->mutex->unlock();
+
+ return result; 
+}
+
+//////////////////////////////////////////////////
+void SensorManager::RemoveSensor(const std::string &_name)
+{
+  this->mutex->lock();
+  std::list<SensorPtr>::iterator iter;
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+    if ((*iter)->GetName() == _name)
       break;
 
   if (iter != this->sensors.end())
   {
     this->sensors.erase(iter);
   }
+  this->mutex->unlock();
+}
+
+//////////////////////////////////////////////////
+void SensorManager::RemoveSensors()
+{
+  this->mutex->lock();
+  std::list<SensorPtr>::iterator iter;
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+    (*iter)->Fini();
+
+  this->sensors.clear();
+  this->initSensors.clear();
+  this->mutex->unlock();
 }
