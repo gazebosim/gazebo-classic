@@ -442,7 +442,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
           if (imageXml && imageXml->FirstChildElement("init_from"))
           {
             std::string imgFile = imageXml->FirstChildElement("init_from")->GetText();
-            _mat->SetTextureImage(imgFile );
+            _mat->SetTextureImage(imgFile, this->path);
           }
         }
       }

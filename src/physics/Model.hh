@@ -169,6 +169,11 @@ namespace gazebo
       public: void SetJointAnimation(
                   const std::map<std::string, common::NumericAnimationPtr> anims);
 
+      private: void SlideBodyAndChildren(LinkPtr _body1, 
+                   const math::Vector3 &_anchor, const math::Vector3 &_axis, 
+                   double _dangle, bool _updateChildren);
+
+
       private: void RotateBodyAndChildren(LinkPtr _body1, 
                    const math::Vector3 &_anchor, const math::Vector3 &_axis, 
                    double _dangle, bool _updateChildren);

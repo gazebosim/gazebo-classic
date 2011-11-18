@@ -783,11 +783,26 @@ void Model::SetJointPositions(
             }
           case Base::SLIDER_JOINT: 
             {
-              //double dposition = jiter->second - 
-              //                   joint->GetAngle(0).GetAsRadian();
-              //slideBodyAndChildren(childLink, joint->GetAnchor(0), 
-              //                     joint->GetAxis(0), dposition, true);
-              //joint->SetAngle(0, jiter->second);
+              double dposition = jiter->second - 
+                                joint->GetAngle(0).GetAsRadian();
+              math::Pose worldPose = childLink->GetWorldPose();
+
+              math::Vector3 anchor;
+              math::Vector3 axis;
+
+              if (this->IsStatic())
+              {
+                axis = worldPose.rot.RotateVector(joint->GetLocalAxis(0));
+                anchor = childLink->GetWorldPose().pos;
+              }
+              else
+              {
+                anchor = joint->GetAnchor(0);
+                axis = joint->GetGlobalAxis(0);
+              }
+
+              this->SlideBodyAndChildren(childLink, anchor,
+                                         axis, dposition, true);
               break;
             }
           default: 
@@ -806,6 +821,41 @@ void Model::SetJointPositions(
     JointPtr joint = this->GetJoint(jiter->first);
     joint->SetAngle(0, jiter->second);
   } 
+}
+
+void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor, 
+    const math::Vector3 &_axis, double _dposition, bool _updateChildren)
+{
+  math::Pose worldPose = _body1->GetWorldPose();
+  math::Pose relativePose(worldPose.pos - _anchor, worldPose.rot);
+
+  // slide relative pose by dposition along axis
+  math::Pose newRelativePose;
+  newRelativePose.pos = relativePose.pos + _axis * _dposition;
+  newRelativePose.rot = relativePose.rot;
+  math::Pose newWorldPose(newRelativePose.pos + _anchor, 
+                          newRelativePose.rot);
+
+  _body1->SetWorldPose(newWorldPose);
+  // std::cout << "      body[" << _body1->GetName()
+  //           << "] wp[" << worldPose
+  //           << "] anchor[" << anchor
+  //           << "] axis[" << axis
+  //           << "] dposition [" << dposition
+  //           << "]\n";
+  // recurse through children bodies
+  if (_updateChildren) 
+  {
+    std::vector<LinkPtr> bodies;
+    this->GetAllChildrenBodies(bodies, _body1);
+
+    for (std::vector<LinkPtr>::iterator biter = bodies.begin(); 
+        biter != bodies.end(); biter++)
+    {
+      this->SlideBodyAndChildren((*biter), _anchor, _axis, _dposition, false);
+    }
+  }
+
 }
 
 void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor, 
