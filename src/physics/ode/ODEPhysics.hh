@@ -43,7 +43,7 @@ namespace gazebo
     class ContactFeedback
     {
       public: Contact contact;
-      public: dJointFeedback feedbacks[DETECT_CONTACT_JOINTS];
+      public: dJointFeedback feedbacks[MAX_CONTACT_JOINTS];
       public: int feedbackCount;
     };
 
@@ -199,10 +199,10 @@ namespace gazebo
     
       private: tbb::spin_mutex collideMutex;
 
-      private: dContactGeom *contactCollisions;
+      private: dContactGeom contactCollisions[MAX_DCOLLIDE_RETURNS];
       private: int (*physicsStepFunc)(dxWorld*, dReal);
 
-      private: int indices[DETECT_CONTACT_JOINTS];
+      private: int indices[MAX_CONTACT_JOINTS];
     };
   
   

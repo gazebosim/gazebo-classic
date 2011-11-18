@@ -30,11 +30,11 @@
 #include "JointFeedback.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
-// ideally, MAX_CONTACT_JOINTS of 4 should work, but in practice
-// collision is not as stable, hence 10 is used for now.
-// Need to investigate further.
-#define MAX_CONTACT_JOINTS 10
-#define DETECT_CONTACT_JOINTS 20
+// MAX_DCOLLIDE_RETURNS limits contact detection, needs to be large
+//                      for proper contact dynamics.
+// MAX_CONTACT_JOINTS truncates <max_contacts> specified in SDF
+#define MAX_DCOLLIDE_RETURNS 250
+#define MAX_CONTACT_JOINTS 20
 
 namespace gazebo
 {
@@ -69,12 +69,12 @@ namespace gazebo
       public: Collision *collision1;
       public: Collision *collision2;
    
-      public: JointFeedback forces[DETECT_CONTACT_JOINTS];
+      public: JointFeedback forces[MAX_CONTACT_JOINTS];
   
-      public: math::Vector3 positions[DETECT_CONTACT_JOINTS];
-      public: math::Vector3 normals[DETECT_CONTACT_JOINTS];
+      public: math::Vector3 positions[MAX_CONTACT_JOINTS];
+      public: math::Vector3 normals[MAX_CONTACT_JOINTS];
     
-      public: double depths[DETECT_CONTACT_JOINTS];
+      public: double depths[MAX_CONTACT_JOINTS];
 
       public: int count;
   

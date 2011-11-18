@@ -94,7 +94,7 @@ class Colliders_TBB
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
-    dContactGeom *contactCollisions = new dContactGeom[this->engine->GetMaxContacts()];
+    dContactGeom *contactCollisions = new dContactGeom[MAX_DCOLLIDE_RETURNS];
 
     for (size_t i=r.begin(); i != r.end(); i++)
     {
@@ -115,7 +115,7 @@ class Colliders_TBB
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-  this->contactCollisions = NULL;
+  //this->contactCollisions = NULL;
 
   // Collision detection init
   dInitODE2(0);
@@ -155,7 +155,7 @@ ODEPhysics::~ODEPhysics()
   this->spaceId = NULL;
   this->worldId = NULL;
 
-  delete [] this->contactCollisions;
+  //delete [] this->contactCollisions;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
   this->stepType = odeElem->GetElement("solver")->GetValueString("type");
 
-  this->contactCollisions = new dContactGeom[this->GetMaxContacts()];
+  //this->contactCollisions = new dContactGeom[MAX_CONTACT_JOINTS];
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, 
@@ -364,7 +364,7 @@ void ODEPhysics::UpdateCollision()
   //  // Process all the contacts, get the feedback info, and call the collision
   //  // callbacks
   //  tbb::parallel_for( tbb::blocked_range<size_t>(0, 
-  //        this->contactFeedbacks.size(), DETECT_CONTACT_JOINTS), 
+  //        this->contactFeedbacks.size(), MAX_CONTACT_JOINTS), 
   //      ContactUpdate_TBB(&this->contactFeedbacks) );
   //}
 }
@@ -534,11 +534,9 @@ void ODEPhysics::SetContactSurfaceLayer(double _depth)
 void ODEPhysics::SetMaxContacts(unsigned int _maxContacts)
 {
   this->sdf->GetElement("ode")->GetOrCreateElement("max_contacts")->GetValue()->Set(_maxContacts);
-
-  if (this->contactCollisions)
-    delete this->contactCollisions;
-  
-  this->contactCollisions = new dContactGeom[_maxContacts];
+  //if (this->contactCollisions)
+  //  delete this->contactCollisions;
+  //this->contactCollisions = new dContactGeom[_maxContacts];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -729,23 +727,47 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
   // maxCollide must less than the size of this->indices. Check the header
   int maxCollide = MAX_CONTACT_JOINTS;
+  if (this->GetMaxContacts() < MAX_CONTACT_JOINTS)
+    maxCollide = this->GetMaxContacts();
 
   numc = dCollide(collision1->GetCollisionId(), collision2->GetCollisionId(), 
-      this->GetMaxContacts(), contactCollisions, sizeof(contactCollisions[0]));
+      MAX_DCOLLIDE_RETURNS, contactCollisions, sizeof(contactCollisions[0]));
 
   if (numc <=0)
     return;
 
-  for (int i=0; i < maxCollide; i++)
+  for (int i=0; i < MAX_CONTACT_JOINTS; i++)
     this->indices[i] = i;
 
+  /*if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
+    for (int i=0; i < numc; i++)
+      gzerr << "   all   [" << i
+            << "] depth [" << contactCollisions[i].depth
+            << "] pos [" << contactCollisions[i].pos[0]
+            << ", "      << contactCollisions[i].pos[1]
+            << ", "      << contactCollisions[i].pos[2]
+            << "] norm [" << contactCollisions[i].normal[0]
+            << ", "       << contactCollisions[i].normal[1]
+            << ", "       << contactCollisions[i].normal[2]
+            << "] current i_max [" << this->indices[maxCollide-1]
+            << "]\n";*/
   if (numc > maxCollide)
   {
     double max = contactCollisions[maxCollide-1].depth;
     for (int i=maxCollide; i < numc; i++)
     {
-      if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
-        gzerr << "depths " << contactCollisions[i].depth << " " << max << "\n";
+      /*if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
+        gzerr << "       i [" << i
+              << "] depth [" << contactCollisions[i].depth
+              << "] pos [" << contactCollisions[i].pos[0]
+              << ", "      << contactCollisions[i].pos[1]
+              << ", "      << contactCollisions[i].pos[2]
+              << "] norm [" << contactCollisions[i].normal[0]
+              << ", "       << contactCollisions[i].normal[1]
+              << ", "       << contactCollisions[i].normal[2]
+              << "] current i_max [" << this->indices[maxCollide-1]
+              << "] depth [" << max
+              << "]\n";*/
       if (contactCollisions[i].depth > max)
       {
         max = contactCollisions[i].depth;
@@ -754,6 +776,18 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
     }
     numc = maxCollide;
   }
+
+  /*if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
+    for (int i=0; i < numc; i++)
+      gzerr << "max      [" << this->indices[i]
+            << "] depth [" << contactCollisions[this->indices[i]].depth
+            << "] pos [" << contactCollisions[this->indices[i]].pos[0]
+            << ", "      << contactCollisions[this->indices[i]].pos[1]
+            << ", "      << contactCollisions[this->indices[i]].pos[2]
+            << "] norm [" << contactCollisions[this->indices[i]].normal[0]
+            << ", "       << contactCollisions[this->indices[i]].normal[1]
+            << ", "       << contactCollisions[this->indices[i]].normal[2]
+            << "]\n";*/
 
   /*if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
     gzerr << "maxContacts: " << this->GetMaxContacts()
