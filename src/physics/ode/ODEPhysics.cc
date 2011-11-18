@@ -741,9 +741,11 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
   if (numc > maxCollide)
   {
-    double max = 0;
-    for (int i=maxCollide-1; i < numc; i++)
+    double max = contactCollisions[maxCollide-1].depth;
+    for (int i=maxCollide; i < numc; i++)
     {
+      if (collision1->GetCompleteScopedName() == "default::sushi1_3::sushi1::sushi1_geom")
+        gzerr << "depths " << contactCollisions[i].depth << " " << max << "\n";
       if (contactCollisions[i].depth > max)
       {
         max = contactCollisions[i].depth;
@@ -824,9 +826,11 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
   {
     // A depth of <0 may never occur. Commenting this out for now.
     // skip negative depth contacts
-    /*if(contactCollisions[this->indices[j]].depth < 0)
+    if(contactCollisions[this->indices[j]].depth < 0)
+    {
+      gzerr << "negative depth [" << contactCollisions[this->indices[j]].depth << "]\n";
       continue;
-      */
+    }
 
     contact.geom = contactCollisions[this->indices[j]];
     dJointID contact_joint = dJointCreateContact (this->worldId, this->contactGroup, &contact);

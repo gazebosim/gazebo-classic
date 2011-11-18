@@ -30,7 +30,10 @@
 #include "JointFeedback.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
-#define MAX_CONTACT_JOINTS 4
+// ideally, MAX_CONTACT_JOINTS of 4 should work, but in practice
+// collision is not as stable, hence 10 is used for now.
+// Need to investigate further.
+#define MAX_CONTACT_JOINTS 10
 #define DETECT_CONTACT_JOINTS 20
 
 namespace gazebo
