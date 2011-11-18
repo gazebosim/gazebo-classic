@@ -348,6 +348,19 @@ void RenderEngine::LoadPlugins()
 
 }
 
+void RenderEngine::AddResourcePath(const std::string &_path)
+{
+  try
+  {
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+        _path, "FileSystem", "General");
+  }
+  catch (Ogre::Exception)
+  {
+    gzthrow("Unable to load Ogre Resources.\nMake sure the resources path in the world file is set correctly.");
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Setup resources
 void RenderEngine::SetupResources()
@@ -366,19 +379,19 @@ void RenderEngine::SetupResources()
     }
     closedir(dir);
 
-    archNames.push_back(std::make_pair( (*iter)+"/", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/rtshaderlib", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/materials/programs", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/materials/scripts", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/materials/textures", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/models", "General") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/looknfeel", "LookNFeel") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/schemes", "Schemes") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/imagesets", "Imagesets") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/fonts", "Fonts") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/layouts", "Layouts") );
-    archNames.push_back(std::make_pair( (*iter)+"/Media/gui/animations", "Animations") );
+    archNames.push_back(std::make_pair((*iter)+"/", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/rtshaderlib", "General") );
+    archNames.push_back(std::make_pair((*iter)+"/Media/materials/programs", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/materials/scripts", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/materials/textures", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/models", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/gui/looknfeel", "LookNFeel"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/gui/schemes", "Schemes"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/gui/imagesets", "Imagesets"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/gui/fonts", "Fonts"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/gui/layouts", "Layouts"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/gui/animations", "Animations"));
 
     for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {

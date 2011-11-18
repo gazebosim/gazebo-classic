@@ -44,6 +44,16 @@ Mesh::~Mesh()
   this->submeshes.clear();
 }
 
+void Mesh::SetPath(const std::string &_path)
+{
+  this->path = _path;
+}
+
+std::string Mesh::GetPath() const
+{
+  return this->path;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of this mesh
 void Mesh::SetName(const std::string &n)

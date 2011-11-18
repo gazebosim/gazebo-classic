@@ -159,18 +159,18 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
       sdf::ElementPtr elem = geomElem->AddElement("box");
       elem->GetAttribute("size")->Set(
-          msgs::Convert( _msg->geometry().box().size()) );
+          msgs::Convert(_msg->geometry().box().size()));
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
       sdf::ElementPtr elem = geomElem->AddElement("sphere");
-      elem->GetAttribute("radius")->Set( _msg->geometry().sphere().radius() );
+      elem->GetAttribute("radius")->Set(_msg->geometry().sphere().radius());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
       sdf::ElementPtr elem = geomElem->AddElement("cylinder");
-      elem->GetAttribute("radius")->Set( _msg->geometry().cylinder().radius() );
-      elem->GetAttribute("length")->Set( _msg->geometry().cylinder().length() );
+      elem->GetAttribute("radius")->Set(_msg->geometry().cylinder().radius());
+      elem->GetAttribute("length")->Set(_msg->geometry().cylinder().length());
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
@@ -239,7 +239,6 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   this->Load();
   this->UpdateFromMsg(_msg);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,15 +273,20 @@ void Visual::Load()
       // Create the visual
       stream << "VISUAL_" << this->sceneNode->getName();
 
+      const common::Mesh *mesh;
       if (!common::MeshManager::Instance()->HasMesh(meshName))
       {
-        common::MeshManager::Instance()->Load(meshName);
+        mesh = common::MeshManager::Instance()->Load(meshName);
+        RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+
       }
-      // dae paths are added to GazeboPaths via SystemConfig, setup resources
-      gazebo::rendering::RenderEngine::Instance()->SetupResources();
+      else
+      {
+        mesh = common::MeshManager::Instance()->GetMesh(meshName);
+      }
 
       // Add the mesh into OGRE
-      this->InsertMesh( common::MeshManager::Instance()->GetMesh(meshName) );
+      this->InsertMesh(mesh);
 
       Ogre::SceneManager *mgr = this->sceneNode->getCreator();
       if (mgr->hasEntity(stream.str()))

@@ -80,6 +80,7 @@ Mesh *ColladaLoader::Load( const std::string &_filename )
   }
 
   Mesh *mesh = new Mesh();
+  mesh->SetPath(this->path);
   this->LoadScene(mesh);
 
   return mesh;
@@ -670,7 +671,7 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 
 void ColladaLoader::LoadTransparent( TiXmlElement *_elem, Material * /*_mat*/ )
 {
-  const char *opaque = _elem->Attribute("opaque");
+  //const char *opaque = _elem->Attribute("opaque");
   /*if (!opaque)
     gzerr << "No Opaque set\n";
     */
