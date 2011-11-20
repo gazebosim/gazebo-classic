@@ -175,6 +175,9 @@ namespace gazebo
       public: void GetNearestEntityBelow(double &_distBelow,
                                          std::string &_entityName);
 
+      /// \brief Move this entity to be ontop of the nearest entity below
+      public: void PlaceOnNearestEntityBelow();
+
       public: math::Box GetCollisionBoundingBox() const;
 
       public: void SetWorldTwist(const math::Vector3 &linear,

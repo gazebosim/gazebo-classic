@@ -70,7 +70,7 @@ namespace gazebo
 
       private: std::list<PublicationTransportPtr> transports;
 
-      private: google::protobuf::Message *prevMsg;
+      private: std::list<google::protobuf::Message*> prevMsgBuffer;
 
       private: bool locallyAdvertised;
     };

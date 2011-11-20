@@ -12,15 +12,19 @@ Publication::Publication( const std::string &topic, const std::string &msgType )
   : topic(topic), msgType(msgType), locallyAdvertised(false)
 {
   this->id = idCounter++;
-  this->prevMsg = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Publication::~Publication()
 {
-  delete this->prevMsg;
-  this->prevMsg = NULL;
+  std::list<google::protobuf::Message*>::iterator iter;
+  for (iter = this->prevMsgBuffer.begin();
+       iter != this->prevMsgBuffer.end(); iter++)
+  {
+    delete (*iter);
+  }
+  this->prevMsgBuffer.clear();
 }
         
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,9 +44,14 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
   {
     this->callbacks.push_back(callback);
 
-    if (this->prevMsg && this->prevMsg->IsInitialized())
+    std::list<google::protobuf::Message*>::iterator msgIter;
+    for (msgIter = this->prevMsgBuffer.begin();
+         msgIter != this->prevMsgBuffer.end(); msgIter++)
     {
-      callback->HandleMessage(this->prevMsg);
+      if ((*msgIter)->IsInitialized())
+      {
+        callback->HandleMessage(*msgIter);
+      }
     }
   } 
 }
@@ -59,7 +68,8 @@ void Publication::AddTransport( const PublicationTransportPtr &_publink)
   {
     if ((*iter)->GetTopic() == _publink->GetTopic() &&
         (*iter)->GetMsgType() == _publink->GetMsgType() &&
-        (*iter)->GetConnection()->GetRemoteURI() == _publink->GetConnection()->GetRemoteURI())
+        (*iter)->GetConnection()->GetRemoteURI() ==
+        _publink->GetConnection()->GetRemoteURI())
     {
       add = false;
       break;
@@ -222,10 +232,13 @@ void Publication::Publish(const google::protobuf::Message &_msg,
   if (_cb)
     (_cb)();
 
-  if (!this->prevMsg)
-    this->prevMsg = _msg.New();
-
-  this->prevMsg->CopyFrom(_msg);
+  if (this->prevMsgBuffer.size() > 10)
+  {
+    delete this->prevMsgBuffer.front();
+    this->prevMsgBuffer.pop_front();
+  }
+  this->prevMsgBuffer.push_back(_msg.New());
+  this->prevMsgBuffer.back()->CopyFrom(_msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

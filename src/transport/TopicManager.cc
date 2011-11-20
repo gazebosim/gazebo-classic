@@ -121,13 +121,15 @@ void TopicManager::Publish( const std::string &_topic,
 {
   if (!_message.IsInitialized())
   {
-    gzthrow( "Publishing and uninitialized message on topic[" + _topic + "]. Required field [" + _message.InitializationErrorString() + "] missing." );
+    gzthrow( "Publishing and uninitialized message on topic[" +
+        _topic + "]. Required field [" +
+        _message.InitializationErrorString() + "] missing." );
   }
 
   PublicationPtr pub = this->FindPublication(_topic);
   PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
-  pub->Publish( _message, _cb ); 
+  pub->Publish(_message, _cb); 
 
   if (dbgPub->GetCallbackCount() > 0)
   {

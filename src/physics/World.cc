@@ -162,34 +162,38 @@ void World::Load( sdf::ElementPtr _sdf )
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
+  {
+    // Make all incoming messages wait until the world is done loading.
+    boost::mutex::scoped_lock lock(*this->receiveMutex);
 
-  std::string type = _sdf->GetElement("physics")->GetValueString("type");
-  this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 
-                                                          shared_from_this());
+    std::string type = _sdf->GetElement("physics")->GetValueString("type");
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 
+        shared_from_this());
 
-  if (this->physicsEngine == NULL)
-    gzthrow("Unable to create physics engine\n");
+    if (this->physicsEngine == NULL)
+      gzthrow("Unable to create physics engine\n");
 
-  // This should come before loading of entities
-  this->physicsEngine->Load( _sdf->GetElement("physics") );
+    // This should come before loading of entities
+    this->physicsEngine->Load( _sdf->GetElement("physics") );
 
-  this->rootElement.reset(new Base(BasePtr()));
-  this->rootElement->SetName(this->GetName());
-  WorldPtr me = shared_from_this();
-  this->rootElement->SetWorld(me);
+    this->rootElement.reset(new Base(BasePtr()));
+    this->rootElement->SetName(this->GetName());
+    WorldPtr me = shared_from_this();
+    this->rootElement->SetWorld(me);
 
-  // Create all the entities
-  this->LoadEntities(_sdf, this->rootElement);
+    // Create all the entities
+    this->LoadEntities(_sdf, this->rootElement);
 
-  // TODO: Performance test to see if TBB model updating is necessary
-  // Choose threaded or unthreaded model updating depending on the number of
-  // models in the scene
-  //if (this->GetModelCount() < 20)
+    // TODO: Performance test to see if TBB model updating is necessary
+    // Choose threaded or unthreaded model updating depending on the number of
+    // models in the scene
+    //if (this->GetModelCount() < 20)
     this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-  //else
+    //else
     //this->modelUpdateFunc = &World::ModelUpdateTBB;
 
-  event::Events::worldCreated(this->GetName());
+    event::Events::worldCreated(this->GetName());
+  }
 }
 
 void World::Save(const std::string &_filename)
@@ -656,6 +660,7 @@ void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
   response.set_id( _msg->id() );
   response.set_request( _msg->request() );
   response.set_response( "success" );
+
 
   if (_msg->request() == "entity_list")
   {

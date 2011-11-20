@@ -542,3 +542,16 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   rayShape->GetIntersection(_distBelow, _entityName);
   _distBelow += 0.00001;
 }
+
+void Entity::PlaceOnNearestEntityBelow()
+{
+  double dist;
+  std::string entityName;
+  this->GetNearestEntityBelow(dist, entityName);
+  if (dist > 0.0)
+  {
+    math::Pose p = this->GetWorldPose();
+    p.pos.z -= dist;
+    this->SetWorldPose(p);
+  }
+}
