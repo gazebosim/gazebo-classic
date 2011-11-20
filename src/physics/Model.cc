@@ -230,6 +230,11 @@ void Model::Update()
     {
       this->SetJointPositions(jointPositions);
     }
+    else
+    {
+      this->onJointAnimationComplete();
+      this->onJointAnimationComplete.clear();
+    }
     this->prevAnimationTime = this->world->GetSimTime();
   }
 
@@ -784,7 +789,9 @@ void Model::SetJointPositions(
           case Base::SLIDER_JOINT: 
             {
               double dposition = jiter->second - 
-                                 joint->GetAngle(0).GetAsRadian();
+                                joint->GetAngle(0).GetAsRadian();
+
+
               math::Vector3 anchor;
               math::Vector3 axis;
 
@@ -800,7 +807,7 @@ void Model::SetJointPositions(
                 axis = joint->GetGlobalAxis(0);
               }
 
-              this->SlideBodyAndChildren(childLink, anchor, 
+              this->SlideBodyAndChildren(childLink, anchor,
                                          axis, dposition, true);
               break;
             }
@@ -966,7 +973,8 @@ bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
 }
 
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims)
+    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    boost::function<void()> _onComplete)
 {
   this->updateMutex->lock();
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
@@ -974,6 +982,46 @@ void Model::SetJointAnimation(
   {
     this->jointAnimations[iter->first] = iter->second;
   }
+  this->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
   this->updateMutex->unlock();
+}
+
+void Model::AttachStaticModel(ModelPtr &_model, const std::string &_linkName,
+                              math::Pose _offset)
+{
+  if (!_model->IsStatic())
+  {
+    gzerr << "AttachStaticModel requires a static model\n";
+    return;
+  }
+
+  this->attachedModels.push_back(_model);
+  this->attachedModelsLinks.push_back(_linkName);
+  this->attachedModelsOffset.push_back(_offset);
+}
+
+void Model::DetachStaticModel(const std::string &_modelName)
+{
+  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  {
+    if (this->attachedModels[i]->GetName() == _modelName)
+    {
+      this->attachedModels.erase(this->attachedModels.begin()+i);
+      this->attachedModelsLinks.erase(this->attachedModelsLinks.begin()+i);
+      this->attachedModelsOffset.erase(this->attachedModelsOffset.begin()+i);
+      break;
+    }
+  }
+}
+
+void Model::OnPoseChange()
+{
+  math::Pose p;
+  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  {
+    p = this->GetLink(this->attachedModelsLinks[i])->GetWorldPose();
+    p += this->attachedModelsOffset[i];
+    this->attachedModels[i]->SetWorldPose(p);
+  }
 }

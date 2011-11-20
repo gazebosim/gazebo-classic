@@ -40,7 +40,13 @@ namespace gazebo
     
       /// \brief Destructor
       public: virtual ~Mesh();
-  
+
+      /// \brief Set the path which contains the mesh resource
+      public: void SetPath(const std::string &_path);
+
+      /// \brief Get the path which contains the mesh resource
+      public: std::string GetPath() const;
+
       /// \brief Set the name of this mesh
       public: void SetName(const std::string &n);
   
@@ -101,6 +107,7 @@ namespace gazebo
   
   
       private: std::string name;
+      private: std::string path;
       private: std::vector<SubMesh *> submeshes;
       private: std::vector<Material *> materials;
     };

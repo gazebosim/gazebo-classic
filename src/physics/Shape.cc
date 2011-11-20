@@ -26,8 +26,10 @@ Shape::Shape(CollisionPtr p)
   : Base(p) 
 {
   this->AddType(Base::SHAPE);
-  this->collisionParent = p;
   this->SetName("shape");
+
+  if (p)
+    this->collisionParent = p;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

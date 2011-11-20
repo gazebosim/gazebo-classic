@@ -108,10 +108,13 @@ namespace gazebo
       /// \brief Returns true if the graphics card support GLSL
       public: bool HasGLSL();
   
+      public: void AddResourcePath(const std::string &_path);
+
       private: void CreateContext();
 
       private: void LoadPlugins();
-      public: void SetupResources();
+
+      private: void SetupResources();
       private: void SetupRenderSystem();
   
       private: void PreRender();

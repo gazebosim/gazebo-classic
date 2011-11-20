@@ -44,6 +44,7 @@
 #include "physics/World.hh"
 
 #include "sensors/Sensor.hh"
+#include "sensors/SensorManager.hh"
 #include "sensors/CameraSensor.hh"
 
 #include "physics/Collision.hh"
@@ -797,7 +798,9 @@ void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
   for (unsigned int i=0; i < _link->GetSensorCount(); i++)
   {
     msgs::Sensor *sensorMsg = _msg->add_sensors();
-    sensors::SensorPtr sensor = _link->GetSensor(i);
+    std::string sensorName = _link->GetSensorName(i);
+    sensors::SensorPtr sensor = sensors::SensorManager::Instance()->GetSensor(
+        sensorName);
     this->BuildSensorMsg(sensorMsg, sensor);
   }
 }

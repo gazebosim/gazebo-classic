@@ -28,6 +28,7 @@
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"
+#include "sdf/sdf.h"
 
 namespace gazebo
 {
@@ -61,22 +62,30 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Add a sensor
-      public: void AddSensor(SensorPtr sensor);
+      public: std::string LoadSensor(sdf::ElementPtr _elem,
+                                     const std::string &_parentName);
+
+      /// \brief Get a sensor
+      public: SensorPtr GetSensor(const std::string &_name);
 
       /// \brief Remove a sensor
-      public: void RemoveSensor(SensorPtr sensor);
+      public: void RemoveSensor(const std::string &_name);
+
+      /// \brief Remove all sensors
+      public: void RemoveSensors();
 
       /// \brief Update loop
       private: void RunLoop();
 
       private: bool stop;
       private: boost::thread *runThread;
+      private: boost::recursive_mutex *mutex;
 
       private: std::list<SensorPtr > sensors;
 
       private: friend class SingletonT<SensorManager>;
 
-      private: std::list<SensorPtr > init_sensors;
+      private: std::list<SensorPtr > initSensors;
     };
     /// \}
   }

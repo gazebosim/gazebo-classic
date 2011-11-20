@@ -32,6 +32,7 @@ Node::Node()
 
 Node::~Node()
 {
+  this->publishers.clear();
   delete this->publisherMutex;
   this->publisherMutex = NULL;
   TopicManager::Instance()->RemoveNode( this->id );
@@ -43,6 +44,7 @@ void Node::Init(const std::string &_space)
 
   if (_space.empty())
   {
+    this->topicNamespace = "default";
     std::list<std::string> namespaces;
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 

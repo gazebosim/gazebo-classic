@@ -19,7 +19,9 @@
  * Date: 14 Oct 2009
  */
 
+#include "physics/World.hh"
 #include "physics/Link.hh"
+#include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODERayShape.hh"
@@ -27,6 +29,13 @@
 using namespace gazebo;
 using namespace physics;
 
+ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
+  : RayShape(_physicsEngine)
+{
+  this->physicsEngine =
+    boost::shared_static_cast<ODEPhysics>(_physicsEngine);
+  this->geomId = dCreateRay(physicsEngine->GetSpaceId(), 1.0 );
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -35,10 +44,15 @@ ODERayShape::ODERayShape( CollisionPtr parent, bool displayRays )
 {
   this->SetName("ODE Ray Shape");
 
-  ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
+  ODECollisionPtr collision =
+    boost::shared_static_cast<ODECollision>(this->collisionParent);
+
+  this->physicsEngine = boost::shared_static_cast<ODEPhysics>(
+      this->collisionParent->GetWorld()->GetPhysicsEngine());
+  this->geomId = dCreateRay( collision->GetSpaceId(), 1.0 );
 
   // Create default ray with unit length
-  collision->SetCollision(dCreateRay( collision->GetSpaceId(), 1.0 ),  false);
+  collision->SetCollision(this->geomId, false);
   collision->SetCategoryBits(GZ_SENSOR_COLLIDE);
   collision->SetCollideBits(~GZ_SENSOR_COLLIDE);
 }
@@ -47,65 +61,134 @@ ODERayShape::ODERayShape( CollisionPtr parent, bool displayRays )
 // Destructor
 ODERayShape::~ODERayShape()
 {
+  dGeomDestroy(this->geomId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the ray collision
 void ODERayShape::Update()
 {
-  ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
-
   math::Vector3 dir;
 
-  this->globalStartPos = this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-      this->relativeStartPos);
+  if (this->collisionParent)
+  {
+    ODECollisionPtr collision =
+      boost::shared_static_cast<ODECollision>(this->collisionParent);
 
-  this->globalEndPos = this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-      this->relativeEndPos);
+    this->globalStartPos =
+      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+          this->relativeStartPos);
+
+    this->globalEndPos =
+      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+          this->relativeEndPos);
+  }
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  //gzerr << "contactLen[" << this->contactLen << "]";
   if (this->contactLen != 0)
   {
-    dGeomRaySet(collision->GetCollisionId(), 
+    dGeomRaySet(this->geomId,
         this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
         dir.x, dir.y, dir.z);
 
-    dGeomRaySetLength( collision->GetCollisionId(),
+    dGeomRaySetLength(this->geomId,
         this->globalStartPos.Distance(this->globalEndPos) );
+  }
+}
 
-     //gzerr << "  linkparent[" << this->collisionParent->GetLink()->GetName() << "]"
-     //      << "  linkpose[" << this->collisionParent->GetLink()->GetWorldPose() << "]"
-     //      << "  collparent[" << this->collisionParent->GetName() << "]"
-     //      << "  collpose[" << this->collisionParent->GetWorldPose() << "]"
+void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
+{
+  if (this->physicsEngine)
+  {
+    Intersection intersection;
+    intersection.depth = 1000;
 
-     //      << "  relativeStart[" << this->relativeStartPos << "]"
-     //      << "  relativeEnd[" << this->relativeEndPos << "]"
-     //      << "  globalStartPos[" << this->globalStartPos << "]"
-     //      << "  globalEndPos[" << this->globalEndPos << "]"
-     //      << "  dir[" << dir << "]"
-     //      << "  dist[" << this->globalStartPos.Distance(this->globalEndPos) << "]\n";
+    this->physicsEngine->GetRayMutex()->lock(); 
+    // Do collision detection
+    dSpaceCollide2(this->geomId, 
+        (dGeomID)(this->physicsEngine->GetSpaceId()),
+        &intersection, &UpdateCallback );
+    this->physicsEngine->GetRayMutex()->unlock(); 
+
+    _dist = intersection.depth;
+    _entity = intersection.name;
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the starting point and direction
-void ODERayShape::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
+void ODERayShape::SetPoints(const math::Vector3 &_posStart,
+                            const math::Vector3 &_posEnd)
 {
   math::Vector3 dir;
-  ODECollisionPtr collision = boost::shared_static_cast<ODECollision>(this->collisionParent);
-
-  RayShape::SetPoints(posStart, posEnd);
+  RayShape::SetPoints(_posStart, _posEnd);
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(collision->GetCollisionId(), this->globalStartPos.x,
+  dGeomRaySet(this->geomId, this->globalStartPos.x,
               this->globalStartPos.y, this->globalStartPos.z,
               dir.x, dir.y, dir.z);
 
-  dGeomRaySetLength( collision->GetCollisionId(),
+  dGeomRaySetLength(this->geomId,
                      this->globalStartPos.Distance(this->globalEndPos) );
+}
+
+void ODERayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
+{
+  dContactGeom contact;
+  ODERayShape::Intersection *inter = NULL;
+
+  inter = (Intersection*)(data);
+
+  // Check space
+  if ( dGeomIsSpace( o1 ) || dGeomIsSpace( o2 ) )
+  {
+    dSpaceCollide2( o1, o2, inter, &UpdateCallback );
+  }
+  else
+  {
+    ODECollision *collision1, *collision2;
+    ODECollision *hitCollision = NULL;
+
+    // Get pointers to the underlying collisions
+    if (dGeomGetClass(o1) == dGeomTransformClass)
+      collision1 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(o1));
+    else
+      collision1 = (ODECollision*) dGeomGetData(o1);
+
+    if (dGeomGetClass(o2) == dGeomTransformClass)
+      collision2 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(o2));
+    else
+      collision2 = (ODECollision*) dGeomGetData(o2);
+
+    // Figure out which one is a ray; note that this assumes
+    // that the ODE dRayClass is used *soley* by the RayCollision.
+    if (dGeomGetClass(o1) == dRayClass)
+    {
+      hitCollision = collision2;
+      dGeomRaySetParams(o1, 0, 0);
+      dGeomRaySetClosestHit(o1, 1);
+    }
+    else if (dGeomGetClass(o2) == dRayClass)
+    {
+      hitCollision = collision1;
+      dGeomRaySetParams(o2, 0, 0);
+      dGeomRaySetClosestHit(o2, 1);
+    }
+
+    // Check for ray/collision intersections
+    int n = dCollide(o1, o2, 1, &contact, sizeof(contact));
+
+    if (n > 0)
+    {
+      if (contact.depth < inter->depth)
+      {
+        inter->depth = contact.depth;
+        inter->name = hitCollision->GetName();
+      }
+    }
+  }
 }

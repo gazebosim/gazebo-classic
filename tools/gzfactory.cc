@@ -40,10 +40,7 @@ int main(int argc, char **argv)
 
   msgs::Factory msg;
   msg.set_sdf(content);
-  pub->Publish(msg);
-
-  while (pub->GetOutgoingCount() >0)
-    usleep(100000);
+  pub->Publish(msg, true);
   
   transport::fini();
   printf("Spawn complete\n");

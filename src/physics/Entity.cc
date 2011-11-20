@@ -30,6 +30,7 @@
 #include "transport/Transport.hh"
 #include "transport/Node.hh"
 
+#include "physics/RayShape.hh"
 #include "physics/Collision.hh"
 #include "physics/Model.hh"
 #include "physics/Collision.hh"
@@ -81,7 +82,11 @@ Entity::~Entity()
   this->poseMsg = NULL;
 
   delete this->poseMutex;
+  this->node.reset();
+  this->posePub.reset();
+  this->visPub.reset();
   this->requestPub.reset();
+  this->poseSub.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +96,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
   this->posePub = this->node->Advertise<msgs::Pose>("~/pose/info", 10);
+
   this->poseSub = this->node->Subscribe("~/pose/modify", &Entity::OnPoseMsg, this);
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
@@ -200,7 +206,7 @@ void Entity::PublishPose()
     if (relativePose != msgs::Convert(*this->poseMsg))
     {
       msgs::Set( this->poseMsg, this->worldPose);
-      this->posePub->Publish( *this->poseMsg);
+      this->posePub->Publish(*this->poseMsg);
     }
   }
 }
@@ -448,7 +454,7 @@ void Entity::Fini()
   msgs::Request *msg = msgs::CreateRequest( "entity_delete", 
       this->GetCompleteScopedName() );
 
-  this->requestPub->Publish(*msg);
+  this->requestPub->Publish(*msg, true);
 
   this->connections.clear();
   this->parentEntity.reset();
@@ -491,4 +497,48 @@ void Entity::UpdateAnimation()
 const math::Pose &Entity::GetDirtyPose() const
 {
   return this->dirtyPose;
+}
+
+math::Box Entity::GetCollisionBoundingBox() const
+{
+  math::Box box;
+  for (Base_V::const_iterator iter = this->children.begin();
+       iter != this->children.end(); iter++)
+  {
+    box += this->GetCollisionBoundingBoxHelper(*iter);
+  }
+
+  return box;
+}
+
+math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
+{
+  if (_base->HasType(COLLISION))
+    return boost::shared_dynamic_cast<Collision>(_base)->GetBoundingBox();
+
+  math::Box box;
+
+  for (unsigned int i=0; i < _base->GetChildCount(); i++)
+  {
+    box += this->GetCollisionBoundingBoxHelper(_base->GetChild(i));
+  }
+
+  return box;
+}
+
+void Entity::GetNearestEntityBelow(double &_distBelow,
+                                   std::string &_entityName)
+{
+  RayShapePtr rayShape = boost::shared_dynamic_cast<RayShape>(
+    this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  math::Box box = this->GetCollisionBoundingBox();
+
+  math::Vector3 start = this->GetWorldPose().pos; 
+  math::Vector3 end = start;
+  start.z = box.min.z - 0.00001;
+  end.z -= 1000;
+  rayShape->SetPoints(start, end);
+  rayShape->GetIntersection(_distBelow, _entityName);
+  _distBelow += 0.00001;
 }

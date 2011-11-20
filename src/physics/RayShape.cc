@@ -39,6 +39,16 @@
 using namespace gazebo;
 using namespace physics;
 
+RayShape::RayShape(PhysicsEnginePtr _physicsEngine)
+  : Shape(CollisionPtr())
+{
+  this->AddType(RAY_SHAPE);
+  this->SetName("Ray");
+
+  this->contactLen = DBL_MAX;
+  this->contactRetro = 0.0;
+  this->contactFiducial = -1;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -52,7 +62,8 @@ RayShape::RayShape( CollisionPtr _parent, bool /*_displayRays*/ )
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
-  this->collisionParent->SetSaveable(false);
+  if (collisionParent)
+    this->collisionParent->SetSaveable(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,10 +82,20 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   this->relativeStartPos = _posStart;
   this->relativeEndPos = _posEnd;
 
-  this->globalStartPos = this->collisionParent->GetWorldPose().CoordPositionAdd(
-      this->relativeStartPos);
-  this->globalEndPos = this->collisionParent->GetWorldPose().CoordPositionAdd(
-      this->relativeEndPos);
+  if (this->collisionParent)
+  {
+    this->globalStartPos =
+      this->collisionParent->GetWorldPose().CoordPositionAdd(
+        this->relativeStartPos);
+    this->globalEndPos =
+      this->collisionParent->GetWorldPose().CoordPositionAdd(
+        this->relativeEndPos);
+  }
+  else
+  {
+    this->globalStartPos = this->relativeStartPos;
+    this->globalEndPos = this->relativeEndPos;
+  }
 
   // Compute the direction of the ray
   dir = this->globalEndPos - this->globalStartPos;

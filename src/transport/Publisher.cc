@@ -54,7 +54,7 @@ Publisher::~Publisher()
   for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
     delete *iter;
   this->messages.clear();
- 
+
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 
@@ -71,7 +71,8 @@ bool Publisher::HasConnections() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Publish a message
-void Publisher::PublishImpl(const google::protobuf::Message &_message )
+void Publisher::PublishImpl(const google::protobuf::Message &_message,
+                            bool _block)
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
@@ -92,6 +93,12 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message )
     this->messages.pop_front();
   }
   this->mutex->unlock();
+
+  if (_block)
+  {
+    while(this->GetOutgoingCount() > 0 && !transport::is_stopped())
+      common::Time::MSleep(50);
+  }
 
 }
 

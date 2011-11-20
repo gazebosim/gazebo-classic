@@ -47,6 +47,7 @@
 #include "physics/ode/ODEBallJoint.hh"
 #include "physics/ode/ODEUniversalJoint.hh"
 
+#include "physics/ode/ODERayShape.hh"
 #include "physics/ode/ODEBoxShape.hh"
 #include "physics/ode/ODESphereShape.hh"
 #include "physics/ode/ODECylinderShape.hh"
@@ -426,34 +427,48 @@ LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new collision
-CollisionPtr ODEPhysics::CreateCollision(const std::string &type, LinkPtr body)
+CollisionPtr ODEPhysics::CreateCollision(const std::string &_type,
+                                         LinkPtr _body)
 {
-  ODECollisionPtr collision( new ODECollision(body) );
-  ShapePtr shape;
-
-  if ( type == "sphere")
-    shape.reset( new ODESphereShape(collision) );
-  else if ( type == "plane")
-    shape.reset( new ODEPlaneShape(collision) );
-  else if ( type == "box")
-    shape.reset( new ODEBoxShape(collision) );
-  else if ( type == "cylinder")
-    shape.reset( new ODECylinderShape(collision) );
-  else if ( type == "multiray")
-    shape.reset( new ODEMultiRayShape(collision) );
-  else if ( type == "mesh" || type == "trimesh")
-    shape.reset( new ODETrimeshShape(collision) );
-  else if ( type == "heightmap")
-    shape.reset( new ODEHeightmapShape(collision) );
-  else if ( type == "map" || type == "image" )
-    shape.reset( new MapShape(collision) );
-  else
-    gzerr << "Unable to create collision of type[" << type << "]\n";
-
+  ODECollisionPtr collision(new ODECollision(_body));
+  ShapePtr shape = this->CreateShape(_type, collision);
   collision->SetShape(shape);
-  shape->SetWorld(body->GetWorld());
-
+  shape->SetWorld(_body->GetWorld());
   return collision;
+}
+
+ShapePtr ODEPhysics::CreateShape(const std::string &_type,
+                                 CollisionPtr _collision)
+{
+  ShapePtr shape;
+  ODECollisionPtr collision =
+    boost::shared_dynamic_cast<ODECollision>(_collision);
+
+  if (_type == "sphere")
+    shape.reset(new ODESphereShape(collision));
+  else if (_type == "plane")
+    shape.reset(new ODEPlaneShape(collision));
+  else if (_type == "box")
+    shape.reset(new ODEBoxShape(collision));
+  else if (_type == "cylinder")
+    shape.reset(new ODECylinderShape(collision));
+  else if (_type == "multiray")
+    shape.reset(new ODEMultiRayShape(collision));
+  else if (_type == "mesh" || _type == "trimesh")
+    shape.reset(new ODETrimeshShape(collision));
+  else if (_type == "heightmap")
+    shape.reset(new ODEHeightmapShape(collision));
+  else if (_type == "map" || _type == "image")
+    shape.reset(new MapShape(collision));
+  else if (_type == "ray")
+    if (_collision)
+      shape.reset(new ODERayShape(collision, false));
+    else
+      shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
+  else
+    gzerr << "Unable to create collision of type[" << _type << "]\n";
+
+  return shape;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

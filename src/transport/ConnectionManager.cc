@@ -255,6 +255,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   {
     msgs::Publish result;
     result.ParseFromString( packet.serialized_data() );
+
     std::list<msgs::Publish>::iterator iter = this->publishers.begin();
     while (iter != this->publishers.end())
     {
@@ -295,7 +296,8 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     sub.ParseFromString( packet.serialized_data() );
 
     // Disconnect a local publisher from a remote subscriber
-    TopicManager::Instance()->DisconnectPubFromSub(sub.topic(), sub.host(), sub.port());
+    TopicManager::Instance()->DisconnectPubFromSub(sub.topic(), 
+        sub.host(), sub.port());
   }
   else if (packet.type() == "unadvertise")
   {
@@ -389,10 +391,10 @@ void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionManager::Unadvertise( const std::string &topic )
+void ConnectionManager::Unadvertise(const std::string &_topic)
 {
   msgs::Publish msg;
-  msg.set_topic( topic );
+  msg.set_topic(_topic);
   msg.set_msg_type( "" );
 
   if (this->serverConn)

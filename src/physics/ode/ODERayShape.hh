@@ -39,9 +39,13 @@ namespace gazebo
     /// \brief Ray collision 
     class ODERayShape : public RayShape
     {
+      /// \brief Constructor for a global ray
+      public: ODERayShape(PhysicsEnginePtr _physicsEngine);
+
       /// \brief Constructor
       /// \param body Link the ray is attached to
-      /// \param displayRays Indicates if the rays should be displayed when rendering images
+      /// \param displayRays Indicates if the rays should be
+      ///        displayed when rendering images
       public: ODERayShape( CollisionPtr collision, bool displayRays );
     
       /// \brief Destructor
@@ -50,12 +54,27 @@ namespace gazebo
       /// \brief Update the tay collision
       public: virtual void Update();
    
-      /// \brief Set the ray based on starting and ending points relative to the 
+      /// \brief Get the nearest intersection 
+      public: virtual void GetIntersection(double &_dist,
+                                           std::string &_entity);
+
+      /// \brief Set the ray based on starting and ending points relative to the
       ///        body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
       public: virtual void SetPoints(const math::Vector3 &posStart, 
                                      const math::Vector3 &posEnd);
+
+      private: static void UpdateCallback(void *data, dGeomID o1, dGeomID o2);
+
+      private: dGeomID geomId;
+      private: ODEPhysicsPtr physicsEngine;
+
+      private: class Intersection
+               {
+                 public: double depth;
+                 public: std::string name;
+               };
     };
     /// \}
     /// \}

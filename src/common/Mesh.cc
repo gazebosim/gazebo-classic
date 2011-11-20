@@ -44,6 +44,16 @@ Mesh::~Mesh()
   this->submeshes.clear();
 }
 
+void Mesh::SetPath(const std::string &_path)
+{
+  this->path = _path;
+}
+
+std::string Mesh::GetPath() const
+{
+  return this->path;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of this mesh
 void Mesh::SetName(const std::string &n)
@@ -388,42 +398,42 @@ void SubMesh::SetTexCoordCount( unsigned int _count )
 /// Add an index to the mesh
 void SubMesh::AddIndex( unsigned int _i)
 {
-  this->indices.push_back( _i );
+  this->indices.push_back(_i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a vertex to the mesh
 void SubMesh::AddVertex( const math::Vector3 &_v )
 {
-  this->vertices.push_back( _v );
+  this->vertices.push_back(_v);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a vertex to the mesh
 void SubMesh::AddVertex(double x, double y, double z )
 {
-  this->AddVertex( math::Vector3(x,y,z) );
+  this->AddVertex(math::Vector3(x,y,z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a normal to the mesh
 void SubMesh::AddNormal( const math::Vector3 &_n )
 {
-  this->normals.push_back( _n );
+  this->normals.push_back(_n);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a normal to the mesh
-void SubMesh::AddNormal(double x, double y, double z )
+void SubMesh::AddNormal(double x, double y, double z)
 {
-  this->AddNormal( math::Vector3(x,y,z) );
+  this->AddNormal(math::Vector3(x,y,z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a texture coord to the mesh
 void SubMesh::AddTexCoord(double u, double v )
 {
-  this->texCoords.push_back( math::Vector2d(u,v) );
+  this->texCoords.push_back(math::Vector2d(u,v));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -167,7 +167,16 @@ namespace gazebo
                   const std::map<std::string, double> &_jointPositions);
 
       public: void SetJointAnimation(
-                  const std::map<std::string, common::NumericAnimationPtr> anims);
+                  const std::map<std::string, common::NumericAnimationPtr> anim,
+                  boost::function<void()> _onComplete);
+
+      /// \brief Attach a static model to this model
+      public: void AttachStaticModel(ModelPtr &_model, 
+                  const std::string &_linkName, math::Pose _offset);
+
+      public: void DetachStaticModel(const std::string &_model);
+
+      protected: virtual void OnPoseChange();
 
       private: void RotateBodyAndChildren(LinkPtr _body1, 
                    const math::Vector3 &_anchor, const math::Vector3 &_axis, 
@@ -202,9 +211,15 @@ namespace gazebo
 
       private: transport::PublisherPtr jointPub;
       private: std::map<std::string, common::NumericAnimationPtr> jointAnimations;
+      private: boost::function<void()> onJointAnimationComplete;
       private: common::Time prevAnimationTime;
 
       private: boost::recursive_mutex *updateMutex;
+
+      protected: std::vector<ModelPtr> attachedModels;
+      protected: std::vector<std::string> attachedModelsLinks;
+      protected: std::vector<math::Pose> attachedModelsOffset;
+
     };
     /// \}
   }

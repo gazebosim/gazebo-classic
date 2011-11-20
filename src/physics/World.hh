@@ -101,7 +101,6 @@ namespace gazebo
       /// Return the physics engine
       /// \return Pointer to the physics engine
       public: PhysicsEnginePtr GetPhysicsEngine() const;
-    
    
       /// \brief Get the number of models
       public: unsigned int GetModelCount() const;

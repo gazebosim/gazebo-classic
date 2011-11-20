@@ -24,8 +24,6 @@
 #include <map>
 #include <vector>
 
-#include "sensors/SensorTypes.hh"
-
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
@@ -164,9 +162,6 @@ namespace gazebo
       /// \bridf accessor for collisions
       public: CollisionPtr GetCollision(std::string name);
   
-      /// \brief Load a sensor
-      private: void LoadSensor( sdf::ElementPtr &_sdf );
-  
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
   
@@ -185,8 +180,8 @@ namespace gazebo
       /// \brief Get sensor count
       public: unsigned int GetSensorCount() const;
 
-      /// \brief Get sensor count
-      public: sensors::SensorPtr GetSensor(unsigned int _i) const;
+      /// \brief Get sensor name
+      public: std::string GetSensorName(unsigned int _i) const;
   
       /// \brief Connect a to the add entity signal
       public: template<typename T>
@@ -199,6 +194,12 @@ namespace gazebo
       /// \brief Fill a link message
       /// \param _msg Message to fill
       public: void FillLinkMsg( msgs::Link &_msg );
+
+      /// \brief Joints that have this Link as a parent Link
+      public: void AddChildJoint(JointPtr joint);
+
+      /// \brief Joints that have this Link as a child Link
+      public: void AddParentJoint(JointPtr joint);
 
       protected: bool isStatic;
   
@@ -222,15 +223,11 @@ namespace gazebo
 
       protected: math::Pose newPose;
   
-      private: sensors::Sensor_V sensors;
+      private: std::vector<std::string> sensors;
 
-      /// \brief Joints that have this Link as a child Link
       private: std::vector< JointPtr > parentJoints;
-      public: void AddParentJoint(JointPtr joint);
 
-      /// \brief Joints that have this Link as a parent Link
       private: std::vector< JointPtr > childJoints;
-      public: void AddChildJoint(JointPtr joint);
     };
     /// \}
   }

@@ -91,8 +91,12 @@ namespace gazebo
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
     
       /// \brief Create a collision
-      public: virtual CollisionPtr CreateCollision(const std::string &shapeTypename, 
-                                         LinkPtr parent);
+      public: virtual CollisionPtr CreateCollision(
+                  const std::string &_shapeType, LinkPtr _parent);
+
+      public: virtual ShapePtr CreateShape(
+                  const std::string &_shapeType,
+                  CollisionPtr _collision);
      
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string &type);
@@ -204,7 +208,7 @@ namespace gazebo
 
       private: int indices[MAX_CONTACT_JOINTS];
     };
-  
+    typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
   
   /// \}
   /// \}

@@ -168,6 +168,30 @@ namespace gazebo
       /// \brief Get a child linke entity, if one exists
       public: LinkPtr GetChildLink(const std::string &_name);
 
+      /// \brief Get the distance to the nearest entity below
+      ///        (along the Z-axis) this entity.
+      /// \param _distBelow The distance to the nearest entity below
+      /// \param _entityName The name of the nearest entity below
+      public: void GetNearestEntityBelow(double &_distBelow,
+                                         std::string &_entityName);
+
+      public: math::Box GetCollisionBoundingBox() const;
+
+      public: void SetWorldTwist(const math::Vector3 &linear,
+                                 const math::Vector3 &angular,
+                                 bool updateChildren=true);
+
+      public: const math::Pose &GetDirtyPose() const; 
+
+      private: math::Box GetCollisionBoundingBoxHelper(BasePtr _base) const;
+
+      private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify);
+
+      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
+                                              bool _notify);
+
+      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
+
       /// \brief Called when a new pose message arrives
       private: void OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg);
 
@@ -189,22 +213,13 @@ namespace gazebo
       /// \brief Only used by Links. Included here for performance.
       private: bool isCanonicalLink;
   
-      public: void SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &angular, bool updateChildren=true);
-
-      public: const math::Pose &GetDirtyPose() const; 
-
-      private: void SetWorldPoseModel(const math::Pose &_pose, bool _notify);
-
-      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify);
-      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
-
       /// The initial pose of the entity
       private: math::Pose initialRelativePose;
       private: math::Pose worldPose;
 
       protected: transport::NodePtr node;
-      protected: transport::PublisherPtr posePub;
-      protected: transport::SubscriberPtr poseSub;
+      private: transport::PublisherPtr posePub;
+      private: transport::SubscriberPtr poseSub;
       protected: transport::PublisherPtr visPub;
       private: transport::PublisherPtr requestPub;
 
