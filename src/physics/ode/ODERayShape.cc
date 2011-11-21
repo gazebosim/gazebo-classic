@@ -34,7 +34,8 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
 {
   this->physicsEngine =
     boost::shared_static_cast<ODEPhysics>(_physicsEngine);
-  this->geomId = dCreateRay(physicsEngine->GetSpaceId(), 1.0 );
+  this->geomId = dCreateRay(this->physicsEngine->GetSpaceId(), 2.0 );
+  this->collisionParent.reset();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -106,8 +107,9 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
     intersection.depth = 1000;
 
     this->physicsEngine->GetRayMutex()->lock(); 
+
     // Do collision detection
-    dSpaceCollide2(this->geomId, 
+    dSpaceCollide2(this->geomId,
         (dGeomID)(this->physicsEngine->GetSpaceId()),
         &intersection, &UpdateCallback );
     this->physicsEngine->GetRayMutex()->unlock(); 
@@ -179,15 +181,18 @@ void ODERayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
       dGeomRaySetClosestHit(o2, 1);
     }
 
-    // Check for ray/collision intersections
-    int n = dCollide(o1, o2, 1, &contact, sizeof(contact));
-
-    if (n > 0)
+    if (hitCollision)
     {
-      if (contact.depth < inter->depth)
+      // Check for ray/collision intersections
+      int n = dCollide(o1, o2, 1, &contact, sizeof(contact));
+
+      if (n > 0)
       {
-        inter->depth = contact.depth;
-        inter->name = hitCollision->GetName();
+        if (contact.depth < inter->depth)
+        {
+          inter->depth = contact.depth;
+          inter->name = hitCollision->GetName();
+        }
       }
     }
   }

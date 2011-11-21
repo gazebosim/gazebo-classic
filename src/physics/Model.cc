@@ -232,7 +232,8 @@ void Model::Update()
     }
     else
     {
-      this->onJointAnimationComplete();
+      if (this->onJointAnimationComplete)
+        this->onJointAnimationComplete();
       this->onJointAnimationComplete.clear();
     }
     this->prevAnimationTime = this->world->GetSimTime();
