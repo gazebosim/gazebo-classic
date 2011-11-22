@@ -46,7 +46,7 @@ void TopicManager::Init()
 {
   this->advertisedTopics.clear();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
-  this->subscribed_topics.clear();
+  this->subscribedNodess.clear();
   this->nodes.clear();
 }
 
@@ -59,7 +59,8 @@ void TopicManager::Fini()
     this->Unadvertise( iter->first );
   }
 
-  SubMap::iterator iter2;
+  // FIX THIS
+  /*SubMap::iterator iter2;
   for (iter2 = this->subscribed_topics.begin(); 
        iter2 != this->subscribed_topics.end(); iter2++)
   {
@@ -68,11 +69,11 @@ void TopicManager::Fini()
     {
       this->Unsubscribe( iter2->first, iter2->second.front() );
     }
-  }
+  }*/
 
   this->advertisedTopics.clear();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
-  this->subscribed_topics.clear();
+  this->subscribedNodess.clear();
   this->nodes.clear();
 }
 
@@ -151,35 +152,33 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Subscribe to a topic give some options
-SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
+SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 {
-  CallbackHelperPtr subscription = ops.GetSubscription();
+  CallbackHelperPtr subscription = _ops.GetSubscription();
 
   // Create a subscription (essentially a callback that gets 
   // fired every time a Publish occurs on the corresponding
   // topic
-  //CallbackHelperPtr subscription( new CallbackHelperT<M>( callback ) );
-  //this->subscribed_topics[topic].push_back(subscription);
-  
-  this->subscribed_topics[ops.GetTopic()].push_back(subscription);
+  this->subscribedNodess[_ops.GetTopic()].push_back(_ops.GetNode());
 
   // The object that gets returned to the caller of this
   // function
-  SubscriberPtr sub( new Subscriber(ops.GetTopic(), subscription) );
+  SubscriberPtr sub( new Subscriber(_ops.GetTopic(), subscription) );
 
   // Find a current publication
-  PublicationPtr pub = this->FindPublication(ops.GetTopic());
+  PublicationPtr pub = this->FindPublication(_ops.GetTopic());
 
   // If the publication exits, just add the subscription to it 
   if (pub)
   {
-    pub->AddSubscription( subscription );
+    pub->AddSubscription(_ops.GetNode());
+    //pub->AddSubscription(subscription);
   }
-  else if (ops.GetTopic() == "/gazebo/default/selection")
+  else if (_ops.GetTopic() == "/gazebo/default/selection")
     gzdbg << "No publication\n";
 
   // Use this to find other remote publishers
-  ConnectionManager::Instance()->Subscribe(ops.GetTopic(), ops.GetMsgType());
+  ConnectionManager::Instance()->Subscribe(_ops.GetTopic(), _ops.GetMsgType());
   return sub;
 }
 
@@ -194,8 +193,8 @@ void TopicManager::HandleIncoming()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unsubscribe from a topic
-void TopicManager::Unsubscribe( const std::string &_topic, 
-                                const CallbackHelperPtr &_sub)
+void TopicManager::Unsubscribe(const std::string &_topic,
+                               const CallbackHelperPtr &_sub)
 {
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
@@ -204,7 +203,8 @@ void TopicManager::Unsubscribe( const std::string &_topic,
     ConnectionManager::Instance()->Unsubscribe(_topic, _sub->GetMsgType() );
   }
 
-  this->subscribed_topics[_topic].remove( _sub );
+  // TODO: Fix this
+  //this->subscribed_topics[_topic].remove(_sub);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,26 +234,30 @@ void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::st
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Connect all subscribers on a topic to known publishers
+// Connect all local subscribers on a topic to known publishers
 void TopicManager::ConnectSubscribers(const std::string &_topic)
 {
-  SubMap::iterator iter = this->subscribed_topics.find(_topic);
+  SubNodeMap::iterator nodeIter = this->subscribedNodess.find(_topic);
 
-  if (iter != this->subscribed_topics.end())
+  if (nodeIter != this->subscribedNodess.end())
   {
     PublicationPtr publication = this->FindPublication(_topic);
     if (!publication)
       return;
 
     // Add all of our subscriptions to the publication
-    std::list<CallbackHelperPtr>::iterator cbIter;
-    for (cbIter = iter->second.begin(); cbIter != iter->second.end(); cbIter++)
+    std::list<NodePtr>::iterator cbIter;
+    for (cbIter = nodeIter->second.begin();
+         cbIter != nodeIter->second.end(); cbIter++)
     {
-      publication->AddSubscription( *cbIter );
+      publication->AddSubscription(*cbIter);
     }
   }
   else
-    gzerr << "Shouldn't get here topic[" << _topic << "]\n";//TODO: Properly handle this error
+  {
+    //TODO: Properly handle this error
+    gzerr << "Shouldn't get here topic[" << _topic << "]\n";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

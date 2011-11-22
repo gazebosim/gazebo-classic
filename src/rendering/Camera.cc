@@ -143,20 +143,19 @@ void Camera::Load( sdf::ElementPtr &_sdf )
 // Load the camera
 void Camera::Load()
 {
-
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
   if (imageElem)
   {
     this->imageWidth = imageElem->GetValueInt("width");
     this->imageHeight = imageElem->GetValueInt("height");
-    this->imageFormat = this->GetOgrePixelFormat( imageElem->GetValueString("format") );
+    this->imageFormat = this->GetOgrePixelFormat(
+        imageElem->GetValueString("format"));
   }
   else
     gzthrow("Camera has no <image> tag.");
 
-
   // Create the directory to store frames
-  if (this->sdf->HasElement("save") && 
+  if (this->sdf->HasElement("save") &&
       this->sdf->GetElement("save")->GetValueBool("enabled"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("save");
@@ -175,7 +174,7 @@ void Camera::Load()
     {
       gzthrow("Camera horizontal field of veiw invalid.");
     }
-    this->SetFOV( angle );
+    this->SetHFOV( angle );
   }
 
 }
@@ -470,12 +469,11 @@ void Camera::SetClipDist(float _near, float _far)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the camera FOV (horizontal)  
-void Camera::SetFOV( float radians )
+void Camera::SetHFOV( float radians )
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("horizontal_fov");
   elem->GetAttribute("angle")->Set(radians);
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the horizontal field of view of the camera
@@ -712,9 +710,9 @@ unsigned int Camera::GetViewportHeight() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the aspect ratio
-void Camera::SetAspectRatio( float ratio )
+void Camera::SetAspectRatio(float ratio)
 {
-  this->camera->setAspectRatio( ratio );
+  this->camera->setAspectRatio(ratio);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1062,10 +1060,9 @@ void Camera::CreateCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get point on a plane
-bool Camera::GetWorldPointOnPlane(int _x, int _y, 
-                                           const math::Vector3 &_planeNorm, 
-                                           double _d,
-                                           math::Vector3 &_result)
+bool Camera::GetWorldPointOnPlane(int _x, int _y,
+                                  const math::Vector3 &_planeNorm,
+                                  double _d, math::Vector3 &_result)
 {
   math::Vector3 origin, dir;
   double dist;
@@ -1085,7 +1082,7 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the render target for the camera
-void Camera::SetRenderTarget( Ogre::RenderTarget *target )
+void Camera::SetRenderTarget(Ogre::RenderTarget *target)
 {
   this->renderTarget = target;
 
@@ -1094,15 +1091,15 @@ void Camera::SetRenderTarget( Ogre::RenderTarget *target )
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
-    this->viewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
+    this->viewport->setBackgroundColour(
+        Conversions::Convert( this->scene->GetBackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
-    double ratio = (double)this->viewport->getActualWidth() / 
+    double ratio = (double)this->viewport->getActualWidth() /
                    (double)this->viewport->getActualHeight();
 
     double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
-    //gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
@@ -1198,7 +1195,6 @@ bool Camera::TrackVisualImpl( VisualPtr _visual )
   return true;
 }
 
-/// \brief Get the render texture
 Ogre::Texture *Camera::GetRenderTexture() const
 {
   return this->renderTexture;
@@ -1207,4 +1203,25 @@ Ogre::Texture *Camera::GetRenderTexture() const
 math::Vector3 Camera::GetDirection() const
 {
   return Conversions::Convert( this->camera->getDerivedDirection() );
+}
+
+bool Camera::IsVisible(VisualPtr _visual)
+{
+  if (this->camera && _visual)
+  {
+    _visual->ShowBoundingBox();
+    math::Box bbox = _visual->GetBoundingBox();
+    Ogre::AxisAlignedBox box;
+    box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
+    box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
+
+    return this->camera->isVisible(box);
+  }
+
+  return false;
+}
+
+bool Camera::IsVisible(const std::string &_visualName)
+{
+  return this->IsVisible(this->scene->GetVisual(_visualName));
 }

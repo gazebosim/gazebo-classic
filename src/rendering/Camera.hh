@@ -47,7 +47,6 @@ namespace Ogre
 
 namespace gazebo
 {
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
 	namespace rendering
@@ -66,7 +65,8 @@ namespace gazebo
     class Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
-      public: Camera(const std::string &namePrefix, Scene *scene, bool _autoRender=true);
+      public: Camera(const std::string &namePrefix, Scene *scene,
+                     bool _autoRender=true);
     
       /// \brief Destructor
       public: virtual ~Camera();
@@ -76,7 +76,7 @@ namespace gazebo
       public: void Load( sdf::ElementPtr &_sdf );
 
        /// \brief Load the camera with default parmeters
-      public: void Load( );
+      public: void Load();
   
       /// \brief Initialize the camera
       public: void Init();
@@ -134,14 +134,13 @@ namespace gazebo
       /// \brief Rotate the camera around the pitch axis
       public: void RotatePitch( float angle );
   
-  
-  
       /// \brief Set the clip distances
       public: void SetClipDist(float near, float far);
+
       public: void SetClipDist();
   
       /// \brief Set the camera FOV (horizontal)  
-      public: void SetFOV( float radians );
+      public: void SetHFOV(float radians);
   
       /// \brief Get the camera FOV (horizontal)  
       public: math::Angle GetHFOV() const;
@@ -204,6 +203,7 @@ namespace gazebo
   
       /// \brief Get a pointer to the ogre camera
       public: Ogre::Camera *GetOgreCamera() const;
+
       public: Ogre::Viewport *GetViewport() const;
   
       /// \brief Get the viewport width in pixels
@@ -251,11 +251,13 @@ namespace gazebo
       /// \brief Set whether to view the world in wireframe
       public: void ShowWireframe(bool s);
 
-      /// \brief Get a world space ray as cast from the camer through the viewport
+      /// \brief Get a world space ray as cast from the camera
+      ///        through the viewport
       public: void GetCameraToViewportRay(int screenx, int screeny,
-                                          math::Vector3 &origin, math::Vector3 &dir);
+                                          math::Vector3 &origin,
+                                          math::Vector3 &dir);
   
-          /// \brief Set whether to capture data
+      /// \brief Set whether to capture data
       public: void SetCaptureData( bool value );
   
       /// \brief Set the render target
@@ -302,6 +304,14 @@ namespace gazebo
 
       /// \brief Get the last time the camera was rendered
       public: common::Time GetLastRenderWallTime();
+
+      /// \brief Return true if the visual is within the camera's view
+      ///        frustum
+      public: bool IsVisible(VisualPtr _visual);
+
+      /// \brief Return true if the visual is within the camera's view
+      ///        frustum
+      public: bool IsVisible(const std::string &_visualName);
 
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
@@ -366,7 +376,9 @@ namespace gazebo
 
       protected: Scene *scene;
 
-      protected: event::EventT<void(const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> newImageFrame;
+      protected: event::EventT<void(const unsigned char *,
+                     unsigned int, unsigned int, unsigned int,
+                     const std::string &)> newImageFrame;
 
       protected: std::vector<event::ConnectionPtr> connections;
       protected: std::list<msgs::Request> requests;

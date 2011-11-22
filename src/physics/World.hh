@@ -207,7 +207,8 @@ namespace gazebo
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
       private: void ProcessEntityMsgs();
-      private: void FillModelMsg( msgs::Model &_msg, ModelPtr &_model );
+      private: void FillModelMsg(msgs::Model &_msg, ModelPtr &_model);
+      private: void ProcessRequestMsgs();
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
@@ -268,6 +269,7 @@ namespace gazebo
       private: std::list<std::string> deleteEntity;
 
       public: std::list< Entity* > dirtyPoses;
+      private: std::list<msgs::Request> requestQueue;
 
       private: boost::mutex *receiveMutex;
     };

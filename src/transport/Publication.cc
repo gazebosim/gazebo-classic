@@ -1,5 +1,23 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #include "SubscriptionTransport.hh"
 #include "Publication.hh"
+#include "Node.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -18,12 +36,6 @@ Publication::Publication( const std::string &topic, const std::string &msgType )
 // Destructor
 Publication::~Publication()
 {
-  std::list<google::protobuf::Message*>::iterator iter;
-  for (iter = this->prevMsgBuffer.begin();
-       iter != this->prevMsgBuffer.end(); iter++)
-  {
-    delete (*iter);
-  }
   this->prevMsgBuffer.clear();
 }
         
@@ -34,7 +46,23 @@ std::string Publication::GetTopic() const
   return this->topic;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+void Publication::AddSubscription(const NodePtr &_node)
+{
+  std::list<NodePtr>::iterator iter;
+  iter = std::find(this->nodes.begin(), this->nodes.end(), _node);
+  if (iter == this->nodes.end())
+  {
+    this->nodes.push_back(_node);
+
+    std::list<std::string>::iterator msgIter;
+    for (msgIter = this->prevMsgBuffer.begin();
+         msgIter != this->prevMsgBuffer.end(); msgIter++)
+    {
+      _node->HandleData(this->topic, *msgIter);
+    }
+  }
+}
+
 // Add a subscription callback
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
@@ -44,14 +72,11 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
   {
     this->callbacks.push_back(callback);
 
-    std::list<google::protobuf::Message*>::iterator msgIter;
+    std::list<std::string>::iterator msgIter;
     for (msgIter = this->prevMsgBuffer.begin();
          msgIter != this->prevMsgBuffer.end(); msgIter++)
     {
-      if ((*msgIter)->IsInitialized())
-      {
-        callback->HandleMessage(*msgIter);
-      }
+      callback->HandleData(*msgIter);
     }
   } 
 }
@@ -143,7 +168,6 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 // Remove a subscription
 void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 {
-
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
 
@@ -170,19 +194,26 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Publish data
-void Publication::Publish(const std::string &data)
+void Publication::Publish(const std::string &_data)
 {
-  std::list< CallbackHelperPtr >::iterator iter;
-  iter = this->callbacks.begin();
-
-  while (iter != this->callbacks.end())
+  std::list<NodePtr>::iterator iter;
+  iter = this->nodes.begin();
+  while (iter != this->nodes.end())
   {
-    if ((*iter)->HandleData(data))
+    if ((*iter)->HandleData(this->topic, _data))
       iter++;
     else
-    {
-      this->callbacks.erase( iter++ );
-    }
+      this->nodes.erase(iter++);
+  }
+
+  std::list< CallbackHelperPtr >::iterator cbIter;
+  cbIter = this->callbacks.begin();
+  while (cbIter != this->callbacks.end())
+  {
+    if ((*cbIter)->HandleData(_data))
+      cbIter++;
+    else
+      this->callbacks.erase(cbIter++);
   }
 }
 
@@ -190,55 +221,66 @@ void Publication::Publish(const std::string &data)
 // Publish data only on local subscriptions
 void Publication::LocalPublish(const std::string &data)
 {
-  std::list< CallbackHelperPtr >::iterator iter;
-  iter = this->callbacks.begin();
+  std::list<NodePtr>::iterator iter;
+  iter = this->nodes.begin();
 
-  while (iter != this->callbacks.end())
+  while (iter != this->nodes.end())
   {
-    if ((*iter)->IsLocal())
-    {
-      if ((*iter)->HandleData(data))
-        iter++;
-      else
-        iter = this->callbacks.erase( iter );
-    }
-    else
+    if ((*iter)->HandleData(this->topic, data))
       iter++;
+    else
+      iter = this->nodes.erase( iter );
   }
 
+  std::list< CallbackHelperPtr >::iterator cbIter;
+  cbIter = this->callbacks.begin();
+  while (cbIter != this->callbacks.end())
+  {
+    if ((*cbIter)->IsLocal())
+    {
+      if ((*cbIter)->HandleData(data))
+        cbIter++;
+      else
+        cbIter = this->callbacks.erase( cbIter );
+    }
+    else
+      cbIter++;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Publication::Publish(const google::protobuf::Message &_msg,
                           const boost::function<void()> &_cb)
 {
-  std::list< CallbackHelperPtr >::iterator iter;
-
   std::string data;
   _msg.SerializeToString(&data);
 
-  iter = this->callbacks.begin();
-  while (iter != this->callbacks.end())
+  std::list<NodePtr>::iterator iter;
+  iter = this->nodes.begin();
+  while (iter != this->nodes.end())
   {
-    if ((*iter)->HandleData(data))
-    {
+    if ((*iter)->HandleData(this->topic, data))
       iter++;
-    }
     else
-    {
-      this->callbacks.erase( iter++ );
-    }
+      this->nodes.erase( iter++ );
   }
+
+  std::list< CallbackHelperPtr >::iterator cbIter;
+  cbIter = this->callbacks.begin();
+  while (cbIter != this->callbacks.end())
+  {
+    if ((*cbIter)->HandleData(data))
+      cbIter++;
+    else
+      this->callbacks.erase( cbIter++ );
+  }
+
   if (_cb)
     (_cb)();
 
   if (this->prevMsgBuffer.size() > 10)
-  {
-    delete this->prevMsgBuffer.front();
     this->prevMsgBuffer.pop_front();
-  }
-  this->prevMsgBuffer.push_back(_msg.New());
-  this->prevMsgBuffer.back()->CopyFrom(_msg);
+  this->prevMsgBuffer.push_back(data);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +290,6 @@ std::string Publication::GetMsgType() const
   return this->msgType;
 }
 
-
 unsigned int Publication::GetTransportCount()
 {
   return this->transports.size();
@@ -256,15 +297,15 @@ unsigned int Publication::GetTransportCount()
 
 unsigned int Publication::GetCallbackCount()
 {
-  return this->callbacks.size();
+  return this->nodes.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 unsigned int Publication::GetRemoteSubscriptionCount()
 {
-  std::list< CallbackHelperPtr >::iterator iter;
   unsigned int count = 0;
 
+  std::list< CallbackHelperPtr >::iterator iter;
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
     if ( !(*iter)->IsLocal() )

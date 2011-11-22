@@ -203,7 +203,7 @@ void Scene::Init()
   }
 
   // Create ray scene query
-  this->raySceneQuery = this->manager->createRayQuery( Ogre::Ray() );
+  this->raySceneQuery = this->manager->createRayQuery(Ogre::Ray());
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
@@ -214,16 +214,16 @@ void Scene::Init()
 
   // Send a request to get the current world state
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response", &Scene::OnResponse, this);
+  this->responseSub = this->node->Subscribe("~/response", 
+      &Scene::OnResponse, this);
 
-  this->requestMsg = msgs::CreateRequest( "scene_info" );
+  this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
 
   //this->InitShadows();
-
 }
 
 // TODO: put this back in, and disable PSSM shadows in the RTShader. 
@@ -503,6 +503,12 @@ VisualPtr Scene::GetVisual( const std::string &_name ) const
   Visual_M::const_iterator iter = this->visuals.find(_name);
   if (iter != this->visuals.end())
     result = iter->second;
+  else
+  {
+    iter = this->visuals.find(this->GetName() + "::" + _name);
+    if (iter != this->visuals.end())
+      result = iter->second;
+  }
 
   return result;
 }
@@ -944,12 +950,13 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   for (int i=0; i < _msg->model_size(); i++)
   {
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
-    pm->set_name( _msg->model(i).name() );
+    pm->set_name(_msg->model(i).name());
     this->poseMsgs.push_back( pm );
 
     for (int j=0; j < _msg->model(i).links_size(); j++)
     {
-      boost::shared_ptr<msgs::Pose> pm2(new msgs::Pose(_msg->model(i).links(j).pose()));
+      boost::shared_ptr<msgs::Pose> pm2(
+          new msgs::Pose(_msg->model(i).links(j).pose()));
       pm2->set_name(_msg->model(i).links(j).name());
       this->poseMsgs.push_back(pm2);
 

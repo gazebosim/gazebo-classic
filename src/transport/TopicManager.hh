@@ -123,22 +123,23 @@ namespace gazebo
                   publication->SetLocallyAdvertised(true);
                   pub->SetPublication( publication, i );
 
-                  SubMap::iterator iter;
-                  SubMap::iterator st_end = this->subscribed_topics.end();
-                  for (iter = this->subscribed_topics.begin(); 
-                      iter != st_end; iter++)
+                  SubNodeMap::iterator iter2;
+                  SubNodeMap::iterator st_end2 = this->subscribedNodess.end();
+                  for (iter2 = this->subscribedNodess.begin(); 
+                       iter2 != st_end2; iter2++)
                   {
-                    if ( iter->first == t )
+                    if (iter2->first == t)
                     {
-                      std::list<CallbackHelperPtr>::iterator liter;
-                      std::list<CallbackHelperPtr>::iterator l_end = iter->second.end();
-                      for (liter = iter->second.begin(); 
-                          liter != l_end; liter++)
+                      std::list<NodePtr>::iterator liter;
+                      std::list<NodePtr>::iterator l_end = iter2->second.end();
+                      for (liter = iter2->second.begin(); 
+                           liter != l_end; liter++)
                       {
-                        publication->AddSubscription( *liter );
+                        publication->AddSubscription(*liter);
                       }
                     }
                   }
+
                 }
 
                 return pub;
@@ -191,14 +192,14 @@ namespace gazebo
 
       /// \brief A map <subscribed_topic_name, subscription_callbacks> of 
       ///        subscribers to topics
-      typedef std::map< std::string, std::list<CallbackHelperPtr> > SubMap;
+      typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 
       //private: std::vector<PublicationPtr> advertisedTopics;
       //private: std::vector<PublicationPtr>::iterator advertisedTopicsEnd;
       private: typedef std::map<std::string, PublicationPtr> PublicationPtr_M;
       private: PublicationPtr_M advertisedTopics;
       private: PublicationPtr_M::iterator advertisedTopicsEnd;
-      private: SubMap subscribed_topics; 
+      private: SubNodeMap subscribedNodess; 
       private: std::vector<NodePtr> nodes;
 
       private: boost::recursive_mutex *nodeMutex;

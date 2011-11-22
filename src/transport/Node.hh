@@ -62,6 +62,7 @@ namespace gazebo
       /// \brief Process all publishers, which has each publisher send it's
       /// most recent message over the wire. This is for internal use only
       public: void ProcessPublishers();
+      public: void ProcessIncomingMsgs();
 
       /// \brief Adverise a topic
       template<typename M>
@@ -86,7 +87,9 @@ namespace gazebo
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic, boost::bind(fp, obj, _1));
+        ops.template Init<M>(decodedTopic, boost::bind(fp, obj, _1),
+                             shared_from_this());
+        this->callbacks[decodedTopic].push_back(ops.GetSubscription());
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
   
@@ -97,10 +100,14 @@ namespace gazebo
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic, fp);
+        ops.template Init<M>(decodedTopic, fp, shared_from_this());
+        this->callbacks[decodedTopic].push_back(ops.GetSubscription());
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
 
+      public: bool HandleData(const std::string &_topic,
+                              const std::string &_msg);
+      
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;
       private: std::vector<PublisherPtr>::iterator publishersIter;
@@ -108,6 +115,10 @@ namespace gazebo
       private: static unsigned int idCounter;
       private: unsigned int id;
 
+      private: typedef std::list<CallbackHelperPtr> Callback_L;
+      private: typedef std::map<std::string, Callback_L> Callback_M;
+      private: Callback_M callbacks;
+      private: std::map<std::string, std::list<std::string> > incomingMsgs;
       private: boost::recursive_mutex *publisherMutex;
     };
     /// \}

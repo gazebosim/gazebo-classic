@@ -326,6 +326,7 @@ void World::Update()
   }
 
   this->ProcessEntityMsgs();
+  this->ProcessRequestMsgs();
 
   event::Events::worldUpdateEnd();
 }
@@ -655,100 +656,113 @@ void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
 void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->requestQueue.push_back(*_msg);
+}
 
+void World::ProcessRequestMsgs()
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   msgs::Response response;
-  response.set_id( _msg->id() );
-  response.set_request( _msg->request() );
-  response.set_response( "success" );
 
-
-  if (_msg->request() == "entity_list")
+  std::list<msgs::Request>::iterator iter;
+  for (iter = this->requestQueue.begin();
+       iter != this->requestQueue.end(); iter++)
   {
-    msgs::Model_V modelVMsg;
+    response.set_id((*iter).id());
+    response.set_request( (*iter).request() );
+    response.set_response( "success" );
 
-    for (unsigned int i=0; i < this->rootElement->GetChildCount(); i++)
+    if ((*iter).request() == "entity_list")
     {
-      BasePtr entity = this->rootElement->GetChild(i);
-      msgs::Model *modelMsg = modelVMsg.add_models();
-      if (entity->HasType(Base::MODEL))
+      msgs::Model_V modelVMsg;
+
+      for (unsigned int i=0; i < this->rootElement->GetChildCount(); i++)
       {
-        ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
-        model->FillModelMsg( *modelMsg );
+        BasePtr entity = this->rootElement->GetChild(i);
+        msgs::Model *modelMsg = modelVMsg.add_models();
+        if (entity->HasType(Base::MODEL))
+        {
+          ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+          model->FillModelMsg( *modelMsg );
+        }
+      }
+
+      response.set_type( modelVMsg.GetTypeName() );
+      std::string *serializedData = response.mutable_serialized_data();
+      modelVMsg.SerializeToString( serializedData );
+    }
+    else if ((*iter).request() == "entity_delete")
+    {
+      this->deleteEntity.push_back( (*iter).data() );
+    }
+    else if ((*iter).request() == "entity_info")
+    {
+      BasePtr entity = this->rootElement->GetByName( (*iter).data() );
+      if (entity)
+      {
+        if (entity->HasType(Base::MODEL))
+        {
+          msgs::Model modelMsg;
+          ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
+          model->FillModelMsg(modelMsg);
+
+          std::string *serializedData = response.mutable_serialized_data();
+          modelMsg.SerializeToString( serializedData );
+          response.set_type( modelMsg.GetTypeName() );
+        }
+        else if (entity->HasType(Base::LINK))
+        {
+          msgs::Link linkMsg;
+          LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
+          link->FillLinkMsg(linkMsg);
+
+          std::string *serializedData = response.mutable_serialized_data();
+          linkMsg.SerializeToString( serializedData );
+          response.set_type( linkMsg.GetTypeName() );
+        }
+        else if (entity->HasType(Base::COLLISION))
+        {
+          msgs::Collision collisionMsg;
+          CollisionPtr collision = boost::shared_dynamic_cast<Collision>(entity);
+          collision->FillCollisionMsg( collisionMsg );
+
+          std::string *serializedData = response.mutable_serialized_data();
+          collisionMsg.SerializeToString( serializedData );
+          response.set_type( collisionMsg.GetTypeName() );
+        }
+        else if (entity->HasType(Base::JOINT))
+        {
+          msgs::Joint jointMsg;
+          JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
+          joint->FillJointMsg( jointMsg );
+
+          std::string *serializedData = response.mutable_serialized_data();
+          jointMsg.SerializeToString( serializedData );
+          response.set_type( jointMsg.GetTypeName() );
+        }
+      }
+      else
+      {
+        response.set_type("error");
+        response.set_response( "nonexistant" );
       }
     }
-
-    response.set_type( modelVMsg.GetTypeName() );
-    std::string *serializedData = response.mutable_serialized_data();
-    modelVMsg.SerializeToString( serializedData );
-  }
-  else if (_msg->request() == "entity_delete")
-  {
-    this->deleteEntity.push_back( _msg->data() );
-  }
-  else if (_msg->request() == "entity_info")
-  {
-    BasePtr entity = this->rootElement->GetByName( _msg->data() );
-    if (entity)
+    else if ((*iter).request() == "scene_info")
     {
-      if (entity->HasType(Base::MODEL))
-      {
-        msgs::Model modelMsg;
-        ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
-        model->FillModelMsg(modelMsg);
+      this->incomingMsgMutex->lock();
+      this->sceneMsg.clear_model();
+      this->BuildSceneMsg( this->sceneMsg, this->rootElement );
 
-        std::string *serializedData = response.mutable_serialized_data();
-        modelMsg.SerializeToString( serializedData );
-        response.set_type( modelMsg.GetTypeName() );
-      }
-      else if (entity->HasType(Base::LINK))
-      {
-        msgs::Link linkMsg;
-        LinkPtr link = boost::shared_dynamic_cast<Link>(entity);
-        link->FillLinkMsg(linkMsg);
-
-        std::string *serializedData = response.mutable_serialized_data();
-        linkMsg.SerializeToString( serializedData );
-        response.set_type( linkMsg.GetTypeName() );
-      }
-      else if (entity->HasType(Base::COLLISION))
-      {
-        msgs::Collision collisionMsg;
-        CollisionPtr collision = boost::shared_dynamic_cast<Collision>(entity);
-        collision->FillCollisionMsg( collisionMsg );
-
-        std::string *serializedData = response.mutable_serialized_data();
-        collisionMsg.SerializeToString( serializedData );
-        response.set_type( collisionMsg.GetTypeName() );
-      }
-      else if (entity->HasType(Base::JOINT))
-      {
-        msgs::Joint jointMsg;
-        JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
-        joint->FillJointMsg( jointMsg );
-
-        std::string *serializedData = response.mutable_serialized_data();
-        jointMsg.SerializeToString( serializedData );
-        response.set_type( jointMsg.GetTypeName() );
-      }
+      std::string *serializedData = response.mutable_serialized_data();
+      this->sceneMsg.SerializeToString(serializedData);
+      response.set_type( sceneMsg.GetTypeName() );
+      this->incomingMsgMutex->unlock();
     }
-    else
-    {
-      response.set_type("error");
-      response.set_response( "nonexistant" );
-    }
-  }
-  else if (_msg->request() == "scene_info")
-  {
-    this->sceneMsg.clear_model();
-    this->BuildSceneMsg( this->sceneMsg, this->rootElement );
 
-    std::string *serializedData = response.mutable_serialized_data();
-    this->sceneMsg.SerializeToString( serializedData );
-    response.set_type( sceneMsg.GetTypeName() );
-    
+    this->responsePub->Publish(response);
   }
 
-  this->responsePub->Publish( response );
+  this->requestQueue.clear();
 }
 
 void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
@@ -839,6 +853,7 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
   if (msg->name().find("__GZ_USER_") != std::string::npos)
     return;
 
+  this->incomingMsgMutex->lock();
   int i = 0;
   for (; i < this->sceneMsg.visual_size(); i++)
   {
@@ -855,12 +870,14 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
     newVis->CopyFrom(*msg);
   }
   
+  this->incomingMsgMutex->unlock();
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Log the joint, which allows the world to maintain the current state of
 // the scene. This in turns allows a gui to query the latest state.
 void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
 {
+  this->incomingMsgMutex->lock();
   int i = 0;
   for (; i < this->sceneMsg.joint_size(); i++)
   {
@@ -876,6 +893,7 @@ void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
     msgs::Joint *newJoint = this->sceneMsg.add_joint();
     newJoint->CopyFrom(*msg);
   }
+  this->incomingMsgMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -103,5 +103,45 @@ void Node::ProcessPublishers()
   {
     (*this->publishersIter)->SendMessage();
   }
+  this->ProcessIncomingMsgs();
   this->publisherMutex->unlock();
+}
+
+bool Node::HandleData(const std::string &_topic, const std::string &_msg)
+{
+  this->publisherMutex->lock();
+  this->incomingMsgs[_topic].push_back(_msg);
+  this->publisherMutex->unlock();
+  return true;
+}
+
+void Node::ProcessIncomingMsgs()
+{
+  Callback_M::iterator cbIter;
+  Callback_L::iterator liter;
+  std::list<std::string>::iterator msgIter;
+
+  // For each topic
+  std::map<std::string, std::list<std::string> >::iterator inIter;
+  for (inIter = this->incomingMsgs.begin(); inIter != this->incomingMsgs.end();
+       inIter++)
+  {
+    // Find the callbacks for the topic
+    cbIter = this->callbacks.find(inIter->first);
+    if (cbIter != this->callbacks.end())
+    {
+      // For each message in the buffer
+      for (msgIter = inIter->second.begin(); msgIter != inIter->second.end();
+           msgIter++)
+      {
+        // Send the message to all callbacks
+        for (liter = cbIter->second.begin();
+             liter != cbIter->second.end(); liter++)
+        {
+          (*liter)->HandleData(*msgIter);
+        }
+      }
+    }
+  }
+  this->incomingMsgs.clear();
 }

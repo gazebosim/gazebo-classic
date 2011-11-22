@@ -33,6 +33,7 @@ namespace gazebo
       public: std::string GetMsgType() const;
 
       public: void AddSubscription(const CallbackHelperPtr &callback);
+      public: void AddSubscription(const NodePtr &_node);
 
       public: void RemoveSubscription(const CallbackHelperPtr &callback);
 
@@ -66,11 +67,16 @@ namespace gazebo
       private: static unsigned int idCounter;
       private: std::string topic;
       private: std::string msgType;
-      private: std::list< CallbackHelperPtr > callbacks;
+
+      /// \brief Remove nodes that receieve messages
+      private: std::list<CallbackHelperPtr> callbacks;
+
+      /// \brief Local nodes that recieve messages
+      private: std::list<NodePtr> nodes;
 
       private: std::list<PublicationTransportPtr> transports;
 
-      private: std::list<google::protobuf::Message*> prevMsgBuffer;
+      private: std::list<std::string> prevMsgBuffer;
 
       private: bool locallyAdvertised;
     };

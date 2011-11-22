@@ -76,8 +76,6 @@ void GUIOverlay::Init( Ogre::RenderTarget *_renderTarget )
   CEGUI::Window *rootWindow  = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
   rootWindow->setMousePassThroughEnabled(true);
   CEGUI::System::getSingleton().setGUISheet( rootWindow );
-
-  CEGUI::AnimationManager::getSingleton().loadAnimationsFromXML("fade.xml");
 #endif
 }
 

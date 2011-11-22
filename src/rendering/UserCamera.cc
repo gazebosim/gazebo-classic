@@ -103,7 +103,7 @@ void UserCamera::Load( )
 void UserCamera::Init()
 {
   Camera::Init();
-  this->SetFOV( DTOR(60) );
+  this->SetHFOV(DTOR(60));
   this->SetClipDist(0.001, 100);
 
   /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
