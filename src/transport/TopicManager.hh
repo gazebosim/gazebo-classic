@@ -67,11 +67,7 @@ namespace gazebo
       public: bool IsAdvertised(const std::string &_topic);
 
       /// \brief Subscribe to a topic
-      //public: template<class M>
       public: SubscriberPtr Subscribe(const SubscribeOptions &options);
-                  //const boost::function<void (const boost::shared_ptr<M const> &)> &callback)
-                  //void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)
-              
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
@@ -124,8 +120,8 @@ namespace gazebo
                   pub->SetPublication( publication, i );
 
                   SubNodeMap::iterator iter2;
-                  SubNodeMap::iterator st_end2 = this->subscribedNodess.end();
-                  for (iter2 = this->subscribedNodess.begin(); 
+                  SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
+                  for (iter2 = this->subscribedNodes.begin(); 
                        iter2 != st_end2; iter2++)
                   {
                     if (iter2->first == t)
@@ -190,16 +186,12 @@ namespace gazebo
 
       private: void HandleIncoming();
 
-      /// \brief A map <subscribed_topic_name, subscription_callbacks> of 
-      ///        subscribers to topics
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 
-      //private: std::vector<PublicationPtr> advertisedTopics;
-      //private: std::vector<PublicationPtr>::iterator advertisedTopicsEnd;
       private: typedef std::map<std::string, PublicationPtr> PublicationPtr_M;
       private: PublicationPtr_M advertisedTopics;
       private: PublicationPtr_M::iterator advertisedTopicsEnd;
-      private: SubNodeMap subscribedNodess; 
+      private: SubNodeMap subscribedNodes; 
       private: std::vector<NodePtr> nodes;
 
       private: boost::recursive_mutex *nodeMutex;

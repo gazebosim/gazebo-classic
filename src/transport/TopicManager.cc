@@ -46,7 +46,7 @@ void TopicManager::Init()
 {
   this->advertisedTopics.clear();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
-  this->subscribedNodess.clear();
+  this->subscribedNodes.clear();
   this->nodes.clear();
 }
 
@@ -59,25 +59,13 @@ void TopicManager::Fini()
     this->Unadvertise( iter->first );
   }
 
-  // FIX THIS
-  /*SubMap::iterator iter2;
-  for (iter2 = this->subscribed_topics.begin(); 
-       iter2 != this->subscribed_topics.end(); iter2++)
-  {
-    std::list<CallbackHelperPtr>::iterator iter3;
-    while (iter2->second.size() > 0)
-    {
-      this->Unsubscribe( iter2->first, iter2->second.front() );
-    }
-  }*/
-
   this->advertisedTopics.clear();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
-  this->subscribedNodess.clear();
+  this->subscribedNodes.clear();
   this->nodes.clear();
 }
 
-void TopicManager::AddNode( NodePtr _node )
+void TopicManager::AddNode(NodePtr _node)
 {
   this->nodeMutex->lock();
   this->nodes.push_back(_node);
@@ -159,7 +147,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
   // Create a subscription (essentially a callback that gets 
   // fired every time a Publish occurs on the corresponding
   // topic
-  this->subscribedNodess[_ops.GetTopic()].push_back(_ops.GetNode());
+  this->subscribedNodes[_ops.GetTopic()].push_back(_ops.GetNode());
 
   // The object that gets returned to the caller of this
   // function
@@ -202,9 +190,6 @@ void TopicManager::Unsubscribe(const std::string &_topic,
     publication->RemoveSubscription(_sub);
     ConnectionManager::Instance()->Unsubscribe(_topic, _sub->GetMsgType() );
   }
-
-  // TODO: Fix this
-  //this->subscribed_topics[_topic].remove(_sub);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,9 +222,9 @@ void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::st
 // Connect all local subscribers on a topic to known publishers
 void TopicManager::ConnectSubscribers(const std::string &_topic)
 {
-  SubNodeMap::iterator nodeIter = this->subscribedNodess.find(_topic);
+  SubNodeMap::iterator nodeIter = this->subscribedNodes.find(_topic);
 
-  if (nodeIter != this->subscribedNodess.end())
+  if (nodeIter != this->subscribedNodes.end())
   {
     PublicationPtr publication = this->FindPublication(_topic);
     if (!publication)
