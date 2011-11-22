@@ -206,9 +206,11 @@ namespace gazebo
 
       private: void LoadPlugin( sdf::ElementPtr &_sdf );
 
-      private: void ProcessEntityMsgs();
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr &_model);
+
+      private: void ProcessEntityMsgs();
       private: void ProcessRequestMsgs();
+      private: void ProcessFactoryMsgs();
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
@@ -256,22 +258,22 @@ namespace gazebo
       private: common::Time pauseStartTime;
       private: common::Time realTimeOffset;
 
-      private: boost::mutex *updateMutex;
-      private: sdf::ElementPtr sdf;
+      private: boost::mutex *receiveMutex;
 
       /// TODO: Add an accessor for this, and make it private
       /// lock all pose updates when worldPose is being updated for a model
-      public: boost::recursive_mutex* modelWorldPoseUpdateMutex;
+      public: boost::recursive_mutex *modelWorldPoseUpdateMutex;
 
-      private: boost::recursive_mutex *incomingMsgMutex;
+      private: sdf::ElementPtr sdf;
 
       private: std::vector<WorldPluginPtr> plugins;
       private: std::list<std::string> deleteEntity;
 
       public: std::list< Entity* > dirtyPoses;
-      private: std::list<msgs::Request> requestQueue;
 
-      private: boost::mutex *receiveMutex;
+      private: std::list<msgs::Request> requestMsgs;
+      private: std::list<msgs::Factory> factoryMsgs;
+
     };
 
     /// \}

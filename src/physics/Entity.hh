@@ -229,7 +229,6 @@ namespace gazebo
       protected: msgs::Visual *visualMsg;
       protected: msgs::Pose *poseMsg;
 
-      protected: boost::recursive_mutex *poseMutex;
       protected: common::PoseAnimationPtr animation;
       protected: common::Time prevAnimationTime;
       protected: math::Pose animationStartPose;

@@ -80,30 +80,22 @@ World::World(const std::string &_name)
 
   this->name = _name;
 
-  this->updateMutex = new boost::mutex();
-  this->incomingMsgMutex = new boost::recursive_mutex();
   this->modelWorldPoseUpdateMutex = new boost::recursive_mutex();
 
-  this->connections.push_back( 
-     event::Events::ConnectStep( boost::bind(&World::OnStep, this) ) );
-  this->connections.push_back( 
-     event::Events::ConnectSetSelectedEntity( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
   this->connections.push_back(
-     event::Events::ConnectDeleteEntity( boost::bind(&World::DeleteEntityCB, this, _1) ) );
-
+     event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&World::SetSelectedEntityCB, this, _1)));
+  this->connections.push_back(
+     event::Events::ConnectDeleteEntity(
+       boost::bind(&World::DeleteEntityCB, this, _1)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Private destructor
 World::~World()
 {
-  delete this->updateMutex;
-  this->updateMutex = NULL;
-
-  delete this->incomingMsgMutex;
-  this->incomingMsgMutex = NULL;
-
-
   delete this->modelWorldPoseUpdateMutex;
   this->modelWorldPoseUpdateMutex = NULL;
 
@@ -143,24 +135,21 @@ void World::Load( sdf::ElementPtr _sdf )
 
   this->factorySub = this->node->Subscribe("~/factory", 
                                            &World::OnFactoryMsg, this);
-
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);
-
   this->requestSub = this->node->Subscribe("~/request",&World::OnRequest, this);
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->sceneSub = this->node->Subscribe("~/scene", 
                                         &World::OnScene, this);
-
   this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
+  this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
+      &World::OnModelMsg, this);
 
+
+  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
   this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
-
-  this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
-      &World::OnModelMsg, this);
 
   {
     // Make all incoming messages wait until the world is done loading.
@@ -281,7 +270,6 @@ void World::RunLoop()
       this->pauseTime += step;
     else
     {
-      boost::mutex::scoped_lock lock(*this->updateMutex);
       this->simTime += step;
       this->Update();
     }
@@ -327,25 +315,10 @@ void World::Update()
 
   this->ProcessEntityMsgs();
   this->ProcessRequestMsgs();
+  this->ProcessFactoryMsgs();
 
   event::Events::worldUpdateEnd();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-void World::ProcessEntityMsgs()
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-
-  std::list< std::string >::iterator iter;
-  for (iter = this->deleteEntity.begin(); 
-       iter != this->deleteEntity.end(); iter++)
-  {
-    this->rootElement->RemoveChild( (*iter) );
-  }
-
-  this->deleteEntity.clear();
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the world
@@ -643,20 +616,218 @@ void World::SetPaused(bool p)
 }
 
 
+// Received a factory msg
+void World::OnFactoryMsg(const boost::shared_ptr<msgs::Factory const> &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->factoryMsgs.push_back(*_msg);
+}
 
-void World::OnControl( const boost::shared_ptr<msgs::WorldControl const> &data )
+void World::OnControl(const boost::shared_ptr<msgs::WorldControl const> &data)
 {
   if (data->has_pause())
-    this->SetPaused( data->pause() );
+    this->SetPaused(data->pause());
 
   if (data->has_step())
     this->OnStep();
 }
 
-void World::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
+void World::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->requestQueue.push_back(*_msg);
+  this->requestMsgs.push_back(*_msg);
+}
+
+void World::OnScene(const boost::shared_ptr<msgs::Scene const> &_data)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sceneMsg.MergeFrom(*_data);
+}
+
+void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  if (msg->name().find("__GZ_USER_") != std::string::npos)
+    return;
+
+  int i = 0;
+  for (; i < this->sceneMsg.visual_size(); i++)
+  {
+    if (this->sceneMsg.visual(i).name() == msg->name())
+    {
+      this->sceneMsg.mutable_visual(i)->CopyFrom(*msg);
+      break;
+    }
+  }
+
+  if (i >= this->sceneMsg.visual_size())
+  {
+    msgs::Visual *newVis = this->sceneMsg.add_visual();
+    newVis->CopyFrom(*msg);
+  }
+}
+
+void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  int i = 0;
+  for (; i < this->sceneMsg.joint_size(); i++)
+  {
+    if (this->sceneMsg.joint(i).name() == msg->name())
+    {
+      this->sceneMsg.mutable_joint(i)->CopyFrom(*msg);
+      break;
+    }
+  }
+
+  if (i >= this->sceneMsg.joint_size())
+  {
+    msgs::Joint *newJoint = this->sceneMsg.add_joint();
+    newJoint->CopyFrom(*msg);
+  }
+}
+
+void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  ModelPtr model = this->GetModelByName( _msg->name() );
+  if (!model)
+  {
+    gzerr << "Unable to find model[" << _msg->name() << "]\n";
+    return;
+  }
+
+  if (_msg->has_pose())
+  {
+    model->SetWorldPose( msgs::Convert(_msg->pose()) );
+  }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Construct a scene message
+void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
+{
+  if (entity)
+  {
+    if (entity->HasType(Entity::MODEL))
+    {
+      msgs::Model *modelMsg = scene.add_model();
+      this->BuildModelMsg(modelMsg, boost::shared_static_cast<Model>(entity));
+    }
+
+    for (unsigned int i=0; i < entity->GetChildCount(); i++)
+    {
+      this->BuildSceneMsg( scene, entity->GetChild(i) );
+    }
+  }
+}
+
+void World::BuildModelMsg(msgs::Model *_msg, ModelPtr _model)
+{
+  math::Pose pose = _model->GetWorldPose();
+  _msg->set_name( _model->GetCompleteScopedName() );
+  msgs::Set(_msg->mutable_pose(), pose);
+
+  for (unsigned int i=0; i < _model->GetChildCount(); i++)
+  {
+    if (_model->GetChild(i)->HasType(Entity::LINK))
+    {
+      msgs::Link *linkMsg = _msg->add_links();
+      LinkPtr link = boost::shared_static_cast<Link>(_model->GetChild(i));
+      this->BuildLinkMsg(linkMsg, link);
+    }
+  }
+}
+
+void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
+{
+  math::Pose pose = _link->GetWorldPose();
+  _msg->set_name( _link->GetCompleteScopedName() );
+  msgs::Set(_msg->mutable_pose(), pose);
+
+  for (unsigned int i=0; i < _link->GetSensorCount(); i++)
+  {
+    msgs::Sensor *sensorMsg = _msg->add_sensors();
+    std::string sensorName = _link->GetSensorName(i);
+    sensors::SensorPtr sensor = sensors::SensorManager::Instance()->GetSensor(
+        sensorName);
+    this->BuildSensorMsg(sensorMsg, sensor);
+  }
+}
+
+void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
+{
+  math::Pose pose = _sensor->GetPose();
+  _msg->set_name( _sensor->GetName() );
+  _msg->set_type( _sensor->GetType() );
+  _msg->set_parent(_sensor->GetParentName());
+  msgs::Set(_msg->mutable_pose(), pose);
+
+  _msg->set_visualize(_sensor->GetVisualize());
+  _msg->set_topic(_sensor->GetTopic());
+
+  if (_sensor->GetType() == "camera")
+  {
+    sensors::CameraSensorPtr camSensor =
+      boost::shared_static_cast<sensors::CameraSensor>(_sensor);
+    msgs::CameraSensor *camMsg = _msg->mutable_camera();
+    camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
+    camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
+  }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// TBB version of model updating
+/*void World::ModelUpdateTBB()
+{
+  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
+      ModelUpdate_TBB(&this->models) );
+}*/
+
+////////////////////////////////////////////////////////////////////////////////
+// Single loop verison of model updating
+void World::ModelUpdateSingleLoop()
+{
+  // Update all the models
+  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+    this->rootElement->GetChild(i)->Update();
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a plugin
+void World::LoadPlugin( sdf::ElementPtr &_sdf )
+{
+  std::string name = _sdf->GetValueString("name");
+  std::string filename = _sdf->GetValueString("filename");
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename, name);
+  if (plugin)
+  {
+    WorldPtr myself = shared_from_this();
+    plugin->Load(myself,_sdf);
+    this->plugins.push_back( plugin );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void World::ProcessEntityMsgs()
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  std::list<std::string>::iterator iter;
+  for (iter = this->deleteEntity.begin(); 
+       iter != this->deleteEntity.end(); iter++)
+  {
+    this->rootElement->RemoveChild( (*iter) );
+  }
+
+  this->deleteEntity.clear();
 }
 
 void World::ProcessRequestMsgs()
@@ -665,8 +836,8 @@ void World::ProcessRequestMsgs()
   msgs::Response response;
 
   std::list<msgs::Request>::iterator iter;
-  for (iter = this->requestQueue.begin();
-       iter != this->requestQueue.end(); iter++)
+  for (iter = this->requestMsgs.begin();
+       iter != this->requestMsgs.end(); iter++)
   {
     response.set_id((*iter).id());
     response.set_request( (*iter).request() );
@@ -749,256 +920,78 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "scene_info")
     {
-      this->incomingMsgMutex->lock();
       this->sceneMsg.clear_model();
       this->BuildSceneMsg( this->sceneMsg, this->rootElement );
 
       std::string *serializedData = response.mutable_serialized_data();
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type( sceneMsg.GetTypeName() );
-      this->incomingMsgMutex->unlock();
     }
 
     this->responsePub->Publish(response);
   }
 
-  this->requestQueue.clear();
+  this->requestMsgs.clear();
 }
 
-void World::OnScene( const boost::shared_ptr<msgs::Scene const> &_data )
+void World::ProcessFactoryMsgs()
 {
-  this->incomingMsgMutex->lock();
-  this->sceneMsg.MergeFrom( *_data );
-  this->incomingMsgMutex->unlock();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Construct a scene message
-void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
-{
-  if (entity)
-  {
-    if (entity->HasType(Entity::MODEL))
-    {
-      msgs::Model *modelMsg = scene.add_model();
-      this->BuildModelMsg(modelMsg, boost::shared_static_cast<Model>(entity));
-    }
-
-    for (unsigned int i=0; i < entity->GetChildCount(); i++)
-    {
-      this->BuildSceneMsg( scene, entity->GetChild(i) );
-    }
-  }
-}
-
-void World::BuildModelMsg(msgs::Model *_msg, ModelPtr _model)
-{
-  math::Pose pose = _model->GetWorldPose();
-  _msg->set_name( _model->GetCompleteScopedName() );
-  msgs::Set(_msg->mutable_pose(), pose);
-
-  for (unsigned int i=0; i < _model->GetChildCount(); i++)
-  {
-    if (_model->GetChild(i)->HasType(Entity::LINK))
-    {
-      msgs::Link *linkMsg = _msg->add_links();
-      LinkPtr link = boost::shared_static_cast<Link>(_model->GetChild(i));
-      this->BuildLinkMsg(linkMsg, link);
-    }
-  }
-}
-
-void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
-{
-  math::Pose pose = _link->GetWorldPose();
-  _msg->set_name( _link->GetCompleteScopedName() );
-  msgs::Set(_msg->mutable_pose(), pose);
-
-  for (unsigned int i=0; i < _link->GetSensorCount(); i++)
-  {
-    msgs::Sensor *sensorMsg = _msg->add_sensors();
-    std::string sensorName = _link->GetSensorName(i);
-    sensors::SensorPtr sensor = sensors::SensorManager::Instance()->GetSensor(
-        sensorName);
-    this->BuildSensorMsg(sensorMsg, sensor);
-  }
-}
-
-void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
-{
-  math::Pose pose = _sensor->GetPose();
-  _msg->set_name( _sensor->GetName() );
-  _msg->set_type( _sensor->GetType() );
-  _msg->set_parent(_sensor->GetParentName());
-  msgs::Set(_msg->mutable_pose(), pose);
-
-  _msg->set_visualize(_sensor->GetVisualize());
-  _msg->set_topic(_sensor->GetTopic());
-
-  if (_sensor->GetType() == "camera")
-  {
-    sensors::CameraSensorPtr camSensor =
-      boost::shared_static_cast<sensors::CameraSensor>(_sensor);
-    msgs::CameraSensor *camMsg = _msg->mutable_camera();
-    camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
-    camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Log the visuals, which allows the world to maintain the current state of
-// the scene. This in turns allows a gui to query the latest state.
-void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
-{
-  if (msg->name().find("__GZ_USER_") != std::string::npos)
-    return;
-
-  this->incomingMsgMutex->lock();
-  int i = 0;
-  for (; i < this->sceneMsg.visual_size(); i++)
-  {
-    if (this->sceneMsg.visual(i).name() == msg->name())
-    {
-      this->sceneMsg.mutable_visual(i)->CopyFrom(*msg);
-      break;
-    }
-  }
-
-  if (i >= this->sceneMsg.visual_size())
-  {
-    msgs::Visual *newVis = this->sceneMsg.add_visual();
-    newVis->CopyFrom(*msg);
-  }
-  
-  this->incomingMsgMutex->unlock();
-}
-////////////////////////////////////////////////////////////////////////////////
-// Log the joint, which allows the world to maintain the current state of
-// the scene. This in turns allows a gui to query the latest state.
-void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
-{
-  this->incomingMsgMutex->lock();
-  int i = 0;
-  for (; i < this->sceneMsg.joint_size(); i++)
-  {
-    if (this->sceneMsg.joint(i).name() == msg->name())
-    {
-      this->sceneMsg.mutable_joint(i)->CopyFrom(*msg);
-      break;
-    }
-  }
-
-  if (i >= this->sceneMsg.joint_size())
-  {
-    msgs::Joint *newJoint = this->sceneMsg.add_joint();
-    newJoint->CopyFrom(*msg);
-  }
-  this->incomingMsgMutex->unlock();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// TBB version of model updating
-/*void World::ModelUpdateTBB()
-{
-  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
-      ModelUpdate_TBB(&this->models) );
-}*/
-
-////////////////////////////////////////////////////////////////////////////////
-// Single loop verison of model updating
-void World::ModelUpdateSingleLoop()
-{
-  // Update all the models
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Update();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Received a factory msg
-void World::OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &_msg)
-{
-  sdf::SDFPtr factorySDF(new sdf::SDF);
-  sdf::initFile( "/sdf/gazebo.sdf", factorySDF );
-
-  if (_msg->has_sdf() && !_msg->sdf().empty())
-  {
-    // SDF Parsing happens here
-    sdf::readString( _msg->sdf(), factorySDF );
-  }
-  else if (_msg->has_sdf_filename() && !_msg->sdf_filename().empty())
-  {
-    sdf::readFile( _msg->sdf_filename(), factorySDF);
-  }
-  else
-  {
-    gzerr << "Unable to load sdf from factory message."
-          << "No SDF or SDF filename specified.\n";
-  }
-
-  if (_msg->has_edit_name())
-  {
-    factorySDF->PrintValues();
-
-    BasePtr base = this->rootElement->GetByName( _msg->edit_name() );
-    if (base)
-    {
-      sdf::ElementPtr elem;
-      if (factorySDF->root->GetName() == "gazebo")
-        elem = factorySDF->root->GetFirstElement();
-      else
-        elem = factorySDF->root;
-
-      boost::mutex::scoped_lock lock(*this->updateMutex);
-      base->UpdateParameters( elem );
-    }
-  }
-  else
-  {
-    boost::mutex::scoped_lock lock(*this->updateMutex);
-    sdf::ElementPtr elem = factorySDF->root->GetElement("model");
-    if (!elem) 
-      elem = factorySDF->root->GetElement("world")->GetElement("model");
-
-    elem->SetParent(this->sdf);
-    elem->GetParent()->InsertElement(elem);
-    ModelPtr model = this->LoadModel( elem, this->rootElement );
-    if (_msg->has_pose())
-      model->SetWorldPose( msgs::Convert( _msg->pose() ) );
-
-    model->Init();
-  }
-
-  factorySDF->root.reset();
-}
-
-void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)
-{
+  std::list<msgs::Factory>::iterator iter;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  ModelPtr model = this->GetModelByName( _msg->name() );
-  if (!model)
+  for (iter = this->factoryMsgs.begin();
+       iter != this->factoryMsgs.end(); iter++)
   {
-    gzerr << "Unable to find model[" << _msg->name() << "]\n";
-    return;
+    sdf::SDFPtr factorySDF(new sdf::SDF);
+    sdf::initFile( "/sdf/gazebo.sdf", factorySDF );
+
+    if ((*iter).has_sdf() && !(*iter).sdf().empty())
+    {
+      // SDF Parsing happens here
+      sdf::readString( (*iter).sdf(), factorySDF );
+    }
+    else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
+    {
+      sdf::readFile( (*iter).sdf_filename(), factorySDF);
+    }
+    else
+    {
+      gzerr << "Unable to load sdf from factory message."
+        << "No SDF or SDF filename specified.\n";
+    }
+
+    if ((*iter).has_edit_name())
+    {
+      factorySDF->PrintValues();
+
+      BasePtr base = this->rootElement->GetByName( (*iter).edit_name() );
+      if (base)
+      {
+        sdf::ElementPtr elem;
+        if (factorySDF->root->GetName() == "gazebo")
+          elem = factorySDF->root->GetFirstElement();
+        else
+          elem = factorySDF->root;
+
+        base->UpdateParameters( elem );
+      }
+    }
+    else
+    {
+      sdf::ElementPtr elem = factorySDF->root->GetElement("model");
+      if (!elem) 
+        elem = factorySDF->root->GetElement("world")->GetElement("model");
+
+      elem->SetParent(this->sdf);
+      elem->GetParent()->InsertElement(elem);
+      ModelPtr model = this->LoadModel( elem, this->rootElement );
+      if ((*iter).has_pose())
+        model->SetWorldPose( msgs::Convert( (*iter).pose() ) );
+
+      model->Init();
+    }
+
+    factorySDF->root.reset();
   }
 
-  if (_msg->has_pose())
-  {
-    model->SetWorldPose( msgs::Convert(_msg->pose()) );
-  }
+  this->factoryMsgs.clear();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Load a plugin
-void World::LoadPlugin( sdf::ElementPtr &_sdf )
-{
-  std::string name = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
-  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename, name);
-  if (plugin)
-  {
-    WorldPtr myself = shared_from_this();
-    plugin->Load(myself,_sdf);
-    this->plugins.push_back( plugin );
-  }
-}
-

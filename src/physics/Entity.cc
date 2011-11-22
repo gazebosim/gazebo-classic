@@ -55,8 +55,6 @@ Entity::Entity(BasePtr parent)
   this->visualMsg = new msgs::Visual;
   this->poseMsg = new msgs::Pose;
 
-  this->poseMutex = new boost::recursive_mutex();
-
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
@@ -81,7 +79,6 @@ Entity::~Entity()
   delete this->poseMsg;
   this->poseMsg = NULL;
 
-  delete this->poseMutex;
   this->node.reset();
   this->posePub.reset();
   this->visPub.reset();
@@ -439,14 +436,11 @@ LinkPtr Entity::GetChildLink(const std::string &_name)
 /// Called when a new pose message arrives
 void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
-  //this->poseMutex->lock();
   if (_msg->name() == this->GetCompleteScopedName())
   {
     math::Pose p = msgs::Convert(*_msg);
     this->SetWorldPose( p );
   }
-  
-  //this->poseMutex->unlock();
 }
 
 void Entity::Fini()

@@ -129,7 +129,7 @@ void ODELink::MoveCallback(dBodyID id)
   const dReal *p;
   const dReal *r;
   ODELink *self = (ODELink*)(dBodyGetData(id));
-  self->poseMutex->lock();
+  //self->poseMutex->lock();
 
   p = dBodyGetPosition(id);
   r = dBodyGetQuaternion(id);
@@ -145,7 +145,7 @@ void ODELink::MoveCallback(dBodyID id)
 
   self->world->dirtyPoses.push_back( self );
 
-  self->poseMutex->unlock();
+  //self->poseMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
