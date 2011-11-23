@@ -497,7 +497,7 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a visual by name 
-VisualPtr Scene::GetVisual( const std::string &_name ) const
+VisualPtr Scene::GetVisual(const std::string &_name) const
 {
   VisualPtr result;
   Visual_M::const_iterator iter = this->visuals.find(_name);
@@ -1202,11 +1202,12 @@ void Scene::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
+    //std::cout << "Delete entity[" << _msg->data() << "]\n";
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
-    if (iter != this->visuals.end() )
+    if (iter != this->visuals.end())
     {
-      this->RemoveVisual( iter->second );
+      this->RemoveVisual(iter->second);
     }
   }
   else if (_msg->request() == "show_collision")
@@ -1356,15 +1357,19 @@ void Scene::AddVisual( VisualPtr &_vis )
 }
 
 /// Remove a visual from the scene
-void Scene::RemoveVisual( VisualPtr &_vis )
+void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
   {
-    Visual_M::iterator iter = this->visuals.find( _vis->GetName() );
+    Visual_M::iterator iter = this->visuals.find(_vis->GetName());
     if (iter != this->visuals.end())
     {
       iter->second->GetParent()->DetachVisual(iter->second);
+      iter->second->parent.reset();
+      iter->second->children.clear();
+      std::cout << "Remove Visual[" << _vis->GetName() << "] Use[" << iter->second.use_count() << "]...";
       this->visuals.erase(iter);
+      std::cout << "[" << _vis.use_count() << "]\n"; 
     }
 
     if (this->selectionObj->GetVisualName() == _vis->GetName())

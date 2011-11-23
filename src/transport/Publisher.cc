@@ -45,15 +45,17 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 // Destructor
 Publisher::~Publisher()
 {
-  /*if (this->messages.size() > 0)
+  if (this->messages.size() > 0)
   {
-    gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
+    this->SendMessage();
+    //gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
   }
-*/
-  std::list<google::protobuf::Message *>::iterator iter;
+
+  /*std::list<google::protobuf::Message *>::iterator iter;
   for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
     delete *iter;
   this->messages.clear();
+  */
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
@@ -80,13 +82,13 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   //if (!this->HasConnections())
     //return;
 
-  if (_block)
+  /*if (_block)
   {
-    TopicManager::Instance()->Publish(this->topic, _message,
-          boost::bind(&Publisher::OnPublishComplete, this));
+    TopicManager::Instance()->Publish(this->topic, _message);
   }
   else
   {
+  */
     // Save the latest message
     google::protobuf::Message *msg = _message.New();
     msg->CopyFrom( _message );
@@ -100,7 +102,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
       this->messages.pop_front();
     }
     this->mutex->unlock();
-  }
+  //}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

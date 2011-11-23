@@ -216,9 +216,9 @@ void World::Init()
   // Initialize the physics engine
   this->physicsEngine->Init();
 
-  //this->sceneMsg.clear_model();
-  //this->BuildSceneMsg( this->sceneMsg, this->rootElement );
-  //this->scenePub->Publish(this->sceneMsg);
+  this->sceneMsg.clear_model();
+  this->BuildSceneMsg( this->sceneMsg, this->rootElement );
+  this->scenePub->Publish(this->sceneMsg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -761,11 +761,15 @@ void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
 
   for (unsigned int i=0; i < _link->GetSensorCount(); i++)
   {
-    msgs::Sensor *sensorMsg = _msg->add_sensors();
     std::string sensorName = _link->GetSensorName(i);
     sensors::SensorPtr sensor = sensors::SensorManager::Instance()->GetSensor(
         sensorName);
-    this->BuildSensorMsg(sensorMsg, sensor);
+
+    if (sensor)
+    {
+      msgs::Sensor *sensorMsg = _msg->add_sensors();
+      this->BuildSensorMsg(sensorMsg, sensor);
+    }
   }
 }
 

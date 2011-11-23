@@ -103,6 +103,7 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 /// Destructor
 Visual::~Visual()
 {
+  std::cout << "   Delete Vis[" << this->GetName() << "]\n";
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender( this->preRenderConnection );
 

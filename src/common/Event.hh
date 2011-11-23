@@ -247,13 +247,14 @@ namespace gazebo
       public: template< typename P1, typename P2, typename P3, typename P4,
                         typename P5, typename P6, typename P7, typename P8,
                         typename P9, typename P10 >
-              void Signal(const P1 &p1, const P2 &p2, const P3 &p3, const P4 &p4,
-                          const P5 &p5, const P6 &p6, const P7 &p7, const P8 &p8,
-                          const P9 &p9, const P10 &p10)
+              void Signal(const P1 &p1, const P2 &p2, const P3 &p3,
+                  const P4 &p4, const P5 &p5, const P6 &p6, const P7 &p7,
+                  const P8 &p8, const P9 &p9, const P10 &p10)
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+                  (*this->connections[i])(p1, p2, p3, p4, p5,
+                      p6, p7, p8, p9, p10);
                 }
               }
 
@@ -274,11 +275,11 @@ namespace gazebo
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
-      this->lock.lock();
+      //this->lock.lock();
       int index = this->connections.size();
       this->connections.push_back(new boost::function<T>(_subscriber));
       this->connectionIds.push_back(index);
-      this->lock.unlock();
+      //this->lock.unlock();
       return ConnectionPtr(new Connection(this, index));
     }
     
@@ -293,7 +294,7 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
-      this->lock.lock();
+      //this->lock.lock();
       // search for index of the connection based on id
       for(unsigned int i=0; i < this->connectionIds.size(); i++)
       {
@@ -304,7 +305,7 @@ namespace gazebo
           break;
         }
       }
-      this->lock.unlock();
+      //this->lock.unlock();
     }
     /// \}
   }

@@ -57,6 +57,7 @@ Sensor::~Sensor()
   this->sdf->Reset();
   this->sdf.reset();
   this->node.reset();
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -250,6 +250,8 @@ namespace gazebo
 
       private: std::string GetMeshName() const;
   
+      public: void ClearParent();
+
       private: sdf::ElementPtr sdf;
 
       private: std::string myMaterialName;
@@ -278,8 +280,8 @@ namespace gazebo
 
       private: std::string name;
       private: std::string physicsEntityName;
-      protected: VisualPtr parent;
-      protected: std::vector<VisualPtr> children;
+      public: VisualPtr parent;
+      public: std::vector<VisualPtr> children;
 
       /// List of all the parameters
       protected: std::vector<common::Param*> parameters;

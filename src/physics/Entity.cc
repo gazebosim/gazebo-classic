@@ -448,6 +448,7 @@ void Entity::Fini()
   msgs::Request *msg = msgs::CreateRequest("entity_delete", 
       this->GetCompleteScopedName());
 
+  std::cout << "Request Entity Delete[" << this->GetCompleteScopedName() << "]\n";
   this->requestPub->Publish(*msg, true);
 
   this->connections.clear();

@@ -38,7 +38,7 @@ Connection::~Connection()
 
   if (this->event && this->id >= 0)
   {
-    this->event->Disconnect( this->id ); 
+    this->event->Disconnect(this->id); 
     this->id = -1;
     this->event = NULL;
   }
