@@ -104,6 +104,7 @@ World::~World()
 
   this->sdf->Reset();
   this->rootElement.reset();
+  this->node.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +139,9 @@ void World::Load( sdf::ElementPtr _sdf )
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);
   this->requestSub = this->node->Subscribe("~/request",&World::OnRequest, this);
-  this->sceneSub = this->node->Subscribe("~/scene", 
-                                        &World::OnScene, this);
+  //this->sceneSub = this->node->Subscribe("~/scene", 
+                                        //&World::OnScene, this);
+  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
@@ -213,6 +215,10 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
+
+  //this->sceneMsg.clear_model();
+  //this->BuildSceneMsg( this->sceneMsg, this->rootElement );
+  //this->scenePub->Publish(this->sceneMsg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -327,13 +333,19 @@ void World::Fini()
   this->Stop();
   this->plugins.clear();
 
-  this->rootElement->Fini();
+  if (this->rootElement)
+  {
+    this->rootElement->Fini();
+    this->rootElement.reset();
+  }
 
   if (this->physicsEngine)
   {
     this->physicsEngine->Fini();
     this->physicsEngine.reset();
   }
+
+  this->node->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -640,8 +652,8 @@ void World::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
 
 void World::OnScene(const boost::shared_ptr<msgs::Scene const> &_data)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->sceneMsg.MergeFrom(*_data);
+  //boost::mutex::scoped_lock lock(*this->receiveMutex);
+  //this->sceneMsg.MergeFrom(*_data);
 }
 
 void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
@@ -864,7 +876,7 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_delete")
     {
-      this->deleteEntity.push_back( (*iter).data() );
+      this->deleteEntity.push_back((*iter).data());
     }
     else if ((*iter).request() == "entity_info")
     {

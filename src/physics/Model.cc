@@ -851,14 +851,6 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
                           newRelativePose.rot);
 
   _body1->SetWorldPose(newWorldPose);
-  //std::cout << "      body[" << _body1->GetName()
-  //          << "] wp[" << worldPose
-  //          << "] np[" << _body1->GetWorldPose() 
-  //          << "] anchor[" << _anchor
-  //          << "] axis[" << _axis
-  //          << "] dangle [" << _dangle
-  //          << "] rotation[" << rotation
-  //          << "]\n";
 
   // recurse through children bodies
   if (_updateChildren) 
@@ -890,13 +882,6 @@ void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
 
   math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
   _body1->SetWorldPose(newWorldPose);
-
-  // std::cout << "      body[" << body1->GetName()
-  //           << "] wp[" << world_pose
-  //           << "] anchor[" << anchor
-  //           << "] axis[" << axis
-  //           << "] dposition [" << dposition
-  //           << "]\n";
 
   // recurse through children bodies
   if (_updateChildren) 

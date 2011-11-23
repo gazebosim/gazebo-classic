@@ -74,6 +74,8 @@ namespace gazebo
       public: void Unsubscribe(const std::string &topic, 
                                const CallbackHelperPtr &_sub);
 
+      public: void Unsubscribe(const std::string &_topic, const NodePtr &_sub);
+
       /// \brief Advertise on a topic
       /// \param topic The name of the topic
       public: template<typename M>
@@ -150,7 +152,7 @@ namespace gazebo
       /// \param message The message to send.
       /// \param cb Callback, used when the publish is completed.
       public: void Publish( const std::string &topic, 
-                            google::protobuf::Message &message,
+                            const google::protobuf::Message &message,
                             const boost::function<void()> &cb = NULL);
 
       /// \brief Connection a local Publisher to a remote Subscriber
@@ -183,6 +185,8 @@ namespace gazebo
 
       /// \brief Get all the topic namespaces
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
+
+      public: void ClearBuffers();
 
       private: void HandleIncoming();
 

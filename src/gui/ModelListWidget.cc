@@ -80,6 +80,9 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->responseSub = this->node->Subscribe("~/response", 
                                             &ModelListWidget::OnResponse, this);
 
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelListWidget::OnRequest, this);
+
   this->newEntitySub = this->node->Subscribe("~/model/info", 
       &ModelListWidget::OnModel, this);
 
@@ -274,7 +277,7 @@ void ModelListWidget::OnResponse(
   this->requestMsg = NULL;
 }
 
-void ModelListWidget::RemoveEntity( const std::string &_name )
+void ModelListWidget::RemoveEntity(const std::string &_name)
 {
   QTreeWidgetItem *listItem = this->GetModelListItem( _name );
   if (listItem)
@@ -1207,4 +1210,13 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
     _parent->addSubProperty(item);
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
   item->setValue(RTOD(rpy.z));
+}
+
+void ModelListWidget::OnRequest(
+    const boost::shared_ptr<msgs::Request const> &_msg)
+{
+  if (_msg->request() == "entity_delete")
+  {
+    this->RemoveEntity(_msg->data());
+  }
 }

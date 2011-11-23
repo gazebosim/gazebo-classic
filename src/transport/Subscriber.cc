@@ -26,8 +26,8 @@ using namespace transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Subscriber::Subscriber(const std::string &t, CallbackHelperPtr sub)
-  : topic(t), subscription(sub)
+Subscriber::Subscriber(const std::string &t, NodePtr _node)
+  : topic(t), node(_node)
 {
 }
 
@@ -36,6 +36,7 @@ Subscriber::Subscriber(const std::string &t, CallbackHelperPtr sub)
 Subscriber::~Subscriber()
 {
   this->Unsubscribe();
+  this->node.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,21 +50,20 @@ std::string Subscriber::GetTopic() const
 /// Get the message type
 std::string Subscriber::GetMsgType() const
 {
-  return this->subscription->GetMsgType();
+  return std::string();//this->subscription->GetMsgType();
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Unsubscribe from the topic
 void Subscriber::Unsubscribe() const
 {
-  TopicManager::Instance()->Unsubscribe( this->topic, this->subscription );
+  if (this->node)
+  {
+    TopicManager::Instance()->Unsubscribe(this->topic, this->node);
+  }
+  else
+  {
+    gzerr << "\n\nSub unsun with callback\n\n";
+  }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the subscription 
-CallbackHelperPtr Subscriber::GetSubscription() const
-{
-  return this->subscription;
-}
-
-

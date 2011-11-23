@@ -56,6 +56,8 @@ namespace gazebo
 
     /// \brief Cleanup the transport component
     void fini();
+
+    void clear_buffers();
     /// \}
   }
 }

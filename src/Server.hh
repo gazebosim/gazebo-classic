@@ -11,6 +11,10 @@
 #include "physics/PhysicsTypes.hh"
 #include "physics/World.hh"
 
+namespace boost
+{
+  class mutex;
+}
 
 namespace gazebo
 {
@@ -35,6 +39,8 @@ namespace gazebo
     private: void OnControl(
                  const boost::shared_ptr<msgs::ServerControl const> &_msg);
 
+    private: void ProcessControlMsgs();
+
     private: bool stop;
 
     private: Master *master;
@@ -42,6 +48,9 @@ namespace gazebo
     private: std::vector<gazebo::SystemPluginPtr> plugins;
     private: transport::NodePtr node;
     private: transport::SubscriberPtr serverSub;
+
+    private: boost::mutex *receiveMutex;
+    private: std::list<msgs::ServerControl> controlMsgs;
   };
 }
 

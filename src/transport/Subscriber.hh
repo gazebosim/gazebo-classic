@@ -37,7 +37,7 @@ namespace gazebo
     class Subscriber
     {
       /// \brief Constructor
-      public: Subscriber(const std::string &topic, CallbackHelperPtr sub);
+      public: Subscriber(const std::string &topic, NodePtr _node);
 
       /// \brief Destructor
       public: virtual ~Subscriber();
@@ -51,11 +51,8 @@ namespace gazebo
       /// \brief Unsubscribe from the topic
       public: void Unsubscribe() const;
 
-      /// \brief Get the subscription 
-      public: CallbackHelperPtr GetSubscription() const;
-
       private: std::string topic;
-      private: CallbackHelperPtr subscription;
+      private: NodePtr node;
     };
     /// \}
   }

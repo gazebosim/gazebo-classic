@@ -72,7 +72,7 @@ void TopicManager::AddNode(NodePtr _node)
   this->nodeMutex->unlock();
 }
 
-void TopicManager::RemoveNode( unsigned int _id )
+void TopicManager::RemoveNode(unsigned int _id)
 {
   std::vector<NodePtr>::iterator iter;
   this->nodeMutex->lock();
@@ -94,7 +94,9 @@ void TopicManager::ProcessNodes()
   std::vector<NodePtr>::iterator iter;
 
   this->nodeMutex->lock();
-  int s = this->nodes.size(); // store as size might change (spawning)
+
+  // store as size might change (spawning)
+  int s = this->nodes.size();
   for (int i = 0; i < s; i ++)
   {
     this->nodes[i]->ProcessPublishers();
@@ -105,7 +107,7 @@ void TopicManager::ProcessNodes()
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
 void TopicManager::Publish( const std::string &_topic, 
-                            google::protobuf::Message &_message,
+                            const google::protobuf::Message &_message,
                             const boost::function<void()> &_cb)
 {
   if (!_message.IsInitialized())
@@ -118,9 +120,10 @@ void TopicManager::Publish( const std::string &_topic,
   PublicationPtr pub = this->FindPublication(_topic);
   PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
-  pub->Publish(_message, _cb); 
+  if (pub)
+    pub->Publish(_message, _cb); 
 
-  if (dbgPub->GetCallbackCount() > 0)
+  if (dbgPub && dbgPub->GetCallbackCount() > 0)
   {
     msgs::String dbgMsg;
     dbgMsg.set_data(_message.DebugString());
@@ -142,8 +145,6 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 // Subscribe to a topic give some options
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 {
-  CallbackHelperPtr subscription = _ops.GetSubscription();
-
   // Create a subscription (essentially a callback that gets 
   // fired every time a Publish occurs on the corresponding
   // topic
@@ -151,7 +152,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
   // The object that gets returned to the caller of this
   // function
-  SubscriberPtr sub( new Subscriber(_ops.GetTopic(), subscription) );
+  SubscriberPtr sub(new Subscriber(_ops.GetTopic(), _ops.GetNode()));
 
   // Find a current publication
   PublicationPtr pub = this->FindPublication(_ops.GetTopic());
@@ -160,7 +161,6 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
   if (pub)
   {
     pub->AddSubscription(_ops.GetNode());
-    //pub->AddSubscription(subscription);
   }
   else if (_ops.GetTopic() == "/gazebo/default/selection")
     gzdbg << "No publication\n";
@@ -184,12 +184,27 @@ void TopicManager::HandleIncoming()
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const CallbackHelperPtr &_sub)
 {
+  gzerr << "TM::Unsub with callback[" << _topic << "]\n";
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
     publication->RemoveSubscription(_sub);
     ConnectionManager::Instance()->Unsubscribe(_topic, _sub->GetMsgType() );
   }
+}
+
+void TopicManager::Unsubscribe(const std::string &_topic,
+                               const NodePtr &_sub)
+{
+  PublicationPtr publication = this->FindPublication(_topic);
+  if (publication)
+  {
+    publication->RemoveSubscription(_sub);
+    ConnectionManager::Instance()->Unsubscribe(_topic, 
+        _sub->GetMsgType(_topic));
+  }
+
+  this->subscribedNodes[_topic].remove(_sub);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +226,8 @@ void TopicManager::DisconnectPubFromSub( const std::string &topic, const std::st
 
 ////////////////////////////////////////////////////////////////////////////////
 // Disconnection all local subscribers from a remote publisher
-void TopicManager::DisconnectSubFromPub( const std::string &topic, const std::string &host, unsigned int port)
+void TopicManager::DisconnectSubFromPub(const std::string &topic,
+    const std::string &host, unsigned int port)
 {
   PublicationPtr publication = this->FindPublication(topic);
   if (publication)
@@ -284,15 +300,17 @@ PublicationPtr TopicManager::UpdatePublications( const std::string &topic,
   {
     // TODO: Handle this error properly
     if (msgType != pub->GetMsgType())
-      gzerr << "Attempting to advertise on an existing topic with a conflicting message type\n";
+      gzerr << "Attempting to advertise on an existing "
+            << "topic with a conflicting message type\n";
   }
   else
   {
     PublicationPtr dbgPub;
     msgs::String tmp;
 
-    pub = PublicationPtr( new Publication(topic, msgType) );
-    dbgPub = PublicationPtr( new Publication(topic+"/__dbg", tmp.GetTypeName()) );
+    pub = PublicationPtr(new Publication(topic, msgType));
+    dbgPub = PublicationPtr(new Publication(topic+"/__dbg",
+          tmp.GetTypeName()));
     this->advertisedTopics[topic] =  pub;
     this->advertisedTopics[topic+"/__dbg"] = dbgPub;
     this->advertisedTopicsEnd = this->advertisedTopics.end();
@@ -335,4 +353,13 @@ void TopicManager::RegisterTopicNamespace(const std::string &_name)
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
+}
+
+void TopicManager::ClearBuffers()
+{
+  PublicationPtr_M::iterator iter;
+  for (iter = this->advertisedTopics.begin(); iter != this->advertisedTopics.end(); iter++)
+  {
+    iter->second->ClearBuffer();
+  }
 }

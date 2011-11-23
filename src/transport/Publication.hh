@@ -36,6 +36,7 @@ namespace gazebo
       public: void AddSubscription(const NodePtr &_node);
 
       public: void RemoveSubscription(const CallbackHelperPtr &callback);
+      public: void RemoveSubscription(const NodePtr &_node);
 
       /// \brief Remove a subscription
       public: void RemoveSubscription(const std::string &host, unsigned int port);
@@ -62,6 +63,8 @@ namespace gazebo
 
       public: void AddTransport( const PublicationTransportPtr &publink );
       public: bool HasTransport( const std::string &_host, unsigned int _port );
+
+      public: void ClearBuffer();
 
       private: unsigned int id;
       private: static unsigned int idCounter;

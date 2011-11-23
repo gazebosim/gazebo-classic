@@ -44,7 +44,6 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
-  this->visPub = this->node->Advertise<msgs::Visual>("~/visual");
   this->physicsSub = this->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
@@ -53,84 +52,25 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
                                            &PhysicsEngine::OnRequest, this);
 
   this->rayMutex = new boost::recursive_mutex();
-  {
-    /*this->visualMsg = new VisualMsg();
-    this->visualMsg->parentId.clear();
-    this->visualMsg->id = "physics_engine_visual";
-    this->visualMsg->visible = false;
-    //this->visualMsg->rtShader = false;
-    this->visualMsg->castShadows = false;
-    this->visualMsg->action = VisualMsg::UPDATE;
-    */
-
-    //Simulator::Instance()->SendMessage( *this->visualMsg );
-
-    /* NATY: put this back in
-    this->contactLines.resize(1);
-
-    Material *mat = new Material();
-    mat->SetName("ContactPointsMaterial");
-    mat->SetPointSize(10);
-    mat->SetAmbient(Color(1,0,0,1));
-    mat->SetDiffuse(Color(1,0,0,1));
-    mat->SetEmissive(Color(1,0,0,1));
-    std::string matName = OgreCreator::CreateMaterial(mat);
-
-    unsigned int i=0;
-    for (this->contactLinesIter = this->contactLines.begin();
-         this->contactLinesIter != this->contactLines.end(); 
-         this->contactLinesIter++, i++)
-    {
-      (*this->contactLinesIter) = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(math::Vector3(0,0,0));
-      (*this->contactLinesIter)->setMaterial(matName);
-    }
-    */
-
-    this->showContactConnection = event::Events::ConnectShowContacts( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
-
-    // TODO: put this back in
-    //this->contactLinesIter = this->contactLines.begin();
-    //delete mat;
-  }
-
 }
 
 void PhysicsEngine::Fini()
 {
   this->world.reset();
+  this->node->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
-  if (!this->visual.empty())
-  {
-    msgs::Visual msg;
-    msg.set_name(this->visual);
-    msg.set_delete_me( true );
-    this->visPub->Publish(msg);
-  }
   this->sdf->Reset();
   this->sdf.reset();
   delete this->rayMutex;
   this->rayMutex = NULL;
+  this->responsePub.reset();
+  this->requestSub.reset();
+  this->node.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,62 +78,4 @@ PhysicsEngine::~PhysicsEngine()
 math::Vector3 PhysicsEngine::GetGravity() const
 {
   return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Add a contact visual
-void PhysicsEngine::AddContactVisual(const math::Vector3 &/*pos_*/, 
-                                     const math::Vector3 &/*norm_*/)
-{
-  // NATY: put back in
- /* if (!RenderState::GetShowContacts())
-    return;
-
-  math::Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
-  math::Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
-
-  (*this->contactLinesIter)->SetPoint( 0, pos);
-  (*this->contactLinesIter)->SetPoint( 1, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint( 2, pos);
-  (*this->contactLinesIter)->SetPoint( 3, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint( 4, pos);
-  (*this->contactLinesIter)->SetPoint( 5, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint( 6, pos);
-  (*this->contactLinesIter)->SetPoint( 7, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint( 8, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
-  (*this->contactLinesIter)->SetPoint( 9, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint(10, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
-  (*this->contactLinesIter)->SetPoint(11, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint(12, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
-  (*this->contactLinesIter)->SetPoint(13, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
-
-  (*this->contactLinesIter)->SetPoint(14, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
-  (*this->contactLinesIter)->SetPoint(15, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
-
-  this->contactLinesIter++;
-
-  if (this->contactLinesIter == this->contactLines.end())
-    this->contactLinesIter = this->contactLines.begin();
-    */
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set whether to show contacts
-void PhysicsEngine::ShowContacts(const bool &_show)
-{
-  msgs::Visual msg;
-  msg.set_name(this->visual);
-  msg.set_visible( _show );
-  this->visPub->Publish(msg);
-
-  /* TODO put back in
-  if (show)
-    this->contactLinesIter = this->contactLines.begin();
-    */
 }

@@ -1083,9 +1083,11 @@ bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   std::ifstream fin;
   fin.open(_filename.c_str(), std::ios::in);
-  if( !fin.is_open() )
+  if (!fin.is_open())
   {
     gzerr << "The model file can not be opened, check path and permissions\n";
+    fin.close();
+    return false;
   }
   fin.close();
 

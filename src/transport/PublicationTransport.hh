@@ -22,7 +22,9 @@ namespace gazebo
       public: virtual ~PublicationTransport();
 
       public: void Init(const ConnectionPtr &conn);
-      public: void AddCallback(const boost::function<void(const std::string &)> &cb);
+      public: void Fini();
+      public: void AddCallback(
+                  const boost::function<void(const std::string &)> &cb);
 
       public: const ConnectionPtr GetConnection() const;
       public: std::string GetTopic() const;

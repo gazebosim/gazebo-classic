@@ -136,17 +136,44 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
         ((*iter)->GetConnection()->GetRemoteAddress() == host_ &&
          (*iter)->GetConnection()->GetRemotePort() == port_) )
     {
-      this->transports.erase( iter++ );
+      (*iter)->Fini();
+      this->transports.erase(iter++);
     }
     else 
       iter++;
   }
 }
 
+void Publication::RemoveSubscription(const NodePtr &_node)
+{
+  std::list<NodePtr>::iterator iter;
+
+  for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
+  {
+    if (*iter == _node)
+    {
+      this->nodes.erase(iter);
+      break;
+    }
+  }
+
+  // If no more subscribers, then disconnect from all publishers
+  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
+  {
+    this->transports.clear();
+    this->prevMsgBuffer.clear();
+  }
+}
+
+void Publication::ClearBuffer()
+{
+  this->prevMsgBuffer.clear();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 {
-  std::list< CallbackHelperPtr >::iterator iter;
+  std::list<CallbackHelperPtr>::iterator iter;
 
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
@@ -158,10 +185,12 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
   }
 
   // If no more subscribers, then disconnect from all publishers
-  if (this->callbacks.size() == 0)
+  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
   {
     this->transports.clear();
+    this->prevMsgBuffer.clear();
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +218,7 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
   if (this->callbacks.size() == 0)
   {
     this->transports.clear();
+    this->prevMsgBuffer.clear();
   }
 }
 

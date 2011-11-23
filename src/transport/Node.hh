@@ -46,6 +46,8 @@ namespace gazebo
       ///              namespace on the Master
       public: void Init(const std::string &_space="");
 
+      public: void Fini();
+
       /// \brief Get the topic namespace for this node
       /// \return The namespace
       public: std::string GetTopicNamespace() const;
@@ -87,9 +89,12 @@ namespace gazebo
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic, boost::bind(fp, obj, _1),
+        ops.template Init<M>(decodedTopic,
                              shared_from_this());
-        this->callbacks[decodedTopic].push_back(ops.GetSubscription());
+
+        this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
+              new CallbackHelperT<M>(boost::bind(fp, obj, _1))));
+
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
   
@@ -100,14 +105,20 @@ namespace gazebo
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic, fp, shared_from_this());
-        this->callbacks[decodedTopic].push_back(ops.GetSubscription());
+        ops.template Init<M>(decodedTopic, shared_from_this());
+
+        this->callbacks[decodedTopic].push_back(
+            CallbackHelperPtr(new CallbackHelperT<M>(fp)));
+
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
 
       public: bool HandleData(const std::string &_topic,
                               const std::string &_msg);
-      
+
+      /// \brief Get the message type for a topic
+      public: std::string GetMsgType(const std::string &_topic) const;
+
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;
       private: std::vector<PublisherPtr>::iterator publishersIter;

@@ -24,10 +24,12 @@ using namespace gazebo;
 Server::Server()
 {
   this->stop = false;
+  this->receiveMutex = new boost::mutex();
 }
 
 Server::~Server()
 {
+  delete this->receiveMutex;
   delete this->master;
 }
 
@@ -147,6 +149,7 @@ void Server::Run()
   // Update the sensors.
   while (!this->stop)
   {
+    this->ProcessControlMsgs();
     sensors::run_once(true);
     common::Time::MSleep(1);
   }
@@ -197,42 +200,56 @@ void Server::SetParams( const common::StrStr_M &params )
 
 void Server::OnControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
 {
-  if (_msg->has_save_world_name() && _msg->has_save_filename())
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->controlMsgs.push_back(*_msg);
+}
+
+void Server::ProcessControlMsgs()
+{
+  std::list<msgs::ServerControl>::iterator iter;
+  for (iter = this->controlMsgs.begin();
+       iter != this->controlMsgs.end(); iter++)
   {
-    physics::WorldPtr world = physics::get_world(_msg->save_world_name());
-    world->Save(_msg->save_filename());
-  }
-  else if (_msg->has_open_filename())
-  {
-    // Load the world file
-    sdf::SDFPtr sdf(new sdf::SDF);
-    if (!sdf::init(sdf))
+    if ((*iter).has_save_world_name() && (*iter).has_save_filename())
     {
-      gzerr << "Unable to initialize sdf\n";
-      return;
+      physics::WorldPtr world = physics::get_world((*iter).save_world_name());
+      world->Save((*iter).save_filename());
     }
-
-    if (!sdf::readFile(_msg->open_filename(), sdf))
+    else if ((*iter).has_open_filename())
     {
-      gzerr << "Unable to read sdf file[" << _msg->open_filename() << "]\n";
-      return;
+      // Load the world file
+      sdf::SDFPtr sdf(new sdf::SDF);
+      if (!sdf::init(sdf))
+      {
+        gzerr << "Unable to initialize sdf\n";
+        return;
+      }
+
+      if (!sdf::readFile((*iter).open_filename(), sdf))
+      {
+        gzerr << "Unable to read sdf file[" << (*iter).open_filename() << "]\n";
+        return;
+      }
+
+      // Stop all the worlds
+      physics::stop_worlds();
+
+      physics::remove_worlds();
+
+      sensors::remove_sensors();
+
+      gazebo::transport::clear_buffers();
+
+      sdf::ElementPtr worldElem = sdf->root->GetElement("world");
+
+      physics::WorldPtr world = physics::create_world();
+
+      physics::load_world(world, worldElem);
+
+      physics::init_world(world);
+
+      physics::run_world(world);
     }
-
-    // Stop all the worlds
-    physics::stop_worlds();
-
-    physics::remove_worlds();
-
-    sensors::remove_sensors();
-
-    sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-
-    physics::WorldPtr world = physics::create_world();
-
-    physics::load_world(world, worldElem);
-
-    physics::init_world(world);
-
-    physics::run_world(world);
   }
+  this->controlMsgs.clear();
 }

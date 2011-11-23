@@ -229,12 +229,14 @@ bool readFile(const std::string &_filename, SDFPtr &_sdf)
     return true;
   else
   {
-    gzwarn << "parse as sdf version 1.0 failed, trying to parse as old deprecated format\n";
+    gzwarn << "parser as sdf version 1.0 failed, "
+           << "trying to parse as old deprecated format\n";
     if (deprecated_sdf::initWorldFile(filename, _sdf))
       return true;
     else
     {
-      gzwarn << "parse as old deprecated world file failed, trying old model format.\n";
+      gzwarn << "parsing using deprecated world file failed "
+             << "trying old model format.\n";
       if (deprecated_sdf::initModelFile(filename,_sdf))
         return true;
       else

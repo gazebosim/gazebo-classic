@@ -65,13 +65,16 @@ void PublicationTransport::AddCallback(const boost::function<void(const std::str
 
 void PublicationTransport::OnPublish(const std::string &data)
 {
-  this->connection->AsyncRead( 
-      boost::bind(&PublicationTransport::OnPublish, this, _1) );
-
-  if (!data.empty())
+  if (this->connection && this->connection->IsOpen())
   {
-    if (this->callback)
-      (this->callback)(data);
+    this->connection->AsyncRead( 
+        boost::bind(&PublicationTransport::OnPublish, this, _1) );
+
+    if (!data.empty())
+    {
+      if (this->callback)
+        (this->callback)(data);
+    }
   }
 }
 
@@ -88,6 +91,13 @@ std::string PublicationTransport::GetTopic() const
 std::string PublicationTransport::GetMsgType() const
 {
   return this->msgType;
+}
+
+void PublicationTransport::Fini()
+{
+  /// Cancel all async operatiopns.
+  this->connection->Cancel();
+  this->connection.reset();
 }
 
 

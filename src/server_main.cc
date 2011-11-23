@@ -111,7 +111,11 @@ int main(int argc, char **argv)
     server->LoadPlugin(*iter);
   }
 
-  server->Load(config_filename);
+  if (!server->Load(config_filename))
+  {
+    gzerr << "Could not open file[" << config_filename << "]\n";
+    return -1;
+  }
 
   server->SetParams( params );
   server->Init();

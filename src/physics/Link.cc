@@ -248,6 +248,19 @@ void Link::Init()
 // Finalize the body
 void Link::Fini()
 {
+  std::vector<std::string>::iterator iter;
+  for(iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
+    this->requestPub->Publish(*msg, true);
+  }
+
+  for(iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); iter++)
+  {
+    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
+    this->requestPub->Publish(*msg, true);
+  }
+
   Entity::Fini();
 }
 

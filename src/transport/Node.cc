@@ -32,10 +32,15 @@ Node::Node()
 
 Node::~Node()
 {
-  this->publishers.clear();
   delete this->publisherMutex;
   this->publisherMutex = NULL;
-  TopicManager::Instance()->RemoveNode( this->id );
+}
+
+void Node::Fini()
+{
+  this->publishers.clear();
+  this->callbacks.clear();
+  TopicManager::Instance()->RemoveNode(this->id);
 }
 
 void Node::Init(const std::string &_space)
@@ -144,4 +149,13 @@ void Node::ProcessIncomingMsgs()
     }
   }
   this->incomingMsgs.clear();
+}
+
+std::string Node::GetMsgType(const std::string &_topic) const
+{
+  Callback_M::const_iterator iter = this->callbacks.find(_topic);
+  if (iter != this->callbacks.end())
+    return iter->second.front()->GetMsgType();
+
+  return std::string();
 }

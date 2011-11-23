@@ -45,13 +45,19 @@ namespace gazebo
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
       private slots:void OnShowCollision();
 
-      private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg );
-      private: void OnModel( const boost::shared_ptr<msgs::Model const> &_msg );
+      private: void OnResponse(
+                   const boost::shared_ptr<msgs::Response const> &_msg );
 
-      private: void AddModelToList( const msgs::Model &_msg );
+      private: void OnModel(const boost::shared_ptr<msgs::Model const> &_msg);
+
+      private: void OnRequest(
+                   const boost::shared_ptr<msgs::Request const> &_msg);
+
+      private: void AddModelToList(const msgs::Model &_msg);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parentItem);
+
       private: void FillPropertyTree(const msgs::Link &_msg,
                                      QtProperty *_parentItem);
 
@@ -59,15 +65,15 @@ namespace gazebo
       //private: void FillPropertyTree(sdf::ElementPtr &_elem,
                                      //QtProperty *_parentItem);
 
-      private: void FillSDF( QtProperty *_item, sdf::ElementPtr &_elem,
-                             QtProperty *_changedItem );
+      private: void FillSDF(QtProperty *_item, sdf::ElementPtr &_elem,
+                             QtProperty *_changedItem);
 
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
       private: QtProperty *GetChildItem(QtProperty *_item, 
                                         const std::string &_name);
 
-      private: void RemoveEntity( const std::string &_name );
+      private: void RemoveEntity(const std::string &_name);
 
       private: QTreeWidgetItem *GetModelListItem( const std::string &_name );
 
@@ -85,6 +91,7 @@ namespace gazebo
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr selectionPub, factoryPub;
       private: transport::SubscriberPtr responseSub, newEntitySub;
+      private: transport::SubscriberPtr requestSub;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;

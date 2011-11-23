@@ -124,10 +124,10 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer() {return 0;}
       /// \brief access functions to set ODE parameters
       public: virtual int GetMaxContacts() {return 0;}
-  
-      /// \brief Add a contact visual
-      protected: void AddContactVisual(const math::Vector3 &pos_, 
-                                       const math::Vector3 &norm_);
+
+      public: boost::recursive_mutex* GetRayMutex() const
+              { return this->rayMutex; }
+ 
       protected: virtual void OnRequest( 
                  const boost::shared_ptr<msgs::Request const> &/*_msg*/ )
                  {}
@@ -141,17 +141,10 @@ namespace gazebo
       protected: WorldPtr world;
       protected: sdf::ElementPtr sdf;
   
-      protected: std::string visual;
       protected: transport::NodePtr node;
-      protected: transport::PublisherPtr visPub;
       protected: transport::PublisherPtr responsePub;
       protected: transport::SubscriberPtr physicsSub, requestSub;
       protected: boost::recursive_mutex *rayMutex;
-      public: boost::recursive_mutex* GetRayMutex() const { return this->rayMutex; }
-      private: event::ConnectionPtr showContactConnection; 
-
-      //private: std::vector<OgreDynamicLines*> contactLines;
-      //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
 
       public: std::map<LinkPtr,LinkPtr> contactPairs;
       public: void AddLinkPair(LinkPtr link1, LinkPtr link2)

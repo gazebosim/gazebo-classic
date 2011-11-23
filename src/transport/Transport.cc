@@ -116,3 +116,8 @@ void transport::fini()
   }
   transport::ConnectionManager::Instance()->Fini();
 }
+
+void transport::clear_buffers()
+{
+  transport::TopicManager::Instance()->ClearBuffers();
+}

@@ -82,7 +82,7 @@ namespace gazebo
       private: void Close();
 
       /// \brief Cancel all async operations on an open socket
-      private: void Cancel();
+      public: void Cancel();
 
       /// \brief Read data from the socket
       public: bool Read(std::string &data);
@@ -197,7 +197,6 @@ namespace gazebo
               void OnReadData(const boost::system::error_code &e,
                               boost::tuple<Handler> handler)
               {
-
                 if (e)
                   gzerr << "Error Reading data!\n";
 

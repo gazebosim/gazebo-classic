@@ -80,26 +80,27 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   //if (!this->HasConnections())
     //return;
 
-  // Save the latest message
-  google::protobuf::Message *msg = _message.New();
-  msg->CopyFrom( _message );
-
-  this->mutex->lock();
-  this->messages.push_back( msg );
-
-  if (this->messages.size() > this->queueLimit)
-  {
-    delete this->messages.front();
-    this->messages.pop_front();
-  }
-  this->mutex->unlock();
-
   if (_block)
   {
-    while(this->GetOutgoingCount() > 0 && !transport::is_stopped())
-      common::Time::MSleep(50);
+    TopicManager::Instance()->Publish(this->topic, _message,
+          boost::bind(&Publisher::OnPublishComplete, this));
   }
+  else
+  {
+    // Save the latest message
+    google::protobuf::Message *msg = _message.New();
+    msg->CopyFrom( _message );
 
+    this->mutex->lock();
+    this->messages.push_back( msg );
+
+    if (this->messages.size() > this->queueLimit)
+    {
+      delete this->messages.front();
+      this->messages.pop_front();
+    }
+    this->mutex->unlock();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

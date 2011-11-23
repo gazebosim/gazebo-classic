@@ -79,11 +79,11 @@ Entity::~Entity()
   delete this->poseMsg;
   this->poseMsg = NULL;
 
-  this->node.reset();
   this->posePub.reset();
   this->visPub.reset();
   this->requestPub.reset();
   this->poseSub.reset();
+  this->node.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,13 +445,14 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 
 void Entity::Fini()
 {
-  msgs::Request *msg = msgs::CreateRequest( "entity_delete", 
-      this->GetCompleteScopedName() );
+  msgs::Request *msg = msgs::CreateRequest("entity_delete", 
+      this->GetCompleteScopedName());
 
   this->requestPub->Publish(*msg, true);
 
   this->connections.clear();
   this->parentEntity.reset();
+  this->node->Fini();
   Base::Fini();
 }
 
