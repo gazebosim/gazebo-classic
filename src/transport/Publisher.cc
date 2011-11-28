@@ -45,10 +45,11 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 // Destructor
 Publisher::~Publisher()
 {
+  std::cout << "DELETE Pub__LISHER[" << this->topic << "]\n";
   if (this->messages.size() > 0)
   {
+    gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
     this->SendMessage();
-    //gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
   }
 
   /*std::list<google::protobuf::Message *>::iterator iter;

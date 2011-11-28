@@ -304,6 +304,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
 
+    std::cout << "Unadvertise[" << pub.topic() << "]\n";
     // Disconnection all local subscribers from a remote publisher
     TopicManager::Instance()->DisconnectSubFromPub(pub.topic(), 
         pub.host(), pub.port());

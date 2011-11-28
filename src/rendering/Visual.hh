@@ -68,6 +68,7 @@ namespace gazebo
   
       /// \brief Helper for the contructor
       public: void Init();
+      public: void Fini();
   
       /// \brief Load from a message
       public: void LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
@@ -92,6 +93,7 @@ namespace gazebo
              
       /// \brief Detach a visual 
       public: void DetachVisual(VisualPtr _vis);
+      public: void DetachVisual(const std::string &_name);
   
       /// \brief Attach a renerable object to the visual
       public: void AttachObject( Ogre::MovableObject *obj);
@@ -251,6 +253,9 @@ namespace gazebo
       private: std::string GetMeshName() const;
   
       public: void ClearParent();
+
+      private: void DestroyAllAttachedMovableObjects(
+                   Ogre::SceneNode* i_pSceneNode);
 
       private: sdf::ElementPtr sdf;
 

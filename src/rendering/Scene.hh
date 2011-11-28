@@ -222,6 +222,8 @@ namespace gazebo
 
       public: VisualPtr GetWorldVisual() const;
 
+      public: void Clear();
+
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::Mesh *mesh,
@@ -247,11 +249,15 @@ namespace gazebo
       private: void ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
 
       private: void OnLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
-      private: void ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
+      private: void ProcessLightMsg(
+                   const boost::shared_ptr<msgs::Light const> &msg);
 
-      private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
+      private: void OnSelectionMsg(
+                   const boost::shared_ptr<msgs::Selection const> &msg);
                
       private: void OnPoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
+
+      private: void OnServerControl(const boost::shared_ptr<msgs::ServerControl const> &_msg);
 
       private: std::string name;
 
@@ -284,15 +290,15 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Joint const> > JointMsgs_L;
       private: JointMsgs_L jointMsgs;
 
+      typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
+      private: SensorMsgs_L sensorMsgs;
+
  
       typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;
 
       typedef std::map<std::string, Light*> Light_M;
       private: Light_M lights;
-
-      typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
-      private: SensorMsgs_L sensorMsgs;
 
       private: boost::shared_ptr<msgs::Selection const> selectionMsg;
 
@@ -306,6 +312,7 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
+      private: transport::SubscriberPtr serverSub;
       private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;
@@ -316,6 +323,7 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       private: bool enableVisualizations;
+      private: bool clearAll;
     };
     /// \}
   }

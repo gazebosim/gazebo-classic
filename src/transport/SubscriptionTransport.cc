@@ -14,7 +14,8 @@ SubscriptionTransport::SubscriptionTransport()
 // Destructor
 SubscriptionTransport::~SubscriptionTransport()
 {
-  ConnectionManager::Instance()->RemoveConnection( this->connection );
+  gzdbg << "SubTransport::Destructor  msgtyp[" << this->GetMsgType() << "]\n";
+  ConnectionManager::Instance()->RemoveConnection(this->connection);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,6 +44,8 @@ bool SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg_)
     this->connection->EnqueueMsg( data );
     result = true;
   }
+  else
+    gzdbg << "Connection closed[" << this->GetMsgType() << "]\n";
 
   return result;
 }
@@ -55,11 +58,12 @@ bool SubscriptionTransport::HandleData(const std::string &newdata)
   std::string data;
   if (this->connection->IsOpen())
   {
-    this->connection->EnqueueMsg( newdata );
+    this->connection->EnqueueMsg(newdata);
     result = true;
   }
   else
   {
+    gzdbg << "Connection closed[" << this->GetMsgType() << "]\n";
     this->connection.reset();
   }
 

@@ -76,6 +76,10 @@ Collision::~Collision()
 /// Finalize the collision
 void Collision::Fini()
 {
+  msgs::Request *msg = msgs::CreateRequest("entity_delete",
+      this->GetCompleteScopedName()+"__COLLISION_VISUAL__");
+  this->requestPub->Publish(*msg, true);
+
   Entity::Fini();
   this->link.reset();
   this->shape.reset();

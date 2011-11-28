@@ -54,7 +54,6 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
-      <plugin filename="test/libbelow.so" name="below"/>
     </model>
 
 <!--

@@ -38,6 +38,20 @@ Node::~Node()
 
 void Node::Fini()
 {
+  /*
+  for (this->publishersIter = this->publishers.begin(); 
+       this->publishersIter != this->publishers.end();
+       this->publishersIter++)
+  {
+    if ((*this->publishersIter)->GetOutgoingCount() > 0)
+    {
+      gzwarn << "Node::Fini outgoing publisher count["
+        <<(*this->publishersIter)->GetOutgoingCount() << "]\n";
+      (*this->publishersIter)->SendMessage();
+    }
+  }
+  */
+
   this->publishers.clear();
   this->callbacks.clear();
   TopicManager::Instance()->RemoveNode(this->id);

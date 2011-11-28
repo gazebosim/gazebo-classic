@@ -106,9 +106,9 @@ void TopicManager::ProcessNodes()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
-void TopicManager::Publish( const std::string &_topic, 
-                            const google::protobuf::Message &_message,
-                            const boost::function<void()> &_cb)
+void TopicManager::Publish(const std::string &_topic,
+                           const google::protobuf::Message &_message,
+                           const boost::function<void()> &_cb)
 {
   if (!_message.IsInitialized())
   {
@@ -117,11 +117,16 @@ void TopicManager::Publish( const std::string &_topic,
         _message.InitializationErrorString() + "] missing." );
   }
 
+  if (_topic == "/gazebo/default/request")
+    std::cout << "TopicManager::Publish request[" << _message.DebugString() << "]\n";
+
   PublicationPtr pub = this->FindPublication(_topic);
   PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
     pub->Publish(_message, _cb); 
+  else
+    gzerr << "No publication...this shouldn't happen\n";
 
   if (dbgPub && dbgPub->GetCallbackCount() > 0)
   {
@@ -332,8 +337,9 @@ void TopicManager::Unadvertise(const std::string &_topic)
     else
       t = _topic + "/__dbg";
 
-    PublicationPtr publication = this->FindPublication( t );
-    if (publication && publication->GetLocallyAdvertised())
+    PublicationPtr publication = this->FindPublication(t);
+    if (publication && publication->GetLocallyAdvertised() &&
+        publication->GetTransportCount() == 0)
     {
       publication->SetLocallyAdvertised(false);
       ConnectionManager::Instance()->Unadvertise(t);

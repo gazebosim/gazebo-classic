@@ -56,6 +56,8 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
+  gzdbg << "Destructor Connection[" << this->id << "]\n";
+  this->ProcessWriteQueue();
   this->writeQueue.clear();
   this->Shutdown();
 
@@ -230,7 +232,10 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 void Connection::ProcessWriteQueue()
 {
   if (!this->IsOpen())
+  {
+    gzerr << "Connection::ProcessWriteQueue Not OPEND!!\n";
     return;
+  }
 
   this->writeMutex->lock();
 
@@ -267,6 +272,7 @@ void Connection::ProcessWriteQueue()
   } 
   catch (...)
   {
+    gzerr << "Connection Unable to asio::write buffer\n";
     this->Shutdown();
   }
   
@@ -358,8 +364,10 @@ bool Connection::IsOpen() const
 // Close a connection
 void Connection::Close()
 {
+  gzdbg << "Closing Connection[" << this->id << "]\n";
   if (this->socket && this->socket->is_open())
   {
+    this->ProcessWriteQueue();
     try
     {
       this->socket->close();
@@ -391,6 +399,7 @@ void Connection::Close()
 // Cancel all async operations on an open socket
 void Connection::Cancel()
 {
+  gzdbg << "Cancel Connection[" << this->id << "]\n";
   if (this->acceptor)
   {
     try
