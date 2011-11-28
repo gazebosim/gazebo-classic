@@ -451,10 +451,11 @@ void Entity::Fini()
   std::cout << "Request Entity Delete[" << this->GetCompleteScopedName() << "]\n";
   this->requestPub->Publish(*msg, true);
 
-  this->connections.clear();
   this->parentEntity.reset();
-  this->node->Fini();
   Base::Fini();
+
+  this->connections.clear();
+  this->node->Fini();
 }
 
 //// Update the parameters using new sdf values

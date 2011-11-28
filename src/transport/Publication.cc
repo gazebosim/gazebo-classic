@@ -36,6 +36,7 @@ Publication::Publication( const std::string &topic, const std::string &msgType )
 // Destructor
 Publication::~Publication()
 {
+  std::cout << "DELETE Publication[" << this->topic << "]\n";
   this->prevMsgBuffer.clear();
 }
         
@@ -175,6 +176,8 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 {
   std::list<CallbackHelperPtr>::iterator iter;
 
+  std::cout << "Publication[" << this->topic << "] Remove Callback\n";
+
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
     if (*iter == callback)
@@ -236,7 +239,7 @@ void Publication::Publish(const std::string &_data)
       this->nodes.erase(iter++);
   }
 
-  std::list< CallbackHelperPtr >::iterator cbIter;
+  std::list<CallbackHelperPtr>::iterator cbIter;
   cbIter = this->callbacks.begin();
   while (cbIter != this->callbacks.end())
   {
@@ -295,14 +298,20 @@ void Publication::Publish(const google::protobuf::Message &_msg,
       this->nodes.erase( iter++ );
   }
 
-  std::list< CallbackHelperPtr >::iterator cbIter;
+  if (this->topic == "/gazebo/default/request")
+    std::cout << "Publication::Publish. CallbackCount[" << this->callbacks.size() << "]\n";
+
+  std::list<CallbackHelperPtr>::iterator cbIter;
   cbIter = this->callbacks.begin();
   while (cbIter != this->callbacks.end())
   {
     if ((*cbIter)->HandleData(data))
       cbIter++;
     else
+    {
+      gzerr << "Unable to handle data\n";
       this->callbacks.erase( cbIter++ );
+    }
   }
 
   if (_cb)
@@ -327,7 +336,7 @@ unsigned int Publication::GetTransportCount()
 
 unsigned int Publication::GetCallbackCount()
 {
-  return this->nodes.size();
+  return this->callbacks.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

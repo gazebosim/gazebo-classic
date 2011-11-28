@@ -78,6 +78,9 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
+  this->serverSub = this->node->Subscribe("/gazebo/server/control",
+                                          &Scene::OnServerControl, this);
+
 
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
@@ -89,6 +92,42 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("/sdf/scene.sdf", this->sdf );
+
+  this->clearAll = false;
+}
+
+void Scene::OnServerControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  if (_msg->has_open_filename())
+  {
+    this->clearAll = true;
+  }
+}
+
+void Scene::Clear()
+{
+  this->visualMsgs.clear();
+  this->lightMsgs.clear();
+  this->poseMsgs.clear();
+  this->sceneMsgs.clear();
+  this->jointMsgs.clear();
+
+  printf("\n\n\n\n\n\n CLEAR \n\n\n\n\n\n\n\n");
+  while (this->visuals.size() > 0)
+  {
+    this->RemoveVisual(this->visuals.begin()->second);
+  }
+  this->visuals.clear();
+
+  for (Light_M::iterator iter = this->lights.begin();
+      iter != this->lights.end(); iter++)
+  {
+    delete iter->second;
+  }
+  this->lights.clear();
+  this->sensorMsgs.clear();
+  RTShaderSystem::Instance()->Clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -703,6 +742,10 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 
   std::cout << prefix_ << nodeName << "\n";
   std::cout << prefix_ << "  Num Objs[" << numAttachedObjs << "]\n";
+  for (int i=0; i < numAttachedObjs; i++)
+  {
+    std::cout << prefix_ << "    Obj[" << snode->getAttachedObject(i)->getName() << "]\n";
+  }
   std::cout << prefix_ << "  Num Children[" << numChildren << "]\n";
   std::cout << prefix_ << "  IsInGraph[" << isInSceneGraph << "]\n";
   std::cout << prefix_ << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
@@ -919,7 +962,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   }
 }
 
-void Scene::OnResponse( const boost::shared_ptr<msgs::Response const> &_msg)
+void Scene::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -928,7 +971,7 @@ void Scene::OnResponse( const boost::shared_ptr<msgs::Response const> &_msg)
   boost::shared_ptr<msgs::Scene> sm( new msgs::Scene() );
   if (_msg->has_type() && _msg->type() == sm->GetTypeName())
   {
-    sm->ParseFromString( _msg->serialized_data() );
+    sm->ParseFromString(_msg->serialized_data());
     this->sceneMsgs.push_back( sm );
   }
 }
@@ -951,14 +994,14 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   {
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
     pm->set_name(_msg->model(i).name());
-    this->poseMsgs.push_back( pm );
+    this->poseMsgs.push_front(pm);
 
     for (int j=0; j < _msg->model(i).link_size(); j++)
     {
       boost::shared_ptr<msgs::Pose> pm2(
           new msgs::Pose(_msg->model(i).link(j).pose()));
       pm2->set_name(_msg->model(i).link(j).name());
-      this->poseMsgs.push_back(pm2);
+      this->poseMsgs.push_front(pm2);
 
       for (int k=0; k < _msg->model(i).link(j).sensor_size(); k++)
       {
@@ -1046,6 +1089,11 @@ void Scene::OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  if (this->clearAll)
+  {
+    this->Clear();
+    this->clearAll = false;
+  }
 
   SceneMsgs_L::iterator sIter;
   VisualMsgs_L::iterator vIter;
@@ -1100,7 +1148,7 @@ void Scene::PreRender()
   pIter = this->poseMsgs.begin(); 
   while (pIter != this->poseMsgs.end())
   {
-    Visual_M::iterator iter = this->visuals.find( (*pIter)->name() );
+    Visual_M::iterator iter = this->visuals.find((*pIter)->name());
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
@@ -1109,12 +1157,12 @@ void Scene::PreRender()
           iter->first.find(this->selectionObj->GetVisualName()) == 
           std::string::npos)
       {
-        math::Pose pose = msgs::Convert( *(*pIter) );
+        math::Pose pose = msgs::Convert(*(*pIter));
 
-        iter->second->SetWorldPose( pose );
+        iter->second->SetWorldPose(pose);
       }
       PoseMsgs_L::iterator prev = pIter++;
-      this->poseMsgs.erase( prev );
+      this->poseMsgs.erase(prev);
     }
     else
       ++pIter;
@@ -1198,8 +1246,10 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
   }
 }
 
-void Scene::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg)
+void Scene::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
 {
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  //std::cout << _msg->DebugString() << "\n";
   if (_msg->request() == "entity_delete")
   {
     //std::cout << "Delete entity[" << _msg->data() << "]\n";
@@ -1364,12 +1414,10 @@ void Scene::RemoveVisual(VisualPtr _vis)
     Visual_M::iterator iter = this->visuals.find(_vis->GetName());
     if (iter != this->visuals.end())
     {
-      iter->second->GetParent()->DetachVisual(iter->second);
-      iter->second->parent.reset();
-      iter->second->children.clear();
-      std::cout << "Remove Visual[" << _vis->GetName() << "] Use[" << iter->second.use_count() << "]...";
+
+      iter->second->Fini();
       this->visuals.erase(iter);
-      std::cout << "[" << _vis.use_count() << "]\n"; 
+      std::cout << "Visual After Erase[" << _vis.use_count() << "]\n"; 
     }
 
     if (this->selectionObj->GetVisualName() == _vis->GetName())

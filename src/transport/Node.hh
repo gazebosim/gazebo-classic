@@ -89,8 +89,7 @@ namespace gazebo
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic,
-                             shared_from_this());
+        ops.template Init<M>(decodedTopic, shared_from_this());
 
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
               new CallbackHelperT<M>(boost::bind(fp, obj, _1))));

@@ -244,10 +244,14 @@ void Server::ProcessControlMsgs()
 
       physics::WorldPtr world = physics::create_world();
 
+
+      printf("\n\n load_world \n\n");
       physics::load_world(world, worldElem);
 
+      printf("\n\n init_world \n\n");
       physics::init_world(world);
 
+      printf("\n\n run_world \n\n");
       physics::run_world(world);
     }
   }

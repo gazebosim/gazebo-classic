@@ -49,6 +49,7 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
+  gzmsg << "New Vis[" << _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -67,7 +68,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 
   this->SetName(uniqueName);
 
-  this->sceneNode = pnode->createChildSceneNode( this->GetName() );
+  this->sceneNode = pnode->createChildSceneNode(this->GetName());
 
   this->parent = _parent;
   this->scene = this->parent->GetScene();
@@ -78,6 +79,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 /// Constructor
 Visual::Visual (const std::string &_name, Scene *_scene)
 {
+  gzmsg << "New Vis[" << _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -103,7 +105,7 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 /// Destructor
 Visual::~Visual()
 {
-  std::cout << "   Delete Vis[" << this->GetName() << "]\n";
+  gzerr << "Delete Vis[" << this->GetName() << "]\n";
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender( this->preRenderConnection );
 
@@ -113,15 +115,19 @@ Visual::~Visual()
     delete *iter;
   this->lines.clear();
 
-  RTShaderSystem::Instance()->DetachEntity(this);
 
   if (this->sceneNode != NULL)
   {
-    this->sceneNode->removeAllChildren();
-    this->sceneNode->detachAllObjects();
+    this->DestroyAllAttachedMovableObjects(this->sceneNode);
+    gzdbg << "Remove and destroy children\n";
+    this->sceneNode->removeAndDestroyAllChildren();
+    //this->sceneNode->detachAllObjects();
 
-    if (this->sceneNode->getParentSceneNode())
-      this->sceneNode->getParentSceneNode()->removeAndDestroyChild( this->sceneNode->getName() );
+    /*if (this->sceneNode->getParentSceneNode())
+      this->sceneNode->getParentSceneNode()->removeAndDestroyChild(
+          this->sceneNode->getName() );
+          */
+    this->scene->GetManager()->destroySceneNode(this->sceneNode->getName());
     this->sceneNode = NULL;
   }
 
@@ -129,6 +135,66 @@ Visual::~Visual()
   this->sdf.reset();
   this->parent.reset();
   this->children.clear();
+}
+
+void Visual::Fini()
+{
+  // Detach from the parent
+  if (this->parent)
+    this->parent->DetachVisual(this->GetName());
+
+  // Detach all children
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    this->sceneNode->removeChild((*iter)->GetSceneNode());
+    (*iter)->parent.reset();
+  }
+  this->children.clear();
+
+  if (this->sceneNode != NULL)
+  {
+    this->DestroyAllAttachedMovableObjects(this->sceneNode);
+    gzdbg << "Remove and destroy children\n";
+    this->sceneNode->removeAndDestroyAllChildren();
+    this->sceneNode->detachAllObjects();
+
+    /*if (this->sceneNode->getParentSceneNode())
+      this->sceneNode->getParentSceneNode()->removeAndDestroyChild(
+      this->sceneNode->getName() );
+      */
+    this->scene->GetManager()->destroySceneNode(this->sceneNode);
+    this->sceneNode = NULL;
+  }
+
+  RTShaderSystem::Instance()->DetachEntity(this);
+}
+
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
+{
+  if (!i_pSceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject = i_pSceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    /*Ogre::MovableObject* pObject = static_cast<Ogre::MovableObject*>(itObject.getNext());
+    i_pSceneNode->getCreator()->destroyMovableObject(pObject);
+    */
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    this->scene->GetManager()->destroyEntity(ent);
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = i_pSceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -405,14 +471,19 @@ void Visual::AttachVisual(VisualPtr _vis)
 /// Detach a visual 
 void Visual::DetachVisual(VisualPtr _vis)
 {
+  this->DetachVisual(_vis->GetName());
+}
+
+void Visual::DetachVisual(const std::string &_name)
+{
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if ((*iter)->GetName() == _vis->GetName())
+    if ((*iter)->GetName() == _name)
     {
-      this->sceneNode->removeChild(_vis->GetSceneNode());
+      this->sceneNode->removeChild((*iter)->GetSceneNode());
+      (*iter)->parent.reset();
       this->children.erase(iter);
-      _vis->parent = this->scene->GetWorldVisual();
       break;
     }
   }
@@ -420,7 +491,7 @@ void Visual::DetachVisual(VisualPtr _vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
-void Visual::AttachObject( Ogre::MovableObject *_obj)
+void Visual::AttachObject(Ogre::MovableObject *_obj)
 {
   // This code makes plane render before grids. This allows grids to overlay
   // planes, and then other elements to overlay both planes and grids.
@@ -431,7 +502,7 @@ void Visual::AttachObject( Ogre::MovableObject *_obj)
   this->sceneNode->attachObject(_obj);
   RTShaderSystem::Instance()->UpdateShaders();
 
-  _obj->setUserAny( Ogre::Any(this->GetName()) );
+  _obj->setUserAny(Ogre::Any(this->GetName()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -478,7 +549,7 @@ void Visual::MakeStatic()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a mesh to this visual by name
-void Visual::AttachMesh( const std::string &meshName )
+void Visual::AttachMesh(const std::string &meshName)
 {
   std::ostringstream stream;
   Ogre::MovableObject *obj;
@@ -488,14 +559,15 @@ void Visual::AttachMesh( const std::string &meshName )
   if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
       common::MeshManager::Instance()->HasMesh(meshName))
   {
-    const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh(meshName);
-
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh(meshName);
     this->InsertMesh( mesh );
   }
 
-  obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
+  obj = (Ogre::MovableObject*)
+    (this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
 
-  this->AttachObject( obj );
+  this->AttachObject(obj);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1036,7 +1108,7 @@ void Visual::SetWorldPose(const math::Pose _pose)
 
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
-  this->sceneNode->_setDerivedPosition( Conversions::Convert(_pos) );
+  this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 void Visual::SetWorldRotation(const math::Quaternion &_q)
@@ -1431,8 +1503,8 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &_msg)
     this->MakeStatic();
     */
 
-  if (_msg->has_pose())
-    this->SetWorldPose( msgs::Convert(_msg->pose()) );
+  //if (_msg->has_pose())
+    //this->SetWorldPose( msgs::Convert(_msg->pose()) );
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());

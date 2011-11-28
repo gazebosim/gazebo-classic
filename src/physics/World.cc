@@ -155,7 +155,7 @@ void World::Load( sdf::ElementPtr _sdf )
 
   {
     // Make all incoming messages wait until the world is done loading.
-    boost::mutex::scoped_lock lock(*this->receiveMutex);
+    //boost::mutex::scoped_lock lock(*this->receiveMutex);
 
     std::string type = _sdf->GetElement("physics")->GetValueString("type");
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 

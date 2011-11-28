@@ -146,12 +146,17 @@ void RTShaderSystem::AttachEntity(Visual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove and entity
-void RTShaderSystem::DetachEntity(Visual *vis)
+void RTShaderSystem::DetachEntity(Visual *_vis)
 {
   if (!this->initialized)
     return;
 
-  this->entities.remove(vis);
+  this->entities.remove(_vis);
+}
+
+void RTShaderSystem::Clear()
+{
+  this->entities.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
