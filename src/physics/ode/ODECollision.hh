@@ -25,7 +25,6 @@
 #include "ode/ode.h"
 
 #include "common/CommonTypes.hh"
-#include "physics/ode/ODESurfaceParams.hh"
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/Collision.hh"
@@ -98,9 +97,6 @@ namespace gazebo
   
       ///  ID for the sub-collision
       protected: dGeomID collisionId;
-
-      ///  Contact parameters
-      public: ODESurfaceParamsPtr surface; 
 
       private: void (ODECollision::*onPoseChangeFunc)();
     };

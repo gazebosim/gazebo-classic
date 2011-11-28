@@ -60,3 +60,9 @@ math::Vector3 BoxShape::GetSize() const
 {
   return this->sdf->GetValueVector3("size");
 }
+
+void BoxShape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  _msg.set_type(msgs::Geometry::BOX);
+  msgs::Set(_msg.mutable_box()->mutable_size(),this->GetSize());
+}

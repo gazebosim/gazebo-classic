@@ -17,7 +17,6 @@ set (sources ODEPhysics.cc
              ODERayShape.cc
              ODEMultiRayShape.cc
              ODEHeightmapShape.cc
-             ODESurfaceParams.cc
              ODEScrewJoint.cc
 )
 
@@ -35,7 +34,6 @@ SET (headers ODEPhysics.hh
              ODEMultiRayShape.hh
              ODEHeightmapShape.hh
              ODETypes.hh
-             ODESurfaceParams.hh
              ODEScrewJoint.hh
 )
 

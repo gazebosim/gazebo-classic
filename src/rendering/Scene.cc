@@ -953,17 +953,17 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
     pm->set_name(_msg->model(i).name());
     this->poseMsgs.push_back( pm );
 
-    for (int j=0; j < _msg->model(i).links_size(); j++)
+    for (int j=0; j < _msg->model(i).link_size(); j++)
     {
       boost::shared_ptr<msgs::Pose> pm2(
-          new msgs::Pose(_msg->model(i).links(j).pose()));
-      pm2->set_name(_msg->model(i).links(j).name());
+          new msgs::Pose(_msg->model(i).link(j).pose()));
+      pm2->set_name(_msg->model(i).link(j).name());
       this->poseMsgs.push_back(pm2);
 
-      for (int k=0; k < _msg->model(i).links(j).sensors_size(); k++)
+      for (int k=0; k < _msg->model(i).link(j).sensor_size(); k++)
       {
         boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
-              _msg->model(i).links(j).sensors(k)));
+              _msg->model(i).link(j).sensor(k)));
         this->sensorMsgs.push_back(sm);
       }
     }

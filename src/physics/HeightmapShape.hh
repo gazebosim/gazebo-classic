@@ -51,6 +51,12 @@ namespace gazebo
       /// \brief Initialize the heightmap
       public: virtual void Init();
   
+      public: std::string GetFilename() const;
+      public: math::Vector3 GetSize() const;
+      public: math::Vector3 GetOffset() const;
+
+      public: void FillShapeMsg(msgs::Geometry &_msg);
+
       protected: std::vector<double> heights;
   
       protected: common::Image img;

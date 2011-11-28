@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "msgs/msgs.h"
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
@@ -45,6 +46,8 @@ namespace gazebo
 
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
+
+      public: virtual void FillShapeMsg(msgs::Geometry &_msg) = 0;
 
       public: CollisionPtr collisionParent;
       protected: sdf::ElementPtr sdf;

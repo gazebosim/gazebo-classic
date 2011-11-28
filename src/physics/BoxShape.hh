@@ -51,6 +51,8 @@ namespace gazebo
 
       /// \brief Get the size of the box
       public: math::Vector3 GetSize() const;
+
+      public: void FillShapeMsg(msgs::Geometry &_msg);
     };
     /// \}
   }

@@ -31,11 +31,13 @@
 
 #include "transport/Publisher.hh"
 
+#include "physics/PhysicsTypes.hh"
 #include "physics/PhysicsFactory.hh"
 #include "physics/World.hh"
 #include "physics/Entity.hh"
 #include "physics/Model.hh"
 #include "physics/SurfaceParams.hh"
+#include "physics/Collision.hh"
 #include "physics/MapShape.hh"
 
 #include "physics/ode/ODECollision.hh"

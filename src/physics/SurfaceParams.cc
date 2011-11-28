@@ -41,8 +41,8 @@ SurfaceParams::SurfaceParams()
   this->erp = 0.2; // hm, not defined in sdf?
   this->mu1 = 1.0;
   this->mu2 = 1.0;
-  this->max_vel = -1.0;
-  this->min_depth = 0.0;
+  this->maxVel = -1.0;
+  this->minDepth = 0.0;
   this->slip1 = 0.0;
   this->slip2 = 0.0;
   this->enableFriction = true;
@@ -51,7 +51,7 @@ SurfaceParams::SurfaceParams()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the contact params
-void SurfaceParams::Load( sdf::ElementPtr &_sdf )
+void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
   if (bounceElem)
@@ -73,7 +73,7 @@ void SurfaceParams::Load( sdf::ElementPtr &_sdf )
   }
 
 
-  // TODO: read kp, kd, soft_cfm, max_vel, min_depth from sdf
+  // TODO: read kp, kd, soft_cfm, maxVel, minDepth from sdf
   sdf::ElementPtr contactElem = _sdf->GetElement("contact");
   sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
   if (contactOdeElem)
@@ -81,7 +81,27 @@ void SurfaceParams::Load( sdf::ElementPtr &_sdf )
     this->kp = contactOdeElem->GetValueDouble("kp");
     this->kd = contactOdeElem->GetValueDouble("kd");
     this->cfm = contactOdeElem->GetValueDouble("soft_cfm");
-    this->max_vel = contactOdeElem->GetValueDouble("max_vel");
-    this->min_depth = contactOdeElem->GetValueDouble("min_depth");
+    this->maxVel = contactOdeElem->GetValueDouble("maxVel");
+    this->minDepth = contactOdeElem->GetValueDouble("minDepth");
   }
 }
+
+void SurfaceParams::FillSurfaceMsg(msgs::Surface &_msg)
+{
+  _msg.mutable_friction()->set_mu(this->mu1);
+  _msg.mutable_friction()->set_mu2(this->mu2);
+  _msg.mutable_friction()->set_slip1(this->slip1);
+  _msg.mutable_friction()->set_slip2(this->slip2);
+  msgs::Set(_msg.mutable_friction()->mutable_fdir1(), this->fdir1);
+
+  _msg.set_restitution_coefficient(this->bounce);
+  _msg.set_bounce_threshold(this->bounceThreshold);
+
+  _msg.set_soft_cfm(this->cfm);
+  _msg.set_soft_erp(this->erp);
+  _msg.set_kp(this->kp);
+  _msg.set_kd(this->kd);
+  _msg.set_max_vel(this->maxVel);
+  _msg.set_min_depth(this->minDepth);
+}
+ 

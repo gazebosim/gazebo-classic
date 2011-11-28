@@ -114,3 +114,10 @@ std::string TrimeshShape::GetFilename() const
 {
   return this->sdf->GetValueString("filename");
 }
+
+void TrimeshShape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  _msg.set_type(msgs::Geometry::MESH);
+  _msg.mutable_mesh()->set_filename(this->GetFilename());
+  msgs::Set(_msg.mutable_mesh()->mutable_scale(),this->GetSize());
+}

@@ -61,6 +61,7 @@ namespace gazebo
       /// \brief Set the size of the cylinder
       public: virtual void SetSize( const double &radius, const double &length  );
   
+      public: void FillShapeMsg(msgs::Geometry &_msg);
     };
     /// \}
   }

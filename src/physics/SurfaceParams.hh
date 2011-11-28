@@ -22,6 +22,7 @@
 #ifndef SURFACEPARAMS_HH
 #define SURFACEPARAMS_HH
 
+#include "msgs/msgs.h"
 #include "sdf/sdf.h"
 
 namespace gazebo
@@ -38,7 +39,10 @@ namespace gazebo
       public: SurfaceParams();
     
       /// \brief Load the contact params
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      /// \brief Fill in a surface message
+      public: void FillSurfaceMsg(msgs::Surface &_msg);
    
       /// 0..1, 0=no bounciness
       public: double bounce;
@@ -51,8 +55,8 @@ namespace gazebo
 
       public: double cfm;
       public: double erp;
-      public: double max_vel;
-      public: double min_depth;
+      public: double maxVel;
+      public: double minDepth;
       public: double mu1;
       public: double mu2;
       public: double slip1;

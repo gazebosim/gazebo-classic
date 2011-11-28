@@ -56,6 +56,8 @@ namespace gazebo
       /// \brief Get the filename of the mesh data
       public: std::string GetFilename() const;
   
+      public: void FillShapeMsg(msgs::Geometry &_msg);
+
       protected: const common::Mesh *mesh;
     };
     /// \}

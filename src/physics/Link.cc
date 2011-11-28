@@ -547,7 +547,45 @@ void Link::AddChildJoint(JointPtr joint)
 /// Fill a link message
 void Link::FillLinkMsg( msgs::Link &_msg )
 {
-  _msg.set_name( this->GetCompleteScopedName() );
+  _msg.set_name(this->GetName());
+  _msg.set_self_collide(this->GetSelfCollide());
+  _msg.set_gravity(this->GetGravityMode());
+  _msg.set_kinematic(this->GetKinematic());
+  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+
+  _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
+  _msg.mutable_inertial()->set_linear_damping(
+      this->inertial->GetLinearDamping());
+  _msg.mutable_inertial()->set_angular_damping(
+      this->inertial->GetAngularDamping() );
+  _msg.mutable_inertial()->set_ixx(this->inertial->GetIXX());
+  _msg.mutable_inertial()->set_ixy(this->inertial->GetIXY());
+  _msg.mutable_inertial()->set_ixz(this->inertial->GetIXZ());
+  _msg.mutable_inertial()->set_iyy(this->inertial->GetIYY());
+  _msg.mutable_inertial()->set_iyz(this->inertial->GetIYZ());
+  _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
+  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
+
+  for (unsigned int j=0; j < this->GetChildCount(); j++)
+  {
+    if (this->GetChild(j)->HasType(Base::COLLISION))
+    {
+      CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
+          this->GetChild(j));
+      coll->FillCollisionMsg(*_msg.add_collision());
+    }
+  }
+
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      _msg.add_visual()->CopyFrom(msgs::VisualFromSDF(visualElem));
+      visualElem = visualElem->GetNextElement(); 
+    }
+  }
+
 }
 
 //////////////////////////////////////////////////

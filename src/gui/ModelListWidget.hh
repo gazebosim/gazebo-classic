@@ -61,12 +61,25 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Link &_msg,
                                      QtProperty *_parentItem);
 
+      private: void FillPropertyTree(const msgs::Collision &_msg,
+                                     QtProperty *_parent);
 
-      //private: void FillPropertyTree(sdf::ElementPtr &_elem,
-                                     //QtProperty *_parentItem);
+      private: void FillMsgField(QtProperty *_item, 
+                   google::protobuf::Message *_message,
+                   const google::protobuf::Reflection *_reflection,
+                   const google::protobuf::FieldDescriptor *_field);
 
-      private: void FillSDF(QtProperty *_item, sdf::ElementPtr &_elem,
-                             QtProperty *_changedItem);
+      private: void FillMsg(QtProperty *_item, 
+                   google::protobuf::Message *_message,
+                   const google::protobuf::Descriptor *_descriptor);
+
+      private: void FillGeometryMsg(QtProperty *_item, 
+                   google::protobuf::Message *_message,
+                   const google::protobuf::Descriptor *_descriptor);
+
+      private: void FillPoseMsg(QtProperty *_item, 
+                   google::protobuf::Message *_message,
+                   const google::protobuf::Descriptor *_descriptor);
 
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
@@ -77,8 +90,20 @@ namespace gazebo
 
       private: QTreeWidgetItem *GetModelListItem( const std::string &_name );
 
+      private: void FillVector3dProperty(const msgs::Vector3d &_msg,
+                                         QtProperty *_parent);
+
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
+
+      private: void FillPropertyTree(const msgs::Surface &_msg,
+                                       QtProperty *_parent);
+
+      private: void FillPropertyTree(const msgs::Visual &_msg,
+                                       QtProperty *_parent);
+
+      private: void FillPropertyTree(const msgs::Geometry &_msg,
+                                       QtProperty *_parent);
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -88,7 +113,7 @@ namespace gazebo
       private: QAction *showCollisionAction;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr requestPub;
+      private: transport::PublisherPtr requestPub, modelPub;
       private: transport::PublisherPtr selectionPub, factoryPub;
       private: transport::SubscriberPtr responseSub, newEntitySub;
       private: transport::SubscriberPtr requestSub;

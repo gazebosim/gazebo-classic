@@ -73,3 +73,27 @@ void HeightmapShape::Load( sdf::ElementPtr &_sdf )
 void HeightmapShape::Init()
 {
 }
+
+std::string HeightmapShape::GetFilename() const
+{
+  return this->sdf->GetValueString("filename");
+}
+
+math::Vector3 HeightmapShape::GetSize() const
+{
+  return math::Vector3();
+}
+
+math::Vector3 HeightmapShape::GetOffset() const
+{
+  return math::Vector3();
+}
+
+void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  _msg.set_type(msgs::Geometry::HEIGHTMAP);
+  _msg.mutable_heightmap()->set_filename(this->GetFilename());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
+  msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
+
+}

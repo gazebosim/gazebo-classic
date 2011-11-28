@@ -59,6 +59,10 @@ namespace gazebo
   
       /// \brief Set the normal
       public: void SetNormal( const math::Vector3 &norm );
+
+      public: math::Vector3 GetNormal() const;
+
+      public: void FillShapeMsg(msgs::Geometry &_msg);
     };
     /// \}
   }

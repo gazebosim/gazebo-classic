@@ -195,8 +195,10 @@ namespace gazebo
       private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
       private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);
 
-      private: void OnFactoryMsg( const boost::shared_ptr<msgs::Factory const> &data);
-      private: void OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg);
+      private: void OnFactoryMsg(
+                   const boost::shared_ptr<msgs::Factory const> &data);
+      private: void OnModelMsg(
+                   const boost::shared_ptr<msgs::Model const> &_msg);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();
@@ -211,6 +213,7 @@ namespace gazebo
       private: void ProcessEntityMsgs();
       private: void ProcessRequestMsgs();
       private: void ProcessFactoryMsgs();
+      private: void ProcessModelMsgs();
 
       /// Pointer the physics engine
       private: PhysicsEnginePtr physicsEngine;
@@ -273,6 +276,7 @@ namespace gazebo
 
       private: std::list<msgs::Request> requestMsgs;
       private: std::list<msgs::Factory> factoryMsgs;
+      private: std::list<msgs::Model> modelMsgs;
 
     };
 

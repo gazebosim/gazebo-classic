@@ -15,7 +15,7 @@ message Model
   optional bool is_static      = 2;
   optional Pose pose           = 3;
   repeated Joint joints        = 4;
-  repeated Link links          = 5;
+  repeated Link link           = 5;
   optional bool deleted        = 6;
 }
 /// \endverbatim

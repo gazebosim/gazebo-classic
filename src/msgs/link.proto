@@ -21,8 +21,8 @@ message Link
   optional bool kinematic       = 5;
   optional Inertial inertial    = 6;
   optional Pose pose            = 7;
-  repeated Visual visuals       = 8;
-  repeated Collision collisions = 9;
-  repeated Sensor sensors       = 10;
+  repeated Visual visual        = 8;
+  repeated Collision collision  = 9;
+  repeated Sensor sensor        = 10;
 }
 /// \endverbatim

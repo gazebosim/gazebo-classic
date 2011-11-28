@@ -62,3 +62,9 @@ double SphereShape::GetRadius() const
 {
   return this->sdf->GetValueDouble("radius");
 }
+
+void SphereShape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  _msg.set_type(msgs::Geometry::SPHERE);
+  _msg.mutable_sphere()->set_radius(this->GetRadius());
+}

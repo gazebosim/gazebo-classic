@@ -56,6 +56,14 @@ namespace gazebo
       /// \brief Init the map
       public: virtual void Init();
   
+      public: void FillShapeMsg(msgs::Geometry &_msg);
+
+      public: std::string GetFilename() const;
+      public: double GetScale() const;
+      public: int GetThreshold() const;
+      public: double GetHeight() const;
+      public: int GetGranularity() const;
+
       /// \brief Build the quadtree
       private: void BuildTree(QuadNode *node);
   

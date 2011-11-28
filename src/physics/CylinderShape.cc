@@ -85,3 +85,10 @@ double CylinderShape::GetLength() const
 {
   return this->sdf->GetValueDouble("length");
 }
+
+void CylinderShape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  _msg.set_type(msgs::Geometry::CYLINDER);
+  _msg.mutable_cylinder()->set_radius(this->GetRadius());
+  _msg.mutable_cylinder()->set_length(this->GetLength());
+}

@@ -108,6 +108,8 @@ namespace gazebo
       /// \brief Update the collision
       public: void Update();
     
+      public: void FillShapeMsg(msgs::Geometry &) {}
+
        /// \brief Physics engine specific method for updating the rays
       protected: virtual void UpdateRays() = 0;
     

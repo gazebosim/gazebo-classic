@@ -35,7 +35,7 @@
     </model>
 
     <model name="box_model1" static="true">
-      <origin pose="0 0 10 0 0 0"/>
+      <origin pose="0 0 1 0 0 0"/>
       <link name="box_body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -54,34 +54,7 @@
           <material script="Gazebo/WoodPallet"/>
         </visual>
       </link>
-      <plugin filename="test/libbelow.so" name="below"/>
     </model>
-
-<!--
-    <model name="box_model" static="false">
-      <origin pose="0 0 1.249 0 0 0"/>
-      <link name="box_body">
-        <inertial mass="1.0">
-          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
-        </inertial>
-
-        <collision name="static_geom1">
-          <geometry>
-            <box size="2 1 .49"/>
-          </geometry>
-        </collision>
-
-        <visual name="visual">
-          <geometry>
-            <box size="2 1 .49"/>
-          </geometry>
-          <material script="Gazebo/WoodPallet"/>
-        </visual>
-      </link>
-    </model>
-    -->
- 
-    <!--
 
     <model name="sphere_model">
       <origin pose="0 1.5 1.0 0 0 0"/>
@@ -126,7 +99,29 @@
         </visual>
       </link>
     </model>
-    -->
+
+    <model name="mesh_model">
+      <origin pose="0 2.5 1.0 0 0 0"/>
+      <link name="body">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="geom">
+          <geometry>
+            <mesh filename="bowl.dae" scale="1 1 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <mesh filename="bowl.dae" scale="1 1 1"/>
+          </geometry>
+          <material script="Gazebo/WoodPallet"/>
+        </visual>
+      </link>
+    </model>
+
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>

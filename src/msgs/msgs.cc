@@ -366,6 +366,7 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Visual result;
 
+  result.set_name( _sdf->GetValueString("name") );
   result.set_cast_shadows( _sdf->GetValueBool("cast_shadows") );
   result.set_transparency( _sdf->GetValueDouble("transparency") );
 

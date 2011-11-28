@@ -26,6 +26,7 @@ set (sources Base.cc
              TrimeshShape.cc
              World.cc
              Inertial.cc
+             SurfaceParams.cc
 ) 
 
 set (headers BallJoint.hh
@@ -58,6 +59,7 @@ set (headers BallJoint.hh
              World.hh
              Inertial.hh
              ScrewJoint.hh
+             SurfaceParams.hh
 )
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)

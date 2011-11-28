@@ -100,6 +100,8 @@ namespace gazebo
 
       /// \brief In the ray
       public: virtual void Init();
+              
+      public: void FillShapeMsg(msgs::Geometry &) {}
   
       /// Contact information; this is filled out during collision
       /// detection.  

@@ -39,7 +39,6 @@ ODECollision::ODECollision( LinkPtr _link )
 {
   this->SetName("ODE_Collision");
   this->collisionId = NULL;
-  this->surface.reset(new ODESurfaceParams());
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 }
 
@@ -58,9 +57,6 @@ void ODECollision::Load( sdf::ElementPtr &_sdf )
 {
   Collision::Load(_sdf);
 
-  if (_sdf->HasElement("surface"))
-    this->surface->Load( _sdf->GetElement("surface") );
-
   this->SetSpaceId( boost::shared_static_cast<ODELink>(this->link)->GetSpaceId() );
 
   if (this->IsStatic())
@@ -73,7 +69,6 @@ void ODECollision::Load( sdf::ElementPtr &_sdf )
 /// \brief Finalize the collision
 void ODECollision::Fini()
 {
-  this->surface.reset();
   Collision::Fini();
 }
  

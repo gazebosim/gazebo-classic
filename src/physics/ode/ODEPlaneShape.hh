@@ -45,7 +45,7 @@ namespace gazebo
     
         double altitude = 0;
   
-        math::Vector3 n = this->sdf->GetValueVector3("normal");
+        math::Vector3 n = this->GetNormal();
         odeParent->SetCollision(dCreatePlane(odeParent->GetSpaceId(), 
                            n.x, n.y, n.z, altitude), false);
       }

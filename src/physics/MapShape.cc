@@ -111,6 +111,41 @@ void MapShape::Init()
   this->CreateBoxes(this->root);
 }
 
+void MapShape::FillShapeMsg(msgs::Geometry &_msg)
+{
+  _msg.set_type(msgs::Geometry::IMAGE);
+  _msg.mutable_image()->set_filename(this->GetFilename());
+  _msg.mutable_image()->set_scale(this->GetScale());
+  _msg.mutable_image()->set_threshold(this->GetThreshold());
+  _msg.mutable_image()->set_height(this->GetHeight());
+  _msg.mutable_image()->set_granularity(this->GetGranularity());
+}
+
+
+std::string MapShape::GetFilename() const
+{
+  return this->sdf->GetValueString("filename");
+}
+
+double MapShape::GetScale() const
+{
+  return this->sdf->GetValueDouble("scale");
+}
+
+int MapShape::GetThreshold() const
+{
+  return this->sdf->GetValueInt("threshold");
+}
+
+double MapShape::GetHeight() const
+{
+  return this->sdf->GetValueDouble("height");
+}
+
+int MapShape::GetGranularity() const
+{
+  return this->sdf->GetValueInt("granularity");
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Create the ODE boxes

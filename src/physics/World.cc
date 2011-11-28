@@ -322,6 +322,7 @@ void World::Update()
   this->ProcessEntityMsgs();
   this->ProcessRequestMsgs();
   this->ProcessFactoryMsgs();
+  this->ProcessModelMsgs();
 
   event::Events::worldUpdateEnd();
 }
@@ -650,7 +651,7 @@ void World::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
   this->requestMsgs.push_back(*_msg);
 }
 
-void World::OnScene(const boost::shared_ptr<msgs::Scene const> &_data)
+void World::OnScene(const boost::shared_ptr<msgs::Scene const> & /*_data*/)
 {
   //boost::mutex::scoped_lock lock(*this->receiveMutex);
   //this->sceneMsg.MergeFrom(*_data);
@@ -699,20 +700,11 @@ void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
   }
 }
 
-void World::OnModelMsg( const boost::shared_ptr<msgs::Model const> &_msg)
+void World::OnModelMsg(const boost::shared_ptr<msgs::Model const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  ModelPtr model = this->GetModelByName( _msg->name() );
-  if (!model)
-  {
-    gzerr << "Unable to find model[" << _msg->name() << "]\n";
-    return;
-  }
+  this->modelMsgs.push_back(*_msg);
 
-  if (_msg->has_pose())
-  {
-    model->SetWorldPose( msgs::Convert(_msg->pose()) );
-  }
 }
 
 
@@ -746,7 +738,7 @@ void World::BuildModelMsg(msgs::Model *_msg, ModelPtr _model)
   {
     if (_model->GetChild(i)->HasType(Entity::LINK))
     {
-      msgs::Link *linkMsg = _msg->add_links();
+      msgs::Link *linkMsg = _msg->add_link();
       LinkPtr link = boost::shared_static_cast<Link>(_model->GetChild(i));
       this->BuildLinkMsg(linkMsg, link);
     }
@@ -767,7 +759,7 @@ void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
 
     if (sensor)
     {
-      msgs::Sensor *sensorMsg = _msg->add_sensors();
+      msgs::Sensor *sensorMsg = _msg->add_sensor();
       this->BuildSensorMsg(sensorMsg, sensor);
     }
   }
@@ -948,6 +940,28 @@ void World::ProcessRequestMsgs()
   }
 
   this->requestMsgs.clear();
+}
+
+void World::ProcessModelMsgs()
+{
+  std::list<msgs::Model>::iterator iter;
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  for (iter = this->modelMsgs.begin();
+       iter != this->modelMsgs.end(); iter++)
+  {
+    ModelPtr model = this->GetModelByName((*iter).name());
+    if (!model)
+    {
+      gzerr << "Unable to find model[" << (*iter).name() << "]\n";
+      return;
+    }
+
+    if ((*iter).has_pose())
+    {
+      model->SetWorldPose( msgs::Convert((*iter).pose()) );
+    }
+  }
+  this->modelMsgs.clear();
 }
 
 void World::ProcessFactoryMsgs()
