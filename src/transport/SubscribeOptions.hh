@@ -20,9 +20,8 @@ namespace gazebo
 
       public: template<class M>
               void Init(const std::string &_topic, 
-                        /*const boost::function<
-                        void (const boost::shared_ptr<M const> &)> &_callback,*/
-                        NodePtr _node)
+                        NodePtr _node,
+                        bool _latching)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -33,8 +32,7 @@ namespace gazebo
                 this->node = _node; 
                 this->topic = _topic;
                 this->msgType = msg->GetTypeName();
-                  //this->subscription = CallbackHelperPtr( 
-                      //new CallbackHelperT<M>(_callback) );
+                this->latching = _latching;
               }
 
       public: NodePtr GetNode() const
@@ -52,16 +50,15 @@ namespace gazebo
                 return this->msgType;
               }
 
-      /*public: CallbackHelperPtr GetSubscription() const
+      public: bool GetLatching() const
               {
-                return this->subscription;
+                return this->latching;
               }
-              */
 
       private: std::string topic;
       private: std::string msgType;
-      //private: CallbackHelperPtr subscription;
       private: NodePtr node;
+      private: bool latching;
     };
     /// \}
   }

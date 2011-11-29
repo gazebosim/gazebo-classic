@@ -2,6 +2,7 @@
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
+#include "common/Events.hh"
 
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
@@ -34,6 +35,15 @@ MainWindow::MainWindow()
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+  this->selectionPub =
+    this->node->Advertise<msgs::Selection>("~/selection",1);
+
+  this->newEntitySub = this->node->Subscribe("~/model/info", 
+      &MainWindow::OnModel, this, false);
+
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response", 
+      &MainWindow::OnResponse, this, false);
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -52,7 +62,7 @@ MainWindow::MainWindow()
 
   this->modelsDock = new QDockWidget(tr("Models"), this);
   this->modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
-  ModelListWidget *modelListWidget = new ModelListWidget();
+  ModelListWidget *modelListWidget = new ModelListWidget(this);
   this->modelsDock->setWidget(modelListWidget);
   this->addDockWidget(Qt::LeftDockWidgetArea, this->modelsDock);
 
@@ -91,6 +101,12 @@ MainWindow::MainWindow()
       gui::Events::ConnectMoveMode( 
         boost::bind(&MainWindow::OnMoveMode, this, _1) ) );
 
+  this->connections.push_back(
+     event::Events::ConnectSetSelectedEntity(
+       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
+
+  this->requestMsg = msgs::CreateRequest("entity_list");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
 MainWindow::~MainWindow()
@@ -450,4 +466,61 @@ void MainWindow::OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg)
       cam->AttachToVisual( name, minDist, maxDist );
     }
   }
+}
+
+void MainWindow::OnModel(const boost::shared_ptr<msgs::Model const> &_msg )
+{
+  this->entities[_msg->name()] = _msg->id();
+  gui::Events::modelUpdate(*_msg);
+}
+
+void MainWindow::OnResponse(
+    const boost::shared_ptr<msgs::Response const> &_msg)
+{
+  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
+    return;
+
+  msgs::Model_V modelVMsg;
+
+  if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
+  {
+    modelVMsg.ParseFromString( _msg->serialized_data() );
+
+    for (int i=0; i < modelVMsg.models_size(); i++)
+    {
+      this->entities[modelVMsg.models(i).name()] = modelVMsg.models(i).id();
+      gui::Events::modelUpdate(modelVMsg.models(i));
+    }
+  }
+
+  delete this->requestMsg;
+  this->requestMsg = NULL;
+}
+
+void MainWindow::OnSetSelectedEntity(const std::string &_name)
+{
+  std::map<std::string, unsigned int>::iterator iter;
+  msgs::Selection msg;
+  msg.set_name(_name);
+
+  iter = this->entities.find(_name);
+  if (iter != this->entities.end())
+    msg.set_id(iter->second);
+  else
+    gzerr << "Unable to find model[" << _name << "]\n";
+
+  this->selectionPub->Publish(msg);
+}
+
+unsigned int MainWindow::GetEntityId(const std::string &_name)
+{
+  unsigned int result = 0;
+  std::map<std::string, unsigned int>::iterator iter;
+  iter = this->entities.find(_name);
+  if (iter != this->entities.end())
+    result = iter->second;
+  else
+    gzerr << "Unable to find model[" << _name << "]\n";
+
+  return result;
 }

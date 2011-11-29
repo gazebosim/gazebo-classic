@@ -45,18 +45,12 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 // Destructor
 Publisher::~Publisher()
 {
-  std::cout << "DELETE Pub__LISHER[" << this->topic << "]\n";
   if (this->messages.size() > 0)
   {
-    gzerr << "Deleting Publisher on topic[" << this->topic << "] With " << this->messages.size() << " outstanding publications.\n";
+    gzerr << "Deleting Publisher on topic[" << this->topic << "] With "
+          << this->messages.size() << " outstanding publications.\n";
     this->SendMessage();
   }
-
-  /*std::list<google::protobuf::Message *>::iterator iter;
-  for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
-    delete *iter;
-  this->messages.clear();
-  */
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
@@ -95,7 +89,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     msg->CopyFrom( _message );
 
     this->mutex->lock();
-    this->messages.push_back( msg );
+    this->messages.push_back(msg);
 
     if (this->messages.size() > this->queueLimit)
     {

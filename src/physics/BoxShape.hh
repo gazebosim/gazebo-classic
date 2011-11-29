@@ -53,6 +53,8 @@ namespace gazebo
       public: math::Vector3 GetSize() const;
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
+
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
     };
     /// \}
   }

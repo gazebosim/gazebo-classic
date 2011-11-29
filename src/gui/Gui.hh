@@ -36,6 +36,8 @@ namespace gazebo
 
     void set_active_camera( rendering::UserCameraPtr _cam );
     rendering::UserCameraPtr get_active_camera();
+
+    unsigned int get_entity_id(const std::string &_name);
   }
 }
 

@@ -105,3 +105,37 @@ void SurfaceParams::FillSurfaceMsg(msgs::Surface &_msg)
   _msg.set_min_depth(this->minDepth);
 }
  
+
+void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
+{
+  if (_msg.has_friction())
+  {
+    if (_msg.friction().has_mu())
+      this->mu1 = _msg.friction().mu();
+    if (_msg.friction().has_mu2())
+      this->mu2 = _msg.friction().mu2();
+    if (_msg.friction().has_slip1())
+      this->slip1 = _msg.friction().slip1();
+    if (_msg.friction().has_slip2())
+      this->slip2 = _msg.friction().slip2();
+    if (_msg.friction().has_fdir1())
+      this->fdir1 = msgs::Convert(_msg.friction().fdir1());
+  }
+
+  if (_msg.has_restitution_coefficient())
+    this->bounce = _msg.restitution_coefficient();
+  if (_msg.has_bounce_threshold())
+    this->bounceThreshold = _msg.bounce_threshold();
+  if (_msg.has_soft_cfm())
+    this->cfm = _msg.soft_cfm();
+  if (_msg.has_soft_erp())
+    this->erp = _msg.soft_erp();
+  if (_msg.has_kp())
+    this->kp = _msg.kp();
+  if (_msg.has_kd())
+    this->kd = _msg.kd();
+  if (_msg.has_max_vel())
+    this->maxVel = _msg.max_vel();
+  if (_msg.has_min_depth())
+    this->minDepth = _msg.min_depth();
+}

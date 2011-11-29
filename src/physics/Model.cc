@@ -97,22 +97,26 @@ void Model::Load( sdf::ElementPtr &_sdf )
   if (_sdf->HasElement("link"))
   {
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
-    //bool first = false;
+    bool first = true;
     while (linkElem)
     {
       // Create a new link
-      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink( boost::shared_static_cast<Model>(shared_from_this()));
+      LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
+          boost::shared_static_cast<Model>(shared_from_this()));
 
-      // if (first)
-      // {
-      //   link->SetCanonicalLink(true);
-      //   first = false;
-      // }
+      /// FIXME: canonical link is hardcoded to the first link.
+      ///        warn users for now, need  to add parsing of
+      ///        the canonical tag in sdf
+      if (first)
+      {
+        link->SetCanonicalLink(true);
+        this->canonicalLink = link;
+        first = false;
+      }
 
       // Load the link using the config node. This also loads all of the
       // bodies collisionetries
       link->Load(linkElem);
-
       linkElem = linkElem->GetNextElement();
     }
   }
@@ -138,6 +142,7 @@ void Model::Load( sdf::ElementPtr &_sdf )
       pluginElem = pluginElem->GetNextElement();
     }
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,22 +155,7 @@ void Model::Init()
   pose = this->sdf->GetOrCreateElement("origin")->GetValuePose("pose");
 
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose( pose );
-
-
-  /// FIXME: canonical link is hardcoded to the first link.
-  ///        warn users for now, need  to add parsing of
-  ///        the canonical tag in sdf
-  for (unsigned int i=0; i < this->children.size(); i++)
-  {
-    if (this->children[i]->HasType(LINK))
-    {
-      gzwarn << "Model Canonical Link is presetting to first link for now, ignoring any canonical tag if one exists in your xml\n";
-      this->canonicalLink = boost::shared_static_cast<Link>(this->children[i]);
-      this->canonicalLink->SetCanonicalLink(true);
-      break;
-    }
-  }
+  this->SetInitialRelativePose(pose);
 
   this->SetRelativePose( pose );
 
@@ -173,9 +163,9 @@ void Model::Init()
   for (Base_V::iterator iter = this->children.begin(); 
        iter!=this->children.end(); iter++)
   {
-    if ((*iter)->HasType(LINK))
+    if ((*iter)->HasType(Base::LINK))
       boost::shared_static_cast<Link>(*iter)->Init();
-    else if ((*iter)->HasType(MODEL))
+    else if ((*iter)->HasType(Base::MODEL))
     {
       boost::shared_static_cast<Model>(*iter)->Init();
     }
@@ -582,7 +572,11 @@ JointPtr Model::GetJoint(const std::string &name)
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+LinkPtr Model::GetLinkById(unsigned int _id) const
+{
+  return boost::shared_dynamic_cast<Link>(this->GetById(_id));
+}
+
 /// Get a link by name
 LinkPtr Model::GetLink(const std::string &name) const
 {
@@ -696,7 +690,7 @@ void Model::SetCollideMode( const std::string &m )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the Laser retro property of the model
-void Model::SetLaserRetro( const float &retro )
+void Model::SetLaserRetro(const float &retro)
 {
   Base_V::iterator iter;
 
@@ -709,12 +703,15 @@ void Model::SetLaserRetro( const float &retro )
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void Model::FillModelMsg( msgs::Model &_msg )
+void Model::FillModelMsg(msgs::Model &_msg)
 {
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetCompleteScopedName());
   _msg.set_is_static(this->IsStatic());
-  _msg.mutable_pose()->CopyFrom(msgs::Convert(this->GetWorldPose()));
+  _msg.mutable_pose()->CopyFrom(
+      msgs::Convert(this->GetWorldPose()));
+  _msg.set_id(this->GetId());
+
+  _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (unsigned int j=0; j < this->GetChildCount(); j++)
   {
@@ -731,8 +728,29 @@ void Model::FillModelMsg( msgs::Model &_msg )
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void Model::SetJointPositions( 
+void Model::ProcessMsg(const msgs::Model &_msg)
+{
+  if (_msg.id() != this->GetId())
+  {
+    gzerr << "Incorrect ID\n";
+    return;
+  }
+
+  std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ProcessMsg!!\n";
+  this->SetName(_msg.name());
+  this->SetWorldPose(msgs::Convert(_msg.pose()));
+  /*for (int i=0; i < _msg.link_size(); i++)
+  {
+    LinkPtr link = this->GetLinkById(_msg.link(i).id());
+    if (link)
+      link->ProcessMsg(_msg.link(i));
+  }
+  */
+
+  this->SetStatic(_msg.is_static());
+}
+
+void Model::SetJointPositions(
     const std::map<std::string, double> &_jointPositions)
 
 {

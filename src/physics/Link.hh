@@ -159,8 +159,12 @@ namespace gazebo
       /// \param _sdf SDF element used to load the collision
       private: void LoadCollision( sdf::ElementPtr &_sdf );
 
-      /// \bridf accessor for collisions
-      public: CollisionPtr GetCollision(std::string name);
+      /// \brief Get a collision by id
+      /// \return Pointer to the collision
+      public: CollisionPtr GetCollisionById(unsigned int _id) const;
+
+      /// \brief accessor for collisions
+      public: CollisionPtr GetCollision(const std::string &name);
   
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
@@ -194,6 +198,10 @@ namespace gazebo
       /// \brief Fill a link message
       /// \param _msg Message to fill
       public: void FillLinkMsg( msgs::Link &_msg );
+
+      /// \brief Update parameters from a message
+      /// \param _msg Message to read
+      public: void ProcessMsg(const msgs::Link &_msg);
 
       /// \brief Joints that have this Link as a parent Link
       public: void AddChildJoint(JointPtr joint);

@@ -445,9 +445,30 @@ void Collision::UpdateParameters( sdf::ElementPtr &_sdf )
 void Collision::FillCollisionMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  _msg.set_id(this->GetId());
   _msg.set_name(this->GetName());
   _msg.set_laser_retro(this->GetLaserRetro());
   this->shape->FillShapeMsg(*_msg.mutable_geometry());
   this->surface->FillSurfaceMsg(*_msg.mutable_surface());
+
+  _msg.add_visual()->CopyFrom(*this->visualMsg);
 }
  
+void Collision::ProcessMsg(const msgs::Collision &_msg)
+{
+  if (_msg.id() != this->GetId())
+  {
+    gzerr << "Incorrect ID\n";
+    return;
+  }
+
+  this->SetName(_msg.name());
+  if (_msg.has_laser_retro())
+    this->SetLaserRetro(_msg.laser_retro());
+  if (_msg.has_pose())
+    this->SetRelativePose(msgs::Convert(_msg.pose()));
+  if (_msg.has_geometry())
+    this->shape->ProcessMsg(_msg.geometry());
+  if (_msg.has_surface())
+    this->surface->ProcessMsg(_msg.surface());
+}

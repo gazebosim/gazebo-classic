@@ -20,9 +20,10 @@ SubscriptionTransport::~SubscriptionTransport()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the publication link 
-void SubscriptionTransport::Init( const ConnectionPtr &conn )
+void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
 {
-  this->connection = conn;
+  this->connection = _conn;
+  this->latching = _latching;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

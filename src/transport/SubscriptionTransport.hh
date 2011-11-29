@@ -24,7 +24,7 @@ namespace gazebo
       public: virtual ~SubscriptionTransport();
 
       /// \brief Initialize the publication link 
-      public: void Init( const ConnectionPtr &conn );
+      public: void Init(const ConnectionPtr &conn, bool _latching);
 
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const;

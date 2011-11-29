@@ -73,7 +73,8 @@ GLWidget::GLWidget( QWidget *parent )
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-  this->selectionSub = this->node->Subscribe("~/selection", &GLWidget::OnSelectionMsg, this);
+  this->selectionSub = this->node->Subscribe("~/selection",
+      &GLWidget::OnSelectionMsg, this);
 
   this->installEventFilter(this);
   this->keyModifiers = 0;
@@ -206,7 +207,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
-  else if (this->selection)
+  else if (this->selectionVis)
   {
     this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos, 
                              this->selectionMod);
@@ -254,7 +255,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (this->keyModifiers & Qt::ControlModifier)
     {
-      if (this->selection)
+      if (this->selectionVis)
       {
         newHoverVis = this->scene->GetVisualAt(this->userCamera, 
             this->mouseEvent.pos, mod);
@@ -270,7 +271,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         this->setCursor(Qt::SizeAllCursor);
         this->scene->GetSelectionObj()->SetHighlight( mod );
       }
-      else if (newHoverVis && !this->selection)
+      else if (newHoverVis && !this->selectionVis)
       {
         this->scene->GetSelectionObj()->SetHighlight("");
 
@@ -313,13 +314,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (this->entityMaker)
       this->entityMaker->OnMouseDrag(this->mouseEvent);
-    else if (this->selection && !this->selectionMod.empty())
+    else if (this->selectionVis && !this->selectionMod.empty())
     {
       this->scene->GetSelectionObj()->SetActive(true);
       if (this->selectionMod.substr(0,3) == "rot")
-        this->RotateEntity(this->selection);
+        this->RotateEntity(this->selectionVis);
       else
-        this->TranslateEntity(this->selection);
+        this->TranslateEntity(this->selectionVis);
     }
     else
       this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -367,12 +368,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     {
       if (this->hoverVis)
       {
-        this->selection = this->hoverVis;
-        if (this->selection)
+        this->selectionVis = this->hoverVis;
+        if (this->selectionVis)
         {
           // Get the model associated with the visual
-          this->selection = this->selection->GetParent()->GetParent();
-          this->scene->SelectVisual(this->selection->GetName());
+          this->selectionVis = this->selectionVis->GetParent()->GetParent();
+          this->scene->SelectVisual(this->selectionVis->GetName());
         }
       }
       else
@@ -381,11 +382,13 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     else
       this->scene->SelectVisual("");
   }
-  else if ( !this->selectionMod.empty() && this->selection)
+  else if (!this->selectionMod.empty() && this->selectionVis)
   {
     msgs::Model msg;
-    msg.set_name(this->selection->GetName());
-    msgs::Set( msg.mutable_pose(), this->selection->GetWorldPose() );
+    msg.set_id(gui::get_entity_id(this->selectionVis->GetName()));
+    msg.set_name(this->selectionVis->GetName());
+
+    msgs::Set(msg.mutable_pose(), this->selectionVis->GetWorldPose());
     this->modelPub->Publish(msg);
   }
 
@@ -629,17 +632,14 @@ void GLWidget::TranslateEntity( rendering::VisualPtr &_vis )
 
 }
 
-void GLWidget::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
+void GLWidget::OnSelectionMsg(
+    const boost::shared_ptr<msgs::Selection const> &_msg)
 {
   if (_msg->has_selected())
   {
     if (_msg->selected())
-    {
-      this->selection = this->scene->GetVisual(_msg->name() );
-    }
+      this->selectionVis = this->scene->GetVisual(_msg->name());
     else
-    {
-      this->selection.reset();
-    }
+      this->selectionVis.reset();
   }
 }

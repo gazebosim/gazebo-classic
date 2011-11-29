@@ -69,10 +69,12 @@ namespace gazebo
       /// \brief Adverise a topic
       template<typename M>
       transport::PublisherPtr Advertise(const std::string &topic, 
-                                        unsigned int _queueLimit=20)
+                                        unsigned int _queueLimit=10)
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
-        PublisherPtr publisher = transport::TopicManager::Instance()->Advertise<M>(decodedTopic, _queueLimit);
+        PublisherPtr publisher =
+          transport::TopicManager::Instance()->Advertise<M>(
+              decodedTopic,_queueLimit);
 
         this->publisherMutex->lock();
         this->publishers.push_back(publisher);
@@ -85,11 +87,12 @@ namespace gazebo
       /// \brief Subscribe to a topic, and return data on the callback
       template<typename M, typename T>
       SubscriberPtr Subscribe(const std::string &topic,
-          void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)
+          void(T::*fp)(const boost::shared_ptr<M const> &), T *obj,
+          bool _latching=true)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic, shared_from_this());
+        ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
               new CallbackHelperT<M>(boost::bind(fp, obj, _1))));
@@ -100,11 +103,11 @@ namespace gazebo
       /// \brief Subscribe to a topic, and return data on the callback
       template<typename M>
       SubscriberPtr Subscribe(const std::string &topic,
-          void(*fp)(const boost::shared_ptr<M const> &))
+          void(*fp)(const boost::shared_ptr<M const> &), bool _latching=true)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
-        ops.template Init<M>(decodedTopic, shared_from_this());
+        ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
         this->callbacks[decodedTopic].push_back(
             CallbackHelperPtr(new CallbackHelperT<M>(fp)));

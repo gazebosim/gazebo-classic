@@ -36,7 +36,6 @@ Publication::Publication( const std::string &topic, const std::string &msgType )
 // Destructor
 Publication::~Publication()
 {
-  std::cout << "DELETE Publication[" << this->topic << "]\n";
   this->prevMsgBuffer.clear();
 }
         
@@ -65,24 +64,26 @@ void Publication::AddSubscription(const NodePtr &_node)
 }
 
 // Add a subscription callback
-void Publication::AddSubscription(const CallbackHelperPtr &callback)
+void Publication::AddSubscription(const CallbackHelperPtr &_callback)
 {
   std::list< CallbackHelperPtr >::iterator iter;
-  iter = std::find(this->callbacks.begin(), this->callbacks.end(), callback);
+  iter = std::find(this->callbacks.begin(), this->callbacks.end(), _callback);
   if (iter == this->callbacks.end())
   {
-    this->callbacks.push_back(callback);
+    this->callbacks.push_back(_callback);
 
-    std::list<std::string>::iterator msgIter;
-    for (msgIter = this->prevMsgBuffer.begin();
-         msgIter != this->prevMsgBuffer.end(); msgIter++)
+    if (_callback->GetLatching())
     {
-      callback->HandleData(*msgIter);
+      std::list<std::string>::iterator msgIter;
+      for (msgIter = this->prevMsgBuffer.begin();
+          msgIter != this->prevMsgBuffer.end(); msgIter++)
+      {
+        _callback->HandleData(*msgIter);
+      }
     }
   } 
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // A a transport
 void Publication::AddTransport( const PublicationTransportPtr &_publink)
 {

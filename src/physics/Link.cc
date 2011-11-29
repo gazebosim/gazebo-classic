@@ -87,7 +87,7 @@ Link::~Link()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the body
-void Link::Load( sdf::ElementPtr &_sdf )
+void Link::Load(sdf::ElementPtr &_sdf)
 {
   Entity::Load(_sdf);
 
@@ -101,7 +101,7 @@ void Link::Load( sdf::ElementPtr &_sdf )
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
+  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
   this->sdf->GetAttribute("self_collide")->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide,this));
 
@@ -111,12 +111,8 @@ void Link::Load( sdf::ElementPtr &_sdf )
     sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
     while (visualElem)
     {
-      std::ostringstream visname;
-      visname << this->GetCompleteScopedName() << "::VISUAL_" << 
-        this->visuals.size();
-
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-      msg.set_name( visname.str() );
+      msg.set_name(this->GetCompleteScopedName() + "::" + msg.name());
       msg.set_parent_name( this->GetCompleteScopedName() );
       msg.set_is_static( this->IsStatic() );
 
@@ -240,8 +236,8 @@ void Link::Init()
 
   // DO THIS LAST!
   sdf::ElementPtr originElem = this->sdf->GetOrCreateElement("origin");
-  this->SetRelativePose( originElem->GetValuePose("pose") );
-  this->SetInitialRelativePose( originElem->GetValuePose("pose") );
+  this->SetRelativePose(originElem->GetValuePose("pose"));
+  this->SetInitialRelativePose(originElem->GetValuePose("pose"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +284,7 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
   // before loading child collsiion, we have to figure out if 
   // selfCollide is true and modify parent class Entity so this 
   // body has its own spaceId
-  this->SetSelfCollide( this->sdf->GetValueBool("self_collide") );
+  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
 
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -298,9 +294,10 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
     {
       // TODO: Update visuals properly
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-      msg.set_name(visualElem->GetValueString("name"));
-      msg.set_parent_name( this->GetCompleteScopedName() );
-      msg.set_is_static( this->IsStatic() );
+
+      msg.set_name(this->GetCompleteScopedName() + "::" + msg.name());
+      msg.set_parent_name(this->GetCompleteScopedName());
+      msg.set_is_static(this->IsStatic());
 
       this->visPub->Publish(msg);
 
@@ -408,6 +405,27 @@ void Link::LoadCollision( sdf::ElementPtr &_sdf )
     gzthrow("Unknown Collisionetry Type["+type +"]");
 
   collision->Load(_sdf);
+}
+
+CollisionPtr Link::GetCollisionById(unsigned int _id) const
+{
+  return boost::shared_dynamic_cast<Collision>(this->GetById(_id));
+}
+
+CollisionPtr Link::GetCollision(const std::string &_name)
+{
+  CollisionPtr result;
+  Base_V::const_iterator biter;
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
+  {
+    if ((*biter)->GetName() == _name)
+    {
+      result = boost::shared_dynamic_cast<Collision>(*biter);
+      break;
+    }
+  }
+
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -547,11 +565,14 @@ void Link::AddChildJoint(JointPtr joint)
 /// Fill a link message
 void Link::FillLinkMsg( msgs::Link &_msg )
 {
-  _msg.set_name(this->GetName());
+  _msg.set_id(this->GetId());
+  _msg.set_name(this->GetCompleteScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
-  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
+
+  _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
   _msg.mutable_inertial()->set_linear_damping(
@@ -581,12 +602,47 @@ void Link::FillLinkMsg( msgs::Link &_msg )
     sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
     while (visualElem)
     {
-      _msg.add_visual()->CopyFrom(msgs::VisualFromSDF(visualElem));
+      msgs::Visual *vis = _msg.add_visual();
+      vis->CopyFrom(msgs::VisualFromSDF(visualElem));
+      vis->set_name(this->GetCompleteScopedName() + "::" + vis->name());
+      vis->set_parent_name(this->GetCompleteScopedName());
+
+      std::cout << "Link Visual[" << vis->DebugString() << "]\n";
+
       visualElem = visualElem->GetNextElement(); 
     }
   }
-
 }
+
+void Link::ProcessMsg(const msgs::Link &_msg)
+{
+  if (_msg.id() != this->GetId())
+  {
+    gzerr << "Incorrect ID\n";
+    return;
+  }
+
+  this->SetName(_msg.name());
+
+  if(_msg.has_pose())
+    this->SetRelativePose(msgs::Convert(_msg.pose()));
+  if (_msg.has_self_collide())
+    this->SetSelfCollide(_msg.self_collide());
+  if (_msg.has_gravity())
+    this->SetGravityMode(_msg.gravity());
+  if (_msg.has_kinematic())
+    this->SetKinematic(_msg.kinematic());
+  if (_msg.has_inertial())
+    this->inertial->ProcessMsg(_msg.inertial());
+
+  for (int i=0; i < _msg.collision_size(); i++)
+  {
+    CollisionPtr coll = this->GetCollisionById(_msg.collision(i).id());
+    if (coll)
+      coll->ProcessMsg(_msg.collision(i));
+  }
+}
+
 
 //////////////////////////////////////////////////
 unsigned int Link::GetSensorCount() const

@@ -89,7 +89,7 @@ namespace gazebo
   
       /// \brief Get the absolute pose of the entity
       public: inline const math::Pose &GetWorldPose() const
-              { return this->worldPose; }
+              {return this->worldPose;}
   
       /// \brief Get the pose of the entity relative to its parent
       public: math::Pose GetRelativePose() const;

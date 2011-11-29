@@ -17,6 +17,7 @@
 #ifndef INERTIAL_HH
 #define INERTIAL_HH
 
+#include "msgs/msgs.h"
 #include "sdf/sdf.h"
 #include "math/Quaternion.hh"
 #include "math/Vector3.hh"
@@ -50,6 +51,9 @@ namespace gazebo
 
       public: double GetLinearDamping();
       public: double GetAngularDamping();
+
+      public: void SetLinearDamping(double _damping);
+      public: void SetAngularDamping(double _damping);
 
       /// \brief Reset all the mass properties
       public: void Reset();
@@ -89,7 +93,14 @@ namespace gazebo
       public: double GetIXY() const;
       public: double GetIXZ() const;
       public: double GetIYZ() const;
-  
+
+      public: void SetIXX(double _v);
+      public: void SetIYY(double _v);
+      public: void SetIZZ(double _v);
+      public: void SetIXY(double _v);
+      public: void SetIXZ(double _v);
+      public: void SetIYZ(double _v);
+ 
       /// \brief Rotate this mass
       public: void Rotate(const math::Quaternion &rot);
   
@@ -98,7 +109,11 @@ namespace gazebo
   
       public: Inertial operator+(const Inertial &_inertial ) const;
       public: const Inertial &operator+=(const Inertial &_inertial );
-  
+
+      /// \brief Update parameters from a message
+      /// \param _msg Message to read
+      public: void ProcessMsg(const msgs::Inertial &_msg);
+
       public: friend std::ostream &operator<<(std::ostream &out, 
                                               const gazebo::physics::Inertial &_inertial)
               {

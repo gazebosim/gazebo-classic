@@ -57,6 +57,8 @@ namespace gazebo
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
       protected: std::vector<double> heights;
   
       protected: common::Image img;

@@ -44,6 +44,8 @@ namespace gazebo
       /// \brief Fill in a surface message
       public: void FillSurfaceMsg(msgs::Surface &_msg);
    
+      public: virtual void ProcessMsg(const msgs::Surface &_msg);
+
       /// 0..1, 0=no bounciness
       public: double bounce;
       

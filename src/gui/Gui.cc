@@ -67,6 +67,11 @@ void gui::load()
   }
 }
 
+unsigned int gui::get_entity_id(const std::string &_name)
+{
+  return g_main_win->GetEntityId(_name);
+}
+
 void gui::init()
 {
   g_main_win->show();

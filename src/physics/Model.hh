@@ -143,8 +143,12 @@ namespace gazebo
       /// \return Pointer to the joint
       public: JointPtr GetJoint(const std::string &name);
  
-      /// \brief Get a body by name
-      /// \return Pointer to the body
+      /// \brief Get a link by id
+      /// \return Pointer to the link
+      public: LinkPtr GetLinkById(unsigned int _id) const;
+
+      /// \brief Get a link by name
+      /// \return Pointer to the link
       public: LinkPtr GetLink(const std::string &name="canonical") const;
  
       /// \brief Set the gravity mode of the model
@@ -160,7 +164,10 @@ namespace gazebo
 
       /// \brief Fill a model message
       /// \param _msg Message to fill
-      public: void FillModelMsg( msgs::Model &_msg );
+      public: void FillModelMsg(msgs::Model &_msg);
+
+      /// \brief Update parameters from a model message
+      public: void ProcessMsg(const msgs::Model &_msg);
 
       /// \brief Set the positions of a set of joints
       public: void SetJointPositions(

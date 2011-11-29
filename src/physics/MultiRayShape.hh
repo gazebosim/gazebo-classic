@@ -110,6 +110,8 @@ namespace gazebo
     
       public: void FillShapeMsg(msgs::Geometry &) {}
 
+      public: virtual void ProcessMsg(const msgs::Geometry &) {}
+
        /// \brief Physics engine specific method for updating the rays
       protected: virtual void UpdateRays() = 0;
     

@@ -98,7 +98,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
-  this->visualMsg->set_name( this->GetCompleteScopedName() );
+  this->visualMsg->set_name(this->GetCompleteScopedName());
 
   if (this->sdf->HasElement("origin"))
   {
@@ -119,9 +119,9 @@ void Entity::Load(sdf::ElementPtr &_sdf)
 
   this->visPub->Publish(*this->visualMsg);
 
-  this->poseMsg->set_name( this->GetCompleteScopedName() );
+  this->poseMsg->set_name(this->GetCompleteScopedName());
 
-  if (this->HasType(MODEL))
+  if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
   else if (this->IsCanonicalLink())
     this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalLink;
@@ -202,7 +202,7 @@ void Entity::PublishPose()
     math::Pose relativePose = this->GetRelativePose();
     if (relativePose != msgs::Convert(*this->poseMsg))
     {
-      msgs::Set( this->poseMsg, this->worldPose);
+      msgs::Set(this->poseMsg, this->worldPose);
       this->posePub->Publish(*this->poseMsg);
     }
   }
@@ -229,12 +229,14 @@ math::Pose Entity::GetRelativePose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the pose of the entity relative to its parent
-void Entity::SetRelativePose(const math::Pose &pose, bool notify)
+void Entity::SetRelativePose(const math::Pose &_pose, bool notify)
 {
+  std::cout << "Entity::SetRelativePose[" << this->GetName() << "][" 
+            << _pose.pos << "]\n";
   if (this->parent && this->parentEntity)
-    this->SetWorldPose(pose + this->parentEntity->GetWorldPose(), notify);
+    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), notify);
   else
-    this->SetWorldPose(pose, notify);
+    this->SetWorldPose(_pose, notify);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -267,6 +269,8 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 
 void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
 {
+  std::cout << "Entity::SetWorldPoseModel[" << this->GetName() << "][" 
+            <<  _pose.pos << "]\n";
   math::Pose oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
@@ -296,17 +300,21 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
       else
       {
         entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+
+        std::cout << "Entity.....Publish Pose\n";
+        entity->PublishPose();
       }
+
       if (_notify) 
         entity->UpdatePhysicsPose(false);
-
-      entity->PublishPose();
     }
   }
 }
 
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 {
+  std::cout << "Entity::SetWorldPoseCanonicalLink[" << this->GetName() << "]["
+            << _pose.pos << "]\n";
   this->worldPose = _pose;
   this->worldPose.Correct();
 
@@ -321,6 +329,7 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 
     if (_notify) 
       this->parentEntity->UpdatePhysicsPose(false);
+    std::cout << "Publish Parent Entity Pose\n";
     this->parentEntity->PublishPose();
   }
   else
@@ -330,6 +339,8 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 
 void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 {
+  std::cout << "Entity::SetWorldPoseDefault[" << this->GetName() << "][" 
+            << _pose.pos << "]\n";
   this->worldPose = _pose;
   this->worldPose.Correct();
 
@@ -377,7 +388,7 @@ void Entity::SetWorldPose(const math::Pose &_pose, bool _notify)
 
   this->GetWorld()->modelWorldPoseUpdateMutex->unlock();
 
-  this->PublishPose();
+  //this->PublishPose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

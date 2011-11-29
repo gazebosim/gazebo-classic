@@ -354,7 +354,7 @@ void ConnectionManager::OnRead(const ConnectionPtr &_connection,
     // Create a transport link for the publisher to the remote subscriber
     // via the connection
     SubscriptionTransportPtr subLink( new SubscriptionTransport() );
-    subLink->Init( _connection );
+    subLink->Init(_connection, sub.latching());
 
     // Connect the publisher to this transport mechanism
     TopicManager::Instance()->ConnectPubToSub(sub.topic(), subLink);
@@ -453,8 +453,9 @@ void ConnectionManager::Unsubscribe( const std::string &_topic,
   this->masterConn->EnqueueMsg(msgs::Package("unsubscribe", msg), true);
 }
 
-void ConnectionManager::Subscribe(const std::string &topic, 
-                                  const std::string &msgType)
+void ConnectionManager::Subscribe(const std::string &_topic, 
+                                  const std::string &_msgType,
+                                  bool _latching)
 {
   if (!this->initialized)
   {
@@ -471,10 +472,11 @@ void ConnectionManager::Subscribe(const std::string &topic,
   //if (!conn)
   {
     msgs::Subscribe msg;
-    msg.set_topic( topic );
-    msg.set_msg_type( msgType );
-    msg.set_host( this->serverConn->GetLocalAddress() );
-    msg.set_port( this->serverConn->GetLocalPort() );
+    msg.set_topic(_topic);
+    msg.set_msg_type(_msgType);
+    msg.set_host(this->serverConn->GetLocalAddress());
+    msg.set_port(this->serverConn->GetLocalPort());
+    msg.set_latching(_latching);
 
     // Inform the master that we want to subscribe to a topic.
     // This will result in Connection::OnMasterRead getting called with a 

@@ -82,7 +82,8 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr selection, hoverVis;
+      private: rendering::VisualPtr selectionVis, hoverVis;
+      private: unsigned int selectionId;
       private: std::string selectionMod;
       private: math::Pose selectionPoseOrig;
 

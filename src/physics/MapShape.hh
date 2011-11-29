@@ -58,6 +58,8 @@ namespace gazebo
   
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
       public: std::string GetFilename() const;
       public: double GetScale() const;
       public: int GetThreshold() const;

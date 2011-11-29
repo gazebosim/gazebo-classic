@@ -420,3 +420,8 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
     }
   }
 }
+
+void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
+{
+  gzerr << "TODO: not implement yet.";
+}

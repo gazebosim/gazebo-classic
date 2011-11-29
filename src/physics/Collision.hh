@@ -140,7 +140,10 @@ namespace gazebo
 
       /// \brief Fill a collision message
       public: void FillCollisionMsg( msgs::Collision &_msg );
-  
+
+      /// \brief Update parameters from a message
+      public: void ProcessMsg(const msgs::Collision &_msg);
+
       /// \brief Enable callback: Called when the link changes
       private: void EnabledCB(bool enabled);
   

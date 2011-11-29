@@ -171,7 +171,8 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
     gzdbg << "No publication\n";
 
   // Use this to find other remote publishers
-  ConnectionManager::Instance()->Subscribe(_ops.GetTopic(), _ops.GetMsgType());
+  ConnectionManager::Instance()->Subscribe(_ops.GetTopic(), _ops.GetMsgType(),
+      _ops.GetLatching());
   return sub;
 }
 

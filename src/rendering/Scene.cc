@@ -77,7 +77,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
 
-  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
   this->serverSub = this->node->Subscribe("/gazebo/server/control",
                                           &Scene::OnServerControl, this);
 
@@ -177,7 +176,6 @@ Scene::~Scene()
   }
   this->connections.clear();
   this->node.reset();  
-  this->sceneSub.reset();
   this->visSub.reset();
   this->lightSub.reset();
   this->poseSub.reset();
@@ -976,32 +974,36 @@ void Scene::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
   }
 }
 
-void Scene::OnSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->sceneMsgs.push_back(_msg);
-}
-
 void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 {
-  for (int i=0; i < _msg->visual_size(); i++)
-  {
-    boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(_msg->visual(i)) );
-    this->visualMsgs.push_back(vm);
-  }
-
   for (int i=0; i < _msg->model_size(); i++)
   {
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
     pm->set_name(_msg->model(i).name());
+    std::cout << pm->DebugString() << "\n";
     this->poseMsgs.push_front(pm);
+
+    for (int j=0; j < _msg->model(i).visual_size(); j++)
+    {
+      boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+            _msg->model(i).visual(j)));
+      this->visualMsgs.push_back(vm);
+    }
 
     for (int j=0; j < _msg->model(i).link_size(); j++)
     {
       boost::shared_ptr<msgs::Pose> pm2(
           new msgs::Pose(_msg->model(i).link(j).pose()));
       pm2->set_name(_msg->model(i).link(j).name());
+
       this->poseMsgs.push_front(pm2);
+
+      for (int k=0; k < _msg->model(i).link(j).visual_size(); k++)
+      {
+        boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+              _msg->model(i).link(j).visual(k)));
+        this->visualMsgs.push_back(vm);
+      }
 
       for (int k=0; k < _msg->model(i).link(j).sensor_size(); k++)
       {

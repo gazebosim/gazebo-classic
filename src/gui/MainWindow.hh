@@ -26,6 +26,8 @@ namespace gazebo
       public: void Load();
       public: void Init();
 
+      public: unsigned int GetEntityId(const std::string &_name);
+
       protected: void closeEvent(QCloseEvent *event);
 
       private: void OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg);
@@ -58,6 +60,11 @@ namespace gazebo
       private: void CreateActions();
       private: void CreateMenus();
       private: void CreateToolbars();
+
+      private: void OnModel(const boost::shared_ptr<msgs::Model const> &_msg);
+      private: void OnSetSelectedEntity(const std::string &_name);
+      private: void OnResponse(
+                   const boost::shared_ptr<msgs::Response const> &_msg);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;
@@ -97,13 +104,22 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::PublisherPtr worldControlPub;
       private: transport::PublisherPtr serverControlPub;
+      private: transport::PublisherPtr selectionPub;
+      private: transport::PublisherPtr requestPub;
+      private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
+      private: transport::SubscriberPtr newEntitySub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *modelsDock;
       private: QDockWidget *insertModelsDock;
 
       private: std::vector<event::ConnectionPtr> connections;
+
+      // A map that associates physics_id's with entity names
+      private: std::map<std::string, unsigned int> entities;
+
+      private: msgs::Request *requestMsg;
     };
   }
 }

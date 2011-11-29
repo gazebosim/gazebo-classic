@@ -49,7 +49,6 @@ unsigned int Visual::visualCounter = 0;
 // Constructor
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
-  gzmsg << "New Vis[" << _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -79,7 +78,6 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 /// Constructor
 Visual::Visual (const std::string &_name, Scene *_scene)
 {
-  gzmsg << "New Vis[" << _name << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;

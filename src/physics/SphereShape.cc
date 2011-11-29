@@ -68,3 +68,8 @@ void SphereShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.set_type(msgs::Geometry::SPHERE);
   _msg.mutable_sphere()->set_radius(this->GetRadius());
 }
+
+void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
+{
+  this->SetRadius(_msg.sphere().radius());
+}

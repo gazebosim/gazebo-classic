@@ -62,6 +62,8 @@ namespace gazebo
       public: virtual void SetSize( const double &radius, const double &length  );
   
       public: void FillShapeMsg(msgs::Geometry &_msg);
+
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
     };
     /// \}
   }

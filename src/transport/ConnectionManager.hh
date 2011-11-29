@@ -57,8 +57,9 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
-      public: void Subscribe( const std::string &topic, 
-                              const std::string &msgType);
+      public: void Subscribe( const std::string &_topic, 
+                              const std::string &_msgType,
+                              bool _latching);
 
       public: void Unsubscribe( const msgs::Subscribe &_sub );
 

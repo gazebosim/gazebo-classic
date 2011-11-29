@@ -25,7 +25,7 @@ namespace gazebo
     /// \brief A helper class to handle callbacks when messages arrive 
     class CallbackHelper
     {
-      public: CallbackHelper() {}
+      public: CallbackHelper() : latching(true) {}
 
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const = 0;
@@ -36,6 +36,11 @@ namespace gazebo
       /// \brief Return true if the callback is local, false if the callback
       ///        is tied to a remote connection
       public: virtual bool IsLocal() const = 0;
+
+      public: bool GetLatching() const
+              {return this->latching;}
+
+      protected: bool latching;
     };
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
 

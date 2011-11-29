@@ -49,6 +49,8 @@ namespace gazebo
 
       public: virtual void FillShapeMsg(msgs::Geometry &_msg) = 0;
 
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg) = 0;
+
       public: CollisionPtr collisionParent;
       protected: sdf::ElementPtr sdf;
     };

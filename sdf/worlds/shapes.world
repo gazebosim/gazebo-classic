@@ -34,7 +34,7 @@
       </link>
     </model>
 
-    <model name="box_model1" static="true">
+    <model name="box_model1" static="false">
       <origin pose="0 0 1 0 0 0"/>
       <link name="box_body">
         <inertial mass="1.0">
@@ -56,6 +56,7 @@
       </link>
     </model>
 
+    <!--
     <model name="sphere_model">
       <origin pose="0 1.5 1.0 0 0 0"/>
       <link name="body">
@@ -122,6 +123,7 @@
       </link>
     </model>
 
+-->
 
     <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>

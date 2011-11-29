@@ -53,6 +53,8 @@ namespace gazebo
       public: double GetRadius() const;
 
       public: virtual void FillShapeMsg(msgs::Geometry &_msg);
+
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
     };
     /// \}
   }

@@ -124,7 +124,7 @@ std::string Base::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the ID of this entity. This id is unique
-int Base::GetId() const
+unsigned int Base::GetId() const
 {
   return this->id;
 }
@@ -185,7 +185,7 @@ void Base::RemoveChild(unsigned int _id)
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
   {
-    if ((*iter)->GetId() == (int)_id)
+    if ((*iter)->GetId() == _id)
     {
       (*iter)->Fini();
       this->children.erase(iter);
@@ -253,7 +253,24 @@ void Base::RemoveChildren()
   this->children.clear();
   this->childrenEnd = this->children.end();
 }
- 
+
+BasePtr Base::GetById(unsigned int _id) const
+{
+  BasePtr result;
+  Base_V::const_iterator biter;
+
+  for (biter = this->children.begin(); biter != this->children.end(); biter++)
+  {
+    if ((*biter)->GetId() == _id)
+    {
+      result = *biter;
+      break;
+    }
+  }
+
+  return result;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Get by name helper
 BasePtr Base::GetByName(const std::string &_name)

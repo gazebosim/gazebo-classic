@@ -178,13 +178,12 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId,0);
+  dWorldSetAutoDisableFlag(this->worldId,1);
 
-  /*dWorldSetAutoDisableTime(this->worldId, 1);
+  dWorldSetAutoDisableTime(this->worldId, 2);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableSteps(this->worldId, 10);
-  */
+  dWorldSetAutoDisableSteps(this->worldId, 50);
   
   math::Vector3 g = this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
   if (g == math::Vector3(0,0,0))

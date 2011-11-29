@@ -81,3 +81,8 @@ void PlaneShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.set_type(msgs::Geometry::PLANE);
   msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal());
 }
+
+void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
+{
+  this->SetNormal(msgs::Convert(_msg.plane().normal()));
+}

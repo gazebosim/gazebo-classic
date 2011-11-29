@@ -145,6 +145,9 @@ namespace gazebo
       /// \brief Get an element by name
       public: BasePtr GetByName(const std::string &name);
 
+      /// \brief Get a model by id
+      public: ModelPtr GetModelById(unsigned int _id);
+
       /// \brief Get a model by name
       public: ModelPtr GetModelByName(const std::string &name);
 
@@ -182,17 +185,11 @@ namespace gazebo
       /// \brief Set the selected entity
       private: void SetSelectedEntityCB( const std::string &name );
     
-      private: void OnScene( const boost::shared_ptr<msgs::Scene const> &_data );
       private: void OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_data );
 
       /// \brief Construct a scene message from the known world state
       private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
-      private: void BuildModelMsg(msgs::Model *_msg, ModelPtr _model);
-      private: void BuildLinkMsg(msgs::Link *_msg, LinkPtr _link);
-      private: void BuildSensorMsg(msgs::Sensor *_msg, 
-                                   sensors::SensorPtr _sensor);
 
-      private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
       private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);
 
       private: void OnFactoryMsg(
@@ -247,8 +244,8 @@ namespace gazebo
       private: transport::PublisherPtr statPub, responsePub, modelPub;
       private: transport::PublisherPtr guiPub, scenePub;
 
-      private: transport::SubscriberPtr visSub, controlSub;
-      private: transport::SubscriberPtr factorySub, jointSub, sceneSub;
+      private: transport::SubscriberPtr controlSub;
+      private: transport::SubscriberPtr factorySub, jointSub;
       private: transport::SubscriberPtr modelSub, requestSub;
 
       private: msgs::WorldStatistics worldStatsMsg;
@@ -272,12 +269,11 @@ namespace gazebo
       private: std::vector<WorldPluginPtr> plugins;
       private: std::list<std::string> deleteEntity;
 
-      public: std::list< Entity* > dirtyPoses;
+      public: std::list<Entity*> dirtyPoses;
 
       private: std::list<msgs::Request> requestMsgs;
       private: std::list<msgs::Factory> factoryMsgs;
       private: std::list<msgs::Model> modelMsgs;
-
     };
 
     /// \}

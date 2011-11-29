@@ -92,3 +92,8 @@ void CylinderShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.mutable_cylinder()->set_radius(this->GetRadius());
   _msg.mutable_cylinder()->set_length(this->GetLength());
 }
+
+void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
+{
+  this->SetSize(_msg.cylinder().radius(), _msg.cylinder().length());
+}

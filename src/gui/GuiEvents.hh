@@ -15,6 +15,7 @@
  *
 */
 #include "common/Event.hh"
+#include "msgs/msgs.h"
 
 namespace gazebo
 {
@@ -86,6 +87,15 @@ namespace gazebo
       public: static void DisconnectKeyPress( event::ConnectionPtr subscriber)
               { keyPress.Disconnect(subscriber); }
 
+      //////////////////////////////////////////////////////////////////////////
+      public: template<typename T>
+              static event::ConnectionPtr ConnectModelUpdate(T subscriber)
+              { return modelUpdate.Connect(subscriber); }
+
+      public: static void DisconnectModelUpdate(event::ConnectionPtr subscriber)
+              { modelUpdate.Disconnect(subscriber); }
+
+
 
 
       ///  that indicates the user is moving the camera
@@ -95,6 +105,7 @@ namespace gazebo
       public: static event::EventT<void (bool)>  manipMode;
 
       public: static event::EventT<void (std::string)> createEntity;
+      public: static event::EventT<void (const msgs::Model &)> modelUpdate;
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;

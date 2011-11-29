@@ -366,7 +366,7 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
 {
   msgs::Visual result;
 
-  result.set_name( _sdf->GetValueString("name") );
+  result.set_name(_sdf->GetValueString("name"));
   result.set_cast_shadows( _sdf->GetValueBool("cast_shadows") );
   result.set_transparency( _sdf->GetValueDouble("transparency") );
 
@@ -512,6 +512,7 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
   msgs::Scene result;
 
   Init(result,"scene");
+  result.set_name(_sdf->GetWorldName());
 
   if (_sdf->HasElement("grid"))
     result.set_grid( _sdf->GetElement("grid")->GetValueBool("enabled") );

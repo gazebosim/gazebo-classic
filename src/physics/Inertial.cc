@@ -109,6 +109,18 @@ void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
       boost::bind(&Inertial::GetMass, this));
 }
 
+void Inertial::SetLinearDamping(double _damping)
+{
+  this->sdf->GetOrCreateElement("damping")->GetAttribute("linear")->Set(
+      _damping);
+}
+
+void Inertial::SetAngularDamping(double _damping)
+{
+  this->sdf->GetOrCreateElement("damping")->GetAttribute("angular")->Set(
+      _damping);
+}
+
 double Inertial::GetLinearDamping()
 {
   double value = 0;
@@ -258,4 +270,60 @@ double Inertial::GetIXZ() const
 double Inertial::GetIYZ() const
 {
   return this->products.z;
+}
+
+void Inertial::SetIXX(double _v)
+{
+  this->principals.x = _v;
+}
+
+void Inertial::SetIYY(double _v)
+{
+  this->principals.y = _v;
+}
+
+void Inertial::SetIZZ(double _v)
+{
+  this->principals.z = _v;
+}
+
+void Inertial::SetIXY(double _v)
+{
+  this->products.x = _v;
+}
+
+void Inertial::SetIXZ(double _v)
+{
+  this->products.y = _v;
+}
+
+void Inertial::SetIYZ(double _v)
+{
+  this->products.z = _v;
+}
+ 
+void Inertial::ProcessMsg(const msgs::Inertial &_msg)
+{
+  if (_msg.has_mass())
+    this->SetMass(_msg.mass());
+  if (_msg.has_pose())
+    this->SetCoG(_msg.pose().position().x(),
+                 _msg.pose().position().y(),
+                 _msg.pose().position().z());
+  if (_msg.has_linear_damping())
+    this->SetLinearDamping(_msg.linear_damping());
+  if (_msg.has_angular_damping())
+    this->SetAngularDamping(_msg.angular_damping());
+  if(_msg.has_ixx())
+    this->SetIXX(_msg.ixx());
+  if(_msg.has_ixy())
+    this->SetIXY(_msg.ixy());
+  if(_msg.has_ixz())
+    this->SetIXZ(_msg.ixz());
+  if(_msg.has_iyy())
+    this->SetIYY(_msg.iyy());
+  if(_msg.has_iyz())
+    this->SetIYZ(_msg.iyz());
+  if(_msg.has_izz())
+    this->SetIZZ(_msg.izz());
 }

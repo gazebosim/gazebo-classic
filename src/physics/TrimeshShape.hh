@@ -46,7 +46,7 @@ namespace gazebo
       public: virtual void Update() {}
   
       /// \brief Load the trimesh
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Init the trimesh shape
       public: virtual void Init();
@@ -55,8 +55,14 @@ namespace gazebo
 
       /// \brief Get the filename of the mesh data
       public: std::string GetFilename() const;
+
+      public: void SetFilename(const std::string &_filename);
   
+      public: void SetScale(const math::Vector3 &_scale);
+
       public: void FillShapeMsg(msgs::Geometry &_msg);
+
+      public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
       protected: const common::Mesh *mesh;
     };

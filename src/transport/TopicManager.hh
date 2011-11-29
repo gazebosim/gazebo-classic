@@ -90,8 +90,8 @@ namespace gazebo
 
                 this->UpdatePublications(_topic, msg->GetTypeName());
               
-                PublisherPtr pub = PublisherPtr( new Publisher(_topic, 
-                      msg->GetTypeName(), _queueLimit) );
+                PublisherPtr pub = PublisherPtr(new Publisher(_topic,
+                      msg->GetTypeName(), _queueLimit));
 
                 std::string msgTypename;
                 PublicationPtr publication;

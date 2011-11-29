@@ -105,6 +105,11 @@ void TrimeshShape::Init()
   }
 }
 
+void TrimeshShape::SetScale(const math::Vector3 &_scale)
+{
+  this->sdf->GetAttribute("scale")->Set(_scale);
+}
+
 math::Vector3 TrimeshShape::GetSize() const
 {
   return this->sdf->GetValueVector3("scale");
@@ -115,9 +120,21 @@ std::string TrimeshShape::GetFilename() const
   return this->sdf->GetValueString("filename");
 }
 
+void TrimeshShape::SetFilename(const std::string &_filename)
+{
+  this->sdf->GetAttribute("filename")->Set(_filename);
+  this->Init();
+}
+
 void TrimeshShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
   _msg.mutable_mesh()->set_filename(this->GetFilename());
   msgs::Set(_msg.mutable_mesh()->mutable_scale(),this->GetSize());
+}
+
+void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
+{
+  this->SetScale(msgs::Convert(_msg.mesh().scale()));
+  this->SetFilename(_msg.mesh().filename());
 }

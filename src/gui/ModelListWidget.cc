@@ -9,6 +9,7 @@
 #include "sdf/sdf_parser.h"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
+#include "common/Events.hh"
 
 #include "rendering/Rendering.hh"
 #include "rendering/Scene.hh"
@@ -22,6 +23,7 @@
 #include "math/Angle.hh"
 #include "math/Helpers.hh"
 
+#include "gui/GuiEvents.hh"
 #include "gui/qtpropertybrowser/qttreepropertybrowser.h"
 #include "gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gui/ModelListWidget.hh"
@@ -39,9 +41,10 @@ const std::string yLbl = std::string("Y");
 const std::string zLbl = std::string("Z");
 
 
-ModelListWidget::ModelListWidget( QWidget *parent )
-  : QWidget( parent )
+ModelListWidget::ModelListWidget(QWidget *parent)
+  : QWidget(parent)
 {
+  this->requestMsg = NULL;
   this->propMutex = new boost::recursive_mutex();
   this->fillPropertyTree = false;
 
@@ -81,16 +84,15 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response", 
-                                            &ModelListWidget::OnResponse, this);
+      &ModelListWidget::OnResponse, this, false);
+
+  this->poseSub = this->node->Subscribe("~/pose/info",
+      &ModelListWidget::OnPose, this);
 
   this->requestSub = this->node->Subscribe("~/request",
-      &ModelListWidget::OnRequest, this);
-
-  this->newEntitySub = this->node->Subscribe("~/model/info", 
-      &ModelListWidget::OnModel, this);
+      &ModelListWidget::OnRequest, this, false);
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
 
   this->followAction = new QAction(tr("Follow"), this);
   this->followAction->setStatusTip(tr("Follow the selection"));
@@ -110,12 +112,13 @@ ModelListWidget::ModelListWidget( QWidget *parent )
   connect(this->showCollisionAction, SIGNAL(triggered()), this, 
           SLOT(OnShowCollision()));
 
-
   this->fillingPropertyTree = false;
   this->selectedProperty = NULL;
 
-  this->requestMsg = msgs::CreateRequest("entity_list");
-  this->requestPub->Publish(*this->requestMsg);
+  this->connections.push_back( 
+      gui::Events::ConnectModelUpdate( 
+        boost::bind(&ModelListWidget::OnModelUpdate, this, _1) ) );
+
 
   QTimer::singleShot( 500, this, SLOT(Update()) );
 }
@@ -133,22 +136,17 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     msgs::Selection msg;
 
     if (!this->selectedModelName.empty())
-    {
-      msg.set_name( this->selectedModelName );
-      msg.set_selected( false );
-      this->selectionPub->Publish(msg);
-    }
+      event::Events::setSelectedEntity("");
 
     this->propTreeBrowser->clear();
     this->selectedModelName = 
-      _item->data(0, Qt::UserRole).toString().toStdString();
-    msg.set_name( this->selectedModelName );
-    msg.set_selected( true );
-    this->selectionPub->Publish(msg);
+      _item->data(1, Qt::UserRole).toString().toStdString();
+
+    event::Events::setSelectedEntity(this->selectedModelName);
 
     this->requestMsg = msgs::CreateRequest("entity_info",
-                                           this->selectedModelName );
-    this->requestPub->Publish( *this->requestMsg );
+        this->selectedModelName);
+    this->requestPub->Publish(*this->requestMsg);
   }
   else
     this->selectedModelName.clear();
@@ -158,58 +156,29 @@ void ModelListWidget::Update()
 {
   if (this->fillPropertyTree)
   {
-    this->FillPropertyTree(this->modelMsg,NULL);
-    this->fillPropertyTree = NULL;
+    this->FillPropertyTree(this->modelMsg, NULL);
+    this->fillPropertyTree = false;
   }
 
-  QTimer::singleShot( 500, this, SLOT(Update()) );
-
-  /*if (!this->selectedModelName.empty())
-  {
-    this->requestMsg = msgs::CreateRequest("entity_info",
-                                           this->selectedModelName );
-    this->requestPub->Publish( *this->requestMsg );
-  }
-
-  if (this->sdfElement)
-  {
-    this->propMutex->lock();
-    this->fillingPropertyTree = true;
-
-    for (sdf::ElementPtr_V::iterator iter = this->sdfElement->elements.begin();
-         iter != this->sdfElement->elements.end(); iter++)
-    {
-      this->FillPropertyTree((*iter), NULL);
-    }
-    this->fillingPropertyTree = false;
-    this->propMutex->unlock();
-  }
-  else
-  {
-  }
-  */
+  QTimer::singleShot(500, this, SLOT(Update()));
 }
 
-void ModelListWidget::OnModel(const boost::shared_ptr<msgs::Model const> &_msg )
-{
-  this->AddModelToList(*_msg);
-}
-
-void ModelListWidget::AddModelToList( const msgs::Model &_msg )
+void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 {
   std::string name = _msg.name();
 
-  QTreeWidgetItem *listItem = this->GetModelListItem(name);
+  QTreeWidgetItem *listItem = this->GetModelListItem(_msg.id());
 
   if (!listItem)
   {
     if (!_msg.has_deleted() || !_msg.deleted())
     {
       // Create a top-level tree item for the path
-      QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, 
-          QStringList(QString("%1").arg( QString::fromStdString(name)) ));
+      QTreeWidgetItem *topItem = new QTreeWidgetItem((QTreeWidgetItem*)0, 
+          QStringList(QString("%1").arg(QString::fromStdString(name))));
 
-      topItem->setData(0, Qt::UserRole, QVariant(name.c_str()));
+      topItem->setData(0, Qt::UserRole, QVariant(_msg.id()));
+      topItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
       this->modelTreeWidget->addTopLevelItem(topItem);
 
       for (int i=0; i < _msg.link_size(); i++)
@@ -223,8 +192,9 @@ void ModelListWidget::AddModelToList( const msgs::Model &_msg )
           QStringList(QString("%1").arg( 
               QString::fromStdString(linkNameShort)) ));
 
-        linkItem->setData(0, Qt::UserRole, QVariant( linkName.c_str() ) );
-        this->modelTreeWidget->addTopLevelItem( linkItem );
+        linkItem->setData(0, Qt::UserRole, QVariant(_msg.link(i).id()));
+        linkItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
+        this->modelTreeWidget->addTopLevelItem(linkItem);
       }
     }
   }
@@ -235,6 +205,11 @@ void ModelListWidget::AddModelToList( const msgs::Model &_msg )
       int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
       this->modelTreeWidget->takeTopLevelItem(i);
     }
+    else
+    {
+      listItem->setText(0, _msg.name().c_str());
+      listItem->setData(1, Qt::UserRole, QVariant(_msg.name().c_str()));
+    }
   }
 }
 
@@ -244,29 +219,15 @@ void ModelListWidget::OnResponse(
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  msgs::Model_V modelVMsg;
   msgs::Model modelMsg;
-  msgs::String stringMsg;
 
-  if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
-  {
-    modelVMsg.ParseFromString( _msg->serialized_data() );
-
-    for (int i=0; i < modelVMsg.models_size(); i++)
-    {
-      this->AddModelToList( modelVMsg.models(i) );
-    }
-  }
-  else if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
     this->modelMsg.ParseFromString(_msg->serialized_data());
     this->propTreeBrowser->clear();
     this->fillPropertyTree = true;
     this->propMutex->unlock();
-  }
-  else if (_msg->has_type() && _msg->type() == stringMsg.GetTypeName())
-  {
   }
   else if (_msg->has_type() && _msg->type() == "error")
   {
@@ -282,7 +243,7 @@ void ModelListWidget::OnResponse(
 
 void ModelListWidget::RemoveEntity(const std::string &_name)
 {
-  QTreeWidgetItem *listItem = this->GetModelListItem( _name );
+  QTreeWidgetItem *listItem = this->GetModelListItem(gui::get_entity_id(_name));
   if (listItem)
   {
     int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
@@ -294,7 +255,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
   }
 }
 
-QTreeWidgetItem *ModelListWidget::GetModelListItem( const std::string &_name )
+QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
 {
   QTreeWidgetItem *listItem = NULL;
 
@@ -302,8 +263,8 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem( const std::string &_name )
   for (int i=0; i < this->modelTreeWidget->topLevelItemCount() && !listItem;i++)
   {
     QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
-    std::string data = item->data(0, Qt::UserRole).toString().toStdString();
-    if (data == _name)
+    unsigned int data = item->data(0, Qt::UserRole).toUInt();
+    if (data == _id)
     {
       listItem = item;
       break;
@@ -312,8 +273,8 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem( const std::string &_name )
     for (int j=0; j < item->childCount(); j++)
     {
       QTreeWidgetItem *childItem = item->child(j);
-      data = childItem->data(0, Qt::UserRole).toString().toStdString();
-      if (data == _name)
+      data = childItem->data(0, Qt::UserRole).toUInt();
+      if (data == _id)
       {
         listItem = childItem;
         break;
@@ -421,7 +382,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
         for (int i=0; i < reflection->FieldSize(this->modelMsg, field); i++)
         {
           this->FillMsg((*iter),
-              reflection->MutableRepeatedMessage(&this->modelMsg, field, i),
+              reflection->MutableRepeatedMessage(
+                &this->modelMsg, field, i),
               field->message_type());
         }
       }
@@ -444,7 +406,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
       gzerr << "Unable to process[" 
             << (*iter)->propertyName().toStdString() << "]\n";
     }
-    
   }
 
   this->modelPub->Publish(this->modelMsg);
@@ -896,23 +857,80 @@ QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
   return NULL;
 }
 
-QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
-                                          const std::string &_name)
+QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
+{
+  QtProperty *result = NULL;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin(); 
+      iter != properties.end(); iter++)
+  {
+    if ((*iter)->propertyName().toStdString() == _name)
+      return NULL;
+    else if ((result = this->GetParentItem(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
+}
+
+QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
+                                           const std::string &_name)
 {
   if (!_item)
     return NULL;
+
+  QtProperty *result = NULL;
 
   QList<QtProperty*> subProperties = _item->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
       iter != subProperties.end(); iter++)
   {
-    if ( (*iter)->propertyName().toStdString() == _name )
+    if ((*iter)->propertyName().toStdString() == _name)
     {
-      return (*iter);
+      result = _item;
+      break;
     }
+    else if ( (result = this->GetParentItem(*iter, _name)) != NULL)
+      break;
   }
 
-  return NULL;
+  return result;
+}
+
+QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
+{
+  QtProperty *result = NULL;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin(); 
+      iter != properties.end(); iter++)
+  {
+    if ((result = this->GetChildItem(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
+}
+
+QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
+                                          const std::string &_name)
+{
+  if (!_item)
+    return NULL;
+  if (_item->propertyName().toStdString() == _name)
+    return _item;
+
+  QtProperty *result = NULL;
+  QList<QtProperty*> subProperties = _item->subProperties();
+  for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
+      iter != subProperties.end(); iter++)
+  {
+    if ((result = this->GetChildItem(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
 }
 
 
@@ -1477,27 +1495,39 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   value.Round(6);
 
   // Add X value
-  item = this->variantManager->addProperty(QVariant::Double, "x");
-  if (_parent)
-    _parent->addSubProperty(item);
+  item = (QtVariantProperty*)this->GetChildItem(_parent, "x");
+  if (!item)
+  {
+    item = this->variantManager->addProperty(QVariant::Double, "x");
+    if (_parent)
+      _parent->addSubProperty(item);
+  }
   ((QtVariantPropertyManager*)
    this->variantFactory->propertyManager(item))->setAttribute(item,
    "decimals", 6);
   item->setValue(value.x);
 
   // Add Y value
-  item = this->variantManager->addProperty(QVariant::Double, "y");
-  if (_parent)
-    _parent->addSubProperty(item);
+  item = (QtVariantProperty*)this->GetChildItem(_parent, "y");
+  if (!item)
+  {
+    item = this->variantManager->addProperty(QVariant::Double, "y");
+    if (_parent)
+      _parent->addSubProperty(item);
+  }
   ((QtVariantPropertyManager*)
    this->variantFactory->propertyManager(item))->setAttribute(item,
    "decimals", 6);
   item->setValue(value.y);
 
   // Add Z value
-  item = this->variantManager->addProperty( QVariant::Double, "z");
-  if (_parent)
-    _parent->addSubProperty(item);
+  item = (QtVariantProperty*)this->GetChildItem(_parent, "z");
+  if (!item)
+  {
+    item = this->variantManager->addProperty( QVariant::Double, "z");
+    if (_parent)
+      _parent->addSubProperty(item);
+  }
   ((QtVariantPropertyManager*)
    this->variantFactory->propertyManager(item))->setAttribute(item,
    "decimals", 6);
@@ -1518,25 +1548,50 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   this->FillVector3dProperty(_msg.position(), _parent);
 
   // Add Roll value
-  item = this->variantManager->addProperty( QVariant::Double, "roll");
-  if (_parent)
-    _parent->addSubProperty(item);
+  item = (QtVariantProperty*)this->GetChildItem(_parent, "roll");
+  if (!item)
+  {
+    item = this->variantManager->addProperty( QVariant::Double, "roll");
+    if (_parent)
+      _parent->addSubProperty(item);
+  }
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
   item->setValue(RTOD(rpy.x));
 
   // Add Pitch value
-  item = this->variantManager->addProperty( QVariant::Double, "pitch");
-  if (_parent)
-    _parent->addSubProperty(item);
+  item = (QtVariantProperty*)this->GetChildItem(_parent, "pitch");
+  if (!item)
+  {
+    item = this->variantManager->addProperty( QVariant::Double, "pitch");
+    if (_parent)
+      _parent->addSubProperty(item);
+  }
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
   item->setValue(RTOD(rpy.y));
 
   // Add Yaw value
-  item = this->variantManager->addProperty( QVariant::Double, "yaw");
-  if (_parent)
-    _parent->addSubProperty(item);
+  item = (QtVariantProperty*)this->GetChildItem(_parent, "yaw");
+  if (!item)
+  {
+    item = this->variantManager->addProperty( QVariant::Double, "yaw");
+    if (_parent)
+      _parent->addSubProperty(item);
+  }
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
   item->setValue(RTOD(rpy.z));
+}
+
+void ModelListWidget::OnPose(
+    const boost::shared_ptr<msgs::Pose const> &_msg)
+{
+  if (_msg->name().find(this->selectedModelName) != std::string::npos)
+  {
+    this->selectedProperty = NULL;
+    QtProperty *poseItem = this->GetChildItem("pose");
+    std::cout << "PPP[" << poseItem->propertyName().toStdString() << "]\n";
+    this->FillPoseProperty(*_msg, poseItem);
+    std::cout << "OnPose[" << _msg->DebugString() << "]\n";
+  }
 }
 
 void ModelListWidget::OnRequest(

@@ -48,10 +48,13 @@ namespace gazebo
       private: void OnResponse(
                    const boost::shared_ptr<msgs::Response const> &_msg );
 
-      private: void OnModel(const boost::shared_ptr<msgs::Model const> &_msg);
+      private: void OnModelUpdate(const msgs::Model &_msg);
 
       private: void OnRequest(
                    const boost::shared_ptr<msgs::Request const> &_msg);
+
+      private: void OnPose(
+                   const boost::shared_ptr<msgs::Pose const> &_msg);
 
       private: void AddModelToList(const msgs::Model &_msg);
 
@@ -83,12 +86,18 @@ namespace gazebo
 
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
+
+      private: QtProperty *GetParentItem(const std::string &_name);
+      private: QtProperty *GetParentItem(QtProperty *_item,
+                                           const std::string &_name);
+
+      private: QtProperty *GetChildItem(const std::string &_name);
       private: QtProperty *GetChildItem(QtProperty *_item, 
                                         const std::string &_name);
 
       private: void RemoveEntity(const std::string &_name);
 
-      private: QTreeWidgetItem *GetModelListItem( const std::string &_name );
+      private: QTreeWidgetItem *GetModelListItem(unsigned int _id);
 
       private: void FillVector3dProperty(const msgs::Vector3d &_msg,
                                          QtProperty *_parent);
@@ -114,9 +123,10 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub, modelPub;
-      private: transport::PublisherPtr selectionPub, factoryPub;
+      private: transport::PublisherPtr factoryPub;
       private: transport::SubscriberPtr responseSub, newEntitySub;
       private: transport::SubscriberPtr requestSub;
+      private: transport::SubscriberPtr poseSub;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
@@ -133,6 +143,7 @@ namespace gazebo
 
       private: msgs::Request *requestMsg;
 
+      private: std::vector<event::ConnectionPtr> connections;
 
       private: msgs::Model modelMsg;
       private: bool fillPropertyTree;

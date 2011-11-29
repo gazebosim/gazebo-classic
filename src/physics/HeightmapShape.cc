@@ -97,3 +97,8 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
 
 }
+
+void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
+{
+  gzerr << "TODO: not implement yet.";
+}

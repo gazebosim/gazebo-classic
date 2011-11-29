@@ -242,7 +242,6 @@ namespace gazebo
       private: void ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg);
       private: void ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
 
-      private: void OnSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
       private: void ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg);
 
       private: void OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
@@ -305,7 +304,6 @@ namespace gazebo
       private: boost::mutex *receiveMutex;
 
       private: transport::NodePtr node;  
-      private: transport::SubscriberPtr sceneSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;

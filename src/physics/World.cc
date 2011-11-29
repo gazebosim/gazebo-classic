@@ -139,18 +139,16 @@ void World::Load( sdf::ElementPtr _sdf )
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);
   this->requestSub = this->node->Subscribe("~/request",&World::OnRequest, this);
-  //this->sceneSub = this->node->Subscribe("~/scene", 
-                                        //&World::OnScene, this);
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
-  this->visSub = this->node->Subscribe("~/visual", &World::VisualLog, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->statPub = this->node->Advertise<msgs::WorldStatistics>("~/world_stats");
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
+  this->statPub =
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats",1);
+  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection",1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
 
   {
@@ -217,7 +215,8 @@ void World::Init()
   this->physicsEngine->Init();
 
   this->sceneMsg.clear_model();
-  this->BuildSceneMsg( this->sceneMsg, this->rootElement );
+  this->sceneMsg.set_name(this->GetName());
+  this->BuildSceneMsg(this->sceneMsg, this->rootElement);
   this->scenePub->Publish(this->sceneMsg);
 }
 
@@ -396,25 +395,28 @@ void World::DeleteEntityCB(const std::string &/*_name*/)
   // TODO: Implement this function
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Get an element by name
 BasePtr World::GetByName(const std::string &_name)
 {
   return this->rootElement->GetByName(_name);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+ModelPtr World::GetModelById(unsigned int _id)
+{
+  return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
+}
+
 /// Get a model by name
 ModelPtr World::GetModelByName(const std::string &_name)
 {
-  return boost::shared_dynamic_cast<Model>( this->GetByName( _name ) );
+  return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get a pointer to a model based on a name
 EntityPtr World::GetEntityByName(const std::string &_name)
 {
-  return boost::shared_dynamic_cast<Entity>( this->GetByName( _name ) );
+  return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
 }
 
 
@@ -518,17 +520,18 @@ void World::OnStep()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the selected entity
-void World::SetSelectedEntityCB( const std::string &name )
+void World::SetSelectedEntityCB(const std::string &_name)
 {
   msgs::Selection msg;
-  BasePtr base = this->GetByName(name);
+  BasePtr base = this->GetByName(_name);
   EntityPtr ent = boost::shared_dynamic_cast<Entity>(base);
 
   // unselect selectedEntity
   if (this->selectedEntity)
   {
-    msg.set_name( this->selectedEntity->GetCompleteScopedName() );
-    msg.set_selected( false );
+    msg.set_id(this->selectedEntity->GetId());
+    msg.set_name(this->selectedEntity->GetCompleteScopedName());
+    msg.set_selected(false);
     this->selectionPub->Publish(msg);
 
     this->selectedEntity->SetSelected(false);
@@ -541,7 +544,8 @@ void World::SetSelectedEntityCB( const std::string &name )
     this->selectedEntity = ent;
     this->selectedEntity->SetSelected(true);
 
-    msg.set_name( this->selectedEntity->GetCompleteScopedName() );
+    msg.set_id(this->selectedEntity->GetId());
+    msg.set_name(this->selectedEntity->GetCompleteScopedName());
     msg.set_selected( true );
 
     this->selectionPub->Publish(msg);
@@ -651,35 +655,6 @@ void World::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
   this->requestMsgs.push_back(*_msg);
 }
 
-void World::OnScene(const boost::shared_ptr<msgs::Scene const> & /*_data*/)
-{
-  //boost::mutex::scoped_lock lock(*this->receiveMutex);
-  //this->sceneMsg.MergeFrom(*_data);
-}
-
-void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  if (msg->name().find("__GZ_USER_") != std::string::npos)
-    return;
-
-  int i = 0;
-  for (; i < this->sceneMsg.visual_size(); i++)
-  {
-    if (this->sceneMsg.visual(i).name() == msg->name())
-    {
-      this->sceneMsg.mutable_visual(i)->CopyFrom(*msg);
-      break;
-    }
-  }
-
-  if (i >= this->sceneMsg.visual_size())
-  {
-    msgs::Visual *newVis = this->sceneMsg.add_visual();
-    newVis->CopyFrom(*msg);
-  }
-}
-
 void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -704,12 +679,8 @@ void World::OnModelMsg(const boost::shared_ptr<msgs::Model const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->modelMsgs.push_back(*_msg);
-
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
 // Construct a scene message
 void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
 {
@@ -718,75 +689,15 @@ void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
     if (entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = scene.add_model();
-      this->BuildModelMsg(modelMsg, boost::shared_static_cast<Model>(entity));
+      boost::shared_static_cast<Model>(entity)->FillModelMsg(*modelMsg);
     }
 
     for (unsigned int i=0; i < entity->GetChildCount(); i++)
     {
-      this->BuildSceneMsg( scene, entity->GetChild(i) );
+      this->BuildSceneMsg(scene, entity->GetChild(i));
     }
   }
 }
-
-void World::BuildModelMsg(msgs::Model *_msg, ModelPtr _model)
-{
-  math::Pose pose = _model->GetWorldPose();
-  _msg->set_name( _model->GetCompleteScopedName() );
-  msgs::Set(_msg->mutable_pose(), pose);
-
-  for (unsigned int i=0; i < _model->GetChildCount(); i++)
-  {
-    if (_model->GetChild(i)->HasType(Entity::LINK))
-    {
-      msgs::Link *linkMsg = _msg->add_link();
-      LinkPtr link = boost::shared_static_cast<Link>(_model->GetChild(i));
-      this->BuildLinkMsg(linkMsg, link);
-    }
-  }
-}
-
-void World::BuildLinkMsg(msgs::Link *_msg, LinkPtr _link)
-{
-  math::Pose pose = _link->GetWorldPose();
-  _msg->set_name( _link->GetCompleteScopedName() );
-  msgs::Set(_msg->mutable_pose(), pose);
-
-  for (unsigned int i=0; i < _link->GetSensorCount(); i++)
-  {
-    std::string sensorName = _link->GetSensorName(i);
-    sensors::SensorPtr sensor = sensors::SensorManager::Instance()->GetSensor(
-        sensorName);
-
-    if (sensor)
-    {
-      msgs::Sensor *sensorMsg = _msg->add_sensor();
-      this->BuildSensorMsg(sensorMsg, sensor);
-    }
-  }
-}
-
-void World::BuildSensorMsg(msgs::Sensor *_msg, sensors::SensorPtr _sensor)
-{
-  math::Pose pose = _sensor->GetPose();
-  _msg->set_name( _sensor->GetName() );
-  _msg->set_type( _sensor->GetType() );
-  _msg->set_parent(_sensor->GetParentName());
-  msgs::Set(_msg->mutable_pose(), pose);
-
-  _msg->set_visualize(_sensor->GetVisualize());
-  _msg->set_topic(_sensor->GetTopic());
-
-  if (_sensor->GetType() == "camera")
-  {
-    sensors::CameraSensorPtr camSensor =
-      boost::shared_static_cast<sensors::CameraSensor>(_sensor);
-    msgs::CameraSensor *camMsg = _msg->mutable_camera();
-    camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
-    camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-  }
-}
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -866,9 +777,9 @@ void World::ProcessRequestMsgs()
         }
       }
 
-      response.set_type( modelVMsg.GetTypeName() );
+      response.set_type(modelVMsg.GetTypeName());
       std::string *serializedData = response.mutable_serialized_data();
-      modelVMsg.SerializeToString( serializedData );
+      modelVMsg.SerializeToString(serializedData);
     }
     else if ((*iter).request() == "entity_delete")
     {
@@ -928,8 +839,10 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "scene_info")
     {
+      std::cout << "scene_info\n";
       this->sceneMsg.clear_model();
-      this->BuildSceneMsg( this->sceneMsg, this->rootElement );
+      this->BuildSceneMsg(this->sceneMsg, this->rootElement);
+      std::cout << this->sceneMsg.DebugString() << "\n\n";
 
       std::string *serializedData = response.mutable_serialized_data();
       this->sceneMsg.SerializeToString(serializedData);
@@ -949,16 +862,17 @@ void World::ProcessModelMsgs()
   for (iter = this->modelMsgs.begin();
        iter != this->modelMsgs.end(); iter++)
   {
-    ModelPtr model = this->GetModelByName((*iter).name());
+    ModelPtr model = this->GetModelById((*iter).id());
     if (!model)
-    {
       gzerr << "Unable to find model[" << (*iter).name() << "]\n";
-      return;
-    }
-
-    if ((*iter).has_pose())
+    else
     {
-      model->SetWorldPose( msgs::Convert((*iter).pose()) );
+      model->ProcessMsg(*iter);
+
+      // Let all other subscribers know about the change
+      msgs::Model msg;
+      model->FillModelMsg(msg);
+      this->modelPub->Publish(msg);
     }
   }
   this->modelMsgs.clear();

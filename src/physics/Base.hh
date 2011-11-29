@@ -127,7 +127,7 @@ namespace gazebo
   
       /// \brief Return the ID of this entity. This id is unique
       /// \return Integer ID
-      public: int GetId() const;
+      public: unsigned int GetId() const;
   
       /// \brief Set whether the object should be "saved", when the user
       ///        selects to save the world to xml
@@ -165,7 +165,10 @@ namespace gazebo
       /// \brief Get the number of children
       /// \return The number of children
       public: unsigned int GetChildCount() const;
-  
+
+      /// \brief Get by id 
+      public: BasePtr GetById(unsigned int _id) const;
+
       /// \brief Get by name 
       /// \param name Get a child (or self) object by name
       /// \return A pointer to the object, NULL if not found

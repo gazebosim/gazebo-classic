@@ -75,7 +75,7 @@ void ODELink::Init()
 
     dBodySetData(this->linkId, this);
     dBodySetAutoDisableDefaults(this->linkId);
-    dBodySetAutoDisableFlag(this->linkId, 0);
+    dBodySetAutoDisableFlag(this->linkId, 1);
   }
 
   Link::Init();
@@ -165,11 +165,12 @@ void ODELink::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether gravity affects this link
-void ODELink::SetGravityMode(bool mode)
+void ODELink::SetGravityMode(bool _mode)
 {
+  this->sdf->GetAttribute("gravity")->Set(_mode);
   if (this->linkId)
   {
-    dBodySetGravityMode(this->linkId, mode ? 1: 0);
+    dBodySetGravityMode(this->linkId, _mode ? 1: 0);
   }
 }
 
@@ -188,10 +189,11 @@ bool ODELink::GetGravityMode()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this link will collide with others in the model
-void ODELink::SetSelfCollide(bool collide)
+void ODELink::SetSelfCollide(bool _collide)
 {
-  if (collide)
-    this->spaceId = dSimpleSpaceCreate( this->odePhysics->GetSpaceId() );
+  this->sdf->GetAttribute("self_collide")->Set(_collide);
+  if (_collide && !this->spaceId)
+    this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -432,11 +434,12 @@ void ODELink::SetAngularDamping(double damping)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this link is in the kinematic state
-void ODELink::SetKinematic(const bool &state)
+void ODELink::SetKinematic(const bool &_state)
 {
+  this->sdf->GetAttribute("kinematic")->Set(_state);
   if (this->linkId)
   {
-    if (state)
+    if (_state)
       dBodySetKinematic(this->linkId);
     else
       dBodySetDynamic(this->linkId);
