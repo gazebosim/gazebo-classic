@@ -27,6 +27,7 @@
 
 #include "physics/Collision.hh"
 #include "physics/World.hh"
+#include "physics/Model.hh"
 #include "physics/ode/ODECollision.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/ode/ODELink.hh"
@@ -69,13 +70,17 @@ void ODELink::Load( sdf::ElementPtr &_sdf)
 // Init the ODE link
 void ODELink::Init() 
 {
-  if ( !this->IsStatic() )
+  if (!this->IsStatic())
   {
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
 
-    dBodySetData(this->linkId, this);
-    dBodySetAutoDisableDefaults(this->linkId);
-    dBodySetAutoDisableFlag(this->linkId, 1);
+    // Only use auto disable if no joints are present
+    if (this->GetModel()->GetJointCount() == 0)
+    {
+      dBodySetData(this->linkId, this);
+      dBodySetAutoDisableDefaults(this->linkId);
+      dBodySetAutoDisableFlag(this->linkId, 1);
+    }
   }
 
   Link::Init();

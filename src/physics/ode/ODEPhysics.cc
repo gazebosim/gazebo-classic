@@ -178,7 +178,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId,1);
+  dWorldSetAutoDisableFlag(this->worldId, 0);
 
   dWorldSetAutoDisableTime(this->worldId, 2);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);

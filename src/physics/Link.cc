@@ -624,8 +624,6 @@ void Link::ProcessMsg(const msgs::Link &_msg)
 
   this->SetName(_msg.name());
 
-  if(_msg.has_pose())
-    this->SetRelativePose(msgs::Convert(_msg.pose()));
   if (_msg.has_self_collide())
     this->SetSelfCollide(_msg.self_collide());
   if (_msg.has_gravity())
@@ -633,7 +631,13 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.has_kinematic())
     this->SetKinematic(_msg.kinematic());
   if (_msg.has_inertial())
+  {
     this->inertial->ProcessMsg(_msg.inertial());
+    this->UpdateMass();
+  }
+
+  if(_msg.has_pose())
+    this->SetRelativePose(msgs::Convert(_msg.pose()));
 
   for (int i=0; i < _msg.collision_size(); i++)
   {

@@ -145,7 +145,6 @@ namespace gazebo
       /// \brief Get the torque applied to the body in the world frame
       public: virtual math::Vector3 GetWorldTorque() const = 0;
   
-  
       /// \brief Get the model that this body belongs to
       public: ModelPtr GetModel() const;
   
@@ -154,6 +153,8 @@ namespace gazebo
   
       /// \brief Set the mass of the body
       public: void SetInertial(const InertialPtr &_inertial);
+
+      public: virtual void UpdateMass() {}
   
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision

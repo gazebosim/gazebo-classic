@@ -45,7 +45,8 @@ ModelListWidget::ModelListWidget(QWidget *parent)
   : QWidget(parent)
 {
   this->requestMsg = NULL;
-  this->propMutex = new boost::recursive_mutex();
+  this->propMutex = new boost::mutex();
+  this->receiveMutex = new boost::mutex();
   this->fillPropertyTree = false;
 
   setMinimumWidth(280);
@@ -63,8 +64,8 @@ ModelListWidget::ModelListWidget(QWidget *parent)
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
   this->variantFactory = new QtVariantEditorFactory();
-  this->propTreeBrowser->setFactoryForManager( this->variantManager, 
-                                               this->variantFactory);
+  this->propTreeBrowser->setFactoryForManager(this->variantManager, 
+                                              this->variantFactory);
   connect(this->variantManager, 
           SIGNAL(propertyChanged(QtProperty*)), 
           this, SLOT(OnPropertyChanged(QtProperty *)));
@@ -126,6 +127,7 @@ ModelListWidget::ModelListWidget(QWidget *parent)
 ModelListWidget::~ModelListWidget()
 {
   delete this->propMutex;
+  delete this->receiveMutex;
 }
 
 
@@ -156,10 +158,13 @@ void ModelListWidget::Update()
 {
   if (this->fillPropertyTree)
   {
+    this->fillingPropertyTree = true;
     this->FillPropertyTree(this->modelMsg, NULL);
+    this->fillingPropertyTree = false;
     this->fillPropertyTree = false;
   }
 
+  this->ProcessPoseMsgs();
   QTimer::singleShot(500, this, SLOT(Update()));
 }
 
@@ -350,24 +355,31 @@ void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
 
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
-  this->propMutex->lock();
+  if (!this->propMutex->try_lock())
+    return;
 
-  if (this->selectedProperty != _item)
+  if (this->selectedProperty != _item || this->fillingPropertyTree)
   {
     this->propMutex->unlock();
     return;
   }
 
-  const google::protobuf::Descriptor *descriptor =
-    this->modelMsg.GetDescriptor();
+  msgs::Model msg;
 
-  const google::protobuf::Reflection *reflection =
-    this->modelMsg.GetReflection();
+  msg.set_id(this->modelMsg.id());
+  msg.set_name(this->modelMsg.name());
+
+  const google::protobuf::Descriptor *descriptor = msg.GetDescriptor();
+  const google::protobuf::Reflection *reflection = msg.GetReflection();
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin(); 
        iter != properties.end(); iter++)
   {
+    if (!this->HasChildItem(*iter, _item))
+      continue;
+    std::cout << "Has Item[" << (*iter)->propertyName().toStdString() << "]\n";
+
     const google::protobuf::FieldDescriptor *field =
       descriptor->FindFieldByName((*iter)->propertyName().toStdString());
 
@@ -378,28 +390,19 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     {
       if (field->is_repeated())
       {
-        // Iterate over all repeated fields
-        for (int i=0; i < reflection->FieldSize(this->modelMsg, field); i++)
-        {
-          this->FillMsg((*iter),
-              reflection->MutableRepeatedMessage(
-                &this->modelMsg, field, i),
-              field->message_type());
-        }
+        this->FillMsg((*iter), reflection->AddMessage(&msg, field),
+            field->message_type(), _item);
       }
       else
       {
         this->FillMsg((*iter),
-            reflection->MutableMessage(&this->modelMsg, field),
-            field->message_type());
+            reflection->MutableMessage(&msg, field),
+            field->message_type(), _item);
       }
     }
     else if (field)
     {
-      std::cout << "PropName[" << (*iter)->propertyName().toStdString() 
-                << "] FieldName[" << field->name() 
-                << "] FieldType[" << field->type() << "]\n";
-      this->FillMsgField((*iter), &this->modelMsg, reflection, field);
+      this->FillMsgField((*iter), &msg, reflection, field);
     }
     else
     {
@@ -408,7 +411,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     }
   }
 
-  this->modelPub->Publish(this->modelMsg);
+  std::cout << "\n\n" << msg.DebugString() << "\n\n";
+  this->modelPub->Publish(msg);
 
   this->propMutex->unlock();
 }
@@ -442,7 +446,8 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
 
 void ModelListWidget::FillGeometryMsg(QtProperty *_item, 
     google::protobuf::Message *_message,
-    const google::protobuf::Descriptor *_descriptor)
+    const google::protobuf::Descriptor *_descriptor,
+    QtProperty *_changedItem)
 {
   QtProperty *typeProperty = this->GetChildItem(_item,"type");
 
@@ -459,121 +464,153 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
 
   if (type == "box")
   {
-    msgs::BoxGeom *boxMsg = (msgs::BoxGeom*)(message);
-
     QtProperty *sizeProperty = this->GetChildItem(_item,"size");
-    double xValue = this->variantManager->value(
-        this->GetChildItem(sizeProperty,"x")).toDouble();
-    double yValue = this->variantManager->value(
-        this->GetChildItem(sizeProperty,"y")).toDouble();
-    double zValue = this->variantManager->value(
-        this->GetChildItem(sizeProperty,"z")).toDouble();
+    if (sizeProperty == _changedItem)
+    {
+      msgs::BoxGeom *boxMsg = (msgs::BoxGeom*)(message);
+      double xValue = this->variantManager->value(
+          this->GetChildItem(sizeProperty,"x")).toDouble();
+      double yValue = this->variantManager->value(
+          this->GetChildItem(sizeProperty,"y")).toDouble();
+      double zValue = this->variantManager->value(
+          this->GetChildItem(sizeProperty,"z")).toDouble();
 
-    boxMsg->mutable_size()->set_x(xValue);
-    boxMsg->mutable_size()->set_y(yValue);
-    boxMsg->mutable_size()->set_z(zValue);
+      boxMsg->mutable_size()->set_x(xValue);
+      boxMsg->mutable_size()->set_y(yValue);
+      boxMsg->mutable_size()->set_z(zValue);
+    }
   }
   else if (type == "sphere")
   {
-    msgs::SphereGeom *sphereMsg = (msgs::SphereGeom*)(message);
-
     QtProperty *radiusProperty = this->GetChildItem(_item,"radius");
-    sphereMsg->set_radius(
-        this->variantManager->value(radiusProperty).toDouble());
+    if (radiusProperty == _changedItem)
+    {
+      msgs::SphereGeom *sphereMsg = (msgs::SphereGeom*)(message);
+
+      sphereMsg->set_radius(
+          this->variantManager->value(radiusProperty).toDouble());
+    }
   }
   else if (type == "cylinder")
   {
-    msgs::CylinderGeom *cylinderMsg = (msgs::CylinderGeom*)(message);
-
     QtProperty *radiusProperty = this->GetChildItem(_item,"radius");
     QtProperty *lengthProperty = this->GetChildItem(_item,"length");
-    cylinderMsg->set_radius(
-        this->variantManager->value(radiusProperty).toDouble());
-    cylinderMsg->set_length(
-        this->variantManager->value(lengthProperty).toDouble());
+
+    if (radiusProperty == _changedItem || lengthProperty == _changedItem)
+    {
+      msgs::CylinderGeom *cylinderMsg = (msgs::CylinderGeom*)(message);
+      cylinderMsg->set_radius(
+          this->variantManager->value(radiusProperty).toDouble());
+      cylinderMsg->set_length(
+          this->variantManager->value(lengthProperty).toDouble());
+    }
   }
   else if (type == "plane")
   {
-    msgs::PlaneGeom *planeMessage = (msgs::PlaneGeom*)(message);
-
     QtProperty *normalProperty = this->GetChildItem(_item,"normal");
-    double xValue = this->variantManager->value(
-        this->GetChildItem(normalProperty,"x")).toDouble();
-    double yValue = this->variantManager->value(
-        this->GetChildItem(normalProperty,"y")).toDouble();
-    double zValue = this->variantManager->value(
-        this->GetChildItem(normalProperty,"z")).toDouble();
+    if (normalProperty == _changedItem)
+    {
+      msgs::PlaneGeom *planeMessage = (msgs::PlaneGeom*)(message);
 
-    planeMessage->mutable_normal()->set_x(xValue);
-    planeMessage->mutable_normal()->set_y(yValue);
-    planeMessage->mutable_normal()->set_z(zValue);
+      double xValue = this->variantManager->value(
+          this->GetChildItem(normalProperty,"x")).toDouble();
+      double yValue = this->variantManager->value(
+          this->GetChildItem(normalProperty,"y")).toDouble();
+      double zValue = this->variantManager->value(
+          this->GetChildItem(normalProperty,"z")).toDouble();
+
+      planeMessage->mutable_normal()->set_x(xValue);
+      planeMessage->mutable_normal()->set_y(yValue);
+      planeMessage->mutable_normal()->set_z(zValue);
+    }
   }
   else if (type == "image")
   {
-    msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
+    QtProperty *fileProp = this->GetChildItem(_item,"filename");
+    QtProperty *scaleProp = this->GetChildItem(_item,"scale");
+    QtProperty *heightProp = this->GetChildItem(_item,"height");
+    QtProperty *thresholdProp = this->GetChildItem(_item,"threshold");
+    QtProperty *granularityProp = this->GetChildItem(_item,"granularity");
 
-    imageMessage->set_filename(this->variantManager->value(
-        this->GetChildItem(_item,"filename")).toString().toStdString());
-    imageMessage->set_scale(this->variantManager->value(
-        this->GetChildItem(_item,"scale")).toDouble());
-    imageMessage->set_height(this->variantManager->value(
-        this->GetChildItem(_item,"height")).toDouble());
-    imageMessage->set_threshold(this->variantManager->value(
-        this->GetChildItem(_item,"threshold")).toInt());
-    imageMessage->set_granularity(this->variantManager->value(
-        this->GetChildItem(_item,"granularity")).toInt());
+    if (fileProp == _changedItem || scaleProp == _changedItem ||
+        heightProp == _changedItem || thresholdProp == _changedItem ||
+        granularityProp == _changedItem)
+    {
+      msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
+      imageMessage->set_filename(
+          this->variantManager->value(fileProp).toString().toStdString());
+      imageMessage->set_scale(
+          this->variantManager->value(scaleProp).toDouble());
+      imageMessage->set_height(
+          this->variantManager->value(heightProp).toDouble());
+      imageMessage->set_threshold(
+          this->variantManager->value(thresholdProp).toInt());
+      imageMessage->set_granularity(
+          this->variantManager->value(granularityProp).toInt());
+    }
   }
   else if (type == "heightmap")
   {
-    msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
+    QtProperty *sizeProp = this->GetChildItem(_item, "size");
+    QtProperty *offsetProp = this->GetChildItem(_item, "offset");
+    QtProperty *fileProp = this->GetChildItem(_item, "filename");
 
-    heightmapMessage->set_filename(this->variantManager->value(
-        this->GetChildItem(_item,"filename")).toString().toStdString());
+    if (sizeProp == _changedItem || offsetProp == _changedItem ||
+        fileProp == _changedItem)
+    {
+      double x,y,z;
+      msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
 
-    double x,y,z;
-    QtProperty *vecProperty = this->GetChildItem(_item,"size");
-    x = this->variantManager->value(
-        this->GetChildItem(vecProperty,"x")).toDouble();
-    y = this->variantManager->value(
-        this->GetChildItem(vecProperty,"y")).toDouble();
-    z = this->variantManager->value(
-        this->GetChildItem(vecProperty,"z")).toDouble();
+      heightmapMessage->set_filename(this->variantManager->value(
+            fileProp).toString().toStdString());
 
-    heightmapMessage->mutable_size()->set_x(x);
-    heightmapMessage->mutable_size()->set_y(y);
-    heightmapMessage->mutable_size()->set_z(z);
+      x = this->variantManager->value(
+          this->GetChildItem(sizeProp,"x")).toDouble();
+      y = this->variantManager->value(
+          this->GetChildItem(sizeProp,"y")).toDouble();
+      z = this->variantManager->value(
+          this->GetChildItem(sizeProp,"z")).toDouble();
 
-    vecProperty = this->GetChildItem(_item,"offset");
-    x = this->variantManager->value(
-        this->GetChildItem(vecProperty,"x")).toDouble();
-    y = this->variantManager->value(
-        this->GetChildItem(vecProperty,"y")).toDouble();
-    z = this->variantManager->value(
-        this->GetChildItem(vecProperty,"z")).toDouble();
+      heightmapMessage->mutable_size()->set_x(x);
+      heightmapMessage->mutable_size()->set_y(y);
+      heightmapMessage->mutable_size()->set_z(z);
 
-    heightmapMessage->mutable_offset()->set_x(x);
-    heightmapMessage->mutable_offset()->set_y(y);
-    heightmapMessage->mutable_offset()->set_z(z);
+      x = this->variantManager->value(
+          this->GetChildItem(offsetProp,"x")).toDouble();
+      y = this->variantManager->value(
+          this->GetChildItem(offsetProp,"y")).toDouble();
+      z = this->variantManager->value(
+          this->GetChildItem(offsetProp,"z")).toDouble();
+
+      heightmapMessage->mutable_offset()->set_x(x);
+      heightmapMessage->mutable_offset()->set_y(y);
+      heightmapMessage->mutable_offset()->set_z(z);
+    }
   }
   else if (type == "mesh")
   {
-    msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
+    QtProperty *sizeProp = this->GetChildItem(_item, "scale");
+    QtProperty *fileProp = this->GetChildItem(_item, "filename");
 
-    meshMessage->set_filename(this->variantManager->value(
-        this->GetChildItem(_item,"filename")).toString().toStdString());
+    if (sizeProp == _changedItem || fileProp == _changedItem)
+    {
+      double x,y,z;
+      msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
+      meshMessage->set_filename(this->variantManager->value(
+            fileProp).toString().toStdString());
 
-    double x,y,z;
-    QtProperty *vecProperty = this->GetChildItem(_item,"scale");
-    x = this->variantManager->value(
-        this->GetChildItem(vecProperty,"x")).toDouble();
-    y = this->variantManager->value(
-        this->GetChildItem(vecProperty,"y")).toDouble();
-    z = this->variantManager->value(
-        this->GetChildItem(vecProperty,"z")).toDouble();
 
-    meshMessage->mutable_scale()->set_x(x);
-    meshMessage->mutable_scale()->set_y(y);
-    meshMessage->mutable_scale()->set_z(z);
+      x = this->variantManager->value(
+          this->GetChildItem(sizeProp,"x")).toDouble();
+      y = this->variantManager->value(
+          this->GetChildItem(sizeProp,"y")).toDouble();
+      z = this->variantManager->value(
+          this->GetChildItem(sizeProp,"z")).toDouble();
+
+      meshMessage->mutable_scale()->set_x(x);
+      meshMessage->mutable_scale()->set_y(y);
+      meshMessage->mutable_scale()->set_z(z);
+    }
   }
   else
     std::cout << "Unknown geom type[" << type << "]\n";
@@ -641,18 +678,42 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
 
 void ModelListWidget::FillMsg(QtProperty *_item, 
     google::protobuf::Message *_message,
-    const google::protobuf::Descriptor *_descriptor)
+    const google::protobuf::Descriptor *_descriptor,
+    QtProperty *_changedItem)
 {
   if (!_item)
     return;
 
-  if (_item->propertyName().toStdString() == "geometry")
+  std::cout << "::FillMsg[" << _item->propertyName().toStdString() << "]\n";
+
+  if (_item->propertyName().toStdString() == "link")
   {
-    this->FillGeometryMsg(_item, _message, _descriptor);
+    QtProperty *nameItem = this->GetChildItem(_item,"name");
+    ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
+    ((msgs::Link*)(_message))->set_id(
+      gui::get_entity_id(nameItem->valueText().toStdString()));
+  }
+  else if (_item->propertyName().toStdString() == "collision")
+  {
+    QtProperty *nameItem = this->GetChildItem(_item,"name");
+    ((msgs::Collision*)_message)->set_name(nameItem->valueText().toStdString());
+    ((msgs::Collision*)_message)->set_id(
+      gui::get_entity_id(nameItem->valueText().toStdString()));
+  }
+
+  if (_item->propertyName().toStdString() == "geometry" &&
+      this->HasChildItem(_item, _changedItem))
+  {
+    this->FillGeometryMsg(_item, _message, _descriptor, _changedItem);
   }
   else if (_item->propertyName().toStdString() == "pose")
   {
-    this->FillPoseMsg(_item, _message, _descriptor);
+    std::cout << "Item is a pose\n";
+    if (this->HasChildItem(_item, _changedItem))
+    {
+      std::cout << "Filling pose message\n";
+      this->FillPoseMsg(_item, _message, _descriptor);
+    }
   }
   else
   {
@@ -662,6 +723,9 @@ void ModelListWidget::FillMsg(QtProperty *_item,
     for (QList<QtProperty*>::iterator iter = properties.begin(); 
         iter != properties.end(); iter++)
     {
+      if (!this->HasChildItem(*iter, _changedItem))
+        continue;
+      std::cout << "    Has Item[" << (*iter)->propertyName().toStdString() << "]\n";
       const google::protobuf::FieldDescriptor *field =
         _descriptor->FindFieldByName((*iter)->propertyName().toStdString());
 
@@ -672,26 +736,18 @@ void ModelListWidget::FillMsg(QtProperty *_item,
       {
         if (field->is_repeated())
         {
-          // Iterate over all repeated fields
-          for (int i=0; i < reflection->FieldSize(*_message, field); i++)
-          {
-            this->FillMsg((*iter),
-                reflection->MutableRepeatedMessage(_message, field, i),
-                field->message_type());
-          }
+          this->FillMsg((*iter), reflection->AddMessage(_message, field),
+              field->message_type(), _changedItem);
         }
         else
         {
           this->FillMsg((*iter),
               reflection->MutableMessage(_message, field),
-              field->message_type());
+              field->message_type(), _changedItem);
         }
       }
       else if (field)
       {
-        std::cout << "PropName[" << (*iter)->propertyName().toStdString() 
-          << "] FieldName[" << field->name() 
-          << "] FieldType[" << field->type() << "]\n";
         this->FillMsgField((*iter), _message, reflection, field);
       }
       else
@@ -701,144 +757,6 @@ void ModelListWidget::FillMsg(QtProperty *_item,
       }
     }
   }
-
-    /*
-       if ( (*iter)->IsPose())
-       {
-       math::Pose pose;
-       math::Vector3 rpy;
-       (*iter)->Get(pose);
-       rpy = pose.rot.GetAsEuler();
-
-       bool changed = false;
-       QList<QtProperty*> subProperties = _item->subProperties();
-       for (QList<QtProperty*>::iterator propIter = subProperties.begin();
-       propIter != subProperties.end(); propIter++)
-       {
-       if ( (*propIter) != _changedItem)
-       continue;
-
-       changed = true;
-
-       if ( (*propIter)->propertyName().toStdString() == xLbl)
-       pose.pos.x = boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString());
-       else if ( (*propIter)->propertyName().toStdString() == yLbl)
-       pose.pos.y = boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString());
-       else if ( (*propIter)->propertyName().toStdString() == zLbl)
-       pose.pos.z = boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString());
-       else if ( (*propIter)->propertyName().toStdString() == rollLbl)
-       rpy.x = DTOR( boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString()) );
-       else if ((*propIter)->propertyName().toStdString() == pitchLbl)
-       rpy.y = DTOR( boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString()) );
-       else if ( (*propIter)->propertyName().toStdString() == yawLbl)
-       rpy.z = DTOR( boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString()) );
-       }
-
-       if (changed)
-       {
-       pose.rot.SetFromEuler( rpy );
-       (*iter)->Set( pose );
-       (*iter)->Get(pose);
-       }
-       }
-       else if ( (*iter)->IsVector3() )
-       {
-       math::Vector3 xyz;
-       (*iter)->Get(xyz);
-
-       bool changed = false;
-
-       QList<QtProperty*> subProperties = _item->subProperties();
-       for (QList<QtProperty*>::iterator propIter = subProperties.begin();
-       propIter != subProperties.end(); propIter++)
-       {
-       if ( (*propIter) != _changedItem)
-       continue;
-       changed = true;
-
-       if ( (*propIter)->propertyName().toStdString() == xLbl)
-       xyz.x = boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString());
-       else if ( (*propIter)->propertyName().toStdString() == yLbl)
-       xyz.y = boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString());
-       else if ( (*propIter)->propertyName().toStdString() == zLbl)
-       xyz.z = boost::lexical_cast<double>(
-       (*propIter)->valueText().toStdString());
-       }
-
-    if (changed)
-    {
-      (*iter)->Set(xyz);
-    }
-  }
-    else if ( (*iter)->IsQuaternion())
-    {
-      math::Quaternion q;
-      (*iter)->Get(q);
-      math::Vector3 rpy;
-      rpy = q.GetAsEuler();
-
-      bool changed = false;
-
-      QList<QtProperty*> subProperties = _item->subProperties();
-      for (QList<QtProperty*>::iterator propIter = subProperties.begin();
-          propIter != subProperties.end(); propIter++)
-      {
-        if ( (*propIter) != _changedItem)
-          continue;
-        changed = true;
-
-        if ( (*propIter)->propertyName().toStdString() == rollLbl)
-          rpy.x = DTOR( boost::lexical_cast<double>(
-                (*propIter)->valueText().toStdString()) );
-        else if ((*propIter)->propertyName().toStdString() == pitchLbl)
-          rpy.y = DTOR( boost::lexical_cast<double>(
-                (*propIter)->valueText().toStdString()) );
-        else if ((*propIter)->propertyName().toStdString() == yawLbl)
-          rpy.z = DTOR( boost::lexical_cast<double>(
-                (*propIter)->valueText().toStdString()) );
-      }
-
-      if (changed)
-      {
-        q.SetFromEuler( rpy );
-        (*iter)->Set(q);
-      }
-    }
-    else if ((*iter)->IsColor())
-    {
-      QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
-
-      if (childItem && childItem == _changedItem)
-      {
-        std::string color = childItem->valueText().toStdString();
-      }
-    }
-    else
-    {
-      QtProperty *childItem = this->GetChildItem(_item, (*iter)->GetKey() );
-
-      if (childItem && childItem == _changedItem)
-      {
-        (*iter)->SetFromString( childItem->valueText().toStdString() );
-      }
-    }
-  }
-
-  for (sdf::ElementPtr_V::iterator iter = _elem->elements.begin();
-      iter != _elem->elements.end(); iter++)
-  {
-    this->FillSDF( 
-        this->GetChildItem(_item, (*iter)->GetName()), (*iter), _changedItem);
-  }
-  */
 }
 
 QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
@@ -855,6 +773,47 @@ QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
   }
 
   return NULL;
+}
+
+QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
+{
+  QtProperty *result = NULL;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin(); 
+      iter != properties.end(); iter++)
+  {
+    if ((*iter)->valueText().toStdString() == _name)
+      return NULL;
+    else if ((result = this->GetParentItemValue(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
+}
+
+QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
+                                           const std::string &_name)
+{
+  if (!_item)
+    return NULL;
+
+  QtProperty *result = NULL;
+
+  QList<QtProperty*> subProperties = _item->subProperties();
+  for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
+      iter != subProperties.end(); iter++)
+  {
+    if ((*iter)->valueText().toStdString() == _name)
+    {
+      result = _item;
+      break;
+    }
+    else if ((result = this->GetParentItemValue(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
 }
 
 QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
@@ -892,6 +851,60 @@ QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
       break;
     }
     else if ( (result = this->GetParentItem(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
+}
+
+bool ModelListWidget::HasChildItem(QtProperty *_parent, QtProperty *_child)
+{
+  if (!_parent)
+    return false;
+  if (_parent == _child)
+    return true;
+
+  bool result = false;
+  QList<QtProperty*> subProperties = _parent->subProperties();
+  for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
+      iter != subProperties.end(); iter++)
+  {
+    if ((result = this->HasChildItem(*iter, _child)))
+      break;
+  }
+
+  return result;
+}
+
+QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
+{
+  QtProperty *result = NULL;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin(); 
+      iter != properties.end(); iter++)
+  {
+    if ((result = this->GetChildItemValue(*iter, _name)) != NULL)
+      break;
+  }
+
+  return result;
+}
+
+QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
+                                          const std::string &_name)
+{
+  if (!_item)
+    return NULL;
+  if (_item->valueText().toStdString() == _name)
+    return _item;
+
+  QtProperty *result = NULL;
+  QList<QtProperty*> subProperties = _item->subProperties();
+  for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
+      iter != subProperties.end(); iter++)
+  {
+    if ((result = this->GetChildItem(*iter, _name)) != NULL)
       break;
   }
 
@@ -1581,17 +1594,38 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   item->setValue(RTOD(rpy.z));
 }
 
+void ModelListWidget::ProcessPoseMsgs()
+{
+  this->receiveMutex->lock();
+  this->propMutex->lock();
+  this->fillingPropertyTree = true;
+
+  std::list<msgs::Pose>::iterator iter;
+  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+  {
+    if ((*iter).name().find(this->selectedModelName) != std::string::npos)
+    {
+      QtProperty *poseItem;
+      QtProperty *nameItem = this->GetParentItemValue((*iter).name());
+      if (!nameItem)
+        poseItem = this->GetChildItem("pose");
+      else
+        poseItem = this->GetChildItem(nameItem, "pose");
+      this->FillPoseProperty(*iter, poseItem);
+    }
+  }
+  this->poseMsgs.clear();
+  this->fillingPropertyTree = false;
+  this->propMutex->unlock();
+  this->receiveMutex->unlock();
+}
+
 void ModelListWidget::OnPose(
     const boost::shared_ptr<msgs::Pose const> &_msg)
 {
-  if (_msg->name().find(this->selectedModelName) != std::string::npos)
-  {
-    this->selectedProperty = NULL;
-    QtProperty *poseItem = this->GetChildItem("pose");
-    std::cout << "PPP[" << poseItem->propertyName().toStdString() << "]\n";
-    this->FillPoseProperty(*_msg, poseItem);
-    std::cout << "OnPose[" << _msg->DebugString() << "]\n";
-  }
+  this->receiveMutex->lock();
+  this->poseMsgs.push_back(*_msg);
+  this->receiveMutex->unlock();
 }
 
 void ModelListWidget::OnRequest(

@@ -94,14 +94,13 @@ void TopicManager::ProcessNodes()
   std::vector<NodePtr>::iterator iter;
 
   this->nodeMutex->lock();
-
   // store as size might change (spawning)
   int s = this->nodes.size();
+  this->nodeMutex->unlock();
   for (int i = 0; i < s; i ++)
   {
     this->nodes[i]->ProcessPublishers();
   }
-  this->nodeMutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,9 +115,6 @@ void TopicManager::Publish(const std::string &_topic,
         _topic + "]. Required field [" +
         _message.InitializationErrorString() + "] missing." );
   }
-
-  if (_topic == "/gazebo/default/request")
-    std::cout << "TopicManager::Publish request[" << _message.DebugString() << "]\n";
 
   PublicationPtr pub = this->FindPublication(_topic);
   PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");

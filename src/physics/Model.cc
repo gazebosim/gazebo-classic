@@ -736,18 +736,18 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     return;
   }
 
-  std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ProcessMsg!!\n";
   this->SetName(_msg.name());
-  this->SetWorldPose(msgs::Convert(_msg.pose()));
-  /*for (int i=0; i < _msg.link_size(); i++)
+  if (_msg.has_pose())
+    this->SetWorldPose(msgs::Convert(_msg.pose()));
+  for (int i=0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
     if (link)
       link->ProcessMsg(_msg.link(i));
   }
-  */
 
-  this->SetStatic(_msg.is_static());
+  if (_msg.has_is_static())
+    this->SetStatic(_msg.is_static());
 }
 
 void Model::SetJointPositions(

@@ -21,6 +21,7 @@ class QtVariantEditorFactory;
 namespace boost
 {
   class recursive_mutex;
+  class mutex;
 }
 
 namespace gazebo
@@ -74,11 +75,13 @@ namespace gazebo
 
       private: void FillMsg(QtProperty *_item, 
                    google::protobuf::Message *_message,
-                   const google::protobuf::Descriptor *_descriptor);
+                   const google::protobuf::Descriptor *_descriptor,
+                   QtProperty *_changedItem);
 
       private: void FillGeometryMsg(QtProperty *_item, 
                    google::protobuf::Message *_message,
-                   const google::protobuf::Descriptor *_descriptor);
+                   const google::protobuf::Descriptor *_descriptor,
+                   QtProperty *_changedItem);
 
       private: void FillPoseMsg(QtProperty *_item, 
                    google::protobuf::Message *_message,
@@ -87,13 +90,23 @@ namespace gazebo
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
 
+      private: QtProperty *GetParentItemValue(const std::string &_name);
+      private: QtProperty *GetParentItemValue(QtProperty *_item,
+                                           const std::string &_name);
+
       private: QtProperty *GetParentItem(const std::string &_name);
       private: QtProperty *GetParentItem(QtProperty *_item,
                                            const std::string &_name);
 
+      private: QtProperty *GetChildItemValue(const std::string &_name);
+      private: QtProperty *GetChildItemValue(QtProperty *_item, 
+                                             const std::string &_name);
+
       private: QtProperty *GetChildItem(const std::string &_name);
       private: QtProperty *GetChildItem(QtProperty *_item, 
                                         const std::string &_name);
+
+      private: bool HasChildItem(QtProperty *_parent, QtProperty *_child);
 
       private: void RemoveEntity(const std::string &_name);
 
@@ -113,6 +126,8 @@ namespace gazebo
 
       private: void FillPropertyTree(const msgs::Geometry &_msg,
                                        QtProperty *_parent);
+
+      private: void ProcessPoseMsgs();
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -135,7 +150,7 @@ namespace gazebo
       private: ModelEditWidget *modelEditWidget;
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
-      private: boost::recursive_mutex *propMutex;
+      private: boost::mutex *propMutex, *receiveMutex;
       private: sdf::ElementPtr sdfElement;
       private: std::string selectedModelName;
       private: bool fillingPropertyTree;
@@ -144,6 +159,7 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       private: std::vector<event::ConnectionPtr> connections;
+      private: std::list<msgs::Pose> poseMsgs;
 
       private: msgs::Model modelMsg;
       private: bool fillPropertyTree;

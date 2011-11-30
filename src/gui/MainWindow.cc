@@ -471,6 +471,17 @@ void MainWindow::OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg)
 void MainWindow::OnModel(const boost::shared_ptr<msgs::Model const> &_msg )
 {
   this->entities[_msg->name()] = _msg->id();
+  for (int i=0; i < _msg->link_size(); i++)
+  {
+    this->entities[_msg->link(i).name()] = _msg->link(i).id();
+
+    for (int j=0; j < _msg->link(i).collision_size(); j++)
+    {
+      this->entities[_msg->link(i).collision(j).name()] = 
+        _msg->link(i).collision(j).id();
+    }
+  }
+
   gui::Events::modelUpdate(*_msg);
 }
 
@@ -489,6 +500,18 @@ void MainWindow::OnResponse(
     for (int i=0; i < modelVMsg.models_size(); i++)
     {
       this->entities[modelVMsg.models(i).name()] = modelVMsg.models(i).id();
+
+      for (int j=0; j < modelVMsg.models(i).link_size(); j++)
+      {
+        this->entities[modelVMsg.models(i).link(j).name()] = 
+          modelVMsg.models(i).link(j).id();
+
+        for (int k=0; k < modelVMsg.models(i).link(j).collision_size(); k++)
+        {
+          this->entities[modelVMsg.models(i).link(j).collision(k).name()] = 
+            modelVMsg.models(i).link(j).collision(k).id();
+        }
+      }
       gui::Events::modelUpdate(modelVMsg.models(i));
     }
   }

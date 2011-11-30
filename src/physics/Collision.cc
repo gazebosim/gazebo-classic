@@ -446,7 +446,7 @@ void Collision::FillCollisionMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   _msg.set_id(this->GetId());
-  _msg.set_name(this->GetName());
+  _msg.set_name(this->GetCompleteScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
   this->shape->FillShapeMsg(*_msg.mutable_geometry());
   this->surface->FillSurfaceMsg(*_msg.mutable_surface());
