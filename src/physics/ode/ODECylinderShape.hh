@@ -39,9 +39,13 @@ namespace gazebo
       {
         CylinderShape::SetSize(radius, length);
         ODECollisionPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+        oParent =
+          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
   
-        oParent->SetCollision( dCreateCylinder( 0, radius, length ), true );
+        if (oParent->GetCollisionId() == NULL)
+          oParent->SetCollision(dCreateCylinder( 0, radius, length ), true );
+        else
+          dGeomCylinderSetParams(oParent->GetCollisionId(), radius, length);
       }
     };
 

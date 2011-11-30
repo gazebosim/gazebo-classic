@@ -42,10 +42,14 @@ namespace gazebo
       {
         SphereShape::SetRadius(radius);
         ODECollisionPtr oParent;
-        oParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+        oParent =
+          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
   
         // Create the sphere geometry
-        oParent->SetCollision( dCreateSphere(0, radius), true);
+        if (oParent->GetCollisionId() == NULL)
+          oParent->SetCollision(dCreateSphere(0, radius), true);
+        else
+          dGeomSphereSetRadius(oParent->GetCollisionId(), radius);
       }
     
     };

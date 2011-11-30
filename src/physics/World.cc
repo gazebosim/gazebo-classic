@@ -279,6 +279,11 @@ void World::RunLoop()
       this->Update();
     }
 
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
+
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
@@ -317,11 +322,6 @@ void World::Update()
 
     this->physicsEngine->UpdatePhysics();
   }
-
-  this->ProcessEntityMsgs();
-  this->ProcessRequestMsgs();
-  this->ProcessFactoryMsgs();
-  this->ProcessModelMsgs();
 
   event::Events::worldUpdateEnd();
 }
@@ -839,10 +839,8 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "scene_info")
     {
-      std::cout << "scene_info\n";
       this->sceneMsg.clear_model();
       this->BuildSceneMsg(this->sceneMsg, this->rootElement);
-      std::cout << this->sceneMsg.DebugString() << "\n\n";
 
       std::string *serializedData = response.mutable_serialized_data();
       this->sceneMsg.SerializeToString(serializedData);

@@ -32,8 +32,6 @@
 using namespace gazebo;
 using namespace physics;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
 ODECollision::ODECollision( LinkPtr _link )
     : Collision(_link)
 {
@@ -42,8 +40,6 @@ ODECollision::ODECollision( LinkPtr _link )
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
 ODECollision::~ODECollision()
 {
   if (this->collisionId)
@@ -51,8 +47,6 @@ ODECollision::~ODECollision()
   this->collisionId = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load the collision
 void ODECollision::Load( sdf::ElementPtr &_sdf )
 {
   Collision::Load(_sdf);
@@ -66,14 +60,11 @@ void ODECollision::Load( sdf::ElementPtr &_sdf )
   }
 }
 
-/// \brief Finalize the collision
 void ODECollision::Fini()
 {
   Collision::Fini();
 }
  
-////////////////////////////////////////////////////////////////////////////////
-// Pose change callback
 void ODECollision::OnPoseChange()
 {
   // Update all the models
@@ -205,6 +196,7 @@ void ODECollision::OnPoseChangeGlobal()
   q[2] = localPose.rot.y;
   q[3] = localPose.rot.z;
 
+  std::cout << "DGeomSetPositionGlobal[" << localPose.pos << "]\n";
   dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
                    localPose.pos.z);
   dGeomSetQuaternion(this->collisionId, q);
@@ -212,7 +204,6 @@ void ODECollision::OnPoseChangeGlobal()
 
 void ODECollision::OnPoseChangeRelative()
 {
-  /*
   dQuaternion q;
   // Transform into CoM relative Pose
   math::Pose localPose = this->GetRelativePose();
@@ -226,12 +217,12 @@ void ODECollision::OnPoseChangeRelative()
   q[2] = localPose.rot.y;
   q[3] = localPose.rot.z;
 
+  std::cout << "DGeomSetPositionGlobal[" << localPose.pos << "]\n";
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
   dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
       localPose.pos.z);
   dGeomSetOffsetQuaternion(this->collisionId, q);
-  */
 }
 
 void ODECollision::OnPoseChangeNull()

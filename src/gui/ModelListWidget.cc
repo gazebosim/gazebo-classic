@@ -296,9 +296,9 @@ void ModelListWidget::OnShowCollision()
   std::string modelName = item->text(0).toStdString();
 
   if (this->showCollisionAction->isChecked())
-    this->requestMsg = msgs::CreateRequest( "show_collision", modelName );
+    this->requestMsg = msgs::CreateRequest("show_collision", modelName);
   else
-    this->requestMsg = msgs::CreateRequest( "hide_collision", modelName );
+    this->requestMsg = msgs::CreateRequest("hide_collision", modelName);
 
   this->requestPub->Publish(*this->requestMsg);
 }
@@ -465,64 +465,52 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   if (type == "box")
   {
     QtProperty *sizeProperty = this->GetChildItem(_item,"size");
-    if (sizeProperty == _changedItem)
-    {
-      msgs::BoxGeom *boxMsg = (msgs::BoxGeom*)(message);
-      double xValue = this->variantManager->value(
-          this->GetChildItem(sizeProperty,"x")).toDouble();
-      double yValue = this->variantManager->value(
-          this->GetChildItem(sizeProperty,"y")).toDouble();
-      double zValue = this->variantManager->value(
-          this->GetChildItem(sizeProperty,"z")).toDouble();
+    msgs::BoxGeom *boxMsg = (msgs::BoxGeom*)(message);
+    double xValue = this->variantManager->value(
+        this->GetChildItem(sizeProperty,"x")).toDouble();
+    double yValue = this->variantManager->value(
+        this->GetChildItem(sizeProperty,"y")).toDouble();
+    double zValue = this->variantManager->value(
+        this->GetChildItem(sizeProperty,"z")).toDouble();
 
-      boxMsg->mutable_size()->set_x(xValue);
-      boxMsg->mutable_size()->set_y(yValue);
-      boxMsg->mutable_size()->set_z(zValue);
-    }
+    boxMsg->mutable_size()->set_x(xValue);
+    boxMsg->mutable_size()->set_y(yValue);
+    boxMsg->mutable_size()->set_z(zValue);
   }
   else if (type == "sphere")
   {
     QtProperty *radiusProperty = this->GetChildItem(_item,"radius");
-    if (radiusProperty == _changedItem)
-    {
-      msgs::SphereGeom *sphereMsg = (msgs::SphereGeom*)(message);
+    msgs::SphereGeom *sphereMsg = (msgs::SphereGeom*)(message);
 
-      sphereMsg->set_radius(
-          this->variantManager->value(radiusProperty).toDouble());
-    }
+    sphereMsg->set_radius(
+        this->variantManager->value(radiusProperty).toDouble());
   }
   else if (type == "cylinder")
   {
     QtProperty *radiusProperty = this->GetChildItem(_item,"radius");
     QtProperty *lengthProperty = this->GetChildItem(_item,"length");
 
-    if (radiusProperty == _changedItem || lengthProperty == _changedItem)
-    {
-      msgs::CylinderGeom *cylinderMsg = (msgs::CylinderGeom*)(message);
-      cylinderMsg->set_radius(
-          this->variantManager->value(radiusProperty).toDouble());
-      cylinderMsg->set_length(
-          this->variantManager->value(lengthProperty).toDouble());
-    }
+    msgs::CylinderGeom *cylinderMsg = (msgs::CylinderGeom*)(message);
+    cylinderMsg->set_radius(
+        this->variantManager->value(radiusProperty).toDouble());
+    cylinderMsg->set_length(
+        this->variantManager->value(lengthProperty).toDouble());
   }
   else if (type == "plane")
   {
     QtProperty *normalProperty = this->GetChildItem(_item,"normal");
-    if (normalProperty == _changedItem)
-    {
-      msgs::PlaneGeom *planeMessage = (msgs::PlaneGeom*)(message);
+    msgs::PlaneGeom *planeMessage = (msgs::PlaneGeom*)(message);
 
-      double xValue = this->variantManager->value(
-          this->GetChildItem(normalProperty,"x")).toDouble();
-      double yValue = this->variantManager->value(
-          this->GetChildItem(normalProperty,"y")).toDouble();
-      double zValue = this->variantManager->value(
-          this->GetChildItem(normalProperty,"z")).toDouble();
+    double xValue = this->variantManager->value(
+        this->GetChildItem(normalProperty,"x")).toDouble();
+    double yValue = this->variantManager->value(
+        this->GetChildItem(normalProperty,"y")).toDouble();
+    double zValue = this->variantManager->value(
+        this->GetChildItem(normalProperty,"z")).toDouble();
 
-      planeMessage->mutable_normal()->set_x(xValue);
-      planeMessage->mutable_normal()->set_y(yValue);
-      planeMessage->mutable_normal()->set_z(zValue);
-    }
+    planeMessage->mutable_normal()->set_x(xValue);
+    planeMessage->mutable_normal()->set_y(yValue);
+    planeMessage->mutable_normal()->set_z(zValue);
   }
   else if (type == "image")
   {
@@ -532,22 +520,17 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *thresholdProp = this->GetChildItem(_item,"threshold");
     QtProperty *granularityProp = this->GetChildItem(_item,"granularity");
 
-    if (fileProp == _changedItem || scaleProp == _changedItem ||
-        heightProp == _changedItem || thresholdProp == _changedItem ||
-        granularityProp == _changedItem)
-    {
-      msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
-      imageMessage->set_filename(
-          this->variantManager->value(fileProp).toString().toStdString());
-      imageMessage->set_scale(
-          this->variantManager->value(scaleProp).toDouble());
-      imageMessage->set_height(
-          this->variantManager->value(heightProp).toDouble());
-      imageMessage->set_threshold(
-          this->variantManager->value(thresholdProp).toInt());
-      imageMessage->set_granularity(
-          this->variantManager->value(granularityProp).toInt());
-    }
+    msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
+    imageMessage->set_filename(
+        this->variantManager->value(fileProp).toString().toStdString());
+    imageMessage->set_scale(
+        this->variantManager->value(scaleProp).toDouble());
+    imageMessage->set_height(
+        this->variantManager->value(heightProp).toDouble());
+    imageMessage->set_threshold(
+        this->variantManager->value(thresholdProp).toInt());
+    imageMessage->set_granularity(
+        this->variantManager->value(granularityProp).toInt());
   }
   else if (type == "heightmap")
   {
@@ -555,62 +538,54 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *offsetProp = this->GetChildItem(_item, "offset");
     QtProperty *fileProp = this->GetChildItem(_item, "filename");
 
-    if (sizeProp == _changedItem || offsetProp == _changedItem ||
-        fileProp == _changedItem)
-    {
-      double x,y,z;
-      msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
+    double x,y,z;
+    msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
 
-      heightmapMessage->set_filename(this->variantManager->value(
-            fileProp).toString().toStdString());
+    heightmapMessage->set_filename(this->variantManager->value(
+          fileProp).toString().toStdString());
 
-      x = this->variantManager->value(
-          this->GetChildItem(sizeProp,"x")).toDouble();
-      y = this->variantManager->value(
-          this->GetChildItem(sizeProp,"y")).toDouble();
-      z = this->variantManager->value(
-          this->GetChildItem(sizeProp,"z")).toDouble();
+    x = this->variantManager->value(
+        this->GetChildItem(sizeProp,"x")).toDouble();
+    y = this->variantManager->value(
+        this->GetChildItem(sizeProp,"y")).toDouble();
+    z = this->variantManager->value(
+        this->GetChildItem(sizeProp,"z")).toDouble();
 
-      heightmapMessage->mutable_size()->set_x(x);
-      heightmapMessage->mutable_size()->set_y(y);
-      heightmapMessage->mutable_size()->set_z(z);
+    heightmapMessage->mutable_size()->set_x(x);
+    heightmapMessage->mutable_size()->set_y(y);
+    heightmapMessage->mutable_size()->set_z(z);
 
-      x = this->variantManager->value(
-          this->GetChildItem(offsetProp,"x")).toDouble();
-      y = this->variantManager->value(
-          this->GetChildItem(offsetProp,"y")).toDouble();
-      z = this->variantManager->value(
-          this->GetChildItem(offsetProp,"z")).toDouble();
+    x = this->variantManager->value(
+        this->GetChildItem(offsetProp,"x")).toDouble();
+    y = this->variantManager->value(
+        this->GetChildItem(offsetProp,"y")).toDouble();
+    z = this->variantManager->value(
+        this->GetChildItem(offsetProp,"z")).toDouble();
 
-      heightmapMessage->mutable_offset()->set_x(x);
-      heightmapMessage->mutable_offset()->set_y(y);
-      heightmapMessage->mutable_offset()->set_z(z);
-    }
+    heightmapMessage->mutable_offset()->set_x(x);
+    heightmapMessage->mutable_offset()->set_y(y);
+    heightmapMessage->mutable_offset()->set_z(z);
   }
   else if (type == "mesh")
   {
     QtProperty *sizeProp = this->GetChildItem(_item, "scale");
     QtProperty *fileProp = this->GetChildItem(_item, "filename");
 
-    if (sizeProp == _changedItem || fileProp == _changedItem)
-    {
-      double x,y,z;
-      msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
-      meshMessage->set_filename(this->variantManager->value(
-            fileProp).toString().toStdString());
+    double x,y,z;
+    msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
+    meshMessage->set_filename(this->variantManager->value(
+          fileProp).toString().toStdString());
 
+    x = this->variantManager->value(
+        this->GetChildItem(sizeProp,"x")).toDouble();
+    y = this->variantManager->value(
+        this->GetChildItem(sizeProp,"y")).toDouble();
+    z = this->variantManager->value(
+        this->GetChildItem(sizeProp,"z")).toDouble();
 
-      x = this->variantManager->value(
-          this->GetChildItem(sizeProp,"x")).toDouble();
-      y = this->variantManager->value(
-          this->GetChildItem(sizeProp,"y")).toDouble();
-      z = this->variantManager->value(
-          this->GetChildItem(sizeProp,"z")).toDouble();
-
-      meshMessage->mutable_scale()->set_x(x);
-      meshMessage->mutable_scale()->set_y(y);
-      meshMessage->mutable_scale()->set_z(z);
-    }
+    meshMessage->mutable_scale()->set_x(x);
+    meshMessage->mutable_scale()->set_y(y);
+    meshMessage->mutable_scale()->set_z(z);
   }
   else
     std::cout << "Unknown geom type[" << type << "]\n";

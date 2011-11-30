@@ -382,7 +382,7 @@ void Visual::Load()
   }
  
   math::Vector3 scale = this->GetScale(); 
-  this->sceneNode->setScale( scale.x, scale.y, scale.z );
+  this->sceneNode->setScale(scale.x, scale.y, scale.z);
 
   // Set the material of the mesh
   if (this->sdf->HasElement("material"))
@@ -1548,7 +1548,9 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &_msg)
     math::Vector3 scale;
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
+    {
       scale = msgs::Convert(_msg->geometry().box().size());
+    }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
       scale.x = _msg->geometry().cylinder().radius() * 2.0;
@@ -1576,7 +1578,7 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &_msg)
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
-    this->SetScale( scale );
+    this->SetScale(scale);
   }
 
   /*if (msg->points.size() > 0)

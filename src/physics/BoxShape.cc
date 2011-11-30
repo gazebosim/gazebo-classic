@@ -46,7 +46,7 @@ void BoxShape::Load( sdf::ElementPtr &_sdf )
 // Initialize the box
 void BoxShape::Init()
 {
-  this->SetSize( this->sdf->GetValueVector3("size") );
+  this->SetSize(this->sdf->GetValueVector3("size"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

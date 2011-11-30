@@ -112,11 +112,20 @@ void Link::Load(sdf::ElementPtr &_sdf)
     while (visualElem)
     {
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-      msg.set_name(this->GetCompleteScopedName() + "::" + msg.name());
+
+      std::string visName = this->GetCompleteScopedName() + "::" + msg.name();
+      msg.set_name(visName);
       msg.set_parent_name( this->GetCompleteScopedName() );
       msg.set_is_static( this->IsStatic() );
 
       this->visPub->Publish(msg);
+
+      std::cout << "VisualName[" << msg.name() << "]\n";
+      std::vector<std::string>::iterator iter;
+      iter = std::find(this->visuals.begin(), this->visuals.end(), msg.name());
+      if (iter != this->visuals.end())
+        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+      
       this->visuals.push_back(msg.name());
 
       visualElem = visualElem->GetNextElement(); 
@@ -566,7 +575,7 @@ void Link::AddChildJoint(JointPtr joint)
 void Link::FillLinkMsg( msgs::Link &_msg )
 {
   _msg.set_id(this->GetId());
-  _msg.set_name(this->GetCompleteScopedName());
+  _msg.set_name(this->GetName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
@@ -607,8 +616,6 @@ void Link::FillLinkMsg( msgs::Link &_msg )
       vis->set_name(this->GetCompleteScopedName() + "::" + vis->name());
       vis->set_parent_name(this->GetCompleteScopedName());
 
-      std::cout << "Link Visual[" << vis->DebugString() << "]\n";
-
       visualElem = visualElem->GetNextElement(); 
     }
   }
@@ -627,17 +634,27 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.has_self_collide())
     this->SetSelfCollide(_msg.self_collide());
   if (_msg.has_gravity())
+  {
     this->SetGravityMode(_msg.gravity());
+    this->SetEnabled(true);
+  }
   if (_msg.has_kinematic())
+  {
     this->SetKinematic(_msg.kinematic());
+    this->SetEnabled(true);
+  }
   if (_msg.has_inertial())
   {
     this->inertial->ProcessMsg(_msg.inertial());
+    this->SetEnabled(true);
     this->UpdateMass();
   }
 
   if(_msg.has_pose())
+  {
+    this->SetEnabled(true);
     this->SetRelativePose(msgs::Convert(_msg.pose()));
+  }
 
   for (int i=0; i < _msg.collision_size(); i++)
   {

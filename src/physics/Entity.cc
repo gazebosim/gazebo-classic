@@ -58,7 +58,7 @@ Entity::Entity(BasePtr parent)
   if (this->parent && this->parent->HasType(ENTITY))
   {
     this->parentEntity = boost::shared_dynamic_cast<Entity>(this->parent);
-    this->SetStatic( this->parentEntity->IsStatic() );
+    this->SetStatic(this->parentEntity->IsStatic());
   }
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;

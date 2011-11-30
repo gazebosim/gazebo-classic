@@ -976,12 +976,15 @@ void Scene::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
 
 void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 {
+  std::string sceneName = _msg->name() + "::";
+  std::string modelName, linkName;
   for (int i=0; i < _msg->model_size(); i++)
   {
+    modelName = _msg->model(i).name() + "::";
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
-    pm->set_name(_msg->model(i).name());
-    std::cout << pm->DebugString() << "\n";
+    pm->set_name(sceneName + _msg->model(i).name());
     this->poseMsgs.push_front(pm);
+
 
     for (int j=0; j < _msg->model(i).visual_size(); j++)
     {
@@ -992,10 +995,10 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 
     for (int j=0; j < _msg->model(i).link_size(); j++)
     {
+      linkName = sceneName + modelName +_msg->model(i).link(j).name(); 
       boost::shared_ptr<msgs::Pose> pm2(
           new msgs::Pose(_msg->model(i).link(j).pose()));
-      pm2->set_name(_msg->model(i).link(j).name());
-
+      pm2->set_name(linkName);
       this->poseMsgs.push_front(pm2);
 
       for (int k=0; k < _msg->model(i).link(j).visual_size(); k++)
@@ -1251,10 +1254,8 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
 void Scene::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  //std::cout << _msg->DebugString() << "\n";
   if (_msg->request() == "entity_delete")
   {
-    //std::cout << "Delete entity[" << _msg->data() << "]\n";
     Visual_M::iterator iter;
     iter = this->visuals.find(_msg->data());
     if (iter != this->visuals.end())
@@ -1267,6 +1268,8 @@ void Scene::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
     VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
       vis->ShowCollision(true);
+    else
+      gzerr << "Unable to find visual[" << _msg->data() << "]\n";
   }
   else if (_msg->request() == "hide_collision")
   {
@@ -1416,10 +1419,8 @@ void Scene::RemoveVisual(VisualPtr _vis)
     Visual_M::iterator iter = this->visuals.find(_vis->GetName());
     if (iter != this->visuals.end())
     {
-
       iter->second->Fini();
       this->visuals.erase(iter);
-      std::cout << "Visual After Erase[" << _vis.use_count() << "]\n"; 
     }
 
     if (this->selectionObj->GetVisualName() == _vis->GetName())

@@ -78,8 +78,9 @@ void ODELink::Init()
     if (this->GetModel()->GetJointCount() == 0)
     {
       dBodySetData(this->linkId, this);
-      dBodySetAutoDisableDefaults(this->linkId);
+      /*dBodySetAutoDisableDefaults(this->linkId);
       dBodySetAutoDisableFlag(this->linkId, 1);
+      */
     }
   }
 

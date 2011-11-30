@@ -35,8 +35,8 @@ using namespace physics;
 // Constructor
 ODETrimeshShape::ODETrimeshShape(CollisionPtr parent) : TrimeshShape(parent)
 {
+  this->odeData = NULL;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -51,9 +51,11 @@ ODETrimeshShape::~ODETrimeshShape()
 /// Update function.
 void ODETrimeshShape::Update()
 {
-  ODECollisionPtr ocollision = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+  ODECollisionPtr ocollision =
+    boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
 
-  /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
+  /// FIXME: use below to update trimesh geometry for collision without
+  // using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
   // this is fairly important for good results.
 
@@ -95,12 +97,12 @@ void ODETrimeshShape::Load( sdf::ElementPtr &_sdf )
 
 void ODETrimeshShape::Init()
 {
-  ODECollisionPtr pcollision = boost::shared_static_cast<ODECollision>(this->collisionParent);
+  ODECollisionPtr pcollision =
+    boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   TrimeshShape::Init();
 
   unsigned int i =0;
-
 
   const common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
   if (subMesh->GetVertexCount() < 3)
@@ -110,7 +112,10 @@ void ODETrimeshShape::Init()
   }
 
   /// This will hold the vertex data of the triangle mesh
-  this->odeData = dGeomTriMeshDataCreate();
+  if (this->odeData == NULL)
+  {
+    this->odeData = dGeomTriMeshDataCreate();
+  }
 
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
@@ -133,12 +138,20 @@ void ODETrimeshShape::Init()
   }
 
   // Build the ODE triangle mesh
-  dGeomTriMeshDataBuildSingle( this->odeData,
+  dGeomTriMeshDataBuildSingle(this->odeData,
       (float*)this->vertices, 3*sizeof(float), numVertices,
       (int*)this->indices, numIndices, 3*sizeof(int));
 
-  pcollision->SetSpaceId( dSimpleSpaceCreate(pcollision->GetSpaceId()) );
-  pcollision->SetCollision( dCreateTriMesh(pcollision->GetSpaceId(), this->odeData,0,0,0 ), true);
+  if (pcollision->GetCollisionId() == NULL)
+  {
+    pcollision->SetSpaceId(dSimpleSpaceCreate(pcollision->GetSpaceId()));
+    pcollision->SetCollision(dCreateTriMesh(pcollision->GetSpaceId(),
+          this->odeData,0,0,0), true);
+  }
+  else
+  {
+    dGeomTriMeshSetData(pcollision->GetCollisionId(), this->odeData); 
+  }
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;

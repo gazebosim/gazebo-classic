@@ -40,14 +40,19 @@ namespace gazebo
       public: void CreatePlane()
       {
         PlaneShape::CreatePlane();
-        ODECollisionPtr odeParent;
-        odeParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+        ODECollisionPtr oParent;
+        oParent =
+          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
     
         double altitude = 0;
   
         math::Vector3 n = this->GetNormal();
-        odeParent->SetCollision(dCreatePlane(odeParent->GetSpaceId(), 
-                           n.x, n.y, n.z, altitude), false);
+        if (oParent->GetCollisionId() == NULL)
+          oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(), 
+                n.x, n.y, n.z, altitude), false);
+        else
+          dGeomPlaneSetParams(oParent->GetCollisionId(),
+                              n.x, n.y, n.z, altitude);
       }
     
       /// Set the altitude of the plane

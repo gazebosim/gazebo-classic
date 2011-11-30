@@ -41,7 +41,7 @@ namespace gazebo
     {
       public: ODEBoxShape(ODECollisionPtr parent) : BoxShape(parent) {}
       public: virtual ~ODEBoxShape() {}
-      public: virtual void SetSize( const math::Vector3 &size )
+      public: virtual void SetSize(const math::Vector3 &size)
       {
         BoxShape::SetSize(size);
 
@@ -49,7 +49,10 @@ namespace gazebo
         oParent = boost::shared_dynamic_cast<ODECollision>(
             this->collisionParent);
 
-        oParent->SetCollision( dCreateBox( 0, size.x, size.y, size.z), true );
+        if (oParent->GetCollisionId() == NULL)
+          oParent->SetCollision(dCreateBox(0, size.x, size.y, size.z), true);
+        else
+          dGeomBoxSetLengths(oParent->GetCollisionId(), size.x, size.y, size.z);
       }
     };
     /// \}

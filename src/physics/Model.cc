@@ -705,7 +705,7 @@ void Model::SetLaserRetro(const float &retro)
 
 void Model::FillModelMsg(msgs::Model &_msg)
 {
-  _msg.set_name(this->GetCompleteScopedName());
+  _msg.set_name(this->GetName());
   _msg.set_is_static(this->IsStatic());
   _msg.mutable_pose()->CopyFrom(
       msgs::Convert(this->GetWorldPose()));

@@ -35,7 +35,7 @@
     </model>
 
     <model name="box_model1" static="false">
-      <origin pose="0 0 1 0 0 0"/>
+      <origin pose="0 0 .25 0 0 0"/>
       <link name="box_body">
         <inertial mass="1.0">
           <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
@@ -43,13 +43,13 @@
 
         <collision name="geom1">
           <geometry>
-            <box size="1 1 .49"/>
+            <box size="1 1 .5"/>
           </geometry>
         </collision>
 
         <visual name="visual">
           <geometry>
-            <box size="1 1 .49"/>
+            <box size="1 1 .5"/>
           </geometry>
           <material script="Gazebo/WoodPallet"/>
         </visual>

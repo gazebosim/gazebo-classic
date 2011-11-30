@@ -1,6 +1,7 @@
 <gazebo version='1.0'>
   <model name='pr2' static='1'>
     <origin pose='0 0 0 0 -0 0'/>
+
     <link name='base_footprint' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0 0 0 0 -0 0'/>
       <inertial mass='118.001'>
@@ -22,7 +23,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual1' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <box size='0.01 0.01 0.01'/>
@@ -43,7 +44,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual2' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='-0.29 0 0.851 0 -0 0'/>
         <geometry>
           <box size='0.05 0.37 0.3'/>
@@ -64,7 +65,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual3' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0.051 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/base.dae' scale='1 1 1'/>
@@ -118,7 +119,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual4' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
@@ -146,7 +147,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual5' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -179,7 +180,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual6' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -213,7 +214,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual7' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
@@ -241,7 +242,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual8' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -275,7 +276,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual9' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -309,7 +310,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual10' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
@@ -337,7 +338,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual11' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -371,7 +372,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual12' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -405,7 +406,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual13' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/caster.stl' scale='1 1 1'/>
@@ -433,7 +434,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual14' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -467,7 +468,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual15' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/base_v0/wheel.dae' scale='1 1 1'/>
@@ -501,7 +502,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual16' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/torso_v0/torso_lift.dae' scale='1 1 1'/>
@@ -534,7 +535,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual17' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/head_v0/head_pan.dae' scale='1 1 1'/>
@@ -593,7 +594,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual18' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0.0232 0 0.0645 0 -0 0'/>
         <geometry>
           <box size='0.01 0.01 0.01'/>
@@ -632,7 +633,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual20' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
@@ -665,7 +666,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual21' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
@@ -698,7 +699,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual22' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
@@ -725,7 +726,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual23' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
@@ -760,7 +761,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual24' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
@@ -794,7 +795,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual25' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
@@ -815,7 +816,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual16' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
@@ -848,7 +849,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual27' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
@@ -882,7 +883,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual28' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
@@ -903,7 +904,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual29' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <box size='0.001 0.001 0.001'/>
@@ -924,7 +925,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual30' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
@@ -958,7 +959,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual31' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -992,7 +993,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual32' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
@@ -1026,7 +1027,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual33' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -1060,7 +1061,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual34' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
@@ -1094,7 +1095,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual26' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/tilting_laser_v0/tilting_hokuyo.dae' scale='1 1 1'/>
@@ -1128,7 +1129,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual27' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_pan.dae' scale='1 1 1'/>
@@ -1161,7 +1162,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual28' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/shoulder_lift.dae' scale='1 1 1'/>
@@ -1194,7 +1195,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual29' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/shoulder_v0/upper_arm_roll.dae' scale='1 1 1'/>
@@ -1220,7 +1221,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual30' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/upper_arm.dae' scale='1 1 1'/>
@@ -1253,7 +1254,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual31' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/elbow_flex.dae' scale='1 1 1'/>
@@ -1286,7 +1287,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual32' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/upper_arm_v0/forearm_roll.stl' scale='1 1 1'/>
@@ -1307,7 +1308,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual33' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/forearm.dae' scale='1 1 1'/>
@@ -1340,7 +1341,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual34' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_flex.dae' scale='1 1 1'/>
@@ -1374,7 +1375,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual35' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/forearm_v0/wrist_roll.stl' scale='1 1 1'/>
@@ -1395,7 +1396,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual36' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <box size='0.001 0.001 0.001'/>
@@ -1416,7 +1417,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual37' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/gripper_palm.dae' scale='1 1 1'/>
@@ -1450,7 +1451,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual38' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -1484,7 +1485,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual40' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 0 -0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>
@@ -1518,7 +1519,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual41' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger.dae' scale='1 1 1'/>
@@ -1552,7 +1553,7 @@
           </contact>
         </surface>
       </collision>
-      <visual name='old_gazebo_xml_visual' cast_shadows='1' laser_retro='0' transparency='0'>
+      <visual name='visual42' cast_shadows='1' laser_retro='0' transparency='0'>
         <origin pose='0 0 0 -3.1415 0 0'/>
         <geometry>
           <mesh filename='pr2/gripper_v0/l_finger_tip.dae' scale='1 1 1'/>

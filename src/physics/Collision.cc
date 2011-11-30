@@ -95,7 +95,7 @@ void Collision::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 // First step in the loading process
-void Collision::Load( sdf::ElementPtr &_sdf )
+void Collision::Load(sdf::ElementPtr &_sdf)
 {
   Entity::Load(_sdf);
 
@@ -169,9 +169,6 @@ void Collision::Load( sdf::ElementPtr &_sdf )
 
     this->visPub->Publish(msg);
   }
-
-  //TODO: this shouldn't exist in the physics sim
-  //this->CreateBoundingBox();
 }
 
 void Collision::Init()
@@ -444,9 +441,9 @@ void Collision::UpdateParameters( sdf::ElementPtr &_sdf )
 /// Fill a collision message
 void Collision::FillCollisionMsg(msgs::Collision &_msg)
 {
-  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
+  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
   _msg.set_id(this->GetId());
-  _msg.set_name(this->GetCompleteScopedName());
+  _msg.set_name(this->GetName());
   _msg.set_laser_retro(this->GetLaserRetro());
   this->shape->FillShapeMsg(*_msg.mutable_geometry());
   this->surface->FillSurfaceMsg(*_msg.mutable_surface());
@@ -465,10 +462,22 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   this->SetName(_msg.name());
   if (_msg.has_laser_retro())
     this->SetLaserRetro(_msg.laser_retro());
+
   if (_msg.has_pose())
+  {
+    this->link->SetEnabled(true);
     this->SetRelativePose(msgs::Convert(_msg.pose()));
+  }
+
   if (_msg.has_geometry())
+  {
+    this->link->SetEnabled(true);
     this->shape->ProcessMsg(_msg.geometry());
+  }
+
   if (_msg.has_surface())
+  {
+    this->link->SetEnabled(true);
     this->surface->ProcessMsg(_msg.surface());
+  }
 }
