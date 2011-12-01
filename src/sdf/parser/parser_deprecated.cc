@@ -645,6 +645,9 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     {
       sdf::ElementPtr sdfVisual = _sdf->AddElement("visual");
 
+      // set name to geom(collision) name append _visual
+      sdfVisual->GetAttribute("name")->SetFromString(sdfCollision->GetAttribute("name")->GetAsString() + "_visual");
+
       if (!initVisual(visual_xml, sdfVisual))
       {
         gzerr << "Unable to parse visual\n";
@@ -684,7 +687,6 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 /// _sdf = visual
 bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
-  _sdf->GetAttribute("name")->SetFromString("old_gazebo_xml_visual");
   _sdf->GetAttribute("cast_shadows")->SetFromString("true");
 
   initOrigin(_config, _sdf);
