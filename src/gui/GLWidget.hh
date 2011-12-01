@@ -32,9 +32,11 @@ namespace gazebo
 
       public: void ViewScene(rendering::ScenePtr scene);
       public: rendering::UserCameraPtr GetCamera() const;
+      public: rendering::ScenePtr GetScene() const;
 
       public: void CreateEntity(const std::string &name);
-                                //const EntityMaker::CreateCallback &cb);
+
+      public: void Clear();
 
       signals:
         void clicked();
@@ -54,6 +56,8 @@ namespace gazebo
 
       private: std::string GetOgreHandle() const;
 
+      private: void OnCreateScene(const std::string &_name);
+      private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool mode);
       private: void OnCreateEntity( const std::string &_type );
       private: void OnFPS();

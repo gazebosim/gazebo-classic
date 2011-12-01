@@ -120,7 +120,6 @@ void Link::Load(sdf::ElementPtr &_sdf)
 
       this->visPub->Publish(msg);
 
-      std::cout << "VisualName[" << msg.name() << "]\n";
       std::vector<std::string>::iterator iter;
       iter = std::find(this->visuals.begin(), this->visuals.end(), msg.name());
       if (iter != this->visuals.end())
@@ -254,6 +253,12 @@ void Link::Init()
 void Link::Fini()
 {
   std::vector<std::string>::iterator iter;
+
+  this->parentJoints.clear();
+  this->childJoints.clear();
+  this->sensors.clear();
+  this->inertial.reset();
+
   for(iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);

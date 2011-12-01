@@ -32,29 +32,18 @@ Node::Node()
 
 Node::~Node()
 {
+  this->Fini();
   delete this->publisherMutex;
   this->publisherMutex = NULL;
 }
 
 void Node::Fini()
 {
-  /*
-  for (this->publishersIter = this->publishers.begin(); 
-       this->publishersIter != this->publishers.end();
-       this->publishersIter++)
-  {
-    if ((*this->publishersIter)->GetOutgoingCount() > 0)
-    {
-      gzwarn << "Node::Fini outgoing publisher count["
-        <<(*this->publishersIter)->GetOutgoingCount() << "]\n";
-      (*this->publishersIter)->SendMessage();
-    }
-  }
-  */
-
+  this->publisherMutex->lock();
   this->publishers.clear();
   this->callbacks.clear();
   TopicManager::Instance()->RemoveNode(this->id);
+  this->publisherMutex->unlock();
 }
 
 void Node::Init(const std::string &_space)

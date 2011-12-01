@@ -38,7 +38,7 @@ namespace gazebo
       public: GUIOverlay();
       public: virtual ~GUIOverlay();
 
-      public: void Init( Ogre::RenderTarget *_renderTarget );
+      public: void Init(Ogre::RenderTarget *_renderTarget);
 
       public: void Update();
 

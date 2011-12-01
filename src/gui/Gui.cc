@@ -97,11 +97,11 @@ void gui::stop()
 
 void gui::fini()
 {
-  g_active_camera.reset();
+  gui::clear_active_camera();
   rendering::fini();
 }
 
-void gui::set_world( const std::string& _name)
+void gui::set_world(const std::string &_name)
 {
   g_worldname = _name;
 }
@@ -111,9 +111,14 @@ std::string gui::get_world()
   return g_worldname;
 }
 
-void gui::set_active_camera( rendering::UserCameraPtr _cam )
+void gui::set_active_camera(rendering::UserCameraPtr _cam)
 {
   g_active_camera = _cam;
+}
+
+void gui::clear_active_camera()
+{
+  g_active_camera.reset();
 }
 
 rendering::UserCameraPtr gui::get_active_camera()

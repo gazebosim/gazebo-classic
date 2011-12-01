@@ -65,6 +65,8 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnResponse(
                    const boost::shared_ptr<msgs::Response const> &_msg);
+      private: void OnWorldModify(
+                   const boost::shared_ptr<msgs::WorldModify const> &_msg);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;
@@ -109,6 +111,7 @@ namespace gazebo
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
       private: transport::SubscriberPtr newEntitySub;
+      private: transport::SubscriberPtr worldModSub;
 
       private: WorldPropertiesWidget *worldPropertiesWidget;
       private: QDockWidget *modelsDock;

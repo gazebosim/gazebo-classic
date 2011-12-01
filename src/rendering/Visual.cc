@@ -103,7 +103,9 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 /// Destructor
 Visual::~Visual()
 {
-  gzerr << "Delete Vis[" << this->GetName() << "]\n";
+  std::cout << "Delete Visual[" << this->GetName() << "]\n";
+  RTShaderSystem::Instance()->DetachEntity(this);
+
   if (this->preRenderConnection)
     event::Events::DisconnectPreRender( this->preRenderConnection );
 
@@ -117,7 +119,6 @@ Visual::~Visual()
   if (this->sceneNode != NULL)
   {
     this->DestroyAllAttachedMovableObjects(this->sceneNode);
-    gzdbg << "Remove and destroy children\n";
     this->sceneNode->removeAndDestroyAllChildren();
     //this->sceneNode->detachAllObjects();
 
@@ -153,7 +154,6 @@ void Visual::Fini()
   if (this->sceneNode != NULL)
   {
     this->DestroyAllAttachedMovableObjects(this->sceneNode);
-    gzdbg << "Remove and destroy children\n";
     this->sceneNode->removeAndDestroyAllChildren();
     this->sceneNode->detachAllObjects();
 
@@ -174,15 +174,19 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
     return;
 
   // Destroy all the attached objects
-  Ogre::SceneNode::ObjectIterator itObject = i_pSceneNode->getAttachedObjectIterator();
+  Ogre::SceneNode::ObjectIterator itObject =
+    i_pSceneNode->getAttachedObjectIterator();
 
   while (itObject.hasMoreElements())
   {
-    /*Ogre::MovableObject* pObject = static_cast<Ogre::MovableObject*>(itObject.getNext());
-    i_pSceneNode->getCreator()->destroyMovableObject(pObject);
-    */
     Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
-    this->scene->GetManager()->destroyEntity(ent);
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+    {
+      std::cout << "Delete MovableType[" << ent << "]\n";
+      this->scene->GetManager()->destroyEntity(ent);
+    }
+    else
+      delete ent;
   }
 
   // Recurse to child SceneNodes
@@ -190,7 +194,8 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 
   while (itChild.hasMoreElements())
   {
-    Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+    Ogre::SceneNode* pChildNode =
+      static_cast<Ogre::SceneNode*>(itChild.getNext());
     this->DestroyAllAttachedMovableObjects(pChildNode);
   }
 }

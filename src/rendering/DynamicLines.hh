@@ -45,6 +45,8 @@ namespace gazebo
       /// Destructor
       public: virtual ~DynamicLines();
     
+      public: static std::string GetMovableType();
+
       /// \brief Returns "gazebo::ogredynamicslines"
       public: virtual const Ogre::String &getMovableType() const;
     

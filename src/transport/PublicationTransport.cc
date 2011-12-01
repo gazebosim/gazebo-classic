@@ -27,11 +27,12 @@ PublicationTransport::~PublicationTransport()
     sub.set_host( this->connection->GetLocalAddress() );
     sub.set_port( this->connection->GetLocalPort() );
     ConnectionManager::Instance()->Unsubscribe( sub );
-    //this->connection->StopRead();
+    this->connection->Cancel();
     this->connection.reset();
 
     ConnectionManager::Instance()->RemoveConnection( this->connection );
   }
+  this->callback.clear();
 }
 
 void PublicationTransport::Init(const ConnectionPtr &conn_)
@@ -65,6 +66,7 @@ void PublicationTransport::AddCallback(const boost::function<void(const std::str
 
 void PublicationTransport::OnPublish(const std::string &data)
 {
+  std::cout << "PublicationTransport::OnPublish[" << this->topic << "]\n";
   if (this->connection && this->connection->IsOpen())
   {
     this->connection->AsyncRead( 

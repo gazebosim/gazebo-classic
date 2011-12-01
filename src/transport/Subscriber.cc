@@ -35,6 +35,7 @@ Subscriber::Subscriber(const std::string &t, NodePtr _node)
 // Destructor
 Subscriber::~Subscriber()
 {
+  std::cout << "Subscriber::Destructor[" << this->topic << "]\n";
   this->Unsubscribe();
   this->node.reset();
 }
@@ -60,6 +61,7 @@ void Subscriber::Unsubscribe() const
 {
   if (this->node)
   {
+    std::cout << "Subscriber::Unsub[" << this->topic << "]\n";
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
   }
   else

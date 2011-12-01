@@ -152,8 +152,9 @@ void Publication::RemoveSubscription(const NodePtr &_node)
 
   for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
   {
-    if (*iter == _node)
+    if ((*iter)->GetId() == _node->GetId())
     {
+      std::cout << "      Publication::RemoveSubscription[" << this->topic << "]\n";
       this->nodes.erase(iter);
       break;
     }
@@ -310,7 +311,6 @@ void Publication::Publish(const google::protobuf::Message &_msg,
       cbIter++;
     else
     {
-      gzerr << "Unable to handle data\n";
       this->callbacks.erase( cbIter++ );
     }
   }

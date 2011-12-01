@@ -62,11 +62,11 @@ void WindowManager::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a camera to a window
-void WindowManager::SetCamera( int windowId, CameraPtr camera)
+void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
-  this->windows[windowId]->removeAllViewports(); 
-  camera->SetRenderTarget( this->windows[windowId] );
-  RTShaderSystem::AttachViewport(camera->GetViewport(), camera->GetScene());
+  this->windows[_windowId]->removeAllViewports(); 
+  _camera->SetRenderTarget(this->windows[_windowId]);
+  RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -51,7 +51,7 @@ void ODECollision::Load( sdf::ElementPtr &_sdf )
 {
   Collision::Load(_sdf);
 
-  this->SetSpaceId( boost::shared_static_cast<ODELink>(this->link)->GetSpaceId() );
+  this->SetSpaceId(boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
 
   if (this->IsStatic())
   {
@@ -62,6 +62,16 @@ void ODECollision::Load( sdf::ElementPtr &_sdf )
 
 void ODECollision::Fini()
 {
+  /*
+  if (this->collisionId)
+    dGeomDestroy(this->collisionId);
+  this->collisionId = NULL;
+
+  if (this->spaceId)
+    dSpaceDestroy(this->spaceId);
+  this->spaceId = NULL;
+  */
+
   Collision::Fini();
 }
  
@@ -196,7 +206,6 @@ void ODECollision::OnPoseChangeGlobal()
   q[2] = localPose.rot.y;
   q[3] = localPose.rot.z;
 
-  std::cout << "DGeomSetPositionGlobal[" << localPose.pos << "]\n";
   dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 
                    localPose.pos.z);
   dGeomSetQuaternion(this->collisionId, q);
@@ -217,7 +226,6 @@ void ODECollision::OnPoseChangeRelative()
   q[2] = localPose.rot.y;
   q[3] = localPose.rot.z;
 
-  std::cout << "DGeomSetPositionGlobal[" << localPose.pos << "]\n";
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
   dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y, 

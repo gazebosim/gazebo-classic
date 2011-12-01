@@ -222,7 +222,6 @@ namespace gazebo
 
       public: VisualPtr GetWorldVisual() const;
 
-      public: void Clear();
 
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
@@ -256,8 +255,9 @@ namespace gazebo
                
       private: void OnPoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
 
-      private: void OnServerControl(const boost::shared_ptr<msgs::ServerControl const> &_msg);
+      public: void Clear();
 
+      //private: void ClearImpl();
       private: std::string name;
 
       private: sdf::ElementPtr sdf;
@@ -310,7 +310,6 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub;
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
-      private: transport::SubscriberPtr serverSub;
       private: transport::PublisherPtr requestPub;
 
       private: std::vector<event::ConnectionPtr> connections;

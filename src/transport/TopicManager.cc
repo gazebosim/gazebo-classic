@@ -198,9 +198,11 @@ void TopicManager::Unsubscribe(const std::string &_topic,
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_sub)
 {
+  gzerr << "TM::Unsub with Node[" << _topic << "]\n";
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
+    printf("    Found Publication...\n");
     publication->RemoveSubscription(_sub);
     ConnectionManager::Instance()->Unsubscribe(_topic, 
         _sub->GetMsgType(_topic));

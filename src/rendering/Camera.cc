@@ -87,11 +87,11 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 
   if (_autoRender)
   {
-    this->connections.push_back( 
-        event::Events::ConnectRender( boost::bind(&Camera::Render, this) ) );
-    this->connections.push_back( 
+    this->connections.push_back(
+        event::Events::ConnectRender(boost::bind(&Camera::Render, this)));
+    this->connections.push_back(
         event::Events::ConnectPostRender(
-          boost::bind(&Camera::PostRender, this) ) );
+          boost::bind(&Camera::PostRender, this)));
   }
 
   this->lastRenderWallTime = common::Time::GetWallTime();
@@ -206,6 +206,7 @@ void Camera::Init()
 // Finalize the camera
 void Camera::Fini()
 {
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

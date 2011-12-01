@@ -214,10 +214,11 @@ void World::Init()
   // Initialize the physics engine
   this->physicsEngine->Init();
 
-  this->sceneMsg.clear_model();
+  /*this->sceneMsg.clear_model();
   this->sceneMsg.set_name(this->GetName());
   this->BuildSceneMsg(this->sceneMsg, this->rootElement);
   this->scenePub->Publish(this->sceneMsg);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,14 +331,19 @@ void World::Update()
 // Finilize the world
 void World::Fini()
 {
+  std::cout << "----- World FIINI ----- \n";
   this->Stop();
   this->plugins.clear();
 
+  this->node->Fini();
+
+  std::cout << "Delete entities\n";
   if (this->rootElement)
   {
     this->rootElement->Fini();
     this->rootElement.reset();
   }
+  std::cout << "DONE Delete entities\n";
 
   if (this->physicsEngine)
   {
@@ -345,7 +351,7 @@ void World::Fini()
     this->physicsEngine.reset();
   }
 
-  this->node->Fini();
+  std::cout << "****************** END WORLD FINI *********************\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

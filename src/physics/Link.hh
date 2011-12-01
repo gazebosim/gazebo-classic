@@ -212,17 +212,13 @@ namespace gazebo
 
       protected: bool isStatic;
   
-      // Helper entity for separating body pose from center-of-mass pose
-      protected: EntityPtr comEntity;
-  
       protected: InertialPtr inertial;
 
-      protected: std::vector< std::string > cgVisuals;
+      protected: std::vector<std::string> cgVisuals;
+      protected: std::vector<std::string> visuals;
   
       protected: math::Vector3 linearAccel;
       protected: math::Vector3 angularAccel;
-  
-      protected: std::vector<std::string> visuals;
   
       private: event::EventT<void (bool)> enabledSignal;
       private: event::ConnectionPtr showPhysicsConnection; 
@@ -233,10 +229,8 @@ namespace gazebo
       protected: math::Pose newPose;
   
       private: std::vector<std::string> sensors;
-
-      private: std::vector< JointPtr > parentJoints;
-
-      private: std::vector< JointPtr > childJoints;
+      private: std::vector<JointPtr> parentJoints;
+      private: std::vector<JointPtr> childJoints;
     };
     /// \}
   }

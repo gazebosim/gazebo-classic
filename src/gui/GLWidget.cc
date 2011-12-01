@@ -8,6 +8,7 @@
 
 #include "transport/transport.h"
 
+#include "rendering/RenderEvents.hh"
 #include "rendering/Rendering.hh"
 #include "rendering/Visual.hh"
 #include "rendering/WindowManager.hh"
@@ -48,6 +49,14 @@ GLWidget::GLWidget( QWidget *parent )
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
   this->setLayout(mainLayout);
+
+  this->connections.push_back( 
+      rendering::Events::ConnectCreateScene( 
+        boost::bind(&GLWidget::OnCreateScene, this, _1) ) );
+
+  this->connections.push_back( 
+      rendering::Events::ConnectRemoveScene( 
+        boost::bind(&GLWidget::OnRemoveScene, this, _1) ) );
 
   this->connections.push_back( 
       gui::Events::ConnectMoveMode( 
@@ -141,6 +150,9 @@ void GLWidget::paintEvent(QPaintEvent *e)
 
 void GLWidget::resizeEvent(QResizeEvent *e)
 {
+  if (!this->scene)
+    return;
+
   if (this->windowId >= 0)
   {
     rendering::WindowManager::Instance()->Resize( this->windowId, 
@@ -151,6 +163,9 @@ void GLWidget::resizeEvent(QResizeEvent *e)
 
 void GLWidget::keyPressEvent( QKeyEvent *_event)
 {
+  if (!this->scene)
+    return;
+
   std::string keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
@@ -170,6 +185,9 @@ void GLWidget::keyPressEvent( QKeyEvent *_event)
 
 void GLWidget::keyReleaseEvent( QKeyEvent *_event)
 {
+  if (!this->scene)
+    return;
+
   this->keyModifiers = _event->modifiers();
 
   if (!(this->keyModifiers & Qt::ControlModifier))
@@ -181,6 +199,9 @@ void GLWidget::keyReleaseEvent( QKeyEvent *_event)
 
 void GLWidget::mousePressEvent(QMouseEvent *_event)
 {
+  if (!this->scene)
+    return;
+
   this->mouseEvent.pressPos.Set( _event->pos().x() + this->mouseOffset,
                                  _event->pos().y() + this->mouseOffset);
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
@@ -218,6 +239,9 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
+  if (!this->scene)
+    return;
+
   this->mouseEvent.scroll.y = event->delta() > 0 ? -1 : 1;
   this->mouseEvent.type = common::MouseEvent::SCROLL;
   this->mouseEvent.buttons |= event->buttons() & Qt::LeftButton ? 
@@ -232,6 +256,9 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+  if (!this->scene)
+    return;
+
   this->mouseEvent.pos.Set( event->pos().x()+this->mouseOffset, 
                             event->pos().y()+this->mouseOffset );
   this->mouseEvent.type = common::MouseEvent::MOVE;
@@ -333,6 +360,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 {
+  if (!this->scene)
+    return;
+
   this->mouseEvent.pos.Set( _event->pos().x()+this->mouseOffset, 
                             _event->pos().y()+this->mouseOffset );
   this->mouseEvent.prevPos = this->mouseEvent.pos;
@@ -412,7 +442,22 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   this->userCamera->SetWorldRotation( math::Quaternion::EulerToQuaternion(0, 0, 0) );
 
   if (this->windowId >= 0)
-    rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
+    rendering::WindowManager::Instance()->SetCamera(this->windowId,
+        this->userCamera);
+}
+
+rendering::ScenePtr GLWidget::GetScene() const
+{
+  return this->scene;
+}
+
+void GLWidget::Clear()
+{
+  gui::clear_active_camera();
+  this->userCamera.reset();
+  this->scene.reset();
+  this->selectionVis.reset();
+  this->hoverVis.reset();
 }
 
 
@@ -473,6 +518,21 @@ void GLWidget::CreateEntity(const std::string &name)
   {
     // TODO: make sure cursor state stays at the default
   }
+}
+
+void GLWidget::OnRemoveScene(const std::string &_name)
+{
+  if (this->scene && this->scene->GetName() == _name)
+  {
+    std::cout << "GLWIDGET ********************** CLEARE\n\n\n";
+    this->Clear();
+  }
+}
+
+void GLWidget::OnCreateScene(const std::string &_name)
+{
+  this->ViewScene(rendering::get_scene(_name));
+  std::cout << "GLWidget Scene Created[" << _name << "]\n";
 }
 
 void GLWidget::OnMoveMode(bool mode)

@@ -281,6 +281,7 @@ void Model::Fini()
 {
   Entity::Fini();
 
+  this->attachedModels.clear();
   this->joints.clear();
   this->plugins.clear();
   this->canonicalLink.reset();

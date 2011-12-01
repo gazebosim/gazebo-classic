@@ -67,7 +67,6 @@ namespace gazebo
       public: ~Grid();
   
       public: void Init();
-  
       
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
@@ -93,8 +92,8 @@ namespace gazebo
       
       private: void Create();
   
-      private: Ogre::SceneNode* sceneNode;           ///< The scene node that this grid is attached to
-      private: Ogre::ManualObject* manualObject;     ///< The manual object used to draw the grid
+      private: Ogre::SceneNode* sceneNode;
+      private: Ogre::ManualObject* manualObject;
       
       private: Ogre::MaterialPtr material;
   

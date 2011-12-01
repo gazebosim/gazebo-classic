@@ -47,6 +47,7 @@ ODELink::ODELink(EntityPtr parent)
 // Destructor
 ODELink::~ODELink()
 {
+  std::cout << "ODELink::Destructor[" << this->GetName() << "]\n";
   if (this->linkId)
     dBodyDestroy(this->linkId);
   this->linkId = NULL;
@@ -158,8 +159,12 @@ void ODELink::MoveCallback(dBodyID id)
 /// Finalize the link
 void ODELink::Fini()
 {
-  this->odePhysics.reset();
   Link::Fini();
+  if (this->linkId)
+    dBodyDestroy(this->linkId);
+  this->linkId = NULL;
+
+  this->odePhysics.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +211,7 @@ void ODELink::SetSelfCollide(bool _collide)
 // Change the ode pose
 void ODELink::OnPoseChange()
 {
-  if (this->linkId == NULL)
+  if (!this->linkId)
     return;
   this->SetEnabled(true);
 

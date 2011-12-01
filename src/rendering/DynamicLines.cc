@@ -44,10 +44,15 @@ DynamicLines::~DynamicLines()
 {
 }
 
+std::string DynamicLines::GetMovableType()
+{
+  return "gazebo::ogredynamiclines";
+}
+
 /// Returns "gazebo::ogredynamicslines"
 const Ogre::String &DynamicLines::getMovableType() const
 {
-  static Ogre::String moveType = "gazebo::ogredynamiclines";
+  static Ogre::String moveType = DynamicLines::GetMovableType();
   return moveType;
 }
 

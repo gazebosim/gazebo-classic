@@ -48,6 +48,7 @@ namespace gazebo
     private: std::vector<gazebo::SystemPluginPtr> plugins;
     private: transport::NodePtr node;
     private: transport::SubscriberPtr serverSub;
+    private: transport::PublisherPtr worldModPub;
 
     private: boost::mutex *receiveMutex;
     private: std::list<msgs::ServerControl> controlMsgs;

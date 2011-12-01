@@ -24,8 +24,10 @@
 
 #include <vector>
 
+#include "msgs/msgs.h"
 #include "common/SingletonT.hh"
 #include "common/Event.hh"
+#include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace Ogre
@@ -121,6 +123,9 @@ namespace gazebo
       private: void Render();
       private: void PostRender();
 
+      private: void OnWorldModify(
+                   const boost::shared_ptr<msgs::WorldModify const> &_msg);
+
       /// Pointer to the root scene node
       public: Ogre::Root *root;
     
@@ -145,6 +150,15 @@ namespace gazebo
    
       private: std::vector<event::ConnectionPtr> connections;
       private: friend class SingletonT<RenderEngine>;
+
+      private: transport::NodePtr node;    
+      private: transport::SubscriberPtr worldModSub;
+
+      private: bool removeScene;
+      private: std::string removeSceneName;
+
+      private: bool createScene;
+      private: std::string createSceneName;
     };
     /// \}
   }

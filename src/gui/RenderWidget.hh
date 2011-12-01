@@ -21,6 +21,8 @@ namespace gazebo
       public: RenderWidget( QWidget *parent = 0 );
       public: virtual ~RenderWidget();
 
+      public: void RemoveScene(const std::string &_name);
+
       private slots: virtual void update();
 
       private: void OnFullScreen(bool &_value);
@@ -41,6 +43,9 @@ namespace gazebo
       private: QLineEdit *trianglesEdit;
 
       private: std::vector<event::ConnectionPtr> connections;
+
+      private: bool clear;
+      private: std::string clearName;
     };
   }
 }

@@ -33,12 +33,15 @@
 
 #include "gazebo_config.h"
 
+#include "transport/Node.hh"
+#include "transport/Subscriber.hh"
 #include "common/Color.hh"
 #include "common/Events.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/SystemPaths.hh"
 
+#include "rendering/RenderEvents.hh"
 #include "rendering/RTShaderSystem.hh"
 #include "rendering/WindowManager.hh"
 #include "rendering/Scene.hh"
@@ -69,7 +72,10 @@ RenderEngine::RenderEngine()
         boost::bind(&RenderEngine::Render, this) ) );
   this->connections.push_back( event::Events::ConnectPostRender( 
         boost::bind(&RenderEngine::PostRender, this) ) );
+
+
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
@@ -129,31 +135,38 @@ void RenderEngine::Load()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a scene
-ScenePtr RenderEngine::CreateScene(const std::string &name, 
+ScenePtr RenderEngine::CreateScene(const std::string &_name, 
                                    bool _enableVisualizations)
 {
-  ScenePtr scene(new Scene(name, _enableVisualizations));
+  ScenePtr scene(new Scene(_name, _enableVisualizations));
+  this->scenes.push_back(scene);
 
+  std::cout << "RenderEngine::CreateScene[" << _name << "]\n";
   scene->Load();
   if (this->initialized)
     scene->Init();
+  else
+    gzerr << "RenderEngine is not initialized\n";
 
-  this->scenes.push_back(scene);
+  rendering::Events::createScene(_name);
   return scene;
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Remove a scene
-void RenderEngine::RemoveScene(const std::string &name)
+void RenderEngine::RemoveScene(const std::string &_name)
 {
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); iter++)
-    if ((*iter)->GetName() == name)
+    if ((*iter)->GetName() == _name)
       break;
 
   if (iter != this->scenes.end())
   {
+    rendering::Events::removeScene(_name);
+
+    (*iter)->Clear();
+    (*iter).reset();
     this->scenes.erase(iter);
   }
 }
@@ -168,6 +181,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
     if ((*iter)->GetName() == _name)
       return (*iter);
 
+  gzerr << "Unable to find scene[" << _name << "]\n";
   return ScenePtr();
 }
 
@@ -193,6 +207,17 @@ unsigned int RenderEngine::GetSceneCount() const
 
 void RenderEngine::PreRender()
 {
+  if (this->removeScene)
+  {
+    this->RemoveScene(this->removeSceneName);
+    this->removeScene = false;
+  }
+  else if (this->createScene)
+  {
+    this->CreateScene(this->createSceneName,true);
+    this->createScene = false;
+  }
+
   this->root->_fireFrameStarted();
 }
 
@@ -211,6 +236,11 @@ void RenderEngine::PostRender()
 // Initialize ogre
 void RenderEngine::Init()
 {
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init("default");
+  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
+                                            &RenderEngine::OnWorldModify, this);
+
   this->initialized = false;
 
   Ogre::ColourValue ambient;
@@ -245,6 +275,7 @@ void RenderEngine::Fini()
   if (!this->initialized)
     return;
 
+  this->node->Fini();
   this->connections.clear();
 
   // TODO: this was causing a segfault on shutdown
@@ -494,4 +525,20 @@ void RenderEngine::CreateContext()
 
   glXMakeCurrent((Display*)this->dummyDisplay, 
       this->dummyWindowId, (GLXContext)this->dummyContext);
+}
+
+void RenderEngine::OnWorldModify(
+    const boost::shared_ptr<msgs::WorldModify const> &_msg)
+{
+  if (_msg->has_remove() && _msg->remove())
+  {
+    this->removeScene = true;
+    this->removeSceneName = _msg->world_name();
+  }
+  else if (_msg->has_create() && _msg->create())
+  {
+    std::cout << "Has Create!\n\n\n";
+    this->createScene = true;
+    this->createSceneName = _msg->world_name();
+  }
 }

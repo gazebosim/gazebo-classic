@@ -14,32 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_GUI_HH
-#define GAZEBO_GUI_HH
 
-#include "rendering/Rendering.hh"
+#include "rendering/RenderEvents.hh"
 
-namespace gazebo
-{
-  namespace gui
-  {
-    void load();
-    void init();
-    void run();
-    void stop();
-    void fini();
+using namespace gazebo;
+using namespace rendering;
 
-    void load_plugin( const std::string &_filename );
-
-    void set_world( const std::string& _name);
-    std::string get_world();
-
-    void set_active_camera( rendering::UserCameraPtr _cam );
-    rendering::UserCameraPtr get_active_camera();
-    void clear_active_camera();
-
-    unsigned int get_entity_id(const std::string &_name);
-  }
-}
-
-#endif
+event::EventT<void (const std::string &)> Events::createScene;
+event::EventT<void (const std::string &)> Events::removeScene;

@@ -136,6 +136,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 // Destructor
 ODEPhysics::~ODEPhysics()
 {
+  std::cout << "Physics Engine Close\n";
   dCloseODE();
 
   for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)

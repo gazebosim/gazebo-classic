@@ -164,8 +164,8 @@ namespace gazebo
 
       private: bool contactsEnabled;
   
-      public: event::EventT< void (const std::string &,
-                                   const Contact &)> contact;
+      public: event::EventT<void (const std::string &,
+                                  const Contact &)> contact;
 
       public: SurfaceParamsPtr surface; 
       private: std::vector<event::ConnectionPtr> connections;

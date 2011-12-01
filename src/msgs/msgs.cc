@@ -379,7 +379,6 @@ msgs::Visual VisualFromSDF( sdf::ElementPtr _sdf )
 
     if (geomElem->GetName() == "box")
     {
-      std::cout << "VISUALFromSDF SIZE[" << geomElem->GetValueVector3("size") << "]\n";
       geomMsg->set_type(msgs::Geometry::BOX);
       msgs::Set(geomMsg->mutable_box()->mutable_size(),
                 geomElem->GetValueVector3("size"));

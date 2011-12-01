@@ -13,6 +13,7 @@ include_directories (
 
 set (sources MovableText.cc
              RenderEngine.cc
+             RenderEvents.cc
              DynamicRenderable.cc
              DynamicLines.cc
              Visual.cc
@@ -40,6 +41,7 @@ set (sources MovableText.cc
 
 set (headers MovableText.hh
              RenderEngine.hh
+             RenderEvents.hh
              DynamicRenderable.hh
              DynamicLines.hh
              Visual.hh

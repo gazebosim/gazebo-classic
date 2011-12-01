@@ -53,6 +53,7 @@ set (msgs axis.proto
           visual.proto
           world_control.proto
           world_stats.proto 
+          world_modify.proto 
           gui_overlay_config.proto
           gui_camera.proto
           gui.proto

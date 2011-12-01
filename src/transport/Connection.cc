@@ -56,7 +56,6 @@ Connection::Connection()
 // Destructor
 Connection::~Connection()
 {
-  gzdbg << "Destructor Connection[" << this->id << "]\n";
   this->ProcessWriteQueue();
   this->writeQueue.clear();
   this->Shutdown();
@@ -105,7 +104,8 @@ bool Connection::Connect(const std::string &host, unsigned short port)
     return false;
   }
 
-  this->remoteURI =  std::string("http://") + this->GetRemoteHostname() + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
+  this->remoteURI =  std::string("http://") + this->GetRemoteHostname()
+    + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
 
   if (this->socket && this->socket->is_open())
     this->remoteAddress = this->socket->remote_endpoint().address().to_string();
@@ -233,7 +233,6 @@ void Connection::ProcessWriteQueue()
 {
   if (!this->IsOpen())
   {
-    gzerr << "Connection::ProcessWriteQueue Not OPEND!!\n";
     return;
   }
 
@@ -268,11 +267,10 @@ void Connection::ProcessWriteQueue()
 
   try
   {
-    boost::asio::write( *this->socket, buffer->data() );
+    boost::asio::write(*this->socket, buffer->data());
   } 
   catch (...)
   {
-    gzerr << "Connection Unable to asio::write buffer\n";
     this->Shutdown();
   }
   
@@ -364,7 +362,6 @@ bool Connection::IsOpen() const
 // Close a connection
 void Connection::Close()
 {
-  gzdbg << "Closing Connection[" << this->id << "]\n";
   if (this->socket && this->socket->is_open())
   {
     this->ProcessWriteQueue();
@@ -387,7 +384,7 @@ void Connection::Close()
     }
     catch (boost::system::system_error &e)
     {
-      gzwarn <<"Error closing acceptor[" << this->id << "]\n";// msg[" << e.what() << "]\n";
+      gzwarn <<"Error closing acceptor[" << this->id << "]\n";
     }
 
     delete this->acceptor;
@@ -399,7 +396,6 @@ void Connection::Close()
 // Cancel all async operations on an open socket
 void Connection::Cancel()
 {
-  gzdbg << "Cancel Connection[" << this->id << "]\n";
   if (this->acceptor)
   {
     try

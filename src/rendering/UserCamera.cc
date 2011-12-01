@@ -75,11 +75,15 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 /// Destructor
 UserCamera::~UserCamera()
 {
+  std::cout << "User Cmaera destruct\n";
   //delete this->visual;
   //this->visual = NULL;
 
   delete this->orbitViewController;
   delete this->fpsViewController;
+
+  delete this->gui;
+  this->gui = NULL;
 
   this->connections.clear();
 }
@@ -331,7 +335,10 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setFOVy(Ogre::Radian(vfov));
 
     if (this->gui)
-      this->gui->Resize( this->viewport->getActualWidth(), this->viewport->getActualHeight());
+    {
+      this->gui->Resize(this->viewport->getActualWidth(),
+                        this->viewport->getActualHeight());
+    }
   }
 
 }

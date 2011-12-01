@@ -28,9 +28,10 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : renderWidget(0)
 {
+  this->requestMsg = NULL;
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  gui::set_world( this->node->GetTopicNamespace() );
+  gui::set_world(this->node->GetTopicNamespace());
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
@@ -44,6 +45,9 @@ MainWindow::MainWindow()
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response", 
       &MainWindow::OnResponse, this, false);
+
+  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
+                                            &MainWindow::OnWorldModify, this);
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -546,4 +550,11 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
     gzerr << "Unable to find model[" << _name << "]\n";
 
   return result;
+}
+
+void MainWindow::OnWorldModify(
+    const boost::shared_ptr<msgs::WorldModify const> &_msg)
+{
+  if (_msg->has_remove() && _msg->remove())
+    this->renderWidget->RemoveScene(_msg->world_name());
 }

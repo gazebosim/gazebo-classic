@@ -23,6 +23,7 @@
 #include "common/Exception.hh"
 #include "common/Console.hh"
 
+#include "rendering/RenderEvents.hh"
 #include "rendering/LaserVisual.hh"
 #include "rendering/CameraVisual.hh"
 #include "rendering/ContactVisual.hh"
@@ -77,15 +78,11 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
 
-  this->serverSub = this->node->Subscribe("/gazebo/server/control",
-                                          &Scene::OnServerControl, this);
-
-
-  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
-  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
-  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
-  this->selectionSub = this->node->Subscribe("~/selection", &Scene::OnSelectionMsg, this);
-  this->requestSub = this->node->Subscribe("~/request", &Scene::OnRequest, this);
+  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this, false);
+  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this, false);
+  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this, false);
+  this->selectionSub = this->node->Subscribe("~/selection", &Scene::OnSelectionMsg, this, false);
+  this->requestSub = this->node->Subscribe("~/request", &Scene::OnRequest, this, false);
 
   this->selectionObj = new SelectionObj(this);
 
@@ -95,24 +92,17 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->clearAll = false;
 }
 
-void Scene::OnServerControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  if (_msg->has_open_filename())
-  {
-    this->clearAll = true;
-  }
-}
-
 void Scene::Clear()
 {
+  std::cout << "SCENE CLEAR START\n";
+  this->node->Fini();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
+  this->cameras.clear();
 
-  printf("\n\n\n\n\n\n CLEAR \n\n\n\n\n\n\n\n");
   while (this->visuals.size() > 0)
   {
     this->RemoveVisual(this->visuals.begin()->second);
@@ -124,15 +114,39 @@ void Scene::Clear()
   {
     delete iter->second;
   }
+
+  for (unsigned int i=0; i < this->grids.size(); i++)
+    delete this->grids[i];
+  this->grids.clear();
+
   this->lights.clear();
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
+
+  std::cout << "SCENE CLEAR END\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Scene::~Scene()
 {
+  std::cout << "SCENE DELETE\n";
+  delete this->selectionObj;
+  delete this->requestMsg;
+  delete this->receiveMutex;
+  delete this->raySceneQuery;
+
+  this->node->Fini();
+  this->node.reset();  
+  this->visSub.reset();
+  this->lightSub.reset();
+  this->poseSub.reset();
+  this->selectionSub.reset();
+  this->responseSub.reset();
+  this->requestSub.reset();
+  this->requestPub.reset();
+
+
   Visual_M::iterator iter;
   this->visuals.clear();
   this->jointMsgs.clear();
@@ -141,14 +155,8 @@ Scene::~Scene()
   this->lightMsgs.clear();
   this->visualMsgs.clear();
 
-
   this->worldVisual.reset();
   this->selectionMsg.reset();
-  delete this->selectionObj;
-  delete this->requestMsg;
-  delete this->receiveMutex;
-  delete this->raySceneQuery;
-
   for (Light_M::iterator lightIter = this->lights.begin(); 
        lightIter != this->lights.end(); lightIter++)
   {
@@ -175,17 +183,13 @@ Scene::~Scene()
     delete this->manager;
   }
   this->connections.clear();
-  this->node.reset();  
-  this->visSub.reset();
-  this->lightSub.reset();
-  this->poseSub.reset();
-  this->selectionSub.reset();
-  this->responseSub.reset();
-  this->requestSub.reset();
-  this->requestPub.reset();
 
   this->sdf->Reset();
   this->sdf.reset();
+
+  std::cout << "SCENE DELETE DONE\n";
+
+  std::cout << "WorldVisualCount[" << this->worldVisual.use_count() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +204,12 @@ void Scene::Load(sdf::ElementPtr &_sdf)
 // Load
 void Scene::Load()
 {
+  Ogre::Root *root = RenderEngine::Instance()->root;
+
+  if (this->manager)
+    root->destroySceneManager(this->manager);
+
+  this->manager = root->createSceneManager(Ogre::ST_GENERIC);
 }
 
 VisualPtr Scene::GetWorldVisual() const
@@ -211,13 +221,7 @@ VisualPtr Scene::GetWorldVisual() const
 // Initialize the scene
 void Scene::Init()
 {
-  Ogre::Root *root = RenderEngine::Instance()->root;
-
-  if (this->manager)
-    root->destroySceneManager(this->manager);
-
-  this->manager = root->createSceneManager(Ogre::ST_GENERIC);
-  this->worldVisual.reset(new Visual( "__world_node__", this));
+  this->worldVisual.reset(new Visual("__world_node__", this));
 
   RTShaderSystem::Instance()->AddScene(this);
 
@@ -225,7 +229,7 @@ void Scene::Init()
     this->grids[i]->Init();
 
   // Create the sky
-  if ( this->sdf->HasElement("sky") )
+  if (this->sdf->HasElement("sky"))
     this->SetSky(this->sdf->GetElement("sky")->GetValueString("material"));
 
   // Create Fog
@@ -252,7 +256,7 @@ void Scene::Init()
   // Send a request to get the current world state
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response", 
-      &Scene::OnResponse, this);
+      &Scene::OnResponse, this, false);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
@@ -451,16 +455,18 @@ Grid *Scene::GetGrid(unsigned int index) const
 //Create a camera
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
-  CameraPtr camera( new Camera(this->name + "::" + _name, this, _autoRender) );
+  CameraPtr camera(new Camera(this->name + "::" + _name, this, _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DepthCameraPtr Scene::CreateDepthCamera( const std::string &_name, bool _autoRender )
+DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
+                                        bool _autoRender )
 {
-  DepthCameraPtr camera( new DepthCamera(this->name + "::" + _name, this, _autoRender) );
+  DepthCameraPtr camera(new DepthCamera(this->name + "::" + _name,
+        this, _autoRender));
   this->cameras.push_back(camera);
 
   return camera;
@@ -1094,11 +1100,6 @@ void Scene::OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  if (this->clearAll)
-  {
-    this->Clear();
-    this->clearAll = false;
-  }
 
   SceneMsgs_L::iterator sIter;
   VisualMsgs_L::iterator vIter;
@@ -1247,7 +1248,8 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
   }
   else
   {
-    gzwarn << "Unable to create joint visual. Parent[" << _msg->parent() << "] Child[" << _msg->child() << "].\n";
+    gzwarn << "Unable to create joint visual. Parent["
+           << _msg->parent() << "] Child[" << _msg->child() << "].\n";
   }
 }
 

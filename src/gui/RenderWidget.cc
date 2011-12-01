@@ -3,6 +3,7 @@
 
 #include "rendering/UserCamera.hh"
 #include "rendering/Rendering.hh"
+#include "rendering/Scene.hh"
 
 #include "gui/Gui.hh"
 #include "gui/GLWidget.hh"
@@ -15,6 +16,8 @@ using namespace gui;
 RenderWidget::RenderWidget( QWidget *parent )
   : QWidget(parent)
 {
+  this->clear = false;
+
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
   this->mainFrame->setLineWidth(1);
@@ -26,7 +29,7 @@ RenderWidget::RenderWidget( QWidget *parent )
 
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
-  this->glWidget->ViewScene( scene );
+  //this->glWidget->ViewScene(scene);
 
   this->xPosEdit = new QLineEdit;
   this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit) );
@@ -160,10 +163,21 @@ void RenderWidget::OnFullScreen(bool &_value)
 
 void RenderWidget::update()
 {
+  /*if (this->clear)
+  {
+    if (this->glWidget->GetScene()->GetName() == this->clearName)
+      this->glWidget->Clear();
+    this->clear = false;
+    return;
+  }*/
+
   rendering::UserCameraPtr cam = this->glWidget->GetCamera();
 
   if (!cam)
+  {
+    event::Events::preRender();
     return;
+  }
 
   //float fps = cam->GetAvgFPS();
   //int triangleCount = cam->GetTriangleCount();
@@ -204,4 +218,10 @@ void RenderWidget::update()
   */
 
   this->glWidget->update();
+}
+
+void RenderWidget::RemoveScene(const std::string &_name)
+{
+  this->clear = true;
+  this->clearName = _name;
 }

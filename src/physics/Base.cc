@@ -96,6 +96,7 @@ void Base::UpdateParameters( sdf::ElementPtr &_sdf )
 /// Finialize the object
 void Base::Fini()
 {
+  std::cout << "Fini[" << this->GetName() << "]\n";
   Base_V::iterator iter;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
