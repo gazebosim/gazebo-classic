@@ -39,6 +39,7 @@ namespace gazebo
     void clear_active_camera();
 
     unsigned int get_entity_id(const std::string &_name);
+    bool has_entity_name(const std::string &_name);
   }
 }
 

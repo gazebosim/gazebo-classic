@@ -33,6 +33,7 @@ namespace gazebo
     rendering::ScenePtr get_scene(const std::string &_name);
     rendering::ScenePtr create_scene(const std::string &name, 
                                      bool _enableVisualizations);
+    void remove_scene(const std::string &name);
     /// \}
   }
 }

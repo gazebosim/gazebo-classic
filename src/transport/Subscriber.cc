@@ -35,7 +35,6 @@ Subscriber::Subscriber(const std::string &t, NodePtr _node)
 // Destructor
 Subscriber::~Subscriber()
 {
-  std::cout << "Subscriber::Destructor[" << this->topic << "]\n";
   this->Unsubscribe();
   this->node.reset();
 }
@@ -51,7 +50,7 @@ std::string Subscriber::GetTopic() const
 /// Get the message type
 std::string Subscriber::GetMsgType() const
 {
-  return std::string();//this->subscription->GetMsgType();
+  return std::string();
 }
 
 
@@ -61,7 +60,6 @@ void Subscriber::Unsubscribe() const
 {
   if (this->node)
   {
-    std::cout << "Subscriber::Unsub[" << this->topic << "]\n";
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
   }
   else

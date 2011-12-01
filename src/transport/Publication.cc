@@ -154,7 +154,6 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   {
     if ((*iter)->GetId() == _node->GetId())
     {
-      std::cout << "      Publication::RemoveSubscription[" << this->topic << "]\n";
       this->nodes.erase(iter);
       break;
     }
@@ -177,8 +176,6 @@ void Publication::ClearBuffer()
 void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 {
   std::list<CallbackHelperPtr>::iterator iter;
-
-  std::cout << "Publication[" << this->topic << "] Remove Callback\n";
 
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
@@ -299,9 +296,6 @@ void Publication::Publish(const google::protobuf::Message &_msg,
     else
       this->nodes.erase( iter++ );
   }
-
-  if (this->topic == "/gazebo/default/request")
-    std::cout << "Publication::Publish. CallbackCount[" << this->callbacks.size() << "]\n";
 
   std::list<CallbackHelperPtr>::iterator cbIter;
   cbIter = this->callbacks.begin();

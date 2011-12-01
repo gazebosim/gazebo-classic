@@ -53,7 +53,9 @@ Light::Light(Scene *scene_)
 
   this->lightCounter++;
 
-  this->showLightsConnection = event::Events::ConnectShowLights(boost::bind(&Light::ToggleShowVisual, this));
+  this->showLightsConnection =
+    event::Events::ConnectShowLights(
+        boost::bind(&Light::ToggleShowVisual, this));
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/light.sdf", this->sdf );
@@ -64,9 +66,7 @@ Light::Light(Scene *scene_)
 Light::~Light()
 {
   if (this->light)
-  {
     this->scene->GetManager()->destroyLight(this->GetName());
-  }
 
   this->sdf->Reset();
   this->sdf.reset();

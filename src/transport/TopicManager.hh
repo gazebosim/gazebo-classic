@@ -188,6 +188,8 @@ namespace gazebo
 
       public: void ClearBuffers();
 
+      public: void PauseIncoming(bool _pause);
+
       private: void HandleIncoming();
 
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
@@ -199,6 +201,8 @@ namespace gazebo
       private: std::vector<NodePtr> nodes;
 
       private: boost::recursive_mutex *nodeMutex;
+
+      private: bool pauseIncoming;
 
       //Singleton implementation
       private: friend class SingletonT<TopicManager>;

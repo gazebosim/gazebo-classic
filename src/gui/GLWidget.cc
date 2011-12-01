@@ -524,7 +524,6 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 {
   if (this->scene && this->scene->GetName() == _name)
   {
-    std::cout << "GLWIDGET ********************** CLEARE\n\n\n";
     this->Clear();
   }
 }
@@ -532,7 +531,6 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 void GLWidget::OnCreateScene(const std::string &_name)
 {
   this->ViewScene(rendering::get_scene(_name));
-  std::cout << "GLWidget Scene Created[" << _name << "]\n";
 }
 
 void GLWidget::OnMoveMode(bool mode)

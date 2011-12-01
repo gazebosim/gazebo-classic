@@ -22,6 +22,7 @@ namespace gazebo
       public: virtual ~RenderWidget();
 
       public: void RemoveScene(const std::string &_name);
+      public: void CreateScene(const std::string &_name);
 
       private slots: virtual void update();
 
@@ -46,6 +47,10 @@ namespace gazebo
 
       private: bool clear;
       private: std::string clearName;
+
+      private: bool create;
+      private: std::string createName;
+
     };
   }
 }

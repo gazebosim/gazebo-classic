@@ -239,30 +239,22 @@ void Server::ProcessControlMsgs()
       worldMsg.set_remove(true);
       this->worldModPub->Publish(worldMsg);
 
-      printf("\n\n stop_worlds \n\n");
       physics::stop_worlds();
 
-      printf("\n\n remove_worlds \n\n");
       physics::remove_worlds();
 
-      printf("\n\n remove_sensors \n\n");
       sensors::remove_sensors();
 
-      printf("\n\n clear_buffers \n\n");
       gazebo::transport::clear_buffers();
 
       sdf::ElementPtr worldElem = sdf->root->GetElement("world");
 
-      printf("\n\n create_world \n\n");
       physics::WorldPtr world = physics::create_world();
 
-      printf("\n\n load_world \n\n");
       physics::load_world(world, worldElem);
 
-      printf("\n\n init_world \n\n");
       physics::init_world(world);
 
-      printf("\n\n run_world \n\n");
       physics::run_world(world);
 
       worldMsg.set_world_name("default");

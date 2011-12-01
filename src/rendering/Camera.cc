@@ -81,9 +81,12 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
   this->origParentNode = NULL;
 
   // Connect to the render signal
-  this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Camera::Update, this) ) );
+  this->connections.push_back(
+      event::Events::ConnectPreRender(boost::bind(&Camera::Update, this)));
 
-  this->connections.push_back( event::Events::ConnectShowWireframe( boost::bind(&Camera::ToggleShowWireframe, this) ));
+  this->connections.push_back(
+      event::Events::ConnectShowWireframe(
+        boost::bind(&Camera::ToggleShowWireframe, this) ));
 
   if (_autoRender)
   {
@@ -281,8 +284,11 @@ void Camera::Render()
 
 void Camera::RenderImpl()
 {
-  this->renderTarget->update(false);
-  this->lastRenderWallTime = common::Time::GetWallTime();
+  if (this->renderTarget)
+  {
+    this->renderTarget->update(false);
+    this->lastRenderWallTime = common::Time::GetWallTime();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -57,6 +57,9 @@ namespace gazebo
       private: void OnPose(
                    const boost::shared_ptr<msgs::Pose const> &_msg);
 
+      private: void OnRemoveScene(const std::string &_name);
+      private: void OnCreateScene(const std::string &_name);
+
       private: void AddModelToList(const msgs::Model &_msg);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
@@ -129,6 +132,8 @@ namespace gazebo
 
       private: void ProcessPoseMsgs();
 
+      private: void InitTransport(const std::string &_name="");
+
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
       private: QAction *moveToAction;
@@ -138,16 +143,10 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub, modelPub;
-      private: transport::PublisherPtr factoryPub;
-      private: transport::SubscriberPtr responseSub, newEntitySub;
+      private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
       private: transport::SubscriberPtr poseSub;
 
-      private: rendering::VisualPtr modelVisual;
-      private: std::list<rendering::VisualPtr> visuals;
-      private: sdf::SDFPtr modelSDF;
-
-      private: ModelEditWidget *modelEditWidget;
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
       private: boost::mutex *propMutex, *receiveMutex;

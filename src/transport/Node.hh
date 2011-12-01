@@ -64,7 +64,7 @@ namespace gazebo
       /// \brief Process all publishers, which has each publisher send it's
       /// most recent message over the wire. This is for internal use only
       public: void ProcessPublishers();
-      public: void ProcessIncomingMsgs();
+      public: void ProcessIncoming();
 
       /// \brief Adverise a topic
       template<typename M>
@@ -94,8 +94,10 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
+        this->incomingMutex->lock();
         this->callbacks[decodedTopic].push_back(CallbackHelperPtr(
               new CallbackHelperT<M>(boost::bind(fp, obj, _1))));
+        this->incomingMutex->unlock();
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
@@ -109,8 +111,10 @@ namespace gazebo
         std::string decodedTopic = this->DecodeTopicName(topic);
         ops.template Init<M>(decodedTopic, shared_from_this(), _latching);
 
+        this->incomingMutex->lock();
         this->callbacks[decodedTopic].push_back(
             CallbackHelperPtr(new CallbackHelperT<M>(fp)));
+        this->incomingMutex->unlock();
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
@@ -133,6 +137,7 @@ namespace gazebo
       private: Callback_M callbacks;
       private: std::map<std::string, std::list<std::string> > incomingMsgs;
       private: boost::recursive_mutex *publisherMutex;
+      private: boost::recursive_mutex *incomingMutex;
     };
     /// \}
   }

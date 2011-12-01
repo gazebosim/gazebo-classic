@@ -131,3 +131,8 @@ void gui::load_plugin( const std::string &_filename )
   gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename, _filename);
   g_plugins.push_back( plugin );
 }
+
+bool gui::has_entity_name(const std::string &_name)
+{
+  return g_main_win->HasEntityName(_name);
+}

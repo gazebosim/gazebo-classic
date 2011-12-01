@@ -102,9 +102,10 @@ namespace gazebo
   
       private: bool initialized;
   
-      private: std::vector< Scene * > scenes;
+      private: std::vector<Scene *> scenes;
       private: Ogre::RTShader::SubRenderState *shadowRenderState;
-  
+ 
+      private: boost::mutex *entityMutex; 
       private: friend class SingletonT<RTShaderSystem>;
     };
     /// \}

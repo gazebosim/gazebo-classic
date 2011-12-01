@@ -144,9 +144,12 @@ void MainWindow::Open()
       tr("Open World"), "",
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  msgs::ServerControl msg;
-  msg.set_open_filename(filename);
-  this->serverControlPub->Publish(msg);
+  if (!filename.empty())
+  {
+    msgs::ServerControl msg;
+    msg.set_open_filename(filename);
+    this->serverControlPub->Publish(msg);
+  }
 }
 
 void MainWindow::Save()
@@ -552,9 +555,24 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   return result;
 }
 
+bool MainWindow::HasEntityName(const std::string &_name)
+{
+  bool result = false;
+
+  std::map<std::string, unsigned int>::iterator iter;
+  iter = this->entities.find(_name);
+
+  if (iter != this->entities.end())
+    result = true;
+
+  return result;
+}
+
 void MainWindow::OnWorldModify(
     const boost::shared_ptr<msgs::WorldModify const> &_msg)
 {
   if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_create() && _msg->create())
+    this->renderWidget->CreateScene(_msg->world_name());
 }

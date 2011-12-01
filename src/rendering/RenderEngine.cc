@@ -33,6 +33,7 @@
 
 #include "gazebo_config.h"
 
+#include "transport/Transport.hh"
 #include "transport/Node.hh"
 #include "transport/Subscriber.hh"
 #include "common/Color.hh"
@@ -141,7 +142,6 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
   ScenePtr scene(new Scene(_name, _enableVisualizations));
   this->scenes.push_back(scene);
 
-  std::cout << "RenderEngine::CreateScene[" << _name << "]\n";
   scene->Load();
   if (this->initialized)
     scene->Init();
@@ -149,6 +149,7 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
     gzerr << "RenderEngine is not initialized\n";
 
   rendering::Events::createScene(_name);
+
   return scene;
 }
 
@@ -163,6 +164,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
 
   if (iter != this->scenes.end())
   {
+    RTShaderSystem::Instance()->Clear();
     rendering::Events::removeScene(_name);
 
     (*iter)->Clear();
@@ -207,16 +209,19 @@ unsigned int RenderEngine::GetSceneCount() const
 
 void RenderEngine::PreRender()
 {
-  if (this->removeScene)
+  /*if (this->removeScene)
   {
+    std::cout << "REnderingEngin::RemoveScene\n";
     this->RemoveScene(this->removeSceneName);
     this->removeScene = false;
+    transport::pause_incoming(false);
   }
   else if (this->createScene)
   {
     this->CreateScene(this->createSceneName,true);
     this->createScene = false;
   }
+  */
 
   this->root->_fireFrameStarted();
 }
@@ -257,7 +262,8 @@ void RenderEngine::Init()
   // init the resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
+  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
+      Ogre::TFO_ANISOTROPIC);
 
   RTShaderSystem::Instance()->Init();
 
@@ -530,15 +536,19 @@ void RenderEngine::CreateContext()
 void RenderEngine::OnWorldModify(
     const boost::shared_ptr<msgs::WorldModify const> &_msg)
 {
-  if (_msg->has_remove() && _msg->remove())
+  /*if (_msg->has_remove() && _msg->remove())
   {
+    std::cout << "REnderingEngin::OnWorldModify\n";
     this->removeScene = true;
     this->removeSceneName = _msg->world_name();
+
+    transport::pause_incoming(true);
   }
-  else if (_msg->has_create() && _msg->create())
+  */
+  /*else if (_msg->has_create() && _msg->create())
   {
     std::cout << "Has Create!\n\n\n";
     this->createScene = true;
     this->createSceneName = _msg->world_name();
-  }
+  }*/
 }

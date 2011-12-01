@@ -28,6 +28,7 @@ using namespace transport;
 // Constructor
 TopicManager::TopicManager()
 {
+  this->pauseIncoming = false;
   this->nodeMutex = new boost::recursive_mutex();
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
@@ -98,8 +99,15 @@ void TopicManager::ProcessNodes()
   int s = this->nodes.size();
   this->nodeMutex->unlock();
   for (int i = 0; i < s; i ++)
-  {
     this->nodes[i]->ProcessPublishers();
+
+  if (!this->pauseIncoming)
+  {
+    this->nodeMutex->lock();
+    int s = this->nodes.size();
+    for (int i = 0; i < s; i ++)
+      this->nodes[i]->ProcessIncoming();
+    this->nodeMutex->unlock();
   }
 }
 
@@ -186,7 +194,6 @@ void TopicManager::HandleIncoming()
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const CallbackHelperPtr &_sub)
 {
-  gzerr << "TM::Unsub with callback[" << _topic << "]\n";
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
@@ -198,11 +205,9 @@ void TopicManager::Unsubscribe(const std::string &_topic,
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_sub)
 {
-  gzerr << "TM::Unsub with Node[" << _topic << "]\n";
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
-    printf("    Found Publication...\n");
     publication->RemoveSubscription(_sub);
     ConnectionManager::Instance()->Unsubscribe(_topic, 
         _sub->GetMsgType(_topic));
@@ -367,4 +372,9 @@ void TopicManager::ClearBuffers()
   {
     iter->second->ClearBuffer();
   }
+}
+
+void TopicManager::PauseIncoming(bool _pause)
+{
+  this->pauseIncoming = _pause;
 }

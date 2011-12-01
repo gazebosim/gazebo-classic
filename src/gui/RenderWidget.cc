@@ -17,6 +17,7 @@ RenderWidget::RenderWidget( QWidget *parent )
   : QWidget(parent)
 {
   this->clear = false;
+  this->create = false;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->mainFrame = new QFrame;
@@ -163,13 +164,18 @@ void RenderWidget::OnFullScreen(bool &_value)
 
 void RenderWidget::update()
 {
-  /*if (this->clear)
+  if (this->clear)
   {
-    if (this->glWidget->GetScene()->GetName() == this->clearName)
-      this->glWidget->Clear();
+    rendering::remove_scene(this->clearName);
     this->clear = false;
     return;
-  }*/
+  }
+  else if (this->create)
+  {
+    rendering::create_scene(this->createName, true);
+    this->create = false;
+    return;
+  }
 
   rendering::UserCameraPtr cam = this->glWidget->GetCamera();
 
@@ -224,4 +230,10 @@ void RenderWidget::RemoveScene(const std::string &_name)
 {
   this->clear = true;
   this->clearName = _name;
+}
+
+void RenderWidget::CreateScene(const std::string &_name)
+{
+  this->create = true;
+  this->createName = _name;
 }

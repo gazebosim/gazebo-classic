@@ -28,6 +28,7 @@ Node::Node()
   this->id = idCounter++;
   this->topicNamespace = "";
   this->publisherMutex = new boost::recursive_mutex();
+  this->incomingMutex = new boost::recursive_mutex();
 }
 
 Node::~Node()
@@ -35,15 +36,23 @@ Node::~Node()
   this->Fini();
   delete this->publisherMutex;
   this->publisherMutex = NULL;
+
+  delete this->incomingMutex;
+  this->incomingMutex = NULL;
 }
 
 void Node::Fini()
 {
+  TopicManager::Instance()->RemoveNode(this->id);
+
   this->publisherMutex->lock();
   this->publishers.clear();
-  this->callbacks.clear();
-  TopicManager::Instance()->RemoveNode(this->id);
   this->publisherMutex->unlock();
+
+  this->incomingMutex->lock();
+  this->callbacks.clear();
+  this->incomingMutex->unlock();
+
 }
 
 void Node::Init(const std::string &_space)
@@ -111,28 +120,31 @@ void Node::ProcessPublishers()
   {
     (*this->publishersIter)->SendMessage();
   }
-  this->ProcessIncomingMsgs();
   this->publisherMutex->unlock();
 }
 
 bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 {
-  this->publisherMutex->lock();
+  this->incomingMutex->lock();
   this->incomingMsgs[_topic].push_back(_msg);
-  this->publisherMutex->unlock();
+  this->incomingMutex->unlock();
   return true;
 }
 
-void Node::ProcessIncomingMsgs()
+void Node::ProcessIncoming()
 {
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
   std::list<std::string>::iterator msgIter;
 
+  this->incomingMutex->lock();
   // For each topic
   std::map<std::string, std::list<std::string> >::iterator inIter;
-  for (inIter = this->incomingMsgs.begin(); inIter != this->incomingMsgs.end();
-       inIter++)
+  std::map<std::string, std::list<std::string> >::iterator endIter;
+  inIter = this->incomingMsgs.begin();
+  endIter = this->incomingMsgs.end();
+
+  for (; inIter != endIter; inIter++)
   {
     // Find the callbacks for the topic
     cbIter = this->callbacks.find(inIter->first);
@@ -152,6 +164,7 @@ void Node::ProcessIncomingMsgs()
     }
   }
   this->incomingMsgs.clear();
+  this->incomingMutex->unlock();
 }
 
 std::string Node::GetMsgType(const std::string &_topic) const

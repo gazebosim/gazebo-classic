@@ -59,23 +59,23 @@ void PublicationTransport::OnConnectionShutdown()
   gzdbg << "Publication transport connection shutdown\n";
 }
 
-void PublicationTransport::AddCallback(const boost::function<void(const std::string &)> &cb_)
+void PublicationTransport::AddCallback(
+    const boost::function<void(const std::string &)> &cb_)
 {
   this->callback = cb_;
 }
 
-void PublicationTransport::OnPublish(const std::string &data)
+void PublicationTransport::OnPublish(const std::string &_data)
 {
-  std::cout << "PublicationTransport::OnPublish[" << this->topic << "]\n";
   if (this->connection && this->connection->IsOpen())
   {
     this->connection->AsyncRead( 
         boost::bind(&PublicationTransport::OnPublish, this, _1) );
 
-    if (!data.empty())
+    if (!_data.empty())
     {
       if (this->callback)
-        (this->callback)(data);
+        (this->callback)(_data);
     }
   }
 }

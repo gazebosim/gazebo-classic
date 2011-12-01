@@ -11,6 +11,7 @@
 #include "common/Console.hh"
 #include "common/Events.hh"
 
+#include "rendering/RenderEvents.hh"
 #include "rendering/Rendering.hh"
 #include "rendering/Scene.hh"
 #include "rendering/UserCamera.hh"
@@ -79,21 +80,7 @@ ModelListWidget::ModelListWidget(QWidget *parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(2,2,2,2);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-
-  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response", 
-      &ModelListWidget::OnResponse, this, false);
-
-  this->poseSub = this->node->Subscribe("~/pose/info",
-      &ModelListWidget::OnPose, this);
-
-  this->requestSub = this->node->Subscribe("~/request",
-      &ModelListWidget::OnRequest, this, false);
-
-  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->InitTransport();
 
   this->followAction = new QAction(tr("Follow"), this);
   this->followAction->setStatusTip(tr("Follow the selection"));
@@ -120,6 +107,13 @@ ModelListWidget::ModelListWidget(QWidget *parent)
       gui::Events::ConnectModelUpdate( 
         boost::bind(&ModelListWidget::OnModelUpdate, this, _1) ) );
 
+  this->connections.push_back( 
+      rendering::Events::ConnectCreateScene( 
+        boost::bind(&ModelListWidget::OnCreateScene, this, _1) ) );
+
+  this->connections.push_back( 
+      rendering::Events::ConnectRemoveScene( 
+        boost::bind(&ModelListWidget::OnRemoveScene, this, _1) ) );
 
   QTimer::singleShot( 500, this, SLOT(Update()) );
 }
@@ -248,15 +242,19 @@ void ModelListWidget::OnResponse(
 
 void ModelListWidget::RemoveEntity(const std::string &_name)
 {
-  QTreeWidgetItem *listItem = this->GetModelListItem(gui::get_entity_id(_name));
-  if (listItem)
+  if (gui::has_entity_name(_name))
   {
-    int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
-    this->modelTreeWidget->takeTopLevelItem(i);
+    QTreeWidgetItem *listItem =
+      this->GetModelListItem(gui::get_entity_id(_name));
+    if (listItem)
+    {
+      int i = this->modelTreeWidget->indexOfTopLevelItem(listItem);
+      this->modelTreeWidget->takeTopLevelItem(i);
 
-    this->propTreeBrowser->clear();
-    this->selectedModelName.clear();
-    this->sdfElement.reset();
+      this->propTreeBrowser->clear();
+      this->selectedModelName.clear();
+      this->sdfElement.reset();
+    }
   }
 }
 
@@ -447,7 +445,7 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
 void ModelListWidget::FillGeometryMsg(QtProperty *_item, 
     google::protobuf::Message *_message,
     const google::protobuf::Descriptor *_descriptor,
-    QtProperty *_changedItem)
+    QtProperty * /*_changedItem*/)
 {
   QtProperty *typeProperty = this->GetChildItem(_item,"type");
 
@@ -1610,4 +1608,57 @@ void ModelListWidget::OnRequest(
   {
     this->RemoveEntity(_msg->data());
   }
+}
+
+void ModelListWidget::OnRemoveScene(const std::string &_name)
+{
+  this->poseMsgs.clear();
+  this->modelTreeWidget->clear();
+  this->propTreeBrowser->clear();
+  this->node->Fini();
+  this->node.reset();
+
+  this->requestPub.reset();
+  this->modelPub.reset();
+  this->responseSub.reset();
+  this->requestSub.reset();
+  this->poseSub.reset();
+}
+
+void ModelListWidget::OnCreateScene(const std::string &_name)
+{
+  this->poseMsgs.clear();
+  this->modelTreeWidget->clear();
+  this->propTreeBrowser->clear();
+
+  this->InitTransport(_name);
+}
+
+void ModelListWidget::InitTransport(const std::string &_name)
+{
+  if (this->node)
+  {
+    this->node->Fini();
+    this->node.reset();
+    this->requestPub.reset();
+    this->modelPub.reset();
+    this->responseSub.reset();
+    this->requestSub.reset();
+    this->poseSub.reset();
+  }
+
+
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_name);
+
+  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->responseSub = this->node->Subscribe("~/response", 
+      &ModelListWidget::OnResponse, this, false);
+
+  this->poseSub = this->node->Subscribe("~/pose/info",
+      &ModelListWidget::OnPose, this);
+
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelListWidget::OnRequest, this, false);
 }

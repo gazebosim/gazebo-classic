@@ -75,10 +75,6 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 /// Destructor
 UserCamera::~UserCamera()
 {
-  std::cout << "User Cmaera destruct\n";
-  //delete this->visual;
-  //this->visual = NULL;
-
   delete this->orbitViewController;
   delete this->fpsViewController;
 
@@ -232,7 +228,7 @@ void UserCamera::Fini()
 /// Handle a mouse event
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if ( !this->gui->HandleMouseEvent(_evt) )
+  if (!this->gui || !this->gui->HandleMouseEvent(_evt))
     this->viewController->HandleMouseEvent(_evt);
 }
 

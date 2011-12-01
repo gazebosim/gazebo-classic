@@ -87,3 +87,8 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
 
   return scene;
 }
+
+void rendering::remove_scene(const std::string &_name)
+{
+  rendering::RenderEngine::Instance()->RemoveScene(_name);
+}

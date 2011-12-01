@@ -121,3 +121,8 @@ void transport::clear_buffers()
 {
   transport::TopicManager::Instance()->ClearBuffers();
 }
+
+void transport::pause_incoming(bool _pause)
+{
+  transport::TopicManager::Instance()->PauseIncoming(_pause);
+}

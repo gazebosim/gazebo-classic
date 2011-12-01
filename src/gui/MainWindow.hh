@@ -27,6 +27,7 @@ namespace gazebo
       public: void Init();
 
       public: unsigned int GetEntityId(const std::string &_name);
+      public: bool HasEntityName(const std::string &_name);
 
       protected: void closeEvent(QCloseEvent *event);
 

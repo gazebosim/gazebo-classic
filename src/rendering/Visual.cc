@@ -103,7 +103,6 @@ Visual::Visual (const std::string &_name, Scene *_scene)
 /// Destructor
 Visual::~Visual()
 {
-  std::cout << "Delete Visual[" << this->GetName() << "]\n";
   RTShaderSystem::Instance()->DetachEntity(this);
 
   if (this->preRenderConnection)
@@ -120,12 +119,6 @@ Visual::~Visual()
   {
     this->DestroyAllAttachedMovableObjects(this->sceneNode);
     this->sceneNode->removeAndDestroyAllChildren();
-    //this->sceneNode->detachAllObjects();
-
-    /*if (this->sceneNode->getParentSceneNode())
-      this->sceneNode->getParentSceneNode()->removeAndDestroyChild(
-          this->sceneNode->getName() );
-          */
     this->scene->GetManager()->destroySceneNode(this->sceneNode->getName());
     this->sceneNode = NULL;
   }
@@ -181,10 +174,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
   {
     Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
     if (ent->getMovableType() != DynamicLines::GetMovableType())
-    {
-      std::cout << "Delete MovableType[" << ent << "]\n";
       this->scene->GetManager()->destroyEntity(ent);
-    }
     else
       delete ent;
   }

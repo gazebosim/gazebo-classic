@@ -58,6 +58,11 @@ namespace gazebo
     void fini();
 
     void clear_buffers();
+
+    /// \brief Set to true to pause incoming messages. They are still queued
+    ///        for later delivery
+    void pause_incoming(bool _pause);
+
     /// \}
   }
 }

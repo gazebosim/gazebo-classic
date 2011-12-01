@@ -94,7 +94,6 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
 void Scene::Clear()
 {
-  std::cout << "SCENE CLEAR START\n";
   this->node->Fini();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
@@ -122,15 +121,12 @@ void Scene::Clear()
   this->lights.clear();
   this->sensorMsgs.clear();
   RTShaderSystem::Instance()->Clear();
-
-  std::cout << "SCENE CLEAR END\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Scene::~Scene()
 {
-  std::cout << "SCENE DELETE\n";
   delete this->selectionObj;
   delete this->requestMsg;
   delete this->receiveMutex;
@@ -165,7 +161,7 @@ Scene::~Scene()
   this->lights.clear();
 
   // Remove a scene
-  RTShaderSystem::Instance()->RemoveScene( this );
+  RTShaderSystem::Instance()->RemoveScene(this);
 
   for (unsigned int i=0; i < this->grids.size(); i++)
     delete this->grids[i];
@@ -176,20 +172,13 @@ Scene::~Scene()
 
   if (this->manager)
   {
-    // TODO: this was causing a segfault. Need to debug, and put back in
-    //this->manager->clearScene();
-    //RenderEngine::Instance()->root->destroySceneManager(this->manager);
+    RenderEngine::Instance()->root->destroySceneManager(this->manager);
     this->manager = NULL;
-    delete this->manager;
   }
   this->connections.clear();
 
   this->sdf->Reset();
   this->sdf.reset();
-
-  std::cout << "SCENE DELETE DONE\n";
-
-  std::cout << "WorldVisualCount[" << this->worldVisual.use_count() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
