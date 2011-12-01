@@ -57,9 +57,11 @@ Publisher::~Publisher()
 bool Publisher::HasConnections() const
 {
   return ((this->publications[0] && 
-           this->publications[0]->GetCallbackCount() > 0) ||
+           (this->publications[0]->GetCallbackCount() > 0 ||
+            this->publications[0]->GetNodeCount() > 0)) ||
           (this->publications[1] && 
-           this->publications[1]->GetCallbackCount() > 0));
+           (this->publications[1]->GetCallbackCount() > 0 ||
+            this->publications[0]->GetNodeCount() > 0)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

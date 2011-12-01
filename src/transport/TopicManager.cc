@@ -105,9 +105,9 @@ void TopicManager::ProcessNodes()
   {
     this->nodeMutex->lock();
     int s = this->nodes.size();
+    this->nodeMutex->unlock();
     for (int i = 0; i < s; i ++)
       this->nodes[i]->ProcessIncoming();
-    this->nodeMutex->unlock();
   }
 }
 

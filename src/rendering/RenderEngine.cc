@@ -183,7 +183,6 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
     if ((*iter)->GetName() == _name)
       return (*iter);
 
-  gzerr << "Unable to find scene[" << _name << "]\n";
   return ScenePtr();
 }
 

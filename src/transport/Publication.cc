@@ -324,14 +324,19 @@ std::string Publication::GetMsgType() const
   return this->msgType;
 }
 
-unsigned int Publication::GetTransportCount()
+unsigned int Publication::GetTransportCount() const
 {
   return this->transports.size();
 }
 
-unsigned int Publication::GetCallbackCount()
+unsigned int Publication::GetCallbackCount() const
 {
   return this->callbacks.size();
+}
+
+unsigned int Publication::GetNodeCount() const
+{
+  return this->nodes.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

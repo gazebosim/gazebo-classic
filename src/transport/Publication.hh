@@ -43,8 +43,9 @@ namespace gazebo
 
       public: void RemoveTransport(const std::string &host, unsigned int port);
 
-      public: unsigned int GetTransportCount();
-      public: unsigned int GetCallbackCount();
+      public: unsigned int GetTransportCount() const;
+      public: unsigned int GetCallbackCount() const;
+      public: unsigned int GetNodeCount() const;
       public: unsigned int GetRemoteSubscriptionCount();
 
       /// \brief Return true if the topic has been advertised from this

@@ -74,11 +74,11 @@ void ODELink::Init()
   if (!this->IsStatic())
   {
     this->linkId = dBodyCreate(this->odePhysics->GetWorldId());
+    dBodySetData(this->linkId, this);
 
     // Only use auto disable if no joints are present
     if (this->GetModel()->GetJointCount() == 0)
     {
-      dBodySetData(this->linkId, this);
       /*dBodySetAutoDisableDefaults(this->linkId);
       dBodySetAutoDisableFlag(this->linkId, 1);
       */

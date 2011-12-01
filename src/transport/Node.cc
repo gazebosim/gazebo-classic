@@ -52,7 +52,6 @@ void Node::Fini()
   this->incomingMutex->lock();
   this->callbacks.clear();
   this->incomingMutex->unlock();
-
 }
 
 void Node::Init(const std::string &_space)
