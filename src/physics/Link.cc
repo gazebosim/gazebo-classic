@@ -279,14 +279,6 @@ void Link::Fini()
 
 void Link::Reset()
 {
-  gzdbg << "Reset[" << this->GetName() << "]\n";
-  std::cout << "  A. Vel: Ang[" << this->GetWorldAngularVel() 
-                    << "] Lin[" << this->GetWorldLinearVel() << "]\n";
-  std::cout << "  A. Accel: Ang[" << this->GetWorldAngularAccel() 
-                      << "] Lin[" << this->GetWorldLinearAccel() << "]\n";
-  std::cout << "  A. Force[" << this->GetWorldForce() 
-              << "] Torque[" << this->GetWorldTorque() << "]\n";
-
   Entity::Reset();
   this->SetAngularVel(math::Vector3(0,0,0));
   this->SetLinearVel(math::Vector3(0,0,0));
@@ -294,13 +286,6 @@ void Link::Reset()
   this->SetLinearAccel(math::Vector3(0,0,0));
   this->SetForce(math::Vector3(0,0,0));
   this->SetTorque(math::Vector3(0,0,0));
-
-  std::cout << "  B. Vel: Ang[" << this->GetWorldAngularVel() 
-                    << "] Lin[" << this->GetWorldLinearVel() << "]\n";
-  std::cout << "  B. Accel: Ang[" << this->GetWorldAngularAccel() 
-                      << "] Lin[" << this->GetWorldLinearAccel() << "]\n";
-  std::cout << "  B. Force[" << this->GetWorldForce() 
-              << "] Torque[" << this->GetWorldTorque() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

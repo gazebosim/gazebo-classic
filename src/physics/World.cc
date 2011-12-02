@@ -273,11 +273,6 @@ void World::RunLoop()
       this->Update();
     }
 
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
-
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
@@ -287,6 +282,11 @@ void World::RunLoop()
 
     if (this->IsPaused() && this->stepInc)
       this->stepInc = false;
+
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
   }
 }
 
