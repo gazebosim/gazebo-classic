@@ -303,8 +303,39 @@ bool Param::Get(gazebo::math::Vector3 &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is not a vector3\n";
-    return false;
+    gzwarn << "Parameter [" << this->key << "] is not a vector3, try parsing\n";
+    std::string val_str = this->GetAsString();
+    std::vector<double> elements;
+    std::vector<std::string> pieces;
+    boost::split( pieces, val_str, boost::is_any_of(" "));
+    if (pieces.size() != 3)
+    {
+      gzerr << "string does not have 3 pieces to parse into Vector3, using 0s\n";
+      return false;
+    }
+    else
+    {
+      for (unsigned int i = 0; i < pieces.size(); ++i)
+      {
+        if (pieces[i] != "")
+        {
+          try
+          {
+            elements.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
+          }
+          catch (boost::bad_lexical_cast &e)
+          {
+            gzerr << "value ["
+                  << pieces[i] << "] is not a valid double for Vector3[" << i << "]\n";
+            return false;
+          }
+        }
+      }
+      _value.x = elements[0];
+      _value.y = elements[1];
+      _value.z = elements[2];
+      return true;
+    }
   }
 }
 bool Param::Get(int &_value)
