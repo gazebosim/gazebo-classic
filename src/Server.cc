@@ -225,13 +225,13 @@ void Server::ProcessControlMsgs()
       if (!sdf::init(sdf))
       {
         gzerr << "Unable to initialize sdf\n";
-        return;
+        continue;
       }
 
       if (!sdf::readFile((*iter).open_filename(), sdf))
       {
         gzerr << "Unable to read sdf file[" << (*iter).open_filename() << "]\n";
-        return;
+        continue;
       }
 
       msgs::WorldModify worldMsg;

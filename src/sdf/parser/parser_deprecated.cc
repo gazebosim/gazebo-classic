@@ -1115,8 +1115,7 @@ bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
   std::string output;
   PreParser(_filename, output);
 
-  initModelString(output, _sdf);
-  return true;
+  return initModelString(output, _sdf);
 }
 
 
@@ -1146,11 +1145,14 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     initModel(modelXml, model);
 
     modelXml = nextSiblingElement(modelXml,"physical");
-    model_initialized = true; // need at least one model, otherwise, return false and try as model
+    // need at least one model, otherwise, return false and try as model
+    model_initialized = true;
   }
 
-  if (model_initialized) return true;
-  else return false;
+  if (model_initialized)
+    return true;
+  else
+    return false;
 
 }
 

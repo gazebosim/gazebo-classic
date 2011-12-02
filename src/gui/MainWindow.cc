@@ -144,7 +144,6 @@ void MainWindow::Open()
       tr("Open World"), "",
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
-  gzdbg << "Open File[" << filename << "]\n";
   if (!filename.empty())
   {
     msgs::ServerControl msg;

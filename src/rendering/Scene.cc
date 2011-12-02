@@ -632,6 +632,10 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
     // is the result a MovableObject
     if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
     {
+      if (!iter->movable->isVisible() ||
+          iter->movable->getName().find("__COLLISION_VISUAL__") !=
+          std::string::npos)
+        continue;
       if (_ignoreSelectionObj && 
           iter->movable->getName().substr(0,15) == "__SELECTION_OBJ")
         continue;
@@ -738,12 +742,15 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
   std::cout << prefix_ << "  Num Objs[" << numAttachedObjs << "]\n";
   for (int i=0; i < numAttachedObjs; i++)
   {
-    std::cout << prefix_ << "    Obj[" << snode->getAttachedObject(i)->getName() << "]\n";
+    std::cout << prefix_
+      << "    Obj[" << snode->getAttachedObject(i)->getName() << "]\n";
   }
   std::cout << prefix_ << "  Num Children[" << numChildren << "]\n";
   std::cout << prefix_ << "  IsInGraph[" << isInSceneGraph << "]\n";
-  std::cout << prefix_ << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
-  std::cout << prefix_ << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
+  std::cout << prefix_
+    << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
+  std::cout << prefix_
+    << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
   
   for (unsigned int i=0; i < node_->numChildren(); i++)
   {

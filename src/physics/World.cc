@@ -885,11 +885,20 @@ void World::ProcessFactoryMsgs()
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
       // SDF Parsing happens here
-      sdf::readString( (*iter).sdf(), factorySDF );
+      if (!sdf::readString( (*iter).sdf(), factorySDF))
+      {
+        gzerr << "Unable to read sdf string\n";
+        continue;
+      }
+
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      sdf::readFile( (*iter).sdf_filename(), factorySDF);
+      if (!sdf::readFile( (*iter).sdf_filename(), factorySDF))
+      {
+        gzerr << "Unable to read sdf file.\n";
+        continue;
+      }
     }
     else
     {

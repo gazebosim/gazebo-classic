@@ -229,7 +229,7 @@ bool readFile(const std::string &_filename, SDFPtr &_sdf)
     return true;
   else
   {
-    gzwarn << "parser as sdf version 1.0 failed, "
+    gzwarn << "parser for sdf version 1.0 failed, "
            << "trying to parse as old deprecated format\n";
     if (deprecated_sdf::initWorldFile(filename, _sdf))
       return true;
@@ -307,7 +307,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
     TiXmlElement* elemXml = _xmlDoc->FirstChildElement(_sdf->root->GetName());
     if (!readXml( elemXml, _sdf->root))
     {
-      gzwarn << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";
+      gzerr << "Unable to parse sdf element[" << _sdf->root->GetName() << "]\n";
       return false;
     }
   }
@@ -414,7 +414,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     }
 
     if (iter == _sdf->attributes.end())
-      gzwarn << "XML Attribute[" << attribute->Name() << "] in element[" << _xml->Value() << "] not defined in SDF, ignoring.\n";
+    {
+      gzwarn << "XML Attribute[" << attribute->Name()
+        << "] in element[" << _xml->Value()
+        << "] not defined in SDF, ignoring.\n";
+    }
 
     attribute = attribute->Next();
   }
@@ -425,7 +429,9 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
   {
     if ((*iter)->GetRequired() && !(*iter)->GetSet())
     {
-      gzerr << "Required attribute[" << (*iter)->GetKey() << "] in element[" << _xml->Value() << "] is not specified in SDF.\n";
+      gzerr << "Required attribute[" << (*iter)->GetKey()
+        << "] in element[" << _xml->Value() << "] is not specified in SDF.\n";
+      return false;
     }
   }
 
@@ -492,7 +498,10 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
           if (readXml( elemXml, element ) )
             _sdf->elements.push_back(element);
           else
+          {
             gzerr << "Error reading element\n";
+            return false;
+          }
           break;
         }
       }
@@ -502,6 +511,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
         gzerr << "XML Element[" << elemXml->Value() 
           << "], child of element[" << _xml->Value() 
           << "] not defined in SDF. Ignoring.[" << _sdf->GetName() << "]\n";
+        return false;
       }
     }
 
@@ -513,8 +523,11 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
       if ( (*eiter)->GetRequired() == "1" || (*eiter)->GetRequired() == "+")
       {
         if (!_sdf->HasElement( (*eiter)->GetName() ))
+        {
           gzerr << "XML Missing required element[" << (*eiter)->GetName() 
             << "], child of element[" << _sdf->GetName() << "]\n";
+          return false;
+        }
       }
     }
   }

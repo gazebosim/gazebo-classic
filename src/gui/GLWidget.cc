@@ -304,8 +304,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
         if (!newHoverVis->IsPlane())
         {
-          std::cout << "1\n";
-          this->hoverVis->SetEmissive(common::Color(0,0,0));
+          if (this->hoverVis && this->hoverVis->GetName() !=
+              newHoverVis->GetName())
+          {
+            this->hoverVis->SetEmissive(common::Color(0,0,0));
+          }
           newHoverVis->SetEmissive(common::Color(.5,.5,.5));
           this->setCursor(Qt::PointingHandCursor);
         }
@@ -313,7 +316,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         {
           if (this->hoverVis)
           {
-            std::cout << "000\n";
             this->hoverVis->SetEmissive(common::Color(0,0,0));
           }
 
@@ -326,7 +328,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         this->scene->GetSelectionObj()->SetHighlight( "" );
         if (this->hoverVis)
         {
-          std::cout << "00\n";
           this->hoverVis->SetEmissive(common::Color(0,0,0));
         }
 
@@ -337,7 +338,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     {
       if (this->hoverVis)
       {
-        std::cout << "0\n";
         this->hoverVis->SetEmissive(common::Color(0,0,0));
       }
       this->setCursor(Qt::ArrowCursor);
