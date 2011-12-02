@@ -150,10 +150,6 @@ void Visual::Fini()
     this->sceneNode->removeAndDestroyAllChildren();
     this->sceneNode->detachAllObjects();
 
-    /*if (this->sceneNode->getParentSceneNode())
-      this->sceneNode->getParentSceneNode()->removeAndDestroyChild(
-      this->sceneNode->getName() );
-      */
     this->scene->GetManager()->destroySceneNode(this->sceneNode);
     this->sceneNode = NULL;
   }
@@ -948,7 +944,7 @@ void Visual::SetTransparency( float _trans )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the emissive value
-void Visual::SetEmissive( const common::Color &_color )
+void Visual::SetEmissive(const common::Color &_color)
 {
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {

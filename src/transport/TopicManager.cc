@@ -368,9 +368,9 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 void TopicManager::ClearBuffers()
 {
   PublicationPtr_M::iterator iter;
-  for (iter = this->advertisedTopics.begin(); iter != this->advertisedTopics.end(); iter++)
+  for (iter = this->advertisedTopics.begin();
+       iter != this->advertisedTopics.end(); iter++)
   {
-    iter->second->ClearBuffer();
   }
 }
 

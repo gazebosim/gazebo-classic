@@ -80,7 +80,8 @@ namespace gazebo
       /// \param topic The name of the topic
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
-                                     unsigned int _queueLimit)
+                                     unsigned int _queueLimit,
+                                     bool _latch)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -91,7 +92,7 @@ namespace gazebo
                 this->UpdatePublications(_topic, msg->GetTypeName());
               
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit));
+                      msg->GetTypeName(), _queueLimit, _latch));
 
                 std::string msgTypename;
                 PublicationPtr publication;
@@ -112,14 +113,15 @@ namespace gazebo
                     msgTypename = tmp.GetTypeName();
                   }
 
-                  publication = this->FindPublication( t );
+                  publication = this->FindPublication(t);
+                  publication->AddPublisher(pub);
                   if (!publication->GetLocallyAdvertised())
                   {
                     ConnectionManager::Instance()->Advertise(t, msgTypename);
                   }
 
                   publication->SetLocallyAdvertised(true);
-                  pub->SetPublication( publication, i );
+                  pub->SetPublication(publication, i);
 
                   SubNodeMap::iterator iter2;
                   SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
@@ -137,7 +139,6 @@ namespace gazebo
                       }
                     }
                   }
-
                 }
 
                 return pub;

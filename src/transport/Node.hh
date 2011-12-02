@@ -69,12 +69,13 @@ namespace gazebo
       /// \brief Adverise a topic
       template<typename M>
       transport::PublisherPtr Advertise(const std::string &topic, 
-                                        unsigned int _queueLimit=10)
+                                        unsigned int _queueLimit=10,
+                                        bool _latch = false)
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
         PublisherPtr publisher =
           transport::TopicManager::Instance()->Advertise<M>(
-              decodedTopic,_queueLimit);
+              decodedTopic,_queueLimit, _latch);
 
         this->publisherMutex->lock();
         this->publishers.push_back(publisher);

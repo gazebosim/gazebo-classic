@@ -65,7 +65,8 @@ namespace gazebo
       public: void AddTransport( const PublicationTransportPtr &publink );
       public: bool HasTransport( const std::string &_host, unsigned int _port );
 
-      public: void ClearBuffer();
+      public: void AddPublisher(PublisherPtr _pub);
+      public: void RemovePublisher();
 
       private: unsigned int id;
       private: static unsigned int idCounter;
@@ -80,7 +81,7 @@ namespace gazebo
 
       private: std::list<PublicationTransportPtr> transports;
 
-      private: std::list<std::string> prevMsgBuffer;
+      private: std::vector<PublisherPtr> publishers;
 
       private: bool locallyAdvertised;
     };

@@ -78,11 +78,13 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
 
-  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this, false);
-  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this, false);
-  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this, false);
-  this->selectionSub = this->node->Subscribe("~/selection", &Scene::OnSelectionMsg, this, false);
-  this->requestSub = this->node->Subscribe("~/request", &Scene::OnRequest, this, false);
+  this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
+  this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+  this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
+  this->selectionSub = this->node->Subscribe("~/selection",
+      &Scene::OnSelectionMsg, this);
+  this->requestSub = this->node->Subscribe("~/request",
+      &Scene::OnRequest, this);
 
   this->selectionObj = new SelectionObj(this);
 
@@ -245,9 +247,9 @@ void Scene::Init()
   RTShaderSystem::Instance()->ApplyShadows(this);
 
   // Send a request to get the current world state
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
   this->responseSub = this->node->Subscribe("~/response", 
-      &Scene::OnResponse, this, false);
+      &Scene::OnResponse, this);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
@@ -1077,10 +1079,10 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   }
 }
 
-void Scene::OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
+void Scene::OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  this->visualMsgs.push_back(msg);
+  this->visualMsgs.push_back(_msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

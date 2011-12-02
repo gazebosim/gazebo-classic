@@ -40,14 +40,14 @@ MainWindow::MainWindow()
     this->node->Advertise<msgs::Selection>("~/selection",1);
 
   this->newEntitySub = this->node->Subscribe("~/model/info", 
-      &MainWindow::OnModel, this, false);
+      &MainWindow::OnModel, this);
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response", 
-      &MainWindow::OnResponse, this, false);
+      &MainWindow::OnResponse, this);
 
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
-                                            &MainWindow::OnWorldModify, this,false);
+                                            &MainWindow::OnWorldModify, this);
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -503,7 +503,7 @@ void MainWindow::OnResponse(
 
   if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
   {
-    modelVMsg.ParseFromString( _msg->serialized_data() );
+    modelVMsg.ParseFromString(_msg->serialized_data());
 
     for (int i=0; i < modelVMsg.models_size(); i++)
     {

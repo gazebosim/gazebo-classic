@@ -36,13 +36,13 @@ namespace gazebo
     class Publisher
     {
       /// \brief Default Constructor
-      public: Publisher(unsigned int _limit);
+      public: Publisher(unsigned int _limit, bool _latch);
 
       /// \brief Use this constructor
       /// \param topic Name of topic
       /// \param msg_type Type of the message which is to be published
       public: Publisher(const std::string &topic, const std::string &msg_type,
-                        unsigned int _limit);
+                        unsigned int _limit, bool _latch);
 
       /// \brief Destructor
       public: virtual ~Publisher();
@@ -73,6 +73,9 @@ namespace gazebo
 
       /// \brief Send latest message over the wire. For internal use only
       public: void SendMessage();
+      public: bool GetLatching() const;
+
+      public: std::string GetPrevMsg() const;
 
       /// \brief Callback when a publish is completed
       private: void OnPublishComplete();
@@ -83,6 +86,9 @@ namespace gazebo
       private: std::list<google::protobuf::Message *> messages;
       private: boost::recursive_mutex *mutex;
       private: PublicationPtr publications[2];
+
+      private: bool latch;
+      private: std::string prevMsg;
     };
     /// \}
   }

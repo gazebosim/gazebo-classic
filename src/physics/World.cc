@@ -129,8 +129,7 @@ void World::Load( sdf::ElementPtr _sdf )
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui");
-
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui",1,true);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
@@ -139,12 +138,11 @@ void World::Load( sdf::ElementPtr _sdf )
   this->controlSub = this->node->Subscribe("~/world_control", 
                                            &World::OnControl, this);
   this->requestSub = this->node->Subscribe("~/request",&World::OnRequest, this);
-  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
-
+  this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
     this->node->Advertise<msgs::WorldStatistics>("~/world_stats",1);

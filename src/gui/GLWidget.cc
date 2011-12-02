@@ -280,7 +280,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     rendering::VisualPtr newHoverVis;
 
-    if (this->keyModifiers & Qt::ControlModifier)
+    if (this->keyModifiers & Qt::ControlModifier && !this->entityMaker)
     {
       if (this->selectionVis)
       {
@@ -296,22 +296,27 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
       if (!mod.empty())
       {
         this->setCursor(Qt::SizeAllCursor);
-        this->scene->GetSelectionObj()->SetHighlight( mod );
+        this->scene->GetSelectionObj()->SetHighlight(mod);
       }
       else if (newHoverVis && !this->selectionVis)
       {
         this->scene->GetSelectionObj()->SetHighlight("");
 
-        if (this->hoverVis)
-          this->hoverVis->SetEmissive(common::Color(0,0,0));
-
         if (!newHoverVis->IsPlane())
         {
+          std::cout << "1\n";
+          this->hoverVis->SetEmissive(common::Color(0,0,0));
           newHoverVis->SetEmissive(common::Color(.5,.5,.5));
           this->setCursor(Qt::PointingHandCursor);
         }
         else
         {
+          if (this->hoverVis)
+          {
+            std::cout << "000\n";
+            this->hoverVis->SetEmissive(common::Color(0,0,0));
+          }
+
           this->setCursor(Qt::ArrowCursor);
           newHoverVis.reset();
         }
@@ -320,7 +325,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
       {
         this->scene->GetSelectionObj()->SetHighlight( "" );
         if (this->hoverVis)
+        {
+          std::cout << "00\n";
           this->hoverVis->SetEmissive(common::Color(0,0,0));
+        }
 
         this->setCursor(Qt::ArrowCursor);
       }
@@ -328,7 +336,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     else
     {
       if (this->hoverVis)
+      {
+        std::cout << "0\n";
         this->hoverVis->SetEmissive(common::Color(0,0,0));
+      }
       this->setCursor(Qt::ArrowCursor);
     }
 
@@ -458,6 +469,9 @@ void GLWidget::Clear()
   this->scene.reset();
   this->selectionVis.reset();
   this->hoverVis.reset();
+  this->selectionMod.clear();
+  this->selectionId = 0;
+  this->keyModifiers = 0;
 }
 
 
@@ -530,6 +544,9 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 
 void GLWidget::OnCreateScene(const std::string &_name)
 {
+  this->hoverVis.reset();
+  this->selectionVis.reset();
+
   this->ViewScene(rendering::get_scene(_name));
 }
 

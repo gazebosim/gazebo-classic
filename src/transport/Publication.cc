@@ -36,7 +36,7 @@ Publication::Publication( const std::string &topic, const std::string &msgType )
 // Destructor
 Publication::~Publication()
 {
-  this->prevMsgBuffer.clear();
+  this->publishers.clear();
 }
         
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,11 +54,14 @@ void Publication::AddSubscription(const NodePtr &_node)
   {
     this->nodes.push_back(_node);
 
-    std::list<std::string>::iterator msgIter;
-    for (msgIter = this->prevMsgBuffer.begin();
-         msgIter != this->prevMsgBuffer.end(); msgIter++)
+    std::vector<PublisherPtr>::iterator pubIter;
+    for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
+         pubIter++)
     {
-      _node->HandleData(this->topic, *msgIter);
+      if ((*pubIter)->GetLatching() && !(*pubIter)->GetPrevMsg().empty())
+      {
+        _node->HandleData(this->topic, (*pubIter)->GetPrevMsg());
+      }
     }
   }
 }
@@ -72,20 +75,20 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
   {
     this->callbacks.push_back(_callback);
 
-    if (_callback->GetLatching())
+    std::vector<PublisherPtr>::iterator pubIter;
+    for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
+         pubIter++)
     {
-      std::list<std::string>::iterator msgIter;
-      for (msgIter = this->prevMsgBuffer.begin();
-          msgIter != this->prevMsgBuffer.end(); msgIter++)
+      if ((*pubIter)->GetLatching())
       {
-        _callback->HandleData(*msgIter);
+        _callback->HandleData((*pubIter)->GetPrevMsg());
       }
     }
   } 
 }
 
 // A a transport
-void Publication::AddTransport( const PublicationTransportPtr &_publink)
+void Publication::AddTransport(const PublicationTransportPtr &_publink)
 {
   bool add = true;
 
@@ -111,7 +114,7 @@ void Publication::AddTransport( const PublicationTransportPtr &_publink)
   }
 }
 
-bool Publication::HasTransport( const std::string &_host, unsigned int _port )
+bool Publication::HasTransport(const std::string &_host, unsigned int _port)
 {
   std::list<PublicationTransportPtr>::iterator iter;
   for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
@@ -126,7 +129,6 @@ bool Publication::HasTransport( const std::string &_host, unsigned int _port )
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Remove a transport
 void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 {
@@ -163,13 +165,7 @@ void Publication::RemoveSubscription(const NodePtr &_node)
   if (this->nodes.size() == 0 && this->callbacks.size() == 0)
   {
     this->transports.clear();
-    this->prevMsgBuffer.clear();
   }
-}
-
-void Publication::ClearBuffer()
-{
-  this->prevMsgBuffer.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +186,6 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
   if (this->nodes.size() == 0 && this->callbacks.size() == 0)
   {
     this->transports.clear();
-    this->prevMsgBuffer.clear();
   }
 
 }
@@ -220,7 +215,6 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
   if (this->callbacks.size() == 0)
   {
     this->transports.clear();
-    this->prevMsgBuffer.clear();
   }
 }
 
@@ -311,10 +305,6 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 
   if (_cb)
     (_cb)();
-
-  if (this->prevMsgBuffer.size() > 10)
-    this->prevMsgBuffer.pop_front();
-  this->prevMsgBuffer.push_back(data);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,4 +356,14 @@ bool Publication::GetLocallyAdvertised() const
 void Publication::SetLocallyAdvertised(bool _value)
 {
   this->locallyAdvertised = _value;
+}
+
+void Publication::AddPublisher(PublisherPtr _pub)
+{
+  this->publishers.push_back(_pub);
+}
+
+void Publication::RemovePublisher()
+{
+
 }

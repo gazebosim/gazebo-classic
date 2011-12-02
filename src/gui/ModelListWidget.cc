@@ -1593,18 +1593,17 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->poseSub.reset();
   }
 
-
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_name);
 
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->requestPub = this->node->Advertise<msgs::Request>("~/request",5,true);
   this->responseSub = this->node->Subscribe("~/response", 
-      &ModelListWidget::OnResponse, this, false);
+      &ModelListWidget::OnResponse, this);
 
   //this->poseSub = this->node->Subscribe("~/pose/info",
   //    &ModelListWidget::OnPose, this);
 
   this->requestSub = this->node->Subscribe("~/request",
-      &ModelListWidget::OnRequest, this, false);
+      &ModelListWidget::OnRequest, this);
 }

@@ -27,16 +27,17 @@ using namespace transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Publisher::Publisher(unsigned int _limit)
+Publisher::Publisher(unsigned int _limit, bool _latch)
 {
   this->queueLimit = _limit;
+  this->latch = _latch;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType, 
-                     unsigned int _limit)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit)
+                     unsigned int _limit, bool _latch)
+  : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
 {
   this->mutex = new boost::recursive_mutex();
 }
@@ -67,35 +68,32 @@ bool Publisher::HasConnections() const
 ////////////////////////////////////////////////////////////////////////////////
 // Publish a message
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
-                            bool _block)
+                            bool /*_block*/)
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
   //if (!this->HasConnections())
-    //return;
+  //return;
 
-  /*if (_block)
+  // Save the latest message
+  google::protobuf::Message *msg = _message.New();
+  msg->CopyFrom(_message);
+
+  if (this->latch)
   {
-    TopicManager::Instance()->Publish(this->topic, _message);
+    msg->SerializeToString(&this->prevMsg);
   }
-  else
+
+  this->mutex->lock();
+  this->messages.push_back(msg);
+
+  if (this->messages.size() > this->queueLimit)
   {
-  */
-    // Save the latest message
-    google::protobuf::Message *msg = _message.New();
-    msg->CopyFrom( _message );
-
-    this->mutex->lock();
-    this->messages.push_back(msg);
-
-    if (this->messages.size() > this->queueLimit)
-    {
-      delete this->messages.front();
-      this->messages.pop_front();
-    }
-    this->mutex->unlock();
-  //}
+    delete this->messages.front();
+    this->messages.pop_front();
+  }
+  this->mutex->unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,4 +150,14 @@ void Publisher::OnPublishComplete()
 void Publisher::SetPublication(PublicationPtr &_publication, int _i)
 {
   this->publications[_i] = _publication;
+}
+
+bool Publisher::GetLatching() const
+{
+  return this->latch;
+}
+
+std::string Publisher::GetPrevMsg() const
+{
+  return this->prevMsg;
 }

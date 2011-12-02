@@ -184,8 +184,11 @@ void Connection::StopRead()
 // Write data out
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
+  // Don't enqueu empty messages
   if (_buffer.empty())
-    gzerr << "\n\n!!!!! ENQUEUE MESSAGE EMPTY DATA!!!!\n\n";
+  {
+    return;
+  }
 
   std::ostringstream header_stream;
 
