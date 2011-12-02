@@ -111,7 +111,7 @@ namespace gazebo
       public: virtual void Fini();
 
       public: virtual void Init() {}
-      public: virtual void Reset() {}
+      public: virtual void Reset();
       public: virtual void Update() {}
 
       /// \brief Update the parameters using new sdf values

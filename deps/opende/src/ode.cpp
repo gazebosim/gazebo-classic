@@ -1197,6 +1197,11 @@ dxJoint* createJoint(dWorldID w, dJointGroupID group)
     return j;
 }
 
+void dJointReset(dJointID _j)
+{
+  for (unsigned int i=0; i<6; i++)
+    _j->lambda[i] = 0.0;
+}
 
 dxJoint * dJointCreateBall (dWorldID w, dJointGroupID group)
 {

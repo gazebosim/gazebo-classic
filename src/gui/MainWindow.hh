@@ -54,6 +54,7 @@ namespace gazebo
       private slots: void ViewFullScreen();
       private slots: void ViewFPS();
       private slots: void ViewOrbit();
+      private slots: void OnResetWorld();
 
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool mode);
@@ -83,6 +84,7 @@ namespace gazebo
       private: QAction *quitAct;
 
       private: QAction *newModelAct;
+      private: QAction *resetWorldAct;
       private: QAction *editWorldPropertiesAct;
 
       private: QAction *playAct;

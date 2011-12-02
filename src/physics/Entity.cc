@@ -169,7 +169,6 @@ void Entity::SetInitialRelativePose(const math::Pose &p )
   this->initialRelativePose = p;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the bounding box for the entity 
 math::Box Entity::GetBoundingBox() const
@@ -456,6 +455,16 @@ void Entity::Fini()
 
   this->connections.clear();
   this->node->Fini();
+}
+
+void Entity::Reset()
+{
+  Base::Reset();
+
+  if (this->HasType(Base::MODEL))
+    this->SetWorldPose(this->initialRelativePose);
+  else
+    this->SetRelativePose(this->initialRelativePose);
 }
 
 //// Update the parameters using new sdf values

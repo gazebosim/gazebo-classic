@@ -242,9 +242,6 @@ void RenderEngine::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("default");
-  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
-                                            &RenderEngine::OnWorldModify, this);
-
   this->initialized = false;
 
   Ogre::ColourValue ambient;
@@ -530,24 +527,4 @@ void RenderEngine::CreateContext()
 
   glXMakeCurrent((Display*)this->dummyDisplay, 
       this->dummyWindowId, (GLXContext)this->dummyContext);
-}
-
-void RenderEngine::OnWorldModify(
-    const boost::shared_ptr<msgs::WorldModify const> &_msg)
-{
-  /*if (_msg->has_remove() && _msg->remove())
-  {
-    std::cout << "REnderingEngin::OnWorldModify\n";
-    this->removeScene = true;
-    this->removeSceneName = _msg->world_name();
-
-    transport::pause_incoming(true);
-  }
-  */
-  /*else if (_msg->has_create() && _msg->create())
-  {
-    std::cout << "Has Create!\n\n\n";
-    this->createScene = true;
-    this->createSceneName = _msg->world_name();
-  }*/
 }

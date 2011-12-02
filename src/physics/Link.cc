@@ -274,6 +274,17 @@ void Link::Fini()
   Entity::Fini();
 }
 
+void Link::Reset()
+{
+  Entity::Reset();
+  this->SetAngularVel(math::Vector3(0,0,0));
+  this->SetLinearVel(math::Vector3(0,0,0));
+  this->SetAngularAccel(math::Vector3(0,0,0));
+  this->SetLinearAccel(math::Vector3(0,0,0));
+  this->SetForce(math::Vector3(0,0,0));
+  this->SetTorque(math::Vector3(0,0,0));
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the parameters using new sdf values
 void Link::UpdateParameters( sdf::ElementPtr &_sdf )

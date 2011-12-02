@@ -105,6 +105,8 @@ namespace gazebo
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute( Attribute, int index, double value);
    
+      public: virtual void Reset();
+
       /// This is our id
       protected: dJointID jointId;
     

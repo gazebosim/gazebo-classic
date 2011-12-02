@@ -54,6 +54,8 @@ namespace gazebo
 
       /// \brief Finilize the physics engine
       public: virtual void Fini();
+
+      public: virtual void Reset() {}
    
       /// \brief Init the engine for threads. 
       public: virtual void InitForThread() = 0;

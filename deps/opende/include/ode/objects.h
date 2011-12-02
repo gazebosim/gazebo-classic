@@ -1626,6 +1626,8 @@ ODE_API void dBodySetGyroscopicMode(dBodyID b, int enabled);
  */
 
 
+ODE_API void dJointReset(dJointID);
+
 /**
  * @brief Create a new joint of the ball type.
  * @ingroup joints

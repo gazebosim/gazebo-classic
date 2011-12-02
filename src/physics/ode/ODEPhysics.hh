@@ -69,6 +69,8 @@ namespace gazebo
       /// \brief Initialize the ODE engine
       public: virtual void Init();
     
+      public: void Reset();
+
       /// \brief Init the engine for threads. 
       public: virtual void InitForThread();
     

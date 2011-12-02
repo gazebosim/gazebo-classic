@@ -65,6 +65,8 @@ namespace gazebo
       /// \brief Finalize the entity
       public: virtual void Fini();
 
+      public: virtual void Reset();
+
       /// \brief Update the parameters using new sdf values
       public: virtual void UpdateParameters( sdf::ElementPtr &_sdf );
 

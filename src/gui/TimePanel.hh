@@ -23,7 +23,10 @@ namespace gazebo
       private slots: void Update();
 
       private: void OnFullScreen(bool &_value);
-      private: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg);
+      private: void OnStats(
+                   const boost::shared_ptr<msgs::WorldStatistics const> &_msg);
+
+      private slots: void OnTimeReset();
 
       private: QLineEdit *percentRealTimeEdit;
       private: QLineEdit *simTimeEdit;
@@ -32,9 +35,10 @@ namespace gazebo
 
       private: common::Time lastUpdateTime,statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;
-      private: transport::SubscriberPtr statsSub;
 
       private: transport::NodePtr node;
+      private: transport::SubscriberPtr statsSub;
+      private: transport::PublisherPtr worldControlPub;
 
       private: std::vector<event::ConnectionPtr> connections;
     };

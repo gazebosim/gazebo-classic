@@ -108,6 +108,15 @@ void Base::Fini()
   this->parent.reset();
 }
 
+void Base::Reset()
+{
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  {
+    (*iter)->Reset();
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of the entity
 void Base::SetName(const std::string &_name)

@@ -123,9 +123,6 @@ namespace gazebo
       private: void Render();
       private: void PostRender();
 
-      private: void OnWorldModify(
-                   const boost::shared_ptr<msgs::WorldModify const> &_msg);
-
       /// Pointer to the root scene node
       public: Ogre::Root *root;
     
@@ -152,7 +149,6 @@ namespace gazebo
       private: friend class SingletonT<RenderEngine>;
 
       private: transport::NodePtr node;    
-      private: transport::SubscriberPtr worldModSub;
 
       private: bool removeScene;
       private: std::string removeSceneName;

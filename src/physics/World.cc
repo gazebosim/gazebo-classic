@@ -499,9 +499,14 @@ ModelPtr World::GetModel(unsigned int _index)
 // Reset the simulation to the initial settings
 void World::Reset()
 {
-  // Reset all the entities
-  for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
-    this->rootElement->GetChild(i)->Reset();
+  this->rootElement->Reset();
+
+  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); iter++)
+  {
+    (*iter)->Reset();
+  }
+  this->physicsEngine->Reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -640,6 +645,21 @@ void World::OnControl(const boost::shared_ptr<msgs::WorldControl const> &data)
 
   if (data->has_step())
     this->OnStep();
+
+  if (data->has_reset_time())
+  {
+    this->simTime = common::Time(0);
+    this->pauseTime = common::Time(0);
+    this->startTime = common::Time::GetWallTime();
+  }
+
+  if (data->has_reset_world())
+  {
+    this->Reset();
+    this->simTime = common::Time(0);
+    this->pauseTime = common::Time(0);
+    this->startTime = common::Time::GetWallTime();
+  }
 }
 
 void World::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)

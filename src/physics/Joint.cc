@@ -202,7 +202,7 @@ void Joint::ShowJoints(const bool & /*s_kk*/)
 /// Reset the joint
 void Joint::Reset()
 {
-  this->SetForce(0,0);
+  //this->SetForce(0,0);
   this->SetMaxForce(0,0);
   this->SetVelocity(0,0);
 }

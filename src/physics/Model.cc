@@ -331,46 +331,27 @@ const sdf::ElementPtr &Model::GetSDF()
 // Reset the model
 void Model::Reset()
 {
-  /* TODO: Put back in
-  JointContainer::iterator jiter;
-  Base_V::iterator biter;
-  std::map<std::string, Controller* >::iterator citer;
-  math::Vector3 v(0,0,0);
+  Entity::Reset();
 
-  //this->SetWorldPose(this->initPose);  // this has to be relative for nested models to work
-  this->SetRelativePose(this->initPose);  // this has to be relative for nested models to work
-
-  for (citer=this->controllers.begin(); citer!=this->controllers.end(); citer++)
-  {
-    citer->second->Reset();
-  }
-
-  for (jiter=this->joints.begin(); jiter!=this->joints.end(); jiter++)
+  for (Joint_V::iterator jiter=this->joints.begin();
+       jiter!=this->joints.end(); jiter++)
   {
     (*jiter)->Reset();
   }
 
-  for (biter=this->children.begin(); biter != this->children.end(); biter++)
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); iter++)
   {
-    if (*biter && (*biter)->HasType(LINK))
-    {
-      Link *link = (Link*)*biter;
-      link->SetLinearVel(v);
-      link->SetAngularVel(v);
-      link->SetForce(v);
-      link->SetTorque(v);
-    }
+    (*iter)->Reset();
   }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear velocity of the model
 void Model::SetLinearVel( const math::Vector3 &vel )
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (Base_V::iterator iter = this->children.begin();
+      iter != this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(LINK))
     {

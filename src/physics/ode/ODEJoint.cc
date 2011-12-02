@@ -366,3 +366,9 @@ void ODEJoint::SetAttribute( Attribute _attr, int /*_index*/, double _value)
       break;
   };
 }
+
+void ODEJoint::Reset()
+{
+  dJointReset(this->jointId);
+  Joint::Reset();
+}

@@ -252,10 +252,11 @@ void ODEPhysics::OnPhysicsMsg(
   {
     this->SetStepTime(_msg->dt());
   }
-  if (_msg->has_solver_type())
 
+  if (_msg->has_solver_type())
   {
-    sdf::ElementPtr solverElem = this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver");
+    sdf::ElementPtr solverElem =
+      this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver");
     if (_msg->solver_type() == "quick")
     {
       solverElem->GetAttribute("type")->Set("quick");
@@ -389,11 +390,18 @@ void ODEPhysics::Fini()
   PhysicsEngine::Fini();
 }
 
+void ODEPhysics::Reset()
+{
+  // Very important to clear out the contact group
+  dJointGroupEmpty( this->contactGroup );
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set the step time
 void ODEPhysics::SetStepTime(double _value)
 {
-  this->sdf->GetOrCreateElement("ode")->GetOrCreateElement("solver")->GetAttribute("dt")->Set(_value);
+  this->sdf->GetOrCreateElement("ode")->GetOrCreateElement(
+      "solver")->GetAttribute("dt")->Set(_value);
 
   this->stepTimeDouble = _value;
 }

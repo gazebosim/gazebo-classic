@@ -205,6 +205,13 @@ void MainWindow::NewModel()
   */
 }
 
+void MainWindow::OnResetWorld()
+{
+  msgs::WorldControl msg;
+  msg.set_reset_world(true);
+  this->worldControlPub->Publish(msg);
+}
+
 void MainWindow::EditWorldProperties()
 {
   if (!this->worldPropertiesWidget)
@@ -321,6 +328,12 @@ void MainWindow::CreateActions()
   this->newModelAct->setStatusTip(tr("Create a new model"));
   connect(this->newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
+  this->resetWorldAct = new QAction(tr("&Reset World"), this);
+  this->resetWorldAct->setShortcut(tr("Ctrl+R"));
+  this->resetWorldAct->setStatusTip(tr("Reset the world"));
+  connect(this->resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
+
+
   this->editWorldPropertiesAct = new QAction(tr("&World"), this);
   this->editWorldPropertiesAct->setShortcut(tr("Ctrl+W"));
   this->editWorldPropertiesAct->setStatusTip(tr("Edit World Properties"));
@@ -401,6 +414,7 @@ void MainWindow::CreateMenus()
 
   this->editMenu = this->menuBar()->addMenu(tr("&Edit"));
   //this->editMenu->addAction(this->newModelAct);
+  this->editMenu->addAction(this->resetWorldAct);
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
