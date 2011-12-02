@@ -40,6 +40,11 @@ EntityMaker::EntityMaker()
 /// Destructor
 EntityMaker::~EntityMaker()
 {
+  this->camera.reset();
+  this->node->Fini();
+  this->node.reset();
+  this->visPub.reset();
+  this->requestPub.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +78,8 @@ math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 p)
 
   if (this->snapToGrid)
   {
-    math::Vector3 rounded = (p / this->snapGridSize).GetRounded() * this->snapGridSize;
+    math::Vector3 rounded = (p / this->snapGridSize).GetRounded() *
+      this->snapGridSize;
     if (p.Distance( rounded ) < this->snapDistance)
       result = rounded;
   }

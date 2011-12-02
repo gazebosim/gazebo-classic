@@ -48,7 +48,8 @@ void PublicationTransport::Init(const ConnectionPtr &conn_)
 
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher
-  this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish, this, _1));
+  this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish,
+        this, _1));
 
   this->shutdownConnectionPtr = this->connection->ConnectToShutdown(
       boost::bind(&PublicationTransport::OnConnectionShutdown, this));
@@ -56,7 +57,6 @@ void PublicationTransport::Init(const ConnectionPtr &conn_)
 
 void PublicationTransport::OnConnectionShutdown()
 {
-  gzdbg << "Publication transport connection shutdown\n";
 }
 
 void PublicationTransport::AddCallback(

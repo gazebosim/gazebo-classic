@@ -572,7 +572,9 @@ bool MainWindow::HasEntityName(const std::string &_name)
 void MainWindow::OnWorldModify(
     const boost::shared_ptr<msgs::WorldModify const> &_msg)
 {
-  if (_msg->has_remove() && _msg->remove())
+  if (_msg->has_create() && _msg->create())
+    this->renderWidget->CreateScene(_msg->world_name());
+  else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
   else if (_msg->has_create() && _msg->create())
     this->renderWidget->CreateScene(_msg->world_name());

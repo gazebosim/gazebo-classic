@@ -37,32 +37,32 @@ SphereMaker::SphereMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
-  this->visualMsg->mutable_geometry()->set_type(  msgs::Geometry::SPHERE );
-  this->visualMsg->mutable_material()->set_script( "Gazebo/TurquoiseGlowOutline" );
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(), math::Quaternion());
+  this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::SPHERE);
+  this->visualMsg->mutable_material()->set_script(
+      "Gazebo/TurquoiseGlowOutline" );
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
+      math::Quaternion());
 }
 
 SphereMaker::~SphereMaker()
 {
+  this->camera.reset();
   delete this->visualMsg;
 }
 
 void SphereMaker::Start(const rendering::UserCameraPtr camera)
-                        //const CreateCallback &cb)
 {
-  //this->createCB = cb;
   this->camera = camera;
 
   std::ostringstream stream;
   stream << "__GZ_USER_sphere_" << counter++;
-  this->visualMsg->set_name( stream.str() );
-
+  this->visualMsg->set_name(stream.str());
   this->state = 1;
 }
 
 void SphereMaker::Stop()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", 
+  msgs::Request *msg = msgs::CreateRequest("entity_delete",
                                            this ->visualMsg->name());
 
   this->requestPub->Publish(*msg);
@@ -124,14 +124,14 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
     return;
   }
 
-  p2 = this->GetSnappedPoint( p2 );
+  p2 = this->GetSnappedPoint(p2);
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
-  math::Vector3 p( this->visualMsg->pose().position().x(),
-                   this->visualMsg->pose().position().y(),
-                   this->visualMsg->pose().position().z() );
+  math::Vector3 p(this->visualMsg->pose().position().x(),
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z() );
 
   p.z = scale;
 
@@ -149,19 +149,22 @@ void SphereMaker::CreateTheEntity()
     <model name='custom_user_sphere" << counter << "_model'>\
     <origin pose='" << this->visualMsg->pose().position().x() << " " 
                     << this->visualMsg->pose().position().y() << " " 
-                    << this->visualMsg->geometry().sphere().radius() << " 0 0 0'/>\
+                    << this->visualMsg->geometry().sphere().radius()
+                    << " 0 0 0'/>\
     <link name='body'>\
       <inertial mass='1.0'>\
           <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
       </inertial>\
       <collision name='geom'>\
         <geometry>\
-          <sphere radius='" << this->visualMsg->geometry().sphere().radius() << "'/>\
+          <sphere radius='" << this->visualMsg->geometry().sphere().radius()
+          << "'/>\
         </geometry>\
       </collision>\
       <visual name='visual' cast_shadows='true'>\
         <geometry>\
-          <sphere radius='" << this->visualMsg->geometry().sphere().radius() << "'/>\
+          <sphere radius='" << this->visualMsg->geometry().sphere().radius()
+          << "'/>\
         </geometry>\
         <material script='Gazebo/Grey'/>\
       </visual>\
@@ -169,11 +172,13 @@ void SphereMaker::CreateTheEntity()
   </model>\
   </gazebo>";
 
-  msg.set_sdf( newModelStr.str() );
+  msg.set_sdf(newModelStr.str());
 
-  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete", this->visualMsg->name());
+  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
+      this->visualMsg->name());
   this->requestPub->Publish(*requestMsg);
   delete requestMsg;
 
   this->makerPub->Publish(msg);
+  this->camera.reset();
 }

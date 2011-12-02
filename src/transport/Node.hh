@@ -88,7 +88,7 @@ namespace gazebo
       template<typename M, typename T>
       SubscriberPtr Subscribe(const std::string &topic,
           void(T::*fp)(const boost::shared_ptr<M const> &), T *obj,
-          bool _latching=true)
+          bool _latching=false)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
@@ -105,7 +105,7 @@ namespace gazebo
       /// \brief Subscribe to a topic, and return data on the callback
       template<typename M>
       SubscriberPtr Subscribe(const std::string &topic,
-          void(*fp)(const boost::shared_ptr<M const> &), bool _latching=true)
+          void(*fp)(const boost::shared_ptr<M const> &), bool _latching=false)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);

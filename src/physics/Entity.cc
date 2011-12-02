@@ -231,8 +231,6 @@ math::Pose Entity::GetRelativePose() const
 /// Set the pose of the entity relative to its parent
 void Entity::SetRelativePose(const math::Pose &_pose, bool notify)
 {
-  //std::cout << "Entity::SetRelativePose[" << this->GetName() << "][" 
-  //          << _pose.pos << "]\n";
   if (this->parent && this->parentEntity)
     this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), notify);
   else
@@ -269,8 +267,6 @@ void Entity::SetWorldTwist(const math::Vector3 &linear, const math::Vector3 &ang
 
 void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
 {
-  //std::cout << "Entity::SetWorldPoseModel[" << this->GetName() << "][" 
-  //          <<  _pose.pos << "]\n";
   math::Pose oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
@@ -311,8 +307,6 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
 
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 {
-  //std::cout << "Entity::SetWorldPoseCanonicalLink[" << this->GetName() << "]["
-  //          << _pose.pos << "]\n";
   this->worldPose = _pose;
   this->worldPose.Correct();
 
@@ -337,8 +331,6 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify)
 
 void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 {
-  //std::cout << "Entity::SetWorldPoseDefault[" << this->GetName() << "][" 
-  //          << _pose.pos << "]\n";
   this->worldPose = _pose;
   this->worldPose.Correct();
 

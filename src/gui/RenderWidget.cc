@@ -30,7 +30,6 @@ RenderWidget::RenderWidget( QWidget *parent )
 
   this->glWidget = new GLWidget(this->mainFrame);
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
-  //this->glWidget->ViewScene(scene);
 
   this->xPosEdit = new QLineEdit;
   this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit) );

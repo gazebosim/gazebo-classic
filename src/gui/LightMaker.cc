@@ -102,4 +102,5 @@ void LightMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
 void LightMaker::CreateTheEntity()
 {
   this->lightPub->Publish(this->msg);
+  this->camera.reset();
 }

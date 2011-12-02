@@ -213,12 +213,6 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
-
-  /*this->sceneMsg.clear_model();
-  this->sceneMsg.set_name(this->GetName());
-  this->BuildSceneMsg(this->sceneMsg, this->rootElement);
-  this->scenePub->Publish(this->sceneMsg);
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -25,7 +25,7 @@ namespace gazebo
     /// \brief A helper class to handle callbacks when messages arrive 
     class CallbackHelper
     {
-      public: CallbackHelper() : latching(true) {}
+      public: CallbackHelper() : latching(false) {}
 
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const = 0;

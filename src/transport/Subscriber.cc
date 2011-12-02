@@ -62,8 +62,4 @@ void Subscriber::Unsubscribe() const
   {
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
   }
-  else
-  {
-    gzerr << "\n\nSub unsun with callback\n\n";
-  }
 }

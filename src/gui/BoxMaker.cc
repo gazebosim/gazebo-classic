@@ -47,13 +47,12 @@ BoxMaker::BoxMaker()
 
 BoxMaker::~BoxMaker()
 {
+  this->camera.reset();
   delete this->visualMsg;
 }
 
 void BoxMaker::Start(const rendering::UserCameraPtr _camera)
-                     //const CreateCallback &cb)
 {
-  //this->createCB = cb;
   this->camera = _camera;
 
   std::ostringstream stream;
@@ -199,4 +198,5 @@ void BoxMaker::CreateTheEntity()
   delete requestMsg;
 
   this->makerPub->Publish(msg);
+  this->camera.reset();
 }

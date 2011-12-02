@@ -1496,8 +1496,8 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &_msg)
     this->MakeStatic();
     */
 
-  //if (_msg->has_pose())
-    //this->SetWorldPose( msgs::Convert(_msg->pose()) );
+  if (_msg->has_pose())
+    this->SetWorldPose( msgs::Convert(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());

@@ -69,8 +69,6 @@ void OrbitViewController::Init(const math::Vector3 &_focalPoint)
   this->focalPoint = _focalPoint;
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
 
-  std::cout << "OrbitInit. FP[" << this->focalPoint << "] Distance[" << this->distance << "] Pos[" << this->camera->GetWorldPosition() << "]\n";
-
   this->refVisual->SetVisible(false);
   this->refVisual->SetWorldPosition( this->focalPoint );
 }

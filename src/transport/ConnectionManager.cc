@@ -179,6 +179,7 @@ void ConnectionManager::Stop()
 void ConnectionManager::Run()
 {
   std::list<ConnectionPtr>::iterator iter;
+  std::list<ConnectionPtr>::iterator endIter;
   while (!this->stop)
   {
     this->masterMessagesMutex->lock();
@@ -194,7 +195,9 @@ void ConnectionManager::Run()
 
     this->connectionMutex->lock();
     iter = this->connections.begin();
-    while (iter != this->connections.end())
+    endIter = this->connections.end();
+    this->connectionMutex->unlock();
+    while (iter != endIter)
     {
       if ((*iter)->IsOpen())
       {
@@ -203,10 +206,11 @@ void ConnectionManager::Run()
       }
       else
       {
+        this->connectionMutex->lock();
         iter = this->connections.erase( iter );
+        this->connectionMutex->unlock();
       }
     }
-    this->connectionMutex->unlock();
 
     common::Time::MSleep(30);
   }

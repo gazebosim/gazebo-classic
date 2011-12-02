@@ -1,5 +1,4 @@
 #include <QtGui>
-#include <google/profiler.h>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -585,7 +584,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     meshMessage->mutable_scale()->set_z(z);
   }
   else
-    std::cout << "Unknown geom type[" << type << "]\n";
+    gzerr << "Unknown geom type[" << type << "]\n";
 }
 
 void ModelListWidget::FillPoseMsg(QtProperty *_item, 
@@ -1381,7 +1380,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
 void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
                                        QtProperty * /*_parent*/)
 {
-  ProfilerStart("/tmp/modellist.prof");
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
@@ -1413,8 +1411,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
  
     this->FillPropertyTree(_msg.link(i),topItem);
   }
-
-  ProfilerStop();
 }
 
 void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,

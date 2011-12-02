@@ -172,11 +172,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
   // If the publication exits, just add the subscription to it 
   if (pub)
-  {
     pub->AddSubscription(_ops.GetNode());
-  }
-  else if (_ops.GetTopic() == "/gazebo/default/selection")
-    gzdbg << "No publication\n";
 
   // Use this to find other remote publishers
   ConnectionManager::Instance()->Subscribe(_ops.GetTopic(), _ops.GetMsgType(),

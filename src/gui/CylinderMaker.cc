@@ -46,6 +46,7 @@ CylinderMaker::CylinderMaker()
 
 CylinderMaker::~CylinderMaker()
 {
+  this->camera.reset();
   delete this->visualMsg;
 }
 
@@ -197,5 +198,6 @@ void CylinderMaker::CreateTheEntity()
   delete requestMsg;
 
   this->makerPub->Publish(msg);
+  this->camera.reset();
 }
 

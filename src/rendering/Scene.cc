@@ -101,6 +101,8 @@ void Scene::Clear()
   this->sceneMsgs.clear();
   this->jointMsgs.clear();
   this->cameras.clear();
+  this->userCameras.clear();
+
 
   while (this->visuals.size() > 0)
   {
@@ -272,7 +274,6 @@ void Scene::InitShadows()
   this->manager->setShadowTextureCasterMaterial("shadow_caster");
 
   //const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
-  //printf("NumShadowRTTS[%d]\n", numShadowRTTs );
 
   /*for (unsigned i = 0; i < numShadowRTTs; ++i) 
   {
