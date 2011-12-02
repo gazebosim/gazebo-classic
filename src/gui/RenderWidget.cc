@@ -106,9 +106,9 @@ RenderWidget::RenderWidget( QWidget *parent )
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0,0,0,0);
 
-  QTimer *timer = new QTimer(this);
-  connect( timer, SIGNAL(timeout()), this, SLOT(update()) );
-  timer->start(33);
+  this->timer = new QTimer(this);
+  connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
+  this->timer->start(33);
 
   this->connections.push_back( 
       gui::Events::ConnectFullScreen( 
@@ -179,7 +179,7 @@ void RenderWidget::update()
 
   rendering::UserCameraPtr cam = this->glWidget->GetCamera();
 
-  if (!cam)
+  if (!cam || !cam->initialized)
   {
     event::Events::preRender();
     return;

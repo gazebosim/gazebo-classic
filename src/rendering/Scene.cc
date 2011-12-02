@@ -252,8 +252,6 @@ void Scene::Init()
 
   // Register this scene the the real time shaders system
   this->selectionObj->Init();
-
-  //this->InitShadows();
 }
 
 // TODO: put this back in, and disable PSSM shadows in the RTShader. 

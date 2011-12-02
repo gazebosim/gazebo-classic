@@ -47,7 +47,7 @@ MainWindow::MainWindow()
       &MainWindow::OnResponse, this, false);
 
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
-                                            &MainWindow::OnWorldModify, this);
+                                            &MainWindow::OnWorldModify, this,false);
 
   (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
   this->CreateActions();
@@ -144,6 +144,7 @@ void MainWindow::Open()
       tr("Open World"), "",
       tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
 
+  gzdbg << "Open File[" << filename << "]\n";
   if (!filename.empty())
   {
     msgs::ServerControl msg;

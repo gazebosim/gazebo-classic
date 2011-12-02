@@ -139,6 +139,7 @@ void RenderEngine::Load()
 ScenePtr RenderEngine::CreateScene(const std::string &_name, 
                                    bool _enableVisualizations)
 {
+  gzdbg << "Create scene start\n";
   ScenePtr scene(new Scene(_name, _enableVisualizations));
   this->scenes.push_back(scene);
 
@@ -150,6 +151,7 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
 
   rendering::Events::createScene(_name);
 
+  gzdbg << "Create scene done\n";
   return scene;
 }
 
@@ -170,6 +172,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
     (*iter)->Clear();
     (*iter).reset();
     this->scenes.erase(iter);
+
   }
 }
 

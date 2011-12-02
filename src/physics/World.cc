@@ -331,27 +331,22 @@ void World::Update()
 // Finilize the world
 void World::Fini()
 {
-  std::cout << "----- World FIINI ----- \n";
   this->Stop();
   this->plugins.clear();
 
   this->node->Fini();
 
-  std::cout << "Delete entities\n";
   if (this->rootElement)
   {
     this->rootElement->Fini();
     this->rootElement.reset();
   }
-  std::cout << "DONE Delete entities\n";
 
   if (this->physicsEngine)
   {
     this->physicsEngine->Fini();
     this->physicsEngine.reset();
   }
-
-  std::cout << "****************** END WORLD FINI *********************\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -793,6 +788,7 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_info")
     {
+      std::cout << "Entity Info\n";
       BasePtr entity = this->rootElement->GetByName( (*iter).data() );
       if (entity)
       {
@@ -842,6 +838,8 @@ void World::ProcessRequestMsgs()
         response.set_type("error");
         response.set_response( "nonexistant" );
       }
+
+      std::cout << "Entity Info done\n";
     }
     else if ((*iter).request() == "scene_info")
     {

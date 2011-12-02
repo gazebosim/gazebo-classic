@@ -59,8 +59,10 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   
   this->connections.push_back( event::Events::ConnectShowCameras( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
 
-  this->connections.push_back( event::Events::ConnectRender( boost::bind(&Camera::Render, this) ) );
-  this->connections.push_back( event::Events::ConnectPostRender( boost::bind(&Camera::PostRender, this) ) );
+  this->connections.push_back(
+      event::Events::ConnectRender( boost::bind(&Camera::Render, this)));
+  this->connections.push_back( event::Events::ConnectPostRender(
+        boost::bind(&Camera::PostRender, this)));
 
   this->animState = NULL;
 
@@ -504,12 +506,13 @@ void UserCamera::MoveToPosition( const math::Vector3 &_end,
 }
 
 //////////////////////////////////////////////////////////////////////////////
-void UserCamera::SetRenderTarget( Ogre::RenderTarget *_target )
+void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->gui->Init(this->renderTarget);
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////////////////////////////////

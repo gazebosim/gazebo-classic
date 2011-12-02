@@ -50,7 +50,7 @@ namespace gazebo
 
       private: bool create;
       private: std::string createName;
-
+      private: QTimer *timer;
     };
   }
 }

@@ -313,6 +313,9 @@ namespace gazebo
       ///        frustum
       public: bool IsVisible(const std::string &_visualName);
 
+      /// \brief Returns true if initialized
+      public: bool GetInitialized() const;
+
       protected: bool TrackVisualImpl( const std::string &_visualName);
 
       /// \brief Set the camera to track a scene node
@@ -328,8 +331,10 @@ namespace gazebo
                      bool _inheritOrientation,
                      double _minDist=0, double _maxDist=0 );
 
-      /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
-      private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
+      /// \brief if user requests bayer image, post process rgb from ogre
+      ///        to generate bayer formats
+      private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
+                                      std::string format,int width, int height);
 
       private: static int GetOgrePixelFormat( const std::string &_format );
   
@@ -385,6 +390,8 @@ namespace gazebo
       private: friend class Scene;
 
       private: sdf::ElementPtr imageElem;
+
+      public: bool initialized;
     };
     
     /// \}

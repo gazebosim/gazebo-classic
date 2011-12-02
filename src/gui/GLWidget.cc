@@ -136,7 +136,7 @@ void GLWidget::moveEvent(QMoveEvent *e)
 
 void GLWidget::paintEvent(QPaintEvent *e)
 {
-  if (this->userCamera)
+  if (this->userCamera && this->userCamera->initialized)
   {
     event::Events::preRender();
 

@@ -203,6 +203,7 @@ void Server::SetParams( const common::StrStr_M &params )
 
 void Server::OnControl(const boost::shared_ptr<msgs::ServerControl const> &_msg)
 {
+  std::cout << "Got control msag\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }

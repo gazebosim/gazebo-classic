@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <google/profiler.h>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -376,7 +377,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
   {
     if (!this->HasChildItem(*iter, _item))
       continue;
-    std::cout << "Has Item[" << (*iter)->propertyName().toStdString() << "]\n";
 
     const google::protobuf::FieldDescriptor *field =
       descriptor->FindFieldByName((*iter)->propertyName().toStdString());
@@ -409,7 +409,6 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     }
   }
 
-  std::cout << "\n\n" << msg.DebugString() << "\n\n";
   this->modelPub->Publish(msg);
 
   this->propMutex->unlock();
@@ -657,8 +656,6 @@ void ModelListWidget::FillMsg(QtProperty *_item,
   if (!_item)
     return;
 
-  std::cout << "::FillMsg[" << _item->propertyName().toStdString() << "]\n";
-
   if (_item->propertyName().toStdString() == "link")
   {
     QtProperty *nameItem = this->GetChildItem(_item,"name");
@@ -681,10 +678,8 @@ void ModelListWidget::FillMsg(QtProperty *_item,
   }
   else if (_item->propertyName().toStdString() == "pose")
   {
-    std::cout << "Item is a pose\n";
     if (this->HasChildItem(_item, _changedItem))
     {
-      std::cout << "Filling pose message\n";
       this->FillPoseMsg(_item, _message, _descriptor);
     }
   }
@@ -698,7 +693,6 @@ void ModelListWidget::FillMsg(QtProperty *_item,
     {
       if (!this->HasChildItem(*iter, _changedItem))
         continue;
-      std::cout << "    Has Item[" << (*iter)->propertyName().toStdString() << "]\n";
       const google::protobuf::FieldDescriptor *field =
         _descriptor->FindFieldByName((*iter)->propertyName().toStdString());
 
@@ -919,40 +913,6 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
   return result;
 }
 
-
-/*void ModelListWidget::FillSDF( QtProperty *_item, QtProperty *_parent, 
-                               std::string &_sdf )
-{
-  std::string name = _item->propertyName().toStdString();
-  std::string value = _item->valueText().toStdString();
-
-  if (_item->hasValue())
-  {
-    std::cout << " " << name << "='" << value << "'";
-  }
-  else
-  {
-    std::cout << "<" << name;
-
-    bool closed = false;
-    QList<QtProperty*> subProperties = _item->subProperties();
-    for (QList<QtProperty*>::iterator iter = subProperties.begin(); 
-        iter != subProperties.end(); iter++)
-    {
-      if ( !(*iter)->hasValue() && !closed )
-      {
-        closed = true;
-        std::cout << ">\n";
-      }
-      this->FillSDF(*iter, _item, _sdf);
-    }
-
-    std::cout << "</" << name << ">\n";
-  }
-}*/
-
-
-
 void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
                                        QtProperty *_parent)
 {
@@ -960,15 +920,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   QtProperty *inertialItem = NULL;
   QtVariantProperty *item = NULL;
 
-  item = this->variantManager->addProperty(QVariant::String,
-                                           QLatin1String("name"));
+  item = this->variantManager->addProperty(QVariant::String, tr("name"));
   item->setValue(_msg.name().c_str());
   _parent->addSubProperty(item);
 
-
   // Self-collide
-  item = this->variantManager->addProperty(QVariant::Bool,
-                                           QLatin1String("self_collide"));
+  item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
   if (_msg.has_self_collide())
     item->setValue(_msg.self_collide());
   else
@@ -976,8 +933,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   _parent->addSubProperty(item);
 
   // gravity
-  item = this->variantManager->addProperty(QVariant::Bool,
-                                           QLatin1String("gravity"));
+  item = this->variantManager->addProperty(QVariant::Bool, tr("gravity"));
   if (_msg.has_gravity())
     item->setValue(_msg.gravity());
   else
@@ -985,8 +941,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   _parent->addSubProperty(item);
 
   // kinematic
-  item = this->variantManager->addProperty(QVariant::Bool,
-                                           QLatin1String("kinematic"));
+  item = this->variantManager->addProperty(QVariant::Bool, tr("kinematic"));
   if (_msg.has_kinematic())
     item->setValue(_msg.kinematic());
   else
@@ -994,20 +949,17 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   _parent->addSubProperty(item);
 
   topItem = this->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("pose"));
+      QtVariantPropertyManager::groupTypeId(), tr("pose"));
   _parent->addSubProperty(topItem);
   this->FillPoseProperty(_msg.pose(), topItem);
 
   // Inertial
   inertialItem = this->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("inertial"));
+      QtVariantPropertyManager::groupTypeId(), tr("inertial"));
   _parent->addSubProperty(inertialItem);
 
   // Inertial::Mass
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("mass"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("mass"));
   if (_msg.inertial().has_mass())
     item->setValue(_msg.inertial().mass());
   else
@@ -1016,7 +968,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 
   // Inertial::LinearDamping
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("linear_damping"));
+                                           tr("linear_damping"));
   if (_msg.inertial().has_linear_damping())
     item->setValue(_msg.inertial().linear_damping());
   else
@@ -1025,7 +977,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 
   // Inertial::AngularDamping
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("angular_damping"));
+                                           tr("angular_damping"));
   if (_msg.inertial().has_angular_damping())
     item->setValue(_msg.inertial().angular_damping());
   else
@@ -1033,8 +985,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::ixx
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("ixx"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("ixx"));
   if (_msg.inertial().has_ixx())
     item->setValue(_msg.inertial().ixx());
   else
@@ -1042,8 +993,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::ixy
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("ixy"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("ixy"));
   if (_msg.inertial().has_ixy())
     item->setValue(_msg.inertial().ixy());
   else
@@ -1051,8 +1001,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::ixz
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("ixz"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("ixz"));
   if (_msg.inertial().has_ixz())
     item->setValue(_msg.inertial().ixz());
   else
@@ -1060,8 +1009,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::iyy
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("iyy"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("iyy"));
   if (_msg.inertial().has_iyy())
     item->setValue(_msg.inertial().iyy());
   else
@@ -1069,8 +1017,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::iyz
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("iyz"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("iyz"));
   if (_msg.inertial().has_iyz())
     item->setValue(_msg.inertial().iyz());
   else
@@ -1078,8 +1025,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   // Inertial::izz
-  item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("izz"));
+  item = this->variantManager->addProperty(QVariant::Double, tr("izz"));
   if (_msg.inertial().has_izz())
     item->setValue(_msg.inertial().izz());
   else
@@ -1087,17 +1033,15 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   inertialItem->addSubProperty(item);
 
   topItem = this->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("pose"));
+      QtVariantPropertyManager::groupTypeId(), tr("pose"));
   inertialItem->addSubProperty(topItem);
   this->FillPoseProperty(_msg.inertial().pose(), topItem);
-
 
   for (int i=0; i < _msg.collision_size(); i++)
   {
     topItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("collision"));
+        tr("collision"));
     _parent->addSubProperty(topItem);
  
     this->FillPropertyTree(_msg.collision(i),topItem);
@@ -1108,7 +1052,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   {
     topItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("visual"));
+        tr("visual"));
     _parent->addSubProperty(topItem);
     this->FillPropertyTree(_msg.visual(i),topItem);
   }
@@ -1117,12 +1061,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   {
     topItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("sensor"));
+        tr("sensor"));
     _parent->addSubProperty(topItem);
  
     //this->FillPropertyTree(_msg.sensor(i),topItem);
   }
-
 }
 
 void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
@@ -1132,13 +1075,13 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
   QtVariantProperty *item = NULL;
 
   item = this->variantManager->addProperty(QVariant::String,
-                                           QLatin1String("name"));
+                                           tr("name"));
   item->setValue(_msg.name().c_str());
   _parent->addSubProperty(item);
 
   // Laser Retro value
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("laser_retro"));
+                                           tr("laser_retro"));
   if (_msg.has_laser_retro())
     item->setValue(_msg.laser_retro());
   else
@@ -1148,21 +1091,21 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
   // Pose value
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("pose"));
+      tr("pose"));
   _parent->addSubProperty(topItem);
   this->FillPoseProperty(_msg.pose(), topItem);
 
   // Geometry shape value
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("geometry"));
+      tr("geometry"));
   _parent->addSubProperty(topItem);
   this->FillPropertyTree(_msg.geometry(), topItem);
 
   // Surface value
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("surface"));
+      tr("surface"));
   _parent->addSubProperty(topItem);
   this->FillPropertyTree(_msg.surface(), topItem);
 }
@@ -1175,86 +1118,86 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
 
   // Restituion Coefficient
   item = this->variantManager->addProperty(QVariant::Double,
-      QLatin1String("restitution_coefficient"));
+      tr("restitution_coefficient"));
   item->setValue(_msg.restitution_coefficient());
   _parent->addSubProperty(item);
 
   // Bounce Threshold
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("bounce_threshold"));
+                                           tr("bounce_threshold"));
   item->setValue(_msg.bounce_threshold());
   _parent->addSubProperty(item);
 
   // Soft CFM
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("soft_cfm"));
+                                           tr("soft_cfm"));
   item->setValue(_msg.soft_cfm());
   _parent->addSubProperty(item);
 
   // Soft ERP
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("soft_erp"));
+                                           tr("soft_erp"));
   item->setValue(_msg.soft_erp());
   _parent->addSubProperty(item);
 
   // KP
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("kp"));
+                                           tr("kp"));
   item->setValue(_msg.kp());
   _parent->addSubProperty(item);
 
   // KD
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("kd"));
+                                           tr("kd"));
   item->setValue(_msg.kd());
   _parent->addSubProperty(item);
 
   // max vel
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("max_vel"));
+                                           tr("max_vel"));
   item->setValue(_msg.max_vel());
   _parent->addSubProperty(item);
 
   // min depth
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("min_depth"));
+                                           tr("min_depth"));
   item->setValue(_msg.min_depth());
   _parent->addSubProperty(item);
 
   // Friction
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("friction"));
+      tr("friction"));
   _parent->addSubProperty(topItem);
 
   // Mu
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("mu"));
+                                           tr("mu"));
   item->setValue(_msg.friction().mu());
   topItem->addSubProperty(item);
 
   // Mu2
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("mu2"));
+                                           tr("mu2"));
   item->setValue(_msg.friction().mu2());
   topItem->addSubProperty(item);
 
   // slip1
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("slip1"));
+                                           tr("slip1"));
   item->setValue(_msg.friction().slip1());
   topItem->addSubProperty(item);
 
   // slip2
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("slip2"));
+                                           tr("slip2"));
   item->setValue(_msg.friction().slip2());
   topItem->addSubProperty(item);
 
   // Fdir1
   QtProperty *fdirItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("fdir1"));
+      tr("fdir1"));
     topItem->addSubProperty(fdirItem);
     this->FillVector3dProperty(_msg.friction().fdir1(), fdirItem);
 }
@@ -1265,7 +1208,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   QtVariantProperty *item = NULL;
 
   item = this->variantManager->addProperty(
-      QtVariantPropertyManager::enumTypeId(), QLatin1String("type"));
+      QtVariantPropertyManager::enumTypeId(), tr("type"));
   QStringList types;
   types << "BOX" << "SPHERE" << "CYLINDER" << "PLANE" << "MESH" << "IMAGE" 
         << "HEIGHTMAP";
@@ -1277,7 +1220,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(0);
     QtProperty *sizeItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("size"));
+        tr("size"));
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.box().size(), sizeItem);
   }
@@ -1286,7 +1229,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(1);
 
     item = this->variantManager->addProperty(QVariant::Double,
-        QLatin1String("radius"));
+        tr("radius"));
     item->setValue(_msg.sphere().radius());
     _parent->addSubProperty(item);
   }
@@ -1294,12 +1237,12 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
   {
     item->setValue(2);
     item = this->variantManager->addProperty(QVariant::Double,
-        QLatin1String("radius"));
+        tr("radius"));
     item->setValue(_msg.cylinder().radius());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Double,
-        QLatin1String("length"));
+        tr("length"));
     item->setValue(_msg.cylinder().length());
     _parent->addSubProperty(item);
   }
@@ -1308,7 +1251,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(3);
     QtProperty *normalItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("normal"));
+        tr("normal"));
     _parent->addSubProperty(normalItem);
     this->FillVector3dProperty(_msg.plane().normal(), normalItem);
   }
@@ -1317,13 +1260,13 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(4);
 
     item = this->variantManager->addProperty(QVariant::String,
-        QLatin1String("filename"));
+        tr("filename"));
     item->setValue(_msg.mesh().filename().c_str());
     _parent->addSubProperty(item);
 
     QtProperty *sizeItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("scale"));
+        tr("scale"));
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.mesh().scale(), sizeItem);
   }
@@ -1332,27 +1275,27 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(5);
 
     item = this->variantManager->addProperty(QVariant::String,
-        QLatin1String("filename"));
+        tr("filename"));
     item->setValue(_msg.image().filename().c_str());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Double,
-        QLatin1String("scale"));
+        tr("scale"));
     item->setValue(_msg.image().scale());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Double,
-        QLatin1String("height"));
+        tr("height"));
     item->setValue(_msg.image().height());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Int,
-        QLatin1String("threshold"));
+        tr("threshold"));
     item->setValue(_msg.image().threshold());
     _parent->addSubProperty(item);
 
     item = this->variantManager->addProperty(QVariant::Int,
-        QLatin1String("granularity"));
+        tr("granularity"));
     item->setValue(_msg.image().granularity());
     _parent->addSubProperty(item);
   }
@@ -1361,19 +1304,19 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     item->setValue(6);
 
     item = this->variantManager->addProperty(QVariant::String,
-        QLatin1String("filename"));
+        tr("filename"));
     item->setValue(_msg.image().filename().c_str());
     _parent->addSubProperty(item);
 
     QtProperty *sizeItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("size"));
+        tr("size"));
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.heightmap().size(), sizeItem);
 
     sizeItem = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("offset"));
+        tr("offset"));
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.heightmap().offset(), sizeItem);
   }
@@ -1388,13 +1331,13 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
 
   // Name value
   item = this->variantManager->addProperty(QVariant::String,
-                                           QLatin1String("name"));
+                                           tr("name"));
   item->setValue(_msg.name().c_str());
   _parent->addSubProperty(item);
 
   // Laser Retro value
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("laser_retro"));
+                                           tr("laser_retro"));
   if (_msg.has_laser_retro())
     item->setValue(_msg.laser_retro());
   else
@@ -1403,7 +1346,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
 
   // cast shadows value
   item = this->variantManager->addProperty(QVariant::Bool,
-                                           QLatin1String("cast_shadows"));
+                                           tr("cast_shadows"));
   if (_msg.has_cast_shadows())
     item->setValue(_msg.cast_shadows());
   else
@@ -1412,7 +1355,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
 
   // transparency
   item = this->variantManager->addProperty(QVariant::Double,
-                                           QLatin1String("transparency"));
+                                           tr("transparency"));
   if (_msg.has_transparency())
     item->setValue(_msg.transparency());
   else
@@ -1423,14 +1366,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
   // Pose value
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("pose"));
+      tr("pose"));
   _parent->addSubProperty(topItem);
   this->FillPoseProperty(_msg.pose(), topItem);
 
   // Geometry shape value
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("geometry"));
+      tr("geometry"));
   _parent->addSubProperty(topItem);
   this->FillPropertyTree(_msg.geometry(), topItem);
 }
@@ -1438,17 +1381,18 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
 void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
                                        QtProperty * /*_parent*/)
 {
+  ProfilerStart("/tmp/modellist.prof");
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
   item = this->variantManager->addProperty(QVariant::String,
-                                           QLatin1String("name"));
+                                           tr("name"));
   item->setValue(_msg.name().c_str());
   this->propTreeBrowser->addProperty(item);
 
 
   item = this->variantManager->addProperty(QVariant::Bool,
-                                           QLatin1String("is_static"));
+                                           tr("is_static"));
   if (_msg.has_is_static())
     item->setValue(_msg.is_static());
   else
@@ -1457,19 +1401,20 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(),
-      QLatin1String("pose"));
+      tr("pose"));
   this->propTreeBrowser->addProperty(topItem);
   this->FillPoseProperty(_msg.pose(), topItem);
 
   for (int i=0; i < _msg.link_size(); i++)
   {
     topItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(),
-        QLatin1String("link"));
+        QtVariantPropertyManager::groupTypeId(), tr("link"));
     this->propTreeBrowser->addProperty(topItem);
  
     this->FillPropertyTree(_msg.link(i),topItem);
   }
+
+  ProfilerStop();
 }
 
 void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
@@ -1597,7 +1542,12 @@ void ModelListWidget::OnPose(
     const boost::shared_ptr<msgs::Pose const> &_msg)
 {
   this->receiveMutex->lock();
+  if (this->selectedProperty &&
+      this->selectedProperty->valueText().toStdString().find(
+        _msg->name()) != std::string::npos)
+  {
   this->poseMsgs.push_back(*_msg);
+  }
   this->receiveMutex->unlock();
 }
 
@@ -1656,8 +1606,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->responseSub = this->node->Subscribe("~/response", 
       &ModelListWidget::OnResponse, this, false);
 
-  this->poseSub = this->node->Subscribe("~/pose/info",
-      &ModelListWidget::OnPose, this);
+  //this->poseSub = this->node->Subscribe("~/pose/info",
+  //    &ModelListWidget::OnPose, this);
 
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this, false);

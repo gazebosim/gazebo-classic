@@ -48,6 +48,7 @@ unsigned int Camera::cameraCounter = 0;
 // Constructor
 Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 {
+  this->initialized = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile( "/sdf/camera.sdf", this->sdf );
 
@@ -1041,6 +1042,7 @@ void Camera::CreateRenderTexture( const std::string &textureName )
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
   RTShaderSystem::AttachViewport(this->GetViewport(), this->GetScene());
+  this->initialized = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1231,4 +1233,9 @@ bool Camera::IsVisible(VisualPtr _visual)
 bool Camera::IsVisible(const std::string &_visualName)
 {
   return this->IsVisible(this->scene->GetVisual(_visualName));
+}
+
+bool Camera::GetInitialized() const
+{
+  return this->initialized;
 }

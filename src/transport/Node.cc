@@ -132,6 +132,10 @@ bool Node::HandleData(const std::string &_topic, const std::string &_msg)
 
 void Node::ProcessIncoming()
 {
+  // Hack...
+  if (!this->incomingMutex)
+    return;
+
   Callback_M::iterator cbIter;
   Callback_L::iterator liter;
   std::list<std::string>::iterator msgIter;

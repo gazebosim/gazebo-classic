@@ -99,15 +99,21 @@ void TopicManager::ProcessNodes()
   int s = this->nodes.size();
   this->nodeMutex->unlock();
   for (int i = 0; i < s; i ++)
+  {
     this->nodes[i]->ProcessPublishers();
+  }
 
   if (!this->pauseIncoming)
   {
     this->nodeMutex->lock();
-    int s = this->nodes.size();
+    s = this->nodes.size();
     this->nodeMutex->unlock();
     for (int i = 0; i < s; i ++)
+    {
       this->nodes[i]->ProcessIncoming();
+      if (this->pauseIncoming)
+        break;
+    }
   }
 }
 
@@ -129,8 +135,6 @@ void TopicManager::Publish(const std::string &_topic,
 
   if (pub)
     pub->Publish(_message, _cb); 
-  else
-    gzerr << "No publication...this shouldn't happen\n";
 
   if (dbgPub && dbgPub->GetCallbackCount() > 0)
   {

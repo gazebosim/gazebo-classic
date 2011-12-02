@@ -47,7 +47,6 @@ ODELink::ODELink(EntityPtr parent)
 // Destructor
 ODELink::~ODELink()
 {
-  std::cout << "ODELink::Destructor[" << this->GetName() << "]\n";
   if (this->linkId)
     dBodyDestroy(this->linkId);
   this->linkId = NULL;
