@@ -116,7 +116,6 @@ namespace gazebo
       /// \brief Set the torque applied to the body
       public: virtual void SetTorque(const math::Vector3 &force) = 0;
   
-  
       /// \brief Get the linear velocity of the body
       public: math::Vector3 GetRelativeLinearVel() const;
   

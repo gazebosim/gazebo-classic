@@ -241,7 +241,7 @@ void RenderEngine::PostRender()
 void RenderEngine::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init();
   this->initialized = false;
 
   Ogre::ColourValue ambient;
@@ -249,8 +249,6 @@ void RenderEngine::Init()
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
   /// initialize properly
-  
-  
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );

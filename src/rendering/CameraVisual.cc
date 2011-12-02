@@ -62,13 +62,14 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   plane.normal = Ogre::Vector3::NEGATIVE_UNIT_X;
   plane.d = dist;
 
-  Ogre::MeshManager::getSingleton().createPlane("floor", 
+  Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor", 
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
       plane, width, height, 1, 1, true, 1, 1.0f, 1.0f, 
       Ogre::Vector3::UNIT_Z);
 
   Ogre::Entity* planeEnt = 
-    this->scene->GetManager()->createEntity("plane", "floor");
+    this->scene->GetManager()->createEntity(this->GetName() + "__plane", 
+        this->GetName() + "__floor");
   planeEnt->setMaterialName(this->GetName()+"_RTT_material");
   planeEnt->setCastShadows(false);
   planeEnt->setVisibilityFlags( GZ_VISIBILITY_GUI );

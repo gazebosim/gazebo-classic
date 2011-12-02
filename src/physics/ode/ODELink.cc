@@ -356,7 +356,7 @@ void ODELink::SetForce(const math::Vector3 &force)
 {
   if (this->linkId)
   {
-    dBodyAddForce(this->linkId, force.x, force.y, force.z);
+    dBodySetForce(this->linkId, force.x, force.y, force.z);
   }
 }
 
@@ -387,7 +387,7 @@ void ODELink::SetTorque(const math::Vector3 &torque)
 {
   if (this->linkId)
   {
-    dBodyAddRelTorque(this->linkId, torque.x, torque.y, torque.z);
+    dBodySetTorque(this->linkId, torque.x, torque.y, torque.z);
   }
 }
 

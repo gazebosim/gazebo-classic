@@ -29,10 +29,8 @@ namespace gazebo
     /// \brief Load the sensor library
     bool load();
 
-    /// \brief Create a sensor
-    /// \param type: Type name of the sensors (camera, laser, etc)
-    /// \return SensorPtr: Pointer to the new sensor (NULL on failure)
-    SensorPtr create_sensor(const std::string &type);
+    std::string create_sensor(sdf::ElementPtr _elem,
+                              const std::string &_parentName);
 
     /// \brief Run the sensor generation one step.
     /// \param force: If true, all sensors are forced to update. Otherwise
@@ -50,6 +48,10 @@ namespace gazebo
 
     // \brief Remove all sensors.
     bool remove_sensors();
+
+    /// \brief Get a sensor by name
+    SensorPtr get_sensor(const std::string &_name);
+
     /// \}
   }
 }
