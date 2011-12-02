@@ -700,6 +700,8 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     sdf::ElementPtr sdfBox = sdfGeom->AddElement("box");
     if (firstChildElement(_config,"scale"))
       sdfBox->GetAttribute("size")->SetFromString( getNodeValue(_config, "scale") );
+    else if (firstChildElement(_config,"size"))
+      sdfBox->GetAttribute("size")->SetFromString( getNodeValue(_config, "size") );
     else
       sdfBox->GetAttribute("size")->SetFromString("1 1 1");
   }
@@ -707,7 +709,15 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   {
     sdf::ElementPtr sdfSphere = sdfGeom->AddElement("sphere");
     if (firstChildElement(_config,"scale"))
-      sdfSphere->GetAttribute("radius")->SetFromString( getNodeTuple(_config, "scale", 0) );
+    {
+      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0)); // FIXME: using first elem
+      sdfSphere->GetAttribute("radius")->Set( 0.5*sx );
+    }
+    else if (firstChildElement(_config,"size"))
+    {
+      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "size", 0)); // FIXME: using first elem
+      sdfSphere->GetAttribute("radius")->Set( 0.5*sx );
+    }
     else
       sdfSphere->GetAttribute("radius")->SetFromString( "1.0" );
   }
@@ -720,6 +730,12 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       double sx = boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
       sdfCylinder->GetAttribute("radius")->Set( 0.5*sx );
       sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "scale", 2) );
+    }
+    else if (firstChildElement(_config,"size"))
+    {
+      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "size", 0));
+      sdfCylinder->GetAttribute("radius")->Set( 0.5*sx );
+      sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "size", 2) );
     }
     else
     {
