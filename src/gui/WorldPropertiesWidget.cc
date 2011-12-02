@@ -16,16 +16,15 @@ WorldPropertiesWidget::WorldPropertiesWidget( QWidget *parent )
 
   QTabWidget *tabWidget = new QTabWidget;
   this->sceneWidget = new SceneWidget;
-  //this->physicsWidget = new PhysicsWidget;
+  this->physicsWidget = new PhysicsWidget;
 
-  //tabWidget->addTab(this->sceneWidget, tr("Scene") );
-  //tabWidget->addTab(this->physicsWidget, tr("Physics") );
+  tabWidget->addTab(this->sceneWidget, tr("Scene") );
+  tabWidget->addTab(this->physicsWidget, tr("Physics") );
 
   mainLayout->addWidget(tabWidget);
 
   this->setLayout(mainLayout);
   this->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-
 }
 
 WorldPropertiesWidget::~WorldPropertiesWidget()
@@ -34,8 +33,8 @@ WorldPropertiesWidget::~WorldPropertiesWidget()
 
 void WorldPropertiesWidget::showEvent(QShowEvent * /*_event*/)
 {
-  //this->sceneWidget->Init();
-  //this->physicsWidget->Init();
+  this->sceneWidget->Init();
+  this->physicsWidget->Init();
 }
 
 void WorldPropertiesWidget::closeEvent(QCloseEvent * /*_event*/)
@@ -77,8 +76,9 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
   gravityLayout->addWidget(this->gravityZLineEdit);
 
 
-  QGroupBox *solverBox = new QGroupBox( tr("Solver") );
-  solverBox->setStyleSheet(tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
+  QGroupBox *solverBox = new QGroupBox(tr("Solver"));
+  solverBox->setStyleSheet(
+      tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
   QVBoxLayout *solverBoxLayout = new QVBoxLayout;
   solverBox->setLayout(solverBoxLayout);
 
@@ -128,7 +128,8 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
   solverBoxLayout->addLayout( dtLayout );
 
   QGroupBox *constraintsBox = new QGroupBox( tr("Constraints") );
-  constraintsBox->setStyleSheet(tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
+  constraintsBox->setStyleSheet(
+      tr("QGroupBox{border: 1px solid black; padding-top: 2ex;}"));
   QVBoxLayout *constraintsBoxLayout = new QVBoxLayout;
   constraintsBox->setLayout(constraintsBoxLayout);
 
@@ -164,7 +165,8 @@ PhysicsWidget::PhysicsWidget(QWidget *parent )
 
   QHBoxLayout *surfaceLayerLayout = new QHBoxLayout;
   this->surfaceLayerLineEdit = new QLineEdit;
-  this->surfaceLayerLineEdit->setValidator(new QDoubleValidator(this->surfaceLayerLineEdit) );
+  this->surfaceLayerLineEdit->setValidator(
+      new QDoubleValidator(this->surfaceLayerLineEdit) );
   this->surfaceLayerLineEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->surfaceLayerLineEdit->setFixedWidth(80);
   QLabel *surfaceLayerLabel = new QLabel(tr("Surface Layer:"));
@@ -223,11 +225,12 @@ PhysicsWidget::~PhysicsWidget()
 void PhysicsWidget::Init()
 {
   this->initialized = false;
-  this->requestMsg = msgs::CreateRequest( "physics_info" );
-  this->requestPub->Publish( *this->requestMsg );
+  this->requestMsg = msgs::CreateRequest("physics_info");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
-void PhysicsWidget::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
+void PhysicsWidget::OnResponse(
+    const boost::shared_ptr<msgs::Response const> &_msg)
 {
   if (this->initialized || !this->requestMsg || 
       this->requestMsg->id() != _msg->id())
@@ -335,8 +338,6 @@ void PhysicsWidget::OnResponse(const boost::shared_ptr<msgs::Response const> &_m
   
     this->initialized = true;
   }
-  else
-    gzerr << "Unable to process message type[" << _msg->type() << "]\n";
 
   delete this->requestMsg;
   this->requestMsg = NULL;
@@ -641,6 +642,7 @@ void SceneWidget::OnFogToggle(bool _value)
   else
     msg.mutable_fog()->set_type( msgs::Fog::NONE );
 
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -656,6 +658,8 @@ void SceneWidget::OnFogType(int _index)
     msg.mutable_fog()->set_type( msgs::Fog::EXPONENTIAL );
   else 
     msg.mutable_fog()->set_type( msgs::Fog::EXPONENTIAL2 );
+
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -665,6 +669,8 @@ void SceneWidget::OnFogDensity(double _density)
     return;
   msgs::Scene msg;
   msg.mutable_fog()->set_density(_density );
+
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -677,6 +683,8 @@ void SceneWidget::OnFogStart()
   if (!value.empty())
   {
     msg.mutable_fog()->set_start(boost::lexical_cast<double>( value ));
+
+    msg.set_name(this->sceneName);
     this->scenePub->Publish(msg);
   }
 }
@@ -690,6 +698,8 @@ void SceneWidget::OnFogEnd()
   if (!value.empty())
   {
     msg.mutable_fog()->set_end(boost::lexical_cast<double>( value ));
+
+    msg.set_name(this->sceneName);
     this->scenePub->Publish(msg);
   }
 }
@@ -712,6 +722,8 @@ void SceneWidget::OnAmbientColor()
   msg.mutable_ambient()->set_g( color.green() /255.0 );
   msg.mutable_ambient()->set_b( color.blue() /255.0 );
   msg.mutable_ambient()->set_a( 1.0 );
+
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -734,6 +746,7 @@ void SceneWidget::OnBackgroundColor()
   msg.mutable_background()->set_g( color.green() / 255.0 );
   msg.mutable_background()->set_b( color.blue() / 255.0 );
   msg.mutable_background()->set_a( 1.0 );
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -755,6 +768,7 @@ void SceneWidget::OnFogColor()
   msg.mutable_fog()->mutable_color()->set_g( color.green() / 255.0 );
   msg.mutable_fog()->mutable_color()->set_b( color.blue() / 255.0 );
   msg.mutable_fog()->mutable_color()->set_a( 1.0 );
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -765,6 +779,7 @@ void SceneWidget::OnShadows(bool _state)
 
   msgs::Scene msg;
   msg.set_shadows( _state );
+  msg.set_name(this->sceneName);
   this->scenePub->Publish(msg);
 }
 
@@ -779,7 +794,8 @@ void SceneWidget::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg
   msgs::Scene sceneMsg;
   if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
   {
-    sceneMsg.ParseFromString( _msg->serialized_data() );
+    sceneMsg.ParseFromString(_msg->serialized_data());
+    this->sceneName = sceneMsg.name();
 
     if (sceneMsg.has_ambient())
     {

@@ -101,9 +101,11 @@ namespace gazebo
 
       private slots: void OnShadows(bool _state=false);
 
-      private: void OnResponse(const boost::shared_ptr<msgs::Response const> &_msg);
+      private: void OnResponse(
+                   const boost::shared_ptr<msgs::Response const> &_msg);
 
       public: bool initialized;
+      private: std::string sceneName;
       private: QPushButton *ambientColorButton;
       private: QFrame *ambientColorFrame;
 

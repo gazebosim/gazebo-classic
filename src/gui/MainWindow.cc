@@ -400,7 +400,7 @@ void MainWindow::CreateMenus()
   this->fileMenu->addAction(this->quitAct);
 
   this->editMenu = this->menuBar()->addMenu(tr("&Edit"));
-  this->editMenu->addAction(this->newModelAct);
+  //this->editMenu->addAction(this->newModelAct);
   this->editMenu->addAction(this->editWorldPropertiesAct);
 
   this->viewMenu = this->menuBar()->addMenu(tr("&View"));
@@ -530,14 +530,20 @@ void MainWindow::OnResponse(
 void MainWindow::OnSetSelectedEntity(const std::string &_name)
 {
   std::map<std::string, unsigned int>::iterator iter;
-  msgs::Selection msg;
-  msg.set_name(_name);
+  std::string name = _name;
+  boost::replace_first(name, gui::get_world()+"::","");
 
-  iter = this->entities.find(_name);
+  msgs::Selection msg;
+  msg.set_name(name);
+
+  iter = this->entities.find(name);
   if (iter != this->entities.end())
     msg.set_id(iter->second);
   else
+  {
+
     gzerr << "Unable to find model[" << _name << "]\n";
+  }
 
   this->selectionPub->Publish(msg);
 }
@@ -545,12 +551,16 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name)
 unsigned int MainWindow::GetEntityId(const std::string &_name)
 {
   unsigned int result = 0;
+
+  std::string name = _name;
+  boost::replace_first(name, gui::get_world()+"::","");
+
   std::map<std::string, unsigned int>::iterator iter;
-  iter = this->entities.find(_name);
+  iter = this->entities.find(name);
   if (iter != this->entities.end())
     result = iter->second;
   else
-    gzerr << "Unable to find model[" << _name << "]\n";
+    gzerr << "Unable to find model[" << name << "]\n";
 
   return result;
 }

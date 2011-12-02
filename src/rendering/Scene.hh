@@ -234,17 +234,26 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
   
-      private: void OnRequest( const boost::shared_ptr<msgs::Request const> &_msg);
-      private: void OnResponse( const boost::shared_ptr<msgs::Response const> &_msg);
+      private: void OnRequest(
+                   const boost::shared_ptr<msgs::Request const> &_msg);
+      private: void OnResponse(
+                   const boost::shared_ptr<msgs::Response const> &_msg);
       private: void OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
 
-      private: void ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg);
-      private: void ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
+      private: void ProcessSensorMsg(
+                   const boost::shared_ptr<msgs::Sensor const> &_msg);
+      private: void ProcessJointMsg(
+                   const boost::shared_ptr<msgs::Joint const> &_msg);
 
-      private: void ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg);
+      private: void ProcessSceneMsg(
+                   const boost::shared_ptr<msgs::Scene const> &_msg);
 
-      private: void OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
-      private: void ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
+      private: void OnSceneMsg(
+                   const boost::shared_ptr<msgs::Scene const> &_msg);
+      private: void OnVisualMsg(
+                   const boost::shared_ptr<msgs::Visual const> &msg);
+      private: void ProcessVisualMsg(
+                   const boost::shared_ptr<msgs::Visual const> &msg);
 
       private: void OnLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
       private: void ProcessLightMsg(
@@ -304,6 +313,7 @@ namespace gazebo
       private: boost::mutex *receiveMutex;
 
       private: transport::NodePtr node;  
+      private: transport::SubscriberPtr sceneSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
       private: transport::SubscriberPtr poseSub;

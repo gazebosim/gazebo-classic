@@ -751,9 +751,10 @@ void World::ProcessRequestMsgs()
   for (iter = this->requestMsgs.begin();
        iter != this->requestMsgs.end(); iter++)
   {
+    bool send = true;
     response.set_id((*iter).id());
-    response.set_request( (*iter).request() );
-    response.set_response( "success" );
+    response.set_request((*iter).request());
+    response.set_response("success");
 
     if ((*iter).request() == "entity_list")
     {
@@ -780,7 +781,6 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_info")
     {
-      std::cout << "Entity Info\n";
       BasePtr entity = this->rootElement->GetByName( (*iter).data() );
       if (entity)
       {
@@ -842,8 +842,11 @@ void World::ProcessRequestMsgs()
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type( sceneMsg.GetTypeName() );
     }
+    else
+      send = false;
 
-    this->responsePub->Publish(response);
+    if (send)
+      this->responsePub->Publish(response);
   }
 
   this->requestMsgs.clear();
@@ -858,7 +861,7 @@ void World::ProcessModelMsgs()
   {
     ModelPtr model = this->GetModelById((*iter).id());
     if (!model)
-      gzerr << "Unable to find model[" << (*iter).name() << "]\n";
+      gzerr << "Unable to find model[" << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
     else
     {
       model->ProcessMsg(*iter);

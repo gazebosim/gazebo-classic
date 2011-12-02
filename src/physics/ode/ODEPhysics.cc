@@ -217,8 +217,8 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
 void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 {
   msgs::Response response;
-  response.set_id( _msg->id() );
-  response.set_request( _msg->request() );
+  response.set_id(_msg->id());
+  response.set_request(_msg->request());
   response.set_response( "success" );
   std::string *serializedData = response.mutable_serialized_data();
 
@@ -232,7 +232,8 @@ void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
     physicsMsg.set_sor( this->GetSORPGSW() );
     physicsMsg.set_cfm( this->GetWorldCFM() );
     physicsMsg.set_erp( this->GetWorldERP() );
-    physicsMsg.set_contact_max_correcting_vel( this->GetContactMaxCorrectingVel() );
+    physicsMsg.set_contact_max_correcting_vel(
+        this->GetContactMaxCorrectingVel() );
     physicsMsg.set_contact_surface_layer( this->GetContactSurfaceLayer() );
     physicsMsg.mutable_gravity()->CopyFrom( msgs::Convert(this->GetGravity()) );
 

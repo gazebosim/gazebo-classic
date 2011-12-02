@@ -27,7 +27,7 @@
 #include "common/Console.hh"
 #include "rendering/RTShaderSystem.hh"
 
-#define MINOR_VERSION 700
+#define MINOR_VERSION 7
 using namespace gazebo;
 using namespace rendering;
 

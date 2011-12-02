@@ -426,6 +426,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   else if (!this->selectionMod.empty() && this->selectionVis)
   {
     msgs::Model msg;
+    std::cout << "Selection Name[" << this->selectionVis->GetName() << "] Id[" << gui::get_entity_id(this->selectionVis->GetName()) << "]\n";
     msg.set_id(gui::get_entity_id(this->selectionVis->GetName()));
     msg.set_name(this->selectionVis->GetName());
 

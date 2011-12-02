@@ -1538,11 +1538,20 @@ void ModelListWidget::OnPose(
     const boost::shared_ptr<msgs::Pose const> &_msg)
 {
   this->receiveMutex->lock();
-  if (this->selectedProperty &&
-      this->selectedProperty->valueText().toStdString().find(
-        _msg->name()) != std::string::npos)
+  if (_msg->name().find(this->selectedModelName) != std::string::npos)
   {
-  this->poseMsgs.push_back(*_msg);
+    std::list<msgs::Pose>::iterator iter;
+
+    // Find an old model message, and remove them
+    for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+    {
+      if ((*iter).name() == _msg->name() )
+      {
+        this->poseMsgs.erase(iter);
+        break;
+      }
+    }
+    this->poseMsgs.push_back(*_msg);
   }
   this->receiveMutex->unlock();
 }
@@ -1601,8 +1610,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->responseSub = this->node->Subscribe("~/response", 
       &ModelListWidget::OnResponse, this);
 
-  //this->poseSub = this->node->Subscribe("~/pose/info",
-  //    &ModelListWidget::OnPose, this);
+  this->poseSub = this->node->Subscribe("~/pose/info",
+      &ModelListWidget::OnPose, this);
 
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this);

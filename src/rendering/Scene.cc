@@ -78,6 +78,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
 
+  this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
   this->lightSub = this->node->Subscribe("~/light", &Scene::OnLightMsg, this);
   this->poseSub = this->node->Subscribe("~/pose/info", &Scene::OnPoseMsg, this);
@@ -1084,6 +1085,12 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
                   elem->GetValueDouble("start"),
                   elem->GetValueDouble("end"));
   }
+}
+
+void Scene::OnSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->sceneMsgs.push_back(_msg);
 }
 
 void Scene::OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
