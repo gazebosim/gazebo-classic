@@ -85,11 +85,17 @@ namespace gazebo
       public: virtual void SetAngularVel(const math::Vector3 &vel);
   
       /// \brief Set the force applied to the link
-      public: virtual void SetForce(const math::Vector3 &force);
+      public: virtual void SetForce(const math::Vector3 &_force);
   
       /// \brief Set the torque applied to the link
-      public: virtual void SetTorque(const math::Vector3 &force);
+      public: virtual void SetTorque(const math::Vector3 &_torque);
+
+      /// \brief Add a force to the body
+      public: virtual void AddForce(const math::Vector3 &_force);
   
+      /// \brief Add a torque to the body
+      public: virtual void AddTorque(const math::Vector3 &_torque);
+ 
       /// \brief Get the linear velocity of the link in the world frame
       public: virtual math::Vector3 GetWorldLinearVel() const;
   

@@ -16,7 +16,7 @@ link_directories(
 find_package( GTest REQUIRED )
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
-set (gtest_sources transport.cc speed.cc)
+set (gtest_sources transport.cc speed.cc factory.cc)
 
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})

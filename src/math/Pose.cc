@@ -53,6 +53,12 @@ Pose::~Pose()
 {
 }
 
+void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
+{
+  this->pos = _pos;
+  this->rot = _rot;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // See if a pose is finite (e.g., not nan)
 bool Pose::IsFinite() const

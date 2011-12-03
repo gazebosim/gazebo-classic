@@ -83,7 +83,7 @@ Collision::~Collision()
 void Collision::Fini()
 {
   msgs::Request *msg = msgs::CreateRequest("entity_delete",
-      this->GetCompleteScopedName()+"__COLLISION_VISUAL__");
+      this->GetScopedName()+"__COLLISION_VISUAL__");
   this->requestPub->Publish(*msg, true);
 
   Entity::Fini();
@@ -111,8 +111,8 @@ void Collision::Load(sdf::ElementPtr &_sdf)
       this->shape->GetType() != RAY_SHAPE)
   {
     msgs::Visual msg;
-    msg.set_name(this->GetCompleteScopedName()+"__COLLISION_VISUAL__");
-    msg.set_parent_name(this->GetCompleteScopedName());
+    msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+    msg.set_parent_name(this->GetScopedName());
     msg.set_is_static(this->IsStatic());
     msg.set_cast_shadows(false);
     msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
@@ -194,12 +194,12 @@ void Collision::CreateBoundingBox()
     box = this->GetBoundingBox();
 
     std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "::BBVISUAL" ;
+    visname << this->GetScopedName() << "::BBVISUAL" ;
 
     msgs::Visual msg;
     msg.mutable_geometry()->set_type( msgs::Geometry::BOX );
-    msg.set_parent_name( this->GetCompleteScopedName() );
-    msg.set_name( this->GetCompleteScopedName() + "_BBVISUAL" );
+    msg.set_parent_name( this->GetScopedName() );
+    msg.set_name( this->GetScopedName() + "_BBVISUAL" );
     msg.set_cast_shadows(false);
 
     //msg.set_visible( RenderState::GetShowBoundingBoxes() );

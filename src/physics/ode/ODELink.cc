@@ -350,16 +350,29 @@ math::Vector3 ODELink::GetWorldAngularVel() const
   return vel;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Set the force applied to the link
-void ODELink::SetForce(const math::Vector3 &force)
+void ODELink::SetForce(const math::Vector3 &_force)
 {
   if (this->linkId)
-  {
-    dBodySetForce(this->linkId, force.x, force.y, force.z);
-  }
+    dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
 }
 
+void ODELink::SetTorque(const math::Vector3 &_torque)
+{
+  if (this->linkId)
+    dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+}
+
+void ODELink::AddForce(const math::Vector3 &_force)
+{
+  if (this->linkId)
+    dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
+}
+  
+void ODELink::AddTorque(const math::Vector3 &_torque)
+{
+  if (this->linkId)
+    dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the force applied to the link in the world frame
@@ -381,15 +394,7 @@ math::Vector3 ODELink::GetWorldForce() const
   return force;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Set the torque applied to the link
-void ODELink::SetTorque(const math::Vector3 &torque)
-{
-  if (this->linkId)
-  {
-    dBodySetTorque(this->linkId, torque.x, torque.y, torque.z);
-  }
-}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

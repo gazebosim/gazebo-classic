@@ -43,7 +43,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param pos A position
       /// \param rot A rotation
-      public: Pose( const Vector3 &pos, const Quaternion &rot);
+      public: Pose(const Vector3 &pos, const Quaternion &rot);
     
       /// \brief Copy constructor
       /// \param pose Pose to copy
@@ -51,7 +51,9 @@ namespace gazebo
     
       /// \brief Destructor
       public: virtual ~Pose();
-    
+
+      public: void Set(const Vector3 &_pos, const Quaternion &_rot);
+
       /// \brief See if a pose is finite (e.g., not nan)
       public: bool IsFinite() const;
     

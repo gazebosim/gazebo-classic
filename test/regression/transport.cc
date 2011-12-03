@@ -153,17 +153,18 @@ TEST_F(ServerTest, PubSub)
 
   msgs::Scene msg;
   msgs::Init(msg, "test");
+  msg.set_name("default");
 
-  scenePub->Publish( msg );
+  scenePub->Publish(msg);
 
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
   for (unsigned int i=0; i < 100; i++)
   {
-    pubs.push_back( node->Advertise<msgs::Scene>("~/scene") );
-    subs.push_back( node->Subscribe("~/scene", &ReceiveSceneMsg) );
-    scenePub->Publish( msg );
+    pubs.push_back(node->Advertise<msgs::Scene>("~/scene") );
+    subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg) );
+    scenePub->Publish(msg);
   }
 
   pubs.clear();

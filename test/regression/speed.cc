@@ -12,8 +12,8 @@ using namespace gazebo;
 
 double g_percent = 0;
 
-Server *server = NULL;
 std::string g_worldFile;
+Server *server = NULL;
 
 void OnStats(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
 {
@@ -38,11 +38,10 @@ void RunServer()
 void SpeedTest(double minSpeed)
 {
   boost::thread thread(boost::bind(RunServer));
-  while (!server || !server->IsRunning())
+  while (!server || !server->GetInitialized())
     usleep(1000000);
 
-  usleep(1000000);
-  transport::NodePtr node = transport::NodePtr( new transport::Node() );
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
   ASSERT_NO_THROW(node->Init());
   transport::SubscriberPtr sub = node->Subscribe("~/world_stats", OnStats);
 

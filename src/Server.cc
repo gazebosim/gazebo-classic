@@ -33,9 +33,9 @@ Server::~Server()
   delete this->master;
 }
 
-bool Server::IsRunning() const
+bool Server::GetInitialized() const
 {
-  return !this->stop;
+  return !this->stop && !transport::is_stopped();
 }
 
 void Server::LoadPlugin(const std::string &_filename)

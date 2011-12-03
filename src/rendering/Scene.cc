@@ -986,9 +986,8 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   {
     modelName = _msg->model(i).name() + "::";
     boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
-    pm->set_name(sceneName + _msg->model(i).name());
+    pm->set_name(_msg->model(i).name());
     this->poseMsgs.push_front(pm);
-
 
     for (int j=0; j < _msg->model(i).visual_size(); j++)
     {
@@ -999,7 +998,7 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
 
     for (int j=0; j < _msg->model(i).link_size(); j++)
     {
-      linkName = sceneName + modelName +_msg->model(i).link(j).name(); 
+      linkName = modelName +_msg->model(i).link(j).name(); 
       boost::shared_ptr<msgs::Pose> pm2(
           new msgs::Pose(_msg->model(i).link(j).pose()));
       pm2->set_name(linkName);

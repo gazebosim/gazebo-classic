@@ -308,7 +308,8 @@ std::string Base::GetScopedName() const
 
   while (p)
   {
-    scopedName.insert(0, p->GetName()+"::");
+    if (p->GetParent())
+      scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
 
@@ -317,7 +318,7 @@ std::string Base::GetScopedName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of this entity with the model scope
-/// model1::...::modelN::entityName
+/// world::model1::...::modelN::entityName
 std::string Base::GetCompleteScopedName() const
 {
   BasePtr p = this->parent;

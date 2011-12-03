@@ -98,7 +98,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   this->visPub = this->node->Advertise<msgs::Visual>("~/visual", 10);
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
-  this->visualMsg->set_name(this->GetCompleteScopedName());
+  this->visualMsg->set_name(this->GetScopedName());
 
   if (this->sdf->HasElement("origin"))
   {
@@ -115,11 +115,11 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   }
 
   if (this->parent)
-    this->visualMsg->set_parent_name( this->parent->GetCompleteScopedName() );
+    this->visualMsg->set_parent_name( this->parent->GetScopedName() );
 
   this->visPub->Publish(*this->visualMsg);
 
-  this->poseMsg->set_name(this->GetCompleteScopedName());
+  this->poseMsg->set_name(this->GetScopedName());
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
@@ -436,7 +436,7 @@ LinkPtr Entity::GetChildLink(const std::string &_name)
 /// Called when a new pose message arrives
 void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 {
-  if (_msg->name() == this->GetCompleteScopedName())
+  if (_msg->name() == this->GetScopedName())
   {
     math::Pose p = msgs::Convert(*_msg);
     this->SetWorldPose( p );
@@ -446,7 +446,7 @@ void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
 void Entity::Fini()
 {
   msgs::Request *msg = msgs::CreateRequest("entity_delete", 
-      this->GetCompleteScopedName());
+      this->GetScopedName());
 
   this->requestPub->Publish(*msg, true);
 

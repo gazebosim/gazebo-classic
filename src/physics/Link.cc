@@ -114,9 +114,9 @@ void Link::Load(sdf::ElementPtr &_sdf)
     {
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
 
-      std::string visName = this->GetCompleteScopedName() + "::" + msg.name();
+      std::string visName = this->GetScopedName() + "::" + msg.name();
       msg.set_name(visName);
-      msg.set_parent_name( this->GetCompleteScopedName() );
+      msg.set_parent_name( this->GetScopedName() );
       msg.set_is_static( this->IsStatic() );
 
       this->visPub->Publish(msg);
@@ -150,9 +150,7 @@ void Link::Load(sdf::ElementPtr &_sdf)
     while (sensorElem)
     {
       std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetCompleteScopedName());
-      //std::string sensorName = sensors::SensorManager::Instance()->LoadSensor(
-          //sensorElem, this->GetCompleteScopedName());
+        sensors::create_sensor(sensorElem, this->GetScopedName());
       this->sensors.push_back(sensorName);
       sensorElem = sensorElem->GetNextElement(); 
     }
@@ -323,8 +321,8 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
       // TODO: Update visuals properly
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
 
-      msg.set_name(this->GetCompleteScopedName() + "::" + msg.name());
-      msg.set_parent_name(this->GetCompleteScopedName());
+      msg.set_name(this->GetScopedName() + "::" + msg.name());
+      msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 
       this->visPub->Publish(msg);
@@ -641,8 +639,8 @@ void Link::FillLinkMsg( msgs::Link &_msg )
     {
       msgs::Visual *vis = _msg.add_visual();
       vis->CopyFrom(msgs::VisualFromSDF(visualElem));
-      vis->set_name(this->GetCompleteScopedName() + "::" + vis->name());
-      vis->set_parent_name(this->GetCompleteScopedName());
+      vis->set_name(this->GetScopedName() + "::" + vis->name());
+      vis->set_parent_name(this->GetScopedName());
 
       visualElem = visualElem->GetNextElement(); 
     }

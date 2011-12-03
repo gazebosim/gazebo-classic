@@ -111,10 +111,16 @@ namespace gazebo
       public: void SetAngularAccel(const math::Vector3 &accel);
   
       /// \brief Set the force applied to the body
-      public: virtual void SetForce(const math::Vector3 &force) = 0;
+      public: virtual void SetForce(const math::Vector3 &_force) = 0;
   
       /// \brief Set the torque applied to the body
-      public: virtual void SetTorque(const math::Vector3 &force) = 0;
+      public: virtual void SetTorque(const math::Vector3 &_force) = 0;
+
+       /// \brief Add a force to the body
+      public: virtual void AddForce(const math::Vector3 &_force) = 0;
+  
+      /// \brief Add a torque to the body
+      public: virtual void AddTorque(const math::Vector3 &_torque) = 0;
   
       /// \brief Get the linear velocity of the body
       public: math::Vector3 GetRelativeLinearVel() const;
