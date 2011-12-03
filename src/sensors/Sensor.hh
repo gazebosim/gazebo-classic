@@ -29,6 +29,7 @@
 
 #include "physics/PhysicsTypes.hh"
 
+#include "msgs/msgs.h"
 #include "common/Events.hh"
 #include "common/Time.hh"
 #include "math/Pose.hh"
@@ -95,6 +96,8 @@ namespace gazebo
       public: bool GetVisualize() const;
 
       public: std::string GetTopic() const;
+
+      public: void FillMsg(msgs::Sensor &_msg);
 
       /// \brief Load a plugin for this sensor
       /// \param _sdf SDF parameters

@@ -30,6 +30,8 @@
 #include "common/Exception.hh"
 #include "common/Plugin.hh"
 
+#include "sensors/CameraSensor.hh"
+
 #include "sensors/Sensor.hh"
 #include "sensors/SensorManager.hh"
 
@@ -238,4 +240,21 @@ std::string Sensor::GetTopic() const
   return result;
 }
 
+void Sensor::FillMsg(msgs::Sensor &_msg)
+{
+  _msg.set_name(this->GetName());
+  _msg.set_type(this->GetType());
+  _msg.set_parent(this->GetParentName());
+  msgs::Set(_msg.mutable_pose(), this->GetPose());
 
+  _msg.set_visualize(this->GetVisualize());
+  _msg.set_topic(this->GetTopic());
+
+  if (this->GetType() == "camera")
+  {
+    CameraSensor *camSensor = (CameraSensor*)(this);
+    msgs::CameraSensor *camMsg = _msg.mutable_camera();
+    camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
+    camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
+  }
+}

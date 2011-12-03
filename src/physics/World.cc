@@ -74,6 +74,7 @@ World::World(const std::string &_name)
 {
   this->receiveMutex = new boost::mutex();
 
+  this->needsReset = false;
   this->stepInc = false;
   this->pause = false;
   this->thread = NULL;
@@ -272,11 +273,6 @@ void World::RunLoop()
       this->Update();
     }
 
-    this->ProcessEntityMsgs();
-    this->ProcessRequestMsgs();
-    this->ProcessFactoryMsgs();
-    this->ProcessModelMsgs();
-
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
@@ -286,6 +282,11 @@ void World::RunLoop()
 
     if (this->IsPaused() && this->stepInc)
       this->stepInc = false;
+
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
   }
 }
 
@@ -293,6 +294,12 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
+  if (this->needsReset)
+  {
+    this->Reset();
+    this->needsReset = false;
+  }
+
   event::Events::worldUpdateStart();
 
   // Update all the models
@@ -499,6 +506,10 @@ ModelPtr World::GetModel(unsigned int _index)
 // Reset the simulation to the initial settings
 void World::Reset()
 {
+  this->simTime = common::Time(0);
+  this->pauseTime = common::Time(0);
+  this->startTime = common::Time::GetWallTime();
+
   this->rootElement->Reset();
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
@@ -655,10 +666,7 @@ void World::OnControl(const boost::shared_ptr<msgs::WorldControl const> &data)
 
   if (data->has_reset_world())
   {
-    this->Reset();
-    this->simTime = common::Time(0);
-    this->pauseTime = common::Time(0);
-    this->startTime = common::Time::GetWallTime();
+    this->needsReset = true;
   }
 }
 

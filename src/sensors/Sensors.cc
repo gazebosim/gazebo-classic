@@ -37,6 +37,11 @@ bool sensors::load()
   if (!gazebo::rendering::load())
     gzthrow("Unable to load the rendering engine");
 
+  return true;
+}
+
+bool sensors::init()
+{
   // The rendering engine will run headless 
   if (!gazebo::rendering::init())
   {
@@ -44,11 +49,8 @@ bool sensors::load()
     return false;
   }
 
-  return true;
-}
+  sensors::SensorManager::Instance()->Init();
 
-bool sensors::init()
-{
   return true;
 }
 
@@ -60,20 +62,12 @@ bool sensors::fini()
   return true;
 }
 
-sensors::SensorPtr sensors::create_sensor(const std::string &type)
+std::string sensors::create_sensor(sdf::ElementPtr _elem,
+                          const std::string &_parentName)
 {
-  SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
-
-  if (sensor)
-  {
-    sensor->Load();
-    sensor->Init();
-  }
-  else
-    gzerr << "Unable to create sensor\n";
-
-  return sensor;
+  return sensors::SensorManager::Instance()->LoadSensor(_elem, _parentName);
 }
+
 
 void sensors::run()
 {
@@ -96,3 +90,7 @@ bool sensors::remove_sensors()
   return true;
 }
 
+sensors::SensorPtr sensors::get_sensor(const std::string &_name)
+{
+  return sensors::SensorManager::Instance()->GetSensor(_name);
+}
