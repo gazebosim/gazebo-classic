@@ -24,7 +24,7 @@
 using namespace gazebo;
 
 Master::Master()
-  : connection( new transport::Connection() )
+  : connection(new transport::Connection())
 {
   this->stop = false;
   this->runThread = NULL;
@@ -51,7 +51,8 @@ Master::~Master()
   this->connections.clear();
 
   this->connection->Shutdown();
-  this->connection.reset();
+  delete this->connection;
+  this->connection = NULL;
 }
 
 void Master::Init(unsigned short _port)
@@ -72,7 +73,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   // Send the gazebo version string
   msgs::String versionMsg;
   versionMsg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
-  new_connection->EnqueueMsg( msgs::Package("version_init", versionMsg), true );
+  new_connection->EnqueueMsg(msgs::Package("version_init", versionMsg), true);
 
   // Send all the current topic namespaces
   msgs::String_V namespacesMsg;

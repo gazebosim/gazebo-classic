@@ -23,14 +23,17 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${PROJECT_SOURCE_DIR}/src/Server.cc ${PROJECT_SOURCE_DIR}/src/Master.cc)
 
   target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
-                         gazebo_common 
-                         gazebo_transport 
-                         gazebo_physics
-                         gazebo_sensors
-                         gazebo_rendering
-                         gazebo_msgs
-                         pthread 
-                         )
+    gazebo_common
+    gazebo_sdf_interface
+    gazebo_sdf_parser
+    gazebo_transport
+    gazebo_physics
+    gazebo_sensors
+    gazebo_rendering
+    gazebo_msgs
+    pthread
+    ${tinyxml_libraries}
+    )
   add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
 
   #file(STRINGS ${GTEST_SOURCE_file} GTEST_NAMES REGEX ^TEST)

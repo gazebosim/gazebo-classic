@@ -18,8 +18,6 @@ class ServerTest : public testing::Test
   protected: virtual void SetUp()
              {
                this->serverThread = NULL;
-               this->server = new Server();
-               EXPECT_TRUE(this->server != NULL);
              }
 
   protected: virtual void TearDown()
@@ -31,6 +29,9 @@ class ServerTest : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename)
              {
+               this->server = new Server();
+               EXPECT_TRUE(this->server != NULL);
+
                ASSERT_TRUE(this->server->Load(_worldFilename));
                this->server->Init();
 
@@ -40,13 +41,16 @@ class ServerTest : public testing::Test
 
   protected: virtual void Unload()
              {
-               this->server->Fini();
+               if (this->server)
+                 this->server->Fini();
                if (this->serverThread)
                {
                  this->serverThread->join();
                }
                delete this->serverThread;
                this->serverThread = NULL;
+               delete this->server;
+               this->server = NULL;
              }
 
   protected: Server *server;
@@ -64,10 +68,11 @@ class MasterTest : public testing::Test
 
                this->master = new Master();
                this->master->Init(port);
-               this->master->Run();
+               this->master->RunThread();
              }
   protected: virtual void TearDown()
              {
+               this->master->Stop();
                this->master->Fini();
                delete this->master;
                this->master = NULL;
@@ -84,7 +89,7 @@ class MasterTest : public testing::Test
                transport::get_master_uri(host,port);
 
                // Connect to the master
-               transport::ConnectionPtr connection( new transport::Connection() );
+               transport::ConnectionPtr connection(new transport::Connection());
                connection->Connect(host, port);
 
                // Read the verification message
@@ -119,8 +124,11 @@ TEST_F(MasterTest, MasterConnect)
     transport::ConnectionPtr conn = ConnectToMaster();
     EXPECT_TRUE(conn != NULL);
     EXPECT_TRUE(conn->IsOpen());
+    conn->Shutdown();
+    conn.reset();
   }
 }
+
 
 void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &/*_msg*/)
 {
@@ -134,7 +142,6 @@ TEST_F(ServerTest, ServerConstructor)
     Unload();
   }
 }
-
 
 TEST_F(ServerTest, PubSub)
 {

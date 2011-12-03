@@ -23,7 +23,7 @@ using namespace gazebo;
 
 Server::Server()
 {
-  this->stop = false;
+  this->stop = true;
   this->receiveMutex = new boost::mutex();
 }
 
@@ -31,6 +31,11 @@ Server::~Server()
 {
   delete this->receiveMutex;
   delete this->master;
+}
+
+bool Server::IsRunning() const
+{
+  return !this->stop;
 }
 
 void Server::LoadPlugin(const std::string &_filename)

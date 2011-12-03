@@ -12,6 +12,9 @@ using namespace gazebo;
 
 double g_percent = 0;
 
+Server *server = NULL;
+std::string g_worldFile;
+
 void OnStats(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
 {
   common::Time simTime  = msgs::Convert( _msg->sim_time() );
@@ -21,16 +24,24 @@ void OnStats(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
     g_percent  = (simTime / realTime).Double();
 }
 
-void SpeedTest(const std::string &worldFile, double minSpeed)
+void RunServer()
 {
-  Server *server = NULL;
-
   ASSERT_NO_THROW(server = new Server());
-  ASSERT_NO_THROW(server->Load(worldFile));
+  ASSERT_NO_THROW(server->Load(g_worldFile));
   ASSERT_NO_THROW(server->Init());
 
-  boost::thread thread(boost::bind(&Server::Run, server));
+  server->Run();
+  ASSERT_NO_THROW(server->Fini());
+  delete server;
+}
 
+void SpeedTest(double minSpeed)
+{
+  boost::thread thread(boost::bind(RunServer));
+  while (!server || !server->IsRunning())
+    usleep(1000000);
+
+  usleep(1000000);
   transport::NodePtr node = transport::NodePtr( new transport::Node() );
   ASSERT_NO_THROW(node->Init());
   transport::SubscriberPtr sub = node->Subscribe("~/world_stats", OnStats);
@@ -43,28 +54,26 @@ void SpeedTest(const std::string &worldFile, double minSpeed)
 
   ASSERT_NO_THROW(server->Stop());
   thread.join();
-  ASSERT_NO_THROW(server->Fini());
 
-  delete server;
-
-  //TODO: this sleep should get removed...there is a timing issue with
-  // cleanup. Some of the singletons don't shutdown in time.
-  usleep(100000);
+  usleep(1000000);
 }
 
 TEST(Speed, EmptyWorld)
 {
-  SpeedTest("worlds/empty.world", 1600.0);
+  g_worldFile = "worlds/empty.world";
+  SpeedTest(3800.0);
 }
 
 TEST(Speed, ShapesWorld)
 {
-  SpeedTest("worlds/shapes.world", 1100.0);
+  g_worldFile = "worlds/shapes.world";
+  SpeedTest(120.0);
 }
 
 TEST(Speed, PR2World)
 {
-  SpeedTest("worlds/pr2.world", 1.2);
+  g_worldFile = "worlds/pr2.world";
+  SpeedTest(4.0);
 }
 
 int main(int argc, char **argv)

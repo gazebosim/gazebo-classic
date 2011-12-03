@@ -14,8 +14,8 @@ link_directories(
 )
 
 enable_testing()
-find_package( GTest )
-if (GTest_FOUND)
-  include_directories( ${GTEST_INCLUDE_DIRS} )
-  add_subdirectory( regression )
+find_package(GTest)
+if (GTEST_FOUND)
+  include_directories(${GTEST_INCLUDE_DIRS})
+  add_subdirectory(regression)
 endif()

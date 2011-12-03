@@ -99,8 +99,8 @@ int main(int argc, char **argv)
   server = new gazebo::Server();
   if (config_filename.empty())
   {
-    printf("Error: no world filename specified on the command line\n");
-    return -1;
+    printf("Warning: no world filename specified, using default world\n");
+    config_filename = "worlds/empty.world";
   }
 
   // Construct plugins

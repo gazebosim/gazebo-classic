@@ -129,7 +129,7 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
   this->acceptConn = ConnectionPtr(new Connection());
 
   this->acceptor->async_accept(*this->acceptConn->socket,
-      boost::bind(&Connection::OnAccept, shared_from_this(), 
+      boost::bind(&Connection::OnAccept, this, 
                   boost::asio::placeholders::error));
 }
 
@@ -141,12 +141,12 @@ void Connection::OnAccept(const boost::system::error_code &e)
   if (!e)
   {
     // First start a new acceptor
-    this->acceptCB( this->acceptConn );
+    this->acceptCB(this->acceptConn);
 
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket, 
-        boost::bind(&Connection::OnAccept, shared_from_this(), 
+        boost::bind(&Connection::OnAccept, this, 
           boost::asio::placeholders::error));
   }
   else
@@ -229,7 +229,9 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
   //}
   
     if (_force)
+    {
       this->ProcessWriteQueue();
+    }
 }
 
 void Connection::ProcessWriteQueue()

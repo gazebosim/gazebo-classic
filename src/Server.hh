@@ -34,7 +34,7 @@ namespace gazebo
 
     public: void SetParams( const common::StrStr_M &params );
 
-    private: void RunLoop();
+    public: bool IsRunning() const;
 
     private: void OnControl(
                  const boost::shared_ptr<msgs::ServerControl const> &_msg);

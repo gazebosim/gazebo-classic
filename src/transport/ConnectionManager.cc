@@ -33,6 +33,7 @@ ConnectionManager::ConnectionManager()
   this->stop = false;
   //this->thread = NULL;
 
+  this->serverConn = NULL;
   this->listMutex = new boost::recursive_mutex();
   this->masterMessagesMutex = new boost::recursive_mutex();
   this->connectionMutex = new boost::recursive_mutex();
@@ -51,6 +52,8 @@ ConnectionManager::~ConnectionManager()
   delete this->connectionMutex;
   this->connectionMutex = NULL;
 
+  delete this->serverConn;
+  this->serverConn = NULL;
   this->Fini();
 }
 
@@ -59,11 +62,15 @@ ConnectionManager::~ConnectionManager()
 bool ConnectionManager::Init(const std::string &master_host, 
                              unsigned short master_port)
 {
+  this->stop = false;
   this->masterConn.reset( new Connection() );
-  this->serverConn.reset( new Connection() );
+  if (this->serverConn)
+    delete this->serverConn;
+  this->serverConn = new Connection();
 
   // Create a new TCP server on a free port
-  this->serverConn->Listen(0, boost::bind(&ConnectionManager::OnAccept, this, _1) );
+  this->serverConn->Listen(0,
+      boost::bind(&ConnectionManager::OnAccept, this, _1) );
 
   gzmsg << "Waiting for master";
   while (!this->masterConn->Connect(master_host, master_port) && 
@@ -76,7 +83,10 @@ bool ConnectionManager::Init(const std::string &master_host,
   printf("\n");
 
   if (!this->IsRunning())
+  {
+    gzerr << "Connection Manager is not running\n";
     return false;
+  }
 
   std::string initData, namespacesData, publishersData;
   this->masterConn->Read(initData);
@@ -94,7 +104,8 @@ bool ConnectionManager::Init(const std::string &master_host,
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
-      gzmsg << "Connected to gazebo master @ " << this->masterConn->GetRemoteURI() << "\n";
+      gzmsg << "Connected to gazebo master @ "
+            << this->masterConn->GetRemoteURI() << "\n";
     }
     else
     {
@@ -140,7 +151,6 @@ bool ConnectionManager::Init(const std::string &master_host,
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
 
   this->initialized = true;
-  this->stop = false;
 
   return true;
 }
@@ -155,14 +165,15 @@ void ConnectionManager::Fini()
   this->Stop();
 
   this->masterConn->ProcessWriteQueue();
+  this->masterConn->Shutdown();
   this->masterConn.reset();
 
   this->serverConn->ProcessWriteQueue();
-  this->serverConn.reset();
+  this->serverConn->Shutdown();
+  delete this->serverConn;
+  this->serverConn = NULL;
 
   this->connections.clear();
-  this->initialized = false;
-
   this->initialized = false;
 }
 

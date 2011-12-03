@@ -101,7 +101,7 @@ namespace gazebo
       private: void ProcessMessage(const std::string &_packet);
 
       private: ConnectionPtr masterConn;
-      private: ConnectionPtr serverConn;
+      private: Connection *serverConn;
 
       private: std::list<ConnectionPtr> connections;
 

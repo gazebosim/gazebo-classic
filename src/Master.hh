@@ -83,7 +83,7 @@ namespace gazebo
     private: std::list< std::string > worldNames;
     private: std::list< std::pair<unsigned int, std::string> > msgs;
 
-    private: transport::ConnectionPtr connection;
+    private: transport::Connection *connection;
     private: boost::thread *runThread;
     private: bool stop;
 

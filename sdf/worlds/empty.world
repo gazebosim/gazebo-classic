@@ -16,7 +16,7 @@
     </physics>
 
     <!-- Ground Plane -->
-    <!--<model name="plane1_model" static="true">
+    <model name="plane1_model" static="true">
       <link name="body">
         <collision name="geom_1">
           <geometry>
@@ -40,6 +40,5 @@
       <attenuation range="20"/>
       <direction xyz="0 0 -1"/>
     </light>
-    -->
   </world>
 </gazebo>
