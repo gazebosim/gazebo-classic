@@ -78,6 +78,7 @@ namespace gazebo
       private: void RunLoop();
 
       private: bool stop;
+      private: bool initialized;
       private: boost::thread *runThread;
       private: boost::recursive_mutex *mutex;
 

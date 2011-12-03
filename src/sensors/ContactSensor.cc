@@ -144,9 +144,9 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
       {
         msgs::Contact *contactMsg = msg.add_contact();
         contactMsg->set_collision1(
-            iter2->second.collision1->GetCompleteScopedName());
+            iter2->second.collision1->GetScopedName());
         contactMsg->set_collision2(
-            iter2->second.collision2->GetCompleteScopedName());
+            iter2->second.collision2->GetScopedName());
 
         for (int i=0; i < iter2->second.count; i++)
         {

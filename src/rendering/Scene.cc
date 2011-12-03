@@ -985,7 +985,7 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   for (int i=0; i < _msg->model_size(); i++)
   {
     modelName = _msg->model(i).name() + "::";
-    boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(_msg->model(i).pose()) );
+    boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
     pm->set_name(_msg->model(i).name());
     this->poseMsgs.push_front(pm);
 
@@ -1168,7 +1168,7 @@ void Scene::PreRender()
       {
         math::Pose pose = msgs::Convert(*(*pIter));
 
-        iter->second->SetWorldPose(pose);
+        iter->second->SetPose(pose);
       }
       PoseMsgs_L::iterator prev = pIter++;
       this->poseMsgs.erase(prev);

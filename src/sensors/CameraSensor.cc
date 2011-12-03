@@ -86,7 +86,9 @@ void CameraSensor::Init()
   {
     this->scene = rendering::get_scene(worldName);
     if (!this->scene)
+    {
       this->scene = rendering::create_scene(worldName, false);
+    }
 
     this->camera = this->scene->CreateCamera(
         this->sdf->GetValueString("name"), false);
@@ -110,8 +112,8 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    this->camera->SetWorldPose( this->pose );
-    this->camera->AttachToVisual( this->parentName, true );
+    this->camera->SetWorldPose(this->pose);
+    this->camera->AttachToVisual(this->parentName, true);
   }
   else
     gzerr << "No world name\n";
@@ -124,7 +126,8 @@ void CameraSensor::Init()
 void CameraSensor::Fini()
 {
   Sensor::Fini();
-  this->camera->Fini();
+  if (this->camera)
+    this->camera->Fini();
   this->camera.reset();
   this->scene.reset();
 }

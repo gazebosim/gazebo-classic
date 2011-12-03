@@ -629,7 +629,8 @@ void Link::FillLinkMsg( msgs::Link &_msg )
        iter != this->sensors.end(); iter++)
   {
     sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    sensor->FillMsg(*_msg.add_sensor());
+    if (sensor)
+      sensor->FillMsg(*_msg.add_sensor());
   }
 
   if (this->sdf->HasElement("visual"))

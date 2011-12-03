@@ -16,6 +16,42 @@ class FactoryTest : public ServerFixture
                  this->node->Advertise<msgs::Factory>("~/factory");
              }
 
+  protected: void SpawnCamera(const std::string &_modelName, 
+                 const std::string &_cameraName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+             {
+               msgs::Factory msg;
+               std::ostringstream newModelStr;
+
+               newModelStr << "<gazebo version='1.0'>"
+                 << "<model name='" << _modelName << "' static='true'>"
+                 << "<origin pose='" << _pos.x << " " 
+                                     << _pos.y << " " 
+                                     << _pos.z << " "
+                                     << _rpy.x << " "
+                                     << _rpy.y << " " 
+                                     << _rpy.z << "'/>"
+                 << "<link name='body'>"
+                 << "  <sensor name='" << _cameraName << "' type='camera' always_on='1' update_rate='25' visualize='true'>"
+                 << "    <camera>"
+                 << "      <horizontal_fov angle='0.78539816339744828'/>"
+                 << "      <image width='320' height='240' format='L8'/>"
+                 << "      <clip near='0.10000000000000001' far='100'/>"
+                 << "      <save enabled='true' path='/tmp/camera/'/>"
+                 << "    </camera>"
+                 << "  </sensor>"
+                 << "</link>"
+                 << "</model>"
+                 << "</gazebo>";
+
+               msg.set_sdf(newModelStr.str());
+               this->factoryPub->Publish(msg);
+
+               // Wait for the entity to spawn
+               while (!this->HasEntity(_modelName))
+                 usleep(10000);
+             }
+ 
   protected: void SpawnCylinder(const std::string &_name, 
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
@@ -179,6 +215,18 @@ TEST_F(FactoryTest, Sphere)
 }
 */
 
+TEST_F(FactoryTest, Camera)
+{
+  math::Pose setPose, testPose;
+  Load("worlds/empty.world");
+  setPose.Set(math::Vector3(-5,0,5), math::Quaternion(0,DTOR(15),0));
+  SpawnCamera("camera_model", "camera_sensor", setPose.pos,
+      setPose.rot.GetAsEuler());
+  usleep(1000000);
+}
+
+
+/*
 TEST_F(FactoryTest, Cylinder)
 {
   math::Pose setPose, testPose;
@@ -196,6 +244,8 @@ TEST_F(FactoryTest, Cylinder)
     EXPECT_EQ(testPose, setPose);
   }
 }
+*/
+
 
 int main(int argc, char **argv)
 {

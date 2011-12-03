@@ -201,7 +201,7 @@ void Entity::PublishPose()
     math::Pose relativePose = this->GetRelativePose();
     if (relativePose != msgs::Convert(*this->poseMsg))
     {
-      msgs::Set(this->poseMsg, this->worldPose);
+      msgs::Set(this->poseMsg, relativePose);
       this->posePub->Publish(*this->poseMsg);
     }
   }

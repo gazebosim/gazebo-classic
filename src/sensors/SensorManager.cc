@@ -29,7 +29,8 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 SensorManager::SensorManager()
-  : stop(true), runThread(NULL), mutex(new boost::recursive_mutex())
+  : stop(true), initialized(false), runThread(NULL),
+    mutex(new boost::recursive_mutex())
 {
 }
 
@@ -109,11 +110,13 @@ void SensorManager::Init()
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Init();
   this->mutex->unlock();
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::Fini()
 {
+  this->initialized = false;
   this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
@@ -137,7 +140,7 @@ std::string SensorManager::LoadSensor(sdf::ElementPtr _elem,
   sensor->Load(_elem);
   sensor->SetParent(_parentName);
 
-  if (this->stop)
+  if (!this->initialized)
   {
     this->sensors.push_back(sensor);
   }
@@ -165,8 +168,6 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
   }
   this->mutex->unlock();
 
-  if (!result)
-    gzerr << "Unable to find sensor[" << _name << "]\n";
  return result; 
 }
 

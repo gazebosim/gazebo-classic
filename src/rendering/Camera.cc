@@ -262,8 +262,8 @@ void Camera::Update()
     {
       msgs::TrackVisual msg;
       msg.ParseFromString((*iter).data());
-      if (this->AttachToVisualImpl( msg.name(), msg.inherit_orientation(), 
-                                    msg.min_dist(), msg.max_dist() ))
+      if (this->AttachToVisualImpl(msg.name(), msg.inherit_orientation(), 
+                                    msg.min_dist(), msg.max_dist()))
         erase = true;
     }
 
@@ -1149,7 +1149,8 @@ bool Camera::AttachToVisualImpl( const std::string &_name,
     bool _inheritOrientation, double _minDist, double _maxDist )
 {
   VisualPtr visual = this->scene->GetVisual(_name);
-  return this->AttachToVisualImpl(visual, _inheritOrientation, _minDist, _maxDist);
+  return this->AttachToVisualImpl(visual, _inheritOrientation,
+                                  _minDist, _maxDist);
 }
 
 bool Camera::AttachToVisualImpl( VisualPtr _visual, bool _inheritOrientation, 
@@ -1163,9 +1164,7 @@ bool Camera::AttachToVisualImpl( VisualPtr _visual, bool _inheritOrientation,
     math::Pose origPose = this->GetWorldPose();
     _visual->GetSceneNode()->addChild(this->sceneNode);
     this->sceneNode->setInheritOrientation( _inheritOrientation );
-    //this->sceneNode->_setDerivedPosition(Conversions::Convert(origPose.pos));
     this->SetWorldPose(origPose);
-
     return true;
   }
 
