@@ -29,7 +29,8 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 
-#include "sensors/SensorManager.hh"
+#include "sensors/Sensors.hh"
+#include "sensors/Sensor.hh"
 
 #include "physics/Model.hh"
 #include "physics/World.hh"
@@ -148,8 +149,10 @@ void Link::Load(sdf::ElementPtr &_sdf)
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      std::string sensorName = sensors::SensorManager::Instance()->LoadSensor(
-          sensorElem, this->GetCompleteScopedName());
+      std::string sensorName =
+        sensors::create_sensor(sensorElem, this->GetCompleteScopedName());
+      //std::string sensorName = sensors::SensorManager::Instance()->LoadSensor(
+          //sensorElem, this->GetCompleteScopedName());
       this->sensors.push_back(sensorName);
       sensorElem = sensorElem->GetNextElement(); 
     }
@@ -457,7 +460,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 /// Set the linear acceleration of the body
 void Link::SetLinearAccel(const math::Vector3 &accel)
 {
-  //this->SetEnabled(true); Disabled this line to make autoDisable work
+  this->SetEnabled(true);
   this->linearAccel = accel;// * this->GetMass();
 }
 
@@ -467,7 +470,7 @@ void Link::SetLinearAccel(const math::Vector3 &accel)
 /// Set the angular acceleration of the body
 void Link::SetAngularAccel(const math::Vector3 &accel)
 {
-  //this->SetEnabled(true); Disabled this line to make autoDisable work
+  this->SetEnabled(true);
   this->angularAccel = accel * this->inertial->GetMass();
 }
 
@@ -475,14 +478,16 @@ void Link::SetAngularAccel(const math::Vector3 &accel)
 /// Get the linear velocity of the body
 math::Vector3 Link::GetRelativeLinearVel() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldLinearVel());
+  return this->GetWorldPose().rot.RotateVectorReverse(
+      this->GetWorldLinearVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the body
 math::Vector3 Link::GetRelativeAngularVel() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldAngularVel());
+  return this->GetWorldPose().rot.RotateVectorReverse(
+      this->GetWorldAngularVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -620,6 +625,13 @@ void Link::FillLinkMsg( msgs::Link &_msg )
           this->GetChild(j));
       coll->FillCollisionMsg(*_msg.add_collision());
     }
+  }
+
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+       iter != this->sensors.end(); iter++)
+  {
+    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
+    sensor->FillMsg(*_msg.add_sensor());
   }
 
   if (this->sdf->HasElement("visual"))
