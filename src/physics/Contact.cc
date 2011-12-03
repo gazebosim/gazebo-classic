@@ -64,7 +64,7 @@ const Contact &Contact::operator=(const Contact &contact)
   this->collision2 = contact.collision2;
 
   this->count = contact.count;
-  for (int i=0; i < 3; i++)
+  for (int i=0; i < MAX_CONTACT_JOINTS; i++)
   {
     this->forces[i] = contact.forces[i];
     this->positions[i] = contact.positions[i];
