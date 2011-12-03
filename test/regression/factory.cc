@@ -1,4 +1,5 @@
 #include <string.h>
+#include "math/Helpers.hh"
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
 #include "rendering/Camera.hh"
@@ -24,9 +25,9 @@ TEST_F(FactoryTest, Box)
     setPose.Set(math::Vector3(0,0,i+0.5), math::Quaternion(0,0,0));
     SpawnBox(name.str(), setPose.pos, setPose.rot.GetAsEuler());
     testPose = GetEntityPose(name.str());
-    testPose.Round(2);
-    setPose.Round(2);
-    EXPECT_EQ(testPose, setPose);
+    EXPECT_TRUE(math::equal(testPose.pos.x, setPose.pos.x, 0.1));
+    EXPECT_TRUE(math::equal(testPose.pos.y, setPose.pos.y, 0.1));
+    EXPECT_TRUE(math::equal(testPose.pos.z, setPose.pos.z, 0.1));
   }
 }
 
@@ -42,11 +43,13 @@ TEST_F(FactoryTest, Sphere)
     setPose.Set(math::Vector3(0,0,i+0.5), math::Quaternion(0,0,0));
     SpawnSphere(name.str(), setPose.pos, setPose.rot.GetAsEuler());
     testPose = GetEntityPose(name.str());
-    testPose.Round(1);
-    setPose.Round(1);
-    EXPECT_EQ(testPose, setPose);
+    EXPECT_TRUE(math::equal(testPose.pos.x, setPose.pos.x, 0.1));
+    EXPECT_TRUE(math::equal(testPose.pos.y, setPose.pos.y, 0.1));
+    EXPECT_TRUE(math::equal(testPose.pos.z, setPose.pos.z, 0.1));
+
   }
 }
+
 
 TEST_F(FactoryTest, Cylinder)
 {
@@ -60,9 +63,9 @@ TEST_F(FactoryTest, Cylinder)
     setPose.Set(math::Vector3(0,0,i+0.5), math::Quaternion(0,0,0));
     SpawnCylinder(name.str(), setPose.pos, setPose.rot.GetAsEuler());
     testPose = GetEntityPose(name.str());
-    testPose.Round(1);
-    setPose.Round(1);
-    EXPECT_EQ(testPose, setPose);
+    EXPECT_TRUE(math::equal(testPose.pos.x, setPose.pos.x, 0.1));
+    EXPECT_TRUE(math::equal(testPose.pos.y, setPose.pos.y, 0.1));
+    EXPECT_TRUE(math::equal(testPose.pos.z, setPose.pos.z, 0.1));
   }
 }
 
