@@ -210,6 +210,8 @@ void Camera::Init()
 // Finalize the camera
 void Camera::Fini()
 {
+  RTShaderSystem::DetachViewport(this->viewport, this->scene);
+  this->renderTarget->removeAllViewports();
   this->connections.clear();
 }
 
@@ -356,7 +358,7 @@ void Camera::PostRender()
       buffer = this->bayerFrameBuffer;
     }
 
-    this->newImageFrame( buffer, width, height, this->GetImageDepth(), 
+    this->newImageFrame(buffer, width, height, this->GetImageDepth(), 
                     this->GetImageFormat());
   }
 

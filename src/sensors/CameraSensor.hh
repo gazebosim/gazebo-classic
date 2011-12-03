@@ -73,6 +73,7 @@ namespace gazebo
 
       public: unsigned int GetImageWidth() const;
       public: unsigned int GetImageHeight() const;
+      public: const unsigned char *GetImageData();
 
       private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
 

@@ -83,6 +83,8 @@ namespace gazebo
       /// \brief Set a viewport to use shaders
       public: static void AttachViewport(Ogre::Viewport *viewport, Scene *scene);
   
+      public: static void DetachViewport(Ogre::Viewport *_viewport, Scene *_scene);
+
       /// Set the lighting model to per pixel or per vertex
       public: void SetPerPixelLighting( bool s);
   

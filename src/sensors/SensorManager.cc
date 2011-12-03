@@ -121,6 +121,7 @@ void SensorManager::Fini()
   std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Fini();
+  this->sensors.clear();
   this->mutex->unlock();
 }
 

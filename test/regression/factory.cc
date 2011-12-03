@@ -1,183 +1,17 @@
+#include <string.h>
 #include "transport/TransportTypes.hh"
 #include "transport/Node.hh"
+#include "rendering/Camera.hh"
+#include "sensors/Sensors.hh"
+#include "sensors/CameraSensor.hh"
 #include "ServerFixture.hh"
+#include "images_cmp.h"
+
 
 using namespace gazebo;
 class FactoryTest : public ServerFixture 
-{
-  protected: virtual ~FactoryTest()
-             {
-             }
+{};
 
-  protected: virtual void Load(const std::string &_worldFilename)
-             {
-               ServerFixture::Load(_worldFilename);
-               this->factoryPub =
-                 this->node->Advertise<msgs::Factory>("~/factory");
-             }
-
-  protected: void SpawnCamera(const std::string &_modelName, 
-                 const std::string &_cameraName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
-
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _modelName << "' static='true'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " " 
-                                     << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <sensor name='" << _cameraName << "' type='camera' always_on='1' update_rate='25' visualize='true'>"
-                 << "    <camera>"
-                 << "      <horizontal_fov angle='0.78539816339744828'/>"
-                 << "      <image width='320' height='240' format='L8'/>"
-                 << "      <clip near='0.10000000000000001' far='100'/>"
-                 << "      <save enabled='true' path='/tmp/camera/'/>"
-                 << "    </camera>"
-                 << "  </sensor>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
-
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 usleep(10000);
-             }
- 
-  protected: void SpawnCylinder(const std::string &_name, 
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
-
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _name << "'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " " 
-                                     << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <inertial mass='1.0'>"
-                 << "    <inertia ixx='1' ixy='0' ixz='0' iyy='1'"
-                 << " iyz='0' izz='1'/>"
-                 << "  </inertial>"
-                 << "  <collision name='geom'>"
-                 << "    <geometry>"
-                 << "      <cylinder radius='.5' length='1.0'/>"
-                 << "    </geometry>"
-                 << "  </collision>"
-                 << "  <visual name='visual' cast_shadows='true'>"
-                 << "    <geometry>"
-                 << "      <cylinder radius='.5' length='1.0'/>"
-                 << "    </geometry>"
-                 << "  </visual>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
-
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
-                 usleep(10000);
-             }
-
-  protected: void SpawnSphere(const std::string &_name, 
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
-
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _name << "'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " " 
-                                     << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <inertial mass='1.0'>"
-                 << "    <inertia ixx='1' ixy='0' ixz='0' iyy='1'"
-                 << " iyz='0' izz='1'/>"
-                 << "  </inertial>"
-                 << "  <collision name='geom'>"
-                 << "    <geometry>"
-                 << "      <sphere radius='.5'/>"
-                 << "    </geometry>"
-                 << "  </collision>"
-                 << "  <visual name='visual' cast_shadows='true'>"
-                 << "    <geometry>"
-                 << "      <sphere radius='.5'/>"
-                 << "    </geometry>"
-                 << "  </visual>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
-
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
-                 usleep(10000);
-             }
-
-  protected: void SpawnBox(const std::string &_name, 
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
-
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _name << "'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " " 
-                                     << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <inertial mass='1.0'>"
-                 << "    <inertia ixx='1' ixy='0' ixz='0' iyy='1'"
-                 << " iyz='0' izz='1'/>"
-                 << "  </inertial>"
-                 << "  <collision name='geom'>"
-                 << "    <geometry>"
-                 << "      <box size='1 1 1'/>"
-                 << "    </geometry>"
-                 << "  </collision>"
-                 << "  <visual name='visual' cast_shadows='true'>"
-                 << "    <geometry>"
-                 << "      <box size='1 1 1'/>"
-                 << "    </geometry>"
-                 << "  </visual>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
-
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
-                 usleep(10000);
-             }
-
-  protected: transport::PublisherPtr factoryPub;
-};
-/*
 TEST_F(FactoryTest, Box)
 {
   math::Pose setPose, testPose;
@@ -231,7 +65,35 @@ TEST_F(FactoryTest, Cylinder)
     EXPECT_EQ(testPose, setPose);
   }
 }
-*/
+
+
+TEST_F(FactoryTest, BlackCamera)
+{
+  math::Pose setPose, testPose;
+  Load("worlds/empty.world");
+  setPose.Set(math::Vector3(0,0,-5), math::Quaternion(0,DTOR(15),0));
+  SpawnCamera("camera_model", "camera_sensor", setPose.pos,
+      setPose.rot.GetAsEuler());
+
+  unsigned char *img = NULL;
+  unsigned int width;
+  unsigned int height;
+  GetFrame("camera_sensor", &img, width, height);
+  ASSERT_EQ(width, 320);
+  ASSERT_EQ(height, 240);
+
+  unsigned char *trueImage = new unsigned char[width * height * 3];
+  memset(trueImage, 0, width*height*3);
+
+  unsigned int diffMax = 0;
+  unsigned int diffSum = 0;
+  double diffAvg = 0;
+  ImageCompare(&img, &trueImage, width, height, 3, diffMax, diffSum, diffAvg);
+  ASSERT_EQ(diffSum, 0);
+  ASSERT_EQ(diffMax, 0);
+  ASSERT_EQ(diffAvg, 0.0);
+}
+
 
 TEST_F(FactoryTest, Camera)
 {
@@ -240,9 +102,24 @@ TEST_F(FactoryTest, Camera)
   setPose.Set(math::Vector3(-5,0,5), math::Quaternion(0,DTOR(15),0));
   SpawnCamera("camera_model", "camera_sensor", setPose.pos,
       setPose.rot.GetAsEuler());
+
+  unsigned char *img = NULL;
+  unsigned int width;
+  unsigned int height;
+  GetFrame("camera_sensor", &img, width, height);
+  ASSERT_EQ(width, 320);
+  ASSERT_EQ(height, 240);
+
+  unsigned int diffMax = 0;
+  unsigned int diffSum = 0;
+  double diffAvg = 0;
+  ImageCompare(&img, &empty_world_camera1, 
+      width, height, 3, diffMax, diffSum, diffAvg);
+  //PrintImage("empty_world_camera1", &img, width, height, 3);
+  ASSERT_EQ(diffSum, 0);
+  ASSERT_EQ(diffMax, 0);
+  ASSERT_EQ(diffAvg, 0.0);
 }
-
-
 
 int main(int argc, char **argv)
 {

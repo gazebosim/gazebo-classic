@@ -96,6 +96,8 @@ void RTShaderSystem::Fini()
     this->shaderGenerator = NULL;
   }
 
+  this->entities.clear();
+  this->scenes.clear();
   this->initialized = false;
 }
 
@@ -178,6 +180,14 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, Scene *_scene)
   _viewport->setMaterialScheme( _scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 #endif
+}
+
+void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, Scene *_scene)
+{
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+  _viewport->setMaterialScheme( _scene->GetName() );
+#endif
+
 }
 
 

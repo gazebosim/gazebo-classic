@@ -169,4 +169,7 @@ unsigned int CameraSensor::GetImageHeight() const
   return 0;
 }
 
-
+const unsigned char *CameraSensor::GetImageData()
+{
+  return this->camera->GetImageData(0);
+}

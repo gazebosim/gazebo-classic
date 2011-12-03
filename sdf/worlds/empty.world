@@ -16,7 +16,7 @@
     </physics>
 
     <!-- Ground Plane -->
-    <model name="plane1_model" static="true">
+    -<model name="plane1_model" static="true">
       <link name="body">
         <collision name="geom_1">
           <geometry>
@@ -32,25 +32,6 @@
         </visual>
       </link>
     </model>
-
-    <!--
-    <model name="box_model1" static="true">
-      <origin pose="0 0 .25 0 0 0"/>
-      <link name="box_body">
-
-      <sensor name='narrow_stereo_gazebo_l_stereo_camera_sensor' type='camera' always_on='1' update_rate='25' visualize='true'>
-        <origin pose='0.0232 0.06 0.098 0 -0 0'/>
-        <camera>
-          <horizontal_fov angle='0.78539816339744828'/>
-          <image width='320' height='240' format='L8'/>
-          <clip near='0.10000000000000001' far='100'/>
-          <save enabled='true' path='/tmp/camera/'/>
-        </camera>
-      </sensor>
-      </link>
-    </model>
-    -->
-
 
     <light type="directional" name="my_light" cast_shadows="false">
       <origin pose="0 0 10 0 0 0"/>
