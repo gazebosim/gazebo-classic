@@ -173,7 +173,6 @@ void Collision::Load(sdf::ElementPtr &_sdf)
 
 void Collision::Init()
 {
-  this->SetContactsEnabled(false);
   if (this->sdf->HasElement("origin"))
       this->SetRelativePose(
         this->sdf->GetElement("origin")->GetValuePose("pose"));
