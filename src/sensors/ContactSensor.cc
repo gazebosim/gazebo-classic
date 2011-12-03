@@ -168,7 +168,6 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
     this->contactsPub->Publish(msg);
   }
 
-  this->contacts.clear();
   this->mutex->unlock();
 }
 
@@ -246,6 +245,7 @@ physics::Contact ContactSensor::GetCollisionContact(
 std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
     const std::string &_collisionName)
 {
+
   Contact_M::const_iterator iter = this->contacts.find(_collisionName);
 
   if (iter != this->contacts.end())

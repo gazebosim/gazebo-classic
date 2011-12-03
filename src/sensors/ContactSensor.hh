@@ -99,6 +99,7 @@ namespace gazebo
       private: transport::PublisherPtr contactsPub;
 
       private: boost::mutex *mutex;
+      public: boost::mutex* GetUpdateMutex() const {return this->mutex;}
     };
     /// \}
   }
