@@ -213,20 +213,7 @@ TEST_F(FactoryTest, Sphere)
     EXPECT_EQ(testPose, setPose);
   }
 }
-*/
 
-TEST_F(FactoryTest, Camera)
-{
-  math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  setPose.Set(math::Vector3(-5,0,5), math::Quaternion(0,DTOR(15),0));
-  SpawnCamera("camera_model", "camera_sensor", setPose.pos,
-      setPose.rot.GetAsEuler());
-  usleep(1000000);
-}
-
-
-/*
 TEST_F(FactoryTest, Cylinder)
 {
   math::Pose setPose, testPose;
@@ -245,6 +232,16 @@ TEST_F(FactoryTest, Cylinder)
   }
 }
 */
+
+TEST_F(FactoryTest, Camera)
+{
+  math::Pose setPose, testPose;
+  Load("worlds/empty.world");
+  setPose.Set(math::Vector3(-5,0,5), math::Quaternion(0,DTOR(15),0));
+  SpawnCamera("camera_model", "camera_sensor", setPose.pos,
+      setPose.rot.GetAsEuler());
+}
+
 
 
 int main(int argc, char **argv)

@@ -41,9 +41,9 @@ for geometry objects
 #include "collision_space_internal.h"
 #include "odeou.h"
 
-#ifdef dLIBCCD_ENABLED
+//#ifdef dLIBCCD_ENABLED
 # include "collision_libccd.h"
-#endif /* dLIBCCD_ENABLED */
+//#endif /* dLIBCCD_ENABLED */
 
 
 #ifdef _MSC_VER
@@ -212,12 +212,12 @@ static void setAllColliders (int i, dColliderFn *fn)
   setCollider (dCylinderClass,dSphereClass,&dCollideCylinderSphere);
   setCollider (dCylinderClass,dPlaneClass,&dCollideCylinderPlane);
 
-#ifdef dLIBCCD_CYL_CYL
+//#ifdef dLIBCCD_CYL_CYL
   setCollider (dCylinderClass, dCylinderClass, &dCollideCylinderCylinder);
-#endif
-#ifdef dLIBCCD_CAP_CYL
+//#endif
+//#ifdef dLIBCCD_CAP_CYL
   setCollider (dCapsuleClass, dCylinderClass, &dCollideCapsuleCylinder);
-#endif
+//#endif
 
 //--> Convex Collision
 #ifdef dLIBCCD_CONVEX_BOX
