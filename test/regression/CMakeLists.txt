@@ -13,7 +13,7 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-find_package( GTest REQUIRED )
+find_package(GTest REQUIRED)
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
 set (gtest_sources transport.cc speed.cc factory.cc)

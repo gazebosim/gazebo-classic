@@ -39,27 +39,20 @@ set (sources MovableText.cc
              ContactVisual.cc
 )
 
-set (headers MovableText.hh
-             RenderEngine.hh
+set (headers RenderEngine.hh
              RenderEvents.hh
-             DynamicRenderable.hh
-             DynamicLines.hh
              Visual.hh
              Camera.hh
              DepthCamera.hh
              UserCamera.hh
-             Heightmap.hh
              Light.hh
-             RTShaderSystem.hh
              SelectionObj.hh
              ViewController.hh
              FPSViewController.hh
              OrbitViewController.hh
-             Grid.hh
              Scene.hh
              WindowManager.hh
              RenderTypes.hh
-             Conversions.hh
              Rendering.hh
              Material.hh
              GUIOverlay.hh

@@ -1,7 +1,12 @@
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
+
+#include "transport/transport.h"
+#include "sensors/sensors.h"
+#include "rendering/rendering.h"
 #include "msgs/msgs.h"
-#include "math/MathTypes.hh"
+
+#include "gazebo_config.h"
 #include "src/Server.hh"
 
 using namespace gazebo;
@@ -12,19 +17,30 @@ class ServerFixture : public testing::Test
              {
                this->receiveMutex = new boost::mutex();
                this->server = NULL;
+               this->serverRunning = false;
              }
 
   protected: virtual void TearDown()
              {
+               this->Unload();
+               delete this->receiveMutex;
+             }
+
+  protected: virtual void Unload()
+             {
+               this->serverRunning = false;
                this->node->Fini();
 
                if (this->server)
+               {
                  this->server->Stop();
 
-               if (this->serverThread)
-                 this->serverThread->join();
+                 if (this->serverThread)
+                   this->serverThread->join();
+               }
 
-               delete this->receiveMutex;
+               delete this->serverThread;
+               this->serverThread = NULL;
              }
 
   protected: virtual void Load(const std::string &_worldFilename)
@@ -45,6 +61,8 @@ class ServerFixture : public testing::Test
                ASSERT_NO_THROW(this->node->Init());
                this->poseSub = this->node->Subscribe("~/pose/info",
                    &ServerFixture::OnPose, this);
+               this->statsSub = this->node->Subscribe("~/world_stats", 
+                   &ServerFixture::OnStats, this);
 
                this->factoryPub =
                  this->node->Advertise<msgs::Factory>("~/factory");
@@ -58,6 +76,28 @@ class ServerFixture : public testing::Test
                this->server->Run();
                ASSERT_NO_THROW(this->server->Fini());
                delete this->server;
+               this->server = NULL;
+             }
+
+  protected: void OnStats(
+                 const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+             {
+               this->simTime = msgs::Convert(_msg->sim_time());
+               this->realTime = msgs::Convert( _msg->real_time());
+               this->pauseTime = msgs::Convert(_msg->pause_time());
+               this->paused = _msg->paused();
+               this->percentRealTime =
+                 (this->simTime / this->realTime).Double();
+
+               this->serverRunning = true;
+             }
+
+  protected: double GetPercentRealTime() const
+             {
+               while (!this->serverRunning)
+                 usleep(100000);
+
+               return this->percentRealTime;
              }
 
   protected: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
@@ -334,12 +374,20 @@ class ServerFixture : public testing::Test
 
   protected: Server *server;
   protected: boost::thread *serverThread;
+
   protected: transport::NodePtr node;
   protected: transport::SubscriberPtr poseSub;
+  protected: transport::SubscriberPtr statsSub;
+  protected: transport::PublisherPtr factoryPub;
+
   protected: std::map<std::string, math::Pose> poses;
   protected: boost::mutex *receiveMutex;
 
   private: unsigned char **imgData;
   private: int gotImage;
-  protected: transport::PublisherPtr factoryPub;
+
+  private: common::Time simTime, realTime, pauseTime;
+  private: double percentRealTime;
+  private: bool paused;
+  private: bool serverRunning;
 };

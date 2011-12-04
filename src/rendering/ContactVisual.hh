@@ -39,8 +39,6 @@ namespace gazebo
                    const boost::shared_ptr<msgs::Contacts const> &_msg);
 
       private: void SetupInstancedMaterialToEntity(Ogre::Entity *ent);
-      private: Ogre::String BuildInstancedMaterial(
-                   const Ogre::String &originalMaterialName);
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr contactsSub;

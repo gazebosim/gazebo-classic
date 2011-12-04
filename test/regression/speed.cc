@@ -1,20 +1,11 @@
-#include <gtest/gtest.h>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-
-#include "src/Server.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
-
+#include "ServerFixture.hh"
 
 using namespace gazebo;
+class SpeedTest : public ServerFixture 
+{};
 
-double g_percent = 0;
 
-std::string g_worldFile;
-Server *server = NULL;
-
+/*
 void OnStats(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
 {
   common::Time simTime  = msgs::Convert( _msg->sim_time() );
@@ -23,56 +14,54 @@ void OnStats(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
   if (simTime.Double() > 0)
     g_percent  = (simTime / realTime).Double();
 }
+*/
 
-void RunServer()
+
+TEST_F(SpeedTest, EmptyWorld)
 {
-  ASSERT_NO_THROW(server = new Server());
-  ASSERT_NO_THROW(server->Load(g_worldFile));
-  ASSERT_NO_THROW(server->Init());
+  Load("worlds/empty.world");
+  double speed = GetPercentRealTime();
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speed, 3800.0);
+#endif
+#ifdef BUILD_TYPE_DEBUG
+  EXPECT_GT(speed, 800.0);
+#endif
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speed, 340.0);
+#endif
 
-  server->Run();
-  ASSERT_NO_THROW(server->Fini());
-  delete server;
 }
 
-void SpeedTest(double minSpeed)
+TEST_F(SpeedTest, ShapesWorld)
 {
-  boost::thread thread(boost::bind(RunServer));
-  while (!server || !server->GetInitialized())
-    usleep(1000000);
+  Load("worlds/shapes.world");
+  double speed = GetPercentRealTime();
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speed, 120.0);
+#endif
+#ifdef BUILD_TYPE_DEBUG
+  EXPECT_GT(speed, 25.0);
+#endif
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speed, 18.0);
+#endif
 
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  ASSERT_NO_THROW(node->Init());
-  transport::SubscriberPtr sub = node->Subscribe("~/world_stats", OnStats);
-
-  g_percent = -1;
-  while (g_percent < 0)
-    usleep(100000);
-
-  EXPECT_GT(g_percent, minSpeed);
-
-  ASSERT_NO_THROW(server->Stop());
-  thread.join();
-
-  usleep(1000000);
 }
 
-TEST(Speed, EmptyWorld)
+TEST_F(SpeedTest, PR2World)
 {
-  g_worldFile = "worlds/empty.world";
-  SpeedTest(3800.0);
-}
-
-TEST(Speed, ShapesWorld)
-{
-  g_worldFile = "worlds/shapes.world";
-  SpeedTest(120.0);
-}
-
-TEST(Speed, PR2World)
-{
-  g_worldFile = "worlds/pr2.world";
-  SpeedTest(4.0);
+  Load("worlds/pr2.world");
+  double speed = GetPercentRealTime();
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speed, 4.0);
+#endif
+#ifdef BUILD_TYPE_DEBUG
+  EXPECT_GT(speed, 1.0);
+#endif
+#ifdef BUILD_TYPE_RELEASE
+  EXPECT_GT(speed, 0.4);
+#endif
 }
 
 int main(int argc, char **argv)

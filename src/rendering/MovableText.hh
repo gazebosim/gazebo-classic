@@ -25,6 +25,7 @@
 // TODO: remove this line
 #include "rendering/ogre.h"
 
+
 #include <string>
 
 namespace boost
