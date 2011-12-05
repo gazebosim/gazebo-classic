@@ -31,17 +31,7 @@ execute_process(COMMAND pkg-config --modversion protobuf
   RESULT_VARIABLE protobuf_modversion_failed)
 
 if (PROTOBUF_VERSION LESS 2.3.0)
-  set (PROTOBUF_VERSION_CURRENT false)
-  message (status "version is less")
-else()
-  set (PROTOBUF_VERSION_CURRENT true)
-  message (status "version is more")
-endif()
-
-if (PROTOBUF_FOUND)
-  message (status "We have 2.3.0")
-else ()
-  message (status "We have 2.2.0")
+  BUILD_ERROR("Incorrect version: Gazebo requires protobuf version 2.3.0 or greater")
 endif()
 
 # The Google Protobuf library for message generation + serialization
@@ -55,8 +45,6 @@ endif()
 if (NOT PROTOBUF_PROTOC_LIBRARY)
   BUILD_ERROR ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
 endif()
-message (STATUS "PROTOVER=${PROTOBUF_VER}")
-
 
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)

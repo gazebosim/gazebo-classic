@@ -21,7 +21,6 @@
 #cmakedefine ENABLE_SHADOWS 1
 #cmakedefine INCLUDE_BULLET 1
 #cmakedefine INCLUDE_RTSHADER 1
-#cmakedefine PROTOBUF_VERSION_CURRENT 1
 
 #ifdef BUILD_TYPE_PROFILE
 #include <google/heap-checker.h>

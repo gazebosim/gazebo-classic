@@ -9,7 +9,6 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/descriptor.pb.h>
-#include "gazebo_config.h"
 
 namespace google {
 namespace protobuf {
@@ -29,13 +28,8 @@ bool GazeboGenerator::Generate(const FileDescriptor* file,
 
   // Add boost shared point include
   {
-#ifdef PROTOBUF_VERSION_CURRENT
     scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->OpenForInsert(filename, "includes"));
-#else
-    scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->Open(filename));
-#endif
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
@@ -43,14 +37,8 @@ bool GazeboGenerator::Generate(const FileDescriptor* file,
 
   // Add boost shared typedef
   {
-#ifdef PROTOBUF_VERSION_CURRENT
     scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->OpenForInsert(filename, "global_scope"));
-#else
-    scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->Open(filename));
-#endif
-
     io::Printer printer(output.get(), '$');
 
     std::string package = file->package();
