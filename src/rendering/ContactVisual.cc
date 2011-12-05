@@ -126,7 +126,7 @@ void ContactVisual::Update()
 }
 
 void ContactVisual::OnContact(
-    const boost::shared_ptr<msgs::Contacts const> &_msg)
+    ConstContactsPtr &_msg)
 {
   this->contactsMsg = _msg;
 }

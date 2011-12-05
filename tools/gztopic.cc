@@ -108,7 +108,7 @@ void list()
   connection.reset();
 }
 
-void echo_cb(const boost::shared_ptr<msgs::String const> &_data)
+void echo_cb(ConstStringPtr &_data)
 {
   std::cout << _data->data() << "\n";
 }

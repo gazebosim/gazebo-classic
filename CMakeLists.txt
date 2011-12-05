@@ -129,6 +129,18 @@ else()
   set (BUILD_TYPE_PROFILE FALSE)
 endif()
 
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
+  set (BUILD_TYPE_RELEASE TRUE)
+else()
+  set (BUILD_TYPE_RELEASE FALSE)
+endif()
+
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+  set (BUILD_TYPE_DEBUG TRUE)
+else()
+  set (BUILD_TYPE_DEBUG FALSE)
+endif()
+
 
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")

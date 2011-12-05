@@ -66,7 +66,7 @@ namespace gazebo
       private: void RotateEntity( rendering::VisualPtr &_vis );
       private: void TranslateEntity( rendering::VisualPtr &_vis );
 
-      private: void OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg);
+      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *obj, QEvent *event);
       private: int windowId;

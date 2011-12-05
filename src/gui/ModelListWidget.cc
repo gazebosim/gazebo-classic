@@ -213,7 +213,7 @@ void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 }
 
 void ModelListWidget::OnResponse(
-    const boost::shared_ptr<msgs::Response const> &_msg)
+    ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -1535,7 +1535,7 @@ void ModelListWidget::ProcessPoseMsgs()
 }
 
 void ModelListWidget::OnPose(
-    const boost::shared_ptr<msgs::Pose const> &_msg)
+    ConstPosePtr &_msg)
 {
   this->receiveMutex->lock();
   if (_msg->name().find(this->selectedModelName) != std::string::npos)
@@ -1557,7 +1557,7 @@ void ModelListWidget::OnPose(
 }
 
 void ModelListWidget::OnRequest(
-    const boost::shared_ptr<msgs::Request const> &_msg)
+    ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {

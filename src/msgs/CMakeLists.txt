@@ -60,13 +60,35 @@ set (msgs axis.proto
           track_visual.proto
 )
 
+add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
+target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
+
 set (sources msgs.cc)
 set (headers msgs.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
+
+set(PROTO_SRCS)
+set(PROTO_HDRS)
+foreach(FIL ${msgs})
+  get_filename_component(ABS_FIL ${FIL} ABSOLUTE)
+  get_filename_component(FIL_WE ${FIL} NAME_WE)
+
+  list(APPEND PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
+  list(APPEND PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
+
+  add_custom_command(TARGET gazebomsgs_out POST_BUILD
+    COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
+    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    COMMENT "Running C++ protocol buffer compiler on ${FIL}"
+    VERBATIM )
+endforeach()
+
+set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
+
 add_library(gazebo_msgs SHARED ${PROTO_SRCS} ${sources})
 target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY} gazebo_sdf_interface)
+add_dependencies(gazebo_msgs gazebomsgs_out)
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
 

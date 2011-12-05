@@ -151,6 +151,6 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
   }
 }
 
-void DepthCameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
+void DepthCameraSensor::OnPose(ConstPosePtr &/*_msg*/)
 {
 }

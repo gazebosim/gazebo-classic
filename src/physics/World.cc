@@ -643,13 +643,13 @@ void World::SetPaused(bool p)
 
 
 // Received a factory msg
-void World::OnFactoryMsg(const boost::shared_ptr<msgs::Factory const> &_msg)
+void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->factoryMsgs.push_back(*_msg);
 }
 
-void World::OnControl(const boost::shared_ptr<msgs::WorldControl const> &data)
+void World::OnControl(ConstWorldControlPtr &data)
 {
   if (data->has_pause())
     this->SetPaused(data->pause());
@@ -670,13 +670,13 @@ void World::OnControl(const boost::shared_ptr<msgs::WorldControl const> &data)
   }
 }
 
-void World::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
+void World::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->requestMsgs.push_back(*_msg);
 }
 
-void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
+void World::JointLog(ConstJointPtr &msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   int i = 0;
@@ -696,7 +696,7 @@ void World::JointLog(const boost::shared_ptr<msgs::Joint const> &msg)
   }
 }
 
-void World::OnModelMsg(const boost::shared_ptr<msgs::Model const> &_msg)
+void World::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->modelMsgs.push_back(*_msg);

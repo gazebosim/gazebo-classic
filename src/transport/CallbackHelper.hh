@@ -110,7 +110,7 @@ namespace gazebo
     class DebugCallbackHelper : public CallbackHelper
     {
       public: DebugCallbackHelper( 
-                  const boost::function<void (const boost::shared_ptr<msgs::String const> &)> &cb) : callback(cb) 
+                  const boost::function<void (ConstStringPtr &)> &cb) : callback(cb) 
               {
               }
 
@@ -142,6 +142,7 @@ namespace gazebo
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);
 
+                //ConstStringPtr m(new msgs::String);
                 boost::shared_ptr<msgs::String> m( new msgs::String );
                 m->ParseFromString( newdata );
                 this->callback( m );
@@ -153,7 +154,7 @@ namespace gazebo
                 return true;
               }
 
-      private: boost::function<void (const boost::shared_ptr<msgs::String const> &)> callback;
+      private: boost::function<void (boost::shared_ptr<msgs::String> &)> callback;
     };
     /// \}
   }

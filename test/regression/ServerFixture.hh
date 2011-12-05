@@ -79,8 +79,7 @@ class ServerFixture : public testing::Test
                this->server = NULL;
              }
 
-  protected: void OnStats(
-                 const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+  protected: void OnStats(ConstWorldStatisticsPtr &_msg)
              {
                this->simTime = msgs::Convert(_msg->sim_time());
                this->realTime = msgs::Convert( _msg->real_time());
@@ -100,7 +99,7 @@ class ServerFixture : public testing::Test
                return this->percentRealTime;
              }
 
-  protected: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg)
+  protected: void OnPose(ConstPosePtr &_msg)
              {
                this->receiveMutex->lock();
                this->poses[_msg->name()] = msgs::Convert(*_msg);

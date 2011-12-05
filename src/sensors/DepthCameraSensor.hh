@@ -72,7 +72,7 @@ namespace gazebo
       public: rendering::DepthCameraPtr GetDepthCamera() const 
               {return this->camera; };
 
-      private: void OnPose(const boost::shared_ptr<msgs::Pose const> &_msg);
+      private: void OnPose(ConstPosePtr &_msg);
    
       private: rendering::DepthCameraPtr camera;
 

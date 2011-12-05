@@ -11,6 +11,8 @@
 #define GAZEBO_VERSION_HEADER "Gazebo multi-robot simulator, version ${GAZEBO_VERSION}\nCopyright (C) 2011 Nate Koenig, John Hsu, Andrew Howard, and contributors.\nReleased under the Apache 2 License.\nhttp://gazebosim.org\n\n"
 
 #cmakedefine BUILD_TYPE_PROFILE 1
+#cmakedefine BUILD_TYPE_DEBUG 1
+#cmakedefine BUILD_TYPE_RELEASE 1
 #cmakedefine HAVE_CEGUI 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1

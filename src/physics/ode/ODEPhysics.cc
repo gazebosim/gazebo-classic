@@ -214,7 +214,7 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
 
 }
 
-void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
+void ODEPhysics::OnRequest( ConstRequestPtr &_msg )
 {
   msgs::Response response;
   response.set_id(_msg->id());
@@ -245,7 +245,7 @@ void ODEPhysics::OnRequest( const boost::shared_ptr<msgs::Request const> &_msg )
 }
 
 void ODEPhysics::OnPhysicsMsg( 
-    const boost::shared_ptr<msgs::Physics const> &_msg )
+    ConstPhysicsPtr &_msg )
 {
 
   if (_msg->has_dt())

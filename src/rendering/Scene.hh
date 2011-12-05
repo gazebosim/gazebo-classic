@@ -235,34 +235,34 @@ namespace gazebo
                                        const Ogre::Vector3 &scale);
   
       private: void OnRequest(
-                   const boost::shared_ptr<msgs::Request const> &_msg);
+                   ConstRequestPtr &_msg);
       private: void OnResponse(
-                   const boost::shared_ptr<msgs::Response const> &_msg);
-      private: void OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg);
+                   ConstResponsePtr &_msg);
+      private: void OnJointMsg(ConstJointPtr &_msg);
 
       private: void ProcessSensorMsg(
-                   const boost::shared_ptr<msgs::Sensor const> &_msg);
+                   ConstSensorPtr &_msg);
       private: void ProcessJointMsg(
-                   const boost::shared_ptr<msgs::Joint const> &_msg);
+                   ConstJointPtr &_msg);
 
       private: void ProcessSceneMsg(
-                   const boost::shared_ptr<msgs::Scene const> &_msg);
+                   ConstScenePtr &_msg);
 
       private: void OnSceneMsg(
-                   const boost::shared_ptr<msgs::Scene const> &_msg);
+                   ConstScenePtr &_msg);
       private: void OnVisualMsg(
-                   const boost::shared_ptr<msgs::Visual const> &msg);
+                   ConstVisualPtr &msg);
       private: void ProcessVisualMsg(
-                   const boost::shared_ptr<msgs::Visual const> &msg);
+                   ConstVisualPtr &msg);
 
-      private: void OnLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
+      private: void OnLightMsg(ConstLightPtr &msg);
       private: void ProcessLightMsg(
-                   const boost::shared_ptr<msgs::Light const> &msg);
+                   ConstLightPtr &msg);
 
       private: void OnSelectionMsg(
-                   const boost::shared_ptr<msgs::Selection const> &msg);
+                   ConstSelectionPtr &msg);
                
-      private: void OnPoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
+      private: void OnPoseMsg(ConstPosePtr &msg);
 
       public: void Clear();
 

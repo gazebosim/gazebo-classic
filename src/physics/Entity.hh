@@ -198,7 +198,7 @@ namespace gazebo
       private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify);
 
       /// \brief Called when a new pose message arrives
-      private: void OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg);
+      private: void OnPoseMsg(ConstPosePtr &_msg);
 
       /// \brief This function is called when the entity's 
       ///        (or one of its parents) pose of the parent has changed

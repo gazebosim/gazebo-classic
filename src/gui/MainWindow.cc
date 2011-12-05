@@ -460,7 +460,7 @@ void MainWindow::OnMoveMode(bool mode)
   }
 }
 
-void MainWindow::OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg)
+void MainWindow::OnGUI(ConstGUIPtr &_msg)
 {
   if (_msg->has_fullscreen() && _msg->fullscreen())
   {
@@ -489,7 +489,7 @@ void MainWindow::OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg)
   }
 }
 
-void MainWindow::OnModel(const boost::shared_ptr<msgs::Model const> &_msg )
+void MainWindow::OnModel(ConstModelPtr &_msg )
 {
   this->entities[_msg->name()] = _msg->id();
   for (int i=0; i < _msg->link_size(); i++)
@@ -507,7 +507,7 @@ void MainWindow::OnModel(const boost::shared_ptr<msgs::Model const> &_msg )
 }
 
 void MainWindow::OnResponse(
-    const boost::shared_ptr<msgs::Response const> &_msg)
+    ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -593,7 +593,7 @@ bool MainWindow::HasEntityName(const std::string &_name)
 }
 
 void MainWindow::OnWorldModify(
-    const boost::shared_ptr<msgs::WorldModify const> &_msg)
+    ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())
     this->renderWidget->CreateScene(_msg->world_name());

@@ -174,9 +174,9 @@ namespace gazebo
       /// \brief Step callback
       private: void OnStep();
 
-      private: void OnControl( const boost::shared_ptr<msgs::WorldControl const> &data );
+      private: void OnControl( ConstWorldControlPtr &data );
     
-      private: void OnRequest( const boost::shared_ptr<msgs::Request const> &_msg );
+      private: void OnRequest( ConstRequestPtr &_msg );
 
       /// \brief Delete an entity by name
       /// \param name The name of the entity to delete
@@ -185,17 +185,17 @@ namespace gazebo
       /// \brief Set the selected entity
       private: void SetSelectedEntityCB( const std::string &name );
     
-      private: void OnEntitiesRequest( const boost::shared_ptr<msgs::Request const> &_data );
+      private: void OnEntitiesRequest( ConstRequestPtr &_data );
 
       /// \brief Construct a scene message from the known world state
       private: void BuildSceneMsg(msgs::Scene &scene, BasePtr entity);
 
-      private: void JointLog(const boost::shared_ptr<msgs::Joint const> &msg);
+      private: void JointLog(ConstJointPtr &msg);
 
       private: void OnFactoryMsg(
-                   const boost::shared_ptr<msgs::Factory const> &data);
+                   ConstFactoryPtr &data);
       private: void OnModelMsg(
-                   const boost::shared_ptr<msgs::Model const> &_msg);
+                   ConstModelPtr &_msg);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();

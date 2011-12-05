@@ -87,7 +87,7 @@ TimePanel::~TimePanel()
 }
 
 void TimePanel::OnStats(
-    const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+    ConstWorldStatisticsPtr &_msg)
 {
   this->simTime  = msgs::Convert( _msg->sim_time() );
   this->realTime = msgs::Convert( _msg->real_time() );

@@ -47,15 +47,15 @@ namespace gazebo
       private slots:void OnShowCollision();
 
       private: void OnResponse(
-                   const boost::shared_ptr<msgs::Response const> &_msg );
+                   ConstResponsePtr &_msg );
 
       private: void OnModelUpdate(const msgs::Model &_msg);
 
       private: void OnRequest(
-                   const boost::shared_ptr<msgs::Request const> &_msg);
+                   ConstRequestPtr &_msg);
 
       private: void OnPose(
-                   const boost::shared_ptr<msgs::Pose const> &_msg);
+                   ConstPosePtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);

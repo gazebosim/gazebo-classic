@@ -169,10 +169,10 @@ namespace gazebo
       public: void ProcessContactFeedback(ContactFeedback* feedback);
 
       protected: virtual void OnRequest( 
-                   const boost::shared_ptr<msgs::Request const> &/*_msg*/ );
+                   ConstRequestPtr &/*_msg*/ );
 
       protected: virtual void OnPhysicsMsg( 
-                   const boost::shared_ptr<msgs::Physics const> &/*_msg*/ );
+                   ConstPhysicsPtr &/*_msg*/ );
 
       private: void  AddTrimeshCollider( ODECollision *_collision1, 
                                          ODECollision *_collision2 );

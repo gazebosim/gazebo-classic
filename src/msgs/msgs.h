@@ -43,8 +43,8 @@ namespace gazebo
     /// \param _request Request string
     /// \param _data Optional data string
     /// \return A Request message
-    msgs::Request *CreateRequest( const std::string &_request, 
-                                  const std::string &_data = "" );
+    msgs::Request *CreateRequest(const std::string &_request, 
+                                 const std::string &_data = "");
 
 
     /// \brief Initialize a message

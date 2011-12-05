@@ -29,8 +29,15 @@ include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 # The Google Protobuf library for message generation + serialization
 find_package(Protobuf REQUIRED)
 if (NOT PROTOBUF_FOUND)
-  BUILD_ERROR ("Missing: Google Protobuf")
+  BUILD_ERROR ("Missing: Google Protobuf (libprotobuf-dev")
 endif()
+if (NOT PROTOBUF_PROTOC_EXECUTABLE)
+  BUILD_ERROR ("Missing: Google Protobuf Compiler (protobuf-compiler)")
+endif()
+if (NOT PROTOBUF_PROTOC_LIBRARY)
+  BUILD_ERROR ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
+endif()
+
 
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)

@@ -50,7 +50,7 @@ LaserVisual::~LaserVisual()
 }
 
 
-void LaserVisual::OnScan( const boost::shared_ptr<msgs::LaserScan const> &_msg)
+void LaserVisual::OnScan( ConstLaserScanPtr &_msg)
 {
   double angle = _msg->angle_min();
   double r;

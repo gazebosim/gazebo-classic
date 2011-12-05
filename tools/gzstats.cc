@@ -11,7 +11,7 @@
 
 using namespace gazebo;
 
-void cb(const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+void cb(ConstWorldStatisticsPtr &_msg)
 {
   double percent = 0;
   char paused;

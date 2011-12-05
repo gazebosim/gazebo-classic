@@ -230,7 +230,7 @@ void PhysicsWidget::Init()
 }
 
 void PhysicsWidget::OnResponse(
-    const boost::shared_ptr<msgs::Response const> &_msg)
+    ConstResponsePtr &_msg)
 {
   if (this->initialized || !this->requestMsg || 
       this->requestMsg->id() != _msg->id())
@@ -783,7 +783,7 @@ void SceneWidget::OnShadows(bool _state)
   this->scenePub->Publish(msg);
 }
 
-void SceneWidget::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
+void SceneWidget::OnResponse(ConstResponsePtr &_msg)
 {
   if (this->initialized || !this->requestMsg || 
       this->requestMsg->id() != _msg->id())

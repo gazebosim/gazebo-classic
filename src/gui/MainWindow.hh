@@ -31,7 +31,7 @@ namespace gazebo
 
       protected: void closeEvent(QCloseEvent *event);
 
-      private: void OnGUI(const boost::shared_ptr<msgs::GUI const> &_msg);
+      private: void OnGUI(ConstGUIPtr &_msg);
 
       private slots: void New();
       private slots: void Open();
@@ -63,12 +63,12 @@ namespace gazebo
       private: void CreateMenus();
       private: void CreateToolbars();
 
-      private: void OnModel(const boost::shared_ptr<msgs::Model const> &_msg);
+      private: void OnModel(ConstModelPtr &_msg);
       private: void OnSetSelectedEntity(const std::string &_name);
       private: void OnResponse(
-                   const boost::shared_ptr<msgs::Response const> &_msg);
+                   ConstResponsePtr &_msg);
       private: void OnWorldModify(
-                   const boost::shared_ptr<msgs::WorldModify const> &_msg);
+                   ConstWorldModifyPtr &_msg);
 
       private: QMenu *fileMenu;
       private: QMenu *editMenu;

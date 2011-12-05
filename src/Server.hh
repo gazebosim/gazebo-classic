@@ -37,7 +37,7 @@ namespace gazebo
     public: bool GetInitialized() const;
 
     private: void OnControl(
-                 const boost::shared_ptr<msgs::ServerControl const> &_msg);
+                 ConstServerControlPtr &_msg);
 
     private: void ProcessControlMsgs();
 

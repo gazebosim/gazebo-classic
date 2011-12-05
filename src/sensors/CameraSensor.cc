@@ -151,7 +151,7 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
   }
 }
 
-void CameraSensor::OnPose(const boost::shared_ptr<msgs::Pose const> &/*_msg*/)
+void CameraSensor::OnPose(ConstPosePtr &/*_msg*/)
 {
 }
 

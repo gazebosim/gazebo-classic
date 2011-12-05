@@ -60,7 +60,7 @@ namespace gazebo
       private slots: void OnMaxVel();
       private slots: void OnSurfaceLayer();
 
-      private: void OnResponse(const boost::shared_ptr<msgs::Response const> &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr physicsPub, requestPub;
@@ -102,7 +102,7 @@ namespace gazebo
       private slots: void OnShadows(bool _state=false);
 
       private: void OnResponse(
-                   const boost::shared_ptr<msgs::Response const> &_msg);
+                   ConstResponsePtr &_msg);
 
       public: bool initialized;
       private: std::string sceneName;

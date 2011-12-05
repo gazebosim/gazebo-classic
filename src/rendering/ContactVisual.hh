@@ -36,7 +36,7 @@ namespace gazebo
 
       private: void Update();
       private: void OnContact(
-                   const boost::shared_ptr<msgs::Contacts const> &_msg);
+                   ConstContactsPtr &_msg);
 
       private: void SetupInstancedMaterialToEntity(Ogre::Entity *ent);
 

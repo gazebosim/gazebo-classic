@@ -64,7 +64,7 @@ namespace gazebo
       public: void Load( );
   
       /// \brief Load from a light message
-      public: void LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg);
+      public: void LoadFromMsg(ConstLightPtr &msg);
   
         /// \brief Set the name of the visual
       public: void SetName( const std::string &name );

@@ -434,7 +434,7 @@ LinkPtr Entity::GetChildLink(const std::string &_name)
 }
 
 /// Called when a new pose message arrives
-void Entity::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
+void Entity::OnPoseMsg(ConstPosePtr &_msg)
 {
   if (_msg->name() == this->GetScopedName())
   {

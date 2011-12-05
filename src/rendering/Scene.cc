@@ -964,7 +964,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   }
 }
 
-void Scene::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
+void Scene::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -978,7 +978,7 @@ void Scene::OnResponse(const boost::shared_ptr<msgs::Response const> &_msg)
   }
 }
 
-void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
+void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
 {
   std::string sceneName = _msg->name() + "::";
   std::string modelName, linkName;
@@ -1086,13 +1086,13 @@ void Scene::ProcessSceneMsg( const boost::shared_ptr<msgs::Scene const> &_msg)
   }
 }
 
-void Scene::OnSceneMsg(const boost::shared_ptr<msgs::Scene const> &_msg)
+void Scene::OnSceneMsg(ConstScenePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }
 
-void Scene::OnVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
+void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(_msg);
@@ -1184,13 +1184,13 @@ void Scene::PreRender()
   }
 }
 
-void Scene::OnJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
+void Scene::OnJointMsg(ConstJointPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->jointMsgs.push_back(_msg);
 }
 
-void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
+void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
     return;
@@ -1228,7 +1228,7 @@ void Scene::ProcessSensorMsg(const boost::shared_ptr<msgs::Sensor const> &_msg)
   }
 }
 
-void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
+void Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
   VisualPtr parentVis = this->GetVisual(_msg->parent());
   VisualPtr childVis;
@@ -1256,7 +1256,7 @@ void Scene::ProcessJointMsg(const boost::shared_ptr<msgs::Joint const> &_msg)
   }
 }
 
-void Scene::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
+void Scene::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   if (_msg->request() == "entity_delete")
@@ -1285,7 +1285,7 @@ void Scene::OnRequest(const boost::shared_ptr<msgs::Request const> &_msg)
 
 }
 
-void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
+void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
   Visual_M::iterator iter;
   iter = this->visuals.find( _msg->name() );
@@ -1328,7 +1328,7 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &_msg)
   }
 }
 
-void Scene::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
+void Scene::OnPoseMsg( ConstPosePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
@@ -1346,13 +1346,13 @@ void Scene::OnPoseMsg( const boost::shared_ptr<msgs::Pose const> &_msg)
   this->poseMsgs.push_back( _msg );
 }
 
-void Scene::OnLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
+void Scene::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->lightMsgs.push_back(_msg);
 }
 
-void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
+void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
   iter = this->lights.find(_msg->name());
@@ -1365,7 +1365,7 @@ void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &_msg)
   }
 }
 
-void Scene::OnSelectionMsg(const boost::shared_ptr<msgs::Selection const> &_msg)
+void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   this->selectionMsg = _msg;
 }

@@ -24,7 +24,7 @@ namespace gazebo
 
       private: void OnFullScreen(bool &_value);
       private: void OnStats(
-                   const boost::shared_ptr<msgs::WorldStatistics const> &_msg);
+                   ConstWorldStatisticsPtr &_msg);
 
       private slots: void OnTimeReset();
 

@@ -136,7 +136,7 @@ void Light::Load()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load from a light message
-void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
+void Light::LoadFromMsg(ConstLightPtr &msg)
 {
   this->sdf->GetAttribute("name")->Set( msg->name() );
 
