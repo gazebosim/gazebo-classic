@@ -9,6 +9,7 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/descriptor.pb.h>
+#include "gazebo_config.h"
 
 namespace google {
 namespace protobuf {
@@ -28,17 +29,28 @@ bool GazeboGenerator::Generate(const FileDescriptor* file,
 
   // Add boost shared point include
   {
+#ifdef PROTOBUF_VERSION_CURRENT
     scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->OpenForInsert(filename, "includes"));
+#else
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        generator_context->Open(filename));
+#endif
     io::Printer printer(output.get(), '$');
 
-    printer.Print("#include <boost/shared_ptr.hpp>", "name", parameter);
+    printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
   }
 
   // Add boost shared typedef
   {
+#ifdef PROTOBUF_VERSION_CURRENT
     scoped_ptr<io::ZeroCopyOutputStream> output(
         generator_context->OpenForInsert(filename, "global_scope"));
+#else
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        generator_context->Open(filename));
+#endif
+
     io::Printer printer(output.get(), '$');
 
     std::string package = file->package();
@@ -48,7 +60,7 @@ bool GazeboGenerator::Generate(const FileDescriptor* file,
       + "::" + file->message_type(0)->name() + " const> Const" 
       + file->message_type(0)->name() + "Ptr;";
 
-    printer.Print(constType.c_str(), "name", parameter);
+    printer.Print(constType.c_str(), "name", "global_scope");
   }
 
   return true;
