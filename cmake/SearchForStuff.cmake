@@ -214,7 +214,7 @@ if (PKG_CONFIG_FOUND)
 
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  message (FATAL_ERROR "\nError: pkg-config not found")
+  BUILD_ERROR ("Error: pkg-config not found")
 endif (PKG_CONFIG_FOUND)
 
 find_package (Qt4)

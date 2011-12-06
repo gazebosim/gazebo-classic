@@ -86,7 +86,7 @@ set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 
-set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC -fprofile-arcs -ftest-coverage" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
 set (CMAKE_C_FLAGS_CHECK " -ggdb3 -Wall -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow -pedantic -Wno-long-long -Wno-unused-value -fPIC" CACHE INTERNAL "C Flags for static code checking" FORCE)
@@ -96,7 +96,7 @@ set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
 # Build type link flags
 set (CMAKE_LINK_FLAGS_RELEASE " -fPIC" CACHE INTERNAL "Link flags fro release" FORCE)
 set (CMAKE_LINK_FLAGS_DEBUG " -fPIC" CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE " -fPIC" CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_PROFILE " -fPIC -lgcov" CACHE INTERNAL "Link flags for profile" FORCE)
 set (CMAKE_LINK_FLAGS_CHECK " -fPIC" CACHE INTERNAL "Link flags for static code checking" FORCE)
 
 #####################################
@@ -123,7 +123,7 @@ set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
   set (BUILD_TYPE_PROFILE TRUE)
 else()
   set (BUILD_TYPE_PROFILE FALSE)

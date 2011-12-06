@@ -54,6 +54,10 @@ target_link_libraries( gzserver gazebo_common
                                 ${tinyxml_libraries}
                                 )
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+  target_link_libraries(gzserver gcov)
+endif()
+
 
 
 INSTALL_EXECUTABLE( gzmaster )
