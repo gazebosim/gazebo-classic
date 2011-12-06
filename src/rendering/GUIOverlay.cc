@@ -21,6 +21,7 @@ using namespace rendering;
 
 GUIOverlay::GUIOverlay()
 {
+  this->initialized = false;
 #ifdef HAVE_CEGUI
   this->guiRenderer = NULL;
 
@@ -33,6 +34,7 @@ GUIOverlay::GUIOverlay()
 
 GUIOverlay::~GUIOverlay()
 {
+  this->initialized = false;
 #ifdef HAVE_CEGUI
   CEGUI::OgreRenderer::destroySystem();
 #endif
@@ -40,6 +42,9 @@ GUIOverlay::~GUIOverlay()
 
 void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
 {
+  if (this->initialized)
+    return;
+
 #ifdef HAVE_CEGUI
   CEGUI::System::getSingletonPtr();
 
@@ -77,6 +82,7 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
   rootWindow->setMousePassThroughEnabled(true);
   CEGUI::System::getSingleton().setGUISheet( rootWindow );
 #endif
+  this->initialized = true;
 }
 
 void GUIOverlay::Update()

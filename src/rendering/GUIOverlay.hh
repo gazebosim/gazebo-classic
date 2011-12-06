@@ -97,6 +97,7 @@ namespace gazebo
       private: std::map<std::string, boost::function<void()> > callbacks;
                
       private: unsigned int rttImageSetCount;
+      private: bool initialized;
     };
   }
 }
