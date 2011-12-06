@@ -34,20 +34,6 @@ material Gazebo/DepthMap
   }
 }
 
-material Gazebo/GreyGrid
-{
-  receive_shadows_on
-  technique
-  {
-    pass ambient
-    {
-      ambient .5 .5 .5 1
-      diffuse .5 .5 .5 
-      specular .1 .1 .1 128
-    }
- }
-}
-
 material Gazebo/Grey
 {
 	receive_shadows on
@@ -83,15 +69,11 @@ material Gazebo/FlatBlack : perpixel_template
 {
 	technique
 	{
-		pass ambient
+		pass
 		{
 			ambient 0 0 0
-		}
-
-    pass light
-    {
-      diffuse 0 0 0
-      specular 0 0 0 0
+      diffuse 0.1 0.1 0.1
+      specular 0.01 0.01 0.01 0
     }
 	}
 }

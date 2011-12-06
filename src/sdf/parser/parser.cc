@@ -140,7 +140,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     gzerr << "Element is missing the required attributed\n";
     return false;
   }
-  _sdf->SetRequired( requiredString );
+  _sdf->SetRequired(requiredString);
 
   const char *elemTypeString = _xml->Attribute("type");
   if (elemTypeString)
@@ -158,6 +158,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     const char *type = child->Attribute("type");
     const char *defaultValue = child->Attribute("default");
     const char *requiredString = child->Attribute("required");
+
     if (!name)
     {
       gzerr << "Attribute is missing a name\n";
@@ -178,7 +179,9 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
       gzerr << "Attribute is missing a required string\n";
       return false;
     }
-    bool required = std::string(requiredString) == "1" ? true : false;
+    std::string requiredStr = requiredString;
+    boost::trim(requiredStr);
+    bool required = requiredStr == "1" ? true : false;
 
     _sdf->AddAttribute(name, type, defaultValue, required);
   }
@@ -375,6 +378,12 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
 ////////////////////////////////////////////////////////////////////////////////
 bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
 {
+  if (_sdf->GetRequired() == "-1")
+  {
+    gzwarn << "SDF Element[" << _sdf->GetName() << "] is deprecated\n";
+    return true;
+  }
+
   if (!_xml)
   {
     if (_sdf->GetRequired() == "1" || _sdf->GetRequired() =="+")
@@ -522,11 +531,15 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     {
       if ( (*eiter)->GetRequired() == "1" || (*eiter)->GetRequired() == "+")
       {
-        if (!_sdf->HasElement( (*eiter)->GetName() ))
+        if (!_sdf->HasElement((*eiter)->GetName()))
         {
-          gzerr << "XML Missing required element[" << (*eiter)->GetName() 
-            << "], child of element[" << _sdf->GetName() << "]\n";
-          return false;
+          if (_sdf->GetName() == "joint" &&
+              _sdf->GetValueString("type") != "ball")
+          {
+            gzerr << "XML Missing required element[" << (*eiter)->GetName() 
+              << "], child of element[" << _sdf->GetName() << "]\n";
+            return false;
+          }
         }
       }
     }

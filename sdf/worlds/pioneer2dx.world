@@ -2,11 +2,9 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.5 0.5 0.5 1"/>
-      <background rgba="0 0 0 1">
-        <sky material="Gazebo/CloudySky"/>
-      </background>
-      <shadows enabled="true"/>
+      <ambient rgba="0.1 0.1 0.1 1"/>
+      <background rgba="0 0 0 1"/>
+      <shadows enabled="false"/>
     </scene>
 
     <physics type="ode">
@@ -20,32 +18,52 @@
     <!-- Ground Plane -->
     <model name="plane1_model" static="true">
       <link name="body">
-        <collision name="geom">
+        <collision name="geom_1">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
         </collision>
 
-        <visual name="visual">
+        <visual name="visual_1" cast_shadows="false">
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
-          <material script="Gazebo/GreyGrid"/>
-          <cast_shadows>false</cast_shadows>
+          <material script="Gazebo/Grey"/>
         </visual>
       </link>
     </model>
 
     <include filename="pioneer2dx.model"/>
+    <!--
+    <model name="box_model1" static="false">
+      <origin pose="0 0 .25 0 0 0"/>
+      <link name="box_body">
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
 
-    <light type="directional" name="my_light">
-      <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba="1 1 1 1"/>
+        <collision name="geom1">
+          <geometry>
+            <box size="1 1 .5"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box size="1 1 .5"/>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    -->
+
+    <light type="directional" name="my_light" cast_shadows="false">
+      <origin pose="-2 0 1 0.707 3.1415 0"/>
+      <diffuse rgba=".9 .9 .9 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
-      <directional direction="0 0 -1"/>
     </light>
-
   </world>
-
 </gazebo>
+
+

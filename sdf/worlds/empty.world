@@ -4,7 +4,7 @@
     <scene>
       <ambient rgba="0.1 0.1 0.1 1"/>
       <background rgba="0 0 0 1"/>
-      <shadows enabled="false"/>
+      <shadows enabled="true"/>
     </scene>
 
     <physics type="ode">
@@ -16,7 +16,7 @@
     </physics>
 
     <!-- Ground Plane -->
-    -<model name="plane1_model" static="true">
+    <model name="plane1_model" static="true">
       <link name="body">
         <collision name="geom_1">
           <geometry>
@@ -28,17 +28,17 @@
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
-          <material script="Gazebo/GreyGrid"/>
+          <material script="Gazebo/Grey"/>
         </visual>
       </link>
     </model>
 
-    <light type="directional" name="my_light" cast_shadows="false">
+    <light type="directional" name="sun" cast_shadows="true">
       <origin pose="0 0 10 0 0 0"/>
-      <diffuse rgba=".9 .9 .9 1"/>
-      <specular rgba=".1 .1 .1 1"/>
-      <attenuation range="20"/>
-      <direction xyz="0 0 -1"/>
+      <diffuse rgba="0.8 0.8 0.8 1"/>
+      <specular rgba="0 0 0 1"/>
+      <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
+      <direction xyz="0.0 -0.2 -0.8"/>
     </light>
-  </world>
+
 </gazebo>

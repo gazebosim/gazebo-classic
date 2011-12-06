@@ -37,7 +37,7 @@
           <geometry>
             <plane normal="0 0 1"/>
           </geometry>
-          <material script="Gazebo/GreyGrid"/>
+          <material script="Gazebo/Grey"/>
         </visual>
       </link>
     </model>

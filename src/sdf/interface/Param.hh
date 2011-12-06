@@ -188,19 +188,22 @@ namespace sdf
     /// \brief Set the parameter value from a string
     public: virtual bool Set( const std::string &_str )
     {
-      if (_str.empty() && this->required)
+      std::string str =_str;
+      boost::trim(str);
+      if (str.empty() && this->required)
       {
-        gzerr << "Empty string used when setting a required parameter. Key[" << this->GetKey() << "]\n";
+        gzerr << "Empty string used when setting a required parameter. Key["
+              << this->GetKey() << "]\n";
         return false;
       }
-      else if (_str.empty())
+      else if (str.empty())
       {
         this->value = this->defaultValue;
         return true;
       }
 
-      std::string tmp( _str );
-      std::string lowerTmp( _str );
+      std::string tmp(str);
+      std::string lowerTmp(str);
       boost::to_lower(lowerTmp);
 
       // "true" and "false" doesn't work properly
@@ -215,15 +218,17 @@ namespace sdf
       }
       catch (boost::bad_lexical_cast &e)
       {
-        if (_str == "inf" || _str == "-inf")
+        if (str == "inf" || str == "-inf")
         {
           // in this case, the parser complains, but seems to assign the 
           // right values
-          gzmsg << "INFO [sdf::Param]: boost throws when lexical casting inf's, but the values are usually passed through correctly\n";
+          gzmsg << "INFO [sdf::Param]: boost throws when lexical casting "
+            << "inf's, but the values are usually passed through correctly\n";
         }
         else
         {
-          gzerr << "Unable to set value [" <<  _str << "] for key[" << this->key << "]\n";
+          gzerr << "Unable to set value [" <<  str
+                << "] for key[" << this->key << "]\n";
           return false;
         }
       }

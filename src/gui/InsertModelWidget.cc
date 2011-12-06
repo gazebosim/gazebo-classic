@@ -194,8 +194,9 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
     }
 
     msgs::Selection selectMsg;
-    selectMsg.set_name( modelName );
+    selectMsg.set_name(modelName);
     selectMsg.set_selected(true);
+    selectMsg.set_id(gui::get_entity_id(modelName));
     this->selectionPub->Publish(selectMsg);
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);
@@ -213,8 +214,9 @@ void InsertModelWidget::OnApply()
  
   // Remove the selection 
   msgs::Selection selectMsg;
-  selectMsg.set_name( modelName );
+  selectMsg.set_name(modelName);
   selectMsg.set_selected(false);
+  selectMsg.set_id(gui::get_entity_id(modelName));
   this->selectionPub->Publish(selectMsg);
  
   // Remove the topic namespace from the model name. This will get re-inserted
@@ -248,8 +250,9 @@ void InsertModelWidget::OnCancel()
  
   // Remove the selection 
   msgs::Selection selectMsg;
-  selectMsg.set_name( modelName );
+  selectMsg.set_name(modelName);
   selectMsg.set_selected(false);
+  selectMsg.set_id(gui::get_entity_id(modelName));
   this->selectionPub->Publish(selectMsg);
   this->fileTreeWidget->clearSelection();
 }
