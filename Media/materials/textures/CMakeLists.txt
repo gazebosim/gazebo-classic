@@ -33,8 +33,17 @@ SET (files
             terrain_texture.jpg
             willowMap.png
             WoodPallet.png 
+            test.png
+            redSelect.png
+            greenSelect.png
+            blueSelect.png
+            wood.jpg
+            beigeWall.jpg
+            granite.jpg
+            granite2.jpg
+            grass.jpg
 )
 
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/textures/)
 

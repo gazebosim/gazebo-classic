@@ -1,0 +1,242 @@
+<gazebo version="1.0">
+
+<world name="my_world">
+
+  <scene>
+    <ambient rgba="0.1 0.1 0.1 1"/>
+    <background rgba=".5 .0 .1 1.0">
+      <sky material="Gazebo/CloudySky"/>
+    </background>
+    <shadows enabled="true"/>
+  </scene>
+
+  <physics type="ode">
+    <gravity xyz="0 0 0"/>
+    <ode>
+      <solver type="quick" dt="0.001" iters="100" sor="1.3"/>
+      <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
+    </ode>
+  </physics>
+
+  <light type="directional" name="my_light">
+   <origin pose="0 0 10 0 0 0"/>
+   <diffuse rgba="1 1 1 1"/>
+   <specular rgba="0.1 0.1 0.1 1.0"/>
+   <attenuation range="20" constant="1.0" linear="1.0" quadratic="0.001"/>
+  </light>
+
+  <model name="default_pioneer_model">
+  
+    <link name="chassis_body">
+      <origin pose="0.0 0.0 0.16 0 0 0"/>
+  
+      <inertial mass="1.0">
+        <origin pose="0 0 0 0 0 0"/>
+        <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
+      </inertial>
+  
+      <collision name="collision_1">
+        <origin pose="0 0 0 0 0 0"/>
+        <geometry>
+          <box size="0.445 0.277 0.17"/>
+        </geometry>
+      </collision>
+  
+      <collision name="collision_2">
+        <origin pose="0 0 0 0 0 0"/>
+        <geometry>
+          <box size="0.445 0.277 0.17"/>
+        </geometry>
+        <surface>
+          <friction>
+            <ode mu="1.0" mu2="0" fdir1="1 0 0" slip1="0.1" slip2="0.2"/>
+          </friction>
+          <bounce restitution_coefficient="0.5" threshold="0.2"/>
+          <contact>
+            <ode soft_cfm="0.0" kp="100" kd="10" max_vel="0.4" min_depth="0.3"/>
+          </contact>
+        </surface>
+      </collision>
+    
+      <visual name="visual_1">
+        <origin pose="0 0 0.04 0 180 0"/>
+        <geometry>
+          <box size="1 2 3"/>
+        </geometry>
+        <material script="Gazebo/Pioneer2Body"/>
+      </visual>
+  
+       <visual name="visual_2" cast_shadows="true">
+        <origin pose="0 0 0.04 0 180 0"/>
+        <geometry>
+          <box size="1 2 3"/>
+        </geometry>
+        <material script="Gazebo/Pioneer2Body"/>
+      </visual>
+   
+    </link>
+  
+     <link name="body_2">
+      <origin pose="0.0 0.0 0.16 0 0 0"/>
+  
+      <inertial mass="1.0">
+        <origin pose="0 0 0 0 0 0"/>
+        <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
+      </inertial>
+  
+      <collision name="chassis_geom">
+        <origin pose="0 0 0 0 0 0"/>
+        <geometry>
+          <box size="0.445 0.277 0.17"/>
+        </geometry>
+      </collision>
+  
+      <collision name="chassis_geom_2">
+        <origin pose="0 0 0 0 0 0"/>
+        <geometry>
+          <box size="0.445 0.277 0.17"/>
+        </geometry>
+      </collision>
+    
+      <visual name="visual1" cast_shadows="true">
+        <origin pose="0 0 0.04 0 180 0"/>
+        <geometry>
+          <box size="1 2 3"/>
+        </geometry>
+        <material script="Gazebo/Pioneer2Body"/>
+      </visual>
+  
+       <visual name="visual2" cast_shadows="true">
+        <origin pose="0 0 0.04 0 180 0"/>
+        <geometry>
+          <box size="1 2 3"/>
+        </geometry>
+        <material script="Gazebo/Pioneer2Body"/>
+      </visual>
+  
+      <sensor name="my_sensor" always_on="true" update_rate="3">
+        <plugin name="sensor_plugin" filename="/tmp/sensor_plugin.so">  
+          <sensor_funky_xml>so sensor funky</sensor_funky_xml>
+          <sensor_more value="hello"/>
+        </plugin>
+ 
+        <camera> 
+          <origin pose="1 2 3 0 0 0"/>
+          <horizontal_fov angle="1.57"/>
+          <image width="640" height="480" format="L8"/>
+          <clip near="0.1" far="1000"/>
+          <save enabled="false" path="/tmp"/>
+        </camera>
+      </sensor>
+   
+    </link>
+  
+    <joint name="super_awesome_joint" type="ball">
+      <parent link="chassis_body"/>
+      <child link="body_2"/>
+    </joint>
+  
+     <joint name="less_awesome_joint" type="revolute">
+      <parent link="chassis_body"/>
+      <child link="body_2"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+  
+    <plugin name="best_plugin2" filename="/tmp/good_plugin.so">  
+      <funky_xml txt="so funky"/>
+      <more value="hello"/>
+    </plugin>
+  </model>
+
+  
+  <model name="other_model">
+    <link name="body_2">
+      <origin pose="0.0 0.0 0.16 0 0 0"/>
+    
+      <inertial mass="1.0">
+        <origin pose="0 0 0 0 0 0"/>
+        <inertia ixx="1.0" ixy="1.0" ixz="0.0" iyy="0.0" iyz="1.0" izz="1.0"/>
+      </inertial>
+    
+      <collision name="chassis_geom">
+        <origin pose="0 0 0 0 0 0"/>
+        <geometry>
+          <box size="0.445 0.277 0.17"/>
+        </geometry>
+      </collision>
+    
+      <collision name="chassis_geom_2">
+        <origin pose="0 0 0 0 0 0"/>
+        <geometry>
+          <box size="0.445 0.277 0.17"/>
+        </geometry>
+      </collision>
+    
+      <visual name="visual1" cast_shadows="true">
+        <origin pose="0 0 0.04 0 180 0"/>
+        <geometry>
+          <box size="1 2 3"/>
+        </geometry>
+        <material script="Gazebo/Pioneer2Body"/>
+      </visual>
+    
+       <visual name="visual2" cast_shadows="true">
+        <origin pose="0 0 0.04 0 180 0"/>
+        <geometry>
+          <box size="1 2 3"/>
+        </geometry>
+        <material script="Gazebo/Pioneer2Body"/>
+      </visual>
+    
+      <sensor name="my_sensor" always_on="true" update_rate="3">
+        <plugin name="sensor_plugin" filename="/tmp/sensor_plugin.so">  
+          <sensor_funky_xml>so sensor funky</sensor_funky_xml>
+          <sensor_more value="hello"/>
+        </plugin>
+   
+        <camera> 
+          <origin pose="1 2 3 0 0 0"/>
+          <horizontal_fov angle="1.57"/>
+          <image width="640" height="480" format="L8"/>
+          <clip near="0.1" far="1000"/>
+          <save enabled="false" path="/tmp"/>
+        </camera>
+      </sensor>
+    
+    </link>
+  </model>
+
+  <joint name="world_joint" type="revolute">
+    <parent link="default_pioneer_model::chassis_body"/>
+    <child link="other_model::body_2"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <plugin name="best_plugin_yeah!!" filename="/tmp/good_plugin.so">  
+    <funky_xml>so funky</funky_xml>
+    <more value="hello"/>
+  </plugin>
+
+</world>
+
+<world name="second_world">
+
+  <scene>
+    <ambient rgba="0.1 0.1 0.1 1"/>
+    <background rgba=".1 .1 .1 1.0">
+      <sky material="Gazebo/Sky"/>
+    </background>
+    <shadows enabled="true"/>
+  </scene>
+
+  <physics type="ode">
+    <gravity xyz="0 0 0"/>
+    <ode>
+      <solver type="quick" dt="0.001" iters="100" sor="1.3"/>
+      <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
+    </ode>
+  </physics>
+</world>
+
+</gazebo>
+

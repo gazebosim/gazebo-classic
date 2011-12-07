@@ -1,99 +1,16 @@
 
-/** \mainpage Gazebo
+/** \mainpage Gazebo API Reference
 
 
 Gazebo is a multi-robot simulator for both indoor and outdoor
-environments.  Like Stage, it is capable of simulating a population of
+environments.  It is capable of simulating a population of
 robots, sensors and objects, but does so in a three-dimensional
 world. It generates realistic sensor feedback, object collisions and
 dynamics.
 
-Gazebo is normally used in conjunction with the Player device server;
-Player provides an abstracted, network-centric mechanism (a server)
-through which robot controllers (clients) can interact with robot
-hardware. When used with Gazebo, Player provides \e simulated data in
-the place of real sensor data.  In principle, client programs cannot
-tell the difference between real devices and the Gazebo simulation of
-those devices.
+<a href="http://gazebosim.org/">Website</a>: The main gazebo website, which contains news, downloads, and contact information.
 
-Gazebo can also be controlled through a low-level C API (libgazebo).
-This library is included to allow third-party developers to easily
-integrate Gazebo into their own (non-Player) servers or architectures.
+<a href="http://gazebosim.org/wiki/tutorials">Tutorials</a>: Tutorials that describe how to use Gazebo and implement your own simulations.
 
-Installation instructions for Gazebo can be found \ref install "here".
-
-
-\section mainpage_usage Quick-start guide
-
-The Gazebo server can be started as follows:
-
-\verbatim
-$ gazebo <xmlfile>
-\endverbatim
-
-where <tt>xmlfile</tt> is an XML configuration file containing the description of the world and everything in it.  Sample world files can be found in
-the <tt>worlds</tt> directory of the source distribution, or in the
-installed version under <tt>/usr/local/share/gazebo/worlds/</tt>
-(default install).  For example:
-\verbatim
-$ gazebo /usr/local/share/gazebo/worlds/pioneer2dx.world
-\endverbatim
-will create a simple world with a single robot.  Gazebo will display a
-window with a view of the simulated world; the camera viewpoint can be
-changed by dragging the mouse in the window.
-
-
-\section mainpage_player Working with Player (optional)
-
-The Player device server treats Gazebo in exactly the same way that it
-treats real robot hardware: as a device that is a source of data and a
-sink for commands.  Users must therefore run Player seperately, and
-point it at an running instance of Gazebo.  Player has a number of
-specific drivers, such as %gz_position and %gz_laser that can be used
-to interact with Gazebo models.
-
-For example, after starting Gazebo as per the above example, run
-Player like this:
-
-\verbatim
-$ player /usr/local/share/player/config/gazebo.cfg
-\endverbatim
-
-Player will output a message indicating that is has connected with the
-simulator:
-
-\verbatim
-libgazebo msg : opening /tmp/gazebo-<username>-default-sim-default
-\endverbatim
-
-Users can now interact with the simulated robot exactly as they would a
-real robot.  Try running <tt>playerv</tt>, for example:
-
-\verbatim
-$ playerv --position:0 --laser:0
-\endverbatim
-
-This will pop up the standard Player viewer utility.  You should see
-an outline of the robot and the laser scan.  Use the mouse to pan and
-zoom.  You can drive the robot around by selecting the "command"
-option from the menu, then dragging the little cross hairs to where
-you want the robot to go.  You should see the the robot in the Gazebo
-window moving at the same time.
-
-See \ref player for examples of typical Player/Gazebo configurations,
-and consult the Player manual for information on specific Player
-drivers.
-
-
-\section mainpage_info Further Information
-
-More detailed information can be found here:
-  - \ref install
-  - TODO install_osx
-  - \ref gazebo_server
-  - TODO gazebo_gui
-  - \ref config_syntax 
-  - TODO libgazebo_usage
-  - \ref tutorial_models
-
+<a href="http://gazebosim.org/wiki">Wiki</a>: A collection of user supported documentation. 
 */

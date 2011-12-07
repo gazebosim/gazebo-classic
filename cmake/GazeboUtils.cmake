@@ -4,7 +4,7 @@
 # Appends items to a cached list.
 MACRO (APPEND_TO_CACHED_STRING _string _cacheDesc)
   FOREACH (newItem ${ARGN})
-    SET (${_string} "${${_string}} ${newItem}" CACHE STRING ${_cacheDesc} FORCE)
+    SET (${_string} "${${_string}} ${newItem}" CACHE INTERNAL ${_cacheDesc} FORCE)
   ENDFOREACH (newItem ${ARGN})
   #STRING(STRIP ${${_string}} ${_string})
 ENDMACRO (APPEND_TO_CACHED_STRING)
@@ -90,30 +90,17 @@ macro (BUILD_WARNING)
   endforeach (str ${ARGN})
 endmacro (BUILD_WARNING)
 
+macro (INSTALL_INCLUDES _subdir)
+  install(FILES ${ARGN} DESTINATION ${INCLUDE_INSTALL_DIR}/${_subdir} COMPONENT headers)
+endmacro(INSTALL_INCLUDES)
 
-###############################################################################
-# Reset lists
-MACRO (GAZEBOSERVER_RESET_LISTS)
-  SET (gazeboserver_sources "" CACHE INTERNAL 
-       ${gazeboserver_sources_desc} FORCE)
-  SET (gazeboserver_headers "" CACHE INTERNAL 
-       ${gazeboserver_sources_desc} FORCE)
-  SET (gazeboserver_headers_nopath "" CACHE INTERNAL 
-       "gazeboserver_headers_nopath" FORCE)
-  SET (gazeboserver_include_dirs "" CACHE INTERNAL 
-       ${gazeboserver_include_dirs_desc} FORCE)
-  SET (gazeboserver_link_dirs "" CACHE INTERNAL 
-       ${gazeboserver_link_dirs_desc} FORCE)
-  SET (gazeboserver_link_libs "" CACHE INTERNAL 
-       ${gazeboserver_link_libs_desc} FORCE)
-  SET (gazeboserver_ldflags "" CACHE INTERNAL 
-       ${gazeboserver_ldflags_desc} FORCE)
-  SET (gazeboserver_cflags "" CACHE INTERNAL 
-       ${gazeboserver_cflags_desc} FORCE)
-  SET (gazebosensor_sources "" CACHE INTERNAL 
-       ${gazebosensor_sources_desc} FORCE)
-  SET (gazebocontroller_sources "" CACHE INTERNAL 
-       ${gazebocontroller_sources_desc} FORCE)
-  set (bullet_link_libs "" CACHE INTERNAL 
-       ${bullet_link_libs_desc} FORCE)
-ENDMACRO (GAZEBOSERVER_RESET_LISTS)
+macro (INSTALL_LIBRARY _name)
+  set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION})
+  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR})
+endmacro (INSTALL_LIBRARY _name)
+
+macro (INSTALL_EXECUTABLE _name)
+  set_target_properties(${_name} PROPERTIES VERSION ${GAZEBO_VERSION})
+  install (TARGETS ${_name} DESTINATION ${BIN_INSTALL_DIR})
+endmacro (INSTALL_EXECUTABLE _name)
+

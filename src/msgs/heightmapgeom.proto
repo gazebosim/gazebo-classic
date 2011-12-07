@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Heightmap geom 
+/// \brief Message for a heightmap geometry
+/// \verbatim
+
+import "vector3d.proto";
+
+message HeightmapGeom
+{
+  required string filename  = 1;
+  optional Vector3d size    = 2;
+  optional Vector3d offset  = 3;
+}
+
+/// \endverbatim

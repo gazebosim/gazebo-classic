@@ -1,15 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckCXXSourceCompiles)
 
-# John - ode version with joint damping
-SET(ODE_JOINT_DAMPING_VERSION 0.11.1.1 CACHE INTERNAL "ODE version with joint damping" FORCE)
-
-set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
-set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
-set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
-set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
+set (tinyxml_include_dirs "" CACHE STRING "Tinyxml include paths. Use this to override automatic detection.")
+set (tinyxml_library_dirs "" CACHE STRING "Tinyxml library paths. Use this to override automatic detection.")
+set (tinyxml_libraries "" CACHE STRING "Tinyxml libraries Use this to override automatic detection.")
+set (tinyxml_cflags "" CACHE STRING "Tinyxml Use this cflag to enable string support.")
 
 set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
@@ -27,8 +24,27 @@ set (GTK2_INCLUDE_DIRS "" CACHE STRING "WX GTK2 include paths. Use this to overr
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
-include (FindwxWidgets)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
+
+execute_process(COMMAND pkg-config --modversion protobuf 
+  OUTPUT_VARIABLE PROTOBUF_VERSION
+  RESULT_VARIABLE protobuf_modversion_failed)
+
+if (PROTOBUF_VERSION LESS 2.3.0)
+  BUILD_ERROR("Incorrect version: Gazebo requires protobuf version 2.3.0 or greater")
+endif()
+
+# The Google Protobuf library for message generation + serialization
+find_package(Protobuf REQUIRED)
+if (NOT PROTOBUF_FOUND)
+  BUILD_ERROR ("Missing: Google Protobuf (libprotobuf-dev")
+endif()
+if (NOT PROTOBUF_PROTOC_EXECUTABLE)
+  BUILD_ERROR ("Missing: Google Protobuf Compiler (protobuf-compiler)")
+endif()
+if (NOT PROTOBUF_PROTOC_LIBRARY)
+  BUILD_ERROR ("Missing: Google Protobuf Compiler Library (libprotoc-dev)")
+endif()
 
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
@@ -47,56 +63,76 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(CEGUI CEGUI)
+  pkg_check_modules(CEGUI_OGRE CEGUI-OGRE)
+  if (NOT CEGUI_FOUND)
+    BUILD_WARNING ("CEGUI not found, opengl GUI will be disabled.")
+    set (HAVE_CEGUI FALSE)
+  else()
+    message (STATUS "Looking for CEGUI, found")
+    if (NOT CEGUI_OGRE_FOUND)
+      BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
+      set (HAVE_CEGUI FALSE)
+    else()
+      set (HAVE_CEGUI TRUE)
+      message (STATUS "Looking for CEGUI-OGRE, found")
+    endif()
+  endif()
+
+  #################################################
+  # Find tinyxml
+  pkg_check_modules(tinyxml tinyxml)
+  if (NOT tinyxml_FOUND)
+    message(STATUS "tinyxml system package not found, using passed in paths")
+    ########################################
+    # Find tinyxml
+    if (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
+
+      message(STATUS "tinyxml has no passed in paths, try to auto detect manually.")
+
+      find_path(tinyxml_include_dir tinyxml/tinyxml.hpp ${tinyxml_include_dirs} ENV CPATH)
+      
+      if (NOT tinyxml_include_dir)
+        message (STATUS "Looking for tinyxml/tinyxml.hpp - not found.")
+        set (tinyxml_include_dirs /usr/include CACHE STRING
+          "tinyxml include paths. Use this to override automatic detection.")
+      else (NOT tinyxml_include_dir)
+        message (STATUS "Looking for tinyxml/tinyxml.hpp - found")
+        set (assim_include_dirs ${tinyxml_include_dir} CACHE STRING
+          "tinyxml include paths. Use this to override automatic detection.")
+      endif (NOT tinyxml_include_dir)
+      
+      find_library(tinyxml_library tinyxml ENV LD_LIBRARY_PATH)
+      
+      if (tinyxml_library)
+        message (STATUS "Looking for libtinyxml - found")
+        APPEND_TO_CACHED_LIST(tinyxml_libraries
+                              "tinyxml libraries Use this to override automatic detection."
+                              ${tinyxml_library})
+      endif (tinyxml_library)
+     
+      if (NOT tinyxml_include_dir OR NOT tinyxml_library)
+        BUILD_ERROR("Missing: tinyxml")
+      endif (NOT tinyxml_include_dir OR NOT tinyxml_library)
+
+    endif (NOT tinyxml_include_dirs AND NOT tinyxml_library_dirs AND NOT tinyxml_libraries )
+  else ()
+    set(tinyxml_include_dirs ${tinyxml_INCLUDE_DIRS} CACHE STRING "Tinyxml include paths. Use this to override automatic detection." FORCE)
+
+    set(tinyxml_library_dirs ${tinyxml_LIBRARY_DIRS} CACHE STRING "Tinyxml library paths. Use this to override automatic detection." FORCE)
+
+    set(tinyxml_libraries ${tinyxml_LIBRARIES} CACHE STRING "Tinyxml libraries Use this to override automatic detection." FORCE)
+
+    set(tinyxml_cflags ${tinyxml_CFLAGS} CACHE STRING "Tinyxml Use this cflag to enable string support." FORCE)
+  endif ()
+
+
   #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
   IF (NOT TBB_FOUND)
     BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
-  ELSE (NOT TBB_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${TBB_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${TBB_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${TBB_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${TBB_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                          ${gazeboserver_ldflags_desc} 
-                          ${TBB_LDFLAGS})
   ENDIF (NOT TBB_FOUND)
-
-
-
-  #################################################
-  # Find ODE
-  pkg_check_modules(ODE ode>=${ODE_VERSION})
-  IF (NOT ODE_FOUND)
-    BUILD_ERROR ("Missing: ODE(http://www.ode.org)")
-    SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
-  ELSE (NOT ODE_FOUND)
-    SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
-  
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${ODE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${ODE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                          ${gazeboserver_ldflags_desc} 
-                          ${ODE_LDFLAGS})
-  ENDIF (NOT ODE_FOUND)
 
   #################################################
   # Find OGRE 
@@ -128,102 +164,15 @@ if (PKG_CONFIG_FOUND)
       
   endif (OGRE-RTShaderSystem_FOUND)
 
-
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
-
-  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                        ${gazeboserver_include_dirs_desc} 
-                        ${ogre_include_dirs})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                        ${gazeboserver_link_dirs_desc} 
-                        ${ogre_library_dirs})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${ogre_link_libs})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${ogre_libraries})
-  APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                        ${gazeboserver_ldflags_desc} 
-                        ${ogre_ldflags})
-  APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                        ${gazeboserver_cflags_desc} 
-                        ${ogre_cflags})
-
-  #################################################
-  # Find GTK
-  pkg_check_modules(GTK2 gtk+-2.0)
-  IF (NOT GTK2_FOUND)
-    BUILD_ERROR("Missing: gtk+-2.0")
-  ELSE (NOT GTK2_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${GTK2_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${GTK2_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${GTK2_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${GTK2_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                          ${gazeboserver_ldflags_desc} 
-                          ${GTK2_LDFLAGS})
-    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                          ${gazeboserver_cflags_desc} 
-                          ${GTK2_CFLAGS})
-  ENDIF (NOT GTK2_FOUND)
-
+  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
 
   #################################################
   # Find XML
   pkg_check_modules(XML libxml-2.0)
-  IF (NOT XML_FOUND)
+  if (NOT XML_FOUND)
     BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
-  ELSE (NOT XML_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${XML_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${XML_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XML_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XML_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                          ${gazeboserver_ldflags_desc} 
-                          ${XML_LDFLAGS})
-    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                          ${gazeboserver_cflags_desc} 
-                          ${XML_CFLAGS})
-
-  ENDIF (NOT XML_FOUND)
-
-
-  ########################################
-  # Find libXPM
-  pkg_check_modules(XPM xpm)
-  if (NOT XPM_FOUND)
-    BUILD_ERROR("Missing: libXpm(http://cgit.freedesktop.org/xorg/lib/libXpm)")
-  else (NOT XPM_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${XPM_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${XPM_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XPM_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XPM_LIBRARIES})
-  endif (NOT XPM_FOUND)
+  endif (NOT XML_FOUND)
 
 
   ########################################
@@ -231,20 +180,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(OAL openal)
   if (NOT OAL_FOUND)
     BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
+    set (HAVE_OPENAL FALSE)
   else (NOT OAL_FOUND)
     set (HAVE_OPENAL TRUE)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${OAL_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${OAL_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OAL_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OAL_LIBRARIES})
   endif (NOT OAL_FOUND)
 
   ########################################
@@ -252,19 +190,6 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(AVF libavformat)
   if (NOT AVF_FOUND)
     BUILD_WARNING ("libavformat not found. Audio capabilities will be disabled.")
-  else (NOT AVF_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${AVF_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${AVF_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVF_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVF_LIBRARIES})
   endif (NOT AVF_FOUND)
 
   ########################################
@@ -272,24 +197,11 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(AVC libavcodec)
   if (NOT AVC_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio capabilities will be disabled.")
-  else (NOT AVC_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${AVC_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${AVC_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVC_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVC_LIBRARIES})
   endif (NOT AVC_FOUND)
 
-  IF (AVF_FOUND AND AVC_FOUND)
-    SET (HAVE_FFMPEG TRUE)
-  ENDIF (AVF_FOUND AND AVC_FOUND)
+  if (AVF_FOUND AND AVC_FOUND)
+    set (HAVE_FFMPEG TRUE)
+  endif (AVF_FOUND AND AVC_FOUND)
 
   ########################################
   # Find Player
@@ -307,65 +219,46 @@ if (PKG_CONFIG_FOUND)
          "Player libraries")
   endif (NOT PLAYER_FOUND)
 
-  ########################################
-  # Find Websim
-  pkg_check_modules(WEBSIM websim)
-  if (NOT WEBSIM_FOUND)
-    set (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Build webgazebo" FORCE)
-    BUILD_WARNING ("Websim not found. Webgazebo will not be built")
-  else (NOT WEBSIM_FOUND)
-    set (WEBSIM_INCLUDE_DIRS ${WEBSIM_INCLUDE_DIRS} CACHE INTERNAL
-         "Websim include directory")
-    set (WEBSIM_LINK_DIRS ${WEBSIM_LINK_DIRS} CACHE INTERNAL 
-         "Websim link directory")
-    set (WEBSIM_LINK_LIBS ${WEBSIM_LIBRARIES} CACHE INTERNAL
-         "Websim libraries")
-  endif (NOT WEBSIM_FOUND)
-
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  message (FATAL_ERROR "\nError: pkg-config not found")
+  BUILD_ERROR ("Error: pkg-config not found")
 endif (PKG_CONFIG_FOUND)
 
-
-########################################
-# Find wxWidgets
-find_package(wxWidgets)
-if (NOT wxWidgets_FOUND)
-    BUILD_ERROR ("Missing: wxWidgets(http://www.wxwidgets.org)")
-endif (NOT wxWidgets_FOUND)
-
+find_package (Qt4)
+if (NOT QT4_FOUND)
+  BUILD_ERROR("Missing: Qt4")
+endif()
 
 ########################################
 # Find Boost, if not specified manually
-IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
+if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
 
   # Clear some variables to ensure that the checks for boost are 
   # always run
-  SET (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
-  SET (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
+  set (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
+  set (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
 
-  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
-  INCLUDE (FindBoost)
+  set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
+  include (FindBoost)
 
-  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
+  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex system filesystem)
 
-  IF (NOT Boost_FOUND)
-    SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-    MESSAGE (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
-  ENDIF (NOT Boost_FOUND)
+  if (NOT Boost_FOUND)
+    set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+    message (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
+  endif (NOT Boost_FOUND)
 
-  SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
+  set (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
     "Boost include paths. Use this to override automatic detection." FORCE)
 
-  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
+  set (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
     "Boost link dirs. Use this to override automatic detection." FORCE)
 
   LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
-  SET (boost_libraries ${tmp} CACHE STRING 
+  set (boost_libraries ${tmp} CACHE STRING 
     "Boost libraries. Use this to override automatic detection." FORCE )
 
-ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries ) 
+endif (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries ) 
 
 STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
 STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
@@ -410,32 +303,26 @@ ELSE (HAVE_FFMPEG)
 ENDIF (HAVE_FFMPEG)
 
 ########################################
-# Find libevent
-SET (libevent_search_path /usr/include /usr/local/include)
-FIND_PATH(LIBEVENT_PATH event.h ${libevent_search_path})
-IF (NOT LIBEVENT_PATH)
-  MESSAGE (STATUS "Looking for event.h - not found")
-  BUILD_WARNING ("event.h not found. webgazebo will not be built")
-  SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Found libevent" FORCE)
-ELSE (NOT LIBEVENT_PATH)
-  MESSAGE (STATUS "Looking for event.h - found")
-ENDIF (NOT LIBEVENT_PATH)
-
-########################################
 # Find profiler library, optional
-#FIND_LIBRARY(PROFILER "profiler")
-#IF (PROFILER)
-#  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
-#       CACHE INTERNAL "Link flags for profile" FORCE)
-#ENDIF (PROFILER)
+find_library(PROFILER profiler)
+if (PROFILER)
+  message (STATUS "Looking for libprofiler - found")
+  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
+       CACHE INTERNAL "Link flags for profile" FORCE)
+else ()
+  message (STATUS "Looking for libprofiler - not found")
+endif ()
 
 ########################################
 # Find tcmalloc library, optional
-FIND_LIBRARY(TCMALLOC "tcmalloc")
-IF (TCMALLOC)
-  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
+find_library(TCMALLOC tcmalloc)
+if (TCMALLOC)
+  set (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
        CACHE INTERNAL "Link flags for profile" FORCE)
-ENDIF (TCMALLOC)
+  message (STATUS "Looking for libtcmalloc - found")
+else ()
+  message (STATUS "Looking for libtcmalloc - not found")
+endif ()
 
 ########################################
 # Find libtool
@@ -508,37 +395,6 @@ else (libdl_library AND libdl_include_dir)
 endif (libdl_library AND libdl_include_dir)
 
 ########################################
-# Find assimp
-if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
-
-  find_path(assimp_include_dir assimp/assimp.hpp ${assimp_include_dirs} ENV CPATH)
-  
-  if (NOT assimp_include_dir)
-    message (STATUS "Looking for assimp/assimp.hpp - not found.")
-    set (assimp_include_dirs /usr/include CACHE STRING
-      "Assimp include paths. Use this to override automatic detection.")
-  else (NOT assimp_include_dir)
-    message (STATUS "Looking for assimp/assimp.hpp - found")
-    set (assim_include_dirs ${assimp_include_dir} CACHE STRING
-      "Assimp include paths. Use this to override automatic detection.")
-  endif (NOT assimp_include_dir)
-  
-  find_library(assimp_library assimp ENV LD_LIBRARY_PATH)
-  
-  if (assimp_library)
-    message (STATUS "Looking for libassimp - found")
-    APPEND_TO_CACHED_LIST(assimp_libraries
-                          "Assimp libraries Use this to override automatic detection."
-                          ${assimp_library})
-  endif (assimp_library)
- 
-  if (NOT assimp_include_dir OR NOT assimp_library)
-    BUILD_ERROR("Missing: Assimp(http://assimp.sourceforge.net)")
-  endif (NOT assimp_include_dir OR NOT assimp_library)
-
-endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
-
-########################################
 # Find bullet
 if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
@@ -587,10 +443,6 @@ if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
     APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
   endif (NOT bullet_softbody_library)
 
-  APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                        ${gazeboserver_ldflags_desc} 
-                        ${bullet_lflags})
-
   if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
     set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
   else (NOT bullet_include_dir OR NOT bullet_dynamics_library)
@@ -602,26 +454,26 @@ else (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags 
 endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
 # Check to make sure bullet was compiled with DOUBLE_PRECISION
-if (INCLUDE_BULLET)
-  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
-int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
-
-  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
-  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
-  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
-  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
-  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
-  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
-  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
-  set (CMAKE_REQUIRED_LIBRARIES)
-  set (CMAKE_REQUIRED_DEFINITIONS)
-  set( CMAKE_REQUIRED_INCLUDES)
-  set( CMAKE_REQUIRED_FLAGS)
-
-  if (NOT BULLET_DOUBLE_PRECISION)
-    BUILD_ERROR("Dependency: bullet was not compiled to use double precision.")
-    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-  endif (NOT BULLET_DOUBLE_PRECISION)
-endif (INCLUDE_BULLET)
+#if (INCLUDE_BULLET)
+#  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
+#int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
+#
+#  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
+#  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
+#  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
+#  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
+#  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
+#  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
+#  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
+#  set (CMAKE_REQUIRED_LIBRARIES)
+#  set (CMAKE_REQUIRED_DEFINITIONS)
+#  set( CMAKE_REQUIRED_INCLUDES)
+#  set( CMAKE_REQUIRED_FLAGS)
+#
+#  if (NOT BULLET_DOUBLE_PRECISION)
+#    BUILD_ERROR("Dependency: bullet was not compiled to use double precision.")
+#    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+#  endif (NOT BULLET_DOUBLE_PRECISION)
+#endif (INCLUDE_BULLET)
 
 

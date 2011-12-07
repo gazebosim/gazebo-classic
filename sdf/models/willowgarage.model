@@ -1,0 +1,26 @@
+<gazebo version='1.0'>
+  <model name='wg' static='1'>
+    <origin pose='-20 -20 0 0 0 0'/>
+    <link name='walls' gravity='1' self_collide='0' kinematic='0'>
+      <origin pose='0 0 0 0 -0 0'/>
+      <inertial mass='0'>
+        <origin pose='0 0 0 0 0 0'/>
+        <inertia ixx='1' ixy='0' ixz='0' 
+                 iyy='1' iyz='0' 
+                 izz='0'/>
+      </inertial>
+
+      <collision name='geom'>
+        <geometry>
+          <box size='0.1 0.1 0.1'/>
+        </geometry>
+      </collision>
+
+      <visual name='visual' cast_shadows='0'>
+        <geometry>
+          <mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</gazebo>

@@ -33,15 +33,18 @@ div.leftbar{
   text-align:left;
   float: left;
   width: 12em;
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
+  margin: 5 5 5 5;
+  padding: 4 4 4 4;
+  background-color: #DDD;
+  height: 100%;
 }
 
 div.menu {
   #display:block;
   background:#EEE;
   font-size: 90%;
-  border: 1px solid #000000;
+  border-top: 2px solid #000000;
+  border-bottom: 2px solid #000000;
   margin: 0 0 10px 0;
 }
 
@@ -61,7 +64,7 @@ div.menu dt {
 div.menu dd {
   font-weight: bold;
   margin-left: 0px;
-  padding-left: 10px;
+  padding-left: 20px;
   padding-bottom: 2px;
   font-size: 100%;
 }
@@ -81,24 +84,3 @@ div.submenu dd {
 div.submenu dd .secondline {
   margin-left: 12px;
 }
-
-a:link {
-  color: #A00;
-}
-
-a:visited {
-  color: #244c92;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-h1 {
-  font-size: 160%;
-}
-

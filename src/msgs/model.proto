@@ -1,0 +1,24 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Model 
+/// \brief Information about a model
+/// \verbatim
+
+import "joint.proto";
+import "link.proto";
+import "pose.proto";
+import "visual.proto";
+
+message Model
+{
+  required uint32 id           = 1;
+  required string name         = 2;
+  optional bool is_static      = 3;
+  optional Pose pose           = 4;
+  repeated Joint joints        = 5;
+  repeated Link link           = 6;
+  optional bool deleted        = 7;
+  repeated Visual visual       = 8;
+}
+/// \endverbatim

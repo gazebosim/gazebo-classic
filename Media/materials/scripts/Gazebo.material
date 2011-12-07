@@ -1,39 +1,49 @@
-
 import * from "shadow_receiver.program"
 import * from "perpixel.program"
 
-material Gazebo/GrayGrid : shadow_receiver_template
+vertex_program Gazebo/DepthMapVS glsl
 {
-  set_texture_alias ambient_tex grayGrid.png
-  set_texture_alias diffuse_tex grayGrid.png
+  source depth_map.vert
 
-  technique
+  default_params
   {
-    pass spot
-    {
-      specular 0.5 0.5 0.5 128
-    }
-
-    pass directional
-    {
-      specular 0.5 0.5 0.5 128
-    }
- }
+    param_named_auto texelOffsets texel_offsets
+  }
 }
 
-material Gazebo/Grey : perpixel_template
+fragment_program Gazebo/DepthMapFS glsl
+{
+  source depth_map.frag
+
+  default_params
+  {
+    param_named_auto pNear near_clip_distance
+    param_named_auto pFar far_clip_distance
+  }
+}
+
+material Gazebo/DepthMap
 {
   technique
   {
-    pass ambient
+    pass
     {
-      ambient .1 .1 .1 
+      vertex_program_ref Gazebo/DepthMapVS { }
+      fragment_program_ref Gazebo/DepthMapFS { }
     }
+  }
+}
 
-    pass light
+material Gazebo/Grey
+{
+	receive_shadows on
+  technique
+  {
+    pass
     {
-      diffuse .1 .1 .1
-      specular .1 .1 .1 128
+      ambient .1 .1 .1  1.0
+      diffuse .5 .5 .5  1.0
+			specular 0.1 0.1 0.1 1.000000 12.500000
     }
   }
 }
@@ -55,19 +65,15 @@ material Gazebo/White : perpixel_template
 	}
 }
 
-material Gazebo/FlatBlack : perpixel_template
+material Gazebo/FlatBlack
 {
 	technique
 	{
-		pass ambient
+		pass
 		{
 			ambient 0 0 0
-		}
-
-    pass light
-    {
-      diffuse 0 0 0
-      specular 0 0 0 0
+      diffuse 0.1 0.1 0.1
+      specular 0.01 0.01 0.01 0
     }
 	}
 }
@@ -104,6 +110,8 @@ material Gazebo/Red : perpixel_template
 			diffuse 1 0 0 
 			specular .1 .1 .1 128 
     }
+
+
 	}
 }
 
@@ -216,10 +224,17 @@ material Gazebo/RedGlow : Gazebo/Red
 	}
 }
 
+
+
 material Gazebo/GreenGlow : Gazebo/Green
 {
   technique
   {
+    pass ambient
+    {
+      emissive 0 1 0
+    }
+
     pass light
     {
       emissive 0 1 0
@@ -271,6 +286,32 @@ material Gazebo/TurquoiseGlow : Gazebo/Turquoise
 	}
 }
 
+material Gazebo/TurquoiseGlowOutline
+{
+	technique
+	{
+    pass ambient
+    {
+      scene_blend alpha_blend
+      //lighting off
+
+			diffuse 0 1 1 1
+			specular .1 .1 .1 128 
+    }
+
+    pass ambient2
+    {
+      scene_blend alpha_blend
+
+			diffuse 0 1 1 
+			specular .1 .1 .1 128 
+			emissive 0 1 1
+
+      polygon_mode wireframe
+    }
+	}
+}
+
 material Gazebo/RedTransparent
 {
 	technique
@@ -279,14 +320,12 @@ material Gazebo/RedTransparent
     {
       scene_blend alpha_blend
       depth_write off
-
-      ambient 1.0 0.0 0.0 1
-      diffuse 1.0 0.0 0.0 1
+      lighting off
 
       texture_unit
       {
-        colour_op_ex source1 src_current src_current 1 0 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        colour_op_ex source1 src_manual src_current 1 0 0
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
 	}
@@ -308,7 +347,7 @@ material Gazebo/GreenTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
 	}
@@ -329,7 +368,7 @@ material Gazebo/BlueTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
 	}
@@ -372,6 +411,31 @@ material Gazebo/YellowTransparent
   }
 }
 
+material Gazebo/LightOn
+{
+  technique
+  {
+    pass ambient
+    {
+      diffuse 0 1 0
+      ambient 0 1 0
+      emissive 0 1 0
+    }
+  }
+}
+
+material Gazebo/LightOff
+{
+  technique
+  {
+    pass ambient
+    {
+      diffuse 1 0 0
+      ambient 1 0 0
+      emissive 1 0 0
+    }
+  }
+}
 
 
 
@@ -399,6 +463,29 @@ material Gazebo/BlueLaser
   }
 }
 
+material Gazebo/OrangeTransparent
+{
+  receive_shadows off
+
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 1.0 0.44 0.0 1
+      diffuse 1.0 0.44 0.0 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.4
+      }
+
+    }
+  }
+}
 
 
 material Gazebo/JointAnchor
@@ -417,6 +504,7 @@ material Gazebo/JointAnchor
     }
   }
 }
+
 
 material Gazebo/WoodFloor
 {
@@ -540,8 +628,7 @@ material Gazebo/Gold
 		{
 			ambient 0.400000 0.248690 0.020759 1.000000
 			diffuse 0.800000 0.648690 0.120759 1.000000
-			specular 0.500000 0.500000 0.500000 1.000000 12.500000
-			emissive 0.000000 0.000000 0.000000 1.000000
+			specular 0.400000 0.400000 0.400000 1.000000 12.500000
 		}
 	}
 }
@@ -566,7 +653,6 @@ material Gazebo/CloudySky
 
 material Gazebo/WoodPallet
 {
-	receive_shadows on
 	technique
 	{
 		pass
@@ -578,6 +664,25 @@ material Gazebo/WoodPallet
 			texture_unit
 			{
 				texture WoodPallet.png
+				filtering trilinear
+			}
+		}
+	}
+}
+
+material Gazebo/Wood
+{
+	technique
+	{
+		pass
+		{
+			ambient 1.0 1.0 1.0 1.0
+			diffuse 1.0 1.0 1.0 1.0
+			specular 0.2 0.2 0.2 1.0 12.5
+
+			texture_unit
+			{
+				texture wood.jpg
 				filtering trilinear
 			}
 		}

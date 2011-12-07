@@ -1,37 +1,30 @@
-INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
-STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
-STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
-
-INCLUDE_DIRECTORIES(
-  .
-  ${CMAKE_SOURCE_DIR}/libgazebo 
-  ${boost_include_dirs_split}
+include_directories( 
+  ${PROJECT_BINARY_DIR}/src 
+  ${PROJECT_SOURCE_DIR}/src 
+  ${tinyxml_include_dirs}
+  ${XML_INCLUDE_DIRS}
 )
 
-LINK_DIRECTORIES(  
- ${CMAKE_BINARY_DIR}/libgazebo 
- ${boost_library_dirs_split} 
-)
+link_directories(${tinyxml_library_dirs})
+add_definitions(${tinyxml_cflags})
 
+add_executable( gzsdf check_sdf.cc )
+target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_parser)
+INSTALL_EXECUTABLE( gzsdf )
 
-set (sources gazebomodel.cc gazebobody.cc gazeboplugin.cc Toolbase.cc)
+add_executable( gztopic gztopic.cc )
+target_link_libraries(gztopic gazebo_msgs gazebo_common gazebo_transport )
+INSTALL_EXECUTABLE( gztopic )
 
-set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "-ggdb -g2 -Wall")
+add_executable( gzstats gzstats.cc )
+target_link_libraries(gzstats gazebo_msgs gazebo_common gazebo_transport )
+INSTALL_EXECUTABLE( gzstats )
 
-add_executable(gazebomodel gazebomodel.cc Toolbase.cc)
-add_executable(gazebobody gazebobody.cc Toolbase.cc)
-add_executable(gazeboplugin gazeboplugin.cc Toolbase.cc)
+add_executable( sdf2pov sdf2pov.cc )
+target_link_libraries(sdf2pov gazebo_common gazebo_sdf_parser)
+INSTALL_EXECUTABLE( sdf2pov )
 
-target_link_libraries(gazebomodel gazeboshm yaml ${boost_libraries})
-target_link_libraries(gazebobody gazeboshm yaml ${boost_libraries})
-target_link_libraries(gazeboplugin gazeboshm yaml ${boost_libraries})
+add_executable( gzfactory gzfactory.cc )
+target_link_libraries(gzfactory gazebo_common gazebo_transport)
+INSTALL_EXECUTABLE( gzfactory )
 
-set_target_properties(gazebomodel PROPERTIES SKIP_BUILD_RPATH TRUE)
-set_target_properties(gazebomodel PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
-set_target_properties(gazebobody PROPERTIES SKIP_BUILD_RPATH TRUE)
-set_target_properties(gazebobody PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
-set_target_properties(gazeboplugin PROPERTIES SKIP_BUILD_RPATH TRUE)
-set_target_properties(gazeboplugin PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
-
-
-install (TARGETS gazebomodel gazebobody gazeboplugin DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

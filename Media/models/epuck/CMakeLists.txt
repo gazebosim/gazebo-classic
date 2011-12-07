@@ -12,4 +12,4 @@ SET (files camera.material
            turret.mesh
 )
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models/epuck)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/models/epuck)

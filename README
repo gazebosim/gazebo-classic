@@ -4,16 +4,14 @@ Gazebo - A dynamic multi-robot simulator
 This is the Gazebo simulator.  Gazebo simulates multiple robots in a
 3D environment, with extensive dynamic interaction between objects.
 Gazebo was developed at the USC Robotics Research Lab as part of the
-Player/Stage project, and is fully compatible at with the Player robot
-device server.  Gazebo is available under the GNU General Public License (GPL)
-and can be downloaded from the Player/Stage homepage:
+Player/Stage project, and is partially support by Willow Garage (www.willowgarage.com). 
 
-  http://playerstage.sourceforge.net
+  http://gazebosim.org
 
 
 Installation
 ------------
-Read the installation instructions in the online manual for generic instructions.  For most people, the following sequence will suffice:
+Read the installation instructions (http://gazebosim.org/documentation.html) in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
   $ mkdir build (inside the gazebo-trunk directory)
   $ cd build
@@ -23,36 +21,9 @@ Read the installation instructions in the online manual for generic instructions
 
 Uninstallation
 --------------
-Read the installation instructions in the online manual for generic instructions.  For most people, the following sequence will suffice:
+Read the installation instructions (http://gazebosim.org/documentation.html) in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
-  $ make install (inside the gazebo-trunk/build directory)
-
-
-3rd Party Libraries
-------------------
-Gazebo uses the following libraries:
-
-  Geospatial Data Abstraction Library (GDAL) http://www.remotesensing.org/gdal
-  OpenDynamicsEngine (ODE) http://opende.sourceforge.net
-  Ogre3D  http://www.ogre3d.org
-
-ODE and Ogre3D are mandatory. GDAL is required only for specific features
-such as the MapExtruder and Terrain models, but is highly recommended.
+  $ make uninstall (inside the gazebo-trunk/build directory)
 
 
-On-line installation instructions
----------------------------------
-
-The latest installation instructions can be found on-line, at
-
-  http://playerstage.sourceforge.net/doc/
-
-or in these sources under the doc/ directory.
-
-General information (changelog, etc) can be found in the wiki pages, at
-
-  http://playerstage.sourceforge.net/wiki/Gazebo
-
-
-  - Andrew Howard (ahoward@usc.edu), Nate Koenig (nkoenig@usc.edu)
-
+- Nate Koenig

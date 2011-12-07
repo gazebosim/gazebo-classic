@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Time
+/// \brief A message for time data
+/// \verbatim
+
+message Time
+{
+  required uint32 sec = 2;
+  required uint32 nsec = 3;
+}
+
+/// \endverbatim

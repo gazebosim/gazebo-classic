@@ -10,8 +10,12 @@ SET (files shadow_caster_fp.glsl
            blur.glsl
            perpixel_vp.glsl
            perpixel_fp.glsl
+           pssm.cg
+           pssm.hlsl
+           depth_map.frag
+           depth_map.vert
 ) 
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/programs/)
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/Media/materials/programs/)
 
 

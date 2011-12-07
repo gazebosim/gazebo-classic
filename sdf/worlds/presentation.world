@@ -1,0 +1,409 @@
+<?xml version="1.0"?> 
+<gazebo version="1.0">
+  <world name="default">
+    <scene>
+      <ambient rgba="0.1 0.1 0.1 1"/>
+      <background rgba="1 1 1 1"/>
+      <shadows enabled="false"/>
+      <grid enabled="false"/>
+    </scene>
+
+    <!--<gui fullscreen="true">
+      <camera name="user_camera">
+        <view_controller type="orbit"/>
+        <origin pose="0 0 5 0 -1.5707 0"/>
+      </camera>
+    </gui>
+    -->
+
+    <physics type="ode">
+      <gravity xyz="0 0 -9.8"/>
+      <ode>
+        <solver type="quick" dt="0.001" iters="10" sor="1.3"/>
+        <constraints cfm="0.0" erp="0.2" contact_max_correcting_vel="100.0" contact_surface_layer="0.001"/>
+      </ode>
+    </physics>
+
+    <!-- Ground Plane -->
+    <model name="plane1_model" static="true">
+      <link name="body">
+        <collision name="geom_1">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+        </collision>
+
+        <visual name="visual_1" cast_shadows="false">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <material script="Gazebo/Grey"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide1" static="true">
+      <origin pose="0 0 0 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.1 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size="3 4 0.2"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size="3 4 0.2"/>
+          </geometry>
+          <material script="nate/slide1"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide2" static="true">
+      <origin pose="1 0 0.201 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide2"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide3" static="true">
+      <origin pose="0.95 -0.05 0.201 0 0 -1.5707"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide3"/>
+        </visual>
+      </link>
+    </model>
+
+     <model name="slide4" static="true">
+      <origin pose="0.95 -0.07 0.201 0 0 -1.5707"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide4"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide5" static="true">
+      <origin pose="0.95 -0.09 0.201 0 0 -1.5707"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide5"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide6" static="true">
+      <origin pose="0.95 -0.11 0.201 0 0 -1.5707"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide6"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide7" static="true">
+      <origin pose="0.91 -0.11 0.2011 0 0 -1.5707"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide7"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide8" static="true">
+      <origin pose="10 10 0 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size="3 4 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size="3 4 0.001"/>
+          </geometry>
+          <material script="nate/slide8"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide9" static="true">
+      <origin pose="10.2 9.78 0.005 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide9"/>
+        </visual>
+      </link>
+    </model>
+    <model name="slide10" static="true">
+      <origin pose="10.20 9.74 0.005 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide10"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide11" static="true">
+      <origin pose="9.93 9.07 0.005 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide11"/>
+        </visual>
+      </link>
+    </model>
+
+
+    <model name="slide12" static="true">
+      <origin pose="9.69 8.21 0.005 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide12"/>
+        </visual>
+      </link>
+    </model>
+
+
+    <model name="slide13" static="true">
+      <origin pose="9.43 8.93 0.005 0 0 0"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size=".03 .04 0.001"/>
+          </geometry>
+          <material script="nate/slide13"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide14" static="true">
+      <origin pose="7 14 0.005 0 0 1.5707"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size="3 4 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size="3 4 0.001"/>
+          </geometry>
+          <material script="nate/slide14"/>
+        </visual>
+      </link>
+    </model>
+
+    <model name="slide15" static="true">
+      <origin pose="3 10 0.005 0 0 3.1415"/>
+      <link name="link">
+        <origin pose="0 0 0.0005 0 0 0"/>
+        <inertial mass="1.0">
+          <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+        </inertial>
+
+        <collision name="c">
+          <geometry>
+            <box size="3 4 0.001"/>
+          </geometry>
+        </collision>
+
+        <visual name="v">
+          <geometry>
+            <box size="3 4 0.001"/>
+          </geometry>
+          <material script="nate/slide15"/>
+        </visual>
+      </link>
+    </model>
+
+
+    <!--
+    <light type="point" name="point_light" cast_shadows="false">
+      <origin pose="-5 -2 5 0 0 0"/>
+      <diffuse rgba=".4 .4 .4 1"/>
+      <specular rgba=".2 .2 .2 1"/>
+      <attenuation range="20" constant="0.9" linear="0.01" quadratic="0.001"/>
+    </light>
+    -->
+
+    <light type="directional" name="my_light" cast_shadows="false">
+      <origin pose="0 0 10 0 0 0"/>
+      <diffuse rgba=".9 .9 .9 1"/>
+      <specular rgba=".1 .1 .1 1"/>
+      <attenuation range="20"/>
+      <direction xyz="0 0 -1"/>
+    </light>
+  </world>
+</gazebo>

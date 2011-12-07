@@ -1,0 +1,2524 @@
+<?xml version="1.0"?>
+
+<gazebo:world 
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
+  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
+  xmlns:geo="http://willowgarage.com/xmlschema/#geo" 
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
+
+  <thread>4</thread>
+  <verbosity>5</verbosity>
+
+  <!-- cfm is 1e-5 for single precision -->
+  <!-- erp is typically .1-.8 -->
+  <!-- here's the global contact cfm/erp -->
+  <physics:ode>
+    <stepTime>0.001</stepTime>
+
+    <gravity>0 5 -9.8</gravity>
+
+    <cfm>0.0000000001</cfm>
+    <erp>0.2</erp>
+
+    <stepType>quick</stepType>
+    <quickStep>true</quickStep>
+
+    <stepIters>10</stepIters>
+    <quickStepIters>10</quickStepIters>
+
+    <stepW>1.3</stepW>
+    <quickStepW>1.3</quickStepW>
+
+    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
+    <contactSurfaceLayer>0.001</contactSurfaceLayer>
+  </physics:ode>
+
+  <geo:origin>
+    <lat>37.4270909558</lat><lon>-122.077919338</lon>
+  </geo:origin>
+
+  <rendering:gui>
+    <type>fltk</type>
+    <size>480 320</size>
+    <pos>0 0</pos>
+    <frames>
+      <row height="100%">
+        <camera width="100%">
+          <xyz>0.3 0 3</xyz>
+          <rpy>0 90 90</rpy>
+        </camera>
+      </row>
+    </frames>
+  </rendering:gui>
+
+
+  <rendering:ogre>
+    <ambient>0.5 0.5 0.5 0.5</ambient>
+    <background>0.5 0.5 0.5 1.0</background>
+    <sky>
+      <material>Gazebo/CloudySky</material>
+    </sky>
+    <grid>false</grid>
+    <maxUpdateRate>10.</maxUpdateRate>
+    <shadowTechnique>none</shadowTechnique>
+    <shadows>true</shadows>
+  </rendering:ogre>
+
+  <!-- ground plane -->
+  <model:physical name="gplane">
+    <xyz>0 0 0</xyz>	
+    <rpy>0 0 0</rpy>
+    <static>true</static>
+    <body:plane name="plane">
+      <geom:plane name="plane">
+        <laserRetro>2000.0</laserRetro>
+        <mu1>50.0</mu1>
+        <mu2>50.0</mu2>
+        <kp>1000000000.0</kp>
+        <kd>1.0</kd>
+        <normal>0 0 1</normal>
+        <size>51.3 51.3</size>
+        <segments>10 10</segments>
+        <uvTile>100 100</uvTile>
+        <material>Gazebo/GrayGrid</material>
+        <visual>
+          <normal>0 0 1</normal>
+        </visual>
+      </geom:plane>
+    </body:plane>
+  </model:physical>
+
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>0.0 0.0 8</xyz>
+    <enableGravity>false</enableGravity>
+    <light>
+      <type>directional</type>
+      <diffuseColor>0.5 0.5 0.5 1.0</diffuseColor>
+      <specularColor>.1 .1 .1 1.0</specularColor>
+      <attenuation>0.2 0.1 0</attenuation>
+      <range>10</range>
+      <direction>0 0 -2</direction>
+    </light>
+  </model:renderable>
+
+  <model:physical name="pr2">
+      <xyz>0 0 0</xyz>
+      <rpy>0 0 0</rpy>
+      <body:empty name="base_footprint">
+          <massMatrix>true</massMatrix>
+          <mass>118.001</mass>
+          <ixx>8.36506</ixx>
+          <ixy>-0.00971993</ixy>
+          <ixz>1.88991</ixz>
+          <iyy>8.46638</iyy>
+          <iyz>-0.00737958</iyz>
+          <izz>3.78747</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:box name="base_footprint_geom">
+              <xyz>0 0 0.071</xyz>
+              <rpy>0 -0 0</rpy>
+              <size>0.001 0.001 0.001</size>
+              <visual>
+                  <xyz>0 0 -0.071</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>0.01 0.01 0.01</scale>
+                  <mesh>unit_box</mesh>
+              </visual>
+          </geom:box>
+          <geom:box name="base_footprint_geom_base_bellow_link">
+              <xyz>-0.29 0 0.851</xyz>
+              <rpy>0 -0 0</rpy>
+              <size>0.05 0.37 0.3</size>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>0.05 0.37 0.3</scale>
+                  <mesh>unit_box</mesh>
+                  <material>PR2/Black</material>
+              </visual>
+          </geom:box>
+          <geom:trimesh name="base_footprint_geom_base_link">
+              <xyz>0 0 0.051</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/base_v0/base_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/base.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <sensor:contact name="base_contact_sensor">
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="base_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>base_bumper</bumperTopicName>
+                  <interface:bumper name="base_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+              <geom>base_footprint_geom_base_link</geom>
+          </sensor:contact>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:ray name="base_laser">
+              <rayCount>640</rayCount>
+              <rangeCount>640</rangeCount>
+              <laserCount>1</laserCount>
+              <origin>0.0 0.0 0.0</origin>
+              <displayRays>false</displayRays>
+              <minAngle>-129.998394137</minAngle>
+              <maxAngle>129.998394137</maxAngle>
+              <minRange>0.08</minRange>
+              <maxRange>10.0</maxRange>
+              <resRange>0.01</resRange>
+              <updateRate>20</updateRate>
+              <controller:gazebo_ros_laser name="gazebo_ros_base_laser_controller" plugin="libgazebo_ros_laser.so">
+                  <gaussianNoise>0.005</gaussianNoise>
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>20</updateRate>
+                  <topicName>base_scan</topicName>
+                  <frameName>base_laser_link</frameName>
+                  <interface:laser name="gazebo_ros_base_laser_iface" />
+              </controller:gazebo_ros_laser>
+              <xyz>0.275 0 0.303</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:ray>
+      </body:empty>
+      <body:empty name="bl_caster_rotation_link">
+          <massMatrix>true</massMatrix>
+          <mass>3.47308</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0.07</cz>
+          <xyz>-0.2246 0.2246 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="bl_caster_rotation_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
+                  <material>PR2/caster_texture</material>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="bl_caster_rotation_joint">
+          <body1>bl_caster_rotation_link</body1>
+          <body2>base_footprint</body2>
+          <anchor>bl_caster_rotation_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="bl_caster_l_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>-0.2246 0.2736 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="bl_caster_l_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="bl_caster_l_wheel_joint">
+          <body1>bl_caster_l_wheel_link</body1>
+          <body2>bl_caster_rotation_link</body2>
+          <anchor>bl_caster_l_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="bl_caster_r_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>-0.2246 0.1756 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="bl_caster_r_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="bl_caster_r_wheel_joint">
+          <body1>bl_caster_r_wheel_link</body1>
+          <body2>bl_caster_rotation_link</body2>
+          <anchor>bl_caster_r_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="br_caster_rotation_link">
+          <massMatrix>true</massMatrix>
+          <mass>3.47308</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0.07</cz>
+          <xyz>-0.2246 -0.2246 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="br_caster_rotation_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
+              <genTexCoord>false</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
+                  <material>PR2/caster_texture</material>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="br_caster_rotation_joint">
+          <body1>br_caster_rotation_link</body1>
+          <body2>base_footprint</body2>
+          <anchor>br_caster_rotation_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="br_caster_l_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>-0.2246 -0.1756 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="br_caster_l_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="br_caster_l_wheel_joint">
+          <body1>br_caster_l_wheel_link</body1>
+          <body2>br_caster_rotation_link</body2>
+          <anchor>br_caster_l_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="br_caster_r_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>-0.2246 -0.2736 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="br_caster_r_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="br_caster_r_wheel_joint">
+          <body1>br_caster_r_wheel_link</body1>
+          <body2>br_caster_rotation_link</body2>
+          <anchor>br_caster_r_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="fl_caster_rotation_link">
+          <massMatrix>true</massMatrix>
+          <mass>3.47308</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0.07</cz>
+          <xyz>0.2246 0.2246 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="fl_caster_rotation_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
+                  <material>PR2/caster_texture</material>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="fl_caster_rotation_joint">
+          <body1>fl_caster_rotation_link</body1>
+          <body2>base_footprint</body2>
+          <anchor>fl_caster_rotation_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="fl_caster_l_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.2246 0.2736 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="fl_caster_l_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="fl_caster_l_wheel_joint">
+          <body1>fl_caster_l_wheel_link</body1>
+          <body2>fl_caster_rotation_link</body2>
+          <anchor>fl_caster_l_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="fl_caster_r_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.2246 0.1756 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="fl_caster_r_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="fl_caster_r_wheel_joint">
+          <body1>fl_caster_r_wheel_link</body1>
+          <body2>fl_caster_rotation_link</body2>
+          <anchor>fl_caster_r_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="fr_caster_rotation_link">
+          <massMatrix>true</massMatrix>
+          <mass>3.47308</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0.07</cz>
+          <xyz>0.2246 -0.2246 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="fr_caster_rotation_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/base_v0/caster_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/caster.stl</mesh>
+                  <material>PR2/caster_texture</material>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="fr_caster_rotation_joint">
+          <body1>fr_caster_rotation_link</body1>
+          <body2>base_footprint</body2>
+          <anchor>fr_caster_rotation_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="fr_caster_l_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.2246 -0.1756 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="fr_caster_l_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="fr_caster_l_wheel_joint">
+          <body1>fr_caster_l_wheel_link</body1>
+          <body2>fr_caster_rotation_link</body2>
+          <anchor>fr_caster_l_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="fr_caster_r_wheel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.44036</mass>
+          <ixx>0.0124118</ixx>
+          <ixy>-0.000711734</ixy>
+          <ixz>0.00050273</ixz>
+          <iyy>0.0152182</iyy>
+          <iyz>-4.27347e-06</iyz>
+          <izz>0.011764</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.2246 -0.2736 0.0792</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:cylinder name="fr_caster_r_wheel_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>90 -0 0</rpy>
+              <size>0.074792 0.034</size>
+              <mu1>100</mu1>
+              <mu2>100</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>-90 0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/base_v0/wheel.dae</mesh>
+              </visual>
+          </geom:cylinder>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="fr_caster_r_wheel_joint">
+          <body1>fr_caster_r_wheel_link</body1>
+          <body2>fr_caster_rotation_link</body2>
+          <anchor>fr_caster_r_wheel_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0</damping>
+      </joint:hinge>
+      <body:empty name="torso_lift_link">
+          <massMatrix>true</massMatrix>
+          <mass>36.449</mass>
+          <ixx>2.79233</ixx>
+          <ixy>0.00428007</ixy>
+          <ixz>-0.160631</ixz>
+          <iyy>2.52106</iyy>
+          <iyz>0.029689</iyz>
+          <izz>0.536551</izz>
+          <cx>-0.1</cx>
+          <cy>0</cy>
+          <cz>-0.0885</cz>
+          <xyz>-0.05 0 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="torso_lift_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/torso_v0/torso_lift_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/torso_v0/torso_lift.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="torso_lift_contact_sensor">
+              <geom>torso_lift_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="torso_lift_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>torso_lift_bumper</bumperTopicName>
+                  <interface:bumper name="torso_lift_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:slider name="torso_lift_joint">
+          <body1>torso_lift_link</body1>
+          <body2>base_footprint</body2>
+          <anchor>torso_lift_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>20000</damping>
+          <lowStop>0</lowStop>
+          <highStop>0.31</highStop>
+      </joint:slider>
+      <body:empty name="head_pan_link">
+          <massMatrix>true</massMatrix>
+          <mass>6.339</mass>
+          <ixx>0.0324976</ixx>
+          <ixy>0.000636041</ixy>
+          <ixz>0.00258515</ixz>
+          <iyy>0.0465456</iyy>
+          <iyz>-0.00245343</iyz>
+          <izz>0.0576527</izz>
+          <cx>0.010907</cx>
+          <cy>0.031693</cy>
+          <cz>0.090507</cz>
+          <xyz>-0.06707 0 1.17213</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="head_pan_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/head_v0/head_pan_L.stl</mesh>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/head_v0/head_pan.dae</mesh>
+              </visual>
+          </geom:trimesh>
+      </body:empty>
+      <joint:hinge name="head_pan_joint">
+          <body1>head_pan_link</body1>
+          <body2>torso_lift_link</body2>
+          <anchor>head_pan_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>1</damping>
+          <lowStop>-172.288</lowStop>
+          <highStop>172.288</highStop>
+      </joint:hinge>
+      <body:empty name="head_tilt_link">
+          <massMatrix>true</massMatrix>
+          <mass>4.919</mass>
+          <ixx>0.0585063</ixx>
+          <ixy>0.000620635</ixy>
+          <ixz>-0.000755326</ixz>
+          <iyy>0.0880657</iyy>
+          <iyz>0.00246762</iyz>
+          <izz>0.11772</izz>
+          <cx>0.001716</cx>
+          <cy>-0.019556</cy>
+          <cz>0.055002</cz>
+          <xyz>0.00093 0 1.17213</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="head_tilt_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/head_v0/head_tilt_L.stl</mesh>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/head_v0/head_tilt.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <geom:box name="head_tilt_link_geom_head_plate_frame">
+              <xyz>0.0232 0 0.0645</xyz>
+              <rpy>0 -0 0</rpy>
+              <size>0.01 0.01 0.01</size>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>0.01 0.01 0.01</scale>
+                  <mesh>unit_box</mesh>
+                  <material>Gazebo/Grey</material>
+              </visual>
+          </geom:box>
+          <sensor:camera name="narrow_stereo_gazebo_l_stereo_camera_sensor">
+              <imageSize>640 480</imageSize>
+              <imageFormat>L8</imageFormat>
+              <hfov>45</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>25.0</updateRate>
+              <controller:gazebo_ros_camera name="narrow_stereo_gazebo_l_stereo_camera_controller" plugin="libgazebo_ros_camera.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>25.0</updateRate>
+                  <imageTopicName>narrow_stereo/left/image_raw</imageTopicName>
+                  <cameraInfoTopicName>narrow_stereo/left/camera_info</cameraInfoTopicName>
+                  <frameName>narrow_stereo_optical_frame</frameName>
+                  <hackBaseline>0</hackBaseline>
+                  <CxPrime>320.5</CxPrime>
+                  <Cx>320.5</Cx>
+                  <Cy>240.5</Cy>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <!-- 320 for wide and 772.55 for narrow stereo camera -->
+                  <focal_length>772.55</focal_length>
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="narrow_stereo_gazebo_l_stereo_camera_iface" />
+              </controller:gazebo_ros_camera>
+              <xyz>0.0232 0.06 0.098</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:camera>
+          <sensor:camera name="narrow_stereo_gazebo_r_stereo_camera_sensor">
+              <imageSize>640 480</imageSize>
+              <imageFormat>L8</imageFormat>
+              <hfov>45</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>25.0</updateRate>
+              <controller:gazebo_ros_camera name="narrow_stereo_gazebo_r_stereo_camera_controller" plugin="libgazebo_ros_camera.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>25.0</updateRate>
+                  <imageTopicName>narrow_stereo/right/image_raw</imageTopicName>
+                  <cameraInfoTopicName>narrow_stereo/right/camera_info</cameraInfoTopicName>
+                  <frameName>narrow_stereo_optical_frame</frameName>
+                  <hackBaseline>0.09</hackBaseline>
+                  <CxPrime>320.5</CxPrime>
+                  <Cx>320.5</Cx>
+                  <Cy>240.5</Cy>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <!-- 320 for wide and 772.55 for narrow stereo camera -->
+                  <focal_length>772.55</focal_length>
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="narrow_stereo_gazebo_r_stereo_camera_iface" />
+              </controller:gazebo_ros_camera>
+              <xyz>0.0232 -0.03 0.098</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:camera>
+          <sensor:camera name="wide_stereo_gazebo_l_stereo_camera_sensor">
+              <imageSize>640 480</imageSize>
+              <imageFormat>BAYER_BGGR8</imageFormat>
+              <hfov>90</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>25.0</updateRate>
+              <controller:gazebo_ros_camera name="wide_stereo_gazebo_l_stereo_camera_controller" plugin="libgazebo_ros_camera.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>25.0</updateRate>
+                  <imageTopicName>wide_stereo/left/image_raw</imageTopicName>
+                  <cameraInfoTopicName>wide_stereo/left/camera_info</cameraInfoTopicName>
+                  <frameName>wide_stereo_optical_frame</frameName>
+                  <hackBaseline>0</hackBaseline>
+                  <CxPrime>320.5</CxPrime>
+                  <Cx>320.5</Cx>
+                  <Cy>240.5</Cy>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <!-- 320 for wide and 772.55 for narrow stereo camera -->
+                  <focal_length>320</focal_length>
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="wide_stereo_gazebo_l_stereo_camera_iface" />
+              </controller:gazebo_ros_camera>
+              <xyz>0.0232 0.03 0.098</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:camera>
+          <sensor:camera name="wide_stereo_gazebo_r_stereo_camera_sensor">
+              <imageSize>640 480</imageSize>
+              <imageFormat>BAYER_BGGR8</imageFormat>
+              <hfov>90</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>25.0</updateRate>
+              <controller:gazebo_ros_camera name="wide_stereo_gazebo_r_stereo_camera_controller" plugin="libgazebo_ros_camera.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>25.0</updateRate>
+                  <imageTopicName>wide_stereo/right/image_raw</imageTopicName>
+                  <cameraInfoTopicName>wide_stereo/right/camera_info</cameraInfoTopicName>
+                  <frameName>wide_stereo_optical_frame</frameName>
+                  <hackBaseline>0.09</hackBaseline>
+                  <CxPrime>320.5</CxPrime>
+                  <Cx>320.5</Cx>
+                  <Cy>240.5</Cy>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <!-- 320 for wide and 772.55 for narrow stereo camera -->
+                  <focal_length>320</focal_length>
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="wide_stereo_gazebo_r_stereo_camera_iface" />
+              </controller:gazebo_ros_camera>
+              <xyz>0.0232 -0.06 0.098</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:camera>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:camera name="high_def_sensor">
+              <imageFormat>R8G8B8</imageFormat>
+              <imageSize>2448 2050</imageSize>
+              <hfov>45</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>20.0</updateRate>
+              <controller:gazebo_ros_prosilica name="high_def_controller" plugin="libgazebo_ros_prosilica.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>20.0</updateRate>
+                  <imageTopicName>/prosilica/image_raw</imageTopicName>
+                  <cameraInfoTopicName>/prosilica/camera_info</cameraInfoTopicName>
+                  <pollServiceName>/prosilica/request_image</pollServiceName>
+                  <frameName>high_def_frame</frameName>
+                  <CxPrime>1224.5</CxPrime>
+                  <Cx>1224.5</Cx>
+                  <Cy>1025.5</Cy>
+                  <focal_length>2955</focal_length>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="high_def_iface" />
+              </controller:gazebo_ros_prosilica>
+              <xyz>0.0232 -0.109 0.0995</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:camera>
+      </body:empty>
+      <joint:hinge name="head_tilt_joint">
+          <body1>head_tilt_link</body1>
+          <body2>head_pan_link</body2>
+          <anchor>head_tilt_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>1</damping>
+          <lowStop>-26.9999</lowStop>
+          <highStop>79.9998</highStop>
+      </joint:hinge>
+      <body:empty name="l_shoulder_pan_link">
+          <massMatrix>true</massMatrix>
+          <mass>25.7993</mass>
+          <ixx>0.866179</ixx>
+          <ixy>-0.0608651</ixy>
+          <ixz>-0.121181</ixz>
+          <iyy>0.874217</iyy>
+          <iyz>-0.0588661</iyz>
+          <izz>0.273538</izz>
+          <cx>-0.001201</cx>
+          <cy>0.024513</cy>
+          <cz>-0.098231</cz>
+          <xyz>-0.05 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_shoulder_pan_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/shoulder_v0/shoulder_pan.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/shoulder_v0/shoulder_pan.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="l_shoulder_pan_joint">
+          <body1>l_shoulder_pan_link</body1>
+          <body2>torso_lift_link</body2>
+          <anchor>l_shoulder_pan_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>10</damping>
+          <lowStop>-40.9437</lowStop>
+          <highStop>130.944</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_shoulder_lift_link">
+          <massMatrix>true</massMatrix>
+          <mass>2.74988</mass>
+          <ixx>0.0210558</ixx>
+          <ixy>0.00496704</ixy>
+          <ixz>-0.00194809</ixz>
+          <iyy>0.0212722</iyy>
+          <iyz>0.00110425</iyz>
+          <izz>0.0197575</izz>
+          <cx>0.02195</cx>
+          <cy>-0.02664</cy>
+          <cz>-0.03127</cz>
+          <xyz>0.05 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_shoulder_lift_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/shoulder_v0/shoulder_lift.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/shoulder_v0/shoulder_lift.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="l_shoulder_lift_joint">
+          <body1>l_shoulder_lift_link</body1>
+          <body2>l_shoulder_pan_link</body2>
+          <anchor>l_shoulder_lift_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>10</damping>
+          <lowStop>-30.0001</lowStop>
+          <highStop>80.0021</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_upper_arm_roll_link">
+          <massMatrix>true</massMatrix>
+          <mass>6.11769</mass>
+          <ixx>0.025306</ixx>
+          <ixy>-0.00339325</ixy>
+          <ixz>0.000607655</ixz>
+          <iyy>0.0847369</iyy>
+          <iyz>-0.000199537</iyz>
+          <izz>0.0860159</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.05 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_upper_arm_roll_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/shoulder_v0/upper_arm_roll_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/shoulder_v0/upper_arm_roll.stl</mesh>
+                  <material>PR2/RollLinks</material>
+              </visual>
+          </geom:trimesh>
+          <geom:trimesh name="l_upper_arm_roll_link_geom_l_upper_arm_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/upper_arm_v0/upper_arm.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/upper_arm_v0/upper_arm.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="l_upper_arm_roll_joint">
+          <body1>l_upper_arm_roll_link</body1>
+          <body2>l_shoulder_lift_link</body2>
+          <anchor>l_upper_arm_roll_link</anchor>
+          <axis>1 0 0</axis>
+          <damping>0.1</damping>
+          <lowStop>-45.8366</lowStop>
+          <highStop>223.454</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>0.5</fudgeFactor>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_elbow_flex_link">
+          <massMatrix>true</massMatrix>
+          <mass>1.90327</mass>
+          <ixx>0.00346542</ixx>
+          <ixy>4.06683e-05</ixy>
+          <ixz>0.000431716</ixz>
+          <iyy>0.00441606</iyy>
+          <iyz>-3.96891e-05</iyz>
+          <izz>0.00359157</izz>
+          <cx>0.01014</cx>
+          <cy>0.00032</cy>
+          <cz>-0.01211</cz>
+          <xyz>0.45 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_elbow_flex_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/upper_arm_v0/elbow_flex.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/upper_arm_v0/elbow_flex.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="l_elbow_flex_joint">
+          <body1>l_elbow_flex_link</body1>
+          <body2>l_upper_arm_roll_link</body2>
+          <anchor>l_elbow_flex_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>1</damping>
+          <lowStop>-133.001</lowStop>
+          <highStop>0</highStop>
+          <initial_joint_position>-1</initial_joint_position>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_forearm_roll_link">
+          <massMatrix>true</massMatrix>
+          <mass>2.68968</mass>
+          <ixx>0.0146679</ixx>
+          <ixy>5.21588e-05</ixy>
+          <ixz>0.000655948</ixz>
+          <iyy>0.026279</iyy>
+          <iyz>-1.31077e-05</iyz>
+          <izz>0.0277754</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.45 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_forearm_roll_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/upper_arm_v0/forearm_roll_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/upper_arm_v0/forearm_roll.stl</mesh>
+                  <material>PR2/RollLinks</material>
+              </visual>
+          </geom:trimesh>
+          <geom:trimesh name="l_forearm_roll_link_geom_l_forearm_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/forearm_v0/forearm.stl</mesh>
+              <genTexCoord>false</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/forearm_v0/forearm.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <sensor:camera name="l_forearm_cam_sensor">
+              <imageSize>640 480</imageSize>
+              <imageFormat>L8</imageFormat>
+              <hfov>90</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>25.0</updateRate>
+              <controller:gazebo_ros_camera name="l_forearm_cam_controller" plugin="libgazebo_ros_camera.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>25.0</updateRate>
+                  <imageTopicName>l_forearm_cam/image_raw</imageTopicName>
+                  <cameraInfoTopicName>l_forearm_cam/camera_info</cameraInfoTopicName>
+                  <frameName>l_forearm_cam_optical_frame</frameName>
+                  <hackBaseline>0</hackBaseline>
+                  <CxPrime>320.5</CxPrime>
+                  <Cx>320.5</Cx>
+                  <Cy>240.5</Cy>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <!-- 320 for wide and 772.55 for narrow stereo camera -->
+                  <focal_length>320</focal_length>
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="l_forearm_cam_iface" />
+              </controller:gazebo_ros_camera>
+              <xyz>0.135 0 0.044</xyz>
+              <rpy>-90 -32.25 0</rpy>
+          </sensor:camera>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="l_forearm_roll_joint">
+          <body1>l_forearm_roll_link</body1>
+          <body2>l_elbow_flex_link</body2>
+          <anchor>l_forearm_roll_link</anchor>
+          <axis>1 0 0</axis>
+          <damping>0.1</damping>
+          <fudgeFactor>0.5</fudgeFactor>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_wrist_flex_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.61402</mass>
+          <ixx>0.000651657</ixx>
+          <ixy>2.8864e-07</ixy>
+          <ixz>3.03477e-06</ixz>
+          <iyy>0.000198244</iyy>
+          <iyz>-2.2645e-07</iyz>
+          <izz>0.000644505</izz>
+          <cx>-0.00157</cx>
+          <cy>0</cy>
+          <cz>-0.00075</cz>
+          <xyz>0.771 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_wrist_flex_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/forearm_v0/wrist_flex.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/forearm_v0/wrist_flex.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="l_wrist_flex_joint">
+          <body1>l_wrist_flex_link</body1>
+          <body2>l_forearm_roll_link</body2>
+          <anchor>l_wrist_flex_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0.1</damping>
+          <lowStop>-124.905</lowStop>
+          <highStop>0</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_wrist_roll_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.68107</mass>
+          <ixx>0.0113522</ixx>
+          <ixy>-1.58048e-05</ixy>
+          <ixz>-9.175e-07</ixz>
+          <iyy>0.0116774</iyy>
+          <iyz>-5.9554e-07</iyz>
+          <izz>0.0118656</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.771 0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_wrist_roll_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/forearm_v0/wrist_roll_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/forearm_v0/wrist_roll.stl</mesh>
+                  <material>PR2/RollLinks</material>
+              </visual>
+          </geom:trimesh>
+          <geom:box name="l_wrist_roll_link_geom_l_gripper_motor_accelerometer_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <size>0.001 0.001 0.001</size>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>0.001 0.001 0.001</scale>
+                  <mesh>unit_box</mesh>
+              </visual>
+          </geom:box>
+          <geom:trimesh name="l_wrist_roll_link_geom_l_gripper_palm_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/gripper_palm.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/gripper_palm.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="l_gripper_palm_contact_sensor">
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="l_gripper_palm_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>100.0</updateRate>
+                  <frameName>l_gripper_palm_link</frameName>
+                  <bumperTopicName>l_gripper_palm_bumper</bumperTopicName>
+                  <interface:bumper name="l_gripper_palm_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+              <geom>l_wrist_roll_link_geom_l_gripper_palm_link</geom>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="l_wrist_roll_joint">
+          <body1>l_wrist_roll_link</body1>
+          <body2>l_wrist_flex_link</body2>
+          <anchor>l_wrist_roll_link</anchor>
+          <axis>1 0 0</axis>
+          <damping>0.1</damping>
+          <fudgeFactor>0.5</fudgeFactor>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_gripper_l_finger_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17126</mass>
+          <ixx>7.7562e-05</ixx>
+          <ixy>1.49095e-06</ixy>
+          <ixz>-9.83385e-06</ixz>
+          <iyy>0.000197083</iyy>
+          <iyz>-3.06125e-06</iyz>
+          <izz>0.000181054</izz>
+          <cx>0.03598</cx>
+          <cy>0.0173</cy>
+          <cz>-0.00164</cz>
+          <xyz>0.84791 0.198 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_gripper_l_finger_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>false</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="l_gripper_l_finger_contact_sensor">
+              <geom>l_gripper_l_finger_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="l_gripper_l_finger_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>100.0</updateRate>
+                  <frameName>l_gripper_l_finger_link</frameName>
+                  <bumperTopicName>l_gripper_l_finger_bumper</bumperTopicName>
+                  <interface:bumper name="l_gripper_l_finger_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="l_gripper_l_finger_joint">
+          <body1>l_gripper_l_finger_link</body1>
+          <body2>l_wrist_roll_link</body2>
+          <anchor>l_gripper_l_finger_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0.2</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_gripper_l_finger_tip_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.04419</mass>
+          <ixx>8.37047e-06</ixx>
+          <ixy>5.83632e-06</ixy>
+          <ixz>0</ixz>
+          <iyy>9.87067e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.54177e-05</izz>
+          <cx>0.00423</cx>
+          <cy>0.00284</cy>
+          <cz>0</cz>
+          <xyz>0.93928 0.20295 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_gripper_l_finger_tip_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+07</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="l_gripper_l_finger_tip_contact_sensor">
+              <geom>l_gripper_l_finger_tip_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="l_gripper_l_finger_tip_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <frameName>l_gripper_l_finger_tip_link</frameName>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>l_gripper_l_finger_tip_bumper</bumperTopicName>
+                  <interface:bumper name="l_gripper_l_finger_tip_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="l_gripper_l_finger_tip_joint">
+          <body1>l_gripper_l_finger_tip_link</body1>
+          <body2>l_gripper_l_finger_link</body2>
+          <anchor>l_gripper_l_finger_tip_link</anchor>
+          <axis>0 0 -1</axis>
+          <damping>0.01</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_gripper_r_finger_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17389</mass>
+          <ixx>7.73841e-05</ixx>
+          <ixy>-2.09309e-06</ixy>
+          <ixz>-8.36228e-06</ixz>
+          <iyy>0.000198474</iyy>
+          <iyz>2.4611e-06</iyz>
+          <izz>0.00018107</izz>
+          <cx>0.03576</cx>
+          <cy>-0.01736</cy>
+          <cz>-0.00095</cz>
+          <xyz>0.84791 0.178 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_gripper_r_finger_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>-180 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="l_gripper_r_finger_contact_sensor">
+              <geom>l_gripper_r_finger_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="l_gripper_r_finger_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <frameName>l_gripper_r_finger_link</frameName>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>l_gripper_r_finger_bumper</bumperTopicName>
+                  <interface:bumper name="l_gripper_r_finger_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="l_gripper_r_finger_joint">
+          <body1>l_gripper_r_finger_link</body1>
+          <body2>l_wrist_roll_link</body2>
+          <anchor>l_gripper_r_finger_link</anchor>
+          <axis>0 0 -1</axis>
+          <damping>0.2</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="l_gripper_r_finger_tip_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.04419</mass>
+          <ixx>8.37047e-06</ixx>
+          <ixy>-5.83632e-06</ixy>
+          <ixz>0</ixz>
+          <iyy>9.87067e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.54177e-05</izz>
+          <cx>0.00423</cx>
+          <cy>-0.00284</cy>
+          <cz>0</cz>
+          <xyz>0.93928 0.17305 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="l_gripper_r_finger_tip_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>-180 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+07</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="l_gripper_r_finger_tip_contact_sensor">
+              <geom>l_gripper_r_finger_tip_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="l_gripper_r_finger_tip_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <frameName>l_gripper_r_finger_tip_link</frameName>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>l_gripper_r_finger_tip_bumper</bumperTopicName>
+                  <interface:bumper name="l_gripper_r_finger_tip_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="l_gripper_r_finger_tip_joint">
+          <body1>l_gripper_r_finger_tip_link</body1>
+          <body2>l_gripper_r_finger_link</body2>
+          <anchor>l_gripper_r_finger_tip_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0.01</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="laser_tilt_mount_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.051</mass>
+          <ixx>0.0002009</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.19e-05</iyy>
+          <iyz>0</iyz>
+          <izz>0.0002</izz>
+          <cx>-0.03</cx>
+          <cy>0</cy>
+          <cz>-0.03</cz>
+          <xyz>0.04893 0 1.01768</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="laser_tilt_mount_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/tilting_laser_v0/tilting_hokuyo_L.stl</mesh>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/tilting_laser_v0/tilting_hokuyo.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>false</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:ray name="laser_tilt">
+              <rayCount>640</rayCount>
+              <rangeCount>640</rangeCount>
+              <laserCount>1</laserCount>
+              <origin>0.0 0.0 0.0</origin>
+              <displayRays>false</displayRays>
+              <minAngle>-79.9999999086</minAngle>
+              <maxAngle>79.9999999086</maxAngle>
+              <minRange>0.08</minRange>
+              <maxRange>10.0</maxRange>
+              <resRange>0.01</resRange>
+              <updateRate>40</updateRate>
+              <controller:gazebo_ros_laser name="gazebo_ros_laser_tilt_controller" plugin="libgazebo_ros_laser.so">
+                  <gaussianNoise>0.005</gaussianNoise>
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>40</updateRate>
+                  <topicName>tilt_scan</topicName>
+                  <frameName>laser_tilt_link</frameName>
+                  <interface:laser name="gazebo_ros_laser_tilt_iface" />
+              </controller:gazebo_ros_laser>
+              <xyz>0 0 0.03</xyz>
+              <rpy>0 -0 0</rpy>
+          </sensor:ray>
+      </body:empty>
+      <joint:hinge name="laser_tilt_mount_joint">
+          <body1>laser_tilt_mount_link</body1>
+          <body2>torso_lift_link</body2>
+          <anchor>laser_tilt_mount_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0.008</damping>
+          <lowStop>-45.0001</lowStop>
+          <highStop>85</highStop>
+      </joint:hinge>
+      <body:empty name="r_shoulder_pan_link">
+          <massMatrix>true</massMatrix>
+          <mass>25.7993</mass>
+          <ixx>0.866179</ixx>
+          <ixy>-0.0608651</ixy>
+          <ixz>-0.121181</ixz>
+          <iyy>0.874217</iyy>
+          <iyz>-0.0588661</iyz>
+          <izz>0.273538</izz>
+          <cx>-0.001201</cx>
+          <cy>0.024513</cy>
+          <cz>-0.098231</cz>
+          <xyz>-0.05 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_shoulder_pan_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/shoulder_v0/shoulder_pan.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/shoulder_v0/shoulder_pan.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="r_shoulder_pan_joint">
+          <body1>r_shoulder_pan_link</body1>
+          <body2>torso_lift_link</body2>
+          <anchor>r_shoulder_pan_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>10</damping>
+          <lowStop>-130.944</lowStop>
+          <highStop>40.9437</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_shoulder_lift_link">
+          <massMatrix>true</massMatrix>
+          <mass>2.74988</mass>
+          <ixx>0.0210558</ixx>
+          <ixy>0.00496704</ixy>
+          <ixz>-0.00194809</ixz>
+          <iyy>0.0212722</iyy>
+          <iyz>0.00110425</iyz>
+          <izz>0.0197575</izz>
+          <cx>0.02195</cx>
+          <cy>-0.02664</cy>
+          <cz>-0.03127</cz>
+          <xyz>0.05 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_shoulder_lift_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/shoulder_v0/shoulder_lift.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/shoulder_v0/shoulder_lift.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="r_shoulder_lift_joint">
+          <body1>r_shoulder_lift_link</body1>
+          <body2>r_shoulder_pan_link</body2>
+          <anchor>r_shoulder_lift_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>10</damping>
+          <lowStop>-30.0001</lowStop>
+          <highStop>80.0021</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_upper_arm_roll_link">
+          <massMatrix>true</massMatrix>
+          <mass>6.11769</mass>
+          <ixx>0.0253775</ixx>
+          <ixy>0.00375711</ixy>
+          <ixz>-0.000708529</ixz>
+          <iyy>0.0847367</iyy>
+          <iyz>-0.000179365</iyz>
+          <izz>0.0860876</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.05 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_upper_arm_roll_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/shoulder_v0/upper_arm_roll_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/shoulder_v0/upper_arm_roll.stl</mesh>
+                  <material>PR2/RollLinks</material>
+              </visual>
+          </geom:trimesh>
+          <geom:trimesh name="r_upper_arm_roll_link_geom_r_upper_arm_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/upper_arm_v0/upper_arm.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/upper_arm_v0/upper_arm.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="r_upper_arm_roll_joint">
+          <body1>r_upper_arm_roll_link</body1>
+          <body2>r_shoulder_lift_link</body2>
+          <anchor>r_upper_arm_roll_link</anchor>
+          <axis>1 0 0</axis>
+          <damping>0.1</damping>
+          <lowStop>-223.454</lowStop>
+          <highStop>45.8366</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>0.5</fudgeFactor>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_elbow_flex_link">
+          <massMatrix>true</massMatrix>
+          <mass>1.90327</mass>
+          <ixx>0.00346542</ixx>
+          <ixy>4.06683e-05</ixy>
+          <ixz>0.000431716</ixz>
+          <iyy>0.00441606</iyy>
+          <iyz>-3.96891e-05</iyz>
+          <izz>0.00359157</izz>
+          <cx>0.01014</cx>
+          <cy>0.00032</cy>
+          <cz>-0.01211</cz>
+          <xyz>0.45 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_elbow_flex_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/upper_arm_v0/elbow_flex.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/upper_arm_v0/elbow_flex.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="r_elbow_flex_joint">
+          <body1>r_elbow_flex_link</body1>
+          <body2>r_upper_arm_roll_link</body2>
+          <anchor>r_elbow_flex_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>1</damping>
+          <lowStop>-133.001</lowStop>
+          <highStop>0</highStop>
+          <initial_joint_position>-1</initial_joint_position>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_forearm_roll_link">
+          <massMatrix>true</massMatrix>
+          <mass>2.68968</mass>
+          <ixx>0.0146679</ixx>
+          <ixy>5.21588e-05</ixy>
+          <ixz>0.000655948</ixz>
+          <iyy>0.026279</iyy>
+          <iyz>-1.31077e-05</iyz>
+          <izz>0.0277754</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.45 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_forearm_roll_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/upper_arm_v0/forearm_roll_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/upper_arm_v0/forearm_roll.stl</mesh>
+                  <material>PR2/RollLinks</material>
+              </visual>
+          </geom:trimesh>
+          <geom:trimesh name="r_forearm_roll_link_geom_r_forearm_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/forearm_v0/forearm.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/forearm_v0/forearm.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <sensor:camera name="r_forearm_cam_sensor">
+              <imageSize>640 480</imageSize>
+              <imageFormat>L8</imageFormat>
+              <hfov>90</hfov>
+              <nearClip>0.1</nearClip>
+              <farClip>100</farClip>
+              <updateRate>25.0</updateRate>
+              <controller:gazebo_ros_camera name="r_forearm_cam_controller" plugin="libgazebo_ros_camera.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>25.0</updateRate>
+                  <imageTopicName>r_forearm_cam/image_raw</imageTopicName>
+                  <cameraInfoTopicName>r_forearm_cam/camera_info</cameraInfoTopicName>
+                  <frameName>r_forearm_cam_optical_frame</frameName>
+                  <hackBaseline>0</hackBaseline>
+                  <CxPrime>320.5</CxPrime>
+                  <Cx>320.5</Cx>
+                  <Cy>240.5</Cy>
+                  <!-- image_width / (2*tan(hfov_radian /2)) -->
+                  <!-- 320 for wide and 772.55 for narrow stereo camera -->
+                  <focal_length>320</focal_length>
+                  <distortion_k1>0.0</distortion_k1>
+                  <distortion_k2>0.0</distortion_k2>
+                  <distortion_k3>0.0</distortion_k3>
+                  <distortion_t1>0.0</distortion_t1>
+                  <distortion_t2>0.0</distortion_t2>
+                  <interface:camera name="r_forearm_cam_iface" />
+              </controller:gazebo_ros_camera>
+              <xyz>0.135 0 0.044</xyz>
+              <rpy>90 -32.25 0</rpy>
+          </sensor:camera>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="r_forearm_roll_joint">
+          <body1>r_forearm_roll_link</body1>
+          <body2>r_elbow_flex_link</body2>
+          <anchor>r_forearm_roll_link</anchor>
+          <axis>1 0 0</axis>
+          <damping>0.1</damping>
+          <fudgeFactor>0.5</fudgeFactor>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_wrist_flex_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.61402</mass>
+          <ixx>0.000651657</ixx>
+          <ixy>2.8864e-07</ixy>
+          <ixz>3.03477e-06</ixz>
+          <iyy>0.000198244</iyy>
+          <iyz>-2.2645e-07</iyz>
+          <izz>0.000644505</izz>
+          <cx>-0.00157</cx>
+          <cy>0</cy>
+          <cz>-0.00075</cz>
+          <xyz>0.771 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_wrist_flex_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/forearm_v0/wrist_flex.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/forearm_v0/wrist_flex.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:empty>
+      <joint:hinge name="r_wrist_flex_joint">
+          <body1>r_wrist_flex_link</body1>
+          <body2>r_forearm_roll_link</body2>
+          <anchor>r_wrist_flex_link</anchor>
+          <axis>0 1 0</axis>
+          <damping>0.1</damping>
+          <lowStop>-124.905</lowStop>
+          <highStop>0</highStop>
+          <stopKp>1e+06</stopKp>
+          <stopKd>1</stopKd>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_wrist_roll_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.68107</mass>
+          <ixx>0.0113522</ixx>
+          <ixy>-1.58048e-05</ixy>
+          <ixz>-9.175e-07</ixz>
+          <iyy>0.0116774</iyy>
+          <iyz>-5.9554e-07</iyz>
+          <izz>0.0118656</izz>
+          <cx>0</cx>
+          <cy>0</cy>
+          <cz>0</cz>
+          <xyz>0.771 -0.188 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_wrist_roll_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/forearm_v0/wrist_roll_L.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/forearm_v0/wrist_roll.stl</mesh>
+                  <material>PR2/RollLinks</material>
+              </visual>
+          </geom:trimesh>
+          <geom:box name="r_wrist_roll_link_geom_r_gripper_motor_accelerometer_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <size>0.001 0.001 0.001</size>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>0.001 0.001 0.001</scale>
+                  <mesh>unit_box</mesh>
+              </visual>
+          </geom:box>
+          <geom:trimesh name="r_wrist_roll_link_geom_r_gripper_palm_link">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/gripper_palm.stl</mesh>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/gripper_palm.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="r_gripper_palm_contact_sensor">
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="r_gripper_palm_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>100.0</updateRate>
+                  <frameName>r_gripper_palm_link</frameName>
+                  <bumperTopicName>r_gripper_palm_bumper</bumperTopicName>
+                  <interface:bumper name="r_gripper_palm_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+              <geom>r_wrist_roll_link_geom_r_gripper_palm_link</geom>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="r_wrist_roll_joint">
+          <body1>r_wrist_roll_link</body1>
+          <body2>r_wrist_flex_link</body2>
+          <anchor>r_wrist_roll_link</anchor>
+          <axis>1 0 0</axis>
+          <damping>0.1</damping>
+          <fudgeFactor>0.5</fudgeFactor>
+          <provideFeedback>false</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_gripper_l_finger_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17126</mass>
+          <ixx>7.7562e-05</ixx>
+          <ixy>1.49095e-06</ixy>
+          <ixz>-9.83385e-06</ixz>
+          <iyy>0.000197083</iyy>
+          <iyz>-3.06125e-06</iyz>
+          <izz>0.000181054</izz>
+          <cx>0.03598</cx>
+          <cy>0.0173</cy>
+          <cz>-0.00164</cz>
+          <xyz>0.84791 -0.178 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_gripper_l_finger_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="r_gripper_l_finger_contact_sensor">
+              <geom>r_gripper_l_finger_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="r_gripper_l_finger_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <updateRate>100.0</updateRate>
+                  <frameName>r_gripper_l_finger_link</frameName>
+                  <bumperTopicName>r_gripper_l_finger_bumper</bumperTopicName>
+                  <interface:bumper name="r_gripper_l_finger_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="r_gripper_l_finger_joint">
+          <body1>r_gripper_l_finger_link</body1>
+          <body2>r_wrist_roll_link</body2>
+          <anchor>r_gripper_l_finger_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0.2</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_gripper_l_finger_tip_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.04419</mass>
+          <ixx>8.37047e-06</ixx>
+          <ixy>5.83632e-06</ixy>
+          <ixz>0</ixz>
+          <iyy>9.87067e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.54177e-05</izz>
+          <cx>0.00423</cx>
+          <cy>0.00284</cy>
+          <cz>0</cz>
+          <xyz>0.93928 -0.17305 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_gripper_l_finger_tip_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>0 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+07</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="r_gripper_l_finger_tip_contact_sensor">
+              <geom>r_gripper_l_finger_tip_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="r_gripper_l_finger_tip_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <frameName>r_gripper_l_finger_tip_link</frameName>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>r_gripper_l_finger_tip_bumper</bumperTopicName>
+                  <interface:bumper name="r_gripper_l_finger_tip_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="r_gripper_l_finger_tip_joint">
+          <body1>r_gripper_l_finger_tip_link</body1>
+          <body2>r_gripper_l_finger_link</body2>
+          <anchor>r_gripper_l_finger_tip_link</anchor>
+          <axis>0 0 -1</axis>
+          <damping>0.01</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_gripper_r_finger_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17389</mass>
+          <ixx>7.73841e-05</ixx>
+          <ixy>-2.09309e-06</ixy>
+          <ixz>-8.36228e-06</ixz>
+          <iyy>0.000198474</iyy>
+          <iyz>2.4611e-06</iyz>
+          <izz>0.00018107</izz>
+          <cx>0.03576</cx>
+          <cy>-0.01736</cy>
+          <cz>-0.00095</cz>
+          <xyz>0.84791 -0.198 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_gripper_r_finger_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>-180 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+06</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="r_gripper_r_finger_contact_sensor">
+              <geom>r_gripper_r_finger_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="r_gripper_r_finger_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <frameName>r_gripper_r_finger_link</frameName>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>r_gripper_r_finger_bumper</bumperTopicName>
+                  <interface:bumper name="r_gripper_r_finger_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="r_gripper_r_finger_joint">
+          <body1>r_gripper_r_finger_link</body1>
+          <body2>r_wrist_roll_link</body2>
+          <anchor>r_gripper_r_finger_link</anchor>
+          <axis>0 0 -1</axis>
+          <damping>0.2</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <body:empty name="r_gripper_r_finger_tip_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.04419</mass>
+          <ixx>8.37047e-06</ixx>
+          <ixy>-5.83632e-06</ixy>
+          <ixz>0</ixz>
+          <iyy>9.87067e-06</iyy>
+          <iyz>0</iyz>
+          <izz>1.54177e-05</izz>
+          <cx>0.00423</cx>
+          <cy>-0.00284</cy>
+          <cz>0</cz>
+          <xyz>0.93928 -0.20295 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <geom:trimesh name="r_gripper_r_finger_tip_link_geom">
+              <xyz>0 0 0</xyz>
+              <rpy>-180 -0 0</rpy>
+              <scale>1 1 1</scale>
+              <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+              <mu1>500</mu1>
+              <mu2>500</mu2>
+              <kp>1e+07</kp>
+              <kd>1</kd>
+              <genTexCoord>true</genTexCoord>
+              <visual>
+                  <xyz>0 0 0</xyz>
+                  <rpy>0 -0 0</rpy>
+                  <scale>1 1 1</scale>
+                  <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+              </visual>
+          </geom:trimesh>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+          <sensor:contact name="r_gripper_r_finger_tip_contact_sensor">
+              <geom>r_gripper_r_finger_tip_link_geom</geom>
+              <updateRate>100.0</updateRate>
+              <controller:gazebo_ros_bumper name="r_gripper_r_finger_tip_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
+                  <alwaysOn>true</alwaysOn>
+                  <frameName>r_gripper_r_finger_tip_link</frameName>
+                  <updateRate>100.0</updateRate>
+                  <bumperTopicName>r_gripper_r_finger_tip_bumper</bumperTopicName>
+                  <interface:bumper name="r_gripper_r_finger_tip_gazebo_ros_bumper_iface" />
+              </controller:gazebo_ros_bumper>
+          </sensor:contact>
+      </body:empty>
+      <joint:hinge name="r_gripper_r_finger_tip_joint">
+          <body1>r_gripper_r_finger_tip_link</body1>
+          <body2>r_gripper_r_finger_link</body2>
+          <anchor>r_gripper_r_finger_tip_link</anchor>
+          <axis>0 0 1</axis>
+          <damping>0.01</damping>
+          <lowStop>0</lowStop>
+          <highStop>31.3981</highStop>
+          <stopKp>1e+07</stopKp>
+          <stopKd>1</stopKd>
+          <fudgeFactor>1</fudgeFactor>
+          <provideFeedback>true</provideFeedback>
+      </joint:hinge>
+      <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>1000.0</updateRate>
+          <interface:audio name="gazebo_ros_controller_manager_dummy_iface" />
+      </controller:gazebo_ros_controller_manager>
+      <controller:gazebo_ros_power_monitor name="gazebo_ros_power_monitor_controller" plugin="libgazebo_ros_power_monitor.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>1.0</updateRate>
+          <timeout>5</timeout>
+          <interface:audio name="power_monitor_dummy_interface" />
+          <powerStateTopic>power_state</powerStateTopic>
+          <powerStateRate>10.0</powerStateRate>
+          <fullChargeCapacity>87.78</fullChargeCapacity>
+          <dischargeRate>-474</dischargeRate>
+          <chargeRate>525</chargeRate>
+          <dischargeVoltage>15.52</dischargeVoltage>
+          <chargeVoltage>16.41</chargeVoltage>
+      </controller:gazebo_ros_power_monitor>
+      <controller:gazebo_ros_p3d name="p3d_base_controller" plugin="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <topicName>base_pose_ground_truth</topicName>
+          <gaussianNoise>0.01</gaussianNoise>
+          <frameName>map</frameName>
+          <xyzOffsets>25.7 25.7 0</xyzOffsets>
+          <!-- initialize odometry for fake localization-->
+          <rpyOffsets>0 0 0</rpyOffsets>
+          <interface:position name="p3d_base_position" />
+          <bodyName>base_footprint</bodyName>
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+      </controller:gazebo_ros_p3d>
+      <canonicalBody>base_footprint</canonicalBody>
+      <controller:gazebo_ros_imu name="imu_controller" plugin="libgazebo_ros_imu.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <topicName>torso_lift_imu/data</topicName>
+          <gaussianNoise>2.89e-08</gaussianNoise>
+          <xyzOffsets>0 0 0</xyzOffsets>
+          <rpyOffsets>0 0 0</rpyOffsets>
+          <interface:position name="imu_position" />
+          <bodyName>torso_lift_link</bodyName>
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+      </controller:gazebo_ros_imu>
+      <controller:gazebo_ros_projector name="projector_wg6802418_controller" plugin="libgazebo_ros_projector.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>15.0</updateRate>
+          <textureName>stereo_projection_pattern_high_res_red.png</textureName>
+          <filterTextureName>stereo_projection_pattern_filter.png</filterTextureName>
+          <textureTopicName>projector_wg6802418_controller/image</textureTopicName>
+          <projectorTopicName>projector_wg6802418_controller/projector</projectorTopicName>
+          <fov>0.785398163397</fov>
+          <nearClipDist>0.4</nearClipDist>
+          <farClipDist>10</farClipDist>
+          <bodyName>head_tilt_link</bodyName>
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+      </controller:gazebo_ros_projector>
+      <controller:gazebo_ros_p3d name="p3d_r_gripper_l_finger_controller" plugin="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <bodyName>r_gripper_l_finger_link</bodyName>
+          <topicName>r_gripper_l_finger_pose_ground_truth</topicName>
+          <gaussianNoise>0.0</gaussianNoise>
+          <frameName>base_link</frameName>
+          <interface:position name="p3d_r_gripper_l_finger_position_iface" />
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+      </controller:gazebo_ros_p3d>
+      <controller:gazebo_ros_f3d name="f3d_r_gripper_l_finger_controller" plugin="libgazebo_ros_f3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <bodyName>r_gripper_l_finger_link</bodyName>
+          <topicName>r_gripper_l_finger_force_ground_truth</topicName>
+          <frameName>r_gripper_l_finger_link</frameName>
+          <interface:position name="f3d_r_gripper_l_finger_force_iface" />
+      </controller:gazebo_ros_f3d>
+      <body:box name="r_gripper_l_parallel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17126</mass>
+          <ixx>7.7562e-05</ixx>
+          <ixy>1.49095e-06</ixy>
+          <ixz>-9.83385e-06</ixz>
+          <iyy>0.000197083</iyy>
+          <iyz>-3.06125e-06</iyz>
+          <izz>0.000181054</izz>
+          <cx>0.03598</cx>
+          <cy>0.0173</cy>
+          <cz>-0.00164</cz>
+          <xyz>0.82991 -0.157 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:box>
+      <body:box name="r_gripper_r_parallel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17389</mass>
+          <ixx>7.73841e-05</ixx>
+          <ixy>-2.09309e-06</ixy>
+          <ixz>-8.36228e-06</ixz>
+          <iyy>0.000198474</iyy>
+          <iyz>2.4611e-06</iyz>
+          <izz>0.00018107</izz>
+          <cx>0.03576</cx>
+          <cy>-0.01736</cy>
+          <cz>-0.00095</cz>
+          <xyz>0.82991 -0.219 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:box>
+      <joint:hinge name="r_gripper_r_parallel_root_joint">
+          <body1>r_gripper_r_parallel_link</body1>
+          <axis>0 0 -1</axis>
+          <damping>0.2</damping>
+          <anchorOffset>0.05891 -0.031 0</anchorOffset>
+          <body2>r_wrist_roll_link</body2>
+          <anchor>r_wrist_roll_link</anchor>
+      </joint:hinge>
+      <joint:hinge name="r_gripper_l_parallel_root_joint">
+          <body1>r_gripper_l_parallel_link</body1>
+          <axis>0 0 1</axis>
+          <damping>0.2</damping>
+          <anchorOffset>0.05891 0.031 0</anchorOffset>
+          <body2>r_wrist_roll_link</body2>
+          <anchor>r_wrist_roll_link</anchor>
+      </joint:hinge>
+      <joint:hinge name="r_gripper_r_parallel_tip_joint">
+          <body1>r_gripper_r_parallel_link</body1>
+          <body2>r_gripper_r_finger_tip_link</body2>
+          <anchor>r_gripper_r_finger_tip_link</anchor>
+          <axis>0 0 1</axis>
+          <anchorOffset>-0.018 -0.021 0</anchorOffset>
+      </joint:hinge>
+      <joint:hinge name="r_gripper_l_parallel_tip_joint">
+          <body1>r_gripper_l_parallel_link</body1>
+          <body2>r_gripper_l_finger_tip_link</body2>
+          <anchor>r_gripper_l_finger_tip_link</anchor>
+          <axis>0 0 1</axis>
+          <anchorOffset>-0.018 0.021 0</anchorOffset>
+      </joint:hinge>
+      <joint:slider name="r_gripper_joint">
+          <body1>r_gripper_l_finger_tip_link</body1>
+          <body2>r_gripper_r_finger_tip_link</body2>
+          <anchor>r_gripper_r_finger_tip_link</anchor>
+          <axis>0 1 0</axis>
+      </joint:slider>
+      <controller:gazebo_ros_p3d name="p3d_r_gripper_palm_controller" plugin="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <topicName>r_gripper_palm_pose_ground_truth</topicName>
+          <xyzOffsets>0 0 0</xyzOffsets>
+          <rpyOffsets>0 0 0</rpyOffsets>
+          <gaussianNoise>0.0</gaussianNoise>
+          <frameName>map</frameName>
+          <interface:position name="p3d_r_gripper_palm_position_iface" />
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+          <bodyName>r_wrist_roll_link</bodyName>
+      </controller:gazebo_ros_p3d>
+      <controller:gazebo_ros_p3d name="p3d_l_gripper_l_finger_controller" plugin="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <bodyName>l_gripper_l_finger_link</bodyName>
+          <topicName>l_gripper_l_finger_pose_ground_truth</topicName>
+          <gaussianNoise>0.0</gaussianNoise>
+          <frameName>base_link</frameName>
+          <interface:position name="p3d_l_gripper_l_finger_position_iface" />
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+      </controller:gazebo_ros_p3d>
+      <controller:gazebo_ros_f3d name="f3d_l_gripper_l_finger_controller" plugin="libgazebo_ros_f3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <bodyName>l_gripper_l_finger_link</bodyName>
+          <topicName>l_gripper_l_finger_force_ground_truth</topicName>
+          <frameName>l_gripper_l_finger_link</frameName>
+          <interface:position name="f3d_l_gripper_l_finger_force_iface" />
+      </controller:gazebo_ros_f3d>
+      <body:box name="l_gripper_l_parallel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17126</mass>
+          <ixx>7.7562e-05</ixx>
+          <ixy>1.49095e-06</ixy>
+          <ixz>-9.83385e-06</ixz>
+          <iyy>0.000197083</iyy>
+          <iyz>-3.06125e-06</iyz>
+          <izz>0.000181054</izz>
+          <cx>0.03598</cx>
+          <cy>0.0173</cy>
+          <cz>-0.00164</cz>
+          <xyz>0.82991 0.219 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:box>
+      <body:box name="l_gripper_r_parallel_link">
+          <massMatrix>true</massMatrix>
+          <mass>0.17389</mass>
+          <ixx>7.73841e-05</ixx>
+          <ixy>-2.09309e-06</ixy>
+          <ixz>-8.36228e-06</ixz>
+          <iyy>0.000198474</iyy>
+          <iyz>2.4611e-06</iyz>
+          <izz>0.00018107</izz>
+          <cx>0.03576</cx>
+          <cy>-0.01736</cy>
+          <cz>-0.00095</cz>
+          <xyz>0.82991 0.157 0.790675</xyz>
+          <rpy>0 -0 0</rpy>
+          <turnGravityOff>true</turnGravityOff>
+          <selfCollide>false</selfCollide>
+      </body:box>
+      <joint:hinge name="l_gripper_r_parallel_root_joint">
+          <body1>l_gripper_r_parallel_link</body1>
+          <axis>0 0 -1</axis>
+          <damping>0.2</damping>
+          <anchorOffset>0.05891 -0.031 0</anchorOffset>
+          <body2>l_wrist_roll_link</body2>
+          <anchor>l_wrist_roll_link</anchor>
+      </joint:hinge>
+      <joint:hinge name="l_gripper_l_parallel_root_joint">
+          <body1>l_gripper_l_parallel_link</body1>
+          <axis>0 0 1</axis>
+          <damping>0.2</damping>
+          <anchorOffset>0.05891 0.031 0</anchorOffset>
+          <body2>l_wrist_roll_link</body2>
+          <anchor>l_wrist_roll_link</anchor>
+      </joint:hinge>
+      <joint:hinge name="l_gripper_r_parallel_tip_joint">
+          <body1>l_gripper_r_parallel_link</body1>
+          <body2>l_gripper_r_finger_tip_link</body2>
+          <anchor>l_gripper_r_finger_tip_link</anchor>
+          <axis>0 0 1</axis>
+          <anchorOffset>-0.018 -0.021 0</anchorOffset>
+      </joint:hinge>
+      <joint:hinge name="l_gripper_l_parallel_tip_joint">
+          <body1>l_gripper_l_parallel_link</body1>
+          <body2>l_gripper_l_finger_tip_link</body2>
+          <anchor>l_gripper_l_finger_tip_link</anchor>
+          <axis>0 0 1</axis>
+          <anchorOffset>-0.018 0.021 0</anchorOffset>
+      </joint:hinge>
+      <joint:slider name="l_gripper_joint">
+          <body1>l_gripper_l_finger_tip_link</body1>
+          <body2>l_gripper_r_finger_tip_link</body2>
+          <anchor>l_gripper_r_finger_tip_link</anchor>
+          <axis>0 1 0</axis>
+      </joint:slider>
+      <static>false</static>
+      <controller:gazebo_ros_p3d name="p3d_l_gripper_palm_controller" plugin="libgazebo_ros_p3d.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>100.0</updateRate>
+          <topicName>l_gripper_palm_pose_ground_truth</topicName>
+          <xyzOffsets>0 0 0</xyzOffsets>
+          <rpyOffsets>0 0 0</rpyOffsets>
+          <gaussianNoise>0.0</gaussianNoise>
+          <frameName>map</frameName>
+          <interface:position name="p3d_l_gripper_palm_position_iface" />
+          <bodyName>l_wrist_roll_link</bodyName>
+          <xyz>0 0 0</xyz>
+          <rpy>0 -0 0</rpy>
+      </controller:gazebo_ros_p3d>
+
+      <!--<controller:plugin_1 name="plugin_1_name" filename="libpr2_pose_test.so"/>-->
+  </model:physical>
+</gazebo:world>
