@@ -80,6 +80,7 @@ foreach(FIL ${msgs})
   add_custom_command(TARGET gazebomsgs_out POST_BUILD
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
     ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    DEPENDS ${ABS_FIL}
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
 endforeach()
