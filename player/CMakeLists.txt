@@ -15,6 +15,7 @@ set (gazeboplugin_sources GazeboDriver.cc
              GripperInterface.cc
              BumperInterface.cc
              IRInterface.cc
+             ImuInterface.cc
 )
 
 include_directories( 

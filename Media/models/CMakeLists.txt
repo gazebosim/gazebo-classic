@@ -14,21 +14,10 @@ add_subdirectory(kitchen)
 add_subdirectory(saucepan)
 add_subdirectory(people)
 
-set (files column.mesh
-           geosphere4500.mesh
-           geosphere8000.mesh
-           knot.mesh
-           razor.mesh
-           robot.mesh
-           sicklms200.mesh
-           unitpyramid.mesh
-           wheel.mesh
-           WoodPallet.mesh
-           willowgarage.dae
+set (files willowgarage.dae
            hanoi_red_disk.dae
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
-           cup.mesh
            bowl.dae
 )
 
