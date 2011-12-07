@@ -38,7 +38,7 @@
       <diffuse rgba="0.8 0.8 0.8 1"/>
       <specular rgba="0 0 0 1"/>
       <attenuation range="20" constant="0.8" linear="0.01" quadratic="0.0"/>
-      <direction xyz="0.0 -0.2 -0.8"/>
+      <direction xyz="1.0 1.0 -1.0"/>
     </light>
 
 </gazebo>

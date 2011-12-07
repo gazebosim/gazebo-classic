@@ -13,6 +13,7 @@ using namespace gazebo;
 class FactoryTest : public ServerFixture 
 {};
 
+
 TEST_F(FactoryTest, Box)
 {
   math::Pose setPose, testPose;
@@ -98,6 +99,7 @@ TEST_F(FactoryTest, BlackCamera)
 }
 
 
+
 TEST_F(FactoryTest, Camera)
 {
   math::Pose setPose, testPose;
@@ -122,6 +124,7 @@ TEST_F(FactoryTest, Camera)
   ASSERT_EQ(diffSum, 0);
   ASSERT_EQ(diffMax, 0);
   ASSERT_EQ(diffAvg, 0.0);
+
 }
 
 int main(int argc, char **argv)
