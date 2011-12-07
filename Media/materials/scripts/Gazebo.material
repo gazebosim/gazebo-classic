@@ -65,7 +65,7 @@ material Gazebo/White : perpixel_template
 	}
 }
 
-material Gazebo/FlatBlack : perpixel_template
+material Gazebo/FlatBlack
 {
 	technique
 	{

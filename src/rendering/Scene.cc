@@ -1011,6 +1011,16 @@ void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
         this->visualMsgs.push_back(vm);
       }
 
+      for (int k=0; k < _msg->model(i).link(j).collision_size(); k++)
+      {
+        for (int l=0; l < _msg->model(i).link(j).collision(k).visual_size();l++)
+        {
+          boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
+                _msg->model(i).link(j).collision(k).visual(l)));
+          this->visualMsgs.push_back(vm);
+        }
+      }
+
       for (int k=0; k < _msg->model(i).link(j).sensor_size(); k++)
       {
         boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
@@ -1230,7 +1240,8 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 
 void Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  VisualPtr parentVis = this->GetVisual(_msg->parent());
+  // TODO: Fix this
+  /*VisualPtr parentVis = this->GetVisual(_msg->parent());
   VisualPtr childVis;
 
   if (_msg->child() == "world")
@@ -1240,20 +1251,21 @@ void Scene::ProcessJointMsg(ConstJointPtr &_msg)
 
   if (parentVis && childVis)
   {
-    DynamicLines *line= new DynamicLines();
-    this->worldVisual->AttachObject(line);
+    DynamicLines *line= parentVis->CreateDynamicLine();
+    //this->worldVisual->AttachObject(line);
 
-    line->AddPoint( math::Vector3(0,0,0) );
-    line->AddPoint( math::Vector3(0,0,0) );
+    line->AddPoint(math::Vector3(0,0,0));
+    line->AddPoint(math::Vector3(0,0,0));
 
-    parentVis->AttachLineVertex( line, 0);
-    childVis->AttachLineVertex( line, 1);
+    //parentVis->AttachLineVertex(line, 0);
+    childVis->AttachLineVertex(line, 1);
   }
   else
   {
     gzwarn << "Unable to create joint visual. Parent["
            << _msg->parent() << "] Child[" << _msg->child() << "].\n";
   }
+  */
 }
 
 void Scene::OnRequest(ConstRequestPtr &_msg)
@@ -1281,6 +1293,12 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
     VisualPtr vis = this->GetVisual(_msg->data());
     if (vis)
       vis->ShowCollision(false);
+  }
+  else if (_msg->request() == "set_transparency")
+  {
+    VisualPtr vis = this->GetVisual(_msg->data());
+    if (vis)
+      vis->SetTransparency(_msg->dbl_data());
   }
 
 }

@@ -66,7 +66,8 @@ namespace gazebo
                                   std::vector<math::Vector3> &_values);
 
       private: void LoadNormals(const std::string &_id, 
-                               std::vector<math::Vector3> &_values);
+                                const math::Matrix4 &_transform,
+                                std::vector<math::Vector3> &_values);
       private: void LoadTexCoords(const std::string &_id, 
                                  std::vector<math::Vector2d> &_values);
 

@@ -124,7 +124,8 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
 
   if (_elem->FirstChildElement("instance_node"))
   {
-    std::string nodeURLStr = _elem->FirstChildElement("instance_node")->Attribute("url");
+    std::string nodeURLStr =
+      _elem->FirstChildElement("instance_node")->Attribute("url");
 
     nodeXml = this->GetElementId("node", nodeURLStr);
     if (!nodeXml)
@@ -298,7 +299,7 @@ void ColladaLoader::LoadVertices(const std::string &_id,
     std::string sourceStr = inputXml->Attribute("source");
     if (semantic == "NORMAL")
     {
-      this->LoadNormals(sourceStr, _norms);
+      this->LoadNormals(sourceStr, _transform, _norms);
     }
     else if (semantic == "POSITION")
     {
@@ -334,6 +335,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
 }
 
 void ColladaLoader::LoadNormals(const std::string &_id, 
+                               const math::Matrix4 &_transform,
                                std::vector<math::Vector3> &_values)
 {
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
@@ -352,6 +354,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     iss >> vec.x >> vec.y >> vec.z;
     if (iss)
     {
+      vec = _transform * vec;
       vec.Normalize();
       _values.push_back(vec);
     }
@@ -559,7 +562,7 @@ void ColladaLoader::LoadTriangles( TiXmlElement *_trianglesXml,
     }
     else if (semantic == "NORMAL")
     {
-      this->LoadNormals(source, norms);
+      this->LoadNormals(source, _transform, norms);
       combinedVertNorms = false;
     }
     else if (semantic == "TEXCOORD")
@@ -572,7 +575,6 @@ void ColladaLoader::LoadTriangles( TiXmlElement *_trianglesXml,
 
   TiXmlElement *pXml = _trianglesXml->FirstChildElement("p");
   std::string pStr = pXml->GetText();
-  //std::istringstream iss(pStr);
 
   std::vector<math::Vector3> vertNorms(verts.size());
   std::vector<int> vertNormsCounts(verts.size());

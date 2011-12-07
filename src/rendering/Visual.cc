@@ -407,8 +407,16 @@ void Visual::Update()
   std::list<DynamicLines*>::iterator iter;
 
   // Update the lines
-  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
-    (*iter)->Update();
+  //for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+    //(*iter)->Update();
+
+  std::list< std::pair<DynamicLines*, unsigned int> >::iterator liter;
+  for (liter = this->lineVertices.begin(); liter != this->lineVertices.end(); liter++)
+  {
+    liter->first->SetPoint(liter->second,
+        Conversions::Convert(this->sceneNode->_getDerivedPosition()));
+    liter->first->Update();
+  }
 
   if (this->animState)
   {
@@ -885,12 +893,18 @@ void Visual::AttachAxes()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the transparency
-void Visual::SetTransparency( float _trans )
+void Visual::SetTransparency(float _trans)
 {
   if (_trans == this->transparency)
     return;
 
   this->transparency = std::min(std::max(_trans, (float)0.0), (float)1.0);
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    (*iter)->SetTransparency(_trans);
+  }
+
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
@@ -929,17 +943,25 @@ void Visual::SetTransparency( float _trans )
           }
 
           if (this->transparency > 0.0)
+          {
             pass->setDepthWriteEnabled(false);
+            pass->setDepthCheckEnabled(false);
+          }
           else
+          {
             pass->setDepthWriteEnabled(true);
+            pass->setDepthCheckEnabled(true);
+          }
 
+          
           dc = pass->getDiffuse();
-          dc.a = (1.0f - this->transparency);
+          dc.a =(1.0f - this->transparency);
           pass->setDiffuse(dc);
         }
       }
     }
   }
+  RTShaderSystem::Instance()->UpdateShaders();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1040,13 +1062,6 @@ void Visual::SetPosition( const math::Vector3 &_pos)
   }*/
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
 
-  std::list< std::pair<DynamicLines*, unsigned int> >::iterator iter;
-  for (iter = this->lineVertices.begin(); iter != this->lineVertices.end(); iter++)
-  {
-    iter->first->SetPoint( iter->second, 
-        Conversions::Convert(this->sceneNode->_getDerivedPosition()) );
-    iter->first->Update();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1254,10 +1269,10 @@ void Visual::DeleteDynamicLine(DynamicLines *line)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a vertex of a line to the position of the visual 
-void Visual::AttachLineVertex( DynamicLines *_line, unsigned int _index )
+void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 {
-  this->lineVertices.push_back( std::make_pair(_line, _index) );
-  _line->SetPoint( _index, this->GetWorldPose().pos);
+  this->lineVertices.push_back(std::make_pair(_line, _index));
+  _line->SetPoint(_index, this->GetWorldPose().pos);
 }
  
 ////////////////////////////////////////////////////////////////////////////////

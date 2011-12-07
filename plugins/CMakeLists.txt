@@ -5,7 +5,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-set (plugins CameraPlugin DepthCameraPlugin ContactPlugin RayPlugin)
+set (plugins CameraPlugin DepthCameraPlugin ContactPlugin RayPlugin Pioneer2dxPlugin)
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)

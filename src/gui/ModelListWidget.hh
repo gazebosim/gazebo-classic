@@ -44,7 +44,8 @@ namespace gazebo
       private slots: void OnFollow();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
       private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
-      private slots:void OnShowCollision();
+      private slots: void OnShowCollision();
+      private slots: void OnTransparent();
 
       private: void OnResponse(
                    ConstResponsePtr &_msg );
@@ -140,6 +141,7 @@ namespace gazebo
       private: QAction *deleteAction;
       private: QAction *followAction;
       private: QAction *showCollisionAction;
+      private: QAction *transparentAction;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr requestPub, modelPub;
@@ -159,6 +161,9 @@ namespace gazebo
 
       private: std::vector<event::ConnectionPtr> connections;
       private: std::list<msgs::Pose> poseMsgs;
+
+      private: std::map<std::string, bool> showCollisionsActionState;
+      private: std::map<std::string, bool> transparentActionState;
 
       private: msgs::Model modelMsg;
       private: bool fillPropertyTree;

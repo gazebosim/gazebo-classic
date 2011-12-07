@@ -2,9 +2,9 @@
 <gazebo version="1.0">
   <world name="default">
     <scene>
-      <ambient rgba="0.1 0.1 0.1 1"/>
+      <ambient rgba="0.3 0.3 0.3 1"/>
       <background rgba="0 0 0 1"/>
-      <shadows enabled="false"/>
+      <shadows enabled="true"/>
     </scene>
 
     <physics type="ode">
@@ -57,11 +57,12 @@
     </model>
     -->
 
-    <light type="directional" name="my_light" cast_shadows="false">
-      <origin pose="-2 0 1 0.707 3.1415 0"/>
+    <light type="directional" name="my_light" cast_shadows="true">
+      <origin pose="-2 0 1 0 0 0"/>
       <diffuse rgba=".9 .9 .9 1"/>
       <specular rgba=".1 .1 .1 1"/>
       <attenuation range="20"/>
+      <direction xyz="1 0 -1"/>
     </light>
   </world>
 </gazebo>

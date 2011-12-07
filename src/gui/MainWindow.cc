@@ -555,7 +555,6 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name)
     msg.set_id(iter->second);
   else
   {
-
     gzerr << "Unable to find model[" << _name << "]\n";
   }
 

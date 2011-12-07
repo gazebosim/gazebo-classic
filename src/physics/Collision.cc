@@ -93,6 +93,8 @@ void Collision::Fini()
   this->connections.clear();
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // First step in the loading process
 void Collision::Load(sdf::ElementPtr &_sdf)
@@ -110,64 +112,7 @@ void Collision::Load(sdf::ElementPtr &_sdf)
   if (this->shape->GetType() != MULTIRAY_SHAPE &&
       this->shape->GetType() != RAY_SHAPE)
   {
-    msgs::Visual msg;
-    msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
-    msg.set_parent_name(this->GetScopedName());
-    msg.set_is_static(this->IsStatic());
-    msg.set_cast_shadows(false);
-    msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
-    msgs::Geometry *geom = msg.mutable_geometry();
-
-    if (this->shape->HasType(BOX_SHAPE))
-    {
-      BoxShape *box = (BoxShape*)(this->shape.get());
-      geom->set_type(msgs::Geometry::BOX);
-      math::Vector3 size = box->GetSize();
-      msgs::Set(geom->mutable_box()->mutable_size(), size);
-    }
-    else if (this->shape->HasType(CYLINDER_SHAPE))
-    {
-      CylinderShape *cyl = (CylinderShape*)(this->shape.get());
-      msg.mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
-      geom->mutable_cylinder()->set_radius(cyl->GetRadius());
-      geom->mutable_cylinder()->set_length(cyl->GetLength());
-    }
-
-    else if (this->shape->HasType(SPHERE_SHAPE))
-    {
-      SphereShape *sph = (SphereShape*)(this->shape.get());
-      msg.mutable_geometry()->set_type(msgs::Geometry::SPHERE);
-      geom->mutable_sphere()->set_radius(sph->GetRadius());
-    }
-
-    else if (this->shape->HasType(HEIGHTMAP_SHAPE))
-    {
-      msg.mutable_geometry()->set_type(msgs::Geometry::HEIGHTMAP);
-    }
-
-    else if (this->shape->HasType(MAP_SHAPE))
-    {
-      msg.mutable_geometry()->set_type(msgs::Geometry::IMAGE);
-    }
-
-    else if (this->shape->HasType(PLANE_SHAPE))
-    {
-      msg.mutable_geometry()->set_type(msgs::Geometry::PLANE);
-    }
-    else if (this->shape->HasType(TRIMESH_SHAPE))
-    {
-      TrimeshShape *msh = (TrimeshShape*)(this->shape.get());
-      msg.mutable_geometry()->set_type(msgs::Geometry::MESH);
-      math::Vector3 size = msh->GetSize();
-      msgs::Set(geom->mutable_mesh()->mutable_scale(), size);
-      geom->mutable_mesh()->set_filename(msh->GetFilename());
-    }
-    else
-      gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
-
-    msgs::Set(msg.mutable_pose(), this->GetRelativePose());
-
-    this->visPub->Publish(msg);
+    this->visPub->Publish(this->CreateCollisionVisual());
   }
 }
 
@@ -448,6 +393,7 @@ void Collision::FillCollisionMsg(msgs::Collision &_msg)
   this->surface->FillSurfaceMsg(*_msg.mutable_surface());
 
   _msg.add_visual()->CopyFrom(*this->visualMsg);
+  _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
 }
  
 void Collision::ProcessMsg(const msgs::Collision &_msg)
@@ -479,4 +425,66 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
     this->link->SetEnabled(true);
     this->surface->ProcessMsg(_msg.surface());
   }
+}
+
+msgs::Visual Collision::CreateCollisionVisual()
+{
+  msgs::Visual msg;
+  msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
+  msg.set_parent_name(this->GetScopedName());
+  msg.set_is_static(this->IsStatic());
+  msg.set_cast_shadows(false);
+  msg.mutable_material()->set_script("Gazebo/OrangeTransparent");
+  msgs::Geometry *geom = msg.mutable_geometry();
+
+  if (this->shape->HasType(BOX_SHAPE))
+  {
+    BoxShape *box = (BoxShape*)(this->shape.get());
+    geom->set_type(msgs::Geometry::BOX);
+    math::Vector3 size = box->GetSize();
+    msgs::Set(geom->mutable_box()->mutable_size(), size);
+  }
+  else if (this->shape->HasType(CYLINDER_SHAPE))
+  {
+    CylinderShape *cyl = (CylinderShape*)(this->shape.get());
+    msg.mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
+    geom->mutable_cylinder()->set_radius(cyl->GetRadius());
+    geom->mutable_cylinder()->set_length(cyl->GetLength());
+  }
+
+  else if (this->shape->HasType(SPHERE_SHAPE))
+  {
+    SphereShape *sph = (SphereShape*)(this->shape.get());
+    msg.mutable_geometry()->set_type(msgs::Geometry::SPHERE);
+    geom->mutable_sphere()->set_radius(sph->GetRadius());
+  }
+
+  else if (this->shape->HasType(HEIGHTMAP_SHAPE))
+  {
+    msg.mutable_geometry()->set_type(msgs::Geometry::HEIGHTMAP);
+  }
+
+  else if (this->shape->HasType(MAP_SHAPE))
+  {
+    msg.mutable_geometry()->set_type(msgs::Geometry::IMAGE);
+  }
+
+  else if (this->shape->HasType(PLANE_SHAPE))
+  {
+    msg.mutable_geometry()->set_type(msgs::Geometry::PLANE);
+  }
+  else if (this->shape->HasType(TRIMESH_SHAPE))
+  {
+    TrimeshShape *msh = (TrimeshShape*)(this->shape.get());
+    msg.mutable_geometry()->set_type(msgs::Geometry::MESH);
+    math::Vector3 size = msh->GetSize();
+    msgs::Set(geom->mutable_mesh()->mutable_scale(), size);
+    geom->mutable_mesh()->set_filename(msh->GetFilename());
+  }
+  else
+    gzerr << "Unknown shape[" << this->shape->GetType() << "]\n";
+
+  msgs::Set(msg.mutable_pose(), this->GetRelativePose());
+
+  return msg;
 }

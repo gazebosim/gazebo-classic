@@ -207,7 +207,8 @@ namespace gazebo
       public: math::Box GetBoundingBox() const;
   
       /// \brief Add a line to the visual
-      public: DynamicLines *CreateDynamicLine(RenderOpType type);
+      public: DynamicLines *CreateDynamicLine(
+                  RenderOpType type=RENDERING_LINE_STRIP);
   
       /// \brief Delete a dynamic line
       public: void DeleteDynamicLine(DynamicLines *line);

@@ -100,7 +100,13 @@ ModelListWidget::ModelListWidget(QWidget *parent)
   connect(this->showCollisionAction, SIGNAL(triggered()), this, 
           SLOT(OnShowCollision()));
 
-  this->fillingPropertyTree = false;
+  this->transparentAction = new QAction(tr("Transparent"), this);
+  this->transparentAction->setStatusTip(tr("Make model transparent"));
+  this->transparentAction->setCheckable(true);
+  connect(this->transparentAction, SIGNAL(triggered()), this, 
+          SLOT(OnTransparent()));
+
+ this->fillingPropertyTree = false;
   this->selectedProperty = NULL;
 
   this->connections.push_back( 
@@ -130,9 +136,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
   if (_item)
   {
     msgs::Selection msg;
-
-    if (!this->selectedModelName.empty())
-      event::Events::setSelectedEntity("");
 
     this->propTreeBrowser->clear();
     this->selectedModelName = 
@@ -293,10 +296,36 @@ void ModelListWidget::OnShowCollision()
   QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
   std::string modelName = item->text(0).toStdString();
 
+  this->showCollisionsActionState[modelName] =
+    this->showCollisionAction->isChecked();
+
+
   if (this->showCollisionAction->isChecked())
     this->requestMsg = msgs::CreateRequest("show_collision", modelName);
   else
     this->requestMsg = msgs::CreateRequest("hide_collision", modelName);
+
+  this->requestPub->Publish(*this->requestMsg);
+}
+
+void ModelListWidget::OnTransparent()
+{
+  QTreeWidgetItem *item = this->modelTreeWidget->currentItem();
+  std::string modelName = item->text(0).toStdString();
+
+  this->transparentActionState[modelName] =
+    this->transparentAction->isChecked();
+
+  if (this->transparentAction->isChecked())
+  {
+    this->requestMsg = msgs::CreateRequest("set_transparency", modelName);
+    this->requestMsg->set_dbl_data(0.5);
+  }
+  else
+  {
+    this->requestMsg = msgs::CreateRequest("set_transparency", modelName);
+    this->requestMsg->set_dbl_data(0.0);
+  }
 
   this->requestPub->Publish(*this->requestMsg);
 }
@@ -334,11 +363,25 @@ void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 
   if (item)
   {
+    std::string modelName = item->text(0).toStdString();
+
     QMenu menu(this->modelTreeWidget);
     menu.addAction(this->moveToAction);
     menu.addAction(this->followAction);
     menu.addAction(this->deleteAction);
     menu.addAction(this->showCollisionAction);
+    menu.addAction(this->transparentAction);
+
+    if (this->transparentActionState[modelName])
+      this->transparentAction->setChecked(true);
+    else
+      this->transparentAction->setChecked(false);
+
+    if (this->showCollisionsActionState[modelName])
+      this->showCollisionAction->setChecked(true);
+    else
+      this->showCollisionAction->setChecked(false);
+
     menu.exec(this->modelTreeWidget->mapToGlobal(_pt));
   }
 }

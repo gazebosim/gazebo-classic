@@ -162,7 +162,7 @@ void ODEHingeJoint::SetForce(int /*index*/, double torque)
     this->childLink->SetEnabled(true);
   if (this->parentLink) 
     this->parentLink->SetEnabled(true);
-  dJointAddHingeTorque( this->jointId, torque );
+  dJointAddHingeTorque(this->jointId, torque);
 }
 
 //////////////////////////////////////////////////////////////////////////////

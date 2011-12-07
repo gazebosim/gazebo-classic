@@ -149,6 +149,8 @@ namespace gazebo
   
       /// \brief Create the bounding box for the collision
       private: void CreateBoundingBox();
+
+      private: msgs::Visual CreateCollisionVisual();
  
       /// The link this collision belongs to
       protected: LinkPtr link;

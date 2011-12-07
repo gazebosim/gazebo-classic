@@ -858,8 +858,6 @@ void World::ProcessRequestMsgs()
         response.set_type("error");
         response.set_response( "nonexistant" );
       }
-
-      std::cout << "Entity Info done\n";
     }
     else if ((*iter).request() == "scene_info")
     {
