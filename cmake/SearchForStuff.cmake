@@ -19,9 +19,6 @@ set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRI
 
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
 
-set (GTK2_LIBRARIES "" CACHE STRING "WX GTK2 include paths. Use this to override automatic detection.")
-set (GTK2_INCLUDE_DIRS "" CACHE STRING "WX GTK2 include paths. Use this to override automatic detection.")
-
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
@@ -138,7 +135,6 @@ if (PKG_CONFIG_FOUND)
   # Find OGRE 
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
   if (OGRE-RTShaderSystem_FOUND)
-
     set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})
     set(ogre_include_dirs ${OGRE-RTShaderSystem_INCLUDE_DIRS})
     set(ogre_library_dirs ${OGRE-RTShaderSystem_LIBRARY_DIRS})

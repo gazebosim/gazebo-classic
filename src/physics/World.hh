@@ -109,7 +109,7 @@ namespace gazebo
       public: ModelPtr GetModel(unsigned int index);
     
       /// \brief Reset the simulation to the initial settings
-      public: void Reset();
+      public: void Reset(bool _resetTime=true);
     
       /// \brief Get the selected entity
       public: EntityPtr GetSelectedEntity() const;
