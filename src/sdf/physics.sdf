@@ -1,6 +1,8 @@
 <!-- Physics -->
 <element name="physics" required="1">
   <attribute name="type" type="string" default="ode" required="1"/>
+  <attribute name="update_rate" type="double" default="0" required="0"/>
+
   <element name="max_contacts" type="int" default="20" required="0"/>
 
   <element name="gravity" required="0">

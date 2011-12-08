@@ -241,7 +241,8 @@ if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
   include (FindBoost)
 
-  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex system filesystem)
+  include (FindBoost)
+  find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex system filesystem)
 
   if (NOT Boost_FOUND)
     set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
@@ -259,6 +260,8 @@ if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
     "Boost libraries. Use this to override automatic detection." FORCE )
 
 endif (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries ) 
+
+set (Boost_DIR "" CACHE INTERNAL "" FORCE)
 
 STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
 STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
