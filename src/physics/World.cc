@@ -511,11 +511,14 @@ ModelPtr World::GetModel(unsigned int _index)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Reset the simulation to the initial settings
-void World::Reset()
+void World::Reset(bool _resetTime)
 {
-  this->simTime = common::Time(0);
-  this->pauseTime = common::Time(0);
-  this->startTime = common::Time::GetWallTime();
+  if (_resetTime)
+  {
+    this->simTime = common::Time(0);
+    this->pauseTime = common::Time(0);
+    this->startTime = common::Time::GetWallTime();
+  }
 
   this->rootElement->Reset();
 

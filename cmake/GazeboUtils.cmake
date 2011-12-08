@@ -96,7 +96,7 @@ endmacro(INSTALL_INCLUDES)
 
 macro (INSTALL_LIBRARY _name)
   set_target_properties(${_name} PROPERTIES SOVERSION ${GAZEBO_MAJOR_VERSION} VERSION ${GAZEBO_VERSION})
-  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR})
+  install (TARGETS ${_name} DESTINATION ${LIB_INSTALL_DIR} COMPONENT shlib)
 endmacro (INSTALL_LIBRARY _name)
 
 macro (INSTALL_EXECUTABLE _name)

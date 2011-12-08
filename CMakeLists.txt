@@ -18,6 +18,10 @@ set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PAT
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set (CMAKE_INSTALL_PREFIX "/usr/" CACHE PATH "Gazebo install prefix" FORCE)
+endif()
+
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
@@ -80,7 +84,7 @@ include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
 # Build type cflags
-set (CMAKE_C_FLAGS_RELEASE " -O2 -DNDEBUG -Wall -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
+set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG -Wall -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
 set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
@@ -162,11 +166,6 @@ else (build_errors)
   # Write the config.h file
   configure_file (${gazebo_cmake_dir}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
   INSTALL_INCLUDES("" ${PROJECT_BINARY_DIR}/gazebo_config.h)
-
-  ########################################
-  # Make the gazebo rc file
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
