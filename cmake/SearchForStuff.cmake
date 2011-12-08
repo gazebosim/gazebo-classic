@@ -350,23 +350,23 @@ ENDIF (libtool_library AND libtool_include_dir)
 ########################################
 # Find libyaml
 #
-find_path(yaml_include yaml.h ${yaml_include} ENV CPATH)
-if (yaml_include)
-  message (STATUS "Looking for yaml.h - found")
-else ()
-  message (STATUS "Looking for yaml.h - not found")
-endif ()
-
-find_library(libyaml yaml ENV LD_LIBRARY_PATH)
-if (libyaml)
-  message (STATUS "Looking for libyaml - found")
-else ()
-  message (STATUS "Looking for libyaml - not found")
-endif ()
-
-if (NOT libyaml OR NOT yaml_include)
-  BUILD_ERROR("Missing: yaml(http://www.yaml.org)")
-endif (NOT libyaml OR NOT yaml_include)
+#find_path(yaml_include yaml.h ${yaml_include} ENV CPATH)
+#if (yaml_include)
+#  message (STATUS "Looking for yaml.h - found")
+#else ()
+#  message (STATUS "Looking for yaml.h - not found")
+#endif ()
+#
+#find_library(libyaml yaml ENV LD_LIBRARY_PATH)
+#if (libyaml)
+#  message (STATUS "Looking for libyaml - found")
+#else ()
+#  message (STATUS "Looking for libyaml - not found")
+#endif ()
+#
+#if (NOT libyaml OR NOT yaml_include)
+#  BUILD_ERROR("Missing: yaml(http://www.yaml.org)")
+#endif (NOT libyaml OR NOT yaml_include)
 
 ########################################
 # Find libdl
