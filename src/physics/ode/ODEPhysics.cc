@@ -398,6 +398,22 @@ void ODEPhysics::Reset()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the step time
+void ODEPhysics::SetUpdateRate(double _value)
+{
+  this->sdf->GetOrCreateElement("ode")->GetAttribute("updateRate")->Set(_value);
+  this->updateRateDouble = _value;
+  gzwarn << "physics updateRate enforcement not implemented yet\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the simulation step time
+double ODEPhysics::GetUpdateRate()
+{
+  return this->updateRateDouble;
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
+// Set the step time
 void ODEPhysics::SetStepTime(double _value)
 {
   this->sdf->GetOrCreateElement("ode")->GetOrCreateElement(
