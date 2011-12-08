@@ -63,6 +63,16 @@ namespace gazebo
       /// \brief Update the physics engine collision
       public: virtual void UpdateCollision() = 0;
 
+      /// \brief Set the simulation update rate
+      public: virtual void SetUpdateRate(double _value) = 0;
+
+      /// \brief Get the simulation update rate
+      public: virtual double GetUpdateRate() = 0;
+      public: virtual double GetUpdatePeriod() = 0;
+  
+      /// \brief Set the simulation step time
+      public: virtual void SetStepTime(double _value) = 0;
+
       /// \brief Get the simulation step time
       public: virtual double GetStepTime() = 0;
   

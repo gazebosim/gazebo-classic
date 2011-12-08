@@ -251,6 +251,7 @@ void World::RunLoop()
   if (this->IsPaused())
     this->pauseStartTime = this->startTime;
 
+  common::Time prevUpdateTime = common::Time::GetWallTime();
   while (!this->stop)
   {
     /// Send statistics about the world simulation
@@ -269,8 +270,14 @@ void World::RunLoop()
       this->pauseTime += step;
     else
     {
-      this->simTime += step;
-      this->Update();
+      // throttling update rate
+      if (common::Time::GetWallTime() - prevUpdateTime
+             >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+      {
+        prevUpdateTime = common::Time::GetWallTime();
+        this->simTime += step;
+        this->Update();
+      }
     }
 
     // TODO: Fix timeout:  this belongs in simulator.cc

@@ -83,6 +83,13 @@ namespace gazebo
       /// \brief Finilize the ODE engine
       public: virtual void Fini();
 
+      /// \brief Set the simulation update rate
+      public: void SetUpdateRate(double _value);
+
+      /// \brief Get the simulation simulation update rate
+      public: virtual double GetUpdateRate();
+      public: virtual double GetUpdatePeriod();
+
       /// \brief Set the step time
       public: void SetStepTime(double _value);
 
@@ -190,6 +197,10 @@ namespace gazebo
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
     
+      /// Store the value of the updateRate parameter in doubl form. To improve
+      /// efficiency
+      private: double updateRateDouble; 
+
       /// Store the value of the stepTime parameter in doubl form. To improve
       /// efficiency
       private: double stepTimeDouble; 
