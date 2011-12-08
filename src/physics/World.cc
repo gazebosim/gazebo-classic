@@ -254,47 +254,46 @@ void World::RunLoop()
   common::Time prevUpdateTime = common::Time::GetWallTime();
   while (!this->stop)
   {
-    // throttling update rate
-    if (common::Time::GetWallTime() - prevUpdateTime
-           >= common::Time(this->physicsEngine->GetUpdatePeriod()))
+    /// Send statistics about the world simulation
+    if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
     {
-      prevUpdateTime = common::Time::GetWallTime();
-      /// Send statistics about the world simulation
-      if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
-      {
-        msgs::Set( this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-        msgs::Set( this->worldStatsMsg.mutable_real_time(), this->GetRealTime() );
-        msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
-        this->worldStatsMsg.set_paused( this->IsPaused() ); 
+      msgs::Set( this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+      msgs::Set( this->worldStatsMsg.mutable_real_time(), this->GetRealTime() );
+      msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
+      this->worldStatsMsg.set_paused( this->IsPaused() ); 
 
-        this->statPub->Publish( this->worldStatsMsg );
-        this->prevStatTime = common::Time::GetWallTime();
-      }
+      this->statPub->Publish( this->worldStatsMsg );
+      this->prevStatTime = common::Time::GetWallTime();
+    }
 
-      if (this->IsPaused() && !this->stepInc)
-        this->pauseTime += step;
-      else
+    if (this->IsPaused() && !this->stepInc)
+      this->pauseTime += step;
+    else
+    {
+      // throttling update rate
+      if (common::Time::GetWallTime() - prevUpdateTime
+             >= common::Time(this->physicsEngine->GetUpdatePeriod()))
       {
+        prevUpdateTime = common::Time::GetWallTime();
         this->simTime += step;
         this->Update();
       }
-
-      // TODO: Fix timeout:  this belongs in simulator.cc
-      /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
-      {
-        this->stop = true;
-        break;
-      }*/
-
-      if (this->IsPaused() && this->stepInc)
-        this->stepInc = false;
-
-      this->ProcessEntityMsgs();
-      this->ProcessRequestMsgs();
-      this->ProcessFactoryMsgs();
-      this->ProcessModelMsgs();
-
     }
+
+    // TODO: Fix timeout:  this belongs in simulator.cc
+    /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+    {
+      this->stop = true;
+      break;
+    }*/
+
+    if (this->IsPaused() && this->stepInc)
+      this->stepInc = false;
+
+    this->ProcessEntityMsgs();
+    this->ProcessRequestMsgs();
+    this->ProcessFactoryMsgs();
+    this->ProcessModelMsgs();
   }
 }
 
