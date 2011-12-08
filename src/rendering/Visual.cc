@@ -407,8 +407,8 @@ void Visual::Update()
   std::list<DynamicLines*>::iterator iter;
 
   // Update the lines
-  //for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
-    //(*iter)->Update();
+  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+    (*iter)->Update();
 
   std::list< std::pair<DynamicLines*, unsigned int> >::iterator liter;
   for (liter = this->lineVertices.begin(); liter != this->lineVertices.end(); liter++)

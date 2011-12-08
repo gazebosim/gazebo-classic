@@ -1238,7 +1238,7 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
   }
 }
 
-void Scene::ProcessJointMsg(ConstJointPtr &_msg)
+void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
 {
   // TODO: Fix this
   /*VisualPtr parentVis = this->GetVisual(_msg->parent());

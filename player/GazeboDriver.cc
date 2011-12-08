@@ -37,6 +37,7 @@
 #include "BumperInterface.hh"
 #include "GripperInterface.hh"
 #include "IRInterface.hh"
+#include "ImuInterface.hh"
 
 /*
 #include "PowerInterface.hh"
@@ -307,6 +308,10 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new IRInterface( playerAddr,  this, cf, section );
         break;
 
+      case PLAYER_IMU_CODE:
+        if (!player_quiet_startup) printf(" an imu interface.\n");
+        ifsrc = new ImuInterface( playerAddr,  this, cf, section );
+        break;
 
         /*      case PLAYER_POWER_CODE:
                 if (!player_quiet_startup) printf(" a power interface.\n");

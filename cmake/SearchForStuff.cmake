@@ -49,6 +49,13 @@ endif()
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
+else ()
+ APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                       ${gazeboserver_include_dirs_desc} 
+                       ${OPENGL_INCLUDE_DIR})
+ APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                       ${gazeboserver_link_libs_desc} 
+                       ${OPENGL_LIBRARIES})
 endif ()
 
 
