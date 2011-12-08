@@ -167,6 +167,8 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
   this->stepType = odeElem->GetElement("solver")->GetValueString("type");
 
+  this->SetUpdateRate(_sdf->GetValueDouble("updateRate"));
+
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, 
       odeElem->GetOrCreateElement("constraints")->GetValueDouble("contact_max_correcting_vel"));
@@ -400,9 +402,8 @@ void ODEPhysics::Reset()
 // Set the step time
 void ODEPhysics::SetUpdateRate(double _value)
 {
-  this->sdf->GetOrCreateElement("ode")->GetAttribute("updateRate")->Set(_value);
+  this->sdf->GetAttribute("updateRate")->Set(_value);
   this->updateRateDouble = _value;
-  gzwarn << "physics updateRate enforcement not implemented yet\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -410,6 +411,16 @@ void ODEPhysics::SetUpdateRate(double _value)
 double ODEPhysics::GetUpdateRate()
 {
   return this->updateRateDouble;
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the simulation step time
+double ODEPhysics::GetUpdatePeriod()
+{
+  if (this->updateRateDouble > 0)
+    return 1.0/this->updateRateDouble;
+  else
+    return 0;
 }
  
 ////////////////////////////////////////////////////////////////////////////////

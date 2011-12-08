@@ -68,6 +68,7 @@ namespace gazebo
 
       /// \brief Get the simulation update rate
       public: virtual double GetUpdateRate() = 0;
+      public: virtual double GetUpdatePeriod() = 0;
   
       /// \brief Set the simulation step time
       public: virtual void SetStepTime(double _value) = 0;
