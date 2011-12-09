@@ -117,7 +117,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   if (this->parent)
     this->visualMsg->set_parent_name( this->parent->GetScopedName() );
 
-  this->visPub->Publish(*this->visualMsg);
+  //this->visPub->Publish(*this->visualMsg);
 
   this->poseMsg->set_name(this->GetScopedName());
 
