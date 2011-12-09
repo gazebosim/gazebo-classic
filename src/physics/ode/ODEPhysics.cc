@@ -354,10 +354,6 @@ void ODEPhysics::UpdateCollision()
   // tbb not has memeory issues
   //if (this->contactFeedbacks.size() < 50)
   //{
-    for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
-    {
-      this->ProcessContactFeedback(this->contactFeedbacks[i]);
-    }
   //}
   //else
   //{
@@ -378,6 +374,10 @@ void ODEPhysics::UpdatePhysics()
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
     this->rayMutex->unlock(); 
+
+    // put contact forces into contact feedbacks
+    for (unsigned int i=0; i < this->contactFeedbacks.size(); i++)
+      this->ProcessContactFeedback(this->contactFeedbacks[i]);
   }
 
   // Very important to clear out the contact group
