@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckIncludeFiles)
 include (CheckFunctionExists)
+include (CheckLibraryExists)
 
 include_directories( 
   ${CMAKE_CURRENT_BINARY_DIR} 
