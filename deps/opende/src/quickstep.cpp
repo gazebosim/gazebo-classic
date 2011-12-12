@@ -35,8 +35,6 @@
 
 #include <sys/time.h>
 
-#define SSE 1
-
 #if SSE
 #include <xmmintrin.h>
 #define Kf(x) _mm_set_pd((x),(x))

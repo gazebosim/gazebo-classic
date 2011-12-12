@@ -235,6 +235,12 @@ include/ode/timer.h
 )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
+
+if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND)
+  message(STATUS "Found SSE")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
+endif()
+
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
 add_library(gazebo_ode SHARED ${sources})
