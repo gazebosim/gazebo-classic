@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include (${gazebo_cmake_dir}/FindSSE.cmake)
 include (CheckCXXSourceCompiles)
 
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")

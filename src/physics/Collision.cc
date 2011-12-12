@@ -112,7 +112,7 @@ void Collision::Load(sdf::ElementPtr &_sdf)
   if (this->shape->GetType() != MULTIRAY_SHAPE &&
       this->shape->GetType() != RAY_SHAPE)
   {
-    this->visPub->Publish(this->CreateCollisionVisual());
+    //this->visPub->Publish(this->CreateCollisionVisual());
   }
 }
 
@@ -159,7 +159,7 @@ void Collision::CreateBoundingBox()
     msgs::Set(msg.mutable_pose()->mutable_orientation(), math::Quaternion(1,0,0,0));
     msg.set_transparency( .5 );
 
-    this->visPub->Publish(msg);
+    //this->visPub->Publish(msg);
   }
 }
 
@@ -214,7 +214,7 @@ void Collision::ShowBoundingBox(const bool &show)
     msg.set_name( this->bbVisual );
     msg.set_visible( show );
     msg.set_delete_me( true );
-    this->visPub->Publish(msg);
+    //this->visPub->Publish(msg);
   }
 }
 
@@ -291,7 +291,7 @@ void Collision::EnabledCB(bool enabled)
   else
     msg.mutable_material()->set_script( "Gazebo/RedTransparent" );
 
-  this->visPub->Publish(msg);
+  //this->visPub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

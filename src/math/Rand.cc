@@ -21,13 +21,19 @@
  */
 
 #include <ctime>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "math/Rand.hh"
 
 using namespace gazebo;
 using namespace math;
 
 
-GeneratorType *Rand::randGenerator = new GeneratorType(std::time(0));
+// We don't seed with time for the cases when two processes are started the
+// same time (this mostly happens with launch scripts that start a server
+// and gui simultaneously).
+GeneratorType *Rand::randGenerator = new GeneratorType(getpid());
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor

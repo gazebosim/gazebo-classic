@@ -38,7 +38,7 @@ msgs::Request *CreateRequest( const std::string &_request,
 
   request->set_request( _request );
   request->set_data( _data );
-  request->set_id( math::Rand::GetIntUniform(1, 10000) );
+  request->set_id(math::Rand::GetIntUniform(1, 10000));
 
   return request;
 }
