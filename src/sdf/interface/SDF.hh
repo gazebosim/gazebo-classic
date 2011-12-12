@@ -72,7 +72,8 @@ namespace sdf
     public: void PrintDescription(std::string _prefix);
     public: void PrintValues(std::string _prefix);
 
-    private: void ToString(const std::string &_prefix, std::ostringstream &_out) const;
+    private: void ToString(const std::string &_prefix,
+                           std::ostringstream &_out) const;
     public: std::string ToString(const std::string &_prefix) const;
 
     public: void AddAttribute(const std::string &_key, 
@@ -81,11 +82,13 @@ namespace sdf
                               bool _required);
 
     public: void AddValue(const std::string &_type, 
-                       const std::string &_defaultValue, bool _required);
+                          const std::string &_defaultValue, bool _required);
 
     /// \brief Get the param of an attribute.
     /// \param _key the name of the attribute
     public: ParamPtr GetAttribute(const std::string &_key);
+
+    public: bool HasAttribute(const std::string &_key);
 
     /// \brief Get the param of the elements value
     public: ParamPtr GetValue();
