@@ -62,7 +62,6 @@ target_link_libraries( gazebo_gui gazebo_common
                                   gazebo_sensors
                                   gazebo_msgs
                                   gzqtpropertybrowser 
-                                  Xpm 
                                   ${QT_LIBRARIES} 
                                   ${ogre_libraries} 
                                   ${boost_libraries} 
@@ -76,7 +75,6 @@ target_link_libraries( gzclient  gazebo_common
                                  gazebo_sensors
                                  gazebo_msgs
                                  gzqtpropertybrowser 
-                                 Xpm 
                                  ${QT_LIBRARIES} 
                                  ${ogre_libraries} 
                                  ${boost_libraries} 

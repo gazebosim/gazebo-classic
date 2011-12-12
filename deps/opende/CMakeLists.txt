@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckIncludeFiles)
 include (CheckFunctionExists)
+include (CheckLibraryExists)
 
 include_directories( 
   ${CMAKE_CURRENT_BINARY_DIR} 
@@ -91,18 +92,11 @@ int main() {return 1;}" HAVE_LIMITS)
 CHECK_CXX_SOURCE_COMPILES("#include <boost/shared_array.hpp> 
 int main() {return 1;}" HAVE_BOOST_SHARED_ARRAY_HPP)
 
-CHECK_CXX_SOURCE_COMPILES("#include <GL/gl.h>
-#include <GL/glext.h> 
-int main() {return 1;}" HAVE_GL_GLEXT_H)
-
-
 set (NDEBUG bool true)
 
 CHECK_INCLUDE_FILES(alloca.h HAVE_ALLOCA_H)
 CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)
 CHECK_INCLUDE_FILES(float.h HAVE_FLOAT_H)
-CHECK_INCLUDE_FILES(GL/glu.h HAVE_GL_GLU_H)
-CHECK_INCLUDE_FILES(GL/gl.h HAVE_GL_GL_H)
 CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILES(malloc.h HAVE_MALLOC_H)
 CHECK_INCLUDE_FILES(math.h HAVE_MATH_H)

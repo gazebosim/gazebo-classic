@@ -167,7 +167,8 @@ void ODEPhysics::Load( sdf::ElementPtr _sdf)
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
   this->stepType = odeElem->GetElement("solver")->GetValueString("type");
 
-  this->SetUpdateRate(_sdf->GetValueDouble("update_rate"));
+  if (_sdf->HasAttribute("update_rate"))
+    this->SetUpdateRate(_sdf->GetValueDouble("update_rate"));
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, 

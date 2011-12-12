@@ -216,7 +216,7 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
 }
 
 void Element::AddAttribute(const std::string &_key, const std::string &_type,
-                              const std::string &_defaultValue, bool _required)
+                           const std::string &_defaultValue, bool _required)
 {
   this->attributes.push_back(
       this->CreateParam(_key, _type, _defaultValue, _required));
@@ -378,6 +378,18 @@ void Element::ToString(const std::string &_prefix, std::ostringstream &_out) con
 
 }
 
+bool Element::HasAttribute(const std::string &_key)
+{
+  Param_V::const_iterator iter;
+  for (iter = this->attributes.begin(); 
+      iter != this->attributes.end(); iter++)
+  {
+    if ( (*iter)->GetKey() == _key)
+      return true;
+  }
+
+  return false;
+}
 
 ParamPtr Element::GetAttribute(const std::string &_key)
 {

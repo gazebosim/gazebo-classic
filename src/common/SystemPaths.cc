@@ -142,7 +142,9 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     char *pathCStr = getenv("GAZEBO_PLUGIN_PATH");
     if (!pathCStr || *pathCStr == '\0')
     {
-      gzdbg << "pluginPaths and GAZEBO_PLUGIN_PATH doesn't exist. Set GAZEBO_PLUGIN_PATH to Ogre's installation path.  ...or are you loading via SystemPlugins?\n";
+      gzdbg << "pluginPaths and GAZEBO_PLUGIN_PATH doesn't exist."
+        << "Set GAZEBO_PLUGIN_PATH to Ogre's installation path."
+        << "  ...or are you loading via SystemPlugins?\n";
       return this->pluginPaths;
     }
     path = pathCStr;
