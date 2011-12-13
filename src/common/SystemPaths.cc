@@ -178,7 +178,7 @@ std::string SystemPaths::GetWorldPathExtension()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// search for file given GAZEBO_RESOURCE_PATHS
+/// search for file given GAZEBO_RESOURCE_PATH
 std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
 {
   struct stat st;
@@ -221,7 +221,7 @@ std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
   if (!found)
   {
     fullname.clear();
-    gzerr << "cannot load file [" << filename << "]in GAZEBO_RESOURCE_PATHS\n";
+    gzerr << "cannot load file [" << filename << "]in GAZEBO_RESOURCE_PATH\n";
   }
 
   return fullname;
