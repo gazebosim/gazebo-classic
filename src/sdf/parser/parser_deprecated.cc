@@ -1010,21 +1010,25 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
 
   sdf::ElementPtr sdfAmbient = _sdf->AddElement("ambient");
-  initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
+  if (sdfAmbient)
+    initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
 
   sdf::ElementPtr sdfBackground = _sdf->AddElement("background");
-  initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
+  if (sdfBackground)
+    initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
 
   xmlNodePtr sky = firstChildElement(_config, "sky");
   if (sky)
   {
     sdf::ElementPtr sdfSky = sdfBackground->AddElement("sky");
-    initAttr(sky, "material", sdfSky->GetAttribute("material"));
+    if (sdfSky)
+      initAttr(sky, "material", sdfSky->GetAttribute("material"));
   }
 
   sdf::ElementPtr sdfShadow = _sdf->AddElement("shadows");
 
-  initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
+  if (sdfShadow)
+    initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
 
   //  per pixel shading does not allow options
   //sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
@@ -1044,33 +1048,38 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdf::ElementPtr sdfODESolver = sdfODE->AddElement("solver");
   sdf::ElementPtr sdfODEConstraints = sdfODE->AddElement("constraints");
 
-  initAttr(_config, "gravity", sdfGravity->GetAttribute("xyz"));
+  if (sdfGravity)
+    initAttr(_config, "gravity", sdfGravity->GetAttribute("xyz"));
 
-  initAttr(_config, "stepType", sdfODESolver->GetAttribute("type"));
-  initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
-  
-
-  if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
+  if (sdfODESolver)
   {
-    initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
-    initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
-  }
+    initAttr(_config, "stepType", sdfODESolver->GetAttribute("type"));
+    initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
 
-  if (sdfODESolver->GetAttribute("type")->GetAsString() == "pgs")
-  {
-    initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
-    initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+    if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
+    {
+      initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
+      initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+    }
+
+    if (sdfODESolver->GetAttribute("type")->GetAsString() == "pgs")
+    {
+      initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
+      initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+    }
   }
 
 
   // Contraints
-  initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
-  initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
-  initAttr(_config, "contactMaxCorrectingVel", 
-      sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
-  initAttr(_config, "contactSurfaceLayer", 
-      sdfODEConstraints->GetAttribute("contact_surface_layer"));
-
+  if (sdfODEConstraints)
+  {
+    initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
+    initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
+    initAttr(_config, "contactMaxCorrectingVel", 
+        sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
+    initAttr(_config, "contactSurfaceLayer", 
+        sdfODEConstraints->GetAttribute("contact_surface_layer"));
+  }
   return true;
 }
 
