@@ -154,10 +154,10 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   initAttr(lightNode, "type", _sdf->GetAttribute("type"));
 
   sdf::ElementPtr sdfDiffuse = _sdf->AddElement("diffuse");
-  initAttr(lightNode, "diffuseColor", sdfDiffuse->GetAttribute("rgba"));
+  initAttr(lightNode, "diffuse", sdfDiffuse->GetAttribute("rgba"));
 
   sdf::ElementPtr sdfSpecular = _sdf->AddElement("specular");
-  initAttr(lightNode, "specularColor", sdfDiffuse->GetAttribute("rgba"));
+  initAttr(lightNode, "specular", sdfDiffuse->GetAttribute("rgba"));
 
   sdf::ElementPtr sdfAttenuation = _sdf->AddElement("attenuation");
   initAttr(lightNode, "range", sdfAttenuation->GetAttribute("range"));
@@ -1051,6 +1051,12 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   
 
   if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
+  {
+    initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
+    initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+  }
+
+  if (sdfODESolver->GetAttribute("type")->GetAsString() == "pgs")
   {
     initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
     initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
