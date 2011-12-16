@@ -107,7 +107,7 @@ RenderWidget::RenderWidget( QWidget *parent )
 
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(33);
+  this->timer->start(44);
 
   this->connections.push_back( 
       gui::Events::ConnectFullScreen( 

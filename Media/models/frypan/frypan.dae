@@ -78,7 +78,7 @@
 	</library_effects>
 	<library_images>
 		<image id="saucepan_Cylinder_Cyl-img" name="saucepan_Cylinder_Cyl-img">
-			<init_from>saucepan.jpg</init_from>
+			<init_from>frypan.jpg</init_from>
 		</image>
 	</library_images>
 	<library_materials>

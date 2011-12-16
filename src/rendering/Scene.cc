@@ -404,7 +404,6 @@ void Scene::SetBackgroundColor(const common::Color &color)
     if ((*iter2)->GetViewport())
       (*iter2)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -659,7 +658,10 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
       {
-        if (i+2 >= static_cast<int>(index_count)) break; // when indices size is not divisible by 3
+        // when indices size is not divisible by 3
+        if (i+2 >= static_cast<int>(index_count))
+          break; 
+
         // check for a hit against this triangle
         std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, 
             vertices[indices[i]], 
@@ -685,10 +687,12 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       if (new_closest_found)
       {
         closestEntity = pentity;
-        break;
+        //break;
       }
     }
   }
+
+  std::cout << "Closest Entity[" << closestEntity->getName() << "]\n";
 
   return closestEntity;
 }
@@ -1395,7 +1399,7 @@ void Scene::SetSky(const std::string &_material)
   try
   {
     Ogre::Quaternion orientation;
-    orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
+    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1,0,0));
     double curvature = 10; // ogre recommended default
     double tiling = 8; // ogre recommended default
     double distance = 4000; // ogre recommended default

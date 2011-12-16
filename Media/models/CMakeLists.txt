@@ -11,7 +11,7 @@ add_subdirectory(pr2)
 add_subdirectory(chair3)
 add_subdirectory(wg)
 add_subdirectory(kitchen)
-add_subdirectory(saucepan)
+add_subdirectory(frypan)
 add_subdirectory(people)
 
 set (files willowgarage.dae
