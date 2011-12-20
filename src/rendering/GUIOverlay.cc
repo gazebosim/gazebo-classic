@@ -118,11 +118,12 @@ void GUIOverlay::CreateWindow( const std::string &_type,
 bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
 {
   bool result = false;
-  bool press, release, pos;
+  bool press, release, pos, scroll;
 
   press = false;
   release = false;
   pos = false;
+  scroll = false;
 
 #ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
@@ -148,7 +149,10 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
       release = system->injectMouseButtonUp( CEGUI::MiddleButton );
   }
 
-  result = pos || release || press;
+  if (_evt.type == common::MouseEvent::SCROLL)
+    scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y);
+
+  result = pos || release || press || scroll;
 #endif
 
   return result;
