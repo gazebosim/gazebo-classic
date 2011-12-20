@@ -108,6 +108,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
                         this->parentEntity->worldPose;
     else
       this->worldPose = originElem->GetValuePose("pose");
+
     this->initialRelativePose = originElem->GetValuePose("pose");
 
     originElem->GetAttribute("pose")->SetUpdateFunc( 
@@ -391,9 +392,15 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
     for  (Base_V::iterator iter = this->children.begin();
           iter != this->childrenEnd; iter++)
     {
-      if ((*iter)->HasType(ENTITY))
+      if ((*iter)->HasType(LINK))
+        ((Link*)(*iter).get())->OnPoseChange();
+      else
       {
-        ((Entity*)(*iter).get())->OnPoseChange();
+        Collision *coll = ((Collision*)(*iter).get());
+
+        if (this->IsStatic())
+          coll->worldPose = this->worldPose + coll->initialRelativePose;
+        coll->OnPoseChange();
       }
     }
   }
@@ -539,7 +546,6 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   math::Box box = this->GetCollisionBoundingBox();
-
   math::Vector3 start = this->GetWorldPose().pos; 
   math::Vector3 end = start;
   start.z = box.min.z - 0.00001;

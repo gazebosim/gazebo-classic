@@ -81,7 +81,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
 
   params["parentWindowHandle"] = ogreHandle;
   params["externalGLControl"] = true;
-  params["FSAA"] = "4";
+  params["FSAA"] = "2";
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";

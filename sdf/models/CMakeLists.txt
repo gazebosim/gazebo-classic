@@ -6,7 +6,6 @@ set (files pioneer2dx.model
            bookshelf.model
            bowl.model
            saucepan.model
-           kitchen.model
            female_standing.model
 )
 

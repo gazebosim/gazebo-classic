@@ -202,7 +202,7 @@ namespace gazebo
 
       /// \brief This function is called when the entity's 
       ///        (or one of its parents) pose of the parent has changed
-      protected: virtual void OnPoseChange() {}
+      protected: virtual void OnPoseChange() = 0;
   
       /// \brief Handle a change of pose
       private: void UpdatePhysicsPose(bool update_children = true);

@@ -1007,6 +1007,6 @@ void Model::OnPoseChange()
   {
     p = this->GetLink(this->attachedModelsLinks[i])->GetWorldPose();
     p += this->attachedModelsOffset[i];
-    this->attachedModels[i]->SetWorldPose(p);
+    this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
