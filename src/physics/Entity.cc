@@ -183,16 +183,28 @@ void Entity::SetCanonicalLink(bool _value)
   this->isCanonicalLink = _value;
 }
 
-/// Set an animation for this entity
-void Entity::SetAnimation( const common::PoseAnimationPtr &_anim )
+void Entity::SetAnimation(const common::PoseAnimationPtr &_anim)
 {
   this->animationStartPose = this->worldPose;
 
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
-  this->connections.push_back(
-     event::Events::ConnectWorldUpdateStart(
-       boost::bind(&Entity::UpdateAnimation, this)));
+  this->onAnimationComplete.clear();
+  this->animationConnection = event::Events::ConnectWorldUpdateStart(
+      boost::bind(&Entity::UpdateAnimation, this));
+
+}
+/// Set an animation for this entity
+void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
+                          boost::function<void()> _onComplete)
+{
+  this->animationStartPose = this->worldPose;
+
+  this->prevAnimationTime = this->world->GetSimTime();
+  this->animation = _anim;
+  this->onAnimationComplete = _onComplete;
+  this->animationConnection = event::Events::ConnectWorldUpdateStart(
+      boost::bind(&Entity::UpdateAnimation, this));
 }
 
 void Entity::PublishPose()
@@ -492,6 +504,7 @@ void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
 
 void Entity::UpdateAnimation()
 {
+  std::cout << "UpdateAnimation[" << this->GetName() << "]\n";
   common::PoseKeyFrame kf(0);
 
   this->animation->AddTime(
@@ -504,6 +517,16 @@ void Entity::UpdateAnimation()
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = this->world->GetSimTime();
+
+  if (this->animation->GetLength() <= this->animation->GetTime())
+  {
+    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    this->animationConnection.reset();
+    if (this->onAnimationComplete)
+    {
+      this->onAnimationComplete();
+    }
+  }
 }
 
 

@@ -156,7 +156,9 @@ namespace gazebo
               { return this->isCanonicalLink; }
 
       /// \brief Set an animation for this entity
-      public: void SetAnimation( const common::PoseAnimationPtr &_anim );
+      public: void SetAnimation(const common::PoseAnimationPtr &_anim,
+                                boost::function<void()> _onComplete);
+      public: void SetAnimation(const common::PoseAnimationPtr &_anim);
 
       private: void PublishPose();
  
@@ -236,8 +238,10 @@ namespace gazebo
       protected: math::Pose animationStartPose;
 
       protected: std::vector<event::ConnectionPtr> connections;
+      protected: event::ConnectionPtr animationConnection;
 
       protected: math::Pose dirtyPose;
+      private: boost::function<void()> onAnimationComplete;
 
       private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool);
     };
