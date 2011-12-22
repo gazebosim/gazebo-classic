@@ -504,7 +504,6 @@ void Entity::UpdateParameters( sdf::ElementPtr &_sdf )
 
 void Entity::UpdateAnimation()
 {
-  std::cout << "UpdateAnimation[" << this->GetName() << "]\n";
   common::PoseKeyFrame kf(0);
 
   this->animation->AddTime(
