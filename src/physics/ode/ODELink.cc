@@ -210,8 +210,11 @@ void ODELink::SetSelfCollide(bool _collide)
 // Change the ode pose
 void ODELink::OnPoseChange()
 {
+  Link::OnPoseChange();
+
   if (!this->linkId)
     return;
+
   this->SetEnabled(true);
 
   const math::Pose pose = this->GetWorldPose();

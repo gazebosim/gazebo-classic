@@ -972,8 +972,7 @@ void Model::SetJointAnimation(
   this->updateMutex->unlock();
 }
 
-void Model::AttachStaticModel(ModelPtr &_model, const std::string &_linkName,
-                              math::Pose _offset)
+void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
 {
   if (!_model->IsStatic())
   {
@@ -982,7 +981,6 @@ void Model::AttachStaticModel(ModelPtr &_model, const std::string &_linkName,
   }
 
   this->attachedModels.push_back(_model);
-  this->attachedModelsLinks.push_back(_linkName);
   this->attachedModelsOffset.push_back(_offset);
 }
 
@@ -993,7 +991,6 @@ void Model::DetachStaticModel(const std::string &_modelName)
     if (this->attachedModels[i]->GetName() == _modelName)
     {
       this->attachedModels.erase(this->attachedModels.begin()+i);
-      this->attachedModelsLinks.erase(this->attachedModelsLinks.begin()+i);
       this->attachedModelsOffset.erase(this->attachedModelsOffset.begin()+i);
       break;
     }
@@ -1005,7 +1002,7 @@ void Model::OnPoseChange()
   math::Pose p;
   for (unsigned int i=0; i < this->attachedModels.size(); i++)
   {
-    p = this->GetLink(this->attachedModelsLinks[i])->GetWorldPose();
+    p = this->GetWorldPose();
     p += this->attachedModelsOffset[i];
     this->attachedModels[i]->SetWorldPose(p, true);
   }

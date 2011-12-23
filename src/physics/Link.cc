@@ -61,6 +61,8 @@ Link::~Link()
 {
   std::vector<Entity*>::iterator iter;
 
+  this->attachedModels.clear();
+
   for (unsigned int i=0; i < this->visuals.size(); i++)
   {
     msgs::Visual msg;
@@ -705,4 +707,41 @@ std::string Link::GetSensorName(unsigned int _i) const
     return this->sensors[_i];
 
   return std::string();
+}
+
+//////////////////////////////////////////////////
+void Link::AttachStaticModel(ModelPtr &_model, const math::Pose &_offset)
+{
+  if (!_model->IsStatic())
+  {
+    gzerr << "AttachStaticModel requires a static model\n";
+    return;
+  }
+
+  this->attachedModels.push_back(_model);
+  this->attachedModelsOffset.push_back(_offset);
+}
+
+void Link::DetachStaticModel(const std::string &_modelName)
+{
+  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  {
+    if (this->attachedModels[i]->GetName() == _modelName)
+    {
+      this->attachedModels.erase(this->attachedModels.begin()+i);
+      this->attachedModelsOffset.erase(this->attachedModelsOffset.begin()+i);
+      break;
+    }
+  }
+}
+
+void Link::OnPoseChange()
+{
+  math::Pose p;
+  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  {
+    p = this->GetWorldPose();
+    p += this->attachedModelsOffset[i];
+    this->attachedModels[i]->SetWorldPose(p, true);
+  }
 }

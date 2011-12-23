@@ -217,6 +217,15 @@ namespace gazebo
       /// \brief Joints that have this Link as a child Link
       public: void AddParentJoint(JointPtr joint);
 
+      /// \brief Attach a static model to this link
+      public: void AttachStaticModel(ModelPtr &_model,
+                                     const math::Pose &_offset);
+
+      /// \brief Detach a static model from this link
+      public: void DetachStaticModel(const std::string &_modelName);
+
+      public: virtual void OnPoseChange();
+
       protected: bool isStatic;
   
       protected: InertialPtr inertial;
@@ -238,6 +247,9 @@ namespace gazebo
       private: std::vector<std::string> sensors;
       private: std::vector<JointPtr> parentJoints;
       private: std::vector<JointPtr> childJoints;
+
+      private: std::vector<ModelPtr> attachedModels;
+      protected: std::vector<math::Pose> attachedModelsOffset;
     };
     /// \}
   }
