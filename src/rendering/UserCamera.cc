@@ -214,18 +214,28 @@ void UserCamera::PostRender()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Finalize
 void UserCamera::Fini()
 {
   Camera::Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Handle a mouse event
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
     this->viewController->HandleMouseEvent(_evt);
+}
+
+void UserCamera::HandleKeyPressEvent(const std::string &_key)
+{
+  if (this->gui)
+    this->gui->HandleKeyPressEvent(_key);
+}
+
+void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
+{
+  if (this->gui)
+    this->gui->HandleKeyReleaseEvent(_key);
 }
 
 bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,

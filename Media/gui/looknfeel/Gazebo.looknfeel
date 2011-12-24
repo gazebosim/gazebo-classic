@@ -996,6 +996,80 @@
     </StateImagery>
   </WidgetLook>
 
-
+  <WidgetLook name="Gazebo/Editbox">
+      <PropertyDefinition name="ReadOnlyBGColour" initialValue="FFDFDFDF" redrawOnWrite="true" />
+      <PropertyDefinition name="NormalTextColour" initialValue="FF000000" redrawOnWrite="true" />
+      <PropertyDefinition name="SelectedTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
+      <PropertyDefinition name="ActiveSelectionColour" initialValue="FF607FFF" redrawOnWrite="true" />
+      <PropertyDefinition name="InactiveSelectionColour" initialValue="FF808080" redrawOnWrite="true" />
+      <NamedArea name="TextArea">
+          <Area>
+              <Dim type="LeftEdge" ><AbsoluteDim value="7" /></Dim>
+              <Dim type="TopEdge" ><AbsoluteDim value="3" /></Dim>
+              <Dim type="RightEdge" ><UnifiedDim scale="1.0" offset="-7" type="RightEdge" /></Dim>
+              <Dim type="BottomEdge" ><UnifiedDim scale="1.0" offset="-7" type="BottomEdge" /></Dim>
+          </Area>
+      </NamedArea>
+      <ImagerySection name="selection">
+          <ImageryComponent>
+              <Area>
+                  <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                  <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                  <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+                  <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+              </Area>
+              <Image imageset="Gazebo-Images" image="GenericBrush" />
+              <VertFormat type="Stretched" />
+              <HorzFormat type="Stretched" />
+          </ImageryComponent>
+      </ImagerySection>
+      <ImagerySection name="Carat">
+          <ImageryComponent>
+              <Area>
+                  <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                  <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                  <Dim type="Width" ><AbsoluteDim value="2" /></Dim>
+                  <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+              </Area>
+              <Image imageset="Gazebo-Images" image="GenericBrush" />
+              <Colours topLeft="FF2222FF" topRight="FF2222FF" bottomLeft="FF2222FF" bottomRight="FF2222FF" />
+              <VertFormat type="Stretched" />
+              <HorzFormat type="Stretched" />
+          </ImageryComponent>
+      </ImagerySection>
+      <StateImagery name="Enabled">
+          <Layer>
+              <Section look="Gazebo/Shared" section="Frame" />
+          </Layer>
+      </StateImagery>
+      <StateImagery name="ReadOnly">
+          <Layer>
+              <Section look="Gazebo/Shared" section="Frame" >
+                  <ColourProperty name="ReadOnlyBGColour" />
+              </Section>
+          </Layer>
+      </StateImagery>
+      <StateImagery name="Disabled">
+          <Layer>
+              <Section look="Gazebo/Shared" section="Frame" >
+                  <ColourProperty name="ReadOnlyBGColour" />
+              </Section>
+          </Layer>
+      </StateImagery>
+      <StateImagery name="ActiveSelection">
+          <Layer>
+              <Section section="selection">
+                  <ColourProperty name="ActiveSelectionColour" />
+              </Section>
+          </Layer>
+      </StateImagery>
+      <StateImagery name="InactiveSelection">
+          <Layer>
+              <Section section="selection">
+                  <ColourProperty name="InactiveSelectionColour" />
+              </Section>
+          </Layer>
+      </StateImagery>
+  </WidgetLook>
 
 </Falagard>

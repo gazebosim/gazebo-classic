@@ -70,7 +70,9 @@ namespace gazebo
   
       /// \brief Hande a mouse event
       public: void HandleMouseEvent(const common::MouseEvent &evt);
-  
+      public: void HandleKeyPressEvent(const std::string &_key);
+      public: void HandleKeyReleaseEvent(const std::string &_key);
+
       /// \brief Set view controller
       public: void SetViewController( const std::string &type );
 

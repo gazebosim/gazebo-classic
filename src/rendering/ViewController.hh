@@ -42,7 +42,7 @@ namespace gazebo
       public: virtual void Update() = 0;
   
       /// \brief Handle a mouse event
-      public: virtual void HandleMouseEvent(const common::MouseEvent &event)=0;
+      public: virtual void HandleMouseEvent(const common::MouseEvent &_event)=0;
 
       public: std::string GetTypeString() const;
   

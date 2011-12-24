@@ -177,10 +177,12 @@ void GLWidget::keyPressEvent( QKeyEvent *_event)
     gui::Events::fullScreen(g_fullscreen);
   }
 
-  this->mouseEvent.control = this->keyModifiers & Qt::ControlModifier ? true : false;
-  this->mouseEvent.shift = this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->mouseEvent.control =
+    this->keyModifiers & Qt::ControlModifier ? true : false;
+  this->mouseEvent.shift =
+    this->keyModifiers & Qt::ShiftModifier ? true : false;
 
-  // TODO: Broadcast gui events: gui::Events::keyPress(" ");
+  this->userCamera->HandleKeyPressEvent(keyText);
 }
 
 void GLWidget::keyReleaseEvent( QKeyEvent *_event)
@@ -195,6 +197,7 @@ void GLWidget::keyReleaseEvent( QKeyEvent *_event)
 
   this->mouseEvent.control = this->keyModifiers & Qt::ControlModifier ? true : false;
   this->mouseEvent.shift = this->keyModifiers & Qt::ShiftModifier ? true : false;
+  this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *_event)

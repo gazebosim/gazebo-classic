@@ -45,7 +45,6 @@ namespace gazebo
   
       /// \brief Handle a mouse event
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);
-
     };
     /// \}
   }

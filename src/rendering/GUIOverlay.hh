@@ -52,6 +52,8 @@ namespace gazebo
                                  const std::string &_text);
 
       public: bool HandleMouseEvent( const common::MouseEvent &_evt);
+      public: bool HandleKeyPressEvent( const std::string &_key);
+      public: bool HandleKeyReleaseEvent( const std::string &_key);
 
       /// \brief Load a CEGUI layout file
       public: void LoadLayout( const std::string &_filename );
@@ -88,6 +90,7 @@ namespace gazebo
       private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
 
       private: bool OnButtonClicked(const CEGUI::EventArgs& _e);
+      private: int GetKeyCode(const std::string  &_unicode);
 
       private: CEGUI::OgreRenderer *guiRenderer;
 #endif
