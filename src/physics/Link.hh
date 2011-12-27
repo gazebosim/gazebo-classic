@@ -116,12 +116,21 @@ namespace gazebo
       /// \brief Set the torque applied to the body
       public: virtual void SetTorque(const math::Vector3 &_force) = 0;
 
-       /// \brief Add a force to the body
+      /// \brief Add a force to the body
       public: virtual void AddForce(const math::Vector3 &_force) = 0;
   
+      /// \brief Add a force to the body, components are relative to the body's own frame of reference.
+      public: virtual void AddRelForce(const math::Vector3 &_force) = 0;
+
+      /// \brief Add a force to the body at position expressed to the body's own frame of reference.
+      public: virtual void AddForceAtRelPos(const math::Vector3 &_force,const math::Vector3 &_relpos) = 0;
+
       /// \brief Add a torque to the body
       public: virtual void AddTorque(const math::Vector3 &_torque) = 0;
-  
+
+      /// \brief Add a torque to the body, components are relative to the body's own frame of reference.
+      public: virtual void AddRelTorque(const math::Vector3 &_torque) = 0;
+
       /// \brief Get the linear velocity of the body
       public: math::Vector3 GetRelativeLinearVel() const;
   

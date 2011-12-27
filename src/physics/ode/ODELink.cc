@@ -370,11 +370,30 @@ void ODELink::AddForce(const math::Vector3 &_force)
   if (this->linkId)
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
 }
+
+void ODELink::AddRelForce(const math::Vector3 &_force)
+{
+  if (this->linkId)
+	  dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
+}
+
+void ODELink::AddForceAtRelPos(const math::Vector3 &_force,const math::Vector3 &_relpos)
+{
+  if (this->linkId)
+    dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,_relpos.x,_relpos.y,_relpos.z);
+}
+
   
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+}
+
+void ODELink::AddRelTorque(const math::Vector3 &_torque)
+{
+  if (this->linkId)
+	  dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
