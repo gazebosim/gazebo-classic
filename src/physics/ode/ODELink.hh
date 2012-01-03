@@ -94,16 +94,17 @@ namespace gazebo
       public: virtual void AddForce(const math::Vector3 &_force);
   
       /// \brief Add a force to the body
-      public: virtual void AddRelForce(const math::Vector3 &_force);
+      public: virtual void AddRelativeForce(const math::Vector3 &_force);
 
       /// \brief Set the force applied to the body (add by Stefano)
-      public: virtual void AddForceAtRelPos(const math::Vector3 &_force,const math::Vector3 &_relpos);
+      public: virtual void AddForceAtRelativePosition(
+                  const math::Vector3 &_force,const math::Vector3 &_relpos);
 
       /// \brief Add a torque to the body
       public: virtual void AddTorque(const math::Vector3 &_torque);
  
       /// \brief Add a torque to the body relative frame
-      public: virtual void AddRelTorque(const math::Vector3 &_torque);
+      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
       /// \brief Get the linear velocity of the link in the world frame
       public: virtual math::Vector3 GetWorldLinearVel() const;

@@ -371,18 +371,19 @@ void ODELink::AddForce(const math::Vector3 &_force)
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
 }
 
-void ODELink::AddRelForce(const math::Vector3 &_force)
+void ODELink::AddRelativeForce(const math::Vector3 &_force)
 {
   if (this->linkId)
-	  dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
+    dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
 }
 
-void ODELink::AddForceAtRelPos(const math::Vector3 &_force,const math::Vector3 &_relpos)
+void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
+                               const math::Vector3 &_relpos)
 {
   if (this->linkId)
-    dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,_relpos.x,_relpos.y,_relpos.z);
+    dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
+                          _relpos.x,_relpos.y,_relpos.z);
 }
-
   
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
@@ -390,14 +391,12 @@ void ODELink::AddTorque(const math::Vector3 &_torque)
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
-void ODELink::AddRelTorque(const math::Vector3 &_torque)
+void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
 	  dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the force applied to the link in the world frame
 math::Vector3 ODELink::GetWorldForce() const
 {
   math::Vector3 force;
