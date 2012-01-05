@@ -204,10 +204,9 @@ else (build_errors)
     add_subdirectory(tools)
     add_subdirectory(plugins)
    
-    #if (INCLUDE_PLAYER)
-    #  add_subdirectory(player)
-    #  add_subdirectory(player_cfgs)
-    #endif (INCLUDE_PLAYER)
+    if (INCLUDE_PLAYER)
+      add_subdirectory(player)
+    endif (INCLUDE_PLAYER)
   endif (BUILD_GAZEBO)
 
   ########################################

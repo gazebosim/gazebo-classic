@@ -895,9 +895,15 @@ void World::ProcessModelMsgs()
   for (iter = this->modelMsgs.begin();
        iter != this->modelMsgs.end(); iter++)
   {
-    ModelPtr model = this->GetModelById((*iter).id());
+    ModelPtr model;
+    if ((*iter).id())
+      model = this->GetModelById((*iter).id());
+    else
+      model = this->GetModelByName((*iter).name());
+
     if (!model)
-      gzerr << "Unable to find model[" << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
+      gzerr << "Unable to find model[" 
+            << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
     else
     {
       model->ProcessMsg(*iter);

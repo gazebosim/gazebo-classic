@@ -17,23 +17,18 @@
 /* Desc: Generic Gazebo Device Inteface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
-
 
 #include "GazeboInterface.hh"
 #include "GazeboDriver.hh"
 
-using namespace libgazebo;
-
-GazeboInterface::GazeboInterface(player_devaddr_t addr, GazeboDriver *driver,
+GazeboInterface::GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
                                  ConfigFile * /*cf*/, int /*section*/)
 {
-  this->device_addr = addr;
-  this->driver = driver;
+  this->device_addr = _addr;
+  this->driver = _driver;
 }
 
 GazeboInterface::~GazeboInterface()
 {
 }
-

@@ -17,16 +17,12 @@
 /* Desc: Generic Gazebo Device Inteface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
-#ifndef GAZEBOINTERFACE_HH
-#define GAZEBOINTERFACE_HH
+#ifndef GAZEBO_PLAYER_INTERFACE_HH
+#define GAZEBO_PLAYER_INTERFACE_HH
 
 #include <libplayercore/playercore.h>
-
-namespace libgazebo
-{
 
 /// \addtogroup player
 /// \brief Base class for all the player interfaces
@@ -39,15 +35,15 @@ class GazeboDriver;
 class GazeboInterface
 {
   /// \brief Constructor
-  public: GazeboInterface(player_devaddr_t addr, GazeboDriver *driver,
-                    ConfigFile *cf, int section);
+  public: GazeboInterface(player_devaddr_t _addr, GazeboDriver *_driver,
+                          ConfigFile *_cf, int _section);
 
   /// \brief Destructor
   public: virtual ~GazeboInterface();
 
   /// \brief Handle all messages. This is called from GazeboDriver
-  public: virtual int ProcessMessage(QueuePointer &respQueue,
-                                     player_msghdr_t *hdr, void *data) = 0;
+  public: virtual int ProcessMessage(QueuePointer &_respQueue,
+                                     player_msghdr_t *_hdr, void *_data) = 0;
 
   /// \brief Update this interface, publish new info.
   public: virtual void Update() = 0;
@@ -69,6 +65,4 @@ class GazeboInterface
 
 /// \}
 
-
-}
 #endif

@@ -17,7 +17,6 @@
 /* Desc: Gazebo (simulator) client functions
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 #include <assert.h>
@@ -28,46 +27,10 @@
 #include "GazeboTime.hh"
 #include "GazeboClient.hh"
 
-using namespace libgazebo;
-
-Client *GazeboClient::client = NULL;
-SimulationIface *GazeboClient::sim = NULL;
-const char *GazeboClient::prefixId = "";
-
 extern PlayerTime* GlobalTime;
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize
-void GazeboClient::Init(int serverid, const char *prefixid)
+void GazeboClient::Init(int /*_serverid*/, const std::string & /*_worldName*/)
 {
-
-  if (prefixid != NULL)
-    GazeboClient::prefixId = prefixid;
-
-  GazeboClient::client = new Client();
-
-  try
-  {
-  GazeboClient::client->ConnectWait(serverid, GZ_CLIENT_ID_PLAYER);
-  }
-  catch( std::string e )
-  {
-    std::cerr << "Error[" << e << "]\n";
-    exit(0);
-  }
-
-  GazeboClient::sim = new SimulationIface();
-
-  try
-  {
-    GazeboClient::sim->Open( GazeboClient::client, "default");
-  }
-  catch (std::string e)
-  {
-    std::cout << "Error: " << e << "\n";
-    exit(0);
-  }
-
   // steal the global clock - a bit aggressive, but a simple approach
   if (GlobalTime)
   {
@@ -77,16 +40,8 @@ void GazeboClient::Init(int serverid, const char *prefixid)
 
   GlobalTime = new GazeboTime();
   assert(GlobalTime != 0);
-
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Finalize
 void GazeboClient::Fini()
 {
-  GazeboClient::sim->Close();
-
-  GazeboClient::client->Disconnect();
 }
-

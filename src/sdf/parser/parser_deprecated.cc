@@ -174,8 +174,8 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     double innerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",0));
     double outerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",1));
 
-    sdfSpot->GetAttribute("inner_angle")->SetFromString( boost::lexical_cast<std::string>(DTOR(innerAngle)) );
-    sdfSpot->GetAttribute("outer_angle")->SetFromString( boost::lexical_cast<std::string>(DTOR(outerAngle)) );
+    sdfSpot->GetAttribute("inner_angle")->SetFromString( boost::lexical_cast<std::string>(GZ_DTOR(innerAngle)) );
+    sdfSpot->GetAttribute("outer_angle")->SetFromString( boost::lexical_cast<std::string>(GZ_DTOR(outerAngle)) );
     sdfSpot->GetAttribute("falloff")->SetFromString( getNodeTuple(lightNode, "spotCone",2));
   }
 
@@ -237,7 +237,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdf::ElementPtr sdfHFOV = _sdf->AddElement("horizontal_fov");
   double hfov = boost::lexical_cast<double>(getNodeValue(_config,"hfov"));
   if (!sdfHFOV->GetAttribute("angle")->SetFromString( 
-        boost::lexical_cast<std::string>(DTOR(hfov)) ))
+        boost::lexical_cast<std::string>(GZ_DTOR(hfov)) ))
   {
     gzerr << "Unable to parse hfov angle\n";
     return false;
@@ -327,14 +327,14 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   double maxAngle = boost::lexical_cast<double>(getNodeValue(_config,"maxAngle"));
 
   if (!sdfHoriz->GetAttribute("min_angle")->SetFromString( 
-        boost::lexical_cast<std::string>(DTOR(minAngle)) ))
+        boost::lexical_cast<std::string>(GZ_DTOR(minAngle)) ))
   {
     gzerr << "Unable to parse min_angle\n";
     return false;
   } 
 
   if (!sdfHoriz->GetAttribute("max_angle")->SetFromString( 
-        boost::lexical_cast<std::string>(DTOR(maxAngle)) ))
+        boost::lexical_cast<std::string>(GZ_DTOR(maxAngle)) ))
   {
     gzerr << "Unable to parse max_angle\n";
     return false;
@@ -572,9 +572,9 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       }
       // convert degrees to radian
       std::ostringstream rpy_stream;
-      rpy_stream << DTOR(degrees[0]) << " "
-                 << DTOR(degrees[1]) << " "
-                 << DTOR(degrees[2]);
+      rpy_stream << GZ_DTOR(degrees[0]) << " "
+                 << GZ_DTOR(degrees[1]) << " "
+                 << GZ_DTOR(degrees[2]);
       if (rpy_stream.str().empty()) 
       {
         gzerr << "rpy_stream is empty, something is wrong\n";
@@ -871,7 +871,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("lower")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
@@ -879,7 +879,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("upper")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
 
   }
@@ -904,7 +904,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("lower")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
@@ -912,7 +912,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("upper")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
 
   }

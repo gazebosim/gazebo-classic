@@ -26,13 +26,13 @@
 #include <math.h>
 
 // Convert radians to degrees
-#define RTOD(r) ((r) * 180 / M_PI)
+#define GZ_RTOD(r) ((r) * 180 / M_PI)
 
 // Convert degrees to radians
-#define DTOR(d) ((d) * M_PI / 180)
+#define GZ_DTOR(d) ((d) * M_PI / 180)
 
 // Normalize an angle in the range -Pi to Pi
-#define NORMALIZE(a) (atan2(sin(a), cos(a)))
+#define GZ_NORMALIZE(a) (atan2(sin(a), cos(a)))
 
 namespace gazebo
 {

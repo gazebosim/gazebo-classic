@@ -20,19 +20,13 @@
  * CVS: $Id$
  */
 
-#ifndef GAZEBODRIVER_HH
-#define GAZEBODRIVER_HH
+#ifndef GAZEBO_PLAYER_DRIVER_HH
+#define GAZEBO_PLAYER_DRIVER_HH
 
 #include <unistd.h>
 #include <string.h>
 
 #include <libplayercore/playercore.h>
-
-#include "GazeboClient.hh"
-
-
-namespace libgazebo
-{
 
 /// \addtogroup player
 /// \brief Gazebo player driver
@@ -45,7 +39,7 @@ class GazeboInterface;
 class GazeboDriver : public Driver
 {
   /// \brief Constructor 
-  public: GazeboDriver(ConfigFile* cf, int section);
+  public: GazeboDriver(ConfigFile *_cf, int _section);
 
   /// \brief Destructor 
   public: virtual ~GazeboDriver();
@@ -88,6 +82,4 @@ class GazeboDriver : public Driver
 
 /// \}
 
-
-}
 #endif

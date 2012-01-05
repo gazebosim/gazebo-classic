@@ -17,7 +17,6 @@
 /* Desc: Position Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /**
@@ -36,269 +35,220 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 
-using namespace libgazebo;
-
 boost::recursive_mutex *Position2dInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
-Position2dInterface::Position2dInterface(player_devaddr_t addr,
-    GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+Position2dInterface::Position2dInterface(player_devaddr_t _addr,
+    GazeboDriver *_driver, ConfigFile *_cf, int _section)
+    : GazeboInterface(_addr, _driver, _cf, _section)
 {
-  // Get the ID of the interface
-  this->gz_id = (char*) calloc(1024, sizeof(char));
-  strcat(this->gz_id, GazeboClient::prefixId);
-  strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
-
-  // Allocate a Position Interface
-  this->iface = new PositionIface();
-
   this->datatime = -1;
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
-
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 Position2dInterface::~Position2dInterface()
 {
-  // Release this interface
-  delete this->iface;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
-                                        player_msghdr_t *hdr, void *data)
+int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
+                                        player_msghdr_t *_hdr, void *_data)
 {
   int result = 0;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (this->iface->Lock(1))
+
+  // COMMAND VELOCITY:
+  if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
+        PLAYER_POSITION2D_CMD_VEL, this->device_addr))
   {
+    player_position2d_cmd_vel_t *cmd;
 
-    // COMMAND VELOCITY:
-    if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                              PLAYER_POSITION2D_CMD_VEL, this->device_addr))
+    cmd = (player_position2d_cmd_vel_t*)_data;
+
+    /*this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
+    this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
+    this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
+    */
+
+    result = 0;
+  }
+
+  // REQUEST SET ODOMETRY
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
+        PLAYER_POSITION2D_REQ_SET_ODOM, this->device_addr))
+  {
+    if (_hdr->size != sizeof(player_position2d_set_odom_req_t))
     {
-      player_position2d_cmd_vel_t *cmd;
-
-      cmd = (player_position2d_cmd_vel_t*) data;
-
-      this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
-      this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
-      this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
-
-      result = 0;
-    }
-
-    // REQUEST SET ODOMETRY
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                   PLAYER_POSITION2D_REQ_SET_ODOM, this->device_addr))
-    {
-      if (hdr->size != sizeof(player_position2d_set_odom_req_t))
-      {
-        PLAYER_WARN("Arg to odometry set requestes wrong size; ignoring");
-        result = -1;
-      }
-      else
-      {
-        player_position2d_set_odom_req_t *odom = 
-          (player_position2d_set_odom_req_t*)data;
-
-        this->iface->data->pose.pos.x = odom->pose.px;
-        this->iface->data->pose.pos.y = odom->pose.py;
-        this->iface->data->pose.yaw = odom->pose.pa;
-
-        this->driver->Publish(this->device_addr, respQueue,
-            PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
-
-        result = 0;
-      }
-    }
-
-    // CMD Set Motor Power
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                                   PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
-    {
-      // TODO
-      result = 0;
-    }
-
-    // REQUEST SET MOTOR POWER
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                         PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
-    {
-      if (hdr->size != sizeof(player_position2d_power_config_t))
-      {
-        PLAYER_WARN("Arg to motor set requestes wrong size; ignoring");
-        result = -1;
-      }
-      else
-      {
-
-        player_position2d_power_config_t *power;
-
-        power = (player_position2d_power_config_t*) data;
-
-        this->iface->data->cmdEnableMotors = power->state;
-
-        this->driver->Publish(this->device_addr, respQueue,
-            PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
-
-        result = 0;
-      }
-    }
-
-    // REQUEST GET GEOMETRY
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                            PLAYER_POSITION2D_REQ_GET_GEOM, this->device_addr))
-    {
-      if (hdr->size != 0)
-      {
-        PLAYER_WARN("Arg get robot geom is wrong size; ignoring");
-        result = -1;
-      }
-      else
-      {
-
-        player_position2d_geom_t geom;
-
-        // TODO: get correct dimensions; there are for the P2AT
-
-        geom.pose.px = 0;
-        geom.pose.py = 0;
-        geom.pose.pz = 0;
-        geom.pose.pyaw = 0;
-        geom.pose.ppitch = 0;
-        geom.pose.proll = 0;
-        geom.size.sw= 0.53;
-        geom.size.sl = 0.38;
-        geom.size.sh = 0.31;
-
-        this->driver->Publish(this->device_addr, respQueue,
-            PLAYER_MSGTYPE_RESP_ACK,
-            PLAYER_POSITION2D_REQ_GET_GEOM,
-            &geom, sizeof(geom), NULL);
-
-        result = 0;
-      }
-    }
-
-    // REQUEST RESET ODOMETRY
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                           PLAYER_POSITION2D_REQ_RESET_ODOM, this->device_addr))
-    {
-      if (hdr->size != 0)
-      {
-        PLAYER_WARN("Arg reset position request is wrong size; ignoring");
-        result = -1;
-      }
-      else
-      {
-        // TODO: Make this work!!
-        //
-        this->driver->Publish(this->device_addr, respQueue,
-            PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_RESET_ODOM);
-
-        result = 0;
-      }
-    }
-
-    else
-    {
+      PLAYER_WARN("Arg to odometry set requestes wrong size; ignoring");
       result = -1;
     }
+    else
+    {
+      /*
+      player_position2d_set_odom_req_t *odom = 
+        (player_position2d_set_odom_req_t*)_data;
 
-    this->iface->Unlock();
+      this->iface->data->pose.pos.x = odom->pose.px;
+      this->iface->data->pose.pos.y = odom->pose.py;
+      this->iface->data->pose.yaw = odom->pose.pa;
+      */
+
+      this->driver->Publish(this->device_addr, _respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
+
+      result = 0;
+    }
+  }
+
+  // CMD Set Motor Power
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
+        PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
+  {
+    // TODO
+    result = 0;
+  }
+
+  // REQUEST SET MOTOR POWER
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
+        PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
+  {
+    if (_hdr->size != sizeof(player_position2d_power_config_t))
+    {
+      PLAYER_WARN("Arg to motor set requestes wrong size; ignoring");
+      result = -1;
+    }
+    else
+    {
+      player_position2d_power_config_t *power;
+
+      power = (player_position2d_power_config_t*)_data;
+
+      //this->iface->data->cmdEnableMotors = power->state;
+
+      this->driver->Publish(this->device_addr, _respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
+
+      result = 0;
+    }
+  }
+
+  // REQUEST GET GEOMETRY
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
+        PLAYER_POSITION2D_REQ_GET_GEOM, this->device_addr))
+  {
+    if (_hdr->size != 0)
+    {
+      PLAYER_WARN("Arg get robot geom is wrong size; ignoring");
+      result = -1;
+    }
+    else
+    {
+      player_position2d_geom_t geom;
+
+      // TODO: get correct dimensions; these are for the P2AT
+      geom.pose.px = 0;
+      geom.pose.py = 0;
+      geom.pose.pz = 0;
+      geom.pose.pyaw = 0;
+      geom.pose.ppitch = 0;
+      geom.pose.proll = 0;
+      geom.size.sw= 0.53;
+      geom.size.sl = 0.38;
+      geom.size.sh = 0.31;
+
+      this->driver->Publish(this->device_addr, _respQueue,
+          PLAYER_MSGTYPE_RESP_ACK,
+          PLAYER_POSITION2D_REQ_GET_GEOM,
+          &geom, sizeof(geom), NULL);
+
+      result = 0;
+    }
+  }
+
+  // REQUEST RESET ODOMETRY
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
+           PLAYER_POSITION2D_REQ_RESET_ODOM, this->device_addr))
+  {
+    if (_hdr->size != 0)
+    {
+      PLAYER_WARN("Arg reset position request is wrong size; ignoring");
+      result = -1;
+    }
+    else
+    {
+      // TODO: Make this work!!
+      this->driver->Publish(this->device_addr, _respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_RESET_ODOM);
+      result = 0;
+    }
   }
   else
   {
-    this->Unsubscribe();
     result = -1;
   }
 
   return result;
-
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Update this interface, publish new info. This is
 // called from GazeboDriver::Update
 void Position2dInterface::Update()
 {
+  /*
   player_position2d_data_t data;
   struct timeval ts;
 
   memset(&data, 0, sizeof(data));
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (this->iface->Lock(1))
+  // Only Update when new data is present
+  if (this->iface->data->head.time > this->datatime)
   {
-    // Only Update when new data is present
-    if (this->iface->data->head.time > this->datatime)
-    {
-      this->datatime = this->iface->data->head.time;
+    this->datatime = this->iface->data->head.time;
 
-      ts.tv_sec = (int) (this->iface->data->head.time);
-      ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
+    ts.tv_sec = (int) (this->iface->data->head.time);
+    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
-      data.pos.px = this->iface->data->pose.pos.x;
-      data.pos.py = this->iface->data->pose.pos.y;
-      data.pos.pa = this->iface->data->pose.yaw;
+    data.pos.px = this->iface->data->pose.pos.x;
+    data.pos.py = this->iface->data->pose.pos.y;
+    data.pos.pa = this->iface->data->pose.yaw;
 
-      data.vel.px = this->iface->data->velocity.pos.x;
-      data.vel.py = this->iface->data->velocity.pos.y;
-      data.vel.pa = this->iface->data->velocity.yaw;
+    data.vel.px = this->iface->data->velocity.pos.x;
+    data.vel.py = this->iface->data->velocity.pos.y;
+    data.vel.pa = this->iface->data->velocity.yaw;
 
-      data.stall = (uint8_t) this->iface->data->stall;
+    data.stall = (uint8_t) this->iface->data->stall;
 
-      this->driver->Publish( this->device_addr,
-                             PLAYER_MSGTYPE_DATA,
-                             PLAYER_POSITION2D_DATA_STATE,
-                             (void*)&data, sizeof(data), &this->datatime );
+    this->driver->Publish( this->device_addr,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_POSITION2D_DATA_STATE,
+        (void*)&data, sizeof(data), &this->datatime );
 
-    }
-
-    this->iface->Unlock();
   }
-  else
-    this->Unsubscribe();
+  */
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Open a SHM interface when a subscription is received. This is called from
 // GazeboDriver::Subscribe
 void Position2dInterface::Subscribe()
 {
-  // Open the interface
-  try
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open(GazeboClient::client, this->gz_id);
-  }
-  catch (std::string e)
-  {
-    //std::ostringstream stream;
-    std::cout <<"Error Subscribing to Gazebo Position2d Interface\n"
-    << e << "\n";
-    //gzthrow(stream.str());
-    exit(0);
-  }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void Position2dInterface::Unsubscribe()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  this->iface->Close();
 }

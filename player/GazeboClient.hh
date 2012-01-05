@@ -17,19 +17,10 @@
 /* Desc: Gazebo (simulator) client functions 
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
-#ifndef GAZEBOCLIENT_HH
-#define GAZEBOCLIENT_HH
-
-#include "gz.h"
-
-namespace libgazebo
-{
-  class SimulationIface;
-  class Client;
-}
+#ifndef GAZEBO_PLAYER_CLIENT_HH
+#define GAZEBO_PLAYER_CLIENT_HH
 
 /// \addtogroup player
 /// \brief Gazebo client handler
@@ -44,19 +35,13 @@ namespace libgazebo
 class GazeboClient
 {
   /// \brief Initialize 
-  public: static void Init(int serverid, const char *prefixid);
+  public: static void Init(int _serverid, const std::string &_worldName);
 
   /// \brief Finalize
   public: static void Fini();
 
   /// \brief The prefix used for all gazebo ID's
-  public: static const char *prefixId;
-
-  /// \brief The one and only gazebo client
-  public: static libgazebo::Client *client;
-
-  /// \brief The simulation interface
-  public: static libgazebo::SimulationIface *sim;
+  public: static std::string worldName;
 };
 
 /// \}

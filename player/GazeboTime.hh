@@ -17,21 +17,20 @@
 /* Desc: Gazebo Time functions 
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
-#ifndef GAZEBOTIME_HH
-#define GAZEBOTIME_HH
+#ifndef GAZEBO_PLAYER_TIME_HH
+#define GAZEBO_PLAYER_TIME_HH
 
 #include <libplayercore/playercore.h>
 
-namespace libgazebo
-{
+#include "common/CommonTypes.hh"
+#include "transport/TransportTypes.hh"
+#include "msgs/msgs.h"
 
 /// \addtogroup player
 /// \brief Gazebo player driver
 /// \{
-
 
   /// \brief Gazebo access to PlayerTime
 class GazeboTime : public PlayerTime
@@ -43,14 +42,18 @@ class GazeboTime : public PlayerTime
   public: virtual ~GazeboTime();
 
   /// \brief Get the simulator time
-  public: int GetTime(struct timeval* time);
+  public: int GetTime(struct timeval *_time);
 
   /// \brief Get the simulator time
-  public: int GetTimeDouble(double* time);
+  public: int GetTimeDouble(double *_time);
 
+  private: void OnStats(ConstWorldStatisticsPtr &_msg);
+
+  private: gazebo::transport::NodePtr node;
+  private: gazebo::transport::SubscriberPtr statsSub;
+  private: gazebo::common::Time simTime;
 };
 
 /// \}
 
-}
 #endif

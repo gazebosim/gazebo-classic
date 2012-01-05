@@ -208,7 +208,7 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 
       iss >> axis.x >> axis.y >> axis.z;
       iss >> angle;
-      mat.SetFromAxis(axis,DTOR(angle));
+      mat.SetFromAxis(axis,GZ_DTOR(angle));
 
       transform = transform * mat;
 
