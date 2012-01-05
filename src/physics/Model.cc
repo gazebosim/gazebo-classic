@@ -711,9 +711,15 @@ void Model::FillModelMsg(msgs::Model &_msg)
 
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (_msg.id() != this->GetId())
+  if (_msg.has_id() && _msg.id() != this->GetId())
   {
-    gzerr << "Incorrect ID\n";
+    gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
+    return;
+  }
+  else if (_msg.name() != this->GetName())
+  {
+    gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
+          << "]\n";
     return;
   }
 

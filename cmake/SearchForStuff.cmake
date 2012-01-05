@@ -202,7 +202,7 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find Player
-  pkg_check_modules(PLAYER playercore>=3.0)
+  pkg_check_modules(PLAYER playercore>=3.0 playerc++)
   if (NOT PLAYER_FOUND)
     set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
     BUILD_WARNING ("Player not found, gazebo plugin for player will not be built.")

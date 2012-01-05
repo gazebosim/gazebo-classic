@@ -26,6 +26,7 @@
 #ifndef GAZEBO_RAY_PLUGIN_HH
 #define GAZEBO_RAY_PLUGIN_HH
 
+#include "common/Plugin.hh"
 #include "sensors/SensorTypes.hh"
 #include "sensors/RaySensor.hh"
 #include "gazebo.h"

@@ -23,13 +23,18 @@
 #include <time.h>
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
+#include <libplayercore/playercore.h>
 
 #include "transport/transport.h"
 
+#include "gazebo.h"
+#include "GazeboTime.hh"
 #include "GazeboDriver.hh"
 #include "SimulationInterface.hh"
 
 boost::recursive_mutex *SimulationInterface::mutex = NULL;
+
+extern PlayerTime* GlobalTime;
 
 //////////////////////////////////////////////////
 // Constructor
@@ -37,6 +42,20 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
     GazeboDriver *_driver, ConfigFile *_cf, int _section)
 : GazeboInterface(_addr, _driver, _cf, _section)
 {
+  gazebo::load();
+  gazebo::init();
+  gazebo::run();
+
+  // steal the global clock - a bit aggressive, but a simple approach
+  if (GlobalTime)
+  {
+    delete GlobalTime;
+    GlobalTime = NULL;
+  }
+
+  GlobalTime = new GazeboTime();
+  assert(GlobalTime != 0);
+
   this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   this->node->Init(_cf->ReadString(_section, "world_name", "default"));
   this->statsSub =
@@ -57,6 +76,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
 // Destructor
 SimulationInterface::~SimulationInterface()
 {
+  gazebo::fini();
   if (this->responseQueue)
   {
     delete this->responseQueue;

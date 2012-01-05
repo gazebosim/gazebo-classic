@@ -18,28 +18,10 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
  */
-
-#include <assert.h>
-#include <stdio.h>
-#include <iostream>
-#include <libplayercore/playercore.h>
-
-#include "GazeboTime.hh"
 #include "GazeboClient.hh"
-
-extern PlayerTime* GlobalTime;
 
 void GazeboClient::Init(int /*_serverid*/, const std::string & /*_worldName*/)
 {
-  // steal the global clock - a bit aggressive, but a simple approach
-  if (GlobalTime)
-  {
-    delete GlobalTime;
-    GlobalTime = NULL;
-  }
-
-  GlobalTime = new GazeboTime();
-  assert(GlobalTime != 0);
 }
 
 void GazeboClient::Fini()

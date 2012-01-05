@@ -26,6 +26,7 @@
 #ifndef GAZEBO_CONTACT_PLUGIN_HH
 #define GAZEBO_CONTACT_PLUGIN_HH
 
+#include "common/Plugin.hh"
 #include "sensors/SensorTypes.hh"
 #include "sensors/ContactSensor.hh"
 #include "gazebo.h"

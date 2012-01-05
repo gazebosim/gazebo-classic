@@ -24,7 +24,7 @@
 
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
-//#include "Position2dInterface.hh"
+#include "Position2dInterface.hh"
 //#include "Graphics3dInterface.hh"
 //#include "LaserInterface.hh"
 //#include "CameraInterface.hh"
@@ -101,6 +101,7 @@ extern "C"
 GazeboDriver::GazeboDriver(ConfigFile *_cf, int _section)
     : Driver(_cf, _section, false, 4096)
 {
+  printf("GazeboDriver::GazeboDriver\n");
   this->devices = NULL;
   this->deviceCount = 0;
   this->deviceMaxCount = 0;
@@ -244,15 +245,15 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
     {
       case PLAYER_SIMULATION_CODE:
         if (!player_quiet_startup) printf(" a simulation interface.\n");
-        ifsrc = new SimulationInterface( playerAddr, this, _cf, _section );
+        ifsrc = new SimulationInterface(playerAddr, this, _cf, _section);
         break;
 
-      /*case PLAYER_POSITION2D_CODE:
+      case PLAYER_POSITION2D_CODE:
         if (!player_quiet_startup) printf(" a position2d interface.\n");
-        ifsrc = new Position2dInterface( playerAddr, this,  _cf, _section );
+        ifsrc = new Position2dInterface(playerAddr, this,  _cf, _section);
         break;
 
-      case PLAYER_GRAPHICS3D_CODE:
+      /*case PLAYER_GRAPHICS3D_CODE:
         if (!player_quiet_startup) printf(" a graphics3d interface.\n");
         ifsrc = new Graphics3dInterface( playerAddr, this,  _cf, _section );
         break;

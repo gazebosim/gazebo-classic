@@ -896,7 +896,7 @@ void World::ProcessModelMsgs()
        iter != this->modelMsgs.end(); iter++)
   {
     ModelPtr model;
-    if ((*iter).id())
+    if ((*iter).has_id())
       model = this->GetModelById((*iter).id());
     else
       model = this->GetModelByName((*iter).name());
