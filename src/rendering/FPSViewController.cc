@@ -53,6 +53,9 @@ void FPSViewController::Update()
 /// Handle a mouse event
 void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
+  if (!this->enabled)
+    return;
+
   math::Vector2i drag = _event.pos - _event.prevPos;
 
   math::Vector3 directionVec(0,0,0);

@@ -47,14 +47,14 @@ namespace gazebo
     class UserCamera : public Camera
     {
       /// \brief Constructor
-      public: UserCamera( const std::string &name, Scene *scene);
+      public: UserCamera(const std::string &_name, Scene *_scene);
   
       /// \brief Destructor
       public: virtual ~UserCamera();
   
       /// \brief Load the user camera
-      public: void Load( sdf::ElementPtr _sdf );
-      public: void Load( );
+      public: void Load(sdf::ElementPtr _sdf);
+      public: void Load();
   
       /// \brief Initialize
       public: void Init();
@@ -69,22 +69,23 @@ namespace gazebo
       public: void Fini();
   
       /// \brief Hande a mouse event
-      public: void HandleMouseEvent(const common::MouseEvent &evt);
+      public: void HandleMouseEvent(const common::MouseEvent &_evt);
       public: void HandleKeyPressEvent(const std::string &_key);
       public: void HandleKeyReleaseEvent(const std::string &_key);
 
       /// \brief Set view controller
-      public: void SetViewController( const std::string &type );
+      public: void SetViewController(const std::string &_type);
 
        /// \brief Set view controller
-      public: void SetViewController( const std::string &type,
-                                      const math::Vector3 &_pos );
+      public: void SetViewController(const std::string &_type,
+                                     const math::Vector3 &_pos);
   
       /// \brief Resize the camera
-      public: void Resize(unsigned int w, unsigned int h);
+      public: void Resize(unsigned int _w, unsigned int _h);
   
       /// \brief Set the dimensions of the viewport
-      public: void SetViewportDimensions(float x, float y, float w, float h);
+      public: void SetViewportDimensions(float _x, float _y,
+                                         float _w, float _h);
   
       /// \brief Get the average frames per second
       public: float GetAvgFPS() const;
@@ -96,27 +97,31 @@ namespace gazebo
       public: void MoveToVisual(VisualPtr _visual );
       public: void MoveToVisual(const std::string &_visualName );
 
-      public: void MoveToPosition( const math::Vector3 &_end, double _pitch, double _yaw, double _time );
+      public: void MoveToPosition(const math::Vector3 &_end,
+                  double _pitch, double _yaw, double _time );
 
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
-                     bool _inheritOrientation,
-                    double _minDist=0, double _maxDist=0 );
+                     bool _inheritOrientation, double _minDist=0,
+                     double _maxDist=0 );
 
       /// \brief Set the camera to track a scene node
-      protected: virtual bool TrackVisualImpl( VisualPtr _visual );
+      protected: virtual bool TrackVisualImpl(VisualPtr _visual);
 
       /// \brief Set to true to enable rendering
-      public: virtual void SetRenderTarget( Ogre::RenderTarget *_target );
+      public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
       /// \brief Get the GUI overlay 
       public: GUIOverlay *GetGUIOverlay();
+
+      /// \brief Set whether the view controller is enabled
+      public: void EnableViewController(bool _value) const;
 
       /// \brief Toggle whether to show the visual
       private: void ToggleShowVisual();
   
       /// \brief Set whether to show the visual
-      private: void ShowVisual(bool s);
+      private: void ShowVisual(bool _s);
   
       private: std::string name;
       private: static int count;

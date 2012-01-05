@@ -479,6 +479,13 @@ void UserCamera::MoveToPosition( const math::Vector3 &_end,
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;
 
+  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
+
+  if (dyaw > M_PI)
+    _yaw += 2*M_PI;
+  else if (dyaw < -M_PI)
+    _yaw -= 2*M_PI;
+
   Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0,0,1));
   Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0,1,0));
 
@@ -519,8 +526,14 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->initialized = true;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 GUIOverlay *UserCamera::GetGUIOverlay()
 {
   return this->gui;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::EnableViewController(bool _value) const
+{
+  this->viewController->SetEnabled(_value);
 }
