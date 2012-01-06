@@ -261,7 +261,7 @@ msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
 
     guiCam->set_name( camSDF->GetValueString("name") );
 
-    if (_sdf->HasElement("origin"))
+    if (camSDF->HasElement("origin"))
     {
       msgs::Set( guiCam->mutable_origin(), 
           camSDF->GetElement("origin")->GetValuePose("pose") );
