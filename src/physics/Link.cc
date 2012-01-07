@@ -741,7 +741,9 @@ void Link::OnPoseChange()
   for (unsigned int i=0; i < this->attachedModels.size(); i++)
   {
     p = this->GetWorldPose();
-    p += this->attachedModelsOffset[i];
+    p.pos += this->attachedModelsOffset[i].pos;
+    p.rot = p.rot * this->attachedModelsOffset[i].rot;
+
     this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
