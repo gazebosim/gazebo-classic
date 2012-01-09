@@ -1072,4 +1072,144 @@
       </StateImagery>
   </WidgetLook>
 
+  <WidgetLook name="Gazebo/Combobox">
+      <PropertyLinkDefinition name="NormalEditTextColour" widget="__auto_editbox__" targetProperty="NormalTextColour" initialValue="FF000000" />
+      <PropertyLinkDefinition name="SelectedEditTextColour" widget="__auto_editbox__" targetProperty="SelectedTextColour" initialValue="FFFFFFFF" />
+      <PropertyLinkDefinition name="ActiveEditSelectionColour" widget="__auto_editbox__" targetProperty="ActiveSelectionColour" initialValue="FF607FFF" />
+      <PropertyLinkDefinition name="InactiveEditSelectionColour" widget="__auto_editbox__" targetProperty="InactiveSelectionColour" initialValue="FF808080" />
+      <Child  type="Gazebo/Editbox" nameSuffix="__auto_editbox__">
+          <Area>
+              <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+              <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+              <Dim type="RightEdge" >
+                  <UnifiedDim scale="1" type="RightEdge">
+                      <DimOperator op="Subtract">
+                          <FontDim type="LineSpacing" padding="10" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+              <Dim type="Height" >
+                  <FontDim type="LineSpacing" padding="10" />
+              </Dim>
+          </Area>
+      </Child>
+      <Child  type="Gazebo/ComboDropList" nameSuffix="__auto_droplist__">
+          <Area>
+              <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+              <Dim type="TopEdge" ><WidgetDim widget="__auto_editbox__" dimension="BottomEdge" /></Dim>
+              <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+              <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+          </Area>
+      </Child>
+      <Child  type="Gazebo/Button" nameSuffix="__auto_button__">
+          <Area>
+              <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+              <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+              <Dim type="Width" ><WidgetDim widget="__auto_editbox__" dimension="Height" /></Dim>
+              <Dim type="Height" ><WidgetDim widget="__auto_editbox__" dimension="Height" /></Dim>
+          </Area>
+          <HorzAlignment type="RightAligned" />
+      </Child>
+      <StateImagery name="Enabled" />
+      <StateImagery name="Disabled" />
+  </WidgetLook>
+
+  <WidgetLook name="Gazebo/ComboDropList">
+      <Property name="ForceVertScrollbar" value="False" />
+      <NamedArea name="ItemRenderingArea">
+          <Area>
+              <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+              <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+              <Dim type="RightEdge" >
+                  <UnifiedDim scale="1" type="RightEdge">
+                      <DimOperator op="Subtract">
+                          <ImageDim imageset="Gazebo-Images" image="FrameRight" dimension="Width" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+              <Dim type="BottomEdge" >
+                  <UnifiedDim scale="1" type="BottomEdge">
+                      <DimOperator op="Subtract">
+                          <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+          </Area>
+      </NamedArea>
+      <NamedArea name="ItemRenderingAreaVScroll">
+          <Area>
+              <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+              <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+              <Dim type="RightEdge" >
+                  <UnifiedDim scale="1" type="RightEdge">
+                      <DimOperator op="Subtract">
+                          <AbsoluteDim value="30" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+              <Dim type="BottomEdge" >
+                  <UnifiedDim scale="1" type="BottomEdge">
+                      <DimOperator op="Subtract">
+                          <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+          </Area>
+      </NamedArea>
+      <NamedArea name="ItemRenderingAreaHVScroll">
+          <Area>
+              <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+              <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+              <Dim type="RightEdge" >
+                  <UnifiedDim scale="1" type="RightEdge">
+                      <DimOperator op="Subtract">
+                          <AbsoluteDim value="30" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+              <Dim type="BottomEdge" >
+                  <UnifiedDim scale="1" type="BottomEdge">
+                      <DimOperator op="Subtract">
+                          <AbsoluteDim value="30" />
+                      </DimOperator>
+                  </UnifiedDim>
+              </Dim>
+          </Area>
+      </NamedArea>
+      <Child  type="Gazebo/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
+          <Area>
+              <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
+              <Dim type="TopEdge" ><AbsoluteDim value="-5" /></Dim>
+              <Dim type="Width" ><UnifiedDim scale="1" offset="-30" type="Width" /></Dim>
+              <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+          </Area>
+          <VertAlignment type="BottomAligned" />
+      </Child>
+      <Child  type="Gazebo/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
+          <Area>
+              <Dim type="LeftEdge" ><AbsoluteDim value="-5" /></Dim>
+              <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
+              <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+              <Dim type="Height" ><UnifiedDim scale="1" offset="-10" type="Height" /></Dim>
+          </Area>
+          <HorzAlignment type="RightAligned" />
+      </Child>
+      <StateImagery name="Enabled">
+          <Layer>
+              <Section look="Gazebo/Shared" section="Frame">
+                  <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+              </Section>
+          </Layer>
+      </StateImagery>
+      <StateImagery name="Disabled">
+          <Layer>
+              <Section look="Gazebo/Shared" section="Frame">
+                  <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+              </Section>
+          </Layer>
+      </StateImagery>
+  </WidgetLook>
+
+
+
 </Falagard>

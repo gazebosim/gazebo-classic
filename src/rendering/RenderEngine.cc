@@ -49,7 +49,6 @@
 #include "rendering/Grid.hh"
 #include "rendering/Visual.hh"
 #include "rendering/UserCamera.hh"
-#include "rendering/MovableText.hh"
 #include "rendering/RenderEngine.hh"
 
 using namespace gazebo;

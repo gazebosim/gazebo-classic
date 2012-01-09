@@ -19,8 +19,8 @@
  * Date: 08 May 2009
  */
 
-#ifndef COLOR_HH
-#define COLOR_HH
+#ifndef GAZEBO_COLOR_HH
+#define GAZEBO_COLOR_HH
 
 #include <iostream>
 #include "math/Vector3.hh"
@@ -29,12 +29,19 @@ namespace gazebo
 {
   namespace common
   {
+
     /// \addtogroup gazebo_common Common 
     /// \{
 
     /// \brief Defines a color 
     class Color
     {
+      public: static const Color White;
+      public: static const Color Black;
+      public: static const Color Red;
+      public: static const Color Green;
+      public: static const Color Blue;
+
       /// \brief Constructor
       public: Color();
 
