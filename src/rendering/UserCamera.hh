@@ -97,8 +97,8 @@ namespace gazebo
       public: void MoveToVisual(VisualPtr _visual );
       public: void MoveToVisual(const std::string &_visualName );
 
-      public: void MoveToPosition(const math::Vector3 &_end,
-                  double _pitch, double _yaw, double _time );
+      public: bool MoveToPosition(const math::Vector3 &_end,
+                                  double _pitch, double _yaw, double _time);
 
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,

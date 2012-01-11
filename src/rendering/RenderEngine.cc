@@ -336,7 +336,8 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
-  std::list<std::string> ogrePaths = common::SystemPaths::Instance()->GetOgrePaths();
+  std::list<std::string> ogrePaths =
+    common::SystemPaths::Instance()->GetOgrePaths();
  
   for (iter=ogrePaths.begin(); 
        iter!=ogrePaths.end(); ++iter)
@@ -416,6 +417,7 @@ void RenderEngine::SetupResources()
     archNames.push_back(std::make_pair((*iter)+"/Media/materials/scripts", "General"));
     archNames.push_back(std::make_pair((*iter)+"/Media/materials/textures", "General"));
     archNames.push_back(std::make_pair((*iter)+"/Media/models", "General"));
+    archNames.push_back(std::make_pair((*iter)+"/Media/fonts", "Fonts"));
     archNames.push_back(std::make_pair((*iter)+"/Media/gui/looknfeel", "LookNFeel"));
     archNames.push_back(std::make_pair((*iter)+"/Media/gui/schemes", "Schemes"));
     archNames.push_back(std::make_pair((*iter)+"/Media/gui/imagesets", "Imagesets"));

@@ -107,8 +107,7 @@ void MovableText::Load( const std::string &name_,
 
   this->SetFontName(this->fontName);
 
-  // TODO: is this necessary?
-  //this->_setupGeometry();
+  this->_setupGeometry();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,9 +391,9 @@ void MovableText::_setupGeometry()
     }
   }
 
-  for ( i = this->text.begin(); i != this->text.end(); ++i )
+  for (i = this->text.begin(); i != this->text.end(); ++i)
   {
-    if ( newLine )
+    if (newLine)
     {
       len = 0.0;
       for (std::string::iterator j = i; j != this->text.end(); j++ )
@@ -411,7 +410,8 @@ void MovableText::_setupGeometry()
         }
         else
         {
-          len += this->font->getGlyphAspectRatio(character) * this->charHeight * 2.0 * this->viewportAspectCoef;
+          len += this->font->getGlyphAspectRatio(character) *
+                 this->charHeight * 2.0 * this->viewportAspectCoef;
         }
       }
 
@@ -440,7 +440,8 @@ void MovableText::_setupGeometry()
       continue;
     }
 
-    float horiz_height = this->font->getGlyphAspectRatio(character) * this->viewportAspectCoef ;
+    float horiz_height = this->font->getGlyphAspectRatio(character) *
+                         this->viewportAspectCoef;
 
     const Ogre::Font::UVRect& uvRect = this->font->getGlyphTexCoords(character);
 
@@ -604,9 +605,6 @@ void MovableText::_setupGeometry()
   ptbuf->unlock();
 
 
-  /*  min.x=min.y=min.z=-10000;
-    max.x=max.y=max.z = 10000;
-    */
 
   // update AABB/Sphere radius
   this->aabb->setMinimum(min);
@@ -698,7 +696,8 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
     //mParentNode->_getDerivedOrientation().ToRotationMatrix(rot3x3);
 
     // parent node position
-    Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() + Ogre::Vector3::UNIT_Y * this->baseline;
+    Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() +
+                         Ogre::Vector3::UNIT_Z * this->baseline;
 
     // apply scale
     scale3x3[0][0] = mParentNode->_getDerivedScale().x / 2;

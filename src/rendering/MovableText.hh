@@ -29,6 +29,7 @@
 #include <string>
 
 #include "common/CommonTypes.hh"
+#include "common/Color.hh"
 #include "math/MathTypes.hh"
 
 namespace boost
@@ -59,10 +60,10 @@ namespace gazebo
       public: virtual ~MovableText();
     
       /// \brief Loads text and font info 
-      public: void Load(const std::string &name, 
-                        const std::string &text, 
-                        const std::string &fontName = "Arial", 
-                        float charHeight = 1.0,
+      public: void Load(const std::string &_name, 
+                        const std::string &_text, 
+                        const std::string &_fontName = "Arial", 
+                        float _charHeight = 1.0,
                         const common::Color &_color = common::Color::White);
     
       /// \brief Set the font

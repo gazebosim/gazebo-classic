@@ -692,8 +692,6 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
     }
   }
 
-  std::cout << "Closest Entity[" << closestEntity->getName() << "]\n";
-
   return closestEntity;
 }
 

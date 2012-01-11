@@ -1608,7 +1608,7 @@ void ModelListWidget::OnRequest(
   }
 }
 
-void ModelListWidget::OnRemoveScene(const std::string &_name)
+void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
   this->poseMsgs.clear();
   this->modelTreeWidget->clear();

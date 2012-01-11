@@ -473,11 +473,11 @@ void UserCamera::MoveToVisual( VisualPtr _visual )
   this->animState->setLoop(false);
 }
 
-void UserCamera::MoveToPosition( const math::Vector3 &_end, 
+bool UserCamera::MoveToPosition( const math::Vector3 &_end, 
                                  double _pitch, double _yaw, double _time)
 {
   if (this->animState)
-    return;
+    return false;
 
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;
@@ -517,6 +517,7 @@ void UserCamera::MoveToPosition( const math::Vector3 &_end,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////

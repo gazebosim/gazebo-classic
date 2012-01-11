@@ -73,7 +73,7 @@ namespace gazebo
       public: void SetFromYUV(float y, float u, float v);
 
       /// \brief Equal operator
-      public: const Color &operator=( const Color &pt );
+      public: const Color &operator=(const Color &_pt);
 
       /// \brief Array index operator
       public: float operator[](unsigned int index);
