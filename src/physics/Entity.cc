@@ -420,9 +420,13 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the parent model, if one exists
-ModelPtr Entity::GetParentModel() const
+ModelPtr Entity::GetParentModel()
 {
-  BasePtr p = this->parent;
+  BasePtr p;
+  if (this->HasType(MODEL))
+    return boost::shared_dynamic_cast<Model>(shared_from_this());
+
+  p = this->parent;
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();

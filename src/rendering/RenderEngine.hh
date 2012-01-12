@@ -33,23 +33,8 @@
 namespace Ogre
 {
   class Root;
-  class SceneManager;
-  class RenderWindow;
-  class Viewport;
-  class InputReader;
-  class Window;
-  class Camera;
-  class SceneNode;
   class Node;
   class LogManager;
-  class Overlay;
-  class OverlayContainer;
-  class SceneNode;
-  class RenderTarget;
-  class ColourValue;
-  class RenderSystem;
-  class RaySceneQuery; 
-  class Mesh;
 }
 
 
@@ -59,13 +44,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
-    
-    class OgreFrameListener;
-    class Entity;
-    class UserCamera;
-    class Camera;
-    class Visual;
-    class Scene;
     
     /// \brief Adaptor to Ogre3d
     class RenderEngine : public SingletonT<RenderEngine>

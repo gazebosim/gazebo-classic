@@ -154,6 +154,12 @@ namespace gazebo
       /// \brief Get a pointer to a entity based on a name
       public: EntityPtr GetEntityByName(const std::string &_name);
 
+      /// \brief Get the nearest model below a point
+      public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
+
+      /// \brief Get the nearest entity below a point
+      public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load

@@ -164,7 +164,7 @@ namespace gazebo
  
       /// \brief Get the parent model, if one exists
       /// \return Pointer to a model, or NULL if no parent model exists
-      public: ModelPtr GetParentModel() const;
+      public: ModelPtr GetParentModel();
 
       /// \brief Get a child collision entity, if one exists
       public: CollisionPtr GetChildCollision(const std::string &_name);
