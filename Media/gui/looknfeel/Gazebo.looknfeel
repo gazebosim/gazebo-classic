@@ -98,7 +98,6 @@
           <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
         </Area>
         <Image imageset="Gazebo-Images" image="ScrollbarThumb" />
-        <Colours topLeft="FF494949" topRight="FF494949" bottomLeft="FF494949" bottomRight="FF494949" />
         <VertFormat type="Stretched" />
         <HorzFormat type="Stretched" />
       </ImageryComponent>
@@ -214,7 +213,8 @@
           <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
         </Area>
         <Image imageset="Gazebo-Images" image="ScrollbarThumb" />
-        <Colours topLeft="FF494949" topRight="FF494949" bottomLeft="FF494949" bottomRight="FF494949" />
+        <!--<Colours topLeft="FF494949" topRight="FF494949" bottomLeft="FF494949" bottomRight="FF494949" />
+             -->
         <VertFormat type="Stretched" />
         <HorzFormat type="Stretched" />
       </ImageryComponent>
@@ -241,8 +241,12 @@
     <NamedArea name="ThumbTrackArea">
       <Area>
         <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-        <Dim type="TopEdge" ><WidgetDim widget="__auto_decbtn__" dimension="BottomEdge" /></Dim>
-        <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+        <Dim type="TopEdge" >
+          <WidgetDim widget="__auto_decbtn__" dimension="BottomEdge" />
+        </Dim>
+        <Dim type="RightEdge" >
+          <UnifiedDim scale="1.0" type="RightEdge" />
+        </Dim>
         <Dim type="BottomEdge" >
           <UnifiedDim scale="1.0" type="BottomEdge">
             <DimOperator op="Subtract">
@@ -479,7 +483,7 @@
         <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="-5" /></Dim>
         <Dim type="Width" ><UnifiedDim scale="1" offset="-25" type="Width" /></Dim>
-        <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+        <Dim type="Height" ><AbsoluteDim value="15" /></Dim>
       </Area>
       <VertAlignment type="BottomAligned" />
     </Child>
@@ -487,7 +491,7 @@
       <Area>
         <Dim type="LeftEdge" ><AbsoluteDim value="-5" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
-        <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+        <Dim type="Width" ><AbsoluteDim value="15" /></Dim>
         <Dim type="Height" ><UnifiedDim scale="1" offset="-10" type="Height" /></Dim>
       </Area>
       <HorzAlignment type="RightAligned" />
@@ -868,7 +872,7 @@
           </UnifiedDim>
         </Dim>
         <Dim type="BottomEdge" >
-          <UnifiedDim scale="1" offset="-20" type="BottomEdge" />
+          <UnifiedDim scale="1" offset="-15" type="BottomEdge" />
         </Dim>
       </Area>
     </NamedArea>
@@ -877,7 +881,7 @@
         <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
         <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
         <Dim type="RightEdge" >
-          <UnifiedDim scale="1" offset="-20" type="RightEdge" />
+          <UnifiedDim scale="1" offset="-15" type="RightEdge" />
         </Dim>
         <Dim type="BottomEdge" >
           <UnifiedDim scale="1" type="BottomEdge">
@@ -893,10 +897,10 @@
         <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
         <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
         <Dim type="RightEdge" >
-          <UnifiedDim scale="1" offset="-20" type="RightEdge" />
+          <UnifiedDim scale="1" offset="-15" type="RightEdge" />
         </Dim>
         <Dim type="BottomEdge" >
-          <UnifiedDim scale="1" offset="-20" type="BottomEdge" />
+          <UnifiedDim scale="1" offset="-15" type="BottomEdge" />
         </Dim>
       </Area>
     </NamedArea>
@@ -913,14 +917,14 @@
         <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
         <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
-        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-20" type="BottomEdge" /></Dim>
+        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-15" type="BottomEdge" /></Dim>
       </Area>
     </NamedArea>
     <NamedArea name="NoFrameTextRenderAreaVScroll">
       <Area>
         <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-        <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-20" type="RightEdge" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-15" type="RightEdge" /></Dim>
         <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
       </Area>
     </NamedArea>
@@ -928,16 +932,16 @@
       <Area>
         <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-        <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-20" type="RightEdge" /></Dim>
-        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-20" type="BottomEdge" /></Dim>
+        <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-15" type="RightEdge" /></Dim>
+        <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-15" type="BottomEdge" /></Dim>
       </Area>
     </NamedArea>
     <Child  type="Gazebo/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
       <Area>
         <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-        <Dim type="Width" ><UnifiedDim scale="1" offset="-20" type="Width" /></Dim>
-        <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+        <Dim type="Width" ><UnifiedDim scale="1" offset="-15" type="Width" /></Dim>
+        <Dim type="Height" ><AbsoluteDim value="15" /></Dim>
       </Area>
       <VertAlignment type="BottomAligned" />
     </Child>
@@ -945,8 +949,8 @@
       <Area>
         <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
         <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-        <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
-        <Dim type="Height" ><UnifiedDim scale="1" offset="-20" type="Height" /></Dim>
+        <Dim type="Width" ><AbsoluteDim value="15" /></Dim>
+        <Dim type="Height" ><UnifiedDim scale="1" offset="-15" type="Height" /></Dim>
       </Area>
       <HorzAlignment type="RightAligned" />
     </Child>
@@ -1181,7 +1185,7 @@
               <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
               <Dim type="TopEdge" ><AbsoluteDim value="-5" /></Dim>
               <Dim type="Width" ><UnifiedDim scale="1" offset="-30" type="Width" /></Dim>
-              <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
+              <Dim type="Height" ><AbsoluteDim value="15" /></Dim>
           </Area>
           <VertAlignment type="BottomAligned" />
       </Child>
@@ -1189,7 +1193,7 @@
           <Area>
               <Dim type="LeftEdge" ><AbsoluteDim value="-5" /></Dim>
               <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
-              <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+              <Dim type="Width" ><AbsoluteDim value="15" /></Dim>
               <Dim type="Height" ><UnifiedDim scale="1" offset="-10" type="Height" /></Dim>
           </Area>
           <HorzAlignment type="RightAligned" />

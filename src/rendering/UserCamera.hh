@@ -100,6 +100,9 @@ namespace gazebo
       public: bool MoveToPosition(const math::Vector3 &_end,
                                   double _pitch, double _yaw, double _time);
 
+      public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
+                                   double _time);
+
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
                      bool _inheritOrientation, double _minDist=0,

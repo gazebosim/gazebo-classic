@@ -520,6 +520,64 @@ bool UserCamera::MoveToPosition( const math::Vector3 &_end,
   return true;
 }
 
+bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts, 
+                                 double _time)
+{
+  if (this->animState)
+    return false;
+
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation("cameratrack",_time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  double dt = _time / _pts.size();
+  double tt = 0;
+  for (unsigned int i=0; i < _pts.size(); i++)
+  {
+    math::Vector3 pos = _pts[i].pos;
+    math::Vector3 rpy = _pts[i].rot.GetAsEuler();
+    double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
+
+    if (dyaw > M_PI)
+      rpy.z += 2*M_PI;
+    else if (dyaw < -M_PI)
+      rpy.z -= 2*M_PI;
+
+    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0,0,1));
+    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0,1,0));
+
+    key = strack->createNodeKeyFrame(tt);
+    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
+    key->setRotation(yawFinal);
+
+    key = ptrack->createNodeKeyFrame(tt);
+    key->setRotation(pitchFinal);
+
+    tt += dt;
+  }
+
+  this->animState = this->scene->GetManager()->createAnimationState(
+      "cameratrack");
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  return true;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
