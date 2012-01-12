@@ -5,7 +5,6 @@
 #include <limits>
 #include <string>
 #include <iostream>
-#define EPSILON 0.0001
 
 namespace gazebo
 {

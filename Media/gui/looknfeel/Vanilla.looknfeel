@@ -1175,7 +1175,7 @@
     </WidgetLook>
 
     <WidgetLook name="Vanilla/ComboDropList">
-        <Property name="ForceVertScrollbar" value="True" />
+        <Property name="ForceVertScrollbar" value="False" />
         <NamedArea name="ItemRenderingArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="Vanilla-Images" image="FrameLeft" dimension="Width" /></Dim>

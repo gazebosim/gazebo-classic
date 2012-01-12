@@ -39,7 +39,8 @@ set (sources MovableText.cc
              ContactVisual.cc
 )
 
-set (headers RenderEngine.hh
+set (headers MovableText.hh
+             RenderEngine.hh
              RenderEvents.hh
              Visual.hh
              Camera.hh

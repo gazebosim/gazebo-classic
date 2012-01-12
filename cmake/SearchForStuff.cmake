@@ -202,7 +202,7 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find Player
-  pkg_check_modules(PLAYER playercore>=3.0)
+  pkg_check_modules(PLAYER playercore>=3.0 playerc++)
   if (NOT PLAYER_FOUND)
     set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
     BUILD_WARNING ("Player not found, gazebo plugin for player will not be built.")
@@ -395,62 +395,64 @@ endif (libdl_library AND libdl_include_dir)
 
 ########################################
 # Find bullet
-if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
+#if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
+#
+#  find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
+#  
+#  if (NOT bullet_include_dir)
+#    message (STATUS "Looking for btBulletDynamicsCommon.h - not found.")
+#    set (bullet_include_dirs /usr/include CACHE STRING
+#      "bullet include paths. Use this to override automatic detection.")
+#  else (NOT bullet_include_dir)
+#    message (STATUS "Looking for btBulletDynamicsCommon.h - found")
+#    set (bullet_include_dirs ${bullet_include_dir} CACHE STRING
+#      "bullet include paths. Use this to override automatic detection.")
+#  endif (NOT bullet_include_dir)
+#  
+#  find_library(bullet_math_library LinearMath ENV LD_LIBRARY_PATH)
+#  find_library(bullet_collision_library BulletCollision ENV LD_LIBRARY_PATH)
+#  find_library(bullet_softbody_library BulletSoftBody  ENV LD_LIBRARY_PATH)
+#  find_library(bullet_dynamics_library BulletDynamics ENV LD_LIBRARY_PATH)
+#  
+#  if (NOT bullet_dynamics_library)
+#    message (STATUS "Looking for libBulletDynamics - not found.")
+#  else (NOT bullet_dynamics_library)
+#    message (STATUS "Looking for libBulletDynamics - found")
+#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletDynamics)
+#  endif (NOT bullet_dynamics_library)
+#
+#  if (NOT bullet_collision_library)
+#    message (STATUS "Looking for libBulletCollision - not found.")
+#  else (NOT bullet_collision_library)
+#    message (STATUS "Looking for libBulletCollision - found")
+#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletCollision)
+#  endif (NOT bullet_collision_library)
+#  
+#  if (NOT bullet_math_library)
+#    message (STATUS "Looking for libLinearMath - not found.")
+#  else (NOT bullet_math_library)
+#    message (STATUS "Looking for libLinearMath - found")
+#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lLinearMath)
+#  endif (NOT bullet_math_library)
+#
+#  if (NOT bullet_softbody_library)
+#    message (STATUS "Looking for libBulletSoftBody - not found.")
+#  else (NOT bullet_softbody_library)
+#    message (STATUS "Looking for libBulletSoftBody - found")
+#    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
+#  endif (NOT bullet_softbody_library)
+#
+#  if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
+#    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+#  else (NOT bullet_include_dir OR NOT bullet_dynamics_library)
+#    set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
+#  endif (NOT bullet_include_dir OR NOT bullet_dynamics_library)
+#
+#else (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
+#  set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
+#endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
-  find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
-  
-  if (NOT bullet_include_dir)
-    message (STATUS "Looking for btBulletDynamicsCommon.h - not found.")
-    set (bullet_include_dirs /usr/include CACHE STRING
-      "bullet include paths. Use this to override automatic detection.")
-  else (NOT bullet_include_dir)
-    message (STATUS "Looking for btBulletDynamicsCommon.h - found")
-    set (bullet_include_dirs ${bullet_include_dir} CACHE STRING
-      "bullet include paths. Use this to override automatic detection.")
-  endif (NOT bullet_include_dir)
-  
-  find_library(bullet_math_library LinearMath ENV LD_LIBRARY_PATH)
-  find_library(bullet_collision_library BulletCollision ENV LD_LIBRARY_PATH)
-  find_library(bullet_softbody_library BulletSoftBody  ENV LD_LIBRARY_PATH)
-  find_library(bullet_dynamics_library BulletDynamics ENV LD_LIBRARY_PATH)
-  
-  if (NOT bullet_dynamics_library)
-    message (STATUS "Looking for libBulletDynamics - not found.")
-  else (NOT bullet_dynamics_library)
-    message (STATUS "Looking for libBulletDynamics - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletDynamics)
-  endif (NOT bullet_dynamics_library)
-
-  if (NOT bullet_collision_library)
-    message (STATUS "Looking for libBulletCollision - not found.")
-  else (NOT bullet_collision_library)
-    message (STATUS "Looking for libBulletCollision - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletCollision)
-  endif (NOT bullet_collision_library)
-  
-  if (NOT bullet_math_library)
-    message (STATUS "Looking for libLinearMath - not found.")
-  else (NOT bullet_math_library)
-    message (STATUS "Looking for libLinearMath - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lLinearMath)
-  endif (NOT bullet_math_library)
-
-  if (NOT bullet_softbody_library)
-    message (STATUS "Looking for libBulletSoftBody - not found.")
-  else (NOT bullet_softbody_library)
-    message (STATUS "Looking for libBulletSoftBody - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
-  endif (NOT bullet_softbody_library)
-
-  if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
-    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
-  else (NOT bullet_include_dir OR NOT bullet_dynamics_library)
-    set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
-  endif (NOT bullet_include_dir OR NOT bullet_dynamics_library)
-
-else (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
-  set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
-endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
+set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
 
 # Check to make sure bullet was compiled with DOUBLE_PRECISION
 #if (INCLUDE_BULLET)

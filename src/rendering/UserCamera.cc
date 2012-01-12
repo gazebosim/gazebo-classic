@@ -56,18 +56,8 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   this->name = stream.str(); 
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
-        boost::bind(&UserCamera::Update, this)));
-  
-  this->connections.push_back(
       event::Events::ConnectShowCameras(
         boost::bind(&UserCamera::ToggleShowVisual, this) ) );
-
-  this->connections.push_back(
-      event::Events::ConnectRender( boost::bind(&Camera::Render, this)));
-  this->connections.push_back( event::Events::ConnectPostRender(
-        boost::bind(&Camera::PostRender, this)));
-
   this->animState = NULL;
 
   this->gui = new GUIOverlay();
@@ -109,7 +99,7 @@ void UserCamera::Load( )
 void UserCamera::Init()
 {
   Camera::Init();
-  this->SetHFOV(DTOR(60));
+  this->SetHFOV(GZ_DTOR(60));
   this->SetClipDist(0.001, 100);
 
   /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
@@ -186,6 +176,8 @@ void UserCamera::Update()
 
       this->scene->GetManager()->destroyAnimation("cameratrack");
       this->scene->GetManager()->destroyAnimationState("cameratrack");
+      if (this->onAnimationComplete)
+        this->onAnimationComplete();
     }
   }
 
@@ -224,18 +216,28 @@ void UserCamera::PostRender()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Finalize
 void UserCamera::Fini()
 {
   Camera::Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Handle a mouse event
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
     this->viewController->HandleMouseEvent(_evt);
+}
+
+void UserCamera::HandleKeyPressEvent(const std::string &_key)
+{
+  if (this->gui)
+    this->gui->HandleKeyPressEvent(_key);
+}
+
+void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
+{
+  if (this->gui)
+    this->gui->HandleKeyReleaseEvent(_key);
 }
 
 bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,
@@ -473,11 +475,21 @@ void UserCamera::MoveToVisual( VisualPtr _visual )
   this->animState->setLoop(false);
 }
 
-void UserCamera::MoveToPosition( const math::Vector3 &_end, 
+bool UserCamera::MoveToPosition( const math::Vector3 &_end, 
                                  double _pitch, double _yaw, double _time)
 {
+  if (this->animState)
+    return false;
+
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;
+
+  double dyaw =  this->GetWorldRotation().GetAsEuler().z - _yaw;
+
+  if (dyaw > M_PI)
+    _yaw += 2*M_PI;
+  else if (dyaw < -M_PI)
+    _yaw -= 2*M_PI;
 
   Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0,0,1));
   Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0,1,0));
@@ -507,6 +519,70 @@ void UserCamera::MoveToPosition( const math::Vector3 &_end,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
+  return true;
+}
+
+bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts, 
+                                 double _time,
+                                 boost::function<void()> _onComplete)
+{
+  if (this->animState)
+    return false;
+
+  this->onAnimationComplete = _onComplete;
+
+  Ogre::TransformKeyFrame *key;
+  math::Vector3 start = this->GetWorldPose().pos;
+
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation("cameratrack",_time);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  double dt = _time / _pts.size();
+  double tt = 0;
+  std::cout << "Time[" << _time << "] DT[" << dt << "]\n";
+  for (unsigned int i=0; i < _pts.size(); i++)
+  {
+    math::Vector3 pos = _pts[i].pos;
+    math::Vector3 rpy = _pts[i].rot.GetAsEuler();
+    double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
+
+    if (dyaw > M_PI)
+      rpy.z += 2*M_PI;
+    else if (dyaw < -M_PI)
+      rpy.z -= 2*M_PI;
+
+    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0,0,1));
+    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0,1,0));
+
+    std::cout << "TT[" << tt << "]\n";
+    key = strack->createNodeKeyFrame(tt);
+    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
+    key->setRotation(yawFinal);
+
+    key = ptrack->createNodeKeyFrame(tt);
+    key->setRotation(pitchFinal);
+
+    tt += dt;
+  }
+
+  this->animState = this->scene->GetManager()->createAnimationState(
+      "cameratrack");
+
+  this->animState->setTimePosition(0);
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+  return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -519,8 +595,14 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->initialized = true;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 GUIOverlay *UserCamera::GetGUIOverlay()
 {
   return this->gui;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::EnableViewController(bool _value) const
+{
+  this->viewController->SetEnabled(_value);
 }

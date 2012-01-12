@@ -39,7 +39,7 @@
 using namespace gazebo;
 using namespace physics;
 
-RayShape::RayShape(PhysicsEnginePtr _physicsEngine)
+RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   : Shape(CollisionPtr())
 {
   this->AddType(RAY_SHAPE);

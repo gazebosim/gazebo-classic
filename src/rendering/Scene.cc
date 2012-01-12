@@ -404,7 +404,6 @@ void Scene::SetBackgroundColor(const common::Color &color)
     if ((*iter2)->GetViewport())
       (*iter2)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -594,6 +593,17 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   return visual;
 }
 
+VisualPtr Scene::GetVisualBelowPoint(const math::Vector3 &_pt)
+{
+  VisualPtr visual;
+
+  Ogre::Entity *entity = this->GetOgreEntityBelowPoint(_pt, true);
+  visual = this->GetVisual(Ogre::any_cast<std::string>(entity->getUserAny()));
+
+  return visual;
+}
+
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
 VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
@@ -608,6 +618,88 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
   }
 
   return visual;
+}
+
+Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
+                                             bool _ignoreSelectionObj)
+{
+  Ogre::Real closest_distance = -1.0f;
+  Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0,0,-1));
+
+  this->raySceneQuery->setRay(ray);
+  this->raySceneQuery->setSortByDistance(true,0);
+
+  // Perform the scene query
+  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult::iterator iter = result.begin();
+  Ogre::Entity *closestEntity = NULL;
+
+  for (iter = result.begin(); iter != result.end(); iter++)
+  {
+    // is the result a MovableObject
+    if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
+    {
+      if (!iter->movable->isVisible() ||
+          iter->movable->getName().find("__COLLISION_VISUAL__") !=
+          std::string::npos)
+        continue;
+      if (_ignoreSelectionObj && 
+          iter->movable->getName().substr(0,15) == "__SELECTION_OBJ")
+        continue;
+
+      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
+
+      // mesh data to retrieve         
+      size_t vertex_count;
+      size_t index_count;
+      Ogre::Vector3 *vertices;
+      unsigned long *indices;
+
+      // Get the mesh information
+      this->GetMeshInformation( pentity->getMesh().get(), vertex_count, 
+          vertices, index_count, indices,             
+          pentity->getParentNode()->_getDerivedPosition(),
+          pentity->getParentNode()->_getDerivedOrientation(),
+          pentity->getParentNode()->_getDerivedScale());
+
+      bool new_closest_found = false;
+      for (int i = 0; i < static_cast<int>(index_count); i += 3)
+      {
+        // when indices size is not divisible by 3
+        if (i+2 >= static_cast<int>(index_count))
+          break; 
+
+        // check for a hit against this triangle
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray, 
+            vertices[indices[i]], 
+            vertices[indices[i+1]], 
+            vertices[indices[i+2]], 
+            true, false);
+
+        // if it was a hit check if its the closest
+        if (hit.first)
+        {
+          if ((closest_distance < 0.0f) || (hit.second < closest_distance))
+          {
+            // this is the closest so far, save it off
+            closest_distance = hit.second; 
+            new_closest_found = true;
+          }
+        }
+      }
+
+      delete [] vertices;
+      delete [] indices;
+
+      if (new_closest_found)
+      {
+        closestEntity = pentity;
+        //break;
+      }
+    }
+  }
+
+  return closestEntity;
 }
 
 Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera, 
@@ -659,7 +751,10 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
       {
-        if (i+2 >= static_cast<int>(index_count)) break; // when indices size is not divisible by 3
+        // when indices size is not divisible by 3
+        if (i+2 >= static_cast<int>(index_count))
+          break; 
+
         // check for a hit against this triangle
         std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, 
             vertices[indices[i]], 
@@ -685,7 +780,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       if (new_closest_found)
       {
         closestEntity = pentity;
-        break;
+        //break;
       }
     }
   }
@@ -1395,7 +1490,7 @@ void Scene::SetSky(const std::string &_material)
   try
   {
     Ogre::Quaternion orientation;
-    orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
+    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1,0,0));
     double curvature = 10; // ogre recommended default
     double tiling = 8; // ogre recommended default
     double distance = 4000; // ogre recommended default

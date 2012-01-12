@@ -29,9 +29,9 @@
 
 void RegisterODEPhysics();
 
-#ifdef INCLUDE_BULLET
-void RegisterBulletPhysics();
-#endif
+//#ifdef INCLUDE_BULLET
+//void RegisterBulletPhysics();
+//#endif
 
 using namespace gazebo;
 using namespace physics;
@@ -45,9 +45,9 @@ void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
 
-#ifdef INCLUDE_BULLET
-  RegisterBulletPhysics();
-#endif
+//#ifdef INCLUDE_BULLET
+//  RegisterBulletPhysics();
+//#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

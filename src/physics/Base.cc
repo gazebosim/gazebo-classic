@@ -337,7 +337,7 @@ std::string Base::GetCompleteScopedName() const
 /// Get the type
 bool Base::HasType(const Base::EntityType &_t) const
 {
-  return ((_t & this->type) == _t);
+  return ((unsigned int)(_t & this->type) == (unsigned int)_t);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

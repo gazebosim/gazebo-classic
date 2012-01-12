@@ -14,7 +14,7 @@ set (GAZEBO_MAJOR_VERSION 1)
 set (GAZEBO_MINOR_VERSION 0)
 set (GAZEBO_PATCH_VERSION 0)
 
-set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC1)
+set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION}-RC2)
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
@@ -84,16 +84,34 @@ include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
 # Build type cflags
-set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG -Wall -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
+set (CMAKE_C_FLAGS_ALL " -Wall -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -fPIC -pedantic" CACHE INTERNAL "General C Flags")
+
+if (SSE2_FOUND)
+  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
+endif()
+if (SSE3_FOUND)
+  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse3")
+endif()
+if (SSSE3_FOUND)
+  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -mssse3")
+endif()
+if (SSE4_1_FOUND)
+  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.1")
+endif()
+if (SSE4_2_FOUND)
+  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.2")
+endif()
+
+set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
-set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
+set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wextra ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 
-set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-value -fPIC -fprofile-arcs -ftest-coverage" CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wextra -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
-set (CMAKE_C_FLAGS_CHECK " -ggdb3 -Wall -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow -pedantic -Wno-long-long -Wno-unused-value -fPIC" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_C_FLAGS_CHECK " -ggdb3 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
 set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
 
 #####################################
@@ -113,11 +131,6 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
-
-message (STATUS "\n\n====== Finding 3rd Party Packages ======")
-include (${gazebo_cmake_dir}/SearchForStuff.cmake)
-add_subdirectory(deps)
-message (STATUS "----------------------------------------\n")
 
 #####################################
 # Set all the global build flags
@@ -144,6 +157,11 @@ if ( "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
 else()
   set (BUILD_TYPE_DEBUG FALSE)
 endif()
+
+message (STATUS "\n\n====== Finding 3rd Party Packages ======")
+include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+add_subdirectory(deps)
+message (STATUS "----------------------------------------\n")
 
 
 if ( build_warnings )
@@ -186,10 +204,9 @@ else (build_errors)
     add_subdirectory(tools)
     add_subdirectory(plugins)
    
-    #if (INCLUDE_PLAYER)
-    #  add_subdirectory(player)
-    #  add_subdirectory(player_cfgs)
-    #endif (INCLUDE_PLAYER)
+    if (INCLUDE_PLAYER)
+      add_subdirectory(player)
+    endif (INCLUDE_PLAYER)
   endif (BUILD_GAZEBO)
 
   ########################################

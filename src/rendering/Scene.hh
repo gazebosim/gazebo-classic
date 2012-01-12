@@ -158,11 +158,18 @@ namespace gazebo
 
       /// \brief Get a visual at a mouse position
       public: VisualPtr GetVisualAt(CameraPtr camera, math::Vector2i mousePos);
+
+      /// \brief Get a visual directly below a point
+      public: VisualPtr GetVisualBelowPoint(const math::Vector3 &_pt);
  
       /// \brief Helper function for GetVisualAt functions 
       private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera, 
                                              math::Vector2i _mousePos,
                                              bool _ignorSelectionObj);
+
+      /// \brief Helper function for GetVisualAt functions 
+      private: Ogre::Entity *GetOgreEntityBelowPoint(
+                   const math::Vector3 &_mousePos, bool _ignorSelectionObj);
 
       /// \brief Get the world pos of a the first contact at a pixel location
       public: math::Vector3 GetFirstContact(CameraPtr camera, 

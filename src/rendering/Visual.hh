@@ -96,7 +96,7 @@ namespace gazebo
       public: void DetachVisual(const std::string &_name);
   
       /// \brief Attach a renerable object to the visual
-      public: void AttachObject( Ogre::MovableObject *obj);
+      public: void AttachObject(Ogre::MovableObject *obj);
   
       /// \brief Detach all objects
       public: void DetachObjects();

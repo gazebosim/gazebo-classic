@@ -17,20 +17,22 @@
 /* Desc: Gazebo Time functions
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 #include <math.h>
+#include "common/common.h"
+#include "transport/transport.h"
 
-#include "GazeboClient.hh"
 #include "GazeboTime.hh"
-
-using namespace libgazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 GazeboTime::GazeboTime()
 {
+  this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node->Init();
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &GazeboTime::OnStats, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,26 +41,24 @@ GazeboTime::~GazeboTime()
 {
 }
 
+void GazeboTime::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  this->simTime  = gazebo::msgs::Convert( _msg->sim_time() );
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Get the simulator time
-int GazeboTime::GetTime(struct timeval* time)
+int GazeboTime::GetTime(struct timeval *_time)
 {
-  time->tv_sec = (int) floor(GazeboClient::sim->data->simTime);
-  time->tv_usec = (int) floor(fmod((double)GazeboClient::sim->data->simTime, (double)1.0) * 1e6);
-
+  _time->tv_sec = this->simTime.sec;
+  _time->tv_usec = this->simTime.nsec * 1e3;
   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the simulator time
-int GazeboTime::GetTimeDouble(double* time)
+int GazeboTime::GetTimeDouble(double *_time)
 {
-  struct timeval ts;
-
-  ts.tv_sec = (int) floor(GazeboClient::sim->data->simTime);
-  ts.tv_usec = (int) floor(fmod((double)GazeboClient::sim->data->simTime, (double)1.0) * 1e6);
-
-  *time = ts.tv_sec + ts.tv_usec/1e6;
-
+  *_time = this->simTime.Double();
   return 0;
 }

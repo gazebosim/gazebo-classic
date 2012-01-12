@@ -23,10 +23,14 @@
 #define MOVABLETEXT_HH
 
 // TODO: remove this line
-#include "rendering/ogre.h"
-
+#include <OGRE/OgreMovableObject.h>
+#include <OGRE/OgreRenderable.h>
 
 #include <string>
+
+#include "common/CommonTypes.hh"
+#include "common/Color.hh"
+#include "math/MathTypes.hh"
 
 namespace boost
 {
@@ -56,11 +60,11 @@ namespace gazebo
       public: virtual ~MovableText();
     
       /// \brief Loads text and font info 
-      public: void Load(const std::string &name, 
-                          const Ogre::UTFString &text, 
-                          const std::string &fontName = "Arial", 
-                          float charHeight = 1.0,
-                          const Ogre::ColourValue &color = Ogre::ColourValue::White);
+      public: void Load(const std::string &_name, 
+                        const std::string &_text, 
+                        const std::string &_fontName = "Arial", 
+                        float _charHeight = 1.0,
+                        const common::Color &_color = common::Color::White);
     
       /// \brief Set the font
       public: void SetFontName(const std::string &font);
@@ -69,16 +73,16 @@ namespace gazebo
       public: const std::string &GetFont() const;
     
       /// \brief Set the text to display
-      public: void SetText(const Ogre::UTFString & caption);
+      public: void SetText(const std::string & caption);
     
       /// \brief Get the displayed text
-      public: const Ogre::UTFString & GetText() const;
+      public: const std::string &GetText() const;
     
       /// \brief Set the text color
-      public: void SetColor(const Ogre::ColourValue & color);
+      public: void SetColor(const common::Color &_color);
     
       /// \brief Get the text color
-      public: const Ogre::ColourValue & GetColor() const; 
+      public: const common::Color &GetColor() const; 
     
       /// \brief Set the height of a character
       public: void SetCharHeight(float height);
@@ -109,15 +113,15 @@ namespace gazebo
       public: bool GetShowOnTop() const;
     
       /// \brief Get the axis aligned bounding box of the text
-      public: Ogre::AxisAlignedBox GetAABB();
-    
-      /// \brief Method to allow a caller to abstractly iterate over the
-      //         Renderable instances
-      public: virtual void visitRenderables( Ogre::Renderable::Visitor* visitor,
-                                     bool debug = false );
-    
+      public: math::Box GetAABB();
+   
       /// \brief Update the text
       public: void Update();
+
+      /// \brief Method to allow a caller to abstractly iterate over the
+      //         Renderable instances
+      public: virtual void visitRenderables(Ogre::Renderable::Visitor* visitor,
+                  bool debug = false );
   
       /// \brief setup the geometry (from MovableText)
       protected: void _setupGeometry();
@@ -135,11 +139,11 @@ namespace gazebo
       protected: float getSquaredViewDepth(const Ogre::Camera *cam) const;
     
       private: std::string fontName;
-      private: Ogre::UTFString text;
+      private: std::string text;
     
-      private: Ogre::ColourValue color;
+      private: common::Color color;
       private: Ogre::RenderOperation renderOp;
-      private: Ogre::AxisAlignedBox aabb;
+      private: Ogre::AxisAlignedBox *aabb;
       private: Ogre::LightList lightList;
     
       private: float charHeight;
@@ -150,21 +154,21 @@ namespace gazebo
     
       private: Ogre::Camera *camera;
       private: Ogre::RenderWindow *renderWindow;
-      private: float viewportAspectCoef;
       private: Ogre::Font *font;
+      private: Ogre::MaterialPtr material;
+      private: Ogre::MaterialPtr backgroundMaterial;
+ 
+      private: float viewportAspectCoef;
       private: float spaceWidth;
       private: bool updateColors;
       private: VertAlign vertAlign;
       private: HorizAlign horizAlign;
       private: bool onTop;
       private: float baseline;
-      private: Ogre::MaterialPtr material;
-      private: Ogre::MaterialPtr backgroundMaterial;
-    
+   
       private: const Ogre::Quaternion &getWorldOrientation(void) const;
       private: const Ogre::Vector3 &getWorldPosition(void) const;
       private: const Ogre::AxisAlignedBox &getBoundingBox(void) const;
-    
       private: const Ogre::String &getMovableType() const;
     
       private: void _notifyCurrentCamera(Ogre::Camera *cam);
@@ -177,10 +181,12 @@ namespace gazebo
       protected: const Ogre::MaterialPtr &getMaterial(void) const;
     
       /// \brief Get the lights
-      protected: const Ogre::LightList &getLights(void) const; //{return mLList;}; 
+      protected: const Ogre::LightList &getLights(void) const; 
+
       private: bool dirty;
   
       private: boost::recursive_mutex *mutex;
+      private: Ogre::SimpleRenderable *renderable;
     };
     /// \}
   }

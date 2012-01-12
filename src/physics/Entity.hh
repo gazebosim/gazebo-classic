@@ -156,13 +156,15 @@ namespace gazebo
               { return this->isCanonicalLink; }
 
       /// \brief Set an animation for this entity
-      public: void SetAnimation( const common::PoseAnimationPtr &_anim );
+      public: void SetAnimation(const common::PoseAnimationPtr &_anim,
+                                boost::function<void()> _onComplete);
+      public: void SetAnimation(const common::PoseAnimationPtr &_anim);
 
       private: void PublishPose();
  
       /// \brief Get the parent model, if one exists
       /// \return Pointer to a model, or NULL if no parent model exists
-      public: ModelPtr GetParentModel() const;
+      public: ModelPtr GetParentModel();
 
       /// \brief Get a child collision entity, if one exists
       public: CollisionPtr GetChildCollision(const std::string &_name);
@@ -202,7 +204,7 @@ namespace gazebo
 
       /// \brief This function is called when the entity's 
       ///        (or one of its parents) pose of the parent has changed
-      protected: virtual void OnPoseChange() {}
+      protected: virtual void OnPoseChange() = 0;
   
       /// \brief Handle a change of pose
       private: void UpdatePhysicsPose(bool update_children = true);
@@ -236,8 +238,10 @@ namespace gazebo
       protected: math::Pose animationStartPose;
 
       protected: std::vector<event::ConnectionPtr> connections;
+      protected: event::ConnectionPtr animationConnection;
 
       protected: math::Pose dirtyPose;
+      private: boost::function<void()> onAnimationComplete;
 
       private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool);
     };

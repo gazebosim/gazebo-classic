@@ -117,6 +117,9 @@ void OrbitViewController::Init()
 // Update
 void OrbitViewController::Update()
 {
+  if (!this->enabled)
+    return;
+
   math::Vector3 pos;
 
   pos.x = this->distance * -cos(this->yaw) * cos(this->pitch);
@@ -137,6 +140,9 @@ void OrbitViewController::Update()
 /// Handle a mouse event
 void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
+  if (!this->enabled)
+    return;
+
   math::Vector2i drag = _event.pos - _event.prevPos;
 
   math::Vector3 directionVec(0,0,0);

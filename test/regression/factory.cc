@@ -75,7 +75,7 @@ TEST_F(FactoryTest, BlackCamera)
 {
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
-  setPose.Set(math::Vector3(0,0,-5), math::Quaternion(0,DTOR(15),0));
+  setPose.Set(math::Vector3(0,0,-5), math::Quaternion(0,GZ_DTOR(15),0));
   SpawnCamera("camera_model", "camera_sensor", setPose.pos,
       setPose.rot.GetAsEuler());
 
@@ -104,7 +104,7 @@ TEST_F(FactoryTest, Camera)
 {
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
-  setPose.Set(math::Vector3(-5,0,5), math::Quaternion(0,DTOR(15),0));
+  setPose.Set(math::Vector3(-5,0,5), math::Quaternion(0,GZ_DTOR(15),0));
   SpawnCamera("camera_model", "camera_sensor", setPose.pos,
       setPose.rot.GetAsEuler());
 

@@ -1220,7 +1220,6 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    _visual->ShowBoundingBox();
     math::Box bbox = _visual->GetBoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);

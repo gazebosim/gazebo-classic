@@ -92,7 +92,7 @@ namespace gazebo
       public: virtual void PostRender();
   
       /// \brief Update the sensor information
-      public: void Update();
+      public: virtual void Update();
     
       /// Finalize the camera
       public: void Fini();

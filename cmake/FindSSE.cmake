@@ -40,6 +40,15 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
    ELSE (SSE41_TRUE)
       set(SSE4_1_FOUND false CACHE BOOL "SSE4.1 available on host")
    ENDIF (SSE41_TRUE)
+
+   STRING(REGEX REPLACE "^.*(sse4_2).*$" "\\1" SSE_THERE ${CPUINFO})
+   STRING(COMPARE EQUAL "sse4_2" "${SSE_THERE}" SSE42_TRUE)
+   IF (SSE42_TRUE)
+      set(SSE4_2_FOUND true CACHE BOOL "SSE4.2 available on host")
+   ELSE (SSE42_TRUE)
+      set(SSE4_2_FOUND false CACHE BOOL "SSE4.2 available on host")
+   ENDIF (SSE42_TRUE)
+
 ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
    EXEC_PROGRAM("/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE
       CPUINFO)

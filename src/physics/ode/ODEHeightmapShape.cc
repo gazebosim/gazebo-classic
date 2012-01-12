@@ -122,7 +122,7 @@ void ODEHeightmapShape::Init()
   math::Quaternion quat;
   math::Pose pose = oParent->GetWorldPose();
 
-  quat.SetFromEuler(math::Vector3(DTOR(90),0,0));
+  quat.SetFromEuler(math::Vector3(GZ_DTOR(90),0,0));
 
   pose.rot = pose.rot * quat;
   //this->body->SetPose(pose);

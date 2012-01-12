@@ -178,8 +178,7 @@ namespace gazebo
                   boost::function<void()> _onComplete);
 
       /// \brief Attach a static model to this model
-      public: void AttachStaticModel(ModelPtr &_model, 
-                  const std::string &_linkName, math::Pose _offset);
+      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
       public: void DetachStaticModel(const std::string &_model);
 
@@ -224,9 +223,7 @@ namespace gazebo
       private: boost::recursive_mutex *updateMutex;
 
       protected: std::vector<ModelPtr> attachedModels;
-      protected: std::vector<std::string> attachedModelsLinks;
       protected: std::vector<math::Pose> attachedModelsOffset;
-
     };
     /// \}
   }

@@ -85,6 +85,16 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
   this->initialized = true;
 }
 
+void GUIOverlay::Hide()
+{
+  CEGUI::System::getSingletonPtr()->getGUISheet()->hide();
+}
+
+void GUIOverlay::Show()
+{
+  CEGUI::System::getSingletonPtr()->getGUISheet()->show();
+}
+
 void GUIOverlay::Update()
 {
 #ifdef HAVE_CEGUI
@@ -115,14 +125,39 @@ void GUIOverlay::CreateWindow( const std::string &_type,
 #endif
 }
 
+bool GUIOverlay::HandleKeyPressEvent( const std::string &_key)
+{
+#ifdef HAVE_CEGUI
+  CEGUI::System *system = CEGUI::System::getSingletonPtr();
+  int unicode = (int)(_key[0]);
+  if (unicode >= 32 && unicode <= 126)
+    system->injectChar(unicode);
+  else
+    system->injectKeyDown(this->GetKeyCode(_key));
+#endif
+  return true;
+}
+
+bool GUIOverlay::HandleKeyReleaseEvent( const std::string &_key)
+{
+#ifdef HAVE_CEGUI
+  CEGUI::System *system = CEGUI::System::getSingletonPtr();
+  int unicode = (int)(_key[0]);
+  if (unicode <= 32 || unicode >= 126)
+    system->injectKeyUp(this->GetKeyCode(_key));
+#endif
+  return true;
+}
+
 bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
 {
   bool result = false;
-  bool press, release, pos;
+  bool press, release, pos, scroll;
 
   press = false;
   release = false;
   pos = false;
+  scroll = false;
 
 #ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
@@ -148,7 +183,10 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
       release = system->injectMouseButtonUp( CEGUI::MiddleButton );
   }
 
-  result = pos || release || press;
+  if (_evt.type == common::MouseEvent::SCROLL)
+    scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y);
+
+  result = pos || release || press || scroll;
 #endif
 
   return result;
@@ -304,4 +342,97 @@ CEGUI::Window *GUIOverlay::GetWindow( const std::string &_name )
 {
   return CEGUI::WindowManager::getSingletonPtr()->getWindow(_name);
 }
+
+int GUIOverlay::GetKeyCode(const std::string  &_unicode)
+{
+  switch (_unicode[0])
+  {
+    case 'A':
+    case 'a': return CEGUI::Key::A;
+    case 'B':
+    case 'b': return CEGUI::Key::B;
+    case 'C':
+    case 'c': return CEGUI::Key::C;
+    case 'D':
+    case 'd': return CEGUI::Key::D;
+    case 'E':
+    case 'e': return CEGUI::Key::E;
+    case 'F':
+    case 'f': return CEGUI::Key::F;
+    case 'G':
+    case 'g': return CEGUI::Key::G;
+    case 'H':
+    case 'h': return CEGUI::Key::H;
+    case 'I':
+    case 'i': return CEGUI::Key::I;
+    case 'J':
+    case 'j': return CEGUI::Key::J;
+    case 'K':
+    case 'k': return CEGUI::Key::K;
+    case 'L':
+    case 'l': return CEGUI::Key::L;
+    case 'M':
+    case 'm': return CEGUI::Key::M;
+    case 'N':
+    case 'n': return CEGUI::Key::N;
+    case 'O':
+    case 'o': return CEGUI::Key::O;
+    case 'P':
+    case 'p': return CEGUI::Key::P;
+    case 'Q':
+    case 'q': return CEGUI::Key::Q;
+    case 'R':
+    case 'r': return CEGUI::Key::R;
+    case 'S':
+    case 's': return CEGUI::Key::S;
+    case 'T':
+    case 't': return CEGUI::Key::T;
+    case 'U':
+    case 'u': return CEGUI::Key::U;
+    case 'V':
+    case 'v': return CEGUI::Key::V;
+    case 'W':
+    case 'w': return CEGUI::Key::W;
+    case 'X':
+    case 'x': return CEGUI::Key::X;
+    case 'Y':
+    case 'y': return CEGUI::Key::Y;
+    case 'Z':
+    case 'z': return CEGUI::Key::Z;
+    case '1': return CEGUI::Key::One;
+    case '2': return CEGUI::Key::Two;
+    case '3': return CEGUI::Key::Three;
+    case '4': return CEGUI::Key::Four;
+    case '5': return CEGUI::Key::Five;
+    case '6': return CEGUI::Key::Six;
+    case '7': return CEGUI::Key::Seven;
+    case '8': return CEGUI::Key::Eight;
+    case '9': return CEGUI::Key::Nine;
+    case '0': return CEGUI::Key::Zero;
+    case '-': return CEGUI::Key::Minus;
+    case '=': return CEGUI::Key::Equals;
+    case '[': return CEGUI::Key::LeftBracket;
+    case ']': return CEGUI::Key::RightBracket;
+    case ';': return CEGUI::Key::Semicolon;
+    case '\'': return CEGUI::Key::Apostrophe;
+    case '`': return CEGUI::Key::Grave;
+    case '\\': return CEGUI::Key::Backslash;
+    case ',': return CEGUI::Key::Comma;
+    case '.': return CEGUI::Key::Period;
+    case '/': return CEGUI::Key::Slash;
+    case ':': return CEGUI::Key::Colon;
+    case ' ': return CEGUI::Key::Space;
+    case '_': return CEGUI::Key::Underline;
+    case '*': return CEGUI::Key::Multiply;
+  };
+
+  switch ((int)(_unicode[0]))
+  {
+    case 8: return CEGUI::Key::Backspace;
+    case 27: return CEGUI::Key::Escape;
+    case 13: return CEGUI::Key::Return;
+    case 127: return CEGUI::Key::Delete;
+  };
+}
+
 #endif

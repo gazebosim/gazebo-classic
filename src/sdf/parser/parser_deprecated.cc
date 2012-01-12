@@ -154,10 +154,10 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   initAttr(lightNode, "type", _sdf->GetAttribute("type"));
 
   sdf::ElementPtr sdfDiffuse = _sdf->AddElement("diffuse");
-  initAttr(lightNode, "diffuseColor", sdfDiffuse->GetAttribute("rgba"));
+  initAttr(lightNode, "diffuse", sdfDiffuse->GetAttribute("rgba"));
 
   sdf::ElementPtr sdfSpecular = _sdf->AddElement("specular");
-  initAttr(lightNode, "specularColor", sdfDiffuse->GetAttribute("rgba"));
+  initAttr(lightNode, "specular", sdfDiffuse->GetAttribute("rgba"));
 
   sdf::ElementPtr sdfAttenuation = _sdf->AddElement("attenuation");
   initAttr(lightNode, "range", sdfAttenuation->GetAttribute("range"));
@@ -174,8 +174,8 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     double innerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",0));
     double outerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",1));
 
-    sdfSpot->GetAttribute("inner_angle")->SetFromString( boost::lexical_cast<std::string>(DTOR(innerAngle)) );
-    sdfSpot->GetAttribute("outer_angle")->SetFromString( boost::lexical_cast<std::string>(DTOR(outerAngle)) );
+    sdfSpot->GetAttribute("inner_angle")->SetFromString( boost::lexical_cast<std::string>(GZ_DTOR(innerAngle)) );
+    sdfSpot->GetAttribute("outer_angle")->SetFromString( boost::lexical_cast<std::string>(GZ_DTOR(outerAngle)) );
     sdfSpot->GetAttribute("falloff")->SetFromString( getNodeTuple(lightNode, "spotCone",2));
   }
 
@@ -237,7 +237,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdf::ElementPtr sdfHFOV = _sdf->AddElement("horizontal_fov");
   double hfov = boost::lexical_cast<double>(getNodeValue(_config,"hfov"));
   if (!sdfHFOV->GetAttribute("angle")->SetFromString( 
-        boost::lexical_cast<std::string>(DTOR(hfov)) ))
+        boost::lexical_cast<std::string>(GZ_DTOR(hfov)) ))
   {
     gzerr << "Unable to parse hfov angle\n";
     return false;
@@ -327,14 +327,14 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   double maxAngle = boost::lexical_cast<double>(getNodeValue(_config,"maxAngle"));
 
   if (!sdfHoriz->GetAttribute("min_angle")->SetFromString( 
-        boost::lexical_cast<std::string>(DTOR(minAngle)) ))
+        boost::lexical_cast<std::string>(GZ_DTOR(minAngle)) ))
   {
     gzerr << "Unable to parse min_angle\n";
     return false;
   } 
 
   if (!sdfHoriz->GetAttribute("max_angle")->SetFromString( 
-        boost::lexical_cast<std::string>(DTOR(maxAngle)) ))
+        boost::lexical_cast<std::string>(GZ_DTOR(maxAngle)) ))
   {
     gzerr << "Unable to parse max_angle\n";
     return false;
@@ -572,9 +572,9 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       }
       // convert degrees to radian
       std::ostringstream rpy_stream;
-      rpy_stream << DTOR(degrees[0]) << " "
-                 << DTOR(degrees[1]) << " "
-                 << DTOR(degrees[2]);
+      rpy_stream << GZ_DTOR(degrees[0]) << " "
+                 << GZ_DTOR(degrees[1]) << " "
+                 << GZ_DTOR(degrees[2]);
       if (rpy_stream.str().empty()) 
       {
         gzerr << "rpy_stream is empty, something is wrong\n";
@@ -871,7 +871,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("lower")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
@@ -879,7 +879,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("upper")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
 
   }
@@ -904,7 +904,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("lower")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("lower")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
@@ -912,7 +912,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("upper")->Set(stop_angle);
       else
-        sdfLimit->GetAttribute("upper")->Set(DTOR(stop_angle));
+        sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
 
   }
@@ -1010,21 +1010,25 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
 
   sdf::ElementPtr sdfAmbient = _sdf->AddElement("ambient");
-  initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
+  if (sdfAmbient)
+    initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
 
   sdf::ElementPtr sdfBackground = _sdf->AddElement("background");
-  initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
+  if (sdfBackground)
+    initAttr(_config, "background", sdfBackground->GetAttribute("rgba"));
 
   xmlNodePtr sky = firstChildElement(_config, "sky");
   if (sky)
   {
     sdf::ElementPtr sdfSky = sdfBackground->AddElement("sky");
-    initAttr(sky, "material", sdfSky->GetAttribute("material"));
+    if (sdfSky)
+      initAttr(sky, "material", sdfSky->GetAttribute("material"));
   }
 
   sdf::ElementPtr sdfShadow = _sdf->AddElement("shadows");
 
-  initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
+  if (sdfShadow)
+    initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
 
   //  per pixel shading does not allow options
   //sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
@@ -1044,27 +1048,38 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdf::ElementPtr sdfODESolver = sdfODE->AddElement("solver");
   sdf::ElementPtr sdfODEConstraints = sdfODE->AddElement("constraints");
 
-  initAttr(_config, "gravity", sdfGravity->GetAttribute("xyz"));
+  if (sdfGravity)
+    initAttr(_config, "gravity", sdfGravity->GetAttribute("xyz"));
 
-  initAttr(_config, "stepType", sdfODESolver->GetAttribute("type"));
-  initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
-  
-
-  if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
+  if (sdfODESolver)
   {
-    initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
-    initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+    initAttr(_config, "stepType", sdfODESolver->GetAttribute("type"));
+    initAttr(_config, "stepTime", sdfODESolver->GetAttribute("dt"));
+
+    if (sdfODESolver->GetAttribute("type")->GetAsString() == "quick")
+    {
+      initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
+      initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+    }
+
+    if (sdfODESolver->GetAttribute("type")->GetAsString() == "pgs")
+    {
+      initAttr(_config, "stepIters", sdfODESolver->GetAttribute("iters"));
+      initAttr(_config, "stepW", sdfODESolver->GetAttribute("sor"));
+    }
   }
 
 
   // Contraints
-  initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
-  initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
-  initAttr(_config, "contactMaxCorrectingVel", 
-      sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
-  initAttr(_config, "contactSurfaceLayer", 
-      sdfODEConstraints->GetAttribute("contact_surface_layer"));
-
+  if (sdfODEConstraints)
+  {
+    initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
+    initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
+    initAttr(_config, "contactMaxCorrectingVel", 
+        sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
+    initAttr(_config, "contactSurfaceLayer", 
+        sdfODEConstraints->GetAttribute("contact_surface_layer"));
+  }
   return true;
 }
 

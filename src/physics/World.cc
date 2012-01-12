@@ -37,6 +37,7 @@
 #include "common/Console.hh"
 #include "common/Plugin.hh"
 
+#include "physics/RayShape.hh"
 #include "physics/Link.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
@@ -895,9 +896,15 @@ void World::ProcessModelMsgs()
   for (iter = this->modelMsgs.begin();
        iter != this->modelMsgs.end(); iter++)
   {
-    ModelPtr model = this->GetModelById((*iter).id());
+    ModelPtr model;
+    if ((*iter).has_id())
+      model = this->GetModelById((*iter).id());
+    else
+      model = this->GetModelByName((*iter).name());
+
     if (!model)
-      gzerr << "Unable to find model[" << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
+      gzerr << "Unable to find model[" 
+            << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
     else
     {
       model->ProcessMsg(*iter);
@@ -981,3 +988,35 @@ void World::ProcessFactoryMsgs()
 
   this->factoryMsgs.clear();
 }
+
+ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
+{
+  ModelPtr model;
+  EntityPtr entity = this->GetEntityBelowPoint(_pt);
+
+  if (entity)
+    model = entity->GetParentModel();
+  else
+    gzerr << "Unable to find entity below point[" << _pt << "]\n";
+
+  return model;
+}
+
+EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
+{
+  std::string entityName;
+  double dist;
+  math::Vector3 end;
+
+  RayShapePtr rayShape = boost::shared_dynamic_cast<RayShape>(
+    this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
+
+  end = _pt;
+  end.z -= 1000;
+
+  rayShape->SetPoints(_pt, end);
+  rayShape->GetIntersection(dist, entityName);
+  return this->GetEntityByName(entityName);
+}
+
+

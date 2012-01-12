@@ -17,10 +17,6 @@
 #ifndef GAZEBO_HH
 #define GAZEBO_HH
 
-#include "common/common.h"
-#include "math/gzmath.h"
-#include "msgs/msgs.h"
-#include "sdf/sdf.h"
 #include "transport/transport.h"
 
 #include "gazebo_config.h"

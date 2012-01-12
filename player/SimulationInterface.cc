@@ -23,49 +23,60 @@
 #include <time.h>
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
+#include <libplayercore/playercore.h>
 
-#include "gz.h"
+#include "transport/transport.h"
+
+#include "gazebo.h"
+#include "GazeboTime.hh"
 #include "GazeboDriver.hh"
 #include "SimulationInterface.hh"
 
-using namespace libgazebo;
-
 boost::recursive_mutex *SimulationInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
+extern PlayerTime* GlobalTime;
+
+//////////////////////////////////////////////////
 // Constructor
-SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+SimulationInterface::SimulationInterface(player_devaddr_t _addr,
+    GazeboDriver *_driver, ConfigFile *_cf, int _section)
+: GazeboInterface(_addr, _driver, _cf, _section)
 {
-  // Get the ID of the interface
-  this->gz_id = (char*) calloc(1024, sizeof(char));
-  strcat(this->gz_id, GazeboClient::prefixId);
-  strcat(this->gz_id, cf->ReadString(section, "server_id", "default"));
+  gazebo::load();
+  gazebo::init();
+  gazebo::run();
 
-  // ID of the server
-  int serverId = atoi((char*)cf->ReadString(section,"server_id","default"));
+  // steal the global clock - a bit aggressive, but a simple approach
+  if (GlobalTime)
+  {
+    delete GlobalTime;
+    GlobalTime = NULL;
+  }
 
-  // Initialize the Client. Creates the SHM connection
+  GlobalTime = new GazeboTime();
+  assert(GlobalTime != 0);
 
-  GazeboClient::Init(serverId, "");
+  this->node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  this->node->Init(_cf->ReadString(_section, "world_name", "default"));
+  this->statsSub =
+    this->node->Subscribe("~/world_stats", &SimulationInterface::OnStats, this);
 
-  this->iface = new SimulationIface();
+  this->modelPub = this->node->Advertise<gazebo::msgs::Model>("~/model/modify");
 
   this->responseQueue = NULL;
 
-  memset( &this->pose3dReq, 0, sizeof(this->pose3dReq) ); 
-  memset( &this->pose2dReq, 0, sizeof(this->pose2dReq) ); 
+  memset(&this->pose3dReq, 0, sizeof(this->pose3dReq)); 
+  memset(&this->pose2dReq, 0, sizeof(this->pose2dReq)); 
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 SimulationInterface::~SimulationInterface()
 {
-  delete this->iface;
-
+  gazebo::fini();
   if (this->responseQueue)
   {
     delete this->responseQueue;
@@ -73,152 +84,156 @@ SimulationInterface::~SimulationInterface()
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
-                                        player_msghdr_t *hdr, void *data)
+int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
+                                        player_msghdr_t *_hdr, void *_data)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->responseQueue)
     delete this->responseQueue;
 
-  this->responseQueue = new QueuePointer(respQueue);
+  this->responseQueue = new QueuePointer(_respQueue);
 
   /// Set a 3D pose
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                            PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
+  if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
+                            PLAYER_SIMULATION_REQ_SET_POSE3D,
+                            this->device_addr))
   {
-    libgazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose3d_req_t *req =
-      (player_simulation_pose3d_req_t*)(data);
+      (player_simulation_pose3d_req_t*)(_data);
 
-    this->iface->Lock(1);
+    gazebo::math::Pose pose(
+        gazebo::math::Vector3(req->pose.px, req->pose.py, req->pose.pz),
+        gazebo::math::Quaternion(req->pose.proll, req->pose.ppitch,
+                                 req->pose.pyaw));
 
-    gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++ ]);
+    gazebo::msgs::Model msg;
+    msg.set_name(req->name);
+    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    this->modelPub->Publish(msg);
 
-    gzReq->type = libgazebo::SimulationRequestData::SET_POSE3D;
-    strcpy((char*)gzReq->name, req->name);
-
-    gzReq->modelPose.pos.x = req->pose.px;
-    gzReq->modelPose.pos.y = req->pose.py;
-    gzReq->modelPose.pos.z = req->pose.pz;
-
-    gzReq->modelPose.roll = req->pose.proll;
-    gzReq->modelPose.pitch = req->pose.ppitch;
-    gzReq->modelPose.yaw = req->pose.pyaw;
-
-    this->iface->Unlock();
-
-    this->driver->Publish(this->device_addr, respQueue,
+    this->driver->Publish(this->device_addr, _respQueue,
                           PLAYER_MSGTYPE_RESP_ACK, 
                           PLAYER_SIMULATION_REQ_SET_POSE3D);
-
   }
 
   /// Set a 2D pose
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_SET_POSE2D, 
                                  this->device_addr))
   {
-    libgazebo::SimulationRequestData *gzReq = NULL;
-
     player_simulation_pose2d_req_t *req =
-      (player_simulation_pose2d_req_t*)(data);
+      (player_simulation_pose2d_req_t*)(_data);
 
-    this->iface->Lock(1);
+    gazebo::math::Pose pose(
+        gazebo::math::Vector3(req->pose.px, req->pose.py, 0),
+        gazebo::math::Quaternion(0, 0, req->pose.pa));
 
-    gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++]);
+    gazebo::msgs::Model msg;
+    msg.set_name(req->name);
+    gazebo::msgs::Set(msg.mutable_pose(), pose);
+    this->modelPub->Publish(msg);
 
-    gzReq->type = libgazebo::SimulationRequestData::SET_POSE2D;
-
-    strcpy((char*)gzReq->name, req->name);
-
-    gzReq->modelPose.pos.x = req->pose.px;
-    gzReq->modelPose.pos.y = req->pose.py;
-    gzReq->modelPose.yaw = req->pose.pa;
-
-    this->iface->Unlock();
-
-    this->driver->Publish(this->device_addr, respQueue,
+    this->driver->Publish(this->device_addr, _respQueue,
                           PLAYER_MSGTYPE_RESP_ACK, 
                           PLAYER_SIMULATION_REQ_SET_POSE2D);
   }
 
   /// Get a 3d pose
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_GET_POSE3D, 
                                  this->device_addr))
   {
-    libgazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose3d_req_t *req =
-      (player_simulation_pose3d_req_t*)(data);
+      (player_simulation_pose3d_req_t*)(_data);
 
-    this->iface->Lock(1);
+    std::map<std::string, gazebo::math::Pose>::iterator iter;
 
-    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
+    iter = this->entityPoses.find(req->name);
+    if (iter != this->entityPoses.end())
+    {
+      strcpy(this->pose3dReq.name, req->name);
+      this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
-    gzReq->type = libgazebo::SimulationRequestData::GET_POSE3D;
+      this->pose3dReq.pose.px = iter->second.pos.x;
+      this->pose3dReq.pose.py = iter->second.pos.y;
+      this->pose3dReq.pose.pz = iter->second.pos.z;
 
-    strcpy((char*)gzReq->name, req->name);
+      this->pose3dReq.pose.proll = iter->second.rot.GetAsEuler().x;
+      this->pose3dReq.pose.ppitch = iter->second.rot.GetAsEuler().y;
+      this->pose3dReq.pose.pyaw = iter->second.rot.GetAsEuler().z;
+    }
 
-    this->iface->Unlock();
+    this->driver->Publish(this->device_addr, *(this->responseQueue),
+        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
+        &this->pose3dReq, sizeof(this->pose3dReq), NULL);
   }
 
   /// Get a 2D pose
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_GET_POSE2D, 
                                  this->device_addr))
   {
-    libgazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose2d_req_t *req =
-      (player_simulation_pose2d_req_t*)(data);
+      (player_simulation_pose2d_req_t*)(_data);
 
-    this->iface->Lock(1);
+    std::map<std::string, gazebo::math::Pose>::iterator iter;
 
-    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
+    iter = this->entityPoses.find(req->name);
+    if (iter != this->entityPoses.end())
+    {
+      strcpy(this->pose3dReq.name, req->name);
+      this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
-    gzReq->type = libgazebo::SimulationRequestData::GET_POSE2D;
+      this->pose2dReq.pose.px = iter->second.pos.x;
+      this->pose2dReq.pose.py = iter->second.pos.y;
+      this->pose2dReq.pose.pa = iter->second.rot.GetAsEuler().z;
+    }
+    this->driver->Publish(this->device_addr, *(this->responseQueue),
+        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
+        &this->pose2dReq, sizeof(this->pose2dReq), NULL);
 
-    strcpy((char*)gzReq->name, req->name);
-
-    this->iface->Unlock();
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_GET_PROPERTY, 
                                  this->device_addr))
   {
     player_simulation_property_req_t *req =
-      (player_simulation_property_req_t*)(data);
+      (player_simulation_property_req_t*)(_data);
 
     std::string name = req->name;
     std::string prop = req->prop;
 
     if (name == "world")
     {
-      this->iface->Lock(1);
       req->value = new char[ sizeof(double) ];
       req->value_count = sizeof(double);
 
       if (prop == "sim_time")
       {
-        memcpy(req->value, &this->iface->data->simTime, sizeof(double));
+        memcpy(req->value, &this->simTime, sizeof(double));
       }
       else if (prop == "pause_time")
       {
-        memcpy(req->value, &this->iface->data->pauseTime, sizeof(double));
+        memcpy(req->value, &this->pauseTime, sizeof(double));
       }
       else if (prop == "real_time")
       {
-        memcpy(req->value, &this->iface->data->realTime, sizeof(double));
+        memcpy(req->value, &this->realTime, sizeof(double));
       }
       else if (prop == "state")
       {
-        memcpy(req->value, &this->iface->data->state, sizeof(int));
+        if (this->paused)
+          req->value[0] = 0;
+        else
+          req->value[0] = 1;
       }
-      this->iface->Unlock();
 
-      this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY, req, sizeof(*req), NULL);
+      this->driver->Publish(this->device_addr, _respQueue,
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_SIMULATION_REQ_GET_PROPERTY, req,
+                          sizeof(*req), NULL);
 
       if (req->value)
       {
@@ -228,79 +243,34 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     }
     else
     {
-      this->iface->Lock(1);
-      libgazebo::SimulationRequestData *gzReq = NULL;
-      gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
-
-      if (prop == "num_children")
+      if (prop == "fiducial_id")
       {
-        gzReq->type = libgazebo::SimulationRequestData::GET_NUM_CHILDREN;
-        strcpy((char*)gzReq->name, req->name);   
-      }
-      else if (prop == "model_name")
-      {
-        gzReq->type = libgazebo::SimulationRequestData::GET_MODEL_NAME;
-        gzReq->uintValue = req->index;
-      }
-      else if (prop == "child_name")
-      {
-        gzReq->type = libgazebo::SimulationRequestData::GET_CHILD_NAME;
-        gzReq->uintValue = req->index;
-        strcpy((char*)gzReq->name, req->name);   
-      }
-       else if (prop == "fiducial_id")
-      {
-        gzReq->type = libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID;
-        strcpy((char*)gzReq->name, req->name);   
-      }
-      else if (prop == "model_type")
-      {
-        gzReq->type = libgazebo::SimulationRequestData::GET_MODEL_TYPE;
-        strcpy((char*)gzReq->name, req->name);   
-      }
-      else if ((prop == "num_models") && (name == "world"))
-      { 
-        libgazebo::SimulationRequestData *gzReq = NULL;
-        gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
-        gzReq->type = libgazebo::SimulationRequestData::GET_NUM_MODELS;
+        //strcpy((char*)gzReq->name, req->name);   
       }
       else 
       {
-        this->iface->data->requestCount--; //we did ++ but didnt introduced real request 
-        std::cerr << "The object [" << name << "] does not have the property [" << prop << "].\n";
+        gzerr << "The object [" << name
+          << "] does not have the property [" << prop << "].\n";
       }
-      this->iface->Unlock();
     }
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
                                  PLAYER_SIMULATION_CMD_PAUSE, 
                                  this->device_addr))
   {
-    this->iface->Lock(1);
-    libgazebo::SimulationRequestData *gzReq = NULL;
-    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
-    gzReq->type = SimulationRequestData::PAUSE;
-    this->iface->Unlock();
+    // TODO: Implement
   } 
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
                                  PLAYER_SIMULATION_CMD_RESET, 
                                  this->device_addr))
   {
-    this->iface->Lock(1);
-    libgazebo::SimulationRequestData *gzReq = NULL;
-    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
-    gzReq->type = SimulationRequestData::RESET;
-    this->iface->Unlock();
+    // TODO:: Implement
   } 
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+  else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
                                  PLAYER_SIMULATION_CMD_SAVE, 
                                  this->device_addr))
   {
-    this->iface->Lock(1);
-    libgazebo::SimulationRequestData *gzReq = NULL;
-    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
-    gzReq->type = SimulationRequestData::SAVE;
-    this->iface->Unlock();
+    // TODO:: Implement
   }
   else
     printf("Unhandled Process message[%d][%d]\n",0,0);
@@ -309,82 +279,12 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Update this interface, publish new info. This is
 // called from GazeboDriver::Update
 void SimulationInterface::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  libgazebo::SimulationRequestData *response = NULL;
-  this->iface->Lock(1);
-
-  for (unsigned int i=0; i < this->iface->data->responseCount; i++)
-  {
-    response = &(this->iface->data->responses[i]);
-
-    switch (response->type)
-    {
-      case libgazebo::SimulationRequestData::SET_STATE:
-      case libgazebo::SimulationRequestData::GO:
-      case libgazebo::SimulationRequestData::PAUSE:
-      case libgazebo::SimulationRequestData::RESET:
-      case libgazebo::SimulationRequestData::SAVE:
-      case libgazebo::SimulationRequestData::SET_POSE2D:
-      case libgazebo::SimulationRequestData::SET_POSE3D:
-        break;
-
-      case libgazebo::SimulationRequestData::GET_POSE3D:
-        {
-
-          if (this->pose3dReq.name_count != strlen(response->name))
-          {
-            if (this->pose3dReq.name)
-              delete [] this->pose3dReq.name;
-            this->pose3dReq.name = new char[strlen(response->name)+1];
-          }
-
-          strcpy(this->pose3dReq.name, response->name);
-          this->pose3dReq.name_count = strlen(this->pose3dReq.name);
-
-          this->pose3dReq.pose.px = response->modelPose.pos.x;
-          this->pose3dReq.pose.py = response->modelPose.pos.y;
-          this->pose3dReq.pose.pz = response->modelPose.pos.z;
-
-          this->pose3dReq.pose.proll = response->modelPose.roll;
-          this->pose3dReq.pose.ppitch = response->modelPose.pitch;
-          this->pose3dReq.pose.pyaw = response->modelPose.yaw;
-
-          this->driver->Publish(this->device_addr, *(this->responseQueue),
-              PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
-              &this->pose3dReq, sizeof(this->pose3dReq), NULL);
-
-          break;
-        }
-      case libgazebo::SimulationRequestData::GET_POSE2D:
-        {
-
-          if (this->pose2dReq.name_count != strlen(response->name))
-          {
-            if (this->pose2dReq.name)
-              delete [] this->pose2dReq.name;
-            this->pose2dReq.name = new char[strlen(response->name)+1];
-          }
-
-          strcpy(this->pose2dReq.name, response->name);
-          this->pose2dReq.name_count = strlen(this->pose2dReq.name);
-
-          this->pose2dReq.pose.px = response->modelPose.pos.x;
-          this->pose2dReq.pose.py = response->modelPose.pos.y;
-          this->pose2dReq.pose.pa = response->modelPose.yaw;
-
-          this->driver->Publish(this->device_addr, *(this->responseQueue),
-              PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
-              &this->pose2dReq, sizeof(this->pose2dReq), NULL);
-
-          break;
-        }
-
-      case libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
+      /*case libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
         {
           player_simulation_property_req_t *req ;
           memset (req, 0, sizeof(player_simulation_property_req_t));
@@ -395,45 +295,28 @@ void SimulationInterface::Update()
                           PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY, req, sizeof(*req), NULL);
           break;
         }
-
-
-
-
-    }
-  }
-
-  this->iface->data->responseCount = 0;
-
-  this->iface->Unlock();
+        */
 
   return;
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Open a SHM interface when a subscription is received. This is called from
 // GazeboDriver::Subscribe
 void SimulationInterface::Subscribe()
 {
-  // Open the interface
-  try
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open(GazeboClient::client, this->gz_id);
-  }
-  catch (std::string e)
-  {
-    //std::ostringstream stream;
-    std::cout <<"Error Subscribing to Gazebo Simulation Interface\n"
-    << e << "\n";
-    //gzthrow(stream.str());
-    exit(0);
-  }
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void SimulationInterface::Unsubscribe()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  this->iface->Close();
+}
+
+void SimulationInterface::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  this->simTime  = gazebo::msgs::Convert(_msg->sim_time()).Double();
+  this->realTime  = gazebo::msgs::Convert(_msg->real_time()).Double();
+  this->pauseTime  = gazebo::msgs::Convert(_msg->pause_time()).Double();
+  this->paused  = _msg->paused();
 }

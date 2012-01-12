@@ -49,7 +49,7 @@ namespace gazebo
   
       /// \brief Handle a mouse event
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);
-  
+
       /// \brief Get the type name of this view controller
       public: static std::string GetTypeString();
   

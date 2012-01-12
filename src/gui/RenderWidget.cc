@@ -107,7 +107,7 @@ RenderWidget::RenderWidget( QWidget *parent )
 
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
-  this->timer->start(33);
+  this->timer->start(44);
 
   this->connections.push_back( 
       gui::Events::ConnectFullScreen( 
@@ -202,15 +202,18 @@ void RenderWidget::update()
   this->zPosEdit->setText(tr(stream.str().c_str()));
   stream.str("");
 
-  stream << std::fixed << std::setprecision(2) << RTOD(pose.rot.GetAsEuler().x);
+  stream << std::fixed << std::setprecision(2)
+         << GZ_RTOD(pose.rot.GetAsEuler().x);
   this->rollEdit->setText(tr(stream.str().c_str()));
   stream.str("");
 
-  stream << std::fixed << std::setprecision(2) << RTOD(pose.rot.GetAsEuler().y);
+  stream << std::fixed << std::setprecision(2)
+         << GZ_RTOD(pose.rot.GetAsEuler().y);
   this->pitchEdit->setText(tr(stream.str().c_str()));
   stream.str("");
 
-  stream << std::fixed << std::setprecision(2) << RTOD(pose.rot.GetAsEuler().z);
+  stream << std::fixed << std::setprecision(2)
+         << GZ_RTOD(pose.rot.GetAsEuler().z);
   this->yawEdit->setText(tr(stream.str().c_str()));
   stream.str("");
 

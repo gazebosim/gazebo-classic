@@ -53,14 +53,17 @@ void FPSViewController::Update()
 /// Handle a mouse event
 void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
+  if (!this->enabled)
+    return;
+
   math::Vector2i drag = _event.pos - _event.prevPos;
 
   math::Vector3 directionVec(0,0,0);
 
   if (_event.buttons & common::MouseEvent::LEFT)
   {
-    this->camera->RotateYaw(DTOR(drag.x * 0.1));
-    this->camera->RotatePitch(DTOR(-drag.y * 0.1));
+    this->camera->RotateYaw(GZ_DTOR(drag.x * 0.1));
+    this->camera->RotatePitch(GZ_DTOR(-drag.y * 0.1));
   }
   else if (_event.buttons & common::MouseEvent::RIGHT)
   {

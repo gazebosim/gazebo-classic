@@ -17,11 +17,10 @@
 /* Desc: Position Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
-#ifndef POSITION2DINTERFACE_HH
-#define POSITION2DINTERFACE_HH
+#ifndef GAZEBO_POSITION2DINTERFACE_HH
+#define GAZEBO_POSITION2DINTERFACE_HH
 
 #include "GazeboInterface.hh"
 
@@ -31,58 +30,44 @@ namespace boost
 }
 
 
-namespace libgazebo
-{
-  
-  /// \addtogroup player_iface 
-  /// \{
-  /// \defgroup position2d_player Position2d Interface
-  /// \brief Position2d Player interface
-  /// \{
-  
-  // Forward declarations
-  class PositionIface;
-  
-  /// \brief Position2d Player interface
-  class Position2dInterface : public GazeboInterface
-  {
-    /// \brief Constructor
-    public: Position2dInterface(player_devaddr_t addr, GazeboDriver *driver,
-                                ConfigFile *cf, int section);
-  
-    /// \brief Destructor
-    public: virtual ~Position2dInterface();
-  
-    /// \brief Handle all messages. This is called from GazeboDriver
-    public: virtual int ProcessMessage(QueuePointer &respQueue,
-                                       player_msghdr_t *hdr, void *data);
-  
-    /// \brief Update this interface, publish new info.
-    public: virtual void Update();
-  
-    /// \brief Open a SHM interface when a subscription is received.
-    ///        This is called fromGazeboDriver::Subscribe
-    public: virtual void Subscribe();
-  
-    /// \brief Close a SHM interface. This is called from
-    ///        GazeboDriver::Unsubscribe
-    public: virtual void Unsubscribe();
-  
-    private: PositionIface *iface;
-  
-    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-    private: char *gz_id;
-  
-    /// \brief Timestamp on last data update
-    private: double datatime;
+/// \addtogroup player_iface 
+/// \{
+/// \defgroup position2d_player Position2d Interface
+/// \brief Position2d Player interface
+/// \{
 
-    private: static boost::recursive_mutex *mutex;
-  };
-  
-  /// \} 
-  /// \} 
-  
-  
-}
+/// \brief Position2d Player interface
+class Position2dInterface : public GazeboInterface
+{
+  /// \brief Constructor
+  public: Position2dInterface(player_devaddr_t _addr, GazeboDriver *_driver,
+                              ConfigFile *_cf, int _section);
+
+  /// \brief Destructor
+  public: virtual ~Position2dInterface();
+
+  /// \brief Handle all messages. This is called from GazeboDriver
+  public: virtual int ProcessMessage(QueuePointer &_respQueue,
+                                     player_msghdr_t *_hdr, void *_data);
+
+  /// \brief Update this interface, publish new info.
+  public: virtual void Update();
+
+  /// \brief Open a SHM interface when a subscription is received.
+  ///        This is called fromGazeboDriver::Subscribe
+  public: virtual void Subscribe();
+
+  /// \brief Close a SHM interface. This is called from
+  ///        GazeboDriver::Unsubscribe
+  public: virtual void Unsubscribe();
+
+  /// \brief Timestamp on last data update
+  private: double datatime;
+
+  private: static boost::recursive_mutex *mutex;
+};
+
+/// \} 
+/// \} 
 
 #endif

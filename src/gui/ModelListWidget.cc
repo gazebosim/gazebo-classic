@@ -1526,7 +1526,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
       _parent->addSubProperty(item);
   }
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
-  item->setValue(RTOD(rpy.x));
+  item->setValue(GZ_RTOD(rpy.x));
 
   // Add Pitch value
   item = (QtVariantProperty*)this->GetChildItem(_parent, "pitch");
@@ -1537,7 +1537,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
       _parent->addSubProperty(item);
   }
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
-  item->setValue(RTOD(rpy.y));
+  item->setValue(GZ_RTOD(rpy.y));
 
   // Add Yaw value
   item = (QtVariantProperty*)this->GetChildItem(_parent, "yaw");
@@ -1548,7 +1548,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
       _parent->addSubProperty(item);
   }
   ((QtVariantPropertyManager*)this->variantFactory->propertyManager(item))->setAttribute(item, "decimals", 6);
-  item->setValue(RTOD(rpy.z));
+  item->setValue(GZ_RTOD(rpy.z));
 }
 
 void ModelListWidget::ProcessPoseMsgs()
@@ -1608,7 +1608,7 @@ void ModelListWidget::OnRequest(
   }
 }
 
-void ModelListWidget::OnRemoveScene(const std::string &_name)
+void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
 {
   this->poseMsgs.clear();
   this->modelTreeWidget->clear();

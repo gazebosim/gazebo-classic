@@ -17,21 +17,20 @@
 /* Desc: Simulation Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
-#ifndef SIMULATIONINTERFACE_HH
-#define SIMULATIONINTERFACE_HH
+#ifndef GAZEBO_SIMULATION_INTERFACE_HH
+#define GAZEBO_SIMULATION_INTERFACE_HH
 
 #include "GazeboInterface.hh"
+#include "msgs/msgs.h"
+#include "transport/TransportTypes.hh"
 
 namespace boost
 {
   class recursive_mutex;
 }
 
-namespace libgazebo
-{
 /// \addtogroup player_iface 
 /// \{
 /// \defgroup simulation_player Simulation Interface
@@ -51,7 +50,6 @@ namespace libgazebo
 /// \brief The Simulation interface
 /// \{
 ///
-  class SimulationIface;
 
 /// \brief The Simulation interface
 class SimulationInterface : public GazeboInterface
@@ -77,11 +75,7 @@ class SimulationInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-  private: char *gz_id;
-
-  /// \brief Pointer to the Simulation Interface
-  public: SimulationIface *iface;
+  private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
   private: QueuePointer *responseQueue;
 
@@ -89,10 +83,16 @@ class SimulationInterface : public GazeboInterface
 
   private: player_simulation_pose2d_req_t pose2dReq;
   private: static boost::recursive_mutex *mutex;
+
+  private: gazebo::transport::NodePtr node;
+  private: gazebo::transport::SubscriberPtr statsSub;
+  private: gazebo::transport::PublisherPtr modelPub;
+  private: double simTime, realTime, pauseTime;
+  private: bool paused;
+
+  private: std::map<std::string, gazebo::math::Pose> entityPoses;
 };
 
   /// \} 
   /// \} 
-
-}
 #endif

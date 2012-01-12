@@ -24,11 +24,18 @@
  * @update  2007 by independentCreations see independentCreations@gmail.com
  */
 
+#include "common/common.h"
+#include "math/gzmath.h"
 #include "rendering/MovableText.hh"
 
 #include <boost/thread/recursive_mutex.hpp>
-#include <OgreFontManager.h>
-#include <OgrePrerequisites.h>
+
+#include <OGRE/OgreFontManager.h>
+#include <OGRE/OgreMaterialManager.h>
+#include <OGRE/OgreHardwareBufferManager.h>
+#include <OGRE/OgreCamera.h>
+#include <OGRE/OgreNode.h>
+#include <OGRE/OgreRoot.h>
 
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1
@@ -41,8 +48,8 @@ using namespace rendering;
 MovableText::MovableText()
     : camera(NULL),
     renderWindow(NULL) ,
-    viewportAspectCoef (0.75),
     font(NULL) ,
+    viewportAspectCoef (0.75),
     spaceWidth(0) ,
     updateColors(true) ,
     vertAlign(V_BELOW) ,
@@ -54,6 +61,7 @@ MovableText::MovableText()
 
   this->dirty = true;
   this->mutex = new boost::recursive_mutex();
+  this->aabb = new Ogre::AxisAlignedBox;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,15 +72,16 @@ MovableText::~MovableText()
     delete this->renderOp.vertexData;
 
   delete this->mutex;
+  delete this->aabb;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //Loads the text to display and select the font
 void MovableText::Load( const std::string &name_,
-                        const Ogre::UTFString &text_,
+                        const std::string &text_,
                         const std::string &fontName_,
                         float charHeight_,
-                        const Ogre::ColourValue &color_)
+                        const common::Color &color_)
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -98,8 +107,7 @@ void MovableText::Load( const std::string &name_,
 
   this->SetFontName(this->fontName);
 
-  // TODO: is this necessary?
-  //this->_setupGeometry();
+  this->_setupGeometry();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +127,8 @@ void MovableText::SetFontName(const std::string &newFontName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if ((Ogre::MaterialManager::getSingletonPtr()->resourceExists(this->mName + "Material")))
+  if ((Ogre::MaterialManager::getSingletonPtr()->resourceExists(
+          this->mName + "Material")))
   {
     Ogre::MaterialManager::getSingleton().remove(this->mName + "Material");
   }
@@ -161,7 +170,7 @@ void MovableText::SetFontName(const std::string &newFontName)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the caption
-void MovableText::SetText(const Ogre::UTFString &newText)
+void MovableText::SetText(const std::string &newText)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -174,7 +183,7 @@ void MovableText::SetText(const Ogre::UTFString &newText)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the color
-void MovableText::SetColor(const Ogre::ColourValue &newColor)
+void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -266,10 +275,16 @@ bool MovableText::GetShowOnTop() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the axis aligned bounding box
-Ogre::AxisAlignedBox MovableText::GetAABB(void)
+math::Box MovableText::GetAABB(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return this->aabb;
+  return math::Box(
+      math::Vector3(this->aabb->getMinimum().x,
+                    this->aabb->getMinimum().y,
+                    this->aabb->getMinimum().z),
+      math::Vector3(this->aabb->getMaximum().x,
+                    this->aabb->getMaximum().y,
+                    this->aabb->getMaximum().z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -292,7 +307,7 @@ void MovableText::_setupGeometry()
   size_t offset = 0;
   float maxSquaredRadius = 0.0f;
   bool first = true;
-  Ogre::UTFString::iterator i;
+  std::string::iterator i;
   bool newLine = true;
   float len = 0.0f;
 
@@ -376,14 +391,14 @@ void MovableText::_setupGeometry()
     }
   }
 
-  for ( i = this->text.begin(); i != this->text.end(); ++i )
+  for (i = this->text.begin(); i != this->text.end(); ++i)
   {
-    if ( newLine )
+    if (newLine)
     {
       len = 0.0;
-      for ( Ogre::UTFString::iterator j = i; j != this->text.end(); j++ )
+      for (std::string::iterator j = i; j != this->text.end(); j++ )
       {
-        Ogre::Font::CodePoint character = j.getCharacter();
+        Ogre::Font::CodePoint character = *j;
         if (character == 0x000D // CR
             || character == 0x0085) // NEL
         {
@@ -395,14 +410,15 @@ void MovableText::_setupGeometry()
         }
         else
         {
-          len += this->font->getGlyphAspectRatio(character) * this->charHeight * 2.0 * this->viewportAspectCoef;
+          len += this->font->getGlyphAspectRatio(character) *
+                 this->charHeight * 2.0 * this->viewportAspectCoef;
         }
       }
 
       newLine = false;
     }
 
-    Ogre::Font::CodePoint character = i.getCharacter();
+    Ogre::Font::CodePoint character = (*i);
 
     if (character == 0x000D // CR
         || character == 0x0085) // NEL
@@ -424,7 +440,8 @@ void MovableText::_setupGeometry()
       continue;
     }
 
-    float horiz_height = this->font->getGlyphAspectRatio(character) * this->viewportAspectCoef ;
+    float horiz_height = this->font->getGlyphAspectRatio(character) *
+                         this->viewportAspectCoef;
 
     const Ogre::Font::UVRect& uvRect = this->font->getGlyphTexCoords(character);
 
@@ -588,12 +605,10 @@ void MovableText::_setupGeometry()
   ptbuf->unlock();
 
 
-  /*  min.x=min.y=min.z=-10000;
-    max.x=max.y=max.z = 10000;
-    */
 
   // update AABB/Sphere radius
-  this->aabb = Ogre::AxisAlignedBox(min, max);
+  this->aabb->setMinimum(min);
+  this->aabb->setMaximum(max);
   this->radius = Ogre::Math::Sqrt(maxSquaredRadius);
 
   if (this->updateColors)
@@ -617,11 +632,15 @@ void MovableText::_updateColors(void)
   assert(!this->material.isNull());
 
   // Convert to system-specific
-  Ogre::Root::getSingleton().convertColourValue(this->color, & clr);
+  Ogre::ColourValue cv(this->color.R(), this->color.G(),
+                       this->color.B(), this->color.A());
+  Ogre::Root::getSingleton().convertColourValue(cv, &clr);
 
-  vbuf = this->renderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);
+  vbuf = this->renderOp.vertexData->vertexBufferBinding->getBuffer(
+         COLOUR_BINDING);
 
-  pDest = static_cast<Ogre::RGBA*>(vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+  pDest = static_cast<Ogre::RGBA*>(
+      vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   for (i = 0; i < this->renderOp.vertexData->vertexCount; ++i)
   {
@@ -653,7 +672,7 @@ const Ogre::Vector3 & MovableText::getWorldPosition(void) const
 const Ogre::AxisAlignedBox &MovableText::getBoundingBox(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return this->aabb;
+  return *this->aabb;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -677,7 +696,8 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
     //mParentNode->_getDerivedOrientation().ToRotationMatrix(rot3x3);
 
     // parent node position
-    Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() + Ogre::Vector3::UNIT_Y * this->baseline;
+    Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() +
+                         Ogre::Vector3::UNIT_Z * this->baseline;
 
     // apply scale
     scale3x3[0][0] = mParentNode->_getDerivedScale().x / 2;
