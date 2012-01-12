@@ -40,6 +40,9 @@ namespace gazebo
 
       public: void Init(Ogre::RenderTarget *_renderTarget);
 
+      public: void Hide();
+      public: void Show();
+
       public: void Update();
 
       public: bool IsInitialized();

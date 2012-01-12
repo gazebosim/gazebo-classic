@@ -176,6 +176,8 @@ void UserCamera::Update()
 
       this->scene->GetManager()->destroyAnimation("cameratrack");
       this->scene->GetManager()->destroyAnimationState("cameratrack");
+      if (this->onAnimationComplete)
+        this->onAnimationComplete();
     }
   }
 
@@ -521,10 +523,13 @@ bool UserCamera::MoveToPosition( const math::Vector3 &_end,
 }
 
 bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts, 
-                                 double _time)
+                                 double _time,
+                                 boost::function<void()> _onComplete)
 {
   if (this->animState)
     return false;
+
+  this->onAnimationComplete = _onComplete;
 
   Ogre::TransformKeyFrame *key;
   math::Vector3 start = this->GetWorldPose().pos;

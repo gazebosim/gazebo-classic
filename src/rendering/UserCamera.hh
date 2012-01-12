@@ -101,7 +101,8 @@ namespace gazebo
                                   double _pitch, double _yaw, double _time);
 
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
-                                   double _time);
+                                   double _time,
+                                   boost::function<void()> _onComplete);
 
       /// \brief Set the camera to be attached to a scene node
       protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
@@ -136,6 +137,7 @@ namespace gazebo
       private: FPSViewController *fpsViewController;
   
       private: Ogre::AnimationState *animState;
+      private: boost::function<void()> onAnimationComplete;
 
       private: GUIOverlay *gui;
     };
