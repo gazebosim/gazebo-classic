@@ -548,9 +548,8 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  double dt = _time / _pts.size();
+  double dt = _time / (_pts.size()-1);
   double tt = 0;
-  std::cout << "Time[" << _time << "] DT[" << dt << "]\n";
   for (unsigned int i=0; i < _pts.size(); i++)
   {
     math::Vector3 pos = _pts[i].pos;
@@ -565,7 +564,6 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
     Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0,0,1));
     Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0,1,0));
 
-    std::cout << "TT[" << tt << "]\n";
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
     key->setRotation(yawFinal);
