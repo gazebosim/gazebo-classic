@@ -87,12 +87,16 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
 
 void GUIOverlay::Hide()
 {
+#ifdef HAVE_CEGUI
   CEGUI::System::getSingletonPtr()->getGUISheet()->hide();
+#endif
 }
 
 void GUIOverlay::Show()
 {
+#ifdef HAVE_CEGUI
   CEGUI::System::getSingletonPtr()->getGUISheet()->show();
+#endif
 }
 
 void GUIOverlay::Update()
