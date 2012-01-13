@@ -13,7 +13,9 @@ link_directories(
   ${ODE_LIBRARY_DIRS}
 )
 
-add_subdirectory(player)
+if (INCLUDE_PLAYER)
+  add_subdirectory(player)
+endif()
 
 find_package(GTest REQUIRED)
 include_directories( ${GTEST_INCLUDE_DIRS} )
