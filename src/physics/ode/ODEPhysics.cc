@@ -752,11 +752,14 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       collision2 = (ODECollision*) dGeomGetData(o2);
 
-    if (collision1->GetShapeType() == Base::TRIMESH_SHAPE ||
-        collision2->GetShapeType() == Base::TRIMESH_SHAPE )
-      self->AddTrimeshCollider(collision1, collision2);
-    else
-      self->AddCollider(collision1, collision2);
+    if (collision1 && collision2)
+    {
+      if (collision1->GetShapeType() == Base::TRIMESH_SHAPE ||
+          collision2->GetShapeType() == Base::TRIMESH_SHAPE )
+        self->AddTrimeshCollider(collision1, collision2);
+      else
+        self->AddCollider(collision1, collision2);
+    }
   }
 }
 

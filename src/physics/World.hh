@@ -282,6 +282,8 @@ namespace gazebo
       private: std::list<msgs::Model> modelMsgs;
 
       private: bool needsReset;
+
+      private: RayShapePtr testRay;
     };
 
     /// \}

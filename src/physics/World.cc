@@ -107,6 +107,8 @@ World::~World()
   this->sdf->Reset();
   this->rootElement.reset();
   this->node.reset();
+
+  this->testRay.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,6 +185,7 @@ void World::Load( sdf::ElementPtr _sdf )
 
     event::Events::worldCreated(this->GetName());
   }
+
 }
 
 void World::Save(const std::string &_filename)
@@ -213,6 +216,9 @@ void World::Init()
 
   // Initialize the physics engine
   this->physicsEngine->Init();
+
+  this->testRay = boost::shared_dynamic_cast<RayShape>(
+      this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1008,14 +1014,12 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   double dist;
   math::Vector3 end;
 
-  RayShapePtr rayShape = boost::shared_dynamic_cast<RayShape>(
-    this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
-
   end = _pt;
   end.z -= 1000;
 
-  rayShape->SetPoints(_pt, end);
-  rayShape->GetIntersection(dist, entityName);
+  this->physicsEngine->InitForThread();
+  this->testRay->SetPoints(_pt, end);
+  this->testRay->GetIntersection(dist, entityName);
   return this->GetEntityByName(entityName);
 }
 
