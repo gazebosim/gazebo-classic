@@ -22,7 +22,7 @@
 
 namespace gazebo
 {
-	namespace gui
+  namespace gui
   {
     class LightMaker : public EntityMaker
     {
@@ -36,7 +36,6 @@ namespace gazebo
 
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &) {}
-
       protected: virtual void CreateTheEntity();
 
       protected: int state;
@@ -50,24 +49,25 @@ namespace gazebo
     {
       public: PointLightMaker() : LightMaker()
               {
-                this->msg.set_type( msgs::Light::POINT );
-                this->msg.set_cast_shadows( false );
+                this->msg.set_type(msgs::Light::POINT);
+                this->msg.set_cast_shadows(false);
                 this->lightTypename = "point";
               }
-    
+
     };
 
     class SpotLightMaker : public LightMaker
     {
       public: SpotLightMaker() : LightMaker()
               {
-                this->msg.set_type( msgs::Light::SPOT );
-                msgs::Set(this->msg.mutable_direction(), math::Vector3(0,0,-1));
-                this->msg.set_cast_shadows( false );
+                this->msg.set_type(msgs::Light::SPOT);
+                msgs::Set(this->msg.mutable_direction(),
+                          math::Vector3(0, 0, -1));
+                this->msg.set_cast_shadows(false);
 
-                this->msg.set_spot_inner_angle( 0.6 );
-                this->msg.set_spot_outer_angle( 1.0 );
-                this->msg.set_spot_falloff( 1.0 );
+                this->msg.set_spot_inner_angle(0.6);
+                this->msg.set_spot_outer_angle(1.0);
+                this->msg.set_spot_falloff(1.0);
                 this->lightTypename  = "spot";
               }
     };
@@ -76,9 +76,10 @@ namespace gazebo
     {
       public: DirectionalLightMaker() : LightMaker()
               {
-                this->msg.set_type( msgs::Light::DIRECTIONAL );
-                msgs::Set( this->msg.mutable_direction(), math::Vector3(.1, .1, -0.9));
-                this->msg.set_cast_shadows( true );
+                this->msg.set_type(msgs::Light::DIRECTIONAL);
+                msgs::Set(this->msg.mutable_direction(),
+                          math::Vector3(.1, .1, -0.9));
+                this->msg.set_cast_shadows(true);
 
                 this->lightTypename  = "directional";
               }
@@ -87,3 +88,5 @@ namespace gazebo
   }
 }
 #endif
+
+

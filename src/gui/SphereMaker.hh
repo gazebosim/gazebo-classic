@@ -27,33 +27,33 @@ namespace gazebo
     class Visual;
   }
 
-	namespace gui
+  namespace gui
   {
+    class SphereMaker : public EntityMaker
+    {
+      public: SphereMaker();
+      public: virtual ~SphereMaker();
 
-   class SphereMaker : public EntityMaker
-   {
-     public: SphereMaker();
-     public: virtual ~SphereMaker();
-   
-     public: virtual void Start(const rendering::UserCameraPtr camera);
-                                 //const CreateCallback &cb);
-     
-     public: virtual void Stop();
-     public: virtual bool IsActive() const;
- 
-     public: virtual void OnMousePush(const common::MouseEvent &event);
-     public: virtual void OnMouseRelease(const common::MouseEvent &event);
-     public: virtual void OnMouseDrag(const common::MouseEvent &event);
-   
-     protected: virtual void CreateTheEntity();
- 
-     private: int state;
-     private: bool leftMousePressed;
-     private: math::Vector2i mousePushPos;
-     private: msgs::Visual *visualMsg;
- 
-     private: static unsigned int counter;
-   };
- }
+      public: virtual void Start(const rendering::UserCameraPtr _camera);
+              //const CreateCallback &cb);
+
+      public: virtual void Stop();
+      public: virtual bool IsActive() const;
+
+      public: virtual void OnMousePush(const common::MouseEvent &_event);
+      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
+      protected: virtual void CreateTheEntity();
+
+      private: int state;
+      private: bool leftMousePressed;
+      private: math::Vector2i mousePushPos;
+      private: msgs::Visual *visualMsg;
+
+      private: static unsigned int counter;
+    };
+  }
 }
 #endif
+

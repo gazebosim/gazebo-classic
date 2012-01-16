@@ -49,9 +49,9 @@ EntityMaker::~EntityMaker()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether to snap to grid
-void EntityMaker::SetSnapToGrid(bool snap)
+void EntityMaker::SetSnapToGrid(bool _snap)
 {
-  snapToGrid = snap;
+  snapToGrid = _snap;
 }
 
 
@@ -72,17 +72,18 @@ void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get a point snapped to a grid
-math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 p)
+math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
 {
-  math::Vector3 result = p;
+  math::Vector3 result = _p;
 
   if (this->snapToGrid)
   {
-    math::Vector3 rounded = (p / this->snapGridSize).GetRounded() *
+    math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
       this->snapGridSize;
-    if (p.Distance( rounded ) < this->snapDistance)
+    if (_p.Distance(rounded) < this->snapDistance)
       result = rounded;
   }
 
   return result;
 }
+

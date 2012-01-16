@@ -16,7 +16,7 @@
 using namespace gazebo;
 using namespace gui;
 
-ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
+ModelBuilderWidget::ModelBuilderWidget(QWidget *_parent)
   : QWidget(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -32,11 +32,11 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
 
   this->glWidget = new GLWidget(renderFrame);
   rendering::ScenePtr scene = rendering::create_scene("model_builder", true);
-  this->glWidget->ViewScene( scene );
+  this->glWidget->ViewScene(scene);
 
   frameLayout->addWidget(this->glWidget);
   renderFrame->setLayout(frameLayout);
-  renderFrame->layout()->setContentsMargins(4,4,4,4);
+  renderFrame->layout()->setContentsMargins(4, 4, 4, 4);
 
   QFrame *rightFrame = new QFrame;
   rightFrame->setLineWidth(1);
@@ -50,14 +50,18 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   connect(this->boxCreateAct, SIGNAL(triggered()), this, SLOT(CreateBox()));
   toolbar->addAction(boxCreateAct);
 
-  this->sphereCreateAct = new QAction(QIcon(":/images/sphere.png"), tr("Sphere"), this);
+  this->sphereCreateAct = new QAction(QIcon(":/images/sphere.png"),
+      tr("Sphere"), this);
   this->sphereCreateAct->setStatusTip(tr("Create a sphere"));
-  connect(this->sphereCreateAct, SIGNAL(triggered()), this, SLOT(CreateSphere()));
+  connect(this->sphereCreateAct, SIGNAL(triggered()), this,
+      SLOT(CreateSphere()));
   toolbar->addAction(sphereCreateAct);
 
-  this->cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"), tr("Cylinder"), this);
+  this->cylinderCreateAct = new QAction(QIcon(":/images/cylinder.png"),
+      tr("Cylinder"), this);
   this->cylinderCreateAct->setStatusTip(tr("Create a sphere"));
-  connect(this->cylinderCreateAct, SIGNAL(triggered()), this, SLOT(CreateCylinder()));
+  connect(this->cylinderCreateAct, SIGNAL(triggered()), this,
+      SLOT(CreateCylinder()));
   toolbar->addAction(cylinderCreateAct);
 
   splitter->addWidget(renderFrame);
@@ -71,42 +75,42 @@ ModelBuilderWidget::ModelBuilderWidget( QWidget *parent )
   mainLayout->addWidget(splitter);
 
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0,0,0,0);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  // TODO: Use messages so that the gui doesn't depend upon physics 
+  // TODO: Use messages so that the gui doesn't depend upon physics
   physics::init();
   this->world = physics::create_world("model_builder");
-  this->world->Load( sdf::ElementPtr());
+  this->world->Load(sdf::ElementPtr());
   this->world->Init();
   this->world->SetPaused(true);
-  
+
   msgs::Factory msg;
   std::ostringstream newModelStr;
 
-  newModelStr << "<?xml version='1.0'?>";
+  newModelStr << "<?xml version ='1.0'?>";
 
-  newModelStr << "<model name='my_new_model'>\
+  newModelStr << "<model name ='my_new_model'>\
     <static>true</static>\
-    <origin xyz='0 0 0'/>\
-    <link name='body'>\
-      <collision name='geom'>\
+    <origin xyz ='0 0 0'/>\
+    <link name ='body'>\
+      <collision name ='geom'>\
         <geometry>\
-          <box size='1 1 1'/>\
+          <box size ='1 1 1'/>\
         </geometry>\
         <mass>0.5</mass>\
       </collision>\
       <visual>\
         <geometry>\
-          <box size='1 1 1'/>\
+          <box size ='1 1 1'/>\
         </geometry>\
-        <material name='Gazebo/Grey'/>\
+        <material name ='Gazebo/Grey'/>\
         <cast_shadows>true</cast_shadows>\
         <shader>pixel</shader>\
       </visual>\
     </link>\
   </model>";
 
-  msg.set_sdf( newModelStr.str() );
+  msg.set_sdf(newModelStr.str());
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("model_builder");
@@ -127,33 +131,34 @@ void ModelBuilderWidget::Init()
 
 void ModelBuilderWidget::CreateBox()
 {
-  this->glWidget->CreateEntity("box", 
-      boost::bind(&ModelBuilderWidget::OnBoxCreate, this, _1, _2) );
+  this->glWidget->CreateEntity("box",
+      boost::bind(&ModelBuilderWidget::OnBoxCreate, this, _1, _2));
 }
 
 void ModelBuilderWidget::CreateSphere()
 {
   this->glWidget->CreateEntity("sphere",
-      boost::bind(&ModelBuilderWidget::OnSphereCreate, this, _1, _2) );
+      boost::bind(&ModelBuilderWidget::OnSphereCreate, this, _1, _2));
 }
 
 void ModelBuilderWidget::CreateCylinder()
 {
   this->glWidget->CreateEntity("cylinder",
-      boost::bind(&ModelBuilderWidget::OnCylinderCreate, this, _1, _2) );
+      boost::bind(&ModelBuilderWidget::OnCylinderCreate, this, _1, _2));
 }
 
-void ModelBuilderWidget::OnBoxCreate(const math::Vector3 &/*pos*/,  
+void ModelBuilderWidget::OnBoxCreate(const math::Vector3 &/*pos*/,
                                      const math::Vector3 &/*scale*/)
 {
 }
 
-void ModelBuilderWidget::OnSphereCreate(const math::Vector3 &/*pos*/,  
+void ModelBuilderWidget::OnSphereCreate(const math::Vector3 &/*pos*/,
                                      const math::Vector3 &/*scale*/)
 {
 }
 
-void ModelBuilderWidget::OnCylinderCreate(const math::Vector3 &/*pos*/,  
+void ModelBuilderWidget::OnCylinderCreate(const math::Vector3 &/*pos*/,
                                      const math::Vector3 &/*scale*/)
 {
 }
+

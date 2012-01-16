@@ -17,7 +17,7 @@ namespace gazebo
     class TimePanel : public QWidget
     {
       Q_OBJECT
-      public: TimePanel( QWidget *parent = 0 );
+      public: TimePanel(QWidget *_parent = 0);
       public: virtual ~TimePanel();
 
       private slots: void Update();
@@ -33,7 +33,7 @@ namespace gazebo
       private: QLineEdit *realTimeEdit;
       private: QLabel *pauseLabel;
 
-      private: common::Time lastUpdateTime,statusUpdatePeriod;
+      private: common::Time lastUpdateTime, statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;
 
       private: transport::NodePtr node;
@@ -46,3 +46,4 @@ namespace gazebo
 }
 
 #endif
+

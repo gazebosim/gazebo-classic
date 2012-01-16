@@ -325,7 +325,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
 
   std::vector<std::string> strs;
   std::vector<std::string>::iterator iter, end;
-  boost::split(strs, valueStr, boost::is_any_of("\t "));
+  boost::split(strs, valueStr, boost::is_any_of("   "));
 
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter+= 3)
@@ -592,7 +592,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   math::Vector2d vec;
 
   std::vector<std::string> strs;
-  boost::split(strs, pStr, boost::is_any_of("\t "));
+  boost::split(strs, pStr, boost::is_any_of("   "));
   for (unsigned int j = 0; j < strs.size(); j+= inputs.size())
   {
     for (unsigned int i = 0; i < inputs.size(); i++)

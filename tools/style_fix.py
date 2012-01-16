@@ -73,6 +73,7 @@ def ProcessFile(filename):
     # Add space around =
     line = re.sub(r'(\w|\d)=','\\1 =',line)
     line = re.sub(r'=(\w|\d)','= \\1',line)
+    line = re.sub(r'\t','  ',line)
 
     regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('
     if re.match(regexp, line) and not re.search(r'\(\)\(\)',line):
@@ -95,6 +96,8 @@ def ProcessFile(filename):
             paramType = param[0:index]
             paramName = param[index+1:]
             paramNameStripped = paramName.lstrip("*&")
+            if len(paramNameStripped) <= 0:
+              continue
             if re.search(r'\[', paramNameStripped):
               index2 = paramNameStripped.find('[')
               paramNameStripped = paramNameStripped[0:index2]

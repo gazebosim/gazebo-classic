@@ -22,21 +22,21 @@
 
 namespace gazebo
 {
-	namespace gui
+  namespace gui
   {
     class SpotLightMaker : public EntityMaker
     {
       public: SpotLightMaker();
       public: virtual ~SpotLightMaker();
-    
-      public: virtual void Start(const rendering::UserCameraPtr camera);
+
+      public: virtual void Start(const rendering::UserCameraPtr _camera);
       public: virtual void Stop();
       public: virtual bool IsActive() const;
 
       public: virtual void OnMousePush(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
- 
+
       private: virtual void CreateTheEntity();
       private: int state;
       private: msgs::Light msg;
@@ -45,3 +45,4 @@ namespace gazebo
   }
 }
 #endif
+

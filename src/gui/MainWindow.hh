@@ -29,7 +29,7 @@ namespace gazebo
       public: unsigned int GetEntityId(const std::string &_name);
       public: bool HasEntityName(const std::string &_name);
 
-      protected: void closeEvent(QCloseEvent *event);
+      protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
@@ -57,7 +57,7 @@ namespace gazebo
       private slots: void OnResetWorld();
 
       private: void OnFullScreen(bool _value);
-      private: void OnMoveMode(bool mode);
+      private: void OnMoveMode(bool _mode);
 
       private: void CreateActions();
       private: void CreateMenus();
@@ -131,3 +131,4 @@ namespace gazebo
 }
 
 #endif
+

@@ -27,48 +27,48 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: GLWidget(QWidget *parent=0);
+      public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
-      public: void ViewScene(rendering::ScenePtr scene);
+      public: void ViewScene(rendering::ScenePtr _scene);
       public: rendering::UserCameraPtr GetCamera() const;
       public: rendering::ScenePtr GetScene() const;
 
-      public: void CreateEntity(const std::string &name);
+      public: void CreateEntity(const std::string &_name);
 
       public: void Clear();
 
       signals:
         void clicked();
 
-      protected: virtual void moveEvent(QMoveEvent *e);
-      protected: virtual void paintEvent(QPaintEvent *e);
-      protected: virtual void resizeEvent(QResizeEvent *e);
-      protected: virtual void showEvent(QShowEvent *e);
+      protected: virtual void moveEvent(QMoveEvent *_e);
+      protected: virtual void paintEvent(QPaintEvent *_e);
+      protected: virtual void resizeEvent(QResizeEvent *_e);
+      protected: virtual void showEvent(QShowEvent *_e);
 
 
-      protected: void keyPressEvent( QKeyEvent *_event);
-      protected: void keyReleaseEvent( QKeyEvent *_event);
-      protected: void wheelEvent(QWheelEvent *event);
-      protected: void mousePressEvent(QMouseEvent *event);
-      protected: void mouseMoveEvent(QMouseEvent *event);
-      protected: void mouseReleaseEvent(QMouseEvent *event);
+      protected: void keyPressEvent(QKeyEvent *_event);
+      protected: void keyReleaseEvent(QKeyEvent *_event);
+      protected: void wheelEvent(QWheelEvent *_event);
+      protected: void mousePressEvent(QMouseEvent *_event);
+      protected: void mouseMoveEvent(QMouseEvent *_event);
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
 
       private: std::string GetOgreHandle() const;
 
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
-      private: void OnMoveMode(bool mode);
-      private: void OnCreateEntity( const std::string &_type );
+      private: void OnMoveMode(bool _mode);
+      private: void OnCreateEntity(const std::string &_type);
       private: void OnFPS();
       private: void OnOrbit();
 
-      private: void RotateEntity( rendering::VisualPtr &_vis );
-      private: void TranslateEntity( rendering::VisualPtr &_vis );
+      private: void RotateEntity(rendering::VisualPtr &_vis);
+      private: void TranslateEntity(rendering::VisualPtr &_vis);
 
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
-      private: bool eventFilter(QObject *obj, QEvent *event);
+      private: bool eventFilter(QObject *_obj, QEvent *_event);
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
@@ -102,3 +102,4 @@ namespace gazebo
 }
 
 #endif
+

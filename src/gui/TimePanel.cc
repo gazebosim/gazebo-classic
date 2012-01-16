@@ -8,8 +8,8 @@
 using namespace gazebo;
 using namespace gui;
 
-TimePanel::TimePanel( QWidget *parent )
-  : QWidget( parent )
+TimePanel::TimePanel(QWidget *_parent)
+  : QWidget(_parent)
 {
   QHBoxLayout *mainLayout = new QHBoxLayout;
 
@@ -26,7 +26,7 @@ TimePanel::TimePanel( QWidget *parent )
   this->realTimeEdit->setFixedWidth(110);
 
   this->pauseLabel =
-    new QLabel(tr("<font style='color:'#dddddd'>Paused</font>"));
+    new QLabel(tr("<font style ='color:'#dddddd'>Paused</font>"));
 
   QLabel *percentRealTimeLabel = new QLabel(tr("Real Time Factor:"));
   QLabel *simTimeLabel = new QLabel(tr("Sim Time:"));
@@ -48,12 +48,12 @@ TimePanel::TimePanel( QWidget *parent )
   mainLayout->addWidget(timeResetButton);
   mainLayout->addWidget(this->pauseLabel);
 
-  mainLayout->addItem(new QSpacerItem(20,20,QSizePolicy::Expanding,
+  mainLayout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding,
                                       QSizePolicy::Minimum));
 
-  this->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0,0,0,0);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -67,9 +67,9 @@ TimePanel::TimePanel( QWidget *parent )
   connect(timer, SIGNAL(timeout()), this, SLOT(Update()));
   timer->start(33);
 
-  this->connections.push_back( 
-      gui::Events::ConnectFullScreen( 
-        boost::bind(&TimePanel::OnFullScreen, this, _1) ) );
+  this->connections.push_back(
+      gui::Events::ConnectFullScreen(
+        boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   this->simTime.Set(0);
 }
@@ -89,14 +89,14 @@ TimePanel::~TimePanel()
 void TimePanel::OnStats(
     ConstWorldStatisticsPtr &_msg)
 {
-  this->simTime  = msgs::Convert( _msg->sim_time() );
-  this->realTime = msgs::Convert( _msg->real_time() );
+  this->simTime  = msgs::Convert(_msg->sim_time());
+  this->realTime = msgs::Convert(_msg->real_time());
   if (_msg->paused())
     this->pauseLabel->setText(
-        "<font style='color:green;font-weight:bold;'>Paused</font>");
+        "<font style ='color:green;font-weight:bold;'>Paused</font>");
   else
     this->pauseLabel->setText(
-        "<font style='color:green;font-weight:bold;'>      </font>");
+        "<font style ='color:green;font-weight:bold;'>      </font>");
 }
 
 void TimePanel::Update()
@@ -115,7 +115,7 @@ void TimePanel::Update()
     sim << std::fixed << std::setprecision(2) << simDbl/3600 << " hrs";
   else if (simDbl > 999)
     sim << std::fixed << std::setprecision(2) << simDbl/60 << " min";
-  else 
+  else
     sim << std::fixed << std::setprecision(2) << simDbl << " sec";
 
   double realDbl = this->realTime.Double();
@@ -132,14 +132,14 @@ void TimePanel::Update()
 
   if (simDbl > 0)
     percent << std::fixed << std::setprecision(2)
-      << ( this->simTime / this->realTime).Double();
+      << (this->simTime / this->realTime).Double();
   else
     percent << "0";
 
-  this->percentRealTimeEdit->setText( tr(percent.str().c_str()) );
+  this->percentRealTimeEdit->setText(tr(percent.str().c_str()));
 
-  this->simTimeEdit->setText( tr(sim.str().c_str()));
-  this->realTimeEdit->setText( tr(real.str().c_str()) );
+  this->simTimeEdit->setText(tr(sim.str().c_str()));
+  this->realTimeEdit->setText(tr(real.str().c_str()));
 }
 
 void TimePanel::OnTimeReset()
@@ -148,3 +148,4 @@ void TimePanel::OnTimeReset()
   msg.set_reset_time(true);
   this->worldControlPub->Publish(msg);
 }
+

@@ -139,17 +139,17 @@ namespace gazebo
                   const gazebo::common::Material &_m)
               {
                 _out << "Material:\n";
-                _out << "\tName: " << _m.name << "\n";
-                _out << "\tTexture: " << _m.texImage << "\n";
-                _out << "\tAmbient: " << _m.ambient << "\n";
-                _out << "\tDiffuse: " << _m.diffuse << "\n";
-                _out << "\tSpecular: " << _m.specular << "\n";
-                _out << "\tEmissive: " << _m.emissive << "\n";
-                _out << "\tTransparency: " << _m.transparency << "\n";
-                _out << "\tShininess: " << _m.shininess << "\n";
-                _out << "\tBlendMode: " << BlendModeStr[_m.blendMode] << "\n";
-                _out << "\tShadeMode: " << ShadeModeStr[_m.shadeMode] << "\n";
-                _out << "\tDepthWrite: " << _m.depthWrite << "\n";
+                _out << "  Name: " << _m.name << "\n";
+                _out << "  Texture: " << _m.texImage << "\n";
+                _out << "  Ambient: " << _m.ambient << "\n";
+                _out << "  Diffuse: " << _m.diffuse << "\n";
+                _out << "  Specular: " << _m.specular << "\n";
+                _out << "  Emissive: " << _m.emissive << "\n";
+                _out << "  Transparency: " << _m.transparency << "\n";
+                _out << "  Shininess: " << _m.shininess << "\n";
+                _out << "  BlendMode: " << BlendModeStr[_m.blendMode] << "\n";
+                _out << "  ShadeMode: " << ShadeModeStr[_m.shadeMode] << "\n";
+                _out << "  DepthWrite: " << _m.depthWrite << "\n";
                 return _out;
               }
 

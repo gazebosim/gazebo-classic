@@ -50,14 +50,14 @@ CylinderMaker::~CylinderMaker()
   delete this->visualMsg;
 }
 
-void CylinderMaker::Start(const rendering::UserCameraPtr camera)
+void CylinderMaker::Start(const rendering::UserCameraPtr _camera)
                           //const CreateCallback &cb)
 {
   //this->createCB = cb;
-  this->camera = camera;
+  this->camera = _camera;
   std::ostringstream stream;
   stream << "__GZ_USER_cylinder_" << counter++;
-  this->visualMsg->set_name( stream.str() );
+  this->visualMsg->set_name(stream.str());
   this->state = 1;
 }
 
@@ -78,12 +78,12 @@ bool CylinderMaker::IsActive() const
   return this->state > 0;
 }
 
-void CylinderMaker::OnMousePush(const common::MouseEvent &event)
+void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
-  this->mousePushPos = event.pressPos;
+  this->mousePushPos = _event.pressPos;
 }
 
 void CylinderMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
@@ -100,7 +100,7 @@ void CylinderMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
   }
 }
 
-void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
+void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
@@ -109,33 +109,34 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   math::Vector3 p1, p2;
 
   if (this->state == 1)
-    norm.Set(0,0,1);
+    norm.Set(0, 0, 1);
   else if (this->state == 2)
-    norm.Set(1,0,0);
+    norm.Set(1, 0, 0);
 
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x, 
+  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
                                           this->mousePushPos.y, norm, 0, p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
   }
 
-  p1 = this->GetSnappedPoint( p1 );
+  p1 = this->GetSnappedPoint(p1);
 
-  if (!this->camera->GetWorldPointOnPlane(event.pos.x,event.pos.y,norm,0,p2))
+  if (!this->camera->GetWorldPointOnPlane(
+        _event.pos.x, _event.pos.y, norm, 0, p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
   }
 
-  p2 = this->GetSnappedPoint( p2 );
+  p2 = this->GetSnappedPoint(p2);
 
   if (this->state == 1)
-    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
+    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
-  math::Vector3 p( this->visualMsg->pose().position().x(),
+  math::Vector3 p(this->visualMsg->pose().position().x(),
              this->visualMsg->pose().position().y(),
-             this->visualMsg->pose().position().z() );
+             this->visualMsg->pose().position().z());
 
   math::Vector3 scale;
 
@@ -149,12 +150,12 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &event)
   else
   {
     this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(
-        (this->mousePushPos.y - event.pos.y)*0.01);
+        (this->mousePushPos.y - _event.pos.y)*0.01);
 
-    p.z = ((this->mousePushPos.y - event.pos.y)*0.01)/2.0;
+    p.z = ((this->mousePushPos.y - _event.pos.y)*0.01)/2.0;
   }
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   this->visPub->Publish(*this->visualMsg);
 }
 
@@ -164,33 +165,37 @@ void CylinderMaker::CreateTheEntity()
   std::ostringstream newModelStr;
 
 
-  newModelStr << "<gazebo version='1.0'>\
-    <model name='custom_user_cylinder" << counter << "_model'>\
-      <origin pose='" << this->visualMsg->pose().position().x() << " " 
-                      << this->visualMsg->pose().position().y() << " " 
+  newModelStr << "<gazebo version ='1.0'>\
+    <model name ='custom_user_cylinder" << counter << "_model'>\
+      <origin pose ='" << this->visualMsg->pose().position().x() << " "
+                      << this->visualMsg->pose().position().y() << " "
                       << this->visualMsg->pose().position().z() << " 0 0 0'/>\
-      <link name='body'>\
-        <inertial mass='1.0'>\
-            <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
+      <link name ='body'>\
+        <inertial mass ='1.0'>\
+            <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
         </inertial>\
-        <collision name='geom'>\
+        <collision name ='geom'>\
           <geometry>\
-            <cylinder radius='" << this->visualMsg->geometry().cylinder().radius() << "'\
-                      length='" << this->visualMsg->geometry().cylinder().length() << "'/>\
+            <cylinder radius ='" <<
+            this->visualMsg->geometry().cylinder().radius() << "'\
+                      length ='" <<
+                      this->visualMsg->geometry().cylinder().length() << "'/>\
           </geometry>\
         </collision>\
-        <visual name='visual' cast_shadows='true'>\
+        <visual name ='visual' cast_shadows ='true'>\
           <geometry>\
-            <cylinder radius='" << this->visualMsg->geometry().cylinder().radius() << "'\
-                      length='" << this->visualMsg->geometry().cylinder().length() << "'/>\
+            <cylinder radius ='" <<
+            this->visualMsg->geometry().cylinder().radius() << "'\
+                      length ='" <<
+                      this->visualMsg->geometry().cylinder().length() << "'/>\
           </geometry>\
-          <material script='Gazebo/Grey'/>\
+          <material script ='Gazebo/Grey'/>\
         </visual>\
       </link>\
     </model>\
     </gazebo>";
 
-  msg.set_sdf( newModelStr.str() );
+  msg.set_sdf(newModelStr.str());
 
   msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());
@@ -200,4 +205,5 @@ void CylinderMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
+
 

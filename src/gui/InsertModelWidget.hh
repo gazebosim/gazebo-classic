@@ -18,7 +18,7 @@ namespace gazebo
     class InsertModelWidget : public QWidget
     {
       Q_OBJECT
-      public: InsertModelWidget( QWidget *parent = 0 );
+      public: InsertModelWidget(QWidget *_parent = 0);
       public: virtual ~InsertModelWidget();
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
@@ -39,3 +39,4 @@ namespace gazebo
   }
 }
 #endif
+

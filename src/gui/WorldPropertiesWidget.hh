@@ -30,7 +30,7 @@ namespace gazebo
     class WorldPropertiesWidget : public QWidget
     {
       Q_OBJECT
-      public: WorldPropertiesWidget( QWidget *parent = 0 );
+      public: WorldPropertiesWidget(QWidget *_parent = 0);
       public: virtual ~WorldPropertiesWidget();
 
       protected: void closeEvent(QCloseEvent * /*_event*/);
@@ -44,7 +44,7 @@ namespace gazebo
     class PhysicsWidget : public QWidget
     {
       Q_OBJECT
-      public: PhysicsWidget( QWidget *parent = 0 );
+      public: PhysicsWidget(QWidget *_parent = 0);
       public: virtual ~PhysicsWidget();
 
       public: void Init();
@@ -85,7 +85,7 @@ namespace gazebo
     class SceneWidget : public QWidget
     {
       Q_OBJECT
-      public: SceneWidget( QWidget *parent = 0 );
+      public: SceneWidget(QWidget *_parent = 0);
       public: virtual ~SceneWidget();
       public: void Init();
 
@@ -99,7 +99,7 @@ namespace gazebo
       private slots: void OnFogType(int _index);
       private slots: void OnFogToggle(bool _value);
 
-      private slots: void OnShadows(bool _state=false);
+      private slots: void OnShadows(bool _state = false);
 
       private: void OnResponse(
                    ConstResponsePtr &_msg);
@@ -130,3 +130,4 @@ namespace gazebo
 }
 
 #endif
+

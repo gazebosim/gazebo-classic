@@ -22,7 +22,7 @@ namespace gazebo
     class ModelEditWidget : public QWidget
     {
       Q_OBJECT
-      public: ModelEditWidget( QWidget *parent = 0 );
+      public: ModelEditWidget(QWidget *_parent = 0);
       public: virtual ~ModelEditWidget();
 
       protected: void closeEvent(QCloseEvent * /*_event*/);
@@ -33,7 +33,7 @@ namespace gazebo
     class ModelPropertyWidget : public QWidget
     {
       Q_OBJECT
-      public: ModelPropertyWidget( QWidget *parent = 0 );
+      public: ModelPropertyWidget(QWidget *_parent = 0);
       public: virtual ~ModelPropertyWidget();
 
       private: QLineEdit *nameEdit;
@@ -47,3 +47,4 @@ namespace gazebo
 }
 
 #endif
+

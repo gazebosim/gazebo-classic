@@ -33,7 +33,7 @@ namespace gazebo
     class ModelListWidget : public QWidget
     {
       Q_OBJECT
-      public: ModelListWidget( QWidget *parent = 0 );
+      public: ModelListWidget(QWidget *_parent = 0);
       public: virtual ~ModelListWidget();
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
@@ -48,7 +48,7 @@ namespace gazebo
       private slots: void OnTransparent();
 
       private: void OnResponse(
-                   ConstResponsePtr &_msg );
+                   ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
 
@@ -72,22 +72,22 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Collision &_msg,
                                      QtProperty *_parent);
 
-      private: void FillMsgField(QtProperty *_item, 
+      private: void FillMsgField(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Reflection *_reflection,
                    const google::protobuf::FieldDescriptor *_field);
 
-      private: void FillMsg(QtProperty *_item, 
+      private: void FillMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor,
                    QtProperty *_changedItem);
 
-      private: void FillGeometryMsg(QtProperty *_item, 
+      private: void FillGeometryMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor,
                    QtProperty *_changedItem);
 
-      private: void FillPoseMsg(QtProperty *_item, 
+      private: void FillPoseMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor);
 
@@ -103,11 +103,11 @@ namespace gazebo
                                            const std::string &_name);
 
       private: QtProperty *GetChildItemValue(const std::string &_name);
-      private: QtProperty *GetChildItemValue(QtProperty *_item, 
+      private: QtProperty *GetChildItemValue(QtProperty *_item,
                                              const std::string &_name);
 
       private: QtProperty *GetChildItem(const std::string &_name);
-      private: QtProperty *GetChildItem(QtProperty *_item, 
+      private: QtProperty *GetChildItem(QtProperty *_item,
                                         const std::string &_name);
 
       private: bool HasChildItem(QtProperty *_parent, QtProperty *_child);
@@ -133,7 +133,7 @@ namespace gazebo
 
       private: void ProcessPoseMsgs();
 
-      private: void InitTransport(const std::string &_name="");
+      private: void InitTransport(const std::string &_name ="");
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -171,3 +171,4 @@ namespace gazebo
   }
 }
 #endif
+

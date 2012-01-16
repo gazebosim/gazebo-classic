@@ -23,16 +23,16 @@
 using namespace gazebo;
 using namespace gui;
 
-InsertModelWidget::InsertModelWidget( QWidget *parent )
-  : QWidget( parent )
+InsertModelWidget::InsertModelWidget(QWidget *_parent)
+  : QWidget(_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
   this->fileTreeWidget->setColumnCount(1);
-  this->fileTreeWidget->setContextMenuPolicy( Qt::CustomContextMenu );
+  this->fileTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->fileTreeWidget->header()->hide();
   connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-          this, SLOT(OnModelSelection(QTreeWidgetItem *, int)) );
+          this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
   QHBoxLayout *buttonLayout = new QHBoxLayout;
   this->addButton = new QPushButton(tr("Apply"));
@@ -44,40 +44,42 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
   buttonLayout->addWidget(this->addButton);
   buttonLayout->addWidget(this->cancelButton);
 
-
   mainLayout->addWidget(this->fileTreeWidget);
   mainLayout->addLayout(buttonLayout);
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0,0,0,0);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 
   QList<QTreeWidgetItem*> items;
-  std::list<std::string> gazeboPaths = common::SystemPaths::Instance()->GetGazeboPaths();
+  std::list<std::string> gazeboPaths =
+    common::SystemPaths::Instance()->GetGazeboPaths();
 
   // Iterate over all the gazebo paths
-  for (std::list<std::string>::iterator iter = gazeboPaths.begin(); 
+  for (std::list<std::string>::iterator iter = gazeboPaths.begin();
        iter != gazeboPaths.end(); iter++)
   {
     // This is the full model path
-    std::string path = (*iter) + common::SystemPaths::Instance()->GetModelPathExtension();
+    std::string path = (*iter) +
+      common::SystemPaths::Instance()->GetModelPathExtension();
 
     // Create a top-level tree item for the path
-    QTreeWidgetItem *topItem = new QTreeWidgetItem( (QTreeWidgetItem*)0, QStringList(QString("%1").arg( QString::fromStdString(path)) ));
+    QTreeWidgetItem *topItem =
+      new QTreeWidgetItem((QTreeWidgetItem*)0,
+          QStringList(QString("%1").arg(QString::fromStdString(path))));
     this->fileTreeWidget->addTopLevelItem(topItem);
 
     boost::filesystem::path dir(path);
     boost::filesystem::directory_iterator endIter;
     std::list<boost::filesystem::path> resultSet;
 
-    if ( boost::filesystem::exists(dir) && 
-         boost::filesystem::is_directory(dir) )
+    if (boost::filesystem::exists(dir) &&
+         boost::filesystem::is_directory(dir))
     {
       // Iterate over all the model in the current gazebo path
-      for( boost::filesystem::directory_iterator dirIter(dir); 
+      for(boost::filesystem::directory_iterator dirIter(dir);
            dirIter != endIter; ++dirIter)
       {
-        if ( boost::filesystem::is_regular_file(dirIter->status()) )
+        if (boost::filesystem::is_regular_file(dirIter->status()))
         {
-
           // This is for boost::filesystem version 3+
           // std::string modelName = dirIter->path().filename().string();
           std::string modelName = dirIter->path().filename();
@@ -85,11 +87,9 @@ InsertModelWidget::InsertModelWidget( QWidget *parent )
           if (modelName.find(".model") != std::string::npos)
           {
             // Add a child item for the model
-            QTreeWidgetItem *childItem = new QTreeWidgetItem( topItem, 
-                QStringList(QString("%1").arg( 
-                    // This is for boost::filesystem version 3+
-                    //QString::fromStdString( dirIter->path().filename().string() )) ));
-                    QString::fromStdString( dirIter->path().filename() )) ));
+            QTreeWidgetItem *childItem = new QTreeWidgetItem(topItem,
+                QStringList(QString("%1").arg(
+                    QString::fromStdString(dirIter->path().filename()))));
             this->fileTreeWidget->addTopLevelItem(childItem);
           }
         }
@@ -109,11 +109,12 @@ InsertModelWidget::~InsertModelWidget()
 {
 }
 
-void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
+void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
+                                         int /*_column*/)
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
-  scene->RemoveVisual( this->modelVisual );
+  scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->visuals.clear();
 
@@ -132,8 +133,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
       return;
 
     this->modelSDF.reset(new sdf::SDF);
-    sdf::initFile( "/sdf/gazebo.sdf", this->modelSDF );
-    sdf::readFile( path+filename, this->modelSDF);
+    sdf::initFile("/sdf/gazebo.sdf", this->modelSDF);
+    sdf::readFile(path+filename, this->modelSDF);
 
     // Load the world file
     std::string modelName;
@@ -143,7 +144,8 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
     if (modelElem->HasElement("origin"))
       modelPose = modelElem->GetElement("origin")->GetValuePose("pose");
 
-    modelName = this->node->GetTopicNamespace() + "::"+ modelElem->GetValueString("name");
+    modelName = this->node->GetTopicNamespace() + "::" +
+                 modelElem->GetValueString("name");
 
     this->modelVisual.reset(new rendering::Visual(modelName,
                             scene->GetWorldVisual()));
@@ -163,9 +165,10 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
         linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
 
 
-      rendering::VisualPtr linkVisual( new rendering::Visual(modelName+"::"+linkName, this->modelVisual) );
+      rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
+            linkName, this->modelVisual));
       linkVisual->Load();
-      linkVisual->SetPose( linkPose );
+      linkVisual->SetPose(linkPose);
       this->visuals.push_back(linkVisual);
 
       int visualIndex = 0;
@@ -180,16 +183,17 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/
           visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
 
         std::ostringstream visualName;
-        visualName << modelName << "::" << linkName << "::Visual_" 
+        visualName << modelName << "::" << linkName << "::Visual_"
                    << visualIndex++;
-        rendering::VisualPtr visVisual( new rendering::Visual(visualName.str(), linkVisual) );
+        rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+                                                             linkVisual));
         visVisual->Load(visualElem);
         this->visuals.push_back(visVisual);
 
 
         visualElem = visualElem->GetNextElement();
       }
- 
+
       linkElem = linkElem->GetNextElement();
     }
 
@@ -211,14 +215,14 @@ void InsertModelWidget::OnApply()
   sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
   std::string modelName = modelElem->GetValueString("name");
- 
-  // Remove the selection 
+
+  // Remove the selection
   msgs::Selection selectMsg;
   selectMsg.set_name(modelName);
   selectMsg.set_selected(false);
   selectMsg.set_id(gui::get_entity_id(modelName));
   this->selectionPub->Publish(selectMsg);
- 
+
   // Remove the topic namespace from the model name. This will get re-inserted
   // by the World automatically
   modelName.erase(0, this->node->GetTopicNamespace().size()+2);
@@ -229,7 +233,7 @@ void InsertModelWidget::OnApply()
       this->modelVisual->GetWorldPose());
 
   // Remove the temporary visual from the scene
-  scene->RemoveVisual( this->modelVisual );
+  scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->visuals.clear();
 
@@ -241,14 +245,15 @@ void InsertModelWidget::OnCancel()
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
-  scene->RemoveVisual( this->modelVisual );
+  scene->RemoveVisual(this->modelVisual);
   this->modelVisual.reset();
   this->visuals.clear();
 
   // Get the name of the model
-  std::string modelName = this->modelSDF->root->GetElement("model")->GetValueString("name");
- 
-  // Remove the selection 
+  std::string modelName =
+    this->modelSDF->root->GetElement("model")->GetValueString("name");
+
+  // Remove the selection
   msgs::Selection selectMsg;
   selectMsg.set_name(modelName);
   selectMsg.set_selected(false);
@@ -256,3 +261,4 @@ void InsertModelWidget::OnCancel()
   this->selectionPub->Publish(selectMsg);
   this->fileTreeWidget->clearSelection();
 }
+

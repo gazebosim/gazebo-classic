@@ -18,7 +18,7 @@ namespace gazebo
     class RenderWidget : public QWidget
     {
       Q_OBJECT
-      public: RenderWidget( QWidget *parent = 0 );
+      public: RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
       public: void RemoveScene(const std::string &_name);
@@ -55,3 +55,4 @@ namespace gazebo
   }
 }
 #endif
+

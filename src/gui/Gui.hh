@@ -29,12 +29,12 @@ namespace gazebo
     void stop();
     void fini();
 
-    void load_plugin( const std::string &_filename );
+    void load_plugin(const std::string &_filename);
 
-    void set_world( const std::string& _name);
+    void set_world(const std::string& _name);
     std::string get_world();
 
-    void set_active_camera( rendering::UserCameraPtr _cam );
+    void set_active_camera(rendering::UserCameraPtr _cam);
     rendering::UserCameraPtr get_active_camera();
     void clear_active_camera();
 
@@ -44,3 +44,4 @@ namespace gazebo
 }
 
 #endif
+

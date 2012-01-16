@@ -16,7 +16,7 @@ namespace gazebo
     class ModelBuilderWidget : public QWidget
     {
       Q_OBJECT
-      public: ModelBuilderWidget( QWidget *parent = 0 );
+      public: ModelBuilderWidget(QWidget *_parent = 0);
       public: virtual ~ModelBuilderWidget();
 
       public: void Init();
@@ -25,16 +25,16 @@ namespace gazebo
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
 
-      private: void OnBoxCreate(const math::Vector3 &pos,  
+      private: void OnBoxCreate(const math::Vector3 &pos,
                                 const math::Vector3 &scale);
- 
-      private: void OnSphereCreate(const math::Vector3 &pos,  
+
+      private: void OnSphereCreate(const math::Vector3 &pos,
                                    const math::Vector3 &scale);
- 
-      private: void OnCylinderCreate(const math::Vector3 &pos,  
+
+      private: void OnCylinderCreate(const math::Vector3 &pos,
                                      const math::Vector3 &scale);
 
-      private: GLWidget *glWidget; 
+      private: GLWidget *glWidget;
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;
 
       private: physics::WorldPtr world;
@@ -46,3 +46,4 @@ namespace gazebo
 }
 
 #endif
+
