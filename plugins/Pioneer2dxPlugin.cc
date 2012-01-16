@@ -24,7 +24,8 @@ Pioneer2dxPlugin::Pioneer2dxPlugin()
 {
 }
 
-void Pioneer2dxPlugin::Load(physics::ModelPtr &_model, sdf::ElementPtr &_sdf)
+void Pioneer2dxPlugin::Load(physics::ModelPtr &_model,
+                            sdf::ElementPtr &/*_sdf*/)
 {
   this->model = _model;
   this->leftJoint = _model->GetJoint("left_wheel_hinge");

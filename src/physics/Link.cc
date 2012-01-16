@@ -350,7 +350,7 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide mode of the body
-void Link::SetCollideMode( const std::string &m )
+void Link::SetCollideMode(const std::string & /*m*/)
 {
   // TODO: Put this back in
 /*

@@ -18,18 +18,18 @@ namespace cpp {
 GazeboGenerator::GazeboGenerator(const std::string &/*_name*/) {}
 GazeboGenerator::~GazeboGenerator() {}
 
-bool GazeboGenerator::Generate(const FileDescriptor* file,
-                               const string& parameter,
-                               OutputDirectory *generator_context,
-                               std::string *error) const
+bool GazeboGenerator::Generate(const FileDescriptor *_file,
+                               const string &/*parameter*/,
+                               OutputDirectory *_generator_context,
+                               std::string * /*_error*/) const
 {
-  std::string filename = file->name();
+  std::string filename = _file->name();
   boost::replace_last(filename, ".proto",".pb.h");
 
   // Add boost shared point include
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(filename, "includes"));
+        _generator_context->OpenForInsert(filename, "includes"));
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
@@ -38,15 +38,15 @@ bool GazeboGenerator::Generate(const FileDescriptor* file,
   // Add boost shared typedef
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(filename, "global_scope"));
+        _generator_context->OpenForInsert(filename, "global_scope"));
     io::Printer printer(output.get(), '$');
 
-    std::string package = file->package();
+    std::string package = _file->package();
     boost::replace_all(package,".","::");
 
     std::string constType = "typedef const boost::shared_ptr<" + package 
-      + "::" + file->message_type(0)->name() + " const> Const" 
-      + file->message_type(0)->name() + "Ptr;";
+      + "::" + _file->message_type(0)->name() + " const> Const" 
+      + _file->message_type(0)->name() + "Ptr;";
 
     printer.Print(constType.c_str(), "name", "global_scope");
   }
