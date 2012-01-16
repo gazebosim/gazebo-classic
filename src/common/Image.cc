@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Image class
  * Author: Nate Koenig
  * Date: 14 July 2008
- * SVN: $Id$
  */
 
 #include <iostream>
@@ -69,15 +68,16 @@ Image::~Image()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load
-int Image::Load(const std::string &filename)
+int Image::Load(const std::string &_filename)
 {
   struct stat st;
 
-  // @todo: fix path search. for now repeat similar path search in simulator 
-  std::list<std::string> gazeboPaths=SystemPaths::Instance()->GetGazeboPaths();
- 
-  for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
-       iter!=gazeboPaths.end(); ++iter)
+  // @todo: fix path search. for now repeat similar path search in simulator
+  std::list<std::string> gazeboPaths =
+    SystemPaths::Instance()->GetGazeboPaths();
+
+  for (std::list<std::string>::iterator iter = gazeboPaths.begin();
+      iter!= gazeboPaths.end(); ++iter)
   {
     std::vector<std::string> pathNames;
     pathNames.push_back((*iter)+"/Media");
@@ -89,32 +89,37 @@ int Image::Load(const std::string &filename)
     pathNames.push_back((*iter)+"/Media/sets");
     pathNames.push_back((*iter)+"/Media/maps");
 
-    for (std::vector<std::string>::iterator piter = pathNames.begin();piter!=pathNames.end();piter++)
+    for (std::vector<std::string>::iterator piter = pathNames.begin();
+         piter!= pathNames.end();piter++)
     {
       std::string path(*piter);
-      DIR *dir=opendir(path.c_str()); 
+      DIR *dir = opendir(path.c_str());
 
       // if directory exist
       if (dir != NULL)
       {
         closedir(dir);
 
-        this->fullName = (((*piter)+"/")+filename);
+        this->fullName = (((*piter)+"/")+_filename);
         // if file exist
         if (stat(this->fullName.c_str(), &st) == 0)
         {
-          FREE_IMAGE_FORMAT fifmt = FreeImage_GetFIFFromFilename(this->fullName.c_str());
+          FREE_IMAGE_FORMAT fifmt =
+            FreeImage_GetFIFFromFilename(this->fullName.c_str());
 
           if (this->bitmap)
             FreeImage_Unload(this->bitmap);
           this->bitmap = NULL;
 
           if (fifmt == FIF_PNG)
-            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), PNG_DEFAULT);
+            this->bitmap =
+              FreeImage_Load(fifmt, this->fullName.c_str(), PNG_DEFAULT);
           else if (fifmt == FIF_JPEG)
-            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), JPEG_DEFAULT);
+            this->bitmap =
+              FreeImage_Load(fifmt, this->fullName.c_str(), JPEG_DEFAULT);
           else if (fifmt == FIF_BMP)
-            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), BMP_DEFAULT);
+            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(),
+                BMP_DEFAULT);
           else
           {
             gzerr << "Unknown image format[" << this->fullName << "]\n";
@@ -124,18 +129,18 @@ int Image::Load(const std::string &filename)
           return 0;
         }
       }
-      
+
     }
   }
 
-  gzerr << "Unable to open image file[" << filename << "]\n";
+  gzerr << "Unable to open image file[" << _filename << "]\n";
   return -1;
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the image from raw data (R8G8B8)
-void Image::SetFromData( const unsigned char *data, unsigned int width,
+void Image::SetFromData(const unsigned char *data, unsigned int width,
     unsigned int height, int scanline_bytes, unsigned int bpp)
 {
   //int redmask = FI_RGBA_RED_MASK;
@@ -153,12 +158,13 @@ void Image::SetFromData( const unsigned char *data, unsigned int width,
   }
   this->bitmap = NULL;
 
-  this->bitmap = FreeImage_ConvertFromRawBits((BYTE*)data, width, height, scanline_bytes, bpp, redmask, greenmask, bluemask);
+  this->bitmap = FreeImage_ConvertFromRawBits((BYTE*)data, width, height,
+      scanline_bytes, bpp, redmask, greenmask, bluemask);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the image as a data array
-void Image::GetData( unsigned char **data, unsigned int &count )
+void Image::GetData(unsigned char **_data, unsigned int &_count)
 {
   int redmask = FI_RGBA_RED_MASK;
   //int bluemask = 0x00ff0000;
@@ -171,34 +177,34 @@ void Image::GetData( unsigned char **data, unsigned int &count )
 
   int scan_width = FreeImage_GetPitch(this->bitmap);
 
-  if (*data)
-    delete [] *data;
+  if (*_data)
+    delete [] *_data;
 
-  count = scan_width * this->GetHeight();
-  *data = new unsigned char[count];
+  _count = scan_width * this->GetHeight();
+  *_data = new unsigned char[_count];
 
-  FreeImage_ConvertToRawBits( (BYTE*)(*data), this->bitmap, 
-      scan_width, this->GetBPP(),redmask, greenmask, bluemask, true);
+  FreeImage_ConvertToRawBits((BYTE*)(*_data), this->bitmap,
+      scan_width, this->GetBPP(), redmask, greenmask, bluemask, true);
 
 #ifdef FREEIMAGE_COLORORDER
-    if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-      return;
+  if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
+    return;
 #else
 #ifdef FREEIMAGE_BIGENDIAN
-      return;
+  return;
 #endif
 #endif
 
-  int i=0;
-  for (unsigned int y=0; y<this->GetHeight(); y++)
+  int i = 0;
+  for (unsigned int y = 0; y<this->GetHeight(); y++)
   {
-    for (unsigned int x=0; x < this->GetWidth(); x++)
+    for (unsigned int x = 0; x < this->GetWidth(); x++)
     {
-      std::swap( (*data)[i], (*data)[i+2]); 
+      std::swap((*_data)[i], (*_data)[i+2]);
       i += 4;
     }
   }
-      
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +214,7 @@ unsigned int Image::GetWidth() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetWidth( this->bitmap );
+  return FreeImage_GetWidth(this->bitmap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +224,7 @@ unsigned int Image::GetHeight() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetHeight( this->bitmap );
+  return FreeImage_GetHeight(this->bitmap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,12 +234,12 @@ unsigned int Image::GetBPP() const
   if (!this->Valid())
     return 0;
 
-  return FreeImage_GetBPP( this->bitmap );
+  return FreeImage_GetBPP(this->bitmap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a pixel color value
-Color Image::GetPixel(unsigned int x, unsigned int y)
+Color Image::GetPixel(unsigned int _x, unsigned int _y)
 {
   Color clr;
 
@@ -246,23 +252,23 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
   {
     RGBQUAD firgb;
 
-    if (FreeImage_GetPixelColor( this->bitmap, x, y, &firgb ) == FALSE)
+    if (FreeImage_GetPixelColor(this->bitmap, _x, _y, &firgb) == FALSE)
     {
-      gzerr << "Image: Coordinates out of range[" 
-                << x << " " << y << "] \n";
+      gzerr << "Image: Coordinates out of range["
+        << _x << " " << _y << "] \n";
       return clr;
     }
 
 #ifdef FREEIMAGE_COLORORDER
     if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-      clr.Set(  firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+      clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
     else
-      clr.Set( firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
+      clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
 #else
 #ifdef FREEIMAGE_BIGENDIAN
-    clr.Set(  firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+    clr.Set(firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
 #else
-    clr.Set( firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
+    clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
 #endif
 #endif
 
@@ -270,14 +276,14 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
   else
   {
     BYTE byteValue;
-    if (FreeImage_GetPixelIndex(this->bitmap, x, y, &byteValue) == FALSE)
+    if (FreeImage_GetPixelIndex(this->bitmap, _x, _y, &byteValue) == FALSE)
     {
-      gzerr << "Image: Coordinates out of range   [" 
-        << x << " " << y << "] \n";
+      gzerr << "Image: Coordinates out of range ["
+        << _x << " " << _y << "] \n";
       return clr;
     }
 
-    clr.Set( byteValue, byteValue, byteValue);
+    clr.Set(byteValue, byteValue, byteValue);
   }
 
   return clr;
@@ -294,7 +300,7 @@ Color Image::GetAvgColor()
   {
     for (x = 0; x < this->GetWidth(); x++)
     {
-      clrSum += this->GetPixel(x,y);
+      clrSum += this->GetPixel(x, y);
     }
   }
 
@@ -309,15 +315,15 @@ Color Image::GetMaxColor()
   Color clr;
   Color maxClr;
 
-  maxClr.Set(0,0,0,0);
+  maxClr.Set(0, 0, 0, 0);
 
   for (y = 0; y < this->GetHeight(); y++)
   {
     for (x = 0; x < this->GetWidth(); x++)
     {
-      clr = this->GetPixel(x,y);
+      clr = this->GetPixel(x, y);
 
-      if ( clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
+      if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
       {
         maxClr = clr;
       }
@@ -329,59 +335,60 @@ Color Image::GetMaxColor()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Rescale the image
-void Image::Rescale(int width, int height)
+void Image::Rescale(int _width, int _height)
 {
-  this->bitmap = FreeImage_Rescale(this->bitmap, width, height, FILTER_BICUBIC);
+  this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
+      FILTER_BICUBIC);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Render this image using opengl
 /*void Image::RenderOpengl(float destW, float destH)
-{
+  {
   if (!this->Valid())
   {
-    printf("Invalid\n");
-    return;
+  printf("Invalid\n");
+  return;
   }
 
-  FIBITMAP *resizedBitmap = FreeImage_Rescale(this->bitmap, destW, destH, 
-                                              FILTER_LANCZOS3);
+  FIBITMAP *resizedBitmap = FreeImage_Rescale(this->bitmap, destW, destH,
+  FILTER_LANCZOS3);
 
   math::Vector3d pt;
   Color clr;
 
-  unsigned int x,y;
+  unsigned int x, y;
   unsigned int w = this->GetWidth();
   unsigned int h = this->GetHeight();
 
-  //float xRes = destW / w;
-  //float yRes = destH / h;
+//float xRes = destW / w;
+//float yRes = destH / h;
 
-  pt.z = 0;
+pt.z = 0;
 
-  glBegin(GL_TRIANGLE_STRIP);
-  for (y = h-1; y > 0; y--)
-  {
-    for (x=0; x < w; x++)
-    {
-      pt.x = x;// * xRes;
-      pt.y = (h-y);// * yRes;
+glBegin(GL_TRIANGLE_STRIP);
+for (y = h-1; y > 0; y--)
+{
+for (x = 0; x < w; x++)
+{
+pt.x = x;// * xRes;
+pt.y = (h-y);// * yRes;
 
-      clr = this->GetPixel(x,y);
-      glColor3ub( clr.r, clr.g, clr.b );
-      glVertex3f(pt.x, pt.y, pt.z);
+clr = this->GetPixel(x, y);
+glColor3ub(clr.r, clr.g, clr.b);
+glVertex3f(pt.x, pt.y, pt.z);
 
-      pt.y = (h-y-1);// * yRes;
-      clr = this->GetPixel(x,y-1);
-      glColor3ub( clr.r, clr.g, clr.b );
-      glVertex3f(pt.x, pt.y, pt.z);
-    }
-    glVertex3f(pt.x, pt.y, pt.z);
-    glVertex3f(pt.x, pt.y, pt.z);
-  }
-  glEnd();
-  
-  FreeImage_Unload(resizedBitmap);
+pt.y = (h-y-1);// * yRes;
+clr = this->GetPixel(x, y-1);
+glColor3ub(clr.r, clr.g, clr.b);
+glVertex3f(pt.x, pt.y, pt.z);
+}
+glVertex3f(pt.x, pt.y, pt.z);
+glVertex3f(pt.x, pt.y, pt.z);
+}
+glEnd();
+
+FreeImage_Unload(resizedBitmap);
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -397,5 +404,6 @@ std::string Image::GetFilename() const
 {
   return this->fullName;
 }
+
 
 

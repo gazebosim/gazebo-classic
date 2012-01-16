@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-/* Desc: Local Gazebo configuration 
+ */
+/* Desc: Local Gazebo configuration
  * Author: Jordi Polo
  * Date: 3 May 2008
  */
@@ -53,7 +53,7 @@ SystemPaths::SystemPaths()
       path = strcat(path, "/.gazebo");
   }
 
-  DIR *dir = opendir(path); 
+  DIR *dir = opendir(path);
   if (!dir)
   {
     mkdir(path, S_IRWXU | S_IRGRP | S_IROTH);
@@ -80,7 +80,9 @@ const std::list<std::string> &SystemPaths::GetGazeboPaths()
     char *pathCStr = getenv("GAZEBO_RESOURCE_PATH");
     if (!pathCStr || *pathCStr == '\0')
     {
-      gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. Set GAZEBO_RESOURCE_PATH to gazebo's installation path.  ...or are you using SystemPlugins?\n";
+      gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
+            << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
+            << "...or are you using SystemPlugins?\n";
       return this->gazeboPaths;
     }
     path = pathCStr;
@@ -89,18 +91,18 @@ const std::list<std::string> &SystemPaths::GetGazeboPaths()
     int pos2 = path.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->gazeboPaths.push_back(path.substr(pos1,pos2-pos1));
+      this->gazeboPaths.push_back(path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
-      pos2 = path.find(delim,pos2+1);
+      pos2 = path.find(delim, pos2+1);
     }
-    this->gazeboPaths.push_back(path.substr(pos1,path.size()-pos1));
+    this->gazeboPaths.push_back(path.substr(pos1, path.size()-pos1));
   }
 
   return this->gazeboPaths;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the ogre install paths  
+/// Get the ogre install paths
 const std::list<std::string> &SystemPaths::GetOgrePaths()
 {
   if (this->ogrePaths.size() == 0)
@@ -111,7 +113,9 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
     char *pathCStr = getenv("OGRE_RESOURCE_PATH");
     if (!pathCStr || *pathCStr == '\0')
     {
-      gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. Set OGRE_RESOURCE_PATH to Ogre's installation path. ...or are you using SystemPlugins?\n";
+      gzdbg << "ogrePaths is empty and OGRE_RESOURCE_PATH doesn't exist. "
+            << "Set OGRE_RESOURCE_PATH to Ogre's installation path. "
+            << "...or are you using SystemPlugins?\n";
       return this->ogrePaths;
     }
     path = pathCStr;
@@ -120,18 +124,18 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
     int pos2 = path.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->ogrePaths.push_back(path.substr(pos1,pos2-pos1));
+      this->ogrePaths.push_back(path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
-      pos2 = path.find(delim,pos2+1);
+      pos2 = path.find(delim, pos2+1);
     }
-    this->ogrePaths.push_back(path.substr(pos1,path.size()-pos1));
+    this->ogrePaths.push_back(path.substr(pos1, path.size()-pos1));
   }
 
   return this->ogrePaths;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the plugin paths  
+/// Get the plugin paths
 const std::list<std::string> &SystemPaths::GetPluginPaths()
 {
   if (this->pluginPaths.size() == 0)
@@ -144,7 +148,7 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     {
       gzdbg << "pluginPaths and GAZEBO_PLUGIN_PATH doesn't exist."
         << "Set GAZEBO_PLUGIN_PATH to Ogre's installation path."
-        << "  ...or are you loading via SystemPlugins?\n";
+        << " ...or are you loading via SystemPlugins?\n";
       return this->pluginPaths;
     }
     path = pathCStr;
@@ -153,11 +157,11 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     int pos2 = path.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->pluginPaths.push_back(path.substr(pos1,pos2-pos1));
+      this->pluginPaths.push_back(path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
-      pos2 = path.find(delim,pos2+1);
+      pos2 = path.find(delim, pos2+1);
     }
-    this->pluginPaths.push_back(path.substr(pos1,path.size()-pos1));
+    this->pluginPaths.push_back(path.substr(pos1, path.size()-pos1));
   }
 
   return this->pluginPaths;
@@ -165,7 +169,7 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the model path extension
-std::string SystemPaths::GetModelPathExtension() 
+std::string SystemPaths::GetModelPathExtension()
 {
   return "/models";
 }
@@ -179,10 +183,10 @@ std::string SystemPaths::GetWorldPathExtension()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// search for file given GAZEBO_RESOURCE_PATH
-std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
+std::string SystemPaths::FindFileWithGazeboPaths(std::string _filename)
 {
   struct stat st;
-  std::string fullname =  std::string("./")+filename;
+  std::string fullname = std::string("./")+_filename;
   bool found = false;
 
   std::list<std::string> paths = GetGazeboPaths();
@@ -191,17 +195,17 @@ std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
   {
     found = true;
   }
-  else if ( stat(filename.c_str(), &st) == 0)
+  else if (stat(_filename.c_str(), &st) == 0)
   {
-    fullname =  filename;
+    fullname = _filename;
     found = true;
   }
   else
   {
-    for (std::list<std::string>::const_iterator iter = paths.begin(); 
+    for (std::list<std::string>::const_iterator iter = paths.begin();
         iter != paths.end(); ++iter)
     {
-      fullname = (*iter)+"/"+filename;
+      fullname = (*iter)+"/"+_filename;
       if (stat(fullname.c_str(), &st) == 0)
       {
         found = true;
@@ -209,7 +213,7 @@ std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
       }
       // also search under some default hardcoded subdirectories
       // is this a good idea?
-      fullname = (*iter)+"/Media/models/"+filename;
+      fullname = (*iter)+"/Media/models/"+_filename;
       if (stat(fullname.c_str(), &st) == 0)
       {
         found = true;
@@ -221,7 +225,7 @@ std::string SystemPaths::FindFileWithGazeboPaths(std::string filename)
   if (!found)
   {
     fullname.clear();
-    gzerr << "cannot load file [" << filename << "]in GAZEBO_RESOURCE_PATH\n";
+    gzerr << "cannot load file [" << _filename << "]in GAZEBO_RESOURCE_PATH\n";
   }
 
   return fullname;
@@ -240,54 +244,59 @@ void SystemPaths::ClearPluginPaths()
 {
   this->pluginPaths.clear();
 }
-void SystemPaths::AddGazeboPaths(std::string gazebo_resource_path)
+void SystemPaths::AddGazeboPaths(std::string _gazebo_resource_path)
 {
   std::string delim(":");
-  if(!gazebo_resource_path.empty()) 
+  if(!_gazebo_resource_path.empty())
   {
     int pos1 = 0;
-    int pos2 = gazebo_resource_path.find(delim);
+    int pos2 = _gazebo_resource_path.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->gazeboPaths.push_back(gazebo_resource_path.substr(pos1,pos2-pos1));
+      this->gazeboPaths.push_back(_gazebo_resource_path.substr(pos1,
+                                                               pos2-pos1));
       pos1 = pos2+1;
-      pos2 = gazebo_resource_path.find(delim,pos2+1);
+      pos2 = _gazebo_resource_path.find(delim, pos2+1);
     }
-    this->gazeboPaths.push_back(gazebo_resource_path.substr(pos1,gazebo_resource_path.size()-pos1));
+    this->gazeboPaths.push_back(_gazebo_resource_path.substr(pos1,
+                                _gazebo_resource_path.size()-pos1));
   }
 }
 
-void SystemPaths::AddOgrePaths(std::string ogre_resource_path)
+void SystemPaths::AddOgrePaths(std::string _ogre_resource_path)
 {
   std::string delim(":");
-  if(!ogre_resource_path.empty()) 
+  if(!_ogre_resource_path.empty())
   {
     int pos1 = 0;
-    int pos2 = ogre_resource_path.find(delim);
+    int pos2 = _ogre_resource_path.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->ogrePaths.push_back(ogre_resource_path.substr(pos1,pos2-pos1));
+      this->ogrePaths.push_back(_ogre_resource_path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
-      pos2 = ogre_resource_path.find(delim,pos2+1);
+      pos2 = _ogre_resource_path.find(delim, pos2+1);
     }
-    this->ogrePaths.push_back(ogre_resource_path.substr(pos1,ogre_resource_path.size()-pos1));
+    this->ogrePaths.push_back(_ogre_resource_path.substr(pos1,
+          _ogre_resource_path.size()-pos1));
   }
 }
 
-void SystemPaths::AddPluginPaths(std::string gazebo_plugin_path)
+void SystemPaths::AddPluginPaths(std::string _gazebo_plugin_path)
 {
   std::string delim(":");
-  if(!gazebo_plugin_path.empty()) 
+  if(!_gazebo_plugin_path.empty())
   {
     int pos1 = 0;
-    int pos2 = gazebo_plugin_path.find(delim);
+    int pos2 = _gazebo_plugin_path.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,pos2-pos1));
+      this->pluginPaths.push_back(_gazebo_plugin_path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
-      pos2 = gazebo_plugin_path.find(delim,pos2+1);
+      pos2 = _gazebo_plugin_path.find(delim, pos2+1);
     }
-    this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,gazebo_plugin_path.size()-pos1));
+    this->pluginPaths.push_back(_gazebo_plugin_path.substr(pos1,
+          _gazebo_plugin_path.size()-pos1));
   }
 }
+
 

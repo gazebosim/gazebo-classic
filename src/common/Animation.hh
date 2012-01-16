@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #ifndef ANIMATION_HH
 #define ANIMATION_HH
 
@@ -31,7 +47,7 @@ namespace gazebo
       public: double GetTime() const;
 
       protected: double GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
-                                           KeyFrame **_kf2, 
+                                           KeyFrame **_kf2,
                                            unsigned int &_firstKeyIndex) const;
 
 
@@ -47,7 +63,7 @@ namespace gazebo
 
     class PoseAnimation : public Animation
     {
-      public: PoseAnimation(const std::string _name, 
+      public: PoseAnimation(const std::string _name,
                             double _length, bool _loop);
       public: virtual ~PoseAnimation();
 
@@ -55,7 +71,7 @@ namespace gazebo
 
       public: void GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const;
 
-      protected: void GetInterpolatedKeyFrame(double _time, 
+      protected: void GetInterpolatedKeyFrame(double _time,
                                               PoseKeyFrame &_kf) const;
 
       protected: void BuildInterpolationSplines() const;
@@ -66,7 +82,7 @@ namespace gazebo
 
     class NumericAnimation : public Animation
     {
-      public: NumericAnimation(const std::string _name, 
+      public: NumericAnimation(const std::string _name,
                                double _length, bool _loop);
       public: virtual ~NumericAnimation();
 
@@ -78,3 +94,4 @@ namespace gazebo
 }
 
 #endif
+

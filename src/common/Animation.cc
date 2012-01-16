@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include <algorithm>
 
 #include "math/Spline.hh"
@@ -10,19 +26,19 @@ using namespace common;
 
 namespace
 {
-struct KeyFrameTimeLess
-{
-  bool operator() (const common::KeyFrame *_kf, 
-                   const common::KeyFrame *_kf2) const
+  struct KeyFrameTimeLess
   {
-    return _kf->GetTime() < _kf2->GetTime();
-  }
-};
+    bool operator() (const common::KeyFrame *_kf,
+        const common::KeyFrame *_kf2) const
+    {
+      return _kf->GetTime() < _kf2->GetTime();
+    }
+  };
 }
 
 
-Animation::Animation(const std::string _name, double _length, bool _loop)
-  : name(_name), length(_length), loop(_loop)
+  Animation::Animation(const std::string _name, double _length, bool _loop)
+: name(_name), length(_length), loop(_loop)
 {
   this->timePos = 0;
   this->build = false;
@@ -73,9 +89,9 @@ double Animation::GetTime() const
   return this->timePos;
 }
 
-double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1, 
-                                     KeyFrame **_kf2, 
-                                     unsigned int &_firstKeyIndex) const
+double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
+    KeyFrame **_kf2,
+    unsigned int &_firstKeyIndex) const
 
 
 {
@@ -91,7 +107,7 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
   KeyFrame_V::const_iterator iter;
   KeyFrame timeKey(_time);
   iter = std::lower_bound(this->keyFrames.begin(), this->keyFrames.end(),
-                          &timeKey, KeyFrameTimeLess());
+      &timeKey, KeyFrameTimeLess());
 
   if (iter == this->keyFrames.end())
   {
@@ -128,9 +144,9 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
 
 
 
-PoseAnimation::PoseAnimation(const std::string _name, 
-                             double _length, bool _loop)
-  : Animation( _name, _length, _loop)
+PoseAnimation::PoseAnimation(const std::string _name,
+    double _length, bool _loop)
+: Animation(_name, _length, _loop)
 {
   this->positionSpline = NULL;
   this->rotationSpline = NULL;
@@ -146,8 +162,8 @@ PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
 {
   PoseKeyFrame *frame = new PoseKeyFrame(_time);
   std::vector<KeyFrame*>::iterator iter =
-    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(), 
-        (KeyFrame*)frame, KeyFrameTimeLess() );
+    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
+        (KeyFrame*)frame, KeyFrameTimeLess());
 
   this->keyFrames.insert(iter, frame);
   this->build = true;
@@ -160,9 +176,9 @@ void PoseAnimation::BuildInterpolationSplines() const
   if (!this->positionSpline)
     this->positionSpline = new math::Spline();
 
-   if (!this->rotationSpline)
+  if (!this->rotationSpline)
     this->rotationSpline = new math::RotationSpline();
-  
+
   this->positionSpline->SetAutoCalculate(false);
   this->rotationSpline->SetAutoCalculate(false);
 
@@ -170,7 +186,7 @@ void PoseAnimation::BuildInterpolationSplines() const
   this->rotationSpline->Clear();
 
   for (KeyFrame_V::const_iterator iter = this->keyFrames.begin();
-       iter != this->keyFrames.end(); iter++)
+      iter != this->keyFrames.end(); iter++)
   {
     PoseKeyFrame *pkey = (PoseKeyFrame*)(*iter);
     this->positionSpline->AddPoint(pkey->GetTranslate());
@@ -187,10 +203,9 @@ void PoseAnimation::GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const
   this->GetInterpolatedKeyFrame(this->timePos, _kf);
 }
 
-void PoseAnimation::GetInterpolatedKeyFrame(double _time, 
-                                            PoseKeyFrame &_kf) const
+void PoseAnimation::GetInterpolatedKeyFrame(double _time,
+    PoseKeyFrame &_kf) const
 {
-
   KeyFrame *kBase1, *kBase2;
   PoseKeyFrame *k1;//, *k2;
   unsigned int firstKeyIndex;
@@ -216,9 +231,9 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 
 
 
-NumericAnimation::NumericAnimation(const std::string _name, 
-                                   double _length, bool _loop)
-  : Animation(_name, _length, _loop)
+NumericAnimation::NumericAnimation(const std::string _name,
+    double _length, bool _loop)
+: Animation(_name, _length, _loop)
 {
 }
 
@@ -230,9 +245,9 @@ NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
 {
   NumericKeyFrame *frame = new NumericKeyFrame(_time);
   std::vector<KeyFrame*>::iterator iter =
-    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(), 
-        (KeyFrame*)frame, 
-        KeyFrameTimeLess() );
+    std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
+        (KeyFrame*)frame,
+        KeyFrameTimeLess());
 
   this->keyFrames.insert(iter, frame);
   this->build = true;
@@ -266,3 +281,4 @@ void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
     _kf.SetValue(k1->GetValue() + diff * t);
   }
 }
+

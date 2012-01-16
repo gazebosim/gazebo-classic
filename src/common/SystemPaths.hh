@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo configuration on this computer 
+/* Desc: Gazebo configuration on this computer
  * Date: 3 May 2008
  */
 
@@ -29,20 +29,19 @@
 
 #define LINUX
 #ifdef WINDOWS
- #include <direct.h>
- #define GetCurrentDir _getcwd
+  #include <direct.h>
+  #define GetCurrentDir _getcwd
 #else
- #include <unistd.h>
- #define GetCurrentDir getcwd
+  #include <unistd.h>
+  #define GetCurrentDir getcwd
 #endif
 
 namespace gazebo
 {
   namespace common
   {
-    /// \addtogroup gazebo_common Common 
+    /// \addtogroup gazebo_common Common
     /// \{
-
     /// \brief Functions to handle getting system paths
     class SystemPaths : public SingletonT<SystemPaths>
     {
@@ -52,13 +51,13 @@ namespace gazebo
       public: std::string GetLogPath() const;
 
       /// \brief Get the gazebo install paths
-      public: const std::list<std::string> &GetGazeboPaths(); 
+      public: const std::list<std::string> &GetGazeboPaths();
 
-      /// \brief Get the ogre install paths  
-      public: const std::list<std::string> &GetOgrePaths(); 
+      /// \brief Get the ogre install paths
+      public: const std::list<std::string> &GetOgrePaths();
 
-      /// \brief Get the plugin paths  
-      public: const std::list<std::string> &GetPluginPaths(); 
+      /// \brief Get the plugin paths
+      public: const std::list<std::string> &GetPluginPaths();
 
       /// \brief Get the model path extension
       public: std::string GetModelPathExtension();
@@ -66,24 +65,24 @@ namespace gazebo
       /// \brief Get the world path extension
       public: std::string GetWorldPathExtension();
 
-      public: std::string FindFileWithGazeboPaths(std::string filename);
+      public: std::string FindFileWithGazeboPaths(std::string _filename);
 
-      /// \brief Add colon delimited paths to Gazebo install 
-      public: void AddGazeboPaths(std::string path);
+      /// \brief Add colon delimited paths to Gazebo install
+      public: void AddGazeboPaths(std::string _path);
 
       /// \brief Add colon delimited paths to ogre install
-      public: void AddOgrePaths(std::string path);
-   
+      public: void AddOgrePaths(std::string _path);
+
       /// \brief Add colon delimited paths to plugins
-      public: void AddPluginPaths(std::string path);
+      public: void AddPluginPaths(std::string _path);
 
       public: void ClearGazeboPaths();
       public: void ClearOgrePaths();
       public: void ClearPluginPaths();
- 
+
       /// Paths gazebo install
       private: std::list<std::string> gazeboPaths;
-      
+
       /// Paths to the ogre install
       private: std::list<std::string> ogrePaths;
 
@@ -91,10 +90,11 @@ namespace gazebo
       private: std::list<std::string> pluginPaths;
 
       private: std::string logPath;
- 
+
       private: friend class SingletonT<SystemPaths>;
     };
     /// \}
   }
 }
 #endif
+

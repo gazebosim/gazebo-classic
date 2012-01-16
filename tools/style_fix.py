@@ -38,6 +38,7 @@ def ParseArguments(args):
 
 def ProcessFile(filename):
   lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
+  outFile = open(filename,'w')
   # Remove trailing '\r'.
   for linenum in range(len(lines)):
     if lines[linenum].endswith('\r'):
@@ -85,7 +86,12 @@ def ProcessFile(filename):
         for param in params:
           if len(param) > 0:
             param = param.rstrip()
-            index = param.rfind(' ')
+            param = re.sub(' +',' ',param)
+            eqIndex = param.rfind('=')
+            end = len(param)
+            if eqIndex != -1:
+              end = param.rfind(' ',0,eqIndex)
+            index = param.rfind(' ',0,end)
             paramType = param[0:index]
             paramName = param[index+1:]
             paramNameStripped = paramName.lstrip("*&")
@@ -121,7 +127,8 @@ def ProcessFile(filename):
     if funcStart > 0:
       for i in range(len(paramSub)):
         line = re.sub(paramSub[i], paramRep[i],line)
-    print line
+    print >>outFile, line
+    #print line
 
 def main():
   filenames = ParseArguments(sys.argv[1:])

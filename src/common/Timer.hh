@@ -27,36 +27,36 @@
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
     /// \addtogroup gazebo_common
     /// \{
-   
     /// \brief A timer class
     class Timer
     {
       /// \brief Constructor
       public: Timer();
-              
+
       /// \brief Destructor
       public: virtual ~Timer();
-  
+
       /// \brief Start the timer
       public: void Start();
-  
+
       /// \brief Get the elapsed itme
       public: Time GetElapsed() const;
-  
-      public: friend std::ostream &operator<<(std::ostream &out, 
+
+      public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
               {
                 out << t.GetElapsed();
                 return out;
               }
-  
+
       private: Time start;
     };
     /// \}
   }
 }
 #endif
+

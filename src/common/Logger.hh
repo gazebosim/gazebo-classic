@@ -30,49 +30,50 @@
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
-    /// \addtogroup gazebo_common Common 
+    /// \addtogroup gazebo_common Common
     /// \{
-
     /// \brief Handles logging of data to disk
     class Logger : public SingletonT<Logger>
     {
       /// \brief Constructor
       public: Logger();
-  
+
       /// \brief Destructor
       public: virtual ~Logger();
-  
+
       /// \brief Add a log file
-      public: void AddLog(const std::string &model, const std::string &filename);
-  
+      public: void AddLog(const std::string &_model,
+                          const std::string &_filename);
+
       /// \brief Remove a log
-      public: void RemoveLog(const std::string &entity);
-  
+      public: void RemoveLog(const std::string &_entity);
+
       /// \brief Update the log files
       public: void Update();
-  
+
       private: class LogObj
                {
-                 public: LogObj(const std::string &entityName, 
+                 public: LogObj(const std::string &entityName,
                                 const std::string &filename);
                  public: virtual ~LogObj();
                  public: void Update();
                  public: std::string GetEntityName() const;
-  
+
                  public: bool valid;
                  private: Entity *entity;
                  private: std::fstream logFile;
                  private: Time startSimTime;
                  private: Time startRealTime;
                };
-  
+
       private: std::vector<LogObj*> logObjects;
-  
+
       private: friend class SingletonT<Logger>;
     };
     /// \}
   }
 }
 #endif
+

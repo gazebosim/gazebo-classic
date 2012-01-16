@@ -29,51 +29,51 @@
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
     /// \addtogroup gazebo_common
     /// \{
-
     /// Throw an error
-    #define gzthrow(msg) {std::ostringstream throwStream; throwStream << msg << std::endl << std::flush; throw gazebo::common::Exception(__FILE__,__LINE__,throwStream.str()); }
-  
-   
+    #define gzthrow(msg) {std::ostringstream throwStream;\
+      throwStream << msg << std::endl << std::flush;\
+      throw gazebo::common::Exception(__FILE__, __LINE__, throwStream.str()); }
+
     /// \brief Class for generating exceptions
     class Exception
     {
       /// \brief Constructor
       public: Exception();
-    
+
       /// \brief Default constructor
       /// \param file File name
       /// \param line Line number where the error occurred
       /// \param msg Error message
-      public: Exception(const char *file, 
-                          int line, 
+      public: Exception(const char *file,
+                          int line,
                           std::string msg);
-    
+
       /// \brief Destructor
       public: virtual ~Exception();
-    
+
       /// \brief Return the error function
       /// \return The error function name
       public: std::string GetErrorFile() const;
-    
+
       /// \brief Return the error string
       /// \return The error string
-      public: std::string GetErrorStr() const; 
-  
+      public: std::string GetErrorStr() const;
+
       /// \brief The error function
       private: std::string file;
-    
+
       /// \brief Line the error occured on
       private: int line;
-    
+
       /// \brief The error string
       private: std::string str;
-    
+
       /// \brief Ostream operator for Gazebo Error
-      public: friend std::ostream &operator<<(std::ostream& out, 
+      public: friend std::ostream &operator<<(std::ostream& out,
                   const gazebo::common::Exception &err)
               {
                 return out << err.GetErrorStr();
@@ -84,3 +84,4 @@ namespace gazebo
 }
 
 #endif
+

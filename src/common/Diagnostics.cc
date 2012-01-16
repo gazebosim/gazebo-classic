@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: A diagnostic class
  * Author: Nate Koenig
  * Date: 2 Feb 2011
@@ -30,8 +30,8 @@ DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-DiagnosticManager::DiagnosticManager()
-  : enabled(false)
+  DiagnosticManager::DiagnosticManager()
+: enabled(false)
 {
 }
 
@@ -41,29 +41,29 @@ DiagnosticManager::~DiagnosticManager()
 {
 }
 
-DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &name)
+DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
 {
   if (this->GetEnabled())
-    return DiagnosticTimerPtr( new DiagnosticTimer(name) );
+    return DiagnosticTimerPtr(new DiagnosticTimer(_name));
   else
     return DiagnosticTimerPtr();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// A diagnostic timer has started
-void DiagnosticManager::TimerStart(DiagnosticTimer *timer)
+void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
 {
-  this->timers[timer->GetName()] = Time();
-  event::Events::diagTimerStart(timer->GetName());
+  this->timers[_timer->GetName()] = Time();
+  event::Events::diagTimerStart(_timer->GetName());
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// A diagnostic timer has stoped
-void DiagnosticManager::TimerStop(DiagnosticTimer *timer)
+void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)
 {
-  this->timers[timer->GetName()] = timer->GetElapsed();
-  event::Events::diagTimerStop(timer->GetName());
+  this->timers[_timer->GetName()] = _timer->GetElapsed();
+  event::Events::diagTimerStop(_timer->GetName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,12 +75,12 @@ int DiagnosticManager::GetTimerCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific time
-Time DiagnosticManager::GetTime(int index) const
+Time DiagnosticManager::GetTime(int _index) const
 {
   std::map<std::string, Time>::const_iterator iter;
 
   iter = this->timers.begin();
-  std::advance(iter,index);
+  std::advance(iter, _index);
 
   if (iter != this->timers.end())
     return iter->second;
@@ -92,12 +92,12 @@ Time DiagnosticManager::GetTime(int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a label for a timer
-std::string DiagnosticManager::GetLabel(int index) const
+std::string DiagnosticManager::GetLabel(int _index) const
 {
   std::map<std::string, Time>::const_iterator iter;
 
   iter = this->timers.begin();
-  std::advance(iter,index);
+  std::advance(iter, _index);
 
   if (iter != this->timers.end())
     return iter->first;
@@ -109,10 +109,10 @@ std::string DiagnosticManager::GetLabel(int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a time based on a label
-Time DiagnosticManager::GetTime(const std::string &label) const
+Time DiagnosticManager::GetTime(const std::string &_label) const
 {
   std::map<std::string, Time>::const_iterator iter;
-  iter = this->timers.find(label);
+  iter = this->timers.find(_label);
 
   if (iter != this->timers.end())
     return iter->second;
@@ -121,5 +121,6 @@ Time DiagnosticManager::GetTime(const std::string &label) const
 
   return Time();
 }
+
 
 

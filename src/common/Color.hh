@@ -29,11 +29,9 @@ namespace gazebo
 {
   namespace common
   {
-
-    /// \addtogroup gazebo_common Common 
+    /// \addtogroup gazebo_common Common
     /// \{
-
-    /// \brief Defines a color 
+    /// \brief Defines a color
     class Color
     {
       public: static const Color White;
@@ -46,34 +44,34 @@ namespace gazebo
       public: Color();
 
       /// \brief Constructor
-      public: Color( float r, float g, float b, float a=1.0 );
+      public: Color(float _r, float _g, float _b, float _a = 1.0);
 
       /// \brief Copy Constructor
-      public: Color( const Color &clr );
-    
+      public: Color(const Color &_clr);
+
       /// \brief Destructor
       public: virtual ~Color();
 
       /// \brief Reset the color to default values
       public: void Reset();
-    
+
       /// \brief Set the contents of the vector
-      public: void Set(float r = 1, float g =1 , float b = 1, float a = 1);
+      public: void Set(float _r = 1, float _g = 1 , float _b = 1, float _a = 1);
 
       /// \brief Get the color in HSV colorspace
       public: math::Vector3 GetAsHSV() const;
- 
+
       /// \brief Set a color based on HSV values
-      public: void SetFromHSV(float h, float s, float v);
+      public: void SetFromHSV(float _h, float _s, float _v);
 
       /// \brief Get the color in YUV colorspace
       public: math::Vector3 GetAsYUV() const;
 
       /// \brief Set from yuv
-      public: void SetFromYUV(float y, float u, float v);
+      public: void SetFromYUV(float _y, float _u, float _v);
 
       /// \brief Equal operator
-      public: const Color &operator=(const Color &_pt);
+      public: const Color &operator =(const Color &_pt);
 
       /// \brief Array index operator
       public: float operator[](unsigned int index);
@@ -91,57 +89,59 @@ namespace gazebo
       public: float A() const;
 
       /// \brief Set the red color
-      public: void R(float r);
+      public: void R(float _r);
 
       /// \brief Set the green color
-      public: void G(float g);
+      public: void G(float _g);
 
       /// \brief Set the blue color
-      public: void B(float b);
+      public: void B(float _b);
 
       /// \brief Set the alpha color
-      public: void A(float a);
-   
+      public: void A(float _a);
+
       // Addition operators
-      public: Color operator+( const Color &pt ) const;
-      public: Color operator+( const float &v ) const;
-      public: const Color &operator+=( const Color &pt );
-    
-      // Subtraction operators 
-      public: Color operator-( const Color &pt ) const;
-      public: Color operator-( const float &pt ) const;
-      public: const Color &operator-=( const Color &pt );
-    
+      public: Color operator+(const Color &pt) const;
+      public: Color operator+(const float &v) const;
+      public: const Color &operator+=(const Color &pt);
+
+      // Subtraction operators
+      public: Color operator-(const Color &pt) const;
+      public: Color operator-(const float &pt) const;
+      public: const Color &operator-=(const Color &pt);
+
       // Division operators
-      public: const Color operator/( const float &i ) const;
-      public: const Color operator/( const Color &pt ) const;
-      public: const Color &operator/=( const Color &pt );
-    
+      public: const Color operator/(const float &i) const;
+      public: const Color operator/(const Color &pt) const;
+      public: const Color &operator/=(const Color &pt);
+
       // Multiplication operators
       public: const Color operator*(const float &i) const;
-      public: const Color operator*( const Color &pt ) const;
-      public: const Color &operator*=( const Color &pt );
-    
+      public: const Color operator*(const Color &pt) const;
+      public: const Color &operator*=(const Color &pt);
+
       // Equality operators
-      public: bool operator==( const Color &pt ) const;
-      public: bool operator!=( const Color &pt ) const;
+      public: bool operator ==(const Color &pt) const;
+      public: bool operator!=(const Color &pt) const;
 
       /// Clamp the color values
       private: void Clamp();
 
       // Ostream operator
-      public: friend std::ostream &operator<< (std::ostream &out, const Color &pt)    {
-        out << pt.r << " " << pt.g << " " << pt.b << " " << pt.a;
-        return out; 
-      }
+      public: friend std::ostream &operator<< (std::ostream &_out,
+                                               const Color &_pt)
+              {
+                _out << _pt.r << " " << _pt.g << " " << _pt.b << " " << _pt.a;
+                return _out;
+              }
 
       // Istream operator
       public: friend std::istream &operator>> (std::istream &in, Color &pt)
-      { 
+      {
         // Skip white spaces
-        in.setf( std::ios_base::skipws );
+        in.setf(std::ios_base::skipws);
         in >> pt.r >> pt.g >> pt.b >> pt.a;
-        return in; 
+        return in;
       }
 
       // The values
@@ -151,3 +151,4 @@ namespace gazebo
   }
 }
 #endif
+

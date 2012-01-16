@@ -280,7 +280,8 @@ def GetPreviousNonBlankLine(clean_lines, linenum):
   prevlinenum = linenum - 1
   while prevlinenum >= 0:
     prevline = clean_lines.elided[prevlinenum]
-    if not IsBlankLine(prevline):     # if not a blank line...
+    #if not IsBlankLine(prevline):     # if not a blank line...
+    if prevline.strip():
       return (prevline, prevlinenum)
     prevlinenum -= 1
   return ('', -1)
@@ -862,12 +863,10 @@ def CheckForFunctionParams(filename, clean_lines, linenum,
   regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('  # decls * & space::name( ...
   match_result = Match(regexp, line)
   if match_result:
-    print line
     regexp = r'(\s|\S)*\((\s|\S)*\)'
     match_result = Match(regexp, line)
-    print match_result
-    params = match_result.group(2).split()[-1]
-    print params
+    if match_result!= None and match_result.group(2) != None:
+      params = match_result.group(2).split()[-1]
  
 
 def CheckForFunctionLengths(filename, clean_lines, linenum,
@@ -903,7 +902,6 @@ def CheckForFunctionLengths(filename, clean_lines, linenum,
   regexp = r'(\w(\w|:|::|\*|\&|\s)*)\('  # decls * & space::name( ...
   match_result = Match(regexp, line)
   if match_result:
-    print line
     # If the name is all caps and underscores, figure it's a macro and
     # ignore it, unless it's TEST or TEST_F.
     function_name = match_result.group(1).split()[-1]
@@ -922,7 +920,6 @@ def CheckForFunctionLengths(filename, clean_lines, linenum,
       elif Search(r'{', start_line):
         body_found = True
         function = Search(r'((\w|:)*)\(', line).group(1)
-        print function
         if Match(r'TEST', function):    # Handle TEST... macros
           parameter_regexp = Search(r'(\(.*\))', joined_line)
           if parameter_regexp:             # Ignore bad syntax

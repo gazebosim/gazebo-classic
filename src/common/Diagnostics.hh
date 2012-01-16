@@ -27,83 +27,80 @@
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
-    /// \addtogroup gazebo_common Common 
+    /// \addtogroup gazebo_common Common
     /// \{
-
     #define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
-  
+
     class DiagnosticTimer;
     typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
-  
+
     /// \brief A diagnostic manager class
     class DiagnosticManager : public SingletonT<DiagnosticManager>
     {
       /// \brief Constructor
       private: DiagnosticManager();
-  
+
       /// \brief Destructor
       private: virtual ~DiagnosticManager();
-  
-      public: DiagnosticTimerPtr CreateTimer(const std::string &name);
-  
+
+      public: DiagnosticTimerPtr CreateTimer(const std::string &_name);
+
       /// \brief A diagnostic timer has started
-      public: void TimerStart(DiagnosticTimer *timer);
-  
+      public: void TimerStart(DiagnosticTimer *_timer);
+
       /// \brief A diagnostic timer has stoped
-      public: void TimerStop(DiagnosticTimer *timer);
-  
+      public: void TimerStop(DiagnosticTimer *_timer);
+
       /// \brief Get the number of timers
       public: int GetTimerCount() const;
-  
+
       /// \brief Get a specific time
-      public: Time GetTime(int index) const;
-  
+      public: Time GetTime(int _index) const;
+
       /// \brief Get a time based on a label
-      public: Time GetTime(const std::string &label) const;
-  
+      public: Time GetTime(const std::string &_label) const;
+
       /// \brief Get a label for a timer
-      public: std::string GetLabel(int index) const;
-  
-      public: void SetEnabled(bool e) {this->enabled = e;}
-  
+      public: std::string GetLabel(int _index) const;
+
+      public: void SetEnabled(bool _e) {this->enabled = _e;}
       public: inline bool GetEnabled() const {return this->enabled;}
-  
       private: bool enabled;
-  
+
       private: std::map<std::string, Time> timers;
-  
+
       //Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
     };
-  
+
     /// \brief A timer designed for diagnostics
     class DiagnosticTimer : public Timer
     {
       /// \brief Constructor
-      public: DiagnosticTimer(const std::string &name) : Timer() 
+      public: DiagnosticTimer(const std::string &_name) : Timer()
               {
                 this->Start();
-                this->name = name; 
+                this->name = _name;
                 this->diagManager->TimerStart(this);
               }
-  
+
       /// \brief Destructor
-      public: virtual ~DiagnosticTimer() 
-              { 
+      public: virtual ~DiagnosticTimer()
+              {
                 this->diagManager->TimerStop(this);
               }
-  
-      public: inline const std::string GetName() const 
+
+      public: inline const std::string GetName() const
               { return this->name; }
-  
       private: std::string name;
       private: static DiagnosticManager *diagManager;
     };
 
-    /// \}  
+    /// \}
   }
- 
+
 }
 #endif
+

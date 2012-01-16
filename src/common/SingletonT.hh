@@ -22,9 +22,8 @@
 #ifndef SINGLETONT_HH
 #define SINGLETONT_HH
 
-/// \addtogroup gazebo_common Common 
+/// \addtogroup gazebo_common Common
 /// \{
-
 /// \brief Singleton class
 template <class T>
 class SingletonT
@@ -37,10 +36,8 @@ class SingletonT
 
   /// \brief Constructor
   protected: SingletonT() {}
-
   /// \brief Destructor
   protected: virtual ~SingletonT() {}
-
   private: static T &GetInstance()
            {
              static T t;
@@ -55,3 +52,4 @@ T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 /// \}
 
 #endif
+
