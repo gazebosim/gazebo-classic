@@ -15,14 +15,15 @@ void _dSolveL1T (const dReal *L, dReal *B, int n, int lskip1)
   /* declare variables - Z matrix, p and q vectors, etc */
   dReal Z11,m11,Z21,m21,Z31,m31,Z41,m41,p1,q1,p2,p3,p4,*ex;
   const dReal *ell;
-  int lskip2,lskip3,i,j;
+  int lskip2,i,j;
+  /*int lskip3;*/
   /* special handling for L and B because we're solving L1 *transpose* */
   L = L + (n-1)*(lskip1+1);
   B = B + n-1;
   lskip1 = -lskip1;
   /* compute lskip values */
   lskip2 = 2*lskip1;
-  lskip3 = 3*lskip1;
+  /* lskip3 = 3*lskip1; */
   /* compute all 4 x 1 blocks of X */
   for (i=0; i <= n-4; i+=4) {
     /* compute all 4 x 1 block of X, from rows i..i+4-1 */

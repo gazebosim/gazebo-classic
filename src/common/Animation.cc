@@ -192,7 +192,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 {
 
   KeyFrame *kBase1, *kBase2;
-  PoseKeyFrame *k1, *k2;
+  PoseKeyFrame *k1;//, *k2;
   unsigned int firstKeyIndex;
 
   if (this->build)
@@ -201,7 +201,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
   double t = this->GetKeyFramesAtTime(_time, &kBase1, &kBase2, firstKeyIndex);
 
   k1 = static_cast<PoseKeyFrame*>(kBase1);
-  k2 = static_cast<PoseKeyFrame*>(kBase2);
+  //k2 = static_cast<PoseKeyFrame*>(kBase2);
 
   if (t == 0.0)
   {

@@ -801,6 +801,9 @@ static void expandPolytope(ccd_pt_t *pt, ccd_pt_el_t *el,
     ccd_pt_edge_t *e[8];
     ccd_pt_face_t *f[2];
 
+    v[0] = v[1] = v[2] = v[3] = v[4] = 0;    
+    e[0] = e[1] = e[2] = e[3] = e[4] = e[5] = e[6] = e[7] = 0;
+    f[0] = f[1] = 0;
 
     /* element can be either segment or triangle */
     if (el->type == CCD_PT_EDGE){

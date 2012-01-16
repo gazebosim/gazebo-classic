@@ -1561,7 +1561,7 @@ L40:
     static integer i__, j, l, info;
     static logical nota, notb;
     static real temp;
-    static integer ncola;
+    /*static integer ncola;*/
     extern logical lsame_(char *, char *, ftnlen, ftnlen);
     static integer nrowa, nrowb;
 
@@ -1727,10 +1727,10 @@ L40:
     notb = lsame_(transb, "N", (ftnlen)1, (ftnlen)1);
     if (nota) {
 	nrowa = *m;
-	ncola = *k;
+	/*ncola = *k;*/
     } else {
 	nrowa = *k;
-	ncola = *m;
+	/*ncola = *m;*/
     }
     if (notb) {
 	nrowb = *k;
@@ -3717,7 +3717,7 @@ static integer c_n1 = -1;
 	integer *lwork, integer *info, ftnlen uplo_len)
 {
     /* System generated locals */
-    integer a_dim1, a_offset, b_dim1, b_offset, i__1;
+    integer a_dim1, a_offset, b_dim1, b_offset;/*, i__1;*/
 
     /* Local variables */
     static integer nb;
@@ -3883,7 +3883,7 @@ static integer c_n1 = -1;
     }
 
     if (*info != 0) {
-	i__1 = -(*info);
+	/*i__1 = -(*info);*/
 	return 0;
     } else if (lquery) {
 	return 0;

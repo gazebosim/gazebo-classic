@@ -53,11 +53,11 @@ void MultiRayShape::Init()
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
-  double horzResolution = 1.0;
+  //double horzResolution = 1.0;
 
   double pDiff = 0;
   int vertSamples = 1;
-  double vertResolution = 1.0;
+  //double vertResolution = 1.0;
   double vertMinAngle = 0;
   double vertMaxAngle = 0;
 
@@ -74,14 +74,14 @@ void MultiRayShape::Init()
     vertMinAngle = this->vertElem->GetValueDouble("min_angle");
     vertMaxAngle = this->vertElem->GetValueDouble("max_angle");
     vertSamples = this->vertElem->GetValueUInt("samples");
-    vertResolution = this->vertElem->GetValueDouble("resolution");
+    //vertResolution = this->vertElem->GetValueDouble("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
   horzMinAngle = this->horzElem->GetValueDouble("min_angle");
   horzMaxAngle = this->horzElem->GetValueDouble("max_angle");
   horzSamples = this->horzElem->GetValueUInt("samples");
-  horzResolution = this->horzElem->GetValueDouble("resolution");
+  //horzResolution = this->horzElem->GetValueDouble("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
   minRange = this->rangeElem->GetValueDouble("min");

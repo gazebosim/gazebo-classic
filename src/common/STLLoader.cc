@@ -170,8 +170,8 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 /// Reads a binary STL (stereolithography) file.
 void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 {
-  char c;
-  short int attribute = 0;
+  //char c;
+  //short int attribute = 0;
   int i;
   int iface;
   int face_num;
@@ -180,8 +180,9 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
   mesh->AddSubMesh(subMesh);
 
   //80 byte Header.
-  for ( i = 0; i < 80; i++ )
-    c = (char)fgetc(filein);
+  for (i = 0; i < 80; i++)
+    (char)fgetc(filein);
+    //c = (char)fgetc(filein);
 
   //Number of faces.
   face_num = this->LongIntRead(filein);
@@ -220,7 +221,8 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
     subMesh->AddNormal(normal);
     subMesh->AddIndex( subMesh->GetVertexCount()-1 );
 
-    attribute = ShortIntRead ( filein );
+    //attribute = ShortIntRead ( filein );
+    ShortIntRead ( filein );
   }
 }
 

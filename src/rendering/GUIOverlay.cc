@@ -156,6 +156,7 @@ bool GUIOverlay::HandleKeyReleaseEvent( const std::string &_key)
 bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
 {
   bool result = false;
+#ifdef HAVE_CEGUI
   bool press, release, pos, scroll;
 
   press = false;
@@ -163,7 +164,6 @@ bool GUIOverlay::HandleMouseEvent( const common::MouseEvent &_evt)
   pos = false;
   scroll = false;
 
-#ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
   pos = system->injectMousePosition( _evt.pos.x, _evt.pos.y);
 

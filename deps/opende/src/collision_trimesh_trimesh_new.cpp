@@ -1026,7 +1026,8 @@ dReal FindTriangleTriangleCollision(
 {
 	dReal maxdeep=dInfinity;
 	dReal dist;
-	int mostdir=0,mostface = 0, currdir=0;
+	int mostdir=0, currdir=0;
+        //int mostface = 0;
 //	dReal vmin1,vmax1,vmin2,vmax2;
 //	dVector3 crossdir, pt1,pt2;
 	dVector4 tri1plane,tri2plane;
@@ -1095,7 +1096,7 @@ dReal FindTriangleTriangleCollision(
 		{
 			maxdeep = dist;
 			mostdir = currdir;
-			mostface = 1;
+			//mostface = 1;
 			SET(separating_normal,tri2plane);
 		}
 	}

@@ -352,6 +352,8 @@ void Link::UpdateParameters( sdf::ElementPtr &_sdf )
 /// Set the collide mode of the body
 void Link::SetCollideMode( const std::string &m )
 {
+  // TODO: Put this back in
+/*
   Base_V::iterator giter;
 
   unsigned int collideBits;
@@ -370,8 +372,7 @@ void Link::SetCollideMode( const std::string &m )
     return;
   }
 
-  // TODO: Put this back in
-  /*for (giter = this->collisions.begin(); giter != this->collisions.end(); giter++)
+  for (giter = this->collisions.begin(); giter != this->collisions.end(); giter++)
   {
     (*giter)->SetCategoryBits(collideBits);
     (*giter)->SetCollideBits(collideBits);
