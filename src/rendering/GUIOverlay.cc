@@ -437,6 +437,8 @@ int GUIOverlay::GetKeyCode(const std::string  &_unicode)
     case 13: return CEGUI::Key::Return;
     case 127: return CEGUI::Key::Delete;
   };
+
+  return 0;
 }
 
 #endif

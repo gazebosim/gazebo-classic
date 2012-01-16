@@ -700,7 +700,7 @@ const int ANN_N_SHRINK_RULES	= 4;	// number of shrink rules
 //----------------------------------------------------------------------
 class ANNkdStats;				// stats on kd-tree
 class ANNkd_node;				// generic node in a kd-tree
-typedef ANNkd_node*	ANNkd_ptr;	// pointer to a kd-tree node
+typedef ANNkd_node *ANNkd_ptr;	// pointer to a kd-tree node
 
 class DLL_API ANNkd_tree: public ANNpointSet {
 protected:
