@@ -69,15 +69,15 @@ rendering::ScenePtr rendering::get_scene(const std::string &_name)
   return rendering::RenderEngine::Instance()->GetScene(_name);
 }
 
-rendering::ScenePtr rendering::create_scene(const std::string &_name, 
-                                            bool _enableVisualizations )
+rendering::ScenePtr rendering::create_scene(const std::string &_name,
+                                            bool _enableVisualizations)
 {
   ScenePtr scene;
 
   // Create a default scene for the gui
   try
   {
-    scene = rendering::RenderEngine::Instance()->CreateScene(_name, 
+    scene = rendering::RenderEngine::Instance()->CreateScene(_name,
         _enableVisualizations);
   }
   catch (common::Exception e)
@@ -92,3 +92,5 @@ void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
 }
+
+

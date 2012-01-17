@@ -51,7 +51,8 @@ namespace gazebo
     public: int GetCount() const;
 
     /// \brief Get the relative starting and ending points of a ray
-    public: void GetRelativePoints(int index, math::Vector3 &a, math::Vector3 &b);
+    public: void GetRelativePoints(int index, math::Vector3 &a,
+                                   math::Vector3 &b);
 
     /// \brief Get the range of a ray
     public: double GetRange(int index) const;

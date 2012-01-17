@@ -73,15 +73,18 @@ namespace gazebo
             {gzerr << "Not implement in Bullet\n";}
     /// \brief Get the anchor point
     public: virtual gazebo::math::Vector3 GetAnchor(int index) const
-            {gzerr << "Not implement in Bullet\n"; return math::Vector3();}
+            {gzerr << "Not implement in Bullet\n";
+             return math::Vector3();}
     /// \brief Get the force the joint applies to the first body
     /// \param index The index of the body(0 or 1)
     public: virtual math::Vector3 GetLinkForce(unsigned int index) const
-            {gzerr << "Not implement in Bullet\n"; return math::Vector3();}
+            {gzerr << "Not implement in Bullet\n";
+             return math::Vector3();}
     /// \brief Get the torque the joint applies to the first body
     /// \param index The index of the body(0 or 1)
     public: virtual math::Vector3 GetLinkTorque(unsigned int index) const
-            {gzerr << "Not implement in Bullet\n"; return math::Vector3();}
+            {gzerr << "Not implement in Bullet\n";
+             return math::Vector3();}
     /// \brief Set a parameter for the joint
     public: virtual void SetAttribute(Attribute, int index, double value)
             {gzerr << "Not implement in Bullet\n";}

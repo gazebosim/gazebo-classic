@@ -295,6 +295,7 @@ btTransform BulletPhysics::ConvertPose(const math::Pose _pose)
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->gravityP->SetValue(_gravity);
-  this->dynamicsWorld->setGravity(btmath::Vector3(_gravity.x, _gravity.y, _gravity.z));
+  this->dynamicsWorld->setGravity(btmath::Vector3(_gravity.x,
+        _gravity.y, _gravity.z));
 }
 

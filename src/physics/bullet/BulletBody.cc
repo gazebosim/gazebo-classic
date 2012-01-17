@@ -160,7 +160,8 @@ void BulletLink::Load(common::XMLConfigNode *_node)
   this->rigidLink = new btRigidLink(rigidLinkCI);
   this->rigidLink->setUserPointer(this);
 
-  // before loading child collisionetry, we have to figure out of selfCollide is true
+  // before loading child collisionetry, we have to figure out of
+  // selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   if (**this->selfCollideP)
   {
@@ -215,7 +216,8 @@ void BulletLink::SetGravityMode(bool _mode)
 bool BulletLink::GetGravityMode()
 {
   bool result;
-  gzerr << "BulletLink::GetGravityMode not implemented, returning spurious result\n";
+  gzerr << "BulletLink::GetGravityMode not implemented, "
+        << "returning spurious result\n";
 
   return result;
 }
@@ -283,8 +285,8 @@ void BulletLink::SetEnabled(bool _enable) const
 
   The UpdateCoM() function is used to compute this offset, based on
   the mass distribution of attached collisions.  This function also shifts
-  the Bullet-pose of the collisions, to keep everything in the same place in the
-  Gazebo cs.  Simple, neh?
+  the Bullet-pose of the collisions, to keep everything in the same place in
+  the Gazebo cs.  Simple, neh?
 */
 void BulletLink::UpdateCoM()
 {
@@ -342,7 +344,8 @@ void BulletLink::SetForce(const math::Vector3 &_force)
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->applyCentralForce(btmath::Vector3(_force.x, _force.y, _force.z));
+  this->rigidLink->applyCentralForce(
+      btmath::Vector3(_force.x, _force.y, _force.z));
 }
 
 //////////////////////////////////////////////////
@@ -366,8 +369,8 @@ void BulletLink::SetTorque(const math::Vector3 &_torque)
   if (!this->rigidLink)
     return;
 
-  this->rigidLink->applyTorque(btmath::Vector3(_torque.x, _torque.y, _torque.z));
-
+  this->rigidLink->applyTorque(
+      btmath::Vector3(_torque.x, _torque.y, _torque.z));
 }
 
 //////////////////////////////////////////////////
@@ -408,13 +411,14 @@ void BulletLink::SetAngularDamping(double _damping)
 }
 
 //////////////////////////////////////////////////
-/// Set the relative pose of a child collision.
-void BulletLink::SetCollisionRelativePose(BulletCollision *_collision, const math::Pose &_newPose)
+void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
+    const math::Pose &_newPose)
 {
   std::map<std::string, Collision*>::iterator iter;
   unsigned int i;
 
-  for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end(); iter++, i++)
+  for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end();
+       iter++, i++)
   {
     if (iter->second == _collision)
       break;

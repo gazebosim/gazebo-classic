@@ -13,7 +13,7 @@ bool quit = false;
 
 //////////////////////////////////////////////////
 // sighandler to shut everything down properly
-void SignalHandler( int )
+void SignalHandler(int)
 {
   quit = true;
 }
@@ -53,3 +53,4 @@ int main(int /*argc*/, char ** /*argv*/)
 
   return 0;
 }
+

@@ -61,12 +61,13 @@ BulletRaySensor::~BulletRaySensor()
 
 //////////////////////////////////////////////////
 /// Add a ray to the sensor
-void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end, double minRange,
-                          double maxRange, bool display)
+void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end,
+    double minRange, double maxRange, bool display)
 {
   BulletRayCollision *rayCollision;
 
-  rayCollision = (BulletRayCollision*)this->GetWorld()->CreateCollision("ray", this->body);
+  rayCollision = (BulletRayCollision*)this->GetWorld()->CreateCollision("ray",
+      this->body);
   rayCollision->SetDisplayRays(display);
   rayCollision->SetMinLength(minRange);
   rayCollision->SetMaxLength(maxRange);
@@ -84,7 +85,8 @@ int BulletRaySensor::GetCount() const
 
 //////////////////////////////////////////////////
 /// Get the relative starting and ending points of a ray
-void BulletRaySensor::GetRelativePoints(int _index, math::Vector3 &_a, math::Vector3 &_b)
+void BulletRaySensor::GetRelativePoints(int _index,
+    math::Vector3 &_a, math::Vector3 &_b)
 {
   if (_index <0 || _index >= (int)(this->rays.size()))
   {

@@ -32,7 +32,7 @@ void Material::Update(const gazebo::common::Material *_mat)
         _mat->GetName(), "General");
   else
     matPtr = Ogre::MaterialManager::getSingleton().create(
-        _mat->GetName(),"General");
+        _mat->GetName(), "General");
 
   matPtr->setReceiveShadows(false);
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
@@ -42,7 +42,7 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
 
-  pass->setLightingEnabled( _mat->GetLighting() );
+  pass->setLightingEnabled(_mat->GetLighting());
   pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
   pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
 
@@ -54,10 +54,10 @@ void Material::Update(const gazebo::common::Material *_mat)
 
   pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
   pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
-  
+
   pass->setShininess(_mat->GetShininess());
- 
-  // Only add the texture unit if it's not present in the material 
+
+  // Only add the texture unit if it's not present in the material
   if (!_mat->GetTextureImage().empty() &&
       pass->getTextureUnitState(_mat->GetTextureImage()) == NULL)
   {
@@ -67,3 +67,5 @@ void Material::Update(const gazebo::common::Material *_mat)
     texState->setName(_mat->GetTextureImage());
   }
 }
+
+

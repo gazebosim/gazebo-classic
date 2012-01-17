@@ -15,7 +15,7 @@ void PrintVersion()
 
 //////////////////////////////////////////////////
 // sighandler to shut everything down properly
-void SignalHandler( int /*dummy*/ )
+void SignalHandler(int /*dummy*/)
 {
   master->Stop();
   return;
@@ -34,7 +34,7 @@ int main(int /*argc*/, char ** /*argv*/)
   std::string host = "";
   unsigned short port = 0;
 
-  if ( !gazebo::transport::get_master_uri(host,port) )
+  if (!gazebo::transport::get_master_uri(host, port))
 
   master = new gazebo::Master();
   master->Init(port);
@@ -46,3 +46,4 @@ int main(int /*argc*/, char ** /*argv*/)
 
   return 1;
 }
+

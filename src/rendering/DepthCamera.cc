@@ -44,8 +44,9 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 // Constructor
-DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene, bool _autoRender) :
-             Camera(_namePrefix, _scene, _autoRender)
+DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene,
+                         bool _autoRender)
+: Camera(_namePrefix, _scene, _autoRender)
 {
   this->depthTarget = NULL;
   this->depthBuffer = NULL;
@@ -60,7 +61,7 @@ DepthCamera::~DepthCamera()
 
 //////////////////////////////////////////////////
 // Load the camera
-void DepthCamera::Load( sdf::ElementPtr &_sdf )
+void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
 }
@@ -87,7 +88,7 @@ void DepthCamera::Fini()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::CreateDepthTexture( const std::string &_textureName )
+void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 {
   // Create the depth buffer
   std::string depthMaterialName = this->GetName() + "_RttMat_Camera_Depth";
@@ -103,11 +104,11 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   this->depthTarget = this->depthTexture->getBuffer()->getRenderTarget();
   this->depthTarget->setAutoUpdated(false);
 
-  this->SetDepthTarget( this->depthTarget );
+  this->SetDepthTarget(this->depthTarget);
 
   this->depthViewport->setOverlaysEnabled(false);
-  //this->depthViewport->setBackgroundColour(Ogre::ColourValue::Black);
-  this->depthViewport->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0,0,0)));
+  this->depthViewport->setBackgroundColour(
+      Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
   // Create materials for all the render textures.
   Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
@@ -119,7 +120,7 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   matPtr->getTechnique(0)->getPass(0)->setLightingEnabled(false);
 
   matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
-      _textureName );
+      _textureName);
 
   this->depthMaterial = (Ogre::Material*)(
       Ogre::MaterialManager::getSingleton().getByName(
@@ -128,19 +129,21 @@ void DepthCamera::CreateDepthTexture( const std::string &_textureName )
   this->depthMaterial->load();
 
 /*
-  // Create a custom render queue invocation sequence for the depth 
+  // Create a custom render queue invocation sequence for the depth
   // render texture
   Ogre::RenderQueueInvocationSequence* invocationSequence =
-    Ogre::Root::getSingleton().createRenderQueueInvocationSequence(_textureName + "_DepthMap");
+    Ogre::Root::getSingleton().createRenderQueueInvocationSequence(_textureName
+    + "_DepthMap");
 
   // Add a render queue invocation to the sequence, and disable shadows for it
-  Ogre::RenderQueueInvocation* invocation = 
+  Ogre::RenderQueueInvocation* invocation =
     invocationSequence->add(Ogre::RENDER_QUEUE_MAIN, _textureName + "_main");
   invocation->setSuppressShadows(true);
 
-  // Set the render queue invocation sequence for the depth render texture 
+  // Set the render queue invocation sequence for the depth render texture
   // viewport
-  this->depthViewport->setRenderQueueInvocationSequenceName(_textureName + "_DepthMap");
+  this->depthViewport->setRenderQueueInvocationSequenceName(
+  _textureName + "_DepthMap");
 */
 }
 
@@ -165,7 +168,7 @@ void DepthCamera::PostRender()
     if (!this->depthBuffer)
       this->depthBuffer = new float[width*height];
 
-    Ogre::Box src_box(0,0,width, height);
+    Ogre::Box src_box(0, 0, width, height);
     Ogre::PixelBox dst_box(width, height,
         1, format, this->depthBuffer);
 
@@ -173,7 +176,7 @@ void DepthCamera::PostRender()
     pixelBuffer->blitToMemory(src_box, dst_box);
     pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
-    this->newDepthFrame( this->depthBuffer, width, height, 1, "FLOAT32");
+    this->newDepthFrame(this->depthBuffer, width, height, 1, "FLOAT32");
   }
 
   // also new image frame for camera texture
@@ -202,16 +205,17 @@ void DepthCamera::RenderImpl()
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
-  this->GetOgreCamera()->setFarClipDistance( this->GetFarClip() );
+  this->GetOgreCamera()->setFarClipDistance(this->GetFarClip());
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
   vp = this->depthTarget->getViewport(0);
 
   // return 0 in case no renderable object is inside frustrum
-  vp->setBackgroundColour( Ogre::ColourValue(Ogre::ColourValue(0,0,0)) );
+  vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
 
-  Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Gazebo/DepthMap", true);
+  Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp,
+      "Gazebo/DepthMap", true);
 
   // Need this line to render the ground plane. No idea why it's necessary.
   renderSys->_setViewport(vp);
@@ -225,21 +229,22 @@ void DepthCamera::RenderImpl()
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   pass->_updateAutoParamsNoLights(&autoParamDataSource);
 #else
-  pass->_updateAutoParams(&autoParamDataSource,1);
+  pass->_updateAutoParams(&autoParamDataSource, 1);
 #endif
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
 
   // These two lines don't seem to do anything useful
-  renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS());
+  renderSys->_setProjectionMatrix(
+      this->GetOgreCamera()->getProjectionMatrixRS());
   renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
 
   // NOTE: We MUST bind parameters AFTER updating the autos
   if (pass->hasVertexProgram())
   {
     renderSys->bindGpuProgram(
-    pass->getVertexProgram()->_getBindingDelegate() );
+    pass->getVertexProgram()->_getBindingDelegate());
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
@@ -253,7 +258,7 @@ void DepthCamera::RenderImpl()
   if (pass->hasFragmentProgram())
   {
     renderSys->bindGpuProgram(
-    pass->getFragmentProgram()->_getBindingDelegate() );
+    pass->getFragmentProgram()->_getBindingDelegate());
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
@@ -283,7 +288,7 @@ const float* DepthCamera::GetDepthData()
 
 //////////////////////////////////////////////////
 // Set the render target for the camera
-void DepthCamera::SetDepthTarget( Ogre::RenderTarget *target )
+void DepthCamera::SetDepthTarget(Ogre::RenderTarget *target)
 {
   this->depthTarget = target;
 
@@ -292,17 +297,21 @@ void DepthCamera::SetDepthTarget( Ogre::RenderTarget *target )
     // Setup the viewport to use the texture
     this->depthViewport = this->depthTarget->addViewport(this->camera);
     this->depthViewport->setClearEveryFrame(true);
-    this->depthViewport->setBackgroundColour( Conversions::Convert( this->scene->GetBackgroundColor() ) );
-    this->depthViewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->depthViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+    this->depthViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
-    double ratio = (double)this->depthViewport->getActualWidth() / 
+    double ratio = (double)this->depthViewport->getActualWidth() /
                    (double)this->depthViewport->getActualHeight();
 
     double hfov = this->GetHFOV().GetAsRadian();
-    double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     //gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
 }
+
+
 

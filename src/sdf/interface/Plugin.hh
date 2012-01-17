@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -45,18 +45,18 @@ namespace sdf
 {
   class Plugin : public SDFBase
   {
-    public: Plugin() : 
-            name("name", "", true), 
+    public: Plugin() :
+            name("name", "", true),
             filename("filename", "", true)
-            { 
+            {
               Param::End();
-              this->xmlTree = "{plugin:name,filename}";
+              this->xmlTree = "{plugin:name, filename}";
             }
-  
+
     public: ParamT<std::string> name;
     public: ParamT<std::string> filename;
     public: std::vector<ParamT<std::string> > data;
- 
+
     public: void Clear()
     {
       SDFBase::Clear();
@@ -68,10 +68,11 @@ namespace sdf
 
     public: void Print(const std::string &prefix)
             {
-              std::cout << prefix  << "Plugin: Name[" << this->name 
+              std::cout << prefix  << "Plugin: Name[" << this->name
                         << "] File[" << this->filename << "]\n";
             }
   };
 }
 
 #endif
+

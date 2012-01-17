@@ -37,7 +37,7 @@
 #include "rendering/Camera.hh"
 #include "rendering/Visual.hh"
 #include "rendering/DynamicLines.hh"
-#include "rendering/UserCamera.hh"   
+#include "rendering/UserCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -46,18 +46,17 @@ using namespace rendering;
 int UserCamera::count = 0;
 
 //////////////////////////////////////////////////
-/// Constructor
 UserCamera::UserCamera(const std::string &name_, Scene *scene_)
   : Camera(name_, scene_)
 {
   std::stringstream stream;
 
   stream << "UserCamera_" << this->count++;
-  this->name = stream.str(); 
+  this->name = stream.str();
 
   this->connections.push_back(
       event::Events::ConnectShowCameras(
-        boost::bind(&UserCamera::ToggleShowVisual, this) ) );
+        boost::bind(&UserCamera::ToggleShowVisual, this)));
   this->animState = NULL;
 
   this->gui = new GUIOverlay();
@@ -68,7 +67,6 @@ UserCamera::UserCamera(const std::string &name_, Scene *scene_)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 UserCamera::~UserCamera()
 {
   delete this->orbitViewController;
@@ -81,21 +79,18 @@ UserCamera::~UserCamera()
 }
 
 //////////////////////////////////////////////////
-// Load child
-void UserCamera::Load( sdf::ElementPtr _sdf )
+void UserCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-// Load 
-void UserCamera::Load( )
+void UserCamera::Load()
 {
   Camera::Load();
 }
 
 //////////////////////////////////////////////////
-/// Initialize
 void UserCamera::Init()
 {
   Camera::Init();
@@ -105,52 +100,52 @@ void UserCamera::Init()
   /*this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 
   // The lines draw a visualization of the camera
-  DynamicLines *line = this->visual->CreateDynamicLine( RENDERING_LINE_LIST );
+  DynamicLines *line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
 
   float f = 0.2;
 
   // Create the front face
-  line->AddPoint(math::Vector3(0, -f, -f)); 
-  line->AddPoint(math::Vector3(0, -f, +f)); 
+  line->AddPoint(math::Vector3(0, -f, -f));
+  line->AddPoint(math::Vector3(0, -f, +f));
 
-  line->AddPoint(math::Vector3(0, -f, +f)); 
-  line->AddPoint(math::Vector3(0, +f, +f)); 
+  line->AddPoint(math::Vector3(0, -f, +f));
+  line->AddPoint(math::Vector3(0, +f, +f));
 
-  line->AddPoint(math::Vector3(0, +f, +f)); 
-  line->AddPoint(math::Vector3(0, +f, -f)); 
+  line->AddPoint(math::Vector3(0, +f, +f));
+  line->AddPoint(math::Vector3(0, +f, -f));
 
-  line->AddPoint(math::Vector3(0, +f, -f)); 
-  line->AddPoint(math::Vector3(0, -f, -f)); 
+  line->AddPoint(math::Vector3(0, +f, -f));
+  line->AddPoint(math::Vector3(0, -f, -f));
 
 
   // Create the connecting lines
-  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(math::Vector3(+0.0, -f, -f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0));
+  line->AddPoint(math::Vector3(+0.0, -f, -f));
 
-  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(math::Vector3(+0.0, -f, +f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0));
+  line->AddPoint(math::Vector3(+0.0, -f, +f));
 
-  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(math::Vector3(+0.0, +f, +f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0));
+  line->AddPoint(math::Vector3(+0.0, +f, +f));
 
-  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(math::Vector3(+0.0, +f, -f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0));
+  line->AddPoint(math::Vector3(+0.0, +f, -f));
 
-  line->AddPoint(math::Vector3(-0.4, 0, 0)); 
-  line->AddPoint(math::Vector3(+0.0, -f, -f)); 
+  line->AddPoint(math::Vector3(-0.4, 0, 0));
+  line->AddPoint(math::Vector3(+0.0, -f, -f));
 
   // Draw up arrow
-  line->AddPoint(math::Vector3(0, 0, +f)); 
-  line->AddPoint(math::Vector3(0, 0, +f+0.1)); 
+  line->AddPoint(math::Vector3(0, 0, +f));
+  line->AddPoint(math::Vector3(0, 0, +f+0.1));
 
-  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1)); 
-  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1)); 
+  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1));
+  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1));
 
-  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1)); 
-  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15)); 
+  line->AddPoint(math::Vector3(0.0, +0.02, +f+0.1));
+  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15));
 
-  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15)); 
-  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1)); 
+  line->AddPoint(math::Vector3(0.0, +0.00, +f+0.15));
+  line->AddPoint(math::Vector3(0.0, -0.02, +f+0.1));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -160,7 +155,6 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-/// Update
 void UserCamera::Update()
 {
   this->viewController->Update();
@@ -186,7 +180,6 @@ void UserCamera::Update()
 }
 
 //////////////////////////////////////////////////
-// Post Render
 void UserCamera::PostRender()
 {
   Camera::PostRender();
@@ -240,8 +233,8 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
     this->gui->HandleKeyReleaseEvent(_key);
 }
 
-bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,
-                                     double _minDist, double _maxDist )
+bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
+                                     double _minDist, double _maxDist)
 {
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
@@ -254,11 +247,11 @@ bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
     double pitch = 0;
 
-    if (fabs(zDiff) > 1e-3) 
+    if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Distance( 
+      double dist = _visual->GetWorldPose().pos.Distance(
           this->GetWorldPose().pos);
-      pitch = acos(zDiff/dist );
+      pitch = acos(zDiff/dist);
     }
 
     this->RotateYaw(yaw);
@@ -266,10 +259,11 @@ bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,
 
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z; 
+    pos.z = bb.max.z;
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
-    ((OrbitViewController*)this->viewController)->SetDistanceRange( _minDist, _maxDist );
+    ((OrbitViewController*)this->viewController)->SetDistanceRange(_minDist,
+      _maxDist);
   }
   else
     this->SetViewController(FPSViewController::GetTypeString());
@@ -277,9 +271,10 @@ bool UserCamera::AttachToVisualImpl( VisualPtr _visual,bool _inheritOrientation,
   return true;
 }
 
-bool UserCamera::TrackVisualImpl( VisualPtr _visual )
+//////////////////////////////////////////////////
+bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 {
-  Camera::TrackVisualImpl( _visual );
+  Camera::TrackVisualImpl(_visual);
   if (_visual)
     this->SetViewController(OrbitViewController::GetTypeString());
   else
@@ -289,8 +284,7 @@ bool UserCamera::TrackVisualImpl( VisualPtr _visual )
 }
 
 //////////////////////////////////////////////////
-// Set view controller
-void UserCamera::SetViewController( const std::string &type )
+void UserCamera::SetViewController(const std::string &type)
 {
   if (this->viewController->GetTypeString() == type)
     return;
@@ -300,15 +294,14 @@ void UserCamera::SetViewController( const std::string &type )
   else if (type == FPSViewController::GetTypeString())
     this->viewController = this->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type );
+    gzthrow("Invalid view controller type: " + type);
 
   this->viewController->Init();
 }
 
 //////////////////////////////////////////////////
-// Set view controller
-void UserCamera::SetViewController( const std::string &type, 
-                                    const math::Vector3 &_pos )
+void UserCamera::SetViewController(const std::string &type,
+                                    const math::Vector3 &_pos)
 {
   if (this->viewController->GetTypeString() == type)
     return;
@@ -318,23 +311,23 @@ void UserCamera::SetViewController( const std::string &type,
   else if (type == FPSViewController::GetTypeString())
     this->viewController = this->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type );
+    gzthrow("Invalid view controller type: " + type);
 
   this->viewController->Init(_pos);
 }
 
 //////////////////////////////////////////////////
-/// Resize the camera
 void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 {
   if (this->viewport)
   {
-    this->viewport->setDimensions(0,0,1,1);
-    double ratio = (double)this->viewport->getActualWidth() / 
+    this->viewport->setDimensions(0, 0, 1, 1);
+    double ratio = (double)this->viewport->getActualWidth() /
                    (double)this->viewport->getActualHeight();
 
-    double hfov = this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
-    double vfov = 2.0 * atan(tan( hfov / 2.0) / ratio);
+    double hfov =
+      this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
@@ -348,42 +341,38 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 }
 
 //////////////////////////////////////////////////
-// Set the dimensions of the viewport
-void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/, float /*w_*/, float /*h_*/)
+void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
+                                       float /*w_*/, float /*h_*/)
 {
   //this->viewport->setDimensions(x, y, w, h);
 }
 
 //////////////////////////////////////////////////
-/// Get the average frames per second
 float UserCamera::GetAvgFPS() const
 {
   return WindowManager::Instance()->GetAvgFPS(this->windowId);
 }
 
 //////////////////////////////////////////////////
-/// Get the triangle count 
 float UserCamera::GetTriangleCount() const
 {
   return WindowManager::Instance()->GetTriangleCount(this->windowId);
 }
 
 //////////////////////////////////////////////////
-// Toggle whether to show the visual
 void UserCamera::ToggleShowVisual()
 {
   //this->visual->ToggleVisible();
 }
 
 //////////////////////////////////////////////////
-// Set whether to show the visual
 void UserCamera::ShowVisual(bool /*_s*/)
 {
   //this->visual->SetVisible(_s);
 }
 
 //////////////////////////////////////////////////
-void UserCamera::MoveToVisual( const std::string &_name )
+void UserCamera::MoveToVisual(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
@@ -393,8 +382,7 @@ void UserCamera::MoveToVisual( const std::string &_name )
 }
 
 //////////////////////////////////////////////////
-// Move the camera to focus on an scene node
-void UserCamera::MoveToVisual( VisualPtr _visual )
+void UserCamera::MoveToVisual(VisualPtr _visual)
 {
     if (!_visual)
     return;
@@ -405,11 +393,12 @@ void UserCamera::MoveToVisual( VisualPtr _visual )
     this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
-  Ogre::Animation *anim = this->scene->GetManager()->createAnimation("cameratrack",.5);
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation("cameratrack", .5);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
 
   math::Box box = _visual->GetBoundingBox();
   math::Vector3 size = box.GetSize();
@@ -434,14 +423,14 @@ void UserCamera::MoveToVisual( VisualPtr _visual )
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y,dir.x);
+  double yawAngle = atan2(dir.y, dir.x);
   double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0,0,1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0,1,0));
+  Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0, 0, 1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0, 1, 0));
 
   dir.Normalize();
 
-  double scale = maxSize / tan( (this->GetHFOV()/2.0).GetAsRadian() );
+  double scale = maxSize / tan((this->GetHFOV()/2.0).GetAsRadian());
 
   end = mid + dir*(dist - scale);
 
@@ -455,27 +444,28 @@ void UserCamera::MoveToVisual( VisualPtr _visual )
   key->setRotation(this->pitchNode->getOrientation());
 
   key = strack->createNodeKeyFrame(.2);
-  key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
+  key->setTranslate(Ogre::Vector3(mid.x, mid.y, mid.z));
   key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(.2);
   key->setRotation(pitchFinal);
 
   key = strack->createNodeKeyFrame(.5);
-  key->setTranslate( Ogre::Vector3(end.x, end.y, end.z));
+  key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
   key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(.5);
   key->setRotation(pitchFinal);
 
-  this->animState = this->scene->GetManager()->createAnimationState("cameratrack");
+  this->animState =
+    this->scene->GetManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
 }
 
-bool UserCamera::MoveToPosition( const math::Vector3 &_end, 
+bool UserCamera::MoveToPosition(const math::Vector3 &_end,
                                  double _pitch, double _yaw, double _time)
 {
   if (this->animState)
@@ -491,14 +481,15 @@ bool UserCamera::MoveToPosition( const math::Vector3 &_end,
   else if (dyaw < -M_PI)
     _yaw -= 2*M_PI;
 
-  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0,0,1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0,1,0));
+  Ogre::Quaternion yawFinal(Ogre::Radian(_yaw), Ogre::Vector3(0, 0, 1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(_pitch), Ogre::Vector3(0, 1, 0));
 
-  Ogre::Animation *anim = this->scene->GetManager()->createAnimation("cameratrack",_time);
+  Ogre::Animation *anim =
+    this->scene->GetManager()->createAnimation("cameratrack", _time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
 
   key = strack->createNodeKeyFrame(0);
   key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
@@ -508,13 +499,14 @@ bool UserCamera::MoveToPosition( const math::Vector3 &_end,
   key->setRotation(this->pitchNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate( Ogre::Vector3(_end.x, _end.y, _end.z));
+  key->setTranslate(Ogre::Vector3(_end.x, _end.y, _end.z));
   key->setRotation(yawFinal);
 
   key = ptrack->createNodeKeyFrame(_time);
   key->setRotation(pitchFinal);
 
-  this->animState = this->scene->GetManager()->createAnimationState("cameratrack");
+  this->animState =
+    this->scene->GetManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -522,7 +514,7 @@ bool UserCamera::MoveToPosition( const math::Vector3 &_end,
   return true;
 }
 
-bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts, 
+bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
                                  double _time,
                                  boost::function<void()> _onComplete)
 {
@@ -535,11 +527,11 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
   math::Vector3 start = this->GetWorldPose().pos;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack",_time);
+    this->scene->GetManager()->createAnimation("cameratrack", _time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
-  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
 
   key = strack->createNodeKeyFrame(0);
   key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
@@ -550,7 +542,7 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
 
   double dt = _time / (_pts.size()-1);
   double tt = 0;
-  for (unsigned int i=0; i < _pts.size(); i++)
+  for (unsigned int i = 0; i < _pts.size(); i++)
   {
     math::Vector3 pos = _pts[i].pos;
     math::Vector3 rpy = _pts[i].rot.GetAsEuler();
@@ -561,8 +553,8 @@ bool UserCamera::MoveToPositions(const std::vector<math::Pose> &_pts,
     else if (dyaw < -M_PI)
       rpy.z -= 2*M_PI;
 
-    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0,0,1));
-    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0,1,0));
+    Ogre::Quaternion yawFinal(Ogre::Radian(rpy.z), Ogre::Vector3(0, 0, 1));
+    Ogre::Quaternion pitchFinal(Ogre::Radian(rpy.y), Ogre::Vector3(0, 1, 0));
 
     key = strack->createNodeKeyFrame(tt);
     key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));

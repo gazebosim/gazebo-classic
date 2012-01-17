@@ -41,7 +41,6 @@ namespace Ogre
 
 namespace gazebo
 {
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -50,28 +49,28 @@ namespace gazebo
     class ViewController;
     class Scene;
 
-    /// \addtogroup gazebo_rendering Rendering 
+    /// \addtogroup gazebo_rendering Rendering
     /// \brief A set of rendering related class, functions, and definitions
     /// \{
-
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
     class DepthCamera : public Camera
     {
       /// \brief Constructor
-      public: DepthCamera(const std::string &_namePrefix, Scene *_scene, bool _autoRender=true);
-    
+      public: DepthCamera(const std::string &_namePrefix,
+                          Scene *_scene, bool _autoRender = true);
+
       /// \brief Destructor
       public: virtual ~DepthCamera();
-    
+
       /// \brief Load the camera with a set of parmeters
       /// \param _sdf The SDF camera info
-      public: void Load( sdf::ElementPtr &_sdf );
+      public: void Load(sdf::ElementPtr &_sdf);
 
        /// \brief Load the camera with default parmeters
-      public: void Load( );
-  
+      public: void Load();
+
       /// \brief Initialize the camera
       public: void Init();
 
@@ -88,27 +87,27 @@ namespace gazebo
 
       /// \brief Connect a to the add entity signal
       public: template<typename T>
-              event::ConnectionPtr ConnectNewDepthFrame( T subscriber )
+              event::ConnectionPtr ConnectNewDepthFrame(T subscriber)
               { return newDepthFrame.Connect(subscriber); }
-  
-      public: void DisconnectNewDepthFrame( event::ConnectionPtr &c )
+      public: void DisconnectNewDepthFrame(event::ConnectionPtr &c)
               { newDepthFrame.Disconnect(c); }
-
       private: virtual void RenderImpl();
 
       private: float *depthBuffer;
       private: Ogre::Material *depthMaterial;
 
-      private: event::EventT<void(const float *, unsigned int, unsigned int, unsigned int, const std::string &)> newDepthFrame;
+      private: event::EventT<void(const float *, unsigned int, unsigned int,
+                   unsigned int, const std::string &)> newDepthFrame;
 
       protected: Ogre::Texture *depthTexture;
       protected: Ogre::RenderTarget *depthTarget;
-      public: virtual void SetDepthTarget( Ogre::RenderTarget *target );
+      public: virtual void SetDepthTarget(Ogre::RenderTarget *target);
       protected: Ogre::Viewport *depthViewport;
     };
-    
+
     /// \}
   }
 }
 #endif
+
 

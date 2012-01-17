@@ -140,14 +140,16 @@ void BulletSliderJoint::SetForce(int _index, double _force)
 /// Set the high stop of an axis(index).
 void BulletSliderJoint::SetHighStop(int _index, math::Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setUpperLinLimit(_angle.GetAsRadian());
+  ((btSliderConstraint*)this->constraint)->setUpperLinLimit(
+    _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 /// Set the low stop of an axis(index).
 void BulletSliderJoint::SetLowStop(int _index, math::Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setLowerLinLimit(_angle.GetAsRadian());
+  ((btSliderConstraint*)this->constraint)->setLowerLinLimit(
+    _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
@@ -166,7 +168,7 @@ math::Angle BulletSliderJoint::GetLowStop(int _index)
 
 //////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
-void BulletSliderJoint::SetMaxForce(int _/*t*/*index*_/*t*/, double _/*t*/*t*_/*t*_/*t*/)
+void BulletSliderJoint::SetMaxForce(int _index, double _force)
 {
   gzerr << "Not implemented\n";
 }

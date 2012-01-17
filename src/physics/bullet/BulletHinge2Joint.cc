@@ -80,9 +80,12 @@ void BulletHinge2Joint::Attach(Link *_one, Link *_two)
 
   btmath::Vector3 anchor, axis1, axis2;
 
-  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  axis1 = btmath::Vector3((**this->axis1P).x, (**this->axis1P).y, (**this->axis1P).z);
-  axis2 = btmath::Vector3((**this->axis2P).x, (**this->axis2P).y, (**this->axis2P).z);
+  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y,
+                           this->anchorPos.z);
+  axis1 = btmath::Vector3((**this->axis1P).x, (**this->axis1P).y,
+                          (**this->axis1P).z);
+  axis2 = btmath::Vector3((**this->axis2P).x, (**this->axis2P).y,
+                          (**this->axis2P).z);
 
   this->constraint = new btHinge2Constraint(*rigidLink1, *rigidLink2,
       anchor, axis1, axis2);
@@ -193,7 +196,8 @@ void BulletHinge2Joint::SetLowStop(int _index, math::Angle _angle)
 /// Get the high stop of an axis(index).
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
-  btRotationalLimitMotor *motor = ((btHinge2Constraint*)this->constraint)->getRotationalLimitMotor(_index);
+  btRotationalLimitMotor *motor =
+    ((btHinge2Constraint*)this->constraint)->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_hiLimit;
 
@@ -205,7 +209,8 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 /// Get the low stop of an axis(index).
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
-  btRotationalLimitMotor *motor = ((btHinge2Constraint*)this->constraint)->getRotationalLimitMotor(_index);
+  btRotationalLimitMotor *motor =
+    ((btHinge2Constraint*)this->constraint)->getRotationalLimitMotor(_index);
   if (motor)
     return motor->m_loLimit;
 

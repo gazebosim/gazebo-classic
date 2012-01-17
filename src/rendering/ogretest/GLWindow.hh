@@ -21,7 +21,7 @@
 
 class GLWindow : public Fl_Gl_Window
 {
-  public: GLWindow(int x, int y, int w, int h, const char *t=NULL );
+  public: GLWindow(int x, int y, int w, int h, const char *t = NULL);
   public: virtual ~GLWindow();
   public: virtual void Init();
 
@@ -32,3 +32,4 @@ class GLWindow : public Fl_Gl_Window
 
 }
 #endif
+

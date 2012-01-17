@@ -25,7 +25,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
- 
     /// \brief Load the sensor library
     bool load();
 
@@ -35,7 +34,7 @@ namespace gazebo
     /// \brief Run the sensor generation one step.
     /// \param force: If true, all sensors are forced to update. Otherwise
     ///        a sensor will update based on it's Hz rate.
-    void run_once(bool force=true);
+    void run_once(bool force = true);
 
     /// \brief Run sensor generation continuously. This is a blocking call
     void run();
@@ -56,3 +55,4 @@ namespace gazebo
   }
 }
 #endif
+

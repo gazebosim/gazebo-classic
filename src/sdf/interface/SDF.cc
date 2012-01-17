@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 #include "common/Color.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
@@ -30,21 +30,21 @@ Element::Element()
 Element::~Element()
 {
   this->parent.reset();
-  for (Param_V::iterator iter = this->attributes.begin(); 
-       iter != this->attributes.end(); iter++)
+  for (Param_V::iterator iter = this->attributes.begin();
+      iter != this->attributes.end(); iter++)
   {
     (*iter).reset();
   }
   this->attributes.clear();
 
-  for (ElementPtr_V::iterator iter = this->elements.begin(); 
-       iter != this->elements.end(); iter++)
+  for (ElementPtr_V::iterator iter = this->elements.begin();
+      iter != this->elements.end(); iter++)
   {
     (*iter).reset();
   }
 
-  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin(); 
-       iter != this->elementDescriptions.end(); iter++)
+  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin();
+      iter != this->elementDescriptions.end(); iter++)
   {
     (*iter).reset();
   }
@@ -66,7 +66,7 @@ void Element::SetParent(const ElementPtr &_parent)
   this->parent = _parent;
 }
 
-/// Get the name of the parent link. 
+/// Get the name of the parent link.
 std::string Element::GetLinkName() const
 {
   std::string result;
@@ -77,12 +77,12 @@ std::string Element::GetLinkName() const
     sdfParent = sdfParent->GetParent();
 
   if (sdfParent)
-   result = sdfParent->GetValueString("name");
+    result = sdfParent->GetValueString("name");
 
   return result;
 }
 
-/// Get the name of the parent model. 
+/// Get the name of the parent model.
 std::string Element::GetModelName() const
 {
   std::string result;
@@ -93,12 +93,12 @@ std::string Element::GetModelName() const
     sdfParent = sdfParent->GetParent();
 
   if (sdfParent)
-   result = sdfParent->GetValueString("name");
+    result = sdfParent->GetValueString("name");
 
   return result;
 }
 
-/// Get the name of the parent world. 
+/// Get the name of the parent world.
 std::string Element::GetWorldName() const
 {
   std::string result;
@@ -109,7 +109,7 @@ std::string Element::GetWorldName() const
     sdfParent = sdfParent->GetParent();
 
   if (sdfParent)
-   result = sdfParent->GetValueString("name");
+    result = sdfParent->GetValueString("name");
 
   return result;
 }
@@ -135,7 +135,7 @@ const std::string &Element::GetRequired() const
   return this->required;
 }
 
-void Element::SetCopyChildren( bool _value )
+void Element::SetCopyChildren(bool _value)
 {
   this->copyChildren = _value;
 }
@@ -145,67 +145,67 @@ bool Element::GetCopyChildren() const
   return this->copyChildren;
 }
 
-void Element::AddValue(const std::string &_type, 
-                       const std::string &_defaultValue, bool _required)
+void Element::AddValue(const std::string &_type,
+    const std::string &_defaultValue, bool _required)
 {
   this->value = this->CreateParam(this->name, _type, _defaultValue, _required);
 }
 
-boost::shared_ptr<Param> Element::CreateParam(const std::string &_key, 
+boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
     const std::string &_type, const std::string &_defaultValue, bool _required)
 {
   if (_type == "double")
   {
-    boost::shared_ptr<ParamT<double> > param( 
-        new ParamT<double>(_key, _defaultValue,_required) );
+    boost::shared_ptr<ParamT<double> > param(
+        new ParamT<double>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "int")
   {
-    boost::shared_ptr<ParamT<int> > param( 
-        new ParamT<int>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<int> > param(
+        new ParamT<int>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "unsigned int")
   {
-    boost::shared_ptr<ParamT<unsigned int> > param( 
-        new ParamT<unsigned int>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<unsigned int> > param(
+        new ParamT<unsigned int>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "float")
   {
-    boost::shared_ptr<ParamT<float> > param( 
-        new ParamT<float>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<float> > param(
+        new ParamT<float>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "bool")
   {
-    boost::shared_ptr<ParamT<bool> > param( 
-        new ParamT<bool>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<bool> > param(
+        new ParamT<bool>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "string")
   {
-    boost::shared_ptr<ParamT<std::string> > param( 
-        new ParamT<std::string>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<std::string> > param(
+        new ParamT<std::string>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "color")
   {
-    boost::shared_ptr<ParamT<gazebo::common::Color> > param( 
-        new ParamT<gazebo::common::Color>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<gazebo::common::Color> > param(
+        new ParamT<gazebo::common::Color>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "vector3")
   {
-    boost::shared_ptr<ParamT<gazebo::math::Vector3> > param( 
-        new ParamT<gazebo::math::Vector3>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<gazebo::math::Vector3> > param(
+        new ParamT<gazebo::math::Vector3>(_key, _defaultValue, _required));
     return param;
   }
   else if (_type == "pose")
   {
-    boost::shared_ptr<ParamT<gazebo::math::Pose> > param( 
-        new ParamT<gazebo::math::Pose>(_key,_defaultValue,_required) );
+    boost::shared_ptr<ParamT<gazebo::math::Pose> > param(
+        new ParamT<gazebo::math::Pose>(_key, _defaultValue, _required));
     return param;
   }
   else
@@ -216,7 +216,7 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
 }
 
 void Element::AddAttribute(const std::string &_key, const std::string &_type,
-                           const std::string &_defaultValue, bool _required)
+    const std::string &_defaultValue, bool _required)
 {
   this->attributes.push_back(
       this->CreateParam(_key, _type, _defaultValue, _required));
@@ -231,15 +231,15 @@ ElementPtr Element::Clone() const
   clone->copyChildren = this->copyChildren;
 
   Param_V::const_iterator aiter;
-  for (aiter = this->attributes.begin(); 
+  for (aiter = this->attributes.begin();
       aiter != this->attributes.end(); aiter++)
   {
-    clone->attributes.push_back( (*aiter)->Clone() );
+    clone->attributes.push_back((*aiter)->Clone());
   }
 
   ElementPtr_V::const_iterator eiter;
-  for (eiter = this->elementDescriptions.begin(); 
-       eiter != this->elementDescriptions.end(); eiter++)
+  for (eiter = this->elementDescriptions.begin();
+      eiter != this->elementDescriptions.end(); eiter++)
   {
     clone->elementDescriptions.push_back((*eiter)->Clone());
   }
@@ -250,46 +250,50 @@ ElementPtr Element::Clone() const
 }
 
 /// \brief Copy values from an Element
-void Element::Copy( const ElementPtr &_elem )
+void Element::Copy(const ElementPtr &_elem)
 {
-  for (Param_V::iterator iter = this->attributes.begin(); 
-       iter != this->attributes.end(); iter++)
+  for (Param_V::iterator iter = this->attributes.begin();
+      iter != this->attributes.end(); iter++)
   {
-    ParamPtr param = _elem->GetAttribute( (*iter)->GetKey() );
+    ParamPtr param = _elem->GetAttribute((*iter)->GetKey());
     if (param)
     {
-      (*iter)->SetFromString( param->GetAsString() );
+      (*iter)->SetFromString(param->GetAsString());
     }
   }
 
   if (this->value && _elem->GetValue())
-    this->value->SetFromString( _elem->GetValue()->GetAsString() );
+    this->value->SetFromString(_elem->GetValue()->GetAsString());
 
   for (ElementPtr_V::iterator iter = this->elements.begin();
-       iter != this->elements.end(); iter++)
+      iter != this->elements.end(); iter++)
   {
-    ElementPtr elem = _elem->GetElement( (*iter)->GetName() );
+    ElementPtr elem = _elem->GetElement((*iter)->GetName());
     if (elem)
-      (*iter)->Copy( elem );
+      (*iter)->Copy(elem);
   }
 }
 
 void Element::PrintDescription(std::string _prefix)
 {
-  std::cout << _prefix << "<element name='" << this->name << "' required='" << this->required << "'>\n";
+  std::cout << _prefix << "<element name ='" << this->name
+            << "' required ='" << this->required << "'>\n";
 
   Param_V::iterator aiter;
-  for (aiter = this->attributes.begin(); 
+  for (aiter = this->attributes.begin();
       aiter != this->attributes.end(); aiter++)
   {
-    std::cout << _prefix << "  <attribute name='" << (*aiter)->GetKey() << "' type='" << (*aiter)->GetTypeName() << "' default='" << (*aiter)->GetDefaultAsString() << "' required='" << (*aiter)->GetRequired() << "'/>\n";
+    std::cout << _prefix << "  <attribute name ='"
+              << (*aiter)->GetKey() << "' type ='" << (*aiter)->GetTypeName()
+              << "' default ='" << (*aiter)->GetDefaultAsString()
+              << "' required ='" << (*aiter)->GetRequired() << "'/>\n";
   }
 
   if (this->GetCopyChildren())
-    std::cout << _prefix << "  <element copy_data='true' required='*'/>\n";
+    std::cout << _prefix << "  <element copy_data ='true' required ='*'/>\n";
 
   ElementPtr_V::iterator eiter;
-  for (eiter = this->elementDescriptions.begin(); 
+  for (eiter = this->elementDescriptions.begin();
       eiter != this->elementDescriptions.end(); eiter++)
   {
     (*eiter)->PrintDescription(_prefix + "  ");
@@ -303,10 +307,10 @@ void Element::PrintValues(std::string _prefix)
   std::cout << _prefix << "<" << this->name;
 
   Param_V::iterator aiter;
-  for (aiter = this->attributes.begin(); 
+  for (aiter = this->attributes.begin();
       aiter != this->attributes.end(); aiter++)
   {
-    std::cout << " " << (*aiter)->GetKey() << "='" 
+    std::cout << " " << (*aiter)->GetKey() << "='"
       << (*aiter)->GetAsString() << "'";
   }
 
@@ -314,7 +318,7 @@ void Element::PrintValues(std::string _prefix)
   {
     std::cout << ">\n";
     ElementPtr_V::iterator eiter;
-    for (eiter = this->elements.begin(); 
+    for (eiter = this->elements.begin();
         eiter != this->elements.end(); eiter++)
     {
       (*eiter)->PrintValues(_prefix + "  ");
@@ -325,8 +329,8 @@ void Element::PrintValues(std::string _prefix)
   {
     if (this->value)
     {
-      std::cout << ">" << this->value->GetAsString() 
-                << "</" << this->name << ">\n";
+      std::cout << ">" << this->value->GetAsString()
+        << "</" << this->name << ">\n";
     }
     else
     {
@@ -342,12 +346,13 @@ std::string Element::ToString(const std::string &_prefix) const
   return out.str();
 }
 
-void Element::ToString(const std::string &_prefix, std::ostringstream &_out) const
+void Element::ToString(const std::string &_prefix,
+                       std::ostringstream &_out) const
 {
   _out << _prefix << "<" << this->name;
 
   Param_V::const_iterator aiter;
-  for (aiter = this->attributes.begin(); 
+  for (aiter = this->attributes.begin();
       aiter != this->attributes.end(); aiter++)
   {
     _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
@@ -357,8 +362,8 @@ void Element::ToString(const std::string &_prefix, std::ostringstream &_out) con
   {
     _out << ">\n";
     ElementPtr_V::const_iterator eiter;
-    for (eiter = this->elements.begin(); 
-         eiter != this->elements.end(); eiter++)
+    for (eiter = this->elements.begin();
+        eiter != this->elements.end(); eiter++)
     {
       (*eiter)->ToString(_prefix + "  ", _out);
     }
@@ -381,10 +386,10 @@ void Element::ToString(const std::string &_prefix, std::ostringstream &_out) con
 bool Element::HasAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
-  for (iter = this->attributes.begin(); 
+  for (iter = this->attributes.begin();
       iter != this->attributes.end(); iter++)
   {
-    if ( (*iter)->GetKey() == _key)
+    if ((*iter)->GetKey() == _key)
       return true;
   }
 
@@ -394,13 +399,14 @@ bool Element::HasAttribute(const std::string &_key)
 ParamPtr Element::GetAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
-  for (iter = this->attributes.begin(); 
+  for (iter = this->attributes.begin();
       iter != this->attributes.end(); iter++)
   {
-    if ( (*iter)->GetKey() == _key)
+    if ((*iter)->GetKey() == _key)
       return (*iter);
   }
-  gzerr << "Element[" << this->GetName() << "] does not have attribute [" << _key << "]\n";
+  gzerr << "Element[" << this->GetName() << "] does not have attribute ["
+        << _key << "]\n";
   return ParamPtr();
 }
 
@@ -415,7 +421,7 @@ bool Element::HasElement(const std::string &_name) const
   ElementPtr_V::const_iterator iter;
   for (iter = this->elements.begin(); iter != this->elements.end(); iter++)
   {
-    if ( (*iter)->GetName() == _name )
+    if ((*iter)->GetName() == _name)
       return true;
   }
 
@@ -427,7 +433,7 @@ ElementPtr Element::GetElement(const std::string &_name) const
   ElementPtr_V::const_iterator iter;
   for (iter = this->elements.begin(); iter != this->elements.end(); iter++)
   {
-    if ( (*iter)->GetName() == _name )
+    if ((*iter)->GetName() == _name)
       return (*iter);
   }
 
@@ -445,7 +451,7 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
   if (this->parent)
   {
     ElementPtr_V::const_iterator iter;
-    iter = std::find(this->parent->elements.begin(), 
+    iter = std::find(this->parent->elements.begin(),
         this->parent->elements.end(), shared_from_this());
 
     if (iter == this->parent->elements.end())
@@ -453,7 +459,7 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
 
     for (iter++; iter != this->parent->elements.end(); iter++)
     {
-      if ( (*iter)->GetName() == _name )
+      if ((*iter)->GetName() == _name)
         return (*iter);
     }
   }
@@ -483,14 +489,14 @@ void Element::InsertElement(ElementPtr _elem)
 ElementPtr Element::AddElement(const std::string &_name)
 {
   ElementPtr_V::const_iterator iter;
-  for (iter = this->elementDescriptions.begin(); 
+  for (iter = this->elementDescriptions.begin();
       iter != this->elementDescriptions.end(); iter++)
   {
     if ((*iter)->name == _name)
     {
       ElementPtr elem = (*iter)->Clone();
-      elem->SetParent( shared_from_this() );
-      this->elements.push_back( elem );
+      elem->SetParent(shared_from_this());
+      this->elements.push_back(elem);
       return this->elements.back();
     }
   }
@@ -522,7 +528,6 @@ int Element::GetValueInt(const std::string &_key)
     this->value->Get(result);
   else
   {
-
     ParamPtr param = this->GetAttribute(_key);
     if (param)
       param->Get(result);
@@ -688,8 +693,8 @@ void Element::ClearElements()
   this->elements.clear();
 }
 
-SDF::SDF()
-  : root(new Element)
+  SDF::SDF()
+: root(new Element)
 {
 }
 
@@ -722,7 +727,7 @@ std::string SDF::ToString() const
   std::string result;
 
   if (this->root->GetName() != "gazebo")
-    result = std::string("<gazebo version='") + SDF_VERSION + "'>";
+    result = std::string("<gazebo version ='") + SDF_VERSION + "'>";
 
   result += this->root->ToString("");
 
@@ -735,13 +740,13 @@ std::string SDF::ToString() const
 void Element::Update()
 {
   for (sdf::Param_V::iterator iter = this->attributes.begin();
-       iter != this->attributes.end(); iter++)
+      iter != this->attributes.end(); iter++)
   {
     (*iter)->Update();
   }
 
   for (sdf::ElementPtr_V::iterator iter = this->elements.begin();
-       iter != this->elements.end(); iter++)
+      iter != this->elements.end(); iter++)
   {
     (*iter)->Update();
   }
@@ -751,15 +756,15 @@ void Element::Reset()
 {
   this->parent.reset();
 
-  for (ElementPtr_V::iterator iter = this->elements.begin(); 
-       iter != this->elements.end(); iter++)
+  for (ElementPtr_V::iterator iter = this->elements.begin();
+      iter != this->elements.end(); iter++)
   {
     (*iter)->Reset();
     (*iter).reset();
   }
 
-  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin(); 
-       iter != this->elementDescriptions.end(); iter++)
+  for (ElementPtr_V::iterator iter = this->elementDescriptions.begin();
+      iter != this->elementDescriptions.end(); iter++)
   {
     (*iter)->Reset();
     (*iter).reset();
@@ -769,3 +774,4 @@ void Element::Reset()
 
   this->value.reset();
 }
+

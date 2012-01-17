@@ -42,7 +42,7 @@ bool sensors::load()
 
 bool sensors::init()
 {
-  // The rendering engine will run headless 
+  // The rendering engine will run headless
   if (!gazebo::rendering::init())
   {
     gzthrow("Unable to intialize the rendering engine");
@@ -72,7 +72,7 @@ std::string sensors::create_sensor(sdf::ElementPtr _elem,
 void sensors::run()
 {
   sensors::SensorManager::Instance()->Run();
- }
+}
 
 void sensors::run_once(bool _force)
 {
@@ -94,3 +94,4 @@ sensors::SensorPtr sensors::get_sensor(const std::string &_name)
 {
   return sensors::SensorManager::Instance()->GetSensor(_name);
 }
+

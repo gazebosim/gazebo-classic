@@ -40,54 +40,53 @@ namespace Ogre
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     /// \addtogroup gazebo_rendering
     /// \{
-    
     /// \brief Adaptor to Ogre3d
     class RenderEngine : public SingletonT<RenderEngine>
     {
       /// \brief Constructor
       private: RenderEngine();
-    
+
       /// \brief Destructor
       private: virtual ~RenderEngine();
-    
+
       /// \brief Load the parameters for Ogre
       public: void Load();
-  
+
       /// \brief Initialize ogre
       public: void Init();
-  
+
       /// \brief Finalize
       public: void Fini();
-    
-      /// \brief Save Ogre settings 
+
+      /// \brief Save Ogre settings
       public: void Save(std::string &prefix, std::ostream &stream);
-    
+
       /// \brief Get the desired update rate
       public: double GetUpdateRate();
-  
+
       /// \brief Create a scene
-      public: ScenePtr CreateScene(const std::string &name, 
+      public: ScenePtr CreateScene(const std::string &name,
                                    bool _enableVisualizations);
-  
+
       /// \brief Remove a scene
       public: void RemoveScene(const std::string &name);
 
-      /// \brief Get a scene 
+      /// \brief Get a scene
       public: ScenePtr GetScene(const std::string &_name);
 
       /// \brief Get a scene manager
       public: ScenePtr GetScene(unsigned int index);
-  
+
       /// \brief Get the number of scene managers
       public: unsigned int GetSceneCount() const;
-  
+
       /// \brief Returns true if the graphics card support GLSL
       public: bool HasGLSL();
-  
+
       public: void AddResourcePath(const std::string &_path);
 
       private: void CreateContext();
@@ -96,37 +95,37 @@ namespace gazebo
 
       private: void SetupResources();
       private: void SetupRenderSystem();
-  
+
       private: void PreRender();
       private: void Render();
       private: void PostRender();
 
       /// Pointer to the root scene node
       public: Ogre::Root *root;
-    
+
       /// All of the scenes
       private: std::vector< ScenePtr > scenes;
-    
+
       private: Ogre::LogManager *logManager;
-   
+
       /// ID for a dummy window. Used for gui-less operation
       protected: unsigned long dummyWindowId;
-  
+
       /// Pointer to the dummy display.Used for gui-less operation
       protected: void *dummyDisplay;
-      
+
       /// GLX context used to render the scenes.Used for gui-less operation
       protected: void* dummyContext;
-  
+
       /// True if the GUI is enabled
       private: bool headless;
 
       private: bool initialized;
-   
+
       private: std::vector<event::ConnectionPtr> connections;
       private: friend class SingletonT<RenderEngine>;
 
-      private: transport::NodePtr node;    
+      private: transport::NodePtr node;
 
       private: bool removeScene;
       private: std::string removeSceneName;
@@ -135,3 +134,4 @@ namespace gazebo
   }
 }
 #endif
+

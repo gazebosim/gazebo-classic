@@ -46,7 +46,7 @@ SensorManager::~SensorManager()
 void SensorManager::Run()
 {
   this->stop = false;
-  this->runThread = new boost::thread( 
+  this->runThread = new boost::thread(
       boost::bind(&SensorManager::RunLoop, this));
 }
 
@@ -169,7 +169,7 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
   }
   this->mutex->unlock();
 
- return result; 
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -200,3 +200,4 @@ void SensorManager::RemoveSensors()
   this->initSensors.clear();
   this->mutex->unlock();
 }
+

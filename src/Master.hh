@@ -11,7 +11,6 @@
 
 namespace gazebo
 {
-
   class Master
   {
     /// \brief Constructor
@@ -29,7 +28,7 @@ namespace gazebo
     /// \brief Run the master in a new thread
     public: void RunThread();
 
-    /// \brief Run the master one iteration 
+    /// \brief Run the master one iteration
     public: void RunOnce();
 
     /// \brief Stop the master
@@ -59,13 +58,13 @@ namespace gazebo
     /// \brief Get a publisher for the given topic
     /// \param _topic Name of the topic
     /// \return A publish message
-    private: msgs::Publish GetPublisher( const std::string &_topic );
+    private: msgs::Publish GetPublisher(const std::string &_topic);
 
     /// \brief Find a connection given a host and port
     /// \param _host Host name
     /// \param _port Port number
     /// \return The found connection, or NULL
-    private: transport::ConnectionPtr FindConnection(const std::string &_host, 
+    private: transport::ConnectionPtr FindConnection(const std::string &_host,
                                                      unsigned short _port);
 
 
@@ -74,8 +73,10 @@ namespace gazebo
     private: void RemoveSubscriber(const msgs::Subscribe _sub);
 
     typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
-    typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> > PubList;
-    typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> > SubList;
+    typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
+      PubList;
+    typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
+      SubList;
     private: PubList publishers;
     private: SubList subscribers;
 
@@ -92,3 +93,4 @@ namespace gazebo
 }
 
 #endif
+

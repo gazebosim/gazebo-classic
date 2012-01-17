@@ -48,9 +48,12 @@ BulletHeightmapCollision::BulletHeightmapCollision(Link *_body)
   common::Param::Begin(&this->parameters);
   this->imageFilenameP = new common::ParamT<std::string>("image", "", 1);
   this->worldTextureP = new common::ParamT<std::string>("worldTexture", "", 0);
-  this->detailTextureP = new common::ParamT<std::string>("detailTexture", "", 0);
-  this->sizeP = new common::ParamT<math::Vector3>("size", math::Vector3(10, 10, 10), 0);
-  this->offsetP = new common::ParamT<math::Vector3>("offset", math::Vector3(0, 0, 0), 0);
+  this->detailTextureP =
+    new common::ParamT<std::string>("detailTexture", "", 0);
+  this->sizeP = new common::ParamT<math::Vector3>("size",
+      math::Vector3(10, 10, 10), 0);
+  this->offsetP = new common::ParamT<math::Vector3>("offset",
+      math::Vector3(0, 0, 0), 0);
   common::Param::End();
 
   this->ogreHeightmap = new OgreHeightmap();

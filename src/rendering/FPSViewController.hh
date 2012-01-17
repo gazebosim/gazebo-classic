@@ -21,28 +21,27 @@
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
-
     /// \brief First Person Shooter style view controller
     class FPSViewController : public ViewController
     {
       /// \brief Constructor
       public: FPSViewController(UserCamera *camera);
-  
+
       /// \brief Destructor
       public: virtual ~FPSViewController();
-  
+
       public: virtual void Init();
 
       /// \brief Update
       public: virtual void Update();
-  
+
       /// \brief Get the type name of this view controller
       public: static std::string GetTypeString();
-  
+
       /// \brief Handle a mouse event
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);
     };
@@ -50,3 +49,4 @@ namespace gazebo
   }
 }
 #endif
+

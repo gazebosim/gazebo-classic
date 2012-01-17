@@ -32,14 +32,13 @@
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class Visual;
     class Scene;
-  
-    /// \addtogroup gazebo_rendering 
-    /// \{
 
+    /// \addtogroup gazebo_rendering
+    /// \{
     /// \brief Implements Ogre's Run-Time Shader system
     class RTShaderSystem : public SingletonT<RTShaderSystem>
     {
@@ -50,69 +49,72 @@ namespace gazebo
                 SSLM_NormalMapLightingTangentSpace,
                 SSLM_NormalMapLightingObjectSpace
               };
-  
+
       /// \brief Constructor
       private: RTShaderSystem();
-  
+
       /// \brief Destructor
       private: virtual ~RTShaderSystem();
-  
+
       /// \brief Init the run time shader system
       public: void Init();
-  
+
       /// \brief Finalize the shader system
       public: void Fini();
-  
+
       public: void Clear();
 
       /// \brief Add a scene manager
       public: void AddScene(Scene *_scene);
-  
+
       /// \brief Remove a scene
-      public: void RemoveScene( Scene *scene );
-  
+      public: void RemoveScene(Scene *scene);
+
       /// \brief Update the shaders
       public: void UpdateShaders();
-  
+
       /// \brief Set an Ogre::Entity to use RT shaders
       public: void AttachEntity(Visual *vis);
-  
+
       /// \brief Remove and entity
       public: void DetachEntity(Visual *vis);
-  
+
       /// \brief Set a viewport to use shaders
-      public: static void AttachViewport(Ogre::Viewport *viewport, Scene *scene);
-  
-      public: static void DetachViewport(Ogre::Viewport *_viewport, Scene *_scene);
+      public: static void AttachViewport(Ogre::Viewport *viewport,
+                                         Scene *scene);
+
+      public: static void DetachViewport(Ogre::Viewport *_viewport,
+                                         Scene *_scene);
 
       /// Set the lighting model to per pixel or per vertex
-      public: void SetPerPixelLighting( bool s);
-  
+      public: void SetPerPixelLighting(bool s);
+
       /// \brief Generate shaders for an entity
       public: void GenerateShaders(Visual *vis);
-  
+
       public: void ApplyShadows(Scene *scene);
       public: void RemoveShadows(Scene *_scene);
-  
+
       /// \brief Get paths for the shader system
       private: bool GetPaths(std::string &coreLibsPath, std::string &cachePath);
-  
+
   #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
       private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
       private: std::list<Visual*> entities;
   #endif
-  
+
       private: bool initialized;
-  
+
       private: std::vector<Scene *> scenes;
       private: Ogre::RTShader::SubRenderState *shadowRenderState;
- 
-      private: boost::mutex *entityMutex; 
+
+      private: boost::mutex *entityMutex;
       private: friend class SingletonT<RTShaderSystem>;
     };
     /// \}
-  
+
   }
 
 }
 #endif
+

@@ -64,16 +64,16 @@ void WindowManager::Fini()
 /// Attach a camera to a window
 void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
-  this->windows[_windowId]->removeAllViewports(); 
+  this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
   RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
 }
 
 //////////////////////////////////////////////////
 // Create a window
-int WindowManager::CreateWindow( const std::string ogreHandle, 
-                                 unsigned int width, 
-                                 unsigned int height) 
+int WindowManager::CreateWindow(const std::string ogreHandle,
+                                 unsigned int width,
+                                 unsigned int height)
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -91,7 +91,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   {
     try
     {
-      window = RenderEngine::Instance()->root->createRenderWindow( 
+      window = RenderEngine::Instance()->root->createRenderWindow(
           stream.str(), width, height, false, &params);
     }
     catch (...)
@@ -118,7 +118,8 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   return this->windows.size()-1;
 }
 
-void WindowManager::GetAttribute(unsigned int id, const std::string &attr, void *data)
+void WindowManager::GetAttribute(unsigned int id,
+    const std::string &attr, void *data)
 {
   if (id >= this->windows.size())
     gzerr << "Invalid window id[" << id << "]\n";
@@ -137,7 +138,7 @@ void WindowManager::Resize(unsigned int id, int width, int height)
     this->windows[id]->resize(width, height);
     this->windows[id]->windowMovedOrResized();
   }
-} 
+}
 
 void WindowManager::Moved(unsigned int id)
 {
@@ -172,3 +173,5 @@ unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
   else
     return 0;
 }
+
+

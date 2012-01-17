@@ -28,48 +28,47 @@
 
 namespace gazebo
 {
-  
   /// \ingroup gazebo_sensors
   /// \brief Sensors namespace
   namespace sensors
   {
-    /// \addtogroup gazebo_sensors Sensors 
+    /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
     /// \{
- 
     /// \brief Basic camera sensor
     /// This sensor is used for simulating standard monocular cameras
     class CameraSensor : public Sensor
     {
       /// \brief Constructor
       public: CameraSensor();
-    
+
       /// \brief Destructor
       public: virtual ~CameraSensor();
 
       /// \brief Set the parent of the sensor
-      public: virtual void SetParent( const std::string &_name );
-   
+      public: virtual void SetParent(const std::string &_name);
+
       /// \brief Load the camera using parameter from an SDF element
       /// \param _sdf The SDF parameters
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Load the camera using default parameters
       public: virtual void Load();
-    
+
       /// \brief Initialize the camera
       public: virtual void Init();
 
       /// \brief Update the sensor information
       protected: virtual void UpdateImpl(bool _force);
-    
+
       /// Finalize the camera
       protected: virtual void Fini();
-    
+
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
-    
-      public: rendering::CameraPtr GetCamera() const {return this->camera; };
+
+      public: rendering::CameraPtr GetCamera() const
+              {return this->camera;}
 
       public: unsigned int GetImageWidth() const;
       public: unsigned int GetImageHeight() const;
@@ -85,3 +84,4 @@ namespace gazebo
   }
 }
 #endif
+

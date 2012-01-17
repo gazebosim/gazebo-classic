@@ -32,7 +32,6 @@ using namespace rendering;
 
 
 enum { POSITION_BINDING, TEXCOORD_BINDING };
-
 DynamicLines::DynamicLines(RenderOpType opType)
 {
   this->Init(opType, false);
@@ -67,7 +66,8 @@ void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
   if (index >= this->points.size())
   {
     std::ostringstream stream;
-    stream << "Point index[" << index << "] is out of bounds[0-" << this->points.size()-1 << "]";
+    stream << "Point index[" << index << "] is out of bounds[0-"
+           << this->points.size()-1 << "]";
     gzthrow(stream.str());
   }
 
@@ -106,27 +106,28 @@ void DynamicLines::Update()
 
 void DynamicLines::CreateVertexDeclaration()
 {
-  Ogre::VertexDeclaration *decl = this->mRenderOp.vertexData->vertexDeclaration;
+  Ogre::VertexDeclaration *decl =
+    this->mRenderOp.vertexData->vertexDeclaration;
 
   decl->addElement(POSITION_BINDING, 0, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
-
 }
 
 void DynamicLines::FillHardwareBuffers()
 {
   int size = this->points.size();
-  this->PrepareHardwareBuffers(size,0);
+  this->PrepareHardwareBuffers(size, 0);
 
   if (!size)
   {
     this->mBox.setExtents(Ogre::Vector3::ZERO, Ogre::Vector3::ZERO);
-    this->dirty=false;
+    this->dirty = false;
   }
 
   Ogre::HardwareVertexBufferSharedPtr vbuf =
     this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(0);
 
-  Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
+  Ogre::Real *prPos =
+    static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
   {
     for (int i = 0; i < size; i++)
     {
@@ -134,14 +135,15 @@ void DynamicLines::FillHardwareBuffers()
       *prPos++ = this->points[i].y;
       *prPos++ = this->points[i].z;
 
-      this->mBox.merge(Ogre::Vector3(this->points[i].x,this->points[i].y,this->points[i].z));
+      this->mBox.merge(Ogre::Vector3(this->points[i].x,
+                                     this->points[i].y, this->points[i].z));
     }
   }
   vbuf->unlock();
 
-  // need to update after mBox change, otherwise the lines goes in and out of scope based on old mBox
+  // need to update after mBox change, otherwise the lines goes in and out
+  // of scope based on old mBox
   this->getParentSceneNode()->needUpdate();
 
   this->dirty = false;
 }
-

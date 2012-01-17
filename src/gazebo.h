@@ -44,10 +44,11 @@ namespace gazebo
   {
     gazebo::transport::stop();
   }
-  
+
   void fini()
   {
     gazebo::transport::fini();
   }
 }
 #endif
+

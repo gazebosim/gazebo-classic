@@ -134,13 +134,14 @@ RenderOpType DynamicRenderable::GetOperationType() const
 }
 
 //////////////////////////////////////////////////
-/// Prepares the hardware buffers for the requested vertex and index counts.
-void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
+void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
+                                               size_t indexCount)
 {
   // Prepare vertex buffer
   size_t newVertCapacity = this->vertexBufferCapacity;
 
-  if ((vertexCount > this->vertexBufferCapacity) || (!this->vertexBufferCapacity))
+  if ((vertexCount > this->vertexBufferCapacity) ||
+      (!this->vertexBufferCapacity))
   {
     // vertexCount exceeds current capacity!
     // It is necessary to reallocate the buffer.
@@ -183,7 +184,8 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexC
 
   if (this->mRenderOp.useIndexes)
   {
-    OgreAssert(indexCount <= std::numeric_limits<unsigned short>::max(), "indexCount exceeds 16 bit");
+    OgreAssert(indexCount <= std::numeric_limits<unsigned short>::max(),
+        "indexCount exceeds 16 bit");
 
     size_t newIndexCapacity = this->indexBufferCapacity;
 
@@ -246,3 +248,5 @@ Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
   vDist = cam->getDerivedPosition() - vMid;
   return vDist.squaredLength();
 }
+
+

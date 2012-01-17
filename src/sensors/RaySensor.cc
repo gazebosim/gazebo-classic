@@ -59,20 +59,20 @@ RaySensor::~RaySensor()
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load( sdf::ElementPtr &_sdf )
+void RaySensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load( )
+void RaySensor::Load()
 {
   Sensor::Load();
 
   std::string linkName = this->sdf->GetLinkName();
   std::string modelName = this->sdf->GetModelName();
   std::string worldName = this->sdf->GetWorldName();
-  std::string linkFullyScopedName = worldName + "::" + modelName + "::" + 
+  std::string linkFullyScopedName = worldName + "::" + modelName + "::" +
                                     linkName;
 
   if (this->sdf->GetElement("topic"))
@@ -96,7 +96,7 @@ void RaySensor::Load( )
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
       this->laserCollision->GetShape());
 
-  this->laserShape->Load( this->sdf );
+  this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
 }
@@ -140,7 +140,7 @@ double RaySensor::GetRangeMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetAngleResolution() const
 {
-  return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /  
+  return (this->GetAngleMax() - this->GetAngleMin()).GetAsRadian() /
     (this->GetRangeCount()-1);
 }
 
@@ -218,14 +218,14 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 
     msg.set_frame(this->link->GetScopedName());
     msgs::Set(msg.mutable_offset(), this->GetPose());
-    msg.set_angle_min( this->GetAngleMin().GetAsRadian() );
-    msg.set_angle_max( this->GetAngleMax().GetAsRadian() );
-    msg.set_angle_step( this->GetAngleResolution() );
+    msg.set_angle_min(this->GetAngleMin().GetAsRadian());
+    msg.set_angle_max(this->GetAngleMax().GetAsRadian());
+    msg.set_angle_step(this->GetAngleResolution());
 
-    msg.set_range_min( this->GetRangeMin() );
-    msg.set_range_max( this->GetRangeMax() );
+    msg.set_range_min(this->GetRangeMin());
+    msg.set_range_max(this->GetRangeMax());
 
-    for (unsigned int i=0; i < (unsigned int)this->GetRangeCount(); i++)
+    for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
     {
       msg.add_ranges(this->laserShape->GetRange(i));
       msg.add_intensities(0);
@@ -234,3 +234,4 @@ void RaySensor::UpdateImpl(bool /*_force*/)
     this->scanPub->Publish(msg);
   }
 }
+

@@ -32,7 +32,7 @@ std::vector<Param*> *Param::params = NULL;
 
 //////////////////////////////////////////////////
 // Constructor
-Param::Param(Param *_newParam) 
+Param::Param(Param *_newParam)
   : key(""), required(false), set(false), typeName("")
 {
   /*if (params == NULL)
@@ -44,7 +44,7 @@ Param::Param(Param *_newParam)
 
 //////////////////////////////////////////////////
 // Destructor
-Param::~Param() 
+Param::~Param()
 {
 }
 
@@ -74,7 +74,7 @@ ParamPtr Param::Find(Param_V &_params, const std::string &key)
 {
   for (Param_V::iterator iter = _params.begin(); iter != _params.end(); iter++)
   {
-    if ( (*iter)->GetKey() == key )
+    if ((*iter)->GetKey() == key)
       return (*iter);
   }
   return ParamPtr();
@@ -248,7 +248,7 @@ bool Param::Get(double &_value)
   }
   else
   {
-    gzerr << "Parameter [" << this->key << "] is a [" 
+    gzerr << "Parameter [" << this->key << "] is a ["
           << this->typeName << "], attempting to get as a double.\n";
     return false;
   }
@@ -307,10 +307,11 @@ bool Param::Get(gazebo::math::Vector3 &_value)
     std::string val_str = this->GetAsString();
     std::vector<double> elements;
     std::vector<std::string> pieces;
-    boost::split( pieces, val_str, boost::is_any_of(" "));
+    boost::split(pieces, val_str, boost::is_any_of(" "));
     if (pieces.size() != 3)
     {
-      gzerr << "string does not have 3 pieces to parse into Vector3, using 0s\n";
+      gzerr <<
+        "string does not have 3 pieces to parse into Vector3, using 0s\n";
       return false;
     }
     else
@@ -326,7 +327,8 @@ bool Param::Get(gazebo::math::Vector3 &_value)
           catch (boost::bad_lexical_cast &e)
           {
             gzerr << "value ["
-                  << pieces[i] << "] is not a valid double for Vector3[" << i << "]\n";
+                  << pieces[i]
+                  << "] is not a valid double for Vector3[" << i << "]\n";
             return false;
           }
         }
@@ -403,3 +405,4 @@ bool Param::Get(gazebo::math::Quaternion &_value)
     return false;
   }
 }
+

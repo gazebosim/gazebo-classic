@@ -74,7 +74,6 @@ class Mgr: public Ogre::WindowEventListener {
     // functions" and so on
     void shadowTexturesUpdated(size_t) {}
     void shadowTextureReceiverPreViewProj(Ogre::Light*, Ogre::Frustum*) {}
-
     // local "continue?" variable
     bool running;
 
@@ -86,8 +85,9 @@ class Mgr: public Ogre::WindowEventListener {
     }
 
     Mgr():
-        root(NULL), sceneMgr(NULL), cam(NULL), vp(NULL), window(NULL), timer(NULL),
-        rsys(NULL), input(NULL), keys(NULL), mouse(NULL), running(true) {
+      root(NULL), sceneMgr(NULL), cam(NULL), vp(NULL),
+      window(NULL), timer(NULL), rsys(NULL), input(NULL), keys(NULL),
+      mouse(NULL), running(true) {
         // stupid constructor.  don't base your code on this code ;)
         // but since I wanted to make it easy, everything is done
         // in seperate "init" functions.  so this just makes everything
@@ -97,14 +97,14 @@ class Mgr: public Ogre::WindowEventListener {
 
 // simple "choosing" of the renderer
 enum Renderer { D3D, OGL };
-
 // initialize Ogre and the renderer
 void initRenderer() { // default to D3D
     // create our Root
     // note the ""s.  we supply our own plugins and config options
     mgr.root = new Ogre::Root("", ""); // default "Ogre.log"
     mgr.root->loadPlugin("/home/nate/local/lib/OGRE/RenderSystem_GL.so");
-    mgr.root->loadPlugin("/home/nate/local/lib/OGRE/Plugin_CgProgramManager.so");
+    mgr.root->loadPlugin(
+        "/home/nate/local/lib/OGRE/Plugin_CgProgramManager.so");
 
     // get the available render systems
     // technically, should be only one since we only load one plugin
@@ -124,11 +124,13 @@ void initRenderer() { // default to D3D
     // OK, this is really badly hard coded.  but its an example
     // the disorder engine, for example, reads a lua script for these values
     // (the disorder engine is what's under Portalized)
-    // (*cough*don'tworryifyou'veneverheardofit,it'smyproject*cough*)
+    // (*cough*don'tworryifyou'veneverheardofit, it'smyproject*cough*)
     Ogre::NameValuePairList miscParams;
     // retrive anti aliasing from the config file
-    miscParams["FSAA"] = removeQuotes(mgr.cfgFile.getSetting("FSAA", "renderer"));
-    miscParams["vsync"] = removeQuotes(mgr.cfgFile.getSetting("vsync", "renderer"));
+    miscParams["FSAA"] =
+      removeQuotes(mgr.cfgFile.getSetting("FSAA", "renderer"));
+    miscParams["vsync"] =
+      removeQuotes(mgr.cfgFile.getSetting("vsync", "renderer"));
 
     // get these settings from the cfg file, too
     int width = 800, height = 600;
@@ -153,7 +155,8 @@ void initRenderer() { // default to D3D
     // ok, back to coding
 
     // now, we can, for example, set the default texture filtering
-    ::Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(::Ogre::TFO_ANISOTROPIC);
+    ::Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
+        ::Ogre::TFO_ANISOTROPIC);
     // tada.
 
     // tell the window it's active (duh, rofl)
@@ -162,8 +165,10 @@ void initRenderer() { // default to D3D
     mgr.window->setAutoUpdated(true);
 
     // time to prepare the scene
-    mgr.sceneMgr = mgr.root->createSceneManager(Ogre::ST_GENERIC); // just generic for the example
-    // the shadows will work on anything that follows ogre materials properly, BTW
+    mgr.sceneMgr = mgr.root->createSceneManager(Ogre::ST_GENERIC);
+    // just generic for the example
+    // the shadows will work on anything that follows ogre materials
+    // properly, BTW
     // "some" ambient light
     mgr.sceneMgr->setAmbientLight(Ogre::ColourValue(0.2, 0.2, 0.2));
 
@@ -183,7 +188,8 @@ void initRenderer() { // default to D3D
     mgr.vp->setClearEveryFrame(true);
 
     // aspect ratio, etc.
-    mgr.cam->setAspectRatio(mgr.window->getWidth() / float(mgr.window->getHeight()));
+    mgr.cam->setAspectRatio(mgr.window->getWidth() /
+        float(mgr.window->getHeight()));
     // 60 degree FOV
     mgr.cam->setFOVy(Ogre::Degree(60));
 
@@ -206,7 +212,8 @@ void stopRenderer() {
 
 void initResources() {
     // just some hard coded stuff
-    Ogre::ResourceGroupManager *rgm = Ogre::ResourceGroupManager::getSingletonPtr();
+    Ogre::ResourceGroupManager *rgm =
+      Ogre::ResourceGroupManager::getSingletonPtr();
 
     // add our data directory (we sort of stuff everything in there
     // just to make it easy on ourselves.  organize better otherwise!)
@@ -224,17 +231,23 @@ void initShadows() {
     // note we have no "receiver".  all the "receivers" are integrated.
 
     // get the shadow texture count from the cfg file
-    std::string tempData = mgr.cfgFile.getSetting("shadowTextureCount", "renderer");
+    std::string tempData = mgr.cfgFile.getSetting("shadowTextureCount",
+        "renderer");
+
     // (each light needs a shadow texture)
-    mgr.sceneMgr->setShadowTextureCount(Ogre::StringConverter::parseInt(removeQuotes(tempData)));
+    mgr.sceneMgr->setShadowTextureCount(Ogre::StringConverter::parseInt(
+          removeQuotes(tempData)));
 
     // the size, too (1024 looks good with 3x3 or more filtering)
     tempData = mgr.cfgFile.getSetting("shadowTextureRes", "renderer");
-    mgr.sceneMgr->setShadowTextureSize(Ogre::StringConverter::parseInt(removeQuotes(tempData)));
+    mgr.sceneMgr->setShadowTextureSize(Ogre::StringConverter::parseInt(
+          removeQuotes(tempData)));
 
     // float 16 here.  we need the R and G channels.
-    // float 32 works a lot better with a low/none VSM epsilon (wait till the shaders)
-    // but float 16 is "good enough" and supports bilinear filtering on a lot of cards
+    // float 32 works a lot better with a low/none VSM epsilon
+    // (wait till the shaders)
+    // but float 16 is "good enough" and supports bilinear filtering
+    // on a lot of cards
     // (note we're using floats and not bytes.  bytes, 0-255, won't be
     // able to store our depth data accurately enough.  technically,
     // we can "split" the floats into multiple bytes ourselves, but it's
@@ -242,7 +255,8 @@ void initShadows() {
     mgr.sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_RGB);
 
     // big NONO to render back faces for VSM.  it doesn't need any biasing
-    // so it's worthless (and rather problematic) to use the back face hack that
+    // so it's worthless (and rather problematic) to use the back face hack
+    // that
     // works so well for normal depth shadow mapping (you know, so you don't
     // get surface acne)
     mgr.sceneMgr->setShadowCasterRenderBackFaces(false);
@@ -250,31 +264,38 @@ void initShadows() {
     const unsigned numShadowRTTs = mgr.sceneMgr->getShadowTextureCount();
     for (unsigned i = 0; i < numShadowRTTs; ++i) {
         Ogre::TexturePtr tex = mgr.sceneMgr->getShadowTexture(i);
-        Ogre::Viewport *vp = tex->getBuffer()->getRenderTarget()->getViewport(0);
+        Ogre::Viewport *vp =
+          tex->getBuffer()->getRenderTarget()->getViewport(0);
         vp->setBackgroundColour(Ogre::ColourValue(1, 1, 1, 1));
         vp->setClearEveryFrame(true);
         Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
-        Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur", true);
+        Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp,
+            "blur", true);
     }
 
     // enable integrated additive shadows
     // actually, since we render the shadow map ourselves, it doesn't
     // really matter whether they are additive or modulative
     // as long as they are integrated v(O_o)v
-    mgr.sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+    mgr.sceneMgr->setShadowTechnique(
+        Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
     // some "tests" with shadow camera setups
-    //Ogre::LiSPSMShadowCameraSetup *camSetup = new Ogre::LiSPSMShadowCameraSetup();
-    //Ogre::FocusedShadowCameraSetup *camSetup = new Ogre::FocusedShadowCameraSetup();
+    //Ogre::LiSPSMShadowCameraSetup *camSetup =
+    //new Ogre::LiSPSMShadowCameraSetup();
+    //Ogre::FocusedShadowCameraSetup *camSetup =
+    //new Ogre::FocusedShadowCameraSetup();
     //mgr.sceneMgr->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(camSetup));
 
     // all done for the shadows.  see how easy it was?  might want to experiment
     // with stuff like different shadow camera setups.  or something.
 }
 
-void Mgr::shadowTextureCasterPreViewProj(Ogre::Light *light, Ogre::Camera *cam) {
+void Mgr::shadowTextureCasterPreViewProj(Ogre::Light *light, Ogre::Camera *cam)
+{
     // basically, here we do some forceful camera near/far clip attenuation
-    // yeah.  simplistic, but it works nicely.  this is the function I was talking
+    // yeah.  simplistic, but it works nicely.  this is the function I
+    // was talking
     // about you ignoring above in the Mgr declaration.
     float range = light->getAttenuationRange();
     cam->setNearClipDistance(range * 0.01);
@@ -282,7 +303,8 @@ void Mgr::shadowTextureCasterPreViewProj(Ogre::Light *light, Ogre::Camera *cam) 
     // we just use a small near clip so that the light doesn't "miss" anything
     // that can shadow stuff.  and the far clip is equal to the lights' range.
     // (thus, if the light only covers 15 units of objects, it can only
-    // shadow 15 units - the rest of it should be attenuated away, and not rendered)
+    // shadow 15 units - the rest of it should be attenuated away,
+    // and not rendered)
 }
 
 void initInput() {
@@ -295,7 +317,8 @@ void initInput() {
     // create input "manager" or "hook", as I call it
     mgr.input = OIS::InputManager::createInputSystem(winHandle);
 
-    mgr.keys = (OIS::Keyboard*)mgr.input->createInputObject(OIS::OISKeyboard, true);
+    mgr.keys = (OIS::Keyboard*)mgr.input->createInputObject(OIS::OISKeyboard,
+        true);
     mgr.mouse = (OIS::Mouse*)mgr.input->createInputObject(OIS::OISMouse, true);
 
     // tada.  I think.  rofl just kidding.  seriously.  that's it.
@@ -325,7 +348,7 @@ void handleCamera(float dt) {
     // get the current mouse state
     const OIS::MouseState &ms = mgr.mouse->getMouseState();
     // fix pitch and yaw
-    pitch += -ms.Y.rel; // add the relative mouse movement (up/down for pitching)
+    pitch += -ms.Y.rel;// add the relative mouse movement (up/down for pitching)
     yaw += -ms.X.rel; // add the relative mouse movement (left/right for yawing)
     // constrain pitch to +/- 90 degrees
     if (pitch < -90) pitch = -90;
@@ -355,7 +378,8 @@ void handleCamera(float dt) {
 }
 
 Ogre::Quaternion makeQuat(
-    const Ogre::Vector3 &forward, const Ogre::Vector3 &wantedUp = Ogre::Vector3::UNIT_Y) {
+    const Ogre::Vector3 &forward, const Ogre::Vector3 &wantedUp =
+    Ogre::Vector3::UNIT_Y) {
     // if you don't understand this, don't worry
     // just basically makes a full orientation based
     // on a desired "up" vector and a desired "forward" vector
@@ -375,7 +399,8 @@ void setupScene() {
         true, // yes, we need normals for proper lighting
         1, // one texture coordinate set
         1, 1, // UV tiling (texture coordinates)
-        Ogre::Vector3::NEGATIVE_UNIT_Z); // up vector.  if it's facing up, then it's up is -Z
+        Ogre::Vector3::NEGATIVE_UNIT_Z); // up vector.
+    //  if it's facing up, then it's up is -Z
     // make sure it loaded
     planeMesh->load();
 
@@ -426,7 +451,7 @@ void setupScene() {
     light->setType(Ogre::Light::LT_SPOTLIGHT);
     light->setSpotlightInnerAngle(Ogre::Degree(45));
     light->setSpotlightOuterAngle(Ogre::Degree(65));
-    light->setAttenuation(50, 1, 1, 1); // meter range.  the others our shader ignores
+    light->setAttenuation(50, 1, 1, 1); // meter range.
     light->setDirection(Ogre::Vector3(0, 0, -1));
     node = rootNode->createChildSceneNode("flashLightNode");
     node->attachObject(light);
@@ -448,13 +473,13 @@ void handleScene(float dt) {
 // example of a key listener
 struct LightControl: public OIS::KeyListener {
     LightControl(size_t li = 0): lightIndex(li) {}
-
     size_t lightIndex;
 
     bool keyPressed(const OIS::KeyEvent &e) {
         // place a light if we pressed space
         if (e.key == OIS::KC_SPACE) {
-            std::string name = "light" + Ogre::StringConverter::toString(lightIndex++);
+            std::string name = "light" +
+              Ogre::StringConverter::toString(lightIndex++);
             Ogre::Light *light = mgr.sceneMgr->createLight(name);
             // random colour
             float r = Ogre::Math::UnitRandom(),
@@ -475,10 +500,11 @@ struct LightControl: public OIS::KeyListener {
             //light->setSpotlightInnerAngle(Ogre::Degree(70));
             //light->setSpotlightOuterAngle(Ogre::Degree(90));
 
-            light->setAttenuation(30, 1, 1, 1); // meter range.  the others our shader ignores
+            light->setAttenuation(30, 1, 1, 1);
 
             Ogre::SceneNode *node =
-                mgr.sceneMgr->getRootSceneNode()->createChildSceneNode(name + "Node");
+                mgr.sceneMgr->getRootSceneNode()->createChildSceneNode(
+                    name + "Node");
             node->setPosition(mgr.cam->getDerivedPosition());
             node->setOrientation(mgr.cam->getDerivedOrientation());
             node->attachObject(light);
@@ -498,7 +524,6 @@ struct LightControl: public OIS::KeyListener {
         return true;
     }
 } lightPlacer(0);
-// start off with a light index of 0 (we have a 0th light, but it's named "flashLight")
 
 int main(int, char**) {
     // seed the random number generator
@@ -508,7 +533,8 @@ int main(int, char**) {
     mgr.cfgFile.loadDirect("../data/config.ini");
     // get our renderer (OpenGL or Direct3D)
     Renderer renderer = OGL; // default to OGL
-    std::string rendererAsString = removeQuotes(mgr.cfgFile.getSetting("library", "renderer"));
+    std::string rendererAsString = removeQuotes(mgr.cfgFile.getSetting(
+          "library", "renderer"));
 
     // start up the renderer and a window (OGL for the example)
     initRenderer();
@@ -528,16 +554,19 @@ int main(int, char**) {
     float currentTime = float(mgr.timer->getMilliseconds()) * 0.001;
 
     // keep running until something stops us
-    // (frame listener, escape key, window closed (the mgr gets a message for this), etc.)
+    // (frame listener, escape key, window closed
+    // (the mgr gets a message for this), etc.)
     for (bool running = true; running; running = running && mgr.running) {
         // note this
         // when we render manually, we need to pump
         // the window events ourselves
-        // (or we won't get window events, like closing of the window, input, etc.)
+        // (or we won't get window events, like closing of the window,
+        // input)
         Ogre::WindowEventUtilities::messagePump();
 
         // get the delta time and advance currentTime
-        float deltaTime = (float(mgr.timer->getMilliseconds()) * 0.001) - currentTime;
+        float deltaTime =
+          (float(mgr.timer->getMilliseconds()) * 0.001) - currentTime;
         currentTime += deltaTime;
 
         // capture our input state

@@ -28,10 +28,9 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-/// Constructor
-Grid::Grid( Scene *scene_,  unsigned int cellCount_, float cellLength_, 
-            float lineWidth_, const common::Color& color_ )
-: scene( scene_ )
+Grid::Grid(Scene *scene_, unsigned int cellCount_, float cellLength_,
+            float lineWidth_, const common::Color& color_)
+: scene(scene_)
 {
   this->height = 0;
 
@@ -49,11 +48,10 @@ Grid::Grid( Scene *scene_,  unsigned int cellCount_, float cellLength_,
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Grid::~Grid()
 {
-  this->scene->GetManager()->destroySceneNode( this->sceneNode->getName() );
-  this->scene->GetManager()->destroyManualObject( this->manualObject );
+  this->scene->GetManager()->destroySceneNode(this->sceneNode->getName());
+  this->scene->GetManager()->destroyManualObject(this->manualObject);
 
   this->material->unload();
 }
@@ -87,16 +85,16 @@ void Grid::SetColor(const common::Color& color_)
 {
   this->colorP = color_;
 
-  this->material->setDiffuse( color_.R(), color_.G(), color_.B(), color_.A() );
-  this->material->setAmbient( color_.R(), color_.G(), color_.B() );
+  this->material->setDiffuse(color_.R(), color_.G(), color_.B(), color_.A());
+  this->material->setAmbient(color_.R(), color_.G(), color_.B());
 
-  if ( (this->colorP).A() < 0.9998 )
-    this->material->setSceneBlending( Ogre::SBT_TRANSPARENT_ALPHA );
+  if ((this->colorP).A() < 0.9998)
+    this->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   else
-    this->material->setSceneBlending( Ogre::SBT_REPLACE );
+    this->material->setSceneBlending(Ogre::SBT_REPLACE);
 
-  this->material->setDepthWriteEnabled( false );
-  this->material->setDepthCheckEnabled( false );
+  this->material->setDepthWriteEnabled(false);
+  this->material->setDepthCheckEnabled(false);
 
   this->Create();
 }
@@ -111,22 +109,25 @@ void Grid::SetHeight(uint32_t height_)
 }
 
 //////////////////////////////////////////////////
-// Init
 void Grid::Init()
 {
-  this->manualObject = this->scene->GetManager()->createManualObject( this->name );
-  this->manualObject->setVisibilityFlags( GZ_VISIBILITY_GUI );
+  this->manualObject =
+    this->scene->GetManager()->createManualObject(this->name);
+  this->manualObject->setVisibilityFlags(GZ_VISIBILITY_GUI);
   this->manualObject->setDynamic(true);
-  this->manualObject->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
+  this->manualObject->setRenderQueueGroup(
+      Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
   Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
 
   this->sceneNode = parent_node->createChildSceneNode(this->name);
-  this->sceneNode->attachObject( this->manualObject );
+  this->sceneNode->attachObject(this->manualObject);
 
   std::stringstream ss;
   ss << this->name << "Material";
-  this->material = Ogre::MaterialManager::getSingleton().create( ss.str(), Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+  this->material =
+    Ogre::MaterialManager::getSingleton().create(ss.str(),
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   this->material->setReceiveShadows(false);
   this->material->getTechnique(0)->setLightingEnabled(false);
 
@@ -143,30 +144,35 @@ void Grid::Create()
   float extent = (this->cellLengthP*((double)this->cellCountP))/2;
 
   this->manualObject->setCastShadows(false);
-  this->manualObject->estimateVertexCount( this->cellCountP * 4 * this->height + ((this->cellCountP + 1) * (this->cellCountP + 1)));
-  this->manualObject->begin( this->material->getName(), Ogre::RenderOperation::OT_LINE_LIST );
+  this->manualObject->estimateVertexCount(
+      this->cellCountP * 4 * this->height +
+      ((this->cellCountP + 1) * (this->cellCountP + 1)));
+
+  this->manualObject->begin(this->material->getName(),
+      Ogre::RenderOperation::OT_LINE_LIST);
 
   for (uint32_t h = 0; h <= this->height; ++h)
   {
-    float h_real = this->h_offsetP + (this->height / 2.0f - (float)h) * this->cellLengthP;
-    for( uint32_t i = 0; i <= this->cellCountP; i++ )
+    float h_real = this->h_offsetP +
+      (this->height / 2.0f - (float)h) * this->cellLengthP;
+    for(uint32_t i = 0; i <= this->cellCountP; i++)
     {
-      float inc = extent - ( i * this->cellLengthP );
+      float inc = extent - (i * this->cellLengthP);
 
-      Ogre::Vector3 p1(inc, -extent,h_real );
-      Ogre::Vector3 p2(inc, extent ,h_real );
-      Ogre::Vector3 p3(-extent,inc, h_real );
-      Ogre::Vector3 p4(extent, inc, h_real );
+      Ogre::Vector3 p1(inc, -extent, h_real);
+      Ogre::Vector3 p2(inc, extent , h_real);
+      Ogre::Vector3 p3(-extent, inc, h_real);
+      Ogre::Vector3 p4(extent, inc, h_real);
 
       this->manualObject->position(p1);
-      this->manualObject->colour( Conversions::Convert(this->colorP) );
+      this->manualObject->colour(Conversions::Convert(this->colorP));
       this->manualObject->position(p2);
-      this->manualObject->colour( Conversions::Convert(this->colorP) );
+      this->manualObject->colour(Conversions::Convert(this->colorP));
 
       this->manualObject->position(p3);
-      this->manualObject->colour( Conversions::Convert(this->colorP) );
+      this->manualObject->colour(Conversions::Convert(this->colorP));
       this->manualObject->position(p4);
-      this->manualObject->colour( Conversions::Convert(this->colorP) );
+      this->manualObject->colour(Conversions::Convert(this->colorP));
     }
   }
 
@@ -182,10 +188,10 @@ void Grid::Create()
         float z_top = (this->height / 2.0f) * this->cellLengthP;
         float z_bottom = -z_top;
 
-        this->manualObject->position( x_real, y_real, z_bottom );
-        this->manualObject->colour( Conversions::Convert(this->colorP) );
         this->manualObject->position(x_real, y_real, z_bottom);
-        this->manualObject->colour( Conversions::Convert(this->colorP) );
+        this->manualObject->colour(Conversions::Convert(this->colorP));
+        this->manualObject->position(x_real, y_real, z_bottom);
+        this->manualObject->colour(Conversions::Convert(this->colorP));
       }
     }
   }
@@ -194,7 +200,7 @@ void Grid::Create()
 }
 
 //////////////////////////////////////////////////
-void Grid::SetUserData( const Ogre::Any& data_ )
+void Grid::SetUserData(const Ogre::Any& data_)
 {
-  this->manualObject->setUserAny( data_ );
+  this->manualObject->setUserAny(data_);
 }

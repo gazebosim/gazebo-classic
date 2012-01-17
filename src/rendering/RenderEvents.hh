@@ -26,23 +26,20 @@ namespace gazebo
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateScene(T subscriber)
               { return createScene.Connect(subscriber); }
-
       public: static void DisconnectCreateScene(
                   event::ConnectionPtr subscriber)
               { createScene.Disconnect(subscriber); }
-
     public: template<typename T>
               static event::ConnectionPtr ConnectRemoveScene(T subscriber)
               { return removeScene.Connect(subscriber); }
-
       public: static void DisconnectRemoveScene(
                   event::ConnectionPtr subscriber)
               { removeScene.Disconnect(subscriber); }
-
 
       public: static event::EventT<void (const std::string &)> createScene;
       public: static event::EventT<void (const std::string &)> removeScene;
     };
   }
 }
+
 

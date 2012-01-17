@@ -33,7 +33,7 @@ namespace gazebo
     class DynamicLines;
     class LaserVisual : public Visual
     {
-      public: LaserVisual(const std::string &_name, VisualPtr _vis, 
+      public: LaserVisual(const std::string &_name, VisualPtr _vis,
                           const std::string &_topicName);
 
       public: virtual ~LaserVisual();
@@ -49,3 +49,4 @@ namespace gazebo
   }
 }
 #endif
+

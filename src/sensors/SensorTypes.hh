@@ -45,5 +45,6 @@ namespace gazebo
     typedef std::vector<ContactSensorPtr> ContactSensor_V;
   }
 }
- 
+
 #endif
+

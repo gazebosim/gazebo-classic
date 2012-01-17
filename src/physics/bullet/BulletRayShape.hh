@@ -60,7 +60,8 @@ namespace gazebo
     ///        the body
     /// \param posStart Start position, relative the body
     /// \param posEnd End position, relative to the body
-    public: void SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd);
+    public: void SetPoints(const math::Vector3 &posStart,
+                           const math::Vector3 &posEnd);
 
     /// \brief Update the tay collision
     public: void Update();

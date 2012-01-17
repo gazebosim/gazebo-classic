@@ -51,8 +51,7 @@ namespace boost
 
 namespace gazebo
 {
-
-	namespace rendering
+  namespace rendering
   {
     class Light;
     class Visual;
@@ -62,98 +61,97 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
-
-    /// \brief Representation of an entire scene graph  
+    /// \brief Representation of an entire scene graph
     class Scene
     {
       public: enum SceneType {BSP, GENERIC};
-
       private: Scene() {}
-  
       /// \brief Constructor
-      public: Scene(const std::string &_name, 
-                    bool _enableVisualizations=false);
-  
+      public: Scene(const std::string &_name,
+                    bool _enableVisualizations = false);
+
       /// \brief Destructor
       public: virtual ~Scene();
-  
+
       /// \brief Load the scene from a set of parameters
       public: void Load(sdf::ElementPtr &_scene);
 
       /// \brief Load the scene with default parameters
       public: void Load();
-  
+
       /// \brief Init
       public: void Init();
 
-      /// \brief Process all received messages 
+      /// \brief Process all received messages
       public: void PreRender();
 
       /// \brief Get the OGRE scene manager
       public: Ogre::SceneManager *GetManager() const;
-  
+
       /// \brief Get the name of the scene
       public: std::string GetName() const;
-  
+
       /// \brief Set the ambient color
       public: void SetAmbientColor(const common::Color &color);
-  
+
       /// \brief Get the ambient color
       public: common::Color GetAmbientColor() const;
-  
+
       /// \brief Set the background color
       public: void SetBackgroundColor(const common::Color &color);
 
       /// \brief Get the background color
       public: common::Color GetBackgroundColor() const;
-  
+
       /// \brief Create a grid
-      public: void CreateGrid(uint32_t cell_count, float cell_length, 
-                              float line_width, const common::Color &color );
-  
+      public: void CreateGrid(uint32_t cell_count, float cell_length,
+                              float line_width, const common::Color &color);
+
       /// \brief Get the grid
       public: Grid *GetGrid(unsigned int index) const;
-  
+
       /// \brief Create a camera
-      public: CameraPtr CreateCamera(const std::string &name, 
-                                     bool _autoRender=true);
- 
-      /// \brief Create depth camera 
-      public: DepthCameraPtr CreateDepthCamera( const std::string &_name, bool _autoRender=true);
+      public: CameraPtr CreateCamera(const std::string &name,
+                                     bool _autoRender = true);
+
+      /// \brief Create depth camera
+      public: DepthCameraPtr CreateDepthCamera(const std::string &_name,
+                                               bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
       public: unsigned int GetCameraCount() const;
-  
+
       /// \brief Get a camera
       public: CameraPtr GetCamera(unsigned int index) const;
 
       /// \brief Get a camera by name
-      public: CameraPtr GetCamera( const std::string &_name ) const;
-  
+      public: CameraPtr GetCamera(const std::string &_name) const;
+
       /// \brief Create a user camera
       public: UserCameraPtr CreateUserCamera(const std::string &name);
-  
+
       /// \brief Get the number of user cameras in this scene
       public: unsigned int GetUserCameraCount() const;
-  
+
       /// \brief Get a user camera
       public: UserCameraPtr GetUserCamera(unsigned int index) const;
 
-      /// \brief Get a visual by name 
-      public: VisualPtr GetVisual( const std::string &_name ) const;
+      /// \brief Get a visual by name
+      public: VisualPtr GetVisual(const std::string &_name) const;
 
-      public: VisualPtr SelectVisualAt(CameraPtr camera, math::Vector2i mousePos);
+      public: VisualPtr SelectVisualAt(CameraPtr camera,
+                                       math::Vector2i mousePos);
       /// \brief Select a visual by name
-      public: void SelectVisual( const std::string &_name ) const;
+      public: void SelectVisual(const std::string &_name) const;
 
       /// \brief Get an entity at a pixel location using a camera. Used for
-      ///        mouse picking. 
+      ///        mouse picking.
       /// \param camera The ogre camera, used to do mouse picking
       /// \param mousePos The position of the mouse in screen coordinates
       /// \param _mod Used for object manipulation
       /// \return The selected entity, or NULL
-      public: VisualPtr GetVisualAt(CameraPtr camera, 
-                                    math::Vector2i mousePos, 
+      public: VisualPtr GetVisualAt(CameraPtr camera,
+                                    math::Vector2i mousePos,
                                     std::string &mod);
 
       /// \brief Get a visual at a mouse position
@@ -161,50 +159,50 @@ namespace gazebo
 
       /// \brief Get a visual directly below a point
       public: VisualPtr GetVisualBelowPoint(const math::Vector3 &_pt);
- 
-      /// \brief Helper function for GetVisualAt functions 
-      private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera, 
+
+      /// \brief Helper function for GetVisualAt functions
+      private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera,
                                              math::Vector2i _mousePos,
                                              bool _ignorSelectionObj);
 
-      /// \brief Helper function for GetVisualAt functions 
+      /// \brief Helper function for GetVisualAt functions
       private: Ogre::Entity *GetOgreEntityBelowPoint(
                    const math::Vector3 &_mousePos, bool _ignorSelectionObj);
 
       /// \brief Get the world pos of a the first contact at a pixel location
-      public: math::Vector3 GetFirstContact(CameraPtr camera, 
+      public: math::Vector3 GetFirstContact(CameraPtr camera,
                                             math::Vector2i mousePos);
-  
+
       public: void PrintSceneGraph();
-  
+
       /// \brief Hide a visual
       public: void SetVisible(const std::string &name, bool visible);
-  
+
       /// \brief Draw a named line
-      public: void DrawLine(const math::Vector3 &start, 
-                            const math::Vector3 &end, 
+      public: void DrawLine(const math::Vector3 &start,
+                            const math::Vector3 &end,
                             const std::string &name);
-  
-      public: void SetFog( const std::string &_type, 
-                           const common::Color &_color, 
-                           double _density, double _start, double _end );
+
+      public: void SetFog(const std::string &_type,
+                           const common::Color &_color,
+                           double _density, double _start, double _end);
 
       // Get the scene ID
       public: unsigned int GetId() const;
-  
+
       // Get the scene Id as a string
       public: std::string GetIdString() const;
- 
-      /// \brief Get a unique scene node node 
+
+      /// \brief Get a unique scene node node
       public: std::string GetUniqueName(const std::string &_prefix);
 
       /// \brief Get the selection object
       public: SelectionObj *GetSelectionObj() const;
 
       /// \brief Print scene graph
-      private: void PrintSceneGraphHelper(const std::string &prefix, 
+      private: void PrintSceneGraphHelper(const std::string &prefix,
                                           Ogre::Node *node);
- 
+
       /// \brief Deprecated: use RTShader::ApplyShadows
       public: void InitShadows();
 
@@ -218,14 +216,14 @@ namespace gazebo
       public: bool GetShadowsEnabled() const;
 
       /// \brief Add a visual to the scene
-      public: void AddVisual( VisualPtr &_vis );
+      public: void AddVisual(VisualPtr &_vis);
 
       /// \brief Remove a visual from the scene
-      public: void RemoveVisual( VisualPtr _vis );
+      public: void RemoveVisual(VisualPtr _vis);
 
       /// \brief Set the grid on or off
       /// \param _enabled Set to true to turn on the grid
-      public: void SetGrid( bool _enabled );
+      public: void SetGrid(bool _enabled);
 
       public: VisualPtr GetWorldVisual() const;
 
@@ -240,7 +238,7 @@ namespace gazebo
                                        const Ogre::Vector3 &position,
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
-  
+
       private: void OnRequest(
                    ConstRequestPtr &_msg);
       private: void OnResponse(
@@ -268,7 +266,7 @@ namespace gazebo
 
       private: void OnSelectionMsg(
                    ConstSelectionPtr &msg);
-               
+
       private: void OnPoseMsg(ConstPosePtr &msg);
 
       public: void Clear();
@@ -277,19 +275,19 @@ namespace gazebo
       private: std::string name;
 
       private: sdf::ElementPtr sdf;
-  
+
       private: std::vector<CameraPtr> cameras;
       private: std::vector<UserCameraPtr> userCameras;
-  
+
       private: Ogre::SceneManager *manager;
       private: Ogre::RaySceneQuery *raySceneQuery;
-  
+
       private: std::vector<Grid *> grids;
-  
+
       private: static unsigned int idCounter;
       private: unsigned int id;
       private: std::string idString;
-  
+
       typedef std::list<boost::shared_ptr<msgs::Visual const> > VisualMsgs_L;
       private: VisualMsgs_L visualMsgs;
 
@@ -308,7 +306,7 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
       private: SensorMsgs_L sensorMsgs;
 
- 
+
       typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;
 
@@ -319,7 +317,7 @@ namespace gazebo
 
       private: boost::mutex *receiveMutex;
 
-      private: transport::NodePtr node;  
+      private: transport::NodePtr node;
       private: transport::SubscriberPtr sceneSub;
       private: transport::SubscriberPtr visSub;
       private: transport::SubscriberPtr lightSub;
@@ -342,4 +340,5 @@ namespace gazebo
     /// \}
   }
 }
-#endif 
+#endif
+

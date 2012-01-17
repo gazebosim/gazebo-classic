@@ -104,7 +104,8 @@ namespace gazebo
     protected: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Save a joint to a stream in XML format
-    protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream);
+    protected: virtual void SaveJoint(std::string &prefix,
+                                      std::ostream &stream);
 
     /// \brief Attach the two bodies with this joint
     public: virtual void Attach(Link *one, Link *two);

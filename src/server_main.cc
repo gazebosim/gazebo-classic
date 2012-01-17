@@ -49,7 +49,7 @@ int ParseArgs(int argc, char **argv)
       case 'p':
         {
           if (optarg != NULL)
-            plugins.push_back( std::string(optarg) );
+            plugins.push_back(std::string(optarg));
           else
             gzerr << "Missing plugin filename with -p argument\n";
           break;
@@ -77,7 +77,7 @@ int ParseArgs(int argc, char **argv)
 
 //////////////////////////////////////////////////
 // sighandler to shut everything down properly
-void SignalHandler( int )
+void SignalHandler(int)
 {
   server->Stop();
 }
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 
   // Construct plugins
   /// Load all the plugins specified on the command line
-  for (std::vector<std::string>::iterator iter = plugins.begin(); 
+  for (std::vector<std::string>::iterator iter = plugins.begin();
        iter != plugins.end(); iter++)
   {
     server->LoadPlugin(*iter);
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  server->SetParams( params );
+  server->SetParams(params);
   server->Init();
 
   server->Run();
@@ -127,6 +127,7 @@ int main(int argc, char **argv)
   delete server;
   server = NULL;
 
-  printf("\n");  
+  printf("\n");
   return 0;
 }
+

@@ -50,7 +50,7 @@ bool Server::Load(const std::string &_filename)
   std::string host = "";
   unsigned short port = 0;
 
-  gazebo::transport::get_master_uri(host,port);
+  gazebo::transport::get_master_uri(host, port);
 
   this->master = new gazebo::Master();
   this->master->Init(port);
@@ -170,11 +170,11 @@ void Server::Run()
   // Stop gazebo
   gazebo::stop();
 
-  // Stop the master 
+  // Stop the master
   this->master->Stop();
 }
 
-void Server::SetParams( const common::StrStr_M &params )
+void Server::SetParams(const common::StrStr_M &params)
 {
   common::StrStr_M::const_iterator iter;
   for (iter = params.begin(); iter != params.end(); iter++)
@@ -197,7 +197,7 @@ void Server::SetParams( const common::StrStr_M &params )
         else if (str == "false")
           p = false;
         else
-          gzerr << "Invalid param value[" << iter->first << ":" 
+          gzerr << "Invalid param value[" << iter->first << ":"
                 << iter->second << "]\n";
       }
 
@@ -270,3 +270,4 @@ void Server::ProcessControlMsgs()
   }
   this->controlMsgs.clear();
 }
+

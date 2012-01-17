@@ -58,7 +58,7 @@ Light::Light(Scene *scene_)
         boost::bind(&Light::ToggleShowVisual, this));
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( "/sdf/light.sdf", this->sdf );
+  sdf::initFile("/sdf/light.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -96,9 +96,9 @@ void Light::Load()
         "Unable to create a light");
   }
 
-  this->SetCastShadows( this->sdf->GetValueBool("cast_shadows") );
+  this->SetCastShadows(this->sdf->GetValueBool("cast_shadows"));
 
-  this->SetLightType( this->sdf->GetValueString("type") );
+  this->SetLightType(this->sdf->GetValueString("type"));
   this->SetDiffuseColor(
       this->sdf->GetOrCreateElement("diffuse")->GetValueColor("rgba"));
   this->SetSpecularColor(
@@ -123,9 +123,9 @@ void Light::Load()
   if (this->sdf->HasElement("spot"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("spot");
-    this->SetSpotInnerAngle( elem->GetValueDouble("inner_angle") );
-    this->SetSpotOuterAngle( elem->GetValueDouble("outer_angle")  );
-    this->SetSpotFalloff( elem->GetValueDouble("falloff") );
+    this->SetSpotInnerAngle(elem->GetValueDouble("inner_angle"));
+    this->SetSpotOuterAngle(elem->GetValueDouble("outer_angle"));
+    this->SetSpotFalloff(elem->GetValueDouble("falloff"));
   }
 
   this->visual->AttachObject(this->light);
@@ -138,7 +138,7 @@ void Light::Load()
 /// Load from a light message
 void Light::LoadFromMsg(ConstLightPtr &msg)
 {
-  this->sdf->GetAttribute("name")->Set( msg->name() );
+  this->sdf->GetAttribute("name")->Set(msg->name());
 
   if (msg->has_type() && msg->type() == msgs::Light::POINT)
     this->sdf->GetAttribute("type")->Set("point");
@@ -150,18 +150,19 @@ void Light::LoadFromMsg(ConstLightPtr &msg)
   if (msg->has_diffuse())
   {
     this->sdf->GetOrCreateElement("diffuse")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->diffuse()) );
+        msgs::Convert(msg->diffuse()));
   }
 
   if (msg->has_specular())
   {
     this->sdf->GetOrCreateElement("specular")->GetAttribute("rgba")->Set(
-        msgs::Convert(msg->diffuse()) );
+        msgs::Convert(msg->diffuse()));
   }
 
   if (msg->has_direction())
   {
-    this->sdf->GetOrCreateElement("direction")->GetAttribute("xyz")->Set( msgs::Convert(msg->direction()) );
+    this->sdf->GetOrCreateElement("direction")->GetAttribute("xyz")->Set(
+        msgs::Convert(msg->direction()));
   }
 
   if (msg->has_attenuation_constant())
@@ -217,7 +218,7 @@ void Light::LoadFromMsg(ConstLightPtr &msg)
 
 //////////////////////////////////////////////////
 /// Set the name of the visual
-void Light::SetName( const std::string &name )
+void Light::SetName(const std::string &name)
 {
   this->sdf->GetAttribute("name")->Set(name);
 }
@@ -234,71 +235,71 @@ std::string Light::GetName() const
 void Light::CreateVisual()
 {
   // The lines draw a visualization of the camera
-  this->line = this->visual->CreateDynamicLine( RENDERING_LINE_LIST );
+  this->line = this->visual->CreateDynamicLine(RENDERING_LINE_LIST);
 
   std::string lightType = this->sdf->GetValueString("type");
 
-  if ( lightType == "directional")
+  if (lightType == "directional")
   {
-    float s=.5;
-    this->line->AddPoint( math::Vector3(-s, -s, 0) );
-    this->line->AddPoint( math::Vector3(-s, s, 0) );
+    float s =.5;
+    this->line->AddPoint(math::Vector3(-s, -s, 0));
+    this->line->AddPoint(math::Vector3(-s, s, 0));
 
-    this->line->AddPoint( math::Vector3(-s, s, 0) );
-    this->line->AddPoint( math::Vector3(s, s, 0) );
+    this->line->AddPoint(math::Vector3(-s, s, 0));
+    this->line->AddPoint(math::Vector3(s, s, 0));
 
-    this->line->AddPoint( math::Vector3(s, s, 0) );
-    this->line->AddPoint( math::Vector3(s, -s, 0) );
+    this->line->AddPoint(math::Vector3(s, s, 0));
+    this->line->AddPoint(math::Vector3(s, -s, 0));
 
-    this->line->AddPoint( math::Vector3(s, -s, 0) );
-    this->line->AddPoint( math::Vector3(-s, -s, 0) );
+    this->line->AddPoint(math::Vector3(s, -s, 0));
+    this->line->AddPoint(math::Vector3(-s, -s, 0));
 
-    this->line->AddPoint( math::Vector3(0, 0, 0) );
-    this->line->AddPoint( math::Vector3(0, 0, -s) );
+    this->line->AddPoint(math::Vector3(0, 0, 0));
+    this->line->AddPoint(math::Vector3(0, 0, -s));
   }
-  if ( lightType == "point" )
+  if (lightType == "point")
   {
-    float s=0.1;
-    this->line->AddPoint(math::Vector3(-s,-s,0));
-    this->line->AddPoint(math::Vector3(-s,s,0));
+    float s = 0.1;
+    this->line->AddPoint(math::Vector3(-s, -s, 0));
+    this->line->AddPoint(math::Vector3(-s, s, 0));
 
-    this->line->AddPoint(math::Vector3(-s,s,0));
-    this->line->AddPoint(math::Vector3(s,s,0));
+    this->line->AddPoint(math::Vector3(-s, s, 0));
+    this->line->AddPoint(math::Vector3(s, s, 0));
 
-    this->line->AddPoint(math::Vector3(s,s,0));
-    this->line->AddPoint(math::Vector3(s,-s,0));
+    this->line->AddPoint(math::Vector3(s, s, 0));
+    this->line->AddPoint(math::Vector3(s, -s, 0));
 
-    this->line->AddPoint(math::Vector3(s,-s,0));
-    this->line->AddPoint(math::Vector3(-s,-s,0));
-
-
-    this->line->AddPoint(math::Vector3(-s,-s,0));
-    this->line->AddPoint(math::Vector3(0,0,s));
-
-    this->line->AddPoint(math::Vector3(-s,s,0));
-    this->line->AddPoint(math::Vector3(0,0,s));
-
-    this->line->AddPoint(math::Vector3(s,s,0));
-    this->line->AddPoint(math::Vector3(0,0,s));
-
-    this->line->AddPoint(math::Vector3(s,-s,0));
-    this->line->AddPoint(math::Vector3(0,0,s));
+    this->line->AddPoint(math::Vector3(s, -s, 0));
+    this->line->AddPoint(math::Vector3(-s, -s, 0));
 
 
+    this->line->AddPoint(math::Vector3(-s, -s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, s));
 
-    this->line->AddPoint(math::Vector3(-s,-s,0));
-    this->line->AddPoint(math::Vector3(0,0,-s));
+    this->line->AddPoint(math::Vector3(-s, s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, s));
 
-    this->line->AddPoint(math::Vector3(-s,s,0));
-    this->line->AddPoint(math::Vector3(0,0,-s));
+    this->line->AddPoint(math::Vector3(s, s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, s));
 
-    this->line->AddPoint(math::Vector3(s,s,0));
-    this->line->AddPoint(math::Vector3(0,0,-s));
+    this->line->AddPoint(math::Vector3(s, -s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, s));
 
-    this->line->AddPoint(math::Vector3(s,-s,0));
-    this->line->AddPoint(math::Vector3(0,0,-s));
+
+
+    this->line->AddPoint(math::Vector3(-s, -s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, -s));
+
+    this->line->AddPoint(math::Vector3(-s, s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, -s));
+
+    this->line->AddPoint(math::Vector3(s, s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, -s));
+
+    this->line->AddPoint(math::Vector3(s, -s, 0));
+    this->line->AddPoint(math::Vector3(0, 0, -s));
   }
-  else if ( lightType == "spot" )
+  else if (lightType == "spot")
   {
     double innerAngle = this->light->getSpotlightInnerAngle().valueRadians();
     double outerAngle = this->light->getSpotlightOuterAngle().valueRadians();
@@ -309,34 +310,34 @@ void Light::CreateVisual()
     angles[1] = range * tan(innerAngle);
 
     unsigned int i = 0;
-    this->line->AddPoint(math::Vector3(0,0,0));
-    this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
- 
-    for (i=0; i < 2; i++)
+    this->line->AddPoint(math::Vector3(0, 0, 0));
+    this->line->AddPoint(math::Vector3(angles[i], angles[i], -range));
+
+    for (i = 0; i < 2; i++)
     {
-      this->line->AddPoint(math::Vector3(0,0,0));
-      this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(0, 0, 0));
+      this->line->AddPoint(math::Vector3(angles[i], angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(0,0,0));
-      this->line->AddPoint(math::Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(0, 0, 0));
+      this->line->AddPoint(math::Vector3(-angles[i], -angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(0,0,0));
-      this->line->AddPoint(math::Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(0, 0, 0));
+      this->line->AddPoint(math::Vector3(angles[i], -angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(0,0,0));
-      this->line->AddPoint(math::Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(0, 0, 0));
+      this->line->AddPoint(math::Vector3(-angles[i], angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
-      this->line->AddPoint(math::Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i], angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i], angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(-angles[i],angles[i], -range));
-      this->line->AddPoint(math::Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i], angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i], -angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(-angles[i],-angles[i], -range));
-      this->line->AddPoint(math::Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(math::Vector3(-angles[i], -angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i], -angles[i], -range));
 
-      this->line->AddPoint(math::Vector3(angles[i],-angles[i], -range));
-      this->line->AddPoint(math::Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i], -angles[i], -range));
+      this->line->AddPoint(math::Vector3(angles[i], angles[i], -range));
     }
   }
 
@@ -356,9 +357,9 @@ void Light::SetPosition(const math::Vector3 &p)
 
 //////////////////////////////////////////////////
 /// Set whether this entity has been selected by the user through the gui
-bool Light::SetSelected( bool s )
+bool Light::SetSelected(bool s)
 {
-  // NATY: FIX 
+  // NATY: FIX
   // Entity::SetSelected(s);
 
   if (this->light->getType() != Ogre::Light::LT_DIRECTIONAL)
@@ -403,7 +404,7 @@ void Light::SetLightType(const std::string &_type)
   }
 
   if (this->sdf->GetValueString("type") != _type)
-    this->sdf->GetAttribute("type")->Set( _type );
+    this->sdf->GetAttribute("type")->Set(_type);
 }
 
 //////////////////////////////////////////////////
@@ -413,7 +414,7 @@ void Light::SetDiffuseColor(const common::Color &color)
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("diffuse");
 
   if (elem->GetValueColor("rgba") != color)
-    elem->GetAttribute("rgba")->Set( color );
+    elem->GetAttribute("rgba")->Set(color);
 
   this->light->setDiffuseColour(color.R(), color.G(), color.B());
 }
@@ -425,7 +426,7 @@ void Light::SetSpecularColor(const common::Color &color)
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("specular");
 
   if (elem->GetValueColor("rgba") != color)
-    elem->GetAttribute("rgba")->Set( color );
+    elem->GetAttribute("rgba")->Set(color);
 
   this->light->setSpecularColour(color.R(), color.G(), color.B());
 }
@@ -440,7 +441,7 @@ void Light::SetDirection(const math::Vector3 &dir)
 
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("direction");
   if (elem->GetValueVector3("xyz") != vec)
-    elem->GetAttribute("xyz")->Set( vec );
+    elem->GetAttribute("xyz")->Set(vec);
 
   this->light->setDirection(vec.x, vec.y, vec.z);
 }
@@ -467,7 +468,7 @@ void Light::SetAttenuation(double constant, double linear, double quadratic)
   elem->GetAttribute("quadratic")->Set(quadratic);
 
   // Set attenuation
-  this->light->setAttenuation(elem->GetValueDouble("range"), 
+  this->light->setAttenuation(elem->GetValueDouble("range"),
                               constant, linear, quadratic);
 }
 
@@ -480,7 +481,7 @@ void Light::SetRange(const double &range)
 
   elem->GetAttribute("range")->Set(range);
 
-  this->light->setAttenuation( elem->GetValueDouble("range"),
+  this->light->setAttenuation(elem->GetValueDouble("range"),
                                elem->GetValueDouble("constant"),
                                elem->GetValueDouble("linear"),
                                elem->GetValueDouble("quadratic"));
@@ -511,8 +512,8 @@ void Light::SetSpotInnerAngle(const double &angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setSpotlightRange(
-        Ogre::Radian(elem->GetValueDouble("inner_angle")), 
-        Ogre::Radian(elem->GetValueDouble("outer_angle")), 
+        Ogre::Radian(elem->GetValueDouble("inner_angle")),
+        Ogre::Radian(elem->GetValueDouble("outer_angle")),
         elem->GetValueDouble("falloff"));
   }
 }
@@ -527,8 +528,8 @@ void Light::SetSpotOuterAngle(const double &_angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setSpotlightRange(
-        Ogre::Radian(elem->GetValueDouble("inner_angle")), 
-        Ogre::Radian(elem->GetValueDouble("outer_angle")), 
+        Ogre::Radian(elem->GetValueDouble("inner_angle")),
+        Ogre::Radian(elem->GetValueDouble("outer_angle")),
         elem->GetValueDouble("falloff"));
   }
 }
@@ -543,8 +544,8 @@ void Light::SetSpotFalloff(const double &_angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
     this->light->setSpotlightRange(
-        Ogre::Radian(elem->GetValueDouble("inner_angle")), 
-        Ogre::Radian(elem->GetValueDouble("outer_angle")), 
+        Ogre::Radian(elem->GetValueDouble("inner_angle")),
+        Ogre::Radian(elem->GetValueDouble("outer_angle")),
         elem->GetValueDouble("falloff"));
   }
 
@@ -561,7 +562,8 @@ void Light::SetupShadows()
     // shadow camera setup
     Ogre::PSSMShadowCameraSetup* pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-    Ogre::PSSMShadowCameraSetup::SplitPointList splitPointList = pssmSetup->getSplitPoints();
+    Ogre::PSSMShadowCameraSetup::SplitPointList splitPointList =
+      pssmSetup->getSplitPoints();
 
     // These were hand tuned by me (Nate)...hopefully they work for all cases.
     splitPointList[0] = 0.5;
@@ -578,27 +580,30 @@ void Light::SetupShadows()
     pssmSetup->setOptimalAdjustFactor(2, 1.0);
     */
 
-    this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
+    this->light->setCustomShadowCameraSetup(
+        Ogre::ShadowCameraSetupPtr(pssmSetup));
 
     Ogre::Vector4 splitPoints;
     for (unsigned int i = 0; i < numShadowTextures; ++i)
       splitPoints[i] = splitPointList[i];
 
-    Ogre::MaterialManager::ResourceMapIterator iter = Ogre::MaterialManager::getSingleton().getResourceIterator();
+    Ogre::MaterialManager::ResourceMapIterator iter =
+      Ogre::MaterialManager::getSingleton().getResourceIterator();
 
     // Iterate over all the materials, and set the pssm split points
     while(iter.hasMoreElements())
     {
       Ogre::MaterialPtr mat = iter.getNext();
-      for(int i = 0; i < mat->getNumTechniques(); i++) 
+      for(int i = 0; i < mat->getNumTechniques(); i++)
       {
         Ogre::Technique *tech = mat->getTechnique(i);
-        for(int j = 0; j < tech->getNumPasses(); j++) 
+        for(int j = 0; j < tech->getNumPasses(); j++)
         {
           Ogre::Pass *pass = tech->getPass(j);
           if (pass->hasFragmentProgram())
           {
-            Ogre::GpuProgramParametersSharedPtr params = pass->getFragmentProgramParameters();
+            Ogre::GpuProgramParametersSharedPtr params =
+              pass->getFragmentProgramParameters();
             if (params->_findNamedConstantDefinition("pssm_split_points"))
               params->setNamedConstant("pssm_split_points", splitPoints);
           }
@@ -608,8 +613,11 @@ void Light::SetupShadows()
   }
   /*else if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
   {
-    this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup()));
+    this->light->setCustomShadowCameraSetup(
+    Ogre::ShadowCameraSetupPtr(new Ogre::DefaultShadowCameraSetup()));
   }
   */
 }
+
+
 

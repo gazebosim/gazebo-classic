@@ -39,7 +39,7 @@ using namespace gazebo;
 using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
- 
+
 //////////////////////////////////////////////////
 // Constructor
 DepthCameraSensor::DepthCameraSensor()
@@ -55,14 +55,14 @@ DepthCameraSensor::~DepthCameraSensor()
 
 //////////////////////////////////////////////////
 /// Set the parent of the sensor
-void DepthCameraSensor::SetParent( const std::string &_name )
+void DepthCameraSensor::SetParent(const std::string &_name)
 {
   Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
 // Load the camera with SDF parameters
-void DepthCameraSensor::Load( sdf::ElementPtr &_sdf )
+void DepthCameraSensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
 }
@@ -72,10 +72,10 @@ void DepthCameraSensor::Load( sdf::ElementPtr &_sdf )
 void DepthCameraSensor::Load()
 {
   Sensor::Load();
-  this->poseSub = this->node->Subscribe("~/pose", 
-                                        &DepthCameraSensor::OnPose, this );
+  this->poseSub = this->node->Subscribe("~/pose",
+                                        &DepthCameraSensor::OnPose, this);
 }
- 
+
 //////////////////////////////////////////////////
 // Initialize the camera
 void DepthCameraSensor::Init()
@@ -90,7 +90,7 @@ void DepthCameraSensor::Init()
       this->scene = rendering::create_scene(worldName, false);
 
     this->camera = this->scene->CreateDepthCamera(
-        this->sdf->GetValueString("name"),false);
+        this->sdf->GetValueString("name"), false);
 
     if (!this->camera)
     {
@@ -100,10 +100,10 @@ void DepthCameraSensor::Init()
     this->camera->SetCaptureData(true);
 
     sdf::ElementPtr cameraSdf = this->sdf->GetOrCreateElement("camera");
-    this->camera->Load( cameraSdf );
+    this->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 || 
+    if (this->camera->GetImageWidth() == 0 ||
         this->camera->GetImageHeight() == 0)
     {
       gzthrow("image has zero size");
@@ -112,8 +112,8 @@ void DepthCameraSensor::Init()
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
     this->camera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
-    this->camera->SetWorldPose( this->pose );
-    this->camera->AttachToVisual( this->parentName, true );
+    this->camera->SetWorldPose(this->pose);
+    this->camera->AttachToVisual(this->parentName, true);
   }
   else
     gzerr << "No world name\n";
@@ -154,3 +154,4 @@ void DepthCameraSensor::UpdateImpl(bool /*_force*/)
 void DepthCameraSensor::OnPose(ConstPosePtr &/*_msg*/)
 {
 }
+

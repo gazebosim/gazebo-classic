@@ -58,8 +58,9 @@ SensorPtr SensorFactory::NewSensor(const std::string &classname)
 
   if (sensor_map[classname])
   {
-    sensor.reset( (sensor_map[classname]) () );
+    sensor.reset((sensor_map[classname]) ());
   }
 
   return sensor;
 }
+

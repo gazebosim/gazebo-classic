@@ -32,7 +32,7 @@ namespace gazebo
     public: void Stop();
     public: void Fini();
 
-    public: void SetParams( const common::StrStr_M &params );
+    public: void SetParams(const common::StrStr_M &params);
 
     public: bool GetInitialized() const;
 
@@ -56,3 +56,4 @@ namespace gazebo
 }
 
 #endif
+

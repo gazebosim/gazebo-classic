@@ -27,9 +27,8 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
-
     /// \brief A set of utility function to convert between Gazebo and Ogre
     /// data types
     class Conversions
@@ -54,3 +53,4 @@ namespace gazebo
   }
 }
 #endif
+

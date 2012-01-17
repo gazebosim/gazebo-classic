@@ -39,11 +39,10 @@ using namespace gazebo;
 using namespace sensors;
 
 //////////////////////////////////////////////////
-// Constructor
 Sensor::Sensor()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( "/sdf/sensor.sdf", this->sdf );
+  sdf::initFile("/sdf/sensor.sdf", this->sdf);
 
   this->active = false;
 
@@ -53,7 +52,6 @@ Sensor::Sensor()
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Sensor::~Sensor()
 {
   this->sdf->Reset();
@@ -63,15 +61,13 @@ Sensor::~Sensor()
 }
 
 //////////////////////////////////////////////////
-// Load the sensor
-void Sensor::Load( sdf::ElementPtr &_sdf )
+void Sensor::Load(sdf::ElementPtr &_sdf)
 {
   this->sdf = _sdf;
   this->Load();
 }
 
 //////////////////////////////////////////////////
-// Load the sensor
 void Sensor::Load()
 {
   if (this->sdf->HasElement("origin"))
@@ -87,16 +83,16 @@ void Sensor::Load()
   // get world
   std::string worldName = this->sdf->GetWorldName();
   this->world = physics::get_world(worldName);
-  this->lastUpdateTime = this->world->GetSimTime(); //TODO: hmm, special case for start.
+  this->lastUpdateTime = this->world->GetSimTime();
 }
- 
+
 //////////////////////////////////////////////////
 /// Initialize the sensor
 void Sensor::Init()
 {
   //gzerr << "Sensor::Init()\n";
 
-  this->SetUpdateRate( this->sdf->GetValueDouble("update_rate")  );
+  this->SetUpdateRate(this->sdf->GetValueDouble("update_rate"));
 
   // Load the plugins
   if (this->sdf->HasElement("plugin"))
@@ -112,8 +108,7 @@ void Sensor::Init()
 }
 
 //////////////////////////////////////////////////
-/// Set the parent of the sensor
-void Sensor::SetParent( const std::string &_name )
+void Sensor::SetParent(const std::string &_name)
 {
   this->parentName = _name;
 }
@@ -125,7 +120,6 @@ std::string Sensor::GetParentName() const
 }
 
 //////////////////////////////////////////////////
-/// Update the sensor
 void Sensor::Update(bool _force)
 {
   if (this->IsActive())
@@ -140,7 +134,8 @@ void Sensor::Update(bool _force)
 
   //Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
 
-  //if (((this->GetWorld()->GetSimTime() - this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
+  //if (((this->GetWorld()->GetSimTime() -
+  //      this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
   {
     //this->lastUpdate = this->GetWorld()->GetSimTime();
   }
@@ -151,59 +146,51 @@ void Sensor::Update(bool _force)
 }
 
 //////////////////////////////////////////////////
-/// Finalize the sensor
 void Sensor::Fini()
 {
   this->plugins.clear();
 }
 
 //////////////////////////////////////////////////
-/// Get name 
 std::string Sensor::GetName() const
 {
   return this->sdf->GetValueString("name");
 }
 
 //////////////////////////////////////////////////
-/// Load a controller helper function
-void Sensor::LoadPlugin( sdf::ElementPtr &_sdf )
+void Sensor::LoadPlugin(sdf::ElementPtr &_sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  //gzerr << "Sensor LoadPlugin [" << name << "] [" << filename << "]\n";
   gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
 
   if (plugin)
   {
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
-    this->plugins.push_back( plugin );
+    this->plugins.push_back(plugin);
   }
 }
 
 //////////////////////////////////////////////////
-/// \brief Set whether the sensor is active or not
 void Sensor::SetActive(bool value)
 {
   this->active = value;
 }
 
 //////////////////////////////////////////////////
-/// \brief Set whether the sensor is active or not
 bool Sensor::IsActive()
 {
   return this->active;
 }
 
 //////////////////////////////////////////////////
-/// Get the current pose
 math::Pose Sensor::GetPose() const
 {
   return this->pose;
 }
 
 //////////////////////////////////////////////////
-// Set the update Hz rate
 void Sensor::SetUpdateRate(double _hz)
 {
   if (_hz > 0.0)
@@ -213,7 +200,6 @@ void Sensor::SetUpdateRate(double _hz)
 }
 
 //////////////////////////////////////////////////
-// return last render time
 common::Time Sensor::GetLastUpdateTime()
 {
   return this->lastUpdateTime;
@@ -240,6 +226,7 @@ std::string Sensor::GetTopic() const
   return result;
 }
 
+//////////////////////////////////////////////////
 void Sensor::FillMsg(msgs::Sensor &_msg)
 {
   _msg.set_name(this->GetName());

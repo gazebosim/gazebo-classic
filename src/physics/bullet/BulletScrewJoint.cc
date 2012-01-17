@@ -39,7 +39,8 @@ BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world)
     : ScrewJoint<BulletJoint>()
 {
   this->world = _world;
-  gzthrow("bullet screw constraint is copied from BulletSlider, not a screw joint.");
+  gzthrow(std::string("bullet screw constraint is copied from BulletSlider,") +
+          " not a screw joint.");
 }
 
 
@@ -139,14 +140,16 @@ void BulletScrewJoint::SetForce(int _index, double _force)
 /// Set the high stop of an axis(index).
 void BulletScrewJoint::SetHighStop(int _index, Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setUpperLinLimit(_angle.GetAsRadian());
+  ((btSliderConstraint*)this->constraint)->setUpperLinLimit(
+    _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 /// Set the low stop of an axis(index).
 void BulletScrewJoint::SetLowStop(int _index, Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setLowerLinLimit(_angle.GetAsRadian());
+  ((btSliderConstraint*)this->constraint)->setLowerLinLimit(
+    _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
@@ -165,7 +168,7 @@ Angle BulletScrewJoint::GetLowStop(int _index)
 
 //////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
-void BulletScrewJoint::SetMaxForce(int _/*t*/*index*_/*t*/, double _/*t*/*t*_/*t*_/*t*/)
+void BulletScrewJoint::SetMaxForce(int _index, double _force)
 {
   gzerr(0) << "Not implemented\n";
 }

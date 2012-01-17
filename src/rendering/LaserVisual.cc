@@ -29,20 +29,20 @@ using namespace rendering;
 
 LaserVisual::LaserVisual (const std::string &_name, VisualPtr _vis,
                           const std::string &_topicName)
- : Visual(_name, _vis)
+: Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName, 
+  this->laserScanSub = this->node->Subscribe(_topicName,
       &LaserVisual::OnScan, this);
 
   this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
-  this->rayFan->AddPoint(math::Vector3(0,0,0));
+  this->rayFan->AddPoint(math::Vector3(0, 0, 0));
 }
- 
+
 LaserVisual::~LaserVisual()
 {
   delete this->rayFan;
@@ -50,7 +50,7 @@ LaserVisual::~LaserVisual()
 }
 
 
-void LaserVisual::OnScan( ConstLaserScanPtr &_msg)
+void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
 {
   double angle = _msg->angle_min();
   double r;
@@ -58,11 +58,11 @@ void LaserVisual::OnScan( ConstLaserScanPtr &_msg)
   math::Pose offset = msgs::Convert(_msg->offset());
 
   this->rayFan->SetPoint(0, offset.pos);
-  for (int i=0; i < _msg->ranges_size(); i++)
+  for (int i = 0; i < _msg->ranges_size(); i++)
   {
     r = _msg->ranges(i) + _msg->range_min();
     pt.x = 0 + r * cos(angle);
-    pt.y = 0 + r * sin(angle); 
+    pt.y = 0 + r * sin(angle);
     pt.z = 0;
     pt += offset.pos;
 
@@ -74,3 +74,5 @@ void LaserVisual::OnScan( ConstLaserScanPtr &_msg)
     angle += _msg->angle_step();
   }
 }
+
+

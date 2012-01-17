@@ -29,40 +29,41 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
-
-    /// \brief An IMU sensor 
+    /// \brief An IMU sensor
     class ImuSensor: public Sensor
     {
       /// \brief Constructor
       /// \param body The IMU sensor must be attached to a body.
       public: ImuSensor(Body *body);
-    
+
       /// \brief Destructor
       public: virtual ~ImuSensor();
-    
+
       /// \param node The XMLConfig node
       protected: virtual void LoadChild(XMLConfigNode *node);
-    
+
       /// \brief Save the sensor info in XML format
-      protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
-    
+      protected: virtual void SaveChild(std::string &prefix,
+                                        std::ostream &stream);
+
       /// Initialize the ray
       protected: virtual void InitChild();
-    
+
       ///  Update sensed values
       protected: virtual void UpdateChild();
-      
+
       /// Finalize the ray
       protected: virtual void FiniChild();
-    
+
       public: Pose GetVelocity();
-    
+
       private: Pose prevPose;
       private: Pose imuVel;
-    
+
     };
     /// \}
   }
 }
 
 #endif
+

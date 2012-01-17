@@ -30,12 +30,11 @@ namespace Ogre
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     /// \addtogroup gazebo_rendering
     /// \{
-
-    /// \brief Class to mangage render windows 
+    /// \brief Class to mangage render windows
     class WindowManager : public SingletonT<WindowManager>
     {
       public: WindowManager();
@@ -43,35 +42,36 @@ namespace gazebo
 
       /// \brief Shutdown all the windows
       public: void Fini();
- 
-      public: int CreateWindow( std::string ogreHandle, 
-                                unsigned int width, 
-                                unsigned int height );
-  
-      public: void GetAttribute(unsigned int id, 
+
+      public: int CreateWindow(std::string ogreHandle,
+                                unsigned int width,
+                                unsigned int height);
+
+      public: void GetAttribute(unsigned int id,
                   const std::string &attr, void *data);
-  
+
       /// \brief Attach a camera to a window
-      public: void SetCamera( int windowId, CameraPtr camera);
-  
+      public: void SetCamera(int windowId, CameraPtr camera);
+
       /// \brief Resize a window
       public: void Resize(unsigned int id, int width, int height);
-  
+
       public: void Moved(unsigned int id);
 
       /// \brief Get the average FPS
       public: float GetAvgFPS(unsigned int windowId);
-  
+
       /// \brief Get the triangle count
       public: unsigned int GetTriangleCount(unsigned int windotId);
- 
+
       private: std::vector<Ogre::RenderWindow *> windows;
-  
+
       private: static unsigned int windowCounter;
-  
+
       private: friend class SingletonT<WindowManager>;
     };
     /// \}
   }
 }
 #endif
+

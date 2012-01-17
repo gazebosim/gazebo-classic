@@ -52,8 +52,8 @@ void BulletRayCollision::Update()
 }
 
 //////////////////////////////////////////////////
-// Set the starting point and direction
-void BulletRayCollision::SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
+void BulletRayCollision::SetPoints(const math::Vector3 &_posStart,
+                                   const math::Vector3 &_posEnd)
 {
   RayCollision<BulletCollision>::SetPoints(_posStart, _posEnd);
 }

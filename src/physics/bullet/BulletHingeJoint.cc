@@ -81,8 +81,10 @@ void BulletHingeJoint::Attach(Link *_one, Link *_two)
   pivotA = (this->anchorPos - this->body1->GetWorldPose().pos);
   pivotB = (this->anchorPos - this->body2->GetWorldPose().pos);
 
-  axisA = btmath::Vector3((**this->axisP).x, (**this->axisP).y, (**this->axisP).z);
-  axisB = btmath::Vector3((**this->axisP).x, (**this->axisP).y, (**this->axisP).z);
+  axisA =
+    btmath::Vector3((**this->axisP).x, (**this->axisP).y, (**this->axisP).z);
+  axisB =
+    btmath::Vector3((**this->axisP).x, (**this->axisP).y, (**this->axisP).z);
 
   this->constraint = new btHingeConstraint(*rigidLink1, *rigidLink2,
       btmath::Vector3(pivotA.x, pivotA.y, pivotA.z),
@@ -101,8 +103,10 @@ void BulletHingeJoint::Attach(Link *_one, Link *_two)
 math::Vector3 BulletHingeJoint::GetAnchor(int _index) const
 {
   btTransform trans = ((btHingeConstraint*)this->constraint)->getAFrame();
-  trans.getOrigin() += this->constraint->getRigidLinkA().getCenterOfMassTransform().getOrigin();
-  return math::Vector3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+  trans.getOrigin() +=
+    this->constraint->getRigidLinkA().getCenterOfMassTransform().getOrigin();
+  return math::Vector3(trans.getOrigin().getX(),
+      trans.getOrigin().getY(), trans.getOrigin().getZ());
 }
 
 //////////////////////////////////////////////////

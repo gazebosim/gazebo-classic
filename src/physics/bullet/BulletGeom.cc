@@ -113,7 +113,8 @@ Mass BulletCollision::GetLinkMassMatrix()
 
 //////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void BulletCollision::GetBoundingBox(math::Vector3 &_min, math::Vector3 &_max) const
+void BulletCollision::GetBoundingBox(math::Vector3 &_min,
+                                     math::Vector3 &_max) const
 {
   if (this->collisionShape)
   {

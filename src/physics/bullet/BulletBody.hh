@@ -118,7 +118,8 @@ namespace gazebo
     public: virtual void SetAngularDamping(double damping);
 
     /// \brief Set the relative pose of a child collision.
-    public: void SetCollisionRelativePose(BulletCollision *collision, const math::Pose &newPose);
+    public: void SetCollisionRelativePose(BulletCollision *collision,
+                                          const math::Pose &newPose);
 
     private: btCompoundShape *compoundShape;
     private: BulletMotionState *motionState;

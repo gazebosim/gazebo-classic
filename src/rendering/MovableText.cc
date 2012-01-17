@@ -55,7 +55,7 @@ MovableText::MovableText()
     vertAlign(V_BELOW) ,
     horizAlign(H_LEFT) ,
     onTop(false) ,
-    baseline(0.0) 
+    baseline(0.0)
 {
   this->renderOp.vertexData = NULL;
 
@@ -77,7 +77,7 @@ MovableText::~MovableText()
 
 //////////////////////////////////////////////////
 //Loads the text to display and select the font
-void MovableText::Load( const std::string &name_,
+void MovableText::Load(const std::string &name_,
                         const std::string &text_,
                         const std::string &fontName_,
                         float charHeight_,
@@ -137,7 +137,8 @@ void MovableText::SetFontName(const std::string &newFontName)
   {
     this->fontName = newFontName;
 
-    this->font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(this->fontName).getPointer();
+    this->font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(
+        this->fontName).getPointer();
 
     if (!this->font)
     {
@@ -150,7 +151,8 @@ void MovableText::SetFontName(const std::string &newFontName)
 
     if (!this->material.isNull())
     {
-      Ogre::MaterialManager::getSingletonPtr()->remove(this->material->getName());
+      Ogre::MaterialManager::getSingletonPtr()->remove(
+          this->material->getName());
       this->material.setNull();
     }
 
@@ -240,10 +242,10 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 
 //////////////////////////////////////////////////
 // Set additional height
-void MovableText::SetBaseline( float base_ )
+void MovableText::SetBaseline(float base_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if ( this->baseline != base_ )
+  if (this->baseline != base_)
   {
     this->baseline = base_;
     this->needUpdate = true;
@@ -266,7 +268,7 @@ void MovableText::SetShowOnTop(bool show)
 }
 
 //////////////////////////////////////////////////
-// True=text is displayed on top
+// True = text is displayed on top
 bool MovableText::GetShowOnTop() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -312,9 +314,9 @@ void MovableText::_setupGeometry()
   float len = 0.0f;
 
   // for calculation of AABB
-  Ogre::Vector3 min(0,0,0);
-  Ogre::Vector3 max(0,0,0);
-  Ogre::Vector3 currPos(0,0,0);
+  Ogre::Vector3 min(0, 0, 0);
+  Ogre::Vector3 max(0, 0, 0);
+  Ogre::Vector3 currPos(0, 0, 0);
 
   unsigned int vertexCount = static_cast<unsigned int>(this->text.size() * 6);
 
@@ -377,7 +379,8 @@ void MovableText::_setupGeometry()
 
   // Derive space width from a capital A
   if (this->spaceWidth == 0)
-    this->spaceWidth = this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
+    this->spaceWidth =
+      this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 
   if (this->vertAlign == MovableText::V_ABOVE)
   {
@@ -396,7 +399,7 @@ void MovableText::_setupGeometry()
     if (newLine)
     {
       len = 0.0;
-      for (std::string::iterator j = i; j != this->text.end(); j++ )
+      for (std::string::iterator j = i; j != this->text.end(); j++)
       {
         Ogre::Font::CodePoint character = *j;
         if (character == 0x000D // CR
@@ -462,7 +465,7 @@ void MovableText::_setupGeometry()
 
     // Deal with bounds
     if (this->horizAlign == MovableText::H_LEFT)
-      currPos = Ogre::Vector3(left,top,0);
+      currPos = Ogre::Vector3(left, top, 0);
     else
       currPos = Ogre::Vector3(left - (len/2.0), top, 0);
 
@@ -494,7 +497,7 @@ void MovableText::_setupGeometry()
 
     // Deal with bounds
     if (this->horizAlign == MovableText::H_LEFT)
-      currPos = Ogre::Vector3(left,top,0);
+      currPos = Ogre::Vector3(left, top, 0);
     else
       currPos = Ogre::Vector3(left - (len/2), top, 0);
 
@@ -519,7 +522,7 @@ void MovableText::_setupGeometry()
 
     // Deal with bounds
     if (this->horizAlign == MovableText::H_LEFT)
-      currPos = Ogre::Vector3(left,top,0);
+      currPos = Ogre::Vector3(left, top, 0);
     else
       currPos = Ogre::Vector3(left - (len/2), top, 0);
 
@@ -544,7 +547,7 @@ void MovableText::_setupGeometry()
     *pVert++ = uvRect.top;
 
     // Deal with bounds
-    currPos = Ogre::Vector3(left,top,0);
+    currPos = Ogre::Vector3(left, top, 0);
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
@@ -564,7 +567,7 @@ void MovableText::_setupGeometry()
     *pVert++ = uvRect.bottom;
 
     // Deal with bounds
-    currPos = Ogre::Vector3(left,top,0);
+    currPos = Ogre::Vector3(left, top, 0);
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
@@ -583,7 +586,7 @@ void MovableText::_setupGeometry()
     *pVert++ = uvRect.bottom;
 
     // Deal with bounds
-    currPos = Ogre::Vector3(left,top,0);
+    currPos = Ogre::Vector3(left, top, 0);
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
@@ -625,7 +628,7 @@ void MovableText::_updateColors(void)
 
   Ogre::RGBA clr;
   Ogre::HardwareVertexBufferSharedPtr vbuf;
-  Ogre::RGBA *pDest=NULL;
+  Ogre::RGBA *pDest = NULL;
   unsigned int i;
 
   assert(this->font);
@@ -774,17 +777,16 @@ void MovableText::_updateRenderQueue(Ogre::RenderQueue* queue)
     if (this->updateColors)
       this->_updateColors();
 
-    queue->addRenderable(this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY);
+    queue->addRenderable(this, mRenderQueueID,
+                         OGRE_RENDERABLE_DEFAULT_PRIORITY);
   }
 }
 
 //////////////////////////////////////////////////
 /// Method to allow a caller to abstractly iterate over the Renderable instances
-void MovableText::visitRenderables( Ogre::Renderable::Visitor* /*visitor*/,
-                                 bool /*debug*/) 
+void MovableText::visitRenderables(Ogre::Renderable::Visitor* /*visitor*/,
+                                 bool /*debug*/)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return;
 }
-
-

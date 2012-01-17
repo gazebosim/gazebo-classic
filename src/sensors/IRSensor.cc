@@ -41,23 +41,20 @@ using namespace gazebo;
 GZ_REGISTER_STATIC_SENSOR("ir", IRSensor);
 
 //////////////////////////////////////////////////
-// Constructor
-IRSensor::IRSensor(Body *body)
- : Sensor(body)
+  IRSensor::IRSensor(Body *_body)
+: Sensor(_body)
 {
   this->active = false;
 }
 
 
 //////////////////////////////////////////////////
-// Destructor
 IRSensor::~IRSensor()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the ray using parameter from an SDF
-void IRSensor::LoadChild( sdf::ElementPtr &_sdf )
+void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
 {
   if (this->body == NULL)
   {
@@ -74,21 +71,22 @@ void IRSensor::LoadChild( sdf::ElementPtr &_sdf )
   while (iNode)
   {
     laserCollision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(
-                     "multiray", this->body);
+        "multiray", this->body);
     laserCollision->SetName("IR Sensor Collision");
 
     laserShape = (MultiRayShape*)(laserCollision->GetShape());
 
-    //laserShape->SetDisplayType( (**this->displayRaysP) );
+    //laserShape->SetDisplayType((**this->displayRaysP));
     laserShape->Load(iNode);
-    /*laserShape->Load(**verticalRayCountP, **rayCountP, 
-        **this->originP, **minRangeP, **maxRangeP, 
-        **this->verticalMinAngleP, **this->verticalMaxAngleP, **this->minAngleP, **this->maxAngleP);*/
+    /*laserShape->Load(**verticalRayCountP, **rayCountP,
+     **this->originP, **minRangeP, **maxRangeP,
+     **this->verticalMinAngleP, **this->verticalMaxAngleP,
+     **this->minAngleP, **this->maxAngleP);*/
 
     iNode = iNode->GetNext("ir");
   }
 
-  /*this->IRCount = node->GetInt("irCount",0,1);
+  /*this->IRCount = node->GetInt("irCount", 0, 1);
 
   //Allocate memeorys
   this->rayCount = new int[this->IRCount];
@@ -101,93 +99,91 @@ void IRSensor::LoadChild( sdf::ElementPtr &_sdf )
 
 
   //Read configuration from XML file
-  for(i=0, iNode = node->GetChild("ir"); iNode;i++)
+  for(i = 0, iNode = node->GetChild("ir"); iNode;i++)
   {
-    if(i >= this->IRCount)
-    {
-      std::ostringstream stream;
-      stream<< "please check the irCount is correct!";
-      gzthrow(stream.str());
-    }
+  if(i >= this->IRCount)
+  {
+  std::ostringstream stream;
+  stream<< "please check the irCount is correct!";
+  gzthrow(stream.str());
+  }
 
-    std::string name = iNode->GetString("name","",1);
-    this->rayCount[i] = iNode->GetInt("rayCount",0,1);
-    this->rangeCount[i] = iNode->GetInt("rangeCount",0,1);
-    this->minAngle[i] = DTOR(iNode->GetDouble("minAngle",-90,1));
-    this->maxAngle[i] = DTOR(iNode->GetDouble("maxAngle",90,1));
-    this->minRange[i] = iNode->GetDouble("minRange",0,1);
-    this->maxRange[i] = iNode->GetDouble("maxRange",8,1);
-    this->origin[i] = iNode->GetVector3("origin", Vector3(0,0,0));
-    iNode = iNode->GetNext("ir");
+  std::string name = iNode->GetString("name", "", 1);
+  this->rayCount[i] = iNode->GetInt("rayCount", 0, 1);
+  this->rangeCount[i] = iNode->GetInt("rangeCount", 0, 1);
+  this->minAngle[i] = DTOR(iNode->GetDouble("minAngle", -90, 1));
+  this->maxAngle[i] = DTOR(iNode->GetDouble("maxAngle", 90, 1));
+  this->minRange[i] = iNode->GetDouble("minRange", 0, 1);
+  this->maxRange[i] = iNode->GetDouble("maxRange", 8, 1);
+  this->origin[i] = iNode->GetVector3("origin", Vector3(0, 0, 0));
+  iNode = iNode->GetNext("ir");
   }
 
   this->displayRays = node->GetBool("displayRays", true);
 
   // Create a space to contain the ray space
-  this->superSpaceId = dSimpleSpaceCreate( 0 );
+  this->superSpaceId = dSimpleSpaceCreate(0);
 
   // Create a space to contain all the rays
-  this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
+  this->raySpaceId = dSimpleSpaceCreate(this->superSpaceId);
 
   // Set collision bits
   dCollisionSetCategoryBits((dCollisionID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dCollisionSetCollideBits((dCollisionID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  */
+*/
   /* BULLET
-     this->body->SetSpaceId( this->raySpaceId );
+     this->body->SetSpaceId(this->raySpaceId);
      */
 
 }
 
 //////////////////////////////////////////////////
-// Init the ray
 void IRSensor::InitChild()
 {
   /*Pose bodyPose;
-  double angle;
-  Vector3 start, end, axis;
-  RayCollision *ray;
-  */
+    double angle;
+    Vector3 start, end, axis;
+    RayCollision *ray;
+    */
 
   /*bodyPose = this->body->GetWorldPose();
   //this->prevPose = bodyPose;
 
   // Create and array of ray collisions
   //for (int i = 0; i < this->rayCount; i++)
-  for(unsigned int j=0; j<this->irBeams.size(); j++)
+  for(unsigned int j = 0; j<this->irBeams.size(); j++)
   {
-    for (int i = this->rayCount[j]-1; i >= 0; i--)
-    {
-      if(this->rayCount[j]==1)
-        angle=(this->maxAngle[j]+ this->minAngle[j])/2;
-      else
-        angle = i * (this->maxAngle[j] - this->minAngle[j]) / (this->rayCount[j] - 1) + this->minAngle[j];
+  for (int i = this->rayCount[j]-1; i >= 0; i--)
+  {
+  if(this->rayCount[j]== 1)
+  angle =(this->maxAngle[j]+ this->minAngle[j])/2;
+  else
+  angle = i * (this->maxAngle[j] - this->minAngle[j]) / (this->rayCount[j] - 1) + this->minAngle[j];
 
-      axis.Set(cos(angle), sin(angle),0);
+  axis.Set(cos(angle), sin(angle), 0);
 
 
-      start = (axis * this->minRange[j]) + this->origin[j];
-      end = (axis * this->maxRange[j]) + this->origin[j];
+  start = (axis * this->minRange[j]) + this->origin[j];
+  end = (axis * this->maxRange[j]) + this->origin[j];
 
-      // BULLET
-      //ray = new RayCollision(this->body, displayRays);
+  // BULLET
+  //ray = new RayCollision(this->body, displayRays);
 
-      ray->SetPoints(start, end);
+  ray->SetPoints(start, end);
 
-      this->rays.push_back(ray);
+  this->rays.push_back(ray);
 
-    }
+  }
   }*/
 
 }
 
 //////////////////////////////////////////////////
-// Init the ray
 void IRSensor::FiniChild()
 {
   std::vector<RaySensor*>::iterator iter;
-  for (iter=this->irBeams.begin(); iter!=this->irBeams.end(); iter++)
+  for (iter = this->irBeams.begin(); iter!= this->irBeams.end(); iter++)
   {
     delete *iter;
   }
@@ -195,7 +191,6 @@ void IRSensor::FiniChild()
 }
 
 //////////////////////////////////////////////////
-/// Get the ray count
 unsigned int IRSensor::GetIRCount() const
 {
   return this->irBeams.size();
@@ -203,7 +198,6 @@ unsigned int IRSensor::GetIRCount() const
 
 
 //////////////////////////////////////////////////
-// Get detected range for a ray
 double IRSensor::GetRange(unsigned int index) const
 {
   if (index >= this->irBeams.size())
@@ -218,7 +212,6 @@ double IRSensor::GetRange(unsigned int index) const
 }
 
 //////////////////////////////////////////////////
-// Get the pose of an ir beam
 Pose IRSensor::GetPose(unsigned int index) const
 {
   if (index >= this->irBeams.size())
@@ -233,7 +226,6 @@ Pose IRSensor::GetPose(unsigned int index) const
 }
 
 //////////////////////////////////////////////////
-// Update the sensor information
 void IRSensor::UpdateChild()
 {
   if (this->active)
@@ -243,3 +235,4 @@ void IRSensor::UpdateChild()
       (*iter)->Update();
   }
 }
+

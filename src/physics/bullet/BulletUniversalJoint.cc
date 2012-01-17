@@ -64,9 +64,12 @@ void BulletUniversalJoint::Attach(Link *_one, Link *_two)
 
   btmath::Vector3 anchor, axis1, axis2;
 
-  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
-  axis1 = btmath::Vector3((**this->axis1P).x, (**this->axis1P).y, (**this->axis1P).z);
-  axis2 = btmath::Vector3((**this->axis2P).x, (**this->axis2P).y, (**this->axis2P).z);
+  anchor = btmath::Vector3(this->anchorPos.x, this->anchorPos.y,
+                           this->anchorPos.z);
+  axis1 = btmath::Vector3((**this->axis1P).x, (**this->axis1P).y,
+                          (**this->axis1P).z);
+  axis2 = btmath::Vector3((**this->axis2P).x, (**this->axis2P).y,
+                          (**this->axis2P).z);
 
   this->constraint = new btUniversalConstraint(*rigidLink1, *rigidLink2,
       anchor, axis1, axis2);
@@ -96,7 +99,8 @@ void BulletUniversalJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 // Get the first axis of rotation
 math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
-  btmath::Vector3 axis = ((btUniversalConstraint*)this->constraint)->getAxis(_index);
+  btmath::Vector3 axis =
+    ((btUniversalConstraint*)this->constraint)->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
 }
 
@@ -201,7 +205,8 @@ math::Angle BulletUniversalJoint::GetHighStop(int _index)
   if (this->constraint)
   {
     btRotationalLimitMotor *motor;
-    motor = ((btUniversalConstraint*)this->constraint)->getRotationalLimitMotor(_index);
+    motor = ((btUniversalConstraint*)this->constraint)->getRotationalLimitMotor(
+        _index);
 
     return motor->m_hiLimit;
   }
@@ -220,7 +225,8 @@ math::Angle BulletUniversalJoint::GetLowStop(int _index)
   if (this->constraint)
   {
     btRotationalLimitMotor *motor;
-    motor = ((btUniversalConstraint*)this->constraint)->getRotationalLimitMotor(_index);
+    motor = ((btUniversalConstraint*)this->constraint)->getRotationalLimitMotor(
+        _index);
 
     return motor->m_loLimit;
   }

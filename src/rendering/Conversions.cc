@@ -54,3 +54,5 @@ math::Quaternion Conversions::Convert(const Ogre::Quaternion &v)
 {
   return math::Quaternion(v.w, v.x, v.y, v.z);
 }
+
+

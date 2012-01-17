@@ -22,14 +22,13 @@
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class Visual;
 
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
-
-    /// \brief Orbit view controller  
+    /// \brief Orbit view controller
     class OrbitViewController : public ViewController
     {
       /// \brief Constructor
@@ -37,7 +36,7 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~OrbitViewController();
-  
+
       public: virtual void Init();
       public: virtual void Init(const math::Vector3 &_focalPoint);
 
@@ -46,25 +45,25 @@ namespace gazebo
 
       /// \brief Update
       public: virtual void Update();
-  
+
       /// \brief Handle a mouse event
       public: virtual void HandleMouseEvent(const common::MouseEvent &event);
 
       /// \brief Get the type name of this view controller
       public: static std::string GetTypeString();
-  
+
       /// \brief Translate the focal point
       private: void Translate(math::Vector3 vec);
 
       /// \brief Zoom the camera
       private: void Zoom(float _amount);
-  
+
       /// \brief Normalize yaw value
       private: void NormalizeYaw(float &v);
-  
+
       /// \brief Normalize pitch value
       private: void NormalizePitch(float &v);
-  
+
       private: float yaw, pitch;
       private: float distance;
       private: float minDist, maxDist;
@@ -76,3 +75,4 @@ namespace gazebo
   }
 }
 #endif
+

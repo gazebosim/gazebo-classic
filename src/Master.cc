@@ -63,7 +63,7 @@ void Master::Init(unsigned short _port)
   }
   catch (std::exception &e)
   {
-    gzthrow( "Unable to start server[" << e.what() << "]\n");
+    gzthrow("Unable to start server[" << e.what() << "]\n");
   }
 }
 
@@ -78,25 +78,25 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   // Send all the current topic namespaces
   msgs::String_V namespacesMsg;
   std::list<std::string>::iterator iter;
-  for (iter = this->worldNames.begin(); 
+  for (iter = this->worldNames.begin();
        iter != this->worldNames.end(); iter++)
   {
     namespacesMsg.add_data(*iter);
   }
-  new_connection->EnqueueMsg( msgs::Package("topic_namepaces_init", 
+  new_connection->EnqueueMsg(msgs::Package("topic_namepaces_init",
                               namespacesMsg), true);
 
   // Send all the publishers
   msgs::Publishers publishersMsg;
   PubList::iterator pubiter;
-  for (pubiter = this->publishers.begin(); 
+  for (pubiter = this->publishers.begin();
        pubiter != this->publishers.end(); pubiter++)
   {
     msgs::Publish *pub = publishersMsg.add_publisher();
-    pub->CopyFrom( pubiter->first );
+    pub->CopyFrom(pubiter->first);
   }
-  new_connection->EnqueueMsg( 
-      msgs::Package("publishers_init", publishersMsg),true);
+  new_connection->EnqueueMsg(
+      msgs::Package("publishers_init", publishersMsg), true);
 
 
   // Add the connection to our list
@@ -106,13 +106,13 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   this->connections[index] = new_connection;
 
   // Start reading from the connection
-  new_connection->AsyncRead( 
+  new_connection->AsyncRead(
       boost::bind(&Master::OnRead, this, index, _1));
   this->connectionMutex->unlock();
 }
 
 //////////////////////////////////////////////////
-void Master::OnRead(const unsigned int _connectionIndex, 
+void Master::OnRead(const unsigned int _connectionIndex,
                     const std::string &_data)
 {
   if (this->stop)
@@ -127,18 +127,18 @@ void Master::OnRead(const unsigned int _connectionIndex,
 
   // Read the next message
   if (conn && conn->IsOpen())
-    conn->AsyncRead( boost::bind(&Master::OnRead, this, _connectionIndex, _1));
+    conn->AsyncRead(boost::bind(&Master::OnRead, this, _connectionIndex, _1));
 
   // Store the message if it's not empty
   if (!_data.empty())
   {
     this->msgsMutex->lock();
-    this->msgs.push_back( std::make_pair(_connectionIndex,_data) );
+    this->msgs.push_back(std::make_pair(_connectionIndex, _data));
     this->msgsMutex->unlock();
   }
   else
   {
-    gzerr << "Master got empty data message from[" 
+    gzerr << "Master got empty data message from["
           << conn->GetRemotePort() << "]\n";
   }
 }
@@ -159,21 +159,22 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   if (packet.type() == "register_topic_namespace")
   {
     msgs::String worldNameMsg;
-    worldNameMsg.ParseFromString( packet.serialized_data() );
+    worldNameMsg.ParseFromString(packet.serialized_data());
 
     std::list<std::string>::iterator iter;
     iter = std::find(this->worldNames.begin(), this->worldNames.end(),
         worldNameMsg.data());
     if (iter == this->worldNames.end())
     {
-      this->worldNames.push_back( worldNameMsg.data() );
+      this->worldNames.push_back(worldNameMsg.data());
 
       this->connectionMutex->lock();
       Connection_M::iterator iter2;
-      for (iter2 = this->connections.begin(); 
+      for (iter2 = this->connections.begin();
           iter2 != this->connections.end(); iter2++)
       {
-        iter2->second->EnqueueMsg( msgs::Package("topic_namespace_add", worldNameMsg));
+        iter2->second->EnqueueMsg(
+            msgs::Package("topic_namespace_add", worldNameMsg));
       }
       this->connectionMutex->unlock();
 
@@ -183,23 +184,23 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   else if (packet.type() == "advertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString( packet.serialized_data() );
+    pub.ParseFromString(packet.serialized_data());
 
     this->connectionMutex->lock();
     Connection_M::iterator iter2;
-    for (iter2 = this->connections.begin(); 
+    for (iter2 = this->connections.begin();
          iter2 != this->connections.end(); iter2++)
     {
-      iter2->second->EnqueueMsg(msgs::Package("publisher_add", pub)); 
+      iter2->second->EnqueueMsg(msgs::Package("publisher_add", pub));
     }
     this->connectionMutex->unlock();
 
-    this->publishers.push_back( std::make_pair(pub, conn) );
+    this->publishers.push_back(std::make_pair(pub, conn));
 
     SubList::iterator iter;
 
     // Find all subscribers of the topic
-    for (iter = this->subscribers.begin(); 
+    for (iter = this->subscribers.begin();
         iter != this->subscribers.end(); iter++)
     {
       if (iter->first.topic() == pub.topic())
@@ -211,26 +212,26 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   else if (packet.type() == "unadvertise")
   {
     msgs::Publish pub;
-    pub.ParseFromString( packet.serialized_data() );
+    pub.ParseFromString(packet.serialized_data());
     this->RemovePublisher(pub);
   }
   else if (packet.type() == "unsubscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString( packet.serialized_data() );
+    sub.ParseFromString(packet.serialized_data());
     this->RemoveSubscriber(sub);
   }
   else if (packet.type() == "subscribe")
   {
     msgs::Subscribe sub;
-    sub.ParseFromString( packet.serialized_data() );
+    sub.ParseFromString(packet.serialized_data());
 
-    this->subscribers.push_back( std::make_pair(sub, conn) );
+    this->subscribers.push_back(std::make_pair(sub, conn));
 
     PubList::iterator iter;
 
     // Find all publishers of the topic
-    for (iter = this->publishers.begin(); 
+    for (iter = this->publishers.begin();
         iter != this->publishers.end(); iter++)
     {
       if (iter->first.topic() == sub.topic())
@@ -248,57 +249,57 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       msgs::Publishers msg;
       PubList::iterator iter;
-      for (iter = this->publishers.begin(); 
+      for (iter = this->publishers.begin();
           iter != this->publishers.end(); iter++)
       {
         msgs::Publish *pub = msg.add_publisher();
-        pub->CopyFrom( iter->first );
+        pub->CopyFrom(iter->first);
       }
-      conn->EnqueueMsg( msgs::Package("publisher_list", msg), true);
+      conn->EnqueueMsg(msgs::Package("publisher_list", msg), true);
     }
     else if (req.request() == "topic_info")
     {
-      msgs::Publish pub = this->GetPublisher( req.data() );
+      msgs::Publish pub = this->GetPublisher(req.data());
       msgs::TopicInfo ti;
-      ti.set_msg_type( pub.msg_type() );
+      ti.set_msg_type(pub.msg_type());
 
       PubList::iterator piter;
       SubList::iterator siter;
 
       // Find all publishers of the topic
-      for (piter = this->publishers.begin(); 
+      for (piter = this->publishers.begin();
           piter != this->publishers.end(); piter++)
       {
-        if ( piter->first.topic() == req.data())
+        if (piter->first.topic() == req.data())
         {
           msgs::Publish *pubPtr = ti.add_publisher();
-          pubPtr->CopyFrom( piter->first );
+          pubPtr->CopyFrom(piter->first);
         }
       }
 
       // Find all subscribers of the topic
-      for (siter = this->subscribers.begin(); 
+      for (siter = this->subscribers.begin();
           siter != this->subscribers.end(); siter++)
       {
-        if ( siter->first.topic() == req.data())
+        if (siter->first.topic() == req.data())
         {
           msgs::Subscribe *sub = ti.add_subscriber();
-          sub->CopyFrom( siter->first );
+          sub->CopyFrom(siter->first);
         }
       }
 
-      conn->EnqueueMsg( msgs::Package("topic_info_response", ti));
+      conn->EnqueueMsg(msgs::Package("topic_info_response", ti));
     }
     else if (req.request() == "get_topic_namespaces")
     {
       msgs::String_V msg;
       std::list<std::string>::iterator iter;
-      for (iter = this->worldNames.begin(); 
+      for (iter = this->worldNames.begin();
           iter != this->worldNames.end(); iter++)
       {
         msg.add_data(*iter);
       }
-      conn->EnqueueMsg( msgs::Package("get_topic_namespaces_response", msg));
+      conn->EnqueueMsg(msgs::Package("get_topic_namespaces_response", msg));
     }
     else
     {
@@ -306,7 +307,8 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
   }
   else
-    std::cerr << "Master Unknown message type[" << packet.type() << "] From[" << conn->GetRemotePort() << "]\n";
+    std::cerr << "Master Unknown message type[" << packet.type()
+              << "] From[" << conn->GetRemotePort() << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -336,15 +338,15 @@ void Master::RunOnce()
   this->msgsMutex->lock();
   while (this->msgs.size() > 0)
   {
-    this->ProcessMessage( this->msgs.front().first, 
-        this->msgs.front().second );
+    this->ProcessMessage(this->msgs.front().first,
+        this->msgs.front().second);
     this->msgs.pop_front();
   }
   this->msgsMutex->unlock();
 
   // Process all the connections
   this->connectionMutex->lock();
-  for (iter = this->connections.begin(); 
+  for (iter = this->connections.begin();
        iter != this->connections.end();)
   {
     if (iter->second->IsOpen())
@@ -354,7 +356,7 @@ void Master::RunOnce()
     }
     else
     {
-      this->RemoveConnection( iter->first );
+      this->RemoveConnection(iter->first);
       iter++;
     }
   }
@@ -375,7 +377,7 @@ void Master::RemoveConnection(unsigned int _index)
   msgIter = this->msgs.begin();
   while (msgIter != this->msgs.end())
   {
-    if ( (*msgIter).first == _index)
+    if ((*msgIter).first == _index)
       this->msgs.erase(msgIter++);
     else
       msgIter++;
@@ -390,7 +392,7 @@ void Master::RemoveConnection(unsigned int _index)
     PubList::iterator pubIter = this->publishers.begin();
     while (pubIter != this->publishers.end())
     {
-      if ((*pubIter).second->id == 
+      if ((*pubIter).second->id ==
           connIter->second->id)
       {
         this->RemovePublisher((*pubIter).first);
@@ -428,19 +430,18 @@ void Master::RemoveConnection(unsigned int _index)
 
 void Master::RemovePublisher(const msgs::Publish _pub)
 {
-
   this->connectionMutex->lock();
   Connection_M::iterator iter2;
-  for (iter2 = this->connections.begin(); 
+  for (iter2 = this->connections.begin();
       iter2 != this->connections.end(); iter2++)
   {
-    iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub)); 
+    iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub));
   }
   this->connectionMutex->unlock();
 
   SubList::iterator iter;
   // Find all subscribers of the topic
-  for (iter = this->subscribers.begin(); 
+  for (iter = this->subscribers.begin();
       iter != this->subscribers.end(); iter++)
   {
     if (iter->first.topic() == _pub.topic())
@@ -456,7 +457,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
         pubIter->first.host() == _pub.host() &&
         pubIter->first.port() == _pub.port())
     {
-      pubIter = this->publishers.erase( pubIter );
+      pubIter = this->publishers.erase(pubIter);
     }
     else
       pubIter++;
@@ -466,7 +467,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
 void Master::RemoveSubscriber(const msgs::Subscribe _sub)
 {
   // Find all publishers of the topic, and remove the subscriptions
-  for (PubList::iterator iter = this->publishers.begin(); 
+  for (PubList::iterator iter = this->publishers.begin();
       iter != this->publishers.end(); iter++)
   {
     if (iter->first.topic() == _sub.topic())
@@ -479,7 +480,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe _sub)
   SubList::iterator subiter = this->subscribers.begin();
   while (subiter != this->subscribers.end())
   {
-    if (subiter->first.topic() == _sub.topic() && 
+    if (subiter->first.topic() == _sub.topic() &&
         subiter->first.host() == _sub.host() &&
         subiter->first.port() == _sub.port())
     {
@@ -494,7 +495,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe _sub)
 void Master::Stop()
 {
   this->stop = true;
-  
+
   if (this->runThread)
   {
     this->runThread->join();
@@ -510,14 +511,14 @@ void Master::Fini()
 }
 
 //////////////////////////////////////////////////
-msgs::Publish Master::GetPublisher( const std::string &_topic )
+msgs::Publish Master::GetPublisher(const std::string &_topic)
 {
   msgs::Publish msg;
 
   PubList::iterator iter;
 
   // Find all publishers of the topic
-  for (iter = this->publishers.begin(); 
+  for (iter = this->publishers.begin();
        iter != this->publishers.end(); iter++)
   {
     if (iter->first.topic() == _topic)
@@ -531,17 +532,17 @@ msgs::Publish Master::GetPublisher( const std::string &_topic )
 }
 
 //////////////////////////////////////////////////
-transport::ConnectionPtr Master::FindConnection(const std::string &_host, 
+transport::ConnectionPtr Master::FindConnection(const std::string &_host,
                                                 unsigned short _port)
 {
   transport::ConnectionPtr conn;
   Connection_M::iterator iter;
 
   this->connectionMutex->lock();
-  for (iter = this->connections.begin(); 
+  for (iter = this->connections.begin();
        iter != this->connections.end(); iter++)
   {
-    if (iter->second->GetRemoteAddress() == _host && 
+    if (iter->second->GetRemoteAddress() == _host &&
         iter->second->GetRemotePort() == _port)
     {
       conn = iter->second;
@@ -552,3 +553,4 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
 
   return conn;
 }
+

@@ -123,16 +123,16 @@ void ImuSensor::UpdateChild()
 
     heading = atan2(velocity.y, velocity.x);
 
-    v1 = sqrt(pow(velocity.x,2) + pow(velocity.y,2));
+    v1 = sqrt(pow(velocity.x, 2) + pow(velocity.y, 2));
 
     vlong = v1 * cos(heading - rot.z);
     vlat = v1 * sin(heading - rot.z);
-   
-    this->imuVel.pos.x = vlong; 
-    this->imuVel.pos.y = vlat; 
+
+    this->imuVel.pos.x = vlong;
+    this->imuVel.pos.y = vlat;
 
     this->imuVel.pos.z = 0;
-   
+
     velocity = this->body->GetWorldAngularVel();
     this->imuVel.rot.x = velocity.x;
     this->imuVel.rot.y = velocity.y;
@@ -141,3 +141,4 @@ void ImuSensor::UpdateChild()
     this->eulerAngles = rot;
   }
 }
+

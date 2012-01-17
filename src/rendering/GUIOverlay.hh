@@ -47,39 +47,41 @@ namespace gazebo
 
       public: bool IsInitialized();
 
-      public: void CreateWindow( const std::string &_type, 
+      public: void CreateWindow(const std::string &_type,
                                  const std::string &_name,
                                  const std::string &_parent,
-                                 const math::Vector2d &_position, 
+                                 const math::Vector2d &_position,
                                  const math::Vector2d &_size,
                                  const std::string &_text);
 
-      public: bool HandleMouseEvent( const common::MouseEvent &_evt);
-      public: bool HandleKeyPressEvent( const std::string &_key);
-      public: bool HandleKeyReleaseEvent( const std::string &_key);
+      public: bool HandleMouseEvent(const common::MouseEvent &_evt);
+      public: bool HandleKeyPressEvent(const std::string &_key);
+      public: bool HandleKeyReleaseEvent(const std::string &_key);
 
       /// \brief Load a CEGUI layout file
-      public: void LoadLayout( const std::string &_filename );
+      public: void LoadLayout(const std::string &_filename);
 
-      public: bool AttachCameraToImage(CameraPtr &_camera, 
+      public: bool AttachCameraToImage(CameraPtr &_camera,
                                        const std::string &_windowName);
 
-      public: bool AttachCameraToImage(DepthCameraPtr &_camera, 
+      public: bool AttachCameraToImage(DepthCameraPtr &_camera,
                                        const std::string &_windowName);
 
 
-      public: void Resize( unsigned int _width, unsigned int _height );
+      public: void Resize(unsigned int _width, unsigned int _height);
       private: void PreRender();
 
 
       public: template<typename T>
-              void ButtonCallback( const std::string &_buttonName,
-                                   void (T::*_fp)(), T *_obj )
+              void ButtonCallback(const std::string &_buttonName,
+                                   void (T::*_fp)(), T *_obj)
               {
 #ifdef HAVE_CEGUI
                 CEGUI::Window *buttonWindow;
-                buttonWindow = CEGUI::WindowManager::getSingletonPtr()->getWindow(_buttonName);
-                buttonWindow->subscribeEvent( CEGUI::PushButton::EventClicked,
+                buttonWindow =
+                  CEGUI::WindowManager::getSingletonPtr()->getWindow(
+                      _buttonName);
+                buttonWindow->subscribeEvent(CEGUI::PushButton::EventClicked,
                   CEGUI::Event::Subscriber(&GUIOverlay::OnButtonClicked, this));
 
                 this->callbacks[_buttonName] = boost::bind(_fp, _obj);
@@ -87,10 +89,10 @@ namespace gazebo
               }
 
 #ifdef HAVE_CEGUI
-      public: CEGUI::Window *GetWindow( const std::string &_name );
+      public: CEGUI::Window *GetWindow(const std::string &_name);
 
       /// Load a CEGUI layout file
-      private: CEGUI::Window *LoadLayoutImpl( const std::string &_filename );
+      private: CEGUI::Window *LoadLayoutImpl(const std::string &_filename);
 
       private: bool OnButtonClicked(const CEGUI::EventArgs& _e);
       private: int GetKeyCode(const std::string  &_unicode);
@@ -101,7 +103,7 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
       private: std::string layoutFilename;
       private: std::map<std::string, boost::function<void()> > callbacks;
-               
+
       private: unsigned int rttImageSetCount;
       private: bool initialized;
     };
@@ -109,3 +111,4 @@ namespace gazebo
 }
 
 #endif
+
