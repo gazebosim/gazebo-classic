@@ -28,15 +28,13 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
-    /// \brief ODE Box shape 
+    /// \brief ODE Box shape
     class ODEBoxShape : public BoxShape
     {
       public: ODEBoxShape(ODECollisionPtr parent) : BoxShape(parent) {}
@@ -60,3 +58,5 @@ namespace gazebo
   }
 }
 #endif
+
+

@@ -27,26 +27,25 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Sphere collision
     class SphereShape : public Shape
     {
       /// \brief Constructor
       public: SphereShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~SphereShape();
-  
+
       /// \brief Load the sphere
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Initialize the sphere
       public: virtual void Init();
- 
+
       /// \brief Set the size
       public: virtual void SetRadius(const double &radius);
 
@@ -60,3 +59,4 @@ namespace gazebo
   }
 }
 #endif
+

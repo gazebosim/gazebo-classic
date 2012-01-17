@@ -27,29 +27,27 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief Triangle mesh collision
     class ODETrimeshShape : public TrimeshShape
     {
       /// \brief Constructor
       public: ODETrimeshShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~ODETrimeshShape();
-  
-      /// \brief Update function 
+
+      /// \brief Update function
       public: void Update();
-  
+
       /// \brief Load the trimesh
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
-  
+      protected: virtual void Load(sdf::ElementPtr &_sdf);
+
       protected: virtual void Init();
 
       private: dReal matrix_dblbuff[16*2];
@@ -63,3 +61,5 @@ namespace gazebo
   }
 }
 #endif
+
+

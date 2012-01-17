@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 #include "physics/World.hh"
 #include "physics/ode/ODETypes.hh"
 #include "physics/ode/ODELink.hh"
@@ -27,8 +27,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
-  : MultiRayShape(_parent)
+  ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
+: MultiRayShape(_parent)
 {
   this->SetName("ODE Multiray Shape");
 
@@ -43,9 +43,11 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
   // These three lines may be unessecary
-  ODELinkPtr pLink = boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
+  ODELinkPtr pLink =
+    boost::shared_static_cast<ODELink>(this->collisionParent->GetLink());
   pLink->SetSpaceId(this->raySpaceId);
-  boost::shared_static_cast<ODECollision>(_parent)->SetSpaceId(this->raySpaceId);
+  boost::shared_static_cast<ODECollision>(_parent)->SetSpaceId(
+      this->raySpaceId);
 }
 
 //////////////////////////////////////////////////
@@ -70,7 +72,7 @@ void ODEMultiRayShape::UpdateRays()
   dSpaceCollide2((dGeomID) (this->superSpaceId),
       (dGeomID) (ode->GetSpaceId()),
       this, &UpdateCallback);
- ode->GetRayMutex()->unlock();
+  ode->GetRayMutex()->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -166,7 +168,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
 //////////////////////////////////////////////////
 void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
-                              const math::Vector3 &_end)
+    const math::Vector3 &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

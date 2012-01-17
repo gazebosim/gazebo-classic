@@ -21,35 +21,34 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode
     /// \{
-
     /// \brief ODE specific version of MultiRayShape
     class ODEMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
       public: ODEMultiRayShape(CollisionPtr parent);
-    
+
       /// \brief Destructor
       public: virtual ~ODEMultiRayShape();
-   
-      /// \brief Update the rays 
+
+      /// \brief Update the rays
       public: virtual void UpdateRays();
-  
+
       /// \brief Ray-intersection callback
-      private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
-  
+      private: static void UpdateCallback(void *data, dGeomID o1, dGeomID o2);
+
       /// \brief Add a ray to the collision
-      protected: void AddRay(const math::Vector3 &start, const math::Vector3 &end );
-  
+      protected: void AddRay(const math::Vector3 &start,
+                             const math::Vector3 &end);
+
       /// Ray space for collision detector
       private: dSpaceID superSpaceId;
-      private: dSpaceID raySpaceId; 
+      private: dSpaceID raySpaceId;
     };
     /// \}
     /// \}
@@ -57,3 +56,5 @@ namespace gazebo
   }
 }
 #endif
+
+

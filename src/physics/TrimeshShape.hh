@@ -29,22 +29,20 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Triangle mesh collision
     class TrimeshShape : public Shape
     {
       /// \brief Constructor
       public: TrimeshShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~TrimeshShape();
-  
+
       public: virtual void Update() {}
-  
       /// \brief Load the trimesh
       public: virtual void Load(sdf::ElementPtr &_sdf);
 
@@ -57,7 +55,7 @@ namespace gazebo
       public: std::string GetFilename() const;
 
       public: void SetFilename(const std::string &_filename);
-  
+
       public: void SetScale(const math::Vector3 &_scale);
 
       public: void FillShapeMsg(msgs::Geometry &_msg);
@@ -70,3 +68,4 @@ namespace gazebo
   }
 }
 #endif
+

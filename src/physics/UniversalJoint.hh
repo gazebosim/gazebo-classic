@@ -26,11 +26,10 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief A universal joint
     template<class T>
     class UniversalJoint : public T
@@ -38,44 +37,44 @@ namespace gazebo
       /// \brief Constructor
       public: UniversalJoint() : T()
               { this->AddType(Base::UNIVERSAL_JOINT); }
-    
       /// \brief Destuctor
       public: virtual ~UniversalJoint()
               { }
-    
       /// \brief Load the joint
-      protected: virtual void Load( sdf::ElementPtr &_sdf )
+      protected: virtual void Load(sdf::ElementPtr &_sdf)
                  {
                    T::Load(_sdf);
-    
+
                    this->SetAxis(0,
                        _sdf->GetElement("axis")->GetValueVector3("xyz"));
                    this->SetAxis(1,
                        _sdf->GetElement("axis2")->GetValueVector3("xyz"));
-    
+
                    if (_sdf->GetElement("axis")->HasElement("limit"))
                    {
-                     sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
+                     sdf::ElementPtr limitElem =
+                       _sdf->GetElement("axis")->GetElement("limit");
 
-                     // Perform this three step ordering to ensure the 
-                     // parameters are set properly. 
+                     // Perform this three step ordering to ensure the
+                     // parameters are set properly.
                      // This is taken from the ODE wiki.
-                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                     this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                     this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                     this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+                     this->SetLowStop(0, limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(0, limitElem->GetValueDouble("upper"));
                    }
 
                    if (_sdf->GetElement("axis2")->HasElement("limit"))
                    {
-                     sdf::ElementPtr limitElem = _sdf->GetElement("axis2")->GetElement("limit");
+                     sdf::ElementPtr limitElem =
+                       _sdf->GetElement("axis2")->GetElement("limit");
 
-                     // Perform this three step ordering to ensure the 
-                     // parameters  are set properly. 
+                     // Perform this three step ordering to ensure the
+                     // parameters  are set properly.
                      // This is taken from the ODE wiki.
                      limitElem = _sdf->GetElement("axis2")->GetElement("limit");
-                     this->SetHighStop(1,limitElem->GetValueDouble("upper"));
-                     this->SetLowStop( 1,limitElem->GetValueDouble("lower"));
-                     this->SetHighStop(1,limitElem->GetValueDouble("upper"));
+                     this->SetHighStop(1, limitElem->GetValueDouble("upper"));
+                     this->SetLowStop(1, limitElem->GetValueDouble("lower"));
+                     this->SetHighStop(1, limitElem->GetValueDouble("upper"));
                    }
                  }
     };
@@ -83,4 +82,5 @@ namespace gazebo
   }
 }
 #endif
+
 

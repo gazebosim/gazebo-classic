@@ -31,49 +31,48 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
- 
     // Prototype for sensor factory functions
     typedef PhysicsEnginePtr (*PhysicsFactoryFn) (WorldPtr world);
-   
+
     /// \brief The physics factory
     class PhysicsFactory
     {
       /// \brief Register everything
       public: static void RegisterAll();
-  
-      /// \brief Register a physics class.
+
+              /// \brief Register a physics class.
       public: static void RegisterPhysicsEngine(std::string classname,
-                                          PhysicsFactoryFn factoryfn);
-    
-      /// \brief Create a new instance of a physics engine.  
-      public: static PhysicsEnginePtr NewPhysicsEngine(const std::string &classname, WorldPtr world);
-    
-      /// \brief A list of registered physics classes
+                  PhysicsFactoryFn factoryfn);
+
+              /// \brief Create a new instance of a physics engine.
+      public: static PhysicsEnginePtr NewPhysicsEngine(
+                  const std::string &classname, WorldPtr world);
+
+              /// \brief A list of registered physics classes
       private: static std::map<std::string, PhysicsFactoryFn> engines;
     };
-    
-    
+
+
     /// \brief Static sensor registration macro
     ///
     /// Use this macro to register sensors with the server.
     /// @param name Physics type name, as it appears in the world file.
     /// @param classname C++ class name for the sensor.
-  #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-  PhysicsEnginePtr New##classname(WorldPtr world) \
-  { \
-    return PhysicsEnginePtr(new gazebo::physics::classname(world)); \
-  } \
-  void Register##classname() \
-  {\
-    PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\
+#define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
+    PhysicsEnginePtr New##classname(WorldPtr world) \
+    { \
+      return PhysicsEnginePtr(new gazebo::physics::classname(world)); \
+    } \
+    void Register##classname() \
+    {\
+      PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\
+    }
+    /// \}
   }
-   
-   /// \} 
-  }
-
 }
 #endif
+

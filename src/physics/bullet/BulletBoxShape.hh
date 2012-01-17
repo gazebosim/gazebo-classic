@@ -30,26 +30,24 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   /// \brief Box collision
   class BulletBoxShape : public BoxShape
   {
     /// \brief Constructor
     public: BulletBoxShape(Collision *parent) : BoxShape(parent) {}
-
     /// \brief Destructor
     public: virtual ~BulletBoxShape() {}
-
     /// \brief Set the size of the box
-    public: void SetSize( const math::Vector3 &size )
+    public: void SetSize(const math::Vector3 &size)
             {
               BoxShape::SetSize(size);
               BulletCollision *bParent = (BulletCollision*)(this->parent);
 
-              /// Bullet requires the half-extents of the box 
-              bParent->SetCollisionShape( new btBoxShape(
-                  btmath::Vector3(size.x*0.5, size.y*0.5, size.z*0.5)) );
+              /// Bullet requires the half-extents of the box
+              bParent->SetCollisionShape(new btBoxShape(
+                  btmath::Vector3(size.x*0.5, size.y*0.5, size.z*0.5)));
             }
   };
 
@@ -57,3 +55,4 @@ namespace gazebo
 }
 }
 #endif
+

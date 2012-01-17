@@ -114,7 +114,6 @@ void ODEScrewJoint::SetDamping(int /*index*/, const double _damping)
 // Set thread pitch
 void ODEScrewJoint::SetThreadPitch(int /*index*/, const double _thread_pitch)
 {
-  //std::cout << "\n\n\n\nsetting threadPitch: " << _thread_pitch << "\n\n\n\n\n";
   dJointSetScrewThreadPitch(this->jointId, _thread_pitch);
 }
 

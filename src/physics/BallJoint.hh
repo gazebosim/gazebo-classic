@@ -28,12 +28,11 @@ namespace gazebo
 {
   /// \ingroup gazebo_physics
   /// \brief Physics namespace
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \brief A set of physics related class, functions, and definitions
     /// \{
-
     /// \brief A ball joint
     template< class T>
     class BallJoint : public T
@@ -50,31 +49,26 @@ namespace gazebo
               }
 
       /// \brief Load the joint
-      protected: void Load( sdf::ElementPtr &_sdf )
+      protected: void Load(sdf::ElementPtr &_sdf)
                  { T::Load(_sdf); }
- 
       /// \brief Set the axis of rotation
-      public: virtual void SetAxis(int /*_index*/, 
-                                   const math::Vector3 &/*_axis*/) 
+      public: virtual void SetAxis(int /*_index*/,
+                                   const math::Vector3 &/*_axis*/)
               {}
-   
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int /*_index*/, 
+      public: virtual void SetHighStop(int /*_index*/,
                                        math::Angle /*_angle*/) {}
-  
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(int /*_index*/, math::Angle /*_angle*/) {}
-   
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(int /*_index*/) 
+      public: virtual math::Angle GetHighStop(int /*_index*/)
               {return math::Angle();}
-  
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(int /*_index*/) 
+      public: virtual math::Angle GetLowStop(int /*_index*/)
               { return math::Angle();}
-  
     };
     /// \}
   }
 }
 #endif
+

@@ -30,25 +30,23 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   /// \brief Cylinder collision
   class BulletCylinderShape : public CylinderShape
   {
     /// \brief Constructor
     public: BulletCylinderShape(Collision *parent) : CylinderShape(parent) {}
-
     /// \brief Destructor
     public: virtual ~BulletCylinderShape() {}
-
     /// \brief Set the size of the cylinder
-    public: void SetSize( const math::Vector2d &size )
+    public: void SetSize(const math::Vector2d &size)
             {
               CylinderShape::SetSize(size);
               BulletCollision *bParent = (BulletCollision*)(this->parent);
-  
-              bParent->SetCollisionShape( new btCylinderShapeZ(
-                  btmath::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)) );
+
+              bParent->SetCollisionShape(new btCylinderShapeZ(
+                  btmath::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)));
             }
   };
 
@@ -57,3 +55,4 @@ namespace gazebo
 }
 }
 #endif
+

@@ -75,7 +75,8 @@ dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
 //////////////////////////////////////////////////
 void ODEHeightmapShape::Init()
 {
-  ODECollisionPtr oParent = boost::shared_static_cast<ODECollision>(this->collisionParent);
+  ODECollisionPtr oParent =
+    boost::shared_static_cast<ODECollision>(this->collisionParent);
 
   math::Vector3 terrainSize = this->sdf->GetValueVector3("size");
 

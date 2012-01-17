@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: ODECollision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
@@ -32,8 +32,8 @@
 using namespace gazebo;
 using namespace physics;
 
-ODECollision::ODECollision(LinkPtr _link)
-    : Collision(_link)
+  ODECollision::ODECollision(LinkPtr _link)
+: Collision(_link)
 {
   this->SetName("ODE_Collision");
   this->collisionId = NULL;
@@ -51,7 +51,8 @@ void ODECollision::Load(sdf::ElementPtr &_sdf)
 {
   Collision::Load(_sdf);
 
-  this->SetSpaceId(boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
+  this->SetSpaceId(
+      boost::shared_static_cast<ODELink>(this->link)->GetSpaceId());
 
   if (this->IsStatic())
   {
@@ -63,14 +64,14 @@ void ODECollision::Load(sdf::ElementPtr &_sdf)
 void ODECollision::Fini()
 {
   /*
-  if (this->collisionId)
-    dGeomDestroy(this->collisionId);
-  this->collisionId = NULL;
+     if (this->collisionId)
+     dGeomDestroy(this->collisionId);
+     this->collisionId = NULL;
 
-  if (this->spaceId)
-    dSpaceDestroy(this->spaceId);
-  this->spaceId = NULL;
-  */
+     if (this->spaceId)
+     dSpaceDestroy(this->spaceId);
+     this->spaceId = NULL;
+     */
 
   Collision::Fini();
 }
@@ -80,9 +81,9 @@ void ODECollision::OnPoseChange()
   // Update all the models
   //(*this.*onPoseChangeFunc)();
 
- if (this->IsStatic() && this->collisionId && this->placeable)
+  if (this->IsStatic() && this->collisionId && this->placeable)
     this->OnPoseChangeGlobal();
- else if (this->collisionId && this->placeable)
+  else if (this->collisionId && this->placeable)
     this->OnPoseChangeRelative();
 }
 
@@ -207,7 +208,7 @@ void ODECollision::OnPoseChangeGlobal()
   q[3] = localPose.rot.z;
 
   dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
-                   localPose.pos.z);
+      localPose.pos.z);
   dGeomSetQuaternion(this->collisionId, q);
 }
 

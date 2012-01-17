@@ -27,22 +27,21 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Base class for all shapes
     class Shape : public Base
     {
       /// \brief Constructor
       public: Shape(CollisionPtr p);
-  
+
       /// \brief Destructor
       public: virtual ~Shape();
-    
+
       /// \brief Load the shape
-      public: virtual void Load( sdf::ElementPtr _sdf );
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the shape
       public: virtual void Init() = 0;
@@ -58,3 +57,4 @@ namespace gazebo
   }
 }
 #endif
+

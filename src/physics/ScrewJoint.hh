@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,29 +34,28 @@ namespace gazebo
 {
   namespace physics
   {
-
 /// \addtogroup gazebo_screw_joint Screw Joint
 /// \{
-
     /// \brief A screw joint
     template<class T>
     class ScrewJoint : public T
     {
       /// \brief Constructor
-      public: ScrewJoint( ) : T()
+      public: ScrewJoint() : T()
               { this->AddType(Base::SCREW_JOINT); }
-
       /// \brief Destructor
       public: virtual ~ScrewJoint()
               { }
-
       /// \brief Load the joint
-      protected: virtual void Load( sdf::ElementPtr &_sdf )
+      protected: virtual void Load(sdf::ElementPtr &_sdf)
                  {
                    T::Load(_sdf);
-  
+
                    if (_sdf->HasElement("thread_pitch"))
-                     this->threadPitch = _sdf->GetElement("thread_pitch")->GetValueDouble();
+                   {
+                     this->threadPitch =
+                       _sdf->GetElement("thread_pitch")->GetValueDouble();
+                   }
                    else
                    {
                      gzerr << "should not see this\n";
@@ -69,28 +68,32 @@ namespace gazebo
                      this->SetAxis(0, axisElem->GetValueVector3("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
-                       sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
-                       // Perform this three step ordering to ensure the parameters 
-                       // are set properly. This is taken from the ODE wiki.
-                       this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                       this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                       this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                       sdf::ElementPtr limitElem =
+                         _sdf->GetElement("axis")->GetElement("limit");
+
+                       // Perform this three step ordering to ensure the
+                       // parameters are set properly. This is taken from
+                       // the ODE wiki.
+                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+                       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
+                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
                      }
                    }
                  }
 
       /// \brief Set the anchor
-      public: virtual void SetAnchor( int /*_index */, const math::Vector3 &anchor)
-                {fakeAnchor = anchor;}
+      public: virtual void SetAnchor(int /*_index */,
+                                     const math::Vector3 &anchor)
+              {fakeAnchor = anchor;}
 
       /// \brief Get the anchor
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
                {return fakeAnchor;}
-   
       protected: math::Vector3 fakeAnchor;
-      protected: double threadPitch; 
+      protected: double threadPitch;
     };
 /// \}
   }
 }
 #endif
+

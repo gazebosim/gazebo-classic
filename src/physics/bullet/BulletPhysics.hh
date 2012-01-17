@@ -36,7 +36,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class Entity;
   class XMLConfigNode;
@@ -44,7 +44,6 @@ namespace gazebo
 
 /// \addtogroup gazebo_physics_engine
 /// \{
-
 /** \defgroup bulletphysicsengine Bullet Physics Engine
 
 The \c param:physics tag is used to specify certain parameters for the Bullet phyics engine. The following parameters are in addition to those provided by the PhysicsEngine base class.
@@ -98,7 +97,7 @@ class BulletPhysics : public PhysicsEngine
   /// \brief Initialize the Bullet engine
   public: virtual void Init();
 
-  /// \brief Init the engine for threads. 
+  /// \brief Init the engine for threads.
   public: virtual void InitForThread();
 
   /// \brief Update the Bullet collision
@@ -127,7 +126,7 @@ class BulletPhysics : public PhysicsEngine
 
   /// \brief Create a physics based ray sensor
   //public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
- 
+
   /// \brief Convert an bullet mass to a gazebo Mass
   public: virtual void ConvertMass(Mass *mass, void *engineMass);
 
@@ -143,7 +142,6 @@ class BulletPhysics : public PhysicsEngine
   /// \brief Register a joint with the dynamics world
   public: btDynamicsWorld *GetDynamicsWorld() const
           {return this->dynamicsWorld;}
-
   /// \brief Set the gavity vector
   public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
@@ -164,3 +162,4 @@ class BulletPhysics : public PhysicsEngine
 }
 }
 #endif
+

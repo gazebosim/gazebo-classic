@@ -28,7 +28,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class OgreDynamicLines;
   class Visual;
@@ -38,38 +38,38 @@ namespace gazebo
   /** \defgroup gazebo_ray_collision Ray collision
       \brief Ray collision
 
-      This collision is used soley by ray sensors. It should not be directly 
+      This collision is used soley by ray sensors. It should not be directly
       included in a world file.
   */
   /// \}
-  /// \addtogroup gazebo_ray_collision 
+  /// \addtogroup gazebo_ray_collision
   /// \{
-
-  /// \brief Ray collision 
+  /// \brief Ray collision
   class BulletRayCollision : public RayCollision<BulletCollision>
   {
     /// \brief Constructor
     /// \param body Link the ray is attached to
-    /// \param displayRays Indicates if the rays should be displayed when 
+    /// \param displayRays Indicates if the rays should be displayed when
     ///        rendering images
-    public: BulletRayCollision( Link *body, bool displayRays );
-  
+    public: BulletRayCollision(Link *body, bool displayRays);
+
     /// \brief Destructor
     public: virtual ~BulletRayCollision();
-  
-    /// \brief Set the ray based on starting and ending points relative to 
+
+    /// \brief Set the ray based on starting and ending points relative to
     ///        the body
     /// \param posStart Start position, relative the body
     /// \param posEnd End position, relative to the body
     public: void SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd);
-  
+
     /// \brief Update the tay collision
     public: void Update();
   };
-  
+
   /// \}
 }
 
 }
 }
 #endif
+

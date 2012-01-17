@@ -27,89 +27,88 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode
     /// \{
-
     /// \brief ODE joint interface
     class ODEJoint : public Joint
     {
       /// \brief Constructor
       public: ODEJoint();
-    
+
       /// \brief Destructor
       public: virtual ~ODEJoint();
-  
+
       /// \brief Load a joint
-      public: virtual void Load( sdf::ElementPtr &_sdf );
-  
-      /// \brief Get the link to which the joint is attached according the _index
-      public: virtual LinkPtr GetJointLink( int index ) const;
-  
+      public: virtual void Load(sdf::ElementPtr &_sdf);
+
+      /// \brief Get the link to which the joint is attached according
+      ///        the _index
+      public: virtual LinkPtr GetJointLink(int index) const;
+
       /// \brief Determines of the two bodies are connected by a joint
-      public: bool virtual AreConnected( LinkPtr one, LinkPtr two ) const;
-  
-      /// \brief The default function does nothing. This should be overriden in 
-      ///        the child classes where appropriate
-      public: virtual double GetParam( int /*parameter*/ ) const;
-  
+      public: bool virtual AreConnected(LinkPtr one, LinkPtr two) const;
+
+      /// \brief The default function does nothing. This should be
+      ///        overriden in the child classes where appropriate
+      public: virtual double GetParam(int /*parameter*/) const;
+
       /// \brief Attach the two bodies with this joint
-      public: virtual void Attach( LinkPtr parent, LinkPtr child );
-  
+      public: virtual void Attach(LinkPtr parent, LinkPtr child);
+
       /// \brief Detach this joint from all bodies
       public: virtual void Detach();
-  
-      /// \brief By default this does nothing. It should be overridden in child 
+
+      /// \brief By default this does nothing. It should be overridden in child
       ///        classes where appropriate
       public: virtual void SetParam(int /*parameter*/, double /*value*/);
-  
+
       /// \brief Set the ERP of this joint
       public: void SetERP(double newERP);
-  
+
       /// \brief Get the ERP of this joint
       public: double GetERP();
-  
+
       /// \brief Set the CFM of this joint
       public: void SetCFM(double newCFM);
-  
+
       /// \brief Get the ERP of this joint
       public: double GetCFM();
-  
+
       /// \brief Get the feedback data structure for this joint, if set
       public: dJointFeedback *GetFeedback();
-  
+
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int index, math::Angle angle);
-  
+
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(int index, math::Angle angle);
-   
+
       /// \brief Get the high stop of an axis(index).
       public: virtual math::Angle GetHighStop(int index);
-  
+
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int index);
-  
+
       /// \brief Get the force the joint applies to the first link
-      /// \param index The index of the link( 0 or 1 )
+      /// \param index The index of the link(0 or 1)
       public: virtual math::Vector3 GetLinkForce(unsigned int index) const;
-  
+
       /// \brief Get the torque the joint applies to the first link
-      /// \param index The index of the link( 0 or 1 )
+      /// \param index The index of the link(0 or 1)
       public: virtual math::Vector3 GetLinkTorque(unsigned int index) const;
-  
+
       /// \brief Set a parameter for the joint
-      public: virtual void SetAttribute( Attribute, int index, double value);
-   
+      public: virtual void SetAttribute(Attribute, int index, double value);
+
       public: virtual void Reset();
 
       /// This is our id
       protected: dJointID jointId;
-    
+
       /// Feedback data for this joint
       private: dJointFeedback *feedback;
     };
@@ -118,3 +117,5 @@ namespace gazebo
   }
 }
 #endif
+
+

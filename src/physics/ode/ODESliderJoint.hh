@@ -27,65 +27,65 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief A slider joint
     class ODESliderJoint : public SliderJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODESliderJoint( dWorldID worldId );
-    
+      public: ODESliderJoint(dWorldID worldId);
+
       /// \brief Destructor
       public: virtual ~ODESliderJoint();
-    
+
       /// \brief Load the joint
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
-  
+      protected: virtual void Load(sdf::ElementPtr &_sdf);
+
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetGlobalAxis(int index) const;
-  
+
       /// \brief Set the axis of motion
-      public: virtual void SetAxis( int index, const math::Vector3 &axis );
-    
+      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
-  
+
       /// \brief callback to apply damping force to joint
       public: void ApplyDamping();
-  
+
       /// \brief Get the position of the joint
       public: virtual math::Angle GetAngleImpl(int index) const;
-  
+
       /// \brief Get the rate of change
       public: virtual double GetVelocity(int index) const;
-  
+
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double angle);
-  
+
       /// \brief Set the slider force
       public: virtual void SetForce(int index, double force);
-  
+
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int index, double t);
-  
+
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int index);
-  
+
       /// \brief Get the _parameter
-      public: virtual double GetParam( int parameter ) const;
-  
+      public: virtual double GetParam(int parameter) const;
+
       /// \brief Set the _parameter
-      public: virtual void SetParam( int parameter, double value);
+      public: virtual void SetParam(int parameter, double value);
     };
-    
+
   /// \}
   /// \}
   }
 }
 #endif
+
+

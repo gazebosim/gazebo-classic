@@ -30,32 +30,31 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     class SpaceTree;
     class QuadNode;
 
     /// \addtogroup gazebo_physics
-    /// \{ 
-    
+    /// \{
     /// \brief Map collision
     class MapShape : public Shape
     {
       /// \brief Constructor
       public: MapShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~MapShape();
-  
-      /// \brief Update function 
+
+      /// \brief Update function
       public: void Update();
-  
+
       /// \brief Load the map
-      public: virtual void Load( sdf::ElementPtr _sdf );
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Init the map
       public: virtual void Init();
-  
+
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
@@ -68,75 +67,77 @@ namespace gazebo
 
       /// \brief Build the quadtree
       private: void BuildTree(QuadNode *node);
-  
+
       /// \brief Get the number of free and occupied pixels in a given area
-      private: void GetPixelCount(unsigned int xStart, unsigned int yStart, 
-                                  unsigned int width, unsigned int height, 
-                                  unsigned int &freePixels, 
-                                  unsigned int &occPixels  );
-  
-      /// \brief Reduce the number of nodes in the tree. 
+      private: void GetPixelCount(unsigned int xStart, unsigned int yStart,
+                                  unsigned int width, unsigned int height,
+                                  unsigned int &freePixels,
+                                  unsigned int &occPixels);
+
+      /// \brief Reduce the number of nodes in the tree.
       private: void ReduceTree(QuadNode *node);
-  
+
       /// \brief Try to merge to nodes
       private: void Merge(QuadNode *nodeA, QuadNode *nodeB);
-  
+
       private: void CreateBox();
-  
+
       /// \brief Create the boxes for the map
       private: void CreateBoxes(QuadNode *node);
-  
+
       private: common::Image *mapImage;
-  
+
       private: QuadNode *root;
-  
+
       private: bool merged;
       private: static unsigned int collisionCounter;
     };
-  
- 
-    /// \cond 
+
+
+    /// \cond
     class QuadNode
     {
-      public: QuadNode( QuadNode *_parent ) 
+      public: QuadNode(QuadNode *_parent)
               {
                 parent = _parent;
                 occupied = false;
                 leaf = true;
                 valid = true;
               }
-  
-      public: ~QuadNode() 
-              { 
+
+      public: ~QuadNode()
+              {
                 std::deque<QuadNode*>::iterator iter;
-                for (iter = children.begin(); iter != children.end(); iter++) 
-                    delete (*iter); 
+                for (iter = children.begin(); iter != children.end(); iter++)
+                    delete (*iter);
               }
-  
+
       public: void Print(std::string space)
               {
                 std::deque<QuadNode*>::iterator iter;
-  
-                printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",space.c_str(),x,y,width, height, occupied, leaf, valid);
+
+                printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",
+                    space.c_str(), x, y, width, height, occupied, leaf, valid);
                 space += "  ";
-                for (iter = children.begin(); iter != children.end(); iter++) 
+                for (iter = children.begin(); iter != children.end(); iter++)
                   if ((*iter)->occupied)
                     (*iter)->Print(space);
               }
-  
+
       public: unsigned int x, y;
       public: unsigned int width, height;
-  
+
       public: QuadNode *parent;
       public: std::deque<QuadNode*> children;
       public: bool occupied;
       public: bool leaf;
-  
+
       public: bool valid;
     };
-    /// \endcond 
+    /// \endcond
 
     /// \}
   }
 }
 #endif
+

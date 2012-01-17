@@ -27,64 +27,64 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief A universal joint
     class ODEUniversalJoint : public UniversalJoint<ODEJoint>
     {
       /// \brief Constructor
       public: ODEUniversalJoint(dWorldID worldId);
-    
+
       /// \brief Destuctor
       public: virtual ~ODEUniversalJoint();
-    
+
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int index) const;
-  
+
       /// \brief Set the anchor point
-      public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
-   
+      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
-  
+
       /// \brief Get the first axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int index ) const;
-  
+      public: virtual math::Vector3 GetGlobalAxis(int index) const;
+
       /// \brief Set the first axis of rotation
-      public: virtual void SetAxis( int index, const math::Vector3 &axis );
-    
-      /// \brief Get the angle of axis 
+      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+
+      /// \brief Get the angle of axis
       public: virtual math::Angle GetAngleImpl(int index) const;
-  
+
       /// \brief Get the angular rate of an axis
       public: virtual double GetVelocity(int index) const;
-   
+
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double angle);
-  
+
       /// \brief Set the torque of a joint.
       public: virtual void SetForce(int index, double torque);
-  
+
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int index, double t);
-  
+
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int index);
-  
-  
+
+
       /// \brief Set the parameter to value
-      public: virtual void SetParam( int parameter, double value );
-    
+      public: virtual void SetParam(int parameter, double value);
+
     };
-    
+
     /// \}
     /// \}
   }
 }
 #endif
+
+

@@ -32,7 +32,7 @@ class btHeightfieldTerrainShape;
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class OgreHeightmap;
 
@@ -62,7 +62,7 @@ namespace gazebo
 
     \par Example
     \verbatim
-      <collision:heightmap name="terrain_collision">
+      <collision:heightmap name ="terrain_collision">
         <image>terrain.png</image>
         <worldTexture>terrain_texture.jpg</worldTexture>
         <detailTexture>terrain_detail.jpg</detailTexture>
@@ -71,9 +71,8 @@ namespace gazebo
     \endverbatim
     */
   /// \}
-  /// \addtogroup gazebo_heightmap_collision 
+  /// \addtogroup gazebo_heightmap_collision
   /// \{
-
 
   /// \brief Height map collision
   class BulletHeightmapCollision : public BulletCollision
@@ -84,7 +83,7 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~BulletHeightmapCollision();
 
-    /// \brief Update function 
+    /// \brief Update function
     public: void Update();
 
     /// \brief Load the heightmap
@@ -116,3 +115,4 @@ namespace gazebo
 }
 }
 #endif
+

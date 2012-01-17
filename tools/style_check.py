@@ -814,12 +814,13 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, class_state,
 
   # Check if the line is a header guard.
   is_header_guard = False
-  if file_extension == 'h':
-    cppvar = GetHeaderGuardCPPVariable(filename)
-    if (line.startswith('#ifndef %s' % cppvar) or
-        line.startswith('#define %s' % cppvar) or
-        line.startswith('#endif  // %s' % cppvar)):
-      is_header_guard = True
+  #if file_extension == 'h':
+  #  cppvar = GetHeaderGuardCPPVariable(filename)
+  #  if (line.startswith('#ifndef %s' % cppvar) or
+  #      line.startswith('#define %s' % cppvar) or
+  #      line.startswith('#endif  // %s' % cppvar)):
+  #    is_header_guard = True
+
   # #include lines and header guards can be long, since there's no clean way to
   # split them.
   #

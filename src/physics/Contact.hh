@@ -38,49 +38,49 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     class Collision;
     /// \addtogroup gazebo_physics
     /// \{
-   
     /// \brief A contact between two collisions. Each contact can consist of
-    ///        a numnber of contact points 
+    ///        a numnber of contact points
     class Contact
     {
       /// \brief Constructor
       public: Contact();
-  
+
       /// \brief Copy constructor
       public: Contact(const Contact &c);
-  
+
       /// \brief Destructor
       public: virtual ~Contact();
-  
+
       /// \brief Clone the contact
       public: Contact Clone() const;
-    
+
       /// \brief Operator =
-      public: const Contact &operator=(const Contact &contact);
-  
+      public: const Contact &operator =(const Contact &contact);
+
       /// \brief Reset
       public: void Reset();
-    
+
       public: Collision *collision1;
       public: Collision *collision2;
-   
+
       public: JointFeedback forces[MAX_CONTACT_JOINTS];
-  
+
       public: math::Vector3 positions[MAX_CONTACT_JOINTS];
       public: math::Vector3 normals[MAX_CONTACT_JOINTS];
-    
+
       public: double depths[MAX_CONTACT_JOINTS];
 
       public: int count;
-  
+
       public: common::Time time;
     };
     /// \}
   }
 }
 #endif
+

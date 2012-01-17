@@ -31,13 +31,12 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
-
 /// \addtogroup gazebo_physics_joints
 /// \{
 /** \defgroup gazebo_slider_joint Slider Joint
-  
+
   \brief A slider joint
 
   \par Attributes
@@ -57,16 +56,16 @@ namespace gazebo
     - The high stop position
     - Default: infinity
   - erp (double)
-    - Error reduction parameter. 
+    - Error reduction parameter.
     - Default = 0.4
   - cfm (double)
-    - Constraint force mixing. 
+    - Constraint force mixing.
     - Default = 0.8
 
 
   \par Example
   \verbatim
-  <joint:slider name="slider_joint>
+  <joint:slider name ="slider_joint>
     <body1>body1_name</body1>
     <body2>body2_name</body2>
     <anchor>anchor_body</anchor>
@@ -81,28 +80,27 @@ namespace gazebo
 
 /// \addtogroup gazebo_slider_joint Slider Joint
 /// \{
-
   /// \brief A slider joint
   class BulletSliderJoint : public SliderJoint<BulletJoint>
   {
     /// \brief Constructor
-    public: BulletSliderJoint( btDynamicsWorld *world );
-  
+    public: BulletSliderJoint(btDynamicsWorld *world);
+
     /// \brief Destructor
     public: virtual ~BulletSliderJoint();
-  
+
     /// \brief Load the joint
     protected: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Attach the two bodies with this joint
-    public: void Attach( Link *one, Link *two );
- 
+    public: void Attach(Link *one, Link *two);
+
     /// \brief Get the axis of rotation
     public: virtual math::Vector3 GetAxis(int index) const;
 
     /// \brief Set the axis of motion
-    public: void SetAxis( int index, const math::Vector3 &axis );
-  
+    public: void SetAxis(int index, const math::Vector3 &axis);
+
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
 
@@ -111,7 +109,7 @@ namespace gazebo
 
     /// \brief Set the low stop of an axis(index).
     public: virtual void SetLowStop(int index, math::Angle angle);
- 
+
     /// \brief Get the high stop of an axis(index).
     public: virtual math::Angle GetHighStop(int index);
 
@@ -120,7 +118,7 @@ namespace gazebo
 
     /// \brief Get the position of the joint
     public: virtual math::Angle GetAngle(int index) const;
-  
+
     /// \brief Get the rate of change
     public: virtual double GetVelocity(int index) const;
 
@@ -137,9 +135,10 @@ namespace gazebo
     public: virtual double GetMaxForce(int index);
 
   };
-  
+
 /// \}
 }
 }
 }
 #endif
+

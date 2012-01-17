@@ -29,14 +29,14 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   /// \addtogroup gazebo_physics_joints
   /// \{
   /** \defgroup gazebo_universal_joint Universal Joint
-   
+
     \brief A universal joint
-  
+
     \par Attributes
     - body1 (string)
       - Name of the first body to attach to the joint
@@ -63,16 +63,16 @@ namespace gazebo
       - The high stop angle for the second degree of freedom
       - Default: infinity
     - erp (double)
-      - Error reduction parameter. 
+      - Error reduction parameter.
       - Default = 0.4
     - cfm (double)
-      - Constraint force mixing. 
+      - Constraint force mixing.
       - Default = 0.8
-  
-  
+
+
     \par Example
     \verbatim
-    <joint:universal name="universal_joint>
+    <joint:universal name ="universal_joint>
       <body1>body1_name</body1>
       <body2>body2_name</body2>
       <anchor>anchor_body</anchor>
@@ -86,37 +86,36 @@ namespace gazebo
     \endverbatim
   */
   /// \}
-  
+
   /// \defgroup gazebo_universal_joint Universal Joint
   /// \{
-  
   /// \brief A universal joint
   class BulletUniversalJoint : public UniversalJoint<BulletJoint>
   {
     /// \brief Constructor
     public: BulletUniversalJoint(btDynamicsWorld *world);
-  
+
     /// \brief Destuctor
     public: virtual ~BulletUniversalJoint();
 
     /// \brief Attach the two bodies with this joint
-    public: void Attach( Link *one, Link *two );
+    public: void Attach(Link *one, Link *two);
 
     /// \brief Get the anchor point
     public: virtual math::Vector3 GetAnchor(int index) const;
 
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
+    public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
 
     /// \brief Set the first axis of rotation
-    public: void SetAxis(int index, const math::Vector3 &axis );
-  
+    public: void SetAxis(int index, const math::Vector3 &axis);
+
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
 
     /// \brief Get the first axis of rotation
     public: virtual math::Vector3 GetAxis(int index) const;
-  
+
     /// \brief Get the angle of axis 1
     public: virtual math::Angle GetAngle(int index) const;
 
@@ -125,7 +124,7 @@ namespace gazebo
 
     /// \brief Get the angular rate of axis 1
     public: virtual double GetVelocity(int index) const;
-  
+
     /// \brief Set the torque of a joint.
     public: virtual void SetForce(int index, double torque);
 
@@ -140,17 +139,18 @@ namespace gazebo
 
     /// \brief Set the low stop of an axis(index).
     public: virtual void SetLowStop(int index, math::Angle angle);
- 
+
     /// \brief Get the high stop of an axis(index).
     public: virtual math::Angle GetHighStop(int index);
 
     /// \brief Get the low stop of an axis(index).
     public: virtual math::Angle GetLowStop(int index);
   };
-  
+
   /// \}
 }
 }
 }
 #endif
+
 

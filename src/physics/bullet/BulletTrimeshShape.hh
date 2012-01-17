@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class Visual;
 
@@ -47,7 +47,7 @@ namespace gazebo
 
     \par Example
     \verbatim
-      <collision:trimesh name="pallet_collision">
+      <collision:trimesh name ="pallet_collision">
         <mesh>WoodPallet.mesh</mesh>
         <scale>.2 .2 .2</scale>
         <mass>0.1</mass>
@@ -61,9 +61,8 @@ namespace gazebo
     \endverbatim
   */
   /// \}
-  /// \addtogroup gazebo_trimesh_collision 
+  /// \addtogroup gazebo_trimesh_collision
   /// \{
-
 
   /// \brief Triangle mesh collision
   class BulletTrimeshShape : public TrimeshShape
@@ -74,7 +73,7 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~BulletTrimeshShape();
 
-    /// \brief Update function 
+    /// \brief Update function
     public: void Update();
 
     /// \brief Load the trimesh
@@ -87,3 +86,4 @@ namespace gazebo
 }
 }
 #endif
+

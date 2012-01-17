@@ -33,7 +33,7 @@ class btCollisionShape;
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class Link;
   class XMLConfigNode;
@@ -42,15 +42,13 @@ namespace gazebo
   /// \addtogroup gazebo_physics_ode
   /// \brief Base class for all Bullet collisions
   /// \{
-
   /// \brief Base class for all collisions
   class BulletCollision : public Collision
   {
-  
     /// \brief Constructor
     //public: Collision(Link *body, const std::string &name);
     public: BulletCollision(Link *body);
-  
+
     /// \brief Destructor
     public: virtual ~BulletCollision();
 
@@ -69,25 +67,25 @@ namespace gazebo
     /// \brief Set the category bits, used during collision detection
     /// \param bits The bits
     public: virtual void SetCategoryBits(unsigned int bits);
-  
+
     /// \brief Set the collide bits, used during collision detection
     /// \param bits The bits
     public: virtual void SetCollideBits(unsigned int bits);
-  
+
     /// \brief Get the mass of the collision
     public: Mass GetLinkMassMatrix();
-  
+
     /// \brief Get the bounding box, defined by the physics engine
-    public: virtual void GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const;
+    public: virtual void GetBoundingBox(math::Vector3 &min, math::Vector3 &max) const;
 
     /// \brief Set the collision shape
-    public: void SetCollisionShape( btCollisionShape *shape );
+    public: void SetCollisionShape(btCollisionShape *shape);
 
     /// \brief Get the bullet collision shape
     public: btCollisionShape *GetCollisionShape() const;
 
     /// \brief Set the index of the compound shape
-    public: void SetCompoundShapeIndex( int index );
+    public: void SetCompoundShapeIndex(int index);
 
     protected: BulletPhysics *bulletPhysics;
     protected: btCollisionShape *collisionShape;
@@ -101,3 +99,4 @@ namespace gazebo
 }
 }
 #endif
+

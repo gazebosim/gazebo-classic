@@ -29,7 +29,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class BulletRayCollision;
   class BulletLink;
@@ -44,7 +44,7 @@ namespace gazebo
     public: virtual ~BulletRaySensor();
 
     /// \brief Add a ray to the sensor
-    public: void AddRay(math::Vector3 start, math::Vector3 end, double minRange, 
+    public: void AddRay(math::Vector3 start, math::Vector3 end, double minRange,
                         double maxRange, bool display);
 
     /// \brief Get the number of rays
@@ -74,3 +74,4 @@ namespace gazebo
 }
 }
 #endif
+

@@ -35,42 +35,41 @@ namespace gazebo
     class Visual;
   }
 
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
-    /// \brief Laser collision contains a set of ray-collisions, structured to simulate
-    ///        a laser range scanner
+    /// \brief Laser collision contains a set of ray-collisions,
+    ///        structured to simulate a laser range scanner
     class MultiRayShape : public Shape
     {
       /// \brief Constructor
       public: MultiRayShape(CollisionPtr parent);
-    
+
       /// \brief Destructor
       public: virtual ~MultiRayShape();
-  
+
       /// \brief Load a multi-ray shape from SDF
-      public: virtual void Load( sdf::ElementPtr &_sdf );
- 
-      /// \brief Init the shape 
+      public: virtual void Load(sdf::ElementPtr &_sdf);
+
+      /// \brief Init the shape
       public: virtual void Init();
-              
+
       public: void SetDisplayType(const std::string &type);
-    
+
       /// \brief Get detected range for a ray.
       /// \returns Returns DBL_MAX for no detection.
       public: double GetRange(int index);
-    
+
       /// \brief Get detected retro (intensity) value for a ray.
       public: double GetRetro(int index);
-    
+
       /// \brief Get detected fiducial value for a ray.
       public: int GetFiducial(int index);
-  
+
       /// \brief Get the minimum range
       public: double GetMinRange() const;
-  
+
       /// \brief Get the maximum range
       public: double GetMaxRange() const;
 
@@ -80,48 +79,46 @@ namespace gazebo
 
       /// \brief Get the horizontal sample count
       public: int GetSampleCount() const;
-  
+
       /// \brief Get the range resolution
       public: double GetScanResolution() const;
-  
+
       /// \brief Get the minimum angle
       public: math::Angle GetMinAngle() const;
-              
+
       /// \brief Get the maximum angle
       public: math::Angle GetMaxAngle() const;
 
 
 
-  
+
       /// \brief Get the vertical sample count
       public: int GetVerticalSampleCount() const;
-  
+
       /// \brief Get the vertical range resolution
       public: double GetVerticalScanResolution() const;
-  
+
       /// \brief Get the vertical min angle
       public: math::Angle GetVerticalMinAngle() const;
-  
+
       /// \brief Get the vertical max angle
       public: math::Angle GetVerticalMaxAngle() const;
-  
+
       /// \brief Update the collision
       public: void Update();
-    
+
       public: void FillShapeMsg(msgs::Geometry &) {}
-
       public: virtual void ProcessMsg(const msgs::Geometry &) {}
-
        /// \brief Physics engine specific method for updating the rays
       protected: virtual void UpdateRays() = 0;
-    
+
       /// \brief Add a ray to the collision
-      protected: virtual void AddRay(const math::Vector3 &start, 
-                                     const math::Vector3 &end );
-    
+      protected: virtual void AddRay(const math::Vector3 &start,
+                                     const math::Vector3 &end);
+
       /// Ray data
       protected: std::vector< RayShapePtr > rays;
-  
+
       protected: math::Vector3 offset;
       protected: sdf::ElementPtr rayElem;
       protected: sdf::ElementPtr scanElem;
@@ -130,8 +127,9 @@ namespace gazebo
       protected: sdf::ElementPtr rangeElem;
     };
     /// \}
-  
+
   }
 
 }
 #endif
+

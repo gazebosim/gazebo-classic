@@ -22,15 +22,13 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
-    /// \brief ODE cylinder shape 
+    /// \brief ODE cylinder shape
     class ODECylinderShape : public CylinderShape
     {
       public: ODECylinderShape(CollisionPtr parent) : CylinderShape(parent) {}
@@ -41,9 +39,9 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-  
+
         if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateCylinder( 0, radius, length ), true );
+          oParent->SetCollision(dCreateCylinder(0, radius, length), true);
         else
           dGeomCylinderSetParams(oParent->GetCollisionId(), radius, length);
       }
@@ -54,3 +52,5 @@ namespace gazebo
   }
 }
 #endif
+
+

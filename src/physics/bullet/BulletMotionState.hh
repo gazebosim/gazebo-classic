@@ -15,7 +15,7 @@
  *
 */
 /* Desc: Bullet motion state class.
- * Author: Nate Koenig 
+ * Author: Nate Koenig
  * Date: 25 May 2009
  */
 
@@ -28,7 +28,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class Visual;
   class Link;
@@ -62,7 +62,7 @@ namespace gazebo
     public: void SetWorldPose(const math::Pose &pose);
 
     /// \brief Set the center of mass offset
-    public: void SetCoMOffset( const math::Pose &com );
+    public: void SetCoMOffset(const math::Pose &com);
 
     /// \brief Get the world transform
     public: virtual void getWorldTransform(btTransform &worldTrans) const;
@@ -79,3 +79,4 @@ namespace gazebo
 }
 }
 #endif
+

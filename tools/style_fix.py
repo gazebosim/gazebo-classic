@@ -75,49 +75,49 @@ def ProcessFile(filename):
     line = re.sub(r'=(\w|\d)','= \\1',line)
     line = re.sub(r'\t','  ',line)
 
-    regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('
-    if re.match(regexp, line) and not re.search(r'\(\)\(\)',line):
-      funcStart = 0
-      regexp = r'(\s|\w|:)*?\(((\s|\S)*)\)\s*:*'
-      matchResult = re.match(regexp,line)
-      if matchResult:
-        tmp = matchResult.group(2)
-        tmp = re.sub(r'\)\s*:(\s*\S*)+$','',tmp)
-        params = tmp.split(',')
-        for param in params:
-          if len(param) > 0:
-            param = param.rstrip()
-            param = re.sub(' +',' ',param)
-            eqIndex = param.rfind('=')
-            end = len(param)
-            if eqIndex != -1:
-              end = param.rfind(' ',0,eqIndex)
-            index = param.rfind(' ',0,end)
-            paramType = param[0:index]
-            paramName = param[index+1:]
-            paramNameStripped = paramName.lstrip("*&")
-            if len(paramNameStripped) <= 0:
-              continue
-            if re.search(r'\[', paramNameStripped):
-              index2 = paramNameStripped.find('[')
-              paramNameStripped = paramNameStripped[0:index2]
-            if paramNameStripped[0] != '_':
-              regexp = r'' + paramNameStripped + '$'
-              paramName = re.sub(regexp, "_" + paramNameStripped, paramName)
-              replacement = paramType + " " + paramName
-              sub = '(\W)' + paramNameStripped + '(\W)'
-              rep = '\\1_' + paramNameStripped + '\\2'
-              paramSub.append( sub )
-              paramRep.append( rep )
-              regexp = re.sub(r'\&',"\\&",param)
-              regexp = re.sub(r'\*',"\\*",param)
-              regexp = re.sub(r'\s',"\\s",regexp)
-              regexp = re.sub(r'\(',"\\(",regexp)
-              regexp = re.sub(r'\)',"\\)",regexp)
-              regexp = re.sub(r'\]',"\\]",regexp)
-              regexp = re.sub(r'\[',"\\[",regexp)
-              line = re.sub(regexp,replacement, line)
-              line = re.sub(sub, rep,line)
+    #regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('
+    #if re.match(regexp, line) and not re.search(r'\(\)\(\)',line):
+    #  funcStart = 0
+    #  regexp = r'(\s|\w|:)*?\(((\s|\S)*)\)\s*:*'
+    #  matchResult = re.match(regexp,line)
+    #  if matchResult:
+    #    tmp = matchResult.group(2)
+    #    tmp = re.sub(r'\)\s*:(\s*\S*)+$','',tmp)
+    #    params = tmp.split(',')
+    #    for param in params:
+    #      if len(param) > 0:
+    #        param = param.rstrip()
+    #        param = re.sub(' +',' ',param)
+    #        eqIndex = param.rfind('=')
+    #        end = len(param)
+    #        if eqIndex != -1:
+    #          end = param.rfind(' ',0,eqIndex)
+    #        index = param.rfind(' ',0,end)
+    #        paramType = param[0:index]
+    #        paramName = param[index+1:]
+    #        paramNameStripped = paramName.lstrip("*&")
+    #        if len(paramNameStripped) <= 0:
+    #          continue
+    #        if re.search(r'\[', paramNameStripped):
+    #          index2 = paramNameStripped.find('[')
+    #          paramNameStripped = paramNameStripped[0:index2]
+    #        if paramNameStripped[0] != '_':
+    #          regexp = r'' + paramNameStripped + '$'
+    #          paramName = re.sub(regexp, "_" + paramNameStripped, paramName)
+    #          replacement = paramType + " " + paramName
+    #          sub = '(\W)' + paramNameStripped + '(\W)'
+    #          rep = '\\1_' + paramNameStripped + '\\2'
+    #          paramSub.append( sub )
+    #          paramRep.append( rep )
+    #          regexp = re.sub(r'\&',"\\&",param)
+    #          regexp = re.sub(r'\*',"\\*",param)
+    #          regexp = re.sub(r'\s',"\\s",regexp)
+    #          regexp = re.sub(r'\(',"\\(",regexp)
+    #          regexp = re.sub(r'\)',"\\)",regexp)
+    #          regexp = re.sub(r'\]',"\\]",regexp)
+    #          regexp = re.sub(r'\[',"\\[",regexp)
+    #          line = re.sub(regexp,replacement, line)
+    #          line = re.sub(sub, rep,line)
 
     if re.search(r'{', line) and funcStart >= 0:
       funcStart = funcStart + 1

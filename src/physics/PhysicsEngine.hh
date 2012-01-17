@@ -30,25 +30,24 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-  
     /// \brief Base class for a physics engine
     class PhysicsEngine
     {
       /// \brief Default constructor
       /// \param world Pointer to the world
       public: PhysicsEngine(WorldPtr world);
-    
+
       /// \brief Destructor
       public: virtual ~PhysicsEngine();
-    
+
       /// \brief Load the physics engine
       /// \param _sdf Pointer to the SDF parameters
-      public: virtual void Load( sdf::ElementPtr _sdf ) = 0;
-    
+      public: virtual void Load(sdf::ElementPtr _sdf) = 0;
+
       /// \brief Initialize the physics engine
       public: virtual void Init() = 0;
 
@@ -56,10 +55,9 @@ namespace gazebo
       public: virtual void Fini();
 
       public: virtual void Reset() {}
-   
-      /// \brief Init the engine for threads. 
+      /// \brief Init the engine for threads.
       public: virtual void InitForThread() = 0;
-  
+
       /// \brief Update the physics engine collision
       public: virtual void UpdateCollision() = 0;
 
@@ -69,19 +67,18 @@ namespace gazebo
       /// \brief Get the simulation update rate
       public: virtual double GetUpdateRate() = 0;
       public: virtual double GetUpdatePeriod() = 0;
-  
+
       /// \brief Set the simulation step time
       public: virtual void SetStepTime(double _value) = 0;
 
       /// \brief Get the simulation step time
       public: virtual double GetStepTime() = 0;
-  
+
       /// \brief Update the physics engine
       public: virtual void UpdatePhysics() {}
-    
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(ModelPtr _parent) = 0;
-  
+
       /// \brief Create a collision
       public: virtual CollisionPtr CreateCollision(
                   const std::string &_shapeType, LinkPtr _body) = 0;
@@ -89,20 +86,20 @@ namespace gazebo
       public: virtual ShapePtr CreateShape(
                   const std::string &_shapeType,
                   CollisionPtr _collision) = 0;
-  
+
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string &type) = 0;
-    
+
       /// \brief Return the gavity vector
       /// \return The gavity vector
       public: math::Vector3 GetGravity() const;
-  
+
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3 &gravity) = 0;
-  
+
       /// \brief Set whether to show contacts
       public: void ShowContacts(const bool &show);
-  
+
       /// \brief access functions to set ODE parameters
       public: virtual void SetWorldCFM(double /*cfm_*/) {}
       /// \brief access functions to set ODE parameters
@@ -119,7 +116,6 @@ namespace gazebo
       public: virtual void SetContactSurfaceLayer(double /*layerDepth_*/) {}
       /// \brief access functions to set ODE parameters
       public: virtual void SetMaxContacts(double /*maxContacts_*/) {}
-  
       /// \brief access functions to set ODE parameters
       public: virtual double GetWorldCFM() {return 0;}
       /// \brief access functions to set ODE parameters
@@ -136,36 +132,32 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer() {return 0;}
       /// \brief access functions to set ODE parameters
       public: virtual int GetMaxContacts() {return 0;}
-
       public: boost::recursive_mutex* GetRayMutex() const
               { return this->rayMutex; }
- 
-      protected: virtual void OnRequest( 
-                 ConstRequestPtr &/*_msg*/ )
+      protected: virtual void OnRequest(
+                 ConstRequestPtr &/*_msg*/)
                  {}
-
-      protected: virtual void OnPhysicsMsg( 
-                 ConstPhysicsPtr &/*_msg*/ )
+      protected: virtual void OnPhysicsMsg(
+                 ConstPhysicsPtr &/*_msg*/)
                  {}
-
 
 
       protected: WorldPtr world;
       protected: sdf::ElementPtr sdf;
-  
+
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr responsePub;
       protected: transport::SubscriberPtr physicsSub, requestSub;
       protected: boost::recursive_mutex *rayMutex;
 
-      public: std::map<LinkPtr,LinkPtr> contactPairs;
+      public: std::map<LinkPtr, LinkPtr> contactPairs;
       public: void AddLinkPair(LinkPtr link1, LinkPtr link2)
       {
         // keep a map of both directions, easier to search later
         if (this->contactPairs.find(link1) == this->contactPairs.end())
-          this->contactPairs.insert(std::make_pair(link1,link2));
+          this->contactPairs.insert(std::make_pair(link1, link2));
         if (this->contactPairs.find(link2) == this->contactPairs.end())
-          this->contactPairs.insert(std::make_pair(link2,link1));
+          this->contactPairs.insert(std::make_pair(link2, link1));
       };
       public: bool AreTouching(LinkPtr link1, LinkPtr link2)
       {
@@ -178,9 +170,10 @@ namespace gazebo
           return true;
       };
     };
-    
+
     /// \}
   }
 
 }
 #endif
+

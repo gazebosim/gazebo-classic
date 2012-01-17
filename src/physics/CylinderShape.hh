@@ -26,41 +26,40 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
- 
     /// \brief Cylinder collision
     class CylinderShape : public Shape
     {
       /// \brief Constructor
       public: CylinderShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~CylinderShape();
-  
+
       /// \brief Load the cylinder
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Initialize the cylinder
       public: void Init();
 
       /// \brief Set radius
       public: void SetRadius(const double &radius);
-  
+
       /// \brief Set length
       public: void SetLength(const double &length);
 
        /// \brief Get radius
       public: double GetRadius() const;
-  
+
       /// \brief Get length
       public: double GetLength() const;
-  
+
       /// \brief Set the size of the cylinder
-      public: virtual void SetSize( const double &radius, const double &length  );
-  
+      public: virtual void SetSize(const double &radius, const double &length);
+
       public: void FillShapeMsg(msgs::Geometry &_msg);
 
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
@@ -69,3 +68,4 @@ namespace gazebo
   }
 }
 #endif
+

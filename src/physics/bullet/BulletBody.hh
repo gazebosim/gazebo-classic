@@ -28,7 +28,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class XMLConfigNode;
   class BulletMotionState;
@@ -37,7 +37,6 @@ namespace gazebo
   /// \addtogroup gazebo_physics
   /// \brief The body class
   /// \{
-
   /// Link class
   class BulletLink : public Link
   {
@@ -62,7 +61,7 @@ namespace gazebo
 
     /// \brief Attach a collision to this body
     /// \param collision Collisionetery to attach to this body
-    public: virtual void AttachCollision( Collision *collision );
+    public: virtual void AttachCollision(Collision *collision);
 
     /// \brief Called when the pose of the entity (or one of its parents) has
     /// changed
@@ -73,7 +72,6 @@ namespace gazebo
 
     /// \brief Get whether this body is enabled in the physics engine
     public: virtual bool GetEnabled() const {return true;}
-
     /// \brief Update the center of mass
     public: virtual void UpdateCoM();
 
@@ -136,4 +134,5 @@ namespace gazebo
 }
 }
 #endif
+
 

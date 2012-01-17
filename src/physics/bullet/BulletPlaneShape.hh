@@ -30,7 +30,7 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
 {
   class Link;
   class XMLConfig;
@@ -40,10 +40,8 @@ namespace gazebo
   {
     /// \brief Constructor
     public: BulletPlaneShape(Collision *parent) : PlaneShape(parent) {}
-
     /// \brief Destructor
     public: virtual ~BulletPlaneShape() {}
-  
     /// \brief Set the altitude of the plane
     public: void SetAltitude(const math::Vector3 &pos)
             {
@@ -56,16 +54,17 @@ namespace gazebo
               BulletCollision *bParent = (BulletCollision*)(this->parent);
               PlaneShape::CreatePlane();
 
-              btmath::Vector3 vec( (**normalP).x, (**normalP).y, (**normalP).z);
+              btmath::Vector3 vec((**normalP).x, (**normalP).y, (**normalP).z);
 
               btCollisionShape *btshape = new btStaticPlaneShape(vec, 0.0);
 
               bParent->SetCollisionShape(btshape);
             }
   };
-  
+
   /// \}
 }
 }
 }
 #endif
+
