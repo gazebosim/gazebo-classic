@@ -35,7 +35,7 @@ Publisher::Publisher(unsigned int _limit, bool _latch)
 
 //////////////////////////////////////////////////
 // Constructor
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType, 
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, bool _latch)
   : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
 {
@@ -57,10 +57,10 @@ Publisher::~Publisher()
 
 bool Publisher::HasConnections() const
 {
-  return ((this->publications[0] && 
+  return ((this->publications[0] &&
            (this->publications[0]->GetCallbackCount() > 0 ||
             this->publications[0]->GetNodeCount() > 0)) ||
-          (this->publications[1] && 
+          (this->publications[1] &&
            (this->publications[1]->GetCallbackCount() > 0 ||
             this->publications[0]->GetNodeCount() > 0)));
 }
@@ -108,7 +108,7 @@ void Publisher::SendMessage()
     for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
     {
       // Send the latest message.
-      TopicManager::Instance()->Publish(this->topic, **iter, 
+      TopicManager::Instance()->Publish(this->topic, **iter,
           boost::bind(&Publisher::OnPublishComplete, this));
       delete *iter;
     }
@@ -161,3 +161,4 @@ std::string Publisher::GetPrevMsg() const
 {
   return this->prevMsg;
 }
+

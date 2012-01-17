@@ -13,7 +13,6 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-
     /// \brief Handles sending data over the wire to remote subscribers
     class SubscriptionTransport : public CallbackHelper
     {
@@ -23,7 +22,7 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SubscriptionTransport();
 
-      /// \brief Initialize the publication link 
+      /// \brief Initialize the publication link
       public: void Init(const ConnectionPtr &conn, bool _latching);
 
       /// \brief Get the typename of the message that is handled
@@ -37,7 +36,7 @@ namespace gazebo
       /// \brief Get the connection
       public: const ConnectionPtr &GetConnection() const;
 
-      /// \brief Return true if the callback is local, false if the callback 
+      /// \brief Return true if the callback is local, false if the callback
       /// is tied to a  remote connection
       public: virtual bool IsLocal() const;
 
@@ -48,3 +47,4 @@ namespace gazebo
 }
 
 #endif
+

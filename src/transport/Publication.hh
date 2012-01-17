@@ -14,14 +14,13 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief A publication for a topic. This facilitates transport of
     ///messages
     class Publication
     {
       /// \brief Constructor
-      public: Publication( const std::string &topic, 
-                           const std::string &msgType );
+      public: Publication(const std::string &topic,
+                           const std::string &msgType);
 
       /// \brief Destructor
       public: virtual ~Publication();
@@ -39,7 +38,8 @@ namespace gazebo
       public: void RemoveSubscription(const NodePtr &_node);
 
       /// \brief Remove a subscription
-      public: void RemoveSubscription(const std::string &host, unsigned int port);
+      public: void RemoveSubscription(const std::string &host,
+                                      unsigned int port);
 
       public: void RemoveTransport(const std::string &host, unsigned int port);
 
@@ -62,8 +62,8 @@ namespace gazebo
       public: void Publish(const google::protobuf::Message &msg,
                            const boost::function<void()> &cb = NULL);
 
-      public: void AddTransport( const PublicationTransportPtr &publink );
-      public: bool HasTransport( const std::string &_host, unsigned int _port );
+      public: void AddTransport(const PublicationTransportPtr &publink);
+      public: bool HasTransport(const std::string &_host, unsigned int _port);
 
       public: void AddPublisher(PublisherPtr _pub);
       public: void RemovePublisher();
@@ -89,3 +89,4 @@ namespace gazebo
   }
 }
 #endif
+

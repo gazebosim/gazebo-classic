@@ -18,7 +18,7 @@ SubscriptionTransport::~SubscriptionTransport()
 }
 
 //////////////////////////////////////////////////
-/// Initialize the publication link 
+/// Initialize the publication link
 void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
 {
   this->connection = _conn;
@@ -41,7 +41,7 @@ bool SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg_)
 
   if (this->connection->IsOpen())
   {
-    this->connection->EnqueueMsg( data );
+    this->connection->EnqueueMsg(data);
     result = true;
   }
 
@@ -74,11 +74,12 @@ const ConnectionPtr &SubscriptionTransport::GetConnection() const
 }
 
 //////////////////////////////////////////////////
-/// Return true if the callback is local, false if the callback is tied to a 
+/// Return true if the callback is local, false if the callback is tied to a
 /// remote connection
 bool SubscriptionTransport::IsLocal() const
 {
   return false;
 }
+
 
 

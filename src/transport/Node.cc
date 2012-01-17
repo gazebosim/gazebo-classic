@@ -114,7 +114,7 @@ unsigned int Node::GetId() const
 void Node::ProcessPublishers()
 {
   this->publisherMutex->lock();
-  for (this->publishersIter = this->publishers.begin(); 
+  for (this->publishersIter = this->publishers.begin();
        this->publishersIter != this->publishersEnd; this->publishersIter++)
   {
     (*this->publishersIter)->SendMessage();
@@ -178,3 +178,4 @@ std::string Node::GetMsgType(const std::string &_topic) const
 
   return std::string();
 }
+

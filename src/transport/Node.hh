@@ -29,9 +29,8 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief A node can advertise and subscribe topics, publish on
-    ///        advertised topics and listen to subscribed topics. 
+    ///        advertised topics and listen to subscribed topics.
     class Node : public boost::enable_shared_from_this<Node>
     {
       /// \brief Constructor
@@ -42,9 +41,9 @@ namespace gazebo
 
       /// \brief Init the node
       /// \param space Set the global namespace of all topics. If left
-      ///              blank, the topic will initialize to the first 
+      ///              blank, the topic will initialize to the first
       ///              namespace on the Master
-      public: void Init(const std::string &_space="");
+      public: void Init(const std::string &_space ="");
 
       public: void Fini();
 
@@ -68,14 +67,14 @@ namespace gazebo
 
       /// \brief Adverise a topic
       template<typename M>
-      transport::PublisherPtr Advertise(const std::string &topic, 
-                                        unsigned int _queueLimit=10,
+      transport::PublisherPtr Advertise(const std::string &topic,
+                                        unsigned int _queueLimit = 10,
                                         bool _latch = false)
       {
         std::string decodedTopic = this->DecodeTopicName(topic);
         PublisherPtr publisher =
           transport::TopicManager::Instance()->Advertise<M>(
-              decodedTopic,_queueLimit, _latch);
+              decodedTopic, _queueLimit, _latch);
 
         this->publisherMutex->lock();
         this->publishers.push_back(publisher);
@@ -89,7 +88,7 @@ namespace gazebo
       template<typename M, typename T>
       SubscriberPtr Subscribe(const std::string &topic,
           void(T::*fp)(const boost::shared_ptr<M const> &), T *obj,
-          bool _latching=false)
+          bool _latching = false)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
@@ -102,11 +101,11 @@ namespace gazebo
 
         return transport::TopicManager::Instance()->Subscribe(ops);
       }
-  
+
       /// \brief Subscribe to a topic, and return data on the callback
       template<typename M>
       SubscriberPtr Subscribe(const std::string &topic,
-          void(*fp)(const boost::shared_ptr<M const> &), bool _latching=false)
+          void(*fp)(const boost::shared_ptr<M const> &), bool _latching = false)
       {
         SubscribeOptions ops;
         std::string decodedTopic = this->DecodeTopicName(topic);
@@ -144,3 +143,4 @@ namespace gazebo
   }
 }
 #endif
+

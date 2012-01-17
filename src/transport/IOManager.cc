@@ -24,9 +24,9 @@ IOManager::IOManager()
   : count(0)
 {
   this->io_service = new boost::asio::io_service;
-  this->work = new boost::asio::io_service::work(*this->io_service); 
-  this->thread = new boost::thread( boost::bind(&boost::asio::io_service::run, 
-                                                this->io_service) );
+  this->work = new boost::asio::io_service::work(*this->io_service);
+  this->thread = new boost::thread(boost::bind(&boost::asio::io_service::run,
+                                                this->io_service));
 }
 
 IOManager::~IOManager()
@@ -73,3 +73,4 @@ unsigned int IOManager::GetCount() const
 {
   return this->count;
 }
+

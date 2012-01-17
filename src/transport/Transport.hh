@@ -29,7 +29,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
     /// environment variable
     /// \param master_host The hostname of the master is set to this param
@@ -42,7 +41,8 @@ namespace gazebo
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
     /// \param master_port The port  of the master. Leave empty to
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
-    bool init(const std::string &master_host="", unsigned short master_port=0);
+    bool init(const std::string &master_host ="",
+              unsigned short master_port = 0);
 
     /// \brief Run the transport component. This starts message passing. This is
     ///        a blocking call
@@ -68,3 +68,4 @@ namespace gazebo
 }
 
 #endif
+

@@ -63,3 +63,4 @@ void Subscriber::Unsubscribe() const
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
   }
 }
+

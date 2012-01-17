@@ -11,15 +11,13 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief Options for a subscription
     class SubscribeOptions
     {
       public: SubscribeOptions()
               {}
-
       public: template<class M>
-              void Init(const std::string &_topic, 
+              void Init(const std::string &_topic,
                         NodePtr _node,
                         bool _latching)
               {
@@ -29,7 +27,7 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Subscribe requires a google protobuf type");
 
-                this->node = _node; 
+                this->node = _node;
                 this->topic = _topic;
                 this->msgType = msg->GetTypeName();
                 this->latching = _latching;
@@ -65,3 +63,4 @@ namespace gazebo
 }
 
 #endif
+

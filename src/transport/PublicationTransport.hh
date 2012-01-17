@@ -11,12 +11,11 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
     class PublicationTransport
     {
-      public: PublicationTransport(const std::string &topic, 
+      public: PublicationTransport(const std::string &topic,
                                    const std::string &msgType);
 
       public: virtual ~PublicationTransport();
@@ -48,3 +47,4 @@ namespace gazebo
 }
 
 #endif
+

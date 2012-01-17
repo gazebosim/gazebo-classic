@@ -26,7 +26,7 @@ unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
 // Constructor
-Publication::Publication( const std::string &topic, const std::string &msgType )
+Publication::Publication(const std::string &topic, const std::string &msgType)
   : topic(topic), msgType(msgType), locallyAdvertised(false)
 {
   this->id = idCounter++;
@@ -38,7 +38,7 @@ Publication::~Publication()
 {
   this->publishers.clear();
 }
-        
+
 //////////////////////////////////////////////////
 /// Get the topic for this publication
 std::string Publication::GetTopic() const
@@ -84,7 +84,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
         _callback->HandleData((*pubIter)->GetPrevMsg());
       }
     }
-  } 
+  }
 }
 
 // A a transport
@@ -109,8 +109,8 @@ void Publication::AddTransport(const PublicationTransportPtr &_publink)
   // Don't add a duplicate transport
   if (add)
   {
-    _publink->AddCallback( boost::bind(&Publication::LocalPublish, this, _1) );
-    this->transports.push_back( _publink );
+    _publink->AddCallback(boost::bind(&Publication::LocalPublish, this, _1));
+    this->transports.push_back(_publink);
   }
 }
 
@@ -119,7 +119,7 @@ bool Publication::HasTransport(const std::string &_host, unsigned int _port)
   std::list<PublicationTransportPtr>::iterator iter;
   for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
   {
-    if ( (*iter)->GetConnection()->GetRemoteAddress() == _host &&
+    if ((*iter)->GetConnection()->GetRemoteAddress() == _host &&
          (*iter)->GetConnection()->GetRemotePort() == _port)
     {
       return true;
@@ -133,17 +133,17 @@ bool Publication::HasTransport(const std::string &_host, unsigned int _port)
 void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 {
   std::list<PublicationTransportPtr>::iterator iter;
-  iter = this->transports.begin(); 
+  iter = this->transports.begin();
   while (iter != this->transports.end())
   {
-    if (!(*iter)->GetConnection()->IsOpen() || 
+    if (!(*iter)->GetConnection()->IsOpen() ||
         ((*iter)->GetConnection()->GetRemoteAddress() == host_ &&
-         (*iter)->GetConnection()->GetRemotePort() == port_) )
+         (*iter)->GetConnection()->GetRemotePort() == port_))
     {
       (*iter)->Fini();
       this->transports.erase(iter++);
     }
-    else 
+    else
       iter++;
   }
 }
@@ -197,7 +197,7 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
   SubscriptionTransportPtr subptr;
   std::list< CallbackHelperPtr >::iterator iter;
 
-  iter = this->callbacks.begin(); 
+  iter = this->callbacks.begin();
   while (iter != this->callbacks.end())
   {
     subptr = boost::shared_dynamic_cast<SubscriptionTransport>(*iter);
@@ -255,7 +255,7 @@ void Publication::LocalPublish(const std::string &data)
     if ((*iter)->HandleData(this->topic, data))
       iter++;
     else
-      iter = this->nodes.erase( iter );
+      iter = this->nodes.erase(iter);
   }
 
   std::list< CallbackHelperPtr >::iterator cbIter;
@@ -267,7 +267,7 @@ void Publication::LocalPublish(const std::string &data)
       if ((*cbIter)->HandleData(data))
         cbIter++;
       else
-        cbIter = this->callbacks.erase( cbIter );
+        cbIter = this->callbacks.erase(cbIter);
     }
     else
       cbIter++;
@@ -288,7 +288,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
     if ((*iter)->HandleData(this->topic, data))
       iter++;
     else
-      this->nodes.erase( iter++ );
+      this->nodes.erase(iter++);
   }
 
   std::list<CallbackHelperPtr>::iterator cbIter;
@@ -299,7 +299,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
       cbIter++;
     else
     {
-      this->callbacks.erase( cbIter++ );
+      this->callbacks.erase(cbIter++);
     }
   }
 
@@ -337,7 +337,7 @@ unsigned int Publication::GetRemoteSubscriptionCount()
   std::list< CallbackHelperPtr >::iterator iter;
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
-    if ( !(*iter)->IsLocal() )
+    if (!(*iter)->IsLocal())
       count++;
   }
 
@@ -365,5 +365,5 @@ void Publication::AddPublisher(PublisherPtr _pub)
 
 void Publication::RemovePublisher()
 {
-
 }
+

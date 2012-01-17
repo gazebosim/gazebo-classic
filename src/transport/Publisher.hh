@@ -31,7 +31,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief A publisher of messages on a topic
     class Publisher
     {
@@ -52,14 +51,12 @@ namespace gazebo
       public: void SetPublication(PublicationPtr &_publication, int _i);
 
       /// \brief Publish a message on the topic
-      public: void Publish( const google::protobuf::Message &_message,
+      public: void Publish(const google::protobuf::Message &_message,
                  bool _block = false)
               { this->PublishImpl(_message, _block); }
-
       public: template< typename M>
-              void Publish(M _message, bool _block=false)
+              void Publish(M _message, bool _block = false)
               { this->PublishImpl(_message, _block); }
-
       public: unsigned int GetOutgoingCount() const;
 
       private: void PublishImpl(const google::protobuf::Message &_message,
@@ -79,7 +76,7 @@ namespace gazebo
 
       /// \brief Callback when a publish is completed
       private: void OnPublishComplete();
-               
+
       private: std::string topic;
       private: std::string msgType;
       private: unsigned int queueLimit;
@@ -95,3 +92,4 @@ namespace gazebo
 }
 
 #endif
+

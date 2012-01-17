@@ -32,7 +32,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief Manager of connections
     class ConnectionManager : public SingletonT<ConnectionManager>
     {
@@ -42,7 +41,7 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ConnectionManager();
 
-      public: bool Init(const std::string &master_host, 
+      public: bool Init(const std::string &master_host,
                         unsigned short master_port);
 
       /// \brief Run the connection manager loop
@@ -57,46 +56,46 @@ namespace gazebo
       /// \brief Stop the conneciton manager
       public: void Stop();
 
-      public: void Subscribe( const std::string &_topic, 
+      public: void Subscribe(const std::string &_topic,
                               const std::string &_msgType,
                               bool _latching);
 
-      public: void Unsubscribe( const msgs::Subscribe &_sub );
+      public: void Unsubscribe(const msgs::Subscribe &_sub);
 
-      public: void Unsubscribe( const std::string &_topic,
-                                const std::string &_msgType );
+      public: void Unsubscribe(const std::string &_topic,
+                                const std::string &_msgType);
 
-      public: void Advertise( const std::string &topic, 
+      public: void Advertise(const std::string &topic,
                               const std::string &msgType);
 
-      public: void Unadvertise( const std::string &topic );
+      public: void Unadvertise(const std::string &topic);
 
       /// \brief Explicitly update the publisher list
-      public: void GetAllPublishers( std::list<msgs::Publish> &publishers );
+      public: void GetAllPublishers(std::list<msgs::Publish> &publishers);
 
       /// \brief Remove a connection
       public: void RemoveConnection(ConnectionPtr &conn);
 
-      /// \brief Register a new topic namespace 
+      /// \brief Register a new topic namespace
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
 
       /// \brief Find a connection that matches a host and port
-      private: ConnectionPtr FindConnection(const std::string &host, 
+      private: ConnectionPtr FindConnection(const std::string &host,
                                             unsigned short port);
-             
+
       /// \brief Connect to a remote server
-      public: ConnectionPtr ConnectToRemoteHost( const std::string &host,
+      public: ConnectionPtr ConnectToRemoteHost(const std::string &host,
                                                   unsigned short port);
 
-      private: void OnMasterRead( const std::string &data );
+      private: void OnMasterRead(const std::string &data);
 
       private: void OnAccept(const ConnectionPtr &new_connection);
 
-      private: void OnRead( const ConnectionPtr &new_connection,
-                            const std::string &data );
+      private: void OnRead(const ConnectionPtr &new_connection,
+                            const std::string &data);
 
       private: void ProcessMessage(const std::string &_packet);
 
@@ -126,3 +125,4 @@ namespace gazebo
 }
 
 #endif
+
