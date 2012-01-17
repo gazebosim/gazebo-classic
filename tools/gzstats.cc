@@ -15,8 +15,8 @@ void cb(ConstWorldStatisticsPtr &_msg)
 {
   double percent = 0;
   char paused;
-  common::Time simTime  = msgs::Convert( _msg->sim_time() );
-  common::Time realTime = msgs::Convert( _msg->real_time() );
+  common::Time simTime  = msgs::Convert(_msg->sim_time());
+  common::Time realTime = msgs::Convert(_msg->real_time());
 
   if (_msg->paused())
     paused = 'T';
@@ -52,3 +52,4 @@ int main(int argc, char **argv)
 
   transport::fini();
 }
+

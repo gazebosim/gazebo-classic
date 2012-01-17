@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Laser Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /* TODO
@@ -35,11 +34,10 @@
 using namespace libgazebo;
 boost::recursive_mutex *LaserInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 LaserInterface::LaserInterface(player_devaddr_t addr,
-                               GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf, int section)
+: GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -60,8 +58,7 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 LaserInterface::~LaserInterface()
 {
   player_laser_data_t_cleanup(&this->data);
@@ -70,32 +67,31 @@ LaserInterface::~LaserInterface()
   delete this->iface;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Handle all messages. This is called from GazeboDriver
+/////////////////////////////////////////////////
 int LaserInterface::ProcessMessage(QueuePointer &respQueue,
-                                   player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Is it a request to set the laser's config?
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                            PLAYER_LASER_REQ_SET_CONFIG,
-                            this->device_addr))
+        PLAYER_LASER_REQ_SET_CONFIG,
+        this->device_addr))
   {
     //player_laser_config_t* plc = (player_laser_config_t*)data;
 
-    if ( hdr->size == sizeof(player_laser_config_t) )
+    if (hdr->size == sizeof(player_laser_config_t))
     {
       // TODO: Complete this
 
       this->driver->Publish(this->device_addr, respQueue,
-                            PLAYER_MSGTYPE_RESP_ACK,
-                            PLAYER_LASER_REQ_SET_CONFIG);
+          PLAYER_MSGTYPE_RESP_ACK,
+          PLAYER_LASER_REQ_SET_CONFIG);
       return(0);
     }
     else
     {
       printf("config request len is invalid (%d != %d)",
-             (int)hdr->size, (int)sizeof(player_laser_config_t));
+          (int)hdr->size, (int)sizeof(player_laser_config_t));
 
       return(-1);
     }
@@ -103,15 +99,15 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 
   // Is it a request to get the laser's config?
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_LASER_REQ_GET_CONFIG,
-                                 this->device_addr))
+        PLAYER_LASER_REQ_GET_CONFIG,
+        this->device_addr))
   {
-    if ( hdr->size == 0 )
+    if (hdr->size == 0)
     {
       int intensity = 1; // todo
 
       player_laser_config_t plc;
-      memset(&plc,0,sizeof(plc));
+      memset(&plc, 0, sizeof(plc));
 
       plc.min_angle = this->iface->data->min_angle;
       plc.max_angle = this->iface->data->max_angle;
@@ -121,21 +117,21 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
       plc.intensity = intensity;
 
       this->driver->Publish(this->device_addr, respQueue,
-                            PLAYER_MSGTYPE_RESP_ACK,
-                            PLAYER_LASER_REQ_GET_CONFIG,
-                            (void*)&plc, sizeof(plc), NULL);
+          PLAYER_MSGTYPE_RESP_ACK,
+          PLAYER_LASER_REQ_GET_CONFIG,
+          (void*)&plc, sizeof(plc), NULL);
       return(0);
     }
     else
     {
-      printf("config request len is invalid (%d != %d)", (int)hdr->size,0);
+      printf("config request len is invalid (%d != %d)", (int)hdr->size, 0);
       return(-1);
     }
   }
 
 
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
+        PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
   {
     player_laser_geom_t rep;
 
@@ -152,20 +148,16 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
     rep.size.sl = this->iface->data->size.y;
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_LASER_REQ_GET_GEOM,
-                          &rep, sizeof(rep), NULL);
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_LASER_REQ_GET_GEOM,
+        &rep, sizeof(rep), NULL);
 
     return 0;
   }
-
-
   return -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Update this interface, publish new info. This is
-// called from GazeboDriver::Update
+/////////////////////////////////////////////////
 void LaserInterface::Update()
 {
   struct timeval ts;
@@ -173,7 +165,6 @@ void LaserInterface::Update()
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
-
     // Only Update when new data is present
     if (this->iface->data->head.time > this->datatime)
     {
@@ -195,7 +186,8 @@ void LaserInterface::Update()
       this->data.max_angle = this->iface->data->max_angle;
       this->data.resolution = angleRes;
       this->data.max_range = this->iface->data->max_range;
-      this->data.ranges_count = this->data.intensity_count = this->iface->data->range_count;
+      this->data.ranges_count =
+        this->data.intensity_count = this->iface->data->range_count;
       this->data.id = this->scanId++;
 
       if (oldCount != this->data.ranges_count)
@@ -210,15 +202,16 @@ void LaserInterface::Update()
       for (i = 0; i < this->iface->data->range_count; i++)
       {
         this->data.ranges[i] = this->iface->data->ranges[i] / rangeRes;
-        this->data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
+        this->data.intensity[i] =
+          (uint8_t) (int) this->iface->data->intensity[i];
       }
 
       if (this->data.ranges_count > 0)
       {
-        this->driver->Publish( this->device_addr,
+        this->driver->Publish(this->device_addr,
             PLAYER_MSGTYPE_DATA,
             PLAYER_LASER_DATA_SCAN,
-            (void*)&this->data, sizeof(this->data), &this->datatime );
+            (void*)&this->data, sizeof(this->data), &this->datatime);
       }
     }
 
@@ -228,10 +221,7 @@ void LaserInterface::Update()
     this->Unsubscribe();
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
+/////////////////////////////////////////////////
 void LaserInterface::Subscribe()
 {
   // Open the interface
@@ -244,14 +234,13 @@ void LaserInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Laser Interface\n"
-    << e << "\n";
+      << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
+/////////////////////////////////////////////////
 void LaserInterface::Unsubscribe()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);

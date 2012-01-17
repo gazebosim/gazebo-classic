@@ -65,8 +65,8 @@ SimulationInterface::SimulationInterface(player_devaddr_t _addr,
 
   this->responseQueue = NULL;
 
-  memset(&this->pose3dReq, 0, sizeof(this->pose3dReq)); 
-  memset(&this->pose2dReq, 0, sizeof(this->pose2dReq)); 
+  memset(&this->pose3dReq, 0, sizeof(this->pose3dReq));
+  memset(&this->pose2dReq, 0, sizeof(this->pose2dReq));
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
@@ -114,13 +114,13 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, 
+                          PLAYER_MSGTYPE_RESP_ACK,
                           PLAYER_SIMULATION_REQ_SET_POSE3D);
   }
 
   /// Set a 2D pose
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_SET_POSE2D, 
+                                 PLAYER_SIMULATION_REQ_SET_POSE2D,
                                  this->device_addr))
   {
     player_simulation_pose2d_req_t *req =
@@ -136,13 +136,13 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, 
+                          PLAYER_MSGTYPE_RESP_ACK,
                           PLAYER_SIMULATION_REQ_SET_POSE2D);
   }
 
   /// Get a 3d pose
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_GET_POSE3D, 
+                                 PLAYER_SIMULATION_REQ_GET_POSE3D,
                                  this->device_addr))
   {
     player_simulation_pose3d_req_t *req =
@@ -172,7 +172,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
   /// Get a 2D pose
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_GET_POSE2D, 
+                                 PLAYER_SIMULATION_REQ_GET_POSE2D,
                                  this->device_addr))
   {
     player_simulation_pose2d_req_t *req =
@@ -196,7 +196,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
 
   }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_GET_PROPERTY, 
+                                 PLAYER_SIMULATION_REQ_GET_PROPERTY,
                                  this->device_addr))
   {
     player_simulation_property_req_t *req =
@@ -245,9 +245,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     {
       if (prop == "fiducial_id")
       {
-        //strcpy((char*)gzReq->name, req->name);   
+        //strcpy((char*)gzReq->name, req->name);
       }
-      else 
+      else
       {
         gzerr << "The object [" << name
           << "] does not have the property [" << prop << "].\n";
@@ -255,25 +255,25 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     }
   }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_SIMULATION_CMD_PAUSE, 
+                                 PLAYER_SIMULATION_CMD_PAUSE,
                                  this->device_addr))
   {
     // TODO: Implement
-  } 
+  }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_SIMULATION_CMD_RESET, 
+                                 PLAYER_SIMULATION_CMD_RESET,
                                  this->device_addr))
   {
     // TODO:: Implement
-  } 
+  }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_SIMULATION_CMD_SAVE, 
+                                 PLAYER_SIMULATION_CMD_SAVE,
                                  this->device_addr))
   {
     // TODO:: Implement
   }
   else
-    printf("Unhandled Process message[%d][%d]\n",0,0);
+    printf("Unhandled Process message[%d][%d]\n", 0, 0);
 
   return 0;
 }
@@ -320,3 +320,4 @@ void SimulationInterface::OnStats(ConstWorldStatisticsPtr &_msg)
   this->pauseTime  = gazebo::msgs::Convert(_msg->pause_time()).Double();
   this->paused  = _msg->paused();
 }
+

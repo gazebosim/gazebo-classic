@@ -44,7 +44,7 @@ boost::recursive_mutex *BumperInterface::mutex = NULL;
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 BumperInterface::BumperInterface(player_devaddr_t addr,
-                                 GazeboDriver *driver, ConfigFile *cf, 
+                                 GazeboDriver *driver, ConfigFile *cf,
                                  int section)
     : GazeboInterface(addr, driver, cf, section)
 {
@@ -105,13 +105,13 @@ void BumperInterface::Update()
     // Copy bumper data
     this->data.bumpers_count = this->iface->data->bumper_count;
 
-    memcpy( this->data.bumpers, this->iface->data->bumpers, 
-            sizeof(uint8_t) * this->data.bumpers_count );
+    memcpy(this->data.bumpers, this->iface->data->bumpers,
+            sizeof(uint8_t) * this->data.bumpers_count);
 
-    this->driver->Publish( this->device_addr,
+    this->driver->Publish(this->device_addr,
                            PLAYER_MSGTYPE_DATA,
                            PLAYER_BUMPER_DATA_STATE,
-                           (void*)&data, sizeof(data), &this->datatime );
+                           (void*)&data, sizeof(data), &this->datatime);
   }
 
   this->iface->Unlock();
@@ -126,7 +126,7 @@ void BumperInterface::Subscribe()
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open( GazeboClient::client, this->gz_id);
+    this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
   {
@@ -143,3 +143,4 @@ void BumperInterface::Unsubscribe()
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }
+

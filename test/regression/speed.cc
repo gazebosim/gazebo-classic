@@ -1,9 +1,8 @@
 #include "ServerFixture.hh"
 
 using namespace gazebo;
-class SpeedTest : public ServerFixture 
+class SpeedTest : public ServerFixture
 {};
-
 TEST_F(SpeedTest, EmptyWorld)
 {
   Load("worlds/empty.world");
@@ -65,3 +64,4 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+

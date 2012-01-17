@@ -27,3 +27,4 @@ void GazeboClient::Init(int /*_serverid*/, const std::string & /*_worldName*/)
 void GazeboClient::Fini()
 {
 }
+

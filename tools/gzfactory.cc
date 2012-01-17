@@ -6,11 +6,11 @@ using namespace gazebo;
 
 void help()
 {
-  printf("This tool spawns models into a running Gazebo simulation.\n\n");
-  printf("  gzfactory <world_name> <model_filename>\n");
-  printf("    world_name     : Name of the world in which to spawn the model.\n");
-  printf("    modle_filename : Filename of the SDF model.\n");
-  printf("\n");
+  std::cout << "This tool spawns models into a running Gazebo simulation.\n\n"
+            << "  gzfactory <world_name> <model_filename>\n"
+            << "    world_name     : Name of the world in which to spawn "
+            << "the model.\n"
+            << "    modle_filename : Filename of the SDF model.\n\n";
 }
 
 int main(int argc, char **argv)
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
   msgs::Factory msg;
   msg.set_sdf(content);
   pub->Publish(msg, true);
-  
+
   transport::fini();
   printf("Spawn complete\n");
 }

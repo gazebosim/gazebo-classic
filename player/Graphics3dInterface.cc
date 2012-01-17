@@ -103,7 +103,7 @@ int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
     this->iface->data->color.b = cmd->color.blue/255.0;
     this->iface->data->color.a = cmd->color.alpha/255.0;
 
-    for (unsigned int i=0; i<this->iface->data->point_count; i++)
+    for (unsigned int i = 0; i<this->iface->data->point_count; i++)
     {
       this->iface->data->points[i].x = cmd->points[i].px;
       this->iface->data->points[i].y = cmd->points[i].py;
@@ -154,3 +154,4 @@ void Graphics3dInterface::Unsubscribe()
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }
+

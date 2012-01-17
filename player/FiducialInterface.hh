@@ -37,7 +37,6 @@ namespace libgazebo
 /// \defgroup fiduacial_player Fiducial Interface
 /// \brief Plugin Player interface for Gazebo fiducials
 /// \{
-
   // Forward declarations
   class FiducialIface;
 
@@ -92,3 +91,4 @@ namespace libgazebo
 
 }
 #endif
+

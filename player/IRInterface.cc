@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Laser Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
@@ -21,8 +21,8 @@
  */
 
 /* TODO
-PLAYER_LASER_REQ_GET_GEOM
-*/
+   PLAYER_LASER_REQ_GET_GEOM
+   */
 
 #include <math.h>
 #include <iostream>
@@ -36,11 +36,10 @@ using namespace libgazebo;
 
 boost::recursive_mutex *IRInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 IRInterface::IRInterface(player_devaddr_t addr,
-                               GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf, int section)
+: GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -56,56 +55,51 @@ IRInterface::IRInterface(player_devaddr_t addr,
     this->mutex = new boost::recursive_mutex();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 IRInterface::~IRInterface()
 {
   player_ir_data_t_cleanup(&this->data);
-  
+
   // Release this interface
   delete this->iface;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Handle all messages. This is called from GazeboDriver
+/////////////////////////////////////////////////
 int IRInterface::ProcessMessage(QueuePointer &respQueue,
-                                   player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
-
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_IR_REQ_POSE, this->device_addr))
+        PLAYER_IR_REQ_POSE, this->device_addr))
   {
     player_ir_pose_t rep;
 
     // TODO: get geometry from somewhere
-	rep.poses_count =  this->iface->data->ir_count;
-	rep.poses = new player_pose3d_t[rep.poses_count];
-	
-	for(unsigned int i=0;i<rep.poses_count;i++)
-	{
-		rep.poses[i].px = this->iface->data->poses[i].pos.x;
-		rep.poses[i].py = this->iface->data->poses[i].pos.y;
-		rep.poses[i].pz = this->iface->data->poses[i].pos.z;
-		rep.poses[i].proll = this->iface->data->poses[i].roll;
-		rep.poses[i].ppitch = this->iface->data->poses[i].pitch;
-		rep.poses[i].pyaw = this->iface->data->poses[i].yaw;
-	}
+    rep.poses_count =  this->iface->data->ir_count;
+    rep.poses = new player_pose3d_t[rep.poses_count];
+
+    for(unsigned int i = 0;i<rep.poses_count;i++)
+    {
+      rep.poses[i].px = this->iface->data->poses[i].pos.x;
+      rep.poses[i].py = this->iface->data->poses[i].pos.y;
+      rep.poses[i].pz = this->iface->data->poses[i].pos.z;
+      rep.poses[i].proll = this->iface->data->poses[i].roll;
+      rep.poses[i].ppitch = this->iface->data->poses[i].pitch;
+      rep.poses[i].pyaw = this->iface->data->poses[i].yaw;
+    }
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_IR_REQ_POSE,
-                          &rep, sizeof(rep), NULL);
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_IR_REQ_POSE,
+        &rep, sizeof(rep), NULL);
     delete []rep.poses;
     return 0;
   }
- 
+
   return -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Update this interface, publish new info. This is
-// called from GazeboDriver::Update
+/////////////////////////////////////////////////
 void IRInterface::Update()
 {
   struct timeval ts;
@@ -113,49 +107,46 @@ void IRInterface::Update()
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
-    // Only Update when new data is present
+  // Only Update when new data is present
   if (this->iface->data->head.time > this->datatime)
+  {
+    this->datatime = this->iface->data->head.time;
+
+    ts.tv_sec = (int) (this->iface->data->head.time);
+    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
+
+
+    int oldCount = this->data.ranges_count;
+    this->data.ranges_count = this->iface->data->ir_count;
+    this->data.voltages_count = this->iface->data->ir_count;
+
+    if(oldCount != (int)this->data.ranges_count)
     {
-      this->datatime = this->iface->data->head.time;
+      delete []this->data.ranges;
+      delete []this->data.voltages;
 
-      ts.tv_sec = (int) (this->iface->data->head.time);
-      ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
-      
-
-      int oldCount = this->data.ranges_count;
-      this->data.ranges_count = this->iface->data->ir_count;
-      this->data.voltages_count = this->iface->data->ir_count;
-      
-      if(oldCount != (int)this->data.ranges_count)
-      {
-      	delete []this->data.ranges;
-      	delete []this->data.voltages;
-      	
-      	this->data.ranges = new float[data.ranges_count];
-      	this->data.voltages = new float[data.ranges_count];
-      }
-      
-
-      for (unsigned int i = 0; i < this->data.ranges_count; i++)
-      {
-         this->data.ranges[i] = (float)this->iface->data->ranges[i];
-         this->data.voltages[i]=0;
-      }
-
-      this->driver->Publish( this->device_addr,
-                             PLAYER_MSGTYPE_DATA,
-                             PLAYER_IR_DATA_RANGES,
-                             (void*)&this->data, sizeof(this->data), &this->datatime );
+      this->data.ranges = new float[data.ranges_count];
+      this->data.voltages = new float[data.ranges_count];
     }
 
-    this->iface->Unlock();
+
+    for (unsigned int i = 0; i < this->data.ranges_count; i++)
+    {
+      this->data.ranges[i] = (float)this->iface->data->ranges[i];
+      this->data.voltages[i]= 0;
+    }
+
+    this->driver->Publish(this->device_addr,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_IR_DATA_RANGES,
+        (void*)&this->data, sizeof(this->data), &this->datatime);
+  }
+
+  this->iface->Unlock();
 
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
+/////////////////////////////////////////////////
 void IRInterface::Subscribe()
 {
   // Open the interface
@@ -168,17 +159,16 @@ void IRInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo IR Interface\n"
-    << e << "\n";
+      << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }
-  
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
+/////////////////////////////////////////////////
 void IRInterface::Unsubscribe()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }
+

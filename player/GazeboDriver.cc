@@ -148,7 +148,7 @@ int GazeboDriver::ProcessMessage(QueuePointer &_respQueue,
     printf("can't find interface for device %d.%d.%d",
             this->device_addr.robot,
             this->device_addr.interf,
-            this->device_addr.index );
+            this->device_addr.index);
     return(-1);
   }
 }
@@ -165,7 +165,7 @@ int GazeboDriver::Subscribe(player_devaddr_t addr)
     return Driver::Subscribe(addr);
   }
 
-  puts("failed to find a device." );
+  puts("failed to find a device.");
 
   return 1;
 }
@@ -194,7 +194,7 @@ void GazeboDriver::Update()
 
   Driver::ProcessMessages();
 
-  for (i=0; i<this->deviceCount; i++)
+  for (i = 0; i<this->deviceCount; i++)
   {
     iface = this->devices[i];
     iface->Update();
@@ -214,9 +214,9 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 
   if (!player_quiet_startup)
   {
-    printf( "  Gazebo Plugin driver creating %d %s\n",
+    printf("  Gazebo Plugin driver creating %d %s\n",
             this->deviceMaxCount,
-            this->deviceMaxCount == 1 ? "device" : "devices" );
+            this->deviceMaxCount == 1 ? "device" : "devices");
   }
 
   // Load all the devices
@@ -250,88 +250,88 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 
       case PLAYER_POSITION2D_CODE:
         if (!player_quiet_startup) printf(" a position2d interface.\n");
-        ifsrc = new Position2dInterface(playerAddr, this,  _cf, _section);
+        ifsrc = new Position2dInterface(playerAddr, this, _cf, _section);
         break;
 
       /*case PLAYER_GRAPHICS3D_CODE:
         if (!player_quiet_startup) printf(" a graphics3d interface.\n");
-        ifsrc = new Graphics3dInterface( playerAddr, this,  _cf, _section );
+        ifsrc = new Graphics3dInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_LASER_CODE:
         if (!player_quiet_startup) printf(" a laser interface.\n");
-        ifsrc = new LaserInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new LaserInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_CAMERA_CODE:
         if (!player_quiet_startup) printf(" a camera interface.\n");
-        ifsrc = new CameraInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new CameraInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_FIDUCIAL_CODE:
         if (!player_quiet_startup) printf(" a fiducial interface.\n");
-        ifsrc = new FiducialInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new FiducialInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_POSITION3D_CODE:
         if (!player_quiet_startup) printf(" a position3d interface.\n");
-        ifsrc = new Position3dInterface( playerAddr, this,  _cf, _section );
+        ifsrc = new Position3dInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_ACTARRAY_CODE:
         if (!player_quiet_startup) printf(" an actarray interface.\n");
-        ifsrc = new ActarrayInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new ActarrayInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_OPAQUE_CODE:
         if (!player_quiet_startup) printf(" an opaque interface.\n");
-        ifsrc = new OpaqueInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new OpaqueInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_PTZ_CODE:
         if (!player_quiet_startup) printf(" a ptz interface.\n");
-        ifsrc = new PTZInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new PTZInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_GRIPPER_CODE:
         if (!player_quiet_startup) printf(" a gripper interface.\n");
-        ifsrc = new GripperInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new GripperInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_BUMPER_CODE:
         if (!player_quiet_startup) printf(" a bumper interface.\n");
-        ifsrc = new BumperInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new BumperInterface(playerAddr, this, _cf, _section);
         break;
-        
+
       case PLAYER_IR_CODE:
         if (!player_quiet_startup) printf(" an ir interface.\n");
-        ifsrc = new IRInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new IRInterface(playerAddr, this, _cf, _section);
         break;
 
       case PLAYER_IMU_CODE:
         if (!player_quiet_startup) printf(" an imu interface.\n");
-        ifsrc = new ImuInterface( playerAddr,  this, _cf, _section );
+        ifsrc = new ImuInterface(playerAddr, this, _cf, _section);
         break;
 
         */
         /*      case PLAYER_POWER_CODE:
                 if (!player_quiet_startup) printf(" a power interface.\n");
-                ifsrc = new PowerInterface( playerAddr,  this, _cf, _section );
+                ifsrc = new PowerInterface(playerAddr, this, _cf, _section);
                 break;
 
               case PLAYER_SONAR_CODE:
                 if (!player_quiet_startup) printf(" a sonar interface.\n");
-                ifsrc = new SonarInterface( playerAddr,  this, cf, _section );
+                ifsrc = new SonarInterface(playerAddr, this, cf, _section);
                 break;
 
               case PLAYER_GPS_CODE:
                 if (!player_quiet_startup) printf(" a gps interface.\n");
-                ifsrc = new GpsInterface( playerAddr,  this, cf, _section );
+                ifsrc = new GpsInterface(playerAddr, this, cf, _section);
                 break;
         */
       default:
         printf("error: Gazebo driver doesn't support interface type %d\n",
-               playerAddr.interf );
+               playerAddr.interf);
         this->SetError(-1);
         return -1;
     }
@@ -341,7 +341,7 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
       // attempt to add this interface and we're done
       if (this->AddInterface(ifsrc->device_addr))
       {
-        printf( "Gazebo driver error: AddInterface() failed\n" );
+        printf("Gazebo driver error: AddInterface() failed\n");
         this->SetError(-2);
         return -1;
       }
@@ -352,10 +352,10 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
     }
     else
     {
-      printf( "No Gazebo source found for interface %d:%d:%d",
+      printf("No Gazebo source found for interface %d:%d:%d",
               playerAddr.robot,
               playerAddr.interf,
-              playerAddr.index );
+              playerAddr.index);
 
       this->SetError(-3);
       return -1;
@@ -385,3 +385,4 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 
   return NULL;
 }
+

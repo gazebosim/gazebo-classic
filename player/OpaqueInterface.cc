@@ -74,7 +74,6 @@ OpaqueInterface::~OpaqueInterface()
 int OpaqueInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
-
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
@@ -110,10 +109,10 @@ void OpaqueInterface::Update()
         data.data_count = this->iface->data->data_count;
         data.data = this->iface->data->data;
 
-        this->driver->Publish( this->device_addr,
+        this->driver->Publish(this->device_addr,
           PLAYER_MSGTYPE_DATA,
           PLAYER_OPAQUE_DATA_STATE,
-          (void*)&data, sizeof(data), &this->datatime );
+          (void*)&data, sizeof(data), &this->datatime);
     }
 
     this->iface->Unlock();
@@ -151,3 +150,4 @@ void OpaqueInterface::Unsubscribe()
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }
+

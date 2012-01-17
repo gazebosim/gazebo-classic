@@ -22,19 +22,21 @@ namespace gazebo
 {
   class WorldEdit : public WorldPlugin
   {
-    public: void Load( physics::WorldPtr &/*_parent*/, sdf::ElementPtr &_sdf )
+    public: void Load(physics::WorldPtr &/*_parent*/, sdf::ElementPtr &_sdf)
     {
       // Create a new transport node
       transport::NodePtr node(new transport::Node());
 
       // Initialize the node with the world name
       node->Init(_sdf->GetWorldName());
-    
-      // Create a publisher on the ~/scene topic 
-      transport::PublisherPtr scenePub = node->Advertise<msgs::Scene>("~/scene");
+
+      // Create a publisher on the ~/scene topic
+      transport::PublisherPtr scenePub =
+        node->Advertise<msgs::Scene>("~/scene");
 
       // Create a publisher on the ~/physics topic
-      transport::PublisherPtr physicsPub = node->Advertise<msgs::Physics>("~/physics");
+      transport::PublisherPtr physicsPub =
+        node->Advertise<msgs::Physics>("~/physics");
 
       // Set the ambient color to red
       msgs::Scene sceneMsg;
@@ -43,17 +45,18 @@ namespace gazebo
       sceneMsg.mutable_ambient()->set_g(0.0);
       sceneMsg.mutable_ambient()->set_b(0.0);
       sceneMsg.mutable_ambient()->set_a(1.0);
-      scenePub->Publish( sceneMsg );
+      scenePub->Publish(sceneMsg);
 
       // Set the step time
       msgs::Physics physicsMsg;
       msgs::Init(physicsMsg);
       physicsMsg.set_type(msgs::Physics::ODE);
       physicsMsg.set_dt(0.01);
-      physicsPub->Publish( physicsMsg );
+      physicsPub->Publish(physicsMsg);
     }
   };
 
   // Register this plugin with the simulator
   GZ_REGISTER_WORLD_PLUGIN(WorldEdit)
 }
+

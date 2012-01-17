@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Gripper Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /**
-@addtogroup player
-@par Gripper Interface
-- PLAYER_GRIPPER_CMD_STATE
-*/
+  @addtogroup player
+  @par Gripper Interface
+  - PLAYER_GRIPPER_CMD_STATE
+  */
 
 /* TODO
-- PLAYER_GRIPPER_REQ_GET_GEOM
-*/
+   - PLAYER_GRIPPER_REQ_GET_GEOM
+   */
 
 #include <iostream>
 #include <math.h>
@@ -42,13 +41,11 @@ using namespace libgazebo;
 
 boost::recursive_mutex *GripperInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 GripperInterface::GripperInterface(player_devaddr_t addr,
-                                   GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf, int section)
+: GazeboInterface(addr, driver, cf, section)
 {
-
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -63,20 +60,17 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
     this->mutex = new boost::recursive_mutex();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 GripperInterface::~GripperInterface()
 {
   // Release this interface
   delete this->iface;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Handle all messages. This is called from GazeboDriver
+/////////////////////////////////////////////////
 int GripperInterface::ProcessMessage(QueuePointer &respQueue,
-                                     player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
-
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
@@ -152,9 +146,7 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
   return -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Update this interface, publish new info. This is
-// called from GazeboDriver::Update
+/////////////////////////////////////////////////
 void GripperInterface::Update()
 {
   player_gripper_data_t data;
@@ -196,25 +188,22 @@ void GripperInterface::Update()
       data.state = PLAYER_GRIPPER_STATE_ERROR;
 #endif
 
-    this->driver->Publish( this->device_addr,
-                           PLAYER_MSGTYPE_DATA,
-                           PLAYER_GRIPPER_DATA_STATE,
-                           (void*)&data, sizeof(data), &this->datatime );
+    this->driver->Publish(this->device_addr,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_GRIPPER_DATA_STATE,
+        (void*)&data, sizeof(data), &this->datatime);
   }
 
   this->iface->Unlock();
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
+/////////////////////////////////////////////////
 void GripperInterface::Subscribe()
 {
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open( GazeboClient::client, this->gz_id);
+    this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
   {
@@ -224,10 +213,10 @@ void GripperInterface::Subscribe()
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
+/////////////////////////////////////////////////
 void GripperInterface::Unsubscribe()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }
+

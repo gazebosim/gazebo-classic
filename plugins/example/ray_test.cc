@@ -26,7 +26,7 @@ namespace gazebo
 {
   class RayTest : public SensorPlugin
   {
-    public: void Load( sensors::SensorPtr &/*_parent*/, sdf::ElementPtr &_sdf )
+    public: void Load(sensors::SensorPtr &/*_parent*/, sdf::ElementPtr &_sdf)
     {
       // Get then name of the parent model
       std::string modelName = _sdf->GetParent()->GetValueString("name");
@@ -51,8 +51,8 @@ namespace gazebo
 
       this->node = transport::NodePtr(new transport::Node());
       this->node->Init(worldName);
-      this->statsSub = this->node->Subscribe("~/world_stats", &RayTest::OnStats, this);
-
+      this->statsSub =
+        this->node->Subscribe("~/world_stats", &RayTest::OnStats, this);
     }
 
     // Called by the world update start event
@@ -62,18 +62,21 @@ namespace gazebo
       //gzdbg << "plugin update\n";
     }
 
-    public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
+    public: void OnStats(
+                const boost::shared_ptr<msgs::WorldStatistics const> &_msg)
     {
-      this->simTime  = msgs::Convert( _msg->sim_time() );
+      this->simTime  = msgs::Convert(_msg->sim_time());
 
       math::Pose pose;
       pose.pos.x = 0.5*sin(0.01*this->simTime.Double());
       math::Pose orig_pose = this->model->GetWorldPose();
 
       if (this->simTime.Double() > 20.0)
-        this->model->SetWorldPose( pose );
+        this->model->SetWorldPose(pose);
 
-      gzdbg << "plugin simTime [" << this->simTime.Double() << "] update pose [" << pose.pos.x << "] orig pose [" << orig_pose << "]\n";
+      gzdbg << "plugin simTime [" << this->simTime.Double()
+            << "] update pose [" << pose.pos.x << "] orig pose ["
+            << orig_pose << "]\n";
     }
 
     // Pointer to the model
@@ -92,3 +95,4 @@ namespace gazebo
   // Register this plugin with the simulator
   GZ_REGISTER_SENSOR_PLUGIN(RayTest)
 }
+

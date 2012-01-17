@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo (simulator) client functions 
+/* Desc: Gazebo (simulator) client functions
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
  */
@@ -26,7 +26,6 @@
 /// \brief Gazebo client handler
 /// \{
 
-
 /// \brief Gazebo client handler
 ///
 /// This class handles the Gazebo client object, and acts as a shared
@@ -34,7 +33,7 @@
 /// can only be one instance of this class (it is entirely static).
 class GazeboClient
 {
-  /// \brief Initialize 
+  /// \brief Initialize
   public: static void Init(int _serverid, const std::string &_worldName);
 
   /// \brief Finalize
@@ -49,3 +48,4 @@ class GazeboClient
 
 
 #endif
+

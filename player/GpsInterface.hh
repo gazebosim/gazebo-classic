@@ -45,15 +45,15 @@ class GpsInterface : public GazeboInterface
   public: virtual ~GpsInterface();
 
   /// @brief Handle all messages. This is called from GazeboDriver
-  public: virtual int ProcessMessage(QueuePointer &respQueue, 
+  public: virtual int ProcessMessage(QueuePointer &respQueue,
               player_msghdr_t *hdr, void *data);
 
   /// @brief Update this interface, publish new info.
-  public: virtual void Update(); 
+  public: virtual void Update();
 
   /// @brief Open a GPS interface when a subscription is received.  \
   /// This is called fromGazeboDriver::Subscribe
-  public: virtual void Subscribe(); 
+  public: virtual void Subscribe();
 
   /// @brief Close a GPS interface.  This is called from \
   /// GazeboDriver::Unsubscribe
@@ -70,4 +70,5 @@ class GpsInterface : public GazeboInterface
   private: static boost::recursive_mutex *mutex;
 };
 #endif
+
 

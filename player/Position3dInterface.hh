@@ -33,13 +33,11 @@ namespace boost
 // Forward declarations
 namespace libgazebo
 {
-
 /// \addtogroup player_iface Interfaces
 /// \{
 /// \defgroup position3d_player Position3d Interface
 /// \brief Position3d interface
 /// \{
-
 
   class PositionIface;
 
@@ -79,7 +77,8 @@ namespace libgazebo
   };
 }
 
-/// \} 
+/// \}
 /// \}
 
 #endif
+

@@ -104,7 +104,7 @@ void GpsInterface::Update()
     // data.err_horz = this->iface->data->err_horz;
     // data.err_vert = this->iface->data->err_vert;
 
-    this->driver->Publish( this->device_addr, NULL, PLAYER_MSGTYPE_DATA,
+    this->driver->Publish(this->device_addr, NULL, PLAYER_MSGTYPE_DATA,
                            PLAYER_GPS_DATA_STATE, (void*)&data,
                            sizeof(data), &this->datatime);
 
@@ -134,3 +134,4 @@ void GpsInterface::Unsubscribe()
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   gz_gps_close(this->iface);
 }
+

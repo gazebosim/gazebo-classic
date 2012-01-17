@@ -28,20 +28,20 @@ bool parse(int argc, char **argv)
   }
 
   // Get parameters from command line
-  for (int i=1; i < argc; i++)
+  for (int i = 1; i < argc; i++)
   {
     std::string p = argv[i];
     boost::trim(p);
-    params.push_back( p );
+    params.push_back(p);
   }
 
-  // Get parameters from stdin 
+  // Get parameters from stdin
   if (!isatty(fileno(stdin)))
   {
     char str[1024];
     while (!feof(stdin))
     {
-      if (fgets(str, 1024, stdin)==NULL)
+      if (fgets(str, 1024, stdin)== NULL)
         break;
 
       if (feof(stdin))
@@ -55,13 +55,14 @@ bool parse(int argc, char **argv)
   return true;
 }
 
-transport::ConnectionPtr connect_to_master(const std::string &host, unsigned short port)
+transport::ConnectionPtr connect_to_master(const std::string &host,
+                                           unsigned short port)
 {
   std::string data, namespacesData, publishersData;
   msgs::Packet packet;
 
   // Connect to the master
-  transport::ConnectionPtr connection( new transport::Connection() );
+  transport::ConnectionPtr connection(new transport::Connection());
   connection->Connect(host, port);
 
   // Read the verification message
@@ -73,7 +74,7 @@ transport::ConnectionPtr connect_to_master(const std::string &host, unsigned sho
   if (packet.type() == "init")
   {
     msgs::String msg;
-    msg.ParseFromString( packet.serialized_data() );
+    msg.ParseFromString(packet.serialized_data());
     if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
       std::cerr << "Conflicting gazebo versions\n";
   }
@@ -92,13 +93,13 @@ void list()
 
   request.set_id(0);
   request.set_request("get_publishers");
-  connection->EnqueueMsg( msgs::Package("request", request), true );
+  connection->EnqueueMsg(msgs::Package("request", request), true);
   connection->Read(data);
 
   packet.ParseFromString(data);
-  pubs.ParseFromString( packet.serialized_data() );
+  pubs.ParseFromString(packet.serialized_data());
 
-  for (int i=0; i < pubs.publisher_size(); i++)
+  for (int i = 0; i < pubs.publisher_size(); i++)
   {
     const msgs::Publish &p = pubs.publisher(i);
     if (p.topic().find("__dbg") == std::string::npos)
@@ -124,13 +125,13 @@ msgs::TopicInfo get_topic_info(const std::string &_topic)
 
   request.set_request("topic_info");
   request.set_data(_topic);
-  connection->EnqueueMsg( msgs::Package("request", request), true );
+  connection->EnqueueMsg(msgs::Package("request", request), true);
   connection->Read(data);
 
   packet.ParseFromString(data);
   if (packet.type() == "topic_info_response")
   {
-    topic_info.ParseFromString( packet.serialized_data() );
+    topic_info.ParseFromString(packet.serialized_data());
   }
   else
     std::cerr << "Invalid response\n";
@@ -144,16 +145,16 @@ void print_topic_info(const std::string &_topic)
   std::cout << "Type: " << info.msg_type() << "\n\n";
 
   std::cout << "Publishers:\n";
-  for (int i=0; i < info.publisher_size(); i++)
+  for (int i = 0; i < info.publisher_size(); i++)
   {
-    std::cout << "\t" << info.publisher(i).host() << ":" 
+    std::cout << "\t" << info.publisher(i).host() << ":"
               << info.publisher(i).port() << "\n";
   }
 
   std::cout << "\nSubscribers:\n";
-  for (int i=0; i < info.subscriber_size(); i++)
+  for (int i = 0; i < info.subscriber_size(); i++)
   {
-    std::cout << "\t" << info.subscriber(i).host() << ":" 
+    std::cout << "\t" << info.subscriber(i).host() << ":"
               << info.subscriber(i).port() << "\n";
   }
   std::cout << "\n";
@@ -179,7 +180,6 @@ void echo()
 
   transport::fini();
 }
-
 
 int main(int argc, char **argv)
 {

@@ -2,13 +2,12 @@
 
 using namespace gazebo;
 
-class TransportTest : public ServerFixture 
+class TransportTest : public ServerFixture
 {};
-
 
 TEST_F(TransportTest, Load)
 {
-  for (unsigned int i=0; i < 2; i++)
+  for (unsigned int i = 0; i < 2; i++)
   {
     Load("worlds/empty.world");
     Unload();
@@ -38,10 +37,10 @@ TEST_F(TransportTest, PubSub)
   std::vector<transport::PublisherPtr> pubs;
   std::vector<transport::SubscriberPtr> subs;
 
-  for (unsigned int i=0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; i++)
   {
-    pubs.push_back(node->Advertise<msgs::Scene>("~/scene") );
-    subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg) );
+    pubs.push_back(node->Advertise<msgs::Scene>("~/scene"));
+    subs.push_back(node->Subscribe("~/scene", &ReceiveSceneMsg));
     scenePub->Publish(msg);
   }
 
@@ -54,3 +53,4 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+

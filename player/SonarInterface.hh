@@ -62,3 +62,4 @@ class SonarInterface : public GazeboInterface
   private: double datatime;
 };
 #endif
+

@@ -32,7 +32,6 @@ namespace boost
 
 namespace libgazebo
 {
-
 // Forward declarations
 class Graphics3dIface;
 
@@ -72,3 +71,4 @@ class Graphics3dInterface : public GazeboInterface
 }
 
 #endif
+

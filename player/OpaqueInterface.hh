@@ -31,13 +31,11 @@ namespace boost
 
 namespace libgazebo
 {
-
 /// \addtogroup player_iface
 /// \{
 /// \defgroup opaque_player Opaque Interface
 /// \brief Opaque Player interface
 /// \{
-
 // Forward declarations
 class OpaqueIface;
 
@@ -84,3 +82,4 @@ class OpaqueInterface : public GazeboInterface
 }
 
 #endif
+

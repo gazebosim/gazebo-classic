@@ -41,7 +41,7 @@ namespace gazebo
 
       /*gazebo::common::NumericAnimationPtr shoulderAnim(
           new gazebo::common::NumericAnimation("shoulder_anim", 0.5, false));
-      
+
       gazebo::common::NumericAnimationPtr headAnim(
           new gazebo::common::NumericAnimation("head_anim", 0.5, false));
 
@@ -74,7 +74,7 @@ namespace gazebo
       positions["r_forearm_roll_joint"] = 3.139403;
       positions["r_wrist_flex_joint"] = -0.529580;
       positions["r_wrist_roll_joint"] = -1.591270;
-      
+
       this->model->SetJointPositions(positions);
     }
 
@@ -84,3 +84,4 @@ namespace gazebo
   // Register this plugin with the simulator
   GZ_REGISTER_MODEL_PLUGIN(PR2JointTest)
 }
+

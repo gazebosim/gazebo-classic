@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Sonar Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
@@ -21,14 +21,14 @@
  */
 
 /**
-@addtogroup player
-@par Sonar Interface
-- PLAYER_SONAR_REQ_GET_GEOM
-*/
+  @addtogroup player
+  @par Sonar Interface
+  - PLAYER_SONAR_REQ_GET_GEOM
+  */
 
 /* TODO
-PLAYER_SONAR_REQ_POWER
-*/
+   PLAYER_SONAR_REQ_POWER
+   */
 
 #include <math.h>
 
@@ -36,11 +36,10 @@ PLAYER_SONAR_REQ_POWER
 #include "GazeboDriver.hh"
 #include "SonarInterface.hh"
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 SonarInterface::SonarInterface(player_devaddr_t addr,
-                               GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf, int section)
+: GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -53,21 +52,19 @@ SonarInterface::SonarInterface(player_devaddr_t addr,
   this->datatime = -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 SonarInterface::~SonarInterface()
 {
   // Release this interface
   gz_sonar_free(this->iface);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Handle all messages. This is called from GazeboDriver
+/////////////////////////////////////////////////
 int SonarInterface::ProcessMessage(QueuePointer &respQueue,
-                                   player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                            PLAYER_SONAR_REQ_GET_GEOM, this->device_addr))
+        PLAYER_SONAR_REQ_GET_GEOM, this->device_addr))
   {
     player_sonar_geom_t geom;
 
@@ -85,15 +82,15 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
     gz_sonar_unlock(this->iface);
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_SONAR_REQ_GET_GEOM,
-                          &geom, sizeof(geom), NULL);
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_SONAR_REQ_GET_GEOM,
+        &geom, sizeof(geom), NULL);
 
     return 0;
   }
 
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SONAR_REQ_POWER,this->device_addr))
+        PLAYER_SONAR_REQ_POWER, this->device_addr))
   {
     player_sonar_power_config_t *power;
 
@@ -107,9 +104,9 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
     gz_sonar_unlock(this->iface);
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_SONAR_REQ_POWER,
-                          power, sizeof(*power), NULL);
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_SONAR_REQ_POWER,
+        power, sizeof(*power), NULL);
 
     return 0;
   }
@@ -117,9 +114,7 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
   return -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Update this interface, publish new info. This is
-// called from GazeboDriver::Update
+/////////////////////////////////////////////////
 void SonarInterface::Update()
 {
   player_sonar_data_t data;
@@ -146,20 +141,16 @@ void SonarInterface::Update()
     for (int i = 0; i < this->iface->data->sonar_count; i++)
       data.ranges[i] = this->iface->data->sonar_ranges[i];
 
-    this->driver->Publish( this->device_addr, NULL,
-                           PLAYER_MSGTYPE_DATA,
-                           PLAYER_SONAR_DATA_RANGES,
-                           (void*)&data, sizeof(data), &this->datatime );
-
+    this->driver->Publish(this->device_addr, NULL,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_SONAR_DATA_RANGES,
+        (void*)&data, sizeof(data), &this->datatime);
   }
 
   gz_sonar_unlock(this->iface);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
+/////////////////////////////////////////////////
 void SonarInterface::Subscribe()
 {
   // Open the interface
@@ -169,8 +160,7 @@ void SonarInterface::Subscribe()
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
+/////////////////////////////////////////////////
 void SonarInterface::Unsubscribe()
 {
   gz_sonar_close(this->iface);

@@ -34,10 +34,9 @@ namespace libgazebo
 {
 /// \addtogroup player_iface
 /// \{
-/// \defgroup camera_player Camera interface 
+/// \defgroup camera_player Camera interface
 /// \brief Camera interface
 /// \{
-
   class CameraIface;
 
   /// \brief Camera interface
@@ -92,3 +91,4 @@ namespace libgazebo
 }
 
 #endif
+

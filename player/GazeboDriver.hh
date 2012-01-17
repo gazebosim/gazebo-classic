@@ -31,17 +31,16 @@
 /// \addtogroup player
 /// \brief Gazebo player driver
 /// \{
-
 // Forward declarations
 class GazeboInterface;
 
 /// \brief Gazebo player driver
 class GazeboDriver : public Driver
 {
-  /// \brief Constructor 
+  /// \brief Constructor
   public: GazeboDriver(ConfigFile *_cf, int _section);
 
-  /// \brief Destructor 
+  /// \brief Destructor
   public: virtual ~GazeboDriver();
 
   /// \brief Set up the device.  Return 0 if things go well, and -1 otherwise.
@@ -50,9 +49,9 @@ class GazeboDriver : public Driver
   /// \brief Shutdown the device
   public: virtual int Shutdown();
 
-  /// \brief Process all messages for this driver. 
-  public: virtual int ProcessMessage(QueuePointer &respQueue, 
-                                     player_msghdr * hdr, 
+  /// \brief Process all messages for this driver.
+  public: virtual int ProcessMessage(QueuePointer &respQueue,
+                                     player_msghdr * hdr,
                                      void * data);
 
   /// \brief Subscribe an device to this driver
@@ -61,7 +60,8 @@ class GazeboDriver : public Driver
   /// \brief Remove a device from this driver
   public: virtual int Unsubscribe(player_devaddr_t addr);
 
-  /// \brief The server thread calls this method frequently. We use it to check  for new commands and configs
+  /// \brief The server thread calls this method frequently.
+  ///        We use it to check  for new commands and configs
   private: virtual void Update();
 
   /// \brief Helper function to load all devices on startup
@@ -83,3 +83,4 @@ class GazeboDriver : public Driver
 /// \}
 
 #endif
+
