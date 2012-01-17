@@ -31,7 +31,7 @@ bool rendering::load()
   {
     rendering::RenderEngine::Instance()->Load();
   }
-  catch(common::Exception e)
+  catch(common::Exception &e)
   {
     result = false;
     gzerr << "Failed to load the Rendering engine subsystem\n" << e ;
@@ -49,7 +49,7 @@ bool rendering::init()
   {
     rendering::RenderEngine::Instance()->Init();
   }
-  catch (common::Exception e)
+  catch (common::Exception &e)
   {
     result = false;
     gzerr <<"Failed to Initialize the Rendering engine subsystem\n" << e ;
@@ -80,7 +80,7 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
     scene = rendering::RenderEngine::Instance()->CreateScene(_name,
         _enableVisualizations);
   }
-  catch (common::Exception e)
+  catch (common::Exception &e)
   {
     gzerr <<"Failed to create a scene in the Rendering engine" << e ;
   }

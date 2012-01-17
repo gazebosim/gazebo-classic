@@ -89,7 +89,7 @@ class QtButtonPropertyBrowserPrivate
     QtButtonPropertyBrowser *q_ptr;
     Q_DECLARE_PUBLIC(QtButtonPropertyBrowser)
 public:
-
+      QtButtonPropertyBrowserPrivate() : q_ptr(NULL),m_mainLayout(NULL) {}
     void init(QWidget *parent);
 
     void propertyInserted(QtBrowserItem *index, QtBrowserItem *afterIndex);

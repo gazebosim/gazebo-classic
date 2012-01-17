@@ -41,9 +41,11 @@ bool init(SDFPtr _sdf)
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
+  {
     result = true;
+    fclose(ftest);
+  }
 
-  fclose(ftest);
   return result;
 }
 
@@ -417,7 +419,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
   {
     // Find the matching attribute in SDF
     for (iter = _sdf->attributes.begin();
-         iter != _sdf->attributes.end(); iter++)
+         iter != _sdf->attributes.end(); ++iter)
     {
       if ((*iter)->GetKey() == attribute->Name())
       {
@@ -443,7 +445,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
 
   // Check that all required attributes have been set
   for (iter = _sdf->attributes.begin();
-       iter != _sdf->attributes.end(); iter++)
+       iter != _sdf->attributes.end(); ++iter)
   {
     if ((*iter)->GetRequired() && !(*iter)->GetSet())
     {
@@ -509,7 +511,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
       // Find the matching element in SDF
       ElementPtr_V::iterator eiter;
       for (eiter = _sdf->elementDescriptions.begin();
-          eiter != _sdf->elementDescriptions.end(); eiter++)
+          eiter != _sdf->elementDescriptions.end(); ++eiter)
       {
         if ((*eiter)->GetName() == elemXml->Value())
         {
@@ -538,7 +540,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
     // Chek that all required elements have been set
     ElementPtr_V::iterator eiter;
     for (eiter = _sdf->elementDescriptions.begin();
-        eiter != _sdf->elementDescriptions.end(); eiter++)
+        eiter != _sdf->elementDescriptions.end(); ++eiter)
     {
       if ((*eiter)->GetRequired() == "1" || (*eiter)->GetRequired() == "+")
       {

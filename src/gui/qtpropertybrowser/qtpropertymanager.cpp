@@ -2066,6 +2066,7 @@ void QtCharPropertyManager::uninitializeProperty(QtProperty *property)
 
 
 QtLocalePropertyManagerPrivate::QtLocalePropertyManagerPrivate()
+  : q_ptr(NULL), m_enumPropertyManager(NULL)
 {
 }
 
@@ -4781,6 +4782,7 @@ void QtFlagPropertyManager::uninitializeProperty(QtProperty *property)
 
 
 QtSizePolicyPropertyManagerPrivate::QtSizePolicyPropertyManagerPrivate()
+  : q_ptr(NULL), m_intPropertyManager(NULL), m_enumPropertyManager(NULL)
 {
 }
 
@@ -5079,8 +5081,9 @@ Q_GLOBAL_STATIC(QFontDatabase, fontDatabase)
 
 
 QtFontPropertyManagerPrivate::QtFontPropertyManagerPrivate() :
-    m_settingValue(false),
-    m_fontDatabaseChangeTimer(0)
+  q_ptr(NULL), m_intPropertyManager(NULL), m_enumPropertyManager(NULL),
+  m_boolPropertyManager(NULL), m_settingValue(false),
+  m_fontDatabaseChangeTimer(0)
 {
 }
 

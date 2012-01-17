@@ -20,7 +20,6 @@
  * SVN: $Id: BulletPhysics.cc 7714 2009-05-23 18:08:49Z natepak $
  */
 
-#include "BulletLink.hh"
 #include "BulletPlaneShape.hh"
 #include "BulletSphereShape.hh"
 #include "BulletBoxShape.hh"
@@ -35,14 +34,11 @@
 #include "BulletUniversalJoint.hh"
 
 #include "PhysicsFactory.hh"
-#include "Mass.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"
 #include "math/Vector3.hh"
 #include "Entity.hh"
-
-#include "common/XMLConfig.hh"
 
 #include "BulletPhysics.hh"
 
@@ -54,7 +50,7 @@ using namespace physics;
 using namespace physics;
 
 
-GZ_REGISTER_PHYSICS_ENGINE("bullet _"bullet", _BulletPhysics);
+GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics);
 
 //////////////////////////////////////////////////
 // Constructor
@@ -194,7 +190,6 @@ Link *BulletPhysics::CreateLink(Entity *parent)
 Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 {
   BulletCollision *collision = NULL;
-  Shape *shape = NULL;
   BulletLink *body = NULL;
 
   body = dynamic_cast<BulletLink*>(parent);
@@ -205,17 +200,17 @@ Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
   collision = new BulletCollision(parent);
 
   if (type == "sphere")
-    shape = new BulletSphereShape(collision);
+    new BulletSphereShape(collision);
   if (type == "box")
-    shape = new BulletBoxShape(collision);
+    new BulletBoxShape(collision);
   if (type == "cylinder")
-    shape = new BulletCylinderShape(collision);
+    new BulletCylinderShape(collision);
   if (type == "plane")
-    shape = new BulletPlaneShape(collision);
+    new BulletPlaneShape(collision);
   if (type == "trimesh")
-    shape = new BulletTrimeshShape(collision);
+    new BulletTrimeshShape(collision);
   if (type == "map")
-    shape = new MapShape(collision);
+    new MapShape(collision);
   else
     gzthrow("Unable to create a collision of type[" << type << "]");
 

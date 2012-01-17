@@ -74,7 +74,7 @@ void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
         "multiray", this->body);
     laserCollision->SetName("IR Sensor Collision");
 
-    laserShape = (MultiRayShape*)(laserCollision->GetShape());
+    laserShape = static_cast<MultiRayShape*>(laserCollision->GetShape());
 
     //laserShape->SetDisplayType((**this->displayRaysP));
     laserShape->Load(iNode);
@@ -183,7 +183,7 @@ void IRSensor::InitChild()
 void IRSensor::FiniChild()
 {
   std::vector<RaySensor*>::iterator iter;
-  for (iter = this->irBeams.begin(); iter!= this->irBeams.end(); iter++)
+  for (iter = this->irBeams.begin(); iter!= this->irBeams.end(); ++iter)
   {
     delete *iter;
   }
@@ -231,7 +231,7 @@ void IRSensor::UpdateChild()
   if (this->active)
   {
     std::vector<RaySensor*>::iterator iter;
-    for (iter = this->irBeams.begin(); iter != this->irBeams.end(); iter++)
+    for (iter = this->irBeams.begin(); iter != this->irBeams.end(); ++iter)
       (*iter)->Update();
   }
 }

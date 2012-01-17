@@ -51,10 +51,6 @@ namespace gazebo
       this->node->Init();
 
       this->connections.push_back(
-          event::Events::ConnectPreRender(
-            boost::bind(&Presentation::PreRender, this)));
-
-      this->connections.push_back(
           gui::Events::ConnectKeyPress(
             boost::bind(&Presentation::KeyPress, this, _1)));
 
@@ -118,7 +114,7 @@ namespace gazebo
              {
              }
 
-    private: void KeyPress(std::string _key)
+    private: void KeyPress(const std::string &_key)
              {
                rendering::UserCameraPtr userCam = gui::get_active_camera();
 
@@ -131,10 +127,6 @@ namespace gazebo
                  this->Update();
                else
                  this->iter = this->states.end()-1;
-             }
-
-    private: void PreRender()
-             {
              }
 
     private: void Update()

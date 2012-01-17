@@ -22,14 +22,9 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletLink.hh"
 #include "BulletUniversalJoint.hh"
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

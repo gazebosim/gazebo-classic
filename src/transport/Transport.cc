@@ -81,7 +81,7 @@ void transport::run()
   // This chunk of code just waits until we get a list of topic namespaces.
   unsigned int trys = 0;
   unsigned int limit = 50;
-  while (namespaces.size() == 0 && trys < limit)
+  while (namespaces.empty() && trys < limit)
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
     common::Time::MSleep(50);

@@ -114,7 +114,7 @@ void Scene::Clear()
   this->visuals.clear();
 
   for (Light_M::iterator iter = this->lights.begin();
-      iter != this->lights.end(); iter++)
+      iter != this->lights.end(); ++iter)
   {
     delete iter->second;
   }
@@ -158,7 +158,7 @@ Scene::~Scene()
   this->worldVisual.reset();
   this->selectionMsg.reset();
   for (Light_M::iterator lightIter = this->lights.begin();
-       lightIter != this->lights.end(); lightIter++)
+       lightIter != this->lights.end(); ++lightIter)
   {
     delete lightIter->second;
   }
@@ -386,7 +386,7 @@ void Scene::SetBackgroundColor(const common::Color &color)
   elem->GetAttribute("rgba")->Set(color);
 
   std::vector<CameraPtr>::iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
     if ((*iter)->GetViewport())
       (*iter)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
@@ -394,7 +394,7 @@ void Scene::SetBackgroundColor(const common::Color &color)
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->userCameras.begin();
-       iter2 != this->userCameras.end(); iter2++)
+       iter2 != this->userCameras.end(); ++iter2)
   {
     if ((*iter2)->GetViewport())
       (*iter2)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
@@ -475,7 +475,7 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 {
   CameraPtr result;
   std::vector<CameraPtr>::const_iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       result = *iter;
@@ -615,7 +615,7 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
   Ogre::Entity *closestEntity = NULL;
 
-  for (iter = result.begin(); iter != result.end(); iter++)
+  for (iter = result.begin(); iter != result.end(); ++iter)
   {
     // is the result a MovableObject
     if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
@@ -701,7 +701,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
   Ogre::Entity *closestEntity = NULL;
 
-  for (iter = result.begin(); iter != result.end(); iter++)
+  for (iter = result.begin(); iter != result.end(); ++iter)
   {
     // is the result a MovableObject
     if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
@@ -1050,7 +1050,6 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
-  std::string sceneName = _msg->name() + "::";
   std::string modelName, linkName;
   for (int i = 0; i < _msg->model_size(); i++)
   {
@@ -1194,7 +1193,7 @@ void Scene::PreRender()
   SensorMsgs_L::iterator sensorIter;
 
   for (sensorIter = this->sensorMsgs.begin();
-       sensorIter != this->sensorMsgs.end(); sensorIter++)
+       sensorIter != this->sensorMsgs.end(); ++sensorIter)
   {
     this->ProcessSensorMsg(*sensorIter);
   }
@@ -1202,7 +1201,7 @@ void Scene::PreRender()
 
   // Process the scene messages. DO THIS FIRST
   for (sIter = this->sceneMsgs.begin();
-       sIter != this->sceneMsgs.end(); sIter++)
+       sIter != this->sceneMsgs.end(); ++sIter)
   {
     this->ProcessSceneMsg(*sIter);
   }
@@ -1211,7 +1210,7 @@ void Scene::PreRender()
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
   for (vIter = this->visualMsgs.begin();
-       vIter != this->visualMsgs.end(); vIter++)
+       vIter != this->visualMsgs.end(); ++vIter)
   {
     this->ProcessVisualMsg(*vIter);
   }
@@ -1219,7 +1218,7 @@ void Scene::PreRender()
 
   // Process the light messages
   for (lIter =  this->lightMsgs.begin();
-       lIter != this->lightMsgs.end(); lIter++)
+       lIter != this->lightMsgs.end(); ++lIter)
   {
     this->ProcessLightMsg(*lIter);
   }
@@ -1227,7 +1226,7 @@ void Scene::PreRender()
 
   // Process the joint messages
   for (jIter =  this->jointMsgs.begin();
-       jIter != this->jointMsgs.end(); jIter++)
+       jIter != this->jointMsgs.end(); ++jIter)
   {
     this->ProcessJointMsg(*jIter);
   }
@@ -1424,7 +1423,7 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   PoseMsgs_L::iterator iter;
 
   // Find an old model message, and remove them
-  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
   {
     if ((*iter)->name() == _msg->name())
     {

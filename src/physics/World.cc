@@ -321,7 +321,7 @@ void World::Update()
     this->physicsEngine->UpdateCollision();
 
     for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
-        iter != this->dirtyPoses.end(); iter++)
+        iter != this->dirtyPoses.end(); ++iter)
     {
       (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
@@ -514,7 +514,7 @@ void World::Reset(bool _resetTime)
   this->rootElement->Reset();
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); iter++)
+       iter != this->plugins.end(); ++iter)
   {
     (*iter)->Reset();
   }
@@ -754,7 +754,7 @@ void World::ProcessEntityMsgs()
 
   std::list<std::string>::iterator iter;
   for (iter = this->deleteEntity.begin();
-       iter != this->deleteEntity.end(); iter++)
+       iter != this->deleteEntity.end(); ++iter)
   {
     this->rootElement->RemoveChild((*iter));
   }
@@ -770,7 +770,7 @@ void World::ProcessRequestMsgs()
 
   std::list<msgs::Request>::iterator iter;
   for (iter = this->requestMsgs.begin();
-       iter != this->requestMsgs.end(); iter++)
+       iter != this->requestMsgs.end(); ++iter)
   {
     bool send = true;
     response.set_id((*iter).id());
@@ -878,7 +878,7 @@ void World::ProcessModelMsgs()
   std::list<msgs::Model>::iterator iter;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (iter = this->modelMsgs.begin();
-       iter != this->modelMsgs.end(); iter++)
+       iter != this->modelMsgs.end(); ++iter)
   {
     ModelPtr model;
     if ((*iter).has_id())
@@ -908,7 +908,7 @@ void World::ProcessFactoryMsgs()
   std::list<msgs::Factory>::iterator iter;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (iter = this->factoryMsgs.begin();
-       iter != this->factoryMsgs.end(); iter++)
+       iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
     sdf::initFile("/sdf/gazebo.sdf", factorySDF);

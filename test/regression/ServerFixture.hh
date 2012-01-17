@@ -18,6 +18,11 @@ class ServerFixture : public testing::Test
                this->receiveMutex = new boost::mutex();
                this->server = NULL;
                this->serverRunning = false;
+               this->paused = false;
+               this->percentRealTime = 0;
+               this->gotImage = 0;
+               this->imgData = NULL;
+               this->serverThread = NULL;
              }
 
   protected: virtual void TearDown()
@@ -45,8 +50,7 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename)
              {
-               if (this->server)
-                 delete this->server;
+               delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread

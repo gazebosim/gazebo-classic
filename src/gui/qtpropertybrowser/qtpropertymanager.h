@@ -161,6 +161,7 @@ class QtIntPropertyManagerPrivate
     QtIntPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtIntPropertyManager)
 public:
+      QtIntPropertyManagerPrivate() : q_ptr(NULL) {}
 
     struct Data
     {
@@ -210,7 +211,7 @@ class QtBoolPropertyManagerPrivate
     QtBoolPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtBoolPropertyManager)
 public:
-
+      QtBoolPropertyManagerPrivate() :q_ptr(NULL) {}
     QMap<const QtProperty *, bool> m_values;
 };
 
@@ -256,7 +257,7 @@ class QtDoublePropertyManagerPrivate
     QtDoublePropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtDoublePropertyManager)
 public:
-
+      QtDoublePropertyManagerPrivate() : q_ptr(NULL) {}
     struct Data
     {
         Data() : val(0), minVal(-INT_MAX), maxVal(INT_MAX), singleStep(1), decimals(2) {}
@@ -311,6 +312,7 @@ class QtStringPropertyManagerPrivate
     QtStringPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtStringPropertyManager)
 public:
+      QtStringPropertyManagerPrivate() : q_ptr(NULL) {}
 
     struct Data
     {
@@ -360,7 +362,7 @@ class QtDatePropertyManagerPrivate
     QtDatePropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtDatePropertyManager)
 public:
-
+      QtDatePropertyManagerPrivate() : q_ptr(NULL) {}
     struct Data
     {
         Data() : val(QDate::currentDate()), minVal(QDate(1752, 9, 14)),
@@ -408,7 +410,7 @@ class QtTimePropertyManagerPrivate
     QtTimePropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtTimePropertyManager)
 public:
-
+      QtTimePropertyManagerPrivate() : q_ptr(NULL) {}
     QString m_format;
 
     typedef QMap<const QtProperty *, QTime> PropertyValueMap;
@@ -445,7 +447,7 @@ class QtDateTimePropertyManagerPrivate
     QtDateTimePropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtDateTimePropertyManager)
 public:
-
+      QtDateTimePropertyManagerPrivate() : q_ptr(NULL) {}
     QString m_format;
 
     typedef QMap<const QtProperty *, QDateTime> PropertyValueMap;
@@ -482,7 +484,7 @@ class QtKeySequencePropertyManagerPrivate
     QtKeySequencePropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtKeySequencePropertyManager)
 public:
-
+      QtKeySequencePropertyManagerPrivate() : q_ptr(NULL) {}
     QString m_format;
 
     typedef QMap<const QtProperty *, QKeySequence> PropertyValueMap;
@@ -519,7 +521,7 @@ class QtCharPropertyManagerPrivate
     QtCharPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtCharPropertyManager)
 public:
-
+      QtCharPropertyManagerPrivate() : q_ptr(NULL) {}
     typedef QMap<const QtProperty *, QChar> PropertyValueMap;
     PropertyValueMap m_values;
 };
@@ -614,7 +616,8 @@ class QtPointPropertyManagerPrivate
     QtPointPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtPointPropertyManager)
 public:
-
+      QtPointPropertyManagerPrivate()
+        : q_ptr(NULL), m_intPropertyManager(NULL) {}
     void slotIntChanged(QtProperty *property, int value);
     void slotPropertyDestroyed(QtProperty *property);
 
@@ -666,7 +669,8 @@ class QtPointFPropertyManagerPrivate
     QtPointFPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtPointFPropertyManager)
 public:
-
+      QtPointFPropertyManagerPrivate()
+        : q_ptr(NULL), m_doublePropertyManager(NULL) {}
     struct Data
     {
         Data() : decimals(2) {}
@@ -729,7 +733,8 @@ class QtSizePropertyManagerPrivate
     QtSizePropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtSizePropertyManager)
 public:
-
+      QtSizePropertyManagerPrivate()
+        : q_ptr(NULL), m_intPropertyManager(NULL) {}
     void slotIntChanged(QtProperty *property, int value);
     void slotPropertyDestroyed(QtProperty *property);
     void setValue(QtProperty *property, const QSize &val);
@@ -803,7 +808,8 @@ class QtSizeFPropertyManagerPrivate
     QtSizeFPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtSizeFPropertyManager)
 public:
-
+      QtSizeFPropertyManagerPrivate()
+        : q_ptr(NULL), m_doublePropertyManager(NULL) {}
     void slotDoubleChanged(QtProperty *property, double value);
     void slotPropertyDestroyed(QtProperty *property);
     void setValue(QtProperty *property, const QSizeF &val);
@@ -872,6 +878,8 @@ class QtRectPropertyManagerPrivate
     QtRectPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtRectPropertyManager)
 public:
+      QtRectPropertyManagerPrivate()
+        : q_ptr(NULL), m_intPropertyManager(NULL) {}
 
     void slotIntChanged(QtProperty *property, int value);
     void slotPropertyDestroyed(QtProperty *property);
@@ -940,7 +948,8 @@ class QtRectFPropertyManagerPrivate
     QtRectFPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtRectFPropertyManager)
 public:
-
+      QtRectFPropertyManagerPrivate()
+        : q_ptr(NULL), m_doublePropertyManager(NULL) {}
     void slotDoubleChanged(QtProperty *property, double value);
     void slotPropertyDestroyed(QtProperty *property);
     void setConstraint(QtProperty *property, const QRectF &constraint, const QRectF &val);
@@ -1006,6 +1015,7 @@ class QtEnumPropertyManagerPrivate
     QtEnumPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtEnumPropertyManager)
 public:
+      QtEnumPropertyManagerPrivate() : q_ptr(NULL) {}
 
     struct Data
     {
@@ -1056,7 +1066,8 @@ class QtFlagPropertyManagerPrivate
     QtFlagPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtFlagPropertyManager)
 public:
-
+      QtFlagPropertyManagerPrivate()
+        : q_ptr(NULL), m_boolPropertyManager(NULL) {}
     void slotBoolChanged(QtProperty *property, bool value);
     void slotPropertyDestroyed(QtProperty *property);
 
@@ -1252,7 +1263,8 @@ class QtColorPropertyManagerPrivate
     QtColorPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtColorPropertyManager)
 public:
-
+      QtColorPropertyManagerPrivate()
+        : q_ptr(NULL), m_intPropertyManager(NULL) {}
     void slotIntChanged(QtProperty *property, int value);
     void slotPropertyDestroyed(QtProperty *property);
 
@@ -1305,6 +1317,7 @@ class QtCursorPropertyManagerPrivate
     QtCursorPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtCursorPropertyManager)
 public:
+      QtCursorPropertyManagerPrivate() : q_ptr(NULL) {}
     typedef QMap<const QtProperty *, QCursor> PropertyValueMap;
     PropertyValueMap m_values;
 };

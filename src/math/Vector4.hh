@@ -65,7 +65,7 @@ namespace gazebo
                        double _w = 0);
 
       /// \brief Equal operator
-      public: const Vector4 &operator =(const Vector4 &pt);
+      public: Vector4 &operator =(const Vector4 &pt);
 
       /// \brief Equal operator
       public: const Vector4 &operator =(double value);

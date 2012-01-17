@@ -80,6 +80,7 @@ class QtGroupBoxPropertyBrowserPrivate
     QtGroupBoxPropertyBrowser *q_ptr;
     Q_DECLARE_PUBLIC(QtGroupBoxPropertyBrowser)
 public:
+      QtGroupBoxPropertyBrowserPrivate() : q_ptr(NULL), m_mainLayout(NULL) {}
 
     void init(QWidget *parent);
 

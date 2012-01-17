@@ -116,7 +116,7 @@ Time Time::MSleep(unsigned int _ms)
 }
 
 // Equal opeators
-const Time &Time::operator =(const struct timeval &tv)
+Time &Time::operator =(const struct timeval &tv)
 {
   this->sec = tv.tv_sec;
   this->nsec = tv.tv_usec*1000;
@@ -124,7 +124,7 @@ const Time &Time::operator =(const struct timeval &tv)
   return *this;
 }
 
-const Time &Time::operator =(const Time &time)
+Time &Time::operator =(const Time &time)
 {
   this->sec = time.sec;
   this->nsec = time.nsec;

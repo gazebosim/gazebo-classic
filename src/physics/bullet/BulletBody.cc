@@ -17,25 +17,21 @@
 /* Desc: Link class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id: Link.cc 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #include <sstream>
 
-#include "common/XMLConfig.hh"
 #include "common/Console.hh"
 
 #include "physics/Collision.hh"
-#include "BulletCollision.hh"
 #include "BulletMotionState.hh"
 #include "math/Quaternion.hh"
 #include "common/Exception.hh"
 #include "BulletPhysics.hh"
 #include "PhysicsEngine.hh"
-#include "Mass.hh"
 #include "rendering/Visual.hh"
 
-#include "BulletLink.hh"
+#include "BulletBody.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -65,8 +61,7 @@ BulletLink::BulletLink(Entity *_parent)
 // Destructor
 BulletLink::~BulletLink()
 {
-  if (this->rigidLink)
-    delete this->rigidLink;
+  delete this->rigidLink;
 }
 
 //////////////////////////////////////////////////
@@ -215,7 +210,7 @@ void BulletLink::SetGravityMode(bool _mode)
 /// Get the gravity mode
 bool BulletLink::GetGravityMode()
 {
-  bool result;
+  bool result = false;
   gzerr << "BulletLink::GetGravityMode not implemented, "
         << "returning spurious result\n";
 
@@ -418,7 +413,7 @@ void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
   unsigned int i;
 
   for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end();
-       iter++, i++)
+       ++iter, ++i)
   {
     if (iter->second == _collision)
       break;

@@ -291,6 +291,7 @@ bool QtPropertyEditorDelegate::eventFilter(QObject *object, QEvent *event)
 
 //  -------- QtTreePropertyBrowserPrivate implementation
 QtTreePropertyBrowserPrivate::QtTreePropertyBrowserPrivate() :
+    q_ptr(NULL),
     m_treeWidget(0),
     m_headerVisible(true),
     m_resizeMode(QtTreePropertyBrowser::Stretch),

@@ -30,6 +30,4 @@ class GLWindow : public Fl_Gl_Window
   public: void resize(int x, int y, int w, int h);
 };
 
-}
 #endif
-

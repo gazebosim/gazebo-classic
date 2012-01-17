@@ -77,7 +77,8 @@ class QtVariantPropertyPrivate
 {
     QtVariantProperty *q_ptr;
 public:
-    QtVariantPropertyPrivate(QtVariantPropertyManager *m) : manager(m) {}
+    QtVariantPropertyPrivate(QtVariantPropertyManager *m)
+      : q_ptr(NULL), manager(m) {}
 
     QtVariantPropertyManager *manager;
 };
@@ -274,6 +275,22 @@ class QtVariantEditorFactoryPrivate
     QtVariantEditorFactory *q_ptr;
     Q_DECLARE_PUBLIC(QtVariantEditorFactory)
 public:
+      QtVariantEditorFactoryPrivate()
+        : q_ptr(NULL),
+          m_spinBoxFactory(NULL),
+          m_doubleSpinBoxFactory(NULL),
+          m_checkBoxFactory(NULL),
+          m_lineEditFactory(NULL),
+          m_dateEditFactory(NULL),
+          m_timeEditFactory(NULL),
+          m_dateTimeEditFactory(NULL),
+          m_keySequenceEditorFactory(NULL),
+          m_charEditorFactory(NULL),
+          m_comboBoxFactory(NULL),
+          m_cursorEditorFactory(NULL),
+          m_colorEditorFactory(NULL),
+          m_fontEditorFactory(NULL) {}
+
 
     QtSpinBoxFactory           *m_spinBoxFactory;
     QtDoubleSpinBoxFactory     *m_doubleSpinBoxFactory;

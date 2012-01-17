@@ -90,7 +90,7 @@ void Light::Load()
   {
     this->light = this->scene->GetManager()->createLight(this->GetName());
   }
-  catch (Ogre::Exception e)
+  catch (Ogre::Exception &e)
   {
     gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
         "Unable to create a light");

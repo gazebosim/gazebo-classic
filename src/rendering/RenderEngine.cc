@@ -104,7 +104,7 @@ void RenderEngine::Load()
   {
     this->root = new Ogre::Root();
   }
-  catch (Ogre::Exception e)
+  catch (Ogre::Exception &e)
   {
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
   }
@@ -151,7 +151,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
 {
   std::vector<ScenePtr>::iterator iter;
 
-  for (iter = this->scenes.begin(); iter != this->scenes.end(); iter++)
+  for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
     if ((*iter)->GetName() == _name)
       break;
 
@@ -171,7 +171,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
 {
   std::vector<ScenePtr>::iterator iter;
 
-  for (iter = this->scenes.begin(); iter != this->scenes.end(); iter++)
+  for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
     if ((*iter)->GetName() == _name)
       return (*iter);
 
@@ -295,7 +295,10 @@ void RenderEngine::Fini()
     {
       delete this->root;
     }
-    catch (...) {}
+    catch (...) 
+    {
+      ;
+    }
   }
   this->root = NULL;
 
@@ -350,14 +353,14 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
     plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
-    for (piter = plugins.begin(); piter!= plugins.end(); piter++)
+    for (piter = plugins.begin(); piter!= plugins.end(); ++piter)
     {
       try
       {
         // Load the plugin into OGRE
         this->root->loadPlugin(*piter);
       }
-      catch (Ogre::Exception e)
+      catch (Ogre::Exception &e)
       {
         std::string description("Unable to load Ogre Plugin[");
         description.append(*piter);
@@ -392,7 +395,7 @@ void RenderEngine::SetupResources()
   std::list<std::string> paths =
     common::SystemPaths::Instance()->GetGazeboPaths();
 
-  for (iter = paths.begin(); iter != paths.end(); iter++)
+  for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
     DIR *dir;
     if ((dir = opendir((*iter).c_str())) == NULL)
@@ -430,7 +433,7 @@ void RenderEngine::SetupResources()
     archNames.push_back(
         std::make_pair((*iter)+"/Media/gui/animations", "Animations"));
 
-    for (aiter = archNames.begin(); aiter!= archNames.end(); aiter++)
+    for (aiter = archNames.begin(); aiter!= archNames.end(); ++aiter)
     {
       try
       {
@@ -471,7 +474,8 @@ void RenderEngine::SetupRenderSystem()
     renderSys = rsList->at(c);
     c++;
   }
-  while (renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
+  while (renderSys &&
+         renderSys->getName().compare("OpenGL Rendering Subsystem") != 0);
 
   if (renderSys == NULL)
     gzthrow("unable to find rendering system");

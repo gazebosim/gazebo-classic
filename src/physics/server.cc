@@ -106,7 +106,7 @@ void Load()
     {
       gazebo::physics::load_world(world, worldElem);
     }
-    catch (gazebo::common::Exception e)
+    catch (gazebo::common::Exception &e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }

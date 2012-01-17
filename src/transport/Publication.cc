@@ -56,7 +56,7 @@ void Publication::AddSubscription(const NodePtr &_node)
 
     std::vector<PublisherPtr>::iterator pubIter;
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
-         pubIter++)
+         ++pubIter)
     {
       if ((*pubIter)->GetLatching() && !(*pubIter)->GetPrevMsg().empty())
       {
@@ -77,7 +77,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
 
     std::vector<PublisherPtr>::iterator pubIter;
     for (pubIter = this->publishers.begin(); pubIter != this->publishers.end();
-         pubIter++)
+         ++pubIter)
     {
       if ((*pubIter)->GetLatching())
       {
@@ -94,7 +94,7 @@ void Publication::AddTransport(const PublicationTransportPtr &_publink)
 
   // Find an existing publication transport
   std::list<PublicationTransportPtr>::iterator iter;
-  for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
+  for (iter = this->transports.begin(); iter != this->transports.end(); ++iter)
   {
     if ((*iter)->GetTopic() == _publink->GetTopic() &&
         (*iter)->GetMsgType() == _publink->GetMsgType() &&
@@ -117,7 +117,7 @@ void Publication::AddTransport(const PublicationTransportPtr &_publink)
 bool Publication::HasTransport(const std::string &_host, unsigned int _port)
 {
   std::list<PublicationTransportPtr>::iterator iter;
-  for (iter = this->transports.begin(); iter != this->transports.end(); iter++)
+  for (iter = this->transports.begin(); iter != this->transports.end(); ++iter)
   {
     if ((*iter)->GetConnection()->GetRemoteAddress() == _host &&
          (*iter)->GetConnection()->GetRemotePort() == _port)
@@ -144,7 +144,7 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
       this->transports.erase(iter++);
     }
     else
-      iter++;
+      ++iter;
   }
 }
 
@@ -152,7 +152,7 @@ void Publication::RemoveSubscription(const NodePtr &_node)
 {
   std::list<NodePtr>::iterator iter;
 
-  for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
+  for (iter = this->nodes.begin(); iter != this->nodes.end(); ++iter)
   {
     if ((*iter)->GetId() == _node->GetId())
     {
@@ -173,7 +173,7 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 {
   std::list<CallbackHelperPtr>::iterator iter;
 
-  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
+  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); ++iter)
   {
     if (*iter == callback)
     {
@@ -208,7 +208,7 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
       this->callbacks.erase(iter++);
     }
     else
-      iter++;
+      ++iter;
   }
 
   // If no more subscribers, then disconnect from all publishers
@@ -227,7 +227,7 @@ void Publication::Publish(const std::string &_data)
   while (iter != this->nodes.end())
   {
     if ((*iter)->HandleData(this->topic, _data))
-      iter++;
+      ++iter;
     else
       this->nodes.erase(iter++);
   }
@@ -237,7 +237,7 @@ void Publication::Publish(const std::string &_data)
   while (cbIter != this->callbacks.end())
   {
     if ((*cbIter)->HandleData(_data))
-      cbIter++;
+      ++cbIter;
     else
       this->callbacks.erase(cbIter++);
   }
@@ -253,7 +253,7 @@ void Publication::LocalPublish(const std::string &data)
   while (iter != this->nodes.end())
   {
     if ((*iter)->HandleData(this->topic, data))
-      iter++;
+      ++iter;
     else
       iter = this->nodes.erase(iter);
   }
@@ -265,12 +265,12 @@ void Publication::LocalPublish(const std::string &data)
     if ((*cbIter)->IsLocal())
     {
       if ((*cbIter)->HandleData(data))
-        cbIter++;
+        ++cbIter;
       else
         cbIter = this->callbacks.erase(cbIter);
     }
     else
-      cbIter++;
+      ++cbIter;
   }
 }
 
@@ -286,7 +286,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
   while (iter != this->nodes.end())
   {
     if ((*iter)->HandleData(this->topic, data))
-      iter++;
+      ++iter;
     else
       this->nodes.erase(iter++);
   }
@@ -296,7 +296,7 @@ void Publication::Publish(const google::protobuf::Message &_msg,
   while (cbIter != this->callbacks.end())
   {
     if ((*cbIter)->HandleData(data))
-      cbIter++;
+      ++cbIter;
     else
     {
       this->callbacks.erase(cbIter++);
@@ -335,7 +335,7 @@ unsigned int Publication::GetRemoteSubscriptionCount()
   unsigned int count = 0;
 
   std::list< CallbackHelperPtr >::iterator iter;
-  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
+  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); ++iter)
   {
     if (!(*iter)->IsLocal())
       count++;
@@ -363,7 +363,7 @@ void Publication::AddPublisher(PublisherPtr _pub)
   this->publishers.push_back(_pub);
 }
 
-void Publication::RemovePublisher()
+void Publication::RemovePublisher() const
 {
 }
 

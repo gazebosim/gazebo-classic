@@ -68,9 +68,7 @@ MovableText::MovableText()
 // Destructor
 MovableText::~MovableText()
 {
-  if (this->renderOp.vertexData)
-    delete this->renderOp.vertexData;
-
+  delete this->renderOp.vertexData;
   delete this->mutex;
   delete this->aabb;
 }
@@ -399,7 +397,7 @@ void MovableText::_setupGeometry()
     if (newLine)
     {
       len = 0.0;
-      for (std::string::iterator j = i; j != this->text.end(); j++)
+      for (std::string::iterator j = i; j != this->text.end(); ++j)
       {
         Ogre::Font::CodePoint character = *j;
         if (character == 0x000D // CR

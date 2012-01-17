@@ -57,7 +57,7 @@ bool Server::Load(const std::string &_filename)
   this->master->RunThread();
 
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
-       this->plugins.begin(); iter != this->plugins.end(); iter++)
+       this->plugins.begin(); iter != this->plugins.end(); ++iter)
   {
     (*iter)->Load();
   }
@@ -95,7 +95,7 @@ bool Server::Load(const std::string &_filename)
     {
       physics::load_world(world, worldElem);
     }
-    catch (common::Exception e)
+    catch (common::Exception &e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -177,7 +177,7 @@ void Server::Run()
 void Server::SetParams(const common::StrStr_M &params)
 {
   common::StrStr_M::const_iterator iter;
-  for (iter = params.begin(); iter != params.end(); iter++)
+  for (iter = params.begin(); iter != params.end(); ++iter)
   {
     if (iter->first == "pause")
     {
@@ -216,7 +216,7 @@ void Server::ProcessControlMsgs()
 {
   std::list<msgs::ServerControl>::iterator iter;
   for (iter = this->controlMsgs.begin();
-       iter != this->controlMsgs.end(); iter++)
+       iter != this->controlMsgs.end(); ++iter)
   {
     if ((*iter).has_save_world_name() && (*iter).has_save_filename())
     {

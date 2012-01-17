@@ -105,7 +105,7 @@ void Publisher::SendMessage()
   if (this->messages.size() > 0)
   {
     std::list<google::protobuf::Message *>::iterator iter;
-    for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
+    for (iter = this->messages.begin(); iter != this->messages.end(); ++iter)
     {
       // Send the latest message.
       TopicManager::Instance()->Publish(this->topic, **iter,

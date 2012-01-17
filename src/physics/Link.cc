@@ -160,7 +160,7 @@ void Link::Load(sdf::ElementPtr &_sdf)
 void Link::Init()
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
@@ -257,13 +257,13 @@ void Link::Fini()
   this->sensors.clear();
   this->inertial.reset();
 
-  for(iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  for(iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
   }
 
-  for(iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); iter++)
+  for(iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
@@ -383,7 +383,7 @@ void Link::SetLaserRetro(float _retro)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
       boost::shared_static_cast<Collision>(*iter)->SetLaserRetro(_retro);
@@ -437,7 +437,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 {
   CollisionPtr result;
   Base_V::const_iterator biter;
-  for (biter = this->children.begin(); biter != this->children.end(); biter++)
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
   {
     if ((*biter)->GetName() == _name)
     {
@@ -528,7 +528,7 @@ math::Box Link::GetBoundingBox() const
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(0, 0, 0);
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
       box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
@@ -602,7 +602,7 @@ void Link::FillLinkMsg(msgs::Link &_msg)
   }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); iter++)
+       iter != this->sensors.end(); ++iter)
   {
     sensors::SensorPtr sensor = sensors::get_sensor(*iter);
     if (sensor)

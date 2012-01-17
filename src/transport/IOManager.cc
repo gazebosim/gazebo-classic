@@ -33,12 +33,10 @@ IOManager::~IOManager()
 {
   this->Stop();
 
-  if (this->work)
-    delete this->work;
+  delete this->work;
   this->work = NULL;
 
-  if (this->io_service)
-    delete this->io_service;
+  delete this->io_service;
   this->io_service = NULL;
 }
 

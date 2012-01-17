@@ -17,17 +17,11 @@
 /* Desc: A ray
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #include "Link.hh"
-#include "BulletRayCollision.hh"
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

@@ -144,7 +144,7 @@ void Entity::SetStatic(const bool &_s)
 
   this->isStatic = _s ;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
     EntityPtr e = boost::shared_dynamic_cast<Entity>(*iter);
     if (e)
@@ -259,7 +259,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->childrenEnd; iter++)
+            iter != this->childrenEnd; ++iter)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -290,7 +290,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
   // force an update of all children
   // update all children pose, moving them with the model.
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; iter++)
+       iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
@@ -398,7 +398,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (_updateChildren || this->IsStatic())
   {
     for  (Base_V::iterator iter = this->children.begin();
-          iter != this->childrenEnd; iter++)
+          iter != this->childrenEnd; ++iter)
     {
       if ((*iter)->HasType(LINK))
         ((Link*)(*iter).get())->OnPoseChange();
@@ -540,7 +540,7 @@ math::Box Entity::GetCollisionBoundingBox() const
 {
   math::Box box;
   for (Base_V::const_iterator iter = this->children.begin();
-       iter != this->children.end(); iter++)
+       iter != this->children.end(); ++iter)
   {
     box += this->GetCollisionBoundingBoxHelper(*iter);
   }

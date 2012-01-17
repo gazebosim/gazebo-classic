@@ -90,7 +90,7 @@ void ODELink::Init()
   {
     math::Vector3 cog_vec = this->inertial->GetCoG();
     Base_V::iterator iter;
-    for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(Base::COLLISION))
       {
@@ -134,7 +134,7 @@ void ODELink::MoveCallback(dBodyID _id)
 {
   const dReal *p;
   const dReal *r;
-  ODELink *self = (ODELink*)(dBodyGetData(_id));
+  ODELink *self = static_cast<ODELink*>(dBodyGetData(_id));
   //self->poseMutex->lock();
 
   p = dBodyGetPosition(_id);

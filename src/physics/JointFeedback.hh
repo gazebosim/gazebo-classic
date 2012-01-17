@@ -34,7 +34,7 @@ namespace gazebo
     class JointFeedback
     {
       /// \brief Operator =
-      public: const JointFeedback &operator =(const JointFeedback &f)
+      public: JointFeedback &operator =(const JointFeedback &f)
               {
                 this->body1Force = f.body1Force;
                 this->body2Force = f.body2Force;

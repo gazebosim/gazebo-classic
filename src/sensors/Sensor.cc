@@ -239,7 +239,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
 
   if (this->GetType() == "camera")
   {
-    CameraSensor *camSensor = (CameraSensor*)(this);
+    CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());

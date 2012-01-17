@@ -81,7 +81,7 @@ Quaternion::~Quaternion()
 
 //////////////////////////////////////////////////
 // Equal operator
-const Quaternion &Quaternion::operator =(const Quaternion &qt)
+Quaternion &Quaternion::operator =(const Quaternion &qt)
 {
   this->w = qt.w;
   this->x = qt.x;

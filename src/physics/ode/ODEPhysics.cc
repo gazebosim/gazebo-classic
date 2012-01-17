@@ -104,7 +104,7 @@ class Colliders_TBB
       this->engine->Collide(collision1, collision2, contactCollisions);
     }
 
-    delete contactCollisions;
+    delete [] contactCollisions;
   }
 
   private: std::vector< std::pair<ODECollision*, ODECollision*> > *colliders;
@@ -698,7 +698,7 @@ std::string ODEPhysics::GetStepType() const
 
 //////////////////////////////////////////////////
 /// Set the step type
-void ODEPhysics::SetStepType(const std::string _type)
+void ODEPhysics::SetStepType(const std::string &_type)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
   elem->GetAttribute("type")->Set(_type);
@@ -731,7 +731,7 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
   if (b1 && b2 && dAreConnectedExcluding(b1, b2, dJointTypeContact))
     return;
 
-  ODEPhysics *self = (ODEPhysics*) _data;
+  ODEPhysics *self = static_cast<ODEPhysics*>(_data);
 
   // Check if either are spaces
   if (dGeomIsSpace(_o1) || dGeomIsSpace(_o2))
@@ -753,14 +753,16 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
-      collision1 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(_o1));
+      collision1 =
+        static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o1)));
     else
-      collision1 = (ODECollision*) dGeomGetData(_o1);
+      collision1 = static_cast<ODECollision*>(dGeomGetData(_o1));
 
     if (dGeomGetClass(_o2) == dGeomTransformClass)
-      collision2 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(_o2));
+      collision2 =
+        static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o2)));
     else
-      collision2 = (ODECollision*) dGeomGetData(_o2);
+      collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
 
     if (collision1 && collision2)
     {

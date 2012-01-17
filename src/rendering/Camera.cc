@@ -105,17 +105,8 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 // Destructor
 Camera::~Camera()
 {
-  if (this->saveFrameBuffer)
-    delete [] this->saveFrameBuffer;
-
-  if (this->bayerFrameBuffer)
-    delete [] this->bayerFrameBuffer;
-
-  //if(this->sceneNode)
-    //this->sceneNode->removeAndDestroyAllChildren();
-  //if (this->sceneNode->getParentSceneNode())
-  //    this->sceneNode->getParentSceneNode()->removeAndDestroyChild(
-  //        this->sceneNode->getName());
+  delete [] this->saveFrameBuffer;
+  delete [] this->bayerFrameBuffer;
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
@@ -276,7 +267,7 @@ void Camera::Update()
     if (erase)
       iter = this->requests.erase(iter);
     else
-      iter++;
+      ++iter;
   }
 }
 
@@ -836,6 +827,7 @@ void Camera::SaveFrame()
                   this->GetImageFormat(), tmp);
 
   this->saveCount++;
+  closedir(dir);
 }
 
 void Camera::SaveFrame(const unsigned char *_image,

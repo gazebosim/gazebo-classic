@@ -22,8 +22,6 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletLink.hh"
-#include "common/XMLConfig.hh"
 #include "BulletPhysics.hh"
 #include "BulletHinge2Joint.hh"
 

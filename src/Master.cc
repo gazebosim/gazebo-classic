@@ -79,7 +79,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   msgs::String_V namespacesMsg;
   std::list<std::string>::iterator iter;
   for (iter = this->worldNames.begin();
-       iter != this->worldNames.end(); iter++)
+       iter != this->worldNames.end(); ++iter)
   {
     namespacesMsg.add_data(*iter);
   }
@@ -90,7 +90,7 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   msgs::Publishers publishersMsg;
   PubList::iterator pubiter;
   for (pubiter = this->publishers.begin();
-       pubiter != this->publishers.end(); pubiter++)
+       pubiter != this->publishers.end(); ++pubiter)
   {
     msgs::Publish *pub = publishersMsg.add_publisher();
     pub->CopyFrom(pubiter->first);
@@ -171,7 +171,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       this->connectionMutex->lock();
       Connection_M::iterator iter2;
       for (iter2 = this->connections.begin();
-          iter2 != this->connections.end(); iter2++)
+          iter2 != this->connections.end(); ++iter2)
       {
         iter2->second->EnqueueMsg(
             msgs::Package("topic_namespace_add", worldNameMsg));
@@ -189,7 +189,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     this->connectionMutex->lock();
     Connection_M::iterator iter2;
     for (iter2 = this->connections.begin();
-         iter2 != this->connections.end(); iter2++)
+         iter2 != this->connections.end(); ++iter2)
     {
       iter2->second->EnqueueMsg(msgs::Package("publisher_add", pub));
     }
@@ -201,7 +201,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
     // Find all subscribers of the topic
     for (iter = this->subscribers.begin();
-        iter != this->subscribers.end(); iter++)
+        iter != this->subscribers.end(); ++iter)
     {
       if (iter->first.topic() == pub.topic())
       {
@@ -232,7 +232,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
     // Find all publishers of the topic
     for (iter = this->publishers.begin();
-        iter != this->publishers.end(); iter++)
+        iter != this->publishers.end(); ++iter)
     {
       if (iter->first.topic() == sub.topic())
       {
@@ -250,7 +250,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       msgs::Publishers msg;
       PubList::iterator iter;
       for (iter = this->publishers.begin();
-          iter != this->publishers.end(); iter++)
+          iter != this->publishers.end(); ++iter)
       {
         msgs::Publish *pub = msg.add_publisher();
         pub->CopyFrom(iter->first);
@@ -268,7 +268,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
       // Find all publishers of the topic
       for (piter = this->publishers.begin();
-          piter != this->publishers.end(); piter++)
+          piter != this->publishers.end(); ++piter)
       {
         if (piter->first.topic() == req.data())
         {
@@ -279,7 +279,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
       // Find all subscribers of the topic
       for (siter = this->subscribers.begin();
-          siter != this->subscribers.end(); siter++)
+          siter != this->subscribers.end(); ++siter)
       {
         if (siter->first.topic() == req.data())
         {
@@ -295,7 +295,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
       msgs::String_V msg;
       std::list<std::string>::iterator iter;
       for (iter = this->worldNames.begin();
-          iter != this->worldNames.end(); iter++)
+          iter != this->worldNames.end(); ++iter)
       {
         msg.add_data(*iter);
       }
@@ -352,12 +352,12 @@ void Master::RunOnce()
     if (iter->second->IsOpen())
     {
       iter->second->ProcessWriteQueue();
-      iter++;
+      ++iter;
     }
     else
     {
       this->RemoveConnection(iter->first);
-      iter++;
+      ++iter;
     }
   }
   this->connectionMutex->unlock();
@@ -380,7 +380,7 @@ void Master::RemoveConnection(unsigned int _index)
     if ((*msgIter).first == _index)
       this->msgs.erase(msgIter++);
     else
-      msgIter++;
+      ++msgIter;
   }
   this->msgsMutex->unlock();
 
@@ -400,7 +400,7 @@ void Master::RemoveConnection(unsigned int _index)
         break;
       }
       else
-        pubIter++;
+        ++pubIter;
     }
   }
 
@@ -421,7 +421,7 @@ void Master::RemoveConnection(unsigned int _index)
         break;
       }
       else
-        subIter++;
+        ++subIter;
     }
   }
 
@@ -433,7 +433,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
   this->connectionMutex->lock();
   Connection_M::iterator iter2;
   for (iter2 = this->connections.begin();
-      iter2 != this->connections.end(); iter2++)
+      iter2 != this->connections.end(); ++iter2)
   {
     iter2->second->EnqueueMsg(msgs::Package("publisher_del", _pub));
   }
@@ -442,7 +442,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
   SubList::iterator iter;
   // Find all subscribers of the topic
   for (iter = this->subscribers.begin();
-      iter != this->subscribers.end(); iter++)
+      iter != this->subscribers.end(); ++iter)
   {
     if (iter->first.topic() == _pub.topic())
     {
@@ -460,7 +460,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
       pubIter = this->publishers.erase(pubIter);
     }
     else
-      pubIter++;
+      ++pubIter;
   }
 }
 
@@ -468,7 +468,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe _sub)
 {
   // Find all publishers of the topic, and remove the subscriptions
   for (PubList::iterator iter = this->publishers.begin();
-      iter != this->publishers.end(); iter++)
+      iter != this->publishers.end(); ++iter)
   {
     if (iter->first.topic() == _sub.topic())
     {
@@ -487,7 +487,7 @@ void Master::RemoveSubscriber(const msgs::Subscribe _sub)
       subiter = this->subscribers.erase(subiter);
     }
     else
-      subiter++;
+      ++subiter;
   }
 }
 
@@ -519,7 +519,7 @@ msgs::Publish Master::GetPublisher(const std::string &_topic)
 
   // Find all publishers of the topic
   for (iter = this->publishers.begin();
-       iter != this->publishers.end(); iter++)
+       iter != this->publishers.end(); ++iter)
   {
     if (iter->first.topic() == _topic)
     {
@@ -540,7 +540,7 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
 
   this->connectionMutex->lock();
   for (iter = this->connections.begin();
-       iter != this->connections.end(); iter++)
+       iter != this->connections.end(); ++iter)
   {
     if (iter->second->GetRemoteAddress() == _host &&
         iter->second->GetRemotePort() == _port)

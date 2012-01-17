@@ -81,7 +81,7 @@ void Vector2d::Set(double _x, double _y)
 
 //////////////////////////////////////////////////
 // Equals operator
-const Vector2d &Vector2d::operator =(const Vector2d &pt)
+Vector2d &Vector2d::operator =(const Vector2d &pt)
 {
   this->x = pt.x;
   this->y = pt.y;

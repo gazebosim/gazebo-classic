@@ -156,7 +156,7 @@ void Model::Init()
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
-       iter!= this->children.end(); iter++)
+       iter!= this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
       boost::shared_static_cast<Link>(*iter)->Init();
@@ -168,13 +168,13 @@ void Model::Init()
 
   // Initialize the joints last.
   for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); iter++)
+       iter != this->joints.end(); ++iter)
   {
     (*iter)->Init();
   }
 
   for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); iter++)
+       iter != this->plugins.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -208,9 +208,9 @@ void Model::Update()
       {
         this->jointAnimations.erase(iter);
       }
-      iter++;
+      ++iter;
     }
-    if (jointPositions.size() > 0)
+    if (!jointPositions.empty())
     {
       this->SetJointPositions(jointPositions);
     }
@@ -238,7 +238,7 @@ void Model::RemoveChild(EntityPtr _child)
     {
       done = true;
 
-      for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
+      for (jiter = this->joints.begin(); jiter != this->joints.end(); ++jiter)
       {
         if (!(*jiter))
           continue;
@@ -261,7 +261,7 @@ void Model::RemoveChild(EntityPtr _child)
   Entity::RemoveChild(_child->GetId());
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
 
@@ -322,13 +322,13 @@ void Model::Reset()
   Entity::Reset();
 
   for (Joint_V::iterator jiter = this->joints.begin();
-       jiter!= this->joints.end(); jiter++)
+       jiter!= this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
   }
 
   for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); iter++)
+       iter != this->plugins.end(); ++iter)
   {
     (*iter)->Reset();
   }
@@ -338,7 +338,7 @@ void Model::Reset()
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
   for (Base_V::iterator iter = this->children.begin();
-      iter != this->children.end(); iter++)
+      iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -354,7 +354,7 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -370,7 +370,7 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -386,7 +386,7 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -479,7 +479,7 @@ math::Box Model::GetBoundingBox() const
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -514,7 +514,7 @@ JointPtr Model::GetJoint(const std::string &_name)
   JointPtr result;
   Joint_V::iterator iter;
 
-  for (iter = this->joints.begin(); iter != this->joints.end(); iter++)
+  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
     {
@@ -544,7 +544,7 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
   else
   {
-    for (biter = this->children.begin(); biter != this->children.end(); biter++)
+    for (biter = this->children.begin(); biter != this->children.end(); ++biter)
     {
       if ((*biter)->GetName() == _name)
       {
@@ -614,7 +614,7 @@ void Model::SetGravityMode(const bool &_v)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -629,7 +629,7 @@ void Model::SetCollideMode(const std::string &_m)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -644,7 +644,7 @@ void Model::SetLaserRetro(const float &_retro)
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -717,7 +717,7 @@ void Model::SetJointPositions(
   //   for each joint update, recursively update all children
   Joint_V::iterator iter;
   std::map<std::string, double>::const_iterator jiter = _jointPositions.begin();
-  for (iter = this->joints.begin(); iter != this->joints.end() ; iter++)
+  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
     JointPtr joint = *iter;
 
@@ -800,7 +800,7 @@ void Model::SetJointPositions(
     }
   }
 
-  for (jiter = _jointPositions.begin(); jiter != _jointPositions.end(); jiter++)
+  for (jiter = _jointPositions.begin(); jiter != _jointPositions.end(); ++jiter)
   {
     JointPtr joint = this->GetJoint(jiter->first);
     joint->SetAngle(0, jiter->second);
@@ -837,7 +837,7 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
     this->GetAllChildrenBodies(bodies, _body1);
 
     for (std::vector<LinkPtr>::iterator biter = bodies.begin();
-        biter != bodies.end(); biter++)
+        biter != bodies.end(); ++biter)
     {
       this->RotateBodyAndChildren((*biter), _anchor, _axis, _dangle, false);
     }
@@ -869,7 +869,7 @@ void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
     this->GetAllChildrenBodies(bodies, _body1);
 
     for (std::vector<LinkPtr>::iterator biter = bodies.begin();
-        biter != bodies.end(); biter++)
+        biter != bodies.end(); ++biter)
     {
       this->SlideBodyAndChildren((*biter), _anchor, _axis, _dposition, false);
     }
@@ -929,7 +929,7 @@ void Model::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
 bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
 {
   for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin();
-       bit != _bodies.end(); bit++)
+       bit != _bodies.end(); ++bit)
   {
     if ((*bit)->GetName() == _body->GetName())
       return true;
@@ -945,7 +945,7 @@ void Model::SetJointAnimation(
 {
   this->updateMutex->lock();
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
-  for (iter = _anims.begin(); iter != _anims.end(); iter++)
+  for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
     this->jointAnimations[iter->first] = iter->second;
   }

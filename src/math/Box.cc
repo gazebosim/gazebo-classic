@@ -100,7 +100,7 @@ void Box::Merge(const Box &_box)
 
 //////////////////////////////////////////////////
 /// Equal operator
-const Box &Box::operator =(const Box &b)
+Box &Box::operator =(const Box &b)
 {
   this->max = b.max;
   this->min = b.min;

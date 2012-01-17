@@ -66,7 +66,7 @@ namespace gazebo
       public: bool HasTransport(const std::string &_host, unsigned int _port);
 
       public: void AddPublisher(PublisherPtr _pub);
-      public: void RemovePublisher();
+      public: void RemovePublisher() const;
 
       private: unsigned int id;
       private: static unsigned int idCounter;

@@ -29,7 +29,6 @@
 #include <math.h>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "GpsInterface.hh"
 
@@ -77,7 +76,7 @@ int GpsInterface::ProcessMessage(QueuePointer &respQueue, player_msghdr_t *hdr,
 void GpsInterface::Update()
 {
   player_gps_data_t data;
-  double e[3];
+  //double e[3];
   struct timeval ts;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);

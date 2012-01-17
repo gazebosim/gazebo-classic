@@ -15,7 +15,9 @@ namespace gazebo
     class SubscribeOptions
     {
       public: SubscribeOptions()
+              : latching(false)
               {}
+
       public: template<class M>
               void Init(const std::string &_topic,
                         NodePtr _node,

@@ -69,7 +69,7 @@ Mesh *STLLoader::Load(const std::string &filename)
 void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 {
   int count;
-  int ivert;
+  //int ivert;
   char *next;
   float r1;
   float r2;
@@ -113,7 +113,7 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
         gzerr << "Error..\n";
 
-      ivert = 0;
+      //ivert = 0;
 
       for (;;)
       {
@@ -134,7 +134,7 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         subMesh->AddNormal(normal);
         subMesh->AddIndex(subMesh->GetVertexIndex(vertex));
 
-        ivert = ivert + 1;
+        //ivert = ivert + 1;
       }
 
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)

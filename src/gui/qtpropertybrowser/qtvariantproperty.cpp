@@ -268,6 +268,11 @@ void QtVariantProperty::setAttribute(const QString &attribute, const QVariant &v
 
 
 QtVariantPropertyManagerPrivate::QtVariantPropertyManagerPrivate() :
+    q_ptr(NULL),
+    m_creatingProperty(false),
+    m_creatingSubProperties(false),
+    m_destroyingSubProperties(false),
+    m_propertyType(0),
     m_constraintAttribute(QLatin1String("constraint")),
     m_singleStepAttribute(QLatin1String("singleStep")),
     m_decimalsAttribute(QLatin1String("decimals")),

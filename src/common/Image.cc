@@ -90,7 +90,7 @@ int Image::Load(const std::string &_filename)
     pathNames.push_back((*iter)+"/Media/maps");
 
     for (std::vector<std::string>::iterator piter = pathNames.begin();
-         piter!= pathNames.end();piter++)
+         piter!= pathNames.end(); ++piter)
     {
       std::string path(*piter);
       DIR *dir = opendir(path.c_str());
@@ -187,24 +187,28 @@ void Image::GetData(unsigned char **_data, unsigned int &_count)
       scan_width, this->GetBPP(), redmask, greenmask, bluemask, true);
 
 #ifdef FREEIMAGE_COLORORDER
-  if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-    return;
+  if (FREEIMAGE_COLORORDER != FREEIMAGE_COLORORDER_RGB)
+  {
 #else
 #ifdef FREEIMAGE_BIGENDIAN
-  return;
-#endif
-#endif
-
-  int i = 0;
-  for (unsigned int y = 0; y<this->GetHeight(); y++)
+  if (false)
   {
-    for (unsigned int x = 0; x < this->GetWidth(); x++)
-    {
-      std::swap((*_data)[i], (*_data)[i+2]);
-      i += 4;
-    }
-  }
+#else
+  {
+#endif
+#endif
 
+    int i = 0;
+    for (unsigned int y = 0; y<this->GetHeight(); y++)
+    {
+      for (unsigned int x = 0; x < this->GetWidth(); x++)
+      {
+        std::swap((*_data)[i], (*_data)[i+2]);
+        i += 4;
+      }
+    }
+
+  }
 }
 
 //////////////////////////////////////////////////

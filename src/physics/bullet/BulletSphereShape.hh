@@ -30,25 +30,23 @@
 namespace gazebo
 {
   namespace physics
-{
-  /// \brief Bullet sphere collision
-  class BulletSphereShape : public SphereShape
   {
-    /// \brief Constructor
-    public: BulletSphereShape(Collision *parent) : SphereShape(parent) {}
-    /// \brief Destructor
-    public: virtual ~BulletSphereShape() {}
-    /// \brief Set the size
-    public: void SetSize(const double &radius)
-            {
-              SphereShape::SetSize(radius);
-              BulletCollision *bParent = (BulletCollision*)(this->parent);
-              bParent->SetCollisionShape(new btSphereShape(radius));
-            }
-  };
-}
-
-}
+    /// \brief Bullet sphere collision
+    class BulletSphereShape : public SphereShape
+    {
+      /// \brief Constructor
+      public: BulletSphereShape(Collision *parent) : SphereShape(parent) {}
+      /// \brief Destructor
+      public: virtual ~BulletSphereShape() {}
+      /// \brief Set the size
+      public: void SetSize(const double &radius)
+              {
+                SphereShape::SetSize(radius);
+                BulletCollision *bParent = (BulletCollision*)(this->parent);
+                bParent->SetCollisionShape(new btSphereShape(radius));
+              }
+    };
+  }
 }
 #endif
 

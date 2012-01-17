@@ -206,12 +206,14 @@ void Inertial::Rotate(const math::Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
-void Inertial::operator =(const Inertial &_inertial)
+Inertial &Inertial::operator=(const Inertial &_inertial)
 {
   this->mass = _inertial.mass;
   this->cog = _inertial.cog;
   this->principals = _inertial.principals;
   this->products = _inertial.products;
+
+  return *this;
 }
 
 //////////////////////////////////////////////////

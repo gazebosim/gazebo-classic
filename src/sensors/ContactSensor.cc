@@ -120,7 +120,7 @@ void ContactSensor::Init()
   Sensor::Init();
 
   std::vector<physics::CollisionPtr>::iterator iter;
-  for (iter = this->collisions.begin(); iter != this->collisions.end(); iter++)
+  for (iter = this->collisions.begin(); iter != this->collisions.end(); ++iter)
   {
     (*iter)->SetContactsEnabled(true);
   }
@@ -137,10 +137,10 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
 
     Contact_M::iterator iter;
     std::map<std::string, physics::Contact>::iterator iter2;
-    for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
+    for (iter = this->contacts.begin(); iter != this->contacts.end(); ++iter)
     {
       // Only transmit one contact
-      for (iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++)
+      for (iter2 = iter->second.begin(); iter2 != iter->second.end(); ++iter2)
       {
         msgs::Contact *contactMsg = msg.add_contact();
         contactMsg->set_collision1(

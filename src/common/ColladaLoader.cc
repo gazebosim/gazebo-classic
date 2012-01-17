@@ -597,7 +597,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   {
     for (unsigned int i = 0; i < inputs.size(); i++)
       values[i] = math::parseInt(strs[j+i]);
-    for (iter = inputs.begin(); iter != end; iter++)
+    for (iter = inputs.begin(); iter != end; ++iter)
     {
       if (iter->first == "VERTEX")
       {
@@ -668,7 +668,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
   TiXmlElement *inputXml = _xml->FirstChildElement("input");
-  std::string semantic = inputXml->Attribute("semantic");
+  //std::string semantic = inputXml->Attribute("semantic");
   std::string source = inputXml->Attribute("source");
 
   std::vector<math::Vector3> verts;

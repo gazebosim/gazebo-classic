@@ -34,7 +34,6 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "PTZInterface.hh"
 
@@ -187,7 +186,7 @@ void PTZInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     //std::ostringstream stream;
     std::cout << "Error subscribing to Gazebo PTZ Interface\n" << e << "\n";

@@ -122,7 +122,7 @@ void RTShaderSystem::RemoveScene(Scene *_scene)
     return;
 
   std::vector<Scene*>::iterator iter;
-  for (iter = this->scenes.begin(); iter != scenes.end(); iter++)
+  for (iter = this->scenes.begin(); iter != scenes.end(); ++iter)
     if ((*iter) == _scene)
       break;
 
@@ -196,7 +196,7 @@ void RTShaderSystem::UpdateShaders()
 
   this->entityMutex->lock();
   // Update all the shaders
-  for (iter = this->entities.begin(); iter != this->entities.end(); iter++)
+  for (iter = this->entities.begin(); iter != this->entities.end(); ++iter)
     this->GenerateShaders(*iter);
   this->entityMutex->unlock();
 }

@@ -26,10 +26,8 @@
 #include <GL/gl.h>
 #include <Ogre.h>
 
-#include "Controller.hh"
 #include "World.hh"
 #include "common/Exception.hh"
-#include "Body.hh"
 #include "rendering/Visual.hh"
 
 #include "SensorFactory.hh"

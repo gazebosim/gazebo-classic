@@ -124,7 +124,7 @@ namespace gazebo
       public: virtual std::string GetStepType() const;
 
       /// \brief Set the step type
-      public: virtual void SetStepType(const std::string type);
+      public: virtual void SetStepType(const std::string &_type);
 
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);

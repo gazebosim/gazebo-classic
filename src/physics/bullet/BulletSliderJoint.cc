@@ -23,15 +23,9 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletLink.hh"
-#include "common/XMLConfig.hh"
 #include "BulletSliderJoint.hh"
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

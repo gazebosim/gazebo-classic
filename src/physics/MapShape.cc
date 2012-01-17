@@ -48,11 +48,8 @@ MapShape::MapShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 MapShape::~MapShape()
 {
-  if (this->root)
-    delete this->root;
-
-  if (this->mapImage)
-    delete this->mapImage;
+  delete this->root;
+  delete this->mapImage;
   this->mapImage = NULL;
 }
 
@@ -231,7 +228,7 @@ void MapShape::ReduceTree(QuadNode *_node)
     if (_node->parent && count == _node->children.size())
     {
       for (iter = _node->children.begin();
-           iter != _node->children.end(); iter++)
+           iter != _node->children.end(); ++iter)
       {
         _node->parent->children.push_back(*iter);
         (*iter)->parent = _node->parent;
@@ -245,7 +242,7 @@ void MapShape::ReduceTree(QuadNode *_node)
       {
         done = true;
         for (iter = _node->children.begin();
-             iter != _node->children.end();iter++)
+             iter != _node->children.end(); ++iter)
         {
           if (!(*iter)->valid)
           {
@@ -302,7 +299,7 @@ void MapShape::Merge(QuadNode *_nodeA, QuadNode *_nodeB)
   else
   {
     for (iter = _nodeB->children.begin();
-         iter != _nodeB->children.end(); iter++)
+         iter != _nodeB->children.end(); ++iter)
     {
       if ((*iter)->valid)
       {

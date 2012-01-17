@@ -60,7 +60,7 @@ namespace gazebo
       public: Contact Clone() const;
 
       /// \brief Operator =
-      public: const Contact &operator =(const Contact &contact);
+      public: Contact &operator =(const Contact &contact);
 
       /// \brief Reset
       public: void Reset();

@@ -24,9 +24,7 @@
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"
-#include "BulletLink.hh"
 #include "BulletPhysics.hh"
-#include "common/XMLConfig.hh"
 #include "BulletHingeJoint.hh"
 
 using namespace gazebo;

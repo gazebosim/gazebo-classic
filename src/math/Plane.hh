@@ -51,7 +51,7 @@ namespace gazebo
 
       /// \brief Equal operator
       /// \param _p Plane values
-      public: const Plane &operator =(const Plane &_p);
+      public: Plane &operator =(const Plane &_p);
 
       /// \brief Plane normal
       public: Vector3 normal;

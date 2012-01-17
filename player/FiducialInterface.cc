@@ -31,7 +31,6 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "FiducialInterface.hh"
 
@@ -216,7 +215,7 @@ void FiducialInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     //std::ostringstream stream;
     std::cerr << "Error Subscribing to Gazebo Fiducial Interface\n"

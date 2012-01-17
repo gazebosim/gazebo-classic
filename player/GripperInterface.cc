@@ -33,7 +33,6 @@
 #include <math.h>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "GripperInterface.hh"
 
@@ -205,7 +204,7 @@ void GripperInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     std::cerr << "Error subscribing to Gazebo Gripper Interface\n"
       << e << "\n";

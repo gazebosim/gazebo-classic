@@ -81,10 +81,10 @@ namespace gazebo
       public: static Time MSleep(unsigned int _ms);
 
       /// \brief Equal opeator
-      public: const Time &operator =(const struct timeval &tv);
+      public: Time &operator =(const struct timeval &tv);
 
       /// \brief Equal opeator
-      public: const Time &operator =(const Time &time);
+      public: Time &operator =(const Time &time);
 
       /// \brief Addition operators
       public: Time operator +(const struct timeval &tv) const;

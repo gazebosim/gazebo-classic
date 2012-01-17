@@ -39,7 +39,7 @@ Mesh::Mesh()
 Mesh::~Mesh()
 {
   std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
     delete *iter;
   this->submeshes.clear();
 }
@@ -79,7 +79,7 @@ math::Vector3 Mesh::GetMax() const
   max.y = -FLT_MAX;
   max.z = -FLT_MAX;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -104,7 +104,7 @@ math::Vector3 Mesh::GetMin() const
   min.y = FLT_MAX;
   min.z = FLT_MAX;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -125,7 +125,7 @@ unsigned int Mesh::GetVertexCount() const
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -142,7 +142,7 @@ unsigned int Mesh::GetNormalCount() const
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -159,7 +159,7 @@ unsigned int Mesh::GetIndexCount() const
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -176,7 +176,7 @@ unsigned int Mesh::GetTexCoordCount() const
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -245,7 +245,7 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
   unsigned int vertCount = 0;
   unsigned int indCount = 0;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -266,7 +266,7 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
   unsigned int index = 0;
   unsigned int offset = 0;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -297,7 +297,7 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
 void Mesh::RecalculateNormals()
 {
   std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
     (*iter)->RecalculateNormals();
 }
 
@@ -517,7 +517,7 @@ math::Vector3 SubMesh::GetMax() const
   max.y = -FLT_MAX;
   max.z = -FLT_MAX;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
     max.x = std::max(max.x, (*iter).x);
     max.y = std::max(max.y, (*iter).y);
@@ -538,7 +538,7 @@ math::Vector3 SubMesh::GetMin() const
   min.y = FLT_MAX;
   min.z = FLT_MAX;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
     min.x = std::min(min.x, (*iter).x);
     min.y = std::min(min.y, (*iter).y);
@@ -609,7 +609,7 @@ bool SubMesh::HasVertex(const math::Vector3 &_v) const
 {
   std::vector< math::Vector3 >::const_iterator iter;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
     if (_v.Equal(*iter))
       return true;
 
@@ -622,7 +622,7 @@ unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 {
   std::vector< math::Vector3 >::const_iterator iter;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
     if (_v.Equal(*iter))
       return iter - this->vertices.begin();
 
@@ -650,7 +650,7 @@ void SubMesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
   *_indArr = new unsigned int[ this->indices.size() ];
 
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
-      viter++)
+      ++viter)
   {
     (*_vertArr)[i++] = (float)(*viter).x;
     (*_vertArr)[i++] = (float)(*viter).y;
@@ -658,7 +658,7 @@ void SubMesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
   }
 
   for (iiter = this->indices.begin(), i = 0;
-      iiter != this->indices.end(); iiter++)
+      iiter != this->indices.end(); ++iiter)
     (*_indArr)[i++] = (*iiter);
 }
 
@@ -715,7 +715,7 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
   _center.z = 0;
 
   std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
   {
     math::Vector3 max = (*siter)->GetMax();
     math::Vector3 min = (*siter)->GetMin();
@@ -736,7 +736,7 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
 void Mesh::SetMeshCenter(math::Vector3 _center)
 {
   std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
     (*siter)->SetSubMeshCenter(_center);
 }
 
@@ -745,7 +745,7 @@ void Mesh::SetMeshCenter(math::Vector3 _center)
 void Mesh::GenSphericalTexCoord(math::Vector3 _center)
 {
   std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
     (*siter)->GenSphericalTexCoord(_center);
 }
 
@@ -754,7 +754,7 @@ void Mesh::GenSphericalTexCoord(math::Vector3 _center)
 void SubMesh::SetSubMeshCenter(math::Vector3 _center)
 {
   std::vector<math::Vector3>::iterator viter;
-  for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
+  for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
   {
     // generate projected texture coordinates, projected from _center of aabb
     // get x, y, z for computing texture coordinate projections
@@ -769,7 +769,7 @@ void SubMesh::SetSubMeshCenter(math::Vector3 _center)
 void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
 {
   std::vector<math::Vector3>::const_iterator viter;
-  for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
+  for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
   {
     // generate projected texture coordinates, projected from center
     // get x, y, z for computing texture coordinate projections

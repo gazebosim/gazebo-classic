@@ -17,19 +17,12 @@
 /* Desc: The base Bullet joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 15 May 2009
- * SVN: $Id$
  */
-
-#include "BulletLink.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "BulletJoint.hh"
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 
@@ -45,8 +38,7 @@ BulletJoint::BulletJoint()
 // Desctructor
 BulletJoint::~BulletJoint()
 {
-  if (this->constraint)
-    delete this->constraint;
+  delete this->constraint;
 }
 
 //////////////////////////////////////////////////
@@ -97,8 +89,7 @@ void BulletJoint::Detach()
   this->body1 = NULL;
   this->body2 = NULL;
 
-  if (this->constraint)
-    delete this->constraint;
+  delete this->constraint;
 }
 
 //////////////////////////////////////////////////

@@ -16,10 +16,7 @@ TEST_F(SpeedTest, EmptyWorld)
 #ifdef BUILD_TYPE_DEBUG
   EXPECT_GT(speed, 800.0);
 #endif
-#ifdef BUILD_TYPE_PROFILE
   EXPECT_GT(speed, 340.0);
-#endif
-
 }
 
 TEST_F(SpeedTest, ShapesWorld)
@@ -35,10 +32,7 @@ TEST_F(SpeedTest, ShapesWorld)
 #ifdef BUILD_TYPE_DEBUG
   EXPECT_GT(speed, 25.0);
 #endif
-#ifdef BUILD_TYPE_PROFILE
   EXPECT_GT(speed, 18.0);
-#endif
-
 }
 
 TEST_F(SpeedTest, PR2World)
@@ -54,9 +48,7 @@ TEST_F(SpeedTest, PR2World)
 #ifdef BUILD_TYPE_DEBUG
   EXPECT_GT(speed, 1.0);
 #endif
-#ifdef BUILD_TYPE_PROFILE
   EXPECT_GT(speed, 0.4);
-#endif
 }
 
 int main(int argc, char **argv)
@@ -64,4 +56,3 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-

@@ -72,8 +72,6 @@ void RaySensor::Load()
   std::string linkName = this->sdf->GetLinkName();
   std::string modelName = this->sdf->GetModelName();
   std::string worldName = this->sdf->GetWorldName();
-  std::string linkFullyScopedName = worldName + "::" + modelName + "::" +
-                                    linkName;
 
   if (this->sdf->GetElement("topic"))
   {

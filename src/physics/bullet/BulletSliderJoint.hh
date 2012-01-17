@@ -23,7 +23,6 @@
 #ifndef BULLETSLIDERJOINT_HH
 #define BULLETSLIDERJOINT_HH
 
-#include "common/Param.hh"
 #include "SliderJoint.hh"
 #include "BulletJoint.hh"
 
@@ -32,113 +31,111 @@
 namespace gazebo
 {
   namespace physics
-{
-/// \addtogroup gazebo_physics_joints
-/// \{
-/** \defgroup gazebo_slider_joint Slider Joint
-
-  \brief A slider joint
-
-  \par Attributes
-  - body1 (string)
-    - Name of the first body to attach to the joint
-  - body2 (string)
-    - Name of the second body to attach to the joint
-  - anchor (string)
-    - Name of the body which will act as the anchor to the joint
-  - axis (float, tuple)
-    - Defines the axis of movement
-    - Default: 0 0 1
-  - lowStop (float, meters)
-    - The low stop position
-    - Default: infinity
-  - highStop (float, meters)
-    - The high stop position
-    - Default: infinity
-  - erp (double)
-    - Error reduction parameter.
-    - Default = 0.4
-  - cfm (double)
-    - Constraint force mixing.
-    - Default = 0.8
-
-
-  \par Example
-  \verbatim
-  <joint:slider name ="slider_joint>
-    <body1>body1_name</body1>
-    <body2>body2_name</body2>
-    <anchor>anchor_body</anchor>
-    <axis>0 0 1</axis>
-    <lowStop>0</lowStop>
-    <highStop>30</highStop>
-  </joint:slider>
-  \endverbatim
-*/
-/// \}
-
-
-/// \addtogroup gazebo_slider_joint Slider Joint
-/// \{
-  /// \brief A slider joint
-  class BulletSliderJoint : public SliderJoint<BulletJoint>
   {
-    /// \brief Constructor
-    public: BulletSliderJoint(btDynamicsWorld *world);
-
-    /// \brief Destructor
-    public: virtual ~BulletSliderJoint();
-
-    /// \brief Load the joint
-    protected: virtual void Load(common::XMLConfigNode *node);
-
-    /// \brief Attach the two bodies with this joint
-    public: void Attach(Link *one, Link *two);
-
-    /// \brief Get the axis of rotation
-    public: virtual math::Vector3 GetAxis(int index) const;
-
-    /// \brief Set the axis of motion
-    public: void SetAxis(int index, const math::Vector3 &axis);
-
-    /// \brief Set joint damping, not yet implemented
-    public: virtual void SetDamping(int index, const double damping);
-
-    /// \brief Set the high stop of an axis(index).
-    public: virtual void SetHighStop(int index, math::Angle angle);
-
-    /// \brief Set the low stop of an axis(index).
-    public: virtual void SetLowStop(int index, math::Angle angle);
-
-    /// \brief Get the high stop of an axis(index).
-    public: virtual math::Angle GetHighStop(int index);
-
-    /// \brief Get the low stop of an axis(index).
-    public: virtual math::Angle GetLowStop(int index);
-
-    /// \brief Get the position of the joint
-    public: virtual math::Angle GetAngle(int index) const;
-
-    /// \brief Get the rate of change
-    public: virtual double GetVelocity(int index) const;
-
-     /// \brief Set the velocity of an axis(index).
-    public: virtual void SetVelocity(int index, double angle);
-
-    /// \brief Set the slider force
-    public: virtual void SetForce(int index, double force);
-
-    /// \brief Set the max allowed force of an axis(index).
-    public: virtual void SetMaxForce(int index, double t);
-
-    /// \brief Get the max allowed force of an axis(index).
-    public: virtual double GetMaxForce(int index);
-
-  };
-
-/// \}
-}
-}
+  /// \addtogroup gazebo_physics_joints
+  /// \{
+  /** \defgroup gazebo_slider_joint Slider Joint
+  
+    \brief A slider joint
+  
+    \par Attributes
+    - body1 (string)
+      - Name of the first body to attach to the joint
+    - body2 (string)
+      - Name of the second body to attach to the joint
+    - anchor (string)
+      - Name of the body which will act as the anchor to the joint
+    - axis (float, tuple)
+      - Defines the axis of movement
+      - Default: 0 0 1
+    - lowStop (float, meters)
+      - The low stop position
+      - Default: infinity
+    - highStop (float, meters)
+      - The high stop position
+      - Default: infinity
+    - erp (double)
+      - Error reduction parameter.
+      - Default = 0.4
+    - cfm (double)
+      - Constraint force mixing.
+      - Default = 0.8
+  
+  
+    \par Example
+    \verbatim
+    <joint:slider name ="slider_joint>
+      <body1>body1_name</body1>
+      <body2>body2_name</body2>
+      <anchor>anchor_body</anchor>
+      <axis>0 0 1</axis>
+      <lowStop>0</lowStop>
+      <highStop>30</highStop>
+    </joint:slider>
+    \endverbatim
+  */
+  /// \}
+  
+  
+  /// \addtogroup gazebo_slider_joint Slider Joint
+  /// \{
+    /// \brief A slider joint
+    class BulletSliderJoint : public SliderJoint<BulletJoint>
+    {
+      /// \brief Constructor
+      public: BulletSliderJoint(btDynamicsWorld *world);
+  
+      /// \brief Destructor
+      public: virtual ~BulletSliderJoint();
+  
+      /// \brief Load the joint
+      protected: virtual void Load(common::XMLConfigNode *node);
+  
+      /// \brief Attach the two bodies with this joint
+      public: void Attach(Link *one, Link *two);
+  
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetAxis(int index) const;
+  
+      /// \brief Set the axis of motion
+      public: void SetAxis(int index, const math::Vector3 &axis);
+  
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int index, const double damping);
+  
+      /// \brief Set the high stop of an axis(index).
+      public: virtual void SetHighStop(int index, math::Angle angle);
+  
+      /// \brief Set the low stop of an axis(index).
+      public: virtual void SetLowStop(int index, math::Angle angle);
+  
+      /// \brief Get the high stop of an axis(index).
+      public: virtual math::Angle GetHighStop(int index);
+  
+      /// \brief Get the low stop of an axis(index).
+      public: virtual math::Angle GetLowStop(int index);
+  
+      /// \brief Get the position of the joint
+      public: virtual math::Angle GetAngle(int index) const;
+  
+      /// \brief Get the rate of change
+      public: virtual double GetVelocity(int index) const;
+  
+       /// \brief Set the velocity of an axis(index).
+      public: virtual void SetVelocity(int index, double angle);
+  
+      /// \brief Set the slider force
+      public: virtual void SetForce(int index, double force);
+  
+      /// \brief Set the max allowed force of an axis(index).
+      public: virtual void SetMaxForce(int index, double t);
+  
+      /// \brief Get the max allowed force of an axis(index).
+      public: virtual double GetMaxForce(int index);
+  
+    };
+  
+  /// \}
+  }
 }
 #endif
-

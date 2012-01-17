@@ -143,7 +143,7 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   dContactGeom contact;
   ODERayShape::Intersection *inter = NULL;
 
-  inter = (Intersection*)(_data);
+  inter = static_cast<Intersection*>(_data);
 
   // Check space
   if (dGeomIsSpace(_o1) || dGeomIsSpace(_o2))
@@ -157,14 +157,16 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
-      collision1 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(_o1));
+      collision1 =
+        static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o1)));
     else
-      collision1 = (ODECollision*) dGeomGetData(_o1);
+      collision1 = static_cast<ODECollision*>(dGeomGetData(_o1));
 
     if (dGeomGetClass(_o2) == dGeomTransformClass)
-      collision2 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(_o2));
+      collision2 =
+        static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o2)));
     else
-      collision2 = (ODECollision*) dGeomGetData(_o2);
+      collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
 
     // Figure out which one is a ray; note that this assumes
     // that the ODE dRayClass is used *soley* by the RayCollision.

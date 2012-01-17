@@ -33,7 +33,6 @@ Do we need these?
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "OpaqueInterface.hh"
 
@@ -133,7 +132,7 @@ void OpaqueInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     //std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Opaque Interface\n"

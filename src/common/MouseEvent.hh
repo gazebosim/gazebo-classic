@@ -33,8 +33,8 @@ namespace gazebo
       public: enum EventType {NO_EVENT, MOVE, PRESS, RELEASE, SCROLL};
       public: MouseEvent()
               : pos(0, 0), prevPos(0, 0), pressPos(0, 0), scroll(0, 0),
-                moveScale(0.01), dragging(false), type(NO_EVENT),
-                buttons(NO_BUTTON)
+                moveScale(0.01), dragging(false), type(NO_EVENT), button(0),
+                buttons(NO_BUTTON), shift(false), control(false)
               {}
       public: math::Vector2i pos;
       public: math::Vector2i prevPos;

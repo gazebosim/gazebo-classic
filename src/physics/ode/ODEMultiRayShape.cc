@@ -84,7 +84,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   ODECollision *hitCollision = NULL;
   ODEMultiRayShape *self = NULL;
 
-  self = (ODEMultiRayShape*) _data;
+  self = static_cast<ODEMultiRayShape*>(_data);
 
   // Check space
   if (dGeomIsSpace(_o1) || dGeomIsSpace(_o2))
@@ -104,14 +104,22 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
-      collision1 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(_o1));
+    {
+      collision1 = static_cast<ODECollision*>(
+          dGeomGetData(dGeomTransformGetGeom(_o1)));
+    }
     else
-      collision1 = (ODECollision*) dGeomGetData(_o1);
+      collision1 = static_cast<ODECollision*>(dGeomGetData(_o1));
 
     if (dGeomGetClass(_o2) == dGeomTransformClass)
-      collision2 = (ODECollision*) dGeomGetData(dGeomTransformGetGeom(_o2));
+    {
+      collision2 =
+        static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o2)));
+    }
     else
-      collision2 = (ODECollision*) dGeomGetData(_o2);
+    {
+      collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
+    }
 
     assert(collision1 && collision2);
 
@@ -122,16 +130,16 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
     // that the ODE dRayClass is used *soley* by the RayCollision.
     if (dGeomGetClass(_o1) == dRayClass)
     {
-      rayCollision = (ODECollision*) collision1;
-      hitCollision = (ODECollision*) collision2;
+      rayCollision = static_cast<ODECollision*>(collision1);
+      hitCollision = static_cast<ODECollision*>(collision2);
       dGeomRaySetParams(_o1, 0, 0);
       dGeomRaySetClosestHit(_o1, 1);
     }
     else if (dGeomGetClass(_o2) == dRayClass)
     {
       assert(rayCollision == NULL);
-      rayCollision = (ODECollision*) collision2;
-      hitCollision = (ODECollision*) collision1;
+      rayCollision = static_cast<ODECollision*>(collision2);
+      hitCollision = static_cast<ODECollision*>(collision1);
       dGeomRaySetParams(_o2, 0, 0);
       dGeomRaySetClosestHit(_o2, 1);
     }

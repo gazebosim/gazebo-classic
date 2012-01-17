@@ -262,8 +262,8 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     pos.z = bb.max.z;
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
-    ((OrbitViewController*)this->viewController)->SetDistanceRange(_minDist,
-      _maxDist);
+    static_cast<OrbitViewController*>(this->viewController)->SetDistanceRange(
+        _minDist, _maxDist);
   }
   else
     this->SetViewController(FPSViewController::GetTypeString());

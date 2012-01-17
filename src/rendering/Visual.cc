@@ -107,7 +107,7 @@ Visual::~Visual()
 
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end();iter++)
+       iter!= this->lines.end(); ++iter)
     delete *iter;
   this->lines.clear();
 
@@ -134,7 +134,7 @@ void Visual::Fini()
 
   // Detach all children
   std::vector<VisualPtr>::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     this->sceneNode->removeChild((*iter)->GetSceneNode());
     (*iter)->parent.reset();
@@ -343,7 +343,7 @@ void Visual::Load()
       else
         obj = (Ogre::MovableObject*)mgr->createEntity(stream.str(), meshName);
     }
-    catch (Ogre::Exception e)
+    catch (Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
       gzthrow("Unable to create a mesh from " + meshName);
@@ -400,12 +400,12 @@ void Visual::Update()
   std::list<DynamicLines*>::iterator iter;
 
   // Update the lines
-  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+  for (iter = this->lines.begin(); iter != this->lines.end(); ++iter)
     (*iter)->Update();
 
   std::list< std::pair<DynamicLines*, unsigned int> >::iterator liter;
   for (liter = this->lineVertices.begin();
-       liter != this->lineVertices.end(); liter++)
+       liter != this->lineVertices.end(); ++liter)
   {
     liter->first->SetPoint(liter->second,
         Conversions::Convert(this->sceneNode->_getDerivedPosition()));
@@ -468,7 +468,7 @@ void Visual::DetachVisual(VisualPtr _vis)
 void Visual::DetachVisual(const std::string &_name)
 {
   std::vector<VisualPtr>::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
     {
@@ -638,7 +638,7 @@ void Visual::SetMaterial(const std::string &materialName)
     origMaterial =
       Ogre::MaterialManager::getSingleton().getByName(materialName);
   }
-  catch (Ogre::Exception e)
+  catch (Ogre::Exception &e)
   {
     gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
@@ -682,7 +682,7 @@ void Visual::SetMaterial(const std::string &materialName)
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
   }
-  catch (Ogre::Exception e)
+  catch (Ogre::Exception &e)
   {
     gzwarn << "Unable to set Material[" << this->myMaterialName
            << "] to Geometry["
@@ -891,7 +891,7 @@ void Visual::SetTransparency(float _trans)
 
   this->transparency = std::min(std::max(_trans, (float)0.0), (float)1.0);
   std::vector<VisualPtr>::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->SetTransparency(_trans);
   }
@@ -1201,7 +1201,7 @@ void Visual::SetRibbonTrail(bool value)
     try
     {
       this->ribbonTrail->addNode(this->sceneNode);
-    } catch (...) { }
+    } catch (...) {;}
   }
   else
   {
@@ -1228,7 +1228,7 @@ void Visual::DeleteDynamicLine(DynamicLines *line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end();iter++)
+       iter!= this->lines.end(); ++iter)
   {
     if (*iter == line)
     {
@@ -1459,7 +1459,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
     // this line makes clear the mesh is loaded (avoids memory leaks)
     ogreMesh->load();
   }
-  catch (Ogre::Exception e)
+  catch (Ogre::Exception &e)
   {
     gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
   }
@@ -1666,7 +1666,7 @@ void Visual::ShowCollision(bool _show)
     this->SetVisible(_show);
 
   std::vector<VisualPtr>::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     (*iter)->ShowCollision(_show);
   }

@@ -30,7 +30,6 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "Graphics3dInterface.hh"
 
@@ -79,9 +78,8 @@ int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
                             PLAYER_GRAPHICS3D_CMD_CLEAR, this->device_addr))
   {
-    player_graphics3d_cmd_draw_t *cmd;
-
-    cmd = (player_graphics3d_cmd_draw_t*) data;
+    //player_graphics3d_cmd_draw_t *cmd;
+    //cmd = (player_graphics3d_cmd_draw_t*) data;
 
     this->iface->data->point_count = 0;
 
@@ -137,7 +135,7 @@ void Graphics3dInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Graphics3d Interface\n"

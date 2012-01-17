@@ -17,7 +17,6 @@
 #include <iomanip>
 #include "common/Time.hh"
 #include "Entity.hh"
-#include "Simulator.hh"
 #include "common/Console.hh"
 #include "common/Logger.hh"
 
@@ -37,7 +36,7 @@ Logger::~Logger()
 {
   std::vector<LogObj*>::iterator iter;
 
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); iter++)
+  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
     delete *iter;
   this->logObjects.clear();
 }
@@ -63,7 +62,7 @@ void Logger::RemoveLog(const std::string &_entity)
 {
   std::vector<LogObj*>::iterator iter;
 
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); iter++)
+  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
   {
     if ((*iter)->GetEntityName() == _entity)
     {
@@ -80,7 +79,7 @@ void Logger::Update()
 {
   std::vector<LogObj*>::iterator iter;
 
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); iter++)
+  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
     (*iter)->Update();
 }
 
@@ -165,4 +164,3 @@ std::string Logger::LogObj::GetEntityName() const
   else
     return std::string("");
 }
-

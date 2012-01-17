@@ -119,9 +119,9 @@ void Matrix4::SetScale(const Vector3 &_s)
 
 //////////////////////////////////////////////////
 // Equality operator
-const Matrix4 &Matrix4::operator =(const Matrix4 &mat)
+Matrix4 &Matrix4::operator =(const Matrix4 &_mat)
 {
-  memcpy(this->m, mat.m, sizeof(double)*16);
+  memcpy(this->m, _mat.m, sizeof(double)*16);
   return *this;
 }
 

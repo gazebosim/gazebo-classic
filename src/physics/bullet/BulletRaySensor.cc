@@ -22,9 +22,7 @@
 
 #include "World.hh"
 
-#include "BulletRayCollision.hh"
 #include "BulletPhysics.hh"
-#include "BulletLink.hh"
 #include "BulletRaySensor.hh"
 
 using namespace gazebo;
@@ -52,7 +50,7 @@ BulletRaySensor::~BulletRaySensor()
 {
   std::vector<BulletRayCollision*>::iterator iter;
 
-  for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+  for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
   {
     delete (*iter);
   }
@@ -66,8 +64,8 @@ void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end,
 {
   BulletRayCollision *rayCollision;
 
-  rayCollision = (BulletRayCollision*)this->GetWorld()->CreateCollision("ray",
-      this->body);
+  rayCollision = static_cast<BulletRayCollision*>(
+        this->GetWorld()->CreateCollision("ray", this->body));
   rayCollision->SetDisplayRays(display);
   rayCollision->SetMinLength(minRange);
   rayCollision->SetMaxLength(maxRange);
@@ -150,7 +148,7 @@ void BulletRaySensor::Update()
 {
   std::vector<BulletRayCollision*>::iterator iter;
 
-  for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+  for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
   {
     (*iter)->SetLength((*iter)->GetMaxLength());
     (*iter)->SetRetro(0.0);

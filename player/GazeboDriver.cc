@@ -375,7 +375,7 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 
   for (i = 0; i < (int)this->deviceCount; i++)
   {
-    iface = (GazeboInterface*)this->devices[i];
+    iface = static_cast<GazeboInterface*>(this->devices[i]);
 
     if (iface->device_addr.robot == _addr.robot &&
         iface->device_addr.interf == _addr.interf &&

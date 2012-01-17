@@ -108,7 +108,7 @@ namespace gazebo
       /// \brief Equal operator. this = _mat
       /// \param _mat Incoming matrix
       /// \return The resulting matrix
-      public: const Matrix4 &operator =(const Matrix4 &_mat);
+      public: Matrix4 &operator =(const Matrix4 &_mat);
 
       /// \brief Equal operator for 3x3 matrix
       /// \param _mat Incoming matrix

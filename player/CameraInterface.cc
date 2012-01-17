@@ -24,7 +24,6 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "CameraInterface.hh"
 
@@ -72,7 +71,6 @@ int CameraInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void CameraInterface::Update()
 {
-  size_t size;
   char filename[256];
 
   struct timeval ts;
@@ -84,6 +82,7 @@ void CameraInterface::Update()
   // Only Update when new data is present
   if (this->iface->data->head.time > this->datatime)
   {
+    size_t size;
     this->datatime = this->iface->data->head.time;
 
     ts.tv_sec = (int) (this->iface->data->head.time);
@@ -141,7 +140,7 @@ void CameraInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Camera Interface["
@@ -162,7 +161,7 @@ void CameraInterface::Unsubscribe()
 /////////////////////////////////////////////////
 void CameraInterface::SaveFrame(const char *filename)
 {
-  int i, width, height;
+  int width, height;
   FILE *file;
 
   file = fopen(filename, "w+");
@@ -179,7 +178,7 @@ void CameraInterface::SaveFrame(const char *filename)
   {
     // Write ppm
     fprintf(file, "P6\n%d %d\n%d\n", width, height, 255);
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
       fwrite(this->data.image + i * rowSize, rowSize, 1, file);
   }
   else

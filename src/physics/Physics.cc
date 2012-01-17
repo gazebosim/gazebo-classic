@@ -58,7 +58,7 @@ physics::WorldPtr physics::get_world(const std::string &_name)
       return *(g_worlds.begin());
   else
   for(std::vector<WorldPtr>::iterator iter = g_worlds.begin();
-       iter != g_worlds.end(); iter++)
+       iter != g_worlds.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       return (*iter);
@@ -72,7 +72,7 @@ physics::WorldPtr physics::get_world(const std::string &_name)
 void physics::load_worlds(sdf::ElementPtr &_sdf)
 {
   std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
     (*iter)->Load(_sdf);
 }
 
@@ -80,7 +80,7 @@ void physics::load_worlds(sdf::ElementPtr &_sdf)
 void physics::init_worlds()
 {
   std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
     (*iter)->Init();
 }
 
@@ -88,7 +88,7 @@ void physics::init_worlds()
 void physics::run_worlds()
 {
   std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
     (*iter)->Run();
 }
 
@@ -96,7 +96,7 @@ void physics::run_worlds()
 void physics::pause_worlds(bool _pause)
 {
   std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
     (*iter)->SetPaused(_pause);
 }
 
@@ -104,7 +104,7 @@ void physics::pause_worlds(bool _pause)
 void physics::stop_worlds()
 {
   std::vector<WorldPtr>::iterator iter;
-  for (iter = g_worlds.begin(); iter != g_worlds.end(); iter++)
+  for (iter = g_worlds.begin(); iter != g_worlds.end(); ++iter)
     (*iter)->Stop();
 }
 
@@ -142,7 +142,7 @@ void physics::stop_world(WorldPtr _world)
 void physics::remove_worlds()
 {
   for(std::vector<WorldPtr>::iterator iter = g_worlds.begin();
-      iter != g_worlds.end(); iter++)
+      iter != g_worlds.end(); ++iter)
   {
     (*iter)->Fini();
     (*iter).reset();

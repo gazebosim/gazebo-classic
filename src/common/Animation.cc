@@ -37,7 +37,7 @@ namespace
 }
 
 
-  Animation::Animation(const std::string _name, double _length, bool _loop)
+Animation::Animation(const std::string &_name, double _length, bool _loop)
 : name(_name), length(_length), loop(_loop)
 {
   this->timePos = 0;
@@ -144,7 +144,7 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
 
 
 
-PoseAnimation::PoseAnimation(const std::string _name,
+PoseAnimation::PoseAnimation(const std::string &_name,
     double _length, bool _loop)
 : Animation(_name, _length, _loop)
 {
@@ -163,7 +163,7 @@ PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
   PoseKeyFrame *frame = new PoseKeyFrame(_time);
   std::vector<KeyFrame*>::iterator iter =
     std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
-        (KeyFrame*)frame, KeyFrameTimeLess());
+        static_cast<KeyFrame*>(frame), KeyFrameTimeLess());
 
   this->keyFrames.insert(iter, frame);
   this->build = true;
@@ -186,7 +186,7 @@ void PoseAnimation::BuildInterpolationSplines() const
   this->rotationSpline->Clear();
 
   for (KeyFrame_V::const_iterator iter = this->keyFrames.begin();
-      iter != this->keyFrames.end(); iter++)
+      iter != this->keyFrames.end(); ++iter)
   {
     PoseKeyFrame *pkey = (PoseKeyFrame*)(*iter);
     this->positionSpline->AddPoint(pkey->GetTranslate());
@@ -229,9 +229,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
   }
 }
 
-
-
-NumericAnimation::NumericAnimation(const std::string _name,
+NumericAnimation::NumericAnimation(const std::string &_name,
     double _length, bool _loop)
 : Animation(_name, _length, _loop)
 {
@@ -246,7 +244,7 @@ NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
   NumericKeyFrame *frame = new NumericKeyFrame(_time);
   std::vector<KeyFrame*>::iterator iter =
     std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
-        (KeyFrame*)frame,
+        static_cast<KeyFrame*>(frame),
         KeyFrameTimeLess());
 
   this->keyFrames.insert(iter, frame);

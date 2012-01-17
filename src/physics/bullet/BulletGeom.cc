@@ -22,15 +22,12 @@
 
 #include <sstream>
 
-#include "Mass.hh"
 #include "PhysicsEngine.hh"
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
 #include "common/Console.hh"
 #include "World.hh"
-#include "BulletLink.hh"
 
-#include "BulletCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -54,8 +51,7 @@ BulletCollision::BulletCollision(Link *_body)
 // Destructor
 BulletCollision::~BulletCollision()
 {
-  if (this->collisionShape)
-    delete this->collisionShape;
+  delete this->collisionShape;
   this->collisionShape = NULL;
 }
 

@@ -105,7 +105,7 @@ int main(int _argc, char **_argv)
 
   /// Load all the plugins specified on the command line
   for (std::vector<std::string>::iterator iter = plugins.begin();
-       iter != plugins.end(); iter++)
+       iter != plugins.end(); ++iter)
   {
     gazebo::gui::load_plugin(*iter);
   }

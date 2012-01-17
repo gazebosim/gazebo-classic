@@ -1770,7 +1770,8 @@ Q_GLOBAL_STATIC(QtCursorDatabase, cursorDatabase)
 
 
 QtCursorEditorFactoryPrivate::QtCursorEditorFactoryPrivate()
-    : m_updatingEnum(false)
+    : q_ptr(NULL), m_enumEditorFactory(NULL), m_enumPropertyManager(NULL),
+      m_updatingEnum(false)
 {
 
 }

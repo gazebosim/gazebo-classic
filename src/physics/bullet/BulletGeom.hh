@@ -34,70 +34,69 @@ class btCollisionShape;
 namespace gazebo
 {
   namespace physics
-{
-  class Link;
-  class XMLConfigNode;
-  class BulletPhysics;
-
-  /// \addtogroup gazebo_physics_ode
-  /// \brief Base class for all Bullet collisions
-  /// \{
-  /// \brief Base class for all collisions
-  class BulletCollision : public Collision
   {
-    /// \brief Constructor
-    //public: Collision(Link *body, const std::string &name);
-    public: BulletCollision(Link *body);
-
-    /// \brief Destructor
-    public: virtual ~BulletCollision();
-
-    /// \brief Load the collision
-    public: virtual void Load(common::XMLConfigNode *node);
-
-    /// \brief Load the collision
-    public: virtual void Save(std::string &prefix, std::ostream &stream);
-
-    /// \brief Update function for collisions
-    public: virtual void Update();
-
-    /// \brief On pose change
-    public: virtual void OnPoseChange();
-
-    /// \brief Set the category bits, used during collision detection
-    /// \param bits The bits
-    public: virtual void SetCategoryBits(unsigned int bits);
-
-    /// \brief Set the collide bits, used during collision detection
-    /// \param bits The bits
-    public: virtual void SetCollideBits(unsigned int bits);
-
-    /// \brief Get the mass of the collision
-    public: Mass GetLinkMassMatrix();
-
-    /// \brief Get the bounding box, defined by the physics engine
-    public: virtual void GetBoundingBox(math::Vector3 &min,
-                                        math::Vector3 &max) const;
-
-    /// \brief Set the collision shape
-    public: void SetCollisionShape(btCollisionShape *shape);
-
-    /// \brief Get the bullet collision shape
-    public: btCollisionShape *GetCollisionShape() const;
-
-    /// \brief Set the index of the compound shape
-    public: void SetCompoundShapeIndex(int index);
-
-    protected: BulletPhysics *bulletPhysics;
-    protected: btCollisionShape *collisionShape;
-
-    protected: int compoundShapeIndex;
-  };
-
-  /// \}
-
-}
-}
+    class Link;
+    class XMLConfigNode;
+    class BulletPhysics;
+  
+    /// \addtogroup gazebo_physics_ode
+    /// \brief Base class for all Bullet collisions
+    /// \{
+    /// \brief Base class for all collisions
+    class BulletCollision : public Collision
+    {
+      /// \brief Constructor
+      //public: Collision(Link *body, const std::string &name);
+      public: BulletCollision(Link *body);
+  
+      /// \brief Destructor
+      public: virtual ~BulletCollision();
+  
+      /// \brief Load the collision
+      public: virtual void Load(common::XMLConfigNode *node);
+  
+      /// \brief Load the collision
+      public: virtual void Save(std::string &prefix, std::ostream &stream);
+  
+      /// \brief Update function for collisions
+      public: virtual void Update();
+  
+      /// \brief On pose change
+      public: virtual void OnPoseChange();
+  
+      /// \brief Set the category bits, used during collision detection
+      /// \param bits The bits
+      public: virtual void SetCategoryBits(unsigned int bits);
+  
+      /// \brief Set the collide bits, used during collision detection
+      /// \param bits The bits
+      public: virtual void SetCollideBits(unsigned int bits);
+  
+      /// \brief Get the mass of the collision
+      public: Mass GetLinkMassMatrix();
+  
+      /// \brief Get the bounding box, defined by the physics engine
+      public: virtual void GetBoundingBox(math::Vector3 &min,
+                                          math::Vector3 &max) const;
+  
+      /// \brief Set the collision shape
+      public: void SetCollisionShape(btCollisionShape *shape);
+  
+      /// \brief Get the bullet collision shape
+      public: btCollisionShape *GetCollisionShape() const;
+  
+      /// \brief Set the index of the compound shape
+      public: void SetCompoundShapeIndex(int index);
+  
+      protected: BulletPhysics *bulletPhysics;
+      protected: btCollisionShape *collisionShape;
+  
+      protected: int compoundShapeIndex;
+    };
+  
+    /// \}
+  
+  }
 }
 #endif
 

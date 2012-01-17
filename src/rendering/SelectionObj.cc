@@ -253,8 +253,6 @@ void SelectionObj::SetActive(bool _active)
 
 void SelectionObj::SetHighlight(const std::string &_mod)
 {
-  std::string name;
-
   Ogre::ColourValue color;
 
   std::map<std::string, std::string> matNames;
@@ -266,7 +264,7 @@ void SelectionObj::SetHighlight(const std::string &_mod)
   matNames["transz"] = "__GAZEBO_TRANSZ_SELECTION_MATERIAL__";
 
   std::map<std::string, std::string >::iterator iter;
-  for (iter = matNames.begin(); iter != matNames.end(); iter++)
+  for (iter = matNames.begin(); iter != matNames.end(); ++iter)
   {
     Ogre::MaterialPtr mat =
       Ogre::MaterialManager::getSingleton().getByName(iter->second);

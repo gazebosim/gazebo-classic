@@ -31,20 +31,20 @@ Element::~Element()
 {
   this->parent.reset();
   for (Param_V::iterator iter = this->attributes.begin();
-      iter != this->attributes.end(); iter++)
+      iter != this->attributes.end(); ++iter)
   {
     (*iter).reset();
   }
   this->attributes.clear();
 
   for (ElementPtr_V::iterator iter = this->elements.begin();
-      iter != this->elements.end(); iter++)
+      iter != this->elements.end(); ++iter)
   {
     (*iter).reset();
   }
 
   for (ElementPtr_V::iterator iter = this->elementDescriptions.begin();
-      iter != this->elementDescriptions.end(); iter++)
+      iter != this->elementDescriptions.end(); ++iter)
   {
     (*iter).reset();
   }
@@ -232,14 +232,14 @@ ElementPtr Element::Clone() const
 
   Param_V::const_iterator aiter;
   for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); aiter++)
+      aiter != this->attributes.end(); ++aiter)
   {
     clone->attributes.push_back((*aiter)->Clone());
   }
 
   ElementPtr_V::const_iterator eiter;
   for (eiter = this->elementDescriptions.begin();
-      eiter != this->elementDescriptions.end(); eiter++)
+      eiter != this->elementDescriptions.end(); ++eiter)
   {
     clone->elementDescriptions.push_back((*eiter)->Clone());
   }
@@ -253,7 +253,7 @@ ElementPtr Element::Clone() const
 void Element::Copy(const ElementPtr &_elem)
 {
   for (Param_V::iterator iter = this->attributes.begin();
-      iter != this->attributes.end(); iter++)
+      iter != this->attributes.end(); ++iter)
   {
     ParamPtr param = _elem->GetAttribute((*iter)->GetKey());
     if (param)
@@ -266,7 +266,7 @@ void Element::Copy(const ElementPtr &_elem)
     this->value->SetFromString(_elem->GetValue()->GetAsString());
 
   for (ElementPtr_V::iterator iter = this->elements.begin();
-      iter != this->elements.end(); iter++)
+      iter != this->elements.end(); ++iter)
   {
     ElementPtr elem = _elem->GetElement((*iter)->GetName());
     if (elem)
@@ -281,7 +281,7 @@ void Element::PrintDescription(std::string _prefix)
 
   Param_V::iterator aiter;
   for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); aiter++)
+      aiter != this->attributes.end(); ++aiter)
   {
     std::cout << _prefix << "  <attribute name ='"
               << (*aiter)->GetKey() << "' type ='" << (*aiter)->GetTypeName()
@@ -294,7 +294,7 @@ void Element::PrintDescription(std::string _prefix)
 
   ElementPtr_V::iterator eiter;
   for (eiter = this->elementDescriptions.begin();
-      eiter != this->elementDescriptions.end(); eiter++)
+      eiter != this->elementDescriptions.end(); ++eiter)
   {
     (*eiter)->PrintDescription(_prefix + "  ");
   }
@@ -308,7 +308,7 @@ void Element::PrintValues(std::string _prefix)
 
   Param_V::iterator aiter;
   for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); aiter++)
+      aiter != this->attributes.end(); ++aiter)
   {
     std::cout << " " << (*aiter)->GetKey() << "='"
       << (*aiter)->GetAsString() << "'";
@@ -319,7 +319,7 @@ void Element::PrintValues(std::string _prefix)
     std::cout << ">\n";
     ElementPtr_V::iterator eiter;
     for (eiter = this->elements.begin();
-        eiter != this->elements.end(); eiter++)
+        eiter != this->elements.end(); ++eiter)
     {
       (*eiter)->PrintValues(_prefix + "  ");
     }
@@ -353,7 +353,7 @@ void Element::ToString(const std::string &_prefix,
 
   Param_V::const_iterator aiter;
   for (aiter = this->attributes.begin();
-      aiter != this->attributes.end(); aiter++)
+      aiter != this->attributes.end(); ++aiter)
   {
     _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
   }
@@ -363,7 +363,7 @@ void Element::ToString(const std::string &_prefix,
     _out << ">\n";
     ElementPtr_V::const_iterator eiter;
     for (eiter = this->elements.begin();
-        eiter != this->elements.end(); eiter++)
+        eiter != this->elements.end(); ++eiter)
     {
       (*eiter)->ToString(_prefix + "  ", _out);
     }
@@ -387,7 +387,7 @@ bool Element::HasAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
   for (iter = this->attributes.begin();
-      iter != this->attributes.end(); iter++)
+      iter != this->attributes.end(); ++iter)
   {
     if ((*iter)->GetKey() == _key)
       return true;
@@ -400,7 +400,7 @@ ParamPtr Element::GetAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
   for (iter = this->attributes.begin();
-      iter != this->attributes.end(); iter++)
+      iter != this->attributes.end(); ++iter)
   {
     if ((*iter)->GetKey() == _key)
       return (*iter);
@@ -419,7 +419,7 @@ ParamPtr Element::GetValue()
 bool Element::HasElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
-  for (iter = this->elements.begin(); iter != this->elements.end(); iter++)
+  for (iter = this->elements.begin(); iter != this->elements.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       return true;
@@ -431,7 +431,7 @@ bool Element::HasElement(const std::string &_name) const
 ElementPtr Element::GetElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
-  for (iter = this->elements.begin(); iter != this->elements.end(); iter++)
+  for (iter = this->elements.begin(); iter != this->elements.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       return (*iter);
@@ -457,7 +457,7 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
     if (iter == this->parent->elements.end())
       return ElementPtr();
 
-    for (iter++; iter != this->parent->elements.end(); iter++)
+    for (iter++; iter != this->parent->elements.end(); ++iter)
     {
       if ((*iter)->GetName() == _name)
         return (*iter);
@@ -490,7 +490,7 @@ ElementPtr Element::AddElement(const std::string &_name)
 {
   ElementPtr_V::const_iterator iter;
   for (iter = this->elementDescriptions.begin();
-      iter != this->elementDescriptions.end(); iter++)
+      iter != this->elementDescriptions.end(); ++iter)
   {
     if ((*iter)->name == _name)
     {
@@ -740,13 +740,13 @@ std::string SDF::ToString() const
 void Element::Update()
 {
   for (sdf::Param_V::iterator iter = this->attributes.begin();
-      iter != this->attributes.end(); iter++)
+      iter != this->attributes.end(); ++iter)
   {
     (*iter)->Update();
   }
 
   for (sdf::ElementPtr_V::iterator iter = this->elements.begin();
-      iter != this->elements.end(); iter++)
+      iter != this->elements.end(); ++iter)
   {
     (*iter)->Update();
   }
@@ -757,14 +757,14 @@ void Element::Reset()
   this->parent.reset();
 
   for (ElementPtr_V::iterator iter = this->elements.begin();
-      iter != this->elements.end(); iter++)
+      iter != this->elements.end(); ++iter)
   {
     (*iter)->Reset();
     (*iter).reset();
   }
 
   for (ElementPtr_V::iterator iter = this->elementDescriptions.begin();
-      iter != this->elementDescriptions.end(); iter++)
+      iter != this->elementDescriptions.end(); ++iter)
   {
     (*iter)->Reset();
     (*iter).reset();

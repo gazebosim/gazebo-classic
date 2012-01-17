@@ -66,7 +66,7 @@ void ODEHeightmapShape::FillHeightMap()
 //////////////////////////////////////////////////
 dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
 {
-  ODEHeightmapShape *collision = (ODEHeightmapShape*)(_data);
+  ODEHeightmapShape *collision = static_cast<ODEHeightmapShape*>(_data);
 
   // Return the height at a specific vertex
   return collision->heights[_y * collision->odeVertSize + _x];

@@ -581,7 +581,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       }
     }
 
-    if (degrees.size() == 0)
+    if (degrees.empty())
     {
       poseStr += "0 0 0";
     }

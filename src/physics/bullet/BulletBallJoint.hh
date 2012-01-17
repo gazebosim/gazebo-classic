@@ -30,45 +30,43 @@
 namespace gazebo
 {
   namespace physics
-{
-  /// \brief A ball joint
-  class BulletBallJoint : public BallJoint<BulletJoint>
   {
-    /// \brief Constructor
-    public: BulletBallJoint(btDynamicsWorld *world);
-
-    /// \brief Destructor
-    public: virtual ~BulletBallJoint();
-
-    /// \brief Get joint's anchor point
-    public: math::Vector3 GetAnchor(int index) const;
-
-    /// \brief Set joint's anchor point
-    public: void SetAnchor(int index, const math::Vector3 &anchor);
-
-    /// \brief Set joint damping, not yet implemented
-    public: virtual void SetDamping(int index, const double damping);
-
-    /// \brief Attach the two bodies with this joint
-    public: void Attach(Link *one, Link *two);
-
-    /// \brief Get the axis of rotation
-    public: virtual math::Vector3 GetAxis(int index) const {}
-    /// \brief Set the velocity of an axis(index).
-    public: virtual void SetVelocity(int index, double angle) {}
-    /// \brief Get the rotation rate of an axis(index)
-    public: virtual double GetVelocity(int index) const {}
-    /// \brief Get the max allowed force of an axis(index).
-    public: virtual double GetMaxForce(int index) {}
-    /// \brief Set the max allowed force of an axis(index).
-    public: virtual void SetMaxForce(int index, double t) {}
-    /// \brief Get the angle of rotation of an axis(index)
-    public: virtual math::Angle GetAngle(int index) const {}
-  };
-
-}
-
-}
+    /// \brief A ball joint
+    class BulletBallJoint : public BallJoint<BulletJoint>
+    {
+      /// \brief Constructor
+      public: BulletBallJoint(btDynamicsWorld *world);
+  
+      /// \brief Destructor
+      public: virtual ~BulletBallJoint();
+  
+      /// \brief Get joint's anchor point
+      public: math::Vector3 GetAnchor(int index) const;
+  
+      /// \brief Set joint's anchor point
+      public: void SetAnchor(int index, const math::Vector3 &anchor);
+  
+      /// \brief Set joint damping, not yet implemented
+      public: virtual void SetDamping(int index, const double damping);
+  
+      /// \brief Attach the two bodies with this joint
+      public: void Attach(Link *one, Link *two);
+  
+      /// \brief Get the axis of rotation
+      public: virtual math::Vector3 GetAxis(int index) const {}
+      /// \brief Set the velocity of an axis(index).
+      public: virtual void SetVelocity(int index, double angle) {}
+      /// \brief Get the rotation rate of an axis(index)
+      public: virtual double GetVelocity(int index) const {}
+      /// \brief Get the max allowed force of an axis(index).
+      public: virtual double GetMaxForce(int index) {}
+      /// \brief Set the max allowed force of an axis(index).
+      public: virtual void SetMaxForce(int index, double t) {}
+      /// \brief Get the angle of rotation of an axis(index)
+      public: virtual math::Angle GetAngle(int index) const {}
+    };
+  
+  }
 }
 #endif
 

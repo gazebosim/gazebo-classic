@@ -43,9 +43,9 @@ namespace gazebo
       /// \brief Shutdown all the windows
       public: void Fini();
 
-      public: int CreateWindow(std::string ogreHandle,
-                                unsigned int width,
-                                unsigned int height);
+      public: int CreateWindow(const std::string &ogreHandle,
+                               unsigned int width,
+                               unsigned int height);
 
       public: void GetAttribute(unsigned int id,
                   const std::string &attr, void *data);

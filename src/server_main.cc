@@ -106,7 +106,7 @@ int main(int argc, char **argv)
   // Construct plugins
   /// Load all the plugins specified on the command line
   for (std::vector<std::string>::iterator iter = plugins.begin();
-       iter != plugins.end(); iter++)
+       iter != plugins.end(); ++iter)
   {
     server->LoadPlugin(*iter);
   }

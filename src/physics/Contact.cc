@@ -58,7 +58,7 @@ Contact Contact::Clone() const
 
 //////////////////////////////////////////////////
 // Operator =
-const Contact &Contact::operator =(const Contact &contact)
+Contact &Contact::operator =(const Contact &contact)
 {
   this->collision1 = contact.collision1;
   this->collision2 = contact.collision2;

@@ -21,14 +21,10 @@
 /* Desc: A bullet screw or primastic joint
  * Author: Nate Keonig
  * Date: 13 Oct 2009
- * SVN: $Id:$
  */
 
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
 #include "BulletBody.hh"
-#include "XMLConfig.hh"
 #include "BulletScrewJoint.hh"
 
 using namespace gazebo;

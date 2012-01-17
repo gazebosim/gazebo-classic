@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "Sensor.hh"
-#include "Body.hh"
 
 namespace gazebo
 {

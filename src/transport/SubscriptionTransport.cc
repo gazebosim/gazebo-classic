@@ -53,7 +53,6 @@ bool SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg_)
 bool SubscriptionTransport::HandleData(const std::string &newdata)
 {
   bool result = false;
-  std::string data;
   if (this->connection->IsOpen())
   {
     this->connection->EnqueueMsg(newdata);

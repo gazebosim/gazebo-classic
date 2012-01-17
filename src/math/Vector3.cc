@@ -217,11 +217,11 @@ void Vector3::SetToMin(const Vector3 & _v)
 
 //////////////////////////////////////////////////
 // Equals operator
-const Vector3 &Vector3::operator =(const Vector3 &pt)
+Vector3 &Vector3::operator =(const Vector3 &_pt)
 {
-  this->x = pt.x;
-  this->y = pt.y;
-  this->z = pt.z;
+  this->x = _pt.x;
+  this->y = _pt.y;
+  this->z = _pt.z;
 
   return *this;
 }

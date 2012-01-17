@@ -98,6 +98,7 @@ namespace gazebo
     class QuadNode
     {
       public: QuadNode(QuadNode *_parent)
+              : x(0), y(0), width(0), height(0)
               {
                 parent = _parent;
                 occupied = false;
@@ -108,7 +109,7 @@ namespace gazebo
       public: ~QuadNode()
               {
                 std::deque<QuadNode*>::iterator iter;
-                for (iter = children.begin(); iter != children.end(); iter++)
+                for (iter = children.begin(); iter != children.end(); ++iter)
                     delete (*iter);
               }
 
@@ -119,7 +120,7 @@ namespace gazebo
                 printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",
                     space.c_str(), x, y, width, height, occupied, leaf, valid);
                 space += "  ";
-                for (iter = children.begin(); iter != children.end(); iter++)
+                for (iter = children.begin(); iter != children.end(); ++iter)
                   if ((*iter)->occupied)
                     (*iter)->Print(space);
               }

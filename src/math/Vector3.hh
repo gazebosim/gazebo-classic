@@ -106,7 +106,7 @@ namespace gazebo
       public: void SetToMin(const Vector3 &_v);
 
       /// \brief Equal operator
-      public: const Vector3 &operator =(const Vector3 &_pt);
+      public: Vector3 &operator =(const Vector3 &_pt);
 
       /// \brief Equal operator
       public: const Vector3 &operator =(double _value);

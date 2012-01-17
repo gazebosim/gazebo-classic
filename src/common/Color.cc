@@ -307,12 +307,12 @@ void Color::A(float _v)
 
 //////////////////////////////////////////////////
 // Equals operator
-const Color &Color::operator =(const Color &pt)
+Color &Color::operator =(const Color &_pt)
 {
-  this->r = pt.r;
-  this->g = pt.g;
-  this->b = pt.b;
-  this->a = pt.a;
+  this->r = _pt.r;
+  this->g = _pt.g;
+  this->b = _pt.b;
+  this->a = _pt.a;
 
   return *this;
 }

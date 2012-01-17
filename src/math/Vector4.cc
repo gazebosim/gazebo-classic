@@ -107,7 +107,7 @@ void Vector4::Set(double _x, double _y, double _z, double _w)
 
 //////////////////////////////////////////////////
 // Equals operator
-const Vector4 &Vector4::operator =(const Vector4 &pt)
+Vector4 &Vector4::operator =(const Vector4 &pt)
 {
   this->x = pt.x;
   this->y = pt.y;

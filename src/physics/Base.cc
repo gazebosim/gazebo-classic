@@ -59,7 +59,7 @@ Base::~Base()
   this->SetParent(BasePtr());
 
   for (Base_V::iterator iter = this->children.begin();
-       iter != this->childrenEnd; iter++)
+       iter != this->childrenEnd; ++iter)
   {
     if (*iter)
       (*iter)->SetParent(BasePtr());
@@ -93,7 +93,7 @@ void Base::Fini()
 {
   Base_V::iterator iter;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
     (*iter)->Fini();
 
   this->children.clear();
@@ -107,7 +107,7 @@ void Base::Fini()
 void Base::Reset()
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
     (*iter)->Reset();
   }
@@ -180,7 +180,7 @@ void Base::AddChild(BasePtr _child)
 void Base::RemoveChild(unsigned int _id)
 {
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->GetId() == _id)
     {
@@ -226,7 +226,7 @@ void Base::RemoveChild(const std::string &_name)
   Base_V::iterator iter;
 
   for (iter = this->children.begin();
-       iter != this->childrenEnd; iter++)
+       iter != this->childrenEnd; ++iter)
   {
     if ((*iter)->GetCompleteScopedName() == _name)
       break;
@@ -254,7 +254,7 @@ BasePtr Base::GetById(unsigned int _id) const
   BasePtr result;
   Base_V::const_iterator biter;
 
-  for (biter = this->children.begin(); biter != this->children.end(); biter++)
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
   {
     if ((*biter)->GetId() == _id)
     {
@@ -278,7 +278,7 @@ BasePtr Base::GetByName(const std::string &_name)
   Base_V::const_iterator iter;
 
   for (iter =  this->children.begin();
-       iter != this->childrenEnd && result == NULL; iter++)
+       iter != this->childrenEnd && result == NULL; ++iter)
     result = (*iter)->GetByName(_name);
 
   return result;
@@ -334,7 +334,7 @@ void Base::Print(std::string _prefix)
   gzmsg << _prefix << this->GetName() << "\n";
 
   _prefix += "  ";
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
     (*iter)->Print(_prefix);
 }
 
@@ -344,7 +344,7 @@ bool Base::SetSelected(bool _s)
   this->selected = _s;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
     (*iter)->SetSelected(_s);
 
   return true;
@@ -368,7 +368,7 @@ void Base::SetWorld(const WorldPtr &_newWorld)
   this->world = _newWorld;
 
   Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->childrenEnd; iter++)
+  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
     (*iter)->SetWorld(this->world);
   }

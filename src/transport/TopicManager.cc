@@ -55,7 +55,7 @@ void TopicManager::Fini()
 {
   PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin();
-       iter != this->advertisedTopics.end(); iter++)
+       iter != this->advertisedTopics.end(); ++iter)
   {
     this->Unadvertise(iter->first);
   }
@@ -77,7 +77,7 @@ void TopicManager::RemoveNode(unsigned int _id)
 {
   std::vector<NodePtr>::iterator iter;
   this->nodeMutex->lock();
-  for (iter = this->nodes.begin(); iter != this->nodes.end(); iter++)
+  for (iter = this->nodes.begin(); iter != this->nodes.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
     {
@@ -255,7 +255,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
     // Add all of our subscriptions to the publication
     std::list<NodePtr>::iterator cbIter;
     for (cbIter = nodeIter->second.begin();
-         cbIter != nodeIter->second.end(); cbIter++)
+         cbIter != nodeIter->second.end(); ++cbIter)
     {
       publication->AddSubscription(*cbIter);
     }
@@ -365,7 +365,7 @@ void TopicManager::ClearBuffers()
 {
   PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin();
-       iter != this->advertisedTopics.end(); iter++)
+       iter != this->advertisedTopics.end(); ++iter)
   {
   }
 }

@@ -61,7 +61,7 @@ void gui::load()
   g_main_win->resize(1024, 768);
 
   for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); iter++)
+       iter != g_plugins.end(); ++iter)
   {
     (*iter)->Load();
   }
@@ -78,7 +78,7 @@ void gui::init()
   g_main_win->Init();
 
   for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); iter++)
+       iter != g_plugins.end(); ++iter)
   {
     (*iter)->Init();
   }

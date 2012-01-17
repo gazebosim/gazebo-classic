@@ -32,7 +32,6 @@
 
 #include <math.h>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "SonarInterface.hh"
 
@@ -125,9 +124,6 @@ void SonarInterface::Update()
   // Only Update when new data is present
   if (this->iface->data->head.time > this->datatime)
   {
-    int i;
-    float rangeRes;
-    float angleRes;
 
     this->datatime = this->iface->data->head.time;
 

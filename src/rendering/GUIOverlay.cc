@@ -286,6 +286,7 @@ bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
                                      const std::string &_windowName)
 {
+  bool result = false;
 #ifdef HAVE_CEGUI
   CEGUI::Window *window = NULL;
   CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
@@ -309,7 +310,6 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
     return false;
   }
 
-#ifdef HAVE_CEGUI
   Ogre::TexturePtr texPtr(_camera->GetRenderTexture());
   CEGUI::Texture &guiTex = this->guiRenderer->createTexture(
       texPtr);
@@ -328,11 +328,9 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
 
   window->setProperty("Image",
       CEGUI::PropertyHelper::imageToString(&imageSet.getImage("RTTImage")));
-  return true;
-
+  result = true;
 #endif
-#endif
-  return false;
+  return result;
 }
 
 #ifdef HAVE_CEGUI

@@ -22,8 +22,8 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletLink.hh"
-#include "BulletBallJoint.hh"
+#include "physics/bullet/BulletBody.hh"
+#include "physics/bullet/BulletBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;

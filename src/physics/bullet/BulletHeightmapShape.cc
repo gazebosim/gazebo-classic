@@ -27,16 +27,10 @@
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
 #include "common/Image.hh"
-#include "rendering/OgreHeightmap.hh"
 #include "common/Exception.hh"
 #include "Link.hh"
-#include "BulletHeightmapCollision.hh"
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 
@@ -104,13 +98,10 @@ void BulletHeightmapCollision::FillHeightMap()
     }
   }
 
-  if (this->collisionShape)
-    delete this->collisionShape;
+  delete this->collisionShape;
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  int forwardIndex = 1;
-  int rightIndex = 0;
 
   btmath::Vector3 localScaling(this->terrainSize.x, this->terrainSize.y,
                          this->terrainSize.z);

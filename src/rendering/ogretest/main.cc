@@ -532,9 +532,7 @@ int main(int, char**) {
     // load our config file
     mgr.cfgFile.loadDirect("../data/config.ini");
     // get our renderer (OpenGL or Direct3D)
-    Renderer renderer = OGL; // default to OGL
-    std::string rendererAsString = removeQuotes(mgr.cfgFile.getSetting(
-          "library", "renderer"));
+    removeQuotes(mgr.cfgFile.getSetting("library", "renderer"));
 
     // start up the renderer and a window (OGL for the example)
     initRenderer();

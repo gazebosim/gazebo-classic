@@ -115,7 +115,8 @@ class QtPropertyPrivate
 {
 public:
     QtPropertyPrivate(QtAbstractPropertyManager *manager)
-        : m_enabled(true),
+        : q_ptr(NULL),
+          m_enabled(true),
           m_modified(false),
           m_manager(manager) {}
     QtProperty *q_ptr;
@@ -175,6 +176,7 @@ class QtAbstractPropertyManagerPrivate
     QtAbstractPropertyManager *q_ptr;
     Q_DECLARE_PUBLIC(QtAbstractPropertyManager)
 public:
+    QtAbstractPropertyManagerPrivate() : q_ptr(NULL) {}
     void propertyDestroyed(QtProperty *property);
     void propertyChanged(QtProperty *property) const;
     void propertyRemoved(QtProperty *property,

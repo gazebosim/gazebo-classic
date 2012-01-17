@@ -64,14 +64,8 @@ void Node::Init(const std::string &_space)
     std::list<std::string> namespaces;
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
-    std::string ns;
-    if (namespaces.size() == 0)
-    {
-      ns = "default";
+    if (namespaces.empty())
       gzerr << "No namespace found";
-    }
-    else
-      ns = namespaces.front();
 
     this->topicNamespace = namespaces.front();
   }
@@ -147,7 +141,7 @@ void Node::ProcessIncoming()
   inIter = this->incomingMsgs.begin();
   endIter = this->incomingMsgs.end();
 
-  for (; inIter != endIter; inIter++)
+  for (; inIter != endIter; ++inIter)
   {
     // Find the callbacks for the topic
     cbIter = this->callbacks.find(inIter->first);
@@ -155,11 +149,11 @@ void Node::ProcessIncoming()
     {
       // For each message in the buffer
       for (msgIter = inIter->second.begin(); msgIter != inIter->second.end();
-           msgIter++)
+           ++msgIter)
       {
         // Send the message to all callbacks
         for (liter = cbIter->second.begin();
-             liter != cbIter->second.end(); liter++)
+             liter != cbIter->second.end(); ++liter)
         {
           (*liter)->HandleData(*msgIter);
         }

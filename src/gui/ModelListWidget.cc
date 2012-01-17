@@ -417,7 +417,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
-       iter != properties.end(); iter++)
+       iter != properties.end(); ++iter)
   {
     if (!this->HasChildItem(*iter, _item))
       continue;
@@ -733,7 +733,7 @@ void ModelListWidget::FillMsg(QtProperty *_item,
 
     QList<QtProperty*> properties = _item->subProperties();
     for (QList<QtProperty*>::iterator iter = properties.begin();
-        iter != properties.end(); iter++)
+        iter != properties.end(); ++iter)
     {
       if (!this->HasChildItem(*iter, _changedItem))
         continue;
@@ -774,11 +774,11 @@ QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
     const std::string &_name)
 {
   for (QList<QtProperty*>::iterator iter = _list.begin();
-      iter != _list.end(); iter++)
+      iter != _list.end(); ++iter)
   {
     if ((*iter)->propertyName().toStdString() == _name)
     {
-      _list.erase(iter);
+      iter = _list.erase(iter);
       return (*iter);
     }
   }
@@ -792,7 +792,7 @@ QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
-      iter != properties.end(); iter++)
+      iter != properties.end(); ++iter)
   {
     if ((*iter)->valueText().toStdString() == _name)
       return NULL;
@@ -813,7 +813,7 @@ QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
 
   QList<QtProperty*> subProperties = _item->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
-      iter != subProperties.end(); iter++)
+      iter != subProperties.end(); ++iter)
   {
     if ((*iter)->valueText().toStdString() == _name)
     {
@@ -833,7 +833,7 @@ QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
-      iter != properties.end(); iter++)
+      iter != properties.end(); ++iter)
   {
     if ((*iter)->propertyName().toStdString() == _name)
       return NULL;
@@ -854,7 +854,7 @@ QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
 
   QList<QtProperty*> subProperties = _item->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
-      iter != subProperties.end(); iter++)
+      iter != subProperties.end(); ++iter)
   {
     if ((*iter)->propertyName().toStdString() == _name)
     {
@@ -878,7 +878,7 @@ bool ModelListWidget::HasChildItem(QtProperty *_parent, QtProperty *_child)
   bool result = false;
   QList<QtProperty*> subProperties = _parent->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
-      iter != subProperties.end(); iter++)
+      iter != subProperties.end(); ++iter)
   {
     if ((result = this->HasChildItem(*iter, _child)))
       break;
@@ -893,7 +893,7 @@ QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
-      iter != properties.end(); iter++)
+      iter != properties.end(); ++iter)
   {
     if ((result = this->GetChildItemValue(*iter, _name)) != NULL)
       break;
@@ -913,7 +913,7 @@ QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
   QtProperty *result = NULL;
   QList<QtProperty*> subProperties = _item->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
-      iter != subProperties.end(); iter++)
+      iter != subProperties.end(); ++iter)
   {
     if ((result = this->GetChildItem(*iter, _name)) != NULL)
       break;
@@ -928,7 +928,7 @@ QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
-      iter != properties.end(); iter++)
+      iter != properties.end(); ++iter)
   {
     if ((result = this->GetChildItem(*iter, _name)) != NULL)
       break;
@@ -948,7 +948,7 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
   QtProperty *result = NULL;
   QList<QtProperty*> subProperties = _item->subProperties();
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
-      iter != subProperties.end(); iter++)
+      iter != subProperties.end(); ++iter)
   {
     if ((result = this->GetChildItem(*iter, _name)) != NULL)
       break;
@@ -1467,38 +1467,39 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   value.Round(6);
 
   // Add X value
-  item = (QtVariantProperty*)this->GetChildItem(_parent, "x");
+  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "x"));
   if (!item)
   {
     item = this->variantManager->addProperty(QVariant::Double, "x");
     if (_parent)
       _parent->addSubProperty(item);
   }
-  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(
-    item))->setAttribute(item, "decimals", 6);
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
   item->setValue(value.x);
 
   // Add Y value
-  item = (QtVariantProperty*)this->GetChildItem(_parent, "y");
+  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "y"));
   if (!item)
   {
     item = this->variantManager->addProperty(QVariant::Double, "y");
     if (_parent)
       _parent->addSubProperty(item);
   }
-  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(
+  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
   item->setValue(value.y);
 
   // Add Z value
-  item = (QtVariantProperty*)this->GetChildItem(_parent, "z");
+  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "z"));
   if (!item)
   {
     item = this->variantManager->addProperty(QVariant::Double, "z");
     if (_parent)
       _parent->addSubProperty(item);
   }
-  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(
+  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
   item->setValue(value.z);
 }
@@ -1517,38 +1518,38 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   this->FillVector3dProperty(_msg.position(), _parent);
 
   // Add Roll value
-  item = (QtVariantProperty*)this->GetChildItem(_parent, "roll");
+  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "roll"));
   if (!item)
   {
     item = this->variantManager->addProperty(QVariant::Double, "roll");
     if (_parent)
       _parent->addSubProperty(item);
   }
-  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(
+  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
   item->setValue(GZ_RTOD(rpy.x));
 
   // Add Pitch value
-  item = (QtVariantProperty*)this->GetChildItem(_parent, "pitch");
+  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
   if (!item)
   {
     item = this->variantManager->addProperty(QVariant::Double, "pitch");
     if (_parent)
       _parent->addSubProperty(item);
   }
-  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(
+  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
   item->setValue(GZ_RTOD(rpy.y));
 
   // Add Yaw value
-  item = (QtVariantProperty*)this->GetChildItem(_parent, "yaw");
+  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
   if (!item)
   {
     item = this->variantManager->addProperty(QVariant::Double, "yaw");
     if (_parent)
       _parent->addSubProperty(item);
   }
-  ((QtVariantPropertyManager*)this->variantFactory->propertyManager(
+  static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
   item->setValue(GZ_RTOD(rpy.z));
 }
@@ -1560,7 +1561,7 @@ void ModelListWidget::ProcessPoseMsgs()
   this->fillingPropertyTree = true;
 
   std::list<msgs::Pose>::iterator iter;
-  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
   {
     if ((*iter).name().find(this->selectedModelName) != std::string::npos)
     {
@@ -1588,7 +1589,7 @@ void ModelListWidget::OnPose(
     std::list<msgs::Pose>::iterator iter;
 
     // Find an old model message, and remove them
-    for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+    for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
     {
       if ((*iter).name() == _msg->name())
       {

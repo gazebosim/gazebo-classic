@@ -25,12 +25,9 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-#include "common/XMLConfig.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "common/Exception.hh"
-#include "common/XMLConfig.hh"
-#include "Controller.hh"
 #include "ImuSensor.hh"
 
 #include "math/Vector3.hh"

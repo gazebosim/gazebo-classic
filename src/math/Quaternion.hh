@@ -71,7 +71,7 @@ namespace gazebo
 
     /// \brief Equal operator
     /// \param qt Quaternion to copy
-    public: const Quaternion &operator =(const Quaternion &qt);
+    public: Quaternion &operator =(const Quaternion &qt);
 
     /// \brief Invert the quaternion
     public: void Invert();

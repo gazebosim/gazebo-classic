@@ -102,7 +102,7 @@ namespace gazebo
       public: void Rotate(const math::Quaternion &rot);
 
       /// \brief Equal operator
-      public: void operator =(const Inertial &_inertial);
+      public: Inertial &operator=(const Inertial &_inertial);
 
       public: Inertial operator+(const Inertial &_inertial) const;
       public: const Inertial &operator+=(const Inertial &_inertial);

@@ -72,7 +72,7 @@ void Param::End()
 // Find a parameter by name
 ParamPtr Param::Find(Param_V &_params, const std::string &key)
 {
-  for (Param_V::iterator iter = _params.begin(); iter != _params.end(); iter++)
+  for (Param_V::iterator iter = _params.begin(); iter != _params.end(); ++iter)
   {
     if ((*iter)->GetKey() == key)
       return (*iter);

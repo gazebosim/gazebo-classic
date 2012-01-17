@@ -64,8 +64,7 @@ bool ConnectionManager::Init(const std::string &master_host,
 {
   this->stop = false;
   this->masterConn.reset(new Connection());
-  if (this->serverConn)
-    delete this->serverConn;
+  delete this->serverConn;
   this->serverConn = new Connection();
 
   // Create a new TCP server on a free port
@@ -213,7 +212,7 @@ void ConnectionManager::Run()
       if ((*iter)->IsOpen())
       {
         (*iter)->ProcessWriteQueue();
-        iter++;
+        ++iter;
       }
       else
       {
@@ -279,7 +278,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
           (*iter).port() == result.port())
         iter = this->publishers.erase(iter);
       else
-        iter++;
+        ++iter;
     }
   }
   else if (packet.type() == "topic_namespace_add")
@@ -432,7 +431,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
   std::list<msgs::Publish>::iterator iter;
 
   this->listMutex->lock();
-  for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
+  for (iter = this->publishers.begin(); iter != this->publishers.end(); ++iter)
     _publishers.push_back(*iter);
   this->listMutex->unlock();
 }
@@ -444,7 +443,7 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
   std::list<std::string>::iterator iter;
 
   this->listMutex->lock();
-  for (iter = this->namespaces.begin(); iter != this->namespaces.end(); iter++)
+  for (iter = this->namespaces.begin(); iter != this->namespaces.end(); ++iter)
     _namespaces.push_back(*iter);
   this->listMutex->unlock();
 }
@@ -538,7 +537,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
     if ((*iter) == conn)
       iter = this->connections.erase(iter);
     else
-      iter++;
+      ++iter;
   }
   this->connectionMutex->unlock();
 }
@@ -559,7 +558,7 @@ ConnectionPtr ConnectionManager::FindConnection(const std::string &host,
   // Check to see if we are already connected to the remote publisher
   this->connectionMutex->lock();
   for (iter = this->connections.begin();
-       iter != this->connections.end(); iter++)
+       iter != this->connections.end(); ++iter)
   {
     if ((*iter)->IsOpen() && (*iter)->GetRemoteURI() == uri)
       conn = *iter;

@@ -1175,7 +1175,7 @@ Q_GLOBAL_STATIC(Map2, m_managerToFactoryToViews)
 
 
 QtAbstractPropertyBrowserPrivate::QtAbstractPropertyBrowserPrivate() :
-   m_currentItem(0)
+   q_ptr(NULL), m_currentItem(0)
 {
 }
 

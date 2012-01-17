@@ -24,47 +24,45 @@
 #define BULLETPLANESHAPE_HH
 
 #include "common/Exception.hh"
-#include "BulletCollision.hh"
 #include "BulletPhysics.hh"
 #include "PlaneShape.hh"
 
 namespace gazebo
 {
   namespace physics
-{
-  class Link;
-  class XMLConfig;
-
-  /// \brief Bullet collision for an infinite plane.
-  class BulletPlaneShape : public PlaneShape
   {
-    /// \brief Constructor
-    public: BulletPlaneShape(Collision *parent) : PlaneShape(parent) {}
-    /// \brief Destructor
-    public: virtual ~BulletPlaneShape() {}
-    /// \brief Set the altitude of the plane
-    public: void SetAltitude(const math::Vector3 &pos)
-            {
-              PlaneShape::SetAltitude(pos);
-            }
-
-    /// \brief Create the plane
-    public: void CreatePlane()
-            {
-              BulletCollision *bParent = (BulletCollision*)(this->parent);
-              PlaneShape::CreatePlane();
-
-              btmath::Vector3 vec((**normalP).x, (**normalP).y, (**normalP).z);
-
-              btCollisionShape *btshape = new btStaticPlaneShape(vec, 0.0);
-
-              bParent->SetCollisionShape(btshape);
-            }
-  };
-
-  /// \}
-}
-}
+    class Link;
+    class XMLConfig;
+  
+    /// \brief Bullet collision for an infinite plane.
+    class BulletPlaneShape : public PlaneShape
+    {
+      /// \brief Constructor
+      public: BulletPlaneShape(Collision *parent) : PlaneShape(parent) {}
+      /// \brief Destructor
+      public: virtual ~BulletPlaneShape() {}
+      /// \brief Set the altitude of the plane
+      public: void SetAltitude(const math::Vector3 &pos)
+              {
+                PlaneShape::SetAltitude(pos);
+              }
+  
+      /// \brief Create the plane
+      public: void CreatePlane()
+              {
+                BulletCollision *bParent = (BulletCollision*)(this->parent);
+                PlaneShape::CreatePlane();
+  
+                btmath::Vector3 vec((**normalP).x,
+                    (**normalP).y, (**normalP).z);
+  
+                btCollisionShape *btshape = new btStaticPlaneShape(vec, 0.0);
+  
+                bParent->SetCollisionShape(btshape);
+              }
+    };
+  
+    /// \}
+  }
 }
 #endif
-

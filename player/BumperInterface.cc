@@ -34,7 +34,6 @@
 #include <math.h>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "BumperInterface.hh"
 
@@ -128,7 +127,7 @@ void BumperInterface::Subscribe()
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     std::cerr << "Error subscribing to Gazebo Bumper Interface\n"
       << e << "\n";

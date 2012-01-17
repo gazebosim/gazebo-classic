@@ -71,7 +71,7 @@ namespace gazebo
       /// \brief Equal operator. Set this box to the parameter
       /// \param _b Box to copy
       /// \return The new box.
-      public: const Box &operator =(const Box &_b);
+      public: Box &operator =(const Box &_b);
 
       /// \brief Addition operator. result = this + _b
       /// \param _b Box to add

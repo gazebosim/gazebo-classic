@@ -77,7 +77,7 @@ void SensorManager::Update(bool force)
   this->mutex->lock();
   // in case things are spawn, sensors length changes
   std::list<SensorPtr>::iterator end = this->initSensors.end();
-  for (iter = this->initSensors.begin(); iter != end; iter++)
+  for (iter = this->initSensors.begin(); iter != end; ++iter)
   {
     (*iter)->Init();
     this->sensors.push_back((*iter));
@@ -95,7 +95,7 @@ void SensorManager::Update(bool force)
   this->mutex->lock();
   // in case things are spawn, sensors length changes
   end = this->sensors.end();
-  for (iter = this->sensors.begin(); iter != end; iter++)
+  for (iter = this->sensors.begin(); iter != end; ++iter)
   {
     (*iter)->Update(force);
   }
@@ -107,7 +107,7 @@ void SensorManager::Init()
 {
   this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Init();
   this->mutex->unlock();
   this->initialized = true;
@@ -119,7 +119,7 @@ void SensorManager::Fini()
   this->initialized = false;
   this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Fini();
   this->sensors.clear();
   this->mutex->unlock();
@@ -162,7 +162,7 @@ SensorPtr SensorManager::GetSensor(const std::string &_name)
 
   this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       result = (*iter);
@@ -177,7 +177,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
 {
   this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     if ((*iter)->GetName() == _name)
       break;
 
@@ -193,7 +193,7 @@ void SensorManager::RemoveSensors()
 {
   this->mutex->lock();
   std::list<SensorPtr>::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
     (*iter)->Fini();
 
   this->sensors.clear();

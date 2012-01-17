@@ -74,7 +74,7 @@ MeshManager::~MeshManager()
   delete this->colladaLoader;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
-  for (iter = this->meshes.begin(); iter != this->meshes.end(); iter++)
+  for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
     delete iter->second;
   this->meshes.clear();
 }
@@ -139,7 +139,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
         mesh = this->meshes[filename];
       }
     }
-    catch (gazebo::common::Exception e)
+    catch (gazebo::common::Exception &e)
     {
       gzerr << "Error loading mesh[" << fullname << "]\n";
       gzerr << e << "\n";

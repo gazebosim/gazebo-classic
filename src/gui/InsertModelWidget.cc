@@ -49,13 +49,12 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
-  QList<QTreeWidgetItem*> items;
   std::list<std::string> gazeboPaths =
     common::SystemPaths::Instance()->GetGazeboPaths();
 
   // Iterate over all the gazebo paths
   for (std::list<std::string>::iterator iter = gazeboPaths.begin();
-       iter != gazeboPaths.end(); iter++)
+       iter != gazeboPaths.end(); ++iter)
   {
     // This is the full model path
     std::string path = (*iter) +

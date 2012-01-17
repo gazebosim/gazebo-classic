@@ -60,7 +60,7 @@ namespace gazebo
       public: Vector2d GetCrossProd(const Vector2d &_pt) const;
 
       /// \brief Equal operator
-      public: const Vector2d &operator =(const Vector2d &pt);
+      public: Vector2d &operator =(const Vector2d &pt);
 
       /// \brief Equal operator
       public: const Vector2d &operator =(double value);

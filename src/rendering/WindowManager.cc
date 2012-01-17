@@ -71,9 +71,9 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 
 //////////////////////////////////////////////////
 // Create a window
-int WindowManager::CreateWindow(const std::string ogreHandle,
-                                 unsigned int width,
-                                 unsigned int height)
+int WindowManager::CreateWindow(const std::string &ogreHandle,
+                                unsigned int width,
+                                unsigned int height)
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -156,10 +156,13 @@ void WindowManager::Moved(unsigned int id)
 /// Get the average FPS
 float WindowManager::GetAvgFPS(unsigned int windowId)
 {
-  float lastFPS, avgFPS, bestFPS, worstFPS = 0;
+  float avgFPS = 0;
 
   if (windowId < this->windows.size())
+  {
+    float lastFPS, bestFPS, worstFPS = 0;
     this->windows[windowId]->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+  }
 
   return avgFPS;
 }

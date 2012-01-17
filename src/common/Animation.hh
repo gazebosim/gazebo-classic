@@ -36,7 +36,7 @@ namespace gazebo
 
     class Animation
     {
-      public: Animation(const std::string _name, double _length, bool _loop);
+      public: Animation(const std::string &_name, double _length, bool _loop);
       public: virtual ~Animation();
 
       public: double GetLength() const;
@@ -63,7 +63,7 @@ namespace gazebo
 
     class PoseAnimation : public Animation
     {
-      public: PoseAnimation(const std::string _name,
+      public: PoseAnimation(const std::string &_name,
                             double _length, bool _loop);
       public: virtual ~PoseAnimation();
 
@@ -82,7 +82,7 @@ namespace gazebo
 
     class NumericAnimation : public Animation
     {
-      public: NumericAnimation(const std::string _name,
+      public: NumericAnimation(const std::string &_name,
                                double _length, bool _loop);
       public: virtual ~NumericAnimation();
 
