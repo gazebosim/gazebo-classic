@@ -18,6 +18,10 @@
 #ifndef COLLADALOADER_HH
 #define COLLADALOADER_HH
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "common/MeshLoader.hh"
 #include "math/MathTypes.hh"
 

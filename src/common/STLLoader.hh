@@ -18,6 +18,7 @@
 #define STLLOADER_HH
 
 #include <stdint.h>
+#include <string>
 
 #include "common/MeshLoader.hh"
 
@@ -25,7 +26,6 @@
 #define COR3_MAX 200000
 #define ORDER_MAX 10
 #define FACE_MAX 200000
-
 
 namespace gazebo
 {
@@ -49,26 +49,24 @@ namespace gazebo
       private: void ReadAscii(FILE *_filein, Mesh *_mesh);
 
       /// Reads a binary STL (stereolithography) file.
-      private: void ReadBinary (FILE *_filein, Mesh *_mesh);
+      private: void ReadBinary(FILE *_filein, Mesh *_mesh);
 
       /// Compares two strings for equality, disregarding case.
-      private: bool Leqi (char* _string1, char* _string2);
+      private: bool Leqi(char* _string1, char* _string2);
 
       /// Finds if a vector occurs in a table.
-      private: int RcolFind (float _a[][COR3_MAX], int _m, int _n, float _r[]);
+      private: int RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[]);
 
       /// Reads a long int from a binary file.
-      private: uint32_t LongIntRead (FILE *_filein);
+      private: uint32_t LongIntRead(FILE *_filein);
 
       /// Reads a short int from a binary file.
-      private: uint16_t ShortIntRead (FILE *_filein);
+      private: uint16_t ShortIntRead(FILE *_filein);
 
       /// Read 1 float from a binary file.
-      private: float FloatRead (FILE *_filein);
-
+      private: float FloatRead(FILE *_filein);
     };
     /// \}
   }
 }
 #endif
-

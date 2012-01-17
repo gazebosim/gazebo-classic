@@ -18,14 +18,15 @@
  * Author: Jordi Polo
  * Date: 3 May 2008
  */
-#include <assert.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <tinyxml.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include <assert.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "common/SystemPaths.hh"
 #include "common/Exception.hh"
@@ -72,7 +73,7 @@ std::string SystemPaths::GetLogPath() const
 
 const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
-  if (this->gazeboPaths.size() == 0)
+  if (this->gazeboPaths.empty())
   {
     std::string delim(":");
     std::string path;
@@ -87,9 +88,9 @@ const std::list<std::string> &SystemPaths::GetGazeboPaths()
     }
     path = pathCStr;
 
-    int pos1 = 0;
-    int pos2 = path.find(delim);
-    while (pos2 != (int)std::string::npos)
+    size_t pos1 = 0;
+    size_t pos2 = path.find(delim);
+    while (pos2 != std::string::npos)
     {
       this->gazeboPaths.push_back(path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
@@ -120,9 +121,9 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
     }
     path = pathCStr;
 
-    int pos1 = 0;
-    int pos2 = path.find(delim);
-    while (pos2 != (int)std::string::npos)
+    size_t pos1 = 0;
+    size_t pos2 = path.find(delim);
+    while (pos2 != std::string::npos)
     {
       this->ogrePaths.push_back(path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
@@ -153,9 +154,9 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
     }
     path = pathCStr;
 
-    int pos1 = 0;
-    int pos2 = path.find(delim);
-    while (pos2 != (int)std::string::npos)
+    size_t pos1 = 0;
+    size_t pos2 = path.find(delim);
+    while (pos2 != std::string::npos)
     {
       this->pluginPaths.push_back(path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
@@ -229,7 +230,6 @@ std::string SystemPaths::FindFileWithGazeboPaths(std::string _filename)
   }
 
   return fullname;
-
 }
 
 void SystemPaths::ClearGazeboPaths()
@@ -247,11 +247,11 @@ void SystemPaths::ClearPluginPaths()
 void SystemPaths::AddGazeboPaths(std::string _gazebo_resource_path)
 {
   std::string delim(":");
-  if(!_gazebo_resource_path.empty())
+  if (!_gazebo_resource_path.empty())
   {
-    int pos1 = 0;
-    int pos2 = _gazebo_resource_path.find(delim);
-    while (pos2 != (int)std::string::npos)
+    size_t pos1 = 0;
+    size_t pos2 = _gazebo_resource_path.find(delim);
+    while (pos2 != std::string::npos)
     {
       this->gazeboPaths.push_back(_gazebo_resource_path.substr(pos1,
                                                                pos2-pos1));
@@ -266,11 +266,11 @@ void SystemPaths::AddGazeboPaths(std::string _gazebo_resource_path)
 void SystemPaths::AddOgrePaths(std::string _ogre_resource_path)
 {
   std::string delim(":");
-  if(!_ogre_resource_path.empty())
+  if (!_ogre_resource_path.empty())
   {
-    int pos1 = 0;
-    int pos2 = _ogre_resource_path.find(delim);
-    while (pos2 != (int)std::string::npos)
+    size_t pos1 = 0;
+    size_t pos2 = _ogre_resource_path.find(delim);
+    while (pos2 != std::string::npos)
     {
       this->ogrePaths.push_back(_ogre_resource_path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;
@@ -284,11 +284,11 @@ void SystemPaths::AddOgrePaths(std::string _ogre_resource_path)
 void SystemPaths::AddPluginPaths(std::string _gazebo_plugin_path)
 {
   std::string delim(":");
-  if(!_gazebo_plugin_path.empty())
+  if (!_gazebo_plugin_path.empty())
   {
-    int pos1 = 0;
-    int pos2 = _gazebo_plugin_path.find(delim);
-    while (pos2 != (int)std::string::npos)
+    size_t pos1 = 0;
+    size_t pos2 = _gazebo_plugin_path.find(delim);
+    while (pos2 != std::string::npos)
     {
       this->pluginPaths.push_back(_gazebo_plugin_path.substr(pos1, pos2-pos1));
       pos1 = pos2+1;

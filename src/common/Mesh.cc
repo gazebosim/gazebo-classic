@@ -14,9 +14,9 @@
  * limitations under the License.
  *
  */
-#include <algorithm>
 #include <float.h>
 #include <string.h>
+#include <algorithm>
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -230,7 +230,7 @@ unsigned int Mesh::GetMaterialCount() const
 /// Get a material
 const Material *Mesh::GetMaterial(int index) const
 {
-  if (index >= 0 && index < (int)this->materials.size())
+  if (index >= 0 && index < static_cast<int>(this->materials.size()))
     return this->materials[index];
 
   return NULL;
@@ -275,7 +275,7 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
     unsigned int *indTmp = NULL;
     (*iter)->FillArrays(&vertTmp, &indTmp);
 
-    memcpy(vPtr, vertTmp, sizeof(float)*(*iter)->GetVertexCount()*3);
+    memcpy(vPtr, vertTmp, sizeof(vertTmp[0])*(*iter)->GetVertexCount()*3);
 
     for (unsigned int i = 0; i < (*iter)->GetIndexCount(); i++)
     {
@@ -289,7 +289,6 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
     delete [] vertTmp;
     delete [] indTmp;
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -652,9 +651,9 @@ void SubMesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
       ++viter)
   {
-    (*_vertArr)[i++] = (float)(*viter).x;
-    (*_vertArr)[i++] = (float)(*viter).y;
-    (*_vertArr)[i++] = (float)(*viter).z;
+    (*_vertArr)[i++] = static_cast<float>((*viter).x);
+    (*_vertArr)[i++] = static_cast<float>((*viter).y);
+    (*_vertArr)[i++] = static_cast<float>((*viter).z);
   }
 
   for (iiter = this->indices.begin(), i = 0;
@@ -782,7 +781,6 @@ void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
     double t = std::min(1.0, std::max(-1.0, y/r));
     double u = acos(s) / M_PI;
     double v = acos(t) / M_PI;
-    //gzerr << "uv1 debug: " << u << ", " << v << std::endl;
     this->AddTexCoord(u, v);
   }
 }

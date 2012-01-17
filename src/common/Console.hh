@@ -42,11 +42,11 @@ namespace gazebo
     #define gzdbg (gazebo::common::Console::Instance()->ColorMsg("Dbg", 36))
 
     /// \brief Output a warning message
-    #define gzwarn (gazebo::common::Console::Instance()->ColorErr("Warning",\
+    #define gzwarn (gazebo::common::Console::Instance()->ColorErr("Warning", \
           __FILE__, __LINE__, 33))
 
     /// \brief Output an error message
-    #define gzerr (gazebo::common::Console::Instance()->ColorErr("Error",\
+    #define gzerr (gazebo::common::Console::Instance()->ColorErr("Error", \
           __FILE__, __LINE__, 31))
 
     /// Log a message

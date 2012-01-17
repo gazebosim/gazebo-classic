@@ -22,6 +22,9 @@
 #ifndef DIAGNOSTICMANAGER_HH
 #define DIAGNOSTICMANAGER_HH
 
+#include <map>
+#include <string>
+
 #include "common/SingletonT.hh"
 #include "common/Timer.hh"
 
@@ -71,7 +74,7 @@ namespace gazebo
 
       private: std::map<std::string, Time> timers;
 
-      //Singleton implementation
+      // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
     };
 
@@ -97,10 +100,8 @@ namespace gazebo
       private: std::string name;
       private: static DiagnosticManager *diagManager;
     };
-
     /// \}
   }
-
 }
 #endif
 

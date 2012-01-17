@@ -30,10 +30,10 @@ namespace gazebo
     /// \brief Encapsulates a description of a material
     class Material
     {
-      public: enum ShadeMode{FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};
+      public: enum ShadeMode {FLAT, GOURAUD, PHONG, BLINN, SHADE_COUNT};
       public: static std::string ShadeModeStr[SHADE_COUNT];
 
-      public: enum BlendMode{ADD, MODULATE, REPLACE, BLEND_COUNT};
+      public: enum BlendMode {ADD, MODULATE, REPLACE, BLEND_COUNT};
       public: static std::string BlendModeStr[BLEND_COUNT];
 
       /// \brief Constructor

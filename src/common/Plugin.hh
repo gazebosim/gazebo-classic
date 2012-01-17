@@ -17,11 +17,19 @@
 #ifndef PLUGIN_HH
 #define PLUGIN_HH
 
-#include <string>
 #include <unistd.h>
 #include <sys/types.h>
-#include <list>
 #include <sys/stat.h>
+
+#include "gazebo_config.h"
+#ifdef HAVE_DL
+#include <dlfcn.h>
+#elif HAVE_LTDL
+#include <ltdl.h>
+#endif
+
+#include <list>
+#include <string>
 
 #include "common/CommonTypes.hh"
 #include "common/SystemPaths.hh"
@@ -32,13 +40,6 @@
 #include "sensors/SensorTypes.hh"
 #include "sdf/sdf.h"
 
-#include "gazebo_config.h"
-
-#ifdef HAVE_DL
-#include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 
 namespace gazebo
@@ -69,7 +70,7 @@ namespace gazebo
                                     const std::string &_handle)
     {
       TPtr result;
-      //PluginPtr result;
+      // PluginPtr result;
       struct stat st;
       bool found = false;
       std::string fullname;
@@ -110,7 +111,7 @@ namespace gazebo
 
       registerFunc.ptr = dlsym(handle, registerName.c_str());
 
-      if(!registerFunc.ptr)
+      if (!registerFunc.ptr)
       {
         gzerr << "Failed to resolve " << registerName << ": " << dlerror();
         return result;
@@ -146,7 +147,7 @@ namespace gazebo
 
       T *(*registerFunc)() = (T *(*)())lt_dlsym(handle, registerName.c_str());
       resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-      if(!registerFunc.ptr)
+      if (!registerFunc.ptr)
       {
         gzerr << "Failed to resolve " << registerName << ": " << lt_dlerror();
         return NULL;
@@ -155,11 +156,11 @@ namespace gazebo
       // Register the new controller.
       result.result(registerFunc.func());
 
-    #else // HAVE_LTDL
+    #else  // HAVE_LTDL
 
       gzthrow("Cannot load plugins as libtool is not installed.");
 
-    #endif // HAVE_LTDL
+    #endif  // HAVE_LTDL
 
       result->handle = _handle;
       result->filename = _filename;
@@ -176,8 +177,8 @@ namespace gazebo
     /// \brief Load function
     public: virtual void Load(physics::WorldPtr &_world,
                               sdf::ElementPtr &_sdf) = 0;
-    public: virtual void Init() {};
-    public: virtual void Reset() {};
+    public: virtual void Init() {}
+    public: virtual void Reset() {}
   };
 
   class ModelPlugin : public PluginT<ModelPlugin>
@@ -185,8 +186,8 @@ namespace gazebo
     /// \brief Load function
     public: virtual void Load(physics::ModelPtr &_model,
                               sdf::ElementPtr &_sdf) = 0;
-    public: virtual void Init() {};
-    public: virtual void Reset() {};
+    public: virtual void Init() {}
+    public: virtual void Reset() {}
   };
 
   class SensorPlugin : public PluginT<SensorPlugin>
@@ -194,8 +195,8 @@ namespace gazebo
     /// \brief Load function
     public: virtual void Load(
                 sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf) = 0;
-    public: virtual void Init() {};
-    public: virtual void Reset() {};
+    public: virtual void Init() {}
+    public: virtual void Reset() {}
   };
 
   class SystemPlugin : public PluginT<SystemPlugin>
@@ -203,7 +204,7 @@ namespace gazebo
     /// \brief Load function
     public: virtual void Load() = 0;
     public: virtual void Init() {}
-    public: virtual void Reset() {};
+    public: virtual void Reset() {}
   };
 
   /// \}

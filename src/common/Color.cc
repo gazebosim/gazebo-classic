@@ -19,8 +19,8 @@
  * Date: 08 May 2009
  */
 
-#include <algorithm>
 #include <math.h>
+#include <algorithm>
 
 #include "common/Console.hh"
 #include "common/Color.hh"
@@ -90,17 +90,18 @@ void Color::SetFromHSV(float _h, float _s, float _v)
   int i;
   float f, p , q, t;
 
-  _h = (int)(_h) % 360;
+  _h = static_cast<int>(_h) % 360;
 
   if (_s == 0)
   {
-    //acromatic (grey)
+    // acromatic (grey)
     this->r = this->g = this->b = _v;
     return;
   }
 
-  _h /= 60; // sector 0 - 5
-  i = (int)floor(_h);
+  // sector 0 - 5
+  _h /= 60;
+  i = static_cast<int>(floor(_h));
 
   f = _h - i;
 
@@ -108,7 +109,7 @@ void Color::SetFromHSV(float _h, float _s, float _v)
   q = _v * (1 - _s * f);
   t = _v * (1 - _s * (1-f));
 
-  switch(i)
+  switch (i)
   {
     case 0:
       this->r = _v;
@@ -155,7 +156,7 @@ math::Vector3 Color::GetAsHSV() const
   x = std::min(this->r, std::min(this->g, this->b));
   v = std::max(this->r, std::max(this->g, this->b));
 
-  if(v == x)
+  if (v == x)
   {
     gzerr << "rgb to hsv undefined\n";
     return hsv;
@@ -237,7 +238,7 @@ void Color::SetFromYUV(float _y, float _u, float _v)
 // Array index operator
 float Color::operator[](unsigned int index)
 {
-  switch(index)
+  switch (index)
   {
     case 0: return this->R();
     case 1: return this->G();

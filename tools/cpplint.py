@@ -1520,7 +1520,8 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
       error(filename, linenum, 'whitespace/parens', 2,
             'Extra space after (')
     if (Search(r'\w\s+\(', fncall) and
-        not Search(r'#\s*define|typedef', fncall)):
+        not Search(r'#\s*define|typedef', fncall) and
+        not Search(r'<.*>',fncall)):
       error(filename, linenum, 'whitespace/parens', 4,
             'Extra space before ( in function call')
     # If the ) is followed only by a newline or a { + newline, assume it's
@@ -1739,10 +1740,10 @@ def CheckSpacing(filename, clean_lines, linenum, error):
         error(filename, linenum, 'whitespace/blank_line', 3,
               'Blank line at the end of a code block.  Is this needed?')
 
-    matched = Match(r'\s*(public|protected|private):', prev_line)
-    if matched:
-      error(filename, linenum, 'whitespace/blank_line', 3,
-            'Do not leave a blank line after "%s:"' % matched.group(1))
+    #matched = Match(r'\s*(public|protected|private):', prev_line)
+    #if matched:
+    #  error(filename, linenum, 'whitespace/blank_line', 3,
+    #        'Do not leave a blank line after "%s:"' % matched.group(1))
 
   # Next, we complain if there's a comment too near the text
   commentpos = line.find('//')
@@ -2524,21 +2525,21 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
   # paren (for fn-prototype start), typename, &, varname.  For the const
   # version, we're willing for const to be before typename or after
   # Don't check the implementation on same line.
-  fnline = line.split('{', 1)[0]
-  if (len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) >
-      len(re.findall(r'\([^()]*\bconst\s+(?:typename\s+)?(?:struct\s+)?'
-                     r'(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) +
-      len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+\s+const(\s?&|&\s?)[\w]+',
-                     fnline))):
+  #fnline = line.split('{', 1)[0]
+  #if (len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) >
+  #    len(re.findall(r'\([^()]*\bconst\s+(?:typename\s+)?(?:struct\s+)?'
+  #                   r'(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) +
+  #    len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+\s+const(\s?&|&\s?)[\w]+',
+  #                   fnline))):
 
-    # We allow non-const references in a few standard places, like functions
-    # called "swap()" or iostream operators like "<<" or ">>".
-    if not Search(
-        r'(swap|Swap|operator[<>][<>])\s*\(\s*(?:[\w:]|<.*>)+\s*&',
-        fnline):
-      error(filename, linenum, 'runtime/references', 2,
-            'Is this a non-const reference? '
-            'If so, make const or use a pointer.')
+  #  # We allow non-const references in a few standard places, like functions
+  #  # called "swap()" or iostream operators like "<<" or ">>".
+  #  if not Search(
+  #      r'(swap|Swap|operator[<>][<>])\s*\(\s*(?:[\w:]|<.*>)+\s*&',
+  #      fnline):
+  #    error(filename, linenum, 'runtime/references', 2,
+  #          'Is this a non-const reference? '
+  #          'If so, make const or use a pointer.')
 
   # Check to see if they're using an conversion function cast.
   # I just try to capture the most common basic types, though there are more.
@@ -2604,11 +2605,11 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
           (match.group(1), match.group(2)))
 
   # Check that we're not using RTTI outside of testing code.
-  if Search(r'\bdynamic_cast<', line) and not _IsTestFilename(filename):
-    error(filename, linenum, 'runtime/rtti', 5,
-          'Do not use dynamic_cast<>.  If you need to cast within a class '
-          "hierarchy, use static_cast<> to upcast.  Google doesn't support "
-          'RTTI.')
+  #if Search(r'\bdynamic_cast<', line) and not _IsTestFilename(filename):
+  #  error(filename, linenum, 'runtime/rtti', 5,
+  #        'Do not use dynamic_cast<>.  If you need to cast within a class '
+  #        "hierarchy, use static_cast<> to upcast.  Google doesn't support "
+  #        'RTTI.')
 
   if Search(r'\b([A-Za-z0-9_]*_)\(\1\)', line):
     error(filename, linenum, 'runtime/init', 4,
@@ -2820,7 +2821,7 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
   if function_match:
     if (not function_match.group(3) or
         function_match.group(3) == ';' or
-        ('MockCallback<' not in raw_line and
+        ('<' not in raw_line and
          '/*' not in raw_line)):
       error(filename, linenum, 'readability/function', 3,
             'All parameters should be named in a function')
@@ -3228,7 +3229,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   # When reading from stdin, the extension is unknown, so no cpplint tests
   # should rely on the extension.
   if (filename != '-' and file_extension != 'cc' and file_extension != 'h'
-      and file_extension != 'cpp'):
+      and file_extension != 'cpp' and file_extension != 'hh'):
     sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
   else:
     ProcessFileData(filename, file_extension, lines, Error,

@@ -69,7 +69,6 @@ Mesh *STLLoader::Load(const std::string &filename)
 void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 {
   int count;
-  //int ivert;
   char *next;
   float r1;
   float r2;
@@ -92,19 +91,19 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')
       continue;
 
-    //Extract the first word in this line.
-    sscanf (next, "%s%n", token, &width);
+    // Extract the first word in this line.
+    sscanf(next, "%s%n", token, &width);
 
-    //Set NEXT to point to just after this token.
+    // Set NEXT to point to just after this token.
     next = next + width;
 
-    //FACET
-    if (this->Leqi(token, (char*)"facet"))
+    // FACET
+    if (this->Leqi(token, static_cast<char*>("facet")))
     {
       math::Vector3 normal;
 
-      //Get the XYZ coordinates of the normal vector to the face.
-      sscanf (next, "%*s %e %e %e", &r1, &r2, &r3);
+      // Get the XYZ coordinates of the normal vector to the face.
+      sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
 
       normal.x = r1;
       normal.y = r2;
@@ -113,15 +112,13 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
         gzerr << "Error..\n";
 
-      //ivert = 0;
-
       for (;;)
       {
         math::Vector3 vertex;
         if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
           gzerr << "Error...\n";
 
-        count = sscanf (input, "%*s %e %e %e", &r1, &r2, &r3);
+        count = sscanf(input, "%*s %e %e %e", &r1, &r2, &r3);
 
         if (count != 3)
           break;
@@ -133,43 +130,38 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         subMesh->AddVertex(vertex);
         subMesh->AddNormal(normal);
         subMesh->AddIndex(subMesh->GetVertexIndex(vertex));
-
-        //ivert = ivert + 1;
       }
 
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
         printf("Error...\n");
     }
     // COLOR
-    else if (this->Leqi (token, (char*)"color"))
+    else if (this->Leqi (token, static_cast<char*>("color")))
     {
-      sscanf (next, "%*s %f %f %f %f", &r1, &r2, &r3, &r4);
+      sscanf(next, "%*s %f %f %f %f", &r1, &r2, &r3, &r4);
     }
     // SOLID
-    else if (this->Leqi (token, (char*)"solid"))
+    else if (this->Leqi (token, static_cast<char*>("solid")))
     {
     }
     // ENDSOLID
-    else if (this->Leqi (token, (char*)"endsolid"))
+    else if (this->Leqi (token, static_cast<char*>("endsolid")))
     {
     }
     // Unexpected or unrecognized.
     else
     {
-      printf ("\n");
-      printf ("stl - Fatal error!\n");
-      printf (" Unrecognized first word on line.\n");
+      printf("\n");
+      printf("stl - Fatal error!\n");
+      printf(" Unrecognized first word on line.\n");
     }
   }
-
 }
 
 //////////////////////////////////////////////////
 /// Reads a binary STL (stereolithography) file.
-void STLLoader::ReadBinary (FILE *_filein, Mesh *_mesh)
+void STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
 {
-  //char c;
-  //short int attribute = 0;
   int i;
   int iface;
   int face_num;
@@ -177,18 +169,17 @@ void STLLoader::ReadBinary (FILE *_filein, Mesh *_mesh)
   SubMesh *subMesh = new SubMesh();
   _mesh->AddSubMesh(subMesh);
 
-  //80 byte Header.
+  // 80 byte Header.
   for (i = 0; i < 80; i++)
-    (char)fgetc(_filein);
-  //c = (char)fgetc(_filein);
+    static_cast<char>(fgetc(_filein));
 
-  //Number of faces.
+  // Number of faces.
   face_num = this->LongIntRead(_filein);
 
   math::Vector3 normal;
   math::Vector3 vertex;
 
-  //For each (triangular) face,
+  // For each (triangular) face,
   // components of normal vector,
   // coordinates of three vertices,
   // 2 byte "attribute".
@@ -219,22 +210,21 @@ void STLLoader::ReadBinary (FILE *_filein, Mesh *_mesh)
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    //attribute = ShortIntRead (_filein);
-    ShortIntRead (_filein);
+    ShortIntRead(_filein);
   }
 }
 
 //////////////////////////////////////////////////
 /// Compares two strings for equality, disregarding case.
-bool STLLoader::Leqi (char* _string1, char* _string2)
+bool STLLoader::Leqi(char* _string1, char* _string2)
 {
   int i;
   int nchar;
   int nchar1;
   int nchar2;
 
-  nchar1 = strlen (_string1);
-  nchar2 = strlen (_string2);
+  nchar1 = strlen(_string1);
+  nchar2 = strlen(_string2);
 
   if (nchar1 < nchar2)
     nchar = nchar1;
@@ -246,7 +236,7 @@ bool STLLoader::Leqi (char* _string1, char* _string2)
     if (toupper (_string1[i]) != toupper (_string2[i]))
       return false;
 
-  //The strings are not equal if the longer one includes nonblanks in the tail.
+  // The strings are not equal if the longer one includes nonblanks in the tail.
   if (nchar1 > nchar)
   {
     for (i = nchar; i < nchar1; i++)
@@ -265,7 +255,7 @@ bool STLLoader::Leqi (char* _string1, char* _string2)
 
 //////////////////////////////////////////////////
 /// Finds if a vector occurs in a table.
-int STLLoader::RcolFind (float _a[][COR3_MAX], int _m, int _n, float _r[])
+int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
 {
   int i;
   int icol;
@@ -289,10 +279,10 @@ int STLLoader::RcolFind (float _a[][COR3_MAX], int _m, int _n, float _r[])
 
 //////////////////////////////////////////////////
 /// Read 1 float from a binary file.
-float STLLoader::FloatRead (FILE *_filein)
+float STLLoader::FloatRead(FILE *_filein)
 {
   float rval;
-  if (fread (&rval, sizeof (float), 1, _filein) == 0)
+  if (fread (&rval, sizeof(rval), 1, _filein) == 0)
     printf("Error...\n");
 
   return rval;
@@ -300,7 +290,7 @@ float STLLoader::FloatRead (FILE *_filein)
 
 //////////////////////////////////////////////////
 /// Reads a long int from a binary file.
-uint32_t STLLoader::LongIntRead (FILE *_filein)
+uint32_t STLLoader::LongIntRead(FILE *_filein)
 {
   union
   {
@@ -308,24 +298,24 @@ uint32_t STLLoader::LongIntRead (FILE *_filein)
     char ychar[4];
   } y;
 
-  y.ychar[0] = fgetc (_filein);
-  y.ychar[1] = fgetc (_filein);
-  y.ychar[2] = fgetc (_filein);
-  y.ychar[3] = fgetc (_filein);
+  y.ychar[0] = fgetc(_filein);
+  y.ychar[1] = fgetc(_filein);
+  y.ychar[2] = fgetc(_filein);
+  y.ychar[3] = fgetc(_filein);
 
   return y.yint;
 }
 
 //////////////////////////////////////////////////
 /// Reads a short int from a binary file.
-uint16_t STLLoader::ShortIntRead (FILE *_filein)
+uint16_t STLLoader::ShortIntRead(FILE *_filein)
 {
   uint8_t c1;
   uint8_t c2;
   uint16_t ival;
 
-  c1 = fgetc (_filein);
-  c2 = fgetc (_filein);
+  c1 = fgetc(_filein);
+  c2 = fgetc(_filein);
 
   ival = c1 | (c2 << 8);
 

@@ -18,14 +18,10 @@
  * Date: 3 May 2008
  */
 
-#ifndef GAZEBOCONFIG_HH
-#define GAZEBOCONFIG_HH
+#ifndef GAZEBO_SYSTEMPATHS_HH
+#define GAZEBO_SYSTEMPATHS_HH
 
-#include <string>
-#include <list>
 #include <stdio.h>
-
-#include "common/SingletonT.hh"
 
 #define LINUX
 #ifdef WINDOWS
@@ -35,6 +31,12 @@
   #include <unistd.h>
   #define GetCurrentDir getcwd
 #endif
+
+#include <string>
+#include <list>
+
+#include "common/SingletonT.hh"
+
 
 namespace gazebo
 {

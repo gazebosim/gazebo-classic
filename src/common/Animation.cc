@@ -188,7 +188,7 @@ void PoseAnimation::BuildInterpolationSplines() const
   for (KeyFrame_V::const_iterator iter = this->keyFrames.begin();
       iter != this->keyFrames.end(); ++iter)
   {
-    PoseKeyFrame *pkey = (PoseKeyFrame*)(*iter);
+    PoseKeyFrame *pkey = reinterpret_cast<PoseKeyFrame*>(*iter);
     this->positionSpline->AddPoint(pkey->GetTranslate());
     this->rotationSpline->AddPoint(pkey->GetRotation());
   }
@@ -207,7 +207,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
     PoseKeyFrame &_kf) const
 {
   KeyFrame *kBase1, *kBase2;
-  PoseKeyFrame *k1;//, *k2;
+  PoseKeyFrame *k1;
   unsigned int firstKeyIndex;
 
   if (this->build)
@@ -216,7 +216,6 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
   double t = this->GetKeyFramesAtTime(_time, &kBase1, &kBase2, firstKeyIndex);
 
   k1 = static_cast<PoseKeyFrame*>(kBase1);
-  //k2 = static_cast<PoseKeyFrame*>(kBase2);
 
   if (t == 0.0)
   {
@@ -254,8 +253,6 @@ NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
 
 void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
 {
-  //NumericKeyFrame *kret = static_cast<NumericKeyFrame*>(kf);
-
   // Keyframe pointers
   KeyFrame *kBase1, *kBase2;
   NumericKeyFrame *k1, *k2;

@@ -16,8 +16,8 @@
  */
 
 #include <tinyxml.h>
-#include <sstream>
 #include <math.h>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -193,7 +193,7 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
       std::string transStr = _elem->FirstChildElement("translate")->GetText();
       math::Vector3 translate;
       translate = boost::lexical_cast<math::Vector3>(transStr);
-      //translate *= this->meter;
+      // translate *= this->meter;
       transform.SetTranslate(translate);
     }
 
@@ -362,7 +362,6 @@ void ColladaLoader::LoadNormals(const std::string &_id,
       _values.push_back(vec);
     }
   } while (iss);
-
 }
 
 void ColladaLoader::LoadTexCoords(const std::string &_id,
@@ -388,7 +387,6 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
       _values.push_back(vec);
     }
   } while (iss);
-
 }
 
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
@@ -443,7 +441,6 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
-
     }
     else if (blinnXml)
     {
@@ -615,7 +612,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         subMesh->AddTexCoord(texcoords[values[iter->second]].x,
             texcoords[values[iter->second]].y);
       }
-      //else
+      // else
       // gzerr << "Unhandled semantic[" << iter->first << "]\n";
     }
   }
@@ -668,7 +665,7 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
   subMesh->SetPrimitiveType(SubMesh::LINES);
 
   TiXmlElement *inputXml = _xml->FirstChildElement("input");
-  //std::string semantic = inputXml->Attribute("semantic");
+  // std::string semantic = inputXml->Attribute("semantic");
   std::string source = inputXml->Attribute("source");
 
   std::vector<math::Vector3> verts;
@@ -690,7 +687,6 @@ void ColladaLoader::LoadLines(TiXmlElement *_xml,
     subMesh->AddIndex(subMesh->GetVertexCount() - 1);
     subMesh->AddVertex(verts[b]);
     subMesh->AddIndex(subMesh->GetVertexCount() - 1);
-
   } while (iss);
 
   _mesh->AddSubMesh(subMesh);
@@ -714,7 +710,7 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 
 void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material * /*_mat*/)
 {
-  //const char *opaque = _elem->Attribute("opaque");
+  // const char *opaque = _elem->Attribute("opaque");
   /*if (!opaque)
     gzerr << "No Opaque set\n";
     */
@@ -728,22 +724,21 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material * /*_mat*/)
     Color color = boost::lexical_cast<Color>(colorStr);
     */
 
-  //double srcFactor, dstFactor;
+  // double srcFactor, dstFactor;
 
   /*if (opaque == "RGB_ZERO")
     {
-  //srcFactor = color.R() * _mat->GetTransparency();
-  //dstFactor = 1.0 - color.R() * _mat->GetTransparency();
+  // srcFactor = color.R() * _mat->GetTransparency();
+  // dstFactor = 1.0 - color.R() * _mat->GetTransparency();
   }
   else if (opaque == "A_ONE")
   {
   // _mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
-  //srcFactor = 1.0 - color.A() * _mat->GetTransparency();
-  //dstFactor = color.A() * _mat->GetTransparency();
+  // srcFactor = 1.0 - color.A() * _mat->GetTransparency();
+  // dstFactor = color.A() * _mat->GetTransparency();
   }
   */
 
-  //_mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
-  //_mat->SetBlendFactors(srcFactor, dstFactor);
+  // _mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
+  // _mat->SetBlendFactors(srcFactor, dstFactor);
 }
-

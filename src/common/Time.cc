@@ -93,7 +93,8 @@ void Time::Set(double _seconds)
 
 double Time::Double() const
 {
-  return ((double)this->sec + (double)this->nsec*1e-9);
+  return (static_cast<double>(this->sec) +
+          static_cast<double>(this->nsec)*1e-9);
 }
 
 /// Millisecond sleep

@@ -120,7 +120,7 @@ namespace gazebo
 
       private: std::vector<std::string> fileExtensions;
 
-      //Singleton implementation
+      // Singleton implementation
       private: friend class SingletonT<MeshManager>;
     };
     /// \}

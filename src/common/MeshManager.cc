@@ -139,7 +139,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
         mesh = this->meshes[filename];
       }
     }
-    catch (gazebo::common::Exception &e)
+    catch(gazebo::common::Exception &e)
     {
       gzerr << "Error loading mesh[" << fullname << "]\n";
       gzerr << e << "\n";
@@ -245,7 +245,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
+  unsigned int verticeIndex = 0;
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
@@ -257,8 +257,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    r0 = radius * sinf (ring * deltaRingAngle);
-    vert.y = radius * cosf (ring * deltaRingAngle);
+    r0 = radius * sinf(ring * deltaRingAngle);
+    vert.y = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -273,8 +273,9 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
       // Add one vertex to the strip which makes up the sphere
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-          (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) /static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -453,7 +454,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   for (i = 0; i < 6; i++)
   {
     // For each vertex in the face
-    for (k = 0; k<4; k++)
+    for (k = 0; k < 4; k++)
     {
       subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
           v[faces[i][k]][2]);
@@ -464,7 +465,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   }
 
   // Set the indices
-  for (i = 0;i<36; i++)
+  for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
   subMesh->RecalculateNormals();
@@ -551,18 +552,18 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   for (i = 0; i < 6; i++)
   {
     // For each vertex in the face
-    for (k = 0; k<4; k++)
+    for (k = 0; k < 4; k++)
     {
       subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
           v[faces[i][k]][2]);
       subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1],
           n[faces[i][k]][2]);
-      //subMesh->AddTexCoord(t[k][0], t[k][1]);
+      // subMesh->AddTexCoord(t[k][0], t[k][1]);
     }
   }
 
   // Set the indices
-  for (i = 0;i<36; i++)
+  for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
   mesh->RecalculateNormals();
@@ -574,7 +575,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
     float height, int rings, int segments)
 {
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
+  unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
@@ -610,8 +611,9 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
       // Add one vertex to the strip which makes up the sphere
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-          (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -660,13 +662,13 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   {
     norm.Set();
 
-    for (j = 0; j<3; j++)
+    for (j = 0; j < 3; j++)
       norm += subMesh->GetNormal(subMesh->GetIndex(i+j));
 
     norm /= 3;
     norm.Normalize();
 
-    for (j = 0; j<3; j++)
+    for (j = 0; j < 3; j++)
       subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
   }
 
@@ -679,7 +681,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
     float height, int rings, int segments)
 {
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
+  unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
 
@@ -722,8 +724,9 @@ void MeshManager::CreateCone(const std::string &name, float radius,
       // Add one vertex to the strip which makes up the sphere
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-          (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != (rings-1))
       {
@@ -768,17 +771,17 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   }
 
   // Fix all the normals
-  for (i = 0; i+3<subMesh->GetIndexCount(); i+= 3)
+  for (i = 0; i + 3 < subMesh->GetIndexCount(); i += 3)
   {
     norm.Set();
 
-    for (j = 0; j<3; j++)
+    for (j = 0; j < 3; j++)
       norm += subMesh->GetNormal(subMesh->GetIndex(i+j));
 
     norm /= 3;
     norm.Normalize();
 
-    for (j = 0; j<3; j++)
+    for (j = 0; j < 3; j++)
       subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
   }
 
@@ -792,7 +795,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
     int segments)
 {
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
+  unsigned int verticeIndex = 0;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 
@@ -831,8 +834,9 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
       // Add one vertex to the strip which makes up the tube
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-          (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -889,8 +893,9 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
       // Add one vertex to the strip which makes up the tube
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-          (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -923,7 +928,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   {
     iterations = 2;
     vInc = 1;
-    v = 0; // Start with the front
+    v = 0;
   }
   else
   {
@@ -938,7 +943,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   {
     // Make tris in a zigzag pattern (compatible with strips)
     u = 0;
-    uInc = 1; // Start with moving +u
+    uInc = 1;
 
     vCount = meshHeight - 1;
     while (vCount--)

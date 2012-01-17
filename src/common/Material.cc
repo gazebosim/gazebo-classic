@@ -157,8 +157,8 @@ Color Material::GetEmissive() const
 /// Set the transparency percentage (0..1)
 void Material::SetTransparency(float _t)
 {
-  this->transparency = std::min(_t, (float)1.0);
-  this->transparency = std::max(this->transparency, (float)0.0);
+  this->transparency = std::min(_t, static_cast<float>(1.0));
+  this->transparency = std::max(this->transparency, static_cast<float>(0.0));
   this->lighting = true;
 }
 

@@ -18,6 +18,7 @@
 #define MESH_HH
 
 #include <vector>
+#include <string>
 
 #include "math/Vector3.hh"
 #include "math/Vector2d.hh"
@@ -245,7 +246,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
-

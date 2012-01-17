@@ -20,7 +20,6 @@
  * Date: 09 June 2007
  */
 
-//#include <time.h>
 #include <string.h>
 #include <sstream>
 
@@ -80,15 +79,15 @@ void Console::Load()
     else
     {
     */
-  strcpy(logFilename, "/dev/null");
-  //}
+  snprintf(logFilename, strlen("/dev/null"), "/dev/null");
+  // }
 
   this->logStream.open(logFilename, std::ios::out);
 }
 
 //////////////////////////////////////////////////
 /// Set the verbosity
-void Console::SetQuiet(bool /*_q*/)
+void Console::SetQuiet(bool)
 {
 }
 
@@ -96,13 +95,13 @@ void Console::SetQuiet(bool /*_q*/)
 /// Get the message stream
 std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 {
-  //if (**this->quietP)
-  //return this->nullStream;
-  //else
-  //{
+  // if (**this->quietP)
+  // return this->nullStream;
+  // else
+  // {
   *this->msgStream << "\033[1;" << color << "m" << lbl << "\033[0m ";
   return *this->msgStream;
-  //}
+  // }
 }
 
 //////////////////////////////////////////////////

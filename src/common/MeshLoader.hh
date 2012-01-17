@@ -41,7 +41,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
-

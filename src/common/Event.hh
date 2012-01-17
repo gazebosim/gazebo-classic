@@ -40,6 +40,7 @@ namespace gazebo
     /// \brief Base class for all events
     class Event
     {
+      public: virtual ~Event() {}
       public: virtual void Disconnect(ConnectionPtr _c) = 0;
       public: virtual void Disconnect(int _id) = 0;
     };
@@ -265,11 +266,11 @@ namespace gazebo
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
     {
-      //this->lock.lock();
+      // this->lock.lock();
       int index = this->connections.size();
       this->connections.push_back(new boost::function<T>(_subscriber));
       this->connectionIds.push_back(index);
-      //this->lock.unlock();
+      // this->lock.unlock();
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -284,9 +285,9 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Disconnect(int _id)
     {
-      //this->lock.lock();
+      // this->lock.lock();
       // search for index of the connection based on id
-      for(unsigned int i = 0; i < this->connectionIds.size(); i++)
+      for (unsigned int i = 0; i < this->connectionIds.size(); i++)
       {
         if (_id == this->connectionIds[i])
         {
@@ -295,7 +296,7 @@ namespace gazebo
           break;
         }
       }
-      //this->lock.unlock();
+      // this->lock.unlock();
     }
     /// \}
   }

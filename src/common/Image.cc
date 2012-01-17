@@ -19,14 +19,13 @@
  * Date: 14 July 2008
  */
 
-#include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
 
-//#include <GL/gl.h>
+#include <iostream>
 
 #include "math/Vector3.hh"
 #include "common/Console.hh"
@@ -63,7 +62,6 @@ Image::~Image()
 
   if (count == 0)
     FreeImage_DeInitialise();
-
 }
 
 //////////////////////////////////////////////////
@@ -129,13 +127,11 @@ int Image::Load(const std::string &_filename)
           return 0;
         }
       }
-
     }
   }
 
   gzerr << "Unable to open image file[" << _filename << "]\n";
   return -1;
-
 }
 
 //////////////////////////////////////////////////
@@ -143,13 +139,13 @@ int Image::Load(const std::string &_filename)
 void Image::SetFromData(const unsigned char *data, unsigned int width,
     unsigned int height, int scanline_bytes, unsigned int bpp)
 {
-  //int redmask = FI_RGBA_RED_MASK;
+  // int redmask = FI_RGBA_RED_MASK;
   int redmask = 0xff0000;
 
-  //int greenmask = FI_RGBA_GREEN_MASK;
+  // int greenmask = FI_RGBA_GREEN_MASK;
   int greenmask = 0x00ff00;
 
-  //int bluemask = FI_RGBA_BLUE_MASK;
+  // int bluemask = FI_RGBA_BLUE_MASK;
   int bluemask = 0x0000ff;
 
   if (this->bitmap)
@@ -158,8 +154,8 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
   }
   this->bitmap = NULL;
 
-  this->bitmap = FreeImage_ConvertFromRawBits((BYTE*)data, width, height,
-      scanline_bytes, bpp, redmask, greenmask, bluemask);
+  this->bitmap = FreeImage_ConvertFromRawBits(const_cast<BYTE*>(data),
+      width, height, scanline_bytes, bpp, redmask, greenmask, bluemask);
 }
 
 //////////////////////////////////////////////////
@@ -167,13 +163,13 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
 void Image::GetData(unsigned char **_data, unsigned int &_count)
 {
   int redmask = FI_RGBA_RED_MASK;
-  //int bluemask = 0x00ff0000;
+  // int bluemask = 0x00ff0000;
 
   int greenmask = FI_RGBA_GREEN_MASK;
-  //int greenmask = 0x0000ff00;
+  // int greenmask = 0x0000ff00;
 
   int bluemask = FI_RGBA_BLUE_MASK;
-  //int redmask = 0x000000ff;
+  // int redmask = 0x000000ff;
 
   int scan_width = FreeImage_GetPitch(this->bitmap);
 
@@ -183,7 +179,7 @@ void Image::GetData(unsigned char **_data, unsigned int &_count)
   _count = scan_width * this->GetHeight();
   *_data = new unsigned char[_count];
 
-  FreeImage_ConvertToRawBits((BYTE*)(*_data), this->bitmap,
+  FreeImage_ConvertToRawBits(reinterpret_cast<BYTE*>(*_data), this->bitmap,
       scan_width, this->GetBPP(), redmask, greenmask, bluemask, true);
 
 #ifdef FREEIMAGE_COLORORDER
@@ -199,7 +195,7 @@ void Image::GetData(unsigned char **_data, unsigned int &_count)
 #endif
 
     int i = 0;
-    for (unsigned int y = 0; y<this->GetHeight(); y++)
+    for (unsigned int y = 0; y < this->GetHeight(); y++)
     {
       for (unsigned int x = 0; x < this->GetWidth(); x++)
       {
@@ -207,7 +203,6 @@ void Image::GetData(unsigned char **_data, unsigned int &_count)
         i += 4;
       }
     }
-
   }
 }
 
@@ -275,7 +270,6 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y)
     clr.Set(firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
 #endif
 #endif
-
   }
   else
   {

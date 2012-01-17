@@ -17,6 +17,7 @@
 #ifndef EVENTS_HH
 #define EVENTS_HH
 
+#include <string>
 #include "common/Event.hh"
 
 namespace gazebo

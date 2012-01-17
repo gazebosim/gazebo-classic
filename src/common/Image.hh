@@ -23,8 +23,8 @@
 #ifndef IMAGE_HH
 #define IMAGE_HH
 
-#include <string>
 #include <FreeImage.h>
+#include <string>
 
 #include "common/Color.hh"
 
@@ -82,7 +82,7 @@ namespace gazebo
       public: void Rescale(int _width, int _height);
 
       /// \brief Render this image using opengl
-      //public: void RenderOpengl(float destW, float destH);
+      // public: void RenderOpengl(float destW, float destH);
 
       /// \brief Returns whether this is a valid image
       public: bool Valid() const;
@@ -99,7 +99,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
-
