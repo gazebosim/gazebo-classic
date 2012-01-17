@@ -24,7 +24,7 @@
 using namespace gazebo;
 using namespace transport;
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
 ConnectionManager::ConnectionManager()
 {
@@ -39,7 +39,7 @@ ConnectionManager::ConnectionManager()
   this->connectionMutex = new boost::recursive_mutex();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 ConnectionManager::~ConnectionManager()
 {
@@ -57,7 +57,7 @@ ConnectionManager::~ConnectionManager()
   this->Fini();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Initialize the connection manager
 bool ConnectionManager::Init(const std::string &master_host, 
                              unsigned short master_port)
@@ -155,7 +155,7 @@ bool ConnectionManager::Init(const std::string &master_host,
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Finalize
 void ConnectionManager::Fini()
 {
@@ -178,14 +178,14 @@ void ConnectionManager::Fini()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Stop the conneciton manager
 void ConnectionManager::Stop()
 {
   this->stop = true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Run all the connections
 void ConnectionManager::Run()
 {
@@ -235,7 +235,7 @@ bool ConnectionManager::IsRunning() const
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // On read master
 void ConnectionManager::OnMasterRead( const std::string &_data)
 {
@@ -330,7 +330,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // On accept
 void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
 {
@@ -343,7 +343,7 @@ void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
   this->connectionMutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // On read header
 void ConnectionManager::OnRead(const ConnectionPtr &_connection, 
                                const std::string &_data )
@@ -377,7 +377,7 @@ void ConnectionManager::OnRead(const ConnectionPtr &_connection,
     gzerr << "Error est here\n";
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Advertise a topic
 void ConnectionManager::Advertise(const std::string &topic, 
                                   const std::string &msgType)
@@ -394,7 +394,7 @@ void ConnectionManager::Advertise(const std::string &topic,
   this->masterConn->EnqueueMsg(msgs::Package("advertise", msg));
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
 {
   if (!this->initialized)
@@ -405,7 +405,7 @@ void ConnectionManager::RegisterTopicNamespace(const std::string &_name)
   this->masterConn->EnqueueMsg(msgs::Package("register_topic_namespace", msg));
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void ConnectionManager::Unadvertise(const std::string &_topic)
 {
   msgs::Publish msg;
@@ -424,7 +424,7 @@ void ConnectionManager::Unadvertise(const std::string &_topic)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
 {
   _publishers.clear();
@@ -436,7 +436,7 @@ void ConnectionManager::GetAllPublishers(std::list<msgs::Publish> &_publishers)
   this->listMutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void ConnectionManager::GetTopicNamespaces( std::list<std::string> &_namespaces)
 {
   _namespaces.clear();
@@ -499,7 +499,7 @@ void ConnectionManager::Subscribe(const std::string &_topic,
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Connect to a remote server
 ConnectionPtr ConnectionManager::ConnectToRemoteHost( const std::string &host,
                                                        unsigned short port)
@@ -524,7 +524,7 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost( const std::string &host,
   return conn;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Remove a connection
 void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 {
@@ -543,7 +543,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 } 
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Find a connection that matches a host and port
 ConnectionPtr ConnectionManager::FindConnection(const std::string &host, 
                                                  unsigned short port)

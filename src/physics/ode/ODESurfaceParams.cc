@@ -25,7 +25,7 @@
 using namespace gazebo;
 using namespace physics;
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Default constructor
 ODESurfaceParams::ODESurfaceParams()
 {
@@ -42,12 +42,12 @@ ODESurfaceParams::ODESurfaceParams()
   this->mu2 = 0.0;
   this->slip1 = 0.0;
   this->slip2 = 0.0;
-  this->fdir1 = math::Vector3(0,0,0);
+  this->fdir1 = math::Vector3(0, 0, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Load the contact params
-void ODESurfaceParams::Load( sdf::ElementPtr _sdf )
+void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   if (_sdf->HasElement("friction"))
   {
@@ -78,3 +78,4 @@ void ODESurfaceParams::Load( sdf::ElementPtr _sdf )
   }
 
 }
+

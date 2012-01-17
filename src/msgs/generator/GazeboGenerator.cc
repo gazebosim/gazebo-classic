@@ -14,17 +14,15 @@ namespace google {
 namespace protobuf {
 namespace compiler {
 namespace cpp {
-
 GazeboGenerator::GazeboGenerator(const std::string &/*_name*/) {}
 GazeboGenerator::~GazeboGenerator() {}
-
 bool GazeboGenerator::Generate(const FileDescriptor *_file,
                                const string &/*parameter*/,
                                OutputDirectory *_generator_context,
                                std::string * /*_error*/) const
 {
   std::string filename = _file->name();
-  boost::replace_last(filename, ".proto",".pb.h");
+  boost::replace_last(filename, ".proto", ".pb.h");
 
   // Add boost shared point include
   {
@@ -42,10 +40,10 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
     io::Printer printer(output.get(), '$');
 
     std::string package = _file->package();
-    boost::replace_all(package,".","::");
+    boost::replace_all(package, ".", "::");
 
-    std::string constType = "typedef const boost::shared_ptr<" + package 
-      + "::" + _file->message_type(0)->name() + " const> Const" 
+    std::string constType = "typedef const boost::shared_ptr<" + package
+      + "::" + _file->message_type(0)->name() + " const> Const"
       + _file->message_type(0)->name() + "Ptr;";
 
     printer.Print(constType.c_str(), "name", "global_scope");
@@ -57,3 +55,4 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 }
 }
 }
+

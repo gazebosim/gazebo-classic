@@ -30,151 +30,151 @@ using namespace gazebo;
 using namespace physics;
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
-ODEUniversalJoint::ODEUniversalJoint( dWorldID worldId )
+ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId)
     : UniversalJoint<ODEJoint>()
 {
-  this->jointId = dJointCreateUniversal( worldId, NULL );
+  this->jointId = dJointCreateUniversal(_worldId, NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 ODEUniversalJoint::~ODEUniversalJoint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the anchor point
 math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
-  dJointGetUniversalAnchor( this->jointId, result );
+  dJointGetUniversalAnchor(this->jointId, result);
 
-  return math::Vector3( result[0], result[1], result[2] );
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the anchor point
-void ODEUniversalJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
+void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  dJointSetUniversalAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
+  dJointSetUniversalAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the first axis of rotation
-math::Vector3 ODEUniversalJoint::GetGlobalAxis(int index ) const
+math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 {
   dVector3 result;
 
-  if (index == 0)
-    dJointGetUniversalAxis1( this->jointId, result );
+  if (_index == 0)
+    dJointGetUniversalAxis1(this->jointId, result);
   else
-    dJointGetUniversalAxis2( this->jointId, result );
+    dJointGetUniversalAxis2(this->jointId, result);
 
-  return math::Vector3( result[0], result[1], result[2] );
+  return math::Vector3(result[0], result[1], result[2]);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the first axis of rotation
-void ODEUniversalJoint::SetAxis( int index, const math::Vector3 &axis )
+void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
-
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
-  if (index == 0)
-    dJointSetUniversalAxis1( this->jointId, axis.x, axis.y, axis.z );
+  if (_index == 0)
+    dJointSetUniversalAxis1(this->jointId, _axis.x, _axis.y, _axis.z);
   else
-    dJointSetUniversalAxis2( this->jointId, axis.x, axis.y, axis.z );
+    dJointSetUniversalAxis2(this->jointId, _axis.x, _axis.y, _axis.z);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the joint damping
-void ODEUniversalJoint::SetDamping( int /*_index*/, const double _damping )
+void ODEUniversalJoint::SetDamping(int /*_index*/, const double _damping)
 {
-  dJointSetDamping( this->jointId, _damping);
+  dJointSetDamping(this->jointId, _damping);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the angle of an axis
-math::Angle ODEUniversalJoint::GetAngleImpl(int index) const
+math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
 
-  if (index == 0)
-    result = dJointGetUniversalAngle1( this->jointId );
+  if (_index == 0)
+    result = dJointGetUniversalAngle1(this->jointId);
   else
-    result = dJointGetUniversalAngle2( this->jointId );
+    result = dJointGetUniversalAngle2(this->jointId);
 
   return result;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the angular rate of an axis
-double ODEUniversalJoint::GetVelocity(int index) const
+double ODEUniversalJoint::GetVelocity(int _index) const
 {
   double result;
 
-  if (index == 0)
-    result = dJointGetUniversalAngle1Rate( this->jointId );
-  else 
-    result = dJointGetUniversalAngle2Rate( this->jointId );
+  if (_index == 0)
+    result = dJointGetUniversalAngle1Rate(this->jointId);
+  else
+    result = dJointGetUniversalAngle2Rate(this->jointId);
 
   return result;
 }
- 
-//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
 /// Set the velocity of an axis(index).
-void ODEUniversalJoint::SetVelocity(int index,double angle)
+void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 {
-  if (index == 0)
-    this->SetParam(dParamVel, angle);
+  if (_index == 0)
+    this->SetParam(dParamVel, _angle);
   else
-    this->SetParam(dParamVel2, angle);
+    this->SetParam(dParamVel2, _angle);
 }
- 
-//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
 // Set the torque of this joint
-void ODEUniversalJoint::SetForce(int index, double torque)
+void ODEUniversalJoint::SetForce(int _index, double _torque)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
-  if (index == 0)
-    dJointAddUniversalTorques( this->jointId, torque, 0);
+  if (_index == 0)
+    dJointAddUniversalTorques(this->jointId, _torque, 0);
   else
-    dJointAddUniversalTorques( this->jointId, 0, torque);
+    dJointAddUniversalTorques(this->jointId, 0, _torque);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
-void ODEUniversalJoint::SetMaxForce(int index, double t)
+void ODEUniversalJoint::SetMaxForce(int _index, double _t)
 {
-  if (index == 0)
-    this->SetParam(dParamFMax, t);
+  if (_index == 0)
+    this->SetParam(dParamFMax, _t);
   else
-    this->SetParam(dParamFMax2, t);
+    this->SetParam(dParamFMax2, _t);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
-double ODEUniversalJoint::GetMaxForce(int index)
+double ODEUniversalJoint::GetMaxForce(int _index)
 {
-  if (index == 0)
+  if (_index == 0)
     return this->GetParam(dParamFMax);
   else
     return this->GetParam(dParamFMax2);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the parameter to value
-void ODEUniversalJoint::SetParam( int parameter, double value)
+void ODEUniversalJoint::SetParam(int _parameter, double _value)
 {
-  ODEJoint::SetParam(parameter, value);
-  dJointSetUniversalParam( this->jointId, parameter, value );
+  ODEJoint::SetParam(_parameter, _value);
+  dJointSetUniversalParam(this->jointId, _parameter, _value);
 }
+
 
 

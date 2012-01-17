@@ -1,7 +1,7 @@
 #include <google/protobuf/compiler/plugin.h>
 #include "GazeboGenerator.hh"
 
-int main(int argc, char *argv[])
+int main(int _argc, char *_argv[])
 {
   #ifdef _MSC_VER
   // Don't print a silly message or stick a modal dialog box in my face,
@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
 #endif  // !_MSC_VER
 
   google::protobuf::compiler::cpp::GazeboGenerator generator("gazebo_plugin");
-  return google::protobuf::compiler::PluginMain(argc, argv, &generator);
+  return google::protobuf::compiler::PluginMain(_argc, _argv, &generator);
 }
+

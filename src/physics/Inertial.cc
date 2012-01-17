@@ -20,60 +20,56 @@
 using namespace gazebo;
 using namespace physics;
 
-////////////////////////////////////////////////////////////////////////////////
-/// Default Constructor
+//////////////////////////////////////////////////
 Inertial::Inertial()
 {
   this->mass = 0;
-  this->principals.Set(0,0,0);
-  this->products.Set(0,0,0);
+  this->principals.Set(0, 0, 0);
+  this->products.Set(0, 0, 0);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( "/sdf/inertial.sdf", this->sdf );
+  sdf::initFile("/sdf/inertial.sdf", this->sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-Inertial::Inertial(double m)
+//////////////////////////////////////////////////
+Inertial::Inertial(double _m)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( "/sdf/inertial.sdf", this->sdf );
+  sdf::initFile("/sdf/inertial.sdf", this->sdf);
 
-  this->mass = m;
-  this->cog.Set(0,0,0);
-  this->principals.Set(0,0,0);
-  this->products.Set(0,0,0);
+  this->mass = _m;
+  this->cog.Set(0, 0, 0);
+  this->principals.Set(0, 0, 0);
+  this->products.Set(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Copy constructor
+//////////////////////////////////////////////////
 Inertial::Inertial(const Inertial &_inertial)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( "/sdf/inertial.sdf", this->sdf );
+  sdf::initFile("/sdf/inertial.sdf", this->sdf);
 
   (*this) = _inertial;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 Inertial::~Inertial()
 {
   this->sdf.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void Inertial::Load( sdf::ElementPtr _sdf)
+//////////////////////////////////////////////////
+void Inertial::Load(sdf::ElementPtr _sdf)
 {
   this->UpdateParameters(_sdf);
 }
 
-/// update the parameters using new sdf values
-void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Inertial::UpdateParameters(sdf::ElementPtr &_sdf)
 {
   this->sdf = _sdf;
 
-  math::Vector3 center(0,0,0);
+  math::Vector3 center(0, 0, 0);
   if (this->sdf->HasElement("origin"))
   {
     center = this->sdf->GetElement("origin")->GetValuePose("pose").pos;
@@ -81,9 +77,9 @@ void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
         boost::bind(&Inertial::GetPose, this));
   }
   this->SetCoG(center.x, center.y, center.z);
- 
-  sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia"); 
-  this->SetInertiaMatrix( 
+
+  sdf::ElementPtr inertiaElem = this->sdf->GetElement("inertia");
+  this->SetInertiaMatrix(
       inertiaElem->GetValueDouble("ixx"),
       inertiaElem->GetValueDouble("iyy"),
       inertiaElem->GetValueDouble("izz"),
@@ -104,23 +100,26 @@ void Inertial::UpdateParameters( sdf::ElementPtr &_sdf )
   inertiaElem->GetAttribute("iyz")->SetUpdateFunc(
       boost::bind(&Inertial::GetIYZ, this));
 
-  this->SetMass( this->sdf->GetValueDouble("mass") );
+  this->SetMass(this->sdf->GetValueDouble("mass"));
   this->sdf->GetAttribute("mass")->SetUpdateFunc(
       boost::bind(&Inertial::GetMass, this));
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetLinearDamping(double _damping)
 {
   this->sdf->GetOrCreateElement("damping")->GetAttribute("linear")->Set(
       _damping);
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetAngularDamping(double _damping)
 {
   this->sdf->GetOrCreateElement("damping")->GetAttribute("angular")->Set(
       _damping);
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetLinearDamping()
 {
   double value = 0;
@@ -133,6 +132,7 @@ double Inertial::GetLinearDamping()
   return value;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetAngularDamping()
 {
   double value = 0;
@@ -145,78 +145,68 @@ double Inertial::GetAngularDamping()
   return value;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Reset all the mass properties
+//////////////////////////////////////////////////
 void Inertial::Reset()
 {
   this->mass = 0;
-  this->cog.Set(0,0,0);
-  this->principals.Set(0,0,0);
-  this->products.Set(0,0,0);
+  this->cog.Set(0, 0, 0);
+  this->principals.Set(0, 0, 0);
+  this->products.Set(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the mass
-void Inertial::SetMass(double m)
+//////////////////////////////////////////////////
+void Inertial::SetMass(double _m)
 {
-  this->mass = m;
+  this->mass = _m;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the mass value
+//////////////////////////////////////////////////
 double Inertial::GetMass() const
 {
   return this->mass;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the center of gravity
-void Inertial::SetCoG(double cx, double cy, double cz)
+//////////////////////////////////////////////////
+void Inertial::SetCoG(double _cx, double _cy, double _cz)
 {
-  this->cog.Set(cx, cy, cz);
+  this->cog.Set(_cx, _cy, _cz);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the center of gravity
-void Inertial::SetCoG(const math::Vector3 &c)
+//////////////////////////////////////////////////
+void Inertial::SetCoG(const math::Vector3 &_c)
 {
-  this->cog = c;
+  this->cog = _c;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the mass matrix
+//////////////////////////////////////////////////
 void Inertial::SetInertiaMatrix(double ixx, double iyy, double izz,
                                 double ixy, double ixz, double iyz)
 {
-  this->principals.Set( ixx, iyy, izz );
-  this->products.Set( ixy, ixz, iyz );
+  this->principals.Set(ixx, iyy, izz);
+  this->products.Set(ixy, ixz, iyz);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
+//////////////////////////////////////////////////
 math::Vector3 Inertial::GetPrincipalMoments() const
 {
   return this->principals;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the products of inertia (Ixy, Ixy, Iyz)
+//////////////////////////////////////////////////
 math::Vector3 Inertial::GetProductsofInertia() const
 {
   return this->products;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Rotate this mass
-void Inertial::Rotate(const math::Quaternion &rot)
+//////////////////////////////////////////////////
+void Inertial::Rotate(const math::Quaternion &_rot)
 {
-  this->cog = rot.RotateVector(this->cog);
+  this->cog = _rot.RotateVector(this->cog);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Equal operator
-void Inertial::operator=(const Inertial &_inertial)
+//////////////////////////////////////////////////
+void Inertial::operator =(const Inertial &_inertial)
 {
   this->mass = _inertial.mass;
   this->cog = _inertial.cog;
@@ -224,84 +214,100 @@ void Inertial::operator=(const Inertial &_inertial)
   this->products = _inertial.products;
 }
 
-Inertial Inertial::operator+(const Inertial &_inertial ) const
+//////////////////////////////////////////////////
+Inertial Inertial::operator+(const Inertial &_inertial) const
 {
   Inertial result;
   result.mass = this->mass + _inertial.mass;
 
-  result.cog = (this->cog*this->mass + _inertial.cog * _inertial.mass) / result.mass;
+  result.cog = (this->cog*this->mass + _inertial.cog * _inertial.mass) /
+                result.mass;
 
   result.principals = this->principals + _inertial.principals;
   result.products = this->products + _inertial.products;
   return result;
 }
 
-const Inertial &Inertial::operator+=(const Inertial &_inertial )
+//////////////////////////////////////////////////
+const Inertial &Inertial::operator+=(const Inertial &_inertial)
 {
   *this = *this + _inertial;
   return *this;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetIXX() const
 {
   return this->principals.x;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetIYY() const
 {
   return this->principals.y;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetIZZ() const
 {
   return this->principals.z;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetIXY() const
 {
   return this->products.x;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetIXZ() const
 {
   return this->products.y;
 }
 
+//////////////////////////////////////////////////
 double Inertial::GetIYZ() const
 {
   return this->products.z;
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetIXX(double _v)
 {
   this->principals.x = _v;
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetIYY(double _v)
 {
   this->principals.y = _v;
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetIZZ(double _v)
 {
   this->principals.z = _v;
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetIXY(double _v)
 {
   this->products.x = _v;
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetIXZ(double _v)
 {
   this->products.y = _v;
 }
 
+//////////////////////////////////////////////////
 void Inertial::SetIYZ(double _v)
 {
   this->products.z = _v;
 }
- 
+
+//////////////////////////////////////////////////
 void Inertial::ProcessMsg(const msgs::Inertial &_msg)
 {
   if (_msg.has_mass())
@@ -327,3 +333,4 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
   if(_msg.has_izz())
     this->SetIZZ(_msg.izz());
 }
+

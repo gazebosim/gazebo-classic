@@ -8,7 +8,6 @@ namespace google{
 namespace protobuf{
 namespace compiler{
 namespace cpp{
-
 class GeneratorContext;
 
 class GazeboGenerator : public CodeGenerator
@@ -30,3 +29,4 @@ class GazeboGenerator : public CodeGenerator
 }
 }
 #endif
+

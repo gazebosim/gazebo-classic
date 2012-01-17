@@ -56,11 +56,10 @@ using namespace physics;
 
 class ModelUpdate_TBB
 {
-  public: ModelUpdate_TBB(Model_V *models) : models(models) {}
-
-  public: void operator() (const tbb::blocked_range<size_t> &r) const
+  public: ModelUpdate_TBB(Model_V *_models) : models(_models) {}
+  public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
-    for (size_t i=r.begin(); i != r.end(); i++)
+    for (size_t i = _r.begin(); i != _r.end(); i++)
     {
       (*models)[i]->Update();
     }
@@ -69,8 +68,7 @@ class ModelUpdate_TBB
   private: Model_V *models;
 };
 
-////////////////////////////////////////////////////////////////////////////////
-// constructor
+//////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
   this->receiveMutex = new boost::mutex();
@@ -94,8 +92,7 @@ World::World(const std::string &_name)
        boost::bind(&World::DeleteEntityCB, this, _1)));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Private destructor
+//////////////////////////////////////////////////
 World::~World()
 {
   delete this->modelWorldPoseUpdateMutex;
@@ -111,37 +108,37 @@ World::~World()
   this->testRay.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the world
-void World::Load( sdf::ElementPtr _sdf )
+//////////////////////////////////////////////////
+void World::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
 
   if (this->sdf->GetValueString("name").empty())
-    gzwarn << "create_world(world_name=[" 
+    gzwarn << "create_world(world_name =["
            << this->name << "]) overwrites sdf world name\n!";
   else
     this->name = this->sdf->GetValueString("name");
 
-  this->sceneMsg.CopyFrom( 
-        msgs::SceneFromSDF(_sdf->GetElement("scene")) );
+  this->sceneMsg.CopyFrom(
+        msgs::SceneFromSDF(_sdf->GetElement("scene")));
 
   // The period at which statistics about the world are published
-  this->statPeriod = common::Time(0,200000000);
+  this->statPeriod = common::Time(0, 200000000);
 
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
 
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui",1,true);
+  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 1, true);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
-  this->factorySub = this->node->Subscribe("~/factory", 
+  this->factorySub = this->node->Subscribe("~/factory",
                                            &World::OnFactoryMsg, this);
-  this->controlSub = this->node->Subscribe("~/world_control", 
+  this->controlSub = this->node->Subscribe("~/world_control",
                                            &World::OnControl, this);
-  this->requestSub = this->node->Subscribe("~/request",&World::OnRequest, this);
+  this->requestSub = this->node->Subscribe("~/request",
+                                           &World::OnRequest, this);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
@@ -149,8 +146,8 @@ void World::Load( sdf::ElementPtr _sdf )
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
   this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats",1);
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection",1);
+    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 1);
+  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
 
   {
@@ -158,14 +155,14 @@ void World::Load( sdf::ElementPtr _sdf )
     //boost::mutex::scoped_lock lock(*this->receiveMutex);
 
     std::string type = _sdf->GetElement("physics")->GetValueString("type");
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, 
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
         shared_from_this());
 
     if (this->physicsEngine == NULL)
       gzthrow("Unable to create physics engine\n");
 
     // This should come before loading of entities
-    this->physicsEngine->Load( _sdf->GetElement("physics") );
+    this->physicsEngine->Load(_sdf->GetElement("physics"));
 
     this->rootElement.reset(new Base(BasePtr()));
     this->rootElement->SetName(this->GetName());
@@ -188,12 +185,13 @@ void World::Load( sdf::ElementPtr _sdf )
 
 }
 
+//////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
   this->sdf->Update();
   std::string data;
-  data = "<?xml version='1.0'?>\n";
-  data += "<gazebo version='1.0'>\n";
+  data = "<?xml version ='1.0'?>\n";
+  data += "<gazebo version ='1.0'>\n";
   data += this->sdf->ToString("");
   data += "</gazebo>\n";
 
@@ -206,8 +204,7 @@ void World::Save(const std::string &_filename)
   out.close();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the world
+//////////////////////////////////////////////////
 void World::Init()
 {
   // Initialize all the entities
@@ -221,17 +218,15 @@ void World::Init()
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Run the world in a thread
+//////////////////////////////////////////////////
 void World::Run()
 {
   this->stop = false;
-  this->thread = new boost::thread( 
+  this->thread = new boost::thread(
       boost::bind(&World::RunLoop, this));
 }
- 
-////////////////////////////////////////////////////////////////////////////////
-// Stop the world
+
+//////////////////////////////////////////////////
 void World::Stop()
 {
   this->stop = true;
@@ -244,8 +239,7 @@ void World::Stop()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Function to run physics. Used by physicsThread
+//////////////////////////////////////////////////
 void World::RunLoop()
 {
   this->physicsEngine->InitForThread();
@@ -261,15 +255,15 @@ void World::RunLoop()
   common::Time prevUpdateTime = common::Time::GetWallTime();
   while (!this->stop)
   {
-    /// Send statistics about the world simulation
+    // Send statistics about the world simulation
     if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
     {
-      msgs::Set( this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
-      msgs::Set( this->worldStatsMsg.mutable_real_time(), this->GetRealTime() );
-      msgs::Set( this->worldStatsMsg.mutable_pause_time(),this->GetPauseTime());
-      this->worldStatsMsg.set_paused( this->IsPaused() ); 
+      msgs::Set(this->worldStatsMsg.mutable_sim_time(), this->GetSimTime());
+      msgs::Set(this->worldStatsMsg.mutable_real_time(), this->GetRealTime());
+      msgs::Set(this->worldStatsMsg.mutable_pause_time(), this->GetPauseTime());
+      this->worldStatsMsg.set_paused(this->IsPaused());
 
-      this->statPub->Publish( this->worldStatsMsg );
+      this->statPub->Publish(this->worldStatsMsg);
       this->prevStatTime = common::Time::GetWallTime();
     }
 
@@ -304,8 +298,7 @@ void World::RunLoop()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the world
+//////////////////////////////////////////////////
 void World::Update()
 {
   if (this->needsReset)
@@ -327,10 +320,10 @@ void World::Update()
   {
     this->physicsEngine->UpdateCollision();
 
-    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin(); 
+    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
         iter != this->dirtyPoses.end(); iter++)
     {
-      (*iter)->SetWorldPose( (*iter)->GetDirtyPose(), false );
+      (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
     }
     this->dirtyPoses.clear();
 
@@ -340,8 +333,7 @@ void World::Update()
   event::Events::worldUpdateEnd();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Finilize the world
+//////////////////////////////////////////////////
 void World::Fini()
 {
   this->Stop();
@@ -362,29 +354,25 @@ void World::Fini()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Remove all entities from the world
+//////////////////////////////////////////////////
 void World::Clear()
 {
   // TODO: Implement this
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the name of the world
+//////////////////////////////////////////////////
 std::string World::GetName() const
 {
   return this->name;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of parameters
+//////////////////////////////////////////////////
 unsigned int World::GetParamCount() const
 {
   return this->parameters.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a param
+//////////////////////////////////////////////////
 common::Param *World::GetParam(unsigned int index) const
 {
   if (index < this->parameters.size())
@@ -395,15 +383,13 @@ common::Param *World::GetParam(unsigned int index) const
   return NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the physics engine
+//////////////////////////////////////////////////
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->physicsEngine;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Delete an entity by name
+//////////////////////////////////////////////////
 void World::DeleteEntityCB(const std::string &/*_name*/)
 {
   // TODO: Implement this function
@@ -420,25 +406,22 @@ ModelPtr World::GetModelById(unsigned int _id)
   return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
 }
 
-/// Get a model by name
 ModelPtr World::GetModelByName(const std::string &_name)
 {
   return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get a pointer to a model based on a name
+//////////////////////////////////////////////////
 EntityPtr World::GetEntityByName(const std::string &_name)
 {
   return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a model 
-ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
+//////////////////////////////////////////////////
+ModelPtr World::LoadModel(sdf::ElementPtr &_sdf , BasePtr _parent)
 {
-  ModelPtr model( new Model(_parent) );
+  ModelPtr model(new Model(_parent));
   model->SetWorld(shared_from_this());
   model->Load(_sdf);
 
@@ -451,9 +434,8 @@ ModelPtr World::LoadModel( sdf::ElementPtr &_sdf , BasePtr _parent)
   return model;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Load a model
-void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
+//////////////////////////////////////////////////
+void World::LoadEntities(sdf::ElementPtr &_sdf, BasePtr _parent)
 {
   if (_sdf->HasElement("light"))
   {
@@ -461,7 +443,7 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
     while (childElem)
     {
       msgs::Light *lm = this->sceneMsg.add_light();
-      lm->CopyFrom( msgs::LightFromSDF(childElem) );
+      lm->CopyFrom(msgs::LightFromSDF(childElem));
 
       childElem = childElem->GetNextElement();
     }
@@ -494,30 +476,32 @@ void World::LoadEntities( sdf::ElementPtr &_sdf, BasePtr _parent )
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Get the number of models
+//////////////////////////////////////////////////
 unsigned int World::GetModelCount() const
 {
   return this->rootElement->GetChildCount();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Get a model based on an index
+//////////////////////////////////////////////////
 ModelPtr World::GetModel(unsigned int _index)
 {
   ModelPtr model;
 
   if (_index < this->rootElement->GetChildCount() &&
       this->rootElement->GetChild(_index)->HasType(Base::MODEL))
-    model = boost::shared_static_cast<Model>(this->rootElement->GetChild(_index));
+  {
+    model =
+      boost::shared_static_cast<Model>(this->rootElement->GetChild(_index));
+  }
   else
+  {
     gzerr << "Invalid model index\n";
+  }
 
   return model;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Reset the simulation to the initial settings
+//////////////////////////////////////////////////
 void World::Reset(bool _resetTime)
 {
   if (_resetTime)
@@ -537,15 +521,13 @@ void World::Reset(bool _resetTime)
   this->physicsEngine->Reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Step callback
+//////////////////////////////////////////////////
 void World::OnStep()
 {
   this->stepInc = true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the selected entity
+//////////////////////////////////////////////////
 void World::SetSelectedEntityCB(const std::string &_name)
 {
   msgs::Selection msg;
@@ -572,7 +554,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
 
     msg.set_id(this->selectedEntity->GetId());
     msg.set_name(this->selectedEntity->GetCompleteScopedName());
-    msg.set_selected( true );
+    msg.set_selected(true);
 
     this->selectionPub->Publish(msg);
   }
@@ -581,15 +563,13 @@ void World::SetSelectedEntityCB(const std::string &_name)
   //event::Events::entitySelected(this->selectedEntity);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the selected entity
+//////////////////////////////////////////////////
 EntityPtr World::GetSelectedEntity() const
 {
   return this->selectedEntity;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Print entity tree
+//////////////////////////////////////////////////
 void World::PrintEntityTree()
 {
   // Initialize all the entities
@@ -597,111 +577,108 @@ void World::PrintEntityTree()
     this->rootElement->GetChild(i)->Print("");
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the simulation time
 gazebo::common::Time World::GetSimTime() const
 {
   return this->simTime;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the sim time
-void World::SetSimTime(common::Time t)
+//////////////////////////////////////////////////
+void World::SetSimTime(common::Time _t)
 {
-  this->simTime = t;
+  this->simTime = _t;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the pause time
+//////////////////////////////////////////////////
 gazebo::common::Time World::GetPauseTime() const
 {
   return this->pauseTime;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the start time
+//////////////////////////////////////////////////
 gazebo::common::Time World::GetStartTime() const
 {
   return this->startTime;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the real time (elapsed time)
+//////////////////////////////////////////////////
 common::Time World::GetRealTime() const
 {
   if (this->pause)
     return (this->pauseStartTime - this->startTime) - this->realTimeOffset;
   else
-    return (common::Time::GetWallTime() - this->startTime) - this->realTimeOffset;
+    return (common::Time::GetWallTime() - this->startTime) -
+             this->realTimeOffset;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return when this simulator is paused
+//////////////////////////////////////////////////
 bool World::IsPaused() const
 {
   return this->pause;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether the simulation is paused
-void World::SetPaused(bool p)
+//////////////////////////////////////////////////
+void World::SetPaused(bool _p)
 {
-  if (this->pause == p)
+  if (this->pause == _p)
     return;
 
-  if (p)
+  if (_p)
     this->pauseStartTime = common::Time::GetWallTime();
   else
     this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
 
-  event::Events::pause(p);
-  this->pause = p;
+  event::Events::pause(_p);
+  this->pause = _p;
 }
 
 
-// Received a factory msg
+//////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->factoryMsgs.push_back(*_msg);
 }
 
-void World::OnControl(ConstWorldControlPtr &data)
-{
-  if (data->has_pause())
-    this->SetPaused(data->pause());
+//////////////////////////////////////////////////
+void World::OnControl(ConstWorldControlPtr &_data)
+{ if (_data->has_pause())
+    this->SetPaused(_data->pause());
 
-  if (data->has_step())
+  if (_data->has_step())
     this->OnStep();
 
-  if (data->has_reset_time())
+  if (_data->has_reset_time())
   {
     this->simTime = common::Time(0);
     this->pauseTime = common::Time(0);
     this->startTime = common::Time::GetWallTime();
   }
 
-  if (data->has_reset_world())
+  if (_data->has_reset_world())
   {
     this->needsReset = true;
   }
 }
 
+//////////////////////////////////////////////////
 void World::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->requestMsgs.push_back(*_msg);
 }
 
-void World::JointLog(ConstJointPtr &msg)
+//////////////////////////////////////////////////
+void World::JointLog(ConstJointPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   int i = 0;
   for (; i < this->sceneMsg.joint_size(); i++)
   {
-    if (this->sceneMsg.joint(i).name() == msg->name())
+    if (this->sceneMsg.joint(i).name() == _msg->name())
     {
-      this->sceneMsg.mutable_joint(i)->CopyFrom(*msg);
+      this->sceneMsg.mutable_joint(i)->CopyFrom(*_msg);
       break;
     }
   }
@@ -709,45 +686,44 @@ void World::JointLog(ConstJointPtr &msg)
   if (i >= this->sceneMsg.joint_size())
   {
     msgs::Joint *newJoint = this->sceneMsg.add_joint();
-    newJoint->CopyFrom(*msg);
+    newJoint->CopyFrom(*_msg);
   }
 }
 
+//////////////////////////////////////////////////
 void World::OnModelMsg(ConstModelPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->modelMsgs.push_back(*_msg);
 }
 
-// Construct a scene message
-void World::BuildSceneMsg(msgs::Scene &scene, BasePtr entity)
+//////////////////////////////////////////////////
+void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 {
-  if (entity)
+  if (_entity)
   {
-    if (entity->HasType(Entity::MODEL))
+    if (_entity->HasType(Entity::MODEL))
     {
-      msgs::Model *modelMsg = scene.add_model();
-      boost::shared_static_cast<Model>(entity)->FillModelMsg(*modelMsg);
+      msgs::Model *modelMsg = _scene.add_model();
+      boost::shared_static_cast<Model>(_entity)->FillModelMsg(*modelMsg);
     }
 
-    for (unsigned int i=0; i < entity->GetChildCount(); i++)
+    for (unsigned int i = 0; i < _entity->GetChildCount(); i++)
     {
-      this->BuildSceneMsg(scene, entity->GetChild(i));
+      this->BuildSceneMsg(_scene, _entity->GetChild(i));
     }
   }
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// TBB version of model updating
+//////////////////////////////////////////////////
 /*void World::ModelUpdateTBB()
 {
-  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
-      ModelUpdate_TBB(&this->models) );
+  tbb::parallel_for(tbb::blocked_range<size_t>(0, this->models.size(), 10),
+      ModelUpdate_TBB(&this->models));
 }*/
 
-////////////////////////////////////////////////////////////////////////////////
-// Single loop verison of model updating
+//////////////////////////////////////////////////
 void World::ModelUpdateSingleLoop()
 {
   // Update all the models
@@ -757,9 +733,8 @@ void World::ModelUpdateSingleLoop()
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a plugin
-void World::LoadPlugin( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void World::LoadPlugin(sdf::ElementPtr &_sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
@@ -767,26 +742,27 @@ void World::LoadPlugin( sdf::ElementPtr &_sdf )
   if (plugin)
   {
     WorldPtr myself = shared_from_this();
-    plugin->Load(myself,_sdf);
-    this->plugins.push_back( plugin );
+    plugin->Load(myself, _sdf);
+    this->plugins.push_back(plugin);
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
   std::list<std::string>::iterator iter;
-  for (iter = this->deleteEntity.begin(); 
+  for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); iter++)
   {
-    this->rootElement->RemoveChild( (*iter) );
+    this->rootElement->RemoveChild((*iter));
   }
 
   this->deleteEntity.clear();
 }
 
+//////////////////////////////////////////////////
 void World::ProcessRequestMsgs()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -805,14 +781,14 @@ void World::ProcessRequestMsgs()
     {
       msgs::Model_V modelVMsg;
 
-      for (unsigned int i=0; i < this->rootElement->GetChildCount(); i++)
+      for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
       {
         BasePtr entity = this->rootElement->GetChild(i);
         msgs::Model *modelMsg = modelVMsg.add_models();
         if (entity->HasType(Base::MODEL))
         {
           ModelPtr model = boost::shared_dynamic_cast<Model>(entity);
-          model->FillModelMsg( *modelMsg );
+          model->FillModelMsg(*modelMsg);
         }
       }
 
@@ -826,7 +802,7 @@ void World::ProcessRequestMsgs()
     }
     else if ((*iter).request() == "entity_info")
     {
-      BasePtr entity = this->rootElement->GetByName( (*iter).data() );
+      BasePtr entity = this->rootElement->GetByName((*iter).data());
       if (entity)
       {
         if (entity->HasType(Base::MODEL))
@@ -836,8 +812,8 @@ void World::ProcessRequestMsgs()
           model->FillModelMsg(modelMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
-          modelMsg.SerializeToString( serializedData );
-          response.set_type( modelMsg.GetTypeName() );
+          modelMsg.SerializeToString(serializedData);
+          response.set_type(modelMsg.GetTypeName());
         }
         else if (entity->HasType(Base::LINK))
         {
@@ -846,34 +822,35 @@ void World::ProcessRequestMsgs()
           link->FillLinkMsg(linkMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
-          linkMsg.SerializeToString( serializedData );
-          response.set_type( linkMsg.GetTypeName() );
+          linkMsg.SerializeToString(serializedData);
+          response.set_type(linkMsg.GetTypeName());
         }
         else if (entity->HasType(Base::COLLISION))
         {
           msgs::Collision collisionMsg;
-          CollisionPtr collision = boost::shared_dynamic_cast<Collision>(entity);
-          collision->FillCollisionMsg( collisionMsg );
+          CollisionPtr collision =
+            boost::shared_dynamic_cast<Collision>(entity);
+          collision->FillCollisionMsg(collisionMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
-          collisionMsg.SerializeToString( serializedData );
-          response.set_type( collisionMsg.GetTypeName() );
+          collisionMsg.SerializeToString(serializedData);
+          response.set_type(collisionMsg.GetTypeName());
         }
         else if (entity->HasType(Base::JOINT))
         {
           msgs::Joint jointMsg;
           JointPtr joint = boost::shared_dynamic_cast<Joint>(entity);
-          joint->FillJointMsg( jointMsg );
+          joint->FillJointMsg(jointMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
-          jointMsg.SerializeToString( serializedData );
-          response.set_type( jointMsg.GetTypeName() );
+          jointMsg.SerializeToString(serializedData);
+          response.set_type(jointMsg.GetTypeName());
         }
       }
       else
       {
         response.set_type("error");
-        response.set_response( "nonexistant" );
+        response.set_response("nonexistant");
       }
     }
     else if ((*iter).request() == "scene_info")
@@ -883,7 +860,7 @@ void World::ProcessRequestMsgs()
 
       std::string *serializedData = response.mutable_serialized_data();
       this->sceneMsg.SerializeToString(serializedData);
-      response.set_type( sceneMsg.GetTypeName() );
+      response.set_type(sceneMsg.GetTypeName());
     }
     else
       send = false;
@@ -895,6 +872,7 @@ void World::ProcessRequestMsgs()
   this->requestMsgs.clear();
 }
 
+//////////////////////////////////////////////////
 void World::ProcessModelMsgs()
 {
   std::list<msgs::Model>::iterator iter;
@@ -909,7 +887,7 @@ void World::ProcessModelMsgs()
       model = this->GetModelByName((*iter).name());
 
     if (!model)
-      gzerr << "Unable to find model[" 
+      gzerr << "Unable to find model["
             << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
     else
     {
@@ -924,6 +902,7 @@ void World::ProcessModelMsgs()
   this->modelMsgs.clear();
 }
 
+//////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
   std::list<msgs::Factory>::iterator iter;
@@ -932,12 +911,12 @@ void World::ProcessFactoryMsgs()
        iter != this->factoryMsgs.end(); iter++)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile( "/sdf/gazebo.sdf", factorySDF );
+    sdf::initFile("/sdf/gazebo.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {
       // SDF Parsing happens here
-      if (!sdf::readString( (*iter).sdf(), factorySDF))
+      if (!sdf::readString((*iter).sdf(), factorySDF))
       {
         gzerr << "Unable to read sdf string\n";
         continue;
@@ -946,7 +925,7 @@ void World::ProcessFactoryMsgs()
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
-      if (!sdf::readFile( (*iter).sdf_filename(), factorySDF))
+      if (!sdf::readFile((*iter).sdf_filename(), factorySDF))
       {
         gzerr << "Unable to read sdf file.\n";
         continue;
@@ -962,7 +941,7 @@ void World::ProcessFactoryMsgs()
     {
       factorySDF->PrintValues();
 
-      BasePtr base = this->rootElement->GetByName( (*iter).edit_name() );
+      BasePtr base = this->rootElement->GetByName((*iter).edit_name());
       if (base)
       {
         sdf::ElementPtr elem;
@@ -971,20 +950,20 @@ void World::ProcessFactoryMsgs()
         else
           elem = factorySDF->root;
 
-        base->UpdateParameters( elem );
+        base->UpdateParameters(elem);
       }
     }
     else
     {
       sdf::ElementPtr elem = factorySDF->root->GetElement("model");
-      if (!elem) 
+      if (!elem)
         elem = factorySDF->root->GetElement("world")->GetElement("model");
 
       elem->SetParent(this->sdf);
       elem->GetParent()->InsertElement(elem);
-      ModelPtr model = this->LoadModel( elem, this->rootElement );
+      ModelPtr model = this->LoadModel(elem, this->rootElement);
       if ((*iter).has_pose())
-        model->SetWorldPose( msgs::Convert( (*iter).pose() ) );
+        model->SetWorldPose(msgs::Convert((*iter).pose()));
 
       model->Init();
     }
@@ -995,6 +974,7 @@ void World::ProcessFactoryMsgs()
   this->factoryMsgs.clear();
 }
 
+//////////////////////////////////////////////////
 ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 {
   ModelPtr model;
@@ -1008,9 +988,9 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
   return model;
 }
 
+//////////////////////////////////////////////////
 EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
-{
-  std::string entityName;
+{ std::string entityName;
   double dist;
   math::Vector3 end;
 
@@ -1022,5 +1002,3 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   this->testRay->GetIntersection(dist, entityName);
   return this->GetEntityByName(entityName);
 }
-
-

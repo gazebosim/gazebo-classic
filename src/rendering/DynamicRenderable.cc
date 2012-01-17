@@ -24,13 +24,13 @@ using namespace gazebo;
 using namespace rendering;
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Constructor
 DynamicRenderable::DynamicRenderable()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 DynamicRenderable::~DynamicRenderable()
 {
@@ -38,7 +38,7 @@ DynamicRenderable::~DynamicRenderable()
   delete this->mRenderOp.indexData;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Initializes the dynamic renderable.
 void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 {
@@ -59,7 +59,7 @@ void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
   this->CreateVertexDeclaration();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the render operation type
 void DynamicRenderable::SetOperationType(RenderOpType opType)
 {
@@ -97,7 +97,7 @@ void DynamicRenderable::SetOperationType(RenderOpType opType)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the render operation type
 RenderOpType DynamicRenderable::GetOperationType() const
 {
@@ -133,7 +133,7 @@ RenderOpType DynamicRenderable::GetOperationType() const
   return type;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Prepares the hardware buffers for the requested vertex and index counts.
 void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
 {
@@ -227,7 +227,7 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexC
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Implementation of Ogre::SimpleRenderable
 Ogre::Real DynamicRenderable::getBoundingRadius() const
 {
@@ -235,7 +235,7 @@ Ogre::Real DynamicRenderable::getBoundingRadius() const
                                    mBox.getMinimum().squaredLength()));
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Implementation of Ogre::SimpleRenderable
 Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
 {

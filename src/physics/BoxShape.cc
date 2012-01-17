@@ -22,38 +22,38 @@ using namespace gazebo;
 using namespace physics;
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Constructor
-BoxShape::BoxShape(CollisionPtr parent) : Shape(parent)
+BoxShape::BoxShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::BOX_SHAPE);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Destructor
 BoxShape::~BoxShape()
 {
-} 
+}
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Load the box
-void BoxShape::Load( sdf::ElementPtr &_sdf )
+void BoxShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Initialize the box
 void BoxShape::Init()
 {
   this->SetSize(this->sdf->GetValueVector3("size"));
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the size of the box
-void BoxShape::SetSize( const math::Vector3 &size )
+void BoxShape::SetSize(const math::Vector3 &_size)
 {
-  this->sdf->GetAttribute("size")->Set( size );
+  this->sdf->GetAttribute("size")->Set(_size);
 }
 
 math::Vector3 BoxShape::GetSize() const
@@ -64,10 +64,11 @@ math::Vector3 BoxShape::GetSize() const
 void BoxShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
-  msgs::Set(_msg.mutable_box()->mutable_size(),this->GetSize());
+  msgs::Set(_msg.mutable_box()->mutable_size(), this->GetSize());
 }
 
 void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetSize(msgs::Convert(_msg.box().size()));
 }
+

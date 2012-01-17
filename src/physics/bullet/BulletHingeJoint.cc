@@ -37,34 +37,34 @@ using namespace physics;
 using namespace physics;
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
-BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *world )
+BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world)
     : HingeJoint<BulletJoint>()
 {
-  this->world = world;
+  this->world = _world;
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 BulletHingeJoint::~BulletHingeJoint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Load a hinge joint
-void BulletHingeJoint::Load(common::XMLConfigNode *node)
+void BulletHingeJoint::Load(common::XMLConfigNode *_node)
 {
-  HingeJoint<BulletJoint>::Load(node);
+  HingeJoint<BulletJoint>::Load(_node);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Attach the two bodies with this joint
-void BulletHingeJoint::Attach( Link *one, Link *two )
+void BulletHingeJoint::Attach(Link *_one, Link *_two)
 {
-  HingeJoint<BulletJoint>::Attach(one,two);
+  HingeJoint<BulletJoint>::Attach(_one, _two);
   BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
   BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
@@ -81,12 +81,12 @@ void BulletHingeJoint::Attach( Link *one, Link *two )
   pivotA = (this->anchorPos - this->body1->GetWorldPose().pos);
   pivotB = (this->anchorPos - this->body2->GetWorldPose().pos);
 
-  axisA = btmath::Vector3((**this->axisP).x,(**this->axisP).y,(**this->axisP).z);
-  axisB = btmath::Vector3((**this->axisP).x,(**this->axisP).y,(**this->axisP).z);
+  axisA = btmath::Vector3((**this->axisP).x, (**this->axisP).y, (**this->axisP).z);
+  axisB = btmath::Vector3((**this->axisP).x, (**this->axisP).y, (**this->axisP).z);
 
-  this->constraint = new btHingeConstraint( *rigidLink1, *rigidLink2,
+  this->constraint = new btHingeConstraint(*rigidLink1, *rigidLink2,
       btmath::Vector3(pivotA.x, pivotA.y, pivotA.z),
-      btmath::Vector3(pivotB.x, pivotB.y, pivotB.z), axisA, axisB); 
+      btmath::Vector3(pivotB.x, pivotB.y, pivotB.z), axisA, axisB);
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);
@@ -96,51 +96,51 @@ void BulletHingeJoint::Attach( Link *one, Link *two )
   ((btHingeConstraint*)this->constraint)->setAngularOnly(true);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the anchor point
-math::Vector3 BulletHingeJoint::GetAnchor(int index ) const
+math::Vector3 BulletHingeJoint::GetAnchor(int _index) const
 {
   btTransform trans = ((btHingeConstraint*)this->constraint)->getAFrame();
   trans.getOrigin() += this->constraint->getRigidLinkA().getCenterOfMassTransform().getOrigin();
   return math::Vector3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the anchor point
-void BulletHingeJoint::SetAnchor( int index, const math::Vector3 &anchor )
+void BulletHingeJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 {
   gzerr << "Not implemented...\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the axis of rotation
-math::Vector3 BulletHingeJoint::GetAxis(int index) const
+math::Vector3 BulletHingeJoint::GetAxis(int _index) const
 {
   return (**this->axisP);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the axis of rotation
-void BulletHingeJoint::SetAxis( int index, const math::Vector3 &axis )
+void BulletHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   gzerr << "Bullet handles setAxis improperly\n";
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3 vec(axis.x, axis.y, axis.z);
+  /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
   ((btHingeConstraint*)this->constraint)->setAxis(vec);
   */
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the joint damping
-void BulletHingeJoint::SetDamping( int /*index*/, const double damping )
+void BulletHingeJoint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the angle of rotation
-math::Angle BulletHingeJoint::GetAngle(int index ) const
+math::Angle BulletHingeJoint::GetAngle(int _index) const
 {
   if (this->constraint)
     return ((btHingeConstraint*)this->constraint)->getHingemath::Angle();
@@ -148,84 +148,84 @@ math::Angle BulletHingeJoint::GetAngle(int index ) const
     gzthrow("Joint has not been created");
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the velocity of an axis(index).
-void BulletHingeJoint::SetVelocity(int index, double angle)
+void BulletHingeJoint::SetVelocity(int _index, double _angle)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the rotation rate
-double BulletHingeJoint::GetVelocity(int index) const
+double BulletHingeJoint::GetVelocity(int _index) const
 {
   gzerr << "Not implemented...\n";
   return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the max allowed force of an axis(index).
-void BulletHingeJoint::SetMaxForce(int index, double t)
+void BulletHingeJoint::SetMaxForce(int _index, double _t)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the max allowed force of an axis(index).
-double BulletHingeJoint::GetMaxForce(int index)
+double BulletHingeJoint::GetMaxForce(int _index)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the torque of this joint
-void BulletHingeJoint::SetForce(int index, double torque)
+void BulletHingeJoint::SetForce(int _index, double _torque)
 {
   gzerr << "Not implemented...\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the torque of a joint.
-double BulletHingeJoint::GetForce(int index)
+double BulletHingeJoint::GetForce(int _index)
 {
   gzerr << "Not implemented...\n";
   return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the high stop of an axis(index).
-void BulletHingeJoint::SetHighStop(int index, math::Angle angle)
+void BulletHingeJoint::SetHighStop(int _index, math::Angle _angle)
 {
   if (this->constraint)
-    // this function has additional parameters that we may one day 
+    // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    ((btHingeConstraint*)this->constraint)->setLimit( 
-      this->GetLowStop(index).GetAsRadian(), angle.GetAsRadian() );
+    ((btHingeConstraint*)this->constraint)->setLimit(
+      this->GetLowStop(_index).GetAsRadian(), _angle.GetAsRadian());
   else
     gzthrow("Joint must be created first");
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the low stop of an axis(index).
-void BulletHingeJoint::SetLowStop(int index, math::Angle angle)
+void BulletHingeJoint::SetLowStop(int _index, math::Angle _angle)
 {
   if (this->constraint)
-    // this function has additional parameters that we may one day 
+    // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    ((btHingeConstraint*)this->constraint)->setLimit( angle.GetAsRadian(), 
-      this->GetHighStop(index).GetAsRadian() );
+    ((btHingeConstraint*)this->constraint)->setLimit(_angle.GetAsRadian(),
+      this->GetHighStop(_index).GetAsRadian());
   else
     gzthrow("Joint must be created first");
 
 }
- 
-//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
 /// Get the high stop of an axis(index).
-math::Angle BulletHingeJoint::GetHighStop(int index)
+math::Angle BulletHingeJoint::GetHighStop(int _index)
 {
   if (this->constraint)
     return ((btHingeConstraint*)this->constraint)->getUpperLimit();
@@ -233,12 +233,13 @@ math::Angle BulletHingeJoint::GetHighStop(int index)
     gzthrow("Joint must be created first");
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// \brief Get the low stop of an axis(index).
-math::Angle BulletHingeJoint::GetLowStop(int index)
+math::Angle BulletHingeJoint::GetLowStop(int _index)
 {
   if (this->constraint)
     return ((btHingeConstraint*)this->constraint)->getLowerLimit();
   else
     gzthrow("Joint must be created first");
 }
+

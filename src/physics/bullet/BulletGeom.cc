@@ -40,9 +40,9 @@ using namespace physics;
 using namespace physics;
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
-BulletCollision::BulletCollision( Link *_body )
+BulletCollision::BulletCollision(Link *_body)
     : Collision(_body)
 {
   this->SetName("Bullet Collision");
@@ -50,7 +50,7 @@ BulletCollision::BulletCollision( Link *_body )
   this->collisionShape = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 BulletCollision::~BulletCollision()
 {
@@ -59,29 +59,29 @@ BulletCollision::~BulletCollision()
   this->collisionShape = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Load the collision
-void BulletCollision::Load(common::XMLConfigNode *node)
+void BulletCollision::Load(common::XMLConfigNode *_node)
 {
-  Collision::Load(node);
-//  this->visualNode->SetPose( this->GetRelativePose() );
+  Collision::Load(_node);
+//  this->visualNode->SetPose(this->GetRelativePose());
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Save the body based on our common::XMLConfig node
-void BulletCollision::Save(std::string &prefix, std::ostream &stream)
+void BulletCollision::Save(std::string &_prefix, std::ostream &_stream)
 {
-  Collision::Save(prefix, stream);
+  Collision::Save(_prefix, _stream);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Update
 void BulletCollision::Update()
 {
   Collision::Update();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // On pose change
 void BulletCollision::OnPoseChange()
 {
@@ -91,19 +91,19 @@ void BulletCollision::OnPoseChange()
   bbody->SetCollisionRelativePose(this, pose);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the category bits, used during collision detection
-void BulletCollision::SetCategoryBits(unsigned int bits)
+void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
-void BulletCollision::SetCollideBits(unsigned int bits)
+void BulletCollision::SetCollideBits(unsigned int _bits)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the mass of the collision
 Mass BulletCollision::GetLinkMassMatrix()
 {
@@ -111,25 +111,25 @@ Mass BulletCollision::GetLinkMassMatrix()
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void BulletCollision::GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const
+void BulletCollision::GetBoundingBox(math::Vector3 &_min, math::Vector3 &_max) const
 {
   if (this->collisionShape)
   {
     btmath::Vector3 btMin, btMax;
-    this->collisionShape->getAabb( btTransform::getIdentity(), btMin, btMax );
+    this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    min.Set(btMin.x(), btMin.y(), btMin.z());
-    max.Set(btMax.x(), btMax.y(), btMax.z());
+    _min.Set(btMin.x(), btMin.y(), btMin.z());
+    _max.Set(btMax.x(), btMax.y(), btMax.z());
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the collision shape
-void BulletCollision::SetCollisionShape( btCollisionShape *shape ) 
+void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 {
-  this->collisionShape = shape;
+  this->collisionShape = _shape;
 
   /*btmath::Vector3 vec;
   this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
@@ -138,16 +138,17 @@ void BulletCollision::SetCollisionShape( btCollisionShape *shape )
   this->mass.SetCoG(this->GetRelativePose().pos);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the bullet collision shape
 btCollisionShape *BulletCollision::GetCollisionShape() const
 {
   return this->collisionShape;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the index of the compound shape
-void BulletCollision::SetCompoundShapeIndex( int index )
+void BulletCollision::SetCompoundShapeIndex(int _index)
 {
   this->compoundShapeIndex = 0;
 }
+

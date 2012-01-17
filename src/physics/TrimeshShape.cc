@@ -31,41 +31,38 @@
 using namespace gazebo;
 using namespace physics;
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-TrimeshShape::TrimeshShape(CollisionPtr parent) 
-  : Shape(parent)
+//////////////////////////////////////////////////
+TrimeshShape::TrimeshShape(CollisionPtr _parent)
+  : Shape(_parent)
 {
   this->AddType(Base::TRIMESH_SHAPE);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 TrimeshShape::~TrimeshShape()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Load the trimesh
-void TrimeshShape::Load( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void TrimeshShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Init the trimesh shape
+//////////////////////////////////////////////////
 void TrimeshShape::Init()
 {
   common::MeshManager *meshManager = common::MeshManager::Instance();
-  this->mesh = meshManager->Load( this->sdf->GetValueString("filename") );
+  this->mesh = meshManager->Load(this->sdf->GetValueString("filename"));
 
   if (this->mesh->GetSubMeshCount() > 1)
   {
     // Create a mesh for each of the submeshes.
-    for (unsigned int i=1; i < this->mesh->GetSubMeshCount(); i++)
+    for (unsigned int i = 1; i < this->mesh->GetSubMeshCount(); i++)
     {
-      common::SubMesh *subMesh = const_cast<common::SubMesh*>(mesh->GetSubMesh(i));
+      common::SubMesh *subMesh =
+        const_cast<common::SubMesh*>(mesh->GetSubMesh(i));
 
       if (subMesh->GetVertexCount() < 3)
         continue;
@@ -74,67 +71,74 @@ void TrimeshShape::Init()
       newName << this->mesh->GetName() << "_" << i;
 
       common::Mesh *newMesh = new common::Mesh();
-      newMesh->SetName( newName.str() );
-      newMesh->AddSubMesh( subMesh );
+      newMesh->SetName(newName.str());
+      newMesh->AddSubMesh(subMesh);
 
-      meshManager->AddMesh( newMesh ); 
+      meshManager->AddMesh(newMesh);
 
       std::ostringstream stream;
 
-      stream << "<collision name='" << newName.str() << "_collision'>";
+      stream << "<collision name ='" << newName.str() << "_collision'>";
       stream << "  <geometry>";
-      stream << "    <mesh filename='" << newName.str() << "' scale='" 
+      stream << "    <mesh filename ='" << newName.str() << "' scale ='"
              << this->sdf->GetValueVector3("scale") << "'/>";
       stream << "  </geometry>";
       stream << "</collision>";
-      stream << "<visual name='" << newName.str() << "_visual'>";
+      stream << "<visual name ='" << newName.str() << "_visual'>";
       stream << "  <geometry>";
-      stream << "    <mesh filename='" << newName.str() << "' scale='" 
+      stream << "    <mesh filename ='" << newName.str() << "' scale ='"
              << this->sdf->GetValueVector3("scale") << "'/>";
       stream << "  </geometry>";
       stream << "</visual>";
 
-      CollisionPtr newCollision = 
-        this->GetWorld()->GetPhysicsEngine()->CreateCollision( 
-          "trimesh", this->collisionParent->GetLink() );
+      CollisionPtr newCollision =
+        this->GetWorld()->GetPhysicsEngine()->CreateCollision(
+          "trimesh", this->collisionParent->GetLink());
 
       // TODO: need to implement this function properly.
       newCollision->SetSaveable(false);
-      //newCollision->Load( config->GetRootNode()->GetChild() );
+      //newCollision->Load(config->GetRootNode()->GetChild());
     }
   }
 }
 
+//////////////////////////////////////////////////
 void TrimeshShape::SetScale(const math::Vector3 &_scale)
 {
   this->sdf->GetAttribute("scale")->Set(_scale);
 }
 
+//////////////////////////////////////////////////
 math::Vector3 TrimeshShape::GetSize() const
 {
   return this->sdf->GetValueVector3("scale");
 }
 
+//////////////////////////////////////////////////
 std::string TrimeshShape::GetFilename() const
 {
   return this->sdf->GetValueString("filename");
 }
 
+//////////////////////////////////////////////////
 void TrimeshShape::SetFilename(const std::string &_filename)
 {
   this->sdf->GetAttribute("filename")->Set(_filename);
   this->Init();
 }
 
+//////////////////////////////////////////////////
 void TrimeshShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
   _msg.mutable_mesh()->set_filename(this->GetFilename());
-  msgs::Set(_msg.mutable_mesh()->mutable_scale(),this->GetSize());
+  msgs::Set(_msg.mutable_mesh()->mutable_scale(), this->GetSize());
 }
 
+//////////////////////////////////////////////////
 void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetScale(msgs::Convert(_msg.mesh().scale()));
   this->SetFilename(_msg.mesh().filename());
 }
+

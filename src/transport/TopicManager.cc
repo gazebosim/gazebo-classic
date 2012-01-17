@@ -24,7 +24,7 @@
 using namespace gazebo;
 using namespace transport;
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
 TopicManager::TopicManager()
 {
@@ -33,7 +33,7 @@ TopicManager::TopicManager()
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 TopicManager::~TopicManager()
 {
@@ -41,7 +41,7 @@ TopicManager::~TopicManager()
   this->nodeMutex = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Init the topic Manager
 void TopicManager::Init()
 {
@@ -88,7 +88,7 @@ void TopicManager::RemoveNode(unsigned int _id)
   this->nodeMutex->unlock();
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Process all nodes
 void TopicManager::ProcessNodes()
 {
@@ -117,7 +117,7 @@ void TopicManager::ProcessNodes()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Send a message
 void TopicManager::Publish(const std::string &_topic,
                            const google::protobuf::Message &_message,
@@ -144,7 +144,7 @@ void TopicManager::Publish(const std::string &_topic,
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 {
   PublicationPtr_M::iterator iter = this->advertisedTopics.find(_topic);
@@ -154,7 +154,7 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
     return PublicationPtr();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Subscribe to a topic give some options
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 {
@@ -181,7 +181,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Handle an incoming message
 void TopicManager::HandleIncoming()
 {
@@ -189,7 +189,7 @@ void TopicManager::HandleIncoming()
   // Read a header in the message the indicates the topic
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Unsubscribe from a topic
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const CallbackHelperPtr &_sub)
@@ -216,7 +216,7 @@ void TopicManager::Unsubscribe(const std::string &_topic,
   this->subscribedNodes[_topic].remove(_sub);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Connect a local Publisher to a remote Subscriber
 void TopicManager::ConnectPubToSub( const std::string &topic,
                                     const SubscriptionTransportPtr &sublink )
@@ -225,7 +225,7 @@ void TopicManager::ConnectPubToSub( const std::string &topic,
   publication->AddSubscription( sublink );
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Disconnect a local publisher from a remote subscriber
 void TopicManager::DisconnectPubFromSub( const std::string &topic, const std::string &host, unsigned int port)
 {
@@ -233,7 +233,7 @@ void TopicManager::DisconnectPubFromSub( const std::string &topic, const std::st
   publication->RemoveSubscription(host, port);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Disconnection all local subscribers from a remote publisher
 void TopicManager::DisconnectSubFromPub(const std::string &topic,
     const std::string &host, unsigned int port)
@@ -243,7 +243,7 @@ void TopicManager::DisconnectSubFromPub(const std::string &topic,
     publication->RemoveTransport(host, port);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Connect all local subscribers on a topic to known publishers
 void TopicManager::ConnectSubscribers(const std::string &_topic)
 {
@@ -270,7 +270,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Connect a local subscriber to a remote publisher
 void TopicManager::ConnectSubToPub( const msgs::Publish &_pub)
 {
@@ -297,7 +297,7 @@ void TopicManager::ConnectSubToPub( const msgs::Publish &_pub)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Add a new publication to the list of advertised publication
 PublicationPtr TopicManager::UpdatePublications( const std::string &topic, 
                                                  const std::string &msgType )
@@ -328,7 +328,7 @@ PublicationPtr TopicManager::UpdatePublications( const std::string &topic,
   return pub;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Stop advertising on a topic
 void TopicManager::Unadvertise(const std::string &_topic)
 {
@@ -351,14 +351,14 @@ void TopicManager::Unadvertise(const std::string &_topic)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Register a new topic namespace 
 void TopicManager::RegisterTopicNamespace(const std::string &_name)
 {
   ConnectionManager::Instance()->RegisterTopicNamespace(_name);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get all the topic namespaces
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {

@@ -36,26 +36,24 @@ using namespace gazebo;
 using namespace physics;
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 Joint::Joint()
   : Base(BasePtr())
 {
   this->AddType(Base::JOINT);
   this->showJoints = false;
 
-  this->showJointsConnection = event::Events::ConnectShowJoints(boost::bind(&Joint::ShowJoints, this, _1) );
+  this->showJointsConnection =
+    event::Events::ConnectShowJoints(boost::bind(&Joint::ShowJoints, this, _1));
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Desctructor
+//////////////////////////////////////////////////
 Joint::~Joint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Load a joint
+//////////////////////////////////////////////////
 void Joint::Load(sdf::ElementPtr &_sdf)
 {
   Base::Load(_sdf);
@@ -67,20 +65,20 @@ void Joint::Load(sdf::ElementPtr &_sdf)
 
   if (this->model)
   {
-    visname << this->model->GetScopedName() 
+    visname << this->model->GetScopedName()
             << "::" << this->GetName() << "_VISUAL";
 
-    this->childLink = this->model->GetLink( childName );
-    this->parentLink = this->model->GetLink( parentName );
+    this->childLink = this->model->GetLink(childName);
+    this->parentLink = this->model->GetLink(parentName);
   }
   else
   {
     visname << this->GetName() << "_VISUAL";
     this->childLink = boost::shared_dynamic_cast<Link>(
-        this->GetWorld()->GetByName( childName) );
+        this->GetWorld()->GetByName(childName));
 
     this->parentLink = boost::shared_dynamic_cast<Link>(
-        this->GetWorld()->GetByName( parentName ));
+        this->GetWorld()->GetByName(parentName));
   }
 
   BasePtr myBase = shared_from_this();
@@ -89,7 +87,7 @@ void Joint::Load(sdf::ElementPtr &_sdf)
   {
     if (parentName != std::string("world"))
     {
-      gzthrow("Couldn't Find Parent Link[" + parentName );
+      gzthrow("Couldn't Find Parent Link[" + parentName);
     }
   }
   else
@@ -110,9 +108,10 @@ void Joint::Load(sdf::ElementPtr &_sdf)
   if (this->childLink)
     this->anchorPos = (offset + this->childLink->GetWorldPose()).pos ;
   else
-    this->anchorPos = math::Vector3(0,0,0); // default for world
+    this->anchorPos = math::Vector3(0, 0, 0); // default for world
 }
 
+//////////////////////////////////////////////////
 void Joint::Init()
 {
   this->Attach(this->parentLink, this->childLink);
@@ -160,6 +159,7 @@ void Joint::Init()
 
 }
 
+//////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(int _index) const
 {
   math::Vector3 vec;
@@ -167,82 +167,74 @@ math::Vector3 Joint::GetLocalAxis(int _index) const
   if (_index == 0)
     vec = this->sdf->GetElement("axis")->GetValueVector3("xyz");
   else
-    vec =this->sdf->GetElement("axis2")->GetValueVector3("xyz");
+    vec = this->sdf->GetElement("axis2")->GetValueVector3("xyz");
 
   return vec;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Update the joint
+//////////////////////////////////////////////////
 void Joint::Update()
 {
   this->jointUpdate();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// update the parameters using new sdf values
-void Joint::UpdateParameters( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Joint::UpdateParameters(sdf::ElementPtr &_sdf)
 {
   Base::UpdateParameters(_sdf);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the joint to show visuals
+//////////////////////////////////////////////////
 void Joint::ShowJoints(const bool & /*s_kk*/)
 {
   /*msgs::Visual msg;
-  msg.set_name( this->visual);
+  msg.set_name(this->visual);
   msg.set_visible(s);
   this->vis_pub->Publish(msg);
   this->showJoints = s;
   */
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Reset the joint
+//////////////////////////////////////////////////
 void Joint::Reset()
 {
-  this->SetMaxForce(0,0);
-  this->SetVelocity(0,0);
+  this->SetMaxForce(0, 0);
+  this->SetVelocity(0, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Attach the two bodies with this joint
-void Joint::Attach( LinkPtr parent, LinkPtr child )
+//////////////////////////////////////////////////
+void Joint::Attach(LinkPtr _parent, LinkPtr _child)
 {
-  this->parentLink = parent;
-  this->childLink = child;
+  this->parentLink = _parent;
+  this->childLink = _child;
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the model this joint belongs too
-void Joint::SetModel(ModelPtr model)
+//////////////////////////////////////////////////
+void Joint::SetModel(ModelPtr _model)
 {
-  this->model = model;
+  this->model = _model;
   this->SetWorld(this->model->GetWorld());
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the child link
+//////////////////////////////////////////////////
 LinkPtr Joint::GetChild() const
 {
   return this->childLink;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the child link
+//////////////////////////////////////////////////
 LinkPtr Joint::GetParent() const
 {
   return this->parentLink;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Fill a joint message
-void Joint::FillJointMsg( msgs::Joint &/*_msg*/ )
+//////////////////////////////////////////////////
+void Joint::FillJointMsg(msgs::Joint &/*_msg*/)
 {
 }
 
+//////////////////////////////////////////////////
 math::Angle Joint::GetAngle(int _index) const
 {
   if (this->model->IsStatic())
@@ -251,6 +243,7 @@ math::Angle Joint::GetAngle(int _index) const
     return this->GetAngleImpl(_index);
 }
 
+//////////////////////////////////////////////////
 void Joint::SetAngle(int /*index*/, math::Angle _angle)
 {
   this->staticAngle = _angle;

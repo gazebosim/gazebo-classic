@@ -16,7 +16,7 @@
 */
 /*
  * Desc: Factory for creating physics engine
- * Author: Nate Koenig 
+ * Author: Nate Koenig
  * Date: 21 May 2009
  * SVN info: $Id:$
  */
@@ -39,8 +39,7 @@ using namespace physics;
 
 std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 
-////////////////////////////////////////////////////////////////////////////////
-/// Register everything
+//////////////////////////////////////////////////
 void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
@@ -50,26 +49,26 @@ void PhysicsFactory::RegisterAll()
 //#endif
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Register a physics engine class.
+//////////////////////////////////////////////////
 void PhysicsFactory::RegisterPhysicsEngine(std::string classname,
                                      PhysicsFactoryFn factoryfn)
 {
   engines[classname] = factoryfn;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create a new instance of a physics engine.
-PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &classname, WorldPtr world)
+//////////////////////////////////////////////////
+PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
+    WorldPtr _world)
 {
   PhysicsEnginePtr result;
 
-  if (engines[classname])
+  if (engines[_classname])
   {
-    result = (engines[classname]) (world);
+    result = (engines[_classname]) (_world);
   }
   else
-    gzerr << "Invalid Physics Type[" << classname << "]\n";
+    gzerr << "Invalid Physics Type[" << _classname << "]\n";
 
   return result;
 }
+

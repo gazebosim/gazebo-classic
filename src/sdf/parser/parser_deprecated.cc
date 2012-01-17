@@ -919,7 +919,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// \brief Load Model from xmlNode
 bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
@@ -958,7 +958,7 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Set world name
@@ -1005,7 +1005,7 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
 
@@ -1111,7 +1111,7 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
 
   return true;
 }
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   std::ifstream fin;
@@ -1134,7 +1134,7 @@ bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initModelString(const std::string &_xmlString, sdf::SDFPtr &_sdf)
 {
   xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
@@ -1142,7 +1142,7 @@ bool initModelString(const std::string &_xmlString, sdf::SDFPtr &_sdf)
   return initModelDoc(xmlDoc, _sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// \brief Load Model from xmlDoc
 bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 {
@@ -1172,7 +1172,7 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initWorldFile(const std::string &_filename, 
     sdf::SDFPtr &_sdf)
 {
@@ -1193,7 +1193,7 @@ bool initWorldFile(const std::string &_filename,
   return initWorldString(output, _sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initWorldString(const std::string &_xmlString, 
                      sdf::SDFPtr &_sdf)
 {
@@ -1202,7 +1202,7 @@ bool initWorldString(const std::string &_xmlString,
   return initWorldDoc(xmlDoc,_sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 {
   if (!_xmlDoc)

@@ -30,7 +30,7 @@ namespace gazebo
   /// \brief Physics namespace
 	namespace physics
   {
-    /// \addtogroup gazebo_physics 
+    /// \addtogroup gazebo_physics
     /// \brief A set of physics related class, functions, and definitions
     /// \{
 
@@ -43,12 +43,12 @@ namespace gazebo
               {
                 this->AddType(Base::BALL_JOINT);
               }
-    
+
       /// \brief Destructor
       public: virtual ~BallJoint()
               {
               }
-    
+
       /// \brief Load the joint
       protected: void Load( sdf::ElementPtr &_sdf )
                  { T::Load(_sdf); }

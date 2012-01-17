@@ -81,7 +81,7 @@ void Node::Init(const std::string &_space)
   TopicManager::Instance()->AddNode(shared_from_this());
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the topic namespace for this node
 std::string Node::GetTopicNamespace() const
 {

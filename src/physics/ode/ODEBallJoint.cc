@@ -27,40 +27,41 @@
 using namespace gazebo;
 using namespace physics;
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
-ODEBallJoint::ODEBallJoint(dWorldID worldId)
+ODEBallJoint::ODEBallJoint(dWorldID _worldId)
     : BallJoint<ODEJoint>()
 {
-  this->jointId = dJointCreateBall(worldId, NULL);
+  this->jointId = dJointCreateBall(_worldId, NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 ODEBallJoint::~ODEBallJoint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the joints anchor point
 math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 {
   dVector3 result;
-  dJointGetBallAnchor( jointId, result );
+  dJointGetBallAnchor(jointId, result);
   return math::Vector3(result[0], result[1], result[2]);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the joints anchor point
-void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &anchor)
+void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 {
-  dJointSetBallAnchor( jointId, anchor.x, anchor.y, anchor.z );
+  dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Set the joint damping
-void ODEBallJoint::SetDamping( int /*_index*/, const double _damping )
+void ODEBallJoint::SetDamping(int /*_index*/, const double _damping)
 {
-  dJointSetDamping( this->jointId, _damping);
+  dJointSetDamping(this->jointId, _damping);
 }
+

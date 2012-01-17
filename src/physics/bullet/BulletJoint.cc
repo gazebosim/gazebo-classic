@@ -33,7 +33,7 @@ using namespace physics;
 using namespace physics;
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
 BulletJoint::BulletJoint()
   : Joint()
@@ -41,7 +41,7 @@ BulletJoint::BulletJoint()
   this->constraint = NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Desctructor
 BulletJoint::~BulletJoint()
 {
@@ -49,24 +49,24 @@ BulletJoint::~BulletJoint()
     delete this->constraint;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Load a joint
-void BulletJoint::Load(common::XMLConfigNode *node)
+void BulletJoint::Load(common::XMLConfigNode *_node)
 {
-  Joint::Load(node);
+  Joint::Load(_node);
 
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Get the body to which the joint is attached according the _index
-Link *BulletJoint::GetJointLink( int index ) const
+Link *BulletJoint::GetJointLink(int index) const
 {
-  Link *result=NULL;
+  Link *result = NULL;
 
   if (this->constraint == NULL)
     gzthrow("Attach bodies to the joint first");
 
-  if (index == 0 || index ==1)
+  if (index == 0 || index == 1)
   {
     BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
     BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
@@ -82,15 +82,15 @@ Link *BulletJoint::GetJointLink( int index ) const
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Determines of the two bodies are connected by a joint
-bool BulletJoint::AreConnected( Link *one, Link *two ) const
+bool BulletJoint::AreConnected(Link *_one, Link *_two) const
 {
-  return this->constraint && ((this->body1 == one && this->body2 == two) || 
-         (this->body1 == two && this->body2 == one));
+  return this->constraint && ((this->body1 == _one && this->body2 == _two) ||
+         (this->body1 == _two && this->body2 == _one));
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Detach this joint from all bodies
 void BulletJoint::Detach()
 {
@@ -101,28 +101,29 @@ void BulletJoint::Detach()
     delete this->constraint;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the ERP of this joint
-void BulletJoint::SetERP(double newERP)
+void BulletJoint::SetERP(double _newERP)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the ERP of this joint
 double BulletJoint::GetERP()
 {
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Set the CFM of this joint
-void BulletJoint::SetCFM(double newCFM)
+void BulletJoint::SetCFM(double _newCFM)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get the ERP of this joint
 double BulletJoint::GetCFM()
 {
   return 0;
 }
+

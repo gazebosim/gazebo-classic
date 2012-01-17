@@ -25,7 +25,7 @@
 using namespace gazebo;
 using namespace physics;
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Default constructor
 SurfaceParams::SurfaceParams()
 {
@@ -46,10 +46,10 @@ SurfaceParams::SurfaceParams()
   this->slip1 = 0.0;
   this->slip2 = 0.0;
   this->enableFriction = true;
-  this->fdir1 = math::Vector3(0,0,0);
+  this->fdir1 = math::Vector3(0, 0, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Load the contact params
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
@@ -107,7 +107,7 @@ void SurfaceParams::FillSurfaceMsg(msgs::Surface &_msg)
   _msg.set_max_vel(this->maxVel);
   _msg.set_min_depth(this->minDepth);
 }
- 
+
 
 void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 {
@@ -142,3 +142,4 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_min_depth())
     this->minDepth = _msg.min_depth();
 }
+

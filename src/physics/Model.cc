@@ -48,11 +48,10 @@ using namespace physics;
 
 class LinkUpdate_TBB
 {
-  public: LinkUpdate_TBB(Link_V *bodies) : bodies(bodies) {}
-
-  public: void operator() (const tbb::blocked_range<size_t> &r) const
+  public: LinkUpdate_TBB(Link_V *_bodies) : bodies(_bodies) {}
+  public: void operator() (const tbb::blocked_range<size_t> &_r) const
   {
-    for (size_t i=r.begin(); i != r.end(); i++)
+    for (size_t i = _r.begin(); i != _r.end(); i++)
     {
       (*this->bodies)[i]->Update();
     }
@@ -62,31 +61,28 @@ class LinkUpdate_TBB
 };
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-Model::Model(BasePtr parent)
-  : Entity(parent)
+//////////////////////////////////////////////////
+Model::Model(BasePtr _parent)
+  : Entity(_parent)
 {
   this->AddType(MODEL);
   this->updateMutex = new boost::recursive_mutex();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 Model::~Model()
 {
   delete this->updateMutex;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the model
-void Model::Load( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Model::Load(sdf::ElementPtr &_sdf)
 {
   Entity::Load(_sdf);
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
-  this->SetStatic( this->sdf->GetValueBool("static") );
+  this->SetStatic(this->sdf->GetValueBool("static"));
   this->sdf->GetAttribute("static")->SetUpdateFunc(
       boost::bind(&Entity::IsStatic, this));
 
@@ -104,9 +100,9 @@ void Model::Load( sdf::ElementPtr &_sdf )
       LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
           boost::shared_static_cast<Model>(shared_from_this()));
 
-      /// FIXME: canonical link is hardcoded to the first link.
-      ///        warn users for now, need  to add parsing of
-      ///        the canonical tag in sdf
+      // FIXME: canonical link is hardcoded to the first link.
+      //        warn users for now, need  to add parsing of
+      //        the canonical tag in sdf
       if (first)
       {
         link->SetCanonicalLink(true);
@@ -145,8 +141,7 @@ void Model::Load( sdf::ElementPtr &_sdf )
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the model
+//////////////////////////////////////////////////
 void Model::Init()
 {
   math::Pose pose;
@@ -157,11 +152,11 @@ void Model::Init()
   // Record the model's initial pose (for reseting)
   this->SetInitialRelativePose(pose);
 
-  this->SetRelativePose( pose );
+  this->SetRelativePose(pose);
 
   // Initialize the bodies before the joints
-  for (Base_V::iterator iter = this->children.begin(); 
-       iter!=this->children.end(); iter++)
+  for (Base_V::iterator iter = this->children.begin();
+       iter!= this->children.end(); iter++)
   {
     if ((*iter)->HasType(Base::LINK))
       boost::shared_static_cast<Link>(*iter)->Init();
@@ -172,7 +167,7 @@ void Model::Init()
   }
 
   // Initialize the joints last.
-  for (Joint_V::iterator iter = this->joints.begin(); 
+  for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); iter++)
   {
     (*iter)->Init();
@@ -186,8 +181,7 @@ void Model::Init()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the model
+//////////////////////////////////////////////////
 void Model::Update()
 {
   this->updateMutex->lock();
@@ -198,7 +192,7 @@ void Model::Update()
     std::map<std::string, double> jointPositions;
     std::map<std::string, common::NumericAnimationPtr>::iterator iter;
     iter = this->jointAnimations.begin();
-    while (iter !=this->jointAnimations.end())
+    while (iter != this->jointAnimations.end())
     {
       iter->second->GetInterpolatedKeyFrame(kf);
 
@@ -231,13 +225,12 @@ void Model::Update()
   this->updateMutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Remove a child
-void Model::RemoveChild(EntityPtr child)
+//////////////////////////////////////////////////
+void Model::RemoveChild(EntityPtr _child)
 {
   Joint_V::iterator jiter;
 
-  if (child->HasType(LINK))
+  if (_child->HasType(LINK))
   {
     bool done = false;
 
@@ -253,11 +246,11 @@ void Model::RemoveChild(EntityPtr child)
         LinkPtr jlink0 = (*jiter)->GetJointLink(0);
         LinkPtr jlink1 = (*jiter)->GetJointLink(1);
 
-        if (!jlink0 || !jlink1 || jlink0->GetName() == child->GetName() ||
-            jlink1->GetName() == child->GetName() ||
+        if (!jlink0 || !jlink1 || jlink0->GetName() == _child->GetName() ||
+            jlink1->GetName() == _child->GetName() ||
             jlink0->GetName() == jlink1->GetName())
         {
-          this->joints.erase( jiter );
+          this->joints.erase(jiter);
           done = false;
           break;
         }
@@ -265,17 +258,16 @@ void Model::RemoveChild(EntityPtr child)
     }
   }
 
-  Entity::RemoveChild(child->GetId());
+  Entity::RemoveChild(_child->GetId());
 
   Base_V::iterator iter;
-  for (iter =this->children.begin(); iter != this->children.end(); iter++)
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Finalize the model
+//////////////////////////////////////////////////
 void Model::Fini()
 {
   Entity::Fini();
@@ -286,11 +278,10 @@ void Model::Fini()
   this->canonicalLink.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//// Update the parameters using new sdf values
-void Model::UpdateParameters( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Model::UpdateParameters(sdf::ElementPtr &_sdf)
 {
-  Entity::UpdateParameters( _sdf );
+  Entity::UpdateParameters(_sdf);
 
   if (_sdf->HasElement("link"))
   {
@@ -318,22 +309,20 @@ void Model::UpdateParameters( sdf::ElementPtr &_sdf )
   */
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the SDF values for the model
+//////////////////////////////////////////////////
 const sdf::ElementPtr &Model::GetSDF()
 {
   Entity::GetSDF();
   return this->sdf;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Reset the model
+//////////////////////////////////////////////////
 void Model::Reset()
 {
   Entity::Reset();
 
-  for (Joint_V::iterator jiter=this->joints.begin();
-       jiter!=this->joints.end(); jiter++)
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter!= this->joints.end(); jiter++)
   {
     (*jiter)->Reset();
   }
@@ -345,9 +334,8 @@ void Model::Reset()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the linear velocity of the model
-void Model::SetLinearVel( const math::Vector3 &vel )
+//////////////////////////////////////////////////
+void Model::SetLinearVel(const math::Vector3 &_vel)
 {
   for (Base_V::iterator iter = this->children.begin();
       iter != this->children.end(); iter++)
@@ -356,14 +344,13 @@ void Model::SetLinearVel( const math::Vector3 &vel )
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
-      link->SetLinearVel( vel );
+      link->SetLinearVel(_vel);
     }
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the angular velocity of the model
-void Model::SetAngularVel( const math::Vector3 &vel )
+//////////////////////////////////////////////////
+void Model::SetAngularVel(const math::Vector3 &_vel)
 {
   Base_V::iterator iter;
 
@@ -373,14 +360,13 @@ void Model::SetAngularVel( const math::Vector3 &vel )
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
-      link->SetAngularVel( vel );
+      link->SetAngularVel(_vel);
     }
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the linear acceleration of the model
-void Model::SetLinearAccel( const math::Vector3 &accel )
+//////////////////////////////////////////////////
+void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
   Base_V::iterator iter;
 
@@ -390,14 +376,13 @@ void Model::SetLinearAccel( const math::Vector3 &accel )
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
-      link->SetLinearAccel( accel );
+      link->SetLinearAccel(_accel);
     }
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the angular acceleration of the model
-void Model::SetAngularAccel( const math::Vector3 &accel )
+//////////////////////////////////////////////////
+void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
   Base_V::iterator iter;
 
@@ -407,94 +392,85 @@ void Model::SetAngularAccel( const math::Vector3 &accel )
     {
       LinkPtr link = boost::shared_static_cast<Link>(*iter);
       link->SetEnabled(true);
-      link->SetAngularAccel( accel );
+      link->SetAngularAccel(_accel);
     }
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the model
+//////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearVel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearVel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the entity in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearVel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the model
+//////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularVel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularVel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the model in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularVel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularVel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the model
+//////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearAccel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the model in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearAccel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearAccel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the model
+//////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularAccel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the model in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularAccel() const
 {
   if (!this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularAccel();
   else
-    return math::Vector3(0,0,0);
+    return math::Vector3(0, 0, 0);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the size of the bounding box
+//////////////////////////////////////////////////
 math::Box Model::GetBoundingBox() const
 {
   math::Box box;
@@ -503,7 +479,7 @@ math::Box Model::GetBoundingBox() const
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
@@ -516,34 +492,31 @@ math::Box Model::GetBoundingBox() const
 
   return box;
 }
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of joints
+
+//////////////////////////////////////////////////
 unsigned int Model::GetJointCount() const
 {
   return this->joints.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a joing by index
-JointPtr Model::GetJoint( unsigned int index ) const
+//////////////////////////////////////////////////
+JointPtr Model::GetJoint(unsigned int _index) const
 {
-  if (index >= this->joints.size())
-    gzthrow("Invalid joint index[" << index << "]\n");
+  if (_index >= this->joints.size())
+    gzthrow("Invalid joint _index[" << _index << "]\n");
 
-  return this->joints[index];
+  return this->joints[_index];
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get a joint by name
-JointPtr Model::GetJoint(const std::string &name)
+//////////////////////////////////////////////////
+JointPtr Model::GetJoint(const std::string &_name)
 {
   JointPtr result;
   Joint_V::iterator iter;
 
   for (iter = this->joints.begin(); iter != this->joints.end(); iter++)
   {
-    if ( (*iter)->GetName() == name)
+    if ((*iter)->GetName() == _name)
     {
       result = (*iter);
       break;
@@ -553,78 +526,77 @@ JointPtr Model::GetJoint(const std::string &name)
   return result;
 }
 
+//////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
   return boost::shared_dynamic_cast<Link>(this->GetById(_id));
 }
 
-/// Get a link by name
-LinkPtr Model::GetLink(const std::string &name) const
+//////////////////////////////////////////////////
+LinkPtr Model::GetLink(const std::string &_name) const
 {
   Base_V::const_iterator biter;
   LinkPtr result;
 
-  if (name == "canonical")
+  if (_name == "canonical")
   {
     result = this->canonicalLink;
   }
   else
   {
-    for (biter=this->children.begin(); biter != this->children.end(); biter++)
+    for (biter = this->children.begin(); biter != this->children.end(); biter++)
     {
-      if ((*biter)->GetName() == name)
+      if ((*biter)->GetName() == _name)
       {
         result = boost::shared_dynamic_cast<Link>(*biter);
         break;
       }
     }
   }
- 
+
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a new joint helper function
-void Model::LoadJoint( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Model::LoadJoint(sdf::ElementPtr &_sdf)
 {
   JointPtr joint;
 
   std::string type = _sdf->GetValueString("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint( type );
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(type);
   if (!joint)
     gzthrow("Unable to create joint of type[" + type + "]\n");
 
-  joint->SetModel( boost::shared_static_cast<Model>(shared_from_this()) );
+  joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
 
   // Load the joint
   joint->Load(_sdf);
 
-  if (this->GetJoint( joint->GetName() ) != NULL)
-    gzthrow( "can't have two joint with the same name");
+  if (this->GetJoint(joint->GetName()) != NULL)
+    gzthrow("can't have two joint with the same name");
 
   msgs::Joint msg;
-  msg.set_name( joint->GetName() );
-  msg.set_type( msgs::Joint::REVOLUTE );
+  msg.set_name(joint->GetName());
+  msg.set_type(msgs::Joint::REVOLUTE);
 
   if(joint->GetParent())
-    msg.set_parent( joint->GetParent()->GetScopedName() );
+    msg.set_parent(joint->GetParent()->GetScopedName());
   else
-    msg.set_parent( "world" );
+    msg.set_parent("world");
 
   if(joint->GetChild())
-    msg.set_child( joint->GetChild()->GetScopedName() );
+    msg.set_child(joint->GetChild()->GetScopedName());
   else
-    msg.set_child( "world" );
-  
+    msg.set_child("world");
+
   this->jointPub->Publish(msg);
 
-  this->joints.push_back( joint );
+  this->joints.push_back(joint);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a plugin
-void Model::LoadPlugin( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Model::LoadPlugin(sdf::ElementPtr &_sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
@@ -633,57 +605,55 @@ void Model::LoadPlugin( sdf::ElementPtr &_sdf )
   {
     ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
-    this->plugins.push_back( plugin );
+    this->plugins.push_back(plugin);
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the gravity mode of the model
-void Model::SetGravityMode( const bool &v )
+//////////////////////////////////////////////////
+void Model::SetGravityMode(const bool &_v)
 {
   Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      boost::shared_static_cast<Link>(*iter)->SetGravityMode( v );
+      boost::shared_static_cast<Link>(*iter)->SetGravityMode(_v);
     }
   }
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the collide mode of the model
-void Model::SetCollideMode( const std::string &m )
+//////////////////////////////////////////////////
+void Model::SetCollideMode(const std::string &_m)
 {
   Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      boost::shared_static_cast<Link>(*iter)->SetCollideMode( m );
+      boost::shared_static_cast<Link>(*iter)->SetCollideMode(_m);
     }
   }
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the Laser retro property of the model
-void Model::SetLaserRetro(const float &retro)
+//////////////////////////////////////////////////
+void Model::SetLaserRetro(const float &_retro)
 {
   Base_V::iterator iter;
 
-  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
+  for (iter = this->children.begin(); iter!= this->children.end(); iter++)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-       boost::shared_static_cast<Link>(*iter)->SetLaserRetro(retro);
+       boost::shared_static_cast<Link>(*iter)->SetLaserRetro(_retro);
     }
   }
 }
 
+//////////////////////////////////////////////////
 void Model::FillModelMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetName());
@@ -694,21 +664,22 @@ void Model::FillModelMsg(msgs::Model &_msg)
 
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j=0; j < this->GetChildCount(); j++)
+  for (unsigned int j = 0; j < this->GetChildCount(); j++)
   {
     if (this->GetChild(j)->HasType(Base::LINK))
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>( this->GetChild(j) );
-      link->FillLinkMsg( *_msg.add_link() );
+      LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
+      link->FillLinkMsg(*_msg.add_link());
     }
     if (this->GetChild(j)->HasType(Base::JOINT))
     {
-      JointPtr joint = boost::shared_dynamic_cast<Joint>( this->GetChild(j) );
-      joint->FillJointMsg( *_msg.add_joints() );
+      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(j));
+      joint->FillJointMsg(*_msg.add_joints());
     }
   }
 }
 
+//////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
   if (_msg.has_id() && _msg.id() != this->GetId())
@@ -726,7 +697,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
   this->SetName(_msg.name());
   if (_msg.has_pose())
     this->SetWorldPose(msgs::Convert(_msg.pose()));
-  for (int i=0; i < _msg.link_size(); i++)
+  for (int i = 0; i < _msg.link_size(); i++)
   {
     LinkPtr link = this->GetLinkById(_msg.link(i).id());
     if (link)
@@ -737,6 +708,7 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     this->SetStatic(_msg.is_static());
 }
 
+//////////////////////////////////////////////////
 void Model::SetJointPositions(
     const std::map<std::string, double> &_jointPositions)
 
@@ -749,11 +721,11 @@ void Model::SetJointPositions(
   {
     JointPtr joint = *iter;
 
-    std::map<std::string, double>::const_iterator jiter = 
+    std::map<std::string, double>::const_iterator jiter =
       _jointPositions.find(joint->GetName());
     unsigned int type = joint->GetType();
 
-    // only deal with hinge and revolute joints in the user 
+    // only deal with hinge and revolute joints in the user
     // request joint_names list
     if ((type == Base::HINGE_JOINT || type == Base::SLIDER_JOINT) &&
         jiter != _jointPositions.end())
@@ -761,15 +733,15 @@ void Model::SetJointPositions(
       LinkPtr parentLink = joint->GetParent();
       LinkPtr childLink = joint->GetChild();
 
-      if (parentLink && childLink && 
+      if (parentLink && childLink &&
           parentLink->GetName() != childLink->GetName())
       {
         // transform about the current anchor, about the axis
         switch(type)
         {
-          case Base::HINGE_JOINT: 
+          case Base::HINGE_JOINT:
             {
-              // rotate child (childLink) about anchor point, by delta-angle 
+              // rotate child (childLink) about anchor point, by delta-angle
               // along axis
               double dangle = jiter->second - joint->GetAngle(0).GetAsRadian();
 
@@ -792,9 +764,9 @@ void Model::SetJointPositions(
                                           axis, dangle, true);
               break;
             }
-          case Base::SLIDER_JOINT: 
+          case Base::SLIDER_JOINT:
             {
-              double dposition = jiter->second - 
+              double dposition = jiter->second -
                                 joint->GetAngle(0).GetAsRadian();
 
 
@@ -817,7 +789,7 @@ void Model::SetJointPositions(
                                          axis, dposition, true);
               break;
             }
-          default: 
+          default:
             {
               gzwarn << "Setting non HINGE/SLIDER joint types not"
                        << "implemented [" << joint->GetName() << "]\n";
@@ -832,10 +804,11 @@ void Model::SetJointPositions(
   {
     JointPtr joint = this->GetJoint(jiter->first);
     joint->SetAngle(0, jiter->second);
-  } 
+  }
 }
 
-void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor, 
+//////////////////////////////////////////////////
+void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
     const math::Vector3 &_axis, double _dangle, bool _updateChildren)
 {
   math::Pose worldPose = _body1->GetWorldPose();
@@ -844,7 +817,7 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
   math::Pose relativePose(worldPose.pos - _anchor, worldPose.rot);
 
   // take axis rotation and turn it int a quaternion
-  math::Quaternion rotation(_axis, _dangle); 
+  math::Quaternion rotation(_axis, _dangle);
 
   // rotate relative pose by rotation
   math::Pose newRelativePose;
@@ -858,12 +831,12 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
   _body1->SetWorldPose(newWorldPose);
 
   // recurse through children bodies
-  if (_updateChildren) 
+  if (_updateChildren)
   {
     std::vector<LinkPtr> bodies;
     this->GetAllChildrenBodies(bodies, _body1);
 
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin(); 
+    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
         biter != bodies.end(); biter++)
     {
       this->RotateBodyAndChildren((*biter), _anchor, _axis, _dangle, false);
@@ -872,7 +845,8 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
 }
 
 
-void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor, 
+//////////////////////////////////////////////////
+void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
     const math::Vector3 &_axis, double _dposition, bool _updateChildren)
 {
   math::Pose worldPose = _body1->GetWorldPose();
@@ -889,12 +863,12 @@ void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
   _body1->SetWorldPose(newWorldPose);
 
   // recurse through children bodies
-  if (_updateChildren) 
+  if (_updateChildren)
   {
     std::vector<LinkPtr> bodies;
     this->GetAllChildrenBodies(bodies, _body1);
 
-    for (std::vector<LinkPtr>::iterator biter = bodies.begin(); 
+    for (std::vector<LinkPtr>::iterator biter = bodies.begin();
         biter != bodies.end(); biter++)
     {
       this->SlideBodyAndChildren((*biter), _anchor, _axis, _dposition, false);
@@ -902,9 +876,8 @@ void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
   }
 }
 
-
-
-void Model::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies, 
+//////////////////////////////////////////////////
+void Model::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
                                  const LinkPtr &_body)
 {
   // strategy, for each child, recursively look for children
@@ -928,7 +901,8 @@ void Model::GetAllChildrenBodies(std::vector<LinkPtr> &_bodies,
   }
 }
 
-void Model::GetAllParentBodies(std::vector<LinkPtr> &_bodies, 
+//////////////////////////////////////////////////
+void Model::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
     const LinkPtr &_body, const LinkPtr &_origParentBody)
 {
   for (unsigned int i = 0; i < this->GetJointCount(); i++)
@@ -951,18 +925,20 @@ void Model::GetAllParentBodies(std::vector<LinkPtr> &_bodies,
   }
 }
 
+//////////////////////////////////////////////////
 bool Model::InBodies(const LinkPtr &_body, const std::vector<LinkPtr> &_bodies)
 {
-  for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin(); 
+  for (std::vector<LinkPtr>::const_iterator bit = _bodies.begin();
        bit != _bodies.end(); bit++)
   {
-    if ((*bit)->GetName() == _body->GetName()) 
+    if ((*bit)->GetName() == _body->GetName())
       return true;
   }
 
   return false;
 }
 
+//////////////////////////////////////////////////
 void Model::SetJointAnimation(
     const std::map<std::string, common::NumericAnimationPtr> _anims,
     boost::function<void()> _onComplete)
@@ -978,6 +954,7 @@ void Model::SetJointAnimation(
   this->updateMutex->unlock();
 }
 
+//////////////////////////////////////////////////
 void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
 {
   if (!_model->IsStatic())
@@ -990,9 +967,10 @@ void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
   this->attachedModelsOffset.push_back(_offset);
 }
 
+//////////////////////////////////////////////////
 void Model::DetachStaticModel(const std::string &_modelName)
 {
-  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
     if (this->attachedModels[i]->GetName() == _modelName)
     {
@@ -1003,13 +981,15 @@ void Model::DetachStaticModel(const std::string &_modelName)
   }
 }
 
+//////////////////////////////////////////////////
 void Model::OnPoseChange()
 {
   math::Pose p;
-  for (unsigned int i=0; i < this->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
     p = this->GetWorldPose();
     p += this->attachedModelsOffset[i];
     this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
+

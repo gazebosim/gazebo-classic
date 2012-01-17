@@ -34,13 +34,13 @@
 using namespace gazebo;
 using namespace physics;
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Constructor
 PhysicsEngine::PhysicsEngine(WorldPtr _world)
   : world(_world)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile( "/sdf/physics.sdf", this->sdf );
+  sdf::initFile("/sdf/physics.sdf", this->sdf);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());
@@ -48,7 +48,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
       &PhysicsEngine::OnPhysicsMsg, this);
 
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->requestSub = this->node->Subscribe("~/request", 
+  this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);
 
   this->rayMutex = new boost::recursive_mutex();
@@ -60,7 +60,7 @@ void PhysicsEngine::Fini()
   this->node->Fini();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
@@ -73,9 +73,10 @@ PhysicsEngine::~PhysicsEngine()
   this->node.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Return the gavity vector
 math::Vector3 PhysicsEngine::GetGravity() const
 {
   return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
 }
+

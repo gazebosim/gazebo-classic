@@ -34,7 +34,7 @@ using namespace gazebo;
 using namespace common;
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Constructor
 MeshManager::MeshManager()
 {
@@ -67,7 +67,7 @@ MeshManager::MeshManager()
   this->fileExtensions.push_back("xml");
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Destructor
 MeshManager::~MeshManager()
 {
@@ -79,7 +79,7 @@ MeshManager::~MeshManager()
   this->meshes.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Load a mesh from a file
 const Mesh *MeshManager::Load(const std::string &filename)
 {
@@ -152,7 +152,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   return mesh;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Return true if the file extension is loadable
 bool MeshManager::IsValidFilename(const std::string &_filename)
 {
@@ -169,7 +169,7 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// modify mesh setting its center to aabb center
 void MeshManager::SetMeshCenter(const Mesh *_mesh, math::Vector3 _center)
 {
@@ -177,7 +177,7 @@ void MeshManager::SetMeshCenter(const Mesh *_mesh, math::Vector3 _center)
     this->meshes[_mesh->GetName()]->SetMeshCenter(_center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// get mesh aabb
 void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
     math::Vector3 &_min_xyz, math::Vector3 &_max_xyz)
@@ -186,7 +186,7 @@ void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
     this->meshes[_mesh->GetName()]->GetAABB(_center, _min_xyz, _max_xyz);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// generate spherical texture coordinates
 void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, math::Vector3 _center)
 {
@@ -194,7 +194,7 @@ void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, math::Vector3 _center)
     this->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Add a mesh to the manager
 void MeshManager::AddMesh(Mesh *_mesh)
 {
@@ -202,7 +202,7 @@ void MeshManager::AddMesh(Mesh *_mesh)
     this->meshes[_mesh->GetName()] = _mesh;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Get a mesh by name
 const Mesh *MeshManager::GetMesh(const std::string &name) const
 {
@@ -217,7 +217,7 @@ const Mesh *MeshManager::GetMesh(const std::string &name) const
   return NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Return true if the mesh exists
 bool MeshManager::HasMesh(const std::string &_name) const
 {
@@ -230,7 +230,7 @@ bool MeshManager::HasMesh(const std::string &_name) const
   return iter != this->meshes.end();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Create a sphere
 void MeshManager::CreateSphere(const std::string &name, float radius,
     int rings, int segments)
@@ -294,7 +294,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // Create a plane
 void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
     const math::Vector2d &segments,
@@ -303,7 +303,7 @@ void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // This function was taken from OGRE:
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::CreatePlane(const std::string &name,
@@ -371,7 +371,7 @@ void MeshManager::CreatePlane(const std::string &name,
   this->Tesselate2DMesh(subMesh, segments.x + 1, segments.y + 1, false);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Create a Box mesh
 void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
     const math::Vector2d &uvCoords)
@@ -470,7 +470,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   subMesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Create a Camera mesh
 void MeshManager::CreateCamera(const std::string &_name, float _scale)
 {
@@ -568,7 +568,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Create a cylinder mesh
 void MeshManager::CreateCylinder(const std::string &name, float radius,
     float height, int rings, int segments)
@@ -673,7 +673,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Create a cone mesh
 void MeshManager::CreateCone(const std::string &name, float radius,
     float height, int rings, int segments)
@@ -785,7 +785,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 /// Create a tube mesh
 void MeshManager::CreateTube(const std::string &name, float innerRadius,
     float outterRadius, float height, int rings,
@@ -910,7 +910,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // This function was taken from OGRE:
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
