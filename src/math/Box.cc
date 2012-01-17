@@ -32,15 +32,15 @@ Box::Box()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Box::Box (const Vector3 &min, const Vector3 &max)
-  : min(min), max(max)
+Box::Box (const Vector3 &_min, const Vector3 &_max)
+  : min(_min), max(_max)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Copy Constructor
-Box::Box( const Box &b )
-  : min(b.min), max(b.max)
+Box::Box(const Box &_b)
+  : min(_b.min), max(_b.max)
 {
 }
 
@@ -75,7 +75,9 @@ double Box::GetZLength() const
 /// Get the size of the box
 math::Vector3 Box::GetSize() const
 {
-  return math::Vector3(this->GetXLength(), this->GetYLength(), this->GetZLength());
+  return math::Vector3(this->GetXLength(),
+                       this->GetYLength(),
+                       this->GetZLength());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,15 +92,15 @@ math::Vector3 Box::GetCenter() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Merge a box with this box
-void Box::Merge(const Box &box)
+void Box::Merge(const Box &_box)
 {
-  this->min.SetToMin(box.min);
-  this->max.SetToMax(box.max);
+  this->min.SetToMin(_box.min);
+  this->max.SetToMax(_box.max);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Equal operator
-const Box &Box::operator=( const Box &b )
+const Box &Box::operator =(const Box &b)
 {
   this->max = b.max;
   this->min = b.min;
@@ -107,7 +109,7 @@ const Box &Box::operator=( const Box &b )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Box Box::operator+( const Box &b ) const
+Box Box::operator+(const Box &b) const
 {
   Vector3 mn = this->min;
   Vector3 mx = this->max;
@@ -119,9 +121,10 @@ Box Box::operator+( const Box &b ) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Box &Box::operator+=( const Box &b )
+const Box &Box::operator+=(const Box &b)
 {
   this->min.SetToMin(b.min);
   this->max.SetToMax(b.max);
   return *this;
 }
+

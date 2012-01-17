@@ -28,138 +28,139 @@
 
 namespace gazebo
 {
-	namespace math
+  namespace math
   {
     /// \addtogroup gazebo_math
     /// \{
-    
-    /// \brief Generic double x,y,z vector 
+    /// \brief Generic double x, y, z vector
     class Vector3
     {
       /// \brief Constructor
       public: Vector3();
-    
+
       /// \brief Constructor
-      public: Vector3( const double &x, const double &y, const double &z );
-    
+      public: Vector3(const double &_x, const double &_y, const double &_z);
+
       /// \brief Constructor
-      public: Vector3( const Vector3 &pt );
-    
+      public: Vector3(const Vector3 &_pt);
+
       /// \brief Destructor
       public: virtual ~Vector3();
-    
+
       /// \brief Calc distance to the given point
-      public: double Distance( const Vector3 &pt ) const;
-    
+      public: double Distance(const Vector3 &_pt) const;
+
       /// \brief Returns the length (magnitude) of the vector
       public: double GetLength() const;
-    
+
       /// \brief Return the square of the length (magnitude) of the vector
       public: double GetSquaredLength() const;
-    
+
       /// \brief Normalize the vector length
       public: void Normalize();
-    
+
       /// \brief Round to near whole number, return the result.
       public: Vector3 Round();
-    
+
       /// \brief Get a rounded version of this vector
       public: Vector3 GetRounded() const;
-    
+
       /// \brief Set the contents of the vector
-      public: inline void Set(double x = 0, double y =0 , double z = 0)
+      public: inline void Set(double _x = 0, double _y = 0 , double _z = 0)
               {
-                this->x = x;
-                this->y = y;
-                this->z = z;
+                this->x = _x;
+                this->y = _y;
+                this->z = _z;
               }
-    
+
       /// \brief Return the cross product of this vector and pt
-      public: Vector3 GetCrossProd(const Vector3 &pt) const;
-    
+      public: Vector3 GetCrossProd(const Vector3 &_pt) const;
+
       /// \brief Return the dot product of this vector and pt
-      public: double GetDotProd(const Vector3 &pt) const;
-    
+      public: double GetDotProd(const Vector3 &_pt) const;
+
       /// \breif Get the absolute value of the vector
       public: Vector3 GetAbs() const;
-    
+
       /// \brief Return a vector that is perpendicular to this one.
       public: Vector3 GetPerpendicular() const;
-    
+
       /// \brief Get a normal vector to a triangle
-      public: static Vector3 GetNormal(const Vector3 &v1, const Vector3 &v2, 
+      public: static Vector3 GetNormal(const Vector3 &v1, const Vector3 &v2,
                                        const Vector3 &v3);
-    
-      /// \brief Get distance to a plane, given a direction. Treats this 
+
+      /// \brief Get distance to a plane, given a direction. Treats this
       ///        vector as a ray
-      public: double GetDistToPlane(const Vector3 &_dir, 
-                                    const Vector3 &_planeNormal, 
+      public: double GetDistToPlane(const Vector3 &_dir,
+                                    const Vector3 &_planeNormal,
                                     double _d) const;
       /// \brief Get distance to a line
       public: double GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2);
-    
-      /// \brief Set this vector's components to the maximum of itself and the 
+
+      /// \brief Set this vector's components to the maximum of itself and the
       ///        passed in vector
-      public: void SetToMax(const Vector3 & v);
-    
-      /// \brief Set this vector's components to the minimum of itself and the 
+      public: void SetToMax(const Vector3 &_v);
+
+      /// \brief Set this vector's components to the minimum of itself and the
       ///        passed in vector
-      public: void SetToMin(const Vector3 & v);
-    
+      public: void SetToMin(const Vector3 &_v);
+
       /// \brief Equal operator
-      public: const Vector3 &operator=( const Vector3 &pt );
-    
+      public: const Vector3 &operator =(const Vector3 &_pt);
+
       /// \brief Equal operator
-      public: const Vector3 &operator=( double value );
-    
+      public: const Vector3 &operator =(double _value);
+
       /// \brief Addition operator
-      public: Vector3 operator+( const Vector3 &pt ) const;
-    
+      public: Vector3 operator+(const Vector3 &_pt) const;
+
       /// \brief Addition operator
-      public: const Vector3 &operator+=( const Vector3 &pt );
-    
-      /// \brief Subtraction operators 
-      public: inline Vector3 operator-( const Vector3 &pt ) const
+      public: const Vector3 &operator+=(const Vector3 &_pt);
+
+      /// \brief Subtraction operators
+      public: inline Vector3 operator-(const Vector3 &_pt) const
               {
-                return Vector3(this->x - pt.x, this->y - pt.y, this->z - pt.z);
+                return Vector3(this->x - _pt.x,
+                               this->y - _pt.y,
+                               this->z - _pt.z);
               }
-    
-      /// \brief Subtraction operators 
-      public: const Vector3 &operator-=( const Vector3 &pt );
-    
+
+      /// \brief Subtraction operators
+      public: const Vector3 &operator-=(const Vector3 &_pt);
+
       /// \brief Division operators
-      public: const Vector3 operator/( const Vector3 &pt ) const;
-    
+      public: const Vector3 operator/(const Vector3 &_pt) const;
+
       /// \brief Division operators
-      public: const Vector3 &operator/=( const Vector3 &pt );
-    
+      public: const Vector3 &operator/=(const Vector3 &_pt);
+
       /// \brief Division operators
-      public: const Vector3 operator/( double v ) const;
-    
+      public: const Vector3 operator/(double _v) const;
+
       /// \brief Division operators
-      public: const Vector3 &operator/=( double v );
-    
+      public: const Vector3 &operator/=(double _v);
+
       /// \brief Multiplication operators
-      public: const Vector3 operator*( const Vector3 &pt ) const;
-    
+      public: const Vector3 operator*(const Vector3 &_pt) const;
+
       /// \brief Multiplication operators
-      public: const Vector3 &operator*=( const Vector3 &pt );
-    
+      public: const Vector3 &operator*=(const Vector3 &_pt);
+
       /// \brief Multiplication operators
-      public: const Vector3 operator*( double v ) const;
-    
+      public: const Vector3 operator*(double _v) const;
+
       /// \brief Multiplication operators
-      public: const Vector3 &operator*=( double v );
-    
+      public: const Vector3 &operator*=(double _v);
+
       /// \brief Equality operators
-      public: bool operator==( const Vector3 &pt ) const;
-    
+      public: bool operator ==(const Vector3 &_pt) const;
+
       /// \brief Equality operators
-      public: bool operator!=( const Vector3 &pt ) const;
-    
+      public: bool operator!=(const Vector3 &_pt) const;
+
       /// \brief See if a point is finite (e.g., not nan)
       public: bool IsFinite() const;
-    
+
       /// \brief Corrects any nan values
       public: inline void Correct()
               {
@@ -170,51 +171,55 @@ namespace gazebo
                 if (!finite(this->z))
                   this->z = 0;
               }
-    
+
       /// \brief [] operator
       public: double operator[](unsigned int index) const;
 
       /// \brief Round all values to _precision decimal places
       public: void Round(int _precision);
 
-      /// \brief Returns true if the two vectors are exacatly equal 
-      public: bool Equal( const Vector3 &_v ) const;
+      /// \brief Returns true if the two vectors are exacatly equal
+      public: bool Equal(const Vector3 &_v) const;
 
       /// \brief X location
       public: double x;
-    
+
       /// \brief Y location
       public: double y;
-    
+
       /// \brief Z location
       public: double z;
-    
+
       /// \brief Ostream operator
       /// \param out Ostream
       /// \param pt Vector3 to output
       /// \return The Ostream
-      public: friend std::ostream &operator<<( std::ostream &out, const gazebo::math::Vector3 &pt )
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                              const gazebo::math::Vector3 &_pt)
       {
-        out << pt.x << " " << pt.y << " " << pt.z;
-    
-        return out;
+        _out << _pt.x << " " << _pt.y << " " << _pt.z;
+
+        return _out;
       }
-    
+
       /// \brief Istream operator
       /// \param in Ostream
       /// \param pt Vector3 to read values into
       /// \return The istream
-      public: friend std::istream &operator>>( std::istream &in, gazebo::math::Vector3 &pt )
+      public: friend std::istream &operator>>(std::istream &_in,
+                                              gazebo::math::Vector3 &_pt)
       {
         // Skip white spaces
-        in.setf( std::ios_base::skipws );
-        in >> pt.x >> pt.y >> pt.z;
-        return in;
+        _in.setf(std::ios_base::skipws);
+        _in >> _pt.x >> _pt.y >> _pt.z;
+        return _in;
       }
     };
-    
+
     /// \}
   }
 
 }
 #endif
+
+

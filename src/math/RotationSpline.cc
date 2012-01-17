@@ -4,10 +4,10 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright ( _c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+of this software and associated documentation files (the _"Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
@@ -31,7 +31,7 @@ using namespace gazebo;
 using namespace math;
 
 RotationSpline::RotationSpline()
- : autoCalc(true)
+: autoCalc(true)
 {
 }
 
@@ -52,7 +52,7 @@ Quaternion RotationSpline::Interpolate(double _t, bool _useShortestPath)
   double fSeg = _t * (this->points.size() - 1);
   unsigned int segIdx = (unsigned int)fSeg;
 
-  // Apportion t 
+  // Apportion t
   _t = fSeg - segIdx;
 
   return this->Interpolate(segIdx, _t, _useShortestPath);
@@ -62,7 +62,7 @@ Quaternion RotationSpline::Interpolate(unsigned int _fromIndex, double _t,
                                        bool _useShortestPath)
 {
   // Bounds check
-  assert ( _fromIndex < this->points.size() && "fromIndex out of bounds");
+  assert (_fromIndex < this->points.size() && "fromIndex out of bounds");
 
   if ((_fromIndex + 1) == this->points.size())
   {
@@ -95,7 +95,8 @@ void RotationSpline::RecalcTangents()
   // And no, I don't understand how to derive this!
   //
   // let p = point[i], pInv = p.Inverse
-  // tangent[i] = p * exp( -0.25 * ( log(pInv * point[i+1]) + log(pInv * point[i-1]) ) )
+  // tangent[i] = p * exp(-0.25 *
+  // (log(pInv * point[i+1]) + log(pInv * point[i-1])))
   //
   // Assume endpoint tangents are parallel with line with neighbour
 
@@ -123,7 +124,7 @@ void RotationSpline::RecalcTangents()
     Quaternion &p = this->points[i];
     invp = p.GetInverse();
 
-    if (i ==0)
+    if (i == 0)
     {
       // special case start
       part1 = (invp * this->points[i+1]).GetLog();
@@ -180,7 +181,7 @@ void RotationSpline::Clear()
   this->tangents.clear();
 }
 
-void RotationSpline::UpdatePoint(unsigned short _index, 
+void RotationSpline::UpdatePoint(unsigned short _index,
                                  const Quaternion &_value)
 {
   assert (_index < this->points.size() && "Point index is out of bounds!!");
@@ -194,3 +195,4 @@ void RotationSpline::SetAutoCalculate(bool _autoCalc)
 {
   this->autoCalc = _autoCalc;
 }
+

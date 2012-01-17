@@ -35,16 +35,16 @@ Angle::Angle()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Angle::Angle(double radian)
+Angle::Angle(double _radian)
 {
-  this->value = radian;
+  this->value = _radian;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Copy constructor
-Angle::Angle(const Angle &angle)
+Angle::Angle(const Angle &_angle)
 {
-  this->value = angle.value;
+  this->value = _angle.value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,16 +55,16 @@ Angle::~Angle()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the value from an angle in radians
-void Angle::SetFromRadian( double radian )
+void Angle::SetFromRadian(double _radian)
 {
-  this->value = radian;
+  this->value = _radian;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the value from an angle in degrees
-void Angle::SetFromDegree( double degree )
+void Angle::SetFromDegree(double _degree)
 {
-  this->value = degree * M_PI / 180.0;
+  this->value = _degree * M_PI / 180.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ double Angle::GetAsDegree() const
 // Normalize the angle
 void Angle::Normalize()
 {
- this->value = atan2(sin(this->value), cos(this->value));
+  this->value = atan2(sin(this->value), cos(this->value));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ Angle Angle::operator/=(const Angle &angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Equality
-bool Angle::operator==(const Angle &angle) const
+bool Angle::operator ==(const Angle &angle) const
 {
   return this->value == angle.value;
 }
@@ -189,3 +189,4 @@ bool Angle::operator>=(const Angle &angle) const
 {
   return this->value >= angle.value;
 }
+

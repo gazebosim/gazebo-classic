@@ -32,9 +32,9 @@ Matrix3::Matrix3()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Matrix3::Matrix3(const Matrix3 &m)
+Matrix3::Matrix3(const Matrix3 &_m)
 {
-  memcpy(this->m, m.m, sizeof(double)*9);
+  memcpy(this->m, _m.m, sizeof(double)*9);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ Matrix3::~Matrix3()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set from axes
-void Matrix3::SetFromAxes(const Vector3 &xAxis, const Vector3 &yAxis, 
+void Matrix3::SetFromAxes(const Vector3 &xAxis, const Vector3 &yAxis,
                           const Vector3 &zAxis)
 {
   this->SetCol(0, xAxis);
@@ -94,12 +94,13 @@ void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a column
-void Matrix3::SetCol(unsigned int i, const Vector3 &v)
+void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 {
-  if (i >= 3)
+  if (_i >= 3)
     gzthrow("Invalid column number");
 
-  m[0][i] = v.x;
-  m[1][i] = v.y;
-  m[2][i] = v.z;
+  m[0][_i] = _v.x;
+  m[1][_i] = _v.y;
+  m[2][_i] = _v.z;
 }
+
