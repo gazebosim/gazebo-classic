@@ -18,6 +18,8 @@
 #ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 #define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 
+#include <string>
+
 #include "common/Plugin.hh"
 #include "sensors/DepthCameraSensor.hh"
 #include "sensors/CameraSensor.hh"
@@ -51,4 +53,3 @@ namespace gazebo
   };
 }
 #endif
-

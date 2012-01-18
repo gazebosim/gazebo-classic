@@ -78,8 +78,5 @@ namespace libgazebo
 
   /// \}
   /// \}
-
 }
-
 #endif
-

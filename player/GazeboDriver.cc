@@ -25,18 +25,18 @@
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
 #include "Position2dInterface.hh"
-//#include "Graphics3dInterface.hh"
-//#include "LaserInterface.hh"
-//#include "CameraInterface.hh"
-//#include "FiducialInterface.hh"
-//#include "Position3dInterface.hh"
-//#include "ActarrayInterface.hh"
-//#include "OpaqueInterface.hh"
-//#include "PTZInterface.hh"
-//#include "BumperInterface.hh"
-//#include "GripperInterface.hh"
-//#include "IRInterface.hh"
-//#include "ImuInterface.hh"
+// #include "Graphics3dInterface.hh"
+// #include "LaserInterface.hh"
+// #include "CameraInterface.hh"
+// #include "FiducialInterface.hh"
+// #include "Position3dInterface.hh"
+// #include "ActarrayInterface.hh"
+// #include "OpaqueInterface.hh"
+// #include "PTZInterface.hh"
+// #include "BumperInterface.hh"
+// #include "GripperInterface.hh"
+// #include "IRInterface.hh"
+// #include "ImuInterface.hh"
 
 /*
 #include "PowerInterface.hh"
@@ -57,7 +57,7 @@
 Driver *GazeboDriver_Init(ConfigFile *_cf, int _section)
 {
   // Create and return a new instance of this driver
-  return ((Driver*) (new GazeboDriver(_cf, _section)));
+  return (static_cast<Driver*>(new GazeboDriver(_cf, _section)));
 }
 
 //////////////////////////////////////////////////
@@ -67,12 +67,12 @@ Driver *GazeboDriver_Init(ConfigFile *_cf, int _section)
 /// driver can support and how to create a driver instance.
 void GazeboDriver_Register(DriverTable *_table)
 {
-  //! TODO: Fix the PACKAGE_VERSION
-  //printf("\n ** Gazebo plugin v%s **", PACKAGE_VERSION);
+  // TODO: Fix the PACKAGE_VERSION
+  // printf("\n ** Gazebo plugin v%s **", PACKAGE_VERSION);
 
   if (!player_quiet_startup)
   {
-    puts ("\n * Part of the Player/Stage Project "
+    puts("\n * Part of the Player/Stage Project "
           "[http://playerstage.sourceforge.net]\n"
           " * Copyright 2000-2006 Richard Vaughan, Andrew Howard, "
           "Brian Gerkey, Nathan Koenig\n"
@@ -80,7 +80,7 @@ void GazeboDriver_Register(DriverTable *_table)
           " License v2.");
   }
 
-  _table->AddDriver((char*)"gazebo", GazeboDriver_Init);
+  _table->AddDriver(const_cast<char*>("gazebo"), GazeboDriver_Init);
 }
 
 //////////////////////////////////////////////////
@@ -194,7 +194,7 @@ void GazeboDriver::Update()
 
   Driver::ProcessMessages();
 
-  for (i = 0; i<this->deviceCount; i++)
+  for (i = 0; i < this->deviceCount; i++)
   {
     iface = this->devices[i];
     iface->Update();
@@ -209,8 +209,8 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 {
   // Get the device count, and create the device array
   this->deviceMaxCount = _cf->GetTupleCount(_section, "provides");
-  this->devices = (GazeboInterface**)realloc(this->devices,
-      this->deviceMaxCount * sizeof(this->devices[0]));
+  this->devices = static_cast<GazeboInterface**>(realloc(this->devices,
+      this->deviceMaxCount * sizeof(this->devices[0])));
 
   if (!player_quiet_startup)
   {
@@ -348,7 +348,6 @@ int GazeboDriver::LoadDevices(ConfigFile *_cf, int _section)
 
       // store the Interaface in our device list
       this->devices[this->deviceCount++] = ifsrc;
-
     }
     else
     {
@@ -373,7 +372,7 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
   int i;
   GazeboInterface *iface = NULL;
 
-  for (i = 0; i < (int)this->deviceCount; i++)
+  for (i = 0; i < static_cast<int>(this->deviceCount); ++i)
   {
     iface = static_cast<GazeboInterface*>(this->devices[i]);
 
@@ -385,4 +384,5 @@ GazeboInterface *GazeboDriver::LookupDevice(player_devaddr_t _addr)
 
   return NULL;
 }
+
 

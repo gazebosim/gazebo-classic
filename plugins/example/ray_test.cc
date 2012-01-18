@@ -59,7 +59,7 @@ namespace gazebo
     public: void OnUpdate()
     {
       // do something on update
-      //gzdbg << "plugin update\n";
+      // gzdbg << "plugin update\n";
     }
 
     public: void OnStats(
@@ -89,7 +89,6 @@ namespace gazebo
     private: transport::NodePtr node;
     private: transport::SubscriberPtr statsSub;
     private: common::Time simTime;
-
   };
 
   // Register this plugin with the simulator

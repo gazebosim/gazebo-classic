@@ -48,10 +48,9 @@ ActarrayInterface::ActarrayInterface(player_devaddr_t addr,
     int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
-  this->gz_id = (char*) calloc(1024, sizeof(char));
-  strcat(this->gz_id, GazeboClient::prefixId);
-  strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
+  this->gz_id = GazeboClient::prefixId + cf->ReadString(section, "gz_id", "");
 
   // Allocate a Actarray Interface
   this->iface = new ActarrayIface();
@@ -62,20 +61,24 @@ ActarrayInterface::ActarrayInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 ActarrayInterface::~ActarrayInterface()
 {
+  /*
   delete [] this->actData.actuators;
 
   // Release this interface
   delete this->iface;
+  */
 }
 
 
 int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
         PLAYER_ACTARRAY_CMD_POS, this->device_addr))
@@ -163,7 +166,7 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
     player_actarray_brakes_config_t *req;
     req = (player_actarray_brakes_config_t*) data;
 
-    //If brakes = on -> Stop all the joints. If they are off, don't do anything
+    // If brakes = on -> Stop all the joints. If they are off, don't do anything
     if (req->value == 1)
     {
       this->iface->Lock(1);
@@ -191,7 +194,7 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
     player_actarray_power_config_t *req;
     req = (player_actarray_power_config_t*) data;
 
-    //If power = off -> Stop all the joints. If power = on, don't do anything
+    // If power = off -> Stop all the joints. If power = on, don't do anything
     if (req->value == 0)
     {
       this->iface->Lock(1);
@@ -247,18 +250,20 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
     return(0);
   }
 
+  */
   return -1;
 }
 
 void ActarrayInterface::Update()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
   if (this->iface->data->head.time > this->datatime)
   {
-    //Update the local time so we know when new info comes
+    // Update the local time so we know when new info comes
     this->datatime = this->iface->data->head.time;
 
     unsigned int prevCount = this->actData.actuators_count;
@@ -279,11 +284,11 @@ void ActarrayInterface::Update()
       float pos = this->iface->data->actuators[i].position;
       float speed = this->iface->data->actuators[i].speed;
 
-      //float current = this->iface->data->actuators_data[i].current;
+      // float current = this->iface->data->actuators_data[i].current;
       uint8_t report_state = this->iface->data->actuators[i].state;
       this->actData.actuators[i].position = pos;
       this->actData.actuators[i].speed = speed;
-      //data.actuators[i].current = current;
+      // data.actuators[i].current = current;
       this->actData.actuators[i].state = report_state;
 
     }
@@ -295,11 +300,13 @@ void ActarrayInterface::Update()
   }
 
   this->iface->Unlock();
+  */
 }
 
 
 void ActarrayInterface::Subscribe()
 {
+  /*
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -307,16 +314,19 @@ void ActarrayInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout << "Error subscribing to Gazebo Actarray Interface\n"
               << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 void ActarrayInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

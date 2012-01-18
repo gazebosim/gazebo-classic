@@ -29,8 +29,9 @@
    - PLAYER_GRIPPER_REQ_GET_GEOM
    */
 
-#include <iostream>
 #include <math.h>
+
+#include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboDriver.hh"
@@ -45,6 +46,7 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -57,19 +59,23 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 /////////////////////////////////////////////////
 GripperInterface::~GripperInterface()
 {
+  /*
   // Release this interface
   delete this->iface;
+  */
 }
 
 /////////////////////////////////////////////////
 int GripperInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
@@ -142,12 +148,14 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
   else
     this->Unsubscribe();
 
+    */
   return -1;
 }
 
 /////////////////////////////////////////////////
 void GripperInterface::Update()
 {
+  /*
   player_gripper_data_t data;
   struct timeval ts;
 
@@ -194,11 +202,13 @@ void GripperInterface::Update()
   }
 
   this->iface->Unlock();
+  */
 }
 
 /////////////////////////////////////////////////
 void GripperInterface::Subscribe()
 {
+  /*
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -210,12 +220,14 @@ void GripperInterface::Subscribe()
       << e << "\n";
     exit(0);
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void GripperInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }
-

@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Gps Interface for Player
  * Author: Glenn Laguna
  * Date: 20 June 2006
- * CVS: $Id$
  */
 
 /**
-@addtogroup player
-@par Gps Interface
-- PLAYER_GPS_DATA_STATE
-*/
+  @addtogroup player
+  @par Gps Interface
+  - PLAYER_GPS_DATA_STATE
+  */
 
 #include <math.h>
 #include <boost/thread/recursive_mutex.hpp>
@@ -37,9 +36,10 @@ boost::recursive_mutex *GpsInterface::mutex = NULL;
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver,
-                           ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+    ConfigFile *cf, int section)
+: GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -52,20 +52,23 @@ GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 GpsInterface::~GpsInterface()
 {
+  /*
   // Release this interface
   gz_gps_free(this->iface);
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages.  This is called from GazeboDriver
 int GpsInterface::ProcessMessage(QueuePointer &respQueue, player_msghdr_t *hdr,
-                                 void *data)
+    void *data)
 {
   return 0;
 }
@@ -75,8 +78,9 @@ int GpsInterface::ProcessMessage(QueuePointer &respQueue, player_msghdr_t *hdr,
 // called from GazeboDriver::Update
 void GpsInterface::Update()
 {
+  /*
   player_gps_data_t data;
-  //double e[3];
+  // double e[3];
   struct timeval ts;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -104,12 +108,13 @@ void GpsInterface::Update()
     // data.err_vert = this->iface->data->err_vert;
 
     this->driver->Publish(this->device_addr, NULL, PLAYER_MSGTYPE_DATA,
-                           PLAYER_GPS_DATA_STATE, (void*)&data,
-                           sizeof(data), &this->datatime);
+        PLAYER_GPS_DATA_STATE, (void*)&data,
+        sizeof(data), &this->datatime);
 
   }
 
   gz_gps_unlock(this->iface);
+  */
 }
 
 
@@ -118,19 +123,22 @@ void GpsInterface::Update()
 // GazeboDriver::Subscribe
 void GpsInterface::Subscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Open the interface
   if (gz_gps_open(this->iface, GazeboClient::client, this->gz_id) != 0)
   {
     printf("Error Subscribing to Gazebo Position Interface\n");
   }
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a GPS interface.  This is called from GazeboDriver::Unsubscribe
 void GpsInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   gz_gps_close(this->iface);
+  */
 }
-

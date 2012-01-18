@@ -17,7 +17,6 @@
 /* Desc: PTZ Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /**
@@ -46,6 +45,7 @@ PTZInterface::PTZInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -58,19 +58,23 @@ PTZInterface::PTZInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 /////////////////////////////////////////////////
 PTZInterface::~PTZInterface()
 {
+  /*
   // Release this interface
   delete this->iface;
+  */
 }
 
 /////////////////////////////////////////////////
 int PTZInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
         PLAYER_PTZ_CMD_STATE, this->device_addr))
@@ -143,12 +147,14 @@ int PTZInterface::ProcessMessage(QueuePointer &respQueue,
     }
   }
 
+*/
   return -1;
 }
 
 /////////////////////////////////////////////////
 void PTZInterface::Update()
 {
+  /*
   player_ptz_data_t data;
   struct timeval ts;
 
@@ -176,11 +182,13 @@ void PTZInterface::Update()
   }
 
   this->iface->Unlock();
+  */
 }
 
 /////////////////////////////////////////////////
 void PTZInterface::Subscribe()
 {
+  /*
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -188,16 +196,19 @@ void PTZInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout << "Error subscribing to Gazebo PTZ Interface\n" << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void PTZInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

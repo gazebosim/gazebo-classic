@@ -17,7 +17,6 @@
 /* Desc: Fiducial Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /* TODO
@@ -44,6 +43,7 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
     int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -58,21 +58,25 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 /////////////////////////////////////////////////
 FiducialInterface::~FiducialInterface()
 {
+  /*
   player_fiducial_data_t_cleanup(&this->data);
 
   // Release this interface
   delete this->iface;
+  */
 }
 
 /////////////////////////////////////////////////
 int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Request the pose and size of the fiducial device
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
@@ -146,13 +150,14 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
-
+*/
   return -1;
 }
 
 /////////////////////////////////////////////////
 void FiducialInterface::Update()
 {
+  /*
   struct timeval ts;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -204,11 +209,13 @@ void FiducialInterface::Update()
   }
 
   this->iface->Unlock();
+  */
 }
 
 /////////////////////////////////////////////////
 void FiducialInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
@@ -217,17 +224,20 @@ void FiducialInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cerr << "Error Subscribing to Gazebo Fiducial Interface\n"
       << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void FiducialInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

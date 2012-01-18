@@ -17,7 +17,6 @@
 /* Desc: Position 3d Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /* TODO
@@ -40,6 +39,7 @@ Position3dInterface::Position3dInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -52,18 +52,21 @@ Position3dInterface::Position3dInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
-
+*/
 }
 
 Position3dInterface::~Position3dInterface()
 {
+  /*
   // Release this interface
   delete this->iface;
+  */
 }
 
 int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
@@ -185,11 +188,13 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
 
   this->iface->Unlock();
 
+  */
   return -1;
 }
 
 void Position3dInterface::Update()
 {
+  /*
   player_position3d_data_t data;
   struct timeval ts;
 
@@ -229,10 +234,12 @@ void Position3dInterface::Update()
   }
 
   this->iface->Unlock();
+  */
 }
 
 void Position3dInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
@@ -241,16 +248,19 @@ void Position3dInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Position3d Interface\n"
       << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 void Position3dInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

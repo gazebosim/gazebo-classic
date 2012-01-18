@@ -36,6 +36,7 @@ CameraInterface::CameraInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -52,13 +53,16 @@ CameraInterface::CameraInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 /////////////////////////////////////////////////
 CameraInterface::~CameraInterface()
 {
+  /*
   // Delete this interface
   delete this->iface;
+  */
 }
 
 /////////////////////////////////////////////////
@@ -71,6 +75,7 @@ int CameraInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void CameraInterface::Update()
 {
+  /*
   char filename[256];
 
   struct timeval ts;
@@ -128,12 +133,13 @@ void CameraInterface::Update()
 
   // Done with the interface
   this->iface->Unlock();
-
+  */
 }
 
 /////////////////////////////////////////////////
 void CameraInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
@@ -142,25 +148,29 @@ void CameraInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Camera Interface["
       << this->gz_id << "]\n" << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void CameraInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   this->iface->Close();
+  */
 }
 
 /////////////////////////////////////////////////
 void CameraInterface::SaveFrame(const char *filename)
 {
+  /*
   int width, height;
   FILE *file;
 
@@ -187,4 +197,5 @@ void CameraInterface::SaveFrame(const char *filename)
   }
 
   fclose(file);
+  */
 }

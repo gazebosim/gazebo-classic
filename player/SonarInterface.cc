@@ -17,7 +17,6 @@
 /* Desc: Sonar Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /**
@@ -40,6 +39,7 @@ SonarInterface::SonarInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -49,19 +49,23 @@ SonarInterface::SonarInterface(player_devaddr_t addr,
   this->iface = gz_sonar_alloc();
 
   this->datatime = -1;
+  */
 }
 
 /////////////////////////////////////////////////
 SonarInterface::~SonarInterface()
 {
+  /*
   // Release this interface
   gz_sonar_free(this->iface);
+  */
 }
 
 /////////////////////////////////////////////////
 int SonarInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
         PLAYER_SONAR_REQ_GET_GEOM, this->device_addr))
   {
@@ -71,7 +75,7 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
 
     geom.poses_count = this->iface->data->sonar_count;
 
-    //the position of valid sonar
+    // the position of valid sonar
     for (int i = 0; i < this->iface->data->sonar_count; i++)
     {
       geom.poses[i].px = this->iface->data->sonar_pos[i][0];
@@ -109,6 +113,7 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
+  */
 
   return -1;
 }
@@ -116,6 +121,7 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void SonarInterface::Update()
 {
+  /*
   player_sonar_data_t data;
   struct timeval ts;
 
@@ -144,20 +150,25 @@ void SonarInterface::Update()
   }
 
   gz_sonar_unlock(this->iface);
+  */
 }
 
 /////////////////////////////////////////////////
 void SonarInterface::Subscribe()
 {
+  /*
   // Open the interface
   if (gz_sonar_open(this->iface, GazeboClient::client, this->gz_id) != 0)
   {
     printf("Error Subscribing to Gazebo Position Interface\n");
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void SonarInterface::Unsubscribe()
 {
+  /*
   gz_sonar_close(this->iface);
+  */
 }

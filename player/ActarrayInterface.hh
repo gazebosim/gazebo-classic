@@ -22,6 +22,8 @@
 #ifndef ACTARRAYINTERFACE_HH
 #define ACTARRAYINTERFACE_HH
 
+#include <string>
+
 #include "GazeboInterface.hh"
 
 namespace boost
@@ -66,7 +68,7 @@ namespace libgazebo
     private: ActarrayIface *iface;
 
     /// Gazebo id. This needs to match and ID in a Gazebo WorldFile
-    private: char *gz_id;
+    private: std::string gz_id;
 
     /// Timestamp on last data update
     private: double datatime;
@@ -75,11 +77,7 @@ namespace libgazebo
 
     private: static boost::recursive_mutex *mutex;
   };
-
   /// \}
   /// \}
-
-
 }
 #endif
-

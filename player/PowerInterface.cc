@@ -17,7 +17,6 @@
 /* Desc: Position Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /**
@@ -35,6 +34,7 @@ PowerInterface::PowerInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -44,13 +44,16 @@ PowerInterface::PowerInterface(player_devaddr_t addr,
   this->iface = gz_power_alloc();
 
   this->datatime = -1;
+  */
 }
 
 /////////////////////////////////////////////////
 PowerInterface::~PowerInterface()
 {
+  /*
   // Release this interface
   gz_power_free(this->iface);
+  */
 }
 
 /////////////////////////////////////////////////
@@ -63,6 +66,7 @@ int PowerInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void PowerInterface::Update()
 {
+  /*
   player_power_data_t data;
   struct timeval ts;
 
@@ -85,20 +89,25 @@ void PowerInterface::Update()
   }
 
   gz_power_unlock(this->iface);
+  */
 }
 
 /////////////////////////////////////////////////
 void PowerInterface::Subscribe()
 {
+  /*
   // Open the interface
   if (gz_power_open(this->iface, GazeboClient::client, this->gz_id) != 0)
   {
     printf("Error Subscribing to Gazebo Power Interface\n");
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void PowerInterface::Unsubscribe()
 {
+  /*
   gz_power_close(this->iface);
+  */
 }

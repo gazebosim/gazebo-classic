@@ -21,9 +21,10 @@
  */
 
 #include <time.h>
+#include <libplayercore/playercore.h>
+
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
-#include <libplayercore/playercore.h>
 
 #include "transport/transport.h"
 
@@ -101,7 +102,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
                             this->device_addr))
   {
     player_simulation_pose3d_req_t *req =
-      (player_simulation_pose3d_req_t*)(_data);
+      static_cast<player_simulation_pose3d_req_t*>(_data);
 
     gazebo::math::Pose pose(
         gazebo::math::Vector3(req->pose.px, req->pose.py, req->pose.pz),
@@ -124,7 +125,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
                                  this->device_addr))
   {
     player_simulation_pose2d_req_t *req =
-      (player_simulation_pose2d_req_t*)(_data);
+      static_cast<player_simulation_pose2d_req_t*>(_data);
 
     gazebo::math::Pose pose(
         gazebo::math::Vector3(req->pose.px, req->pose.py, 0),
@@ -146,14 +147,15 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
                                  this->device_addr))
   {
     player_simulation_pose3d_req_t *req =
-      (player_simulation_pose3d_req_t*)(_data);
+      static_cast<player_simulation_pose3d_req_t*>(_data);
 
     std::map<std::string, gazebo::math::Pose>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      strcpy(this->pose3dReq.name, req->name);
+      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+          "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
       this->pose3dReq.pose.px = iter->second.pos.x;
@@ -176,14 +178,15 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
                                  this->device_addr))
   {
     player_simulation_pose2d_req_t *req =
-      (player_simulation_pose2d_req_t*)(_data);
+      static_cast<player_simulation_pose2d_req_t*>(_data);
 
     std::map<std::string, gazebo::math::Pose>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      strcpy(this->pose3dReq.name, req->name);
+      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+          "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
       this->pose2dReq.pose.px = iter->second.pos.x;
@@ -193,34 +196,33 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     this->driver->Publish(this->device_addr, *(this->responseQueue),
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
         &this->pose2dReq, sizeof(this->pose2dReq), NULL);
-
   }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_GET_PROPERTY,
                                  this->device_addr))
   {
     player_simulation_property_req_t *req =
-      (player_simulation_property_req_t*)(_data);
+      static_cast<player_simulation_property_req_t*>(_data);
 
     std::string name = req->name;
     std::string prop = req->prop;
 
     if (name == "world")
     {
-      req->value = new char[ sizeof(double) ];
-      req->value_count = sizeof(double);
+      req->value = new char[sizeof(this->simTime)];
+      req->value_count = sizeof(this->simTime);
 
       if (prop == "sim_time")
       {
-        memcpy(req->value, &this->simTime, sizeof(double));
+        memcpy(req->value, &this->simTime, sizeof(this->simTime));
       }
       else if (prop == "pause_time")
       {
-        memcpy(req->value, &this->pauseTime, sizeof(double));
+        memcpy(req->value, &this->pauseTime, sizeof(this->pauseTime));
       }
       else if (prop == "real_time")
       {
-        memcpy(req->value, &this->realTime, sizeof(double));
+        memcpy(req->value, &this->realTime, sizeof(this->realTime));
       }
       else if (prop == "state")
       {
@@ -245,7 +247,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     {
       if (prop == "fiducial_id")
       {
-        //strcpy((char*)gzReq->name, req->name);
+        // strcpy((char*)gzReq->name, req->name);
       }
       else
       {
@@ -264,13 +266,13 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
                                  PLAYER_SIMULATION_CMD_RESET,
                                  this->device_addr))
   {
-    // TODO:: Implement
+    // TODO: Implement
   }
   else if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
                                  PLAYER_SIMULATION_CMD_SAVE,
                                  this->device_addr))
   {
-    // TODO:: Implement
+    // TODO: Implement
   }
   else
     printf("Unhandled Process message[%d][%d]\n", 0, 0);
@@ -320,4 +322,3 @@ void SimulationInterface::OnStats(ConstWorldStatisticsPtr &_msg)
   this->pauseTime  = gazebo::msgs::Convert(_msg->pause_time()).Double();
   this->paused  = _msg->paused();
 }
-

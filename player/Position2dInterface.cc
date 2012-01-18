@@ -71,8 +71,8 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
   if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
         PLAYER_POSITION2D_CMD_VEL, this->device_addr))
   {
-    //player_position2d_cmd_vel_t *cmd;
-    //cmd = (player_position2d_cmd_vel_t*)_data;
+    // player_position2d_cmd_vel_t *cmd;
+    // cmd = (player_position2d_cmd_vel_t*)_data;
 
     /*this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
     this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
@@ -128,11 +128,11 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     }
     else
     {
-      //player_position2d_power_config_t *power;
+      // player_position2d_power_config_t *power;
 
-      //power = (player_position2d_power_config_t*)_data;
+      // power = (player_position2d_power_config_t*)_data;
 
-      //this->iface->data->cmdEnableMotors = power->state;
+      // this->iface->data->cmdEnableMotors = power->state;
 
       this->driver->Publish(this->device_addr, _respQueue,
           PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
@@ -251,4 +251,5 @@ void Position2dInterface::Subscribe()
 void Position2dInterface::Unsubscribe()
 {
 }
+
 

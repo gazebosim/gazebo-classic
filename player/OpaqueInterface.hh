@@ -77,9 +77,5 @@ class OpaqueInterface : public GazeboInterface
 
 /// \}
 /// \}
-
-
 }
-
 #endif
-

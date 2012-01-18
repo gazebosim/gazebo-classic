@@ -22,6 +22,9 @@
 #ifndef GAZEBO_SIMULATION_INTERFACE_HH
 #define GAZEBO_SIMULATION_INTERFACE_HH
 
+#include <map>
+#include <string>
+
 #include "GazeboInterface.hh"
 #include "msgs/msgs.h"
 #include "transport/TransportTypes.hh"
@@ -96,4 +99,5 @@ class SimulationInterface : public GazeboInterface
   /// \}
   /// \}
 #endif
+
 

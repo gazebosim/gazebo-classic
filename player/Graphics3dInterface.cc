@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Position Interface for Player
  * Author: Nate Koenig
  * Date: 30 Jan 2007
- * SVN: $Id$
  */
 
 /**
-@addtogroup player
-@par Graphics3d Interface
-- PLAYER_GRAPHICS3D_CMD_CLEAR
-- PLAYER_GRAPHICS3D_CMD_DRAW
-*/
+  @addtogroup player
+  @par Graphics3d Interface
+  - PLAYER_GRAPHICS3D_CMD_CLEAR
+  - PLAYER_GRAPHICS3D_CMD_DRAW
+  */
 
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
@@ -41,8 +40,9 @@ boost::recursive_mutex *Graphics3dInterface::mutex = NULL;
 // Constructor
 Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+: GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -53,33 +53,36 @@ Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
-
+*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 Graphics3dInterface::~Graphics3dInterface()
 {
+  /*
   // Release this interface
   delete this->iface;
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
-                                        player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
   int result = -1;
+  /*
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // COMMAND CLEAR:
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                            PLAYER_GRAPHICS3D_CMD_CLEAR, this->device_addr))
+        PLAYER_GRAPHICS3D_CMD_CLEAR, this->device_addr))
   {
-    //player_graphics3d_cmd_draw_t *cmd;
-    //cmd = (player_graphics3d_cmd_draw_t*) data;
+    // player_graphics3d_cmd_draw_t *cmd;
+    // cmd = (player_graphics3d_cmd_draw_t*) data;
 
     this->iface->data->point_count = 0;
 
@@ -88,7 +91,7 @@ int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
 
   // COMMAND DRAW:
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_GRAPHICS3D_CMD_DRAW, this->device_addr))
+        PLAYER_GRAPHICS3D_CMD_DRAW, this->device_addr))
   {
     player_graphics3d_cmd_draw_t *cmd;
 
@@ -112,7 +115,7 @@ int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
   }
 
   this->iface->Unlock();
-
+*/
   return result;
 }
 
@@ -129,6 +132,7 @@ void Graphics3dInterface::Update()
 // GazeboDriver::Subscribe
 void Graphics3dInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
@@ -137,19 +141,21 @@ void Graphics3dInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Graphics3d Interface\n"
-    << e << "\n";
-    //gzthrow(stream.str());
+      << e << "\n";
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void Graphics3dInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }
-

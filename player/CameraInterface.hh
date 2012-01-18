@@ -84,11 +84,7 @@ namespace libgazebo
 
     private: static boost::recursive_mutex *mutex;
   };
-
 /// \}
 /// \}
-
 }
-
 #endif
-

@@ -17,7 +17,6 @@
 /* Desc: Laser Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: IRInterface.cc 6296 2008-04-10 21:24:57Z natepak $
  */
 
 /* TODO
@@ -40,6 +39,7 @@ IRInterface::IRInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -52,21 +52,25 @@ IRInterface::IRInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 /////////////////////////////////////////////////
 IRInterface::~IRInterface()
 {
+  /*
   player_ir_data_t_cleanup(&this->data);
 
   // Release this interface
   delete this->iface;
+  */
 }
 
 /////////////////////////////////////////////////
 int IRInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
         PLAYER_IR_REQ_POSE, this->device_addr))
@@ -94,6 +98,7 @@ int IRInterface::ProcessMessage(QueuePointer &respQueue,
     delete []rep.poses;
     return 0;
   }
+  */
 
   return -1;
 }
@@ -101,6 +106,7 @@ int IRInterface::ProcessMessage(QueuePointer &respQueue,
 /////////////////////////////////////////////////
 void IRInterface::Update()
 {
+  /*
   struct timeval ts;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -142,12 +148,13 @@ void IRInterface::Update()
   }
 
   this->iface->Unlock();
-
+  */
 }
 
 /////////////////////////////////////////////////
 void IRInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
@@ -156,18 +163,20 @@ void IRInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo IR Interface\n"
       << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void IRInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }
-

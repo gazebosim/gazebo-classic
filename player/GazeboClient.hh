@@ -22,6 +22,8 @@
 #ifndef GAZEBO_PLAYER_CLIENT_HH
 #define GAZEBO_PLAYER_CLIENT_HH
 
+#include <string>
+
 /// \addtogroup player
 /// \brief Gazebo client handler
 /// \{
@@ -48,4 +50,5 @@ class GazeboClient
 
 
 #endif
+
 

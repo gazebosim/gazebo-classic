@@ -38,6 +38,7 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -54,29 +55,32 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
-
+*/
 }
 
 /////////////////////////////////////////////////
 LaserInterface::~LaserInterface()
 {
+  /*
   player_laser_data_t_cleanup(&this->data);
 
   // Release this interface
   delete this->iface;
+  */
 }
 
 /////////////////////////////////////////////////
 int LaserInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Is it a request to set the laser's config?
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
         PLAYER_LASER_REQ_SET_CONFIG,
         this->device_addr))
   {
-    //player_laser_config_t* plc = (player_laser_config_t*)data;
+    // player_laser_config_t* plc = (player_laser_config_t*)data;
 
     if (hdr->size == sizeof(player_laser_config_t))
     {
@@ -153,12 +157,14 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
+*/
   return -1;
 }
 
 /////////////////////////////////////////////////
 void LaserInterface::Update()
 {
+  /*
   struct timeval ts;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -218,11 +224,13 @@ void LaserInterface::Update()
   }
   else
     this->Unsubscribe();
+    */
 }
 
 /////////////////////////////////////////////////
 void LaserInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
@@ -231,17 +239,20 @@ void LaserInterface::Subscribe()
   }
   catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Laser Interface\n"
       << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 /////////////////////////////////////////////////
 void LaserInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }
