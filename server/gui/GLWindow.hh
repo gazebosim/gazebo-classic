@@ -70,7 +70,7 @@ namespace gazebo
     public: virtual ~GLWindow();
 
     /// \brief Create user cameras
-    public: void CreateCameras();
+    public: void CreateCameras(double hfov_deg);
 
     /// \brief Initalize the gui
     public: virtual void Init();

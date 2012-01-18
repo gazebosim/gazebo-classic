@@ -78,7 +78,7 @@ void UserCamera::Load(XMLConfigNode *node)
 {
   OgreCamera::LoadCam(node);
 
-  this->SetFOV( DTOR(90) );
+  //this->SetFOV( DTOR(90) );
   this->SetClipDist(0.001, 4000); // quick hack: be bigger than 4 * sky dom box boundaries for now
 }
 

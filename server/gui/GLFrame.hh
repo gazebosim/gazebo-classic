@@ -113,6 +113,7 @@ namespace gazebo
 
     /// Starting pose of the camera
     private: Pose3d startPose;
+    private: double hfov_deg;
 
     private: bool saveFrames;
     private: std::string savePathname;

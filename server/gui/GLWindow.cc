@@ -97,7 +97,7 @@ GLWindow::~GLWindow()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create user cameras
-void GLWindow::CreateCameras()
+void GLWindow::CreateCameras(double hfov_deg)
 {
   this->show();
   Fl::check();
@@ -107,6 +107,7 @@ void GLWindow::CreateCameras()
   // Create the default camera.
   this->userCamera = new UserCamera( this );
   this->userCamera->Load(NULL);
+  this->userCamera->SetFOV(DTOR(hfov_deg));
 }
 
 

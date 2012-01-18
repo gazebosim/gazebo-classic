@@ -176,6 +176,7 @@ void GLFrame::Load( XMLConfigNode *node )
   {
     this->startPose.pos = node->GetVector3("xyz", Vector3(0,0,0));
     this->startPose.rot = node->GetRotation("rpy", Quatern());
+    this->hfov_deg = node->GetDouble("hfov", 90, 0);
     this->saveFrames = node->GetBool("saveFrames",false,0);
     this->savePathname = node->GetString("saveFramePath","",0);
   }
@@ -186,7 +187,7 @@ void GLFrame::Load( XMLConfigNode *node )
 /// Create user cameras
 void GLFrame::CreateCameras()
 {
-  this->glWindow->CreateCameras();
+  this->glWindow->CreateCameras(this->hfov_deg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
