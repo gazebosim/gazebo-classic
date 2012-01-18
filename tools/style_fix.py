@@ -51,12 +51,16 @@ def ProcessFile(filename):
 
   for linenum in range(len(lines)):
     line = lines[linenum]
-    if 'http' not in line:
-      line = re.sub(r'//([a-z])','// \\1', line)
-      line = re.sub(r'//(\()','// \\1', line)
-      line = re.sub(r'//([A-Z])','// \\1', line)
-      line = re.sub(r'//({)','// \\1', line)
-      line = re.sub(r'//(})','// \\1', line)
+    prevLine = lines[linenum-1]
+    #if 'http' not in line:
+    #  line = re.sub(r'//([a-z])','// \\1', line)
+    #  line = re.sub(r'//(\()','// \\1', line)
+    #  line = re.sub(r'//([A-Z])','// \\1', line)
+    #  line = re.sub(r'//({)','// \\1', line)
+    #  line = re.sub(r'//(})','// \\1', line)
+
+    if '//' in line and '//////////////////////////////////////////////////' in prevLine:
+      continue
 
     # Skip blank lines after start of new block
     #if re.search(r'^\s*$',line) or len(line) == 0:

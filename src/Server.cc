@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -86,7 +102,7 @@ bool Server::Load(const std::string &_filename)
   physics::load();
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  while(worldElem)
+  while (worldElem)
   {
     physics::WorldPtr world = physics::create_world();
 
@@ -95,7 +111,7 @@ bool Server::Load(const std::string &_filename)
     {
       physics::load_world(world, worldElem);
     }
-    catch (common::Exception &e)
+    catch(common::Exception &e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -186,7 +202,7 @@ void Server::SetParams(const common::StrStr_M &params)
       {
         p = boost::lexical_cast<bool>(iter->second);
       }
-      catch (...)
+      catch(...)
       {
         // Unable to convert via lexical_cast, so try "true/false" string
         std::string str = iter->second;

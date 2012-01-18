@@ -55,13 +55,13 @@ Master::~Master()
   this->connection = NULL;
 }
 
-void Master::Init(unsigned short _port)
+void Master::Init(uint16_t _port)
 {
   try
   {
     this->connection->Listen(_port, boost::bind(&Master::OnAccept, this, _1));
   }
-  catch (std::exception &e)
+  catch(std::exception &e)
   {
     gzthrow("Unable to start server[" << e.what() << "]\n");
   }
@@ -177,9 +177,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
             msgs::Package("topic_namespace_add", worldNameMsg));
       }
       this->connectionMutex->unlock();
-
     }
-
   }
   else if (packet.type() == "advertise")
   {
@@ -533,7 +531,7 @@ msgs::Publish Master::GetPublisher(const std::string &_topic)
 
 //////////////////////////////////////////////////
 transport::ConnectionPtr Master::FindConnection(const std::string &_host,
-                                                unsigned short _port)
+                                                uint16_t _port)
 {
   transport::ConnectionPtr conn;
   Connection_M::iterator iter;
@@ -553,5 +551,3 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
 
   return conn;
 }
-
-

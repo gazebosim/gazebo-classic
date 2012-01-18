@@ -1,9 +1,27 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #ifndef MASTER_HH
 #define MASTER_HH
 
 #include <string>
 #include <list>
 #include <deque>
+#include <utility>
+#include <map>
 #include <boost/shared_ptr.hpp>
 
 #include "msgs/msgs.h"
@@ -21,7 +39,7 @@ namespace gazebo
 
     /// \brief Initialize
     /// \param _port The master's port
-    public: void Init(unsigned short _port);
+    public: void Init(uint16_t _port);
 
     public: void Run();
 
@@ -65,7 +83,7 @@ namespace gazebo
     /// \param _port Port number
     /// \return The found connection, or NULL
     private: transport::ConnectionPtr FindConnection(const std::string &_host,
-                                                     unsigned short _port);
+                                                     uint16_t _port);
 
 
     private: void RemoveConnection(unsigned int _index);
