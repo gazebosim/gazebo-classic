@@ -47,7 +47,7 @@ namespace gazebo
       public: void AddPoint(const Vector3 &_pt);
 
       /// \brief Gets the detail of one of the control points of the spline.
-      public: const Vector3 &GetPoint(unsigned short _index) const;
+      public: const Vector3 &GetPoint(unsigned int _index) const;
 
       /// \brief  Gets the number of control points in the spline.
       public: unsigned int GetNumPoints() const;

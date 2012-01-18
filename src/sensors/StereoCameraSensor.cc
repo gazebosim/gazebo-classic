@@ -18,13 +18,12 @@
 /* Desc: Stereo Camera Sensor
  * Author: Nate Koenig
  * Date: 25 March 2008
- * SVN: $Id$
  */
 #include <arpa/inet.h>
-#include <sstream>
 #include <OgreImageCodec.h>
 #include <GL/gl.h>
 #include <Ogre.h>
+#include <sstream>
 
 #include "World.hh"
 #include "common/Exception.hh"
@@ -58,7 +57,7 @@ StereoCameraSensor::StereoCameraSensor(Body *body)
 // Destructor
 StereoCameraSensor::~StereoCameraSensor()
 {
-  for (int i = 0; i<2; i++)
+  for (int i = 0; i < 2; i++)
   {
     if (this->depthBuffer[i])
       delete [] this->depthBuffer[i];
@@ -107,7 +106,7 @@ void StereoCameraSensor::InitChild()
   this->materialName[D_RIGHT] = this->GetName()+"_RttMat_Stereo_Right_Depth";
 
   // Create the render textures for the color textures
-  for (i = 0; i<2; i++)
+  for (i = 0; i < 2; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], false);
     this->renderTargets[i] =
@@ -116,7 +115,7 @@ void StereoCameraSensor::InitChild()
   }
 
   // Create the render texture for the depth textures
-  for (i = 2; i<4; i++)
+  for (i = 2; i < 4; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
     this->renderTargets[i] =
@@ -129,7 +128,7 @@ void StereoCameraSensor::InitChild()
   this->InitCam();
 
   // Hack to make the camera use the right render target too.
-  for (i = 0; i<4; i++)
+  for (i = 0; i < 4; i++)
   {
     if (i != D_LEFT)
     {
@@ -138,8 +137,8 @@ void StereoCameraSensor::InitChild()
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
       // TODO: Fix
-      //cviewport->setBackgroundColour(
-      //*OgreAdaptor::Instance()->backgroundColor);
+      // cviewport->setBackgroundColour(
+      // *OgreAdaptor::Instance()->backgroundColor);
       cviewport->setVisibilityMask(this->visibilityMask);
     }
 
@@ -363,23 +362,23 @@ void StereoCameraSensor::FillBuffers()
   int i;
   int top, left, right, bottom;
 
-  for (i = 0; i<4; i++)
+  for (i = 0; i < 4; i++)
   {
     // Get access to the buffer and make an image and write it to file
     hardwareBuffer = this->renderTexture[i]->getBuffer(0, 0);
 
     hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
 
-    top = (int)((hardwareBuffer->getHeight() -
+    top = static_cast<int>((hardwareBuffer->getHeight() -
                  this->imageSizeP->GetValue().y) / 2.0);
-    left = (int)((hardwareBuffer->getWidth() -
+    left = static_cast<int>((hardwareBuffer->getWidth() -
                   this->imageSizeP->GetValue().x) / 2.0);
     right = left + this->imageSizeP->GetValue().x;
     bottom = top + this->imageSizeP->GetValue().y;
 
     if (i < 2)
     {
-      hardwareBuffer->blitToMemory (Ogre::Box(left, top, right, bottom),
+      hardwareBuffer->blitToMemory(Ogre::Box(left, top, right, bottom),
           Ogre::PixelBox(this->imageSizeP->GetValue().x,
                          this->imageSizeP->GetValue().y,
             1, PF_RGB, this->rgbBuffer[i])
@@ -387,7 +386,7 @@ void StereoCameraSensor::FillBuffers()
     }
     else
     {
-      hardwareBuffer->blitToMemory (Ogre::Box(left, top, right, bottom),
+      hardwareBuffer->blitToMemory(Ogre::Box(left, top, right, bottom),
           Ogre::PixelBox(this->imageSizeP->GetValue().x,
             this->imageSizeP->GetValue().y,
             1, PF_FLOAT, this->depthBuffer[i-2]));
@@ -395,7 +394,6 @@ void StereoCameraSensor::FillBuffers()
 
     hardwareBuffer->unlock();
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -405,7 +403,7 @@ void StereoCameraSensor::SaveFrame()
   char tmp[1024];
   FILE *fp;
 
-  sprintf(tmp, "frame%04d.pgm", this->saveCount);
+  snprintf(tmp, sizeof(tmp), "frame%04d.pgm", this->saveCount);
 
   fp = fopen(tmp, "wb");
 
@@ -422,7 +420,7 @@ void StereoCameraSensor::SaveFrame()
        i< (unsigned int)this->imageSizeP->GetValue().y; i++)
   {
     for (unsigned int j = 0;
-         j<(unsigned int)this->imageSizeP->GetValue().x; j++)
+         j < (unsigned int)this->imageSizeP->GetValue().x; j++)
     {
       double f = this->depthBuffer[0][i*this->imageSizeP->GetValue().x+j];
 

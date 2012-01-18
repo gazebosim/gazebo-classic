@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef MESSAGES_UTILITY_HH
-#define MESSAGES_UTILITY_HH
+#ifndef MESSAGES_UTILITY_H
+#define MESSAGES_UTILITY_H
+
+#include <string>
 
 #include "msgs/MessageTypes.hh"
 #include "sdf/sdf.h"
@@ -190,7 +192,8 @@ namespace gazebo
     msgs::Scene      SceneFromSDF(sdf::ElementPtr _sdf);
 
     /// \cond
-    const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
+    const google::protobuf::FieldDescriptor *GetFD(
+        google::protobuf::Message &message, const std::string &name);
     /// \endcond
 
     /// \brief Get the header from a protobuf message

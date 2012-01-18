@@ -83,13 +83,12 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
       _sdf->elements.push_back(element);
     }
-    else // copy namespaced element
+    else
     {
       gzwarn << "skipping prefixed element [" << prefix << ":"
              << (const char*)elemXml->name << "] when copying plugins\n";
-      //element->SetName(prefix + ":" + (const char*)elemXml->name);
+      // element->SetName(prefix + ":" + (const char*)elemXml->name);
     }
-
   }
 }
 
@@ -105,11 +104,11 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       sdf::ElementPtr sdfPlugin = _sdf->AddElement("plugin");
       initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
 
-      if (xmlGetProp(pluginXml, (xmlChar*)"plugin"))
+      if (xmlGetProp(pluginXml, reinterpret_cast<const xmlChar*>("plugin")))
         initAttr(pluginXml, "plugin", sdfPlugin->GetAttribute("filename"));
       else
-        //sdfPlugin->GetAttribute("filename")->SetFromString(
-        //(const char*)pluginXml->name);
+        // sdfPlugin->GetAttribute("filename")->SetFromString(
+        // (const char*)pluginXml->name);
         initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
 
       deprecated_sdf::copyChildren(pluginXml, sdfPlugin);
@@ -268,7 +267,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       {
         sizes.push_back(boost::lexical_cast<unsigned int>(pieces[i].c_str()));
       }
-      catch (boost::bad_lexical_cast &e)
+      catch(boost::bad_lexical_cast &e)
       {
         gzerr << "<imageSize> value ["
               << pieces[i] << "] is not a valid unsigned int from a 2-tuple\n";
@@ -279,7 +278,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   if (sizes.size() != 2)
   {
-    gzerr << "Vector contains [" << (int)sizes.size()
+    gzerr << "Vector contains [" << static_cast<int>(sizes.size())
           << "] elements instead of 3 elements\n";
     return false;
   }
@@ -572,7 +571,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         {
           degrees.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
         }
-        catch (boost::bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
           gzerr << "rpy value ["
                 << pieces[i] << "] is not a valid double from a 3-tuple\n";
@@ -589,7 +588,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     {
       if (degrees.size() != 3)
       {
-        gzerr << "Vector contains [" << (int)degrees.size()
+        gzerr << "Vector contains [" << static_cast<int>(degrees.size())
               << "] elements instead of 3 elements\n";
         return false;
       }
@@ -897,8 +896,8 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   if (threadPitchXml)
     _sdf->GetOrCreateElement("thread_pitch")->GetValue()->SetFromString(
         getValue(threadPitchXml));
-    //_sdf->GetOrCreateElement("thread_pitch")->value->SetFromString(
-    //getValue(threadPitchXml));
+    // _sdf->GetOrCreateElement("thread_pitch")->value->SetFromString(
+    // getValue(threadPitchXml));
 
   initAttr(_config, "anchor", sdfChild->GetAttribute("link"));
   if (firstChildElement(_config, "axis"))
@@ -935,7 +934,6 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       else
         sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
-
   }
 
   if (firstChildElement(_config, "axis2"))
@@ -972,7 +970,6 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       else
         sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
-
   }
   return true;
 }
@@ -1086,14 +1083,14 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
 
   //  per pixel shading does not allow options
-  //sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
-  //initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
+  // sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
+  // initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
 
   return true;
 }
 
-//_config = physics:ode
-//_sdf = physics
+// _config = physics:ode
+// _sdf = physics
 bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   _sdf->GetAttribute("type")->SetFromString("ode");
@@ -1192,7 +1189,8 @@ bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 //////////////////////////////////////////////////
 bool initModelString(const std::string &_xmlString, sdf::SDFPtr &_sdf)
 {
-  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
+  xmlDocPtr xmlDoc =
+    xmlParseDoc(reinterpret_cast<const xmlChar*>(_xmlString.c_str()));
 
   return initModelDoc(xmlDoc, _sdf);
 }
@@ -1223,9 +1221,7 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     return true;
   else
     return false;
-
 }
-
 
 //////////////////////////////////////////////////
 bool initWorldFile(const std::string &_filename,
@@ -1233,7 +1229,7 @@ bool initWorldFile(const std::string &_filename,
 {
   std::ifstream fin;
   fin.open(_filename.c_str(), std::ios::in);
-  if(!fin.is_open())
+  if (!fin.is_open())
   {
     gzerr << "The world file can not be opened, check path and permissions\n";
   }
@@ -1252,7 +1248,8 @@ bool initWorldFile(const std::string &_filename,
 bool initWorldString(const std::string &_xmlString,
                      sdf::SDFPtr &_sdf)
 {
-  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
+  xmlDocPtr xmlDoc =
+    xmlParseDoc(reinterpret_cast<const xmlChar*>(_xmlString.c_str()));
 
   return initWorldDoc(xmlDoc, _sdf);
 }
@@ -1283,8 +1280,10 @@ bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 
   // need all worlds successfully initialized, otherwise,
   // return false and try as model
-  if (world_initialized) return true;
-  else return false;
+  if (world_initialized)
+    return true;
+  else
+    return false;
 }
 
 xmlNodePtr firstChildElement(xmlDocPtr node, const std::string &name)
@@ -1341,13 +1340,13 @@ std::string getNodeValue(xmlNodePtr node, const std::string &key)
   xmlChar *value = NULL;
 
   // First check if the key is an attribute
-  if (xmlHasProp(node, (xmlChar*) key.c_str()))
+  if (xmlHasProp(node, reinterpret_cast<const xmlChar*>(key.c_str())))
   {
-    value = xmlGetProp(node, (xmlChar*) key.c_str());
+    value = xmlGetProp(node, reinterpret_cast<const xmlChar*>(key.c_str()));
 
     // If not an attribute, then it should be a child node
   }
-  else if (key == (const char*)node->name)
+  else if (key == reinterpret_cast<const char*>(node->name))
   {
     value = xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1);
   }
@@ -1361,7 +1360,7 @@ std::string getNodeValue(xmlNodePtr node, const std::string &key)
     while (currNode)
     {
       // If the name matches, then return its value
-      if (key == (const char*)currNode->name)
+      if (key == reinterpret_cast<const char*>(currNode->name))
       {
         value = xmlNodeListGetString(node->doc, currNode->xmlChildrenNode, 1);
         break;
@@ -1373,7 +1372,7 @@ std::string getNodeValue(xmlNodePtr node, const std::string &key)
 
   if (value)
   {
-    result = (char*)value;
+    result = reinterpret_cast<char*>(value);
     boost::trim(result);
 
     xmlFree(value);
@@ -1396,7 +1395,7 @@ std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
   count = 0;
   a = b = 0;
 
-  for (i = 0; i < (int)value.size(); i++)
+  for (i = 0; i < static_cast<int>(value.size()); i++)
   {
     // Look for start of element
     if (state == 0)
@@ -1431,12 +1430,12 @@ std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
   {
     const char *s = value.c_str() + a;
     size_t size = b-a+2;
-    char *end = (char *)memchr(s, 0, size);
+    const char *end = reinterpret_cast<const char *>(memchr(s, 0, size));
 
     if (end)
-      size = end -s + 1;
+      size = end - s + 1;
 
-    char *r = (char *)malloc(size);
+    char *r = static_cast<char *>(malloc(size));
 
     if (size)
     {
@@ -1485,5 +1484,4 @@ void PreParser(const std::string &fname, std::string &output)
 
   ifs.close();
 }
-
 }

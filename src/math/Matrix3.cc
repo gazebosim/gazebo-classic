@@ -27,31 +27,31 @@ using namespace math;
 // Constructor
 Matrix3::Matrix3()
 {
-  memset(this->m, 0, sizeof(double)*9);
+  memset(this->m, 0, sizeof(this->m[0][0])*9);
 }
 
 //////////////////////////////////////////////////
 // Constructor
 Matrix3::Matrix3(const Matrix3 &_m)
 {
-  memcpy(this->m, _m.m, sizeof(double)*9);
+  memcpy(this->m, _m.m, sizeof(this->m[0][0])*9);
 }
 
 //////////////////////////////////////////////////
 // Constructor
-Matrix3::Matrix3(double v00, double v01, double v02,
-                    double v10, double v11, double v12,
-                    double v20, double v21, double v22)
+Matrix3::Matrix3(double _v00, double _v01, double _v02,
+                 double _v10, double _v11, double _v12,
+                 double _v20, double _v21, double _v22)
 {
-  this->m[0][0] = v00;
-  this->m[0][1] = v01;
-  this->m[0][2] = v02;
-  this->m[1][0] = v10;
-  this->m[1][1] = v11;
-  this->m[1][2] = v12;
-  this->m[2][0] = v20;
-  this->m[2][1] = v21;
-  this->m[2][2] = v22;
+  this->m[0][0] = _v00;
+  this->m[0][1] = _v01;
+  this->m[0][2] = _v02;
+  this->m[1][0] = _v10;
+  this->m[1][1] = _v11;
+  this->m[1][2] = _v12;
+  this->m[2][0] = _v20;
+  this->m[2][1] = _v21;
+  this->m[2][2] = _v22;
 }
 
 

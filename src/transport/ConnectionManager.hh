@@ -17,11 +17,13 @@
 #ifndef CONNECTION_MANAGER_HH
 #define CONNECTION_MANAGER_HH
 
-#include <string>
-#include <boost/shared_ptr.hpp>
 
-#include "common/SingletonT.hh"
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <list>
+
 #include "msgs/msgs.h"
+#include "common/SingletonT.hh"
 
 #include "transport/Publisher.hh"
 #include "transport/Connection.hh"
@@ -42,7 +44,7 @@ namespace gazebo
       private: virtual ~ConnectionManager();
 
       public: bool Init(const std::string &master_host,
-                        unsigned short master_port);
+                        unsigned int master_port);
 
       /// \brief Run the connection manager loop
       public: void Run();
@@ -84,11 +86,11 @@ namespace gazebo
 
       /// \brief Find a connection that matches a host and port
       private: ConnectionPtr FindConnection(const std::string &host,
-                                            unsigned short port);
+                                            unsigned int port);
 
       /// \brief Connect to a remote server
       public: ConnectionPtr ConnectToRemoteHost(const std::string &host,
-                                                  unsigned short port);
+                                                  unsigned int port);
 
       private: void OnMasterRead(const std::string &data);
 
@@ -117,7 +119,7 @@ namespace gazebo
       private: std::list<std::string> namespaces;
       private: std::list<std::string> masterMessages;
 
-      //Singleton implementation
+      // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;
     };
     /// \}

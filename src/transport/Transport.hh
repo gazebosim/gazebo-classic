@@ -18,6 +18,7 @@
 #define GAZEBO_TRANSPORT_HH
 
 #include <boost/bind.hpp>
+#include <string>
 
 #include "transport/TransportTypes.hh"
 #include "transport/SubscribeOptions.hh"
@@ -34,7 +35,7 @@ namespace gazebo
     /// \param master_host The hostname of the master is set to this param
     /// \param master_port The port of the master is set to this param
     /// \return False if the GAZEBO_MASTER_URI was not found
-    bool get_master_uri(std::string &master_host, unsigned short &master_port);
+    bool get_master_uri(std::string &master_host, unsigned int &master_port);
 
     /// \brief Initialize the transport system
     /// \param master_host The hostname or IP of the master. Leave empty to
@@ -42,7 +43,7 @@ namespace gazebo
     /// \param master_port The port  of the master. Leave empty to
     ///                    use pull address from the GAZEBO_MASTER_URI env var.
     bool init(const std::string &master_host ="",
-              unsigned short master_port = 0);
+              unsigned int master_port = 0);
 
     /// \brief Run the transport component. This starts message passing. This is
     ///        a blocking call

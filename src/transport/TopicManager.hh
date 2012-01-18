@@ -17,9 +17,11 @@
 #ifndef TOPICMANAGER_HH
 #define TOPICMANAGER_HH
 
+#include <boost/bind.hpp>
 #include <map>
 #include <list>
-#include <boost/bind.hpp>
+#include <string>
+#include <vector>
 
 #include "common/Exception.hh"
 #include "msgs/msgs.h"
@@ -30,7 +32,6 @@
 #include "transport/SubscriptionTransport.hh"
 #include "transport/PublicationTransport.hh"
 #include "transport/ConnectionManager.hh"
-//#include "transport/Connection.hh"
 #include "transport/Publisher.hh"
 #include "transport/Publication.hh"
 #include "transport/Subscriber.hh"
@@ -204,13 +205,10 @@ namespace gazebo
 
       private: bool pauseIncoming;
 
-      //Singleton implementation
+      // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
     /// \}
   }
 }
-
 #endif
-
-

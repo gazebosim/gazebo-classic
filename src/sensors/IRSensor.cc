@@ -76,7 +76,7 @@ void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
 
     laserShape = static_cast<MultiRayShape*>(laserCollision->GetShape());
 
-    //laserShape->SetDisplayType((**this->displayRaysP));
+    // laserShape->SetDisplayType((**this->displayRaysP));
     laserShape->Load(iNode);
     /*laserShape->Load(**verticalRayCountP, **rayCountP,
      **this->originP, **minRangeP, **maxRangeP,
@@ -88,7 +88,7 @@ void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
 
   /*this->IRCount = node->GetInt("irCount", 0, 1);
 
-  //Allocate memeorys
+  // Allocate memeorys
   this->rayCount = new int[this->IRCount];
   this->rangeCount = new int[this->IRCount];
   this->minAngle = new double[this->IRCount];
@@ -135,7 +135,6 @@ void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
   /* BULLET
      this->body->SetSpaceId(this->raySpaceId);
      */
-
 }
 
 //////////////////////////////////////////////////
@@ -176,7 +175,6 @@ void IRSensor::InitChild()
 
   }
   }*/
-
 }
 
 //////////////////////////////////////////////////

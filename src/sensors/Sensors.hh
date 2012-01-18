@@ -17,6 +17,7 @@
 #ifndef GAZEBO_SENSORS_HH
 #define GAZEBO_SENSORS_HH
 
+#include <string>
 #include "SensorTypes.hh"
 
 namespace gazebo
@@ -55,4 +56,3 @@ namespace gazebo
   }
 }
 #endif
-

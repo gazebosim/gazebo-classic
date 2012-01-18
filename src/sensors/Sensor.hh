@@ -22,8 +22,9 @@
 #ifndef SENSOR_HH
 #define SENSOR_HH
 
-#include <vector>
 #include <boost/enable_shared_from_this.hpp>
+#include <vector>
+#include <string>
 
 #include "sdf/sdf.h"
 
@@ -115,10 +116,8 @@ namespace gazebo
       protected: gazebo::physics::WorldPtr world;
       protected: common::Time updatePeriod;
       protected: common::Time lastUpdateTime;
-
     };
     /// \}
   }
 }
 #endif
-

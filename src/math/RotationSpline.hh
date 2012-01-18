@@ -44,7 +44,7 @@ namespace gazebo
       public: void AddPoint(const Quaternion &_p);
 
       /// \brief Gets the detail of one of the control points of the spline.
-      public: const Quaternion &GetPoint(unsigned short _index) const;
+      public: const Quaternion &GetPoint(unsigned int _index) const;
 
       /// \brief Gets the number of control points in the spline.
       public: unsigned int GetNumPoints() const;
@@ -54,7 +54,7 @@ namespace gazebo
 
       /// \brief Updates a single point in the spline.
       /// \remarks This point must already exist in the spline.
-      public: void UpdatePoint(unsigned short _index, const Quaternion &_value);
+      public: void UpdatePoint(unsigned int _index, const Quaternion &_value);
 
       /// \brief Returns an interpolated point based on a parametric
       ///        value over the whole series.

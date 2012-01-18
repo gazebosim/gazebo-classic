@@ -32,7 +32,7 @@ Box::Box()
 
 //////////////////////////////////////////////////
 /// Constructor
-Box::Box (const Vector3 &_min, const Vector3 &_max)
+Box::Box(const Vector3 &_min, const Vector3 &_max)
   : min(_min), max(_max)
 {
 }

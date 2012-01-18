@@ -22,8 +22,8 @@
 #ifndef ANGLE_HH
 #define ANGLE_HH
 
-#include <iostream>
 #include <math.h>
+#include <iostream>
 
 // Convert radians to degrees
 #define GZ_RTOD(r) ((r) * 180 / M_PI)

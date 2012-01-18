@@ -81,7 +81,7 @@ Connection::~Connection()
 
 //////////////////////////////////////////////////
 // Connect to a remote host
-bool Connection::Connect(const std::string &host, unsigned short port)
+bool Connection::Connect(const std::string &host, unsigned int port)
 {
   std::string service = boost::lexical_cast<std::string>(port);
 
@@ -115,7 +115,7 @@ bool Connection::Connect(const std::string &host, unsigned short port)
 }
 
 //////////////////////////////////////////////////
-void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
+void Connection::Listen(unsigned int port, const AcceptCallback &accept_cb)
 {
   this->acceptCB = accept_cb;
 
@@ -162,8 +162,9 @@ void Connection::OnAccept(const boost::system::error_code &e)
 void Connection::StartRead(const ReadCallback & /*_cb*/)
 {
   gzerr << "\n\n\n\n DONT USE \n\n\n\n";
-  //this->readThread =
-  //new boost::thread(boost::bind(&Connection::ReadLoop,shared_from_this(),cb));
+  // this->readThread =
+  // new boost::thread(
+  // boost::bind(&Connection::ReadLoop,shared_from_this(),cb));
 }
 
 //////////////////////////////////////////////////
@@ -194,7 +195,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
   if (header_stream.str().empty() ||
       header_stream.str().size() != HEADER_LENGTH)
   {
-    //Something went wrong, inform the caller
+    // Something went wrong, inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
     gzerr << "Connection::Write error[" << error.message() << "]\n";
     return;
@@ -222,7 +223,7 @@ void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
     this->writeQueue.push_back(header_stream.str());
     this->writeQueue.push_back(_buffer);
     this->writeMutex->unlock();
-  //}
+  // }
 
     if (_force)
     {
@@ -270,7 +271,7 @@ void Connection::ProcessWriteQueue()
   {
     boost::asio::write(*this->socket, buffer->data());
   }
-  catch (...)
+  catch(...)
   {
     this->Shutdown();
   }
@@ -303,7 +304,7 @@ void Connection::OnWrite(const boost::system::error_code &e,
 
   if (e)
   {
-    //gzerr << "onWrite error[" << e.message() << "]\n";
+    // gzerr << "onWrite error[" << e.message() << "]\n";
     // It will reach this point if the remote connection disconnects.
     this->Shutdown();
   }
@@ -323,7 +324,7 @@ void Connection::Shutdown()
   }
 
   this->shutdown();
-  //this->StopRead();
+  // this->StopRead();
 
   this->Cancel();
 
@@ -347,7 +348,7 @@ bool Connection::IsOpen() const
   {
     this->GetRemoteURI();
   }
-  catch (...)
+  catch(...)
   {
     result = false;
   }
@@ -367,7 +368,7 @@ void Connection::Close()
     {
       this->socket->close();
     }
-    catch (boost::system::system_error &e)
+    catch(boost::system::system_error &e)
     {
       gzwarn << "Error closing socket[" << this->id << "] ["
              << e.what() << "]\n";
@@ -380,7 +381,7 @@ void Connection::Close()
     {
       this->acceptor->close();
     }
-    catch (boost::system::system_error &e)
+    catch(boost::system::system_error &e)
     {
       gzwarn <<"Error closing acceptor[" << this->id << "]\n";
     }
@@ -400,7 +401,7 @@ void Connection::Cancel()
     {
       this->acceptor->cancel();
     }
-    catch (boost::system::system_error &e)
+    catch(boost::system::system_error &e)
     {
       gzwarn << "Connection::Cancel Error[" << e.what() << "]\n";
       // Left empty on purpose
@@ -474,7 +475,7 @@ std::string Connection::GetLocalAddress() const
 
 //////////////////////////////////////////////////
 /// Get the port of this connection
-unsigned short Connection::GetLocalPort() const
+unsigned int Connection::GetLocalPort() const
 {
   if (this->socket && this->socket->is_open())
     return this->socket->local_endpoint().port();
@@ -493,7 +494,7 @@ std::string Connection::GetRemoteAddress() const
 
 //////////////////////////////////////////////////
 /// Get the remote port number
-unsigned short Connection::GetRemotePort() const
+unsigned int Connection::GetRemotePort() const
 {
   if (this->socket && this->socket->is_open())
     return this->socket->remote_endpoint().port();
@@ -543,7 +544,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
         continue;
       }
     }
-    catch (std::exception &e)
+    catch(std::exception &e)
     {
       // The connection closed
       break;
@@ -558,7 +559,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
   boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(boost::asio::ip::host_name(), "");
   boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
-  boost::asio::ip::tcp::resolver::iterator end; // End marker.
+  boost::asio::ip::tcp::resolver::iterator end;
   boost::asio::ip::tcp::endpoint ep;
 
   while (iter != end)

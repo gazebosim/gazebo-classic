@@ -142,7 +142,7 @@ void DepthCameraSensor::SetActive(bool value)
 // Update the drawing
 void DepthCameraSensor::UpdateImpl(bool /*_force*/)
 {
-  //Sensor::Update(force);
+  // Sensor::Update(force);
   if (this->camera)
   {
     this->camera->Render();

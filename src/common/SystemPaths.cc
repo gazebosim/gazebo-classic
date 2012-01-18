@@ -45,24 +45,27 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
 
   char *path = getenv("GAZEBO_LOG_PATH");
+  std::string fullPath;
   if (!path)
   {
     path = getenv("HOME");
     if (!path)
-      path = strdup("/tmp/gazebo");
+      fullPath = "/tmp/gazebo";
     else
-      path = strcat(path, "/.gazebo");
+      fullPath = std::string(path) + "/.gazebo";
   }
+  else
+    fullPath = path;
 
-  DIR *dir = opendir(path);
+  DIR *dir = opendir(fullPath.c_str());
   if (!dir)
   {
-    mkdir(path, S_IRWXU | S_IRGRP | S_IROTH);
+    mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
   }
   else
     closedir(dir);
 
-  this->logPath = path;
+  this->logPath = fullPath;
 }
 
 std::string SystemPaths::GetLogPath() const

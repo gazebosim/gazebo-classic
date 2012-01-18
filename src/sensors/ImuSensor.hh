@@ -19,6 +19,7 @@
 #define IMUSENSOR_HH
 
 #include <vector>
+#include <string>
 
 #include "Sensor.hh"
 
@@ -58,11 +59,8 @@ namespace gazebo
 
       private: Pose prevPose;
       private: Pose imuVel;
-
     };
     /// \}
   }
 }
-
 #endif
-

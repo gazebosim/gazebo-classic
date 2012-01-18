@@ -22,9 +22,10 @@
 #ifndef CONTACTSENSOR_HH
 #define CONTACTSENSOR_HH
 
-#include <vector>
-
 #include <stdint.h>
+#include <vector>
+#include <map>
+#include <string>
 
 #include "math/Angle.hh"
 #include "sensors/Sensor.hh"

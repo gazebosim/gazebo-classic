@@ -1076,25 +1076,25 @@ def CheckForHeaderGuard(filename, lines, error):
 
   # The guard should be PATH_FILE_H_, but we also allow PATH_FILE_H__
   # for backward compatibility.
-  if ifndef != cppvar:
-    error_level = 0
-    if ifndef != cppvar + '_':
-      error_level = 5
+  #if ifndef != cppvar:
+  #  error_level = 0
+  #  if ifndef != cppvar + '_':
+  #    error_level = 5
 
-    ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
-                            error)
-    error(filename, ifndef_linenum, 'build/header_guard', error_level,
-          '#ifndef header guard has wrong style, please use: %s' % cppvar)
+  #  ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
+  #                          error)
+  #  error(filename, ifndef_linenum, 'build/header_guard', error_level,
+  #        '#ifndef header guard has wrong style, please use: %s' % cppvar)
 
-  if endif != ('#endif  // %s' % cppvar):
-    error_level = 0
-    if endif != ('#endif  // %s' % (cppvar + '_')):
-      error_level = 5
+  #if endif != ('#endif  // %s' % cppvar):
+  #  error_level = 0
+  #  if endif != ('#endif  // %s' % (cppvar + '_')):
+  #    error_level = 5
 
-    ParseNolintSuppressions(filename, lines[endif_linenum], endif_linenum,
-                            error)
-    error(filename, endif_linenum, 'build/header_guard', error_level,
-          '#endif line should be "#endif  // %s"' % cppvar)
+  #  ParseNolintSuppressions(filename, lines[endif_linenum], endif_linenum,
+  #                          error)
+  #  error(filename, endif_linenum, 'build/header_guard', error_level,
+  #        '#endif line should be "#endif  // %s"' % cppvar)
 
 
 def CheckForUnicodeReplacementCharacters(filename, lines, error):
@@ -2373,9 +2373,9 @@ def CheckIncludeLine(filename, clean_lines, linenum, include_state, error):
   line = clean_lines.lines[linenum]
 
   # "include" should use the new style "foo/bar.h" instead of just "bar.h"
-  if _RE_PATTERN_INCLUDE_NEW_STYLE.search(line):
-    error(filename, linenum, 'build/include', 4,
-          'Include the directory when naming .h files')
+  #if _RE_PATTERN_INCLUDE_NEW_STYLE.search(line):
+  #  error(filename, linenum, 'build/include', 4,
+  #        'Include the directory when naming .h files')
 
   # we shouldn't include a file more than once. actually, there are a
   # handful of instances where doing so is okay, but in general it's
@@ -2652,9 +2652,9 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
     error(filename, linenum, 'runtime/printf', 4,
           'Almost always, snprintf is better than %s' % match.group(1))
 
-  if Search(r'\bsscanf\b', line):
-    error(filename, linenum, 'runtime/printf', 1,
-          'sscanf can be ok, but is slow and can overflow buffers.')
+  #if Search(r'\bsscanf\b', line):
+  #  error(filename, linenum, 'runtime/printf', 1,
+  #        'sscanf can be ok, but is slow and can overflow buffers.')
 
   # Check if some verboten operator overloading is going on
   # TODO(unknown): catch out-of-line unary operator&:
@@ -2803,6 +2803,10 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
           'Using sizeof(type).  Use sizeof(varname) instead if possible')
     return True
 
+  typeid_match = Match(r'.*typeid\s*$',line[0:match.start(1) - 1])
+  if typeid_match:
+    return True
+
   remainder = line[match.end(0):]
 
   # The close paren is for function pointers as arguments to a function.
@@ -2828,7 +2832,8 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
     return True
 
   # At this point, all that should be left is actual casts.
-  error(filename, linenum, 'readability/casting', 4,
+  if len(remainder) > 0:
+    error(filename, linenum, 'readability/casting', 4,
         'Using C-style cast.  Use %s<%s>(...) instead' %
         (cast_type, match.group(1)))
 
@@ -3230,7 +3235,9 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   # should rely on the extension.
   if (filename != '-' and file_extension != 'cc' and file_extension != 'h'
       and file_extension != 'cpp' and file_extension != 'hh'):
-    sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
+    if (filename != "CMakeLists.txt" and file_extension != "in"
+        and file_extension != "proto" and file_extension != "sdf"):
+      sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
   else:
     ProcessFileData(filename, file_extension, lines, Error,
                     extra_check_functions)

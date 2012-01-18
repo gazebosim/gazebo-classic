@@ -61,7 +61,6 @@ void ImuSensor::LoadChild(XMLConfigNode *node)
   {
     gzthrow("Null body in the IMU sensor");
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -106,7 +105,7 @@ void ImuSensor::UpdateChild()
 
     double vlong, vlat;
 
-    //Quatern rot;
+    // Quatern rot;
     Vector3 rot;
     Vector3 pose;
 

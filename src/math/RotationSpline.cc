@@ -74,7 +74,7 @@ Quaternion RotationSpline::Interpolate(unsigned int _fromIndex, double _t,
   // Fast special cases
   if (_t == 0.0f)
     return this->points[_fromIndex];
-  else if(_t == 1.0f)
+  else if (_t == 1.0f)
     return this->points[_fromIndex + 1];
 
   // double interpolation
@@ -119,7 +119,7 @@ void RotationSpline::RecalcTangents()
     isClosed = false;
 
   Quaternion invp, part1, part2, preExp;
-  for(i = 0; i < numPoints; ++i)
+  for (i = 0; i < numPoints; ++i)
   {
     Quaternion &p = this->points[i];
     invp = p.GetInverse();
@@ -163,7 +163,7 @@ void RotationSpline::RecalcTangents()
   }
 }
 
-const Quaternion& RotationSpline::GetPoint(unsigned short _index) const
+const Quaternion& RotationSpline::GetPoint(unsigned int _index) const
 {
   assert (_index < this->points.size() && "Point index is out of bounds!!");
 
@@ -181,7 +181,7 @@ void RotationSpline::Clear()
   this->tangents.clear();
 }
 
-void RotationSpline::UpdatePoint(unsigned short _index,
+void RotationSpline::UpdatePoint(unsigned int _index,
                                  const Quaternion &_value)
 {
   assert (_index < this->points.size() && "Point index is out of bounds!!");

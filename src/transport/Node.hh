@@ -19,6 +19,10 @@
 #define NODE_HH
 
 #include <boost/enable_shared_from_this.hpp>
+#include <map>
+#include <list>
+#include <string>
+#include <vector>
 
 #include "transport/TransportTypes.hh"
 #include "transport/TopicManager.hh"

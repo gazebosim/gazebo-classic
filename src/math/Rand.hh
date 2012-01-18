@@ -73,10 +73,6 @@ namespace gazebo
       private: static GeneratorType *randGenerator;
     };
     /// \}
-
   }
-
 }
 #endif
-
-

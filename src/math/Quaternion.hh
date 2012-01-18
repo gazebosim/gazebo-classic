@@ -17,14 +17,13 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 
 #ifndef QUATERN_HH
 #define QUATERN_HH
 
-#include <iostream>
 #include <math.h>
+#include <iostream>
 #include <cmath>
 
 #include "math/Angle.hh"
@@ -262,7 +261,7 @@ namespace gazebo
                 Quaternion &_rkQ, bool _shortestPath = false);
 
     /// \brief Spherical linear interpolation
-    public: static Quaternion Slerp (double _fT, const Quaternion &_rkP,
+    public: static Quaternion Slerp(double _fT, const Quaternion &_rkP,
                 const Quaternion &_rkQ, bool _shortestPath = false);
 
 
@@ -286,20 +285,7 @@ namespace gazebo
                 const gazebo::math::Quaternion &q)
     {
       Vector3 v(q.GetAsEuler());
-      //v.x = v.x * 180.0 / M_PI;
-      //v.y = v.y * 180.0 / M_PI;
-      //v.z = v.z * 180.0 / M_PI;
-
-      /*if (std::isnan(v.x))
-        v.x = 90.0;
-      if (std::isnan(v.y))
-        v.y = 90.0;
-      if (std::isnan(v.z))
-        v.z = 90.0;
-        */
-
       out << v.x << " " << v.y << " " << v.z;
-
       return out;
     }
 
@@ -320,14 +306,8 @@ namespace gazebo
 
       return in;
     }
-
-
   };
-
   /// \}
   }
-
 }
 #endif
-
-

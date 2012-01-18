@@ -324,7 +324,7 @@ bool Param::Get(gazebo::math::Vector3 &_value)
           {
             elements.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
           }
-          catch (boost::bad_lexical_cast &e)
+          catch(boost::bad_lexical_cast &e)
           {
             gzerr << "value ["
                   << pieces[i]

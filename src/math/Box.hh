@@ -35,7 +35,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param _min Minimum corner of the box
       /// \param _max Maximum corner of the box
-      public: Box (const Vector3 &_min, const Vector3 &_max);
+      public: Box(const Vector3 &_min, const Vector3 &_max);
 
       /// \brief Copy Constructor
       /// \param _b Box to copy

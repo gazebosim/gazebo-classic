@@ -187,7 +187,6 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
   {
     this->transports.clear();
   }
-
 }
 
 //////////////////////////////////////////////////

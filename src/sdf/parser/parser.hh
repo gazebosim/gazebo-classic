@@ -17,8 +17,8 @@
 #ifndef SDF_PARSER_HH
 #define SDF_PARSER_HH
 
-#include <string>
 #include <tinyxml.h>
+#include <string>
 
 #include "sdf/interface/SDF.hh"
 
@@ -65,5 +65,3 @@ namespace sdf
 }
 
 #endif
-
-

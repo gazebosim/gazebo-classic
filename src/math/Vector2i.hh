@@ -22,8 +22,8 @@
 #ifndef VECTOR2I_HH
 #define VECTOR2I_HH
 
-#include <iostream>
 #include <math.h>
+#include <iostream>
 #include <fstream>
 
 namespace gazebo

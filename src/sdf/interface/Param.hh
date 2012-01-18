@@ -29,6 +29,7 @@
 #include <boost/function.hpp>
 #include <typeinfo>
 #include <string>
+#include <vector>
 
 #include "common/Console.hh"
 #include "common/Color.hh"
@@ -207,7 +208,7 @@ namespace sdf
       {
         this->value = boost::lexical_cast<T>(tmp);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch(boost::bad_lexical_cast &e)
       {
         if (str == "inf" || str == "-inf")
         {

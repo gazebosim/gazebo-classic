@@ -337,9 +337,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
             << gazebo_node->Attribute("version")
             << "] is not 1.0\n";
     return false;
-
   }
-
 
   return true;
 }
@@ -380,7 +378,6 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
             << gazeboNode->Attribute("version")
             << "] is not 1.0\n";
     return false;
-
   }
 
   return true;
@@ -502,9 +499,7 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
             pluginElem->GetAttribute("name")->SetFromString(
                 childElemXml->Attribute("name"));
           }
-
         }
-
         continue;
       }
 
@@ -580,7 +575,4 @@ void copyChildren(ElementPtr &_sdf, TiXmlElement *_xml)
     _sdf->elements.push_back(element);
   }
 }
-
 }
-
-

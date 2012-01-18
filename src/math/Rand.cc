@@ -17,12 +17,11 @@
 /* Desc: Random number generator
  * Author: Nate Koenig
  * Date: 27 May 2009
- * SVN: $Id:$
  */
 
-#include <ctime>
 #include <sys/types.h>
 #include <unistd.h>
+#include <ctime>
 
 #include "math/Rand.hh"
 
@@ -36,19 +35,16 @@ using namespace math;
 GeneratorType *Rand::randGenerator = new GeneratorType(getpid());
 
 //////////////////////////////////////////////////
-// Constructor
 Rand::Rand()
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Rand::~Rand()
 {
 }
 
 //////////////////////////////////////////////////
-/// Get a double from a uniform distribution
 double Rand::GetDblUniform(double _min, double _max)
 {
   URealGen gen(*randGenerator, UniformRealDist(_min, _max));
@@ -57,7 +53,6 @@ double Rand::GetDblUniform(double _min, double _max)
 }
 
 //////////////////////////////////////////////////
-/// Get a double from a normal distribution
 double Rand::GetDblNormal(double _mean, double _sigma)
 {
   NRealGen gen(*randGenerator, NormalRealDist(_mean, _sigma));
@@ -66,7 +61,6 @@ double Rand::GetDblNormal(double _mean, double _sigma)
 }
 
 //////////////////////////////////////////////////
-/// Get a integer from a uniform distribution
 int Rand::GetIntUniform(int _min, int _max)
 {
   UIntGen gen(*randGenerator, UniformIntDist(_min, _max));
@@ -75,11 +69,9 @@ int Rand::GetIntUniform(int _min, int _max)
 }
 
 //////////////////////////////////////////////////
-/// Get a double from a normal distribution
 int Rand::GetIntNormal(int _mean, int _sigma)
 {
   NRealGen gen(*randGenerator, NormalRealDist(_mean, _sigma));
 
-  return (int)(gen());
+  return static_cast<int>(gen());
 }
-

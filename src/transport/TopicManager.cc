@@ -185,7 +185,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 // Handle an incoming message
 void TopicManager::HandleIncoming()
 {
-  //implement this
+  // implement this
   // Read a header in the message the indicates the topic
 }
 
@@ -262,7 +262,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
   }
   else
   {
-    //TODO: Properly handle this error
+    // TODO: Properly handle this error
     gzerr << "Shouldn't get here topic[" << _topic << "]\n";
   }
 }

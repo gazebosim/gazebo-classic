@@ -17,16 +17,20 @@
 #ifndef CONNECTION_HH
 #define CONNECTION_HH
 
+#include <google/protobuf/message.h>
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include <string>
+#include <vector>
 #include <iostream>
 #include <iomanip>
 #include <deque>
 
-#include <google/protobuf/message.h>
 
 #include "common/Event.hh"
 #include "common/Console.hh"
@@ -56,12 +60,12 @@ namespace gazebo
       public: virtual ~Connection();
 
       /// \brief Connect to a remote host
-      public: bool Connect(const std::string &host, unsigned short port);
+      public: bool Connect(const std::string &host, unsigned int port);
 
       typedef boost::function<void(const ConnectionPtr&)> AcceptCallback;
 
       /// \brief Start a server that listens on a port
-      public: void Listen(unsigned short port, const AcceptCallback &accept_cb);
+      public: void Listen(unsigned int port, const AcceptCallback &accept_cb);
 
       typedef boost::function<void(const std::string &data)> ReadCallback;
       /// \brief Start a thread that reads from the connection, and passes
@@ -99,13 +103,13 @@ namespace gazebo
       public: std::string GetLocalAddress() const;
 
       /// \brief Get the port of this connection
-      public: unsigned short GetLocalPort() const;
+      public: unsigned int GetLocalPort() const;
 
       /// \brief Get the remote address
       public: std::string GetRemoteAddress() const;
 
       /// \brief Get the remote port number
-      public: unsigned short GetRemotePort() const;
+      public: unsigned int GetRemotePort() const;
 
       /// \brief Get the remote hostname
       public: std::string GetRemoteHostname() const;
@@ -180,13 +184,13 @@ namespace gazebo
                     boost::get<0>(_handler)("");
                     // This code tries to read the header again. We should
                     // never get here.
-                    //this->inbound_header.resize(HEADER_LENGTH);
+                    // this->inbound_header.resize(HEADER_LENGTH);
 
-                    //void (Connection::*f)(const boost::system::error_code &,
-                    //boost::tuple<Handler>) =
-                    //&Connection::OnReadHeader<Handler>;
+                    // void (Connection::*f)(const boost::system::error_code &,
+                    // boost::tuple<Handler>) =
+                    // &Connection::OnReadHeader<Handler>;
 
-                    //boost::asio::async_read(*this->socket,
+                    // boost::asio::async_read(*this->socket,
                     //    boost::asio::buffer(this->inbound_header),
                     //    boost::bind(f, this,
                     //      boost::asio::placeholders::error, _handler));
@@ -227,7 +231,6 @@ namespace gazebo
 
      private: void OnWrite(const boost::system::error_code &e,
                   boost::asio::streambuf *_b);
-           //std::list<boost::asio::const_buffer> *_buffer);
 
      /// \brief Handle new connections, if this is a server
      private: void OnAccept(const boost::system::error_code &e);
@@ -257,7 +260,6 @@ namespace gazebo
       // Called when a new connection is received
       private: AcceptCallback acceptCB;
 
-      //private: char inbound_header[HEADER_LENGTH];
       private: std::vector<char> inbound_header;
       private: std::vector<char> inbound_data;
 

@@ -31,7 +31,6 @@ ConnectionManager::ConnectionManager()
   this->tmpIndex = 0;
   this->initialized = false;
   this->stop = false;
-  //this->thread = NULL;
 
   this->serverConn = NULL;
   this->listMutex = new boost::recursive_mutex();
@@ -60,7 +59,7 @@ ConnectionManager::~ConnectionManager()
 //////////////////////////////////////////////////
 // Initialize the connection manager
 bool ConnectionManager::Init(const std::string &master_host,
-                             unsigned short master_port)
+                             unsigned int master_port)
 {
   this->stop = false;
   this->masterConn.reset(new Connection());
@@ -479,11 +478,11 @@ void ConnectionManager::Subscribe(const std::string &_topic,
 
   // TODO:
   // Find a current connection on the topic
-  //ConnectionPtr conn = this->FindConnection(topic);
+  // ConnectionPtr conn = this->FindConnection(topic);
 
   // If the connection to a remote publisher does not exist, then we need
   // to establish a connection.
-  //if (!conn)
+  // if (!conn)
   {
     msgs::Subscribe msg;
     msg.set_topic(_topic);
@@ -502,7 +501,7 @@ void ConnectionManager::Subscribe(const std::string &_topic,
 //////////////////////////////////////////////////
 // Connect to a remote server
 ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
-                                                       unsigned short port)
+                                                       unsigned int port)
 {
   ConnectionPtr conn;
 
@@ -546,7 +545,7 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 //////////////////////////////////////////////////
 // Find a connection that matches a host and port
 ConnectionPtr ConnectionManager::FindConnection(const std::string &host,
-                                                 unsigned short port)
+                                                 unsigned int port)
 {
   ConnectionPtr conn;
 

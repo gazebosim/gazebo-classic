@@ -23,8 +23,9 @@
 #ifndef SENSORMANAGER_HH
 #define SENSORMANAGER_HH
 
-#include <list>
 #include <boost/thread.hpp>
+#include <list>
+#include <string>
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"

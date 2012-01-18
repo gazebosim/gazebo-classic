@@ -21,8 +21,11 @@
 #ifndef PUBLISHER_HH
 #define PUBLISHER_HH
 
-#include <boost/thread.hpp>
 #include <google/protobuf/message.h>
+#include <boost/thread.hpp>
+#include <string>
+#include <list>
+
 #include "transport/TransportTypes.hh"
 
 namespace gazebo

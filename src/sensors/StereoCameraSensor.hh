@@ -27,6 +27,8 @@
 #include <OgreTexture.h>
 #include <OgreMaterial.h>
 
+#include <string>
+
 #include "rendering/Camera.hh"
 #include "Sensor.hh"
 
@@ -91,8 +93,6 @@ namespace gazebo
     private: void FillBuffers();
 
     private: Ogre::TexturePtr CreateRTT(const std::string &name, bool depth);
-
-    //private: void UpdateAllDependentRenderTargets();
 
     private: Ogre::TexturePtr renderTexture[4];
     private: Ogre::RenderTarget *renderTargets[4];

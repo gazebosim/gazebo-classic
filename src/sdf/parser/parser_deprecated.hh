@@ -37,10 +37,11 @@
 #ifndef URDF_PARSER_DEPRECATED_HH
 #define URDF_PARSER_DEPRECATED_HH
 
+#include <libxml/parser.h>
+#include <boost/shared_ptr.hpp>
+
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
-#include <libxml/parser.h>
 
 #include "sdf/interface/SDF.hh"
 #include "math/Pose.hh"
@@ -124,10 +125,5 @@ namespace deprecated_sdf
   // Get the value of this node
   std::string getValue(xmlNodePtr node);
   void PreParser(const std::string &fname, std::string &output);
-
-
 }
-
 #endif
-
-

@@ -161,7 +161,6 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
   Vector3 a = v2 - v1;
   Vector3 b = v3 - v1;
   Vector3 n = a.GetCrossProd(b);
-  //n.Normalize();
   return n;
 }
 

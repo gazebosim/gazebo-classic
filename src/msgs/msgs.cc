@@ -544,7 +544,4 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
 
   return result;
 }
-
-
 } }
-

@@ -22,6 +22,8 @@
 #ifndef DEPTHCAMERASENSOR_HH
 #define DEPTHCAMERASENSOR_HH
 
+#include <string>
+
 #include "sensors/Sensor.hh"
 #include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"

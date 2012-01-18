@@ -479,7 +479,6 @@ Vector3 Quaternion::GetXAxis() const
   double fTzz = fTz*this->z;
 
   return Vector3(1.0f-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
-
 }
 
 Vector3 Quaternion::GetYAxis() const
@@ -594,7 +593,7 @@ Quaternion Quaternion::Squad(double _fT, const Quaternion &_rkP,
   return Slerp(fSlerpT, kSlerpP, kSlerpQ);
 }
 
-Quaternion Quaternion::Slerp (double _fT, const Quaternion &_rkP,
+Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     const Quaternion &_rkQ, bool _shortestPath)
 {
   double fCos = _rkP.Dot(_rkQ);

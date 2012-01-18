@@ -1,11 +1,28 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #ifndef CALLBACKHELPER_HH
 #define CALLBACKHELPER_HH
 
-#include <vector>
-
+#include <google/protobuf/message.h>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <google/protobuf/message.h>
+
+#include <vector>
+#include <string>
 
 #include "common/Console.hh"
 #include "msgs/msgs.h"
@@ -24,6 +41,8 @@ namespace gazebo
     class CallbackHelper
     {
       public: CallbackHelper() : latching(false) {}
+      public: virtual ~CallbackHelper() {}
+
       /// \brief Get the typename of the message that is handled
       public: virtual std::string GetMsgType() const = 0;
 
@@ -126,26 +145,14 @@ namespace gazebo
 
       public: virtual bool HandleMessage(const google::protobuf::Message *msg)
               {
-                //std::string data;
-                //msg->SerializeToString(data);
-
                 return this->HandleData(msg->DebugString());
               }
 
       public: virtual bool HandleData(const std::string &newdata)
               {
-                /*msgs::Packet packet;
-                packet.ParseFromString(newdata);
-
-                // TODO: Handle this error properly
-                if (packet.type() != "data")
-                  gzerr << "CallbackHelperT::HandleData Invalid message!!!\n";
-                  */
-
                 msgs::Packet packet;
                 packet.ParseFromString(newdata);
 
-                //ConstStringPtr m(new msgs::String);
                 boost::shared_ptr<msgs::String> m(new msgs::String);
                 m->ParseFromString(newdata);
                 this->callback(m);

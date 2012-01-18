@@ -171,7 +171,7 @@ void Spline::RecalcTangents()
 
   this->tangents.resize(numPoints);
 
-  for(i = 0; i < numPoints; ++i)
+  for (i = 0; i < numPoints; ++i)
   {
     if (i == 0)
     {
@@ -208,7 +208,7 @@ void Spline::RecalcTangents()
 }
 
 ///////////////////////////////////////////////////////////
-const Vector3 &Spline::GetPoint(unsigned short _index) const
+const Vector3 &Spline::GetPoint(unsigned int _index) const
 {
   assert (_index < this->points.size() && "Point index is out of bounds!!");
   return this->points[_index];

@@ -53,7 +53,7 @@ Element::~Element()
 
   this->value.reset();
 
-  //this->Reset();
+  // this->Reset();
 }
 
 ElementPtr Element::GetParent() const
@@ -314,7 +314,7 @@ void Element::PrintValues(std::string _prefix)
       << (*aiter)->GetAsString() << "'";
   }
 
-  if(this->elements.size() > 0)
+  if (this->elements.size() > 0)
   {
     std::cout << ">\n";
     ElementPtr_V::iterator eiter;
@@ -358,7 +358,7 @@ void Element::ToString(const std::string &_prefix,
     _out << " " << (*aiter)->GetKey() << "='" << (*aiter)->GetAsString() << "'";
   }
 
-  if(this->elements.size() > 0)
+  if (this->elements.size() > 0)
   {
     _out << ">\n";
     ElementPtr_V::const_iterator eiter;
@@ -380,7 +380,6 @@ void Element::ToString(const std::string &_prefix,
       _out << "/>\n";
     }
   }
-
 }
 
 bool Element::HasAttribute(const std::string &_key)

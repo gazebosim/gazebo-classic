@@ -40,14 +40,14 @@ const Matrix4 Matrix4::ZERO(
 // Default constructor
 Matrix4::Matrix4()
 {
-  memset(this->m, 0, sizeof(double)*16);
+  memset(this->m, 0, sizeof(this->m[0][0])*16);
 }
 
 //////////////////////////////////////////////////
 // Copy constructor
 Matrix4::Matrix4(const Matrix4 &_m)
 {
-  memcpy(this->m, _m.m, sizeof(double)*16);
+  memcpy(this->m, _m.m, sizeof(this->m[0][0])*16);
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +121,7 @@ void Matrix4::SetScale(const Vector3 &_s)
 // Equality operator
 Matrix4 &Matrix4::operator =(const Matrix4 &_mat)
 {
-  memcpy(this->m, _mat.m, sizeof(double)*16);
+  memcpy(this->m, _mat.m, sizeof(this->m[0][0])*16);
   return *this;
 }
 

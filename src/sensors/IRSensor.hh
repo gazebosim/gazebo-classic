@@ -74,11 +74,8 @@ namespace gazebo
       public: Pose GetPose(unsigned int index) const;
 
       private: std::vector<RaySensor*> irBeams;
-
     };
     /// \}
   }
 }
-
 #endif
-

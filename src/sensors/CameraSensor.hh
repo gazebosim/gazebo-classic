@@ -22,6 +22,8 @@
 #ifndef CAMERASENSOR_HH
 #define CAMERASENSOR_HH
 
+#include <string>
+
 #include "sensors/Sensor.hh"
 #include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"

@@ -27,32 +27,29 @@ using namespace math;
 
 
 //////////////////////////////////////////////////
-/// Default constructors
 Pose::Pose()
   : pos(0, 0, 0), rot(1, 0, 0, 0)
 {
 }
 
 //////////////////////////////////////////////////
-/// Constructor
 Pose::Pose(const Vector3 &_pos, const Quaternion &_rot)
   : pos(_pos), rot(_rot)
 {
 }
 
 //////////////////////////////////////////////////
-/// Copy constructor
 Pose::Pose(const Pose &_pose)
   : pos(_pose.pos), rot(_pose.rot)
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Pose::~Pose()
 {
 }
 
+//////////////////////////////////////////////////
 void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 {
   this->pos = _pos;
@@ -60,14 +57,12 @@ void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
-// See if a pose is finite (e.g., not nan)
 bool Pose::IsFinite() const
 {
   return this->pos.IsFinite() && this->rot.IsFinite();
 }
 
 //////////////////////////////////////////////////
-/// Get the inverse of this pose
 Pose Pose::GetInverse() const
 {
   Quaternion inv = this->rot.GetInverse();
@@ -75,7 +70,6 @@ Pose Pose::GetInverse() const
 }
 
 //////////////////////////////////////////////////
-// Add two poses: result = this + obj
 Pose Pose::operator+(const Pose &obj) const
 {
   Pose result;
@@ -87,7 +81,6 @@ Pose Pose::operator+(const Pose &obj) const
 }
 
 //////////////////////////////////////////////////
-/// Add-Equals operator
 const Pose &Pose::operator+=(const Pose &obj)
 {
   this->pos = this->CoordPositionAdd(obj);
@@ -97,7 +90,6 @@ const Pose &Pose::operator+=(const Pose &obj)
 }
 
 //////////////////////////////////////////////////
-// Add two poses: result = this - obj
 const Pose &Pose::operator-=(const Pose &_obj)
 {
   this->pos = this->CoordPositionSub(_obj);
@@ -119,14 +111,12 @@ bool Pose::operator!=(const Pose &_pose) const
 }
 
 //////////////////////////////////////////////////
-/// Multiplication operator
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose), this->rot * pose.rot);
 }
 
 //////////////////////////////////////////////////
-// Add one point to a vector: result = this + pos
 Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 {
   Quaternion tmp;
@@ -147,7 +137,6 @@ Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 }
 
 //////////////////////////////////////////////////
-// Add one point to another: result = this + pose
 Vector3 Pose::CoordPositionAdd(const Pose &_pose) const
 {
   Quaternion tmp;
@@ -159,7 +148,6 @@ Vector3 Pose::CoordPositionAdd(const Pose &_pose) const
   tmp.y = this->pos.y;
   tmp.z = this->pos.z;
 
-  //tmp = (tmp * _pose.rot) * _pose.rot.GetInverse();
   tmp = _pose.rot * (tmp * _pose.rot.GetInverse());
 
   result.x = _pose.pos.x + tmp.x;
@@ -170,14 +158,12 @@ Vector3 Pose::CoordPositionAdd(const Pose &_pose) const
 }
 
 //////////////////////////////////////////////////
-// Add one rotation to another: result =  this->rot + rot
 Quaternion Pose::CoordRotationAdd(const Quaternion &_rot) const
 {
   return Quaternion(_rot * this->rot);
 }
 
 //////////////////////////////////////////////////
-/// Reset the pose
 void Pose::Reset()
 {
   // set the position to zero
@@ -187,8 +173,6 @@ void Pose::Reset()
 
 
 //////////////////////////////////////////////////
-// Find the inverse of a pose; i.e., if b = this + a, given b and this,
-// find a
 Pose Pose::CoordPoseSolve(const Pose &_b) const
 {
   Quaternion q;
@@ -203,7 +187,6 @@ Pose Pose::CoordPoseSolve(const Pose &_b) const
 }
 
 //////////////////////////////////////////////////
-// Rotate a vector by a quaternion, added for computing CG location for the Body
 Pose Pose::RotatePositionAboutOrigin(const Quaternion &_rot) const
 {
   Pose a = *this;
@@ -220,10 +203,8 @@ Pose Pose::RotatePositionAboutOrigin(const Quaternion &_rot) const
 }
 
 //////////////////////////////////////////////////
-/// Round all values to _decimalPlaces
 void Pose::Round(int _precision)
 {
   this->rot.Round(_precision);
   this->pos.Round(_precision);
 }
-
