@@ -84,7 +84,7 @@ BulletPhysics::~BulletPhysics()
   delete this->solver;
 
   // TODO: Fix this line
-  //delete this->dynamicsWorld;
+  // delete this->dynamicsWorld;
 
   this->broadPhase = NULL;
   this->collisionConfig = NULL;
@@ -144,9 +144,9 @@ void BulletPhysics::UpdatePhysics()
 
   steps = std::max(steps, 1);
 
-  //time = 0.000001;
-  //steps = 1;
-  //this->dynamicsWorld->stepSimulation(time, steps, (**this->stepTimeP));
+  // time = 0.000001;
+  // steps = 1;
+  // this->dynamicsWorld->stepSimulation(time, steps, (**this->stepTimeP));
   this->dynamicsWorld->stepSimulation((**this->stepTimeP).Double());
 
   this->lastUpdatecommon::Time = Simulator::Instance()->GetRealTime();
@@ -293,4 +293,5 @@ void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
   this->dynamicsWorld->setGravity(btmath::Vector3(_gravity.x,
         _gravity.y, _gravity.z));
 }
+
 

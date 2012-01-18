@@ -23,6 +23,7 @@
 #define RAYSHAPE_HH
 
 #include <float.h>
+#include <string>
 
 #include "physics/PhysicsTypes.hh"
 #include "physics/Shape.hh"
@@ -120,4 +121,5 @@ namespace gazebo
   }
 }
 #endif
+
 

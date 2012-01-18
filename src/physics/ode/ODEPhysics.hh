@@ -22,12 +22,16 @@
 #ifndef ODEPHYSICS_HH
 #define ODEPHYSICS_HH
 
-#include "physics/ode/ode_inc.h"
-
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
+#include <map>
+#include <string>
+#include <vector>
+#include <utility>
 
 #include <boost/thread/thread.hpp>
+
+#include "physics/ode/ode_inc.h"
 
 #include "physics/ode/ODETypes.hh"
 
@@ -230,5 +234,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
 
 

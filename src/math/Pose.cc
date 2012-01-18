@@ -208,3 +208,4 @@ void Pose::Round(int _precision)
   this->rot.Round(_precision);
   this->pos.Round(_precision);
 }
+

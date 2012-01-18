@@ -43,7 +43,6 @@ LightMaker::LightMaker() : EntityMaker()
   this->msg.set_attenuation_linear(0.01);
   this->msg.set_attenuation_quadratic(0.001);
   this->msg.set_range(20);
-
 }
 
 void LightMaker::Start(const rendering::UserCameraPtr _camera)
@@ -104,4 +103,5 @@ void LightMaker::CreateTheEntity()
   this->lightPub->Publish(this->msg);
   this->camera.reset();
 }
+
 

@@ -26,8 +26,9 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <iostream>
 #include <string.h>
+
+#include <iostream>
 
 #include "rendering/ogre.h"
 
@@ -77,7 +78,7 @@ RenderEngine::RenderEngine()
 //////////////////////////////////////////////////
 RenderEngine::~RenderEngine()
 {
-  //this->Fini();
+  // this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -104,7 +105,7 @@ void RenderEngine::Load()
   {
     this->root = new Ogre::Root();
   }
-  catch (Ogre::Exception &e)
+  catch(Ogre::Exception &e)
   {
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
   }
@@ -223,7 +224,7 @@ void RenderEngine::Render()
 //////////////////////////////////////////////////
 void RenderEngine::PostRender()
 {
-  //_fireFrameRenderingQueued needs to be here for CEGUI to work
+  // _fireFrameRenderingQueued needs to be here for CEGUI to work
   this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
 }
@@ -295,10 +296,8 @@ void RenderEngine::Fini()
     {
       delete this->root;
     }
-    catch (...) 
-    {
-      ;
-    }
+    catch(...)
+    { }
   }
   this->root = NULL;
 
@@ -307,10 +306,11 @@ void RenderEngine::Fini()
 
   if (this->dummyDisplay)
   {
-    glXDestroyContext((Display*)this->dummyDisplay,
-                      (GLXContext)this->dummyContext);
-    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
-    XCloseDisplay((Display*)this->dummyDisplay);
+    glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
+                      static_cast<GLXContext>(this->dummyContext));
+    XDestroyWindow(static_cast<Display*>(this->dummyDisplay),
+                   this->dummyWindowId);
+    XCloseDisplay(static_cast<Display*>(this->dummyDisplay));
     this->dummyDisplay = NULL;
   }
 
@@ -321,7 +321,7 @@ void RenderEngine::Fini()
 void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<rendering:ogre>\n";
-  //this->scenes[0]->Save(prefix, stream);
+  // this->scenes[0]->Save(prefix, stream);
   stream << prefix << "</rendering:ogre>\n";
 }
 
@@ -360,7 +360,7 @@ void RenderEngine::LoadPlugins()
         // Load the plugin into OGRE
         this->root->loadPlugin(*piter);
       }
-      catch (Ogre::Exception &e)
+      catch(Ogre::Exception &e)
       {
         std::string description("Unable to load Ogre Plugin[");
         description.append(*piter);
@@ -369,7 +369,6 @@ void RenderEngine::LoadPlugins()
       }
     }
   }
-
 }
 
 void RenderEngine::AddResourcePath(const std::string &_path)
@@ -379,7 +378,7 @@ void RenderEngine::AddResourcePath(const std::string &_path)
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
         _path, "FileSystem", "General");
   }
-  catch (Ogre::Exception)
+  catch(Ogre::Exception)
   {
     gzthrow(std::string("Unable to load Ogre Resources.\nMake sure the") +
         "resources path in the world file is set correctly.");
@@ -440,7 +439,7 @@ void RenderEngine::SetupResources()
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
             aiter->first, "FileSystem", aiter->second);
       }
-      catch (Ogre::Exception)
+      catch(Ogre::Exception)
       {
         gzthrow(std::string("Unable to load Ogre Resources.\n") +
             "Make sure the resources path in the world file is set correctly.");
@@ -468,7 +467,7 @@ void RenderEngine::SetupRenderSystem()
 
   do
   {
-    if (c == (int)rsList->size())
+    if (c == static_cast<int>(rsList->size()))
       break;
 
     renderSys = rsList->at(c);
@@ -523,15 +522,19 @@ void RenderEngine::CreateContext()
   int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16,
     GLX_STENCIL_SIZE, 8, None };
 
-  XVisualInfo *dummyVisual = glXChooseVisual((Display*)this->dummyDisplay,
-      screen, (int *)attribList);
+  XVisualInfo *dummyVisual = glXChooseVisual(
+      static_cast<Display*>(this->dummyDisplay),
+      screen, static_cast<int *>(attribList));
 
-  this->dummyWindowId = XCreateSimpleWindow((Display*)this->dummyDisplay,
-      RootWindow((Display*)this->dummyDisplay, screen), 0, 0, 1, 1, 0, 0, 0);
+  this->dummyWindowId = XCreateSimpleWindow(
+      static_cast<Display*>(this->dummyDisplay),
+      RootWindow(static_cast<Display*>(this->dummyDisplay), screen),
+      0, 0, 1, 1, 0, 0, 0);
 
-  this->dummyContext = glXCreateContext((Display*)this->dummyDisplay,
+  this->dummyContext = glXCreateContext(
+      static_cast<Display*>(this->dummyDisplay),
       dummyVisual, NULL, 1);
 
-  glXMakeCurrent((Display*)this->dummyDisplay,
-      this->dummyWindowId, (GLXContext)this->dummyContext);
+  glXMakeCurrent(static_cast<Display*>(this->dummyDisplay),
+      this->dummyWindowId, static_cast<GLXContext>(this->dummyContext));
 }

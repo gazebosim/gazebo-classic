@@ -22,6 +22,8 @@
 #ifndef ODEHEIGHTMAPSHAPE_HH
 #define ODEHEIGHTMAPSHAPE_HH
 
+#include <vector>
+
 #include "physics/HeightmapShape.hh"
 #include "physics/ode/ODEPhysics.hh"
 #include "physics/Collision.hh"
@@ -65,5 +67,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
 
 

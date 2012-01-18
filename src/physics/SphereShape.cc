@@ -72,3 +72,4 @@ void SphereShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetRadius(_msg.sphere().radius());
 }
 
+

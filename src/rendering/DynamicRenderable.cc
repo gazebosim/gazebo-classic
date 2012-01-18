@@ -153,7 +153,6 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
     // Make capacity the next power of two
     while (newVertCapacity < vertexCount)
       newVertCapacity <<= 1;
-
   }
   else if (vertexCount < this->vertexBufferCapacity>>1)
   {
@@ -184,7 +183,7 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
 
   if (this->mRenderOp.useIndexes)
   {
-    OgreAssert(indexCount <= std::numeric_limits<unsigned short>::max(),
+    OgreAssert(indexCount <= std::numeric_limits<uint16_t>::max(),
         "indexCount exceeds 16 bit");
 
     size_t newIndexCapacity = this->indexBufferCapacity;
@@ -202,7 +201,6 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
       // Make capacity the next power of two
       while (newIndexCapacity < indexCount)
         newIndexCapacity <<= 1;
-
     }
     else if (indexCount < newIndexCapacity>>1)
     {
@@ -248,5 +246,6 @@ Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
   vDist = cam->getDerivedPosition() - vMid;
   return vDist.squaredLength();
 }
+
 
 

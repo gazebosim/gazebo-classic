@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 #include <QtGui>
 
 #include "transport/Node.hh"
@@ -17,7 +33,7 @@ ModelEditWidget::ModelEditWidget(QWidget *_parent)
   this->treeWidget = new QTreeWidget();
   this->treeWidget->setColumnCount(1);
   this->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  //this->treeWidget->header()->hide();
+  // this->treeWidget->header()->hide();
   mainLayout->addWidget(this->treeWidget);
 
   this->setLayout(mainLayout);
@@ -32,14 +48,13 @@ ModelEditWidget::~ModelEditWidget()
 
 void ModelEditWidget::showEvent(QShowEvent * /*_event*/)
 {
-  //this->sceneWidget->Init();
-  //this->physicsWidget->Init();
+  // this->sceneWidget->Init();
+  // this->physicsWidget->Init();
 }
 
 void ModelEditWidget::closeEvent(QCloseEvent * /*_event*/)
 {
 }
-
 
 ModelPropertyWidget::ModelPropertyWidget(QWidget * /*_parent*/)
 {
@@ -115,4 +130,5 @@ ModelPropertyWidget::ModelPropertyWidget(QWidget * /*_parent*/)
 ModelPropertyWidget::~ModelPropertyWidget()
 {
 }
+
 

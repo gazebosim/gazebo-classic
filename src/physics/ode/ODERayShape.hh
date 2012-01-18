@@ -23,6 +23,8 @@
 #ifndef ODERAYSHAPE_HH
 #define ODERAYSHAPE_HH
 
+#include <string>
+
 #include "physics/RayShape.hh"
 #include "physics/Shape.hh"
 
@@ -79,5 +81,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
 
 

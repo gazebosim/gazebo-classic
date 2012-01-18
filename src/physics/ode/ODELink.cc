@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#include <sstream>
 #include <math.h>
+#include <sstream>
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -135,7 +135,7 @@ void ODELink::MoveCallback(dBodyID _id)
   const dReal *p;
   const dReal *r;
   ODELink *self = static_cast<ODELink*>(dBodyGetData(_id));
-  //self->poseMutex->lock();
+  // self->poseMutex->lock();
 
   p = dBodyGetPosition(_id);
   r = dBodyGetQuaternion(_id);
@@ -151,7 +151,7 @@ void ODELink::MoveCallback(dBodyID _id)
 
   self->world->dirtyPoses.push_back(self);
 
-  //self->poseMutex->unlock();
+  // self->poseMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -493,4 +493,8 @@ bool ODELink::GetKinematic() const
 
   return result;
 }
+
+
+
+
 

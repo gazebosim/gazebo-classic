@@ -18,12 +18,12 @@
  * Author: Andrew Howard and Nate Koenig
  */
 
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-
-#include <tbb/parallel_for.h>
-#include <tbb/blocked_range.h>
 
 #include "sdf/parser/parser.hh"
 #include "transport/Node.hh"
@@ -152,7 +152,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
   {
     // Make all incoming messages wait until the world is done loading.
-    //boost::mutex::scoped_lock lock(*this->receiveMutex);
+    // boost::mutex::scoped_lock lock(*this->receiveMutex);
 
     std::string type = _sdf->GetElement("physics")->GetValueString("type");
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
@@ -175,14 +175,13 @@ void World::Load(sdf::ElementPtr _sdf)
     // TODO: Performance test to see if TBB model updating is necessary
     // Choose threaded or unthreaded model updating depending on the number of
     // models in the scene
-    //if (this->GetModelCount() < 20)
+    // if (this->GetModelCount() < 20)
     this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-    //else
-    //this->modelUpdateFunc = &World::ModelUpdateTBB;
+    // else
+    // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
     event::Events::worldCreated(this->GetName());
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -313,7 +312,7 @@ void World::Update()
   (*this.*modelUpdateFunc)();
 
   // TODO: put back in
-  //Logger::Instance()->Update();
+  // Logger::Instance()->Update();
 
   // Update the physics engine
   if (this->physicsEngine)
@@ -560,7 +559,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
   }
   else
     this->selectedEntity.reset();
-  //event::Events::entitySelected(this->selectedEntity);
+  // event::Events::entitySelected(this->selectedEntity);
 }
 
 //////////////////////////////////////////////////
@@ -921,7 +920,6 @@ void World::ProcessFactoryMsgs()
         gzerr << "Unable to read sdf string\n";
         continue;
       }
-
     }
     else if ((*iter).has_sdf_filename() && !(*iter).sdf_filename().empty())
     {
@@ -1002,3 +1000,4 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   this->testRay->GetIntersection(dist, entityName);
   return this->GetEntityByName(entityName);
 }
+

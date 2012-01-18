@@ -26,7 +26,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Default constructor
 SurfaceParams::SurfaceParams()
 {
   // Bounce param
@@ -38,7 +37,10 @@ SurfaceParams::SurfaceParams()
   this->kp = 1000000.0;
   this->kd = 10000.0;
   this->cfm = 0;
-  this->erp = 0.2; // hm, not defined in sdf?
+
+  // hm, not defined in sdf?
+  this->erp = 0.2;
+
   this->mu1 = 1.0;
   this->mu2 = 1.0;
   this->maxVel = -1.0;
@@ -47,6 +49,11 @@ SurfaceParams::SurfaceParams()
   this->slip2 = 0.0;
   this->enableFriction = true;
   this->fdir1 = math::Vector3(0, 0, 0);
+}
+
+//////////////////////////////////////////////////
+SurfaceParams::~SurfaceParams()
+{
 }
 
 //////////////////////////////////////////////////
@@ -142,4 +149,5 @@ void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_min_depth())
     this->minDepth = _msg.min_depth();
 }
+
 

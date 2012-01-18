@@ -18,7 +18,6 @@
  * Desc: Factory for creating physics engine
  * Author: Nate Koenig
  * Date: 21 May 2009
- * SVN info: $Id:$
  */
 
 #include "physics/World.hh"
@@ -29,9 +28,9 @@
 
 void RegisterODEPhysics();
 
-//#ifdef INCLUDE_BULLET
-//void RegisterBulletPhysics();
-//#endif
+// #ifdef INCLUDE_BULLET
+// void RegisterBulletPhysics();
+// #endif
 
 using namespace gazebo;
 using namespace physics;
@@ -44,9 +43,9 @@ void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
 
-//#ifdef INCLUDE_BULLET
-//  RegisterBulletPhysics();
-//#endif
+// #ifdef INCLUDE_BULLET
+//   RegisterBulletPhysics();
+// #endif
 }
 
 //////////////////////////////////////////////////

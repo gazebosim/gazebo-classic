@@ -98,3 +98,4 @@ void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetSize(_msg.cylinder().radius(), _msg.cylinder().length());
 }
 
+

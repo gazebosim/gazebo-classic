@@ -36,7 +36,7 @@ namespace gazebo
     /// \{
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-    ///\brief A single axis hinge joint
+    /// \brief A single axis hinge joint
     class ODEHingeJoint : public HingeJoint<ODEJoint>
     {
       ///  Constructor
@@ -95,10 +95,6 @@ namespace gazebo
 
     /// \}
     /// \}
-
   }
 }
 #endif
-
-
-

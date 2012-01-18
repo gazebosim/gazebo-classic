@@ -162,3 +162,4 @@ void BulletHeightmapCollision::Save(std::string &_prefix, std::ostream &_stream)
   _stream << _prefix << *(this->offsetP) << "\n";
 }
 
+

@@ -19,6 +19,8 @@
  * Date: 03 Apr 2007
  */
 
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "msgs/msgs.h"
 
 #include "common/Events.hh"
@@ -33,12 +35,10 @@
 #include "physics/RayShape.hh"
 #include "physics/Collision.hh"
 #include "physics/Model.hh"
-#include "physics/Collision.hh"
 #include "physics/Link.hh"
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/Entity.hh"
-#include <boost/thread/recursive_mutex.hpp>
 
 using namespace gazebo;
 using namespace physics;
@@ -69,7 +69,7 @@ Entity::~Entity()
   Base_V::iterator iter;
 
   // TODO: put this back in
-  //this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
   delete this->visualMsg;
   this->visualMsg = NULL;
@@ -116,7 +116,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   if (this->parent)
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
 
-  //this->visPub->Publish(*this->visualMsg);
+  // this->visPub->Publish(*this->visualMsg);
 
   this->poseMsg->set_name(this->GetScopedName());
 
@@ -142,7 +142,7 @@ void Entity::SetStatic(const bool &_s)
 {
   Base_V::iterator iter;
 
-  this->isStatic = _s ;
+  this->isStatic = _s;
 
   for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
   {
@@ -186,7 +186,6 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim)
   this->onAnimationComplete.clear();
   this->animationConnection = event::Events::ConnectWorldUpdateStart(
       boost::bind(&Entity::UpdateAnimation, this));
-
 }
 
 //////////////////////////////////////////////////
@@ -280,8 +279,9 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
   this->worldPose = _pose;
   this->worldPose.Correct();
 
+  // (OnPoseChange uses GetWorldPose)
   if (_notify)
-    this->UpdatePhysicsPose(false); // (OnPoseChange uses GetWorldPose)
+    this->UpdatePhysicsPose(false);
 
   //
   // user deliberate setting: lock and update all children's wp
@@ -294,7 +294,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
   {
     if ((*iter)->HasType(ENTITY))
     {
-      Entity *entity = (Entity*)((*iter).get());
+      Entity *entity = reinterpret_cast<Entity*>((*iter).get());
 
       if (entity->IsCanonicalLink())
       {
@@ -401,10 +401,10 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
           iter != this->childrenEnd; ++iter)
     {
       if ((*iter)->HasType(LINK))
-        ((Link*)(*iter).get())->OnPoseChange();
+        reinterpret_cast<Link*>((*iter).get())->OnPoseChange();
       else
       {
-        Collision *coll = ((Collision*)(*iter).get());
+        Collision *coll = reinterpret_cast<Collision*>((*iter).get());
 
         if (this->IsStatic())
           coll->worldPose = this->worldPose + coll->initialRelativePose;
@@ -594,3 +594,4 @@ void Entity::PlaceOnNearestEntityBelow()
     this->SetWorldPose(p);
   }
 }
+

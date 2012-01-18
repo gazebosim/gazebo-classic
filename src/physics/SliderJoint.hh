@@ -75,8 +75,8 @@ namespace gazebo
       protected: math::Vector3 fakeAnchor;
     };
     /// \}
-
   }
 }
 #endif
+
 

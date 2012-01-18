@@ -22,6 +22,9 @@
 #ifndef HEIGHTMAPSHAPE_HH
 #define HEIGHTMAPSHAPE_HH
 
+#include <string>
+#include <vector>
+
 #include "common/Image.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Shape.hh"
@@ -64,7 +67,7 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
+
 

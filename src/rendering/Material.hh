@@ -32,7 +32,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
-

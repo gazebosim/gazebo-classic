@@ -23,6 +23,7 @@
 #define RENDERENGINE_HH
 
 #include <vector>
+#include <string>
 
 #include "msgs/msgs.h"
 #include "common/SingletonT.hh"
@@ -109,7 +110,7 @@ namespace gazebo
       private: Ogre::LogManager *logManager;
 
       /// ID for a dummy window. Used for gui-less operation
-      protected: unsigned long dummyWindowId;
+      protected: uint64_t dummyWindowId;
 
       /// Pointer to the dummy display.Used for gui-less operation
       protected: void *dummyDisplay;
@@ -134,4 +135,5 @@ namespace gazebo
   }
 }
 #endif
+
 

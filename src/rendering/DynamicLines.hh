@@ -23,10 +23,11 @@
 #ifndef OGREDYNAMICLINES_HH
 #define OGREDYNAMICLINES_HH
 
+#include <vector>
+#include <string>
+
 #include "math/Vector3.hh"
 #include "rendering/DynamicRenderable.hh"
-
-#include <vector>
 
 namespace gazebo
 {
@@ -88,4 +89,5 @@ namespace gazebo
   }
 }
 #endif
+
 

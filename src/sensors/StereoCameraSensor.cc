@@ -473,18 +473,18 @@ void StereoCameraSensor::SaveFrame()
     char tmp[1024];
     if (!this->savePathname.empty())
     {
-      //if (i == 0)
+      // if (i == 0)
         sprintf(tmp, "%s/%s-%04d-left.png", this->savePathname.c_str(),
             this->GetName().c_str(), this->saveCount);
-      //else
-        //sprintf(tmp, "%s/%s-%04d-right.png", this->savePathname.c_str(),
-            //this->GetName().c_str(), this->saveCount);
+      // else
+        // sprintf(tmp, "%s/%s-%04d-right.png", this->savePathname.c_str(),
+            // this->GetName().c_str(), this->saveCount);
     }
     else
     {
-      //if (i == 0)
+      // if (i == 0)
         sprintf(tmp, "%s-%04d-left.png", this->GetName().c_str(), this->saveCount);
-      //else
+      // else
        // sprintf(tmp, "%s-%04d-right.png", this->GetName().c_str(), this->saveCount);
     }
 
@@ -548,13 +548,13 @@ void StereoCameraSensor::StereoCameraListener::preViewportUpdate(const Ogre::Ren
   pos += offset * this->camera->getRight();
   this->camera->setPosition(pos);
 
-  //this->sensor->UpdateAllDependentRenderTargets();
-  //this->sensor->chooseDebugPlaneMaterial(mIsLeftEye);
+  // this->sensor->UpdateAllDependentRenderTargets();
+  // this->sensor->chooseDebugPlaneMaterial(mIsLeftEye);
 }
 
 void StereoCameraSensor::StereoCameraListener::postViewportUpdate(const Ogre::RenderTargetViewportEvent &evt)
 {
-  //this->sensor->ReadDepthImage();
+  // this->sensor->ReadDepthImage();
 
   this->camera->setFrustumOffset(0, 0);
   this->camera->setPosition(this->pos);
@@ -580,4 +580,5 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name,
       pf,
       Ogre::TU_RENDERTARGET);
 }
+
 

@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+#ifndef RENDER_EVENTS_HH_
+#define RENDER_EVENTS_HH_
+
+#include <string>
 #include "common/Event.hh"
 #include "msgs/msgs.h"
 
@@ -41,5 +45,4 @@ namespace gazebo
     };
   }
 }
-
-
+#endif

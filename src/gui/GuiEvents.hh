@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+#ifndef GUI_EVENTS_HH
+#define GUI_EVENTS_HH
+
+#include <string>
 #include "common/Event.hh"
 #include "msgs/msgs.h"
 
@@ -100,4 +104,5 @@ namespace gazebo
     };
   }
 }
+#endif
 

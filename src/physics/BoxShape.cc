@@ -72,3 +72,4 @@ void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetSize(msgs::Convert(_msg.box().size()));
 }
 
+

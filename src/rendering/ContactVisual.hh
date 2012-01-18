@@ -21,6 +21,9 @@
 #ifndef CONTACTVISUAL_HH
 #define CONTACTVISUAL_HH
 
+#include <string>
+#include <vector>
+
 #include "rendering/Visual.hh"
 
 namespace gazebo
@@ -55,4 +58,5 @@ namespace gazebo
   }
 }
 #endif
+
 

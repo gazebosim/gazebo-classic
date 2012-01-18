@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 #include <QtGui>
 #include <iomanip>
 
@@ -72,8 +88,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   this->xyzLabel = new QLabel(tr("XYZ:"));
   this->rpyLabel = new QLabel(tr("RPY:"));
-  //QLabel *fpsLabel = new QLabel(tr("FPS:"));
-  //QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
+  // QLabel *fpsLabel = new QLabel(tr("FPS:"));
+  // QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
 
   bottomBarLayout = new QHBoxLayout;
   bottomBarLayout->addWidget(this->xyzLabel);
@@ -89,10 +105,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
 
   bottomBarLayout->addItem(
       new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  //bottomBarLayout->addWidget(fpsLabel);
-  //bottomBarLayout->addWidget(this->fpsEdit);
-  //bottomBarLayout->addWidget(trianglesLabel);
-  //bottomBarLayout->addWidget(this->trianglesEdit);
+  // bottomBarLayout->addWidget(fpsLabel);
+  // bottomBarLayout->addWidget(this->fpsEdit);
+  // bottomBarLayout->addWidget(trianglesLabel);
+  // bottomBarLayout->addWidget(this->trianglesEdit);
   bottomBarLayout->addSpacing(10);
 
   frameLayout->addWidget(this->glWidget);
@@ -139,8 +155,8 @@ void RenderWidget::OnFullScreen(bool &_value)
     this->rollEdit->hide();
     this->pitchEdit->hide();
     this->yawEdit->hide();
-    //this->fpsEdit->hide();
-    //this->trianglesEdit->hide();
+    // this->fpsEdit->hide();
+    // this->trianglesEdit->hide();
   }
   else
   {
@@ -157,8 +173,8 @@ void RenderWidget::OnFullScreen(bool &_value)
     this->rollEdit->show();
     this->pitchEdit->show();
     this->yawEdit->show();
-    //this->fpsEdit->show();
-    //this->trianglesEdit->show();
+    // this->fpsEdit->show();
+    // this->trianglesEdit->show();
   }
 }
 
@@ -185,8 +201,8 @@ void RenderWidget::update()
     return;
   }
 
-  //float fps = cam->GetAvgFPS();
-  //int triangleCount = cam->GetTriangleCount();
+  // float fps = cam->GetAvgFPS();
+  // int triangleCount = cam->GetTriangleCount();
   math::Pose pose = cam->GetWorldPose();
 
   std::ostringstream stream;
@@ -240,4 +256,5 @@ void RenderWidget::CreateScene(const std::string &_name)
   this->create = true;
   this->createName = _name;
 }
+
 

@@ -17,6 +17,8 @@
 #ifndef ORBITVIEWCONTROLLER_HH
 #define ORBITVIEWCONTROLLER_HH
 
+#include <string>
+
 #include "rendering/ViewController.hh"
 #include "math/Vector3.hh"
 
@@ -75,4 +77,5 @@ namespace gazebo
   }
 }
 #endif
+
 

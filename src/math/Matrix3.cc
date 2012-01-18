@@ -104,3 +104,4 @@ void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
   m[2][_i] = _v.z;
 }
 
+

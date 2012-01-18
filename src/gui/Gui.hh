@@ -17,6 +17,7 @@
 #ifndef GAZEBO_GUI_HH
 #define GAZEBO_GUI_HH
 
+#include <string>
 #include "rendering/Rendering.hh"
 
 namespace gazebo
@@ -42,6 +43,5 @@ namespace gazebo
     bool has_entity_name(const std::string &_name);
   }
 }
-
 #endif
 

@@ -48,7 +48,7 @@ void Server::LoadPlugin(const std::string &_filename)
 bool Server::Load(const std::string &_filename)
 {
   std::string host = "";
-  unsigned short port = 0;
+  unsigned int port = 0;
 
   gazebo::transport::get_master_uri(host, port);
 
@@ -90,7 +90,7 @@ bool Server::Load(const std::string &_filename)
   {
     physics::WorldPtr world = physics::create_world();
 
-    //Create the world
+    // Create the world
     try
     {
       physics::load_world(world, worldElem);
@@ -270,4 +270,5 @@ void Server::ProcessControlMsgs()
   }
   this->controlMsgs.clear();
 }
+
 

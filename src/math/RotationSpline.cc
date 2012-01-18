@@ -196,3 +196,4 @@ void RotationSpline::SetAutoCalculate(bool _autoCalc)
   this->autoCalc = _autoCalc;
 }
 
+

@@ -635,3 +635,4 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
   }
 }
 
+

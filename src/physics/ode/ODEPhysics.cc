@@ -18,11 +18,10 @@
  * Author: Nate Koenig
  * Date: 11 June 2007
  */
-
-#include "gazebo_config.h"
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include "gazebo_config.h"
 #include "common/Diagnostics.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -123,7 +122,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   this->worldId = dWorldCreate();
 
-  //this->spaceId = dSimpleSpaceCreate(0);
+  // this->spaceId = dSimpleSpaceCreate(0);
   this->spaceId = dHashSpaceCreate(0);
   dHashSpaceSetLevels(this->spaceId, -2, 8);
 
@@ -216,7 +215,6 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
     this->physicsStepFunc = &dWorldStep;
   else
     gzthrow(std::string("Invalid step type[") + this->stepType);
-
 }
 
 void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
@@ -327,23 +325,23 @@ void ODEPhysics::UpdateCollision()
   this->contactFeedbacks.clear();
 
   // Collide all the collisions
-  //if (this->colliders.size() < 50)
-  //if (this->collidersCount < 50)
-  //{
-    for (unsigned int i = 0; i<this->collidersCount; i++)
+  // if (this->colliders.size() < 50)
+  // if (this->collidersCount < 50)
+  // {
+    for (unsigned int i = 0; i < this->collidersCount; i++)
     {
       this->Collide(this->colliders[i].first,
                     this->colliders[i].second, this->contactCollisions);
     }
-  //}
-  //else
-  //{
+  // }
+  // else
+  // {
   //  tbb::parallel_for(tbb::blocked_range<size_t>(0,
   //        this->collidersCount, 10), Colliders_TBB(&this->colliders, this));
-  //}
+  // }
 
   // Trimesh collision must happen in this thread sequentially
-  for (unsigned int i = 0; i<this->trimeshCollidersCount; i++)
+  for (unsigned int i = 0; i < this->trimeshCollidersCount; i++)
   {
     ODECollision *collision1 = this->trimeshColliders[i].first;
     ODECollision *collision2 = this->trimeshColliders[i].second;
@@ -351,20 +349,20 @@ void ODEPhysics::UpdateCollision()
   }
 
 
-  //printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
+  // printf("ContactFeedbacks[%d]\n", this->contactFeedbacks.size());
   // Process all the contact feedbacks
   // tbb not has memeory issues
-  //if (this->contactFeedbacks.size() < 50)
-  //{
-  //}
-  //else
-  //{
+  // if (this->contactFeedbacks.size() < 50)
+  // {
+  // }
+  // else
+  // {
   //  // Process all the contacts, get the feedback info, and call the collision
   //  // callbacks
   //  tbb::parallel_for(tbb::blocked_range<size_t>(0,
   //        this->contactFeedbacks.size(), MAX_CONTACT_JOINTS),
   //      ContactUpdate_TBB(&this->contactFeedbacks));
-  //}
+  // }
 }
 
 //////////////////////////////////////////////////
@@ -521,7 +519,7 @@ dWorldID ODEPhysics::GetWorldId()
 /// Convert an odeMass to Mass
 void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
 {
-  dMass *odeMass = (dMass*)_engineMass;
+  dMass *odeMass = static_cast<dMass*>(_engineMass);
 
   _inertial->SetMass(odeMass->mass);
   _inertial->SetCoG(odeMass->c[0], odeMass->c[1], odeMass->c[2]);
@@ -643,7 +641,7 @@ int ODEPhysics::GetMaxContacts()
 /// Convert an odeMass to Mass
 void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
 {
-  dMass *odeMass = (dMass*)(_engineMass);
+  dMass *odeMass = static_cast<dMass*>(_engineMass);
 
   odeMass->mass = _inertial->GetMass();
   odeMass->c[0] = _inertial->GetCoG()[0];
@@ -827,7 +825,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
   double h = this->stepTimeDouble;
 
-  contact.surface.mode = //dContactFDir1 |
+  contact.surface.mode =  // dContactFDir1 |
                          dContactBounce |
                          dContactMu2 |
                          dContactSoftERP |
@@ -843,17 +841,17 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
   double kd = collision1->surface->kd + collision2->surface->kd;
   contact.surface.soft_erp = h * kp / (h * kp + kd);
   contact.surface.soft_cfm = 1.0 / (h * kp + kd);
-  //contact.surface.soft_erp = 0.5*(collision1->surface->softERP +
+  // contact.surface.soft_erp = 0.5*(collision1->surface->softERP +
   //                                collision2->surface->softERP);
-  //contact.surface.soft_cfm = 0.5*(collision1->surface->softCFM +
+  // contact.surface.soft_cfm = 0.5*(collision1->surface->softCFM +
   //                                collision2->surface->softCFM);
 
-  //contact.fdir1[0] = 0.5*
-  //(collision1->surface->fdir1.x+collision2->surface->fdir1.x);
-  //contact.fdir1[1] = 0.5*
-  //(collision1->surface->fdir1.y+collision2->surface->fdir1.y);
-  //contact.fdir1[2] = 0.5*
-  //(collision1->surface->fdir1.z+collision2->surface->fdir1.z);
+  // contact.fdir1[0] = 0.5*
+  // (collision1->surface->fdir1.x+collision2->surface->fdir1.x);
+  // contact.fdir1[1] = 0.5*
+  // (collision1->surface->fdir1.y+collision2->surface->fdir1.y);
+  // contact.fdir1[2] = 0.5*
+  // (collision1->surface->fdir1.z+collision2->surface->fdir1.z);
 
   contact.surface.mu = std::min(collision1->surface->mu1,
                                 collision2->surface->mu1);
@@ -872,11 +870,11 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
   dBodyID b1 = dGeomGetBody(collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(collision2->GetCollisionId());
 
-  for (int j = 0; j<numc; j++)
+  for (int j = 0; j < numc; j++)
   {
     // A depth of <0 may never occur. Commenting this out for now.
     // skip negative depth contacts
-    if(contactCollisions[this->indices[j]].depth < 0)
+    if (contactCollisions[this->indices[j]].depth < 0)
     {
       gzerr << "negative depth ["
             << contactCollisions[this->indices[j]].depth << "]\n";
@@ -885,7 +883,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
 
     contact.geom = contactCollisions[this->indices[j]];
     dJointID contact_joint =
-      dJointCreateContact (this->worldId, this->contactGroup, &contact);
+      dJointCreateContact(this->worldId, this->contactGroup, &contact);
 
     // Store the contact info
     if (contactFeedback)
@@ -904,7 +902,7 @@ void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
       dJointSetFeedback(contact_joint, &(contactFeedback->feedbacks[j]));
     }
 
-    dJointAttach (contact_joint, b1, b2);
+    dJointAttach(contact_joint, b1, b2);
 
     // my joints map
     LinkPtr link1 = collision1->GetLink();
@@ -972,3 +970,7 @@ void ODEPhysics::AddCollider(ODECollision *_collision1,
   this->colliders[this->collidersCount].second = _collision2;
   this->collidersCount++;
 }
+
+
+
+

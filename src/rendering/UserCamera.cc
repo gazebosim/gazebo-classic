@@ -19,8 +19,9 @@
  * Date: 19 Jun 2008
  */
 
-#include "rendering/ogre.h"
 #include <sstream>
+
+#include "rendering/ogre.h"
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -192,16 +193,17 @@ void UserCamera::PostRender()
     char tmp[1024];
     if (!path.empty())
     {
-      sprintf(tmp, "%s/%s-%04d.jpg", path.c_str(),
+      snprintf(tmp, sizeof(tmp), "%s/%s-%04d.jpg", path.c_str(),
           this->name.c_str(), this->saveCount);
     }
     else
     {
-      sprintf(tmp, "%s-%04d.jpg", this->name.c_str(), this->saveCount);
+      snprintf(tmp, sizeof(tmp),
+          "%s-%04d.jpg", this->name.c_str(), this->saveCount);
     }
 
     // TODO: Use the window manager instead.
-    //this->window->writeContentsToFile(tmp);
+    // this->window->writeContentsToFile(tmp);
 
     this->saveCount++;
   }
@@ -322,8 +324,8 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
   if (this->viewport)
   {
     this->viewport->setDimensions(0, 0, 1, 1);
-    double ratio = (double)this->viewport->getActualWidth() /
-                   (double)this->viewport->getActualHeight();
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+                   static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
       this->sdf->GetOrCreateElement("horizontal_fov")->GetValueDouble("angle");
@@ -337,14 +339,13 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
                         this->viewport->getActualHeight());
     }
   }
-
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
                                        float /*w_*/, float /*h_*/)
 {
-  //this->viewport->setDimensions(x, y, w, h);
+  // this->viewport->setDimensions(x, y, w, h);
 }
 
 //////////////////////////////////////////////////
@@ -362,13 +363,13 @@ float UserCamera::GetTriangleCount() const
 //////////////////////////////////////////////////
 void UserCamera::ToggleShowVisual()
 {
-  //this->visual->ToggleVisible();
+  // this->visual->ToggleVisible();
 }
 
 //////////////////////////////////////////////////
 void UserCamera::ShowVisual(bool /*_s*/)
 {
-  //this->visual->SetVisible(_s);
+  // this->visual->SetVisible(_s);
 }
 
 //////////////////////////////////////////////////
@@ -596,3 +597,4 @@ void UserCamera::EnableViewController(bool _value) const
 {
   this->viewController->SetEnabled(_value);
 }
+

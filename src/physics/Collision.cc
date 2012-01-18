@@ -109,7 +109,7 @@ void Collision::Load(sdf::ElementPtr &_sdf)
   if (this->shape->GetType() != MULTIRAY_SHAPE &&
       this->shape->GetType() != RAY_SHAPE)
   {
-    //this->visPub->Publish(this->CreateCollisionVisual());
+    // this->visPub->Publish(this->CreateCollisionVisual());
   }
 }
 
@@ -136,7 +136,7 @@ void Collision::CreateBoundingBox()
     box = this->GetBoundingBox();
 
     std::ostringstream visname;
-    visname << this->GetScopedName() << "::BBVISUAL" ;
+    visname << this->GetScopedName() << "::BBVISUAL";
 
     msgs::Visual msg;
     msg.mutable_geometry()->set_type(msgs::Geometry::BOX);
@@ -144,7 +144,6 @@ void Collision::CreateBoundingBox()
     msg.set_name(this->GetScopedName() + "_BBVISUAL");
     msg.set_cast_shadows(false);
 
-    //msg.set_visible(RenderState::GetShowBoundingBoxes());
     if (this->IsStatic())
       msg.mutable_material()->set_script("Gazebo/YellowTransparent");
     else
@@ -157,8 +156,6 @@ void Collision::CreateBoundingBox()
     msgs::Set(msg.mutable_pose()->mutable_orientation(),
               math::Quaternion(1, 0, 0, 0));
     msg.set_transparency(.5);
-
-    //this->visPub->Publish(msg);
   }
 }
 
@@ -209,7 +206,7 @@ void Collision::ShowBoundingBox(const bool &_show)
     msg.set_name(this->bbVisual);
     msg.set_visible(_show);
     msg.set_delete_me(true);
-    //this->visPub->Publish(msg);
+    // this->visPub->Publish(msg);
   }
 }
 
@@ -280,7 +277,7 @@ void Collision::EnabledCB(bool _enabled)
   else
     msg.mutable_material()->set_script("Gazebo/RedTransparent");
 
-  //this->visPub->Publish(msg);
+  // this->visPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
@@ -467,4 +464,5 @@ msgs::Visual Collision::CreateCollisionVisual()
 
   return msg;
 }
+
 

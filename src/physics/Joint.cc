@@ -106,9 +106,9 @@ void Joint::Load(sdf::ElementPtr &_sdf)
 
   // setting anchor relative to gazebo link frame origin
   if (this->childLink)
-    this->anchorPos = (offset + this->childLink->GetWorldPose()).pos ;
+    this->anchorPos = (offset + this->childLink->GetWorldPose()).pos;
   else
-    this->anchorPos = math::Vector3(0, 0, 0); // default for world
+    this->anchorPos = math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
@@ -156,7 +156,6 @@ void Joint::Init()
              << "]\n";
     }
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -248,3 +247,4 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
 {
   this->staticAngle = _angle;
 }
+

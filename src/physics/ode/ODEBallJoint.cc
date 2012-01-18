@@ -17,7 +17,6 @@
 /* Desc: An ODE ball joint
  * Author: Nate Koenig
  * Date: k13 Oct 2009
- * SVN: $Id: ODEBallJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #include "gazebo_config.h"
@@ -28,21 +27,18 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor
 ODEBallJoint::ODEBallJoint(dWorldID _worldId)
-    : BallJoint<ODEJoint>()
+: BallJoint<ODEJoint>()
 {
   this->jointId = dJointCreateBall(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODEBallJoint::~ODEBallJoint()
 {
 }
 
 //////////////////////////////////////////////////
-// Get the joints anchor point
 math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 {
   dVector3 result;
@@ -52,16 +48,13 @@ math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 
 
 //////////////////////////////////////////////////
-// Set the joints anchor point
 void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 {
   dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void ODEBallJoint::SetDamping(int /*_index*/, const double _damping)
 {
   dJointSetDamping(this->jointId, _damping);
 }
-

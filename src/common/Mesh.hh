@@ -91,7 +91,7 @@ namespace gazebo
       public: const SubMesh *GetSubMesh(unsigned int i) const;
 
       /// \brief Put all the data into flat arrays
-      public: void FillArrays(float **_vertArr, unsigned int **_indArr) const;
+      public: void FillArrays(float **_vertArr, int **_indArr) const;
 
       /// \brief Recalculate all the normals.
       public: void RecalculateNormals();
@@ -223,7 +223,7 @@ namespace gazebo
       public: unsigned int GetVertexIndex(const math::Vector3 &_v) const;
 
       /// \brief Put all the data into flat arrays
-      public: void FillArrays(float **_vertArr, unsigned int **_indArr) const;
+      public: void FillArrays(float **_vertArr, int **_indArr) const;
 
       /// \brief Recalculate all the normals.
       public: void RecalculateNormals();
@@ -248,3 +248,4 @@ namespace gazebo
   }
 }
 #endif
+

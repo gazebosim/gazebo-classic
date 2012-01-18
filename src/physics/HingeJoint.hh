@@ -29,7 +29,7 @@ namespace gazebo
 {
   namespace physics
   {
-    ///\brief A single axis hinge joint
+    /// \brief A single axis hinge joint
     template<class T>
     class HingeJoint : public T
     {
@@ -61,11 +61,9 @@ namespace gazebo
                        this->SetHighStop(0, limitElem->GetValueDouble("upper"));
                      }
                    }
-
                  }
       };
   }
 }
 #endif
-
 

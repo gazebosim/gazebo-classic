@@ -96,7 +96,7 @@ void ODEJoint::Load(sdf::ElementPtr &_sdf)
           elem->GetElement("velocity")->GetValueDouble());
   }
 
-  //TODO: reimplement
+  // TODO: reimplement
   /*if (**this->provideFeedbackP)
   {
     this->feedback = new dJointFeedback;
@@ -372,4 +372,8 @@ void ODEJoint::Reset()
   dJointReset(this->jointId);
   Joint::Reset();
 }
+
+
+
+
 

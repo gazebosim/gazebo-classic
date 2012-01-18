@@ -78,7 +78,6 @@ namespace gazebo
 
       /// \brief Set the parameter to value
       public: virtual void SetParam(int parameter, double value);
-
     };
 
     /// \}
@@ -86,5 +85,3 @@ namespace gazebo
   }
 }
 #endif
-
-

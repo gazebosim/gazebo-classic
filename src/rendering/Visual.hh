@@ -24,6 +24,9 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
+#include <utility>
+#include <list>
+#include <vector>
 
 #include "common/Event.hh"
 #include "math/Box.hh"
@@ -57,10 +60,10 @@ namespace gazebo
     class Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
-      public: Visual (const std::string &name, VisualPtr _parent);
+      public: Visual(const std::string &name, VisualPtr _parent);
 
       /// \brief Constructor
-      public: Visual (const std::string &name, Scene *scene);
+      public: Visual(const std::string &name, Scene *scene);
 
       /// \brief Destructor
       public: virtual ~Visual();
@@ -298,7 +301,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
-

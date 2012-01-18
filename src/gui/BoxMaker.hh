@@ -52,7 +52,7 @@ namespace gazebo
       private: static unsigned int counter;
     };
   }
-
 }
 #endif
+
 

@@ -17,11 +17,11 @@
 /* Desc: Heightmap geometry
  * Author: Nate Keonig
  * Date: 12 May 2009
- * SVN: $Id:$
  */
 
 #ifndef HEIGHTMAP_HH
 #define HEIGHTMAP_HH
+#include <string>
 
 // TODO: remove this line
 #include "rendering/ogre.h"
@@ -73,7 +73,7 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
+
 

@@ -94,3 +94,4 @@ bool SubscriptionTransport::IsLocal() const
 {
   return false;
 }
+

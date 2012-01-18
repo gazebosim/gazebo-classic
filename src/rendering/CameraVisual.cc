@@ -28,7 +28,7 @@ using namespace gazebo;
 using namespace rendering;
 
 /// \brief Constructor
-CameraVisual::CameraVisual (const std::string &_name, VisualPtr _vis)
+CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 : Visual(_name, _vis)
 {
 }
@@ -42,7 +42,7 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
 {
   double dist = 2.0;
   double width = 1.0;
-  double height = _height / (double)_width;
+  double height = _height / static_cast<double>(_width);
 
   this->camera = this->scene->CreateCamera(this->GetName(), true);
   this->camera->Load();
@@ -97,6 +97,7 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   this->AttachObject(planeEnt);
   this->camera->AttachToVisual(this->GetName(), true);
 }
+
 
 
 

@@ -74,7 +74,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 }
 
 //////////////////////////////////////////////////
-Visual::Visual (const std::string &_name, Scene *_scene)
+Visual::Visual(const std::string &_name, Scene *_scene)
 {
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -248,7 +248,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    if(_msg->material().has_script())
+    if (_msg->material().has_script())
     {
       sdf::ElementPtr elem = this->sdf->GetOrCreateElement("material");
       elem->GetAttribute("script")->Set(_msg->material().script());
@@ -286,7 +286,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_cast_shadows())
     this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
 
-  //if (msg->has_scale())
+  // if (msg->has_scale())
   // this->SetScale(msgs::Convert(msg->scale()));
 
   this->Load();
@@ -343,7 +343,7 @@ void Visual::Load()
       else
         obj = (Ogre::MovableObject*)mgr->createEntity(stream.str(), meshName);
     }
-    catch (Ogre::Exception &e)
+    catch(Ogre::Exception &e)
     {
       gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
       gzthrow("Unable to create a mesh from " + meshName);
@@ -384,7 +384,6 @@ void Visual::Load()
       this->SetSpecular(matElem->GetElement("speclar")->GetValueColor("rgba"));
     else if (matElem->HasElement("emissive"))
       this->SetEmissive(matElem->GetElement("emissive")->GetValueColor("rgba"));
-
   }
 
   // Allow the mesh to cast shadows
@@ -638,7 +637,7 @@ void Visual::SetMaterial(const std::string &materialName)
     origMaterial =
       Ogre::MaterialManager::getSingleton().getByName(materialName);
   }
-  catch (Ogre::Exception &e)
+  catch(Ogre::Exception &e)
   {
     gzwarn << "Unable to get Material[" << materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
@@ -682,7 +681,7 @@ void Visual::SetMaterial(const std::string &materialName)
         ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
   }
-  catch (Ogre::Exception &e)
+  catch(Ogre::Exception &e)
   {
     gzwarn << "Unable to set Material[" << this->myMaterialName
            << "] to Geometry["
@@ -838,7 +837,7 @@ void Visual::AttachAxes()
 {
   std::ostringstream nodeName;
 
-  nodeName << this->sceneNode->getName()<<"_AXES_NODE";
+  nodeName << this->sceneNode->getName() << "_AXES_NODE";
 
   if (!this->sceneNode->getCreator()->hasEntity("axis_cylinder"))
     this->InsertMesh(common::MeshManager::Instance()->GetMesh("axis_cylinder"));
@@ -889,7 +888,8 @@ void Visual::SetTransparency(float _trans)
   if (_trans == this->transparency)
     return;
 
-  this->transparency = std::min(std::max(_trans, (float)0.0), (float)1.0);
+  this->transparency = std::min(
+      std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
@@ -1040,10 +1040,9 @@ void Visual::SetPosition(const math::Vector3 &_pos)
     this->staticGeom->reset();
     delete this->staticGeom;
     this->staticGeom = NULL;
-    //this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
+    // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
   }*/
   this->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
-
 }
 
 //////////////////////////////////////////////////
@@ -1201,7 +1200,9 @@ void Visual::SetRibbonTrail(bool value)
     try
     {
       this->ribbonTrail->addNode(this->sceneNode);
-    } catch (...) {;}
+    }
+    catch(...)
+    { }
   }
   else
   {
@@ -1288,7 +1289,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
     }
   }
 
-  while(it.hasMoreElements())
+  while (it.hasMoreElements())
   {
     Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
     this->GetBoundsHelper(next, box);
@@ -1321,7 +1322,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
       Ogre::HardwareVertexBufferSharedPtr vBuf;
       Ogre::HardwareIndexBufferSharedPtr iBuf;
       float *vertices;
-      unsigned short *indices;
+      uint16_t *indices;
 
       size_t currOffset = 0;
 
@@ -1399,7 +1400,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
             false);
 
       iBuf = ogreSubMesh->indexData->indexBuffer;
-      indices = static_cast<unsigned short*>(
+      indices = static_cast<uint16_t*>(
           iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
       unsigned int j;
@@ -1459,7 +1460,7 @@ void Visual::InsertMesh(const common::Mesh *mesh)
     // this line makes clear the mesh is loaded (avoids memory leaks)
     ogreMesh->load();
   }
-  catch (Ogre::Exception &e)
+  catch(Ogre::Exception &e)
   {
     gzerr << "Unable to insert mesh[" << e.getDescription() << std::endl;
   }
@@ -1671,5 +1672,6 @@ void Visual::ShowCollision(bool _show)
     (*iter)->ShowCollision(_show);
   }
 }
+
 
 

@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#include <boost/bind.hpp>
 #include <sys/stat.h>
+#include <boost/bind.hpp>
 
 #include "rendering/Scene.hh"
 #include "rendering/Visual.hh"
@@ -134,7 +134,7 @@ void RTShaderSystem::RemoveScene(Scene *_scene)
     this->shaderGenerator->removeSceneManager(_scene->GetManager());
     this->shaderGenerator->removeAllShaderBasedTechniques();
     this->shaderGenerator->flushShaderCache();
-    //this->UpdateShaders();
+    // this->UpdateShaders();
   }
 }
 
@@ -182,7 +182,6 @@ void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, Scene *_scene)
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
   _viewport->setMaterialScheme(_scene->GetName());
 #endif
-
 }
 
 
@@ -256,7 +255,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
 
             renderState->addTemplateSubRenderState(perPerVertexLightModel);
           }
-          else //if (vis->GetShaderType() == "pixel")
+          else
           {
             Ogre::RTShader::SubRenderState* perPixelLightModel =
               this->shaderGenerator->createSubRenderState(
@@ -357,11 +356,11 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           // Get the tmp dir
           tmpdir = getenv("TMP");
           if (!tmpdir)
-            tmpdir = (char*)"/tmp";
+            tmpdir = const_cast<char*>("/tmp");
           // Get the user
           user = getenv("USER");
           if (!user)
-            user = (char*)"nobody";
+            user = const_cast<char*>("nobody");
           stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
           cachePath = stream.str();
           // Create the directory
@@ -373,7 +372,6 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
                 <<  strerror(errno) << "]";
               throw(errStream.str());
             }
-
           }
 
           coreLibsFound = true;
@@ -440,7 +438,7 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
 
   // Set up caster material - this is just a standard depth/shadow map caster
   sceneMgr->setShadowTextureCasterMaterial("PSSM/shadow_caster");
-  //sceneMgr->setShadowTextureCasterMaterial("shadow_caster");
+  // sceneMgr->setShadowTextureCasterMaterial("shadow_caster");
 
 
   // Disable fog on the caster pass.
@@ -481,3 +479,4 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
 
   this->UpdateShaders();
 }
+

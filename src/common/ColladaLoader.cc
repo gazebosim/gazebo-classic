@@ -647,7 +647,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     subMesh->AddTexCoord(texcoords[values[iter->second]].x,
     texcoords[values[iter->second]].y);
     }
-  //else
+  // else
   // gzerr << "Unhandled semantic[" << iter->first << "]\n";
 
   }
@@ -742,3 +742,4 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material * /*_mat*/)
   // _mat->SetBlendFactors(ONE_MINUS_SRC_ALPHA, SRC_ALPHA);
   // _mat->SetBlendFactors(srcFactor, dstFactor);
 }
+

@@ -67,7 +67,6 @@ Base::~Base()
   this->children.clear();
   this->childrenEnd = this->children.end();
   this->sdf.reset();
-
 }
 
 //////////////////////////////////////////////////
@@ -386,4 +385,5 @@ const sdf::ElementPtr &Base::GetSDF()
   this->sdf->Update();
   return this->sdf;
 }
+
 

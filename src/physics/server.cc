@@ -50,10 +50,10 @@ void PrintVersion()
 //////////////////////////////////////////////////
 int ParseArgs(int _argc, char **_argv)
 {
-  //FILE *tmpFile;
+  // FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("h");
+  char *flags = const_cast<char*>("h");
 
   // Get letter options
   while ((ch = getopt(_argc, _argv, flags)) != -1)
@@ -96,17 +96,17 @@ void Load()
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
 
-  while(worldElem)
+  while (worldElem)
   {
     gazebo::physics::WorldPtr world =
       gazebo::physics::create_world(worldElem->GetValueString("name"));
 
-    //Create the world
+    // Create the world
     try
     {
       gazebo::physics::load_world(world, worldElem);
     }
-    catch (gazebo::common::Exception &e)
+    catch(gazebo::common::Exception &e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -130,7 +130,7 @@ void Run()
 //////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  //Application Setup
+  // Application Setup
   if (ParseArgs(_argc, _argv) != 0)
     return -1;
 
@@ -147,4 +147,5 @@ int main(int _argc, char **_argv)
 
   return 0;
 }
+
 

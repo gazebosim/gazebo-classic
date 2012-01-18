@@ -21,6 +21,8 @@
 #ifndef CAMERAVISUAL_HH
 #define CAMERAVISUAL_HH
 
+#include <string>
+
 #include "rendering/Visual.hh"
 
 namespace gazebo
@@ -31,13 +33,12 @@ namespace gazebo
     class CameraVisual : public Visual
     {
       public: CameraVisual(const std::string &_name, VisualPtr _vis);
+      public: virtual ~CameraVisual();
 
       public: void Load(unsigned int _width, unsigned int _height);
-      public: virtual ~CameraVisual();
 
       private: CameraPtr camera;
     };
   }
 }
 #endif
-

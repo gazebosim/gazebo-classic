@@ -285,3 +285,4 @@ double Vector4::operator[](unsigned int index) const
   }
 }
 
+

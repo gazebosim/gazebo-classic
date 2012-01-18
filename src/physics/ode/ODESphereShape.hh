@@ -49,13 +49,9 @@ namespace gazebo
         else
           dGeomSphereSetRadius(oParent->GetCollisionId(), radius);
       }
-
     };
     /// \}
     /// \}
-
   }
 }
 #endif
-
-

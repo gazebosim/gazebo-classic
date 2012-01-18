@@ -50,7 +50,7 @@ void gui::load()
   for (int i = 0; i < g_argc; i++)
   {
     g_argv[i] = new char[strlen("gazebo")];
-    strcpy(g_argv[i], "gazebo");
+    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
 
   g_app = new QApplication(g_argc, g_argv);
@@ -137,4 +137,5 @@ bool gui::has_entity_name(const std::string &_name)
 {
   return g_main_win->HasEntityName(_name);
 }
+
 

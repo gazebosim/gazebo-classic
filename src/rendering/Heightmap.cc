@@ -101,8 +101,8 @@ void Heightmap::Load(std::string imageFilename,
 
   terrainVertSize = img.GetWidth();
 
-  float nf = (float)(log(terrainVertSize-1)/log(2));
-  int ni = (int)(log(terrainVertSize-1)/log(2));
+  float nf = static_cast<float>(log(terrainVertSize-1)/log(2));
+  int ni = static_cast<int>(log(terrainVertSize-1)/log(2));
 
   // Make sure the heightmap image size is (2^n)+1 in size
   if (nf - ni != 0)
@@ -111,7 +111,7 @@ void Heightmap::Load(std::string imageFilename,
   }
 
   // Calculate a good tile size
-  tileSize = (int)(pow(2, ni/2));
+  tileSize = static_cast<int>(pow(2, ni/2));
 
   if (tileSize <= 2)
   {
@@ -121,7 +121,7 @@ void Heightmap::Load(std::string imageFilename,
   tileSize++;
 
   stream << "WorldTexture =" << worldTexture << "\n";
-  //The detail texture
+  // The detail texture
   stream << "DetailTexture =" << detailTexture << "\n";
   // number of times the detail texture will tile in a terrain tile
   stream << "DetailTile = 3\n";
@@ -169,5 +169,6 @@ void Heightmap::Load(std::string imageFilename,
 
   free(mstr);
 }
+
 
 

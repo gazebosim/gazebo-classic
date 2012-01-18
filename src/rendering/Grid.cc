@@ -141,7 +141,7 @@ void Grid::Create()
 {
   this->manualObject->clear();
 
-  float extent = (this->cellLengthP*((double)this->cellCountP))/2;
+  float extent = (this->cellLengthP * static_cast<double>(this->cellCountP))/2;
 
   this->manualObject->setCastShadows(false);
   this->manualObject->estimateVertexCount(
@@ -154,8 +154,8 @@ void Grid::Create()
   for (uint32_t h = 0; h <= this->height; ++h)
   {
     float h_real = this->h_offsetP +
-      (this->height / 2.0f - (float)h) * this->cellLengthP;
-    for(uint32_t i = 0; i <= this->cellCountP; i++)
+      (this->height / 2.0f - static_cast<float>(h)) * this->cellLengthP;
+    for (uint32_t i = 0; i <= this->cellCountP; i++)
     {
       float inc = extent - (i * this->cellLengthP);
 
@@ -204,3 +204,4 @@ void Grid::SetUserData(const Ogre::Any& data_)
 {
   this->manualObject->setUserAny(data_);
 }
+

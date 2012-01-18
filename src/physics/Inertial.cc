@@ -322,17 +322,17 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
     this->SetLinearDamping(_msg.linear_damping());
   if (_msg.has_angular_damping())
     this->SetAngularDamping(_msg.angular_damping());
-  if(_msg.has_ixx())
+  if (_msg.has_ixx())
     this->SetIXX(_msg.ixx());
-  if(_msg.has_ixy())
+  if (_msg.has_ixy())
     this->SetIXY(_msg.ixy());
-  if(_msg.has_ixz())
+  if (_msg.has_ixz())
     this->SetIXZ(_msg.ixz());
-  if(_msg.has_iyy())
+  if (_msg.has_iyy())
     this->SetIYY(_msg.iyy());
-  if(_msg.has_iyz())
+  if (_msg.has_iyz())
     this->SetIYZ(_msg.iyz());
-  if(_msg.has_izz())
+  if (_msg.has_izz())
     this->SetIZZ(_msg.izz());
 }
 

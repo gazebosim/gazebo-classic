@@ -22,6 +22,9 @@
 #ifndef USERCAMERA_HH
 #define USERCAMERA_HH
 
+#include <string>
+#include <vector>
+
 #include "rendering/Camera.hh"
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
@@ -142,7 +145,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
-

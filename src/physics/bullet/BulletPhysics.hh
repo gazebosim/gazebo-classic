@@ -126,7 +126,7 @@ namespace gazebo
     public: virtual Joint *CreateJoint(std::string type);
   
     /// \brief Create a physics based ray sensor
-    //public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
+    // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
   
     /// \brief Convert an bullet mass to a gazebo Mass
     public: virtual void ConvertMass(Mass *mass, void *engineMass);
@@ -146,7 +146,7 @@ namespace gazebo
     /// \brief Set the gavity vector
     public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
   
-    //private: btAxisSweep3 *broadPhase;
+    // private: btAxisSweep3 *broadPhase;
     private: btBroadphaseInterface *broadPhase;
     private: btDefaultCollisionConfiguration *collisionConfig;
     private: btCollisionDispatcher *dispatcher;
@@ -162,4 +162,5 @@ namespace gazebo
 
 }
 #endif
+
 

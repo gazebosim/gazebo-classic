@@ -23,6 +23,7 @@
 
 #include <map>
 #include <vector>
+#include <string>
 
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
@@ -262,4 +263,5 @@ namespace gazebo
   }
 }
 #endif
+
 

@@ -19,12 +19,13 @@
 
 #include <vector>
 #include <map>
+#include <string>
+#include <list>
 #include <boost/shared_ptr.hpp>
 
 #include "sdf/sdf.h"
 #include "msgs/msgs.h"
 
-//#include "rendering/ogre.h"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"
@@ -108,7 +109,7 @@ namespace gazebo
                               float line_width, const common::Color &color);
 
       /// \brief Get the grid
-      public: Grid *GetGrid(unsigned int index) const;
+      public: Grid *GetGrid(uint32_t index) const;
 
       /// \brief Create a camera
       public: CameraPtr CreateCamera(const std::string &name,
@@ -119,10 +120,10 @@ namespace gazebo
                                                bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
-      public: unsigned int GetCameraCount() const;
+      public: uint32_t GetCameraCount() const;
 
       /// \brief Get a camera
-      public: CameraPtr GetCamera(unsigned int index) const;
+      public: CameraPtr GetCamera(uint32_t index) const;
 
       /// \brief Get a camera by name
       public: CameraPtr GetCamera(const std::string &_name) const;
@@ -131,10 +132,10 @@ namespace gazebo
       public: UserCameraPtr CreateUserCamera(const std::string &name);
 
       /// \brief Get the number of user cameras in this scene
-      public: unsigned int GetUserCameraCount() const;
+      public: uint32_t GetUserCameraCount() const;
 
       /// \brief Get a user camera
-      public: UserCameraPtr GetUserCamera(unsigned int index) const;
+      public: UserCameraPtr GetUserCamera(uint32_t index) const;
 
       /// \brief Get a visual by name
       public: VisualPtr GetVisual(const std::string &_name) const;
@@ -188,7 +189,7 @@ namespace gazebo
                            double _density, double _start, double _end);
 
       // Get the scene ID
-      public: unsigned int GetId() const;
+      public: uint32_t GetId() const;
 
       // Get the scene Id as a string
       public: std::string GetIdString() const;
@@ -234,7 +235,7 @@ namespace gazebo
                                        size_t &vertex_count,
                                        Ogre::Vector3* &vertices,
                                        size_t &index_count,
-                                       unsigned long* &indices,
+                                       uint64_t* &indices,
                                        const Ogre::Vector3 &position,
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
@@ -271,7 +272,7 @@ namespace gazebo
 
       public: void Clear();
 
-      //private: void ClearImpl();
+      // private: void ClearImpl();
       private: std::string name;
 
       private: sdf::ElementPtr sdf;
@@ -284,8 +285,8 @@ namespace gazebo
 
       private: std::vector<Grid *> grids;
 
-      private: static unsigned int idCounter;
-      private: unsigned int id;
+      private: static uint32_t idCounter;
+      private: uint32_t id;
       private: std::string idString;
 
       typedef std::list<boost::shared_ptr<msgs::Visual const> > VisualMsgs_L;
@@ -341,4 +342,5 @@ namespace gazebo
   }
 }
 #endif
+
 

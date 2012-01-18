@@ -51,29 +51,35 @@ def ProcessFile(filename):
 
   for linenum in range(len(lines)):
     line = lines[linenum]
+    if 'http' not in line:
+      line = re.sub(r'//([a-z])','// \\1', line)
+      line = re.sub(r'//(\()','// \\1', line)
+      line = re.sub(r'//([A-Z])','// \\1', line)
+      line = re.sub(r'//({)','// \\1', line)
+      line = re.sub(r'//(})','// \\1', line)
 
     # Skip blank lines after start of new block
-    if re.search(r'^\s*$',line) or len(line) == 0:
-      prevLine = lines[linenum-1]
-      if re.search(r'\s*{', prevLine):
-        continue
+    #if re.search(r'^\s*$',line) or len(line) == 0:
+    #  prevLine = lines[linenum-1]
+    #  if re.search(r'\s*{', prevLine):
+    #    continue
 
-    # Remove space at end of lines
-    if line and line[-1].isspace():
-      line = line.rstrip()
+    ## Remove space at end of lines
+    #if line and line[-1].isspace():
+    #  line = line.rstrip()
 
-    # Remove spaces after ( and before )
-    line = re.sub(r'\(\s*','(',line)
-    line = re.sub(r'\s*\)',')',line)
+    ## Remove spaces after ( and before )
+    #line = re.sub(r'\(\s*','(',line)
+    #line = re.sub(r'\s*\)',')',line)
 
-    # Add space after comma
-    line = re.sub(r',\s*',',',line)
-    line = re.sub(r',(\S)',', \\1',line)
+    ## Add space after comma
+    #line = re.sub(r',\s*',',',line)
+    #line = re.sub(r',(\S)',', \\1',line)
 
-    # Add space around =
-    line = re.sub(r'(\w|\d)=','\\1 =',line)
-    line = re.sub(r'=(\w|\d)','= \\1',line)
-    line = re.sub(r'\t','  ',line)
+    ## Add space around =
+    #line = re.sub(r'(\w|\d)=','\\1 =',line)
+    #line = re.sub(r'=(\w|\d)','= \\1',line)
+    #line = re.sub(r'\t','  ',line)
 
     #regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('
     #if re.match(regexp, line) and not re.search(r'\(\)\(\)',line):
@@ -119,17 +125,17 @@ def ProcessFile(filename):
     #          line = re.sub(regexp,replacement, line)
     #          line = re.sub(sub, rep,line)
 
-    if re.search(r'{', line) and funcStart >= 0:
-      funcStart = funcStart + 1
-    if re.search(r'}', line) and funcStart >= 0:
-      funcStart = funcStart - 1
-      if funcStart == 0:
-        paramSub = []
-        paramRep = []
+    #if re.search(r'{', line) and funcStart >= 0:
+    #  funcStart = funcStart + 1
+    #if re.search(r'}', line) and funcStart >= 0:
+    #  funcStart = funcStart - 1
+    #  if funcStart == 0:
+    #    paramSub = []
+    #    paramRep = []
 
-    if funcStart > 0:
-      for i in range(len(paramSub)):
-        line = re.sub(paramSub[i], paramRep[i],line)
+    #if funcStart > 0:
+    #  for i in range(len(paramSub)):
+    #    line = re.sub(paramSub[i], paramRep[i],line)
     print >>outFile, line
     #print line
 

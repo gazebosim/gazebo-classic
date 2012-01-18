@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include <QtGui>
 #include <QX11Info>
 
@@ -128,7 +144,7 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 {
   QWidget::moveEvent(_e);
 
-  if(_e->isAccepted() && this->windowId >= 0)
+  if (_e->isAccepted() && this->windowId >= 0)
   {
     rendering::WindowManager::Instance()->Moved(this->windowId);
   }
@@ -496,19 +512,21 @@ std::string GLWidget::GetOgreHandle() const
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
-  handle = boost::lexical_cast<std::string>((unsigned long)info.display());
+  handle = boost::lexical_cast<std::string>(
+      reinterpret_cast<uint64_t>(info.display()));
   handle += ":";
-  handle += boost::lexical_cast<std::string>((unsigned int)info.screen());
+  handle += boost::lexical_cast<std::string>(
+      static_cast<uint32_t>(info.screen()));
   handle += ":";
   assert(q_parent);
-  handle += boost::lexical_cast<std::string>((unsigned long)q_parent->winId());
+  handle += boost::lexical_cast<std::string>(
+      static_cast<uint64_t>(q_parent->winId()));
 #endif
 
   return handle;
 }
 
 void GLWidget::CreateEntity(const std::string &_name)
-                            //const EntityMaker::CreateCallback &cb)
 {
   if (this->entityMaker)
     this->entityMaker->Stop();
@@ -641,7 +659,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 
     _vis->SetRotation(pose.rot * delta);
 
-    //TODO: send message
+    // TODO: send message
 
 /*  if (entity->GetType() == Entity::MODEL)
   {
@@ -710,7 +728,6 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
     body->SetForce(moveVector);
   }
 */
-
 }
 
 void GLWidget::OnSelectionMsg(
@@ -724,4 +741,5 @@ void GLWidget::OnSelectionMsg(
       this->selectionVis.reset();
   }
 }
+
 

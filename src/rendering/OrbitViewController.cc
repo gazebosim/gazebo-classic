@@ -197,8 +197,10 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     int height = this->camera->GetViewportHeight();
 
     this->Translate(math::Vector3(0.0,
-         (drag.x / (float)width)  * this->distance * tan(fovX / 2.0) * 2.0,
-         (drag.y / (float)height) * this->distance * tan(fovY / 2.0) * 2.0));
+          (drag.x / static_cast<float>(width)) *
+          this->distance * tan(fovX / 2.0) * 2.0,
+          (drag.y / static_cast<float>(height)) *
+          this->distance * tan(fovY / 2.0) * 2.0));
   }
   else
     this->refVisual->SetVisible(false);
@@ -248,6 +250,7 @@ std::string OrbitViewController::GetTypeString()
 {
   return TYPE_STRING;
 }
+
 
 
 

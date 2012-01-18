@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#include <sstream>
 #include <float.h>
+#include <sstream>
 
 #include "msgs/msgs.h"
 
@@ -118,7 +118,7 @@ void Link::Load(sdf::ElementPtr &_sdf)
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 
-      //this->visPub->Publish(msg);
+      // this->visPub->Publish(msg);
 
       std::vector<std::string>::iterator iter;
       iter = std::find(this->visuals.begin(), this->visuals.end(), msg.name());
@@ -257,13 +257,13 @@ void Link::Fini()
   this->sensors.clear();
   this->inertial.reset();
 
-  for(iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
   }
 
-  for(iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); ++iter)
+  for (iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
@@ -322,7 +322,7 @@ void Link::UpdateParameters(sdf::ElementPtr &_sdf)
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 
-      //this->visPub->Publish(msg);
+      // this->visPub->Publish(msg);
 
       visualElem = visualElem->GetNextElement();
     }
@@ -394,10 +394,10 @@ void Link::SetLaserRetro(float _retro)
 void Link::Update()
 {
   // Apply our linear accel
-  //this->SetForce(this->linearAccel);
+  // this->SetForce(this->linearAccel);
 
   // Apply our angular accel
-  //this->SetTorque(this->angularAccel);
+  // this->SetTorque(this->angularAccel);
 
   // FIXME: race condition on factory-based model loading!!!!!
    /*if (this->GetEnabled() != this->enabled)
@@ -453,7 +453,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 void Link::SetLinearAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
-  this->linearAccel = _accel;// * this->GetMass();
+  this->linearAccel = _accel;
 }
 
 //////////////////////////////////////////////////
@@ -654,7 +654,7 @@ void Link::ProcessMsg(const msgs::Link &_msg)
     this->UpdateMass();
   }
 
-  if(_msg.has_pose())
+  if (_msg.has_pose())
   {
     this->SetEnabled(true);
     this->SetRelativePose(msgs::Convert(_msg.pose()));
@@ -724,3 +724,4 @@ void Link::OnPoseChange()
     this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
+

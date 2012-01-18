@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <string>
 
 // TODO: remove this line
 #include "rendering/ogre.h"
@@ -102,9 +103,6 @@ namespace gazebo
       private: Scene *scene;
     };
     /// \}
-
   }
-
 }
 #endif
-

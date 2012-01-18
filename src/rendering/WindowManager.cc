@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#include "rendering/ogre.h"
 #include <math.h>
+
+#include "rendering/ogre.h"
 
 #include "common/Events.hh"
 #include "common/Color.hh"
@@ -94,7 +95,7 @@ int WindowManager::CreateWindow(const std::string &ogreHandle,
       window = RenderEngine::Instance()->root->createRenderWindow(
           stream.str(), width, height, false, &params);
     }
-    catch (...)
+    catch(...)
     {
       gzerr << " Unable to create the rendering window\n";
       window = NULL;
@@ -109,7 +110,7 @@ int WindowManager::CreateWindow(const std::string &ogreHandle,
   if (window)
   {
     window->setActive(true);
-    //window->setVisible(true);
+    // window->setVisible(true);
     window->setAutoUpdated(false);
 
     this->windows.push_back(window);
@@ -176,5 +177,6 @@ unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
   else
     return 0;
 }
+
 
 

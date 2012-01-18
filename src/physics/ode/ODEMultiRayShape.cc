@@ -155,7 +155,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
             rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {
-          //gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
+          // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
           //      << " depth[" << contact.depth << "]"
           //      << " position[" << contact.pos[0]
           //        << ", " << contact.pos[1]
@@ -191,3 +191,7 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
   ray->SetPoints(_start, _end);
   this->rays.push_back(ray);
 }
+
+
+
+

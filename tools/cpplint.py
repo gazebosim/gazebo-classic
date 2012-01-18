@@ -1521,7 +1521,7 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
             'Extra space after (')
     if (Search(r'\w\s+\(', fncall) and
         not Search(r'#\s*define|typedef', fncall) and
-        not Search(r'<.*>',fncall)):
+        not Search(r'<.*',fncall)):
       error(filename, linenum, 'whitespace/parens', 4,
             'Extra space before ( in function call')
     # If the ) is followed only by a newline or a { + newline, assume it's
@@ -2822,17 +2822,19 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
   # it's unnamed.  It should probably be expanded to check for multiple
   # arguments with some unnamed.
   function_match = Match(r'\s*(\)|=|(const)?\s*(;|\{|throw\(\)|>))', remainder)
+  #print "Remainder[%s]" % remainder
   if function_match:
-    if (not function_match.group(3) or
+    if ('SIGNAL' not in raw_line and  'SLOT' not in raw_line and
+        (not function_match.group(3) or
         function_match.group(3) == ';' or
         ('<' not in raw_line and
-         '/*' not in raw_line)):
+         '/*' not in raw_line))):
       error(filename, linenum, 'readability/function', 3,
             'All parameters should be named in a function')
     return True
 
   # At this point, all that should be left is actual casts.
-  if len(remainder) > 0:
+  if len(remainder) > 0 and 'public: ' not in raw_line and 'private:' not in raw_line and 'protected: ' not in raw_line and remainder != ' const':
     error(filename, linenum, 'readability/casting', 4,
         'Using C-style cast.  Use %s<%s>(...) instead' %
         (cast_type, match.group(1)))

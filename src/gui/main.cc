@@ -48,7 +48,7 @@ int ParseArgs(int _argc, char **_argv)
 {
   int ch;
 
-  char *flags = (char*)("hp:");
+  char *flags = const_cast<char*>("hp:");
 
   // Get letter options
   while ((ch = getopt(_argc, _argv, flags)) != -1)
@@ -129,4 +129,5 @@ int main(int _argc, char **_argv)
   printf("done.\n");
   return 0;
 }
+
 

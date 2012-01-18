@@ -245,3 +245,4 @@ math::Angle BulletHingeJoint::GetLowStop(int _index)
     gzthrow("Joint must be created first");
 }
 
+

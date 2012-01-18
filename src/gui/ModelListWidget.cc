@@ -1,9 +1,26 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/message.h>
+
 #include <QtGui>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
 
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
@@ -32,7 +49,7 @@
 using namespace gazebo;
 using namespace gui;
 
-const unsigned short dgrsUnicode = 0x00b0;
+const uint16_t dgrsUnicode = 0x00b0;
 const std::string dgrsStdStr =
 QString::fromUtf16(&dgrsUnicode, 1).toStdString();
 const std::string rollLbl = std::string("Roll") + dgrsStdStr;
@@ -177,7 +194,8 @@ void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
     if (!_msg.has_deleted() || !_msg.deleted())
     {
       // Create a top-level tree item for the path
-      QTreeWidgetItem *topItem = new QTreeWidgetItem((QTreeWidgetItem*)0,
+      QTreeWidgetItem *topItem = new QTreeWidgetItem(
+          static_cast<QTreeWidgetItem*>(0),
           QStringList(QString("%1").arg(QString::fromStdString(name))));
 
       topItem->setData(0, Qt::UserRole, QVariant(_msg.id()));
@@ -268,7 +286,7 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
 
   // Find an existing element with the name from the message
   for (int i = 0; i < this->modelTreeWidget->topLevelItemCount()
-      && !listItem;i++)
+      && !listItem; ++i)
   {
     QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
     unsigned int data = item->data(0, Qt::UserRole).toUInt();
@@ -689,7 +707,6 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
       orientMessage,
       orientDescriptor->FindFieldByName("w"),
       q.w);
-
 }
 
 void ModelListWidget::FillMsg(QtProperty *_item,
@@ -1108,7 +1125,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
         tr("sensor"));
     _parent->addSubProperty(topItem);
 
-    //this->FillPropertyTree(_msg.sensor(i), topItem);
+    // this->FillPropertyTree(_msg.sensor(i), topItem);
   }
 }
 
@@ -1364,7 +1381,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
     _parent->addSubProperty(sizeItem);
     this->FillVector3dProperty(_msg.heightmap().offset(), sizeItem);
   }
-
 }
 
 void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
@@ -1662,4 +1678,5 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this);
 }
+
 

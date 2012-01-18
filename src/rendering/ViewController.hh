@@ -16,7 +16,7 @@
 */
 #ifndef VIEWCONTROLLER_HH
 #define VIEWCONTROLLER_HH
-
+#include <string>
 #include "common/CommonTypes.hh"
 
 namespace gazebo
@@ -57,4 +57,5 @@ namespace gazebo
   }
 }
 #endif
+
 

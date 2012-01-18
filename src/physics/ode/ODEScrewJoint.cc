@@ -131,7 +131,7 @@ void ODEScrewJoint::SetForce(int /*index*/, double _force)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
-  //dJointAddScrewForce(this->jointId, _force);
+  // dJointAddScrewForce(this->jointId, _force);
   dJointAddScrewTorque(this->jointId, _force);
 }
 
@@ -165,4 +165,8 @@ double ODEScrewJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }
+
+
+
+
 

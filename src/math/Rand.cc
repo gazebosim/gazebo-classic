@@ -75,3 +75,4 @@ int Rand::GetIntNormal(int _mean, int _sigma)
 
   return static_cast<int>(gen());
 }
+

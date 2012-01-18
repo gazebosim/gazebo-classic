@@ -35,49 +35,52 @@ namespace gazebo
     /// \brief Surface params
     class ODESurfaceParams
     {
-      /// Constructor
+      /// \brief Constructor
       public: ODESurfaceParams();
+
+      /// \brief Destructor
+      public: virtual ~ODESurfaceParams();
 
       /// \brief Load the contact params
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief dynamically "stiffness"-equivalent coefficient for contact
       /// joints
-      //public: double kp;
+      // public: double kp;
 
       /// \brief dynamically "damping"-equivalent coefficient for contact
       /// joints
-      //public: double kd;
+      // public: double kd;
 
       /// \brief 0..1, 0 = no bounciness
-      //public: double bounce;
+      // public: double bounce;
 
       /// \brief bounce vel
-      //public: double bounceThreshold;
+      // public: double bounceThreshold;
 
       /// \brief  first coefficient of friction
-      //public: double mu1;
+      // public: double mu1;
 
       /// \brief  second coefficient of friction
-      //public: double mu2;
+      // public: double mu2;
 
       /// \brief  Force-dependent-slip direction 1
-      //public: double slip1;
+      // public: double slip1;
 
       /// \brief Force-dependent-slip direction 2
-      //public: double slip2;
+      // public: double slip2;
 
       /// \brief Direction of m1 in the collision local frame
-      //public: math::Vector3 fdir1;
+      // public: math::Vector3 fdir1;
 
       /// \brief soft constraint force mixing
-      //public: double softCFM;
+      // public: double softCFM;
 
       /// \brief soft error reduction parameter
-      //public: double softERP;
+      // public: double softERP;
 
-      //public: double maxVel;
-      //public: double minDepth;
+      // public: double maxVel;
+      // public: double minDepth;
     };
     typedef  boost::shared_ptr<ODESurfaceParams> ODESurfaceParamsPtr;
     /// \}
@@ -85,5 +88,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
 
 

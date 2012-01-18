@@ -21,7 +21,7 @@
 
 #ifndef RENDERING_DEPTHCAMERA_HH
 #define RENDERING_DEPTHCAMERA_HH
-
+#include <string>
 
 #include "rendering/Camera.hh"
 
@@ -109,5 +109,6 @@ namespace gazebo
   }
 }
 #endif
+
 
 

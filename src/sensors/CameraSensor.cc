@@ -174,3 +174,4 @@ const unsigned char *CameraSensor::GetImageData()
   return this->camera->GetImageData(0);
 }
 
+

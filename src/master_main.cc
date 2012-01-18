@@ -32,7 +32,7 @@ int main(int /*argc*/, char ** /*argv*/)
   }
 
   std::string host = "";
-  unsigned short port = 0;
+  unsigned int port = 0;
 
   if (!gazebo::transport::get_master_uri(host, port))
 
@@ -46,3 +46,4 @@ int main(int /*argc*/, char ** /*argv*/)
 
   return 1;
 }
+

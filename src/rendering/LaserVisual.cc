@@ -27,8 +27,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-LaserVisual::LaserVisual (const std::string &_name, VisualPtr _vis,
-                          const std::string &_topicName)
+LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
+                         const std::string &_topicName)
 : Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -66,7 +66,7 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
     pt.z = 0;
     pt += offset.pos;
 
-    if (i+1 >= (int)this->rayFan->GetPointCount())
+    if (i+1 >= static_cast<int>(this->rayFan->GetPointCount()))
       this->rayFan->AddPoint(pt);
     else
       this->rayFan->SetPoint(i+1, pt);
@@ -74,5 +74,6 @@ void LaserVisual::OnScan(ConstLaserScanPtr &_msg)
     angle += _msg->angle_step();
   }
 }
+
 
 

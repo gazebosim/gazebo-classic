@@ -23,6 +23,8 @@
 #define MODEL_HH
 
 #include <string>
+#include <map>
+#include <vector>
 
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
@@ -230,4 +232,5 @@ namespace gazebo
   }
 }
 #endif
+
 

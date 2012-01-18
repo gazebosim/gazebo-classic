@@ -401,3 +401,4 @@ void SelectionObj::CreateMaterials()
   texState->setColourOperationEx(Ogre::LBX_ADD, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 0));
 }
+

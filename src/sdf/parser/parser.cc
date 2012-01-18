@@ -576,3 +576,4 @@ void copyChildren(ElementPtr &_sdf, TiXmlElement *_xml)
   }
 }
 }
+

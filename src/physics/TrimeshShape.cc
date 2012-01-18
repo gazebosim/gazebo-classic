@@ -97,7 +97,7 @@ void TrimeshShape::Init()
 
       // TODO: need to implement this function properly.
       newCollision->SetSaveable(false);
-      //newCollision->Load(config->GetRootNode()->GetChild());
+      // newCollision->Load(config->GetRootNode()->GetChild());
     }
   }
 }
@@ -141,4 +141,5 @@ void TrimeshShape::ProcessMsg(const msgs::Geometry &_msg)
   this->SetScale(msgs::Convert(_msg.mesh().scale()));
   this->SetFilename(_msg.mesh().filename());
 }
+
 

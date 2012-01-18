@@ -48,7 +48,7 @@ using namespace gazebo;
 using namespace rendering;
 
 
-unsigned int Scene::idCounter = 0;
+uint32_t Scene::idCounter = 0;
 
 struct VisualMessageLess {
     bool operator() (boost::shared_ptr<msgs::Visual const> _i,
@@ -56,7 +56,6 @@ struct VisualMessageLess {
     {
       return _i->name().size() < _j->name().size();
     }
-
 } VisualMessageLessOp;
 
 
@@ -119,7 +118,7 @@ void Scene::Clear()
     delete iter->second;
   }
 
-  for (unsigned int i = 0; i < this->grids.size(); i++)
+  for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
 
@@ -167,7 +166,7 @@ Scene::~Scene()
   // Remove a scene
   RTShaderSystem::Instance()->RemoveScene(this);
 
-  for (unsigned int i = 0; i < this->grids.size(); i++)
+  for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
 
@@ -215,7 +214,7 @@ void Scene::Init()
 
   RTShaderSystem::Instance()->AddScene(this);
 
-  for (unsigned int i = 0; i < this->grids.size(); i++)
+  for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
   // Create the sky
@@ -261,19 +260,19 @@ void Scene::InitShadows()
   // Allow a total of 3 shadow casters per scene
   const int numShadowTextures = 3;
 
-  //this->manager->setShadowFarDistance(500);
-  //this->manager->setShadowTextureCount(numShadowTextures);
+  // this->manager->setShadowFarDistance(500);
+  // this->manager->setShadowTextureCount(numShadowTextures);
 
-  //this->manager->setShadowTextureSize(1024);
-  //this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_RGB);
-  //this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-  //this->manager->setShadowTextureSelfShadow(false);
-  //this->manager->setShadowCasterRenderBackFaces(true);
-  //this->manager->setShadowTechnique(
-  //Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+  // this->manager->setShadowTextureSize(1024);
+  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_RGB);
+  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+  // this->manager->setShadowTextureSelfShadow(false);
+  // this->manager->setShadowCasterRenderBackFaces(true);
+  // this->manager->setShadowTechnique(
+  // Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
   this->manager->setShadowTextureCasterMaterial("shadow_caster");
 
-  //const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
+  // const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
 
   /*for (unsigned i = 0; i < numShadowRTTs; ++i)
   {
@@ -282,9 +281,9 @@ void Scene::InitShadows()
     vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0, 1));
     vp->setClearEveryFrame(true);
 
-    //Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
-    //Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur",
-    //true);
+    // Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
+    // Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur",
+    // true);
   }
   // END
   */
@@ -292,8 +291,8 @@ void Scene::InitShadows()
   this->manager->setShadowTechnique(
       Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
-  //Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
-      //Ogre::TFO_ANISOTROPIC);
+  // Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
+      // Ogre::TFO_ANISOTROPIC);
 
   this->manager->setShadowFarDistance(500);
   this->manager->setShadowTextureCount(numShadowTextures);
@@ -302,7 +301,7 @@ void Scene::InitShadows()
       numShadowTextures);
   this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
 
-  //this->manager->setShadowTextureCount(numShadowTextures+1);
+  // this->manager->setShadowTextureCount(numShadowTextures+1);
 
   this->manager->setShadowTextureCasterMaterial("shadow_caster");
   this->manager->setShadowCasterRenderBackFaces(true);
@@ -312,7 +311,7 @@ void Scene::InitShadows()
   this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT32_RGB);
   this->manager->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_RGB);
   this->manager->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_RGB);
-  //this->manager->setShadowTextureConfig(3, 512, 512, Ogre::PF_FLOAT32_RGB);
+  // this->manager->setShadowTextureConfig(3, 512, 512, Ogre::PF_FLOAT32_RGB);
 
 
   // DEBUG CODE: Will display three overlay panels that show the contents of
@@ -321,7 +320,8 @@ void Scene::InitShadows()
   // init overlay elements
   Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
   Ogre::Overlay* overlay = mgr.create("DebugOverlay");
-  for (size_t i = 0; i < 3; ++i) {
+  for (size_t i = 0; i < 3; ++i)
+  {
     Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
 
     // Set up a debug panel to display the shadow
@@ -418,11 +418,10 @@ void Scene::CreateGrid(uint32_t cell_count, float cell_length,
     grid->Init();
 
   this->grids.push_back(grid);
-
 }
 
 //////////////////////////////////////////////////
-Grid *Scene::GetGrid(unsigned int index) const
+Grid *Scene::GetGrid(uint32_t index) const
 {
   if (index >= this->grids.size())
   {
@@ -454,13 +453,13 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-unsigned int Scene::GetCameraCount() const
+uint32_t Scene::GetCameraCount() const
 {
   return this->cameras.size();
 }
 
 //////////////////////////////////////////////////
-CameraPtr Scene::GetCamera(unsigned int index) const
+CameraPtr Scene::GetCamera(uint32_t index) const
 {
   CameraPtr cam;
 
@@ -496,13 +495,13 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 }
 
 //////////////////////////////////////////////////
-unsigned int Scene::GetUserCameraCount() const
+uint32_t Scene::GetUserCameraCount() const
 {
   return this->userCameras.size();
 }
 
 //////////////////////////////////////////////////
-UserCameraPtr Scene::GetUserCamera(unsigned int index) const
+UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 {
   UserCameraPtr cam;
 
@@ -634,7 +633,7 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
       size_t vertex_count;
       size_t index_count;
       Ogre::Vector3 *vertices;
-      unsigned long *indices;
+      uint64_t *indices;
 
       // Get the mesh information
       this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
@@ -675,7 +674,7 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
       if (new_closest_found)
       {
         closestEntity = pentity;
-        //break;
+        // break;
       }
     }
   }
@@ -691,8 +690,10 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)_mousePos.x / ogreCam->getViewport()->getActualWidth(),
-      (float)_mousePos.y / ogreCam->getViewport()->getActualHeight());
+      static_cast<float>(_mousePos.x) /
+      ogreCam->getViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.y) /
+      ogreCam->getViewport()->getActualHeight());
 
   this->raySceneQuery->setRay(mouseRay);
 
@@ -720,7 +721,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       size_t vertex_count;
       size_t index_count;
       Ogre::Vector3 *vertices;
-      unsigned long *indices;
+      uint64_t *indices;
 
       // Get the mesh information
       this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
@@ -761,7 +762,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       if (new_closest_found)
       {
         closestEntity = pentity;
-        //break;
+        // break;
       }
     }
   }
@@ -773,10 +774,12 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 math::Vector3 Scene::GetFirstContact(CameraPtr camera, math::Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetOgreCamera();
-  //Ogre::Real closest_distance = -1.0f;
+  // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(),
-      (float)mousePos.y / ogreCam->getViewport()->getActualHeight());
+      static_cast<float>(mousePos.x) /
+      ogreCam->getViewport()->getActualWidth(),
+      static_cast<float>(mousePos.y) /
+      ogreCam->getViewport()->getActualHeight());
 
   this->raySceneQuery->setRay(mouseRay);
 
@@ -826,7 +829,7 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
   std::cout << prefix_
     << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
 
-  for (unsigned int i = 0; i < node_->numChildren(); i++)
+  for (uint32_t i = 0; i < node_->numChildren(); i++)
   {
     this->PrintSceneGraphHelper(prefix_ + "  ", node_->getChild(i));
   }
@@ -903,7 +906,7 @@ void Scene::SetVisible(const std::string &name_, bool visible_)
 }
 
 //////////////////////////////////////////////////
-unsigned int Scene::GetId() const
+uint32_t Scene::GetId() const
 {
   return this->id;
 }
@@ -920,7 +923,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
                                size_t &vertex_count,
                                Ogre::Vector3* &vertices,
                                size_t &index_count,
-                               unsigned long* &indices,
+                               uint64_t* &indices,
                                const Ogre::Vector3 &position,
                                const Ogre::Quaternion &orient,
                                const Ogre::Vector3 &scale)
@@ -933,14 +936,14 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   vertex_count = index_count = 0;
 
   // Calculate how many vertices and indices we're going to need
-  for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
+  for (uint16_t i = 0; i < mesh->getNumSubMeshes(); ++i)
   {
     Ogre::SubMesh* submesh = mesh->getSubMesh(i);
 
     // We only need to add the shared vertices once
-    if(submesh->useSharedVertices)
+    if (submesh->useSharedVertices)
     {
-      if(!added_shared)
+      if (!added_shared)
       {
         vertex_count += mesh->sharedVertexData->vertexCount;
         added_shared = true;
@@ -958,12 +961,12 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 
   // Allocate space for the vertices and indices
   vertices = new Ogre::Vector3[vertex_count];
-  indices = new unsigned long[index_count];
+  indices = new uint64_t[index_count];
 
   added_shared = false;
 
   // Run through the submeshes again, adding the data into the arrays
-  for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
+  for (uint16_t i = 0; i < mesh->getNumSubMeshes(); ++i)
   {
     Ogre::SubMesh* submesh = mesh->getSubMesh(i);
 
@@ -973,7 +976,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     if ((!submesh->useSharedVertices) ||
         (submesh->useSharedVertices && !added_shared))
     {
-      if(submesh->useSharedVertices)
+      if (submesh->useSharedVertices)
       {
         added_shared = true;
       }
@@ -985,7 +988,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
       Ogre::HardwareVertexBufferSharedPtr vbuf =
         vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
 
-      unsigned char* vertex =
+      unsigned char *vertex =
         static_cast<unsigned char*>(
             vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
 
@@ -993,9 +996,9 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
       // Ogre::Real or a double as second argument. So make it float,
       // to avoid trouble when Ogre::Real will be comiled/typedefed as double:
       //      Ogre::Real* pReal;
-      float* pReal;
+      float *pReal;
 
-      for(size_t j = 0; j < vertex_data->vertexCount;
+      for (size_t j = 0; j < vertex_data->vertexCount;
            ++j, vertex += vbuf->getVertexSize())
       {
         posElem->baseVertexPointerToElement(vertex, &pReal);
@@ -1010,7 +1013,7 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     Ogre::IndexData* index_data = submesh->indexData;
     Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
 
-    unsigned long*  pLong = static_cast<unsigned long*>(
+    uint64_t*  pLong = static_cast<uint64_t*>(
         ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
 
     if ((ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT))
@@ -1022,10 +1025,10 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     }
     else
     {
-      unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
+      uint16_t* pShort = reinterpret_cast<uint16_t*>(pLong);
       for (size_t k = 0; k < index_data->indexCount; k++)
       {
-        indices[index_offset++] = static_cast<unsigned long>(pShort[k]);
+        indices[index_offset++] = static_cast<uint64_t>(pShort[k]);
       }
     }
 
@@ -1083,7 +1086,7 @@ void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
       for (int k = 0; k < _msg->model(i).link(j).collision_size(); k++)
       {
         for (int l = 0;
-             l < _msg->model(i).link(j).collision(k).visual_size();l++)
+             l < _msg->model(i).link(j).collision(k).visual_size(); l++)
         {
           boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
                 _msg->model(i).link(j).collision(k).visual(l)));
@@ -1323,12 +1326,12 @@ void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
   if (parentVis && childVis)
   {
     DynamicLines *line = parentVis->CreateDynamicLine();
-    //this->worldVisual->AttachObject(line);
+    // this->worldVisual->AttachObject(line);
 
     line->AddPoint(math::Vector3(0, 0, 0));
     line->AddPoint(math::Vector3(0, 0, 0));
 
-    //parentVis->AttachLineVertex(line, 0);
+    // parentVis->AttachLineVertex(line, 0);
     childVis->AttachLineVertex(line, 1);
   }
   else
@@ -1371,7 +1374,6 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
     if (vis)
       vis->SetTransparency(_msg->dbl_data());
   }
-
 }
 
 void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
@@ -1468,13 +1470,13 @@ void Scene::SetSky(const std::string &_material)
   {
     Ogre::Quaternion orientation;
     orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
-    double curvature = 10; // ogre recommended default
-    double tiling = 8; // ogre recommended default
-    double distance = 4000; // ogre recommended default
+    double curvature = 10;  // ogre recommended default
+    double tiling = 8;  // ogre recommended default
+    double distance = 4000;  // ogre recommended default
     this->manager->setSkyDome(true, _material, curvature,
         tiling, distance, true, orientation);
   }
-  catch (int)
+  catch(int)
   {
     gzwarn << "Unable to set sky dome to material[" << _material << "]\n";
   }
@@ -1555,3 +1557,4 @@ void Scene::SetGrid(bool _enabled)
     this->grids.push_back(grid);
   }
 }
+

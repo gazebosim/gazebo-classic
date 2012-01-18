@@ -45,7 +45,6 @@ namespace gazebo
       public: static void SetSnapToGrid(bool _snap);
 
       public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
-                                 //const CreateCallback &cb) = 0;
 
       public: virtual void Stop() = 0;
       public: virtual bool IsActive() const = 0;
@@ -75,4 +74,5 @@ namespace gazebo
   }
 }
 #endif
+
 

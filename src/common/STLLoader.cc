@@ -98,7 +98,7 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     next = next + width;
 
     // FACET
-    if (this->Leqi(token, static_cast<char*>("facet")))
+    if (this->Leqi(token, const_cast<char*>("facet")))
     {
       math::Vector3 normal;
 
@@ -136,16 +136,16 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         printf("Error...\n");
     }
     // COLOR
-    else if (this->Leqi (token, static_cast<char*>("color")))
+    else if (this->Leqi (token, const_cast<char*>("color")))
     {
       sscanf(next, "%*s %f %f %f %f", &r1, &r2, &r3, &r4);
     }
     // SOLID
-    else if (this->Leqi (token, static_cast<char*>("solid")))
+    else if (this->Leqi (token, const_cast<char*>("solid")))
     {
     }
     // ENDSOLID
-    else if (this->Leqi (token, static_cast<char*>("endsolid")))
+    else if (this->Leqi (token, const_cast<char*>("endsolid")))
     {
     }
     // Unexpected or unrecognized.
@@ -321,4 +321,5 @@ uint16_t STLLoader::ShortIntRead(FILE *_filein)
 
   return ival;
 }
+
 

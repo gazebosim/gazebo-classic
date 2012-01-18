@@ -17,7 +17,6 @@
 /* Desc: ODE Heightmap shape
  * Author: Nate Keonig
  * Date: 12 Nov 2009
- * SVN: $Id:$
  */
 
 #include "common/Exception.hh"
@@ -49,13 +48,13 @@ void ODEHeightmapShape::FillHeightMap()
   this->heights.resize(this->odeVertSize*this->odeVertSize);
 
   // Iterate over all the verices
-  for (y = 0; y<this->odeVertSize; y++)
+  for (y = 0; y < this->odeVertSize; y++)
   {
-    for (x = 0; x<this->odeVertSize; x++)
+    for (x = 0; x < this->odeVertSize; x++)
     {
       // Find the height at a vertex
-      //TODO: h = //this->ogreHeightmap->GetHeightAt(
-      //math::Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
+      // TODO: h = // this->ogreHeightmap->GetHeightAt(
+      // math::Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
 
       // Store the height for future use
       this->heights[y*this->odeVertSize + x] = h;
@@ -85,8 +84,8 @@ void ODEHeightmapShape::Init()
   this->odeScale = terrainSize / this->odeVertSize;
 
   // Step 1: Create the Ogre height map: Performs a ray scene query
-  //TODO: this->ogreHeightmap->Load((**this->imageFilenameP),
-  //(**this->worldTextureP), (**this->detailTextureP), terrainSize);
+  // TODO: this->ogreHeightmap->Load((**this->imageFilenameP),
+  // (**this->worldTextureP), (**this->detailTextureP), terrainSize);
 
   // Step 2: Construct the heightmap lookup table, using the ogre ray scene
   // query functionality
@@ -100,15 +99,14 @@ void ODEHeightmapShape::Init()
       this->odeData,
       this,
       ODEHeightmapShape::GetHeightCallback,
-      terrainSize.x, // in meters
-      terrainSize.y, // in meters
-      this->odeVertSize, // width sampling size
-      this->odeVertSize, // depth sampling size (along height of image)
-      1.0, // vertical (z-axis) scaling
-      0.0, // vertical (z-axis) offset
-      0.1, // vertical thickness for closing the height map mesh
-      0 // wrap mode
-      );
+      terrainSize.x,  // in meters
+      terrainSize.y,  // in meters
+      this->odeVertSize,  // width sampling size
+      this->odeVertSize,  // depth sampling size (along height of image)
+      1.0,  // vertical (z-axis) scaling
+      0.0,  // vertical (z-axis) offset
+      0.1,  // vertical thickness for closing the height map mesh
+      0);  // wrap mode
 
   // Step 5: Restrict the bounds of the AABB to improve efficiency
   dGeomHeightfieldDataSetBounds(this->odeData, 0, terrainSize.z);
@@ -116,14 +114,14 @@ void ODEHeightmapShape::Init()
   oParent->SetCollision(dCreateHeightfield(0, this->odeData, 1), false);
   oParent->SetStatic(true);
 
-  //Rotate so Z is up, not Y (which is the default orientation)
+  // Rotate so Z is up, not Y (which is the default orientation)
   math::Quaternion quat;
   math::Pose pose = oParent->GetWorldPose();
 
   quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
 
   pose.rot = pose.rot * quat;
-  //this->body->SetPose(pose);
+  // this->body->SetPose(pose);
 
   dQuaternion q;
   q[0] = pose.rot.w;
@@ -133,3 +131,7 @@ void ODEHeightmapShape::Init()
 
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
 }
+
+
+
+

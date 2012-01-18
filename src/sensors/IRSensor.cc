@@ -98,7 +98,7 @@ void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
   this->origin = new Vector3[this->IRCount];
 
 
-  //Read configuration from XML file
+  // Read configuration from XML file
   for(i = 0, iNode = node->GetChild("ir"); iNode;i++)
   {
   if(i >= this->IRCount)
@@ -147,10 +147,10 @@ void IRSensor::InitChild()
     */
 
   /*bodyPose = this->body->GetWorldPose();
-  //this->prevPose = bodyPose;
+  // this->prevPose = bodyPose;
 
   // Create and array of ray collisions
-  //for (int i = 0; i < this->rayCount; i++)
+  // for (int i = 0; i < this->rayCount; i++)
   for(unsigned int j = 0; j<this->irBeams.size(); j++)
   {
   for (int i = this->rayCount[j]-1; i >= 0; i--)
@@ -167,7 +167,7 @@ void IRSensor::InitChild()
   end = (axis * this->maxRange[j]) + this->origin[j];
 
   // BULLET
-  //ray = new RayCollision(this->body, displayRays);
+  // ray = new RayCollision(this->body, displayRays);
 
   ray->SetPoints(start, end);
 
@@ -233,4 +233,5 @@ void IRSensor::UpdateChild()
       (*iter)->Update();
   }
 }
+
 

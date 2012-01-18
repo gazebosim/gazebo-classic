@@ -66,7 +66,7 @@ namespace gazebo
     /// \brief Base class for most physics classes
     class Base : public boost::enable_shared_from_this<Base>
     {
-      public: enum EntityType{
+      public: enum EntityType {
                 BASE            = 0x00000000,
                 ENTITY          = 0x00000001,
                 MODEL           = 0x00000002,
@@ -253,7 +253,6 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif
 

@@ -29,3 +29,4 @@ int main(int _argc, char *_argv[])
   return google::protobuf::compiler::PluginMain(_argc, _argv, &generator);
 }
 
+

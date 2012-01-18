@@ -89,6 +89,7 @@ namespace gazebo
       /// \brief Get the anchor
       public: virtual math::Vector3 GetAnchor(int /*_index*/) const
                {return fakeAnchor;}
+
       protected: math::Vector3 fakeAnchor;
       protected: double threadPitch;
     };
@@ -96,4 +97,5 @@ namespace gazebo
   }
 }
 #endif
+
 

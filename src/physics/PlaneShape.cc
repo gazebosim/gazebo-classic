@@ -82,3 +82,4 @@ void PlaneShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetNormal(msgs::Convert(_msg.plane().normal()));
 }
+

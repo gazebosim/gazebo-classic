@@ -21,12 +21,15 @@
 #ifndef PHYSICSENGINE_HH
 #define PHYSICSENGINE_HH
 
+#include <boost/thread/recursive_mutex.hpp>
+#include <map>
+#include <string>
+
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 #include "msgs/msgs.h"
 #include "transport/TransportTypes.hh"
 #include "physics/PhysicsTypes.hh"
-#include <boost/thread/recursive_mutex.hpp>
 
 namespace gazebo
 {
@@ -88,7 +91,7 @@ namespace gazebo
                   CollisionPtr _collision) = 0;
 
       /// \brief Create a new joint
-      public: virtual JointPtr CreateJoint(const std::string &type) = 0;
+      public: virtual JointPtr CreateJoint(const std::string &_type) = 0;
 
       /// \brief Return the gavity vector
       /// \return The gavity vector
@@ -173,7 +176,6 @@ namespace gazebo
 
     /// \}
   }
-
 }
 #endif
 

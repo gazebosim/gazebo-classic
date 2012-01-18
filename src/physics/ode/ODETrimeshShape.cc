@@ -85,7 +85,8 @@ void ODETrimeshShape::Update()
   this->last_matrix_index = !this->last_matrix_index;
 
   dGeomTriMeshSetLastTransform(ocollision->GetCollisionId(),
-      *(dMatrix4*)(this->matrix_dblbuff + this->last_matrix_index * 16));
+      *reinterpret_cast<dMatrix4*>(this->matrix_dblbuff +
+                                   this->last_matrix_index * 16));
 }
 
 //////////////////////////////////////////////////
@@ -139,8 +140,8 @@ void ODETrimeshShape::Init()
 
   // Build the ODE triangle mesh
   dGeomTriMeshDataBuildSingle(this->odeData,
-      (float*)this->vertices, 3*sizeof(float), numVertices,
-      (int*)this->indices, numIndices, 3*sizeof(int));
+      this->vertices, 3*sizeof(this->vertices[0]), numVertices,
+      this->indices, numIndices, 3*sizeof(this->indices[0]));
 
   if (pcollision->GetCollisionId() == NULL)
   {
@@ -156,5 +157,9 @@ void ODETrimeshShape::Init()
   memset(this->matrix_dblbuff, 0, 32*sizeof(dReal));
   this->last_matrix_index = 0;
 }
+
+
+
+
 
 

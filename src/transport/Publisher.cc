@@ -162,3 +162,4 @@ std::string Publisher::GetPrevMsg() const
   return this->prevMsg;
 }
 
+

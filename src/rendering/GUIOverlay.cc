@@ -1,3 +1,20 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #include "rendering/GUIOverlay.hh"
 #include "common/Console.hh"
 
@@ -136,7 +153,7 @@ bool GUIOverlay::HandleKeyPressEvent(const std::string &_key)
 {
 #ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
-  int unicode = (int)(_key[0]);
+  int unicode = static_cast<int>(_key[0]);
   if (unicode >= 32 && unicode <= 126)
     system->injectChar(unicode);
   else
@@ -149,7 +166,7 @@ bool GUIOverlay::HandleKeyReleaseEvent(const std::string &_key)
 {
 #ifdef HAVE_CEGUI
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
-  int unicode = (int)(_key[0]);
+  int unicode = static_cast<int>(_key[0]);
   if (unicode <= 32 || unicode >= 126)
     system->injectKeyUp(this->GetKeyCode(_key));
 #endif
@@ -246,13 +263,11 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl(const std::string &_filename)
     if (window->getType() == "DefaultWindow")
       window->setMousePassThroughEnabled(true);
     rootWindow->addChildWindow(window);
-
   }
   else
   {
     gzerr << "Attempting to create a GUI overlay window before load\n";
   }
-
 
   return window;
 }
@@ -280,7 +295,6 @@ bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
 {
   CameraPtr cam = boost::shared_dynamic_cast<Camera>(_camera);
   return this->AttachCameraToImage(cam , _windowName);
-
 }
 
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
@@ -435,7 +449,7 @@ int GUIOverlay::GetKeyCode(const std::string  &_unicode)
     case '*': return CEGUI::Key::Multiply;
   };
 
-  switch ((int)(_unicode[0]))
+  switch (static_cast<int>(_unicode[0]))
   {
     case 8: return CEGUI::Key::Backspace;
     case 27: return CEGUI::Key::Escape;
@@ -445,7 +459,4 @@ int GUIOverlay::GetKeyCode(const std::string  &_unicode)
 
   return 0;
 }
-
 #endif
-
-

@@ -23,6 +23,9 @@
 #define RENDERING_CAMERA_HH
 
 #include <boost/enable_shared_from_this.hpp>
+#include <string>
+#include <list>
+#include <vector>
 
 #include "common/Event.hh"
 #include "common/Time.hh"
@@ -393,5 +396,6 @@ namespace gazebo
   }
 }
 #endif
+
 
 

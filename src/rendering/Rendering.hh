@@ -17,6 +17,7 @@
 #ifndef RENDERING_HH
 #define RENDERING_HH
 
+#include <string>
 #include "RenderTypes.hh"
 
 namespace gazebo
@@ -37,4 +38,5 @@ namespace gazebo
   }
 }
 #endif
+
 

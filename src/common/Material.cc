@@ -270,3 +270,4 @@ bool Material::GetLighting() const
   return this->lighting;
 }
 
+

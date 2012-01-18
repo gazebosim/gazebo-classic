@@ -18,6 +18,7 @@
 #define MULTIRAYGEOM_HH
 
 #include <vector>
+#include <string>
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -127,9 +128,7 @@ namespace gazebo
       protected: sdf::ElementPtr rangeElem;
     };
     /// \}
-
   }
-
 }
 #endif
 

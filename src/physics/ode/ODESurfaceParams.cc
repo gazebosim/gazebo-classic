@@ -26,7 +26,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Default constructor
 ODESurfaceParams::ODESurfaceParams()
 {
   this->kp = 1000000.0;
@@ -43,6 +42,11 @@ ODESurfaceParams::ODESurfaceParams()
   this->slip1 = 0.0;
   this->slip2 = 0.0;
   this->fdir1 = math::Vector3(0, 0, 0);
+}
+
+//////////////////////////////////////////////////
+ODESurfaceParams::~ODESurfaceParams()
+{
 }
 
 //////////////////////////////////////////////////
@@ -76,6 +80,9 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
     this->maxVel = contact->GetValueDouble("max_vel");
     this->minDepth = contact->GetValueDouble("min_depth");
   }
-
 }
+
+
+
+
 

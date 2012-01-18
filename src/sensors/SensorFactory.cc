@@ -64,3 +64,4 @@ SensorPtr SensorFactory::NewSensor(const std::string &classname)
   return sensor;
 }
 
+

@@ -17,6 +17,8 @@
 #ifndef LIGHTMAKER_HH
 #define LIGHTMAKER_HH
 
+#include <string>
+
 #include "msgs/msgs.h"
 #include "gui/EntityMaker.hh"
 
@@ -53,7 +55,6 @@ namespace gazebo
                 this->msg.set_cast_shadows(false);
                 this->lightTypename = "point";
               }
-
     };
 
     class SpotLightMaker : public LightMaker
@@ -84,9 +85,9 @@ namespace gazebo
                 this->lightTypename  = "directional";
               }
     };
-
   }
 }
 #endif
+
 
 

@@ -101,9 +101,6 @@ namespace gazebo
 
     /// \}
     /// \}
-
   }
 }
 #endif
-
-

@@ -253,7 +253,6 @@ void MapShape::ReduceTree(QuadNode *_node)
         }
       }
     }
-
   }
   else
   {
@@ -319,9 +318,10 @@ void MapShape::BuildTree(QuadNode *_node)
   this->GetPixelCount(_node->x, _node->y, _node->width, _node->height,
                       freePixels, occPixels);
 
-  //int diff = labs(freePixels - occPixels);
+  // int diff = labs(freePixels - occPixels);
 
-  if ((int)(_node->width*_node->height) > this->sdf->GetValueInt("granularity"))
+  if (static_cast<int>(_node->width*_node->height) >
+      this->sdf->GetValueInt("granularity"))
   {
     float newX, newY;
     float newW, newH;
@@ -331,11 +331,11 @@ void MapShape::BuildTree(QuadNode *_node)
     newH = _node->height / 2.0;
 
     // Create the children for the node
-    for (int i = 0; i<2; i++)
+    for (int i = 0; i < 2; i++)
     {
       newX = _node->x;
 
-      for (int j = 0; j<2; j++)
+      for (int j = 0; j < 2; j++)
       {
         newNode = new QuadNode(_node);
         newNode->x = (unsigned int)newX;
@@ -367,7 +367,7 @@ void MapShape::BuildTree(QuadNode *_node)
         newY += ceil(newH);
     }
 
-    //_node->occupied = true;
+    // _node->occupied = true;
     _node->occupied = false;
     _node->leaf = false;
   }
@@ -381,7 +381,6 @@ void MapShape::BuildTree(QuadNode *_node)
     _node->occupied = true;
     _node->leaf = true;
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -404,8 +403,8 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 
       v = (unsigned char)(255 *
           ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
-      //if (this->sdf->GetValueBool("negative"))
-        //v = 255 - v;
+      // if (this->sdf->GetValueBool("negative"))
+        // v = 255 - v;
 
       if (v > this->sdf->GetValueInt("threshold"))
         freePixels++;
@@ -420,3 +419,4 @@ void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
+

@@ -22,6 +22,8 @@
 #ifndef JOINT_HH
 #define JOINT_HH
 
+#include <string>
+
 #include "common/Event.hh"
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
@@ -205,5 +207,6 @@ namespace gazebo
   }
 }
 #endif
+
 
 

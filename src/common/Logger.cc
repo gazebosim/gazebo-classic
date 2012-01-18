@@ -164,3 +164,4 @@ std::string Logger::LogObj::GetEntityName() const
   else
     return std::string("");
 }
+

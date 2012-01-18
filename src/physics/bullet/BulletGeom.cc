@@ -149,3 +149,4 @@ void BulletCollision::SetCompoundShapeIndex(int _index)
   this->compoundShapeIndex = 0;
 }
 
+

@@ -20,9 +20,8 @@
  * Date: 15 July 2003
  */
 
-#include <sstream>
 #include <dirent.h>
-
+#include <sstream>
 
 #include "sdf/sdf_parser.h"
 #include "rendering/ogre.h"
@@ -302,16 +301,17 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *target)
     this->depthViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
-    double ratio = (double)this->depthViewport->getActualWidth() /
-                   (double)this->depthViewport->getActualHeight();
+    double ratio = static_cast<double>(this->depthViewport->getActualWidth()) /
+                   static_cast<double>(this->depthViewport->getActualHeight());
 
     double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    //gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
+    // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
 }
+
 
 
 

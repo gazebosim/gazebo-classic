@@ -238,7 +238,7 @@ const Material *Mesh::GetMaterial(int index) const
 
 //////////////////////////////////////////////////
 /// Put all the data into flat arrays
-void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
+void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 {
   std::vector<SubMesh *>::const_iterator iter;
 
@@ -260,7 +260,7 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
     delete [] *_indArr;
 
   *_vertArr = new float[ vertCount * 3 ];
-  *_indArr = new unsigned int[ indCount ];
+  *_indArr = new int[ indCount ];
 
   float *vPtr = *_vertArr;
   unsigned int index = 0;
@@ -272,7 +272,7 @@ void Mesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
       continue;
 
     float *vertTmp = NULL;
-    unsigned int *indTmp = NULL;
+    int *indTmp = NULL;
     (*iter)->FillArrays(&vertTmp, &indTmp);
 
     memcpy(vPtr, vertTmp, sizeof(vertTmp[0])*(*iter)->GetVertexCount()*3);
@@ -630,7 +630,7 @@ unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 
 //////////////////////////////////////////////////
 // Put all the data into flat arrays
-void SubMesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
+void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
 {
   if (this->vertices.size() == 0 || this->indices.size() == 0)
     gzerr << "No vertices or indices\n";
@@ -646,7 +646,7 @@ void SubMesh::FillArrays(float **_vertArr, unsigned int **_indArr) const
     delete [] *_indArr;
 
   *_vertArr = new float[ this->vertices.size() * 3 ];
-  *_indArr = new unsigned int[ this->indices.size() ];
+  *_indArr = new int[ this->indices.size() ];
 
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
       ++viter)
@@ -784,5 +784,6 @@ void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
     this->AddTexCoord(u, v);
   }
 }
+
 
 

@@ -243,3 +243,4 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
   }
 }
+

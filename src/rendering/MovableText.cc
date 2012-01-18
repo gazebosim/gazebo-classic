@@ -24,18 +24,18 @@
  * @update  2007 by independentCreations see independentCreations@gmail.com
  */
 
-#include "common/common.h"
-#include "math/gzmath.h"
-#include "rendering/MovableText.hh"
-
-#include <boost/thread/recursive_mutex.hpp>
-
 #include <OGRE/OgreFontManager.h>
 #include <OGRE/OgreMaterialManager.h>
 #include <OGRE/OgreHardwareBufferManager.h>
 #include <OGRE/OgreCamera.h>
 #include <OGRE/OgreNode.h>
 #include <OGRE/OgreRoot.h>
+
+#include <boost/thread/recursive_mutex.hpp>
+
+#include "common/common.h"
+#include "math/gzmath.h"
+#include "rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1
@@ -49,7 +49,7 @@ MovableText::MovableText()
     : camera(NULL),
     renderWindow(NULL) ,
     font(NULL) ,
-    viewportAspectCoef (0.75),
+    viewportAspectCoef(0.75),
     spaceWidth(0) ,
     updateColors(true) ,
     vertAlign(V_BELOW) ,
@@ -74,7 +74,7 @@ MovableText::~MovableText()
 }
 
 //////////////////////////////////////////////////
-//Loads the text to display and select the font
+// Loads the text to display and select the font
 void MovableText::Load(const std::string &name_,
                         const std::string &text_,
                         const std::string &fontName_,
@@ -324,7 +324,7 @@ void MovableText::_setupGeometry()
     // Removed this test as it causes problems when replacing a caption
     // of the same size: replacing "Hello" with "hello"
     // as well as when changing the text alignment
-    //if (this->renderOp.vertexData->vertexCount != vertexCount)
+    // if (this->renderOp.vertexData->vertexCount != vertexCount)
     {
       delete this->renderOp.vertexData;
       this->renderOp.vertexData = NULL;
@@ -400,12 +400,12 @@ void MovableText::_setupGeometry()
       for (std::string::iterator j = i; j != this->text.end(); ++j)
       {
         Ogre::Font::CodePoint character = *j;
-        if (character == 0x000D // CR
-            || character == 0x0085) // NEL
+        if (character == 0x000D  // CR
+            || character == 0x0085)  // NEL
         {
           break;
         }
-        else if (character == 0x0020) // space
+        else if (character == 0x0020)  // space
         {
           len += this->spaceWidth;
         }
@@ -421,8 +421,8 @@ void MovableText::_setupGeometry()
 
     Ogre::Font::CodePoint character = (*i);
 
-    if (character == 0x000D // CR
-        || character == 0x0085) // NEL
+    if (character == 0x000D  // CR
+        || character == 0x0085)  // NEL
     {
       top -= this->charHeight * 2.0;
       newLine = true;
@@ -431,7 +431,7 @@ void MovableText::_setupGeometry()
       this->renderOp.vertexData->vertexCount -= 6;
       continue;
     }
-    else if (character == 0x0020) // space
+    else if (character == 0x0020)  // space
     {
       // Just leave a gap, no tris
       left += this->spaceWidth;
@@ -658,7 +658,7 @@ const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   assert(this->camera);
   return const_cast<Ogre::Quaternion&>(this->camera->getDerivedOrientation());
-  //return mParentNode->_getDerivedOrientation();
+  // return mParentNode->_getDerivedOrientation();
 }
 
 //////////////////////////////////////////////////
@@ -694,7 +694,7 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
 
     // store rotation in a matrix
     this->camera->getDerivedOrientation().ToRotationMatrix(rot3x3);
-    //mParentNode->_getDerivedOrientation().ToRotationMatrix(rot3x3);
+    // mParentNode->_getDerivedOrientation().ToRotationMatrix(rot3x3);
 
     // parent node position
     Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() +

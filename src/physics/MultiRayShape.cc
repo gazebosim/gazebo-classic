@@ -50,11 +50,11 @@ void MultiRayShape::Init()
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
-  //double horzResolution = 1.0;
+  // double horzResolution = 1.0;
 
   double pDiff = 0;
   int vertSamples = 1;
-  //double vertResolution = 1.0;
+  // double vertResolution = 1.0;
   double vertMinAngle = 0;
   double vertMaxAngle = 0;
 
@@ -71,14 +71,14 @@ void MultiRayShape::Init()
     vertMinAngle = this->vertElem->GetValueDouble("min_angle");
     vertMaxAngle = this->vertElem->GetValueDouble("max_angle");
     vertSamples = this->vertElem->GetValueUInt("samples");
-    //vertResolution = this->vertElem->GetValueDouble("resolution");
+    // vertResolution = this->vertElem->GetValueDouble("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
   horzMinAngle = this->horzElem->GetValueDouble("min_angle");
   horzMaxAngle = this->horzElem->GetValueDouble("max_angle");
   horzSamples = this->horzElem->GetValueUInt("samples");
-  //horzResolution = this->horzElem->GetValueDouble("resolution");
+  // horzResolution = this->horzElem->GetValueDouble("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
   minRange = this->rangeElem->GetValueDouble("min");
@@ -111,7 +111,7 @@ void MultiRayShape::Init()
 //////////////////////////////////////////////////
 double MultiRayShape::GetRange(int _index)
 {
-  if (_index < 0 || _index >= (int)this->rays.size())
+  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -125,7 +125,7 @@ double MultiRayShape::GetRange(int _index)
 //////////////////////////////////////////////////
 double MultiRayShape::GetRetro(int _index)
 {
-  if (_index < 0 || _index >= (int)this->rays.size())
+  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -139,7 +139,7 @@ double MultiRayShape::GetRetro(int _index)
 //////////////////////////////////////////////////
 int MultiRayShape::GetFiducial(int _index)
 {
-  if (_index < 0 || _index >= (int)this->rays.size())
+  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -174,9 +174,9 @@ void MultiRayShape::Update()
 void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
                            const math::Vector3 &/*_end*/)
 {
-  //msgs::Vector3d *pt = NULL;
+  // msgs::Vector3d *pt = NULL;
 
-  //FIXME: need to lock this when spawning models with ray.
+  // FIXME: need to lock this when spawning models with ray.
   // This fails because RaySensor::laserShape->Update()
   // is called before rays could be constructed.
 }
@@ -187,18 +187,18 @@ double MultiRayShape::GetMinRange() const
 {
   return this->rangeElem->GetValueDouble("min");
 }
+
 //////////////////////////////////////////////////
 double MultiRayShape::GetMaxRange() const
 {
   return this->rangeElem->GetValueDouble("max");
 }
+
 //////////////////////////////////////////////////
 double MultiRayShape::GetResRange() const
 {
   return this->rangeElem->GetValueDouble("resolution");
 }
-
-
 
 //////////////////////////////////////////////////
 int MultiRayShape::GetSampleCount() const
@@ -224,10 +224,6 @@ math::Angle MultiRayShape::GetMaxAngle() const
   return this->horzElem->GetValueDouble("max_angle");
 }
 
-
-
-
-
 //////////////////////////////////////////////////
 int MultiRayShape::GetVerticalSampleCount() const
 {
@@ -251,5 +247,4 @@ math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
   return this->vertElem->GetValueDouble("max_angle");
 }
-
 

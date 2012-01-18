@@ -79,7 +79,7 @@ void ODECollision::Fini()
 void ODECollision::OnPoseChange()
 {
   // Update all the models
-  //(*this.*onPoseChangeFunc)();
+  // (*this.*onPoseChangeFunc)();
 
   if (this->IsStatic() && this->collisionId && this->placeable)
     this->OnPoseChangeGlobal();
@@ -168,7 +168,7 @@ math::Box ODECollision::GetBoundingBox() const
 
   memset(aabb, 0, 6 * sizeof(dReal));
 
-  //if (this->collisionId && this->type != Shape::PLANE)
+  // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
   box.min.Set(aabb[0], aabb[2], aabb[4]);
@@ -237,4 +237,8 @@ void ODECollision::OnPoseChangeRelative()
 void ODECollision::OnPoseChangeNull()
 {
 }
+
+
+
+
 

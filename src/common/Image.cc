@@ -359,8 +359,8 @@ void Image::Rescale(int _width, int _height)
   unsigned int w = this->GetWidth();
   unsigned int h = this->GetHeight();
 
-//float xRes = destW / w;
-//float yRes = destH / h;
+// float xRes = destW / w;
+// float yRes = destH / h;
 
 pt.z = 0;
 
@@ -402,6 +402,7 @@ std::string Image::GetFilename() const
 {
   return this->fullName;
 }
+
 
 
 

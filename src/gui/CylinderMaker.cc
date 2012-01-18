@@ -51,9 +51,7 @@ CylinderMaker::~CylinderMaker()
 }
 
 void CylinderMaker::Start(const rendering::UserCameraPtr _camera)
-                          //const CreateCallback &cb)
 {
-  //this->createCB = cb;
   this->camera = _camera;
   std::ostringstream stream;
   stream << "__GZ_USER_cylinder_" << counter++;
@@ -205,5 +203,6 @@ void CylinderMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
+
 
 

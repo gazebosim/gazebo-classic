@@ -81,11 +81,9 @@ namespace gazebo
                      this->SetHighStop(1, limitElem->GetValueDouble("upper"));
                    }
                  }
-
     };
     /// \}
   }
 }
 #endif
-
 

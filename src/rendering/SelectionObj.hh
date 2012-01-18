@@ -17,6 +17,8 @@
 #ifndef SELECTION_OBJ
 #define SELECTION_OBJ
 
+#include <string>
+
 #include "math/Vector3.hh"
 #include "rendering/RenderTypes.hh"
 
@@ -67,4 +69,3 @@ namespace gazebo
   }
 }
 #endif
-

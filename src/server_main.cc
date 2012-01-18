@@ -37,7 +37,7 @@ void PrintVersion()
 // Parse the argument list.  Options are placed in static variables.
 int ParseArgs(int argc, char **argv)
 {
-  //FILE *tmpFile;
+  // FILE *tmpFile;
   int ch;
 
   char *flags = (char*)("up:");
@@ -84,7 +84,7 @@ void SignalHandler(int)
 
 int main(int argc, char **argv)
 {
-  //Application Setup
+  // Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
@@ -130,4 +130,5 @@ int main(int argc, char **argv)
   printf("\n");
   return 0;
 }
+
 

@@ -90,7 +90,7 @@ void Light::Load()
   {
     this->light = this->scene->GetManager()->createLight(this->GetName());
   }
-  catch (Ogre::Exception &e)
+  catch(Ogre::Exception &e)
   {
     gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
         "Unable to create a light");
@@ -131,7 +131,7 @@ void Light::Load()
   this->visual->AttachObject(this->light);
 
   this->CreateVisual();
-  //this->SetupShadows();
+  // this->SetupShadows();
 }
 
 //////////////////////////////////////////////////
@@ -548,7 +548,6 @@ void Light::SetSpotFalloff(const double &_angle)
         Ogre::Radian(elem->GetValueDouble("outer_angle")),
         elem->GetValueDouble("falloff"));
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -591,13 +590,13 @@ void Light::SetupShadows()
       Ogre::MaterialManager::getSingleton().getResourceIterator();
 
     // Iterate over all the materials, and set the pssm split points
-    while(iter.hasMoreElements())
+    while (iter.hasMoreElements())
     {
       Ogre::MaterialPtr mat = iter.getNext();
-      for(int i = 0; i < mat->getNumTechniques(); i++)
+      for (int i = 0; i < mat->getNumTechniques(); i++)
       {
         Ogre::Technique *tech = mat->getTechnique(i);
-        for(int j = 0; j < tech->getNumPasses(); j++)
+        for (int j = 0; j < tech->getNumPasses(); j++)
         {
           Ogre::Pass *pass = tech->getPass(j);
           if (pass->hasFragmentProgram())
@@ -618,6 +617,7 @@ void Light::SetupShadows()
   }
   */
 }
+
 
 
 

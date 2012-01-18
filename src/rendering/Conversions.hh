@@ -47,10 +47,8 @@ namespace gazebo
 
       /// \brief Ogre quaternion to Gazebo quaternion
       public: static math::Quaternion Convert(const Ogre::Quaternion &v);
-
     };
     /// \}
   }
 }
 #endif
-

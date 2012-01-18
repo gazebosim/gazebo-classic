@@ -22,9 +22,11 @@
 #ifndef RTSHADERSYSTEM_HH
 #define RTSHADERSYSTEM_HH
 
-#include "rendering/ogre.h"
-
 #include <list>
+#include <string>
+#include <vector>
+
+#include "rendering/ogre.h"
 #include "gazebo_config.h"
 
 #include "rendering/Camera.hh"
@@ -112,9 +114,6 @@ namespace gazebo
       private: friend class SingletonT<RTShaderSystem>;
     };
     /// \}
-
   }
-
 }
 #endif
-

@@ -83,3 +83,4 @@ const double &NumericKeyFrame::GetValue() const
   return this->value;
 }
 
+

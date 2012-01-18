@@ -32,8 +32,8 @@ using namespace gazebo;
 using namespace rendering;
 
 /// \brief Constructor
-ContactVisual::ContactVisual (const std::string &_name, VisualPtr _vis,
-                              const std::string &_topicName)
+ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
+                             const std::string &_topicName)
 : Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -120,9 +120,8 @@ void ContactVisual::Update()
       c++;
     }
   }
-  for (;c<10;c++)
+  for ( ; c < 10; c++)
     this->points[c]->sceneNode->setVisible(false);
-
 }
 
 void ContactVisual::OnContact(
@@ -130,5 +129,3 @@ void ContactVisual::OnContact(
 {
   this->contactsMsg = _msg;
 }
-
-

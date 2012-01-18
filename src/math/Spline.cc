@@ -243,3 +243,4 @@ void Spline::SetAutoCalculate(bool _autoCalc)
   this->autoCalc = _autoCalc;
 }
 
+

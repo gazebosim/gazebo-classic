@@ -95,3 +95,4 @@ sensors::SensorPtr sensors::get_sensor(const std::string &_name)
   return sensors::SensorManager::Instance()->GetSensor(_name);
 }
 
+

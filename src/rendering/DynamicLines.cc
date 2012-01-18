@@ -19,10 +19,11 @@
  * Date: 28 June 2007
  */
 
-#include "rendering/ogre.h"
-#include <cmath>
 #include <math.h>
+
+#include <cmath>
 #include <sstream>
+#include "rendering/ogre.h"
 
 #include "common/Exception.hh"
 #include "rendering/DynamicLines.hh"
@@ -147,3 +148,4 @@ void DynamicLines::FillHardwareBuffers()
 
   this->dirty = false;
 }
+

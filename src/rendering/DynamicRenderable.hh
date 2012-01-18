@@ -93,11 +93,8 @@ namespace gazebo
 
       /// \brief Maximum capacity of the currently allocated index buffer.
       protected: size_t indexBufferCapacity;
-
     };
-
     /// \}
   }
 }
 #endif
-

@@ -82,3 +82,4 @@ void Contact::Reset()
   this->count = 0;
 }
 
+

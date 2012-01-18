@@ -22,6 +22,8 @@
 #ifndef TRIMESHSHAPE_HH
 #define TRIMESHSHAPE_HH
 
+#include <string>
+
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
@@ -68,4 +70,5 @@ namespace gazebo
   }
 }
 #endif
+
 

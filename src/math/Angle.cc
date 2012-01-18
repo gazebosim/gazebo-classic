@@ -190,3 +190,4 @@ bool Angle::operator>=(const Angle &angle) const
   return this->value >= angle.value;
 }
 
+

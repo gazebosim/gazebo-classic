@@ -17,6 +17,8 @@
 #ifndef FPSVIEWCONTROLLER_HH
 #define FPSVIEWCONTROLLER_HH
 
+#include <string>
+
 #include "rendering/ViewController.hh"
 
 namespace gazebo
@@ -49,4 +51,5 @@ namespace gazebo
   }
 }
 #endif
+
 

@@ -22,6 +22,7 @@
 #define MAPSHAPE_HH
 
 #include <deque>
+#include <string>
 
 #include "common/CommonTypes.hh"
 
@@ -125,8 +126,8 @@ namespace gazebo
                     (*iter)->Print(space);
               }
 
-      public: unsigned int x, y;
-      public: unsigned int width, height;
+      public: uint32_t x, y;
+      public: uint32_t width, height;
 
       public: QuadNode *parent;
       public: std::deque<QuadNode*> children;
@@ -141,4 +142,5 @@ namespace gazebo
   }
 }
 #endif
+
 

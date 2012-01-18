@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 #include <QtGui>
 #define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
@@ -23,8 +39,8 @@
 using namespace gazebo;
 using namespace gui;
 
-InsertModelWidget::InsertModelWidget(QWidget *_parent)
-  : QWidget(_parent)
+  InsertModelWidget::InsertModelWidget(QWidget *_parent)
+: QWidget(_parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->fileTreeWidget = new QTreeWidget();
@@ -32,7 +48,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->fileTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->fileTreeWidget->header()->hide();
   connect(this->fileTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-          this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
+      this, SLOT(OnModelSelection(QTreeWidgetItem *, int)));
 
   QHBoxLayout *buttonLayout = new QHBoxLayout;
   this->addButton = new QPushButton(tr("Apply"));
@@ -54,7 +70,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 
   // Iterate over all the gazebo paths
   for (std::list<std::string>::iterator iter = gazeboPaths.begin();
-       iter != gazeboPaths.end(); ++iter)
+      iter != gazeboPaths.end(); ++iter)
   {
     // This is the full model path
     std::string path = (*iter) +
@@ -62,7 +78,7 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 
     // Create a top-level tree item for the path
     QTreeWidgetItem *topItem =
-      new QTreeWidgetItem((QTreeWidgetItem*)0,
+      new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
           QStringList(QString("%1").arg(QString::fromStdString(path))));
     this->fileTreeWidget->addTopLevelItem(topItem);
 
@@ -71,11 +87,11 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     std::list<boost::filesystem::path> resultSet;
 
     if (boost::filesystem::exists(dir) &&
-         boost::filesystem::is_directory(dir))
+        boost::filesystem::is_directory(dir))
     {
       // Iterate over all the model in the current gazebo path
-      for(boost::filesystem::directory_iterator dirIter(dir);
-           dirIter != endIter; ++dirIter)
+      for (boost::filesystem::directory_iterator dirIter(dir);
+          dirIter != endIter; ++dirIter)
       {
         if (boost::filesystem::is_regular_file(dirIter->status()))
         {
@@ -109,7 +125,7 @@ InsertModelWidget::~InsertModelWidget()
 }
 
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
+    int /*_column*/)
 {
   rendering::Scene *scene = gui::get_active_camera()->GetScene();
 
@@ -144,10 +160,10 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       modelPose = modelElem->GetElement("origin")->GetValuePose("pose");
 
     modelName = this->node->GetTopicNamespace() + "::" +
-                 modelElem->GetValueString("name");
+      modelElem->GetValueString("name");
 
     this->modelVisual.reset(new rendering::Visual(modelName,
-                            scene->GetWorldVisual()));
+          scene->GetWorldVisual()));
     this->modelVisual->Load();
     this->modelVisual->SetPose(modelPose);
 
@@ -183,9 +199,9 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 
         std::ostringstream visualName;
         visualName << modelName << "::" << linkName << "::Visual_"
-                   << visualIndex++;
+          << visualIndex++;
         rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-                                                             linkVisual));
+              linkVisual));
         visVisual->Load(visualElem);
         this->visuals.push_back(visVisual);
 
@@ -260,4 +276,5 @@ void InsertModelWidget::OnCancel()
   this->selectionPub->Publish(selectMsg);
   this->fileTreeWidget->clearSelection();
 }
+
 

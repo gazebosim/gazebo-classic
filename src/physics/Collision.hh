@@ -22,6 +22,9 @@
 #ifndef COLLISION_HH
 #define COLLISION_HH
 
+#include <string>
+#include <vector>
+
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
@@ -175,3 +178,4 @@ namespace gazebo
   }
 }
 #endif
+

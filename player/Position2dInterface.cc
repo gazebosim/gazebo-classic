@@ -61,7 +61,7 @@ Position2dInterface::~Position2dInterface()
 //////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
-                                        player_msghdr_t *_hdr, void *_data)
+                                        player_msghdr_t *_hdr, void * /*_data*/)
 {
   int result = 0;
 

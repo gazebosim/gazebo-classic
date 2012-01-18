@@ -21,10 +21,10 @@
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
-#include <boost/thread/recursive_mutex.hpp>
-
-#include <sstream>
 #include <float.h>
+
+#include <boost/thread/recursive_mutex.hpp>
+#include <sstream>
 
 #include "common/KeyFrame.hh"
 #include "common/Animation.hh"
@@ -87,7 +87,7 @@ void Model::Load(sdf::ElementPtr &_sdf)
       boost::bind(&Entity::IsStatic, this));
 
   // TODO: check for duplicate model, and raise an error
-  //BasePtr dup = Base::GetByName(this->GetScopedName());
+  // BasePtr dup = Base::GetByName(this->GetScopedName());
 
   // Load the bodies
   if (_sdf->HasElement("link"))
@@ -138,7 +138,6 @@ void Model::Load(sdf::ElementPtr &_sdf)
       pluginElem = pluginElem->GetNextElement();
     }
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -264,7 +263,6 @@ void Model::RemoveChild(EntityPtr _child)
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     if (*iter && (*iter)->HasType(LINK))
       boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
-
 }
 
 //////////////////////////////////////////////////
@@ -580,12 +578,12 @@ void Model::LoadJoint(sdf::ElementPtr &_sdf)
   msg.set_name(joint->GetName());
   msg.set_type(msgs::Joint::REVOLUTE);
 
-  if(joint->GetParent())
+  if (joint->GetParent())
     msg.set_parent(joint->GetParent()->GetScopedName());
   else
     msg.set_parent("world");
 
-  if(joint->GetChild())
+  if (joint->GetChild())
     msg.set_child(joint->GetChild()->GetScopedName());
   else
     msg.set_child("world");
@@ -737,7 +735,7 @@ void Model::SetJointPositions(
           parentLink->GetName() != childLink->GetName())
       {
         // transform about the current anchor, about the axis
-        switch(type)
+        switch (type)
         {
           case Base::HINGE_JOINT:
             {
@@ -992,4 +990,5 @@ void Model::OnPoseChange()
     this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
+
 

@@ -55,3 +55,4 @@ Time Timer::GetElapsed() const
   return currentTime - this->start;
 }
 
+

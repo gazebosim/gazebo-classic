@@ -46,7 +46,7 @@ namespace gazebo
     class BulletCollision : public Collision
     {
       /// \brief Constructor
-      //public: Collision(Link *body, const std::string &name);
+      // public: Collision(Link *body, const std::string &name);
       public: BulletCollision(Link *body);
   
       /// \brief Destructor
@@ -99,4 +99,5 @@ namespace gazebo
   }
 }
 #endif
+
 

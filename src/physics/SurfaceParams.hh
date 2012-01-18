@@ -34,8 +34,11 @@ namespace gazebo
     /// \brief Surface params
     class SurfaceParams
     {
-      /// Constructor
+      /// \brief Constructor
       public: SurfaceParams();
+
+      /// \brief Constructor
+      public: virtual ~SurfaceParams();
 
       /// \brief Load the contact params
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -69,4 +72,5 @@ namespace gazebo
   }
 }
 #endif
+
 

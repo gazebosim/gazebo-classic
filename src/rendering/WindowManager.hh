@@ -17,11 +17,11 @@
 #ifndef WINDOWMANAGER_HH
 #define WINDOWMANAGER_HH
 
-#include "common/SingletonT.hh"
-#include "rendering/RenderTypes.hh"
-
 #include <string>
 #include <vector>
+
+#include "common/SingletonT.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace Ogre
 {
@@ -74,4 +74,5 @@ namespace gazebo
   }
 }
 #endif
+
 

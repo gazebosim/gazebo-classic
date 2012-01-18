@@ -54,7 +54,7 @@ namespace gazebo
 
       /// \brief The default function does nothing. This should be
       ///        overriden in the child classes where appropriate
-      public: virtual double GetParam(int /*parameter*/) const;
+      public: virtual double GetParam(int _parameter) const;
 
       /// \brief Attach the two bodies with this joint
       public: virtual void Attach(LinkPtr parent, LinkPtr child);
@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief By default this does nothing. It should be overridden in child
       ///        classes where appropriate
-      public: virtual void SetParam(int /*parameter*/, double /*value*/);
+      public: virtual void SetParam(int _parameter, double _value);
 
       /// \brief Set the ERP of this joint
       public: void SetERP(double newERP);
@@ -117,5 +117,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
 
 

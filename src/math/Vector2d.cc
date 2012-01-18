@@ -220,3 +220,4 @@ double Vector2d::operator[](unsigned int index) const
   }
 }
 
+

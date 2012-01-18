@@ -87,3 +87,4 @@ math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
   return result;
 }
 
+

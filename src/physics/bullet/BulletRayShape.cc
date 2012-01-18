@@ -52,3 +52,4 @@ void BulletRayCollision::SetPoints(const math::Vector3 &_posStart,
   RayCollision<BulletCollision>::SetPoints(_posStart, _posEnd);
 }
 
+

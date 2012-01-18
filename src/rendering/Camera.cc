@@ -20,9 +20,8 @@
  * Date: 15 July 2003
  */
 
-#include <sstream>
 #include <dirent.h>
-
+#include <sstream>
 
 #include "sdf/sdf_parser.h"
 #include "rendering/ogre.h"
@@ -172,7 +171,6 @@ void Camera::Load()
     }
     this->SetHFOV(angle);
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -198,7 +196,6 @@ void Camera::Init()
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
   this->SetClipDist();
-
 }
 
 //////////////////////////////////////////////////
@@ -236,15 +233,15 @@ void Camera::SetScene(Scene *scene_)
 // Update the drawing
 void Camera::Update()
 {
-  //if (this->sceneNode)
-  //{
-    //Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
-  //}
+  // if (this->sceneNode)
+  // {
+    // Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
+  // }
 
-  //if (this->pitchNode)
-  //{
+  // if (this->pitchNode)
+  // {
   //  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
-  //}
+  // }
 
   std::list<msgs::Request>::iterator iter = this->requests.begin();
   while (iter != this->requests.end())
@@ -531,7 +528,7 @@ unsigned int Camera::GetImageWidth() const
 unsigned int Camera::GetImageHeight() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
-  //gzerr << "image height " << elem->GetValueInt("height") << "\n";
+  // gzerr << "image height " << elem->GetValueInt("height") << "\n";
   return elem->GetValueInt("height");
 }
 
@@ -600,7 +597,6 @@ size_t Camera::GetImageByteSize(unsigned int _width, unsigned int _height,
     (Ogre::PixelFormat)(Camera::GetOgrePixelFormat(_format));
 
   return Ogre::PixelUtil::getMemorySize(_width, _height, 1, fmt);
-
 }
 
 int Camera::GetOgrePixelFormat(const std::string &_format)
@@ -608,15 +604,15 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
   int result;
 
   if (_format == "L8")
-    result = (int)Ogre::PF_L8;
+    result = static_cast<int>(Ogre::PF_L8);
   else if (_format == "R8G8B8")
-    result = (int)Ogre::PF_BYTE_RGB;
+    result = static_cast<int>(Ogre::PF_BYTE_RGB);
   else if (_format == "B8G8R8")
-    result = (int)Ogre::PF_BYTE_BGR;
+    result = static_cast<int>(Ogre::PF_BYTE_BGR);
   else if (_format == "FLOAT32")
-    result = (int)Ogre::PF_FLOAT32_R;
+    result = static_cast<int>(Ogre::PF_FLOAT32_R);
   else if (_format == "FLOAT16")
-    result = (int)Ogre::PF_FLOAT16_R;
+    result = static_cast<int>(Ogre::PF_FLOAT16_R);
   else if ((_format == "BAYER_RGGB8") ||
             (_format == "BAYER_BGGR8") ||
             (_format == "BAYER_GBRG8") ||
@@ -624,13 +620,13 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
   {
     // let ogre generate rgb8 images for all bayer format requests
     // then post process to produce actual bayer images
-    result = (int)Ogre::PF_BYTE_RGB;
+    result = static_cast<int>(Ogre::PF_BYTE_RGB);
   }
   else
   {
     gzerr << "Error parsing image format (" << _format
           << "), using default Ogre::PF_R8G8B8\n";
-    result = (int)Ogre::PF_R8G8B8;
+    result = static_cast<int>(Ogre::PF_R8G8B8);
   }
 
   return result;
@@ -807,17 +803,18 @@ void Camera::SaveFrame()
   if (!path.empty())
   {
     double wallTime = common::Time::GetWallTime().Double();
-    int min = (int)(wallTime / 60.0);
-    int sec = (int)(wallTime - min*60);
-    int msec = (int)(wallTime*1000 - min*60000 - sec*1000);
+    int min = static_cast<int>((wallTime / 60.0));
+    int sec = static_cast<int>((wallTime - min*60));
+    int msec = static_cast<int>((wallTime*1000 - min*60000 - sec*1000));
 
-    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg",
+    snprintf(tmp, sizeof(tmp), "%s/%s-%04d-%03dm_%02ds_%03dms.jpg",
         path.c_str(), this->GetName().c_str(),
         this->saveCount, min, sec, msec);
   }
   else
   {
-    sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
+    snprintf(tmp, sizeof(tmp),
+        "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
   }
 
   this->SaveFrame(this->saveFrameBuffer,
@@ -905,8 +902,8 @@ void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
                                     math::Vector3 &_dir)
 {
   Ogre::Ray ray = this->camera->getCameraToViewportRay(
-      (float)_screenx / this->GetViewportWidth(),
-      (float)_screeny / this->GetViewportHeight());
+      static_cast<float>(_screenx) / this->GetViewportWidth(),
+      static_cast<float>(_screeny) / this->GetViewportHeight());
 
   _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
   _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
@@ -923,96 +920,96 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
     // do last minute conversion if Bayer pattern is requested, go from R8G8B8
     if (format == "BAYER_RGGB8")
     {
-      for (int i = 0;i<width;i++)
+      for (int i = 0; i < width; i++)
       {
-        for (int j = 0;j<height;j++)
+        for (int j = 0; j < height; j++)
         {
           //
           // RG
           // GB
           //
           // determine position
-          if (j%2) // even column
-            if (i%2) // even row, red
+          if (j%2)  // even column
+            if (i%2)  // even row, red
               dst[i+j*width] = src[i*3+j*width*3+2];
-            else // odd row, green
+            else  // odd row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
-          else // odd column
-            if (i%2) // even row, green
+          else  // odd column
+            if (i%2)  // even row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
-            else // odd row, blue
+            else  // odd row, blue
               dst[i+j*width] = src[i*3+j*width*3+0];
         }
       }
     }
     else if (format == "BAYER_BGGR8")
     {
-      for (int i = 0;i<width;i++)
+      for (int i = 0; i < width; i++)
       {
-        for (int j = 0;j<height;j++)
+        for (int j = 0; j < height; j++)
         {
           //
           // BG
           // GR
           //
           // determine position
-          if (j%2) // even column
-            if (i%2) // even row, blue
+          if (j%2)  // even column
+            if (i%2)  // even row, blue
               dst[i+j*width] = src[i*3+j*width*3+0];
-            else // odd row, green
+            else  // odd row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
-          else // odd column
-            if (i%2) // even row, green
+          else  // odd column
+            if (i%2)  // even row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
-            else // odd row, red
+            else  // odd row, red
               dst[i+j*width] = src[i*3+j*width*3+2];
         }
       }
     }
     else if (format == "BAYER_GBRG8")
     {
-      for (int i = 0;i<width;i++)
+      for (int i = 0; i < width; i++)
       {
-        for (int j = 0;j<height;j++)
+        for (int j = 0; j < height; j++)
         {
           //
           // GB
           // RG
           //
           // determine position
-          if (j%2) // even column
-            if (i%2) // even row, green
+          if (j%2)  // even column
+            if (i%2)  // even row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
-            else // odd row, blue
+            else  // odd row, blue
               dst[i+j*width] = src[i*3+j*width*3+2];
-          else // odd column
-            if (i%2) // even row, red
+          else  // odd column
+            if (i%2)  // even row, red
               dst[i+j*width] = src[i*3+j*width*3+0];
-            else // odd row, green
+            else  // odd row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
         }
       }
     }
     else if (format == "BAYER_GRBG8")
     {
-      for (int i = 0;i<width;i++)
+      for (int i = 0; i < width; i++)
       {
-        for (int j = 0;j<height;j++)
+        for (int j = 0; j < height; j++)
         {
           //
           // GR
           // BG
           //
           // determine position
-          if (j%2) // even column
-            if (i%2) // even row, green
+          if (j%2)  // even column
+            if (i%2)  // even row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
-            else // odd row, red
+            else  // odd row, red
               dst[i+j*width] = src[i*3+j*width*3+0];
-          else // odd column
-            if (i%2) // even row, blue
+          else  // odd column
+            if (i%2)  // even row, blue
               dst[i+j*width] = src[i*3+j*width*3+2];
-            else // odd row, green
+            else  // odd row, green
               dst[i+j*width] = src[i*3+j*width*3+1];
         }
       }
@@ -1106,8 +1103,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
-    double ratio = (double)this->viewport->getActualWidth() /
-                   (double)this->viewport->getActualHeight();
+    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+                   static_cast<double>(this->viewport->getActualHeight());
 
     double hfov = this->GetHFOV().GetAsRadian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
@@ -1239,3 +1236,4 @@ bool Camera::GetInitialized() const
 {
   return this->initialized;
 }
+

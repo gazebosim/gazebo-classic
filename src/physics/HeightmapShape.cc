@@ -37,7 +37,7 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
   this->AddType(Base::HEIGHTMAP_SHAPE);
-  // TODO:this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
+  // TODO this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
 
 
@@ -45,7 +45,7 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 // Destructor
 HeightmapShape::~HeightmapShape()
 {
-  // NATY: delete this->ogreHeightmap;
+  // TODO delete this->ogreHeightmap;
 }
 
 //////////////////////////////////////////////////
@@ -95,7 +95,6 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_filename(this->GetFilename());
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
-
 }
 
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)

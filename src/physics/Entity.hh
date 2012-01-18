@@ -23,6 +23,7 @@
 #define ENTITY_HH
 
 #include <string>
+#include <vector>
 
 #include "msgs/msgs.h"
 
@@ -239,4 +240,5 @@ namespace gazebo
   }
 }
 #endif
+
 

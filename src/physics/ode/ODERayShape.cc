@@ -200,3 +200,7 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
 }
 
+
+
+
+

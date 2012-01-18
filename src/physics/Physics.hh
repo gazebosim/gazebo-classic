@@ -17,6 +17,8 @@
 #ifndef __PHYSICS_HH__
 #define __PHYSICS_HH__
 
+#include <string>
+
 #include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.h"
 
@@ -49,4 +51,5 @@ namespace gazebo
   }
 }
 #endif
+
 

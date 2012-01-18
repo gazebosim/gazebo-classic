@@ -39,7 +39,7 @@ namespace gazebo
       public: BulletMotionState(Link *body);
   
       /// \brief Constructor
-      //public: BulletMotionState(const math::Pose &initPose);
+      // public: BulletMotionState(const math::Pose &initPose);
   
       /// \brief Destructor
       public: virtual ~BulletMotionState();
@@ -78,4 +78,5 @@ namespace gazebo
   }
 }
 #endif
+
 
