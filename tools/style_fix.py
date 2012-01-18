@@ -37,10 +37,12 @@ def ParseArguments(args):
   return filenames
 
 def ProcessFile(filename):
-  lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
+  #lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
+  lines = codecs.open(filename, 'r', 'utf8', 'replace').readlines()
   outFile = open(filename,'w')
   # Remove trailing '\r'.
   for linenum in range(len(lines)):
+    lines[linenum] = lines[linenum].rstrip('\n')
     if lines[linenum].endswith('\r'):
       lines[linenum] = lines[linenum].rstrip('\r')
       carriage_return_found = True
@@ -52,6 +54,7 @@ def ProcessFile(filename):
   for linenum in range(len(lines)):
     line = lines[linenum]
     prevLine = lines[linenum-1]
+
     #if 'http' not in line:
     #  line = re.sub(r'//([a-z])','// \\1', line)
     #  line = re.sub(r'//(\()','// \\1', line)
