@@ -17,14 +17,14 @@
 /* Desc: Heightmap collisionetry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: BulletHeightmapCollision.cc 7640 2009-05-13 02:06:08Z natepak $
  */
 
-#include <iostream>
 #include <string.h>
 #include <math.h>
 
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+
+#include <iostream>
 
 #include "common/Image.hh"
 #include "common/Exception.hh"
@@ -81,9 +81,9 @@ void BulletHeightmapCollision::FillHeightMap()
   math::Vector3 scale = this->terrainSize / this->width;
 
   // Iterate over all the verices
-  for (y = 0; y<this->height; y++)
+  for (y = 0; y < this->height; y++)
   {
-    for (x = 0; x<this->width; x++)
+    for (x = 0; x < this->width; x++)
     {
       // Find the height at a vertex
       heights[y*this->width + x] = this->ogreHeightmap->GetHeightAt(

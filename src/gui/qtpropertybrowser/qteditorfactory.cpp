@@ -41,7 +41,8 @@
 #include "qteditorfactory.h"
 
 #if defined(Q_CC_MSVC)
-#    pragma warning(disable: 4786) /* MS VS 6: truncating debug info after 255 characters */
+#    pragma warning(disable: 4786)
+/* MS VS 6: truncating debug info after 255 characters */
 #endif
 
 #if QT_VERSION >= 0x040400
@@ -62,14 +63,17 @@ static inline void setupTreeViewEditorMargin(QLayout *lt)
 
 // ------------ QtSpinBoxFactory
 
-void QtSpinBoxFactoryPrivate::slotPropertyChanged(QtProperty *property, int value)
+void QtSpinBoxFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    int value)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QSpinBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QSpinBox *editor = itEditor.next();
-    if (editor->value() != value) {
+    if (editor->value() != value)
+    {
       editor->blockSignals(true);
       editor->setValue(value);
       editor->blockSignals(false);
@@ -77,7 +81,8 @@ void QtSpinBoxFactoryPrivate::slotPropertyChanged(QtProperty *property, int valu
   }
 }
 
-void QtSpinBoxFactoryPrivate::slotRangeChanged(QtProperty *property, int min, int max)
+void QtSpinBoxFactoryPrivate::slotRangeChanged(QtProperty *property, int min,
+    int max)
 {
   if (!m_createdEditors.contains(property))
     return;
@@ -87,7 +92,8 @@ void QtSpinBoxFactoryPrivate::slotRangeChanged(QtProperty *property, int min, in
     return;
 
   QListIterator<QSpinBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QSpinBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setRange(min, max);
@@ -96,12 +102,14 @@ void QtSpinBoxFactoryPrivate::slotRangeChanged(QtProperty *property, int min, in
   }
 }
 
-void QtSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property, int step)
+void QtSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property,
+    int step)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QSpinBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QSpinBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setSingleStep(step);
@@ -112,9 +120,14 @@ void QtSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property, int st
 void QtSpinBoxFactoryPrivate::slotSetValue(int value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QSpinBox *, QtProperty *>::ConstIterator  ecend = m_editorToProperty.constEnd();
-  for (QMap<QSpinBox *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor !=  ecend; ++itEditor) {
-    if (itEditor.key() == object) {
+  const QMap<QSpinBox *,
+        QtProperty *>::ConstIterator  ecend = m_editorToProperty.constEnd();
+  for (QMap<QSpinBox *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor !=  ecend; ++itEditor)
+  {
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtIntPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -142,7 +155,6 @@ void QtSpinBoxFactoryPrivate::slotSetValue(int value)
 {
   d_ptr = new QtSpinBoxFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -174,7 +186,8 @@ void QtSpinBoxFactory::connectPropertyManager(QtIntPropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtSpinBoxFactory::createEditor(QtIntPropertyManager *manager, QtProperty *property,
+QWidget *QtSpinBoxFactory::createEditor(QtIntPropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QSpinBox *editor = d_ptr->createEditor(property, parent);
@@ -206,12 +219,14 @@ void QtSpinBoxFactory::disconnectPropertyManager(QtIntPropertyManager *manager)
 
 // QtSliderFactory
 
-void QtSliderFactoryPrivate::slotPropertyChanged(QtProperty *property, int value)
+void QtSliderFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    int value)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QSlider *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QSlider *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setValue(value);
@@ -219,7 +234,8 @@ void QtSliderFactoryPrivate::slotPropertyChanged(QtProperty *property, int value
   }
 }
 
-void QtSliderFactoryPrivate::slotRangeChanged(QtProperty *property, int min, int max)
+void QtSliderFactoryPrivate::slotRangeChanged(QtProperty *property, int min,
+    int max)
 {
   if (!m_createdEditors.contains(property))
     return;
@@ -229,7 +245,8 @@ void QtSliderFactoryPrivate::slotRangeChanged(QtProperty *property, int min, int
     return;
 
   QListIterator<QSlider *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QSlider *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setRange(min, max);
@@ -238,12 +255,14 @@ void QtSliderFactoryPrivate::slotRangeChanged(QtProperty *property, int min, int
   }
 }
 
-void QtSliderFactoryPrivate::slotSingleStepChanged(QtProperty *property, int step)
+void QtSliderFactoryPrivate::slotSingleStepChanged(QtProperty *property,
+    int step)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QSlider *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QSlider *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setSingleStep(step);
@@ -254,9 +273,14 @@ void QtSliderFactoryPrivate::slotSingleStepChanged(QtProperty *property, int ste
 void QtSliderFactoryPrivate::slotSetValue(int value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QSlider *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QSlider *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor ) {
-    if (itEditor.key() == object) {
+  const QMap<QSlider *,
+        QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QSlider *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor )
+  {
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtIntPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -284,7 +308,6 @@ void QtSliderFactoryPrivate::slotSetValue(int value)
 {
   d_ptr = new QtSliderFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -316,7 +339,8 @@ void QtSliderFactory::connectPropertyManager(QtIntPropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtSliderFactory::createEditor(QtIntPropertyManager *manager, QtProperty *property,
+QWidget *QtSliderFactory::createEditor(QtIntPropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QSlider *editor = new QSlider(Qt::Horizontal, parent);
@@ -348,13 +372,15 @@ void QtSliderFactory::disconnectPropertyManager(QtIntPropertyManager *manager)
 
 // QtSliderFactory
 
-void QtScrollBarFactoryPrivate::slotPropertyChanged(QtProperty *property, int value)
+void QtScrollBarFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    int value)
 {
   if (!m_createdEditors.contains(property))
     return;
 
-  QListIterator<QScrollBar *> itEditor( m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  QListIterator<QScrollBar *> itEditor(m_createdEditors[property]);
+  while (itEditor.hasNext())
+  {
     QScrollBar *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setValue(value);
@@ -362,7 +388,8 @@ void QtScrollBarFactoryPrivate::slotPropertyChanged(QtProperty *property, int va
   }
 }
 
-void QtScrollBarFactoryPrivate::slotRangeChanged(QtProperty *property, int min, int max)
+void QtScrollBarFactoryPrivate::slotRangeChanged(QtProperty *property, int min,
+    int max)
 {
   if (!m_createdEditors.contains(property))
     return;
@@ -371,8 +398,9 @@ void QtScrollBarFactoryPrivate::slotRangeChanged(QtProperty *property, int min, 
   if (!manager)
     return;
 
-  QListIterator<QScrollBar *> itEditor( m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  QListIterator<QScrollBar *> itEditor(m_createdEditors[property]);
+  while (itEditor.hasNext())
+  {
     QScrollBar *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setRange(min, max);
@@ -381,12 +409,14 @@ void QtScrollBarFactoryPrivate::slotRangeChanged(QtProperty *property, int min, 
   }
 }
 
-void QtScrollBarFactoryPrivate::slotSingleStepChanged(QtProperty *property, int step)
+void QtScrollBarFactoryPrivate::slotSingleStepChanged(QtProperty *property,
+    int step)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QScrollBar *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QScrollBar *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setSingleStep(step);
@@ -397,9 +427,13 @@ void QtScrollBarFactoryPrivate::slotSingleStepChanged(QtProperty *property, int 
 void QtScrollBarFactoryPrivate::slotSetValue(int value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QScrollBar *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QScrollBar *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const QMap<QScrollBar *,
+        QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QScrollBar *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtIntPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -426,7 +460,6 @@ void QtScrollBarFactoryPrivate::slotSetValue(int value)
 {
   d_ptr = new QtScrollBarFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -458,7 +491,8 @@ void QtScrollBarFactory::connectPropertyManager(QtIntPropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtScrollBarFactory::createEditor(QtIntPropertyManager *manager, QtProperty *property,
+QWidget *QtScrollBarFactory::createEditor(QtIntPropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QScrollBar *editor = new QScrollBar(Qt::Horizontal, parent);
@@ -477,7 +511,8 @@ QWidget *QtScrollBarFactory::createEditor(QtIntPropertyManager *manager, QtPrope
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtScrollBarFactory::disconnectPropertyManager(QtIntPropertyManager *manager)
+void QtScrollBarFactory::disconnectPropertyManager(
+    QtIntPropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, int)),
       this, SLOT(slotPropertyChanged(QtProperty *, int)));
@@ -489,13 +524,15 @@ void QtScrollBarFactory::disconnectPropertyManager(QtIntPropertyManager *manager
 
 // QtCheckBoxFactory
 
-void QtCheckBoxFactoryPrivate::slotPropertyChanged(QtProperty *property, bool value)
+void QtCheckBoxFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    bool value)
 {
   if (!m_createdEditors.contains(property))
     return;
 
   QListIterator<QtBoolEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QtBoolEdit *editor = itEditor.next();
     editor->blockCheckBoxSignals(true);
     editor->setChecked(value);
@@ -507,9 +544,13 @@ void QtCheckBoxFactoryPrivate::slotSetValue(bool value)
 {
   QObject *object = q_ptr->sender();
 
-  const QMap<QtBoolEdit *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QtBoolEdit *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend;  ++itEditor)
-    if (itEditor.key() == object) {
+  const QMap<QtBoolEdit *,
+        QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QtBoolEdit *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend;  ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtBoolPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -536,7 +577,6 @@ void QtCheckBoxFactoryPrivate::slotSetValue(bool value)
 {
   d_ptr = new QtCheckBoxFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -564,7 +604,8 @@ void QtCheckBoxFactory::connectPropertyManager(QtBoolPropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtCheckBoxFactory::createEditor(QtBoolPropertyManager *manager, QtProperty *property,
+QWidget *QtCheckBoxFactory::createEditor(QtBoolPropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QtBoolEdit *editor = d_ptr->createEditor(property, parent);
@@ -581,7 +622,8 @@ QWidget *QtCheckBoxFactory::createEditor(QtBoolPropertyManager *manager, QtPrope
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtCheckBoxFactory::disconnectPropertyManager(QtBoolPropertyManager *manager)
+void QtCheckBoxFactory::disconnectPropertyManager(
+    QtBoolPropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, bool)),
       this, SLOT(slotPropertyChanged(QtProperty *, bool)));
@@ -589,13 +631,16 @@ void QtCheckBoxFactory::disconnectPropertyManager(QtBoolPropertyManager *manager
 
 // QtDoubleSpinBoxFactory
 
-void QtDoubleSpinBoxFactoryPrivate::slotPropertyChanged(QtProperty *property, double value)
+void QtDoubleSpinBoxFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    double value)
 {
   QList<QDoubleSpinBox *> editors = m_createdEditors[property];
   QListIterator<QDoubleSpinBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDoubleSpinBox *editor = itEditor.next();
-    if (editor->value() != value) {
+    if (editor->value() != value)
+    {
       editor->blockSignals(true);
       editor->setValue(value);
       editor->blockSignals(false);
@@ -615,7 +660,8 @@ void QtDoubleSpinBoxFactoryPrivate::slotRangeChanged(QtProperty *property,
 
   QList<QDoubleSpinBox *> editors = m_createdEditors[property];
   QListIterator<QDoubleSpinBox *> itEditor(editors);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDoubleSpinBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setRange(min, max);
@@ -624,7 +670,8 @@ void QtDoubleSpinBoxFactoryPrivate::slotRangeChanged(QtProperty *property,
   }
 }
 
-void QtDoubleSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property, double step)
+void QtDoubleSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property,
+    double step)
 {
   if (!m_createdEditors.contains(property))
     return;
@@ -635,7 +682,8 @@ void QtDoubleSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property, 
 
   QList<QDoubleSpinBox *> editors = m_createdEditors[property];
   QListIterator<QDoubleSpinBox *> itEditor(editors);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDoubleSpinBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setSingleStep(step);
@@ -643,7 +691,8 @@ void QtDoubleSpinBoxFactoryPrivate::slotSingleStepChanged(QtProperty *property, 
   }
 }
 
-void QtDoubleSpinBoxFactoryPrivate::slotDecimalsChanged(QtProperty *property, int prec)
+void QtDoubleSpinBoxFactoryPrivate::slotDecimalsChanged(QtProperty *property,
+    int prec)
 {
   if (!m_createdEditors.contains(property))
     return;
@@ -654,7 +703,8 @@ void QtDoubleSpinBoxFactoryPrivate::slotDecimalsChanged(QtProperty *property, in
 
   QList<QDoubleSpinBox *> editors = m_createdEditors[property];
   QListIterator<QDoubleSpinBox *> itEditor(editors);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDoubleSpinBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setDecimals(prec);
@@ -666,9 +716,14 @@ void QtDoubleSpinBoxFactoryPrivate::slotDecimalsChanged(QtProperty *property, in
 void QtDoubleSpinBoxFactoryPrivate::slotSetValue(double value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QDoubleSpinBox *, QtProperty *>::ConstIterator itcend = m_editorToProperty.constEnd();
-  for (QMap<QDoubleSpinBox *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != itcend; ++itEditor) {
-    if (itEditor.key() == object) {
+  const QMap<QDoubleSpinBox *,
+        QtProperty *>::ConstIterator itcend = m_editorToProperty.constEnd();
+  for (QMap<QDoubleSpinBox *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != itcend; ++itEditor)
+  {
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtDoublePropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -695,7 +750,6 @@ void QtDoubleSpinBoxFactoryPrivate::slotSetValue(double value)
 {
   d_ptr = new QtDoubleSpinBoxFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -712,7 +766,8 @@ QtDoubleSpinBoxFactory::~QtDoubleSpinBoxFactory()
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtDoubleSpinBoxFactory::connectPropertyManager(QtDoublePropertyManager *manager)
+void QtDoubleSpinBoxFactory::connectPropertyManager(
+    QtDoublePropertyManager *manager)
 {
   connect(manager, SIGNAL(valueChanged(QtProperty *, double)),
       this, SLOT(slotPropertyChanged(QtProperty *, double)));
@@ -739,7 +794,8 @@ QWidget *QtDoubleSpinBoxFactory::createEditor(QtDoublePropertyManager *manager,
   editor->setValue(manager->value(property));
   editor->setKeyboardTracking(false);
 
-  connect(editor, SIGNAL(valueChanged(double)), this, SLOT(slotSetValue(double)));
+  connect(editor, SIGNAL(valueChanged(double)), this,
+      SLOT(slotSetValue(double)));
   connect(editor, SIGNAL(destroyed(QObject *)),
       this, SLOT(slotEditorDestroyed(QObject *)));
   return editor;
@@ -750,7 +806,8 @@ QWidget *QtDoubleSpinBoxFactory::createEditor(QtDoublePropertyManager *manager,
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtDoubleSpinBoxFactory::disconnectPropertyManager(QtDoublePropertyManager *manager)
+void QtDoubleSpinBoxFactory::disconnectPropertyManager(
+    QtDoublePropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, double)),
       this, SLOT(slotPropertyChanged(QtProperty *, double)));
@@ -770,8 +827,9 @@ void QtLineEditFactoryPrivate::slotPropertyChanged(QtProperty *property,
   if (!m_createdEditors.contains(property))
     return;
 
-  QListIterator<QLineEdit *> itEditor( m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  QListIterator<QLineEdit *> itEditor(m_createdEditors[property]);
+  while (itEditor.hasNext())
+  {
     QLineEdit *editor = itEditor.next();
     if (editor->text() != value)
       editor->setText(value);
@@ -789,12 +847,14 @@ void QtLineEditFactoryPrivate::slotRegExpChanged(QtProperty *property,
     return;
 
   QListIterator<QLineEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QLineEdit *editor = itEditor.next();
     editor->blockSignals(true);
     const QValidator *oldValidator = editor->validator();
     QValidator *newValidator = 0;
-    if (regExp.isValid()) {
+    if (regExp.isValid())
+    {
       newValidator = new QRegExpValidator(regExp, editor);
     }
     editor->setValidator(newValidator);
@@ -804,7 +864,8 @@ void QtLineEditFactoryPrivate::slotRegExpChanged(QtProperty *property,
   }
 }
 
-void QtLineEditFactoryPrivate::slotEchoModeChanged(QtProperty *property, int echoMode)
+void QtLineEditFactoryPrivate::slotEchoModeChanged(QtProperty *property,
+    int echoMode)
 {
   if (!m_createdEditors.contains(property))
     return;
@@ -814,22 +875,25 @@ void QtLineEditFactoryPrivate::slotEchoModeChanged(QtProperty *property, int ech
     return;
 
   QListIterator<QLineEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QLineEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setEchoMode((EchoMode)echoMode);
     editor->blockSignals(false);
   }
-
-
 }
 
 void QtLineEditFactoryPrivate::slotSetValue(const QString &value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QLineEdit *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QLineEdit *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const QMap<QLineEdit *,
+        QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QLineEdit *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtStringPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -856,7 +920,6 @@ void QtLineEditFactoryPrivate::slotSetValue(const QString &value)
 {
   d_ptr = new QtLineEditFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -891,11 +954,11 @@ void QtLineEditFactory::connectPropertyManager(QtStringPropertyManager *manager)
 QWidget *QtLineEditFactory::createEditor(QtStringPropertyManager *manager,
     QtProperty *property, QWidget *parent)
 {
-
   QLineEdit *editor = d_ptr->createEditor(property, parent);
   editor->setEchoMode((EchoMode)manager->echoMode(property));
   QRegExp regExp = manager->regExp(property);
-  if (regExp.isValid()) {
+  if (regExp.isValid())
+  {
     QValidator *validator = new QRegExpValidator(regExp, editor);
     editor->setValidator(validator);
   }
@@ -913,24 +976,27 @@ QWidget *QtLineEditFactory::createEditor(QtStringPropertyManager *manager,
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtLineEditFactory::disconnectPropertyManager(QtStringPropertyManager *manager)
+void QtLineEditFactory::disconnectPropertyManager(
+    QtStringPropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QString &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QString &)));
   disconnect(manager, SIGNAL(regExpChanged(QtProperty *, const QRegExp &)),
       this, SLOT(slotRegExpChanged(QtProperty *, const QRegExp &)));
-  disconnect(manager, SIGNAL(echoModeChanged(QtProperty*,int)),
+  disconnect(manager, SIGNAL(echoModeChanged(QtProperty*, int)),
       this, SLOT(slotEchoModeChanged(QtProperty *, int)));
 }
 
 // QtDateEditFactory
 
-void QtDateEditFactoryPrivate::slotPropertyChanged(QtProperty *property, const QDate &value)
+void QtDateEditFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    const QDate &value)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QDateEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDateEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setDate(value);
@@ -949,7 +1015,8 @@ void QtDateEditFactoryPrivate::slotRangeChanged(QtProperty *property,
     return;
 
   QListIterator<QDateEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDateEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setDateRange(min, max);
@@ -961,9 +1028,13 @@ void QtDateEditFactoryPrivate::slotRangeChanged(QtProperty *property,
 void QtDateEditFactoryPrivate::slotSetValue(const QDate &value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QDateEdit *, QtProperty *>::ConstIterator  ecend = m_editorToProperty.constEnd();
-  for (QMap<QDateEdit *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const QMap<QDateEdit *,
+        QtProperty *>::ConstIterator  ecend = m_editorToProperty.constEnd();
+  for (QMap<QDateEdit *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtDatePropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -990,7 +1061,6 @@ void QtDateEditFactoryPrivate::slotSetValue(const QDate &value)
 {
   d_ptr = new QtDateEditFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -1011,7 +1081,8 @@ void QtDateEditFactory::connectPropertyManager(QtDatePropertyManager *manager)
 {
   connect(manager, SIGNAL(valueChanged(QtProperty *, const QDate &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QDate &)));
-  connect(manager, SIGNAL(rangeChanged(QtProperty *, const QDate &, const QDate &)),
+  connect(manager, SIGNAL(rangeChanged(QtProperty *, const QDate &,
+          const QDate &)),
       this, SLOT(slotRangeChanged(QtProperty *, const QDate &, const QDate &)));
 }
 
@@ -1020,7 +1091,8 @@ void QtDateEditFactory::connectPropertyManager(QtDatePropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtDateEditFactory::createEditor(QtDatePropertyManager *manager, QtProperty *property,
+QWidget *QtDateEditFactory::createEditor(QtDatePropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QDateEdit *editor = d_ptr->createEditor(property, parent);
@@ -1040,22 +1112,26 @@ QWidget *QtDateEditFactory::createEditor(QtDatePropertyManager *manager, QtPrope
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtDateEditFactory::disconnectPropertyManager(QtDatePropertyManager *manager)
+void QtDateEditFactory::disconnectPropertyManager(
+    QtDatePropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QDate &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QDate &)));
-  disconnect(manager, SIGNAL(rangeChanged(QtProperty *, const QDate &, const QDate &)),
+  disconnect(manager, SIGNAL(rangeChanged(QtProperty *, const QDate &,
+          const QDate &)),
       this, SLOT(slotRangeChanged(QtProperty *, const QDate &, const QDate &)));
 }
 
 // QtTimeEditFactory
 
-void QtTimeEditFactoryPrivate::slotPropertyChanged(QtProperty *property, const QTime &value)
+void QtTimeEditFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    const QTime &value)
 {
   if (!m_createdEditors.contains(property))
     return;
   QListIterator<QTimeEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QTimeEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setTime(value);
@@ -1066,9 +1142,13 @@ void QtTimeEditFactoryPrivate::slotPropertyChanged(QtProperty *property, const Q
 void QtTimeEditFactoryPrivate::slotSetValue(const QTime &value)
 {
   QObject *object = q_ptr->sender();
-  const  QMap<QTimeEdit *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QTimeEdit *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const  QMap<QTimeEdit *,
+         QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QTimeEdit *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtTimePropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -1095,7 +1175,6 @@ void QtTimeEditFactoryPrivate::slotSetValue(const QTime &value)
 {
   d_ptr = new QtTimeEditFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -1123,7 +1202,8 @@ void QtTimeEditFactory::connectPropertyManager(QtTimePropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtTimeEditFactory::createEditor(QtTimePropertyManager *manager, QtProperty *property,
+QWidget *QtTimeEditFactory::createEditor(QtTimePropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QTimeEdit *editor = d_ptr->createEditor(property, parent);
@@ -1141,7 +1221,8 @@ QWidget *QtTimeEditFactory::createEditor(QtTimePropertyManager *manager, QtPrope
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtTimeEditFactory::disconnectPropertyManager(QtTimePropertyManager *manager)
+void QtTimeEditFactory::disconnectPropertyManager(
+    QtTimePropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QTime &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QTime &)));
@@ -1156,7 +1237,8 @@ void QtDateTimeEditFactoryPrivate::slotPropertyChanged(QtProperty *property,
     return;
 
   QListIterator<QDateTimeEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QDateTimeEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setDateTime(value);
@@ -1167,9 +1249,13 @@ void QtDateTimeEditFactoryPrivate::slotPropertyChanged(QtProperty *property,
 void QtDateTimeEditFactoryPrivate::slotSetValue(const QDateTime &value)
 {
   QObject *object = q_ptr->sender();
-  const  QMap<QDateTimeEdit *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QDateTimeEdit *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend;  ++itEditor)
-    if (itEditor.key() == object) {
+  const  QMap<QDateTimeEdit *,
+         QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QDateTimeEdit *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend;  ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtDateTimePropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -1196,7 +1282,6 @@ void QtDateTimeEditFactoryPrivate::slotSetValue(const QDateTime &value)
 {
   d_ptr = new QtDateTimeEditFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -1213,7 +1298,8 @@ QtDateTimeEditFactory::~QtDateTimeEditFactory()
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtDateTimeEditFactory::connectPropertyManager(QtDateTimePropertyManager *manager)
+void QtDateTimeEditFactory::connectPropertyManager(
+    QtDateTimePropertyManager *manager)
 {
   connect(manager, SIGNAL(valueChanged(QtProperty *, const QDateTime &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QDateTime &)));
@@ -1242,7 +1328,8 @@ QWidget *QtDateTimeEditFactory::createEditor(QtDateTimePropertyManager *manager,
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtDateTimeEditFactory::disconnectPropertyManager(QtDateTimePropertyManager *manager)
+void QtDateTimeEditFactory::disconnectPropertyManager(
+    QtDateTimePropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QDateTime &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QDateTime &)));
@@ -1250,14 +1337,16 @@ void QtDateTimeEditFactory::disconnectPropertyManager(QtDateTimePropertyManager 
 
 // QtKeySequenceEditorFactory
 
-void QtKeySequenceEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
+void QtKeySequenceEditorFactoryPrivate::slotPropertyChanged(
+    QtProperty *property,
     const QKeySequence &value)
 {
   if (!m_createdEditors.contains(property))
     return;
 
   QListIterator<QtKeySequenceEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QtKeySequenceEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setKeySequence(value);
@@ -1268,9 +1357,13 @@ void QtKeySequenceEditorFactoryPrivate::slotPropertyChanged(QtProperty *property
 void QtKeySequenceEditorFactoryPrivate::slotSetValue(const QKeySequence &value)
 {
   QObject *object = q_ptr->sender();
-  const  QMap<QtKeySequenceEdit *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QtKeySequenceEdit *, QtProperty *>::ConstIterator itEditor =  m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const  QMap<QtKeySequenceEdit *,
+         QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QtKeySequenceEdit *,
+      QtProperty *>::ConstIterator itEditor =  m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtKeySequencePropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -1297,7 +1390,6 @@ void QtKeySequenceEditorFactoryPrivate::slotSetValue(const QKeySequence &value)
 {
   d_ptr = new QtKeySequenceEditorFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -1314,7 +1406,8 @@ QtKeySequenceEditorFactory::~QtKeySequenceEditorFactory()
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtKeySequenceEditorFactory::connectPropertyManager(QtKeySequencePropertyManager *manager)
+void QtKeySequenceEditorFactory::connectPropertyManager(
+    QtKeySequencePropertyManager *manager)
 {
   connect(manager, SIGNAL(valueChanged(QtProperty *, const QKeySequence &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QKeySequence &)));
@@ -1325,7 +1418,8 @@ void QtKeySequenceEditorFactory::connectPropertyManager(QtKeySequencePropertyMan
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtKeySequenceEditorFactory::createEditor(QtKeySequencePropertyManager *manager,
+QWidget *QtKeySequenceEditorFactory::createEditor(
+    QtKeySequencePropertyManager *manager,
     QtProperty *property, QWidget *parent)
 {
   QtKeySequenceEdit *editor = d_ptr->createEditor(property, parent);
@@ -1343,7 +1437,8 @@ QWidget *QtKeySequenceEditorFactory::createEditor(QtKeySequencePropertyManager *
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtKeySequenceEditorFactory::disconnectPropertyManager(QtKeySequencePropertyManager *manager)
+void QtKeySequenceEditorFactory::disconnectPropertyManager(
+    QtKeySequencePropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QKeySequence &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QKeySequence &)));
@@ -1368,12 +1463,14 @@ void QtKeySequenceEditorFactory::disconnectPropertyManager(QtKeySequenceProperty
 
 bool QtCharEdit::eventFilter(QObject *o, QEvent *e)
 {
-  if (o == m_lineEdit && e->type() == QEvent::ContextMenu) {
+  if (o == m_lineEdit && e->type() == QEvent::ContextMenu)
+  {
     QContextMenuEvent *c = static_cast<QContextMenuEvent *>(e);
     QMenu *menu = m_lineEdit->createStandardContextMenu();
     QList<QAction *> actions = menu->actions();
     QListIterator<QAction *> itAction(actions);
-    while (itAction.hasNext()) {
+    while (itAction.hasNext())
+    {
       QAction *action = itAction.next();
       action->setShortcut(QKeySequence());
       QString actionString = action->text();
@@ -1410,7 +1507,8 @@ void QtCharEdit::slotClearChar()
 void QtCharEdit::handleKeyEvent(QKeyEvent *e)
 {
   const int key = e->key();
-  switch (key) {
+  switch (key)
+  {
     case Qt::Key_Control:
     case Qt::Key_Shift:
     case Qt::Key_Meta:
@@ -1489,7 +1587,8 @@ void QtCharEdit::paintEvent(QPaintEvent *)
 
 bool QtCharEdit::event(QEvent *e)
 {
-  switch(e->type()) {
+  switch (e->type())
+  {
     case QEvent::Shortcut:
     case QEvent::ShortcutOverride:
     case QEvent::KeyRelease:
@@ -1510,7 +1609,8 @@ void QtCharEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
     return;
 
   QListIterator<QtCharEdit *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QtCharEdit *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setValue(value);
@@ -1521,9 +1621,13 @@ void QtCharEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
 void QtCharEditorFactoryPrivate::slotSetValue(const QChar &value)
 {
   QObject *object = q_ptr->sender();
-  const QMap<QtCharEdit *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QtCharEdit *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend;  ++itEditor)
-    if (itEditor.key() == object) {
+  const QMap<QtCharEdit *,
+        QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QtCharEdit *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend;  ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtCharPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -1550,7 +1654,6 @@ void QtCharEditorFactoryPrivate::slotSetValue(const QChar &value)
 {
   d_ptr = new QtCharEditorFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -1596,7 +1699,8 @@ QWidget *QtCharEditorFactory::createEditor(QtCharPropertyManager *manager,
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtCharEditorFactory::disconnectPropertyManager(QtCharPropertyManager *manager)
+void QtCharEditorFactory::disconnectPropertyManager(
+    QtCharPropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QChar &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QChar &)));
@@ -1604,13 +1708,15 @@ void QtCharEditorFactory::disconnectPropertyManager(QtCharPropertyManager *manag
 
 // QtEnumEditorFactory
 
-void QtEnumEditorFactoryPrivate::slotPropertyChanged(QtProperty *property, int value)
+void QtEnumEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    int value)
 {
   if (!m_createdEditors.contains(property))
     return;
 
   QListIterator<QComboBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QComboBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->setCurrentIndex(value);
@@ -1631,7 +1737,8 @@ void QtEnumEditorFactoryPrivate::slotEnumNamesChanged(QtProperty *property,
   QMap<int, QIcon> enumIcons = manager->enumIcons(property);
 
   QListIterator<QComboBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QComboBox *editor = itEditor.next();
     editor->blockSignals(true);
     editor->clear();
@@ -1656,7 +1763,8 @@ void QtEnumEditorFactoryPrivate::slotEnumIconsChanged(QtProperty *property,
 
   const QStringList enumNames = manager->enumNames(property);
   QListIterator<QComboBox *> itEditor(m_createdEditors[property]);
-  while (itEditor.hasNext()) {
+  while (itEditor.hasNext())
+  {
     QComboBox *editor = itEditor.next();
     editor->blockSignals(true);
     const int nameCount = enumNames.count();
@@ -1670,9 +1778,13 @@ void QtEnumEditorFactoryPrivate::slotEnumIconsChanged(QtProperty *property,
 void QtEnumEditorFactoryPrivate::slotSetValue(int value)
 {
   QObject *object = q_ptr->sender();
-  const  QMap<QComboBox *, QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (QMap<QComboBox *, QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const  QMap<QComboBox *,
+         QtProperty *>::ConstIterator ecend = m_editorToProperty.constEnd();
+  for (QMap<QComboBox *,
+      QtProperty *>::ConstIterator itEditor = m_editorToProperty.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtEnumPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -1699,7 +1811,6 @@ void QtEnumEditorFactoryPrivate::slotSetValue(int value)
 {
   d_ptr = new QtEnumEditorFactoryPrivate();
   d_ptr->q_ptr = this;
-
 }
 
 /*!
@@ -1729,7 +1840,8 @@ void QtEnumEditorFactory::connectPropertyManager(QtEnumPropertyManager *manager)
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtEnumEditorFactory::createEditor(QtEnumPropertyManager *manager, QtProperty *property,
+QWidget *QtEnumEditorFactory::createEditor(QtEnumPropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QComboBox *editor = d_ptr->createEditor(property, parent);
@@ -1744,7 +1856,8 @@ QWidget *QtEnumEditorFactory::createEditor(QtEnumPropertyManager *manager, QtPro
     editor->setItemIcon(i, enumIcons.value(i));
   editor->setCurrentIndex(manager->value(property));
 
-  connect(editor, SIGNAL(currentIndexChanged(int)), this, SLOT(slotSetValue(int)));
+  connect(editor, SIGNAL(currentIndexChanged(int)), this,
+      SLOT(slotSetValue(int)));
   connect(editor, SIGNAL(destroyed(QObject *)),
       this, SLOT(slotEditorDestroyed(QObject *)));
   return editor;
@@ -1755,11 +1868,13 @@ QWidget *QtEnumEditorFactory::createEditor(QtEnumPropertyManager *manager, QtPro
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtEnumEditorFactory::disconnectPropertyManager(QtEnumPropertyManager *manager)
+void QtEnumEditorFactory::disconnectPropertyManager(
+    QtEnumPropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, int)),
       this, SLOT(slotPropertyChanged(QtProperty *, int)));
-  disconnect(manager, SIGNAL(enumNamesChanged(QtProperty *, const QStringList &)),
+  disconnect(manager, SIGNAL(enumNamesChanged(QtProperty *,
+          const QStringList &)),
       this, SLOT(slotEnumNamesChanged(QtProperty *, const QStringList &)));
 }
 
@@ -1773,10 +1888,10 @@ Q_GLOBAL_STATIC(QtCursorDatabase, cursorDatabase)
 : q_ptr(NULL), m_enumEditorFactory(NULL), m_enumPropertyManager(NULL),
   m_updatingEnum(false)
 {
-
 }
 
-void QtCursorEditorFactoryPrivate::slotPropertyChanged(QtProperty *property, const QCursor &cursor)
+void QtCursorEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
+    const QCursor &cursor)
 {
   // update enum property
   QtProperty *enumProp = m_propertyToEnum.value(property);
@@ -1784,11 +1899,13 @@ void QtCursorEditorFactoryPrivate::slotPropertyChanged(QtProperty *property, con
     return;
 
   m_updatingEnum = true;
-  m_enumPropertyManager->setValue(enumProp, cursorDatabase()->cursorToValue(cursor));
+  m_enumPropertyManager->setValue(enumProp,
+      cursorDatabase()->cursorToValue(cursor));
   m_updatingEnum = false;
 }
 
-void QtCursorEditorFactoryPrivate::slotEnumChanged(QtProperty *property, int value)
+void QtCursorEditorFactoryPrivate::slotEnumChanged(QtProperty *property,
+    int value)
 {
   if (m_updatingEnum)
     return;
@@ -1800,7 +1917,8 @@ void QtCursorEditorFactoryPrivate::slotEnumChanged(QtProperty *property, int val
   if (!cursorManager)
     return;
 #ifndef QT_NO_CURSOR
-  cursorManager->setValue(prop, QCursor(cursorDatabase()->valueToCursor(value)));
+  cursorManager->setValue(prop,
+      QCursor(cursorDatabase()->valueToCursor(value)));
 #endif
 }
 
@@ -1809,14 +1927,19 @@ void QtCursorEditorFactoryPrivate::slotEditorDestroyed(QObject *object)
   // remove from m_editorToEnum map;
   // remove from m_enumToEditors map;
   // if m_enumToEditors doesn't contains more editors delete enum property;
-  const  QMap<QWidget *, QtProperty *>::ConstIterator ecend = m_editorToEnum.constEnd();
-  for (QMap<QWidget *, QtProperty *>::ConstIterator itEditor = m_editorToEnum.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const  QMap<QWidget *,
+         QtProperty *>::ConstIterator ecend = m_editorToEnum.constEnd();
+  for (QMap<QWidget *,
+      QtProperty *>::ConstIterator itEditor = m_editorToEnum.constBegin();
+      itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QWidget *editor = itEditor.key();
       QtProperty *enumProp = itEditor.value();
       m_editorToEnum.remove(editor);
       m_enumToEditors[enumProp].removeAll(editor);
-      if (m_enumToEditors[enumProp].isEmpty()) {
+      if (m_enumToEditors[enumProp].isEmpty())
+      {
         m_enumToEditors.remove(enumProp);
         QtProperty *property = m_enumToProperty.value(enumProp);
         m_enumToProperty.remove(enumProp);
@@ -1865,7 +1988,8 @@ QtCursorEditorFactory::~QtCursorEditorFactory()
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtCursorEditorFactory::connectPropertyManager(QtCursorPropertyManager *manager)
+void QtCursorEditorFactory::connectPropertyManager(
+    QtCursorPropertyManager *manager)
 {
   connect(manager, SIGNAL(valueChanged(QtProperty *, const QCursor &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QCursor &)));
@@ -1876,18 +2000,26 @@ void QtCursorEditorFactory::connectPropertyManager(QtCursorPropertyManager *mana
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-QWidget *QtCursorEditorFactory::createEditor(QtCursorPropertyManager *manager, QtProperty *property,
+QWidget *QtCursorEditorFactory::createEditor(QtCursorPropertyManager *manager,
+    QtProperty *property,
     QWidget *parent)
 {
   QtProperty *enumProp = 0;
-  if (d_ptr->m_propertyToEnum.contains(property)) {
+  if (d_ptr->m_propertyToEnum.contains(property))
+  {
     enumProp = d_ptr->m_propertyToEnum[property];
-  } else {
-    enumProp = d_ptr->m_enumPropertyManager->addProperty(property->propertyName());
-    d_ptr->m_enumPropertyManager->setEnumNames(enumProp, cursorDatabase()->cursorShapeNames());
-    d_ptr->m_enumPropertyManager->setEnumIcons(enumProp, cursorDatabase()->cursorShapeIcons());
+  }
+  else
+  {
+    enumProp =
+      d_ptr->m_enumPropertyManager->addProperty(property->propertyName());
+    d_ptr->m_enumPropertyManager->setEnumNames(enumProp,
+        cursorDatabase()->cursorShapeNames());
+    d_ptr->m_enumPropertyManager->setEnumIcons(enumProp,
+        cursorDatabase()->cursorShapeIcons());
 #ifndef QT_NO_CURSOR
-    d_ptr->m_enumPropertyManager->setValue(enumProp, cursorDatabase()->cursorToValue(manager->value(property)));
+    d_ptr->m_enumPropertyManager->setValue(enumProp,
+        cursorDatabase()->cursorToValue(manager->value(property)));
 #endif
     d_ptr->m_propertyToEnum[property] = enumProp;
     d_ptr->m_enumToProperty[enumProp] = property;
@@ -1906,7 +2038,8 @@ QWidget *QtCursorEditorFactory::createEditor(QtCursorPropertyManager *manager, Q
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtCursorEditorFactory::disconnectPropertyManager(QtCursorPropertyManager *manager)
+void QtCursorEditorFactory::disconnectPropertyManager(
+    QtCursorPropertyManager *manager)
 {
   disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QCursor &)),
       this, SLOT(slotPropertyChanged(QtProperty *, const QCursor &)));
@@ -1915,8 +2048,8 @@ void QtCursorEditorFactory::disconnectPropertyManager(QtCursorPropertyManager *m
 // QtColorEditWidget
 
 
-QtColorEditWidget::QtColorEditWidget(QWidget *parent) :
-  QWidget(parent),
+QtColorEditWidget::QtColorEditWidget(QWidget *parent)
+  : QWidget(parent),
   m_pixmapLabel(new QLabel),
   m_label(new QLabel),
   m_button(new QToolButton)
@@ -1926,7 +2059,8 @@ QtColorEditWidget::QtColorEditWidget(QWidget *parent) :
   lt->setSpacing(0);
   lt->addWidget(m_pixmapLabel);
   lt->addWidget(m_label);
-  lt->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Ignored));
+  lt->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding,
+        QSizePolicy::Ignored));
 
   m_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
   m_button->setFixedWidth(20);
@@ -1936,15 +2070,18 @@ QtColorEditWidget::QtColorEditWidget(QWidget *parent) :
   m_button->installEventFilter(this);
   connect(m_button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
   lt->addWidget(m_button);
-  m_pixmapLabel->setPixmap(QtPropertyBrowserUtils::brushValuePixmap(QBrush(m_color)));
+  m_pixmapLabel->setPixmap(QtPropertyBrowserUtils::brushValuePixmap(QBrush(
+          m_color)));
   m_label->setText(QtPropertyBrowserUtils::colorValueText(m_color));
 }
 
 void QtColorEditWidget::setValue(const QColor &c)
 {
-  if (m_color != c) {
+  if (m_color != c)
+  {
     m_color = c;
-    m_pixmapLabel->setPixmap(QtPropertyBrowserUtils::brushValuePixmap(QBrush(c)));
+    m_pixmapLabel->setPixmap(QtPropertyBrowserUtils::brushValuePixmap(QBrush(
+            c)));
     m_label->setText(QtPropertyBrowserUtils::colorValueText(c));
   }
 }
@@ -1954,7 +2091,8 @@ void QtColorEditWidget::buttonClicked()
   bool ok = false;
   QRgb oldRgba = m_color.rgba();
   QRgb newRgba = QColorDialog::getRgba(oldRgba, &ok, this);
-  if (ok && newRgba != oldRgba) {
+  if (ok && newRgba != oldRgba)
+  {
     setValue(QColor::fromRgba(newRgba));
     emit valueChanged(m_color);
   }
@@ -1962,23 +2100,28 @@ void QtColorEditWidget::buttonClicked()
 
 bool QtColorEditWidget::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (obj == m_button) {
-    switch (ev->type()) {
+  if (obj == m_button)
+  {
+    switch (ev->type())
+    {
       case QEvent::KeyPress:
-      case QEvent::KeyRelease: { // Prevent the QToolButton from handling Enter/Escape meant control the delegate
-                                 switch (static_cast<const QKeyEvent*>(ev)->key()) {
-                                   case Qt::Key_Escape:
-                                   case Qt::Key_Enter:
-                                   case Qt::Key_Return:
-                                     ev->ignore();
-                                     return true;
-                                   default:
-                                     break;
-                                 }
-                               }
-                               break;
+
+      case QEvent::KeyRelease:
+        {
+          switch (static_cast<const QKeyEvent*>(ev)->key())
+          {
+            case Qt::Key_Escape:
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+              ev->ignore();
+              return true;
+            default:
+              break;
+          }
+        }
+        break;
       default:
-                               break;
+        break;
     }
   }
   return QWidget::eventFilter(obj, ev);
@@ -2011,9 +2154,12 @@ void QtColorEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
 void QtColorEditorFactoryPrivate::slotSetValue(const QColor &value)
 {
   QObject *object = q_ptr->sender();
-  const EditorToPropertyMap::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (EditorToPropertyMap::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const EditorToPropertyMap::ConstIterator ecend =
+    m_editorToProperty.constEnd();
+  for (EditorToPropertyMap::ConstIterator itEditor =
+      m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtColorPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -2035,8 +2181,8 @@ void QtColorEditorFactoryPrivate::slotSetValue(const QColor &value)
 /*!
   Creates a factory with the given \a parent.
   */
-QtColorEditorFactory::QtColorEditorFactory(QObject *parent) :
-  QtAbstractEditorFactory<QtColorPropertyManager>(parent),
+QtColorEditorFactory::QtColorEditorFactory(QObject *parent)
+: QtAbstractEditorFactory<QtColorPropertyManager>(parent),
   d_ptr(new QtColorEditorFactoryPrivate())
 {
   d_ptr->q_ptr = this;
@@ -2056,10 +2202,11 @@ QtColorEditorFactory::~QtColorEditorFactory()
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtColorEditorFactory::connectPropertyManager(QtColorPropertyManager *manager)
+void QtColorEditorFactory::connectPropertyManager(
+    QtColorPropertyManager *manager)
 {
-  connect(manager, SIGNAL(valueChanged(QtProperty*,QColor)),
-      this, SLOT(slotPropertyChanged(QtProperty*,QColor)));
+  connect(manager, SIGNAL(valueChanged(QtProperty*, QColor)),
+      this, SLOT(slotPropertyChanged(QtProperty*, QColor)));
 }
 
 /*!
@@ -2072,8 +2219,10 @@ QWidget *QtColorEditorFactory::createEditor(QtColorPropertyManager *manager,
 {
   QtColorEditWidget *editor = d_ptr->createEditor(property, parent);
   editor->setValue(manager->value(property));
-  connect(editor, SIGNAL(valueChanged(QColor)), this, SLOT(slotSetValue(QColor)));
-  connect(editor, SIGNAL(destroyed(QObject *)), this, SLOT(slotEditorDestroyed(QObject *)));
+  connect(editor, SIGNAL(valueChanged(QColor)), this,
+      SLOT(slotSetValue(QColor)));
+  connect(editor, SIGNAL(destroyed(QObject *)), this,
+      SLOT(slotEditorDestroyed(QObject *)));
   return editor;
 }
 
@@ -2082,16 +2231,18 @@ QWidget *QtColorEditorFactory::createEditor(QtColorPropertyManager *manager,
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtColorEditorFactory::disconnectPropertyManager(QtColorPropertyManager *manager)
+void QtColorEditorFactory::disconnectPropertyManager(
+    QtColorPropertyManager *manager)
 {
-  disconnect(manager, SIGNAL(valueChanged(QtProperty*,QColor)), this, SLOT(slotPropertyChanged(QtProperty*,QColor)));
+  disconnect(manager, SIGNAL(valueChanged(QtProperty*, QColor)), this,
+      SLOT(slotPropertyChanged(QtProperty*, QColor)));
 }
 
 // QtFontEditWidget
 
 
-QtFontEditWidget::QtFontEditWidget(QWidget *parent) :
-  QWidget(parent),
+QtFontEditWidget::QtFontEditWidget(QWidget *parent)
+  : QWidget(parent),
   m_pixmapLabel(new QLabel),
   m_label(new QLabel),
   m_button(new QToolButton)
@@ -2101,7 +2252,8 @@ QtFontEditWidget::QtFontEditWidget(QWidget *parent) :
   lt->setSpacing(0);
   lt->addWidget(m_pixmapLabel);
   lt->addWidget(m_label);
-  lt->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Ignored));
+  lt->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding,
+        QSizePolicy::Ignored));
 
   m_button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
   m_button->setFixedWidth(20);
@@ -2117,7 +2269,8 @@ QtFontEditWidget::QtFontEditWidget(QWidget *parent) :
 
 void QtFontEditWidget::setValue(const QFont &f)
 {
-  if (m_font != f) {
+  if (m_font != f)
+  {
     m_font = f;
     m_pixmapLabel->setPixmap(QtPropertyBrowserUtils::fontValuePixmap(f));
     m_label->setText(QtPropertyBrowserUtils::fontValueText(f));
@@ -2128,9 +2281,11 @@ void QtFontEditWidget::buttonClicked()
 {
   bool ok = false;
   QFont newFont = QFontDialog::getFont(&ok, m_font, this, tr("Select Font"));
-  if (ok && newFont != m_font) {
+  if (ok && newFont != m_font)
+  {
     QFont f = m_font;
-    // prevent mask for unchanged attributes, don't change other attributes (like kerning, etc...)
+    // prevent mask for unchanged attributes,
+    // don't change other attributes (like kerning, etc...)
     if (m_font.family() != newFont.family())
       f.setFamily(newFont.family());
     if (m_font.pointSize() != newFont.pointSize())
@@ -2150,23 +2305,28 @@ void QtFontEditWidget::buttonClicked()
 
 bool QtFontEditWidget::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (obj == m_button) {
-    switch (ev->type()) {
+  if (obj == m_button)
+  {
+    switch (ev->type())
+    {
       case QEvent::KeyPress:
-      case QEvent::KeyRelease: { // Prevent the QToolButton from handling Enter/Escape meant control the delegate
-                                 switch (static_cast<const QKeyEvent*>(ev)->key()) {
-                                   case Qt::Key_Escape:
-                                   case Qt::Key_Enter:
-                                   case Qt::Key_Return:
-                                     ev->ignore();
-                                     return true;
-                                   default:
-                                     break;
-                                 }
-                               }
-                               break;
+
+      case QEvent::KeyRelease:
+        {
+          switch (static_cast<const QKeyEvent*>(ev)->key())
+          {
+            case Qt::Key_Escape:
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+              ev->ignore();
+              return true;
+            default:
+              break;
+          }
+        }
+        break;
       default:
-                               break;
+        break;
     }
   }
   return QWidget::eventFilter(obj, ev);
@@ -2199,9 +2359,12 @@ void QtFontEditorFactoryPrivate::slotPropertyChanged(QtProperty *property,
 void QtFontEditorFactoryPrivate::slotSetValue(const QFont &value)
 {
   QObject *object = q_ptr->sender();
-  const EditorToPropertyMap::ConstIterator ecend = m_editorToProperty.constEnd();
-  for (EditorToPropertyMap::ConstIterator itEditor = m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
-    if (itEditor.key() == object) {
+  const EditorToPropertyMap::ConstIterator ecend =
+    m_editorToProperty.constEnd();
+  for (EditorToPropertyMap::ConstIterator itEditor =
+      m_editorToProperty.constBegin(); itEditor != ecend; ++itEditor)
+    if (itEditor.key() == object)
+    {
       QtProperty *property = itEditor.value();
       QtFontPropertyManager *manager = q_ptr->propertyManager(property);
       if (!manager)
@@ -2223,8 +2386,8 @@ void QtFontEditorFactoryPrivate::slotSetValue(const QFont &value)
 /*!
   Creates a factory with the given \a parent.
   */
-QtFontEditorFactory::QtFontEditorFactory(QObject *parent) :
-  QtAbstractEditorFactory<QtFontPropertyManager>(parent),
+QtFontEditorFactory::QtFontEditorFactory(QObject *parent)
+: QtAbstractEditorFactory<QtFontPropertyManager>(parent),
   d_ptr(new QtFontEditorFactoryPrivate())
 {
   d_ptr->q_ptr = this;
@@ -2246,8 +2409,8 @@ QtFontEditorFactory::~QtFontEditorFactory()
   */
 void QtFontEditorFactory::connectPropertyManager(QtFontPropertyManager *manager)
 {
-  connect(manager, SIGNAL(valueChanged(QtProperty*,QFont)),
-      this, SLOT(slotPropertyChanged(QtProperty*,QFont)));
+  connect(manager, SIGNAL(valueChanged(QtProperty*, QFont)),
+      this, SLOT(slotPropertyChanged(QtProperty*, QFont)));
 }
 
 /*!
@@ -2261,7 +2424,8 @@ QWidget *QtFontEditorFactory::createEditor(QtFontPropertyManager *manager,
   QtFontEditWidget *editor = d_ptr->createEditor(property, parent);
   editor->setValue(manager->value(property));
   connect(editor, SIGNAL(valueChanged(QFont)), this, SLOT(slotSetValue(QFont)));
-  connect(editor, SIGNAL(destroyed(QObject *)), this, SLOT(slotEditorDestroyed(QObject *)));
+  connect(editor, SIGNAL(destroyed(QObject *)), this,
+      SLOT(slotEditorDestroyed(QObject *)));
   return editor;
 }
 
@@ -2270,14 +2434,16 @@ QWidget *QtFontEditorFactory::createEditor(QtFontPropertyManager *manager,
 
   Reimplemented from the QtAbstractEditorFactory class.
   */
-void QtFontEditorFactory::disconnectPropertyManager(QtFontPropertyManager *manager)
+void QtFontEditorFactory::disconnectPropertyManager(
+    QtFontPropertyManager *manager)
 {
-  disconnect(manager, SIGNAL(valueChanged(QtProperty*,QFont)), this, SLOT(slotPropertyChanged(QtProperty*,QFont)));
+  disconnect(manager, SIGNAL(valueChanged(QtProperty*, QFont)), this,
+      SLOT(slotPropertyChanged(QtProperty*, QFont)));
 }
 
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE
 #endif
 
-//#include "moc_qteditorfactory.cxx"
-//#include "qteditorfactory.moc"
+// #include "moc_qteditorfactory.cxx"
+// #include "qteditorfactory.moc"

@@ -81,7 +81,7 @@ int BulletRaySensor::GetCount() const
 void BulletRaySensor::GetRelativePoints(int _index,
     math::Vector3 &_a, math::Vector3 &_b)
 {
-  if (_index <0 || _index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
@@ -95,7 +95,7 @@ void BulletRaySensor::GetRelativePoints(int _index,
 //////////////////////////////////////////////////
 double BulletRaySensor::GetRange(int _index) const
 {
-  if (_index <0 || _index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
@@ -109,7 +109,7 @@ double BulletRaySensor::GetRange(int _index) const
 //////////////////////////////////////////////////
 double BulletRaySensor::GetRetro(int _index) const
 {
-  if (_index <0 || _index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
@@ -123,7 +123,7 @@ double BulletRaySensor::GetRetro(int _index) const
 //////////////////////////////////////////////////
 double BulletRaySensor::GetFiducial(int _index) const
 {
-  if (_index <0 || _index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"

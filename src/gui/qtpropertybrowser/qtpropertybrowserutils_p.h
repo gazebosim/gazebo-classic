@@ -79,7 +79,8 @@ class QtCursorDatabase
     QCursor valueToCursor(int value) const;
 #endif
   private:
-    void appendCursor(Qt::CursorShape shape, const QString &name, const QIcon &icon);
+    void appendCursor(Qt::CursorShape shape, const QString &name,
+        const QIcon &icon);
     QStringList m_cursorNames;
     QMap<int, QIcon> m_cursorIcons;
     QMap<int, Qt::CursorShape> m_valueToCursorShape;
@@ -99,8 +100,9 @@ class QtPropertyBrowserUtils
 
 class QtBoolEdit : public QWidget {
   Q_OBJECT
+
   public:
-    QtBoolEdit(QWidget *parent = 0);
+    explicit QtBoolEdit(QWidget *parent = 0);
 
     bool textVisible() const { return m_textVisible; }
     void setTextVisible(bool textVisible);
@@ -113,12 +115,12 @@ class QtBoolEdit : public QWidget {
 
     bool blockCheckBoxSignals(bool block);
 
-Q_SIGNALS:
-    void toggled(bool);
+  Q_SIGNALS:
+    void toggled(bool b);
 
   protected:
     void mousePressEvent(QMouseEvent * event);
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
 
   private:
     QCheckBox *m_checkBox;
@@ -128,27 +130,29 @@ Q_SIGNALS:
 class QtKeySequenceEdit : public QWidget
 {
   Q_OBJECT
+
   public:
-    QtKeySequenceEdit(QWidget *parent = 0);
+    explicit QtKeySequenceEdit(QWidget *parent = 0);
 
     QKeySequence keySequence() const;
     bool eventFilter(QObject *o, QEvent *e);
     public Q_SLOTS:
       void setKeySequence(const QKeySequence &sequence);
-Q_SIGNALS:
+  Q_SIGNALS:
     void keySequenceChanged(const QKeySequence &sequence);
   protected:
     void focusInEvent(QFocusEvent *e);
     void focusOutEvent(QFocusEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
     bool event(QEvent *e);
     private slots:
       void slotClearShortcut();
   private:
     void handleKeyEvent(QKeyEvent *e);
-    int translateModifiers(Qt::KeyboardModifiers state, const QString &text) const;
+    int translateModifiers(Qt::KeyboardModifiers state,
+        const QString &text) const;
 
     int m_num;
     QKeySequence m_keySequence;

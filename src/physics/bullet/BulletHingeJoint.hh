@@ -36,9 +36,9 @@ namespace gazebo
     /// \addtogroup gazebo_physics_joints
     /// \{
     /** \defgroup gazebo_hinge_joint Hinge Joint
-  
+
       \brief A two-axis hinge joint.
-  
+
       \par Attributes
       - body1 (string)
         - Name of the first body to attach to the joint
@@ -61,7 +61,7 @@ namespace gazebo
       - cfm (double)
         - Constraint force mixing.
         - Default = 0.8
-  
+
       \par Example
       \verbatim
       <joint:hinge name ="hinge_joint>
@@ -75,77 +75,73 @@ namespace gazebo
       \endverbatim
     */
     /// \}
-  
+
     /// \addtogroup gazebo_hinge_joint
     /// \{
-    ///\brief A single axis hinge joint
+    /// \brief A single axis hinge joint
     class BulletHingeJoint : public HingeJoint<BulletJoint>
     {
       ///  Constructor
       public: BulletHingeJoint(btDynamicsWorld *world);
-  
+
       /// Destructor
       public: virtual ~BulletHingeJoint();
-  
+
       /// \brief Load joint
       protected: virtual void Load(common::XMLConfigNode *node);
-  
+
       /// \brief Attach the two bodies with this joint
       public: virtual void Attach(Link *one, Link *two);
-  
+
       /// \brief Get the anchor point
       public: virtual math::Vector3 GetAnchor(int index) const;
-  
+
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
-  
+
       /// \brief Get the axis of rotation
       public: math::Vector3 GetAxis(int index) const;
-  
+
       /// \brief Set the axis of rotation
       public: void SetAxis(int index, const math::Vector3 &axis);
-  
+
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
-  
+
       /// \brief Get the angle of rotation
       public: virtual math::Angle GetAngle(int index) const;
-  
+
        /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double angle);
-  
+
       /// \brief Get the rotation rate
       public: virtual double GetVelocity(int index) const;
-  
+
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int index, double t);
-  
+
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int index);
-  
+
       /// \brief Set the torque of a joint.
       public: void SetForce(int index, double torque);
-  
+
       /// \brief Get the torque of a joint.
       public: virtual double GetForce(int index);
-  
+
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(int index, math::Angle angle);
-  
+
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(int index, math::Angle angle);
-  
+
       /// \brief Get the high stop of an axis(index).
       public: virtual math::Angle GetHighStop(int index);
-  
+
       /// \brief Get the low stop of an axis(index).
       public: virtual math::Angle GetLowStop(int index);
     };
     /// \}
-  
   }
 }
 #endif
-
-
-

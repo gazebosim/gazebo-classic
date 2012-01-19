@@ -30,28 +30,28 @@ namespace gazebo
   namespace physics
   {
     class Visual;
-  
+
     /// \addtogroup gazebo_physics_collision
     /// \{
     /** \defgroup gazebo_trimesh_collision Triangle Mesh collision
         \brief Trimesh collision
-  
+
       \par Attributes
       The following attributes are supported.
-  
+
       \htmlinclude default_collision_attr_include.html
-  
+
       - scale (float tuple, meters)
         - Scale of the trimesh
         - Default: 1 1 1
-  
+
       \par Example
       \verbatim
         <collision:trimesh name ="pallet_collision">
           <mesh>WoodPallet.mesh</mesh>
           <scale>.2 .2 .2</scale>
           <mass>0.1</mass>
-  
+
           <visual>
             <scale>.2 .2 .2</scale>
             <material>Gazebo/WoodPallet</material>
@@ -63,23 +63,23 @@ namespace gazebo
     /// \}
     /// \addtogroup gazebo_trimesh_collision
     /// \{
-  
+
     /// \brief Triangle mesh collision
     class BulletTrimeshShape : public TrimeshShape
     {
       /// \brief Constructor
       public: BulletTrimeshShape(Collision *parent);
-  
+
       /// \brief Destructor
       public: virtual ~BulletTrimeshShape();
-  
+
       /// \brief Update function
       public: void Update();
-  
+
       /// \brief Load the trimesh
       public: virtual void Load(common::XMLConfigNode *node);
     };
-  
+
     /// \}
   }
 }

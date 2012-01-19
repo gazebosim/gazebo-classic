@@ -76,7 +76,7 @@ void BulletCollision::Update()
 void BulletCollision::OnPoseChange()
 {
   math::Pose pose = this->GetRelativePose();
-  BulletLink *bbody = (BulletLink*)(this->body);
+  BulletLink *bbody = static_cast<BulletLink*>(this->body);
 
   bbody->SetCollisionRelativePose(this, pose);
 }

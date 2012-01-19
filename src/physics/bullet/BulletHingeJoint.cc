@@ -89,13 +89,14 @@ void BulletHingeJoint::Attach(Link *_one, Link *_two)
 
   // Allows access to impulse
   this->constraint->enableFeedback(true);
-  ((btHingeConstraint*)this->constraint)->setAngularOnly(true);
+  static_cast<btHingeConstraint*>(this->constraint)->setAngularOnly(true);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 BulletHingeJoint::GetAnchor(int _index) const
 {
-  btTransform trans = ((btHingeConstraint*)this->constraint)->getAFrame();
+  btTransform trans =
+    static_cast<btHingeConstraint*>(this->constraint)->getAFrame();
   trans.getOrigin() +=
     this->constraint->getRigidLinkA().getCenterOfMassTransform().getOrigin();
   return math::Vector3(trans.getOrigin().getX(),
@@ -187,7 +188,7 @@ void BulletHingeJoint::SetHighStop(int _index, math::Angle _angle)
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    ((btHingeConstraint*)this->constraint)->setLimit(
+    static_cast<btHingeConstraint*>(this->constraint)->setLimit(
       this->GetLowStop(_index).GetAsRadian(), _angle.GetAsRadian());
   else
     gzthrow("Joint must be created first");
@@ -200,18 +201,17 @@ void BulletHingeJoint::SetLowStop(int _index, math::Angle _angle)
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    ((btHingeConstraint*)this->constraint)->setLimit(_angle.GetAsRadian(),
-      this->GetHighStop(_index).GetAsRadian());
+    static_cast<btHingeConstraint*>(this->constraint)->setLimit(
+        _angle.GetAsRadian(), this->GetHighStop(_index).GetAsRadian());
   else
     gzthrow("Joint must be created first");
-
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHingeJoint::GetHighStop(int _index)
 {
   if (this->constraint)
-    return ((btHingeConstraint*)this->constraint)->getUpperLimit();
+    return static_cast<btHingeConstraint*>(this->constraint)->getUpperLimit();
   else
     gzthrow("Joint must be created first");
 }
@@ -220,7 +220,7 @@ math::Angle BulletHingeJoint::GetHighStop(int _index)
 math::Angle BulletHingeJoint::GetLowStop(int _index)
 {
   if (this->constraint)
-    return ((btHingeConstraint*)this->constraint)->getLowerLimit();
+    return static_cast<btHingeConstraint*>(this->constraint)->getLowerLimit();
   else
     gzthrow("Joint must be created first");
 }

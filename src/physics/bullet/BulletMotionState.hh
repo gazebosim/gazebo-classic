@@ -32,44 +32,44 @@ namespace gazebo
   {
     class Visual;
     class Link;
-  
+
     class BulletMotionState : public btMotionState
     {
       /// \brief Constructor
       public: BulletMotionState(Link *body);
-  
+
       /// \brief Constructor
       // public: BulletMotionState(const math::Pose &initPose);
-  
+
       /// \brief Destructor
       public: virtual ~BulletMotionState();
-  
+
       /// \brief Set the visual
       public: void SetVisual(Visual *vis);
-  
+
       /// \brief Get the pose
       public: math::Pose GetWorldPose() const;
-  
+
       /// \brief Set the position of the body
       /// \param pos math::Vector position
       public: virtual void SetWorldPosition(const math::Vector3 &pos);
-  
+
       /// \brief Set the rotation of the body
       /// \param rot Quaternion rotation
       public: virtual void SetWorldRotation(const common::Quatern &rot);
-  
+
       /// \brief Set the pose
       public: void SetWorldPose(const math::Pose &pose);
-  
+
       /// \brief Set the center of mass offset
       public: void SetCoMOffset(const math::Pose &com);
-  
+
       /// \brief Get the world transform
       public: virtual void getWorldTransform(btTransform &worldTrans) const;
-  
+
       /// \brief Set the world transform
       public: virtual void setWorldTransform(const btTransform &worldTrans);
-  
+
       private: Visual *visual;
       private: math::Pose worldPose;
       private: math::Pose comOffset;

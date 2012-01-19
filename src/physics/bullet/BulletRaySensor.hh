@@ -31,42 +31,42 @@ namespace gazebo
   {
     class BulletRayCollision;
     class BulletLink;
-  
+
     /// \brief An Bullet Ray sensor
     class BulletRaySensor : public PhysicsRaySensor
     {
       /// \brief Constructor
       public: BulletRaySensor(Link *body);
-  
+
       /// \brief Destructor
       public: virtual ~BulletRaySensor();
-  
+
       /// \brief Add a ray to the sensor
-      public: void AddRay(math::Vector3 start, math::Vector3 end, double minRange,
-                          double maxRange, bool display);
-  
+      public: void AddRay(math::Vector3 start, math::Vector3 end,
+                  double minRange, double maxRange, bool display);
+
       /// \brief Get the number of rays
       public: int GetCount() const;
-  
+
       /// \brief Get the relative starting and ending points of a ray
       public: void GetRelativePoints(int index, math::Vector3 &a,
                                      math::Vector3 &b);
-  
+
       /// \brief Get the range of a ray
       public: double GetRange(int index) const;
-  
+
       /// \brief Get the retro reflectance value of a ray
       public: double GetRetro(int index) const;
-  
+
       /// \brief Get the fiducial value of a ray
       public: double GetFiducial(int index) const;
-  
+
       /// \brief Update the ray sensor
       public: virtual void Update();
-  
+
       /// All the rays
       private: std::vector<BulletRayCollision*> rays;
-  
+
       private: BulletLink *body;
     };
   }

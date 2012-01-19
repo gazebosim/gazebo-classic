@@ -2834,7 +2834,7 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
     return True
 
   # At this point, all that should be left is actual casts.
-  if len(remainder) > 0 and 'public: ' not in raw_line and 'private:' not in raw_line and 'protected: ' not in raw_line and remainder != ' const':
+  if len(remainder) > 0 and 'public: ' not in raw_line and 'private:' not in raw_line and 'protected: ' not in raw_line and remainder != ' const' and '::' not in raw_line:
     error(filename, linenum, 'readability/casting', 4,
         'Using C-style cast.  Use %s<%s>(...) instead' %
         (cast_type, match.group(1)))

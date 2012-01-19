@@ -102,7 +102,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     for (unsigned int v = 0; v < subMesh->GetVertexCount(); v++)
     {
       gazebo::math::Vector3 vert = subMesh->GetVertex(v);
-      //vert = _pose.CoordPositionAdd(vert);
+      // vert = _pose.CoordPositionAdd(vert);
       printf("<%f, %f, %f>, ", vert.x, vert.y, vert.z);
     }
     printf("  }\n");
@@ -148,12 +148,11 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
       printf("    finish {\n");
       printf("      ambient color rgb <%f, %f, %f>\n",
           mat->GetAmbient().R(), mat->GetAmbient().G(), mat->GetAmbient().B());
-      printf("      specular %f\n", 1.0);//mat->GetSpecular().R());
+      printf("      specular %f\n", 1.0);
       printf("    }\n");
 
       printf("  }\n");
       printf("  }\n");
-
     }
 
     printf("  face_indices {\n");
@@ -170,7 +169,6 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
         printf("    <%d, %d, %d>\n", subMesh->GetIndex(j),
             subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
       }
-
     }
     printf("  }\n");
 
@@ -209,12 +207,13 @@ void ProcessLight(sdf::ElementPtr _elem)
   pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
   diffuse = _elem->GetElement("diffuse")->GetValueColor("rgba");
   specular = _elem->GetElement("specular")->GetValueColor("rgba");
-  //double fadeDist = _elem->GetElement("attenuation")->GetValueDouble("range");
-  //double constant =
-  //_elem->GetElement("attenuation")->GetValueDouble("constant");
-  //double linear = _elem->GetElement("attenuation")->GetValueDouble("linear");
-  //double quadratic =
-  //_elem->GetElement("attenuation")->GetValueDouble("quadratic");
+  // double fadeDist =
+  // _elem->GetElement("attenuation")->GetValueDouble("range");
+  // double constant =
+  // _elem->GetElement("attenuation")->GetValueDouble("constant");
+  // double linear = _elem->GetElement("attenuation")->GetValueDouble("linear");
+  // double quadratic =
+  // _elem->GetElement("attenuation")->GetValueDouble("quadratic");
 
   printf("light_source {\n");
   printf("  <%f, %f, %f>, rgb <%f, %f, %f>\n",
@@ -224,7 +223,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   std::string type = _elem->GetValueString("type");
   if (type == "point")
   {
-    //printf("  pointlight\n");
+    // printf("  pointlight\n");
   }
   else if (type == "directional")
   {
@@ -271,18 +270,18 @@ void ProcessScene(sdf::ElementPtr _elem)
   if (_elem->HasElement("ambient"))
   {
     color = _elem->GetElement("ambient")->GetValueColor("rgba");
-    //printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
-        //color.R(), color.G(), color.B());
+    // printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
+        // color.R(), color.G(), color.B());
   }
 
   int count = 35;
-  //int count = 1600;
+  // int count = 1600;
 
   int recursionLimit = 3;
-  //int recursionLimit = 20;
+  // int recursionLimit = 20;
 
   float errorBound = 1.8;
-  //float errorBound = 1.0;
+  // float errorBound = 1.0;
 
   // Note: Extreme quality
   printf("global_settings { radiosity{\n");
@@ -391,7 +390,7 @@ int main(int argc, char **argv)
     if (worldElem->HasElement("light"))
     {
       sdf::ElementPtr lightElem = worldElem->GetElement("light");
-      while(lightElem)
+      while (lightElem)
       {
         ProcessLight(lightElem);
         lightElem = lightElem->GetNextElement();
@@ -415,10 +414,10 @@ int main(int argc, char **argv)
           {
             visualPose =
               visualElem->GetOrCreateElement("origin")->GetValuePose("pose");
-            //visualPose = (visualPose + linkPose) + modelPose;
+            // visualPose = (visualPose + linkPose) + modelPose;
             visualPose = modelPose + (linkPose + visualPose);
-            //visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;
-            //visualPose.rot = visualPose.rot * linkPose.rot * modelPose.rot;
+            // visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;
+            // visualPose.rot = visualPose.rot * linkPose.rot * modelPose.rot;
             sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
             ProcessGeometry(geomElem, visualPose);
 

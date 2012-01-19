@@ -89,7 +89,8 @@ void BulletLink::Load(common::XMLConfigNode *_node)
     std::map< std::string, Collision* >::iterator iter;
 
     // Get a list of all the collision masses
-    for (iter = this->collisions.begin(), i = 0; iter != collisions.end(); iter++, i++)
+    for (iter = this->collisions.begin(),
+ i = 0; iter != collisions.end(); iter++, i++)
       masses[i] = iter->second->GetMass().GetAsDouble();
 
     // Calculate the center of mass of the compound shape
@@ -109,7 +110,8 @@ void BulletLink::Load(common::XMLConfigNode *_node)
     this->SetRelativePose(tmp, false);
 
     // Move all the collisions relative to the center of mass
-    for (iter = this->collisions.begin(), i = 0; i < this->collisions.size(); i++, iter++)
+    for (iter = this->collisions.begin(),
+ i = 0; i < this->collisions.size(); i++, iter++)
     {
       math::Pose origPose, newPose;
 

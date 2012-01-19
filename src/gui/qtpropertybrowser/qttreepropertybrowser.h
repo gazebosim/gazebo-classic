@@ -57,9 +57,10 @@ class QtPropertyEditorDelegate : public QItemDelegate
 {
   Q_OBJECT
   public:
-    QtPropertyEditorDelegate(QObject *parent = 0)
-      : QItemDelegate(parent), m_editorPrivate(0), m_editedItem(0), m_editedWidget(0), m_disablePainting(false)
-    {}
+    explicit QtPropertyEditorDelegate(QObject *parent = 0)
+      : QItemDelegate(parent), m_editorPrivate(0), m_editedItem(0),
+      m_editedWidget(0), m_disablePainting(false)
+  {}
 
     void setEditorPrivate(QtTreePropertyBrowserPrivate *editorPrivate)
     { m_editorPrivate = editorPrivate; }
@@ -67,13 +68,15 @@ class QtPropertyEditorDelegate : public QItemDelegate
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
         const QModelIndex &index) const;
 
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+    void updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option,
         const QModelIndex &index) const;
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const;
 
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option,
+        const QModelIndex &index) const;
 
     void setModelData(QWidget *, QAbstractItemModel *,
         const QModelIndex &) const {}
@@ -113,7 +116,7 @@ class QtPropertyEditorView : public QTreeWidget
 {
   Q_OBJECT
   public:
-    QtPropertyEditorView(QWidget *parent = 0);
+    explicit QtPropertyEditorView(QWidget *parent = 0);
 
     void setEditorPrivate(QtTreePropertyBrowserPrivate *editorPrivate)
     { m_editorPrivate = editorPrivate; }
@@ -124,23 +127,32 @@ class QtPropertyEditorView : public QTreeWidget
   protected:
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void drawRow(QPainter *painter, const QStyleOptionViewItem &option,
+        const QModelIndex &index) const;
 
   private:
     QtTreePropertyBrowserPrivate *m_editorPrivate;
 };
 
-class QT_QTPROPERTYBROWSER_EXPORT QtTreePropertyBrowser : public QtAbstractPropertyBrowser
+
+class QT_QTPROPERTYBROWSER_EXPORT QtTreePropertyBrowser
+: public QtAbstractPropertyBrowser
 {
   Q_OBJECT
     Q_ENUMS(ResizeMode)
     Q_PROPERTY(int indentation READ indentation WRITE setIndentation)
-    Q_PROPERTY(bool rootIsDecorated READ rootIsDecorated WRITE setRootIsDecorated)
-    Q_PROPERTY(bool alternatingRowColors READ alternatingRowColors WRITE setAlternatingRowColors)
+    Q_PROPERTY(
+        bool rootIsDecorated READ rootIsDecorated WRITE setRootIsDecorated)
+    Q_PROPERTY(
+        bool alternatingRowColors READ
+        alternatingRowColors WRITE setAlternatingRowColors)
     Q_PROPERTY(bool headerVisible READ isHeaderVisible WRITE setHeaderVisible)
     Q_PROPERTY(ResizeMode resizeMode READ resizeMode WRITE setResizeMode)
-    Q_PROPERTY(int splitterPosition READ splitterPosition WRITE setSplitterPosition)
-    Q_PROPERTY(bool propertiesWithoutValueMarked READ propertiesWithoutValueMarked WRITE setPropertiesWithoutValueMarked)
+    Q_PROPERTY(
+        int splitterPosition READ splitterPosition WRITE setSplitterPosition)
+    Q_PROPERTY(
+        bool propertiesWithoutValueMarked READ
+        propertiesWithoutValueMarked WRITE setPropertiesWithoutValueMarked)
   public:
 
     enum ResizeMode
@@ -151,7 +163,7 @@ class QT_QTPROPERTYBROWSER_EXPORT QtTreePropertyBrowser : public QtAbstractPrope
       ResizeToContents
     };
 
-    QtTreePropertyBrowser(QWidget *parent = 0);
+    explicit QtTreePropertyBrowser(QWidget *parent = 0);
     ~QtTreePropertyBrowser();
 
     int indentation() const;
@@ -187,7 +199,7 @@ class QT_QTPROPERTYBROWSER_EXPORT QtTreePropertyBrowser : public QtAbstractPrope
 
     void editItem(QtBrowserItem *item);
 
-Q_SIGNALS:
+  Q_SIGNALS:
 
     void collapsed(QtBrowserItem *item);
     void expanded(QtBrowserItem *item);
@@ -203,11 +215,13 @@ Q_SIGNALS:
     Q_DECLARE_PRIVATE(QtTreePropertyBrowser)
       Q_DISABLE_COPY(QtTreePropertyBrowser)
 
-      Q_PRIVATE_SLOT(d_func(), void slotCollapsed(const QModelIndex &))
-      Q_PRIVATE_SLOT(d_func(), void slotExpanded(const QModelIndex &))
-      Q_PRIVATE_SLOT(d_func(), void slotCurrentBrowserItemChanged(QtBrowserItem *))
-      Q_PRIVATE_SLOT(d_func(), void slotCurrentTreeItemChanged(QTreeWidgetItem *, QTreeWidgetItem *))
-
+      Q_PRIVATE_SLOT(d_func(), void slotCollapsed(const QModelIndex &t))
+      Q_PRIVATE_SLOT(d_func(), void slotExpanded(const QModelIndex &t))
+      Q_PRIVATE_SLOT(d_func(),
+          void slotCurrentBrowserItemChanged(QtBrowserItem *t))
+      Q_PRIVATE_SLOT(d_func(),
+          void slotCurrentTreeItemChanged(
+            QTreeWidgetItem *t, QTreeWidgetItem *t2))
 };
 
 class QtTreePropertyBrowserPrivate
@@ -238,14 +252,16 @@ class QtTreePropertyBrowserPrivate
     QColor calculatedBackgroundColor(QtBrowserItem *item) const;
 
     QtPropertyEditorView *treeWidget() const { return m_treeWidget; }
-    bool markPropertiesWithoutValue() const { return m_markPropertiesWithoutValue; }
+    bool markPropertiesWithoutValue(
+        ) const { return m_markPropertiesWithoutValue; }
 
     QtBrowserItem *currentItem() const;
     void setCurrentItem(QtBrowserItem *browserItem, bool block);
     void editItem(QtBrowserItem *browserItem);
 
     void slotCurrentBrowserItemChanged(QtBrowserItem *item);
-    void slotCurrentTreeItemChanged(QTreeWidgetItem *newItem, QTreeWidgetItem *);
+    void slotCurrentTreeItemChanged(QTreeWidgetItem *newItem,
+        QTreeWidgetItem *);
 
     QTreeWidgetItem *editedItem() const;
 

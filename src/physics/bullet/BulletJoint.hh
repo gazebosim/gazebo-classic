@@ -41,27 +41,29 @@ namespace gazebo
     {
       /// \brief Constructor
       public: BulletJoint();
-  
+
       /// \brief Destructor
       public: virtual ~BulletJoint();
-  
+
       /// \brief Load a joint
       public: void Load(common::XMLConfigNode *node);
-  
+
       /// \brief Update the joint
       public: void Update();
-  
+
       /// \brief Reset the joint
       public: void Reset() {}
-      /// \brief Get the body to which the joint is attached according the _index
+
+      /// \brief Get the body to which the joint is attached
+      ///        according the _index
       public: Link *GetJointLink(int index) const;
-  
+
       /// \brief Determines of the two bodies are connected by a joint
       public: bool AreConnected(Link *one, Link *two) const;
-  
+
       /// \brief Detach this joint from all bodies
       public: virtual void Detach();
-  
+
       /// \brief Set the anchor point
       public: virtual void SetAnchor(int /*index*/,
                                       const gazebo::math::Vector3 & /*anchor*/)
@@ -89,21 +91,21 @@ namespace gazebo
               {gzerr << "Not implement in Bullet\n";}
       /// \brief Set the ERP of this joint
       public: void SetERP(double newERP);
-  
+
       /// \brief Get the ERP of this joint
       public: double GetERP();
-  
+
        /// \brief Set the CFM  of this joint
       public: void SetCFM(double newERP);
-  
+
       /// \brief Get the CFM of this joint
       public: double GetCFM();
-  
+
       protected: btTypedConstraint *constraint;
-  
+
       protected: btDynamicsWorld *world;
     };
-  
+
     /// \}
   }
 }

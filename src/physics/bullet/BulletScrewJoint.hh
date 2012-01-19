@@ -27,11 +27,10 @@
 #ifndef BULLETSCREWJOINT_HH
 #define BULLETSCREWJOINT_HH
 
+#include <btBulletDynamicsCommon.h>
 #include "Param.hh"
 #include "ScrewJoint.hh"
 #include "BulletJoint.hh"
-
-#include <btBulletDynamicsCommon.h>
 
 namespace gazebo
 {
@@ -135,7 +134,6 @@ namespace gazebo
 
     /// \brief Get the max allowed force of an axis(index).
     public: virtual double GetMaxForce(int index);
-
   };
 
 /// \}

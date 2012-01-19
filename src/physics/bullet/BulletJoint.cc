@@ -43,7 +43,6 @@ BulletJoint::~BulletJoint()
 void BulletJoint::Load(common::XMLConfigNode *_node)
 {
   Joint::Load(_node);
-
 }
 
 //////////////////////////////////////////////////

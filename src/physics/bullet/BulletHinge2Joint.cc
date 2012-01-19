@@ -163,20 +163,23 @@ double BulletHinge2Joint::GetMaxForce(int _index)
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetHighStop(int _index, math::Angle _angle)
 {
-  ((btHinge2Constraint*)this->constraint)->setUpperLimit(_angle.GetAsRadian());
+  static_cast<btHinge2Constraint*>(this->constraint)->setUpperLimit(
+      _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 void BulletHinge2Joint::SetLowStop(int _index, math::Angle _angle)
 {
-  ((btHinge2Constraint*)this->constraint)->setLowerLimit(_angle.GetAsRadian());
+  static_cast<btHinge2Constraint*>(this->constraint)->setLowerLimit(
+      _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
   btRotationalLimitMotor *motor =
-    ((btHinge2Constraint*)this->constraint)->getRotationalLimitMotor(_index);
+    static_cast<btHinge2Constraint*>(this->constraint)->getRotationalLimitMotor(
+        _index);
   if (motor)
     return motor->m_hiLimit;
 
@@ -188,7 +191,8 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
   btRotationalLimitMotor *motor =
-    ((btHinge2Constraint*)this->constraint)->getRotationalLimitMotor(_index);
+    static_cast<btHinge2Constraint*>(this->constraint)->getRotationalLimitMotor(
+        _index);
   if (motor)
     return motor->m_loLimit;
 

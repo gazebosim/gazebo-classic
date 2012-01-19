@@ -89,7 +89,7 @@ void BulletUniversalJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
   btmath::Vector3 axis =
-    ((btUniversalConstraint*)this->constraint)->getAxis(_index);
+    static_cast<btUniversalConstraint*>(this->constraint)->getAxis(_index);
   return math::Vector3(axis.getX(), axis.getY(), axis.getZ());
 }
 
@@ -151,14 +151,13 @@ void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
 {
   if (this->constraint)
     if (_index == 0)
-      ((btUniversalConstraint*)this->constraint)->setUpperLimit(
+      static_cast<btUniversalConstraint*>(this->constraint)->setUpperLimit(
         _angle.GetAsRadian(), this->GetHighStop(1).GetAsRadian());
     else
-      ((btUniversalConstraint*)this->constraint)->setUpperLimit(
+      static_cast<btUniversalConstraint*>(this->constraint)->setUpperLimit(
         this->GetHighStop(0).GetAsRadian(), _angle.GetAsRadian());
   else
     gzthrow("Joint must be created first");
-
 }
 
 //////////////////////////////////////////////////
@@ -166,10 +165,10 @@ void BulletUniversalJoint::SetLowStop(int _index, math::Angle _angle)
 {
   if (this->constraint)
     if (_index == 0)
-      ((btUniversalConstraint*)this->constraint)->setLowerLimit(
+      static_cast<btUniversalConstraint*>(this->constraint)->setLowerLimit(
         _angle.GetAsRadian(), this->GetLowStop(1).GetAsRadian());
     else
-      ((btUniversalConstraint*)this->constraint)->setUpperLimit(
+      static_cast<btUniversalConstraint*>(this->constraint)->setUpperLimit(
         this->GetLowStop(0).GetAsRadian(), _angle.GetAsRadian());
   else
     gzthrow("Joint must be created first");
@@ -183,7 +182,8 @@ math::Angle BulletUniversalJoint::GetHighStop(int _index)
   if (this->constraint)
   {
     btRotationalLimitMotor *motor;
-    motor = ((btUniversalConstraint*)this->constraint)->getRotationalLimitMotor(
+    motor = static_cast<btUniversalConstraint*>(
+        this->constraint)->getRotationalLimitMotor(
         _index);
 
     return motor->m_hiLimit;
@@ -202,8 +202,8 @@ math::Angle BulletUniversalJoint::GetLowStop(int _index)
   if (this->constraint)
   {
     btRotationalLimitMotor *motor;
-    motor = ((btUniversalConstraint*)this->constraint)->getRotationalLimitMotor(
-        _index);
+    motor = static_cast<btUniversalConstraint*>(
+        this->constraint)->getRotationalLimitMotor(_index);
 
     return motor->m_loLimit;
   }

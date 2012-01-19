@@ -23,6 +23,8 @@
 #ifndef BULLETHEIGHTMAPGEOM_HH
 #define BULLETHEIGHTMAPGEOM_HH
 
+#include <string>
+
 #include "BulletCollision.hh"
 
 class btHeightfieldTerrainShape;
@@ -32,31 +34,33 @@ namespace gazebo
   namespace physics
   {
     class OgreHeightmap;
-  
+
     /// \addtogroup gazebo_physics_collision
     /// \{
     /** \defgroup gazebo_heightmap_collision Height map collision
         \brief Height map collision
-  
+
       \par Attributes
       The following attributes are supported.
-  
+
       - image (string)
         - Greyscale image to use as the height map
         - Default: (empty)
-  
+
       - worldTexture (string)
-        - Material to use on distant portions of the heightmap, relative to the camera's pose
+        - Material to use on distant portions of the heightmap,
+ relative to the camera's pose
         - Default: (empty)
-  
+
       - detailTexture (string)
-        - Material to use on nearby portions of the heightmap, relative to the camera's pose
+        - Material to use on nearby portions of the heightmap,
+ relative to the camera's pose
         - Default: (empty)
-  
+
       - size (float tuple)
         - Size of the height map
         - Default: 0 0 0
-  
+
       \par Example
       \verbatim
         <collision:heightmap name ="terrain_collision">
@@ -70,45 +74,42 @@ namespace gazebo
     /// \}
     /// \addtogroup gazebo_heightmap_collision
     /// \{
-  
+
     /// \brief Height map collision
     class BulletHeightmapCollision : public BulletCollision
     {
       /// \brief Constructor
       public: BulletHeightmapCollision(Link *body);
-  
+
       /// \brief Destructor
       public: virtual ~BulletHeightmapCollision();
-  
+
       /// \brief Update function
       public: void Update();
-  
+
       /// \brief Load the heightmap
       public: virtual void Load(common::XMLConfigNode *node);
-  
+
       /// \brief Save child parameters
       public: void Save(std::string &prefix, std::ostream &stream);
-  
+
       /// Create a lookup table of the terrain's height
       private: void FillHeightMap();
-  
+
       private: math::Vector3 terrainSize;
-  
+
       private: common::ParamT<std::string> *imageFilenameP;
       private: common::ParamT<std::string> *worldTextureP;
       private: common::ParamT<std::string> *detailTextureP;
       private: common::ParamT<math::Vector3> *sizeP;
       private: common::ParamT<math::Vector3> *offsetP;
-  
+
       private: OgreHeightmap *ogreHeightmap;
-  
+
       private: int width, height;
       private: btHeightfieldTerrainShape* heightFieldShape;
     };
-  
     /// \}
   }
-
 }
 #endif
-

@@ -33,7 +33,7 @@ namespace gazebo
   {
     class Link;
     class XMLConfig;
-  
+
     /// \brief Bullet collision for an infinite plane.
     class BulletPlaneShape : public PlaneShape
     {
@@ -46,24 +46,23 @@ namespace gazebo
               {
                 PlaneShape::SetAltitude(pos);
               }
-  
+
       /// \brief Create the plane
       public: void CreatePlane()
               {
-                BulletCollision *bParent = (BulletCollision*)(this->parent);
+                BulletCollision *bParent =
+                  static_cast<BulletCollision*>(this->parent);
                 PlaneShape::CreatePlane();
-  
+
                 btmath::Vector3 vec((**normalP).x,
                     (**normalP).y, (**normalP).z);
-  
+
                 btCollisionShape *btshape = new btStaticPlaneShape(vec, 0.0);
-  
+
                 bParent->SetCollisionShape(btshape);
               }
     };
-  
     /// \}
   }
 }
 #endif
-

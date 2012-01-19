@@ -39,7 +39,7 @@ def ParseArguments(args):
 def ProcessFile(filename):
   #lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
   lines = codecs.open(filename, 'r', 'utf8', 'replace').readlines()
-  #outFile = open(filename,'w')
+  outFile = open(filename,'w')
   # Remove trailing '\r'.
   for linenum in range(len(lines)):
     lines[linenum] = lines[linenum].rstrip('\n')
@@ -55,6 +55,10 @@ def ProcessFile(filename):
     line = lines[linenum]
     prevLine = lines[linenum-1]
 
+    # Remove space at end of lines
+    if line and line[-1].isspace():
+      line = line.rstrip()
+
     #if 'http' not in line:
     #  line = re.sub(r'//([a-z])','// \\1', line)
     #  line = re.sub(r'//(\()','// \\1', line)
@@ -63,19 +67,21 @@ def ProcessFile(filename):
     #  line = re.sub(r'//(})','// \\1', line)
 
     if len(line) > 80:
-      index = line.rfind(' ', 0, 80)
-      print line[0:index]
-      print line[index:len(line)]
+      index = line.rfind(',', 0, 80)
+      if index < 0:
+        index = line.rfind('=',0,80)
+        if index <0:
+          index = line.rfind('(',0,80)
+      print >>outFile, line[0:index+1]
+      print >>outFile, line[index+1:len(line)]
+    else:
+      print >>outFile, line
 
     # Skip blank lines after start of new block
     #if re.search(r'^\s*$',line) or len(line) == 0:
     #  prevLine = lines[linenum-1]
     #  if re.search(r'\s*{', prevLine):
     #    continue
-
-    ## Remove space at end of lines
-    #if line and line[-1].isspace():
-    #  line = line.rstrip()
 
     ## Remove spaces after ( and before )
     #line = re.sub(r'\(\s*','(',line)

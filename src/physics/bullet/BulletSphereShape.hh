@@ -42,12 +42,11 @@ namespace gazebo
       public: void SetSize(const double &radius)
               {
                 SphereShape::SetSize(radius);
-                BulletCollision *bParent = (BulletCollision*)(this->parent);
+                BulletCollision *bParent =
+                  static_cast<BulletCollision*>(this->parent);
                 bParent->SetCollisionShape(new btSphereShape(radius));
               }
     };
   }
 }
 #endif
-
-

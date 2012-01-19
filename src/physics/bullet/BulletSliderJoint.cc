@@ -85,7 +85,7 @@ math::Vector3 BulletSliderJoint::GetAxis(int _index) const
 //////////////////////////////////////////////////
 math::Angle BulletSliderJoint::GetAngle(int _index) const
 {
-  return ((btSliderConstraint*)this->constraint)->getLinearPos();
+  return static_cast<btSliderConstraint*>(this->constraint)->getLinearPos();
 }
 
 //////////////////////////////////////////////////
@@ -122,27 +122,28 @@ void BulletSliderJoint::SetForce(int _index, double _force)
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetHighStop(int _index, math::Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setUpperLinLimit(
+  static_cast<btSliderConstraint*>(this->constraint)->setUpperLinLimit(
     _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetLowStop(int _index, math::Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setLowerLinLimit(
+  static_cast<btSliderConstraint*>(this->constraint)->setLowerLinLimit(
     _angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletSliderJoint::GetHighStop(int _index)
 {
-  return ((btSliderConstraint*)this->constraint)->getUpperLinLimit();
+  return static_cast<btSliderConstraint*>(this->constraint)->getUpperLinLimit();
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletSliderJoint::GetLowStop(int _index)
 {
-  return ((btSliderConstraint*)this->constraint)->getLowerLinLimit();
+  return static_cast<btSliderConstraint*>(
+      this->constraint)->getLowerLinLimit();
 }
 
 //////////////////////////////////////////////////

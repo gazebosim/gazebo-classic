@@ -69,9 +69,5 @@ namespace gazebo
 
   /// \}
 }
-
-}
 }
 #endif
-
-

@@ -41,10 +41,11 @@
 #ifndef QTGROUPBOXPROPERTYBROWSER_H
 #define QTGROUPBOXPROPERTYBROWSER_H
 
-#include "qtpropertybrowser.h"
 #include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QGroupBox>
+
+#include "qtpropertybrowser.h"
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
@@ -52,12 +53,14 @@ QT_BEGIN_NAMESPACE
 
 class QtGroupBoxPropertyBrowserPrivate;
 
-class QT_QTPROPERTYBROWSER_EXPORT QtGroupBoxPropertyBrowser : public QtAbstractPropertyBrowser
+
+class QT_QTPROPERTYBROWSER_EXPORT QtGroupBoxPropertyBrowser
+: public QtAbstractPropertyBrowser
 {
   Q_OBJECT
   public:
 
-    QtGroupBoxPropertyBrowser(QWidget *parent = 0);
+    explicit QtGroupBoxPropertyBrowser(QWidget *parent = 0);
     ~QtGroupBoxPropertyBrowser();
 
   protected:
@@ -72,7 +75,6 @@ class QT_QTPROPERTYBROWSER_EXPORT QtGroupBoxPropertyBrowser : public QtAbstractP
       Q_DISABLE_COPY(QtGroupBoxPropertyBrowser)
       Q_PRIVATE_SLOT(d_func(), void slotUpdate())
       Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed())
-
 };
 
 class QtGroupBoxPropertyBrowserPrivate
@@ -96,8 +98,9 @@ class QtGroupBoxPropertyBrowserPrivate
     struct WidgetItem
     {
       WidgetItem() : widget(0), label(0), widgetLabel(0),
-      groupBox(0), layout(0), line(0), parent(0) { }
-      QWidget *widget; // can be null
+      groupBox(0), layout(0), line(0), parent(0)
+      { }
+      QWidget *widget;  // can be null
       QLabel *label;
       QLabel *widgetLabel;
       QGroupBox *groupBox;

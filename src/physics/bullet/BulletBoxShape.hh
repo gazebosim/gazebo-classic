@@ -42,8 +42,9 @@ namespace gazebo
       public: void SetSize(const math::Vector3 &size)
               {
                 BoxShape::SetSize(size);
-                BulletCollision *bParent = (BulletCollision*)(this->parent);
-  
+                BulletCollision *bParent =
+                  static_cast<BulletCollision*>(this->parent);
+
                 /// Bullet requires the half-extents of the box
                 bParent->SetCollisionShape(new btBoxShape(
                     btmath::Vector3(size.x*0.5, size.y*0.5, size.z*0.5)));
@@ -52,5 +53,3 @@ namespace gazebo
   }
 }
 #endif
-
-

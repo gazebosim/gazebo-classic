@@ -41,10 +41,11 @@
 #ifndef QTBUTTONPROPERTYBROWSER_H
 #define QTBUTTONPROPERTYBROWSER_H
 
-#include "qtpropertybrowser.h"
 #include <QtGui/QToolButton>
 #include <QtGui/QLabel>
 #include <QtGui/QGridLayout>
+
+#include "qtpropertybrowser.h"
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
@@ -52,18 +53,19 @@ QT_BEGIN_NAMESPACE
 
 class QtButtonPropertyBrowserPrivate;
 
-class QT_QTPROPERTYBROWSER_EXPORT QtButtonPropertyBrowser : public QtAbstractPropertyBrowser
+class QT_QTPROPERTYBROWSER_EXPORT QtButtonPropertyBrowser
+: public QtAbstractPropertyBrowser
 {
   Q_OBJECT
   public:
 
-    QtButtonPropertyBrowser(QWidget *parent = 0);
+    explicit QtButtonPropertyBrowser(QWidget *parent = 0);
     ~QtButtonPropertyBrowser();
 
     void setExpanded(QtBrowserItem *item, bool expanded);
     bool isExpanded(QtBrowserItem *item) const;
 
-Q_SIGNALS:
+  Q_SIGNALS:
 
     void collapsed(QtBrowserItem *item);
     void expanded(QtBrowserItem *item);
@@ -81,7 +83,6 @@ Q_SIGNALS:
       Q_PRIVATE_SLOT(d_func(), void slotUpdate())
       Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed())
       Q_PRIVATE_SLOT(d_func(), void slotToggled(bool))
-
 };
 
 class QtButtonPropertyBrowserPrivate
@@ -89,7 +90,9 @@ class QtButtonPropertyBrowserPrivate
   QtButtonPropertyBrowser *q_ptr;
   Q_DECLARE_PUBLIC(QtButtonPropertyBrowser)
   public:
-    QtButtonPropertyBrowserPrivate() : q_ptr(NULL),m_mainLayout(NULL) {}
+    explicit QtButtonPropertyBrowserPrivate()
+      : q_ptr(NULL), m_mainLayout(NULL)
+  {}
     void init(QWidget *parent);
 
     void propertyInserted(QtBrowserItem *index, QtBrowserItem *afterIndex);
@@ -105,13 +108,16 @@ class QtButtonPropertyBrowserPrivate
     struct WidgetItem
     {
       WidgetItem() : widget(0), label(0), widgetLabel(0),
-      button(0), container(0), layout(0), /*line(0), */parent(0), expanded(false) { }
-      QWidget *widget; // can be null
-      QLabel *label; // main label with property name
-      QLabel *widgetLabel; // label substitute showing the current value if there is no widget
-      QToolButton *button; // expandable button for items with children
-      QWidget *container; // container which is expanded when the button is clicked
-      QGridLayout *layout; // layout in container
+      button(0), container(0), layout(0), /*line(0), */parent(0),
+      expanded(false) { }
+      QWidget *widget;  // can be null
+      QLabel *label;  // main label with property name
+
+      QLabel *widgetLabel;
+      QToolButton *button;  // expandable button for items with children
+
+      QWidget *container;
+      QGridLayout *layout;  // layout in container
       WidgetItem *parent;
       QList<WidgetItem *> children;
       bool expanded;

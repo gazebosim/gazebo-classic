@@ -42,16 +42,14 @@ namespace gazebo
       public: void SetSize(const math::Vector2d &size)
               {
                 CylinderShape::SetSize(size);
-                BulletCollision *bParent = (BulletCollision*)(this->parent);
-  
+                BulletCollision *bParent =
+                  static_cast<BulletCollision*>(this->parent);
+
                 bParent->SetCollisionShape(new btCylinderShapeZ(
                     btmath::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)));
               }
     };
-  
     /// \}
   }
 }
 #endif
-
-
