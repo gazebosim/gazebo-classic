@@ -40,7 +40,6 @@ using namespace gazebo;
 GZ_REGISTER_STATIC_SENSOR("stereocamera", StereoCameraSensor);
 
 //////////////////////////////////////////////////
-// Constructor
 StereoCameraSensor::StereoCameraSensor(Body *body)
     : Sensor(body), Camera("Stereo", 0)
 {
@@ -54,7 +53,6 @@ StereoCameraSensor::StereoCameraSensor(Body *body)
 
 
 //////////////////////////////////////////////////
-// Destructor
 StereoCameraSensor::~StereoCameraSensor()
 {
   for (int i = 0; i < 2; i++)
@@ -68,7 +66,6 @@ StereoCameraSensor::~StereoCameraSensor()
 }
 
 //////////////////////////////////////////////////
-// Load the camera
 void StereoCameraSensor::LoadChild(XMLConfigNode *node)
 {
   this->LoadCam(node);
@@ -77,7 +74,6 @@ void StereoCameraSensor::LoadChild(XMLConfigNode *node)
 }
 
 //////////////////////////////////////////////////
-/// Save the sensor info in XML format
 void StereoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
@@ -85,7 +81,6 @@ void StereoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 }
 
 //////////////////////////////////////////////////
-// Initialize the camera
 void StereoCameraSensor::InitChild()
 {
   Ogre::Viewport *cviewport;
@@ -199,14 +194,12 @@ void StereoCameraSensor::InitChild()
 }
 
 //////////////////////////////////////////////////
-// Finalize the camera
 void StereoCameraSensor::FiniChild()
 {
   this->FiniCam();
 }
 
 //////////////////////////////////////////////////
-// Update the drawing
 void StereoCameraSensor::UpdateChild()
 {
   /* NATY: Fix
@@ -328,14 +321,12 @@ void StereoCameraSensor::UpdateChild()
 }
 
 //////////////////////////////////////////////////
-// Return the material the camera renders to
 std::string StereoCameraSensor::GetMaterialName() const
 {
   return this->materialName[LEFT];
 }
 
 //////////////////////////////////////////////////
-/// Get a pointer to the image data
 const unsigned char *StereoCameraSensor::GetImageData(unsigned int i)
 {
   if (i > 1)
@@ -345,7 +336,6 @@ const unsigned char *StereoCameraSensor::GetImageData(unsigned int i)
 }
 
 //////////////////////////////////////////////////
-// Get a pointer to the depth data
 const float *StereoCameraSensor::GetDepthData(unsigned int i)
 {
   if (i > 1)
@@ -355,7 +345,6 @@ const float *StereoCameraSensor::GetDepthData(unsigned int i)
 }
 
 //////////////////////////////////////////////////
-// Fill all RGB and depth buffers
 void StereoCameraSensor::FillBuffers()
 {
   Ogre::HardwarePixelBufferSharedPtr hardwareBuffer;
@@ -397,7 +386,6 @@ void StereoCameraSensor::FillBuffers()
 }
 
 //////////////////////////////////////////////////
-// Save a single frame to disk
 void StereoCameraSensor::SaveFrame()
 {
   char tmp[1024];
@@ -438,7 +426,6 @@ void StereoCameraSensor::SaveFrame()
 }
 
 //////////////////////////////////////////////////
-// Save the current frame to disk
 /*void StereoCameraSensor::SaveFrame()
 {
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
@@ -509,7 +496,6 @@ void StereoCameraSensor::SaveFrame()
   */
 
 //////////////////////////////////////////////////
-/// Get the baselien of the camera
 double StereoCameraSensor::GetBaseline() const
 {
   return this->baseline;

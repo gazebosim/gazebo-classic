@@ -30,7 +30,6 @@ std::string Material::BlendModeStr[BLEND_COUNT] = {"ADD", "MODULATE",
   "REPLACE"};
 
 //////////////////////////////////////////////////
-/// Constructor
 Material::Material()
 {
   this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
@@ -46,7 +45,6 @@ Material::Material()
 }
 
 //////////////////////////////////////////////////
-/// Create a material with a default color
 Material::Material(const Color &_clr)
 {
   this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
@@ -60,27 +58,23 @@ Material::Material(const Color &_clr)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Material::~Material()
 {
 }
 
 //////////////////////////////////////////////////
-/// Get the name of the material
 std::string Material::GetName() const
 {
   return this->name;
 }
 
 //////////////////////////////////////////////////
-// Set a texture image
 void Material::SetTextureImage(const std::string &_tex)
 {
   this->texImage = _tex;
 }
 
 //////////////////////////////////////////////////
-// Set a texture image with resource_path
 void Material::SetTextureImage(const std::string &_tex,
     const std::string &_resourcePath)
 {
@@ -88,7 +82,6 @@ void Material::SetTextureImage(const std::string &_tex,
 }
 
 //////////////////////////////////////////////////
-/// Get a thie texture image
 std::string Material::GetTextureImage() const
 {
   return this->texImage;
@@ -96,21 +89,18 @@ std::string Material::GetTextureImage() const
 
 
 //////////////////////////////////////////////////
-/// Set the ambient color
 void Material::SetAmbient(const Color &_clr)
 {
   this->ambient = _clr;
 }
 
 //////////////////////////////////////////////////
-/// Get the ambient color
 Color Material::GetAmbient() const
 {
   return this->ambient;
 }
 
 //////////////////////////////////////////////////
-/// Set the diffuse color
 void Material::SetDiffuse(const Color &_clr)
 {
   this->diffuse = _clr;
@@ -118,14 +108,12 @@ void Material::SetDiffuse(const Color &_clr)
 }
 
 //////////////////////////////////////////////////
-/// Get the diffuse color
 Color Material::GetDiffuse() const
 {
   return this->diffuse;
 }
 
 //////////////////////////////////////////////////
-/// Set the specular color
 void Material::SetSpecular(const Color &_clr)
 {
   this->specular = _clr;
@@ -133,28 +121,24 @@ void Material::SetSpecular(const Color &_clr)
 }
 
 //////////////////////////////////////////////////
-/// Get the specular color
 Color Material::GetSpecular() const
 {
   return this->specular;
 }
 
 //////////////////////////////////////////////////
-/// Set the emissive color
 void Material::SetEmissive(const Color &_clr)
 {
   this->emissive = _clr;
 }
 
 //////////////////////////////////////////////////
-/// Get the emissive color
 Color Material::GetEmissive() const
 {
   return this->emissive;
 }
 
 //////////////////////////////////////////////////
-/// Set the transparency percentage (0..1)
 void Material::SetTransparency(float _t)
 {
   this->transparency = std::min(_t, static_cast<float>(1.0));
@@ -163,14 +147,12 @@ void Material::SetTransparency(float _t)
 }
 
 //////////////////////////////////////////////////
-/// Get the transparency percentage (0..1)
 float Material::GetTransparency() const
 {
   return this->transparency;
 }
 
 //////////////////////////////////////////////////
-/// Set the shininess
 void Material::SetShininess(float _s)
 {
   this->shininess = _s;
@@ -178,14 +160,12 @@ void Material::SetShininess(float _s)
 }
 
 //////////////////////////////////////////////////
-/// Get the shininess
 float Material::GetShininess() const
 {
   return this->shininess;
 }
 
 //////////////////////////////////////////////////
-/// Set the blende factors. Will be interpreted as:
 void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 {
   this->srcBlendFactor = _srcFactor;
@@ -193,7 +173,6 @@ void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 }
 
 //////////////////////////////////////////////////
-/// Get the blend factors
 void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor)
 {
   _srcFactor = this->srcBlendFactor;
@@ -202,69 +181,59 @@ void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor)
 
 
 //////////////////////////////////////////////////
-/// Set the blending mode
 void Material::SetBlendMode(BlendMode _b)
 {
   this->blendMode = _b;
 }
 
 //////////////////////////////////////////////////
-/// Get the blending mode
 Material::BlendMode Material::GetBlendMode() const
 {
   return this->blendMode;
 }
 
 //////////////////////////////////////////////////
-/// Set the shading mode
 void Material::SetShadeMode(ShadeMode _s)
 {
   this->shadeMode = _s;
 }
 
 //////////////////////////////////////////////////
-/// Get the shading mode
 Material::ShadeMode Material::GetShadeMode() const
 {
   return this->shadeMode;
 }
 
 //////////////////////////////////////////////////
-/// Set the point size
 void Material::SetPointSize(double _size)
 {
   this->pointSize = _size;
 }
 
 //////////////////////////////////////////////////
-/// Get the point size
 double Material::GetPointSize() const
 {
   return this->pointSize;
 }
 //////////////////////////////////////////////////
-/// Set depth write
 void Material::SetDepthWrite(bool _value)
 {
   this->depthWrite = _value;
 }
 
 //////////////////////////////////////////////////
-/// Get depth write
 bool Material::GetDepthWrite() const
 {
   return this->depthWrite;
 }
 
 //////////////////////////////////////////////////
-/// Set lighting enabled
 void Material::SetLighting(bool _value)
 {
   this->lighting = _value;
 }
 
 //////////////////////////////////////////////////
-/// Get lighting enabled
 bool Material::GetLighting() const
 {
   return this->lighting;

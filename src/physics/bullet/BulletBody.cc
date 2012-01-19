@@ -42,7 +42,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletLink::BulletLink(Entity *_parent)
     : Link(parent)
 {
@@ -58,14 +57,12 @@ BulletLink::BulletLink(Entity *_parent)
 
 
 //////////////////////////////////////////////////
-// Destructor
 BulletLink::~BulletLink()
 {
   delete this->rigidLink;
 }
 
 //////////////////////////////////////////////////
-// Load the body based on an common::XMLConfig node
 void BulletLink::Load(common::XMLConfigNode *_node)
 {
   Link::Load(_node);
@@ -167,28 +164,24 @@ void BulletLink::Load(common::XMLConfigNode *_node)
 }
 
 //////////////////////////////////////////////////
-// Init the Bullet body
 void BulletLink::Init()
 {
   Link::Init();
 }
 
 //////////////////////////////////////////////////
-/// Finalize the body
 void BulletLink::Fini()
 {
   Link::Fini();
 }
 
 //////////////////////////////////////////////////
-// Update the body
 void BulletLink::Update()
 {
   Link::Update();
 }
 
 //////////////////////////////////////////////////
-// Set whether gravity affects this body
 void BulletLink::SetGravityMode(bool _mode)
 {
   if (!this->rigidLink)
@@ -207,7 +200,6 @@ void BulletLink::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-/// Get the gravity mode
 bool BulletLink::GetGravityMode()
 {
   bool result = false;
@@ -218,13 +210,11 @@ bool BulletLink::GetGravityMode()
 }
 
 //////////////////////////////////////////////////
-/// Set whether this body will collide with others in the model
 void BulletLink::SetSelfCollide(bool _collide)
 {
 }
 
 //////////////////////////////////////////////////
-// Attach a collision to this body
 void BulletLink::AttachCollision(Collision *_collision)
 {
   Link::AttachCollision(_collision);
@@ -243,7 +233,6 @@ void BulletLink::AttachCollision(Collision *_collision)
 }
 
 //////////////////////////////////////////////////
-/// \brief Called when the pose of the entity (or one of its parents) has
 /// changed
 void BulletLink::OnPoseChange()
 {
@@ -255,7 +244,6 @@ void BulletLink::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-// Set whether this body is enabled
 void BulletLink::SetEnabled(bool _enable) const
 {
   if (!this->rigidLink)
@@ -268,7 +256,6 @@ void BulletLink::SetEnabled(bool _enable) const
 }
 
 /////////////////////////////////////////////////////////////////////
-// Update the CoM and mass matrix
 /*
   What's going on here?  In ODE the CoM of a body corresponds to the
   origin of the body-fixed coordinate system.  In Gazebo, however, we
@@ -289,7 +276,6 @@ void BulletLink::UpdateCoM()
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of the body
 void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
@@ -299,7 +285,6 @@ void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-/// Get the velocity of the body
 math::Vector3 BulletLink::GetWorldLinearVel() const
 {
   if (!this->rigidLink)
@@ -311,7 +296,6 @@ math::Vector3 BulletLink::GetWorldLinearVel() const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of the body
 void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 {
   if (!this->rigidLink)
@@ -321,7 +305,6 @@ void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-/// Get the velocity of the body
 math::Vector3 BulletLink::GetWorldAngularVel() const
 {
   if (!this->rigidLink)
@@ -333,7 +316,6 @@ math::Vector3 BulletLink::GetWorldAngularVel() const
 }
 
 //////////////////////////////////////////////////
-/// Set the force applied to the body
 void BulletLink::SetForce(const math::Vector3 &_force)
 {
   if (!this->rigidLink)
@@ -344,7 +326,6 @@ void BulletLink::SetForce(const math::Vector3 &_force)
 }
 
 //////////////////////////////////////////////////
-/// Get the force applied to the body
 math::Vector3 BulletLink::GetWorldForce() const
 {
   if (!this->rigidLink)
@@ -358,7 +339,6 @@ math::Vector3 BulletLink::GetWorldForce() const
 }
 
 //////////////////////////////////////////////////
-/// \brief Set the torque applied to the body
 void BulletLink::SetTorque(const math::Vector3 &_torque)
 {
   if (!this->rigidLink)
@@ -369,7 +349,6 @@ void BulletLink::SetTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the torque applied to the body
 math::Vector3 BulletLink::GetWorldTorque() const
 {
   if (!this->rigidLink)
@@ -383,14 +362,12 @@ math::Vector3 BulletLink::GetWorldTorque() const
 }
 
 //////////////////////////////////////////////////
-// Get the bullet rigid body
 btRigidLink *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
 }
 
 //////////////////////////////////////////////////
-/// Set the linear damping factor
 void BulletLink::SetLinearDamping(double _damping)
 {
   this->rigidLink->setDamping((btScalar)_damping,
@@ -398,7 +375,6 @@ void BulletLink::SetLinearDamping(double _damping)
 }
 
 //////////////////////////////////////////////////
-/// Set the angular damping factor
 void BulletLink::SetAngularDamping(double _damping)
 {
   this->rigidLink->setDamping(

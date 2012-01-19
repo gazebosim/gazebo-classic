@@ -25,14 +25,12 @@ using namespace gazebo;
 using namespace transport;
 
 //////////////////////////////////////////////////
-// Constructor
 Subscriber::Subscriber(const std::string &t, NodePtr _node)
   : topic(t), node(_node)
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Subscriber::~Subscriber()
 {
   this->Unsubscribe();
@@ -40,14 +38,12 @@ Subscriber::~Subscriber()
 }
 
 //////////////////////////////////////////////////
-/// Get the topic name
 std::string Subscriber::GetTopic() const
 {
   return this->topic;
 }
 
 //////////////////////////////////////////////////
-/// Get the message type
 std::string Subscriber::GetMsgType() const
 {
   return std::string();
@@ -55,7 +51,6 @@ std::string Subscriber::GetMsgType() const
 
 
 //////////////////////////////////////////////////
-/// Unsubscribe from the topic
 void Subscriber::Unsubscribe() const
 {
   if (this->node)

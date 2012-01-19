@@ -27,14 +27,12 @@ std::vector<std::string> plugins;
 
 
 //////////////////////////////////////////////////
-// Print the version/licence string
 void PrintVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
 //////////////////////////////////////////////////
-// TODO: Implement these options
 void PrintUsage()
 {
   fprintf(stderr, "Usage: gzclient [-h] <config_file>\n");
@@ -43,7 +41,6 @@ void PrintUsage()
 }
 
 //////////////////////////////////////////////////
-// Parse the argument list.  Options are placed in static variables.
 int ParseArgs(int _argc, char **_argv)
 {
   int ch;
@@ -81,7 +78,6 @@ int ParseArgs(int _argc, char **_argv)
 }
 
 //////////////////////////////////////////////////
-// sighandler to shut everything down properly
 void SignalHandler(int)
 {
   gazebo::stop();
@@ -89,7 +85,6 @@ void SignalHandler(int)
 }
 
 //////////////////////////////////////////////////
-// Main function
 int main(int _argc, char **_argv)
 {
   if (ParseArgs(_argc, _argv) != 0)

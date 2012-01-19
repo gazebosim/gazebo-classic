@@ -36,21 +36,18 @@ std::vector<std::string> plugins;
 boost::interprocess::interprocess_semaphore sem(0);
 
 //////////////////////////////////////////////////
-// TODO: Implement these options
 void PrintUsage()
 {
   std::cerr << "Usage: gzserver\n";
 }
 
 //////////////////////////////////////////////////
-// Print the version/licence string
 void PrintVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
 //////////////////////////////////////////////////
-// Parse the argument list.  Options are placed in static variables.
 int ParseArgs(int argc, char **argv)
 {
   // FILE *tmpFile;
@@ -92,7 +89,6 @@ int ParseArgs(int argc, char **argv)
 
 
 //////////////////////////////////////////////////
-// sighandler to shut everything down properly
 void SignalHandler(int)
 {
   server->Stop();

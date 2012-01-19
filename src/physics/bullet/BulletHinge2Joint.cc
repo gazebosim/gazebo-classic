@@ -34,7 +34,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world)
     : Hinge2Joint<BulletJoint>()
 {
@@ -43,27 +42,23 @@ BulletHinge2Joint::BulletHinge2Joint(btDynamicsWorld *_world)
 
 
 //////////////////////////////////////////////////
-// Destructor
 BulletHinge2Joint::~BulletHinge2Joint()
 {
 }
 
 //////////////////////////////////////////////////
-///  Load the joint
 void BulletHinge2Joint::Load(common::XMLConfigNode *_node)
 {
   Hinge2Joint<BulletJoint>::Load(_node);
 }
 
 //////////////////////////////////////////////////
-/// Save a joint to a stream in XML format
 void BulletHinge2Joint::SaveJoint(std::string &_prefix, std::ostream &_stream)
 {
   Hinge2Joint<BulletJoint>::SaveJoint(_prefix, _stream);
 }
 
 //////////////////////////////////////////////////
-/// Attach the two bodies with this joint
 void BulletHinge2Joint::Attach(Link *_one, Link *_two)
 {
   Hinge2Joint<BulletJoint>::Attach(_one, _two);
@@ -96,14 +91,12 @@ void BulletHinge2Joint::Attach(Link *_one, Link *_two)
 }
 
 //////////////////////////////////////////////////
-// Get anchor point
 math::Vector3 BulletHinge2Joint::GetAnchor(int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-// Get first axis of rotation
 math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 {
   btmath::Vector3 vec = ((btHinge2Constraint*)this->constraint)->getAxis1();
@@ -111,14 +104,12 @@ math::Vector3 BulletHinge2Joint::GetAxis(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-// Get angle of rotation about first axis
 math::Angle BulletHinge2Joint::GetAngle(int _index) const
 {
   return ((btHinge2Constraint*)this->constraint)->getmath::Angle1();
 }
 
 //////////////////////////////////////////////////
-// Get rate of rotation about first axis
 double BulletHinge2Joint::GetVelocity(int _index) const
 {
   gzerr << "Not implemented";
@@ -126,21 +117,18 @@ double BulletHinge2Joint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void BulletHinge2Joint::SetVelocity(int _index, double _angle)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-// Set the anchor point
 void BulletHinge2Joint::SetAnchor(int _index, const math::Vector3 &_anchor)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-// Set the first axis of rotation
 void BulletHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   gzerr << "Not implemented";
@@ -148,28 +136,24 @@ void BulletHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void BulletHinge2Joint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Set torque
 void BulletHinge2Joint::SetForce(int _index, double _torque)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void BulletHinge2Joint::SetMaxForce(int _index, double _t)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double BulletHinge2Joint::GetMaxForce(int _index)
 {
   gzerr << "Not implemented";
@@ -177,21 +161,18 @@ double BulletHinge2Joint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-/// Set the high stop of an axis(index).
 void BulletHinge2Joint::SetHighStop(int _index, math::Angle _angle)
 {
   ((btHinge2Constraint*)this->constraint)->setUpperLimit(_angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
-/// Set the low stop of an axis(index).
 void BulletHinge2Joint::SetLowStop(int _index, math::Angle _angle)
 {
   ((btHinge2Constraint*)this->constraint)->setLowerLimit(_angle.GetAsRadian());
 }
 
 //////////////////////////////////////////////////
-/// Get the high stop of an axis(index).
 math::Angle BulletHinge2Joint::GetHighStop(int _index)
 {
   btRotationalLimitMotor *motor =
@@ -204,7 +185,6 @@ math::Angle BulletHinge2Joint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-/// Get the low stop of an axis(index).
 math::Angle BulletHinge2Joint::GetLowStop(int _index)
 {
   btRotationalLimitMotor *motor =

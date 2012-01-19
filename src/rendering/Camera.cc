@@ -44,7 +44,6 @@ using namespace rendering;
 unsigned int Camera::cameraCounter = 0;
 
 //////////////////////////////////////////////////
-// Constructor
 Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 {
   this->initialized = false;
@@ -101,7 +100,6 @@ Camera::Camera(const std::string &namePrefix_, Scene *scene_, bool _autoRender)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Camera::~Camera()
 {
   delete [] this->saveFrameBuffer;
@@ -127,7 +125,6 @@ Camera::~Camera()
 }
 
 //////////////////////////////////////////////////
-// Load the camera
 void Camera::Load(sdf::ElementPtr &_sdf)
 {
   this->sdf = _sdf;
@@ -135,7 +132,6 @@ void Camera::Load(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-// Load the camera
 void Camera::Load()
 {
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
@@ -174,7 +170,6 @@ void Camera::Load()
 }
 
 //////////////////////////////////////////////////
-// Initialize the camera
 void Camera::Init()
 {
   this->SetSceneNode(
@@ -199,7 +194,6 @@ void Camera::Init()
 }
 
 //////////////////////////////////////////////////
-// Finalize the camera
 void Camera::Fini()
 {
   RTShaderSystem::DetachViewport(this->viewport, this->scene);
@@ -208,21 +202,18 @@ void Camera::Fini()
 }
 
 //////////////////////////////////////////////////
-/// Set the ID of the window this camera is rendering into.
 void Camera::SetWindowId(unsigned int windowId_)
 {
   this->windowId = windowId_;
 }
 
 //////////////////////////////////////////////////
-/// Get the ID of the window this camera is rendering into.
 unsigned int Camera::GetWindowId() const
 {
   return this->windowId;
 }
 
 //////////////////////////////////////////////////
-/// Set the scene this camera is viewing
 void Camera::SetScene(Scene *scene_)
 {
   this->scene = scene_;
@@ -230,7 +221,6 @@ void Camera::SetScene(Scene *scene_)
 
 
 //////////////////////////////////////////////////
-// Update the drawing
 void Camera::Update()
 {
   // if (this->sceneNode)
@@ -270,7 +260,6 @@ void Camera::Update()
 
 
 //////////////////////////////////////////////////
-// Render the camera
 void Camera::Render()
 {
   this->newData = true;
@@ -359,14 +348,12 @@ void Camera::PostRender()
 
 
 //////////////////////////////////////////////////
-// Get the global pose of the camera
 math::Pose Camera::GetWorldPose()
 {
   return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
 }
 
 //////////////////////////////////////////////////
-/// Get the camera position in the world
 math::Vector3 Camera::GetWorldPosition() const
 {
   return Conversions::Convert(this->sceneNode->_getDerivedPosition());
@@ -383,7 +370,6 @@ math::Quaternion Camera::GetWorldRotation() const
 }
 
 //////////////////////////////////////////////////
-/// Set the global pose of the camera
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
@@ -391,14 +377,12 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-/// Set the world position
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
   this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
 }
 
 //////////////////////////////////////////////////
-/// Set the world orientation
 void Camera::SetWorldRotation(const math::Quaternion &_quant)
 {
   math::Quaternion p, s;
@@ -414,7 +398,6 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 }
 
 //////////////////////////////////////////////////
-// Translate the camera
 void Camera::Translate(const math::Vector3 &direction)
 {
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
@@ -424,14 +407,12 @@ void Camera::Translate(const math::Vector3 &direction)
 }
 
 //////////////////////////////////////////////////
-// Rotate the camera around the yaw axis
 void Camera::RotateYaw(float angle)
 {
   this->sceneNode->roll(Ogre::Radian(angle), Ogre::Node::TS_WORLD);
 }
 
 //////////////////////////////////////////////////
-// Rotate the camera around the pitch axis
 void Camera::RotatePitch(float angle)
 {
   this->pitchNode->yaw(Ogre::Radian(angle));
@@ -439,7 +420,6 @@ void Camera::RotatePitch(float angle)
 
 
 //////////////////////////////////////////////////
-/// Set the clip distances
 void Camera::SetClipDist()
 {
   sdf::ElementPtr clipElem = this->sdf->GetOrCreateElement("clip");
@@ -457,7 +437,6 @@ void Camera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-/// Set the clip distances
 void Camera::SetClipDist(float _near, float _far)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("clip");
@@ -469,7 +448,6 @@ void Camera::SetClipDist(float _near, float _far)
 }
 
 //////////////////////////////////////////////////
-/// Set the camera FOV (horizontal)
 void Camera::SetHFOV(float radians)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("horizontal_fov");
@@ -477,7 +455,6 @@ void Camera::SetHFOV(float radians)
 }
 
 //////////////////////////////////////////////////
-/// Get the horizontal field of view of the camera
 math::Angle Camera::GetHFOV() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("horizontal_fov");
@@ -485,14 +462,12 @@ math::Angle Camera::GetHFOV() const
 }
 
 //////////////////////////////////////////////////
-/// Get the vertical field of view of the camera
 math::Angle Camera::GetVFOV() const
 {
   return math::Angle(this->camera->getFOVy().valueRadians());
 }
 
 //////////////////////////////////////////////////
-/// Set the image size
 void Camera::SetImageSize(unsigned int _w, unsigned int _h)
 {
   this->SetImageWidth(_w);
@@ -500,7 +475,6 @@ void Camera::SetImageSize(unsigned int _w, unsigned int _h)
 }
 
 //////////////////////////////////////////////////
-// Set the image width
 void Camera::SetImageWidth(unsigned int _w)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
@@ -508,7 +482,6 @@ void Camera::SetImageWidth(unsigned int _w)
 }
 
 //////////////////////////////////////////////////
-// Set the image height
 void Camera::SetImageHeight(unsigned int _h)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
@@ -516,7 +489,6 @@ void Camera::SetImageHeight(unsigned int _h)
 }
 
 //////////////////////////////////////////////////
-/// Get the width of the image
 unsigned int Camera::GetImageWidth() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
@@ -524,7 +496,6 @@ unsigned int Camera::GetImageWidth() const
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the height of the image
 unsigned int Camera::GetImageHeight() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
@@ -533,7 +504,6 @@ unsigned int Camera::GetImageHeight() const
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the height of the image
 unsigned int Camera::GetImageDepth() const
 {
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
@@ -557,7 +527,6 @@ unsigned int Camera::GetImageDepth() const
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the height of the image
 std::string Camera::GetImageFormat() const
 {
   sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
@@ -565,14 +534,12 @@ std::string Camera::GetImageFormat() const
 }
 
 //////////////////////////////////////////////////
-/// Get the width of the texture
 unsigned int Camera::GetTextureWidth() const
 {
   return this->renderTexture->getBuffer(0, 0)->getWidth();
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the height of the texture
 unsigned int Camera::GetTextureHeight() const
 {
   return this->renderTexture->getBuffer(0, 0)->getHeight();
@@ -580,7 +547,6 @@ unsigned int Camera::GetTextureHeight() const
 
 
 //////////////////////////////////////////////////
-// Get the image size in bytes
 size_t Camera::GetImageByteSize() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("image");
@@ -633,7 +599,6 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
 }
 
 //////////////////////////////////////////////////
-// Enable or disable saving
 void Camera::EnableSaveFrame(bool enable)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
@@ -641,7 +606,6 @@ void Camera::EnableSaveFrame(bool enable)
 }
 
 //////////////////////////////////////////////////
-// Set the save frame pathname
 void Camera::SetSaveFramePathname(const std::string &_pathname)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
@@ -658,7 +622,6 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
 }
 
 //////////////////////////////////////////////////
-/// Get a pointer to the ogre camera
 Ogre::Camera *Camera::GetOgreCamera() const
 {
   return this->camera;
@@ -671,7 +634,6 @@ Ogre::Viewport *Camera::GetViewport() const
 }
 
 //////////////////////////////////////////////////
-/// Get the near clip distance
 double Camera::GetNearClip()
 {
   if (this->camera)
@@ -681,7 +643,6 @@ double Camera::GetNearClip()
 }
 
 //////////////////////////////////////////////////
-/// Get the far clip distance
 double Camera::GetFarClip()
 {
   if (this->camera)
@@ -691,7 +652,6 @@ double Camera::GetFarClip()
 }
 
 //////////////////////////////////////////////////
-/// Get the viewport width in pixels
 unsigned int Camera::GetViewportWidth() const
 {
   if (this->renderTarget)
@@ -701,7 +661,6 @@ unsigned int Camera::GetViewportWidth() const
 }
 
 //////////////////////////////////////////////////
-/// Get the viewport height in pixels
 unsigned int Camera::GetViewportHeight() const
 {
   if (this->renderTarget)
@@ -711,21 +670,18 @@ unsigned int Camera::GetViewportHeight() const
 }
 
 //////////////////////////////////////////////////
-/// Set the aspect ratio
 void Camera::SetAspectRatio(float ratio)
 {
   this->camera->setAspectRatio(ratio);
 }
 
 //////////////////////////////////////////////////
-// Get the apect ratio
 float Camera::GetAspectRatio() const
 {
   return this->camera->getAspectRatio();
 }
 
 //////////////////////////////////////////////////
-/// Get the viewport up vector
 math::Vector3 Camera::GetUp()
 {
   Ogre::Vector3 up = this->camera->getRealUp();
@@ -733,7 +689,6 @@ math::Vector3 Camera::GetUp()
 }
 
 //////////////////////////////////////////////////
-/// Get the viewport right vector
 math::Vector3 Camera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
@@ -741,21 +696,18 @@ math::Vector3 Camera::GetRight()
 }
 
 //////////////////////////////////////////////////
-/// Set the camera's scene node
 void Camera::SetSceneNode(Ogre::SceneNode *node)
 {
   this->sceneNode = node;
 }
 
 //////////////////////////////////////////////////
-/// Get the camera's scene node
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
   return this->pitchNode;
 }
 
 //////////////////////////////////////////////////
-/// Get a pointer to the image data
 const unsigned char *Camera::GetImageData(unsigned int _i)
 {
   if (_i!= 0)
@@ -774,14 +726,12 @@ const unsigned char *Camera::GetImageData(unsigned int _i)
 }
 
 //////////////////////////////////////////////////
-/// Get the camera's name
 std::string Camera::GetName() const
 {
   return this->name;
 }
 
 //////////////////////////////////////////////////
-// Save the current frame to disk
 void Camera::SaveFrame()
 {
   sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
@@ -866,7 +816,6 @@ void Camera::SaveFrame(const unsigned char *_image,
 }
 
 //////////////////////////////////////////////////
-// Toggle whether to view the world in wireframe
 void Camera::ToggleShowWireframe()
 {
   if (this->camera)
@@ -879,7 +828,6 @@ void Camera::ToggleShowWireframe()
 }
 
 //////////////////////////////////////////////////
-// Set whether to view the world in wireframe
 void Camera::ShowWireframe(bool s)
 {
   if (this->camera)
@@ -896,7 +844,6 @@ void Camera::ShowWireframe(bool s)
 }
 
 //////////////////////////////////////////////////
-/// Get a world space ray as cast from the camera through the viewport
 void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
                                     math::Vector3 &_origin,
                                     math::Vector3 &_dir)
@@ -911,7 +858,6 @@ void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
 
 
 //////////////////////////////////////////////////
-/// post process, convert from rgb to bayer
 void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
                                std::string format, int width, int height)
 {
@@ -1018,14 +964,12 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
 }
 
 //////////////////////////////////////////////////
-/// Set whether to capture data
 void Camera::SetCaptureData(bool value)
 {
   this->captureData = value;
 }
 
 //////////////////////////////////////////////////
-/// Set the render target
 void Camera::CreateRenderTexture(const std::string &textureName)
 {
   // Create the render texture
@@ -1045,14 +989,12 @@ void Camera::CreateRenderTexture(const std::string &textureName)
 }
 
 //////////////////////////////////////////////////
-// Return this scene
 Scene *Camera::GetScene() const
 {
   return this->scene;
 }
 
 //////////////////////////////////////////////////
-// Create the ogre camera
 void Camera::CreateCamera()
 {
   this->camera = this->scene->GetManager()->createCamera(this->name);
@@ -1067,7 +1009,6 @@ void Camera::CreateCamera()
 }
 
 //////////////////////////////////////////////////
-// Get point on a plane
 bool Camera::GetWorldPointOnPlane(int _x, int _y,
                                   const math::Vector3 &_planeNorm,
                                   double _d, math::Vector3 &_result)
@@ -1089,7 +1030,6 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 }
 
 //////////////////////////////////////////////////
-// Set the render target for the camera
 void Camera::SetRenderTarget(Ogre::RenderTarget *target)
 {
   this->renderTarget = target;
@@ -1182,7 +1122,6 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-/// Set the camera to track a scene node
 bool Camera::TrackVisualImpl(VisualPtr _visual)
 {
   this->sceneNode->getParent()->removeChild(this->sceneNode);

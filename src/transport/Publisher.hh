@@ -51,6 +51,10 @@ namespace gazebo
 
       public: bool HasConnections() const;
 
+      /// \brief Block until a connection has been established with this
+      ///        publisher
+      public: void WaitForConnection() const;
+
       public: void SetPublication(PublicationPtr &_publication, int _i);
 
       /// \brief Publish a message on the topic

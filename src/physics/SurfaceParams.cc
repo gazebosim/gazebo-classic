@@ -57,7 +57,6 @@ SurfaceParams::~SurfaceParams()
 }
 
 //////////////////////////////////////////////////
-/// Load the contact params
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   if (_sdf->HasElement("bounce"))

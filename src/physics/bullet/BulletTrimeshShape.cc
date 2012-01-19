@@ -35,7 +35,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletTrimeshShape::BulletTrimeshShape(Collision *_parent)
   : TrimeshShape(parent)
 {
@@ -43,19 +42,16 @@ BulletTrimeshShape::BulletTrimeshShape(Collision *_parent)
 
 
 //////////////////////////////////////////////////
-// Destructor
 BulletTrimeshShape::~BulletTrimeshShape()
 {
 }
 
 //////////////////////////////////////////////////
-/// Update function.
 void BulletTrimeshShape::Update()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the trimesh
 void BulletTrimeshShape::Load(common::XMLConfigNode *_node)
 {
 }

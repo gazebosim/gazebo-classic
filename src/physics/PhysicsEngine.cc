@@ -35,7 +35,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor
 PhysicsEngine::PhysicsEngine(WorldPtr _world)
   : world(_world)
 {
@@ -61,7 +60,6 @@ void PhysicsEngine::Fini()
 }
 
 //////////////////////////////////////////////////
-// Destructor
 PhysicsEngine::~PhysicsEngine()
 {
   this->sdf->Reset();
@@ -74,7 +72,6 @@ PhysicsEngine::~PhysicsEngine()
 }
 
 //////////////////////////////////////////////////
-/// Return the gavity vector
 math::Vector3 PhysicsEngine::GetGravity() const
 {
   return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");

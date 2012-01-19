@@ -34,7 +34,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world)
     : BallJoint<BulletJoint>()
 {
@@ -42,34 +41,29 @@ BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 BulletBallJoint::~BulletBallJoint()
 {
 }
 
 //////////////////////////////////////////////////
-// Get the joints anchor point
 math::Vector3 BulletBallJoint::GetAnchor(int _index) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-// Set the joints anchor point
 void BulletBallJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void BulletBallJoint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-/// Attach the two bodies with this joint
 void BulletBallJoint::Attach(Link *_one, Link *_two)
 {
   BallJoint<BulletJoint>::Attach(_one, _two);

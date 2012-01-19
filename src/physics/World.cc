@@ -577,7 +577,6 @@ void World::PrintEntityTree()
 }
 
 //////////////////////////////////////////////////
-// Get the simulation time
 gazebo::common::Time World::GetSimTime() const
 {
   return this->simTime;

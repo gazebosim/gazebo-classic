@@ -44,7 +44,6 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-// Constructor
 MovableText::MovableText()
     : camera(NULL),
     renderWindow(NULL) ,
@@ -65,7 +64,6 @@ MovableText::MovableText()
 }
 
 //////////////////////////////////////////////////
-// Destructor
 MovableText::~MovableText()
 {
   delete this->renderOp.vertexData;
@@ -74,7 +72,6 @@ MovableText::~MovableText()
 }
 
 //////////////////////////////////////////////////
-// Loads the text to display and select the font
 void MovableText::Load(const std::string &name_,
                         const std::string &text_,
                         const std::string &fontName_,
@@ -109,7 +106,6 @@ void MovableText::Load(const std::string &name_,
 }
 
 //////////////////////////////////////////////////
-// Update the text
 void MovableText::Update()
 {
   if (this->dirty)
@@ -120,7 +116,6 @@ void MovableText::Update()
 }
 
 //////////////////////////////////////////////////
-// Set the font name
 void MovableText::SetFontName(const std::string &newFontName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -169,7 +164,6 @@ void MovableText::SetFontName(const std::string &newFontName)
 }
 
 //////////////////////////////////////////////////
-// Set the caption
 void MovableText::SetText(const std::string &newText)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -182,7 +176,6 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
-// Set the color
 void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -195,7 +188,6 @@ void MovableText::SetColor(const common::Color &newColor)
 }
 
 //////////////////////////////////////////////////
-// Set the character height
 void MovableText::SetCharHeight(float height_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -208,7 +200,6 @@ void MovableText::SetCharHeight(float height_)
 }
 
 //////////////////////////////////////////////////
-// Set the width of the space between characters
 void MovableText::SetSpaceWidth(float width_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -221,7 +212,6 @@ void MovableText::SetSpaceWidth(float width_)
 }
 
 //////////////////////////////////////////////////
-// Set alignment of the text
 void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -239,7 +229,6 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 }
 
 //////////////////////////////////////////////////
-// Set additional height
 void MovableText::SetBaseline(float base_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -251,7 +240,6 @@ void MovableText::SetBaseline(float base_)
 }
 
 //////////////////////////////////////////////////
-// Set whether the text should be shown on top
 void MovableText::SetShowOnTop(bool show)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -266,7 +254,6 @@ void MovableText::SetShowOnTop(bool show)
 }
 
 //////////////////////////////////////////////////
-// True = text is displayed on top
 bool MovableText::GetShowOnTop() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -274,7 +261,6 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-// Get the axis aligned bounding box
 math::Box MovableText::GetAABB(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -288,7 +274,6 @@ math::Box MovableText::GetAABB(void)
 }
 
 //////////////////////////////////////////////////
-// Setup the billboard that renders the text
 void MovableText::_setupGeometry()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -619,7 +604,6 @@ void MovableText::_setupGeometry()
 }
 
 //////////////////////////////////////////////////
-// Update the colors
 void MovableText::_updateColors(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -749,7 +733,6 @@ const Ogre::MaterialPtr &MovableText::getMaterial(void) const
 }
 
 //////////////////////////////////////////////////
-//
 const Ogre::LightList &MovableText::getLights(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -781,7 +764,6 @@ void MovableText::_updateRenderQueue(Ogre::RenderQueue* queue)
 }
 
 //////////////////////////////////////////////////
-/// Method to allow a caller to abstractly iterate over the Renderable instances
 void MovableText::visitRenderables(Ogre::Renderable::Visitor* /*visitor*/,
                                  bool /*debug*/)
 {

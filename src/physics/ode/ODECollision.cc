@@ -88,7 +88,6 @@ void ODECollision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-// Set the encapsulated geometry object
 void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
 {
   // Must go first in this function
@@ -118,14 +117,12 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
 }
 
 //////////////////////////////////////////////////
-// Return the collision id
 dGeomID ODECollision::GetCollisionId() const
 {
   return this->collisionId;
 }
 
 //////////////////////////////////////////////////
-/// Get the ODE collision class
 int ODECollision::GetCollisionClass() const
 {
   int result = 0;
@@ -140,7 +137,6 @@ int ODECollision::GetCollisionClass() const
 
 
 //////////////////////////////////////////////////
-/// Set the category bits, used during collision detection
 void ODECollision::SetCategoryBits(unsigned int _bits)
 {
   if (this->collisionId)
@@ -150,7 +146,6 @@ void ODECollision::SetCategoryBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-/// Set the collide bits, used during collision detection
 void ODECollision::SetCollideBits(unsigned int _bits)
 {
   if (this->collisionId)
@@ -160,7 +155,6 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-/// Get the bounding box, defined by the physics engine
 math::Box ODECollision::GetBoundingBox() const
 {
   math::Box box;
@@ -178,14 +172,12 @@ math::Box ODECollision::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-/// Get the bodies space ID
 dSpaceID ODECollision::GetSpaceId() const
 {
   return this->spaceId;
 }
 
 //////////////////////////////////////////////////
-/// Set the bodies space ID
 void ODECollision::SetSpaceId(dSpaceID _spaceid)
 {
   this->spaceId = _spaceid;

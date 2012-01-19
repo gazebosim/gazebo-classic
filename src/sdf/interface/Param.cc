@@ -31,7 +31,6 @@ using namespace sdf;
 std::vector<Param*> *Param::params = NULL;
 
 //////////////////////////////////////////////////
-// Constructor
 Param::Param(Param *_newParam)
   : key(""), required(false), set(false), typeName("")
 {
@@ -43,13 +42,11 @@ Param::Param(Param *_newParam)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Param::~Param()
 {
 }
 
 //////////////////////////////////////////////////
-//  Begin a block of "new ParamT<>"
 void Param::Begin(std::vector<Param*> *_params)
 {
   if (params != NULL)
@@ -58,7 +55,6 @@ void Param::Begin(std::vector<Param*> *_params)
 }
 
 //////////////////////////////////////////////////
-//  End a block of "new ParamT<>"
 void Param::End()
 {
   /*if (params == NULL)
@@ -69,7 +65,6 @@ void Param::End()
 }
 
 //////////////////////////////////////////////////
-// Find a parameter by name
 ParamPtr Param::Find(Param_V &_params, const std::string &key)
 {
   for (Param_V::iterator iter = _params.begin(); iter != _params.end(); ++iter)

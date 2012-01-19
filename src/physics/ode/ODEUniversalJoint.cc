@@ -31,7 +31,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId)
     : UniversalJoint<ODEJoint>()
 {
@@ -39,13 +38,11 @@ ODEUniversalJoint::ODEUniversalJoint(dWorldID _worldId)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODEUniversalJoint::~ODEUniversalJoint()
 {
 }
 
 //////////////////////////////////////////////////
-// Get the anchor point
 math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
@@ -55,7 +52,6 @@ math::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-// Set the anchor point
 void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -65,7 +61,6 @@ void ODEUniversalJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-// Get the first axis of rotation
 math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 {
   dVector3 result;
@@ -79,7 +74,6 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Set the first axis of rotation
 void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -92,14 +86,12 @@ void ODEUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void ODEUniversalJoint::SetDamping(int /*_index*/, const double _damping)
 {
   dJointSetDamping(this->jointId, _damping);
 }
 
 //////////////////////////////////////////////////
-// Get the angle of an axis
 math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 {
   math::Angle result;
@@ -113,7 +105,6 @@ math::Angle ODEUniversalJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Get the angular rate of an axis
 double ODEUniversalJoint::GetVelocity(int _index) const
 {
   double result;
@@ -127,7 +118,6 @@ double ODEUniversalJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 {
   if (_index == 0)
@@ -137,7 +127,6 @@ void ODEUniversalJoint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-// Set the torque of this joint
 void ODEUniversalJoint::SetForce(int _index, double _torque)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -149,7 +138,6 @@ void ODEUniversalJoint::SetForce(int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void ODEUniversalJoint::SetMaxForce(int _index, double _t)
 {
   if (_index == 0)
@@ -159,7 +147,6 @@ void ODEUniversalJoint::SetMaxForce(int _index, double _t)
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double ODEUniversalJoint::GetMaxForce(int _index)
 {
   if (_index == 0)
@@ -169,7 +156,6 @@ double ODEUniversalJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-// Set the parameter to value
 void ODEUniversalJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);

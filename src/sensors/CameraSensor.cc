@@ -41,34 +41,29 @@ using namespace sensors;
 GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 
 //////////////////////////////////////////////////
-// Constructor
 CameraSensor::CameraSensor()
     : Sensor()
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 CameraSensor::~CameraSensor()
 {
 }
 
 //////////////////////////////////////////////////
-/// Set the parent of the sensor
 void CameraSensor::SetParent(const std::string &_name)
 {
   Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
-// Load the camera with SDF parameters
 void CameraSensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-/// Load the camera using default parameters
 void CameraSensor::Load()
 {
   Sensor::Load();
@@ -77,7 +72,6 @@ void CameraSensor::Load()
 }
 
 //////////////////////////////////////////////////
-// Initialize the camera
 void CameraSensor::Init()
 {
   std::string worldName = this->sdf->GetWorldName();
@@ -122,7 +116,6 @@ void CameraSensor::Init()
 }
 
 //////////////////////////////////////////////////
-// Finalize the camera
 void CameraSensor::Fini()
 {
   Sensor::Fini();
@@ -133,14 +126,12 @@ void CameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-/// Set whether the sensor is active or not
 void CameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
 }
 
 //////////////////////////////////////////////////
-// Update the drawing
 void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)

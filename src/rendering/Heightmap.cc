@@ -33,21 +33,18 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-// Constructor
 Heightmap::Heightmap(Scene *scene_)
 {
   this->scene = scene_;
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Heightmap::~Heightmap()
 {
   this->scene->GetManager()->destroyQuery(this->rayQuery);
 }
 
 //////////////////////////////////////////////////
-/// get height at a point
 float Heightmap::GetHeightAt(const math::Vector2d &pos)
 {
   Ogre::Vector3 pos3(pos.x, this->terrainSize.z, pos.y);
@@ -68,7 +65,6 @@ bool Heightmap::queryResult(Ogre::MovableObject * /*obj_*/,
 }
 
 //////////////////////////////////////////////////
-/// Overloaded Ogre function for Ray Scene Queries
 bool Heightmap::queryResult(Ogre::SceneQuery::WorldFragment * /*frag_*/,
                             Ogre::Real dist_)
 {
@@ -77,7 +73,6 @@ bool Heightmap::queryResult(Ogre::SceneQuery::WorldFragment * /*frag_*/,
 }
 
 //////////////////////////////////////////////////
-// Load the heightmap
 void Heightmap::Load(std::string imageFilename,
                       std::string worldTexture,
                       std::string detailTexture,

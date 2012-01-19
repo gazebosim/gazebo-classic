@@ -20,13 +20,11 @@ using namespace gazebo;
 using namespace common;
 
 //////////////////////////////////////////////////
-/// Constructor
 MeshLoader::MeshLoader()
 {
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 MeshLoader::~MeshLoader()
 {
 }

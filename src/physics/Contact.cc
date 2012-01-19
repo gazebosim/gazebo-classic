@@ -27,7 +27,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-/// Constructor
 Contact::Contact()
 {
   this->collision1 = NULL;
@@ -36,20 +35,17 @@ Contact::Contact()
 }
 
 //////////////////////////////////////////////////
-/// Copy constructor
 Contact::Contact(const Contact &_c)
 {
   *this = _c;
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Contact::~Contact()
 {
 }
 
 //////////////////////////////////////////////////
-// Clone the contact
 Contact Contact::Clone() const
 {
   Contact c = *this;
@@ -57,7 +53,6 @@ Contact Contact::Clone() const
 }
 
 //////////////////////////////////////////////////
-// Operator =
 Contact &Contact::operator =(const Contact &contact)
 {
   this->collision1 = contact.collision1;
@@ -76,7 +71,6 @@ Contact &Contact::operator =(const Contact &contact)
 }
 
 //////////////////////////////////////////////////
-/// Reset
 void Contact::Reset()
 {
   this->count = 0;

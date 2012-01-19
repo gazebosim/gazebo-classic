@@ -310,7 +310,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 }
 
 //////////////////////////////////////////////////
-// The master run loop
 void Master::Run()
 {
   while (!this->stop)
@@ -321,7 +320,6 @@ void Master::Run()
 }
 
 //////////////////////////////////////////////////
-// Start the master running
 void Master::RunThread()
 {
   this->runThread = new boost::thread(boost::bind(&Master::Run, this));

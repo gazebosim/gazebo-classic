@@ -51,7 +51,6 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
 }
 
 //////////////////////////////////////////////////
-/// Constructor
 RayShape::RayShape(CollisionPtr _parent, bool /*_displayRays*/)
   : Shape(_parent)
 {
@@ -67,13 +66,11 @@ RayShape::RayShape(CollisionPtr _parent, bool /*_displayRays*/)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 RayShape::~RayShape()
 {
 }
 
 //////////////////////////////////////////////////
-/// Set the ray based on starting and ending points relative to the body
 void RayShape::SetPoints(const math::Vector3 &_posStart,
                          const math::Vector3 &_posEnd)
 {
@@ -103,7 +100,6 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
 }
 
 //////////////////////////////////////////////////
-/// Get the relative starting and ending points
 void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
   _posA = this->relativeStartPos;
@@ -111,7 +107,6 @@ void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 }
 
 //////////////////////////////////////////////////
-/// Get the global starting and ending points
 void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
   _posA = this->globalStartPos;
@@ -119,7 +114,6 @@ void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
 }
 
 //////////////////////////////////////////////////
-/// Set the length of the ray
 void RayShape::SetLength(double _len)
 {
   this->contactLen = _len;
@@ -131,49 +125,42 @@ void RayShape::SetLength(double _len)
 }
 
 //////////////////////////////////////////////////
-/// Get the length of the ray
 double RayShape::GetLength() const
 {
   return this->contactLen;
 }
 
 //////////////////////////////////////////////////
-/// Set the retro-reflectivness detected by this ray
 void RayShape::SetRetro(float _retro)
 {
   this->contactRetro = _retro;
 }
 
 //////////////////////////////////////////////////
-/// Get the retro-reflectivness detected by this ray
 float RayShape::GetRetro() const
 {
   return this->contactRetro;
 }
 
 //////////////////////////////////////////////////
-/// Set the fiducial id detected by this ray
 void RayShape::SetFiducial(int _fid)
 {
   this->contactFiducial = _fid;
 }
 
 //////////////////////////////////////////////////
-/// Get the fiducial id detected by this ray
 int RayShape::GetFiducial() const
 {
   return this->contactFiducial;
 }
 
 //////////////////////////////////////////////////
-/// Load thte ray
 void RayShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-/// In the ray
 void RayShape::Init()
 {
 }

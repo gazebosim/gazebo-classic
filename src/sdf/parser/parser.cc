@@ -31,7 +31,6 @@
 namespace sdf
 {
 //////////////////////////////////////////////////
-/// Init based on the installed sdf_format.xml file
 bool init(SDFPtr _sdf)
 {
   bool result = false;

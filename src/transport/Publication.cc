@@ -25,7 +25,6 @@ using namespace transport;
 unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
-// Constructor
 Publication::Publication(const std::string &topic, const std::string &msgType)
   : topic(topic), msgType(msgType), locallyAdvertised(false)
 {
@@ -33,14 +32,12 @@ Publication::Publication(const std::string &topic, const std::string &msgType)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Publication::~Publication()
 {
   this->publishers.clear();
 }
 
 //////////////////////////////////////////////////
-/// Get the topic for this publication
 std::string Publication::GetTopic() const
 {
   return this->topic;
@@ -190,7 +187,6 @@ void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
 }
 
 //////////////////////////////////////////////////
-// Remove a subscription
 void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 {
   SubscriptionTransportPtr subptr;
@@ -218,7 +214,6 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 }
 
 //////////////////////////////////////////////////
-/// Publish data
 void Publication::Publish(const std::string &_data)
 {
   std::list<NodePtr>::iterator iter;
@@ -243,7 +238,6 @@ void Publication::Publish(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-// Publish data only on local subscriptions
 void Publication::LocalPublish(const std::string &data)
 {
   std::list<NodePtr>::iterator iter;
@@ -307,7 +301,6 @@ void Publication::Publish(const google::protobuf::Message &_msg,
 }
 
 //////////////////////////////////////////////////
-/// Get the type of message
 std::string Publication::GetMsgType() const
 {
   return this->msgType;
@@ -344,14 +337,12 @@ unsigned int Publication::GetRemoteSubscriptionCount()
 }
 
 //////////////////////////////////////////////////
-/// Return true if the topic has been advertised from this process.
 bool Publication::GetLocallyAdvertised() const
 {
   return this->locallyAdvertised;
 }
 
 //////////////////////////////////////////////////
-/// Set whether this topic has been advertised from this process
 void Publication::SetLocallyAdvertised(bool _value)
 {
   this->locallyAdvertised = _value;

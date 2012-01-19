@@ -24,21 +24,18 @@ using namespace gazebo;
 using namespace math;
 
 //////////////////////////////////////////////////
-// Constructor
 Matrix3::Matrix3()
 {
   memset(this->m, 0, sizeof(this->m[0][0])*9);
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Matrix3::Matrix3(const Matrix3 &_m)
 {
   memcpy(this->m, _m.m, sizeof(this->m[0][0])*9);
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Matrix3::Matrix3(double _v00, double _v01, double _v02,
                  double _v10, double _v11, double _v12,
                  double _v20, double _v21, double _v22)
@@ -56,13 +53,11 @@ Matrix3::Matrix3(double _v00, double _v01, double _v02,
 
 
 //////////////////////////////////////////////////
-// Destructor
 Matrix3::~Matrix3()
 {
 }
 
 //////////////////////////////////////////////////
-// Set from axes
 void Matrix3::SetFromAxes(const Vector3 &xAxis, const Vector3 &yAxis,
                           const Vector3 &zAxis)
 {
@@ -72,7 +67,6 @@ void Matrix3::SetFromAxes(const Vector3 &xAxis, const Vector3 &yAxis,
 }
 
 //////////////////////////////////////////////////
-/// Set the matrix from an axis and angle
 void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
 {
   double c = cos(_angle);
@@ -93,7 +87,6 @@ void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
 }
 
 //////////////////////////////////////////////////
-/// Set a column
 void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
 {
   if (_i >= 3)

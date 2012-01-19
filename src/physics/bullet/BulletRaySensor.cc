@@ -34,7 +34,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-/// Constructor
 BulletRaySensor::BulletRaySensor(Link *_body)
   : PhysicsRaySensor(_body)
 {
@@ -45,7 +44,6 @@ BulletRaySensor::BulletRaySensor(Link *_body)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 BulletRaySensor::~BulletRaySensor()
 {
   std::vector<BulletRayCollision*>::iterator iter;
@@ -58,7 +56,6 @@ BulletRaySensor::~BulletRaySensor()
 }
 
 //////////////////////////////////////////////////
-/// Add a ray to the sensor
 void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end,
     double minRange, double maxRange, bool display)
 {
@@ -75,14 +72,12 @@ void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end,
 }
 
 //////////////////////////////////////////////////
-/// Get the number of rays
 int BulletRaySensor::GetCount() const
 {
   return this->rays.size();
 }
 
 //////////////////////////////////////////////////
-/// Get the relative starting and ending points of a ray
 void BulletRaySensor::GetRelativePoints(int _index,
     math::Vector3 &_a, math::Vector3 &_b)
 {
@@ -98,7 +93,6 @@ void BulletRaySensor::GetRelativePoints(int _index,
 }
 
 //////////////////////////////////////////////////
-/// Get the range of a ray
 double BulletRaySensor::GetRange(int _index) const
 {
   if (_index <0 || _index >= (int)(this->rays.size()))
@@ -113,7 +107,6 @@ double BulletRaySensor::GetRange(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Get the retro reflectance value of a ray
 double BulletRaySensor::GetRetro(int _index) const
 {
   if (_index <0 || _index >= (int)(this->rays.size()))
@@ -128,7 +121,6 @@ double BulletRaySensor::GetRetro(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Get the fiducial value of a ray
 double BulletRaySensor::GetFiducial(int _index) const
 {
   if (_index <0 || _index >= (int)(this->rays.size()))
@@ -143,7 +135,6 @@ double BulletRaySensor::GetFiducial(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Update the ray sensor
 void BulletRaySensor::Update()
 {
   std::vector<BulletRayCollision*>::iterator iter;

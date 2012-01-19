@@ -26,20 +26,17 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletRayCollision::BulletRayCollision(Link *_body, bool _displayRays)
     : RayCollision<BulletCollision>(body, displayRays)
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 BulletRayCollision::~BulletRayCollision()
 {
 }
 
 //////////////////////////////////////////////////
-// Update the ray collision
 void BulletRayCollision::Update()
 {
   RayCollision<BulletCollision>::Update();

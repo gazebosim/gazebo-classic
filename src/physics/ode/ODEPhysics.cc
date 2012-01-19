@@ -111,7 +111,6 @@ class Colliders_TBB
 };
 
 //////////////////////////////////////////////////
-// Constructor
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
@@ -130,7 +129,6 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODEPhysics::~ODEPhysics()
 {
   dCloseODE();
@@ -155,7 +153,6 @@ ODEPhysics::~ODEPhysics()
 }
 
 //////////////////////////////////////////////////
-// Load the ODE engine
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
@@ -296,20 +293,17 @@ void ODEPhysics::OnPhysicsMsg(
 
 
 //////////////////////////////////////////////////
-// Initialize the ODE engine
 void ODEPhysics::Init()
 {
 }
 
 //////////////////////////////////////////////////
-// Init the engine for threads
 void ODEPhysics::InitForThread()
 {
   dAllocateODEDataForThread(dAllocateMaskAll);
 }
 
 //////////////////////////////////////////////////
-// Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
   this->contactPairs.clear();
@@ -366,7 +360,6 @@ void ODEPhysics::UpdateCollision()
 }
 
 //////////////////////////////////////////////////
-// Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
   {
@@ -386,7 +379,6 @@ void ODEPhysics::UpdatePhysics()
 
 
 //////////////////////////////////////////////////
-// Finilize the ODE engine
 void ODEPhysics::Fini()
 {
   PhysicsEngine::Fini();
@@ -399,7 +391,6 @@ void ODEPhysics::Reset()
 }
 
 //////////////////////////////////////////////////
-// Set the step time
 void ODEPhysics::SetUpdateRate(double _value)
 {
   this->sdf->GetAttribute("update_rate")->Set(_value);
@@ -407,14 +398,12 @@ void ODEPhysics::SetUpdateRate(double _value)
 }
 
 //////////////////////////////////////////////////
-/// Get the simulation step time
 double ODEPhysics::GetUpdateRate()
 {
   return this->updateRateDouble;
 }
 
 //////////////////////////////////////////////////
-/// Get the simulation step time
 double ODEPhysics::GetUpdatePeriod()
 {
   if (this->updateRateDouble > 0)
@@ -424,7 +413,6 @@ double ODEPhysics::GetUpdatePeriod()
 }
 
 //////////////////////////////////////////////////
-// Set the step time
 void ODEPhysics::SetStepTime(double _value)
 {
   this->sdf->GetOrCreateElement("ode")->GetOrCreateElement(
@@ -434,7 +422,6 @@ void ODEPhysics::SetStepTime(double _value)
 }
 
 //////////////////////////////////////////////////
-/// Get the simulation step time
 double ODEPhysics::GetStepTime()
 {
   return this->stepTimeDouble;
@@ -442,7 +429,6 @@ double ODEPhysics::GetStepTime()
 
 
 //////////////////////////////////////////////////
-// Create a new body
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)
@@ -463,7 +449,6 @@ LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-// Create a new collision
 CollisionPtr ODEPhysics::CreateCollision(const std::string &_type,
                                          LinkPtr _body)
 {
@@ -509,14 +494,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-// Get the world id
 dWorldID ODEPhysics::GetWorldId()
 {
   return this->worldId;
 }
 
 //////////////////////////////////////////////////
-/// Convert an odeMass to Mass
 void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
@@ -529,7 +512,6 @@ void ODEPhysics::ConvertMass(InertialPtr &_inertial, void *_engineMass)
 }
 
 //////////////////////////////////////////////////
-/// Set the step iterations
 void ODEPhysics::SetSORPGSIters(unsigned int _iters)
 {
   this->sdf->GetElement("ode")->GetElement(
@@ -638,7 +620,6 @@ int ODEPhysics::GetMaxContacts()
 }
 
 //////////////////////////////////////////////////
-/// Convert an odeMass to Mass
 void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
@@ -658,7 +639,6 @@ void ODEPhysics::ConvertMass(void *_engineMass, const InertialPtr &_inertial)
 }
 
 //////////////////////////////////////////////////
-// Create a new joint
 JointPtr ODEPhysics::CreateJoint(const std::string &_type)
 {
   JointPtr joint;
@@ -680,14 +660,12 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-/// Return the space id
 dSpaceID ODEPhysics::GetSpaceId() const
 {
   return this->spaceId;
 }
 
 //////////////////////////////////////////////////
-/// Get the step type
 std::string ODEPhysics::GetStepType() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
@@ -695,7 +673,6 @@ std::string ODEPhysics::GetStepType() const
 }
 
 //////////////////////////////////////////////////
-/// Set the step type
 void ODEPhysics::SetStepType(const std::string &_type)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("ode")->GetElement("solver");
@@ -704,7 +681,6 @@ void ODEPhysics::SetStepType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-/// Set the gavity vector
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->sdf->GetOrCreateElement("gravity")->GetAttribute("xyz")->Set(_gravity);
@@ -712,14 +688,12 @@ void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 }
 
 //////////////////////////////////////////////////
-// Get gravity vector
 math::Vector3 ODEPhysics::GetGravity() const
 {
   return this->sdf->GetOrCreateElement("gravity")->GetValueVector3("xyz");
 }
 
 //////////////////////////////////////////////////
-// Handle a collision
 void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dBodyID b1 = dGeomGetBody(_o1);
@@ -775,7 +749,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
 
 //////////////////////////////////////////////////
-// Collide two collisions
 void ODEPhysics::Collide(ODECollision *collision1, ODECollision *collision2,
                          dContactGeom *contactCollisions)
 {

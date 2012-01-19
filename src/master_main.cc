@@ -23,14 +23,12 @@
 gazebo::Master *master = NULL;
 
 //////////////////////////////////////////////////
-// Print the version/licence string
 void PrintVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
 //////////////////////////////////////////////////
-// sighandler to shut everything down properly
 void SignalHandler(int /*dummy*/)
 {
   master->Stop();

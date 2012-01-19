@@ -36,7 +36,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor
 ODEScrewJoint::ODEScrewJoint(dWorldID _worldId)
     : ScrewJoint<ODEJoint>()
 {
@@ -44,13 +43,11 @@ ODEScrewJoint::ODEScrewJoint(dWorldID _worldId)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODEScrewJoint::~ODEScrewJoint()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the joint
 void ODEScrewJoint::Load(sdf::ElementPtr &_sdf)
 {
   ScrewJoint<ODEJoint>::Load(_sdf);
@@ -58,7 +55,6 @@ void ODEScrewJoint::Load(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-// Get the axis of rotation
 math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 {
   dVector3 result;
@@ -68,7 +64,6 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-// Get the position of the joint
 math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result = dJointGetScrewPosition(this->jointId);
@@ -77,7 +72,6 @@ math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-// Get the rate of change
 double ODEScrewJoint::GetVelocity(int /*index*/) const
 {
   double result = dJointGetScrewPositionRate(this->jointId);
@@ -86,14 +80,12 @@ double ODEScrewJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void ODEScrewJoint::SetVelocity(int /*index*/, double _angle)
 {
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-// Set the axis of motion
 void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -103,7 +95,6 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void ODEScrewJoint::SetDamping(int /*index*/, const double _damping)
 {
   this->damping_coefficient = _damping;
@@ -111,14 +102,12 @@ void ODEScrewJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-// Set thread pitch
 void ODEScrewJoint::SetThreadPitch(int /*index*/, const double _thread_pitch)
 {
   dJointSetScrewThreadPitch(this->jointId, _thread_pitch);
 }
 
 //////////////////////////////////////////////////
-// callback to apply joint damping force
 void ODEScrewJoint::ApplyDamping()
 {
   double damping_force = this->damping_coefficient * this->GetVelocity(0);
@@ -126,7 +115,6 @@ void ODEScrewJoint::ApplyDamping()
 }
 
 //////////////////////////////////////////////////
-// Set the screw force
 void ODEScrewJoint::SetForce(int /*index*/, double _force)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -136,7 +124,6 @@ void ODEScrewJoint::SetForce(int /*index*/, double _force)
 }
 
 //////////////////////////////////////////////////
-// Set the _parameter
 void ODEScrewJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
@@ -144,7 +131,6 @@ void ODEScrewJoint::SetParam(int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-// Get the _parameter
 double ODEScrewJoint::GetParam(int _parameter) const
 {
   double result = dJointGetScrewParam(this->jointId, _parameter);
@@ -153,14 +139,12 @@ double ODEScrewJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void ODEScrewJoint::SetMaxForce(int /*_index*/, double _t)
 {
   this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double ODEScrewJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);

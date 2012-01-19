@@ -25,13 +25,11 @@ using namespace common;
 
 
 //////////////////////////////////////////////////
-/// Constructor
 Logger::Logger()
 {
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Logger::~Logger()
 {
   std::vector<LogObj*>::iterator iter;
@@ -42,7 +40,6 @@ Logger::~Logger()
 }
 
 //////////////////////////////////////////////////
-// Add a log
 void Logger::AddLog(const std::string &_entity, const std::string &_filename)
 {
   Logger::LogObj *newLog = new Logger::LogObj(_entity, _filename);
@@ -57,7 +54,6 @@ void Logger::AddLog(const std::string &_entity, const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-// Remove a log
 void Logger::RemoveLog(const std::string &_entity)
 {
   std::vector<LogObj*>::iterator iter;
@@ -74,7 +70,6 @@ void Logger::RemoveLog(const std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-// Update the logger
 void Logger::Update()
 {
   std::vector<LogObj*>::iterator iter;
@@ -85,8 +80,6 @@ void Logger::Update()
 
 
 //////////////////////////////////////////////////
-//////////////////////////////////////////////////
-/// Constructor
 Logger::LogObj::LogObj(const std::string &_entityName,
     const std::string &_filename) : valid(false)
 {
@@ -115,14 +108,12 @@ Logger::LogObj::LogObj(const std::string &_entityName,
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Logger::LogObj::~LogObj()
 {
   this->logFile.close();
 }
 
 //////////////////////////////////////////////////
-// Update the log object
 void Logger::LogObj::Update()
 {
   if (this->entity)
@@ -156,7 +147,6 @@ void Logger::LogObj::Update()
 }
 
 //////////////////////////////////////////////////
-// Get the entity name
 std::string Logger::LogObj::GetEntityName() const
 {
   if (this->entity)

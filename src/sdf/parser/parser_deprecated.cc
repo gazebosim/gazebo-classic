@@ -975,7 +975,6 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-/// \brief Load Model from xmlNode
 bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
@@ -1196,7 +1195,6 @@ bool initModelString(const std::string &_xmlString, sdf::SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-/// \brief Load Model from xmlDoc
 bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 {
   if (!_xmlDoc)

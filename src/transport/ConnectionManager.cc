@@ -25,12 +25,12 @@ using namespace gazebo;
 using namespace transport;
 
 //////////////////////////////////////////////////
-// Constructor
 ConnectionManager::ConnectionManager()
 {
   this->tmpIndex = 0;
   this->initialized = false;
   this->stop = false;
+  this->stopped = false;
 
   this->serverConn = NULL;
   this->listMutex = new boost::recursive_mutex();
@@ -39,7 +39,6 @@ ConnectionManager::ConnectionManager()
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ConnectionManager::~ConnectionManager()
 {
   delete this->listMutex;
@@ -57,7 +56,6 @@ ConnectionManager::~ConnectionManager()
 }
 
 //////////////////////////////////////////////////
-// Initialize the connection manager
 bool ConnectionManager::Init(const std::string &master_host,
                              unsigned int master_port)
 {
@@ -154,7 +152,6 @@ bool ConnectionManager::Init(const std::string &master_host,
 }
 
 //////////////////////////////////////////////////
-// Finalize
 void ConnectionManager::Fini()
 {
   if (!this->initialized)
@@ -177,52 +174,61 @@ void ConnectionManager::Fini()
 
 
 //////////////////////////////////////////////////
-// Stop the conneciton manager
 void ConnectionManager::Stop()
 {
   this->stop = true;
+  while (this->stopped == false)
+    common::Time::MSleep(100);
 }
 
-//////////////////////////////////////////////////
-// Run all the connections
-void ConnectionManager::Run()
+void ConnectionManager::RunUpdate()
 {
   std::list<ConnectionPtr>::iterator iter;
   std::list<ConnectionPtr>::iterator endIter;
+
+  this->masterMessagesMutex->lock();
+  while (this->masterMessages.size() > 0)
+  {
+    this->ProcessMessage(this->masterMessages.front());
+    this->masterMessages.pop_front();
+  }
+  this->masterMessagesMutex->unlock();
+
+  this->masterConn->ProcessWriteQueue();
+  TopicManager::Instance()->ProcessNodes();
+
+  this->connectionMutex->lock();
+  iter = this->connections.begin();
+  endIter = this->connections.end();
+  this->connectionMutex->unlock();
+  while (iter != endIter)
+  {
+    if ((*iter)->IsOpen())
+    {
+      (*iter)->ProcessWriteQueue();
+      ++iter;
+    }
+    else
+    {
+      this->connectionMutex->lock();
+      iter = this->connections.erase(iter);
+      this->connectionMutex->unlock();
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void ConnectionManager::Run()
+{
+  this->stopped = false;
   while (!this->stop)
   {
-    this->masterMessagesMutex->lock();
-    while (this->masterMessages.size() > 0)
-    {
-      this->ProcessMessage(this->masterMessages.front());
-      this->masterMessages.pop_front();
-    }
-    this->masterMessagesMutex->unlock();
-
-    this->masterConn->ProcessWriteQueue();
-    TopicManager::Instance()->ProcessNodes();
-
-    this->connectionMutex->lock();
-    iter = this->connections.begin();
-    endIter = this->connections.end();
-    this->connectionMutex->unlock();
-    while (iter != endIter)
-    {
-      if ((*iter)->IsOpen())
-      {
-        (*iter)->ProcessWriteQueue();
-        ++iter;
-      }
-      else
-      {
-        this->connectionMutex->lock();
-        iter = this->connections.erase(iter);
-        this->connectionMutex->unlock();
-      }
-    }
-
+    this->RunUpdate();
     common::Time::MSleep(30);
   }
+  this->RunUpdate();
+
+  this->stopped = true;
 
   this->masterConn->Shutdown();
 }
@@ -234,7 +240,6 @@ bool ConnectionManager::IsRunning() const
 
 
 //////////////////////////////////////////////////
-// On read master
 void ConnectionManager::OnMasterRead(const std::string &_data)
 {
   if (this->masterConn && this->masterConn->IsOpen())
@@ -330,7 +335,6 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
 }
 
 //////////////////////////////////////////////////
-// On accept
 void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
 {
   newConnection->AsyncRead(
@@ -343,7 +347,6 @@ void ConnectionManager::OnAccept(const ConnectionPtr &newConnection)
 }
 
 //////////////////////////////////////////////////
-// On read header
 void ConnectionManager::OnRead(const ConnectionPtr &_connection,
                                const std::string &_data)
 {
@@ -377,7 +380,6 @@ void ConnectionManager::OnRead(const ConnectionPtr &_connection,
 }
 
 //////////////////////////////////////////////////
-// Advertise a topic
 void ConnectionManager::Advertise(const std::string &topic,
                                   const std::string &msgType)
 {
@@ -499,7 +501,6 @@ void ConnectionManager::Subscribe(const std::string &_topic,
 }
 
 //////////////////////////////////////////////////
-// Connect to a remote server
 ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
                                                        unsigned int port)
 {
@@ -524,7 +525,6 @@ ConnectionPtr ConnectionManager::ConnectToRemoteHost(const std::string &host,
 }
 
 //////////////////////////////////////////////////
-// Remove a connection
 void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 {
   std::list<ConnectionPtr>::iterator iter;
@@ -543,7 +543,6 @@ void ConnectionManager::RemoveConnection(ConnectionPtr &conn)
 
 
 //////////////////////////////////////////////////
-// Find a connection that matches a host and port
 ConnectionPtr ConnectionManager::FindConnection(const std::string &host,
                                                  unsigned int port)
 {

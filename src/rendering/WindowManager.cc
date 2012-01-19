@@ -36,7 +36,6 @@ using namespace rendering;
 unsigned int WindowManager::windowCounter = 0;
 
 //////////////////////////////////////////////////
-// Constructor
 WindowManager::WindowManager()
 {
 }
@@ -48,7 +47,6 @@ WindowManager::~WindowManager()
 }
 
 //////////////////////////////////////////////////
-// Shutdown all the windows
 void WindowManager::Fini()
 {
   // TODO: this was causing a segfault on shutdown
@@ -62,7 +60,6 @@ void WindowManager::Fini()
 }
 
 //////////////////////////////////////////////////
-/// Attach a camera to a window
 void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
   this->windows[_windowId]->removeAllViewports();
@@ -71,7 +68,6 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 }
 
 //////////////////////////////////////////////////
-// Create a window
 int WindowManager::CreateWindow(const std::string &ogreHandle,
                                 unsigned int width,
                                 unsigned int height)
@@ -154,7 +150,6 @@ void WindowManager::Moved(unsigned int id)
 }
 
 //////////////////////////////////////////////////
-/// Get the average FPS
 float WindowManager::GetAvgFPS(unsigned int windowId)
 {
   float avgFPS = 0;
@@ -169,7 +164,6 @@ float WindowManager::GetAvgFPS(unsigned int windowId)
 }
 
 //////////////////////////////////////////////////
-/// Get the triangle count
 unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
 {
   if (windowId < this->windows.size())

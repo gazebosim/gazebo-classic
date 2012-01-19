@@ -35,7 +35,6 @@ const Color Color::Green = Color(0, 1, 0, 1);
 const Color Color::Blue = Color(0, 0, 1, 1);
 
 //////////////////////////////////////////////////
-// Constructor
   Color::Color()
 : r(0), g(0), b(0), a(0)
 {
@@ -43,7 +42,6 @@ const Color Color::Blue = Color(0, 0, 1, 1);
 }
 
 //////////////////////////////////////////////////
-// Constructor
   Color::Color(float _r, float _g, float _b, const float _a)
 : r(_r), g(_g), b(_b), a(_a)
 {
@@ -51,7 +49,6 @@ const Color Color::Blue = Color(0, 0, 1, 1);
 }
 
 //////////////////////////////////////////////////
-// Copy Constructor
   Color::Color(const Color &_pt)
 : r(_pt.r), g(_pt.g), b(_pt.b), a(_pt.a)
 {
@@ -59,20 +56,17 @@ const Color Color::Blue = Color(0, 0, 1, 1);
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Color::~Color()
 {
 }
 
 //////////////////////////////////////////////////
-// Reset the vector
 void Color::Reset()
 {
   this->r = this->g = this->b = this->a = 0;
 }
 
 //////////////////////////////////////////////////
-// Set the contents of the vector
 void Color::Set(float _r, float _g, float _b, float _a)
 {
   this->r = _r;
@@ -84,7 +78,6 @@ void Color::Set(float _r, float _g, float _b, float _a)
 }
 
 //////////////////////////////////////////////////
-/// Set a color based on HSV values
 void Color::SetFromHSV(float _h, float _s, float _v)
 {
   int i;
@@ -147,7 +140,6 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 }
 
 //////////////////////////////////////////////////
-/// Get the color in HSV colorspace
 math::Vector3 Color::GetAsHSV() const
 {
   math::Vector3 hsv;
@@ -185,7 +177,6 @@ math::Vector3 Color::GetAsHSV() const
 
 
 //////////////////////////////////////////////////
-/// Get the color in YUV colorspace
 math::Vector3 Color::GetAsYUV() const
 {
   math::Vector3 yuv;
@@ -225,7 +216,6 @@ math::Vector3 Color::GetAsYUV() const
 }
 
 //////////////////////////////////////////////////
-// Set from yuv
 void Color::SetFromYUV(float _y, float _u, float _v)
 {
   this->r = _y + 1.140*_v;
@@ -235,7 +225,6 @@ void Color::SetFromYUV(float _y, float _u, float _v)
 }
 
 //////////////////////////////////////////////////
-// Array index operator
 float Color::operator[](unsigned int index)
 {
   switch (index)
@@ -251,63 +240,54 @@ float Color::operator[](unsigned int index)
 }
 
 //////////////////////////////////////////////////
-// Get the red color
 float Color::R() const
 {
   return this->r;
 }
 
 //////////////////////////////////////////////////
-// Get the green color
 float Color::G() const
 {
   return this->g;
 }
 
 //////////////////////////////////////////////////
-// Get the blue color
 float Color::B() const
 {
   return this->b;
 }
 
 //////////////////////////////////////////////////
-// Get the alpha color
 float Color::A() const
 {
   return this->a;
 }
 
 //////////////////////////////////////////////////
-/// Set the red color
 void Color::R(float _v)
 {
   this->r = _v;
 }
 
 //////////////////////////////////////////////////
-/// Set the green color
 void Color::G(float _v)
 {
   this->g = _v;
 }
 
 //////////////////////////////////////////////////
-/// Set the blue color
 void Color::B(float _v)
 {
   this->b = _v;
 }
 
 //////////////////////////////////////////////////
-/// Set the alpha color
 void Color::A(float _v)
 {
   this->a = _v;
 }
 
 //////////////////////////////////////////////////
-// Equals operator
 Color &Color::operator =(const Color &_pt)
 {
   this->r = _pt.r;
@@ -319,7 +299,6 @@ Color &Color::operator =(const Color &_pt)
 }
 
 //////////////////////////////////////////////////
-// Addition operator
 Color Color::operator+(const Color &pt) const
 {
   return Color(this->r + pt.r, this->g + pt.g, this->b + pt.b, this->a + pt.a);
@@ -343,7 +322,6 @@ const Color &Color::operator+=(const Color &pt)
 }
 
 //////////////////////////////////////////////////
-// Subtraction operators
 Color Color::operator-(const Color &pt) const
 {
   return Color(this->r - pt.r, this->g - pt.g, this->b - pt.b, this->a - pt.a);
@@ -368,7 +346,6 @@ const Color &Color::operator-=(const Color &pt)
 
 
 //////////////////////////////////////////////////
-// Division operators
 const Color Color::operator/(const float &i) const
 {
   return Color(this->r / i, this->g / i, this->b / i, this->a / i);
@@ -393,7 +370,6 @@ const Color &Color::operator/=(const Color &pt)
 
 
 //////////////////////////////////////////////////
-// Mulitplication operators
 const Color Color::operator*(const float &i) const
 {
   return Color(this->r * i, this->g * i, this->b * i, this->a * i);
@@ -418,7 +394,6 @@ const Color &Color::operator*=(const Color &pt)
 
 
 //////////////////////////////////////////////////
-// Equality operator
 bool Color::operator ==(const Color &pt) const
 {
   return this->r == pt.r && this->g == pt.g && this->b == pt.b &&
@@ -426,14 +401,12 @@ bool Color::operator ==(const Color &pt) const
 }
 
 //////////////////////////////////////////////////
-// Inequality operator
 bool Color::operator!=(const Color &pt) const
 {
   return !(*this == pt);
 }
 
 //////////////////////////////////////////////////
-/// Clamp the color values
 void Color::Clamp()
 {
   this->r = this->r < 0 ? 0: this->r;

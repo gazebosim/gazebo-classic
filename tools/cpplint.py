@@ -3226,8 +3226,8 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
         carriage_return_found = True
 
   except IOError:
-    sys.stderr.write(
-        "Skipping input '%s': Can't open for reading\n" % filename)
+    #sys.stderr.write(
+    #    "Skipping input '%s': Can't open for reading\n" % filename)
     return
 
   # Note, if no dot is found, this will give the entire filename as the ext.
@@ -3239,7 +3239,8 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
       and file_extension != 'cpp' and file_extension != 'hh'):
     if (filename != "CMakeLists.txt" and file_extension != "in"
         and file_extension != "proto" and file_extension != "sdf"):
-      sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
+      pass
+      #sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
   else:
     ProcessFileData(filename, file_extension, lines, Error,
                     extra_check_functions)
@@ -3250,7 +3251,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
             'One or more unexpected \\r (^M) found;'
             'better to use only a \\n')
 
-  sys.stderr.write('Done processing %s\n' % filename)
+  #sys.stderr.write('Done processing %s\n' % filename)
 
 
 def PrintUsage(message):

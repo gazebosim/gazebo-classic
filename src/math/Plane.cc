@@ -42,7 +42,6 @@ void Plane::Set(const Vector3 &_n, const Vector2d &_s, double _offset)
 }
 
 //////////////////////////////////////////////////
-/// Equal operator
 Plane &Plane::operator =(const Plane & _p)
 {
   this->normal = _p.normal;

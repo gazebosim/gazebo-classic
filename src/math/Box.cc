@@ -22,7 +22,6 @@ using namespace gazebo;
 using namespace math;
 
 //////////////////////////////////////////////////
-/// Default constructor
 Box::Box()
 {
   this->min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -31,48 +30,41 @@ Box::Box()
 
 
 //////////////////////////////////////////////////
-/// Constructor
 Box::Box(const Vector3 &_min, const Vector3 &_max)
   : min(_min), max(_max)
 {
 }
 
 //////////////////////////////////////////////////
-/// Copy Constructor
 Box::Box(const Box &_b)
   : min(_b.min), max(_b.max)
 {
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Box::~Box()
 {
 }
 
 //////////////////////////////////////////////////
-/// Get the length along the x dimension
 double Box::GetXLength() const
 {
   return fabs(max.x - min.x);
 }
 
 //////////////////////////////////////////////////
-/// Get the length along the y dimension
 double Box::GetYLength() const
 {
   return fabs(max.y - min.y);
 }
 
 //////////////////////////////////////////////////
-/// Get the length along the z dimension
 double Box::GetZLength() const
 {
   return fabs(max.z - min.z);
 }
 
 //////////////////////////////////////////////////
-/// Get the size of the box
 math::Vector3 Box::GetSize() const
 {
   return math::Vector3(this->GetXLength(),
@@ -81,7 +73,6 @@ math::Vector3 Box::GetSize() const
 }
 
 //////////////////////////////////////////////////
-/// Get the box center
 math::Vector3 Box::GetCenter() const
 {
   Vector3 size = this->GetSize();
@@ -91,7 +82,6 @@ math::Vector3 Box::GetCenter() const
 
 
 //////////////////////////////////////////////////
-/// Merge a box with this box
 void Box::Merge(const Box &_box)
 {
   this->min.SetToMin(_box.min);
@@ -99,7 +89,6 @@ void Box::Merge(const Box &_box)
 }
 
 //////////////////////////////////////////////////
-/// Equal operator
 Box &Box::operator =(const Box &b)
 {
   this->max = b.max;

@@ -31,7 +31,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId)
     : Hinge2Joint<ODEJoint>()
 {
@@ -39,20 +38,17 @@ ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODEHinge2Joint::~ODEHinge2Joint()
 {
 }
 
 //////////////////////////////////////////////////
-///  Load the joint
 void ODEHinge2Joint::Load(sdf::ElementPtr &_sdf)
 {
   Hinge2Joint<ODEJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-// Get anchor point
 math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 {
   dVector3 result;
@@ -66,7 +62,6 @@ math::Vector3 ODEHinge2Joint::GetAnchor(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Set the anchor point
 void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -75,7 +70,6 @@ void ODEHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-// Set the first axis of rotation
 void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -88,14 +82,12 @@ void ODEHinge2Joint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void ODEHinge2Joint::SetDamping(int /*_index*/, const double _damping)
 {
   dJointSetDamping(this->jointId, _damping);
 }
 
 //////////////////////////////////////////////////
-// Get first axis of rotation
 math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
 {
   dVector3 result;
@@ -109,7 +101,6 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Get angle of rotation about first axis
 math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 {
   if (_index == 0)
@@ -121,7 +112,6 @@ math::Angle ODEHinge2Joint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Get rate of rotation about first axis
 double ODEHinge2Joint::GetVelocity(int _index) const
 {
   double result;
@@ -135,7 +125,6 @@ double ODEHinge2Joint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void ODEHinge2Joint::SetVelocity(int _index, double _angle)
 {
   if (_index == 0)
@@ -145,7 +134,6 @@ void ODEHinge2Joint::SetVelocity(int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double ODEHinge2Joint::GetMaxForce(int _index)
 {
   if (_index == 0)
@@ -156,7 +144,6 @@ double ODEHinge2Joint::GetMaxForce(int _index)
 
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 {
   if (_index == 0)
@@ -167,7 +154,6 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 
 
 //////////////////////////////////////////////////
-// Set _parameter with _value
 void ODEHinge2Joint::SetForce(int _index, double _torque)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -180,7 +166,6 @@ void ODEHinge2Joint::SetForce(int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-// Get the specified parameter
 double ODEHinge2Joint::GetParam(int _parameter) const
 {
   double result = dJointGetHinge2Param(this->jointId, _parameter);
@@ -189,7 +174,6 @@ double ODEHinge2Joint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-// Set _parameter with _value
 void ODEHinge2Joint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);

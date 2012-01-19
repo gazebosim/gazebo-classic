@@ -27,14 +27,12 @@ using namespace math;
 
 
 //////////////////////////////////////////////////
-// Default Constructor
 Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0)
 {
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Quaternion::Quaternion(const double &_w, const double &_x,
                        const double &_y, const double &_z)
     : w(_w), x(_x), y(_y), z(_z)
@@ -42,7 +40,6 @@ Quaternion::Quaternion(const double &_w, const double &_x,
 }
 
 //////////////////////////////////////////////////
-/// Constructor
 Quaternion::Quaternion(const double &_roll, const double &_pitch,
                        const double &_yaw)
 {
@@ -50,21 +47,18 @@ Quaternion::Quaternion(const double &_roll, const double &_pitch,
 }
 
 //////////////////////////////////////////////////
-/// Constructor
 Quaternion::Quaternion(const Vector3 &_rpy)
 {
   this->SetFromEuler(_rpy);
 }
 
 //////////////////////////////////////////////////
-/// Constructor from axis angle
 Quaternion::Quaternion(const Vector3 &_axis, const double &_angle)
 {
   this->SetFromAxis(_axis, _angle);
 }
 
 //////////////////////////////////////////////////
-// Copy Constructor
 Quaternion::Quaternion(const Quaternion &_qt)
 {
   this->w = _qt.w;
@@ -74,13 +68,11 @@ Quaternion::Quaternion(const Quaternion &_qt)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Quaternion::~Quaternion()
 {
 }
 
 //////////////////////////////////////////////////
-// Equal operator
 Quaternion &Quaternion::operator =(const Quaternion &qt)
 {
   this->w = qt.w;
@@ -92,7 +84,6 @@ Quaternion &Quaternion::operator =(const Quaternion &qt)
 }
 
 //////////////////////////////////////////////////
-// Set quatern to identity
 void Quaternion::SetToIdentity()
 {
   this->w = 1.0;
@@ -163,7 +154,6 @@ Quaternion Quaternion::GetExp() const
 }
 
 //////////////////////////////////////////////////
-// Invert the quaternion
 void Quaternion::Invert()
 {
   double norm = this->w*this->w+this->x*this->x+this->y*this->y+this->z*this->z;
@@ -174,7 +164,6 @@ void Quaternion::Invert()
 }
 
 //////////////////////////////////////////////////
-// Normalize the quaternion
 void Quaternion::Normalize()
 {
   double s = 0;
@@ -199,7 +188,6 @@ void Quaternion::Normalize()
 }
 
 //////////////////////////////////////////////////
-// Set the quaternion from an axis and angle
 void Quaternion::SetFromAxis(double _ax, double _ay, double _az, double _aa)
 {
   double l;
@@ -227,14 +215,12 @@ void Quaternion::SetFromAxis(double _ax, double _ay, double _az, double _aa)
 }
 
 //////////////////////////////////////////////////
-/// Set the quaternion from an axis and angle
 void Quaternion::SetFromAxis(const Vector3 &_axis, double _a)
 {
   this->SetFromAxis(_axis.x, _axis.y, _axis.z, _a);
 }
 
 //////////////////////////////////////////////////
-/// Set this quaternion from another
 void Quaternion::Set(double _w, double _x, double _y, double _z)
 {
   this->w = _w;
@@ -244,7 +230,6 @@ void Quaternion::Set(double _w, double _x, double _y, double _z)
 }
 
 //////////////////////////////////////////////////
-// Set the quaternion from Euler angles
 void Quaternion::SetFromEuler(const Vector3 &_vec)
 {
   double phi, the, psi;
@@ -262,7 +247,6 @@ void Quaternion::SetFromEuler(const Vector3 &_vec)
 }
 
 //////////////////////////////////////////////////
-// Return the rotation in Euler angles
 Vector3 Quaternion::GetAsEuler() const
 {
   Vector3 vec;
@@ -296,7 +280,6 @@ Vector3 Quaternion::GetAsEuler() const
 }
 
 //////////////////////////////////////////////////
-/// Convert euler angles to quatern.
 Quaternion Quaternion::EulerToQuaternion(const Vector3 &_vec)
 {
   Quaternion result;
@@ -305,35 +288,30 @@ Quaternion Quaternion::EulerToQuaternion(const Vector3 &_vec)
 }
 
 //////////////////////////////////////////////////
-/// Convert euler angles to quatern.
 Quaternion Quaternion::EulerToQuaternion(double _x, double _y, double _z)
 {
   return EulerToQuaternion(Vector3(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the Euler roll angle in radians
 double Quaternion::GetRoll()
 {
   return this->GetAsEuler().x;
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the Euler pitch angle in radians
 double Quaternion::GetPitch()
 {
   return this->GetAsEuler().y;
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the Euler yaw angle in radians
 double Quaternion::GetYaw()
 {
   return this->GetAsEuler().z;
 }
 
 //////////////////////////////////////////////////
-// Return rotation as axis and angle
 void Quaternion::GetAsAxis(Vector3 &_axis, double &_angle) const
 {
   double len = this->x*this->x + this->y*this->y + this->z*this->z;
@@ -351,7 +329,6 @@ void Quaternion::GetAsAxis(Vector3 &_axis, double &_angle) const
 }
 
 //////////////////////////////////////////////////
-// Scale a Quaternionion
 void Quaternion::Scale(double _scale)
 {
   Quaternion b;
@@ -366,7 +343,6 @@ void Quaternion::Scale(double _scale)
 }
 
 //////////////////////////////////////////////////
-/// Addition operator
 Quaternion Quaternion::operator+(const Quaternion &qt) const
 {
   Quaternion result(this->w + qt.w, this->x + qt.x,
@@ -375,7 +351,6 @@ Quaternion Quaternion::operator+(const Quaternion &qt) const
 }
 
 //////////////////////////////////////////////////
-/// Addition operator
 Quaternion Quaternion::operator+=(const Quaternion &qt)
 {
   *this = *this + qt;
@@ -384,7 +359,6 @@ Quaternion Quaternion::operator+=(const Quaternion &qt)
 }
 
 //////////////////////////////////////////////////
-/// Subtraction operator
 Quaternion Quaternion::operator-=(const Quaternion &qt)
 {
   *this = *this - qt;
@@ -392,7 +366,6 @@ Quaternion Quaternion::operator-=(const Quaternion &qt)
 }
 
 //////////////////////////////////////////////////
-/// Substraction operator
 Quaternion Quaternion::operator-(const Quaternion &qt) const
 {
   Quaternion result(this->w - qt.w, this->x - qt.x,
@@ -401,7 +374,6 @@ Quaternion Quaternion::operator-(const Quaternion &qt) const
 }
 
 //////////////////////////////////////////////////
-// Multiplication operator
 Quaternion Quaternion::operator*=(const Quaternion &qt)
 {
   *this = *this * qt;
@@ -409,7 +381,6 @@ Quaternion Quaternion::operator*=(const Quaternion &qt)
 }
 
 //////////////////////////////////////////////////
-/// Rotate a vector
 Vector3 Quaternion::operator*(const Vector3 &v) const
 {
 /*  Quaternion tmp(0.0, v.x, v.y, v.z);
@@ -430,14 +401,12 @@ Vector3 Quaternion::operator*(const Vector3 &v) const
 }
 
 //////////////////////////////////////////////////
-/// Multipcation operator
 Quaternion Quaternion::operator*(const double &_f) const
 {
   return Quaternion(this->w*_f, this->x*_f, this->y*_f, this->z*_f);
 }
 
 //////////////////////////////////////////////////
-// Do the reverse rotation of a vector by this quaternion
 Vector3 Quaternion::RotateVectorReverse(Vector3 _vec) const
 {
   Quaternion tmp;
@@ -459,7 +428,6 @@ Vector3 Quaternion::RotateVectorReverse(Vector3 _vec) const
 
 
 //////////////////////////////////////////////////
-// See if a quatern is finite (e.g., not nan)
 bool Quaternion::IsFinite() const
 {
   return finite(this->w) && finite(this->x) && finite(this->y) &&
@@ -512,7 +480,6 @@ Vector3 Quaternion::GetZAxis() const
 }
 
 //////////////////////////////////////////////////
-/// Equality operator
 bool Quaternion::operator ==(const Quaternion &_qt) const
 {
   return equal(this->x, _qt.x, 0.001) &&
@@ -522,7 +489,6 @@ bool Quaternion::operator ==(const Quaternion &_qt) const
 }
 
 //////////////////////////////////////////////////
-/// Inequality operator
 bool Quaternion::operator!=(const Quaternion &_qt) const
 {
   return !equal(this->x, _qt.x, 0.001) ||
@@ -532,14 +498,12 @@ bool Quaternion::operator!=(const Quaternion &_qt) const
 }
 
 //////////////////////////////////////////////////
-/// Negate operator
 Quaternion Quaternion::operator-() const
 {
   return Quaternion(-this->w, -this->x, -this->y, -this->z);
 }
 
 //////////////////////////////////////////////////
-/// Get the quaternion as a 3x3 matrix
 Matrix3 Quaternion::GetAsMatrix3() const
 {
   Quaternion q = *this;
@@ -556,7 +520,6 @@ Matrix3 Quaternion::GetAsMatrix3() const
 }
 
 //////////////////////////////////////////////////
-/// Get the quaternion as a 4x4 matrix
 Matrix4 Quaternion::GetAsMatrix4() const
 {
   Matrix4 result(Matrix4::IDENTITY);
@@ -565,7 +528,6 @@ Matrix4 Quaternion::GetAsMatrix4() const
 }
 
 //////////////////////////////////////////////////
-/// Round all values to _decimalPlaces
 void Quaternion::Round(int _precision)
 {
   this->x = precision(this->x, _precision);
@@ -582,7 +544,6 @@ double Quaternion::Dot(const Quaternion &_q) const
 
 
 //////////////////////////////////////////////////
-/// Spherical quadratic interpolation
 Quaternion Quaternion::Squad(double _fT, const Quaternion &_rkP,
     const Quaternion &_rkA, const Quaternion &_rkB,
     Quaternion &_rkQ, bool _shortestPath)

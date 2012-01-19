@@ -27,7 +27,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletJoint::BulletJoint()
   : Joint()
 {
@@ -35,14 +34,12 @@ BulletJoint::BulletJoint()
 }
 
 //////////////////////////////////////////////////
-// Desctructor
 BulletJoint::~BulletJoint()
 {
   delete this->constraint;
 }
 
 //////////////////////////////////////////////////
-// Load a joint
 void BulletJoint::Load(common::XMLConfigNode *_node)
 {
   Joint::Load(_node);
@@ -50,7 +47,6 @@ void BulletJoint::Load(common::XMLConfigNode *_node)
 }
 
 //////////////////////////////////////////////////
-// Get the body to which the joint is attached according the _index
 Link *BulletJoint::GetJointLink(int index) const
 {
   Link *result = NULL;
@@ -75,7 +71,6 @@ Link *BulletJoint::GetJointLink(int index) const
 
 
 //////////////////////////////////////////////////
-// Determines of the two bodies are connected by a joint
 bool BulletJoint::AreConnected(Link *_one, Link *_two) const
 {
   return this->constraint && ((this->body1 == _one && this->body2 == _two) ||
@@ -83,7 +78,6 @@ bool BulletJoint::AreConnected(Link *_one, Link *_two) const
 }
 
 //////////////////////////////////////////////////
-// Detach this joint from all bodies
 void BulletJoint::Detach()
 {
   this->body1 = NULL;
@@ -93,26 +87,22 @@ void BulletJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-/// Set the ERP of this joint
 void BulletJoint::SetERP(double _newERP)
 {
 }
 
 //////////////////////////////////////////////////
-/// Get the ERP of this joint
 double BulletJoint::GetERP()
 {
   return 0;
 }
 
 //////////////////////////////////////////////////
-/// Set the CFM of this joint
 void BulletJoint::SetCFM(double _newCFM)
 {
 }
 
 //////////////////////////////////////////////////
-/// Get the ERP of this joint
 double BulletJoint::GetCFM()
 {
   return 0;

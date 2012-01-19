@@ -32,7 +32,6 @@ using namespace common;
 Console *Console::myself = NULL;
 
 //////////////////////////////////////////////////
-/// Default constructor
 Console::Console()
 {
   this->msgStream = &std::cout;
@@ -40,13 +39,11 @@ Console::Console()
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Console::~Console()
 {
 }
 
 //////////////////////////////////////////////////
-/// Return an instance to this class
 Console *Console::Instance()
 {
   if (myself == NULL)
@@ -56,7 +53,6 @@ Console *Console::Instance()
 }
 
 //////////////////////////////////////////////////
-// Load the Message parameters
 void Console::Load()
 {
   char logFilename[50];
@@ -86,13 +82,11 @@ void Console::Load()
 }
 
 //////////////////////////////////////////////////
-/// Set the verbosity
 void Console::SetQuiet(bool)
 {
 }
 
 //////////////////////////////////////////////////
-/// Get the message stream
 std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 {
   // if (**this->quietP)
@@ -105,7 +99,6 @@ std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 }
 
 //////////////////////////////////////////////////
-/// Get the error stream
 std::ostream &Console::ColorErr(const std::string &lbl,
                                 const std::string &file,
                                 unsigned int line, int color)
@@ -119,7 +112,6 @@ std::ostream &Console::ColorErr(const std::string &lbl,
 }
 
 //////////////////////////////////////////////////
-// Log a message
 std::ofstream &Console::Log()
 {
   return this->logStream;

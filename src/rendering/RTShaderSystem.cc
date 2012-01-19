@@ -46,7 +46,6 @@ RTShaderSystem::~RTShaderSystem()
 }
 
 //////////////////////////////////////////////////
-/// Init the run time shader system
 void RTShaderSystem::Init()
 {
 #if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 &&\
@@ -77,7 +76,6 @@ void RTShaderSystem::Init()
 }
 
 //////////////////////////////////////////////////
-// Finalize
 void RTShaderSystem::Fini()
 {
   if (!this->initialized)

@@ -29,14 +29,12 @@ using namespace math;
 
 
 //////////////////////////////////////////////////
-// Constructor
 Vector4::Vector4()
     : x(0), y(0), z(0), w(0)
 {
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Vector4::Vector4(const double &_x, const double &_y, const double &_z,
                  const double &_w)
     : x(_x), y(_y), z(_z), w(_w)
@@ -44,20 +42,17 @@ Vector4::Vector4(const double &_x, const double &_y, const double &_z,
 }
 
 //////////////////////////////////////////////////
-// Copy Constructor
 Vector4::Vector4(const Vector4 &_pt)
     : x(_pt.x), y(_pt.y), z(_pt.z), w(_pt.w)
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Vector4::~Vector4()
 {
 }
 
 //////////////////////////////////////////////////
-// Calc distance to the given point
 double Vector4::Distance(const Vector4 &_pt) const
 {
   return sqrt((this->x-_pt.x)*(this->x-_pt.x) +
@@ -67,7 +62,6 @@ double Vector4::Distance(const Vector4 &_pt) const
 }
 
 //////////////////////////////////////////////////
-// Returns the length (magnitude) of the vector
 double Vector4::GetLength() const
 {
   return sqrt(this->x * this->x + this->y * this->y +
@@ -75,7 +69,6 @@ double Vector4::GetLength() const
 }
 
 //////////////////////////////////////////////////
-// Return the square of the length (magnitude) of the vector
 double Vector4::GetSquaredLength() const
 {
   return this->x * this->x + this->y * this->y + this->z * this->z +
@@ -83,7 +76,6 @@ double Vector4::GetSquaredLength() const
 }
 
 //////////////////////////////////////////////////
-// Normalize the vector length
 void Vector4::Normalize()
 {
   double d = this->GetLength();
@@ -95,7 +87,6 @@ void Vector4::Normalize()
 }
 
 //////////////////////////////////////////////////
-// Set the contents of the vector
 void Vector4::Set(double _x, double _y, double _z, double _w)
 {
   this->x = _x;
@@ -106,7 +97,6 @@ void Vector4::Set(double _x, double _y, double _z, double _w)
 
 
 //////////////////////////////////////////////////
-// Equals operator
 Vector4 &Vector4::operator =(const Vector4 &pt)
 {
   this->x = pt.x;
@@ -118,7 +108,6 @@ Vector4 &Vector4::operator =(const Vector4 &pt)
 }
 
 //////////////////////////////////////////////////
-/// Equal operator
 const Vector4 &Vector4::operator =(double value)
 {
   this->x = value;
@@ -132,7 +121,6 @@ const Vector4 &Vector4::operator =(double value)
 
 
 //////////////////////////////////////////////////
-// Addition operator
 Vector4 Vector4::operator+(const Vector4 &pt) const
 {
   return Vector4(this->x + pt.x, this->y + pt.y, this->z + pt.z, this->w+pt.w);
@@ -149,7 +137,6 @@ const Vector4 &Vector4::operator+=(const Vector4 &pt)
 }
 
 //////////////////////////////////////////////////
-// Subtraction operators
 Vector4 Vector4::operator-(const Vector4 &pt) const
 {
   return Vector4(this->x - pt.x, this->y - pt.y, this->z - pt.z, this->w-pt.w);
@@ -167,7 +154,6 @@ const Vector4 &Vector4::operator-=(const Vector4 &pt)
 
 
 //////////////////////////////////////////////////
-// Division operators
 
 const Vector4 Vector4::operator/(const Vector4 &pt) const
 {
@@ -202,7 +188,6 @@ const Vector4 &Vector4::operator/=(double v)
 
 
 //////////////////////////////////////////////////
-// Mulitplication operators
 const Vector4 Vector4::operator*(const Vector4 &pt) const
 {
   return Vector4(this->x * pt.x, this->y * pt.y, this->z * pt.z, this->w*pt.w);
@@ -244,7 +229,6 @@ const Vector4 &Vector4::operator*=(double v)
 }
 
 //////////////////////////////////////////////////
-// Equality operator
 bool Vector4::operator ==(const Vector4 &pt) const
 {
   return this->x == pt.x && this->y == pt.y &&
@@ -252,14 +236,12 @@ bool Vector4::operator ==(const Vector4 &pt) const
 }
 
 //////////////////////////////////////////////////
-// Inequality operator
 bool Vector4::operator!=(const Vector4 &pt) const
 {
   return !(*this == pt);
 }
 
 //////////////////////////////////////////////////
-// See if a point is finite (e.g., not nan)
 bool Vector4::IsFinite() const
 {
   return finite(this->x) && finite(this->y) && finite(this->z) &&
@@ -267,7 +249,6 @@ bool Vector4::IsFinite() const
 }
 
 //////////////////////////////////////////////////
-/// [] operator
 double Vector4::operator[](unsigned int index) const
 {
   switch (index)

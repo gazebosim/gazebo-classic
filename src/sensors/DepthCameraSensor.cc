@@ -41,34 +41,29 @@ using namespace sensors;
 GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 
 //////////////////////////////////////////////////
-// Constructor
 DepthCameraSensor::DepthCameraSensor()
     : Sensor()
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 DepthCameraSensor::~DepthCameraSensor()
 {
 }
 
 //////////////////////////////////////////////////
-/// Set the parent of the sensor
 void DepthCameraSensor::SetParent(const std::string &_name)
 {
   Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
-// Load the camera with SDF parameters
 void DepthCameraSensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-/// Load the camera using default parameters
 void DepthCameraSensor::Load()
 {
   Sensor::Load();
@@ -77,7 +72,6 @@ void DepthCameraSensor::Load()
 }
 
 //////////////////////////////////////////////////
-// Initialize the camera
 void DepthCameraSensor::Init()
 {
   std::string worldName = this->sdf->GetWorldName();
@@ -122,7 +116,6 @@ void DepthCameraSensor::Init()
 }
 
 //////////////////////////////////////////////////
-// Finalize the camera
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
@@ -132,14 +125,12 @@ void DepthCameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-/// Set whether the sensor is active or not
 void DepthCameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
 }
 
 //////////////////////////////////////////////////
-// Update the drawing
 void DepthCameraSensor::UpdateImpl(bool /*_force*/)
 {
   // Sensor::Update(force);

@@ -26,7 +26,6 @@ double EntityMaker::snapDistance = 0.2;
 double EntityMaker::snapGridSize = 1.0;
 
 //////////////////////////////////////////////////
-/// Constructor
 EntityMaker::EntityMaker()
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -37,7 +36,6 @@ EntityMaker::EntityMaker()
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 EntityMaker::~EntityMaker()
 {
   this->camera.reset();
@@ -48,7 +46,6 @@ EntityMaker::~EntityMaker()
 }
 
 //////////////////////////////////////////////////
-/// Set whether to snap to grid
 void EntityMaker::SetSnapToGrid(bool _snap)
 {
   snapToGrid = _snap;
@@ -71,7 +68,6 @@ void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
 }
 
 //////////////////////////////////////////////////
-// Get a point snapped to a grid
 math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
 {
   math::Vector3 result = _p;

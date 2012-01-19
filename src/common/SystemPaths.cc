@@ -37,7 +37,6 @@ using namespace common;
 
 
 //////////////////////////////////////////////////
-/// Get the gazebo install paths
 SystemPaths::SystemPaths()
 {
   this->gazeboPaths.clear();
@@ -106,7 +105,6 @@ const std::list<std::string> &SystemPaths::GetGazeboPaths()
 }
 
 //////////////////////////////////////////////////
-/// Get the ogre install paths
 const std::list<std::string> &SystemPaths::GetOgrePaths()
 {
   if (this->ogrePaths.size() == 0)
@@ -139,7 +137,6 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 //////////////////////////////////////////////////
-/// Get the plugin paths
 const std::list<std::string> &SystemPaths::GetPluginPaths()
 {
   if (this->pluginPaths.size() == 0)
@@ -172,21 +169,18 @@ const std::list<std::string> &SystemPaths::GetPluginPaths()
 }
 
 //////////////////////////////////////////////////
-/// Get the model path extension
 std::string SystemPaths::GetModelPathExtension()
 {
   return "/models";
 }
 
 //////////////////////////////////////////////////
-/// Get the world path extension
 std::string SystemPaths::GetWorldPathExtension()
 {
   return "/worlds";
 }
 
 //////////////////////////////////////////////////
-/// search for file given GAZEBO_RESOURCE_PATH
 std::string SystemPaths::FindFileWithGazeboPaths(std::string _filename)
 {
   struct stat st;

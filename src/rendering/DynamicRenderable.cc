@@ -25,13 +25,11 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-/// Constructor
 DynamicRenderable::DynamicRenderable()
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 DynamicRenderable::~DynamicRenderable()
 {
   delete this->mRenderOp.vertexData;
@@ -39,7 +37,6 @@ DynamicRenderable::~DynamicRenderable()
 }
 
 //////////////////////////////////////////////////
-/// Initializes the dynamic renderable.
 void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 {
   this->SetOperationType(operationType);
@@ -60,7 +57,6 @@ void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 }
 
 //////////////////////////////////////////////////
-// Set the render operation type
 void DynamicRenderable::SetOperationType(RenderOpType opType)
 {
   switch (opType)
@@ -98,7 +94,6 @@ void DynamicRenderable::SetOperationType(RenderOpType opType)
 }
 
 //////////////////////////////////////////////////
-// Get the render operation type
 RenderOpType DynamicRenderable::GetOperationType() const
 {
   RenderOpType type;
@@ -228,7 +223,6 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
 }
 
 //////////////////////////////////////////////////
-/// Implementation of Ogre::SimpleRenderable
 Ogre::Real DynamicRenderable::getBoundingRadius() const
 {
   return Ogre::Math::Sqrt(std::max(mBox.getMaximum().squaredLength(),
@@ -236,7 +230,6 @@ Ogre::Real DynamicRenderable::getBoundingRadius() const
 }
 
 //////////////////////////////////////////////////
-/// Implementation of Ogre::SimpleRenderable
 Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
 {
   Ogre::Vector3 vMin, vMax, vMid, vDist;

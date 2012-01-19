@@ -93,7 +93,6 @@ void Collision::Fini()
 
 
 //////////////////////////////////////////////////
-// First step in the loading process
 void Collision::Load(sdf::ElementPtr &_sdf)
 {
   Entity::Load(_sdf);
@@ -109,7 +108,7 @@ void Collision::Load(sdf::ElementPtr &_sdf)
   if (this->shape->GetType() != MULTIRAY_SHAPE &&
       this->shape->GetType() != RAY_SHAPE)
   {
-    // this->visPub->Publish(this->CreateCollisionVisual());
+    this->visPub->Publish(this->CreateCollisionVisual());
   }
 }
 
@@ -125,7 +124,6 @@ void Collision::Init()
 }
 
 //////////////////////////////////////////////////
-// Create the bounding box for the collision
 void Collision::CreateBoundingBox()
 {
   // Create the bounding box
@@ -206,7 +204,7 @@ void Collision::ShowBoundingBox(const bool &_show)
     msg.set_name(this->bbVisual);
     msg.set_visible(_show);
     msg.set_delete_me(true);
-    // this->visPub->Publish(msg);
+    this->visPub->Publish(msg);
   }
 }
 
@@ -223,7 +221,6 @@ ModelPtr Collision::GetModel() const
 }
 
 //////////////////////////////////////////////////
-// Get the shape type
 unsigned int Collision::GetShapeType()
 {
   return this->shape->GetType();
@@ -242,14 +239,12 @@ ShapePtr Collision::GetShape() const
 }
 
 //////////////////////////////////////////////////
-// Turn contact recording on or off
 void Collision::SetContactsEnabled(bool _enable)
 {
   this->contactsEnabled = _enable;
 }
 
 //////////////////////////////////////////////////
-// Return true of contact recording is on
 bool Collision::GetContactsEnabled() const
 {
   return this->contactsEnabled;
@@ -277,7 +272,7 @@ void Collision::EnabledCB(bool _enabled)
   else
     msg.mutable_material()->set_script("Gazebo/RedTransparent");
 
-  // this->visPub->Publish(msg);
+  this->visPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////

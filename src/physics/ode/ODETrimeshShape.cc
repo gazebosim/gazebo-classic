@@ -32,14 +32,12 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 ODETrimeshShape::ODETrimeshShape(CollisionPtr _parent) : TrimeshShape(_parent)
 {
   this->odeData = NULL;
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODETrimeshShape::~ODETrimeshShape()
 {
   delete [] this->vertices;
@@ -48,7 +46,6 @@ ODETrimeshShape::~ODETrimeshShape()
 }
 
 //////////////////////////////////////////////////
-/// Update function.
 void ODETrimeshShape::Update()
 {
   ODECollisionPtr ocollision =
@@ -90,7 +87,6 @@ void ODETrimeshShape::Update()
 }
 
 //////////////////////////////////////////////////
-/// Load the trimesh
 void ODETrimeshShape::Load(sdf::ElementPtr &_sdf)
 {
   TrimeshShape::Load(_sdf);

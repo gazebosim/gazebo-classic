@@ -50,7 +50,6 @@ ODESurfaceParams::~ODESurfaceParams()
 }
 
 //////////////////////////////////////////////////
-/// Load the contact params
 void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   if (_sdf->HasElement("friction"))

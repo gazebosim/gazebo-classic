@@ -26,7 +26,6 @@ using namespace gazebo;
 using namespace rendering;
 
 //////////////////////////////////////////////////
-/// Constructor
 FPSViewController::FPSViewController(UserCamera *camera_)
   : ViewController(camera_)
 {
@@ -34,7 +33,6 @@ FPSViewController::FPSViewController(UserCamera *camera_)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 FPSViewController::~FPSViewController()
 {
 }
@@ -44,13 +42,11 @@ void FPSViewController::Init()
 }
 
 //////////////////////////////////////////////////
-// Update
 void FPSViewController::Update()
 {
 }
 
 //////////////////////////////////////////////////
-/// Handle a mouse event
 void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
   if (!this->enabled)
@@ -89,7 +85,6 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-/// Get the type name of this view controller
 std::string FPSViewController::GetTypeString()
 {
   return TYPE_STRING;

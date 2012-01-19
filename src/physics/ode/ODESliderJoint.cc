@@ -31,7 +31,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 ODESliderJoint::ODESliderJoint(dWorldID _worldId)
     : SliderJoint<ODEJoint>()
 {
@@ -39,20 +38,17 @@ ODESliderJoint::ODESliderJoint(dWorldID _worldId)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODESliderJoint::~ODESliderJoint()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the joint
 void ODESliderJoint::Load(sdf::ElementPtr &_sdf)
 {
   SliderJoint<ODEJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-// Get the axis of rotation
 math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 {
   dVector3 result;
@@ -61,7 +57,6 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-// Get the position of the joint
 math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 {
   math::Angle result = dJointGetSliderPosition(this->jointId);
@@ -69,7 +64,6 @@ math::Angle ODESliderJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-// Get the rate of change
 double ODESliderJoint::GetVelocity(int /*index*/) const
 {
   double result = dJointGetSliderPositionRate(this->jointId);
@@ -77,14 +71,12 @@ double ODESliderJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void ODESliderJoint::SetVelocity(int /*index*/, double _angle)
 {
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-// Set the axis of motion
 void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
   if (this->childLink)
@@ -95,7 +87,6 @@ void ODESliderJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void ODESliderJoint::SetDamping(int /*index*/, const double _damping)
 {
   this->damping_coefficient = _damping;
@@ -103,7 +94,6 @@ void ODESliderJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-// callback to apply joint damping force
 void ODESliderJoint::ApplyDamping()
 {
   double damping_force = this->damping_coefficient * this->GetVelocity(0);
@@ -111,7 +101,6 @@ void ODESliderJoint::ApplyDamping()
 }
 
 //////////////////////////////////////////////////
-// Set the slider force
 void ODESliderJoint::SetForce(int /*index*/, double _force)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
@@ -121,7 +110,6 @@ void ODESliderJoint::SetForce(int /*index*/, double _force)
 }
 
 //////////////////////////////////////////////////
-// Set the _parameter
 void ODESliderJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
@@ -129,7 +117,6 @@ void ODESliderJoint::SetParam(int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-// Get the _parameter
 double ODESliderJoint::GetParam(int _parameter) const
 {
   double result = dJointGetSliderParam(this->jointId, _parameter);
@@ -137,14 +124,12 @@ double ODESliderJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void ODESliderJoint::SetMaxForce(int /*_index*/, double _t)
 {
   this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double ODESliderJoint::GetMaxForce(int /*_index*/)
 {
   return this->GetParam(dParamFMax);

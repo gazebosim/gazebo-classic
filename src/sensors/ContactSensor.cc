@@ -184,7 +184,6 @@ unsigned int ContactSensor::GetCollisionCount() const
 }
 
 //////////////////////////////////////////////////
-/// Get a collision name
 std::string ContactSensor::GetCollisionName(unsigned int _index) const
 {
   std::string result;

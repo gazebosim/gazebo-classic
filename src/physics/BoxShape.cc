@@ -23,34 +23,29 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-/// Constructor
 BoxShape::BoxShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::BOX_SHAPE);
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 BoxShape::~BoxShape()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the box
 void BoxShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-// Initialize the box
 void BoxShape::Init()
 {
   this->SetSize(this->sdf->GetValueVector3("size"));
 }
 
 //////////////////////////////////////////////////
-/// Set the size of the box
 void BoxShape::SetSize(const math::Vector3 &_size)
 {
   this->sdf->GetAttribute("size")->Set(_size);

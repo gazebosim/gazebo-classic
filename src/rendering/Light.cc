@@ -42,7 +42,6 @@ using namespace rendering;
 unsigned int Light::lightCounter = 0;
 
 //////////////////////////////////////////////////
-/// Constructor
 Light::Light(Scene *scene_)
 {
   this->scene = scene_;
@@ -62,7 +61,6 @@ Light::Light(Scene *scene_)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Light::~Light()
 {
   if (this->light)
@@ -74,7 +72,6 @@ Light::~Light()
 }
 
 //////////////////////////////////////////////////
-/// Load the light
 void Light::Load(sdf::ElementPtr &_sdf)
 {
   this->sdf = _sdf;
@@ -135,7 +132,6 @@ void Light::Load()
 }
 
 //////////////////////////////////////////////////
-/// Load from a light message
 void Light::LoadFromMsg(ConstLightPtr &msg)
 {
   this->sdf->GetAttribute("name")->Set(msg->name());
@@ -217,21 +213,18 @@ void Light::LoadFromMsg(ConstLightPtr &msg)
 }
 
 //////////////////////////////////////////////////
-/// Set the name of the visual
 void Light::SetName(const std::string &name)
 {
   this->sdf->GetAttribute("name")->Set(name);
 }
 
 //////////////////////////////////////////////////
-/// Get the name of the visual
 std::string Light::GetName() const
 {
   return this->sdf->GetValueString("name");
 }
 
 //////////////////////////////////////////////////
-// Helper node to create a visual representation of the light
 void Light::CreateVisual()
 {
   // The lines draw a visualization of the camera
@@ -349,14 +342,12 @@ void Light::CreateVisual()
 }
 
 //////////////////////////////////////////////////
-// Set the position of the light
 void Light::SetPosition(const math::Vector3 &p)
 {
   this->visual->SetPosition(p);
 }
 
 //////////////////////////////////////////////////
-/// Set whether this entity has been selected by the user through the gui
 bool Light::SetSelected(bool s)
 {
   // NATY: FIX
@@ -374,21 +365,18 @@ bool Light::SetSelected(bool s)
 }
 
 //////////////////////////////////////////////////
-// Toggle light visual visibility
 void Light::ToggleShowVisual()
 {
   this->visual->ToggleVisible();
 }
 
 //////////////////////////////////////////////////
-// Set whether to show the visual
 void Light::ShowVisual(bool s)
 {
   this->visual->SetVisible(s);
 }
 
 //////////////////////////////////////////////////
-/// Set the light type
 void Light::SetLightType(const std::string &_type)
 {
   // Set the light _type
@@ -408,7 +396,6 @@ void Light::SetLightType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-/// Set the diffuse
 void Light::SetDiffuseColor(const common::Color &color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("diffuse");
@@ -420,7 +407,6 @@ void Light::SetDiffuseColor(const common::Color &color)
 }
 
 //////////////////////////////////////////////////
-/// Set the specular color
 void Light::SetSpecularColor(const common::Color &color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("specular");
@@ -432,7 +418,6 @@ void Light::SetSpecularColor(const common::Color &color)
 }
 
 //////////////////////////////////////////////////
-/// Set the direction
 void Light::SetDirection(const math::Vector3 &dir)
 {
   // Set the direction which the light points
@@ -447,7 +432,6 @@ void Light::SetDirection(const math::Vector3 &dir)
 }
 
 //////////////////////////////////////////////////
-/// Set the attenuation
 void Light::SetAttenuation(double constant, double linear, double quadratic)
 {
   // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
@@ -474,7 +458,6 @@ void Light::SetAttenuation(double constant, double linear, double quadratic)
 
 
 //////////////////////////////////////////////////
-/// Set the range
 void Light::SetRange(const double &range)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("attenuation");
@@ -488,7 +471,6 @@ void Light::SetRange(const double &range)
 }
 
 //////////////////////////////////////////////////
-/// Set cast shadows
 void Light::SetCastShadows(const bool &_cast)
 {
   this->light->setCastShadows(_cast);
@@ -503,7 +485,6 @@ void Light::SetCastShadows(const bool &_cast)
 }
 
 //////////////////////////////////////////////////
-/// Set the spot light inner angle
 void Light::SetSpotInnerAngle(const double &angle)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
@@ -519,7 +500,6 @@ void Light::SetSpotInnerAngle(const double &angle)
 }
 
 //////////////////////////////////////////////////
-/// Set the spot light outter angle
 void Light::SetSpotOuterAngle(const double &_angle)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
@@ -535,7 +515,6 @@ void Light::SetSpotOuterAngle(const double &_angle)
 }
 
 //////////////////////////////////////////////////
-/// Set the spot light falloff
 void Light::SetSpotFalloff(const double &_angle)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("spot");
@@ -551,7 +530,6 @@ void Light::SetSpotFalloff(const double &_angle)
 }
 
 //////////////////////////////////////////////////
-// Setup the shadow camera for the light
 void Light::SetupShadows()
 {
   if (this->light->getType() == Ogre::Light::LT_DIRECTIONAL)

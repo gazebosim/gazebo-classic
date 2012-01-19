@@ -31,7 +31,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor
 ODEHingeJoint::ODEHingeJoint(dWorldID _worldId)
     : HingeJoint<ODEJoint>()
 {
@@ -39,13 +38,11 @@ ODEHingeJoint::ODEHingeJoint(dWorldID _worldId)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODEHingeJoint::~ODEHingeJoint()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load a hinge joint
 void ODEHingeJoint::Load(sdf::ElementPtr &_sdf)
 {
   HingeJoint<ODEJoint>::Load(_sdf);
@@ -55,7 +52,6 @@ void ODEHingeJoint::Load(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-// Get the anchor point
 math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
@@ -66,7 +62,6 @@ math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-// Set the anchor point
 void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
   if (this->childLink)
@@ -79,7 +74,6 @@ void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 
 
 //////////////////////////////////////////////////
-// Get the axis of rotation
 math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
     dVector3 result;
@@ -88,7 +82,6 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-// Set the axis of rotation
 void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
   if (this->childLink)
@@ -100,7 +93,6 @@ void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping, either through ODE or callback here
 void ODEHingeJoint::SetDamping(int /*index*/, const double _damping)
 {
   this->damping_coefficient = _damping;
@@ -108,7 +100,6 @@ void ODEHingeJoint::SetDamping(int /*index*/, const double _damping)
 }
 
 //////////////////////////////////////////////////
-// callback to apply joint damping force
 void ODEHingeJoint::ApplyDamping()
 {
   double damping_force = this->damping_coefficient * this->GetVelocity(0);
@@ -116,7 +107,6 @@ void ODEHingeJoint::ApplyDamping()
 }
 
 //////////////////////////////////////////////////
-// Get the angle of rotation
 math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 {
   math::Angle result = dJointGetHingeAngle(this->jointId);
@@ -125,7 +115,6 @@ math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-// Get the rotation rate
 double ODEHingeJoint::GetVelocity(int /*index*/) const
 {
   double result = dJointGetHingeAngleRate(this->jointId);
@@ -134,28 +123,24 @@ double ODEHingeJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void ODEHingeJoint::SetVelocity(int /*index*/, double _angle)
 {
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void ODEHingeJoint::SetMaxForce(int /*index*/, double _t)
 {
   return this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double ODEHingeJoint::GetMaxForce(int /*index*/)
 {
   return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////
-// Set the torque of this joint
 void ODEHingeJoint::SetForce(int /*index*/, double _torque)
 {
   if (this->childLink)
@@ -166,7 +151,6 @@ void ODEHingeJoint::SetForce(int /*index*/, double _torque)
 }
 
 //////////////////////////////////////////////////
-// Get the specified parameter
 double ODEHingeJoint::GetParam(int _parameter) const
 {
   double result = dJointGetHingeParam(this->jointId, _parameter);
@@ -175,7 +159,6 @@ double ODEHingeJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-// Set the _parameter to _value
 void ODEHingeJoint::SetParam(int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);

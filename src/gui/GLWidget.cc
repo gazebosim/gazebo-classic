@@ -458,7 +458,6 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 }
 
 //////////////////////////////////////////////////
-/// Create the camera
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
   if (_scene->GetUserCameraCount() == 0)

@@ -35,7 +35,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletHeightmapCollision::BulletHeightmapCollision(Link *_body)
     : BulletCollision(body)
 {
@@ -55,7 +54,6 @@ BulletHeightmapCollision::BulletHeightmapCollision(Link *_body)
 
 
 //////////////////////////////////////////////////
-// Destructor
 BulletHeightmapCollision::~BulletHeightmapCollision()
 {
   delete this->imageFilenameP;
@@ -68,14 +66,12 @@ BulletHeightmapCollision::~BulletHeightmapCollision()
 }
 
 //////////////////////////////////////////////////
-/// Update function.
 void BulletHeightmapCollision::Update()
 {
   BulletCollision::Update();
 }
 
 //////////////////////////////////////////////////
-// Create a lookup table of the terrain's height
 void BulletHeightmapCollision::FillHeightMap()
 {
   unsigned int x, y;
@@ -116,7 +112,6 @@ void BulletHeightmapCollision::FillHeightMap()
 }
 
 //////////////////////////////////////////////////
-/// Load the heightmap
 void BulletHeightmapCollision::Load(common::XMLConfigNode *_node)
 {
   Image tmpImage;
@@ -151,7 +146,6 @@ void BulletHeightmapCollision::Load(common::XMLConfigNode *_node)
 }
 
 //////////////////////////////////////////////////
-/// Save child parameters
 void BulletHeightmapCollision::Save(std::string &_prefix, std::ostream &_stream)
 {
   BulletCollision::Save(_prefix, _stream);

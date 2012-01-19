@@ -29,7 +29,6 @@ unsigned int Connection::idCounter = 0;
 IOManager *Connection::iomanager = NULL;
 
 //////////////////////////////////////////////////
-// Constructor
 Connection::Connection()
 {
   if (iomanager == NULL)
@@ -54,7 +53,6 @@ Connection::Connection()
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Connection::~Connection()
 {
   this->ProcessWriteQueue();
@@ -80,7 +78,6 @@ Connection::~Connection()
 }
 
 //////////////////////////////////////////////////
-// Connect to a remote host
 bool Connection::Connect(const std::string &host, unsigned int port)
 {
   std::string service = boost::lexical_cast<std::string>(port);
@@ -182,7 +179,7 @@ void Connection::StopRead()
 //////////////////////////////////////////////////
 void Connection::EnqueueMsg(const std::string &_buffer, bool _force)
 {
-  // Don't enqueu empty messages
+  // Don't enqueue empty messages
   if (_buffer.empty())
   {
     return;
@@ -311,7 +308,6 @@ void Connection::OnWrite(const boost::system::error_code &e,
 }
 
 //////////////////////////////////////////////////
-// Shutdown the socket
 void Connection::Shutdown()
 {
   this->ProcessWriteQueue();
@@ -340,7 +336,6 @@ void Connection::Shutdown()
 }
 
 //////////////////////////////////////////////////
-/// Return true if the connection is open
 bool Connection::IsOpen() const
 {
   bool result = this->socket && this->socket->is_open();
@@ -358,7 +353,6 @@ bool Connection::IsOpen() const
 
 
 //////////////////////////////////////////////////
-// Close a connection
 void Connection::Close()
 {
   if (this->socket && this->socket->is_open())
@@ -392,7 +386,6 @@ void Connection::Close()
 }
 
 //////////////////////////////////////////////////
-// Cancel all async operations on an open socket
 void Connection::Cancel()
 {
   if (this->acceptor)
@@ -415,7 +408,6 @@ void Connection::Cancel()
 }
 
 //////////////////////////////////////////////////
-// Read data from the socket
 bool Connection::Read(std::string &data)
 {
   bool result = false;
@@ -467,14 +459,12 @@ bool Connection::Read(std::string &data)
 }
 
 //////////////////////////////////////////////////
-/// Get the address of this connection
 std::string Connection::GetLocalAddress() const
 {
   return this->localAddress;
 }
 
 //////////////////////////////////////////////////
-/// Get the port of this connection
 unsigned int Connection::GetLocalPort() const
 {
   if (this->socket && this->socket->is_open())
@@ -486,14 +476,12 @@ unsigned int Connection::GetLocalPort() const
 }
 
 //////////////////////////////////////////////////
-/// Get the remote address
 std::string Connection::GetRemoteAddress() const
 {
   return this->remoteAddress;
 }
 
 //////////////////////////////////////////////////
-/// Get the remote port number
 unsigned int Connection::GetRemotePort() const
 {
   if (this->socket && this->socket->is_open())
@@ -505,7 +493,6 @@ unsigned int Connection::GetRemotePort() const
 
 
 //////////////////////////////////////////////////
-// Parse a header to get the size of a packet
 std::size_t Connection::ParseHeader(const std::string &header)
 {
   std::size_t data_size = 0;
@@ -521,7 +508,6 @@ std::size_t Connection::ParseHeader(const std::string &header)
 }
 
 //////////////////////////////////////////////////
-/// the read thread
 void Connection::ReadLoop(const ReadCallback &cb)
 {
   std::string data;
@@ -553,7 +539,6 @@ void Connection::ReadLoop(const ReadCallback &cb)
 }
 
 //////////////////////////////////////////////////
-// Get the local endpoint
 boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
 {
   boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
@@ -595,14 +580,12 @@ std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep)
 }
 
 //////////////////////////////////////////////////
-/// Get the remote hostname
 std::string Connection::GetRemoteHostname() const
 {
   return this->GetHostname(this->GetRemoteEndpoint());
 }
 
 //////////////////////////////////////////////////
-/// Get the local hostname
 std::string Connection::GetLocalHostname() const
 {
   return this->GetHostname(this->GetLocalEndpoint());

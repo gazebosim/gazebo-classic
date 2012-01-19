@@ -29,7 +29,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world)
     : UniversalJoint<BulletJoint>()
 {
@@ -37,13 +36,11 @@ BulletUniversalJoint::BulletUniversalJoint(btDynamicsWorld *_world)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 BulletUniversalJoint::~BulletUniversalJoint()
 {
 }
 
 //////////////////////////////////////////////////
-/// Attach the two bodies with this joint
 void BulletUniversalJoint::Attach(Link *_one, Link *_two)
 {
   UniversalJoint<BulletJoint>::Attach(_one, _two);
@@ -77,21 +74,18 @@ void BulletUniversalJoint::Attach(Link *_one, Link *_two)
 }
 
 //////////////////////////////////////////////////
-// Get the anchor point
 math::Vector3 BulletUniversalJoint::GetAnchor(int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-// Set the anchor point
 void BulletUniversalJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Get the first axis of rotation
 math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 {
   btmath::Vector3 axis =
@@ -100,21 +94,18 @@ math::Vector3 BulletUniversalJoint::GetAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void BulletUniversalJoint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Set the first axis of rotation
 void BulletUniversalJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Get the angle of an axis
 math::Angle BulletUniversalJoint::GetAngle(int _index) const
 {
   if (_index == 0)
@@ -124,7 +115,6 @@ math::Angle BulletUniversalJoint::GetAngle(int _index) const
 }
 
 //////////////////////////////////////////////////
-// Get the angular rate of an axis
 double BulletUniversalJoint::GetVelocity(int _index) const
 {
   gzerr << "Not implemented\n";
@@ -132,28 +122,24 @@ double BulletUniversalJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void BulletUniversalJoint::SetVelocity(int _index, double _angle)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Set the torque of this joint
 void BulletUniversalJoint::SetForce(int _index, double _torque)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void BulletUniversalJoint::SetMaxForce(int _index, double _t)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double BulletUniversalJoint::GetMaxForce(int _index)
 {
   gzerr << "Not implemented\n";
@@ -161,7 +147,6 @@ double BulletUniversalJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-/// Set the high stop of an axis(index).
 void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
 {
   if (this->constraint)
@@ -177,7 +162,6 @@ void BulletUniversalJoint::SetHighStop(int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-/// Set the low stop of an axis(index).
 void BulletUniversalJoint::SetLowStop(int _index, math::Angle _angle)
 {
   if (this->constraint)
@@ -192,7 +176,6 @@ void BulletUniversalJoint::SetLowStop(int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the high stop of an axis(index).
 math::Angle BulletUniversalJoint::GetHighStop(int _index)
 {
   math::Angle result;
@@ -212,7 +195,6 @@ math::Angle BulletUniversalJoint::GetHighStop(int _index)
 }
 
 //////////////////////////////////////////////////
-/// \brief Get the low stop of an axis(index).
 math::Angle BulletUniversalJoint::GetLowStop(int _index)
 {
   math::Angle result;

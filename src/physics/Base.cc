@@ -143,28 +143,24 @@ bool Base::GetSaveable() const
 }
 
 //////////////////////////////////////////////////
-// Return the ID of the parent
 int Base::GetParentId() const
 {
   return this->parent == NULL ? 0 : this->parent->GetId();
 }
 
 //////////////////////////////////////////////////
-// Set the parent
 void Base::SetParent(BasePtr _parent)
 {
   this->parent = _parent;
 }
 
 //////////////////////////////////////////////////
-// Get the parent
 BasePtr Base::GetParent() const
 {
   return this->parent;
 }
 
 //////////////////////////////////////////////////
-// Add a child to this entity
 void Base::AddChild(BasePtr _child)
 {
   if (_child == NULL)
@@ -266,7 +262,6 @@ BasePtr Base::GetById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-// Get by name helper
 BasePtr Base::GetByName(const std::string &_name)
 {
   if (this->GetCompleteScopedName() == _name ||

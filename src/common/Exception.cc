@@ -29,7 +29,6 @@ using namespace std;
 
 
 //////////////////////////////////////////////////
-/// Default constructor
 Exception::Exception(const char *_file, int _line, std::string _msg)
 {
   this->file = _file;
@@ -40,7 +39,6 @@ Exception::Exception(const char *_file, int _line, std::string _msg)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Exception::~Exception()
 {
   gazebo::common::Console::Instance()->ColorErr("Exception",
@@ -48,14 +46,12 @@ Exception::~Exception()
 }
 
 //////////////////////////////////////////////////
-/// Return the error file
 std::string Exception::GetErrorFile() const
 {
   return this->file;
 }
 
 //////////////////////////////////////////////////
-/// Return the error string
 std::string Exception::GetErrorStr() const
 {
   return this->str;

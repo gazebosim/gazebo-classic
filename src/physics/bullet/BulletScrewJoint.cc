@@ -30,7 +30,6 @@
 using namespace gazebo;
 
 //////////////////////////////////////////////////
-// Constructor
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world)
     : ScrewJoint<BulletJoint>()
 {
@@ -41,20 +40,17 @@ BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world)
 
 
 //////////////////////////////////////////////////
-// Destructor
 BulletScrewJoint::~BulletScrewJoint()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the joint
 void BulletScrewJoint::Load(XMLConfigNode *_node)
 {
   ScrewJoint<BulletJoint>::Load(_node);
 }
 
 //////////////////////////////////////////////////
-/// Attach the two bodies with this joint
 void BulletScrewJoint::Attach(Body *_one, Body *_two)
 {
   ScrewJoint<BulletJoint>::Attach(_one, _two);
@@ -83,21 +79,18 @@ void BulletScrewJoint::Attach(Body *_one, Body *_two)
 }
 
 //////////////////////////////////////////////////
-// Get the axis of rotation
 Vector3 BulletScrewJoint::GetAxis(int _index) const
 {
   return **this->axisP;
 }
 
 //////////////////////////////////////////////////
-// Get the position of the joint
 Angle BulletScrewJoint::GetAngle(int _index) const
 {
   return ((btSliderConstraint*)this->constraint)->getLinearPos();
 }
 
 //////////////////////////////////////////////////
-// Get the rate of change
 double BulletScrewJoint::GetVelocity(int _index) const
 {
   gzerr(0) << "Not implemented in bullet\n";
@@ -105,35 +98,30 @@ double BulletScrewJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
 void BulletScrewJoint::SetVelocity(int _index, double _angle)
 {
   gzerr(0) << "Not implemented in bullet\n";
 }
 
 //////////////////////////////////////////////////
-// Set the axis of motion
 void BulletScrewJoint::SetAxis(int _index, const Vector3 &_axis)
 {
   gzerr(0) << "Not implemented in bullet\n";
 }
 
 //////////////////////////////////////////////////
-// Set the joint damping
 void BulletScrewJoint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr(0) << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-// Set the screw force
 void BulletScrewJoint::SetForce(int _index, double _force)
 {
   gzerr(0) << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-/// Set the high stop of an axis(index).
 void BulletScrewJoint::SetHighStop(int _index, Angle _angle)
 {
   ((btSliderConstraint*)this->constraint)->setUpperLinLimit(
@@ -141,7 +129,6 @@ void BulletScrewJoint::SetHighStop(int _index, Angle _angle)
 }
 
 //////////////////////////////////////////////////
-/// Set the low stop of an axis(index).
 void BulletScrewJoint::SetLowStop(int _index, Angle _angle)
 {
   ((btSliderConstraint*)this->constraint)->setLowerLinLimit(
@@ -149,28 +136,24 @@ void BulletScrewJoint::SetLowStop(int _index, Angle _angle)
 }
 
 //////////////////////////////////////////////////
-///  Get the high stop of an axis(index).
 Angle BulletScrewJoint::GetHighStop(int _index)
 {
   return ((btSliderConstraint*)this->constraint)->getUpperLinLimit();
 }
 
 //////////////////////////////////////////////////
-///  Get the low stop of an axis(index).
 Angle BulletScrewJoint::GetLowStop(int _index)
 {
   return ((btSliderConstraint*)this->constraint)->getLowerLinLimit();
 }
 
 //////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
 void BulletScrewJoint::SetMaxForce(int _index, double _force)
 {
   gzerr(0) << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
 double BulletScrewJoint::GetMaxForce(int /*index*/)
 {
   gzerr(0) << "Not implemented\n";

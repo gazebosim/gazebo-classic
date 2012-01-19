@@ -36,7 +36,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor
 ODELink::ODELink(EntityPtr _parent)
     : Link(_parent)
 {
@@ -44,7 +43,6 @@ ODELink::ODELink(EntityPtr _parent)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 ODELink::~ODELink()
 {
   if (this->linkId)
@@ -53,7 +51,6 @@ ODELink::~ODELink()
 }
 
 //////////////////////////////////////////////////
-// Load the link
 void ODELink::Load(sdf::ElementPtr &_sdf)
 {
   this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(
@@ -67,7 +64,6 @@ void ODELink::Load(sdf::ElementPtr &_sdf)
 
 
 //////////////////////////////////////////////////
-// Init the ODE link
 void ODELink::Init()
 {
   if (!this->IsStatic())
@@ -129,7 +125,6 @@ void ODELink::Init()
 }
 
 //////////////////////////////////////////////////
-// Move callback. Use this to move the visuals
 void ODELink::MoveCallback(dBodyID _id)
 {
   const dReal *p;
@@ -155,7 +150,6 @@ void ODELink::MoveCallback(dBodyID _id)
 }
 
 //////////////////////////////////////////////////
-/// Finalize the link
 void ODELink::Fini()
 {
   Link::Fini();
@@ -167,14 +161,12 @@ void ODELink::Fini()
 }
 
 //////////////////////////////////////////////////
-// Update the link
 void ODELink::Update()
 {
   Link::Update();
 }
 
 //////////////////////////////////////////////////
-// Set whether gravity affects this link
 void ODELink::SetGravityMode(bool _mode)
 {
   this->sdf->GetAttribute("gravity")->Set(_mode);
@@ -185,7 +177,6 @@ void ODELink::SetGravityMode(bool _mode)
 }
 
 //////////////////////////////////////////////////
-// Get the gravity mode
 bool ODELink::GetGravityMode()
 {
   int mode = 0;
@@ -198,7 +189,6 @@ bool ODELink::GetGravityMode()
 }
 
 //////////////////////////////////////////////////
-// Set whether this link will collide with others in the model
 void ODELink::SetSelfCollide(bool _collide)
 {
   this->sdf->GetAttribute("self_collide")->Set(_collide);
@@ -207,7 +197,6 @@ void ODELink::SetSelfCollide(bool _collide)
 }
 
 //////////////////////////////////////////////////
-// Change the ode pose
 void ODELink::OnPoseChange()
 {
   Link::OnPoseChange();
@@ -238,7 +227,6 @@ void ODELink::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-// Return the ID of this link
 dBodyID ODELink::GetODEId() const
 {
   return this->linkId;
@@ -246,7 +234,6 @@ dBodyID ODELink::GetODEId() const
 
 
 //////////////////////////////////////////////////
-// Set whether this link is enabled
 void ODELink::SetEnabled(bool _enable) const
 {
   if (!this->linkId)
@@ -259,7 +246,6 @@ void ODELink::SetEnabled(bool _enable) const
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Get whether this link is enabled in the physics engine
 bool ODELink::GetEnabled() const
 {
   bool result = true;
@@ -271,7 +257,6 @@ bool ODELink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
-// Update the mass matrix
 void ODELink::UpdateMass()
 {
   if (!this->linkId)
@@ -298,7 +283,6 @@ void ODELink::UpdateMass()
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of the link
 void ODELink::SetLinearVel(const math::Vector3 &_vel)
 {
   if (this->linkId)
@@ -308,7 +292,6 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-/// Get the velocity of the link in the world frame
 math::Vector3 ODELink::GetWorldLinearVel() const
 {
   math::Vector3 vel;
@@ -324,7 +307,6 @@ math::Vector3 ODELink::GetWorldLinearVel() const
 }
 
 //////////////////////////////////////////////////
-/// Set the velocity of the link
 void ODELink::SetAngularVel(const math::Vector3 &_vel)
 {
   if (this->linkId)
@@ -336,7 +318,6 @@ void ODELink::SetAngularVel(const math::Vector3 &_vel)
 
 
 //////////////////////////////////////////////////
-/// Get the angular velocity of the link in the world frame
 math::Vector3 ODELink::GetWorldAngularVel() const
 {
   math::Vector3 vel;
@@ -419,7 +400,6 @@ math::Vector3 ODELink::GetWorldForce() const
 
 
 //////////////////////////////////////////////////
-/// Get the torque applied to the link in the world frame
 math::Vector3 ODELink::GetWorldTorque() const
 {
   math::Vector3 torque;
@@ -439,21 +419,18 @@ math::Vector3 ODELink::GetWorldTorque() const
 }
 
 //////////////////////////////////////////////////
-/// Get the bodies space ID
 dSpaceID ODELink::GetSpaceId() const
 {
   return this->spaceId;
 }
 
 //////////////////////////////////////////////////
-/// Set the bodies space ID
 void ODELink::SetSpaceId(dSpaceID _spaceid)
 {
   this->spaceId = _spaceid;
 }
 
 //////////////////////////////////////////////////
-/// Set the linear damping factor
 void ODELink::SetLinearDamping(double _damping)
 {
   if (this->GetODEId())
@@ -461,7 +438,6 @@ void ODELink::SetLinearDamping(double _damping)
 }
 
 //////////////////////////////////////////////////
-/// Set the angular damping factor
 void ODELink::SetAngularDamping(double _damping)
 {
   if (this->GetODEId())
@@ -469,7 +445,6 @@ void ODELink::SetAngularDamping(double _damping)
 }
 
 //////////////////////////////////////////////////
-// Set whether this link is in the kinematic state
 void ODELink::SetKinematic(const bool &_state)
 {
   this->sdf->GetAttribute("kinematic")->Set(_state);
@@ -483,7 +458,6 @@ void ODELink::SetKinematic(const bool &_state)
 }
 
 //////////////////////////////////////////////////
-// Get whether this link is in the kinematic state
 bool ODELink::GetKinematic() const
 {
   bool result = false;

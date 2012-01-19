@@ -28,34 +28,29 @@ using namespace math;
 
 
 //////////////////////////////////////////////////
-// Constructor
 Vector3::Vector3()
     : x(0.0), y(0.0), z(0.0)
 {
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Vector3::Vector3(const double &_x, const double &_y, const double &_z)
     : x(_x), y(_y), z(_z)
 {
 }
 
 //////////////////////////////////////////////////
-// Copy Constructor
 Vector3::Vector3(const Vector3 &_pt)
     : x(_pt.x), y(_pt.y), z(_pt.z)
 {
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Vector3::~Vector3()
 {
 }
 
 //////////////////////////////////////////////////
-// Calc distance to the given point
 double Vector3::Distance(const Vector3 &_pt) const
 {
   return sqrt((this->x-_pt.x)*(this->x-_pt.x) +
@@ -64,21 +59,18 @@ double Vector3::Distance(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-// Returns the length (magnitude) of the vector
 double Vector3::GetLength() const
 {
   return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }
 
 //////////////////////////////////////////////////
-// Return the square of the length (magnitude) of the vector
 double Vector3::GetSquaredLength() const
 {
   return this->x * this->x + this->y * this->y + this->z * this->z;
 }
 
 //////////////////////////////////////////////////
-// Normalize the vector length
 void Vector3::Normalize()
 {
   double d = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
@@ -92,7 +84,6 @@ void Vector3::Normalize()
 }
 
 //////////////////////////////////////////////////
-/// Round to near whole number
 Vector3 Vector3::Round()
 {
   this->x = nearbyint(this->x);
@@ -102,7 +93,6 @@ Vector3 Vector3::Round()
 }
 
 //////////////////////////////////////////////////
-/// Get a rounded version of this vector
 Vector3 Vector3::GetRounded() const
 {
   Vector3 result = *this;
@@ -123,21 +113,18 @@ Vector3 Vector3::GetCrossProd(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-/// Return the dot product of this vector and pt
 double Vector3::GetDotProd(const Vector3 &_pt) const
 {
   return this->x * _pt.x + this->y * _pt.y + this->z * _pt.z;
 }
 
 //////////////////////////////////////////////////
-/// Get the absolute value of the vector
 Vector3 Vector3::GetAbs() const
 {
   return Vector3(fabs(this->x), fabs(this->y), fabs(this->z));
 }
 
 //////////////////////////////////////////////////
-/// Return a vector that is perpendicular to this one.
 Vector3 Vector3::GetPerpendicular() const
 {
   static const double sqrZero = 1e-06 * 1e-06;
@@ -154,7 +141,6 @@ Vector3 Vector3::GetPerpendicular() const
 }
 
 //////////////////////////////////////////////////
-/// Get a normal vector to a triangle
 Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
                            const Vector3 &v3)
 {
@@ -165,7 +151,6 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
 }
 
 //////////////////////////////////////////////////
-// Get a distance to a plane
 double Vector3::GetDistToPlane(const Vector3 &_dir,
                                const Vector3 &_planeNormal, double _d) const
 {
@@ -185,7 +170,6 @@ double Vector3::GetDistToPlane(const Vector3 &_dir,
 }
 
 //////////////////////////////////////////////////
-/// Get distance to a line
 double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 {
   double d = ((*this) - _pt1).GetCrossProd((*this) - _pt2).GetLength();
@@ -194,7 +178,6 @@ double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 }
 
 //////////////////////////////////////////////////
-/// Set this vector's components to the maximum of itself and the passed in
 /// vector
 void Vector3::SetToMax(const Vector3 & _v)
 {
@@ -204,7 +187,6 @@ void Vector3::SetToMax(const Vector3 & _v)
 }
 
 //////////////////////////////////////////////////
-/// Set this vector's components to the minimum of itself and the passed in
 /// vector
 void Vector3::SetToMin(const Vector3 & _v)
 {
@@ -215,7 +197,6 @@ void Vector3::SetToMin(const Vector3 & _v)
 
 
 //////////////////////////////////////////////////
-// Equals operator
 Vector3 &Vector3::operator =(const Vector3 &_pt)
 {
   this->x = _pt.x;
@@ -226,7 +207,6 @@ Vector3 &Vector3::operator =(const Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-/// Equal operator
 const Vector3 &Vector3::operator =(double value)
 {
   this->x = value;
@@ -239,7 +219,6 @@ const Vector3 &Vector3::operator =(double value)
 
 
 //////////////////////////////////////////////////
-// Addition operator
 Vector3 Vector3::operator+(const Vector3 &pt) const
 {
   return Vector3(this->x + pt.x, this->y + pt.y, this->z + pt.z);
@@ -265,7 +244,6 @@ const Vector3 &Vector3::operator-=(const Vector3 &pt)
 
 
 //////////////////////////////////////////////////
-// Division operators
 
 const Vector3 Vector3::operator/(const Vector3 &pt) const
 {
@@ -298,7 +276,6 @@ const Vector3 &Vector3::operator/=(double v)
 
 
 //////////////////////////////////////////////////
-// Mulitplication operators
 const Vector3 Vector3::operator*(const Vector3 &pt) const
 {
   return Vector3(this->x * pt.x, this->y * pt.y, this->z * pt.z);
@@ -328,7 +305,6 @@ const Vector3 &Vector3::operator*=(double v)
 }
 
 //////////////////////////////////////////////////
-// Equality operator
 bool Vector3::operator ==(const Vector3 &_pt) const
 {
   return equal(this->x, _pt.x, 0.001) &&
@@ -337,21 +313,18 @@ bool Vector3::operator ==(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-// Inequality operator
 bool Vector3::operator!=(const Vector3 &pt) const
 {
   return !(*this == pt);
 }
 
 //////////////////////////////////////////////////
-// See if a point is finite (e.g., not nan)
 bool Vector3::IsFinite() const
 {
   return finite(this->x) && finite(this->y) && finite(this->z);
 }
 
 //////////////////////////////////////////////////
-/// [] operator
 double Vector3::operator[](unsigned int index) const
 {
   switch (index)

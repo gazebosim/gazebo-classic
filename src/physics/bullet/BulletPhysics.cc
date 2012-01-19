@@ -53,7 +53,6 @@ using namespace physics;
 GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics);
 
 //////////////////////////////////////////////////
-// Constructor
 BulletPhysics::BulletPhysics(World *_world)
     : PhysicsEngine(world)
 {
@@ -75,7 +74,6 @@ BulletPhysics::BulletPhysics(World *_world)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 BulletPhysics::~BulletPhysics()
 {
   delete this->broadPhase;
@@ -94,7 +92,6 @@ BulletPhysics::~BulletPhysics()
 }
 
 //////////////////////////////////////////////////
-// Load the Bullet engine
 void BulletPhysics::Load(common::XMLConfigNode *_node)
 {
   common::XMLConfigNode *cnode = _node->GetChild("bullet", "physics");
@@ -107,7 +104,6 @@ void BulletPhysics::Load(common::XMLConfigNode *_node)
 }
 
 //////////////////////////////////////////////////
-// Save the Bullet engine
 void BulletPhysics::Save(std::string &_prefix, std::ostream &_stream)
 {
   _stream << _prefix << "<physics:bullet>\n";
@@ -116,7 +112,6 @@ void BulletPhysics::Save(std::string &_prefix, std::ostream &_stream)
 }
 
 //////////////////////////////////////////////////
-// Initialize the Bullet engine
 void BulletPhysics::Init()
 {
   math::Vector3 g = this->gravityP->GetValue();
@@ -124,19 +119,16 @@ void BulletPhysics::Init()
 }
 
 //////////////////////////////////////////////////
-/// Init the engine for threads.
 void BulletPhysics::InitForThread()
 {
 }
 
 //////////////////////////////////////////////////
-// Update the Bullet collisions, create joints
 void BulletPhysics::UpdateCollision()
 {
 }
 
 //////////////////////////////////////////////////
-// Update the Bullet engine
 void BulletPhysics::UpdatePhysics()
 {
   /*common::Time time = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
@@ -155,20 +147,17 @@ void BulletPhysics::UpdatePhysics()
 
 
 //////////////////////////////////////////////////
-// Finilize the Bullet engine
 void BulletPhysics::Fini()
 {
 }
 
 
 //////////////////////////////////////////////////
-// Remove an entity from the physics engine
 void BulletPhysics::RemoveEntity(Entity *_entity)
 {
 }
 
 //////////////////////////////////////////////////
-// Add an entity to the world
 void BulletPhysics::AddEntity(Entity *_entity)
 {
   BulletLink *body = dynamic_cast<BulletLink*>(_entity);
@@ -177,7 +166,6 @@ void BulletPhysics::AddEntity(Entity *_entity)
 }
 
 //////////////////////////////////////////////////
-// Create a new body
 Link *BulletPhysics::CreateLink(Entity *parent)
 {
   BulletLink *body = new BulletLink(parent);
@@ -186,7 +174,6 @@ Link *BulletPhysics::CreateLink(Entity *parent)
 }
 
 //////////////////////////////////////////////////
-/// Create a new collision
 Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 {
   BulletCollision *collision = NULL;
@@ -219,7 +206,6 @@ Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 
 
 //////////////////////////////////////////////////
-// Create a new joint
 Joint *BulletPhysics::CreateJoint(std::string type)
 {
   if (type == "slider")
@@ -239,19 +225,16 @@ Joint *BulletPhysics::CreateJoint(std::string type)
 }
 
 //////////////////////////////////////////////////
-/// Convert an odeMass to Mass
 void BulletPhysics::ConvertMass(Mass *_mass, void *_engineMass)
 {
 }
 
 //////////////////////////////////////////////////
-/// Convert an gazebo Mass to a bullet Mass
 void BulletPhysics::ConvertMass(void *_engineMass, const Mass &_mass)
 {
 }
 
 //////////////////////////////////////////////////
-// Create an object to hold a set of ray collisions
 /*PhysicsRaySensor *BulletPhysics::CreateRaySensor(Link *body)
 {
   return NULL;
@@ -274,7 +257,6 @@ math::Pose BulletPhysics::ConvertPose(btTransform _bt)
 }
 
 //////////////////////////////////////////////////
-/// Convert a gazebo pose to a bullet transform
 btTransform BulletPhysics::ConvertPose(const math::Pose _pose)
 {
   btTransform trans;
@@ -286,7 +268,6 @@ btTransform BulletPhysics::ConvertPose(const math::Pose _pose)
 }
 
 //////////////////////////////////////////////////
-/// Set the gavity vector
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->gravityP->SetValue(_gravity);

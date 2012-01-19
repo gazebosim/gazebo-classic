@@ -118,7 +118,7 @@ void Link::Load(sdf::ElementPtr &_sdf)
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 
-      // this->visPub->Publish(msg);
+      this->visPub->Publish(msg);
 
       std::vector<std::string>::iterator iter;
       iter = std::find(this->visuals.begin(), this->visuals.end(), msg.name());
@@ -322,7 +322,7 @@ void Link::UpdateParameters(sdf::ElementPtr &_sdf)
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 
-      // this->visPub->Publish(msg);
+      this->visPub->Publish(msg);
 
       visualElem = visualElem->GetNextElement();
     }

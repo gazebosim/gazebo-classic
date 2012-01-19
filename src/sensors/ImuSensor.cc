@@ -37,7 +37,6 @@ using namespace gazebo;
 GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor);
 
 //////////////////////////////////////////////////
-// Constructor
 ImuSensor::ImuSensor(Body *body)
     : Sensor(body)
 {
@@ -48,13 +47,11 @@ ImuSensor::ImuSensor(Body *body)
 
 
 //////////////////////////////////////////////////
-// Destructor
 ImuSensor::~ImuSensor()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the ray using parameter from an XMLConfig node
 void ImuSensor::LoadChild(XMLConfigNode *node)
 {
   if (this->body == NULL)
@@ -64,13 +61,11 @@ void ImuSensor::LoadChild(XMLConfigNode *node)
 }
 
 //////////////////////////////////////////////////
-/// Save the sensor info in XML format
 void ImuSensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
 }
 
 //////////////////////////////////////////////////
-// Init the IMU
 void ImuSensor::InitChild()
 {
   Pose bodyPose;
@@ -93,7 +88,6 @@ Vector3 ImuSensor::GetEulerAngles()
 }
 
 //////////////////////////////////////////////////
-// Update the sensor information
 void ImuSensor::UpdateChild()
 {
 //  if (this->active)

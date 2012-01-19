@@ -42,7 +42,6 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-// Constructor
 DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene,
                          bool _autoRender)
 : Camera(_namePrefix, _scene, _autoRender)
@@ -53,34 +52,29 @@ DepthCamera::DepthCamera(const std::string &_namePrefix, Scene *_scene,
 }
 
 //////////////////////////////////////////////////
-// Destructor
 DepthCamera::~DepthCamera()
 {
 }
 
 //////////////////////////////////////////////////
-// Load the camera
 void DepthCamera::Load(sdf::ElementPtr &_sdf)
 {
   Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-// Load the camera
 void DepthCamera::Load()
 {
   Camera::Load();
 }
 
 //////////////////////////////////////////////////
-// Initialize the camera
 void DepthCamera::Init()
 {
   Camera::Init();
 }
 
 //////////////////////////////////////////////////
-// Finalize the camera
 void DepthCamera::Fini()
 {
   Camera::Fini();
@@ -185,7 +179,6 @@ void DepthCamera::PostRender()
 }
 
 //////////////////////////////////////////////////
-// Simulate Depth Data
 void DepthCamera::RenderImpl()
 {
   Ogre::RenderSystem *renderSys;
@@ -279,14 +272,12 @@ void DepthCamera::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-/// Get a pointer to the image data
 const float* DepthCamera::GetDepthData()
 {
   return this->depthBuffer;
 }
 
 //////////////////////////////////////////////////
-// Set the render target for the camera
 void DepthCamera::SetDepthTarget(Ogre::RenderTarget *target)
 {
   this->depthTarget = target;

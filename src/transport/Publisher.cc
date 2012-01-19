@@ -26,7 +26,6 @@ using namespace gazebo;
 using namespace transport;
 
 //////////////////////////////////////////////////
-// Constructor
 Publisher::Publisher(unsigned int _limit, bool _latch)
 {
   this->queueLimit = _limit;
@@ -34,7 +33,6 @@ Publisher::Publisher(unsigned int _limit, bool _latch)
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, bool _latch)
   : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
@@ -43,7 +41,6 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Publisher::~Publisher()
 {
   if (this->messages.size() > 0)
@@ -55,6 +52,7 @@ Publisher::~Publisher()
   delete this->mutex;
 }
 
+//////////////////////////////////////////////////
 bool Publisher::HasConnections() const
 {
   return ((this->publications[0] &&
@@ -66,7 +64,13 @@ bool Publisher::HasConnections() const
 }
 
 //////////////////////////////////////////////////
-// Publish a message
+void Publisher::WaitForConnection() const
+{
+  while (!this->HasConnections())
+    common::Time::MSleep(100);
+}
+
+//////////////////////////////////////////////////
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
                             bool /*_block*/)
 {
@@ -97,7 +101,6 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 }
 
 //////////////////////////////////////////////////
-// Send the lastest message
 void Publisher::SendMessage()
 {
   this->mutex->lock();
@@ -128,21 +131,18 @@ unsigned int Publisher::GetOutgoingCount() const
 }
 
 //////////////////////////////////////////////////
-/// Get the topic name
 std::string Publisher::GetTopic() const
 {
   return this->topic;
 }
 
 //////////////////////////////////////////////////
-/// Get the message type
 std::string Publisher::GetMsgType() const
 {
   return this->msgType;
 }
 
 //////////////////////////////////////////////////
-// Callback when a publish is completed
 void Publisher::OnPublishComplete()
 {
 }

@@ -25,7 +25,6 @@ using namespace gazebo;
 using namespace transport;
 
 //////////////////////////////////////////////////
-// Constructor
 TopicManager::TopicManager()
 {
   this->pauseIncoming = false;
@@ -34,7 +33,6 @@ TopicManager::TopicManager()
 }
 
 //////////////////////////////////////////////////
-// Destructor
 TopicManager::~TopicManager()
 {
   delete this->nodeMutex;
@@ -42,7 +40,6 @@ TopicManager::~TopicManager()
 }
 
 //////////////////////////////////////////////////
-// Init the topic Manager
 void TopicManager::Init()
 {
   this->advertisedTopics.clear();
@@ -51,8 +48,13 @@ void TopicManager::Init()
   this->nodes.clear();
 }
 
+//////////////////////////////////////////////////
 void TopicManager::Fini()
 {
+  // These two lines make sure that pending messages get sent out
+  this->ProcessNodes();
+  ConnectionManager::Instance()->RunUpdate();
+
   PublicationPtr_M::iterator iter;
   for (iter = this->advertisedTopics.begin();
        iter != this->advertisedTopics.end(); ++iter)
@@ -89,7 +91,6 @@ void TopicManager::RemoveNode(unsigned int _id)
 }
 
 //////////////////////////////////////////////////
-// Process all nodes
 void TopicManager::ProcessNodes()
 {
   std::vector<NodePtr>::iterator iter;
@@ -118,7 +119,6 @@ void TopicManager::ProcessNodes()
 }
 
 //////////////////////////////////////////////////
-/// Send a message
 void TopicManager::Publish(const std::string &_topic,
                            const google::protobuf::Message &_message,
                            const boost::function<void()> &_cb)
@@ -134,7 +134,9 @@ void TopicManager::Publish(const std::string &_topic,
   PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
+  {
     pub->Publish(_message, _cb);
+  }
 
   if (dbgPub && dbgPub->GetCallbackCount() > 0)
   {
@@ -155,7 +157,6 @@ PublicationPtr TopicManager::FindPublication(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
-// Subscribe to a topic give some options
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 {
   // Create a subscription (essentially a callback that gets
@@ -182,7 +183,6 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
 
 //////////////////////////////////////////////////
-// Handle an incoming message
 void TopicManager::HandleIncoming()
 {
   // implement this
@@ -190,7 +190,6 @@ void TopicManager::HandleIncoming()
 }
 
 //////////////////////////////////////////////////
-// Unsubscribe from a topic
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const CallbackHelperPtr &_sub)
 {
@@ -294,7 +293,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
 
 
 //////////////////////////////////////////////////
-// Add a new publication to the list of advertised publication
 PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
                                                  const std::string &msgType)
 {
@@ -325,7 +323,6 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
 }
 
 //////////////////////////////////////////////////
-/// Stop advertising on a topic
 void TopicManager::Unadvertise(const std::string &_topic)
 {
   std::string t;
@@ -348,14 +345,12 @@ void TopicManager::Unadvertise(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
-/// Register a new topic namespace
 void TopicManager::RegisterTopicNamespace(const std::string &_name)
 {
   ConnectionManager::Instance()->RegisterTopicNamespace(_name);
 }
 
 //////////////////////////////////////////////////
-/// Get all the topic namespaces
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);

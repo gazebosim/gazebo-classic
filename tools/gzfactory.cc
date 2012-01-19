@@ -31,17 +31,18 @@ int main(int argc, char **argv)
                       (std::istreambuf_iterator<char>()));
 
   transport::init();
-  transport::NodePtr node(new transport::Node());
 
+  transport::run();
+
+  transport::NodePtr node(new transport::Node());
   node->Init(argv[1]);
 
   transport::PublisherPtr pub = node->Advertise<msgs::Factory>("~/factory");
-  transport::run();
+  pub->WaitForConnection();
 
   msgs::Factory msg;
   msg.set_sdf(content);
   pub->Publish(msg, true);
 
   transport::fini();
-  printf("Spawn complete\n");
 }

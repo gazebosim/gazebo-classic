@@ -427,7 +427,6 @@ void Visual::Update()
 }
 
 //////////////////////////////////////////////////
-/// Set the name of the visual
 void Visual::SetName(const std::string &name_)
 {
   this->name = name_;
@@ -1297,7 +1296,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 }
 
 //////////////////////////////////////////////////
-/// Insert a mesh into Ogre
 void Visual::InsertMesh(const common::Mesh *mesh)
 {
   Ogre::MeshPtr ogreMesh;
@@ -1467,7 +1465,6 @@ void Visual::InsertMesh(const common::Mesh *mesh)
 }
 
 //////////////////////////////////////////////////
-/// Update a visual based on a message
 void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
   // TODO: Put back in, and check for performance improvements.
@@ -1575,7 +1572,6 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 }
 
 //////////////////////////////////////////////////
-/// Get the parent visual, if one exists
 VisualPtr Visual::GetParent() const
 {
   return this->parent;

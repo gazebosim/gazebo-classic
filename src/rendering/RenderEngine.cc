@@ -495,7 +495,6 @@ void RenderEngine::SetupRenderSystem()
 }
 
 //////////////////////////////////////////////////
-// Returns true if the graphics card support GLSL
 bool RenderEngine::HasGLSL()
 {
   const Ogre::RenderSystemCapabilities *capabilities;

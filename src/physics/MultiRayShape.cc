@@ -36,7 +36,6 @@ MultiRayShape::~MultiRayShape()
 }
 
 //////////////////////////////////////////////////
-// Load a multi-ray shape from xml file
 void MultiRayShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);

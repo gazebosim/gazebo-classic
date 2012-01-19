@@ -27,20 +27,17 @@ using namespace common;
 
 
 //////////////////////////////////////////////////
-/// Constructor
   STLLoader::STLLoader()
 : MeshLoader()
 {
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 STLLoader::~STLLoader()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load a mesh
 Mesh *STLLoader::Load(const std::string &filename)
 {
   Mesh *mesh = new Mesh();
@@ -65,7 +62,6 @@ Mesh *STLLoader::Load(const std::string &filename)
 }
 
 //////////////////////////////////////////////////
-/// Reads an ASCII STL (stereolithography) file.
 void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 {
   int count;
@@ -159,7 +155,6 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 }
 
 //////////////////////////////////////////////////
-/// Reads a binary STL (stereolithography) file.
 void STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
 {
   int i;
@@ -215,7 +210,6 @@ void STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
 }
 
 //////////////////////////////////////////////////
-/// Compares two strings for equality, disregarding case.
 bool STLLoader::Leqi(char* _string1, char* _string2)
 {
   int i;
@@ -254,7 +248,6 @@ bool STLLoader::Leqi(char* _string1, char* _string2)
 }
 
 //////////////////////////////////////////////////
-/// Finds if a vector occurs in a table.
 int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
 {
   int i;
@@ -278,7 +271,6 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
 }
 
 //////////////////////////////////////////////////
-/// Read 1 float from a binary file.
 float STLLoader::FloatRead(FILE *_filein)
 {
   float rval;
@@ -289,7 +281,6 @@ float STLLoader::FloatRead(FILE *_filein)
 }
 
 //////////////////////////////////////////////////
-/// Reads a long int from a binary file.
 uint32_t STLLoader::LongIntRead(FILE *_filein)
 {
   union
@@ -307,7 +298,6 @@ uint32_t STLLoader::LongIntRead(FILE *_filein)
 }
 
 //////////////////////////////////////////////////
-/// Reads a short int from a binary file.
 uint16_t STLLoader::ShortIntRead(FILE *_filein)
 {
   uint8_t c1;

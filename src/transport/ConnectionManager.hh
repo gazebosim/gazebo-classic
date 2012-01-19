@@ -101,13 +101,15 @@ namespace gazebo
 
       private: void ProcessMessage(const std::string &_packet);
 
+      public: void RunUpdate();
+
       private: ConnectionPtr masterConn;
       private: Connection *serverConn;
 
       private: std::list<ConnectionPtr> connections;
 
       private: bool initialized;
-      private: bool stop;
+      private: bool stop, stopped;
       private: boost::thread *thread;
 
       private: unsigned int tmpIndex;

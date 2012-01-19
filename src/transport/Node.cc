@@ -76,7 +76,6 @@ void Node::Init(const std::string &_space)
 }
 
 //////////////////////////////////////////////////
-/// Get the topic namespace for this node
 std::string Node::GetTopicNamespace() const
 {
   return this->topicNamespace;

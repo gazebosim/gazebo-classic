@@ -22,27 +22,23 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-/// Constructor
 CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 CylinderShape::~CylinderShape()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the cylinder
 void CylinderShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-/// Initialize the cylinder
 void CylinderShape::Init()
 {
   this->SetSize(this->sdf->GetValueDouble("radius"),
@@ -51,7 +47,6 @@ void CylinderShape::Init()
 
 
 //////////////////////////////////////////////////
-// Set radius
 void CylinderShape::SetRadius(const double &_radius)
 {
   this->sdf->GetAttribute("radius")->Set(_radius);
@@ -60,7 +55,6 @@ void CylinderShape::SetRadius(const double &_radius)
 }
 
 //////////////////////////////////////////////////
-// Set length
 void CylinderShape::SetLength(const double &_length)
 {
   this->sdf->GetAttribute("length")->Set(_length);
@@ -69,7 +63,6 @@ void CylinderShape::SetLength(const double &_length)
 }
 
 //////////////////////////////////////////////////
-/// Set the size of the cylinder
 void CylinderShape::SetSize(const double &_radius, const double &_length)
 {
   this->sdf->GetAttribute("radius")->Set(_radius);

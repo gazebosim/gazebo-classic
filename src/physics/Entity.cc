@@ -116,7 +116,7 @@ void Entity::Load(sdf::ElementPtr &_sdf)
   if (this->parent)
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
 
-  // this->visPub->Publish(*this->visualMsg);
+  this->visPub->Publish(*this->visualMsg);
 
   this->poseMsg->set_name(this->GetScopedName());
 
@@ -349,7 +349,6 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 
 
 //////////////////////////////////////////////////
-// Set the abs pose of the entity
 //   The entity stores an initialRelativePose and dynamic worldPose
 //   When calling SetWroldPose (SWP) or SetRelativePose on an entity
 //   that is a Model (M), Canonical Body (CB) or Body (B), different

@@ -34,7 +34,6 @@ static const float PITCH_LIMIT_LOW = -M_PI*0.5 + 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 
 //////////////////////////////////////////////////
-/// Constructor
 OrbitViewController::OrbitViewController(UserCamera *camera)
   : ViewController(camera), distance(5.0f)
 {
@@ -54,7 +53,6 @@ OrbitViewController::OrbitViewController(UserCamera *camera)
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 OrbitViewController::~OrbitViewController()
 {
   this->refVisual.reset();
@@ -114,7 +112,6 @@ void OrbitViewController::Init()
 }
 
 //////////////////////////////////////////////////
-// Update
 void OrbitViewController::Update()
 {
   if (!this->enabled)
@@ -137,7 +134,6 @@ void OrbitViewController::Update()
 }
 
 //////////////////////////////////////////////////
-/// Handle a mouse event
 void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
   if (!this->enabled)
@@ -207,7 +203,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-// Translate the focal point
 void OrbitViewController::Translate(math::Vector3 vec)
 {
   this->focalPoint += this->camera->GetWorldPose().rot * vec;
@@ -215,7 +210,6 @@ void OrbitViewController::Translate(math::Vector3 vec)
 }
 
 //////////////////////////////////////////////////
-// Normalize yaw value
 void OrbitViewController::NormalizeYaw(float &v)
 {
   v = fmod(v, M_PI*2);
@@ -226,7 +220,6 @@ void OrbitViewController::NormalizeYaw(float &v)
 }
 
 //////////////////////////////////////////////////
-// Normalize pitch value
 void OrbitViewController::NormalizePitch(float &v)
 {
   if (v < PITCH_LIMIT_LOW)
@@ -245,7 +238,6 @@ void OrbitViewController::Zoom(float _amount)
 }
 
 //////////////////////////////////////////////////
-/// Get the type name of this view controller
 std::string OrbitViewController::GetTypeString()
 {
   return TYPE_STRING;

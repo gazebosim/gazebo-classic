@@ -33,7 +33,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletMotionState::BulletMotionState(Link *_body)
   : btMotionState()
 {
@@ -42,55 +41,47 @@ BulletMotionState::BulletMotionState(Link *_body)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 BulletMotionState::~BulletMotionState()
 {
 }
 
 //////////////////////////////////////////////////
-// Set the visual node
 void BulletMotionState::SetVisual(Visual *_vis)
 {
   this->visual = _vis;
 }
 
 //////////////////////////////////////////////////
-/// Get the pose
 math::Pose BulletMotionState::GetWorldPose() const
 {
   return this->worldPose;
 }
 
 //////////////////////////////////////////////////
-/// Set the position of the body
 void BulletMotionState::SetWorldPosition(const math::Vector3 &_pos)
 {
   this->worldPose._pos = _pos;
 }
 
 //////////////////////////////////////////////////
-/// Set the rotation of the body
 void BulletMotionState::SetWorldRotation(const common::Quatern &_rot)
 {
   this->worldPose._rot = _rot;
 }
 
 //////////////////////////////////////////////////
-/// Set the pose
 void BulletMotionState::SetWorldPose(const math::Pose &_pose)
 {
   this->worldPose = _pose;
 }
 
 //////////////////////////////////////////////////
-/// Set the center of mass offset
 void BulletMotionState::SetCoMOffset(const math::Pose &_com)
 {
   this->comOffset = _com;
 }
 
 //////////////////////////////////////////////////
-// Get the world transform
 void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 {
   math::Pose result = this->worldPose;
@@ -100,7 +91,6 @@ void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 }
 
 //////////////////////////////////////////////////
-// Set the world transform
 void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
 {
   if (this->visual == NULL)

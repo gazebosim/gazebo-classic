@@ -37,20 +37,17 @@ using namespace gazebo;
 using namespace common;
 
 //////////////////////////////////////////////////
-/// Constructor
   ColladaLoader::ColladaLoader()
 : MeshLoader(), meter(1.0)
 {
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 ColladaLoader::~ColladaLoader()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load a mesh
 Mesh *ColladaLoader::Load(const std::string &_filename)
 {
   TiXmlDocument xmlDoc;

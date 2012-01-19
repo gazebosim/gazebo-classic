@@ -29,14 +29,12 @@ using namespace common;
 DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
 
 //////////////////////////////////////////////////
-/// Constructor
   DiagnosticManager::DiagnosticManager()
 : enabled(false)
 {
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 DiagnosticManager::~DiagnosticManager()
 {
 }
@@ -50,7 +48,6 @@ DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-/// A diagnostic timer has started
 void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
 {
   this->timers[_timer->GetName()] = Time();
@@ -59,7 +56,6 @@ void DiagnosticManager::TimerStart(DiagnosticTimer *_timer)
 
 
 //////////////////////////////////////////////////
-/// A diagnostic timer has stoped
 void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)
 {
   this->timers[_timer->GetName()] = _timer->GetElapsed();
@@ -67,14 +63,12 @@ void DiagnosticManager::TimerStop(DiagnosticTimer *_timer)
 }
 
 //////////////////////////////////////////////////
-/// Get the number of timers
 int DiagnosticManager::GetTimerCount() const
 {
   return this->timers.size();
 }
 
 //////////////////////////////////////////////////
-/// Get a specific time
 Time DiagnosticManager::GetTime(int _index) const
 {
   std::map<std::string, Time>::const_iterator iter;
@@ -91,7 +85,6 @@ Time DiagnosticManager::GetTime(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Get a label for a timer
 std::string DiagnosticManager::GetLabel(int _index) const
 {
   std::map<std::string, Time>::const_iterator iter;
@@ -108,7 +101,6 @@ std::string DiagnosticManager::GetLabel(int _index) const
 }
 
 //////////////////////////////////////////////////
-/// Get a time based on a label
 Time DiagnosticManager::GetTime(const std::string &_label) const
 {
   std::map<std::string, Time>::const_iterator iter;

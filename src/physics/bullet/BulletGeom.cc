@@ -38,7 +38,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 BulletCollision::BulletCollision(Link *_body)
     : Collision(_body)
 {
@@ -48,7 +47,6 @@ BulletCollision::BulletCollision(Link *_body)
 }
 
 //////////////////////////////////////////////////
-// Destructor
 BulletCollision::~BulletCollision()
 {
   delete this->collisionShape;
@@ -56,7 +54,6 @@ BulletCollision::~BulletCollision()
 }
 
 //////////////////////////////////////////////////
-/// Load the collision
 void BulletCollision::Load(common::XMLConfigNode *_node)
 {
   Collision::Load(_node);
@@ -64,21 +61,18 @@ void BulletCollision::Load(common::XMLConfigNode *_node)
 }
 
 //////////////////////////////////////////////////
-// Save the body based on our common::XMLConfig node
 void BulletCollision::Save(std::string &_prefix, std::ostream &_stream)
 {
   Collision::Save(_prefix, _stream);
 }
 
 //////////////////////////////////////////////////
-// Update
 void BulletCollision::Update()
 {
   Collision::Update();
 }
 
 //////////////////////////////////////////////////
-// On pose change
 void BulletCollision::OnPoseChange()
 {
   math::Pose pose = this->GetRelativePose();
@@ -88,19 +82,16 @@ void BulletCollision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-/// Set the category bits, used during collision detection
 void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
 }
 
 //////////////////////////////////////////////////
-/// Set the collide bits, used during collision detection
 void BulletCollision::SetCollideBits(unsigned int _bits)
 {
 }
 
 //////////////////////////////////////////////////
-/// Get the mass of the collision
 Mass BulletCollision::GetLinkMassMatrix()
 {
   Mass result;
@@ -108,7 +99,6 @@ Mass BulletCollision::GetLinkMassMatrix()
 }
 
 //////////////////////////////////////////////////
-/// Get the bounding box, defined by the physics engine
 void BulletCollision::GetBoundingBox(math::Vector3 &_min,
                                      math::Vector3 &_max) const
 {
@@ -123,7 +113,6 @@ void BulletCollision::GetBoundingBox(math::Vector3 &_min,
 }
 
 //////////////////////////////////////////////////
-// Set the collision shape
 void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 {
   this->collisionShape = _shape;
@@ -136,14 +125,12 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape)
 }
 
 //////////////////////////////////////////////////
-/// Get the bullet collision shape
 btCollisionShape *BulletCollision::GetCollisionShape() const
 {
   return this->collisionShape;
 }
 
 //////////////////////////////////////////////////
-// Set the index of the compound shape
 void BulletCollision::SetCompoundShapeIndex(int _index)
 {
   this->compoundShapeIndex = 0;

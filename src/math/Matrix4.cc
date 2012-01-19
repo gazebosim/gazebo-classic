@@ -37,21 +37,18 @@ const Matrix4 Matrix4::ZERO(
 
 
 //////////////////////////////////////////////////
-// Default constructor
 Matrix4::Matrix4()
 {
   memset(this->m, 0, sizeof(this->m[0][0])*16);
 }
 
 //////////////////////////////////////////////////
-// Copy constructor
 Matrix4::Matrix4(const Matrix4 &_m)
 {
   memcpy(this->m, _m.m, sizeof(this->m[0][0])*16);
 }
 
 //////////////////////////////////////////////////
-// Constructor
 Matrix4::Matrix4(double _v00, double _v01, double _v02, double _v03,
                  double _v10, double _v11, double _v12, double _v13,
                  double _v20, double _v21, double _v22, double _v23,
@@ -64,13 +61,11 @@ Matrix4::Matrix4(double _v00, double _v01, double _v02, double _v03,
 }
 
 //////////////////////////////////////////////////
-// Destructor
 Matrix4::~Matrix4()
 {
 }
 
 //////////////////////////////////////////////////
-// Constructor
 void Matrix4::Set(double _v00, double _v01, double _v02, double _v03,
                   double _v10, double _v11, double _v12, double _v13,
                   double _v20, double _v21, double _v22, double _v23,
@@ -98,7 +93,6 @@ void Matrix4::Set(double _v00, double _v01, double _v02, double _v03,
 }
 
 //////////////////////////////////////////////////
-// Set translation
 void Matrix4::SetTranslate(const Vector3 &_t)
 {
   this->m[0][3] = _t.x;
@@ -107,7 +101,6 @@ void Matrix4::SetTranslate(const Vector3 &_t)
 }
 
 //////////////////////////////////////////////////
-/// Set the scale
 void Matrix4::SetScale(const Vector3 &_s)
 {
   this->m[0][0] = _s.x;
@@ -118,7 +111,6 @@ void Matrix4::SetScale(const Vector3 &_s)
 
 
 //////////////////////////////////////////////////
-// Equality operator
 Matrix4 &Matrix4::operator =(const Matrix4 &_mat)
 {
   memcpy(this->m, _mat.m, sizeof(this->m[0][0])*16);
@@ -126,7 +118,6 @@ Matrix4 &Matrix4::operator =(const Matrix4 &_mat)
 }
 
 //////////////////////////////////////////////////
-// Equality operator
 const Matrix4 &Matrix4::operator =(const Matrix3 &mat)
 {
   this->m[0][0] = mat.m[0][0];
@@ -146,7 +137,6 @@ const Matrix4 &Matrix4::operator =(const Matrix3 &mat)
 
 
 //////////////////////////////////////////////////
-// Mult operator
 Matrix4 Matrix4::operator*(const Matrix3 &m2) const
 {
   Matrix4 r;
@@ -168,7 +158,6 @@ Matrix4 Matrix4::operator*(const Matrix3 &m2) const
 }
 
 //////////////////////////////////////////////////
-// Mult operator
 Matrix4 Matrix4::operator*(const Matrix4 &m2) const
 {
   Matrix4 r;
@@ -257,7 +246,6 @@ Matrix4 Matrix4::operator*(const Matrix4 &m2) const
 }
 
 //////////////////////////////////////////////////
-/// Multiplication operator
 Vector3 Matrix4::operator*(const Vector3 &_vec) const
 {
   Vector3 result;
@@ -271,7 +259,6 @@ Vector3 Matrix4::operator*(const Vector3 &_vec) const
 }
 
 //////////////////////////////////////////////////
-// Return true if affine
 bool Matrix4::IsAffine() const
 {
   return this->m[3][0] == 0 && this->m[3][1] == 0 &&
@@ -279,7 +266,6 @@ bool Matrix4::IsAffine() const
 }
 
 //////////////////////////////////////////////////
-// Affine transform
 Vector3 Matrix4::TransformAffine(const Vector3 &_v) const
 {
   if (!this->IsAffine())

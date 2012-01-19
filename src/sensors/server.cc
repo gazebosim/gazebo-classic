@@ -28,7 +28,6 @@
 bool quit = false;
 
 //////////////////////////////////////////////////
-// sighandler to shut everything down properly
 void SignalHandler(int)
 {
   quit = true;

@@ -32,7 +32,6 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-// Constructor
 HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
@@ -42,20 +41,17 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 
 
 //////////////////////////////////////////////////
-// Destructor
 HeightmapShape::~HeightmapShape()
 {
   // TODO delete this->ogreHeightmap;
 }
 
 //////////////////////////////////////////////////
-/// Update function.
 void HeightmapShape::Update()
 {
 }
 
 //////////////////////////////////////////////////
-/// Load the heightmap
 void HeightmapShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
@@ -69,7 +65,6 @@ void HeightmapShape::Load(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-/// Initialize the heightmap
 void HeightmapShape::Init()
 {
 }

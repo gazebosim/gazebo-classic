@@ -39,7 +39,6 @@ using namespace common;
 int Image::count = 0;
 
 //////////////////////////////////////////////////
-/// Constructor
 Image::Image()
 {
   if (count == 0)
@@ -51,7 +50,6 @@ Image::Image()
 }
 
 //////////////////////////////////////////////////
-/// Destructor
 Image::~Image()
 {
   count--;
@@ -65,7 +63,6 @@ Image::~Image()
 }
 
 //////////////////////////////////////////////////
-/// Load
 int Image::Load(const std::string &_filename)
 {
   struct stat st;
@@ -135,7 +132,6 @@ int Image::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-/// Set the image from raw data (R8G8B8)
 void Image::SetFromData(const unsigned char *data, unsigned int width,
     unsigned int height, int scanline_bytes, unsigned int bpp)
 {
@@ -159,7 +155,6 @@ void Image::SetFromData(const unsigned char *data, unsigned int width,
 }
 
 //////////////////////////////////////////////////
-/// Get the image as a data array
 void Image::GetData(unsigned char **_data, unsigned int &_count)
 {
   int redmask = FI_RGBA_RED_MASK;
@@ -207,7 +202,6 @@ void Image::GetData(unsigned char **_data, unsigned int &_count)
 }
 
 //////////////////////////////////////////////////
-/// Get the width
 unsigned int Image::GetWidth() const
 {
   if (!this->Valid())
@@ -217,7 +211,6 @@ unsigned int Image::GetWidth() const
 }
 
 //////////////////////////////////////////////////
-/// Get the height
 unsigned int Image::GetHeight() const
 {
   if (!this->Valid())
@@ -227,7 +220,6 @@ unsigned int Image::GetHeight() const
 }
 
 //////////////////////////////////////////////////
-/// Get the size of one pixel in bits
 unsigned int Image::GetBPP() const
 {
   if (!this->Valid())
@@ -237,7 +229,6 @@ unsigned int Image::GetBPP() const
 }
 
 //////////////////////////////////////////////////
-/// Get a pixel color value
 Color Image::GetPixel(unsigned int _x, unsigned int _y)
 {
   Color clr;
@@ -288,7 +279,6 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y)
 }
 
 //////////////////////////////////////////////////
-/// Get the average color
 Color Image::GetAvgColor()
 {
   unsigned int x, y;
@@ -306,7 +296,6 @@ Color Image::GetAvgColor()
 }
 
 //////////////////////////////////////////////////
-/// Get the max color
 Color Image::GetMaxColor()
 {
   unsigned int x, y;
@@ -332,7 +321,6 @@ Color Image::GetMaxColor()
 }
 
 //////////////////////////////////////////////////
-/// Rescale the image
 void Image::Rescale(int _width, int _height)
 {
   this->bitmap = FreeImage_Rescale(this->bitmap, _width, _height,
@@ -340,7 +328,6 @@ void Image::Rescale(int _width, int _height)
 }
 
 //////////////////////////////////////////////////
-/// Render this image using opengl
 /*void Image::RenderOpengl(float destW, float destH)
   {
   if (!this->Valid())
@@ -390,14 +377,12 @@ FreeImage_Unload(resizedBitmap);
 }*/
 
 //////////////////////////////////////////////////
-/// Returns whether this is a valid image
 bool Image::Valid() const
 {
   return this->bitmap != NULL;
 }
 
 //////////////////////////////////////////////////
-/// Get the full filename of the image
 std::string Image::GetFilename() const
 {
   return this->fullName;
