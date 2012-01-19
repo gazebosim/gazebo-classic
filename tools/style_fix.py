@@ -39,7 +39,7 @@ def ParseArguments(args):
 def ProcessFile(filename):
   #lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
   lines = codecs.open(filename, 'r', 'utf8', 'replace').readlines()
-  outFile = open(filename,'w')
+  #outFile = open(filename,'w')
   # Remove trailing '\r'.
   for linenum in range(len(lines)):
     lines[linenum] = lines[linenum].rstrip('\n')
@@ -62,8 +62,10 @@ def ProcessFile(filename):
     #  line = re.sub(r'//({)','// \\1', line)
     #  line = re.sub(r'//(})','// \\1', line)
 
-    if '//' in line and '//////////////////////////////////////////////////' in prevLine:
-      continue
+    if len(line) > 80:
+      index = line.rfind(' ', 0, 80)
+      print line[0:index]
+      print line[index:len(line)]
 
     # Skip blank lines after start of new block
     #if re.search(r'^\s*$',line) or len(line) == 0:
@@ -143,7 +145,7 @@ def ProcessFile(filename):
     #if funcStart > 0:
     #  for i in range(len(paramSub)):
     #    line = re.sub(paramSub[i], paramRep[i],line)
-    print >>outFile, line
+    #print >>outFile, line
     #print line
 
 def main():
