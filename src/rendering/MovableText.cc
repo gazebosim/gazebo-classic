@@ -24,13 +24,6 @@
  * @update  2007 by independentCreations see independentCreations@gmail.com
  */
 
-#include <OGRE/OgreFontManager.h>
-#include <OGRE/OgreMaterialManager.h>
-#include <OGRE/OgreHardwareBufferManager.h>
-#include <OGRE/OgreCamera.h>
-#include <OGRE/OgreNode.h>
-#include <OGRE/OgreRoot.h>
-
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "common/common.h"
@@ -229,12 +222,12 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 }
 
 //////////////////////////////////////////////////
-void MovableText::SetBaseline(float base_)
+void MovableText::SetBaseline(float _base)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (this->baseline != base_)
+  if (this->baseline != _base)
   {
-    this->baseline = base_;
+    this->baseline = _base;
     this->needUpdate = true;
   }
 }

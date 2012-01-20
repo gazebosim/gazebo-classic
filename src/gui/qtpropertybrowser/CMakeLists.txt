@@ -42,7 +42,7 @@ add_library(gzqtpropertybrowser ${sources} ${headers_MOC} ${resources_RCC})
 #                           qtpropertybrowserutils.cpp
 #)
 #
-include_directories ( ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #include_directories( ${QT_INCLUDE_DIR} )
 #
 #qt4_generate_moc(

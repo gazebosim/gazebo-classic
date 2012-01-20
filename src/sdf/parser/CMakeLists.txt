@@ -1,4 +1,4 @@
-include_directories(${tinyxml_include_dirs} ${XML_INCLUDE_DIRS})
+include_directories(SYSTEM ${XML_INCLUDE_DIRS})
 link_directories( ${tinyxml_library_dirs})
 add_definitions(${tinyxml_cflags})
 

@@ -32,6 +32,7 @@ namespace google {
 namespace protobuf {
 namespace compiler {
 namespace cpp {
+
 GazeboGenerator::GazeboGenerator(const std::string &/*_name*/) {}
 GazeboGenerator::~GazeboGenerator() {}
 bool GazeboGenerator::Generate(const FileDescriptor *_file,
@@ -39,13 +40,35 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
                                OutputDirectory *_generator_context,
                                std::string * /*_error*/) const
 {
-  std::string filename = _file->name();
-  boost::replace_last(filename, ".proto", ".pb.h");
+  std::string headerFilename = _file->name();
+  boost::replace_last(headerFilename, ".proto",".pb.h");
+
+  std::string sourceFilename = _file->name();
+  boost::replace_last(sourceFilename, ".proto",".pb.cc");
 
   // Add boost shared point include
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        _generator_context->OpenForInsert(filename, "includes"));
+        generator_context->OpenForInsert(headerFilename, "includes"));
+    io::Printer printer(output.get(), '$');
+
+    printer.Print("#pragma GCC system_header", "name", "includes");
+  }
+
+  // Add boost shared point include
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        generator_context->OpenForInsert(sourceFilename, "includes"));
+    io::Printer printer(output.get(), '$');
+
+    printer.Print("#pragma GCC diagnostic ignored \"-Wshadow\"", "name",
+                  "includes");
+  }
+
+
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
@@ -54,7 +77,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
   // Add boost shared typedef
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        _generator_context->OpenForInsert(filename, "global_scope"));
+        generator_context->OpenForInsert(headerFilename, "global_scope"));
     io::Printer printer(output.get(), '$');
 
     std::string package = _file->package();
@@ -73,5 +96,3 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 }
 }
 }
-
-

@@ -1,8 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories( 
+include_directories(SYSTEM
   ${CMAKE_SOURCE_DIR}/deps/opende/include)
-
 
 set (sources ODEPhysics.cc
              ODECollision.cc
@@ -38,9 +37,6 @@ SET (headers ODEPhysics.hh
 )
 
 add_library(gazebo_physics_ode SHARED ${sources})
-
-#LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")
-#set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}")
 
 set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC")
 target_link_libraries( gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})

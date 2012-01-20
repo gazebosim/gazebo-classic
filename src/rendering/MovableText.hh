@@ -22,11 +22,10 @@
 #ifndef MOVABLETEXT_HH
 #define MOVABLETEXT_HH
 
-// TODO: remove this line
-#include <OGRE/OgreMovableObject.h>
-#include <OGRE/OgreRenderable.h>
-
 #include <string>
+
+// TODO: remove this line
+#include "rendering/ogre.h"
 
 #include "common/CommonTypes.hh"
 #include "common/Color.hh"

@@ -1,9 +1,5 @@
 add_subdirectory(ode)
 
-include_directories(${tinyxml_include_dirs})
-link_directories( ${tinyxml_library_dirs})
-add_definitions(${tinyxml_cflags})
-
 set (sources Base.cc
              Link.cc
              BoxShape.cc

@@ -28,7 +28,7 @@ set (sources
   src/conservative_advancement.cpp
 )
 
-include_directories( 
+include_directories(SYSTEM
   ${CMAKE_SOURCE_DIR}/deps/fcl/include 
   ${CMAKE_SOURCE_DIR}/deps/ann/include 
   ${CMAKE_SOURCE_DIR}/deps/libccd/include 

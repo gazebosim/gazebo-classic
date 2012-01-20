@@ -19,7 +19,7 @@
 #include "common/Console.hh"
 
 #ifdef HAVE_CEGUI
-#include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #endif
 
 #include "common/SystemPaths.hh"
