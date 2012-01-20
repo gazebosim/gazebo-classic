@@ -58,6 +58,7 @@ set (headers MovableText.hh
              LaserVisual.hh
              CameraVisual.hh
              ContactVisual.hh
+             ogre.h
 )
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
