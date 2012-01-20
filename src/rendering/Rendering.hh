@@ -17,6 +17,7 @@
 #ifndef RENDERING_HH
 #define RENDERING_HH
 
+#include <string>
 #include "RenderTypes.hh"
 
 namespace gazebo
@@ -25,16 +26,17 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
- 
     bool load();
     bool init();
     bool fini();
 
     rendering::ScenePtr get_scene(const std::string &_name);
-    rendering::ScenePtr create_scene(const std::string &name, 
+    rendering::ScenePtr create_scene(const std::string &name,
                                      bool _enableVisualizations);
     void remove_scene(const std::string &name);
     /// \}
   }
 }
 #endif
+
+

@@ -18,6 +18,8 @@
 #ifndef __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 #define __GAZEBO_DEPTH_CAMERA_PLUGIN_HH__
 
+#include <string>
+
 #include "common/Plugin.hh"
 #include "sensors/DepthCameraSensor.hh"
 #include "sensors/CameraSensor.hh"
@@ -30,14 +32,14 @@ namespace gazebo
   {
     public: DepthCameraPlugin();
 
-    public: void Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf );
+    public: void Load(sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf);
 
     public: virtual void OnNewDepthFrame(const float *_image,
-                unsigned int _width, unsigned int _height, 
+                unsigned int _width, unsigned int _height,
                 unsigned int _depth, const std::string &_format);
 
     public: virtual void OnNewImageFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height, 
+                              unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
     protected: unsigned int width, height, depth;

@@ -22,22 +22,19 @@ using namespace gazebo;
 using namespace rendering;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 DynamicRenderable::DynamicRenderable()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 DynamicRenderable::~DynamicRenderable()
 {
   delete this->mRenderOp.vertexData;
   delete this->mRenderOp.indexData;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Initializes the dynamic renderable.
+//////////////////////////////////////////////////
 void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 {
   this->SetOperationType(operationType);
@@ -57,8 +54,7 @@ void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
   this->CreateVertexDeclaration();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the render operation type
+//////////////////////////////////////////////////
 void DynamicRenderable::SetOperationType(RenderOpType opType)
 {
   switch (opType)
@@ -95,8 +91,7 @@ void DynamicRenderable::SetOperationType(RenderOpType opType)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the render operation type
+//////////////////////////////////////////////////
 RenderOpType DynamicRenderable::GetOperationType() const
 {
   RenderOpType type;
@@ -131,14 +126,15 @@ RenderOpType DynamicRenderable::GetOperationType() const
   return type;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Prepares the hardware buffers for the requested vertex and index counts.
-void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
+//////////////////////////////////////////////////
+void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount,
+                                               size_t indexCount)
 {
   // Prepare vertex buffer
   size_t newVertCapacity = this->vertexBufferCapacity;
 
-  if ((vertexCount > this->vertexBufferCapacity) || (!this->vertexBufferCapacity))
+  if ((vertexCount > this->vertexBufferCapacity) ||
+      (!this->vertexBufferCapacity))
   {
     // vertexCount exceeds current capacity!
     // It is necessary to reallocate the buffer.
@@ -150,7 +146,6 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexC
     // Make capacity the next power of two
     while (newVertCapacity < vertexCount)
       newVertCapacity <<= 1;
-
   }
   else if (vertexCount < this->vertexBufferCapacity>>1)
   {
@@ -181,7 +176,8 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexC
 
   if (this->mRenderOp.useIndexes)
   {
-    OgreAssert(indexCount <= std::numeric_limits<unsigned short>::max(), "indexCount exceeds 16 bit");
+    OgreAssert(indexCount <= std::numeric_limits<uint16_t>::max(),
+        "indexCount exceeds 16 bit");
 
     size_t newIndexCapacity = this->indexBufferCapacity;
 
@@ -198,7 +194,6 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexC
       // Make capacity the next power of two
       while (newIndexCapacity < indexCount)
         newIndexCapacity <<= 1;
-
     }
     else if (indexCount < newIndexCapacity>>1)
     {
@@ -225,16 +220,14 @@ void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexC
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Implementation of Ogre::SimpleRenderable
+//////////////////////////////////////////////////
 Ogre::Real DynamicRenderable::getBoundingRadius() const
 {
   return Ogre::Math::Sqrt(std::max(mBox.getMaximum().squaredLength(),
                                    mBox.getMinimum().squaredLength()));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Implementation of Ogre::SimpleRenderable
+//////////////////////////////////////////////////
 Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
 {
   Ogre::Vector3 vMin, vMax, vMid, vDist;
@@ -244,3 +237,6 @@ Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
   vDist = cam->getDerivedPosition() - vMid;
   return vDist.squaredLength();
 }
+
+
+

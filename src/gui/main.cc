@@ -26,15 +26,13 @@ std::string config_file = "";
 std::vector<std::string> plugins;
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Print the version/licence string
+//////////////////////////////////////////////////
 void PrintVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// TODO: Implement these options
+//////////////////////////////////////////////////
 void PrintUsage()
 {
   fprintf(stderr, "Usage: gzclient [-h] <config_file>\n");
@@ -42,23 +40,22 @@ void PrintUsage()
   fprintf(stderr, "  <config_file> : Load a GUI configuration file\n");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Parse the argument list.  Options are placed in static variables.
-int ParseArgs(int argc, char **argv)
+//////////////////////////////////////////////////
+int ParseArgs(int _argc, char **_argv)
 {
   int ch;
 
-  char *flags = (char*)("hp:");
+  char *flags = const_cast<char*>("hp:");
 
   // Get letter options
-  while ((ch = getopt(argc, argv, flags)) != -1)
+  while ((ch = getopt(_argc, _argv, flags)) != -1)
   {
     switch (ch)
     {
       case 'p':
         {
           if (optarg != NULL)
-            plugins.push_back( std::string(optarg) );
+            plugins.push_back(std::string(optarg));
           else
             gzerr << "Missing plugin filename with -p argument\n";
           break;
@@ -70,29 +67,27 @@ int ParseArgs(int argc, char **argv)
     }
   }
 
-  argc -= optind;
-  argv += optind;
+  _argc -= optind;
+  _argv += optind;
 
   // Get the world file name
-  if (argc >= 1)
-    config_file = argv[0];
+  if (_argc >= 1)
+    config_file = _argv[0];
 
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// sighandler to shut everything down properly
-void SignalHandler( int )
+//////////////////////////////////////////////////
+void SignalHandler(int)
 {
   gazebo::stop();
   gazebo::gui::stop();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Main function
-int main(int argc, char **argv)
+//////////////////////////////////////////////////
+int main(int _argc, char **_argv)
 {
-  if (ParseArgs(argc, argv) != 0)
+  if (ParseArgs(_argc, _argv) != 0)
     return -1;
 
   PrintVersion();
@@ -104,8 +99,8 @@ int main(int argc, char **argv)
   }
 
   /// Load all the plugins specified on the command line
-  for (std::vector<std::string>::iterator iter = plugins.begin(); 
-       iter != plugins.end(); iter++)
+  for (std::vector<std::string>::iterator iter = plugins.begin();
+       iter != plugins.end(); ++iter)
   {
     gazebo::gui::load_plugin(*iter);
   }
@@ -129,3 +124,5 @@ int main(int argc, char **argv)
   printf("done.\n");
   return 0;
 }
+
+

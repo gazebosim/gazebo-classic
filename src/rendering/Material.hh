@@ -21,11 +21,10 @@
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
-
     /// \brief Rendering material. Just a helper function for now
     class Material
     {
@@ -33,6 +32,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif

@@ -50,9 +50,8 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   this->contactFiducial = -1;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-RayShape::RayShape( CollisionPtr _parent, bool /*_displayRays*/ ) 
+//////////////////////////////////////////////////
+RayShape::RayShape(CollisionPtr _parent, bool /*_displayRays*/)
   : Shape(_parent)
 {
   this->AddType(RAY_SHAPE);
@@ -66,15 +65,13 @@ RayShape::RayShape( CollisionPtr _parent, bool /*_displayRays*/ )
     this->collisionParent->SetSaveable(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 RayShape::~RayShape()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the ray based on starting and ending points relative to the body
-void RayShape::SetPoints(const math::Vector3 &_posStart, 
+//////////////////////////////////////////////////
+void RayShape::SetPoints(const math::Vector3 &_posStart,
                          const math::Vector3 &_posEnd)
 {
   math::Vector3 dir;
@@ -102,78 +99,70 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   dir.Normalize();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the relative starting and ending points
-void RayShape::GetRelativePoints(math::Vector3 &posA, math::Vector3 &posB)
+//////////////////////////////////////////////////
+void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
-  posA = this->relativeStartPos;
-  posB = this->relativeEndPos;
+  _posA = this->relativeStartPos;
+  _posB = this->relativeEndPos;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the global starting and ending points
-void RayShape::GetGlobalPoints(math::Vector3 &posA, math::Vector3 &posB)
+//////////////////////////////////////////////////
+void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
-  posA = this->globalStartPos;
-  posB = this->globalEndPos;
+  _posA = this->globalStartPos;
+  _posB = this->globalEndPos;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the length of the ray
-void RayShape::SetLength( double len )
+//////////////////////////////////////////////////
+void RayShape::SetLength(double _len)
 {
-  this->contactLen=len;
+  this->contactLen = _len;
 
   math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
-  this->relativeEndPos = dir * len + this->relativeStartPos;
+  this->relativeEndPos = dir * _len + this->relativeStartPos;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the length of the ray
+//////////////////////////////////////////////////
 double RayShape::GetLength() const
 {
   return this->contactLen;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the retro-reflectivness detected by this ray
-void RayShape::SetRetro( float retro )
+//////////////////////////////////////////////////
+void RayShape::SetRetro(float _retro)
 {
-  this->contactRetro = retro;
+  this->contactRetro = _retro;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the retro-reflectivness detected by this ray
+//////////////////////////////////////////////////
 float RayShape::GetRetro() const
 {
   return this->contactRetro;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the fiducial id detected by this ray
-void RayShape::SetFiducial( int fid )
+//////////////////////////////////////////////////
+void RayShape::SetFiducial(int _fid)
 {
-  this->contactFiducial = fid;
+  this->contactFiducial = _fid;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the fiducial id detected by this ray
+//////////////////////////////////////////////////
 int RayShape::GetFiducial() const
 {
   return this->contactFiducial;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load thte ray
-void RayShape::Load( sdf::ElementPtr &_sdf ) 
+//////////////////////////////////////////////////
+void RayShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// In the ray
+//////////////////////////////////////////////////
 void RayShape::Init()
 {
 }
+
+

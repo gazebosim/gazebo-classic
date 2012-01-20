@@ -22,8 +22,8 @@
 #ifndef ANGLE_HH
 #define ANGLE_HH
 
-#include <iostream>
 #include <math.h>
+#include <iostream>
 
 // Convert radians to degrees
 #define GZ_RTOD(r) ((r) * 180 / M_PI)
@@ -36,18 +36,15 @@
 
 namespace gazebo
 {
-
   /// \ingroup gazebo_math
   /// \brief Math namespace
   namespace math
   {
-
   /// \addtogroup gazebo_math Math
   /// \brief A set of classes that encapsulate math related properties and
   ///        functions.
   /// \{
-  
-  /// \brief An angle and related functions. 
+  /// \brief An angle and related functions.
   class Angle
   {
     /// \brief Constructor
@@ -59,23 +56,23 @@ namespace gazebo
 
     /// \brief Copy constructor
     /// \param _angle Angle to copy
-    public: Angle(const Angle &angle);
-  
+    public: Angle(const Angle &_angle);
+
     /// \brief Destructor
     public: virtual ~Angle();
-  
+
     /// \brief Set the value from an angle in radians
     /// \param _radian Radian value
-    public: void SetFromRadian( double _radian );
-  
+    public: void SetFromRadian(double _radian);
+
     /// \brief Set the value from an angle in degrees
     /// \param _degree Degree value
-    public: void SetFromDegree( double degree );
-  
+    public: void SetFromDegree(double _degree);
+
     /// \brief Get the angle in radians
     /// \return Double containing the angle's radian value
     public: double GetAsRadian() const;
-  
+
     /// \brief Get the angle in degrees
     /// \return Double containing the angle's degree value
     public: double GetAsDegree() const;
@@ -86,7 +83,6 @@ namespace gazebo
     /// \brief Dereference operator
     /// \return Double containing the angle's radian value
     public: inline double operator*() const { return value; }
-
     /// \brief Substraction, result = this - _angle
     /// \param _angle Angle for substraction
     /// \return The new angle
@@ -130,7 +126,7 @@ namespace gazebo
     /// \brief Equality operator, result = this == _angle
     /// \param _angle Angle to check for equality
     /// \return True if this == _angle
-    public: bool operator==(const Angle &_angle) const;
+    public: bool operator ==(const Angle &_angle) const;
 
     /// \brief Inequality
     /// \param _angle Angle to check for inequality
@@ -161,30 +157,35 @@ namespace gazebo
     /// \param out Ostream
     /// \param pt Angle to output
     /// \return The Ostream
-    public: friend std::ostream &operator<<( std::ostream &out, const gazebo::math::Angle &a )
+    public: friend std::ostream &operator<<(std::ostream &_out,
+                                            const gazebo::math::Angle &_a)
     {
-      out << a.GetAsRadian();
-      return out;
+      _out << _a.GetAsRadian();
+      return _out;
     }
-  
+
     /// \brief Istream operator. Assumes input is in degrees
     /// \param in Ostream
     /// \param pt Angle to read value into
     /// \return The istream
-    public: friend std::istream &operator>>( std::istream &in, gazebo::math::Angle &a )
+    public: friend std::istream &operator>>(std::istream &_in,
+                                            gazebo::math::Angle &_a)
     {
       // Skip white spaces
-      in.setf( std::ios_base::skipws );
-      in >> a.value;
-      return in;
+      _in.setf(std::ios_base::skipws);
+      _in >> _a.value;
+      return _in;
     }
-  
+
     /// The angle in radians
     private: double value;
   };
-    
+
   /// \}
   }
 }
 
 #endif
+
+
+

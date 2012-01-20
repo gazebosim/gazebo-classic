@@ -25,16 +25,14 @@
 using namespace gazebo;
 using namespace rendering;
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 FPSViewController::FPSViewController(UserCamera *camera_)
   : ViewController(camera_)
 {
   this->typeString = TYPE_STRING;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 FPSViewController::~FPSViewController()
 {
 }
@@ -43,14 +41,12 @@ void FPSViewController::Init()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update
+//////////////////////////////////////////////////
 void FPSViewController::Update()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Handle a mouse event
+//////////////////////////////////////////////////
 void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
   if (!this->enabled)
@@ -58,7 +54,7 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector2i drag = _event.pos - _event.prevPos;
 
-  math::Vector3 directionVec(0,0,0);
+  math::Vector3 directionVec(0, 0, 0);
 
   if (_event.buttons & common::MouseEvent::LEFT)
   {
@@ -88,9 +84,11 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
   this->camera->Translate(directionVec);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the type name of this view controller
-std::string FPSViewController::GetTypeString() 
+//////////////////////////////////////////////////
+std::string FPSViewController::GetTypeString()
 {
   return TYPE_STRING;
 }
+
+
+

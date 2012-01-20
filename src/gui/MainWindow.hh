@@ -1,7 +1,27 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #ifndef MAINWINDOW_HH
 #define MAINWINDOW_HH
 
 #include <qmainwindow.h>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "common/Event.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
@@ -29,7 +49,7 @@ namespace gazebo
       public: unsigned int GetEntityId(const std::string &_name);
       public: bool HasEntityName(const std::string &_name);
 
-      protected: void closeEvent(QCloseEvent *event);
+      protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
 
@@ -57,7 +77,7 @@ namespace gazebo
       private slots: void OnResetWorld();
 
       private: void OnFullScreen(bool _value);
-      private: void OnMoveMode(bool mode);
+      private: void OnMoveMode(bool _mode);
 
       private: void CreateActions();
       private: void CreateMenus();
@@ -98,7 +118,6 @@ namespace gazebo
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;
 
-      //private: QAction *insertModelAct;
       private: QAction *viewFullScreenAct;
       private: QAction *viewFPSAct;
       private: QAction *viewOrbitAct;
@@ -131,3 +150,5 @@ namespace gazebo
 }
 
 #endif
+
+

@@ -33,70 +33,67 @@ using namespace gazebo;
 using namespace physics;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 ODEJoint::ODEJoint()
   : Joint()
 {
   this->jointId = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
-  dJointDestroy( this->jointId );
+  dJointDestroy(this->jointId);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load a joint
-void ODEJoint::Load( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void ODEJoint::Load(sdf::ElementPtr &_sdf)
 {
   Joint::Load(_sdf);
 
-  if (this->sdf->HasElement("physics") && 
+  if (this->sdf->HasElement("physics") &&
       this->sdf->GetElement("physics")->HasElement("ode"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
 
     if (elem->HasElement("limit"))
     {
-      this->SetParam(dParamStopERP, 
+      this->SetParam(dParamStopERP,
           elem->GetElement("limit")->GetValueDouble("cfm"));
-      this->SetParam(dParamStopCFM, 
+      this->SetParam(dParamStopCFM,
           elem->GetElement("limit")->GetValueDouble("erp"));
     }
 
     if (elem->HasElement("suspension"))
     {
-      this->SetParam(dParamSuspensionERP, 
+      this->SetParam(dParamSuspensionERP,
           elem->GetElement("suspension")->GetValueDouble("cfm"));
-      this->SetParam(dParamSuspensionCFM, 
+      this->SetParam(dParamSuspensionCFM,
           elem->GetElement("suspension")->GetValueDouble("erp"));
     }
 
     if (elem->HasElement("fudge_factor"))
-      this->SetParam(dParamFudgeFactor, 
+      this->SetParam(dParamFudgeFactor,
           elem->GetElement("fudge_factor")->GetValueDouble());
 
     if (elem->HasElement("cfm"))
-        this->SetParam(dParamCFM, 
+        this->SetParam(dParamCFM,
           elem->GetElement("cfm")->GetValueDouble());
 
     if (elem->HasElement("bounce"))
-        this->SetParam(dParamBounce, 
+        this->SetParam(dParamBounce,
           elem->GetElement("bounce")->GetValueDouble());
 
     if (elem->HasElement("max_force"))
-      this->SetParam(dParamFMax, 
+      this->SetParam(dParamFMax,
           elem->GetElement("max_force")->GetValueDouble());
 
     if (elem->HasElement("velocity"))
-      this->SetParam(dParamVel, 
+      this->SetParam(dParamVel,
           elem->GetElement("velocity")->GetValueDouble());
   }
 
-  //TODO: reimplement
+  // TODO: reimplement
   /*if (**this->provideFeedbackP)
   {
     this->feedback = new dJointFeedback;
@@ -105,18 +102,17 @@ void ODEJoint::Load( sdf::ElementPtr &_sdf )
   */
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the link to which the joint is attached according the _index
-LinkPtr ODEJoint::GetJointLink( int index ) const
+//////////////////////////////////////////////////
+LinkPtr ODEJoint::GetJointLink(int _index) const
 {
   LinkPtr result;
 
-  if ( index==0 || index==1 )
+  if (_index == 0 || _index == 1)
   {
     ODELinkPtr odeLink1 = boost::shared_dynamic_cast<ODELink>(this->childLink);
     ODELinkPtr odeLink2 = boost::shared_dynamic_cast<ODELink>(this->parentLink);
     if (odeLink1 != NULL &&
-        dJointGetBody( this->jointId, index ) == odeLink1->GetODEId())
+        dJointGetBody(this->jointId, _index) == odeLink1->GetODEId())
       result = this->childLink;
     else if (odeLink2)
       result = this->parentLink;
@@ -125,32 +121,29 @@ LinkPtr ODEJoint::GetJointLink( int index ) const
   return result;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Determines of the two bodies are connected by a joint
-bool ODEJoint::AreConnected( LinkPtr one, LinkPtr two ) const
+//////////////////////////////////////////////////
+bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  ODELinkPtr odeLink1 = boost::shared_dynamic_cast<ODELink>(one);
-  ODELinkPtr odeLink2 = boost::shared_dynamic_cast<ODELink>(two);
+  ODELinkPtr odeLink1 = boost::shared_dynamic_cast<ODELink>(_one);
+  ODELinkPtr odeLink2 = boost::shared_dynamic_cast<ODELink>(_two);
 
   if (odeLink1 == NULL || odeLink2 == NULL)
     gzthrow("ODEJoint requires ODE bodies\n");
 
-  return dAreConnected( odeLink1->GetODEId(), odeLink2->GetODEId() );
+  return dAreConnected(odeLink1->GetODEId(), odeLink2->GetODEId());
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// The default function does nothing. This should be overriden in the
+//////////////////////////////////////////////////
 // child classes where appropriate
-double ODEJoint::GetParam( int /*parameter*/ ) const
+double ODEJoint::GetParam(int /*parameter*/) const
 {
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Attach the two bodies with this joint
-void ODEJoint::Attach(LinkPtr parent, LinkPtr child)
+//////////////////////////////////////////////////
+void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 {
-  Joint::Attach(parent, child);
+  Joint::Attach(_parent, _child);
 
   ODELinkPtr odechild = boost::shared_dynamic_cast<ODELink>(this->childLink);
   ODELinkPtr odeparent = boost::shared_dynamic_cast<ODELink>(this->parentLink);
@@ -158,111 +151,101 @@ void ODEJoint::Attach(LinkPtr parent, LinkPtr child)
   if (odechild == NULL && odeparent == NULL)
     gzthrow("ODEJoint requires at least one ODE link\n");
 
-  
+
   if (!odechild && odeparent)
   {
-    dJointAttach( this->jointId, 0, odeparent->GetODEId() );
+    dJointAttach(this->jointId, 0, odeparent->GetODEId());
   }
   else if (odechild && !odeparent)
   {
-    dJointAttach( this->jointId, odechild->GetODEId(), 0 );
+    dJointAttach(this->jointId, odechild->GetODEId(), 0);
   }
   else if (odechild && odeparent)
   {
-    dJointAttach( this->jointId, odechild->GetODEId(), odeparent->GetODEId() );
+    dJointAttach(this->jointId, odechild->GetODEId(), odeparent->GetODEId());
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Detach this joint from all bodies
+//////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
   this->childLink.reset();
   this->parentLink.reset();
-  dJointAttach( this->jointId, 0, 0 );
+  dJointAttach(this->jointId, 0, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// By default this does nothing. It should be overridden in child classes
+//////////////////////////////////////////////////
 // where appropriate
 void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
 {
-  if (this->childLink) 
+  if (this->childLink)
     this->childLink->SetEnabled(true);
-  if (this->parentLink) 
+  if (this->parentLink)
     this->parentLink->SetEnabled(true);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the ERP of this joint
-void ODEJoint::SetERP(double newERP)
+//////////////////////////////////////////////////
+void ODEJoint::SetERP(double _newERP)
 {
-  this->SetParam(dParamSuspensionERP, newERP);
+  this->SetParam(dParamSuspensionERP, _newERP);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ERP of this joint
+//////////////////////////////////////////////////
 double ODEJoint::GetERP()
 {
   return this->GetParam(dParamSuspensionERP);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the CFM of this joint
-void ODEJoint::SetCFM(double newCFM)
+//////////////////////////////////////////////////
+void ODEJoint::SetCFM(double _newCFM)
 {
-  this->SetParam(dParamSuspensionCFM, newCFM);
+  this->SetParam(dParamSuspensionCFM, _newCFM);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ERP of this joint
+//////////////////////////////////////////////////
 double ODEJoint::GetCFM()
 {
   return this->GetParam(dParamSuspensionCFM);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the feedback data structure for this joint, if set
+//////////////////////////////////////////////////
 dJointFeedback *ODEJoint::GetFeedback()
 {
   return dJointGetFeedback(this->jointId);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the high stop of an axis(index)
-void ODEJoint::SetHighStop(int index, math::Angle angle)
+//////////////////////////////////////////////////
+void ODEJoint::SetHighStop(int _index, math::Angle _angle)
 {
-  switch (index)
+  switch (_index)
   {
     case 0:
-      this->SetParam(dParamHiStop, angle.GetAsRadian());
+      this->SetParam(dParamHiStop, _angle.GetAsRadian());
     case 1:
-      this->SetParam(dParamHiStop2, angle.GetAsRadian());
+      this->SetParam(dParamHiStop2, _angle.GetAsRadian());
     case 2:
-      this->SetParam(dParamHiStop3, angle.GetAsRadian());
+      this->SetParam(dParamHiStop3, _angle.GetAsRadian());
   };
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the low stop of an axis(index)
-void ODEJoint::SetLowStop(int index, math::Angle angle)
+//////////////////////////////////////////////////
+void ODEJoint::SetLowStop(int _index, math::Angle _angle)
 {
-  switch (index)
+  switch (_index)
   {
     case 0:
-      this->SetParam(dParamLoStop, angle.GetAsRadian());
+      this->SetParam(dParamLoStop, _angle.GetAsRadian());
     case 1:
-      this->SetParam(dParamLoStop2, angle.GetAsRadian());
+      this->SetParam(dParamLoStop2, _angle.GetAsRadian());
     case 2:
-      this->SetParam(dParamLoStop3, angle.GetAsRadian());
+      this->SetParam(dParamLoStop3, _angle.GetAsRadian());
   };
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the high stop of an axis(index).
-math::Angle ODEJoint::GetHighStop(int index)
+//////////////////////////////////////////////////
+math::Angle ODEJoint::GetHighStop(int _index)
 {
-  switch (index)
+  switch (_index)
   {
     case 0:
       return this->GetParam(dParamHiStop);
@@ -275,11 +258,10 @@ math::Angle ODEJoint::GetHighStop(int index)
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the low stop of an axis(index).
-math::Angle ODEJoint::GetLowStop(int index)
+//////////////////////////////////////////////////
+math::Angle ODEJoint::GetLowStop(int _index)
 {
-  switch (index)
+  switch (_index)
   {
     case 0:
       return this->GetParam(dParamLoStop);
@@ -292,14 +274,13 @@ math::Angle ODEJoint::GetLowStop(int index)
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the force the joint applies to the first link
-math::Vector3 ODEJoint::GetLinkForce(unsigned int index) const
+//////////////////////////////////////////////////
+math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 {
   math::Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
-  if (index == 0)
+  if (_index == 0)
     result.Set(feedback->f1[0], feedback->f1[1], feedback->f1[2]);
   else
     result.Set(feedback->f2[0], feedback->f2[1], feedback->f2[2]);
@@ -307,14 +288,13 @@ math::Vector3 ODEJoint::GetLinkForce(unsigned int index) const
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the torque the joint applies to the first link
-math::Vector3 ODEJoint::GetLinkTorque(unsigned int index) const
+//////////////////////////////////////////////////
+math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 {
   math::Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
-  if (index == 0)
+  if (_index == 0)
     result.Set(feedback->t1[0], feedback->t1[1], feedback->t1[2]);
   else
     result.Set(feedback->t2[0], feedback->t2[1], feedback->t2[2]);
@@ -322,9 +302,8 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int index) const
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set a parameter for the joint
-void ODEJoint::SetAttribute( Attribute _attr, int /*_index*/, double _value)
+//////////////////////////////////////////////////
+void ODEJoint::SetAttribute(Attribute _attr, int /*_index*/, double _value)
 {
   switch (_attr)
   {
@@ -372,3 +351,8 @@ void ODEJoint::Reset()
   dJointReset(this->jointId);
   Joint::Reset();
 }
+
+
+
+
+

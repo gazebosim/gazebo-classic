@@ -48,7 +48,7 @@ ContactPlugin::~ContactPlugin()
 void ContactPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf)
 {
   // Get then name of the parent sensor
-  this->parentSensor = 
+  this->parentSensor =
     boost::shared_dynamic_cast<sensors::ContactSensor>(_parent);
 
   this->world = physics::get_world(_sdf->GetWorldName());
@@ -56,3 +56,4 @@ void ContactPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf)
   if (!this->parentSensor)
     gzthrow("ContactPlugin requires a Contact Sensor as its parent");
 }
+

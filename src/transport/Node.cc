@@ -64,14 +64,8 @@ void Node::Init(const std::string &_space)
     std::list<std::string> namespaces;
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
-    std::string ns;
-    if (namespaces.size() == 0)
-    {
-      ns = "default";
+    if (namespaces.empty())
       gzerr << "No namespace found";
-    }
-    else
-      ns = namespaces.front();
 
     this->topicNamespace = namespaces.front();
   }
@@ -81,8 +75,7 @@ void Node::Init(const std::string &_space)
   TopicManager::Instance()->AddNode(shared_from_this());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the topic namespace for this node
+//////////////////////////////////////////////////
 std::string Node::GetTopicNamespace() const
 {
   return this->topicNamespace;
@@ -114,7 +107,7 @@ unsigned int Node::GetId() const
 void Node::ProcessPublishers()
 {
   this->publisherMutex->lock();
-  for (this->publishersIter = this->publishers.begin(); 
+  for (this->publishersIter = this->publishers.begin();
        this->publishersIter != this->publishersEnd; this->publishersIter++)
   {
     (*this->publishersIter)->SendMessage();
@@ -147,7 +140,7 @@ void Node::ProcessIncoming()
   inIter = this->incomingMsgs.begin();
   endIter = this->incomingMsgs.end();
 
-  for (; inIter != endIter; inIter++)
+  for (; inIter != endIter; ++inIter)
   {
     // Find the callbacks for the topic
     cbIter = this->callbacks.find(inIter->first);
@@ -155,11 +148,11 @@ void Node::ProcessIncoming()
     {
       // For each message in the buffer
       for (msgIter = inIter->second.begin(); msgIter != inIter->second.end();
-           msgIter++)
+           ++msgIter)
       {
         // Send the message to all callbacks
         for (liter = cbIter->second.begin();
-             liter != cbIter->second.end(); liter++)
+             liter != cbIter->second.end(); ++liter)
         {
           (*liter)->HandleData(*msgIter);
         }
@@ -178,3 +171,5 @@ std::string Node::GetMsgType(const std::string &_topic) const
 
   return std::string();
 }
+
+

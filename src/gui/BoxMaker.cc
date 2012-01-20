@@ -34,13 +34,14 @@ using namespace gui;
 
 unsigned int BoxMaker::counter = 0;
 
-BoxMaker::BoxMaker() 
+BoxMaker::BoxMaker()
 : EntityMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::BOX);
-  this->visualMsg->mutable_material()->set_script("Gazebo/TurquoiseGlowOutline");
+  this->visualMsg->mutable_material()->set_script(
+      "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
             math::Quaternion());
 }
@@ -57,14 +58,14 @@ void BoxMaker::Start(const rendering::UserCameraPtr _camera)
 
   std::ostringstream stream;
   stream << "__GZ_USER_box_" << counter++;
-  this->visualMsg->set_name( stream.str() );
+  this->visualMsg->set_name(stream.str());
 
   this->state = 1;
 }
 
 void BoxMaker::Stop()
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", 
+  msgs::Request *msg = msgs::CreateRequest("entity_delete",
                                            this->visualMsg->name());
 
   this->requestPub->Publish(*msg);
@@ -79,12 +80,12 @@ bool BoxMaker::IsActive() const
   return this->state > 0;
 }
 
-void BoxMaker::OnMousePush(const common::MouseEvent &event)
+void BoxMaker::OnMousePush(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
-  this->mousePushPos = event.pressPos;
+  this->mousePushPos = _event.pressPos;
 }
 
 void BoxMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
@@ -101,38 +102,39 @@ void BoxMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
   }
 }
 
-void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
+void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
-  math::Vector3 norm(0,0,1);
+  math::Vector3 norm(0, 0, 1);
   math::Vector3 p1, p2;
 
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x, 
+  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
                                           this->mousePushPos.y, norm, 0, p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
   }
 
-  p1 = this->GetSnappedPoint( p1 );
+  p1 = this->GetSnappedPoint(p1);
 
-  if (!this->camera->GetWorldPointOnPlane(event.pos.x,event.pos.y ,norm, 0,p2))
+  if (!this->camera->GetWorldPointOnPlane(
+        _event.pos.x, _event.pos.y , norm, 0, p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
   }
 
-  p2 = this->GetSnappedPoint( p2 );
+  p2 = this->GetSnappedPoint(p2);
 
   if (this->state == 1)
-    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
+    msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   math::Vector3 scale = p1-p2;
-  math::Vector3 p( this->visualMsg->pose().position().x(), 
-                     this->visualMsg->pose().position().y(), 
-                     this->visualMsg->pose().position().z() );
+  math::Vector3 p(this->visualMsg->pose().position().x(),
+                     this->visualMsg->pose().position().y(),
+                     this->visualMsg->pose().position().z());
 
 
   if (this->state == 1)
@@ -143,15 +145,16 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &event)
   }
   else
   {
-    scale.Set( this->visualMsg->geometry().box().size().x(),
+    scale.Set(this->visualMsg->geometry().box().size().x(),
                this->visualMsg->geometry().box().size().y(),
-               this->visualMsg->geometry().box().size().z() );
-    scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
+               this->visualMsg->geometry().box().size().z());
+    scale.z = (this->mousePushPos.y - _event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
-  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
-  msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(), scale );
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(),
+      scale);
 
   this->visPub->Publish(*this->visualMsg);
 }
@@ -162,37 +165,37 @@ void BoxMaker::CreateTheEntity()
 
   std::ostringstream newModelStr;
 
-  newModelStr << "<gazebo version='1.0'>\
-    <model name='custom_user_box" << counter << "_model'>\
-    <origin pose='" << this->visualMsg->pose().position().x() << " " 
-                    << this->visualMsg->pose().position().y() << " " 
+  newModelStr << "<gazebo version ='1.0'>\
+    <model name ='custom_user_box" << counter << "_model'>\
+    <origin pose ='" << this->visualMsg->pose().position().x() << " "
+                    << this->visualMsg->pose().position().y() << " "
                     << this->visualMsg->pose().position().z() << " 0 0 0'/>\
-    <link name='body'>\
-      <inertial mass='1.0'>\
-          <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
+    <link name ='body'>\
+      <inertial mass ='1.0'>\
+          <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
       </inertial>\
-      <collision name='geom'>\
+      <collision name ='geom'>\
         <geometry>\
-          <box size='" << this->visualMsg->geometry().box().size().x() << " "
+          <box size ='" << this->visualMsg->geometry().box().size().x() << " "
                        << this->visualMsg->geometry().box().size().y() << " "
                        << this->visualMsg->geometry().box().size().z() << "'/>\
         </geometry>\
       </collision>\
-      <visual name='visual' cast_shadows='true'>\
+      <visual name ='visual' cast_shadows ='true'>\
         <geometry>\
-          <box size='" << this->visualMsg->geometry().box().size().x() << " "
+          <box size ='" << this->visualMsg->geometry().box().size().x() << " "
                        << this->visualMsg->geometry().box().size().y() << " "
                        << this->visualMsg->geometry().box().size().z() << "'/>\
         </geometry>\
-        <material script='Gazebo/Grey'/>\
+        <material script ='Gazebo/Grey'/>\
       </visual>\
     </link>\
   </model>\
   </gazebo>";
 
-  msg.set_sdf( newModelStr.str() );
+  msg.set_sdf(newModelStr.str());
 
-  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete", 
+  msgs::Request *requestMsg = msgs::CreateRequest("entity_delete",
       this->visualMsg->name());
   this->requestPub->Publish(*requestMsg);
   delete requestMsg;
@@ -200,3 +203,5 @@ void BoxMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
+
+

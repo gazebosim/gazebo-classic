@@ -414,10 +414,11 @@ bool sCylinderTrimeshColliderData::_cldTestSeparatingAxes(
 	vCp0[1] = m_vCylinderPos[1] + m_vCylinderAxis[1]*(m_fCylinderSize* REAL(0.5));
 	vCp0[2] = m_vCylinderPos[2] + m_vCylinderAxis[2]*(m_fCylinderSize* REAL(0.5));
 
-	dVector3 vCp1;
+	/*dVector3 vCp1;
 	vCp1[0] = m_vCylinderPos[0] - m_vCylinderAxis[0]*(m_fCylinderSize* REAL(0.5));
 	vCp1[1] = m_vCylinderPos[1] - m_vCylinderAxis[1]*(m_fCylinderSize* REAL(0.5));
 	vCp1[2] = m_vCylinderPos[2] - m_vCylinderAxis[2]*(m_fCylinderSize* REAL(0.5));
+*/
 
 	// reset best axis
 	m_iBestAxis = 0;

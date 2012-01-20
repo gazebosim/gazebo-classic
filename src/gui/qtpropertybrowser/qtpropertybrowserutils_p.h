@@ -1,41 +1,41 @@
 /****************************************************************************
-**
-** Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
-** All rights reserved.
-**
-** Contact: Nokia Corporation (qt-info@nokia.com)
-**
-** This file is part of a Qt Solutions component.
-**
-** You may use this file under the terms of the BSD license as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
-**     the names of its contributors may be used to endorse or promote
-**     products derived from this software without specific prior written
-**     permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-****************************************************************************/
+ **
+ ** Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+ ** All rights reserved.
+ **
+ ** Contact: Nokia Corporation (qt-info@nokia.com)
+ **
+ ** This file is part of a Qt Solutions component.
+ **
+ ** You may use this file under the terms of the BSD license as follows:
+ **
+ ** "Redistribution and use in source and binary forms, with or without
+ ** modification, are permitted provided that the following conditions are
+ ** met:
+ **   * Redistributions of source code must retain the above copyright
+ **     notice, this list of conditions and the following disclaimer.
+ **   * Redistributions in binary form must reproduce the above copyright
+ **     notice, this list of conditions and the following disclaimer in
+ **     the documentation and/or other materials provided with the
+ **     distribution.
+ **   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
+ **     the names of its contributors may be used to endorse or promote
+ **     products derived from this software without specific prior written
+ **     permission.
+ **
+ ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ ** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ ** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ ** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ ** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ ** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ ** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ ** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ ** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+ **
+ ****************************************************************************/
 
 
 //
@@ -67,7 +67,7 @@ class QLineEdit;
 
 class QtCursorDatabase
 {
-public:
+  public:
     QtCursorDatabase();
 
     QStringList cursorShapeNames() const;
@@ -78,8 +78,9 @@ public:
 #ifndef QT_NO_CURSOR
     QCursor valueToCursor(int value) const;
 #endif
-private:
-    void appendCursor(Qt::CursorShape shape, const QString &name, const QIcon &icon);
+  private:
+    void appendCursor(Qt::CursorShape shape, const QString &name,
+        const QIcon &icon);
     QStringList m_cursorNames;
     QMap<int, QIcon> m_cursorIcons;
     QMap<int, Qt::CursorShape> m_valueToCursorShape;
@@ -88,7 +89,7 @@ private:
 
 class QtPropertyBrowserUtils
 {
-public:
+  public:
     static QPixmap brushValuePixmap(const QBrush &b);
     static QIcon brushValueIcon(const QBrush &b);
     static QString colorValueText(const QColor &c);
@@ -98,9 +99,10 @@ public:
 };
 
 class QtBoolEdit : public QWidget {
-    Q_OBJECT
-public:
-    QtBoolEdit(QWidget *parent = 0);
+  Q_OBJECT
+
+  public:
+    explicit QtBoolEdit(QWidget *parent = 0);
 
     bool textVisible() const { return m_textVisible; }
     void setTextVisible(bool textVisible);
@@ -113,42 +115,44 @@ public:
 
     bool blockCheckBoxSignals(bool block);
 
-Q_SIGNALS:
-    void toggled(bool);
+  Q_SIGNALS:
+    void toggled(bool b);
 
-protected:
+  protected:
     void mousePressEvent(QMouseEvent * event);
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
 
-private:
+  private:
     QCheckBox *m_checkBox;
     bool m_textVisible;
 };
 
 class QtKeySequenceEdit : public QWidget
 {
-    Q_OBJECT
-public:
-    QtKeySequenceEdit(QWidget *parent = 0);
+  Q_OBJECT
+
+  public:
+    explicit QtKeySequenceEdit(QWidget *parent = 0);
 
     QKeySequence keySequence() const;
     bool eventFilter(QObject *o, QEvent *e);
-public Q_SLOTS:
-    void setKeySequence(const QKeySequence &sequence);
-Q_SIGNALS:
+    public Q_SLOTS:
+      void setKeySequence(const QKeySequence &sequence);
+  Q_SIGNALS:
     void keySequenceChanged(const QKeySequence &sequence);
-protected:
+  protected:
     void focusInEvent(QFocusEvent *e);
     void focusOutEvent(QFocusEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *e);
     bool event(QEvent *e);
-private slots:
-    void slotClearShortcut();
-private:
+    private slots:
+      void slotClearShortcut();
+  private:
     void handleKeyEvent(QKeyEvent *e);
-    int translateModifiers(Qt::KeyboardModifiers state, const QString &text) const;
+    int translateModifiers(Qt::KeyboardModifiers state,
+        const QString &text) const;
 
     int m_num;
     QKeySequence m_keySequence;

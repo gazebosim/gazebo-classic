@@ -572,11 +572,14 @@ static void ComputeRows(
                 dxSORLCPParameters params,
                 boost::recursive_mutex* /*mutex*/)
 {
+
+  #ifdef REPORT_THREAD_TIMING
   struct timeval tv;
   double cur_time;
   gettimeofday(&tv,NULL);
   cur_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   //printf("thread %d started at time %f\n",thread_id,cur_time);
+  #endif
 
   //boost::recursive_mutex::scoped_lock lock(*mutex); // put in ac read/writes?
   dxQuickStepParameters *qs    = params.qs;
@@ -1131,12 +1134,14 @@ static void SOR_LCP (dxWorldProcessContext *context,
   int thread_id = 0;
 
 
+  #ifdef REPORT_THREAD_TIMING
   // timing
   struct timeval tv;
   double cur_time;
   gettimeofday(&tv,NULL);
   cur_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
   //printf("    quickstep start threads at time %f\n",cur_time);
+  #endif
 
 
   IFTIMING (dTimerNow ("start pgs rows"));

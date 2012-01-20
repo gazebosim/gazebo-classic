@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -48,16 +64,16 @@ void Server::LoadPlugin(const std::string &_filename)
 bool Server::Load(const std::string &_filename)
 {
   std::string host = "";
-  unsigned short port = 0;
+  unsigned int port = 0;
 
-  gazebo::transport::get_master_uri(host,port);
+  gazebo::transport::get_master_uri(host, port);
 
   this->master = new gazebo::Master();
   this->master->Init(port);
   this->master->RunThread();
 
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =
-       this->plugins.begin(); iter != this->plugins.end(); iter++)
+       this->plugins.begin(); iter != this->plugins.end(); ++iter)
   {
     (*iter)->Load();
   }
@@ -86,16 +102,16 @@ bool Server::Load(const std::string &_filename)
   physics::load();
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  while(worldElem)
+  while (worldElem)
   {
     physics::WorldPtr world = physics::create_world();
 
-    //Create the world
+    // Create the world
     try
     {
       physics::load_world(world, worldElem);
     }
-    catch (common::Exception e)
+    catch(common::Exception &e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -170,14 +186,14 @@ void Server::Run()
   // Stop gazebo
   gazebo::stop();
 
-  // Stop the master 
+  // Stop the master
   this->master->Stop();
 }
 
-void Server::SetParams( const common::StrStr_M &params )
+void Server::SetParams(const common::StrStr_M &params)
 {
   common::StrStr_M::const_iterator iter;
-  for (iter = params.begin(); iter != params.end(); iter++)
+  for (iter = params.begin(); iter != params.end(); ++iter)
   {
     if (iter->first == "pause")
     {
@@ -186,7 +202,7 @@ void Server::SetParams( const common::StrStr_M &params )
       {
         p = boost::lexical_cast<bool>(iter->second);
       }
-      catch (...)
+      catch(...)
       {
         // Unable to convert via lexical_cast, so try "true/false" string
         std::string str = iter->second;
@@ -197,7 +213,7 @@ void Server::SetParams( const common::StrStr_M &params )
         else if (str == "false")
           p = false;
         else
-          gzerr << "Invalid param value[" << iter->first << ":" 
+          gzerr << "Invalid param value[" << iter->first << ":"
                 << iter->second << "]\n";
       }
 
@@ -216,7 +232,7 @@ void Server::ProcessControlMsgs()
 {
   std::list<msgs::ServerControl>::iterator iter;
   for (iter = this->controlMsgs.begin();
-       iter != this->controlMsgs.end(); iter++)
+       iter != this->controlMsgs.end(); ++iter)
   {
     if ((*iter).has_save_world_name() && (*iter).has_save_filename())
     {
@@ -270,3 +286,5 @@ void Server::ProcessControlMsgs()
   }
   this->controlMsgs.clear();
 }
+
+

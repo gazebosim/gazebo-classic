@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo Time functions 
+/* Desc: Gazebo Time functions
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
  */
@@ -31,7 +31,6 @@
 /// \addtogroup player
 /// \brief Gazebo player driver
 /// \{
-
   /// \brief Gazebo access to PlayerTime
 class GazeboTime : public PlayerTime
 {
@@ -57,3 +56,5 @@ class GazeboTime : public PlayerTime
 /// \}
 
 #endif
+
+

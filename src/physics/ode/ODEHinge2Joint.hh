@@ -31,71 +31,73 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
-  
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
-
   /// \brief A two axis hinge joint
   class ODEHinge2Joint : public Hinge2Joint<ODEJoint>
   {
     /// \brief Constructor
     public: ODEHinge2Joint(dWorldID worldId);
-  
+
     /// \brief Destructor
-    public: virtual ~ODEHinge2Joint(); 
-  
+    public: virtual ~ODEHinge2Joint();
+
     /// \brief Load the joint
-    protected: virtual void Load( sdf::ElementPtr &_sdf );
-   
+    protected: virtual void Load(sdf::ElementPtr &_sdf);
+
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
-  
+    public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+
     /// \brief Set the first axis of rotation
-    public: virtual void SetAxis( int index, const math::Vector3 &axis );
-  
+    public: virtual void SetAxis(int index, const math::Vector3 &axis);
+
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
-  
+
     /// \brief Get anchor point
     public: virtual math::Vector3 GetAnchor(int index) const;
-  
+
     /// \brief Get first axis of rotation
     public: virtual math::Vector3 GetGlobalAxis(int index) const;
-  
+
     /// \brief Get angle of rotation about first axis
     public: virtual math::Angle GetAngleImpl(int index) const;
-  
+
     /// \brief Get rate of rotation about first axis
     public: virtual double GetVelocity(int index) const;
-  
+
     /// \brief Set the velocity of an axis(index).
     public: virtual void SetVelocity(int index, double angle);
-  
+
     /// \brief Set the max allowed force of an axis(index).
     public: virtual void SetMaxForce(int index, double t);
-  
+
     /// \brief Get the max allowed force of an axis(index).
     public: virtual double GetMaxForce(int index);
-  
+
     /// \brief Set the torque
     public: virtual void SetForce(int index, double torque);
-  
+
     /// \brief Get the specified parameter
-    public: virtual double GetParam( int parameter ) const;
-  
+    public: virtual double GetParam(int parameter) const;
+
     /// \brief Set _parameter with _value
-    public: virtual void SetParam( int parameter, double value );
+    public: virtual void SetParam(int parameter, double value);
   };
-  
+
   /// \}
   /// \}
   }
 }
 #endif
+
+
+
+
+
+
 

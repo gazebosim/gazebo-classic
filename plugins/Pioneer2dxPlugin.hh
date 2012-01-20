@@ -34,4 +34,5 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
   };
 }
-#endif 
+#endif
+

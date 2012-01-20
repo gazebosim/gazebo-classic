@@ -34,32 +34,29 @@ std::string config_filename = "";
 
 bool quit = false;
 
-////////////////////////////////////////////////////////////////////////////////
-// TODO: Implement these options
+//////////////////////////////////////////////////
 void PrintUsage()
 {
   fprintf(stderr, "Usage: gzphysics [-hv] <worldfile>\n");
   return;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Print the version/licence string
+//////////////////////////////////////////////////
 void PrintVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Parse the argument list.  Options are placed in static variables.
-int ParseArgs(int argc, char **argv)
+//////////////////////////////////////////////////
+int ParseArgs(int _argc, char **_argv)
 {
-  //FILE *tmpFile;
+  // FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("h");
+  char *flags = const_cast<char*>("h");
 
   // Get letter options
-  while ((ch = getopt(argc, argv, flags)) != -1)
+  while ((ch = getopt(_argc, _argv, flags)) != -1)
   {
     switch (ch)
     {
@@ -70,19 +67,18 @@ int ParseArgs(int argc, char **argv)
     }
   }
 
-  argc -= optind;
-  argv += optind;
+  _argc -= optind;
+  _argv += optind;
 
   // Get the world file name
-  if (argc >= 1)
-    config_filename = argv[0];
+  if (_argc >= 1)
+    config_filename = _argv[0];
 
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// sighandler to shut everything down properly
-void SignalHandler( int )
+//////////////////////////////////////////////////
+void SignalHandler(int)
 {
   quit = true;
 }
@@ -100,16 +96,17 @@ void Load()
 
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
 
-  while(worldElem)
+  while (worldElem)
   {
-    gazebo::physics::WorldPtr world = gazebo::physics::create_world(worldElem->GetValueString("name"));
+    gazebo::physics::WorldPtr world =
+      gazebo::physics::create_world(worldElem->GetValueString("name"));
 
-    //Create the world
+    // Create the world
     try
     {
       gazebo::physics::load_world(world, worldElem);
     }
-    catch (gazebo::common::Exception e)
+    catch(gazebo::common::Exception &e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -130,12 +127,11 @@ void Run()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Main function
-int main(int argc, char **argv)
+//////////////////////////////////////////////////
+int main(int _argc, char **_argv)
 {
-  //Application Setup
-  if (ParseArgs(argc, argv) != 0)
+  // Application Setup
+  if (ParseArgs(_argc, _argv) != 0)
     return -1;
 
   PrintVersion();
@@ -148,6 +144,8 @@ int main(int argc, char **argv)
 
   Load();
   Run();
-  
+
   return 0;
 }
+
+

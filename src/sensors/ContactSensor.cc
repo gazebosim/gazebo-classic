@@ -87,7 +87,7 @@ void ContactSensor::Load()
   physics::WorldPtr world = gazebo::physics::get_world(worldName);
   this->model = world->GetModelByName(modelName);
 
-  sdf::ElementPtr collisionElem = 
+  sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
 
   // Get all the collision elements
@@ -95,13 +95,13 @@ void ContactSensor::Load()
   {
     // get collision name
     collisionName = collisionElem->GetValueString("name");
-    collisionFullyScopedName = worldName + "::" + modelName + "::" + 
+    collisionFullyScopedName = worldName + "::" + modelName + "::" +
       linkName + "::" + collisionName;
     collision = this->model->GetChildCollision(collisionFullyScopedName);
 
     if (!collision)
     {
-      gzerr << "Unable to find collision element[" 
+      gzerr << "Unable to find collision element["
             << collisionFullyScopedName  << "]\n";
     }
     else
@@ -120,7 +120,7 @@ void ContactSensor::Init()
   Sensor::Init();
 
   std::vector<physics::CollisionPtr>::iterator iter;
-  for (iter = this->collisions.begin(); iter != this->collisions.end(); iter++)
+  for (iter = this->collisions.begin(); iter != this->collisions.end(); ++iter)
   {
     (*iter)->SetContactsEnabled(true);
   }
@@ -130,17 +130,17 @@ void ContactSensor::Init()
 void ContactSensor::UpdateImpl(bool /*_force*/)
 {
   this->mutex->lock();
-  if (this->contactsPub && this->contactsPub->HasConnections() && 
+  if (this->contactsPub && this->contactsPub->HasConnections() &&
       this->contacts.size() > 0)
   {
     msgs::Contacts msg;
 
     Contact_M::iterator iter;
     std::map<std::string, physics::Contact>::iterator iter2;
-    for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
+    for (iter = this->contacts.begin(); iter != this->contacts.end(); ++iter)
     {
       // Only transmit one contact
-      for (iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++)
+      for (iter2 = iter->second.begin(); iter2 != iter->second.end(); ++iter2)
       {
         msgs::Contact *contactMsg = msg.add_contact();
         contactMsg->set_collision1(
@@ -148,7 +148,7 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
         contactMsg->set_collision2(
             iter2->second.collision2->GetScopedName());
 
-        for (int i=0; i < iter2->second.count; i++)
+        for (int i = 0; i < iter2->second.count; i++)
         {
           msgs::Vector3d *posMsg = contactMsg->add_position();
           msgs::Vector3d *normalMsg = contactMsg->add_normal();
@@ -184,7 +184,6 @@ unsigned int ContactSensor::GetCollisionCount() const
 }
 
 //////////////////////////////////////////////////
-/// Get a collision name
 std::string ContactSensor::GetCollisionName(unsigned int _index) const
 {
   std::string result;
@@ -204,7 +203,7 @@ unsigned int ContactSensor::GetCollisionContactCount(
   if (iter != this->contacts.end())
     return iter->second.size();
   else
-    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
+    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision["
           << _collisionName << "]\n";
 
   return 0;
@@ -222,19 +221,19 @@ physics::Contact ContactSensor::GetCollisionContact(
     {
       std::map<std::string, physics::Contact>::const_iterator iter2;
       iter2 = iter->second.begin();
-      std::advance(iter2,_index);
+      std::advance(iter2, _index);
       return iter2->second;
     }
     else
     {
-      gzerr << "Invalid index[" << _index 
-            << "] retreiving contact for collision[" << _collisionName 
+      gzerr << "Invalid index[" << _index
+            << "] retreiving contact for collision[" << _collisionName
             << "] in contact sensor[" << this->GetName() << "]\n";
     }
   }
   else
   {
-    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
+    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision["
           << _collisionName << "]\n";
   }
 
@@ -245,23 +244,24 @@ physics::Contact ContactSensor::GetCollisionContact(
 std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
     const std::string &_collisionName)
 {
-
   Contact_M::const_iterator iter = this->contacts.find(_collisionName);
 
   if (iter != this->contacts.end())
     return iter->second;
   else
-    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision[" 
+    gzerr << "Contact Sensor[" << this->GetName() << "] has no collision["
           << _collisionName << "]\n";
 
   return std::map<std::string, gazebo::physics::Contact>();
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::OnContact(const std::string &_collisionName, 
+void ContactSensor::OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact)
 {
   this->mutex->lock();
   this->contacts[_collisionName][_contact.collision2->GetName()] = _contact;
   this->mutex->unlock();
 }
+
+

@@ -25,8 +25,7 @@ bool EntityMaker::snapToGrid = true;
 double EntityMaker::snapDistance = 0.2;
 double EntityMaker::snapGridSize = 1.0;
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 EntityMaker::EntityMaker()
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -36,8 +35,7 @@ EntityMaker::EntityMaker()
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 EntityMaker::~EntityMaker()
 {
   this->camera.reset();
@@ -47,42 +45,42 @@ EntityMaker::~EntityMaker()
   this->requestPub.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to snap to grid
-void EntityMaker::SetSnapToGrid(bool snap)
+//////////////////////////////////////////////////
+void EntityMaker::SetSnapToGrid(bool _snap)
 {
-  snapToGrid = snap;
+  snapToGrid = _snap;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void EntityMaker::OnMousePush(const common::MouseEvent &/*event*/)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void EntityMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get a point snapped to a grid
-math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 p)
+//////////////////////////////////////////////////
+math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
 {
-  math::Vector3 result = p;
+  math::Vector3 result = _p;
 
   if (this->snapToGrid)
   {
-    math::Vector3 rounded = (p / this->snapGridSize).GetRounded() *
+    math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
       this->snapGridSize;
-    if (p.Distance( rounded ) < this->snapDistance)
+    if (_p.Distance(rounded) < this->snapDistance)
       result = rounded;
   }
 
   return result;
 }
+
+

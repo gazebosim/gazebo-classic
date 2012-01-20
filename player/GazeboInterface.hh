@@ -27,7 +27,6 @@
 /// \addtogroup player
 /// \brief Base class for all the player interfaces
 /// \{
-
 // Forward declarations
 class GazeboDriver;
 
@@ -66,3 +65,5 @@ class GazeboInterface
 /// \}
 
 #endif
+
+

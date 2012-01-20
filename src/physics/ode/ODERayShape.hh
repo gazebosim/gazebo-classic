@@ -23,20 +23,20 @@
 #ifndef ODERAYSHAPE_HH
 #define ODERAYSHAPE_HH
 
+#include <string>
+
 #include "physics/RayShape.hh"
 #include "physics/Shape.hh"
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
-    /// \brief Ray collision 
+    /// \brief Ray collision
     class ODERayShape : public RayShape
     {
       /// \brief Constructor for a global ray
@@ -46,15 +46,15 @@ namespace gazebo
       /// \param body Link the ray is attached to
       /// \param displayRays Indicates if the rays should be
       ///        displayed when rendering images
-      public: ODERayShape( CollisionPtr collision, bool displayRays );
-    
+      public: ODERayShape(CollisionPtr collision, bool displayRays);
+
       /// \brief Destructor
       public: virtual ~ODERayShape();
-  
+
       /// \brief Update the tay collision
       public: virtual void Update();
-   
-      /// \brief Get the nearest intersection 
+
+      /// \brief Get the nearest intersection
       public: virtual void GetIntersection(double &_dist,
                                            std::string &_entity);
 
@@ -62,7 +62,7 @@ namespace gazebo
       ///        body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
-      public: virtual void SetPoints(const math::Vector3 &posStart, 
+      public: virtual void SetPoints(const math::Vector3 &posStart,
                                      const math::Vector3 &posEnd);
 
       private: static void UpdateCallback(void *data, dGeomID o1, dGeomID o2);
@@ -81,3 +81,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
+
+

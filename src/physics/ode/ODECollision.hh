@@ -31,25 +31,23 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief Base class for all ODE collisions
     class ODECollision : public Collision
     {
       /// \brief Constructor
       public: ODECollision(LinkPtr link);
-    
+
       /// \brief Destructor
       public: virtual ~ODECollision();
-  
+
       /// \brief Load the collision
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /*public: virtual void Load()
               {
@@ -59,51 +57,50 @@ namespace gazebo
 
       /// \brief Finalize the collision
       public: void Fini();
- 
+
       /// \brief Set the encapsulated geometry object
       public: void SetCollision(dGeomID collisionId, bool placeable);
-    
+
       /// \brief Return the collision id
       /// \return The collision id
       public: dGeomID GetCollisionId() const;
-    
+
       /// \brief Get the ODE collision class
       public: int GetCollisionClass() const;
-    
+
       public: virtual void OnPoseChange();
-  
+
       /// \brief Set the category bits, used during collision detection
       /// \param bits The bits
       public: virtual void SetCategoryBits(unsigned int bits);
-    
+
       /// \brief Set the collide bits, used during collision detection
       /// \param bits The bits
       public: virtual void SetCollideBits(unsigned int bits);
-    
+
       /// \brief Get the bounding box, defined by the physics engine
       public: virtual math::Box GetBoundingBox() const;
-  
+
       /// \brief Get the collision's space ID
       public: dSpaceID GetSpaceId() const;
-  
+
       /// \brief Set the collision's space ID
       public: void SetSpaceId(dSpaceID spaceid);
-  
+
       private: void OnPoseChangeGlobal();
       private: void OnPoseChangeRelative();
       private: void OnPoseChangeNull();
 
       protected: dSpaceID spaceId;
-  
+
       ///  ID for the sub-collision
       protected: dGeomID collisionId;
 
       private: void (ODECollision::*onPoseChangeFunc)();
     };
-  
+
     /// \}
     /// \}
-  
   }
 }
 #endif

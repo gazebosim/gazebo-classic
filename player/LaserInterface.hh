@@ -32,67 +32,62 @@ namespace boost
 
 namespace libgazebo
 {
+  /// \addtogroup player_iface Interfaces
+  /// \{
+  /// \defgroup laser_player Laser Interface
+  /// \brief Plugin Player interface for a Gazebo laser
+  /// \{
+  // Forward declarations
+  class LaserIface;
 
-/// \addtogroup player_iface Interfaces
-/// \{
-/// \defgroup laser_player Laser Interface
-/// \brief Plugin Player interface for a Gazebo laser
-/// \{
-
-// Forward declarations
-class LaserIface;
-
-/// \brief Plugin Player interface for a Gazebo laser
-class LaserInterface : public GazeboInterface
-{
-  /// \brief Constructor
-  /// \param addr Plaer device address
-  /// \param driver The Gazebo driver
-  /// \param cf Player config file
-  /// \param section Section of the config
-  public: LaserInterface(player_devaddr_t addr, GazeboDriver *driver,
+  /// \brief Plugin Player interface for a Gazebo laser
+  class LaserInterface : public GazeboInterface
+  {
+    /// \brief Constructor
+    /// \param addr Plaer device address
+    /// \param driver The Gazebo driver
+    /// \param cf Player config file
+    /// \param section Section of the config
+    public: LaserInterface(player_devaddr_t addr, GazeboDriver *driver,
                               ConfigFile *cf, int section);
 
-  /// \brief Destructor
-  public: virtual ~LaserInterface();
+    /// \brief Destructor
+    public: virtual ~LaserInterface();
 
-  /// \brief Handle all messages. This is called from GazeboDriver
-  /// \param respQueue Response queue
-  /// \param hdr Message header
-  /// \param data Pointer to the message data
-  public: virtual int ProcessMessage(QueuePointer &respQueue,
+    /// \brief Handle all messages. This is called from GazeboDriver
+    /// \param respQueue Response queue
+    /// \param hdr Message header
+    /// \param data Pointer to the message data
+    public: virtual int ProcessMessage(QueuePointer &respQueue,
                                      player_msghdr_t *hdr, void *data);
 
-  /// \brief Update this interface, publish new info.
-  public: virtual void Update();
+    /// \brief Update this interface, publish new info.
+    public: virtual void Update();
 
-  /// \brief Open a SHM interface when a subscription is received.
-  ///        This is called fromGazeboDriver::Subscribe
-  public: virtual void Subscribe();
+    /// \brief Open a SHM interface when a subscription is received.
+    ///        This is called fromGazeboDriver::Subscribe
+    public: virtual void Subscribe();
 
-  /// \brief Close a SHM interface. This is called from
-  ///        GazeboDriver::Unsubscribe
-  public: virtual void Unsubscribe();
+    /// \brief Close a SHM interface. This is called from
+    ///        GazeboDriver::Unsubscribe
+    public: virtual void Unsubscribe();
 
-  /// \brief The gazebo laser interface
-  private: LaserIface *iface;
+    /// \brief The gazebo laser interface
+    private: LaserIface *iface;
 
-  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-  private: char *gz_id;
+    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+    private: char *gz_id;
 
-  /// \brief Timestamp on last data update
-  private: double datatime;
+    /// \brief Timestamp on last data update
+    private: double datatime;
 
-  private: int scanId;
+    private: int scanId;
 
-  private: player_laser_data_t data;
+    private: player_laser_data_t data;
 
-  private: static boost::recursive_mutex *mutex;
-};
-
-/// \} 
-/// \} 
-
-
+    private: static boost::recursive_mutex *mutex;
+  };
+  /// \}
+  /// \}
 }
 #endif

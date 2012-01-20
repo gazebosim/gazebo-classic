@@ -29,26 +29,25 @@
 
 namespace gazebo
 {
-	namespace math
+  namespace math
   {
     /// \addtogroup gazebo_math
     /// \{
-    
     /// \brief Encapsulates a position and rotation in three space
     class Pose
     {
       /// \brief Default constructors
       public: Pose();
-    
+
       /// \brief Constructor
       /// \param pos A position
       /// \param rot A rotation
-      public: Pose(const Vector3 &pos, const Quaternion &rot);
-    
+      public: Pose(const Vector3 &_pos, const Quaternion &_rot);
+
       /// \brief Copy constructor
       /// \param pose Pose to copy
-      public: Pose( const Pose &pose );
-    
+      public: Pose(const Pose &_pose);
+
       /// \brief Destructor
       public: virtual ~Pose();
 
@@ -56,31 +55,33 @@ namespace gazebo
 
       /// \brief See if a pose is finite (e.g., not nan)
       public: bool IsFinite() const;
-    
+
       /// \brief Fix any nan values
       public: inline void Correct()
-              {  this->pos.Correct(); this->rot.Correct(); }
+              {
+                this->pos.Correct();
+                this->rot.Correct();
+              }
 
-    
       /// \brief Get the inverse of this pose
       public: Pose GetInverse() const;
-    
+
       /// \brief Addition operator
       /// \param pose Pose to add to this pose
       /// \return The resulting pose
       public: Pose operator+(const Pose &pose) const;
-    
+
       /// \brief Add-Equals operator
       /// \param pose Pose to add to this pose
       /// \return The resulting pose
       public: const Pose &operator+=(const Pose &pose);
-    
+
       /// \brief Subtraction operator
       /// \param pose Pose to subtract from this one
       /// \return The resulting pose
       public: inline Pose operator-(const Pose &_pose) const
               {
-                return Pose(this->CoordPositionSub(_pose), 
+                return Pose(this->CoordPositionSub(_pose),
                             this->CoordRotationSub(_pose.rot));
               }
 
@@ -92,32 +93,32 @@ namespace gazebo
       /// \brief Equality operator
       /// \param _pose Pose for comparison
       /// \return True if equal
-      public: bool operator==(const Pose &_pose) const;
+      public: bool operator ==(const Pose &_pose) const;
 
       /// \brief Inequality operator
       /// \param _pose Pose for comparison
       /// \return True if not equal
       public: bool operator!=(const Pose &_pose) const;
-    
+
       /// \brief Multiplication operator
       public: Pose operator*(const Pose &pose);
-              
+
       /// \brief Add one point to a vector: result = this + pos
       /// \param pos Position to add to this pose
       /// \return The resulting position
-      public: Vector3 CoordPositionAdd(const Vector3 &pos) const;
-    
+      public: Vector3 CoordPositionAdd(const Vector3 &_pos) const;
+
       /// \brief Add one point to another: result = this + pose
       /// \param pose The Pose to add
       /// \return The resulting position
-      public: Vector3 CoordPositionAdd(const Pose &pose) const;
-    
+      public: Vector3 CoordPositionAdd(const Pose &_pose) const;
+
       /// \brief Subtract one position from another: result = this - pose
       /// \param pose Pose to subtract
       /// \return The resulting position
       public: inline Vector3 CoordPositionSub(const Pose &_pose) const
               {
-                Quaternion tmp( 0.0,
+                Quaternion tmp(0.0,
                     this->pos.x - _pose.pos.x,
                     this->pos.y - _pose.pos.y,
                     this->pos.z - _pose.pos.z);
@@ -125,66 +126,67 @@ namespace gazebo
                 tmp = _pose.rot.GetInverse() * (tmp * _pose.rot);
                 return Vector3(tmp.x, tmp.y, tmp.z);
               }
-    
+
       /// \brief Add one rotation to another: result =  this->rot + rot
       /// \param rot Rotation to add
       /// \return The resulting rotation
-      public: Quaternion CoordRotationAdd(const Quaternion &rot) const;
-    
+      public: Quaternion CoordRotationAdd(const Quaternion &_rot) const;
+
       /// \brief Subtract one rotation from another: result = this->rot - rot
       /// \param rot The rotation to subtract
       /// \return The resulting rotation
-      public: inline Quaternion CoordRotationSub(const Quaternion &rot) const
+      public: inline Quaternion CoordRotationSub(const Quaternion &_rot) const
               {
-                Quaternion result(rot.GetInverse() * this->rot);
+                Quaternion result(_rot.GetInverse() * this->rot);
                 result.Normalize();
                 return result;
               }
 
-    
-      /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and 
+
+      /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and
       ///        this, find a
-      public: Pose CoordPoseSolve(const Pose &b) const;
-    
+      public: Pose CoordPoseSolve(const Pose &_b) const;
+
       /// \brief Reset the pose
       public: void Reset();
-    
+
       /// \brief Rotate vector part of a pose about the origin
-      public: Pose RotatePositionAboutOrigin(const Quaternion &rot) const;
+      public: Pose RotatePositionAboutOrigin(const Quaternion &_rot) const;
 
       /// \brief Round all values to _precision decimal places
       public: void Round(int _precision);
-    
+
       /// \brief The position
       public: Vector3 pos;
-    
+
       /// \brief The rotation
       public: Quaternion rot;
-    
+
       /// \brief Ostream operator
       /// \param out Ostream
       /// \param pose Pose to output
       /// \return the Ostream
-      public: friend std::ostream &operator<<(std::ostream &out, 
-                                              const gazebo::math::Pose &pose)
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                              const gazebo::math::Pose &_pose)
               {
-                out << pose.pos << " " << pose.rot;
-                return out;
+                _out << _pose.pos << " " << _pose.rot;
+                return _out;
               }
 
-    public: friend std::istream &operator>>( std::istream &in, 
-                gazebo::math::Pose &pose )
+    public: friend std::istream &operator>>(std::istream &_in,
+                gazebo::math::Pose &_pose)
             {
               // Skip white spaces
-              in.setf( std::ios_base::skipws );
-              in >> pose.pos >> pose.rot;
-              return in;
+              _in.setf(std::ios_base::skipws);
+              _in >> _pose.pos >> _pose.rot;
+              return _in;
             }
     };
-    
     /// \}
   }
-
 }
 #endif
+
+
+
 

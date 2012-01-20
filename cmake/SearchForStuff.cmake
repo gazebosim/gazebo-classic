@@ -226,6 +226,13 @@ if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()
 
+find_package(GTest)
+if (GTEST_FOUND)
+  enable_testing()
+else()
+  message (STATUS "  Tests will not be built")
+endif()
+
 ########################################
 # Find Boost, if not specified manually
 if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
@@ -325,26 +332,28 @@ endif ()
 
 ########################################
 # Find libtool
-FIND_PATH(libtool_include_dir ltdl.h /usr/include /usr/local/include)
-IF (NOT libtool_include_dir)
-  MESSAGE (STATUS "Looking for ltdl.h - not found")
-  BUILD_WARNING ("ltdl.h not found, plugins will not be supported.")
-  SET (libtool_include_dir /usr/include)
-ELSE (NOT libtool_include_dir)
-  MESSAGE (STATUS "Looking for ltdl.h - found")
-ENDIF (NOT libtool_include_dir)
+find_path(libtool_include_dir ltdl.h /usr/include /usr/local/include)
+if (NOT libtool_include_dir)
+  message (STATUS "Looking for ltdl.h - not found")
+  BUILD_WARNING ("ltdl.h not found")
+  set (libtool_include_dir /usr/include)
+else (NOT libtool_include_dir)
+  message (STATUS "Looking for ltdl.h - found")
+endif (NOT libtool_include_dir)
 
-FIND_LIBRARY(libtool_library ltdl /usr/lib /usr/local/lib)
-IF (NOT libtool_library)
-  MESSAGE (STATUS "Looking for libltdl - not found")
+find_library(libtool_library ltdl /usr/lib /usr/local/lib)
+if (NOT libtool_library)
+  message (STATUS "Looking for libltdl - not found")
+else (NOT libtool_library)
+  message (STATUS "Looking for libltdl - found")
+endif (NOT libtool_library)
 
-ELSE (NOT libtool_library)
-  MESSAGE (STATUS "Looking for libltdl - found")
-ENDIF (NOT libtool_library)
-
-IF (libtool_library AND libtool_include_dir)
-  SET (HAVE_LTDL TRUE)
-ENDIF (libtool_library AND libtool_include_dir)
+if (libtool_library AND libtool_include_dir)
+  set (HAVE_LTDL TRUE)
+else ()
+  set (HAVE_LTDL FALSE)
+  set (libtool_library "" CACHE STRING "" FORCE)
+endif ()
 
 
 ########################################

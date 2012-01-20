@@ -36,61 +36,52 @@ using namespace physics;
 
 unsigned int MapShape::collisionCounter = 0;
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-MapShape::MapShape(CollisionPtr parent)
-    : Shape(parent)
+//////////////////////////////////////////////////
+MapShape::MapShape(CollisionPtr _parent)
+    : Shape(_parent)
 {
   this->AddType(Base::MAP_SHAPE);
 
   this->root = new QuadNode(NULL);
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 MapShape::~MapShape()
 {
-  if (this->root)
-    delete this->root;
-
-  if (this->mapImage)
-    delete this->mapImage;
+  delete this->root;
+  delete this->mapImage;
   this->mapImage = NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Update function.
+//////////////////////////////////////////////////
 void MapShape::Update()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load the heightmap
-void MapShape::Load( sdf::ElementPtr _sdf )
+//////////////////////////////////////////////////
+void MapShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 
   std::string imageFilename = _sdf->GetValueString("filename");
 
   // Make sure they are ok
-  if (_sdf->GetValueDouble("scale") <= 0) 
-    _sdf->GetAttribute("scale")->Set( 0.1 );
-  if (this->sdf->GetValueInt("threshold") <=0) 
+  if (_sdf->GetValueDouble("scale") <= 0)
+    _sdf->GetAttribute("scale")->Set(0.1);
+  if (this->sdf->GetValueInt("threshold") <= 0)
     _sdf->GetAttribute("threshold")->Set(200);
-  if (this->sdf->GetValueDouble("height") <= 0) 
-    _sdf->GetAttribute("height")->Set( 1.0 );
+  if (this->sdf->GetValueDouble("height") <= 0)
+    _sdf->GetAttribute("height")->Set(1.0);
 
-  // Load the image 
+  // Load the image
   this->mapImage = new common::Image();
   this->mapImage->Load(imageFilename);
 
   if (!this->mapImage->Valid())
-    gzthrow(std::string("Unable to open image file[") + imageFilename + "]" );
+    gzthrow(std::string("Unable to open image file[") + imageFilename + "]");
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Init the map
+//////////////////////////////////////////////////
 void MapShape::Init()
 {
   this->root->x = 0;
@@ -104,13 +95,14 @@ void MapShape::Init()
   this->merged = true;
   while (this->merged)
   {
-    this->merged =false;
+    this->merged = false;
     this->ReduceTree(this->root);
   }
 
   this->CreateBoxes(this->root);
 }
 
+//////////////////////////////////////////////////
 void MapShape::FillShapeMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
@@ -122,36 +114,40 @@ void MapShape::FillShapeMsg(msgs::Geometry &_msg)
 }
 
 
+//////////////////////////////////////////////////
 std::string MapShape::GetFilename() const
 {
   return this->sdf->GetValueString("filename");
 }
 
+//////////////////////////////////////////////////
 double MapShape::GetScale() const
 {
   return this->sdf->GetValueDouble("scale");
 }
 
+//////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
   return this->sdf->GetValueInt("threshold");
 }
 
+//////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
   return this->sdf->GetValueDouble("height");
 }
 
+//////////////////////////////////////////////////
 int MapShape::GetGranularity() const
 {
   return this->sdf->GetValueInt("granularity");
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Create the ODE boxes
+//////////////////////////////////////////////////
 void MapShape::CreateBoxes(QuadNode * /*_node*/)
 {
-  /*TODO: fix this to use SDF 
+  /*TODO: fix this to use SDF
   if (node->leaf)
   {
     if (!node->valid || !node->occupied)
@@ -163,7 +159,7 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     CollisionPtr collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision("box", this->collisionParent->GetLink());
     collision->SetSaveable(false);
 
-    stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">"; 
+    stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";
 
     float x = (node->x + node->width / 2.0) * this->sdf->GetValueDouble("scale");
     float y = (node->y + node->height / 2.0) * this->sdf->GetValueDouble("scale");
@@ -173,9 +169,9 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     float zSize = this->sdf->GetValueDouble("height");
 
     char collisionName[256];
-    sprintf(collisionName,"map_collision_%d",collisionCounter++);
+    sprintf(collisionName, "map_collision_%d", collisionCounter++);
 
-    stream << "<collision:box name='" << collisionName << "'>";
+    stream << "<collision:box name ='" << collisionName << "'>";
     stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
     stream << "  <rpy>0 0 0</rpy>";
     stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
@@ -188,10 +184,10 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     stream << "</collision:box>";
     stream << "</gazebo:world>";
 
-    boxConfig->LoadString( stream.str() );
+    boxConfig->LoadString(stream.str());
 
     collision->SetStatic(true);
-    collision->Load( boxConfig->GetRootNode()->GetChild() );
+    collision->Load(boxConfig->GetRootNode()->GetChild());
 
     delete boxConfig;
   }
@@ -206,38 +202,38 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
   */
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Reduce the size of the quad tree
-void MapShape::ReduceTree(QuadNode *node)
+//////////////////////////////////////////////////
+void MapShape::ReduceTree(QuadNode *_node)
 {
   std::deque<QuadNode*>::iterator iter;
 
-  if (!node->valid)
+  if (!_node->valid)
     return;
 
-  if (!node->leaf)
+  if (!_node->leaf)
   {
     unsigned int count = 0;
-    int size = node->children.size();
+    int size = _node->children.size();
 
     for (int i = 0; i < size; i++)
     {
-      if (node->children[i]->valid)
+      if (_node->children[i]->valid)
       {
-        this->ReduceTree(node->children[i]);
+        this->ReduceTree(_node->children[i]);
       }
-      if (node->children[i]->leaf)
+      if (_node->children[i]->leaf)
         count++;
     }
 
-    if (node->parent && count == node->children.size())
+    if (_node->parent && count == _node->children.size())
     {
-      for (iter = node->children.begin(); iter != node->children.end(); iter++)
+      for (iter = _node->children.begin();
+           iter != _node->children.end(); ++iter)
       {
-        node->parent->children.push_back( *iter );
-        (*iter)->parent = node->parent;
+        _node->parent->children.push_back(*iter);
+        (*iter)->parent = _node->parent;
       }
-      node->valid = false;
+      _node->valid = false;
     }
     else
     {
@@ -245,105 +241,103 @@ void MapShape::ReduceTree(QuadNode *node)
       while (!done)
       {
         done = true;
-        for (iter = node->children.begin(); 
-             iter != node->children.end();iter++ )
+        for (iter = _node->children.begin();
+             iter != _node->children.end(); ++iter)
         {
           if (!(*iter)->valid)
           {
-            node->children.erase(iter, iter+1);
+            _node->children.erase(iter, iter+1);
             done = false;
             break;
           }
         }
       }
     }
-
   }
   else
   {
-    this->Merge(node, node->parent);
+    this->Merge(_node, _node->parent);
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Merege quad tree cells
-void MapShape::Merge(QuadNode *nodeA, QuadNode *nodeB)
+//////////////////////////////////////////////////
+void MapShape::Merge(QuadNode *_nodeA, QuadNode *_nodeB)
 {
   std::deque<QuadNode*>::iterator iter;
 
-  if (!nodeB)
+  if (!_nodeB)
     return;
 
-  if (nodeB->leaf)
+  if (_nodeB->leaf)
   {
-    if (nodeB->occupied != nodeA->occupied)
+    if (_nodeB->occupied != _nodeA->occupied)
       return;
 
-    if ( nodeB->x == nodeA->x + nodeA->width && 
-         nodeB->y == nodeA->y && 
-         nodeB->height == nodeA->height )
+    if (_nodeB->x == _nodeA->x + _nodeA->width &&
+         _nodeB->y == _nodeA->y &&
+         _nodeB->height == _nodeA->height)
     {
-      nodeA->width += nodeB->width;
-      nodeB->valid = false;
-      nodeA->valid = true;
+      _nodeA->width += _nodeB->width;
+      _nodeB->valid = false;
+      _nodeA->valid = true;
 
       this->merged = true;
     }
 
-    if (nodeB->x == nodeA->x && 
-        nodeB->width == nodeA->width &&
-        nodeB->y == nodeA->y + nodeA->height )
+    if (_nodeB->x == _nodeA->x &&
+        _nodeB->width == _nodeA->width &&
+        _nodeB->y == _nodeA->y + _nodeA->height)
     {
-      nodeA->height += nodeB->height;
-      nodeB->valid = false;
-      nodeA->valid = true;
+      _nodeA->height += _nodeB->height;
+      _nodeB->valid = false;
+      _nodeA->valid = true;
 
       this->merged = true;
     }
   }
   else
   {
-
-    for (iter = nodeB->children.begin(); iter != nodeB->children.end(); iter++)
+    for (iter = _nodeB->children.begin();
+         iter != _nodeB->children.end(); ++iter)
     {
       if ((*iter)->valid)
       {
-        this->Merge(nodeA, (*iter));
+        this->Merge(_nodeA, (*iter));
       }
     }
   }
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Construct the quad tree
-void MapShape::BuildTree(QuadNode *node)
+//////////////////////////////////////////////////
+void MapShape::BuildTree(QuadNode *_node)
 {
   QuadNode *newNode = NULL;
   unsigned int freePixels, occPixels;
 
-  this->GetPixelCount(node->x, node->y, node->width, node->height, 
+  this->GetPixelCount(_node->x, _node->y, _node->width, _node->height,
                       freePixels, occPixels);
 
-  //int diff = labs(freePixels - occPixels);
+  // int diff = labs(freePixels - occPixels);
 
-  if ((int)(node->width*node->height) > this->sdf->GetValueInt("granularity"))
+  if (static_cast<int>(_node->width*_node->height) >
+      this->sdf->GetValueInt("granularity"))
   {
     float newX, newY;
     float newW, newH;
-   
-    newY = node->y;
-    newW = node->width / 2.0;
-    newH = node->height / 2.0;
+
+    newY = _node->y;
+    newW = _node->width / 2.0;
+    newH = _node->height / 2.0;
 
     // Create the children for the node
-    for (int i=0; i<2; i++)
+    for (int i = 0; i < 2; i++)
     {
-      newX = node->x;
+      newX = _node->x;
 
-      for (int j=0; j<2; j++)
+      for (int j = 0; j < 2; j++)
       {
-        newNode = new QuadNode(node);
+        newNode = new QuadNode(_node);
         newNode->x = (unsigned int)newX;
         newNode->y = (unsigned int)newY;
 
@@ -352,54 +346,52 @@ void MapShape::BuildTree(QuadNode *node)
         else
           newNode->width = (unsigned int)ceil(newW);
 
-        if (i==0)
+        if (i == 0)
           newNode->height = (unsigned int)floor(newH);
         else
           newNode->height = (unsigned int)ceil(newH);
 
-        node->children.push_back(newNode);
+        _node->children.push_back(newNode);
 
         this->BuildTree(newNode);
 
         newX += newNode->width;
 
-        if (newNode->width == 0 || newNode->height ==0)
+        if (newNode->width == 0 || newNode->height == 0)
           newNode->valid = false;
       }
 
-      if (i==0)
+      if (i == 0)
         newY += floor(newH);
       else
         newY += ceil(newH);
     }
 
-    //node->occupied = true;
-    node->occupied = false;
-    node->leaf = false;
+    // _node->occupied = true;
+    _node->occupied = false;
+    _node->leaf = false;
   }
   else if (occPixels == 0)
   {
-    node->occupied = false;
-    node->leaf = true;
+    _node->occupied = false;
+    _node->leaf = true;
   }
   else
   {
-    node->occupied = true;
-    node->leaf = true;
+    _node->occupied = true;
+    _node->leaf = true;
   }
-
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get a count of pixels within a given area
-void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart, 
-                                 unsigned int width, unsigned int height, 
-                                 unsigned int &freePixels, 
-                                 unsigned int &occPixels )
+//////////////////////////////////////////////////
+void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
+                                 unsigned int width, unsigned int height,
+                                 unsigned int &freePixels,
+                                 unsigned int &occPixels)
 {
   common::Color pixColor;
   unsigned char v;
-  unsigned int x,y;
+  unsigned int x, y;
 
   freePixels = occPixels = 0;
 
@@ -409,9 +401,10 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
     {
       pixColor = this->mapImage->GetPixel(x, y);
 
-      v = (unsigned char)(255 * ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
-      //if (this->sdf->GetValueBool("negative"))
-        //v = 255 - v;
+      v = (unsigned char)(255 *
+          ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
+      // if (this->sdf->GetValueBool("negative"))
+        // v = 255 - v;
 
       if (v > this->sdf->GetValueInt("threshold"))
         freePixels++;
@@ -421,7 +414,9 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
   }
 }
 
+//////////////////////////////////////////////////
 void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
+

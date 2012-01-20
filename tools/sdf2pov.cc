@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include "sdf/sdf.h"
 #include "sdf/sdf_parser.h"
 #include "math/Pose.hh"
@@ -28,20 +44,20 @@ bool parse(int argc, char **argv)
   }
 
   // Get parameters from command line
-  for (int i=1; i < argc; i++)
+  for (int i = 1; i < argc; i++)
   {
     std::string p = argv[i];
     boost::trim(p);
-    params.push_back( p );
+    params.push_back(p);
   }
 
-  // Get parameters from stdin 
+  // Get parameters from stdin
   if (!isatty(fileno(stdin)))
   {
     char str[1024];
     while (!feof(stdin))
     {
-      if (fgets(str, 1024, stdin)==NULL)
+      if (fgets(str, 1024, stdin)== NULL)
         break;
 
       if (feof(stdin))
@@ -58,8 +74,8 @@ bool parse(int argc, char **argv)
 gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
 {
   gazebo::math::Vector3 result;
-  gazebo::math::Quaternion rot1(0,M_PI*.5,0);
-  gazebo::math::Quaternion rot2(0,-M_PI*.5,0);
+  gazebo::math::Quaternion rot1(0, M_PI*.5, 0);
+  gazebo::math::Quaternion rot2(0, -M_PI*.5, 0);
 
   result = rot1.RotateVector(_vec);
   result = rot2.RotateVector(result);
@@ -70,31 +86,30 @@ gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
 void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
 {
   const gazebo::common::Mesh *mesh;
- 
+
   mesh = gazebo::common::MeshManager::Instance()->Load(
       _elem->GetValueString("filename"));
 
   const_cast<gazebo::common::Mesh*>(mesh)->RecalculateNormals();
 
 
-  for (unsigned int i=0; i < mesh->GetSubMeshCount(); i++)
+  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
   {
     const gazebo::common::SubMesh *subMesh = mesh->GetSubMesh(i);
     printf("mesh2 {\n");
-
     printf("  vertex_vectors {\n");
-    printf("    %d,\n    ", subMesh->GetVertexCount());
-    for (unsigned int v=0; v < subMesh->GetVertexCount(); v++)
+    printf("    %d, \n    ", subMesh->GetVertexCount());
+    for (unsigned int v = 0; v < subMesh->GetVertexCount(); v++)
     {
       gazebo::math::Vector3 vert = subMesh->GetVertex(v);
-      //vert = _pose.CoordPositionAdd(vert);
+      // vert = _pose.CoordPositionAdd(vert);
       printf("<%f, %f, %f>, ", vert.x, vert.y, vert.z);
     }
     printf("  }\n");
 
     printf("  normal_vectors {\n");
-    printf("    %d,\n    ", subMesh->GetNormalCount());
-    for (unsigned int n=0; n < subMesh->GetNormalCount(); n++)
+    printf("    %d, \n    ", subMesh->GetNormalCount());
+    for (unsigned int n = 0; n < subMesh->GetNormalCount(); n++)
     {
       gazebo::math::Vector3 norm = subMesh->GetNormal(n);
       printf("<%f, %f, %f>, ", norm.x, norm.y, norm.z);
@@ -102,10 +117,10 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     printf("  }\n");
 
     printf("  uv_vectors {\n");
-    printf("    %d,\n", subMesh->GetTexCoordCount());
-    for (unsigned int j=0; j < subMesh->GetTexCoordCount(); j++)
+    printf("    %d, \n", subMesh->GetTexCoordCount());
+    for (unsigned int j = 0; j < subMesh->GetTexCoordCount(); j++)
     {
-      printf("    <%f, %f>,\n", subMesh->GetTexCoord(j).x,
+      printf("    <%f, %f>, \n", subMesh->GetTexCoord(j).x,
         1.0 - subMesh->GetTexCoord(j).y);
     }
     printf("  }\n");
@@ -115,37 +130,38 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     if (mat)
     {
       printf("  texture_list {\n");
-      printf("    1,\n");
+      printf("    1, \n");
       printf("  texture {\n");
       if (!mat->GetTextureImage().empty())
       {
-        printf("    uv_mapping pigment { image_map { tiff \"/home/nkoenig/%s\" } }\n",
-            mat->GetTextureImage().c_str()); 
+        printf("    uv_mapping pigment { image_map ");
+        printf("{ tiff \"/home/nkoenig/%s\" } }\n",
+            mat->GetTextureImage().c_str());
       }
       else
       {
-        printf("    pigment { color rgb <%f, %f, %f> }\n", 
-            mat->GetDiffuse().R(),mat->GetDiffuse().G(),mat->GetDiffuse().B());
+        printf("    pigment { color rgb <%f, %f, %f> }\n",
+            mat->GetDiffuse().R(), mat->GetDiffuse().G(),
+            mat->GetDiffuse().B());
       }
 
       printf("    finish {\n");
       printf("      ambient color rgb <%f, %f, %f>\n",
           mat->GetAmbient().R(), mat->GetAmbient().G(), mat->GetAmbient().B());
-      printf("      specular %f\n", 1.0);//mat->GetSpecular().R());
+      printf("      specular %f\n", 1.0);
       printf("    }\n");
 
       printf("  }\n");
       printf("  }\n");
-
     }
 
     printf("  face_indices {\n");
-    printf("    %d,\n", subMesh->GetIndexCount() / 3);
-    for (unsigned int j=0; j < subMesh->GetIndexCount(); j+=3)
+    printf("    %d, \n", subMesh->GetIndexCount() / 3);
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+= 3)
     {
       if (mat)
       {
-        printf("    <%d, %d, %d>,0\n", subMesh->GetIndex(j),
+        printf("    <%d, %d, %d>, 0\n", subMesh->GetIndex(j),
             subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
       }
       else
@@ -153,34 +169,33 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
         printf("    <%d, %d, %d>\n", subMesh->GetIndex(j),
             subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
       }
-
     }
     printf("  }\n");
 
     printf("  normal_indices {\n");
-    printf("    %d,\n", subMesh->GetIndexCount() / 3);
-    for (unsigned int j=0; j < subMesh->GetIndexCount(); j+=3)
+    printf("    %d, \n", subMesh->GetIndexCount() / 3);
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+= 3)
     {
-      printf("    <%d, %d, %d>,\n", subMesh->GetIndex(j),
+      printf("    <%d, %d, %d>, \n", subMesh->GetIndex(j),
         subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
     }
     printf("  }\n");
 /*
     printf("  uv_indices {\n");
-    printf("    %d,\n", subMesh->GetIndexCount() / 3);
-    for (unsigned int j=0; j < subMesh->GetIndexCount(); j+=3)
+    printf("    %d, \n", subMesh->GetIndexCount() / 3);
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); j+= 3)
     {
-      printf("    <%d, %d, %d>,\n", subMesh->GetIndex(j),
+      printf("    <%d, %d, %d>, \n", subMesh->GetIndex(j),
         subMesh->GetIndex(j+1), subMesh->GetIndex(j+2));
     }
     printf("  }\n");
     */
 
     gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
-    printf("  translate <%f, %f, %f>\n",_pose.pos.x, _pose.pos.y, _pose.pos.z);
-    printf("  rotate <%f, %f, %f>\n",RTOD(rpy.x), RTOD(rpy.y), RTOD(rpy.z));
+    printf("  translate <%f, %f, %f>\n", _pose.pos.x, _pose.pos.y, _pose.pos.z);
+    printf("  rotate <%f, %f, %f>\n", RTOD(rpy.x), RTOD(rpy.y), RTOD(rpy.z));
 
-    printf("}\n");  
+    printf("}\n");
   }
 }
 
@@ -192,10 +207,13 @@ void ProcessLight(sdf::ElementPtr _elem)
   pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
   diffuse = _elem->GetElement("diffuse")->GetValueColor("rgba");
   specular = _elem->GetElement("specular")->GetValueColor("rgba");
-  //double fadeDist = _elem->GetElement("attenuation")->GetValueDouble("range");
-  //double constant = _elem->GetElement("attenuation")->GetValueDouble("constant");
-  //double linear = _elem->GetElement("attenuation")->GetValueDouble("linear");
-  //double quadratic = _elem->GetElement("attenuation")->GetValueDouble("quadratic");
+  // double fadeDist =
+  // _elem->GetElement("attenuation")->GetValueDouble("range");
+  // double constant =
+  // _elem->GetElement("attenuation")->GetValueDouble("constant");
+  // double linear = _elem->GetElement("attenuation")->GetValueDouble("linear");
+  // double quadratic =
+  // _elem->GetElement("attenuation")->GetValueDouble("quadratic");
 
   printf("light_source {\n");
   printf("  <%f, %f, %f>, rgb <%f, %f, %f>\n",
@@ -205,7 +223,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   std::string type = _elem->GetValueString("type");
   if (type == "point")
   {
-    //printf("  pointlight\n");
+    // printf("  pointlight\n");
   }
   else if (type == "directional")
   {
@@ -225,15 +243,15 @@ void ProcessLight(sdf::ElementPtr _elem)
 
   if (_elem->HasElement("direction"))
   {
-    gazebo::math::Vector3 dir = 
+    gazebo::math::Vector3 dir =
       _elem->GetElement("direction")->GetValueVector3("xyz");
-    double d = pose.pos.GetDistToPlane(dir, gazebo::math::Vector3(0,0,1), 0);
+    double d = pose.pos.GetDistToPlane(dir, gazebo::math::Vector3(0, 0, 1), 0);
     double t;
     t = atan2(dir.x, dir.z*-1);
     double x = sin(t) * d;
     t = atan2(dir.y, dir.z*-1);
     double y = sin(t) * d;
-    printf("  point_at <%f, %f, 0.0>\n",x,y);
+    printf("  point_at <%f, %f, 0.0>\n", x, y);
   }
 
   printf("}\n");
@@ -245,24 +263,25 @@ void ProcessScene(sdf::ElementPtr _elem)
   if (_elem->HasElement("background"))
   {
     color = _elem->GetElement("background")->GetValueColor("rgba");
-    printf("background { rgb <%f, %f, %f> }\n", color.R(), color.G(), color.B());
+    printf("background { rgb <%f, %f, %f> }\n",
+        color.R(), color.G(), color.B());
   }
-  
+
   if (_elem->HasElement("ambient"))
   {
     color = _elem->GetElement("ambient")->GetValueColor("rgba");
-    //printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
-        //color.R(), color.G(), color.B());
+    // printf("global_settings { ambient_light rgb <%f, %f, %f> }\n",
+        // color.R(), color.G(), color.B());
   }
 
   int count = 35;
-  //int count = 1600;
+  // int count = 1600;
 
   int recursionLimit = 3;
-  //int recursionLimit = 20;
+  // int recursionLimit = 20;
 
   float errorBound = 1.8;
-  //float errorBound = 1.0;
+  // float errorBound = 1.0;
 
   // Note: Extreme quality
   printf("global_settings { radiosity{\n");
@@ -293,7 +312,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
     gazebo::math::Vector3 corner2 = _pose.pos + (size/2.0);
     corner1 = _pose.rot.RotateVector(corner1);
     corner2 = _pose.rot.RotateVector(corner2);
-    printf(" <%f, %f, %f,>, <%f, %f, %f>\n",corner1.x, corner1.y, corner1.z,
+    printf(" <%f, %f, %f, >, <%f, %f, %f>\n", corner1.x, corner1.y, corner1.z,
                                             corner2.x, corner2.y, corner2.z);
     printf("}\n");
   }
@@ -317,14 +336,14 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
     double radius = sphereElem->GetValueDouble("radius");
 
     printf("sphere {\n");
-    printf("  <%f, %f, %f> %f\n",_pose.pos.x, _pose.pos.y, _pose.pos.z, radius);
+    printf("  <%f, %f, %f> %f\n",
+        _pose.pos.x, _pose.pos.y, _pose.pos.z, radius);
     printf("}\n");
   }
   else if (_elem->HasElement("mesh"))
   {
     ProcessMesh(_elem->GetElement("mesh"), _pose);
   }
-
 }
 
 
@@ -371,7 +390,7 @@ int main(int argc, char **argv)
     if (worldElem->HasElement("light"))
     {
       sdf::ElementPtr lightElem = worldElem->GetElement("light");
-      while(lightElem)
+      while (lightElem)
       {
         ProcessLight(lightElem);
         lightElem = lightElem->GetNextElement();
@@ -393,12 +412,12 @@ int main(int argc, char **argv)
           sdf::ElementPtr visualElem = linkElem->GetElement("visual");
           while (visualElem)
           {
-            visualPose = 
+            visualPose =
               visualElem->GetOrCreateElement("origin")->GetValuePose("pose");
-            //visualPose = (visualPose + linkPose) + modelPose;
+            // visualPose = (visualPose + linkPose) + modelPose;
             visualPose = modelPose + (linkPose + visualPose);
-            //visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;
-            //visualPose.rot = visualPose.rot * linkPose.rot * modelPose.rot;
+            // visualPose.pos = modelPose.pos + linkPose.pos + visualPose.pos;
+            // visualPose.rot = visualPose.rot * linkPose.rot * modelPose.rot;
             sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
             ProcessGeometry(geomElem, visualPose);
 
@@ -411,5 +430,4 @@ int main(int argc, char **argv)
     }
     worldElem = worldElem->GetNextElement();
   }
-
 }

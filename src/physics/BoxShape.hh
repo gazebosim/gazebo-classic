@@ -26,28 +26,27 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Box geometry
     class BoxShape : public Shape
     {
       /// \brief Constructor
       public: BoxShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~BoxShape();
-  
+
       /// \brief Load the box
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Initialize the box
       public: virtual void Init();
- 
+
       /// \brief Set the size of the box
-      public: virtual void SetSize( const math::Vector3 &size );
+      public: virtual void SetSize(const math::Vector3 &size);
 
       /// \brief Get the size of the box
       public: math::Vector3 GetSize() const;
@@ -60,3 +59,5 @@ namespace gazebo
   }
 }
 #endif
+
+

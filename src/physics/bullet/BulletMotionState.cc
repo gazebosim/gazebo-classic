@@ -15,7 +15,7 @@
  *
 */
 /* Desc: Bullet motion state class.
- * Author: Nate Koenig 
+ * Author: Nate Koenig
  * Date: 25 May 2009
  */
 
@@ -32,82 +32,74 @@ using namespace physics;
 using namespace physics;
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-BulletMotionState::BulletMotionState(Link *body)
+//////////////////////////////////////////////////
+BulletMotionState::BulletMotionState(Link *_body)
   : btMotionState()
 {
-  this->body = body;
+  this->body = _body;
   this->visual = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 BulletMotionState::~BulletMotionState()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the visual node
-void BulletMotionState::SetVisual(Visual *vis) 
+//////////////////////////////////////////////////
+void BulletMotionState::SetVisual(Visual *_vis)
 {
-  this->visual = vis;
+  this->visual = _vis;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the pose
+//////////////////////////////////////////////////
 math::Pose BulletMotionState::GetWorldPose() const
 {
   return this->worldPose;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the position of the body
-void BulletMotionState::SetWorldPosition(const math::Vector3 &pos)
+//////////////////////////////////////////////////
+void BulletMotionState::SetWorldPosition(const math::Vector3 &_pos)
 {
-  this->worldPose.pos = pos;
+  this->worldPose._pos = _pos;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the rotation of the body
-void BulletMotionState::SetWorldRotation(const common::Quatern &rot)
+//////////////////////////////////////////////////
+void BulletMotionState::SetWorldRotation(const common::Quatern &_rot)
 {
-  this->worldPose.rot = rot;
+  this->worldPose._rot = _rot;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the pose
-void BulletMotionState::SetWorldPose(const math::Pose &pose)
+//////////////////////////////////////////////////
+void BulletMotionState::SetWorldPose(const math::Pose &_pose)
 {
-  this->worldPose = pose;
+  this->worldPose = _pose;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the center of mass offset
-void BulletMotionState::SetCoMOffset( const math::Pose &com )
+//////////////////////////////////////////////////
+void BulletMotionState::SetCoMOffset(const math::Pose &_com)
 {
-  this->comOffset = com;
+  this->comOffset = _com;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the world transform
-void BulletMotionState::getWorldTransform(btTransform &worldTrans) const 
+//////////////////////////////////////////////////
+void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
 {
   math::Pose result = this->worldPose;
   result.pos += this->comOffset.pos;
 
-  worldTrans = BulletPhysics::ConvertPose(result);
+  _worldTrans = BulletPhysics::ConvertPose(result);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the world transform
-void BulletMotionState::setWorldTransform(const btTransform &worldTrans) 
+//////////////////////////////////////////////////
+void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
 {
   if (this->visual == NULL)
     return;
 
-  this->worldPose = BulletPhysics::ConvertPose( worldTrans );
+  this->worldPose = BulletPhysics::ConvertPose(_worldTrans);
 
   this->body->SetWorldPose(this->worldPose, false);
-  //this->visual->SetDirty(true, this->worldPose - this->body->GetWorldPose());
+  // this->visual->SetDirty(true, this->worldPose - this->body->GetWorldPose());
 }
+
+

@@ -43,20 +43,20 @@ namespace sdf
     public: boost::shared_ptr<Element> Clone() const;
 
     /// \brief Copy values from an Element
-    public: void Copy( const ElementPtr &_elem );
+    public: void Copy(const ElementPtr &_elem);
 
     public: ElementPtr GetParent() const;
     public: void SetParent(const ElementPtr &_parent);
 
-    /// \brief Get the name of the parent link. 
+    /// \brief Get the name of the parent link.
     /// \return Name of parent link, or empty string if no parent link exists.
     public: std::string GetLinkName() const;
 
-    /// \brief Get the name of the parent model. 
+    /// \brief Get the name of the parent model.
     /// \return Name of parent model, or empty string if no parent model exists.
     public: std::string GetModelName() const;
 
-    /// \brief Get the name of the parent world. 
+    /// \brief Get the name of the parent world.
     /// \return Name of parent world, or empty string if no parent world exists.
     public: std::string GetWorldName() const;
 
@@ -66,7 +66,7 @@ namespace sdf
     public: void SetRequired(const std::string &_req);
     public: const std::string &GetRequired() const;
 
-    public: void SetCopyChildren( bool _value );
+    public: void SetCopyChildren(bool _value);
     public: bool GetCopyChildren() const;
 
     public: void PrintDescription(std::string _prefix);
@@ -76,12 +76,12 @@ namespace sdf
                            std::ostringstream &_out) const;
     public: std::string ToString(const std::string &_prefix) const;
 
-    public: void AddAttribute(const std::string &_key, 
-                              const std::string &_type, 
+    public: void AddAttribute(const std::string &_key,
+                              const std::string &_type,
                               const std::string &_defaultvalue,
                               bool _required);
 
-    public: void AddValue(const std::string &_type, 
+    public: void AddValue(const std::string &_type,
                           const std::string &_defaultValue, bool _required);
 
     /// \brief Get the param of an attribute.
@@ -98,13 +98,14 @@ namespace sdf
     public: float GetValueFloat(const std::string &_key = "");
     public: double GetValueDouble(const std::string &_key = "");
     public: unsigned int GetValueUInt(const std::string &_key = "");
-    public: char GetValueChar(const std::string &_key = "" );
+    public: char GetValueChar(const std::string &_key = "");
     public: std::string GetValueString(const std::string &_key = "");
     public: gazebo::math::Vector3 GetValueVector3(const std::string &_key = "");
-    public: gazebo::math::Quaternion GetValueQuaternion(const std::string &_key = "");
+    public: gazebo::math::Quaternion GetValueQuaternion(
+                const std::string &_key = "");
     public: gazebo::math::Pose GetValuePose(const std::string &_key = "");
     public: gazebo::common::Color GetValueColor(const std::string &_key = "");
- 
+
     public: bool HasElement(const std::string &_name) const;
 
     public: ElementPtr GetElement(const std::string &_name) const;
@@ -122,8 +123,8 @@ namespace sdf
     public: void Update();
     public: void Reset();
 
-    private: boost::shared_ptr<Param> CreateParam(const std::string &_key, 
-                 const std::string &_type, const std::string &_defaultValue, 
+    private: boost::shared_ptr<Param> CreateParam(const std::string &_key,
+                 const std::string &_type, const std::string &_defaultValue,
                  bool _required);
 
     private: std::string name;
@@ -159,3 +160,5 @@ namespace sdf
   };
 }
 #endif
+
+

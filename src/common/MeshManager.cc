@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 #include <sys/stat.h>
 #include <string>
 
@@ -34,29 +34,28 @@ using namespace gazebo;
 using namespace common;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 MeshManager::MeshManager()
 {
   this->colladaLoader = new ColladaLoader();
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
-  this->CreatePlane("unit_plane", math::Plane(math::Vector3(0,0,1),
-                                              math::Vector2d(100,100), 0), 
-                                  math::Vector2d(1,1), 
-                                  math::Vector2d(1,1) );
+  this->CreatePlane("unit_plane", math::Plane(math::Vector3(0, 0, 1),
+        math::Vector2d(100, 100), 0),
+      math::Vector2d(1, 1),
+      math::Vector2d(1, 1));
 
-  this->CreateSphere("unit_sphere",0.5, 32, 32);
-  this->CreateSphere("joint_anchor",0.01, 32, 32);
-  this->CreateBox("body_cg", math::Vector3(0.014,0.014,0.014), 
-                             math::Vector2d(0.014,0.014));
-  this->CreateBox("unit_box", math::Vector3(1,1,1), 
-                             math::Vector2d(1,1));
+  this->CreateSphere("unit_sphere", 0.5, 32, 32);
+  this->CreateSphere("joint_anchor", 0.01, 32, 32);
+  this->CreateBox("body_cg", math::Vector3(0.014, 0.014, 0.014),
+      math::Vector2d(0.014, 0.014));
+  this->CreateBox("unit_box", math::Vector3(1, 1, 1),
+      math::Vector2d(1, 1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
-  this->CreateCylinder("axis_cylinder",0.005,0.5,1,32);
+  this->CreateCylinder("axis_cylinder", 0.005, 0.5, 1, 32);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 
@@ -67,20 +66,18 @@ MeshManager::MeshManager()
   this->fileExtensions.push_back("xml");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
-  for (iter = this->meshes.begin(); iter != this->meshes.end(); iter++)
+  for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
     delete iter->second;
   this->meshes.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a mesh from a file
+//////////////////////////////////////////////////
 const Mesh *MeshManager::Load(const std::string &filename)
 {
   if (!this->IsValidFilename(filename))
@@ -96,49 +93,50 @@ const Mesh *MeshManager::Load(const std::string &filename)
   if (this->HasMesh(filename))
   {
     return this->meshes[filename];
-    
+
     // This breaks trimesh geom. Each new trimesh should have a unique name.
     /*
-      // erase mesh from this->meshes. This allows a mesh to be modified and
-      // inserted into gazebo again without closing gazebo.
-      std::map<std::string, Mesh*>::iterator iter;
-      iter = this->meshes.find(filename);
-      delete iter->second;
-      iter->second = NULL;
-      this->meshes.erase(iter);
+    // erase mesh from this->meshes. This allows a mesh to be modified and
+    // inserted into gazebo again without closing gazebo.
+    std::map<std::string, Mesh*>::iterator iter;
+    iter = this->meshes.find(filename);
+    delete iter->second;
+    iter->second = NULL;
+    this->meshes.erase(iter);
     */
   }
 
-  std::string fullname = 
+  std::string fullname =
     SystemPaths::Instance()->FindFileWithGazeboPaths(filename);
 
   if (!fullname.empty())
   {
     extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
-    std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);
+    std::transform(extension.begin(), extension.end(),
+        extension.begin(), ::tolower);
     MeshLoader *loader = NULL;
 
     if (extension == "stl" || extension == "stlb" || extension == "stla")
-      loader= this->stlLoader;
+      loader = this->stlLoader;
     else if (extension == "dae")
       loader = this->colladaLoader;
     else
       gzerr << "Unsupported mesh format for file[" << filename << "]\n";
 
-    try 
+    try
     {
       if (!this->HasMesh(filename))
       {
         mesh = loader->Load(fullname);
         mesh->SetName(filename);
-        this->meshes.insert( std::make_pair(filename, mesh) );
+        this->meshes.insert(std::make_pair(filename, mesh));
       }
       else
       {
         mesh = this->meshes[filename];
       }
-    } 
-    catch (gazebo::common::Exception e)
+    }
+    catch(gazebo::common::Exception &e)
     {
       gzerr << "Error loading mesh[" << fullname << "]\n";
       gzerr << e << "\n";
@@ -151,56 +149,52 @@ const Mesh *MeshManager::Load(const std::string &filename)
   return mesh;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the file extension is loadable
-bool MeshManager::IsValidFilename(const std::string &filename)
+//////////////////////////////////////////////////
+bool MeshManager::IsValidFilename(const std::string &_filename)
 {
   std::string extension;
 
-  extension = filename.substr(filename.rfind(".")+1, filename.size());
+  extension = _filename.substr(_filename.rfind(".")+1, _filename.size());
   if (extension.empty())
     return false;
-  std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);
+  std::transform(extension.begin(), extension.end(),
+                 extension.begin(), ::tolower);
 
-  return std::find(this->fileExtensions.begin(), this->fileExtensions.end(), 
-                   extension) != this->fileExtensions.end();
+  return std::find(this->fileExtensions.begin(), this->fileExtensions.end(),
+      extension) != this->fileExtensions.end();
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// modify mesh setting its center to aabb center
-void MeshManager::SetMeshCenter(const Mesh *mesh,math::Vector3 center)
+//////////////////////////////////////////////////
+void MeshManager::SetMeshCenter(const Mesh *_mesh, math::Vector3 _center)
 {
-  if (this->HasMesh(mesh->GetName()))
-    this->meshes[mesh->GetName()]->SetMeshCenter(center);
+  if (this->HasMesh(_mesh->GetName()))
+    this->meshes[_mesh->GetName()]->SetMeshCenter(_center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// get mesh aabb
-void MeshManager::GetMeshAABB(const Mesh *mesh,math::Vector3 &center, math::Vector3 &min_xyz, math::Vector3 &max_xyz)
+//////////////////////////////////////////////////
+void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
+    math::Vector3 &_min_xyz, math::Vector3 &_max_xyz)
 {
-  if (this->HasMesh(mesh->GetName()))
-    this->meshes[mesh->GetName()]->GetAABB(center,min_xyz,max_xyz);
+  if (this->HasMesh(_mesh->GetName()))
+    this->meshes[_mesh->GetName()]->GetAABB(_center, _min_xyz, _max_xyz);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// generate spherical texture coordinates
-void MeshManager::GenSphericalTexCoord(const Mesh *mesh,math::Vector3 center)
+//////////////////////////////////////////////////
+void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, math::Vector3 _center)
 {
-  if (this->HasMesh(mesh->GetName()))
-    this->meshes[mesh->GetName()]->GenSphericalTexCoord(center);
+  if (this->HasMesh(_mesh->GetName()))
+    this->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a mesh to the manager
-void MeshManager::AddMesh(Mesh *mesh)
+//////////////////////////////////////////////////
+void MeshManager::AddMesh(Mesh *_mesh)
 {
-  if (!this->HasMesh(mesh->GetName()))
-    this->meshes[mesh->GetName()] = mesh;
+  if (!this->HasMesh(_mesh->GetName()))
+    this->meshes[_mesh->GetName()] = _mesh;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a mesh by name
+//////////////////////////////////////////////////
 const Mesh *MeshManager::GetMesh(const std::string &name) const
 {
   std::map<std::string, Mesh*>::const_iterator iter;
@@ -213,24 +207,22 @@ const Mesh *MeshManager::GetMesh(const std::string &name) const
   gzerr << "Unable to find mesh with name[" << name << "]\n";
   return NULL;
 }
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the mesh exists
-bool MeshManager::HasMesh(const std::string &name) const
+
+//////////////////////////////////////////////////
+bool MeshManager::HasMesh(const std::string &_name) const
 {
-  if (name.empty())
+  if (_name.empty())
     return false;
 
   std::map<std::string, Mesh*>::const_iterator iter;
-  iter = this->meshes.find(name);
+  iter = this->meshes.find(_name);
 
   return iter != this->meshes.end();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create a sphere
-void MeshManager::CreateSphere(const std::string &name, float radius, 
-                               int rings, int segments)
+//////////////////////////////////////////////////
+void MeshManager::CreateSphere(const std::string &name, float radius,
+    int rings, int segments)
 {
   if (this->HasMesh(name))
   {
@@ -242,11 +234,11 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
+  unsigned int verticeIndex = 0;
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh));
+  this->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -254,8 +246,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    r0 = radius * sinf (ring * deltaRingAngle);
-    vert.y = radius * cosf (ring * deltaRingAngle);
+    r0 = radius * sinf(ring * deltaRingAngle);
+    vert.y = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -270,8 +262,9 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
       // Add one vertex to the strip which makes up the sphere
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments, 
-                        (float) ring / (float) rings );
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) /static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -291,21 +284,19 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create a plane
+//////////////////////////////////////////////////
 void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
-                              const math::Vector2d &segments, 
-                              const math::Vector2d &uvTile)
+    const math::Vector2d &segments,
+    const math::Vector2d &uvTile)
 {
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// This function was taken from OGRE:
+//////////////////////////////////////////////////
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
-void MeshManager::CreatePlane(const std::string &name, const math::Vector3 &normal, 
-    double d, const math::Vector2d &size, const math::Vector2d &segments,
-    const math::Vector2d &uvTile)
+void MeshManager::CreatePlane(const std::string &name,
+    const math::Vector3 &normal, double d, const math::Vector2d &size,
+    const math::Vector2d &segments, const math::Vector2d &uvTile)
 {
   if (this->HasMesh(name))
   {
@@ -314,7 +305,7 @@ void MeshManager::CreatePlane(const std::string &name, const math::Vector3 &norm
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh) );
+  this->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -332,12 +323,12 @@ void MeshManager::CreatePlane(const std::string &name, const math::Vector3 &norm
   rot3.SetFromAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
- 
-  xlate.SetTranslate( normal * -d );
+
+  xlate.SetTranslate(normal * -d);
   xform = xlate * rot;
 
   math::Vector3 vec;
-  math::Vector3 norm(0,0,1);
+  math::Vector3 norm(0, 0, 1);
   double xSpace = size.x / segments.x;
   double ySpace = size.y / segments.y;
   double halfWidth = size.x / 2.0;
@@ -365,15 +356,14 @@ void MeshManager::CreatePlane(const std::string &name, const math::Vector3 &norm
     }
   }
 
-  this->Tesselate2DMesh( subMesh, segments.x + 1, segments.y + 1, false  );
+  this->Tesselate2DMesh(subMesh, segments.x + 1, segments.y + 1, false);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a Box mesh
+//////////////////////////////////////////////////
 void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
-                            const math::Vector2d &uvCoords)
+    const math::Vector2d &uvCoords)
 {
-  int i,k;
+  int i, k;
 
   if (this->HasMesh(name))
   {
@@ -382,7 +372,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh) );
+  this->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -410,7 +400,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Texture coords
   float t[4][2] =
   {
-    {uvCoords.x, 0}, {0, 0}, {0,uvCoords.y}, {uvCoords.x, uvCoords.y}
+    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
   };
 
   // Vertices
@@ -428,14 +418,14 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
     2, 3, 0,
     4, 5, 7,
     7, 5, 6,
-    11,8,9,
-    9,10,11,
+    11, 8, 9,
+    9, 10, 11,
     12, 13, 15,
     15, 13, 14,
     16, 17, 18,
     18, 19, 16,
-    21,22,23,
-    23,20,21,
+    21, 22, 23,
+    23, 20, 21,
   };
 
   // Compute the vertices
@@ -450,37 +440,36 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   for (i = 0; i < 6; i++)
   {
     // For each vertex in the face
-    for (k=0; k<4; k++)
+    for (k = 0; k < 4; k++)
     {
-      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1], 
+      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
           v[faces[i][k]][2]);
-      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1], 
+      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1],
           n[faces[i][k]][2]);
       subMesh->AddTexCoord(t[k][0], t[k][1]);
     }
   }
 
   // Set the indices
-  for (i=0;i<36; i++)
+  for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
   subMesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a Camera mesh
-void MeshManager::CreateCamera(const std::string &name, float scale)
+//////////////////////////////////////////////////
+void MeshManager::CreateCamera(const std::string &_name, float _scale)
 {
-  int i,k;
+  int i, k;
 
-  if (this->HasMesh(name))
+  if (this->HasMesh(_name))
   {
     return;
   }
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh) );
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -507,9 +496,9 @@ void MeshManager::CreateCamera(const std::string &name, float scale)
 
   // Texture coords
   /*float t[4][2] =
-  {
-    {uvCoords.x, 0}, {0, 0}, {0,uvCoords.y}, {uvCoords.x, uvCoords.y}
-  };*/
+    {
+    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+    };*/
 
   // Vertices
   int faces[6][4] =
@@ -526,53 +515,52 @@ void MeshManager::CreateCamera(const std::string &name, float scale)
     2, 3, 0,
     4, 5, 7,
     7, 5, 6,
-    11,8,9,
-    9,10,11,
+    11, 8, 9,
+    9, 10, 11,
     12, 13, 15,
     15, 13, 14,
     16, 17, 18,
     18, 19, 16,
-    21,22,23,
-    23,20,21,
+    21, 22, 23,
+    23, 20, 21,
   };
 
   // Compute the vertices
   for (i = 0; i < 8; i++)
   {
-    v[i][0] *= scale * 0.5;
-    v[i][1] *= scale * 0.5;
-    v[i][2] *= scale * 0.5;
+    v[i][0] *= _scale * 0.5;
+    v[i][1] *= _scale * 0.5;
+    v[i][2] *= _scale * 0.5;
   }
 
   // For each face
   for (i = 0; i < 6; i++)
   {
     // For each vertex in the face
-    for (k=0; k<4; k++)
+    for (k = 0; k < 4; k++)
     {
-      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1], 
+      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1],
           v[faces[i][k]][2]);
-      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1], 
+      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1],
           n[faces[i][k]][2]);
-      //subMesh->AddTexCoord(t[k][0], t[k][1]);
+      // subMesh->AddTexCoord(t[k][0], t[k][1]);
     }
   }
 
   // Set the indices
-  for (i=0;i<36; i++)
+  for (i = 0; i < 36; i++)
     subMesh->AddIndex(ind[i]);
 
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a cylinder mesh
-void MeshManager::CreateCylinder(const std::string &name, float radius, 
-                                 float height, int rings, int segments)
+//////////////////////////////////////////////////
+void MeshManager::CreateCylinder(const std::string &name, float radius,
+    float height, int rings, int segments)
 {
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
-  unsigned int i,j;
+  unsigned int verticeIndex = 0;
+  unsigned int i, j;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 
@@ -583,7 +571,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh) );
+  this->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -607,8 +595,9 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
       // Add one vertex to the strip which makes up the sphere
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-                           (float) ring / (float) rings );
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -625,18 +614,18 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   }
 
   /// The top cap vertex
-  subMesh->AddVertex(0,0,height/2.0);
-  subMesh->AddNormal(0,0,1);
-  subMesh->AddTexCoord(0,0);
+  subMesh->AddVertex(0, 0, height/2.0);
+  subMesh->AddNormal(0, 0, 1);
+  subMesh->AddTexCoord(0, 0);
 
   // The bottom cap vertex
-  subMesh->AddVertex(0,0,-height/2.0);
-  subMesh->AddNormal(0,0,-1);
-  subMesh->AddTexCoord(0,0);
+  subMesh->AddVertex(0, 0, -height/2.0);
+  subMesh->AddNormal(0, 0, -1);
+  subMesh->AddTexCoord(0, 0);
 
   // Create the top fan
   verticeIndex += segments + 1;
-  for (seg=0; seg < segments; seg++)
+  for (seg = 0; seg < segments; seg++)
   {
     subMesh->AddIndex(verticeIndex);
     subMesh->AddIndex(verticeIndex - segments + seg);
@@ -645,7 +634,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 
   // Create the bottom fan
   verticeIndex++;
-  for (seg=0; seg < segments; seg++)
+  for (seg = 0; seg < segments; seg++)
   {
     subMesh->AddIndex(verticeIndex);
     subMesh->AddIndex(seg);
@@ -653,31 +642,30 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   }
 
   // Fix all the normals
-  for (i=0; i+3 < subMesh->GetIndexCount(); i+=3)
+  for (i = 0; i+3 < subMesh->GetIndexCount(); i+= 3)
   {
     norm.Set();
 
-    for (j=0; j<3; j++)
-      norm += subMesh->GetNormal( subMesh->GetIndex(i+j) );
+    for (j = 0; j < 3; j++)
+      norm += subMesh->GetNormal(subMesh->GetIndex(i+j));
 
     norm /= 3;
     norm.Normalize();
 
-    for (j=0; j<3; j++)
-      subMesh->SetNormal(subMesh->GetIndex(i+j), norm );
+    for (j = 0; j < 3; j++)
+      subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
   }
 
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a cone mesh
-void MeshManager::CreateCone(const std::string &name, float radius, 
-                             float height, int rings, int segments)
+//////////////////////////////////////////////////
+void MeshManager::CreateCone(const std::string &name, float radius,
+    float height, int rings, int segments)
 {
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
-  unsigned int i,j;
+  unsigned int verticeIndex = 0;
+  unsigned int i, j;
   int ring, seg;
 
   if (this->HasMesh(name))
@@ -687,7 +675,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh) );
+  this->meshes.insert(std::make_pair(name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -719,8 +707,9 @@ void MeshManager::CreateCone(const std::string &name, float radius,
       // Add one vertex to the strip which makes up the sphere
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-                           (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != (rings-1))
       {
@@ -737,18 +726,18 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   }
 
   /// The top point vertex
-  subMesh->AddVertex(0,0,height/2.0);
-  subMesh->AddNormal(0,0,1);
-  subMesh->AddTexCoord(0,0);
+  subMesh->AddVertex(0, 0, height/2.0);
+  subMesh->AddNormal(0, 0, 1);
+  subMesh->AddTexCoord(0, 0);
 
   // The bottom cap vertex
-  subMesh->AddVertex(0,0,-height/2.0);
-  subMesh->AddNormal(0,0,-1);
-  subMesh->AddTexCoord(0,0);
+  subMesh->AddVertex(0, 0, -height/2.0);
+  subMesh->AddNormal(0, 0, -1);
+  subMesh->AddTexCoord(0, 0);
 
   // Create the top fan
   verticeIndex += segments+1;
-  for (seg=0; seg < segments; seg++)
+  for (seg = 0; seg < segments; seg++)
   {
     subMesh->AddIndex(verticeIndex);
     subMesh->AddIndex(verticeIndex - segments + seg);
@@ -757,7 +746,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   // Create the bottom fan
   verticeIndex++;
-  for (seg=0; seg < segments; seg++)
+  for (seg = 0; seg < segments; seg++)
   {
     subMesh->AddIndex(verticeIndex);
     subMesh->AddIndex(seg);
@@ -765,39 +754,38 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   }
 
   // Fix all the normals
-  for (i=0; i+3<subMesh->GetIndexCount(); i+=3)
+  for (i = 0; i + 3 < subMesh->GetIndexCount(); i += 3)
   {
     norm.Set();
 
-    for (j=0; j<3; j++)
-      norm += subMesh->GetNormal( subMesh->GetIndex(i+j) );
+    for (j = 0; j < 3; j++)
+      norm += subMesh->GetNormal(subMesh->GetIndex(i+j));
 
     norm /= 3;
     norm.Normalize();
 
-    for (j=0; j<3; j++)
-      subMesh->SetNormal(subMesh->GetIndex(i+j), norm );
+    for (j = 0; j < 3; j++)
+      subMesh->SetNormal(subMesh->GetIndex(i+j), norm);
   }
 
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a tube mesh
-void MeshManager::CreateTube(const std::string &name, float innerRadius, 
-                             float outterRadius, float height, int rings, 
-                             int segments)
+//////////////////////////////////////////////////
+void MeshManager::CreateTube(const std::string &name, float innerRadius,
+    float outterRadius, float height, int rings,
+    int segments)
 {
   math::Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
+  unsigned int verticeIndex = 0;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 
   // Needs at lest 2 rings, and 3 segments
-  rings = std::max(rings,1);
-  segments = std::max(segments,3);
+  rings = std::max(rings, 1);
+  segments = std::max(segments, 3);
 
-  float radius= 0;
+  float radius = 0;
 
   radius = outterRadius;
 
@@ -806,7 +794,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
-  this->meshes.insert( std::make_pair(name, mesh) );
+  this->meshes.insert(std::make_pair(name, mesh));
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
@@ -828,8 +816,9 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
       // Add one vertex to the strip which makes up the tube
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-                           (float) ring / (float) rings );
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -886,8 +875,9 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
       // Add one vertex to the strip which makes up the tube
       subMesh->AddVertex(vert);
       subMesh->AddNormal(norm);
-      subMesh->AddTexCoord((float) seg / (float) segments,
-                           (float) ring / (float) rings);
+      subMesh->AddTexCoord(
+          static_cast<float>(seg) / static_cast<float>(segments),
+          static_cast<float>(ring) / static_cast<float>(rings));
 
       if (ring != rings)
       {
@@ -907,11 +897,10 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   mesh->RecalculateNormals();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// This function was taken from OGRE:
+//////////////////////////////////////////////////
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
-void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight, 
-                                  bool doubleSided)
+void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
+    bool doubleSided)
 {
   int vInc, uInc, v, u, iterations;
   int vCount, uCount;
@@ -920,7 +909,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   {
     iterations = 2;
     vInc = 1;
-    v = 0; // Start with the front
+    v = 0;
   }
   else
   {
@@ -935,7 +924,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   {
     // Make tris in a zigzag pattern (compatible with strips)
     u = 0;
-    uInc = 1; // Start with moving +u
+    uInc = 1;
 
     vCount = meshHeight - 1;
     while (vCount--)
@@ -974,4 +963,6 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     vInc = -vInc;
   }
 }
+
+
 

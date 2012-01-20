@@ -22,20 +22,17 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {
-      public: ODEPlaneShape(CollisionPtr parent) : PlaneShape(parent) {}
+      public: ODEPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
       public: virtual ~ODEPlaneShape() {}
-    
       /// \brief Create the plane
       public: void CreatePlane()
       {
@@ -43,33 +40,34 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-    
+
         double altitude = 0;
-  
+
         math::Vector3 n = this->GetNormal();
         if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(), 
+          oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
                 n.x, n.y, n.z, altitude), false);
         else
           dGeomPlaneSetParams(oParent->GetCollisionId(),
                               n.x, n.y, n.z, altitude);
       }
-    
+
       /// Set the altitude of the plane
       public: void SetAltitude(const math::Vector3 &pos)
       {
         PlaneShape::SetAltitude(pos);
         ODECollisionPtr odeParent;
-        odeParent = boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-  
+        odeParent =
+          boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
+
         dVector4 vec4;
-    
+
         dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
-    
+
         // Compute "altitude": scalar product of position and normal
         vec4[3] = vec4[0] * pos.x + vec4[1] * pos.y + vec4[2] * pos.z;
 
-        dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1], 
+        dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
                             vec4[2], vec4[3]);
       }
     };
@@ -78,3 +76,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
+
+

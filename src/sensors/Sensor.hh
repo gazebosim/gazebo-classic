@@ -22,8 +22,9 @@
 #ifndef SENSOR_HH
 #define SENSOR_HH
 
-#include <vector>
 #include <boost/enable_shared_from_this.hpp>
+#include <vector>
+#include <string>
 
 #include "sdf/sdf.h"
 
@@ -41,47 +42,45 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
-    
     /// \brief Base class for sensors
     class Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief  Constructor
       public: Sensor();
-    
+
       /// \brief  Destructor
       public: virtual ~Sensor();
-    
+
       /// \brief Load the sensor with SDF parameters
       /// \param _sdf SDF Sensor parameteres
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Load the sensor with default parameters
       public: virtual void Load();
-  
+
       /// \brief  Initialize the sensor
       public: virtual void Init();
 
       /// \brief Set the parent of the sensor
-      public: virtual void SetParent( const std::string &_name );
+      public: virtual void SetParent(const std::string &_name);
 
       public: std::string GetParentName() const;
 
       /// \brief  Update the sensor
       public: void Update(bool _force);
       protected: virtual void UpdateImpl(bool /*_force*/) {}
-
       /// \brief Set the update rate of the sensor
       public: void SetUpdateRate(double _hz);
-    
+
       /// \brief  Finalize the sensor
       public: virtual void Fini();
 
-      /// \brief Get name 
+      /// \brief Get name
       public: std::string GetName() const;
 
       /// \brief Get the current pose
       public: virtual math::Pose GetPose() const;
-  
+
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
 
@@ -101,11 +100,11 @@ namespace gazebo
 
       /// \brief Load a plugin for this sensor
       /// \param _sdf SDF parameters
-      private: void LoadPlugin( sdf::ElementPtr &_sdf );
-    
+      private: void LoadPlugin(sdf::ElementPtr &_sdf);
+
       /// \brief True if active
       protected: bool active;
-      protected: sdf::ElementPtr sdf; 
+      protected: sdf::ElementPtr sdf;
       protected: math::Pose pose;
       protected: std::vector<event::ConnectionPtr> connections;
       protected: transport::NodePtr node;
@@ -117,9 +116,9 @@ namespace gazebo
       protected: gazebo::physics::WorldPtr world;
       protected: common::Time updatePeriod;
       protected: common::Time lastUpdateTime;
-
     };
     /// \}
   }
 }
 #endif
+

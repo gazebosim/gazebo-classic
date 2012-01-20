@@ -28,54 +28,55 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief An ODe ball joint
     class ODEBallJoint : public BallJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEBallJoint( dWorldID worldId );
-    
+      public: ODEBallJoint(dWorldID worldId);
+
       /// \brief Destructor
       public: virtual ~ODEBallJoint();
-    
+
       /// \brief Get joint's anchor point
       public: virtual math::Vector3 GetAnchor(int index) const;
-    
+
       /// \brief Set joint's anchor point
-      public: virtual void SetAnchor( int index, const math::Vector3 &anchor );
-  
+      public: virtual void SetAnchor(int index, const math::Vector3 &anchor);
+
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(int /*index*/) const {return math::Vector3();}
-  
+      public: virtual math::Vector3 GetGlobalAxis(int /*index*/) const
+              {return math::Vector3();}
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
-  
+
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
-  
       /// \brief Get the rotation rate of an axis(index)
       public: virtual double GetVelocity(int /*index*/) const {return 0;}
-  
       /// \brief Get the max allowed force of an axis(index).
       public: virtual double GetMaxForce(int /*index*/) {return 0;}
-  
       /// \brief Set the max allowed force of an axis(index).
       public: virtual void SetMaxForce(int /*index*/, double /*t*/) {}
-  
       /// \brief Get the angle of rotation of an axis(index)
-      public: virtual math::Angle GetAngleImpl(int /*index*/) const {return math::Angle(0);}
-   
+      public: virtual math::Angle GetAngleImpl(int /*index*/) const
+              {return math::Angle(0);}
     };
-    
+
     /// \}
     /// \}
   }
 }
 #endif
+
+
+
+
+
+
+

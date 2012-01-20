@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "Sensor.hh"
-#include "Body.hh"
 
 namespace gazebo
 {
@@ -36,7 +35,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
-    
     /// \brief Sensor with one or more rays.
     ///
     /// This sensor cast rays into the world, tests for intersections, and
@@ -48,38 +46,37 @@ namespace gazebo
       /// \param body The underlying collision test uses an ODE collision, so
       ///             ray sensors must be attached to a body.
       public: IRSensor(Body *body);
-    
+
       /// \brief Destructor
       public: virtual ~IRSensor();
-    
+
       /// Load the ray using parameter from an SDF
       /// \param _sdf The SDF parameter
-      protected: virtual void LoadChild( sdf::ElementPtr &_sdf );
-    
+      protected: virtual void LoadChild(sdf::ElementPtr &_sdf);
+
       /// Initialize the ray
       protected: virtual void InitChild();
-    
+
       ///  Update sensed values
       protected: virtual void UpdateChild();
-      
+
       /// Finalize the ray
       protected: virtual void FiniChild();
-    
+
       /// \brief Get the ray count
       /// \return The number of rays
       public: unsigned int GetIRCount() const;
-    
+
       /// \brief Get detected range for a ray.
       /// \returns Returns DBL_MAX for no detection.
       public: double GetRange(unsigned int index) const;
-    
+
       public: Pose GetPose(unsigned int index) const;
-    
+
       private: std::vector<RaySensor*> irBeams;
-    
     };
     /// \}
   }
 }
-
 #endif
+

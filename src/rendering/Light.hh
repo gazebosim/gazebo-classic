@@ -39,93 +39,91 @@ namespace Ogre
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class Visual;
     class Scene;
     class DynamicLines;
 
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
- 
     /// \brief Wrapper around an ogre light source
     class Light
     {
       /// \brief Constructor
       public: Light(Scene *scene);
-  
+
       /// \brief Destructor
       public: virtual ~Light();
-  
+
       /// \brief Load the light using a set of SDF parameters
-      public: void Load( sdf::ElementPtr &_sdf );
+      public: void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Load the light using default parameters
-      public: void Load( );
-  
+      public: void Load();
+
       /// \brief Load from a light message
       public: void LoadFromMsg(ConstLightPtr &msg);
-  
+
         /// \brief Set the name of the visual
-      public: void SetName( const std::string &name );
+      public: void SetName(const std::string &name);
 
       /// \brief Get the name of the visual
       public: std::string GetName() const;
- 
+
       /// \brief Set the position of the light
       public: void SetPosition(const math::Vector3 &p);
-  
-      /// \brief Set whether this entity has been selected by the user through  
+
+      /// \brief Set whether this entity has been selected by the user through
       ///        the gui
-      public: virtual bool SetSelected( bool s );
-  
+      public: virtual bool SetSelected(bool s);
+
       // \brief Toggle light visual visibility
       public: void ToggleShowVisual();
-  
+
       /// \brief Set whether to show the visual
       public: void ShowVisual(bool s);
-  
+
       /// \brief Set the light type
       public: void SetLightType(const std::string &type);
-  
+
       /// \brief Set the diffuse
       public: void SetDiffuseColor(const common::Color &color);
-  
+
       /// \brief Set the specular color
       public: void SetSpecularColor(const common::Color &color);
-  
+
       /// \brief Set the direction
       public: void SetDirection(const math::Vector3 &dir);
-  
+
       /// \brief Set the attenuation
-      public: void SetAttenuation(double constant, double linear,  
+      public: void SetAttenuation(double constant, double linear,
                                   double quadratic);
-  
+
       /// \brief Set the spot light inner angle
       public: void SetSpotInnerAngle(const double &angle);
-  
+
       /// \brief Set the spot light outter angle
       public: void SetSpotOuterAngle(const double &angle);
-  
+
       /// \brief Set the spot light falloff
       public: void SetSpotFalloff(const double &angle);
-  
+
       /// \brief Set the range
       public: void SetRange(const double &range);
-  
+
       /// \brief Set cast shadowsj
       public: void SetCastShadows(const bool &cast);
-  
+
       /// \private Helper node to create a visual representation of the light
       private: void CreateVisual();
-  
+
       private: void SetupShadows();
-  
+
       protected: virtual void OnPoseChange() {}
- 
       /// The OGRE light source
       private: Ogre::Light *light;
-  
+
       private: Visual *visual;
       private: DynamicLines *line;
 
@@ -139,3 +137,5 @@ namespace gazebo
   }
 }
 #endif
+
+

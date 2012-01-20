@@ -27,57 +27,56 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief A slider joint
     template<class T>
     class SliderJoint : public T
     {
       /// \brief Constructor
-      public: SliderJoint( ) : T()
-              { this->AddType(Base::SLIDER_JOINT); } 
-  
+      public: SliderJoint() : T()
+              { this->AddType(Base::SLIDER_JOINT); }
       /// \brief Destructor
       public: virtual ~SliderJoint()
               { }
-  
       /// \brief Load the joint
-      protected: virtual void Load( sdf::ElementPtr &_sdf )
+      protected: virtual void Load(sdf::ElementPtr &_sdf)
                  {
                    T::Load(_sdf);
-  
+
                    if (_sdf->HasElement("axis"))
                    {
                      sdf::ElementPtr axisElem = _sdf->GetElement("axis");
                      this->SetAxis(0, axisElem->GetValueVector3("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
-                       sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
-                       // Perform this three step ordering to ensure the parameters 
-                       // are set properly. This is taken from the ODE wiki.
-                       this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                       this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                       this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                       sdf::ElementPtr limitElem =
+                         _sdf->GetElement("axis")->GetElement("limit");
+
+                       // Perform this three step ordering to ensure the
+                       // parameters are set properly. This is taken from
+                       // the ODE wiki.
+                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+                       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
+                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
                      }
                    }
                  }
-    
+
       /// \brief Set the anchor
-      public: virtual void SetAnchor( int /*_index*/, 
-                                      const math::Vector3 &_anchor) 
+      public: virtual void SetAnchor(int /*_index*/,
+                                      const math::Vector3 &_anchor)
               {this->fakeAnchor = _anchor;}
-  
       /// \brief Get the anchor
-      public: virtual math::Vector3 GetAnchor(int /*_index*/) const 
+      public: virtual math::Vector3 GetAnchor(int /*_index*/) const
               {return this->fakeAnchor;}
-   
       protected: math::Vector3 fakeAnchor;
     };
     /// \}
-    
   }
 }
 #endif
+
+

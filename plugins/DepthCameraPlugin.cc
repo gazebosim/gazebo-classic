@@ -19,14 +19,15 @@
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
-DepthCameraPlugin::DepthCameraPlugin() : SensorPlugin() 
+DepthCameraPlugin::DepthCameraPlugin() : SensorPlugin()
 {
 }
 
-void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor, 
+void DepthCameraPlugin::Load(sensors::SensorPtr &_sensor,
                               sdf::ElementPtr &/*_sdf*/)
 {
-  this->parentSensor = boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor);
+  this->parentSensor =
+    boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor);
   this->depthCamera = this->parentSensor->GetDepthCamera();
 
   if (!this->parentSensor)
@@ -40,23 +41,25 @@ void DepthCameraPlugin::Load( sensors::SensorPtr &_sensor,
   this->depth = this->depthCamera->GetImageDepth();
   this->format = this->depthCamera->GetImageFormat();
 
-  this->newDepthFrameConnection = this->depthCamera->ConnectNewDepthFrame( 
-      boost::bind(&DepthCameraPlugin::OnNewDepthFrame, this, _1, _2, _3, _4, _5));
+  this->newDepthFrameConnection = this->depthCamera->ConnectNewDepthFrame(
+      boost::bind(&DepthCameraPlugin::OnNewDepthFrame,
+        this, _1, _2, _3, _4, _5));
 
-  this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame( 
-      boost::bind(&DepthCameraPlugin::OnNewImageFrame, this, _1, _2, _3, _4, _5));
+  this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame(
+      boost::bind(&DepthCameraPlugin::OnNewImageFrame,
+        this, _1, _2, _3, _4, _5));
 
   this->parentSensor->SetActive(true);
 }
 
 void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
-    unsigned int _width, unsigned int _height, 
+    unsigned int _width, unsigned int _height,
     unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   float min, max;
   min = 1000;
   max = 0;
-  for (unsigned int i=0; i < _width * _height; i++)
+  for (unsigned int i = 0; i < _width * _height; i++)
   {
     if (_image[i] > max)
       max = _image[i];
@@ -64,21 +67,24 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
       min = _image[i];
   }
 
-  int index =  ((_height * 0.5) * _width) + _width *0.5;
-  printf("W[%d] H[%d] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n", width, height, index, _image[index], min, max);
+  int index =  ((_height * 0.5) * _width) + _width * 0.5;
+  printf("W[%d] H[%d] MidPoint[%d] Dist[%f] Min[%f] Max[%f]\n",
+      width, height, index, _image[index], min, max);
 
-  /*rendering::Camera::SaveFrame( _image, this->width, 
-    this->height, this->depth, this->format, 
-    "/tmp/depthCamera/me.jpg" );
+  /*rendering::Camera::SaveFrame(_image, this->width,
+    this->height, this->depth, this->format,
+    "/tmp/depthCamera/me.jpg");
     */
 }
 
 void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
-                              unsigned int /*_width*/, unsigned int /*_height*/, 
-                              unsigned int /*_depth*/, const std::string &/*_format*/)
+                              unsigned int /*_width*/,
+                              unsigned int /*_height*/,
+                              unsigned int /*_depth*/,
+                              const std::string &/*_format*/)
 {
-  /*rendering::Camera::SaveFrame( _image, this->width, 
-    this->height, this->depth, this->format, 
-    "/tmp/depthCamera/me.jpg" );
+  /*rendering::Camera::SaveFrame(_image, this->width,
+    this->height, this->depth, this->format,
+    "/tmp/depthCamera/me.jpg");
     */
 }

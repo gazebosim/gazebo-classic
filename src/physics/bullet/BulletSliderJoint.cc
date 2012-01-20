@@ -23,45 +23,35 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletLink.hh"
-#include "common/XMLConfig.hh"
 #include "BulletSliderJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-using namespace physics;
 
-using namespace physics;
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-BulletSliderJoint::BulletSliderJoint( btDynamicsWorld *world  )
+//////////////////////////////////////////////////
+BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world)
     : SliderJoint<BulletJoint>()
 {
-  this->world = world;
+  this->world = _world;
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 BulletSliderJoint::~BulletSliderJoint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Load the joint
-void BulletSliderJoint::Load(common::XMLConfigNode *node)
+//////////////////////////////////////////////////
+void BulletSliderJoint::Load(common::XMLConfigNode *_node)
 {
-  SliderJoint<BulletJoint>::Load(node);
+  SliderJoint<BulletJoint>::Load(_node);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Attach the two bodies with this joint
-void BulletSliderJoint::Attach( Link *one, Link *two )
+//////////////////////////////////////////////////
+void BulletSliderJoint::Attach(Link *_one, Link *_two)
 {
-  SliderJoint<BulletJoint>::Attach(one,two);
+  SliderJoint<BulletJoint>::Attach(_one, _two);
   BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
   BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
@@ -76,8 +66,8 @@ void BulletSliderJoint::Attach( Link *one, Link *two )
   frame1 = btTransform::getIdentity();
   frame2 = btTransform::getIdentity();
 
-  this->constraint = new btSliderConstraint( *rigidLink1, *rigidLink2,
-      frame1, frame2, true); 
+  this->constraint = new btSliderConstraint(*rigidLink1, *rigidLink2,
+      frame1, frame2, true);
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);
@@ -86,97 +76,89 @@ void BulletSliderJoint::Attach( Link *one, Link *two )
   this->constraint->enableFeedback(true);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the axis of rotation
-math::Vector3 BulletSliderJoint::GetAxis(int index) const
+//////////////////////////////////////////////////
+math::Vector3 BulletSliderJoint::GetAxis(int _index) const
 {
   return **this->axisP;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the position of the joint
-math::Angle BulletSliderJoint::GetAngle(int index) const
+//////////////////////////////////////////////////
+math::Angle BulletSliderJoint::GetAngle(int _index) const
 {
-  return ((btSliderConstraint*)this->constraint)->getLinearPos();
+  return static_cast<btSliderConstraint*>(this->constraint)->getLinearPos();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the rate of change
-double BulletSliderJoint::GetVelocity(int index) const
+//////////////////////////////////////////////////
+double BulletSliderJoint::GetVelocity(int _index) const
 {
   gzerr << "Not implemented in bullet\n";
   return 0;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
-void BulletSliderJoint::SetVelocity(int index, double angle)
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetVelocity(int _index, double _angle)
 {
   gzerr << "Not implemented in bullet\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the axis of motion
-void BulletSliderJoint::SetAxis( int index, const math::Vector3 &axis )
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
 {
   gzerr << "Not implemented in bullet\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the joint damping
-void BulletSliderJoint::SetDamping( int /*index*/, const double damping )
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the slider force
-void BulletSliderJoint::SetForce(int index, double force)
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetForce(int _index, double _force)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the high stop of an axis(index).
-void BulletSliderJoint::SetHighStop(int index, math::Angle angle)
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetHighStop(int _index, math::Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setUpperLinLimit(angle.GetAsRadian());
+  static_cast<btSliderConstraint*>(this->constraint)->setUpperLinLimit(
+    _angle.GetAsRadian());
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the low stop of an axis(index).
-void BulletSliderJoint::SetLowStop(int index, math::Angle angle)
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetLowStop(int _index, math::Angle _angle)
 {
-  ((btSliderConstraint*)this->constraint)->setLowerLinLimit(angle.GetAsRadian());
-}
- 
-//////////////////////////////////////////////////////////////////////////////
-///  Get the high stop of an axis(index).
-math::Angle BulletSliderJoint::GetHighStop(int index)
-{
-  return ((btSliderConstraint*)this->constraint)->getUpperLinLimit();
+  static_cast<btSliderConstraint*>(this->constraint)->setLowerLinLimit(
+    _angle.GetAsRadian());
 }
 
-//////////////////////////////////////////////////////////////////////////////
-///  Get the low stop of an axis(index).
-math::Angle BulletSliderJoint::GetLowStop(int index)
+//////////////////////////////////////////////////
+math::Angle BulletSliderJoint::GetHighStop(int _index)
 {
-  return ((btSliderConstraint*)this->constraint)->getLowerLinLimit();
+  return static_cast<btSliderConstraint*>(this->constraint)->getUpperLinLimit();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
-void BulletSliderJoint::SetMaxForce(int /*index*/, double /*t*/)
+//////////////////////////////////////////////////
+math::Angle BulletSliderJoint::GetLowStop(int _index)
+{
+  return static_cast<btSliderConstraint*>(
+      this->constraint)->getLowerLinLimit();
+}
+
+//////////////////////////////////////////////////
+void BulletSliderJoint::SetMaxForce(int _index, double _force)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
+//////////////////////////////////////////////////
 double BulletSliderJoint::GetMaxForce(int /*index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
+
+
 
 

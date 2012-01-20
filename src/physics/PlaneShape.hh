@@ -27,38 +27,37 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Collision for an infinite plane.
-    /// 
+    ///
     /// This collision is used primarily for ground planes.  Note that while
-    /// the plane in infinite, only the part near the camera is drawn.  
+    /// the plane in infinite, only the part near the camera is drawn.
     class PlaneShape : public Shape
     {
       /// \brief Constructor
       /// \param body Link to which we are attached.
       public: PlaneShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~PlaneShape();
-   
+
       /// \brief Load the plane
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Initialize the plane
       public: virtual void Init();
- 
+
       /// \brief Create the plane
       public: virtual void CreatePlane();
-  
+
       /// \brief Set the altitude of the plane
       public: virtual void SetAltitude(const math::Vector3 &pos);
-  
+
       /// \brief Set the normal
-      public: void SetNormal( const math::Vector3 &norm );
+      public: void SetNormal(const math::Vector3 &norm);
 
       public: math::Vector3 GetNormal() const;
 
@@ -70,3 +69,5 @@ namespace gazebo
   }
 }
 #endif
+
+

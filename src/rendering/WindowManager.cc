@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#include "rendering/ogre.h"
 #include <math.h>
+
+#include "rendering/ogre.h"
 
 #include "common/Events.hh"
 #include "common/Color.hh"
@@ -34,20 +35,18 @@ using namespace rendering;
 
 unsigned int WindowManager::windowCounter = 0;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 WindowManager::WindowManager()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 WindowManager::~WindowManager()
 {
   this->Fini();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Shutdown all the windows
+//////////////////////////////////////////////////
 void WindowManager::Fini()
 {
   // TODO: this was causing a segfault on shutdown
@@ -60,20 +59,18 @@ void WindowManager::Fini()
   this->windows.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Attach a camera to a window
+//////////////////////////////////////////////////
 void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
-  this->windows[_windowId]->removeAllViewports(); 
+  this->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->windows[_windowId]);
   RTShaderSystem::AttachViewport(_camera->GetViewport(), _camera->GetScene());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create a window
-int WindowManager::CreateWindow( const std::string ogreHandle, 
-                                 unsigned int width, 
-                                 unsigned int height) 
+//////////////////////////////////////////////////
+int WindowManager::CreateWindow(const std::string &ogreHandle,
+                                unsigned int width,
+                                unsigned int height)
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -91,10 +88,10 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   {
     try
     {
-      window = RenderEngine::Instance()->root->createRenderWindow( 
+      window = RenderEngine::Instance()->root->createRenderWindow(
           stream.str(), width, height, false, &params);
     }
-    catch (...)
+    catch(...)
     {
       gzerr << " Unable to create the rendering window\n";
       window = NULL;
@@ -109,7 +106,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   if (window)
   {
     window->setActive(true);
-    //window->setVisible(true);
+    // window->setVisible(true);
     window->setAutoUpdated(false);
 
     this->windows.push_back(window);
@@ -118,7 +115,8 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
   return this->windows.size()-1;
 }
 
-void WindowManager::GetAttribute(unsigned int id, const std::string &attr, void *data)
+void WindowManager::GetAttribute(unsigned int id,
+    const std::string &attr, void *data)
 {
   if (id >= this->windows.size())
     gzerr << "Invalid window id[" << id << "]\n";
@@ -137,7 +135,7 @@ void WindowManager::Resize(unsigned int id, int width, int height)
     this->windows[id]->resize(width, height);
     this->windows[id]->windowMovedOrResized();
   }
-} 
+}
 
 void WindowManager::Moved(unsigned int id)
 {
@@ -151,20 +149,21 @@ void WindowManager::Moved(unsigned int id)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the average FPS
+//////////////////////////////////////////////////
 float WindowManager::GetAvgFPS(unsigned int windowId)
 {
-  float lastFPS, avgFPS, bestFPS, worstFPS = 0;
+  float avgFPS = 0;
 
   if (windowId < this->windows.size())
+  {
+    float lastFPS, bestFPS, worstFPS = 0;
     this->windows[windowId]->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+  }
 
   return avgFPS;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the triangle count
+//////////////////////////////////////////////////
 unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
 {
   if (windowId < this->windows.size())
@@ -172,3 +171,6 @@ unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
   else
     return 0;
 }
+
+
+

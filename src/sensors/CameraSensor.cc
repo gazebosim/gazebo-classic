@@ -39,45 +39,39 @@ using namespace gazebo;
 using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
- 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
+
+//////////////////////////////////////////////////
 CameraSensor::CameraSensor()
     : Sensor()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the parent of the sensor
-void CameraSensor::SetParent( const std::string &_name )
+//////////////////////////////////////////////////
+void CameraSensor::SetParent(const std::string &_name)
 {
   Sensor::SetParent(_name);
 }
-   
-//////////////////////////////////////////////////////////////////////////////
-// Load the camera with SDF parameters
-void CameraSensor::Load( sdf::ElementPtr &_sdf )
+
+//////////////////////////////////////////////////
+void CameraSensor::Load(sdf::ElementPtr &_sdf)
 {
   Sensor::Load(_sdf);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Load the camera using default parameters
+//////////////////////////////////////////////////
 void CameraSensor::Load()
 {
   Sensor::Load();
-  this->poseSub = this->node->Subscribe("~/pose", 
-                                        &CameraSensor::OnPose, this );
+  this->poseSub = this->node->Subscribe("~/pose",
+                                        &CameraSensor::OnPose, this);
 }
- 
-//////////////////////////////////////////////////////////////////////////////
-// Initialize the camera
+
+//////////////////////////////////////////////////
 void CameraSensor::Init()
 {
   std::string worldName = this->sdf->GetWorldName();
@@ -101,10 +95,10 @@ void CameraSensor::Init()
     this->camera->SetCaptureData(true);
 
     sdf::ElementPtr cameraSdf = this->sdf->GetOrCreateElement("camera");
-    this->camera->Load( cameraSdf );
+    this->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 || 
+    if (this->camera->GetImageWidth() == 0 ||
         this->camera->GetImageHeight() == 0)
     {
       gzthrow("image has zero size");
@@ -121,8 +115,7 @@ void CameraSensor::Init()
   Sensor::Init();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Finalize the camera
+//////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
   Sensor::Fini();
@@ -132,15 +125,13 @@ void CameraSensor::Fini()
   this->scene.reset();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set whether the sensor is active or not
+//////////////////////////////////////////////////
 void CameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Update the drawing
+//////////////////////////////////////////////////
 void CameraSensor::UpdateImpl(bool /*_force*/)
 {
   if (this->camera)
@@ -173,3 +164,5 @@ const unsigned char *CameraSensor::GetImageData()
 {
   return this->camera->GetImageData(0);
 }
+
+

@@ -23,6 +23,8 @@
 #ifndef BulletGEOM_HH
 #define BulletGEOM_HH
 
+#include <string>
+
 #include "common/Param.hh"
 #include "Entity.hh"
 #include "math/Pose.hh"
@@ -33,71 +35,67 @@ class btCollisionShape;
 
 namespace gazebo
 {
-	namespace physics
-{
-  class Link;
-  class XMLConfigNode;
-  class BulletPhysics;
-
-  /// \addtogroup gazebo_physics_ode
-  /// \brief Base class for all Bullet collisions
-  /// \{
-
-  /// \brief Base class for all collisions
-  class BulletCollision : public Collision
+  namespace physics
   {
-  
-    /// \brief Constructor
-    //public: Collision(Link *body, const std::string &name);
-    public: BulletCollision(Link *body);
-  
-    /// \brief Destructor
-    public: virtual ~BulletCollision();
+    class Link;
+    class XMLConfigNode;
+    class BulletPhysics;
 
-    /// \brief Load the collision
-    public: virtual void Load(common::XMLConfigNode *node);
+    /// \addtogroup gazebo_physics_ode
+    /// \brief Base class for all Bullet collisions
+    /// \{
+    /// \brief Base class for all collisions
+    class BulletCollision : public Collision
+    {
+      /// \brief Constructor
+      // public: Collision(Link *body, const std::string &name);
+      public: BulletCollision(Link *body);
 
-    /// \brief Load the collision
-    public: virtual void Save(std::string &prefix, std::ostream &stream);
+      /// \brief Destructor
+      public: virtual ~BulletCollision();
 
-    /// \brief Update function for collisions
-    public: virtual void Update();
+      /// \brief Load the collision
+      public: virtual void Load(common::XMLConfigNode *node);
 
-    /// \brief On pose change
-    public: virtual void OnPoseChange();
+      /// \brief Load the collision
+      public: virtual void Save(std::string &prefix, std::ostream &stream);
 
-    /// \brief Set the category bits, used during collision detection
-    /// \param bits The bits
-    public: virtual void SetCategoryBits(unsigned int bits);
-  
-    /// \brief Set the collide bits, used during collision detection
-    /// \param bits The bits
-    public: virtual void SetCollideBits(unsigned int bits);
-  
-    /// \brief Get the mass of the collision
-    public: Mass GetLinkMassMatrix();
-  
-    /// \brief Get the bounding box, defined by the physics engine
-    public: virtual void GetBoundingBox( math::Vector3 &min, math::Vector3 &max ) const;
+      /// \brief Update function for collisions
+      public: virtual void Update();
 
-    /// \brief Set the collision shape
-    public: void SetCollisionShape( btCollisionShape *shape );
+      /// \brief On pose change
+      public: virtual void OnPoseChange();
 
-    /// \brief Get the bullet collision shape
-    public: btCollisionShape *GetCollisionShape() const;
+      /// \brief Set the category bits, used during collision detection
+      /// \param bits The bits
+      public: virtual void SetCategoryBits(unsigned int bits);
 
-    /// \brief Set the index of the compound shape
-    public: void SetCompoundShapeIndex( int index );
+      /// \brief Set the collide bits, used during collision detection
+      /// \param bits The bits
+      public: virtual void SetCollideBits(unsigned int bits);
 
-    protected: BulletPhysics *bulletPhysics;
-    protected: btCollisionShape *collisionShape;
+      /// \brief Get the mass of the collision
+      public: Mass GetLinkMassMatrix();
 
-    protected: int compoundShapeIndex;
-  };
+      /// \brief Get the bounding box, defined by the physics engine
+      public: virtual void GetBoundingBox(math::Vector3 &min,
+                                          math::Vector3 &max) const;
 
-  /// \}
+      /// \brief Set the collision shape
+      public: void SetCollisionShape(btCollisionShape *shape);
 
-}
-}
+      /// \brief Get the bullet collision shape
+      public: btCollisionShape *GetCollisionShape() const;
+
+      /// \brief Set the index of the compound shape
+      public: void SetCompoundShapeIndex(int index);
+
+      protected: BulletPhysics *bulletPhysics;
+      protected: btCollisionShape *collisionShape;
+
+      protected: int compoundShapeIndex;
+    };
+    /// \}
+  }
 }
 #endif

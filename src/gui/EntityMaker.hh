@@ -28,44 +28,44 @@ namespace gazebo
     class MouseEvent;
   }
 
-	namespace gui
+  namespace gui
   {
     class EntityMaker
     {
-      public: typedef boost::function<void(const math::Vector3 &pos, const math::Vector3 &scale)> CreateCallback;
+      public: typedef boost::function<void(const math::Vector3 &pos,
+                  const math::Vector3 &scale)> CreateCallback;
 
       /// \brief Constructor
       public: EntityMaker();
-  
+
       /// \brief Destructor
       public: virtual ~EntityMaker();
-  
+
       /// \brief Set whether to snap to grid
-      public: static void SetSnapToGrid(bool snap);
-  
-      public: virtual void Start(const rendering::UserCameraPtr camera) = 0;
-                                 //const CreateCallback &cb) = 0;
+      public: static void SetSnapToGrid(bool _snap);
+
+      public: virtual void Start(const rendering::UserCameraPtr _camera) = 0;
 
       public: virtual void Stop() = 0;
       public: virtual bool IsActive() const = 0;
-  
-      public: virtual void OnMousePush(const common::MouseEvent &event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &event);
-  
+
+      public: virtual void OnMousePush(const common::MouseEvent &_event);
+      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       // \brief Get a point snapped to a grid
-      protected: math::Vector3 GetSnappedPoint(math::Vector3 p);
-  
+      protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
+
       protected: virtual void CreateTheEntity() = 0;
-  
-      protected: rendering::UserCameraPtr camera; 
+
+      protected: rendering::UserCameraPtr camera;
 
       protected: transport::NodePtr node;
       protected: transport::PublisherPtr visPub;
       protected: transport::PublisherPtr makerPub;
       protected: transport::PublisherPtr requestPub;
       protected: CreateCallback createCB;
-               
+
 
       private: static bool snapToGrid;
       private: static double snapDistance;
@@ -74,3 +74,5 @@ namespace gazebo
   }
 }
 #endif
+
+

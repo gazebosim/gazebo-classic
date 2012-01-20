@@ -31,45 +31,40 @@ using namespace gazebo;
 using namespace physics;
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-HeightmapShape::HeightmapShape(CollisionPtr parent)
-    : Shape(parent)
+//////////////////////////////////////////////////
+HeightmapShape::HeightmapShape(CollisionPtr _parent)
+    : Shape(_parent)
 {
   this->AddType(Base::HEIGHTMAP_SHAPE);
-  // NATY: this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
+  // TODO this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
-  // NATY: delete this->ogreHeightmap;
+  // TODO delete this->ogreHeightmap;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Update function.
+//////////////////////////////////////////////////
 void HeightmapShape::Update()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load the heightmap
-void HeightmapShape::Load( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void HeightmapShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 
   // Use the image to get the size of the heightmap
-  this->img.Load( this->sdf->GetValueString("filename") );
+  this->img.Load(this->sdf->GetValueString("filename"));
 
   // Width and height must be the same
   if (this->img.GetWidth() != this->img.GetHeight())
     gzthrow("Heightmap image must be square\n");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Initialize the heightmap
+//////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
 }
@@ -95,10 +90,10 @@ void HeightmapShape::FillShapeMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_filename(this->GetFilename());
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize());
   msgs::Set(_msg.mutable_heightmap()->mutable_offset(), this->GetOffset());
-
 }
 
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
 }
+

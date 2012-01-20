@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Opaque Interface for Player
  * Author: Benjamin Kloster
  * Date: 13 March 2008
  */
 
 /**
-@addtogroup player
-@par Opaque Interface
-*/
+  @addtogroup player
+  @par Opaque Interface
+  */
 /* TODO
-Do we need these?
-- PLAYER_OPAQUE_DATA_STATE
-- PLAYER_OPAQUE_CMD_DATA
-- PLAYER_OPAQUE_REQ_DATA
-*/
+   Do we need these?
+   - PLAYER_OPAQUE_DATA_STATE
+   - PLAYER_OPAQUE_CMD_DATA
+   - PLAYER_OPAQUE_REQ_DATA
+   */
 #include <math.h>
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "OpaqueInterface.hh"
 
@@ -45,8 +44,9 @@ boost::recursive_mutex *OpaqueInterface::mutex = NULL;
 // Constructor
 OpaqueInterface::OpaqueInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+: GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -59,31 +59,34 @@ OpaqueInterface::OpaqueInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 OpaqueInterface::~OpaqueInterface()
 {
+  /*
   // Release this interface
   delete this->iface;
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int OpaqueInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
-
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
     // nothing yet
-      return 0;
+    return 0;
   }
   else
     this->Unsubscribe();
-
+*/
   return -1;
 }
 
@@ -92,6 +95,7 @@ int OpaqueInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void OpaqueInterface::Update()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   player_opaque_data_t data;
   struct timeval ts;
@@ -102,24 +106,25 @@ void OpaqueInterface::Update()
     // Only Update when new data is present
     if (this->iface->data->head.time > this->datatime)
     {
-        this->datatime = this->iface->data->head.time;
+      this->datatime = this->iface->data->head.time;
 
-        ts.tv_sec = (int) (this->iface->data->head.time);
-        ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
+      ts.tv_sec = (int) (this->iface->data->head.time);
+      ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
-        data.data_count = this->iface->data->data_count;
-        data.data = this->iface->data->data;
+      data.data_count = this->iface->data->data_count;
+      data.data = this->iface->data->data;
 
-        this->driver->Publish( this->device_addr,
+      this->driver->Publish(this->device_addr,
           PLAYER_MSGTYPE_DATA,
           PLAYER_OPAQUE_DATA_STATE,
-          (void*)&data, sizeof(data), &this->datatime );
+          (void*)&data, sizeof(data), &this->datatime);
     }
 
     this->iface->Unlock();
   }
   else
     this->Unsubscribe();
+    */
 }
 
 
@@ -128,26 +133,30 @@ void OpaqueInterface::Update()
 // GazeboDriver::Subscribe
 void OpaqueInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Opaque Interface\n"
-           << e << "\n";
-    //gzthrow(stream.str());
+      << e << "\n";
+    // gzthrow(stream.str());
     exit(0);
   }
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void OpaqueInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

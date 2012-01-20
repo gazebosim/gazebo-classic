@@ -22,8 +22,8 @@
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
-#include "BulletLink.hh"
-#include "BulletBallJoint.hh"
+#include "physics/bullet/BulletBody.hh"
+#include "physics/bullet/BulletBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -33,46 +33,40 @@ using namespace physics;
 using namespace physics;
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-BulletBallJoint::BulletBallJoint(btDynamicsWorld *world)
+//////////////////////////////////////////////////
+BulletBallJoint::BulletBallJoint(btDynamicsWorld *_world)
     : BallJoint<BulletJoint>()
 {
-  this->world = world;
+  this->world = _world;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 BulletBallJoint::~BulletBallJoint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the joints anchor point
-math::Vector3 BulletBallJoint::GetAnchor(int index) const
+//////////////////////////////////////////////////
+math::Vector3 BulletBallJoint::GetAnchor(int _index) const
 {
   return this->anchorPos;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the joints anchor point
-void BulletBallJoint::SetAnchor(int index, const math::Vector3 &anchor)
+//////////////////////////////////////////////////
+void BulletBallJoint::SetAnchor(int _index, const math::Vector3 &_anchor)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the joint damping
-void BulletBallJoint::SetDamping( int /*index*/, const double damping )
+//////////////////////////////////////////////////
+void BulletBallJoint::SetDamping(int /*index*/, const double _damping)
 {
   gzerr << "Not implemented\n";
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Attach the two bodies with this joint
-void BulletBallJoint::Attach( Link *one, Link *two )
+//////////////////////////////////////////////////
+void BulletBallJoint::Attach(Link *_one, Link *_two)
 {
-  BallJoint<BulletJoint>::Attach(one,two);
+  BallJoint<BulletJoint>::Attach(_one, _two);
   BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
   BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
 
@@ -88,9 +82,9 @@ void BulletBallJoint::Attach( Link *one, Link *two )
   pivotA = this->anchorPos - this->body1->GetWorldPose().pos;
   pivotB = this->anchorPos - this->body2->GetWorldPose().pos;
 
-  this->constraint = new btPoint2PointConstraint( *rigidLink1, *rigidLink2,
+  this->constraint = new btPoint2PointConstraint(*rigidLink1, *rigidLink2,
       btmath::Vector3(pivotA.x, pivotA.y, pivotA.z),
-      btmath::Vector3(pivotB.x, pivotB.y, pivotB.z)); 
+      btmath::Vector3(pivotB.x, pivotB.y, pivotB.z));
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);
@@ -98,4 +92,6 @@ void BulletBallJoint::Attach( Link *one, Link *two )
   // Allows access to impulse
   this->constraint->enableFeedback(true);
 }
+
+
 

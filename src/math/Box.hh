@@ -26,8 +26,7 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
- 
-    /// \brief A box and related functions. 
+    /// \brief A box and related functions.
     class Box
     {
       /// \brief Default constructor
@@ -36,11 +35,11 @@ namespace gazebo
       /// \brief Constructor
       /// \param _min Minimum corner of the box
       /// \param _max Maximum corner of the box
-      public: Box (const Vector3 &_min, const Vector3 &_max);
+      public: Box(const Vector3 &_min, const Vector3 &_max);
 
       /// \brief Copy Constructor
       /// \param _b Box to copy
-      public: Box( const Box &b );
+      public: Box(const Box &_b);
 
       /// \brief Destructor
       public: virtual ~Box();
@@ -72,34 +71,34 @@ namespace gazebo
       /// \brief Equal operator. Set this box to the parameter
       /// \param _b Box to copy
       /// \return The new box.
-      public: const Box &operator=( const Box &_b );
+      public: Box &operator =(const Box &_b);
 
       /// \brief Addition operator. result = this + _b
       /// \param _b Box to add
       /// \return The new box
-      public: Box operator+( const Box &_b ) const;
+      public: Box operator+(const Box &_b) const;
 
       /// \brief Addition set operator. this = this + _b
       /// \param _b Box to add
       /// \return This new box
-      public: const Box &operator+=( const Box &_b );
+      public: const Box &operator+=(const Box &_b);
 
       /// \brief Output operator
       /// \param _out Output stream
       /// \param _b Box to output to the stream
       /// \return The stream
-      public: friend std::ostream &operator<<( std::ostream &_out, 
-                                               const gazebo::math::Box &_b )
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                               const gazebo::math::Box &_b)
       {
         _out << "Min[" << _b.min << "] Max[" << _b.max << "]";
 
         return _out;
       }
 
-      /// \brief Minimum corner of the box 
+      /// \brief Minimum corner of the box
       public: Vector3 min;
 
-      /// \brief Maximum corner of the box 
+      /// \brief Maximum corner of the box
       public: Vector3 max;
     };
     /// \}
@@ -107,3 +106,6 @@ namespace gazebo
 }
 
 #endif
+
+
+

@@ -32,14 +32,14 @@ using namespace gazebo;
 using namespace rendering;
 
 /// \brief Constructor
-ContactVisual::ContactVisual (const std::string &_name, VisualPtr _vis, 
-                              const std::string &_topicName)
- : Visual(_name, _vis)
+ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
+                             const std::string &_topicName)
+: Visual(_name, _vis)
 {
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->contactsSub = this->node->Subscribe(_topicName, 
+  this->contactsSub = this->node->Subscribe(_topicName,
       &ContactVisual::OnContact, this);
 
   common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.05, 10, 10);
@@ -53,9 +53,9 @@ ContactVisual::ContactVisual (const std::string &_name, VisualPtr _vis,
     this->InsertMesh(mesh);
   }
 
-  for (unsigned int i=0; i < 10; i++)
+  for (unsigned int i = 0; i < 10; i++)
   {
-    std::string name = this->GetName() + 
+    std::string name = this->GetName() +
         "_contactpoint_" + boost::lexical_cast<std::string>(i);
     Ogre::Entity *obj = this->scene->GetManager()->createEntity(
         name, "contact_sphere");
@@ -68,11 +68,11 @@ ContactVisual::ContactVisual (const std::string &_name, VisualPtr _vis,
     cp->normal = new DynamicLines(RENDERING_LINE_LIST);
     cp->depth = new DynamicLines(RENDERING_LINE_LIST);
 
-    cp->normal->AddPoint(math::Vector3(0,0,0));
-    cp->normal->AddPoint(math::Vector3(0,0,0.1));
+    cp->normal->AddPoint(math::Vector3(0, 0, 0));
+    cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
 
-    cp->depth->AddPoint(math::Vector3(0,0,0));
-    cp->depth->AddPoint(math::Vector3(0,0,-1));
+    cp->depth->AddPoint(math::Vector3(0, 0, 0));
+    cp->depth->AddPoint(math::Vector3(0, 0, -1));
     cp->sceneNode->attachObject(cp->depth);
     cp->sceneNode->attachObject(cp->normal);
     cp->sceneNode->setVisible(false);
@@ -81,9 +81,9 @@ ContactVisual::ContactVisual (const std::string &_name, VisualPtr _vis,
   }
 
 
-  this->connections.push_back( 
-      event::Events::ConnectPreRender( 
-        boost::bind(&ContactVisual::Update, this) ) );
+  this->connections.push_back(
+      event::Events::ConnectPreRender(
+        boost::bind(&ContactVisual::Update, this)));
 }
 
 ContactVisual::~ContactVisual()
@@ -92,13 +92,13 @@ ContactVisual::~ContactVisual()
 
 void ContactVisual::Update()
 {
-  int c=0;
+  int c = 0;
   if (!this->contactsMsg)
     return;
 
-  for (int i=0; i < this->contactsMsg->contact_size(); i++)
+  for (int i = 0; i < this->contactsMsg->contact_size(); i++)
   {
-    for (int j=0; 
+    for (int j = 0;
         c < 10 && j < this->contactsMsg->contact(i).position_size(); j++)
     {
       math::Vector3 pos = msgs::Convert(
@@ -110,8 +110,8 @@ void ContactVisual::Update()
       this->points[c]->sceneNode->setVisible(true);
       this->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
 
-      this->points[c]->normal->SetPoint(1,normal*0.1);
-      this->points[c]->depth->SetPoint(1,normal*-depth*10);
+      this->points[c]->normal->SetPoint(1, normal*0.1);
+      this->points[c]->depth->SetPoint(1, normal*-depth*10);
 
       this->points[c]->normal->setMaterial("Gazebo/LightOn");
       this->points[c]->depth->setMaterial("Gazebo/LightOff");
@@ -120,9 +120,8 @@ void ContactVisual::Update()
       c++;
     }
   }
-  for (;c<10;c++)
+  for ( ; c < 10; c++)
     this->points[c]->sceneNode->setVisible(false);
-
 }
 
 void ContactVisual::OnContact(

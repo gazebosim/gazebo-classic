@@ -61,7 +61,7 @@ Position2dInterface::~Position2dInterface()
 //////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
-                                        player_msghdr_t *_hdr, void *_data)
+                                        player_msghdr_t *_hdr, void * /*_data*/)
 {
   int result = 0;
 
@@ -71,9 +71,8 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
   if (Message::MatchMessage(_hdr, PLAYER_MSGTYPE_CMD,
         PLAYER_POSITION2D_CMD_VEL, this->device_addr))
   {
-    player_position2d_cmd_vel_t *cmd;
-
-    cmd = (player_position2d_cmd_vel_t*)_data;
+    // player_position2d_cmd_vel_t *cmd;
+    // cmd = (player_position2d_cmd_vel_t*)_data;
 
     /*this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
     this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
@@ -95,7 +94,7 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     else
     {
       /*
-      player_position2d_set_odom_req_t *odom = 
+      player_position2d_set_odom_req_t *odom =
         (player_position2d_set_odom_req_t*)_data;
 
       this->iface->data->pose.pos.x = odom->pose.px;
@@ -129,11 +128,11 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
     }
     else
     {
-      player_position2d_power_config_t *power;
+      // player_position2d_power_config_t *power;
 
-      power = (player_position2d_power_config_t*)_data;
+      // power = (player_position2d_power_config_t*)_data;
 
-      //this->iface->data->cmdEnableMotors = power->state;
+      // this->iface->data->cmdEnableMotors = power->state;
 
       this->driver->Publish(this->device_addr, _respQueue,
           PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
@@ -162,7 +161,7 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
       geom.pose.pyaw = 0;
       geom.pose.ppitch = 0;
       geom.pose.proll = 0;
-      geom.size.sw= 0.53;
+      geom.size.sw = 0.53;
       geom.size.sl = 0.38;
       geom.size.sh = 0.31;
 
@@ -230,10 +229,10 @@ void Position2dInterface::Update()
 
     data.stall = (uint8_t) this->iface->data->stall;
 
-    this->driver->Publish( this->device_addr,
+    this->driver->Publish(this->device_addr,
         PLAYER_MSGTYPE_DATA,
         PLAYER_POSITION2D_DATA_STATE,
-        (void*)&data, sizeof(data), &this->datatime );
+        (void*)&data, sizeof(data), &this->datatime);
 
   }
   */
@@ -252,3 +251,5 @@ void Position2dInterface::Subscribe()
 void Position2dInterface::Unsubscribe()
 {
 }
+
+

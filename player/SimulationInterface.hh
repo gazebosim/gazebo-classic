@@ -22,6 +22,9 @@
 #ifndef GAZEBO_SIMULATION_INTERFACE_HH
 #define GAZEBO_SIMULATION_INTERFACE_HH
 
+#include <map>
+#include <string>
+
 #include "GazeboInterface.hh"
 #include "msgs/msgs.h"
 #include "transport/TransportTypes.hh"
@@ -31,7 +34,7 @@ namespace boost
   class recursive_mutex;
 }
 
-/// \addtogroup player_iface 
+/// \addtogroup player_iface
 /// \{
 /// \defgroup simulation_player Simulation Interface
 /// Provides:
@@ -93,6 +96,8 @@ class SimulationInterface : public GazeboInterface
   private: std::map<std::string, gazebo::math::Pose> entityPoses;
 };
 
-  /// \} 
-  /// \} 
+  /// \}
+  /// \}
 #endif
+
+

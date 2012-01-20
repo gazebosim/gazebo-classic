@@ -17,6 +17,8 @@
 #ifndef __PHYSICS_HH__
 #define __PHYSICS_HH__
 
+#include <string>
+
 #include "physics/PhysicsTypes.hh"
 #include "sdf/sdf.h"
 
@@ -26,11 +28,10 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     bool load();
     bool fini();
 
-    WorldPtr create_world(const std::string &name="");
+    WorldPtr create_world(const std::string &name ="");
     WorldPtr get_world(const std::string &name = "");
 
     void load_world(WorldPtr world, sdf::ElementPtr &_sdf);
@@ -43,10 +44,12 @@ namespace gazebo
     void init_worlds();
     void run_worlds();
     void stop_worlds();
-    void pause_worlds( bool pause);
+    void pause_worlds(bool pause);
     void remove_worlds();
 
     /// \}
   }
 }
 #endif
+
+

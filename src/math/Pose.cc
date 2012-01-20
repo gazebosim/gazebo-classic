@@ -26,56 +26,50 @@ using namespace gazebo;
 using namespace math;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Default constructors
+//////////////////////////////////////////////////
 Pose::Pose()
-  : pos(0,0,0), rot(1,0,0,0)
+  : pos(0, 0, 0), rot(1, 0, 0, 0)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-Pose::Pose( const Vector3 &_pos, const Quaternion &_rot)
+//////////////////////////////////////////////////
+Pose::Pose(const Vector3 &_pos, const Quaternion &_rot)
   : pos(_pos), rot(_rot)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Copy constructor
-Pose::Pose( const Pose &_pose )
+//////////////////////////////////////////////////
+Pose::Pose(const Pose &_pose)
   : pos(_pose.pos), rot(_pose.rot)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 Pose::~Pose()
 {
 }
 
+//////////////////////////////////////////////////
 void Pose::Set(const Vector3 &_pos, const Quaternion &_rot)
 {
   this->pos = _pos;
   this->rot = _rot;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// See if a pose is finite (e.g., not nan)
+//////////////////////////////////////////////////
 bool Pose::IsFinite() const
 {
   return this->pos.IsFinite() && this->rot.IsFinite();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the inverse of this pose
+//////////////////////////////////////////////////
 Pose Pose::GetInverse() const
 {
   Quaternion inv = this->rot.GetInverse();
-  return Pose( inv * (this->pos*-1), inv );
+  return Pose(inv * (this->pos*-1), inv);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add two poses: result = this + obj
+//////////////////////////////////////////////////
 Pose Pose::operator+(const Pose &obj) const
 {
   Pose result;
@@ -86,8 +80,7 @@ Pose Pose::operator+(const Pose &obj) const
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add-Equals operator
+//////////////////////////////////////////////////
 const Pose &Pose::operator+=(const Pose &obj)
 {
   this->pos = this->CoordPositionAdd(obj);
@@ -96,8 +89,7 @@ const Pose &Pose::operator+=(const Pose &obj)
   return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add two poses: result = this - obj
+//////////////////////////////////////////////////
 const Pose &Pose::operator-=(const Pose &_obj)
 {
   this->pos = this->CoordPositionSub(_obj);
@@ -106,37 +98,35 @@ const Pose &Pose::operator-=(const Pose &_obj)
   return *this;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-bool Pose::operator==(const Pose &_pose) const
+//////////////////////////////////////////////////
+bool Pose::operator ==(const Pose &_pose) const
 {
   return this->pos == _pose.pos && this->rot == _pose.rot;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool Pose::operator!=(const Pose &_pose) const
 {
   return this->pos != _pose.pos || this->rot != _pose.rot;
 }
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Multiplication operator
+
+//////////////////////////////////////////////////
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose), this->rot * pose.rot);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add one point to a vector: result = this + pos
-Vector3 Pose::CoordPositionAdd(const Vector3 &pos) const
+//////////////////////////////////////////////////
+Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 {
   Quaternion tmp;
   Vector3 result;
 
-  // result = pose.rot + pose.rot * this->pos * pose.rot!
+  // result = pose.rot + pose.rot * this->_pos * pose.rot!
   tmp.w = 0.0;
-  tmp.x = pos.x;
-  tmp.y = pos.y;
-  tmp.z = pos.z;
+  tmp.x = _pos.x;
+  tmp.y = _pos.y;
+  tmp.z = _pos.z;
 
   tmp = this->rot * (tmp * this->rot.GetInverse());
   result.x = this->pos.x + tmp.x;
@@ -146,38 +136,34 @@ Vector3 Pose::CoordPositionAdd(const Vector3 &pos) const
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add one point to another: result = this + pose
-Vector3 Pose::CoordPositionAdd(const Pose &pose) const
+//////////////////////////////////////////////////
+Vector3 Pose::CoordPositionAdd(const Pose &_pose) const
 {
   Quaternion tmp;
   Vector3 result;
 
-  // result = pose.rot + pose.rot * this->pos * pose.rot!
+  // result = _pose.rot + _pose.rot * this->pos * _pose.rot!
   tmp.w = 0.0;
   tmp.x = this->pos.x;
   tmp.y = this->pos.y;
   tmp.z = this->pos.z;
 
-  //tmp = (tmp * pose.rot) * pose.rot.GetInverse();
-  tmp = pose.rot * (tmp * pose.rot.GetInverse());
+  tmp = _pose.rot * (tmp * _pose.rot.GetInverse());
 
-  result.x = pose.pos.x + tmp.x;
-  result.y = pose.pos.y + tmp.y;
-  result.z = pose.pos.z + tmp.z;
+  result.x = _pose.pos.x + tmp.x;
+  result.y = _pose.pos.y + tmp.y;
+  result.z = _pose.pos.z + tmp.z;
 
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add one rotation to another: result =  this->rot + rot
-Quaternion Pose::CoordRotationAdd(const Quaternion &rot) const
+//////////////////////////////////////////////////
+Quaternion Pose::CoordRotationAdd(const Quaternion &_rot) const
 {
-  return Quaternion(rot * this->rot);
+  return Quaternion(_rot * this->rot);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Reset the pose
+//////////////////////////////////////////////////
 void Pose::Reset()
 {
   // set the position to zero
@@ -186,43 +172,40 @@ void Pose::Reset()
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Find the inverse of a pose; i.e., if b = this + a, given b and this,
-// find a
-Pose Pose::CoordPoseSolve(const Pose &b) const
+//////////////////////////////////////////////////
+Pose Pose::CoordPoseSolve(const Pose &_b) const
 {
   Quaternion q;
   Pose a;
 
-  a.rot = this->rot.GetInverse() * b.rot;
+  a.rot = this->rot.GetInverse() * _b.rot;
   q = a.rot * Quaternion(0, this->pos.x, this->pos.y, this->pos.z);
   q = q * a.rot.GetInverse();
-  a.pos = b.pos - Vector3(q.x, q.y, q.z);
+  a.pos = _b.pos - Vector3(q.x, q.y, q.z);
 
   return a;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Rotate a vector by a quaternion, added for computing CG location for the Body
-Pose Pose::RotatePositionAboutOrigin(const Quaternion &rot) const
+//////////////////////////////////////////////////
+Pose Pose::RotatePositionAboutOrigin(const Quaternion &_rot) const
 {
   Pose a = *this;
-  a.pos.x =  (1.0 - 2.0*rot.y*rot.y - 2.0*rot.z*rot.z) * this->pos.x
-            +(2.0*(rot.x*rot.y+rot.w*rot.z)          ) * this->pos.y
-            +(2.0*(rot.x*rot.z-rot.w*rot.y)          ) * this->pos.z;
-  a.pos.y =  (2.0*(rot.x*rot.y-rot.w*rot.z)          ) * this->pos.x
-            +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.z*rot.z) * this->pos.y
-            +(2.0*(rot.y*rot.z+rot.w*rot.x)          ) * this->pos.z;
-  a.pos.z =  (2.0*(rot.x*rot.z+rot.w*rot.y)          ) * this->pos.x
-            +(2.0*(rot.y*rot.z-rot.w*rot.x)          ) * this->pos.y
-            +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.y*rot.y) * this->pos.z;
+  a.pos.x =  (1.0 - 2.0*_rot.y*_rot.y - 2.0*_rot.z*_rot.z) * this->pos.x
+            +(2.0*(_rot.x*_rot.y+_rot.w*_rot.z)) * this->pos.y
+            +(2.0*(_rot.x*_rot.z-_rot.w*_rot.y)) * this->pos.z;
+  a.pos.y =  (2.0*(_rot.x*_rot.y-_rot.w*_rot.z)) * this->pos.x
+            +(1.0 - 2.0*_rot.x*_rot.x - 2.0*_rot.z*_rot.z) * this->pos.y
+            +(2.0*(_rot.y*_rot.z+_rot.w*_rot.x)) * this->pos.z;
+  a.pos.z =  (2.0*(_rot.x*_rot.z+_rot.w*_rot.y)) * this->pos.x
+            +(2.0*(_rot.y*_rot.z-_rot.w*_rot.x)) * this->pos.y
+            +(1.0 - 2.0*_rot.x*_rot.x - 2.0*_rot.y*_rot.y) * this->pos.z;
   return a;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Round all values to _decimalPlaces
+//////////////////////////////////////////////////
 void Pose::Round(int _precision)
 {
   this->rot.Round(_precision);
   this->pos.Round(_precision);
 }
+

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Camera Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
@@ -24,7 +24,6 @@
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "CameraInterface.hh"
 
@@ -32,12 +31,12 @@ using namespace libgazebo;
 
 boost::recursive_mutex *CameraInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 CameraInterface::CameraInterface(player_devaddr_t addr,
-                                 GazeboDriver *driver, ConfigFile *cf, int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf, int section)
+: GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -54,30 +53,29 @@ CameraInterface::CameraInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 CameraInterface::~CameraInterface()
 {
+  /*
   // Delete this interface
   delete this->iface;
+  */
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Handle all messages. This is called from GazeboDriver
+/////////////////////////////////////////////////
 int CameraInterface::ProcessMessage(QueuePointer &respQueue,
-                                    player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
   return -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Update this interface, publish new info. This is
-// called from GazeboDriver::Update
+/////////////////////////////////////////////////
 void CameraInterface::Update()
 {
-  size_t size;
+  /*
   char filename[256];
 
   struct timeval ts;
@@ -87,8 +85,9 @@ void CameraInterface::Update()
   this->iface->Lock(1);
 
   // Only Update when new data is present
-  if (this->iface->data->head.time > this->datatime )
+  if (this->iface->data->head.time > this->datatime)
   {
+    size_t size;
     this->datatime = this->iface->data->head.time;
 
     ts.tv_sec = (int) (this->iface->data->head.time);
@@ -113,68 +112,66 @@ void CameraInterface::Update()
 
     // Set the image pixels
     memcpy(this->data.image, this->iface->data->image,
-           this->iface->data->image_size);
+        this->iface->data->image_size);
 
     size = sizeof(this->data) - sizeof(this->data.image) +
-           this->iface->data->image_size;
+      this->iface->data->image_size;
 
     // Send data to server
     this->driver->Publish(this->device_addr,
-                          PLAYER_MSGTYPE_DATA,
-                          PLAYER_CAMERA_DATA_STATE,
-                          (void*)&this->data, size, &this->datatime);
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_CAMERA_DATA_STATE,
+        (void*)&this->data, size, &this->datatime);
 
     // Save frames
     if (this->save)
     {
-      snprintf(filename, sizeof(filename), "click-%04d.ppm",this->frameno++);
+      snprintf(filename, sizeof(filename), "click-%04d.ppm", this->frameno++);
       this->SaveFrame(filename);
     }
   }
 
   // Done with the interface
   this->iface->Unlock();
-
+  */
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
+/////////////////////////////////////////////////
 void CameraInterface::Subscribe()
 {
-
+  /*
   // Open the interface
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
-    //std::ostringstream stream;
-    std::cout << "Error Subscribing to Gazebo Camera Interface[" 
+    // std::ostringstream stream;
+    std::cout << "Error Subscribing to Gazebo Camera Interface["
       << this->gz_id << "]\n" << e << "\n";
-    //gzthrow(stream.str());
+    // gzthrow(stream.str());
     exit(0);
   }
-
+  */
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
+/////////////////////////////////////////////////
 void CameraInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   this->iface->Close();
+  */
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Save an image frame
+/////////////////////////////////////////////////
 void CameraInterface::SaveFrame(const char *filename)
 {
-  int i, width, height;
+  /*
+  int width, height;
   FILE *file;
 
   file = fopen(filename, "w+");
@@ -191,7 +188,7 @@ void CameraInterface::SaveFrame(const char *filename)
   {
     // Write ppm
     fprintf(file, "P6\n%d %d\n%d\n", width, height, 255);
-    for (i = 0; i < height; i++)
+    for (int i = 0; i < height; i++)
       fwrite(this->data.image + i * rowSize, rowSize, 1, file);
   }
   else
@@ -200,4 +197,5 @@ void CameraInterface::SaveFrame(const char *filename)
   }
 
   fclose(file);
+  */
 }

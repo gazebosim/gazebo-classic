@@ -17,6 +17,8 @@
 #ifndef __GAZEBO_CAMERA_PLUGIN_HH__
 #define __GAZEBO_CAMERA_PLUGIN_HH__
 
+#include <string>
+
 #include "common/Plugin.hh"
 #include "sensors/CameraSensor.hh"
 #include "rendering/Camera.hh"
@@ -28,10 +30,10 @@ namespace gazebo
   {
     public: CameraPlugin();
 
-    public: void Load( sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf );
+    public: void Load(sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf);
 
     public: virtual void OnNewFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height, 
+                              unsigned int _width, unsigned int _height,
                               unsigned int _depth, const std::string &_format);
 
     protected: unsigned int width, height, depth;
@@ -44,3 +46,4 @@ namespace gazebo
   };
 }
 #endif
+

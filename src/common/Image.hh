@@ -23,84 +23,82 @@
 #ifndef IMAGE_HH
 #define IMAGE_HH
 
-#include <string>
 #include <FreeImage.h>
+#include <string>
 
 #include "common/Color.hh"
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
-  
-    /// \addtogroup gazebo_common Common 
+    /// \addtogroup gazebo_common Common
     /// \{
-
-    /// \brief Encapsulates an image  
+    /// \brief Encapsulates an image
     class Image
     {
       /// \brief Constructor
       public: Image();
-  
+
       /// \brief Destructor
       public: virtual ~Image();
-  
+
       /// \brief Load an image. Return 0 on success
-      public: int Load(const std::string &filename);
-  
+      public: int Load(const std::string &_filename);
+
       /// \brief Set the image from raw data (R8G8B8)
       /// \param data Pointer to the raw image data
       /// \param width Width in pixels
       /// \param height Height in pixels
       /// \param scanline_bytes Size of a image row in bytes
       /// \param bpp Bits per pixels, aka depth
-      public: void SetFromData( const unsigned char *data, unsigned int width,
-                       unsigned int height, int scanline_bytes, unsigned int bpp);
-  
+      public: void SetFromData(const unsigned char *data, unsigned int width,
+                  unsigned int height, int scanline_bytes, unsigned int bpp);
+
       /// \brief Get the image as a data array
       /// \param data Pointer to a NULL array of char.
       /// \param count The resulting data array size
-      public: void GetData( unsigned char **data, unsigned int &count );
-  
+      public: void GetData(unsigned char **_data, unsigned int &_count);
+
       /// \brief Get the width
       public: unsigned int GetWidth() const;
-  
+
       /// \brief Get the height
       public: unsigned int GetHeight() const;
-  
+
       /// \brief Get the size of one pixel in bits
       public: unsigned int GetBPP() const;
-  
+
       /// \brief Get a pixel color value
-      public: Color GetPixel(unsigned int x, unsigned int y);
-  
+      public: Color GetPixel(unsigned int _x, unsigned int _y);
+
       /// \brief Get the average color
       public: Color GetAvgColor();
-  
+
       /// \brief Get the max color
       public: Color GetMaxColor();
-  
+
       /// \brief Rescale the image
-      public: void Rescale(int width, int height);
-  
+      public: void Rescale(int _width, int _height);
+
       /// \brief Render this image using opengl
-      //public: void RenderOpengl(float destW, float destH);
-  
+      // public: void RenderOpengl(float destW, float destH);
+
       /// \brief Returns whether this is a valid image
       public: bool Valid() const;
-  
+
       /// \brief Get the full filename of the image
       public: std::string GetFilename() const;
-  
+
       /// Count the number of images created. Used for initialising free image
       private: static int count;
-  
+
       private: FIBITMAP *bitmap;
-  
+
       private: std::string fullName;
     };
     /// \}
   }
-
 }
 #endif
+

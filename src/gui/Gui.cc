@@ -47,10 +47,10 @@ void gui::load()
   rendering::init();
 
   g_argv = new char*[g_argc];
-  for (int i=0; i < g_argc; i++)
+  for (int i = 0; i < g_argc; i++)
   {
     g_argv[i] = new char[strlen("gazebo")];
-    strcpy(g_argv[i], "gazebo");
+    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
   }
 
   g_app = new QApplication(g_argc, g_argv);
@@ -58,10 +58,10 @@ void gui::load()
   g_main_win = new MainWindow();
 
   g_main_win->Load();
-  g_main_win->resize(1024,768);
+  g_main_win->resize(1024, 768);
 
   for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); iter++)
+       iter != g_plugins.end(); ++iter)
   {
     (*iter)->Load();
   }
@@ -77,8 +77,8 @@ void gui::init()
   g_main_win->show();
   g_main_win->Init();
 
-  for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin(); 
-       iter != g_plugins.end(); iter++)
+  for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
+       iter != g_plugins.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -126,13 +126,16 @@ rendering::UserCameraPtr gui::get_active_camera()
   return g_active_camera;
 }
 
-void gui::load_plugin( const std::string &_filename )
+void gui::load_plugin(const std::string &_filename)
 {
-  gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename, _filename);
-  g_plugins.push_back( plugin );
+  gazebo::SystemPluginPtr plugin =
+    gazebo::SystemPlugin::Create(_filename, _filename);
+  g_plugins.push_back(plugin);
 }
 
 bool gui::has_entity_name(const std::string &_name)
 {
   return g_main_win->HasEntityName(_name);
 }
+
+

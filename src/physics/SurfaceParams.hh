@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for a surface 
+/* Desc: common::Parameters for a surface
  * Author: Nate Koenig
  * Date: 30 July 2003
  */
@@ -27,28 +27,30 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Surface params
     class SurfaceParams
     {
-      /// Constructor
+      /// \brief Constructor
       public: SurfaceParams();
-    
+
+      /// \brief Constructor
+      public: virtual ~SurfaceParams();
+
       /// \brief Load the contact params
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Fill in a surface message
       public: void FillSurfaceMsg(msgs::Surface &_msg);
-   
+
       public: virtual void ProcessMsg(const msgs::Surface &_msg);
 
-      /// 0..1, 0=no bounciness
+      /// 0..1, 0 = no bounciness
       public: double bounce;
-      
+
       /// \brief bounce vel
       public: double bounceThreshold;
 
@@ -70,3 +72,5 @@ namespace gazebo
   }
 }
 #endif
+
+

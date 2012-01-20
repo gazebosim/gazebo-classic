@@ -28,18 +28,16 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
-    /// \brief ODE Box shape 
+    /// \brief ODE Box shape
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(ODECollisionPtr parent) : BoxShape(parent) {}
+      public: ODEBoxShape(ODECollisionPtr _parent) : BoxShape(_parent) {}
       public: virtual ~ODEBoxShape() {}
       public: virtual void SetSize(const math::Vector3 &size)
       {
@@ -60,3 +58,9 @@ namespace gazebo
   }
 }
 #endif
+
+
+
+
+
+

@@ -1,59 +1,47 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include "transport/ConnectionManager.hh"
 #include "transport/SubscriptionTransport.hh"
 
 using namespace gazebo;
 using namespace transport;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 SubscriptionTransport::SubscriptionTransport()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 SubscriptionTransport::~SubscriptionTransport()
 {
   ConnectionManager::Instance()->RemoveConnection(this->connection);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Initialize the publication link 
+//////////////////////////////////////////////////
 void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
 {
   this->connection = _conn;
   this->latching = _latching;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the typename of the message that is handled
-std::string SubscriptionTransport::GetMsgType() const
-{
-  return "";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg_)
-{
-  bool result = false;
-  std::string data;
-  msg_->SerializeToString(&data);
-
-  if (this->connection->IsOpen())
-  {
-    this->connection->EnqueueMsg( data );
-    result = true;
-  }
-
-  return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Output a message to a connection
+//////////////////////////////////////////////////
 bool SubscriptionTransport::HandleData(const std::string &newdata)
 {
   bool result = false;
-  std::string data;
   if (this->connection->IsOpen())
   {
     this->connection->EnqueueMsg(newdata);
@@ -65,20 +53,16 @@ bool SubscriptionTransport::HandleData(const std::string &newdata)
   return result;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the connection
+//////////////////////////////////////////////////
 const ConnectionPtr &SubscriptionTransport::GetConnection() const
 {
   return this->connection;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the callback is local, false if the callback is tied to a 
+//////////////////////////////////////////////////
 /// remote connection
 bool SubscriptionTransport::IsLocal() const
 {
   return false;
 }
-
 

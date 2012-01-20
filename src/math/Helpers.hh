@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #ifndef GAZEBO_MATH_FUNCTIONS_HH
 #define GAZEBO_MATH_FUNCTIONS_HH
 
@@ -13,25 +29,26 @@ namespace gazebo
     static const double NAN_D = std::numeric_limits<double>::quiet_NaN();
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
 
-    inline bool equal(const double &_a, const double &_b, 
-                      const double &_epsilon)
+    inline bool equal(const double &_a, const double &_b,
+                      const double &_epsilon = 1e-6)
     {
       return std::fabs(_a - _b) <= _epsilon;
     }
 
-    inline bool equal(const float &_a, const float &_b, const float &_epsilon)
+    inline bool equal(const float &_a, const float &_b,
+                      const float &_epsilon = 1e-6)
     {
       return std::fabs(_a - _b) <= _epsilon;
     }
 
     inline double precision(const double &_a, const unsigned int &_precision)
     {
-      return round(_a * pow(10,_precision)) / pow(10,_precision);
+      return round(_a * pow(10, _precision)) / pow(10, _precision);
     }
 
     inline float precision(const float &_a, const unsigned int &_precision)
     {
-      return roundf(_a * pow(10,_precision)) / pow(10,_precision);
+      return roundf(_a * pow(10, _precision)) / pow(10, _precision);
     }
 
     inline int parseInt(const std::string& input)
@@ -44,9 +61,9 @@ namespace gazebo
       while (*p == ' ')
         p++;
 
-      if (*p == '-') 
+      if (*p == '-')
       {
-        s = -1; 
+        s = -1;
         p++;
       }
 
@@ -72,9 +89,9 @@ namespace gazebo
       while (*p == ' ')
         p++;
 
-      if (*p == '-') 
+      if (*p == '-')
       {
-        s = -1; 
+        s = -1;
         p++;
       }
 
@@ -82,11 +99,11 @@ namespace gazebo
       while (*p >= '0' && *p <= '9')
         acc = acc * 10 + *p++ - '0';
 
-      if (*p == '.') 
+      if (*p == '.')
       {
         double k = 0.1;
         p++;
-        while (*p >= '0' && *p <= '9') 
+        while (*p >= '0' && *p <= '9')
         {
           acc += (*p++ - '0') * k;
           k *= 0.1;
@@ -97,20 +114,20 @@ namespace gazebo
         int es = 1;
         int f = 0;
         p++;
-        if (*p == '-') 
+        if (*p == '-')
         {
-          es = -1; 
+          es = -1;
           p++;
         }
         else if (*p == '+')
         {
-          es = 1; 
+          es = 1;
           p++;
         }
-        while (*p >= '0' && *p <= '9') 
+        while (*p >= '0' && *p <= '9')
           f = f * 10 + *p++ - '0';
 
-        acc *= pow(10,f*es);
+        acc *= pow(10, f*es);
       }
 
       if (*p)
@@ -123,3 +140,6 @@ namespace gazebo
   }
 }
 #endif
+
+
+

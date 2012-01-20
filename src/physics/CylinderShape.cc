@@ -21,66 +21,59 @@ using namespace gazebo;
 using namespace physics;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-CylinderShape::CylinderShape(CollisionPtr parent) : Shape(parent)
+//////////////////////////////////////////////////
+CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 CylinderShape::~CylinderShape()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load the cylinder
-void CylinderShape::Load( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void CylinderShape::Load(sdf::ElementPtr &_sdf)
 {
   Shape::Load(_sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Initialize the cylinder
+//////////////////////////////////////////////////
 void CylinderShape::Init()
 {
-  this->SetSize( this->sdf->GetValueDouble("radius"), 
-                 this->sdf->GetValueDouble("length") );
+  this->SetSize(this->sdf->GetValueDouble("radius"),
+                 this->sdf->GetValueDouble("length"));
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Set radius
-void CylinderShape::SetRadius(const double &radius)
+//////////////////////////////////////////////////
+void CylinderShape::SetRadius(const double &_radius)
 {
-  this->sdf->GetAttribute("radius")->Set(radius);
-  this->SetSize( this->sdf->GetValueDouble("radius"), 
-                 this->sdf->GetValueDouble("length") );
+  this->sdf->GetAttribute("radius")->Set(_radius);
+  this->SetSize(this->sdf->GetValueDouble("radius"),
+                 this->sdf->GetValueDouble("length"));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set length
-void CylinderShape::SetLength(const double &length)
+//////////////////////////////////////////////////
+void CylinderShape::SetLength(const double &_length)
 {
-  this->sdf->GetAttribute("length")->Set(length);
-  this->SetSize( this->sdf->GetValueDouble("radius"), 
-                 this->sdf->GetValueDouble("length") );
+  this->sdf->GetAttribute("length")->Set(_length);
+  this->SetSize(this->sdf->GetValueDouble("radius"),
+                 this->sdf->GetValueDouble("length"));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the size of the cylinder
-void CylinderShape::SetSize( const double &radius, const double &length )
+//////////////////////////////////////////////////
+void CylinderShape::SetSize(const double &_radius, const double &_length)
 {
-  this->sdf->GetAttribute("radius")->Set(radius);
-  this->sdf->GetAttribute("length")->Set(length);
+  this->sdf->GetAttribute("radius")->Set(_radius);
+  this->sdf->GetAttribute("length")->Set(_length);
 }
 
 double CylinderShape::GetRadius() const
 {
   return this->sdf->GetValueDouble("radius");
 }
-  
+
 double CylinderShape::GetLength() const
 {
   return this->sdf->GetValueDouble("length");
@@ -97,3 +90,5 @@ void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetSize(_msg.cylinder().radius(), _msg.cylinder().length());
 }
+
+

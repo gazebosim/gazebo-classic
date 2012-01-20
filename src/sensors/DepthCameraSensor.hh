@@ -22,58 +22,58 @@
 #ifndef DEPTHCAMERASENSOR_HH
 #define DEPTHCAMERASENSOR_HH
 
+#include <string>
+
 #include "sensors/Sensor.hh"
 #include "msgs/MessageTypes.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
-  
   /// \ingroup gazebo_sensors
   /// \brief Sensors namespace
   namespace sensors
   {
-    /// \addtogroup gazebo_sensors Sensors 
+    /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
     /// \{
- 
     /// \brief Basic camera sensor
     /// This sensor is used for simulating standard monocular cameras
     class DepthCameraSensor : public Sensor
     {
       /// \brief Constructor
       public: DepthCameraSensor();
-    
+
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
 
       /// \brief Set the parent of the sensor
-      public: virtual void SetParent( const std::string &_name );
-    
+      public: virtual void SetParent(const std::string &_name);
+
       /// \brief Load the camera using parameter from an SDF element
       /// \param _sdf The SDF parameters
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
+      protected: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Load the camera using default parameters
       protected: virtual void Load();
-    
+
       /// \brief Initialize the camera
       protected: virtual void Init();
-    
+
       /// \brief Update the sensor information
       protected: virtual void UpdateImpl(bool _force);
-    
+
       /// Finalize the camera
       protected: virtual void Fini();
-    
+
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
-   
-      public: rendering::DepthCameraPtr GetDepthCamera() const 
-              {return this->camera; };
+
+      public: rendering::DepthCameraPtr GetDepthCamera() const
+              {return this->camera;}
 
       private: void OnPose(ConstPosePtr &_msg);
-   
+
       private: rendering::DepthCameraPtr camera;
 
       private: rendering::ScenePtr scene;
@@ -82,3 +82,5 @@ namespace gazebo
   }
 }
 #endif
+
+

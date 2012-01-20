@@ -25,52 +25,52 @@
 
 #include <vector>
 
-#include "PhysicsRaySensor.hh"
-
 namespace gazebo
 {
-	namespace physics
-{
-  class BulletRayCollision;
-  class BulletLink;
-
-  /// \brief An Bullet Ray sensor
-  class BulletRaySensor : public PhysicsRaySensor
+  namespace physics
   {
-    /// \brief Constructor
-    public: BulletRaySensor(Link *body);
+    class BulletRayCollision;
+    class BulletLink;
 
-    /// \brief Destructor
-    public: virtual ~BulletRaySensor();
+    /// \brief An Bullet Ray sensor
+    class BulletRaySensor : public PhysicsRaySensor
+    {
+      /// \brief Constructor
+      public: BulletRaySensor(Link *body);
 
-    /// \brief Add a ray to the sensor
-    public: void AddRay(math::Vector3 start, math::Vector3 end, double minRange, 
-                        double maxRange, bool display);
+      /// \brief Destructor
+      public: virtual ~BulletRaySensor();
 
-    /// \brief Get the number of rays
-    public: int GetCount() const;
+      /// \brief Add a ray to the sensor
+      public: void AddRay(math::Vector3 start, math::Vector3 end,
+                  double minRange, double maxRange, bool display);
 
-    /// \brief Get the relative starting and ending points of a ray
-    public: void GetRelativePoints(int index, math::Vector3 &a, math::Vector3 &b);
+      /// \brief Get the number of rays
+      public: int GetCount() const;
 
-    /// \brief Get the range of a ray
-    public: double GetRange(int index) const;
+      /// \brief Get the relative starting and ending points of a ray
+      public: void GetRelativePoints(int index, math::Vector3 &a,
+                                     math::Vector3 &b);
 
-    /// \brief Get the retro reflectance value of a ray
-    public: double GetRetro(int index) const;
+      /// \brief Get the range of a ray
+      public: double GetRange(int index) const;
 
-    /// \brief Get the fiducial value of a ray
-    public: double GetFiducial(int index) const;
+      /// \brief Get the retro reflectance value of a ray
+      public: double GetRetro(int index) const;
 
-    /// \brief Update the ray sensor
-    public: virtual void Update();
+      /// \brief Get the fiducial value of a ray
+      public: double GetFiducial(int index) const;
 
-    /// All the rays
-    private: std::vector<BulletRayCollision*> rays;
+      /// \brief Update the ray sensor
+      public: virtual void Update();
 
-    private: BulletLink *body;
-  };
-}
-}
+      /// All the rays
+      private: std::vector<BulletRayCollision*> rays;
+
+      private: BulletLink *body;
+    };
+  }
 }
 #endif
+
+

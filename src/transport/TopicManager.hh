@@ -17,9 +17,11 @@
 #ifndef TOPICMANAGER_HH
 #define TOPICMANAGER_HH
 
+#include <boost/bind.hpp>
 #include <map>
 #include <list>
-#include <boost/bind.hpp>
+#include <string>
+#include <vector>
 
 #include "common/Exception.hh"
 #include "msgs/msgs.h"
@@ -30,7 +32,6 @@
 #include "transport/SubscriptionTransport.hh"
 #include "transport/PublicationTransport.hh"
 #include "transport/ConnectionManager.hh"
-//#include "transport/Connection.hh"
 #include "transport/Publisher.hh"
 #include "transport/Publication.hh"
 #include "transport/Subscriber.hh"
@@ -41,7 +42,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
 
     /// \brief Manages topics and their subscriptions
     class TopicManager : public SingletonT<TopicManager>
@@ -55,9 +55,9 @@ namespace gazebo
 
       public: PublicationPtr FindPublication(const std::string &topic);
 
-      public: void AddNode( NodePtr _node );
+      public: void AddNode(NodePtr _node);
 
-      public: void RemoveNode( unsigned int _id );
+      public: void RemoveNode(unsigned int _id);
 
       public: void ProcessNodes();
 
@@ -71,9 +71,6 @@ namespace gazebo
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
-      public: void Unsubscribe(const std::string &topic, 
-                               const CallbackHelperPtr &_sub);
-
       public: void Unsubscribe(const std::string &_topic, const NodePtr &_sub);
 
       /// \brief Advertise on a topic
@@ -90,7 +87,7 @@ namespace gazebo
                   gzthrow("Advertise requires a google protobuf type");
 
                 this->UpdatePublications(_topic, msg->GetTypeName());
-              
+
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
                       msg->GetTypeName(), _queueLimit, _latch));
 
@@ -98,10 +95,10 @@ namespace gazebo
                 PublicationPtr publication;
 
                 // Connect all local subscription to the publisher
-                for (int i=0; i < 2; i ++)
-                { 
+                for (int i = 0; i < 2; i ++)
+                {
                   std::string t;
-                  if (i==0)
+                  if (i == 0)
                   {
                     t = _topic;
                     msgTypename = msg->GetTypeName();
@@ -125,14 +122,14 @@ namespace gazebo
 
                   SubNodeMap::iterator iter2;
                   SubNodeMap::iterator st_end2 = this->subscribedNodes.end();
-                  for (iter2 = this->subscribedNodes.begin(); 
+                  for (iter2 = this->subscribedNodes.begin();
                        iter2 != st_end2; iter2++)
                   {
                     if (iter2->first == t)
                     {
                       std::list<NodePtr>::iterator liter;
                       std::list<NodePtr>::iterator l_end = iter2->second.end();
-                      for (liter = iter2->second.begin(); 
+                      for (liter = iter2->second.begin();
                            liter != l_end; liter++)
                       {
                         publication->AddSubscription(*liter);
@@ -152,25 +149,25 @@ namespace gazebo
       /// \param topic Name of the topic
       /// \param message The message to send.
       /// \param cb Callback, used when the publish is completed.
-      public: void Publish( const std::string &topic, 
+      public: void Publish(const std::string &topic,
                             const google::protobuf::Message &message,
                             const boost::function<void()> &cb = NULL);
 
       /// \brief Connection a local Publisher to a remote Subscriber
-      public: void ConnectPubToSub( const std::string &topic,
-                                    const SubscriptionTransportPtr &sublink );
+      public: void ConnectPubToSub(const std::string &topic,
+                                    const SubscriptionTransportPtr &sublink);
 
       /// \brief Connect a local Subscriber to a remote Publisher
-      public: void ConnectSubToPub( const msgs::Publish &_pub );
+      public: void ConnectSubToPub(const msgs::Publish &_pub);
 
       /// \brief Disconnect a local publisher from a remote subscriber
-      public: void DisconnectPubFromSub( const std::string &topic, 
-                                         const std::string &host, 
+      public: void DisconnectPubFromSub(const std::string &topic,
+                                         const std::string &host,
                                          unsigned int port);
 
       /// \brief Disconnection all local subscribers from a remote publisher
-      public: void DisconnectSubFromPub( const std::string &topic, 
-                                         const std::string &host, 
+      public: void DisconnectSubFromPub(const std::string &topic,
+                                         const std::string &host,
                                          unsigned int port);
 
       /// \brief Connect all subscribers on a topic to known publishers
@@ -178,10 +175,10 @@ namespace gazebo
 
       /// \brief Update our list of advertised topics
       /// \return True if the provided params define a new publisher.
-      public: PublicationPtr UpdatePublications( const std::string &topic, 
-                                                 const std::string &msgType );
+      public: PublicationPtr UpdatePublications(const std::string &topic,
+                                                 const std::string &msgType);
 
-      /// \brief Register a new topic namespace 
+      /// \brief Register a new topic namespace
       public: void RegisterTopicNamespace(const std::string &_name);
 
       /// \brief Get all the topic namespaces
@@ -191,26 +188,23 @@ namespace gazebo
 
       public: void PauseIncoming(bool _pause);
 
-      private: void HandleIncoming();
-
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 
       private: typedef std::map<std::string, PublicationPtr> PublicationPtr_M;
       private: PublicationPtr_M advertisedTopics;
       private: PublicationPtr_M::iterator advertisedTopicsEnd;
-      private: SubNodeMap subscribedNodes; 
+      private: SubNodeMap subscribedNodes;
       private: std::vector<NodePtr> nodes;
 
       private: boost::recursive_mutex *nodeMutex;
 
       private: bool pauseIncoming;
 
-      //Singleton implementation
+      // Singleton implementation
       private: friend class SingletonT<TopicManager>;
     };
     /// \}
   }
 }
-
 #endif
 

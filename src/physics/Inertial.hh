@@ -28,26 +28,25 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief A class for inertial information about a link
     class Inertial
     {
       /// \brief Default Constructor
       public: Inertial();
-  
+
       /// \brief Constructor
       public: Inertial(double mass);
-  
+
       /// \brief Copy constructor
       public: Inertial(const Inertial &_inertial);
-  
+
       /// \brief Destructor
       public: virtual ~Inertial();
-  
-      public: void Load( sdf::ElementPtr _sdf);
+
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief update the parameters using new sdf values
-      public: void UpdateParameters( sdf::ElementPtr &_sdf );
+      public: void UpdateParameters(sdf::ElementPtr &_sdf);
 
       public: double GetLinearDamping();
       public: double GetAngularDamping();
@@ -63,27 +62,25 @@ namespace gazebo
 
       /// \brief Get the mass
       public: double GetMass() const;
-  
+
       /// \brief Set the mass matrix
-      public: void SetInertiaMatrix( double ixx, double iyy, double izz,
+      public: void SetInertiaMatrix(double ixx, double iyy, double izz,
                                      double ixy, double ixz, double iyz);
-  
+
       /// \brief Set the center of gravity
       public: void SetCoG(double cx, double cy, double cz);
-  
+
       /// \brief Set the center of gravity
       public: void SetCoG(const math::Vector3 &c);
-  
+
       /// \brief Get the center of gravity
       public: inline const math::Vector3 &GetCoG() const
               { return this->cog; }
-
       public: inline const math::Pose GetPose() const
               { return math::Pose(this->cog, math::Quaternion());}
-  
       /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
       public: math::Vector3 GetPrincipalMoments() const;
-  
+
       /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
       public: math::Vector3 GetProductsofInertia() const;
 
@@ -100,28 +97,28 @@ namespace gazebo
       public: void SetIXY(double _v);
       public: void SetIXZ(double _v);
       public: void SetIYZ(double _v);
- 
+
       /// \brief Rotate this mass
       public: void Rotate(const math::Quaternion &rot);
-  
+
       /// \brief Equal operator
-      public: void operator=(const Inertial &_inertial);
-  
-      public: Inertial operator+(const Inertial &_inertial ) const;
-      public: const Inertial &operator+=(const Inertial &_inertial );
+      public: Inertial &operator=(const Inertial &_inertial);
+
+      public: Inertial operator+(const Inertial &_inertial) const;
+      public: const Inertial &operator+=(const Inertial &_inertial);
 
       /// \brief Update parameters from a message
       /// \param _msg Message to read
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
-      public: friend std::ostream &operator<<(std::ostream &out, 
-                                              const gazebo::physics::Inertial &_inertial)
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::physics::Inertial &_inertial)
               {
-                out << "Mass[" << _inertial.mass << "] CoG[" 
+                _out << "Mass[" << _inertial.mass << "] CoG["
                     << _inertial.cog << "]";
-                return out;
+                return _out;
               }
- 
+
       /// Mass properties of the object
       private: double mass;
       private: math::Vector3 cog;
@@ -134,3 +131,5 @@ namespace gazebo
 }
 
 #endif
+
+

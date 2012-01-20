@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
-#include <algorithm>
+ */
 #include <float.h>
 #include <string.h>
+#include <algorithm>
 
 #include "common/Exception.hh"
 #include "common/Console.hh"
@@ -27,19 +27,17 @@ using namespace gazebo;
 using namespace common;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 Mesh::Mesh()
 {
   this->name = "unknown";
 }
-  
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+
+//////////////////////////////////////////////////
 Mesh::~Mesh()
 {
   std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
     delete *iter;
   this->submeshes.clear();
 }
@@ -54,22 +52,19 @@ std::string Mesh::GetPath() const
   return this->path;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the name of this mesh
-void Mesh::SetName(const std::string &n)
+//////////////////////////////////////////////////
+void Mesh::SetName(const std::string &_n)
 {
-  this->name = n;
+  this->name = _n;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the name of this mesh
+//////////////////////////////////////////////////
 std::string Mesh::GetName() const
 {
   return this->name;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the maximun X,Y,Z values
+//////////////////////////////////////////////////
 math::Vector3 Mesh::GetMax() const
 {
   math::Vector3 max;
@@ -79,7 +74,7 @@ math::Vector3 Mesh::GetMax() const
   max.y = -FLT_MAX;
   max.z = -FLT_MAX;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -93,8 +88,7 @@ math::Vector3 Mesh::GetMax() const
   return max;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the minimum X,Y,Z values
+//////////////////////////////////////////////////
 math::Vector3 Mesh::GetMin() const
 {
   math::Vector3 min;
@@ -104,7 +98,7 @@ math::Vector3 Mesh::GetMin() const
   min.y = FLT_MAX;
   min.z = FLT_MAX;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -118,14 +112,13 @@ math::Vector3 Mesh::GetMin() const
   return min;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the number of vertices
+//////////////////////////////////////////////////
 unsigned int Mesh::GetVertexCount() const
 {
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -135,14 +128,13 @@ unsigned int Mesh::GetVertexCount() const
   return sum;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return the number of normals
+//////////////////////////////////////////////////
 unsigned int Mesh::GetNormalCount() const
 {
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -152,14 +144,13 @@ unsigned int Mesh::GetNormalCount() const
   return sum;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the number of indicies
+//////////////////////////////////////////////////
 unsigned int Mesh::GetIndexCount() const
 {
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -169,14 +160,13 @@ unsigned int Mesh::GetIndexCount() const
   return sum;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return the number of texture coordinates
+//////////////////////////////////////////////////
 unsigned int Mesh::GetTexCoordCount() const
 {
   unsigned int sum = 0;
   std::vector<SubMesh *>::const_iterator iter;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -187,22 +177,19 @@ unsigned int Mesh::GetTexCoordCount() const
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a child mesh
-void Mesh::AddSubMesh(SubMesh *sub)
+//////////////////////////////////////////////////
+void Mesh::AddSubMesh(SubMesh *_sub)
 {
-  this->submeshes.push_back(sub);
+  this->submeshes.push_back(_sub);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of children
+//////////////////////////////////////////////////
 unsigned int Mesh::GetSubMeshCount() const
 {
   return this->submeshes.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a child
+//////////////////////////////////////////////////
 const SubMesh *Mesh::GetSubMesh(unsigned int i) const
 {
   if (i < this->submeshes.size())
@@ -211,41 +198,37 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
     gzthrow("Invalid index: " << i << " >= " << this->submeshes.size() << "\n");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a material to the mesh
-unsigned int Mesh::AddMaterial( Material *mat )
+//////////////////////////////////////////////////
+unsigned int Mesh::AddMaterial(Material *_mat)
 {
-  this->materials.push_back(mat);
+  this->materials.push_back(_mat);
   return this->materials.size()-1;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of materials
+//////////////////////////////////////////////////
 unsigned int Mesh::GetMaterialCount() const
 {
   return this->materials.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a material
+//////////////////////////////////////////////////
 const Material *Mesh::GetMaterial(int index) const
 {
-  if (index >= 0 && index < (int)this->materials.size())
+  if (index >= 0 && index < static_cast<int>(this->materials.size()))
     return this->materials[index];
 
   return NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-///  Put all the data into flat arrays
-void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
+//////////////////////////////////////////////////
+void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 {
   std::vector<SubMesh *>::const_iterator iter;
 
   unsigned int vertCount = 0;
   unsigned int indCount = 0;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
@@ -253,33 +236,33 @@ void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
     indCount += (*iter)->GetIndexCount();
   }
 
-  if (*vertArr)
-    delete [] *vertArr;
+  if (*_vertArr)
+    delete [] *_vertArr;
 
-  if (*indArr)
-    delete [] *indArr;
+  if (*_indArr)
+    delete [] *_indArr;
 
-  *vertArr = new float[ vertCount * 3 ];
-  *indArr = new unsigned int[ indCount ];
+  *_vertArr = new float[ vertCount * 3 ];
+  *_indArr = new int[ indCount ];
 
-  float *vPtr = *vertArr;
+  float *vPtr = *_vertArr;
   unsigned int index = 0;
   unsigned int offset = 0;
 
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
     if ((*iter)->GetVertexCount() <= 2)
       continue;
 
     float *vertTmp = NULL;
-    unsigned int *indTmp = NULL;
+    int *indTmp = NULL;
     (*iter)->FillArrays(&vertTmp, &indTmp);
 
-    memcpy(vPtr, vertTmp, sizeof(float)*(*iter)->GetVertexCount()*3);
+    memcpy(vPtr, vertTmp, sizeof(vertTmp[0])*(*iter)->GetVertexCount()*3);
 
-    for (unsigned int i=0; i < (*iter)->GetIndexCount(); i++)
+    for (unsigned int i = 0; i < (*iter)->GetIndexCount(); i++)
     {
-      (*indArr)[index++] = (*iter)->GetIndex(i) + offset;
+      (*_indArr)[index++] = (*iter)->GetIndex(i) + offset;
     }
 
     offset = offset + (*iter)->GetMaxIndex() + 1;
@@ -289,225 +272,196 @@ void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
     delete [] vertTmp;
     delete [] indTmp;
   }
-
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Recalculate all the normals.
+//////////////////////////////////////////////////
 void Mesh::RecalculateNormals()
 {
   std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
     (*iter)->RecalculateNormals();
 }
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-// SUBMESH
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 SubMesh::SubMesh()
 {
   this->materialIndex = -1;
   this->primitiveType = TRIANGLES;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 SubMesh::~SubMesh()
 {
   this->vertices.clear();
   this->indices.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the primitive type
-void SubMesh::SetPrimitiveType( PrimitiveType _type )
+//////////////////////////////////////////////////
+void SubMesh::SetPrimitiveType(PrimitiveType _type)
 {
   this->primitiveType = _type;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the primitive type
+//////////////////////////////////////////////////
 SubMesh::PrimitiveType SubMesh::GetPrimitiveType() const
 {
   return this->primitiveType;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Copy vertices from a vector
-void SubMesh::CopyVertices( const std::vector<math::Vector3> &_verts )
+//////////////////////////////////////////////////
+void SubMesh::CopyVertices(const std::vector<math::Vector3> &_verts)
 {
   this->vertices.clear();
   this->vertices.resize(_verts.size());
   std::copy(_verts.begin(), _verts.end(), this->vertices.begin());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Copy normals from a vector
-void SubMesh::CopyNormals( const std::vector<math::Vector3> &_norms )
+//////////////////////////////////////////////////
+void SubMesh::CopyNormals(const std::vector<math::Vector3> &_norms)
 {
   this->normals.clear();
   this->normals.resize(_norms.size());
-  for (unsigned int i=0; i < _norms.size(); i++)
+  for (unsigned int i = 0; i < _norms.size(); i++)
   {
     this->normals[i] = _norms[i];
     this->normals[i].Normalize();
     if (this->normals[i].GetLength() == 0.0)
     {
       std::cout << "Bad Normals[" << this->normals[i] << "]\n";
-      this->normals[i].Set(0,0,1);
+      this->normals[i].Set(0, 0, 1);
     }
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Resize the vertex array
-void SubMesh::SetVertexCount( unsigned int _count )
+//////////////////////////////////////////////////
+void SubMesh::SetVertexCount(unsigned int _count)
 {
   this->vertices.resize(_count);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Resize the index array
-void SubMesh::SetIndexCount( unsigned int _count )
+//////////////////////////////////////////////////
+void SubMesh::SetIndexCount(unsigned int _count)
 {
   this->indices.resize(_count);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Resize the normal array
-void SubMesh::SetNormalCount( unsigned int _count )
+//////////////////////////////////////////////////
+void SubMesh::SetNormalCount(unsigned int _count)
 {
   this->normals.resize(_count);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Resize the texture coordinate array
-void SubMesh::SetTexCoordCount( unsigned int _count )
+//////////////////////////////////////////////////
+void SubMesh::SetTexCoordCount(unsigned int _count)
 {
   this->texCoords.resize(_count);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add an index to the mesh
-void SubMesh::AddIndex( unsigned int _i)
+//////////////////////////////////////////////////
+void SubMesh::AddIndex(unsigned int _i)
 {
   this->indices.push_back(_i);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a vertex to the mesh
-void SubMesh::AddVertex( const math::Vector3 &_v )
+//////////////////////////////////////////////////
+void SubMesh::AddVertex(const math::Vector3 &_v)
 {
   this->vertices.push_back(_v);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a vertex to the mesh
-void SubMesh::AddVertex(double x, double y, double z )
+//////////////////////////////////////////////////
+void SubMesh::AddVertex(double _x, double _y, double _z)
 {
-  this->AddVertex(math::Vector3(x,y,z));
+  this->AddVertex(math::Vector3(_x, _y, _z));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a normal to the mesh
-void SubMesh::AddNormal( const math::Vector3 &_n )
+//////////////////////////////////////////////////
+void SubMesh::AddNormal(const math::Vector3 &_n)
 {
   this->normals.push_back(_n);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a normal to the mesh
-void SubMesh::AddNormal(double x, double y, double z)
+//////////////////////////////////////////////////
+void SubMesh::AddNormal(double _x, double _y, double _z)
 {
-  this->AddNormal(math::Vector3(x,y,z));
+  this->AddNormal(math::Vector3(_x, _y, _z));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a texture coord to the mesh
-void SubMesh::AddTexCoord(double u, double v )
+//////////////////////////////////////////////////
+void SubMesh::AddTexCoord(double _u, double _v)
 {
-  this->texCoords.push_back(math::Vector2d(u,v));
+  this->texCoords.push_back(math::Vector2d(_u, _v));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a vertex
-math::Vector3 SubMesh::GetVertex(unsigned int i) const
+//////////////////////////////////////////////////
+math::Vector3 SubMesh::GetVertex(unsigned int _i) const
 {
-  if (i >= this->vertices.size())
+  if (_i >= this->vertices.size())
     gzthrow("Index too large");
 
-  return this->vertices[i];
+  return this->vertices[_i];
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set a vertex
-void SubMesh::SetVertex(unsigned int i, const math::Vector3 &v)
+//////////////////////////////////////////////////
+void SubMesh::SetVertex(unsigned int _i, const math::Vector3 &_v)
 {
-  if (i >= this->vertices.size())
+  if (_i >= this->vertices.size())
     gzthrow("Index too large");
 
-  this->vertices[i] = v;
+  this->vertices[_i] = _v;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a normal
-math::Vector3 SubMesh::GetNormal(unsigned int i) const
+//////////////////////////////////////////////////
+math::Vector3 SubMesh::GetNormal(unsigned int _i) const
 {
-  if (i >= this->normals.size())
+  if (_i >= this->normals.size())
     gzthrow("Index too large");
 
-  return this->normals[i];
+  return this->normals[_i];
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set a normal
-void SubMesh::SetNormal(unsigned int i, const math::Vector3 &n)
+//////////////////////////////////////////////////
+void SubMesh::SetNormal(unsigned int _i, const math::Vector3 &_n)
 {
-  if (i >= this->normals.size())
+  if (_i >= this->normals.size())
     gzthrow("Index too large");
 
-  this->normals[i] = n;
+  this->normals[_i] = _n;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a tex coord
-math::Vector2d SubMesh::GetTexCoord(unsigned int i) const
+//////////////////////////////////////////////////
+math::Vector2d SubMesh::GetTexCoord(unsigned int _i) const
 {
-  if (i >= this->texCoords.size())
+  if (_i >= this->texCoords.size())
     gzthrow("Index too large");
 
-  return this->texCoords[i];
+  return this->texCoords[_i];
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set a tex coord
-void SubMesh::SetTexCoord(unsigned int i, const math::Vector2d &t)
+//////////////////////////////////////////////////
+void SubMesh::SetTexCoord(unsigned int _i, const math::Vector2d &_t)
 {
-  if (i >= this->texCoords.size())
+  if (_i >= this->texCoords.size())
     gzthrow("Index too large");
 
-  this->texCoords[i] = t;
+  this->texCoords[_i] = _t;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get an index
-unsigned int SubMesh::GetIndex(unsigned int i) const
+//////////////////////////////////////////////////
+unsigned int SubMesh::GetIndex(unsigned int _i) const
 {
-  if (i > this->indices.size())
+  if (_i > this->indices.size())
     gzthrow("Index too large");
 
-  return this->indices[i];
+  return this->indices[_i];
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the maximun X,Y,Z values
+//////////////////////////////////////////////////
 math::Vector3 SubMesh::GetMax() const
 {
   math::Vector3 max;
@@ -517,7 +471,7 @@ math::Vector3 SubMesh::GetMax() const
   max.y = -FLT_MAX;
   max.z = -FLT_MAX;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
     max.x = std::max(max.x, (*iter).x);
     max.y = std::max(max.y, (*iter).y);
@@ -527,8 +481,7 @@ math::Vector3 SubMesh::GetMax() const
   return max;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the minimum X,Y,Z values
+//////////////////////////////////////////////////
 math::Vector3 SubMesh::GetMin() const
 {
   math::Vector3 min;
@@ -538,7 +491,7 @@ math::Vector3 SubMesh::GetMin() const
   min.y = FLT_MAX;
   min.z = FLT_MAX;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
     min.x = std::min(min.x, (*iter).x);
     min.y = std::min(min.y, (*iter).y);
@@ -548,36 +501,31 @@ math::Vector3 SubMesh::GetMin() const
   return min;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the number of vertices
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetVertexCount() const
 {
   return this->vertices.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return the number of normals
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetNormalCount() const
 {
   return this->normals.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the number of indicies
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetIndexCount() const
 {
   return this->indices.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return the number of texture coordinates
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetTexCoordCount() const
 {
   return this->texCoords.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the highest index value
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetMaxIndex() const
 {
   std::vector<unsigned int>::const_iterator maxIter;
@@ -589,100 +537,94 @@ unsigned int SubMesh::GetMaxIndex() const
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the material index. Relates to the parent mesh material list
-void SubMesh::SetMaterialIndex(unsigned int index)
+//////////////////////////////////////////////////
+void SubMesh::SetMaterialIndex(unsigned int _index)
 {
-  this->materialIndex = index;
+  this->materialIndex = _index;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the material index
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetMaterialIndex() const
 {
   return this->materialIndex;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if this submesh has the vertex
-bool SubMesh::HasVertex( const math::Vector3 &v ) const
+//////////////////////////////////////////////////
+bool SubMesh::HasVertex(const math::Vector3 &_v) const
 {
   std::vector< math::Vector3 >::const_iterator iter;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
-    if (v.Equal(*iter))
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
+    if (_v.Equal(*iter))
       return true;
 
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the index of the vertex
+//////////////////////////////////////////////////
 unsigned int SubMesh::GetVertexIndex(const math::Vector3 &_v) const
 {
   std::vector< math::Vector3 >::const_iterator iter;
 
-  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
     if (_v.Equal(*iter))
       return iter - this->vertices.begin();
 
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Put all the data into flat arrays
-void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
+//////////////////////////////////////////////////
+void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
 {
-  if (this->vertices.size() ==0 || this->indices.size() == 0)
+  if (this->vertices.size() == 0 || this->indices.size() == 0)
     gzerr << "No vertices or indices\n";
 
-  std::vector< math::Vector3 >::const_iterator  viter;
-  std::vector< unsigned int >::const_iterator  iiter;
+  std::vector< math::Vector3 >::const_iterator viter;
+  std::vector< unsigned int >::const_iterator iiter;
   unsigned int i;
 
-  if (*vertArr)
-    delete [] *vertArr;
+  if (*_vertArr)
+    delete [] *_vertArr;
 
-  if (*indArr)
-    delete [] *indArr;
+  if (*_indArr)
+    delete [] *_indArr;
 
-  *vertArr = new float[ this->vertices.size() * 3 ];
-  *indArr = new unsigned int[ this->indices.size() ];
+  *_vertArr = new float[ this->vertices.size() * 3 ];
+  *_indArr = new int[ this->indices.size() ];
 
-  for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end(); 
-       viter++)
+  for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
+      ++viter)
   {
-    (*vertArr)[i++] =  (float)(*viter).x;
-    (*vertArr)[i++] =  (float)(*viter).y;
-    (*vertArr)[i++] =  (float)(*viter).z;
+    (*_vertArr)[i++] = static_cast<float>((*viter).x);
+    (*_vertArr)[i++] = static_cast<float>((*viter).y);
+    (*_vertArr)[i++] = static_cast<float>((*viter).z);
   }
 
-  for (iiter = this->indices.begin(), i=0; 
-       iiter != this->indices.end(); iiter++)
-    (*indArr)[i++] = (*iiter);
+  for (iiter = this->indices.begin(), i = 0;
+      iiter != this->indices.end(); ++iiter)
+    (*_indArr)[i++] = (*iiter);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Recalculate all the normals.
+//////////////////////////////////////////////////
 void SubMesh::RecalculateNormals()
 {
   unsigned int i;
 
   // Reset all the normals
-  for (i=0; i < this->normals.size(); i++)
-    this->normals[i].Set(0,0,0);
+  for (i = 0; i < this->normals.size(); i++)
+    this->normals[i].Set(0, 0, 0);
 
   // For each face, which is defined by three indices, calculate the normals
-  for (i=0; i < this->indices.size(); i+=3)
+  for (i = 0; i < this->indices.size(); i+= 3)
   {
     math::Vector3 v1 = this->vertices[this->indices[i]];
     math::Vector3 v2 = this->vertices[this->indices[i+1]];
     math::Vector3 v3 = this->vertices[this->indices[i+2]];
     math::Vector3 n = math::Vector3::GetNormal(v1, v2, v3);
 
-    for (unsigned int j=0; j< this->vertices.size(); j++)
+    for (unsigned int j = 0; j< this->vertices.size(); j++)
     {
-      if (this->vertices[j] == v1 || 
+      if (this->vertices[j] == v1 ||
           this->vertices[j] == v2 ||
           this->vertices[j] == v3)
       {
@@ -692,97 +634,94 @@ void SubMesh::RecalculateNormals()
   }
 
   // Normalize the results
-  for (i=0; i < this->normals.size(); i++)
+  for (i = 0; i < this->normals.size(); i++)
   {
     this->normals[i].Normalize();
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// find aabb and aabb center of mesh
-void Mesh::GetAABB(math::Vector3 &center,math::Vector3 &min_xyz,math::Vector3 &max_xyz)
+//////////////////////////////////////////////////
+void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
+                   math::Vector3 &_max_xyz)
 {
   // find aabb center
-  min_xyz.x =  1e15;
-  max_xyz.x = -1e15;
-  min_xyz.y =  1e15;
-  max_xyz.y = -1e15;
-  min_xyz.z =  1e15;
-  max_xyz.z = -1e15;
-  center.x = 0;
-  center.y = 0;
-  center.z = 0;
+  _min_xyz.x = 1e15;
+  _max_xyz.x = -1e15;
+  _min_xyz.y = 1e15;
+  _max_xyz.y = -1e15;
+  _min_xyz.z = 1e15;
+  _max_xyz.z = -1e15;
+  _center.x = 0;
+  _center.y = 0;
+  _center.z = 0;
 
   std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
   {
     math::Vector3 max = (*siter)->GetMax();
     math::Vector3 min = (*siter)->GetMin();
-    min_xyz.x = std::min(min_xyz.x,min.x);
-    max_xyz.x = std::max(max_xyz.x,max.x);
-    min_xyz.y = std::min(min_xyz.y,min.y);
-    max_xyz.y = std::max(max_xyz.y,max.y);
-    min_xyz.z = std::min(min_xyz.z,min.z);
-    max_xyz.z = std::max(max_xyz.z,max.z);
+    _min_xyz.x = std::min(_min_xyz.x, min.x);
+    _max_xyz.x = std::max(_max_xyz.x, max.x);
+    _min_xyz.y = std::min(_min_xyz.y, min.y);
+    _max_xyz.y = std::max(_max_xyz.y, max.y);
+    _min_xyz.z = std::min(_min_xyz.z, min.z);
+    _max_xyz.z = std::max(_max_xyz.z, max.z);
   }
-  center.x = 0.5*(min_xyz.x+max_xyz.x);
-  center.y = 0.5*(min_xyz.y+max_xyz.y);
-  center.z = 0.5*(min_xyz.z+max_xyz.z);
+  _center.x = 0.5*(_min_xyz.x+_max_xyz.x);
+  _center.y = 0.5*(_min_xyz.y+_max_xyz.y);
+  _center.z = 0.5*(_min_xyz.z+_max_xyz.z);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set mesh center
-void Mesh::SetMeshCenter(math::Vector3 center)
+//////////////////////////////////////////////////
+void Mesh::SetMeshCenter(math::Vector3 _center)
 {
   std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
-    (*siter)->SetSubMeshCenter(center);
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
+    (*siter)->SetSubMeshCenter(_center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Assign uv coordinates using spherical projection
-void Mesh::GenSphericalTexCoord(math::Vector3 center)
+//////////////////////////////////////////////////
+void Mesh::GenSphericalTexCoord(math::Vector3 _center)
 {
   std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
-    (*siter)->GenSphericalTexCoord(center);
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
+    (*siter)->GenSphericalTexCoord(_center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set submesh center
-void SubMesh::SetSubMeshCenter(math::Vector3 center)
+//////////////////////////////////////////////////
+void SubMesh::SetSubMeshCenter(math::Vector3 _center)
 {
   std::vector<math::Vector3>::iterator viter;
-  for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
+  for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
   {
-    // generate projected texture coordinates, projected from center of aabb
-    // get x,y,z for computing texture coordinate projections
-    (*viter).x = (*viter).x-center.x;
-    (*viter).y = (*viter).y-center.y;
-    (*viter).z = (*viter).z-center.z;
+    // generate projected texture coordinates, projected from _center of aabb
+    // get x, y, z for computing texture coordinate projections
+    (*viter).x = (*viter).x-_center.x;
+    (*viter).y = (*viter).y-_center.y;
+    (*viter).z = (*viter).z-_center.z;
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Assign uv coordinates using spherical projection
-void SubMesh::GenSphericalTexCoord(math::Vector3 center)
+//////////////////////////////////////////////////
+void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
 {
   std::vector<math::Vector3>::const_iterator viter;
-  for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
+  for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
   {
     // generate projected texture coordinates, projected from center
-    // get x,y,z for computing texture coordinate projections
-    double x = (*viter).x-center.x;
-    double y = (*viter).y-center.y;
-    double z = (*viter).z-center.z;
+    // get x, y, z for computing texture coordinate projections
+    double x = (*viter).x-_center.x;
+    double y = (*viter).y-_center.y;
+    double z = (*viter).z-_center.z;
 
-    double r = std::max(0.000001,sqrt(x*x+y*y+z*z));
-    double s = std::min(1.0,std::max(-1.0,z/r));
-    double t = std::min(1.0,std::max(-1.0,y/r));
+    double r = std::max(0.000001, sqrt(x*x+y*y+z*z));
+    double s = std::min(1.0, std::max(-1.0, z/r));
+    double t = std::min(1.0, std::max(-1.0, y/r));
     double u = acos(s) / M_PI;
     double v = acos(t) / M_PI;
-    //gzerr << "uv1 debug: " << u << "," << v << std::endl;
-    this->AddTexCoord(u,v);
+    this->AddTexCoord(u, v);
   }
 }
+
+
 

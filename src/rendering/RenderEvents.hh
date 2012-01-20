@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+#ifndef RENDER_EVENTS_HH_
+#define RENDER_EVENTS_HH_
+
+#include <string>
 #include "common/Event.hh"
 #include "msgs/msgs.h"
 
@@ -26,23 +30,19 @@ namespace gazebo
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateScene(T subscriber)
               { return createScene.Connect(subscriber); }
-
       public: static void DisconnectCreateScene(
                   event::ConnectionPtr subscriber)
               { createScene.Disconnect(subscriber); }
-
     public: template<typename T>
               static event::ConnectionPtr ConnectRemoveScene(T subscriber)
               { return removeScene.Connect(subscriber); }
-
       public: static void DisconnectRemoveScene(
                   event::ConnectionPtr subscriber)
               { removeScene.Disconnect(subscriber); }
-
 
       public: static event::EventT<void (const std::string &)> createScene;
       public: static event::EventT<void (const std::string &)> removeScene;
     };
   }
 }
-
+#endif

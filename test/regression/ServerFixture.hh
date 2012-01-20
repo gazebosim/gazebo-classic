@@ -1,5 +1,25 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
+
+#include <map>
+#include <string>
 
 #include "transport/transport.h"
 #include "sensors/sensors.h"
@@ -18,6 +38,11 @@ class ServerFixture : public testing::Test
                this->receiveMutex = new boost::mutex();
                this->server = NULL;
                this->serverRunning = false;
+               this->paused = false;
+               this->percentRealTime = 0;
+               this->gotImage = 0;
+               this->imgData = NULL;
+               this->serverThread = NULL;
              }
 
   protected: virtual void TearDown()
@@ -45,8 +70,7 @@ class ServerFixture : public testing::Test
 
   protected: virtual void Load(const std::string &_worldFilename)
              {
-               if (this->server)
-                 delete this->server;
+               delete this->server;
                this->server = NULL;
 
                // Create, load, and run the server in its own thread
@@ -61,7 +85,7 @@ class ServerFixture : public testing::Test
                ASSERT_NO_THROW(this->node->Init());
                this->poseSub = this->node->Subscribe("~/pose/info",
                    &ServerFixture::OnPose, this);
-               this->statsSub = this->node->Subscribe("~/world_stats", 
+               this->statsSub = this->node->Subscribe("~/world_stats",
                    &ServerFixture::OnStats, this);
 
                this->factoryPub =
@@ -82,7 +106,7 @@ class ServerFixture : public testing::Test
   protected: void OnStats(ConstWorldStatisticsPtr &_msg)
              {
                this->simTime = msgs::Convert(_msg->sim_time());
-               this->realTime = msgs::Convert( _msg->real_time());
+               this->realTime = msgs::Convert(_msg->real_time());
                this->pauseTime = msgs::Convert(_msg->pause_time());
                this->paused = _msg->paused();
                this->percentRealTime =
@@ -125,26 +149,26 @@ class ServerFixture : public testing::Test
                return iter != this->poses.end();
              }
 
-  protected: void PrintImage(const std::string &_name, unsigned char **_image, 
+  protected: void PrintImage(const std::string &_name, unsigned char **_image,
                  unsigned int _width, unsigned int _height, unsigned int _depth)
              {
                unsigned int count = _height * _width * _depth;
                printf("\n");
-               printf("static unsigned char __%s[] = {",_name.c_str());
-
+               printf("static unsigned char __%s[] = {", _name.c_str());
                unsigned int i;
-               for (i=0; i < count-1; i++)
+               for (i = 0; i < count-1; i++)
                {
                  if (i % 10 == 0)
                    printf("\n");
                  printf("%d, ", (*_image)[i]);
                }
                printf("%d};\n", (*_image)[i]);
-               printf("static unsigned char *%s = __%s;\n",_name.c_str(),
+               printf("static unsigned char *%s = __%s;\n", _name.c_str(),
                    _name.c_str());
              }
 
-  protected: void ImageCompare(unsigned char **_imageA, unsigned char *_imageB[],
+  protected: void ImageCompare(unsigned char **_imageA,
+                 unsigned char *_imageB[],
                  unsigned int _width, unsigned int _height, unsigned int _depth,
                  unsigned int &_maxDiff, unsigned int &_diffSum,
                  double &_diffAvg)
@@ -153,9 +177,9 @@ class ServerFixture : public testing::Test
                _diffSum = 0;
                _diffAvg = 0;
 
-               for (unsigned int y=0; y < _height; y++)
+               for (unsigned int y = 0; y < _height; y++)
                {
-                 for (unsigned int x=0; x < _width*_depth; x++)
+                 for (unsigned int x = 0; x < _width*_depth; x++)
                  {
                    unsigned int a = (*_imageA)[(y*_width*_depth)+x];
                    unsigned int b = (*_imageB)[(y*_width*_depth)+x];
@@ -172,12 +196,12 @@ class ServerFixture : public testing::Test
              }
 
   private: void OnNewFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height, 
+                              unsigned int _width, unsigned int _height,
                               unsigned int _depth,
                               const std::string &/*_format*/)
            {
              memcpy(*this->imgData, _image, _width * _height * _depth);
-             this->gotImage+=1;
+             this->gotImage+= 1;
            }
 
   protected: void GetFrame(const std::string &_cameraName,
@@ -212,28 +236,30 @@ class ServerFixture : public testing::Test
                camSensor->GetCamera()->DisconnectNewImageFrame(c);
              }
 
-  protected: void SpawnCamera(const std::string &_modelName, 
+  protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _modelName << "' static='true'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
+               newModelStr << "<gazebo version ='1.0'>"
+                 << "<model name ='" << _modelName << "' static ='true'>"
+                 << "<origin pose ='" << _pos.x << " "
+                                     << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
-                                     << _rpy.y << " " 
+                                     << _rpy.y << " "
                                      << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <sensor name='" << _cameraName << "' type='camera' always_on='1' update_rate='25' visualize='true'>"
+                 << "<link name ='body'>"
+                 << "  <sensor name ='" << _cameraName
+                 << "' type ='camera' always_on ='1' update_rate ='25' "
+                 << "visualize ='true'>"
                  << "    <camera>"
-                 << "      <horizontal_fov angle='0.78539816339744828'/>"
-                 << "      <image width='320' height='240' format='R8G8B8'/>"
-                 << "      <clip near='0.10000000000000001' far='100'/>"
-                 //<< "      <save enabled='true' path='/tmp/camera/'/>"
+                 << "      <horizontal_fov angle ='0.78539816339744828'/>"
+                 << "      <image width ='320' height ='240' format ='R8G8B8'/>"
+                 << "      <clip near ='0.10000000000000001' far ='100'/>"
+                 // << "      <save enabled ='true' path ='/tmp/camera/'/>"
                  << "    </camera>"
                  << "  </sensor>"
                  << "</link>"
@@ -247,34 +273,34 @@ class ServerFixture : public testing::Test
                while (!this->HasEntity(_modelName))
                  usleep(10000);
              }
- 
-  protected: void SpawnCylinder(const std::string &_name, 
+
+  protected: void SpawnCylinder(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _name << "'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
+               newModelStr << "<gazebo version ='1.0'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<origin pose ='" << _pos.x << " "
+                                     << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
-                                     << _rpy.y << " " 
+                                     << _rpy.y << " "
                                      << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <inertial mass='1.0'>"
-                 << "    <inertia ixx='1' ixy='0' ixz='0' iyy='1'"
-                 << " iyz='0' izz='1'/>"
+                 << "<link name ='body'>"
+                 << "  <inertial mass ='1.0'>"
+                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
+                 << " iyz ='0' izz ='1'/>"
                  << "  </inertial>"
-                 << "  <collision name='geom'>"
+                 << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <cylinder radius='.5' length='1.0'/>"
+                 << "      <cylinder radius ='.5' length ='1.0'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name='visual' cast_shadows='true'>"
+                 << "  <visual name ='visual' cast_shadows ='true'>"
                  << "    <geometry>"
-                 << "      <cylinder radius='.5' length='1.0'/>"
+                 << "      <cylinder radius ='.5' length ='1.0'/>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -289,33 +315,33 @@ class ServerFixture : public testing::Test
                  usleep(10000);
              }
 
-  protected: void SpawnSphere(const std::string &_name, 
+  protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _name << "'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
+               newModelStr << "<gazebo version ='1.0'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<origin pose ='" << _pos.x << " "
+                                     << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
-                                     << _rpy.y << " " 
+                                     << _rpy.y << " "
                                      << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <inertial mass='1.0'>"
-                 << "    <inertia ixx='1' ixy='0' ixz='0' iyy='1'"
-                 << " iyz='0' izz='1'/>"
+                 << "<link name ='body'>"
+                 << "  <inertial mass ='1.0'>"
+                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
+                 << " iyz ='0' izz ='1'/>"
                  << "  </inertial>"
-                 << "  <collision name='geom'>"
+                 << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <sphere radius='.5'/>"
+                 << "      <sphere radius ='.5'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name='visual' cast_shadows='true'>"
+                 << "  <visual name ='visual' cast_shadows ='true'>"
                  << "    <geometry>"
-                 << "      <sphere radius='.5'/>"
+                 << "      <sphere radius ='.5'/>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -330,33 +356,33 @@ class ServerFixture : public testing::Test
                  usleep(10000);
              }
 
-  protected: void SpawnBox(const std::string &_name, 
+  protected: void SpawnBox(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
 
-               newModelStr << "<gazebo version='1.0'>"
-                 << "<model name='" << _name << "'>"
-                 << "<origin pose='" << _pos.x << " " 
-                                     << _pos.y << " " 
+               newModelStr << "<gazebo version ='1.0'>"
+                 << "<model name ='" << _name << "'>"
+                 << "<origin pose ='" << _pos.x << " "
+                                     << _pos.y << " "
                                      << _pos.z << " "
                                      << _rpy.x << " "
-                                     << _rpy.y << " " 
+                                     << _rpy.y << " "
                                      << _rpy.z << "'/>"
-                 << "<link name='body'>"
-                 << "  <inertial mass='1.0'>"
-                 << "    <inertia ixx='1' ixy='0' ixz='0' iyy='1'"
-                 << " iyz='0' izz='1'/>"
+                 << "<link name ='body'>"
+                 << "  <inertial mass ='1.0'>"
+                 << "    <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1'"
+                 << " iyz ='0' izz ='1'/>"
                  << "  </inertial>"
-                 << "  <collision name='geom'>"
+                 << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <box size='1 1 1'/>"
+                 << "      <box size ='1 1 1'/>"
                  << "    </geometry>"
                  << "  </collision>"
-                 << "  <visual name='visual' cast_shadows='true'>"
+                 << "  <visual name ='visual' cast_shadows ='true'>"
                  << "    <geometry>"
-                 << "      <box size='1 1 1'/>"
+                 << "      <box size ='1 1 1'/>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"

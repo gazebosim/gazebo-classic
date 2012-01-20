@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -27,19 +27,17 @@
 #ifndef BULLETSCREWJOINT_HH
 #define BULLETSCREWJOINT_HH
 
+#include <btBulletDynamicsCommon.h>
 #include "Param.hh"
 #include "ScrewJoint.hh"
 #include "BulletJoint.hh"
 
-#include <btBulletDynamicsCommon.h>
-
 namespace gazebo
 {
-
 /// \addtogroup gazebo_physics_joints
 /// \{
 /** \defgroup gazebo_screw_joint Screw Joint
-  
+
   \brief A screw joint
 
   \par Attributes
@@ -59,16 +57,16 @@ namespace gazebo
     - The high stop position
     - Default: infinity
   - erp (double)
-    - Error reduction parameter. 
+    - Error reduction parameter.
     - Default = 0.4
   - cfm (double)
-    - Constraint force mixing. 
+    - Constraint force mixing.
     - Default = 0.8
 
 
   \par Example
   \verbatim
-  <joint:screw name="screw_joint>
+  <joint:screw name ="screw_joint>
     <body1>body1_name</body1>
     <body2>body2_name</body2>
     <anchor>anchor_body</anchor>
@@ -83,28 +81,27 @@ namespace gazebo
 
 /// \addtogroup gazebo_screw_joint Screw Joint
 /// \{
-
   /// \brief A screw joint
   class BulletScrewJoint : public ScrewJoint<BulletJoint>
   {
     /// \brief Constructor
-    public: BulletScrewJoint( btDynamicsWorld *world );
-  
+    public: BulletScrewJoint(btDynamicsWorld *world);
+
     /// \brief Destructor
     public: virtual ~BulletScrewJoint();
-  
+
     /// \brief Load the joint
     protected: virtual void Load(XMLConfigNode *node);
 
     /// \brief Attach the two bodies with this joint
-    public: void Attach( Body *one, Body *two );
- 
+    public: void Attach(Body *one, Body *two);
+
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const;
 
     /// \brief Set the axis of motion
-    public: void SetAxis( int index, const Vector3 &axis );
-  
+    public: void SetAxis(int index, const Vector3 &axis);
+
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
 
@@ -113,7 +110,7 @@ namespace gazebo
 
     /// \brief Set the low stop of an axis(index).
     public: virtual void SetLowStop(int index, Angle angle);
- 
+
     /// \brief Get the high stop of an axis(index).
     public: virtual Angle GetHighStop(int index);
 
@@ -122,7 +119,7 @@ namespace gazebo
 
     /// \brief Get the position of the joint
     public: virtual Angle GetAngle(int index) const;
-  
+
     /// \brief Get the rate of change
     public: virtual double GetVelocity(int index) const;
 
@@ -137,9 +134,10 @@ namespace gazebo
 
     /// \brief Get the max allowed force of an axis(index).
     public: virtual double GetMaxForce(int index);
-
   };
-  
+
 /// \}
 }
 #endif
+
+

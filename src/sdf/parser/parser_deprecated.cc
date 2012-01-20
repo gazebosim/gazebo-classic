@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -49,7 +49,6 @@
 
 namespace deprecated_sdf
 {
-
 void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Iterate over all the child elements
@@ -57,21 +56,24 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
        elemXml != NULL; elemXml = xmlNextElementSibling(elemXml))
   {
     sdf::ElementPtr element(new sdf::Element);
-    element->SetParent( _sdf );
+    element->SetParent(_sdf);
 
     // copy name (with prefix if exists?
     std::string prefix;
     if (elemXml->ns) prefix = (const char*)elemXml->ns->prefix;
     if (prefix.empty())
     {
-      element->SetName( (const char*)elemXml->name );
+      element->SetName((const char*)elemXml->name);
 
       // copy attributes
       for (xmlAttrPtr attrXml = elemXml->properties;
-           attrXml && attrXml->name && attrXml->children; attrXml = attrXml->next)
+           attrXml && attrXml->name && attrXml->children;
+           attrXml = attrXml->next)
       {
-        element->AddAttribute((const char*)attrXml->name,"string","defaultvalue",false);
-        initAttr(elemXml, (const char*)attrXml->name, element->GetAttribute((const char*)attrXml->name));
+        element->AddAttribute((const char*)attrXml->name, "string",
+            "defaultvalue", false);
+        initAttr(elemXml, (const char*)attrXml->name,
+            element->GetAttribute((const char*)attrXml->name));
       }
 
       // copy value
@@ -79,38 +81,37 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if (!value.empty())
         element->AddValue("string", value, "1");
 
-      _sdf->elements.push_back( element );
+      _sdf->elements.push_back(element);
     }
-    else // copy namespaced element
+    else
     {
-      gzwarn << "skipping prefixed element [" << prefix << ":" << (const char*)elemXml->name << "] when copying plugins\n";
-      //element->SetName( prefix + ":" + (const char*)elemXml->name );
+      gzwarn << "skipping prefixed element [" << prefix << ":"
+             << (const char*)elemXml->name << "] when copying plugins\n";
+      // element->SetName(prefix + ":" + (const char*)elemXml->name);
     }
-
   }
 }
 
 bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
-  // Get all plugins 
+  // Get all plugins
   for (xmlNodePtr pluginXml = _config->xmlChildrenNode;
        pluginXml != NULL; pluginXml = pluginXml->next)
   {
-    if (pluginXml->ns && 
+    if (pluginXml->ns &&
          (const char*)pluginXml->ns->prefix == std::string("controller"))
     {
       sdf::ElementPtr sdfPlugin = _sdf->AddElement("plugin");
       initAttr(pluginXml, "name", sdfPlugin->GetAttribute("name"));
 
-      if (xmlGetProp(pluginXml, (xmlChar*)"plugin"))
+      if (xmlGetProp(pluginXml, reinterpret_cast<const xmlChar*>("plugin")))
         initAttr(pluginXml, "plugin", sdfPlugin->GetAttribute("filename"));
       else
-        //sdfPlugin->GetAttribute("filename")->SetFromString((const char*)pluginXml->name);
+        // sdfPlugin->GetAttribute("filename")->SetFromString(
+        // (const char*)pluginXml->name);
         initAttr(pluginXml, "filename", sdfPlugin->GetAttribute("filename"));
 
-      //gzdbg << "Getting plugin[" << sdfPlugin->GetAttribute("filename")->GetAsString() << "]\n";
       deprecated_sdf::copyChildren(pluginXml, sdfPlugin);
-
     }
     else if (std::string((const char*)pluginXml->name) == "plugin")
     {
@@ -123,10 +124,10 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       for (xmlNodePtr dataXml = pluginXml->xmlChildrenNode;
           dataXml != NULL; dataXml = dataXml->next)
       {
-        if (std::string( (const char*) dataXml->ns->prefix ) != "interface")
+        if (std::string((const char*) dataXml->ns->prefix) != "interface")
         {
           sdf::ElementPtr sdfData = sdfPlugin->AddElement("data");
-          sdfData->GetAttribute("value")->SetFromString( getValue(dataXml) );
+          sdfData->GetAttribute("value")->SetFromString(getValue(dataXml));
         }
         else
           gzerr << "<interface:...> are not copied\n";
@@ -161,22 +162,30 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   sdf::ElementPtr sdfAttenuation = _sdf->AddElement("attenuation");
   initAttr(lightNode, "range", sdfAttenuation->GetAttribute("range"));
-  sdfAttenuation->GetAttribute("constant")->SetFromString( getNodeTuple(lightNode, "attenuation",0));
-  sdfAttenuation->GetAttribute("linear")->SetFromString( getNodeTuple(lightNode, "attenuation",1));
-  sdfAttenuation->GetAttribute("quadratic")->SetFromString( getNodeTuple(lightNode, "attenuation",2));
+  sdfAttenuation->GetAttribute("constant")->SetFromString(
+      getNodeTuple(lightNode, "attenuation", 0));
+  sdfAttenuation->GetAttribute("linear")->SetFromString(
+      getNodeTuple(lightNode, "attenuation", 1));
+  sdfAttenuation->GetAttribute("quadratic")->SetFromString(
+      getNodeTuple(lightNode, "attenuation", 2));
 
   sdf::ElementPtr sdfDirection = _sdf->AddElement("direction");
   initAttr(lightNode, "direction", sdfDirection->GetAttribute("xyz"));
 
-  if (firstChildElement(lightNode,"sportCone"))
+  if (firstChildElement(lightNode, "sportCone"))
   {
     sdf::ElementPtr sdfSpot = _sdf->AddElement("spot");
-    double innerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",0));
-    double outerAngle = boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone",1));
+    double innerAngle =
+      boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 0));
+    double outerAngle =
+      boost::lexical_cast<double>(getNodeTuple(lightNode, "spotCone", 1));
 
-    sdfSpot->GetAttribute("inner_angle")->SetFromString( boost::lexical_cast<std::string>(GZ_DTOR(innerAngle)) );
-    sdfSpot->GetAttribute("outer_angle")->SetFromString( boost::lexical_cast<std::string>(GZ_DTOR(outerAngle)) );
-    sdfSpot->GetAttribute("falloff")->SetFromString( getNodeTuple(lightNode, "spotCone",2));
+    sdfSpot->GetAttribute("inner_angle")->SetFromString(
+        boost::lexical_cast<std::string>(GZ_DTOR(innerAngle)));
+    sdfSpot->GetAttribute("outer_angle")->SetFromString(
+        boost::lexical_cast<std::string>(GZ_DTOR(outerAngle)));
+    sdfSpot->GetAttribute("falloff")->SetFromString(
+        getNodeTuple(lightNode, "spotCone", 2));
   }
 
   return true;
@@ -190,8 +199,8 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   initAttr(_config, "updateRate", _sdf->GetAttribute("update_rate"));
 
   initOrigin(_config, _sdf);
- 
-  if ( std::string((const char*)_config->name) == "contact" )
+
+  if (std::string((const char*)_config->name) == "contact")
   {
     sdf::ElementPtr contact = _sdf->AddElement("contact");
     initContact(_config, contact);
@@ -202,18 +211,19 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       return false;
     }
   }
-  else if ( std::string((const char*)_config->name) == "camera" )
+  else if (std::string((const char*)_config->name) == "camera")
   {
     sdf::ElementPtr camera = _sdf->AddElement("camera");
     initCamera(_config, camera);
 
-    if (!_sdf->GetAttribute("type")->SetFromString("depth")) // convert all camera to depth cameras so we can get point cloud if needed
+    // convert all camera to depth cameras so we can get point cloud if needed
+    if (!_sdf->GetAttribute("type")->SetFromString("depth"))
     {
       gzerr << "Unable to set type to camera\n";
       return false;
-    } 
+    }
   }
-  else if ( std::string((const char*)_config->name) == "ray" )
+  else if (std::string((const char*)_config->name) == "ray")
   {
     sdf::ElementPtr ray = _sdf->AddElement("ray");
     initRay(_config, ray);
@@ -222,7 +232,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     {
       gzerr << "Unable to set type to ray\n";
       return false;
-    } 
+    }
   }
 
   /// Get all the plugins
@@ -233,15 +243,14 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
-
   sdf::ElementPtr sdfHFOV = _sdf->AddElement("horizontal_fov");
-  double hfov = boost::lexical_cast<double>(getNodeValue(_config,"hfov"));
-  if (!sdfHFOV->GetAttribute("angle")->SetFromString( 
-        boost::lexical_cast<std::string>(GZ_DTOR(hfov)) ))
+  double hfov = boost::lexical_cast<double>(getNodeValue(_config, "hfov"));
+  if (!sdfHFOV->GetAttribute("angle")->SetFromString(
+        boost::lexical_cast<std::string>(GZ_DTOR(hfov))))
   {
     gzerr << "Unable to parse hfov angle\n";
     return false;
-  } 
+  }
 
   sdf::ElementPtr sdfImage = _sdf->AddElement("image");
 
@@ -249,7 +258,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   std::string image_size_str = getNodeValue(_config, "imageSize");
   std::vector<unsigned int> sizes;
   std::vector<std::string> pieces;
-  boost::split( pieces, image_size_str, boost::is_any_of(" "));
+  boost::split(pieces, image_size_str, boost::is_any_of(" "));
   for (unsigned int i = 0; i < pieces.size(); ++i)
   {
     if (pieces[i] != "")
@@ -258,7 +267,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       {
         sizes.push_back(boost::lexical_cast<unsigned int>(pieces[i].c_str()));
       }
-      catch (boost::bad_lexical_cast &e)
+      catch(boost::bad_lexical_cast &e)
       {
         gzerr << "<imageSize> value ["
               << pieces[i] << "] is not a valid unsigned int from a 2-tuple\n";
@@ -269,7 +278,8 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   if (sizes.size() != 2)
   {
-    gzerr << "Vector contains [" << (int)sizes.size() << "] elements instead of 3 elements\n";
+    gzerr << "Vector contains [" << static_cast<int>(sizes.size())
+          << "] elements instead of 3 elements\n";
     return false;
   }
 
@@ -283,7 +293,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   initAttr(_config, "nearClip", sdfClip->GetAttribute("near"));
   initAttr(_config, "farClip", sdfClip->GetAttribute("far"));
 
-  // save 
+  // save
   if (firstChildElement(_config, "saveFrames"))
   {
     sdf::ElementPtr sdfSave = _sdf->AddElement("save");
@@ -313,32 +323,35 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   initAttr(_config, "rangeCount", sdfHoriz->GetAttribute("samples"));
 
-  int rangeCount = boost::lexical_cast<int>(getNodeValue(_config,"rangeCount"));
+  int rangeCount =
+    boost::lexical_cast<int>(getNodeValue(_config, "rangeCount"));
   int rayCount = boost::lexical_cast<int>(getNodeValue(_config, "rayCount"));
 
-  if (!sdfHoriz->GetAttribute("resolution")->SetFromString( 
-        boost::lexical_cast<std::string>(rangeCount / rayCount) ))
+  if (!sdfHoriz->GetAttribute("resolution")->SetFromString(
+        boost::lexical_cast<std::string>(rangeCount / rayCount)))
   {
     gzerr << "Unable to parse ray sensor rayCount\n";
     return false;
   }
 
-  double minAngle = boost::lexical_cast<double>(getNodeValue(_config,"minAngle"));
-  double maxAngle = boost::lexical_cast<double>(getNodeValue(_config,"maxAngle"));
+  double minAngle =
+    boost::lexical_cast<double>(getNodeValue(_config, "minAngle"));
+  double maxAngle =
+    boost::lexical_cast<double>(getNodeValue(_config, "maxAngle"));
 
-  if (!sdfHoriz->GetAttribute("min_angle")->SetFromString( 
-        boost::lexical_cast<std::string>(GZ_DTOR(minAngle)) ))
+  if (!sdfHoriz->GetAttribute("min_angle")->SetFromString(
+        boost::lexical_cast<std::string>(GZ_DTOR(minAngle))))
   {
     gzerr << "Unable to parse min_angle\n";
     return false;
-  } 
+  }
 
-  if (!sdfHoriz->GetAttribute("max_angle")->SetFromString( 
-        boost::lexical_cast<std::string>(GZ_DTOR(maxAngle)) ))
+  if (!sdfHoriz->GetAttribute("max_angle")->SetFromString(
+        boost::lexical_cast<std::string>(GZ_DTOR(maxAngle))))
   {
     gzerr << "Unable to parse max_angle\n";
     return false;
-  } 
+  }
 
   sdf::ElementPtr sdfRange = _sdf->AddElement("range");
   initAttr(_config, "minRange", sdfRange->GetAttribute("min"));
@@ -361,14 +374,14 @@ bool initContact(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 // _sdf = <inertial>
 bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
-  // Origin (old gazebo xml supports only cx,cy,cz translations, no rotation
+  // Origin (old gazebo xml supports only cx, cy, cz translations, no rotation
   // xyz and rpy under body:... is for the link frame
   xmlNodePtr cx_xml = firstChildElement(_config, "cx");
   xmlNodePtr cy_xml = firstChildElement(_config, "cy");
   xmlNodePtr cz_xml = firstChildElement(_config, "cz");
 
   std::string poseString;
-  if (cx_xml) 
+  if (cx_xml)
     poseString += getValue(cx_xml) + " ";
   else
   {
@@ -376,7 +389,7 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     return false;
   }
 
-  if (cy_xml) 
+  if (cy_xml)
     poseString += getValue(cy_xml) + " ";
   else
   {
@@ -384,13 +397,13 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     return false;
   }
 
-  if (cz_xml) 
+  if (cz_xml)
     poseString += getValue(cz_xml) + " ";
   else
   {
     gzerr << "Missing cz\n";
      return false;
-  } 
+  }
 
   // Put in the rpy values
   poseString += "0 0 0";
@@ -408,17 +421,18 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   xmlNodePtr iyy_xml = firstChildElement(_config, "iyy");
   xmlNodePtr iyz_xml = firstChildElement(_config, "iyz");
   xmlNodePtr izz_xml = firstChildElement(_config, "izz");
-  if (!ixx_xml || !ixy_xml || !ixz_xml || !iyy_xml || !iyz_xml || !izz_xml) 
+  if (!ixx_xml || !ixy_xml || !ixz_xml || !iyy_xml || !iyz_xml || !izz_xml)
   {
-    gzerr << "Inertial: inertia element must have ixx,ixy,ixz,iyy,iyz,izz attributes\n";
+    gzerr << "Inertial: inertia element must have ixx,"
+          << " ixy, ixz, iyy, iyz, izz attributes\n";
     return false;
   }
-  if (!sdfInertia->GetAttribute("ixx")->SetFromString( getValue(ixx_xml) ) ||
-      !sdfInertia->GetAttribute("ixy")->SetFromString( getValue(ixy_xml) ) ||
-      !sdfInertia->GetAttribute("ixz")->SetFromString( getValue(ixz_xml) ) ||
-      !sdfInertia->GetAttribute("iyy")->SetFromString( getValue(iyy_xml) ) ||
-      !sdfInertia->GetAttribute("iyz")->SetFromString( getValue(iyz_xml) ) ||
-      !sdfInertia->GetAttribute("izz")->SetFromString( getValue(izz_xml) ) )
+  if (!sdfInertia->GetAttribute("ixx")->SetFromString(getValue(ixx_xml)) ||
+      !sdfInertia->GetAttribute("ixy")->SetFromString(getValue(ixy_xml)) ||
+      !sdfInertia->GetAttribute("ixz")->SetFromString(getValue(ixz_xml)) ||
+      !sdfInertia->GetAttribute("iyy")->SetFromString(getValue(iyy_xml)) ||
+      !sdfInertia->GetAttribute("iyz")->SetFromString(getValue(iyz_xml)) ||
+      !sdfInertia->GetAttribute("izz")->SetFromString(getValue(izz_xml)))
   {
     gzerr << "one of the inertia elements: "
       << "ixx (" << getValue(ixx_xml) << ") "
@@ -447,31 +461,36 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   if (std::string((const char *)_config->name) == "plane")
   {
     sdf::ElementPtr sdfPlane = sdfGeom->AddElement("plane");
-    sdfPlane->GetAttribute("normal")->SetFromString( getNodeValue(_config, "normal") );
+    sdfPlane->GetAttribute("normal")->SetFromString(
+        getNodeValue(_config, "normal"));
   }
   else if (std::string((const char *)_config->name) == "box")
   {
     sdf::ElementPtr sdfBox = sdfGeom->AddElement("box");
-    sdfBox->GetAttribute("size")->SetFromString( getNodeValue(_config, "size") );
+    sdfBox->GetAttribute("size")->SetFromString(getNodeValue(_config, "size"));
   }
   else if (std::string((const char *)_config->name) == "sphere")
   {
     sdf::ElementPtr sdfSphere = sdfGeom->AddElement("sphere");
-    sdfSphere->GetAttribute("radius")->SetFromString( getNodeValue(_config, "size") );
+    sdfSphere->GetAttribute("radius")->SetFromString(
+        getNodeValue(_config, "size"));
   }
   else if (std::string((const char *)_config->name) == "cylinder")
   {
     sdf::ElementPtr sdfCylinder = sdfGeom->AddElement("cylinder");
-    if (firstChildElement(_config,"size"))
+    if (firstChildElement(_config, "size"))
     {
-      sdfCylinder->GetAttribute("radius")->SetFromString( getNodeTuple(_config, "size",0) );
-      sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "size",1) );
+      sdfCylinder->GetAttribute("radius")->SetFromString(
+          getNodeTuple(_config, "size", 0));
+      sdfCylinder->GetAttribute("length")->SetFromString(
+          getNodeTuple(_config, "size", 1));
     }
   }
   else if (std::string((const char *)_config->name) == "trimesh")
   {
     sdf::ElementPtr sdfMesh = sdfGeom->AddElement("mesh");
-    sdfMesh->GetAttribute("filename")->SetFromString( getNodeValue(_config,"mesh") );
+    sdfMesh->GetAttribute("filename")->SetFromString(
+        getNodeValue(_config, "mesh"));
 
     initAttr(_config, "scale", sdfMesh->GetAttribute("scale"));
   }
@@ -497,7 +516,8 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   // bounce has restitution_coefficient and threshold attributes
   sdf::ElementPtr sdfSurfaceBounce = sdfSurface->AddElement("bounce");
   // bounce --> restitution_coefficient
-  initAttr(_config, "bounce", sdfSurfaceBounce->GetAttribute("restitution_coefficient"));
+  initAttr(_config, "bounce", sdfSurfaceBounce->GetAttribute(
+        "restitution_coefficient"));
   // bounceVel --> threshold
   initAttr(_config, "bounceVel", sdfSurfaceBounce->GetAttribute("threshold"));
 
@@ -513,7 +533,8 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   // maxVel --> max_vel
   initAttr(_config, "maxVel", sdfSurfaceContactOde->GetAttribute("max_vel"));
   // minDepth --> min_depth
-  initAttr(_config, "minDepth", sdfSurfaceContactOde->GetAttribute("min_depth"));
+  initAttr(_config, "minDepth",
+      sdfSurfaceContactOde->GetAttribute("min_depth"));
 
   return true;
 }
@@ -529,7 +550,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   sdf::ElementPtr origin = _sdf->AddElement("origin");
   std::string poseStr;
 
-  if (xyz_xml) 
+  if (xyz_xml)
     poseStr += getValue(xyz_xml) + " ";
   else
     poseStr += "0 0 0 ";
@@ -541,7 +562,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     std::string rpy_str = getNodeValue(rpy_xml, "rpy");
     std::vector<double> degrees;
     std::vector<std::string> pieces;
-    boost::split( pieces, rpy_str, boost::is_any_of(" "));
+    boost::split(pieces, rpy_str, boost::is_any_of(" "));
     for (unsigned int i = 0; i < pieces.size(); ++i)
     {
       if (pieces[i] != "")
@@ -550,7 +571,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         {
           degrees.push_back(boost::lexical_cast<double>(pieces[i].c_str()));
         }
-        catch (boost::bad_lexical_cast &e)
+        catch(boost::bad_lexical_cast &e)
         {
           gzerr << "rpy value ["
                 << pieces[i] << "] is not a valid double from a 3-tuple\n";
@@ -559,7 +580,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       }
     }
 
-    if (degrees.size() == 0)
+    if (degrees.empty())
     {
       poseStr += "0 0 0";
     }
@@ -567,7 +588,8 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     {
       if (degrees.size() != 3)
       {
-        gzerr << "Vector contains [" << (int)degrees.size() << "] elements instead of 3 elements\n";
+        gzerr << "Vector contains [" << static_cast<int>(degrees.size())
+              << "] elements instead of 3 elements\n";
         return false;
       }
       // convert degrees to radian
@@ -575,7 +597,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       rpy_stream << GZ_DTOR(degrees[0]) << " "
                  << GZ_DTOR(degrees[1]) << " "
                  << GZ_DTOR(degrees[2]);
-      if (rpy_stream.str().empty()) 
+      if (rpy_stream.str().empty())
       {
         gzerr << "rpy_stream is empty, something is wrong\n";
         return false;
@@ -586,7 +608,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   else
       poseStr += "0 0 0";
 
-  origin->GetAttribute("pose")->SetFromString( poseStr );
+  origin->GetAttribute("pose")->SetFromString(poseStr);
 
   return true;
 }
@@ -606,8 +628,8 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   xmlNodePtr tgo = firstChildElement(_config, "turnGravityOff");
   if (tgo)
   {
-    sdf::ParamT<bool> tgoP("turnGravity","false",false);
-    tgoP.SetFromString( getValue(tgo).c_str() );
+    sdf::ParamT<bool> tgoP("turnGravity", "false", false);
+    tgoP.SetFromString(getValue(tgo).c_str());
     _sdf->GetAttribute("gravity")->Set(!tgoP.GetValue());
   }
 
@@ -615,14 +637,14 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   xmlNodePtr mm = firstChildElement(_config, "massMatrix");
   if (mm)
   {
-    sdf::ParamT<bool> custom_mass_matrix("mass","false",false);
-    custom_mass_matrix.SetFromString( getValue(mm).c_str() );
+    sdf::ParamT<bool> custom_mass_matrix("mass", "false", false);
+    custom_mass_matrix.SetFromString(getValue(mm).c_str());
     if (custom_mass_matrix.GetValue())
     {
       sdf::ElementPtr sdfInertial = _sdf->AddElement("inertial");
       if (!initInertial(_config, sdfInertial))
       {
-        gzerr << "Could not parse inertial element for Link '" 
+        gzerr << "Could not parse inertial element for Link '"
           << _sdf->GetAttribute("name")->GetAsString() << "'\n";
         return false;
       }
@@ -630,23 +652,24 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   }
 
   // Multiple Collisions (optional)
-  for (xmlNodePtr  collision_xml = getChildByNSPrefix(_config, "geom"); 
+  for (xmlNodePtr  collision_xml = getChildByNSPrefix(_config, "geom");
       collision_xml; collision_xml = getNextByNSPrefix(collision_xml, "geom"))
   {
     sdf::ElementPtr sdfCollision = _sdf->AddElement("collision");
-    if (!initCollision(collision_xml,sdfCollision))
+    if (!initCollision(collision_xml, sdfCollision))
     {
       gzerr << "Unable to parser geom\n";
       return false;
     }
 
-    for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual"); 
+    for (xmlNodePtr  visual_xml = firstChildElement(collision_xml, "visual");
         visual_xml; visual_xml = nextSiblingElement(visual_xml, "visual"))
     {
       sdf::ElementPtr sdfVisual = _sdf->AddElement("visual");
 
       // set name to geom(collision) name append _visual
-      sdfVisual->GetAttribute("name")->SetFromString(sdfCollision->GetAttribute("name")->GetAsString() + "_visual");
+      sdfVisual->GetAttribute("name")->SetFromString(
+          sdfCollision->GetAttribute("name")->GetAsString() + "_visual");
 
       if (!initVisual(visual_xml, sdfVisual))
       {
@@ -657,8 +680,10 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       // In order to parse old gazebo xml (nested format)
       // to new sdf, we need to unwrap visual pose from within collision.
       // take origin of visual, multiply it by collision's transform
-      gazebo::math::Pose col_pose = sdfCollision->GetElement("origin")->GetValuePose("pose");
-      gazebo::math::Pose vis_pose = sdfVisual->GetElement("origin")->GetValuePose("pose");
+      gazebo::math::Pose col_pose =
+        sdfCollision->GetElement("origin")->GetValuePose("pose");
+      gazebo::math::Pose vis_pose =
+        sdfVisual->GetElement("origin")->GetValuePose("pose");
       vis_pose = col_pose*vis_pose;
       // update the sdf pose
       sdfVisual->GetElement("origin")->GetAttribute("pose")->Set(vis_pose);
@@ -668,11 +693,11 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   // Get all sensor elements
   // FIXME: instead of child elements, get namespace == sensor blocks
-  for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor"); 
+  for (xmlNodePtr  sensor_xml = getChildByNSPrefix(_config, "sensor");
       sensor_xml; sensor_xml = getNextByNSPrefix(sensor_xml, "sensor"))
   {
     sdf::ElementPtr sdfSensor = _sdf->AddElement("sensor");
-    if (!initSensor(sensor_xml,sdfSensor))
+    if (!initSensor(sensor_xml, sdfSensor))
     {
       gzerr << "Unable to parse sensor\n";
       return false;
@@ -693,68 +718,87 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
   sdf::ElementPtr sdfGeom = _sdf->AddElement("geometry");
 
-  std::string mesh_attribute = getNodeValue(_config,"mesh");
+  std::string mesh_attribute = getNodeValue(_config, "mesh");
   // check each mesh type
   if (mesh_attribute == "unit_box")
   {
     sdf::ElementPtr sdfBox = sdfGeom->AddElement("box");
-    if (firstChildElement(_config,"scale"))
-      sdfBox->GetAttribute("size")->SetFromString( getNodeValue(_config, "scale") );
-    else if (firstChildElement(_config,"size"))
-      sdfBox->GetAttribute("size")->SetFromString( getNodeValue(_config, "size") );
+    if (firstChildElement(_config, "scale"))
+    {
+      sdfBox->GetAttribute("size")->SetFromString(
+          getNodeValue(_config, "scale"));
+    }
+    else if (firstChildElement(_config, "size"))
+    {
+      sdfBox->GetAttribute("size")->SetFromString(
+          getNodeValue(_config, "size"));
+    }
     else
+    {
       sdfBox->GetAttribute("size")->SetFromString("1 1 1");
+    }
   }
   else if (mesh_attribute == "unit_sphere")
   {
     sdf::ElementPtr sdfSphere = sdfGeom->AddElement("sphere");
-    if (firstChildElement(_config,"scale"))
+    if (firstChildElement(_config, "scale"))
     {
-      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0)); // FIXME: using first elem
-      sdfSphere->GetAttribute("radius")->Set( 0.5*sx );
+      // FIXME: using first elem
+      double sx =
+        boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
+      sdfSphere->GetAttribute("radius")->Set(0.5*sx);
     }
-    else if (firstChildElement(_config,"size"))
+    else if (firstChildElement(_config, "size"))
     {
-      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "size", 0)); // FIXME: using first elem
-      sdfSphere->GetAttribute("radius")->Set( 0.5*sx );
+      // FIXME: using first elem
+      double sx =
+        boost::lexical_cast<double>(getNodeTuple(_config, "size", 0));
+      sdfSphere->GetAttribute("radius")->Set(0.5*sx);
     }
     else
-      sdfSphere->GetAttribute("radius")->SetFromString( "1.0" );
+      sdfSphere->GetAttribute("radius")->SetFromString("1.0");
   }
   else if (mesh_attribute == "unit_cylinder")
   {
     sdf::ElementPtr sdfCylinder = sdfGeom->AddElement("cylinder");
 
-    if (firstChildElement(_config,"scale"))
+    if (firstChildElement(_config, "scale"))
     {
-      double sx = boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
-      sdfCylinder->GetAttribute("radius")->Set( 0.5*sx );
-      sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "scale", 2) );
+      double sx =
+        boost::lexical_cast<double>(getNodeTuple(_config, "scale", 0));
+      sdfCylinder->GetAttribute("radius")->Set(0.5*sx);
+      sdfCylinder->GetAttribute("length")->SetFromString(
+          getNodeTuple(_config, "scale", 2));
     }
-    else if (firstChildElement(_config,"size"))
+    else if (firstChildElement(_config, "size"))
     {
       double sx = boost::lexical_cast<double>(getNodeTuple(_config, "size", 0));
-      sdfCylinder->GetAttribute("radius")->Set( 0.5*sx );
-      sdfCylinder->GetAttribute("length")->SetFromString( getNodeTuple(_config, "size", 2) );
+      sdfCylinder->GetAttribute("radius")->Set(0.5*sx);
+      sdfCylinder->GetAttribute("length")->SetFromString(
+          getNodeTuple(_config, "size", 2));
     }
     else
     {
-      sdfCylinder->GetAttribute("radius")->SetFromString( "1" );
-      sdfCylinder->GetAttribute("length")->SetFromString( "1" );
+      sdfCylinder->GetAttribute("radius")->SetFromString("1");
+      sdfCylinder->GetAttribute("length")->SetFromString("1");
     }
   }
   else if (!mesh_attribute.empty())
   {
     sdf::ElementPtr sdfMesh = sdfGeom->AddElement("mesh");
-    sdfMesh->GetAttribute("filename")->SetFromString( mesh_attribute );
+    sdfMesh->GetAttribute("filename")->SetFromString(mesh_attribute);
 
     if (firstChildElement(_config, "scale"))
-      sdfMesh->GetAttribute("scale")->SetFromString( getNodeValue(_config,"scale") );
+    {
+      sdfMesh->GetAttribute("scale")->SetFromString(
+          getNodeValue(_config, "scale"));
+    }
   }
   else
   {
     sdf::ElementPtr sdfPlane = sdfGeom->AddElement("plane");
-    sdfPlane->GetAttribute("normal")->SetFromString( getNodeValue(_config, "normal") );
+    sdfPlane->GetAttribute("normal")->SetFromString(
+        getNodeValue(_config, "normal"));
   }
 
   // Material
@@ -777,14 +821,14 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   // old <anchorOffset> translates to origin in the new sdf context
   xmlNodePtr anchor_offset_xml = firstChildElement(_config, "anchorOffset");
   std::string poseStr;
-  if (anchor_offset_xml) 
+  if (anchor_offset_xml)
     poseStr += getValue(anchor_offset_xml) + " ";
   else
     poseStr += "0 0 0 ";
   // for rpy, which doesn't exist in old model xml
   poseStr += "0 0 0";
   sdf::ElementPtr origin = _sdf->AddElement("origin");
-  origin->GetAttribute("pose")->SetFromString( poseStr );
+  origin->GetAttribute("pose")->SetFromString(poseStr);
 
 
   // setup parent / child links
@@ -797,7 +841,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   // as child and parent
   if (!firstChildElement(_config, "anchor"))
   {
-    gzerr << "No parent link specified for joint[" 
+    gzerr << "No parent link specified for joint["
           << _sdf->GetAttribute("name")->GetAsString() << "]\n";
     return false;
   }
@@ -812,13 +856,15 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     {
       initAttr(_config, "body2", sdfParent->GetAttribute("link"));
     }
-    else if (sdfChild->GetAttribute("link")->GetAsString() == getValue(body2Xml))
+    else if (sdfChild->GetAttribute("link")->GetAsString() ==
+             getValue(body2Xml))
     {
       initAttr(_config, "body1", sdfParent->GetAttribute("link"));
     }
     else
     {
-      gzerr << "body1 and body2 does not match anchor, not sure which one is parent.\n";
+      gzerr << "body1 and body2 does not match anchor, "
+            << "not sure which one is parent.\n";
       return false;
     }
   }
@@ -844,14 +890,17 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   else
     gzerr << "Unknown joint type[" << (const char*)_config->name << "]\n";
 
-  // for screw joints, if threadPitch exists, translate to "thread_pitch" in sdf
+  // for screw joints, if threadPitch exists, translate to
+  // "thread_pitch" in sdf
   xmlNodePtr threadPitchXml = firstChildElement(_config, "threadPitch");
   if (threadPitchXml)
-    _sdf->GetOrCreateElement("thread_pitch")->GetValue()->SetFromString( getValue(threadPitchXml) );
-    //_sdf->GetOrCreateElement("thread_pitch")->value->SetFromString( getValue(threadPitchXml) );
+    _sdf->GetOrCreateElement("thread_pitch")->GetValue()->SetFromString(
+        getValue(threadPitchXml));
+    // _sdf->GetOrCreateElement("thread_pitch")->value->SetFromString(
+    // getValue(threadPitchXml));
 
   initAttr(_config, "anchor", sdfChild->GetAttribute("link"));
-  if ( firstChildElement(_config,"axis"))
+  if (firstChildElement(_config, "axis"))
   {
     sdf::ElementPtr sdfAxis = _sdf->AddElement("axis");
     initAttr(_config, "axis", sdfAxis->GetAttribute("xyz"));
@@ -867,24 +916,27 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     // Get limit
     if (firstChildElement(_config, "lowStop"))
     {
-      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"lowStop"));
-      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+      double stop_angle =
+        boost::lexical_cast<double>(getNodeValue(_config, "lowStop"));
+      if ((std::string((const char*)_config->name) == "slider") ||
+          (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("lower")->Set(stop_angle);
       else
         sdfLimit->GetAttribute("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
-      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"highStop"));
-      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,
+            "highStop"));
+      if ((std::string((const char*)_config->name) == "slider") ||
+          (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("upper")->Set(stop_angle);
       else
         sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
-
   }
 
-  if ( firstChildElement(_config,"axis2"))
+  if (firstChildElement(_config, "axis2"))
   {
     sdf::ElementPtr sdfAxis = _sdf->AddElement("axis2");
     initAttr(_config, "axis", sdfAxis->GetAttribute("xyz"));
@@ -900,39 +952,40 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     // Get limit
     if (firstChildElement(_config, "lowStop"))
     {
-      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"lowStop"));
-      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,
+            "lowStop"));
+      if ((std::string((const char*)_config->name) == "slider") ||
+          (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("lower")->Set(stop_angle);
       else
         sdfLimit->GetAttribute("lower")->Set(GZ_DTOR(stop_angle));
     }
     if (firstChildElement(_config, "highStop"))
     {
-      double stop_angle = boost::lexical_cast<double>(getNodeValue(_config,"highStop"));
-      if ((std::string((const char*)_config->name) == "slider") || (std::string((const char*)_config->name) == "screw"))
+      double stop_angle =
+        boost::lexical_cast<double>(getNodeValue(_config, "highStop"));
+      if ((std::string((const char*)_config->name) == "slider") ||
+          (std::string((const char*)_config->name) == "screw"))
         sdfLimit->GetAttribute("upper")->Set(stop_angle);
       else
         sdfLimit->GetAttribute("upper")->Set(GZ_DTOR(stop_angle));
     }
-
   }
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Load Model from xmlNode
+//////////////////////////////////////////////////
 bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
-
   initAttr(_config, "name", _sdf->GetAttribute("name"));
   initAttr(_config, "static", _sdf->GetAttribute("static"));
   initOrigin(_config, _sdf);
 
   // Get all Link elements
-  for (xmlNodePtr  linkXml = getChildByNSPrefix(_config, "body"); 
+  for (xmlNodePtr  linkXml = getChildByNSPrefix(_config, "body");
       linkXml; linkXml = getNextByNSPrefix(linkXml, "body"))
   {
-    sdf::ElementPtr sdfLink =_sdf->AddElement("link"); 
+    sdf::ElementPtr sdfLink = _sdf->AddElement("link");
     if (!initLink(linkXml, sdfLink))
     {
       gzerr << "link xml is not initialized correctly\n";
@@ -941,10 +994,10 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   }
 
   // Get all Joint elements
-  for (xmlNodePtr  jointXml = getChildByNSPrefix(_config, "joint"); 
+  for (xmlNodePtr  jointXml = getChildByNSPrefix(_config, "joint");
        jointXml; jointXml = getNextByNSPrefix(jointXml, "joint"))
   {
-    sdf::ElementPtr sdfJoint =_sdf->AddElement("joint"); 
+    sdf::ElementPtr sdfJoint = _sdf->AddElement("joint");
     if (!initJoint(jointXml, sdfJoint))
     {
       gzerr << "joint xml is not initialized correctly\n";
@@ -958,11 +1011,11 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   // Set world name
-  if (!_sdf->GetAttribute("name")->SetFromString( "default" ))
+  if (!_sdf->GetAttribute("name")->SetFromString("default"))
   {
     gzerr << "Unable to set world name\n";
     return false;
@@ -972,14 +1025,13 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   initScene(firstChildElement(_config, "ogre"), sdfScene);
 
   sdf::ElementPtr sdfPhysics = _sdf->AddElement("physics");
-  initPhysics(firstChildElement(_config, "ode"),sdfPhysics);
+  initPhysics(firstChildElement(_config, "ode"), sdfPhysics);
 
   // Get all model elements
-  for (xmlNodePtr  modelXml = getChildByNSPrefix(_config, "model"); 
+  for (xmlNodePtr  modelXml = getChildByNSPrefix(_config, "model");
        modelXml; modelXml = getNextByNSPrefix(modelXml, "model"))
   {
-
-    if (strcmp((const char*)modelXml->name, "renderable")==0)
+    if (strcmp((const char*)modelXml->name, "renderable")== 0)
     {
       sdf::ElementPtr sdfLight = _sdf->AddElement("light");
       if (!initLight(modelXml, sdfLight))
@@ -988,10 +1040,10 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
         return false;
       }
     }
-    else 
+    else
     {
       sdf::ElementPtr sdfModel = _sdf->AddElement("model");
-      if (!initModel(modelXml,sdfModel))
+      if (!initModel(modelXml, sdfModel))
       {
         gzerr << "model xml is not initialized correctly\n";
         return false;
@@ -1005,10 +1057,9 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
-
   sdf::ElementPtr sdfAmbient = _sdf->AddElement("ambient");
   if (sdfAmbient)
     initAttr(_config, "ambient", sdfAmbient->GetAttribute("rgba"));
@@ -1031,14 +1082,14 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
     initAttr(_config, "shadows", sdfShadow->GetAttribute("enabled"));
 
   //  per pixel shading does not allow options
-  //sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
-  //initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
+  // sdfShadow->GetAttribute("rgba")->SetFromString("0 0 0 0");
+  // initAttr(_config, "shadowTechnique", sdfShadow->GetAttribute("type"));
 
   return true;
 }
 
-//_config = physics:ode
-//_sdf = physics
+// _config = physics:ode
+// _sdf = physics
 bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 {
   _sdf->GetAttribute("type")->SetFromString("ode");
@@ -1075,16 +1126,16 @@ bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   {
     initAttr(_config, "cfm", sdfODEConstraints->GetAttribute("cfm"));
     initAttr(_config, "erp", sdfODEConstraints->GetAttribute("erp"));
-    initAttr(_config, "contactMaxCorrectingVel", 
+    initAttr(_config, "contactMaxCorrectingVel",
         sdfODEConstraints->GetAttribute("contact_max_correcting_vel"));
-    initAttr(_config, "contactSurfaceLayer", 
+    initAttr(_config, "contactSurfaceLayer",
         sdfODEConstraints->GetAttribute("contact_surface_layer"));
   }
   return true;
 }
 
 
-bool initAttr(xmlNodePtr _node, const std::string &_key, 
+bool initAttr(xmlNodePtr _node, const std::string &_key,
               sdf::ParamPtr _attr)
 {
   if (_node)
@@ -1092,13 +1143,13 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
     std::string value = getNodeValue(_node, _key);
     if (value.empty())
     {
-      gzwarn << "Node[" << _node->name << "] Has empty key value[" 
+      gzwarn << "Node[" << _node->name << "] Has empty key value["
             << _key << "]\n";
       return false;
     }
-    if (!_attr->SetFromString( value )) 
+    if (!_attr->SetFromString(value))
     {
-      gzerr << "Unable to set attribute from  node[" 
+      gzerr << "Unable to set attribute from  node["
             << _node->name << "] and key[" << _key << "]\n";
       return false;
     }
@@ -1111,7 +1162,7 @@ bool initAttr(xmlNodePtr _node, const std::string &_key,
 
   return true;
 }
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 {
   std::ifstream fin;
@@ -1125,7 +1176,7 @@ bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
   fin.close();
 
   // Enable line numbering
-  xmlLineNumbersDefault( 1 );
+  xmlLineNumbersDefault(1);
 
   std::string output;
   PreParser(_filename, output);
@@ -1134,16 +1185,16 @@ bool initModelFile(const std::string &_filename, sdf::SDFPtr &_sdf)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initModelString(const std::string &_xmlString, sdf::SDFPtr &_sdf)
 {
-  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
+  xmlDocPtr xmlDoc =
+    xmlParseDoc(reinterpret_cast<const xmlChar*>(_xmlString.c_str()));
 
   return initModelDoc(xmlDoc, _sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Load Model from xmlDoc
+//////////////////////////////////////////////////
 bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 {
   if (!_xmlDoc)
@@ -1153,13 +1204,13 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
   }
 
   bool model_initialized = false;
-  xmlNodePtr modelXml = firstChildElement(_xmlDoc, "physical" );
+  xmlNodePtr modelXml = firstChildElement(_xmlDoc, "physical");
   while (modelXml)
   {
     sdf::ElementPtr model = _sdf->root->AddElement("model");
     initModel(modelXml, model);
 
-    modelXml = nextSiblingElement(modelXml,"physical");
+    modelXml = nextSiblingElement(modelXml, "physical");
     // need at least one model, otherwise, return false and try as model
     model_initialized = true;
   }
@@ -1168,24 +1219,22 @@ bool initModelDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     return true;
   else
     return false;
-
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-bool initWorldFile(const std::string &_filename, 
+//////////////////////////////////////////////////
+bool initWorldFile(const std::string &_filename,
     sdf::SDFPtr &_sdf)
 {
   std::ifstream fin;
   fin.open(_filename.c_str(), std::ios::in);
-  if( !fin.is_open() )
+  if (!fin.is_open())
   {
     gzerr << "The world file can not be opened, check path and permissions\n";
   }
   fin.close();
 
   // Enable line numbering
-  xmlLineNumbersDefault( 1 );
+  xmlLineNumbersDefault(1);
 
   std::string output;
   PreParser(_filename, output);
@@ -1193,16 +1242,17 @@ bool initWorldFile(const std::string &_filename,
   return initWorldString(output, _sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-bool initWorldString(const std::string &_xmlString, 
+//////////////////////////////////////////////////
+bool initWorldString(const std::string &_xmlString,
                      sdf::SDFPtr &_sdf)
 {
-  xmlDocPtr xmlDoc = xmlParseDoc((xmlChar*)_xmlString.c_str());
+  xmlDocPtr xmlDoc =
+    xmlParseDoc(reinterpret_cast<const xmlChar*>(_xmlString.c_str()));
 
-  return initWorldDoc(xmlDoc,_sdf);
+  return initWorldDoc(xmlDoc, _sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
 {
   if (!_xmlDoc)
@@ -1218,40 +1268,45 @@ bool initWorldDoc(xmlDocPtr _xmlDoc, sdf::SDFPtr &_sdf)
     _sdf->root->AddAttribute("version", "string", "1.0", false);
 
   bool world_initialized = false;
-  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world" );
+  xmlNodePtr worldXml = firstChildElement(_xmlDoc, "world");
   while (worldXml)
   {
     sdf::ElementPtr world = _sdf->root->AddElement("world");
     world_initialized = initWorld(worldXml, world);
-    worldXml = nextSiblingElement(worldXml,"world");
+    worldXml = nextSiblingElement(worldXml, "world");
   }
 
-  // need all worlds successfully initialized, otherwise, return false and try as model
-  if (world_initialized) return true;
-  else return false;
+  // need all worlds successfully initialized, otherwise,
+  // return false and try as model
+  if (world_initialized)
+    return true;
+  else
+    return false;
 }
 
-xmlNodePtr firstChildElement( xmlDocPtr node, const std::string &name)
+xmlNodePtr firstChildElement(xmlDocPtr node, const std::string &name)
 {
   xmlNodePtr tmp;
-  for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = tmp->next )
+  for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = tmp->next)
     if (tmp->name && name == (const char*)tmp->name) break;
 
   return tmp;
 }
-xmlNodePtr firstChildElement( xmlNodePtr node, const std::string &name)
+xmlNodePtr firstChildElement(xmlNodePtr node, const std::string &name)
 {
   xmlNodePtr tmp;
-  for (tmp = xmlFirstElementChild(node); tmp != NULL; tmp = xmlNextElementSibling(tmp) )
+  for (tmp = xmlFirstElementChild(node);
+       tmp != NULL; tmp = xmlNextElementSibling(tmp))
     if (tmp->name && (name == (const char*)tmp->name)) break;
 
   return tmp;
 }
 
-xmlNodePtr nextSiblingElement( xmlNodePtr node, const std::string &name)
+xmlNodePtr nextSiblingElement(xmlNodePtr node, const std::string &name)
 {
   xmlNodePtr tmp;
-  for (tmp = xmlNextElementSibling(node); tmp != NULL; tmp = xmlNextElementSibling(tmp) )
+  for (tmp = xmlNextElementSibling(node);
+       tmp != NULL; tmp = xmlNextElementSibling(tmp))
     if (tmp->name && (name == (const char*)tmp->name)) break;
 
   return tmp;
@@ -1260,34 +1315,38 @@ xmlNodePtr nextSiblingElement( xmlNodePtr node, const std::string &name)
 xmlNodePtr getNextByNSPrefix(xmlNodePtr node, const std::string &prefix)
 {
   xmlNodePtr tmp;
-  for (tmp = xmlNextElementSibling(node); tmp != NULL; tmp = xmlNextElementSibling(tmp) )
+  for (tmp = xmlNextElementSibling(node);
+       tmp != NULL; tmp = xmlNextElementSibling(tmp))
     if (tmp->ns && prefix == (const char*)tmp->ns->prefix)
       break;
   return tmp;
 }
-xmlNodePtr getChildByNSPrefix(xmlNodePtr node, const std::string &prefix )
+
+xmlNodePtr getChildByNSPrefix(xmlNodePtr node, const std::string &prefix)
 {
   xmlNodePtr tmp;
-  for (tmp = node->xmlChildrenNode; tmp != NULL; tmp = xmlNextElementSibling(tmp) )
+  for (tmp = node->xmlChildrenNode;
+       tmp != NULL; tmp = xmlNextElementSibling(tmp))
     if (tmp->ns && prefix == (const char*)tmp->ns->prefix)
       break;
   return tmp;
 }
-std::string getNodeValue( xmlNodePtr node, const std::string &key )
+
+std::string getNodeValue(xmlNodePtr node, const std::string &key)
 {
   std::string result;
-  xmlChar *value=NULL;
+  xmlChar *value = NULL;
 
   // First check if the key is an attribute
-  if (xmlHasProp( node, (xmlChar*) key.c_str() ))
+  if (xmlHasProp(node, reinterpret_cast<const xmlChar*>(key.c_str())))
   {
-    value = xmlGetProp( node, (xmlChar*) key.c_str() );
+    value = xmlGetProp(node, reinterpret_cast<const xmlChar*>(key.c_str()));
 
     // If not an attribute, then it should be a child node
   }
-  else if (key == (const char*)node->name)
+  else if (key == reinterpret_cast<const char*>(node->name))
   {
-    value = xmlNodeListGetString( node->doc, node->xmlChildrenNode, 1);
+    value = xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1);
   }
   else
   {
@@ -1299,9 +1358,9 @@ std::string getNodeValue( xmlNodePtr node, const std::string &key )
     while (currNode)
     {
       // If the name matches, then return its value
-      if (key == (const char*)currNode->name)
+      if (key == reinterpret_cast<const char*>(currNode->name))
       {
-        value = xmlNodeListGetString( node->doc, currNode->xmlChildrenNode, 1 );
+        value = xmlNodeListGetString(node->doc, currNode->xmlChildrenNode, 1);
         break;
       }
 
@@ -1311,7 +1370,7 @@ std::string getNodeValue( xmlNodePtr node, const std::string &key )
 
   if (value)
   {
-    result = (char*)value;
+    result = reinterpret_cast<char*>(value);
     boost::trim(result);
 
     xmlFree(value);
@@ -1334,12 +1393,12 @@ std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
   count = 0;
   a = b = 0;
 
-  for (i = 0; i < (int)value.size(); i++)
+  for (i = 0; i < static_cast<int>(value.size()); i++)
   {
     // Look for start of element
     if (state == 0)
     {
-      if (!isspace( value[i] ))
+      if (!isspace(value[i]))
       {
         a = i;
         state = 1;
@@ -1349,7 +1408,7 @@ std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
     // Look for end of element
     else if (state == 1)
     {
-      if (isspace( value[i] ))
+      if (isspace(value[i]))
       {
         state = 0;
         b = i - 1;
@@ -1369,12 +1428,12 @@ std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
   {
     const char *s = value.c_str() + a;
     size_t size = b-a+2;
-    char *end = (char *)memchr(s,0,size);
+    const char *end = reinterpret_cast<const char *>(memchr(s, 0, size));
 
     if (end)
-      size = end -s + 1;
+      size = end - s + 1;
 
-    char *r = (char *)malloc(size);
+    char *r = static_cast<char *>(malloc(size));
 
     if (size)
     {
@@ -1390,7 +1449,8 @@ std::string getNodeTuple(xmlNodePtr node, const std::string &key, int index)
 
 std::string getValue(xmlNodePtr node)
 {
-  const char *v =(const char*)xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1); 
+  const char *v =
+    (const char*)xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1);
   if (v)
     return std::string(v);
   else
@@ -1408,10 +1468,10 @@ void PreParser(const std::string &fname, std::string &output)
     std::getline(ifs, line);
     boost::trim(line);
 
-    if (boost::find_first(line,"<include"))
+    if (boost::find_first(line, "<include"))
     {
-      int start = line.find("filename=");
-      start += strlen("filename=") + 1;
+      int start = line.find("filename =");
+      start += strlen("filename =") + 1;
       int end = line.find_first_of("'\"", start);
       std::string fname2 = line.substr(start, end-start);
       PreParser(fname2, output);
@@ -1422,5 +1482,5 @@ void PreParser(const std::string &fname, std::string &output)
 
   ifs.close();
 }
-
 }
+

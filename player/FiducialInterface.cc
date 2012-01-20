@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Fiducial Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 /* TODO
-- PLAYER_FIDUCIAL_REQ_GET_GEOM
-- PLAYER_FIDUCIAL_REQ_SET_ID
-- PLAYER_FIDUCIAL_REQ_GET_ID
-*/
+   - PLAYER_FIDUCIAL_REQ_GET_GEOM
+   - PLAYER_FIDUCIAL_REQ_SET_ID
+   - PLAYER_FIDUCIAL_REQ_GET_ID
+   */
 
 
 #include <math.h>
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "FiducialInterface.hh"
 
@@ -39,13 +37,13 @@ using namespace libgazebo;
 
 boost::recursive_mutex *FiducialInterface::mutex = NULL;
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 FiducialInterface::FiducialInterface(player_devaddr_t addr,
-                                     GazeboDriver *driver, ConfigFile *cf, 
-                                     int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf,
+    int section)
+: GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -60,27 +58,29 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 FiducialInterface::~FiducialInterface()
 {
+  /*
   player_fiducial_data_t_cleanup(&this->data);
 
   // Release this interface
   delete this->iface;
+  */
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Handle all messages. This is called from GazeboDriver
+/////////////////////////////////////////////////
 int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
-                                      player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Request the pose and size of the fiducial device
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                            PLAYER_FIDUCIAL_REQ_GET_GEOM, this->device_addr))
+        PLAYER_FIDUCIAL_REQ_GET_GEOM, this->device_addr))
   {
     player_fiducial_geom_t rep;
 
@@ -100,17 +100,17 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
     rep.fiducial_size.sl = 0.50;
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_FIDUCIAL_REQ_GET_GEOM,
-                          &rep, sizeof(rep),NULL);
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_FIDUCIAL_REQ_GET_GEOM,
+        &rep, sizeof(rep), NULL);
 
     return 0;
   }
 
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_FIDUCIAL_REQ_SET_ID, this->device_addr))
+        PLAYER_FIDUCIAL_REQ_SET_ID, this->device_addr))
   {
-    if ( hdr->size == sizeof(player_fiducial_id_t) )
+    if (hdr->size == sizeof(player_fiducial_id_t))
     {
       // TODO: Implement me
 
@@ -119,24 +119,23 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
 
       // acknowledge, including the new ID
       this->driver->Publish(this->device_addr, respQueue,
-                            PLAYER_MSGTYPE_RESP_ACK,
-                            PLAYER_FIDUCIAL_REQ_SET_ID,
-                            (void*)&pid, sizeof(pid) );
+          PLAYER_MSGTYPE_RESP_ACK,
+          PLAYER_FIDUCIAL_REQ_SET_ID,
+          (void*)&pid, sizeof(pid));
 
       return 0;
     }
     else
     {
       printf("Incorrect packet size setting fiducial ID (%d/%d)",
-             (int)hdr->size, (int)sizeof(player_fiducial_id_t) );
+          (int)hdr->size, (int)sizeof(player_fiducial_id_t));
 
       return -1; // error - NACK is sent automatically
     }
   }
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_FIDUCIAL_REQ_GET_ID, this->device_addr))
+        PLAYER_FIDUCIAL_REQ_GET_ID, this->device_addr))
   {
-
     // TODO: Implement me
 
     // fill in the data formatted player-like
@@ -145,21 +144,20 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
 
     // acknowledge, including the new ID
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_FIDUCIAL_REQ_GET_ID,
-                          (void*)&pid, sizeof(pid) );
+        PLAYER_MSGTYPE_RESP_ACK,
+        PLAYER_FIDUCIAL_REQ_GET_ID,
+        (void*)&pid, sizeof(pid));
 
     return 0;
   }
-
+*/
   return -1;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Update this interface, publish new info. This is
-// called from GazeboDriver::Update
+/////////////////////////////////////////////////
 void FiducialInterface::Update()
 {
+  /*
   struct timeval ts;
 
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -184,7 +182,8 @@ void FiducialInterface::Update()
     {
       delete [] this->data.fiducials;
 
-      this->data.fiducials = new player_fiducial_item_t[this->data.fiducials_count];
+      this->data.fiducials =
+        new player_fiducial_item_t[this->data.fiducials_count];
     }
 
     for (i = 0; i < this->iface->data->count; i++)
@@ -201,44 +200,44 @@ void FiducialInterface::Update()
       this->data.fiducials[i].pose.pyaw = fid->pose.yaw;
     }
 
-    this->driver->Publish( this->device_addr,
-                           PLAYER_MSGTYPE_DATA,
-                           PLAYER_FIDUCIAL_DATA_SCAN,
-                           reinterpret_cast<void*>(&data), sizeof(this->data), 
-                           &this->datatime );
-                           
+    this->driver->Publish(this->device_addr,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_FIDUCIAL_DATA_SCAN,
+        reinterpret_cast<void*>(&data), sizeof(this->data),
+        &this->datatime);
+
   }
 
   this->iface->Unlock();
+  */
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Open a SHM interface when a subscription is received. This is called from
-// GazeboDriver::Subscribe
+/////////////////////////////////////////////////
 void FiducialInterface::Subscribe()
 {
+  /*
   // Open the interface
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
-    //std::ostringstream stream;
+    // std::ostringstream stream;
     std::cerr << "Error Subscribing to Gazebo Fiducial Interface\n"
-    << e << "\n";
-    //gzthrow(stream.str());
+      << e << "\n";
+    // gzthrow(stream.str());
     exit(0);
   }
-
+  */
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Close a SHM interface. This is called from GazeboDriver::Unsubscribe
+/////////////////////////////////////////////////
 void FiducialInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

@@ -25,18 +25,16 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
     /// \brief And ODE sphere shape
     class ODESphereShape : public SphereShape
     {
-      public: ODESphereShape(ODECollisionPtr parent) : SphereShape(parent) {}
+      public: ODESphereShape(ODECollisionPtr _parent) : SphereShape(_parent) {}
       public: virtual ~ODESphereShape() {}
       public: void SetRadius(const double &radius)
       {
@@ -44,18 +42,16 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::shared_dynamic_cast<ODECollision>(this->collisionParent);
-  
+
         // Create the sphere geometry
         if (oParent->GetCollisionId() == NULL)
           oParent->SetCollision(dCreateSphere(0, radius), true);
         else
           dGeomSphereSetRadius(oParent->GetCollisionId(), radius);
       }
-    
     };
     /// \}
     /// \}
-
   }
 }
 #endif

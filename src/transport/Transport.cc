@@ -31,13 +31,13 @@ bool g_stopped = true;
 
 /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
 /// environment variable
-bool transport::get_master_uri(std::string &master_host, 
-                               unsigned short &master_port)
+bool transport::get_master_uri(std::string &master_host,
+                               unsigned int &master_port)
 {
   char *char_uri = getenv("GAZEBO_MASTER_URI");
 
   // Set to default host and port
-  if (!char_uri)
+  if (!char_uri || strlen(char_uri) == 0)
   {
     master_host = "localhost";
     master_port = 11345;
@@ -48,23 +48,24 @@ bool transport::get_master_uri(std::string &master_host,
 
   boost::replace_first(master_uri, "http://", "");
   int last_colon = master_uri.find_last_of(":");
-  master_host = master_uri.substr(0,last_colon);
-  master_port = boost::lexical_cast<unsigned short>( master_uri.substr(last_colon+1, master_uri.size() - (last_colon+1)) );
+  master_host = master_uri.substr(0, last_colon);
+  master_port = boost::lexical_cast<unsigned int>(
+      master_uri.substr(last_colon+1, master_uri.size() - (last_colon+1)));
 
   return true;
 }
 
 
-bool transport::init(const std::string &master_host, unsigned short master_port)
+bool transport::init(const std::string &master_host, unsigned int master_port)
 {
   std::string host = master_host;
-  unsigned short port = master_port;
+  unsigned int port = master_port;
 
   if (host.empty())
     get_master_uri(host, port);
 
   transport::TopicManager::Instance()->Init();
-  if (!transport::ConnectionManager::Instance()->Init( host, port ))
+  if (!transport::ConnectionManager::Instance()->Init(host, port))
     return false;
 
   return true;
@@ -80,7 +81,7 @@ void transport::run()
   // This chunk of code just waits until we get a list of topic namespaces.
   unsigned int trys = 0;
   unsigned int limit = 50;
-  while (namespaces.size() == 0 && trys < limit)
+  while (namespaces.empty() && trys < limit)
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
     common::Time::MSleep(50);
@@ -127,3 +128,5 @@ void transport::pause_incoming(bool _pause)
 {
   transport::TopicManager::Instance()->PauseIncoming(_pause);
 }
+
+

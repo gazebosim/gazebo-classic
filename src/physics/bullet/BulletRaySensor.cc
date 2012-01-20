@@ -22,9 +22,7 @@
 
 #include "World.hh"
 
-#include "BulletRayCollision.hh"
 #include "BulletPhysics.hh"
-#include "BulletLink.hh"
 #include "BulletRaySensor.hh"
 
 using namespace gazebo;
@@ -35,8 +33,7 @@ using namespace physics;
 using namespace physics;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 BulletRaySensor::BulletRaySensor(Link *_body)
   : PhysicsRaySensor(_body)
 {
@@ -46,115 +43,111 @@ BulletRaySensor::BulletRaySensor(Link *_body)
     gzthrow("BulletRaySensor requires an BulletLink");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 BulletRaySensor::~BulletRaySensor()
 {
   std::vector<BulletRayCollision*>::iterator iter;
 
-  for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+  for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
   {
     delete (*iter);
   }
   this->rays.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add a ray to the sensor
-void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end, double minRange, 
-                          double maxRange, bool display)
+//////////////////////////////////////////////////
+void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end,
+    double minRange, double maxRange, bool display)
 {
   BulletRayCollision *rayCollision;
-  
-  rayCollision = (BulletRayCollision*)this->GetWorld()->CreateCollision("ray", this->body );
+
+  rayCollision = static_cast<BulletRayCollision*>(
+        this->GetWorld()->CreateCollision("ray", this->body));
   rayCollision->SetDisplayRays(display);
   rayCollision->SetMinLength(minRange);
   rayCollision->SetMaxLength(maxRange);
 
-  rayCollision->SetPoints(start,end);
+  rayCollision->SetPoints(start, end);
   this->rays.push_back(rayCollision);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of rays
+//////////////////////////////////////////////////
 int BulletRaySensor::GetCount() const
 {
   return this->rays.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the relative starting and ending points of a ray
-void BulletRaySensor::GetRelativePoints(int index, math::Vector3 &a, math::Vector3 &b)
+//////////////////////////////////////////////////
+void BulletRaySensor::GetRelativePoints(int _index,
+    math::Vector3 &_a, math::Vector3 &_b)
 {
-  if (index <0 || index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] is out of range[0-" 
+    stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
     gzthrow(stream.str());
   }
 
-  this->rays[index]->GetRelativePoints(a,b);
+  this->rays[_index]->GetRelativePoints(_a, _b);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the range of a ray
-double BulletRaySensor::GetRange(int index) const
+//////////////////////////////////////////////////
+double BulletRaySensor::GetRange(int _index) const
 {
-  if (index <0 || index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] is out of range[0-" 
+    stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
     gzthrow(stream.str());
   }
 
-  return this->rays[index]->GetLength();
+  return this->rays[_index]->GetLength();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the retro reflectance value of a ray
-double BulletRaySensor::GetRetro(int index) const
+//////////////////////////////////////////////////
+double BulletRaySensor::GetRetro(int _index) const
 {
-  if (index <0 || index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] is out of range[0-" 
+    stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
     gzthrow(stream.str());
   }
 
-  return this->rays[index]->GetRetro();
+  return this->rays[_index]->GetRetro();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the fiducial value of a ray
-double BulletRaySensor::GetFiducial(int index) const
+//////////////////////////////////////////////////
+double BulletRaySensor::GetFiducial(int _index) const
 {
-  if (index <0 || index >= (int)(this->rays.size()))
+  if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] is out of range[0-" 
+    stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
     gzthrow(stream.str());
   }
 
-  return this->rays[index]->GetFiducial();
+  return this->rays[_index]->GetFiducial();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Update the ray sensor
+//////////////////////////////////////////////////
 void BulletRaySensor::Update()
 {
   std::vector<BulletRayCollision*>::iterator iter;
 
-  for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+  for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
   {
-    (*iter)->SetLength( (*iter)->GetMaxLength() );
-    (*iter)->SetRetro( 0.0 );
-    (*iter)->SetFiducial( -1 );
+    (*iter)->SetLength((*iter)->GetMaxLength());
+    (*iter)->SetRetro(0.0);
+    (*iter)->SetFiducial(-1);
 
     // Get the global points of the line
     (*iter)->Update();
   }
 }
+
+

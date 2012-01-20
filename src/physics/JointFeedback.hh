@@ -26,28 +26,27 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-   
     /// \brief Feedback information from a joint
     class JointFeedback
     {
       /// \brief Operator =
-      public: const JointFeedback &operator=(const JointFeedback &f)
+      public: JointFeedback &operator =(const JointFeedback &f)
               {
                 this->body1Force = f.body1Force;
                 this->body2Force = f.body2Force;
-  
+
                 this->body1Torque = f.body1Torque;
                 this->body2Torque = f.body2Torque;
                 return *this;
               }
-  
+
       public: math::Vector3 body1Force;
       public: math::Vector3 body2Force;
-    
+
       public: math::Vector3 body1Torque;
       public: math::Vector3 body2Torque;
     };
@@ -55,3 +54,5 @@ namespace gazebo
   }
 }
 #endif
+
+

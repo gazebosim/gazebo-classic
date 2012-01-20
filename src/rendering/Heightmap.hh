@@ -17,11 +17,11 @@
 /* Desc: Heightmap geometry
  * Author: Nate Keonig
  * Date: 12 May 2009
- * SVN: $Id:$
  */
 
 #ifndef HEIGHTMAP_HH
 #define HEIGHTMAP_HH
+#include <string>
 
 // TODO: remove this line
 #include "rendering/ogre.h"
@@ -31,47 +31,49 @@
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class Scene;
 
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
- 
     /// \brief Height map geom
     class Heightmap : public Ogre::RaySceneQueryListener
     {
       /// \brief Constructor
       public: Heightmap(Scene *scene);
-  
+
       /// \brief Destructor
       public: virtual ~Heightmap();
-  
+
       /// \brief Get the height of the heightmap as a specific coordinate
       public: float GetHeightAt(const math::Vector2d &pos);
-  
+
       /// \brief Overloaded Ogre function for Ray Scene Queries
-      public: virtual bool queryResult(Ogre::MovableObject *obj, Ogre::Real dist);
-  
+      public: virtual bool queryResult(Ogre::MovableObject *obj,
+                                       Ogre::Real dist);
+
       /// \brief Overloaded Ogre function for Ray Scene Queries
-      public: virtual bool queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist);
-  
+      public: virtual bool queryResult(Ogre::SceneQuery::WorldFragment *frag,
+                                       Ogre::Real dist);
+
       /// \brief Load the heightmap
-      public: virtual void Load( std::string imageFilename, 
-                                    std::string worldTexture, 
-                                    std::string detialTexture,
-                                    math::Vector3 terrainSize);
-  
+      public: virtual void Load(std::string imageFilename,
+                                std::string worldTexture,
+                                std::string detialTexture,
+                                math::Vector3 terrainSize);
+
       private: math::Vector3 terrainSize;
-  
+
       private: Ogre::Ray ray;
       private: Ogre::RaySceneQuery *rayQuery;
-  
+
       private: double distToTerrain;
       private: Scene *scene;
     };
     /// \}
   }
-
 }
 #endif
+
+

@@ -17,43 +17,36 @@
 /* Desc: A ray
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #include "Link.hh"
-#include "BulletRayCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-using namespace physics;
 
-using namespace physics;
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-BulletRayCollision::BulletRayCollision( Link *body, bool displayRays )
+//////////////////////////////////////////////////
+BulletRayCollision::BulletRayCollision(Link *_body, bool _displayRays)
     : RayCollision<BulletCollision>(body, displayRays)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 BulletRayCollision::~BulletRayCollision()
 {
 }
- 
-//////////////////////////////////////////////////////////////////////////////
-// Update the ray collision
+
+//////////////////////////////////////////////////
 void BulletRayCollision::Update()
 {
   RayCollision<BulletCollision>::Update();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the starting point and direction
-void BulletRayCollision::SetPoints(const math::Vector3 &posStart, const math::Vector3 &posEnd)
+//////////////////////////////////////////////////
+void BulletRayCollision::SetPoints(const math::Vector3 &_posStart,
+                                   const math::Vector3 &_posEnd)
 {
-  RayCollision<BulletCollision>::SetPoints(posStart, posEnd);
+  RayCollision<BulletCollision>::SetPoints(_posStart, _posEnd);
 }
+
+

@@ -30,26 +30,24 @@
 #include "math/gzmath.h"
 #include "rendering/MovableText.hh"
 
-
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1
 
 using namespace gazebo;
 using namespace rendering;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 MovableText::MovableText()
     : camera(NULL),
     renderWindow(NULL) ,
     font(NULL) ,
-    viewportAspectCoef (0.75),
+    viewportAspectCoef(0.75),
     spaceWidth(0) ,
     updateColors(true) ,
     vertAlign(V_BELOW) ,
     horizAlign(H_LEFT) ,
     onTop(false) ,
-    baseline(0.0) 
+    baseline(0.0)
 {
   this->renderOp.vertexData = NULL;
 
@@ -58,20 +56,16 @@ MovableText::MovableText()
   this->aabb = new Ogre::AxisAlignedBox;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 MovableText::~MovableText()
 {
-  if (this->renderOp.vertexData)
-    delete this->renderOp.vertexData;
-
+  delete this->renderOp.vertexData;
   delete this->mutex;
   delete this->aabb;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//Loads the text to display and select the font
-void MovableText::Load( const std::string &name_,
+//////////////////////////////////////////////////
+void MovableText::Load(const std::string &name_,
                         const std::string &text_,
                         const std::string &fontName_,
                         float charHeight_,
@@ -104,8 +98,7 @@ void MovableText::Load( const std::string &name_,
   this->_setupGeometry();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the text
+//////////////////////////////////////////////////
 void MovableText::Update()
 {
   if (this->dirty)
@@ -115,8 +108,7 @@ void MovableText::Update()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the font name
+//////////////////////////////////////////////////
 void MovableText::SetFontName(const std::string &newFontName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -131,7 +123,8 @@ void MovableText::SetFontName(const std::string &newFontName)
   {
     this->fontName = newFontName;
 
-    this->font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(this->fontName).getPointer();
+    this->font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(
+        this->fontName).getPointer();
 
     if (!this->font)
     {
@@ -144,7 +137,8 @@ void MovableText::SetFontName(const std::string &newFontName)
 
     if (!this->material.isNull())
     {
-      Ogre::MaterialManager::getSingletonPtr()->remove(this->material->getName());
+      Ogre::MaterialManager::getSingletonPtr()->remove(
+          this->material->getName());
       this->material.setNull();
     }
 
@@ -162,8 +156,7 @@ void MovableText::SetFontName(const std::string &newFontName)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the caption
+//////////////////////////////////////////////////
 void MovableText::SetText(const std::string &newText)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -175,8 +168,7 @@ void MovableText::SetText(const std::string &newText)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the color
+//////////////////////////////////////////////////
 void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -188,8 +180,7 @@ void MovableText::SetColor(const common::Color &newColor)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the character height
+//////////////////////////////////////////////////
 void MovableText::SetCharHeight(float height_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -201,8 +192,7 @@ void MovableText::SetCharHeight(float height_)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the width of the space between characters
+//////////////////////////////////////////////////
 void MovableText::SetSpaceWidth(float width_)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -214,8 +204,7 @@ void MovableText::SetSpaceWidth(float width_)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set alignment of the text
+//////////////////////////////////////////////////
 void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -232,20 +221,18 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set additional height
-void MovableText::SetBaseline( float base_ )
+//////////////////////////////////////////////////
+void MovableText::SetBaseline(float _base)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if ( this->baseline != base_ )
+  if (this->baseline != _base)
   {
-    this->baseline = base_;
+    this->baseline = _base;
     this->needUpdate = true;
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set whether the text should be shown on top
+//////////////////////////////////////////////////
 void MovableText::SetShowOnTop(bool show)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -259,16 +246,14 @@ void MovableText::SetShowOnTop(bool show)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// True=text is displayed on top
+//////////////////////////////////////////////////
 bool MovableText::GetShowOnTop() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return this->onTop;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the axis aligned bounding box
+//////////////////////////////////////////////////
 math::Box MovableText::GetAABB(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -281,8 +266,7 @@ math::Box MovableText::GetAABB(void)
                     this->aabb->getMaximum().z));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Setup the billboard that renders the text
+//////////////////////////////////////////////////
 void MovableText::_setupGeometry()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -306,9 +290,9 @@ void MovableText::_setupGeometry()
   float len = 0.0f;
 
   // for calculation of AABB
-  Ogre::Vector3 min(0,0,0);
-  Ogre::Vector3 max(0,0,0);
-  Ogre::Vector3 currPos(0,0,0);
+  Ogre::Vector3 min(0, 0, 0);
+  Ogre::Vector3 max(0, 0, 0);
+  Ogre::Vector3 currPos(0, 0, 0);
 
   unsigned int vertexCount = static_cast<unsigned int>(this->text.size() * 6);
 
@@ -318,7 +302,7 @@ void MovableText::_setupGeometry()
     // Removed this test as it causes problems when replacing a caption
     // of the same size: replacing "Hello" with "hello"
     // as well as when changing the text alignment
-    //if (this->renderOp.vertexData->vertexCount != vertexCount)
+    // if (this->renderOp.vertexData->vertexCount != vertexCount)
     {
       delete this->renderOp.vertexData;
       this->renderOp.vertexData = NULL;
@@ -371,7 +355,8 @@ void MovableText::_setupGeometry()
 
   // Derive space width from a capital A
   if (this->spaceWidth == 0)
-    this->spaceWidth = this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
+    this->spaceWidth =
+      this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 
   if (this->vertAlign == MovableText::V_ABOVE)
   {
@@ -390,15 +375,15 @@ void MovableText::_setupGeometry()
     if (newLine)
     {
       len = 0.0;
-      for (std::string::iterator j = i; j != this->text.end(); j++ )
+      for (std::string::iterator j = i; j != this->text.end(); ++j)
       {
         Ogre::Font::CodePoint character = *j;
-        if (character == 0x000D // CR
-            || character == 0x0085) // NEL
+        if (character == 0x000D  // CR
+            || character == 0x0085)  // NEL
         {
           break;
         }
-        else if (character == 0x0020) // space
+        else if (character == 0x0020)  // space
         {
           len += this->spaceWidth;
         }
@@ -414,8 +399,8 @@ void MovableText::_setupGeometry()
 
     Ogre::Font::CodePoint character = (*i);
 
-    if (character == 0x000D // CR
-        || character == 0x0085) // NEL
+    if (character == 0x000D  // CR
+        || character == 0x0085)  // NEL
     {
       top -= this->charHeight * 2.0;
       newLine = true;
@@ -424,7 +409,7 @@ void MovableText::_setupGeometry()
       this->renderOp.vertexData->vertexCount -= 6;
       continue;
     }
-    else if (character == 0x0020) // space
+    else if (character == 0x0020)  // space
     {
       // Just leave a gap, no tris
       left += this->spaceWidth;
@@ -456,7 +441,7 @@ void MovableText::_setupGeometry()
 
     // Deal with bounds
     if (this->horizAlign == MovableText::H_LEFT)
-      currPos = Ogre::Vector3(left,top,0);
+      currPos = Ogre::Vector3(left, top, 0);
     else
       currPos = Ogre::Vector3(left - (len/2.0), top, 0);
 
@@ -488,7 +473,7 @@ void MovableText::_setupGeometry()
 
     // Deal with bounds
     if (this->horizAlign == MovableText::H_LEFT)
-      currPos = Ogre::Vector3(left,top,0);
+      currPos = Ogre::Vector3(left, top, 0);
     else
       currPos = Ogre::Vector3(left - (len/2), top, 0);
 
@@ -513,7 +498,7 @@ void MovableText::_setupGeometry()
 
     // Deal with bounds
     if (this->horizAlign == MovableText::H_LEFT)
-      currPos = Ogre::Vector3(left,top,0);
+      currPos = Ogre::Vector3(left, top, 0);
     else
       currPos = Ogre::Vector3(left - (len/2), top, 0);
 
@@ -538,7 +523,7 @@ void MovableText::_setupGeometry()
     *pVert++ = uvRect.top;
 
     // Deal with bounds
-    currPos = Ogre::Vector3(left,top,0);
+    currPos = Ogre::Vector3(left, top, 0);
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
@@ -558,7 +543,7 @@ void MovableText::_setupGeometry()
     *pVert++ = uvRect.bottom;
 
     // Deal with bounds
-    currPos = Ogre::Vector3(left,top,0);
+    currPos = Ogre::Vector3(left, top, 0);
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
@@ -577,7 +562,7 @@ void MovableText::_setupGeometry()
     *pVert++ = uvRect.bottom;
 
     // Deal with bounds
-    currPos = Ogre::Vector3(left,top,0);
+    currPos = Ogre::Vector3(left, top, 0);
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
@@ -611,15 +596,14 @@ void MovableText::_setupGeometry()
   this->needUpdate = false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the colors
+//////////////////////////////////////////////////
 void MovableText::_updateColors(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   Ogre::RGBA clr;
   Ogre::HardwareVertexBufferSharedPtr vbuf;
-  Ogre::RGBA *pDest=NULL;
+  Ogre::RGBA *pDest = NULL;
   unsigned int i;
 
   assert(this->font);
@@ -645,16 +629,16 @@ void MovableText::_updateColors(void)
   this->updateColors = false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   assert(this->camera);
   return const_cast<Ogre::Quaternion&>(this->camera->getDerivedOrientation());
-  //return mParentNode->_getDerivedOrientation();
+  // return mParentNode->_getDerivedOrientation();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 const Ogre::Vector3 & MovableText::getWorldPosition(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -662,14 +646,14 @@ const Ogre::Vector3 & MovableText::getWorldPosition(void) const
   return mParentNode->_getDerivedPosition();
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 const Ogre::AxisAlignedBox &MovableText::getBoundingBox(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return *this->aabb;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 const Ogre::String &MovableText::getMovableType() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -677,7 +661,7 @@ const Ogre::String &MovableText::getMovableType() const
   return movType;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -687,7 +671,7 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
 
     // store rotation in a matrix
     this->camera->getDerivedOrientation().ToRotationMatrix(rot3x3);
-    //mParentNode->_getDerivedOrientation().ToRotationMatrix(rot3x3);
+    // mParentNode->_getDerivedOrientation().ToRotationMatrix(rot3x3);
 
     // parent node position
     Ogre::Vector3 ppos = mParentNode->_getDerivedPosition() +
@@ -704,21 +688,21 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 float MovableText::getBoundingRadius() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return this->radius;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 float MovableText::getSquaredViewDepth(const Ogre::Camera * /*cam_*/) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void MovableText::getRenderOperation(Ogre::RenderOperation & op)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -733,7 +717,7 @@ void MovableText::getRenderOperation(Ogre::RenderOperation & op)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 const Ogre::MaterialPtr &MovableText::getMaterial(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -741,22 +725,21 @@ const Ogre::MaterialPtr &MovableText::getMaterial(void) const
   return this->material;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//
+//////////////////////////////////////////////////
 const Ogre::LightList &MovableText::getLights(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return this->lightList;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void MovableText::_notifyCurrentCamera(Ogre::Camera *cam)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->camera = cam;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void MovableText::_updateRenderQueue(Ogre::RenderQueue* queue)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -768,17 +751,15 @@ void MovableText::_updateRenderQueue(Ogre::RenderQueue* queue)
     if (this->updateColors)
       this->_updateColors();
 
-    queue->addRenderable(this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY);
+    queue->addRenderable(this, mRenderQueueID,
+                         OGRE_RENDERABLE_DEFAULT_PRIORITY);
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Method to allow a caller to abstractly iterate over the Renderable instances
-void MovableText::visitRenderables( Ogre::Renderable::Visitor* /*visitor*/,
-                                 bool /*debug*/) 
+//////////////////////////////////////////////////
+void MovableText::visitRenderables(Ogre::Renderable::Visitor* /*visitor*/,
+                                 bool /*debug*/)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return;
 }
-
-

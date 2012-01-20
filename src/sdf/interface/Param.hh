@@ -29,6 +29,7 @@
 #include <boost/function.hpp>
 #include <typeinfo>
 #include <string>
+#include <vector>
 
 #include "common/Console.hh"
 #include "common/Color.hh"
@@ -47,13 +48,13 @@ namespace sdf
   {
     /// \brief Constructor
     public: Param(Param *_newParam);
-  
+
     /// \brief Destructor
     public: virtual  ~Param();
 
     /// \brief Begin a block of "new Param<*>"
     public: static void Begin(std::vector<Param*> *_params);
-  
+
     /// \brief End a block of "new Param<*>"
     public: static void End();
 
@@ -61,33 +62,26 @@ namespace sdf
     public: static ParamPtr Find(Param_V &_params, const std::string &key);
 
     /// \brief Get the type
-    public: virtual std::string GetAsString() const 
+    public: virtual std::string GetAsString() const
             {return std::string();}
-  
-    public: virtual std::string GetDefaultAsString() const 
+    public: virtual std::string GetDefaultAsString() const
             {return std::string();}
-
     /// \brief Set the parameter value from a string
-    public: virtual bool SetFromString(const std::string &) 
+    public: virtual bool SetFromString(const std::string &)
             {return true;}
-
     /// \brief Reset the parameter
     public: virtual void Reset() = 0;
 
-    public: const std::string &GetKey() const {return this->key;} 
-
+    public: const std::string &GetKey() const {return this->key;}
     public: std::string GetTypeName() const;
     public: bool GetRequired() const { return this->required; }
-
     /// \brief Return true if the parameter has been set
     public: bool GetSet() const { return this->set; }
-
     public: virtual boost::shared_ptr<Param> Clone() const = 0;
 
     /// \brief Update function
-    public: template<typename T> void SetUpdateFunc( T _updateFunc )
+    public: template<typename T> void SetUpdateFunc(T _updateFunc)
             { this->updateFunc = _updateFunc; }
-
     public: virtual void Update() = 0;
 
     public: bool IsBool() const;
@@ -114,7 +108,7 @@ namespace sdf
     public: bool Set(const gazebo::math::Quaternion &_value);
     public: bool Set(const gazebo::math::Pose &_value);
     public: bool Set(const gazebo::common::Color &_value);
- 
+
     public: bool Get(bool &_value);
     public: bool Get(int &_value);
     public: bool Get(unsigned int &_value);
@@ -126,25 +120,25 @@ namespace sdf
     public: bool Get(gazebo::math::Quaternion &_value);
     public: bool Get(gazebo::math::Pose &_value);
     public: bool Get(gazebo::common::Color &_value);
- 
+
     /// List of created parameters
     private: static std::vector<Param*> *params;
-  
-    protected: std::string key; 
+
+    protected: std::string key;
     protected: bool required;
     protected: bool set;
     protected: std::string typeName;
 
     protected: boost::function<boost::any ()> updateFunc;
   };
-  
- 
-  /// \brief Templatized parameter class 
+
+
+  /// \brief Templatized parameter class
   template< typename T>
   class ParamT : public Param
   {
     /// \brief Constructor
-    public: ParamT(const std::string &_key, const std::string &_default, 
+    public: ParamT(const std::string &_key, const std::string &_default,
                    bool _required)
             : Param(this)
     {
@@ -156,16 +150,15 @@ namespace sdf
       this->defaultValue = this->value;
       this->set = false;
     }
-   
+
     /// \brief Destructor
     public: virtual ~ParamT() {}
-
     public: virtual void Update()
             {
               if (this->updateFunc)
               {
-                const T value = boost::any_cast<T>(this->updateFunc());
-                Param::Set( value );
+                const T v = boost::any_cast<T>(this->updateFunc());
+                Param::Set(v);
               }
             }
 
@@ -176,9 +169,8 @@ namespace sdf
     }
 
     /// \brief Set the parameter value from a string
-    public: virtual bool SetFromString(const std::string &_value) 
+    public: virtual bool SetFromString(const std::string &_value)
     { return this->Set(_value); }
-
 
     public: virtual std::string GetDefaultAsString() const
     {
@@ -186,9 +178,9 @@ namespace sdf
     }
 
     /// \brief Set the parameter value from a string
-    public: virtual bool Set( const std::string &_str )
+    public: virtual bool Set(const std::string &_str)
     {
-      std::string str =_str;
+      std::string str = _str;
       boost::trim(str);
       if (str.empty() && this->required)
       {
@@ -216,11 +208,11 @@ namespace sdf
       {
         this->value = boost::lexical_cast<T>(tmp);
       }
-      catch (boost::bad_lexical_cast &e)
+      catch(boost::bad_lexical_cast &e)
       {
         if (str == "inf" || str == "-inf")
         {
-          // in this case, the parser complains, but seems to assign the 
+          // in this case, the parser complains, but seems to assign the
           // right values
           gzmsg << "INFO [sdf::Param]: boost throws when lexical casting "
             << "inf's, but the values are usually passed through correctly\n";
@@ -235,7 +227,7 @@ namespace sdf
 
       this->set = true;
       return this->set;
-    } 
+    }
 
     /// \brief Get the value
     public: T GetValue() const
@@ -260,22 +252,23 @@ namespace sdf
     public: virtual boost::shared_ptr<Param> Clone() const
             {
               boost::shared_ptr<ParamT<T> > clone(
-                  new ParamT<T>(this->GetKey(),this->GetDefaultAsString(), 
-                                this->required ) );
+                  new ParamT<T>(this->GetKey(), this->GetDefaultAsString(),
+                                this->required));
               return clone;
             }
 
     public: inline T operator*() const {return value;}
-  
-    public: friend std::ostream &operator<<( std::ostream &_out, 
+    public: friend std::ostream &operator<<(std::ostream &_out,
                                              const ParamT<T> &_p)
             {
               _out << _p.value;
               return _out;
             }
-  
+
     protected: T value;
     protected: T defaultValue;
   };
 }
 #endif
+
+

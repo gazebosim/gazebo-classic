@@ -48,20 +48,18 @@ using namespace gazebo;
 using namespace rendering;
 
 
-unsigned int Scene::idCounter = 0;
+uint32_t Scene::idCounter = 0;
 
 struct VisualMessageLess {
     bool operator() (boost::shared_ptr<msgs::Visual const> _i,
-                     boost::shared_ptr<msgs::Visual const> _j) 
-    { 
+                     boost::shared_ptr<msgs::Visual const> _j)
+    {
       return _i->name().size() < _j->name().size();
     }
-
 } VisualMessageLessOp;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 Scene::Scene(const std::string &_name, bool _enableVisualizations)
 {
   this->enableVisualizations = _enableVisualizations;
@@ -76,7 +74,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
 
   this->receiveMutex = new boost::mutex();
 
-  this->connections.push_back( event::Events::ConnectPreRender( boost::bind(&Scene::PreRender, this) ) );
+  this->connections.push_back(
+      event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnSceneMsg, this);
   this->visSub = this->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
@@ -90,7 +89,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/scene.sdf", this->sdf );
+  sdf::initFile("/sdf/scene.sdf", this->sdf);
 
   this->clearAll = false;
 }
@@ -114,12 +113,12 @@ void Scene::Clear()
   this->visuals.clear();
 
   for (Light_M::iterator iter = this->lights.begin();
-      iter != this->lights.end(); iter++)
+      iter != this->lights.end(); ++iter)
   {
     delete iter->second;
   }
 
-  for (unsigned int i=0; i < this->grids.size(); i++)
+  for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
 
@@ -128,8 +127,7 @@ void Scene::Clear()
   RTShaderSystem::Instance()->Clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 Scene::~Scene()
 {
   delete this->selectionObj;
@@ -138,7 +136,7 @@ Scene::~Scene()
   delete this->raySceneQuery;
 
   this->node->Fini();
-  this->node.reset();  
+  this->node.reset();
   this->visSub.reset();
   this->lightSub.reset();
   this->poseSub.reset();
@@ -158,8 +156,8 @@ Scene::~Scene()
 
   this->worldVisual.reset();
   this->selectionMsg.reset();
-  for (Light_M::iterator lightIter = this->lights.begin(); 
-       lightIter != this->lights.end(); lightIter++)
+  for (Light_M::iterator lightIter = this->lights.begin();
+       lightIter != this->lights.end(); ++lightIter)
   {
     delete lightIter->second;
   }
@@ -168,7 +166,7 @@ Scene::~Scene()
   // Remove a scene
   RTShaderSystem::Instance()->RemoveScene(this);
 
-  for (unsigned int i=0; i < this->grids.size(); i++)
+  for (uint32_t i = 0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
 
@@ -186,16 +184,14 @@ Scene::~Scene()
   this->sdf.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load
+//////////////////////////////////////////////////
 void Scene::Load(sdf::ElementPtr &_sdf)
 {
   this->sdf = _sdf;
   this->Load();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load
+//////////////////////////////////////////////////
 void Scene::Load()
 {
   Ogre::Root *root = RenderEngine::Instance()->root;
@@ -211,15 +207,14 @@ VisualPtr Scene::GetWorldVisual() const
   return this->worldVisual;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the scene
+//////////////////////////////////////////////////
 void Scene::Init()
 {
   this->worldVisual.reset(new Visual("__world_node__", this));
 
   RTShaderSystem::Instance()->AddScene(this);
 
-  for (unsigned int i=0; i < this->grids.size(); i++)
+  for (uint32_t i = 0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
   // Create the sky
@@ -229,11 +224,11 @@ void Scene::Init()
   // Create Fog
   if (this->sdf->HasElement("fog"))
   {
-    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog"); 
-    this->SetFog( fogElem->GetValueString("type"), 
-                  fogElem->GetValueColor("rgba"), 
-                  fogElem->GetValueDouble("density"), 
-                  fogElem->GetValueDouble("start"), 
+    boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
+    this->SetFog(fogElem->GetValueString("type"),
+                  fogElem->GetValueColor("rgba"),
+                  fogElem->GetValueDouble("density"),
+                  fogElem->GetValueDouble("start"),
                   fogElem->GetValueDouble("end"));
   }
 
@@ -249,7 +244,7 @@ void Scene::Init()
 
   // Send a request to get the current world state
   this->requestPub = this->node->Advertise<msgs::Request>("~/request", 5, true);
-  this->responseSub = this->node->Subscribe("~/response", 
+  this->responseSub = this->node->Subscribe("~/response",
       &Scene::OnResponse, this);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
@@ -259,34 +254,36 @@ void Scene::Init()
   this->selectionObj->Init();
 }
 
-// TODO: put this back in, and disable PSSM shadows in the RTShader. 
+// TODO: put this back in, and disable PSSM shadows in the RTShader.
 void Scene::InitShadows()
 {
   // Allow a total of 3 shadow casters per scene
   const int numShadowTextures = 3;
 
-  //this->manager->setShadowFarDistance(500);
-  //this->manager->setShadowTextureCount(numShadowTextures);
+  // this->manager->setShadowFarDistance(500);
+  // this->manager->setShadowTextureCount(numShadowTextures);
 
-  //this->manager->setShadowTextureSize(1024);
-  //this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_RGB);
-  //this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-  //this->manager->setShadowTextureSelfShadow(false);
-  //this->manager->setShadowCasterRenderBackFaces(true);
-  //this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+  // this->manager->setShadowTextureSize(1024);
+  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_RGB);
+  // this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+  // this->manager->setShadowTextureSelfShadow(false);
+  // this->manager->setShadowCasterRenderBackFaces(true);
+  // this->manager->setShadowTechnique(
+  // Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
   this->manager->setShadowTextureCasterMaterial("shadow_caster");
 
-  //const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
+  // const unsigned numShadowRTTs = this->manager->getShadowTextureCount();
 
-  /*for (unsigned i = 0; i < numShadowRTTs; ++i) 
+  /*for (unsigned i = 0; i < numShadowRTTs; ++i)
   {
     Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
     Ogre::Viewport *vp = tex->getBuffer()->getRenderTarget()->getViewport(0);
     vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0, 1));
     vp->setClearEveryFrame(true);
 
-    //Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
-    //Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur", true);
+    // Ogre::CompositorManager::getSingleton().addCompositor(vp, "blur");
+    // Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "blur",
+    // true);
   }
   // END
   */
@@ -294,17 +291,17 @@ void Scene::InitShadows()
   this->manager->setShadowTechnique(
       Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
-  //Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
-      //Ogre::TFO_ANISOTROPIC);
+  // Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(
+      // Ogre::TFO_ANISOTROPIC);
 
   this->manager->setShadowFarDistance(500);
   this->manager->setShadowTextureCount(numShadowTextures);
   this->manager->setShadowTextureSize(1024);
-  this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 
+  this->manager->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL,
       numShadowTextures);
   this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
 
-  //this->manager->setShadowTextureCount(numShadowTextures+1);
+  // this->manager->setShadowTextureCount(numShadowTextures+1);
 
   this->manager->setShadowTextureCasterMaterial("shadow_caster");
   this->manager->setShadowCasterRenderBackFaces(true);
@@ -314,58 +311,58 @@ void Scene::InitShadows()
   this->manager->setShadowTextureConfig(0, 512, 512, Ogre::PF_FLOAT32_RGB);
   this->manager->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_RGB);
   this->manager->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_RGB);
-  //this->manager->setShadowTextureConfig(3, 512, 512, Ogre::PF_FLOAT32_RGB);
+  // this->manager->setShadowTextureConfig(3, 512, 512, Ogre::PF_FLOAT32_RGB);
 
 
-  // DEBUG CODE: Will display three overlay panels that show the contents of 
+  // DEBUG CODE: Will display three overlay panels that show the contents of
   // the shadow maps
   // add the overlay elements to show the shadow maps:
   // init overlay elements
   Ogre::OverlayManager& mgr = Ogre::OverlayManager::getSingleton();
   Ogre::Overlay* overlay = mgr.create("DebugOverlay");
-  for (size_t i = 0; i < 3; ++i) {
+  for (size_t i = 0; i < 3; ++i)
+  {
     Ogre::TexturePtr tex = this->manager->getShadowTexture(i);
 
     // Set up a debug panel to display the shadow
-    Ogre::MaterialPtr debugMat =Ogre:: MaterialManager::getSingleton().create(
+    Ogre::MaterialPtr debugMat = Ogre:: MaterialManager::getSingleton().create(
         "Ogre/DebugTexture" + Ogre::StringConverter::toString(i),
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-    Ogre::TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(tex->getName());
+    Ogre::TextureUnitState *t =
+      debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(
+          tex->getName());
     t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
 
     Ogre::OverlayContainer* debugPanel = (Ogre::OverlayContainer*)
-      (Ogre::OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugTexPanel" + Ogre::StringConverter::toString(i)));
+      (Ogre::OverlayManager::getSingleton().createOverlayElement(
+        "Panel", "Ogre/DebugTexPanel" + Ogre::StringConverter::toString(i)));
     debugPanel->_setPosition(0.8, i*0.25);
     debugPanel->_setDimensions(0.2, 0.24);
     debugPanel->setMaterialName(debugMat->getName());
     overlay->add2D(debugPanel);
     overlay->show();
   }
-
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the OGRE scene manager
+//////////////////////////////////////////////////
 Ogre::SceneManager *Scene::GetManager() const
 {
   return this->manager;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the name of the scene
+//////////////////////////////////////////////////
 std::string Scene::GetName() const
 {
   return this->name;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the ambient color
+//////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("ambient");
-  elem->GetAttribute("rgba")->Set( color );
+  elem->GetAttribute("rgba")->Set(color);
 
   // Ambient lighting
   if (this->manager)
@@ -375,49 +372,45 @@ void Scene::SetAmbientColor(const common::Color &color)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ambient color
+//////////////////////////////////////////////////
 common::Color Scene::GetAmbientColor() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("ambient");
   return elem->GetValueColor("rgba");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the background color
+//////////////////////////////////////////////////
 void Scene::SetBackgroundColor(const common::Color &color)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
   elem->GetAttribute("rgba")->Set(color);
 
   std::vector<CameraPtr>::iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
     if ((*iter)->GetViewport())
       (*iter)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
-  for (iter2 = this->userCameras.begin(); 
-       iter2 != this->userCameras.end(); iter2++)
+  for (iter2 = this->userCameras.begin();
+       iter2 != this->userCameras.end(); ++iter2)
   {
     if ((*iter2)->GetViewport())
       (*iter2)->GetViewport()->setBackgroundColour(Conversions::Convert(color));
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the background color
+//////////////////////////////////////////////////
 common::Color Scene::GetBackgroundColor() const
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("background");
   return elem->GetValueColor("rgba");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a grid
-void Scene::CreateGrid(uint32_t cell_count, float cell_length, 
-                       float line_width, const common::Color &color )
+//////////////////////////////////////////////////
+void Scene::CreateGrid(uint32_t cell_count, float cell_length,
+                       float line_width, const common::Color &color)
 {
   Grid *grid = new Grid(this, cell_count, cell_length, line_width, color);
 
@@ -425,12 +418,10 @@ void Scene::CreateGrid(uint32_t cell_count, float cell_length,
     grid->Init();
 
   this->grids.push_back(grid);
-  
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the grid
-Grid *Scene::GetGrid(unsigned int index) const
+//////////////////////////////////////////////////
+Grid *Scene::GetGrid(uint32_t index) const
 {
   if (index >= this->grids.size())
   {
@@ -441,8 +432,7 @@ Grid *Scene::GetGrid(unsigned int index) const
   return this->grids[index];
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//Create a camera
+//////////////////////////////////////////////////
 CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
 {
   CameraPtr camera(new Camera(this->name + "::" + _name, this, _autoRender));
@@ -451,9 +441,9 @@ CameraPtr Scene::CreateCamera(const std::string &_name, bool _autoRender)
   return camera;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
-                                        bool _autoRender )
+                                        bool _autoRender)
 {
   DepthCameraPtr camera(new DepthCamera(this->name + "::" + _name,
         this, _autoRender));
@@ -462,16 +452,14 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
   return camera;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of cameras in this scene
-unsigned int Scene::GetCameraCount() const
+//////////////////////////////////////////////////
+uint32_t Scene::GetCameraCount() const
 {
   return this->cameras.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a specific camera by index
-CameraPtr Scene::GetCamera(unsigned int index) const
+//////////////////////////////////////////////////
+CameraPtr Scene::GetCamera(uint32_t index) const
 {
   CameraPtr cam;
 
@@ -481,13 +469,12 @@ CameraPtr Scene::GetCamera(unsigned int index) const
   return cam;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a camera by name
-CameraPtr Scene::GetCamera( const std::string &_name ) const
+//////////////////////////////////////////////////
+CameraPtr Scene::GetCamera(const std::string &_name) const
 {
   CameraPtr result;
   std::vector<CameraPtr>::const_iterator iter;
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
     if ((*iter)->GetName() == _name)
       result = *iter;
@@ -495,12 +482,11 @@ CameraPtr Scene::GetCamera( const std::string &_name ) const
 
   return result;
 }
- 
-////////////////////////////////////////////////////////////////////////////////
-// Create a user camera
+
+//////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
 {
-  UserCameraPtr camera( new UserCamera(this->GetName() + "::" + name_, this) );
+  UserCameraPtr camera(new UserCamera(this->GetName() + "::" + name_, this));
   camera->Load();
   camera->Init();
   this->userCameras.push_back(camera);
@@ -508,16 +494,14 @@ UserCameraPtr Scene::CreateUserCamera(const std::string &name_)
   return camera;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of user cameras in this scene
-unsigned int Scene::GetUserCameraCount() const
+//////////////////////////////////////////////////
+uint32_t Scene::GetUserCameraCount() const
 {
   return this->userCameras.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a specific user camera by index
-UserCameraPtr Scene::GetUserCamera(unsigned int index) const
+//////////////////////////////////////////////////
+UserCameraPtr Scene::GetUserCamera(uint32_t index) const
 {
   UserCameraPtr cam;
 
@@ -528,8 +512,7 @@ UserCameraPtr Scene::GetUserCamera(unsigned int index) const
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a visual by name 
+//////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
 {
   VisualPtr result;
@@ -546,9 +529,8 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Select a visual by name
-void Scene::SelectVisual( const std::string &_name ) const
+//////////////////////////////////////////////////
+void Scene::SelectVisual(const std::string &_name) const
 {
   VisualPtr vis = this->GetVisual(_name);
   if (vis)
@@ -557,10 +539,11 @@ void Scene::SelectVisual( const std::string &_name ) const
     this->selectionObj->Clear();
 }
 
+//////////////////////////////////////////////////
 VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 {
   std::string mod;
-  VisualPtr vis = this->GetVisualAt(camera,mousePos, mod);
+  VisualPtr vis = this->GetVisualAt(camera, mousePos, mod);
   if (vis)
     this->selectionObj->Attach(vis);
   else
@@ -570,10 +553,9 @@ VisualPtr Scene::SelectVisualAt(CameraPtr camera, math::Vector2i mousePos)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get an entity at a pixel location using a camera. Used for mouse picking. 
-VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos, 
-                             std::string &_mod) 
+//////////////////////////////////////////////////
+VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
+                             std::string &_mod)
 {
   VisualPtr visual;
   Ogre::Entity *closestEntity = this->GetOgreEntityAt(camera, mousePos, false);
@@ -582,7 +564,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   if (closestEntity)
   {
     // Make sure we set the _mod only if we have found a selection object
-    if (closestEntity->getName().substr(0,15) == "__SELECTION_OBJ" &&
+    if (closestEntity->getName().substr(0, 15) == "__SELECTION_OBJ" &&
         closestEntity->getUserAny().getType() == typeid(std::string))
       _mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
 
@@ -603,9 +585,7 @@ VisualPtr Scene::GetVisualBelowPoint(const math::Vector3 &_pt)
   return visual;
 }
 
- 
-////////////////////////////////////////////////////////////////////////////////
-/// Get an entity at a pixel location using a camera. Used for mouse picking. 
+//////////////////////////////////////////////////
 VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
 {
   VisualPtr visual;
@@ -624,17 +604,17 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
                                              bool _ignoreSelectionObj)
 {
   Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0,0,-1));
+  Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
 
   this->raySceneQuery->setRay(ray);
-  this->raySceneQuery->setSortByDistance(true,0);
+  this->raySceneQuery->setSortByDistance(true, 0);
 
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
   Ogre::Entity *closestEntity = NULL;
 
-  for (iter = result.begin(); iter != result.end(); iter++)
+  for (iter = result.begin(); iter != result.end(); ++iter)
   {
     // is the result a MovableObject
     if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
@@ -643,21 +623,21 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
           iter->movable->getName().find("__COLLISION_VISUAL__") !=
           std::string::npos)
         continue;
-      if (_ignoreSelectionObj && 
-          iter->movable->getName().substr(0,15) == "__SELECTION_OBJ")
+      if (_ignoreSelectionObj &&
+          iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
 
-      // mesh data to retrieve         
+      // mesh data to retrieve
       size_t vertex_count;
       size_t index_count;
       Ogre::Vector3 *vertices;
-      unsigned long *indices;
+      uint64_t *indices;
 
       // Get the mesh information
-      this->GetMeshInformation( pentity->getMesh().get(), vertex_count, 
-          vertices, index_count, indices,             
+      this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
+          vertices, index_count, indices,
           pentity->getParentNode()->_getDerivedPosition(),
           pentity->getParentNode()->_getDerivedOrientation(),
           pentity->getParentNode()->_getDerivedScale());
@@ -667,13 +647,13 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
       {
         // when indices size is not divisible by 3
         if (i+2 >= static_cast<int>(index_count))
-          break; 
+          break;
 
         // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray, 
-            vertices[indices[i]], 
-            vertices[indices[i+1]], 
-            vertices[indices[i+2]], 
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray,
+            vertices[indices[i]],
+            vertices[indices[i+1]],
+            vertices[indices[i+2]],
             true, false);
 
         // if it was a hit check if its the closest
@@ -682,7 +662,7 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
           if ((closest_distance < 0.0f) || (hit.second < closest_distance))
           {
             // this is the closest so far, save it off
-            closest_distance = hit.second; 
+            closest_distance = hit.second;
             new_closest_found = true;
           }
         }
@@ -694,7 +674,7 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
       if (new_closest_found)
       {
         closestEntity = pentity;
-        //break;
+        // break;
       }
     }
   }
@@ -702,7 +682,7 @@ Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
   return closestEntity;
 }
 
-Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera, 
+Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
                                      math::Vector2i _mousePos,
                                      bool _ignoreSelectionObj)
 {
@@ -710,17 +690,19 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)_mousePos.x / ogreCam->getViewport()->getActualWidth(), 
-      (float)_mousePos.y / ogreCam->getViewport()->getActualHeight() );
+      static_cast<float>(_mousePos.x) /
+      ogreCam->getViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.y) /
+      ogreCam->getViewport()->getActualHeight());
 
-  this->raySceneQuery->setRay( mouseRay );
+  this->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
   Ogre::Entity *closestEntity = NULL;
 
-  for (iter = result.begin(); iter != result.end(); iter++)
+  for (iter = result.begin(); iter != result.end(); ++iter)
   {
     // is the result a MovableObject
     if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
@@ -729,21 +711,21 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
           iter->movable->getName().find("__COLLISION_VISUAL__") !=
           std::string::npos)
         continue;
-      if (_ignoreSelectionObj && 
-          iter->movable->getName().substr(0,15) == "__SELECTION_OBJ")
+      if (_ignoreSelectionObj &&
+          iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
       Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
 
-      // mesh data to retrieve         
+      // mesh data to retrieve
       size_t vertex_count;
       size_t index_count;
       Ogre::Vector3 *vertices;
-      unsigned long *indices;
+      uint64_t *indices;
 
       // Get the mesh information
-      this->GetMeshInformation( pentity->getMesh().get(), vertex_count, 
-          vertices, index_count, indices,             
+      this->GetMeshInformation(pentity->getMesh().get(), vertex_count,
+          vertices, index_count, indices,
           pentity->getParentNode()->_getDerivedPosition(),
           pentity->getParentNode()->_getDerivedOrientation(),
           pentity->getParentNode()->_getDerivedScale());
@@ -753,13 +735,13 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       {
         // when indices size is not divisible by 3
         if (i+2 >= static_cast<int>(index_count))
-          break; 
+          break;
 
         // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, 
-            vertices[indices[i]], 
-            vertices[indices[i+1]], 
-            vertices[indices[i+2]], 
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
+            vertices[indices[i]],
+            vertices[indices[i+1]],
+            vertices[indices[i+2]],
             true, false);
 
         // if it was a hit check if its the closest
@@ -768,7 +750,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
           if ((closest_distance < 0.0f) || (hit.second < closest_distance))
           {
             // this is the closest so far, save it off
-            closest_distance = hit.second; 
+            closest_distance = hit.second;
             new_closest_found = true;
           }
         }
@@ -780,7 +762,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
       if (new_closest_found)
       {
         closestEntity = pentity;
-        //break;
+        // break;
       }
     }
   }
@@ -788,17 +770,18 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
   return closestEntity;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the world pos of a the first contact at a pixel location
+//////////////////////////////////////////////////
 math::Vector3 Scene::GetFirstContact(CameraPtr camera, math::Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetOgreCamera();
-  //Ogre::Real closest_distance = -1.0f;
+  // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
-      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
+      static_cast<float>(mousePos.x) /
+      ogreCam->getViewport()->getActualWidth(),
+      static_cast<float>(mousePos.y) /
+      ogreCam->getViewport()->getActualHeight());
 
-  this->raySceneQuery->setRay( mouseRay );
+  this->raySceneQuery->setRay(mouseRay);
 
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
@@ -809,15 +792,13 @@ math::Vector3 Scene::GetFirstContact(CameraPtr camera, math::Vector2i mousePos)
   return math::Vector3(pt.x, pt.y, pt.z);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Print scene graph
+//////////////////////////////////////////////////
 void Scene::PrintSceneGraph()
 {
   this->PrintSceneGraphHelper("", this->manager->getRootSceneNode());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Print scene graph
+//////////////////////////////////////////////////
 void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 {
   Ogre::SceneNode *snode = dynamic_cast<Ogre::SceneNode*>(node_);
@@ -836,7 +817,7 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 
   std::cout << prefix_ << nodeName << "\n";
   std::cout << prefix_ << "  Num Objs[" << numAttachedObjs << "]\n";
-  for (int i=0; i < numAttachedObjs; i++)
+  for (int i = 0; i < numAttachedObjs; i++)
   {
     std::cout << prefix_
       << "    Obj[" << snode->getAttachedObject(i)->getName() << "]\n";
@@ -847,24 +828,23 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
     << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
   std::cout << prefix_
     << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
-  
-  for (unsigned int i=0; i < node_->numChildren(); i++)
+
+  for (uint32_t i = 0; i < node_->numChildren(); i++)
   {
-    this->PrintSceneGraphHelper( prefix_ + "  ", node_->getChild(i) );
+    this->PrintSceneGraphHelper(prefix_ + "  ", node_->getChild(i));
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Draw a named line
-void Scene::DrawLine(const math::Vector3 &start_, 
-                     const math::Vector3 &end_, 
+//////////////////////////////////////////////////
+void Scene::DrawLine(const math::Vector3 &start_,
+                     const math::Vector3 &end_,
                      const std::string &name_)
 {
   Ogre::SceneNode *sceneNode = NULL;
   Ogre::ManualObject *obj = NULL;
   bool attached = false;
 
-  if ( this->manager->hasManualObject(name_))
+  if (this->manager->hasManualObject(name_))
   {
     sceneNode = this->manager->getSceneNode(name_);
     obj = this->manager->getManualObject(name_);
@@ -873,26 +853,25 @@ void Scene::DrawLine(const math::Vector3 &start_,
   else
   {
     sceneNode = this->manager->getRootSceneNode()->createChildSceneNode(name_);
-    obj = this->manager->createManualObject(name_); 
+    obj = this->manager->createManualObject(name_);
   }
 
   sceneNode->setVisible(true);
   obj->setVisible(true);
 
   obj->clear();
-  obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST); 
-  obj->position(start_.x, start_.y, start_.z); 
-  obj->position(end_.x, end_.y, end_.z); 
-  obj->end(); 
+  obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
+  obj->position(start_.x, start_.y, start_.z);
+  obj->position(end_.x, end_.y, end_.z);
+  obj->end();
 
   if (!attached)
     sceneNode->attachObject(obj);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set fog for this scene
-void Scene::SetFog( const std::string &_type, const common::Color &_color, 
-                    double _density, double _start, double _end )
+//////////////////////////////////////////////////
+void Scene::SetFog(const std::string &_type, const common::Color &_color,
+                    double _density, double _start, double _end)
 {
   Ogre::FogMode fogType = Ogre::FOG_NONE;
 
@@ -912,44 +891,39 @@ void Scene::SetFog( const std::string &_type, const common::Color &_color,
   elem->GetAttribute("end")->Set(_end);
 
   if (this->manager)
-    this->manager->setFog( fogType, Conversions::Convert(_color), 
-                           _density, _start, _end );
+    this->manager->setFog(fogType, Conversions::Convert(_color),
+                           _density, _start, _end);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Hide a visual
+//////////////////////////////////////////////////
 void Scene::SetVisible(const std::string &name_, bool visible_)
 {
   if (this->manager->hasSceneNode(name_))
     this->manager->getSceneNode(name_)->setVisible(visible_);
 
-  if ( this->manager->hasManualObject(name_))
+  if (this->manager->hasManualObject(name_))
     this->manager->getManualObject(name_)->setVisible(visible_);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the scene ID
-unsigned int Scene::GetId() const
+//////////////////////////////////////////////////
+uint32_t Scene::GetId() const
 {
   return this->id;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the scene Id as a string
+//////////////////////////////////////////////////
 std::string Scene::GetIdString() const
 {
   return this->idString;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the mesh information for the given mesh.
-// Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
+//////////////////////////////////////////////////
 void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
                                size_t &vertex_count,
                                Ogre::Vector3* &vertices,
                                size_t &index_count,
-                               unsigned long* &indices,
+                               uint64_t* &indices,
                                const Ogre::Vector3 &position,
                                const Ogre::Quaternion &orient,
                                const Ogre::Vector3 &scale)
@@ -962,14 +936,14 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
   vertex_count = index_count = 0;
 
   // Calculate how many vertices and indices we're going to need
-  for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
+  for (uint16_t i = 0; i < mesh->getNumSubMeshes(); ++i)
   {
-    Ogre::SubMesh* submesh = mesh->getSubMesh( i );
+    Ogre::SubMesh* submesh = mesh->getSubMesh(i);
 
     // We only need to add the shared vertices once
-    if(submesh->useSharedVertices)
+    if (submesh->useSharedVertices)
     {
-      if( !added_shared )
+      if (!added_shared)
       {
         vertex_count += mesh->sharedVertexData->vertexCount;
         added_shared = true;
@@ -987,41 +961,44 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
 
   // Allocate space for the vertices and indices
   vertices = new Ogre::Vector3[vertex_count];
-  indices = new unsigned long[index_count];
+  indices = new uint64_t[index_count];
 
   added_shared = false;
 
   // Run through the submeshes again, adding the data into the arrays
-  for ( unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
+  for (uint16_t i = 0; i < mesh->getNumSubMeshes(); ++i)
   {
     Ogre::SubMesh* submesh = mesh->getSubMesh(i);
 
-    Ogre::VertexData* vertex_data = submesh->useSharedVertices ? mesh->sharedVertexData : submesh->vertexData;
+    Ogre::VertexData* vertex_data =
+      submesh->useSharedVertices ? mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) || 
+    if ((!submesh->useSharedVertices) ||
         (submesh->useSharedVertices && !added_shared))
     {
-      if(submesh->useSharedVertices)
+      if (submesh->useSharedVertices)
       {
         added_shared = true;
       }
 
       const Ogre::VertexElement* posElem =
-        vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
+        vertex_data->vertexDeclaration->findElementBySemantic(
+            Ogre::VES_POSITION);
 
       Ogre::HardwareVertexBufferSharedPtr vbuf =
         vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
 
-      unsigned char* vertex =
-        static_cast<unsigned char*>(vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+      unsigned char *vertex =
+        static_cast<unsigned char*>(
+            vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
 
-      // There is _no_ baseVertexPointerToElement() which takes an 
-      // Ogre::Real or a double as second argument. So make it float, 
+      // There is _no_ baseVertexPointerToElement() which takes an
+      // Ogre::Real or a double as second argument. So make it float,
       // to avoid trouble when Ogre::Real will be comiled/typedefed as double:
       //      Ogre::Real* pReal;
-      float* pReal;
+      float *pReal;
 
-      for( size_t j = 0; j < vertex_data->vertexCount; 
+      for (size_t j = 0; j < vertex_data->vertexCount;
            ++j, vertex += vbuf->getVertexSize())
       {
         posElem->baseVertexPointerToElement(vertex, &pReal);
@@ -1036,21 +1013,22 @@ void Scene::GetMeshInformation(const Ogre::Mesh *mesh,
     Ogre::IndexData* index_data = submesh->indexData;
     Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
 
-    unsigned long*  pLong = static_cast<unsigned long*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
+    uint64_t*  pLong = static_cast<uint64_t*>(
+        ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
 
-    if ( (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT) )
+    if ((ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT))
     {
-      for ( size_t k = 0; k < index_data->indexCount; k++)
+      for (size_t k = 0; k < index_data->indexCount; k++)
       {
         indices[index_offset++] = pLong[k];
       }
     }
     else
     {
-      unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
-      for ( size_t k = 0; k < index_data->indexCount; k++)
+      uint16_t* pShort = reinterpret_cast<uint16_t*>(pLong);
+      for (size_t k = 0; k < index_data->indexCount; k++)
       {
-        indices[index_offset++] = static_cast<unsigned long>(pShort[k]);
+        indices[index_offset++] = static_cast<uint64_t>(pShort[k]);
       }
     }
 
@@ -1065,50 +1043,50 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
     return;
 
   boost::mutex::scoped_lock lock(*this->receiveMutex);
-  boost::shared_ptr<msgs::Scene> sm( new msgs::Scene() );
+  boost::shared_ptr<msgs::Scene> sm(new msgs::Scene());
   if (_msg->has_type() && _msg->type() == sm->GetTypeName())
   {
     sm->ParseFromString(_msg->serialized_data());
-    this->sceneMsgs.push_back( sm );
+    this->sceneMsgs.push_back(sm);
   }
 }
 
-void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
+void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
-  std::string sceneName = _msg->name() + "::";
   std::string modelName, linkName;
-  for (int i=0; i < _msg->model_size(); i++)
+  for (int i = 0; i < _msg->model_size(); i++)
   {
     modelName = _msg->model(i).name() + "::";
     boost::shared_ptr<msgs::Pose> pm(new msgs::Pose(_msg->model(i).pose()));
     pm->set_name(_msg->model(i).name());
     this->poseMsgs.push_front(pm);
 
-    for (int j=0; j < _msg->model(i).visual_size(); j++)
+    for (int j = 0; j < _msg->model(i).visual_size(); j++)
     {
       boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
             _msg->model(i).visual(j)));
       this->visualMsgs.push_back(vm);
     }
 
-    for (int j=0; j < _msg->model(i).link_size(); j++)
+    for (int j = 0; j < _msg->model(i).link_size(); j++)
     {
-      linkName = modelName +_msg->model(i).link(j).name(); 
+      linkName = modelName +_msg->model(i).link(j).name();
       boost::shared_ptr<msgs::Pose> pm2(
           new msgs::Pose(_msg->model(i).link(j).pose()));
       pm2->set_name(linkName);
       this->poseMsgs.push_front(pm2);
 
-      for (int k=0; k < _msg->model(i).link(j).visual_size(); k++)
+      for (int k = 0; k < _msg->model(i).link(j).visual_size(); k++)
       {
         boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
               _msg->model(i).link(j).visual(k)));
         this->visualMsgs.push_back(vm);
       }
 
-      for (int k=0; k < _msg->model(i).link(j).collision_size(); k++)
+      for (int k = 0; k < _msg->model(i).link(j).collision_size(); k++)
       {
-        for (int l=0; l < _msg->model(i).link(j).collision(k).visual_size();l++)
+        for (int l = 0;
+             l < _msg->model(i).link(j).collision(k).visual_size(); l++)
         {
           boost::shared_ptr<msgs::Visual> vm(new msgs::Visual(
                 _msg->model(i).link(j).collision(k).visual(l)));
@@ -1116,7 +1094,7 @@ void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
         }
       }
 
-      for (int k=0; k < _msg->model(i).link(j).sensor_size(); k++)
+      for (int k = 0; k < _msg->model(i).link(j).sensor_size(); k++)
       {
         boost::shared_ptr<msgs::Sensor> sm(new msgs::Sensor(
               _msg->model(i).link(j).sensor(k)));
@@ -1125,29 +1103,29 @@ void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
     }
   }
 
-  for (int i=0; i < _msg->light_size(); i++)
+  for (int i = 0; i < _msg->light_size(); i++)
   {
-    boost::shared_ptr<msgs::Light> lm( new msgs::Light(_msg->light(i)) );
-    this->lightMsgs.push_back( lm );
+    boost::shared_ptr<msgs::Light> lm(new msgs::Light(_msg->light(i)));
+    this->lightMsgs.push_back(lm);
   }
 
-  for (int i=0; i < _msg->joint_size(); i++)
+  for (int i = 0; i < _msg->joint_size(); i++)
   {
-    boost::shared_ptr<msgs::Joint> jm( new msgs::Joint(_msg->joint(i)) );
+    boost::shared_ptr<msgs::Joint> jm(new msgs::Joint(_msg->joint(i)));
     this->jointMsgs.push_back(jm);
   }
 
   if (_msg->has_ambient())
-    this->SetAmbientColor( msgs::Convert(_msg->ambient()) );
+    this->SetAmbientColor(msgs::Convert(_msg->ambient()));
 
   if (_msg->has_background())
-    this->SetBackgroundColor( msgs::Convert(_msg->background()) );
+    this->SetBackgroundColor(msgs::Convert(_msg->background()));
 
   if (_msg->has_sky_material())
     this->SetSky(_msg->sky_material());
 
   if (_msg->has_shadows())
-    this->SetShadowsEnabled( _msg->shadows() );
+    this->SetShadowsEnabled(_msg->shadows());
 
   if (_msg->has_grid())
     this->SetGrid(_msg->grid());
@@ -1157,16 +1135,16 @@ void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
     sdf::ElementPtr elem = this->sdf->GetOrCreateElement("fog");
 
     if (_msg->fog().has_color())
-      elem->GetAttribute("rgba")->Set( msgs::Convert(_msg->fog().color()) );
+      elem->GetAttribute("rgba")->Set(msgs::Convert(_msg->fog().color()));
 
     if (_msg->fog().has_density())
-      elem->GetAttribute("density")->Set( _msg->fog().density() );
+      elem->GetAttribute("density")->Set(_msg->fog().density());
 
     if (_msg->fog().has_start())
-      elem->GetAttribute("start")->Set( _msg->fog().start() );
+      elem->GetAttribute("start")->Set(_msg->fog().start());
 
     if (_msg->fog().has_end())
-      elem->GetAttribute("end")->Set( _msg->fog().end() );
+      elem->GetAttribute("end")->Set(_msg->fog().end());
 
     if (_msg->fog().has_type())
     {
@@ -1180,10 +1158,10 @@ void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
       else
         type = "none";
 
-      elem->GetAttribute("type")->Set( type );
+      elem->GetAttribute("type")->Set(type);
     }
 
-    this->SetFog( elem->GetValueString("type"),
+    this->SetFog(elem->GetValueString("type"),
                   elem->GetValueColor("rgba"),
                   elem->GetValueDouble("density"),
                   elem->GetValueDouble("start"),
@@ -1191,20 +1169,21 @@ void Scene::ProcessSceneMsg( ConstScenePtr &_msg)
   }
 }
 
+//////////////////////////////////////////////////
 void Scene::OnSceneMsg(ConstScenePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->sceneMsgs.push_back(_msg);
 }
 
+//////////////////////////////////////////////////
 void Scene::OnVisualMsg(ConstVisualPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(_msg);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Process all incoming messages before rendering
+//////////////////////////////////////////////////
 void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1216,59 +1195,59 @@ void Scene::PreRender()
   JointMsgs_L::iterator jIter;
   SensorMsgs_L::iterator sensorIter;
 
-  for (sensorIter = this->sensorMsgs.begin(); 
-       sensorIter != this->sensorMsgs.end(); sensorIter++)
+  for (sensorIter = this->sensorMsgs.begin();
+       sensorIter != this->sensorMsgs.end(); ++sensorIter)
   {
     this->ProcessSensorMsg(*sensorIter);
   }
   this->sensorMsgs.clear();
 
   // Process the scene messages. DO THIS FIRST
-  for (sIter = this->sceneMsgs.begin(); 
-       sIter != this->sceneMsgs.end(); sIter++)
+  for (sIter = this->sceneMsgs.begin();
+       sIter != this->sceneMsgs.end(); ++sIter)
   {
-    this->ProcessSceneMsg( *sIter );
+    this->ProcessSceneMsg(*sIter);
   }
   this->sceneMsgs.clear();
 
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
-  for (vIter = this->visualMsgs.begin(); 
-       vIter != this->visualMsgs.end(); vIter++)
+  for (vIter = this->visualMsgs.begin();
+       vIter != this->visualMsgs.end(); ++vIter)
   {
     this->ProcessVisualMsg(*vIter);
   }
   this->visualMsgs.clear();
 
   // Process the light messages
-  for (lIter =  this->lightMsgs.begin(); 
-       lIter != this->lightMsgs.end(); lIter++)
+  for (lIter =  this->lightMsgs.begin();
+       lIter != this->lightMsgs.end(); ++lIter)
   {
-    this->ProcessLightMsg( *lIter );
+    this->ProcessLightMsg(*lIter);
   }
   this->lightMsgs.clear();
 
   // Process the joint messages
-  for (jIter =  this->jointMsgs.begin(); 
-       jIter != this->jointMsgs.end(); jIter++)
+  for (jIter =  this->jointMsgs.begin();
+       jIter != this->jointMsgs.end(); ++jIter)
   {
-    this->ProcessJointMsg( *jIter );
+    this->ProcessJointMsg(*jIter);
   }
   this->jointMsgs.clear();
 
   // Process all the model messages last. Remove pose message from the list
   // only when a corresponding visual exits. We may receive pose updates
   // over the wire before  we recieve the visual
-  pIter = this->poseMsgs.begin(); 
+  pIter = this->poseMsgs.begin();
   while (pIter != this->poseMsgs.end())
   {
     Visual_M::iterator iter = this->visuals.find((*pIter)->name());
     if (iter != this->visuals.end())
     {
       // If an object is selected, don't let the physics engine move it.
-      if (this->selectionObj->GetVisualName().empty() || 
+      if (this->selectionObj->GetVisualName().empty() ||
           !this->selectionObj->IsActive() ||
-          iter->first.find(this->selectionObj->GetVisualName()) == 
+          iter->first.find(this->selectionObj->GetVisualName()) ==
           std::string::npos)
       {
         math::Pose pose = msgs::Convert(*(*pIter));
@@ -1346,13 +1325,13 @@ void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
 
   if (parentVis && childVis)
   {
-    DynamicLines *line= parentVis->CreateDynamicLine();
-    //this->worldVisual->AttachObject(line);
+    DynamicLines *line = parentVis->CreateDynamicLine();
+    // this->worldVisual->AttachObject(line);
 
-    line->AddPoint(math::Vector3(0,0,0));
-    line->AddPoint(math::Vector3(0,0,0));
+    line->AddPoint(math::Vector3(0, 0, 0));
+    line->AddPoint(math::Vector3(0, 0, 0));
 
-    //parentVis->AttachLineVertex(line, 0);
+    // parentVis->AttachLineVertex(line, 0);
     childVis->AttachLineVertex(line, 1);
   }
   else
@@ -1395,17 +1374,16 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
     if (vis)
       vis->SetTransparency(_msg->dbl_data());
   }
-
 }
 
 void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
   Visual_M::iterator iter;
-  iter = this->visuals.find( _msg->name() );
+  iter = this->visuals.find(_msg->name());
 
-  if (_msg->has_delete_me() && _msg->delete_me() )
+  if (_msg->has_delete_me() && _msg->delete_me())
   {
-    if (iter != this->visuals.end() )
+    if (iter != this->visuals.end())
     {
       this->visuals.erase(iter);
     }
@@ -1427,7 +1405,7 @@ void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     {
       visual.reset(new Visual(_msg->name(), iter->second));
     }
-    else 
+    else
     {
       visual.reset(new Visual(_msg->name(), this->worldVisual));
     }
@@ -1441,22 +1419,22 @@ void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   }
 }
 
-void Scene::OnPoseMsg( ConstPosePtr &_msg)
+void Scene::OnPoseMsg(ConstPosePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   PoseMsgs_L::iterator iter;
 
   // Find an old model message, and remove them
-  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
+  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); ++iter)
   {
-    if ( (*iter)->name() == _msg->name() )
+    if ((*iter)->name() == _msg->name())
     {
       this->poseMsgs.erase(iter);
       break;
     }
   }
 
-  this->poseMsgs.push_back( _msg );
+  this->poseMsgs.push_back(_msg);
 }
 
 void Scene::OnLightMsg(ConstLightPtr &_msg)
@@ -1485,20 +1463,22 @@ void Scene::OnSelectionMsg(ConstSelectionPtr &_msg)
 
 void Scene::SetSky(const std::string &_material)
 {
-  this->sdf->GetOrCreateElement("background")->GetOrCreateElement("sky")->GetAttribute("material")->Set(_material);
+  this->sdf->GetOrCreateElement("background")->GetOrCreateElement(
+      "sky")->GetAttribute("material")->Set(_material);
 
   try
   {
     Ogre::Quaternion orientation;
-    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1,0,0));
-    double curvature = 10; // ogre recommended default
-    double tiling = 8; // ogre recommended default
-    double distance = 4000; // ogre recommended default
-    this->manager->setSkyDome(true, _material, curvature, tiling, distance, true, orientation);
+    orientation.FromAngleAxis(Ogre::Degree(90), Ogre::Vector3(1, 0, 0));
+    double curvature = 10;  // ogre recommended default
+    double tiling = 8;  // ogre recommended default
+    double distance = 4000;  // ogre recommended default
+    this->manager->setSkyDome(true, _material, curvature,
+        tiling, distance, true, orientation);
   }
-  catch (int)
+  catch(int)
   {
-    gzwarn << "Unable to set sky dome to material[" << _material << "]\n"; 
+    gzwarn << "Unable to set sky dome to material[" << _material << "]\n";
   }
 }
 
@@ -1523,13 +1503,11 @@ bool Scene::GetShadowsEnabled() const
   return shadowElem->GetValueBool("enabled");
 }
 
-/// Add a visual to the scene
-void Scene::AddVisual( VisualPtr &_vis )
+void Scene::AddVisual(VisualPtr &_vis)
 {
   this->visuals[_vis->GetName()] = _vis;
 }
 
-/// Remove a visual from the scene
 void Scene::RemoveVisual(VisualPtr _vis)
 {
   if (_vis)
@@ -1555,28 +1533,28 @@ std::string Scene::GetUniqueName(const std::string &_prefix)
   {
     test.str("");
     test << _prefix << "_" << index++;
-    exists = this->manager->hasSceneNode( test.str() );
+    exists = this->manager->hasSceneNode(test.str());
   }
 
   return test.str();
 }
 
-/// Get the selection object
 SelectionObj *Scene::GetSelectionObj() const
 {
   return this->selectionObj;
 }
 
-void Scene::SetGrid( bool _enabled )
+void Scene::SetGrid(bool _enabled)
 {
   if (_enabled)
   {
-    Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
+    Grid *grid = new Grid(this, 1, 1, 10, common::Color(1, 1, 0, 1));
     grid->Init();
     this->grids.push_back(grid);
 
-    grid = new Grid(this, 20, 1, 10, common::Color(1,1,1,1));
+    grid = new Grid(this, 20, 1, 10, common::Color(1, 1, 1, 1));
     grid->Init();
     this->grids.push_back(grid);
   }
 }
+

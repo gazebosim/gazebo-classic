@@ -37,9 +37,12 @@ def ParseArguments(args):
   return filenames
 
 def ProcessFile(filename):
-  lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
+  #lines = codecs.open(filename, 'r', 'utf8', 'replace').read().split('\n')
+  lines = codecs.open(filename, 'r', 'utf8', 'replace').readlines()
+  outFile = open(filename,'w')
   # Remove trailing '\r'.
   for linenum in range(len(lines)):
+    lines[linenum] = lines[linenum].rstrip('\n')
     if lines[linenum].endswith('\r'):
       lines[linenum] = lines[linenum].rstrip('\r')
       carriage_return_found = True
@@ -50,78 +53,106 @@ def ProcessFile(filename):
 
   for linenum in range(len(lines)):
     line = lines[linenum]
-
-    # Skip blank lines after start of new block
-    if re.search(r'^\s*$',line) or len(line) == 0:
-      prevLine = lines[linenum-1]
-      if re.search(r'\s*{', prevLine):
-        continue
+    prevLine = lines[linenum-1]
 
     # Remove space at end of lines
     if line and line[-1].isspace():
       line = line.rstrip()
 
-    # Remove spaces after ( and before )
-    line = re.sub(r'\(\s*','(',line)
-    line = re.sub(r'\s*\)',')',line)
+    #if 'http' not in line:
+    #  line = re.sub(r'//([a-z])','// \\1', line)
+    #  line = re.sub(r'//(\()','// \\1', line)
+    #  line = re.sub(r'//([A-Z])','// \\1', line)
+    #  line = re.sub(r'//({)','// \\1', line)
+    #  line = re.sub(r'//(})','// \\1', line)
 
-    # Add space after comma
-    line = re.sub(r',\s*',',',line)
-    line = re.sub(r',(\S)',', \\1',line)
+    if len(line) > 80:
+      index = line.rfind(',', 0, 80)
+      if index < 0:
+        index = line.rfind('=',0,80)
+        if index <0:
+          index = line.rfind('(',0,80)
+      print >>outFile, line[0:index+1]
+      print >>outFile, line[index+1:len(line)]
+    else:
+      print >>outFile, line
 
-    # Add space around =
-    line = re.sub(r'(\w|\d)=','\\1 =',line)
-    line = re.sub(r'=(\w|\d)','= \\1',line)
+    # Skip blank lines after start of new block
+    #if re.search(r'^\s*$',line) or len(line) == 0:
+    #  prevLine = lines[linenum-1]
+    #  if re.search(r'\s*{', prevLine):
+    #    continue
 
-    regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('
-    if re.match(regexp, line) and not re.search(r'\(\)\(\)',line):
-      funcStart = 0
-      regexp = r'(\s|\w|:)*?\(((\s|\S)*)\)\s*:*'
-      matchResult = re.match(regexp,line)
-      if matchResult:
-        tmp = matchResult.group(2)
-        tmp = re.sub(r'\)\s*:(\s*\S*)+$','',tmp)
-        params = tmp.split(',')
-        for param in params:
-          if len(param) > 0:
-            param = param.rstrip()
-            index = param.rfind(' ')
-            paramType = param[0:index]
-            paramName = param[index+1:]
-            paramNameStripped = paramName.lstrip("*&")
-            if re.search(r'\[', paramNameStripped):
-              index2 = paramNameStripped.find('[')
-              paramNameStripped = paramNameStripped[0:index2]
-            if paramNameStripped[0] != '_':
-              regexp = r'' + paramNameStripped + '$'
-              paramName = re.sub(regexp, "_" + paramNameStripped, paramName)
-              replacement = paramType + " " + paramName
-              sub = '(\W)' + paramNameStripped + '(\W)'
-              rep = '\\1_' + paramNameStripped + '\\2'
-              paramSub.append( sub )
-              paramRep.append( rep )
-              regexp = re.sub(r'\&',"\\&",param)
-              regexp = re.sub(r'\*',"\\*",param)
-              regexp = re.sub(r'\s',"\\s",regexp)
-              regexp = re.sub(r'\(',"\\(",regexp)
-              regexp = re.sub(r'\)',"\\)",regexp)
-              regexp = re.sub(r'\]',"\\]",regexp)
-              regexp = re.sub(r'\[',"\\[",regexp)
-              line = re.sub(regexp,replacement, line)
-              line = re.sub(sub, rep,line)
+    ## Remove spaces after ( and before )
+    #line = re.sub(r'\(\s*','(',line)
+    #line = re.sub(r'\s*\)',')',line)
 
-    if re.search(r'{', line) and funcStart >= 0:
-      funcStart = funcStart + 1
-    if re.search(r'}', line) and funcStart >= 0:
-      funcStart = funcStart - 1
-      if funcStart == 0:
-        paramSub = []
-        paramRep = []
+    ## Add space after comma
+    #line = re.sub(r',\s*',',',line)
+    #line = re.sub(r',(\S)',', \\1',line)
 
-    if funcStart > 0:
-      for i in range(len(paramSub)):
-        line = re.sub(paramSub[i], paramRep[i],line)
-    print line
+    ## Add space around =
+    #line = re.sub(r'(\w|\d)=','\\1 =',line)
+    #line = re.sub(r'=(\w|\d)','= \\1',line)
+    #line = re.sub(r'\t','  ',line)
+
+    #regexp = r'(\s*(public:|private:|protected:)\s*)*(\w(\w|:|::|\*|\&|\s)*)\('
+    #if re.match(regexp, line) and not re.search(r'\(\)\(\)',line):
+    #  funcStart = 0
+    #  regexp = r'(\s|\w|:)*?\(((\s|\S)*)\)\s*:*'
+    #  matchResult = re.match(regexp,line)
+    #  if matchResult:
+    #    tmp = matchResult.group(2)
+    #    tmp = re.sub(r'\)\s*:(\s*\S*)+$','',tmp)
+    #    params = tmp.split(',')
+    #    for param in params:
+    #      if len(param) > 0:
+    #        param = param.rstrip()
+    #        param = re.sub(' +',' ',param)
+    #        eqIndex = param.rfind('=')
+    #        end = len(param)
+    #        if eqIndex != -1:
+    #          end = param.rfind(' ',0,eqIndex)
+    #        index = param.rfind(' ',0,end)
+    #        paramType = param[0:index]
+    #        paramName = param[index+1:]
+    #        paramNameStripped = paramName.lstrip("*&")
+    #        if len(paramNameStripped) <= 0:
+    #          continue
+    #        if re.search(r'\[', paramNameStripped):
+    #          index2 = paramNameStripped.find('[')
+    #          paramNameStripped = paramNameStripped[0:index2]
+    #        if paramNameStripped[0] != '_':
+    #          regexp = r'' + paramNameStripped + '$'
+    #          paramName = re.sub(regexp, "_" + paramNameStripped, paramName)
+    #          replacement = paramType + " " + paramName
+    #          sub = '(\W)' + paramNameStripped + '(\W)'
+    #          rep = '\\1_' + paramNameStripped + '\\2'
+    #          paramSub.append( sub )
+    #          paramRep.append( rep )
+    #          regexp = re.sub(r'\&',"\\&",param)
+    #          regexp = re.sub(r'\*',"\\*",param)
+    #          regexp = re.sub(r'\s',"\\s",regexp)
+    #          regexp = re.sub(r'\(',"\\(",regexp)
+    #          regexp = re.sub(r'\)',"\\)",regexp)
+    #          regexp = re.sub(r'\]',"\\]",regexp)
+    #          regexp = re.sub(r'\[',"\\[",regexp)
+    #          line = re.sub(regexp,replacement, line)
+    #          line = re.sub(sub, rep,line)
+
+    #if re.search(r'{', line) and funcStart >= 0:
+    #  funcStart = funcStart + 1
+    #if re.search(r'}', line) and funcStart >= 0:
+    #  funcStart = funcStart - 1
+    #  if funcStart == 0:
+    #    paramSub = []
+    #    paramRep = []
+
+    #if funcStart > 0:
+    #  for i in range(len(paramSub)):
+    #    line = re.sub(paramSub[i], paramRep[i],line)
+    #print >>outFile, line
+    #print line
 
 def main():
   filenames = ParseArguments(sys.argv[1:])

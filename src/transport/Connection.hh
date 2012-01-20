@@ -17,16 +17,20 @@
 #ifndef CONNECTION_HH
 #define CONNECTION_HH
 
+#include <google/protobuf/message.h>
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include <string>
+#include <vector>
 #include <iostream>
 #include <iomanip>
 #include <deque>
 
-#include <google/protobuf/message.h>
 
 #include "common/Event.hh"
 #include "common/Console.hh"
@@ -46,7 +50,6 @@ namespace gazebo
 
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief TCP/IP Connection
     class Connection : public boost::enable_shared_from_this<Connection>
     {
@@ -57,19 +60,19 @@ namespace gazebo
       public: virtual ~Connection();
 
       /// \brief Connect to a remote host
-      public: bool Connect(const std::string &host,  unsigned short port);
+      public: bool Connect(const std::string &host, unsigned int port);
 
       typedef boost::function<void(const ConnectionPtr&)> AcceptCallback;
 
       /// \brief Start a server that listens on a port
-      public: void Listen(unsigned short port, const AcceptCallback &accept_cb);
+      public: void Listen(unsigned int port, const AcceptCallback &accept_cb);
 
       typedef boost::function<void(const std::string &data)> ReadCallback;
       /// \brief Start a thread that reads from the connection, and passes
       ///        new message to the ReadCallback
       public: void StartRead(const ReadCallback &cb);
-             
-      /// \brief Stop the read loop 
+
+      /// \brief Stop the read loop
       public: void StopRead();
 
       /// \brief Shutdown the socket
@@ -92,7 +95,7 @@ namespace gazebo
 
       /// \brief Get the local URI
       public: std::string GetLocalURI() const;
-              
+
       /// \brief Get the remote URI
       public: std::string GetRemoteURI() const;
 
@@ -100,13 +103,13 @@ namespace gazebo
       public: std::string GetLocalAddress() const;
 
       /// \brief Get the port of this connection
-      public: unsigned short GetLocalPort() const;
+      public: unsigned int GetLocalPort() const;
 
       /// \brief Get the remote address
       public: std::string GetRemoteAddress() const;
 
       /// \brief Get the remote port number
-      public: unsigned short GetRemotePort() const;
+      public: unsigned int GetRemotePort() const;
 
       /// \brief Get the remote hostname
       public: std::string GetRemoteHostname() const;
@@ -130,9 +133,9 @@ namespace gazebo
                 this->inbound_header.resize(HEADER_LENGTH);
                 boost::asio::async_read(*this->socket,
                     boost::asio::buffer(this->inbound_header),
-                    boost::bind(f, this, 
+                    boost::bind(f, this,
                                 boost::asio::placeholders::error,
-                                boost::make_tuple(handler)) );
+                                boost::make_tuple(handler)));
               }
 
       // Handle a completed read of a message header. The handler is passed
@@ -154,7 +157,7 @@ namespace gazebo
                 else
                 {
                   std::size_t inbound_data_size = 0;
-                  std::string header(&this->inbound_header[0], 
+                  std::string header(&this->inbound_header[0],
                                       this->inbound_header.size());
                   this->inbound_header.clear();
 
@@ -166,13 +169,14 @@ namespace gazebo
                     this->inbound_data.resize(inbound_data_size);
 
                     void (Connection::*f)(const boost::system::error_code &e,
-                        boost::tuple<Handler>) = &Connection::OnReadData<Handler>;
+                        boost::tuple<Handler>) =
+                      &Connection::OnReadData<Handler>;
 
-                    boost::asio::async_read( *this->socket, 
-                        boost::asio::buffer(this->inbound_data), 
-                        boost::bind(f, this, 
-                                    boost::asio::placeholders::error, 
-                                    _handler) );
+                    boost::asio::async_read(*this->socket,
+                        boost::asio::buffer(this->inbound_data),
+                        boost::bind(f, this,
+                                    boost::asio::placeholders::error,
+                                    _handler));
                   }
                   else
                   {
@@ -180,15 +184,16 @@ namespace gazebo
                     boost::get<0>(_handler)("");
                     // This code tries to read the header again. We should
                     // never get here.
-                    //this->inbound_header.resize(HEADER_LENGTH);
+                    // this->inbound_header.resize(HEADER_LENGTH);
 
-                    //void (Connection::*f)(const boost::system::error_code &,
-                    //    boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;
+                    // void (Connection::*f)(const boost::system::error_code &,
+                    // boost::tuple<Handler>) =
+                    // &Connection::OnReadHeader<Handler>;
 
-                    //boost::asio::async_read(*this->socket,
+                    // boost::asio::async_read(*this->socket,
                     //    boost::asio::buffer(this->inbound_header),
-                    //    boost::bind(f, this, 
-                    //      boost::asio::placeholders::error, _handler) );
+                    //    boost::bind(f, this,
+                    //      boost::asio::placeholders::error, _handler));
                   }
                 }
               }
@@ -201,38 +206,37 @@ namespace gazebo
                   gzerr << "Error Reading data!\n";
 
                 // Inform caller that data has been received
-                std::string data(&this->inbound_data[0], 
+                std::string data(&this->inbound_data[0],
                                   this->inbound_data.size());
                 this->inbound_data.clear();
 
                 if (data.empty())
                   gzerr << "OnReadData got empty data!!!\n";
 
-                if (!e && !transport::is_stopped()) 
+                if (!e && !transport::is_stopped())
                 {
                   boost::get<0>(handler)(data);
                 }
               }
 
-     public: event::ConnectionPtr ConnectToShutdown( boost::function<void()> subscriber_ ) 
+     public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
+                 subscriber_)
              { return this->shutdown.Connect(subscriber_); }
 
-     public: void DisconnectShutdown( event::ConnectionPtr subscriber_)
+     public: void DisconnectShutdown(event::ConnectionPtr subscriber_)
              {this->shutdown.Disconnect(subscriber_);}
-
 
      /// \brief Handle on write callbacks
      public: void ProcessWriteQueue();
 
      private: void OnWrite(const boost::system::error_code &e,
                   boost::asio::streambuf *_b);
-           //std::list<boost::asio::const_buffer> *_buffer);
 
      /// \brief Handle new connections, if this is a server
      private: void OnAccept(const boost::system::error_code &e);
 
      /// \brief Parse a header to get the size of a packet
-     private: std::size_t ParseHeader( const std::string &header );
+     private: std::size_t ParseHeader(const std::string &header);
 
      /// \brief the read thread
      private: void ReadLoop(const ReadCallback &cb);
@@ -256,7 +260,6 @@ namespace gazebo
       // Called when a new connection is received
       private: AcceptCallback acceptCB;
 
-      //private: char inbound_header[HEADER_LENGTH];
       private: std::vector<char> inbound_header;
       private: std::vector<char> inbound_data;
 
@@ -282,3 +285,5 @@ namespace gazebo
 }
 
 #endif
+
+

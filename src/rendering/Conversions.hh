@@ -27,9 +27,8 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \addtogroup gazebo_rendering 
+    /// \addtogroup gazebo_rendering
     /// \{
-
     /// \brief A set of utility function to convert between Gazebo and Ogre
     /// data types
     class Conversions
@@ -48,7 +47,6 @@ namespace gazebo
 
       /// \brief Ogre quaternion to Gazebo quaternion
       public: static math::Quaternion Convert(const Ogre::Quaternion &v);
-
     };
     /// \}
   }

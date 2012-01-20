@@ -20,14 +20,15 @@ namespace gazebo
 {
   class PluginTemplate : public Plugin
   {
-    public: PluginTemplate() : Plugin() 
+    public: PluginTemplate() : Plugin()
             {
             }
 
-    public: void Load( sdf::ElementPtr &_sdf )
+    public: void Load(sdf::ElementPtr &_sdf)
             {
             };
 
     GZ_REGISTER_PLUGIN("PluginTemplate", PluginTemplate)
   };
 }
+

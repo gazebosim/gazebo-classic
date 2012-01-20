@@ -17,45 +17,46 @@
 #ifndef SELECTION_OBJ
 #define SELECTION_OBJ
 
+#include <string>
+
 #include "math/Vector3.hh"
 #include "rendering/RenderTypes.hh"
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class Scene;
 
     /// \addtogroup gazebo_rendering
     /// \{
-
-    /// \brief A graphical selection object 
+    /// \brief A graphical selection object
     class SelectionObj
     {
       /// \brief Constructor
       public: SelectionObj(Scene *scene_);
-  
+
       /// \brief Destructor
       public: virtual ~SelectionObj();
-  
+
       public: void Init();
-  
+
       /// \brief Set the position of the node
-      public: void Attach( VisualPtr visual );
-      public: void Clear( );
+      public: void Attach(VisualPtr visual);
+      public: void Clear();
 
       /// \brief Return true if the user is move the selection obj
       public: bool IsActive() const;
 
       /// \brief Set true if the user is moving the selection obj
-      public: void SetActive( bool _active );
+      public: void SetActive(bool _active);
 
       /// \brief Get the name of the visual the seleciton obj is attached to
       public: std::string GetVisualName() const;
 
       /// \brief Highlight the selection object based on a modifier
-      public: void SetHighlight( const std::string &_mod );
-  
+      public: void SetHighlight(const std::string &_mod);
+
       private: void CreateMaterials();
 
       private: VisualPtr node;
@@ -64,7 +65,7 @@ namespace gazebo
 
       private: bool active;
     };
-    /// \brief 
+    /// \brief
   }
 }
 #endif

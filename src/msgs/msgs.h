@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef MESSAGES_UTILITY_HH
-#define MESSAGES_UTILITY_HH
+#ifndef MESSAGES_UTILITY_H
+#define MESSAGES_UTILITY_H
+
+#include <string>
 
 #include "msgs/MessageTypes.hh"
 #include "sdf/sdf.h"
@@ -33,24 +35,23 @@ namespace gazebo
 {
   /// \ingroup gazebo_msgs Messages
   /// \brief Messages namespace
-	namespace msgs
+  namespace msgs
   {
-    /// \addtogroup gazebo_msgs Messages 
+    /// \addtogroup gazebo_msgs Messages
     /// \brief All messages and helper functions
     /// \{
-    
     /// \brief Create a request message
     /// \param _request Request string
     /// \param _data Optional data string
     /// \return A Request message
-    msgs::Request *CreateRequest(const std::string &_request, 
+    msgs::Request *CreateRequest(const std::string &_request,
                                  const std::string &_data = "");
 
 
     /// \brief Initialize a message
     /// \param _message Message to initialize
     /// \param _id Optional string id
-    void Init(google::protobuf::Message &_message, const std::string &_id="");
+    void Init(google::protobuf::Message &_message, const std::string &_id ="");
 
     /// \brief Time stamp a header
     /// \param _header Header to stamp
@@ -61,7 +62,7 @@ namespace gazebo
     void Stamp(msgs::Time *_time);
 
     /// \cond
-    std::string Package(const std::string &type, 
+    std::string Package(const std::string &type,
         const google::protobuf::Message &message);
     /// \endcond
 
@@ -163,7 +164,7 @@ namespace gazebo
     /// \brief Create a msgs::TrackVisual from a track visual SDF element
     /// \param _sdf The sdf element
     /// \return The new msgs::TrackVisual object
-    msgs::TrackVisual TrackVisualFromSDF( sdf::ElementPtr _sdf );
+    msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create a msgs::GUI from a GUI SDF element
     /// \param _sdf The sdf element
@@ -191,7 +192,8 @@ namespace gazebo
     msgs::Scene      SceneFromSDF(sdf::ElementPtr _sdf);
 
     /// \cond
-    const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
+    const google::protobuf::FieldDescriptor *GetFD(
+        google::protobuf::Message &message, const std::string &name);
     /// \endcond
 
     /// \brief Get the header from a protobuf message
@@ -204,3 +206,4 @@ namespace gazebo
 }
 
 #endif
+

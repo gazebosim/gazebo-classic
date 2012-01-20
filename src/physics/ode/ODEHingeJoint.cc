@@ -30,23 +30,20 @@
 using namespace gazebo;
 using namespace physics;
 
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
-ODEHingeJoint::ODEHingeJoint( dWorldID worldId )
+//////////////////////////////////////////////////
+ODEHingeJoint::ODEHingeJoint(dWorldID _worldId)
     : HingeJoint<ODEJoint>()
 {
-  this->jointId = dJointCreateHinge(worldId, NULL);
+  this->jointId = dJointCreateHinge(_worldId, NULL);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Load a hinge joint
-void ODEHingeJoint::Load( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void ODEHingeJoint::Load(sdf::ElementPtr &_sdf)
 {
   HingeJoint<ODEJoint>::Load(_sdf);
 
@@ -54,131 +51,122 @@ void ODEHingeJoint::Load( sdf::ElementPtr &_sdf )
   this->SetForce(0, 0);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the anchor point
+//////////////////////////////////////////////////
 math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
 
-  dJointGetHingeAnchor( this->jointId, result );
+  dJointGetHingeAnchor(this->jointId, result);
 
   return math::Vector3(result[0], result[1], result[2]);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the anchor point
-void ODEHingeJoint::SetAnchor( int /*index*/, const math::Vector3 &anchor )
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 {
-  if (this->childLink) 
+  if (this->childLink)
     this->childLink->SetEnabled(true);
-  if (this->parentLink) 
+  if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
+  dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the axis of rotation
+//////////////////////////////////////////////////
 math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 {
     dVector3 result;
-    dJointGetHingeAxis( this->jointId, result );
+    dJointGetHingeAxis(this->jointId, result);
     return math::Vector3(result[0], result[1], result[2]);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the axis of rotation
-void ODEHingeJoint::SetAxis( int /*index*/, const math::Vector3 &axis )
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 {
-  if (this->childLink) 
+  if (this->childLink)
     this->childLink->SetEnabled(true);
-  if (this->parentLink) 
+  if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
+  dJointSetHingeAxis(this->jointId, _axis.x, _axis.y, _axis.z);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the joint damping, either through ODE or callback here
-void ODEHingeJoint::SetDamping( int /*index*/, const double damping )
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetDamping(int /*index*/, const double _damping)
 {
-  this->damping_coefficient = damping;
-  dJointSetDamping( this->jointId, this->damping_coefficient);
+  this->damping_coefficient = _damping;
+  dJointSetDamping(this->jointId, this->damping_coefficient);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// callback to apply joint damping force
+//////////////////////////////////////////////////
 void ODEHingeJoint::ApplyDamping()
 {
   double damping_force = this->damping_coefficient * this->GetVelocity(0);
-  this->SetForce(0,damping_force);
+  this->SetForce(0, damping_force);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the angle of rotation
+//////////////////////////////////////////////////
 math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 {
-  math::Angle result = dJointGetHingeAngle( this->jointId );
+  math::Angle result = dJointGetHingeAngle(this->jointId);
 
   return result;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the rotation rate
+//////////////////////////////////////////////////
 double ODEHingeJoint::GetVelocity(int /*index*/) const
 {
-  double result = dJointGetHingeAngleRate( this->jointId );
+  double result = dJointGetHingeAngleRate(this->jointId);
 
   return result;
-} 
-
-//////////////////////////////////////////////////////////////////////////////
-/// Set the velocity of an axis(index).
-void ODEHingeJoint::SetVelocity(int /*index*/, double angle)
-{
-  this->SetParam(dParamVel,angle);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Set the max allowed force of an axis(index).
-void ODEHingeJoint::SetMaxForce(int /*index*/, double t)
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetVelocity(int /*index*/, double _angle)
 {
-  return this->SetParam(dParamFMax, t);
+  this->SetParam(dParamVel, _angle);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get the max allowed force of an axis(index).
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetMaxForce(int /*index*/, double _t)
+{
+  return this->SetParam(dParamFMax, _t);
+}
+
+//////////////////////////////////////////////////
 double ODEHingeJoint::GetMaxForce(int /*index*/)
 {
   return this->GetParam(dParamFMax);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the torque of this joint
-void ODEHingeJoint::SetForce(int /*index*/, double torque)
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetForce(int /*index*/, double _torque)
 {
-  if (this->childLink) 
+  if (this->childLink)
     this->childLink->SetEnabled(true);
-  if (this->parentLink) 
+  if (this->parentLink)
     this->parentLink->SetEnabled(true);
-  dJointAddHingeTorque(this->jointId, torque);
+  dJointAddHingeTorque(this->jointId, _torque);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the specified parameter
-double ODEHingeJoint::GetParam( int parameter ) const
+//////////////////////////////////////////////////
+double ODEHingeJoint::GetParam(int _parameter) const
 {
-  double result = dJointGetHingeParam( this->jointId, parameter );
+  double result = dJointGetHingeParam(this->jointId, _parameter);
 
-  return result; 
+  return result;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Set the _parameter to _value
-void ODEHingeJoint::SetParam( int parameter, double value)
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetParam(int _parameter, double _value)
 {
-  ODEJoint::SetParam(parameter, value);
+  ODEJoint::SetParam(_parameter, _value);
 
-  dJointSetHingeParam( this->jointId, parameter, value );
+  dJointSetHingeParam(this->jointId, _parameter, _value);
 }
+
+
+
+
+

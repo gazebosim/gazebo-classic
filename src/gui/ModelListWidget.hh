@@ -1,7 +1,27 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 #ifndef MODEL_LIST_WIDGET_HH
 #define MODEL_LIST_WIDGET_HH
 
 #include <QWidget>
+#include <map>
+#include <string>
+#include <list>
+#include <vector>
 
 #include "sdf/sdf.h"
 #include "msgs/msgs.h"
@@ -33,7 +53,7 @@ namespace gazebo
     class ModelListWidget : public QWidget
     {
       Q_OBJECT
-      public: ModelListWidget( QWidget *parent = 0 );
+      public: ModelListWidget(QWidget *_parent = 0);
       public: virtual ~ModelListWidget();
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
@@ -43,12 +63,12 @@ namespace gazebo
       private slots: void OnDelete();
       private slots: void OnFollow();
       private slots: void OnCustomContextMenu(const QPoint &_pt);
-      private slots: void OnCurrentPropertyChanged(QtBrowserItem *);
+      private slots: void OnCurrentPropertyChanged(QtBrowserItem *_item);
       private slots: void OnShowCollision();
       private slots: void OnTransparent();
 
       private: void OnResponse(
-                   ConstResponsePtr &_msg );
+                   ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
 
@@ -72,22 +92,22 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Collision &_msg,
                                      QtProperty *_parent);
 
-      private: void FillMsgField(QtProperty *_item, 
+      private: void FillMsgField(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Reflection *_reflection,
                    const google::protobuf::FieldDescriptor *_field);
 
-      private: void FillMsg(QtProperty *_item, 
+      private: void FillMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor,
                    QtProperty *_changedItem);
 
-      private: void FillGeometryMsg(QtProperty *_item, 
+      private: void FillGeometryMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor,
                    QtProperty *_changedItem);
 
-      private: void FillPoseMsg(QtProperty *_item, 
+      private: void FillPoseMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
                    const google::protobuf::Descriptor *_descriptor);
 
@@ -103,11 +123,11 @@ namespace gazebo
                                            const std::string &_name);
 
       private: QtProperty *GetChildItemValue(const std::string &_name);
-      private: QtProperty *GetChildItemValue(QtProperty *_item, 
+      private: QtProperty *GetChildItemValue(QtProperty *_item,
                                              const std::string &_name);
 
       private: QtProperty *GetChildItem(const std::string &_name);
-      private: QtProperty *GetChildItem(QtProperty *_item, 
+      private: QtProperty *GetChildItem(QtProperty *_item,
                                         const std::string &_name);
 
       private: bool HasChildItem(QtProperty *_parent, QtProperty *_child);
@@ -133,7 +153,7 @@ namespace gazebo
 
       private: void ProcessPoseMsgs();
 
-      private: void InitTransport(const std::string &_name="");
+      private: void InitTransport(const std::string &_name ="");
 
       private: QTreeWidget *modelTreeWidget;
       private: QtTreePropertyBrowser *propTreeBrowser;
@@ -171,3 +191,5 @@ namespace gazebo
   }
 }
 #endif
+
+

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 #include <QtGui>
 #include <iomanip>
 
@@ -13,8 +29,8 @@
 using namespace gazebo;
 using namespace gui;
 
-RenderWidget::RenderWidget( QWidget *parent )
-  : QWidget(parent)
+RenderWidget::RenderWidget(QWidget *_parent)
+  : QWidget(_parent)
 {
   this->clear = false;
   this->create = false;
@@ -32,32 +48,32 @@ RenderWidget::RenderWidget( QWidget *parent )
   rendering::ScenePtr scene = rendering::create_scene(gui::get_world(), true);
 
   this->xPosEdit = new QLineEdit;
-  this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit) );
+  this->xPosEdit->setValidator(new QDoubleValidator(this->xPosEdit));
   this->xPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->xPosEdit->setFixedWidth(100);
 
   this->yPosEdit = new QLineEdit;
-  this->yPosEdit->setValidator(new QDoubleValidator(this->yPosEdit) );
+  this->yPosEdit->setValidator(new QDoubleValidator(this->yPosEdit));
   this->yPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->yPosEdit->setFixedWidth(100);
 
   this->zPosEdit = new QLineEdit;
-  this->zPosEdit->setValidator(new QDoubleValidator(this->zPosEdit) );
+  this->zPosEdit->setValidator(new QDoubleValidator(this->zPosEdit));
   this->zPosEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->zPosEdit->setFixedWidth(100);
 
   this->rollEdit = new QLineEdit;
-  this->rollEdit->setValidator(new QDoubleValidator(this->rollEdit) );
+  this->rollEdit->setValidator(new QDoubleValidator(this->rollEdit));
   this->rollEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->rollEdit->setFixedWidth(100);
 
   this->pitchEdit = new QLineEdit;
-  this->pitchEdit->setValidator(new QDoubleValidator(this->pitchEdit) );
+  this->pitchEdit->setValidator(new QDoubleValidator(this->pitchEdit));
   this->pitchEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->pitchEdit->setFixedWidth(100);
 
   this->yawEdit = new QLineEdit;
-  this->yawEdit->setValidator(new QDoubleValidator(this->yawEdit) );
+  this->yawEdit->setValidator(new QDoubleValidator(this->yawEdit));
   this->yawEdit->setInputMethodHints(Qt::ImhDigitsOnly);
   this->yawEdit->setFixedWidth(100);
 
@@ -68,12 +84,12 @@ RenderWidget::RenderWidget( QWidget *parent )
   this->trianglesEdit = new QLineEdit;
   this->trianglesEdit->setReadOnly(true);
   this->trianglesEdit->setFixedWidth(80);
-  */ 
+  */
 
   this->xyzLabel = new QLabel(tr("XYZ:"));
   this->rpyLabel = new QLabel(tr("RPY:"));
-  //QLabel *fpsLabel = new QLabel(tr("FPS:"));
-  //QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
+  // QLabel *fpsLabel = new QLabel(tr("FPS:"));
+  // QLabel *trianglesLabel = new QLabel(tr("Triangles:"));
 
   bottomBarLayout = new QHBoxLayout;
   bottomBarLayout->addWidget(this->xyzLabel);
@@ -81,37 +97,38 @@ RenderWidget::RenderWidget( QWidget *parent )
   bottomBarLayout->addWidget(this->yPosEdit);
   bottomBarLayout->addWidget(this->zPosEdit);
 
-  bottomBarLayout->addItem(new QSpacerItem(10,20));
+  bottomBarLayout->addItem(new QSpacerItem(10, 20));
   bottomBarLayout->addWidget(this->rpyLabel);
   bottomBarLayout->addWidget(this->rollEdit);
   bottomBarLayout->addWidget(this->pitchEdit);
   bottomBarLayout->addWidget(this->yawEdit);
 
-  bottomBarLayout->addItem(new QSpacerItem(40,20,QSizePolicy::Expanding, QSizePolicy::Minimum));
-  //bottomBarLayout->addWidget(fpsLabel);
-  //bottomBarLayout->addWidget(this->fpsEdit);
-  //bottomBarLayout->addWidget(trianglesLabel);
-  //bottomBarLayout->addWidget(this->trianglesEdit);
+  bottomBarLayout->addItem(
+      new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+  // bottomBarLayout->addWidget(fpsLabel);
+  // bottomBarLayout->addWidget(this->fpsEdit);
+  // bottomBarLayout->addWidget(trianglesLabel);
+  // bottomBarLayout->addWidget(this->trianglesEdit);
   bottomBarLayout->addSpacing(10);
 
   frameLayout->addWidget(this->glWidget);
   frameLayout->addLayout(bottomBarLayout);
 
   this->mainFrame->setLayout(frameLayout);
-  this->mainFrame->layout()->setContentsMargins(4,4,4,4);
+  this->mainFrame->layout()->setContentsMargins(4, 4, 4, 4);
 
   mainLayout->addWidget(this->mainFrame);
 
   this->setLayout(mainLayout);
-  this->layout()->setContentsMargins(0,0,0,0);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 
   this->timer = new QTimer(this);
   connect(this->timer, SIGNAL(timeout()), this, SLOT(update()));
   this->timer->start(44);
 
-  this->connections.push_back( 
-      gui::Events::ConnectFullScreen( 
-        boost::bind(&RenderWidget::OnFullScreen, this, _1) ) );
+  this->connections.push_back(
+      gui::Events::ConnectFullScreen(
+        boost::bind(&RenderWidget::OnFullScreen, this, _1)));
 }
 
 RenderWidget::~RenderWidget()
@@ -125,9 +142,9 @@ void RenderWidget::OnFullScreen(bool &_value)
   {
     this->mainFrame->layout()->removeItem(this->bottomBarLayout);
     this->mainFrame->setLineWidth(0);
-    this->mainFrame->layout()->setContentsMargins(0,0,0,0);
-    this->glWidget->layout()->setContentsMargins(0,0,0,0);
-    this->layout()->setContentsMargins(0,0,0,0);
+    this->mainFrame->layout()->setContentsMargins(0, 0, 0, 0);
+    this->glWidget->layout()->setContentsMargins(0, 0, 0, 0);
+    this->layout()->setContentsMargins(0, 0, 0, 0);
     this->xyzLabel->hide();
     this->rpyLabel->hide();
 
@@ -138,14 +155,14 @@ void RenderWidget::OnFullScreen(bool &_value)
     this->rollEdit->hide();
     this->pitchEdit->hide();
     this->yawEdit->hide();
-    //this->fpsEdit->hide();
-    //this->trianglesEdit->hide();
+    // this->fpsEdit->hide();
+    // this->trianglesEdit->hide();
   }
   else
   {
     this->mainFrame->layout()->addItem(this->bottomBarLayout);
     this->mainFrame->setLineWidth(1);
-    this->mainFrame->layout()->setContentsMargins(4,4,4,4);
+    this->mainFrame->layout()->setContentsMargins(4, 4, 4, 4);
     this->xyzLabel->show();
     this->rpyLabel->show();
 
@@ -156,8 +173,8 @@ void RenderWidget::OnFullScreen(bool &_value)
     this->rollEdit->show();
     this->pitchEdit->show();
     this->yawEdit->show();
-    //this->fpsEdit->show();
-    //this->trianglesEdit->show();
+    // this->fpsEdit->show();
+    // this->trianglesEdit->show();
   }
 }
 
@@ -184,8 +201,8 @@ void RenderWidget::update()
     return;
   }
 
-  //float fps = cam->GetAvgFPS();
-  //int triangleCount = cam->GetTriangleCount();
+  // float fps = cam->GetAvgFPS();
+  // int triangleCount = cam->GetTriangleCount();
   math::Pose pose = cam->GetWorldPose();
 
   std::ostringstream stream;
@@ -222,7 +239,7 @@ void RenderWidget::update()
   stream.str("");
 
   stream << std::fixed << std::setprecision(2) << triangleCount;
-  this->trianglesEdit->setText( tr(stream.str().c_str()) );
+  this->trianglesEdit->setText(tr(stream.str().c_str()));
   */
 
   this->glWidget->update();
@@ -239,3 +256,5 @@ void RenderWidget::CreateScene(const std::string &_name)
   this->create = true;
   this->createName = _name;
 }
+
+

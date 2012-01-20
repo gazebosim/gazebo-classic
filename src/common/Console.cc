@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /*
  * Desc: Gazebo Console messages
  * Author: Nathan Koenig
  * Date: 09 June 2007
  */
 
-//#include <time.h>
 #include <string.h>
 #include <sstream>
 
@@ -32,22 +31,19 @@ using namespace common;
 
 Console *Console::myself = NULL;
 
-////////////////////////////////////////////////////////////////////////////////
-/// Default constructor
+//////////////////////////////////////////////////
 Console::Console()
 {
   this->msgStream = &std::cout;
   this->errStream = &std::cerr;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 Console::~Console()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return an instance to this class
+//////////////////////////////////////////////////
 Console *Console::Instance()
 {
   if (myself == NULL)
@@ -56,15 +52,14 @@ Console *Console::Instance()
   return myself;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the Message parameters
+//////////////////////////////////////////////////
 void Console::Load()
 {
   char logFilename[50];
 
   // TODO: Reimplement logging
   /*if (**(this->logDataP))
-  {
+    {
     time_t t;
     struct tm *localTime;
     char baseFilename[50];
@@ -73,52 +68,53 @@ void Console::Load()
     localTime = localtime(&t);
 
     strftime(baseFilename, sizeof(baseFilename),
-             "gazebo-%Y_%m_%d_%H_%M", localTime);
+    "gazebo-%Y_%m_%d_%H_%M", localTime);
 
     snprintf(logFilename, sizeof(logFilename), "%s.log", baseFilename);
-  }
-  else
-  {
-  */
-    strcpy(logFilename,"/dev/null");
-  //}
+    }
+    else
+    {
+    */
+  snprintf(logFilename, strlen("/dev/null"), "/dev/null");
+  // }
 
   this->logStream.open(logFilename, std::ios::out);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the verbosity
-void Console::SetQuiet( bool /*_q*/ )
+//////////////////////////////////////////////////
+void Console::SetQuiet(bool)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the message stream
+//////////////////////////////////////////////////
 std::ostream &Console::ColorMsg(const std::string &lbl, int color)
 {
-  //if (**this->quietP)
-    //return this->nullStream;
-  //else
-  //{
-    *this->msgStream << "\033[1;" << color << "m" << lbl <<  "\033[0m ";
-    return *this->msgStream;
-  //}
+  // if (**this->quietP)
+  // return this->nullStream;
+  // else
+  // {
+  *this->msgStream << "\033[1;" << color << "m" << lbl << "\033[0m ";
+  return *this->msgStream;
+  // }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the error stream
-std::ostream &Console::ColorErr(const std::string &lbl, const std::string &file, unsigned int line, int color)
+//////////////////////////////////////////////////
+std::ostream &Console::ColorErr(const std::string &lbl,
+                                const std::string &file,
+                                unsigned int line, int color)
 {
   int index = file.find_last_of("/") + 1;
 
-  *this->errStream << "\033[1;" << color << "m" << lbl << " [" << file.substr( index , file.size() - index)<< ":" << line << "]\033[0m ";
+  *this->errStream << "\033[1;" << color << "m" << lbl << " [" <<
+    file.substr(index , file.size() - index)<< ":" << line << "]\033[0m ";
 
   return *this->errStream;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Log a message
+//////////////////////////////////////////////////
 std::ofstream &Console::Log()
 {
   return this->logStream;
 }
+
+

@@ -25,27 +25,19 @@
 using namespace gazebo;
 using namespace transport;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-Publisher::Publisher(unsigned int _limit, bool _latch)
-{
-  this->queueLimit = _limit;
-  this->latch = _latch;
-}
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType, 
+//////////////////////////////////////////////////
+Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, bool _latch)
   : topic(_topic), msgType(_msgType), queueLimit(_limit), latch(_latch)
 {
   this->mutex = new boost::recursive_mutex();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 Publisher::~Publisher()
 {
+  std::cout << "\n\n PUBLISHER DESTRUCTOR \n\n";
   if (this->messages.size() > 0)
     this->SendMessage();
 
@@ -55,26 +47,40 @@ Publisher::~Publisher()
   delete this->mutex;
 }
 
+//////////////////////////////////////////////////
 bool Publisher::HasConnections() const
 {
-  return ((this->publications[0] && 
+  return ((this->publications[0] &&
            (this->publications[0]->GetCallbackCount() > 0 ||
             this->publications[0]->GetNodeCount() > 0)) ||
-          (this->publications[1] && 
+          (this->publications[1] &&
            (this->publications[1]->GetCallbackCount() > 0 ||
             this->publications[0]->GetNodeCount() > 0)));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Publish a message
+//////////////////////////////////////////////////
+void Publisher::WaitForConnection() const
+{
+  while (!this->HasConnections())
+    common::Time::MSleep(100);
+}
+
+//////////////////////////////////////////////////
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
                             bool /*_block*/)
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  //if (!this->HasConnections())
-  //return;
+  if (!_message.IsInitialized())
+  {
+    gzthrow("Publishing and uninitialized message on topic[" +
+        this->topic + "]. Required field [" +
+        _message.InitializationErrorString() + "] missing.");
+  }
+
+  // if (!this->HasConnections())
+  // return;
 
   // Save the latest message
   google::protobuf::Message *msg = _message.New();
@@ -96,8 +102,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   this->mutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Send the lastest message
+//////////////////////////////////////////////////
 void Publisher::SendMessage()
 {
   this->mutex->lock();
@@ -105,10 +110,10 @@ void Publisher::SendMessage()
   if (this->messages.size() > 0)
   {
     std::list<google::protobuf::Message *>::iterator iter;
-    for (iter = this->messages.begin(); iter != this->messages.end(); iter++)
+    for (iter = this->messages.begin(); iter != this->messages.end(); ++iter)
     {
       // Send the latest message.
-      TopicManager::Instance()->Publish(this->topic, **iter, 
+      TopicManager::Instance()->Publish(this->topic, **iter,
           boost::bind(&Publisher::OnPublishComplete, this));
       delete *iter;
     }
@@ -127,22 +132,19 @@ unsigned int Publisher::GetOutgoingCount() const
   return c;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the topic name
+//////////////////////////////////////////////////
 std::string Publisher::GetTopic() const
 {
   return this->topic;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the message type
+//////////////////////////////////////////////////
 std::string Publisher::GetMsgType() const
 {
   return this->msgType;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Callback when a publish is completed
+//////////////////////////////////////////////////
 void Publisher::OnPublishComplete()
 {
 }
@@ -161,3 +163,5 @@ std::string Publisher::GetPrevMsg() const
 {
   return this->prevMsg;
 }
+
+

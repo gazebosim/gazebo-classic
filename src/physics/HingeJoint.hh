@@ -27,22 +27,20 @@
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
-    ///\brief A single axis hinge joint
+    /// \brief A single axis hinge joint
     template<class T>
     class HingeJoint : public T
     {
       /// \brief Constructor
       public: HingeJoint() : T()
               { this->AddType(Base::HINGE_JOINT); }
-   
       ///  \brief Destructor
       public: virtual ~HingeJoint()
               { }
-  
       /// \brief Load joint
-      protected: virtual void Load( sdf::ElementPtr &_sdf)
+      protected: virtual void Load(sdf::ElementPtr &_sdf)
                  {
                    T::Load(_sdf);
 
@@ -52,17 +50,17 @@ namespace gazebo
                      this->SetAxis(0, axisElem->GetValueVector3("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
-                       sdf::ElementPtr limitElem = _sdf->GetElement("axis")->GetElement("limit");
+                       sdf::ElementPtr limitElem =
+                         _sdf->GetElement("axis")->GetElement("limit");
 
-                       // Perform this three step ordering to ensure the 
-                       // parameters are set properly. 
+                       // Perform this three step ordering to ensure the
+                       // parameters are set properly.
                        // This is taken from the ODE wiki.
-                       this->SetHighStop(0,limitElem->GetValueDouble("upper"));
-                       this->SetLowStop( 0,limitElem->GetValueDouble("lower"));
-                       this->SetHighStop(0,limitElem->GetValueDouble("upper"));
+                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+                       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
+                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
                      }
                    }
-
                  }
       };
   }

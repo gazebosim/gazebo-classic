@@ -15,7 +15,7 @@
  *
 */
 /* Desc: Bullet motion state class.
- * Author: Nate Koenig 
+ * Author: Nate Koenig
  * Date: 25 May 2009
  */
 
@@ -28,54 +28,55 @@
 
 namespace gazebo
 {
-	namespace physics
-{
-  class Visual;
-  class Link;
-
-  class BulletMotionState : public btMotionState
+  namespace physics
   {
-    /// \brief Constructor
-    public: BulletMotionState(Link *body);
+    class Visual;
+    class Link;
 
-    /// \brief Constructor
-    //public: BulletMotionState(const math::Pose &initPose);
+    class BulletMotionState : public btMotionState
+    {
+      /// \brief Constructor
+      public: BulletMotionState(Link *body);
 
-    /// \brief Destructor
-    public: virtual ~BulletMotionState();
+      /// \brief Constructor
+      // public: BulletMotionState(const math::Pose &initPose);
 
-    /// \brief Set the visual
-    public: void SetVisual(Visual *vis);
+      /// \brief Destructor
+      public: virtual ~BulletMotionState();
 
-    /// \brief Get the pose
-    public: math::Pose GetWorldPose() const;
+      /// \brief Set the visual
+      public: void SetVisual(Visual *vis);
 
-    /// \brief Set the position of the body
-    /// \param pos math::Vector position
-    public: virtual void SetWorldPosition(const math::Vector3 &pos);
+      /// \brief Get the pose
+      public: math::Pose GetWorldPose() const;
 
-    /// \brief Set the rotation of the body
-    /// \param rot Quaternion rotation
-    public: virtual void SetWorldRotation(const common::Quatern &rot);
+      /// \brief Set the position of the body
+      /// \param pos math::Vector position
+      public: virtual void SetWorldPosition(const math::Vector3 &pos);
 
-    /// \brief Set the pose
-    public: void SetWorldPose(const math::Pose &pose);
+      /// \brief Set the rotation of the body
+      /// \param rot Quaternion rotation
+      public: virtual void SetWorldRotation(const common::Quatern &rot);
 
-    /// \brief Set the center of mass offset
-    public: void SetCoMOffset( const math::Pose &com );
+      /// \brief Set the pose
+      public: void SetWorldPose(const math::Pose &pose);
 
-    /// \brief Get the world transform
-    public: virtual void getWorldTransform(btTransform &worldTrans) const;
+      /// \brief Set the center of mass offset
+      public: void SetCoMOffset(const math::Pose &com);
 
-    /// \brief Set the world transform
-    public: virtual void setWorldTransform(const btTransform &worldTrans);
+      /// \brief Get the world transform
+      public: virtual void getWorldTransform(btTransform &worldTrans) const;
 
-    private: Visual *visual;
-    private: math::Pose worldPose;
-    private: math::Pose comOffset;
-    private: Link *body;
-  };
-}
-}
+      /// \brief Set the world transform
+      public: virtual void setWorldTransform(const btTransform &worldTrans);
+
+      private: Visual *visual;
+      private: math::Pose worldPose;
+      private: math::Pose comOffset;
+      private: Link *body;
+    };
+  }
 }
 #endif
+
+

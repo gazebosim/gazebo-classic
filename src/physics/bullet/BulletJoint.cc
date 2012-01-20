@@ -17,10 +17,7 @@
 /* Desc: The base Bullet joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 15 May 2009
- * SVN: $Id$
  */
-
-#include "BulletLink.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "BulletJoint.hh"
@@ -28,45 +25,35 @@
 using namespace gazebo;
 using namespace physics;
 
-using namespace physics;
 
-using namespace physics;
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 BulletJoint::BulletJoint()
   : Joint()
 {
   this->constraint = NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Desctructor
+//////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
-  if (this->constraint)
-    delete this->constraint;
+  delete this->constraint;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Load a joint
-void BulletJoint::Load(common::XMLConfigNode *node)
+//////////////////////////////////////////////////
+void BulletJoint::Load(common::XMLConfigNode *_node)
 {
-  Joint::Load(node);
-
+  Joint::Load(_node);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Get the body to which the joint is attached according the _index
-Link *BulletJoint::GetJointLink( int index ) const
+//////////////////////////////////////////////////
+Link *BulletJoint::GetJointLink(int index) const
 {
-  Link *result=NULL;
+  Link *result = NULL;
 
   if (this->constraint == NULL)
     gzthrow("Attach bodies to the joint first");
 
-  if (index == 0 || index ==1)
+  if (index == 0 || index == 1)
   {
     BulletLink *bulletLink1 = dynamic_cast<BulletLink*>(this->body1);
     BulletLink *bulletLink2 = dynamic_cast<BulletLink*>(this->body2);
@@ -82,47 +69,42 @@ Link *BulletJoint::GetJointLink( int index ) const
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Determines of the two bodies are connected by a joint
-bool BulletJoint::AreConnected( Link *one, Link *two ) const
+//////////////////////////////////////////////////
+bool BulletJoint::AreConnected(Link *_one, Link *_two) const
 {
-  return this->constraint && ((this->body1 == one && this->body2 == two) || 
-         (this->body1 == two && this->body2 == one));
+  return this->constraint && ((this->body1 == _one && this->body2 == _two) ||
+         (this->body1 == _two && this->body2 == _one));
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Detach this joint from all bodies
+//////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
   this->body1 = NULL;
   this->body2 = NULL;
 
-  if (this->constraint)
-    delete this->constraint;
+  delete this->constraint;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the ERP of this joint
-void BulletJoint::SetERP(double newERP)
+//////////////////////////////////////////////////
+void BulletJoint::SetERP(double _newERP)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ERP of this joint
+//////////////////////////////////////////////////
 double BulletJoint::GetERP()
 {
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the CFM of this joint
-void BulletJoint::SetCFM(double newCFM)
+//////////////////////////////////////////////////
+void BulletJoint::SetCFM(double _newCFM)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ERP of this joint
+//////////////////////////////////////////////////
 double BulletJoint::GetCFM()
 {
   return 0;
 }
+
+

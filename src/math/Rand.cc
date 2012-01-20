@@ -17,12 +17,11 @@
 /* Desc: Random number generator
  * Author: Nate Koenig
  * Date: 27 May 2009
- * SVN: $Id:$
  */
 
-#include <ctime>
 #include <sys/types.h>
 #include <unistd.h>
+#include <ctime>
 
 #include "math/Rand.hh"
 
@@ -35,50 +34,45 @@ using namespace math;
 // and gui simultaneously).
 GeneratorType *Rand::randGenerator = new GeneratorType(getpid());
 
-///////////////////////////////////////////////////////////////////////////////
-// Constructor
+//////////////////////////////////////////////////
 Rand::Rand()
 {
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 Rand::~Rand()
 {
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Get a double from a uniform distribution
-double Rand::GetDblUniform(double min, double max)
+//////////////////////////////////////////////////
+double Rand::GetDblUniform(double _min, double _max)
 {
-  URealGen gen(*randGenerator, UniformRealDist(min, max));
- 
-  return gen(); 
+  URealGen gen(*randGenerator, UniformRealDist(_min, _max));
+
+  return gen();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Get a double from a normal distribution
-double Rand::GetDblNormal(double mean, double sigma)
+//////////////////////////////////////////////////
+double Rand::GetDblNormal(double _mean, double _sigma)
 {
-  NRealGen gen(*randGenerator, NormalRealDist(mean, sigma));
- 
-  return gen(); 
+  NRealGen gen(*randGenerator, NormalRealDist(_mean, _sigma));
+
+  return gen();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Get a integer from a uniform distribution
-int Rand::GetIntUniform(int min, int max)
+//////////////////////////////////////////////////
+int Rand::GetIntUniform(int _min, int _max)
 {
-  UIntGen gen(*randGenerator, UniformIntDist(min,max));
- 
-  return gen(); 
+  UIntGen gen(*randGenerator, UniformIntDist(_min, _max));
+
+  return gen();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Get a double from a normal distribution
-int Rand::GetIntNormal(int mean, int sigma)
+//////////////////////////////////////////////////
+int Rand::GetIntNormal(int _mean, int _sigma)
 {
-  NRealGen gen(*randGenerator, NormalRealDist(mean, sigma));
- 
-  return (int)(gen()); 
+  NRealGen gen(*randGenerator, NormalRealDist(_mean, _sigma));
+
+  return static_cast<int>(gen());
 }
+

@@ -1,7 +1,25 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 #ifndef TIME_PANEL_HH
 #define TIME_PANEL_HH
 
 #include <QWidget>
+#include <vector>
+
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"
 #include "common/Event.hh"
@@ -17,7 +35,7 @@ namespace gazebo
     class TimePanel : public QWidget
     {
       Q_OBJECT
-      public: TimePanel( QWidget *parent = 0 );
+      public: TimePanel(QWidget *_parent = 0);
       public: virtual ~TimePanel();
 
       private slots: void Update();
@@ -33,7 +51,7 @@ namespace gazebo
       private: QLineEdit *realTimeEdit;
       private: QLabel *pauseLabel;
 
-      private: common::Time lastUpdateTime,statusUpdatePeriod;
+      private: common::Time lastUpdateTime, statusUpdatePeriod;
       private: common::Time simTime, realTime, pauseTime;
 
       private: transport::NodePtr node;
@@ -46,3 +64,5 @@ namespace gazebo
 }
 
 #endif
+
+

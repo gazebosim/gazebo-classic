@@ -42,8 +42,7 @@ LightMaker::LightMaker() : EntityMaker()
   this->msg.set_attenuation_constant(0.5);
   this->msg.set_attenuation_linear(0.01);
   this->msg.set_attenuation_quadratic(0.001);
-  this->msg.set_range( 20 );
-
+  this->msg.set_range(20);
 }
 
 void LightMaker::Start(const rendering::UserCameraPtr _camera)
@@ -52,7 +51,7 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
 
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;
-  this->msg.set_name( stream.str() );
+  this->msg.set_name(stream.str());
   this->state = 1;
 }
 
@@ -74,9 +73,9 @@ void LightMaker::OnMousePush(const common::MouseEvent &_event)
 
   math::Quaternion orient;
   math::Vector3 norm, point;
-  norm.Set(0,0,1);
+  norm.Set(0, 0, 1);
 
-  if (!this->camera->GetWorldPointOnPlane(_event.pressPos.x, 
+  if (!this->camera->GetWorldPointOnPlane(_event.pressPos.x,
         _event.pressPos.y, norm, 0, point))
   {
     gzerr << "Inavlid mouse point\n";
@@ -104,3 +103,5 @@ void LightMaker::CreateTheEntity()
   this->lightPub->Publish(this->msg);
   this->camera.reset();
 }
+
+

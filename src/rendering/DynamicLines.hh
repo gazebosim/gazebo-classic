@@ -23,68 +23,71 @@
 #ifndef OGREDYNAMICLINES_HH
 #define OGREDYNAMICLINES_HH
 
+#include <vector>
+#include <string>
+
 #include "math/Vector3.hh"
 #include "rendering/DynamicRenderable.hh"
 
-#include <vector>
-
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
-  
     /// \addtogroup gazebo_rendering
     /// \{
-    
     /// \brief Class for drawing lines
     class DynamicLines : public DynamicRenderable
     {
       /// Constructor
-      public: DynamicLines(RenderOpType opType=RENDERING_LINE_STRIP);
-    
+      public: DynamicLines(RenderOpType opType = RENDERING_LINE_STRIP);
+
       /// Destructor
       public: virtual ~DynamicLines();
-    
+
       public: static std::string GetMovableType();
 
       /// \brief Returns "gazebo::ogredynamicslines"
       public: virtual const Ogre::String &getMovableType() const;
-    
+
       /// Add a point to the point list
       /// \param pt math::Vector3 point
       public: void AddPoint(const math::Vector3 &pt);
-    
+
       /// Change the location of an existing point in the point list
       /// \param index Index of the point to set
       /// \param value math::Vector3 value to set the point to
       public: void SetPoint(unsigned int index, const math::Vector3 &value);
-    
+
       /// Return the location of an existing point in the point list
       /// \param index Number of the point to return
       /// \return math::Vector3 value of the point
       public: const math::Vector3& GetPoint(unsigned int index) const;
-    
+
       /// Return the total number of points in the point list
       /// \return Number of points
       public: unsigned int GetPointCount() const;
-    
+
       /// Remove all points from the point list
       public: void Clear();
-    
-      /// Call this to update the hardware buffer after making changes.  
+
+      /// Call this to update the hardware buffer after making changes.
       public: void Update();
-    
-      /// \brief Implementation DynamicRenderable, creates a simple vertex-only decl
+
+      /// \brief Implementation DynamicRenderable,
+      ///        creates a simple vertex-only decl
       protected: virtual void  CreateVertexDeclaration();
-    
-      /// \brief Implementation DynamicRenderable, pushes point list out to hardware memory
+
+      /// \brief Implementation DynamicRenderable, pushes point
+      ///        list out to hardware memory
       protected: virtual void FillHardwareBuffers();
-    
+
       private: std::vector<math::Vector3> points;
       private: bool dirty;
     };
-    
+
     /// \}
   }
 }
 #endif
+
+

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,36 +32,34 @@
 
 namespace gazebo
 {
-
-
 /// \addtogroup gazebo_screw_joint Screw Joint
 /// \{
-
   namespace physics
   {
     /// \brief A screw joint
     class ODEScrewJoint : public ScrewJoint<ODEJoint>
     {
       /// \brief Constructor
-      public: ODEScrewJoint( dWorldID worldId );
-    
+      public: ODEScrewJoint(dWorldID worldId);
+
       /// \brief Destructor
       public: virtual ~ODEScrewJoint();
-    
+
       /// \brief Load the joint
-      protected: virtual void Load( sdf::ElementPtr &_sdf );
+      protected: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Get the axis of rotation
       public: virtual math::Vector3 GetGlobalAxis(int index) const;
 
       /// \brief Set the axis of motion
-      public: virtual void SetAxis( int index, const math::Vector3 &axis );
-    
+      public: virtual void SetAxis(int index, const math::Vector3 &axis);
+
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
 
       /// \brief Set screw joint thread pitch
-      public: virtual void SetThreadPitch(int index, const double _thread_pitch);
+      public: virtual void SetThreadPitch(int index,
+                                          const double _thread_pitch);
 
       /// \brief callback to apply damping force to joint
       public: void ApplyDamping();
@@ -85,13 +83,19 @@ namespace gazebo
       public: virtual double GetMaxForce(int index);
 
       /// \brief Get the _parameter
-      public: virtual double GetParam( int parameter ) const;
+      public: virtual double GetParam(int parameter) const;
 
       /// \brief Set the _parameter
-      public: virtual void SetParam( int parameter, double value);
+      public: virtual void SetParam(int parameter, double value);
     };
-  
+
 /// \}
   }
 }
 #endif
+
+
+
+
+
+

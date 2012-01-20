@@ -31,10 +31,10 @@ bool rendering::load()
   {
     rendering::RenderEngine::Instance()->Load();
   }
-  catch(common::Exception e)
+  catch(common::Exception &e)
   {
     result = false;
-    gzerr << "Failed to load the Rendering engine subsystem\n" << e ;
+    gzerr << "Failed to load the Rendering engine subsystem\n" << e;
   }
 
   return result;
@@ -44,15 +44,15 @@ bool rendering::init()
 {
   bool result = true;
 
-  //Initialize RenderEngine
+  // Initialize RenderEngine
   try
   {
     rendering::RenderEngine::Instance()->Init();
   }
-  catch (common::Exception e)
+  catch(common::Exception &e)
   {
     result = false;
-    gzerr <<"Failed to Initialize the Rendering engine subsystem\n" << e ;
+    gzerr << "Failed to Initialize the Rendering engine subsystem\n" << e;
   }
 
   return result;
@@ -69,20 +69,20 @@ rendering::ScenePtr rendering::get_scene(const std::string &_name)
   return rendering::RenderEngine::Instance()->GetScene(_name);
 }
 
-rendering::ScenePtr rendering::create_scene(const std::string &_name, 
-                                            bool _enableVisualizations )
+rendering::ScenePtr rendering::create_scene(const std::string &_name,
+                                            bool _enableVisualizations)
 {
   ScenePtr scene;
 
   // Create a default scene for the gui
   try
   {
-    scene = rendering::RenderEngine::Instance()->CreateScene(_name, 
+    scene = rendering::RenderEngine::Instance()->CreateScene(_name,
         _enableVisualizations);
   }
-  catch (common::Exception e)
+  catch(common::Exception &e)
   {
-    gzerr <<"Failed to create a scene in the Rendering engine" << e ;
+    gzerr << "Failed to create a scene in the Rendering engine" << e;
   }
 
   return scene;
@@ -92,3 +92,6 @@ void rendering::remove_scene(const std::string &_name)
 {
   rendering::RenderEngine::Instance()->RemoveScene(_name);
 }
+
+
+

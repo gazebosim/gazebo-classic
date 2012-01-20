@@ -21,8 +21,11 @@
 #ifndef PUBLISHER_HH
 #define PUBLISHER_HH
 
-#include <boost/thread.hpp>
 #include <google/protobuf/message.h>
+#include <boost/thread.hpp>
+#include <string>
+#include <list>
+
 #include "transport/TransportTypes.hh"
 
 namespace gazebo
@@ -31,13 +34,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief A publisher of messages on a topic
     class Publisher
     {
-      /// \brief Default Constructor
-      public: Publisher(unsigned int _limit, bool _latch);
-
       /// \brief Use this constructor
       /// \param topic Name of topic
       /// \param msg_type Type of the message which is to be published
@@ -49,17 +48,19 @@ namespace gazebo
 
       public: bool HasConnections() const;
 
+      /// \brief Block until a connection has been established with this
+      ///        publisher
+      public: void WaitForConnection() const;
+
       public: void SetPublication(PublicationPtr &_publication, int _i);
 
       /// \brief Publish a message on the topic
-      public: void Publish( const google::protobuf::Message &_message,
+      public: void Publish(const google::protobuf::Message &_message,
                  bool _block = false)
               { this->PublishImpl(_message, _block); }
-
       public: template< typename M>
-              void Publish(M _message, bool _block=false)
+              void Publish(M _message, bool _block = false)
               { this->PublishImpl(_message, _block); }
-
       public: unsigned int GetOutgoingCount() const;
 
       private: void PublishImpl(const google::protobuf::Message &_message,
@@ -79,7 +80,7 @@ namespace gazebo
 
       /// \brief Callback when a publish is completed
       private: void OnPublishComplete();
-               
+
       private: std::string topic;
       private: std::string msgType;
       private: unsigned int queueLimit;
@@ -95,3 +96,5 @@ namespace gazebo
 }
 
 #endif
+
+

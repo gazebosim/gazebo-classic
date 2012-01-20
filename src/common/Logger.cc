@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 #include <iomanip>
 #include "common/Time.hh"
 #include "Entity.hh"
-#include "Simulator.hh"
 #include "common/Console.hh"
 #include "common/Logger.hh"
 
@@ -25,28 +24,25 @@ using namespace gazebo;
 using namespace common;
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
+//////////////////////////////////////////////////
 Logger::Logger()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 Logger::~Logger()
 {
   std::vector<LogObj*>::iterator iter;
 
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); iter++)
+  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
     delete *iter;
   this->logObjects.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add a log
-void Logger::AddLog(const std::string &entity, const std::string &filename)
+//////////////////////////////////////////////////
+void Logger::AddLog(const std::string &_entity, const std::string &_filename)
 {
-  Logger::LogObj *newLog = new Logger::LogObj(entity, filename);
+  Logger::LogObj *newLog = new Logger::LogObj(_entity, _filename);
 
   if (newLog->valid)
     this->logObjects.push_back(newLog);
@@ -57,15 +53,14 @@ void Logger::AddLog(const std::string &entity, const std::string &filename)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Remove a log
-void Logger::RemoveLog(const std::string &entity)
+//////////////////////////////////////////////////
+void Logger::RemoveLog(const std::string &_entity)
 {
   std::vector<LogObj*>::iterator iter;
 
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); iter++)
+  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
   {
-    if ( (*iter)->GetEntityName() == entity)
+    if ((*iter)->GetEntityName() == _entity)
     {
       delete *iter;
       this->logObjects.erase(iter);
@@ -74,53 +69,51 @@ void Logger::RemoveLog(const std::string &entity)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the logger
+//////////////////////////////////////////////////
 void Logger::Update()
 {
   std::vector<LogObj*>::iterator iter;
 
-  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); iter++)
+  for (iter = this->logObjects.begin(); iter != this->logObjects.end(); ++iter)
     (*iter)->Update();
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-Logger::LogObj::LogObj(const std::string &entityName, const std::string &filename) : valid(false)
+//////////////////////////////////////////////////
+Logger::LogObj::LogObj(const std::string &_entityName,
+    const std::string &_filename) : valid(false)
 {
-  this->logFile.open(filename.c_str(), std::fstream::out);
+  this->logFile.open(_filename.c_str(), std::fstream::out);
   this->startRealTime = Simulator::Instance()->GetRealTime();
   this->startSimTime = Simulator::Instance()->GetSimTime();
-  this->entity = dynamic_cast<Entity*>(Common::GetByName(entityName));
+  this->entity = dynamic_cast<Entity*>(Common::GetByName(_entityName));
 
   if (!this->logFile.is_open())
   {
-    gzerr << "Unable to open file for logging:" << filename << "\n";
+    gzerr << "Unable to open file for logging:" << _filename << "\n";
     return;
   }
 
   if (!this->entity)
   {
-    gzerr << "Unable to find entity with name:" << entityName << "\n";
+    gzerr << "Unable to find entity with name:" << _entityName << "\n";
     return;
   }
 
-  this->logFile << "# Global_Sim_Time Global_Real_Time Accum_Sim_Time Accum_Real_Time X Y Z Roll Pitch Yaw Linear_Vel_X Linear_Vel_Y Linear_Vel_Z Angular_Vel_Z Angular_Vel_Y Angular_Vel_Z\n";
+  this->logFile << "# Global_Sim_Time Global_Real_Time Accum_Sim_Time " <<
+    "Accum_Real_Time X Y Z Roll Pitch Yaw Linear_Vel_X Linear_Vel_Y " <<
+    "Linear_Vel_Z Angular_Vel_Z Angular_Vel_Y Angular_Vel_Z\n";
 
   this->valid = true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Destructor
+//////////////////////////////////////////////////
 Logger::LogObj::~LogObj()
 {
   this->logFile.close();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the log object
+//////////////////////////////////////////////////
 void Logger::LogObj::Update()
 {
   if (this->entity)
@@ -138,11 +131,11 @@ void Logger::LogObj::Update()
     yaw = pose3d.rot.GetYaw();
 
     this->logFile << std::setprecision(8) << std::fixed
-      << simTime.Double() << " " << realTime.Double() 
-      << " " << (simTime - this->startSimTime).Double() 
-      << " " << (realTime - this->startRealTime).Double() 
-      << " " << pose3d.pos.x << " " << pose3d.pos.y << " " << pose3d.pos.z 
-      << " " << roll << " " << pitch << " " << yaw 
+      << simTime.Double() << " " << realTime.Double()
+      << " " << (simTime - this->startSimTime).Double()
+      << " " << (realTime - this->startRealTime).Double()
+      << " " << pose3d.pos.x << " " << pose3d.pos.y << " " << pose3d.pos.z
+      << " " << roll << " " << pitch << " " << yaw
       << " " << linearVel.x << " " << linearVel.y << " " << linearVel.z
       << " " << angularVel.x << " " << angularVel.y << " " << angularVel.z
       << "\n";
@@ -153,12 +146,12 @@ void Logger::LogObj::Update()
   this->logFile << "\n";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the entity name
+//////////////////////////////////////////////////
 std::string Logger::LogObj::GetEntityName() const
 {
   if (this->entity)
     return this->entity->GetName();
-  else 
+  else
     return std::string("");
 }
+

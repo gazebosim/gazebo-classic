@@ -1,8 +1,27 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #ifndef PUBLICATION_HH
 #define PUBLICATION_HH
 
 #include <boost/shared_ptr.hpp>
 #include <list>
+#include <string>
+#include <vector>
 
 #include "transport/CallbackHelper.hh"
 #include "transport/TransportTypes.hh"
@@ -14,14 +33,13 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief A publication for a topic. This facilitates transport of
-    ///messages
+    /// messages
     class Publication
     {
       /// \brief Constructor
-      public: Publication( const std::string &topic, 
-                           const std::string &msgType );
+      public: Publication(const std::string &topic,
+                           const std::string &msgType);
 
       /// \brief Destructor
       public: virtual ~Publication();
@@ -39,7 +57,8 @@ namespace gazebo
       public: void RemoveSubscription(const NodePtr &_node);
 
       /// \brief Remove a subscription
-      public: void RemoveSubscription(const std::string &host, unsigned int port);
+      public: void RemoveSubscription(const std::string &host,
+                                      unsigned int port);
 
       public: void RemoveTransport(const std::string &host, unsigned int port);
 
@@ -62,11 +81,11 @@ namespace gazebo
       public: void Publish(const google::protobuf::Message &msg,
                            const boost::function<void()> &cb = NULL);
 
-      public: void AddTransport( const PublicationTransportPtr &publink );
-      public: bool HasTransport( const std::string &_host, unsigned int _port );
+      public: void AddTransport(const PublicationTransportPtr &publink);
+      public: bool HasTransport(const std::string &_host, unsigned int _port);
 
       public: void AddPublisher(PublisherPtr _pub);
-      public: void RemovePublisher();
+      public: void RemovePublisher() const;
 
       private: unsigned int id;
       private: static unsigned int idCounter;
@@ -89,3 +108,5 @@ namespace gazebo
   }
 }
 #endif
+
+

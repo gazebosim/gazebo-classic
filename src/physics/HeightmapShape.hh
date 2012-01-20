@@ -22,35 +22,37 @@
 #ifndef HEIGHTMAPSHAPE_HH
 #define HEIGHTMAPSHAPE_HH
 
+#include <string>
+#include <vector>
+
 #include "common/Image.hh"
 #include "physics/PhysicsTypes.hh"
 #include "physics/Shape.hh"
 
 namespace gazebo
 {
-	namespace physics
+  namespace physics
   {
     /// \addtogroup gazebo_physics
     /// \{
-
     /// \brief Height map collision
     class HeightmapShape : public Shape
     {
       /// \brief Constructor
       public: HeightmapShape(CollisionPtr parent);
-  
+
       /// \brief Destructor
       public: virtual ~HeightmapShape();
-  
-      /// \brief Update function 
+
+      /// \brief Update function
       public: void Update();
-  
+
       /// \brief Load the heightmap
-      public: virtual void Load( sdf::ElementPtr &_sdf );
+      public: virtual void Load(sdf::ElementPtr &_sdf);
 
       /// \brief Initialize the heightmap
       public: virtual void Init();
-  
+
       public: std::string GetFilename() const;
       public: math::Vector3 GetSize() const;
       public: math::Vector3 GetOffset() const;
@@ -60,11 +62,12 @@ namespace gazebo
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
       protected: std::vector<double> heights;
-  
+
       protected: common::Image img;
     };
     /// \}
   }
-
 }
 #endif
+
+

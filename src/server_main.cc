@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -19,28 +35,25 @@ std::vector<std::string> plugins;
 
 boost::interprocess::interprocess_semaphore sem(0);
 
-////////////////////////////////////////////////////////////////////////////////
-// TODO: Implement these options
+//////////////////////////////////////////////////
 void PrintUsage()
 {
   std::cerr << "Usage: gzserver\n";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Print the version/licence string
+//////////////////////////////////////////////////
 void PrintVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Parse the argument list.  Options are placed in static variables.
+//////////////////////////////////////////////////
 int ParseArgs(int argc, char **argv)
 {
-  //FILE *tmpFile;
+  // FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("up:");
+  char *flags = const_cast<char*>("up:");
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
   {
@@ -49,7 +62,7 @@ int ParseArgs(int argc, char **argv)
       case 'p':
         {
           if (optarg != NULL)
-            plugins.push_back( std::string(optarg) );
+            plugins.push_back(std::string(optarg));
           else
             gzerr << "Missing plugin filename with -p argument\n";
           break;
@@ -75,16 +88,15 @@ int ParseArgs(int argc, char **argv)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// sighandler to shut everything down properly
-void SignalHandler( int )
+//////////////////////////////////////////////////
+void SignalHandler(int)
 {
   server->Stop();
 }
 
 int main(int argc, char **argv)
 {
-  //Application Setup
+  // Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
@@ -105,8 +117,8 @@ int main(int argc, char **argv)
 
   // Construct plugins
   /// Load all the plugins specified on the command line
-  for (std::vector<std::string>::iterator iter = plugins.begin(); 
-       iter != plugins.end(); iter++)
+  for (std::vector<std::string>::iterator iter = plugins.begin();
+       iter != plugins.end(); ++iter)
   {
     server->LoadPlugin(*iter);
   }
@@ -117,7 +129,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  server->SetParams( params );
+  server->SetParams(params);
   server->Init();
 
   server->Run();
@@ -127,6 +139,8 @@ int main(int argc, char **argv)
   delete server;
   server = NULL;
 
-  printf("\n");  
+  printf("\n");
   return 0;
 }
+
+

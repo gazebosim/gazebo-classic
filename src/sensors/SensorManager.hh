@@ -23,8 +23,9 @@
 #ifndef SENSORMANAGER_HH
 #define SENSORMANAGER_HH
 
-#include <list>
 #include <boost/thread.hpp>
+#include <list>
+#include <string>
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"
@@ -36,7 +37,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_sensors
     /// \{
- 
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
     {
@@ -47,7 +47,7 @@ namespace gazebo
       public: virtual ~SensorManager();
 
       /// \brief Update all the sensors
-      public: void Update(bool force=false);
+      public: void Update(bool force = false);
 
       /// \brief Init all the sensors
       public: void Init();
@@ -92,3 +92,5 @@ namespace gazebo
   }
 }
 #endif
+
+

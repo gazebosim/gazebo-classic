@@ -17,19 +17,18 @@
 #ifndef MATRIX4_HH
 #define MATRIX4_HH
 
-#include <iostream>
 #include <assert.h>
+#include <iostream>
 
 #include "math/Vector3.hh"
 #include "math/Matrix3.hh"
 
 namespace gazebo
 {
-	namespace math
+  namespace math
   {
     /// \addtogroup gazebo_math
     /// \{
-  
     /// \brief A 3x3 matrix class
     class Matrix4
     {
@@ -38,7 +37,7 @@ namespace gazebo
 
       /// \brief Copy constructor
       /// \param _m Matrix to copy
-      public: Matrix4(const Matrix4 &m);
+      public: Matrix4(const Matrix4 &_m);
 
       /// \brief Constructor
       /// \param _v00 Row 0, Col 0 value
@@ -62,7 +61,7 @@ namespace gazebo
                       double _v20, double _v21, double _v22, double _v23,
                       double _v30, double _v31, double _v32, double _v33);
 
-      /// \brief Destructor 
+      /// \brief Destructor
       public: virtual ~Matrix4();
 
       /// \brief Set
@@ -88,40 +87,40 @@ namespace gazebo
                        double _v30, double _v31, double _v32, double _v33);
 
 
- 
-      /// \brief Set the translational values [ (0,3) (1,3) (2,3) ]
+
+      /// \brief Set the translational values [ (0, 3) (1, 3) (2, 3) ]
       /// \param _t Values to set
       public: void SetTranslate(const Vector3 &_t);
 
       /// \brief Set the scale
       /// \param _s scale
       public: void SetScale(const Vector3 &_s);
- 
-      /// \brief Return true if the matrix is affine 
+
+      /// \brief Return true if the matrix is affine
       /// \return True if the matrix is affine
       public: bool IsAffine() const;
 
       /// \brief Perform an affine transformation
       /// \param _v Vector3 value for the transformation
       /// \return The result of the transformation
-      public: Vector3 TransformAffine( const Vector3 &_v ) const;
- 
+      public: Vector3 TransformAffine(const Vector3 &_v) const;
+
       /// \brief Equal operator. this = _mat
       /// \param _mat Incoming matrix
       /// \return The resulting matrix
-      public: const Matrix4 &operator=( const Matrix4 &_mat );
+      public: Matrix4 &operator =(const Matrix4 &_mat);
 
       /// \brief Equal operator for 3x3 matrix
       /// \param _mat Incoming matrix
       /// \return The resulting matrix
-      public: const Matrix4 & operator=( const Matrix3 &_mat );
- 
-      /// \brief Multiplication operator 
+      public: const Matrix4 & operator =(const Matrix3 &_mat);
+
+      /// \brief Multiplication operator
       /// \param _mat Incoming matrix
       /// \return This matrix * _mat
       public: Matrix4 operator*(const Matrix4 &_mat) const;
 
-      /// \brief Multiplication operator 
+      /// \brief Multiplication operator
       /// \param _mat Incoming matrix
       /// \return This matrix * _mat
       public: Matrix4 operator*(const Matrix3 &_mat) const;
@@ -132,46 +131,49 @@ namespace gazebo
       /// \return Resulting vector from multiplication
       public: Vector3 operator*(const Vector3 &_vec) const;
 
-      public: inline double *operator [] (size_t _row) 
+      public: inline double *operator[](size_t _row)
               {
-                assert( _row < 4 );
+                assert(_row < 4);
                 return this->m[_row];
               }
 
-       public: inline const double *operator [] (size_t _row) const
+       public: inline const double *operator[](size_t _row) const
               {
-                assert( _row < 4 );
+                assert(_row < 4);
                 return this->m[_row];
               }
 
-      /// \brief Output operator 
+      /// \brief Output operator
       /// \param _out Output stream
       /// \param _m Matrix to output
-      public: friend std::ostream &operator<<( std::ostream &_out, 
-                                               const gazebo::math::Matrix4 &_m )
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                               const gazebo::math::Matrix4 &_m)
             {
-              for (int i=0; i < 4; i++)
+              for (int i = 0; i < 4; i++)
               {
-                for (int j=0; j < 4; j++)
+                for (int j = 0; j < 4; j++)
                 {
                   _out << _m.m[i][j] << " ";
                 }
                 _out << "\n";
               }
-  
+
               return _out;
             }
- 
-      /// \brief Identity matrix 
+
+      /// \brief Identity matrix
       public: static const Matrix4 IDENTITY;
 
-      /// \brief Zero matrix 
+      /// \brief Zero matrix
       public: static const Matrix4 ZERO;
-  
-      /// \brief The 4x4 matrix 
+
+      /// \brief The 4x4 matrix
       protected: double m[4][4];
     };
     /// \}
   }
 }
 #endif
+
+
+

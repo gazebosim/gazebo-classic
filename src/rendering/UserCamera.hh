@@ -22,6 +22,9 @@
 #ifndef USERCAMERA_HH
 #define USERCAMERA_HH
 
+#include <string>
+#include <vector>
+
 #include "rendering/Camera.hh"
 #include "rendering/RenderTypes.hh"
 #include "common/CommonTypes.hh"
@@ -33,7 +36,7 @@ namespace Ogre
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class OrbitViewController;
     class FPSViewController;
@@ -42,32 +45,31 @@ namespace gazebo
 
     /// \addtogroup gazebo_rendering
     /// \{
-
     /// \brief A camera used for user visualization of a scene
     class UserCamera : public Camera
     {
       /// \brief Constructor
       public: UserCamera(const std::string &_name, Scene *_scene);
-  
+
       /// \brief Destructor
       public: virtual ~UserCamera();
-  
+
       /// \brief Load the user camera
       public: void Load(sdf::ElementPtr _sdf);
       public: void Load();
-  
+
       /// \brief Initialize
       public: void Init();
-  
+
       /// \brief Render the camera
       public: virtual void Update();
-  
+
       /// \brief Post render
       public: virtual void PostRender();
-  
+
       /// \brief Finialize
       public: void Fini();
-  
+
       /// \brief Hande a mouse event
       public: void HandleMouseEvent(const common::MouseEvent &_evt);
       public: void HandleKeyPressEvent(const std::string &_key);
@@ -79,23 +81,23 @@ namespace gazebo
        /// \brief Set view controller
       public: void SetViewController(const std::string &_type,
                                      const math::Vector3 &_pos);
-  
+
       /// \brief Resize the camera
       public: void Resize(unsigned int _w, unsigned int _h);
-  
+
       /// \brief Set the dimensions of the viewport
       public: void SetViewportDimensions(float _x, float _y,
                                          float _w, float _h);
-  
+
       /// \brief Get the average frames per second
       public: float GetAvgFPS() const;
 
-      /// \brief Get the triangle count 
+      /// \brief Get the triangle count
       public: float GetTriangleCount() const;
 
       /// \brief Move the camera to focus on a scene node
-      public: void MoveToVisual(VisualPtr _visual );
-      public: void MoveToVisual(const std::string &_visualName );
+      public: void MoveToVisual(VisualPtr _visual);
+      public: void MoveToVisual(const std::string &_visualName);
 
       public: bool MoveToPosition(const math::Vector3 &_end,
                                   double _pitch, double _yaw, double _time);
@@ -105,9 +107,9 @@ namespace gazebo
                                    boost::function<void()> _onComplete);
 
       /// \brief Set the camera to be attached to a scene node
-      protected: virtual bool AttachToVisualImpl( VisualPtr _visual,
-                     bool _inheritOrientation, double _minDist=0,
-                     double _maxDist=0 );
+      protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
+                     bool _inheritOrientation, double _minDist = 0,
+                     double _maxDist = 0);
 
       /// \brief Set the camera to track a scene node
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
@@ -115,7 +117,7 @@ namespace gazebo
       /// \brief Set to true to enable rendering
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
-      /// \brief Get the GUI overlay 
+      /// \brief Get the GUI overlay
       public: GUIOverlay *GetGUIOverlay();
 
       /// \brief Set whether the view controller is enabled
@@ -123,19 +125,19 @@ namespace gazebo
 
       /// \brief Toggle whether to show the visual
       private: void ToggleShowVisual();
-  
+
       /// \brief Set whether to show the visual
       private: void ShowVisual(bool _s);
-  
+
       private: std::string name;
       private: static int count;
-  
+
       private: Visual *visual;
-  
+
       private: ViewController *viewController;
       private: OrbitViewController *orbitViewController;
       private: FPSViewController *fpsViewController;
-  
+
       private: Ogre::AnimationState *animState;
       private: boost::function<void()> onAnimationComplete;
 
@@ -143,6 +145,5 @@ namespace gazebo
     };
     /// \}
   }
-
 }
 #endif

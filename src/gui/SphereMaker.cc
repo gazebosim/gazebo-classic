@@ -32,14 +32,14 @@ using namespace gui;
 
 unsigned int SphereMaker::counter = 0;
 
-SphereMaker::SphereMaker() 
+SphereMaker::SphereMaker()
   : EntityMaker()
 {
   this->state = 0;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::SPHERE);
   this->visualMsg->mutable_material()->set_script(
-      "Gazebo/TurquoiseGlowOutline" );
+      "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
       math::Quaternion());
 }
@@ -50,9 +50,9 @@ SphereMaker::~SphereMaker()
   delete this->visualMsg;
 }
 
-void SphereMaker::Start(const rendering::UserCameraPtr camera)
+void SphereMaker::Start(const rendering::UserCameraPtr _camera)
 {
-  this->camera = camera;
+  this->camera = _camera;
 
   std::ostringstream stream;
   stream << "__GZ_USER_sphere_" << counter++;
@@ -77,12 +77,12 @@ bool SphereMaker::IsActive() const
   return this->state > 0;
 }
 
-void SphereMaker::OnMousePush(const common::MouseEvent &event)
+void SphereMaker::OnMousePush(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
-  this->mousePushPos = event.pressPos;
+  this->mousePushPos = _event.pressPos;
 }
 
 void SphereMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
@@ -99,7 +99,7 @@ void SphereMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
   }
 }
 
-void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
+void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
@@ -107,18 +107,19 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
   math::Vector3 norm;
   math::Vector3 p1, p2;
 
-  norm.Set(0,0,1);
+  norm.Set(0, 0, 1);
 
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x, 
+  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
                                           this->mousePushPos.y, norm, 0, p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
   }
 
-  p1 = this->GetSnappedPoint( p1 );
+  p1 = this->GetSnappedPoint(p1);
 
-  if (!this->camera->GetWorldPointOnPlane(event.pos.x,event.pos.y,norm, 0, p2))
+  if (!this->camera->GetWorldPointOnPlane(
+        _event.pos.x, _event.pos.y, norm, 0, p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -131,7 +132,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &event)
   double scale = p1.Distance(p2);
   math::Vector3 p(this->visualMsg->pose().position().x(),
                   this->visualMsg->pose().position().y(),
-                  this->visualMsg->pose().position().z() );
+                  this->visualMsg->pose().position().z());
 
   p.z = scale;
 
@@ -145,28 +146,28 @@ void SphereMaker::CreateTheEntity()
   msgs::Factory msg;
   std::ostringstream newModelStr;
 
-  newModelStr << "<gazebo version='1.0'>\
-    <model name='custom_user_sphere" << counter << "_model'>\
-    <origin pose='" << this->visualMsg->pose().position().x() << " " 
-                    << this->visualMsg->pose().position().y() << " " 
+  newModelStr << "<gazebo version ='1.0'>\
+    <model name ='custom_user_sphere" << counter << "_model'>\
+    <origin pose ='" << this->visualMsg->pose().position().x() << " "
+                    << this->visualMsg->pose().position().y() << " "
                     << this->visualMsg->geometry().sphere().radius()
                     << " 0 0 0'/>\
-    <link name='body'>\
-      <inertial mass='1.0'>\
-          <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
+    <link name ='body'>\
+      <inertial mass ='1.0'>\
+          <inertia ixx ='1' ixy ='0' ixz ='0' iyy ='1' iyz ='0' izz ='1'/>\
       </inertial>\
-      <collision name='geom'>\
+      <collision name ='geom'>\
         <geometry>\
-          <sphere radius='" << this->visualMsg->geometry().sphere().radius()
+          <sphere radius ='" << this->visualMsg->geometry().sphere().radius()
           << "'/>\
         </geometry>\
       </collision>\
-      <visual name='visual' cast_shadows='true'>\
+      <visual name ='visual' cast_shadows ='true'>\
         <geometry>\
-          <sphere radius='" << this->visualMsg->geometry().sphere().radius()
+          <sphere radius ='" << this->visualMsg->geometry().sphere().radius()
           << "'/>\
         </geometry>\
-        <material script='Gazebo/Grey'/>\
+        <material script ='Gazebo/Grey'/>\
       </visual>\
     </link>\
   </model>\
@@ -182,3 +183,5 @@ void SphereMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
+
+

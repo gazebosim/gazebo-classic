@@ -20,7 +20,6 @@
  * SVN: $Id: BulletPhysics.cc 7714 2009-05-23 18:08:49Z natepak $
  */
 
-#include "BulletLink.hh"
 #include "BulletPlaneShape.hh"
 #include "BulletSphereShape.hh"
 #include "BulletBoxShape.hh"
@@ -35,14 +34,11 @@
 #include "BulletUniversalJoint.hh"
 
 #include "PhysicsFactory.hh"
-#include "Mass.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"
 #include "math/Vector3.hh"
 #include "Entity.hh"
-
-#include "common/XMLConfig.hh"
 
 #include "BulletPhysics.hh"
 
@@ -56,9 +52,8 @@ using namespace physics;
 
 GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics);
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-BulletPhysics::BulletPhysics(World *world)
+//////////////////////////////////////////////////
+BulletPhysics::BulletPhysics(World *_world)
     : PhysicsEngine(world)
 {
   this->collisionConfig = new btDefaultCollisionConfiguration();
@@ -78,8 +73,7 @@ BulletPhysics::BulletPhysics(World *world)
   common::Param::End();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 BulletPhysics::~BulletPhysics()
 {
   delete this->broadPhase;
@@ -88,7 +82,7 @@ BulletPhysics::~BulletPhysics()
   delete this->solver;
 
   // TODO: Fix this line
-  //delete this->dynamicsWorld;
+  // delete this->dynamicsWorld;
 
   this->broadPhase = NULL;
   this->collisionConfig = NULL;
@@ -97,60 +91,55 @@ BulletPhysics::~BulletPhysics()
   this->dynamicsWorld = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the Bullet engine
-void BulletPhysics::Load(common::XMLConfigNode *node)
+//////////////////////////////////////////////////
+void BulletPhysics::Load(common::XMLConfigNode *_node)
 {
-  common::XMLConfigNode *cnode = node->GetChild("bullet", "physics");
+  common::XMLConfigNode *cnode = _node->GetChild("bullet", "physics");
   if (cnode == NULL)
-    gzthrow("Must define a <physics:ode> node in the XML file");
+    gzthrow("Must define a <physics:ode> _node in the XML file");
 
   this->stepTimeP->Load(cnode);
 
   this->gravityP->Load(cnode);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Save the Bullet engine
-void BulletPhysics::Save(std::string &prefix, std::ostream &stream)
+//////////////////////////////////////////////////
+void BulletPhysics::Save(std::string &_prefix, std::ostream &_stream)
 {
-  stream << prefix << "<physics:bullet>\n";
-  stream << prefix << "  " << *(this->gravityP) << "\n";
-  stream << prefix << "</physics:bullet>\n";
+  _stream << _prefix << "<physics:bullet>\n";
+  _stream << _prefix << "  " << *(this->gravityP) << "\n";
+  _stream << _prefix << "</physics:bullet>\n";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the Bullet engine
+//////////////////////////////////////////////////
 void BulletPhysics::Init()
 {
   math::Vector3 g = this->gravityP->GetValue();
   this->dynamicsWorld->setGravity(btmath::Vector3(g.x, g.y, g.z));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Init the engine for threads. 
+//////////////////////////////////////////////////
 void BulletPhysics::InitForThread()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the Bullet collisions, create joints
+//////////////////////////////////////////////////
 void BulletPhysics::UpdateCollision()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the Bullet engine
+//////////////////////////////////////////////////
 void BulletPhysics::UpdatePhysics()
 {
-  /*common::Time time = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
-  int steps = (int) round( (time / **this->stepTimeP).Double() );
+  /*common::Time time =
+ Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
+  int steps = (int) round((time / **this->stepTimeP).Double());
 
-  steps = std::max(steps,1);
+  steps = std::max(steps, 1);
 
-  //time = 0.000001;
-  //steps = 1;
-  //this->dynamicsWorld->stepSimulation(time,  steps, (**this->stepTimeP));
+  // time = 0.000001;
+  // steps = 1;
+  // this->dynamicsWorld->stepSimulation(time, steps, (**this->stepTimeP));
   this->dynamicsWorld->stepSimulation((**this->stepTimeP).Double());
 
   this->lastUpdatecommon::Time = Simulator::Instance()->GetRealTime();
@@ -158,30 +147,26 @@ void BulletPhysics::UpdatePhysics()
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Finilize the Bullet engine
+//////////////////////////////////////////////////
 void BulletPhysics::Fini()
 {
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Remove an entity from the physics engine
-void BulletPhysics::RemoveEntity(Entity *entity)
+//////////////////////////////////////////////////
+void BulletPhysics::RemoveEntity(Entity *_entity)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Add an entity to the world
-void BulletPhysics::AddEntity(Entity *entity)
+//////////////////////////////////////////////////
+void BulletPhysics::AddEntity(Entity *_entity)
 {
-  BulletLink *body = dynamic_cast<BulletLink*>(entity);
+  BulletLink *body = dynamic_cast<BulletLink*>(_entity);
 
   this->dynamicsWorld->addRigidLink(body->GetBulletLink());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create a new body
+//////////////////////////////////////////////////
 Link *BulletPhysics::CreateLink(Entity *parent)
 {
   BulletLink *body = new BulletLink(parent);
@@ -189,12 +174,10 @@ Link *BulletPhysics::CreateLink(Entity *parent)
   return body;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Create a new collision
+//////////////////////////////////////////////////
 Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
 {
   BulletCollision *collision = NULL;
-  Shape *shape = NULL;
   BulletLink *body = NULL;
 
   body = dynamic_cast<BulletLink*>(parent);
@@ -205,26 +188,25 @@ Collision *BulletPhysics::CreateCollision(std::string type, Link *parent)
   collision = new BulletCollision(parent);
 
   if (type == "sphere")
-    shape = new BulletSphereShape(collision);
+    new BulletSphereShape(collision);
   if (type == "box")
-    shape = new BulletBoxShape(collision);
+    new BulletBoxShape(collision);
   if (type == "cylinder")
-    shape = new BulletCylinderShape(collision);
+    new BulletCylinderShape(collision);
   if (type == "plane")
-    shape = new BulletPlaneShape(collision);
+    new BulletPlaneShape(collision);
   if (type == "trimesh")
-    shape = new BulletTrimeshShape(collision);
+    new BulletTrimeshShape(collision);
   if (type == "map")
-    shape = new MapShape(collision);
-  else 
+    new MapShape(collision);
+  else
     gzthrow("Unable to create a collision of type[" << type << "]");
 
   return collision;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Create a new joint
+//////////////////////////////////////////////////
 Joint *BulletPhysics::CreateJoint(std::string type)
 {
   if (type == "slider")
@@ -237,63 +219,61 @@ Joint *BulletPhysics::CreateJoint(std::string type)
     return new BulletBallJoint(this->dynamicsWorld);
   if (type == "universal")
     return new BulletUniversalJoint(this->dynamicsWorld);
-  else 
+  else
     gzthrow("Unable to create joint of type[" << type << "]");
 
   return NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Convert an odeMass to Mass
-void BulletPhysics::ConvertMass(Mass *mass, void *engineMass)
+//////////////////////////////////////////////////
+void BulletPhysics::ConvertMass(Mass *_mass, void *_engineMass)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Convert an gazebo Mass to a bullet Mass
-void BulletPhysics::ConvertMass(void *engineMass, const Mass &mass)
+//////////////////////////////////////////////////
+void BulletPhysics::ConvertMass(void *_engineMass, const Mass &_mass)
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create an object to hold a set of ray collisions
+//////////////////////////////////////////////////
 /*PhysicsRaySensor *BulletPhysics::CreateRaySensor(Link *body)
 {
   return NULL;
 }*/
 
-////////////////////////////////////////////////////////////////////////////////
-math::Pose BulletPhysics::ConvertPose(btTransform bt)
+//////////////////////////////////////////////////
+math::Pose BulletPhysics::ConvertPose(btTransform _bt)
 {
   math::Pose pose;
-  pose.pos.x = bt.getOrigin().getX();
-  pose.pos.y = bt.getOrigin().getY();
-  pose.pos.z = bt.getOrigin().getZ();
+  pose.pos.x = _bt.getOrigin().getX();
+  pose.pos.y = _bt.getOrigin().getY();
+  pose.pos.z = _bt.getOrigin().getZ();
 
-  pose.rot.u = bt.getRotation().getW();
-  pose.rot.x = bt.getRotation().getX();
-  pose.rot.y = bt.getRotation().getY();
-  pose.rot.z = bt.getRotation().getZ();
+  pose.rot.u = _bt.getRotation().getW();
+  pose.rot.x = _bt.getRotation().getX();
+  pose.rot.y = _bt.getRotation().getY();
+  pose.rot.z = _bt.getRotation().getZ();
 
   return pose;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Convert a gazebo pose to a bullet transform
-btTransform BulletPhysics::ConvertPose(const math::Pose pose)
+//////////////////////////////////////////////////
+btTransform BulletPhysics::ConvertPose(const math::Pose _pose)
 {
   btTransform trans;
 
-  trans.setOrigin( btmath::Vector3( pose.pos.x, pose.pos.y, pose.pos.z) );
-  trans.setRotation( btQuaternion( pose.rot.x, pose.rot.y, 
-                                   pose.rot.z, pose.rot.u) );
+  trans.setOrigin(btmath::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
+  trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
+                                   _pose.rot.z, _pose.rot.u));
   return trans;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the gavity vector
-void BulletPhysics::SetGravity(const gazebo::math::Vector3 &gravity)
+//////////////////////////////////////////////////
+void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->gravityP->SetValue(gravity);
-  this->dynamicsWorld->setGravity(btmath::Vector3(gravity.x, gravity.y, gravity.z));
+  this->gravityP->SetValue(_gravity);
+  this->dynamicsWorld->setGravity(btmath::Vector3(_gravity.x,
+        _gravity.y, _gravity.z));
 }
+
+

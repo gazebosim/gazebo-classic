@@ -1076,25 +1076,25 @@ def CheckForHeaderGuard(filename, lines, error):
 
   # The guard should be PATH_FILE_H_, but we also allow PATH_FILE_H__
   # for backward compatibility.
-  if ifndef != cppvar:
-    error_level = 0
-    if ifndef != cppvar + '_':
-      error_level = 5
+  #if ifndef != cppvar:
+  #  error_level = 0
+  #  if ifndef != cppvar + '_':
+  #    error_level = 5
 
-    ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
-                            error)
-    error(filename, ifndef_linenum, 'build/header_guard', error_level,
-          '#ifndef header guard has wrong style, please use: %s' % cppvar)
+  #  ParseNolintSuppressions(filename, lines[ifndef_linenum], ifndef_linenum,
+  #                          error)
+  #  error(filename, ifndef_linenum, 'build/header_guard', error_level,
+  #        '#ifndef header guard has wrong style, please use: %s' % cppvar)
 
-  if endif != ('#endif  // %s' % cppvar):
-    error_level = 0
-    if endif != ('#endif  // %s' % (cppvar + '_')):
-      error_level = 5
+  #if endif != ('#endif  // %s' % cppvar):
+  #  error_level = 0
+  #  if endif != ('#endif  // %s' % (cppvar + '_')):
+  #    error_level = 5
 
-    ParseNolintSuppressions(filename, lines[endif_linenum], endif_linenum,
-                            error)
-    error(filename, endif_linenum, 'build/header_guard', error_level,
-          '#endif line should be "#endif  // %s"' % cppvar)
+  #  ParseNolintSuppressions(filename, lines[endif_linenum], endif_linenum,
+  #                          error)
+  #  error(filename, endif_linenum, 'build/header_guard', error_level,
+  #        '#endif line should be "#endif  // %s"' % cppvar)
 
 
 def CheckForUnicodeReplacementCharacters(filename, lines, error):
@@ -1520,7 +1520,8 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
       error(filename, linenum, 'whitespace/parens', 2,
             'Extra space after (')
     if (Search(r'\w\s+\(', fncall) and
-        not Search(r'#\s*define|typedef', fncall)):
+        not Search(r'#\s*define|typedef', fncall) and
+        not Search(r'<.*',fncall)):
       error(filename, linenum, 'whitespace/parens', 4,
             'Extra space before ( in function call')
     # If the ) is followed only by a newline or a { + newline, assume it's
@@ -1739,10 +1740,10 @@ def CheckSpacing(filename, clean_lines, linenum, error):
         error(filename, linenum, 'whitespace/blank_line', 3,
               'Blank line at the end of a code block.  Is this needed?')
 
-    matched = Match(r'\s*(public|protected|private):', prev_line)
-    if matched:
-      error(filename, linenum, 'whitespace/blank_line', 3,
-            'Do not leave a blank line after "%s:"' % matched.group(1))
+    #matched = Match(r'\s*(public|protected|private):', prev_line)
+    #if matched:
+    #  error(filename, linenum, 'whitespace/blank_line', 3,
+    #        'Do not leave a blank line after "%s:"' % matched.group(1))
 
   # Next, we complain if there's a comment too near the text
   commentpos = line.find('//')
@@ -2372,9 +2373,9 @@ def CheckIncludeLine(filename, clean_lines, linenum, include_state, error):
   line = clean_lines.lines[linenum]
 
   # "include" should use the new style "foo/bar.h" instead of just "bar.h"
-  if _RE_PATTERN_INCLUDE_NEW_STYLE.search(line):
-    error(filename, linenum, 'build/include', 4,
-          'Include the directory when naming .h files')
+  #if _RE_PATTERN_INCLUDE_NEW_STYLE.search(line):
+  #  error(filename, linenum, 'build/include', 4,
+  #        'Include the directory when naming .h files')
 
   # we shouldn't include a file more than once. actually, there are a
   # handful of instances where doing so is okay, but in general it's
@@ -2524,21 +2525,21 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
   # paren (for fn-prototype start), typename, &, varname.  For the const
   # version, we're willing for const to be before typename or after
   # Don't check the implementation on same line.
-  fnline = line.split('{', 1)[0]
-  if (len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) >
-      len(re.findall(r'\([^()]*\bconst\s+(?:typename\s+)?(?:struct\s+)?'
-                     r'(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) +
-      len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+\s+const(\s?&|&\s?)[\w]+',
-                     fnline))):
+  #fnline = line.split('{', 1)[0]
+  #if (len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) >
+  #    len(re.findall(r'\([^()]*\bconst\s+(?:typename\s+)?(?:struct\s+)?'
+  #                   r'(?:[\w:]|<[^()]*>)+(\s?&|&\s?)\w+', fnline)) +
+  #    len(re.findall(r'\([^()]*\b(?:[\w:]|<[^()]*>)+\s+const(\s?&|&\s?)[\w]+',
+  #                   fnline))):
 
-    # We allow non-const references in a few standard places, like functions
-    # called "swap()" or iostream operators like "<<" or ">>".
-    if not Search(
-        r'(swap|Swap|operator[<>][<>])\s*\(\s*(?:[\w:]|<.*>)+\s*&',
-        fnline):
-      error(filename, linenum, 'runtime/references', 2,
-            'Is this a non-const reference? '
-            'If so, make const or use a pointer.')
+  #  # We allow non-const references in a few standard places, like functions
+  #  # called "swap()" or iostream operators like "<<" or ">>".
+  #  if not Search(
+  #      r'(swap|Swap|operator[<>][<>])\s*\(\s*(?:[\w:]|<.*>)+\s*&',
+  #      fnline):
+  #    error(filename, linenum, 'runtime/references', 2,
+  #          'Is this a non-const reference? '
+  #          'If so, make const or use a pointer.')
 
   # Check to see if they're using an conversion function cast.
   # I just try to capture the most common basic types, though there are more.
@@ -2604,11 +2605,11 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
           (match.group(1), match.group(2)))
 
   # Check that we're not using RTTI outside of testing code.
-  if Search(r'\bdynamic_cast<', line) and not _IsTestFilename(filename):
-    error(filename, linenum, 'runtime/rtti', 5,
-          'Do not use dynamic_cast<>.  If you need to cast within a class '
-          "hierarchy, use static_cast<> to upcast.  Google doesn't support "
-          'RTTI.')
+  #if Search(r'\bdynamic_cast<', line) and not _IsTestFilename(filename):
+  #  error(filename, linenum, 'runtime/rtti', 5,
+  #        'Do not use dynamic_cast<>.  If you need to cast within a class '
+  #        "hierarchy, use static_cast<> to upcast.  Google doesn't support "
+  #        'RTTI.')
 
   if Search(r'\b([A-Za-z0-9_]*_)\(\1\)', line):
     error(filename, linenum, 'runtime/init', 4,
@@ -2651,9 +2652,9 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension, include_state,
     error(filename, linenum, 'runtime/printf', 4,
           'Almost always, snprintf is better than %s' % match.group(1))
 
-  if Search(r'\bsscanf\b', line):
-    error(filename, linenum, 'runtime/printf', 1,
-          'sscanf can be ok, but is slow and can overflow buffers.')
+  #if Search(r'\bsscanf\b', line):
+  #  error(filename, linenum, 'runtime/printf', 1,
+  #        'sscanf can be ok, but is slow and can overflow buffers.')
 
   # Check if some verboten operator overloading is going on
   # TODO(unknown): catch out-of-line unary operator&:
@@ -2802,6 +2803,10 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
           'Using sizeof(type).  Use sizeof(varname) instead if possible')
     return True
 
+  typeid_match = Match(r'.*typeid\s*$',line[0:match.start(1) - 1])
+  if typeid_match:
+    return True
+
   remainder = line[match.end(0):]
 
   # The close paren is for function pointers as arguments to a function.
@@ -2817,17 +2822,20 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
   # it's unnamed.  It should probably be expanded to check for multiple
   # arguments with some unnamed.
   function_match = Match(r'\s*(\)|=|(const)?\s*(;|\{|throw\(\)|>))', remainder)
+  #print "Remainder[%s]" % remainder
   if function_match:
-    if (not function_match.group(3) or
+    if ('SIGNAL' not in raw_line and  'SLOT' not in raw_line and
+        (not function_match.group(3) or
         function_match.group(3) == ';' or
-        ('MockCallback<' not in raw_line and
-         '/*' not in raw_line)):
+        ('<' not in raw_line and
+         '/*' not in raw_line))):
       error(filename, linenum, 'readability/function', 3,
             'All parameters should be named in a function')
     return True
 
   # At this point, all that should be left is actual casts.
-  error(filename, linenum, 'readability/casting', 4,
+  if len(remainder) > 0 and 'public: ' not in raw_line and 'private:' not in raw_line and 'protected: ' not in raw_line and remainder != ' const' and '::' not in raw_line:
+    error(filename, linenum, 'readability/casting', 4,
         'Using C-style cast.  Use %s<%s>(...) instead' %
         (cast_type, match.group(1)))
 
@@ -3218,8 +3226,8 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
         carriage_return_found = True
 
   except IOError:
-    sys.stderr.write(
-        "Skipping input '%s': Can't open for reading\n" % filename)
+    #sys.stderr.write(
+    #    "Skipping input '%s': Can't open for reading\n" % filename)
     return
 
   # Note, if no dot is found, this will give the entire filename as the ext.
@@ -3228,8 +3236,11 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   # When reading from stdin, the extension is unknown, so no cpplint tests
   # should rely on the extension.
   if (filename != '-' and file_extension != 'cc' and file_extension != 'h'
-      and file_extension != 'cpp'):
-    sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
+      and file_extension != 'cpp' and file_extension != 'hh'):
+    if (filename != "CMakeLists.txt" and file_extension != "in"
+        and file_extension != "proto" and file_extension != "sdf"):
+      pass
+      #sys.stderr.write('Ignoring %s; not a .cc or .h file\n' % filename)
   else:
     ProcessFileData(filename, file_extension, lines, Error,
                     extra_check_functions)
@@ -3240,7 +3251,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
             'One or more unexpected \\r (^M) found;'
             'better to use only a \\n')
 
-  sys.stderr.write('Done processing %s\n' % filename)
+  #sys.stderr.write('Done processing %s\n' % filename)
 
 
 def PrintUsage(message):

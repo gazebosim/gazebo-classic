@@ -32,7 +32,6 @@ namespace gazebo
   {
     /// \addtogroup gazebo_transport
     /// \{
-
     /// \brief A subscriber to a topic
     class Subscriber
     {
@@ -45,9 +44,6 @@ namespace gazebo
       /// \brief Get the topic name
       public: std::string GetTopic() const;
 
-      /// \brief Get the message type
-      public: std::string GetMsgType() const;
-
       /// \brief Unsubscribe from the topic
       public: void Unsubscribe() const;
 
@@ -59,3 +55,5 @@ namespace gazebo
 }
 
 #endif
+
+

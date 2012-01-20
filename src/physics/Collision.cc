@@ -43,14 +43,13 @@
 using namespace gazebo;
 using namespace physics;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-Collision::Collision( LinkPtr link )
-    : Entity(link)
+//////////////////////////////////////////////////
+Collision::Collision(LinkPtr _link)
+    : Entity(_link)
 {
   this->AddType(Base::COLLISION);
 
-  this->link = link;
+  this->link = _link;
 
   this->transparency = 0;
   this->contactsEnabled = false;
@@ -65,21 +64,19 @@ Collision::Collision( LinkPtr link )
         boost::bind(&Collision::EnabledCB, this, _1)));
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 Collision::~Collision()
 {
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    msg.set_name( this->bbVisual );
-    msg.set_delete_me( true );
+    msg.set_name(this->bbVisual);
+    msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Finalize the collision
+//////////////////////////////////////////////////
 void Collision::Fini()
 {
   msgs::Request *msg = msgs::CreateRequest("entity_delete",
@@ -95,8 +92,7 @@ void Collision::Fini()
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// First step in the loading process
+//////////////////////////////////////////////////
 void Collision::Load(sdf::ElementPtr &_sdf)
 {
   Entity::Load(_sdf);
@@ -112,7 +108,7 @@ void Collision::Load(sdf::ElementPtr &_sdf)
   if (this->shape->GetType() != MULTIRAY_SHAPE &&
       this->shape->GetType() != RAY_SHAPE)
   {
-    //this->visPub->Publish(this->CreateCollisionVisual());
+    this->visPub->Publish(this->CreateCollisionVisual());
   }
 }
 
@@ -123,12 +119,11 @@ void Collision::Init()
         this->sdf->GetElement("origin")->GetValuePose("pose"));
   else
     this->SetRelativePose(
-        math::Pose(math::Vector3(0,0,0), math::Quaternion(0,0,0)));
+        math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
   this->shape->Init();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Create the bounding box for the collision
+//////////////////////////////////////////////////
 void Collision::CreateBoundingBox()
 {
   // Create the bounding box
@@ -139,34 +134,33 @@ void Collision::CreateBoundingBox()
     box = this->GetBoundingBox();
 
     std::ostringstream visname;
-    visname << this->GetScopedName() << "::BBVISUAL" ;
+    visname << this->GetScopedName() << "::BBVISUAL";
 
     msgs::Visual msg;
-    msg.mutable_geometry()->set_type( msgs::Geometry::BOX );
-    msg.set_parent_name( this->GetScopedName() );
-    msg.set_name( this->GetScopedName() + "_BBVISUAL" );
+    msg.mutable_geometry()->set_type(msgs::Geometry::BOX);
+    msg.set_parent_name(this->GetScopedName());
+    msg.set_name(this->GetScopedName() + "_BBVISUAL");
     msg.set_cast_shadows(false);
 
-    //msg.set_visible( RenderState::GetShowBoundingBoxes() );
-    if (this->IsStatic() )
-      msg.mutable_material()->set_script( "Gazebo/YellowTransparent" );
+    if (this->IsStatic())
+      msg.mutable_material()->set_script("Gazebo/YellowTransparent");
     else
-      msg.mutable_material()->set_script( "Gazebo/GreenTransparent" );
+      msg.mutable_material()->set_script("Gazebo/GreenTransparent");
 
-    msgs::Set( msg.mutable_geometry()->mutable_box()->mutable_size(), 
-               (box.max - box.min) * 1.05 );
-    msgs::Set(msg.mutable_pose()->mutable_position(), math::Vector3(0,0,0.0));
-    msgs::Set(msg.mutable_pose()->mutable_orientation(), math::Quaternion(1,0,0,0));
-    msg.set_transparency( .5 );
-
-    //this->visPub->Publish(msg);
+    msgs::Set(msg.mutable_geometry()->mutable_box()->mutable_size(),
+               (box.max - box.min) * 1.05);
+    msgs::Set(msg.mutable_pose()->mutable_position(),
+              math::Vector3(0, 0, 0.0));
+    msgs::Set(msg.mutable_pose()->mutable_orientation(),
+              math::Quaternion(1, 0, 0, 0));
+    msg.set_transparency(.5);
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-void Collision::SetCollision(bool placeable)
+//////////////////////////////////////////////////
+void Collision::SetCollision(bool _placeable)
 {
-  this->placeable = placeable;
+  this->placeable = _placeable;
 
   if (this->IsStatic())
   {
@@ -181,121 +175,107 @@ void Collision::SetCollision(bool placeable)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return whether this is a placeable collision.
+//////////////////////////////////////////////////
 bool Collision::IsPlaceable() const
 {
   return this->placeable;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the laser retro reflectiveness
-void Collision::SetLaserRetro(float retro)
+//////////////////////////////////////////////////
+void Collision::SetLaserRetro(float _retro)
 {
-  this->sdf->GetAttribute("laser_retro")->Set(retro);
+  this->sdf->GetAttribute("laser_retro")->Set(_retro);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the laser retro reflectiveness
+//////////////////////////////////////////////////
 float Collision::GetLaserRetro() const
 {
   return this->sdf->GetValueDouble("laser_retro");
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the Bounding box
-void Collision::ShowBoundingBox(const bool &show)
+//////////////////////////////////////////////////
+void Collision::ShowBoundingBox(const bool &_show)
 {
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    msg.set_name( this->bbVisual );
-    msg.set_visible( show );
-    msg.set_delete_me( true );
-    //this->visPub->Publish(msg);
+    msg.set_name(this->bbVisual);
+    msg.set_visible(_show);
+    msg.set_delete_me(true);
+    this->visPub->Publish(msg);
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the link this collision belongs to
+//////////////////////////////////////////////////
 LinkPtr Collision::GetLink() const
 {
   return this->link;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the model this collision belongs to
+//////////////////////////////////////////////////
 ModelPtr Collision::GetModel() const
 {
   return this->link->GetModel();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the shape type
+//////////////////////////////////////////////////
 unsigned int Collision::GetShapeType()
 {
   return this->shape->GetType();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the shape for this collision
-void Collision::SetShape(ShapePtr shape)
+//////////////////////////////////////////////////
+void Collision::SetShape(ShapePtr _shape)
 {
-  this->shape = shape;
+  this->shape = _shape;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the attached shape
+//////////////////////////////////////////////////
 ShapePtr Collision::GetShape() const
 {
   return this->shape;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Turn contact recording on or off
+//////////////////////////////////////////////////
 void Collision::SetContactsEnabled(bool _enable)
 {
   this->contactsEnabled = _enable;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return true of contact recording is on
+//////////////////////////////////////////////////
 bool Collision::GetContactsEnabled() const
 {
   return this->contactsEnabled;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Add an occurance of a contact to this collision
+//////////////////////////////////////////////////
 void Collision::AddContact(const Contact &_contact)
 {
-  if (!this->GetContactsEnabled() || 
-      this->GetShapeType() == RAY_SHAPE || 
+  if (!this->GetContactsEnabled() ||
+      this->GetShapeType() == RAY_SHAPE ||
       this->GetShapeType() == PLANE_SHAPE)
     return;
 
   this->contact(this->GetName(), _contact);
-}           
-
-////////////////////////////////////////////////////////////////////////////////
-/// Enable callback: Called when the link changes
-void Collision::EnabledCB(bool enabled)
-{
-  msgs::Visual msg;
-  msg.set_name( this->bbVisual);
-
-  if (enabled)
-    msg.mutable_material()->set_script( "Gazebo/GreenTransparent" );
-  else
-    msg.mutable_material()->set_script( "Gazebo/RedTransparent" );
-
-  //this->visPub->Publish(msg);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the collision
+//////////////////////////////////////////////////
+void Collision::EnabledCB(bool _enabled)
+{
+  msgs::Visual msg;
+  msg.set_name(this->bbVisual);
+
+  if (_enabled)
+    msg.mutable_material()->set_script("Gazebo/GreenTransparent");
+  else
+    msg.mutable_material()->set_script("Gazebo/RedTransparent");
+
+  this->visPub->Publish(msg);
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearVel() const
 {
   if (this->link)
@@ -304,8 +284,7 @@ math::Vector3 Collision::GetRelativeLinearVel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the collision in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldLinearVel() const
 {
   if (this->link)
@@ -314,8 +293,7 @@ math::Vector3 Collision::GetWorldLinearVel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the collision
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeAngularVel() const
 {
   if (this->link)
@@ -324,8 +302,7 @@ math::Vector3 Collision::GetRelativeAngularVel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the collision in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldAngularVel() const
 {
   if (this->link)
@@ -334,8 +311,7 @@ math::Vector3 Collision::GetWorldAngularVel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the collision
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearAccel() const
 {
   if (this->link)
@@ -344,8 +320,7 @@ math::Vector3 Collision::GetRelativeLinearAccel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the collision in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldLinearAccel() const
 {
   if (this->link)
@@ -354,8 +329,7 @@ math::Vector3 Collision::GetWorldLinearAccel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the collision
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeAngularAccel() const
 {
   if (this->link)
@@ -364,8 +338,7 @@ math::Vector3 Collision::GetRelativeAngularAccel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the collision in the world frame
+//////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldAngularAccel() const
 {
   if (this->link)
@@ -374,15 +347,13 @@ math::Vector3 Collision::GetWorldAngularAccel() const
     return math::Vector3();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Update the parameters using new sdf values
-void Collision::UpdateParameters( sdf::ElementPtr &_sdf )
+//////////////////////////////////////////////////
+void Collision::UpdateParameters(sdf::ElementPtr &_sdf)
 {
   Entity::UpdateParameters(_sdf);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Fill a collision message
+//////////////////////////////////////////////////
 void Collision::FillCollisionMsg(msgs::Collision &_msg)
 {
   msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
@@ -395,7 +366,7 @@ void Collision::FillCollisionMsg(msgs::Collision &_msg)
   _msg.add_visual()->CopyFrom(*this->visualMsg);
   _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
 }
- 
+
 void Collision::ProcessMsg(const msgs::Collision &_msg)
 {
   if (_msg.id() != this->GetId())
@@ -439,14 +410,14 @@ msgs::Visual Collision::CreateCollisionVisual()
 
   if (this->shape->HasType(BOX_SHAPE))
   {
-    BoxShape *box = (BoxShape*)(this->shape.get());
+    BoxShape *box = static_cast<BoxShape*>(this->shape.get());
     geom->set_type(msgs::Geometry::BOX);
     math::Vector3 size = box->GetSize();
     msgs::Set(geom->mutable_box()->mutable_size(), size);
   }
   else if (this->shape->HasType(CYLINDER_SHAPE))
   {
-    CylinderShape *cyl = (CylinderShape*)(this->shape.get());
+    CylinderShape *cyl = static_cast<CylinderShape*>(this->shape.get());
     msg.mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
     geom->mutable_cylinder()->set_radius(cyl->GetRadius());
     geom->mutable_cylinder()->set_length(cyl->GetLength());
@@ -454,7 +425,7 @@ msgs::Visual Collision::CreateCollisionVisual()
 
   else if (this->shape->HasType(SPHERE_SHAPE))
   {
-    SphereShape *sph = (SphereShape*)(this->shape.get());
+    SphereShape *sph = static_cast<SphereShape*>(this->shape.get());
     msg.mutable_geometry()->set_type(msgs::Geometry::SPHERE);
     geom->mutable_sphere()->set_radius(sph->GetRadius());
   }
@@ -475,7 +446,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   }
   else if (this->shape->HasType(TRIMESH_SHAPE))
   {
-    TrimeshShape *msh = (TrimeshShape*)(this->shape.get());
+    TrimeshShape *msh = static_cast<TrimeshShape*>(this->shape.get());
     msg.mutable_geometry()->set_type(msgs::Geometry::MESH);
     math::Vector3 size = msh->GetSize();
     msgs::Set(geom->mutable_mesh()->mutable_scale(), size);
@@ -488,3 +459,5 @@ msgs::Visual Collision::CreateCollisionVisual()
 
   return msg;
 }
+
+

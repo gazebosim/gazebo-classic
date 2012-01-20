@@ -1,7 +1,24 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #ifndef SUBSCRIPTIONTRANSPORT_HH
 #define SUBSCRIPTIONTRANSPORT_HH
 
 #include <boost/shared_ptr.hpp>
+#include <string>
 
 #include "Connection.hh"
 #include "CallbackHelper.hh"
@@ -13,7 +30,6 @@ namespace gazebo
     /// \addtogroup gazebo_transport
     /// \{
 
-
     /// \brief Handles sending data over the wire to remote subscribers
     class SubscriptionTransport : public CallbackHelper
     {
@@ -23,13 +39,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SubscriptionTransport();
 
-      /// \brief Initialize the publication link 
+      /// \brief Initialize the publication link
       public: void Init(const ConnectionPtr &conn, bool _latching);
-
-      /// \brief Get the typename of the message that is handled
-      public: virtual std::string GetMsgType() const;
-
-      public: virtual bool HandleMessage(const google::protobuf::Message *msg);
 
       /// \brief Output a message to a connection
       public: virtual bool HandleData(const std::string &newdata);
@@ -37,7 +48,7 @@ namespace gazebo
       /// \brief Get the connection
       public: const ConnectionPtr &GetConnection() const;
 
-      /// \brief Return true if the callback is local, false if the callback 
+      /// \brief Return true if the callback is local, false if the callback
       /// is tied to a  remote connection
       public: virtual bool IsLocal() const;
 
@@ -48,3 +59,5 @@ namespace gazebo
 }
 
 #endif
+
+

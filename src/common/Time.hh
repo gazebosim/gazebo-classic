@@ -28,168 +28,169 @@
 
 namespace gazebo
 {
-	namespace common
+  namespace common
   {
     /// \addtogroup gazebo_common
     /// \{
-    
     /// \brief A Time class
     class Time
     {
       /// \brief Constructors
       public: Time();
-    
+
       /// \brief Copy constructor
       /// \param time Time to copy
-      public: Time( const Time &time );
-    
+      public: Time(const Time &_time);
+
       /// \brief Constructor
       /// \param tv Time to initialize to
-      public: Time( const struct timeval &tv );
-    
+      public: Time(const struct timeval &_tv);
+
       /// \brief Constructor
       /// \param sec Seconds
       /// \param nsec Microseconds
-      public: Time( int32_t sec,  int32_t nsec );
-    
+      public: Time(int32_t _sec, int32_t _nsec);
+
       /// \brief Constuctor
       /// \param time Time in double format sec.nsec
-      public: Time( double time );
-    
+      public: Time(double _time);
+
       /// \brief Destructor
       public: virtual ~Time();
-    
+
       /// \brief Get the wall time
       public: static const Time &GetWallTime();
-    
+
       /// \brief Set the time to the wall time
       public: void SetToWallTime();
-    
+
       /// \brief Set to sec and nsec
       /// \param sec Seconds
       /// \param nsec micro seconds
-      public: void Set( int32_t sec, int32_t nsec );
-    
+      public: void Set(int32_t _sec, int32_t _nsec);
+
       /// \brief Set to seconds
       /// \param seconds Number of seconds
-      public: void Set(double seconds);
-    
+      public: void Set(double _seconds);
+
       /// \brief Get the time as a double
       /// \return Time as a double
       public: double Double() const;
 
       /// \brief Millisecond sleep
       public: static Time MSleep(unsigned int _ms);
-    
+
       /// \brief Equal opeator
-      public: const Time &operator=( const struct timeval &tv );
-    
+      public: Time &operator =(const struct timeval &tv);
+
       /// \brief Equal opeator
-      public: const Time &operator=( const Time &time );
-    
+      public: Time &operator =(const Time &time);
+
       /// \brief Addition operators
-      public: Time operator +( const struct timeval &tv ) const;
-    
+      public: Time operator +(const struct timeval &tv) const;
+
       /// \brief Addition operators
-      public: const Time &operator +=( const struct timeval &tv );
-    
+      public: const Time &operator +=(const struct timeval &tv);
+
       /// \brief Addition operators
-      public: Time operator +( const Time &time ) const;
-    
+      public: Time operator +(const Time &time) const;
+
       /// \brief Addition operators
-      public: const Time &operator +=( const Time &time );
-    
+      public: const Time &operator +=(const Time &time);
+
       /// \brief Subtraction operator
-      public: Time operator -( const struct timeval &tv ) const;
-    
+      public: Time operator -(const struct timeval &tv) const;
+
       /// \brief Subtraction operator
-      public: const Time &operator -=( const struct timeval &tv );
-    
+      public: const Time &operator -=(const struct timeval &tv);
+
       /// \brief Subtraction operator
-      public: Time operator -( const Time &time ) const;
-    
+      public: Time operator -(const Time &time) const;
+
       /// \brief Subtraction operator
-      public: const Time &operator -=( const Time &time );
-    
+      public: const Time &operator -=(const Time &time);
+
       /// \brief Multiplication operators
-      public: Time operator *( const struct timeval &tv ) const;
-    
+      public: Time operator *(const struct timeval &tv) const;
+
       /// \brief Multiplication operators
-      public: const Time &operator *=( const struct timeval &tv );
-    
+      public: const Time &operator *=(const struct timeval &tv);
+
       /// \brief Multiplication operators
-      public: Time operator *( const Time &time ) const;
-    
+      public: Time operator *(const Time &time) const;
+
       /// \brief Multiplication operators
-      public: const Time &operator *=( const Time &time );
-    
+      public: const Time &operator *=(const Time &time);
+
       /// \brief Division operators
-      public: Time operator /( const struct timeval &tv ) const;
-    
+      public: Time operator /(const struct timeval &tv) const;
+
       /// \brief Division operators
-      public: const Time &operator /=( const struct timeval &tv );
-    
+      public: const Time &operator /=(const struct timeval &tv);
+
       /// \brief Division operators
-      public: Time operator /( const Time &time ) const;
-    
+      public: Time operator /(const Time &time) const;
+
       /// \brief Division operators
-      public: const Time &operator /=( const Time &time );
-    
+      public: const Time &operator /=(const Time &time);
+
       /// \brief Equality operators
-      public: bool operator==( const struct timeval &tv ) const;
+      public: bool operator ==(const struct timeval &tv) const;
       /// \brief Equality operators
-      public: bool operator==( const Time &time ) const;
+      public: bool operator ==(const Time &time) const;
       /// \brief Equality operators
-      public: bool operator==( double time ) const;
+      public: bool operator ==(double time) const;
       /// \brief Equality operators
-      public: bool operator!=( const struct timeval &tv ) const;
+      public: bool operator!=(const struct timeval &tv) const;
       /// \brief Equality operators
-      public: bool operator!=( const Time &time ) const;
+      public: bool operator!=(const Time &time) const;
       /// \brief Equality operators
-      public: bool operator!=( double time ) const;
+      public: bool operator!=(double time) const;
       /// \brief Equality operators
-      public: bool operator<( const struct timeval &tv ) const;
+      public: bool operator<(const struct timeval &tv) const;
       /// \brief Equality operators
-      public: bool operator<( const Time &time ) const;
+      public: bool operator<(const Time &time) const;
       /// \brief Equality operators
-      public: bool operator<( double time ) const;
+      public: bool operator<(double time) const;
       /// \brief Equality operators
-      public: bool operator<=( const struct timeval &tv ) const;
+      public: bool operator<=(const struct timeval &tv) const;
       /// \brief Equality operators
-      public: bool operator<=( const Time &time ) const;
+      public: bool operator<=(const Time &time) const;
       /// \brief Equality operators
-      public: bool operator<=( double time ) const;
+      public: bool operator<=(double time) const;
       /// \brief Equality operators
-      public: bool operator>( const struct timeval &tv ) const;
+      public: bool operator>(const struct timeval &tv) const;
       /// \brief Equality operators
-      public: bool operator>( const Time &time ) const;
+      public: bool operator>(const Time &time) const;
       /// \brief Equality operators
-      public: bool operator>( double time ) const;
+      public: bool operator>(double time) const;
       /// \brief Equality operators
-      public: bool operator>=( const struct timeval &tv ) const;
+      public: bool operator>=(const struct timeval &tv) const;
       /// \brief Equality operators
-      public: bool operator>=( const Time &time ) const;
+      public: bool operator>=(const Time &time) const;
       /// \brief Equality operators
-      public: bool operator>=( double time ) const;
-    
+      public: bool operator>=(double time) const;
+
       /// Stream operators
-      public: friend std::ostream &operator<<(std::ostream &out, const gazebo::common::Time &time)
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                  const gazebo::common::Time &_time)
               {
-                out << time.Double();
-                return out;
+                _out << _time.Double();
+                return _out;
               }
-    
-      public: friend std::istream &operator>>(std::istream &in, gazebo::common::Time &time)
+
+      public: friend std::istream &operator>>(std::istream &_in,
+                  gazebo::common::Time &_time)
               {
                 double t;
-                in >> t;
-                time.Set(t);
-                return in;
+                _in >> t;
+                _time.Set(t);
+                return _in;
               }
-    
+
       /// Seconds
       public: int32_t sec;
-    
+
       /// Microseconds
       public: int32_t nsec;
 
@@ -212,8 +213,9 @@ namespace gazebo
                }
     };
     /// \}
-  
   }
 }
 #endif
+
+
 

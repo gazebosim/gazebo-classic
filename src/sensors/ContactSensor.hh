@@ -22,9 +22,10 @@
 #ifndef CONTACTSENSOR_HH
 #define CONTACTSENSOR_HH
 
-#include <vector>
-
 #include <stdint.h>
+#include <vector>
+#include <map>
+#include <string>
 
 #include "math/Angle.hh"
 #include "sensors/Sensor.hh"
@@ -38,71 +39,75 @@ namespace gazebo
 
     /// \addtogroup gazebo_sensors
     /// \{
-   
     /// \brief Contact sensor.
     ///
-    /// This sensor detects and reports contacts between objects 
+    /// This sensor detects and reports contacts between objects
     class ContactSensor: public Sensor
     {
       /// \brief Constructor
       /// \param body The underlying collision test uses an ODE collision, so
       ///             ray sensors must be attached to a body.
       public: ContactSensor();
-    
+
       /// \brief Destructor
       public: virtual ~ContactSensor();
-  
+
       /// Load the contact sensor using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      public: virtual void Load( sdf::ElementPtr &_sdf );
-      public: virtual void Load( );
-    
+      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load();
+
       /// Initialize the sensor
       public: virtual void Init();
-    
+
       ///  Update sensed values
       protected: virtual void UpdateImpl(bool force);
-  
+
       /// Finalize the sensor
       protected: virtual void Fini();
-  
+
       /// \brief Get the number of collisions that the sensor is observing
       public: unsigned int GetCollisionCount() const;
-  
+
       /// \brief Get a collision name
       public: std::string GetCollisionName(unsigned int _index) const;
-  
+
       /// \brief Return the number of contacts for an observed collision
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
-  
+
       /// \brief Get a contact for a collision by index
       public: physics::Contact GetCollisionContact(
                   const std::string &_collisionName, unsigned int _index) const;
 
-      public: gazebo::physics::ModelPtr GetParentModel() {return this->model;};
+      public: gazebo::physics::ModelPtr GetParentModel()
+              {return this->model;}
 
       public: std::map<std::string, physics::Contact> GetContacts(
                   const std::string &_collisionName);
 
-      private: void OnContact(const std::string &_collisionName, 
+      private: void OnContact(const std::string &_collisionName,
                               const physics::Contact &_contact);
 
       private: std::vector<physics::CollisionPtr> collisions;
 
       private: gazebo::physics::ModelPtr model;
-      private: typedef 
-               std::map<std::string, std::map<std::string, physics::Contact> > Contact_M;
+      private: typedef std::map<std::string,
+               std::map<std::string, physics::Contact> > Contact_M;
+
       private: Contact_M contacts;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr contactsPub;
 
       private: boost::mutex *mutex;
-      public: boost::mutex* GetUpdateMutex() const {return this->mutex;}
+      public: boost::mutex* GetUpdateMutex() const
+              {return this->mutex;}
     };
     /// \}
   }
 }
 
 #endif
+
+

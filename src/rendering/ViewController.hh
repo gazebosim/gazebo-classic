@@ -16,40 +16,40 @@
 */
 #ifndef VIEWCONTROLLER_HH
 #define VIEWCONTROLLER_HH
-
+#include <string>
 #include "common/CommonTypes.hh"
 
 namespace gazebo
 {
-	namespace rendering
+  namespace rendering
   {
     class UserCamera;
 
     /// \addtogroup gazebo_rendering
     /// \{
-
     /// \brief Base class for view controllers
     class ViewController
     {
       /// \brief Constructor
       public: ViewController(UserCamera *camera);
-  
+
       /// \brief Destructor
       public: virtual ~ViewController();
-  
+
       public: virtual void Init() = 0;
       public: virtual void Init(const math::Vector3 & /*_focalPoint*/) {}
       public: virtual void Update() = 0;
- 
-      /// \brief Set whether the controller is enabled 
+
+      /// \brief Set whether the controller is enabled
       public: void SetEnabled(bool _value);
 
       /// \brief Handle a mouse event
-      public: virtual void HandleMouseEvent(const common::MouseEvent &_event)=0;
+      public: virtual void HandleMouseEvent(
+                  const common::MouseEvent &_event) = 0;
 
       public: std::string GetTypeString() const;
-  
-      protected: UserCamera *camera; 
+
+      protected: UserCamera *camera;
       protected: bool enabled;
       protected: std::string typeString;
     };
@@ -57,3 +57,5 @@ namespace gazebo
   }
 }
 #endif
+
+

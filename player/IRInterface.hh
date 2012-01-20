@@ -32,13 +32,11 @@ namespace boost
 
 namespace libgazebo
 {
-
 /// \addtogroup player_iface Interfaces
 /// \{
 /// \defgroup laser_player Laser Interface
 /// \brief Plugin Player interface for a Gazebo laser
 /// \{
-
 // Forward declarations
 class IRIface;
 
@@ -87,10 +85,7 @@ class IRInterface : public GazeboInterface
   private: player_ir_data_t data;
   private: static boost::recursive_mutex *mutex;
 };
-
-/// \} 
-/// \} 
-
-
+/// \}
+/// \}
 }
 #endif

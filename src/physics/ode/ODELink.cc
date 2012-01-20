@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#include <sstream>
 #include <math.h>
+#include <sstream>
 
 #include "common/Console.hh"
 #include "common/Exception.hh"
@@ -35,16 +35,14 @@
 using namespace gazebo;
 using namespace physics;
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-ODELink::ODELink(EntityPtr parent)
-    : Link(parent)
+//////////////////////////////////////////////////
+ODELink::ODELink(EntityPtr _parent)
+    : Link(_parent)
 {
   this->linkId = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+//////////////////////////////////////////////////
 ODELink::~ODELink()
 {
   if (this->linkId)
@@ -52,9 +50,8 @@ ODELink::~ODELink()
   this->linkId = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the link
-void ODELink::Load( sdf::ElementPtr &_sdf)
+//////////////////////////////////////////////////
+void ODELink::Load(sdf::ElementPtr &_sdf)
 {
   this->odePhysics = boost::shared_dynamic_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
@@ -66,9 +63,8 @@ void ODELink::Load( sdf::ElementPtr &_sdf)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Init the ODE link
-void ODELink::Init() 
+//////////////////////////////////////////////////
+void ODELink::Init()
 {
   if (!this->IsStatic())
   {
@@ -90,7 +86,7 @@ void ODELink::Init()
   {
     math::Vector3 cog_vec = this->inertial->GetCoG();
     Base_V::iterator iter;
-    for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(Base::COLLISION))
       {
@@ -111,14 +107,14 @@ void ODELink::Init()
 
           // Set the pose of the encapsulated collision; this is always relative
           // to the CoM
-          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x, 
+          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
               localPose.pos.y, localPose.pos.z);
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
         }
       }
     }
   }
- 
+
   // Update the Center of Mass.
   this->UpdateMass();
 
@@ -128,20 +124,19 @@ void ODELink::Init()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Move callback. Use this to move the visuals
-void ODELink::MoveCallback(dBodyID id)
+//////////////////////////////////////////////////
+void ODELink::MoveCallback(dBodyID _id)
 {
   const dReal *p;
   const dReal *r;
-  ODELink *self = (ODELink*)(dBodyGetData(id));
-  //self->poseMutex->lock();
+  ODELink *self = static_cast<ODELink*>(dBodyGetData(_id));
+  // self->poseMutex->lock();
 
-  p = dBodyGetPosition(id);
-  r = dBodyGetQuaternion(id);
+  p = dBodyGetPosition(_id);
+  r = dBodyGetQuaternion(_id);
 
   self->dirtyPose.pos.Set(p[0], p[1], p[2]);
-  self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3] );
+  self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
   math::Vector3 cog_vec = self->dirtyPose.rot.RotateVector(
@@ -149,13 +144,12 @@ void ODELink::MoveCallback(dBodyID id)
 
   self->dirtyPose.pos -= cog_vec;
 
-  self->world->dirtyPoses.push_back( self );
+  self->world->dirtyPoses.push_back(self);
 
-  //self->poseMutex->unlock();
+  // self->poseMutex->unlock();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Finalize the link
+//////////////////////////////////////////////////
 void ODELink::Fini()
 {
   Link::Fini();
@@ -166,15 +160,13 @@ void ODELink::Fini()
   this->odePhysics.reset();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Update the link
+//////////////////////////////////////////////////
 void ODELink::Update()
 {
   Link::Update();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set whether gravity affects this link
+//////////////////////////////////////////////////
 void ODELink::SetGravityMode(bool _mode)
 {
   this->sdf->GetAttribute("gravity")->Set(_mode);
@@ -184,8 +176,7 @@ void ODELink::SetGravityMode(bool _mode)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the gravity mode
+//////////////////////////////////////////////////
 bool ODELink::GetGravityMode()
 {
   int mode = 0;
@@ -197,8 +188,7 @@ bool ODELink::GetGravityMode()
   return mode;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set whether this link will collide with others in the model
+//////////////////////////////////////////////////
 void ODELink::SetSelfCollide(bool _collide)
 {
   this->sdf->GetAttribute("self_collide")->Set(_collide);
@@ -206,8 +196,7 @@ void ODELink::SetSelfCollide(bool _collide)
     this->spaceId = dSimpleSpaceCreate(this->odePhysics->GetSpaceId());
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Change the ode pose
+//////////////////////////////////////////////////
 void ODELink::OnPoseChange()
 {
   Link::OnPoseChange();
@@ -222,9 +211,9 @@ void ODELink::OnPoseChange()
   math::Vector3 cog_vec = pose.rot.RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
-  dBodySetPosition(this->linkId, 
-      pose.pos.x + cog_vec.x, 
-      pose.pos.y + cog_vec.y, 
+  dBodySetPosition(this->linkId,
+      pose.pos.x + cog_vec.x,
+      pose.pos.y + cog_vec.y,
       pose.pos.z + cog_vec.z);
 
   dQuaternion q;
@@ -237,16 +226,14 @@ void ODELink::OnPoseChange()
   dBodySetQuaternion(this->linkId, q);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the ID of this link
+//////////////////////////////////////////////////
 dBodyID ODELink::GetODEId() const
 {
   return this->linkId;
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Set whether this link is enabled
+//////////////////////////////////////////////////
 void ODELink::SetEnabled(bool _enable) const
 {
   if (!this->linkId)
@@ -259,7 +246,6 @@ void ODELink::SetEnabled(bool _enable) const
 }
 
 /////////////////////////////////////////////////////////////////////
-/// Get whether this link is enabled in the physics engine
 bool ODELink::GetEnabled() const
 {
   bool result = true;
@@ -271,7 +257,6 @@ bool ODELink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////////////////////////
-// Update the mass matrix
 void ODELink::UpdateMass()
 {
   if (!this->linkId)
@@ -280,8 +265,8 @@ void ODELink::UpdateMass()
   dMass odeMass;
   dMassSetZero(&odeMass);
 
-  // The CoG must always be (0,0,0)
-  math::Vector3 cog(0,0,0);
+  // The CoG must always be (0, 0, 0)
+  math::Vector3 cog(0, 0, 0);
 
   math::Vector3 principals = this->inertial->GetPrincipalMoments();
   math::Vector3 products = this->inertial->GetProductsofInertia();
@@ -297,8 +282,7 @@ void ODELink::UpdateMass()
     gzthrow("Setting custom link " + this->GetName()+"mass to zero!");
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the velocity of the link
+//////////////////////////////////////////////////
 void ODELink::SetLinearVel(const math::Vector3 &_vel)
 {
   if (this->linkId)
@@ -307,8 +291,7 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the velocity of the link in the world frame
+//////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldLinearVel() const
 {
   math::Vector3 vel;
@@ -323,20 +306,18 @@ math::Vector3 ODELink::GetWorldLinearVel() const
   return vel;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the velocity of the link
-void ODELink::SetAngularVel(const math::Vector3 &vel)
+//////////////////////////////////////////////////
+void ODELink::SetAngularVel(const math::Vector3 &_vel)
 {
   if (this->linkId)
   {
-    dBodySetAngularVel(this->linkId, vel.x, vel.y, vel.z);
+    dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
 }
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the link in the world frame
+//////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldAngularVel() const
 {
   math::Vector3 vel;
@@ -382,9 +363,9 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
 {
   if (this->linkId)
     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
-                          _relpos.x,_relpos.y,_relpos.z);
+                          _relpos.x, _relpos.y, _relpos.z);
 }
-  
+
 void ODELink::AddTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
@@ -394,7 +375,7 @@ void ODELink::AddTorque(const math::Vector3 &_torque)
 void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 {
   if (this->linkId)
-	  dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+    dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
 }
 
 math::Vector3 ODELink::GetWorldForce() const
@@ -418,8 +399,7 @@ math::Vector3 ODELink::GetWorldForce() const
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the torque applied to the link in the world frame
+//////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const
 {
   math::Vector3 torque;
@@ -429,7 +409,7 @@ math::Vector3 ODELink::GetWorldTorque() const
     const dReal *dtorque;
 
     dtorque = dBodyGetTorque(this->linkId);
-    
+
     torque.x = dtorque[0];
     torque.y = dtorque[1];
     torque.z = dtorque[2];
@@ -438,38 +418,33 @@ math::Vector3 ODELink::GetWorldTorque() const
   return torque;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the bodies space ID
+//////////////////////////////////////////////////
 dSpaceID ODELink::GetSpaceId() const
 {
   return this->spaceId;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the bodies space ID
-void ODELink::SetSpaceId(dSpaceID spaceid)
+//////////////////////////////////////////////////
+void ODELink::SetSpaceId(dSpaceID _spaceid)
 {
-  this->spaceId = spaceid;
+  this->spaceId = _spaceid;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the linear damping factor
-void ODELink::SetLinearDamping(double damping)
+//////////////////////////////////////////////////
+void ODELink::SetLinearDamping(double _damping)
 {
   if (this->GetODEId())
-    dBodySetLinearDamping(this->GetODEId(), damping); 
+    dBodySetLinearDamping(this->GetODEId(), _damping);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the angular damping factor
-void ODELink::SetAngularDamping(double damping)
+//////////////////////////////////////////////////
+void ODELink::SetAngularDamping(double _damping)
 {
   if (this->GetODEId())
-    dBodySetAngularDamping(this->GetODEId(), damping); 
+    dBodySetAngularDamping(this->GetODEId(), _damping);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set whether this link is in the kinematic state
+//////////////////////////////////////////////////
 void ODELink::SetKinematic(const bool &_state)
 {
   this->sdf->GetAttribute("kinematic")->Set(_state);
@@ -482,8 +457,7 @@ void ODELink::SetKinematic(const bool &_state)
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get whether this link is in the kinematic state
+//////////////////////////////////////////////////
 bool ODELink::GetKinematic() const
 {
   bool result = false;
@@ -493,3 +467,8 @@ bool ODELink::GetKinematic() const
 
   return result;
 }
+
+
+
+
+

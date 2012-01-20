@@ -30,12 +30,11 @@ namespace boost
 }
 
 
-/// \addtogroup player_iface 
+/// \addtogroup player_iface
 /// \{
 /// \defgroup position2d_player Position2d Interface
 /// \brief Position2d Player interface
 /// \{
-
 /// \brief Position2d Player interface
 class Position2dInterface : public GazeboInterface
 {
@@ -67,7 +66,9 @@ class Position2dInterface : public GazeboInterface
   private: static boost::recursive_mutex *mutex;
 };
 
-/// \} 
-/// \} 
+/// \}
+/// \}
 
 #endif
+
+

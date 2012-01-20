@@ -28,8 +28,8 @@ using namespace gazebo;
 using namespace rendering;
 
 /// \brief Constructor
-CameraVisual::CameraVisual (const std::string &_name, VisualPtr _vis)
- : Visual(_name, _vis)
+CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
+: Visual(_name, _vis)
 {
 }
 
@@ -42,51 +42,54 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
 {
   double dist = 2.0;
   double width = 1.0;
-  double height = _height / (double)_width;
+  double height = _height / static_cast<double>(_width);
 
-  this->camera = this->scene->CreateCamera(this->GetName(),true);
+  this->camera = this->scene->CreateCamera(this->GetName(), true);
   this->camera->Load();
   this->camera->Init();
   this->camera->CreateRenderTexture(this->GetName() + "_RTT");
 
-  Ogre::MaterialPtr material = 
-    Ogre::MaterialManager::getSingleton().create(this->GetName()+"_RTT_material", 
+  Ogre::MaterialPtr material =
+    Ogre::MaterialManager::getSingleton().create(
+        this->GetName()+"_RTT_material",
+
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
   material->getTechnique(0)->getPass(0)->createTextureUnitState();
   material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(true);
   material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(true);
   material->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-  material->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTextureName(this->GetName()+"_RTT");
+  material->getTechnique(0)->getPass(0)->getTextureUnitState(
+      0)->setTextureName(this->GetName()+"_RTT");
 
-  Ogre::Plane plane; 
+  Ogre::Plane plane;
   plane.normal = Ogre::Vector3::NEGATIVE_UNIT_X;
   plane.d = dist;
 
-  Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor", 
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-      plane, width, height, 1, 1, true, 1, 1.0f, 1.0f, 
+  Ogre::MeshManager::getSingleton().createPlane(this->GetName() + "__floor",
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+      plane, width, height, 1, 1, true, 1, 1.0f, 1.0f,
       Ogre::Vector3::UNIT_Z);
 
-  Ogre::Entity* planeEnt = 
-    this->scene->GetManager()->createEntity(this->GetName() + "__plane", 
+  Ogre::Entity* planeEnt =
+    this->scene->GetManager()->createEntity(this->GetName() + "__plane",
         this->GetName() + "__floor");
   planeEnt->setMaterialName(this->GetName()+"_RTT_material");
   planeEnt->setCastShadows(false);
-  planeEnt->setVisibilityFlags( GZ_VISIBILITY_GUI );
+  planeEnt->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
-  line->AddPoint(math::Vector3(0,0,0));
-  line->AddPoint(math::Vector3(dist,width*0.5,height*0.5));
+  line->AddPoint(math::Vector3(0, 0, 0));
+  line->AddPoint(math::Vector3(dist, width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0,0,0));
-  line->AddPoint(math::Vector3(dist,-width*0.5,height*0.5));
+  line->AddPoint(math::Vector3(0, 0, 0));
+  line->AddPoint(math::Vector3(dist, -width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0,0,0));
-  line->AddPoint(math::Vector3(dist,-width*0.5,-height*0.5));
+  line->AddPoint(math::Vector3(0, 0, 0));
+  line->AddPoint(math::Vector3(dist, -width*0.5, -height*0.5));
 
-  line->AddPoint(math::Vector3(0,0,0));
-  line->AddPoint(math::Vector3(dist,width*0.5,-height*0.5));
+  line->AddPoint(math::Vector3(0, 0, 0));
+  line->AddPoint(math::Vector3(dist, width*0.5, -height*0.5));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -94,5 +97,8 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   this->AttachObject(planeEnt);
   this->camera->AttachToVisual(this->GetName(), true);
 }
- 
+
+
+
+
 

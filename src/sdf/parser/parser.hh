@@ -17,15 +17,15 @@
 #ifndef SDF_PARSER_HH
 #define SDF_PARSER_HH
 
-#include <string>
 #include <tinyxml.h>
+#include <string>
 
 #include "sdf/interface/SDF.hh"
 
 namespace sdf
 {
   /// \brief Init based on the installed sdf_format.xml file
-  bool init( SDFPtr _sdf );
+  bool init(SDFPtr _sdf);
 
   // \brief Initialize the SDF interface using a file
   bool initFile(const std::string &_filename, SDFPtr _sdf);
@@ -61,7 +61,8 @@ namespace sdf
   // \brief For internal use only. Do not use this function.
   bool readXml(TiXmlElement *_xml, ElementPtr &_sdf);
 
-  void copyChildren( ElementPtr &_sdf, TiXmlElement *_xml);
+  void copyChildren(ElementPtr &_sdf, TiXmlElement *_xml);
 }
 
 #endif
+

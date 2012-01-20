@@ -22,12 +22,16 @@
 #ifndef ODEPHYSICS_HH
 #define ODEPHYSICS_HH
 
-#include "physics/ode/ode_inc.h"
-
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
+#include <map>
+#include <string>
+#include <vector>
+#include <utility>
 
 #include <boost/thread/thread.hpp>
+
+#include "physics/ode/ode_inc.h"
 
 #include "physics/ode/ODETypes.hh"
 
@@ -49,37 +53,34 @@ namespace gazebo
 
     /// \addtogroup gazebo_physics
     /// \{
-    
     /// \addtogroup gazebo_physics_ode ODE Physics
     /// \{
-
-
     /// \brief ODE physics engine
     class ODEPhysics : public PhysicsEngine
     {
       /// \brief Constructor
       public: ODEPhysics(WorldPtr world);
-    
+
       /// \brief Destructor
       public: virtual ~ODEPhysics();
-    
+
       /// \brief Load the ODE engine
-      public: virtual void Load( sdf::ElementPtr _sdf );
-    
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
       /// \brief Initialize the ODE engine
       public: virtual void Init();
-    
+
       public: void Reset();
 
-      /// \brief Init the engine for threads. 
+      /// \brief Init the engine for threads.
       public: virtual void InitForThread();
-    
+
       /// \brief Update the ODE collision
       public: virtual void UpdateCollision();
-    
+
       /// \brief Update the ODE engine
       public: virtual void UpdatePhysics();
-    
+
       /// \brief Finilize the ODE engine
       public: virtual void Fini();
 
@@ -95,10 +96,10 @@ namespace gazebo
 
       /// \brief Get the simulation step time
       public: virtual double GetStepTime();
-   
+
       /// \brief Create a new body
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
-    
+
       /// \brief Create a collision
       public: virtual CollisionPtr CreateCollision(
                   const std::string &_shapeType, LinkPtr _parent);
@@ -106,28 +107,29 @@ namespace gazebo
       public: virtual ShapePtr CreateShape(
                   const std::string &_shapeType,
                   CollisionPtr _collision);
-     
+
       /// \brief Create a new joint
       public: virtual JointPtr CreateJoint(const std::string &type);
-    
-      /// \brief Return the space id 
+
+      /// \brief Return the space id
       public: dSpaceID GetSpaceId() const;
-    
+
       /// \brief Get the world id
       public: dWorldID GetWorldId();
-    
+
       /// \brief Convert an odeMass to Mass
       public: static void ConvertMass(InertialPtr &_interial, void *odeMass);
-    
+
       /// \brief Convert an odeMass to Mass
-      public: static void ConvertMass(void *odeMass, const InertialPtr &_inertial);
-    
+      public: static void ConvertMass(void *odeMass,
+                                      const InertialPtr &_inertial);
+
       /// \brief Get the step type
       public: virtual std::string GetStepType() const;
-    
+
       /// \brief Set the step type
-      public: virtual void SetStepType(const std::string type);
-    
+      public: virtual void SetStepType(const std::string &_type);
+
       /// \brief Set the gavity vector
       public: virtual void SetGravity(const gazebo::math::Vector3 &gravity);
 
@@ -148,7 +150,7 @@ namespace gazebo
       public: void SetContactSurfaceLayer(double layer_depth);
       /// \brief access functions to set ODE parameters
       public: void SetMaxContacts(unsigned int max_contacts);
-    
+
       /// \brief access functions to set ODE parameters
       public: double GetWorldCFM();
       /// \brief access functions to set ODE parameters
@@ -163,57 +165,61 @@ namespace gazebo
       public: double GetContactSurfaceLayer();
       /// \brief access functions to set ODE parameters
       public: int GetMaxContacts();
-    
-      public: void CreateContact(ODECollision *collision1, ODECollision *collision2);
-    
+
+      public: void CreateContact(ODECollision *collision1,
+                                 ODECollision *collision2);
+
       /// \brief Do collision detection
-      private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
-    
+      private: static void CollisionCallback(void *data,
+                                             dGeomID o1, dGeomID o2);
+
       /// \brief Collide two collisions
-      public: void Collide(ODECollision *collision1, ODECollision *collision2, 
+      public: void Collide(ODECollision *collision1, ODECollision *collision2,
                            dContactGeom *contactCollisions);
-    
+
       public: void ProcessContactFeedback(ContactFeedback* feedback);
 
-      protected: virtual void OnRequest( 
-                   ConstRequestPtr &/*_msg*/ );
+      protected: virtual void OnRequest(
+                   ConstRequestPtr &/*_msg*/);
 
-      protected: virtual void OnPhysicsMsg( 
-                   ConstPhysicsPtr &/*_msg*/ );
+      protected: virtual void OnPhysicsMsg(
+                   ConstPhysicsPtr &/*_msg*/);
 
-      private: void  AddTrimeshCollider( ODECollision *_collision1, 
-                                         ODECollision *_collision2 );
+      private: void  AddTrimeshCollider(ODECollision *_collision1,
+                                         ODECollision *_collision2);
 
 
-      private: void  AddCollider( ODECollision *_collision1, 
-                                  ODECollision *_collision2 );
+      private: void  AddCollider(ODECollision *_collision1,
+                                  ODECollision *_collision2);
 
       /// \brief Top-level world for all bodies
       private: dWorldID worldId;
-    
+
       /// \brief Top-level space for all sub-spaces/collisions
       private: dSpaceID spaceId;
-    
+
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
-    
+
       /// Store the value of the updateRate parameter in doubl form. To improve
       /// efficiency
-      private: double updateRateDouble; 
+      private: double updateRateDouble;
 
       /// Store the value of the stepTime parameter in doubl form. To improve
       /// efficiency
-      private: double stepTimeDouble; 
+      private: double stepTimeDouble;
       private: std::string stepType;
 
       private: std::vector<ContactFeedback*> contactFeedbacks;
-    
+
       private: std::map<std::string, dSpaceID> spaces;
 
       private: std::vector< std::pair<ODECollision*, ODECollision*> > colliders;
-      private: std::vector< std::pair<ODECollision*, ODECollision*> > trimeshColliders;
+      private: std::vector< std::pair<ODECollision*, ODECollision*> >
+               trimeshColliders;
+
       private: unsigned int collidersCount, trimeshCollidersCount;
-    
+
       private: tbb::spin_mutex collideMutex;
 
       private: dContactGeom contactCollisions[MAX_DCOLLIDE_RETURNS];
@@ -222,9 +228,15 @@ namespace gazebo
       private: int indices[MAX_CONTACT_JOINTS];
     };
     typedef boost::shared_ptr<ODEPhysics> ODEPhysicsPtr;
-  
+
   /// \}
   /// \}
   }
 }
 #endif
+
+
+
+
+
+

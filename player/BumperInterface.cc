@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: Bumper Interface for Player
  * Author: Nate Koenig
  * Date: 09 Sept. 2008
- * CVS: $Id$
  */
 
 /**
-@addtogroup player
-@par Bumper Interface
-- PLAYER_BUMPER_DATA_STATE
-*/
+  @addtogroup player
+  @par Bumper Interface
+  - PLAYER_BUMPER_DATA_STATE
+  */
 
 /* TODO
-- PLAYER_BUMPER_REQ_GET_GEOM
-*/
+   - PLAYER_BUMPER_REQ_GET_GEOM
+   */
 
-#include <iostream>
 #include <math.h>
+#include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gz.h"
 #include "GazeboDriver.hh"
 #include "BumperInterface.hh"
 
@@ -44,10 +42,11 @@ boost::recursive_mutex *BumperInterface::mutex = NULL;
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 BumperInterface::BumperInterface(player_devaddr_t addr,
-                                 GazeboDriver *driver, ConfigFile *cf, 
-                                 int section)
-    : GazeboInterface(addr, driver, cf, section)
+    GazeboDriver *driver, ConfigFile *cf,
+    int section)
+: GazeboInterface(addr, driver, cf, section)
 {
+  /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
   strcat(this->gz_id, GazeboClient::prefixId);
@@ -63,22 +62,25 @@ BumperInterface::BumperInterface(player_devaddr_t addr,
 
   if (this->mutex == NULL)
     this->mutex = new boost::recursive_mutex();
+    */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 BumperInterface::~BumperInterface()
 {
+  /*
   // Release this interface
   delete this->iface;
 
   delete [] this->data.bumpers;
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int BumperInterface::ProcessMessage(QueuePointer &respQueue,
-                                     player_msghdr_t *hdr, void *data)
+    player_msghdr_t *hdr, void *data)
 {
   return -1;
 }
@@ -88,6 +90,7 @@ int BumperInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void BumperInterface::Update()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
@@ -105,16 +108,17 @@ void BumperInterface::Update()
     // Copy bumper data
     this->data.bumpers_count = this->iface->data->bumper_count;
 
-    memcpy( this->data.bumpers, this->iface->data->bumpers, 
-            sizeof(uint8_t) * this->data.bumpers_count );
+    memcpy(this->data.bumpers, this->iface->data->bumpers,
+        sizeof(uint8_t) * this->data.bumpers_count);
 
-    this->driver->Publish( this->device_addr,
-                           PLAYER_MSGTYPE_DATA,
-                           PLAYER_BUMPER_DATA_STATE,
-                           (void*)&data, sizeof(data), &this->datatime );
+    this->driver->Publish(this->device_addr,
+        PLAYER_MSGTYPE_DATA,
+        PLAYER_BUMPER_DATA_STATE,
+        (void*)&data, sizeof(data), &this->datatime);
   }
 
   this->iface->Unlock();
+  */
 }
 
 
@@ -123,23 +127,27 @@ void BumperInterface::Update()
 // GazeboDriver::Subscribe
 void BumperInterface::Subscribe()
 {
+  /*
   try
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
-    this->iface->Open( GazeboClient::client, this->gz_id);
+    this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (std::string e)
+  catch (std::string &e)
   {
     std::cerr << "Error subscribing to Gazebo Bumper Interface\n"
       << e << "\n";
     exit(0);
   }
+  */
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void BumperInterface::Unsubscribe()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
+  */
 }

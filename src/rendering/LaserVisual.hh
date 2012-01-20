@@ -22,6 +22,8 @@
 #ifndef LASERVISUAL_HH
 #define LASERVISUAL_HH
 
+#include <string>
+
 #include "rendering/Visual.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"
@@ -33,7 +35,7 @@ namespace gazebo
     class DynamicLines;
     class LaserVisual : public Visual
     {
-      public: LaserVisual(const std::string &_name, VisualPtr _vis, 
+      public: LaserVisual(const std::string &_name, VisualPtr _vis,
                           const std::string &_topicName);
 
       public: virtual ~LaserVisual();
@@ -49,3 +51,5 @@ namespace gazebo
   }
 }
 #endif
+
+
