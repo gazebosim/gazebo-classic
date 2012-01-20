@@ -42,11 +42,6 @@ namespace gazebo
       /// \brief Initialize the publication link
       public: void Init(const ConnectionPtr &conn, bool _latching);
 
-      /// \brief Get the typename of the message that is handled
-      public: virtual std::string GetMsgType() const;
-
-      public: virtual bool HandleMessage(const google::protobuf::Message *msg);
-
       /// \brief Output a message to a connection
       public: virtual bool HandleData(const std::string &newdata);
 

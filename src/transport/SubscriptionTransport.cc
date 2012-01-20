@@ -39,28 +39,6 @@ void SubscriptionTransport::Init(const ConnectionPtr &_conn, bool _latching)
 }
 
 //////////////////////////////////////////////////
-std::string SubscriptionTransport::GetMsgType() const
-{
-  return "";
-}
-
-//////////////////////////////////////////////////
-bool SubscriptionTransport::HandleMessage(const google::protobuf::Message *msg_)
-{
-  bool result = false;
-  std::string data;
-  msg_->SerializeToString(&data);
-
-  if (this->connection->IsOpen())
-  {
-    this->connection->EnqueueMsg(data);
-    result = true;
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
 bool SubscriptionTransport::HandleData(const std::string &newdata)
 {
   bool result = false;

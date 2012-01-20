@@ -447,6 +447,8 @@ int GUIOverlay::GetKeyCode(const std::string  &_unicode)
     case ' ': return CEGUI::Key::Space;
     case '_': return CEGUI::Key::Underline;
     case '*': return CEGUI::Key::Multiply;
+    default:
+              break;
   };
 
   switch (static_cast<int>(_unicode[0]))
@@ -455,6 +457,8 @@ int GUIOverlay::GetKeyCode(const std::string  &_unicode)
     case 27: return CEGUI::Key::Escape;
     case 13: return CEGUI::Key::Return;
     case 127: return CEGUI::Key::Delete;
+    default:
+              break;
   };
 
   return 0;

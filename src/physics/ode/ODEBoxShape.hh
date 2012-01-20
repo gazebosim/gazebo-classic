@@ -37,7 +37,7 @@ namespace gazebo
     /// \brief ODE Box shape
     class ODEBoxShape : public BoxShape
     {
-      public: ODEBoxShape(ODECollisionPtr parent) : BoxShape(parent) {}
+      public: ODEBoxShape(ODECollisionPtr _parent) : BoxShape(_parent) {}
       public: virtual ~ODEBoxShape() {}
       public: virtual void SetSize(const math::Vector3 &size)
       {

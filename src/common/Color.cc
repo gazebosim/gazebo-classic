@@ -22,6 +22,7 @@
 #include <math.h>
 #include <algorithm>
 
+#include "math/Helpers.hh"
 #include "common/Console.hh"
 #include "common/Color.hh"
 
@@ -85,7 +86,7 @@ void Color::SetFromHSV(float _h, float _s, float _v)
 
   _h = static_cast<int>(_h) % 360;
 
-  if (_s == 0)
+  if (math::equal(_s, 0))
   {
     // acromatic (grey)
     this->r = this->g = this->b = _v;
@@ -134,6 +135,8 @@ void Color::SetFromHSV(float _h, float _s, float _v)
       this->g = p;
       this->b = q;
       break;
+    default:
+      break;
   }
 
   this->Clamp();
@@ -148,22 +151,22 @@ math::Vector3 Color::GetAsHSV() const
   x = std::min(this->r, std::min(this->g, this->b));
   v = std::max(this->r, std::max(this->g, this->b));
 
-  if (v == x)
+  if (math::equal(v, x))
   {
     gzerr << "rgb to hsv undefined\n";
     return hsv;
   }
 
-  if (r == x)
+  if (math::equal(r, x))
     f = this->g - this->b;
-  else if (this->g == x)
+  else if (math::equal(this->g, x))
     f = this->b - this->r;
   else
     f = this->r - this->g;
 
-  if (this->r == x)
+  if (math::equal(this->r, x))
     i = 3;
-  else if (this->g == x)
+  else if (math::equal(this->g, x))
     i = 5;
   else
     i = 1;
@@ -396,8 +399,10 @@ const Color &Color::operator*=(const Color &pt)
 //////////////////////////////////////////////////
 bool Color::operator ==(const Color &pt) const
 {
-  return this->r == pt.r && this->g == pt.g && this->b == pt.b &&
-         this->a == pt.a;
+  return math::equal(this->r, pt.r) &&
+         math::equal(this->g, pt.g) &&
+         math::equal(this->b, pt.b) &&
+         math::equal(this->a, pt.a);
 }
 
 //////////////////////////////////////////////////
@@ -418,7 +423,3 @@ void Color::Clamp()
   this->b = this->b < 0 ? 0: this->b;
   this->b = this->b > 1 ? this->b/255.0: this->b;
 }
-
-
-
-

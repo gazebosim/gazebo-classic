@@ -72,9 +72,9 @@ Quaternion RotationSpline::Interpolate(unsigned int _fromIndex, double _t,
   }
 
   // Fast special cases
-  if (_t == 0.0f)
+  if (math::equal(_t, 0.0))
     return this->points[_fromIndex];
-  else if (_t == 1.0f)
+  else if (math::equal(_t, 1.0))
     return this->points[_fromIndex + 1];
 
   // double interpolation

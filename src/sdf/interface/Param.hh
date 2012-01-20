@@ -157,8 +157,8 @@ namespace sdf
             {
               if (this->updateFunc)
               {
-                const T value = boost::any_cast<T>(this->updateFunc());
-                Param::Set(value);
+                const T v = boost::any_cast<T>(this->updateFunc());
+                Param::Set(v);
               }
             }
 

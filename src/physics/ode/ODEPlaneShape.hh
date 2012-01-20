@@ -31,7 +31,7 @@ namespace gazebo
     /// \brief An ODE Plane shape
     class ODEPlaneShape : public PlaneShape
     {
-      public: ODEPlaneShape(CollisionPtr parent) : PlaneShape(parent) {}
+      public: ODEPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
       public: virtual ~ODEPlaneShape() {}
       /// \brief Create the plane
       public: void CreatePlane()

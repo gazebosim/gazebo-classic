@@ -560,11 +560,11 @@ void Model::LoadJoint(sdf::ElementPtr &_sdf)
 {
   JointPtr joint;
 
-  std::string type = _sdf->GetValueString("type");
+  std::string stype = _sdf->GetValueString("type");
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(type);
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype);
   if (!joint)
-    gzthrow("Unable to create joint of type[" + type + "]\n");
+    gzthrow("Unable to create joint of type[" + stype + "]\n");
 
   joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
 
@@ -719,13 +719,12 @@ void Model::SetJointPositions(
   {
     JointPtr joint = *iter;
 
-    std::map<std::string, double>::const_iterator jiter =
-      _jointPositions.find(joint->GetName());
-    unsigned int type = joint->GetType();
+    jiter = _jointPositions.find(joint->GetName());
+    unsigned int jtype = joint->GetType();
 
     // only deal with hinge and revolute joints in the user
     // request joint_names list
-    if ((type == Base::HINGE_JOINT || type == Base::SLIDER_JOINT) &&
+    if ((jtype == Base::HINGE_JOINT || jtype == Base::SLIDER_JOINT) &&
         jiter != _jointPositions.end())
     {
       LinkPtr parentLink = joint->GetParent();
@@ -735,7 +734,7 @@ void Model::SetJointPositions(
           parentLink->GetName() != childLink->GetName())
       {
         // transform about the current anchor, about the axis
-        switch (type)
+        switch (jtype)
         {
           case Base::HINGE_JOINT:
             {
@@ -748,9 +747,9 @@ void Model::SetJointPositions(
 
               if (this->IsStatic())
               {
-                math::Pose worldPose = childLink->GetWorldPose();
-                axis = worldPose.rot.RotateVector(joint->GetLocalAxis(0));
-                anchor = childLink->GetWorldPose().pos;
+                math::Pose linkWorldPose = childLink->GetWorldPose();
+                axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
+                anchor = linkWorldPose.pos;
               }
               else
               {
@@ -773,9 +772,9 @@ void Model::SetJointPositions(
 
               if (this->IsStatic())
               {
-                math::Pose worldPose = childLink->GetWorldPose();
-                axis = worldPose.rot.RotateVector(joint->GetLocalAxis(0));
-                anchor = childLink->GetWorldPose().pos;
+                math::Pose linkWorldPose = childLink->GetWorldPose();
+                axis = linkWorldPose.rot.RotateVector(joint->GetLocalAxis(0));
+                anchor = linkWorldPose.pos;
               }
               else
               {
@@ -806,13 +805,13 @@ void Model::SetJointPositions(
 }
 
 //////////////////////////////////////////////////
-void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
+void Model::RotateBodyAndChildren(LinkPtr _link1, const math::Vector3 &_anchor,
     const math::Vector3 &_axis, double _dangle, bool _updateChildren)
 {
-  math::Pose worldPose = _body1->GetWorldPose();
+  math::Pose linkWorldPose = _link1->GetWorldPose();
 
   // relative to anchor point
-  math::Pose relativePose(worldPose.pos - _anchor, worldPose.rot);
+  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
 
   // take axis rotation and turn it int a quaternion
   math::Quaternion rotation(_axis, _dangle);
@@ -826,13 +825,13 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
   math::Pose newWorldPose(newRelativePose.pos + _anchor,
                           newRelativePose.rot);
 
-  _body1->SetWorldPose(newWorldPose);
+  _link1->SetWorldPose(newWorldPose);
 
   // recurse through children bodies
   if (_updateChildren)
   {
     std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _body1);
+    this->GetAllChildrenBodies(bodies, _link1);
 
     for (std::vector<LinkPtr>::iterator biter = bodies.begin();
         biter != bodies.end(); ++biter)
@@ -844,13 +843,13 @@ void Model::RotateBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
 
 
 //////////////////////////////////////////////////
-void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
+void Model::SlideBodyAndChildren(LinkPtr _link1, const math::Vector3 &_anchor,
     const math::Vector3 &_axis, double _dposition, bool _updateChildren)
 {
-  math::Pose worldPose = _body1->GetWorldPose();
+  math::Pose linkWorldPose = _link1->GetWorldPose();
 
   // relative to anchor point
-  math::Pose relativePose(worldPose.pos - _anchor, worldPose.rot);
+  math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
 
   // slide relative pose by dposition along axis
   math::Pose newRelativePose;
@@ -858,13 +857,13 @@ void Model::SlideBodyAndChildren(LinkPtr _body1, const math::Vector3 &_anchor,
   newRelativePose.rot = relativePose.rot;
 
   math::Pose newWorldPose(newRelativePose.pos + _anchor, newRelativePose.rot);
-  _body1->SetWorldPose(newWorldPose);
+  _link1->SetWorldPose(newWorldPose);
 
   // recurse through children bodies
   if (_updateChildren)
   {
     std::vector<LinkPtr> bodies;
-    this->GetAllChildrenBodies(bodies, _body1);
+    this->GetAllChildrenBodies(bodies, _link1);
 
     for (std::vector<LinkPtr>::iterator biter = bodies.begin();
         biter != bodies.end(); ++biter)

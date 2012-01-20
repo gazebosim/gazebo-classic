@@ -75,7 +75,7 @@ void Vector3::Normalize()
 {
   double d = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 
-  if (d != 0.0)
+  if (!math::equal(d, 0.0))
   {
     this->x /= d;
     this->y /= d;
@@ -351,9 +351,7 @@ void Vector3::Round(int _precision)
 /// Returns true if the two vectors are exacatly equal
 bool Vector3::Equal(const Vector3 &_v) const
 {
-  return this->x == _v.x && this->y == _v.y && this->z == _v.z;
+  return math::equal(this->x, _v.x) &&
+         math::equal(this->y, _v.y) &&
+         math::equal(this->z, _v.z);
 }
-
-
-
-

@@ -37,7 +37,7 @@ bool transport::get_master_uri(std::string &master_host,
   char *char_uri = getenv("GAZEBO_MASTER_URI");
 
   // Set to default host and port
-  if (!char_uri)
+  if (!char_uri || strlen(char_uri) == 0)
   {
     master_host = "localhost";
     master_port = 11345;

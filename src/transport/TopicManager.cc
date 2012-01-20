@@ -123,20 +123,11 @@ void TopicManager::Publish(const std::string &_topic,
                            const google::protobuf::Message &_message,
                            const boost::function<void()> &_cb)
 {
-  if (!_message.IsInitialized())
-  {
-    gzthrow("Publishing and uninitialized message on topic[" +
-        _topic + "]. Required field [" +
-        _message.InitializationErrorString() + "] missing.");
-  }
-
   PublicationPtr pub = this->FindPublication(_topic);
   PublicationPtr dbgPub = this->FindPublication(_topic+"/__dbg");
 
   if (pub)
-  {
     pub->Publish(_message, _cb);
-  }
 
   if (dbgPub && dbgPub->GetCallbackCount() > 0)
   {
@@ -181,26 +172,7 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
   return sub;
 }
 
-
 //////////////////////////////////////////////////
-void TopicManager::HandleIncoming()
-{
-  // implement this
-  // Read a header in the message the indicates the topic
-}
-
-//////////////////////////////////////////////////
-void TopicManager::Unsubscribe(const std::string &_topic,
-                               const CallbackHelperPtr &_sub)
-{
-  PublicationPtr publication = this->FindPublication(_topic);
-  if (publication)
-  {
-    publication->RemoveSubscription(_sub);
-    ConnectionManager::Instance()->Unsubscribe(_topic, _sub->GetMsgType());
-  }
-}
-
 void TopicManager::Unsubscribe(const std::string &_topic,
                                const NodePtr &_sub)
 {
@@ -301,10 +273,9 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &topic,
 
   if (pub)
   {
-    // TODO: Handle this error properly
     if (msgType != pub->GetMsgType())
-      gzerr << "Attempting to advertise on an existing "
-            << "topic with a conflicting message type\n";
+      gzthrow(std::string("Attempting to advertise on an existing topic with") +
+          " a conflicting message type\n");
   }
   else
   {

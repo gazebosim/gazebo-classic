@@ -31,7 +31,7 @@ namespace gazebo
     /// \brief ODE cylinder shape
     class ODECylinderShape : public CylinderShape
     {
-      public: ODECylinderShape(CollisionPtr parent) : CylinderShape(parent) {}
+      public: ODECylinderShape(CollisionPtr _parent) : CylinderShape(_parent) {}
       public: virtual ~ODECylinderShape() {}
       public: void SetSize(const double &radius, const double &length)
       {

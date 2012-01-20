@@ -25,12 +25,6 @@
 using namespace gazebo;
 using namespace transport;
 
-//////////////////////////////////////////////////
-Publisher::Publisher(unsigned int _limit, bool _latch)
-{
-  this->queueLimit = _limit;
-  this->latch = _latch;
-}
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
@@ -43,6 +37,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
+  std::cout << "\n\n PUBLISHER DESTRUCTOR \n\n";
   if (this->messages.size() > 0)
     this->SendMessage();
 
@@ -76,6 +71,13 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 {
   if (_message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
+
+  if (!_message.IsInitialized())
+  {
+    gzthrow("Publishing and uninitialized message on topic[" +
+        this->topic + "]. Required field [" +
+        _message.InitializationErrorString() + "] missing.");
+  }
 
   // if (!this->HasConnections())
   // return;

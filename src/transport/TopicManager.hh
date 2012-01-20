@@ -71,9 +71,6 @@ namespace gazebo
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
-      public: void Unsubscribe(const std::string &topic,
-                               const CallbackHelperPtr &_sub);
-
       public: void Unsubscribe(const std::string &_topic, const NodePtr &_sub);
 
       /// \brief Advertise on a topic
@@ -190,8 +187,6 @@ namespace gazebo
       public: void ClearBuffers();
 
       public: void PauseIncoming(bool _pause);
-
-      private: void HandleIncoming();
 
       typedef std::map<std::string, std::list<NodePtr> > SubNodeMap;
 

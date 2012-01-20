@@ -26,6 +26,7 @@
 #include <iostream>
 #include <cmath>
 
+#include "math/Helpers.hh"
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
 #include "math/Matrix3.hh"
@@ -235,8 +236,13 @@ namespace gazebo
               if (!finite(this->w))
                 this->w = 1;
 
-              if (this->w == 0 && this->x == 0 && this->y == 0 && this->z == 0)
+              if (math::equal(this->w, 0) &&
+                  math::equal(this->x, 0) &&
+                  math::equal(this->y, 0) &&
+                  math::equal(this->z, 0))
+              {
                 this->w = 1;
+              }
             }
 
     /// \brief Get the quaternion as a 3x3 matrix

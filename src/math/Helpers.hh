@@ -30,12 +30,13 @@ namespace gazebo
     static const double NAN_I = std::numeric_limits<int>::quiet_NaN();
 
     inline bool equal(const double &_a, const double &_b,
-                      const double &_epsilon)
+                      const double &_epsilon = 1e-6)
     {
       return std::fabs(_a - _b) <= _epsilon;
     }
 
-    inline bool equal(const float &_a, const float &_b, const float &_epsilon)
+    inline bool equal(const float &_a, const float &_b,
+                      const float &_epsilon = 1e-6)
     {
       return std::fabs(_a - _b) <= _epsilon;
     }

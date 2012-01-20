@@ -111,15 +111,15 @@ set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wextra -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
-set (CMAKE_C_FLAGS_CHECK " -ggdb3 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow --coverage -fno-elide-constructors ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
 set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
 
 #####################################
 # Build type link flags
 set (CMAKE_LINK_FLAGS_RELEASE " -fPIC" CACHE INTERNAL "Link flags fro release" FORCE)
 set (CMAKE_LINK_FLAGS_DEBUG " -fPIC" CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE " -fPIC -lgcov" CACHE INTERNAL "Link flags for profile" FORCE)
-set (CMAKE_LINK_FLAGS_CHECK " -fPIC" CACHE INTERNAL "Link flags for static code checking" FORCE)
+set (CMAKE_LINK_FLAGS_PROFILE " -fPIC" CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_CHECK " -fPIC --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
 
 #####################################
 # Set the default build type

@@ -359,7 +359,7 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify)
 //  |----------------------------------------------------------|
 //  |SWP  | Lock           | Lock            | Set BWP         |
 //  |     | Update MWP     | Set CBWP        |                 |
-//  |     | SWP Children   | SWP M = CB-CBRP   |                 |
+//  |     | SWP Children   | SWP M = CB-CBRP |                 |
 //  |----------------------------------------------------------|
 //  |SRP  | WP = RP + PP   | WP = RP + PP    | WP = RP + PP    |
 //  |----------------------------------------------------------|

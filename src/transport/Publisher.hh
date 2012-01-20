@@ -37,9 +37,6 @@ namespace gazebo
     /// \brief A publisher of messages on a topic
     class Publisher
     {
-      /// \brief Default Constructor
-      public: Publisher(unsigned int _limit, bool _latch);
-
       /// \brief Use this constructor
       /// \param topic Name of topic
       /// \param msg_type Type of the message which is to be published

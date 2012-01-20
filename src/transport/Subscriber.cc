@@ -44,13 +44,6 @@ std::string Subscriber::GetTopic() const
 }
 
 //////////////////////////////////////////////////
-std::string Subscriber::GetMsgType() const
-{
-  return std::string();
-}
-
-
-//////////////////////////////////////////////////
 void Subscriber::Unsubscribe() const
 {
   if (this->node)
@@ -58,5 +51,3 @@ void Subscriber::Unsubscribe() const
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
   }
 }
-
-

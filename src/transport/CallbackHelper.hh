@@ -44,10 +44,10 @@ namespace gazebo
       public: virtual ~CallbackHelper() {}
 
       /// \brief Get the typename of the message that is handled
-      public: virtual std::string GetMsgType() const = 0;
-
-      public: virtual bool HandleMessage(
-                  const google::protobuf::Message *msg) = 0;
+      public: virtual std::string GetMsgType() const
+              {
+                return std::string();
+              }
 
       public: virtual bool HandleData(const std::string &newdata) = 0;
 
@@ -89,30 +89,8 @@ namespace gazebo
                 return m->GetTypeName();
               }
 
-      public: virtual bool HandleMessage(const google::protobuf::Message *msg)
-              {
-                /*boost::shared_ptr<M> m(new M);
-                m->ParseFromString(((msgs::Packet*)msg)->serialized_data());
-                */
-                boost::shared_ptr<M> m(new M);
-                m->CopyFrom(*msg);
-
-                this->callback(m);
-                return true;
-              }
-
       public: virtual bool HandleData(const std::string &newdata)
               {
-                /*msgs::Packet packet;
-                packet.ParseFromString(newdata);
-
-                // TODO: Handle this error properly
-                if (packet.type() != "data")
-                gzerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
-                boost::shared_ptr<M> m(new M);
-                m->ParseFromString(packet.serialized_data());
-                */
-
                 boost::shared_ptr<M> m(new M);
                 m->ParseFromString(newdata);
                 this->callback(m);
@@ -141,11 +119,6 @@ namespace gazebo
               {
                 msgs::String m;
                 return m.GetTypeName();
-              }
-
-      public: virtual bool HandleMessage(const google::protobuf::Message *msg)
-              {
-                return this->HandleData(msg->DebugString());
               }
 
       public: virtual bool HandleData(const std::string &newdata)

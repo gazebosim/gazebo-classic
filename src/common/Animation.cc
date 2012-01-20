@@ -60,7 +60,7 @@ void Animation::SetLength(double _len)
 
 void Animation::SetTime(double _time)
 {
-  if (_time != this->timePos)
+  if (!math::equal(_time, this->timePos))
   {
     this->timePos = _time;
     if (this->loop)
@@ -133,7 +133,7 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
   *_kf1 = *iter;
   t1 = (*_kf1)->GetTime();
 
-  if (t1 == t2)
+  if (math::equal(t1, t2))
     return 0.0;
   else
     return (_time - t1) / (t2 - t1);
@@ -163,7 +163,7 @@ PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
   PoseKeyFrame *frame = new PoseKeyFrame(_time);
   std::vector<KeyFrame*>::iterator iter =
     std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
-        static_cast<KeyFrame*>(frame), KeyFrameTimeLess());
+        reinterpret_cast<KeyFrame*>(frame), KeyFrameTimeLess());
 
   this->keyFrames.insert(iter, frame);
   this->build = true;
@@ -204,7 +204,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(PoseKeyFrame &_kf) const
 }
 
 void PoseAnimation::GetInterpolatedKeyFrame(double _time,
-    PoseKeyFrame &_kf) const
+                                            PoseKeyFrame &_kf) const
 {
   KeyFrame *kBase1, *kBase2;
   PoseKeyFrame *k1;
@@ -215,9 +215,9 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 
   double t = this->GetKeyFramesAtTime(_time, &kBase1, &kBase2, firstKeyIndex);
 
-  k1 = static_cast<PoseKeyFrame*>(kBase1);
+  k1 = reinterpret_cast<PoseKeyFrame*>(kBase1);
 
-  if (t == 0.0)
+  if (math::equal(t, 0.0))
   {
     _kf.SetTranslate(k1->GetTranslate());
   }
@@ -243,7 +243,7 @@ NumericKeyFrame *NumericAnimation::CreateKeyFrame(double _time)
   NumericKeyFrame *frame = new NumericKeyFrame(_time);
   std::vector<KeyFrame*>::iterator iter =
     std::upper_bound(this->keyFrames.begin(), this->keyFrames.end(),
-        static_cast<KeyFrame*>(frame),
+        reinterpret_cast<KeyFrame*>(frame),
         KeyFrameTimeLess());
 
   this->keyFrames.insert(iter, frame);
@@ -261,10 +261,10 @@ void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
   double t;
   t = this->GetKeyFramesAtTime(this->timePos, &kBase1, &kBase2, firstKeyIndex);
 
-  k1 = static_cast<NumericKeyFrame*>(kBase1);
-  k2 = static_cast<NumericKeyFrame*>(kBase2);
+  k1 = reinterpret_cast<NumericKeyFrame*>(kBase1);
+  k2 = reinterpret_cast<NumericKeyFrame*>(kBase2);
 
-  if (t == 0.0)
+  if (math::equal(t, 0.0))
   {
     // Just use k1
     _kf.SetValue(k1->GetValue());

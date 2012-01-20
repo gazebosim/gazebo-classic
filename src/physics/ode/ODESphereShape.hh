@@ -34,7 +34,7 @@ namespace gazebo
     /// \brief And ODE sphere shape
     class ODESphereShape : public SphereShape
     {
-      public: ODESphereShape(ODECollisionPtr parent) : SphereShape(parent) {}
+      public: ODESphereShape(ODECollisionPtr _parent) : SphereShape(_parent) {}
       public: virtual ~ODESphereShape() {}
       public: void SetRadius(const double &radius)
       {
