@@ -16,7 +16,7 @@
  */
 #include <iomanip>
 #include "common/Time.hh"
-#include "Entity.hh"
+#include "physics/Entity.hh"
 #include "common/Console.hh"
 #include "common/Logger.hh"
 

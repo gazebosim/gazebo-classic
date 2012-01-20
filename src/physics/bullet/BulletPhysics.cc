@@ -17,9 +17,8 @@
 /* Desc: The Bullet physics engine wrapper
  * Author: Nate Koenig
  * Date: 11 June 2007
- * SVN: $Id: BulletPhysics.cc 7714 2009-05-23 18:08:49Z natepak $
  */
-
+/*
 #include "BulletPlaneShape.hh"
 #include "BulletSphereShape.hh"
 #include "BulletBoxShape.hh"
@@ -41,12 +40,9 @@
 #include "Entity.hh"
 
 #include "BulletPhysics.hh"
+*/
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

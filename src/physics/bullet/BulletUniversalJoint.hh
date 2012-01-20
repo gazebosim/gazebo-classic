@@ -17,15 +17,15 @@
 /* Desc: A universal joint
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETUNIVERSALJOINT_HH
 #define BULLETUNIVERSALJOINT_HH
-
+/*
 #include "UniversalJoint.hh"
 #include "BulletJoint.hh"
 #include "BulletPhysics.hh"
+*/
 
 namespace gazebo
 {

@@ -18,17 +18,14 @@
  * Author: Nate Koenig
  * Date: 25 May 2009
  */
-
+/*
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
 #include "Link.hh"
 #include "BulletMotionState.hh"
+*/
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

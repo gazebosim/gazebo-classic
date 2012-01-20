@@ -55,7 +55,7 @@ void ReceiveWorldStatsMsg2(ConstWorldStatisticsPtr &/*_msg*/)
   g_worldStatsMsg2 = true;
 }
 
-void ReceiveWorldStatsDebugMsg(ConstStringPtr &_data)
+void ReceiveWorldStatsDebugMsg(ConstStringPtr &/*_data*/)
 {
   g_worldStatsDebugMsg = true;
 }
@@ -103,8 +103,6 @@ TEST_F(TransportTest, Processes)
     transport::NodePtr node(new transport::Node());
     node->Init();
 
-    //transport::PublisherPtr pub = node->Advertise<msgs::Factory>("~/factory");
-
     transport::SubscriberPtr sub =
       node->Subscribe("~/world_stats", &ReceiveWorldStatsMsg2);
 
@@ -126,7 +124,7 @@ TEST_F(TransportTest, Processes)
   else
   {
     Load("worlds/empty.world");
-    for (unsigned int i=0; i < 20; i++)
+    for (unsigned int i = 0; i < 20; ++i)
     {
       usleep(1000000);
     }
@@ -189,7 +187,7 @@ TEST_F(TransportTest, Errors)
 
 
 
-  putenv("GAZEBO_MASTER_URI=");
+  putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
   std::string masterHost;
   unsigned int masterPort;
   EXPECT_FALSE(transport::get_master_uri(masterHost, masterPort));

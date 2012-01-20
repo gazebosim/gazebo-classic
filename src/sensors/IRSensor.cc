@@ -17,7 +17,6 @@
 /* Desc: IR proximity sensor
  * Author: Wenguo Liu
  * Date: 23 february 2004
- * SVN: $Id: IRSensor.cc 4436 2008-03-24 17:42:45Z robotos $
  */
 
 #include <assert.h>
@@ -25,11 +24,11 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-#include "RayShape.hh"
-#include "MultiRayShape.hh"
+//#include "RayShape.hh"
+//#include "MultiRayShape.hh"
 #include "RaySensor.hh"
-#include "World.hh"
-#include "PhysicsEngine.hh"
+//#include "World.hh"
+//#include "PhysicsEngine.hh"
 #include "common/Exception.hh"
 
 #include "IRSensor.hh"

@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
-
+/*
 #include <sstream>
 
 #include "common/Console.hh"
@@ -32,12 +32,9 @@
 #include "rendering/Visual.hh"
 
 #include "BulletBody.hh"
+*/
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

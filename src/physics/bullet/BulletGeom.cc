@@ -17,9 +17,8 @@
 /* Desc: BulletCollision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
  */
-
+/*
 #include <sstream>
 
 #include "PhysicsEngine.hh"
@@ -27,13 +26,9 @@
 #include "rendering/Visual.hh"
 #include "common/Console.hh"
 #include "World.hh"
-
+*/
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

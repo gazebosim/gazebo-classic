@@ -17,17 +17,18 @@
 /* Desc: The base Bullet joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * SVN: $Id$
  */
 
 #ifndef BULLETJOINT_HH
 #define BULLETJOINT_HH
 
+/*
 #include <btBulletDynamicsCommon.h>
 
 #include "common/Console.hh"
 #include "Joint.hh"
 #include "math/Vector3.hh"
+*/
 
 namespace gazebo
 {

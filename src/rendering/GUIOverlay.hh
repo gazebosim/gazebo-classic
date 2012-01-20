@@ -25,8 +25,8 @@
 #include "gazebo_config.h"
 
 #ifdef HAVE_CEGUI
-#include "CEGUI/CEGUI.h"
-#include "CEGUI/CEGUIEventArgs.h"
+#include <CEGUI/CEGUI.h>
+#include <CEGUI/CEGUIEventArgs.h>
 #endif
 
 #include "common/MouseEvent.hh"

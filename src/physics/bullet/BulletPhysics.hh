@@ -22,7 +22,7 @@
 
 #ifndef BULLETPHYSICS_HH
 #define BULLETPHYSICS_HH
-
+/*
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 
@@ -33,6 +33,7 @@
 #include "PhysicsEngine.hh"
 #include "physics/Collision.hh"
 #include "Shape.hh"
+*/
 
 namespace gazebo
 {

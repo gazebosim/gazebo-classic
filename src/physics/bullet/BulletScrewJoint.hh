@@ -26,11 +26,12 @@
 
 #ifndef BULLETSCREWJOINT_HH
 #define BULLETSCREWJOINT_HH
-
+/*
 #include <btBulletDynamicsCommon.h>
 #include "Param.hh"
 #include "ScrewJoint.hh"
 #include "BulletJoint.hh"
+*/
 
 namespace gazebo
 {

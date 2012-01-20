@@ -41,15 +41,15 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
                                std::string * /*_error*/) const
 {
   std::string headerFilename = _file->name();
-  boost::replace_last(headerFilename, ".proto",".pb.h");
+  boost::replace_last(headerFilename, ".proto", ".pb.h");
 
   std::string sourceFilename = _file->name();
-  boost::replace_last(sourceFilename, ".proto",".pb.cc");
+  boost::replace_last(sourceFilename, ".proto", ".pb.cc");
 
   // Add boost shared point include
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(headerFilename, "includes"));
+        _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
     printer.Print("#pragma GCC system_header", "name", "includes");
@@ -58,7 +58,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
   // Add boost shared point include
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(sourceFilename, "includes"));
+        _generator_context->OpenForInsert(sourceFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
     printer.Print("#pragma GCC diagnostic ignored \"-Wshadow\"", "name",
@@ -68,7 +68,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
 
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(headerFilename, "includes"));
+        _generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
@@ -77,7 +77,7 @@ bool GazeboGenerator::Generate(const FileDescriptor *_file,
   // Add boost shared typedef
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(headerFilename, "global_scope"));
+        _generator_context->OpenForInsert(headerFilename, "global_scope"));
     io::Printer printer(output.get(), '$');
 
     std::string package = _file->package();

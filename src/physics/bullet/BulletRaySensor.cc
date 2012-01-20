@@ -17,19 +17,15 @@
 /* Desc: Bullet ray sensor
  * Author: Nate Koenig
  * Date: 21 May 2009
- * SVN: $Id:$
  */
-
+/*
 #include "World.hh"
 
 #include "BulletPhysics.hh"
 #include "BulletRaySensor.hh"
+*/
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 
