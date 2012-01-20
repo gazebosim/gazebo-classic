@@ -1,12 +1,15 @@
 add_definitions(${tinyxml_cflags})
 
-include_directories( 
-  ${PROJECT_SOURCE_DIR}/src 
-  ${PROJECT_BINARY_DIR}/src 
+include_directories(SYSTEM
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
   ${tinyxml_include_dirs}
+)
+
+include_directories(
+  ${PROJECT_SOURCE_DIR}/src 
+  ${PROJECT_BINARY_DIR}/src 
 )
 
 link_directories(  

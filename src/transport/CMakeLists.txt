@@ -1,8 +1,3 @@
-include_directories( 
-  ${PROJECT_BINARY_DIR}/src/msgs
-  ${PROJECT_SOURCE_DIR}/src 
-)
-
 set (sources TopicManager.cc
              Subscriber.cc
              Publisher.cc

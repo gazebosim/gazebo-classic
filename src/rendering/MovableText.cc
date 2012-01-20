@@ -24,18 +24,12 @@
  * @update  2007 by independentCreations see independentCreations@gmail.com
  */
 
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "common/common.h"
 #include "math/gzmath.h"
 #include "rendering/MovableText.hh"
 
-#include <boost/thread/recursive_mutex.hpp>
-
-#include <OGRE/OgreFontManager.h>
-#include <OGRE/OgreMaterialManager.h>
-#include <OGRE/OgreHardwareBufferManager.h>
-#include <OGRE/OgreCamera.h>
-#include <OGRE/OgreNode.h>
-#include <OGRE/OgreRoot.h>
 
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1

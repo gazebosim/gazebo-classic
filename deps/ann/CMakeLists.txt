@@ -27,7 +27,7 @@ src/pr_queue.h
 src/pr_queue_k.h
 )
 
-include_directories( ${CMAKE_SOURCE_DIR}/deps/ann/include )
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/ann/include )
 
 add_library(gazebo_ann SHARED ${sources})
 INSTALL_LIBRARY(gazebo_ann)

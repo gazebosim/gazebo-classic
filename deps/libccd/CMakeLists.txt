@@ -10,7 +10,7 @@ src/support.c
 src/vec3.c
 )
 
-include_directories( ${CMAKE_SOURCE_DIR}/deps/libccd/include )
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/libccd/include )
 
 add_library(gazebo_ccd SHARED ${sources})
 INSTALL_LIBRARY(gazebo_ccd)

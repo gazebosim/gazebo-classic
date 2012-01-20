@@ -1,9 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories (
-  .
-  ${PROJECT_SOURCE_DIR}/src
-  ${CMAKE_BINARY_DIR}/src/msgs
+
+include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${CEGUI_include_dirs}
   ${CEGUI_INCLUDE_DIRS}

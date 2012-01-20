@@ -1,19 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-########################################
-# Include all the search paths for headers
-
-add_definitions(${tinyxml_cflags})
-
-include_directories( 
-  ${PROJECT_BINARY_DIR}/src 
-  ${tinyxml_include_dirs}
-)
-
-link_directories(  
- ${tinyxml_library_dirs}
-)
-
 set ( sources ColladaLoader.cc
               Color.cc
               Diagnostics.cc

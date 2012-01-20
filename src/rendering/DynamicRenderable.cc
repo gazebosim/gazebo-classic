@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-#include <OgreCamera.h>
-#include <OgreHardwareBufferManager.h>
 
 #include "common/Console.hh"
 #include "rendering/DynamicRenderable.hh"

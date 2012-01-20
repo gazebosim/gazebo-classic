@@ -1,5 +1,3 @@
-include_directories( . )
-
 set (sources Sensors.cc
              Sensor.cc
              SensorFactory.cc

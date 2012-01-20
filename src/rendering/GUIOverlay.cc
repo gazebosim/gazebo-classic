@@ -2,7 +2,7 @@
 #include "common/Console.hh"
 
 #ifdef HAVE_CEGUI
-#include "CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h"
+#include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #endif
 
 #include "common/SystemPaths.hh"
@@ -437,6 +437,8 @@ int GUIOverlay::GetKeyCode(const std::string  &_unicode)
     case 13: return CEGUI::Key::Return;
     case 127: return CEGUI::Key::Delete;
   };
+
+  return 0;
 }
 
 #endif

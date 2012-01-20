@@ -23,22 +23,45 @@ bool GazeboGenerator::Generate(const FileDescriptor* file,
                                OutputDirectory *generator_context,
                                std::string *error) const
 {
-  std::string filename = file->name();
-  boost::replace_last(filename, ".proto",".pb.h");
+  std::string headerFilename = file->name();
+  boost::replace_last(headerFilename, ".proto",".pb.h");
+
+  std::string sourceFilename = file->name();
+  boost::replace_last(sourceFilename, ".proto",".pb.cc");
 
   // Add boost shared point include
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(filename, "includes"));
+        generator_context->OpenForInsert(headerFilename, "includes"));
+    io::Printer printer(output.get(), '$');
+
+    printer.Print("#pragma GCC system_header", "name", "includes");
+  }
+
+  // Add boost shared point include
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        generator_context->OpenForInsert(sourceFilename, "includes"));
+    io::Printer printer(output.get(), '$');
+
+    printer.Print("#pragma GCC diagnostic ignored \"-Wshadow\"", "name",
+                  "includes");
+  }
+
+
+  {
+    scoped_ptr<io::ZeroCopyOutputStream> output(
+        generator_context->OpenForInsert(headerFilename, "includes"));
     io::Printer printer(output.get(), '$');
 
     printer.Print("#include <boost/shared_ptr.hpp>", "name", "includes");
   }
 
+
   // Add boost shared typedef
   {
     scoped_ptr<io::ZeroCopyOutputStream> output(
-        generator_context->OpenForInsert(filename, "global_scope"));
+        generator_context->OpenForInsert(headerFilename, "global_scope"));
     io::Printer printer(output.get(), '$');
 
     std::string package = file->package();

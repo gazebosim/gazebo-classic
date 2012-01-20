@@ -19,8 +19,11 @@
 #include <OGRE/OgreColourValue.h>
 #include <OGRE/OgreQuaternion.h>
 #include <OGRE/OgreMesh.h>
-
-
+#include <OGRE/OgreFontManager.h>
+#include <OGRE/OgreHardwareBufferManager.h>
+#include <OGRE/OgreCamera.h>
+#include <OGRE/OgreNode.h>
+#include <OGRE/OgreSimpleRenderable.h>
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <RTShaderSystem/OgreRTShaderSystem.h>

@@ -3,7 +3,7 @@ include (CheckIncludeFiles)
 include (CheckFunctionExists)
 include (CheckLibraryExists)
 
-include_directories( 
+include_directories(SYSTEM
   ${CMAKE_CURRENT_BINARY_DIR} 
   ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${CMAKE_SOURCE_DIR}/deps/opende/ou/include
