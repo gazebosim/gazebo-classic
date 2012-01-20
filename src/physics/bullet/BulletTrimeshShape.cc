@@ -17,22 +17,18 @@
 /* Desc: Trimesh shape
  * Author: Nate Keonig
  * Date: 21 May 2009
- * SVN: $Id:$
  */
 
+/*
 #include "BulletPhysics.hh"
 #include "rendering/Visual.hh"
 #include "Link.hh"
 #include "common/Exception.hh"
 #include "BulletTrimeshShape.hh"
+*/
 
 using namespace gazebo;
 using namespace physics;
-
-using namespace physics;
-
-using namespace physics;
-
 
 //////////////////////////////////////////////////
 BulletTrimeshShape::BulletTrimeshShape(Collision *_parent)

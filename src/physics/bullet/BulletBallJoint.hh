@@ -17,15 +17,15 @@
 /* Desc: A ball joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: BulletBallJoint.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef BULLETBALLJOINT_HH
 #define BULLETBALLJOINT_HH
-
+/*
 #include "BallJoint.hh"
 #include "BulletJoint.hh"
 #include "BulletPhysics.hh"
+*/
 
 namespace gazebo
 {

@@ -22,10 +22,10 @@
 
 #ifndef BULLETHEIGHTMAPGEOM_HH
 #define BULLETHEIGHTMAPGEOM_HH
-
+/*
 #include <string>
-
 #include "BulletCollision.hh"
+*/
 
 class btHeightfieldTerrainShape;
 

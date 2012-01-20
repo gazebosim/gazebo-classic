@@ -17,12 +17,12 @@
 /* Desc: Collision class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id: Collision.hh 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #ifndef BulletGEOM_HH
 #define BulletGEOM_HH
 
+/*
 #include <string>
 
 #include "common/Param.hh"
@@ -30,6 +30,7 @@
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 #include "physics/Collision.hh"
+*/
 
 class btCollisionShape;
 

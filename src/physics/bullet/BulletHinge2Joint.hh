@@ -23,12 +23,13 @@
 #ifndef BULLETHINGE2JOINT_HH
 #define BULLETHINGE2JOINT_HH
 #include <string>
-
+/*
 #include "math/Angle.hh"
 #include "math/Vector3.hh"
 #include "Hinge2Joint.hh"
 #include "BulletJoint.hh"
 #include "BulletPhysics.hh"
+*/
 
 namespace gazebo
 {

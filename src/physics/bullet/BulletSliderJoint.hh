@@ -22,10 +22,11 @@
 
 #ifndef BULLETSLIDERJOINT_HH
 #define BULLETSLIDERJOINT_HH
-
+/*
 #include <btBulletDynamicsCommon.h>
 #include "SliderJoint.hh"
 #include "BulletJoint.hh"
+*/
 
 
 namespace gazebo

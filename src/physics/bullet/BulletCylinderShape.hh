@@ -17,15 +17,15 @@
 /* Desc: Cylinder shape
  * Author: Nate Keonig
  * Date: 14 Oct 2009
- * SVN: $Id$
  */
 
 #ifndef BULLETCYLINDERSHAPE_HH
 #define BULLETCYLINDERSHAPE_HH
-
+/*
 #include "common/Exception.hh"
 #include "BulletPhysics.hh"
 #include "CylinderShape.hh"
+*/
 
 namespace gazebo
 {

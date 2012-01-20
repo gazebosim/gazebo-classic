@@ -17,21 +17,17 @@
 /* Desc: A BulletHingeJoint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: BulletHingeJoint.cc 7640 2009-05-13 02:06:08Z natepak $
  */
-
+/*
 #include "Model.hh"
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "World.hh"
 #include "BulletPhysics.hh"
 #include "BulletHingeJoint.hh"
+*/
 
 using namespace gazebo;
-using namespace physics;
-
-using namespace physics;
-
 using namespace physics;
 
 

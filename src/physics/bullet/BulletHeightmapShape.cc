@@ -18,7 +18,7 @@
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
  */
-
+/*
 #include <string.h>
 #include <math.h>
 
@@ -29,6 +29,7 @@
 #include "common/Image.hh"
 #include "common/Exception.hh"
 #include "Link.hh"
+*/
 
 using namespace gazebo;
 using namespace physics;

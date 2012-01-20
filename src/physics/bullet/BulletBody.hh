@@ -17,14 +17,15 @@
 /* Desc: Bullet Link class
  * Author: Nate Koenig
  * Date: 15 May 2009
- * SVN: $Id$
  */
 
 #ifndef BulletBODY_HH
 #define BulletBODY_HH
 
+/*
 #include "BulletPhysics.hh"
 #include "Link.hh"
+*/
 
 namespace gazebo
 {

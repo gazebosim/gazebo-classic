@@ -18,9 +18,11 @@
  * Author: Nate Keonig, Andrew Howard
  * Date: 15 May 2009
  */
+/*
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "BulletJoint.hh"
+*/
 
 using namespace gazebo;
 using namespace physics;

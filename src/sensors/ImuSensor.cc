@@ -25,8 +25,8 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-#include "World.hh"
-#include "PhysicsEngine.hh"
+//#include "World.hh"
+//#include "PhysicsEngine.hh"
 #include "common/Exception.hh"
 #include "ImuSensor.hh"
 
