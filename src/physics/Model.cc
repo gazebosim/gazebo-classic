@@ -202,12 +202,12 @@ void Model::Update()
       {
         iter->second->GetInterpolatedKeyFrame(kf);
         jointPositions[iter->first] = kf.GetValue();
+        ++iter;
       }
       else
       {
-        this->jointAnimations.erase(iter);
+        this->jointAnimations.erase(iter++);
       }
-      ++iter;
     }
     if (!jointPositions.empty())
     {

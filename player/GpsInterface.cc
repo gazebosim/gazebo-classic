@@ -39,6 +39,10 @@ GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver,
     ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
+  this->iface = NULL;
+  this->gz_id = NULL;
+  this->datatime = 0;
+
   /*
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
