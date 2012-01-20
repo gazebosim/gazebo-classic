@@ -17,7 +17,6 @@
 /* Desc: IMU sensor
  * Author: Matt Thompson
  * Date: 6 September 2008
- * SVN: $Id$
 */
 
 #include <assert.h>
@@ -25,8 +24,8 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-//#include "World.hh"
-//#include "PhysicsEngine.hh"
+// #include "World.hh"
+// #include "PhysicsEngine.hh"
 #include "common/Exception.hh"
 #include "ImuSensor.hh"
 

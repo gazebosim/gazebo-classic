@@ -22,8 +22,9 @@
 #ifndef BulletGEOM_HH
 #define BulletGEOM_HH
 
-/*
 #include <string>
+
+/*
 
 #include "common/Param.hh"
 #include "Entity.hh"

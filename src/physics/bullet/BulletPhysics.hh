@@ -22,13 +22,14 @@
 
 #ifndef BULLETPHYSICS_HH
 #define BULLETPHYSICS_HH
+#include <string>
+
 /*
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <string>
 
 #include "PhysicsEngine.hh"
 #include "physics/Collision.hh"

@@ -19,9 +19,9 @@
  * Author: Nate Koenig
  * Date: 25 March 2008
  */
-//#include <arpa/inet.h>
-//#include <OgreImageCodec.h>
-//#include <GL/gl.h>
+// #include <arpa/inet.h>
+// #include <OgreImageCodec.h>
+// #include <GL/gl.h>
 #include <Ogre.h>
 #include <sstream>
 

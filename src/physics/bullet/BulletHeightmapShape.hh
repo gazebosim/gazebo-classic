@@ -17,13 +17,13 @@
 /* Desc: Trimesh collisionetry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: BulletHeightmapCollision.hh 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #ifndef BULLETHEIGHTMAPGEOM_HH
 #define BULLETHEIGHTMAPGEOM_HH
-/*
 #include <string>
+
+/*
 #include "BulletCollision.hh"
 */
 
