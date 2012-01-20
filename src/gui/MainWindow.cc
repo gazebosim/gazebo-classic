@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
-
 #include "common/Console.hh"
 #include "common/Exception.hh"
 #include "common/Events.hh"
@@ -512,8 +510,8 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     {
       std::string name = _msg->camera().track().name();
 
-      double minDist, maxDist;
-      minDist = maxDist = 0;
+      double minDist = 0.0;
+      double maxDist = 0.0;
 
       if (_msg->camera().track().has_min_dist())
         minDist = _msg->camera().track().min_dist();

@@ -181,25 +181,25 @@ void MovableText::SetColor(const common::Color &newColor)
 }
 
 //////////////////////////////////////////////////
-void MovableText::SetCharHeight(float height_)
+void MovableText::SetCharHeight(float _height)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (this->charHeight != height_)
+  if (!math::equal(this->charHeight, _height))
   {
-    this->charHeight = height_;
+    this->charHeight = _height;
     this->needUpdate = true;
   }
 }
 
 //////////////////////////////////////////////////
-void MovableText::SetSpaceWidth(float width_)
+void MovableText::SetSpaceWidth(float _width)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (this->spaceWidth != width_)
+  if (!math::equal(this->spaceWidth, _width))
   {
-    this->spaceWidth = width_;
+    this->spaceWidth = _width;
     this->needUpdate = true;
   }
 }
@@ -225,7 +225,7 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 void MovableText::SetBaseline(float _base)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (this->baseline != _base)
+  if (!math::equal(this->baseline, _base))
   {
     this->baseline = _base;
     this->needUpdate = true;
@@ -354,7 +354,7 @@ void MovableText::_setupGeometry()
   pVert = static_cast<float*>(ptbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // Derive space width from a capital A
-  if (this->spaceWidth == 0)
+  if (math::equal(this->spaceWidth, 0))
     this->spaceWidth =
       this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 

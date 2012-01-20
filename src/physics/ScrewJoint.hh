@@ -21,7 +21,6 @@
 /* Desc: A screw or primastic/rotational joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id$
  */
 
 #ifndef SCREWJOINT_HH

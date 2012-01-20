@@ -26,8 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "Vector4.hh"
-#include "Spline.hh"
+#include "math/Helpers.hh"
+#include "math/Vector4.hh"
+#include "math/Spline.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -101,9 +102,9 @@ Vector3 Spline::Interpolate(unsigned int _fromIndex, double _t) const
   }
 
   // Fast special cases
-  if (_t == 0.0f)
+  if (equal(_t, 0.0))
     return this->points[_fromIndex];
-  else if (_t == 1.0f)
+  else if (equal(_t, 1.0))
     return this->points[_fromIndex + 1];
 
   // double interpolation

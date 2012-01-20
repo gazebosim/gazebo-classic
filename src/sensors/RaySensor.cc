@@ -80,13 +80,13 @@ void RaySensor::Load()
         this->sdf->GetElement("topic")->GetValueString());
   }
 
-  physics::WorldPtr world = physics::get_world(worldName);
-  this->link = world->GetModelByName(modelName)->GetChildLink(linkName);
+  physics::WorldPtr worldPtr = physics::get_world(worldName);
+  this->link = worldPtr->GetModelByName(modelName)->GetChildLink(linkName);
 
   if (this->link == NULL)
     gzthrow("Null link in the ray sensor");
 
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = worldPtr->GetPhysicsEngine();
   this->laserCollision = physicsEngine->CreateCollision("multiray", this->link);
   this->laserCollision->SetName("ray_sensor_collision");
   this->laserCollision->SetRelativePose(this->pose);

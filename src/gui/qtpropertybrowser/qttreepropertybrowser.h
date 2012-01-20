@@ -37,6 +37,7 @@
  **
  ****************************************************************************/
 
+#pragma GCC system_header
 
 #ifndef QTTREEPROPERTYBROWSER_H
 #define QTTREEPROPERTYBROWSER_H

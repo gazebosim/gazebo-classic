@@ -17,7 +17,6 @@
 /* Desc: Fiducial Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * SVN: $SVN:$
  */
 
 #ifndef FIDUCIALINTERFACE_HH

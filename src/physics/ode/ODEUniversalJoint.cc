@@ -17,7 +17,6 @@
 /* Desc: A universal joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: ODEUniversalJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #include "gazebo_config.h"

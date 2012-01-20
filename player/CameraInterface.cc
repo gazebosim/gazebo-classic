@@ -17,7 +17,6 @@
 /* Desc: Camera Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 #include <math.h>

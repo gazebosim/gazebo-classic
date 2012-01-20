@@ -34,8 +34,8 @@ static const float PITCH_LIMIT_LOW = -M_PI*0.5 + 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 
 //////////////////////////////////////////////////
-OrbitViewController::OrbitViewController(UserCamera *camera)
-  : ViewController(camera), distance(5.0f)
+OrbitViewController::OrbitViewController(UserCamera *_camera)
+  : ViewController(_camera), distance(5.0f)
 {
   this->minDist = MIN_DISTANCE;
   this->maxDist = 0;

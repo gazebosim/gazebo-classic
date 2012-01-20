@@ -17,7 +17,6 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
-#include <QtGui>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -240,8 +239,6 @@ void ModelListWidget::OnResponse(
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  msgs::Model modelMsg;
-
   if (_msg->has_type() && _msg->type() == this->modelMsg.GetTypeName())
   {
     this->propMutex->lock();
@@ -289,8 +286,8 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
       && !listItem; ++i)
   {
     QTreeWidgetItem *item = this->modelTreeWidget->topLevelItem(i);
-    unsigned int data = item->data(0, Qt::UserRole).toUInt();
-    if (data == _id)
+    unsigned int listData = item->data(0, Qt::UserRole).toUInt();
+    if (listData == _id)
     {
       listItem = item;
       break;
@@ -299,8 +296,8 @@ QTreeWidgetItem *ModelListWidget::GetModelListItem(unsigned int _id)
     for (int j = 0; j < item->childCount(); j++)
     {
       QTreeWidgetItem *childItem = item->child(j);
-      data = childItem->data(0, Qt::UserRole).toUInt();
-      if (data == _id)
+      listData = childItem->data(0, Qt::UserRole).toUInt();
+      if (listData == _id)
       {
         listItem = childItem;
         break;
@@ -597,54 +594,54 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     QtProperty *offsetProp = this->GetChildItem(_item, "offset");
     QtProperty *fileProp = this->GetChildItem(_item, "filename");
 
-    double x, y, z;
+    double px, py, pz;
     msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
 
     heightmapMessage->set_filename(this->variantManager->value(
           fileProp).toString().toStdString());
 
-    x = this->variantManager->value(
-        this->GetChildItem(sizeProp, "x")).toDouble();
-    y = this->variantManager->value(
-        this->GetChildItem(sizeProp, "y")).toDouble();
-    z = this->variantManager->value(
-        this->GetChildItem(sizeProp, "z")).toDouble();
+    px = this->variantManager->value(
+         this->GetChildItem(sizeProp, "x")).toDouble();
+    py = this->variantManager->value(
+         this->GetChildItem(sizeProp, "y")).toDouble();
+    pz = this->variantManager->value(
+         this->GetChildItem(sizeProp, "z")).toDouble();
 
-    heightmapMessage->mutable_size()->set_x(x);
-    heightmapMessage->mutable_size()->set_y(y);
-    heightmapMessage->mutable_size()->set_z(z);
+    heightmapMessage->mutable_size()->set_x(px);
+    heightmapMessage->mutable_size()->set_y(py);
+    heightmapMessage->mutable_size()->set_z(pz);
 
-    x = this->variantManager->value(
-        this->GetChildItem(offsetProp, "x")).toDouble();
-    y = this->variantManager->value(
-        this->GetChildItem(offsetProp, "y")).toDouble();
-    z = this->variantManager->value(
-        this->GetChildItem(offsetProp, "z")).toDouble();
+    px = this->variantManager->value(
+         this->GetChildItem(offsetProp, "x")).toDouble();
+    py = this->variantManager->value(
+         this->GetChildItem(offsetProp, "y")).toDouble();
+    pz = this->variantManager->value(
+         this->GetChildItem(offsetProp, "z")).toDouble();
 
-    heightmapMessage->mutable_offset()->set_x(x);
-    heightmapMessage->mutable_offset()->set_y(y);
-    heightmapMessage->mutable_offset()->set_z(z);
+    heightmapMessage->mutable_offset()->set_x(px);
+    heightmapMessage->mutable_offset()->set_y(py);
+    heightmapMessage->mutable_offset()->set_z(pz);
   }
   else if (type == "mesh")
   {
     QtProperty *sizeProp = this->GetChildItem(_item, "scale");
     QtProperty *fileProp = this->GetChildItem(_item, "filename");
 
-    double x, y, z;
+    double px, py, pz;
     msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
     meshMessage->set_filename(this->variantManager->value(
           fileProp).toString().toStdString());
 
-    x = this->variantManager->value(
-        this->GetChildItem(sizeProp, "x")).toDouble();
-    y = this->variantManager->value(
-        this->GetChildItem(sizeProp, "y")).toDouble();
-    z = this->variantManager->value(
-        this->GetChildItem(sizeProp, "z")).toDouble();
+    px = this->variantManager->value(
+         this->GetChildItem(sizeProp, "x")).toDouble();
+    py = this->variantManager->value(
+         this->GetChildItem(sizeProp, "y")).toDouble();
+    pz = this->variantManager->value(
+         this->GetChildItem(sizeProp, "z")).toDouble();
 
-    meshMessage->mutable_scale()->set_x(x);
-    meshMessage->mutable_scale()->set_y(y);
-    meshMessage->mutable_scale()->set_z(z);
+    meshMessage->mutable_scale()->set_x(px);
+    meshMessage->mutable_scale()->set_y(py);
+    meshMessage->mutable_scale()->set_z(pz);
   }
   else
     gzerr << "Unknown geom type[" << type << "]\n";

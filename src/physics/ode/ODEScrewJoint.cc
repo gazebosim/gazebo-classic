@@ -21,7 +21,6 @@
 /* Desc: A screw or primastic joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: ODEScrewJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #include <boost/bind.hpp>

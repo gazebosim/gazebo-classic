@@ -18,6 +18,7 @@
 #include <string.h>
 #include <algorithm>
 
+#include "math/Helpers.hh"
 #include "common/Exception.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
@@ -330,9 +331,8 @@ void SubMesh::CopyNormals(const std::vector<math::Vector3> &_norms)
   {
     this->normals[i] = _norms[i];
     this->normals[i].Normalize();
-    if (this->normals[i].GetLength() == 0.0)
+    if (math::equal(this->normals[i].GetLength(), 0.0))
     {
-      std::cout << "Bad Normals[" << this->normals[i] << "]\n";
       this->normals[i].Set(0, 0, 1);
     }
   }

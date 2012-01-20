@@ -17,11 +17,11 @@
 /* Desc: Vector 4
  * Author: Andrew Howard and Nate Koenig
  * Date: 4 Apr 2007
- * SVN: $Id$
  */
 
 #include <math.h>
 
+#include "math/Helpers.hh"
 #include "math/Vector4.hh"
 
 using namespace gazebo;
@@ -231,8 +231,8 @@ const Vector4 &Vector4::operator*=(double v)
 //////////////////////////////////////////////////
 bool Vector4::operator ==(const Vector4 &pt) const
 {
-  return this->x == pt.x && this->y == pt.y &&
-         this->z == pt.z && this->w == pt.w;
+  return equal(this->x, pt.x) && equal(this->y, pt.y) &&
+         equal(this->z, pt.z) && equal(this->w, pt.w);
 }
 
 //////////////////////////////////////////////////

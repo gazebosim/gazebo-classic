@@ -315,6 +315,8 @@ void SSaPCollisionManager::collide(void* cdata, CollisionCallBack callback) cons
       pos = objs_z.begin();
       pos_end = objs_z.end();
       break;
+    default:
+      break;
   }
   run_pos = pos;
 

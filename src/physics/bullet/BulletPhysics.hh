@@ -17,7 +17,6 @@
 /* Desc: The Bullet physics engine wrapper
  * Author: Nate Koenig
  * Date: 11 June 2009
- * SVN: $Id: BulletPhysics.hh 7706 2009-05-21 16:46:22Z natepak $
  */
 
 #ifndef BULLETPHYSICS_HH

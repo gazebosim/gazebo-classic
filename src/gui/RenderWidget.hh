@@ -17,10 +17,10 @@
 #ifndef RENDER_WIDGET_HH
 #define RENDER_WIDGET_HH
 
-#include <QWidget>
 #include <string>
 #include <vector>
 
+#include "gui/qt.h"
 #include "common/Event.hh"
 
 class QLineEdit;

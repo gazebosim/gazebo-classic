@@ -734,9 +734,10 @@ void World::ModelUpdateSingleLoop()
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr &_sdf)
 {
-  std::string name = _sdf->GetValueString("name");
+  std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
-  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename, name);
+  gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(filename,
+                                                              pluginName);
   if (plugin)
   {
     WorldPtr myself = shared_from_this();

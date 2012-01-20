@@ -25,8 +25,8 @@ using namespace transport;
 unsigned int Publication::idCounter = 0;
 
 //////////////////////////////////////////////////
-Publication::Publication(const std::string &topic, const std::string &msgType)
-  : topic(topic), msgType(msgType), locallyAdvertised(false)
+Publication::Publication(const std::string &_topic, const std::string &_msgType)
+  : topic(_topic), msgType(_msgType), locallyAdvertised(false)
 {
   this->id = idCounter++;
 }

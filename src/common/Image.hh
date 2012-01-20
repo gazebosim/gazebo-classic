@@ -17,7 +17,6 @@
 /* Desc: Image class
  * Author: Nate Koenig
  * Date: 14 July 2008
- * SVN: $Id$
  */
 
 #ifndef IMAGE_HH

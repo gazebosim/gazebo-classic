@@ -59,6 +59,7 @@ set (headers MovableText.hh
              CameraVisual.hh
              ContactVisual.hh
              ogre.h
+             cegui.h
 )
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)

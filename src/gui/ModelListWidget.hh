@@ -17,12 +17,12 @@
 #ifndef MODEL_LIST_WIDGET_HH
 #define MODEL_LIST_WIDGET_HH
 
-#include <QWidget>
 #include <map>
 #include <string>
 #include <list>
 #include <vector>
 
+#include "gui/qt.h"
 #include "sdf/sdf.h"
 #include "msgs/msgs.h"
 #include "transport/TransportTypes.hh"

@@ -49,6 +49,8 @@
 // We mean it.
 //
 
+#pragma GCC system_header
+
 #ifndef QTPROPERTYBROWSERUTILS_H
 #define QTPROPERTYBROWSERUTILS_H
 

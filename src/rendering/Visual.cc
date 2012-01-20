@@ -884,7 +884,7 @@ void Visual::AttachAxes()
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (_trans == this->transparency)
+  if (math::equal(_trans, this->transparency))
     return;
 
   this->transparency = std::min(

@@ -17,11 +17,11 @@
 #ifndef MAINWINDOW_HH
 #define MAINWINDOW_HH
 
-#include <qmainwindow.h>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "gui/qt.h"
 #include "common/Event.hh"
 #include "msgs/MessageTypes.hh"
 #include "transport/TransportTypes.hh"

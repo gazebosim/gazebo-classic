@@ -17,7 +17,6 @@
 /* Desc: Gps Interface for Player
  * Author: Glenn Laguna
  * Date: 20 June 2006
- * CVS: $Id$
  */
 
 #ifndef GPSINTERFACE_HH

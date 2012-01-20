@@ -17,7 +17,6 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 
 #include "math/Pose.hh"

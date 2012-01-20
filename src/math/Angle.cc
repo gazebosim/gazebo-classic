@@ -17,10 +17,10 @@
 /* Desc: Angle class
  * Author: Nate Koenig
  * Date: 18 Aug 2008
- * SVN: $Id$
  */
 
 #include <math.h>
+#include "math/Helpers.hh"
 #include "math/Angle.hh"
 
 using namespace gazebo;
@@ -134,7 +134,7 @@ Angle Angle::operator/=(const Angle &angle)
 //////////////////////////////////////////////////
 bool Angle::operator ==(const Angle &angle) const
 {
-  return this->value == angle.value;
+  return equal(this->value, angle.value);
 }
 
 //////////////////////////////////////////////////

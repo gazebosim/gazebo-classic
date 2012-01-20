@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
-
 #include "transport/Node.hh"
 #include "transport/Publisher.hh"
 
@@ -264,18 +262,18 @@ void PhysicsWidget::OnResponse(
 
     if (physicsMsg.has_gravity())
     {
-      std::ostringstream x, y, z;
+      std::ostringstream px, py, pz;
       double xDbl = physicsMsg.gravity().x();
       double yDbl = physicsMsg.gravity().y();
       double zDbl = physicsMsg.gravity().z();
 
-      x << std::fixed << std::setprecision(3) << xDbl;
-      y << std::fixed << std::setprecision(3) << yDbl;
-      z << std::fixed << std::setprecision(3) << zDbl;
+      px << std::fixed << std::setprecision(3) << xDbl;
+      py << std::fixed << std::setprecision(3) << yDbl;
+      pz << std::fixed << std::setprecision(3) << zDbl;
 
-      this->gravityXLineEdit->setText(tr(x.str().c_str()));
-      this->gravityYLineEdit->setText(tr(y.str().c_str()));
-      this->gravityZLineEdit->setText(tr(z.str().c_str()));
+      this->gravityXLineEdit->setText(tr(px.str().c_str()));
+      this->gravityYLineEdit->setText(tr(py.str().c_str()));
+      this->gravityZLineEdit->setText(tr(pz.str().c_str()));
     }
 
     if (physicsMsg.has_iters())
@@ -733,11 +731,11 @@ void SceneWidget::OnAmbientColor()
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
-  std::ostringstream style;
-  style << "background-color:rgb(" << color.red()
-        << ", " << color.green() << ", " << color.blue() << ");";
+  std::ostringstream styleStr;
+  styleStr << "background-color:rgb(" << color.red()
+           << ", " << color.green() << ", " << color.blue() << ");";
   this->ambientColorButton->setAutoFillBackground(true);
-  this->ambientColorButton->setStyleSheet(style.str().c_str());
+  this->ambientColorButton->setStyleSheet(styleStr.str().c_str());
 
   msgs::Scene msg;
   msg.mutable_ambient()->set_r(color.red() /255.0);
@@ -757,11 +755,11 @@ void SceneWidget::OnBackgroundColor()
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
-  std::ostringstream style;
-  style << "background-color:rgb(" << color.red()
-        << ", " << color.green() << ", " << color.blue() << ");";
+  std::ostringstream styleStr;
+  styleStr << "background-color:rgb(" << color.red()
+           << ", " << color.green() << ", " << color.blue() << ");";
   this->backgroundColorButton->setAutoFillBackground(true);
-  this->backgroundColorButton->setStyleSheet(style.str().c_str());
+  this->backgroundColorButton->setStyleSheet(styleStr.str().c_str());
 
 
   msgs::Scene msg;
@@ -781,11 +779,11 @@ void SceneWidget::OnFogColor()
   QColor color;
   color = QColorDialog::getColor(Qt::yellow, this);
 
-  std::ostringstream style;
-  style << "background-color:rgb(" << color.red() << ", "
-        << color.green() << ", " << color.blue() << ");";
+  std::ostringstream styleStr;
+  styleStr << "background-color:rgb(" << color.red() << ", "
+           << color.green() << ", " << color.blue() << ");";
   this->fogColorButton->setAutoFillBackground(true);
-  this->fogColorButton->setStyleSheet(style.str().c_str());
+  this->fogColorButton->setStyleSheet(styleStr.str().c_str());
 
   msgs::Scene msg;
   msg.mutable_fog()->mutable_color()->set_r(color.red() / 255.0);
@@ -823,22 +821,22 @@ void SceneWidget::OnResponse(ConstResponsePtr &_msg)
 
     if (sceneMsg.has_ambient())
     {
-      std::ostringstream style;
-      style << "background-color:rgb(" << sceneMsg.ambient().r()*255
-        << ", " << sceneMsg.ambient().g() * 255 << ", "
-        << sceneMsg.ambient().b()*255 << ");";
+      std::ostringstream styleStr;
+      styleStr << "background-color:rgb(" << sceneMsg.ambient().r()*255
+               << ", " << sceneMsg.ambient().g() * 255 << ", "
+               << sceneMsg.ambient().b()*255 << ");";
       this->ambientColorButton->setAutoFillBackground(true);
-      this->ambientColorButton->setStyleSheet(style.str().c_str());
+      this->ambientColorButton->setStyleSheet(styleStr.str().c_str());
     }
 
     if (sceneMsg.has_background())
     {
-      std::ostringstream style;
-      style << "background-color:rgb(" << sceneMsg.background().r()*255
-        << ", " << sceneMsg.background().g() * 255 << ", "
-        << sceneMsg.background().b()*255 << ");";
+      std::ostringstream styleStr;
+      styleStr << "background-color:rgb(" << sceneMsg.background().r()*255
+               << ", " << sceneMsg.background().g() * 255 << ", "
+               << sceneMsg.background().b()*255 << ");";
       this->backgroundColorButton->setAutoFillBackground(true);
-      this->backgroundColorButton->setStyleSheet(style.str().c_str());
+      this->backgroundColorButton->setStyleSheet(styleStr.str().c_str());
     }
 
     if (sceneMsg.has_shadows() && sceneMsg.shadows())
@@ -852,13 +850,13 @@ void SceneWidget::OnResponse(ConstResponsePtr &_msg)
 
       if (sceneMsg.fog().has_color())
       {
-        std::ostringstream style;
-        style << "background-color:rgb("
-          << sceneMsg.fog().color().r()*255
-          << ", " << sceneMsg.fog().color().g() * 255 << ", "
-          << sceneMsg.fog().color().b()*255 << ");";
+        std::ostringstream styleStr;
+        styleStr << "background-color:rgb("
+                 << sceneMsg.fog().color().r()*255
+                 << ", " << sceneMsg.fog().color().g() * 255 << ", "
+                 << sceneMsg.fog().color().b()*255 << ");";
         this->fogColorButton->setAutoFillBackground(true);
-        this->fogColorButton->setStyleSheet(style.str().c_str());
+        this->fogColorButton->setStyleSheet(styleStr.str().c_str());
       }
 
       if (sceneMsg.fog().has_density())
@@ -885,4 +883,3 @@ void SceneWidget::OnResponse(ConstResponsePtr &_msg)
   }
   this->initialized = true;
 }
-

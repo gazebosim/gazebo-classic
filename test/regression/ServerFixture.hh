@@ -15,6 +15,10 @@
  *
 */
 
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wshadow"
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 

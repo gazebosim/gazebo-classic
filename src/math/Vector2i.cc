@@ -17,7 +17,6 @@
 /* Desc: Vector 2
  * Author: Nate Koenig
  * Date: 21 July 2007
- * SVN: $Id$
  */
 
 #include <math.h>

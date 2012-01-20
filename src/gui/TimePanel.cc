@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include <QtGui>
 #include <sstream>
 
 #include "transport/Node.hh"

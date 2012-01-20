@@ -375,9 +375,9 @@ void UserCamera::ShowVisual(bool /*_s*/)
 //////////////////////////////////////////////////
 void UserCamera::MoveToVisual(const std::string &_name)
 {
-  VisualPtr visual = this->scene->GetVisual(_name);
-  if (visual)
-    this->MoveToVisual(visual);
+  VisualPtr visualPtr = this->scene->GetVisual(_name);
+  if (visualPtr)
+    this->MoveToVisual(visualPtr);
   else
     gzerr << "MoveTo Unknown visual[" << _name << "]\n";
 }

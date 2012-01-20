@@ -17,7 +17,6 @@
 /* Desc: A ray
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETRAYGEOM_HH

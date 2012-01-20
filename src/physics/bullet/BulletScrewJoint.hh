@@ -21,7 +21,6 @@
 /* Desc: A screw or primastic joint
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETSCREWJOINT_HH

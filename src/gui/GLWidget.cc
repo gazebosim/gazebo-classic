@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-#include <QtGui>
-#include <QX11Info>
-
 #include <math.h>
 
 #include "common/Exception.hh"
@@ -504,25 +501,25 @@ rendering::UserCameraPtr GLWidget::GetCamera() const
 //////////////////////////////////////////////////
 std::string GLWidget::GetOgreHandle() const
 {
-  std::string handle;
+  std::string ogreHandle;
 
 #ifdef WIN32
-  handle = boost::lexical_cast<std::string>(this->winId());
+  ogreHandle = boost::lexical_cast<std::string>(this->winId());
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
-  handle = boost::lexical_cast<std::string>(
+  ogreHandle = boost::lexical_cast<std::string>(
       reinterpret_cast<uint64_t>(info.display()));
-  handle += ":";
-  handle += boost::lexical_cast<std::string>(
+  ogreHandle += ":";
+  ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint32_t>(info.screen()));
-  handle += ":";
+  ogreHandle += ":";
   assert(q_parent);
-  handle += boost::lexical_cast<std::string>(
+  ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint64_t>(q_parent->winId()));
 #endif
 
-  return handle;
+  return ogreHandle;
 }
 
 void GLWidget::CreateEntity(const std::string &_name)

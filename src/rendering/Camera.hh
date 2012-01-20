@@ -277,7 +277,7 @@ namespace gazebo
       /// \brief Attach the camera to a scene node
       public: void AttachToVisual(const std::string &_visualName,
                   bool _inheritOrientation,
-                  double _minDist = 0, double _maxDist = 0);
+                  double _minDist = 0.0, double _maxDist = 0.0);
 
       /// \brief Set the camera to track a scene node
       public: void TrackVisual(const std::string &_visualName);

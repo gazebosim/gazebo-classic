@@ -44,6 +44,7 @@ set (headers Gui.hh
              CylinderMaker.hh
              GuiEvents.hh
              LightMaker.hh
+             qt.h
 )
 
 set (resources images.qrc)

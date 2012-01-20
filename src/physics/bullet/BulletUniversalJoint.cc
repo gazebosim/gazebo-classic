@@ -17,7 +17,6 @@
 /* Desc: A universal joint
  * Author: Nate Keonig
  * Date: 24 May 2009
- * SVN: $Id:$
  */
 
 #include "common/Exception.hh"

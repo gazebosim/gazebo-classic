@@ -17,7 +17,6 @@
 /* Desc: Graphics 3d Interface for Player
  * Author: Nate Koenig
  * Date: 30 Jan 2007
- * SVN: $Id$
  */
 
 #ifndef GRAPHICS3DINTERFACE_HH

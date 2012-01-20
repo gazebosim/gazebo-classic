@@ -17,7 +17,6 @@
 /* Desc: Trimesh geometry
  * Author: Nate Koenig
  * Date: 16 Oct 2009
- * SVN: $Id$
  */
 
 #ifndef ODETRIMESHSHAPE_HH

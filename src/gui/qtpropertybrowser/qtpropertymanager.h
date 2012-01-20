@@ -37,6 +37,7 @@
  **
  ****************************************************************************/
 
+#pragma GCC system_header
 
 #ifndef QTPROPERTYMANAGER_H
 #define QTPROPERTYMANAGER_H

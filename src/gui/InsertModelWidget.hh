@@ -17,9 +17,9 @@
 #ifndef INSERT_MODEL_WIDGET_HH
 #define INSERT_MODEL_WIDGET_HH
 
-#include <QWidget>
 #include <list>
 
+#include "gui/qt.h"
 #include "sdf/sdf.h"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"

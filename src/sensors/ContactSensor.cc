@@ -84,8 +84,8 @@ void ContactSensor::Load()
   std::string modelName = this->sdf->GetModelName();
   std::string worldName = this->sdf->GetWorldName();
 
-  physics::WorldPtr world = gazebo::physics::get_world(worldName);
-  this->model = world->GetModelByName(modelName);
+  physics::WorldPtr worldPtr = gazebo::physics::get_world(worldName);
+  this->model = worldPtr->GetModelByName(modelName);
 
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");

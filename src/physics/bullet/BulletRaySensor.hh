@@ -17,7 +17,6 @@
 /* Desc: Bullet ray sensor
  * Author: Nate Koenig
  * Date: 21 May 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETRAYSENSOR_HH

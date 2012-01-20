@@ -55,14 +55,14 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
 
   for (unsigned int i = 0; i < 10; i++)
   {
-    std::string name = this->GetName() +
+    std::string objName = this->GetName() +
         "_contactpoint_" + boost::lexical_cast<std::string>(i);
     Ogre::Entity *obj = this->scene->GetManager()->createEntity(
-        name, "contact_sphere");
+        objName, "contact_sphere");
     obj->setMaterialName("Gazebo/BlueLaser");
 
     ContactVisual::ContactPoint *cp = new ContactVisual::ContactPoint();
-    cp->sceneNode = this->sceneNode->createChildSceneNode(name + "_node");
+    cp->sceneNode = this->sceneNode->createChildSceneNode(objName + "_node");
     cp->sceneNode->attachObject(obj);
 
     cp->normal = new DynamicLines(RENDERING_LINE_LIST);

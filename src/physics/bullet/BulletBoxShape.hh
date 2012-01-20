@@ -17,7 +17,6 @@
 /* Desc: Box shape
  * Author: Nate Keonig
  * Date: 14 Oct 2009
- * SVN: $Id:$
  */
 
 #ifndef BULLETBOXSHAPE_HH

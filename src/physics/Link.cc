@@ -411,17 +411,18 @@ void Link::Update()
 void Link::LoadCollision(sdf::ElementPtr &_sdf)
 {
   CollisionPtr collision;
-  std::string type = _sdf->GetElement("geometry")->GetFirstElement()->GetName();
+  std::string geomType =
+    _sdf->GetElement("geometry")->GetFirstElement()->GetName();
 
   /*if (type == "heightmap" || type == "map")
     this->SetStatic(true);
     */
 
-  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(type,
+  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
       boost::shared_static_cast<Link>(shared_from_this()));
 
   if (!collision)
-    gzthrow("Unknown Collisionetry Type["+type +"]");
+    gzthrow("Unknown Collisionetry Type[" + geomType + "]");
 
   collision->Load(_sdf);
 }

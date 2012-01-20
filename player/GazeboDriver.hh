@@ -17,7 +17,6 @@
 /* Desc: Gazebo Driver for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
  */
 
 #ifndef GAZEBO_PLAYER_DRIVER_HH

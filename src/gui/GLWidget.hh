@@ -17,10 +17,10 @@
 #ifndef GL_WIDGET_HH
 #define GL_WIDGET_HH
 
-#include <QtGui>
 #include <string>
 #include <vector>
 
+#include "gui/qt.h"
 #include "rendering/RenderTypes.hh"
 
 #include "transport/TransportTypes.hh"

@@ -17,7 +17,6 @@
 /* Desc: RaySensor proximity sensor
  * Author: Nate Koenig
  * Date: 23 february 2004
- * SVN: $Id$
 */
 
 #ifndef RAYSENSOR_HH

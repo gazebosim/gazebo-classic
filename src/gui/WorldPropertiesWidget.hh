@@ -17,17 +17,9 @@
 #ifndef EDIT_SCENE_WIDGET_HH
 #define EDIT_SCENE_WIDGET_HH
 
-#include <QWidget>
-#include <QPushButton>
-#include <QFrame>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QGroupBox>
-
 #include <string>
 
+#include "gui/qt.h"
 #include "physics/PhysicsTypes.hh"
 #include "transport/TransportTypes.hh"
 #include "math/Vector3.hh"

@@ -17,7 +17,6 @@
 /* Desc: Vector 3
  * Author: Andrew Howard and Nate Koenig
  * Date: 4 Apr 2007
- * SVN: $Id$
  */
 
 #include "math/Helpers.hh"

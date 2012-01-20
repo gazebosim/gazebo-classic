@@ -17,7 +17,6 @@
 /* Desc: A ray
  * Author: Nate Keonig, Andrew Howard
  * Date: 14 Oct 2009
- * SVN: $Id:$
  */
 
 #ifndef ODERAYSHAPE_HH

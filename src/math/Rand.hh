@@ -17,7 +17,6 @@
 /* Desc: Random number generator
  * Author: Nate Koenig
  * Date: 27 May 2009
- * SVN: $Id:$
  */
 
 #ifndef RAND_HH

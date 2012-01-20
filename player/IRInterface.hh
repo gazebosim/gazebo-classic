@@ -17,7 +17,6 @@
 /* Desc: Laser Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * SVN: $Id: LaserInterface.hh 226 2008-01-16 19:01:23Z natepak $
  */
 
 #ifndef IRINTERFACE_HH

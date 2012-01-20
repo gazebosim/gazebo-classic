@@ -18,6 +18,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "math/Helpers.hh"
 #include "common/Console.hh"
 #include "common/Mesh.hh"
 #include "common/STLLoader.hh"
@@ -260,7 +261,7 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
   {
     for (i = 0; i < _m; i++)
     {
-      if (_a[i][j] != _r[i])
+      if (!math::equal(_a[i][j], _r[i]))
         break;
       if (i == _m-1)
         return j;

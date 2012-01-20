@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-#include <QtGui>
-
 #include "rendering/Rendering.hh"
 #include "rendering/UserCamera.hh"
 

@@ -161,7 +161,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
     const char *name = child->Attribute("name");
     const char *type = child->Attribute("type");
     const char *defaultValue = child->Attribute("default");
-    const char *requiredString = child->Attribute("required");
+    requiredString = child->Attribute("required");
 
     if (!name)
     {

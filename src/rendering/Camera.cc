@@ -134,13 +134,13 @@ void Camera::Load(sdf::ElementPtr &_sdf)
 //////////////////////////////////////////////////
 void Camera::Load()
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  if (imageElem)
+  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  if (imgElem)
   {
-    this->imageWidth = imageElem->GetValueInt("width");
-    this->imageHeight = imageElem->GetValueInt("height");
+    this->imageWidth = imgElem->GetValueInt("width");
+    this->imageHeight = imgElem->GetValueInt("height");
     this->imageFormat = this->GetOgrePixelFormat(
-        imageElem->GetValueString("format"));
+        imgElem->GetValueString("format"));
   }
   else
     gzthrow("Camera has no <image> tag.");
@@ -506,8 +506,8 @@ unsigned int Camera::GetImageHeight() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetImageDepth() const
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  std::string imgFmt = imageElem->GetValueString("format");
+  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  std::string imgFmt = imgElem->GetValueString("format");
 
   if (imgFmt == "L8")
     return 1;
@@ -529,8 +529,8 @@ unsigned int Camera::GetImageDepth() const
 //////////////////////////////////////////////////
 std::string Camera::GetImageFormat() const
 {
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
-  return imageElem->GetValueString("format");
+  sdf::ElementPtr imgElem = this->sdf->GetOrCreateElement("image");
+  return imgElem->GetValueString("format");
 }
 
 //////////////////////////////////////////////////
@@ -735,7 +735,6 @@ std::string Camera::GetName() const
 void Camera::SaveFrame()
 {
   sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
-  sdf::ElementPtr imageElem = this->sdf->GetOrCreateElement("image");
 
   std::string path = saveElem->GetValueString("path");
 
@@ -1023,7 +1022,7 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 
   _result = origin + dir * dist;
 
-  if (dist != -1)
+  if (!math::equal(dist, -1))
     return true;
   else
     return false;
@@ -1053,10 +1052,10 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *target)
   }
 }
 
-/// \brief Attach the camera to a scene node
+//////////////////////////////////////////////////
 void Camera::AttachToVisual(const std::string &_visualName,
-                             bool _inheritOrientation,
-                             double _minDist, double _maxDist)
+                            bool _inheritOrientation,
+                            double _minDist, double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;
