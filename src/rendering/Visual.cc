@@ -700,7 +700,12 @@ void Visual::SetAmbient(const common::Color &_color)
     this->SetMaterial(matName);
   }
 
-  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetAmbient(_color);
+  }
+
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
@@ -735,6 +740,11 @@ void Visual::SetAmbient(const common::Color &_color)
       }
     }
   }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetSpecular(_color);
+  }
 }
 
 /// Set the diffuse color of the visual
@@ -755,7 +765,9 @@ void Visual::SetDiffuse(const common::Color &_color)
     entity = dynamic_cast<Ogre::Entity*>(obj);
 
     if (!entity)
+    {
       continue;
+    }
 
     // For each ogre::entity
     for (unsigned int j = 0; j < entity->getNumSubEntities(); j++)
@@ -781,6 +793,11 @@ void Visual::SetDiffuse(const common::Color &_color)
         }
       }
     }
+  }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetDiffuse(_color);
   }
 }
 
@@ -828,6 +845,11 @@ void Visual::SetSpecular(const common::Color &_color)
         }
       }
     }
+  }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetSpecular(_color);
   }
 }
 
@@ -989,6 +1011,11 @@ void Visual::SetEmissive(const common::Color &_color)
         }
       }
     }
+  }
+
+  for (unsigned int i = 0; i < this->children.size(); ++i)
+  {
+    this->children[i]->SetSpecular(_color);
   }
 }
 

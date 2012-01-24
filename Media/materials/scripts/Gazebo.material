@@ -213,13 +213,24 @@ material Gazebo/WhiteGlow : Gazebo/White
 	}
 }
 
-material Gazebo/RedGlow : Gazebo/Red 
+material Gazebo/RedGlow
 {
 	technique
 	{
+    pass ambient
+    {
+      ambient 1 0 0
+      diffuse 1 0 0
+      emmissive 1 0 0
+			specular 0 0 0 128 
+    }
+
     pass light
     {
+      ambient 1 0 0
+      diffuse 1 0 0
 			emissive 1 0 0
+			specular 1 0 0 128 
     }
 	}
 }
