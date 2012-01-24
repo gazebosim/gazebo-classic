@@ -84,12 +84,12 @@ void transport::run()
   while (namespaces.empty() && trys < limit)
   {
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
-    common::Time::MSleep(50);
+    common::Time::MSleep(500); // 25 seconds max wait time
     trys++;
   }
 
   if (trys >= limit)
-    gzerr << "Unable to get topic namespaces\n";
+    gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
 bool transport::is_stopped()
