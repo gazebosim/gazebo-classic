@@ -563,6 +563,17 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
   return box;
 }
 
+void Entity::PlaceOnEntity(const std::string &_entityName)
+{
+  EntityPtr onEntity = this->GetWorld()->GetEntityByName(_entityName);
+  math::Box box = this->GetCollisionBoundingBox();
+  math::Box onBox = onEntity->GetCollisionBoundingBox();
+
+  math::Pose p = onEntity->GetWorldPose();
+  p.pos.z = onBox.max.z + box.GetZLength()*0.5;
+  this->SetWorldPose(p);
+}
+
 //////////////////////////////////////////////////
 void Entity::GetNearestEntityBelow(double &_distBelow,
                                    std::string &_entityName)

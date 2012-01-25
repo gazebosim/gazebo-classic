@@ -1214,6 +1214,108 @@
       </StateImagery>
   </WidgetLook>
 
+  <WidgetLook name="Gazebo/StaticImage">
+    <PropertyDefinition name="ImageColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
+    <PropertyDefinition name="VertFormatting" initialValue="Stretched" redrawOnWrite="true" />
+    <PropertyDefinition name="HorzFormatting" initialValue="Stretched" redrawOnWrite="true" />
+    <Property name="BackgroundEnabled" value="True" />
+    <Property name="FrameEnabled" value="False" />
+    <ImagerySection name="image_withframe">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><ImageDim imageset="Gazebo-Images" image="FrameLeft" dimension="Width" /></Dim>
+          <Dim type="TopEdge" ><ImageDim imageset="Gazebo-Images" image="FrameTop" dimension="Height" /></Dim>
+          <Dim type="RightEdge" >
+            <UnifiedDim scale="1" type="RightEdge">
+              <DimOperator op="Subtract">
+                <ImageDim imageset="Gazebo-Images" image="FrameRight" dimension="Width" />
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+          <Dim type="BottomEdge" >
+            <UnifiedDim scale="1" type="BottomEdge">
+              <DimOperator op="Subtract">
+                <ImageDim imageset="Gazebo-Images" image="FrameBottom" dimension="Height" />
+              </DimOperator>
+            </UnifiedDim>
+          </Dim>
+        </Area>
+        <ImageProperty name="Image" />
+        <ColourRectProperty name="ImageColours" />
+        <VertFormatProperty name="VertFormatting" />
+        <HorzFormatProperty name="HorzFormatting" />
+      </ImageryComponent>
+    </ImagerySection>
+    <ImagerySection name="image_noframe">
+      <ImageryComponent>
+        <Area>
+          <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+          <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+          <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+        </Area>
+        <ImageProperty name="Image" />
+        <ColourRectProperty name="ImageColours" />
+        <VertFormatProperty name="VertFormatting" />
+        <HorzFormatProperty name="HorzFormatting" />
+      </ImageryComponent>
+    </ImagerySection>
+    <StateImagery name="Enabled" />
+    <StateImagery name="Disabled" />
+    <StateImagery name="EnabledFrame">
+      <Layer>
+        <Section look="Gazebo/Shared" section="FrameOnly">
+          <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="DisabledFrame">
+      <Layer>
+        <Section look="Gazebo/Shared" section="FrameOnly">
+          <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="WithFrameEnabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnly">
+          <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="WithFrameDisabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnly">
+          <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="NoFrameEnabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnlyFull">
+          <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="NoFrameDisabledBackground">
+      <Layer>
+        <Section look="Gazebo/Shared" section="BackgroundOnlyFull">
+          <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+        </Section>
+      </Layer>
+    </StateImagery>
+    <StateImagery name="WithFrameImage">
+      <Layer>
+        <Section section="image_withframe" />
+      </Layer>
+    </StateImagery>
+    <StateImagery name="NoFrameImage">
+      <Layer>
+        <Section section="image_noframe" />
+      </Layer>
+    </StateImagery>
+  </WidgetLook>
+
 
 
 </Falagard>
