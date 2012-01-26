@@ -22,6 +22,9 @@
 #ifndef IMAGE_HH
 #define IMAGE_HH
 
+#ifdef BOOL
+#undef BOOL
+#endif
 #include <FreeImage.h>
 #include <string>
 

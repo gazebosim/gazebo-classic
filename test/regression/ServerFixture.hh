@@ -58,14 +58,17 @@ class ServerFixture : public testing::Test
   protected: virtual void Unload()
              {
                this->serverRunning = false;
-               this->node->Fini();
+               if (this->node)
+                 this->node->Fini();
 
                if (this->server)
                {
                  this->server->Stop();
 
                  if (this->serverThread)
+                 {
                    this->serverThread->join();
+                 }
                }
 
                delete this->serverThread;

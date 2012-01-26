@@ -174,17 +174,17 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &_ops)
 
 //////////////////////////////////////////////////
 void TopicManager::Unsubscribe(const std::string &_topic,
-                               const NodePtr &_sub)
+                               const NodePtr &_node)
 {
   PublicationPtr publication = this->FindPublication(_topic);
   if (publication)
   {
-    publication->RemoveSubscription(_sub);
+    publication->RemoveSubscription(_node);
     ConnectionManager::Instance()->Unsubscribe(_topic,
-        _sub->GetMsgType(_topic));
+        _node->GetMsgType(_topic));
   }
 
-  this->subscribedNodes[_topic].remove(_sub);
+  this->subscribedNodes[_topic].remove(_node);
 }
 
 //////////////////////////////////////////////////

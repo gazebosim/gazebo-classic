@@ -44,16 +44,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Publication();
 
-      /// \brief Get the topic for this publication
-      public: std::string GetTopic() const;
-
       /// \brief Get the type of message
       public: std::string GetMsgType() const;
 
       public: void AddSubscription(const CallbackHelperPtr &callback);
       public: void AddSubscription(const NodePtr &_node);
 
-      public: void RemoveSubscription(const CallbackHelperPtr &callback);
+      /// \brief Remove a subscription
       public: void RemoveSubscription(const NodePtr &_node);
 
       /// \brief Remove a subscription
@@ -75,7 +72,6 @@ namespace gazebo
       public: void SetLocallyAdvertised(bool _value);
 
       /// \brief Publish data
-      public: void Publish(const std::string &data);
       public: void LocalPublish(const std::string &data);
 
       public: void Publish(const google::protobuf::Message &msg,
@@ -85,7 +81,6 @@ namespace gazebo
       public: bool HasTransport(const std::string &_host, unsigned int _port);
 
       public: void AddPublisher(PublisherPtr _pub);
-      public: void RemovePublisher() const;
 
       private: unsigned int id;
       private: static unsigned int idCounter;

@@ -18,9 +18,8 @@
 #define GAZEBO_HH
 
 #include "transport/transport.h"
-#include "common/CommonTypes.hh"
-#include "math/MathTypes.hh"
-
+#include "common/common.h"
+#include "math/gzmath.h"
 #include "gazebo_config.h"
 
 namespace gazebo

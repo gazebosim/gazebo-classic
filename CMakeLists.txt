@@ -111,7 +111,8 @@ set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wextra -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
-set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow --coverage -fno-elide-constructors ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_C_FLAGS_CHECK " -g -O0 --coverage -fno-elide-constructors" CACHE INTERNAL "C Flags for static code checking" FORCE)
+#set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow --coverage -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
 set (CMAKE_CXX_FLAGS_CHECK ${CMAKE_C_FLAGS_CHECK})
 
 #####################################

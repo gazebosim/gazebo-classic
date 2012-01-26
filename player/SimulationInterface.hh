@@ -99,5 +99,3 @@ class SimulationInterface : public GazeboInterface
   /// \}
   /// \}
 #endif
-
-

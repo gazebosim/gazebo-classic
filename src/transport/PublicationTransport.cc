@@ -115,10 +115,9 @@ std::string PublicationTransport::GetMsgType() const
 void PublicationTransport::Fini()
 {
   /// Cancel all async operatiopns.
-  this->connection->Cancel();
-  this->connection.reset();
+  if (this->connection)
+  {
+    this->connection->Cancel();
+    //this->connection.reset();
+  }
 }
-
-
-
-

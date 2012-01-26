@@ -38,11 +38,6 @@ Publication::~Publication()
 }
 
 //////////////////////////////////////////////////
-std::string Publication::GetTopic() const
-{
-  return this->topic;
-}
-
 void Publication::AddSubscription(const NodePtr &_node)
 {
   std::list<NodePtr>::iterator iter;
@@ -63,7 +58,7 @@ void Publication::AddSubscription(const NodePtr &_node)
   }
 }
 
-// Add a subscription callback
+//////////////////////////////////////////////////
 void Publication::AddSubscription(const CallbackHelperPtr &_callback)
 {
   std::list< CallbackHelperPtr >::iterator iter;
@@ -84,7 +79,7 @@ void Publication::AddSubscription(const CallbackHelperPtr &_callback)
   }
 }
 
-// A a transport
+//////////////////////////////////////////////////
 void Publication::AddTransport(const PublicationTransportPtr &_publink)
 {
   bool add = true;
@@ -111,6 +106,7 @@ void Publication::AddTransport(const PublicationTransportPtr &_publink)
   }
 }
 
+//////////////////////////////////////////////////
 bool Publication::HasTransport(const std::string &_host, unsigned int _port)
 {
   std::list<PublicationTransportPtr>::iterator iter;
@@ -126,7 +122,7 @@ bool Publication::HasTransport(const std::string &_host, unsigned int _port)
   return false;
 }
 
-// Remove a transport
+//////////////////////////////////////////////////
 void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
 {
   std::list<PublicationTransportPtr>::iterator iter;
@@ -145,6 +141,7 @@ void Publication::RemoveTransport(const std::string &host_, unsigned int port_)
   }
 }
 
+//////////////////////////////////////////////////
 void Publication::RemoveSubscription(const NodePtr &_node)
 {
   std::list<NodePtr>::iterator iter;
@@ -154,27 +151,6 @@ void Publication::RemoveSubscription(const NodePtr &_node)
     if ((*iter)->GetId() == _node->GetId())
     {
       this->nodes.erase(iter);
-      break;
-    }
-  }
-
-  // If no more subscribers, then disconnect from all publishers
-  if (this->nodes.size() == 0 && this->callbacks.size() == 0)
-  {
-    this->transports.clear();
-  }
-}
-
-//////////////////////////////////////////////////
-void Publication::RemoveSubscription(const CallbackHelperPtr &callback)
-{
-  std::list<CallbackHelperPtr>::iterator iter;
-
-  for (iter = this->callbacks.begin(); iter != this->callbacks.end(); ++iter)
-  {
-    if (*iter == callback)
-    {
-      this->callbacks.erase(iter);
       break;
     }
   }
@@ -214,32 +190,9 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 }
 
 //////////////////////////////////////////////////
-void Publication::Publish(const std::string &_data)
-{
-  std::list<NodePtr>::iterator iter;
-  iter = this->nodes.begin();
-  while (iter != this->nodes.end())
-  {
-    if ((*iter)->HandleData(this->topic, _data))
-      ++iter;
-    else
-      this->nodes.erase(iter++);
-  }
-
-  std::list<CallbackHelperPtr>::iterator cbIter;
-  cbIter = this->callbacks.begin();
-  while (cbIter != this->callbacks.end())
-  {
-    if ((*cbIter)->HandleData(_data))
-      ++cbIter;
-    else
-      this->callbacks.erase(cbIter++);
-  }
-}
-
-//////////////////////////////////////////////////
 void Publication::LocalPublish(const std::string &data)
 {
+  std::cout << "\n\nLOCAL PUBLISH!!\n\n";
   std::list<NodePtr>::iterator iter;
   iter = this->nodes.begin();
 
@@ -306,16 +259,19 @@ std::string Publication::GetMsgType() const
   return this->msgType;
 }
 
+//////////////////////////////////////////////////
 unsigned int Publication::GetTransportCount() const
 {
   return this->transports.size();
 }
 
+//////////////////////////////////////////////////
 unsigned int Publication::GetCallbackCount() const
 {
   return this->callbacks.size();
 }
 
+//////////////////////////////////////////////////
 unsigned int Publication::GetNodeCount() const
 {
   return this->nodes.size();
@@ -348,13 +304,8 @@ void Publication::SetLocallyAdvertised(bool _value)
   this->locallyAdvertised = _value;
 }
 
+//////////////////////////////////////////////////
 void Publication::AddPublisher(PublisherPtr _pub)
 {
   this->publishers.push_back(_pub);
 }
-
-void Publication::RemovePublisher() const
-{
-}
-
-

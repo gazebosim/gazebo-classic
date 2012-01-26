@@ -39,6 +39,10 @@ bool g_sceneMsg = false;
 bool g_worldStatsMsg = false;
 bool g_worldStatsDebugMsg = false;
 
+void ReceiveStringMsg(ConstStringPtr &/*_msg*/)
+{
+}
+
 void ReceiveSceneMsg(ConstScenePtr &/*_msg*/)
 {
   g_sceneMsg = true;
@@ -90,23 +94,35 @@ TEST_F(TransportTest, PubSub)
   subs.clear();
 }
 
+// This test creates a child process to test interprocess communication
 TEST_F(TransportTest, Processes)
 {
   pid_t pid = fork();
   if (pid == 0)
   {
     usleep(1000000);
-    printf("HERE\n");
     transport::init();
     transport::run();
 
     transport::NodePtr node(new transport::Node());
     node->Init();
 
+    transport::PublisherPtr pub = node->Advertise<msgs::String>("~/test");
+
     transport::SubscriberPtr sub =
       node->Subscribe("~/world_stats", &ReceiveWorldStatsMsg2);
+    transport::SubscriberPtr sub2 =
+      node->Subscribe("~/test", &ReceiveStringMsg, true);
 
-    std::cout << "SubTopic[" << sub->GetTopic() << "]\n";
+    transport::PublisherPtr pub2 = node->Advertise<msgs::String>("~/test");
+
+    EXPECT_STREQ("gazebo.msgs.WorldStatistics",
+                 node->GetMsgType("/gazebo/default/world_stats").c_str());
+
+    msgs::String msg;
+    msg.set_data("Waiting for message");
+    pub->Publish(msg);
+    pub2->Publish(msg);
 
     int i = 0;
     while (!g_worldStatsMsg2 && i < 20)
@@ -117,18 +133,43 @@ TEST_F(TransportTest, Processes)
     }
     EXPECT_LT(i, 20);
 
+    pub.reset();
+    sub.reset();
+    node.reset();
     transport::fini();
+    usleep(5000000);
   }
   else if (pid < 0)
     printf("Fork failed\n");
   else
   {
     Load("worlds/empty.world");
-    for (unsigned int i = 0; i < 20; ++i)
-    {
+
+    transport::NodePtr node(new transport::Node());
+    node->Init();
+
+    transport::PublisherPtr pub = node->Advertise<msgs::String>("~/test");
+    transport::SubscriberPtr sub =
+      node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+    transport::PublisherPtr pub2 = node->Advertise<msgs::String>("~/test");
+    transport::SubscriberPtr sub2 =
+      node->Subscribe("~/test", &ReceiveStringMsg, true);
+
+    EXPECT_STREQ("gazebo.msgs.String",
+                 node->GetMsgType("/gazebo/default/test").c_str());
+
+    msgs::String msg;
+    msg.set_data("Waiting for message");
+    pub->Publish(msg);
+    pub2->Publish(msg);
+
+    for (int i = 0; i < 5; ++i)
       usleep(1000000);
-    }
-    printf("Now complete\n");
+
+    sub.reset();
+    sub2.reset();
+    kill(pid, SIGKILL);
   }
 }
 
