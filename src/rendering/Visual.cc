@@ -487,10 +487,27 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     if (this->sdf->GetElement("geometry")->HasElement("plane"))
       _obj->setRenderQueueGroup(Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 2);
 
-  this->sceneNode->attachObject(_obj);
-  RTShaderSystem::Instance()->UpdateShaders();
+  if (!this->HasAttachedObject(_obj->getName()))
+  {
+    this->sceneNode->attachObject(_obj);
+    RTShaderSystem::Instance()->UpdateShaders();
+    _obj->setUserAny(Ogre::Any(this->GetName()));
+  }
+  else
+    gzerr << "Visual[" << this->GetName() << "] already has object["
+          << _obj->getName() << "] attached.";
+}
 
-  _obj->setUserAny(Ogre::Any(this->GetName()));
+//////////////////////////////////////////////////
+bool Visual::HasAttachedObject(const std::string &_name)
+{
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); ++i)
+  {
+    if (this->sceneNode->getAttachedObject(i)->getName() == _name)
+      return true;
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////

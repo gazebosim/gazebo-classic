@@ -638,7 +638,7 @@
     <PropertyLinkDefinition name="TitlebarFont" widget="__auto_titlebar__" targetProperty="Font" />
 
     <Property name="RollUpEnabled" value="False" />
-    <Property name="UnifiedMinSize" value="{{0.1,0},{0.1,0}}" />
+    <!--<Property name="UnifiedMinSize" value="{{0.1,0},{0.1,0}}" />-->
     <Property name="AutoRenderingSurface" value="True" />
     <NamedArea name="ClientWithTitleWithFrame">
       <Area>
