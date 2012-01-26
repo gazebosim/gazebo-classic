@@ -18,8 +18,8 @@
 #define GAZEBO_HH
 
 #include "transport/transport.h"
-#include "common/common.h"
-#include "math/gzmath.h"
+#include "common/CommonTypes.hh"
+#include "math/MathTypes.hh"
 
 #include "gazebo_config.h"
 
