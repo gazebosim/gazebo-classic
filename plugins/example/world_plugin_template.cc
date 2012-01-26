@@ -15,20 +15,21 @@
  *
 */
 #include "gazebo.h"
+#include "common/common.h"
 
 namespace gazebo
 {
-  class PluginTemplate : public Plugin
+  class PluginTemplate : public WorldPlugin
   {
-    public: PluginTemplate() : Plugin()
+    public: PluginTemplate() : WorldPlugin() 
             {
             }
 
-    public: void Load(sdf::ElementPtr &_sdf)
+    public: void Load( physics::WorldPtr &_world,
+                       sdf::ElementPtr &_sdf )
             {
             };
 
-    GZ_REGISTER_PLUGIN("PluginTemplate", PluginTemplate)
   };
-}
-
+  GZ_REGISTER_WORLD_PLUGIN(PluginTemplate)
+} 
