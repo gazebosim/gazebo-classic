@@ -41,4 +41,5 @@
       <direction xyz="1.0 1.0 -1.0"/>
     </light>
 
+    <plugin name="example_world_plugin" filename="libworld_plugin_tutorial.so"/>
 </gazebo>

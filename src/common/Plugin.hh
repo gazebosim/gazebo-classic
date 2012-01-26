@@ -238,5 +238,3 @@ gazebo::SystemPlugin *RegisterPlugin() \
 }
 }
 #endif
-
-
