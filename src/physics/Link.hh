@@ -232,6 +232,9 @@ namespace gazebo
       /// \brief Detach a static model from this link
       public: void DetachStaticModel(const std::string &_modelName);
 
+      /// \brief Detach all static models from this link
+      public: void DetachAllStaticModels();
+
       public: virtual void OnPoseChange();
 
       protected: bool isStatic;

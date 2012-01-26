@@ -713,6 +713,13 @@ void Link::DetachStaticModel(const std::string &_modelName)
 }
 
 //////////////////////////////////////////////////
+void Link::DetachAllStaticModels()
+{
+  this->attachedModels.clear();
+  this->attachedModelsOffset.clear();
+}
+
+//////////////////////////////////////////////////
 void Link::OnPoseChange()
 {
   math::Pose p;

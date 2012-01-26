@@ -199,6 +199,8 @@ void Joint::Reset()
 {
   this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
+  this->Init();
+  this->staticAngle.SetFromRadian(0);
 }
 
 //////////////////////////////////////////////////

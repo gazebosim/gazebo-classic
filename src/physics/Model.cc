@@ -319,16 +319,16 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (Joint_V::iterator jiter = this->joints.begin();
-       jiter!= this->joints.end(); ++jiter)
-  {
-    (*jiter)->Reset();
-  }
-
   for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
        iter != this->plugins.end(); ++iter)
   {
     (*iter)->Reset();
+  }
+
+  for (Joint_V::iterator jiter = this->joints.begin();
+       jiter!= this->joints.end(); ++jiter)
+  {
+    (*jiter)->Reset();
   }
 }
 
@@ -765,7 +765,6 @@ void Model::SetJointPositions(
             {
               double dposition = jiter->second -
                                 joint->GetAngle(0).GetAsRadian();
-
 
               math::Vector3 anchor;
               math::Vector3 axis;
