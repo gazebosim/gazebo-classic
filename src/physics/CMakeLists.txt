@@ -2,15 +2,18 @@ add_subdirectory(ode)
 
 set (sources Base.cc
              Link.cc
+             LinkState.cc
              BoxShape.cc
              Contact.cc
              CylinderShape.cc
              Entity.cc
              Collision.cc
+             CollisionState.cc
              HeightmapShape.cc
              Joint.cc
              MapShape.cc
              Model.cc
+             ModelState.cc
              MultiRayShape.cc
              Physics.cc
              PhysicsEngine.cc
@@ -21,18 +24,22 @@ set (sources Base.cc
              SphereShape.cc
              TrimeshShape.cc
              World.cc
+             WorldState.cc
              Inertial.cc
              SurfaceParams.cc
+             State.cc
 ) 
 
 set (headers BallJoint.hh
              Base.hh
              Link.hh
+             LinkState.hh
              BoxShape.hh
              Contact.hh
              CylinderShape.hh
              Entity.hh
              Collision.hh
+             CollisionState.hh
              HeightmapShape.hh
              Hinge2Joint.hh
              HingeJoint.hh
@@ -40,6 +47,7 @@ set (headers BallJoint.hh
              JointFeedback.hh
              MapShape.hh
              Model.hh
+             ModelState.hh
              MultiRayShape.hh
              Physics.hh
              PhysicsEngine.hh
@@ -53,9 +61,11 @@ set (headers BallJoint.hh
              TrimeshShape.hh
              UniversalJoint.hh
              World.hh
+             WorldState.hh
              Inertial.hh
              ScrewJoint.hh
              SurfaceParams.hh
+             State.hh
 )
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)

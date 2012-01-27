@@ -14,41 +14,49 @@
  * limitations under the License.
  *
 */
-/* Desc: A world state
+/* Desc: A model state
  * Author: Nate Koenig
  */
 
-#ifndef WORLD_STATE_HH
-#define WORLD_STATE_HH
+#ifndef MODEL_STATE_HH
+#define MODEL_STATE_HH
 
-#include <string>
 #include <vector>
+#include <string>
 
 #include "physics/State.hh"
-#include "physics/ModelState.hh"
+#include "physics/LinkState.hh"
+#include "math/Pose.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class WorldState : public State
+    class ModelState : public State
     {
+      /// \brief Default constructor
+      public: ModelState();
+
       /// \brief Constructor
-      public: WorldState(WorldPtr _world);
+      public: ModelState(ModelPtr _model);
 
       /// \brief Destructor
-      public: virtual ~WorldState();
+      public: virtual ~ModelState();
+
+      /// \brief Get the model pose
+      public: math::Pose GetPose() const;
 
       /// \brief Get the number of model states
-      public: unsigned int GetModelStateCount() const;
+      public: unsigned int GetLinkStateCount() const;
 
       /// \brief Get a model state
-      public: ModelState GetModelState(unsigned int _index) const;
+      public: LinkState GetLinkState(unsigned int _index) const;
 
       /// \brief Get a model state by model name
-      public: ModelState GetModelState(const std::string &_modelName) const;
+      public: LinkState GetLinkState(const std::string &_modelName) const;
 
-      private: std::vector<ModelState> modelStates;
+      private: math::Pose pose;
+      private: std::vector<LinkState> linkStates;
     };
   }
 }

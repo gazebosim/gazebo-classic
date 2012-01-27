@@ -29,6 +29,7 @@
 #include "common/CommonTypes.hh"
 #include "physics/PhysicsTypes.hh"
 
+#include "physics/ModelState.hh"
 #include "physics/Entity.hh"
 
 namespace boost
@@ -182,6 +183,9 @@ namespace gazebo
       public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
 
       public: void DetachStaticModel(const std::string &_model);
+
+      /// \brief Get the current model state
+      public: ModelState GetState();
 
       protected: virtual void OnPoseChange();
 

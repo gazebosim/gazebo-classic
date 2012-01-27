@@ -28,6 +28,7 @@
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
+#include "physics/CollisionState.hh"
 #include "physics/Entity.hh"
 #include "physics/Inertial.hh"
 #include "physics/Joint.hh"

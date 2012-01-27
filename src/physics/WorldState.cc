@@ -14,48 +14,29 @@
  * limitations under the License.
  *
  */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
+/* Desc: A world state
+ * Author: Nate Koenig
  */
 
+#include "World.hh"
+#include "Model.hh"
 #include "WorldState.hh"
+
 using namespace gazebo;
 using namespace physics;
 
-WorldState::WorldState()
-{
-}
-
-WorldState::WorldState(const WorldPtr _world)
-: wallTime(common::Time::GetWallTime), simTime(_world->GetSimTime()),
-  realTime(_world->GetRealTime())
+WorldState::WorldState(WorldPtr _world)
+  : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
   for (unsigned int i = 0; i < _world->GetModelCount(); ++i)
   {
-    ModelPtr model = _world->GetModel(i);
-    this->modelStates.push_back(model->GetState());
+    this->modelStates.push_back(_world->GetModel(i)->GetState());
   }
 }
 
-virtual WorldState::~WorldState()
+WorldState::~WorldState()
 {
-  this->modelStates.clear()
-}
-
-common::Time WorldState::GetWallTime() const
-{
-  return this->wallTime;
-}
-
-common::Time WorldState::GetRealTime() const
-{
-  return this->realTime;
-}
-
-common::Time WorldState::GetSimTime() const
-{
-  return this->simTime;
+  this->modelStates.clear();
 }
 
 unsigned int WorldState::GetModelStateCount() const
@@ -63,20 +44,24 @@ unsigned int WorldState::GetModelStateCount() const
   return this->modelStates.size();
 }
 
-const ModelState &WorldState::GetModelStateCount(unsigned int _index) const
+ModelState WorldState::GetModelState(unsigned int _index) const
 {
   if (_index < this->modelStates.size())
     return this->modelStates[_index];
   else
     gzerr << "Index is out of range\n";
+
+  return ModelState();
 }
 
-ModelState WorldState::GetModelStateCount(const std::string &_modelName) const
+ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
+  std::vector<ModelState>::const_iterator iter;
+
   for (iter = this->modelStates.begin();
        iter != this->modelStates.end(); ++iter)
   {
-    if ((*iter)->GetName() == _modelName)
+    if ((*iter).GetName() == _modelName)
       return *iter;
   }
 

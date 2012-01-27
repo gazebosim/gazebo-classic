@@ -38,6 +38,7 @@
 #include "common/Event.hh"
 
 #include "physics/PhysicsTypes.hh"
+#include "physics/WorldState.hh"
 #include "sdf/sdf.h"
 
 namespace boost
@@ -160,7 +161,7 @@ namespace gazebo
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the current world state
-      //public: WorldState GetState() const;
+      public: WorldState GetState();
 
       /// \brief Create all entities
       /// \param _sdf SDF element

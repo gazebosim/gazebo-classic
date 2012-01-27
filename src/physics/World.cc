@@ -989,7 +989,8 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
 //////////////////////////////////////////////////
 EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
-{ std::string entityName;
+{
+  std::string entityName;
   double dist;
   math::Vector3 end;
 
@@ -1002,3 +1003,8 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   return this->GetEntityByName(entityName);
 }
 
+//////////////////////////////////////////////////
+WorldState World::GetState()
+{
+  return WorldState(shared_from_this());
+}
