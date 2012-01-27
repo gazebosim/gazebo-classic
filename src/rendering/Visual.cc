@@ -501,7 +501,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 //////////////////////////////////////////////////
 bool Visual::HasAttachedObject(const std::string &_name)
 {
-  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); ++i)
+  for (unsigned int i = 0; i < this->sceneNode->numAttachedObjects(); ++i)
   {
     if (this->sceneNode->getAttachedObject(i)->getName() == _name)
       return true;

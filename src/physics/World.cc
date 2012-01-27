@@ -394,7 +394,7 @@ void World::DeleteEntityCB(const std::string &/*_name*/)
   // TODO: Implement this function
 }
 
-// Get an element by name
+//////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
   return this->rootElement->GetByName(_name);
@@ -405,6 +405,7 @@ ModelPtr World::GetModelById(unsigned int _id)
   return boost::shared_dynamic_cast<Model>(this->rootElement->GetById(_id));
 }
 
+//////////////////////////////////////////////////
 ModelPtr World::GetModelByName(const std::string &_name)
 {
   return boost::shared_dynamic_cast<Model>(this->GetByName(_name));

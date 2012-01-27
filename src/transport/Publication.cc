@@ -192,7 +192,6 @@ void Publication::RemoveSubscription(const std::string &host, unsigned int port)
 //////////////////////////////////////////////////
 void Publication::LocalPublish(const std::string &data)
 {
-  std::cout << "\n\nLOCAL PUBLISH!!\n\n";
   std::list<NodePtr>::iterator iter;
   iter = this->nodes.begin();
 

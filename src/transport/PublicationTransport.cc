@@ -118,6 +118,6 @@ void PublicationTransport::Fini()
   if (this->connection)
   {
     this->connection->Cancel();
-    //this->connection.reset();
+    // this->connection.reset();
   }
 }

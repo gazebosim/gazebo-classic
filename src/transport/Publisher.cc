@@ -37,7 +37,6 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 //////////////////////////////////////////////////
 Publisher::~Publisher()
 {
-  std::cout << "\n\n PUBLISHER DESTRUCTOR \n\n";
   if (this->messages.size() > 0)
     this->SendMessage();
 

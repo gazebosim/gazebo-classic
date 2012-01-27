@@ -159,6 +159,9 @@ namespace gazebo
       /// \brief Get the nearest entity below a point
       public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
 
+      /// \brief Get the current world state
+      //public: WorldState GetState() const;
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load

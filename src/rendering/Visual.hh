@@ -102,7 +102,7 @@ namespace gazebo
       public: void AttachObject(Ogre::MovableObject *obj);
 
       /// \brief Returns true if an object with _name is attached
-      public: bool HasAttachedObject(const std::string &_name); 
+      public: bool HasAttachedObject(const std::string &_name);
 
       /// \brief Detach all objects
       public: void DetachObjects();

@@ -20,7 +20,7 @@ namespace gazebo
 {
   class WorldPluginTutorial : public WorldPlugin
   {
-    public: WorldPluginTutorial() : WorldPlugin() 
+    public: WorldPluginTutorial() : WorldPlugin()
             {
               printf("Hello World!\n");
             }
@@ -29,7 +29,6 @@ namespace gazebo
                       sdf::ElementPtr &_sdf)
             {
             };
-
   };
   GZ_REGISTER_WORLD_PLUGIN(WorldPluginTutorial)
-} 
+}
