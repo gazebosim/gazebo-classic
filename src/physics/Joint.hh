@@ -30,6 +30,7 @@
 #include "transport/TransportTypes.hh"
 #include "msgs/MessageTypes.hh"
 
+#include "physics/JointState.hh"
 #include "physics/Base.hh"
 
 namespace gazebo
@@ -79,7 +80,7 @@ namespace gazebo
       public: virtual void Reset();
 
       /// \brief Get the joint state
-      public: JointState GetState() const;
+      public: JointState GetState();
 
       /// \brief Set the joint state
       public: void SetState(const JointState &_state);

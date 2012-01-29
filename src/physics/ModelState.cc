@@ -106,7 +106,7 @@ JointState ModelState::GetJointState(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-JointState ModelState::GetJointState(const std::string &_linkName) const
+JointState ModelState::GetJointState(const std::string &_jointName) const
 {
   std::vector<JointState>::const_iterator iter;
   for (iter = this->jointStates.begin();
