@@ -29,6 +29,7 @@
 #include "common/CommonTypes.hh"
 
 #include "physics/PhysicsTypes.hh"
+#include "physics/CollisionState.hh"
 #include "physics/Entity.hh"
 
 namespace gazebo
@@ -134,6 +135,12 @@ namespace gazebo
       /// \brief Get the angular acceleration of the collision in the
       ///        world frame
       public: virtual math::Vector3 GetWorldAngularAccel() const;
+
+      /// \brief Get the collision state
+      public: CollisionState GetState();
+
+      /// \brief Set the current collision state
+      public: void SetState(const CollisionState &_state);
 
       public: template< typename T>
               event::ConnectionPtr ConnectContact(T subscriber)

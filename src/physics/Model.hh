@@ -153,6 +153,10 @@ namespace gazebo
       /// \return Pointer to the link
       public: LinkPtr GetLink(const std::string &name ="canonical") const;
 
+      /// \brief Get a child link by index
+      /// \return Point to the link
+      public: LinkPtr GetLink(unsigned int _index) const;
+
       /// \brief Set the gravity mode of the model
       public: void SetGravityMode(const bool &v);
 
@@ -186,6 +190,9 @@ namespace gazebo
 
       /// \brief Get the current model state
       public: ModelState GetState();
+
+      /// \brief Set the current model state
+      public: void SetState(const ModelState &_state);
 
       protected: virtual void OnPoseChange();
 

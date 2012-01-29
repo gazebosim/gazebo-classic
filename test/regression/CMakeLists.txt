@@ -20,7 +20,7 @@ endif()
 find_package(GTest REQUIRED)
 include_directories( ${GTEST_INCLUDE_DIRS} )
 
-set (gtest_sources transport.cc speed.cc factory.cc)
+set (gtest_sources transport.cc speed.cc factory.cc physics.cc)
 
 foreach(GTEST_SOURCE_file ${gtest_sources})
   string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})

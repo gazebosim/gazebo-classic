@@ -556,6 +556,18 @@ LinkPtr Model::GetLink(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+LinkPtr Model::GetLink(unsigned int _index) const
+{
+  LinkPtr link;
+  if (_index <= this->GetChildCount())
+    link = boost::shared_static_cast<Link>(this->GetChild(_index));
+  else
+    gzerr << "Index is out of range\n";
+
+  return link;
+}
+
+//////////////////////////////////////////////////
 void Model::LoadJoint(sdf::ElementPtr &_sdf)
 {
   JointPtr joint;
@@ -993,4 +1005,30 @@ void Model::OnPoseChange()
 ModelState Model::GetState()
 {
   return ModelState(boost::shared_static_cast<Model>(shared_from_this()));
+}
+
+//////////////////////////////////////////////////
+void Model::SetState(const ModelState &_state)
+{
+  this->SetWorldPose(_state.GetPose());
+
+  for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  {
+    LinkState linkState = _state.GetLinkState(i);
+    LinkPtr link = this->GetLink(linkState.GetName());
+    if (link)
+      link->SetState(linkState);
+    else
+      gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
+  }
+
+  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  {
+    JointState jointState = _state.GetJointState(i);
+    JointPtr joint = this->GetJoint(jointState.GetName());
+    if (joint)
+      joint->SetState(jointState);
+    else
+      gzerr << "Unable to find joint[" << jointState.GetName() << "]\n";
+  }
 }

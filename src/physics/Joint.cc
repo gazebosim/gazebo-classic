@@ -250,3 +250,18 @@ void Joint::SetAngle(int /*index*/, math::Angle _angle)
   this->staticAngle = _angle;
 }
 
+//////////////////////////////////////////////////
+JointState Joint::GetState()
+{
+  return JointState(boost::shared_static_cast<Joint>(shared_from_this()));
+}
+
+//////////////////////////////////////////////////
+void Joint::SetState(const JointState &_state)
+{
+  this->SetMaxForce(0, 0);
+  this->SetVelocity(0, 0);
+  for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
+    this->SetAngle(i, _state.GetAngle(i));
+}
+

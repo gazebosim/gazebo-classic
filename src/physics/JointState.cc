@@ -15,34 +15,48 @@
  *
  */
 
-#include "physics/Collision.hh"
+#include "physics/Joint.hh"
+#include "physics/Link.hh"
 #include "physics/World.hh"
-#include "physics/CollisionState.hh"
+#include "physics/JointState.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-CollisionState::CollisionState()
+JointState::JointState()
 : State()
 {
 }
 
 /////////////////////////////////////////////////
-CollisionState::CollisionState(const CollisionPtr _collision)
-: State(_collision->GetName(), _collision->GetWorld()->GetRealTime(),
-        _collision->GetWorld()->GetSimTime())
+JointState::JointState(JointPtr _joint)
+: State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
+        _joint->GetWorld()->GetSimTime())
 {
-  this->pose = _collision->GetWorldPose();
+  this->angles.push_back(_joint->GetAngle(0));
 }
 
 /////////////////////////////////////////////////
-CollisionState::~CollisionState()
+JointState::~JointState()
 {
 }
 
 /////////////////////////////////////////////////
-math::Pose CollisionState::GetPose() const
+unsigned int JointState::GetAngleCount() const
 {
-  return this->pose;
+  return this->angles.size();
+}
+
+/////////////////////////////////////////////////
+math::Angle JointState::GetAngle(unsigned int _axis) const
+{
+  math::Angle angle;
+
+  if (_axis < this->angles.size())
+    angle = this->angles[_axis];
+  else
+    gzerr << "Index[" << _axis << " is out of range.\n";
+
+  return angle;
 }

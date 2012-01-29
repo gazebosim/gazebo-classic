@@ -16,6 +16,7 @@
  */
 
 #include "physics/Model.hh"
+#include "physics/Link.hh"
 #include "physics/World.hh"
 #include "physics/ModelState.hh"
 
@@ -35,8 +36,14 @@ ModelState::ModelState(ModelPtr _model)
 {
   for (unsigned int i = 0; i < _model->GetChildCount(); ++i)
   {
-    // this->linkStates.push_back(_model->GetLink(i)->GetState());
+    this->linkStates.push_back(_model->GetLink(i)->GetState());
   }
+
+  for (unsigned int i = 0; i < _model->GetJointCount(); ++i)
+  {
+    this->jointStates.push_back(_model->GetJoint(i)->GetState());
+  }
+
   this->pose = _model->GetWorldPose();
 }
 
@@ -79,4 +86,35 @@ LinkState ModelState::GetLinkState(const std::string &_linkName) const
   }
 
   return LinkState();
+}
+
+/////////////////////////////////////////////////
+unsigned int ModelState::GetJointStateCount() const
+{
+  return this->jointStates.size();
+}
+
+/////////////////////////////////////////////////
+JointState ModelState::GetJointState(unsigned int _index) const
+{
+  if (_index < this->jointStates.size())
+    return this->jointStates[_index];
+  else
+    gzerr << "Index is out of range\n";
+
+  return JointState();
+}
+
+/////////////////////////////////////////////////
+JointState ModelState::GetJointState(const std::string &_linkName) const
+{
+  std::vector<JointState>::const_iterator iter;
+  for (iter = this->jointStates.begin();
+       iter != this->jointStates.end(); ++iter)
+  {
+    if ((*iter).GetName() == _jointName)
+      return *iter;
+  }
+
+  return JointState();
 }

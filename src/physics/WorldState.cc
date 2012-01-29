@@ -25,6 +25,7 @@
 using namespace gazebo;
 using namespace physics;
 
+/////////////////////////////////////////////////
 WorldState::WorldState(WorldPtr _world)
   : State(_world->GetName(), _world->GetSimTime(), _world->GetRealTime())
 {
@@ -34,16 +35,19 @@ WorldState::WorldState(WorldPtr _world)
   }
 }
 
+/////////////////////////////////////////////////
 WorldState::~WorldState()
 {
   this->modelStates.clear();
 }
 
+/////////////////////////////////////////////////
 unsigned int WorldState::GetModelStateCount() const
 {
   return this->modelStates.size();
 }
 
+/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(unsigned int _index) const
 {
   if (_index < this->modelStates.size())
@@ -54,6 +58,7 @@ ModelState WorldState::GetModelState(unsigned int _index) const
   return ModelState();
 }
 
+/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
   std::vector<ModelState>::const_iterator iter;

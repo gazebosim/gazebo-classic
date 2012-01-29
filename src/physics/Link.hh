@@ -28,7 +28,7 @@
 #include "common/Event.hh"
 #include "common/CommonTypes.hh"
 
-#include "physics/CollisionState.hh"
+#include "physics/LinkState.hh"
 #include "physics/Entity.hh"
 #include "physics/Inertial.hh"
 #include "physics/Joint.hh"
@@ -187,6 +187,9 @@ namespace gazebo
       /// \brief accessor for collisions
       public: CollisionPtr GetCollision(const std::string &name);
 
+      /// \brief accessor for collisions
+      public: CollisionPtr GetCollision(unsigned int _index) const;
+
       /// \brief  Get the size of the body
       public: virtual math::Box GetBoundingBox() const;
 
@@ -237,6 +240,12 @@ namespace gazebo
       public: void DetachAllStaticModels();
 
       public: virtual void OnPoseChange();
+
+      /// \brief Get the link state
+      public: LinkState GetState();
+
+      /// \brief Set the current link state
+      public: void SetState(const LinkState &_state);
 
       protected: bool isStatic;
 

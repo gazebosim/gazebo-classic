@@ -16,6 +16,7 @@
  */
 
 #include "physics/Link.hh"
+#include "physics/Collision.hh"
 #include "physics/World.hh"
 #include "physics/LinkState.hh"
 
@@ -35,7 +36,7 @@ LinkState::LinkState(const LinkPtr _link)
 {
   for (unsigned int i = 0; i < _link->GetChildCount(); ++i)
   {
-    // this->linkStates.push_back(_model->GetLink(i)->GetState());
+    this->collisionStates.push_back(_link->GetCollision(i)->GetState());
   }
   this->pose = _link->GetWorldPose();
 }

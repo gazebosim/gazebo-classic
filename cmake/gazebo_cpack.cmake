@@ -13,11 +13,10 @@ list (APPEND CPACK_SOURCE_GENERATOR "TBZ2")
 list (APPEND CPACK_SOURCE_GENERATOR "ZIP")
 list (APPEND CPACK_SOURCE_IGNORE_FILES ";Ogre.log;TODO;/.hg/;.swp$;/build/")
 
-
 include (InstallRequiredSystemLibraries)
 
 #execute_process(COMMAND dpkg --print-architecture _NPROCE)
-set (DEBIAN_PACKAGE_DEPENDS "libogre-dev, libfreeimage-dev, libqt4-dev, libprotobuf6, libtbb2, libxml2, libboost-all-dev, libyaml-dev")
+set (DEBIAN_PACKAGE_DEPENDS "libogre-dev, libfreeimage-dev, libqt4-dev, libprotobuf-dev, libprotoc-dev, libtbb2, libxml2, libboost-all-dev")
 
 set (GAZEBO_CPACK_CFG_FILE "${PROJECT_BINARY_DIR}/cpack_options.cmake")
 

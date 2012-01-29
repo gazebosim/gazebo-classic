@@ -163,6 +163,9 @@ namespace gazebo
       /// \brief Get the current world state
       public: WorldState GetState();
 
+      /// \brief Set the current world state
+      public: void SetState(const WorldState &_state);
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load

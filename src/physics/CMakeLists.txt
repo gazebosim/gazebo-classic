@@ -28,6 +28,7 @@ set (sources Base.cc
              Inertial.cc
              SurfaceParams.cc
              State.cc
+             JointState.cc
 ) 
 
 set (headers BallJoint.hh
@@ -66,6 +67,7 @@ set (headers BallJoint.hh
              ScrewJoint.hh
              SurfaceParams.hh
              State.hh
+             JointState.hh
 )
 
 set (physics_headers "" CACHE INTERNAL "physics headers" FORCE)

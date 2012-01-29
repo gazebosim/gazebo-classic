@@ -26,6 +26,7 @@
 
 #include "physics/State.hh"
 #include "physics/LinkState.hh"
+#include "physics/JointState.hh"
 #include "math/Pose.hh"
 
 namespace gazebo
@@ -46,17 +47,27 @@ namespace gazebo
       /// \brief Get the model pose
       public: math::Pose GetPose() const;
 
-      /// \brief Get the number of model states
+      /// \brief Get the number of link states
       public: unsigned int GetLinkStateCount() const;
 
-      /// \brief Get a model state
+      /// \brief Get a link state
       public: LinkState GetLinkState(unsigned int _index) const;
 
-      /// \brief Get a model state by model name
+      /// \brief Get a link state by model name
       public: LinkState GetLinkState(const std::string &_modelName) const;
+
+      /// \brief Get the number of joint states
+      public: unsigned int GetJointStateCount() const;
+
+      /// \brief Get a model state
+      public: JointState GetJointState(unsigned int _index) const;
+
+      /// \brief Get a model state by model name
+      public: JointState GetJointState(const std::string &_jointName) const;
 
       private: math::Pose pose;
       private: std::vector<LinkState> linkStates;
+      private: std::vector<JointState> jointStates;
     };
   }
 }

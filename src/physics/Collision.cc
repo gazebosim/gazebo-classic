@@ -398,6 +398,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 msgs::Visual Collision::CreateCollisionVisual()
 {
   msgs::Visual msg;
@@ -460,4 +461,15 @@ msgs::Visual Collision::CreateCollisionVisual()
   return msg;
 }
 
+/////////////////////////////////////////////////
+CollisionState Collision::GetState()
+{
+  return CollisionState(
+      boost::shared_static_cast<Collision>(shared_from_this()));
+}
 
+/////////////////////////////////////////////////
+void Collision::SetState(const CollisionState &_state)
+{
+  this->SetWorldPose(_state.GetPose());
+}

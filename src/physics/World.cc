@@ -1008,3 +1008,18 @@ WorldState World::GetState()
 {
   return WorldState(shared_from_this());
 }
+
+//////////////////////////////////////////////////
+void World::SetState(const WorldState &_state)
+{
+  this->SetSimTime(_state.GetSimTime());
+  for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
+  {
+    ModelState modelState = _state.GetModelState(i);
+    ModelPtr model = this->GetModelByName(modelState.GetName());
+    if (model)
+      model->SetState(modelState);
+    else
+      gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
+  }
+}

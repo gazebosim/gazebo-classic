@@ -451,6 +451,18 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+CollisionPtr Link::GetCollision(unsigned int _index) const
+{
+  CollisionPtr collision;
+  if (_index <= this->GetChildCount())
+    collision = boost::shared_static_cast<Collision>(this->GetChild(_index));
+  else
+    gzerr << "Index is out of range\n";
+
+  return collision;
+}
+
+//////////////////////////////////////////////////
 void Link::SetLinearAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
@@ -733,3 +745,24 @@ void Link::OnPoseChange()
   }
 }
 
+//////////////////////////////////////////////////
+LinkState Link::GetState()
+{
+  return LinkState(boost::shared_static_cast<Link>(shared_from_this()));
+}
+
+//////////////////////////////////////////////////
+void Link::SetState(const LinkState &_state)
+{
+  this->SetWorldPose(_state.GetPose());
+
+  for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
+  {
+    CollisionState collisionState = _state.GetCollisionState(i);
+    CollisionPtr collision = this->GetCollision(collisionState.GetName());
+    if (collision)
+      collision->SetState(collisionState);
+    else
+      gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
+  }
+}

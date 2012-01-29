@@ -78,6 +78,12 @@ namespace gazebo
       /// \brief Reset the joint
       public: virtual void Reset();
 
+      /// \brief Get the joint state
+      public: JointState GetState() const;
+
+      /// \brief Set the joint state
+      public: void SetState(const JointState &_state);
+
       /// \brief Set the model this joint belongs too
       public: void SetModel(ModelPtr model);
 
