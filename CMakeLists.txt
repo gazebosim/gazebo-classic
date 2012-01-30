@@ -172,12 +172,14 @@ if ( build_warnings )
   message(STATUS "END BUILD WARNINGS\n")
 endif (build_warnings)
 
+
 if ( build_errors )
   message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
   endforeach (msg ${build_errors})
   message(STATUS "END BUILD ERRORS\n")
+  message (FATAL_ERROR "Errors encountered in build.")
 else (build_errors)
 
   ########################################
