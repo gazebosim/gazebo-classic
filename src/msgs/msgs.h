@@ -47,7 +47,6 @@ namespace gazebo
     msgs::Request *CreateRequest(const std::string &_request,
                                  const std::string &_data = "");
 
-
     /// \brief Initialize a message
     /// \param _message Message to initialize
     /// \param _id Optional string id
