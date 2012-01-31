@@ -47,7 +47,6 @@ target_link_libraries( gzmaster gazebo_common
 
 target_link_libraries( gzserver gazebo_common
                                 gazebo_sdf_interface
-                                gazebo_sdf_parser
                                 gazebo_transport
                                 gazebo_physics
                                 gazebo_sensors
@@ -72,7 +71,6 @@ target_link_libraries( gazebo_server gazebo_common
                                      gazebo_physics
                                      gazebo_sensors
                                      gazebo_rendering
-                                     gazebo_sdf_parser
                                      gazebo_sdf_interface
                                      gazebo_msgs
                                      gazebo_math

@@ -156,9 +156,10 @@ namespace sdf
     public: void Write(const std::string &_filename);
     public: std::string ToString() const;
 
+    /// \brief Set SDF values from a string
+    public: void SetFromString(const std::string &_sdfData);
+
     public: ElementPtr root;
   };
 }
 #endif
-
-

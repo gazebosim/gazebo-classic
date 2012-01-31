@@ -31,21 +31,18 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_SENSOR_PLUGIN(RayPlugin)
 
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
+/////////////////////////////////////////////////
 RayPlugin::RayPlugin()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Destructor
+/////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load the controller
-void RayPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf)
+/////////////////////////////////////////////////
+void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Get then name of the parent sensor
   this->parentSensor =
@@ -56,4 +53,3 @@ void RayPlugin::Load(sensors::SensorPtr &_parent, sdf::ElementPtr &_sdf)
   if (!this->parentSensor)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 }
-

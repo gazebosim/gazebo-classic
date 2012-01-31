@@ -166,13 +166,19 @@ namespace gazebo
       /// \brief Set the current world state
       public: void SetState(const WorldState &_state);
 
+      /// \brief Insert a model from an SDF file
+      public: void InsertModel(const std::string &_sdfFilename);
+
+      /// \brief Insert a model using SDF
+      public: void InsertModel(const sdf::SDF &_sdf);
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load
-      private: void LoadEntities(sdf::ElementPtr &_sdf , BasePtr parent);
+      private: void LoadEntities(sdf::ElementPtr _sdf , BasePtr parent);
 
       /// \brief Load a model
-      private: ModelPtr LoadModel(sdf::ElementPtr &_sdf, BasePtr parent);
+      private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr parent);
 
       /// \brief Function to run physics. Used by physicsThread
       private: void RunLoop();
@@ -204,10 +210,8 @@ namespace gazebo
 
       private: void JointLog(ConstJointPtr &msg);
 
-      private: void OnFactoryMsg(
-                   ConstFactoryPtr &data);
-      private: void OnModelMsg(
-                   ConstModelPtr &_msg);
+      private: void OnFactoryMsg(ConstFactoryPtr &_data);
+      private: void OnModelMsg(ConstModelPtr &_msg);
 
       /// \brief TBB version of model updating
       private: void ModelUpdateTBB();
@@ -215,7 +219,7 @@ namespace gazebo
       /// \brief Single loop verison of model updating
       private: void ModelUpdateSingleLoop();
 
-      private: void LoadPlugin(sdf::ElementPtr &_sdf);
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr &_model);
 

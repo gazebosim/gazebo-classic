@@ -17,7 +17,6 @@
 #include <stdlib.h>
 
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 
 #include "parser_deprecated.hh"
 
@@ -66,7 +65,7 @@ bool initFile(const std::string &_filename, SDFPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-bool initFile(const std::string &_filename, ElementPtr &_sdf)
+bool initFile(const std::string &_filename, ElementPtr _sdf)
 {
   std::string filename =
     gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(_filename);
@@ -81,7 +80,7 @@ bool initFile(const std::string &_filename, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initString(const std::string &_xmlString, SDFPtr &_sdf)
+bool initString(const std::string &_xmlString, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -90,7 +89,7 @@ bool initString(const std::string &_xmlString, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
+bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -109,7 +108,7 @@ bool initDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
+bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -128,7 +127,7 @@ bool initDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
+bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
 {
   const char *nameString = _xml->Attribute("name");
   if (!nameString)
@@ -228,7 +227,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr &_sdf)
 
 
 //////////////////////////////////////////////////
-bool readFile(const std::string &_filename, SDFPtr &_sdf)
+bool readFile(const std::string &_filename, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   std::string filename =
@@ -259,7 +258,7 @@ bool readFile(const std::string &_filename, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readString(const std::string &_xmlString, SDFPtr &_sdf)
+bool readString(const std::string &_xmlString, SDFPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -287,7 +286,7 @@ bool readString(const std::string &_xmlString, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readString(const std::string &_xmlString, ElementPtr &_sdf)
+bool readString(const std::string &_xmlString, ElementPtr _sdf)
 {
   TiXmlDocument xmlDoc;
   xmlDoc.Parse(_xmlString.c_str());
@@ -302,7 +301,7 @@ bool readString(const std::string &_xmlString, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
+bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -342,7 +341,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
+bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
 {
   if (!_xmlDoc)
   {
@@ -357,8 +356,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
       (strcmp(gazeboNode->Attribute("version") , "1.0") == 0))
   {
     /* parse new sdf xml */
-    TiXmlElement* elemXml = gazeboNode->FirstChildElement(_sdf->GetName());
-    if (!readXml(elemXml, _sdf))
+    if (!readXml(gazeboNode, _sdf))
     {
       gzwarn << "Unable to parse sdf element["
              << _sdf->GetName() << "]\n";
@@ -383,7 +381,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
+bool readXml(TiXmlElement *_xml, ElementPtr _sdf)
 {
   if (_sdf->GetRequired() == "-1")
   {
@@ -555,7 +553,8 @@ bool readXml(TiXmlElement *_xml, ElementPtr &_sdf)
   return true;
 }
 
-void copyChildren(ElementPtr &_sdf, TiXmlElement *_xml)
+/////////////////////////////////////////////////
+void copyChildren(ElementPtr _sdf, TiXmlElement *_xml)
 {
   // Iterate over all the child elements
   TiXmlElement* elemXml = NULL;

@@ -22,7 +22,6 @@
 #include "common/Plugin.hh"
 
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 
 #include "sensors/Sensors.hh"
 

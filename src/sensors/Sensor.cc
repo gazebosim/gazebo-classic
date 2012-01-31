@@ -19,7 +19,7 @@
  * Date: 25 May 2007
  */
 
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "transport/transport.h"
 
 #include "physics/Physics.hh"

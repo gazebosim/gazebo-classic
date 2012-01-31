@@ -19,7 +19,6 @@
 #include <boost/lexical_cast.hpp>
 
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 #include "common/SystemPaths.hh"
 #include "common/Console.hh"
 

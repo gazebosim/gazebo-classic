@@ -79,7 +79,7 @@ configure_file ( ${CMAKE_CURRENT_SOURCE_DIR}/physics.h.in ${CMAKE_CURRENT_BINARY
 add_library(gazebo_physics SHARED ${sources} ${sources})
 
 target_link_libraries(gazebo_physics gazebo_common 
-                                     gazebo_sdf_parser
+                                     gazebo_sdf_interface
                                      gazebo_physics_ode
                                      ${TBB_LIBRARIES} 
                                      ${libtool_library} 
@@ -88,14 +88,13 @@ target_link_libraries(gazebo_physics gazebo_common
                                      )
 
 add_executable(gzphysics server.cc)
-target_link_libraries( gzphysics gazebo_common
-                                 gazebo_transport
-                                 gazebo_physics
-                                 gazebo_sensors
-                                 gazebo_sdf_interface
-                                 gazebo_sdf_parser
-                                 gazebo_msgs
-                                 pthread)
+target_link_libraries(gzphysics gazebo_common
+                                gazebo_transport
+                                gazebo_physics
+                                gazebo_sensors
+                                gazebo_sdf_interface
+                                gazebo_msgs
+                                pthread)
 INSTALL_EXECUTABLE( gzphysics )
 INSTALL_LIBRARY(gazebo_physics)
 INSTALL_INCLUDES("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.h)

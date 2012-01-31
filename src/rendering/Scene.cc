@@ -18,7 +18,7 @@
 
 #include "rendering/ogre.h"
 #include "msgs/msgs.h"
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 
 #include "common/Exception.hh"
 #include "common/Console.hh"

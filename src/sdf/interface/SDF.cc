@@ -18,6 +18,7 @@
 #include "math/Pose.hh"
 #include "math/Vector3.hh"
 
+#include "sdf/interface/parser.hh"
 #include "sdf/interface/SDF.hh"
 
 using namespace sdf;
@@ -692,50 +693,6 @@ void Element::ClearElements()
   this->elements.clear();
 }
 
-  SDF::SDF()
-: root(new Element)
-{
-}
-
-void SDF::PrintDescription()
-{
-  this->root->PrintDescription("");
-}
-
-void SDF::PrintValues()
-{
-  this->root->PrintValues("");
-}
-void SDF::Write(const std::string &_filename)
-{
-  std::string string = this->root->ToString("");
-
-  std::ofstream out(_filename.c_str(), std::ios::out);
-
-  if (!out)
-  {
-    gzerr << "Unable to open file[" << _filename << "] for writing\n";
-    return;
-  }
-  out << string;
-  out.close();
-}
-
-std::string SDF::ToString() const
-{
-  std::string result;
-
-  if (this->root->GetName() != "gazebo")
-    result = std::string("<gazebo version ='") + SDF_VERSION + "'>";
-
-  result += this->root->ToString("");
-
-  if (this->root->GetName() != "gazebo")
-    result += "</gazebo>";
-
-  return result;
-}
-
 void Element::Update()
 {
   for (sdf::Param_V::iterator iter = this->attributes.begin();
@@ -772,4 +729,69 @@ void Element::Reset()
   this->elementDescriptions.clear();
 
   this->value.reset();
+}
+
+
+
+
+
+
+/////////////////////////////////////////////////
+SDF::SDF()
+: root(new Element)
+{
+}
+
+/////////////////////////////////////////////////
+void SDF::PrintDescription()
+{
+  this->root->PrintDescription("");
+}
+
+/////////////////////////////////////////////////
+void SDF::PrintValues()
+{
+  this->root->PrintValues("");
+}
+
+/////////////////////////////////////////////////
+void SDF::Write(const std::string &_filename)
+{
+  std::string string = this->root->ToString("");
+
+  std::ofstream out(_filename.c_str(), std::ios::out);
+
+  if (!out)
+  {
+    gzerr << "Unable to open file[" << _filename << "] for writing\n";
+    return;
+  }
+  out << string;
+  out.close();
+}
+
+/////////////////////////////////////////////////
+std::string SDF::ToString() const
+{
+  std::string result;
+
+  if (this->root->GetName() != "gazebo")
+    result = std::string("<gazebo version ='") + SDF_VERSION + "'>";
+
+  result += this->root->ToString("");
+
+  if (this->root->GetName() != "gazebo")
+    result += "</gazebo>";
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+void SDF::SetFromString(const std::string &_sdfData)
+{
+  sdf::initFile("/sdf/gazebo.sdf", this->root);
+  if (!sdf::readString(_sdfData, this->root))
+  {
+    gzerr << "Unable to parse sdf string[" << _sdfData << "]\n";
+  }
 }

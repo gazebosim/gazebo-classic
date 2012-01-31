@@ -15,7 +15,6 @@
  *
 */
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 #include "math/Pose.hh"
 #include "common/Console.hh"
 #include "common/MeshManager.hh"

@@ -27,7 +27,6 @@ foreach(GTEST_SOURCE_file ${gtest_sources})
   target_link_libraries( ${BINARY_NAME} ${GTEST_BOTH_LIBRARIES} 
     gazebo_common
     gazebo_sdf_interface
-    gazebo_sdf_parser
     gazebo_transport
     gazebo_physics
     gazebo_sensors

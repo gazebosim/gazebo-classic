@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "Inertial.hh"
 
 using namespace gazebo;

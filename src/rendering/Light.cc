@@ -24,7 +24,7 @@
 
 #include "rendering/ogre.h"
 
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 #include "msgs/msgs.h"
 
 #include "common/Events.hh"

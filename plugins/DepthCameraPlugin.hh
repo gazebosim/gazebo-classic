@@ -32,7 +32,7 @@ namespace gazebo
   {
     public: DepthCameraPlugin();
 
-    public: void Load(sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf);
+    public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     public: virtual void OnNewDepthFrame(const float *_image,
                 unsigned int _width, unsigned int _height,

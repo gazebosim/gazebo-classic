@@ -25,7 +25,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "sdf/parser/parser.hh"
+#include "sdf/sdf.h"
 #include "transport/Node.hh"
 #include "transport/Transport.hh"
 #include "transport/Publisher.hh"
@@ -166,8 +166,7 @@ void World::Load(sdf::ElementPtr _sdf)
 
     this->rootElement.reset(new Base(BasePtr()));
     this->rootElement->SetName(this->GetName());
-    WorldPtr me = shared_from_this();
-    this->rootElement->SetWorld(me);
+    this->rootElement->SetWorld(shared_from_this());
 
     // Create all the entities
     this->LoadEntities(_sdf, this->rootElement);
@@ -419,7 +418,7 @@ EntityPtr World::GetEntityByName(const std::string &_name)
 
 
 //////////////////////////////////////////////////
-ModelPtr World::LoadModel(sdf::ElementPtr &_sdf , BasePtr _parent)
+ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
   ModelPtr model(new Model(_parent));
   model->SetWorld(shared_from_this());
@@ -435,7 +434,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr &_sdf , BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-void World::LoadEntities(sdf::ElementPtr &_sdf, BasePtr _parent)
+void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   if (_sdf->HasElement("light"))
   {
@@ -733,7 +732,7 @@ void World::ModelUpdateSingleLoop()
 
 
 //////////////////////////////////////////////////
-void World::LoadPlugin(sdf::ElementPtr &_sdf)
+void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");
@@ -741,8 +740,7 @@ void World::LoadPlugin(sdf::ElementPtr &_sdf)
                                                               pluginName);
   if (plugin)
   {
-    WorldPtr myself = shared_from_this();
-    plugin->Load(myself, _sdf);
+    plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
   }
 }
@@ -907,6 +905,7 @@ void World::ProcessFactoryMsgs()
 {
   std::list<msgs::Factory>::iterator iter;
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+
   for (iter = this->factoryMsgs.begin();
        iter != this->factoryMsgs.end(); ++iter)
   {
@@ -933,7 +932,8 @@ void World::ProcessFactoryMsgs()
     else
     {
       gzerr << "Unable to load sdf from factory message."
-        << "No SDF or SDF filename specified.\n";
+            << "No SDF or SDF filename specified.\n";
+      continue;
     }
 
     if ((*iter).has_edit_name())
@@ -955,8 +955,14 @@ void World::ProcessFactoryMsgs()
     else
     {
       sdf::ElementPtr elem = factorySDF->root->GetElement("model");
-      if (!elem)
+      if (!elem && factorySDF->root->GetElement("world"))
         elem = factorySDF->root->GetElement("world")->GetElement("model");
+
+      if (!elem)
+      {
+        gzerr << "Invalid SDF\n";
+        continue;
+      }
 
       elem->SetParent(this->sdf);
       elem->GetParent()->InsertElement(elem);
@@ -1022,4 +1028,22 @@ void World::SetState(const WorldState &_state)
     else
       gzerr << "Unable to find model[" << modelState.GetName() << "]\n";
   }
+}
+
+//////////////////////////////////////////////////
+void World::InsertModel(const std::string &_sdfFilename)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Factory msg;
+  msg.set_sdf_filename(_sdfFilename);
+  this->factoryMsgs.push_back(msg);
+}
+
+//////////////////////////////////////////////////
+void World::InsertModel(const sdf::SDF &_sdf)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Factory msg;
+  msg.set_sdf(_sdf.ToString());
+  this->factoryMsgs.push_back(msg);
 }

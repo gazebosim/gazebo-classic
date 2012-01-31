@@ -32,9 +32,9 @@ TEST_F(PhysicsTest, State)
   EXPECT_TRUE(world != NULL);
 
   physics::WorldState worldState = world->GetState();
-  physics::ModelState modelState = worldState.GetModelState(0); 
-  physics::LinkState linkState = modelState.GetLinkState(0); 
-  physics::CollisionState collisionState = linkState.GetCollisionState(0); 
+  physics::ModelState modelState = worldState.GetModelState(0);
+  physics::LinkState linkState = modelState.GetLinkState(0);
+  physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
   math::Pose pose;
   EXPECT_EQ(1, worldState.GetModelStateCount());
@@ -67,19 +67,18 @@ TEST_F(PhysicsTest, State)
 
   // Move the box
   world->GetModelByName("box")->SetWorldPose(
-      math::Pose(math::Vector3(1,2,3), math::Quaternion(0, 0, 0)));
+      math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 0)));
 
   // Make sure the box has been moved
   physics::ModelState modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(1,2,3), math::Quaternion(0, 0, 0));
+  pose.Set(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
 
   // Reset world state, and check for correctness
   world->SetState(worldState);
   modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(0,0,.5), math::Quaternion(0, 0, 0));
+  pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
-
 }
 
 int main(int argc, char **argv)

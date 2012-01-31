@@ -38,7 +38,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "common/Console.hh"
-#include "sdf/parser/parser_deprecated.hh"
+#include "sdf/interface/parser_deprecated.hh"
 #include "sdf/interface/Param.hh"
 #include "math/Pose.hh"
 #include "math/Vector3.hh"

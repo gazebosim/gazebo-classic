@@ -20,12 +20,14 @@
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(Pioneer2dxPlugin)
 
+/////////////////////////////////////////////////
 Pioneer2dxPlugin::Pioneer2dxPlugin()
 {
 }
 
-void Pioneer2dxPlugin::Load(physics::ModelPtr &_model,
-                            sdf::ElementPtr &/*_sdf*/)
+/////////////////////////////////////////////////
+void Pioneer2dxPlugin::Load(physics::ModelPtr _model,
+                            sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
   this->leftJoint = _model->GetJoint("left_wheel_hinge");
@@ -34,6 +36,7 @@ void Pioneer2dxPlugin::Load(physics::ModelPtr &_model,
           boost::bind(&Pioneer2dxPlugin::OnUpdate, this));
 }
 
+/////////////////////////////////////////////////
 void Pioneer2dxPlugin::OnUpdate()
 {
   this->leftJoint->SetVelocity(0, 0.2);
@@ -41,5 +44,3 @@ void Pioneer2dxPlugin::OnUpdate()
   this->leftJoint->SetForce(0, 0.2);
   this->rightJoint->SetForce(0, 0.2);
 }
-
-

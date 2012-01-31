@@ -58,7 +58,6 @@ add_library(gazebo_gui SHARED ${sources} ${headers_MOC} ${headers} ${resources_R
 target_link_libraries( gazebo_gui gazebo_common
                                   gazebo_transport
                                   gazebo_sdf_interface
-                                  gazebo_sdf_parser
                                   gazebo_rendering
                                   gazebo_sensors
                                   gazebo_msgs
@@ -71,7 +70,6 @@ target_link_libraries( gazebo_gui gazebo_common
 target_link_libraries( gzclient  gazebo_common
                                  gazebo_transport
                                  gazebo_sdf_interface
-                                 gazebo_sdf_parser
                                  gazebo_rendering
                                  gazebo_sensors
                                  gazebo_msgs

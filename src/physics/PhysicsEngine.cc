@@ -29,7 +29,7 @@
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
 
-#include "sdf/sdf_parser.h"
+#include "sdf/sdf.h"
 
 using namespace gazebo;
 using namespace physics;

@@ -175,8 +175,8 @@ namespace gazebo
   class WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Load function
-    public: virtual void Load(physics::WorldPtr &_world,
-                              sdf::ElementPtr &_sdf) = 0;
+    public: virtual void Load(physics::WorldPtr _world,
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -184,8 +184,8 @@ namespace gazebo
   class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Load function
-    public: virtual void Load(physics::ModelPtr &_model,
-                              sdf::ElementPtr &_sdf) = 0;
+    public: virtual void Load(physics::ModelPtr _model,
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };
@@ -193,8 +193,8 @@ namespace gazebo
   class SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Load function
-    public: virtual void Load(
-                sensors::SensorPtr &_sensor, sdf::ElementPtr &_sdf) = 0;
+    public: virtual void Load(sensors::SensorPtr _sensor,
+                              sdf::ElementPtr _sdf) = 0;
     public: virtual void Init() {}
     public: virtual void Reset() {}
   };

@@ -15,7 +15,7 @@
  *
 */
 
-#include "sdf/parser/parser.hh"
+#include "sdf/interface/parser.hh"
 
 std::vector<std::string> params;
 

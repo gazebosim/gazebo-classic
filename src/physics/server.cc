@@ -26,7 +26,6 @@
 #include "common/Time.hh"
 #include "transport/Transport.hh"
 #include "sdf/sdf.h"
-#include "sdf/sdf_parser.h"
 #include "gazebo_config.h"
 
 // Command line options

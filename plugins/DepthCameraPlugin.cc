@@ -19,12 +19,14 @@
 using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(DepthCameraPlugin)
 
+/////////////////////////////////////////////////
 DepthCameraPlugin::DepthCameraPlugin() : SensorPlugin()
 {
 }
 
-void DepthCameraPlugin::Load(sensors::SensorPtr &_sensor,
-                              sdf::ElementPtr &/*_sdf*/)
+/////////////////////////////////////////////////
+void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
+                              sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
     boost::shared_dynamic_cast<sensors::DepthCameraSensor>(_sensor);
@@ -52,6 +54,7 @@ void DepthCameraPlugin::Load(sensors::SensorPtr &_sensor,
   this->parentSensor->SetActive(true);
 }
 
+/////////////////////////////////////////////////
 void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
     unsigned int _width, unsigned int _height,
     unsigned int /*_depth*/, const std::string &/*_format*/)
@@ -77,6 +80,7 @@ void DepthCameraPlugin::OnNewDepthFrame(const float *_image,
     */
 }
 
+/////////////////////////////////////////////////
 void DepthCameraPlugin::OnNewImageFrame(const unsigned char * /*_image*/,
                               unsigned int /*_width*/,
                               unsigned int /*_height*/,
