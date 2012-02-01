@@ -88,6 +88,18 @@ namespace sdf
     /// \param _key the name of the attribute
     public: ParamPtr GetAttribute(const std::string &_key);
 
+    /// \brief Get the number of attributes
+    public: unsigned int GetAttributeCount() const;
+
+    /// \brief Get an attribute using an index
+    public: ParamPtr GetAttribute(unsigned int _index) const;
+
+    /// \brief Get the number of element descriptions
+    public: unsigned int GetElementDescriptionCount() const;
+
+    /// \brief Get an attribute using an index
+    public: ElementPtr GetElementDescription(unsigned int _index) const;
+
     public: bool HasAttribute(const std::string &_key);
 
     /// \brief Get the param of the elements value
@@ -123,6 +135,9 @@ namespace sdf
     public: void Update();
     public: void Reset();
 
+    /// \brief Add a new element description
+    public: void AddElementDescription(ElementPtr _elem);
+
     private: boost::shared_ptr<Param> CreateParam(const std::string &_key,
                  const std::string &_type, const std::string &_defaultValue,
                  bool _required);
@@ -134,16 +149,16 @@ namespace sdf
     private: ElementPtr parent;
 
     // Attributes of this element
-    public: Param_V attributes;
+    private: Param_V attributes;
 
     // Value of this element
-    public: ParamPtr value;
+    private: ParamPtr value;
 
     // The existing child elements
-    public: ElementPtr_V elements;
+    private: ElementPtr_V elements;
 
     // The possible child elements
-    public: ElementPtr_V elementDescriptions;
+    private: ElementPtr_V elementDescriptions;
   };
 
 

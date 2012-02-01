@@ -23,11 +23,13 @@
 
 using namespace sdf;
 
+/////////////////////////////////////////////////
 Element::Element()
 {
   this->copyChildren = false;
 }
 
+/////////////////////////////////////////////////
 Element::~Element()
 {
   this->parent.reset();
@@ -57,17 +59,19 @@ Element::~Element()
   // this->Reset();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetParent() const
 {
   return this->parent;
 }
 
+/////////////////////////////////////////////////
 void Element::SetParent(const ElementPtr &_parent)
 {
   this->parent = _parent;
 }
 
-/// Get the name of the parent link.
+/////////////////////////////////////////////////
 std::string Element::GetLinkName() const
 {
   std::string result;
@@ -83,7 +87,7 @@ std::string Element::GetLinkName() const
   return result;
 }
 
-/// Get the name of the parent model.
+/////////////////////////////////////////////////
 std::string Element::GetModelName() const
 {
   std::string result;
@@ -99,7 +103,7 @@ std::string Element::GetModelName() const
   return result;
 }
 
-/// Get the name of the parent world.
+/////////////////////////////////////////////////
 std::string Element::GetWorldName() const
 {
   std::string result;
@@ -115,43 +119,50 @@ std::string Element::GetWorldName() const
   return result;
 }
 
-
+/////////////////////////////////////////////////
 void Element::SetName(const std::string &_name)
 {
   this->name = _name;
 }
 
+/////////////////////////////////////////////////
 const std::string &Element::GetName() const
 {
   return this->name;
 }
 
+/////////////////////////////////////////////////
 void Element::SetRequired(const std::string &_req)
 {
   this->required = _req;
 }
 
+/////////////////////////////////////////////////
 const std::string &Element::GetRequired() const
 {
   return this->required;
 }
 
+/////////////////////////////////////////////////
 void Element::SetCopyChildren(bool _value)
 {
   this->copyChildren = _value;
 }
 
+/////////////////////////////////////////////////
 bool Element::GetCopyChildren() const
 {
   return this->copyChildren;
 }
 
+/////////////////////////////////////////////////
 void Element::AddValue(const std::string &_type,
     const std::string &_defaultValue, bool _required)
 {
   this->value = this->CreateParam(this->name, _type, _defaultValue, _required);
 }
 
+/////////////////////////////////////////////////
 boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
     const std::string &_type, const std::string &_defaultValue, bool _required)
 {
@@ -216,6 +227,7 @@ boost::shared_ptr<Param> Element::CreateParam(const std::string &_key,
   }
 }
 
+/////////////////////////////////////////////////
 void Element::AddAttribute(const std::string &_key, const std::string &_type,
     const std::string &_defaultValue, bool _required)
 {
@@ -223,6 +235,7 @@ void Element::AddAttribute(const std::string &_key, const std::string &_type,
       this->CreateParam(_key, _type, _defaultValue, _required));
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::Clone() const
 {
   ElementPtr clone(new Element);
@@ -250,7 +263,7 @@ ElementPtr Element::Clone() const
   return clone;
 }
 
-/// \brief Copy values from an Element
+/////////////////////////////////////////////////
 void Element::Copy(const ElementPtr &_elem)
 {
   for (Param_V::iterator iter = this->attributes.begin();
@@ -275,6 +288,7 @@ void Element::Copy(const ElementPtr &_elem)
   }
 }
 
+/////////////////////////////////////////////////
 void Element::PrintDescription(std::string _prefix)
 {
   std::cout << _prefix << "<element name ='" << this->name
@@ -303,6 +317,7 @@ void Element::PrintDescription(std::string _prefix)
   std::cout << _prefix << "</element>\n";
 }
 
+/////////////////////////////////////////////////
 void Element::PrintValues(std::string _prefix)
 {
   std::cout << _prefix << "<" << this->name;
@@ -340,6 +355,7 @@ void Element::PrintValues(std::string _prefix)
   }
 }
 
+/////////////////////////////////////////////////
 std::string Element::ToString(const std::string &_prefix) const
 {
   std::ostringstream out;
@@ -347,6 +363,7 @@ std::string Element::ToString(const std::string &_prefix) const
   return out.str();
 }
 
+/////////////////////////////////////////////////
 void Element::ToString(const std::string &_prefix,
                        std::ostringstream &_out) const
 {
@@ -383,6 +400,7 @@ void Element::ToString(const std::string &_prefix,
   }
 }
 
+/////////////////////////////////////////////////
 bool Element::HasAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
@@ -396,6 +414,7 @@ bool Element::HasAttribute(const std::string &_key)
   return false;
 }
 
+/////////////////////////////////////////////////
 ParamPtr Element::GetAttribute(const std::string &_key)
 {
   Param_V::const_iterator iter;
@@ -410,12 +429,44 @@ ParamPtr Element::GetAttribute(const std::string &_key)
   return ParamPtr();
 }
 
-/// Get the param of the elements value
+/////////////////////////////////////////////////
+unsigned int Element::GetAttributeCount() const
+{
+  return this->attributes.size();
+}
+
+/////////////////////////////////////////////////
+ParamPtr Element::GetAttribute(unsigned int _index) const
+{
+  ParamPtr result;
+  if (_index < this->attributes.size())
+    result = this->attributes[_index];
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+unsigned int Element::GetElementDescriptionCount() const
+{
+  return this->elementDescriptions.size();
+}
+
+/////////////////////////////////////////////////
+ElementPtr Element::GetElementDescription(unsigned int _index) const
+{
+  ElementPtr result;
+  if (_index < this->elementDescriptions.size())
+    result = this->elementDescriptions[_index];
+  return result;
+}
+
+/////////////////////////////////////////////////
 ParamPtr Element::GetValue()
 {
   return this->value;
 }
 
+/////////////////////////////////////////////////
 bool Element::HasElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
@@ -428,6 +479,7 @@ bool Element::HasElement(const std::string &_name) const
   return false;
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetElement(const std::string &_name) const
 {
   ElementPtr_V::const_iterator iter;
@@ -441,11 +493,16 @@ ElementPtr Element::GetElement(const std::string &_name) const
   return ElementPtr();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetFirstElement() const
 {
-  return this->elements.front();
+  if (this->elements.empty())
+    return ElementPtr();
+  else
+    return this->elements.front();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetNextElement(const std::string &_name) const
 {
   if (this->parent)
@@ -467,12 +524,14 @@ ElementPtr Element::GetNextElement(const std::string &_name) const
   return ElementPtr();
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::GetNextElement() const
 {
   return this->GetNextElement(this->name);
 }
 
 
+/////////////////////////////////////////////////
 boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
 {
   if (this->HasElement(_name))
@@ -481,11 +540,13 @@ boost::shared_ptr<Element> Element::GetOrCreateElement(const std::string &_name)
     return this->AddElement(_name);
 }
 
+/////////////////////////////////////////////////
 void Element::InsertElement(ElementPtr _elem)
 {
   this->elements.push_back(_elem);
 }
 
+/////////////////////////////////////////////////
 ElementPtr Element::AddElement(const std::string &_name)
 {
   ElementPtr_V::const_iterator iter;
@@ -504,6 +565,7 @@ ElementPtr Element::AddElement(const std::string &_name)
   return ElementPtr();
 }
 
+/////////////////////////////////////////////////
 bool Element::GetValueBool(const std::string &_key)
 {
   bool result = false;
@@ -521,6 +583,7 @@ bool Element::GetValueBool(const std::string &_key)
   return result;
 }
 
+/////////////////////////////////////////////////
 int Element::GetValueInt(const std::string &_key)
 {
   int result = 0;
@@ -536,6 +599,8 @@ int Element::GetValueInt(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 float Element::GetValueFloat(const std::string &_key)
 {
   float result = 0.0;
@@ -551,6 +616,8 @@ float Element::GetValueFloat(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 double Element::GetValueDouble(const std::string &_key)
 {
   double result = 0.0;
@@ -571,6 +638,8 @@ double Element::GetValueDouble(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 unsigned int Element::GetValueUInt(const std::string &_key)
 {
   unsigned int result = 0;
@@ -591,6 +660,8 @@ unsigned int Element::GetValueUInt(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 char Element::GetValueChar(const std::string &_key)
 {
   char result = '\0';
@@ -611,6 +682,8 @@ char Element::GetValueChar(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 std::string Element::GetValueString(const std::string &_key)
 {
   std::string result = "";
@@ -626,6 +699,8 @@ std::string Element::GetValueString(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
 {
   gazebo::math::Vector3 result;
@@ -641,6 +716,8 @@ gazebo::math::Vector3 Element::GetValueVector3(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
 {
   gazebo::math::Quaternion result;
@@ -657,6 +734,7 @@ gazebo::math::Quaternion Element::GetValueQuaternion(const std::string &_key)
   return result;
 }
 
+/////////////////////////////////////////////////
 gazebo::math::Pose Element::GetValuePose(const std::string &_key)
 {
   gazebo::math::Pose result;
@@ -673,6 +751,7 @@ gazebo::math::Pose Element::GetValuePose(const std::string &_key)
   return result;
 }
 
+/////////////////////////////////////////////////
 gazebo::common::Color Element::GetValueColor(const std::string &_key)
 {
   gazebo::common::Color result;
@@ -688,11 +767,14 @@ gazebo::common::Color Element::GetValueColor(const std::string &_key)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
 void Element::ClearElements()
 {
   this->elements.clear();
 }
 
+/////////////////////////////////////////////////
 void Element::Update()
 {
   for (sdf::Param_V::iterator iter = this->attributes.begin();
@@ -708,6 +790,7 @@ void Element::Update()
   }
 }
 
+/////////////////////////////////////////////////
 void Element::Reset()
 {
   this->parent.reset();
@@ -731,8 +814,11 @@ void Element::Reset()
   this->value.reset();
 }
 
-
-
+/////////////////////////////////////////////////
+void Element::AddElementDescription(ElementPtr _elem)
+{
+  this->elementDescriptions.push_back(_elem);
+}
 
 
 

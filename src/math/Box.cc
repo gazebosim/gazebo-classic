@@ -15,7 +15,6 @@
  *
 */
 #include <math.h>
-#include <float.h>
 #include "math/Box.hh"
 
 using namespace gazebo;
@@ -24,8 +23,8 @@ using namespace math;
 //////////////////////////////////////////////////
 Box::Box()
 {
-  this->min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  this->max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+  this->min.Set(0, 0, 0);
+  this->max.Set(0, 0, 0);
 }
 
 
@@ -117,4 +116,8 @@ const Box &Box::operator+=(const Box &b)
   return *this;
 }
 
-
+//////////////////////////////////////////////////
+bool Box::operator==(const Box &_b)
+{
+  return this->min == _b.min && this->max == _b.max;
+}

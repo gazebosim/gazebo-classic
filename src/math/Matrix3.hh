@@ -17,6 +17,8 @@
 #ifndef MATRIX3_HH
 #define MATRIX3_HH
 
+#include <assert.h>
+
 #include "math/Vector3.hh"
 
 namespace gazebo
@@ -68,6 +70,24 @@ namespace gazebo
       /// \param _c The colum index (0, 1, 2)
       /// \param _v The value to set in each row of the column
       public: void SetCol(unsigned int _c, const Vector3 &_v);
+
+      /// \brief Equality test operatoer
+      /// \param _m Matrix3 to test
+      /// \return True if equal 
+      public: bool operator==(const Matrix3 &_m) const;
+              
+      public: inline const double *operator[](size_t _row) const
+              { 
+                assert(_row < 3);
+                return this->m[_row];
+              }
+
+      public: inline double *operator[](size_t _row)
+              {
+                assert(_row < 3);
+                return this->m[_row];
+              }
+
 
       /// \brief Output operator
       /// \param _out Output stream

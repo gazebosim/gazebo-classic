@@ -58,6 +58,7 @@ set (msgs axis.proto
           gui_camera.proto
           gui.proto
           track_visual.proto
+          test.proto
 )
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)

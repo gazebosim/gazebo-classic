@@ -165,6 +165,7 @@ namespace gazebo
     /// \return The new msgs::TrackVisual object
     msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf);
 
+
     /// \brief Create a msgs::GUI from a GUI SDF element
     /// \param _sdf The sdf element
     /// \return The new msgs::GUI object

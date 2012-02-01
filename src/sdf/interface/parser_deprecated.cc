@@ -81,7 +81,7 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
       if (!value.empty())
         element->AddValue("string", value, "1");
 
-      _sdf->elements.push_back(element);
+      _sdf->InsertElement(element);
     }
     else
     {
