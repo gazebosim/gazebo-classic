@@ -3,6 +3,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
   ${tinyxml_include_dirs}
   ${XML_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 link_directories(${tinyxml_library_dirs})

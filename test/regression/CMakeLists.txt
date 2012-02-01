@@ -5,6 +5,7 @@ include_directories (
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 link_directories(  
