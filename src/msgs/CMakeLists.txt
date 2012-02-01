@@ -61,13 +61,13 @@ set (msgs axis.proto
           test.proto
 )
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${PROTOBUF_INCLUDE_DIR})
+
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
 
 set (sources msgs.cc)
 set (headers msgs.h)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(PROTO_SRCS)
 set(PROTO_HDRS)

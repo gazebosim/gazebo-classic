@@ -1,3 +1,7 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+include_directories(${PROTOBUF_INCLUDE_DIR})
+
 set (sources Sensors.cc
              Sensor.cc
              SensorFactory.cc

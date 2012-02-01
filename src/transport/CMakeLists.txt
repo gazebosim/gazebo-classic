@@ -1,3 +1,7 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+include_directories(${PROTOBUF_INCLUDE_DIR})
+
 set (sources TopicManager.cc
              Subscriber.cc
              Publisher.cc

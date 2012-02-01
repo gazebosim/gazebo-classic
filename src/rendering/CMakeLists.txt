@@ -7,6 +7,7 @@ include_directories(SYSTEM
   ${CEGUI_INCLUDE_DIRS}
   ${CEGUI_OGRE_include_dirs}
   ${CEGUI_OGRE_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 set (sources MovableText.cc

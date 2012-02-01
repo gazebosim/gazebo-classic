@@ -5,6 +5,7 @@ include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
   ${tinyxml_include_dirs}
+  ${PROTOBUF_INCLUDE_DIR}
 )
 
 include_directories(
