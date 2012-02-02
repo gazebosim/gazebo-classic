@@ -89,6 +89,7 @@ TEST_F(MathTest, Vector4)
   EXPECT_TRUE(math::equal(v.Distance(math::Vector4(0, 0, 0, 0)), 5.4772, 1e-3));
 }
 
+/////////////////////////////////////////////////
 TEST_F(MathTest, Quaternion)
 {
   {
@@ -135,6 +136,17 @@ TEST_F(MathTest, Quaternion)
 
   EXPECT_TRUE(q.GetExp() ==
       math::Quaternion(0.545456, -0.588972, 0.093284, 0.588972));
+
+  q1 = q;
+  q1.w = 2.0;
+  EXPECT_TRUE(q1.GetLog() ==
+      math::Quaternion(0, -0.698401, 0.110616, 0.698401));
+
+  q1.x = 0.000000001;
+  q1.y = 0.0;
+  q1.z = 0.0;
+  q1.w = 0.0;
+  EXPECT_TRUE(q1.GetExp() == math::Quaternion(1, 0, 0, 0));
 
   q.Invert();
   EXPECT_TRUE(q == math::Quaternion(0.110616, 0.698401, -0.110616, -0.698401));
@@ -219,6 +231,24 @@ TEST_F(MathTest, Quaternion)
   EXPECT_TRUE(math::equal(2.76, q.y));
   EXPECT_TRUE(math::equal(4.01, q.z));
   EXPECT_TRUE(math::equal(7.68, q.w));
+
+  q.x = q.y = q.z = q.w = 0.0;
+  q.Normalize();
+  EXPECT_TRUE(q == math::Quaternion());
+
+  q.SetFromAxis(0, 0, 0, 0);
+  EXPECT_TRUE(q == math::Quaternion());
+ 
+  EXPECT_TRUE(math::Quaternion::EulerToQuaternion(0.1,0.2,0.3) ==
+      math::Quaternion(0.983347, 0.0342708, 0.106021, 0.143572));
+
+  q.x = q.y = q.z = q.w = 0.0;
+  q.GetAsAxis(axis, angle);
+  EXPECT_TRUE(axis == math::Vector3(1, 0, 0));
+  EXPECT_TRUE(math::equal(angle, 0, 1e-3));
+
+
+  //std::cout << "Exp[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
 }
 
 TEST_F(MathTest, Pose)

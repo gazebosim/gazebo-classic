@@ -127,7 +127,6 @@ TEST_F(TransportTest, Processes)
     int i = 0;
     while (!g_worldStatsMsg2 && i < 20)
     {
-      std::cout << "Waiting for message\n";
       usleep(1000000);
       ++i;
     }
