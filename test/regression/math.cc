@@ -87,6 +87,441 @@ TEST_F(MathTest, Vector4)
   EXPECT_TRUE(v == v1);
 
   EXPECT_TRUE(math::equal(v.Distance(math::Vector4(0, 0, 0, 0)), 5.4772, 1e-3));
+
+  // ::GetLength()
+  v.Set(1, 2, 3, 4);
+  EXPECT_TRUE(math::equal(v.GetLength(), 5.4772, 1e-3));
+
+  // ::GetSquaredLength()
+  EXPECT_TRUE(math::equal(v.GetSquaredLength(), 30));
+
+  // ::Normalize
+  v.Normalize();
+  EXPECT_TRUE(v == math::Vector4(0.182574, 0.365148, 0.547723, 0.730297));
+
+  // ::Set
+  v.Set(2, 4, 6, 8);
+  EXPECT_TRUE(v == math::Vector4(2, 4, 6, 8));
+
+  // ::operator= vector4
+  v = v1;
+  EXPECT_TRUE(v == v1);
+
+  // ::operator= double
+  v = 1.2;
+  EXPECT_TRUE(v == math::Vector4(1.2, 1.2, 1.2, 1.2));
+
+  // ::operator+ vector4
+  v = v + math::Vector4(1, 2, 3, 4);
+  EXPECT_TRUE(v == math::Vector4(2.2, 3.2, 4.2, 5.2));
+
+  // ::operator+=
+  v += v;
+  EXPECT_TRUE(v == math::Vector4(4.4, 6.4, 8.4, 10.4));
+
+  // ::operator- vector4
+  v = v - math::Vector4(1, 1, 1, 1);
+  EXPECT_TRUE(v == math::Vector4(3.4, 5.4, 7.4, 9.4));
+
+  // ::operator-= vector4
+  v -= math::Vector4(1, 1, 1, 1);
+  EXPECT_TRUE(v == math::Vector4(2.4, 4.4, 6.4, 8.4));
+
+
+  // ::operator/ vector4
+  v = v / math::Vector4(.1, .1, .1, .1);
+  EXPECT_TRUE(v == math::Vector4(24, 44, 64, 84));
+
+  // ::operator/ double
+  v = v / 2.0;
+  EXPECT_TRUE(v == math::Vector4(12, 22, 32, 42));
+
+  // ::operator/= vector4
+  v /= math::Vector4(4, 4, 4, 4);
+  EXPECT_TRUE(v == math::Vector4(3, 5.5, 8, 10.5));
+
+  // ::operator/= double
+  v /= .1;
+  EXPECT_TRUE(v == math::Vector4(30, 55, 80, 105));
+
+  // ::operator * matrix4
+  v = v * math::Matrix4(1, 2, 3, 4,
+                        5, 6, 7, 8,
+                        9, 10, 11, 12,
+                        13, 14, 15, 16);
+  EXPECT_TRUE(v == math::Vector4(2390, 2660, 2930, 3200));
+
+
+  // ::operator * vector4
+  v = v * math::Vector4(.2, .3, .4, .5);
+  EXPECT_TRUE(v == math::Vector4(478, 798, 1172, 1600));
+
+  // ::operator *= vector4
+  v *= math::Vector4(2, 4, 6, 8);
+  EXPECT_TRUE(v == math::Vector4(956, 3192, 7032, 12800));
+
+  // ::operator * double
+  v = v * 5.2;
+  EXPECT_TRUE(v == math::Vector4(4971.2, 16598.4, 36566.4, 66560));
+
+  // ::operator *= double
+  v *= 10.0;
+  EXPECT_TRUE(v == math::Vector4(49712, 1.65984e+05, 3.65664e+05, 6.656e+05));
+
+  // ::operator != vector4
+  EXPECT_TRUE(v != math::Vector4());
+
+  // ::IsFinite
+  EXPECT_TRUE(v.IsFinite());
+
+  // ::operator[]
+  v.Set(1, 2, 3, 4);
+  EXPECT_EQ(v[0], 1);
+  EXPECT_EQ(v[1], 2);
+  EXPECT_EQ(v[2], 3);
+  EXPECT_EQ(v[3], 4);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MathTest, Vector3)
+{
+  math::Vector3 v;
+
+  // ::Distance, ::GetLEngth()
+  v.Set(1, 2, 3);
+  EXPECT_TRUE(v.GetLength() == v.Distance(math::Vector3(0, 0, 0)));
+
+  // ::GetRound
+  v.Set(1.23, 2.34, 3.55);
+  EXPECT_TRUE(v.GetRounded() == math::Vector3(1, 2, 4));
+
+  // ::Round
+  v.Round();
+  EXPECT_TRUE(v.Round() == math::Vector3(1, 2, 4));
+
+  // ::GetDotProd
+  EXPECT_TRUE(math::equal(17, v.GetDotProd(math::Vector3(1, 2, 3)), 1e-2));
+
+  // ::GetDistToPlane
+  v.Set(0, 0, 1);
+  EXPECT_EQ(1, v.GetDistToPlane(math::Vector3(0, 0, -1),
+                                math::Vector3(0, 0, 1), 0));
+
+  // ::GetDistToLine
+  EXPECT_TRUE(math::equal(0.816497, v.GetDistToLine(math::Vector3(-1, -1, -1),
+          math::Vector3(1, 1, 1)), 1e-3));
+
+  // ::operator= double
+  v = 4.0;
+  EXPECT_TRUE(v == math::Vector3(4, 4, 4));
+
+  // ::operator/ vector3
+  v = v / math::Vector3(1, 2, 4);
+  EXPECT_TRUE(v == math::Vector3(4, 2, 1));
+
+  // ::operator / double
+  v = v / 2;
+  EXPECT_TRUE(v == math::Vector3(2, 1, .5));
+
+  // ::operator * vector3
+  v = v * math::Vector3(2, 3, 4);
+  EXPECT_TRUE(v == math::Vector3(4, 3, 2));
+
+  // ::operator[]
+  EXPECT_EQ(v[0], 4);
+  EXPECT_EQ(v[1], 3);
+  EXPECT_EQ(v[2], 2);
+
+  v.Set(1.23, 2.35, 3.654321);
+  v.Round(1);
+  EXPECT_TRUE(v == math::Vector3(1.2, 2.4, 3.7));
+
+  // operator GetAbs
+  v.Set(-1, -2, -3);
+  EXPECT_TRUE(v.GetAbs() == math::Vector3(1, 2, 3));
+
+  // operator /=
+  v.Set(1, 2, 4);
+  v /= math::Vector3(1, 4, 4);
+  EXPECT_TRUE(v == math::Vector3(1, .5, 1));
+
+  // operator *=
+  v.Set(1, 2, 4);
+  v *= math::Vector3(2, .5, .1);
+  EXPECT_TRUE(v.Equal(math::Vector3(2, 1, .4)));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MathTest, Vector2i)
+{
+  {
+    math::Vector2i v;
+    EXPECT_EQ(0, v.x);
+    EXPECT_EQ(0, v.y);
+  }
+
+  // Constructor
+  math::Vector2i v(1, 2);
+  EXPECT_EQ(1, v.x);
+  EXPECT_EQ(2, v.y);
+
+  // ::Distance
+  EXPECT_EQ(2, v.Distance(math::Vector2i(0, 0)));
+
+  // ::Normalize
+  v.Normalize();
+  EXPECT_TRUE(v == math::Vector2i(0, 1));
+
+  // ::Set
+  v.Set(4, 5);
+  EXPECT_TRUE(v == math::Vector2i(4, 5));
+
+  // ::operator=
+  v = math::Vector2i(6, 7);
+  EXPECT_TRUE(v == math::Vector2i(6, 7));
+
+  // ::operator= int
+  v = 5;
+  EXPECT_TRUE(v == math::Vector2i(5, 5));
+
+  // ::operator+
+  v = v + math::Vector2i(1, 2);
+  EXPECT_TRUE(v == math::Vector2i(6, 7));
+
+  // ::operator +=
+  v += math::Vector2i(5, 6);
+  EXPECT_TRUE(v == math::Vector2i(11, 13));
+
+  // ::operator -
+  v = v - math::Vector2i(2, 4);
+  EXPECT_TRUE(v == math::Vector2i(9, 9));
+
+  // ::operator -=
+  v.Set(2, 4);
+  v -= math::Vector2i(1, 6);
+  EXPECT_TRUE(v == math::Vector2i(1, -2));
+
+  // ::operator /
+  v.Set(10, 6);
+  v = v / math::Vector2i(2, 3);
+  EXPECT_TRUE(v == math::Vector2i(5, 2));
+
+  // ::operator /=
+  v.Set(10, 6);
+  v /= math::Vector2i(2, 3);
+  EXPECT_TRUE(v == math::Vector2i(5, 2));
+
+  // ::operator / int
+  v.Set(10, 6);
+  v = v / 2;
+  EXPECT_TRUE(v == math::Vector2i(5, 3));
+
+  // ::operator /= int
+  v.Set(10, 6);
+  v /= 2;
+  EXPECT_TRUE(v == math::Vector2i(5, 3));
+
+  // ::operator * int
+  v.Set(10, 6);
+  v = v * 2;
+  EXPECT_TRUE(v == math::Vector2i(20, 12));
+
+  // ::operator * int
+  v.Set(10, 6);
+  v *= 2;
+  EXPECT_TRUE(v == math::Vector2i(20, 12));
+
+  // ::operator * vector2i
+  v.Set(10, 6);
+  v = v * math::Vector2i(2, 4);
+  EXPECT_TRUE(v == math::Vector2i(20, 24));
+
+  // ::operator *= vector2i
+  v.Set(10, 6);
+  v *= math::Vector2i(2, 4);
+  EXPECT_TRUE(v == math::Vector2i(20, 24));
+
+
+  // ::IsFinite
+  EXPECT_TRUE(v.IsFinite());
+
+  // ::operator[]
+  v.Set(6, 7);
+  EXPECT_EQ(6, v[0]);
+  EXPECT_EQ(7, v[1]);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MathTest, Vector2d)
+{
+  {
+    math::Vector2d v;
+    EXPECT_EQ(0, v.x);
+    EXPECT_EQ(0, v.y);
+  }
+
+  // Constructor
+  math::Vector2d v(1, 2);
+  EXPECT_EQ(1, v.x);
+  EXPECT_EQ(2, v.y);
+
+  // ::Distance
+  EXPECT_TRUE(math::equal(2.236, v.Distance(math::Vector2d(0, 0)), 1e-2));
+
+  // ::Normalize
+  v.Normalize();
+  EXPECT_TRUE(v == math::Vector2d(0.447214, 0.894427));
+
+  // ::Set
+  v.Set(4, 5);
+  EXPECT_TRUE(v == math::Vector2d(4, 5));
+
+  // ::operator=
+  v = math::Vector2d(6, 7);
+  EXPECT_TRUE(v == math::Vector2d(6, 7));
+
+  // ::operator= int
+  v = 5;
+  EXPECT_TRUE(v == math::Vector2d(5, 5));
+
+  // ::operator+
+  v = v + math::Vector2d(1, 2);
+  EXPECT_TRUE(v == math::Vector2d(6, 7));
+
+  // ::operator +=
+  v += math::Vector2d(5, 6);
+  EXPECT_TRUE(v == math::Vector2d(11, 13));
+
+  // ::operator -
+  v = v - math::Vector2d(2, 4);
+  EXPECT_TRUE(v == math::Vector2d(9, 9));
+
+  // ::operator -=
+  v.Set(2, 4);
+  v -= math::Vector2d(1, 6);
+  EXPECT_TRUE(v == math::Vector2d(1, -2));
+
+  // ::operator /
+  v.Set(10, 6);
+  v = v / math::Vector2d(2, 3);
+  EXPECT_TRUE(v == math::Vector2d(5, 2));
+
+  // ::operator /=
+  v.Set(10, 6);
+  v /= math::Vector2d(2, 3);
+  EXPECT_TRUE(v == math::Vector2d(5, 2));
+
+  // ::operator / int
+  v.Set(10, 6);
+  v = v / 2;
+  EXPECT_TRUE(v == math::Vector2d(5, 3));
+
+  // ::operator /= int
+  v.Set(10, 6);
+  v /= 2;
+  EXPECT_TRUE(v == math::Vector2d(5, 3));
+
+  // ::operator * int
+  v.Set(10, 6);
+  v = v * 2;
+  EXPECT_TRUE(v == math::Vector2d(20, 12));
+
+  // ::operator *= int
+  v.Set(10, 6);
+  v *= 2;
+  EXPECT_TRUE(v == math::Vector2d(20, 12));
+
+  // ::operator * vector2i
+  v.Set(10, 6);
+  v = v * math::Vector2d(2, 4);
+  EXPECT_TRUE(v == math::Vector2d(20, 24));
+
+  // ::operator *= vector2i
+  v.Set(10, 6);
+  v *= math::Vector2d(2, 4);
+  EXPECT_TRUE(v == math::Vector2d(20, 24));
+
+
+  // ::IsFinite
+  EXPECT_TRUE(v.IsFinite());
+
+  // ::operator[]
+  v.Set(6, 7);
+  EXPECT_EQ(6, v[0]);
+  EXPECT_EQ(7, v[1]);
+}
+
+/////////////////////////////////////////////////
+TEST_F(MathTest, Spline)
+{
+  math::Spline s;
+
+  s.AddPoint(math::Vector3(0, 0, 0));
+  EXPECT_EQ(1, s.GetNumPoints());
+
+  s.Clear();
+  EXPECT_EQ(0, s.GetNumPoints());
+
+  s.AddPoint(math::Vector3(0, 0, 0));
+  EXPECT_TRUE(s.GetPoint(0) == math::Vector3(0, 0, 0));
+  s.AddPoint(math::Vector3(1, 1, 1));
+  EXPECT_TRUE(s.GetPoint(1) == math::Vector3(1, 1, 1));
+
+  // ::UpdatePoint
+  s.UpdatePoint(1, math::Vector3(2, 2, 2));
+  s.SetAutoCalculate(false);
+  s.UpdatePoint(0, math::Vector3(-1, -1, -1));
+  s.SetAutoCalculate(true);
+
+  // ::Interpolate
+  EXPECT_TRUE(s.Interpolate(0.5) == math::Vector3(0.5, 0.5, 0.5));
+
+  // ::Interpolate
+  s.AddPoint(math::Vector3(4, 4, 4));
+  EXPECT_TRUE(s.Interpolate(1, 0.2) == math::Vector3(2.496, 2.496, 2.496));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MathTest, RotationSpline)
+{
+  math::RotationSpline s;
+
+  s.AddPoint(math::Quaternion(0, 0, 0));
+  EXPECT_EQ(1, s.GetNumPoints());
+
+  s.Clear();
+  EXPECT_EQ(0, s.GetNumPoints());
+
+  s.AddPoint(math::Quaternion(0, 0, 0));
+  EXPECT_TRUE(s.GetPoint(0) == math::Quaternion(0, 0, 0));
+  s.AddPoint(math::Quaternion(.1, .1, .1));
+  EXPECT_TRUE(s.GetPoint(1) == math::Quaternion(.1, .1, .1));
+
+  // ::UpdatePoint
+  s.UpdatePoint(1, math::Quaternion(.2, .2, .2));
+  s.SetAutoCalculate(false);
+  s.UpdatePoint(0, math::Vector3(-.1, -.1, -.1));
+  s.SetAutoCalculate(true);
+
+  // ::Interpolate
+  EXPECT_TRUE(s.Interpolate(0.5) ==
+      math::Quaternion(0.998089, 0.0315333, 0.0427683, 0.0315333));
+
+  // ::Interpolate
+  s.AddPoint(math::Quaternion(.4, .4, .4));
+  EXPECT_TRUE(s.Interpolate(1, 0.2) ==
+      math::Quaternion(0.978787, 0.107618, 0.137159, 0.107618));
+}
+
+/////////////////////////////////////////////////
+TEST_F(MathTest, Helpers)
+{
+  EXPECT_EQ(12345, math::parseInt("12345"));
+  EXPECT_EQ(-12345, math::parseInt("-12345"));
+
+  EXPECT_EQ(12.345, math::parseFloat("12.345"));
+  EXPECT_EQ(-12.345, math::parseFloat("-12.345"));
+  EXPECT_TRUE(math::equal(123.45, math::parseFloat("1.2345e2"), 1e-2));
 }
 
 /////////////////////////////////////////////////
@@ -238,17 +673,14 @@ TEST_F(MathTest, Quaternion)
 
   q.SetFromAxis(0, 0, 0, 0);
   EXPECT_TRUE(q == math::Quaternion());
- 
-  EXPECT_TRUE(math::Quaternion::EulerToQuaternion(0.1,0.2,0.3) ==
+
+  EXPECT_TRUE(math::Quaternion::EulerToQuaternion(0.1, 0.2, 0.3) ==
       math::Quaternion(0.983347, 0.0342708, 0.106021, 0.143572));
 
   q.x = q.y = q.z = q.w = 0.0;
   q.GetAsAxis(axis, angle);
   EXPECT_TRUE(axis == math::Vector3(1, 0, 0));
   EXPECT_TRUE(math::equal(angle, 0, 1e-3));
-
-
-  //std::cout << "Exp[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
 }
 
 TEST_F(MathTest, Pose)
@@ -284,7 +716,7 @@ TEST_F(MathTest, Pose)
   EXPECT_TRUE(pose ==
       math::Pose(11.314, 16.0487, 15.2559, 1.49463, 0.184295, 2.13932));
 
-  pose -= pose;
+  pose -= math::Pose(pose);
   EXPECT_TRUE(pose ==
       math::Pose(0, 0, 0, 0, 0, 0));
 
