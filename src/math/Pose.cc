@@ -38,6 +38,13 @@ Pose::Pose(const Vector3 &_pos, const Quaternion &_rot)
 }
 
 //////////////////////////////////////////////////
+Pose::Pose(double _x, double _y, double _z,
+           double _roll, double _pitch, double _yaw)
+: pos(_x, _y, _z), rot(_roll, _pitch, _yaw)
+{
+}
+
+//////////////////////////////////////////////////
 Pose::Pose(const Pose &_pose)
   : pos(_pose.pos), rot(_pose.rot)
 {

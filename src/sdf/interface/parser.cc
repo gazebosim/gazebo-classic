@@ -361,7 +361,7 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf)
     {
       elemXml = gazeboNode->FirstChildElement(_sdf->GetName());
     }
-      
+
     /* parse new sdf xml */
     if (!readXml(elemXml, _sdf))
     {

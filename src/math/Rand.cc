@@ -35,16 +35,6 @@ using namespace math;
 GeneratorType *Rand::randGenerator = new GeneratorType(getpid());
 
 //////////////////////////////////////////////////
-Rand::Rand()
-{
-}
-
-//////////////////////////////////////////////////
-Rand::~Rand()
-{
-}
-
-//////////////////////////////////////////////////
 double Rand::GetDblUniform(double _min, double _max)
 {
   URealGen gen(*randGenerator, UniformRealDist(_min, _max));

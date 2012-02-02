@@ -25,7 +25,6 @@
 using namespace gazebo;
 using namespace math;
 
-
 //////////////////////////////////////////////////
 Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0)
@@ -383,13 +382,6 @@ Quaternion Quaternion::operator*=(const Quaternion &qt)
 //////////////////////////////////////////////////
 Vector3 Quaternion::operator*(const Vector3 &v) const
 {
-/*  Quaternion tmp(0.0, v.x, v.y, v.z);
-
-  tmp = (*this) * (tmp * this->GetInverse());
-
-  return Vector3(tmp.x, tmp.y, tmp.z);
-  */
-
   Vector3 uv, uuv;
   Vector3 qvec(this->x, this->y, this->z);
   uv = qvec.GetCrossProd(v);
@@ -434,6 +426,7 @@ bool Quaternion::IsFinite() const
          finite(this->z);
 }
 
+//////////////////////////////////////////////////
 Vector3 Quaternion::GetXAxis() const
 {
   double fTy  = 2.0f*this->y;
@@ -449,6 +442,7 @@ Vector3 Quaternion::GetXAxis() const
   return Vector3(1.0f-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
 }
 
+//////////////////////////////////////////////////
 Vector3 Quaternion::GetYAxis() const
 {
   double fTx  = 2.0f*this->x;
@@ -464,6 +458,7 @@ Vector3 Quaternion::GetYAxis() const
   return Vector3(fTxy-fTwz, 1.0f-(fTxx+fTzz), fTyz+fTwx);
 }
 
+//////////////////////////////////////////////////
 Vector3 Quaternion::GetZAxis() const
 {
   double fTx  = 2.0f*this->x;
@@ -536,7 +531,7 @@ void Quaternion::Round(int _precision)
   this->w = precision(this->w, _precision);
 }
 
-/// Dot product
+//////////////////////////////////////////////////
 double Quaternion::Dot(const Quaternion &_q) const
 {
   return this->w*_q.w + this->x * _q.x + this->y*_q.y + this->z*_q.z;
@@ -546,7 +541,7 @@ double Quaternion::Dot(const Quaternion &_q) const
 //////////////////////////////////////////////////
 Quaternion Quaternion::Squad(double _fT, const Quaternion &_rkP,
     const Quaternion &_rkA, const Quaternion &_rkB,
-    Quaternion &_rkQ, bool _shortestPath)
+    const Quaternion &_rkQ, bool _shortestPath)
 {
   double fSlerpT = 2.0f*_fT*(1.0f-_fT);
   Quaternion kSlerpP = Slerp(_fT, _rkP, _rkQ, _shortestPath);
@@ -554,6 +549,7 @@ Quaternion Quaternion::Squad(double _fT, const Quaternion &_rkP,
   return Slerp(fSlerpT, kSlerpP, kSlerpQ);
 }
 
+//////////////////////////////////////////////////
 Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     const Quaternion &_rkQ, bool _shortestPath)
 {
@@ -595,5 +591,3 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
     return t;
   }
 }
-
-

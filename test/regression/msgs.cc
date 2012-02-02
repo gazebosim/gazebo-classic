@@ -30,7 +30,7 @@ TEST_F(MsgsTest, Misc)
     common::Time t = common::Time::GetWallTime();
 
     msgs::Test msg, msg2;
-    msgs::Init(msg,"_test_");
+    msgs::Init(msg, "_test_");
     msgs::Init(msg2);
 
     EXPECT_TRUE(msg.header().has_stamp());
@@ -55,13 +55,13 @@ TEST_F(MsgsTest, Misc)
     msgs::Request *request = msgs::CreateRequest("help", "me");
     EXPECT_STREQ("help", request->request().c_str());
     EXPECT_STREQ("me", request->data().c_str());
-    EXPECT_TRUE(request->id() > 0);
+    EXPECT_GT(request->id(), 0);
   }
 
   {
     common::Time t = common::Time::GetWallTime();
     msgs::Time msg;
-    msgs::Stamp(&msg); 
+    msgs::Stamp(&msg);
     EXPECT_EQ(t.sec, msg.sec());
     EXPECT_TRUE(t.nsec <= msg.nsec());
   }
@@ -92,7 +92,6 @@ TEST_F(MsgsTest, Misc)
     msgs::String msg;
     EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
   }
-
 }
 
 TEST_F(MsgsTest, Convert)
@@ -115,17 +114,17 @@ TEST_F(MsgsTest, Convert)
     EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
     EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
     EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-    EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851 ));
+    EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
 
     math::Quaternion v = msgs::Convert(msg);
     EXPECT_TRUE(math::equal(v.x, -0.65328148243818818));
     EXPECT_TRUE(math::equal(v.y, 0.27059805007309856));
     EXPECT_TRUE(math::equal(v.z, 0.65328148243818829));
-    EXPECT_TRUE(math::equal(v.w, 0.27059805007309851 ));
+    EXPECT_TRUE(math::equal(v.w, 0.27059805007309851));
   }
 
   {
-    msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2,3),
+    msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
           math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
     EXPECT_EQ(1, msg.position().x());
@@ -135,7 +134,7 @@ TEST_F(MsgsTest, Convert)
     EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
     EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
     EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-    EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851 ));
+    EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
 
     math::Pose v = msgs::Convert(msg);
     EXPECT_EQ(1, v.pos.x);
@@ -145,7 +144,7 @@ TEST_F(MsgsTest, Convert)
     EXPECT_TRUE(math::equal(v.rot.x, -0.65328148243818818));
     EXPECT_TRUE(math::equal(v.rot.y, 0.27059805007309856));
     EXPECT_TRUE(math::equal(v.rot.z, 0.65328148243818829));
-    EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851 ));
+    EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851));
   }
 
   {
@@ -173,7 +172,7 @@ TEST_F(MsgsTest, Convert)
   }
 
   {
-    msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0,0,1),
+    msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
           math::Vector2d(123, 456), 1.0));
 
     EXPECT_EQ(0, msg.normal().x());
@@ -195,7 +194,6 @@ TEST_F(MsgsTest, Convert)
 
     EXPECT_TRUE(math::equal(1.0, v.d));
   }
-
 }
 
 TEST_F(MsgsTest, Set)
@@ -221,12 +219,12 @@ TEST_F(MsgsTest, Set)
     EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
     EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
     EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-    EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851 ));
+    EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
   }
 
   {
     msgs::Pose msg;
-    msgs::Set(&msg, math::Pose(math::Vector3(1, 2,3),
+    msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
           math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
     EXPECT_EQ(1, msg.position().x());
@@ -236,7 +234,7 @@ TEST_F(MsgsTest, Set)
     EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
     EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
     EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-    EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851 ));
+    EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
   }
 
   {
@@ -257,7 +255,7 @@ TEST_F(MsgsTest, Set)
 
   {
     msgs::PlaneGeom msg;
-    msgs::Set(&msg, math::Plane(math::Vector3(0,0,1),
+    msgs::Set(&msg, math::Plane(math::Vector3(0, 0, 1),
                                 math::Vector2d(123, 456), 1.0));
 
     EXPECT_EQ(0, msg.normal().x());
@@ -288,7 +286,7 @@ TEST_F(MsgsTest, SDF)
                <max_dist>1.0</max_dist>\
              </track_visual>\
            </camera>\
-         </gazebo>" ,sdf);
+         </gazebo>", sdf);
     msgs::GUI msg = msgs::GUIFromSDF(sdf);
   }
 
@@ -305,7 +303,7 @@ TEST_F(MsgsTest, SDF)
              <track_visual name='track'>\
              </track_visual>\
            </camera>\
-         </gazebo>" ,sdf);
+         </gazebo>", sdf);
     msgs::GUI msg = msgs::GUIFromSDF(sdf);
   }
 
@@ -319,7 +317,7 @@ TEST_F(MsgsTest, SDF)
            <gui fullscreen='true'>\
            <camera name='camera'>\
            </camera>\
-         </gazebo>" ,sdf);
+         </gazebo>", sdf);
     msgs::GUI msg = msgs::GUIFromSDF(sdf);
   }
   // GUI without camera
@@ -329,7 +327,7 @@ TEST_F(MsgsTest, SDF)
     sdf::readString(
         "<gazebo version='1.0'>\
            <gui fullscreen='true'>\
-         </gazebo>" ,sdf);
+         </gazebo>", sdf);
     msgs::GUI msg = msgs::GUIFromSDF(sdf);
   }
 

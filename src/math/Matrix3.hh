@@ -73,11 +73,11 @@ namespace gazebo
 
       /// \brief Equality test operatoer
       /// \param _m Matrix3 to test
-      /// \return True if equal 
+      /// \return True if equal
       public: bool operator==(const Matrix3 &_m) const;
-              
+
       public: inline const double *operator[](size_t _row) const
-              { 
+              {
                 assert(_row < 3);
                 return this->m[_row];
               }

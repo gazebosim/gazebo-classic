@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \brief Equality test operatoer
       /// \param _b Box to test
-      /// \return True if equal 
+      /// \return True if equal
       public: bool operator==(const Box &_b);
 
       /// \brief Output operator

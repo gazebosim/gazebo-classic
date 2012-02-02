@@ -42,12 +42,6 @@ namespace gazebo
     /// \brief Random number generator class
     class Rand
     {
-      /// \brief Constructor
-      private: Rand();
-
-      /// \brief Destructor
-      private: virtual ~Rand();
-
       /// \brief Get a double from a uniform distribution
       /// \param min Minimum bound for the random number
       /// \param max Maximum bound for the random number

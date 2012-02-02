@@ -44,6 +44,10 @@ namespace gazebo
       /// \param rot A rotation
       public: Pose(const Vector3 &_pos, const Quaternion &_rot);
 
+      /// \brief Constructor
+      public: Pose(double _x, double _y, double _z,
+                   double _roll, double _pitch, double _yaw);
+
       /// \brief Copy constructor
       /// \param pose Pose to copy
       public: Pose(const Pose &_pose);
