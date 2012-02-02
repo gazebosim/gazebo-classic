@@ -1,8 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include ( ${QT_USE_FILE} )
 
-include_directories(${PROTOBUF_INCLUDE_DIR})
-
 link_directories(  
   ${BOOST_LIBRARY_DIRS} 
 )

@@ -61,7 +61,7 @@ set (msgs axis.proto
           test.proto
 )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR} ${PROTOBUF_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)

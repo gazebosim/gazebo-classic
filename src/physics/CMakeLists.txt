@@ -1,8 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
-include_directories(${PROTOBUF_INCLUDE_DIR})
-
 set (sources Base.cc
              Link.cc
              LinkState.cc

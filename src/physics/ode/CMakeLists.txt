@@ -1,8 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM
-  ${CMAKE_SOURCE_DIR}/deps/opende/include
-  ${PROTOBUF_INCLUDE_DIR})
+  ${CMAKE_SOURCE_DIR}/deps/opende/include)
 
 set (sources ODEPhysics.cc
              ODECollision.cc
