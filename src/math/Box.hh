@@ -105,6 +105,9 @@ namespace gazebo
 
       /// \brief Maximum corner of the box
       public: Vector3 max;
+
+      private: enum Extent{EXTENT_NULL, EXTENT_FINITE};
+      private: Extent extent;
     };
     /// \}
   }

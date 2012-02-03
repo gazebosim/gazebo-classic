@@ -1155,6 +1155,7 @@ bool Camera::IsVisible(VisualPtr _visual)
   if (this->camera && _visual)
   {
     math::Box bbox = _visual->GetBoundingBox();
+    std::cout << "IsVisibleBox[" << bbox << "]\n";
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
     box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);

@@ -150,6 +150,9 @@ namespace gazebo
                                 boost::function<void()> _onComplete);
       public: void SetAnimation(const common::PoseAnimationPtr &_anim);
 
+      /// \brief Stop the current animation, if any
+      public: void StopAnimation();
+
       private: void PublishPose();
 
       /// \brief Get the parent model, if one exists

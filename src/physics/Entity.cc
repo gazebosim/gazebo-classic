@@ -202,6 +202,18 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
 }
 
 //////////////////////////////////////////////////
+void Entity::StopAnimation()
+{
+  this->animation.reset();
+  this->onAnimationComplete.clear();
+  if (this->animationConnection)
+  {
+    event::Events::DisconnectWorldUpdateStart(this->animationConnection);
+    this->animationConnection.reset();
+  }
+}
+
+//////////////////////////////////////////////////
 void Entity::PublishPose()
 {
   if (this->posePub && this->posePub->HasConnections())

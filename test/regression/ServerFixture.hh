@@ -404,6 +404,13 @@ class ServerFixture : public testing::Test
                  usleep(10000);
              }
 
+  protected: void SpawnModel(const std::string &_filename)
+             {
+               msgs::Factory msg;
+               msg.set_sdf_filename(_filename);
+               this->factoryPub->Publish(msg);
+             }
+
   protected: Server *server;
   protected: boost::thread *serverThread;
 
