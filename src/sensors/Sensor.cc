@@ -170,9 +170,9 @@ void Sensor::LoadPlugin(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetActive(bool value)
+void Sensor::SetActive(bool _value)
 {
-  this->active = value;
+  this->active = _value;
 }
 
 //////////////////////////////////////////////////
