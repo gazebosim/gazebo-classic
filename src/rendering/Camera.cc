@@ -314,11 +314,10 @@ void Camera::PostRender()
 
     // record render time stamp
 
-
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->GetValueBool("enabled"))
     {
-      this->SaveFrame();
+      this->SaveFrame(this->GetFrameFilename());
     }
 
     const unsigned char *buffer = this->saveFrameBuffer;
@@ -603,6 +602,7 @@ void Camera::EnableSaveFrame(bool enable)
 {
   sdf::ElementPtr elem = this->sdf->GetOrCreateElement("save");
   elem->GetAttribute("enabled")->Set(enable);
+  this->captureData = true;
 }
 
 //////////////////////////////////////////////////
@@ -732,7 +732,15 @@ std::string Camera::GetName() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SaveFrame()
+bool Camera::SaveFrame(const std::string &_filename)
+{
+  return Camera::SaveFrame(this->saveFrameBuffer, this->GetImageWidth(),
+                          this->GetImageHeight(), this->GetImageDepth(),
+                          this->GetImageFormat(), _filename);
+}
+
+//////////////////////////////////////////////////
+std::string Camera::GetFrameFilename()
 {
   sdf::ElementPtr saveElem = this->sdf->GetOrCreateElement("save");
 
@@ -766,21 +774,24 @@ void Camera::SaveFrame()
         "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
   }
 
-  this->SaveFrame(this->saveFrameBuffer,
-                  this->GetImageWidth(),
-                  this->GetImageHeight(),
-                  this->GetImageDepth(),
-                  this->GetImageFormat(), tmp);
-
   this->saveCount++;
   closedir(dir);
+  return tmp;
 }
 
-void Camera::SaveFrame(const unsigned char *_image,
+
+/////////////////////////////////////////////////
+bool Camera::SaveFrame(const unsigned char *_image,
                        unsigned int _width, unsigned int _height, int _depth,
                        const std::string &_format,
                        const std::string &_filename)
 {
+  if (!_image)
+  {
+    gzerr << "Can't save an empty image\n";
+    return false;
+  }
+
   Ogre::ImageCodec::ImageData *imgData;
   Ogre::Codec * pCodec;
   size_t size, pos;
@@ -812,6 +823,8 @@ void Camera::SaveFrame(const unsigned char *_image,
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
   pCodec->codeToFile(stream, filename, codecDataPtr);
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -963,9 +976,9 @@ void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetCaptureData(bool value)
+void Camera::SetCaptureData(bool _value)
 {
-  this->captureData = value;
+  this->captureData = _value;
 }
 
 //////////////////////////////////////////////////

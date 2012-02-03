@@ -203,6 +203,9 @@ namespace gazebo
       /// \brief Set the save frame pathname
       public: void SetSaveFramePathname(const std::string &pathname);
 
+      /// \brief Save the last frame to disk
+      public: bool SaveFrame(const std::string &_filename);
+
       /// \brief Get a pointer to the ogre camera
       public: Ogre::Camera *GetOgreCamera() const;
 
@@ -258,7 +261,7 @@ namespace gazebo
                                           math::Vector3 &dir);
 
       /// \brief Set whether to capture data
-      public: void SetCaptureData(bool value);
+      public: void SetCaptureData(bool _value);
 
       /// \brief Set the render target
       public: void CreateRenderTexture(const std::string &textureName);
@@ -294,7 +297,8 @@ namespace gazebo
               { return newImageFrame.Connect(subscriber); }
       public: void DisconnectNewImageFrame(event::ConnectionPtr &c)
               { newImageFrame.Disconnect(c); }
-      public: static void SaveFrame(const unsigned char *_image,
+
+      public: static bool SaveFrame(const unsigned char *_image,
                   unsigned int _width, unsigned int _height, int _depth,
                   const std::string &_format,
                   const std::string &_filename);
@@ -336,8 +340,8 @@ namespace gazebo
 
       private: static int GetOgrePixelFormat(const std::string &_format);
 
-      // Save the camera frame
-      protected: virtual void SaveFrame();
+      /// Get the next frame filename based on SDF parameters
+      protected: std::string GetFrameFilename();
 
       // Create the ogre camera
       private: void CreateCamera();
