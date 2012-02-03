@@ -199,20 +199,6 @@ unsigned int RenderEngine::GetSceneCount() const
 
 void RenderEngine::PreRender()
 {
-  /*if (this->removeScene)
-  {
-    std::cout << "REnderingEngin::RemoveScene\n";
-    this->RemoveScene(this->removeSceneName);
-    this->removeScene = false;
-    transport::pause_incoming(false);
-  }
-  else if (this->createScene)
-  {
-    this->CreateScene(this->createSceneName, true);
-    this->createScene = false;
-  }
-  */
-
   this->root->_fireFrameStarted();
 }
 
