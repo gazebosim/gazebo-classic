@@ -142,10 +142,12 @@ void CameraSensor::UpdateImpl(bool /*_force*/)
   }
 }
 
+//////////////////////////////////////////////////
 void CameraSensor::OnPose(ConstPosePtr &/*_msg*/)
 {
 }
 
+//////////////////////////////////////////////////
 unsigned int CameraSensor::GetImageWidth() const
 {
   if (this->camera)
@@ -153,6 +155,7 @@ unsigned int CameraSensor::GetImageWidth() const
   return 0;
 }
 
+//////////////////////////////////////////////////
 unsigned int CameraSensor::GetImageHeight() const
 {
   if (this->camera)
@@ -160,9 +163,15 @@ unsigned int CameraSensor::GetImageHeight() const
   return 0;
 }
 
+//////////////////////////////////////////////////
 const unsigned char *CameraSensor::GetImageData()
 {
   return this->camera->GetImageData(0);
 }
 
-
+//////////////////////////////////////////////////
+bool CameraSensor::SaveFrame(const std::string &_filename)
+{
+  this->SetActive(true);
+  return this->camera->SaveFrame(_filename);
+}

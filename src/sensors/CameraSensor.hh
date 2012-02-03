@@ -76,6 +76,8 @@ namespace gazebo
       public: unsigned int GetImageHeight() const;
       public: const unsigned char *GetImageData();
 
+      public: bool SaveFrame(const std::string &_filename);
+
       private: void OnPose(ConstPosePtr &_msg);
 
       private: rendering::CameraPtr camera;
@@ -86,5 +88,3 @@ namespace gazebo
   }
 }
 #endif
-
-
