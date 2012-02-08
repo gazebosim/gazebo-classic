@@ -82,11 +82,14 @@ set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH
 
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
+message (STATUS "\n\n====== Finding 3rd Party Packages ======")
+include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+message (STATUS "----------------------------------------\n")
+
 #####################################
 # Build type cflags
 set (CMAKE_C_FLAGS_ALL " -Wall -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -fPIC -pedantic" CACHE INTERNAL "General C Flags")
 
-include (${gazebo_cmake_dir}/FindSSE.cmake)
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
 endif()
@@ -159,11 +162,9 @@ else()
   set (BUILD_TYPE_DEBUG FALSE)
 endif()
 
-message (STATUS "\n\n====== Finding 3rd Party Packages ======")
-include (${gazebo_cmake_dir}/SearchForStuff.cmake)
+message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
 add_subdirectory(deps)
 message (STATUS "----------------------------------------\n")
-
 
 if ( build_warnings )
   message(STATUS "BUILD WARNINGS")
