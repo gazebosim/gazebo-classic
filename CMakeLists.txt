@@ -86,6 +86,7 @@ include (${gazebo_cmake_dir}/DissectVersion.cmake)
 # Build type cflags
 set (CMAKE_C_FLAGS_ALL " -Wall -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -fPIC -pedantic" CACHE INTERNAL "General C Flags")
 
+include (${gazebo_cmake_dir}/FindSSE.cmake)
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
 endif()
