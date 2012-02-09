@@ -27,8 +27,8 @@ TEST_F(PR2Test, Load)
   SpawnModel("models/pr2.model");
   while (!this->HasEntity("pr2"))
     usleep(10000);
-/*
-  sensors::SensorPtr sensor =
+
+  /*sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
   if (!sensor)
     printf("Invalid sensor\n");
@@ -38,7 +38,7 @@ TEST_F(PR2Test, Load)
   while (!camSensor->SaveFrame("/tmp/frame_10.png"))
     usleep(100000);
 
-  for (int i = 11; i < 60; i++)
+  for (int i = 11; i < 100; i++)
   {
     std::ostringstream filename;
     filename << "/tmp/frame_" << i << ".png";

@@ -25,8 +25,28 @@ class CommonTest : public ServerFixture
 
 TEST_F(CommonTest, PoseAnimation)
 {
-  common::PoseAnimation anim("pose_test", 10, false);
+  {
+    common::PoseAnimation anim("test", 1.0, true);
+    anim.SetTime(-0.5);
+    EXPECT_EQ(0.5, anim.GetTime());
+  }
+
+  {
+    common::PoseAnimation anim("test", 1.0, false);
+    anim.SetTime(-0.5);
+    EXPECT_EQ(0.0, anim.GetTime());
+
+    anim.SetTime(1.5);
+    EXPECT_EQ(1.0, anim.GetTime());
+  }
+
+
+  common::PoseAnimation anim("pose_test", 5.0, false);
   common::PoseKeyFrame *key = anim.CreateKeyFrame(0.0);
+
+  EXPECT_EQ(5.0, anim.GetLength());
+  anim.SetLength(10.0);
+  EXPECT_EQ(10.0, anim.GetLength());
 
   key->SetTranslation(math::Vector3(0, 0, 0));
   EXPECT_TRUE(key->GetTranslation() == math::Vector3(0, 0, 0));
@@ -47,9 +67,12 @@ TEST_F(CommonTest, PoseAnimation)
   anim.SetTime(4.0);
   EXPECT_EQ(4.0, anim.GetTime());
 
-  common::PoseKeyFrame interpolatedKey(0);
+  common::PoseKeyFrame interpolatedKey(-1.0);
   anim.GetInterpolatedKeyFrame(interpolatedKey);
-  std::cout << "Pose Int[" << interpolatedKey.GetTranslation() << "][" << interpolatedKey.GetRotation() << "]\n";
+  EXPECT_TRUE(interpolatedKey.GetTranslation() ==
+      math::Vector3(3.76, 7.52, 11.28));
+  EXPECT_TRUE(interpolatedKey.GetRotation() ==
+      math::Quaternion(0.0302776, 0.0785971, 0.109824));
 }
 
 TEST_F(CommonTest, NumericAnimation)
@@ -72,7 +95,64 @@ TEST_F(CommonTest, NumericAnimation)
 
   common::NumericKeyFrame interpolatedKey(0);
   anim.GetInterpolatedKeyFrame(interpolatedKey);
-  std::cout << "NUm interpolated[" << interpolatedKey.GetValue() << "]\n";
+  EXPECT_EQ(12, interpolatedKey.GetValue());
+}
+
+TEST_F(CommonTest, Color)
+{
+  common::Color clr(.1, .2, .3, 1.0);
+  EXPECT_EQ(0.1f, clr.R());
+  EXPECT_EQ(0.2f, clr.G());
+  EXPECT_EQ(0.3f, clr.B());
+  EXPECT_EQ(1.0f, clr.A());
+
+  clr.Reset();
+  EXPECT_EQ(0.0f, clr.R());
+  EXPECT_EQ(0.0f, clr.G());
+  EXPECT_EQ(0.0f, clr.B());
+  EXPECT_EQ(0.0f, clr.A());
+
+  clr.SetFromHSV(0, 0.5, 1.0);
+  EXPECT_EQ(1.0f, clr.R());
+  EXPECT_EQ(0.5f, clr.G());
+  EXPECT_EQ(0.5f, clr.B());
+  EXPECT_EQ(0.0f, clr.A());
+
+  EXPECT_TRUE(clr.GetAsHSV() == math::Vector3(6, 0.5, 1));
+
+  clr.SetFromYUV(0.5, 0.2, 0.8);
+  EXPECT_TRUE(math::equal(0.00553f, clr.R(), 1e-3f));
+  EXPECT_TRUE(math::equal(0.0f, clr.G()));
+  EXPECT_TRUE(math::equal(0.9064f, clr.B(), 1e-3f));
+  EXPECT_TRUE(math::equal(0.0f, clr.A()));
+
+  EXPECT_TRUE(clr.GetAsYUV() == math::Vector3(0.104985, 0.95227, 0.429305));
+
+  clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
+  EXPECT_TRUE(math::equal(0.00431373f, clr.R()));
+  EXPECT_TRUE(math::equal(0.3f, clr.G()));
+  EXPECT_TRUE(math::equal(0.9f, clr.B()));
+  EXPECT_TRUE(math::equal(2.0f, clr.A()));
+
+  clr = common::Color(1.0, 0.0, 0.5, 1.0) - common::Color(0.1, 0.3, 0.4, 1.0);
+  EXPECT_TRUE(math::equal(0.9f, clr.R()));
+  EXPECT_TRUE(math::equal(0.0f, clr.G()));
+  EXPECT_TRUE(math::equal(0.1f, clr.B()));
+  EXPECT_TRUE(math::equal(0.0f, clr.A()));
+
+  clr = common::Color(0.5, 0.2, 0.4, 0.6) / 2.0;
+  EXPECT_TRUE(math::equal(0.25f, clr.R()));
+  EXPECT_TRUE(math::equal(0.1f, clr.G()));
+  EXPECT_TRUE(math::equal(0.2f, clr.B()));
+  EXPECT_TRUE(math::equal(0.3f, clr.A()));
+}
+
+TEST_F(CommonTest, Timer)
+{
+  common::Timer timer;
+  timer.Start();
+  usleep(100000);
+  EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
 }
 
 int main(int argc, char **argv)
