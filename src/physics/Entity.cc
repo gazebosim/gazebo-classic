@@ -522,7 +522,7 @@ void Entity::UpdateAnimation()
   this->animation->GetInterpolatedKeyFrame(kf);
 
   math::Pose offset;
-  offset.pos = kf.GetTranslate();
+  offset.pos = kf.GetTranslation();
   offset.rot = kf.GetRotation();
 
   this->SetWorldPose(offset);

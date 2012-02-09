@@ -39,8 +39,8 @@ namespace gazebo
       public: PoseKeyFrame(double _time);
       public: virtual ~PoseKeyFrame();
 
-      public: void SetTranslate(const math::Vector3 &_trans);
-      public: const math::Vector3 &GetTranslate() const;
+      public: void SetTranslation(const math::Vector3 &_trans);
+      public: const math::Vector3 &GetTranslation() const;
 
       public: void SetRotation(const math::Quaternion &_rot);
       public: const math::Quaternion &GetRotation() const;

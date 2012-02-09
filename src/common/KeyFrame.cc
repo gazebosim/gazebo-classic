@@ -44,12 +44,12 @@ PoseKeyFrame::~PoseKeyFrame()
 {
 }
 
-void PoseKeyFrame::SetTranslate(const math::Vector3 &_trans)
+void PoseKeyFrame::SetTranslation(const math::Vector3 &_trans)
 {
   this->translate = _trans;
 }
 
-const math::Vector3 &PoseKeyFrame::GetTranslate() const
+const math::Vector3 &PoseKeyFrame::GetTranslation() const
 {
   return this->translate;
 }

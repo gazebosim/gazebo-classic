@@ -189,7 +189,7 @@ void PoseAnimation::BuildInterpolationSplines() const
       iter != this->keyFrames.end(); ++iter)
   {
     PoseKeyFrame *pkey = reinterpret_cast<PoseKeyFrame*>(*iter);
-    this->positionSpline->AddPoint(pkey->GetTranslate());
+    this->positionSpline->AddPoint(pkey->GetTranslation());
     this->rotationSpline->AddPoint(pkey->GetRotation());
   }
 
@@ -219,11 +219,11 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 
   if (math::equal(t, 0.0))
   {
-    _kf.SetTranslate(k1->GetTranslate());
+    _kf.SetTranslation(k1->GetTranslation());
   }
   else
   {
-    _kf.SetTranslate(this->positionSpline->Interpolate(firstKeyIndex, t));
+    _kf.SetTranslation(this->positionSpline->Interpolate(firstKeyIndex, t));
     _kf.SetRotation(this->rotationSpline->Interpolate(firstKeyIndex, t));
   }
 }
