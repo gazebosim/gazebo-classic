@@ -415,7 +415,8 @@ void Body::Init()
 
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
-  if (this->mass.GetAsDouble() > 0.0)
+  /// Disable CG visual if the model is static
+  if (!this->GetModel()->IsStatic() && this->mass.GetAsDouble() > 0.0)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
