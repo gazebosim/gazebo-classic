@@ -147,12 +147,76 @@ TEST_F(CommonTest, Color)
   EXPECT_TRUE(math::equal(0.3f, clr.A()));
 }
 
-TEST_F(CommonTest, Timer)
+TEST_F(CommonTest, Time)
 {
+  /*
   common::Timer timer;
   timer.Start();
   usleep(100000);
   EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL); 
+  common::Time time(tv);
+  EXPECT_EQ(time.sec, tv.tv_sec);
+  EXPECT_EQ(time.nsec, tv.tv_usec * 1000);
+
+  time.SetToWallTime();
+  EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0,1000000));
+
+  time = common::Time(1,1000) + common::Time(1.5, 1000000000);
+  EXPECT_TRUE(time == common::Time(3.5, 1000));
+
+  time.Set(1, 1000);
+  time += common::Time(1.5, 1000000000);
+  EXPECT_TRUE(time == common::Time(3.5, 1000));
+
+  tv.tv_sec = 2;
+  tv.tv_usec = 1000000;
+  time = common::Time(1,1000) + tv;
+  EXPECT_TRUE(time == common::Time(4.0, 1000));
+
+  time.Set(1, 1000);
+  time += tv;
+  EXPECT_TRUE(time == common::Time(4, 1000));
+
+  time = common::Time(1,1000) - tv;
+  EXPECT_TRUE(time == common::Time(-2, 1000));
+
+  time.Set(1, 1000);
+  time -= tv;
+  EXPECT_TRUE(time == common::Time(-2, 1000));
+
+  tv.tv_sec = 2;
+  tv.tv_usec = 1000;
+  time = common::Time(1, 1000) * tv;
+  std::cout << "T1[" << time.sec << ", " << time.nsec << "]\n";
+  EXPECT_TRUE(time == common::Time(3, 0));
+
+  time.Set(1, 1000);
+  time *= tv;
+  std::cout << "T2[" << time.sec << ", " << time.nsec << "]\n";
+  EXPECT_TRUE(time == common::Time(3, 0));
+
+  time.Set(1, 1000);
+  time = common::Time(1, 1000) * common::Time(2, 2);
+  EXPECT_TRUE(time == common::Time(2, 2000));
+
+
+  time = common::Time(1,2000000) / tv;
+  std::cout << "T3[" << time.sec << ", " << time.nsec << "][" << tv.tv_usec*1000 << "\n";
+  EXPECT_TRUE(time == common::Time(0, 1000));
+
+  time.Set(1, 2000000);
+  time /= tv;
+  std::cout << "T4[" << time.sec << ", " << time.nsec << "]\n";
+  EXPECT_TRUE(time == common::Time(0, 1000));
+
+  time.Set(1, 1000);
+  time = common::Time(1, 1000) / common::Time(2, 2);
+  std::cout << "T5[" << time.sec << ", " << time.nsec << "]\n";
+  EXPECT_TRUE(time == common::Time(.5, 500));
+  */
 }
 
 int main(int argc, char **argv)

@@ -27,21 +27,21 @@ TEST_F(PR2Test, Load)
   SpawnModel("models/pr2.model");
   while (!this->HasEntity("pr2"))
     usleep(10000);
-
-  /*sensors::SensorPtr sensor =
+/*
+  sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
   if (!sensor)
     printf("Invalid sensor\n");
 
   sensors::CameraSensorPtr camSensor =
     boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
-  while (!camSensor->SaveFrame("/tmp/frame_10.png"))
+  while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
     usleep(100000);
 
   for (int i = 11; i < 100; i++)
   {
     std::ostringstream filename;
-    filename << "/tmp/frame_" << i << ".png";
+    filename << "/tmp/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     usleep(100000);
   }

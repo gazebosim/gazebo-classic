@@ -200,7 +200,7 @@ namespace gazebo
       private: inline void Correct()
                {
                  // Make any corrections
-                 if (this->nsec > 1e9)
+                 if (this->nsec >= 1e9)
                  {
                    this->sec++;
                    this->nsec = (int32_t)(this->nsec - 1e9);
