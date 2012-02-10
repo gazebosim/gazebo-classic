@@ -149,7 +149,6 @@ TEST_F(CommonTest, Color)
 
 TEST_F(CommonTest, Time)
 {
-  /*
   common::Timer timer;
   timer.Start();
   usleep(100000);
@@ -190,12 +189,10 @@ TEST_F(CommonTest, Time)
   tv.tv_sec = 2;
   tv.tv_usec = 1000;
   time = common::Time(1, 1000) * tv;
-  std::cout << "T1[" << time.sec << ", " << time.nsec << "]\n";
   EXPECT_TRUE(time == common::Time(3, 0));
 
   time.Set(1, 1000);
   time *= tv;
-  std::cout << "T2[" << time.sec << ", " << time.nsec << "]\n";
   EXPECT_TRUE(time == common::Time(3, 0));
 
   time.Set(1, 1000);
@@ -204,19 +201,69 @@ TEST_F(CommonTest, Time)
 
 
   time = common::Time(1,2000000) / tv;
-  std::cout << "T3[" << time.sec << ", " << time.nsec << "][" << tv.tv_usec*1000 << "\n";
-  EXPECT_TRUE(time == common::Time(0, 1000));
+  EXPECT_TRUE(time == common::Time(0, 2));
 
   time.Set(1, 2000000);
   time /= tv;
-  std::cout << "T4[" << time.sec << ", " << time.nsec << "]\n";
-  EXPECT_TRUE(time == common::Time(0, 1000));
+  EXPECT_TRUE(time == common::Time(0, 2));
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
-  std::cout << "T5[" << time.sec << ", " << time.nsec << "]\n";
   EXPECT_TRUE(time == common::Time(.5, 500));
-  */
+}
+
+TEST_F(CommonTest, Paths)
+{
+  putenv(const_cast<char*>("GAZEBO_LOG_PATH="));
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+
+  EXPECT_TRUE(paths->GetLogPath().empty());
+
+  putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
+  const std::list<std::string> pathList1 = paths->GetGazeboPaths();
+  EXPECT_EQ(2, pathList1.size());
+  EXPECT_STREQ("/tmp/resource",pathList1.front().c_str());
+  EXPECT_STREQ("/test/me/now",pathList1.back().c_str());
+
+  putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
+  const std::list<std::string> pathList2 = paths->GetOgrePaths();
+  EXPECT_EQ(2, pathList2.size());
+  EXPECT_STREQ("/tmp/ogre",pathList2.front().c_str());
+  EXPECT_STREQ("/test/ogre/now",pathList2.back().c_str());
+
+  putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
+  const std::list<std::string> pathList3 = paths->GetPluginPaths();
+  EXPECT_EQ(2, pathList3.size());
+  EXPECT_STREQ("/tmp/plugin",pathList3.front().c_str());
+  EXPECT_STREQ("/test/plugin/now",pathList3.back().c_str());
+
+  EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
+  EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
+
+  paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
+  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
+
+  paths->AddPluginPaths("/plugin/path:/other/plugin");
+  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
+
+  paths->AddOgrePaths("/ogre/path:/other/ogre");
+  EXPECT_EQ(4, paths->GetOgrePaths().size());
+  EXPECT_STREQ("/other/ogre", paths->GetOgrePaths().back().c_str());
+
+  paths->ClearGazeboPaths();
+  paths->ClearOgrePaths();
+  paths->ClearPluginPaths();
+
+  EXPECT_EQ(2, paths->GetGazeboPaths().size());
+  EXPECT_EQ(2, paths->GetOgrePaths().size());
+  EXPECT_EQ(2, paths->GetPluginPaths().size());
+}
+
+TEST_F(CommonTest, Material)
+{
+  common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
 }
 
 int main(int argc, char **argv)

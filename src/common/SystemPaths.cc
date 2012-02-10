@@ -295,6 +295,3 @@ void SystemPaths::AddPluginPaths(std::string _gazebo_plugin_path)
           _gazebo_plugin_path.size()-pos1));
   }
 }
-
-
-

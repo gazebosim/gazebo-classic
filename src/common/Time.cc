@@ -229,29 +229,26 @@ const Time &Time::operator *=(const Time &time)
 }
 
 // Division operators
-Time Time::operator /(const struct timeval &tv) const
+Time Time::operator /(const struct timeval &_tv) const
 {
-  Time t2(tv);
-  Time t(this->Double() / t2.Double());
-  t.Correct();
-  return t;
+  return (*this) / Time(_tv);
 }
 
-const Time &Time::operator /=(const struct timeval &tv)
+const Time &Time::operator /=(const struct timeval &_tv)
 {
-  Time t2(tv);
-  this->Set(this->Double() / t2.Double());
+  *this = *this / Time(_tv);
   return *this;
 }
 
-Time Time::operator /(const Time &time) const
+Time Time::operator /(const Time &_time) const
 {
-  return Time(this->Double() / time.Double());
+
+  return Time(this->sec / _time.sec, this->nsec / _time.nsec);
 }
 
-const Time &Time::operator /=(const Time &time)
+const Time &Time::operator /=(const Time &_time)
 {
-  this->Set(this->Double() / time.Double());
+  *this = *this / _time;
   return *this;
 }
 
