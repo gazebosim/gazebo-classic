@@ -174,13 +174,31 @@ class ServerFixture : public testing::Test
                    _name.c_str());
              }
 
+  protected: void ScanCompare(double *_scanA, double *_scanB,
+                 unsigned int _sampleCount, double &_diffMax,
+                 double &_diffSum, double &_diffAvg)
+             {
+               double diff;
+               _diffMax = 0;
+               _diffSum = 0;
+               _diffAvg = 0;
+               for (unsigned int i = 0; i < _sampleCount; ++i)
+               {
+                 diff = fabs(_scanA[i] - _scanB[i]);
+                 _diffSum += diff;
+                 if (diff > _diffMax)
+                   _diffMax = diff;
+               }
+               _diffAvg = _diffSum / _sampleCount;
+             }
+
   protected: void ImageCompare(unsigned char **_imageA,
                  unsigned char *_imageB[],
                  unsigned int _width, unsigned int _height, unsigned int _depth,
-                 unsigned int &_maxDiff, unsigned int &_diffSum,
+                 unsigned int &_diffMax, unsigned int &_diffSum,
                  double &_diffAvg)
              {
-               _maxDiff = 0;
+               _diffMax = 0;
                _diffSum = 0;
                _diffAvg = 0;
 
@@ -193,8 +211,8 @@ class ServerFixture : public testing::Test
 
                    unsigned int diff = (unsigned int)(fabs(a - b));
 
-                   if (diff > _maxDiff)
-                     _maxDiff = diff;
+                   if (diff > _diffMax)
+                     _diffMax = diff;
 
                    _diffSum += diff;
                  }
@@ -363,8 +381,9 @@ class ServerFixture : public testing::Test
                  usleep(10000);
              }
 
-  protected: void SpawnBox(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
+  protected: void SpawnBox(const std::string &_name, 
+                 const math::Vector3 &_size, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy)
              {
                msgs::Factory msg;
                std::ostringstream newModelStr;
@@ -384,12 +403,12 @@ class ServerFixture : public testing::Test
                  << "  </inertial>"
                  << "  <collision name ='geom'>"
                  << "    <geometry>"
-                 << "      <box size ='1 1 1'/>"
+                 << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
                  << "  </collision>"
                  << "  <visual name ='visual' cast_shadows ='true'>"
                  << "    <geometry>"
-                 << "      <box size ='1 1 1'/>"
+                 << "      <box size ='" << _size << "'/>"
                  << "    </geometry>"
                  << "  </visual>"
                  << "</link>"
@@ -408,6 +427,13 @@ class ServerFixture : public testing::Test
              {
                msgs::Factory msg;
                msg.set_sdf_filename(_filename);
+               this->factoryPub->Publish(msg);
+             }
+
+  protected: void SpawnSDF(const std::string &_sdf)
+             {
+               msgs::Factory msg;
+               msg.set_sdf(_sdf);
                this->factoryPub->Publish(msg);
              }
 

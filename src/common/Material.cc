@@ -76,7 +76,7 @@ void Material::SetTextureImage(const std::string &_tex)
 
 //////////////////////////////////////////////////
 void Material::SetTextureImage(const std::string &_tex,
-    const std::string &_resourcePath)
+                               const std::string &_resourcePath)
 {
   this->texImage = _resourcePath + "/" + _tex;
 }
@@ -86,7 +86,6 @@ std::string Material::GetTextureImage() const
 {
   return this->texImage;
 }
-
 
 //////////////////////////////////////////////////
 void Material::SetAmbient(const Color &_clr)
@@ -139,28 +138,28 @@ Color Material::GetEmissive() const
 }
 
 //////////////////////////////////////////////////
-void Material::SetTransparency(float _t)
+void Material::SetTransparency(double _t)
 {
-  this->transparency = std::min(_t, static_cast<float>(1.0));
-  this->transparency = std::max(this->transparency, static_cast<float>(0.0));
+  this->transparency = std::min(_t, 1.0);
+  this->transparency = std::max(this->transparency, 0.0);
   this->lighting = true;
 }
 
 //////////////////////////////////////////////////
-float Material::GetTransparency() const
+double Material::GetTransparency() const
 {
   return this->transparency;
 }
 
 //////////////////////////////////////////////////
-void Material::SetShininess(float _s)
+void Material::SetShininess(double _s)
 {
   this->shininess = _s;
   this->lighting = true;
 }
 
 //////////////////////////////////////////////////
-float Material::GetShininess() const
+double Material::GetShininess() const
 {
   return this->shininess;
 }
@@ -238,5 +237,3 @@ bool Material::GetLighting() const
 {
   return this->lighting;
 }
-
-

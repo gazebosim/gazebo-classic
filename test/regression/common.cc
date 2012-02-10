@@ -201,15 +201,15 @@ TEST_F(CommonTest, Time)
 
 
   time = common::Time(1,2000000) / tv;
-  EXPECT_TRUE(time == common::Time(0, 2));
+  EXPECT_TRUE(time == common::Time(0, 500000002));
 
   time.Set(1, 2000000);
   time /= tv;
-  EXPECT_TRUE(time == common::Time(0, 2));
+  EXPECT_TRUE(time == common::Time(0, 500000002));
 
   time.Set(1, 1000);
   time = common::Time(1, 1000) / common::Time(2, 2);
-  EXPECT_TRUE(time == common::Time(.5, 500));
+  EXPECT_TRUE(time == common::Time(0, 500000500));
 }
 
 TEST_F(CommonTest, Paths)
@@ -264,6 +264,54 @@ TEST_F(CommonTest, Paths)
 TEST_F(CommonTest, Material)
 {
   common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_TRUE(mat.GetAmbient() == common::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_TRUE(mat.GetDiffuse() == common::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_STREQ("gazebo_material_0", mat.GetName().c_str());
+
+  mat.SetTextureImage("texture_image");
+  EXPECT_STREQ("texture_image", mat.GetTextureImage().c_str());
+
+  mat.SetTextureImage("texture_image", "/path");
+  EXPECT_STREQ("/path/texture_image", mat.GetTextureImage().c_str());
+
+  mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.GetAmbient() == common::Color(0.1, 0.2, 0.3, 0.4));
+
+  mat.SetDiffuse(common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.GetDiffuse() == common::Color(0.1, 0.2, 0.3, 0.4));
+
+  mat.SetSpecular(common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.GetSpecular() == common::Color(0.1, 0.2, 0.3, 0.4));
+
+  mat.SetEmissive(common::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.GetEmissive() == common::Color(0.1, 0.2, 0.3, 0.4));
+
+  mat.SetTransparency(0.2);
+  EXPECT_EQ(0.2, mat.GetTransparency());
+
+  mat.SetShininess(0.2);
+  EXPECT_EQ(0.2, mat.GetShininess());
+
+  mat.SetBlendFactors(.1, .5);
+  double a, b;
+  mat.GetBlendFactors(a, b);
+  EXPECT_EQ(.1, a);
+  EXPECT_EQ(0.5, b);
+
+  mat.SetBlendMode(common::Material::MODULATE);
+  EXPECT_EQ(common::Material::MODULATE, mat.GetBlendMode());
+
+  mat.SetShadeMode(common::Material::BLINN);
+  EXPECT_EQ(common::Material::BLINN, mat.GetShadeMode());
+
+  mat.SetPointSize(0.2);
+  EXPECT_EQ(0.2, mat.GetPointSize());
+
+  mat.SetDepthWrite(false);
+  EXPECT_EQ(false, mat.GetDepthWrite());
+
+  mat.SetLighting(true);
+  EXPECT_EQ(true, mat.GetLighting());
 }
 
 int main(int argc, char **argv)

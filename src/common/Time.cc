@@ -21,6 +21,7 @@
 
 #include <sys/time.h>
 #include <math.h>
+#include "math/Helpers.hh"
 #include "common/Time.hh"
 
 using namespace gazebo;
@@ -242,8 +243,21 @@ const Time &Time::operator /=(const struct timeval &_tv)
 
 Time Time::operator /(const Time &_time) const
 {
+  Time result(*this);
+  double remainder = 0.0;
 
-  return Time(this->sec / _time.sec, this->nsec / _time.nsec);
+  if (_time.sec != 0)
+  {
+    result.sec = this->sec / _time.sec;
+    remainder = (this->sec / (double)(_time.sec)) - result.sec;
+  }
+
+  if (_time.nsec != 0)
+    result.nsec = this->nsec / _time.nsec;
+
+  result.nsec += remainder * 1e9;
+
+  return result;
 }
 
 const Time &Time::operator /=(const Time &_time)
