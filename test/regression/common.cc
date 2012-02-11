@@ -308,10 +308,10 @@ TEST_F(CommonTest, Material)
   EXPECT_EQ(0.2, mat.GetPointSize());
 
   mat.SetDepthWrite(false);
-  EXPECT_EQ(false, mat.GetDepthWrite());
+  EXPECT_FALSE(mat.GetDepthWrite());
 
   mat.SetLighting(true);
-  EXPECT_EQ(true, mat.GetLighting());
+  EXPECT_TRUE(mat.GetLighting());
 }
 
 int main(int argc, char **argv)

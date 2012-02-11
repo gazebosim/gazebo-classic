@@ -36,6 +36,8 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   this->physicsEngine =
     boost::shared_static_cast<ODEPhysics>(_physicsEngine);
   this->geomId = dCreateRay(this->physicsEngine->GetSpaceId(), 2.0);
+  dGeomSetCategoryBits(this->geomId, GZ_SENSOR_COLLIDE);
+  dGeomSetCollideBits(this->geomId, ~GZ_SENSOR_COLLIDE);
   this->collisionParent.reset();
 }
 
@@ -199,8 +201,3 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
     }
   }
 }
-
-
-
-
-

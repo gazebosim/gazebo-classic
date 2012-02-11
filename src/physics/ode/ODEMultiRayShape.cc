@@ -191,7 +191,3 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
   ray->SetPoints(_start, _end);
   this->rays.push_back(ray);
 }
-
-
-
-

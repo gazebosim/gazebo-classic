@@ -174,6 +174,23 @@ class ServerFixture : public testing::Test
                    _name.c_str());
              }
 
+  protected: void PrintScan(const std::string &_name, double *_scan,
+                            unsigned int _sampleCount)
+             {
+               printf("static double __%s[] = {\n", _name.c_str());
+               for (unsigned int i = 0; i < _sampleCount-1; ++i)
+               {
+                 if ((i+1) % 5 == 0)
+                   printf("%13.10f,\n", math::precision(_scan[i], 10));
+                 else
+                   printf("%13.10f, ", math::precision(_scan[i], 10));
+               }
+               printf("%13.10f};\n",
+                   math::precision(_scan[_sampleCount-1], 10));
+               printf("static double *%s = __%s;\n", _name.c_str(),
+                   _name.c_str());
+             }
+
   protected: void ScanCompare(double *_scanA, double *_scanB,
                  unsigned int _sampleCount, double &_diffMax,
                  double &_diffSum, double &_diffAvg)
@@ -184,10 +201,13 @@ class ServerFixture : public testing::Test
                _diffAvg = 0;
                for (unsigned int i = 0; i < _sampleCount; ++i)
                {
-                 diff = fabs(_scanA[i] - _scanB[i]);
+                 diff = fabs(math::precision(_scanA[i], 10) -
+                             math::precision(_scanB[i], 10));
                  _diffSum += diff;
                  if (diff > _diffMax)
+                 {
                    _diffMax = diff;
+                 }
                }
                _diffAvg = _diffSum / _sampleCount;
              }

@@ -46,6 +46,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 RaySensor::RaySensor()
     : Sensor()
 {
+  this->mutex = new boost::mutex();
   this->active = false;
   this->node = transport::NodePtr(new transport::Node());
 }
@@ -53,6 +54,7 @@ RaySensor::RaySensor()
 //////////////////////////////////////////////////
 RaySensor::~RaySensor()
 {
+  delete this->mutex;
   this->laserCollision.reset();
   this->link.reset();
   this->laserShape.reset();
@@ -97,12 +99,14 @@ void RaySensor::Load()
   this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
+
 }
 
 //////////////////////////////////////////////////
 void RaySensor::Init()
 {
   Sensor::Init();
+  this->laserMsg.set_frame(this->link->GetScopedName());
 }
 
 //////////////////////////////////////////////////
@@ -187,50 +191,67 @@ math::Angle RaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
-double RaySensor::GetRange(int index)
+void RaySensor::GetRanges(std::vector<double> &_ranges)
 {
-  return this->laserShape->GetRange(index);
+  boost::mutex::scoped_lock(*this->mutex);
+  _ranges.resize(this->laserMsg.ranges_size());
+  memcpy(&_ranges[0], this->laserMsg.ranges().data(),
+         sizeof(_ranges[0]) * this->laserMsg.ranges_size());
+}
+
+//////////////////////////////////////////////////
+double RaySensor::GetRange(int _index)
+{
+  if (_index < 0 || _index > this->laserMsg.ranges_size())
+  {
+    gzerr << "Invalid range index[" << _index << "]\n";
+    return 0.0;
+  }
+
+  boost::mutex::scoped_lock(*this->mutex);
+  return this->laserMsg.ranges(_index);
+  //return this->laserShape->GetRange(index);
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRetro(int index)
 {
+  boost::mutex::scoped_lock(*this->mutex);
   return this->laserShape->GetRetro(index);
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetFiducial(int index)
 {
+  boost::mutex::scoped_lock(*this->mutex);
   return this->laserShape->GetFiducial(index);
 }
 
 //////////////////////////////////////////////////
 void RaySensor::UpdateImpl(bool /*_force*/)
 {
+  this->mutex->lock();
   this->laserShape->Update();
   this->lastUpdateTime = this->link->GetWorld()->GetSimTime();
 
-  if (this->scanPub)
+  // Store the latest laser scan.
+  msgs::Set(this->laserMsg.mutable_offset(), this->GetPose());
+  this->laserMsg.set_angle_min(this->GetAngleMin().GetAsRadian());
+  this->laserMsg.set_angle_max(this->GetAngleMax().GetAsRadian());
+  this->laserMsg.set_angle_step(this->GetAngleResolution());
+
+  this->laserMsg.set_range_min(this->GetRangeMin());
+  this->laserMsg.set_range_max(this->GetRangeMax());
+  this->laserMsg.clear_ranges();
+  this->laserMsg.clear_intensities();
+
+  for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
   {
-    msgs::LaserScan msg;
-
-    msg.set_frame(this->link->GetScopedName());
-    msgs::Set(msg.mutable_offset(), this->GetPose());
-    msg.set_angle_min(this->GetAngleMin().GetAsRadian());
-    msg.set_angle_max(this->GetAngleMax().GetAsRadian());
-    msg.set_angle_step(this->GetAngleResolution());
-
-    msg.set_range_min(this->GetRangeMin());
-    msg.set_range_max(this->GetRangeMax());
-
-    for (unsigned int i = 0; i < (unsigned int)this->GetRangeCount(); i++)
-    {
-      msg.add_ranges(this->laserShape->GetRange(i));
-      msg.add_intensities(0);
-    }
-
-    this->scanPub->Publish(msg);
+    this->laserMsg.add_ranges(this->laserShape->GetRange(i));
+    this->laserMsg.add_intensities(0);
   }
+  this->mutex->unlock();
+
+  if (this->scanPub)
+    this->scanPub->Publish(this->laserMsg);
 }
-
-

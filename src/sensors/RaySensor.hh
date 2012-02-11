@@ -116,6 +116,8 @@ namespace gazebo
       /// \returns Returns DBL_MAX for no detection.
       public: double GetRange(int index);
 
+      public: void GetRanges(std::vector<double> &_ranges);
+
       /// \brief Get detected retro (intensity) value for a ray.
       public: double GetRetro(int index);
 
@@ -128,11 +130,11 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr scanPub;
+      private: boost::mutex *mutex;
+      private: msgs::LaserScan laserMsg;
     };
     /// \}
   }
 }
 
 #endif
-
-

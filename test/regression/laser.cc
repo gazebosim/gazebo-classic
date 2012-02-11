@@ -29,15 +29,16 @@ class LaserTest : public ServerFixture
 TEST_F(LaserTest, Stationary_EmptyWorld)
 {
   Load("worlds/empty.world");
-  std::string laserModel =
-    "<gazebo version='1.0'>\
+  std::ostringstream laserModel;
+    laserModel << "<gazebo version='1.0'>\
      <model name='box' static='true'>\
        <link name='link'>\
          <origin pose='0 0 0.5 0 0 0'/>\
          <inertial mass='1.0'>\
            <inertia ixx='1' ixy='0' ixz='0' iyy='1' iyz='0' izz='1'/>\
          </inertial>\
-         <sensor name='laser' type='ray' always_on='1' update_rate='10' visualize='true'>\
+         <sensor name='laser' type='ray' always_on='1'\
+                 update_rate='10' visualize='true'>\
            <origin pose='0 0 0 0 0 0'/>\
            <topic>~/laser_scan</topic>\
            <ray>\
@@ -45,13 +46,13 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
                <horizontal samples='640' resolution='1'\
                            min_angle='-2.27' max_angle='2.27'/>\
              </scan>\
-             <range min='0.08' max='10' resolution='0.01'/>\
+             <range min='0.0' max='10' resolution='0.01'/>\
            </ray>\
          </sensor>\
        </link>\
      </model>\
      </gazebo>";
-  SpawnSDF(laserModel);
+  SpawnSDF(laserModel.str());
   while (!HasEntity("box"))
     usleep(10000);
 
@@ -69,46 +70,67 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
   }
 
   // Spawn a box and test for proper laser scan
-  /*{
-    SpawnBox("test_box", math::Vector3(1, 0, 0.5), math::Vector3(0, 0, 0));
+  {
+    SpawnBox("test_box", math::Vector3(1, 1, 1),
+        math::Vector3(2, 0, 0.5), math::Vector3(0, 0, 0));
     usleep(1000000);
 
-    double diffMax, diffSum, diffAvg;
-    double *scan = new double[640];
-    for (int i = 0; i < laser->GetRangeCount(); ++i)
-      scan[i] = laser->GetRange(i);
-    ScanCompare(box_scan1, scan, 640, diffMax, diffSum, diffAvg);
-    EXPECT_LT(diffMax, 1e-6);
-    EXPECT_LT(diffSum, 1e-4);
-    EXPECT_LT(diffAvg, 1e-7);
+    laser->Update(true);
 
-    delete [] scan;
-  }*/
+    double diffMax, diffSum, diffAvg;
+    std::vector<double> scan;
+    laser->GetRanges(scan);
+
+    ScanCompare(box_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+    EXPECT_LT(diffMax, 1e-6);
+    EXPECT_LT(diffSum, 1e-6);
+    EXPECT_LT(diffAvg, 1e-6);
+
+    // This line will print the current scan. Use this to generate
+    // a new test scan sample
+    //PrintScan("box_scan", &scan[0], 640);
+  }
 
   // Move the laser to point down on the ground plane,
   {
-    SpawnBox("test_box2", math::Vector3(20, 20, .2),
-        math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+    common::Time prevTime;
     physics::WorldPtr world = physics::get_world("default");
     EXPECT_TRUE(world);
 
     physics::ModelPtr model = world->GetModelByName("box");
+
+    prevTime = laser->GetLastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0 ));
-    usleep(100000);
+    while (laser->GetLastUpdateTime() <= prevTime)
+      usleep(10000);
 
     double diffMax, diffSum, diffAvg;
-    double *scan = new double[640];
-    //printf("static double __scan1[] = {\n");
-    for (int i = 0; i < laser->GetRangeCount(); ++i)
-    {
-      //if (i % 6 == 0)
-        //printf("\n");
-      //printf("%f, ", laser->GetRange(i));
-      printf("%d %f\n", i, laser->GetRange(i));
-      scan[i] = laser->GetRange(i);
-    }
 
-    delete [] scan;
+    std::vector<double> scan, scan2;
+
+    laser->Update(false);
+    for (unsigned int j=0; j < 5; j++)
+    {
+      laser->Update(true);
+      laser->GetRanges(scan);
+      laser->Update(true);
+      laser->GetRanges(scan2);
+
+      ScanCompare(&scan[0], &scan2[0], 640, diffMax, diffSum, diffAvg);
+      EXPECT_LT(diffMax, 1e-6);
+      EXPECT_LT(diffSum, 1e-6);
+      EXPECT_LT(diffAvg, 1e-6);
+    }
+    laser->Update(true);
+
+    ScanCompare(plane_scan, &scan[0], 640, diffMax, diffSum, diffAvg);
+    EXPECT_LT(diffMax, 1e-6);
+    EXPECT_LT(diffSum, 1e-6);
+    EXPECT_LT(diffAvg, 1e-6);
+    
+    // This line will print the current scan. Use this to generate
+    // a new test scan sample
+    //PrintScan("plane_scan", &scan[0], 640);
   }
 }
 
