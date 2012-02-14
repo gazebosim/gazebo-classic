@@ -94,7 +94,10 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
   TiXmlElement *visSceneXml = this->GetElementId("visual_scene", sceneURL);
 
   if (!visSceneXml)
+  {
     gzerr << "Unable to find visual_scene id ='" << sceneURL << "'\n";
+    return;
+  }
 
   TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
@@ -290,7 +293,10 @@ void ColladaLoader::LoadVertices(const std::string &_id,
   TiXmlElement *verticesXml = this->GetElementId(this->colladaXml,
                                                  "vertices", _id);
   if (!verticesXml)
+  {
     gzerr << "Unable to find vertices[" << _id << "] in collada file\n";
+    return;
+  }
 
   TiXmlElement *inputXml = verticesXml->FirstChildElement("input");
   while (inputXml)
@@ -317,7 +323,10 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   TiXmlElement *sourceXml = this->GetElementId("source", _id);
   TiXmlElement *floatArrayXml = sourceXml->FirstChildElement("float_array");
   if (!floatArrayXml)
+  {
     gzerr << "Vertex source missing float_array element\n";
+    return;
+  }
   std::string valueStr = floatArrayXml->GetText();
 
   std::vector<std::string> strs;
@@ -340,11 +349,17 @@ void ColladaLoader::LoadNormals(const std::string &_id,
 {
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
+  {
     gzerr << "Unable to find normals[" << _id << "] in collada file\n";
+    return;
+  }
 
   TiXmlElement *floatArrayXml = normalsXml->FirstChildElement("float_array");
   if (!floatArrayXml)
+  {
     gzerr << "Normal source missing float_array element\n";
+    return;
+  }
 
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);
@@ -362,15 +377,21 @@ void ColladaLoader::LoadNormals(const std::string &_id,
 }
 
 void ColladaLoader::LoadTexCoords(const std::string &_id,
-    std::vector<math::Vector2d> &_values)
+                                  std::vector<math::Vector2d> &_values)
 {
   TiXmlElement *xml = this->GetElementId("source", _id);
   if (!xml)
+  {
     gzerr << "Unable to find tex coords[" << _id << "] in collada file\n";
+    return;
+  }
 
   TiXmlElement *floatArrayXml = xml->FirstChildElement("float_array");
   if (!floatArrayXml)
+  {
     gzerr << "Normal source missing float_array element\n";
+    return;
+  }
 
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);

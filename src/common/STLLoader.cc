@@ -39,31 +39,34 @@ STLLoader::~STLLoader()
 }
 
 //////////////////////////////////////////////////
-Mesh *STLLoader::Load(const std::string &filename)
+Mesh *STLLoader::Load(const std::string &_filename)
 {
   Mesh *mesh = new Mesh();
 
-  FILE *file = fopen(filename.c_str(), "r");
+  FILE *file = fopen(_filename.c_str(), "r");
 
-  /*
-     std::string extension;
-     extension = filename.substr(filename.rfind(".")+1, filename.size());
-     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-     if (extension == "stl" || extension == "stla")
-     this->ReadAscii(file, mesh);
-     else if (extension == "stlb")
-     this->ReadBinary(file, mesh);
-     */
+  if (!file)
+  {
+    gzerr << "Unable to open file[" << _filename << "]\n";
+    return NULL;
+  }
 
-  this->ReadBinary(file, mesh);
+  // Try to read ASCII first. If that fails, try binary
+  if (!this->ReadAscii(file, mesh))
+  {
+    fclose(file);
+    file = fopen(_filename.c_str(), "r");
+    if (!this->ReadBinary(file, mesh))
+      gzerr << "Unable to read STL[" << _filename << "]\n";
+    fclose(file);
+  }
 
-  fclose(file);
 
   return mesh;
 }
 
 //////////////////////////////////////////////////
-void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
+bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 {
   int count;
   char *next;
@@ -74,9 +77,9 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   char token[LINE_MAX_LEN];
   int width;
   char input[LINE_MAX_LEN];
+  bool result = true;
 
   SubMesh *subMesh = new SubMesh();
-  _mesh->AddSubMesh(subMesh);
 
   // Read the next line of the file into INPUT.
   while (fgets (input, LINE_MAX_LEN, _filein) != NULL)
@@ -107,13 +110,19 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       normal.z = r3;
 
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
-        gzerr << "Error..\n";
+      {
+        result = false;
+        break;
+      }
 
-      for (;;)
+      for (; result; )
       {
         math::Vector3 vertex;
         if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
-          gzerr << "Error...\n";
+        {
+          result = false;
+          break;
+        }
 
         count = sscanf(input, "%*s %e %e %e", &r1, &r2, &r3);
 
@@ -130,7 +139,10 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       }
 
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
-        printf("Error...\n");
+      {
+        result = false;
+        break;
+      }
     }
     // COLOR
     else if (this->Leqi (token, const_cast<char*>("color")))
@@ -148,22 +160,29 @@ void STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // Unexpected or unrecognized.
     else
     {
-      printf("\n");
+      /*printf("\n");
       printf("stl - Fatal error!\n");
       printf(" Unrecognized first word on line.\n");
+      */
+      result = false;
+      break;
     }
   }
+
+  if (result)
+    _mesh->AddSubMesh(subMesh);
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-void STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
+bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
 {
   int i;
   int iface;
   int face_num;
 
   SubMesh *subMesh = new SubMesh();
-  _mesh->AddSubMesh(subMesh);
 
   // 80 byte Header.
   for (i = 0; i < 80; i++)
@@ -181,33 +200,51 @@ void STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   // 2 byte "attribute".
   for (iface = 0; iface < face_num; iface++)
   {
-    normal.x = this->FloatRead(_filein);
-    normal.y = this->FloatRead(_filein);
-    normal.z = this->FloatRead(_filein);
+    if (!this->FloatRead(_filein, normal.x))
+      return false;
+    if (!this->FloatRead(_filein, normal.y))
+      return false;
+    if (!this->FloatRead(_filein, normal.z))
+      return false;
 
-    vertex.x = this->FloatRead(_filein);
-    vertex.y = this->FloatRead(_filein);
-    vertex.z = this->FloatRead(_filein);
+    if (!this->FloatRead(_filein, vertex.x))
+      return false;
+    if (!this->FloatRead(_filein, vertex.y))
+      return false;
+    if (!this->FloatRead(_filein, vertex.z))
+      return false;
+
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    vertex.x = this->FloatRead(_filein);
-    vertex.y = this->FloatRead(_filein);
-    vertex.z = this->FloatRead(_filein);
+    if (!this->FloatRead(_filein, vertex.x))
+      return false;
+    if (!this->FloatRead(_filein, vertex.y))
+      return false;
+    if (!this->FloatRead(_filein, vertex.z))
+      return false;
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    vertex.x = this->FloatRead(_filein);
-    vertex.y = this->FloatRead(_filein);
-    vertex.z = this->FloatRead(_filein);
+    if (!this->FloatRead(_filein, vertex.x))
+      return false;
+    if (!this->FloatRead(_filein, vertex.y))
+      return false;
+    if (!this->FloatRead(_filein, vertex.z))
+      return false;
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    ShortIntRead(_filein);
+    uint16_t shortTmp;
+    if (!ShortIntRead(_filein, shortTmp))
+      return false;
   }
+
+  _mesh->AddSubMesh(subMesh);
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -272,13 +309,14 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
 }
 
 //////////////////////////////////////////////////
-float STLLoader::FloatRead(FILE *_filein)
+bool STLLoader::FloatRead(FILE *_filein, double &_value)
 {
-  float rval;
-  if (fread (&rval, sizeof(rval), 1, _filein) == 0)
-    printf("Error...\n");
+  float v;
+  if (fread (&v, sizeof(v), 1, _filein) == 0)
+    return false;
 
-  return rval;
+  _value = v;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -299,18 +337,17 @@ uint32_t STLLoader::LongIntRead(FILE *_filein)
 }
 
 //////////////////////////////////////////////////
-uint16_t STLLoader::ShortIntRead(FILE *_filein)
+bool STLLoader::ShortIntRead(FILE *_filein, uint16_t &_value)
 {
   uint8_t c1;
   uint8_t c2;
-  uint16_t ival;
 
   c1 = fgetc(_filein);
   c2 = fgetc(_filein);
 
-  ival = c1 | (c2 << 8);
+  _value = c1 | (c2 << 8);
 
-  return ival;
+  return true;
 }
 
 

@@ -589,8 +589,8 @@ void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
   if (*_indArr)
     delete [] *_indArr;
 
-  *_vertArr = new float[ this->vertices.size() * 3 ];
-  *_indArr = new int[ this->indices.size() ];
+  *_vertArr = new float[this->vertices.size() * 3];
+  *_indArr = new int[this->indices.size()];
 
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
       ++viter)
@@ -642,7 +642,7 @@ void SubMesh::RecalculateNormals()
 
 //////////////////////////////////////////////////
 void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
-                   math::Vector3 &_max_xyz)
+                   math::Vector3 &_max_xyz) const
 {
   // find aabb center
   _min_xyz.x = 1e15;
@@ -655,7 +655,7 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
   _center.y = 0;
   _center.z = 0;
 
-  std::vector<SubMesh*>::iterator siter;
+  std::vector<SubMesh*>::const_iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
   {
     math::Vector3 max = (*siter)->GetMax();
@@ -673,33 +673,11 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
 }
 
 //////////////////////////////////////////////////
-void Mesh::SetMeshCenter(math::Vector3 _center)
-{
-  std::vector<SubMesh*>::iterator siter;
-  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
-    (*siter)->SetSubMeshCenter(_center);
-}
-
-//////////////////////////////////////////////////
 void Mesh::GenSphericalTexCoord(math::Vector3 _center)
 {
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
     (*siter)->GenSphericalTexCoord(_center);
-}
-
-//////////////////////////////////////////////////
-void SubMesh::SetSubMeshCenter(math::Vector3 _center)
-{
-  std::vector<math::Vector3>::iterator viter;
-  for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
-  {
-    // generate projected texture coordinates, projected from _center of aabb
-    // get x, y, z for computing texture coordinate projections
-    (*viter).x = (*viter).x-_center.x;
-    (*viter).y = (*viter).y-_center.y;
-    (*viter).z = (*viter).z-_center.z;
-  }
 }
 
 //////////////////////////////////////////////////

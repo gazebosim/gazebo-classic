@@ -39,7 +39,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   : world(_world)
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/physics.sdf", this->sdf);
+  sdf::initFile("sdf/physics.sdf", this->sdf);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->world->GetName());

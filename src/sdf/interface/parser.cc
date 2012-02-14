@@ -35,7 +35,7 @@ bool init(SDFPtr _sdf)
   bool result = false;
   std::string filename =
     gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(
-        "/sdf/gazebo.sdf");
+        "sdf/gazebo.sdf");
 
   FILE *ftest = fopen(filename.c_str(), "r");
   if (ftest && initFile(filename, _sdf))
@@ -214,7 +214,7 @@ bool initXml(TiXmlElement *_xml, ElementPtr _sdf)
   {
     std::string filename =
       gazebo::common::SystemPaths::Instance()->FindFileWithGazeboPaths(
-          std::string("/sdf/") + child->Attribute("filename"));
+          std::string("sdf/") + child->Attribute("filename"));
 
     ElementPtr element(new Element);
 

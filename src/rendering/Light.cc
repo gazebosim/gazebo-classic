@@ -57,7 +57,7 @@ Light::Light(Scene *scene_)
         boost::bind(&Light::ToggleShowVisual, this));
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/light.sdf", this->sdf);
+  sdf::initFile("sdf/light.sdf", this->sdf);
 }
 
 //////////////////////////////////////////////////

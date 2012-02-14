@@ -146,7 +146,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       return;
 
     this->modelSDF.reset(new sdf::SDF);
-    sdf::initFile("/sdf/gazebo.sdf", this->modelSDF);
+    sdf::initFile("sdf/gazebo.sdf", this->modelSDF);
     sdf::readFile(path+filename, this->modelSDF);
 
     // Load the world file

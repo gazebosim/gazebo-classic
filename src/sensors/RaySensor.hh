@@ -113,15 +113,35 @@ namespace gazebo
       public: math::Angle GetVerticalAngleMax() const;
 
       /// \brief Get detected range for a ray.
-      /// \returns Returns DBL_MAX for no detection.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your aceess loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \return Returns DBL_MAX for no detection.
       public: double GetRange(int index);
 
+      /// \brief Get all the ranges
+      /// \param _range A vector that will contain all the range data
       public: void GetRanges(std::vector<double> &_ranges);
 
       /// \brief Get detected retro (intensity) value for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your aceess loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
       public: double GetRetro(int index);
 
       /// \brief Get detected fiducial value for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your aceess loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
       public: int GetFiducial(int index);
 
       private: physics::LinkPtr link;

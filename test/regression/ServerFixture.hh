@@ -86,7 +86,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the server to come up
                while (!this->server || !this->server->GetInitialized())
-                 usleep(10000);
+                 common::Time::MSleep(10000);
 
                this->node = transport::NodePtr(new transport::Node());
                ASSERT_NO_THROW(this->node->Init());
@@ -125,7 +125,7 @@ class ServerFixture : public testing::Test
   protected: double GetPercentRealTime() const
              {
                while (!this->serverRunning)
-                 usleep(100000);
+                 common::Time::MSleep(100000);
 
                return this->percentRealTime;
              }
@@ -276,7 +276,7 @@ class ServerFixture : public testing::Test
                                  this, _1, _2, _3, _4, _5));
 
                while (this->gotImage < 20)
-                 usleep(1000);
+                 common::Time::MSleep(1000);
 
                camSensor->GetCamera()->DisconnectNewImageFrame(c);
              }
@@ -316,7 +316,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_modelName))
-                 usleep(10000);
+                 common::Time::MSleep(10000);
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -357,7 +357,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 usleep(10000);
+                 common::Time::MSleep(10000);
              }
 
   protected: void SpawnSphere(const std::string &_name,
@@ -398,7 +398,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 usleep(10000);
+                 common::Time::MSleep(1000);
              }
 
   protected: void SpawnBox(const std::string &_name,
@@ -440,7 +440,7 @@ class ServerFixture : public testing::Test
 
                // Wait for the entity to spawn
                while (!this->HasEntity(_name))
-                 usleep(10000);
+                 common::Time::MSleep(10000);
              }
 
   protected: void SpawnModel(const std::string &_filename)

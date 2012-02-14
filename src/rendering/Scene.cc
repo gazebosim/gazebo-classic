@@ -89,7 +89,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->selectionObj = new SelectionObj(this);
 
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/scene.sdf", this->sdf);
+  sdf::initFile("sdf/scene.sdf", this->sdf);
 
   this->clearAll = false;
 }
@@ -811,6 +811,12 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
     numAttachedObjs = snode->numAttachedObjects();
     isInSceneGraph = snode->isInSceneGraph();
   }
+  else
+  {
+    gzerr << "Invalid SceneNode\n";
+    return;
+  }
+
   int numChildren = node_->numChildren();
   Ogre::Vector3 pos = node_->getPosition();
   Ogre::Vector3 scale = node_->getScale();

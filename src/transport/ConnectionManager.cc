@@ -74,7 +74,7 @@ bool ConnectionManager::Init(const std::string &master_host,
   {
     printf(".");
     fflush(stdout);
-    usleep(1000000);
+    common::Time::MSleep(1000000);
   }
   printf("\n");
 

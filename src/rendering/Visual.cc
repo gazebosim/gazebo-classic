@@ -187,7 +187,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
 void Visual::Init()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/visual.sdf", this->sdf);
+  sdf::initFile("sdf/visual.sdf", this->sdf);
 
 
   this->transparency = 0.0;

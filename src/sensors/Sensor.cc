@@ -42,7 +42,7 @@ using namespace sensors;
 Sensor::Sensor()
 {
   this->sdf.reset(new sdf::Element);
-  sdf::initFile("/sdf/sensor.sdf", this->sdf);
+  sdf::initFile("sdf/sensor.sdf", this->sdf);
 
   this->active = false;
 

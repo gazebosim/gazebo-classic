@@ -28,7 +28,7 @@ TEST_F(PR2Test, Load)
 
   int i;
   for (i = 0; i < 10 && !this->HasEntity("pr2"); ++i)
-    usleep(10000);
+    common::Time::MSleep(10000);
   EXPECT_LT(i, 10);
 
   sensors::SensorPtr sensor =

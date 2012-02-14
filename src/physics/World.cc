@@ -910,7 +910,7 @@ void World::ProcessFactoryMsgs()
        iter != this->factoryMsgs.end(); ++iter)
   {
     sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("/sdf/gazebo.sdf", factorySDF);
+    sdf::initFile("sdf/gazebo.sdf", factorySDF);
 
     if ((*iter).has_sdf() && !(*iter).sdf().empty())
     {

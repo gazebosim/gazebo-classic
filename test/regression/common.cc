@@ -23,6 +23,201 @@ class CommonTest : public ServerFixture
 {
 };
 
+std::string asciiSTLBox =
+"solid MYSOLID\n\
+  facet normal  0.0   0.0  -1.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   0.0\n\
+      vertex    1.0   1.0   0.0\n\
+      vertex    1.0   0.0   0.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0   0.0  -1.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   0.0\n\
+      vertex    0.0   1.0   0.0\n\
+      vertex    1.0   1.0   0.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal -1.0   0.0   0.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   0.0\n\
+      vertex    0.0   1.0   1.0\n\
+      vertex    0.0   1.0   0.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal -1.0   0.0   0.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   0.0\n\
+      vertex    0.0   0.0   1.0\n\
+      vertex    0.0   1.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0   1.0   0.0\n\
+    outer loop\n\
+      vertex    0.0   1.0   0.0\n\
+      vertex    1.0   1.0   1.0\n\
+      vertex    1.0   1.0   0.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0   1.0   0.0\n\
+    outer loop\n\
+      vertex    0.0   1.0   0.0\n\
+      vertex    0.0   1.0   1.0\n\
+      vertex    1.0   1.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  1.0   0.0   0.0\n\
+    outer loop\n\
+      vertex    1.0   0.0   0.0\n\
+      vertex    1.0   1.0   0.0\n\
+      vertex    1.0   1.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  1.0   0.0   0.0\n\
+    outer loop\n\
+      vertex    1.0   0.0   0.0\n\
+      vertex    1.0   1.0   1.0\n\
+      vertex    1.0   0.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0  -1.0   0.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   0.0\n\
+      vertex    1.0   0.0   0.0\n\
+      vertex    1.0   0.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0  -1.0   0.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   0.0\n\
+      vertex    1.0   0.0   1.0\n\
+      vertex    0.0   0.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0   0.0   1.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   1.0\n\
+      vertex    1.0   0.0   1.0\n\
+      vertex    1.0   1.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+  facet normal  0.0   0.0   1.0\n\
+    outer loop\n\
+      vertex    0.0   0.0   1.0\n\
+      vertex    1.0   1.0   1.0\n\
+      vertex    0.0   1.0   1.0\n\
+    endloop\n\
+  endfacet\n\
+endsolid MYSOLID";
+
+TEST_F(CommonTest, Image)
+{
+  common::Image img;
+  EXPECT_EQ(-1, img.Load("/file/shouldn/never/exist.png"));
+  EXPECT_EQ(0, img.Load("wood.jpg"));
+  EXPECT_EQ(496, img.GetWidth());
+  EXPECT_EQ(329, img.GetHeight());
+  EXPECT_EQ(24, img.GetBPP());
+  EXPECT_TRUE(img.GetPixel(10, 10) ==
+      common::Color(0.133333, 0.376471, 0.654902, 1));
+  EXPECT_TRUE(img.GetAvgColor() ==
+      common::Color(0.260456, 0.506047, 0.758062, 1));
+  EXPECT_TRUE(img.GetMaxColor() ==
+      common::Color(0.807843, 0.909804, 0.964706, 1));
+  EXPECT_TRUE(img.Valid());
+  EXPECT_TRUE(img.GetFilename().find("materials/textures/wood.jpg") !=
+      std::string::npos);
+
+  unsigned char *data = NULL;
+  unsigned int size = 0;
+  img.GetData(&data, size);
+  EXPECT_EQ(489552, size);
+
+  // img.SetFromData(data, img.GetWidth(), img.GetHeight(), img.GetBPP());
+}
+
+TEST_F(CommonTest, Paths)
+{
+  std::string gazeboResourcePathBackup = "GAZEBO_RESOURCE_PATH=";
+  std::string ogreResourcePathBackup = "OGRE_RESOURCE_PATH=";
+  std::string pluginPathBackup = "GAZEBO_PLUGIN_PATH=";
+
+  gazeboResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
+  ogreResourcePathBackup += getenv("GAZEBO_RESOURCE_PATH");
+  pluginPathBackup += getenv("GAZEBO_PLUGIN_PATH");
+
+  putenv(const_cast<char*>("GAZEBO_LOG_PATH="));
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+
+  paths->ClearGazeboPaths();
+  paths->ClearOgrePaths();
+  paths->ClearPluginPaths();
+
+  EXPECT_FALSE(paths->GetLogPath().empty());
+
+  putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
+  const std::list<std::string> pathList1 = paths->GetGazeboPaths();
+  EXPECT_EQ(2, pathList1.size());
+  EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
+  EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
+
+  putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
+  const std::list<std::string> pathList2 = paths->GetOgrePaths();
+  EXPECT_EQ(2, pathList2.size());
+  EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
+  EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
+
+  putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
+  const std::list<std::string> pathList3 = paths->GetPluginPaths();
+  EXPECT_EQ(2, pathList3.size());
+  EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
+  EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
+
+  EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
+  EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
+
+  paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
+  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
+
+  paths->AddPluginPaths("/plugin/path:/other/plugin");
+  EXPECT_EQ(4, paths->GetGazeboPaths().size());
+  EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
+
+  paths->AddOgrePaths("/ogre/path:/other/ogre");
+  EXPECT_EQ(4, paths->GetOgrePaths().size());
+  EXPECT_STREQ("/other/ogre", paths->GetOgrePaths().back().c_str());
+
+  paths->ClearGazeboPaths();
+  paths->ClearOgrePaths();
+  paths->ClearPluginPaths();
+
+  EXPECT_EQ(2, paths->GetGazeboPaths().size());
+  EXPECT_EQ(2, paths->GetOgrePaths().size());
+  EXPECT_EQ(2, paths->GetPluginPaths().size());
+
+  putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH="));
+  paths->ClearGazeboPaths();
+  EXPECT_EQ(0, paths->GetGazeboPaths().size());
+
+  putenv(const_cast<char*>("OGRE_RESOURCE_PATH="));
+  paths->ClearOgrePaths();
+  EXPECT_EQ(0, paths->GetOgrePaths().size());
+
+  putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH="));
+  paths->ClearPluginPaths();
+  EXPECT_EQ(0, paths->GetPluginPaths().size());
+
+  std::cout << "GAZEBO_RESOURCE_BACKUP[" << gazeboResourcePathBackup << "]\n";
+  std::cout << "OGRE_RESOURCE_BACKUP[" << ogreResourcePathBackup << "]\n";
+  std::cout << "GAZEBO_PLUGIN_BACKUP[" << ogreResourcePathBackup << "]\n";
+
+  putenv(const_cast<char*>(gazeboResourcePathBackup.c_str()));
+  putenv(const_cast<char*>(ogreResourcePathBackup.c_str()));
+  putenv(const_cast<char*>(pluginPathBackup.c_str()));
+}
+
 TEST_F(CommonTest, PoseAnimation)
 {
   {
@@ -120,11 +315,87 @@ TEST_F(CommonTest, Color)
 
   EXPECT_TRUE(clr.GetAsHSV() == math::Vector3(6, 0.5, 1));
 
+  clr.SetFromHSV(60, 0.0, 1.0);
+  EXPECT_EQ(1.0f, clr.R());
+  EXPECT_EQ(1.0f, clr.G());
+  EXPECT_EQ(1.0f, clr.B());
+  EXPECT_EQ(0.0f, clr.A());
+
+  clr.SetFromHSV(120, 0.5, 1.0);
+  EXPECT_EQ(0.5f, clr.R());
+  EXPECT_EQ(1.0f, clr.G());
+  EXPECT_EQ(0.5f, clr.B());
+  EXPECT_EQ(0.0f, clr.A());
+
+  clr.SetFromHSV(180, 0.5, 1.0);
+  EXPECT_EQ(0.5f, clr.R());
+  EXPECT_EQ(1.0f, clr.G());
+  EXPECT_EQ(1.0f, clr.B());
+  EXPECT_EQ(0.0f, clr.A());
+
+  clr.SetFromHSV(240, 0.5, 1.0);
+  EXPECT_EQ(0.5f, clr.R());
+  EXPECT_EQ(0.5f, clr.G());
+  EXPECT_EQ(1.0f, clr.B());
+  EXPECT_EQ(0.0f, clr.A());
+
+  clr.SetFromHSV(300, 0.5, 1.0);
+  EXPECT_EQ(1.0f, clr[0]);
+  EXPECT_EQ(0.5f, clr[1]);
+  EXPECT_EQ(1.0f, clr[2]);
+  EXPECT_EQ(0.0f, clr[3]);
+  EXPECT_EQ(0.0f, clr[4]);
+
+  clr.R(0.1);
+  clr.G(0.2);
+  clr.B(0.3);
+  clr.A(0.4);
+  EXPECT_EQ(0.1f, clr[0]);
+  EXPECT_EQ(0.2f, clr[1]);
+  EXPECT_EQ(0.3f, clr[2]);
+  EXPECT_EQ(0.4f, clr[3]);
+
+  clr.Set(0.1, 0.2, 0.3, 0.4);
+  clr = clr + 0.2;
+  EXPECT_TRUE(clr == common::Color(0.3, 0.4, 0.5, 0.6));
+
+  clr.Set(0.1, 0.2, 0.3, 0.4);
+  clr += common::Color(0.2, 0.2, 0.2, 0.2);
+  EXPECT_TRUE(clr == common::Color(0.3, 0.4, 0.5, 0.6));
+
+
+  clr.Set(0.1, 0.2, 0.3, 0.4);
+  clr = clr - 0.1;
+  EXPECT_TRUE(clr == common::Color(0.0, 0.1, 0.2, 0.3));
+
+  clr.Set(0.1, 0.2, 0.3, 0.4);
+  clr -= common::Color(0.1, 0.1, 0.1, 0.1);
+  EXPECT_TRUE(clr == common::Color(0.0, 0.1, 0.2, 0.3));
+
+
+  clr.Set(1, 1, 1, 1.);
+  clr = clr / 1.6;
+  EXPECT_TRUE(clr == common::Color(0.625, 0.625, 0.625, 0.625));
+
+  clr.Set(1, 1, 1, 1);
+  clr /= common::Color(1, 1, 1, 1);
+  EXPECT_TRUE(clr == common::Color(1, 1, 1, 1));
+
+
+  clr.Set(.1, .2, .3, .4);
+  clr = clr * .1;
+  EXPECT_TRUE(clr == common::Color(0.01, 0.02, 0.03, 0.04));
+
+  clr.Set(.1, .2, .3, .4);
+  clr *= common::Color(0.1, 0.1, 0.1, 0.1);
+  EXPECT_TRUE(clr == common::Color(0.01, 0.02, 0.03, 0.04));
+
+
   clr.SetFromYUV(0.5, 0.2, 0.8);
   EXPECT_TRUE(math::equal(0.00553f, clr.R(), 1e-3f));
   EXPECT_TRUE(math::equal(0.0f, clr.G()));
   EXPECT_TRUE(math::equal(0.9064f, clr.B(), 1e-3f));
-  EXPECT_TRUE(math::equal(0.0f, clr.A()));
+  EXPECT_TRUE(math::equal(0.04f, clr.A()));
 
   EXPECT_TRUE(clr.GetAsYUV() == math::Vector3(0.104985, 0.95227, 0.429305));
 
@@ -151,7 +422,7 @@ TEST_F(CommonTest, Time)
 {
   common::Timer timer;
   timer.Start();
-  usleep(100000);
+  common::Time::MSleep(100000);
   EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
 
   struct timeval tv;
@@ -169,6 +440,39 @@ TEST_F(CommonTest, Time)
   time.Set(1, 1000);
   time += common::Time(1.5, 1000000000);
   EXPECT_TRUE(time == common::Time(3.5, 1000));
+
+  time.Set(1, 1000);
+  time -= common::Time(1, 1000);
+  EXPECT_TRUE(time == common::Time(0, 0));
+
+  time.Set(1, 1000);
+  time *= common::Time(2, 2);
+  EXPECT_TRUE(time == common::Time(2, 2000));
+
+  time.Set(2, 4000);
+  time /= common::Time(2, 2);
+  EXPECT_TRUE(time == common::Time(1, 2000));
+  EXPECT_FALSE(time != common::Time(1, 2000));
+
+  tv.tv_sec = 1;
+  tv.tv_usec = 2;
+  EXPECT_TRUE(time == tv);
+  EXPECT_FALSE(time != tv);
+
+  tv.tv_sec = 2;
+  EXPECT_TRUE(time < tv);
+
+  tv.tv_sec = 0;
+  EXPECT_TRUE(time > tv);
+  EXPECT_TRUE(time >= tv);
+
+
+  EXPECT_TRUE(time == 1.0 + 2000*1e-9);
+  EXPECT_FALSE(time != 1.0 + 2000*1e-9);
+  EXPECT_TRUE(time < 2.0);
+  EXPECT_TRUE(time > 0.1);
+  EXPECT_TRUE(time >= 0.1);
+
 
   tv.tv_sec = 2;
   tv.tv_usec = 1000000;
@@ -212,54 +516,7 @@ TEST_F(CommonTest, Time)
   EXPECT_TRUE(time == common::Time(0, 500000500));
 }
 
-TEST_F(CommonTest, Paths)
-{
-  putenv(const_cast<char*>("GAZEBO_LOG_PATH="));
-  common::SystemPaths *paths = common::SystemPaths::Instance();
 
-  EXPECT_TRUE(paths->GetLogPath().empty());
-
-  putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
-  const std::list<std::string> pathList1 = paths->GetGazeboPaths();
-  EXPECT_EQ(2, pathList1.size());
-  EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
-  EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
-
-  putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
-  const std::list<std::string> pathList2 = paths->GetOgrePaths();
-  EXPECT_EQ(2, pathList2.size());
-  EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
-  EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
-
-  putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
-  const std::list<std::string> pathList3 = paths->GetPluginPaths();
-  EXPECT_EQ(2, pathList3.size());
-  EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
-  EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
-
-  EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
-  EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());
-
-  paths->AddGazeboPaths("/gazebo/path:/other/gazebo");
-  EXPECT_EQ(4, paths->GetGazeboPaths().size());
-  EXPECT_STREQ("/other/gazebo", paths->GetGazeboPaths().back().c_str());
-
-  paths->AddPluginPaths("/plugin/path:/other/plugin");
-  EXPECT_EQ(4, paths->GetGazeboPaths().size());
-  EXPECT_STREQ("/other/plugin", paths->GetPluginPaths().back().c_str());
-
-  paths->AddOgrePaths("/ogre/path:/other/ogre");
-  EXPECT_EQ(4, paths->GetOgrePaths().size());
-  EXPECT_STREQ("/other/ogre", paths->GetOgrePaths().back().c_str());
-
-  paths->ClearGazeboPaths();
-  paths->ClearOgrePaths();
-  paths->ClearPluginPaths();
-
-  EXPECT_EQ(2, paths->GetGazeboPaths().size());
-  EXPECT_EQ(2, paths->GetOgrePaths().size());
-  EXPECT_EQ(2, paths->GetPluginPaths().size());
-}
 
 TEST_F(CommonTest, Material)
 {
@@ -312,6 +569,137 @@ TEST_F(CommonTest, Material)
 
   mat.SetLighting(true);
   EXPECT_TRUE(mat.GetLighting());
+}
+
+TEST_F(CommonTest, Console)
+{
+  gzlog << "Log test\n";
+  common::Console::Instance()->SetQuiet(true);
+}
+
+TEST_F(CommonTest, Exception)
+{
+  try
+  {
+    gzthrow("test");
+  }
+  catch(common::Exception &_e)
+  {
+    std::cout << "Exception[" << _e.GetErrorFile() << "]\n";
+    std::cout << "Exception[" << _e.GetErrorStr() << "]\n";
+  }
+}
+
+TEST_F(CommonTest, Diagnostics)
+{
+  common::DiagnosticManager *mgr = common::DiagnosticManager::Instance();
+  EXPECT_TRUE(mgr != NULL);
+
+  mgr->SetEnabled(true);
+  EXPECT_TRUE(mgr->GetEnabled());
+
+  common::Time prev = common::Time::GetWallTime();
+  {
+    common::DiagnosticTimerPtr timer = mgr->CreateTimer("test");
+    EXPECT_STREQ("test", timer->GetName().c_str());
+    EXPECT_STREQ("test", mgr->GetLabel(0).c_str());
+    EXPECT_EQ(1, mgr->GetTimerCount());
+  }
+  common::Time after = common::Time::GetWallTime();
+
+  EXPECT_TRUE(mgr->GetTime(0) == mgr->GetTime("test"));
+  EXPECT_TRUE(mgr->GetTime(0) <= after - prev);
+}
+
+TEST_F(CommonTest, Mesh)
+{
+  const common::Mesh *mesh =
+    common::MeshManager::Instance()->GetMesh("unit_box");
+  EXPECT_EQ(24, mesh->GetVertexCount());
+  EXPECT_EQ(24, mesh->GetNormalCount());
+  EXPECT_EQ(36, mesh->GetIndexCount());
+  EXPECT_EQ(24, mesh->GetTexCoordCount());
+  EXPECT_EQ(0, mesh->GetMaterialCount());
+
+  math::Vector3 center, min, max;
+  mesh->GetAABB(center, min, max);
+  EXPECT_TRUE(center == math::Vector3(0, 0, 0));
+  EXPECT_TRUE(min == math::Vector3(-.5, -.5, -.5));
+  EXPECT_TRUE(max == math::Vector3(.5, .5, .5));
+
+
+  float *vertArray = NULL;
+  int *indArray = NULL;
+  mesh->FillArrays(&vertArray, &indArray);
+
+  int i = 0;
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+
+  EXPECT_EQ(-.5, vertArray[i++]);
+  EXPECT_EQ(.5, vertArray[i++]);
+  EXPECT_EQ(-.5, vertArray[i++]);
+
+  common::Mesh *newMesh = new common::Mesh();
+  newMesh->SetName("testBox");
+  common::SubMesh *subMesh = new common::SubMesh();
+  newMesh->AddSubMesh(subMesh);
+
+  std::vector<math::Vector3> verts;
+  std::vector<math::Vector3> norms;
+
+  for (i = 0; i < 24; ++i)
+  {
+    verts.push_back(mesh->GetSubMesh(0)->GetVertex(i));
+    norms.push_back(mesh->GetSubMesh(0)->GetNormal(i));
+  }
+
+  subMesh->CopyVertices(verts);
+  subMesh->CopyNormals(norms);
+
+  newMesh->GetAABB(center, min, max);
+  EXPECT_TRUE(center == math::Vector3(0, 0, 0));
+  EXPECT_TRUE(min == math::Vector3(-.5, -.5, -.5));
+  EXPECT_TRUE(max == math::Vector3(.5, .5, .5));
+
+
+  delete newMesh;
+
+  std::ofstream stlFile("/tmp/gazebo_stl_test.stl", std::ios::out);
+  stlFile << asciiSTLBox;
+  stlFile.close();
+
+  common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test.stl");
+  mesh = common::MeshManager::Instance()->GetMesh("/tmp/gazebo_stl_test.stl");
+  mesh->GetAABB(center, min, max);
+  EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
+  EXPECT_TRUE(min == math::Vector3(0, 0, 0));
+  EXPECT_TRUE(max == math::Vector3(1, 1, 1));
 }
 
 int main(int argc, char **argv)

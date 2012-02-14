@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   transport::run();
 
   while (true)
-    usleep(10000);
+    common::Time::MSleep(10000);
 
   transport::fini();
 }
