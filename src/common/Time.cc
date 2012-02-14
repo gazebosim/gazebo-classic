@@ -249,7 +249,7 @@ Time Time::operator /(const Time &_time) const
   if (_time.sec != 0)
   {
     result.sec = this->sec / _time.sec;
-    remainder = (this->sec / (double)(_time.sec)) - result.sec;
+    remainder = (this->sec / static_cast<double>(_time.sec)) - result.sec;
   }
 
   if (_time.nsec != 0)

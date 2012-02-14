@@ -401,7 +401,7 @@ class ServerFixture : public testing::Test
                  usleep(10000);
              }
 
-  protected: void SpawnBox(const std::string &_name, 
+  protected: void SpawnBox(const std::string &_name,
                  const math::Vector3 &_size, const math::Vector3 &_pos,
                  const math::Vector3 &_rpy)
              {

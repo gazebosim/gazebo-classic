@@ -99,7 +99,6 @@ void RaySensor::Load()
   this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
-
 }
 
 //////////////////////////////////////////////////
@@ -210,7 +209,6 @@ double RaySensor::GetRange(int _index)
 
   boost::mutex::scoped_lock(*this->mutex);
   return this->laserMsg.ranges(_index);
-  //return this->laserShape->GetRange(index);
 }
 
 //////////////////////////////////////////////////

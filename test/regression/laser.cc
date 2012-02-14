@@ -88,7 +88,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
 
     // This line will print the current scan. Use this to generate
     // a new test scan sample
-    //PrintScan("box_scan", &scan[0], 640);
+    // PrintScan("box_scan", &scan[0], 640);
   }
 
   // Move the laser to point down on the ground plane,
@@ -100,7 +100,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     physics::ModelPtr model = world->GetModelByName("box");
 
     prevTime = laser->GetLastUpdateTime();
-    model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0 ));
+    model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
     while (laser->GetLastUpdateTime() <= prevTime)
       usleep(10000);
 
@@ -109,7 +109,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     std::vector<double> scan, scan2;
 
     laser->Update(false);
-    for (unsigned int j=0; j < 5; j++)
+    for (unsigned int j = 0; j < 5; ++j)
     {
       laser->Update(true);
       laser->GetRanges(scan);
@@ -127,10 +127,10 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     EXPECT_LT(diffMax, 1e-6);
     EXPECT_LT(diffSum, 1e-6);
     EXPECT_LT(diffAvg, 1e-6);
-    
+
     // This line will print the current scan. Use this to generate
     // a new test scan sample
-    //PrintScan("plane_scan", &scan[0], 640);
+    // PrintScan("plane_scan", &scan[0], 640);
   }
 }
 

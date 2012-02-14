@@ -25,17 +25,21 @@ TEST_F(PR2Test, Load)
 {
   Load("worlds/empty.world");
   SpawnModel("models/pr2.model");
-  while (!this->HasEntity("pr2"))
+
+  int i;
+  for (i = 0; i < 10 && !this->HasEntity("pr2"); ++i)
     usleep(10000);
-/*
+  EXPECT_LT(i, 10);
+
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
-  if (!sensor)
-    printf("Invalid sensor\n");
+  EXPECT_TRUE(sensor);
 
   sensors::CameraSensorPtr camSensor =
     boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
-  while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
+  EXPECT_TRUE(camSensor);
+
+  /*while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
     usleep(100000);
 
   for (int i = 11; i < 100; i++)

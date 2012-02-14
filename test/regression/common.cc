@@ -155,15 +155,15 @@ TEST_F(CommonTest, Time)
   EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
 
   struct timeval tv;
-  gettimeofday(&tv, NULL); 
+  gettimeofday(&tv, NULL);
   common::Time time(tv);
   EXPECT_EQ(time.sec, tv.tv_sec);
   EXPECT_EQ(time.nsec, tv.tv_usec * 1000);
 
   time.SetToWallTime();
-  EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0,1000000));
+  EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0, 1000000));
 
-  time = common::Time(1,1000) + common::Time(1.5, 1000000000);
+  time = common::Time(1, 1000) + common::Time(1.5, 1000000000);
   EXPECT_TRUE(time == common::Time(3.5, 1000));
 
   time.Set(1, 1000);
@@ -172,14 +172,14 @@ TEST_F(CommonTest, Time)
 
   tv.tv_sec = 2;
   tv.tv_usec = 1000000;
-  time = common::Time(1,1000) + tv;
+  time = common::Time(1, 1000) + tv;
   EXPECT_TRUE(time == common::Time(4.0, 1000));
 
   time.Set(1, 1000);
   time += tv;
   EXPECT_TRUE(time == common::Time(4, 1000));
 
-  time = common::Time(1,1000) - tv;
+  time = common::Time(1, 1000) - tv;
   EXPECT_TRUE(time == common::Time(-2, 1000));
 
   time.Set(1, 1000);
@@ -200,7 +200,7 @@ TEST_F(CommonTest, Time)
   EXPECT_TRUE(time == common::Time(2, 2000));
 
 
-  time = common::Time(1,2000000) / tv;
+  time = common::Time(1, 2000000) / tv;
   EXPECT_TRUE(time == common::Time(0, 500000002));
 
   time.Set(1, 2000000);
@@ -222,20 +222,20 @@ TEST_F(CommonTest, Paths)
   putenv(const_cast<char*>("GAZEBO_RESOURCE_PATH=/tmp/resource:/test/me/now"));
   const std::list<std::string> pathList1 = paths->GetGazeboPaths();
   EXPECT_EQ(2, pathList1.size());
-  EXPECT_STREQ("/tmp/resource",pathList1.front().c_str());
-  EXPECT_STREQ("/test/me/now",pathList1.back().c_str());
+  EXPECT_STREQ("/tmp/resource", pathList1.front().c_str());
+  EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
 
   putenv(const_cast<char*>("OGRE_RESOURCE_PATH=/tmp/ogre:/test/ogre/now"));
   const std::list<std::string> pathList2 = paths->GetOgrePaths();
   EXPECT_EQ(2, pathList2.size());
-  EXPECT_STREQ("/tmp/ogre",pathList2.front().c_str());
-  EXPECT_STREQ("/test/ogre/now",pathList2.back().c_str());
+  EXPECT_STREQ("/tmp/ogre", pathList2.front().c_str());
+  EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
 
   putenv(const_cast<char*>("GAZEBO_PLUGIN_PATH=/tmp/plugin:/test/plugin/now"));
   const std::list<std::string> pathList3 = paths->GetPluginPaths();
   EXPECT_EQ(2, pathList3.size());
-  EXPECT_STREQ("/tmp/plugin",pathList3.front().c_str());
-  EXPECT_STREQ("/test/plugin/now",pathList3.back().c_str());
+  EXPECT_STREQ("/tmp/plugin", pathList3.front().c_str());
+  EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 
   EXPECT_STREQ("/models", paths->GetModelPathExtension().c_str());
   EXPECT_STREQ("/worlds", paths->GetWorldPathExtension().c_str());

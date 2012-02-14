@@ -48,128 +48,132 @@ namespace gazebo
   /// \{
   /// \brief A class which all plugins must inherit from
   template<class T>
-    class PluginT
-    {
-      public: typedef boost::shared_ptr<T> TPtr;
+  class PluginT
+  {
+    public: typedef boost::shared_ptr<T> TPtr;
 
-              /// \brief Get the name of the handler
-      public: std::string GetFilename() const
+            /// \brief Get the name of the handler
+    public: std::string GetFilename() const
+            {
+              return this->filename;
+            }
+
+            /// \brief Get the short name of the handler
+    public: std::string GetHandle() const
+            {
+              return this->handle;
+            }
+
+    public: static TPtr Create(const std::string &_filename,
+                const std::string &_handle)
+            {
+              TPtr result;
+              // PluginPtr result;
+              struct stat st;
+              bool found = false;
+              std::string fullname;
+              std::list<std::string>::iterator iter;
+              std::list<std::string> pluginPaths =
+                common::SystemPaths::Instance()->GetPluginPaths();
+
+              for (iter = pluginPaths.begin();
+                   iter!= pluginPaths.end(); ++iter)
               {
-                return this->filename;
-              }
-
-              /// \brief Get the short name of the handler
-      public: std::string GetHandle() const
-              {
-                return this->handle;
-              }
-
-      public: static TPtr Create(const std::string &_filename,
-                  const std::string &_handle)
-              {
-                TPtr result;
-                // PluginPtr result;
-                struct stat st;
-                bool found = false;
-                std::string fullname;
-                std::list<std::string>::iterator iter;
-                std::list<std::string> pluginPaths =
-                  common::SystemPaths::Instance()->GetPluginPaths();
-
-                for (iter = pluginPaths.begin(); iter!= pluginPaths.end(); ++iter)
+                fullname = (*iter)+std::string("/")+_filename;
+                if (stat(fullname.c_str(), &st) == 0)
                 {
-                  fullname = (*iter)+std::string("/")+_filename;
-                  if (stat(fullname.c_str(), &st) == 0)
-                  {
-                    found = true;
-                    break;
-                  }
+                  found = true;
+                  break;
                 }
+              }
 
-                if (!found)
-                  fullname = _filename;
-                std::string registerName = "RegisterPlugin";
+              if (!found)
+                fullname = _filename;
+              std::string registerName = "RegisterPlugin";
 
-                fptr_union_t registerFunc;
+              fptr_union_t registerFunc;
 
 #ifdef HAVE_DL
-                void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-                if (!handle)
-                {
-                  gzerr << "Failed to load plugin " << fullname << ": "
-                    << dlerror() << "\n";
-                  return result;
-                }
-
-                registerFunc.ptr = dlsym(handle, registerName.c_str());
-
-                if (!registerFunc.ptr)
-                {
-                  gzerr << "Failed to resolve " << registerName << ": " << dlerror();
-                  return result;
-                }
-
-                // Register the new controller.
-                result.reset(registerFunc.func());
-
-#elif HAVE_LTDL
-
-                static bool init_done = false;
-
-                if (!init_done)
-                {
-                  int errors = lt_dlinit();
-                  if (errors)
-                  {
-                    gzerr << "Error(s) initializing dynamic loader ("
-                      << errors << ", " << lt_dlerror() << ")";
-                    return NULL;
-                  }
-                  else
-                    init_done = true;
-                }
-
-                lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-                if (!handle)
-                {
-                  gzerr << "Failed to load " << fullname << ": " << lt_dlerror();
-                  return NULL;
-                }
-
-                T *(*registerFunc)() = (T *(*)())lt_dlsym(handle, registerName.c_str());
-                resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-                if (!registerFunc.ptr)
-                {
-                  gzerr << "Failed to resolve " << registerName << ": " << lt_dlerror();
-                  return NULL;
-                }
-
-                // Register the new controller.
-                result.result(registerFunc.func());
-
-#else  // HAVE_LTDL
-
-                gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
-
-                result->handle = _handle;
-                result->filename = _filename;
-
+              void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+              if (!handle)
+              {
+                gzerr << "Failed to load plugin " << fullname << ": "
+                  << dlerror() << "\n";
                 return result;
               }
 
-      protected: std::string filename;
-      protected: std::string handle;
+              registerFunc.ptr = dlsym(handle, registerName.c_str());
 
-      private: typedef union
-               {
-                 T *(*func)();
-                 void *ptr;
-               } fptr_union_t;
-    };
-  
+              if (!registerFunc.ptr)
+              {
+                gzerr << "Failed to resolve " << registerName
+                      << ": " << dlerror();
+                return result;
+              }
+
+              // Register the new controller.
+              result.reset(registerFunc.func());
+
+#elif HAVE_LTDL
+
+              static bool init_done = false;
+
+              if (!init_done)
+              {
+                int errors = lt_dlinit();
+                if (errors)
+                {
+                  gzerr << "Error(s) initializing dynamic loader ("
+                    << errors << ", " << lt_dlerror() << ")";
+                  return NULL;
+                }
+                else
+                  init_done = true;
+              }
+
+              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
+
+              if (!handle)
+              {
+                gzerr << "Failed to load " << fullname
+                      << ": " << lt_dlerror();
+                return NULL;
+              }
+
+              T *(*registerFunc)() =
+                (T *(*)())lt_dlsym(handle, registerName.c_str());
+              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
+              if (!registerFunc.ptr)
+              {
+                gzerr << "Failed to resolve " << registerName << ": "
+                      << lt_dlerror();
+                return NULL;
+              }
+
+              // Register the new controller.
+              result.result(registerFunc.func());
+
+#else  // HAVE_LTDL
+
+              gzthrow("Cannot load plugins as libtool is not installed.");
+
+#endif  // HAVE_LTDL
+
+              result->handle = _handle;
+              result->filename = _filename;
+
+              return result;
+            }
+
+    protected: std::string filename;
+    protected: std::string handle;
+
+    private: typedef union
+             {
+               T *(*func)();
+               void *ptr;
+             } fptr_union_t;
+  };
 
   class WorldPlugin : public PluginT<WorldPlugin>
   {
