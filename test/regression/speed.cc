@@ -26,7 +26,7 @@ TEST_F(SpeedTest, EmptyWorld)
   Load("worlds/empty.world");
   double speed = 0;
   while ((speed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100000);
+    common::Time::MSleep(100);
 
 #ifdef BUILD_TYPE_RELEASE
   EXPECT_GT(speed, 3800.0);
@@ -42,7 +42,7 @@ TEST_F(SpeedTest, ShapesWorld)
   Load("worlds/shapes.world");
   double speed = 0;
   while ((speed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100000);
+    common::Time::MSleep(100);
 
 #ifdef BUILD_TYPE_RELEASE
   EXPECT_GT(speed, 110.0);
@@ -58,7 +58,7 @@ TEST_F(SpeedTest, PR2World)
   Load("worlds/pr2.world");
   double speed = 0;
   while ((speed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100000);
+    common::Time::MSleep(100);
 
 #ifdef BUILD_TYPE_RELEASE
   EXPECT_GT(speed, 4.0);

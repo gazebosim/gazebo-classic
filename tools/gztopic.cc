@@ -193,7 +193,7 @@ void echo()
   transport::run();
 
   while (true)
-    common::Time::MSleep(10000);
+    common::Time::MSleep(10);
 
   transport::fini();
 }

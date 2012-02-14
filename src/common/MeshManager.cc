@@ -127,9 +127,13 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     {
       if (!this->HasMesh(_filename))
       {
-        mesh = loader->Load(fullname);
-        mesh->SetName(_filename);
-        this->meshes.insert(std::make_pair(_filename, mesh));
+        if ((mesh = loader->Load(fullname)) != NULL)
+        {
+          mesh->SetName(_filename);
+          this->meshes.insert(std::make_pair(_filename, mesh));
+        }
+        else
+          gzerr << "Unable to load mesh[" << fullname << "]\n";
       }
       else
       {

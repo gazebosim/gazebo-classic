@@ -27,9 +27,9 @@ TEST_F(PR2Test, Load)
   SpawnModel("models/pr2.model");
 
   int i;
-  for (i = 0; i < 10 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(10000);
-  EXPECT_LT(i, 10);
+  for (i = 0; i < 20 && !this->HasEntity("pr2"); ++i)
+    common::Time::MSleep(100);
+  EXPECT_LT(i, 20);
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");

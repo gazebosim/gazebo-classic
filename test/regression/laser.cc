@@ -54,7 +54,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
      </gazebo>";
   SpawnSDF(laserModel.str());
   while (!HasEntity("box"))
-    common::Time::MSleep(10000);
+    common::Time::MSleep(10);
 
   sensors::RaySensorPtr laser =
     boost::shared_static_cast<sensors::RaySensor>(
@@ -73,7 +73,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
   {
     SpawnBox("test_box", math::Vector3(1, 1, 1),
         math::Vector3(2, 0, 0.5), math::Vector3(0, 0, 0));
-    common::Time::MSleep(1000000);
+    common::Time::MSleep(1000);
 
     laser->Update(true);
 
@@ -102,7 +102,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     prevTime = laser->GetLastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
     while (laser->GetLastUpdateTime() <= prevTime)
-      common::Time::MSleep(10000);
+      common::Time::MSleep(10);
 
     double diffMax, diffSum, diffAvg;
 

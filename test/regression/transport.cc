@@ -100,7 +100,7 @@ TEST_F(TransportTest, Processes)
   pid_t pid = fork();
   if (pid == 0)
   {
-    common::Time::MSleep(1000000);
+    common::Time::MSleep(1);
     transport::init();
     transport::run();
 
@@ -127,7 +127,7 @@ TEST_F(TransportTest, Processes)
     int i = 0;
     while (!g_worldStatsMsg2 && i < 20)
     {
-      common::Time::MSleep(1000000);
+      common::Time::MSleep(1);
       ++i;
     }
     EXPECT_LT(i, 20);
@@ -136,7 +136,7 @@ TEST_F(TransportTest, Processes)
     sub.reset();
     node.reset();
     transport::fini();
-    common::Time::MSleep(5000000);
+    common::Time::MSleep(5);
   }
   else if (pid < 0)
     printf("Fork failed\n");
@@ -164,7 +164,7 @@ TEST_F(TransportTest, Processes)
     pub2->Publish(msg);
 
     for (int i = 0; i < 5; ++i)
-      common::Time::MSleep(1000000);
+      common::Time::MSleep(1);
 
     sub.reset();
     sub2.reset();
@@ -223,7 +223,7 @@ TEST_F(TransportTest, Errors)
   int i = 0;
   while (!g_worldStatsMsg && !g_sceneMsg && !g_worldStatsDebugMsg && i < 20)
   {
-    common::Time::MSleep(10000);
+    common::Time::MSleep(10);
     ++i;
   }
   EXPECT_LT(i, 20);

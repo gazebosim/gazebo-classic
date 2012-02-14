@@ -41,8 +41,6 @@ STLLoader::~STLLoader()
 //////////////////////////////////////////////////
 Mesh *STLLoader::Load(const std::string &_filename)
 {
-  Mesh *mesh = new Mesh();
-
   FILE *file = fopen(_filename.c_str(), "r");
 
   if (!file)
@@ -50,6 +48,8 @@ Mesh *STLLoader::Load(const std::string &_filename)
     gzerr << "Unable to open file[" << _filename << "]\n";
     return NULL;
   }
+
+  Mesh *mesh = new Mesh();
 
   // Try to read ASCII first. If that fails, try binary
   if (!this->ReadAscii(file, mesh))
@@ -60,7 +60,6 @@ Mesh *STLLoader::Load(const std::string &_filename)
       gzerr << "Unable to read STL[" << _filename << "]\n";
     fclose(file);
   }
-
 
   return mesh;
 }

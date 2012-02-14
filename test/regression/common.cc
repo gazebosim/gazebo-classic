@@ -422,7 +422,7 @@ TEST_F(CommonTest, Time)
 {
   common::Timer timer;
   timer.Start();
-  common::Time::MSleep(100000);
+  common::Time::MSleep(100);
   EXPECT_TRUE(timer.GetElapsed() > common::Time(0, 100000000));
 
   struct timeval tv;
@@ -673,6 +673,8 @@ TEST_F(CommonTest, Mesh)
   std::vector<math::Vector3> verts;
   std::vector<math::Vector3> norms;
 
+  EXPECT_THROW(mesh->GetSubMesh(1), common::Exception);
+
   for (i = 0; i < 24; ++i)
   {
     verts.push_back(mesh->GetSubMesh(0)->GetVertex(i));
@@ -681,6 +683,8 @@ TEST_F(CommonTest, Mesh)
 
   subMesh->CopyVertices(verts);
   subMesh->CopyNormals(norms);
+  EXPECT_TRUE(subMesh->HasVertex(math::Vector3(-.5, -.5, -.5)));
+  EXPECT_FALSE(subMesh->HasVertex(math::Vector3(0, 0, 0)));
 
   newMesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == math::Vector3(0, 0, 0));
@@ -694,8 +698,10 @@ TEST_F(CommonTest, Mesh)
   stlFile << asciiSTLBox;
   stlFile.close();
 
-  common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test.stl");
-  mesh = common::MeshManager::Instance()->GetMesh("/tmp/gazebo_stl_test.stl");
+  mesh = common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test-bad.stl");
+  EXPECT_EQ(NULL, mesh);
+
+  mesh = common::MeshManager::Instance()->Load("/tmp/gazebo_stl_test.stl");
   mesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == math::Vector3(0, 0, 0));
