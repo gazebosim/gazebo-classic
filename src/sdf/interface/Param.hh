@@ -52,15 +52,6 @@ namespace sdf
     /// \brief Destructor
     public: virtual  ~Param();
 
-    /// \brief Begin a block of "new Param<*>"
-    public: static void Begin(std::vector<Param*> *_params);
-
-    /// \brief End a block of "new Param<*>"
-    public: static void End();
-
-    /// \brief Find a parameter by name
-    public: static ParamPtr Find(Param_V &_params, const std::string &key);
-
     /// \brief Get the type
     public: virtual std::string GetAsString() const
             {return std::string();}

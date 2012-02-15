@@ -574,6 +574,7 @@ TEST_F(CommonTest, Material)
 TEST_F(CommonTest, Console)
 {
   gzlog << "Log test\n";
+  common::Console::Instance()->Load();
   common::Console::Instance()->SetQuiet(true);
 }
 
@@ -613,6 +614,10 @@ TEST_F(CommonTest, Diagnostics)
 
 TEST_F(CommonTest, Mesh)
 {
+  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
+  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
+  EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
+  
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
   EXPECT_EQ(24, mesh->GetVertexCount());
@@ -691,6 +696,21 @@ TEST_F(CommonTest, Mesh)
   EXPECT_TRUE(min == math::Vector3(-.5, -.5, -.5));
   EXPECT_TRUE(max == math::Vector3(.5, .5, .5));
 
+  subMesh->SetVertexCount(1);
+  subMesh->SetIndexCount(1);
+  subMesh->SetNormalCount(1);
+  subMesh->SetTexCoordCount(1);
+
+  EXPECT_EQ(1, subMesh->GetVertexCount());
+  EXPECT_EQ(1, subMesh->GetIndexCount());
+  EXPECT_EQ(1, subMesh->GetNormalCount());
+  EXPECT_EQ(1, subMesh->GetTexCoordCount());
+
+  subMesh->SetVertex(0, math::Vector3(1, 2, 3));
+  EXPECT_TRUE(subMesh->GetVertex(0) == math::Vector3(1, 2, 3));
+
+  subMesh->SetTexCoord(0, math::Vector2d(.1, .2));
+  EXPECT_TRUE(subMesh->GetTexCoord(0) == math::Vector2d(.1, .2));
 
   delete newMesh;
 

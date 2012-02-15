@@ -59,11 +59,8 @@ MeshManager::MeshManager()
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 
-  this->fileExtensions.push_back("mesh");
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
-  this->fileExtensions.push_back("3ds");
-  this->fileExtensions.push_back("xml");
 }
 
 //////////////////////////////////////////////////

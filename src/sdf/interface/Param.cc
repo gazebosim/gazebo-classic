@@ -47,35 +47,6 @@ Param::~Param()
 }
 
 //////////////////////////////////////////////////
-void Param::Begin(std::vector<Param*> *_params)
-{
-  if (params != NULL)
-    gzthrow("Calling Begin before an End\n");
-  params = _params;
-}
-
-//////////////////////////////////////////////////
-void Param::End()
-{
-  /*if (params == NULL)
-    gzthrow("Calling End before a Begin\n");
-
-    */
-  params = NULL;
-}
-
-//////////////////////////////////////////////////
-ParamPtr Param::Find(Param_V &_params, const std::string &key)
-{
-  for (Param_V::iterator iter = _params.begin(); iter != _params.end(); ++iter)
-  {
-    if ((*iter)->GetKey() == key)
-      return (*iter);
-  }
-  return ParamPtr();
-}
-
-//////////////////////////////////////////////////
 std::string Param::GetTypeName() const
 {
   return this->typeName;
