@@ -43,7 +43,6 @@ TEST_F(FactoryTest, Box)
     SpawnBox(name.str(), math::Vector3(1, 1, 1), setPose.pos,
         setPose.rot.GetAsEuler());
     testPose = GetEntityPose(name.str());
-    std::cout << "I[" << i << "] TestPose[" << testPose << "] SetPose[" << setPose << "]\n";
     EXPECT_TRUE(math::equal(testPose.pos.x, setPose.pos.x, 0.1));
     EXPECT_TRUE(math::equal(testPose.pos.y, setPose.pos.y, 0.1));
     EXPECT_TRUE(math::equal(testPose.pos.z, setPose.pos.z, 0.1));
