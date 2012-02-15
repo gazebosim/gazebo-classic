@@ -194,9 +194,10 @@ dxJointHinge2::makeV1andV2()
         dMultiply0_331( ax2, node[1].body->posr.R, axis2 );
 
         // don't do anything if the axis1 or axis2 vectors are zero or the same
-        if (( ax1[0] == 0 && ax1[1] == 0 && ax1[2] == 0 ) ||
-                ( ax2[0] == 0 && ax2[1] == 0 && ax2[2] == 0 ) ||
-                ( ax1[0] == ax2[0] && ax1[1] == ax2[1] && ax1[2] == ax2[2] ) ) return;
+        if ((_dequal(ax1[0], 0.0) && _dequal(ax1[1], 0.0) && _dequal(ax1[2], 0.0)) ||
+            (_dequal(ax2[0], 0.0) && _dequal(ax2[1], 0.0) && _dequal(ax2[2], 0.0)) ||
+            (_dequal(ax1[0], ax2[0]) && _dequal(ax1[1], ax2[1]) && _dequal(ax1[2], ax2[2])))
+          return;
 
         // modify axis 2 so it's perpendicular to axis 1
         dReal k = dCalcVectorDot3( ax1, ax2 );

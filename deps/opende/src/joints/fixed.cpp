@@ -133,15 +133,17 @@ void dJointSetFixed ( dJointID j )
 
 void dxJointFixed::set ( int num, dReal value )
 {
-    switch ( num )
-    {
+  switch ( num )
+  {
     case dParamCFM:
-        cfm = value;
-        break;
+      cfm = value;
+      break;
     case dParamERP:
-        erp = value;
-        break;
-    }
+      erp = value;
+      break;
+    default:
+      break;
+  }
 }
 
 

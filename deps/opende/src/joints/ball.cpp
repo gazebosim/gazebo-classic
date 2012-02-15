@@ -115,29 +115,31 @@ void dJointGetBallAnchor2( dJointID j, dVector3 result )
 
 void dxJointBall::set( int num, dReal value )
 {
-    switch ( num )
-    {
+  switch (num)
+  {
     case dParamCFM:
-        cfm = value;
-        break;
+      cfm = value;
+      break;
     case dParamERP:
-        erp = value;
-        break;
-    }
+      erp = value;
+      break;
+    default:
+      break;
+  }
 }
 
 
 dReal dxJointBall::get( int num )
 {
-    switch ( num )
-    {
+  switch ( num )
+  {
     case dParamCFM:
-        return cfm;
+      return cfm;
     case dParamERP:
-        return erp;
+      return erp;
     default:
-        return 0;
-    }
+      return 0;
+  }
 }
 
 
