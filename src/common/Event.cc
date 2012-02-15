@@ -27,7 +27,6 @@ Connection::Connection(Event *_e, int _i)
   : event(_e), id(_i)
 {
   this->creationTime = common::Time::GetWallTime();
-  this->uniqueId = counter++;
 }
 
 //////////////////////////////////////////////////
@@ -50,10 +49,3 @@ int Connection::GetId() const
 {
   return this->id;
 }
-
-int Connection::GetUniqueId() const
-{
-  return this->uniqueId;
-}
-
-

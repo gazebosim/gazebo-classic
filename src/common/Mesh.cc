@@ -673,7 +673,7 @@ void Mesh::GetAABB(math::Vector3 &_center, math::Vector3 &_min_xyz,
 }
 
 //////////////////////////////////////////////////
-void Mesh::GenSphericalTexCoord(math::Vector3 _center)
+void Mesh::GenSphericalTexCoord(const math::Vector3 &_center)
 {
   std::vector<SubMesh*>::iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
@@ -681,7 +681,7 @@ void Mesh::GenSphericalTexCoord(math::Vector3 _center)
 }
 
 //////////////////////////////////////////////////
-void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
+void SubMesh::GenSphericalTexCoord(const math::Vector3 &_center)
 {
   std::vector<math::Vector3>::const_iterator viter;
   for (viter = this->vertices.begin(); viter != this->vertices.end(); ++viter)
@@ -700,6 +700,3 @@ void SubMesh::GenSphericalTexCoord(math::Vector3 _center)
     this->AddTexCoord(u, v);
   }
 }
-
-
-

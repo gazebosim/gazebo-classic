@@ -102,7 +102,7 @@ namespace gazebo
 
       /// \brief Generate texture coordinates using spherical projection
       ///        from center
-      public: void GenSphericalTexCoord(math::Vector3 _center);
+      public: void GenSphericalTexCoord(const math::Vector3 &_center);
 
       private: std::string name;
       private: std::string path;
@@ -230,7 +230,7 @@ namespace gazebo
 
       /// \brief Generate texture coordinates using spherical projection
       ///        from center
-      public: void GenSphericalTexCoord(math::Vector3 _center);
+      public: void GenSphericalTexCoord(const math::Vector3 &_center);
 
       private: std::vector< math::Vector3 > vertices;
       private: std::vector< math::Vector3 > normals;
