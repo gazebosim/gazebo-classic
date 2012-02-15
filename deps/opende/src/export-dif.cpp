@@ -73,10 +73,10 @@ void PrintingContext::print (const char *name, int x)
 
 void PrintingContext::printReal (dReal x)
 {
-	if (x==dInfinity) {
+	if (_dequal(x, dInfinity)) {
 		fprintf (file,"inf");
 	}
-	else if (x==-dInfinity) {
+	else if (_dequal(x, -dInfinity)) {
 		fprintf (file,"-inf");
 	}
 	else {
@@ -120,13 +120,15 @@ void PrintingContext::print (const char *name, const char *x)
 
 void PrintingContext::printNonzero (const char *name, dReal x)
 {
-	if (x != 0) print (name,x);
+	if (!_dequal(x, 0.0))
+    print (name,x);
 }
 
 
 void PrintingContext::printNonzero (const char *name, const dReal x[3])
 {
-	if (x[0] != 0 && x[1] != 0 && x[2] != 0) print (name,x);
+	if (!_dequal(x[0], 0.0) && !_dequal(x[1], 0.0) && !_dequal(x[2], 0.0))
+    print (name,x);
 }
 
 //***************************************************************************
@@ -486,6 +488,7 @@ static void printGeom (PrintingContext &c, dxGeom *g)
 		case dGeomTransformClass: printGeomTransform (c,g); break;
 		case dTriMeshClass: printTriMesh (c,g); break;
 		case dHeightfieldClass: printHeightfieldClass (c,g); break;
+    default: break;
 	}
 }
 

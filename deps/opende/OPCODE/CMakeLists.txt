@@ -3,7 +3,6 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include_directories(SYSTEM
   ${CMAKE_CURRENT_BINARY_DIR} 
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE/Ice
-  ${CMAKE_SOURCE_DIR}/deps/OPCODE/Ice
 )
 
 

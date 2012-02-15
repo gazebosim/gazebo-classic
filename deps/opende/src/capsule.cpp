@@ -53,7 +53,7 @@ dxCapsule::dxCapsule (dSpaceID space, dReal _radius, dReal _length) :
   type = dCapsuleClass;
   radius = _radius;
   lz = _length;
-  updateZeroSizedFlag(!_radius/* || !_length -- zero length capsule is not a zero sized capsule*/);
+  updateZeroSizedFlag(_dequal(_radius, 0.0)/* || !_length -- zero length capsule is not a zero sized capsule*/);
 }
 
 
@@ -87,7 +87,7 @@ void dGeomCapsuleSetParams (dGeomID g, dReal radius, dReal length)
   dxCapsule *c = (dxCapsule*) g;
   c->radius = radius;
   c->lz = length;
-  c->updateZeroSizedFlag(!radius/* || !length -- zero length capsule is not a zero sized capsule*/);
+  c->updateZeroSizedFlag(_dequal(radius, 0.0)/* || !length -- zero length capsule is not a zero sized capsule*/);
   dGeomMoved (g);
 }
 

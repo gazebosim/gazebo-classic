@@ -19,6 +19,8 @@
 	#include <string.h>
 	#include <float.h>
 	#include <math.h>
+	#include <cmath>
+
 
 	#ifndef ASSERT
 		#define	ASSERT(exp)	{}

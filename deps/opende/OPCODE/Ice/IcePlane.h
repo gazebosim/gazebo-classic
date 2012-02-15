@@ -20,9 +20,9 @@
 		//! Constructor
 		inline_			Plane()															{												}
 		//! Constructor from a normal and a distance
-		inline_			Plane(float nx, float ny, float nz, float d)					{ Set(nx, ny, nz, d);							}
+		inline_			Plane(float _nx, float _ny, float _nz, float _d)					{ Set(_nx, _ny, _nz, _d);							}
 		//! Constructor from a point on the plane and a normal
-		inline_			Plane(const Point& p, const Point& n)							{ Set(p, n);									}
+		inline_			Plane(const Point& _p, const Point& _n)							{ Set(_p, _n);									}
 		//! Constructor from three points
 		inline_			Plane(const Point& p0, const Point& p1, const Point& p2)		{ Set(p0, p1, p2);								}
 		//! Constructor from a normal and a distance

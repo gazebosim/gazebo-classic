@@ -296,7 +296,7 @@ inline bool ClosestPointInRay(const dVector3 Origin1,
   dReal d = dCalcVectorDot3(Direction1 , w);
   dReal e = dCalcVectorDot3(Direction2 , w);
   dReal denominator = (a*c)-(b*b);
-  if(denominator==0.0f)
+  if(_dequal(denominator, 0.0))
     {
       return false;
     }
@@ -379,7 +379,7 @@ inline float ClosestPointBetweenSegments(dVector3& p1,
 
             // If segments not parallel, compute closest point on L1 to L2, and
             // clamp to segment S1. Else pick arbitrary s (here 0)
-            if (denom != 0.0f)
+            if (!_dequal(denom, 0.0))
             {
                 s = Clamp((b*f - c*e) / denom, 0.0f, 1.0f);
             }
@@ -624,7 +624,7 @@ int dCollideConvexPlane (dxGeom *o1, dxGeom *o2, int flags,
 		dReal distance2 = dVector3Dot(Plane->p, v2) - Plane->p[3]; // Ax + By + Cz - D
 		if((distance2 <= REAL(0.0)))
 		{
-			distance2sign = distance2 != REAL(0.0) ? LTEQ_ZERO : BOTH_SIGNS;
+			distance2sign = !_dequal(distance2, REAL(0.0)) ? LTEQ_ZERO : BOTH_SIGNS;
 
 			if (contacts != maxc)
 			{
@@ -1344,9 +1344,9 @@ int TestConvexIntersection(dxConvex& cvx1,dxConvex& cvx2, int flags,
         outside = false;
         for(int j=0;j<contacts;++j)
         {
-          if((SAFECONTACT(flags, contact, j, skip)->pos[0]==i1[0])&&
-              (SAFECONTACT(flags, contact, j, skip)->pos[1]==i1[1])&&
-              (SAFECONTACT(flags, contact, j, skip)->pos[2]==i1[2]))
+          if((_dequal(SAFECONTACT(flags, contact, j, skip)->pos[0], i1[0])) &&
+             (_dequal(SAFECONTACT(flags, contact, j, skip)->pos[1], i1[1])) &&
+             (_dequal(SAFECONTACT(flags, contact, j, skip)->pos[2], i1[2])))
           {
             outside=true;
           }

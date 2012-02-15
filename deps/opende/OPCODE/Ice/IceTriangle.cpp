@@ -86,7 +86,7 @@ float Triangle::Perimeter()	const
 float Triangle::Compacity() const
 {
 	float P = Perimeter();
-	if(P==0.0f)	return 0.0f;
+	if(_equal(P, 0.0f))	return 0.0f;
 	return (4.0f*PI*Area()/(P*P));
 }
 

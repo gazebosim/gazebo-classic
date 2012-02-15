@@ -121,7 +121,7 @@ dReal SqrDistancePointTri( const dVector3 p, const dVector3 triOrigin,
     else  // region 0
     {
       // minimum at interior point
-      if ( fDet == REAL(0.0) )
+      if (_dequal(fDet, REAL(0.0)))
       {
         fS = REAL(0.0);
         fT = REAL(0.0);

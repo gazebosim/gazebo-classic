@@ -134,7 +134,8 @@ TEST_F(CommonTest, Image)
   img.GetData(&data, size);
   EXPECT_EQ(489552, size);
 
-  // img.SetFromData(data, img.GetWidth(), img.GetHeight(), img.GetBPP());
+  img.SetFromData(data, img.GetWidth(), img.GetHeight(),
+                  3*img.GetWidth(), img.GetBPP());
 }
 
 TEST_F(CommonTest, Paths)
@@ -712,6 +713,7 @@ TEST_F(CommonTest, Mesh)
   subMesh->SetTexCoord(0, math::Vector2d(.1, .2));
   EXPECT_TRUE(subMesh->GetTexCoord(0) == math::Vector2d(.1, .2));
 
+  newMesh->GenSphericalTexCoord(math::Vector3(0, 0, 0));
   delete newMesh;
 
   std::ofstream stlFile("/tmp/gazebo_stl_test.stl", std::ios::out);
@@ -726,6 +728,7 @@ TEST_F(CommonTest, Mesh)
   EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == math::Vector3(0, 0, 0));
   EXPECT_TRUE(max == math::Vector3(1, 1, 1));
+
 }
 
 int main(int argc, char **argv)

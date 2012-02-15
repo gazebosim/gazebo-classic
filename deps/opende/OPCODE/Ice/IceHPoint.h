@@ -68,7 +68,7 @@
 		inline_	HPoint&		Normalize()
 							{
 								float M = Magnitude();
-								if(M)
+								if(!_equal(M, 0.0))
 								{
 									M = 1.0f / M;
 									x *= M;
@@ -140,9 +140,9 @@
 		// Logical operators
 
 		//! Operator for "if(HPoint==HPoint)"
-		inline_	bool		operator==(const HPoint& p)			const		{ return ( (x==p.x)&&(y==p.y)&&(z==p.z)&&(w==p.w));			}
+		inline_	bool		operator==(const HPoint& p)			const		{ return ( (_equal(x, p.x))&&(_equal(y, p.y))&&(_equal(z, p.z))&&(_equal(w, p.w)));			}
 		//! Operator for "if(HPoint!=HPoint)"
-		inline_	bool		operator!=(const HPoint& p)			const		{ return ( (x!=p.x)||(y!=p.y)||(z!=p.z)||(w!=p.w));			}
+		inline_	bool		operator!=(const HPoint& p)			const		{ return ( (!_equal(x,p.x))||(!_equal(y, p.y))||(!_equal(z, p.z))||(!_equal(w, p.w)));			}
 
 		// Cast operators
 

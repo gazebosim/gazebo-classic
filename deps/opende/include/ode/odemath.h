@@ -24,6 +24,7 @@
 #define _ODE_ODEMATH_H_
 
 #include <ode/common.h>
+#include <cmath>
 
 /*
  * macro to access elements i,j in an NxM matrix A, independent of the
@@ -445,6 +446,9 @@ PURE_INLINE void _dNormalize4(dVector4 a)
   dVARIABLEUSED(bNormalizationResult);
 }
 
+
+
+
 // For internal use
 #define dSafeNormalize3(a) _dSafeNormalize3(a)
 #define dSafeNormalize4(a) _dSafeNormalize4(a)
@@ -471,5 +475,27 @@ ODE_API void dOrthogonalizeR(dMatrix3 m);
 }
 #endif
 
+inline bool _dequal(const double &_a, const double &_b,
+    const double &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
 
+inline bool _dequal(const float &_a, const float &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
+
+inline bool _dequal(const double &_a, const float &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(static_cast<float>(_a) - _b) <= _epsilon;
+}
+
+inline bool _dequal(const float &_a, const double &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(_a - static_cast<float>(_b)) <= _epsilon;
+}
 #endif

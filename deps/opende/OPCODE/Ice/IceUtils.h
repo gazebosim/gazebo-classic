@@ -11,7 +11,7 @@
 // Include Guard
 #ifndef __ICEUTILS_H__
 #define __ICEUTILS_H__
-
+#include <cmath>
 //	#define START_RUNONCE	{ static bool __RunOnce__ = false;	if(!__RunOnce__){ -- not thread safe
 //	#define END_RUNONCE		__RunOnce__ = true;}} -- not thread safe
 
@@ -255,5 +255,29 @@
 		w = i / (nbu_nbv);
 		Compute2DCoords(u, v, i - (w * nbu_nbv), nbu);
 	}
+
+inline bool _equal(const double &_a, const double &_b,
+    const double &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
+
+inline bool _equal(const float &_a, const float &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(_a - _b) <= _epsilon;
+}
+
+inline bool _equal(const double &_a, const float &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(static_cast<float>(_a) - _b) <= _epsilon;
+}
+
+inline bool _equal(const float &_a, const double &_b,
+    const float &_epsilon = 1e-6)
+{
+  return std::fabs(_a - static_cast<float>(_b)) <= _epsilon;
+}
 
 #endif // __ICEUTILS_H__

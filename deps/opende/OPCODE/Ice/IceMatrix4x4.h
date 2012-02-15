@@ -333,7 +333,7 @@
 		//! Operator for Matrix4x4 Div = Matrix4x4 / float;
 		inline_	Matrix4x4			operator/(float s)				const
 									{
-										if(s) s = 1.0f / s;
+										if(!_equal(s, 0.0)) s = 1.0f / s;
 
 										return Matrix4x4(
 										m[0][0]*s,	m[0][1]*s,	m[0][2]*s,	m[0][3]*s,
@@ -417,7 +417,7 @@
 		//! Operator for Matrix4x4 /= float;
 		inline_	Matrix4x4&		operator/=(float s)
 								{
-									if(s)  s = 1.0f / s;
+									if(!_equal(s, 0.0))  s = 1.0f / s;
 									m[0][0]*=s;	m[0][1]*=s;	m[0][2]*=s;	m[0][3]*=s;
 									m[1][0]*=s;	m[1][1]*=s;	m[1][2]*=s;	m[1][3]*=s;
 									m[2][0]*=s;	m[2][1]*=s;	m[2][2]*=s;	m[2][3]*=s;
