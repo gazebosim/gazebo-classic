@@ -277,7 +277,7 @@ void dMassSetTrimesh( dMass *m, dReal density, dGeomID g )
 		// Even though all triangles might be initially valid, 
 		// a triangle may degenerate into a segment after applying 
 		// space transformation.
-		if (n[C] != REAL(0.0))
+		if (!_dequal(n[C], REAL(0.0)))
 		{
 			A = (C + 1) % 3;
 			B = (A + 1) % 3;
@@ -320,6 +320,8 @@ void dMassSetTrimesh( dMass *m, dReal density, dGeomID g )
 							a1 = v[0][A];
 							b1 = v[0][B];
 							break;
+            default:
+              break;
 						}
 						da = a1 - a0;
 						db = b1 - b0;

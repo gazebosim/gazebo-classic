@@ -187,30 +187,40 @@ static void checkWorld (dxWorld *w)
 
   // check that every joint node appears in the joint lists of both bodies it
   // attaches
-  for (j=w->firstjoint; j; j=(dxJoint*)j->next) {
-    for (int i=0; i<2; i++) {
-      if (j->node[i].body) {
-	int ok = 0;
-	for (dxJointNode *n=j->node[i].body->firstjoint; n; n=n->next) {
-	  if (n->joint == j) ok = 1;
-	}
-	if (ok==0) dDebug (0,"joint not in joint list of attached body");
+  for (j=w->firstjoint; j; j=(dxJoint*)j->next)
+  {
+    for (int i=0; i<2; i++)
+    {
+      if (j->node[i].body)
+      {
+        int ok = 0;
+        for (dxJointNode *nn = j->node[i].body->firstjoint; nn; nn = nn->next)
+        {
+          if (nn->joint == j)
+            ok = 1;
+        }
+        if (ok==0)
+          dDebug (0,"joint not in joint list of attached body");
       }
     }
   }
 
   // check all body joint lists (correct body ptrs)
   for (b=w->firstbody; b; b=(dxBody*)b->next) {
-    for (dxJointNode *n=b->firstjoint; n; n=n->next) {
-      if (&n->joint->node[0] == n) {
-	if (n->joint->node[1].body != b)
-	  dDebug (0,"bad body pointer in joint node of body list (1)");
+    for (dxJointNode *nn = b->firstjoint; nn; nn = nn->next)
+    {
+      if (&nn->joint->node[0] == nn)
+      {
+        if (nn->joint->node[1].body != b)
+          dDebug (0,"bad body pointer in joint node of body list (1)");
       }
-      else {
-	if (n->joint->node[0].body != b)
-	  dDebug (0,"bad body pointer in joint node of body list (2)");
+      else
+      {
+        if (nn->joint->node[0].body != b)
+          dDebug (0,"bad body pointer in joint node of body list (2)");
       }
-      if (n->joint->tag != count) dDebug (0,"bad joint node pointer in body");
+      if (nn->joint->tag != count)
+        dDebug (0,"bad joint node pointer in body");
     }
   }
 
@@ -791,10 +801,13 @@ void dBodySetFiniteRotationMode (dBodyID b, int mode)
 {
   dAASSERT (b);
   b->flags &= ~(dxBodyFlagFiniteRotation | dxBodyFlagFiniteRotationAxis);
-  if (mode) {
+  if (mode)
+  {
     b->flags |= dxBodyFlagFiniteRotation;
-    if (b->finite_rot_axis[0] != 0 || b->finite_rot_axis[1] != 0 ||
-	b->finite_rot_axis[2] != 0) {
+    if (!_dequal(b->finite_rot_axis[0], 0.0) ||
+        !_dequal(b->finite_rot_axis[1], 0.0) ||
+        !_dequal(b->finite_rot_axis[2], 0.0))
+    { 
       b->flags |= dxBodyFlagFiniteRotationAxis;
     }
   }
@@ -807,7 +820,8 @@ void dBodySetFiniteRotationAxis (dBodyID b, dReal x, dReal y, dReal z)
   b->finite_rot_axis[0] = x;
   b->finite_rot_axis[1] = y;
   b->finite_rot_axis[2] = z;
-  if (x != 0 || y != 0 || z != 0) {
+  if (!_dequal(x, 0.0) || !_dequal(y, 0.0) || !_dequal(z, 0.0))
+  {
     dNormalize3 (b->finite_rot_axis);
     b->flags |= dxBodyFlagFiniteRotationAxis;
   }
@@ -869,7 +883,7 @@ void dBodySetKinematic (dBodyID b)
 int dBodyIsKinematic (dBodyID b)
 {
   dAASSERT (b);
-  return b->invMass == 0;
+  return _dequal(b->invMass, 0.0);
 }
 
 void dBodyEnable (dBodyID b)
@@ -1054,12 +1068,12 @@ dReal dBodyGetLinearDamping(dBodyID b)
 
 void dBodySetLinearDamping(dBodyID b, dReal scale)
 {
-        dAASSERT(b);
-        if (scale)
-                b->flags |= dxBodyLinearDamping;
-        else
-                b->flags &= ~dxBodyLinearDamping;
-        b->dampingp.linear_scale = scale;
+  dAASSERT(b);
+  if (!_dequal(scale, 0.0))
+    b->flags |= dxBodyLinearDamping;
+  else
+    b->flags &= ~dxBodyLinearDamping;
+  b->dampingp.linear_scale = scale;
 }
 
 dReal dBodyGetAngularDamping(dBodyID b)
@@ -1070,12 +1084,12 @@ dReal dBodyGetAngularDamping(dBodyID b)
 
 void dBodySetAngularDamping(dBodyID b, dReal scale)
 {
-        dAASSERT(b);
-        if (scale)
-                b->flags |= dxBodyAngularDamping;
-        else
-                b->flags &= ~dxBodyAngularDamping;
-        b->dampingp.angular_scale = scale;
+  dAASSERT(b);
+  if (!_dequal(scale, 0.0))
+    b->flags |= dxBodyAngularDamping;
+  else
+    b->flags &= ~dxBodyAngularDamping;
+  b->dampingp.angular_scale = scale;
 }
 
 void dBodySetDamping(dBodyID b, dReal linear_scale, dReal angular_scale)
@@ -1506,7 +1520,7 @@ void dJointSetDamping (dxJoint *joint, dReal damping)
   if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider || 
       joint->type() == dJointTypeScrew)
   {
-    if (damping != 0.0)
+    if (!_dequal(damping, 0.0))
     {
       if (damping < 0.0) printf("bad to have negative viscous joint damping, make sure you know what's going on.\n");
       // set use_damping to true
@@ -2079,12 +2093,12 @@ dReal dWorldGetLinearDamping(dWorldID w)
 
 void dWorldSetLinearDamping(dWorldID w, dReal scale)
 {
-        dAASSERT(w);
-        if (scale)
-                w->body_flags |= dxBodyLinearDamping;
-        else
-                w->body_flags &= ~dxBodyLinearDamping;
-        w->dampingp.linear_scale = scale;
+  dAASSERT(w);
+  if (!_dequal(scale, 0.0))
+    w->body_flags |= dxBodyLinearDamping;
+  else
+    w->body_flags &= ~dxBodyLinearDamping;
+  w->dampingp.linear_scale = scale;
 }
 
 dReal dWorldGetAngularDamping(dWorldID w)
@@ -2095,12 +2109,12 @@ dReal dWorldGetAngularDamping(dWorldID w)
 
 void dWorldSetAngularDamping(dWorldID w, dReal scale)
 {
-        dAASSERT(w);
-        if (scale)
-                w->body_flags |= dxBodyAngularDamping;
-        else
-                w->body_flags &= ~dxBodyAngularDamping;
-        w->dampingp.angular_scale = scale;
+  dAASSERT(w);
+  if (!_dequal(scale, 0.0))
+    w->body_flags |= dxBodyAngularDamping;
+  else
+    w->body_flags &= ~dxBodyAngularDamping;
+  w->dampingp.angular_scale = scale;
 }
 
 void dWorldSetDamping(dWorldID w, dReal linear_scale, dReal angular_scale)
