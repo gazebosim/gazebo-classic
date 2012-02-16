@@ -27,12 +27,10 @@ TEST_F(PR2Test, Load)
   Load("worlds/empty.world");
   SpawnModel("models/pr2.model");
 
-  physics::get_world("default")->GetPhysicsEngine()->SetGravity(math::Vector3(-1.0,0,-0.01));
-
   int i;
-  for (i = 0; i < 20 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(1000);
-  EXPECT_LT(i, 20);
+  for (i = 0; i < 40 && !this->HasEntity("pr2"); ++i)
+    common::Time::MSleep(100);
+  EXPECT_LT(i, 40);
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
@@ -42,16 +40,19 @@ TEST_F(PR2Test, Load)
     boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor);
 
-  while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
-    usleep(100000);
+  /*while (!camSensor->SaveFrame("/tmp/frame_10.jpg"))
+    common::Time::MSleep(100);
 
-  for (int i = 11; i < 100; i++)
+  physics::get_world("default")->GetPhysicsEngine()->SetGravity(
+      math::Vector3(-0.5,0,-0.1));
+  for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
     filename << "/tmp/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
-    usleep(100000);
+    common::Time::MSleep(100);
   }
+  */
 }
 
 int main(int argc, char **argv)

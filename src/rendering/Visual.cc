@@ -126,6 +126,7 @@ Visual::~Visual()
   this->children.clear();
 }
 
+/////////////////////////////////////////////////
 void Visual::Fini()
 {
   // Detach from the parent
@@ -154,14 +155,15 @@ void Visual::Fini()
   RTShaderSystem::Instance()->DetachEntity(this);
 }
 
-void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
+/////////////////////////////////////////////////
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
 {
-  if (!i_pSceneNode)
+  if (!_sceneNode)
     return;
 
   // Destroy all the attached objects
   Ogre::SceneNode::ObjectIterator itObject =
-    i_pSceneNode->getAttachedObjectIterator();
+    _sceneNode->getAttachedObjectIterator();
 
   while (itObject.hasMoreElements())
   {
@@ -173,7 +175,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* i_pSceneNode)
   }
 
   // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = i_pSceneNode->getChildIterator();
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
 
   while (itChild.hasMoreElements())
   {
@@ -1057,10 +1059,10 @@ void Visual::SetCastShadows(const bool &shadows)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetVisible(bool visible_, bool cascade_)
+void Visual::SetVisible(bool _visible, bool _cascade)
 {
-  this->sceneNode->setVisible(visible_, cascade_);
-  this->visible = visible_;
+  this->sceneNode->setVisible(_visible, _cascade);
+  this->visible = _visible;
 }
 
 //////////////////////////////////////////////////
@@ -1123,17 +1125,20 @@ math::Pose Visual::GetPose() const
   return pos;
 }
 
+//////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose _pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }
 
+//////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
   this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
+//////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
   Ogre::Quaternion vquatern(_q.w, _q.x, _q.y, _q.z);
@@ -1517,7 +1522,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     */
 
   if (_msg->has_pose())
-    this->SetWorldPose(msgs::Convert(_msg->pose()));
+    this->SetPose(msgs::Convert(_msg->pose()));
 
   if (_msg->has_visible())
     this->SetVisible(_msg->visible());

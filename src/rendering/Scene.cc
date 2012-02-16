@@ -1218,13 +1218,15 @@ void Scene::PreRender()
 
   // Process the visual messages
   this->visualMsgs.sort(VisualMessageLessOp);
-  for (vIter = this->visualMsgs.begin();
-       vIter != this->visualMsgs.end(); ++vIter)
+  vIter = this->visualMsgs.begin();
+  while (vIter != this->visualMsgs.end())
   {
-    this->ProcessVisualMsg(*vIter);
+    if (this->ProcessVisualMsg(*vIter))
+      this->visualMsgs.erase(vIter++);
+    else
+      ++vIter;
   }
-  this->visualMsgs.clear();
-
+  
   // Process the light messages
   for (lIter =  this->lightMsgs.begin();
        lIter != this->lightMsgs.end(); ++lIter)
@@ -1382,8 +1384,10 @@ void Scene::OnRequest(ConstRequestPtr &_msg)
   }
 }
 
-void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
+/////////////////////////////////////////////////
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 {
+  bool result = false;
   Visual_M::iterator iter;
   iter = this->visuals.find(_msg->name());
 
@@ -1392,39 +1396,53 @@ void Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
     if (iter != this->visuals.end())
     {
       this->visuals.erase(iter);
+      result = true;
     }
   }
   else if (iter != this->visuals.end())
   {
     iter->second->UpdateFromMsg(_msg);
+    result = true;
   }
   else
   {
     VisualPtr visual;
 
-    if (_msg->has_parent_name())
-      iter = this->visuals.find(_msg->parent_name());
-    else
-      iter = this->visuals.end();
-
-    if (iter != this->visuals.end())
+    // If the visual has a parent which is not the name of the scene...
+    if (_msg->has_parent_name() && _msg->parent_name() != this->GetName())
     {
-      visual.reset(new Visual(_msg->name(), iter->second));
+      iter = this->visuals.find(_msg->name());
+      if (iter != this->visuals.end())
+        gzerr << "Visual already exists. This shouldn't happen.\n";
+
+      // Make sure the parent visual exists before trying to add a child
+      // visual
+      iter = this->visuals.find(_msg->parent_name());
+      if (iter != this->visuals.end())
+        visual.reset(new Visual(_msg->name(), iter->second));
     }
     else
     {
+      // Add a visual that is attached to the scene root
       visual.reset(new Visual(_msg->name(), this->worldVisual));
     }
 
-    visual->LoadFromMsg(_msg);
-    this->visuals[_msg->name()] = visual;
-    if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+    if (visual)
     {
-      visual->SetVisible(false);
+      result = true;
+      visual->LoadFromMsg(_msg);
+      this->visuals[_msg->name()] = visual;
+      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
+      {
+        visual->SetVisible(false);
+      }
     }
   }
+
+  return result;
 }
 
+/////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPosePtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);

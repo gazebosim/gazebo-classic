@@ -258,7 +258,7 @@ namespace gazebo
                    ConstScenePtr &_msg);
       private: void OnVisualMsg(
                    ConstVisualPtr &msg);
-      private: void ProcessVisualMsg(
+      private: bool ProcessVisualMsg(
                    ConstVisualPtr &msg);
 
       private: void OnLightMsg(ConstLightPtr &msg);
