@@ -124,10 +124,15 @@ void SensorManager::Fini()
   this->sensors.clear();
   this->mutex->unlock();
 }
+//////////////////////////////////////////////////
+void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
+{
+  sensors::SensorFactory::GetSensorTypes(_types);
+}
 
 //////////////////////////////////////////////////
-std::string SensorManager::LoadSensor(sdf::ElementPtr _elem,
-                                      const std::string &_parentName)
+std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
+                                        const std::string &_parentName)
 {
   std::string type = _elem->GetValueString("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);

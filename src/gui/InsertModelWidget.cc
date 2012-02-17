@@ -98,14 +98,15 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
         }
       }
     }
+
+    // Make all top-level items expanded. Trying to reduce mouse clicks.
+    this->fileTreeWidget->expandItem(topItem);
   }
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
-  this->visualPub = this->node->Advertise<msgs::Visual>("~/visual");
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection");
 
   this->connections.push_back(
       gui::Events::ConnectMouseRelease(
@@ -206,12 +207,6 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       linkElem = linkElem->GetNextElement();
     }
 
-    /*msgs::Selection selectMsg;
-    selectMsg.set_name(modelName);
-    selectMsg.set_selected(true);
-    selectMsg.set_id(gui::get_entity_id(modelName));
-    this->selectionPub->Publish(selectMsg);
-    */
     gui::Events::mouseMoveVisual(modelName);
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);
@@ -221,7 +216,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void InsertModelWidget::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (!this->modelSDF || 
+  if (!this->modelSDF || _event.dragging ||
       (_event.button != common::MouseEvent::LEFT &&
        _event.button != common::MouseEvent::RIGHT))
   {

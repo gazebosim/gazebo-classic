@@ -88,7 +88,7 @@ message (STATUS "----------------------------------------\n")
 
 #####################################
 # Build type cflags
-set (CMAKE_C_FLAGS_ALL " -Wall -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -fPIC -pedantic" CACHE INTERNAL "General C Flags")
+set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow -Winit-self -Wswitch-default -Wmissing-include-dirs -fPIC -pedantic" CACHE INTERNAL "General C Flags")
 
 if (SSE2_FOUND)
   set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
@@ -109,13 +109,13 @@ endif()
 set (CMAKE_C_FLAGS_RELEASE " -s -O2 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
 set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 
-set (CMAKE_C_FLAGS_DEBUG " -ggdb3 -Wextra ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
+set (CMAKE_C_FLAGS_DEBUG " -ggdb3 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
 set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
 
-set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -Wextra -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -ggdb3 -pg -fprofile-arcs -ftest-coverage ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
-set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wextra -Wformat=2 -Winit-self -Wmissing-include-dirs -Wswitch-default -Wfloat-equal -Wshadow --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
+set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
 set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
 
 #####################################

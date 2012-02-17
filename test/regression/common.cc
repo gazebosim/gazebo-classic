@@ -618,7 +618,7 @@ TEST_F(CommonTest, Mesh)
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.xml"));
-  
+
   const common::Mesh *mesh =
     common::MeshManager::Instance()->GetMesh("unit_box");
   EXPECT_EQ(24, mesh->GetVertexCount());
@@ -728,7 +728,6 @@ TEST_F(CommonTest, Mesh)
   EXPECT_TRUE(center == math::Vector3(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == math::Vector3(0, 0, 0));
   EXPECT_TRUE(max == math::Vector3(1, 1, 1));
-
 }
 
 int main(int argc, char **argv)

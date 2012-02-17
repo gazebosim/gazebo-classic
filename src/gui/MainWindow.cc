@@ -533,7 +533,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       if (_msg->camera().track().has_max_dist())
         maxDist = _msg->camera().track().max_dist();
 
-      cam->AttachToVisual(name, minDist, maxDist);
+      cam->AttachToVisual(name, false, minDist, maxDist);
     }
   }
 }

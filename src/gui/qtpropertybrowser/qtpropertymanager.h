@@ -38,6 +38,10 @@
  ****************************************************************************/
 
 #pragma GCC system_header
+#pragma GCC diagnostic ignored "-Wswitch-default"
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#pragma GCC diagnostic ignored "-Wshadow"
+
 
 #ifndef QTPROPERTYMANAGER_H
 #define QTPROPERTYMANAGER_H

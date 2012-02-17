@@ -36,17 +36,24 @@ namespace gazebo
     class InsertModelWidget : public QWidget
     {
       Q_OBJECT
+
+      /// \brief Constructor
       public: InsertModelWidget(QWidget *_parent = 0);
+
+      /// \brief Destructor
       public: virtual ~InsertModelWidget();
 
+      /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
+      /// \brief Used to spawn the selected model when the left mouse 
+      /// button is released.
       private: void OnMouseRelease(const common::MouseEvent &_event);
 
       private: QTreeWidget *fileTreeWidget;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr factoryPub, visualPub, selectionPub;
+      private: transport::PublisherPtr factoryPub;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;

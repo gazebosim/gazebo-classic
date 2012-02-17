@@ -96,7 +96,7 @@
         <plugin name='laser' filename='libRayPlugin.so'/>
       </sensor>
     </link>
-    <!--<link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
+    <link name='bl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.2246 0.2246 0.0792 0 -0 0'/>
       <inertial mass='3.4730799999999999'>
         <origin pose='0 0 0.07 0 -0 0'/>
@@ -287,7 +287,6 @@
 
       </visual>
     </link>
-    -->
     <link name='fl_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 0.2246 0.0792 0 -0 0'/>
       <inertial mass='3.4730799999999999'>
@@ -384,7 +383,6 @@
 
       </visual>
     </link>
-    <!--
     <link name='fr_caster_rotation_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='0.2246 -0.2246 0.0792 0 -0 0'/>
       <inertial mass='3.4730799999999999'>
@@ -481,7 +479,6 @@
 
       </visual>
     </link>
-    -->
     <link name='torso_lift_link' gravity='1' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0 0.790675 0 -0 0'/>
       <inertial mass='36.448999999999998'>
@@ -613,7 +610,6 @@
       </sensor>
     </link>
 
-    <!--
     <link name='l_shoulder_pan_link' gravity='0' self_collide='0' kinematic='0'>
       <origin pose='-0.05 0.188 0.790675 0 -0 0'/>
       <inertial mass='25.799299999999999'>
@@ -1596,9 +1592,7 @@
         <inertia ixx='7.7384099999999997e-05' ixy='-2.0930900000000001e-06' ixz='-8.3622799999999998e-06' iyy='0.000198474' iyz='2.4611e-06' izz='0.00018107'/>
       </inertial>
     </link>
-    -->
 
-    <!--
     <joint name='bl_caster_rotation_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='base_footprint'/>
@@ -1653,7 +1647,6 @@
         <limit lower='0' upper='0' effort='0' velocity='0'/>
       </axis>
     </joint>
-    -->
     <joint name='fl_caster_rotation_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='base_footprint'/>
@@ -1681,7 +1674,6 @@
         <limit lower='0' upper='0' effort='0' velocity='0'/>
       </axis>
     </joint>
-    <!--
     <joint name='fr_caster_rotation_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='base_footprint'/>
@@ -1709,7 +1701,6 @@
         <limit lower='0' upper='0' effort='0' velocity='0'/>
       </axis>
     </joint>
-    -->
     <joint name='torso_lift_joint' type='prismatic'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='base_footprint'/>
@@ -1738,7 +1729,6 @@
       </axis>
     </joint>
 
-    <!--
     <joint name='l_shoulder_pan_joint' type='revolute'>
       <origin pose='0 0 0 0 -0 0'/>
       <parent link='torso_lift_link'/>
@@ -2036,6 +2026,5 @@
         <limit lower='0' upper='0' effort='0' velocity='0'/>
       </axis>
     </joint>
-    -->
   </model>
 </gazebo>

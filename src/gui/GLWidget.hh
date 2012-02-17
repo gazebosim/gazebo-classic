@@ -56,13 +56,13 @@ namespace gazebo
 
       public: void Clear();
 
-      signals:
-        void clicked();
+      signals: void clicked();
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
       protected: virtual void showEvent(QShowEvent *_e);
+      protected: virtual void enterEvent(QEvent * event);
 
 
       protected: void keyPressEvent(QKeyEvent *_event);
@@ -115,7 +115,9 @@ namespace gazebo
       private: transport::SubscriberPtr selectionSub;
 
       private: Qt::KeyboardModifiers keyModifiers;
+      private: QPoint onShiftMousePos;
       private: int mouseOffset;
+      private: math::Pose mouseMoveVisStartPose;
     };
   }
 }

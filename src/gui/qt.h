@@ -24,6 +24,7 @@
 #include <QX11Info>
 #include <QWidget>
 #include <QPushButton>
+#include <QPoint>
 #include <QFrame>
 #include <QCheckBox>
 #include <QLineEdit>

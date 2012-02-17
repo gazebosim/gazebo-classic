@@ -1228,7 +1228,7 @@ void Scene::PreRender()
     else
       ++vIter;
   }
-  
+
   // Process the light messages
   for (lIter =  this->lightMsgs.begin();
        lIter != this->lightMsgs.end(); ++lIter)

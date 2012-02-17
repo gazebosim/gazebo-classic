@@ -40,6 +40,7 @@ using namespace gui;
 
 extern bool g_fullscreen;
 
+/////////////////////////////////////////////////
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
@@ -107,6 +108,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->keyModifiers = 0;
 }
 
+/////////////////////////////////////////////////
 GLWidget::~GLWidget()
 {
   this->connections.clear();
@@ -117,6 +119,7 @@ GLWidget::~GLWidget()
   this->userCamera.reset();
 }
 
+/////////////////////////////////////////////////
 bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 {
   if (_event->type() == QEvent::Enter)
@@ -128,6 +131,7 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
   return false;
 }
 
+/////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
@@ -142,6 +146,14 @@ void GLWidget::showEvent(QShowEvent *_event)
   this->setFocus();
 }
 
+/////////////////////////////////////////////////
+void GLWidget::enterEvent(QEvent * /*_event*/)
+{
+  printf("Enter Event\n");
+  this->setFocus(Qt::MouseFocusReason);
+}
+
+/////////////////////////////////////////////////
 void GLWidget::moveEvent(QMoveEvent *_e)
 {
   QWidget::moveEvent(_e);
@@ -152,6 +164,7 @@ void GLWidget::moveEvent(QMoveEvent *_e)
   }
 }
 
+/////////////////////////////////////////////////
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
   if (this->userCamera && this->userCamera->initialized)
@@ -166,6 +179,7 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   _e->accept();
 }
 
+/////////////////////////////////////////////////
 void GLWidget::resizeEvent(QResizeEvent *_e)
 {
   if (!this->scene)
@@ -179,6 +193,7 @@ void GLWidget::resizeEvent(QResizeEvent *_e)
   }
 }
 
+/////////////////////////////////////////////////
 void GLWidget::keyPressEvent(QKeyEvent *_event)
 {
   if (!this->scene)
@@ -203,6 +218,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->userCamera->HandleKeyPressEvent(keyText);
 }
 
+/////////////////////////////////////////////////
 void GLWidget::keyReleaseEvent(QKeyEvent *_event)
 {
   if (!this->scene)
@@ -220,6 +236,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
 }
 
+/////////////////////////////////////////////////
 void GLWidget::mousePressEvent(QMouseEvent *_event)
 {
   if (!this->scene)
@@ -257,10 +274,17 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
                              this->selectionMod);
   }
+  else if (this->mouseMoveVis && _event->button() == Qt::MidButton)
+  {
+    this->onShiftMousePos = QCursor::pos();
+    this->mouseMoveVisStartPose = this->mouseMoveVis->GetWorldPose();
+    QCursor::setPos(this->onShiftMousePos.x() + 50, this->onShiftMousePos.y());
+  }
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
+/////////////////////////////////////////////////
 void GLWidget::wheelEvent(QWheelEvent *_event)
 {
   if (!this->scene)
@@ -278,6 +302,7 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
+/////////////////////////////////////////////////
 void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 {
   if (!this->scene)
@@ -293,8 +318,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
     common::MouseEvent::MIDDLE : 0x0;
 
+  // Handle moving a visual around with the mouse
   if (this->mouseMoveVis)
   {
+    // Get the point on the plane which correspoinds to the mouse
     math::Vector3 pp;
     if (!this->userCamera->GetWorldPointOnPlane(
           this->mouseEvent.pos.x, this->mouseEvent.pos.y,
@@ -302,7 +329,30 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     {
       gzerr << "Unable to get Point on plane....\n";
     }
-    this->mouseMoveVis->SetWorldPosition(pp);
+
+    // Rotate the visual using the middle mouse button
+    if (this->mouseEvent.buttons & common::MouseEvent::MIDDLE)
+    {
+      math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
+      math::Vector3 mp = this->mouseMoveVisStartPose.pos;
+      double yaw = atan2((pp.y - mp.y) , (pp.x - mp.x)) + M_PI * 0.5;
+      if (this->mouseEvent.shift)
+      {
+        yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
+      }
+      this->mouseMoveVis->SetWorldRotation(
+          math::Quaternion(rpy.x, rpy.y, rpy.z + yaw));
+    }
+    else
+    {
+      // Translate the visual by just moving the mouse around
+      if (this->mouseEvent.shift)
+      {
+        pp.x = rint(pp.x);
+        pp.y = rint(pp.y);
+      }
+      this->mouseMoveVis->SetWorldPosition(pp);
+    }
   }
 
 
@@ -397,15 +447,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
       else
         this->TranslateEntity(this->selectionVis);
     }
-    else
+    else if (!(this->mouseMoveVis &&
+               this->mouseEvent.buttons & common::MouseEvent::MIDDLE))
+    {
       this->userCamera->HandleMouseEvent(this->mouseEvent);
+    }
 
     this->mouseEvent.prevPos = this->mouseEvent.pos;
   }
   else
+  {
     this->userCamera->HandleMouseEvent(this->mouseEvent);
+  }
 }
 
+/////////////////////////////////////////////////
 void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
 {
   if (!this->scene)
@@ -470,7 +526,11 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     msgs::Set(msg.mutable_pose(), this->selectionVis->GetWorldPose());
     this->modelPub->Publish(msg);
   }
-
+  else if (this->mouseMoveVis && _event->button() == Qt::MidButton)
+  {
+    QCursor::setPos(this->onShiftMousePos);
+  }
+ 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 
@@ -494,11 +554,13 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
         this->userCamera);
 }
 
+/////////////////////////////////////////////////
 rendering::ScenePtr GLWidget::GetScene() const
 {
   return this->scene;
 }
 
+/////////////////////////////////////////////////
 void GLWidget::Clear()
 {
   gui::clear_active_camera();
@@ -542,6 +604,7 @@ std::string GLWidget::GetOgreHandle() const
   return ogreHandle;
 }
 
+/////////////////////////////////////////////////
 void GLWidget::CreateEntity(const std::string &_name)
 {
   if (this->entityMaker)
@@ -573,6 +636,7 @@ void GLWidget::CreateEntity(const std::string &_name)
   }
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnRemoveScene(const std::string &_name)
 {
   if (this->scene && this->scene->GetName() == _name)
@@ -581,6 +645,7 @@ void GLWidget::OnRemoveScene(const std::string &_name)
   }
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnCreateScene(const std::string &_name)
 {
   this->hoverVis.reset();
@@ -589,6 +654,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->ViewScene(rendering::get_scene(_name));
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnMoveMode(bool _mode)
 {
   if (_mode)
@@ -598,23 +664,27 @@ void GLWidget::OnMoveMode(bool _mode)
   }
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnCreateEntity(const std::string &_type)
 {
   this->CreateEntity(_type);
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnFPS()
 {
   this->userCamera->SetViewController(
       rendering::FPSViewController::GetTypeString());
 }
 
+/////////////////////////////////////////////////
 void GLWidget::OnOrbit()
 {
   this->userCamera->SetViewController(
       rendering::OrbitViewController::GetTypeString());
 }
 
+/////////////////////////////////////////////////
 void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 {
   math::Vector3 planeNorm, planeNorm2;
@@ -692,6 +762,7 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
 */
 }
 
+/////////////////////////////////////////////////
 void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
 {
   math::Pose pose = _vis->GetPose();

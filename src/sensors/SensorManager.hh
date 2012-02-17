@@ -61,9 +61,17 @@ namespace gazebo
       /// \brief Finalize all the sensors
       public: void Fini();
 
-      /// \brief Add a sensor
-      public: std::string LoadSensor(sdf::ElementPtr _elem,
-                                     const std::string &_parentName);
+      /// \brief Get all the sensor types
+      public: void GetSensorTypes(std::vector<std::string> &_types) const;
+
+      /// \brief Add a sensor from an SDF element. This function will also Load
+      /// and Init the sensor.
+      /// \param _elem The SDF element that describes the sensor
+      /// \param _parentName The name of the parent link which the sensor is
+      /// attached to.
+      /// \return The name of the sensor
+      public: std::string CreateSensor(sdf::ElementPtr _elem,
+                                       const std::string &_parentName);
 
       /// \brief Get a sensor
       public: SensorPtr GetSensor(const std::string &_name);
