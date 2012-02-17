@@ -21,6 +21,7 @@
 
 #include "gui/qt.h"
 #include "sdf/sdf.h"
+#include "common/MouseEvent.hh"
 #include "transport/TransportTypes.hh"
 #include "rendering/RenderTypes.hh"
 
@@ -39,12 +40,10 @@ namespace gazebo
       public: virtual ~InsertModelWidget();
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
-      private slots: void OnApply();
-      private slots: void OnCancel();
+
+      private: void OnMouseRelease(const common::MouseEvent &_event);
 
       private: QTreeWidget *fileTreeWidget;
-      private: QPushButton *addButton;
-      private: QPushButton *cancelButton;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr factoryPub, visualPub, selectionPub;
@@ -52,8 +51,9 @@ namespace gazebo
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;
       private: sdf::SDFPtr modelSDF;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }
 #endif
-

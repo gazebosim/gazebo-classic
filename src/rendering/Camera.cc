@@ -1022,8 +1022,8 @@ void Camera::CreateCamera()
 
 //////////////////////////////////////////////////
 bool Camera::GetWorldPointOnPlane(int _x, int _y,
-                                  const math::Vector3 &_planeNorm,
-                                  double _d, math::Vector3 &_result)
+                                  const math::Plane &_plane,
+                                  math::Vector3 &_result)
 {
   math::Vector3 origin, dir;
   double dist;
@@ -1031,7 +1031,7 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
   // Cast two rays from the camera into the world
   this->GetCameraToViewportRay(_x, _y, origin, dir);
 
-  dist = origin.GetDistToPlane(dir, _planeNorm, _d);
+  dist = _plane.Distance(origin, dir);
 
   _result = origin + dir * dist;
 

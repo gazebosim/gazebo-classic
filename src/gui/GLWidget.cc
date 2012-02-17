@@ -87,6 +87,11 @@ GLWidget::GLWidget(QWidget *_parent)
       gui::Events::ConnectOrbit(
         boost::bind(&GLWidget::OnOrbit, this)));
 
+  this->connections.push_back(
+      gui::Events::ConnectInsertModel(
+        boost::bind(&GLWidget::OnMouseMoveVisual, this, _1)));
+
+
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
 
@@ -243,6 +248,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
     common::MouseEvent::MIDDLE : 0x0;
 
   this->mouseEvent.dragging = false;
+  gui::Events::mousePress(this->mouseEvent);
 
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
@@ -286,6 +292,19 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     common::MouseEvent::RIGHT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
     common::MouseEvent::MIDDLE : 0x0;
+
+  if (this->mouseMoveVis)
+  {
+    math::Vector3 pp;
+    if (!this->userCamera->GetWorldPointOnPlane(
+          this->mouseEvent.pos.x, this->mouseEvent.pos.y,
+          math::Plane(math::Vector3(0, 0, 1)),pp))
+    {
+      gzerr << "Unable to get Point on plane....\n";
+    }
+    this->mouseMoveVis->SetWorldPosition(pp);
+  }
+
 
   if (_event->buttons())
   {
@@ -415,6 +434,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
     common::MouseEvent::MIDDLE : 0x0;
 
+  gui::Events::mouseRelease(this->mouseEvent);
   emit clicked();
 
   this->scene->GetSelectionObj()->SetActive(false);
@@ -617,13 +637,13 @@ void GLWidget::RotateEntity(rendering::VisualPtr &_vis)
   double d = -pose.pos.GetDotProd(planeNorm);
 
   if (!this->userCamera->GetWorldPointOnPlane(this->mouseEvent.pos.x,
-       this->mouseEvent.pos.y, planeNorm, d, p1))
+       this->mouseEvent.pos.y, math::Plane(planeNorm, d), p1))
   {
     gzerr << "Invalid mouse point\n";
   }
 
   if (!this->userCamera->GetWorldPointOnPlane(this->mouseEvent.prevPos.x,
-       this->mouseEvent.prevPos.y, planeNorm, d, p2))
+       this->mouseEvent.prevPos.y, math::Plane(planeNorm, d), p2))
   {
     gzerr << "Invalid mouse point\n";
   }
@@ -699,8 +719,9 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
 
   // Compute the distance from the camera to plane of translation
   double d = -pose.pos.GetDotProd(planeNorm);
-  double dist1 = origin1.GetDistToPlane(dir1, planeNorm, d);
-  double dist2 = origin2.GetDistToPlane(dir2, planeNorm, d);
+  math::Plane plane(planeNorm, d);
+  double dist1 = plane.Distance(origin1, dir1);
+  double dist2 = plane.Distance(origin2, dir2);
 
   // Compute two points on the plane. The first point is the current
   // mouse position, the second is the previous mouse position
@@ -726,8 +747,8 @@ void GLWidget::TranslateEntity(rendering::VisualPtr &_vis)
 */
 }
 
-void GLWidget::OnSelectionMsg(
-    ConstSelectionPtr &_msg)
+/////////////////////////////////////////////////
+void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
   if (_msg->has_selected())
   {
@@ -738,4 +759,11 @@ void GLWidget::OnSelectionMsg(
   }
 }
 
-
+/////////////////////////////////////////////////
+void GLWidget::OnMouseMoveVisual(const std::string &_visualName)
+{
+  if (_visualName.empty())
+    this->mouseMoveVis.reset();
+  else
+    this->mouseMoveVis = this->scene->GetVisual(_visualName);
+}

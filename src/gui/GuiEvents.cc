@@ -21,6 +21,7 @@ using namespace gazebo;
 using namespace gui;
 
 event::EventT<void (std::string)> Events::createEntity;
+event::EventT<void (std::string)> Events::mouseMoveVisual;
 event::EventT<void (bool)> Events::moveMode;
 event::EventT<void (bool)> Events::manipMode;
 event::EventT<void (bool)> Events::fullScreen;
@@ -28,5 +29,5 @@ event::EventT<void ()> Events::fps;
 event::EventT<void ()> Events::orbit;
 event::EventT<void (std::string)> Events::keyPress;
 event::EventT<void (const msgs::Model &)> Events::modelUpdate;
-
-
+event::EventT<void (const common::MouseEvent &)> Events::mousePress;
+event::EventT<void (const common::MouseEvent &)> Events::mouseRelease;

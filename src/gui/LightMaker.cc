@@ -76,7 +76,7 @@ void LightMaker::OnMousePush(const common::MouseEvent &_event)
   norm.Set(0, 0, 1);
 
   if (!this->camera->GetWorldPointOnPlane(_event.pressPos.x,
-        _event.pressPos.y, norm, 0, point))
+        _event.pressPos.y, math::Plane(norm), point))
   {
     gzerr << "Inavlid mouse point\n";
     return;

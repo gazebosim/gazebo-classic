@@ -150,25 +150,6 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
 }
 
 //////////////////////////////////////////////////
-double Vector3::GetDistToPlane(const Vector3 &_dir,
-                               const Vector3 &_planeNormal, double _d) const
-{
-  double denom = _planeNormal.GetDotProd(_dir);
-
-  if (fabs(denom) < 1e-3)
-  {
-    // parallel
-    return -1;
-  }
-  else
-  {
-    double nom = this->GetDotProd(_planeNormal) + _d;
-    double t = -(nom/denom);
-    return t;
-  }
-}
-
-//////////////////////////////////////////////////
 double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 {
   double d = ((*this) - _pt1).GetCrossProd((*this) - _pt2).GetLength();

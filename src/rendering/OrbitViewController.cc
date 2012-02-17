@@ -93,8 +93,7 @@ void OrbitViewController::Init()
 
   // Try to get a point on a plane to use as the reference point
   if (this->camera->GetWorldPointOnPlane(width/2.0, height/2.0,
-                                          math::Vector3(0, 0, 1), 0,
-                                          fp))
+        math::Plane(math::Vector3(0, 0, 1)), fp))
   {
     dist = this->camera->GetWorldPosition().Distance(fp);
   }

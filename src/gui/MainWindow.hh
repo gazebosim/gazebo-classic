@@ -67,6 +67,7 @@ namespace gazebo
       private slots: void CreateBox();
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
+      private slots: void CreateMesh();
       private slots: void CreatePointLight();
       private slots: void CreateSpotLight();
       private slots: void CreateDirectionalLight();
@@ -114,6 +115,7 @@ namespace gazebo
       private: QAction *boxCreateAct;
       private: QAction *sphereCreateAct;
       private: QAction *cylinderCreateAct;
+      private: QAction *meshCreateAct;
       private: QAction *pointLghtCreateAct;
       private: QAction *spotLghtCreateAct;
       private: QAction *dirLghtCreateAct;

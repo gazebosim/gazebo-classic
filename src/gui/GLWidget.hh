@@ -84,6 +84,7 @@ namespace gazebo
       private: void RotateEntity(rendering::VisualPtr &_vis);
       private: void TranslateEntity(rendering::VisualPtr &_vis);
 
+      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
@@ -104,7 +105,7 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr selectionVis, hoverVis;
+      private: rendering::VisualPtr selectionVis, hoverVis, mouseMoveVis;
       private: unsigned int selectionId;
       private: std::string selectionMod;
       private: math::Pose selectionPoseOrig;
@@ -120,5 +121,3 @@ namespace gazebo
 }
 
 #endif
-
-

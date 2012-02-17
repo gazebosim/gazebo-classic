@@ -244,7 +244,9 @@ void ProcessLight(sdf::ElementPtr _elem)
   {
     gazebo::math::Vector3 dir =
       _elem->GetElement("direction")->GetValueVector3("xyz");
-    double d = pose.pos.GetDistToPlane(dir, gazebo::math::Vector3(0, 0, 1), 0);
+    gazebo::math::Plane plane(gazebo::math::Vector3(0, 0, 1));
+
+    double d = plane.Distance(pose.pos, dir);
     double t;
     t = atan2(dir.x, dir.z*-1);
     double x = sin(t) * d;

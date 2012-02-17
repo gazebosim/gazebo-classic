@@ -32,6 +32,7 @@
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"
+#include "math/Plane.hh"
 #include "math/Vector2i.hh"
 
 #include "msgs/MessageTypes.hh"
@@ -272,8 +273,7 @@ namespace gazebo
       /// \brief Get point on a plane
       /// \return True if a valid point was found
       public: bool GetWorldPointOnPlane(int _x, int _y,
-                  const math::Vector3 &_planeNorm, double _d,
-                  math::Vector3 &_result);
+                  const math::Plane &_plane, math::Vector3 &_result);
 
       public: virtual void SetRenderTarget(Ogre::RenderTarget *target);
 

@@ -575,6 +575,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
   return visual;
 }
 
+//////////////////////////////////////////////////
 VisualPtr Scene::GetVisualBelowPoint(const math::Vector3 &_pt)
 {
   VisualPtr visual;
@@ -600,6 +601,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
   return visual;
 }
 
+//////////////////////////////////////////////////
 Ogre::Entity *Scene::GetOgreEntityBelowPoint(const math::Vector3 &_pt,
                                              bool _ignoreSelectionObj)
 {

@@ -89,11 +89,6 @@ namespace gazebo
       public: static Vector3 GetNormal(const Vector3 &v1, const Vector3 &v2,
                                        const Vector3 &v3);
 
-      /// \brief Get distance to a plane, given a direction. Treats this
-      ///        vector as a ray
-      public: double GetDistToPlane(const Vector3 &_dir,
-                                    const Vector3 &_planeNormal,
-                                    double _d) const;
       /// \brief Get distance to a line
       public: double GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2);
 

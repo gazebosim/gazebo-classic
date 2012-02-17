@@ -181,7 +181,7 @@ void MainWindow::Save()
 void MainWindow::About()
 {
   QMessageBox::about(this, tr("About Gazebo"),
-      tr("The <b>Gazebo</b> is awesome."));
+      tr("Gazebo is a 3D multi-robot simulator with dynamics. It is capable of simulating articulated robot in complex and realistic environments.\n Visit http://www.gazebosim.org for more information. "));
 }
 
 void MainWindow::Play()
@@ -247,6 +247,11 @@ void MainWindow::CreateSphere()
 void MainWindow::CreateCylinder()
 {
   gui::Events::createEntity("cylinder");
+}
+
+void MainWindow::CreateMesh()
+{
+  gui::Events::createEntity("mesh");
 }
 
 void MainWindow::CreatePointLight()
@@ -388,6 +393,14 @@ void MainWindow::CreateActions()
   connect(this->cylinderCreateAct, SIGNAL(triggered()), this,
       SLOT(CreateCylinder()));
 
+  this->meshCreateAct = new QAction(QIcon(":/images/cylinder.png"),
+      tr("Mesh"), this);
+  this->meshCreateAct->setStatusTip(tr("Create a mesh"));
+  this->meshCreateAct->setCheckable(true);
+  connect(this->meshCreateAct, SIGNAL(triggered()), this,
+      SLOT(CreateMesh()));
+
+
   this->pointLghtCreateAct = new QAction(QIcon(":/images/pointlight.png"),
       tr("Point Light"), this);
   this->pointLghtCreateAct->setStatusTip(tr("Create a point light"));
@@ -458,6 +471,7 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
+  this->editToolbar->addAction(this->meshCreateAct);
   this->editToolbar->addSeparator();
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);
@@ -471,6 +485,7 @@ void MainWindow::OnMoveMode(bool _mode)
     this->boxCreateAct->setChecked(false);
     this->sphereCreateAct->setChecked(false);
     this->cylinderCreateAct->setChecked(false);
+    this->meshCreateAct->setChecked(false);
     this->pointLghtCreateAct->setChecked(false);
     this->spotLghtCreateAct->setChecked(false);
     this->dirLghtCreateAct->setChecked(false);

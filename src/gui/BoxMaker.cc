@@ -111,7 +111,8 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   math::Vector3 p1, p2;
 
   if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y, norm, 0, p1))
+                                          this->mousePushPos.y,
+                                          math::Plane(norm), p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -120,7 +121,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y , norm, 0, p2))
+        _event.pos.x, _event.pos.y , math::Plane(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
