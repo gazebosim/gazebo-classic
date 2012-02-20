@@ -329,7 +329,10 @@ void Visual::Load()
       if (!common::MeshManager::Instance()->HasMesh(meshName))
       {
         mesh = common::MeshManager::Instance()->Load(meshName);
-        RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+        if (mesh)
+          RenderEngine::Instance()->AddResourcePath(mesh->GetPath());
+        else
+          gzthrow("Unable to create a mesh from " + meshName);
       }
       else
       {

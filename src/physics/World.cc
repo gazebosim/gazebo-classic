@@ -966,10 +966,11 @@ void World::ProcessFactoryMsgs()
 
       elem->SetParent(this->sdf);
       elem->GetParent()->InsertElement(elem);
-      ModelPtr model = this->LoadModel(elem, this->rootElement);
       if ((*iter).has_pose())
-        model->SetWorldPose(msgs::Convert((*iter).pose()));
+        elem->GetOrCreateElement("origin")->GetAttribute("pose")->Set(
+            msgs::Convert((*iter).pose()));
 
+      ModelPtr model = this->LoadModel(elem, this->rootElement);
       model->Init();
     }
 

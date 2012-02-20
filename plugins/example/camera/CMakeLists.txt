@@ -7,5 +7,8 @@ endif()
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
-add_library(factory SHARED factory.cc)
-target_link_libraries(factory ${GAZEBO_libraries})
+add_library(camera_dump SHARED camera_dump.cc)
+target_link_libraries(camera_dump ${GAZEBO_libraries} CameraPlugin)
+
+add_library(camera_move SHARED camera_move.cc)
+target_link_libraries(camera_move ${GAZEBO_libraries})

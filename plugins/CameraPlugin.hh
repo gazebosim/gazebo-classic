@@ -30,7 +30,7 @@ namespace gazebo
   {
     public: CameraPlugin();
 
-    public: void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
+    public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     public: virtual void OnNewFrame(const unsigned char *_image,
                               unsigned int _width, unsigned int _height,
@@ -46,4 +46,3 @@ namespace gazebo
   };
 }
 #endif
-

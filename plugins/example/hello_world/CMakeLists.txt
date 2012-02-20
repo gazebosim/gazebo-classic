@@ -7,5 +7,5 @@ endif()
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
-add_library(factory SHARED factory.cc)
-target_link_libraries(factory ${GAZEBO_libraries})
+add_library(hello_world SHARED hello_world.cc)
+target_link_libraries(hello_world ${GAZEBO_libraries})

@@ -150,7 +150,6 @@ void GLWidget::showEvent(QShowEvent *_event)
 void GLWidget::enterEvent(QEvent * /*_event*/)
 {
   printf("Enter Event\n");
-  this->setFocus(Qt::MouseFocusReason);
 }
 
 /////////////////////////////////////////////////
@@ -269,11 +268,11 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 
   if (this->entityMaker)
     this->entityMaker->OnMousePush(this->mouseEvent);
-  else if (this->selectionVis)
+  /*else if (this->selectionVis)
   {
     this->scene->GetVisualAt(this->userCamera, this->mouseEvent.pressPos,
                              this->selectionMod);
-  }
+  }*/
   else if (this->mouseMoveVis && _event->button() == Qt::MidButton)
   {
     this->onShiftMousePos = QCursor::pos();
@@ -308,6 +307,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
+  this->setFocus(Qt::MouseFocusReason);
+
   this->mouseEvent.pos.Set(_event->pos().x()+this->mouseOffset,
                             _event->pos().y()+this->mouseOffset);
   this->mouseEvent.type = common::MouseEvent::MOVE;
@@ -336,7 +337,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
       math::Vector3 rpy = this->mouseMoveVisStartPose.rot.GetAsEuler();
       math::Vector3 mp = this->mouseMoveVisStartPose.pos;
       double yaw = atan2((pp.y - mp.y) , (pp.x - mp.x)) + M_PI * 0.5;
-      if (this->mouseEvent.shift)
+      if (!this->mouseEvent.shift)
       {
         yaw = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
       }
@@ -346,15 +347,29 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     else
     {
       // Translate the visual by just moving the mouse around
-      if (this->mouseEvent.shift)
+      if (!this->mouseEvent.shift)
       {
         pp.x = rint(pp.x);
         pp.y = rint(pp.y);
       }
+
+      math::Vector3 pt(pp.x, pp.y, 100.0);
+
+      std::vector<rendering::VisualPtr> below;
+      this->scene->GetVisualsBelowPoint(pt, below);
+      double maxZ = 0;
+
+      for (unsigned int i = 0; i < below.size(); ++i)
+      {
+        if (below[i]->GetName().find(this->mouseMoveVis->GetName()) ==
+            std::string::npos && below[i]->GetBoundingBox().max.z > maxZ)
+          maxZ = below[i]->GetBoundingBox().max.z;
+      }
+      pp.z = maxZ;
+
       this->mouseMoveVis->SetWorldPosition(pp);
     }
   }
-
 
   if (_event->buttons())
   {
@@ -369,15 +384,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 
     if (this->keyModifiers & Qt::ControlModifier && !this->entityMaker)
     {
-      if (this->selectionVis)
+      if (this->mouseMoveVis)
       {
         newHoverVis = this->scene->GetVisualAt(this->userCamera,
-            this->mouseEvent.pos, mod);
+                                               this->mouseEvent.pos, mod);
       }
       else
       {
         newHoverVis = this->scene->GetVisualAt(this->userCamera,
-            this->mouseEvent.pos);
+                                               this->mouseEvent.pos);
       }
 
       if (!mod.empty())
@@ -385,7 +400,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
         this->setCursor(Qt::SizeAllCursor);
         this->scene->GetSelectionObj()->SetHighlight(mod);
       }
-      else if (newHoverVis && !this->selectionVis)
+      else if (newHoverVis && !this->mouseMoveVis)
       {
         this->scene->GetSelectionObj()->SetHighlight("");
 
@@ -439,14 +454,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 
     if (this->entityMaker)
       this->entityMaker->OnMouseDrag(this->mouseEvent);
-    else if (this->selectionVis && !this->selectionMod.empty())
+    /*else if (this->selectionVis && !this->selectionMod.empty())
     {
       this->scene->GetSelectionObj()->SetActive(true);
       if (this->selectionMod.substr(0, 3) == "rot")
         this->RotateEntity(this->selectionVis);
       else
         this->TranslateEntity(this->selectionVis);
-    }
+    }*/
     else if (!(this->mouseMoveVis &&
                this->mouseEvent.buttons & common::MouseEvent::MIDDLE))
     {
@@ -457,7 +472,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
   }
   else
   {
-    this->userCamera->HandleMouseEvent(this->mouseEvent);
+    if (this->entityMaker)
+      this->entityMaker->OnMouseMove(this->mouseEvent);
+    else
+      this->userCamera->HandleMouseEvent(this->mouseEvent);
   }
 }
 
@@ -503,28 +521,29 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
     {
       if (this->hoverVis)
       {
-        this->selectionVis = this->hoverVis;
-        if (this->selectionVis)
+        this->mouseMoveVis = this->hoverVis;
+        if (this->mouseMoveVis)
         {
           // Get the model associated with the visual
-          this->selectionVis = this->selectionVis->GetParent()->GetParent();
-          this->scene->SelectVisual(this->selectionVis->GetName());
+          this->mouseMoveVis = this->mouseMoveVis->GetParent()->GetParent();
+          this->scene->SelectVisual(this->mouseMoveVis->GetName());
         }
       }
-      else
+      else if (this->mouseMoveVis)
+      {
         this->scene->SelectVisual("");
+        msgs::Model msg;
+        msg.set_id(gui::get_entity_id(this->mouseMoveVis->GetName()));
+        msg.set_name(this->mouseMoveVis->GetName());
+
+        msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
+        this->modelPub->Publish(msg);
+
+        this->mouseMoveVis.reset();
+      }
     }
     else
       this->scene->SelectVisual("");
-  }
-  else if (!this->selectionMod.empty() && this->selectionVis)
-  {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(this->selectionVis->GetName()));
-    msg.set_name(this->selectionVis->GetName());
-
-    msgs::Set(msg.mutable_pose(), this->selectionVis->GetWorldPose());
-    this->modelPub->Publish(msg);
   }
   else if (this->mouseMoveVis && _event->button() == Qt::MidButton)
   {
@@ -566,7 +585,7 @@ void GLWidget::Clear()
   gui::clear_active_camera();
   this->userCamera.reset();
   this->scene.reset();
-  this->selectionVis.reset();
+  this->mouseMoveVis.reset();
   this->hoverVis.reset();
   this->selectionMod.clear();
   this->selectionId = 0;
@@ -649,7 +668,7 @@ void GLWidget::OnRemoveScene(const std::string &_name)
 void GLWidget::OnCreateScene(const std::string &_name)
 {
   this->hoverVis.reset();
-  this->selectionVis.reset();
+  this->mouseMoveVis.reset();
 
   this->ViewScene(rendering::get_scene(_name));
 }
@@ -824,9 +843,9 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
   if (_msg->has_selected())
   {
     if (_msg->selected())
-      this->selectionVis = this->scene->GetVisual(_msg->name());
+      this->mouseMoveVis = this->scene->GetVisual(_msg->name());
     else
-      this->selectionVis.reset();
+      this->mouseMoveVis.reset();
   }
 }
 

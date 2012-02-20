@@ -22,7 +22,7 @@ using namespace gazebo;
 using namespace gui;
 
 bool EntityMaker::snapToGrid = true;
-double EntityMaker::snapDistance = 0.2;
+double EntityMaker::snapDistance = 0.4;
 double EntityMaker::snapGridSize = 1.0;
 
 //////////////////////////////////////////////////
@@ -68,6 +68,11 @@ void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
 }
 
 //////////////////////////////////////////////////
+void EntityMaker::OnMouseMove(const common::MouseEvent &/*_event*/)
+{
+}
+
+//////////////////////////////////////////////////
 math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
 {
   math::Vector3 result = _p;
@@ -76,11 +81,11 @@ math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
   {
     math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
       this->snapGridSize;
-    if (_p.Distance(rounded) < this->snapDistance)
-      result = rounded;
+    if (fabs(_p.x - rounded.x) < this->snapDistance)
+      result.x = rounded.x;
+    if (fabs(_p.y - rounded.y) < this->snapDistance)
+      result.y = rounded.y;
   }
 
   return result;
 }
-
-

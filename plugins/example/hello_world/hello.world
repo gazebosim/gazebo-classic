@@ -41,6 +41,5 @@
       <direction xyz="1.0 1.0 -1.0"/>
     </light>
 
-    <plugin name="factory_tutorial" filename="libfactory_tutorial.so"/>
-  </world>
+    <plugin name="hello_world" filename="libhello_world.so"/>
 </gazebo>

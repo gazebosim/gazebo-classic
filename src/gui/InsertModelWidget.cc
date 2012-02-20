@@ -168,45 +168,55 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     scene->AddVisual(this->modelVisual);
 
     sdf::ElementPtr linkElem = modelElem->GetElement("link");
-    while (linkElem)
+
+    try
     {
-      std::string linkName = linkElem->GetValueString("name");
-      if (linkElem->HasElement("origin"))
-        linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
-
-
-      rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-            linkName, this->modelVisual));
-      linkVisual->Load();
-      linkVisual->SetPose(linkPose);
-      this->visuals.push_back(linkVisual);
-
-      int visualIndex = 0;
-      sdf::ElementPtr visualElem;
-
-      if (linkElem->HasElement("visual"))
-        visualElem = linkElem->GetElement("visual");
-
-      while (visualElem)
+      while (linkElem)
       {
-        if (visualElem->HasElement("origin"))
-          visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
-
-        std::ostringstream visualName;
-        visualName << modelName << "::" << linkName << "::Visual_"
-          << visualIndex++;
-        rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-              linkVisual));
-        visVisual->Load(visualElem);
-        this->visuals.push_back(visVisual);
+        std::string linkName = linkElem->GetValueString("name");
+        if (linkElem->HasElement("origin"))
+          linkPose = linkElem->GetElement("origin")->GetValuePose("pose");
 
 
-        visualElem = visualElem->GetNextElement();
+        rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
+              linkName, this->modelVisual));
+        linkVisual->Load();
+        linkVisual->SetPose(linkPose);
+        this->visuals.push_back(linkVisual);
+
+        int visualIndex = 0;
+        sdf::ElementPtr visualElem;
+
+        if (linkElem->HasElement("visual"))
+          visualElem = linkElem->GetElement("visual");
+
+        while (visualElem)
+        {
+          if (visualElem->HasElement("origin"))
+            visualPose = visualElem->GetElement("origin")->GetValuePose("pose");
+
+          std::ostringstream visualName;
+          visualName << modelName << "::" << linkName << "::Visual_"
+            << visualIndex++;
+          rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+                linkVisual));
+
+          visVisual->Load(visualElem);
+          this->visuals.push_back(visVisual);
+
+          visualElem = visualElem->GetNextElement();
+        }
+
+        linkElem = linkElem->GetNextElement();
       }
-
-      linkElem = linkElem->GetNextElement();
+    }
+    catch (common::Exception &_e)
+    {
+      printf("Error\n");
+      this->visuals.clear();
     }
 
+    if (visuals.size() > 0)
     gui::Events::mouseMoveVisual(modelName);
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);

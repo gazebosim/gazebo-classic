@@ -33,8 +33,9 @@ namespace gazebo
       sphereSDF.SetFromString(
          "<gazebo version ='1.0'>\
           <model name ='sphere'>\
-            <origin pose ='0 2 0 0 0 0'/>\
+            <origin pose ='1 2 0 0 0 0'/>\
             <link name ='link'>\
+              <origin pose ='0 0 .5 0 0 0'/>\
               <inertial mass ='1.0'>\
                   <inertia ixx ='1' ixy ='0' ixz ='0'\
                            iyy ='1' iyz ='0' izz ='1'/>\
@@ -75,7 +76,7 @@ namespace gazebo
 
         // Pose to initialize the model to
         msgs::Set(msg.mutable_pose(),
-            math::Pose(math::Vector3(0, -2, 0), math::Quaternion(0, 0, 0)));
+            math::Pose(math::Vector3(1, -2, 0), math::Quaternion(0, 0, 0)));
 
         // Send the message
         factoryPub->Publish(msg);

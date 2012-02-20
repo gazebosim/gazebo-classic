@@ -84,12 +84,13 @@ void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
   this->mousePushPos = _event.pressPos;
 }
 
-void CylinderMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
+void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
   this->state++;
+  this->mouseReleasePos = _event.pos;
 
   if (this->state == 3)
   {
@@ -98,6 +99,34 @@ void CylinderMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
   }
 }
 
+/////////////////////////////////////////////////
+void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
+{
+  if (this->state < 2)
+    return;
+
+  math::Vector3 norm;
+  math::Vector3 p1, p2;
+
+  norm.Set(1, 0, 0);
+
+  math::Vector3 p(this->visualMsg->pose().position().x(),
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
+
+  double size = (this->mouseReleasePos.y - _event.pos.y) * 0.01;
+  if (!_event.shift)
+    size = rint(size);
+
+  this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(size);
+
+  p.z = size / 2.0;
+
+  msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  this->visPub->Publish(*this->visualMsg);
+}
+
+/////////////////////////////////////////////////
 void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
 {
   if (this->state == 0)
@@ -106,10 +135,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   math::Vector3 norm;
   math::Vector3 p1, p2;
 
-  if (this->state == 1)
-    norm.Set(0, 0, 1);
-  else if (this->state == 2)
-    norm.Set(1, 0, 0);
+  norm.Set(0, 0, 1);
 
   if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
                                           this->mousePushPos.y, 
@@ -119,7 +145,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
     return;
   }
 
-  p1 = this->GetSnappedPoint(p1);
+  p1.Round();
 
   if (!this->camera->GetWorldPointOnPlane(
         _event.pos.x, _event.pos.y, math::Plane(norm), p2))
@@ -134,24 +160,18 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
     msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   math::Vector3 p(this->visualMsg->pose().position().x(),
-             this->visualMsg->pose().position().y(),
-             this->visualMsg->pose().position().z());
-
-  math::Vector3 scale;
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
 
   if (this->state == 1)
   {
     double dist = p1.Distance(p2);
+    double rounded = rint(dist);
+    if (fabs(dist - rounded) < 0.2)
+      dist = rounded;
 
     this->visualMsg->mutable_geometry()->mutable_cylinder()->set_radius(dist);
     this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(0.01);
-  }
-  else
-  {
-    this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(
-        (this->mousePushPos.y - _event.pos.y)*0.01);
-
-    p.z = ((this->mousePushPos.y - _event.pos.y)*0.01)/2.0;
   }
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);

@@ -52,6 +52,7 @@ namespace gazebo
       public: virtual void OnMousePush(const common::MouseEvent &_event);
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      public: virtual void OnMouseMove(const common::MouseEvent &_event);
 
       // \brief Get a point snapped to a grid
       protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
