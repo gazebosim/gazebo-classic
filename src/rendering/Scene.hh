@@ -237,35 +237,26 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
 
-      private: void OnRequest(
-                   ConstRequestPtr &_msg);
-      private: void OnResponse(
-                   ConstResponsePtr &_msg);
+      private: void OnRequest(ConstRequestPtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnJointMsg(ConstJointPtr &_msg);
 
-      private: void ProcessSensorMsg(
-                   ConstSensorPtr &_msg);
-      private: void ProcessJointMsg(
-                   ConstJointPtr &_msg);
+      private: void ProcessSensorMsg(ConstSensorPtr &_msg);
+      private: void ProcessJointMsg(ConstJointPtr &_msg);
 
-      private: void ProcessSceneMsg(
-                   ConstScenePtr &_msg);
+      private: void ProcessSceneMsg(ConstScenePtr &_msg);
 
-      private: void OnSceneMsg(
-                   ConstScenePtr &_msg);
-      private: void OnVisualMsg(
-                   ConstVisualPtr &msg);
-      private: bool ProcessVisualMsg(
-                   ConstVisualPtr &msg);
+      private: void OnSceneMsg(ConstScenePtr &_msg);
+      private: void OnVisualMsg(ConstVisualPtr &_msg);
+      private: bool ProcessVisualMsg(ConstVisualPtr &_msg);
 
-      private: void OnLightMsg(ConstLightPtr &msg);
-      private: void ProcessLightMsg(
-                   ConstLightPtr &msg);
+      private: void OnLightMsg(ConstLightPtr &_msg);
+      private: void ProcessLightMsg(ConstLightPtr &_msg);
+      private: void ProcessRequestMsg(ConstRequestPtr &_msg);
 
-      private: void OnSelectionMsg(
-                   ConstSelectionPtr &msg);
+      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
-      private: void OnPoseMsg(ConstPosePtr &msg);
+      private: void OnPoseMsg(ConstPosePtr &_msg);
 
       public: void Clear();
 
@@ -304,6 +295,8 @@ namespace gazebo
       typedef std::list<boost::shared_ptr<msgs::Sensor const> > SensorMsgs_L;
       private: SensorMsgs_L sensorMsgs;
 
+      typedef std::list<boost::shared_ptr<msgs::Request const> > RequestMsgs_L;
+      private: RequestMsgs_L requestMsgs;
 
       typedef std::map<std::string, VisualPtr> Visual_M;
       private: Visual_M visuals;

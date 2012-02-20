@@ -579,7 +579,6 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos,
 void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
                                  std::vector<VisualPtr> &_visuals)
 {
-  Ogre::Real closest_distance = -1.0f;
   Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
 
   this->raySceneQuery->setRay(ray);
@@ -588,7 +587,6 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
-  Ogre::Entity *closestEntity = NULL;
 
   _visuals.clear();
 
@@ -631,7 +629,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr camera, math::Vector2i mousePos)
   return visual;
 }
 
-
+/////////////////////////////////////////////////
 Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
                                      math::Vector2i _mousePos,
                                      bool _ignoreSelectionObj)
@@ -1144,6 +1142,7 @@ void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
 
+  RequestMsgs_L::iterator rIter;
   SceneMsgs_L::iterator sIter;
   VisualMsgs_L::iterator vIter;
   LightMsgs_L::iterator lIter;
@@ -1218,6 +1217,15 @@ void Scene::PreRender()
     else
       ++pIter;
   }
+
+  // Process the request messages
+  for (rIter =  this->requestMsgs.begin();
+       rIter != this->requestMsgs.end(); ++rIter)
+  {
+    this->ProcessRequestMsg(*rIter);
+  }
+  this->requestMsgs.clear();
+
 
   if (this->selectionMsg)
   {
@@ -1300,9 +1308,16 @@ void Scene::ProcessJointMsg(ConstJointPtr & /*_msg*/)
   */
 }
 
+/////////////////////////////////////////////////
 void Scene::OnRequest(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->requestMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
+{
   if (_msg->request() == "entity_delete")
   {
     Visual_M::iterator iter;

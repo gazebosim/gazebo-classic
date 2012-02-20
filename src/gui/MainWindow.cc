@@ -471,7 +471,7 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
-  this->editToolbar->addAction(this->meshCreateAct);
+  //this->editToolbar->addAction(this->meshCreateAct);
   this->editToolbar->addSeparator();
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);
