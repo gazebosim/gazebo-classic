@@ -62,6 +62,12 @@ void Server::LoadPlugin(const std::string &_filename)
 
 bool Server::Load(const std::string &_filename)
 {
+  // Quick test for a valid file
+  FILE *test = fopen(_filename.c_str(), "r");
+  if (!test)
+    return false;
+  fclose(test);
+
   std::string host = "";
   unsigned int port = 0;
 
