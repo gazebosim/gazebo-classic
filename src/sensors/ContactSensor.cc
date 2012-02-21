@@ -59,7 +59,7 @@ ContactSensor::~ContactSensor()
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::Load(sdf::ElementPtr &_sdf)
+void ContactSensor::Load(sdf::ElementPtr _sdf)
 {
   Sensor::Load(_sdf);
 

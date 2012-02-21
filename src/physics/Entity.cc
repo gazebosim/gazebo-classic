@@ -85,7 +85,7 @@ Entity::~Entity()
 }
 
 //////////////////////////////////////////////////
-void Entity::Load(sdf::ElementPtr &_sdf)
+void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
   this->node->Init(this->GetWorld()->GetName());
@@ -497,7 +497,7 @@ void Entity::Reset()
 }
 
 //////////////////////////////////////////////////
-void Entity::UpdateParameters(sdf::ElementPtr &_sdf)
+void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 

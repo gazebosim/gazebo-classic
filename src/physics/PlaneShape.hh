@@ -45,7 +45,7 @@ namespace gazebo
       public: virtual ~PlaneShape();
 
       /// \brief Load the plane
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the plane
       public: virtual void Init();

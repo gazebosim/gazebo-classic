@@ -41,7 +41,7 @@ namespace gazebo
       public: virtual ~SphereShape();
 
       /// \brief Load the sphere
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the sphere
       public: virtual void Init();

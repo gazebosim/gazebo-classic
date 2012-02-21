@@ -186,7 +186,7 @@ Scene::~Scene()
 }
 
 //////////////////////////////////////////////////
-void Scene::Load(sdf::ElementPtr &_sdf)
+void Scene::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   this->Load();

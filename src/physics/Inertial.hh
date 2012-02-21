@@ -46,7 +46,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief update the parameters using new sdf values
-      public: void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: void UpdateParameters(sdf::ElementPtr _sdf);
 
       public: double GetLinearDamping();
       public: double GetAngularDamping();

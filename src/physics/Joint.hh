@@ -62,7 +62,7 @@ namespace gazebo
       public: virtual ~Joint();
 
       /// \brief Load a joint
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize a joint
       public: virtual void Init();
@@ -71,7 +71,7 @@ namespace gazebo
       public: void Update();
 
       /// \brief update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the joint to show visuals
       public: void ShowJoints(const bool &s);

@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Load the model
       /// \param _sdf SDF parameters
-      public: void Load(sdf::ElementPtr &_sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the model
       public: virtual void Init();
@@ -67,10 +67,10 @@ namespace gazebo
       public: virtual void Fini();
 
       /// \brief update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Get the SDF values for the model
-      public: virtual const sdf::ElementPtr &GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF();
 
       /// \brief Remove a child
       /// \param child Remove a child entity
@@ -215,11 +215,11 @@ namespace gazebo
 
       /// \brief Load a joint helper function
       /// \param _sdf SDF parameter
-      private: void LoadJoint(sdf::ElementPtr &_sdf);
+      private: void LoadJoint(sdf::ElementPtr _sdf);
 
       /// \brief Load a plugin helper function
       /// \param _sdf SDF parameter
-      private: void LoadPlugin(sdf::ElementPtr &_sdf);
+      private: void LoadPlugin(sdf::ElementPtr _sdf);
 
       private: LinkPtr canonicalLink;
 

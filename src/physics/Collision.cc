@@ -93,7 +93,7 @@ void Collision::Fini()
 
 
 //////////////////////////////////////////////////
-void Collision::Load(sdf::ElementPtr &_sdf)
+void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
@@ -348,7 +348,7 @@ math::Vector3 Collision::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-void Collision::UpdateParameters(sdf::ElementPtr &_sdf)
+void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 }

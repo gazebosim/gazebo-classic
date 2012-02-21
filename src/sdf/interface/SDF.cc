@@ -66,7 +66,7 @@ ElementPtr Element::GetParent() const
 }
 
 /////////////////////////////////////////////////
-void Element::SetParent(const ElementPtr &_parent)
+void Element::SetParent(const ElementPtr _parent)
 {
   this->parent = _parent;
 }
@@ -270,9 +270,31 @@ ElementPtr Element::Clone() const
 }
 
 /////////////////////////////////////////////////
-void Element::Copy(const ElementPtr &_elem)
+void Element::Copy(const ElementPtr _elem)
 {
-  for (Param_V::iterator iter = this->attributes.begin();
+  for (Param_V::iterator iter = _elem->attributes.begin();
+       iter != _elem->attributes.end(); ++iter)
+  {
+    ParamPtr param = this->GetAttribute((*iter)->GetKey());
+    param->SetFromString((*iter)->GetAsString());
+  }
+
+  if (_elem->GetValue())
+  {
+    if (!this->value)
+      this->value = _elem->GetValue()->Clone();
+    else
+      this->value->SetFromString(_elem->GetValue()->GetAsString());
+  }
+
+  for (ElementPtr_V::iterator iter = _elem->elements.begin();
+       iter != _elem->elements.end(); ++iter)
+  {
+    ElementPtr elem = this->GetOrCreateElement((*iter)->GetName());
+    elem->Copy(*iter);
+  }
+
+  /*for (Param_V::iterator iter = this->attributes.begin();
       iter != this->attributes.end(); ++iter)
   {
     ParamPtr param = _elem->GetAttribute((*iter)->GetKey());
@@ -292,6 +314,7 @@ void Element::Copy(const ElementPtr &_elem)
     if (elem)
       (*iter)->Copy(elem);
   }
+  */
 }
 
 /////////////////////////////////////////////////

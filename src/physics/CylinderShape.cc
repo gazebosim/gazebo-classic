@@ -33,7 +33,7 @@ CylinderShape::~CylinderShape()
 }
 
 //////////////////////////////////////////////////
-void CylinderShape::Load(sdf::ElementPtr &_sdf)
+void CylinderShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 }

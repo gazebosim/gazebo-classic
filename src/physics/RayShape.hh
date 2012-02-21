@@ -96,7 +96,7 @@ namespace gazebo
       public: int GetFiducial() const;
 
       /// \brief Load the ray
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief In the ray
       public: virtual void Init();

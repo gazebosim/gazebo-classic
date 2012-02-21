@@ -51,7 +51,7 @@ namespace gazebo
       public: virtual ~MultiRayShape();
 
       /// \brief Load a multi-ray shape from SDF
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Init the shape
       public: virtual void Init();

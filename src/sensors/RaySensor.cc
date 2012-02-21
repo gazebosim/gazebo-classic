@@ -61,7 +61,7 @@ RaySensor::~RaySensor()
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load(sdf::ElementPtr &_sdf)
+void RaySensor::Load(sdf::ElementPtr _sdf)
 {
   Sensor::Load(_sdf);
 }

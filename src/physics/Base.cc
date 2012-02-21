@@ -70,7 +70,7 @@ Base::~Base()
 }
 
 //////////////////////////////////////////////////
-void Base::Load(sdf::ElementPtr &_sdf)
+void Base::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   if (this->parent)
@@ -81,11 +81,10 @@ void Base::Load(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-void Base::UpdateParameters(sdf::ElementPtr &_sdf)
+void Base::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
 }
-
 
 //////////////////////////////////////////////////
 void Base::Fini()
@@ -375,7 +374,7 @@ const WorldPtr &Base::GetWorld() const
 }
 
 //////////////////////////////////////////////////
-const sdf::ElementPtr &Base::GetSDF()
+const sdf::ElementPtr Base::GetSDF()
 {
   this->sdf->Update();
   return this->sdf;

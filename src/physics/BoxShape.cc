@@ -34,7 +34,7 @@ BoxShape::~BoxShape()
 }
 
 //////////////////////////////////////////////////
-void BoxShape::Load(sdf::ElementPtr &_sdf)
+void BoxShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 }

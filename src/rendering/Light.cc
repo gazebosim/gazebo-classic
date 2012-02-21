@@ -72,7 +72,7 @@ Light::~Light()
 }
 
 //////////////////////////////////////////////////
-void Light::Load(sdf::ElementPtr &_sdf)
+void Light::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   this->Load();

@@ -125,7 +125,7 @@ Camera::~Camera()
 }
 
 //////////////////////////////////////////////////
-void Camera::Load(sdf::ElementPtr &_sdf)
+void Camera::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   this->Load();

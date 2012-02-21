@@ -54,7 +54,7 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(sdf::ElementPtr &_sdf)
+void Joint::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
@@ -178,7 +178,7 @@ void Joint::Update()
 }
 
 //////////////////////////////////////////////////
-void Joint::UpdateParameters(sdf::ElementPtr &_sdf)
+void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 }

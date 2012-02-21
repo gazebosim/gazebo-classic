@@ -46,7 +46,7 @@ ODEJoint::~ODEJoint()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::Load(sdf::ElementPtr &_sdf)
+void ODEJoint::Load(sdf::ElementPtr _sdf)
 {
   Joint::Load(_sdf);
 

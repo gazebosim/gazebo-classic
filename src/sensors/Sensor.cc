@@ -61,7 +61,7 @@ Sensor::~Sensor()
 }
 
 //////////////////////////////////////////////////
-void Sensor::Load(sdf::ElementPtr &_sdf)
+void Sensor::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   this->Load();
@@ -155,7 +155,7 @@ std::string Sensor::GetName() const
 }
 
 //////////////////////////////////////////////////
-void Sensor::LoadPlugin(sdf::ElementPtr &_sdf)
+void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");

@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~BoxShape();
 
       /// \brief Load the box
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the box
       public: virtual void Init();

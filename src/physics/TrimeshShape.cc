@@ -45,7 +45,7 @@ TrimeshShape::~TrimeshShape()
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::Load(sdf::ElementPtr &_sdf)
+void TrimeshShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 }

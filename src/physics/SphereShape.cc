@@ -36,7 +36,7 @@ SphereShape::~SphereShape()
 }
 
 //////////////////////////////////////////////////
-void SphereShape::Load(sdf::ElementPtr &_sdf)
+void SphereShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 }

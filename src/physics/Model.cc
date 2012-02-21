@@ -76,7 +76,7 @@ Model::~Model()
 }
 
 //////////////////////////////////////////////////
-void Model::Load(sdf::ElementPtr &_sdf)
+void Model::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
@@ -277,7 +277,7 @@ void Model::Fini()
 }
 
 //////////////////////////////////////////////////
-void Model::UpdateParameters(sdf::ElementPtr &_sdf)
+void Model::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 
@@ -308,10 +308,9 @@ void Model::UpdateParameters(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-const sdf::ElementPtr &Model::GetSDF()
+const sdf::ElementPtr Model::GetSDF()
 {
-  Entity::GetSDF();
-  return this->sdf;
+  return Entity::GetSDF();
 }
 
 //////////////////////////////////////////////////
@@ -568,7 +567,7 @@ LinkPtr Model::GetLink(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadJoint(sdf::ElementPtr &_sdf)
+void Model::LoadJoint(sdf::ElementPtr _sdf)
 {
   JointPtr joint;
 
@@ -606,7 +605,7 @@ void Model::LoadJoint(sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-void Model::LoadPlugin(sdf::ElementPtr &_sdf)
+void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->GetValueString("name");
   std::string filename = _sdf->GetValueString("filename");

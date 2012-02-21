@@ -36,7 +36,7 @@ PlaneShape::~PlaneShape()
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::Load(sdf::ElementPtr &_sdf)
+void PlaneShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 }

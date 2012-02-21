@@ -43,7 +43,7 @@ ODESliderJoint::~ODESliderJoint()
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::Load(sdf::ElementPtr &_sdf)
+void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 {
   SliderJoint<ODEJoint>::Load(_sdf);
 }

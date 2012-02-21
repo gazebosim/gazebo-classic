@@ -53,7 +53,7 @@ IRSensor::~IRSensor()
 }
 
 //////////////////////////////////////////////////
-void IRSensor::LoadChild(sdf::ElementPtr &_sdf)
+void IRSensor::LoadChild(sdf::ElementPtr _sdf)
 {
   if (this->body == NULL)
   {

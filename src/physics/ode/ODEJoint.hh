@@ -43,7 +43,7 @@ namespace gazebo
       public: virtual ~ODEJoint();
 
       /// \brief Load a joint
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Get the link to which the joint is attached according
       ///        the _index

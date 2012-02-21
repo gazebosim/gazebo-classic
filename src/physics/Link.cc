@@ -87,7 +87,7 @@ Link::~Link()
 }
 
 //////////////////////////////////////////////////
-void Link::Load(sdf::ElementPtr &_sdf)
+void Link::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
@@ -125,6 +125,7 @@ void Link::Load(sdf::ElementPtr &_sdf)
       if (iter != this->visuals.end())
         gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
 
+      std::cout << "Visual[" << msg.DebugString() << "]\n";
       this->visuals.push_back(msg.name());
 
       visualElem = visualElem->GetNextElement();
@@ -285,7 +286,7 @@ void Link::Reset()
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateParameters(sdf::ElementPtr &_sdf)
+void Link::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Entity::UpdateParameters(_sdf);
 
@@ -408,7 +409,7 @@ void Link::Update()
 }
 
 //////////////////////////////////////////////////
-void Link::LoadCollision(sdf::ElementPtr &_sdf)
+void Link::LoadCollision(sdf::ElementPtr _sdf)
 {
   CollisionPtr collision;
   std::string geomType =

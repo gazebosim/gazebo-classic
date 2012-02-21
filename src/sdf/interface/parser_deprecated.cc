@@ -49,7 +49,7 @@
 
 namespace deprecated_sdf
 {
-void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+void copyChildren(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Iterate over all the child elements
   for (xmlNodePtr elemXml = xmlFirstElementChild(_config);
@@ -92,7 +92,7 @@ void copyChildren(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   }
 }
 
-bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool getPlugins(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Get all plugins
   for (xmlNodePtr pluginXml = _config->xmlChildrenNode;
@@ -139,7 +139,7 @@ bool getPlugins(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 // light parsing
-bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initLight(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initOrigin(_config, _sdf);
   xmlNodePtr lightNode = firstChildElement(_config, "light");
@@ -192,7 +192,7 @@ bool initLight(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 // Sensor parsing
-bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initSensor(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
   initAttr(_config, "alwaysOn", _sdf->GetAttribute("always_on"));
@@ -241,7 +241,7 @@ bool initSensor(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initCamera(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr sdfHFOV = _sdf->AddElement("horizontal_fov");
   double hfov = boost::lexical_cast<double>(getNodeValue(_config, "hfov"));
@@ -304,7 +304,7 @@ bool initCamera(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initRay(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr sdfScan = _sdf->AddElement("scan");
 
@@ -361,7 +361,7 @@ bool initRay(xmlNodePtr _config, sdf::ElementPtr &_sdf)
   return true;
 }
 
-bool initContact(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initContact(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr sdfCollision = _sdf->AddElement("collision");
 
@@ -372,7 +372,7 @@ bool initContact(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 // _config = <body>
 // _sdf = <inertial>
-bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initInertial(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Origin (old gazebo xml supports only cx, cy, cz translations, no rotation
   // xyz and rpy under body:... is for the link frame
@@ -450,7 +450,7 @@ bool initInertial(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 // _conifg = "geom"
 // _sdf = "collision"
-bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initCollision(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
 
@@ -541,7 +541,7 @@ bool initCollision(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 // _config = a node with an xyz and/or rpy children
 // _sdf = an sdf element that has an origin child element
-bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initOrigin(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Origin
   xmlNodePtr xyz_xml = firstChildElement(_config, "xyz");
@@ -615,7 +615,7 @@ bool initOrigin(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 // _config = <body>
 // _sdf = <link>
-bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initLink(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
   initOrigin(_config, _sdf);
@@ -710,7 +710,7 @@ bool initLink(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 /// _config = <visual>
 /// _sdf = visual
-bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initVisual(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   _sdf->GetAttribute("cast_shadows")->SetFromString("true");
 
@@ -814,7 +814,7 @@ bool initVisual(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 // _config = <joint>
 // _sdf = joint
-bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initJoint(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
 
@@ -975,7 +975,7 @@ bool initJoint(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initModel(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   initAttr(_config, "name", _sdf->GetAttribute("name"));
   initAttr(_config, "static", _sdf->GetAttribute("static"));
@@ -1012,7 +1012,7 @@ bool initModel(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initWorld(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   // Set world name
   if (!_sdf->GetAttribute("name")->SetFromString("default"))
@@ -1058,7 +1058,7 @@ bool initWorld(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 }
 
 //////////////////////////////////////////////////
-bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initScene(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   sdf::ElementPtr sdfAmbient = _sdf->AddElement("ambient");
   if (sdfAmbient)
@@ -1090,7 +1090,7 @@ bool initScene(xmlNodePtr _config, sdf::ElementPtr &_sdf)
 
 // _config = physics:ode
 // _sdf = physics
-bool initPhysics(xmlNodePtr _config, sdf::ElementPtr &_sdf)
+bool initPhysics(xmlNodePtr _config, sdf::ElementPtr _sdf)
 {
   _sdf->GetAttribute("type")->SetFromString("ode");
 

@@ -380,7 +380,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
       double maxZ = 0;
 
       std::string belowModelName;
-      unsigned int index;
+      size_t index;
       for (unsigned int i = 0; i < below.size(); ++i)
       {
         belowModelName = below[i]->GetName();

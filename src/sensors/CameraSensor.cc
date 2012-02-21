@@ -58,7 +58,7 @@ void CameraSensor::SetParent(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::Load(sdf::ElementPtr &_sdf)
+void CameraSensor::Load(sdf::ElementPtr _sdf)
 {
   Sensor::Load(_sdf);
 }

@@ -75,7 +75,7 @@ namespace gazebo
       public: virtual ~Scene();
 
       /// \brief Load the scene from a set of parameters
-      public: void Load(sdf::ElementPtr &_scene);
+      public: void Load(sdf::ElementPtr _scene);
 
       /// \brief Load the scene with default parameters
       public: void Load();

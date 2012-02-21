@@ -87,7 +87,7 @@ void ODETrimeshShape::Update()
 }
 
 //////////////////////////////////////////////////
-void ODETrimeshShape::Load(sdf::ElementPtr &_sdf)
+void ODETrimeshShape::Load(sdf::ElementPtr _sdf)
 {
   TrimeshShape::Load(_sdf);
 }

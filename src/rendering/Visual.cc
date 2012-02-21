@@ -48,6 +48,9 @@ unsigned int Visual::visualCounter = 0;
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/visual.sdf", this->sdf);
+
   std::cout << "New Visual[" << _name << "] Parent[" << _parent->GetName() << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
@@ -77,6 +80,9 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, Scene *_scene)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/visual.sdf", this->sdf);
+
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -162,8 +168,10 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   std::cout << "Visual::Clone. Orig[" << this->GetName() << "] New[" << _name << "]\n";
 
   VisualPtr result(new Visual(_name, _newParent));
-  result->Load(this->sdf->Clone());
-  result->sdf->PrintValues("");
+  result->Load(this->sdf);
+
+  this->sdf->PrintValues("");
+  //result->sdf->PrintValues("");
 
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
@@ -206,10 +214,6 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
 //////////////////////////////////////////////////
 void Visual::Init()
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("sdf/visual.sdf", this->sdf);
-
-
   this->transparency = 0.0;
   this->isStatic = false;
   this->visible = true;
@@ -306,9 +310,6 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_cast_shadows())
     this->sdf->GetAttribute("cast_shadows")->Set(_msg->cast_shadows());
 
-  // if (msg->has_scale())
-  // this->SetScale(msgs::Convert(msg->scale()));
-
   this->Load();
   this->UpdateFromMsg(_msg);
 }
@@ -316,7 +317,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 //////////////////////////////////////////////////
 void Visual::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 
@@ -450,9 +451,10 @@ void Visual::Update()
 }
 
 //////////////////////////////////////////////////
-void Visual::SetName(const std::string &name_)
+void Visual::SetName(const std::string &_name)
 {
-  this->name = name_;
+  this->name = _name;
+  this->sdf->GetAttribute("name")->Set(_name);
 }
 
 //////////////////////////////////////////////////
@@ -603,11 +605,16 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (geomElem->HasElement("box"))
     geomElem->GetElement("box")->GetAttribute("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
-    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(_scale.x);
+    geomElem->GetElement("sphere")->GetAttribute("radius")->Set(_scale.x/2.0);
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x);
-    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.y);
+    geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.z);
+
+    std::cout << "Cylinder Set Scale[" <<_scale.x << ", " << _scale.z << "]\n";
+    std::cout << "Cylinder Size[" <<
+     geomElem->GetElement("cylinder")->GetAttribute("radius")->GetAsString() << ", " << 
+     geomElem->GetElement("cylinder")->GetAttribute("length")->GetAsString() << "\n";
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetAttribute("scale")->Set(_scale);
@@ -1594,6 +1601,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
   }
 
+  // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
     math::Vector3 scale;
@@ -1647,6 +1655,7 @@ VisualPtr Visual::GetParent() const
   return this->parent;
 }
 
+//////////////////////////////////////////////////
 bool Visual::IsPlane() const
 {
   if (this->sdf->HasElement("geometry"))
@@ -1657,6 +1666,7 @@ bool Visual::IsPlane() const
   return false;
 }
 
+//////////////////////////////////////////////////
 std::string Visual::GetMeshName() const
 {
   if (this->sdf->HasElement("geometry"))
@@ -1677,6 +1687,7 @@ std::string Visual::GetMeshName() const
   return std::string();
 }
 
+//////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Vector3 &_end,
                              double _pitch, double _yaw, double _time)
 {
@@ -1712,21 +1723,25 @@ void Visual::MoveToPosition(const math::Vector3 &_end,
     event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
 }
 
+//////////////////////////////////////////////////
 void Visual::ShowBoundingBox()
 {
   this->sceneNode->showBoundingBox(true);
 }
 
+//////////////////////////////////////////////////
 void Visual::SetScene(Scene *_scene)
 {
   this->scene = _scene;
 }
 
+//////////////////////////////////////////////////
 Scene *Visual::GetScene() const
 {
   return this->scene;
 }
 
+//////////////////////////////////////////////////
 void Visual::ShowCollision(bool _show)
 {
   if (this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
@@ -1738,6 +1753,3 @@ void Visual::ShowCollision(bool _show)
     (*iter)->ShowCollision(_show);
   }
 }
-
-
-

@@ -47,7 +47,7 @@ namespace gazebo
       public: virtual ~ODECollision();
 
       /// \brief Load the collision
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /*public: virtual void Load()
               {

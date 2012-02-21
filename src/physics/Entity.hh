@@ -60,7 +60,7 @@ namespace gazebo
 
       /// \brief Load
       /// \param node Pointer to an configuration node
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finalize the entity
       public: virtual void Fini();
@@ -68,7 +68,7 @@ namespace gazebo
       public: virtual void Reset();
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity
       /// \param name The new name

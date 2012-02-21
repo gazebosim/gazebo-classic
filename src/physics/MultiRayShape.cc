@@ -36,7 +36,7 @@ MultiRayShape::~MultiRayShape()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::Load(sdf::ElementPtr &_sdf)
+void MultiRayShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 }

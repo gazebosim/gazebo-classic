@@ -65,7 +65,7 @@ void Inertial::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Inertial::UpdateParameters(sdf::ElementPtr &_sdf)
+void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
 

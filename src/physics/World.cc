@@ -957,6 +957,7 @@ void World::ProcessFactoryMsgs()
       }
 
       factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
+      factorySDF->PrintValues();
     }
     else
     {
@@ -1000,8 +1001,6 @@ void World::ProcessFactoryMsgs()
       ModelPtr model = this->LoadModel(elem, this->rootElement);
       model->Init();
     }
-
-    factorySDF->root.reset();
   }
 
   this->factoryMsgs.clear();

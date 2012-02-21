@@ -43,10 +43,10 @@ namespace sdf
     public: boost::shared_ptr<Element> Clone() const;
 
     /// \brief Copy values from an Element
-    public: void Copy(const ElementPtr &_elem);
+    public: void Copy(const ElementPtr _elem);
 
     public: ElementPtr GetParent() const;
-    public: void SetParent(const ElementPtr &_parent);
+    public: void SetParent(const ElementPtr _parent);
 
     /// \brief Get the name of the parent link.
     /// \return Name of parent link, or empty string if no parent link exists.

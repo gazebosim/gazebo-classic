@@ -51,12 +51,12 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Load the collision
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       public: virtual void Init();
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Save the collision
       public: void Save(std::string &prefix, std::ostream &stream);

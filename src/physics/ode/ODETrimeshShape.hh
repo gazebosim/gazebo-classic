@@ -45,7 +45,7 @@ namespace gazebo
       public: void Update();
 
       /// \brief Load the trimesh
-      protected: virtual void Load(sdf::ElementPtr &_sdf);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       protected: virtual void Init();
 

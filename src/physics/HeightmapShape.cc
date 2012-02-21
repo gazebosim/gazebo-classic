@@ -52,7 +52,7 @@ void HeightmapShape::Update()
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::Load(sdf::ElementPtr &_sdf)
+void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Shape::Load(_sdf);
 

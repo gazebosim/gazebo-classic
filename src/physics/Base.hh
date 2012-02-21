@@ -104,7 +104,7 @@ namespace gazebo
 
       /// \brief Load
       /// \param node Pointer to an SDF parameters
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Finialize the object
       public: virtual void Fini();
@@ -114,7 +114,7 @@ namespace gazebo
       public: virtual void Update() {}
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the name of the entity
       /// \param name Link name
@@ -226,7 +226,7 @@ namespace gazebo
       public: const WorldPtr &GetWorld() const;
 
       /// \brief Get the SDF values for the model
-      public: virtual const sdf::ElementPtr &GetSDF();
+      public: virtual const sdf::ElementPtr GetSDF();
 
       protected: sdf::ElementPtr sdf;
 

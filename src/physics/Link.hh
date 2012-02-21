@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Load the body based on an SDF element
       /// \param _sdf SDF parameters
-      public: virtual void Load(sdf::ElementPtr &_sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Initialize the body
       public: virtual void Init();
@@ -64,7 +64,7 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Update the parameters using new sdf values
-      public: virtual void UpdateParameters(sdf::ElementPtr &_sdf);
+      public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Update the body
       public: virtual void Update();
@@ -178,7 +178,7 @@ namespace gazebo
       public: virtual void UpdateMass() {}
       /// Load a new collision helper function
       /// \param _sdf SDF element used to load the collision
-      private: void LoadCollision(sdf::ElementPtr &_sdf);
+      private: void LoadCollision(sdf::ElementPtr _sdf);
 
       /// \brief Get a collision by id
       /// \return Pointer to the collision

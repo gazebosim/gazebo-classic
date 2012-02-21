@@ -46,7 +46,7 @@ namespace gazebo
       public: virtual ~ODEHingeJoint();
 
       /// \brief Load joint
-      protected: virtual void Load(sdf::ElementPtr &_sdf);
+      protected: virtual void Load(sdf::ElementPtr _sdf);
 
       /// Get the anchor point
       public: virtual math::Vector3 GetAnchor(int index) const;
