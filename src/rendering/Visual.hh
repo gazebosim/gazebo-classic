@@ -70,14 +70,18 @@ namespace gazebo
 
       /// \brief Helper for the contructor
       public: void Init();
+
       public: void Fini();
+
+      /// \brief Clone the visual with a new name
+      public: VisualPtr Clone(const std::string &_name, VisualPtr _newParent);
 
       /// \brief Load from a message
       public: void LoadFromMsg(
                   const boost::shared_ptr< msgs::Visual const> &msg);
 
       /// \brief Load the visual with a set of parameters
-      public: void Load(sdf::ElementPtr &sdf);
+      public: void Load(sdf::ElementPtr sdf);
 
       /// \brief Load the visual with default parameters
       public: void Load();
@@ -292,12 +296,8 @@ namespace gazebo
       private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
 
       private: std::string name;
-      private: std::string physicsEntityName;
       public: VisualPtr parent;
       public: std::vector<VisualPtr> children;
-
-      /// List of all the parameters
-      protected: std::vector<common::Param*> parameters;
 
       private: Ogre::AnimationState *animState;
       protected: Scene *scene;

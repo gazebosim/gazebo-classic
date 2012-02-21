@@ -97,7 +97,7 @@ TEST_F(LaserTest, Stationary_EmptyWorld)
     physics::WorldPtr world = physics::get_world("default");
     EXPECT_TRUE(world);
 
-    physics::ModelPtr model = world->GetModelByName("box");
+    physics::ModelPtr model = world->GetModel("box");
 
     prevTime = laser->GetLastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));

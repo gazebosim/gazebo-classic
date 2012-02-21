@@ -411,6 +411,12 @@ ModelPtr World::GetModelByName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+ModelPtr World::GetModel(const std::string &_name)
+{
+  return boost::shared_dynamic_cast<Model>(this->GetByName(_name));
+}
+
+//////////////////////////////////////////////////
 EntityPtr World::GetEntityByName(const std::string &_name)
 {
   return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
@@ -882,7 +888,7 @@ void World::ProcessModelMsgs()
     if ((*iter).has_id())
       model = this->GetModelById((*iter).id());
     else
-      model = this->GetModelByName((*iter).name());
+      model = this->GetModel((*iter).name());
 
     if (!model)
       gzerr << "Unable to find model["
@@ -929,6 +935,29 @@ void World::ProcessFactoryMsgs()
         continue;
       }
     }
+    else if ((*iter).has_clone_model_name())
+    {
+      ModelPtr model = this->GetModel((*iter).clone_model_name());
+      if (!model)
+      {
+        gzerr << "Unable to clone model[" << (*iter).clone_model_name()
+              << "]. Model not found.\n";
+        continue;
+      }
+
+      factorySDF->root->InsertElement(model->GetSDF()->Clone());
+
+      std::string newName = model->GetName() + "_clone";
+      int i = 0;
+      while (this->GetModel(newName))
+      {
+        newName = model->GetName() + "_clone_" +
+                  boost::lexical_cast<std::string>(i);
+        i++;
+      }
+
+      factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
+    }
     else
     {
       gzerr << "Unable to load sdf from factory message."
@@ -938,8 +967,6 @@ void World::ProcessFactoryMsgs()
 
     if ((*iter).has_edit_name())
     {
-      factorySDF->PrintValues();
-
       BasePtr base = this->rootElement->GetByName((*iter).edit_name());
       if (base)
       {
@@ -1023,7 +1050,7 @@ void World::SetState(const WorldState &_state)
   for (unsigned int i = 0; i < _state.GetModelStateCount(); ++i)
   {
     ModelState modelState = _state.GetModelState(i);
-    ModelPtr model = this->GetModelByName(modelState.GetName());
+    ModelPtr model = this->GetModel(modelState.GetName());
     if (model)
       model->SetState(modelState);
     else

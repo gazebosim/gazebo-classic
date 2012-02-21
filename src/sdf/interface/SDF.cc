@@ -258,8 +258,14 @@ ElementPtr Element::Clone() const
     clone->elementDescriptions.push_back((*eiter)->Clone());
   }
 
+  for (eiter = this->elements.begin(); eiter != this->elements.end(); ++eiter)
+  {
+    clone->elements.push_back((*eiter)->Clone());
+  }
+
   if (this->value)
     clone->value = this->value->Clone();
+
   return clone;
 }
 

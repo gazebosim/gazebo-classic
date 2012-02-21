@@ -88,6 +88,10 @@ namespace gazebo
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
+
+      /// \brief Copy an object by name
+      private: void Paste(const std::string &_object);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
@@ -105,19 +109,22 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr selectionVis, hoverVis, mouseMoveVis;
+      private: rendering::VisualPtr hoverVis, mouseMoveVis;
       private: unsigned int selectionId;
       private: std::string selectionMod;
       private: math::Pose selectionPoseOrig;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr modelPub;
+      private: transport::PublisherPtr modelPub, factoryPub;
       private: transport::SubscriberPtr selectionSub;
 
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
       private: int mouseOffset;
       private: math::Pose mouseMoveVisStartPose;
+
+      private: std::string copiedObject;
+      private: bool copy;
     };
   }
 }

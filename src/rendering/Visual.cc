@@ -48,6 +48,7 @@ unsigned int Visual::visualCounter = 0;
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent)
 {
+  std::cout << "New Visual[" << _name << "] Parent[" << _parent->GetName() << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -153,6 +154,23 @@ void Visual::Fini()
   }
 
   RTShaderSystem::Instance()->DetachEntity(this);
+}
+
+/////////////////////////////////////////////////
+VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
+{
+  std::cout << "Visual::Clone. Orig[" << this->GetName() << "] New[" << _name << "]\n";
+
+  VisualPtr result(new Visual(_name, _newParent));
+  result->Load(this->sdf->Clone());
+  result->sdf->PrintValues("");
+
+  std::vector<VisualPtr>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    result->children.push_back((*iter)->Clone((*iter)->GetName(), result));
+  }
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -296,7 +314,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 }
 
 //////////////////////////////////////////////////
-void Visual::Load(sdf::ElementPtr &_sdf)
+void Visual::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
   this->Load();

@@ -148,8 +148,11 @@ namespace gazebo
       /// \brief Get a model by id
       public: ModelPtr GetModelById(unsigned int _id);
 
+      /// \brief Get a model by name DEPRECATED
+      public: ModelPtr GetModelByName(const std::string &name)GAZEBO_DEPRECATED;
+
       /// \brief Get a model by name
-      public: ModelPtr GetModelByName(const std::string &name);
+      public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a pointer to a entity based on a name
       public: EntityPtr GetEntityByName(const std::string &_name);

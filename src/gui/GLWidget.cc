@@ -44,6 +44,8 @@ extern bool g_fullscreen;
 GLWidget::GLWidget(QWidget *_parent)
   : QWidget(_parent)
 {
+  this->copy = false;
+
   // This mouse offset is a hack. The glwindow window is not properly sized
   // when first created....
   this->mouseOffset = -10;
@@ -101,6 +103,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
+  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->selectionSub = this->node->Subscribe("~/selection",
       &GLWidget::OnSelectionMsg, this);
 
@@ -227,6 +230,23 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
 
   if (!(this->keyModifiers & Qt::ControlModifier))
     this->setCursor(Qt::ArrowCursor);
+
+
+  if (this->keyModifiers & Qt::ControlModifier)
+  {
+    if (_event->key() == Qt::Key_C)
+    {
+      if (this->hoverVis)
+        this->copiedObject =
+          this->hoverVis->GetParent()->GetParent()->GetName();
+      else if (this->mouseMoveVis)
+        this->copiedObject = this->mouseMoveVis->GetName();
+    }
+    else if (_event->key() == Qt::Key_V)
+    {
+      this->Paste(this->copiedObject);
+    }
+  }
 
   this->mouseEvent.control =
     this->keyModifiers & Qt::ControlModifier ? true : false;
@@ -359,10 +379,17 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
       this->scene->GetVisualsBelowPoint(pt, below);
       double maxZ = 0;
 
+      std::string belowModelName;
+      unsigned int index;
       for (unsigned int i = 0; i < below.size(); ++i)
       {
-        if (below[i]->GetName().find(this->mouseMoveVis->GetName()) ==
-            std::string::npos && below[i]->GetBoundingBox().max.z > maxZ)
+        belowModelName = below[i]->GetName();
+        index = belowModelName.find("::");
+        if (index != std::string::npos)
+          belowModelName = belowModelName.substr(0,index);
+
+        if (belowModelName != this->mouseMoveVis->GetName()
+            && below[i]->GetBoundingBox().max.z > maxZ)
           maxZ = below[i]->GetBoundingBox().max.z;
       }
       pp.z = maxZ;
@@ -532,12 +559,25 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
       else if (this->mouseMoveVis)
       {
         this->scene->SelectVisual("");
-        msgs::Model msg;
-        msg.set_id(gui::get_entity_id(this->mouseMoveVis->GetName()));
-        msg.set_name(this->mouseMoveVis->GetName());
+        if (this->copy)
+        {
+          msgs::Factory msg;
+          msg.set_clone_model_name(this->copiedObject);
+          msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
+          this->factoryPub->Publish(msg);
+          this->copy = false;
+          this->scene->RemoveVisual(this->mouseMoveVis);
+          this->mouseMoveVis.reset();
+        }
+        else
+        {
+          msgs::Model msg;
+          msg.set_id(gui::get_entity_id(this->mouseMoveVis->GetName()));
+          msg.set_name(this->mouseMoveVis->GetName());
 
-        msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
-        this->modelPub->Publish(msg);
+          msgs::Set(msg.mutable_pose(), this->mouseMoveVis->GetWorldPose());
+          this->modelPub->Publish(msg);
+        }
 
         this->mouseMoveVis.reset();
       }
@@ -856,4 +896,13 @@ void GLWidget::OnMouseMoveVisual(const std::string &_visualName)
     this->mouseMoveVis.reset();
   else
     this->mouseMoveVis = this->scene->GetVisual(_visualName);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::Paste(const std::string &_object)
+{
+  rendering::VisualPtr newVis =
+    this->scene->CloneVisual(_object, _object + "_clone_tmp");
+  this->mouseMoveVis = newVis;
+  this->copy = true;
 }

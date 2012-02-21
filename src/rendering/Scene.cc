@@ -94,6 +94,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations)
   this->clearAll = false;
 }
 
+//////////////////////////////////////////////////
 void Scene::Clear()
 {
   this->node->Fini();
@@ -1234,12 +1235,14 @@ void Scene::PreRender()
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::OnJointMsg(ConstJointPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->jointMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
 {
   if (!this->enableVisualizations)
@@ -1547,3 +1550,16 @@ void Scene::SetGrid(bool _enabled)
   }
 }
 
+/////////////////////////////////////////////////
+VisualPtr Scene::CloneVisual(const std::string _visualName,
+                             const std::string &_newName)
+{
+  VisualPtr result;
+  VisualPtr vis = this->GetVisual(_visualName);
+  if (vis)
+  {
+    result = vis->Clone(_newName, this->worldVisual);
+    this->visuals[_newName] = result;
+  }
+  return result;
+}

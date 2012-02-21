@@ -83,7 +83,7 @@ void RaySensor::Load()
   }
 
   physics::WorldPtr worldPtr = physics::get_world(worldName);
-  this->link = worldPtr->GetModelByName(modelName)->GetChildLink(linkName);
+  this->link = worldPtr->GetModel(modelName)->GetChildLink(linkName);
 
   if (this->link == NULL)
     gzthrow("Null link in the ray sensor");

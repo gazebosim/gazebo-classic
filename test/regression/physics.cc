@@ -66,7 +66,7 @@ TEST_F(PhysicsTest, State)
   }
 
   // Move the box
-  world->GetModelByName("box")->SetWorldPose(
+  world->GetModel("box")->SetWorldPose(
       math::Pose(math::Vector3(1, 2, 3), math::Quaternion(0, 0, 0)));
 
   // Make sure the box has been moved
