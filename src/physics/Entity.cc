@@ -306,7 +306,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify)
   {
     if ((*iter)->HasType(ENTITY))
     {
-      Entity *entity = reinterpret_cast<Entity*>((*iter).get());
+      EntityPtr entity = boost::shared_static_cast<Entity>(*iter);
 
       if (entity->IsCanonicalLink())
       {
@@ -406,20 +406,26 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
 {
   this->OnPoseChange();
 
-  if (_updateChildren || this->IsStatic())
+  if (!this->HasType(COLLISION) && (_updateChildren || this->IsStatic()))
   {
-    for  (Base_V::iterator iter = this->children.begin();
-          iter != this->childrenEnd; ++iter)
+    for (Base_V::iterator iter = this->children.begin();
+         iter != this->childrenEnd; ++iter)
     {
       if ((*iter)->HasType(LINK))
-        reinterpret_cast<Link*>((*iter).get())->OnPoseChange();
-      else
+        boost::shared_static_cast<Link>(*iter)->OnPoseChange();
+      else if ((*iter)->HasType(COLLISION))
       {
-        Collision *coll = reinterpret_cast<Collision*>((*iter).get());
+        CollisionPtr coll = boost::shared_static_cast<Collision>(*iter);
 
         if (this->IsStatic())
           coll->worldPose = this->worldPose + coll->initialRelativePose;
         coll->OnPoseChange();
+      }
+      else
+      {
+        // Should never get here.
+        gzthrow(std::string("Invalid type[") +
+                boost::lexical_cast<std::string>((*iter)->GetType()) + "]");
       }
     }
   }

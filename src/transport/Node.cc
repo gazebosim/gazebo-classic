@@ -65,7 +65,7 @@ void Node::Init(const std::string &_space)
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
     if (namespaces.empty())
-      gzerr << "No namespace found";
+      gzerr << "No namespace found\n";
 
     this->topicNamespace = namespaces.front();
   }

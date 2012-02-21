@@ -37,11 +37,3 @@ Shape::~Shape()
   if (this->collisionParent)
     this->collisionParent->SetShape(ShapePtr());
 }
-
-//////////////////////////////////////////////////
-void Shape::Load(sdf::ElementPtr _sdf)
-{
-  this->sdf = _sdf;
-}
-
-

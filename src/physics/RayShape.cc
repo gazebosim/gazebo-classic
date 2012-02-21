@@ -155,14 +155,6 @@ int RayShape::GetFiducial() const
 }
 
 //////////////////////////////////////////////////
-void RayShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void RayShape::Init()
 {
 }
-
-

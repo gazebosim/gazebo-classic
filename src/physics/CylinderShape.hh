@@ -39,9 +39,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CylinderShape();
 
-      /// \brief Load the cylinder
-      public: virtual void Load(sdf::ElementPtr _sdf);
-
       /// \brief Initialize the cylinder
       public: void Init();
 

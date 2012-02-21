@@ -29,6 +29,10 @@ namespace gazebo
     /// \brief Load the sensor library
     bool load();
 
+    /// \brief Create a sensor using SDF
+    /// \param _elem The SDF element that describes the sensor
+    /// \param _parentName The fully scoped parent name (world::model::link)
+    /// \return The name of the new sensor
     std::string create_sensor(sdf::ElementPtr _elem,
                               const std::string &_parentName);
 

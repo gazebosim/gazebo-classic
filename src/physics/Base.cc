@@ -72,7 +72,7 @@ Base::~Base()
 //////////////////////////////////////////////////
 void Base::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   if (this->parent)
   {
     this->world = this->parent->GetWorld();
@@ -289,6 +289,7 @@ std::string Base::GetScopedName() const
       scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
+  scopedName.insert(0, this->world->GetName()+"::");
 
   return scopedName;
 }

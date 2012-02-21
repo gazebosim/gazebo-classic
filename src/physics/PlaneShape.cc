@@ -36,12 +36,6 @@ PlaneShape::~PlaneShape()
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void PlaneShape::Init()
 {
   this->CreatePlane();

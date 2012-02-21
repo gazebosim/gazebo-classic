@@ -188,7 +188,7 @@ Scene::~Scene()
 //////////////////////////////////////////////////
 void Scene::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 

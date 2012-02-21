@@ -155,7 +155,7 @@ ODEPhysics::~ODEPhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   sdf::ElementPtr odeElem = _sdf->GetElement("ode");
 
   this->stepTimeDouble = odeElem->GetElement("solver")->GetValueDouble("dt");
@@ -459,6 +459,7 @@ CollisionPtr ODEPhysics::CreateCollision(const std::string &_type,
   return collision;
 }
 
+//////////////////////////////////////////////////
 ShapePtr ODEPhysics::CreateShape(const std::string &_type,
                                  CollisionPtr _collision)
 {

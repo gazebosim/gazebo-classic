@@ -42,14 +42,14 @@ RayPlugin::~RayPlugin()
 }
 
 /////////////////////////////////////////////////
-void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
+void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
   // Get then name of the parent sensor
   this->parentSensor =
     boost::shared_dynamic_cast<sensors::RaySensor>(_parent);
 
-  this->world = physics::get_world(_sdf->GetWorldName());
-
   if (!this->parentSensor)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
+
+  this->world = physics::get_world(this->parentSensor->GetWorldName());
 }

@@ -67,7 +67,7 @@ void Inertial::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
 
   math::Vector3 center(0, 0, 0);
   if (this->sdf->HasElement("origin"))

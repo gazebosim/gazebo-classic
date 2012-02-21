@@ -112,6 +112,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   }
 }
 
+//////////////////////////////////////////////////
 void Collision::Init()
 {
   if (this->sdf->HasElement("origin"))

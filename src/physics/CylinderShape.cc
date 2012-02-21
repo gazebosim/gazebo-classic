@@ -33,12 +33,6 @@ CylinderShape::~CylinderShape()
 }
 
 //////////////////////////////////////////////////
-void CylinderShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void CylinderShape::Init()
 {
   this->SetSize(this->sdf->GetValueDouble("radius"),

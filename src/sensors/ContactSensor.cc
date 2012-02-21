@@ -27,8 +27,6 @@
 #include "common/Exception.hh"
 #include "physics/Physics.hh"
 #include "physics/World.hh"
-#include "physics/Model.hh"
-#include "physics/Link.hh"
 #include "physics/Collision.hh"
 
 #include "sensors/SensorFactory.hh"
@@ -65,8 +63,7 @@ void ContactSensor::Load(sdf::ElementPtr _sdf)
 
   if (this->sdf->GetElement("topic"))
   {
-    std::string worldName = this->sdf->GetWorldName();
-    this->node->Init(worldName);
+    this->node->Init(this->world->GetName());
     this->contactsPub = this->node->Advertise<msgs::Contacts>(
         this->sdf->GetElement("topic")->GetValueString());
   }
@@ -79,13 +76,7 @@ void ContactSensor::Load()
 
   physics::CollisionPtr collision;
   std::string collisionName;
-  std::string collisionFullyScopedName;
-  std::string linkName = this->sdf->GetLinkName();
-  std::string modelName = this->sdf->GetModelName();
-  std::string worldName = this->sdf->GetWorldName();
-
-  physics::WorldPtr worldPtr = gazebo::physics::get_world(worldName);
-  this->model = worldPtr->GetModel(modelName);
+  std::string collisionScopedName;
 
   sdf::ElementPtr collisionElem =
     this->sdf->GetElement("contact")->GetElement("collision");
@@ -95,14 +86,16 @@ void ContactSensor::Load()
   {
     // get collision name
     collisionName = collisionElem->GetValueString("name");
-    collisionFullyScopedName = worldName + "::" + modelName + "::" +
-      linkName + "::" + collisionName;
-    collision = this->model->GetChildCollision(collisionFullyScopedName);
+    collisionScopedName =
+      this->world->GetEntity(this->parentName)->GetScopedName();
+    collisionScopedName += "::" + collisionName;
+    collision = boost::shared_dynamic_cast<physics::Collision>(
+        this->world->GetEntity(collisionScopedName));
 
     if (!collision)
     {
       gzerr << "Unable to find collision element["
-            << collisionFullyScopedName  << "]\n";
+            << collisionScopedName  << "]\n";
     }
     else
     {

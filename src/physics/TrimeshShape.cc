@@ -45,12 +45,6 @@ TrimeshShape::~TrimeshShape()
 }
 
 //////////////////////////////////////////////////
-void TrimeshShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void TrimeshShape::Init()
 {
   common::MeshManager *meshManager = common::MeshManager::Instance();

@@ -124,6 +124,7 @@ void SensorManager::Fini()
   this->sensors.clear();
   this->mutex->unlock();
 }
+
 //////////////////////////////////////////////////
 void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 {
@@ -143,8 +144,10 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
     return std::string();
   }
 
-  sensor->Load(_elem);
+  // Must come before sensor->Load
   sensor->SetParent(_parentName);
+
+  sensor->Load(_elem);
 
   if (!this->initialized)
   {

@@ -45,8 +45,6 @@ namespace gazebo
       public: virtual ~TrimeshShape();
 
       public: virtual void Update() {}
-      /// \brief Load the trimesh
-      public: virtual void Load(sdf::ElementPtr _sdf);
 
       /// \brief Init the trimesh shape
       public: virtual void Init();

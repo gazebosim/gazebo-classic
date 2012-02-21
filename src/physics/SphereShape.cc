@@ -36,12 +36,6 @@ SphereShape::~SphereShape()
 }
 
 //////////////////////////////////////////////////
-void SphereShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void SphereShape::Init()
 {
   this->SetRadius(this->sdf->GetValueDouble("radius"));

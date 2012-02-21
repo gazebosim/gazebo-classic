@@ -72,54 +72,6 @@ void Element::SetParent(const ElementPtr _parent)
 }
 
 /////////////////////////////////////////////////
-std::string Element::GetLinkName() const
-{
-  std::string result;
-
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParent = this->GetParent();
-  while (sdfParent && sdfParent->GetName() != "link")
-    sdfParent = sdfParent->GetParent();
-
-  if (sdfParent)
-    result = sdfParent->GetValueString("name");
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-std::string Element::GetModelName() const
-{
-  std::string result;
-
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParent = this->GetParent();
-  while (sdfParent && sdfParent->GetName() != "model")
-    sdfParent = sdfParent->GetParent();
-
-  if (sdfParent)
-    result = sdfParent->GetValueString("name");
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-std::string Element::GetWorldName() const
-{
-  std::string result;
-
-  // get parent body name by looking through sdf
-  sdf::ElementPtr sdfParent = this->GetParent();
-  while (sdfParent && sdfParent->GetName() != "world")
-    sdfParent = sdfParent->GetParent();
-
-  if (sdfParent)
-    result = sdfParent->GetValueString("name");
-
-  return result;
-}
-
-/////////////////////////////////////////////////
 void Element::SetName(const std::string &_name)
 {
   this->name = _name;
@@ -275,6 +227,8 @@ void Element::Copy(const ElementPtr _elem)
   for (Param_V::iterator iter = _elem->attributes.begin();
        iter != _elem->attributes.end(); ++iter)
   {
+    if (!this->HasAttribute((*iter)->GetKey()))
+      this->attributes.push_back((*iter)->Clone());
     ParamPtr param = this->GetAttribute((*iter)->GetKey());
     param->SetFromString((*iter)->GetAsString());
   }
@@ -287,34 +241,20 @@ void Element::Copy(const ElementPtr _elem)
       this->value->SetFromString(_elem->GetValue()->GetAsString());
   }
 
+  ElementPtr_V::const_iterator eiter;
+  for (eiter = _elem->elementDescriptions.begin();
+       eiter != _elem->elementDescriptions.end(); ++eiter)
+  {
+    this->elementDescriptions.push_back((*eiter)->Clone());
+  }
+
+
   for (ElementPtr_V::iterator iter = _elem->elements.begin();
        iter != _elem->elements.end(); ++iter)
   {
     ElementPtr elem = this->GetOrCreateElement((*iter)->GetName());
     elem->Copy(*iter);
   }
-
-  /*for (Param_V::iterator iter = this->attributes.begin();
-      iter != this->attributes.end(); ++iter)
-  {
-    ParamPtr param = _elem->GetAttribute((*iter)->GetKey());
-    if (param)
-    {
-      (*iter)->SetFromString(param->GetAsString());
-    }
-  }
-
-  if (this->value && _elem->GetValue())
-    this->value->SetFromString(_elem->GetValue()->GetAsString());
-
-  for (ElementPtr_V::iterator iter = this->elements.begin();
-      iter != this->elements.end(); ++iter)
-  {
-    ElementPtr elem = _elem->GetElement((*iter)->GetName());
-    if (elem)
-      (*iter)->Copy(elem);
-  }
-  */
 }
 
 /////////////////////////////////////////////////

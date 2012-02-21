@@ -90,11 +90,11 @@ namespace gazebo
       private: boost::thread *runThread;
       private: boost::recursive_mutex *mutex;
 
-      private: std::list<SensorPtr > sensors;
+      private: std::list<SensorPtr> sensors;
 
       private: friend class SingletonT<SensorManager>;
 
-      private: std::list<SensorPtr > initSensors;
+      private: std::list<SensorPtr> initSensors;
     };
     /// \}
   }

@@ -34,12 +34,6 @@ BoxShape::~BoxShape()
 }
 
 //////////////////////////////////////////////////
-void BoxShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void BoxShape::Init()
 {
   this->SetSize(this->sdf->GetValueVector3("size"));

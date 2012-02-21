@@ -40,9 +40,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SphereShape();
 
-      /// \brief Load the sphere
-      public: virtual void Load(sdf::ElementPtr _sdf);
-
       /// \brief Initialize the sphere
       public: virtual void Init();
 

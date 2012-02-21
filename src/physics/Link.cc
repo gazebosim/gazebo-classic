@@ -164,10 +164,7 @@ void Link::Init()
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-    {
-      CollisionPtr g = boost::shared_static_cast<Collision>(*iter);
-      g->Init();
-    }
+      boost::shared_static_cast<Collision>(*iter)->Init();
   }
 
   this->SetKinematic(this->sdf->GetValueBool("kinematic"));
@@ -300,7 +297,6 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
       boost::bind(&Link::GetGravityMode, this));
   this->sdf->GetAttribute("kinematic")->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
-
 
   if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->GetValueBool("gravity"));

@@ -521,7 +521,6 @@ msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf)
   msgs::Scene result;
 
   Init(result, "scene");
-  result.set_name(_sdf->GetWorldName());
 
   if (_sdf->HasElement("grid"))
     result.set_grid(_sdf->GetElement("grid")->GetValueBool("enabled"));

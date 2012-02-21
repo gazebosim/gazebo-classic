@@ -74,7 +74,7 @@ Light::~Light()
 //////////////////////////////////////////////////
 void Light::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
   this->Load();
 }
 

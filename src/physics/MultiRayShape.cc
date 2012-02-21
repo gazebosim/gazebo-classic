@@ -36,12 +36,6 @@ MultiRayShape::~MultiRayShape()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::Load(sdf::ElementPtr _sdf)
-{
-  Shape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
 void MultiRayShape::Init()
 {
   math::Vector3 start, end, axis;

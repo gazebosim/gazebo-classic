@@ -192,13 +192,13 @@ namespace gazebo
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
-      ///        model1::...::modelN::entityName
+      ///        world::model1::...::modelN::entityName
       public: std::string GetScopedName() const;
 
       /// \brief Return the name of this entity with the
       ///        model+body+collision scope
       ///        model1::...::modelN::bodyN::entityName
-      public: std::string GetCompleteScopedName() const;
+      public: std::string GetCompleteScopedName() const GAZEBO_DEPRECATED;
 
       public: void Print(std::string prefix);
 

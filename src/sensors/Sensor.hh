@@ -98,6 +98,8 @@ namespace gazebo
 
       public: void FillMsg(msgs::Sensor &_msg);
 
+      public: std::string GetWorldName() const;
+
       /// \brief Load a plugin for this sensor
       /// \param _sdf SDF parameters
       private: void LoadPlugin(sdf::ElementPtr _sdf);

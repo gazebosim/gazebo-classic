@@ -63,7 +63,8 @@ Sensor::~Sensor()
 //////////////////////////////////////////////////
 void Sensor::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
+  this->sdf->PrintValues("");
   this->Load();
 }
 
@@ -78,12 +79,13 @@ void Sensor::Load()
   if (this->sdf->GetValueBool("always_on"))
     this->SetActive(true);
 
-  this->node->Init(this->sdf->GetWorldName());
+  size_t colonIndex = this->parentName.find("::");
 
-  // get world
-  std::string worldName = this->sdf->GetWorldName();
+  std::string worldName = this->parentName.substr(0, colonIndex);
   this->world = physics::get_world(worldName);
   this->lastUpdateTime = this->world->GetSimTime();
+
+  this->node->Init(this->world->GetName());
 }
 
 //////////////////////////////////////////////////
@@ -243,3 +245,8 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   }
 }
 
+//////////////////////////////////////////////////
+std::string Sensor::GetWorldName() const
+{
+  return this->world->GetName();
+}

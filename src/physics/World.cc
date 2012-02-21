@@ -44,10 +44,6 @@
 #include "physics/Model.hh"
 #include "physics/World.hh"
 
-#include "sensors/Sensor.hh"
-#include "sensors/SensorManager.hh"
-#include "sensors/CameraSensor.hh"
-
 #include "physics/Collision.hh"
 
 using namespace gazebo;
@@ -71,6 +67,9 @@ class ModelUpdate_TBB
 //////////////////////////////////////////////////
 World::World(const std::string &_name)
 {
+  this->sdf.reset(new sdf::Element);
+  sdf::initFile("sdf/world.sdf", this->sdf);
+
   this->receiveMutex = new boost::mutex();
 
   this->needsReset = false;
@@ -111,7 +110,7 @@ World::~World()
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
+  this->sdf->Copy(_sdf);
 
   if (this->sdf->GetValueString("name").empty())
     gzwarn << "create_world(world_name =["
@@ -119,8 +118,8 @@ void World::Load(sdf::ElementPtr _sdf)
   else
     this->name = this->sdf->GetValueString("name");
 
-  this->sceneMsg.CopyFrom(
-        msgs::SceneFromSDF(_sdf->GetElement("scene")));
+  this->sceneMsg.CopyFrom(msgs::SceneFromSDF(_sdf->GetElement("scene")));
+  this->sceneMsg.set_name(this->GetName());
 
   // The period at which statistics about the world are published
   this->statPeriod = common::Time(0, 200000000);
@@ -422,6 +421,11 @@ EntityPtr World::GetEntityByName(const std::string &_name)
   return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
 }
 
+//////////////////////////////////////////////////
+EntityPtr World::GetEntity(const std::string &_name)
+{
+  return boost::shared_dynamic_cast<Entity>(this->GetByName(_name));
+}
 
 //////////////////////////////////////////////////
 ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
@@ -708,11 +712,12 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
   {
     if (_entity->HasType(Entity::MODEL))
     {
+      std::cout << "World::BuildSceneMsg[" << _entity->GetName() << "]\n";
       msgs::Model *modelMsg = _scene.add_model();
       boost::shared_static_cast<Model>(_entity)->FillModelMsg(*modelMsg);
     }
 
-    for (unsigned int i = 0; i < _entity->GetChildCount(); i++)
+    for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
     {
       this->BuildSceneMsg(_scene, _entity->GetChild(i));
     }
@@ -1033,7 +1038,7 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   this->physicsEngine->InitForThread();
   this->testRay->SetPoints(_pt, end);
   this->testRay->GetIntersection(dist, entityName);
-  return this->GetEntityByName(entityName);
+  return this->GetEntity(entityName);
 }
 
 //////////////////////////////////////////////////

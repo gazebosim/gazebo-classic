@@ -160,9 +160,7 @@ void Model::Init()
     if ((*iter)->HasType(Base::LINK))
       boost::shared_static_cast<Link>(*iter)->Init();
     else if ((*iter)->HasType(Base::MODEL))
-    {
       boost::shared_static_cast<Model>(*iter)->Init();
-    }
   }
 
   // Initialize the joints last.
@@ -671,6 +669,7 @@ void Model::FillModelMsg(msgs::Model &_msg)
       msgs::Convert(this->GetWorldPose()));
   _msg.set_id(this->GetId());
 
+  std::cout << "Model::FillModelMsg[" << this->GetName() << "]\n";
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (unsigned int j = 0; j < this->GetChildCount(); j++)

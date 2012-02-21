@@ -155,7 +155,11 @@ namespace gazebo
       public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a pointer to a entity based on a name
-      public: EntityPtr GetEntityByName(const std::string &_name);
+      public: EntityPtr GetEntityByName(
+                  const std::string &_name) GAZEBO_DEPRECATED;
+
+      /// \brief Get a pointer to a entity based on a name
+      public: EntityPtr GetEntity(const std::string &_name);
 
       /// \brief Get the nearest model below a point
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);

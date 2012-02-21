@@ -56,7 +56,6 @@ RaySensor::~RaySensor()
 {
   delete this->mutex;
   this->laserCollision.reset();
-  this->link.reset();
   this->laserShape.reset();
 }
 
@@ -71,25 +70,16 @@ void RaySensor::Load()
 {
   Sensor::Load();
 
-  std::string linkName = this->sdf->GetLinkName();
-  std::string modelName = this->sdf->GetModelName();
-  std::string worldName = this->sdf->GetWorldName();
-
   if (this->sdf->GetElement("topic"))
   {
-    this->node->Init(worldName);
+    this->node->Init(this->world->GetName());
     this->scanPub = this->node->Advertise<msgs::LaserScan>(
         this->sdf->GetElement("topic")->GetValueString());
   }
 
-  physics::WorldPtr worldPtr = physics::get_world(worldName);
-  this->link = worldPtr->GetModel(modelName)->GetChildLink(linkName);
-
-  if (this->link == NULL)
-    gzthrow("Null link in the ray sensor");
-
-  physics::PhysicsEnginePtr physicsEngine = worldPtr->GetPhysicsEngine();
-  this->laserCollision = physicsEngine->CreateCollision("multiray", this->link);
+  physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
+  this->laserCollision = physicsEngine->CreateCollision("multiray",
+      this->parentName);
   this->laserCollision->SetName("ray_sensor_collision");
   this->laserCollision->SetRelativePose(this->pose);
 
@@ -105,7 +95,7 @@ void RaySensor::Load()
 void RaySensor::Init()
 {
   Sensor::Init();
-  this->laserMsg.set_frame(this->link->GetScopedName());
+  this->laserMsg.set_frame(this->parentName);
 }
 
 //////////////////////////////////////////////////
@@ -230,7 +220,7 @@ void RaySensor::UpdateImpl(bool /*_force*/)
 {
   this->mutex->lock();
   this->laserShape->Update();
-  this->lastUpdateTime = this->link->GetWorld()->GetSimTime();
+  this->lastUpdateTime = this->world->GetSimTime();
 
   // Store the latest laser scan.
   msgs::Set(this->laserMsg.mutable_offset(), this->GetPose());

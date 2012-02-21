@@ -74,7 +74,7 @@ void DepthCameraSensor::Load()
 //////////////////////////////////////////////////
 void DepthCameraSensor::Init()
 {
-  std::string worldName = this->sdf->GetWorldName();
+  std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
   {

@@ -54,7 +54,7 @@ void HeightmapShape::Update()
 //////////////////////////////////////////////////
 void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
-  Shape::Load(_sdf);
+  Base::Load(_sdf);
 
   // Use the image to get the size of the heightmap
   this->img.Load(this->sdf->GetValueString("filename"));

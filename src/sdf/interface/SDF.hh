@@ -48,18 +48,6 @@ namespace sdf
     public: ElementPtr GetParent() const;
     public: void SetParent(const ElementPtr _parent);
 
-    /// \brief Get the name of the parent link.
-    /// \return Name of parent link, or empty string if no parent link exists.
-    public: std::string GetLinkName() const;
-
-    /// \brief Get the name of the parent model.
-    /// \return Name of parent model, or empty string if no parent model exists.
-    public: std::string GetModelName() const;
-
-    /// \brief Get the name of the parent world.
-    /// \return Name of parent world, or empty string if no parent world exists.
-    public: std::string GetWorldName() const;
-
     public: void SetName(const std::string &_name);
     public: const std::string &GetName() const;
 
