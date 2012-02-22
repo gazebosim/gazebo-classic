@@ -177,9 +177,7 @@ void ModelListWidget::Update()
     this->receiveMutex->lock();
     this->poseMsgs.clear();
     this->fillingPropertyTree = true;
-    printf("Fill Prop Tree Start\n");
     this->FillPropertyTree(this->modelMsg, NULL);
-    printf("Fill Prop Tree End\n");
     this->fillingPropertyTree = false;
     this->fillPropertyTree = false;
     this->receiveMutex->unlock();
@@ -1133,32 +1131,34 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 
   for (int i = 0; i < _msg.collision_size(); i++)
   {
-    topItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(),
-        tr("collision"));
-    _parent->addSubProperty(topItem);
+    QtVariantProperty *prop;
+    prop = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("collision"));
+    prop->setToolTip(tr(_msg.collision(i).name().c_str()));
+    _parent->addSubProperty(prop);
 
-    this->FillPropertyTree(_msg.collision(i), topItem);
+    this->FillPropertyTree(_msg.collision(i), prop);
   }
-
 
   for (int i = 0; i < _msg.visual_size(); i++)
   {
-    topItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(),
-        tr("visual"));
-    _parent->addSubProperty(topItem);
-    this->FillPropertyTree(_msg.visual(i), topItem);
+    QtVariantProperty *prop;
+    prop = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("visual"));
+    prop->setToolTip(tr(_msg.visual(i).name().c_str()));
+    _parent->addSubProperty(prop);
+
+    this->FillPropertyTree(_msg.visual(i), prop);
   }
 
   for (int i = 0; i < _msg.sensor_size(); i++)
   {
-    topItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(),
-        tr("sensor"));
-    _parent->addSubProperty(topItem);
-
-    // this->FillPropertyTree(_msg.sensor(i), topItem);
+    QtVariantProperty *prop;
+    prop = this->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(),"sensor");
+    prop->setToolTip(tr(_msg.sensor(i).name().c_str()));
+    _parent->addSubProperty(prop);
+    // this->FillPropertyTree(_msg.sensor(i), prop);
   }
 }
 
@@ -1509,16 +1509,21 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
-  this->propTreeBrowser->addProperty(topItem);
+  QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
+  this->propTreeBrowser->setExpanded(bItem, false);
   this->FillPoseProperty(_msg.pose(), topItem);
 
   for (int i = 0; i < _msg.link_size(); i++)
   {
-    topItem = this->variantManager->addProperty(
+    QtVariantProperty *prop;
+    prop = this->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(), tr("link"));
-    this->propTreeBrowser->addProperty(topItem);
+    prop->setToolTip(tr(_msg.link(i).name().c_str()));
 
-    this->FillPropertyTree(_msg.link(i), topItem);
+    bItem = this->propTreeBrowser->addProperty(prop);
+    this->propTreeBrowser->setExpanded(bItem, false);
+
+    this->FillPropertyTree(_msg.link(i), prop);
   }
 }
 
@@ -1642,7 +1647,6 @@ void ModelListWidget::ProcessPoseMsgs()
     {
       QtProperty *poseItem;
       QtProperty *nameItem = this->GetParentItemValue((*iter)->name());
-      std::cout << "Name[" << (*iter)->name() << "]\n";
       if (!nameItem)
         poseItem = this->GetChildItem("pose");
       else
@@ -1660,7 +1664,7 @@ void ModelListWidget::ProcessPoseMsgs()
 /////////////////////////////////////////////////
 void ModelListWidget::OnPose(ConstPosePtr &_msg)
 {
-  this->receiveMutex->lock();
+  /*this->receiveMutex->lock();
   if (!this->selectedModelName.empty() && 
       _msg->name().find(this->selectedModelName) != std::string::npos)
   {
@@ -1678,6 +1682,7 @@ void ModelListWidget::OnPose(ConstPosePtr &_msg)
     this->poseMsgs.push_back(_msg);
   }
   this->receiveMutex->unlock();
+  */
 }
 
 /////////////////////////////////////////////////

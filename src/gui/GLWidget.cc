@@ -152,7 +152,6 @@ void GLWidget::showEvent(QShowEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::enterEvent(QEvent * /*_event*/)
 {
-  printf("Enter Event\n");
 }
 
 /////////////////////////////////////////////////

@@ -107,6 +107,7 @@ namespace gazebo
       private: Connection *serverConn;
 
       private: std::list<ConnectionPtr> connections;
+      protected: std::vector<event::ConnectionPtr> eventConnections;
 
       private: bool initialized;
       private: bool stop, stopped;

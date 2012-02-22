@@ -35,24 +35,27 @@
 
 using namespace gazebo;
 
-
+/////////////////////////////////////////////////
 Server::Server()
 {
   this->stop = true;
   this->receiveMutex = new boost::mutex();
 }
 
+/////////////////////////////////////////////////
 Server::~Server()
 {
   delete this->receiveMutex;
   delete this->master;
 }
 
+/////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
   return !this->stop && !transport::is_stopped();
 }
 
+/////////////////////////////////////////////////
 void Server::LoadPlugin(const std::string &_filename)
 {
   gazebo::SystemPluginPtr plugin = gazebo::SystemPlugin::Create(_filename,
@@ -60,6 +63,7 @@ void Server::LoadPlugin(const std::string &_filename)
   this->plugins.push_back(plugin);
 }
 
+/////////////////////////////////////////////////
 bool Server::Load(const std::string &_filename)
 {
   // Quick test for a valid file
@@ -139,6 +143,7 @@ bool Server::Load(const std::string &_filename)
   return true;
 }
 
+/////////////////////////////////////////////////
 void Server::Init()
 {
   sensors::init();
@@ -147,11 +152,13 @@ void Server::Init()
   this->stop = false;
 }
 
+/////////////////////////////////////////////////
 void Server::Stop()
 {
   this->stop = true;
 }
 
+/////////////////////////////////////////////////
 void Server::Fini()
 {
   this->Stop();
@@ -168,6 +175,7 @@ void Server::Fini()
   this->master = NULL;
 }
 
+/////////////////////////////////////////////////
 void Server::Run()
 {
   if (this->stop)
@@ -196,6 +204,7 @@ void Server::Run()
   this->master->Stop();
 }
 
+/////////////////////////////////////////////////
 void Server::SetParams(const common::StrStr_M &params)
 {
   common::StrStr_M::const_iterator iter;
@@ -228,12 +237,14 @@ void Server::SetParams(const common::StrStr_M &params)
   }
 }
 
+/////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }
 
+/////////////////////////////////////////////////
 void Server::ProcessControlMsgs()
 {
   std::list<msgs::ServerControl>::iterator iter;
@@ -292,5 +303,3 @@ void Server::ProcessControlMsgs()
   }
   this->controlMsgs.clear();
 }
-
-

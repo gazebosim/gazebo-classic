@@ -239,9 +239,8 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
 
     response.set_type(physicsMsg.GetTypeName());
     physicsMsg.SerializeToString(serializedData);
+    this->responsePub->Publish(response);
   }
-
-  this->responsePub->Publish(response);
 }
 
 void ODEPhysics::OnPhysicsMsg(

@@ -42,13 +42,15 @@ namespace gazebo
               { return step.Connect(_subscriber); }
       public: static void DisconnectStep(ConnectionPtr _subscriber)
               { step.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the quit signal
+      /// \brief Connect a boost::slot the the stop signal
       public: template<typename T>
-              static ConnectionPtr ConnectQuit(T _subscriber)
-              { return quit.Connect(_subscriber); }
-      public: static void DisconnectQuit(ConnectionPtr _subscriber)
-              { quit.Disconnect(_subscriber); }
+              static ConnectionPtr ConnectStop(T _subscriber)
+              { return stop.Connect(_subscriber); }
+      public: static void DisconnectStop(ConnectionPtr _subscriber)
+              { stop.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world created signal
       public: template<typename T>
@@ -203,8 +205,8 @@ namespace gazebo
       /// \brief Step the simulation once signal
       public: static EventT<void ()> step;
 
-      /// \brief Quit the simulation once signal
-      public: static EventT<void ()> quit;
+      /// \brief Simulation stop signal
+      public: static EventT<void ()> stop;
 
       /// \brief A world has been created
       public: static EventT<void (std::string)> worldCreated;

@@ -789,7 +789,7 @@ void World::ProcessRequestMsgs()
     {
       msgs::Model_V modelVMsg;
 
-      for (unsigned int i = 0; i < this->rootElement->GetChildCount(); i++)
+      for (unsigned int i = 0; i < this->rootElement->GetChildCount(); ++i)
       {
         BasePtr entity = this->rootElement->GetChild(i);
         msgs::Model *modelMsg = modelVMsg.add_models();

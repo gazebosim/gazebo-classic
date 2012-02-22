@@ -38,7 +38,7 @@ using namespace gui;
 
 extern bool g_fullscreen;
 
-
+/////////////////////////////////////////////////
 MainWindow::MainWindow()
   : renderWidget(0)
 {
@@ -74,9 +74,9 @@ MainWindow::MainWindow()
   this->setCentralWidget(mainWidget);
 
   this->setDockOptions(QMainWindow::ForceTabbedDocks |
-//                       QMainWindow::AllowTabbedDocks |
-//                       QMainWindow::AnimatedDocks |
-                       QMainWindow::VerticalTabs);
+                       QMainWindow::AllowTabbedDocks |
+                       QMainWindow::AnimatedDocks);
+                       //QMainWindow::VerticalTabs);
 
   this->modelsDock = new QDockWidget(tr("Models"), this);
   this->modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
@@ -101,6 +101,7 @@ MainWindow::MainWindow()
 
   this->tabifyDockWidget(this->modelsDock, this->insertModelsDock);
   this->modelsDock->raise();
+  this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
@@ -123,35 +124,41 @@ MainWindow::MainWindow()
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
 
-  this->requestMsg = msgs::CreateRequest("entity_list");
-  this->requestPub->Publish(*this->requestMsg);
 }
 
+/////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Init()
 {
   this->renderWidget->show();
+  this->requestMsg = msgs::CreateRequest("entity_list");
+  this->requestPub->Publish(*this->requestMsg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
   delete this->renderWidget;
   delete this->timePanel;
 }
 
+/////////////////////////////////////////////////
 void MainWindow::New()
 {
   gzdbg << "MainWindow::New world\n";
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Open()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
@@ -166,6 +173,7 @@ void MainWindow::Open()
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Save()
 {
   std::string filename = QFileDialog::getSaveFileName(this,
@@ -538,6 +546,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnModel(ConstModelPtr &_msg)
 {
   this->entities[_msg->name()] = _msg->id();
@@ -555,8 +564,8 @@ void MainWindow::OnModel(ConstModelPtr &_msg)
   gui::Events::modelUpdate(*_msg);
 }
 
-void MainWindow::OnResponse(
-    ConstResponsePtr &_msg)
+/////////////////////////////////////////////////
+void MainWindow::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
@@ -590,6 +599,7 @@ void MainWindow::OnResponse(
   this->requestMsg = NULL;
 }
 
+/////////////////////////////////////////////////
 void MainWindow::OnSetSelectedEntity(const std::string &_name)
 {
   std::map<std::string, unsigned int>::iterator iter;
