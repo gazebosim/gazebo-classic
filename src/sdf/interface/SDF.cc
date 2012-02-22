@@ -224,6 +224,10 @@ ElementPtr Element::Clone() const
 /////////////////////////////////////////////////
 void Element::Copy(const ElementPtr _elem)
 {
+  this->name = _elem->GetName();
+  this->required = _elem->GetRequired();
+  this->copyChildren = _elem->GetCopyChildren();
+
   for (Param_V::iterator iter = _elem->attributes.begin();
        iter != _elem->attributes.end(); ++iter)
   {
@@ -241,19 +245,21 @@ void Element::Copy(const ElementPtr _elem)
       this->value->SetFromString(_elem->GetValue()->GetAsString());
   }
 
-  ElementPtr_V::const_iterator eiter;
-  for (eiter = _elem->elementDescriptions.begin();
-       eiter != _elem->elementDescriptions.end(); ++eiter)
+  this->elementDescriptions.clear();
+  for (ElementPtr_V::const_iterator iter = _elem->elementDescriptions.begin();
+       iter != _elem->elementDescriptions.end(); ++iter)
   {
-    this->elementDescriptions.push_back((*eiter)->Clone());
+    this->elementDescriptions.push_back((*iter)->Clone());
   }
 
-
+  this->elements.clear();
   for (ElementPtr_V::iterator iter = _elem->elements.begin();
        iter != _elem->elements.end(); ++iter)
   {
-    ElementPtr elem = this->GetOrCreateElement((*iter)->GetName());
+    ElementPtr elem = (*iter)->Clone();
     elem->Copy(*iter);
+    elem->parent = shared_from_this();
+    this->elements.push_back(elem);
   }
 }
 

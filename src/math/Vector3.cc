@@ -158,7 +158,6 @@ double Vector3::GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
 }
 
 //////////////////////////////////////////////////
-/// vector
 void Vector3::SetToMax(const Vector3 & _v)
 {
   if (_v.x > this->x) this->x = _v.x;
@@ -167,7 +166,6 @@ void Vector3::SetToMax(const Vector3 & _v)
 }
 
 //////////////////////////////////////////////////
-/// vector
 void Vector3::SetToMin(const Vector3 & _v)
 {
   if (_v.x < this->x) this->x = _v.x;
@@ -196,14 +194,13 @@ const Vector3 &Vector3::operator =(double value)
   return *this;
 }
 
-
-
 //////////////////////////////////////////////////
 Vector3 Vector3::operator+(const Vector3 &pt) const
 {
   return Vector3(this->x + pt.x, this->y + pt.y, this->z + pt.z);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator+=(const Vector3 &pt)
 {
   this->x += pt.x;
@@ -213,6 +210,7 @@ const Vector3 &Vector3::operator+=(const Vector3 &pt)
   return *this;
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator-=(const Vector3 &pt)
 {
   this->x -= pt.x;
@@ -222,14 +220,13 @@ const Vector3 &Vector3::operator-=(const Vector3 &pt)
   return *this;
 }
 
-
 //////////////////////////////////////////////////
-
 const Vector3 Vector3::operator/(const Vector3 &pt) const
 {
   return Vector3(this->x / pt.x, this->y / pt.y, this->z / pt.z);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator/=(const Vector3 &pt)
 {
   this->x /= pt.x;
@@ -239,11 +236,13 @@ const Vector3 &Vector3::operator/=(const Vector3 &pt)
   return *this;
 }
 
+//////////////////////////////////////////////////
 const Vector3 Vector3::operator/(double v) const
 {
   return Vector3(this->x / v, this->y / v, this->z / v);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator/=(double v)
 {
   this->x /= v;
@@ -253,14 +252,13 @@ const Vector3 &Vector3::operator/=(double v)
   return *this;
 }
 
-
-
 //////////////////////////////////////////////////
 const Vector3 Vector3::operator*(const Vector3 &pt) const
 {
   return Vector3(this->x * pt.x, this->y * pt.y, this->z * pt.z);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator*=(const Vector3 &pt)
 {
   this->x *= pt.x;
@@ -270,11 +268,13 @@ const Vector3 &Vector3::operator*=(const Vector3 &pt)
   return *this;
 }
 
+//////////////////////////////////////////////////
 const Vector3 Vector3::operator*(double v) const
 {
   return Vector3(this->x * v, this->y * v, this->z * v);
 }
 
+//////////////////////////////////////////////////
 const Vector3 &Vector3::operator*=(double v)
 {
   this->x *= v;

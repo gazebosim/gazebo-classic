@@ -54,8 +54,10 @@ namespace gazebo
 
       /// Load the contact sensor using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      public: virtual void Load(sdf::ElementPtr _sdf);
-      public: virtual void Load();
+      public: virtual void Load(const std::string &_worldName,
+                                sdf::ElementPtr _sdf);
+
+      public: virtual void Load(const std::string &_worldName);
 
       /// Initialize the sensor
       public: virtual void Init();

@@ -203,8 +203,9 @@ TEST_F(MathTest, Vector3)
   EXPECT_TRUE(math::equal(17, v.GetDotProd(math::Vector3(1, 2, 3)), 1e-2));
 
   // ::GetDistToLine
-  EXPECT_TRUE(math::equal(0.816497, v.GetDistToLine(math::Vector3(-1, -1, -1),
-          math::Vector3(1, 1, 1)), 1e-3));
+  v.Set(0, 0, 0);
+  EXPECT_EQ(1.0, v.GetDistToLine(math::Vector3(1, -1, 0),
+                                 math::Vector3(1, 1, 0)));
 
   // ::operator= double
   v = 4.0;
@@ -752,8 +753,8 @@ TEST_F(MathTest, Plane)
     EXPECT_TRUE(plane.normal == math::Vector3(0, 0, 1));
     EXPECT_TRUE(plane.size == math::Vector2d(2, 3));
 
-    EXPECT_EQ(1, plane.Distance(math::Vector3(0, 0, 1),
-                                math::Vector3(0, 0, -1)));
+    EXPECT_EQ(-1, plane.Distance(math::Vector3(0, 0, 1),
+                                 math::Vector3(0, 0, -1)));
 
     plane.Set(math::Vector3(1, 0, 0), math::Vector2d(1, 1), 1.0);
     EXPECT_TRUE(math::equal(plane.d, 1.0));

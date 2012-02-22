@@ -1006,6 +1006,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessSceneMsg(ConstScenePtr &_msg)
 {
   std::string modelName, linkName;
@@ -1253,6 +1254,9 @@ void Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!this->visuals[_msg->name()+"_laser_vis"])
     {
       VisualPtr parentVis = this->GetVisual(_msg->parent());
+      if (!parentVis)
+        gzerr << "Unable to find parent visual[" << _msg->parent() << "]\n";
+
       LaserVisualPtr laserVis(new LaserVisual(
             _msg->name()+"_laser_vis", parentVis, _msg->topic()));
       laserVis->Load();
@@ -1429,12 +1433,14 @@ void Scene::OnPoseMsg(ConstPosePtr &_msg)
   this->poseMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void Scene::OnLightMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->lightMsgs.push_back(_msg);
 }
 
+/////////////////////////////////////////////////
 void Scene::ProcessLightMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
@@ -1562,4 +1568,13 @@ VisualPtr Scene::CloneVisual(const std::string _visualName,
     this->visuals[_newName] = result;
   }
   return result;
+}
+
+//////////////////////////////////////////////////
+std::string Scene::StripSceneName(const std::string &_name) const
+{
+  if (_name.find(this->GetName() + "::") == 0)
+    return _name.substr(this->GetName().size() + 2);
+  else
+    return _name;
 }

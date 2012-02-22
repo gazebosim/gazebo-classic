@@ -60,15 +60,15 @@ RaySensor::~RaySensor()
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load(sdf::ElementPtr _sdf)
+void RaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_sdf);
+  Sensor::Load(_worldName, _sdf);
 }
 
 //////////////////////////////////////////////////
-void RaySensor::Load()
+void RaySensor::Load(const std::string &_worldName)
 {
-  Sensor::Load();
+  Sensor::Load(_worldName);
 
   if (this->sdf->GetElement("topic"))
   {

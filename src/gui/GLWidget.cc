@@ -379,16 +379,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
       this->scene->GetVisualsBelowPoint(pt, below);
       double maxZ = 0;
 
-      std::string belowModelName;
-      size_t index;
       for (unsigned int i = 0; i < below.size(); ++i)
       {
-        belowModelName = below[i]->GetName();
-        index = belowModelName.find("::");
-        if (index != std::string::npos)
-          belowModelName = belowModelName.substr(0,index);
-
-        if (belowModelName != this->mouseMoveVis->GetName()
+        if (below[i]->GetName().find(this->mouseMoveVis->GetName()) != 0
             && below[i]->GetBoundingBox().max.z > maxZ)
           maxZ = below[i]->GetBoundingBox().max.z;
       }

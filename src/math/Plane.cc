@@ -65,11 +65,11 @@ double Plane::Distance(const Vector3 &_origin, const Vector3 &_dir) const
   if (fabs(denom) < 1e-3)
   {
     // parallel
-    return -1;
+    return 0;
   }
   else
   {
-    double nom = _origin.GetDotProd(this->normal) + this->d;
+    double nom = _origin.GetDotProd(this->normal) - this->d;
     double t = -(nom/denom);
     return t;
   }

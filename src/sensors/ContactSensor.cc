@@ -57,9 +57,9 @@ ContactSensor::~ContactSensor()
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::Load(sdf::ElementPtr _sdf)
+void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_sdf);
+  Sensor::Load(_worldName, _sdf);
 
   if (this->sdf->GetElement("topic"))
   {
@@ -70,9 +70,9 @@ void ContactSensor::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::Load()
+void ContactSensor::Load(const std::string &_worldName)
 {
-  Sensor::Load();
+  Sensor::Load(_worldName);
 
   physics::CollisionPtr collision;
   std::string collisionName;

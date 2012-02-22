@@ -230,6 +230,8 @@ namespace gazebo
                                     const std::string &_newName);
 
 
+      public: std::string StripSceneName(const std::string &_name) const;
+
       // \brief Get the mesh information for the given mesh.
       // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
       private: void GetMeshInformation(const Ogre::Mesh *mesh,

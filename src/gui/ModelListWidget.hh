@@ -67,16 +67,13 @@ namespace gazebo
       private slots: void OnShowCollision();
       private slots: void OnTransparent();
 
-      private: void OnResponse(
-                   ConstResponsePtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
 
-      private: void OnRequest(
-                   ConstRequestPtr &_msg);
+      private: void OnRequest(ConstRequestPtr &_msg);
 
-      private: void OnPose(
-                   ConstPosePtr &_msg);
+      private: void OnPose(ConstPosePtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);
@@ -180,7 +177,9 @@ namespace gazebo
       private: msgs::Request *requestMsg;
 
       private: std::vector<event::ConnectionPtr> connections;
-      private: std::list<msgs::Pose> poseMsgs;
+
+      typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
+      private: PoseMsgs_L poseMsgs;
 
       private: std::map<std::string, bool> showCollisionsActionState;
       private: std::map<std::string, bool> transparentActionState;
@@ -191,5 +190,3 @@ namespace gazebo
   }
 }
 #endif
-
-

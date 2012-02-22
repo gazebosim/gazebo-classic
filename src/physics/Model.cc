@@ -669,7 +669,6 @@ void Model::FillModelMsg(msgs::Model &_msg)
       msgs::Convert(this->GetWorldPose()));
   _msg.set_id(this->GetId());
 
-  std::cout << "Model::FillModelMsg[" << this->GetName() << "]\n";
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   for (unsigned int j = 0; j < this->GetChildCount(); j++)
@@ -695,14 +694,14 @@ void Model::ProcessMsg(const msgs::Model &_msg)
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
   }
-  else if (_msg.name() != this->GetName())
+  else if (_msg.name() != this->GetScopedName())
   {
     gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
           << "]\n";
     return;
   }
 
-  this->SetName(_msg.name());
+  this->SetName(this->world->StripWorldName(_msg.name()));
   if (_msg.has_pose())
     this->SetWorldPose(msgs::Convert(_msg.pose()));
   for (int i = 0; i < _msg.link_size(); i++)

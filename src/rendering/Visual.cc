@@ -51,7 +51,6 @@ Visual::Visual(const std::string &_name, VisualPtr _parent)
   this->sdf.reset(new sdf::Element);
   sdf::initFile("sdf/visual.sdf", this->sdf);
 
-  std::cout << "New Visual[" << _name << "] Parent[" << _parent->GetName() << "]\n";
   this->SetName(_name);
   this->sceneNode = NULL;
   this->animState = NULL;
@@ -165,13 +164,8 @@ void Visual::Fini()
 /////////////////////////////////////////////////
 VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 {
-  std::cout << "Visual::Clone. Orig[" << this->GetName() << "] New[" << _name << "]\n";
-
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->sdf);
-
-  this->sdf->PrintValues("");
-  //result->sdf->PrintValues("");
 
   std::vector<VisualPtr>::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
@@ -610,11 +604,6 @@ void Visual::SetScale(const math::Vector3 &_scale)
   {
     geomElem->GetElement("cylinder")->GetAttribute("radius")->Set(_scale.x/2.0);
     geomElem->GetElement("cylinder")->GetAttribute("length")->Set(_scale.z);
-
-    std::cout << "Cylinder Set Scale[" <<_scale.x << ", " << _scale.z << "]\n";
-    std::cout << "Cylinder Size[" <<
-     geomElem->GetElement("cylinder")->GetAttribute("radius")->GetAsString() << ", " << 
-     geomElem->GetElement("cylinder")->GetAttribute("length")->GetAsString() << "\n";
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetAttribute("scale")->Set(_scale);

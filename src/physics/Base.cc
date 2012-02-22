@@ -210,7 +210,7 @@ BasePtr Base::GetChild(unsigned int _i) const
 //////////////////////////////////////////////////
 BasePtr Base::GetChild(const std::string &_name)
 {
-  std::string fullName = this->GetCompleteScopedName() + "::" + _name;
+  std::string fullName = this->GetScopedName() + "::" + _name;
   return this->GetByName(fullName);
 }
 
@@ -222,7 +222,7 @@ void Base::RemoveChild(const std::string &_name)
   for (iter = this->children.begin();
        iter != this->childrenEnd; ++iter)
   {
-    if ((*iter)->GetCompleteScopedName() == _name)
+    if ((*iter)->GetScopedName() == _name)
       break;
   }
 
@@ -263,8 +263,7 @@ BasePtr Base::GetById(unsigned int _id) const
 //////////////////////////////////////////////////
 BasePtr Base::GetByName(const std::string &_name)
 {
-  if (this->GetCompleteScopedName() == _name ||
-      this->GetName() == _name)
+  if (this->GetScopedName() == _name || this->GetName() == _name)
     return shared_from_this();
 
   BasePtr result;
@@ -289,7 +288,6 @@ std::string Base::GetScopedName() const
       scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
-  scopedName.insert(0, this->world->GetName()+"::");
 
   return scopedName;
 }

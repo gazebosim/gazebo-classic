@@ -61,15 +61,14 @@ Sensor::~Sensor()
 }
 
 //////////////////////////////////////////////////
-void Sensor::Load(sdf::ElementPtr _sdf)
+void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
-  this->sdf->PrintValues("");
-  this->Load();
+  this->Load(_worldName);
 }
 
 //////////////////////////////////////////////////
-void Sensor::Load()
+void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("origin"))
   {
@@ -79,10 +78,7 @@ void Sensor::Load()
   if (this->sdf->GetValueBool("always_on"))
     this->SetActive(true);
 
-  size_t colonIndex = this->parentName.find("::");
-
-  std::string worldName = this->parentName.substr(0, colonIndex);
-  this->world = physics::get_world(worldName);
+  this->world = physics::get_world(_worldName);
   this->lastUpdateTime = this->world->GetSimTime();
 
   this->node->Init(this->world->GetName());

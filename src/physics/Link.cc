@@ -125,7 +125,6 @@ void Link::Load(sdf::ElementPtr _sdf)
       if (iter != this->visuals.end())
         gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
 
-      std::cout << "Visual[" << msg.DebugString() << "]\n";
       this->visuals.push_back(msg.name());
 
       visualElem = visualElem->GetNextElement();
@@ -150,7 +149,8 @@ void Link::Load(sdf::ElementPtr _sdf)
     while (sensorElem)
     {
       std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetScopedName());
+        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+                               this->GetScopedName());
       this->sensors.push_back(sensorName);
       sensorElem = sensorElem->GetNextElement();
     }

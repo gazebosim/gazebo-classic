@@ -54,8 +54,10 @@ namespace gazebo
 
       /// Load the ray using parameter from an SDF
       /// \param node The XMLConfig node
-      public: virtual void Load(sdf::ElementPtr _sdf);
-      public: virtual void Load();
+      public: virtual void Load(const std::string &_worldName,
+                                sdf::ElementPtr _sdf);
+
+      public: virtual void Load(const std::string &_worldName);
 
       /// Initialize the ray
       public: virtual void Init();

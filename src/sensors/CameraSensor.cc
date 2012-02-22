@@ -58,15 +58,15 @@ void CameraSensor::SetParent(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::Load(sdf::ElementPtr _sdf)
+void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  Sensor::Load(_sdf);
+  Sensor::Load(_worldName, _sdf);
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::Load()
+void CameraSensor::Load(const std::string &_worldName)
 {
-  Sensor::Load();
+  Sensor::Load(_worldName);
   this->poseSub = this->node->Subscribe("~/pose",
                                         &CameraSensor::OnPose, this);
 }

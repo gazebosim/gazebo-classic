@@ -584,7 +584,7 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 //////////////////////////////////////////////////
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
-  EntityPtr onEntity = this->GetWorld()->GetEntityByName(_entityName);
+  EntityPtr onEntity = this->GetWorld()->GetEntity(_entityName);
   math::Box box = this->GetCollisionBoundingBox();
   math::Box onBox = onEntity->GetCollisionBoundingBox();
 

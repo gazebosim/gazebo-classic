@@ -179,6 +179,9 @@ namespace gazebo
       /// \brief Insert a model using SDF
       public: void InsertModel(const sdf::SDF &_sdf);
 
+      /// \brief Return a version of the name with "<world_name>::" removed
+      public: std::string StripWorldName(const std::string &_name) const;
+
       /// \brief Create all entities
       /// \param _sdf SDF element
       /// \param parent Parent of the model to load

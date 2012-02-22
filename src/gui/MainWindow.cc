@@ -650,5 +650,3 @@ void MainWindow::OnWorldModify(
   else if (_msg->has_create() && _msg->create())
     this->renderWidget->CreateScene(_msg->world_name());
 }
-
-

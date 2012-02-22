@@ -434,7 +434,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   model->SetWorld(shared_from_this());
   model->Load(_sdf);
 
-  event::Events::addEntity(model->GetCompleteScopedName());
+  event::Events::addEntity(model->GetScopedName());
 
   msgs::Model msg;
   model->FillModelMsg(msg);
@@ -547,7 +547,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
   if (this->selectedEntity)
   {
     msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetCompleteScopedName());
+    msg.set_name(this->selectedEntity->GetScopedName());
     msg.set_selected(false);
     this->selectionPub->Publish(msg);
 
@@ -562,7 +562,7 @@ void World::SetSelectedEntityCB(const std::string &_name)
     this->selectedEntity->SetSelected(true);
 
     msg.set_id(this->selectedEntity->GetId());
-    msg.set_name(this->selectedEntity->GetCompleteScopedName());
+    msg.set_name(this->selectedEntity->GetScopedName());
     msg.set_selected(true);
 
     this->selectionPub->Publish(msg);
@@ -712,7 +712,6 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
   {
     if (_entity->HasType(Entity::MODEL))
     {
-      std::cout << "World::BuildSceneMsg[" << _entity->GetName() << "]\n";
       msgs::Model *modelMsg = _scene.add_model();
       boost::shared_static_cast<Model>(_entity)->FillModelMsg(*modelMsg);
     }
@@ -962,7 +961,6 @@ void World::ProcessFactoryMsgs()
       }
 
       factorySDF->root->GetElement("model")->GetAttribute("name")->Set(newName);
-      factorySDF->PrintValues();
     }
     else
     {
@@ -1078,4 +1076,13 @@ void World::InsertModel(const sdf::SDF &_sdf)
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
   this->factoryMsgs.push_back(msg);
+}
+
+//////////////////////////////////////////////////
+std::string World::StripWorldName(const std::string &_name) const
+{
+  if (_name.find(this->GetName() + "::") == 0)
+    return _name.substr(this->GetName().size() + 2);
+  else
+    return _name;
 }
