@@ -76,7 +76,7 @@ MainWindow::MainWindow()
   this->setDockOptions(QMainWindow::ForceTabbedDocks |
                        QMainWindow::AllowTabbedDocks |
                        QMainWindow::AnimatedDocks);
-                       //QMainWindow::VerticalTabs);
+                       // QMainWindow::VerticalTabs);
 
   this->modelsDock = new QDockWidget(tr("Models"), this);
   this->modelsDock->setAllowedAreas(Qt::LeftDockWidgetArea);
@@ -123,7 +123,6 @@ MainWindow::MainWindow()
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1)));
-
 }
 
 /////////////////////////////////////////////////
@@ -186,12 +185,17 @@ void MainWindow::Save()
   this->serverControlPub->Publish(msg);
 }
 
+/////////////////////////////////////////////////
 void MainWindow::About()
 {
-  QMessageBox::about(this, tr("About Gazebo"),
-      tr("Gazebo is a 3D multi-robot simulator with dynamics. It is capable of simulating articulated robot in complex and realistic environments.\n Visit http://www.gazebosim.org for more information. "));
+  std::string helpTxt = "Gazebo is a 3D multi-robot simulator with dynamics. ";
+  helpTxt += "It is capable of simulating articulated robot in complex and ";
+  helpTxt += "realistic environments.\n Visit http://www.gazebosim.org for ";
+  helpTxt += "more information.";
+  QMessageBox::about(this, tr("About Gazebo"), tr(helpTxt.c_str()));
 }
 
+/////////////////////////////////////////////////
 void MainWindow::Play()
 {
   msgs::WorldControl msg;
@@ -479,7 +483,7 @@ void MainWindow::CreateToolbars()
   this->editToolbar->addAction(this->boxCreateAct);
   this->editToolbar->addAction(this->sphereCreateAct);
   this->editToolbar->addAction(this->cylinderCreateAct);
-  //this->editToolbar->addAction(this->meshCreateAct);
+  // this->editToolbar->addAction(this->meshCreateAct);
   this->editToolbar->addSeparator();
   this->editToolbar->addAction(this->pointLghtCreateAct);
   this->editToolbar->addAction(this->spotLghtCreateAct);

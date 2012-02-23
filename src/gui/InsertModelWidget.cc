@@ -210,7 +210,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
         linkElem = linkElem->GetNextElement();
       }
     }
-    catch (common::Exception &_e)
+    catch(common::Exception &_e)
     {
       printf("Error\n");
       this->visuals.clear();

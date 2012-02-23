@@ -130,10 +130,10 @@ namespace gazebo
       public: static event::EventT<void ()> orbit;
 
       public: static event::EventT<void (std::string)> keyPress;
-      public: static event::EventT<
-              void (const common::MouseEvent &)> mousePress;
-      public: static event::EventT<
-              void (const common::MouseEvent &)> mouseRelease;
+      public: static event::EventT<void (const common::MouseEvent &)>
+              mousePress;
+      public: static event::EventT<void (const common::MouseEvent &)>
+              mouseRelease;
     };
   }
 }

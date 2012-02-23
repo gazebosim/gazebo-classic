@@ -345,7 +345,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
     math::Vector3 pp;
     if (!this->userCamera->GetWorldPointOnPlane(
           this->mouseEvent.pos.x, this->mouseEvent.pos.y,
-          math::Plane(math::Vector3(0, 0, 1)),pp))
+          math::Plane(math::Vector3(0, 0, 1)), pp))
     {
       gzerr << "Unable to get Point on plane....\n";
     }
@@ -581,7 +581,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   {
     QCursor::setPos(this->onShiftMousePos);
   }
- 
+
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
 

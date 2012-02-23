@@ -409,7 +409,7 @@ void Connection::Cancel()
     {
       this->socket->cancel();
     }
-    catch (...)
+    catch(...)
     {
       this->socket->close();
     }

@@ -138,7 +138,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   norm.Set(0, 0, 1);
 
   if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y, 
+                                          this->mousePushPos.y,
                                           math::Plane(norm), p1))
   {
     gzerr << "Invalid mouse point\n";

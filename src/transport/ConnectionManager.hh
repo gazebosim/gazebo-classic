@@ -21,6 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <list>
+#include <vector>
 
 #include "msgs/msgs.h"
 #include "common/SingletonT.hh"

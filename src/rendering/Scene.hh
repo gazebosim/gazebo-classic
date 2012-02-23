@@ -224,9 +224,9 @@ namespace gazebo
       public: void SetGrid(bool _enabled);
 
       public: VisualPtr GetWorldVisual() const;
-              
+
       /// \brief Clone a visual
-      public: VisualPtr CloneVisual(const std::string _visualName,
+      public: VisualPtr CloneVisual(const std::string &_visualName,
                                     const std::string &_newName);
 
 

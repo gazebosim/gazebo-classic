@@ -1155,7 +1155,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   {
     QtVariantProperty *prop;
     prop = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(),"sensor");
+        QtVariantPropertyManager::groupTypeId(), "sensor");
     prop->setToolTip(tr(_msg.sensor(i).name().c_str()));
     _parent->addSubProperty(prop);
     // this->FillPropertyTree(_msg.sensor(i), prop);

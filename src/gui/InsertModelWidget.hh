@@ -18,6 +18,7 @@
 #define INSERT_MODEL_WIDGET_HH
 
 #include <list>
+#include <vector>
 
 #include "gui/qt.h"
 #include "sdf/sdf.h"
@@ -46,7 +47,7 @@ namespace gazebo
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
-      /// \brief Used to spawn the selected model when the left mouse 
+      /// \brief Used to spawn the selected model when the left mouse
       /// button is released.
       private: void OnMouseRelease(const common::MouseEvent &_event);
 

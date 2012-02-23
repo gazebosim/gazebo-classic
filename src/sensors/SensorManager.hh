@@ -26,6 +26,7 @@
 #include <boost/thread.hpp>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "common/SingletonT.hh"
 #include "sensors/SensorTypes.hh"

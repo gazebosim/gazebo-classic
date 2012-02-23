@@ -578,7 +578,7 @@ void QtTreePropertyBrowserPrivate::updateItem(QTreeWidgetItem *item)
   else
     item->setText(1, property->toolTip());
   item->setIcon(0, expandIcon);
-  //item->setFirstColumnSpanned(!property->hasValue());
+  // item->setFirstColumnSpanned(!property->hasValue());
   item->setToolTip(0, property->propertyName());
   item->setStatusTip(0, property->statusTip());
   item->setWhatsThis(0, property->whatsThis());

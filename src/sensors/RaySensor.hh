@@ -23,6 +23,7 @@
 #define RAYSENSOR_HH
 
 #include <vector>
+#include <string>
 
 #include "math/Angle.hh"
 #include "math/Pose.hh"

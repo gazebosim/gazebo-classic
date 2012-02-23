@@ -1557,7 +1557,7 @@ void Scene::SetGrid(bool _enabled)
 }
 
 /////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string _visualName,
+VisualPtr Scene::CloneVisual(const std::string &_visualName,
                              const std::string &_newName)
 {
   VisualPtr result;
